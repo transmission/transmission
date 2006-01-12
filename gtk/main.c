@@ -159,7 +159,7 @@ main(int argc, char **argv) {
 
   tr = tr_init();
 
-  if(cf_init(tr_getPrefsDirectory(tr), &err)) {
+  if(cf_init(tr_getPrefsDirectory(), &err)) {
     if(cf_lock(&err)) {
       /* create main window now so any error dialogs can be it's children */
       mainwind = gtk_window_new(GTK_WINDOW_TOPLEVEL);

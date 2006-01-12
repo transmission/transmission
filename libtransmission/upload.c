@@ -45,16 +45,16 @@ tr_upload_t * tr_uploadInit()
 
 void tr_uploadSetLimit( tr_upload_t * u, int limit )
 {
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     u->limit = limit;
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 }
 
 int tr_uploadCanUnchoke( tr_upload_t * u )
 {
     int ret;
 
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     if( u->limit < 0 )
     {
         /* Infinite number of slots */
@@ -65,23 +65,23 @@ int tr_uploadCanUnchoke( tr_upload_t * u )
         /* One slot per 2 KB/s */
         ret = ( u->count < ( u->limit + 1 ) / 2 );
     }
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 
     return ret;
 }
 
 void tr_uploadChoked( tr_upload_t * u )
 {
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     (u->count)--;
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 }
 
 void tr_uploadUnchoked( tr_upload_t * u )
 {
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     (u->count)++;
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 }
 
 int tr_uploadCanUpload( tr_upload_t * u )
@@ -89,7 +89,7 @@ int tr_uploadCanUpload( tr_upload_t * u )
     int ret, i, size;
     uint64_t now;
 
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     if( u->limit < 0 )
     {
         /* No limit */
@@ -114,23 +114,23 @@ int tr_uploadCanUpload( tr_upload_t * u )
             }
         }
     }
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 
     return ret;
 }
 
 void tr_uploadUploaded( tr_upload_t * u, int size )
 {
-    tr_lockLock( u->lock );
+    tr_lockLock( &u->lock );
     memmove( &u->dates[1], &u->dates[0], (FOO-1) * sizeof( uint64_t ) );
     memmove( &u->sizes[1], &u->sizes[0], (FOO-1) * sizeof( int ) );
     u->dates[0] = tr_date();
     u->sizes[0] = size;
-    tr_lockUnlock( u->lock );
+    tr_lockUnlock( &u->lock );
 }
 
 void tr_uploadClose( tr_upload_t * u )
 {
-    tr_lockClose( u->lock );
+    tr_lockClose( &u->lock );
     free( u );
 }

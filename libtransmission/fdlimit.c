@@ -104,7 +104,7 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
     int i, winner;
     uint64_t date;
 
-    tr_lockLock( f->lock );
+    tr_lockLock( &f->lock );
 
     /* Is it already open? */
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
@@ -115,9 +115,9 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
             if( f->open[i].status & STATUS_CLOSING )
             {
                 /* Wait until the file is closed */
-                tr_lockUnlock( f->lock );
+                tr_lockUnlock( &f->lock );
                 tr_wait( 10 );
-                tr_lockLock( f->lock );
+                tr_lockLock( &f->lock );
                 i = -1;
                 continue;
             }
@@ -162,16 +162,16 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
                and we don't want to block other threads */
             tr_dbg( "Closing %s", f->open[winner].path );
             f->open[winner].status = STATUS_CLOSING;
-            tr_lockUnlock( f->lock );
+            tr_lockUnlock( &f->lock );
             fclose( f->open[winner].file );
-            tr_lockLock( f->lock );
+            tr_lockLock( &f->lock );
             goto open;
         }
 
         /* All used! Wait a bit and try again */
-        tr_lockUnlock( f->lock );
+        tr_lockUnlock( &f->lock );
         tr_wait( 10 );
-        tr_lockLock( f->lock );
+        tr_lockLock( &f->lock );
     }
 
 open:
@@ -182,7 +182,7 @@ open:
 done:
     f->open[winner].status = STATUS_USED;
     f->open[winner].date   = tr_date();
-    tr_lockUnlock( f->lock );
+    tr_lockUnlock( &f->lock );
     
     return f->open[winner].file;
 }
@@ -193,7 +193,7 @@ done:
 void tr_fdFileRelease( tr_fd_t * f, FILE * file )
 {
     int i;
-    tr_lockLock( f->lock );
+    tr_lockLock( &f->lock );
 
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
     {
@@ -204,7 +204,7 @@ void tr_fdFileRelease( tr_fd_t * f, FILE * file )
         }
     }
     
-    tr_lockUnlock( f->lock );
+    tr_lockUnlock( &f->lock );
 }
 
 /***********************************************************************
@@ -214,7 +214,7 @@ void tr_fdFileClose( tr_fd_t * f, char * path )
 {
     int i;
 
-    tr_lockLock( f->lock );
+    tr_lockLock( &f->lock );
 
     /* Is it already open? */
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
@@ -232,14 +232,14 @@ void tr_fdFileClose( tr_fd_t * f, char * path )
         }
     }
 
-    tr_lockUnlock( f->lock );
+    tr_lockUnlock( &f->lock );
 }
 
 int tr_fdSocketWillCreate( tr_fd_t * f, int reserved )
 {
     int ret;
 
-    tr_lockLock( f->lock );
+    tr_lockLock( &f->lock );
 
     if( reserved )
     {
@@ -266,14 +266,14 @@ int tr_fdSocketWillCreate( tr_fd_t * f, int reserved )
         }
     }
 
-    tr_lockUnlock( f->lock );
+    tr_lockUnlock( &f->lock );
 
     return ret;
 }
 
 void tr_fdSocketClosed( tr_fd_t * f, int reserved )
 {
-    tr_lockLock( f->lock );
+    tr_lockLock( &f->lock );
 
     if( reserved )
     {
@@ -284,12 +284,12 @@ void tr_fdSocketClosed( tr_fd_t * f, int reserved )
         (f->normal)--;
     }
 
-    tr_lockUnlock( f->lock );
+    tr_lockUnlock( &f->lock );
 }
 
 void tr_fdClose( tr_fd_t * f )
 {
-    tr_lockClose( f->lock );
+    tr_lockClose( &f->lock );
     free( f );
 }
 

@@ -1,5 +1,3 @@
-#ifndef TR_PLATFORM_H
-#define TR_PLATFORM_H 1
 /******************************************************************************
  * Copyright (c) 2005 Eric Petit
  *
@@ -21,22 +19,40 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
-
-#include "transmission.h"
-
+#ifndef TR_PLATFORM_H
+#define TR_PLATFORM_H 1
 
 #ifdef SYS_BEOS
-  #include <fs_info.h>
-  #include <FindDirectory.h>
+  #include <kernel/OS.h>
+  typedef thread_id tr_thread_t;
+  typedef sem_id    tr_lock_t;
+#else
+  #include <pthread.h>
+  typedef pthread_t       tr_thread_t;
+  typedef pthread_mutex_t tr_lock_t;
 #endif
 
-/***********************************************************************
- * tr_init_platform
- ***********************************************************************
- * Performs some platform specific initialization.
- **********************************************************************/
-void tr_init_platform( tr_handle_t *h );
+void tr_threadCreate ( tr_thread_t *, void (*func)(void *), void * arg );
+void tr_threadJoin   ( tr_thread_t * );
+void tr_lockInit     ( tr_lock_t * );
+void tr_lockClose    ( tr_lock_t * );
 
+static inline void tr_lockLock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    acquire_sem( *l );
+#else
+    pthread_mutex_lock( l );
+#endif
+}
 
+static inline void tr_lockUnlock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    release_sem( *l );
+#else
+    pthread_mutex_unlock( l );
+#endif
+}
 
 #endif

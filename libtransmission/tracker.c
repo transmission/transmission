@@ -440,7 +440,7 @@ static void recvAnswer( tr_tracker_t * tc )
         {
             tr_err( "Tracker: \"peers\" of size %d",
                     bePeers->val.s.i );
-            tr_lockUnlock( tor->lock );
+            tr_lockUnlock( &tor->lock );
             goto cleanup;
         }
 

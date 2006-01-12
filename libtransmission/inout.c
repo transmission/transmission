@@ -368,7 +368,7 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
 
     /* Release the torrent lock so the UI can still update itself if
        this blocks for a while */
-    tr_lockUnlock( tor->lock );
+    tr_lockUnlock( &tor->lock );
 
     /* We don't ever read or write more than a piece at a time */
     if( tr_pieceSize( piece ) < begin + size )
@@ -439,11 +439,11 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         buf    += cur;
     }
 
-    tr_lockLock( tor->lock );
+    tr_lockLock( &tor->lock );
     return 0;
 
 fail:
-    tr_lockLock( tor->lock );
+    tr_lockLock( &tor->lock );
     return 1;
 }
 

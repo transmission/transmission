@@ -1,7 +1,7 @@
 AUTHORS for Transmission <http://transmission.m0k.org/>
 =======================================================
 
-Transmission is written is maintained by:
+Transmission is written and maintained by:
 
 Eric Petit <titer@m0k.org>
  + Back-end
@@ -44,3 +44,6 @@ Martin Stadtmueller
 
 John Blitch
  + Contextual menu patch
+
+Mitchell Livingston
+ + OS X patches

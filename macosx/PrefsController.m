@@ -27,8 +27,8 @@
 #define MAX_PORT            65535
 
 #define DOWNLOAD_FOLDER     0
-#define DOWNLOAD_TORRENT    1
-#define DOWNLOAD_ASK        2
+#define DOWNLOAD_TORRENT    2
+#define DOWNLOAD_ASK        3
 
 #define TOOLBAR_GENERAL     @"General"
 #define TOOLBAR_NETWORK     @"Network"
@@ -58,7 +58,7 @@
         - Always download to Desktop
         - Port TR_DEFAULT_PORT
         - Upload limit DEFAULT_UPLOAD
-        - Do not limit upload
+        - Limit upload
         - Ask before quitting
         - Ask before removing */
     desktop = [NSHomeDirectory() stringByAppendingString: @"/Desktop"];
@@ -105,18 +105,17 @@
 
     if( [downloadChoice isEqualToString: @"Constant"] )
     {
-        [fFolderMatrix selectCellAtRow: DOWNLOAD_FOLDER column: 0];
+        [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
     }
     else if( [downloadChoice isEqualToString: @"Torrent"] )
     {
-        [fFolderMatrix selectCellAtRow: DOWNLOAD_TORRENT column: 0];
+        [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
     }
     else
     {
-        [fFolderMatrix selectCellAtRow: DOWNLOAD_ASK column: 0];
+        [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
     }
     [self updatePopUp];
-    [fFolderPopUp setEnabled: [fFolderMatrix selectedRow] == 0];
 
     //set bind port
     int bindPort = [fDefaults integerForKey: @"BindPort"];
@@ -269,7 +268,7 @@
 - (void) setDownloadLocation: (id) sender
 {
     //Download folder
-    switch( [fFolderMatrix selectedRow] )
+    switch( [fFolderPopUp indexOfSelectedItem] )
     {
         case DOWNLOAD_FOLDER:
             [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
@@ -281,7 +280,6 @@
             [fDefaults setObject: @"Ask" forKey: @"DownloadChoice"];
             break;
     }
-    [fFolderPopUp setEnabled: [fFolderMatrix selectedRow] == 0];
 }
 
 - (void) folderSheetShow: (id) sender
@@ -330,18 +328,35 @@
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code
     contextInfo: (void *) info
 {
-    [fFolderPopUp selectItemAtIndex: 0];
+   if (code == NSOKButton)
+   {
+       [fDownloadFolder release];
+       fDownloadFolder = [[openPanel filenames] objectAtIndex: 0];
+       [fDownloadFolder retain];
 
-    if (code != NSOKButton)
-        return;
+       [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+       [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
+       [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
 
-    [fDownloadFolder release];
-    fDownloadFolder = [[openPanel filenames] objectAtIndex: 0];
-    [fDownloadFolder retain];
-    
-    [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
-
-    [self updatePopUp];
+       [self updatePopUp];
+   }
+   else
+   {
+       //reset if cancelled
+       NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
+       if( [downloadChoice isEqualToString: @"Constant"] )
+       {
+           [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+       }
+       else if( [downloadChoice isEqualToString: @"Torrent"] )
+       {
+           [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
+       }
+       else
+       {
+           [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
+       }
+   }
 }
 
 - (void) updatePopUp

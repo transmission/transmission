@@ -20,40 +20,109 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "platform.h"
+#ifdef SYS_BEOS
+  #include <fs_info.h>
+  #include <FindDirectory.h>
+#endif
+#ifdef SYS_DARWIN
+  #include <sys/types.h>
+  #include <dirent.h>
+#endif
+
+#include "transmission.h"
+
+char * tr_getPrefsDirectory()
+{
+    static char prefsDirectory[MAX_PATH_LENGTH];
+    static int  init = 0;
+
+    if( init )
+    {
+        return prefsDirectory;
+    }
 
 #ifdef SYS_BEOS
-/***********************************************************************
- * tr_init_beos
- ***********************************************************************
- * Puts the prefsDirectory in the right place.
- **********************************************************************/
-void tr_init_beos( tr_handle_t * h )
-{
-	int32 length = 0;
-	char path[B_FILE_NAME_LENGTH];
-	
 	find_directory( B_USER_SETTINGS_DIRECTORY, dev_for_path("/boot"),
-	                true, path, length );
-	
-	snprintf( h->prefsDirectory, B_FILE_NAME_LENGTH,
-	          "%s/Transmission", path );
-	mkdir( h->prefsDirectory, 0755 );
-}
+	                true, prefsDirectory, MAX_PATH_LENGTH );
+	strcat( prefsDirectory, "/Transmission" );
+#elif defined( SYS_DARWIN )
+    snprintf( prefsDirectory, MAX_PATH_LENGTH,
+              "%s/Library/Caches/Transmission", getenv( "HOME" ) );
+#else
+    snprintf( prefsDirectory, MAX_PATH_LENGTH, "%s/.transmission",
+              getenv( "HOME" ) );
 #endif
 
-/***********************************************************************
- * tr_init_platform
- ***********************************************************************
- * Setup the prefsDirectory for the current platform.
- **********************************************************************/
-void tr_init_platform( tr_handle_t *h )
+	mkdir( prefsDirectory, 0755 );
+    init = 1;
+
+#ifdef SYS_DARWIN
+    DIR * dirh;
+    struct dirent * dirp;
+    char oldDirectory[MAX_PATH_LENGTH];
+    char oldFile[MAX_PATH_LENGTH];
+    char newFile[MAX_PATH_LENGTH];
+    snprintf( oldDirectory, MAX_PATH_LENGTH, "%s/.transmission",
+              getenv( "HOME" ) );
+    if( ( dirh = opendir( oldDirectory ) ) )
+    {
+        while( ( dirp = readdir( dirh ) ) )
+        {
+            if( !strcmp( ".", dirp->d_name ) ||
+                !strcmp( "..", dirp->d_name ) )
+            {
+                continue;
+            }
+            snprintf( oldFile, MAX_PATH_LENGTH, "%s/%s",
+                      oldDirectory, dirp->d_name );
+            snprintf( newFile, MAX_PATH_LENGTH, "%s/%s",
+                      prefsDirectory, dirp->d_name );
+            rename( oldFile, newFile );
+        }
+
+        closedir( dirh );
+        rmdir( oldDirectory );
+    }
+#endif
+
+    return prefsDirectory;
+}
+
+void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg )
 {
 #ifdef SYS_BEOS
-	tr_init_beos( h );
+    *t = spawn_thread( (void *) func, "torrent-tx", arg );
+    resume_thread( *t );
 #else
-    snprintf( h->prefsDirectory, sizeof( h->prefsDirectory ),
-              "%s/.transmission", getenv( "HOME" ) );
-    mkdir( h->prefsDirectory, 0755 );
+    pthread_create( t, NULL, (void *) func, arg );
 #endif
 }
+
+void tr_threadJoin( tr_thread_t * t )
+{
+#ifdef SYS_BEOS
+    long exit;
+    wait_for_thread( *t, &exit );
+#else
+    pthread_join( *t, NULL );
+#endif
+}
+
+void tr_lockInit( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    *l = create_sem( 1, "" );
+#else
+    pthread_mutex_init( l, NULL );
+#endif
+}
+
+void tr_lockClose( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    delete_sem( *l );
+#else
+    pthread_mutex_destroy( l );
+#endif
+}
+

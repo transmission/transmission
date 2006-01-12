@@ -34,7 +34,6 @@
     IBOutlet NSView         * fNetworkView;
     IBOutlet NSView         * fBlankView;
     
-    IBOutlet NSMatrix       * fFolderMatrix;
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSTextField    * fPortField;
     IBOutlet NSButton       * fUploadCheck;

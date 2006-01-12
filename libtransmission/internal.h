@@ -71,30 +71,6 @@
 #define TR_NTOHL(p,a) (a) = ntohl(*((uint32_t*)(p)))
 #define TR_HTONL(a,p) *((uint32_t*)(p)) = htonl((a))
 
-/* Multithreading support: native threads on BeOS, pthreads elsewhere */
-#ifdef SYS_BEOS
-#  include <kernel/OS.h>
-#  define tr_thread_t             thread_id
-#  define tr_threadCreate(pt,f,d) *(pt) = spawn_thread((void*)f,"",10,d); \
-                                          resume_thread(*(pt));
-#  define tr_threadJoin(t)        { long e; wait_for_thread(t,&e); }
-#  define tr_lock_t               sem_id
-#  define tr_lockInit(pl)         *(pl) = create_sem(1,"")
-#  define tr_lockLock(l)          acquire_sem(l)
-#  define tr_lockUnlock(l)        release_sem(l)
-#  define tr_lockClose(l)         delete_sem(l)
-#else
-#  include <pthread.h>
-#  define tr_thread_t             pthread_t
-#  define tr_threadCreate(pt,f,d) pthread_create(pt,NULL,(void*)f,d)
-#  define tr_threadJoin(t)        pthread_join(t,NULL)
-#  define tr_lock_t               pthread_mutex_t
-#  define tr_lockInit(pl)         pthread_mutex_init(pl,NULL)
-#  define tr_lockLock(l)          pthread_mutex_lock(&l)
-#  define tr_lockUnlock(l)        pthread_mutex_unlock(&l)
-#  define tr_lockClose(l)         pthread_mutex_destroy(&l)
-#endif
-
 /* Sometimes the system defines MAX/MIN, sometimes not. In the latter
    case, define those here since we will use them */
 #ifndef MAX
@@ -109,6 +85,7 @@
 typedef struct tr_torrent_s tr_torrent_t;
 typedef struct tr_completion_s tr_completion_t;
 
+#include "platform.h"
 #include "bencode.h"
 #include "metainfo.h"
 #include "tracker.h"
@@ -171,8 +148,6 @@ struct tr_torrent_s
     uint64_t          dates[10];
     uint64_t          downloaded[10];
     uint64_t          uploaded[10];
-
-    char            * prefsDirectory;
 };
 
 #include "utils.h"
@@ -190,7 +165,6 @@ struct tr_handle_s
 
     char           id[21];
     char           key[21];
-    char           prefsDirectory[256];
 };
 
 #endif

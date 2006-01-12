@@ -22,12 +22,6 @@
 
 #include "transmission.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "platform.h"
-
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
@@ -73,19 +67,7 @@ tr_handle_t * tr_init()
 
     h->bindPort = TR_DEFAULT_PORT;
 
-    tr_init_platform( h );
-
     return h;
-}
-
-/***********************************************************************
- * tr_getPrefsDirectory
- ***********************************************************************
- *
- **********************************************************************/
-char * tr_getPrefsDirectory( tr_handle_t * h )
-{
-    return (char *) h->prefsDirectory;
 }
 
 /***********************************************************************
@@ -125,10 +107,10 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
     for( i = 0; i < h->torrentCount; i++ )
     {
         tor = h->torrents[i];
-        tr_lockLock( tor->lock );
+        tr_lockLock( &tor->lock );
         *dl += rateDownload( tor );
         *ul += rateUpload( tor );
-        tr_lockUnlock( tor->lock );
+        tr_lockUnlock( &tor->lock );
     }
 }
 
@@ -211,7 +193,6 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
 
     tor->upload  = h->upload;
     tor->fdlimit = h->fdlimit;
-    tor->prefsDirectory = (char *) h->prefsDirectory;
  
     /* We have a new torrent */
     h->torrents[h->torrentCount] = tor;
@@ -277,11 +258,11 @@ void tr_torrentStop( tr_handle_t * h, int t )
 {
     tr_torrent_t * tor = h->torrents[t];
 
-    tr_lockLock( tor->lock );
+    tr_lockLock( &tor->lock );
     tr_trackerStopped( tor->tracker );
     tor->status = TR_STATUS_STOPPING;
     tor->stopDate = tr_date();
-    tr_lockUnlock( tor->lock );
+    tr_lockUnlock( &tor->lock );
 }
 
 /***********************************************************************
@@ -294,7 +275,7 @@ static void torrentReallyStop( tr_handle_t * h, int t )
     tr_torrent_t * tor = h->torrents[t];
 
     tor->die = 1;
-    tr_threadJoin( tor->thread );
+    tr_threadJoin( &tor->thread );
     tr_dbg( "Thread joined" );
 
     tr_trackerClose( tor->tracker );
@@ -360,7 +341,7 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
             tor->status = TR_STATUS_PAUSE;
         }
 
-        tr_lockLock( tor->lock );
+        tr_lockLock( &tor->lock );
 
         memcpy( &s[i].info, &tor->info, sizeof( tr_info_t ) );
         s[i].status = tor->status;
@@ -434,7 +415,7 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
 
         s[i].folder = tor->destination;
 
-        tr_lockUnlock( tor->lock );
+        tr_lockUnlock( &tor->lock );
     }
 
     *stat = s;
@@ -459,7 +440,7 @@ void tr_torrentClose( tr_handle_t * h, int t )
 
     h->torrentCount--;
 
-    tr_lockClose( tor->lock );
+    tr_lockClose( &tor->lock );
     tr_cpClose( tor->completion );
 
     if( tor->destination )
@@ -492,13 +473,12 @@ static void downloadLoop( void * _tor )
     tr_dbg( "Thread started" );
 
 #ifdef SYS_BEOS
-	rename_thread(tor->thread, "torrent-tx");
     /* This is required because on BeOS, SIGINT is sent to each thread,
        which kills them not nicely */
     signal( SIGINT, SIG_IGN );
 #endif
 
-    tr_lockLock( tor->lock );
+    tr_lockLock( &tor->lock );
 
     tr_cpReset( tor->completion );
     tor->io     = tr_ioInit( tor );
@@ -534,13 +514,13 @@ static void downloadLoop( void * _tor )
         date2 = tr_date();
         if( date2 < date1 + 20 )
         {
-            tr_lockUnlock( tor->lock );
+            tr_lockUnlock( &tor->lock );
             tr_wait( date1 + 20 - date2 );
-            tr_lockLock( tor->lock );
+            tr_lockLock( &tor->lock );
         }
     }
 
-    tr_lockUnlock( tor->lock );
+    tr_lockUnlock( &tor->lock );
 
     tr_ioClose( tor->io );
 
@@ -580,7 +560,3 @@ static float rateUpload( tr_torrent_t * tor )
 {
     return rateGeneric( tor->dates, tor->uploaded );
 }
-
-#ifdef __cplusplus
-}
-#endif

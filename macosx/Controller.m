@@ -246,36 +246,21 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) showPreferenceWindow: (id) sender
 {
-    NSRect  mainFrame;
-    NSRect  prefsFrame;
-    NSRect  screenRect;
-    NSPoint point;
-
-    /* Place the window */
-    mainFrame  = [fWindow frame];
-    prefsFrame = [fPrefsWindow frame];
-    screenRect = [[NSScreen mainScreen] visibleFrame];
-    point.x    = mainFrame.origin.x + mainFrame.size.width / 2 -
-                    prefsFrame.size.width / 2;
-    point.y    = mainFrame.origin.y + mainFrame.size.height - 30;
-
-    /* Make sure it is in the screen */
-    if( point.x < screenRect.origin.x )
+    //place the window if not open
+    if (![fPrefsWindow isVisible])
     {
-        point.x = screenRect.origin.x;
-    }
-    if( point.x + prefsFrame.size.width >
-            screenRect.origin.x + screenRect.size.width )
-    {
-        point.x = screenRect.origin.x +
-            screenRect.size.width - prefsFrame.size.width;
-    }
-    if( point.y - prefsFrame.size.height < screenRect.origin.y )
-    {
-        point.y = screenRect.origin.y + prefsFrame.size.height;
-    }
+        NSRect  prefsFrame, screenRect;
+        NSPoint point;
 
-    [fPrefsWindow setFrameTopLeftPoint: point];
+        prefsFrame = [fPrefsWindow frame];
+        screenRect = [[NSScreen mainScreen] visibleFrame];
+        point.x    = (screenRect.size.width - prefsFrame.size.width) * 0.5;
+        point.y    = screenRect.origin.y + screenRect.size.height * 0.67 +
+                     prefsFrame.size.height * 0.33;
+
+        [fPrefsWindow setFrameTopLeftPoint: point];
+    }
+    
     [fPrefsWindow makeKeyAndOrderFront:NULL];
 }
 
@@ -309,37 +294,40 @@ static void sleepCallBack( void * controller, io_service_t y,
         if( tr_torrentInit( fHandle, [torrentPath UTF8String] ) )
             continue;
 
+        /* Add it to the "File > Open Recent" menu */
+        [[NSDocumentController sharedDocumentController]
+            noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
+
         if( [downloadChoice isEqualToString: @"Constant"] )
         {
             tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
                                  [downloadFolder UTF8String] );
             tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
-            continue;
         }
-
-        if( [downloadChoice isEqualToString: @"Torrent"] )
+        else if( [downloadChoice isEqualToString: @"Torrent"] )
         {
             tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
                 [[torrentPath stringByDeletingLastPathComponent] UTF8String] );
             tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
-            continue;
         }
+        else
+        {
+            NSOpenPanel * panel = [NSOpenPanel openPanel];
+           
+            [panel setPrompt: @"Select Download Folder"];
+            [panel setMessage: [NSString stringWithFormat:
+                                @"Select the download folder for %@",
+                                [torrentPath lastPathComponent]]];
+            [panel setAllowsMultipleSelection: NO];
+            [panel setCanChooseFiles: NO];
+            [panel setCanChooseDirectories: YES];
 
-        NSOpenPanel * panel = [NSOpenPanel openPanel];
-       
-        [panel setPrompt: @"Select Download Folder"];
-        [panel setMessage: [NSString stringWithFormat:
-                            @"Select the download folder for %@",
-                            [torrentPath lastPathComponent]]];
-        [panel setAllowsMultipleSelection: NO];
-        [panel setCanChooseFiles: NO];
-        [panel setCanChooseDirectories: YES];
-
-        [panel beginSheetForDirectory: NULL file: NULL types: NULL
-            modalForWindow: fWindow modalDelegate: self didEndSelector:
-            @selector( folderChoiceClosed:returnCode:contextInfo: )
-            contextInfo: NULL];
-        [NSApp runModalForWindow: panel];
+            [panel beginSheetForDirectory: NULL file: NULL types: NULL
+                modalForWindow: fWindow modalDelegate: self didEndSelector:
+                @selector( folderChoiceClosed:returnCode:contextInfo: )
+                contextInfo: NULL];
+            [NSApp runModalForWindow: panel];
+        }
     }
 
     [self updateUI: NULL];

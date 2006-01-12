@@ -70,7 +70,6 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fBlankView = NSView; 
-                fFolderMatrix = NSMatrix; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
                 fNetworkView = NSView; 

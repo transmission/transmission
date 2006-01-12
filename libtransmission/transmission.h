@@ -30,7 +30,7 @@ extern "C" {
 #include <inttypes.h>
 
 #define SHA_DIGEST_LENGTH    20
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 # include <StorageDefs.h>
 # define MAX_PATH_LENGTH B_FILE_NAME_LENGTH
 #else
@@ -57,7 +57,7 @@ tr_handle_t * tr_init();
  * store the resume files. The string belongs to libtransmission, do
  * not free it.
  **********************************************************************/
-char * tr_getPrefsDirectory( tr_handle_t * );
+char * tr_getPrefsDirectory();
 
 /***********************************************************************
  * tr_setBindPort
@@ -230,8 +230,8 @@ struct tr_stat_s
     int         peersUploading;
     int         peersDownloading;
     char        pieces[120];
-    int			seeders;
-	int			leechers;
+    int         seeders;
+    int         leechers;
 
     uint64_t    downloaded;
     uint64_t    uploaded;

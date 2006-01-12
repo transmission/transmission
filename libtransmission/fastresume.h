@@ -40,11 +40,10 @@
 
 static char * fastResumeFileName( tr_io_t * io )
 {
-    tr_torrent_t * tor = io->tor;
     char * ret, * p;
     int i;
 
-    asprintf( &ret, "%s/resume.%40d", tor->prefsDirectory, 0 );
+    asprintf( &ret, "%s/resume.%40d", tr_getPrefsDirectory(), 0 );
 
     p = &ret[ strlen( ret ) - 2 * SHA_DIGEST_LENGTH ];
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
