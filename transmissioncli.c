@@ -183,8 +183,8 @@ int main( int argc, char ** argv )
         else if( s[0].status & TR_STATUS_DOWNLOAD )
         {
             chars = snprintf( string, 80,
-                "Progress: %.2f %%, %d peer%s, dl from %d (%.2f kbps), "
-                "ul to %d (%.2f kbps)", 100.0 * s[0].progress,
+                "Progress: %.2f %%, %d peer%s, dl from %d (%.2f KB/s), "
+                "ul to %d (%.2f KB/s)", 100.0 * s[0].progress,
                 s[0].peersTotal, ( s[0].peersTotal == 1 ) ? "" : "s",
                 s[0].peersUploading, s[0].rateDownload,
                 s[0].peersDownloading, s[0].rateUpload );
@@ -192,7 +192,7 @@ int main( int argc, char ** argv )
         else if( s[0].status & TR_STATUS_SEED )
         {
             chars = snprintf( string, 80,
-                "Seeding, uploading to %d of %d peer(s), %.2f kbps",
+                "Seeding, uploading to %d of %d peer(s), %.2f KB/s",
                 s[0].peersDownloading, s[0].peersTotal,
                 s[0].rateUpload );
         }
