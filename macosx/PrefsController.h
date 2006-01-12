@@ -27,23 +27,35 @@
 
 {
     tr_handle_t * fHandle;
+    
+    IBOutlet NSPanel        * fPrefsWindow;
+    NSToolbar               * fToolbar;
+    IBOutlet NSView         * fGeneralView;
+    IBOutlet NSView         * fNetworkView;
+    IBOutlet NSView         * fBlankView;
+    
+    IBOutlet NSMatrix       * fFolderMatrix;
+    IBOutlet NSPopUpButton  * fFolderPopUp;
+    IBOutlet NSTextField    * fPortField;
+    IBOutlet NSButton       * fUploadCheck;
+    IBOutlet NSTextField    * fUploadField;
+    IBOutlet NSButton       * fQuitCheck;
+    IBOutlet NSButton       * fRemoveCheck;
+    
+    IBOutlet NSWindow       * fWindow;
 
-    IBOutlet NSWindow      * fWindow;
-    IBOutlet NSWindow      * fPrefsWindow;
-    IBOutlet NSMatrix      * fFolderMatrix;
-    IBOutlet NSPopUpButton * fFolderPopUp;
-    IBOutlet NSTextField   * fPortField;
-    IBOutlet NSButton      * fUploadCheck;
-    IBOutlet NSTextField   * fUploadField;
-
-    NSString               * fDownloadFolder;
+    NSString                * fDownloadFolder;
+    NSUserDefaults          * fDefaults;
 }
 
-- (void) setHandle: (tr_handle_t *) handle;
-- (void) show:      (id) sender;
-- (void) ratio:     (id) sender;
-- (void) check:     (id) sender;
-- (void) cancel:    (id) sender;
-- (void) save:      (id) sender;
+- (void) setPrefsWindow: (tr_handle_t *) handle;
+
+- (void) setLimitUploadCheck:   (id) sender;
+- (void) setPort:               (id) sender;
+- (void) setUploadLimit:        (id) sender;
+- (void) setQuitMessage:        (id) sender;
+- (void) setRemoveMessage:  (id) sender;
+- (void) setDownloadLocation:   (id) sender;
+- (void) folderSheetShow:       (id) sender;
 
 @end

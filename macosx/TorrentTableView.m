@@ -56,7 +56,6 @@
     return rect;
 }
 
-
 - (BOOL) pointInPauseRect: (NSPoint) point
 {
     return NSPointInRect( point, [self pauseRectForRow:
@@ -114,15 +113,10 @@
 
     point = [self convertPoint: [e locationInWindow] fromView: NULL];
     row = [self rowAtPoint: point];
+    
+    [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-    if( row < 0 )
-    {
-        return NULL;
-    }
-
-    [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-        byExtendingSelection: NO];
-    return [fController menuForIndex: row];
+    return row >= 0 ? fContextRow : fContextNoRow;
 }
 
 - (void) drawRect: (NSRect) r

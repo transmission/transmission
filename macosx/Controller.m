@@ -27,19 +27,18 @@
 #include "Utils.h"
 #include "TorrentTableView.h"
 
+#import "PrefsController.h"
+
 #define TOOLBAR_OPEN        @"Toolbar Open"
 #define TOOLBAR_REMOVE      @"Toolbar Remove"
-#define TOOLBAR_PREFS       @"Toolbar Preferences"
 #define TOOLBAR_INFO        @"Toolbar Info"
 #define TOOLBAR_PAUSE_ALL   @"Toolbar Pause All"
 #define TOOLBAR_RESUME_ALL  @"Toolbar Resume All"
 
-#define CONTEXT_PAUSE           1
-#define CONTEXT_REMOVE          2
-#define CONTEXT_REMOVE_TORRENT  3
-#define CONTEXT_REMOVE_DATA     4
-#define CONTEXT_REMOVE_BOTH     5
-#define CONTEXT_INFO            6                                              
+#define WEBSITE_URL     @"http://transmission.m0k.org/"
+#define FORUM_URL       @"http://transmission.m0k.org/forum/"
+
+#define GROWL_PATH  @"/Library/PreferencePanes/Growl.prefPane/Contents/Resources/GrowlHelperApp.app"
 
 static void sleepCallBack( void * controller, io_service_t y,
         natural_t messageType, void * messageArgument )
@@ -52,103 +51,88 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) awakeFromNib
 {
+    [fWindow setContentMinSize: NSMakeSize( 400, 120 )];
+    
     fHandle = tr_init();
 
-    [fPrefsController setHandle: fHandle];
+    [fPrefsController setPrefsWindow: fHandle];
+    fDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [fInfoPanel setFrameAutosaveName:@"InfoPanel"];
 
-    [fWindow setContentMinSize: NSMakeSize( 400, 120 )];
-
-    /* Check or uncheck menu item in respect to current preferences */
-    [fAdvancedBarItem setState: [[NSUserDefaults standardUserDefaults]
+    //check advanced bar menu item
+    [fAdvancedBarItem setState: [fDefaults
         boolForKey:@"UseAdvancedBar"] ? NSOnState : NSOffState];
     
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
     [fToolbar setAllowsUserCustomization: YES];
     [fToolbar setAutosavesConfiguration: YES];
-    [fWindow  setToolbar:  fToolbar];
-    [fWindow  setDelegate: self];
+    [fWindow setToolbar: fToolbar];
+    [fWindow setDelegate: self];
 
     NSTableColumn * tableColumn;
-    NameCell      * nameCell;
-    ProgressCell  * progressCell;
+    NameCell * nameCell = [[NameCell alloc] init];
+    ProgressCell * progressCell = [[ProgressCell alloc] init];
 
-    nameCell     = [[NameCell     alloc] init];
-    progressCell = [[ProgressCell alloc] init];
     tableColumn  = [fTableView tableColumnWithIdentifier: @"Name"];
     [tableColumn setDataCell: nameCell];
-    [tableColumn setMinWidth: 10.0];
-    [tableColumn setMaxWidth: 3000.0];
 
     tableColumn  = [fTableView tableColumnWithIdentifier: @"Progress"];
     [tableColumn setDataCell: progressCell];
-    [tableColumn setMinWidth: 134.0];
-    [tableColumn setMaxWidth: 134.0];
 
     [fTableView setAutosaveTableColumns: YES];
-    [fTableView sizeToFit];
+    //[fTableView sizeToFit];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObjects:
         NSFilenamesPboardType, NULL]];
 
+    //Register for sleep notifications
     IONotificationPortRef  notify;
     io_object_t            anIterator;
 
-    /* Register for sleep notifications */
-    fRootPort = IORegisterForSystemPower( self, &notify, sleepCallBack,
-                                          &anIterator);
-    if( !fRootPort )
-    {
-        printf( "Could not IORegisterForSystemPower\n" );
-    }
-    else
+    fRootPort = IORegisterForSystemPower( self, & notify, sleepCallBack,
+                                          & anIterator);
+    if (fRootPort)
     {
         CFRunLoopAddSource( CFRunLoopGetCurrent(),
                             IONotificationPortGetRunLoopSource( notify ),
                             kCFRunLoopCommonModes );
     }
+    else
+        printf( "Could not IORegisterForSystemPower\n" );
 
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    NSString * torrentPath, * downloadFolder, * paused;
+    NSDictionary * dic;
 
-    NSArray * history = [defaults arrayForKey: @"History"];
-    if( history )
+    NSEnumerator * enumerator = [[fDefaults arrayForKey: @"History"] objectEnumerator];
+    while ((dic = [enumerator nextObject]))
     {
-        unsigned i;
-        NSDictionary * dic;
-        NSString * torrentPath, * downloadFolder, * paused;
+        torrentPath    = [dic objectForKey: @"TorrentPath"];
+        downloadFolder = [dic objectForKey: @"DownloadFolder"];
+        paused         = [dic objectForKey: @"Paused"];
+            
+        if (!torrentPath || !downloadFolder || !paused)
+            continue;
 
-        for( i = 0; i < [history count]; i++ )
-        {
-            dic = [history objectAtIndex: i];
+        if (tr_torrentInit(fHandle, [torrentPath UTF8String]))
+            continue;
 
-            torrentPath    = [dic objectForKey: @"TorrentPath"];
-            downloadFolder = [dic objectForKey: @"DownloadFolder"];
-            paused         = [dic objectForKey: @"Paused"];
+        tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
+                                [downloadFolder UTF8String] );
 
-            if( !torrentPath || !downloadFolder || !paused )
-            {
-                continue;
-            }
-
-            if( tr_torrentInit( fHandle, [torrentPath UTF8String] ) )
-            {
-                continue;
-            }
-
-            tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
-                                    [downloadFolder UTF8String] );
-
-            if( [paused isEqualToString: @"NO"] )
-            {
-                tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
-            }
-        }
+        if ([paused isEqualToString: @"NO"])
+            tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
     }
-    
-    /*  Register with the growl system */
+
+    //check and register Growl if it is installed for this user or all users
+    NSFileManager * manager = [NSFileManager defaultManager];
+    fHasGrowl = [manager fileExistsAtPath: GROWL_PATH]
+                || [manager fileExistsAtPath: [[NSString stringWithFormat: @"~%@",
+                GROWL_PATH] stringByExpandingTildeInPath]];
     [self growlRegister: self];
     
-    /* Update the interface every 500 ms */
+    //update the interface every 500 ms
     fCount = 0;
     fStat  = NULL;
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self
@@ -175,17 +159,50 @@ static void sleepCallBack( void * controller, io_service_t y,
     return NO;
 }
 
-- (NSApplicationTerminateReply) applicationShouldTerminate:
-    (NSApplication *) app
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    if ([[fDefaults stringForKey: @"CheckQuit"] isEqualToString:@"YES"])
+    {
+        int i;
+        for( i = 0; i < fCount; i++ )
+        {
+            if( fStat[i].status & ( TR_STATUS_CHECK |
+                    TR_STATUS_DOWNLOAD ) )
+            {
+                NSBeginAlertSheet(@"Confirm Quit",
+                                @"Quit", @"Cancel", nil,
+                                fWindow, self,
+                                @selector(quitSheetDidEnd:returnCode:contextInfo:),
+                                NULL, NULL, @"There are active torrents. Do you really want to quit?");
+                return NSTerminateLater;
+            }
+        }
+    }
+    
+    [self quitProcedure];
+    return NSTerminateNow;
+}
+
+- (void) quitSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
+                        contextInfo:(void  *)contextInfo
+{
+    if (returnCode == NSAlertDefaultReturn)
+        [self quitProcedure];
+        
+    [NSApp stopModal];
+    [NSApp replyToApplicationShouldTerminate: (returnCode == NSAlertDefaultReturn)];
+}
+
+- (void) quitProcedure
+{
+    int i;
     NSMutableArray * history = [NSMutableArray
         arrayWithCapacity: TR_MAX_TORRENT_COUNT];
-    int i;
-
-    /* Stop updating the interface */
+    
+    // Stop updating the interface
     [fTimer invalidate];
 
-    /* Save history and stop running torrents */
+    // Save history and stop running torrents
     for( i = 0; i < fCount; i++ )
     {
         [history addObject: [NSDictionary dictionaryWithObjectsAndKeys:
@@ -205,7 +222,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         }
     }
 
-    /* Wait for torrents to stop (5 seconds timeout) */
+    // Wait for torrents to stop (5 seconds timeout)
     NSDate * start = [NSDate date];
     while( fCount > 0 )
     {
@@ -224,48 +241,73 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     tr_close( fHandle );
 
-    [[NSUserDefaults standardUserDefaults]
-        setObject: history forKey: @"History"];
+    [fDefaults setObject: history forKey: @"History"];
+}
 
-    return NSTerminateNow;
+- (void) showPreferenceWindow: (id) sender
+{
+    NSRect  mainFrame;
+    NSRect  prefsFrame;
+    NSRect  screenRect;
+    NSPoint point;
+
+    /* Place the window */
+    mainFrame  = [fWindow frame];
+    prefsFrame = [fPrefsWindow frame];
+    screenRect = [[NSScreen mainScreen] visibleFrame];
+    point.x    = mainFrame.origin.x + mainFrame.size.width / 2 -
+                    prefsFrame.size.width / 2;
+    point.y    = mainFrame.origin.y + mainFrame.size.height - 30;
+
+    /* Make sure it is in the screen */
+    if( point.x < screenRect.origin.x )
+    {
+        point.x = screenRect.origin.x;
+    }
+    if( point.x + prefsFrame.size.width >
+            screenRect.origin.x + screenRect.size.width )
+    {
+        point.x = screenRect.origin.x +
+            screenRect.size.width - prefsFrame.size.width;
+    }
+    if( point.y - prefsFrame.size.height < screenRect.origin.y )
+    {
+        point.y = screenRect.origin.y + prefsFrame.size.height;
+    }
+
+    [fPrefsWindow setFrameTopLeftPoint: point];
+    [fPrefsWindow makeKeyAndOrderFront:NULL];
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) s returnCode: (int) code
     contextInfo: (void *) info
 {
-    if( code != NSOKButton )
+    if (code == NSOKButton)
+    {
+        tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
+                         [[[s filenames] objectAtIndex: 0] UTF8String] );
+        tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
+    }
+    else
     {
         tr_torrentClose( fHandle, tr_torrentCount( fHandle ) - 1 );
-        [NSApp stopModal];
-        return;
     }
-
-    tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
-                         [[[s filenames] objectAtIndex: 0] UTF8String] );
-    tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
     [NSApp stopModal];
 }
-
 
 - (void) application: (NSApplication *) sender
          openFiles: (NSArray *) filenames
 {
-    unsigned i;
-    NSUserDefaults * defaults;
     NSString * downloadChoice, * downloadFolder, * torrentPath;
 
-    defaults       = [NSUserDefaults standardUserDefaults];
-    downloadChoice = [defaults stringForKey: @"DownloadChoice"];
-    downloadFolder = [defaults stringForKey: @"DownloadFolder"];
+    downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
+    downloadFolder = [fDefaults stringForKey: @"DownloadFolder"];
 
-    for( i = 0; i < [filenames count]; i++ )
+    NSEnumerator * enumerator = [filenames objectEnumerator];
+    while ((torrentPath = [enumerator nextObject]))
     {
-        torrentPath = [filenames objectAtIndex: i];
-
         if( tr_torrentInit( fHandle, [torrentPath UTF8String] ) )
-        {
             continue;
-        }
 
         if( [downloadChoice isEqualToString: @"Constant"] )
         {
@@ -283,19 +325,15 @@ static void sleepCallBack( void * controller, io_service_t y,
             continue;
         }
 
-        NSOpenPanel * panel;
-        NSString    * message;
-
-        panel   = [NSOpenPanel openPanel];
-        message = [NSString stringWithFormat:
-            @"Select the download folder for %@",
-            [torrentPath lastPathComponent]];
-        
-        [panel setPrompt:                  @"Select"];
-        [panel setMessage:                   message];
-        [panel setAllowsMultipleSelection:        NO];
-        [panel setCanChooseFiles:                 NO];
-        [panel setCanChooseDirectories:          YES];
+        NSOpenPanel * panel = [NSOpenPanel openPanel];
+       
+        [panel setPrompt: @"Select Download Folder"];
+        [panel setMessage: [NSString stringWithFormat:
+                            @"Select the download folder for %@",
+                            [torrentPath lastPathComponent]]];
+        [panel setAllowsMultipleSelection: NO];
+        [panel setCanChooseFiles: NO];
+        [panel setCanChooseDirectories: YES];
 
         [panel beginSheetForDirectory: NULL file: NULL types: NULL
             modalForWindow: fWindow modalDelegate: self didEndSelector:
@@ -309,21 +347,14 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) advancedChanged: (id) sender
 {
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    if( [fAdvancedBarItem state] == NSOnState )
-    {
-        [fAdvancedBarItem setState: NSOffState];
-        [defaults setObject:@"NO" forKey:@"UseAdvancedBar"];
-    }
-    else
-    {
-        [fAdvancedBarItem setState: NSOnState];
-        [defaults setObject:@"YES" forKey:@"UseAdvancedBar"];
-    }
+    [fAdvancedBarItem setState: ![fAdvancedBarItem state]];
+    [fDefaults setObject: [fAdvancedBarItem state] == NSOffState ? @"NO" : @"YES"
+                forKey:@"UseAdvancedBar"];
+
     [fTableView display];
 }
 
-/* called on by applescript */
+//called on by applescript
 - (void) open: (NSArray *) files
 {
     fFilenames = [files retain];
@@ -417,10 +448,62 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self updateUI: NULL];
 }
 
-
 - (void) removeTorrentWithIndex: (int) idx
                   deleteTorrent: (BOOL) deleteTorrent
                      deleteData: (BOOL) deleteData
+{
+    if ( fStat[idx].status & ( TR_STATUS_CHECK 
+        | TR_STATUS_DOWNLOAD)  )
+    {
+        if ([[fDefaults stringForKey: @"CheckRemove"] isEqualToString:@"YES"])
+        {
+            NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                        [NSString stringWithFormat: @"%d", idx], @"Index",
+                        [NSString stringWithFormat: @"%d", deleteTorrent], @"DeleteTorrent",
+                        [NSString stringWithFormat: @"%d", deleteData], @"DeleteData",
+                        nil];
+            [dict retain];
+            
+            NSBeginAlertSheet(@"Confirm Remove",
+                                @"Remove", @"Cancel", nil,
+                                fWindow, self,
+                                @selector(removeSheetDidEnd:returnCode:contextInfo:),
+                                NULL, dict, @"This torrent is active. Do you really want to remove it?");
+            return;
+        }
+        //stop if not stopped
+        else
+            [self stopTorrentWithIndex:idx];
+    }
+    
+    [self confirmRemoveTorrentWithIndex: idx
+            deleteTorrent: deleteTorrent
+            deleteData: deleteData];
+}
+
+- (void) removeSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
+                        contextInfo:(NSDictionary  *)dict
+{
+    [NSApp stopModal];
+    if (returnCode != NSAlertDefaultReturn)
+    {
+        [dict release];
+        return;
+    }
+    
+    int idx = [[dict objectForKey:@"Index"] intValue];
+    
+    [self stopTorrentWithIndex:idx];
+
+    [self confirmRemoveTorrentWithIndex: idx
+        deleteTorrent: [[dict objectForKey:@"DeleteTorrent"] intValue]
+        deleteData: [[dict objectForKey:@"DeleteData"] intValue]];
+    [dict release];
+}
+                     
+- (void) confirmRemoveTorrentWithIndex: (int) idx
+            deleteTorrent: (BOOL) deleteTorrent
+            deleteData: (BOOL) deleteData
 {
     if( deleteData )
     {
@@ -475,24 +558,23 @@ static void sleepCallBack( void * controller, io_service_t y,
     float dl, ul;
     int row, i;
 
-    /* Update the NSTableView */
-    if( fStat )
-    {
-        free( fStat );
-    }
+    //Update the NSTableView
+    if (fStat)
+        free(fStat);
+        
     fCount = tr_torrentStat( fHandle, &fStat );
     [fTableView updateUI: fStat];
 
-    /* Update the global DL/UL rates */
+    //Update the global DL/UL rates
     tr_torrentRates( fHandle, &dl, &ul );
     [fTotalDLField setStringValue: [NSString stringWithFormat:
         @"Total DL: %.2f KB/s", dl]];
     [fTotalULField setStringValue: [NSString stringWithFormat:
         @"Total UL: %.2f KB/s", ul]];
 
-    /* Update DL/UL totals in the Info panel */
+    //Update DL/UL totals in the Info panel
     row = [fTableView selectedRow];
-    if( row > -1 )
+    if( row >= 0 )
     {
         [fInfoDownloaded setStringValue:
             stringForFileSize( fStat[row].downloaded )];
@@ -500,62 +582,16 @@ static void sleepCallBack( void * controller, io_service_t y,
             stringForFileSize( fStat[row].uploaded )];
     }
     
-    /* check if torrents have recently ended. */
+    //check if torrents have recently ended.
     for (i = 0; i < fCount; i++)
     {
         if( !tr_getFinished( fHandle, i ) )
-        {
             continue;
-        }
+            
         [self notifyGrowl: [NSString stringWithUTF8String: 
             fStat[i].info.name]];
         tr_setFinished( fHandle, i, 0 );
     }
-}
-
-
-- (NSMenu *) menuForIndex: (int) idx
-{
-    if ( idx < 0 || idx >= fCount )
-    {
-        return nil;
-    }
-    
-    int status = fStat[idx].status;
-    
-    NSMenuItem *pauseItem =  [fContextMenu itemWithTag: CONTEXT_PAUSE];
-    NSMenuItem *removeItem = [fContextMenu itemAtIndex: 1];
-    NSMenuItem *infoItem =   [fContextMenu itemAtIndex: 2];
-    
-    [pauseItem setTarget: self];
-    
-    if ( status & TR_STATUS_CHECK ||
-         status & TR_STATUS_DOWNLOAD ||
-         status & TR_STATUS_SEED )
-    {
-        /* we can stop */
-        [removeItem setEnabled: NO];
-        [pauseItem setTitle: @"Pause"];
-        [pauseItem setAction: @selector(stopTorrent:)];
-        [pauseItem setEnabled: YES];
-    } else {
-        /* we are stopped */
-        [removeItem setEnabled: YES];
-        [pauseItem setTitle: @"Resume"];
-        [pauseItem setAction: @selector(resumeTorrent:)];
-        /* don't allow resuming if we aren't in PAUSE */
-        if ( !(status & TR_STATUS_PAUSE) )
-            [pauseItem setEnabled: NO];
-    }
-    
-    if( [fInfoPanel isVisible] )
-    {
-        [infoItem setTitle: @"Hide Info"];
-    } else {
-        [infoItem setTitle: @"Show Info"];
-    }
-    
-    return fContextMenu;
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
@@ -663,8 +699,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
     (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
-    NSToolbarItem * item;
-    item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
+    NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
     if( [ident isEqualToString: TOOLBAR_OPEN] )
     {
@@ -683,15 +718,6 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
         [item setAction: @selector( removeTorrent: )];
-    }
-    else if( [ident isEqualToString: TOOLBAR_PREFS] )
-    {
-        [item setLabel: @"Preferences"];
-        [item setPaletteLabel: [item label]];
-        [item setToolTip: @"Show the Preferences panel"];
-        [item setImage: [NSImage imageNamed: @"Preferences.png"]];
-        [item setTarget: fPrefsController];
-        [item setAction: @selector( show: )];
     }
     else if( [ident isEqualToString: TOOLBAR_INFO] )
     {
@@ -733,8 +759,8 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_OPEN, TOOLBAR_REMOVE,
-            /* TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL, */
-            TOOLBAR_PREFS, TOOLBAR_INFO,
+            TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL,
+            TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
             NSToolbarSpaceItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
@@ -746,24 +772,11 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_OPEN, TOOLBAR_REMOVE,
-            /* NSToolbarSeparatorItemIdentifier,
-            TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL, */
+            NSToolbarSeparatorItemIdentifier,
+            TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL,
             NSToolbarFlexibleSpaceItemIdentifier,
-            TOOLBAR_PREFS, TOOLBAR_INFO,
+            TOOLBAR_INFO,
             NULL];
-}
-
-- (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
-{
-    //check remove item
-    if ([toolbarItem action] == @selector(removeTorrent:))
-    {
-        int row = [fTableView selectedRow];
-        return ( row >= 0 ) && ( fStat[row].status &
-                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
-    }
-    
-    return true;
 }
 
 - (void) runCustomizationPalette: (id) sender
@@ -776,37 +789,72 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fWindow toggleToolbarShown:sender];
 }
 
+- (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
+{
+    //enable remove item
+    if ([toolbarItem action] == @selector(removeTorrent:))
+        return [fTableView selectedRow] >= 0;
+        
+    //enable pause all and resume all items
+    if ([toolbarItem action] == @selector(stopAllTorrents:)
+            || [toolbarItem action] == @selector(resumeAllTorrents:))
+        return fCount > 0;
+    
+    return YES;
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
+    //disable menus if customize sheet is active
+    if ([fToolbar customizationPaletteIsRunning])
+        return NO;
+        
     //enable customize toolbar item
     if ([menuItem action] == @selector(showHideToolbar:))
+    {
         [menuItem setTitle: [fToolbar isVisible] ? @"Hide Toolbar" : @"Show Toolbar"];
-        
-    if ([fToolbar customizationPaletteIsRunning])
-        return false;
+        return YES;
+    }
         
     //enable show info
     if ([menuItem action] == @selector(showInfo:))
     {
         [menuItem setTitle: [fInfoPanel isVisible] ? @"Hide Info" : @"Show Info"];
-        return true;
+        return YES;
     }
+    
+    //enable pause all and resume all
+    if ([menuItem action] == @selector(stopAllTorrents:) || [menuItem action] == @selector(resumeAllTorrents:))
+        return fCount > 0;
         
     int row = [fTableView selectedRow];
         
     //enable remove items
-    if ([menuItem action] == @selector(removeTorrent:) || [menuItem action] == @selector(removeTorrentDeleteFile:)
-        || [menuItem action] == @selector(removeTorrentDeleteData:) || [menuItem action] == @selector(removeTorrentDeleteBoth:)) {
-        /* Can we remove it ? */
-        return ( row >= 0 ) && ( fStat[row].status &
-                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
+    if ([menuItem action] == @selector(removeTorrent:)
+        || [menuItem action] == @selector(removeTorrentDeleteFile:)
+        || [menuItem action] == @selector(removeTorrentDeleteData:)
+        || [menuItem action] == @selector(removeTorrentDeleteBoth:))
+    {
+        //append or remove ellipsis when needed
+        if (row >= 0 && fStat[row].status & ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD)
+                    && [[fDefaults stringForKey: @"CheckRemove"] isEqualToString:@"YES"])
+        {
+            if (![[menuItem title] hasSuffix:NS_ELLIPSIS])
+                [menuItem setTitle:[[menuItem title] stringByAppendingString:NS_ELLIPSIS]];
+        }
+        else
+        {
+            if ([[menuItem title] hasSuffix:NS_ELLIPSIS])
+                [menuItem setTitle:[[menuItem title] substringToIndex:[[menuItem title] length]-[NS_ELLIPSIS length]]];
+        }
+        return row >= 0;
     }
     
     //enable reveal in finder item
     if ([menuItem action] == @selector(revealFromMenu:))
         return row >= 0;
         
-    //enable and change pause and remove item
+    //enable and change pause / remove item
     if ([menuItem action] == @selector(resumeTorrent:) || [menuItem action] == @selector(stopTorrent:))
     {
         if (row >= 0 && fStat[row].status & TR_STATUS_PAUSE)
@@ -822,7 +870,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         return row >= 0;
     }
     
-    return true;
+    return YES;
 }
 
 - (void) sleepCallBack: (natural_t) messageType argument:
@@ -893,40 +941,19 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) showMainWindow: (id) sender
 {
-    [fWindow makeKeyAndOrderFront: NULL];
+    [fWindow makeKeyAndOrderFront: nil];
 }
 
 - (void) linkHomepage: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL
-        URLWithString:@"http://transmission.m0k.org/"]];
+        URLWithString: WEBSITE_URL]];
 }
 
 - (void) linkForums: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL
-        URLWithString:@"http://transmission.m0k.org/forum/"]];
-}
-
-- (BOOL) hasGrowl
-{
-    NSFileManager * manager = [NSFileManager defaultManager];
-    NSString      * helper  = @"/Library/PreferencePanes/Growl.prefPane/"
-                               "Contents/Resources/GrowlHelperApp.app";
-
-    if( [manager fileExistsAtPath: helper] )
-    {
-        /* Growl was installed for all users */
-        return YES;
-    }
-    if( [manager fileExistsAtPath: [[NSString stringWithFormat: @"~%@",
-            helper] stringByExpandingTildeInPath]] )
-    {
-        /* Growl was installed for this user only */
-        return YES;
-    }
-
-    return NO;
+        URLWithString: FORUM_URL]];
 }
 
 - (void) notifyGrowl: (NSString * ) file
@@ -935,10 +962,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSAppleScript * appleScript;
     NSDictionary * error;
 
-    if( ![self hasGrowl] )
-    {
+    if( !fHasGrowl )
         return;
-    }
     
     growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"
@@ -965,10 +990,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSAppleScript * appleScript;
     NSDictionary * error;
 
-    if( ![self hasGrowl] )
-    {
+    if( !fHasGrowl )
         return;
-    }
     
     growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"
@@ -981,6 +1004,7 @@ static void sleepCallBack( void * controller, io_service_t y,
          "    end tell\n"
          "  end if\n"
          "end tell"];
+         
     appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     if( ![appleScript executeAndReturnError: &error] )
     {
@@ -989,19 +1013,15 @@ static void sleepCallBack( void * controller, io_service_t y,
     [appleScript release];
 }
 
-
 - (void) revealFromMenu: (id) sender
 {
-    int row;
-
-    row = [fTableView selectedRow];
-    if( row < 0 )
+    int row = [fTableView selectedRow];
+    if (row >= 0)
     {
-        return;
+        [self finderReveal: [NSString stringWithFormat: @"%@/%@",
+            [NSString stringWithUTF8String: fStat[row].folder],
+            [NSString stringWithUTF8String: fStat[row].info.name]]];
     }
-    [self finderReveal: [NSString stringWithFormat: @"%@/%@",
-        [NSString stringWithUTF8String: fStat[row].folder],
-        [NSString stringWithUTF8String: fStat[row].info.name]]];
 }
 
 - (void) finderReveal: (NSString *) path
