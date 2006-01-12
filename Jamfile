@@ -50,4 +50,9 @@ else if $(GTK) = yes
     SubInclude TOP gtk ;
 }
 
+if $(OS) = BEOS
+{
+    BeOSBuild Transmission : libtransmission.a ;
+}
+
 SubInclude TOP libtransmission ;

@@ -8,12 +8,12 @@ if ! $(DEFINES)
 VERSION_MAJOR  = 0 ;
 VERSION_MINOR  = 4 ;
 # VERSION_STRING = $(VERSION_MAJOR).$(VERSION_MINOR) ;
-VERSION_STRING = CVS-20051124 ;
+VERSION_STRING = CVS-20051213 ;
 
 DEFINES += VERSION_MAJOR=$(VERSION_MAJOR)
            VERSION_MINOR=$(VERSION_MINOR)
            VERSION_STRING=\\\"$(VERSION_STRING)\\\" ;
-OPTIM    = -O3 ;
+OPTIM    = -O0 ;
 RM       = rm -Rf ;
 
 rule SystemLibraries
@@ -91,5 +91,20 @@ if $(OS) = MACOSX
           "$TMP/Contribute.url" &&
         hdiutil create -format UDZO -srcfolder "$TMP" $(1) &&
         rm -rf "$TMP"
+    }
+}
+
+if $(OS) = BEOS
+{
+    rule BeOSBuild
+    {
+        Depends     exe   : $(1) ;
+        Depends     $(1)  : $(2) ;
+        Clean     clean : $(1) beos/obj.$(CPU) ;
+    }
+    actions BeOSBuild
+    {
+        $(RM) $(1) && ( cd beos && make ) && \
+          mv beos/obj.$(CPU)/Transmission $(1)
     }
 }

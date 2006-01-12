@@ -22,6 +22,12 @@
 
 #include "transmission.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "platform.h"
+
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
@@ -67,10 +73,8 @@ tr_handle_t * tr_init()
 
     h->bindPort = TR_DEFAULT_PORT;
 
-    snprintf( h->prefsDirectory, sizeof( h->prefsDirectory ),
-              "%s/.transmission", getenv( "HOME" ) );
-    mkdir( h->prefsDirectory, 0755 );
-    
+    tr_init_platform( h );
+
     return h;
 }
 
@@ -488,6 +492,7 @@ static void downloadLoop( void * _tor )
     tr_dbg( "Thread started" );
 
 #ifdef SYS_BEOS
+	rename_thread(tor->thread, "torrent-tx");
     /* This is required because on BeOS, SIGINT is sent to each thread,
        which kills them not nicely */
     signal( SIGINT, SIG_IGN );
@@ -575,3 +580,7 @@ static float rateUpload( tr_torrent_t * tor )
 {
     return rateGeneric( tor->dates, tor->uploaded );
 }
+
+#ifdef __cplusplus
+}
+#endif

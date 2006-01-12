@@ -23,10 +23,19 @@
 #ifndef TR_TRANSMISSION_H
 #define TR_TRANSMISSION_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <inttypes.h>
 
 #define SHA_DIGEST_LENGTH    20
-#define MAX_PATH_LENGTH      1024
+#ifdef SYS_BEOS
+# include <StorageDefs.h>
+# define MAX_PATH_LENGTH B_FILE_NAME_LENGTH
+#else
+# define MAX_PATH_LENGTH      1024
+#endif
 #define TR_MAX_TORRENT_COUNT 50
 
 #define TR_DEFAULT_PORT      9090
@@ -232,6 +241,10 @@ struct tr_stat_s
 
 #ifdef __TRANSMISSION__
 #  include "internal.h"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

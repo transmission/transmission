@@ -124,6 +124,18 @@ case $SYSTEM in
   BeOS)
     DEFINES="$DEFINES SYS_BEOS"
 
+    CC="gcc"
+    MACHINE=`uname -m`
+    case $MACHINE in
+      BePC) # BeOS on x86
+    	CPU="x86"
+    	;;
+      *)
+        CPU="ppc"
+        ;;
+    esac
+    SYSTEM="$SYSTEM / $CPU"
+	
     RELEASE=`uname -r`
     case $RELEASE in
       6.0|5.0.4) # Zeta or R5 / BONE beta 7
@@ -137,7 +149,8 @@ case $SYSTEM in
         ;;
       *)
         echo "Unsupported BeOS version"
-        exit 1 ;;
+        exit 1 
+        ;;
     esac
     ;;
 
@@ -203,6 +216,11 @@ if [ -n "$OPENSSL_PREFIX" ]; then
 cat >> config.jam << EOF
 HDRS       += $OPENSSL_PREFIX/include ;
 LINKFLAGS  += -L$OPENSSL_PREFIX/lib ;
+EOF
+fi
+if [ -n "$CPU" ]; then
+cat >> config.jam << EOF
+CPU        = $CPU ;
 EOF
 fi
 
