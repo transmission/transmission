@@ -807,10 +807,7 @@ actionclick(GtkWidget *widget, gpointer gdata) {
 
     switch(act) {
       case ACT_START:
-        if(TR_STATUS_STOPPING & sb[index].status)
-          fprintf(stderr, "XXX still running\n");
-        else
-          tr_torrentStart(data->tr, index);
+        tr_torrentStart(data->tr, index);
         updatesave = TRUE;
         break;
       case ACT_STOP:

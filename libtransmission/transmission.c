@@ -25,6 +25,7 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
+static void torrentReallyStop( tr_handle_t * h, int t );
 static void  downloadLoop( void * );
 static float rateDownload( tr_torrent_t * );
 static float rateUpload( tr_torrent_t * );
@@ -231,6 +232,12 @@ void tr_torrentStart( tr_handle_t * h, int t )
     tr_torrent_t * tor = h->torrents[t];
     uint64_t       now;
     int            i;
+
+    if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
+    {
+        /* Join the thread first */
+        torrentReallyStop( h, t );
+    }
 
     tor->status   = TR_STATUS_CHECK;
     tor->tracker  = tr_trackerInit( h, tor );
