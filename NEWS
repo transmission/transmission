@@ -1,5 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+
 0.4 (2005/11/18)
  - Uses less CPU downloading torrents with many pieces
  - The UI could freeze when the hard drive was having a hard time - fixed
