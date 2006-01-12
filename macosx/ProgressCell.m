@@ -172,7 +172,7 @@ static uint32_t kGreen[] =
     {
         for( w = 0; w < end; w++ )
         {
-            p[w] = colors[h];
+            p[w] = htonl( colors[h] );
         }
         p += pixelsPerRow;
     }
@@ -204,7 +204,7 @@ static uint32_t kGreen[] =
     {
         for( w = 0; w < end; w++ )
         {
-            p[w] = kBlue4[h];
+            p[w] = htonl( kBlue4[h] );
         }
         p += pixelsPerRow;
     }
@@ -242,7 +242,7 @@ static uint32_t kGreen[] =
 
         for( h = 2; h < 14; h++ )
         {
-            p[0]  = colors[h];
+            p[0]  = htonl( colors[h] );
             p    += pixelsPerRow;
         }
     }
