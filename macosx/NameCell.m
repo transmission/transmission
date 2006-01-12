@@ -25,8 +25,10 @@
 
 @implementation NameCell
 
-- (void) setStat: (tr_stat_t *) stat
+- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w
 {
+    fWhiteText = w;
+
     fNameString  = [NSString stringWithUTF8String: stat->info.name];
     fSizeString  = [NSString stringWithFormat: @" (%@)",
                     stringForFileSize( stat->info.totalSize )];
@@ -95,8 +97,11 @@
 
     pen = cellFrame.origin;
 
-    attributes = [NSMutableDictionary dictionaryWithCapacity: 1];
-    [attributes setObject: [NSFont messageFontOfSize:12.0]
+    attributes = [NSMutableDictionary dictionaryWithCapacity: 2];
+    [attributes setObject: fWhiteText ? [NSColor whiteColor] :
+        [NSColor blackColor] forKey: NSForegroundColorAttributeName];
+
+    [attributes setObject: [NSFont messageFontOfSize: 12.0]
         forKey: NSFontAttributeName];
 
     pen.x += 5; pen.y += 5;
@@ -105,7 +110,7 @@
         35 - widthForString( fSizeString, 12 ), 12 ), fSizeString];
     [string drawAtPoint: pen withAttributes: attributes];
 
-    [attributes setObject: [NSFont messageFontOfSize:10.0]
+    [attributes setObject: [NSFont messageFontOfSize: 10.0]
         forKey: NSFontAttributeName];
 
     pen.x += 5; pen.y += 20;

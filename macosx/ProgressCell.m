@@ -112,12 +112,13 @@ static uint32_t kGreen[] =
  ***********************************************************************
  * Readies ourselves to draw updated info.
  **********************************************************************/
-- (void) setStat: (tr_stat_t *) stat
+- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w
 {
     int i;
     uint8_t * in, * out;
 
-    fStat = stat;
+    fStat      = stat;
+    fWhiteText = w;
 
     /* Update the strings to be displayed */
     fDlString = [NSString stringWithFormat:
@@ -283,8 +284,12 @@ static uint32_t kGreen[] =
     [img release];
 
     /* Draw the strings with font 10 */
-    attributes = [NSDictionary dictionaryWithObject:
-        [NSFont messageFontOfSize: 10.0] forKey: NSFontAttributeName];
+    attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSFont messageFontOfSize: 10.0],
+        NSFontAttributeName,
+        fWhiteText ? [NSColor whiteColor] : [NSColor blackColor],
+        NSForegroundColorAttributeName,
+        NULL];
     pen.x += 5; pen.y += 20;
     [fDlString drawAtPoint: pen withAttributes: attributes];
     pen.x += 0; pen.y += 15;

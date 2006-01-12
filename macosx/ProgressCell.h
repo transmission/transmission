@@ -29,6 +29,7 @@
 @interface ProgressCell : NSCell
 {
     tr_stat_t * fStat;
+    BOOL        fWhiteText;
 
     NSString  * fDlString;
     NSString  * fUlString;
@@ -37,7 +38,7 @@
     NSBitmapImageRep * fProgressBmp;
 }
 - (id)   init;
-- (void) setStat: (tr_stat_t *) stat;
+- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
 - (void) buildSimpleBar;
 - (void) buildAdvancedBar;
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view;

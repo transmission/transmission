@@ -620,13 +620,16 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
     forTableColumn: (NSTableColumn *) tableColumn row: (int) rowIndex
 {
+    BOOL w;
+
+    w = [fWindow isKeyWindow] && rowIndex == [fTableView selectedRow];
     if( [[tableColumn identifier] isEqualToString: @"Name"] )
     {
-        [(NameCell *) cell setStat: &fStat[rowIndex]];
+        [(NameCell *) cell setStat: &fStat[rowIndex] whiteText: w];
     }
     else if( [[tableColumn identifier] isEqualToString: @"Progress"] )
     {
-        [(ProgressCell *) cell setStat: &fStat[rowIndex]];
+        [(ProgressCell *) cell setStat: &fStat[rowIndex] whiteText: w];
     }
 }
 

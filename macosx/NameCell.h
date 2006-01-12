@@ -29,12 +29,14 @@
 
 @interface NameCell : NSCell
 {
+    BOOL       fWhiteText;
+
     NSString * fNameString;
     NSString * fSizeString;
     NSString * fTimeString;
     NSString * fPeersString;
 }
-- (void) setStat: (tr_stat_t *) stat;
+- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
 @end
 
 #endif
