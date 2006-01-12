@@ -117,7 +117,7 @@ void TRWindow::LoadSettings() {
 
 /**
  * Rescans the active Torrents folder, and will add all the torrents there to the
- * engine.
+ * engine. Called during initial Application Start & Stop.
  */
 void TRWindow::RescanTorrents() {
 	if (Lock()) {
@@ -159,17 +159,31 @@ void TRWindow::AddEntry(BEntry *torrent) {
 			if (addStatus == 0 && Lock()) { // Success. Add the TRTorrent item.
 				transfers->AddItem(new TRTransfer(path.Path(), node));
 				
-				// Start the newly added torrent.
-				worker_info *startData = (worker_info*)calloc(1, sizeof(worker_info));
-				startData->window = this;
-				startData->index = tr_torrentCount(engine) - 1;
-				thread_id start_thread = spawn_thread(TRWindow::AsynchStartTorrent, "BirthCanal",
-				                                      B_NORMAL_PRIORITY, (void *)startData);
-				if (!((start_thread) < B_OK)) {
-					resume_thread(start_thread);
-				} else { // Fallback and start the old way.
-					StartTorrent(startData->index);
-					free(startData);
+				bool autoStart = true;
+				
+				// Decide if we should auto-start this torrent or not.
+				BString prefName("download.");
+				prefName << path.Path() << ".running";
+				
+				Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
+				if (prefs->FindBool(prefName.String(), &autoStart) != B_OK) {
+					autoStart = true;
+				}
+				delete prefs;
+				
+				if (autoStart) {
+					// Start the newly added torrent.
+					worker_info *startData = (worker_info*)calloc(1, sizeof(worker_info));
+					startData->window = this;
+					startData->index = tr_torrentCount(engine) - 1;
+					thread_id start_thread = spawn_thread(TRWindow::AsynchStartTorrent, "BirthCanal",
+					                                      B_NORMAL_PRIORITY, (void *)startData);
+					if (!((start_thread) < B_OK)) {
+						resume_thread(start_thread);
+					} else { // Fallback and start the old way.
+						StartTorrent(startData->index);
+						free(startData);
+					}
 				}
 				Unlock();
 			} else {
@@ -246,9 +260,9 @@ void TRWindow::MessageReceived(BMessage *msg) {
 				// Look for the torrent info in the engine with the matching
 				// path name.
 				tr_stat_t *stats;
-				tr_torrentStat(engine, &stats);
+				int max = tr_torrentStat(engine, &stats);
 				int index;
-				for (index = 0; index < tr_torrentCount(engine); index++) {
+				for (index = 0; index < max; index++) {
 					if (strcmp(stats[index].info.torrent, path) == 0) {
 						tr_torrentClose(engine, index);
 						transfers->RemoveItem(index);
@@ -307,6 +321,8 @@ void TRWindow::MessageReceived(BMessage *msg) {
 		delete entry;
 		delete item;
 		
+		
+		
 		UpdateList(transfers->CurrentSelection(), true);
 	} else if (msg->what == B_SIMPLE_DATA) {
 		be_app->RefsReceived(msg);
@@ -315,7 +331,11 @@ void TRWindow::MessageReceived(BMessage *msg) {
 	BWindow::MessageReceived(msg);
 }
 
-
+/**
+ * Handles QuitRequests.
+ * Displays a BAlert asking if the user really wants to quit if torrents are running.
+ * If affimative, then we'll stop all the running torrents.
+ */
 bool TRWindow::QuitRequested() {
 	bool quit = false;
 	
@@ -348,11 +368,20 @@ bool TRWindow::QuitRequested() {
 	if (quit) {
 		Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
 		prefs->SetRect("window.frame", Frame());
-		delete prefs;
 		
-		for (int i = 0; i < tr_torrentCount(engine); i++) {
-			tr_torrentStop(engine, i);
+		BString strItem("");
+		for (int i = 0; i < tr_torrentStat(engine, &s); i++) {
+			strItem = "download.";
+			strItem << s[i].info.torrent << ".running";
+			if (s[i].status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {
+				prefs->SetBool(strItem.String(), true);
+				tr_torrentStop(engine, i);
+			} else {
+				prefs->SetBool(strItem.String(), false);
+			}
 		}
+		free(s);
+		delete prefs;
 		
 		be_app->PostMessage(new BMessage(B_QUIT_REQUESTED));
 	}

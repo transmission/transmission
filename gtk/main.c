@@ -100,13 +100,11 @@ dopopupmenu(GdkEventButton *event, struct cbdata *data, GtkTreeIter *iter);
 void
 actionclick(GtkWidget *widget, gpointer gdata);
 
-void
-makeaddwind(struct cbdata *data);
 gboolean
 addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
            const char *dir, gboolean paused);
 void
-fileclick(GtkWidget *widget, gpointer gdata);
+addedtorrents(void *vdata);
 const char *
 statusstr(int status);
 void
@@ -696,7 +694,7 @@ actionclick(GtkWidget *widget, gpointer gdata) {
 
   switch(act) {
     case ACT_OPEN:
-      makeaddwind(data);
+      makeaddwind(addtorrent, data->wind, data->tr, addedtorrents, data);
       return;
     case ACT_PREF:
       makeprefwindow(data->wind, data->tr);
@@ -755,29 +753,12 @@ actionclick(GtkWidget *widget, gpointer gdata) {
   }
 }
 
-void
-makeaddwind(struct cbdata *data) {
-  GtkWidget *wind = gtk_file_selection_new("Add a Torrent");
-
-  g_object_set_data(G_OBJECT(GTK_FILE_SELECTION(wind)->ok_button),
-                    CBDATA_PTR, data);
-  g_signal_connect(GTK_FILE_SELECTION(wind)->ok_button, "clicked",
-                   G_CALLBACK(fileclick), wind);
-  g_signal_connect_swapped(GTK_FILE_SELECTION(wind)->cancel_button, "clicked",
-                           G_CALLBACK(gtk_widget_destroy), wind); 
-  gtk_window_set_transient_for(GTK_WINDOW(wind), data->wind);
-  gtk_window_set_destroy_with_parent(GTK_WINDOW(wind), TRUE);
-  gtk_window_set_modal(GTK_WINDOW(wind), TRUE);
-  gtk_widget_show_all(wind);
-}
-
 gboolean
 addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
            const char *dir, gboolean paused) {
   char *wd;
 
-  if(NULL == dir) {
-    dir = cf_getpref(PREF_DIR);
+  if(NULL == dir && NULL != (dir = cf_getpref(PREF_DIR))) {
     if(!mkdir_p(dir, 0777)) {
       errmsg(parentwind, "Failed to create download directory %s:\n%s",
              dir, strerror(errno));
@@ -809,17 +790,11 @@ addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
 }
 
 void
-fileclick(GtkWidget *widget, gpointer gdata) {
-  struct cbdata *data = g_object_get_data(G_OBJECT(widget), CBDATA_PTR);
-  GtkWidget *wind = gdata;
-  const char *file = gtk_file_selection_get_filename(GTK_FILE_SELECTION(wind));
+addedtorrents(void *vdata) {
+  struct cbdata *data = vdata;
 
-  if(addtorrent(data->tr, data->wind, file, NULL, FALSE)) {
-    updatemodel(data);
-    savetorrents(data->tr, data->wind, -1, NULL);
-  }
-
-  gtk_widget_destroy(wind);
+  updatemodel(data);
+  savetorrents(data->tr, data->wind, -1, NULL);
 }
 
 const char *

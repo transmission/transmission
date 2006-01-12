@@ -44,10 +44,28 @@ struct prefdata {
   tr_handle_t *tr;
 };
 
+struct addcb {
+  add_torrent_func_t addfunc;
+  GtkWindow *parent;
+  tr_handle_t *tr;
+  torrents_added_func_t donefunc;
+  void *donedata;
+  gboolean autostart;
+  gboolean usingaltdir;
+  GtkFileChooser *altdir;
+  GtkButtonBox *altbox;
+};
+
 static void
 clicklimitbox(GtkWidget *widget, gpointer gdata);
 static void
 clickdialog(GtkWidget *widget, int resp, gpointer gdata);
+static void
+autoclick(GtkWidget *widget, gpointer gdata);
+static void
+dirclick(GtkWidget *widget, gpointer gdata);
+static void
+addresp(GtkWidget *widget, gint resp, gpointer gdata);
 
 void
 makeprefwindow(GtkWindow *parent, tr_handle_t *tr) {
@@ -82,7 +100,7 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr) {
   /* limit checkbox */
   pref = cf_getpref(PREF_USELIMIT);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(limitbox),
-    (NULL == pref ? FALSE : strbool(pref)));
+    (NULL == pref ? TRUE : strbool(pref)));
   gtk_widget_set_sensitive(limitnum,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(limitbox)));
   g_signal_connect(G_OBJECT(limitbox), "clicked",
@@ -91,8 +109,9 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr) {
 
   /* limit label and entry */
   label = gtk_label_new("Maximum upload speed");
-  if(NULL != (pref = cf_getpref(PREF_LIMIT)))
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(limitnum), strtol(pref,NULL,10));
+  pref = cf_getpref(PREF_LIMIT);
+  gtk_spin_button_set_value(GTK_SPIN_BUTTON(limitnum),
+    (NULL == pref ? DEFAULT_UPLIMIT : strtol(pref,NULL,10)));
   gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 2, 3);
   gtk_table_attach_defaults(GTK_TABLE(table), limitnum,         1, 2, 2, 3);
 
@@ -172,10 +191,119 @@ void
 setlimit(tr_handle_t *tr) {
   const char *pref;
 
-  if(NULL == (pref = cf_getpref(PREF_USELIMIT)) || !strbool(pref))
+  if(NULL != (pref = cf_getpref(PREF_USELIMIT)) && !strbool(pref))
     tr_setUploadLimit(tr, -1);
   else if(NULL != (pref = cf_getpref(PREF_LIMIT)))
     tr_setUploadLimit(tr, strtol(pref, NULL, 10));
   else
-    tr_setUploadLimit(tr, -1);
+    tr_setUploadLimit(tr, DEFAULT_UPLIMIT);
+}
+
+void
+makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
+            torrents_added_func_t donefunc, void *donedata) {
+  GtkWidget *wind = gtk_file_chooser_dialog_new("Add a Torrent", parent,
+    GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+  struct addcb *data = g_new(struct addcb, 1);
+  GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+  GtkWidget *bbox = gtk_hbutton_box_new();
+  GtkWidget *autocheck = gtk_check_button_new_with_label(
+    "Automatically start torrent");
+  GtkWidget *dircheck = gtk_check_button_new_with_label(
+    "Use alternate download directory");
+  GtkFileFilter *filter = gtk_file_filter_new();
+  GtkFileFilter *unfilter = gtk_file_filter_new();
+  GtkWidget *getdir = gtk_file_chooser_button_new(
+    "Choose a download directory", GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  const char *pref;
+
+  data->addfunc = addfunc;
+  data->parent = parent;
+  data->tr = tr;
+  data->donefunc = donefunc;
+  data->donedata = donedata;
+  data->autostart = TRUE;
+  data->usingaltdir = FALSE;
+  data->altdir = GTK_FILE_CHOOSER(getdir);
+  data->altbox = GTK_BUTTON_BOX(bbox);
+
+  gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_START);
+  gtk_box_pack_start_defaults(GTK_BOX(bbox), dircheck);
+  gtk_box_pack_start_defaults(GTK_BOX(bbox), getdir);
+
+  gtk_box_pack_start_defaults(GTK_BOX(vbox), autocheck);
+  gtk_box_pack_start_defaults(GTK_BOX(vbox), bbox);
+
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(autocheck), TRUE);
+  if(NULL != (pref = cf_getpref(PREF_DIR)))
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(getdir), pref);
+  else {
+    pref = g_get_current_dir();
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(getdir), pref);
+    g_free((char*)pref);
+  }
+
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dircheck), FALSE);
+
+  gtk_file_filter_set_name(filter, "Torrent files");
+  gtk_file_filter_add_pattern(filter, "*.torrent");
+  gtk_file_filter_set_name(unfilter, "All files");
+  gtk_file_filter_add_pattern(unfilter, "*");
+
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(wind), filter);
+  gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(wind), unfilter);
+  gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(wind), TRUE);
+  gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(wind), vbox);
+
+  g_signal_connect(G_OBJECT(autocheck), "clicked", G_CALLBACK(autoclick),data);
+  g_signal_connect(G_OBJECT(dircheck), "clicked", G_CALLBACK(dirclick), data);
+  g_signal_connect(G_OBJECT(wind), "response", G_CALLBACK(addresp), data);
+
+  gtk_widget_show_all(wind);
+  gtk_widget_hide(getdir);
+}
+
+static void
+autoclick(GtkWidget *widget, gpointer gdata) {
+  struct addcb *data = gdata;
+
+  data->autostart = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+}
+
+static void
+dirclick(GtkWidget *widget, gpointer gdata) {
+  struct addcb *data = gdata;
+
+  data->usingaltdir = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+  gtk_button_box_set_layout(data->altbox,
+    (data->usingaltdir ? GTK_BUTTONBOX_EDGE : GTK_BUTTONBOX_START));
+  if(data->usingaltdir)
+    gtk_widget_show(GTK_WIDGET(data->altdir));
+  else
+    gtk_widget_hide(GTK_WIDGET(data->altdir));
+}
+
+static void
+addresp(GtkWidget *widget, gint resp, gpointer gdata) {
+  struct addcb *data = gdata;
+  GSList *files, *ii;
+  gboolean added = FALSE;
+  char *dir = NULL;
+
+  if(GTK_RESPONSE_ACCEPT == resp) {
+    if(data->usingaltdir)
+      dir = gtk_file_chooser_get_filename(data->altdir);
+    files = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(widget));
+    for(ii = files; NULL != ii; ii = ii->next)
+      if(data->addfunc(data->tr, data->parent, ii->data, dir,
+                       !data->autostart))
+        added = TRUE;
+    if(added)
+      data->donefunc(data->donedata);
+    if(NULL != dir)
+      g_free(dir);
+  }
+
+  gtk_widget_destroy(widget);
 }

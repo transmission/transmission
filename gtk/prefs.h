@@ -35,11 +35,21 @@
 #define PREF_LIMIT              "upload-limit"
 #define PREF_DIR                "download-directory"
 
+#define DEFAULT_UPLIMIT         20
+
+typedef gboolean (*add_torrent_func_t)(tr_handle_t*, GtkWindow*, const char*, const char *, gboolean);
+typedef void (*torrents_added_func_t)(void *);
+
 void
 makeprefwindow(GtkWindow *parent, tr_handle_t *tr);
 
 /* set the upload limit based on saved prefs */
 void
 setlimit(tr_handle_t *tr);
+
+/* show the "add a torrent" dialog */
+void
+makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
+            torrents_added_func_t donefunc, void *donedata);
 
 #endif /* TG_PREFS_H */
