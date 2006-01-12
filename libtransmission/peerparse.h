@@ -51,10 +51,7 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
         for( i = 0; i < peer->inRequestCount; i++ )
         {
             r = &peer->inRequests[i];
-            if( tor->blockHave[tr_block(r->index,r->begin)] > 0 )
-            {
-                tor->blockHave[tr_block(r->index,r->begin)]--;
-            }
+            tr_cpDownloaderRem( tor->completion, tr_block(r->index,r->begin) );
         }
         peer->inRequestCount = 0;
     }
@@ -245,10 +242,8 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
             for( j = 0; j < i; j++ )
             {
                 r = &peer->inRequests[j];
-                if( tor->blockHave[tr_block(r->index,r->begin)] > 0 )
-                {
-                    tor->blockHave[tr_block(r->index,r->begin)]--;
-                }
+                tr_cpDownloaderRem( tor->completion,
+                                    tr_block(r->index,r->begin) );
             }
             suckyClient = 1;
             peer->inRequestCount -= i;
@@ -274,7 +269,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     }
 
     block = tr_block( r->index, r->begin );
-    if( tor->blockHave[block] < 0 )
+    if( tr_cpBlockIsComplete( tor->completion, block ) )
     {
         peer_dbg( "have this block already" );
         (peer->inRequestCount)--;
@@ -283,13 +278,13 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return 0;
     }
 
-    tor->blockHave[block]  = -1;
-    tor->blockHaveCount   +=  1;
+    tr_cpBlockAdd( tor->completion, block );
     tr_ioWrite( tor->io, index, begin, len - 9, &p[8] );
+    tr_cpDownloaderRem( tor->completion, block );
 
     sendCancel( tor, block );
 
-    if( tr_bitfieldHas( tor->bitfield, index ) )
+    if( tr_cpPieceIsComplete( tor->completion, index ) )
     {
         tr_peer_t * otherPeer;
 

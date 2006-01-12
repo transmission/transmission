@@ -25,209 +25,98 @@
 
 @implementation NameCell
 
-- (void) setController: (Controller *) controller
+- (void) setStat: (tr_stat_t *) stat
 {
-    fController = controller;
-}
+    fNameString  = [NSString stringWithUTF8String: stat->info.name];
+    fSizeString  = [NSString stringWithFormat: @" (%@)",
+                    stringForFileSize( stat->info.totalSize )];
+    fTimeString  = @"";
+    fPeersString = @"";
 
-- (void) setStat: (tr_stat_t *) stat index: (int) idx
-{
-    fStat  = stat;
-    fIndex = idx;
+    if( stat->status & TR_STATUS_PAUSE )
+    {
+        fTimeString = [NSString stringWithFormat:
+            @"Paused (%.2f %%)", 100 * stat->progress];
+    }
+    else if( stat->status & TR_STATUS_CHECK )
+    {
+        fTimeString = [NSString stringWithFormat:
+            @"Checking existing files (%.2f %%)", 100 * stat->progress];
+    }
+    else if( stat->status & TR_STATUS_DOWNLOAD )
+    {
+        if( stat->eta < 0 )
+        {
+            fTimeString = [NSString stringWithFormat:
+                @"Finishing in --:--:-- (%.2f %%)", 100 * stat->progress];
+        }
+        else
+        {
+            fTimeString = [NSString stringWithFormat:
+                @"Finishing in %02d:%02d:%02d (%.2f %%)",
+                stat->eta / 3600, ( stat->eta / 60 ) % 60,
+                stat->eta % 60, 100 * stat->progress];
+        }
+        fPeersString = [NSString stringWithFormat:
+            @"Downloading from %d of %d peer%s",
+            stat->peersUploading, stat->peersTotal,
+            ( stat->peersTotal == 1 ) ? "" : "s"];
+    }
+    else if( stat->status & TR_STATUS_SEED )
+    {
+        fTimeString  = [NSString stringWithFormat:
+            @"Seeding, uploading to %d of %d peer%s",
+            stat->peersDownloading, stat->peersTotal,
+            ( stat->peersTotal == 1 ) ? "" : "s"];
+    }
+    else if( stat->status & TR_STATUS_STOPPING )
+    {
+        fTimeString  = @"Stopping...";
+    }
+
+    if( ( stat->status & ( TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) ) &&
+        ( stat->status & TR_TRACKER_ERROR ) )
+    {
+        fPeersString = [NSString stringWithFormat: @"%@%@",
+    	    @"Error: ", [NSString stringWithUTF8String: stat->error]];
+    }
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
+    NSString * string;
+    NSPoint pen;
+    NSMutableDictionary * attributes;
+
     if( ![view lockFocusIfCanDraw] )
     {
         return;
     }
 
-    NSString * nameString = NULL, * timeString = @"", * peersString = @"";
-    NSMutableDictionary * attributes;
+    pen = cellFrame.origin;
+
     attributes = [NSMutableDictionary dictionaryWithCapacity: 1];
-    NSPoint pen = cellFrame.origin;
-    
-    NSString * sizeString = [NSString stringWithFormat: @" (%@)",
-        stringForFileSize( fStat->info.totalSize )];
-
-    nameString = [NSString stringWithFormat: @"%@%@",
-        stringFittingInWidth( fStat->info.name, cellFrame.size.width -
-                35 - widthForString( sizeString, 12 ), 12 ),
-        sizeString];
-
-    if( fStat->status & TR_STATUS_PAUSE )
-    {
-        timeString = [NSString stringWithFormat:
-            @"Paused (%.2f %%)", 100 * fStat->progress];
-        peersString = @"";
-    }
-    else if( fStat->status & TR_STATUS_CHECK )
-    {
-        timeString = [NSString stringWithFormat:
-            @"Checking existing files (%.2f %%)", 100 * fStat->progress];
-        peersString = @"";
-    }
-    else if( fStat->status & TR_STATUS_DOWNLOAD )
-    {
-        if( fStat->eta < 0 )
-        {
-            timeString = [NSString stringWithFormat:
-                @"Finishing in --:--:-- (%.2f %%)", 100 * fStat->progress];
-        }
-        else
-        {
-            timeString = [NSString stringWithFormat:
-                @"Finishing in %02d:%02d:%02d (%.2f %%)",
-                fStat->eta / 3600, ( fStat->eta / 60 ) % 60,
-                fStat->eta % 60, 100 * fStat->progress];
-        }
-        peersString = [NSString stringWithFormat:
-            @"Downloading from %d of %d peer%s",
-            fStat->peersUploading, fStat->peersTotal,
-            ( fStat->peersTotal == 1 ) ? "" : "s"];
-    }
-    else if( fStat->status & TR_STATUS_SEED )
-    {
-        timeString  = [NSString stringWithFormat:
-            @"Seeding, uploading to %d of %d peer%s",
-            fStat->peersDownloading, fStat->peersTotal,
-            ( fStat->peersTotal == 1 ) ? "" : "s"];
-        peersString = @"";
-    }
-    else if( fStat->status & TR_STATUS_STOPPING )
-    {
-        timeString  = @"Stopping...";
-        peersString = @"";
-    }
-
-    if( ( fStat->status & ( TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) ) &&
-        ( fStat->status & TR_TRACKER_ERROR ) )
-    {
-        peersString = [NSString stringWithFormat: @"%@%@",
-    	@"Error: ", stringFittingInWidth( fStat->error,
-    	    cellFrame.size.width - 40 -
-    	    widthForString( @"Error: ", 10 ), 10 )];
-    }
-
     [attributes setObject: [NSFont messageFontOfSize:12.0]
         forKey: NSFontAttributeName];
 
     pen.x += 5; pen.y += 5;
-    [nameString drawAtPoint: pen withAttributes: attributes];
+    string = [NSString stringWithFormat: @"%@%@",
+        stringFittingInWidth( fNameString, cellFrame.size.width -
+        35 - widthForString( fSizeString, 12 ), 12 ), fSizeString];
+    [string drawAtPoint: pen withAttributes: attributes];
 
     [attributes setObject: [NSFont messageFontOfSize:10.0]
         forKey: NSFontAttributeName];
 
     pen.x += 5; pen.y += 20;
-    [timeString drawAtPoint: pen withAttributes: attributes];
+    [fTimeString drawAtPoint: pen withAttributes: attributes];
 
     pen.x += 0; pen.y += 15;
-    [peersString drawAtPoint: pen withAttributes: attributes];
-
-    /* "Pause" button */
-    fPauseRect = NSMakeRect( cellFrame.origin.x + cellFrame.size.width - 19,
-                             cellFrame.origin.y + cellFrame.size.height - 38,
-                             14, 14 );
-    NSImage * pauseImage = NULL;
-    if( fStat->status & TR_STATUS_PAUSE )
-    {
-        if( NSPointInRect( fClickPoint, fPauseRect ) )
-        {
-            pauseImage = [NSImage imageNamed: @"ResumeOn.png"];
-        }
-        else
-        {
-            pauseImage = [NSImage imageNamed: @"ResumeOff.png"];
-        }
-    }
-    else if( fStat->status &
-             ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
-    {
-        if( NSPointInRect( fClickPoint, fPauseRect ) )
-        {
-            pauseImage = [NSImage imageNamed: @"PauseOn.png"];
-        }
-        else
-        {
-            pauseImage = [NSImage imageNamed: @"PauseOff.png"];
-        }
-    }
-    if( pauseImage )
-    {
-        pen.x = fPauseRect.origin.x;
-        pen.y = fPauseRect.origin.y + 14;
-        [pauseImage compositeToPoint: pen operation: NSCompositeSourceOver];
-    }
-
-    /* "Reveal in Finder" button */
-    fRevealRect = NSMakeRect( cellFrame.origin.x + cellFrame.size.width - 19,
-                              cellFrame.origin.y + cellFrame.size.height - 19,
-                              14, 14 );
-    NSImage * revealImage;
-    if( NSPointInRect( fClickPoint, fRevealRect ) )
-    {
-        revealImage = [NSImage imageNamed: @"RevealOn.png"];
-    }
-    else
-    {
-        revealImage = [NSImage imageNamed: @"RevealOff.png"];
-    }
-    pen.x = fRevealRect.origin.x;
-    pen.y = fRevealRect.origin.y + 14;
-    [revealImage compositeToPoint: pen operation: NSCompositeSourceOver];
+    string = stringFittingInWidth( fPeersString,
+                cellFrame.size.width - 40, 10 );
+    [string drawAtPoint: pen withAttributes: attributes];
 
     [view unlockFocus];
-}
-
-/* Track mouse as long as button is down */
-- (BOOL) startTrackingAt: (NSPoint) start inView: (NSView *) v
-{
-    fClickPoint = start;
-    return YES;
-}
-- (BOOL) continueTracking: (NSPoint) last at: (NSPoint) current
-    inView: (NSView *) v
-{
-    fClickPoint = current;
-    return YES;
-}
-
-- (void) stopTracking: (NSPoint) last at:(NSPoint) stop
-    inView: (NSView *) v mouseIsUp: (BOOL) flag
-{
-    if( flag )
-    {
-        if( NSPointInRect( stop, fRevealRect ) )
-        {
-            /* Reveal in Finder */
-            NSString * string = [NSString stringWithFormat:
-                @"tell application \"Finder\"\nactivate\nreveal (POSIX file \"%s/%s\")\nend tell",
-                fStat->folder, fStat->info.name];
-            NSAppleScript * appleScript;
-            appleScript = [[NSAppleScript alloc] initWithSource: string];
-            NSDictionary * error;
-            if( ![appleScript executeAndReturnError: &error] )
-            {
-                printf( "Reveal in Finder: AppleScript failed\n" );
-            }
-            [appleScript release];
-        }
-        else if( NSPointInRect( stop, fPauseRect ) )
-        {
-            /* Pause, resume */
-            if( fStat->status & TR_STATUS_PAUSE )
-            {
-                [fController resumeTorrentWithIndex: fIndex];
-            }
-            else if( fStat->status & ( TR_STATUS_CHECK |
-                      TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
-            {
-                [fController stopTorrentWithIndex: fIndex];
-            }
-        }
-    }
-    fClickPoint = NSMakePoint(0,0);
 }
 
 @end

@@ -107,6 +107,7 @@
 #define TR_MAX_PEER_COUNT 60
 
 typedef struct tr_torrent_s tr_torrent_t;
+typedef struct tr_completion_s tr_completion_t;
 
 #include "bencode.h"
 #include "metainfo.h"
@@ -129,6 +130,7 @@ struct tr_torrent_s
     char              error[128];
 
     char            * id;
+    char            * key;
 
     /* An escaped string used to include the hash in HTTP queries */
     char              hashString[3*SHA_DIGEST_LENGTH+1];
@@ -142,12 +144,15 @@ struct tr_torrent_s
     int               blockSize;
     int               blockCount;
     
+#if 0
     /* Status for each block
        -1 = we have it
         n = we are downloading it from n peers */
     char            * blockHave;
     int               blockHaveCount;
     uint8_t         * bitfield;
+#endif
+    tr_completion_t * completion;
 
     volatile char     die;
     tr_thread_t       thread;
@@ -170,6 +175,7 @@ struct tr_torrent_s
 };
 
 #include "utils.h"
+#include "completion.h"
 
 struct tr_handle_s
 {
@@ -182,6 +188,7 @@ struct tr_handle_s
     int            bindPort;
 
     char           id[21];
+    char           key[21];
     char           prefsDirectory[256];
 };
 

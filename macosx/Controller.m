@@ -25,11 +25,19 @@
 #include "NameCell.h"
 #include "ProgressCell.h"
 #include "Utils.h"
+#include "TorrentTableView.h"
 
 #define TOOLBAR_OPEN   @"Toolbar Open"
 #define TOOLBAR_REMOVE @"Toolbar Remove"
 #define TOOLBAR_PREFS  @"Toolbar Preferences"
 #define TOOLBAR_INFO   @"Toolbar Info"
+
+#define CONTEXT_PAUSE           1
+#define CONTEXT_REMOVE          2
+#define CONTEXT_REMOVE_TORRENT  3
+#define CONTEXT_REMOVE_DATA     4
+#define CONTEXT_REMOVE_BOTH     5
+#define CONTEXT_INFO            6                                              
 
 static void sleepCallBack( void * controller, io_service_t y,
         natural_t messageType, void * messageArgument )
@@ -82,9 +90,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fWindow  setToolbar:  fToolbar];
     [fWindow  setDelegate: self];
 
-    [fTableView setDataSource: self];
-    [fTableView setDelegate:   self];
-
     NSTableColumn * tableColumn;
     NameCell      * nameCell;
     ProgressCell  * progressCell;
@@ -92,7 +97,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     nameCell     = [[NameCell     alloc] init];
     progressCell = [[ProgressCell alloc] init];
     tableColumn  = [fTableView tableColumnWithIdentifier: @"Name"];
-    [nameCell    setController: self];
     [tableColumn setDataCell: nameCell];
     [tableColumn setMinWidth: 10.0];
     [tableColumn setMaxWidth: 3000.0];
@@ -396,10 +400,103 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self updateUI: NULL];
 }
 
+
+- (void) removeTorrentWithIndex: (int) idx
+                  deleteTorrent: (BOOL) deleteTorrent
+                     deleteData: (BOOL) deleteData
+{
+    BOOL torrentWarning = ![[NSUserDefaults standardUserDefaults]
+                            boolForKey:@"SkipTorrentDeletionWarning"];
+    BOOL dataWarning = ![[NSUserDefaults standardUserDefaults]
+                            boolForKey:@"SkipDataDeletionWarning"];
+    
+    if ( ( torrentWarning && deleteTorrent ) || (dataWarning && deleteData ) )
+    {
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        
+        [alert addButtonWithTitle:@"No"];
+        [alert addButtonWithTitle:@"Yes"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setMessageText:@"Are you sure you want to remove and delete?"];
+        
+        if ( (deleteTorrent && torrentWarning) &&
+             !( dataWarning && deleteData ) )
+        {
+            /* delete torrent warning YES, delete data warning NO */
+            [alert setInformativeText:@"If you choose yes, the .torrent file will "
+                "be deleted. This cannot be undone."];
+        }
+        else if( (deleteData && dataWarning) &&
+                 !( torrentWarning && deleteTorrent ) )
+        {
+            /* delete torrent warning NO, delete data warning YES */
+            [alert setInformativeText:@"If you choose yes, the downloaded data will "
+                "be deleted. This cannot be undone."];
+        }
+        else
+        {
+            /* delete torrent warning YES, delete data warning YES */
+            [alert setInformativeText:@"If you choose yes, both downloaded data and "
+                "torrent file will be deleted. This cannot be undone."];
+        }
+        
+        if ( [alert runModal] == NSAlertFirstButtonReturn )
+            return;
+    }
+    
+    if ( deleteData )
+    {
+        tr_file_t * files = fStat[idx].info.files;
+        int i;
+        
+        for ( i = 0; i < fStat[idx].info.fileCount; i++ )
+        {
+            if ( -1 == remove([[NSString stringWithFormat:@"%s/%s", 
+                                        fStat[idx].folder,
+                                        files[i].name] 
+                                cString]) )
+            {
+                NSLog(@"remove(%s) failed, errno = %i",
+                      files[i].name,
+                      errno);
+            }
+        }
+        
+        /* in some cases, we should remove fStat[idx].folder also. When? */
+    }
+    
+    if ( deleteTorrent )
+    {
+        if ( -1 == remove( fStat[idx].info.torrent ) )
+        {
+            NSLog(@"remove(%s) failed, errno = %i",
+                  fStat[idx].info.torrent,
+                  errno);
+        }
+    }
+    
+    tr_torrentClose( fHandle, idx );
+    [self updateUI: NULL];
+}
+
 - (void) removeTorrent: (id) sender
 {
-    tr_torrentClose( fHandle, [fTableView selectedRow] );
-    [self updateUI: NULL];
+    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: NO deleteData: NO ];
+}
+
+- (void) removeTorrentDeleteFile: (id) sender
+{
+    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: YES deleteData: NO];
+}
+
+- (void) removeTorrentDeleteData: (id) sender
+{
+    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: NO deleteData: YES];
+}
+
+- (void) removeTorrentDeleteBoth: (id) sender
+{
+    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: YES deleteData: YES];
 }
 
 - (void) showInfo: (id) sender
@@ -425,7 +522,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         free( fStat );
     }
     fCount = tr_torrentStat( fHandle, &fStat );
-    [fTableView reloadData];
+    [fTableView updateUI: fStat];
 
     /* Update the global DL/UL rates */
     tr_torrentRates( fHandle, &dl, &ul );
@@ -448,6 +545,43 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self updateToolbar];
 }
 
+
+- (NSMenu *) menuForIndex: (int) idx
+{
+    if ( idx < 0 || idx >= fCount )
+    {
+        return nil;
+    }
+    
+    int status = fStat[idx].status;
+    
+    NSMenuItem *pauseItem = [fContextMenu itemWithTag: CONTEXT_PAUSE];
+    NSMenuItem *removeItem = [fContextMenu itemAtIndex: 1];
+    
+    [pauseItem setTarget: self];
+    
+    if ( status & TR_STATUS_CHECK ||
+         status & TR_STATUS_DOWNLOAD ||
+         status & TR_STATUS_SEED )
+    {
+        /* we can stop */
+        [removeItem setEnabled: NO];
+        [pauseItem setTitle: @"Pause"];
+        [pauseItem setAction: @selector(stopTorrent:)];
+        [pauseItem setEnabled: YES];
+    } else {
+        /* we are stopped */
+        [removeItem setEnabled: YES];
+        [pauseItem setTitle: @"Resume"];
+        [pauseItem setAction: @selector(resumeTorrent:)];
+        /* don't allow resuming if we aren't in PAUSE */
+        if ( !(status & TR_STATUS_PAUSE) )
+            [pauseItem setEnabled: NO];
+    }
+    
+    return fContextMenu;
+}
+
 - (int) numberOfRowsInTableView: (NSTableView *) t
 {
     return fCount;
@@ -464,7 +598,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     if( [[tableColumn identifier] isEqualToString: @"Name"] )
     {
-        [(NameCell *) cell setStat: &fStat[rowIndex] index: rowIndex];
+        [(NameCell *) cell setStat: &fStat[rowIndex]];
     }
     else if( [[tableColumn identifier] isEqualToString: @"Progress"] )
     {
@@ -518,7 +652,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     /* Update info window */
-    [fInfoTitle setStringValue: [NSString stringWithCString:
+    [fInfoTitle setStringValue: [NSString stringWithUTF8String:
         fStat[row].info.name]];
     [fInfoTracker setStringValue: [NSString stringWithFormat:
         @"%s:%d", fStat[row].info.trackerAddress, fStat[row].info.trackerPort]];

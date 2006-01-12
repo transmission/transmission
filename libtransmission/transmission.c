@@ -51,6 +51,13 @@ tr_handle_t * tr_init()
         h->id[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
     }
 
+    /* Random key */
+    for( i = 0; i < 20; i++ )
+    {
+        r         = tr_rand( 36 );
+        h->key[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
+    }
+
     /* Don't exit when writing on a broken socket */
     signal( SIGPIPE, SIG_IGN );
 
@@ -164,6 +171,7 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
 
     tor->status = TR_STATUS_PAUSE;
     tor->id     = h->id;
+    tor->key    = h->key;
 
     /* Guess scrape URL */
     s1 = strchr( inf->trackerAnnounce, '/' );
@@ -191,8 +199,7 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
     tor->blockSize  = MIN( inf->pieceSize, 1 << 14 );
     tor->blockCount = ( inf->totalSize + tor->blockSize - 1 ) /
                         tor->blockSize;
-    tor->blockHave  = calloc( tor->blockCount, 1 );
-    tor->bitfield   = calloc( ( inf->pieceCount + 7 ) / 8, 1 );
+    tor->completion = tr_cpInit( tor );
 
     tr_lockInit( &tor->lock );
 
@@ -330,8 +337,6 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         tor = h->torrents[i];
         inf = &tor->info;
 
-        tr_lockLock( tor->lock );
-
         if( ( tor->status & TR_STATUS_STOPPED ) ||
             ( ( tor->status & TR_STATUS_STOPPING ) &&
               tr_date() > tor->stopDate + 60000 ) )
@@ -339,6 +344,8 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
             torrentReallyStop( h, i );
             tor->status = TR_STATUS_PAUSE;
         }
+
+        tr_lockLock( tor->lock );
 
         memcpy( &s[i].info, &tor->info, sizeof( tr_info_t ) );
         s[i].status = tor->status;
@@ -364,8 +371,7 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
             }
         }
 
-        s[i].progress = (float) tor->blockHaveCount / (float) tor->blockCount;
-
+        s[i].progress     = tr_cpCompletionAsFloat( tor->completion );
         s[i].rateDownload = rateDownload( tor );
         s[i].rateUpload   = rateUpload( tor );
 
@@ -375,8 +381,8 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         }
         else
         {
-            s[i].eta = (float) (tor->blockCount - tor->blockHaveCount ) *
-                (float) tor->blockSize / s[i].rateDownload / 1024.0;
+            s[i].eta = (float) ( 1.0 - s[i].progress ) *
+                (float) inf->totalSize / s[i].rateDownload / 1024.0;
             if( s[i].eta > 99 * 3600 + 59 * 60 + 59 )
             {
                 s[i].eta = -1;
@@ -387,7 +393,7 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         {
             piece = j * inf->pieceCount / 120;
 
-            if( tr_bitfieldHas( tor->bitfield, piece ) )
+            if( tr_cpPieceIsComplete( tor->completion, piece ) )
             {
                 s[i].pieces[j] = -1;
                 continue;
@@ -430,14 +436,13 @@ void tr_torrentClose( tr_handle_t * h, int t )
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
     {
         /* Join the thread first */
-        tr_lockLock( tor->lock );
         torrentReallyStop( h, t );
-        tr_lockUnlock( tor->lock );
     }
 
     h->torrentCount--;
 
     tr_lockClose( tor->lock );
+    tr_cpClose( tor->completion );
 
     if( tor->destination )
     {
@@ -445,8 +450,6 @@ void tr_torrentClose( tr_handle_t * h, int t )
     }
     free( inf->pieces );
     free( inf->files );
-    free( tor->blockHave );
-    free( tor->bitfield );
     free( tor );
 
     memmove( &h->torrents[t], &h->torrents[t+1],
@@ -476,19 +479,19 @@ static void downloadLoop( void * _tor )
     signal( SIGINT, SIG_IGN );
 #endif
 
+    tr_lockLock( tor->lock );
+
     tor->io     = tr_ioInit( tor );
-    tor->status = ( tor->blockHaveCount < tor->blockCount ) ?
-                      TR_STATUS_DOWNLOAD : TR_STATUS_SEED;
-    
+    tor->status = tr_cpIsSeeding( tor->completion ) ?
+                      TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+
     while( !tor->die )
     {
         date1 = tr_date();
 
-        tr_lockLock( tor->lock );
-
         /* Are we finished ? */
         if( ( tor->status & TR_STATUS_DOWNLOAD ) &&
-            tor->blockHaveCount >= tor->blockCount )
+            tr_cpIsSeeding( tor->completion ) )
         {
             /* Done */
             tor->status = TR_STATUS_SEED;
@@ -501,8 +504,6 @@ static void downloadLoop( void * _tor )
         /* Try to get new peers or to send a message to the tracker */
         tr_trackerPulse( tor->tracker );
 
-        tr_lockUnlock( tor->lock );
-
         if( tor->status & TR_STATUS_STOPPED )
         {
             break;
@@ -512,9 +513,13 @@ static void downloadLoop( void * _tor )
         date2 = tr_date();
         if( date2 < date1 + 20 )
         {
+            tr_lockUnlock( tor->lock );
             tr_wait( date1 + 20 - date2 );
+            tr_lockLock( tor->lock );
         }
     }
+
+    tr_lockUnlock( tor->lock );
 
     tr_ioClose( tor->io );
 

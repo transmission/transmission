@@ -29,15 +29,12 @@
 
 @interface NameCell : NSCell
 {
-    Controller * fController;
-    tr_stat_t  * fStat;
-    int          fIndex;
-    NSRect       fPauseRect;
-    NSRect       fRevealRect;
-    NSPoint      fClickPoint;
+    NSString * fNameString;
+    NSString * fSizeString;
+    NSString * fTimeString;
+    NSString * fPeersString;
 }
-- (void) setController: (Controller *) controller;
-- (void) setStat: (tr_stat_t *) stat index: (int) index;
+- (void) setStat: (tr_stat_t *) stat;
 @end
 
 #endif

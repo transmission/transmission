@@ -245,17 +245,28 @@ static void sendQuery( tr_tracker_t * tc )
     else
         event = "";
 
-    left  = (uint64_t) ( tor->blockCount - tor->blockHaveCount ) *
-            (uint64_t) tor->blockSize;
-    left  = MIN( left, inf->totalSize );
+    left = tr_cpLeftBytes( tor->completion );
 
     ret = snprintf( (char *) tc->buf, tc->size,
-              "GET %s?info_hash=%s&peer_id=%s&port=%d&uploaded=%lld&"
-              "downloaded=%lld&left=%lld&compact=1&numwant=50%s "
-              "HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
-              inf->trackerAnnounce, tor->hashString, tc->id,
-              tor->bindPort, tor->uploaded[9], tor->downloaded[9],
-              left, event, inf->trackerAddress );
+            "GET %s?"
+            "info_hash=%s&"
+            "peer_id=%s&"
+            "port=%d&"
+            "uploaded=%lld&"
+            "downloaded=%lld&"
+            "left=%lld&"
+            "compact=1&"
+            "numwant=50&"
+            "key=%s"
+            "%s "
+            "HTTP/1.1\r\n"
+            "Host: %s\r\n"
+            "User-Agent: Transmission/%d.%d\r\n"
+            "Connection: close\r\n\r\n",
+            inf->trackerAnnounce, tor->hashString, tc->id,
+            tor->bindPort, tor->uploaded[9], tor->downloaded[9],
+            left, tor->key, event, inf->trackerAddress,
+            VERSION_MAJOR, VERSION_MINOR );
 
     ret = tr_netSend( tc->socket, tc->buf, ret );
     if( ret & TR_NET_CLOSE )
@@ -381,7 +392,7 @@ static void recvAnswer( tr_tracker_t * tc )
     {
         tc->leechers = beFoo->val.i;
     }
-    if( tc->seeders + tc->seeders >= 50 )
+    if( tc->seeders + tc->leechers >= 50 )
     {
         tc->hasManyPeers = 1;
     }

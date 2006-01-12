@@ -7,6 +7,9 @@
                 linkHomepage = id; 
                 openShowSheet = id; 
                 removeTorrent = id; 
+                removeTorrentDeleteBoth = id; 
+                removeTorrentDeleteData = id; 
+                removeTorrentDeleteFile = id; 
                 resumeTorrent = id; 
                 showInfo = id; 
                 showMainWindow = id; 
@@ -16,6 +19,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fAdvancedBarItem = NSMenuItem; 
+                fContextMenu = NSMenu; 
                 fInfoAnnounce = NSTextField; 
                 fInfoDownloaded = NSTextField; 
                 fInfoFolder = NSTextField; 
@@ -49,6 +53,12 @@
                 fWindow = NSWindow; 
             }; 
             SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = TorrentTableView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fController = Controller; }; 
+            SUPERCLASS = NSTableView; 
         }
     ); 
     IBVersion = 1; 

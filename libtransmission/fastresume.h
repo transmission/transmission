@@ -101,7 +101,6 @@ static void fastResumeSave( tr_io_t * io )
     int       version = 0;
     char    * path;
     int     * fileMTimes;
-    int       i;
     uint8_t * blockBitfield;
 
     /* Get file sizes */
@@ -130,16 +129,8 @@ static void fastResumeSave( tr_io_t * io )
     free( fileMTimes );
 
     /* Build and write the bitfield for blocks */
-    blockBitfield = calloc( ( tor->blockCount + 7 ) / 8, 1 );
-    for( i = 0; i < tor->blockCount; i++ )
-    {
-        if( tor->blockHave[i] < 0 )
-        {
-            tr_bitfieldAdd( blockBitfield, i );
-        }
-    }
+    blockBitfield = tr_cpBlockBitfield( tor->completion );
     fwrite( blockBitfield, ( tor->blockCount + 7 ) / 8, 1, file );
-    free( blockBitfield );
 
     /* Write the 'slotPiece' table */
     fwrite( io->slotPiece, 4, inf->pieceCount, file );
@@ -222,15 +213,7 @@ static int fastResumeLoad( tr_io_t * io )
     /* Load the bitfield for blocks and fill blockHave */
     blockBitfield = calloc( ( tor->blockCount + 7 ) / 8, 1 );
     fread( blockBitfield, ( tor->blockCount + 7 ) / 8, 1, file );
-    tor->blockHaveCount = 0;
-    for( i = 0; i < tor->blockCount; i++ )
-    {
-        if( tr_bitfieldHas( blockBitfield, i ) )
-        {
-            tor->blockHave[i] = -1;
-            (tor->blockHaveCount)++;
-        }
-    }
+    tr_cpBlockBitfieldSet( tor->completion, blockBitfield );
     free( blockBitfield );
 
     /* Load the 'slotPiece' table */
@@ -252,21 +235,6 @@ static int fastResumeLoad( tr_io_t * io )
                 io->slotsUsed = MAX( io->slotsUsed, j + 1 );
                 break;
             }
-        }
-
-        for( j = tr_pieceStartBlock( i );
-             j < tr_pieceStartBlock( i ) + tr_pieceCountBlocks( i );
-             j++ )
-        {
-            if( tor->blockHave[j] > -1 )
-            {
-                break;
-            }
-        }
-        if( j >= tr_pieceStartBlock( i ) + tr_pieceCountBlocks( i ) )
-        {
-            // tr_dbg( "Piece %d is complete", i );
-            tr_bitfieldAdd( tor->bitfield, i );
         }
     }
     // tr_dbg( "Slot used: %d", io->slotsUsed );

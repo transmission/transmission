@@ -50,25 +50,24 @@ static float widthForString( NSString * string, float fontSize )
     return [string sizeWithAttributes: attributes].width;
 }
 
-static NSString * stringFittingInWidth( char * string, float width,
+#define NS_ELLIPSIS [NSString stringWithUTF8String: "\xE2\x80\xA6"]
+
+static NSString * stringFittingInWidth( NSString * oldString, float width,
                                         float fontSize )
 {
-    NSString * nsString = NULL;
-    char     * foo      = strdup( string );
-    int        i;
+    NSString * newString  = NULL;
+    unsigned   i;
 
-    for( i = strlen( string ); i > 0; i-- )
+    for( i = 0; i < [oldString length]; i++ )
     {
-        foo[i] = '\0';
-        nsString = [NSString stringWithFormat: @"%s%@",
-            foo, ( i - strlen( string ) ? [NSString
-            stringWithUTF8String:"\xE2\x80\xA6"] : @"" )];
+        newString = [NSString stringWithFormat: @"%@%@",
+            [oldString substringToIndex: [oldString length] - i],
+            i ? NS_ELLIPSIS : @""];
 
-        if( widthForString( nsString, fontSize ) <= width )
+        if( widthForString( newString, fontSize ) <= width )
         {
             break;
         }
     }
-    free( foo );
-    return nsString;
+    return newString;
 }

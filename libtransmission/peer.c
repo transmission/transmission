@@ -169,10 +169,7 @@ void tr_peerRem( tr_torrent_t * tor, int i )
 
         r     = &peer->inRequests[j];
         block = tr_block( r->index,r->begin );
-        if( tor->blockHave[block] > 0 )
-        {
-          (tor->blockHave[block])--;
-        }
+        tr_cpDownloaderRem( tor->completion, block );
     }
     if( !peer->amChoking )
     {
@@ -271,77 +268,48 @@ void tr_peerPulse( tr_torrent_t * tor )
     {
         peer = tor->peers[i];
 
-        /* Connect */
-        if( ( peer->status & PEER_STATUS_IDLE ) &&
-            !tr_fdSocketWillCreate( tor->fdlimit, 0 ) )
+        if( peer->status < PEER_STATUS_HANDSHAKE )
         {
-            peer->socket = tr_netOpen( peer->addr, peer->port );
-            if( peer->socket < 0 )
-            {
-                peer_dbg( "connection failed" );
-                goto dropPeer;
-            }
-            peer->status = PEER_STATUS_CONNECTING;
+            i++;
+            continue;
         }
 
-        /* Try to send handshake */
-        if( peer->status & PEER_STATUS_CONNECTING )
+        /* Try to read */
+        for( ;; )
         {
-            uint8_t buf[68];
-            tr_info_t * inf = &tor->info;
-
-            buf[0] = 19;
-            memcpy( &buf[1], "BitTorrent protocol", 19 );
-            memset( &buf[20], 0, 8 );
-            memcpy( &buf[28], inf->hash, 20 );
-            memcpy( &buf[48], tor->id, 20 );
-
-            ret = tr_netSend( peer->socket, buf, 68 );
+            if( peer->size < 1 )
+            {
+                peer->size = 1024;
+                peer->buf  = malloc( peer->size );
+            }
+            else if( peer->pos >= peer->size )
+            {
+                peer->size *= 2;
+                peer->buf   = realloc( peer->buf, peer->size );
+            }
+            ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
+                              peer->size - peer->pos );
             if( ret & TR_NET_CLOSE )
             {
                 peer_dbg( "connection closed" );
                 goto dropPeer;
             }
-            else if( !( ret & TR_NET_BLOCK ) )
+            else if( ret & TR_NET_BLOCK )
             {
-                peer_dbg( "SEND handshake" );
-                peer->status = PEER_STATUS_HANDSHAKE;
+                break;
+            }
+            peer->date  = tr_date();
+            peer->pos  += ret;
+            if( parseBuf( tor, peer, ret ) )
+            {
+                goto dropPeer;
             }
         }
 
-        /* Try to read */
-        if( peer->status >= PEER_STATUS_HANDSHAKE )
+        if( peer->status < PEER_STATUS_CONNECTED )
         {
-            for( ;; )
-            {
-                if( peer->size < 1 )
-                {
-                    peer->size = 1024;
-                    peer->buf  = malloc( peer->size );
-                }
-                else if( peer->pos >= peer->size )
-                {
-                    peer->size *= 2;
-                    peer->buf   = realloc( peer->buf, peer->size );
-                }
-                ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
-                                  peer->size - peer->pos );
-                if( ret & TR_NET_CLOSE )
-                {
-                    peer_dbg( "connection closed" );
-                    goto dropPeer;
-                }
-                else if( ret & TR_NET_BLOCK )
-                {
-                    break;
-                }
-                peer->date  = tr_date();
-                peer->pos  += ret;
-                if( parseBuf( tor, peer, ret ) )
-                {
-                    goto dropPeer;
-                }
-            }
+            i++;
+            continue;
         }
 
         /* Try to write */
@@ -393,31 +361,28 @@ writeBegin:
         }
 writeEnd:
 
-        /* Connected peers: ask for a block whenever possible */
-        if( peer->status & PEER_STATUS_CONNECTED )
+        /* Ask for a block whenever possible */
+        if( !tr_cpIsSeeding( tor->completion ) &&
+            !peer->amInterested && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
         {
-            if( tor->blockHaveCount < tor->blockCount &&
-                !peer->amInterested && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
-            {
-                /* This peer is no use to us, and it seems there are
-                   more */
-                peer_dbg( "not interesting" );
-                tr_peerRem( tor, i );
-                continue;
-            }
+            /* This peer is no use to us, and it seems there are
+               more */
+            peer_dbg( "not interesting" );
+            tr_peerRem( tor, i );
+            continue;
+        }
 
-            if( peer->amInterested && !peer->peerChoking )
+        if( peer->amInterested && !peer->peerChoking )
+        {
+            int block;
+            while( peer->inRequestCount < OUR_REQUEST_COUNT )
             {
-                int block;
-                while( peer->inRequestCount < OUR_REQUEST_COUNT )
+                block = chooseBlock( tor, peer );
+                if( block < 0 )
                 {
-                    block = chooseBlock( tor, peer );
-                    if( block < 0 )
-                    {
-                        break;
-                    }
-                    sendRequest( tor, peer, block );
+                    break;
                 }
+                sendRequest( tor, peer, block );
             }
         }
         

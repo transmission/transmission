@@ -163,6 +163,46 @@ static int checkPeer( tr_torrent_t * tor, int i )
         }
     }
 
+    /* Connect */
+    if( ( peer->status & PEER_STATUS_IDLE ) &&
+        !tr_fdSocketWillCreate( tor->fdlimit, 0 ) )
+    {
+        peer->socket = tr_netOpen( peer->addr, peer->port );
+        if( peer->socket < 0 )
+        {
+            peer_dbg( "connection failed" );
+            tr_fdSocketClosed( tor->fdlimit, 0 );
+            return 1;
+        }
+        peer->status = PEER_STATUS_CONNECTING;
+    }
+
+    /* Try to send handshake */
+    if( peer->status & PEER_STATUS_CONNECTING )
+    {
+        uint8_t buf[68];
+        tr_info_t * inf = &tor->info;
+        int ret;
+
+        buf[0] = 19;
+        memcpy( &buf[1], "BitTorrent protocol", 19 );
+        memset( &buf[20], 0, 8 );
+        memcpy( &buf[28], inf->hash, 20 );
+        memcpy( &buf[48], tor->id, 20 );
+
+        ret = tr_netSend( peer->socket, buf, 68 );
+        if( ret & TR_NET_CLOSE )
+        {
+            peer_dbg( "connection closed" );
+            return 1;
+        }
+        else if( !( ret & TR_NET_BLOCK ) )
+        {
+            peer_dbg( "SEND handshake" );
+            peer->status = PEER_STATUS_HANDSHAKE;
+        }
+    }
+
     return 0;
 }
 
@@ -178,6 +218,7 @@ static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
 
     int i;
     int bitfieldSize = ( inf->pieceCount + 7 ) / 8;
+    uint8_t * bitfield = tr_cpPieceBitfield( tor->completion );
 
     if( !peer->bitfield )
     {
@@ -187,7 +228,7 @@ static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
 
     for( i = 0; i < bitfieldSize; i++ )
     {
-        if( ( peer->bitfield[i] & ~(tor->bitfield[i]) ) & 0xFF )
+        if( ( peer->bitfield[i] & ~(bitfield[i]) ) & 0xFF )
         {
             return 1;
         }
@@ -222,8 +263,7 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
 {
     tr_info_t * inf = &tor->info;
 
-    int i, j;
-    int startBlock, endBlock, countBlocks;
+    int i;
     int missingBlocks, minMissing;
     int poolSize, * pool;
     int block, minDownloading;
@@ -234,38 +274,15 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
     minMissing = tor->blockCount + 1;
     for( i = 0; i < inf->pieceCount; i++ )
     {
+        missingBlocks = tr_cpMissingBlocksForPiece( tor->completion, i );
+        if( missingBlocks < 1 )
+        {
+            /* We already have or are downloading all blocks */
+            continue;
+        }
         if( !tr_bitfieldHas( peer->bitfield, i ) )
         {
             /* The peer doesn't have this piece */
-            continue;
-        }
-        if( tr_bitfieldHas( tor->bitfield, i ) )
-        {
-            /* We already have it */
-            continue;
-        }
-
-        /* Count how many blocks from this piece are missing */
-        startBlock    = tr_pieceStartBlock( i );
-        countBlocks   = tr_pieceCountBlocks( i );
-        endBlock      = startBlock + countBlocks;
-        missingBlocks = countBlocks;
-        for( j = startBlock; j < endBlock; j++ )
-        {
-            /* TODO: optimize */
-            if( tor->blockHave[j] )
-            {
-                missingBlocks--;
-            }
-            if( missingBlocks > minMissing )
-            {
-                break;
-            }
-        }
-
-        if( missingBlocks < 1 )
-        {
-            /* We are already downloading all blocks */
             continue;
         }
 
@@ -331,44 +348,43 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
         free( pool2 );
 
         /* Pick a block in this piece */
-        startBlock = tr_pieceStartBlock( piece );
-        endBlock   = startBlock + tr_pieceCountBlocks( piece );
-        for( i = startBlock; i < endBlock; i++ )
-        {
-            if( !tor->blockHave[i] )
-            {
-                block = i;
-                goto check;
-            }
-        }
-
-        /* Shouldn't happen */
-        return -1;
+        block = tr_cpMissingBlockInPiece( tor->completion, piece );
+        goto check;
     }
 
     free( pool );
 
     /* "End game" mode */
-    block          = -1;
-    minDownloading = TR_MAX_PEER_COUNT + 1;
-    for( i = 0; i < tor->blockCount; i++ )
+    minDownloading = 255;
+    block = -1;
+    for( i = 0; i < inf->pieceCount; i++ )
     {
-        /* TODO: optimize */
-        if( tr_bitfieldHas( peer->bitfield, tr_blockPiece( i ) ) &&
-            tor->blockHave[i] >= 0 && tor->blockHave[i] < minDownloading )
+        int downloaders, block2;
+        if( !tr_bitfieldHas( peer->bitfield, i ) )
         {
-            block          = i;
-            minDownloading = tor->blockHave[i];
+            /* The peer doesn't have this piece */
+            continue;
+        }
+        if( tr_cpPieceIsComplete( tor->completion, i ) )
+        {
+            /* We already have it */
+            continue;
+        }
+        block2 = tr_cpMostMissingBlockInPiece( tor->completion, i, &downloaders );
+        if( block2 > -1 && downloaders < minDownloading )
+        {
+            block = block2;
+            minDownloading = downloaders;
         }
     }
 
+check:
     if( block < 0 )
     {
         /* Shouldn't happen */
         return -1;
     }
 
-check:
     for( i = 0; i < peer->inRequestCount; i++ )
     {
         tr_request_t * r;

@@ -136,7 +136,7 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
     endBlock   = startBlock + tr_pieceCountBlocks( index );
     for( i = startBlock; i < endBlock; i++ )
     {
-        if( tor->blockHave[i] >= 0 )
+        if( !tr_cpBlockIsComplete( tor->completion, i ) )
         {
             /* The piece is not complete */
             return 0;
@@ -159,15 +159,14 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
         /* We will need to reload the whole piece */
         for( i = startBlock; i < endBlock; i++ )
         {
-            tor->blockHave[i]    = 0;
-            tor->blockHaveCount -= 1;
+            tr_cpBlockRem( tor->completion, i );
         }
     }
     else
     {
         tr_inf( "Piece %d (slot %d): hash OK", index,
                 io->pieceSlot[index] );
-        tr_bitfieldAdd( tor->bitfield, index );
+        tr_cpPieceAdd( tor->completion, index );
     }
 
     return 0;
@@ -266,7 +265,6 @@ static int checkFiles( tr_io_t * io )
     int i;
     uint8_t * buf;
     uint8_t hash[SHA_DIGEST_LENGTH];
-    int startBlock, endBlock;
 
     io->pieceSlot = malloc( inf->pieceCount * sizeof( int ) );
     io->slotPiece = malloc( inf->pieceCount * sizeof( int ) );
@@ -281,9 +279,6 @@ static int checkFiles( tr_io_t * io )
     /* Yet we don't have anything */
     memset( io->pieceSlot, 0xFF, inf->pieceCount * sizeof( int ) );
     memset( io->slotPiece, 0xFF, inf->pieceCount * sizeof( int ) );
-    memset( tor->bitfield, 0, ( inf->pieceCount + 7 ) / 8 );
-    memset( tor->blockHave, 0, tor->blockCount );
-    tor->blockHaveCount = 0;
 
     /* Check pieces */
     io->slotsUsed = 0;
@@ -304,18 +299,10 @@ static int checkFiles( tr_io_t * io )
         {
             if( !memcmp( hash, &inf->pieces[20*j], SHA_DIGEST_LENGTH ) )
             {
-                int k;
                 io->pieceSlot[j] = i;
                 io->slotPiece[i] = j;
-                tr_bitfieldAdd( tor->bitfield, j );
 
-                startBlock = tr_pieceStartBlock( j );
-                endBlock   = startBlock + tr_pieceCountBlocks( j );
-                for( k = startBlock; k < endBlock; k++ )
-                {
-                    tor->blockHave[k] = -1;
-                    tor->blockHaveCount++;
-                }
+                tr_cpPieceAdd( tor->completion, j );
                 break;
             }
         }
@@ -332,16 +319,8 @@ static int checkFiles( tr_io_t * io )
         {
             io->pieceSlot[inf->pieceCount - 1] = i;
             io->slotPiece[i]                   = inf->pieceCount - 1;
-            tr_bitfieldAdd( tor->bitfield, inf->pieceCount - 1 );
 
-            startBlock = tr_pieceStartBlock( inf->pieceCount - 1 );
-            endBlock   = startBlock +
-                tr_pieceCountBlocks( inf->pieceCount - 1 );
-            for( j = startBlock; j < endBlock; j++ )
-            {
-                tor->blockHave[j] = -1;
-                tor->blockHaveCount++;
-            }
+            tr_cpPieceAdd( tor->completion, inf->pieceCount - 1 );
         }
     }
     free( buf );
@@ -410,7 +389,9 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
     while( size > 0 )
     {
         asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
+        tr_lockUnlock( tor->lock );
         file = tr_fdFileOpen( tor->fdlimit, path );
+        tr_lockLock( tor->lock );
         free( path );
 
         if( !file )
@@ -421,14 +402,17 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         willRead = MIN( inf->files[i].length - posInFile,
                           (uint64_t) size );
 
+        tr_lockUnlock( tor->lock );
         if( fseeko( file, posInFile, SEEK_SET ) )
         {
+            tr_lockLock( tor->lock );
             return 1;
         }
         if( write )
         {
             if( fwrite( buf, willRead, 1, file ) != 1 )
             {
+                tr_lockLock( tor->lock );
                 return 1;
             }
         }
@@ -436,10 +420,11 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         {
             if( fread( buf, willRead, 1, file ) != 1 )
             {
+                tr_lockLock( tor->lock );
                 return 1;
             }
         }
-
+        tr_lockLock( tor->lock );
         tr_fdFileRelease( tor->fdlimit, file );
 
         /* 'willRead' less bytes to do */

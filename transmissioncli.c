@@ -27,6 +27,10 @@
 #include <getopt.h>
 #include <signal.h>
 #include <transmission.h>
+#ifdef SYS_BEOS
+#include <kernel/OS.h>
+#define usleep snooze
+#endif
 
 #define USAGE \
 "Usage: %s [options] file.torrent [options]\n\n" \

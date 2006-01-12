@@ -75,6 +75,11 @@ static inline void tr_bitfieldAdd( uint8_t * bitfield, int piece )
     bitfield[ piece / 8 ] |= ( 1 << ( 7 - ( piece % 8 ) ) );
 }
 
+static inline void tr_bitfieldRem( uint8_t * bitfield, int piece )
+{
+    bitfield[ piece / 8 ] &= ~( 1 << ( 7 - ( piece % 8 ) ) );
+}
+
 #define tr_blockPiece(a) _tr_blockPiece(tor,a)
 static inline int _tr_blockPiece( tr_torrent_t * tor, int block )
 {

@@ -34,6 +34,7 @@ typedef struct tr_openFile_s
 #define STATUS_INVALID 1
 #define STATUS_UNUSED  2
 #define STATUS_USED    4
+#define STATUS_CLOSING 8
     int        status;
 
     uint64_t   date;
@@ -111,6 +112,15 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
         if( f->open[i].status > STATUS_INVALID &&
             !strcmp( path, f->open[i].path ) )
         {
+            if( f->open[i].status & STATUS_CLOSING )
+            {
+                /* Wait until the file is closed */
+                tr_lockUnlock( f->lock );
+                tr_wait( 10 );
+                tr_lockLock( f->lock );
+                i = -1;
+                continue;
+            }
             winner = i;
             goto done;
         }
@@ -134,7 +144,7 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
 
         for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
         {
-            if( f->open[i].status & STATUS_USED )
+            if( !( f->open[i].status & STATUS_UNUSED ) )
             {
                 continue;
             }
@@ -147,8 +157,14 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
 
         if( winner >= 0 )
         {
+            /* Close the file: we mark it as closing then release the
+               lock while doing so, because fclose may take same time
+               and we don't want to block other threads */
             tr_dbg( "Closing %s", f->open[winner].path );
+            f->open[winner].status = STATUS_CLOSING;
+            tr_lockUnlock( f->lock );
             fclose( f->open[winner].file );
+            tr_lockLock( f->lock );
             goto open;
         }
 

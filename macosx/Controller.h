@@ -27,13 +27,15 @@
 #include <transmission.h>
 #include "PrefsController.h"
 
+@class TorrentTableView;
+
 @interface Controller : NSObject
 {
     tr_handle_t                  * fHandle;
     int                            fCount;
     tr_stat_t                    * fStat;
     int                            fResumeOnWake[TR_MAX_TORRENT_COUNT];
-    
+
     NSToolbar                    * fToolbar;
 
     IBOutlet PrefsController     * fPrefsController;
@@ -41,9 +43,10 @@
     IBOutlet NSMenuItem          * fAdvancedBarItem;
 
     IBOutlet NSWindow            * fWindow;
-    IBOutlet NSTableView         * fTableView;
+    IBOutlet TorrentTableView    * fTableView;
     IBOutlet NSTextField         * fTotalDLField;
     IBOutlet NSTextField         * fTotalULField;
+    IBOutlet NSMenu              * fContextMenu;
 
     IBOutlet NSPanel             * fInfoPanel;
     IBOutlet NSTextField         * fInfoTitle;
@@ -70,11 +73,19 @@
 - (void) resumeTorrent:   (id) sender;
 - (void) resumeTorrentWithIndex: (int) index;
 - (void) removeTorrent:   (id) sender;
+- (void) removeTorrentDeleteFile: (id) sender;
+- (void) removeTorrentDeleteData: (id) sender;
+- (void) removeTorrentDeleteBoth: (id) sender;
+- (void) removeTorrentWithIndex: (int) idx
+                  deleteTorrent: (BOOL) deleteTorrent
+                     deleteData: (BOOL) deleteData;
 - (void) showInfo:        (id) sender;
 
 - (void) updateUI:        (NSTimer *) timer;
 - (void) sleepCallBack:   (natural_t) messageType argument:
                             (void *) messageArgument;
+
+- (NSMenu *) menuForIndex: (int) idx;
 
 - (void) showMainWindow:  (id) sender;
 - (void) linkHomepage:    (id) sender;

@@ -215,7 +215,7 @@ static void sendBitfield( tr_torrent_t * tor, tr_peer_t * peer )
 
     TR_HTONL( 1 + bitfieldSize, p );
     p[4] = 5;
-    memcpy( &p[5], tor->bitfield, bitfieldSize );
+    memcpy( &p[5], tr_cpPieceBitfield( tor->completion ), bitfieldSize );
 
     peer_dbg( "SEND bitfield" );
 }
@@ -257,8 +257,7 @@ static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
     TR_HTONL( r->begin, p + 9 );
     TR_HTONL( r->length, p + 13 );
 
-    /* Remember that we have one more uploader for this block */
-    (tor->blockHave[block])++;
+    tr_cpDownloaderAdd( tor->completion, block );
 
     peer_dbg( "SEND request %d/%d (%d bytes)",
               r->index, r->begin, r->length );
