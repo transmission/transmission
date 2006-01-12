@@ -25,18 +25,11 @@ static void updateInterest( tr_torrent_t * tor, tr_peer_t * peer );
 /***********************************************************************
  * peerInit
  ***********************************************************************
- * Returns NULL if we reached the maximum authorized number of peers.
- * Otherwise, allocates a new tr_peer_t, add it to the peers list and
- * returns a pointer to it.
+ * Allocates a new tr_peer_t and returns a pointer to it.
  **********************************************************************/
-static tr_peer_t * peerInit( tr_torrent_t * tor )
+static tr_peer_t * peerInit()
 {
     tr_peer_t * peer;
-
-    if( tor->peerCount >= TR_MAX_PEER_COUNT )
-    {
-        return NULL;
-    }
 
     peer              = calloc( sizeof( tr_peer_t ), 1 );
     peer->amChoking   = 1;
@@ -44,8 +37,26 @@ static tr_peer_t * peerInit( tr_torrent_t * tor )
     peer->date        = tr_date();
     peer->keepAlive   = peer->date;
 
-    tor->peers[tor->peerCount++] = peer;
     return peer;
+}
+
+/***********************************************************************
+ * peerAttach
+ ***********************************************************************
+ * Deallocates the tr_peer_t and returns 0 if we reached the maximum
+ * authorized number of peers. Otherwise, adds the tr_peer_t to the
+ * peers list.
+ **********************************************************************/
+static int peerAttach( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    if( tor->peerCount >= TR_MAX_PEER_COUNT )
+    {
+        tr_peerDestroy( tor->fdlimit, peer );
+        return 0;
+    }
+
+    tor->peers[tor->peerCount++] = peer;
+    return 1;
 }
 
 static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
@@ -83,7 +94,8 @@ static void addWithAddr( tr_torrent_t * tor, struct in_addr addr,
         }
     }
 
-    if( !( peer = peerInit( tor ) ) )
+    peer = peerInit();
+    if( !peerAttach( tor, peer ) )
     {
         return;
     }

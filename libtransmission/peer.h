@@ -26,9 +26,13 @@
 typedef struct tr_peer_s tr_peer_t;
 
 void        tr_peerAddOld        ( tr_torrent_t *, char *, int );
-void        tr_peerAddCompact    ( tr_torrent_t *, struct in_addr,
-                                   in_port_t, int );
+void        tr_peerAddCompact    ( tr_torrent_t *, struct in_addr, in_port_t );
+tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int );
+void        tr_peerAttach        ( tr_torrent_t *, tr_peer_t * );
+void        tr_peerDestroy       ( tr_fd_t *, tr_peer_t * );
 void        tr_peerRem           ( tr_torrent_t *, int );
+int         tr_peerRead          ( tr_torrent_t *, tr_peer_t * );
+uint8_t *   tr_peerHash          ( tr_peer_t * );
 void        tr_peerPulse         ( tr_torrent_t * );
 int         tr_peerIsConnected   ( tr_peer_t * );
 int         tr_peerIsUploading   ( tr_peer_t * );

@@ -106,11 +106,13 @@ int tr_netOpen( struct in_addr addr, in_port_t port )
     return s;
 }
 
-int tr_netBind( int * port )
+int tr_netBind( int port )
 {
-    int s, i;
+    int s;
     struct sockaddr_in sock;
-    int minPort, maxPort;
+#ifdef SO_REUSEADDR
+    int optval;
+#endif
 
     s = createSocket();
     if( s < 0 )
@@ -118,34 +120,25 @@ int tr_netBind( int * port )
         return -1;
     }
 
-    minPort = *port;
-    maxPort = minPort + 1000;
-    maxPort = MIN( maxPort, 65535 );
+#ifdef SO_REUSEADDR
+    optval = 1;
+    setsockopt( s, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof( optval ) );
+#endif
 
-    for( i = minPort; i <= maxPort; i++ )
+    memset( &sock, 0, sizeof( sock ) );
+    sock.sin_family      = AF_INET;
+    sock.sin_addr.s_addr = INADDR_ANY;
+    sock.sin_port        = htons( port );
+
+    if( bind( s, (struct sockaddr *) &sock,
+               sizeof( struct sockaddr_in ) ) )
     {
-        memset( &sock, 0, sizeof( sock ) );
-        sock.sin_family      = AF_INET;
-        sock.sin_addr.s_addr = INADDR_ANY;
-        sock.sin_port        = htons( i );
-
-        if( !bind( s, (struct sockaddr *) &sock,
-                   sizeof( struct sockaddr_in ) ) )
-        {
-            break;
-        }
-    }
-
-    if( i > maxPort )
-    {
+        tr_err( "Could not bind port %d", port );
         tr_netClose( s );
-        tr_err( "Could not bind any port from %d to %d",
-                minPort, maxPort );
         return -1;
     }
    
-    tr_inf( "Binded port %d", i );
-    *port = i;
+    tr_inf( "Binded port %d", port );
     listen( s, 5 );
 
     return s;

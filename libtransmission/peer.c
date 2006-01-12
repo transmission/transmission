@@ -123,32 +123,56 @@ void tr_peerAddOld( tr_torrent_t * tor, char * ip, int port )
 /***********************************************************************
  * tr_peerAddCompact
  ***********************************************************************
- * Tries to add a peer. If 's' is a negative value, will use 'addr' and
- * 'port' to connect to the peer. Otherwise, use the already connected
- * socket 's'.
+ * Tries to add a peer, using 'addr' and 'port' to connect to the peer.
  **********************************************************************/
 void tr_peerAddCompact( tr_torrent_t * tor, struct in_addr addr,
-                        in_port_t port, int s )
+                        in_port_t port )
 {
-    tr_peer_t * peer;
+    addWithAddr( tor, addr, port );
+}
 
-    if( s < 0 )
-    {
-        addWithAddr( tor, addr, port );
-        return;
-    }
-
-    if( !( peer = peerInit( tor ) ) )
-    {
-        tr_netClose( s );
-        tr_fdSocketClosed( tor->fdlimit, 0 );
-        return;
-    }
+/***********************************************************************
+ * tr_peerInit
+ ***********************************************************************
+ * Initializes a new peer.
+ **********************************************************************/
+tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s )
+{
+    tr_peer_t * peer = peerInit();
 
     peer->socket = s;
     peer->addr   = addr;
     peer->port   = port;
     peer->status = PEER_STATUS_CONNECTING;
+
+    return peer;
+}
+
+void tr_peerAttach( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    peerAttach( tor, peer );
+}
+
+void tr_peerDestroy( tr_fd_t * fdlimit, tr_peer_t * peer )
+{
+    if( peer->bitfield )
+    {
+        free( peer->bitfield );
+    }
+    if( peer->buf )
+    {
+        free( peer->buf );
+    }
+    if( peer->outMessages )
+    {
+        free( peer->outMessages );
+    }
+    if( peer->status > PEER_STATUS_IDLE )
+    {
+        tr_netClose( peer->socket );
+        tr_fdSocketClosed( fdlimit, 0 );
+    }
+    free( peer );
 }
 
 /***********************************************************************
@@ -175,27 +199,74 @@ void tr_peerRem( tr_torrent_t * tor, int i )
     {
         tr_uploadChoked( tor->upload );
     }
-    if( peer->bitfield )
-    {
-        free( peer->bitfield );
-    }
-    if( peer->buf )
-    {
-        free( peer->buf );
-    }
-    if( peer->outMessages )
-    {
-        free( peer->outMessages );
-    }
-    if( peer->status > PEER_STATUS_IDLE )
-    {
-        tr_netClose( peer->socket );
-        tr_fdSocketClosed( tor->fdlimit, 0 );
-    }
-    free( peer );
+    tr_peerDestroy( tor->fdlimit, peer );
     tor->peerCount--;
     memmove( &tor->peers[i], &tor->peers[i+1],
              ( tor->peerCount - i ) * sizeof( tr_peer_t * ) );
+}
+
+/***********************************************************************
+ * tr_peerRead
+ ***********************************************************************
+ *
+ **********************************************************************/
+int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    int ret;
+
+    /* Try to read */
+    for( ;; )
+    {
+        if( peer->size < 1 )
+        {
+            peer->size = 1024;
+            peer->buf  = malloc( peer->size );
+        }
+        else if( peer->pos >= peer->size )
+        {
+            peer->size *= 2;
+            peer->buf   = realloc( peer->buf, peer->size );
+        }
+        ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
+                          peer->size - peer->pos );
+        if( ret & TR_NET_CLOSE )
+        {
+            peer_dbg( "connection closed" );
+            return 1;
+        }
+        else if( ret & TR_NET_BLOCK )
+        {
+            break;
+        }
+        peer->date  = tr_date();
+        peer->pos  += ret;
+        if( NULL != tor )
+        {
+            if( parseBuf( tor, peer, ret ) )
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            if( parseBufHeader( peer ) )
+            {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/***********************************************************************
+ * tr_peerHash
+ ***********************************************************************
+ *
+ **********************************************************************/
+uint8_t * tr_peerHash( tr_peer_t * peer )
+{
+    return parseBufHash( peer );
 }
 
 /***********************************************************************
@@ -234,25 +305,6 @@ void tr_peerPulse( tr_torrent_t * tor )
     {
         return;
     }
-
-    /* Check for incoming connections */
-    if( tor->bindSocket > -1 &&
-        tor->peerCount < TR_MAX_PEER_COUNT &&
-        !tr_fdSocketWillCreate( tor->fdlimit, 0 ) )
-    {
-        int            s;
-        struct in_addr addr;
-        in_port_t      port;
-        s = tr_netAccept( tor->bindSocket, &addr, &port );
-        if( s > -1 )
-        {
-            tr_peerAddCompact( tor, addr, port, s );
-        }
-        else
-        {
-            tr_fdSocketClosed( tor->fdlimit, 0 );
-        }
-    }
     
     /* Shuffle peers */
     if( tor->peerCount > 1 )
@@ -274,36 +326,9 @@ void tr_peerPulse( tr_torrent_t * tor )
             continue;
         }
 
-        /* Try to read */
-        for( ;; )
+        if( tr_peerRead( tor, tor->peers[i] ) )
         {
-            if( peer->size < 1 )
-            {
-                peer->size = 1024;
-                peer->buf  = malloc( peer->size );
-            }
-            else if( peer->pos >= peer->size )
-            {
-                peer->size *= 2;
-                peer->buf   = realloc( peer->buf, peer->size );
-            }
-            ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
-                              peer->size - peer->pos );
-            if( ret & TR_NET_CLOSE )
-            {
-                peer_dbg( "connection closed" );
-                goto dropPeer;
-            }
-            else if( ret & TR_NET_BLOCK )
-            {
-                break;
-            }
-            peer->date  = tr_date();
-            peer->pos  += ret;
-            if( parseBuf( tor, peer, ret ) )
-            {
-                goto dropPeer;
-            }
+            goto dropPeer;
         }
 
         if( peer->status < PEER_STATUS_CONNECTED )

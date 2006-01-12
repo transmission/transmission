@@ -29,6 +29,8 @@ static void torrentReallyStop( tr_handle_t * h, int t );
 static void  downloadLoop( void * );
 static float rateDownload( tr_torrent_t * );
 static float rateUpload( tr_torrent_t * );
+static void  acceptLoop( void * );
+static void acceptStop( tr_handle_t * h );
 
 /***********************************************************************
  * tr_init
@@ -67,6 +69,22 @@ tr_handle_t * tr_init()
     h->fdlimit = tr_fdInit();
 
     h->bindPort = TR_DEFAULT_PORT;
+    h->bindSocket = -1;
+
+#ifndef BEOS_NETSERVER
+    /* BeOS net_server seems to be unable to set incoming connections to
+       non-blocking. Too bad. */
+    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
+    {
+        /* XXX should handle failure here in a better way */
+        h->bindSocket = tr_netBind( h->bindPort );
+    }
+#endif
+
+
+    h->acceptDie = 0;
+    tr_lockInit( &h->acceptLock );
+    tr_threadCreate( &h->acceptThread, acceptLoop, h );
 
     return h;
 }
@@ -78,8 +96,46 @@ tr_handle_t * tr_init()
  **********************************************************************/
 void tr_setBindPort( tr_handle_t * h, int port )
 {
-    /* FIXME multithread safety */
+    int ii, sock;
+
+    if( h->bindPort == port )
+      return;
+
+#ifndef BEOS_NETSERVER
+    /* BeOS net_server seems to be unable to set incoming connections to
+       non-blocking. Too bad. */
+    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
+    {
+        /* XXX should handle failure here in a better way */
+        sock = tr_netBind( port );
+    }
+#else
+    return;
+#endif
+
+    tr_lockLock( &h->acceptLock );
+
     h->bindPort = port;
+
+    for( ii = 0; ii < h->torrentCount; ii++ )
+    {
+        tr_lockLock( &h->torrents[ii]->lock );
+        if( NULL != h->torrents[ii]->tracker )
+        {
+            tr_trackerChangePort( h->torrents[ii]->tracker, port );
+        }
+        tr_lockUnlock( &h->torrents[ii]->lock );
+    }
+
+    if( h->bindSocket > -1 )
+    {
+        tr_netClose( h->bindSocket );
+        tr_fdSocketClosed( h->fdlimit, 0 );
+    }
+
+    h->bindSocket = sock;
+
+    tr_lockUnlock( &h->acceptLock );
 }
 
 /***********************************************************************
@@ -196,8 +252,10 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
     tor->fdlimit = h->fdlimit;
  
     /* We have a new torrent */
+    tr_lockLock( &h->acceptLock );
     h->torrents[h->torrentCount] = tor;
     (h->torrentCount)++;
+    tr_lockUnlock( &h->acceptLock );
 
     return 0;
 }
@@ -241,15 +299,6 @@ void tr_torrentStart( tr_handle_t * h, int t )
 
     tor->status   = TR_STATUS_CHECK;
     tor->tracker  = tr_trackerInit( h, tor );
-    tor->bindPort = h->bindPort;
-#ifndef BEOS_NETSERVER
-    /* BeOS net_server seems to be unable to set incoming connections to
-       non-blocking. Too bad. */
-    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
-    {
-        tor->bindSocket = tr_netBind( &tor->bindPort );
-    }
-#endif
 
     now = tr_date();
     for( i = 0; i < 10; i++ )
@@ -290,11 +339,6 @@ static void torrentReallyStop( tr_handle_t * h, int t )
     while( tor->peerCount > 0 )
     {
         tr_peerRem( tor, 0 );
-    }
-    if( tor->bindSocket > -1 )
-    {
-        tr_netClose( tor->bindSocket );
-        tr_fdSocketClosed( h->fdlimit, 0 );
     }
 
     memset( tor->downloaded, 0, sizeof( tor->downloaded ) );
@@ -445,6 +489,8 @@ void tr_torrentClose( tr_handle_t * h, int t )
         torrentReallyStop( h, t );
     }
 
+    tr_lockLock( &h->acceptLock );
+
     h->torrentCount--;
 
     tr_lockClose( &tor->lock );
@@ -460,10 +506,13 @@ void tr_torrentClose( tr_handle_t * h, int t )
 
     memmove( &h->torrents[t], &h->torrents[t+1],
              ( h->torrentCount - t ) * sizeof( void * ) );
+
+    tr_lockUnlock( &h->acceptLock );
 }
 
 void tr_close( tr_handle_t * h )
 {
+    acceptStop( h );
     tr_fdClose( h->fdlimit );
     tr_uploadClose( h->upload );
     free( h );
@@ -566,4 +615,120 @@ static float rateDownload( tr_torrent_t * tor )
 static float rateUpload( tr_torrent_t * tor )
 {
     return rateGeneric( tor->dates, tor->uploaded );
+}
+
+/***********************************************************************
+ * acceptLoop
+ **********************************************************************/
+static void acceptLoop( void * _h )
+{
+    tr_handle_t * h = _h;
+    uint64_t      date1, date2;
+    int           ii, jj;
+    uint8_t     * hash;
+
+    tr_dbg( "Accept thread started" );
+
+#ifdef SYS_BEOS
+    /* This is required because on BeOS, SIGINT is sent to each thread,
+       which kills them not nicely */
+    signal( SIGINT, SIG_IGN );
+#endif
+
+    tr_lockLock( &h->acceptLock );
+
+    while( !h->acceptDie )
+    {
+        date1 = tr_date();
+
+        /* Check for incoming connections */
+        if( h->bindSocket > -1 &&
+            h->acceptPeerCount < TR_MAX_PEER_COUNT &&
+            !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
+        {
+            int            s;
+            struct in_addr addr;
+            in_port_t      port;
+            s = tr_netAccept( h->bindSocket, &addr, &port );
+            if( s > -1 )
+            {
+                h->acceptPeers[h->acceptPeerCount++] = tr_peerInit( addr, port, s );
+            }
+            else
+            {
+                tr_fdSocketClosed( h->fdlimit, 0 );
+            }
+        }
+
+        for( ii = 0; ii < h->acceptPeerCount; )
+        {
+            if( tr_peerRead( NULL, h->acceptPeers[ii] ) )
+            {
+                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
+                goto removePeer;
+            }
+            if( NULL != ( hash = tr_peerHash( h->acceptPeers[ii] ) ) )
+            {
+                for( jj = 0; jj < h->torrentCount; jj++ )
+                {
+                    tr_lockLock( &h->torrents[jj]->lock );
+                    if( 0 == memcmp( h->torrents[jj]->info.hash, hash,
+                                     SHA_DIGEST_LENGTH ) )
+                    {
+                      tr_peerAttach( h->torrents[jj], h->acceptPeers[ii] );
+                      tr_lockUnlock( &h->torrents[jj]->lock );
+                      goto removePeer;
+                    }
+                    tr_lockUnlock( &h->torrents[jj]->lock );
+                }
+                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
+                goto removePeer;
+            }
+            ii++;
+            continue;
+           removePeer:
+            h->acceptPeerCount--;
+            memmove( &h->acceptPeers[ii], &h->acceptPeers[ii+1],
+                     ( h->acceptPeerCount - ii ) * sizeof( tr_peer_t * ) );
+        }
+
+        /* Wait up to 20 ms */
+        date2 = tr_date();
+        if( date2 < date1 + 20 )
+        {
+            tr_lockUnlock( &h->acceptLock );
+            tr_wait( date1 + 20 - date2 );
+            tr_lockLock( &h->acceptLock );
+        }
+    }
+
+    tr_lockUnlock( &h->acceptLock );
+
+    tr_dbg( "Accept thread exited" );
+}
+
+/***********************************************************************
+ * acceptStop
+ ***********************************************************************
+ * Joins the accept thread and frees/closes everything related to it.
+ **********************************************************************/
+static void acceptStop( tr_handle_t * h )
+{
+    int ii;
+
+    h->acceptDie = 1;
+    tr_threadJoin( &h->acceptThread );
+    tr_lockClose( &h->acceptLock );
+    tr_dbg( "Accept thread joined" );
+
+    for( ii = 0; ii < h->acceptPeerCount; ii++ )
+    {
+        tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
+    }
+
+    if( h->bindSocket > -1 )
+    {
+        tr_netClose( h->bindSocket );
+        tr_fdSocketClosed( h->fdlimit, 0 );
+    }
 }

@@ -49,6 +49,8 @@ struct tr_tracker_s
     uint8_t      * buf;
     int            size;
     int            pos;
+
+    int            bindPort;
 };
 
 static void sendQuery  ( tr_tracker_t * tc );
@@ -70,6 +72,8 @@ tr_tracker_t * tr_trackerInit( tr_handle_t * h, tr_torrent_t * tor )
     tc->status   = TC_STATUS_IDLE;
     tc->size     = 1024;
     tc->buf      = malloc( tc->size );
+
+    tc->bindPort = h->bindPort;
 
     return tc;
 }
@@ -115,6 +119,12 @@ static int shouldConnect( tr_tracker_t * tc )
     }
 
     return 0;
+}
+
+void tr_trackerChangePort( tr_tracker_t * tc, int port )
+{
+    /* XXX this doesn't always work, should send stopped then started events */
+    tc->bindPort = port;
 }
 
 int tr_trackerPulse( tr_tracker_t * tc )
@@ -264,7 +274,7 @@ static void sendQuery( tr_tracker_t * tc )
             "User-Agent: Transmission/%d.%d\r\n"
             "Connection: close\r\n\r\n",
             inf->trackerAnnounce, tor->hashString, tc->id,
-            tor->bindPort, tor->uploaded[9], tor->downloaded[9],
+            tc->bindPort, tor->uploaded[9], tor->downloaded[9],
             left, tor->key, event, inf->trackerAddress,
             VERSION_MAJOR, VERSION_MINOR );
 
@@ -450,7 +460,7 @@ static void recvAnswer( tr_tracker_t * tc )
             memcpy( &addr, &bePeers->val.s.s[6*i],   4 );
             memcpy( &port, &bePeers->val.s.s[6*i+4], 2 );
 
-            tr_peerAddCompact( tor, addr, port, -1 );
+            tr_peerAddCompact( tor, addr, port );
         }
 
         if( bePeers->val.s.i / 6 >= 50 )

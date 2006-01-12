@@ -396,6 +396,48 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
     return 1;
 }
 
+static inline int parseBufHeader( tr_peer_t * peer )
+{
+    uint8_t * p   = peer->buf;
+
+    if( 4 > peer->pos )
+    {
+        return 0;
+    }
+
+    if( p[0] != 19 || memcmp( &p[1], "Bit", 3 ) )
+    {
+        /* Don't wait until we get 68 bytes, this is wrong
+           already */
+        peer_dbg( "GET  handshake, invalid" );
+        tr_netSend( peer->socket, (uint8_t *) "Nice try...\r\n", 13 );
+        return 1;
+    }
+    if( peer->pos < 68 )
+    {
+        return 0;
+    }
+    if( memcmp( &p[4], "Torrent protocol", 16 ) )
+    {
+        peer_dbg( "GET  handshake, invalid" );
+        return 1;
+    }
+
+    return 0;
+}
+
+static uint8_t * parseBufHash( tr_peer_t * peer )
+{
+    if( 48 > peer->pos )
+    {
+        return NULL;
+    }
+    else
+    {
+        return peer->buf + 28;
+    }
+}
+
 static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer,
                             int newBytes )
 {
@@ -412,23 +454,8 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer,
         {
             char * client;
 
-            if( p[0] != 19 || memcmp( &p[1], "Bit", 3 ) )
+            if( parseBufHeader( peer ) )
             {
-                /* Don't wait until we get 68 bytes, this is wrong
-                   already */
-                peer_dbg( "GET  handshake, invalid" );
-                tr_netSend( peer->socket, (uint8_t *) "Nice try...\r\n", 13 );
-                return 1;
-            }
-
-            if( peer->pos < 68 )
-            {
-                break;
-            }
-
-            if( memcmp( &p[4], "Torrent protocol", 16 ) )
-            {
-                peer_dbg( "GET  handshake, invalid" );
                 return 1;
             }
 

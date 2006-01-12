@@ -89,11 +89,11 @@ typedef struct tr_completion_s tr_completion_t;
 #include "bencode.h"
 #include "metainfo.h"
 #include "tracker.h"
+#include "fdlimit.h"
 #include "peer.h"
 #include "net.h"
 #include "inout.h"
 #include "upload.h"
-#include "fdlimit.h"
 #include "clients.h"
 
 struct tr_torrent_s
@@ -140,8 +140,6 @@ struct tr_torrent_s
     tr_io_t         * io;
     uint64_t          stopDate;
 
-    int               bindSocket;
-    int               bindPort;
     int               peerCount;
     tr_peer_t       * peers[TR_MAX_PEER_COUNT];
 
@@ -162,9 +160,17 @@ struct tr_handle_s
     tr_fd_t      * fdlimit;
 
     int            bindPort;
+    int            bindSocket;
+
+    int            acceptPeerCount;
+    tr_peer_t    * acceptPeers[TR_MAX_PEER_COUNT];
 
     char           id[21];
     char           key[21];
+
+    volatile char  acceptDie;
+    tr_thread_t    acceptThread;
+    tr_lock_t      acceptLock;
 };
 
 #endif

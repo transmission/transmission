@@ -22,7 +22,7 @@
 
 int  tr_netResolve ( char *, struct in_addr * );
 int  tr_netOpen    ( struct in_addr addr, in_port_t port );
-int  tr_netBind    ( int * );
+int  tr_netBind    ( int );
 int  tr_netAccept  ( int s, struct in_addr *, in_port_t * );
 void tr_netClose   ( int s );
 
