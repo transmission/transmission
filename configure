@@ -47,24 +47,30 @@ gtk_test()
 {
   if pkg-config gtk+-2.0 > /dev/null 2>&1
   then
-    cat > testconf.c << EOF
-    #include <gtk/gtk.h>
-    int main()
-    {
-      gtk_main();
-    }
-EOF
-    if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
+    if expr `pkg-config --modversion gtk+-2.0` '>=' 2.6.0 > /dev/null 2>&1
     then
-      echo "GTK+:    yes"
-      GTK=yes
-      GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
-      GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+      cat > testconf.c << EOF
+      #include <gtk/gtk.h>
+      int main()
+      {
+        gtk_main();
+      }
+EOF
+      if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
+      then
+        echo "GTK+:    yes"
+        GTK=yes
+        GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
+        GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+      else
+        echo "GTK+:    no"
+        GTK=no
+      fi
+      rm -f testconf.c testconf
     else
-      echo "GTK+:    no"
+      echo "GTK+:    no (2.6.0 or later is required)"
       GTK=no
     fi
-    rm -f testconf.c testconf
   else
     echo "GTK+:    no"
     GTK=no

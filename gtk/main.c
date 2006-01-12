@@ -472,6 +472,11 @@ updatemodel(gpointer gdata) {
   }
   free(st);
 
+  /* remove any excess rows */
+  if(gtk_tree_model_iter_next(GTK_TREE_MODEL(data->model), &iter))
+    while(gtk_list_store_remove(data->model, &iter))
+      ;
+
   return TRUE;
 }
 
@@ -592,8 +597,8 @@ actionclick(GtkWidget *widget, gpointer gdata) {
           tr_torrentStop(data->tr, index);
         free(sb);
         tr_torrentClose(data->tr, index);
-        gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
         savetorrents(data->tr, data->wind, -1, NULL);
+        updatemodel(data);
         break;
       case ACT_INFO:
         makeinfowind(data, index);
