@@ -91,7 +91,7 @@ char * tr_getPrefsDirectory()
 void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg )
 {
 #ifdef SYS_BEOS
-    *t = spawn_thread( (void *) func, "torrent-tx", arg );
+    *t = spawn_thread( (void *) func, "torrent-tx", B_NORMAL_PRIORITY, arg );
     resume_thread( *t );
 #else
     pthread_create( t, NULL, (void *) func, arg );

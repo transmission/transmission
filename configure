@@ -138,7 +138,7 @@ case $SYSTEM in
 	
     RELEASE=`uname -r`
     case $RELEASE in
-      6.0|5.0.4) # Zeta or R5 / BONE beta 7
+      6.0*|5.0.4) # Zeta or R5 / BONE beta 7
         SYSTEM="$SYSTEM / BONE"
         LINKLIBS="$LINKLIBS -lbind -lsocket"
         ;;

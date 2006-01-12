@@ -51,7 +51,9 @@ ifeq ($(wildcard /boot/develop/headers/be/bone/arpa/inet.h),)
 else
      LIBS = be bind socket tracker transmission Prefs
 endif
-
+ifneq ($(wildcard /boot/beos/system/lib/libzeta.so),)
+	LIBS += zeta
+endif
 #	specify additional paths to directories following the standard
 #	libXXX.so or libXXX.a naming scheme.  You can specify full paths
 #	or paths relative to the makefile.  The paths included may not
