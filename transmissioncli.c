@@ -40,7 +40,8 @@
 "  -s, --scrape         Print counts of seeders/leechers and exit\n" \
 "  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n" \
 "  -p, --port <int>     Port we should listen on (default = %d)\n" \
-"  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
+"  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n" \
+"  -f, --finish <shell script> Command you wish to run on completion\n"
 
 static int             showHelp     = 0;
 static int             showInfo     = 0;
@@ -50,6 +51,8 @@ static int             bindPort     = TR_DEFAULT_PORT;
 static int             uploadLimit  = 20;
 static char          * torrentPath  = NULL;
 static volatile char   mustDie      = 0;
+
+static char          * finishCall   = NULL;
 
 static int  parseCommandLine ( int argc, char ** argv );
 static void sigHandler       ( int signal );
@@ -166,6 +169,7 @@ int main( int argc, char ** argv )
     {
         char string[80];
         int  chars = 0;
+        int result;
 
         sleep( 1 );
 
@@ -203,6 +207,12 @@ int main( int argc, char ** argv )
         else if( verboseLevel > 0 )
         {
             fprintf( stderr, "\n" );
+        }
+        
+        if( tr_getFinished( h, 0 ) )
+        {
+            tr_setFinished( h, 0, 0 );
+            result = system(finishCall);
         }
 
         free( s );
@@ -244,10 +254,11 @@ static int parseCommandLine( int argc, char ** argv )
             { "verbose", required_argument, NULL, 'v' },
             { "port",    required_argument, NULL, 'p' },
             { "upload",  required_argument, NULL, 'u' },
-            { 0, 0, 0, 0 } };
+            { "finish",  required_argument, NULL, 'f' },
+            { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisv:p:u:", long_options, &optind );
+        c = getopt_long( argc, argv, "hisv:p:u:f:", long_options, &optind );
         if( c < 0 )
         {
             break;
@@ -271,6 +282,9 @@ static int parseCommandLine( int argc, char ** argv )
                 break;
             case 'u':
                 uploadLimit = atoi( optarg );
+                break;
+            case 'f':
+                finishCall = optarg;
                 break;
             default:
                 return 1;

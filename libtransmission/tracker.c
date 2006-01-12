@@ -564,14 +564,14 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         return 1;
     }
 
-    for( i = 0; i < ret - 8; i++ )
+    for( i = 0; i < pos - 8; i++ )
     {
         if( !memcmp( &buf[i], "d5:files", 8 ) )
         {
             break;
         }
     }
-    if( i >= ret - 8 )
+    if( i >= pos - 8 )
     {
         return 1;
     }
