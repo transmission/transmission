@@ -40,6 +40,15 @@ typedef struct tr_handle_s tr_handle_t;
 tr_handle_t * tr_init();
 
 /***********************************************************************
+ * tr_getPrefsDirectory
+ ***********************************************************************
+ * Returns the full path to the directory used by libtransmission to
+ * store the resume files. The string belongs to libtransmission, do
+ * not free it.
+ **********************************************************************/
+char * tr_getPrefsDirectory( tr_handle_t * );
+
+/***********************************************************************
  * tr_setBindPort
  ***********************************************************************
  * Sets a "start" port: everytime we start a torrent, we try to bind

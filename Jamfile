@@ -15,14 +15,14 @@ if $(OS) = MACOSX
         macosx/English.lproj/MainMenu.nib/classes.nib
         macosx/English.lproj/MainMenu.nib/info.nib
         macosx/English.lproj/MainMenu.nib/keyedobjects.nib
-        macosx/Images/Info.tiff
-        macosx/Images/Open.tiff
-        macosx/Images/Progress.tiff
-        macosx/Images/Remove.tiff
-        macosx/Images/Resume.tiff
-        macosx/Images/RevealOff.tiff
-        macosx/Images/RevealOn.tiff
-        macosx/Images/Stop.tiff
+        macosx/Images/Info.png
+        macosx/Images/Open.png
+        macosx/Images/PauseOff.png
+        macosx/Images/PauseOn.png
+        macosx/Images/Progress.png
+        macosx/Images/Remove.png
+        macosx/Images/RevealOff.png
+        macosx/Images/RevealOn.png
         macosx/Images/Transmission.icns
         macosx/Images/TransmissionDocument.icns
         macosx/Info.plist

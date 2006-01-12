@@ -1,12 +1,82 @@
 #! /bin/sh
 
+#
+# Functions
+#
+usage()
+{
+  cat << EOF
+
+  OpenSSL options:
+    --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
+    --openssl-prefix=PATH  Location of OpenSSL headers and library
+
+  Some influential environment variables:
+    CC          C compiler command (default "cc")
+    CFLAGS      C compiler flags (default "-g -Wall -W")
+
+EOF
+}
+
+openssl_test()
+{
+  cat > testconf.c << EOF
+  #include <stdio.h>
+  #include <openssl/sha.h>
+  int main()
+  {
+      SHA1( 0, 0, 0 );
+  }
+EOF
+  if [ -n "$PREFIX" ]; then
+    TMPFLAGS="-I$PREFIX/include -L$PREFIX/lib"
+  fi
+  if $CC $TMPFLAGS -o testconf testconf.c -lcrypto > /dev/null 2>&1
+  then
+    echo "OpenSSL: yes"
+    DEFINES="$DEFINES HAVE_OPENSSL"
+    LINKLIBS="$LINKLIBS -lcrypto"
+  else
+    echo "OpenSSL: no, using built-in SHA1 implementation"
+  fi
+  rm -f testconf.c testconf
+}
+
+#
+# Defaults settings
+#
+CC="${CC-cc}"
+CFLAGS="${CFLAGS--g -Wall -W}"
 # For > 2 GB files
 DEFINES="_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE"
-
 # For asprintf
 DEFINES="$DEFINES _GNU_SOURCE"
+openssl_disable=0
 
+#
+# Parse options
+#
+while [ $# -ne 0 ]; do
+  param=`expr "opt$1" : 'opt[^=]*=\(.*\)'`
+
+  case "x$1" in
+    x--disable-openssl)
+      openssl_disable="1";
+      ;;
+    x--openssl-prefix=*)
+      OPENSSL_PREFIX="$param";
+      ;;
+    x--help)
+      usage
+      exit 0
+      ;;
+  esac
+  shift
+done
+
+#
 # System-specific flags
+#
 SYSTEM=`uname -s`
 case $SYSTEM in
   BeOS)
@@ -55,31 +125,32 @@ case $SYSTEM in
 esac
 echo "System:  $SYSTEM"
 
-# Check for OpenSSL
-cat > testconf.c << EOF
-#include <stdio.h>
-#include <openssl/sha.h>
-int main()
-{
-    SHA1( 0, 0, 0 );
-}
-EOF
-if cc -o testconf testconf.c -lcrypto > /dev/null 2>&1
-then
-  echo "OpenSSL: yes"
-  DEFINES="$DEFINES HAVE_OPENSSL"
-  LINKLIBS="$LINKLIBS -lcrypto"
-else
+#
+# OpenSSL settings
+#
+if [ ${openssl_disable} = 1 ]; then
   echo "OpenSSL: no, using built-in SHA1 implementation"
+else
+    openssl_test
 fi
-rm -f testconf.c testconf
 
+#
 # Generate config.jam
+#
 rm -f config.jam
-cat << EOF > config.jam
-DEFINES  = $DEFINES ;
-LINKLIBS = $LINKLIBS ;
+cat > config.jam << EOF
+CC         = $CC ;
+LINK       = $CC ;
+CCFLAGS    = $CFLAGS ;
+DEFINES    = $DEFINES ;
+LINKLIBS   = $LINKLIBS ;
 EOF
+if [ -n "$OPENSSL_PREFIX" ]; then
+cat >> config.jam << EOF
+HDRS      += $OPENSSL_PREFIX/include ;
+LINKFLAGS += -L$OPENSSL_PREFIX/lib ;
+EOF
+fi
 
 echo
 echo "To build Transmission, run 'jam'."

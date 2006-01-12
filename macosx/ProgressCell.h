@@ -20,6 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef PROGRESSCELL_H
+#define PROGRESSCELL_H
+
 #include <Cocoa/Cocoa.h>
 #include <transmission.h>
 
@@ -41,3 +44,5 @@
 - (void) buildAdvancedBar;
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view;
 @end
+
+#endif

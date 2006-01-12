@@ -30,8 +30,7 @@
  *  - 4 bytes * number of pieces (byte aligned): the pieces that have
  *    been completed or started in each slot
  *
- * The resume file is located in ~/.transmission/. Its name is
- * "resume.<hash>".
+ * The name of the resume file is "resume.<hash>".
  *
  * All values are stored in the native endianness. Moving a
  * libtransmission resume file from an architecture to another will not
@@ -39,21 +38,13 @@
  * so the files will be scanned).
  **********************************************************************/
 
-static char * fastResumeFolderName()
-{
-    char * ret;
-    asprintf( &ret, "%s/.transmission", getenv( "HOME" ) );
-    return ret;
-}
-
 static char * fastResumeFileName( tr_io_t * io )
 {
+    tr_torrent_t * tor = io->tor;
     char * ret, * p;
     int i;
 
-    p = fastResumeFolderName();
-    asprintf( &ret, "%s/resume.%40d", p, 0 );
-    free( p );
+    asprintf( &ret, "%s/resume.%40d", tor->prefsDirectory, 0 );
 
     p = &ret[ strlen( ret ) - 2 * SHA_DIGEST_LENGTH ];
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
@@ -121,11 +112,6 @@ static void fastResumeSave( tr_io_t * io )
         return;
     }
 
-    /* Create folder if missing */
-    path = fastResumeFolderName();
-    mkdir( path, 0755 );
-    free( path );
-
     /* Create/overwrite the resume file */
     path = fastResumeFileName( io );
     if( !( file = fopen( path, "w" ) ) )
@@ -135,7 +121,6 @@ static void fastResumeSave( tr_io_t * io )
         free( path );
         return;
     }
-    free( path );
     
     /* Write format version */
     fwrite( &version, 4, 1, file );
@@ -160,6 +145,9 @@ static void fastResumeSave( tr_io_t * io )
     fwrite( io->slotPiece, 4, inf->pieceCount, file );
 
     fclose( file );
+
+    tr_dbg( "Resume file '%s' written", path );
+    free( path );
 }
 
 static int fastResumeLoad( tr_io_t * io )
@@ -184,6 +172,7 @@ static int fastResumeLoad( tr_io_t * io )
         free( path );
         return 1;
     }
+    tr_dbg( "Resume file '%s' loaded", path );
     free( path );
 
     /* Check the size */

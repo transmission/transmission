@@ -100,6 +100,7 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
 
 #include "peermessages.h"
 #include "peerutils.h"
+#include "peerparse.h"
 
 /***********************************************************************
  * tr_peerAddOld
@@ -232,6 +233,11 @@ void tr_peerPulse( tr_torrent_t * tor )
         }
     }
 
+    if( tor->status & TR_STATUS_STOPPING )
+    {
+        return;
+    }
+
     /* Check for incoming connections */
     if( tor->bindSocket > -1 &&
         tor->peerCount < TR_MAX_PEER_COUNT &&
@@ -331,7 +337,7 @@ void tr_peerPulse( tr_torrent_t * tor )
                 }
                 peer->date  = tr_date();
                 peer->pos  += ret;
-                if( parseMessage( tor, peer, ret ) )
+                if( parseBuf( tor, peer, ret ) )
                 {
                     goto dropPeer;
                 }

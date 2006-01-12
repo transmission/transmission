@@ -155,6 +155,7 @@ struct tr_torrent_s
 
     tr_tracker_t    * tracker;
     tr_io_t         * io;
+    uint64_t          stopDate;
 
     int               bindSocket;
     int               bindPort;
@@ -164,6 +165,8 @@ struct tr_torrent_s
     uint64_t          dates[10];
     uint64_t          downloaded[10];
     uint64_t          uploaded[10];
+
+    char            * prefsDirectory;
 };
 
 #include "utils.h"
@@ -179,6 +182,7 @@ struct tr_handle_s
     int            bindPort;
 
     char           id[21];
+    char           prefsDirectory[256];
 };
 
 #endif

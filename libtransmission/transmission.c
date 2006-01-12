@@ -59,8 +59,22 @@ tr_handle_t * tr_init()
     h->fdlimit = tr_fdInit();
 
     h->bindPort = 9090;
+
+    snprintf( h->prefsDirectory, sizeof( h->prefsDirectory ),
+              "%s/.transmission", getenv( "HOME" ) );
+    mkdir( h->prefsDirectory, 0755 );
     
     return h;
+}
+
+/***********************************************************************
+ * tr_getPrefsDirectory
+ ***********************************************************************
+ *
+ **********************************************************************/
+char * tr_getPrefsDirectory( tr_handle_t * h )
+{
+    return (char *) h->prefsDirectory;
 }
 
 /***********************************************************************
@@ -184,6 +198,7 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
 
     tor->upload  = h->upload;
     tor->fdlimit = h->fdlimit;
+    tor->prefsDirectory = (char *) h->prefsDirectory;
  
     /* We have a new torrent */
     h->torrents[h->torrentCount] = tor;
@@ -252,6 +267,7 @@ void tr_torrentStop( tr_handle_t * h, int t )
     tr_lockLock( tor->lock );
     tr_trackerStopped( tor->tracker );
     tor->status = TR_STATUS_STOPPING;
+    tor->stopDate = tr_date();
     tr_lockUnlock( tor->lock );
 }
 
@@ -316,7 +332,9 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
 
         tr_lockLock( tor->lock );
 
-        if( tor->status & TR_STATUS_STOPPED )
+        if( ( tor->status & TR_STATUS_STOPPED ) ||
+            ( ( tor->status & TR_STATUS_STOPPING ) &&
+              tr_date() > tor->stopDate + 60000 ) )
         {
             torrentReallyStop( h, i );
             tor->status = TR_STATUS_PAUSE;
@@ -478,10 +496,7 @@ static void downloadLoop( void * _tor )
         }
 
         /* Receive/send messages */
-        if( !( tor->status & TR_STATUS_STOPPING ) )
-        {
-            tr_peerPulse( tor );
-        }
+        tr_peerPulse( tor );
 
         /* Try to get new peers or to send a message to the tracker */
         tr_trackerPulse( tor->tracker );

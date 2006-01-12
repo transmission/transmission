@@ -81,7 +81,7 @@ static uint32_t kGreen[] =
     self = [super init];
 
     /* Have a NSBitmapImageRep ready to draw the progression bar */
-    bgImg  = [NSImage imageNamed: @"Progress.tiff"];
+    bgImg  = [NSImage imageNamed: @"Progress.png"];
     fBgBmp = [[bgImg representations] objectAtIndex: 0];
     size   = [bgImg size];
     fImg   = [[NSImage alloc] initWithSize: size];

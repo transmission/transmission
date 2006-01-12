@@ -22,15 +22,13 @@
 
 #include <IOKit/IOMessage.h>
 
-#include "Controller.h"
 #include "NameCell.h"
 #include "ProgressCell.h"
 #include "Utils.h"
 
 #define TOOLBAR_OPEN   @"Toolbar Open"
-#define TOOLBAR_RESUME @"Toolbar Resume"
-#define TOOLBAR_STOP   @"Toolbar Stop"
 #define TOOLBAR_REMOVE @"Toolbar Remove"
+#define TOOLBAR_PREFS  @"Toolbar Preferences"
 #define TOOLBAR_INFO   @"Toolbar Info"
 
 static void sleepCallBack( void * controller, io_service_t y,
@@ -42,60 +40,26 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 @implementation Controller
 
-- (void) enableToolbarItem: (NSString *) ident flag: (BOOL) e
-{
-    NSArray * array = [fToolbar items];
-    NSToolbarItem * item;
-
-    if( [ident isEqualToString: TOOLBAR_OPEN] )
-    {
-        item = [array objectAtIndex: 0];
-        [item setAction: e ? @selector( openShowSheet: ) : NULL];
-    }
-    else if( [ident isEqualToString: TOOLBAR_RESUME] )
-    {
-        item = [array objectAtIndex: 1];
-        [item setAction: e ? @selector( resumeTorrent: ) : NULL];
-    }
-    else if( [ident isEqualToString: TOOLBAR_STOP] )
-    {
-        item = [array objectAtIndex: 2];
-        [item setAction: e ? @selector( stopTorrent: ) : NULL];
-    }
-    else if( [ident isEqualToString: TOOLBAR_REMOVE] )
-    {
-        item = [array objectAtIndex: 3];
-        [item setAction: e ? @selector( removeTorrent: ) : NULL];
-    }
-    else if( [ident isEqualToString: TOOLBAR_INFO] )
-    {
-        item = [array objectAtIndex: 5];
-        [item setAction: e ? @selector( showInfo: ) : NULL];
-    }
-}
-
 - (void) updateToolbar
 {
-    int row = [fTableView selectedRow];
+    NSArray * items;
+    NSToolbarItem * item;
+    BOOL enable;
+    int row;
+    unsigned i;
 
-    [self enableToolbarItem: TOOLBAR_RESUME flag: NO];
-    [self enableToolbarItem: TOOLBAR_STOP   flag: NO];
-    [self enableToolbarItem: TOOLBAR_REMOVE flag: NO];
+    row    = [fTableView selectedRow];
+    enable = ( row >= 0 ) && ( fStat[row].status &
+                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
 
-    if( row < 0 )
+    items = [fToolbar items];
+    for( i = 0; i < [items count]; i++ )
     {
-        return;
-    }
-
-    if( fStat[row].status &
-        ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
-    {
-        [self enableToolbarItem: TOOLBAR_STOP   flag: YES];
-    }
-    else
-    {
-        [self enableToolbarItem: TOOLBAR_RESUME flag: YES];
-        [self enableToolbarItem: TOOLBAR_REMOVE flag: YES];
+        item = [items objectAtIndex: i];
+        if( [[item itemIdentifier] isEqualToString: TOOLBAR_REMOVE] )
+        {
+            [item setAction: enable ? @selector( removeTorrent: ) : NULL];
+        }
     }
 }
 
@@ -118,12 +82,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fWindow  setToolbar:  fToolbar];
     [fWindow  setDelegate: self];
 
-    [self enableToolbarItem: TOOLBAR_OPEN   flag: YES];
-    [self enableToolbarItem: TOOLBAR_RESUME flag: NO];
-    [self enableToolbarItem: TOOLBAR_STOP   flag: NO];
-    [self enableToolbarItem: TOOLBAR_REMOVE flag: NO];
-    [self enableToolbarItem: TOOLBAR_INFO   flag: YES];
-
     [fTableView setDataSource: self];
     [fTableView setDelegate:   self];
 
@@ -134,6 +92,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     nameCell     = [[NameCell     alloc] init];
     progressCell = [[ProgressCell alloc] init];
     tableColumn  = [fTableView tableColumnWithIdentifier: @"Name"];
+    [nameCell    setController: self];
     [tableColumn setDataCell: nameCell];
     [tableColumn setMinWidth: 10.0];
     [tableColumn setMaxWidth: 3000.0];
@@ -143,7 +102,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     [tableColumn setMinWidth: 134.0];
     [tableColumn setMaxWidth: 134.0];
 
-    [fTableView  sizeToFit];
+    [fTableView setAutosaveTableColumns: YES];
+    [fTableView sizeToFit];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObjects:
         NSFilenamesPboardType, NULL]];
@@ -208,7 +168,12 @@ static void sleepCallBack( void * controller, io_service_t y,
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self
         selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
-        forMode: NSModalPanelRunLoopMode];
+        forMode: NSEventTrackingRunLoopMode];
+}
+
+- (void) windowDidResize: (NSNotification *) n
+{
+    [fTableView sizeToFit];
 }
 
 - (BOOL) windowShouldClose: (id) sender
@@ -411,14 +376,24 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) resumeTorrent: (id) sender
 {
-    tr_torrentStart( fHandle, [fTableView selectedRow] );
-    [self updateToolbar];
+    [self resumeTorrentWithIndex: [fTableView selectedRow]];
+}
+
+- (void) resumeTorrentWithIndex: (int) idx
+{
+    tr_torrentStart( fHandle, idx );
+    [self updateUI: NULL];
 }
 
 - (void) stopTorrent: (id) sender
 {
-    tr_torrentStop( fHandle, [fTableView selectedRow] );
-    [self updateToolbar];
+    [self stopTorrentWithIndex: [fTableView selectedRow]];
+}
+
+- (void) stopTorrentWithIndex: (int) idx
+{
+    tr_torrentStop( fHandle, idx );
+    [self updateUI: NULL];
 }
 
 - (void) removeTorrent: (id) sender
@@ -489,7 +464,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     if( [[tableColumn identifier] isEqualToString: @"Name"] )
     {
-        [(NameCell *) cell setStat: &fStat[rowIndex]];
+        [(NameCell *) cell setStat: &fStat[rowIndex] index: rowIndex];
     }
     else if( [[tableColumn identifier] isEqualToString: @"Progress"] )
     {
@@ -565,37 +540,37 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSToolbarItem * item;
     item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
-    [item setTarget: self];
-
     if( [ident isEqualToString: TOOLBAR_OPEN] )
     {
         [item setLabel: @"Open"];
         [item setToolTip: @"Open a torrent"];
-        [item setImage: [NSImage imageNamed: @"Open.tiff"]];
-    }
-    else if( [ident isEqualToString: TOOLBAR_RESUME] )
-    {
-        [item setLabel: @"Resume"];
-        [item setToolTip: @"Resume download"];
-        [item setImage: [NSImage imageNamed: @"Resume.tiff"]];
-    }
-    else if( [ident isEqualToString: TOOLBAR_STOP] )
-    {
-        [item setLabel: @"Stop"];
-        [item setToolTip: @"Stop download"];
-        [item setImage: [NSImage imageNamed: @"Stop.tiff"]];
+        [item setImage: [NSImage imageNamed: @"Open.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( openShowSheet: )];
     }
     else if( [ident isEqualToString: TOOLBAR_REMOVE] )
     {
         [item setLabel: @"Remove"];
         [item setToolTip: @"Remove torrent from list"];
-        [item setImage: [NSImage imageNamed: @"Remove.tiff"]];
+        [item setImage: [NSImage imageNamed: @"Remove.png"]];
+        [item setTarget: self];
+        /* We set the selector in updateToolbar: */
+    }
+    else if( [ident isEqualToString: TOOLBAR_PREFS] )
+    {
+        [item setLabel: @"Preferences"];
+        [item setToolTip: @"Show the Preferences panel"];
+        [item setImage: [NSImage imageNamed: @"Preferences.png"]];
+        [item setTarget: fPrefsController];
+        [item setAction: @selector( show: )];
     }
     else if( [ident isEqualToString: TOOLBAR_INFO] )
     {
         [item setLabel: @"Info"];
         [item setToolTip: @"Information"];
-        [item setImage: [NSImage imageNamed: @"Info.tiff"]];
+        [item setImage: [NSImage imageNamed: @"Info.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( showInfo: )];
     }
     else
     {
@@ -608,9 +583,9 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) t
 {
-    return [NSArray arrayWithObjects:
-            TOOLBAR_OPEN, TOOLBAR_RESUME, TOOLBAR_STOP, TOOLBAR_REMOVE,
-            NSToolbarFlexibleSpaceItemIdentifier, TOOLBAR_INFO, NULL];
+    return [NSArray arrayWithObjects: TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            NSToolbarFlexibleSpaceItemIdentifier, TOOLBAR_PREFS,
+            TOOLBAR_INFO, NULL];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) t

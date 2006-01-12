@@ -25,9 +25,15 @@
 
 @implementation NameCell
 
-- (void) setStat: (tr_stat_t *) stat;
+- (void) setController: (Controller *) controller
 {
-    fStat = stat;
+    fController = controller;
+}
+
+- (void) setStat: (tr_stat_t *) stat index: (int) idx
+{
+    fStat  = stat;
+    fIndex = idx;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
@@ -47,7 +53,7 @@
 
     nameString = [NSString stringWithFormat: @"%@%@",
         stringFittingInWidth( fStat->info.name, cellFrame.size.width -
-                10 - widthForString( sizeString, 12 ), 12 ),
+                35 - widthForString( sizeString, 12 ), 12 ),
         sizeString];
 
     if( fStat->status & TR_STATUS_PAUSE )
@@ -100,7 +106,7 @@
     {
         peersString = [NSString stringWithFormat: @"%@%@",
     	@"Error: ", stringFittingInWidth( fStat->error,
-    	    cellFrame.size.width - 15 -
+    	    cellFrame.size.width - 40 -
     	    widthForString( @"Error: ", 10 ), 10 )];
     }
 
@@ -119,6 +125,41 @@
     pen.x += 0; pen.y += 15;
     [peersString drawAtPoint: pen withAttributes: attributes];
 
+    /* "Pause" button */
+    fPauseRect = NSMakeRect( cellFrame.origin.x + cellFrame.size.width - 19,
+                             cellFrame.origin.y + cellFrame.size.height - 38,
+                             14, 14 );
+    NSImage * pauseImage = NULL;
+    if( fStat->status & TR_STATUS_PAUSE )
+    {
+        if( NSPointInRect( fClickPoint, fPauseRect ) )
+        {
+            pauseImage = [NSImage imageNamed: @"ResumeOn.png"];
+        }
+        else
+        {
+            pauseImage = [NSImage imageNamed: @"ResumeOff.png"];
+        }
+    }
+    else if( fStat->status &
+             ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
+    {
+        if( NSPointInRect( fClickPoint, fPauseRect ) )
+        {
+            pauseImage = [NSImage imageNamed: @"PauseOn.png"];
+        }
+        else
+        {
+            pauseImage = [NSImage imageNamed: @"PauseOff.png"];
+        }
+    }
+    if( pauseImage )
+    {
+        pen.x = fPauseRect.origin.x;
+        pen.y = fPauseRect.origin.y + 14;
+        [pauseImage compositeToPoint: pen operation: NSCompositeSourceOver];
+    }
+
     /* "Reveal in Finder" button */
     fRevealRect = NSMakeRect( cellFrame.origin.x + cellFrame.size.width - 19,
                               cellFrame.origin.y + cellFrame.size.height - 19,
@@ -126,11 +167,11 @@
     NSImage * revealImage;
     if( NSPointInRect( fClickPoint, fRevealRect ) )
     {
-        revealImage = [NSImage imageNamed: @"RevealOn.tiff"];
+        revealImage = [NSImage imageNamed: @"RevealOn.png"];
     }
     else
     {
-        revealImage = [NSImage imageNamed: @"RevealOff.tiff"];
+        revealImage = [NSImage imageNamed: @"RevealOff.png"];
     }
     pen.x = fRevealRect.origin.x;
     pen.y = fRevealRect.origin.y + 14;
@@ -155,11 +196,36 @@
 - (void) stopTracking: (NSPoint) last at:(NSPoint) stop
     inView: (NSView *) v mouseIsUp: (BOOL) flag
 {
-    if( flag && NSPointInRect( stop, fRevealRect ) )
+    if( flag )
     {
-        /* Reveal in Finder */
-        [[NSWorkspace sharedWorkspace] openFile:
-            [NSString stringWithUTF8String: fStat->folder]];
+        if( NSPointInRect( stop, fRevealRect ) )
+        {
+            /* Reveal in Finder */
+            NSString * string = [NSString stringWithFormat:
+                @"tell application \"Finder\"\nactivate\nreveal (POSIX file \"%s/%s\")\nend tell",
+                fStat->folder, fStat->info.name];
+            NSAppleScript * appleScript;
+            appleScript = [[NSAppleScript alloc] initWithSource: string];
+            NSDictionary * error;
+            if( ![appleScript executeAndReturnError: &error] )
+            {
+                printf( "Reveal in Finder: AppleScript failed\n" );
+            }
+            [appleScript release];
+        }
+        else if( NSPointInRect( stop, fPauseRect ) )
+        {
+            /* Pause, resume */
+            if( fStat->status & TR_STATUS_PAUSE )
+            {
+                [fController resumeTorrentWithIndex: fIndex];
+            }
+            else if( fStat->status & ( TR_STATUS_CHECK |
+                      TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
+            {
+                [fController stopTorrentWithIndex: fIndex];
+            }
+        }
     }
     fClickPoint = NSMakePoint(0,0);
 }

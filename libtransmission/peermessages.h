@@ -20,6 +20,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+/***********************************************************************
+ * This file handles all outgoing messages
+ **********************************************************************/
+
 static uint8_t * messagesPending( tr_peer_t * peer, int * size )
 {
     if( peer->outBlockSending || peer->outMessagesPos < 1 )

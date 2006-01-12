@@ -20,6 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
+
 #include <Cocoa/Cocoa.h>
 #include <transmission.h>
 #include "PrefsController.h"
@@ -63,7 +66,9 @@
 - (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
                             contextInfo: (void *) info;
 - (void) stopTorrent:     (id) sender;
+- (void) stopTorrentWithIndex: (int) index;
 - (void) resumeTorrent:   (id) sender;
+- (void) resumeTorrentWithIndex: (int) index;
 - (void) removeTorrent:   (id) sender;
 - (void) showInfo:        (id) sender;
 
@@ -76,3 +81,5 @@
 - (void) linkForums:      (id) sender;
 
 @end
+
+#endif

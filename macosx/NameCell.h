@@ -20,14 +20,24 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef NAMECELL_H
+#define NAMECELL_H
+
 #include <Cocoa/Cocoa.h>
 #include <transmission.h>
+#include "Controller.h"
 
 @interface NameCell : NSCell
 {
-    tr_stat_t * fStat;
-    NSRect      fRevealRect;
-    NSPoint     fClickPoint;
+    Controller * fController;
+    tr_stat_t  * fStat;
+    int          fIndex;
+    NSRect       fPauseRect;
+    NSRect       fRevealRect;
+    NSPoint      fClickPoint;
 }
-- (void) setStat: (tr_stat_t *) stat;
+- (void) setController: (Controller *) controller;
+- (void) setStat: (tr_stat_t *) stat index: (int) index;
 @end
+
+#endif
