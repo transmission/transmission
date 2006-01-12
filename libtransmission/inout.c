@@ -352,91 +352,99 @@ static void closeFiles( tr_io_t * io )
  ***********************************************************************
  *
  **********************************************************************/
+typedef size_t (* iofunc) ( void *, size_t, size_t, FILE * );
 static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
                              uint8_t * buf, int write )
 {
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &tor->info;
 
-    int          piece = offset / inf->pieceSize;
-    int          begin = offset % inf->pieceSize;
+    int    piece = offset / inf->pieceSize;
+    int    begin = offset % inf->pieceSize;
+    int    i, cur;
+    char * path;
+    FILE * file;
+    iofunc readOrWrite = write ? (iofunc) fwrite : (iofunc) fread;
 
-    int          i;
-    uint64_t     foo;
-    uint64_t     posInFile = 0;
-    int          willRead;
-    char       * path;
-    FILE       * file;
+    /* Release the torrent lock so the UI can still update itself if
+       this blocks for a while */
+    tr_lockUnlock( tor->lock );
 
-    /* We can't ever read or write more than a piece at a time */
+    /* We don't ever read or write more than a piece at a time */
     if( tr_pieceSize( piece ) < begin + size )
     {
-        return 1;
+        tr_err( "readOrWriteBytes: trying to write more than a piece" );
+        goto fail;
     }
 
     /* Find which file we shall start reading/writing in */
-    foo = 0;
     for( i = 0; i < inf->fileCount; i++ )
     {
-        if( offset < foo + inf->files[i].length )
+        if( offset < inf->files[i].length )
         {
-            posInFile = offset - foo;
+            /* This is the file */
             break;
         }
-        foo += inf->files[i].length;
+        offset -= inf->files[i].length;
+    }
+    if( i >= inf->fileCount )
+    {
+        /* Should not happen */
+        tr_err( "readOrWriteBytes: offset out of range" );
+        goto fail;
     }
 
     while( size > 0 )
     {
-        asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
-        tr_lockUnlock( tor->lock );
-        file = tr_fdFileOpen( tor->fdlimit, path );
-        tr_lockLock( tor->lock );
-        free( path );
-
-        if( !file )
+        /* How much can we put or take with this file */
+        if( inf->files[i].length < offset + size )
         {
-            return 1;
-        }
-
-        willRead = MIN( inf->files[i].length - posInFile,
-                          (uint64_t) size );
-
-        tr_lockUnlock( tor->lock );
-        if( fseeko( file, posInFile, SEEK_SET ) )
-        {
-            tr_lockLock( tor->lock );
-            return 1;
-        }
-        if( write )
-        {
-            if( fwrite( buf, willRead, 1, file ) != 1 )
-            {
-                tr_lockLock( tor->lock );
-                return 1;
-            }
+            cur = (int) ( inf->files[i].length - offset );
         }
         else
         {
-            if( fread( buf, willRead, 1, file ) != 1 )
-            {
-                tr_lockLock( tor->lock );
-                return 1;
-            }
+            cur = size;
         }
-        tr_lockLock( tor->lock );
+
+        /* Now let's get a stream on the file... */
+        asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
+        file = tr_fdFileOpen( tor->fdlimit, path );
+        if( !file )
+        {
+            tr_err( "readOrWriteBytes: could not open file '%s'", path );
+            free( path );
+            goto fail;
+        }
+        free( path );
+
+        /* seek to the right offset... */
+        if( fseeko( file, offset, SEEK_SET ) )
+        {
+            goto fail;
+        }
+
+        /* do what we are here to do... */
+        if( readOrWrite( buf, cur, 1, file ) != 1 )
+        {
+            goto fail;
+        }
+
+        /* and close the stream. */
         tr_fdFileRelease( tor->fdlimit, file );
 
-        /* 'willRead' less bytes to do */
-        size -= willRead;
-        buf  += willRead;
-
-        /* Go to the beginning of the next file */
-        i         += 1;
-        posInFile  = 0;
+        /* 'cur' bytes done, 'size - cur' bytes to go with the next file */
+        i      += 1;
+        offset  = 0;
+        size   -= cur;
+        buf    += cur;
     }
 
+    tr_lockLock( tor->lock );
     return 0;
+
+fail:
+    tr_lockLock( tor->lock );
+    return 1;
 }
 
 /***********************************************************************
