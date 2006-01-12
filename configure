@@ -1,0 +1,85 @@
+#! /bin/sh
+
+# For > 2 GB files
+DEFINES="_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE"
+
+# For asprintf
+DEFINES="$DEFINES _GNU_SOURCE"
+
+# System-specific flags
+SYSTEM=`uname -s`
+case $SYSTEM in
+  BeOS)
+    DEFINES="$DEFINES SYS_BEOS"
+
+    RELEASE=`uname -r`
+    case $RELEASE in
+      6.0|5.0.4) # Zeta or R5 / BONE beta 7
+        SYSTEM="$SYSTEM / BONE"
+        LINKLIBS="$LINKLIBS -lbind -lsocket"
+        ;;
+      5.0*)      # R5 / net_server
+        SYSTEM="$SYSTEM / net_server"
+        DEFINES="$DEFINES BEOS_NETSERVER"
+        LINKLIBS="$LINKLIBS -lnet"
+        ;;
+      *)
+        echo "Unsupported BeOS version"
+        exit 1 ;;
+    esac
+    ;;
+
+  Darwin)
+    DEFINES="$DEFINES SYS_DARWIN"
+    LINKLIBS="$LINKLIBS -lpthread"
+    ;;
+
+  FreeBSD)
+    DEFINES="$DEFINES SYS_FREEBSD"
+    LINKLIBS="$LINKLIBS -pthread"
+    ;;
+
+  NetBSD)
+    DEFINES="$DEFINES SYS_NETBSD"
+    LINKLIBS="$LINKLIBS -lpthread"
+    ;;
+
+  Linux)
+    DEFINES="$DEFINES SYS_LINUX"
+    LINKLIBS="$LINKLIBS -lpthread"
+    ;;
+
+  *)
+    echo "Unsupported operating system"
+    exit 1 ;;
+esac
+echo "System:  $SYSTEM"
+
+# Check for OpenSSL
+cat > testconf.c << EOF
+#include <stdio.h>
+#include <openssl/sha.h>
+int main()
+{
+    SHA1( 0, 0, 0 );
+}
+EOF
+if cc -o testconf testconf.c -lcrypto > /dev/null 2>&1
+then
+  echo "OpenSSL: yes"
+  DEFINES="$DEFINES HAVE_OPENSSL"
+  LINKLIBS="$LINKLIBS -lcrypto"
+else
+  echo "OpenSSL: no, using built-in SHA1 implementation"
+fi
+rm -f testconf.c testconf
+
+# Generate config.jam
+rm -f config.jam
+cat << EOF > config.jam
+DEFINES  = $DEFINES ;
+LINKLIBS = $LINKLIBS ;
+EOF
+
+echo
+echo "To build Transmission, run 'jam'."

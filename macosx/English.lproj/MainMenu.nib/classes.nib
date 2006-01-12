@@ -1,0 +1,55 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                advancedChanged = id; 
+                linkForums = id; 
+                linkHomepage = id; 
+                openShowSheet = id; 
+                removeTorrent = id; 
+                resumeTorrent = id; 
+                showInfo = id; 
+                showMainWindow = id; 
+                stopTorrent = id; 
+            }; 
+            CLASS = Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAdvancedBarItem = NSMenuItem; 
+                fInfoAnnounce = NSTextField; 
+                fInfoDownloaded = NSTextField; 
+                fInfoFolder = NSTextField; 
+                fInfoPanel = NSPanel; 
+                fInfoPieceSize = NSTextField; 
+                fInfoPieces = NSTextField; 
+                fInfoSize = NSTextField; 
+                fInfoTitle = NSTextField; 
+                fInfoTracker = NSTextField; 
+                fInfoUploaded = NSTextField; 
+                fPrefsController = PrefsController; 
+                fTableView = NSTableView; 
+                fTotalDLField = NSTextField; 
+                fTotalULField = NSTextField; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cancel = id; check = id; ratio = id; save = id; show = id; }; 
+            CLASS = PrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fFolderMatrix = NSMatrix; 
+                fFolderPopUp = NSPopUpButton; 
+                fPortField = NSTextField; 
+                fPrefsWindow = NSWindow; 
+                fUploadCheck = NSButton; 
+                fUploadField = NSTextField; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

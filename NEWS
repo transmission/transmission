@@ -1,0 +1,22 @@
+NEWS file for Transmission <http://transmission.m0k.org/>
+
+0.3 (2005/10/19)
+ - Fixed "Sometimes sends incorrect messages and looses peers"
+ - Fixed "Crashes with many torrents or torrents with many files"
+ - Enhancements in the "End game" mode
+ - Is nicer to the trackers
+ - Asks for the rarest pieces first
+ - OS X: Universal binary for PPC and x86
+ - OS X: Fixed "Progress increases every time I pause then resume"
+ - OS X: Fixed "Sometimes crashes at exit"
+ - OS X: Cleaner icon
+ - OS X: Show all sizes in human readable form
+ - OS X: Keep downloading in the background when the window is closed
+ - Miscellaneus bugfixes and internal enhancements
+
+0.2 (2005/09/22)
+ - Bugfixes
+ - OS X: Users can now choose where the downloads are sent
+
+0.1 (2005/09/15)
+ - First version
