@@ -43,7 +43,11 @@
     IBOutlet NSMenuItem          * fAdvancedBarItem;
     IBOutlet NSMenuItem          * fPauseResumeItem;
     IBOutlet NSMenuItem          * fRemoveItem;
+    IBOutlet NSMenuItem          * fRemoveTorrentItem;
+    IBOutlet NSMenuItem          * fRemoveDataItem;
+    IBOutlet NSMenuItem          * fRemoveBothItem;
     IBOutlet NSMenuItem          * fRevealItem;
+    IBOutlet NSMenuItem          * fShowHideToolbar;
 
     IBOutlet NSWindow            * fWindow;
     IBOutlet TorrentTableView    * fTableView;
@@ -94,10 +98,13 @@
 
 - (NSMenu *) menuForIndex: (int) idx;
 
+- (void) runCustomizationPalette: (id) sender;
+- (void) showHideToolbar: (id) sender;
+
 - (void) showMainWindow:  (id) sender;
 - (void) linkHomepage:    (id) sender;
 - (void) linkForums:      (id) sender;
-- (void) notifyGrowl:	  (NSString *) file;
+- (void) notifyGrowl:     (NSString *) file;
 - (void) finderReveal:    (NSString *) path;
 - (void) finderTrash:     (NSString *) path;
 - (void) growlRegister:   (id) sender;

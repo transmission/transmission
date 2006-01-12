@@ -27,10 +27,12 @@
 #include "Utils.h"
 #include "TorrentTableView.h"
 
-#define TOOLBAR_OPEN   @"Toolbar Open"
-#define TOOLBAR_REMOVE @"Toolbar Remove"
-#define TOOLBAR_PREFS  @"Toolbar Preferences"
-#define TOOLBAR_INFO   @"Toolbar Info"
+#define TOOLBAR_OPEN        @"Toolbar Open"
+#define TOOLBAR_REMOVE      @"Toolbar Remove"
+#define TOOLBAR_PREFS       @"Toolbar Preferences"
+#define TOOLBAR_INFO        @"Toolbar Info"
+#define TOOLBAR_PAUSE_ALL   @"Toolbar Pause All"
+#define TOOLBAR_RESUME_ALL  @"Toolbar Resume All"
 
 #define CONTEXT_PAUSE           1
 #define CONTEXT_REMOVE          2
@@ -47,53 +49,6 @@ static void sleepCallBack( void * controller, io_service_t y,
 }
 
 @implementation Controller
-
-- (void) updateBars
-{
-    NSArray * items;
-    NSToolbarItem * item;
-    BOOL enable;
-    int row;
-    unsigned i;
-
-    row = [fTableView selectedRow];
-
-    /* Can we remove it ? */
-    enable = ( row >= 0 ) && ( fStat[row].status &
-                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
-    items = [fToolbar items];
-    for( i = 0; i < [items count]; i++ )
-    {
-        item = [items objectAtIndex: i];
-        if( [[item itemIdentifier] isEqualToString: TOOLBAR_REMOVE] )
-        {
-            [item setAction: enable ? @selector( removeTorrent: ) : NULL];
-        }
-    }
-    [fRemoveItem setAction: enable ? @selector( removeTorrent: ) : NULL];
-
-    /* Can we pause or resume it ? */
-    [fPauseResumeItem setTitle: @"Pause"];
-    [fPauseResumeItem setAction: NULL];
-    if( row < 0 )
-    {
-        [fRevealItem setAction: NULL];
-        return;
-    }
-    
-    [fRevealItem setAction: @selector( revealFromMenu: )];
-
-    if( fStat[row].status & TR_STATUS_PAUSE )
-    {
-        [fPauseResumeItem setTitle: @"Resume"];
-        [fPauseResumeItem setAction: @selector( resumeTorrent: )];
-    }
-    else if( fStat[row].status & ( TR_STATUS_CHECK |
-                TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
-    {
-        [fPauseResumeItem setAction: @selector( stopTorrent: )];
-    }
-}
 
 - (void) awakeFromNib
 {
@@ -556,9 +511,6 @@ static void sleepCallBack( void * controller, io_service_t y,
             fStat[i].info.name]];
         tr_setFinished( fHandle, i, 0 );
     }
-
-    /* Must we do this? Can't remember */
-    [self updateBars];
 }
 
 
@@ -662,8 +614,6 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     int row = [fTableView selectedRow];
 
-    [self updateBars];
-
     if( row < 0 )
     {
         [fInfoTitle      setStringValue: @"No torrent selected"];
@@ -675,7 +625,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [fInfoFolder     setStringValue: @""];
         [fInfoDownloaded setStringValue: @""];
         [fInfoUploaded   setStringValue: @""];
-        [fInfoSeeders	 setStringValue: @""];
+        [fInfoSeeders    setStringValue: @""];
         [fInfoLeechers   setStringValue: @""];
         return;
     }
@@ -697,17 +647,17 @@ static void sleepCallBack( void * controller, io_service_t y,
         tr_torrentGetFolder( fHandle, row )] lastPathComponent]];
         
     if ( fStat[row].seeders == -1 ) {
-		[fInfoSeeders setStringValue: [NSString stringWithUTF8String: "?"]];
-	} else {
-		[fInfoSeeders setStringValue: [NSString stringWithFormat: @"%d",
-			fStat[row].seeders]];
-	}
-	if ( fStat[row].leechers == -1 ) {
-		[fInfoLeechers setStringValue: [NSString stringWithUTF8String: "?"]];
-	} else {
-		[fInfoLeechers setStringValue: [NSString stringWithFormat: @"%d",
-			fStat[row].leechers]];
-	}
+        [fInfoSeeders setStringValue: [NSString stringWithUTF8String: "?"]];
+    } else {
+        [fInfoSeeders setStringValue: [NSString stringWithFormat: @"%d",
+            fStat[row].seeders]];
+    }
+    if ( fStat[row].leechers == -1 ) {
+        [fInfoLeechers setStringValue: [NSString stringWithUTF8String: "?"]];
+    } else {
+        [fInfoLeechers setStringValue: [NSString stringWithFormat: @"%d",
+            fStat[row].leechers]];
+    }
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -719,6 +669,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     if( [ident isEqualToString: TOOLBAR_OPEN] )
     {
         [item setLabel: @"Open"];
+        [item setPaletteLabel: [item label]];
         [item setToolTip: @"Open a torrent"];
         [item setImage: [NSImage imageNamed: @"Open.png"]];
         [item setTarget: self];
@@ -727,14 +678,16 @@ static void sleepCallBack( void * controller, io_service_t y,
     else if( [ident isEqualToString: TOOLBAR_REMOVE] )
     {
         [item setLabel: @"Remove"];
+        [item setPaletteLabel: [item label]];
         [item setToolTip: @"Remove torrent from list"];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
-        /* We set the selector in updateBars: */
+        [item setAction: @selector( removeTorrent: )];
     }
     else if( [ident isEqualToString: TOOLBAR_PREFS] )
     {
         [item setLabel: @"Preferences"];
+        [item setPaletteLabel: [item label]];
         [item setToolTip: @"Show the Preferences panel"];
         [item setImage: [NSImage imageNamed: @"Preferences.png"]];
         [item setTarget: fPrefsController];
@@ -743,10 +696,29 @@ static void sleepCallBack( void * controller, io_service_t y,
     else if( [ident isEqualToString: TOOLBAR_INFO] )
     {
         [item setLabel: @"Info"];
+        [item setPaletteLabel: [item label]];
         [item setToolTip: @"Information"];
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector( showInfo: )];
+    }
+    else if( [ident isEqualToString: TOOLBAR_RESUME_ALL] )
+    {
+        [item setLabel: @"Resume All"];
+        [item setPaletteLabel: [item label]];
+        [item setToolTip: @"Resume all torrents"];
+        [item setImage: [NSImage imageNamed: @"Resume.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( resumeAllTorrents: )];
+    }
+    else if( [ident isEqualToString: TOOLBAR_PAUSE_ALL] )
+    {
+        [item setLabel: @"Pause All"];
+        [item setPaletteLabel: [item label]];
+        [item setToolTip: @"Pause all torrents"];
+        [item setImage: [NSImage imageNamed: @"Stop.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( stopAllTorrents: )];
     }
     else
     {
@@ -759,14 +731,98 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) t
 {
-    return [NSArray arrayWithObjects: TOOLBAR_OPEN, TOOLBAR_REMOVE,
-            NSToolbarFlexibleSpaceItemIdentifier, TOOLBAR_PREFS,
-            TOOLBAR_INFO, NULL];
+    return [NSArray arrayWithObjects:
+            TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            /* TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL, */
+            TOOLBAR_PREFS, TOOLBAR_INFO,
+            NSToolbarSeparatorItemIdentifier,
+            NSToolbarSpaceItemIdentifier,
+            NSToolbarFlexibleSpaceItemIdentifier,
+            NSToolbarCustomizeToolbarItemIdentifier,
+            NULL];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) t
 {
-    return [self toolbarAllowedItemIdentifiers: t];
+    return [NSArray arrayWithObjects:
+            TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            /* NSToolbarSeparatorItemIdentifier,
+            TOOLBAR_RESUME_ALL, TOOLBAR_PAUSE_ALL, */
+            NSToolbarFlexibleSpaceItemIdentifier,
+            TOOLBAR_PREFS, TOOLBAR_INFO,
+            NULL];
+}
+
+- (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
+{
+    //check remove item
+    if ([toolbarItem action] == @selector(removeTorrent:))
+    {
+        int row = [fTableView selectedRow];
+        return ( row >= 0 ) && ( fStat[row].status &
+                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
+    }
+    
+    return true;
+}
+
+- (void) runCustomizationPalette: (id) sender
+{
+    [fToolbar runCustomizationPalette:sender];
+}
+
+- (void) showHideToolbar: (id) sender
+{
+    [fWindow toggleToolbarShown:sender];
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    //enable customize toolbar item
+    if ([menuItem action] == @selector(showHideToolbar:))
+        [menuItem setTitle: [fToolbar isVisible] ? @"Hide Toolbar" : @"Show Toolbar"];
+        
+    if ([fToolbar customizationPaletteIsRunning])
+        return false;
+        
+    //enable show info
+    if ([menuItem action] == @selector(showInfo:))
+    {
+        [menuItem setTitle: [fInfoPanel isVisible] ? @"Hide Info" : @"Show Info"];
+        return true;
+    }
+        
+    int row = [fTableView selectedRow];
+        
+    //enable remove items
+    if ([menuItem action] == @selector(removeTorrent:) || [menuItem action] == @selector(removeTorrentDeleteFile:)
+        || [menuItem action] == @selector(removeTorrentDeleteData:) || [menuItem action] == @selector(removeTorrentDeleteBoth:)) {
+        /* Can we remove it ? */
+        return ( row >= 0 ) && ( fStat[row].status &
+                ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
+    }
+    
+    //enable reveal in finder item
+    if ([menuItem action] == @selector(revealFromMenu:))
+        return row >= 0;
+        
+    //enable and change pause and remove item
+    if ([menuItem action] == @selector(resumeTorrent:) || [menuItem action] == @selector(stopTorrent:))
+    {
+        if (row >= 0 && fStat[row].status & TR_STATUS_PAUSE)
+        {
+            [menuItem setTitle: @"Resume"];
+            [menuItem setAction: @selector( resumeTorrent: )];
+        }
+        else
+        {
+            [menuItem setTitle: @"Pause"];
+            [menuItem setAction: @selector( stopTorrent: )];
+        }
+        return row >= 0;
+    }
+    
+    return true;
 }
 
 - (void) sleepCallBack: (natural_t) messageType argument:
@@ -814,7 +870,6 @@ static void sleepCallBack( void * controller, io_service_t y,
                     tr_torrentStart( fHandle, i );
                 }
             }
-            [self updateBars];
             break;
     }
 }

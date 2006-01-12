@@ -3,6 +3,7 @@
         {
             ACTIONS = {
                 advancedChanged = id; 
+                growlRegister = id; 
                 linkForums = id; 
                 linkHomepage = id; 
                 openShowSheet = id; 
@@ -13,6 +14,8 @@
                 resumeAllTorrents = id; 
                 resumeTorrent = id; 
                 revealFromMenu = id; 
+                runCustomizationPalette = id; 
+                showHideToolbar = id; 
                 showInfo = id; 
                 showMainWindow = id; 
                 stopAllTorrents = id; 
@@ -37,8 +40,12 @@
                 fInfoUploaded = NSTextField; 
                 fPauseResumeItem = NSMenuItem; 
                 fPrefsController = PrefsController; 
+                fRemoveBothItem = NSMenuItem; 
+                fRemoveDataItem = NSMenuItem; 
                 fRemoveItem = NSMenuItem; 
+                fRemoveTorrentItem = NSMenuItem; 
                 fRevealItem = NSMenuItem; 
+                fShowHideToolbar = NSMenuItem; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
                 fTotalULField = NSTextField; 
