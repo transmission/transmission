@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -34,6 +35,8 @@
 
 #include "util.h"
 
+static void
+sigexithandler(int sig);
 static void
 errcb(GtkWidget *wind, int resp, gpointer data);
 
@@ -98,6 +101,71 @@ mkdir_p(const char *name, mode_t mode) {
   return TRUE;
 }
 
+static int exit_sigs[] = {SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2};
+static callbackfunc_t exit_func = NULL;
+static void *exit_data = NULL;
+static int exit_block_level = 0;
+
+void
+setuphandlers(callbackfunc_t func, void *data) {
+  struct sigaction sa;
+  unsigned int ii;
+
+  exit_data = data;
+  exit_func = func;
+
+  bzero(&sa, sizeof(sa));
+  sa.sa_handler = sigexithandler;
+  for(ii = 0; ii < ALEN(exit_sigs); ii++)
+    sigaction(exit_sigs[ii], &sa, NULL);
+}
+
+void
+clearhandlers(void) {
+  struct sigaction sa;
+  unsigned int ii;
+
+  bzero(&sa, sizeof(sa));
+  sa.sa_handler = SIG_DFL;
+  for(ii = 0; ii < ALEN(exit_sigs); ii++)
+    sigaction(exit_sigs[ii], &sa, NULL);
+}
+
+static void
+sigexithandler(int sig) {
+  exit_func(exit_data);
+  clearhandlers();
+  raise(sig);
+}
+
+void
+blocksigs(void) {
+  sigset_t mask;
+  unsigned int ii;
+
+  if(0 < (exit_block_level++))
+    return;
+
+  sigemptyset(&mask);
+  for(ii = 0; ii < ALEN(exit_sigs); ii++)
+    sigaddset(&mask, exit_sigs[ii]);
+  sigprocmask(SIG_BLOCK, &mask, NULL);
+}
+
+void
+unblocksigs(void) {
+  sigset_t mask;
+  unsigned int ii;
+
+  if(0 < (--exit_block_level))
+    return;
+
+  sigemptyset(&mask);
+  for(ii = 0; ii < ALEN(exit_sigs); ii++)
+    sigaddset(&mask, exit_sigs[ii]);
+  sigprocmask(SIG_UNBLOCK, &mask, NULL);
+}
+
 GtkWidget *
 errmsg(GtkWindow *wind, const char *format, ...) {
   GtkWidget *dialog;
@@ -111,7 +179,7 @@ errmsg(GtkWindow *wind, const char *format, ...) {
 }
 
 GtkWidget *
-errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
+errmsg_full(GtkWindow *wind, callbackfunc_t func, void *data,
             const char *format, ...) {
   GtkWidget *dialog;
   va_list ap;
@@ -124,7 +192,7 @@ errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
 }
 
 GtkWidget *
-verrmsg(GtkWindow *wind, errfunc_t func, void *data,
+verrmsg(GtkWindow *wind, callbackfunc_t func, void *data,
         const char *format, va_list ap) {
   GtkWidget *dialog;
   char *msg;
@@ -155,7 +223,7 @@ verrmsg(GtkWindow *wind, errfunc_t func, void *data,
 static void
 errcb(GtkWidget *widget, int resp SHUTUP, gpointer data) {
   GList *funcdata;
-  errfunc_t func;
+  callbackfunc_t func;
 
   if(NULL != data) {
     funcdata = g_list_first(data);

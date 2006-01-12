@@ -449,9 +449,7 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
   err = NULL;
   for(ii = 0; ii < count; ii++) {
     /* XXX need a better way to query running/stopped state */
-    paused = (TR_STATUS_STOPPING == torrents[ii].status ||
-              TR_STATUS_STOPPED == torrents[ii].status ||
-              TR_STATUS_PAUSE == torrents[ii].status);
+    paused = ((TR_STATUS_STOPPING | TR_STATUS_PAUSE) & torrents[ii].status);
     torrentfile = g_strescape(torrents[ii].info.torrent, "");
     torrentdir = g_strescape(torrents[ii].folder, "");
     /* g_strcompress */

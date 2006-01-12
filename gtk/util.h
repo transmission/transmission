@@ -40,16 +40,38 @@
 /* return number of items in array */
 #define ALEN(a)                 (sizeof(a) / sizeof((a)[0]))
 
+/* used for a callback function with a data parameter */
+typedef void (*callbackfunc_t)(void*);
+
+/* try to interpret a string as a textual representation of a boolean */
 gboolean
 strbool(const char *str);
 
+/* return a human-readable string for the size given in bytes with the
+   requested number of decimal places.  the string must be g_free()d */
 char *
 readablesize(guint64 size, int decimals);
 
+/* create a directory and any missing parent directories */
 gboolean
 mkdir_p(const char *name, mode_t mode);
 
-typedef void (*errfunc_t)(void*);
+/* set up a handler for various fatal signals */
+void
+setuphandlers(callbackfunc_t func, void *data);
+
+/* clear the handlers for fatal signals */
+void
+clearhandlers(void);
+
+/* blocks and unblocks delivery of fatal signals. calls to these
+   functions can be nested as long as unblocksigs() is called exactly
+   as many times as blocksigs().  only the first blocksigs() will
+   block signals and only the last unblocksigs() will unblock them. */
+void
+blocksigs(void);
+void
+unblocksigs(void);
 
 /* if wind is NULL then you must call gtk_widget_show on the returned widget */
 
@@ -61,7 +83,7 @@ errmsg(GtkWindow *wind, const char *format, ...)
   ;
 
 GtkWidget *
-errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
+errmsg_full(GtkWindow *wind, callbackfunc_t func, void *data,
             const char *format, ...)
 #ifdef __GNUC__
   __attribute__ ((format (printf, 4, 5)))
@@ -69,7 +91,7 @@ errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
   ;
 
 GtkWidget *
-verrmsg(GtkWindow *wind, errfunc_t func, void *data,
+verrmsg(GtkWindow *wind, callbackfunc_t func, void *data,
         const char *format, va_list ap);
 
 #endif /* TG_UTIL_H */

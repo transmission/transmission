@@ -76,6 +76,8 @@ gboolean
 winclose(GtkWidget *widget, GdkEvent *event, gpointer gdata);
 gboolean
 exitcheck(gpointer gdata);
+void
+stoptransmission(void *tr);
 GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
@@ -104,6 +106,8 @@ void
 killmenu(GtkWidget *menu, gpointer *gdata SHUTUP);
 void
 actionclick(GtkWidget *widget, gpointer gdata);
+gint
+intrevcmp(gconstpointer a, gconstpointer b);
 void
 doubleclick(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *col,
             gpointer gdata);
@@ -168,6 +172,8 @@ main(int argc, char **argv) {
 
   tr = tr_init();
 
+  setuphandlers(stoptransmission, tr);
+
   if(cf_init(tr_getPrefsDirectory(), &err)) {
     if(cf_lock(&err)) {
       /* create main window now so any error dialogs can be it's children */
@@ -201,12 +207,12 @@ main(int argc, char **argv) {
       if(NULL != stateerr)
         gtk_widget_show_all(stateerr);
     } else {
-      gtk_widget_show(errmsg_full(NULL, (errfunc_t)gtk_main_quit,
+      gtk_widget_show(errmsg_full(NULL, (callbackfunc_t)gtk_main_quit,
                                   NULL, "%s", err));
       g_free(err);
     }
   } else {
-    gtk_widget_show(errmsg_full(NULL, (errfunc_t)gtk_main_quit,
+    gtk_widget_show(errmsg_full(NULL, (callbackfunc_t)gtk_main_quit,
                                 NULL, "%s", err));
     g_free(err);
   }
@@ -308,6 +314,8 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
     g_source_remove(data->timer);
   data->timer = -1;
 
+  blocksigs();
+
   for(ii = tr_torrentStat(data->tr, &st); 0 < ii; ii--) {
     if(TR_TORRENT_NEEDS_STOP(st[ii-1].status)) {
       /*fprintf(stderr, "quit: stopping %i %s\n", ii, st[ii-1].info.name);*/
@@ -318,6 +326,8 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
     }
   }
   free(st);
+
+  unblocksigs();
 
   /* XXX should disable widgets or something */
 
@@ -339,8 +349,10 @@ exitcheck(gpointer gdata) {
   tr_stat_t *st;
   int ii;
 
+  blocksigs();
+
   for(ii = tr_torrentStat(data->cbdata->tr, &st); 0 < ii; ii--) {
-    if(TR_STATUS_PAUSE == st[ii-1].status) {
+    if(TR_STATUS_PAUSE & st[ii-1].status) {
       /*fprintf(stderr, "quit: closing %i %s\n", ii, st[ii-1].info.name);*/
       tr_torrentClose(data->cbdata->tr, ii - 1);
     }
@@ -353,14 +365,9 @@ exitcheck(gpointer gdata) {
   if(0 < tr_torrentCount(data->cbdata->tr) &&
      time(NULL) - data->started < TRACKER_EXIT_TIMEOUT) {
     updatemodel(data->cbdata);
+    unblocksigs();
     return TRUE;
   }
-
-  /*fprintf(stderr, "quit: giving up on %i torrents\n",
-    tr_torrentCount(data->cbdata->tr));*/
-
-  for(ii = tr_torrentCount(data->cbdata->tr); 0 < ii; ii--)
-    tr_torrentClose(data->cbdata->tr, ii - 1);
 
   /* exit otherwise */
 
@@ -368,13 +375,25 @@ exitcheck(gpointer gdata) {
     g_source_remove(data->timer);
   data->timer = -1;
 
+  /*fprintf(stderr, "quit: giving up on %i torrents\n",
+    tr_torrentCount(data->cbdata->tr));*/
+  stoptransmission(data->cbdata->tr);
+  clearhandlers();
+  unblocksigs();
+
   gtk_widget_destroy(GTK_WIDGET(data->cbdata->wind));
-  tr_close(data->cbdata->tr);
   g_free(data->cbdata);
   g_free(data);
   gtk_main_quit();
 
   return FALSE;
+}
+
+void
+stoptransmission(void *tr) {
+  while(0 < tr_torrentCount(tr))
+    tr_torrentClose(tr, 0);
+  tr_close(tr);
 }
 
 GtkWidget *
@@ -589,6 +608,8 @@ updatemodel(gpointer gdata) {
   float up, down;
   char *upstr, *downstr, *str;
 
+  blocksigs();
+
   max = tr_torrentStat(data->tr, &st);
   for(ii = 0; ii < max; ii++) {
     if(!(ii ? gtk_tree_model_iter_next(GTK_TREE_MODEL(data->model), &iter) :
@@ -625,6 +646,8 @@ updatemodel(gpointer gdata) {
 
   /* the status of the selected item may have changed, so update the buttons */
   fixbuttons(NULL, data);
+
+  unblocksigs();
 
   return TRUE;
 }
@@ -790,10 +813,11 @@ actionclick(GtkWidget *widget, gpointer gdata) {
       break;
   assert(actindex < ALEN(actionitems));
 
+  blocksigs();
   updatesave = FALSE;
   count = tr_torrentStat(data->tr, &sb);
 
-  for(ii = g_list_first(ids); NULL != ii; ii = ii->next) {
+  for(ii = g_list_sort(ids, intrevcmp); NULL != ii; ii = ii->next) {
     index = GPOINTER_TO_INT(ii->data);
     if(index >= count) {
       assert(!"illegal torrent id");
@@ -819,6 +843,8 @@ actionclick(GtkWidget *widget, gpointer gdata) {
           tr_torrentStop(data->tr, index);
         tr_torrentClose(data->tr, index);
         updatesave = TRUE;
+        /* XXX should only unselect deleted rows */
+        gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(data->view));
         break;
       case ACT_INFO:
         makeinfowind(data->wind, data->tr, index);
@@ -835,8 +861,23 @@ actionclick(GtkWidget *widget, gpointer gdata) {
     updatemodel(data);
   }
 
+  unblocksigs();
+
   if(FROM_BUTTON == from)
     g_list_free(ids);
+}
+
+gint
+intrevcmp(gconstpointer a, gconstpointer b) {
+  int aint = GPOINTER_TO_INT(a);
+  int bint = GPOINTER_TO_INT(b);
+
+  if(bint > aint)
+    return 1;
+  else if(bint < aint)
+    return -1;
+  else
+    return 0;
 }
 
 void
@@ -866,7 +907,10 @@ addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
     }
   }
 
+  blocksigs();
+
   if(0 != tr_torrentInit(tr, torrent)) {
+    unblocksigs();
     /* XXX would be nice to have errno strings, are they printed to stdout? */
     errmsg(parentwind, "Failed to open torrent file %s", torrent);
     return FALSE;
@@ -886,6 +930,9 @@ addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
 
   if(!paused)
     tr_torrentStart(tr, tr_torrentCount(tr) - 1);
+
+  unblocksigs();
+
   return TRUE;
 }
 
@@ -908,7 +955,9 @@ savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat) {
   if(0 <= count)
     ret = cf_savestate(count, stat, &errstr);
   else {
+    blocksigs();
     count = tr_torrentStat(tr, &st);
+    unblocksigs();
     ret = cf_savestate(count, st, &errstr);
     free(st);
   }
