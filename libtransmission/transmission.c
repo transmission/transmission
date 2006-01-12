@@ -481,6 +481,7 @@ static void downloadLoop( void * _tor )
 
     tr_lockLock( tor->lock );
 
+    tr_cpReset( tor->completion );
     tor->io     = tr_ioInit( tor );
     tor->status = tr_cpIsSeeding( tor->completion ) ?
                       TR_STATUS_SEED : TR_STATUS_DOWNLOAD;

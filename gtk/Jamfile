@@ -1,0 +1,15 @@
+{
+    SubDir TOP gtk ;
+
+    GTK_SRC = conf.c main.c util.c ;
+
+    local CCFLAGS = $(CCFLAGS) $(GTKCCFLAGS) ;
+    #local LINKLIBS = $(LINKLIBS) $(GTKLINKLIBS) ;
+    local HDRS = $(HDRS) $(TOP)/libtransmission ;
+
+    # jesus fucking christ, I give up
+    LINKLIBS += $(GTKLINKLIBS) ;
+
+    Main          transmission-gtk   : $(GTK_SRC) ;
+    LinkLibraries transmission-gtk   : libtransmission.a ;
+}

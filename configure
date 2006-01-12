@@ -10,6 +10,7 @@ usage()
   OpenSSL options:
     --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
     --openssl-prefix=PATH  Location of OpenSSL headers and library
+    --disable-gtk          Don't build the GTK+ GUI
 
   Some influential environment variables:
     CC          C compiler command (default "cc")
@@ -42,6 +43,28 @@ EOF
   rm -f testconf.c testconf
 }
 
+gtk_test()
+{
+  cat > testconf.c << EOF
+  #include <gtk/gtk.h>
+  int main()
+  {
+    gtk_main();
+  }
+EOF
+  if $CC `pkg-config gtk+-2.0 --cflags --libs 2>/dev/null` -o testconf testconf.c
+  then
+    echo "GTK+: yes"
+    GTK=yes
+    GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
+    GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+  else
+    echo "GTK+: no"
+    GTK=no
+  fi
+  rm -f testconf.c testconf
+}
+
 #
 # Defaults settings
 #
@@ -52,6 +75,10 @@ DEFINES="_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE"
 # For asprintf
 DEFINES="$DEFINES _GNU_SOURCE"
 openssl_disable=0
+gtk_disable=0
+GTK=no
+GTKCCFLAGS=
+GTKLINKLIBS=
 
 #
 # Parse options
@@ -65,6 +92,9 @@ while [ $# -ne 0 ]; do
       ;;
     x--openssl-prefix=*)
       OPENSSL_PREFIX="$param";
+      ;;
+    x--disable-gtk)
+      gtk_disable="1";
       ;;
     x--help)
       usage
@@ -125,6 +155,18 @@ case $SYSTEM in
 esac
 echo "System:  $SYSTEM"
 
+# Check for GTK
+if pkg-config gtk+-2.0
+then
+    echo "GTK+: yes"
+    GTK=yes
+    GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
+    GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+else
+    echo "GTK+: no"
+    GTK=no
+fi
+
 #
 # OpenSSL settings
 #
@@ -135,20 +177,32 @@ else
 fi
 
 #
+# GTK settings
+#
+if [ ${gtk_disable} = 1 ]; then
+  echo "GTK+: no"
+else
+    gtk_test
+fi
+
+#
 # Generate config.jam
 #
 rm -f config.jam
 cat > config.jam << EOF
-CC         = $CC ;
-LINK       = $CC ;
-CCFLAGS    = $CFLAGS ;
-DEFINES    = $DEFINES ;
-LINKLIBS   = $LINKLIBS ;
+CC          = $CC ;
+LINK        = $CC ;
+CCFLAGS     = $CFLAGS ;
+DEFINES     = $DEFINES ;
+LINKLIBS    = $LINKLIBS ;
+GTK         = $GTK ;
+GTKCCFLAGS  = $GTKCCFLAGS ;
+GTKLINKLIBS = $GTKLINKLIBS ;
 EOF
 if [ -n "$OPENSSL_PREFIX" ]; then
 cat >> config.jam << EOF
-HDRS      += $OPENSSL_PREFIX/include ;
-LINKFLAGS += -L$OPENSSL_PREFIX/lib ;
+HDRS       += $OPENSSL_PREFIX/include ;
+LINKFLAGS  += -L$OPENSSL_PREFIX/lib ;
 EOF
 fi
 

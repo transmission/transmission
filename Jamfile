@@ -44,5 +44,9 @@ if $(OS) = MACOSX
     NotFile package ;
     Depends package : Transmission-$(VERSION_STRING)-OSX.dmg ;
 }
+else if $(GTK) = yes
+{
+    SubInclude TOP gtk ;
+}
 
 SubInclude TOP libtransmission ;

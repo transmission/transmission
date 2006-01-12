@@ -32,6 +32,7 @@ struct tr_completion_s
 
 tr_completion_t * tr_cpInit( tr_torrent_t * );
 void              tr_cpClose( tr_completion_t * );
+void              tr_cpReset( tr_completion_t * );
 
 /* General */
 float             tr_cpCompletionAsFloat( tr_completion_t * );
