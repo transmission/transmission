@@ -850,11 +850,37 @@ static void sleepCallBack( void * controller, io_service_t y,
         URLWithString:@"http://transmission.m0k.org/forum/"]];
 }
 
+- (BOOL) hasGrowl
+{
+    NSFileManager * manager = [NSFileManager defaultManager];
+    NSString      * helper  = @"/Library/PreferencePanes/Growl.prefPane/"
+                               "Contents/Resources/GrowlHelperApp.app";
+
+    if( [manager fileExistsAtPath: helper] )
+    {
+        /* Growl was installed for all users */
+        return YES;
+    }
+    if( [manager fileExistsAtPath: [[NSString stringWithFormat: @"~%@",
+            helper] stringByExpandingTildeInPath]] )
+    {
+        /* Growl was installed for this user only */
+        return YES;
+    }
+
+    return NO;
+}
+
 - (void) notifyGrowl: (NSString * ) file
 {
     NSString * growlScript;
     NSAppleScript * appleScript;
     NSDictionary * error;
+
+    if( ![self hasGrowl] )
+    {
+        return;
+    }
     
     growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"
@@ -880,6 +906,11 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSString * growlScript;
     NSAppleScript * appleScript;
     NSDictionary * error;
+
+    if( ![self hasGrowl] )
+    {
+        return;
+    }
     
     growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"

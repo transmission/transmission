@@ -55,6 +55,23 @@ strbool(const char *str) {
   return FALSE;
 }
 
+char *
+readablesize(guint64 size, int decimals) {
+  const char *sizes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"};
+  unsigned int ii;
+  double small = size;
+
+  for(ii = 0; ii + 1 < ALEN(sizes) && 1024.0 <= small / 1024.0; ii++)
+    small /= 1024.0;
+
+  if(1024.0 <= small) {
+    small /= 1024.0;
+    ii++;
+  }
+
+  return g_strdup_printf("%.*f %s", decimals, small, sizes[ii]);
+}
+
 gboolean
 mkdir_p(const char *name, mode_t mode) {
   struct stat sb;

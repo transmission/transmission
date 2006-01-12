@@ -43,6 +43,9 @@
 gboolean
 strbool(const char *str);
 
+char *
+readablesize(guint64 size, int decimals);
+
 gboolean
 mkdir_p(const char *name, mode_t mode);
 
