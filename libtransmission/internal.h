@@ -127,6 +127,7 @@ struct tr_torrent_s
     tr_fd_t         * fdlimit;
 
     int               status;
+	int				  finished;
     char              error[128];
 
     char            * id;

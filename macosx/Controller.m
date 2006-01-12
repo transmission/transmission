@@ -77,8 +77,12 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fPauseResumeItem setAction: NULL];
     if( row < 0 )
     {
+        [fRevealItem setAction: NULL];
         return;
     }
+    
+    [fRevealItem setAction: @selector( revealFromMenu: )];
+
     if( fStat[row].status & TR_STATUS_PAUSE )
     {
         [fPauseResumeItem setTitle: @"Resume"];
@@ -185,7 +189,10 @@ static void sleepCallBack( void * controller, io_service_t y,
             }
         }
     }
-
+    
+    /*  Register with the growl system */
+    [GrowlApplicationBridge setGrowlDelegate:self];
+    
     /* Update the interface every 500 ms */
     fCount = 0;
     fStat  = NULL;
@@ -358,6 +365,15 @@ static void sleepCallBack( void * controller, io_service_t y,
         [fAdvancedBarItem setState: NSOnState];
         [defaults setObject:@"YES" forKey:@"UseAdvancedBar"];
     }
+    [fTableView display];
+}
+
+/* called on by applescript */
+- (void) open: (NSArray *) files
+{
+    fFilenames = [files retain];
+    [self performSelectorOnMainThread: @selector(cantFindAName:)
+                withObject: NULL waitUntilDone: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -403,6 +419,19 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self resumeTorrentWithIndex: [fTableView selectedRow]];
 }
 
+- (void) resumeAllTorrents: (id) sender
+{
+    int i;
+    for ( i = 0; i < fCount; i++)
+    {
+        if ( fStat[i].status & ( TR_STATUS_STOPPING 
+        | TR_STATUS_PAUSE | TR_STATUS_STOPPED ) )
+        {
+            [self resumeTorrentWithIndex: i];
+        }
+    }
+}
+
 - (void) resumeTorrentWithIndex: (int) idx
 {
     tr_torrentStart( fHandle, idx );
@@ -412,6 +441,19 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) stopTorrent: (id) sender
 {
     [self stopTorrentWithIndex: [fTableView selectedRow]];
+}
+
+- (void) stopAllTorrents: (id) sender
+{
+    int i;
+    for ( i = 0; i < fCount; i++)
+    {
+        if ( fStat[i].status & ( TR_STATUS_CHECK 
+        | TR_STATUS_DOWNLOAD | TR_STATUS_SEED) )
+        {
+            [self stopTorrentWithIndex: i];
+        }
+    }
 }
 
 - (void) stopTorrentWithIndex: (int) idx
@@ -434,33 +476,33 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         NSAlert *alert = [[[NSAlert alloc] init] autorelease];
         
-        [alert addButtonWithTitle:@"No"];
-        [alert addButtonWithTitle:@"Yes"];
+        [alert addButtonWithTitle:@"Delete"];
+        [alert addButtonWithTitle:@"Cancel"];
         [alert setAlertStyle:NSWarningAlertStyle];
-        [alert setMessageText:@"Are you sure you want to remove and delete?"];
+        [alert setMessageText:@"Do you want to remove this torrent from Transmission?"];
         
         if ( (deleteTorrent && torrentWarning) &&
              !( dataWarning && deleteData ) )
         {
             /* delete torrent warning YES, delete data warning NO */
-            [alert setInformativeText:@"If you choose yes, the .torrent file will "
-                "be deleted. This cannot be undone."];
+            [alert setInformativeText:@"This will delete the .torrent file only. "
+                "This can not be undone!"];
         }
         else if( (deleteData && dataWarning) &&
                  !( torrentWarning && deleteTorrent ) )
         {
             /* delete torrent warning NO, delete data warning YES */
-            [alert setInformativeText:@"If you choose yes, the downloaded data will "
-                "be deleted. This cannot be undone."];
+            [alert setInformativeText:@"This will delete the downloaded data. "
+                "This can not be undone!"];
         }
         else
         {
             /* delete torrent warning YES, delete data warning YES */
-            [alert setInformativeText:@"If you choose yes, both downloaded data and "
-                "torrent file will be deleted. This cannot be undone."];
+            [alert setInformativeText:@"This will delete the downloaded data and "
+                ".torrent file. This can not be undone!"];
         }
         
-        if ( [alert runModal] == NSAlertFirstButtonReturn )
+        if ( [alert runModal] == NSAlertSecondButtonReturn )
             return;
     }
     
@@ -534,7 +576,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) updateUI: (NSTimer *) t
 {
     float dl, ul;
-    int row;
+    int row, i;
 
     /* Update the NSTableView */
     if( fStat )
@@ -560,6 +602,19 @@ static void sleepCallBack( void * controller, io_service_t y,
         [fInfoUploaded setStringValue:
             stringForFileSize( fStat[row].uploaded )];
     }
+    
+    /* check if torrents have recently ended. */
+    for (i = 0; i < fCount; i++)
+    {
+        if( !tr_getFinished( fHandle, i ) )
+        {
+            continue;
+        }
+        [self notifyGrowl: [NSString stringWithUTF8String: 
+            fStat[i].info.name] folder: [NSString stringWithUTF8String:
+            fStat[i].folder]];
+        tr_setFinished( fHandle, i, 0 );
+    }
 
     /* Must we do this? Can't remember */
     [self updateBars];
@@ -575,8 +630,9 @@ static void sleepCallBack( void * controller, io_service_t y,
     
     int status = fStat[idx].status;
     
-    NSMenuItem *pauseItem = [fContextMenu itemWithTag: CONTEXT_PAUSE];
+    NSMenuItem *pauseItem =  [fContextMenu itemWithTag: CONTEXT_PAUSE];
     NSMenuItem *removeItem = [fContextMenu itemAtIndex: 1];
+    NSMenuItem *infoItem =   [fContextMenu itemAtIndex: 2];
     
     [pauseItem setTarget: self];
     
@@ -597,6 +653,13 @@ static void sleepCallBack( void * controller, io_service_t y,
         /* don't allow resuming if we aren't in PAUSE */
         if ( !(status & TR_STATUS_PAUSE) )
             [pauseItem setEnabled: NO];
+    }
+    
+    if( [fInfoPanel isVisible] )
+    {
+        [infoItem setTitle: @"Hide Info"];
+    } else {
+        [infoItem setTitle: @"Show Info"];
     }
     
     return fContextMenu;
@@ -668,6 +731,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         [fInfoFolder     setStringValue: @""];
         [fInfoDownloaded setStringValue: @""];
         [fInfoUploaded   setStringValue: @""];
+        [fInfoSeeders	 setStringValue: @""];
+        [fInfoLeechers   setStringValue: @""];
         return;
     }
 
@@ -686,6 +751,19 @@ static void sleepCallBack( void * controller, io_service_t y,
         stringForFileSize( fStat[row].info.pieceSize )];
     [fInfoFolder setStringValue: [[NSString stringWithUTF8String:
         tr_torrentGetFolder( fHandle, row )] lastPathComponent]];
+        
+    if ( fStat[row].seeders == -1 ) {
+		[fInfoSeeders setStringValue: [NSString stringWithUTF8String: "?"]];
+	} else {
+		[fInfoSeeders setStringValue: [NSString stringWithFormat: @"%d",
+			fStat[row].seeders]];
+	}
+	if ( fStat[row].leechers == -1 ) {
+		[fInfoLeechers setStringValue: [NSString stringWithUTF8String: "?"]];
+	} else {
+		[fInfoLeechers setStringValue: [NSString stringWithFormat: @"%d",
+			fStat[row].leechers]];
+	}
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -805,7 +883,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     rectWin  = [fWindow frame];
     rectView = [[fWindow contentView] frame];
-    foo      = 68.0 + MAX( 1, tr_torrentCount( fHandle ) ) * 62.0 -
+    foo      = 47.0 + MAX( 1, tr_torrentCount( fHandle ) ) * 62.0 -
                   rectView.size.height;
 
     rectWin.size.height += foo;
@@ -830,5 +908,68 @@ static void sleepCallBack( void * controller, io_service_t y,
     [[NSWorkspace sharedWorkspace] openURL: [NSURL
         URLWithString:@"http://transmission.m0k.org/forum/"]];
 }
+
+- (void) notifyGrowl: (NSString * ) file folder: (NSString *) folder
+{
+    [GrowlApplicationBridge
+        notifyWithTitle: @"Download complete."
+        description: [NSString stringWithFormat: @"Seeding: %@", file]
+        notificationName: @"Download complete."
+        iconData: nil
+        priority: 0
+        isSticky: FALSE
+        clickContext: [NSString stringWithFormat: @"%@/%@", folder, file]];
+}
+
+- (NSDictionary *)registrationDictionaryForGrowl 
+{   
+    NSString *title        = [NSString stringWithUTF8String: "Download complete."];
+    NSMutableArray *defNotesArray = [NSMutableArray array];
+    NSMutableArray *allNotesArray = [NSMutableArray array];
+
+    [allNotesArray addObject:title];
+    [defNotesArray addObject:[NSNumber numberWithUnsignedInt:0]];   
+
+    NSDictionary *regDict = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"Transmission", GROWL_APP_NAME,
+        allNotesArray, GROWL_NOTIFICATIONS_ALL, 
+        defNotesArray, GROWL_NOTIFICATIONS_DEFAULT,
+        nil];
+    
+    return regDict;
+}
+
+- (NSString *) applicationNameForGrowl
+{
+    return [NSString stringWithUTF8String: "Transmission"];
+}
+
+- (void) growlNotificationWasClicked: (id) clickContext
+{
+    [self revealInFinder: (NSString *) clickContext];
+}
+
+- (void) revealFromMenu: (id) sender
+{
+    [fTableView revealInFinder: [fTableView selectedRow]];
+}
+
+- (void) revealInFinder: (NSString *) path
+{
+    NSString * string;
+    NSAppleScript * appleScript;
+    NSDictionary * error;
+    
+    string = [NSString stringWithFormat: @"tell application "
+        "\"Finder\"\nactivate\nreveal (POSIX file \"%@\")\nend tell",
+        path];
+    appleScript = [[NSAppleScript alloc] initWithSource: string];
+    if( ![appleScript executeAndReturnError: &error] )
+    {
+        printf( "Reveal in Finder: AppleScript failed\n" );
+    }
+    [appleScript release];
+}
+
 
 @end

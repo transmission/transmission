@@ -106,8 +106,15 @@
     }
     else if( [self pointInRevealRect: point] )
     {
-        [self revealInFinder: row];
+        [fController revealInFinder: [NSString stringWithFormat:
+            @"%@/%@", [NSString stringWithUTF8String: fStat[row].folder],
+            [NSString stringWithUTF8String: fStat[row].info.name]]];
         [self display];
+    }
+    else if( row >= 0 && col == [self columnWithIdentifier: @"Progress"]
+             && ( [e modifierFlags] & NSAlternateKeyMask ) )
+    {
+        [fController advancedChanged: NULL];
     }
     else
     {

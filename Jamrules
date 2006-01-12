@@ -16,6 +16,12 @@ DEFINES += VERSION_MAJOR=$(VERSION_MAJOR)
 OPTIM    = -O3 ;
 RM       = rm -Rf ;
 
+rule SystemLibraries
+{
+    LINKLIBS on [ FAppendSuffix $(<) : $(SUFEXE) ] ?= $(LINKLIBS) ;
+    LINKLIBS on [ FAppendSuffix $(<) : $(SUFEXE) ] +=  $(>) ;
+}
+
 if $(OS) = MACOSX
 {
     # Build universal binaries
@@ -32,6 +38,18 @@ if $(OS) = MACOSX
     actions Archive
     {
         libtool -static $(>) -o $(<) ;
+    }
+
+    rule OSXLinks
+    {
+    }
+    actions OSXLinks
+    {
+        ( cd macosx/Frameworks/Growl.framework/ && \
+          ln -s Versions/Current/Growl && \
+          ln -s Versions/Current/Headers && \
+          ln -s Versions/Current/Resources && \
+          ln -s A Versions/Current )
     }
 
     rule OSXInfoPlist
@@ -73,6 +91,7 @@ if $(OS) = MACOSX
         ditto AUTHORS "$TMP/AUTHORS.txt" &&
         ditto LICENSE "$TMP/LICENSE.txt" &&
         ditto NEWS "$TMP/NEWS.txt" &&
+        strip -S "$TMP/Transmission.app/Contents/MacOS/Transmission" &&
         ( echo "[InternetShortcut]"; \
           echo "URL=http://transmission.m0k.org/" ) > \
           "$TMP/Homepage.url" &&

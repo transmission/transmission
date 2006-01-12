@@ -10,9 +10,12 @@
                 removeTorrentDeleteBoth = id; 
                 removeTorrentDeleteData = id; 
                 removeTorrentDeleteFile = id; 
+                resumeAllTorrents = id; 
                 resumeTorrent = id; 
+                revealFromMenu = id; 
                 showInfo = id; 
                 showMainWindow = id; 
+                stopAllTorrents = id; 
                 stopTorrent = id; 
             }; 
             CLASS = Controller; 
@@ -23,9 +26,11 @@
                 fInfoAnnounce = NSTextField; 
                 fInfoDownloaded = NSTextField; 
                 fInfoFolder = NSTextField; 
+                fInfoLeechers = NSTextField; 
                 fInfoPanel = NSPanel; 
                 fInfoPieceSize = NSTextField; 
                 fInfoPieces = NSTextField; 
+                fInfoSeeders = NSTextField; 
                 fInfoSize = NSTextField; 
                 fInfoTitle = NSTextField; 
                 fInfoTracker = NSTextField; 
@@ -33,6 +38,7 @@
                 fPauseResumeItem = NSMenuItem; 
                 fPrefsController = PrefsController; 
                 fRemoveItem = NSMenuItem; 
+                fRevealItem = NSMenuItem; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
                 fTotalULField = NSTextField; 

@@ -1,7 +1,19 @@
-Authors:
+AUTHORS for Transmission <http://transmission.m0k.org/>
+=======================================================
+
+Transmission is written is maintained by:
 
 Eric Petit <titer@m0k.org>
- + About everything until now
+ + Back-end
+ + OS X interface
+
+Josh Elsasser <josh@elsasser.org>
+ + GTK interface
+
+Michael Demars <keul@m0k.org>
+ + OS X interface
+ + Growl notifications
+ + AppleScript support
 
 
 Thanks to:
@@ -14,10 +26,6 @@ Mike Matas <http://www.mikematas.com/>
 
 Omar and Adrien
  + Beta testing
-
-Michael Demars
- + Beta testing
- + OS X UI patches
 
 Various people
  + Writing http://wiki.theory.org/BitTorrentSpecification

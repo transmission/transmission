@@ -41,7 +41,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path )
     int          i;
     struct stat sb;
 
-    snprintf( inf->torrent, MAX_PATH_LENGTH, path );
+    snprintf( inf->torrent, MAX_PATH_LENGTH, "%s", path );
 
     if( stat( path, &sb ) )
     {
@@ -142,7 +142,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path )
         tr_bencFree( &meta );
         return 1;
     }
-    snprintf( inf->trackerAnnounce, MAX_PATH_LENGTH, s2 );
+    snprintf( inf->trackerAnnounce, MAX_PATH_LENGTH, "%s", s2 );
 
     /* Piece length */
     if( !( val = tr_bencDictFind( beInfo, "piece length" ) ) )

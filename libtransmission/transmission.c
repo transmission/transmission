@@ -172,6 +172,8 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
     tor->status = TR_STATUS_PAUSE;
     tor->id     = h->id;
     tor->key    = h->key;
+	tor->finished = 0;
+
 
     /* Guess scrape URL */
     s1 = strchr( inf->trackerAnnounce, '/' );
@@ -317,6 +319,15 @@ int tr_torrentCount( tr_handle_t * h )
     return h->torrentCount;
 }
 
+int tr_getFinished( tr_handle_t * h, int i)
+{
+	return h->torrents[i]->finished;
+}
+void tr_setFinished( tr_handle_t * h, int i, int val)
+{
+	h->torrents[i]->finished = val;
+}
+
 int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
 {
     tr_stat_t * s;
@@ -374,6 +385,9 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         s[i].progress     = tr_cpCompletionAsFloat( tor->completion );
         s[i].rateDownload = rateDownload( tor );
         s[i].rateUpload   = rateUpload( tor );
+        
+        s[i].seeders	  = tr_trackerSeeders(tor);
+		s[i].leechers	  = tr_trackerLeechers(tor);
 
         if( s[i].rateDownload < 0.1 )
         {
@@ -496,6 +510,7 @@ static void downloadLoop( void * _tor )
         {
             /* Done */
             tor->status = TR_STATUS_SEED;
+			tor->finished = 1;
             tr_trackerCompleted( tor->tracker );
         }
 

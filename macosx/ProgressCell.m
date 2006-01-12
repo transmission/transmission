@@ -84,15 +84,12 @@ static uint32_t kGreen[] =
     bgImg  = [NSImage imageNamed: @"Progress.png"];
     fBgBmp = [[bgImg representations] objectAtIndex: 0];
     size   = [bgImg size];
-    fImg   = [[NSImage alloc] initWithSize: size];
     fBmp   = [[NSBitmapImageRep alloc]
         initWithBitmapDataPlanes: NULL pixelsWide: size.width
         pixelsHigh: size.height bitsPerSample: 8 samplesPerPixel: 4
         hasAlpha: YES isPlanar: NO
         colorSpaceName: NSCalibratedRGBColorSpace
         bytesPerRow: 0 bitsPerPixel: 0];
-
-    [fImg addRepresentation: fBmp];
 
     return self;
 }
@@ -110,11 +107,11 @@ static uint32_t kGreen[] =
     fUlString = [NSString stringWithFormat:
         @"UL: %.2f KB/s", fStat->rateUpload];
 
-    for( i = 0; i < [fImg size].height; i++ )
+    for( i = 0; i < [fBmp size].height; i++ )
     {
         memcpy( [fBmp bitmapData] + i * [fBmp bytesPerRow],
                 [fBgBmp bitmapData] + i * [fBgBmp bytesPerRow],
-                [fImg size].width * 4 );
+                [fBmp size].width * 4 );
     }
 
     if( [[NSUserDefaults standardUserDefaults]
@@ -140,6 +137,11 @@ static uint32_t kGreen[] =
 
         for( w = 0; w < 120; w++ )
         {
+            if( w >= (int) ( fStat->progress * 120 ) )
+            {
+                break;
+            }
+
             if( fStat->status & TR_STATUS_SEED )
             {
                 *p = kGreen[h];
@@ -148,12 +150,6 @@ static uint32_t kGreen[] =
             {
                 *p = kBlue2[h];
             }
-
-            if( w >= (int) ( fStat->progress * 120 ) )
-            {
-                break;
-            }
-
             p++;
         }
     }
@@ -181,12 +177,11 @@ static uint32_t kGreen[] =
                 if( h < 2 )
                 {
                     /* First two lines: dark blue to show progression */
-                    *p = kBlue4[h];
-
                     if( w >= (int) ( fStat->progress * 120 ) )
                     {
                         break;
                     }
+                    *p = kBlue4[h];
                 }
                 else
                 {
@@ -222,6 +217,8 @@ static uint32_t kGreen[] =
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
+    NSImage * img;
+
     if( ![view lockFocusIfCanDraw] )
     {
         return;
@@ -236,9 +233,13 @@ static uint32_t kGreen[] =
 
     pen.x += 5; pen.y += 5;
 
-    pen.y += [fImg size].height;
-    [fImg compositeToPoint: pen operation: NSCompositeSourceOver];
-    pen.y -= [fImg size].height;
+    img = [[NSImage alloc] initWithSize: [fBmp size]];
+    [img addRepresentation: fBmp];
+    [img setFlipped: YES];
+    [img drawAtPoint: pen fromRect:
+        NSMakeRect( 0, 0, [fBmp size].width, [fBmp size].height )
+        operation: NSCompositeSourceOver fraction: 1.0];
+    [img release];
 
     [attributes setObject: [NSFont messageFontOfSize:10.0]
         forKey: NSFontAttributeName];

@@ -45,24 +45,30 @@ EOF
 
 gtk_test()
 {
-  cat > testconf.c << EOF
-  #include <gtk/gtk.h>
-  int main()
-  {
-    gtk_main();
-  }
-EOF
-  if $CC `pkg-config gtk+-2.0 --cflags --libs 2>/dev/null` -o testconf testconf.c
+  if pkg-config gtk+-2.0 > /dev/null 2>&1
   then
-    echo "GTK+: yes"
-    GTK=yes
-    GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
-    GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+    cat > testconf.c << EOF
+    #include <gtk/gtk.h>
+    int main()
+    {
+      gtk_main();
+    }
+EOF
+    if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
+    then
+      echo "GTK+:    yes"
+      GTK=yes
+      GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
+      GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+    else
+      echo "GTK+:    no"
+      GTK=no
+    fi
+    rm -f testconf.c testconf
   else
-    echo "GTK+: no"
+    echo "GTK+:    no"
     GTK=no
   fi
-  rm -f testconf.c testconf
 }
 
 #
@@ -155,18 +161,6 @@ case $SYSTEM in
 esac
 echo "System:  $SYSTEM"
 
-# Check for GTK
-if pkg-config gtk+-2.0
-then
-    echo "GTK+: yes"
-    GTK=yes
-    GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
-    GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
-else
-    echo "GTK+: no"
-    GTK=no
-fi
-
 #
 # OpenSSL settings
 #
@@ -180,7 +174,7 @@ fi
 # GTK settings
 #
 if [ ${gtk_disable} = 1 ]; then
-  echo "GTK+: no"
+  echo "GTK+:    no"
 else
     gtk_test
 fi

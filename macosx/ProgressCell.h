@@ -35,7 +35,6 @@
     NSString  * fUlString;
 
     NSBitmapImageRep * fBgBmp;
-    NSImage          * fImg;
     NSBitmapImageRep * fBmp;
 }
 - (id)   init;

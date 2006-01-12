@@ -6,6 +6,7 @@ ObjectHdrs    transmissioncli.c : $(TOP)/libtransmission ;
 
 if $(OS) = MACOSX
 {
+    OSXLinks macosx/Frameworks/Growl.framework/Growl ;
     OSXInfoPlist macosx/Info.plist : macosx/Info.plist.in ;
     OSXBundle Transmission.app : libtransmission.a
         macosx/Controller.h
@@ -15,6 +16,7 @@ if $(OS) = MACOSX
         macosx/English.lproj/MainMenu.nib/classes.nib
         macosx/English.lproj/MainMenu.nib/info.nib
         macosx/English.lproj/MainMenu.nib/keyedobjects.nib
+        macosx/Frameworks/Growl.framework/Growl
         macosx/Images/Info.png
         macosx/Images/Open.png
         macosx/Images/PauseOff.png

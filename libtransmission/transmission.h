@@ -71,6 +71,20 @@ void tr_setUploadLimit( tr_handle_t *, int );
 void tr_torrentRates( tr_handle_t *, float *, float * );
 
 /***********************************************************************
+ * tr_getFinished
+ ***********************************************************************
+ * Tests to see if torrent is finished
+ **********************************************************************/
+int tr_getFinished( tr_handle_t *, int );
+
+/***********************************************************************
+ * tr_setFinished
+ ***********************************************************************
+ * Sets the boolean value finished in the torrent back to false
+ **********************************************************************/
+void tr_setFinished( tr_handle_t *, int, int );
+
+/***********************************************************************
  * tr_torrentInit
  ***********************************************************************
  * Opens and parses torrent file at 'path'. If the file exists and is a
@@ -205,6 +219,8 @@ struct tr_stat_s
     int         peersUploading;
     int         peersDownloading;
     char        pieces[120];
+    int			seeders;
+	int			leechers;
 
     uint64_t    downloaded;
     uint64_t    uploaded;

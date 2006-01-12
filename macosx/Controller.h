@@ -26,10 +26,11 @@
 #include <Cocoa/Cocoa.h>
 #include <transmission.h>
 #include "PrefsController.h"
+#include <Growl/Growl.h>
 
 @class TorrentTableView;
 
-@interface Controller : NSObject
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
     tr_handle_t                  * fHandle;
     int                            fCount;
@@ -43,6 +44,7 @@
     IBOutlet NSMenuItem          * fAdvancedBarItem;
     IBOutlet NSMenuItem          * fPauseResumeItem;
     IBOutlet NSMenuItem          * fRemoveItem;
+    IBOutlet NSMenuItem          * fRevealItem;
 
     IBOutlet NSWindow            * fWindow;
     IBOutlet TorrentTableView    * fTableView;
@@ -57,6 +59,8 @@
     IBOutlet NSTextField         * fInfoSize;
     IBOutlet NSTextField         * fInfoPieces;
     IBOutlet NSTextField         * fInfoPieceSize;
+    IBOutlet NSTextField         * fInfoSeeders;
+    IBOutlet NSTextField         * fInfoLeechers;
     IBOutlet NSTextField         * fInfoFolder;
     IBOutlet NSTextField         * fInfoDownloaded;
     IBOutlet NSTextField         * fInfoUploaded;
@@ -71,8 +75,10 @@
 - (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
                             contextInfo: (void *) info;
 - (void) stopTorrent:     (id) sender;
+- (void) stopAllTorrents: (id) sender;
 - (void) stopTorrentWithIndex: (int) index;
 - (void) resumeTorrent:   (id) sender;
+- (void) resumeAllTorrents: (id) sender;
 - (void) resumeTorrentWithIndex: (int) index;
 - (void) removeTorrent:   (id) sender;
 - (void) removeTorrentDeleteFile: (id) sender;
@@ -92,6 +98,8 @@
 - (void) showMainWindow:  (id) sender;
 - (void) linkHomepage:    (id) sender;
 - (void) linkForums:      (id) sender;
+- (void) notifyGrowl:	  (NSString *) file folder: (NSString *) folder;
+- (void) revealInFinder:  (NSString *) path;
 
 @end
 

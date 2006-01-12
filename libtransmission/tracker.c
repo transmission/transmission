@@ -358,7 +358,7 @@ static void recvAnswer( tr_tracker_t * tc )
         tr_err( "Tracker: %s", bePeers->val.s.s );
         tor->status |= TR_TRACKER_ERROR;
         snprintf( tor->error, sizeof( tor->error ),
-                  bePeers->val.s.s );
+                  "%s", bePeers->val.s.s );
         goto cleanup;
     }
 
@@ -605,4 +605,22 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
     tr_bencFree( &scrape );
 
     return 0;
+}
+
+int tr_trackerSeeders( tr_torrent_t * tor)
+{
+	if (tor->status != TR_STATUS_PAUSE)
+	{
+		return (tor->tracker)->seeders;
+	}
+	return 0;
+}
+
+int tr_trackerLeechers( tr_torrent_t * tor)
+{
+	if (tor->status != TR_STATUS_PAUSE) 
+	{
+		return (tor->tracker)->leechers;
+	}
+	return 0;
 }
