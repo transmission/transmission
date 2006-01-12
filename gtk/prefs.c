@@ -24,6 +24,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -305,4 +306,99 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   }
 
   gtk_widget_destroy(widget);
+}
+
+#define INFOLINE(tab, ii, nam, val) \
+  do { \
+    GtkWidget *wid = gtk_label_new(NULL); \
+    gtk_misc_set_alignment(GTK_MISC(wid), 1, .5); \
+    gtk_label_set_markup(GTK_LABEL(wid), "<b>" nam ":</b>"); \
+    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 0, 1, ii, ii + 1); \
+    wid = gtk_label_new(val); \
+    gtk_misc_set_alignment(GTK_MISC(wid), 0, .5); \
+    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 1, 2, ii, ii + 1); \
+    ii++; \
+  } while(0);
+
+#define INFOLINEF(tab, ii, fmt, nam, val) \
+  do { \
+    char *buf = g_strdup_printf(fmt, val); \
+    INFOLINE(tab, ii, nam, buf); \
+    g_free(buf); \
+  } while(0);
+
+#define INFOLINEA(tab, ii, nam, val) \
+  do { \
+    char *buf = val; \
+    INFOLINE(tab, ii, nam, buf); \
+    g_free(buf); \
+  } while(0);
+
+#define INFOSEP(tab, ii) \
+  do { \
+    GtkWidget *wid = gtk_hseparator_new(); \
+    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 0, 2, ii, ii + 1); \
+    ii++; \
+  } while(0);
+
+#define INFOSTATUS(st) \
+  (TR_STATUS_CHECK    & (st) ? "check" : \
+  (TR_STATUS_DOWNLOAD & (st) ? "download" : \
+  (TR_STATUS_SEED     & (st) ? "seed" : \
+  (TR_STATUS_STOPPING & (st) ? "stopping" : \
+  (TR_STATUS_STOPPED  & (st) ? "stopped" : \
+  (TR_STATUS_PAUSE    & (st) ? "pause" : \
+  "???"))))))
+
+void
+makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
+  tr_stat_t *sb;
+  GtkWidget *wind, *table, *label;
+  int ii;
+  char *str;
+  const int rowcount = 11;
+
+  /* XXX would be nice to be able to stat just one */
+  if(id >= tr_torrentStat(tr, &sb))
+    assert(!"XXX ");
+  str = g_strdup_printf("%s Properties", sb[id].info.name);
+  wind = gtk_dialog_new_with_buttons(str, parent,
+    GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+  g_free(str);
+
+  table = gtk_table_new(rowcount, 2, FALSE);
+  gtk_table_set_col_spacings(GTK_TABLE(table), 10);
+  gtk_table_set_row_spacings(GTK_TABLE(table), 10);
+
+  label = gtk_label_new(NULL);
+  str = g_markup_printf_escaped("<big>%s</big>", sb[id].info.name);
+  gtk_label_set_markup(GTK_LABEL(label), str);
+  g_free(str);
+  gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
+
+  ii = 1;
+
+  INFOSEP(table, ii);
+
+  INFOLINEA(table, ii, "Tracker", g_strdup_printf("http://%s:%i",
+            sb[id].info.trackerAddress, sb[id].info.trackerPort));
+  INFOLINE(table, ii, "Announce", sb[id].info.trackerAnnounce);
+  INFOLINEA(table, ii, "Piece Size", readablesize(sb[id].info.pieceSize, 1));
+  INFOLINEF(table, ii, "%i", "Pieces", sb[id].info.pieceCount);
+  INFOLINEA(table, ii, "Total Size", readablesize(sb[id].info.totalSize, 1));
+
+  INFOSEP(table, ii);
+
+  INFOLINE(table, ii, "Directory", sb[id].folder);
+  INFOLINEA(table, ii, "Downloaded", readablesize(sb[id].downloaded, 1));
+  INFOLINEA(table, ii, "Uploaded", readablesize(sb[id].uploaded, 1));
+
+  assert(rowcount == ii);
+
+  gtk_container_set_border_width(GTK_CONTAINER(table), 10);
+  gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
+  g_signal_connect(G_OBJECT(wind), "response",
+                   G_CALLBACK(gtk_widget_destroy), NULL);
+  gtk_widget_show_all(wind);
+  free(sb);
 }

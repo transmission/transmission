@@ -52,4 +52,8 @@ void
 makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
             torrents_added_func_t donefunc, void *donedata);
 
+/* show the info window for a torrent */
+void
+makeinfowind(GtkWindow *parent, tr_handle_t *tr, int index);
+
 #endif /* TG_PREFS_H */

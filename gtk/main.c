@@ -98,21 +98,29 @@ listclick(GtkWidget *widget, GdkEventButton *event, gpointer gdata);
 gboolean
 listpopup(GtkWidget *widget, gpointer gdata);
 void
-dopopupmenu(GdkEventButton *event, struct cbdata *data, GtkTreeIter *iter);
+dopopupmenu(GdkEventButton *event, struct cbdata *data,
+            GList *ids, int status);
+void
+killmenu(GtkWidget *menu, gpointer *gdata SHUTUP);
 void
 actionclick(GtkWidget *widget, gpointer gdata);
+void
+doubleclick(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *col,
+            gpointer gdata);
 
 gboolean
 addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
            const char *dir, gboolean paused);
 void
 addedtorrents(void *vdata);
-const char *
-statusstr(int status);
-void
-makeinfowind(struct cbdata *data, int index);
 gboolean
 savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat);
+void
+orstatus(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
+         gpointer gdata);
+void
+makeidlist(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
+           gpointer gdata);
 
 #define TR_TYPE_PIECES_NAME     "tr-type-pieces"
 #define TR_TYPE_PIECES          ((const GType)tr_type_pieces)
@@ -124,7 +132,8 @@ enum listact { ACT_OPEN, ACT_START, ACT_STOP, ACT_DELETE, ACT_INFO, ACT_PREF };
 #define LIST_ACTION_FROM      "torrent-list-action-from"
 enum listfrom { FROM_BUTTON, FROM_POPUP };
 
-#define LIST_INDEX            "torrent-list-index"
+#define LIST_INDEX            "torrent-list-indexes"
+#define LIST_MENU_WIDGET      "torrent-list-popup-menu-widget"
 
 struct { const gchar *name; const gchar *id; enum listact act; gboolean nomenu;
   int avail; const char *ttext; const char *tpriv; }
@@ -445,11 +454,13 @@ makewind_list(struct cbdata *data) {
 
   gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(view), TRUE);
   sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
-  gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_SINGLE);
+  gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_MULTIPLE);
   g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(fixbuttons), data);
   g_signal_connect(G_OBJECT(view), "button-press-event",
                    G_CALLBACK(listclick), data);
   g_signal_connect(G_OBJECT(view), "popup-menu", G_CALLBACK(listpopup), data);
+  g_signal_connect(G_OBJECT(view), "row-activated",
+                   G_CALLBACK(doubleclick), data);
   gtk_widget_show_all(view);
 
   return view;
@@ -468,16 +479,15 @@ stylekludge(GObject *obj, GParamSpec *spec, gpointer gdata) {
 void
 fixbuttons(GtkTreeSelection *sel, gpointer gdata) {
   struct cbdata *data = gdata;
-  GtkTreeModel *model;
-  GtkTreeIter iter;
   gboolean selected;
   unsigned int ii;
   int status;
 
   if(NULL == sel)
     sel = gtk_tree_view_get_selection(data->view);
-  if((selected = gtk_tree_selection_get_selected(sel, &model, &iter)))
-    gtk_tree_model_get(model, &iter, MC_STAT, &status, -1);
+  status = 0;
+  gtk_tree_selection_selected_foreach(sel, orstatus, &status);
+  selected = (0 < gtk_tree_selection_count_selected_rows(sel));
 
   for(ii = 0; ii < ALEN(actionitems); ii++)
     if(actionitems[ii].avail)
@@ -619,19 +629,42 @@ updatemodel(gpointer gdata) {
   return TRUE;
 }
 
+/* show a popup menu for a right-click on the list */
 gboolean
 listclick(GtkWidget *widget SHUTUP, GdkEventButton *event, gpointer gdata) {
   struct cbdata *data = gdata;
+  GtkTreeSelection *sel = gtk_tree_view_get_selection(data->view);
   GtkTreePath *path;
   GtkTreeIter iter;
+  int index, status;
+  GList *ids;
 
   if(GDK_BUTTON_PRESS == event->type && 3 == event->button) {
+    /* find what row, if any, the user clicked on */
     if(!gtk_tree_view_get_path_at_pos(data->view, event->x, event->y, &path,
                                       NULL, NULL, NULL))
-      dopopupmenu(event, data, NULL);
+      /* no row was clicked, do the popup with no torrent IDs or status */
+      dopopupmenu(event, data, NULL, 0);
     else {
-      if(gtk_tree_model_get_iter(GTK_TREE_MODEL(data->model), &iter, path))
-        dopopupmenu(event, data, &iter);
+      if(gtk_tree_model_get_iter(GTK_TREE_MODEL(data->model), &iter, path)) {
+        /* get ID and status for the right-clicked row */
+        gtk_tree_model_get(GTK_TREE_MODEL(data->model), &iter,
+                           MC_ROW_INDEX, &index, MC_STAT, &status, -1);
+        /* get a list of selected IDs */
+        ids = NULL;
+        gtk_tree_selection_selected_foreach(sel, makeidlist, &ids);
+        /* is the clicked row selected? */
+        if(NULL == g_list_find(ids, GINT_TO_POINTER(index))) {
+          /* no, do the popup for just the clicked row */
+          g_list_free(ids);
+          dopopupmenu(event, data, g_list_append(NULL, GINT_TO_POINTER(index)),
+                      status);
+        } else {
+          /* yes, do the popup for all the selected rows */
+          gtk_tree_selection_selected_foreach(sel, orstatus, &status);
+          dopopupmenu(event, data, ids, status);
+        }
+      }
       gtk_tree_path_free(path);
     }
     return TRUE;
@@ -645,46 +678,57 @@ listpopup(GtkWidget *widget SHUTUP, gpointer gdata) {
   struct cbdata *data = gdata;
   GtkTreeSelection *sel = gtk_tree_view_get_selection(data->view);
   GtkTreeModel *model;
-  GtkTreeIter iter;
+  GList *ids;
+  int status;
 
-  if(!gtk_tree_selection_get_selected(sel, &model, &iter))
-    dopopupmenu(NULL, data, NULL);
+  if(0 >= gtk_tree_selection_count_selected_rows(sel))
+    dopopupmenu(NULL, data, NULL, 0);
   else {
     assert(model == GTK_TREE_MODEL(data->model));
-    dopopupmenu(NULL, data, &iter);
+    status = 0;
+    gtk_tree_selection_selected_foreach(sel, orstatus, &status);
+    ids = NULL;
+    gtk_tree_selection_selected_foreach(sel, makeidlist, &ids);
+    dopopupmenu(NULL, data, ids, status);
   }
 
   return TRUE;
 }
 
 void
-dopopupmenu(GdkEventButton *event, struct cbdata *data, GtkTreeIter *iter) {
+dopopupmenu(GdkEventButton *event, struct cbdata *data,
+            GList *ids, int status) {
   GtkWidget *menu = gtk_menu_new();
   GtkWidget *item;
   unsigned int ii;
-  int index, status;
 
-  index = -1;
-  if(NULL != iter)
-    gtk_tree_model_get(GTK_TREE_MODEL(data->model), iter,
-                       MC_ROW_INDEX, &index, MC_STAT, &status, -1);
-
-  /* XXX am I leaking references here? */
   for(ii = 0; ii < ALEN(actionitems); ii++) {
     if(actionitems[ii].nomenu ||
        (actionitems[ii].avail &&
-        (0 > index || !(actionitems[ii].avail & status))))
+        (NULL == ids || !(actionitems[ii].avail & status))))
       continue;
     item = gtk_menu_item_new_with_label(actionitems[ii].name);
+    /* set the action for the menu item */
     g_object_set_data(G_OBJECT(item), LIST_ACTION,
                       GINT_TO_POINTER(actionitems[ii].act));
+    /* show that this action came from a popup menu */
     g_object_set_data(G_OBJECT(item), LIST_ACTION_FROM,
                       GINT_TO_POINTER(FROM_POPUP));
-    g_object_set_data(G_OBJECT(item), LIST_INDEX, GINT_TO_POINTER(index));
+    /* set a glist of selected torrent's IDs */
+    g_object_set_data(G_OBJECT(item), LIST_INDEX, ids);
+    /* set the menu widget, so the activate handler can destroy it */
+    g_object_set_data(G_OBJECT(item), LIST_MENU_WIDGET, menu);
     g_signal_connect(G_OBJECT(item), "activate",
                      G_CALLBACK(actionclick), data);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
   }
+
+  /* set up the glist to be freed when the menu is destroyed */
+  g_object_set_data_full(G_OBJECT(menu), LIST_INDEX, ids,
+                         (GDestroyNotify)g_list_free);
+
+  /* destroy the menu if the user doesn't select anything */
+  g_signal_connect(menu, "selection-done", G_CALLBACK(killmenu), NULL);
 
   gtk_widget_show_all(menu);
 
@@ -694,17 +738,27 @@ dopopupmenu(GdkEventButton *event, struct cbdata *data, GtkTreeIter *iter) {
 }
 
 void
+killmenu(GtkWidget *menu, gpointer *gdata SHUTUP) {
+  gtk_widget_destroy(menu);
+}
+
+void
 actionclick(GtkWidget *widget, gpointer gdata) {
   struct cbdata *data = gdata;
   GtkTreeSelection *sel = gtk_tree_view_get_selection(data->view);
-  GtkTreeModel *model;
-  GtkTreeIter iter;
   enum listact act =
     GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_ACTION));
   enum listfrom from =
     GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_ACTION_FROM));
-  int index;
+  int index, count;
+  unsigned int actindex;
   tr_stat_t *sb;
+  GList *ids, *ii;
+  gboolean updatesave;
+
+  /* destroy the popup menu, if any */
+  if(FROM_POPUP == from)
+    gtk_widget_destroy(g_object_get_data(G_OBJECT(widget), LIST_MENU_WIDGET));
 
   switch(act) {
     case ACT_OPEN:
@@ -717,53 +771,88 @@ actionclick(GtkWidget *widget, gpointer gdata) {
       break;
   }
 
-  index = -1;
   switch(from) {
     case FROM_BUTTON:
-      if(gtk_tree_selection_get_selected(sel, &model, &iter))
-        gtk_tree_model_get(GTK_TREE_MODEL(model), &iter,
-                           MC_ROW_INDEX, &index, -1);
+      ids = NULL;
+      gtk_tree_selection_selected_foreach(sel, makeidlist, &ids);
       /* XXX should I assert(0 <= index) to insure a row was selected? */
       break;
     case FROM_POPUP:
-      index = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_INDEX));
+      ids = g_object_get_data(G_OBJECT(widget), LIST_INDEX);
       break;
     default:
       assert(!"unknown action source");
       break;
   }
 
-  if(0 <= index) {
+  for(actindex = 0; actindex < ALEN(actionitems); actindex++)
+    if(actionitems[actindex].act == act)
+      break;
+  assert(actindex < ALEN(actionitems));
+
+  updatesave = FALSE;
+  count = tr_torrentStat(data->tr, &sb);
+
+  for(ii = g_list_first(ids); NULL != ii; ii = ii->next) {
+    index = GPOINTER_TO_INT(ii->data);
+    if(index >= count) {
+      assert(!"illegal torrent id");
+      continue;
+    }
+    /* check if this action is valid for this torrent */
+    if(actionitems[actindex].nomenu ||
+       (actionitems[actindex].avail &&
+        !(actionitems[actindex].avail & sb[index].status)))
+      continue;
+
     switch(act) {
       case ACT_START:
-        tr_torrentStart(data->tr, index);
-        savetorrents(data->tr, data->wind, -1, NULL);
-        updatemodel(data);
+        if(TR_STATUS_STOPPING & sb[index].status)
+          fprintf(stderr, "XXX still running\n");
+        else
+          tr_torrentStart(data->tr, index);
+        updatesave = TRUE;
         break;
       case ACT_STOP:
         tr_torrentStop(data->tr, index);
-        savetorrents(data->tr, data->wind, -1, NULL);
-        updatemodel(data);
+        updatesave = TRUE;
         break;
       case ACT_DELETE:
-        /* XXX need to be able to stat just one torrent */
-        if(index >= tr_torrentStat(data->tr, &sb)) {
-          assert(!"XXX i'm tired");
-        }
         if(TR_TORRENT_NEEDS_STOP(sb[index].status))
           tr_torrentStop(data->tr, index);
-        free(sb);
         tr_torrentClose(data->tr, index);
-        savetorrents(data->tr, data->wind, -1, NULL);
-        updatemodel(data);
+        updatesave = TRUE;
         break;
       case ACT_INFO:
-        makeinfowind(data, index);
+        makeinfowind(data->wind, data->tr, index);
         break;
       default:
         assert(!"unknown type");
         break;
     }
+  }
+  free(sb);
+
+  if(updatesave) {
+    savetorrents(data->tr, data->wind, -1, NULL);
+    updatemodel(data);
+  }
+
+  if(FROM_BUTTON == from)
+    g_list_free(ids);
+}
+
+void
+doubleclick(GtkWidget *widget SHUTUP, GtkTreePath *path,
+            GtkTreeViewColumn *col SHUTUP, gpointer gdata) {
+  struct cbdata *data = gdata;
+  GtkTreeIter iter;
+  int index;
+
+  if(gtk_tree_model_get_iter(GTK_TREE_MODEL(data->model), &iter, path)) {
+    gtk_tree_model_get(GTK_TREE_MODEL(data->model), &iter,
+                       MC_ROW_INDEX, &index, -1);
+    makeinfowind(data->wind, data->tr, index);
   }
 }
 
@@ -811,138 +900,6 @@ addedtorrents(void *vdata) {
   savetorrents(data->tr, data->wind, -1, NULL);
 }
 
-const char *
-statusstr(int status) {
-  switch(status) {
-    case TR_STATUS_CHECK:       return "check";
-    case TR_STATUS_DOWNLOAD:    return "download";
-    case TR_STATUS_SEED:        return "seed";
-    case TR_STATUS_STOPPING:    return "stopping";
-    case TR_STATUS_STOPPED:     return "stopped";
-    case TR_STATUS_PAUSE:       return "pause";
-    case TR_TRACKER_ERROR:      return "error";
-    default:
-      assert(!"unknown status code");
-      return NULL;
-  }
-}
-
-void
-makeinfowind(struct cbdata *data, int index) {
-  tr_stat_t *sb;
-  GtkWidget *wind, *table, *name, *value;
-  char buf[32];
-
-  if(index >= tr_torrentStat(data->tr, &sb)) {
-    assert(!"XXX i'm tired");
-  }
-  wind = gtk_dialog_new_with_buttons(sb[index].info.name, data->wind,
-    GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
-
-  table = gtk_table_new(21, 2, FALSE);
-
-  name = gtk_label_new("Torrent File");
-  value = gtk_label_new(sb[index].info.torrent);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 0, 1);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 0, 1);
-  name = gtk_label_new("Name");
-  value = gtk_label_new(sb[index].info.name);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 1, 2);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 1, 2);
-  name = gtk_label_new("Tracker Address");
-  value = gtk_label_new(sb[index].info.trackerAddress);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 2, 3);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 2, 3);
-  name = gtk_label_new("Tracker Port");
-  snprintf(buf, sizeof buf, "%i", sb[index].info.trackerPort);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 3, 4);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 3, 4);
-  name = gtk_label_new("Tracker Announce URL");
-  value = gtk_label_new(sb[index].info.trackerAnnounce);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 4, 5);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 4, 5);
-  name = gtk_label_new("Piece Size");
-  snprintf(buf, sizeof buf, "%i", sb[index].info.pieceSize);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 5, 6);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 5, 6);
-  name = gtk_label_new("Piece Count");
-  snprintf(buf, sizeof buf, "%i", sb[index].info.pieceCount);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 6, 7);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 6, 7);
-  name = gtk_label_new("Total Size");
-  snprintf(buf, sizeof buf, "%llu", sb[index].info.totalSize);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 7, 8);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 7, 8);
-  name = gtk_label_new("File Count");
-  snprintf(buf, sizeof buf, "%i", sb[index].info.fileCount);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 8, 9);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 8, 9);
-  name = gtk_label_new("Status");
-  value = gtk_label_new(statusstr(sb[index].status));
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 9, 10);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 9, 10);
-  name = gtk_label_new("Error");
-  value = gtk_label_new(sb[index].error);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 10, 11);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 10, 11);
-  name = gtk_label_new("Progress");
-  snprintf(buf, sizeof buf, "%f", sb[index].progress);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 11, 12);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 11, 12);
-  name = gtk_label_new("Download Rate");
-  value = gtk_label_new(buf);
-  snprintf(buf, sizeof buf, "%f", sb[index].rateDownload);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 12, 13);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 12, 13);
-  name = gtk_label_new("Upload Rate");
-  snprintf(buf, sizeof buf, "%f", sb[index].rateUpload);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 13, 14);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 13, 14);
-  name = gtk_label_new("ETA");
-  snprintf(buf, sizeof buf, "%i", sb[index].eta);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 14, 15);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 14, 15);
-  name = gtk_label_new("Total Peers");
-  snprintf(buf, sizeof buf, "%i", sb[index].peersTotal);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 15, 16);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 15, 16);
-  name = gtk_label_new("Uploading Peers");
-  snprintf(buf, sizeof buf, "%i", sb[index].peersUploading);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 16, 17);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 16, 17);
-  name = gtk_label_new("Downloading Peers");
-  snprintf(buf, sizeof buf, "%i", sb[index].peersDownloading);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 17, 18);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 17, 18);
-  name = gtk_label_new("Downloaded");
-  snprintf(buf, sizeof buf, "%llu", sb[index].downloaded);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 18, 19);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 18, 19);
-  name = gtk_label_new("Uploaded");
-  snprintf(buf, sizeof buf, "%llu", sb[index].uploaded);
-  value = gtk_label_new(buf);
-  gtk_table_attach_defaults(GTK_TABLE(table), name, 0, 1, 19, 20);
-  gtk_table_attach_defaults(GTK_TABLE(table), value, 1, 2, 19, 20);
-
-  gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
-  g_signal_connect(G_OBJECT(wind), "response",
-                   G_CALLBACK(gtk_widget_destroy), NULL);
-  gtk_widget_show_all(wind);
-  free(sb);
-}
-
 gboolean
 savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat) {
   char *errstr;
@@ -965,4 +922,25 @@ savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat) {
   }
 
   return ret;
+}
+
+/* use with gtk_tree_selection_selected_foreach to | status of selected rows */
+void
+orstatus(GtkTreeModel *model, GtkTreePath *path SHUTUP, GtkTreeIter *iter,
+         gpointer gdata) {
+  int *allstatus = gdata;
+  int status;
+
+  gtk_tree_model_get(model, iter, MC_STAT, &status, -1);
+  *allstatus |= status;
+}
+
+void
+makeidlist(GtkTreeModel *model, GtkTreePath *path SHUTUP, GtkTreeIter *iter,
+           gpointer gdata) {
+  GList **ids = gdata;
+  int index;
+
+  gtk_tree_model_get(model, iter, MC_ROW_INDEX, &index, -1);
+  *ids = g_list_append(*ids, GINT_TO_POINTER(index));
 }
