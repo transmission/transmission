@@ -41,6 +41,8 @@
     IBOutlet PrefsController     * fPrefsController;
 
     IBOutlet NSMenuItem          * fAdvancedBarItem;
+    IBOutlet NSMenuItem          * fPauseResumeItem;
+    IBOutlet NSMenuItem          * fRemoveItem;
 
     IBOutlet NSWindow            * fWindow;
     IBOutlet TorrentTableView    * fTableView;

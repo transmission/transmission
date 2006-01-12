@@ -48,7 +48,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 @implementation Controller
 
-- (void) updateToolbar
+- (void) updateBars
 {
     NSArray * items;
     NSToolbarItem * item;
@@ -56,10 +56,11 @@ static void sleepCallBack( void * controller, io_service_t y,
     int row;
     unsigned i;
 
-    row    = [fTableView selectedRow];
+    row = [fTableView selectedRow];
+
+    /* Can we remove it ? */
     enable = ( row >= 0 ) && ( fStat[row].status &
                 ( TR_STATUS_STOPPING | TR_STATUS_PAUSE ) );
-
     items = [fToolbar items];
     for( i = 0; i < [items count]; i++ )
     {
@@ -68,6 +69,25 @@ static void sleepCallBack( void * controller, io_service_t y,
         {
             [item setAction: enable ? @selector( removeTorrent: ) : NULL];
         }
+    }
+    [fRemoveItem setAction: enable ? @selector( removeTorrent: ) : NULL];
+
+    /* Can we pause or resume it ? */
+    [fPauseResumeItem setTitle: @"Pause"];
+    [fPauseResumeItem setAction: NULL];
+    if( row < 0 )
+    {
+        return;
+    }
+    if( fStat[row].status & TR_STATUS_PAUSE )
+    {
+        [fPauseResumeItem setTitle: @"Resume"];
+        [fPauseResumeItem setAction: @selector( resumeTorrent: )];
+    }
+    else if( fStat[row].status & ( TR_STATUS_CHECK |
+                TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
+    {
+        [fPauseResumeItem setAction: @selector( stopTorrent: )];
     }
 }
 
@@ -542,7 +562,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     /* Must we do this? Can't remember */
-    [self updateToolbar];
+    [self updateBars];
 }
 
 
@@ -635,7 +655,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     int row = [fTableView selectedRow];
 
-    [self updateToolbar];
+    [self updateBars];
 
     if( row < 0 )
     {
@@ -688,7 +708,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setToolTip: @"Remove torrent from list"];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
-        /* We set the selector in updateToolbar: */
+        /* We set the selector in updateBars: */
     }
     else if( [ident isEqualToString: TOOLBAR_PREFS] )
     {
@@ -772,7 +792,7 @@ static void sleepCallBack( void * controller, io_service_t y,
                     tr_torrentStart( fHandle, i );
                 }
             }
-            [self updateToolbar];
+            [self updateBars];
             break;
     }
 }

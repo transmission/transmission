@@ -30,8 +30,10 @@
                 fInfoTitle = NSTextField; 
                 fInfoTracker = NSTextField; 
                 fInfoUploaded = NSTextField; 
+                fPauseResumeItem = NSMenuItem; 
                 fPrefsController = PrefsController; 
-                fTableView = NSTableView; 
+                fRemoveItem = NSMenuItem; 
+                fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
                 fTotalULField = NSTextField; 
                 fWindow = NSWindow; 

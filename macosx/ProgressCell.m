@@ -140,7 +140,14 @@ static uint32_t kGreen[] =
 
         for( w = 0; w < 120; w++ )
         {
-            *p = kBlue2[h];
+            if( fStat->status & TR_STATUS_SEED )
+            {
+                *p = kGreen[h];
+            }
+            else
+            {
+                *p = kBlue2[h];
+            }
 
             if( w >= (int) ( fStat->progress * 120 ) )
             {
@@ -156,15 +163,6 @@ static uint32_t kGreen[] =
 {
     int        h, w;
     uint32_t * p;
-
-    if( fStat->status & TR_STATUS_SEED )
-    {
-        for( h = 0; h < 2; h++ )
-        {
-            p = (uint32_t *) ( [fBmp bitmapData] +
-                    h * [fBmp bytesPerRow] ) + 2;
-        }
-    }
 
     for( h = 0; h < 14; h++ )
     {
