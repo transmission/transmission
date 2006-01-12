@@ -1,6 +1,6 @@
 SubDir TOP gtk ;
 
-GTK_SRC = conf.c main.c util.c ;
+GTK_SRC = conf.c main.c prefs.c util.c ;
 
 Main          transmission-gtk   : $(GTK_SRC) ;
 LinkLibraries transmission-gtk   : libtransmission.a ;

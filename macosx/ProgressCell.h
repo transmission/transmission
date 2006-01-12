@@ -30,12 +30,11 @@
 {
     tr_stat_t * fStat;
 
-    NSString  * fProgressString;
     NSString  * fDlString;
     NSString  * fUlString;
 
-    NSBitmapImageRep * fBgBmp;
-    NSBitmapImageRep * fBmp;
+    NSBitmapImageRep * fBackgroundBmp;
+    NSBitmapImageRep * fProgressBmp;
 }
 - (id)   init;
 - (void) setStat: (tr_stat_t *) stat;

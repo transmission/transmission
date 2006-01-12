@@ -22,6 +22,14 @@
 
 #include "ProgressCell.h"
 
+@implementation ProgressCell
+
+/***********************************************************************
+ * Static tables
+ ***********************************************************************
+ * We use these tables to optimize the drawing. They contain packed
+ * RGBA pixels for every color we might need.
+ **********************************************************************/
 #if 0
 /* Coefficients for the "3D effect" */
 static float kBarCoeffs[] =
@@ -71,49 +79,63 @@ static uint32_t kGreen[] =
       0x00C900FF, 0x00C600FF, 0x00D100FF, 0x00DB00FF, 0x00E800FF,
       0x00ED00FF, 0x00F200FF, 0x00F400FF, 0x00B500FF };
 
-@implementation ProgressCell
-
+/***********************************************************************
+ * init
+ ***********************************************************************
+ * Prepares the NSBitmapImageReps we are going to need in order to
+ * draw.
+ **********************************************************************/
 - (id) init
 {
-    NSImage * bgImg;
-    NSSize    size;
-
     self = [super init];
 
-    /* Have a NSBitmapImageRep ready to draw the progression bar */
-    bgImg  = [NSImage imageNamed: @"Progress.png"];
-    fBgBmp = [[bgImg representations] objectAtIndex: 0];
-    size   = [bgImg size];
-    fBmp   = [[NSBitmapImageRep alloc]
-        initWithBitmapDataPlanes: NULL pixelsWide: size.width
-        pixelsHigh: size.height bitsPerSample: 8 samplesPerPixel: 4
-        hasAlpha: YES isPlanar: NO
+    /* Load the background image for the progress bar and get it as a
+       32-bit bitmap */
+    fBackgroundBmp = [[[NSImage imageNamed: @"Progress.png"]
+                        representations] objectAtIndex: 0];
+
+    /* Allocate another bitmap of the same size. We will draw the
+       progress bar in it */
+    fProgressBmp = [[NSBitmapImageRep alloc]
+        initWithBitmapDataPlanes: NULL pixelsWide:
+        [fBackgroundBmp size].width pixelsHigh:
+        [fBackgroundBmp size].height bitsPerSample: 8
+        samplesPerPixel: 4 hasAlpha: YES isPlanar: NO
         colorSpaceName: NSCalibratedRGBColorSpace
         bytesPerRow: 0 bitsPerPixel: 0];
 
     return self;
 }
 
+/***********************************************************************
+ * setStat
+ ***********************************************************************
+ * Readies ourselves to draw updated info.
+ **********************************************************************/
 - (void) setStat: (tr_stat_t *) stat
 {
     int i;
+    uint8_t * in, * out;
 
     fStat = stat;
 
-    fProgressString = [NSString stringWithFormat:
-        @"%.2f %%", 100.0 * fStat->progress];
+    /* Update the strings to be displayed */
     fDlString = [NSString stringWithFormat:
         @"DL: %.2f KB/s", fStat->rateDownload];
     fUlString = [NSString stringWithFormat:
         @"UL: %.2f KB/s", fStat->rateUpload];
 
-    for( i = 0; i < [fBmp size].height; i++ )
+    /* Reset our bitmap to the background image... */
+    in  = [fBackgroundBmp bitmapData];
+    out = [fProgressBmp bitmapData];
+    for( i = 0; i < [fProgressBmp size].height; i++ )
     {
-        memcpy( [fBmp bitmapData] + i * [fBmp bytesPerRow],
-                [fBgBmp bitmapData] + i * [fBgBmp bytesPerRow],
-                [fBmp size].width * 4 );
+        memcpy( out, in, [fProgressBmp size].width * 4 );
+        in  += [fBackgroundBmp bytesPerRow];
+        out += [fProgressBmp bytesPerRow];
     }
 
+    /* ...and redraw the progress bar on the top of it */
     if( [[NSUserDefaults standardUserDefaults]
             boolForKey:@"UseAdvancedBar"])
     {
@@ -125,128 +147,146 @@ static uint32_t kGreen[] =
     }
 }
 
+/***********************************************************************
+ * buildSimpleBar
+ **********************************************************************/
 - (void) buildSimpleBar
 {
-    int        h, w;
+    int        h, w, end, pixelsPerRow;
     uint32_t * p;
+    uint32_t * colors;
+
+    pixelsPerRow = [fProgressBmp bytesPerRow] / 4;
+
+    /* The background image is 124*18 pixels, but the actual
+       progress bar is 120*14 : the first two columns, the last
+       two columns and the last four lines contain the shadow. */
+
+    p      = (uint32_t *) [fProgressBmp bitmapData];
+    p     += 2;
+    end    = lrintf( floor( fStat->progress * 120 ) );
+    colors = ( fStat->status & TR_STATUS_SEED ) ? kGreen : kBlue2;
 
     for( h = 0; h < 14; h++ )
     {
-        p = (uint32_t *) ( [fBmp bitmapData] +
-                h * [fBmp bytesPerRow] ) + 2;
-
-        for( w = 0; w < 120; w++ )
+        for( w = 0; w < end; w++ )
         {
-            if( w >= (int) ( fStat->progress * 120 ) )
-            {
-                break;
-            }
-
-            if( fStat->status & TR_STATUS_SEED )
-            {
-                *p = kGreen[h];
-            }
-            else
-            {
-                *p = kBlue2[h];
-            }
-            p++;
+            p[w] = colors[h];
         }
+        p += pixelsPerRow;
     }
 }
 
+/***********************************************************************
+ * buildAdvancedBar
+ **********************************************************************/
 - (void) buildAdvancedBar
 {
-    int        h, w;
+    int        h, w, end, pixelsPerRow;
     uint32_t * p;
+    uint32_t * colors;
 
-    for( h = 0; h < 14; h++ )
+    if( fStat->status & TR_STATUS_SEED )
     {
-        p = (uint32_t *) ( [fBmp bitmapData] +
-                h * [fBmp bytesPerRow] ) + 2;
+        /* All green, same as the simple bar */
+        [self buildSimpleBar];
+        return;
+    }
 
-        for( w = 0; w < 120; w++ )
+    pixelsPerRow = [fProgressBmp bytesPerRow] / 4;
+
+    /* First two lines: dark blue to show progression */
+    p    = (uint32_t *) [fProgressBmp bitmapData];
+    p   += 2;
+    end  = lrintf( floor( fStat->progress * 120 ) );
+    for( h = 0; h < 2; h++ )
+    {
+        for( w = 0; w < end; w++ )
         {
-            if( fStat->status & TR_STATUS_SEED )
-            {
-                *p = kGreen[h];
-            }
-            else
-            {
-                /* Download is not finished yet */
-                if( h < 2 )
-                {
-                    /* First two lines: dark blue to show progression */
-                    if( w >= (int) ( fStat->progress * 120 ) )
-                    {
-                        break;
-                    }
-                    *p = kBlue4[h];
-                }
-                else
-                {
-                    /* Lines 2 to X: blue or grey depending on whether
-                       we have the piece or not */
-                    if( fStat->pieces[w] < 0 )
-                    {
-                        *p = kGray[h];
-                    }
-                    else if( fStat->pieces[w] < 1 )
-                    {
-                        *p = kRed[h];
-                    }
-                    else if( fStat->pieces[w] < 2 )
-                    {
-                        *p = kBlue1[h];
-                    }
-                    else if( fStat->pieces[w] < 3 )
-                    {
-                        *p = kBlue2[h];
-                    }
-                    else
-                    {
-                        *p = kBlue3[h];
-                    }
-                }
-            }
+            p[w] = kBlue4[h];
+        }
+        p += pixelsPerRow;
+    }
 
-            p++;
+    /* Lines 2 to 14: blue or grey depending on whether
+       we have the piece or not */
+    for( w = 0; w < 120; w++ )
+    {
+        /* Point to pixel ( 2 + w, 2 ). We will then draw
+           "vertically" */
+        p  = (uint32_t *) ( [fProgressBmp bitmapData] +
+                2 * [fProgressBmp bytesPerRow] );
+        p += 2 + w;
+
+        if( fStat->pieces[w] < 0 )
+        {
+            colors = kGray;
+        }
+        else if( fStat->pieces[w] < 1 )
+        {
+            colors = kRed;
+        }
+        else if( fStat->pieces[w] < 2 )
+        {
+            colors = kBlue1;
+        }
+        else if( fStat->pieces[w] < 3 )
+        {
+            colors = kBlue2;
+        }
+        else
+        {
+            colors = kBlue3;
+        }
+
+        for( h = 2; h < 14; h++ )
+        {
+            p[0]  = colors[h];
+            p    += pixelsPerRow;
         }
     }
 }
 
+/***********************************************************************
+ * drawWithFrame
+ ***********************************************************************
+ * We have the strings, we have the bitmap. Let's just draw them where
+ * they belong.
+ **********************************************************************/
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
     NSImage * img;
+    NSMutableDictionary * attributes;
+    NSPoint pen;
 
     if( ![view lockFocusIfCanDraw] )
     {
         return;
     }
 
-    NSMutableDictionary * attributes;
-    NSPoint pen = cellFrame.origin;
+    pen = cellFrame.origin;
 
-    attributes = [NSMutableDictionary dictionaryWithCapacity: 1];
-    [attributes setObject: [NSFont messageFontOfSize:12.0]
-        forKey: NSFontAttributeName];
-
-    pen.x += 5; pen.y += 5;
-
-    img = [[NSImage alloc] initWithSize: [fBmp size]];
-    [img addRepresentation: fBmp];
+    /* Init an NSImage with our bitmap in order to draw it. We need to
+       do this every time, or for some reason it won't draw if the
+       display is set to thousands of colors when Transmission was
+       started */
+    img = [[NSImage alloc] initWithSize: [fProgressBmp size]];
+    [img addRepresentation: fProgressBmp];
     [img setFlipped: YES];
-    [img drawAtPoint: pen fromRect:
-        NSMakeRect( 0, 0, [fBmp size].width, [fBmp size].height )
+
+    /* Actually draw the bar */
+    pen.x += 5; pen.y += 5;
+    [img drawAtPoint: pen fromRect: NSMakeRect( 0, 0,
+            [fProgressBmp size].width, [fProgressBmp size].height )
         operation: NSCompositeSourceOver fraction: 1.0];
+
     [img release];
 
-    [attributes setObject: [NSFont messageFontOfSize:10.0]
-        forKey: NSFontAttributeName];
-
+    /* Draw the strings with font 10 */
+    attributes = [NSDictionary dictionaryWithObject:
+        [NSFont messageFontOfSize: 10.0] forKey: NSFontAttributeName];
     pen.x += 5; pen.y += 20;
     [fDlString drawAtPoint: pen withAttributes: attributes];
-
     pen.x += 0; pen.y += 15;
     [fUlString drawAtPoint: pen withAttributes: attributes];
 

@@ -27,6 +27,7 @@
 #ifndef TG_UTIL_H
 #define TG_UTIL_H
 
+#include <sys/types.h>
 #include <stdarg.h>
 
 /* macro to shut up "unused parameter" warnings */
@@ -36,22 +37,28 @@
 #define SHUTUP
 #endif
 
+/* return number of items in array */
+#define ALEN(a)                 (sizeof(a) / sizeof((a)[0]))
+
 gboolean
 strbool(const char *str);
+
+gboolean
+mkdir_p(const char *name, mode_t mode);
 
 typedef void (*errfunc_t)(void*);
 
 /* if wind is NULL then you must call gtk_widget_show on the returned widget */
 
 GtkWidget *
-errmsg(GtkWidget *wind, const char *format, ...)
+errmsg(GtkWindow *wind, const char *format, ...)
 #ifdef __GNUC__
   __attribute__ ((format (printf, 2, 3)))
 #endif
   ;
 
 GtkWidget *
-errmsg_full(GtkWidget *wind, errfunc_t func, void *data,
+errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
             const char *format, ...)
 #ifdef __GNUC__
   __attribute__ ((format (printf, 4, 5)))
@@ -59,7 +66,7 @@ errmsg_full(GtkWidget *wind, errfunc_t func, void *data,
   ;
 
 GtkWidget *
-verrmsg(GtkWidget *wind, errfunc_t func, void *data,
+verrmsg(GtkWindow *wind, errfunc_t func, void *data,
         const char *format, va_list ap);
 
 #endif /* TG_UTIL_H */

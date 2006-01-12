@@ -44,24 +44,24 @@
 {
     NSUserDefaults * defaults;
     NSDictionary   * appDefaults;
+    NSString       * desktop, * port;
 
     fHandle = handle;
 
     /* Register defaults settings:
         - Simple bar
         - Always download to Desktop
-        - Port 9090
+        - Port TR_DEFAULT_PORT
         - 20 KB/s upload limit */
-    NSString * desktopPath
-        = [NSString stringWithFormat: @"%@/Desktop",
-                            NSHomeDirectory()];
+    desktop = [NSHomeDirectory() stringByAppendingString: @"/Desktop"];
+    port    = [NSString stringWithFormat: @"%d", TR_DEFAULT_PORT];
 
     defaults    = [NSUserDefaults standardUserDefaults];
     appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
                     @"NO",       @"UseAdvancedBar",
                     @"Constant", @"DownloadChoice",
-                    desktopPath, @"DownloadFolder",
-                    @"9090",     @"BindPort",
+                    desktop,     @"DownloadFolder",
+                    port,        @"BindPort",
                     @"20",       @"UploadLimit",
                     NULL];
     [defaults registerDefaults: appDefaults];

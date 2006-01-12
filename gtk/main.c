@@ -24,17 +24,19 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/param.h>
 #include <assert.h>
+#include <errno.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/param.h>
 #include <time.h>
 #include <unistd.h>
 
 #include <gtk/gtk.h>
 
 #include "conf.h"
+#include "prefs.h"
 #include "transmission.h"
 #include "util.h"
 
@@ -42,7 +44,7 @@
 
 struct cbdata {
   tr_handle_t *tr;
-  GtkWidget *wind;
+  GtkWindow *wind;
   GtkListStore *model;
   GtkTreeView *view;
   guint timer;
@@ -58,8 +60,6 @@ struct pieces {
   char p[120];
 };
 
-void
-readargs(int argc, char **argv, int *port, int *limit);
 void
 maketypes(void);
 gpointer
@@ -92,7 +92,7 @@ actionclick(GtkWidget *widget, gpointer gdata);
 void
 makeaddwind(struct cbdata *data);
 gboolean
-addtorrent(tr_handle_t *tr, GtkWidget *parentwind, const char *torrent,
+addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
            const char *dir, gboolean paused);
 void
 fileclick(GtkWidget *widget, gpointer gdata);
@@ -101,7 +101,7 @@ statusstr(int status);
 void
 makeinfowind(struct cbdata *data, int index);
 gboolean
-savetorrents(tr_handle_t *tr, GtkWidget *wind, int count, tr_stat_t *stat);
+savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat);
 
 #define TR_TYPE_PIECES_NAME     "tr-type-pieces"
 #define TR_TYPE_PIECES          ((const GType)tr_type_pieces)
@@ -109,7 +109,7 @@ savetorrents(tr_handle_t *tr, GtkWidget *wind, int count, tr_stat_t *stat);
 GType tr_type_pieces;
 
 #define LIST_ACTION           "torrent-list-action"
-enum listact { ACT_OPEN, ACT_START, ACT_STOP, ACT_DELETE, ACT_INFO };
+enum listact { ACT_OPEN, ACT_START, ACT_STOP, ACT_DELETE, ACT_INFO, ACT_PREF };
 #define LIST_ACTION_FROM      "torrent-list-action-from"
 enum listfrom { FROM_BUTTON, FROM_POPUP };
 
@@ -128,6 +128,8 @@ actionitems[] = {
    "Remove a torrent from the list", "XXX"},
   {4,  "Properties",  GTK_STOCK_PROPERTIES,   ACT_INFO,
    "Get additional information for a torrent", "XXX"},
+  {5,  "Preferences", GTK_STOCK_PREFERENCES,  ACT_PREF,
+   "Open preferences dialog", "XXX"},
 };
 
 #define CBDATA_PTR              "callback-data-pointer"
@@ -135,12 +137,12 @@ int
 main(int argc, char **argv) {
   GtkWidget *mainwind, *preferr, *stateerr;
   char *err;
-  int port, limit;
   tr_handle_t *tr;
   GList *saved;
+  const char *pref;
+  long intval;
 
   gtk_init(&argc, &argv);
-  readargs(argc, argv, &port, &limit);
 
   tr = tr_init();
 
@@ -152,23 +154,22 @@ main(int argc, char **argv) {
       stateerr = NULL;
 
       if(!cf_loadprefs(&err)) {
-        preferr = errmsg(mainwind, "%s", err);
+        preferr = errmsg(GTK_WINDOW(mainwind), "%s", err);
         g_free(err);
       }
       saved = cf_loadstate(&err);
       if(NULL != err) {
-        stateerr = errmsg(mainwind, "%s", err);
+        stateerr = errmsg(GTK_WINDOW(mainwind), "%s", err);
         g_free(err);
       }
 
-      /* XXX need to remove port and limit options and make them prefs */
-      /* XXX need prefs gui */
-      /* XXX need default save dir pref */
+      /* set the upload limit */
+      setlimit(tr);
 
-      if(0 != port)
-        tr_setBindPort(tr, port);
-      if(0 != limit)
-        tr_setUploadLimit(tr, limit);
+      /* set the listening port */
+      if(NULL != (pref = cf_getpref(PREF_PORT)) &&
+         0 < (intval = strtol(pref, NULL, 10)) && 0xffff >= intval)
+        tr_setBindPort(tr, intval);
 
       maketypes();
       makewind(mainwind, tr, saved);
@@ -178,56 +179,19 @@ main(int argc, char **argv) {
       if(NULL != stateerr)
         gtk_widget_show_all(stateerr);
     } else {
-      errmsg_full(NULL, (errfunc_t)gtk_main_quit, NULL, "%s", err);
+      gtk_widget_show(errmsg_full(NULL, (errfunc_t)gtk_main_quit,
+                                  NULL, "%s", err));
       g_free(err);
     }
   } else {
-    errmsg_full(NULL, (errfunc_t)gtk_main_quit, NULL, "%s", err);
+    gtk_widget_show(errmsg_full(NULL, (errfunc_t)gtk_main_quit,
+                                NULL, "%s", err));
     g_free(err);
   }
 
   gtk_main();
 
   return 0;
-}
-
-void
-readargs(int argc, char **argv, int *port, int *limit) {
-  char *name;
-  int opt, num;
-
-  *port = 0;
-  *limit = 0;
-
-  if(NULL == (name = strrchr(argv[0], '/')) || '\0' == *(++name))
-    name = argv[0];
-
-  for(num = 1; num < argc; num++)
-    if(0 == strcmp(argv[num], "-help") || 0 == strcmp(argv[num], "--help"))
-      goto usage;
-
-  while(0 <= (opt = getopt(argc, argv, "hp:u:"))) {
-    switch(opt) {
-      case 'p':
-        num = atoi(optarg);
-        if(0 < num && 0xffff > num)
-          *port = num;
-        break;
-      case 'u':
-        num = atoi(optarg);
-        if(0 != num)
-          *limit = num;
-        break;
-      default:
-        goto usage;
-    }
-  }
-
-  return;
-
- usage:
-  printf("usage: %s [-h] [-p port] [-u limit]\n", name);
-  exit(1);
 }
 
 void
@@ -257,7 +221,7 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   struct cf_torrentstate *ts;
 
   data->tr = tr;
-  data->wind = wind;
+  data->wind = GTK_WINDOW(wind);
   data->timer = -1;
   /* filled in by makewind_list */
   data->model = NULL;
@@ -277,7 +241,8 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
 
   for(ii = g_list_first(saved); NULL != ii; ii = ii->next) {
     ts = ii->data;
-    addtorrent(tr, wind, ts->ts_torrent, ts->ts_directory, ts->ts_paused);
+    addtorrent(tr, GTK_WINDOW(wind),
+               ts->ts_torrent, ts->ts_directory, ts->ts_paused);
     cf_freestate(ts);
   }
   g_list_free(saved);
@@ -322,8 +287,6 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
 
   fprintf(stderr, "quit: starting timeout at %i\n", edata->started);
 
-  //exitcheck(edata);
-
   /* returning FALSE means to destroy the window */
   return TRUE;
 }
@@ -363,7 +326,7 @@ exitcheck(gpointer gdata) {
     g_source_remove(data->timer);
   data->timer = -1;
 
-  gtk_widget_destroy(data->cbdata->wind);
+  gtk_widget_destroy(GTK_WIDGET(data->cbdata->wind));
   tr_close(data->cbdata->tr);
   g_free(data->cbdata);
   g_free(data);
@@ -381,7 +344,7 @@ makewind_toolbar(struct cbdata *data) {
   gtk_toolbar_set_tooltips(GTK_TOOLBAR(bar), TRUE);
   gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
 
-  for(ii = 0; ii < sizeof(actionitems) / sizeof(actionitems[0]); ii++) {
+  for(ii = 0; ii < ALEN(actionitems); ii++) {
     item = gtk_tool_button_new_from_stock(actionitems[ii].id);
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(item), actionitems[ii].name);
     gtk_tool_item_set_tooltip(GTK_TOOL_ITEM(item), GTK_TOOLBAR(bar)->tooltips,
@@ -419,7 +382,7 @@ makewind_list(struct cbdata *data) {
   GtkCellRenderer *rend;
   GtkCellRenderer *rendprog;
 
-  assert(MC_ROW_COUNT == sizeof(types) / sizeof(types[0]));
+  assert(MC_ROW_COUNT == ALEN(types));
 
   model = gtk_list_store_newv(MC_ROW_COUNT, types);
   view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
@@ -431,30 +394,6 @@ makewind_list(struct cbdata *data) {
   rend = gtk_cell_renderer_text_new();
   rendprog = gtk_cell_renderer_progress_new();
   g_object_set(rendprog, "text", "", NULL);
-
-/*
-  col = gtk_tree_view_column_new_with_attributes(
-    "Name", rend, "text", MC_NAME, NULL);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_SIZE);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
-
-  col = gtk_tree_view_column_new_with_attributes(
-    "Status", rend, "text", MC_STAT, NULL);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_ERR);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_DPEERS);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_UPEERS);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
-
-  col = gtk_tree_view_column_new_with_attributes(
-    "Progress", rendprog, "value", MC_PROG, NULL);
-  gtk_tree_view_column_pack_start(col, rend, TRUE);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_ETA);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_DRATE);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_URATE);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_DOWN);
-  gtk_tree_view_column_add_attribute(col, rend, "text", MC_UP);
-  gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
-*/
 
   gtk_tree_view_append_column(GTK_TREE_VIEW(view),
     gtk_tree_view_column_new_with_attributes("Name", rend,
@@ -489,9 +428,6 @@ makewind_list(struct cbdata *data) {
   gtk_tree_view_append_column(GTK_TREE_VIEW(view),
     gtk_tree_view_column_new_with_attributes("Leechers", rend,
                                              "text", MC_DPEERS, NULL));
-  /*gtk_tree_view_append_column(GTK_TREE_VIEW(view),
-    gtk_tree_view_column_new_with_attributes("", rend,
-                                             "text", MC_PIECES, NULL));*/
   gtk_tree_view_append_column(GTK_TREE_VIEW(view),
     gtk_tree_view_column_new_with_attributes("Downloaded", rend,
                                              "text", MC_DOWN, NULL));
@@ -532,7 +468,7 @@ updatemodel(gpointer gdata) {
       MC_ERR, st[ii].error, MC_PROG, prog, MC_DRATE, st[ii].rateDownload,
       MC_URATE, st[ii].rateUpload, MC_ETA, st[ii].eta, MC_PEERS, st[ii].peersTotal,
       MC_UPEERS, st[ii].peersUploading, MC_DPEERS, st[ii].peersDownloading,
-      /*MC_PIECES, st[ii].pieces,*/ MC_DOWN, st[ii].downloaded, MC_UP, st[ii].uploaded, -1);
+      MC_DOWN, st[ii].downloaded, MC_UP, st[ii].uploaded, -1);
   }
   free(st);
 
@@ -578,7 +514,7 @@ dopopupmenu(GtkWidget *widget SHUTUP, GdkEventButton *event,
 
   /* XXX am I leaking references here? */
   /* XXX can I cache this in cbdata? */
-  for(ii = 0; ii < sizeof(actionitems) / sizeof(actionitems[0]); ii++) {
+  for(ii = 0; ii < ALEN(actionitems); ii++) {
     item = gtk_menu_item_new_with_label(actionitems[ii].name);
     g_object_set_data(G_OBJECT(item), LIST_ACTION,
                       GINT_TO_POINTER(actionitems[ii].act));
@@ -610,9 +546,15 @@ actionclick(GtkWidget *widget, gpointer gdata) {
   int index;
   tr_stat_t *sb;
 
-  if(ACT_OPEN == act) {
-    makeaddwind(data);
-    return;
+  switch(act) {
+    case ACT_OPEN:
+      makeaddwind(data);
+      return;
+    case ACT_PREF:
+      makeprefwindow(data->wind, data->tr);
+      return;
+    default:
+      break;
   }
 
   index = -1;
@@ -673,16 +615,25 @@ makeaddwind(struct cbdata *data) {
                    G_CALLBACK(fileclick), wind);
   g_signal_connect_swapped(GTK_FILE_SELECTION(wind)->cancel_button, "clicked",
                            G_CALLBACK(gtk_widget_destroy), wind); 
-  gtk_window_set_transient_for(GTK_WINDOW(wind), GTK_WINDOW(data->wind));
+  gtk_window_set_transient_for(GTK_WINDOW(wind), data->wind);
   gtk_window_set_destroy_with_parent(GTK_WINDOW(wind), TRUE);
   gtk_window_set_modal(GTK_WINDOW(wind), TRUE);
   gtk_widget_show_all(wind);
 }
 
 gboolean
-addtorrent(tr_handle_t *tr, GtkWidget *parentwind, const char *torrent,
+addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
            const char *dir, gboolean paused) {
   char *wd;
+
+  if(NULL == dir) {
+    dir = cf_getpref(PREF_DIR);
+    if(!mkdir_p(dir, 0777)) {
+      errmsg(parentwind, "Failed to create download directory %s:\n%s",
+             dir, strerror(errno));
+      return FALSE;
+    }
+  }
 
   if(0 != tr_torrentInit(tr, torrent)) {
     /* XXX would be nice to have errno strings, are they printed to stdout? */
@@ -693,7 +644,6 @@ addtorrent(tr_handle_t *tr, GtkWidget *parentwind, const char *torrent,
   if(NULL != dir)
     tr_torrentSetFolder(tr, tr_torrentCount(tr) - 1, dir);
   else {
-    /* XXX need pref for download directory */
     wd = g_new(char, MAXPATHLEN + 1);
     if(NULL == getcwd(wd, MAXPATHLEN + 1))
       tr_torrentSetFolder(tr, tr_torrentCount(tr) - 1, ".");
@@ -747,7 +697,7 @@ makeinfowind(struct cbdata *data, int index) {
   if(index >= tr_torrentStat(data->tr, &sb)) {
     assert(!"XXX i'm tired");
   }
-  wind = gtk_dialog_new_with_buttons(sb[index].info.name, GTK_WINDOW(data->wind),
+  wind = gtk_dialog_new_with_buttons(sb[index].info.name, data->wind,
     GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 
   table = gtk_table_new(21, 2, FALSE);
@@ -855,7 +805,7 @@ makeinfowind(struct cbdata *data, int index) {
 }
 
 gboolean
-savetorrents(tr_handle_t *tr, GtkWidget *wind, int count, tr_stat_t *stat) {
+savetorrents(tr_handle_t *tr, GtkWindow *wind, int count, tr_stat_t *stat) {
   char *errstr;
   tr_stat_t *st;
   gboolean ret;

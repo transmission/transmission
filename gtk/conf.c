@@ -39,6 +39,7 @@
 
 #include "conf.h"
 #include "transmission.h"
+#include "util.h"
 
 #define FILE_LOCK               "gtk_lock"
 #define FILE_PREFS              "gtk_prefs"
@@ -159,7 +160,6 @@ cf_loadprefs(char **errstr) {
                                 path, err->message);
     goto done;
   }
-  /*g_io_channel_set_encoding(io, NULL, NULL);*/
   g_io_channel_set_line_term(io, &term, 1);
 
   err = NULL;
@@ -209,7 +209,10 @@ cf_setpref(const char *name, const char *value, char **errstr) {
 
   g_tree_insert(prefs, g_strdup(name), g_strdup(value));
 
-  return writeprefs(errstr);
+  if(NULL != errstr)
+    return writeprefs(errstr);
+  else
+    return TRUE;
 }
 
 struct writeinfo {
@@ -236,9 +239,14 @@ writeprefs(char **errstr) {
     goto done;
   }
 
+#ifdef NDEBUG
+  ftruncate(fd, 0);
+#else
+  assert(0 == ftruncate(fd, 0));
+#endif
+
   info.err = NULL;
   io = g_io_channel_unix_new(fd);
-  /*g_io_channel_set_encoding(io, NULL, NULL);*/
   g_io_channel_set_close_on_unref(io, TRUE);
 
   info.io = io;
@@ -318,7 +326,6 @@ cf_loadstate(char **errstr) {
                                 path, err->message);
     goto done;
   }
-  /*g_io_channel_set_encoding(io, NULL, NULL);*/
   g_io_channel_set_line_term(io, &term, 1);
 
   err = NULL;
@@ -367,43 +374,46 @@ static char *
 getstateval(struct cf_torrentstate *state, char *line) {
   char *start, *end;
 
+  /* skip any leading whitespace */
   while(isspace(*line))
     line++;
 
-  if(NULL == (start = strchr(line, '=')))
-    return NULL;
-
-  while(isspace(*(++start)))
+  /* walk over the key, which may be alphanumerics as well as - or _ */
+  for(start = line; isalnum(*start) || '_' == *start || '-' == *start; start++)
     ;
 
-  if('"' != *start)
+  /* they key must be immediately followed by an = */
+  if('=' != *start)
+    return NULL;
+  *(start++) = '\0';
+
+  /* then the opening quote for the value */
+  if('"' != *(start++))
     return NULL;
 
-  for(end = ++start; '\0' != *end && '"' != *end; end++)
+  /* walk over the value */
+  for(end = start; '\0' != *end && '"' != *end; end++)
+    /* skip over escaped quotes */
     if('\\' == *end && '\0' != *(end + 1))
       end++;
 
+  /* make sure we didn't hit the end of the string */
   if('"' != *end)
     return NULL;
+  *end = '\0';
 
-  if(0 == memcmp(line, "torrent", sizeof("torrent") - 1)) {
-    state->ts_torrent = g_new(char, end - start + 1);
-    memcpy(state->ts_torrent, start, end - start);
-    state->ts_torrent[end - start] = '\0';
-  }
-  else if(0 == memcmp(line, "dir", sizeof("dir") - 1)) {
-    state->ts_directory = g_new(char, end - start + 1);
-    memcpy(state->ts_directory, start, end - start);
-    state->ts_directory[end - start] = '\0';
-  }
-  else if(0 == memcmp(line, "paused", sizeof("paused") - 1)) {
-    state->ts_paused = (0 == memcmp("yes", start, end - start));
-  }
+  /* if it's a key we recognize then save the data */
+  if(0 == strcmp(line, "torrent"))
+    state->ts_torrent = g_strcompress(start);
+  else if(0 == strcmp(line, "dir"))
+    state->ts_directory = g_strcompress(start);
+  else if(0 == strcmp(line, "paused"))
+    state->ts_paused = strbool(start);
 
+  /* return a pointer to just past the end of the value */
   return end + 1;
 }
 
-/* XXX need to save download directory, also maybe running/stopped state */
 gboolean
 cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
   char *file = g_build_filename(confdir, FILE_STATE, NULL);
@@ -425,10 +435,16 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
     goto done;
   }
 
+#ifdef NDEBUG
+  ftruncate(fd, 0);
+#else
+  assert(0 == ftruncate(fd, 0));
+#endif
+
   io = g_io_channel_unix_new(fd);
-  /* XXX what the hell should I be doing about unicode? */
-  /*g_io_channel_set_encoding(io, NULL, NULL);*/
   g_io_channel_set_close_on_unref(io, TRUE);
+
+  /* XXX what the hell should I be doing about unicode? */
 
   err = NULL;
   for(ii = 0; ii < count; ii++) {

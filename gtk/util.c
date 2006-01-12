@@ -24,13 +24,18 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include <stdarg.h>
+#include <string.h>
+
 #include <gtk/gtk.h>
 
 #include "util.h"
 
 static void
-errcb(GtkWidget *widget, int resp, gpointer data);
+errcb(GtkWidget *wind, int resp, gpointer data);
 
 gboolean
 strbool(const char *str) {
@@ -50,8 +55,34 @@ strbool(const char *str) {
   return FALSE;
 }
 
+gboolean
+mkdir_p(const char *name, mode_t mode) {
+  struct stat sb;
+  char *parent;
+  gboolean ret;
+  int oerrno;
+
+  if(0 != stat(name, &sb)) {
+    if(ENOENT != errno)
+      return FALSE;
+    parent = g_path_get_dirname(name);
+    ret = mkdir_p(parent, mode);
+    oerrno = errno;
+    g_free(parent);
+    errno = oerrno;
+    return (ret ? (0 == mkdir(name, mode)) : FALSE);
+  }
+
+  if(!S_ISDIR(sb.st_mode)) {
+    errno = ENOTDIR;
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
 GtkWidget *
-errmsg(GtkWidget *wind, const char *format, ...) {
+errmsg(GtkWindow *wind, const char *format, ...) {
   GtkWidget *dialog;
   va_list ap;
 
@@ -63,7 +94,7 @@ errmsg(GtkWidget *wind, const char *format, ...) {
 }
 
 GtkWidget *
-errmsg_full(GtkWidget *wind, errfunc_t func, void *data,
+errmsg_full(GtkWindow *wind, errfunc_t func, void *data,
             const char *format, ...) {
   GtkWidget *dialog;
   va_list ap;
@@ -76,7 +107,7 @@ errmsg_full(GtkWidget *wind, errfunc_t func, void *data,
 }
 
 GtkWidget *
-verrmsg(GtkWidget *wind, errfunc_t func, void *data,
+verrmsg(GtkWindow *wind, errfunc_t func, void *data,
         const char *format, va_list ap) {
   GtkWidget *dialog;
   char *msg;
@@ -88,8 +119,8 @@ verrmsg(GtkWidget *wind, errfunc_t func, void *data,
     dialog = gtk_message_dialog_new(
       NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
   else
-    dialog = gtk_message_dialog_new(
-      GTK_WINDOW(wind), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+    dialog = gtk_message_dialog_new(wind,
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
       GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", msg);
 
   if(NULL == func)
@@ -98,7 +129,7 @@ verrmsg(GtkWidget *wind, errfunc_t func, void *data,
     funcdata = g_list_append(g_list_append(NULL, func), data);
   g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
   if(NULL != wind)
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
   g_free(msg);
 
   return dialog;

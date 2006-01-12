@@ -8,7 +8,7 @@ if ! $(DEFINES)
 VERSION_MAJOR  = 0 ;
 VERSION_MINOR  = 4 ;
 # VERSION_STRING = $(VERSION_MAJOR).$(VERSION_MINOR) ;
-VERSION_STRING = 0.5-cvs ;
+VERSION_STRING = CVS-20051124 ;
 
 DEFINES += VERSION_MAJOR=$(VERSION_MAJOR)
            VERSION_MINOR=$(VERSION_MINOR)
@@ -38,18 +38,6 @@ if $(OS) = MACOSX
     actions Archive
     {
         libtool -static $(>) -o $(<) ;
-    }
-
-    rule OSXLinks
-    {
-    }
-    actions OSXLinks
-    {
-        ( cd macosx/Frameworks/Growl.framework/ && \
-          ln -s Versions/Current/Growl && \
-          ln -s Versions/Current/Headers && \
-          ln -s Versions/Current/Resources && \
-          ln -s A Versions/Current )
     }
 
     rule OSXInfoPlist

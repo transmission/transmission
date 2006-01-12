@@ -26,11 +26,10 @@
 #include <Cocoa/Cocoa.h>
 #include <transmission.h>
 #include "PrefsController.h"
-#include <Growl/Growl.h>
 
 @class TorrentTableView;
 
-@interface Controller : NSObject <GrowlApplicationBridgeDelegate>
+@interface Controller : NSObject
 {
     tr_handle_t                  * fHandle;
     int                            fCount;
@@ -98,8 +97,10 @@
 - (void) showMainWindow:  (id) sender;
 - (void) linkHomepage:    (id) sender;
 - (void) linkForums:      (id) sender;
-- (void) notifyGrowl:	  (NSString *) file folder: (NSString *) folder;
-- (void) revealInFinder:  (NSString *) path;
+- (void) notifyGrowl:	  (NSString *) file;
+- (void) finderReveal:    (NSString *) path;
+- (void) finderTrash:     (NSString *) path;
+- (void) growlRegister:   (id) sender;
 
 @end
 

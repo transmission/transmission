@@ -65,7 +65,7 @@ tr_handle_t * tr_init()
     h->upload  = tr_uploadInit();
     h->fdlimit = tr_fdInit();
 
-    h->bindPort = 9090;
+    h->bindPort = TR_DEFAULT_PORT;
 
     snprintf( h->prefsDirectory, sizeof( h->prefsDirectory ),
               "%s/.transmission", getenv( "HOME" ) );

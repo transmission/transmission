@@ -39,14 +39,14 @@
 "  -i, --info           Print metainfo and exit\n" \
 "  -s, --scrape         Print counts of seeders/leechers and exit\n" \
 "  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n" \
-"  -p, --port <int>     Port we should listen on (default = 9090)\n" \
+"  -p, --port <int>     Port we should listen on (default = %d)\n" \
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
 
 static int             showHelp     = 0;
 static int             showInfo     = 0;
 static int             showScrape   = 0;
 static int             verboseLevel = 0;
-static int             bindPort     = 9090;
+static int             bindPort     = TR_DEFAULT_PORT;
 static int             uploadLimit  = 20;
 static char          * torrentPath  = NULL;
 static volatile char   mustDie      = 0;
@@ -66,13 +66,13 @@ int main( int argc, char ** argv )
     /* Get options */
     if( parseCommandLine( argc, argv ) )
     {
-        printf( USAGE, argv[0] );
+        printf( USAGE, argv[0], TR_DEFAULT_PORT );
         return 1;
     }
 
     if( showHelp )
     {
-        printf( USAGE, argv[0] );
+        printf( USAGE, argv[0], TR_DEFAULT_PORT );
         return 0;
     }
 

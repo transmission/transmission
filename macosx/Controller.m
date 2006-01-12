@@ -191,7 +191,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     
     /*  Register with the growl system */
-    [GrowlApplicationBridge setGrowlDelegate:self];
+    [self growlRegister: self];
     
     /* Update the interface every 500 ms */
     fCount = 0;
@@ -467,74 +467,16 @@ static void sleepCallBack( void * controller, io_service_t y,
                   deleteTorrent: (BOOL) deleteTorrent
                      deleteData: (BOOL) deleteData
 {
-    BOOL torrentWarning = ![[NSUserDefaults standardUserDefaults]
-                            boolForKey:@"SkipTorrentDeletionWarning"];
-    BOOL dataWarning = ![[NSUserDefaults standardUserDefaults]
-                            boolForKey:@"SkipDataDeletionWarning"];
-    
-    if ( ( torrentWarning && deleteTorrent ) || (dataWarning && deleteData ) )
+    if( deleteData )
     {
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-        
-        [alert addButtonWithTitle:@"Delete"];
-        [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
-        [alert setMessageText:@"Do you want to remove this torrent from Transmission?"];
-        
-        if ( (deleteTorrent && torrentWarning) &&
-             !( dataWarning && deleteData ) )
-        {
-            /* delete torrent warning YES, delete data warning NO */
-            [alert setInformativeText:@"This will delete the .torrent file only. "
-                "This can not be undone!"];
-        }
-        else if( (deleteData && dataWarning) &&
-                 !( torrentWarning && deleteTorrent ) )
-        {
-            /* delete torrent warning NO, delete data warning YES */
-            [alert setInformativeText:@"This will delete the downloaded data. "
-                "This can not be undone!"];
-        }
-        else
-        {
-            /* delete torrent warning YES, delete data warning YES */
-            [alert setInformativeText:@"This will delete the downloaded data and "
-                ".torrent file. This can not be undone!"];
-        }
-        
-        if ( [alert runModal] == NSAlertSecondButtonReturn )
-            return;
+        [self finderTrash: [NSString stringWithFormat: @"%@/%@",
+            [NSString stringWithUTF8String: fStat[idx].folder],
+            [NSString stringWithUTF8String: fStat[idx].info.name]]];
     }
-    
-    if ( deleteData )
+    if( deleteTorrent )
     {
-        tr_file_t * files = fStat[idx].info.files;
-        int i;
-        
-        for ( i = 0; i < fStat[idx].info.fileCount; i++ )
-        {
-            if ( -1 == remove([[NSString stringWithFormat:@"%s/%s", 
-                                        fStat[idx].folder,
-                                        files[i].name] 
-                                cString]) )
-            {
-                NSLog(@"remove(%s) failed, errno = %i",
-                      files[i].name,
-                      errno);
-            }
-        }
-        
-        /* in some cases, we should remove fStat[idx].folder also. When? */
-    }
-    
-    if ( deleteTorrent )
-    {
-        if ( -1 == remove( fStat[idx].info.torrent ) )
-        {
-            NSLog(@"remove(%s) failed, errno = %i",
-                  fStat[idx].info.torrent,
-                  errno);
-        }
+        [self finderTrash: [NSString stringWithUTF8String:
+            fStat[idx].info.torrent]];
     }
     
     tr_torrentClose( fHandle, idx );
@@ -611,8 +553,7 @@ static void sleepCallBack( void * controller, io_service_t y,
             continue;
         }
         [self notifyGrowl: [NSString stringWithUTF8String: 
-            fStat[i].info.name] folder: [NSString stringWithUTF8String:
-            fStat[i].folder]];
+            fStat[i].info.name]];
         tr_setFinished( fHandle, i, 0 );
     }
 
@@ -909,67 +850,108 @@ static void sleepCallBack( void * controller, io_service_t y,
         URLWithString:@"http://transmission.m0k.org/forum/"]];
 }
 
-- (void) notifyGrowl: (NSString * ) file folder: (NSString *) folder
+- (void) notifyGrowl: (NSString * ) file
 {
-    [GrowlApplicationBridge
-        notifyWithTitle: @"Download complete."
-        description: [NSString stringWithFormat: @"Seeding: %@", file]
-        notificationName: @"Download complete."
-        iconData: nil
-        priority: 0
-        isSticky: FALSE
-        clickContext: [NSString stringWithFormat: @"%@/%@", folder, file]];
-}
-
-- (NSDictionary *)registrationDictionaryForGrowl 
-{   
-    NSString *title        = [NSString stringWithUTF8String: "Download complete."];
-    NSMutableArray *defNotesArray = [NSMutableArray array];
-    NSMutableArray *allNotesArray = [NSMutableArray array];
-
-    [allNotesArray addObject:title];
-    [defNotesArray addObject:[NSNumber numberWithUnsignedInt:0]];   
-
-    NSDictionary *regDict = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"Transmission", GROWL_APP_NAME,
-        allNotesArray, GROWL_NOTIFICATIONS_ALL, 
-        defNotesArray, GROWL_NOTIFICATIONS_DEFAULT,
-        nil];
+    NSString * growlScript;
+    NSAppleScript * appleScript;
+    NSDictionary * error;
     
-    return regDict;
+    growlScript = [NSString stringWithFormat:
+        @"tell application \"System Events\"\n"
+         "  if exists application process \"GrowlHelperApp\" then\n"
+         "    tell application \"GrowlHelperApp\"\n "
+         "      notify with name \"Download Complete\""
+         "        title \"Download Complete\""
+         "        description \"%@\""
+         "        application name \"Transmission\"\n"
+         "    end tell\n"
+         "  end if\n"
+         "end tell", file];
+    appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
+    if( ![appleScript executeAndReturnError: &error] )
+    {
+        printf( "Growl notify failed\n" );
+    }
+    [appleScript release];
 }
 
-- (NSString *) applicationNameForGrowl
-{
-    return [NSString stringWithUTF8String: "Transmission"];
+- (void) growlRegister: (id) sender
+{   
+    NSString * growlScript;
+    NSAppleScript * appleScript;
+    NSDictionary * error;
+    
+    growlScript = [NSString stringWithFormat:
+        @"tell application \"System Events\"\n"
+         "  if exists application process \"GrowlHelperApp\" then\n"
+         "    tell application \"GrowlHelperApp\"\n"
+         "      register as application \"Transmission\" "
+         "        all notifications {\"Download Complete\"}"
+         "        default notifications {\"Download Complete\"}"
+         "        icon of application \"Transmission\"\n"
+         "    end tell\n"
+         "  end if\n"
+         "end tell"];
+    appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
+    if( ![appleScript executeAndReturnError: &error] )
+    {
+        printf( "Growl registration failed\n" );
+    }
+    [appleScript release];
 }
 
-- (void) growlNotificationWasClicked: (id) clickContext
-{
-    [self revealInFinder: (NSString *) clickContext];
-}
 
 - (void) revealFromMenu: (id) sender
 {
-    [fTableView revealInFinder: [fTableView selectedRow]];
+    int row;
+
+    row = [fTableView selectedRow];
+    if( row < 0 )
+    {
+        return;
+    }
+    [self finderReveal: [NSString stringWithFormat: @"%@/%@",
+        [NSString stringWithUTF8String: fStat[row].folder],
+        [NSString stringWithUTF8String: fStat[row].info.name]]];
 }
 
-- (void) revealInFinder: (NSString *) path
+- (void) finderReveal: (NSString *) path
 {
     NSString * string;
     NSAppleScript * appleScript;
     NSDictionary * error;
     
-    string = [NSString stringWithFormat: @"tell application "
-        "\"Finder\"\nactivate\nreveal (POSIX file \"%@\")\nend tell",
-        path];
+    string = [NSString stringWithFormat:
+        @"tell application \"Finder\"\n"
+         "  activate\n"
+         "  reveal (POSIX file \"%@\")\n"
+         "end tell", path];
+
     appleScript = [[NSAppleScript alloc] initWithSource: string];
     if( ![appleScript executeAndReturnError: &error] )
     {
-        printf( "Reveal in Finder: AppleScript failed\n" );
+        printf( "finderReveal failed\n" );
     }
     [appleScript release];
 }
 
+- (void) finderTrash: (NSString *) path
+{
+    NSString * string;
+    NSAppleScript * appleScript;
+    NSDictionary * error;
+
+    string = [NSString stringWithFormat:
+        @"tell application \"Finder\"\n"
+         "  move (POSIX file \"%@\") to trash\n"
+         "end tell", path];
+
+    appleScript = [[NSAppleScript alloc] initWithSource: string];
+    if( ![appleScript executeAndReturnError: &error] )
+    {
+        printf( "finderTrash failed\n" );
+    }
+    [appleScript release];
+}
 
 @end

@@ -9,24 +9,6 @@
     [self reloadData];
 }
 
-- (void) revealInFinder: (int) row
-{
-    NSString * string;
-    NSAppleScript * appleScript;
-    NSDictionary * error;
-
-    string = [NSString stringWithFormat: @"tell application "
-        "\"Finder\"\nactivate\nreveal (POSIX file \"%@/%@\")\nend tell",
-        [NSString stringWithUTF8String: fStat[row].folder],
-        [NSString stringWithUTF8String: fStat[row].info.name]];
-    appleScript = [[NSAppleScript alloc] initWithSource: string];
-    if( ![appleScript executeAndReturnError: &error] )
-    {
-        printf( "Reveal in Finder: AppleScript failed\n" );
-    }
-    [appleScript release];
-}
-
 - (void) pauseOrResume: (int) row
 {
     if( fStat[row].status & TR_STATUS_PAUSE )
@@ -106,7 +88,7 @@
     }
     else if( [self pointInRevealRect: point] )
     {
-        [fController revealInFinder: [NSString stringWithFormat:
+        [fController finderReveal: [NSString stringWithFormat:
             @"%@/%@", [NSString stringWithUTF8String: fStat[row].folder],
             [NSString stringWithUTF8String: fStat[row].info.name]]];
         [self display];

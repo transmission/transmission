@@ -101,13 +101,13 @@ int tr_uploadCanUpload( tr_upload_t * u )
         size = 0;
         now  = tr_date();
 
-        /* Check the last four times we sent something and decide if
+        /* Check the last FOO times we sent something and decide if
            we must wait */
         for( i = 0; i < FOO; i++ )
         {
             size += u->sizes[i];
-            if( (uint64_t) size < 1024ULL *
-                    u->limit * ( now - u->dates[i] ) / 1000 )
+            if( (uint64_t) size * 1000 <
+                    ( now - u->dates[i] ) * u->limit * 1024 )
             {
                 ret = 1;
                 break;

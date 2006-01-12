@@ -24,33 +24,22 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TG_CONF_H
-#define TG_CONF_H
+#ifndef TG_PREFS_H
+#define TG_PREFS_H
 
 #include "transmission.h"
 
-struct cf_torrentstate {
-  char *ts_torrent;
-  char *ts_directory;
-  gboolean ts_paused;
-};
+/* macros for names of prefs we use */
+#define PREF_PORT               "listening-port"
+#define PREF_USELIMIT           "use-upload-limit"
+#define PREF_LIMIT              "upload-limit"
+#define PREF_DIR                "download-directory"
 
-gboolean
-cf_init(const char *confdir, char **errstr);
-gboolean
-cf_lock(char **errstr);
-gboolean
-cf_loadprefs(char **errstr);
-const char *
-cf_getpref(const char *name);
-/* if errstr is NULL then prefs will not be saved */
-gboolean
-cf_setpref(const char *name, const char *value, char **errstr);
-GList *
-cf_loadstate(char **errstr);
-gboolean
-cf_savestate(int count, tr_stat_t *torrents, char **errstr);
 void
-cf_freestate(struct cf_torrentstate *state);
+makeprefwindow(GtkWindow *parent, tr_handle_t *tr);
 
-#endif /* TG_CONF_H */
+/* set the upload limit based on saved prefs */
+void
+setlimit(tr_handle_t *tr);
+
+#endif /* TG_PREFS_H */

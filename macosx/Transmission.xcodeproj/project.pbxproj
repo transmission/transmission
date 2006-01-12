@@ -18,8 +18,6 @@
 		4D6DAAC7090CE00500F43C22 /* RevealOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC5090CE00500F43C22 /* RevealOn.png */; };
 		4D752E930913C949008EAAD4 /* Preferences.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D752E920913C949008EAAD4 /* Preferences.png */; };
 		4D813EB508AA43AC00191DB4 /* Progress.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D813EB408AA43AC00191DB4 /* Progress.png */; };
-		4D81E2E4092EF0CB00F24127 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D81E2E3092EF0CB00F24127 /* Growl.framework */; };
-		4D81E309092EF26F00F24127 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4D81E2E3092EF0CB00F24127 /* Growl.framework */; };
 		4DA6FDBA0911233800450CB1 /* PauseOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDB80911233800450CB1 /* PauseOn.png */; };
 		4DA6FDBB0911233800450CB1 /* PauseOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDB90911233800450CB1 /* PauseOff.png */; };
 		4DA6FDC5091141AD00450CB1 /* ResumeOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC3091141AD00450CB1 /* ResumeOff.png */; };
@@ -62,19 +60,6 @@
 		};
 /* End PBXBuildStyle section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		4D81E301092EF24500F24127 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				4D81E309092EF26F00F24127 /* Growl.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -99,7 +84,6 @@
 		4D6DAAC5090CE00500F43C22 /* RevealOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOn.png; path = Images/RevealOn.png; sourceTree = "<group>"; };
 		4D752E920913C949008EAAD4 /* Preferences.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Preferences.png; path = Images/Preferences.png; sourceTree = "<group>"; };
 		4D813EB408AA43AC00191DB4 /* Progress.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Progress.png; path = Images/Progress.png; sourceTree = "<group>"; };
-		4D81E2E3092EF0CB00F24127 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = Frameworks/Growl.framework; sourceTree = "<group>"; };
 		4DA6FDB80911233800450CB1 /* PauseOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseOn.png; path = Images/PauseOn.png; sourceTree = "<group>"; };
 		4DA6FDB90911233800450CB1 /* PauseOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseOff.png; path = Images/PauseOff.png; sourceTree = "<group>"; };
 		4DA6FDC3091141AD00450CB1 /* ResumeOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeOff.png; path = Images/ResumeOff.png; sourceTree = "<group>"; };
@@ -122,7 +106,6 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				4DF0C5AE08991C1600DD8943 /* libtransmission.a in Frameworks */,
 				4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */,
-				4D81E2E4092EF0CB00F24127 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +133,6 @@
 			isa = PBXGroup;
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
-				4D81E2E3092EF0CB00F24127 /* Growl.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -238,7 +220,6 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				4D81E301092EF24500F24127 /* CopyFiles */,
 			);
 			buildRules = (
 			);
