@@ -233,6 +233,7 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   GtkRequisition req;
   GList *ii;
   struct cf_torrentstate *ts;
+  gint height;
 
   data->tr = tr;
   data->wind = GTK_WINDOW(wind);
@@ -243,10 +244,12 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   data->bar = GTK_STATUSBAR(status);
   data->buttons = NULL;
 
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER,
+                                 GTK_POLICY_AUTOMATIC);
+
   gtk_box_pack_start(GTK_BOX(vbox), makewind_toolbar(data), FALSE, FALSE, 0);
 
   list = makewind_list(data);
-  gtk_widget_size_request(list, &req);
   gtk_container_add(GTK_CONTAINER(scroll), list);
   gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
 
@@ -254,9 +257,7 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   gtk_box_pack_start(GTK_BOX(vbox), status, FALSE, FALSE, 0);
 
   gtk_container_add(GTK_CONTAINER(wind), vbox);
-  gtk_window_set_default_size(GTK_WINDOW(wind), req.width, req.height);
   g_signal_connect(G_OBJECT(wind), "delete_event", G_CALLBACK(winclose), data);
-  gtk_widget_show_all(wind);
 
   for(ii = g_list_first(saved); NULL != ii; ii = ii->next) {
     ts = ii->data;
@@ -268,6 +269,19 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
 
   data->timer = g_timeout_add(500, updatemodel, data);
   updatemodel(data);
+
+  gtk_widget_show_all(vbox);
+  gtk_widget_realize(wind);
+
+  gtk_widget_size_request(wind, &req);
+  height = req.height;
+  gtk_widget_size_request(scroll, &req);
+  height -= req.height;
+  gtk_widget_size_request(list, &req);
+  height += req.height;
+  gtk_window_set_default_size(GTK_WINDOW(wind), -1, MAX(height, 100));
+
+  gtk_widget_show(wind);
 }
 
 /* XXX is this the right thing to do? */
@@ -287,10 +301,10 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
 
   for(ii = tr_torrentStat(data->tr, &st); 0 < ii; ii--) {
     if(TR_TORRENT_NEEDS_STOP(st[ii-1].status)) {
-      fprintf(stderr, "quit: stopping %i %s\n", ii, st[ii-1].info.name);
+      /*fprintf(stderr, "quit: stopping %i %s\n", ii, st[ii-1].info.name);*/
       tr_torrentStop(data->tr, ii - 1);
     } else {
-      fprintf(stderr, "quit: closing %i %s\n", ii, st[ii-1].info.name);
+      /*fprintf(stderr, "quit: closing %i %s\n", ii, st[ii-1].info.name);*/
       tr_torrentClose(data->tr, ii - 1);
     }
   }
@@ -304,7 +318,7 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
   edata->started = time(NULL);
   edata->timer = g_timeout_add(500, exitcheck, edata);
 
-  fprintf(stderr, "quit: starting timeout at %i\n", edata->started);
+  /*fprintf(stderr, "quit: starting timeout at %i\n", edata->started);*/
 
   /* returning FALSE means to destroy the window */
   return TRUE;
@@ -318,14 +332,14 @@ exitcheck(gpointer gdata) {
 
   for(ii = tr_torrentStat(data->cbdata->tr, &st); 0 < ii; ii--) {
     if(TR_STATUS_PAUSE == st[ii-1].status) {
-      fprintf(stderr, "quit: closing %i %s\n", ii, st[ii-1].info.name);
+      /*fprintf(stderr, "quit: closing %i %s\n", ii, st[ii-1].info.name);*/
       tr_torrentClose(data->cbdata->tr, ii - 1);
     }
   }
   free(st);
 
-  fprintf(stderr, "quit: %i torrents left at %i\n",
-          tr_torrentCount(data->cbdata->tr), time(NULL));
+  /*fprintf(stderr, "quit: %i torrents left at %i\n",
+    tr_torrentCount(data->cbdata->tr), time(NULL));*/
   /* keep going if we still have torrents and haven't hit the exit timeout */
   if(0 < tr_torrentCount(data->cbdata->tr) &&
      time(NULL) - data->started < TRACKER_EXIT_TIMEOUT) {
@@ -333,8 +347,8 @@ exitcheck(gpointer gdata) {
     return TRUE;
   }
 
-  fprintf(stderr, "quit: giving up on %i torrents\n",
-          tr_torrentCount(data->cbdata->tr));
+  /*fprintf(stderr, "quit: giving up on %i torrents\n",
+    tr_torrentCount(data->cbdata->tr));*/
 
   for(ii = tr_torrentCount(data->cbdata->tr); 0 < ii; ii--)
     tr_torrentClose(data->cbdata->tr, ii - 1);
@@ -361,6 +375,7 @@ makewind_toolbar(struct cbdata *data) {
   unsigned int ii;
 
   gtk_toolbar_set_tooltips(GTK_TOOLBAR(bar), TRUE);
+  gtk_toolbar_set_show_arrow(GTK_TOOLBAR(bar), FALSE);
   gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
 
   data->buttons = g_new(GtkWidget*, ALEN(actionitems));
@@ -570,7 +585,8 @@ updatemodel(gpointer gdata) {
   free(st);
 
   /* remove any excess rows */
-  if(gtk_tree_model_iter_next(GTK_TREE_MODEL(data->model), &iter))
+  if(ii ? gtk_tree_model_iter_next(GTK_TREE_MODEL(data->model), &iter) :
+     gtk_tree_model_get_iter_first(GTK_TREE_MODEL(data->model), &iter))
     while(gtk_list_store_remove(data->model, &iter))
       ;
 
