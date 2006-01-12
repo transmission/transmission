@@ -140,17 +140,20 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
   struct prefdata *data = gdata;
   int intval;
   const char *strval;
-  char *strnum;
+  char *strnum, *errstr;
   gboolean boolval;
 
   if(GTK_RESPONSE_OK == resp) {
     /* check directory */
     strval = gtk_entry_get_text(data->dir);
-    if(!mkdir_p(strval, 0777)) {
+    if('\0' != strval[0] &&!mkdir_p(strval, 0777)) {
       errmsg(data->parent, "Failed to create directory %s:\n%s",
              strval, strerror(errno));
       return;
     }
+
+    /* save dir pref */
+    cf_setpref(PREF_DIR, gtk_entry_get_text(data->dir), NULL);
 
     /* save port pref */
     strnum = g_strdup_printf("%i",
@@ -166,21 +169,17 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
     /* save limit pref */
     intval = gtk_spin_button_get_value_as_int(data->limit);
     strnum = g_strdup_printf("%i", intval);
-    cf_setpref(PREF_LIMIT, strnum, NULL);
-    g_free(strnum);
-
-    setlimit(data->tr);
-
     /*
       note that prefs aren't written to disk unless we pass a pointer
       to an error string, so do this for the last call to cf_setpref()
     */
-    /* save dir pref */
-    if(!cf_setpref(PREF_DIR, gtk_entry_get_text(data->dir), &strnum)) {
-      errmsg(data->parent, "%s", strnum);
+    if(!cf_setpref(PREF_LIMIT, strnum, &errstr)) {
+      errmsg(data->parent, "%s", errstr);
       g_free(strnum);
-      return;
+      g_free(errstr);
     }
+
+    setlimit(data->tr);
   }
 
   gtk_widget_destroy(widget);

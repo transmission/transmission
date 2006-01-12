@@ -107,6 +107,16 @@ gtk_cell_renderer_torrent_new(void) {
   return g_object_new (GTK_TYPE_CELL_RENDERER_TORRENT, NULL);
 }
 
+/* XXX need to do this better somehow */
+void
+gtk_cell_renderer_torrent_reset_style(GtkCellRendererTorrent *tor) {
+  if(NULL != tor->priv->style) {
+    gtk_style_detach(tor->priv->style);
+    gtk_style_unref(tor->priv->style);
+    tor->priv->style = NULL;
+  }
+}
+
 static void
 finalize(GObject *object) {
   GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT(object);

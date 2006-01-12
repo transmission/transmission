@@ -80,6 +80,8 @@ GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
 makewind_list(struct cbdata *data);
+static void
+stylekludge(GObject *obj, GParamSpec *spec, gpointer gdata);
 void
 fixbuttons(GtkTreeSelection *sel, gpointer gdata);
 void
@@ -438,6 +440,9 @@ makewind_list(struct cbdata *data) {
   gtk_tree_view_column_set_cell_data_func(col, progrend, dfprog, NULL, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
+  /* XXX this shouldn't be necessary */
+  g_signal_connect(view, "notify", G_CALLBACK(stylekludge), progrend);
+
   gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(view), TRUE);
   sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
   gtk_tree_selection_set_mode(GTK_TREE_SELECTION(sel), GTK_SELECTION_SINGLE);
@@ -448,6 +453,15 @@ makewind_list(struct cbdata *data) {
   gtk_widget_show_all(view);
 
   return view;
+}
+
+/* kludge to have the progress bars notice theme changes */
+static void
+stylekludge(GObject *obj, GParamSpec *spec, gpointer gdata) {
+  if(0 == strcmp("style", spec->name)) {
+    gtk_cell_renderer_torrent_reset_style(GTK_CELL_RENDERER_TORRENT(gdata));
+    gtk_widget_queue_draw(GTK_WIDGET(obj));
+  }
 }
 
 /* disable buttons the user shouldn't be able to click on */

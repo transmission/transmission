@@ -63,6 +63,7 @@ struct _GtkCellRendererTorrentClass
 
 GType		 gtk_cell_renderer_torrent_get_type (void) G_GNUC_CONST;
 GtkCellRenderer* gtk_cell_renderer_torrent_new      (void);
+void gtk_cell_renderer_torrent_reset_style(GtkCellRendererTorrent *);
 
 G_END_DECLS
 
