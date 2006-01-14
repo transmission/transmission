@@ -459,6 +459,11 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer,
                 return 1;
             }
 
+            if( peer->pos < 68 )
+            {
+                break;
+            }
+
             if( memcmp( &p[28], inf->hash, 20 ) )
             {
                 peer_dbg( "GET  handshake, wrong torrent hash" );
