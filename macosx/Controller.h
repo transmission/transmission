@@ -26,13 +26,14 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 #import "PrefsController.h"
+#import "Badger.h"
 
 @class TorrentTableView;
 
 @interface Controller : NSObject
 {
     tr_handle_t                 * fHandle;
-    int                         fCount;
+    int                         fCount, fCompleted;
     tr_stat_t                   * fStat;
     int                         fResumeOnWake[TR_MAX_TORRENT_COUNT];
 
@@ -74,6 +75,7 @@
     NSUserDefaults              * fDefaults;
     
     BOOL                        fHasGrowl;
+    Badger                      * fBadger; 
 }
 
 - (void) advancedChanged: (id) sender;

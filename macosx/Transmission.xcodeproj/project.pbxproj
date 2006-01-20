@@ -24,6 +24,8 @@
 		4DA6FDC5091141AD00450CB1 /* ResumeOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC3091141AD00450CB1 /* ResumeOff.png */; };
 		4DA6FDC6091141AD00450CB1 /* ResumeOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC4091141AD00450CB1 /* ResumeOn.png */; };
 		4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* StringAdditions.m */; };
+		4DE5CCA70980735700BE280E /* Badger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.m */; };
+		4DE5CCA90980739100BE280E /* Badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA80980739100BE280E /* Badge.png */; };
 		4DF0C5AB0899190500DD8943 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.m */; };
 		4DF0C5AE08991C1600DD8943 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DF0C5AD08991C1600DD8943 /* libtransmission.a */; };
 		4DF7500C08A103AD007B0D70 /* Open.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DF7500708A103AD007B0D70 /* Open.png */; };
@@ -93,6 +95,9 @@
 		4DA6FDC4091141AD00450CB1 /* ResumeOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeOn.png; path = Images/ResumeOn.png; sourceTree = "<group>"; };
 		4DE5CC9B0980656F00BE280E /* StringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = StringAdditions.h; sourceTree = "<group>"; };
 		4DE5CC9C0980656F00BE280E /* StringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = StringAdditions.m; sourceTree = "<group>"; };
+		4DE5CCA50980735700BE280E /* Badger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Badger.h; sourceTree = "<group>"; };
+		4DE5CCA60980735700BE280E /* Badger.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Badger.m; sourceTree = "<group>"; };
+		4DE5CCA80980739100BE280E /* Badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Badge.png; path = Images/Badge.png; sourceTree = "<group>"; };
 		4DF0C5A90899190500DD8943 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DF0C5AD08991C1600DD8943 /* libtransmission.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtransmission.a; path = ../libtransmission/libtransmission.a; sourceTree = SOURCE_ROOT; };
@@ -132,6 +137,8 @@
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.m */,
 				4DE5CC9B0980656F00BE280E /* StringAdditions.h */,
 				4DE5CC9C0980656F00BE280E /* StringAdditions.m */,
+				4DE5CCA50980735700BE280E /* Badger.h */,
+				4DE5CCA60980735700BE280E /* Badger.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -202,6 +209,7 @@
 				4DA6FDC4091141AD00450CB1 /* ResumeOn.png */,
 				4D752E920913C949008EAAD4 /* Preferences.png */,
 				4D8CEF90095870E00063BAEA /* Network.png */,
+				4DE5CCA80980739100BE280E /* Badge.png */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
@@ -292,6 +300,7 @@
 				4DA6FDC6091141AD00450CB1 /* ResumeOn.png in Resources */,
 				4D752E930913C949008EAAD4 /* Preferences.png in Resources */,
 				4D8CEF91095870E00063BAEA /* Network.png in Resources */,
+				4DE5CCA90980739100BE280E /* Badge.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,6 +318,7 @@
 				4D118E1A08CB46B20033958F /* PrefsController.m in Sources */,
 				4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */,
 				4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */,
+				4DE5CCA70980735700BE280E /* Badger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

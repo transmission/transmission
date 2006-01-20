@@ -133,6 +133,10 @@ static void sleepCallBack( void * controller, io_service_t y,
                 || [manager fileExistsAtPath: [[NSString stringWithFormat: @"~%@",
                 GROWL_PATH] stringByExpandingTildeInPath]];
     [self growlRegister: self];
+
+    //initialize badging
+    fBadger = [[Badger alloc] init];
+    fCompleted = 0;
     
     //update the interface every 500 ms
     fCount = 0;
@@ -141,6 +145,12 @@ static void sleepCallBack( void * controller, io_service_t y,
         selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
         forMode: NSEventTrackingRunLoopMode];
+}
+
+- (void) windowDidBecomeKey: (NSNotification *) n
+{
+    /* Reset the number of recently completed downloads */
+    fCompleted = 0;
 }
 
 - (void) windowDidResize: (NSNotification *) n
@@ -557,8 +567,10 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     //Update the global DL/UL rates
     tr_torrentRates( fHandle, &dl, &ul );
-    [fTotalDLField setStringValue: [NSString stringForSpeed: dl]];
-    [fTotalULField setStringValue: [NSString stringForSpeed: ul]];
+    NSString * downloadRate = [NSString stringForSpeed: dl];
+    NSString * uploadRate = [NSString stringForSpeed: ul];
+    [fTotalDLField setStringValue: downloadRate];
+    [fTotalULField setStringValue: uploadRate];
 
     //Update DL/UL totals in the Info panel
     row = [fTableView selectedRow];
@@ -575,11 +587,18 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         if( !tr_getFinished( fHandle, i ) )
             continue;
-            
+
+        fCompleted++;
         [self notifyGrowl: [NSString stringWithUTF8String: 
             fStat[i].info.name]];
         tr_setFinished( fHandle, i, 0 );
     }
+
+    //badge dock
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [fBadger updateBadgeWithCompleted: [defaults boolForKey: @"BadgeCompleted"] ? fCompleted : 0
+                    uploadRate: ul >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"] ? uploadRate : nil
+                    downloadRate: dl >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"] ? downloadRate : nil];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
