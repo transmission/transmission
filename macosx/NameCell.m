@@ -20,8 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "NameCell.h"
-#include "Utils.h"
+#import "NameCell.h"
+#import "StringAdditions.h"
+#import "Utils.h"
 
 @implementation NameCell
 
@@ -31,7 +32,7 @@
 
     fNameString  = [NSString stringWithUTF8String: stat->info.name];
     fSizeString  = [NSString stringWithFormat: @" (%@)",
-                    stringForFileSize( stat->info.totalSize )];
+                    [NSString stringForFileSize: stat->info.totalSize]];
     fTimeString  = @"";
     fPeersString = @"";
 
@@ -105,9 +106,9 @@
         forKey: NSFontAttributeName];
 
     pen.x += 5; pen.y += 5;
-    string = [NSString stringWithFormat: @"%@%@",
-        stringFittingInWidth( fNameString, cellFrame.size.width -
-        35 - widthForString( fSizeString, 12 ), 12 ), fSizeString];
+    string = [[fNameString stringFittingInWidth: cellFrame.size.width -
+        35 - [fSizeString sizeWithAttributes: attributes].width
+        withAttributes: attributes] stringByAppendingString: fSizeString];
     [string drawAtPoint: pen withAttributes: attributes];
 
     [attributes setObject: [NSFont messageFontOfSize: 10.0]
@@ -117,8 +118,8 @@
     [fTimeString drawAtPoint: pen withAttributes: attributes];
 
     pen.x += 0; pen.y += 15;
-    string = stringFittingInWidth( fPeersString,
-                cellFrame.size.width - 40, 10 );
+    string = [fPeersString stringFittingInWidth: cellFrame.size.width -
+        40 withAttributes: attributes];
     [string drawAtPoint: pen withAttributes: attributes];
 
     [view unlockFocus];

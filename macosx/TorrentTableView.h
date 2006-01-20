@@ -1,5 +1,5 @@
-#include <Cocoa/Cocoa.h>
-#include <transmission.h>
+#import <Cocoa/Cocoa.h>
+#import <transmission.h>
 
 @class Controller;
 

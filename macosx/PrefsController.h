@@ -20,8 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <Cocoa/Cocoa.h>
-#include <transmission.h>
+#import <Cocoa/Cocoa.h>
+#import <transmission.h>
 
 @interface PrefsController : NSObject
 

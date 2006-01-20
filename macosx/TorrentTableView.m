@@ -1,5 +1,5 @@
-#include "TorrentTableView.h"
-#include "Controller.h"
+#import "TorrentTableView.h"
+#import "Controller.h"
 
 @implementation TorrentTableView
 

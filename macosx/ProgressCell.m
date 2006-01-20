@@ -20,7 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "ProgressCell.h"
+#import "ProgressCell.h"
+#import "StringAdditions.h"
 
 @implementation ProgressCell
 
@@ -121,10 +122,10 @@ static uint32_t kGreen[] =
     fWhiteText = w;
 
     /* Update the strings to be displayed */
-    fDlString = [NSString stringWithFormat:
-        @"DL: %.2f KB/s", fStat->rateDownload];
-    fUlString = [NSString stringWithFormat:
-        @"UL: %.2f KB/s", fStat->rateUpload];
+    fDlString = [@"DL: " stringByAppendingString:
+                    [NSString stringForSpeed: fStat->rateDownload]];
+    fUlString = [@"UL: " stringByAppendingString:
+                    [NSString stringForSpeed: fStat->rateUpload]];
 
     /* Reset our bitmap to the background image... */
     in  = [fBackgroundBmp bitmapData];

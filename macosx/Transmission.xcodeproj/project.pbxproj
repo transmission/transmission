@@ -23,6 +23,7 @@
 		4DA6FDBB0911233800450CB1 /* PauseOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDB90911233800450CB1 /* PauseOff.png */; };
 		4DA6FDC5091141AD00450CB1 /* ResumeOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC3091141AD00450CB1 /* ResumeOff.png */; };
 		4DA6FDC6091141AD00450CB1 /* ResumeOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC4091141AD00450CB1 /* ResumeOn.png */; };
+		4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* StringAdditions.m */; };
 		4DF0C5AB0899190500DD8943 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.m */; };
 		4DF0C5AE08991C1600DD8943 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DF0C5AD08991C1600DD8943 /* libtransmission.a */; };
 		4DF7500C08A103AD007B0D70 /* Open.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DF7500708A103AD007B0D70 /* Open.png */; };
@@ -90,6 +91,8 @@
 		4DA6FDB90911233800450CB1 /* PauseOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseOff.png; path = Images/PauseOff.png; sourceTree = "<group>"; };
 		4DA6FDC3091141AD00450CB1 /* ResumeOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeOff.png; path = Images/ResumeOff.png; sourceTree = "<group>"; };
 		4DA6FDC4091141AD00450CB1 /* ResumeOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeOn.png; path = Images/ResumeOn.png; sourceTree = "<group>"; };
+		4DE5CC9B0980656F00BE280E /* StringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = StringAdditions.h; sourceTree = "<group>"; };
+		4DE5CC9C0980656F00BE280E /* StringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = StringAdditions.m; sourceTree = "<group>"; };
 		4DF0C5A90899190500DD8943 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DF0C5AD08991C1600DD8943 /* libtransmission.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtransmission.a; path = ../libtransmission/libtransmission.a; sourceTree = SOURCE_ROOT; };
@@ -127,6 +130,8 @@
 				4D118E1908CB46B20033958F /* PrefsController.m */,
 				4D364D9E091FBB2C00377D12 /* TorrentTableView.h */,
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.m */,
+				4DE5CC9B0980656F00BE280E /* StringAdditions.h */,
+				4DE5CC9C0980656F00BE280E /* StringAdditions.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -303,6 +308,7 @@
 				4D096C13089FB4E20091B166 /* ProgressCell.m in Sources */,
 				4D118E1A08CB46B20033958F /* PrefsController.m in Sources */,
 				4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */,
+				4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -23,9 +23,9 @@
 #ifndef NAMECELL_H
 #define NAMECELL_H
 
-#include <Cocoa/Cocoa.h>
-#include <transmission.h>
-#include "Controller.h"
+#import <Cocoa/Cocoa.h>
+#import <transmission.h>
+#import "Controller.h"
 
 @interface NameCell : NSCell
 {

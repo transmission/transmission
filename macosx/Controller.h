@@ -23,9 +23,9 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include <Cocoa/Cocoa.h>
-#include <transmission.h>
-#include "PrefsController.h"
+#import <Cocoa/Cocoa.h>
+#import <transmission.h>
+#import "PrefsController.h"
 
 @class TorrentTableView;
 

@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "PrefsController.h"
+#import "PrefsController.h"
 
 #define DEFAULT_UPLOAD      @"20"
 #define MIN_PORT            1

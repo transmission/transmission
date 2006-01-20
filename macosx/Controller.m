@@ -20,12 +20,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <IOKit/IOMessage.h>
+#import <IOKit/IOMessage.h>
 
-#include "NameCell.h"
-#include "ProgressCell.h"
-#include "Utils.h"
-#include "TorrentTableView.h"
+#import "NameCell.h"
+#import "ProgressCell.h"
+#import "StringAdditions.h"
+#import "Utils.h"
+#import "TorrentTableView.h"
 
 #import "PrefsController.h"
 
@@ -556,19 +557,17 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     //Update the global DL/UL rates
     tr_torrentRates( fHandle, &dl, &ul );
-    [fTotalDLField setStringValue: [NSString stringWithFormat:
-        @"Total DL: %.2f KB/s", dl]];
-    [fTotalULField setStringValue: [NSString stringWithFormat:
-        @"Total UL: %.2f KB/s", ul]];
+    [fTotalDLField setStringValue: [NSString stringForSpeed: dl]];
+    [fTotalULField setStringValue: [NSString stringForSpeed: ul]];
 
     //Update DL/UL totals in the Info panel
     row = [fTableView selectedRow];
     if( row >= 0 )
     {
         [fInfoDownloaded setStringValue:
-            stringForFileSize( fStat[row].downloaded )];
+            [NSString stringForFileSize: fStat[row].downloaded]];
         [fInfoUploaded setStringValue:
-            stringForFileSize( fStat[row].uploaded )];
+            [NSString stringForFileSize: fStat[row].uploaded]];
     }
     
     //check if torrents have recently ended.
@@ -663,11 +662,11 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fInfoAnnounce setStringValue: [NSString stringWithCString:
         fStat[row].info.trackerAnnounce]];
     [fInfoSize setStringValue:
-        stringForFileSize( fStat[row].info.totalSize )];
+        [NSString stringForFileSize: fStat[row].info.totalSize]];
     [fInfoPieces setStringValue: [NSString stringWithFormat: @"%d",
         fStat[row].info.pieceCount]];
     [fInfoPieceSize setStringValue:
-        stringForFileSize( fStat[row].info.pieceSize )];
+        [NSString stringForFileSize: fStat[row].info.pieceSize]];
     [fInfoFolder setStringValue: [[NSString stringWithUTF8String:
         tr_torrentGetFolder( fHandle, row )] lastPathComponent]];
         
