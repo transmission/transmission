@@ -164,10 +164,15 @@ static uint32_t kGreen[] =
        progress bar is 120*14 : the first two columns, the last
        two columns and the last four lines contain the shadow. */
 
-    p      = (uint32_t *) [fProgressBmp bitmapData];
-    p     += 2;
-    end    = lrintf( floor( fStat->progress * 120 ) );
-    colors = ( fStat->status & TR_STATUS_SEED ) ? kGreen : kBlue2;
+    p   = (uint32_t *) [fProgressBmp bitmapData] + 2;
+    end = lrintf( floor( fStat->progress * 120 ) );
+
+    if( fStat->status & TR_STATUS_SEED )
+        colors = kGreen;
+    else if( fStat->status & ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD ) )
+        colors = kBlue2;
+    else
+        colors = kGray;
 
     for( h = 0; h < 14; h++ )
     {

@@ -26,6 +26,8 @@
 		4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* StringAdditions.m */; };
 		4DE5CCA70980735700BE280E /* Badger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.m */; };
 		4DE5CCA90980739100BE280E /* Badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA80980739100BE280E /* Badge.png */; };
+		4DE5CCBA0981D27700BE280E /* ResumeAll.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCB80981D27700BE280E /* ResumeAll.png */; };
+		4DE5CCBB0981D27700BE280E /* PauseAll.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCB90981D27700BE280E /* PauseAll.png */; };
 		4DF0C5AB0899190500DD8943 /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.m */; };
 		4DF0C5AE08991C1600DD8943 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DF0C5AD08991C1600DD8943 /* libtransmission.a */; };
 		4DF7500C08A103AD007B0D70 /* Open.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DF7500708A103AD007B0D70 /* Open.png */; };
@@ -98,6 +100,8 @@
 		4DE5CCA50980735700BE280E /* Badger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Badger.h; sourceTree = "<group>"; };
 		4DE5CCA60980735700BE280E /* Badger.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Badger.m; sourceTree = "<group>"; };
 		4DE5CCA80980739100BE280E /* Badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Badge.png; path = Images/Badge.png; sourceTree = "<group>"; };
+		4DE5CCB80981D27700BE280E /* ResumeAll.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeAll.png; path = Images/ResumeAll.png; sourceTree = "<group>"; };
+		4DE5CCB90981D27700BE280E /* PauseAll.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseAll.png; path = Images/PauseAll.png; sourceTree = "<group>"; };
 		4DF0C5A90899190500DD8943 /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DF0C5AD08991C1600DD8943 /* libtransmission.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtransmission.a; path = ../libtransmission/libtransmission.a; sourceTree = SOURCE_ROOT; };
@@ -105,7 +109,7 @@
 		4DF7500808A103AD007B0D70 /* Info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Info.png; path = Images/Info.png; sourceTree = "<group>"; };
 		4DF7500908A103AD007B0D70 /* Remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Remove.png; path = Images/Remove.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +214,8 @@
 				4D752E920913C949008EAAD4 /* Preferences.png */,
 				4D8CEF90095870E00063BAEA /* Network.png */,
 				4DE5CCA80980739100BE280E /* Badge.png */,
+				4DE5CCB80981D27700BE280E /* ResumeAll.png */,
+				4DE5CCB90981D27700BE280E /* PauseAll.png */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
@@ -301,6 +307,8 @@
 				4D752E930913C949008EAAD4 /* Preferences.png in Resources */,
 				4D8CEF91095870E00063BAEA /* Network.png in Resources */,
 				4DE5CCA90980739100BE280E /* Badge.png in Resources */,
+				4DE5CCBA0981D27700BE280E /* ResumeAll.png in Resources */,
+				4DE5CCBB0981D27700BE280E /* PauseAll.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
