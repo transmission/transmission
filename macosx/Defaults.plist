@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BadgeCompleted</key>
+	<true/>
+	<key>BadgeDownloadRate</key>
+	<false/>
+	<key>BadgeUploadRate</key>
+	<false/>
+	<key>BindPort</key>
+	<integer>9090</integer>
+	<key>CheckQuit</key>
+	<true/>
+	<key>CheckRemove</key>
+	<true/>
+	<key>CheckUpload</key>
+	<true/>
+	<key>DownloadChoice</key>
+	<string>Constant</string>
+	<key>DownloadFolder</key>
+	<string>~/Desktop</string>
+	<key>InfoVisible</key>
+	<false/>
+	<key>Move</key>
+	<false/>
+	<key>MoveChoice</key>
+	<string>Constant</string>
+	<key>MoveFolder</key>
+	<string>~/Desktop</string>
+	<key>ShowInspector</key>
+	<false/>
+	<key>UploadLimit</key>
+	<integer>20</integer>
+	<key>UseAdvancedBar</key>
+	<false/>
+	<key>VersionStartupCheck</key>
+	<true/>
+</dict>
+</plist>

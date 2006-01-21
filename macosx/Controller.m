@@ -313,7 +313,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         if( [downloadChoice isEqualToString: @"Constant"] )
         {
             tr_torrentSetFolder( fHandle, tr_torrentCount( fHandle ) - 1,
-                                 [downloadFolder UTF8String] );
+                                 [[downloadFolder stringByExpandingTildeInPath] UTF8String] );
             tr_torrentStart( fHandle, tr_torrentCount( fHandle ) - 1 );
         }
         else if( [downloadChoice isEqualToString: @"Torrent"] )

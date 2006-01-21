@@ -22,7 +22,6 @@
 
 #import "PrefsController.h"
 
-#define DEFAULT_UPLOAD      @"20"
 #define MIN_PORT            1
 #define MAX_PORT            65535
 
@@ -50,31 +49,10 @@
 
 + (void) initialize
 {
-    NSDictionary   * appDefaults;
-    NSString       * desktop, * port;
-
-    /* Register defaults settings:
-        - Simple bar
-        - Always download to Desktop
-        - Port TR_DEFAULT_PORT
-        - Upload limit DEFAULT_UPLOAD
-        - Limit upload
-        - Ask before quitting
-        - Ask before removing */
-    desktop = [NSHomeDirectory() stringByAppendingString: @"/Desktop"];
-    port = [NSString stringWithFormat: @"%d", TR_DEFAULT_PORT];
-
-    appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                    @"NO",          @"UseAdvancedBar",
-                    @"Constant",    @"DownloadChoice",
-                    desktop,        @"DownloadFolder",
-                    port,           @"BindPort",
-                    DEFAULT_UPLOAD, @"UploadLimit",
-                    @"YES",         @"CheckUpload",
-                    @"YES",         @"CheckQuit",
-                    @"YES",         @"CheckRemove",
-                    NULL];
-    [[NSUserDefaults standardUserDefaults] registerDefaults: appDefaults];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:
+        [NSDictionary dictionaryWithContentsOfFile:
+            [[NSBundle mainBundle] pathForResource: @"Defaults"
+                ofType: @"plist"]]];
 }
 
 - (void)dealloc
@@ -100,7 +78,7 @@
     
     //set download folder
     NSString * downloadChoice  = [fDefaults stringForKey: @"DownloadChoice"];
-    fDownloadFolder = [fDefaults stringForKey: @"DownloadFolder"];
+    fDownloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
     [fDownloadFolder retain];
 
     if( [downloadChoice isEqualToString: @"Constant"] )
@@ -126,27 +104,25 @@
     //checks for old version upload speed of -1
     if ([fDefaults integerForKey: @"UploadLimit"] < 0)
     {
-        [fDefaults setObject: DEFAULT_UPLOAD forKey: @"UploadLimit"];
-        [fDefaults setObject: @"NO" forKey: @"CheckUpload"];
+        [fDefaults setInteger: 20 forKey: @"UploadLimit"];
+        [fDefaults setBool: NO forKey: @"CheckUpload"];
     }
     
     //set upload limit
-    BOOL checkUpload = [[fDefaults stringForKey: @"CheckUpload"] isEqualToString:@"YES"];
+    BOOL checkUpload = [fDefaults boolForKey: @"CheckUpload"];
     int uploadLimit = [fDefaults integerForKey: @"UploadLimit"];
     
     [fUploadCheck setState: checkUpload ? NSOnState : NSOffState];
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
     
-    if (!checkUpload || uploadLimit == 0)
-        uploadLimit = -1;
-    tr_setUploadLimit( fHandle, uploadLimit );
+    tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
     
     //set remove and quit prompts
-    [fQuitCheck setState:([[fDefaults stringForKey: @"CheckQuit"]
-                isEqualToString:@"YES"] ? NSOnState : NSOffState)];
-    [fRemoveCheck setState:([[fDefaults stringForKey: @"CheckRemove"]
-                isEqualToString:@"YES"] ? NSOnState : NSOffState)];
+    [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"] ?
+        NSOnState : NSOffState];
+    [fRemoveCheck setState: [fDefaults boolForKey: @"CheckRemove"] ?
+        NSOnState : NSOffState];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -213,8 +189,7 @@
     else
     {
         tr_setBindPort( fHandle, bindPort );
-        [fDefaults setObject: [NSString stringWithFormat: @"%d", bindPort]
-                    forKey: @"BindPort"];
+        [fDefaults setInteger: bindPort forKey: @"BindPort"];
     }
 }
 
@@ -222,10 +197,9 @@
 {
     BOOL checkUpload = [fUploadCheck state] == NSOnState;
 
-    [fDefaults setObject: checkUpload ? @"YES" : @"NO"
-                            forKey: @"CheckUpload"];
+    [fDefaults setBool: checkUpload forKey: @"CheckUpload"];
     
-    [self setUploadLimit: sender];
+    [self setUploadLimit: nil];
     [fUploadField setEnabled: checkUpload];
 }
 
@@ -244,8 +218,7 @@
     }
     else
     {
-        [fDefaults setObject: [NSString stringWithFormat: @"%d", uploadLimit]
-            forKey: @"UploadLimit"];
+        [fDefaults setInteger: uploadLimit forKey: @"UploadLimit"];
     }
     
     if ([fUploadCheck state] == NSOffState || uploadLimit == 0)
@@ -255,14 +228,14 @@
 
 - (void) setQuitMessage: (id) sender
 {
-    [fDefaults setObject: ([fQuitCheck state] == NSOnState ? @"YES" : @"NO")
-                forKey: @"CheckQuit"];
+    [fDefaults setBool: ( [fQuitCheck state] == NSOnState )
+        forKey: @"CheckQuit"];
 }
 
 - (void) setRemoveMessage: (id) sender
 {
-    [fDefaults setObject: ([fRemoveCheck state] == NSOnState ? @"YES" : @"NO")
-                forKey: @"CheckRemove"];
+    [fDefaults setBool: ( [fRemoveCheck state] == NSOnState )
+        forKey: @"CheckRemove"];
 }
 
 - (void) setDownloadLocation: (id) sender
