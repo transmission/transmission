@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -40,7 +40,7 @@ struct prefdata {
   GtkSpinButton *port;
   GtkCheckButton *uselimit;
   GtkSpinButton *limit;
-  GtkEntry *dir;
+  GtkFileChooser *dir;
   GtkWindow *parent;
   tr_handle_t *tr;
 };
@@ -70,31 +70,41 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata);
 
 void
 makeprefwindow(GtkWindow *parent, tr_handle_t *tr) {
-  GtkWidget *wind = gtk_dialog_new_with_buttons("Preferences", parent,
-    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK,
-    GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+  char *title = g_strconcat(g_get_application_name(), " Preferences", NULL);
+  GtkWidget *wind = gtk_dialog_new_with_buttons(title, parent,
+   GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
+   GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+   GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
   GtkWidget *table = gtk_table_new(4, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
   GtkWidget *limitbox = gtk_check_button_new_with_label("Limit upload speed");
   GtkWidget *limitnum = gtk_spin_button_new_with_range(0, G_MAXLONG, 1);
-  GtkWidget *dirstr = gtk_entry_new();
+  GtkWidget *dirstr = gtk_file_chooser_button_new("Choose download directory",
+    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
   GtkWidget *label;
+  GtkWidget **array;
   const char *pref;
   struct prefdata *data = g_new0(struct prefdata, 1);
+
+  g_free(title);
+  gtk_table_set_col_spacings(GTK_TABLE(table), 12);
+  gtk_table_set_row_spacings(GTK_TABLE(table), 12);
+  gtk_dialog_set_default_response(GTK_DIALOG(wind), GTK_RESPONSE_OK);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 12);
 
   data->port = GTK_SPIN_BUTTON(portnum);
   data->uselimit = GTK_CHECK_BUTTON(limitbox);
   data->limit = GTK_SPIN_BUTTON(limitnum);
-  data->dir = GTK_ENTRY(dirstr);
+  data->dir = GTK_FILE_CHOOSER(dirstr);
   data->parent = parent;
   data->tr = tr;
 
   /* port label and entry */
-  label = gtk_label_new("Listening port");
-  if(NULL != (pref = cf_getpref(PREF_PORT)))
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(portnum), strtol(pref,NULL,10));
-  else
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(portnum), TR_DEFAULT_PORT);
+  label = gtk_label_new("Listening port:");
+  gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+  pref = cf_getpref(PREF_PORT);
+  gtk_spin_button_set_value(GTK_SPIN_BUTTON(portnum),
+    (NULL == pref ? TR_DEFAULT_PORT : strtol(pref, NULL, 10)));
   gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 0, 1);
   gtk_table_attach_defaults(GTK_TABLE(table), portnum,          1, 2, 0, 1);
 
@@ -102,38 +112,45 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr) {
   pref = cf_getpref(PREF_USELIMIT);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(limitbox),
     (NULL == pref ? TRUE : strbool(pref)));
-  gtk_widget_set_sensitive(limitnum,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(limitbox)));
-  g_signal_connect(G_OBJECT(limitbox), "clicked",
-                   G_CALLBACK(clicklimitbox), limitnum);
+  array = g_new(GtkWidget*, 2);
+  g_signal_connect_data(limitbox, "clicked", G_CALLBACK(clicklimitbox),
+                        array, (GClosureNotify)g_free, 0);
   gtk_table_attach_defaults(GTK_TABLE(table), limitbox,         0, 2, 1, 2);
 
   /* limit label and entry */
-  label = gtk_label_new("Maximum upload speed");
+  label = gtk_label_new("Maximum upload speed:");
+  gtk_misc_set_alignment(GTK_MISC(label), 0, 1.0/3.0);
   pref = cf_getpref(PREF_LIMIT);
   gtk_spin_button_set_value(GTK_SPIN_BUTTON(limitnum),
     (NULL == pref ? DEFAULT_UPLIMIT : strtol(pref,NULL,10)));
   gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 2, 3);
   gtk_table_attach_defaults(GTK_TABLE(table), limitnum,         1, 2, 2, 3);
+  array[0] = label;
+  array[1] = limitnum;
+  clicklimitbox(limitbox, array);
 
-  /* directory label and entry */
-  label = gtk_label_new("Download directory");
+  /* directory label and chooser */
+  label = gtk_label_new("Download Directory:");
+  gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   if(NULL != (pref = cf_getpref(PREF_DIR)))
-    gtk_entry_set_text(GTK_ENTRY(dirstr), pref);
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dirstr), pref);
   gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 3, 4);
   gtk_table_attach_defaults(GTK_TABLE(table), dirstr,           1, 2, 3, 4);
 
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
-  g_signal_connect(G_OBJECT(wind), "response", G_CALLBACK(clickdialog), data);
+  g_signal_connect_data(wind, "response", G_CALLBACK(clickdialog),
+                        data, (GClosureNotify)g_free, 0);
   gtk_widget_show_all(wind);
 }
 
 static void
 clicklimitbox(GtkWidget *widget, gpointer gdata) {
-  GtkWidget *entry = gdata;
+  GtkWidget **widgets = gdata;
+  int ii;
 
-  gtk_widget_set_sensitive(entry,
-    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
+  for(ii = 0; 2 > ii; ii++)
+    gtk_widget_set_sensitive(widgets[ii],
+      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
 }
 
 static void
@@ -146,35 +163,35 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
 
   if(GTK_RESPONSE_OK == resp) {
     /* check directory */
-    strval = gtk_entry_get_text(data->dir);
-    if('\0' != strval[0] &&!mkdir_p(strval, 0777)) {
-      errmsg(data->parent, "Failed to create directory %s:\n%s",
-             strval, strerror(errno));
-      return;
-    }
+    if(NULL != (strval = gtk_file_chooser_get_current_folder(data->dir))) {
+      if(!mkdir_p(strval, 0777)) {
+        errmsg(data->parent, "Failed to create directory %s:\n%s",
+               strval, strerror(errno));
+        return;
+      }
 
-    /* save dir pref */
-    cf_setpref(PREF_DIR, gtk_entry_get_text(data->dir), NULL);
+      /* save dir pref */
+      cf_setpref(PREF_DIR, strval);
+    }
 
     /* save port pref */
     strnum = g_strdup_printf("%i",
       gtk_spin_button_get_value_as_int(data->port));
-    cf_setpref(PREF_PORT, strnum, NULL);
+    cf_setpref(PREF_PORT, strnum);
     g_free(strnum);
     /* XXX should I change the port here?  is it even possible? */
 
     /* save uselimit pref */
     boolval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->uselimit));
-    cf_setpref(PREF_USELIMIT, (boolval ? "yes" : "no"), NULL);
+    cf_setpref(PREF_USELIMIT, (boolval ? "yes" : "no"));
 
     /* save limit pref */
     intval = gtk_spin_button_get_value_as_int(data->limit);
     strnum = g_strdup_printf("%i", intval);
-    /*
-      note that prefs aren't written to disk unless we pass a pointer
-      to an error string, so do this for the last call to cf_setpref()
-    */
-    if(!cf_setpref(PREF_LIMIT, strnum, &errstr)) {
+    cf_setpref(PREF_LIMIT, strnum);
+
+    /* save prefs */
+    if(!cf_saveprefs(&errstr)) {
       errmsg(data->parent, "%s", errstr);
       g_free(strnum);
       g_free(errstr);
@@ -184,7 +201,6 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
   }
 
   gtk_widget_destroy(widget);
-  g_free(data);
 }
 
 void
@@ -206,7 +222,7 @@ makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
     GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
   struct addcb *data = g_new(struct addcb, 1);
-  GtkWidget *vbox = gtk_vbox_new(FALSE, 5);
+  GtkWidget *vbox = gtk_vbox_new(FALSE, 3);
   GtkWidget *bbox = gtk_hbutton_box_new();
   GtkWidget *autocheck = gtk_check_button_new_with_label(
     "Automatically start torrent");
@@ -238,11 +254,6 @@ makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(autocheck), TRUE);
   if(NULL != (pref = cf_getpref(PREF_DIR)))
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(getdir), pref);
-  else {
-    pref = g_get_current_dir();
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(getdir), pref);
-    g_free((char*)pref);
-  }
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dircheck), FALSE);
 
@@ -341,34 +352,26 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     ii++; \
   } while(0);
 
-#define INFOSTATUS(st) \
-  (TR_STATUS_CHECK    & (st) ? "check" : \
-  (TR_STATUS_DOWNLOAD & (st) ? "download" : \
-  (TR_STATUS_SEED     & (st) ? "seed" : \
-  (TR_STATUS_STOPPING & (st) ? "stopping" : \
-  (TR_STATUS_STOPPED  & (st) ? "stopped" : \
-  (TR_STATUS_PAUSE    & (st) ? "pause" : \
-  "???"))))))
-
 void
 makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   tr_stat_t *sb;
   GtkWidget *wind, *table, *label;
   int ii;
   char *str;
-  const int rowcount = 11;
+  const int rowcount = 12;
 
   /* XXX would be nice to be able to stat just one */
   if(id >= tr_torrentStat(tr, &sb))
     assert(!"XXX ");
-  str = g_strdup_printf("%s Properties", sb[id].info.name);
+  str = g_strconcat(sb[id].info.name, " Properties", NULL);
   wind = gtk_dialog_new_with_buttons(str, parent,
-    GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
+    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
   g_free(str);
 
   table = gtk_table_new(rowcount, 2, FALSE);
-  gtk_table_set_col_spacings(GTK_TABLE(table), 10);
-  gtk_table_set_row_spacings(GTK_TABLE(table), 10);
+  gtk_table_set_col_spacings(GTK_TABLE(table), 12);
+  gtk_table_set_row_spacings(GTK_TABLE(table), 12);
 
   label = gtk_label_new(NULL);
   str = g_markup_printf_escaped("<big>%s</big>", sb[id].info.name);
@@ -393,9 +396,11 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   INFOLINEA(table, ii, "Downloaded", readablesize(sb[id].downloaded, 1));
   INFOLINEA(table, ii, "Uploaded", readablesize(sb[id].uploaded, 1));
 
+  INFOSEP(table, ii);
+
   assert(rowcount == ii);
 
-  gtk_container_set_border_width(GTK_CONTAINER(table), 10);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 12);
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect(G_OBJECT(wind), "response",
                    G_CALLBACK(gtk_widget_destroy), NULL);

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -43,9 +43,10 @@ gboolean
 cf_loadprefs(char **errstr);
 const char *
 cf_getpref(const char *name);
-/* if errstr is NULL then prefs will not be saved */
+void
+cf_setpref(const char *name, const char *value);
 gboolean
-cf_setpref(const char *name, const char *value, char **errstr);
+cf_saveprefs(char **errstr);
 GList *
 cf_loadstate(char **errstr);
 gboolean

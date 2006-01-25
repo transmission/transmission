@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -144,10 +144,10 @@ struct { const gchar *name; const gchar *id; enum listact act; gboolean nomenu;
 actionitems[] = {
   {"Add",         GTK_STOCK_ADD,          ACT_OPEN,   FALSE,  0,
    "Add a new torrent file", "XXX"},
-  {"Resume",      GTK_STOCK_MEDIA_PLAY,   ACT_START,  FALSE,
+  {"Start",       GTK_STOCK_EXECUTE,      ACT_START,  FALSE,
    (TR_STATUS_STOPPING | TR_STATUS_PAUSE),
    "Resume a torrent that has been paused", "XXX"},
-  {"Pause",       GTK_STOCK_MEDIA_PAUSE,  ACT_STOP,   FALSE,
+  {"Stop",        GTK_STOCK_STOP,         ACT_STOP,   FALSE,
    ~(TR_STATUS_STOPPING | TR_STATUS_PAUSE),
    "Pause a torrent", "XXX"},
   {"Remove",      GTK_STOCK_REMOVE,       ACT_DELETE, FALSE, ~0,
@@ -169,6 +169,8 @@ main(int argc, char **argv) {
   long intval;
 
   gtk_init(&argc, &argv);
+
+  g_set_application_name("Transmission");
 
   tr = tr_init();
 
@@ -272,6 +274,7 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   gtk_box_pack_start(GTK_BOX(vbox), status, FALSE, FALSE, 0);
 
   gtk_container_add(GTK_CONTAINER(wind), vbox);
+  gtk_window_set_title(data->wind, g_get_application_name());
   g_signal_connect(G_OBJECT(wind), "delete_event", G_CALLBACK(winclose), data);
 
   for(ii = g_list_first(saved); NULL != ii; ii = ii->next) {
@@ -288,13 +291,14 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   gtk_widget_show_all(vbox);
   gtk_widget_realize(wind);
 
-  gtk_widget_size_request(wind, &req);
+  gtk_widget_size_request(list, &req);
   height = req.height;
   gtk_widget_size_request(scroll, &req);
   height -= req.height;
-  gtk_widget_size_request(list, &req);
+  gtk_widget_size_request(wind, &req);
   height += req.height;
-  gtk_window_set_default_size(GTK_WINDOW(wind), -1, MAX(height, 100));
+  gtk_window_set_default_size(GTK_WINDOW(wind), -1, (height > req.width ?
+     MIN(height, req.width * 8 / 5) : MAX(height, req.width * 5 / 8)));
 
   gtk_widget_show(wind);
 }

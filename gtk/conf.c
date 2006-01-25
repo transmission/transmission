@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -52,8 +52,6 @@
 
 static int
 lockfile(const char *file, char **errstr);
-static gboolean
-writeprefs(char **errstr);
 static gboolean
 writefile_traverse(gpointer key, gpointer value, gpointer data);
 static char *
@@ -203,16 +201,11 @@ cf_getpref(const char *name) {
   return g_tree_lookup(prefs, name);
 }
 
-gboolean
-cf_setpref(const char *name, const char *value, char **errstr) {
+void
+cf_setpref(const char *name, const char *value) {
   assert(NULL != prefs);
 
   g_tree_insert(prefs, g_strdup(name), g_strdup(value));
-
-  if(NULL != errstr)
-    return writeprefs(errstr);
-  else
-    return TRUE;
 }
 
 struct writeinfo {
@@ -220,8 +213,8 @@ struct writeinfo {
   GError *err;
 };
 
-static gboolean
-writeprefs(char **errstr) {
+gboolean
+cf_saveprefs(char **errstr) {
   char *file = g_build_filename(confdir, FILE_PREFS, NULL);
   char *tmpfile = g_build_filename(confdir, FILE_PREFS_TMP, NULL);
   GIOChannel *io = NULL;
@@ -229,6 +222,7 @@ writeprefs(char **errstr) {
   int fd;
 
   assert(NULL != prefs);
+  assert(NULL != errstr);
 
   *errstr = NULL;
 
