@@ -51,6 +51,7 @@ struct tr_tracker_s
     int            pos;
 
     int            bindPort;
+    int            newPort;
 };
 
 static void sendQuery  ( tr_tracker_t * tc );
@@ -74,6 +75,7 @@ tr_tracker_t * tr_trackerInit( tr_handle_t * h, tr_torrent_t * tor )
     tc->buf      = malloc( tc->size );
 
     tc->bindPort = h->bindPort;
+    tc->newPort  = -1;
 
     return tc;
 }
@@ -89,7 +91,7 @@ static int shouldConnect( tr_tracker_t * tc )
     }
 
     /* Do we need to send an event? */
-    if( tc->started || tc->completed || tc->stopped )
+    if( tc->started || tc->completed || tc->stopped || 0 < tc->newPort )
     {
         return 1;
     }
@@ -123,8 +125,7 @@ static int shouldConnect( tr_tracker_t * tc )
 
 void tr_trackerChangePort( tr_tracker_t * tc, int port )
 {
-    /* XXX this doesn't always work, should send stopped then started events */
-    tc->bindPort = port;
+    tc->newPort = port;
 }
 
 int tr_trackerPulse( tr_tracker_t * tc )
@@ -160,7 +161,8 @@ int tr_trackerPulse( tr_tracker_t * tc )
                 tc->started ? "sending 'started'" :
                 ( tc->completed ? "sending 'completed'" :
                   ( tc->stopped ? "sending 'stopped'" :
-                    "getting peers" ) ) );
+                    ( 0 < tc->newPort ? "sending 'stopped' to change port" :
+                      "getting peers" ) ) ) );
 
         tc->status  = TC_STATUS_CONNECT;
         tc->dateTry = tr_date();
@@ -246,11 +248,17 @@ static void sendQuery( tr_tracker_t * tc )
     uint64_t   left;
     int        ret;
 
+    if( tc->started && 0 < tc->newPort )
+    {
+        tc->bindPort = tc->newPort;
+        tc->newPort = -1;
+    }
+
     if( tc->started )
         event = "&event=started";
     else if( tc->completed )
         event = "&event=completed";
-    else if( tc->stopped )
+    else if( tc->stopped || 0 < tc->newPort )
         event = "&event=stopped";
     else
         event = "";
@@ -478,6 +486,10 @@ static void recvAnswer( tr_tracker_t * tc )
     {
         tor->status = TR_STATUS_STOPPED;
         tc->stopped = 0;
+    }
+    else if( 0 < tc->newPort )
+    {
+        tc->started = 1;
     }
 
 cleanup:

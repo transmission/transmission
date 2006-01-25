@@ -179,7 +179,6 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
       gtk_spin_button_get_value_as_int(data->port));
     cf_setpref(PREF_PORT, strnum);
     g_free(strnum);
-    /* XXX should I change the port here?  is it even possible? */
 
     /* save uselimit pref */
     boolval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->uselimit));
@@ -197,6 +196,7 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
       g_free(errstr);
     }
 
+    tr_setBindPort(data->tr, gtk_spin_button_get_value_as_int(data->port));
     setlimit(data->tr);
   }
 
