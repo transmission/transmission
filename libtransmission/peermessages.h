@@ -59,6 +59,20 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
 
         /* We need to load the block for the next request */
         r = &peer->outRequests[0];
+
+        /* Sanity check */
+        if( !tr_cpPieceIsComplete( tor->completion, r->index ) )
+        {
+            /* We have been asked for something we don't have, buggy client?
+               Let's just drop this request */
+            tr_inf( "Block %d/%d/%d was requested but we don't have it",
+                    r->index, r->begin, r->length );
+            (peer->outRequestCount)--;
+            memmove( &peer->outRequests[0], &peer->outRequests[1],
+                     peer->outRequestCount * sizeof( tr_request_t ) );
+            return NULL;
+        }
+        
         p = (uint8_t *) peer->outBlock;
 
         TR_HTONL( 9 + r->length, p );
