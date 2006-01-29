@@ -123,6 +123,11 @@
         NSOnState : NSOffState];
     [fRemoveCheck setState: [fDefaults boolForKey: @"CheckRemove"] ?
         NSOnState : NSOffState];
+
+    //set dock badging
+    [fBadgeCompletedCheck setState: [fDefaults boolForKey: @"BadgeCompleted"]];
+    [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
+    [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -236,6 +241,19 @@
 {
     [fDefaults setBool: ( [fRemoveCheck state] == NSOnState )
         forKey: @"CheckRemove"];
+}
+
+- (void) setBadge: (id) sender
+{   
+    BOOL state = [sender state];
+    
+    if (sender == fBadgeCompletedCheck)
+        [fDefaults setBool: state forKey: @"BadgeCompleted"];
+    else if (sender == fBadgeDownloadRateCheck)
+        [fDefaults setBool: state forKey: @"BadgeDownloadRate"];
+    else if (sender == fBadgeUploadRateCheck)
+        [fDefaults setBool: state forKey: @"BadgeUploadRate"];
+    else;
 }
 
 - (void) setDownloadLocation: (id) sender

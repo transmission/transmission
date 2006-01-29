@@ -59,6 +59,7 @@
         {
             ACTIONS = {
                 folderSheetShow = id; 
+                setBadge = id; 
                 setDownloadLocation = id; 
                 setLimitUploadCheck = id; 
                 setPort = id; 
@@ -69,6 +70,9 @@
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fBadgeCompletedCheck = NSButton; 
+                fBadgeDownloadRateCheck = NSButton; 
+                fBadgeUploadRateCheck = NSButton; 
                 fBlankView = NSView; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
