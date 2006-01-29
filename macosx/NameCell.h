@@ -35,6 +35,8 @@
     NSString * fSizeString;
     NSString * fTimeString;
     NSString * fPeersString;
+
+    NSImage * fIcon;
 }
 - (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
 @end
