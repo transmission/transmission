@@ -87,7 +87,6 @@
 
 - (void) quitSheetDidEnd:   (NSWindow *)sheet returnCode:(int)returnCode
                             contextInfo:(void  *)contextInfo;
-- (void) quitProcedure;
                         
 - (void) stopTorrent:               (id) sender;
 - (void) stopAllTorrents:           (id) sender;

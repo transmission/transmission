@@ -199,70 +199,68 @@ static void sleepCallBack( void * controller, io_service_t y,
         return NSTerminateLater;
     }                                                                           
     
-    [self quitProcedure];
     return NSTerminateNow;
 }
 
 - (void) quitSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
                         contextInfo:(void  *)contextInfo
 {
-    if (returnCode == NSAlertDefaultReturn)
-        [self quitProcedure];
-        
     [NSApp stopModal];
-    [NSApp replyToApplicationShouldTerminate: (returnCode == NSAlertDefaultReturn)];
+    [NSApp replyToApplicationShouldTerminate:
+        (returnCode == NSAlertDefaultReturn)];
 }
 
-- (void) quitProcedure
+- (void) applicationWillTerminate: (NSNotification *) notification
 {
     int i;
-    NSMutableArray * history = [NSMutableArray
-        arrayWithCapacity: TR_MAX_TORRENT_COUNT];
     
     // Stop updating the interface
     [fTimer invalidate];
     [fUpdateTimer invalidate];
 
+    //clear badge
+    [fBadger clearBadge];
+    [fBadger release];                                                          
+
     // Save history and stop running torrents
+    NSMutableArray * history = [NSMutableArray arrayWithCapacity: fCount];
+    BOOL active;
     for( i = 0; i < fCount; i++ )
     {
+        active = fStat[i].status &
+            ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED );
+
         [history addObject: [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: fStat[i].info.torrent],
             @"TorrentPath",
             [NSString stringWithUTF8String: tr_torrentGetFolder( fHandle, i )],
             @"DownloadFolder",
-            ( fStat[i].status & ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD |
-                TR_STATUS_SEED ) ) ? @"NO" : @"YES",
+            active ? @"NO" : @"YES",
             @"Paused",
             NULL]];
 
-        if( fStat[i].status & ( TR_STATUS_CHECK |
-                TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) )
+        if( active )
         {
             tr_torrentStop( fHandle, i );
         }
     }
+    [fDefaults setObject: history forKey: @"History"];
 
     // Wait for torrents to stop (5 seconds timeout)
     NSDate * start = [NSDate date];
     while( fCount > 0 )
     {
-        while( [[NSDate date] timeIntervalSinceDate: start] < 5 )
+        while( [[NSDate date] timeIntervalSinceDate: start] < 5 &&
+                !( fStat[0].status & TR_STATUS_PAUSE ) )
         {
-            fCount = tr_torrentStat( fHandle, &fStat );
-            if( fStat[0].status & TR_STATUS_PAUSE )
-            {
-                break;
-            }
-            usleep( 500000 );
+            usleep( 100000 );
+            tr_torrentStat( fHandle, &fStat );
         }
         tr_torrentClose( fHandle, 0 );
         fCount = tr_torrentStat( fHandle, &fStat );
     }
 
     tr_close( fHandle );
-
-    [fDefaults setObject: history forKey: @"History"];
 }
 
 - (void) showPreferenceWindow: (id) sender
