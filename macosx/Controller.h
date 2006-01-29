@@ -33,7 +33,7 @@
 @interface Controller : NSObject
 {
     tr_handle_t                 * fHandle;
-    int                         fCount, fCompleted;
+    int                         fCount, fSeeding, fDownloading, fCompleted;
     tr_stat_t                   * fStat;
     int                         fResumeOnWake[TR_MAX_TORRENT_COUNT];
 

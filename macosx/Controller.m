@@ -136,11 +136,14 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     //initialize badging
     fBadger = [[Badger alloc] init];
-    fCompleted = 0;
     
     //update the interface every 500 ms
     fCount = 0;
-    fStat  = NULL;
+    fDownloading = 0;
+    fSeeding = 0;
+    fCompleted = 0;
+
+    fStat  = nil;
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self
         selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
@@ -173,23 +176,21 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-    if ([[fDefaults stringForKey: @"CheckQuit"] isEqualToString:@"YES"])
+    int active = fDownloading + fSeeding;
+    if (active > 0 && [[NSUserDefaults standardUserDefaults] boolForKey: @"CheckQuit"])
     {
-        int i;
-        for( i = 0; i < fCount; i++ )
-        {
-            if( fStat[i].status & ( TR_STATUS_CHECK |
-                    TR_STATUS_DOWNLOAD ) )
-            {
-                NSBeginAlertSheet(@"Confirm Quit",
-                                @"Quit", @"Cancel", nil,
-                                fWindow, self,
-                                @selector(quitSheetDidEnd:returnCode:contextInfo:),
-                                NULL, NULL, @"There are active torrents. Do you really want to quit?");
-                return NSTerminateLater;
-            }
-        }
-    }
+        NSString * message = active == 1
+            ? @"There is an active torrent. Do you really want to quit?"
+            : [NSString stringWithFormat:
+                @"There are %d active torrents. Do you really want to quit?", fDownloading];
+
+        NSBeginAlertSheet(@"Confirm Quit",
+                            @"Quit", @"Cancel", nil,
+                            fWindow, self,
+                            @selector(quitSheetDidEnd:returnCode:contextInfo:),
+                            nil, nil, message);
+        return NSTerminateLater;
+    }                                                                           
     
     [self quitProcedure];
     return NSTerminateNow;
@@ -453,9 +454,9 @@ static void sleepCallBack( void * controller, io_service_t y,
                      deleteData: (BOOL) deleteData
 {
     if ( fStat[idx].status & ( TR_STATUS_CHECK 
-        | TR_STATUS_DOWNLOAD)  )
+        | TR_STATUS_DOWNLOAD | TR_STATUS_SEED )  )
     {
-        if ([[fDefaults stringForKey: @"CheckRemove"] isEqualToString:@"YES"])
+        if ([fDefaults boolForKey: @"CheckRemove"])
         {
             NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
                         [NSString stringWithFormat: @"%d", idx], @"Index",
@@ -563,6 +564,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         free(fStat);
         
     fCount = tr_torrentStat( fHandle, &fStat );
+    fDownloading = 0;
+    fSeeding = 0;
     [fTableView updateUI: fStat];
 
     //Update the global DL/UL rates
@@ -585,6 +588,11 @@ static void sleepCallBack( void * controller, io_service_t y,
     //check if torrents have recently ended.
     for (i = 0; i < fCount; i++)
     {
+        if (fStat[i].status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD))
+            fDownloading++;
+        else if (fStat[i].status & TR_STATUS_SEED)
+            fSeeding++;
+
         if( !tr_getFinished( fHandle, i ) )
             continue;
 
@@ -798,49 +806,61 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
 {
+    SEL action = [toolbarItem action];
+
     //enable remove item
-    if ([toolbarItem action] == @selector(removeTorrent:))
+    if (action == @selector(removeTorrent:))
         return [fTableView selectedRow] >= 0;
         
-    //enable pause all and resume all items
-    if ([toolbarItem action] == @selector(stopAllTorrents:)
-            || [toolbarItem action] == @selector(resumeAllTorrents:))
-        return fCount > 0;
+
+    //enable resume all item
+    if (action == @selector(resumeAllTorrents:))
+        return fCount > fDownloading + fSeeding;
+
+    //enable pause all item
+    if (action == @selector(stopAllTorrents:))
+        return fDownloading > 0 || fSeeding > 0;                                
     
     return YES;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
+    SEL action = [menuItem action];
+
     //disable menus if customize sheet is active
     if ([fToolbar customizationPaletteIsRunning])
         return NO;
         
     //enable customize toolbar item
-    if ([menuItem action] == @selector(showHideToolbar:))
+    if (action == @selector(showHideToolbar:))
     {
         [menuItem setTitle: [fToolbar isVisible] ? @"Hide Toolbar" : @"Show Toolbar"];
         return YES;
     }
         
     //enable show info
-    if ([menuItem action] == @selector(showInfo:))
+    if (action == @selector(showInfo:))
     {
         [menuItem setTitle: [fInfoPanel isVisible] ? @"Hide Info" : @"Show Info"];
         return YES;
     }
+
+    //enable resume all item
+    if (action == @selector(resumeAllTorrents:))
+        return fCount > fDownloading + fSeeding;
+
+    //enable pause all item
+    if (action == @selector(stopAllTorrents:))
+        return fDownloading > 0 || fSeeding > 0;                                
     
-    //enable pause all and resume all
-    if ([menuItem action] == @selector(stopAllTorrents:) || [menuItem action] == @selector(resumeAllTorrents:))
-        return fCount > 0;
-        
     int row = [fTableView selectedRow];
         
     //enable remove items
-    if ([menuItem action] == @selector(removeTorrent:)
-        || [menuItem action] == @selector(removeTorrentDeleteFile:)
-        || [menuItem action] == @selector(removeTorrentDeleteData:)
-        || [menuItem action] == @selector(removeTorrentDeleteBoth:))
+    if (action == @selector(removeTorrent:)
+        || action == @selector(removeTorrentDeleteFile:)
+        || action == @selector(removeTorrentDeleteData:)
+        || action == @selector(removeTorrentDeleteBoth:))
     {
         //append or remove ellipsis when needed
         if (row >= 0 && fStat[row].status & ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD)
@@ -858,11 +878,11 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     
     //enable reveal in finder item
-    if ([menuItem action] == @selector(revealFromMenu:))
+    if (action == @selector(revealFromMenu:))
         return row >= 0;
         
     //enable and change pause / remove item
-    if ([menuItem action] == @selector(resumeTorrent:) || [menuItem action] == @selector(stopTorrent:))
+    if (action == @selector(resumeTorrent:) || action == @selector(stopTorrent:))
     {
         if (row >= 0 && fStat[row].status & TR_STATUS_PAUSE)
         {
@@ -911,9 +931,11 @@ static void sleepCallBack( void * controller, io_service_t y,
             break;
 
         case kIOMessageCanSystemSleep:
-            /* Do not prevent idle sleep */
-            /* TODO: prevent it unless there are all paused? */
-            IOAllowPowerChange( fRootPort, (long) messageArgument );
+            /* Prevent idle sleep unless all paused */
+            if (fDownloading > 0 || fSeeding > 0)
+                IOCancelPowerChange( fRootPort, (long) messageArgument );
+            else
+                IOAllowPowerChange( fRootPort, (long) messageArgument );
             break;
 
         case kIOMessageSystemHasPoweredOn:
