@@ -40,6 +40,7 @@
     IBOutlet NSButton       * fBadgeCompletedCheck;
     IBOutlet NSButton       * fBadgeDownloadRateCheck;
     IBOutlet NSButton       * fBadgeUploadRateCheck;                            
+    IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fPortField;
     IBOutlet NSButton       * fUploadCheck;
@@ -56,6 +57,7 @@
 - (void) setQuitMessage:        (id) sender;
 - (void) setRemoveMessage:      (id) sender;
 - (void) setBadge:              (id) sender;
+- (void) setUpdate:             (id) sender;
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 

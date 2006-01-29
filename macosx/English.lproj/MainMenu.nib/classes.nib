@@ -3,6 +3,7 @@
         {
             ACTIONS = {
                 advancedChanged = id; 
+                checkForUpdate = id; 
                 growlRegister = id; 
                 linkForums = id; 
                 linkHomepage = id; 
@@ -65,6 +66,7 @@
                 setPort = id; 
                 setQuitMessage = id; 
                 setRemoveMessage = id; 
+                setUpdate = id; 
                 setUploadLimit = id; 
             }; 
             CLASS = PrefsController; 
@@ -81,6 +83,7 @@
                 fPrefsWindow = NSPanel; 
                 fQuitCheck = NSButton; 
                 fRemoveCheck = NSButton; 
+                fUpdatePopUp = NSPopUpButton; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
                 fWindow = NSWindow; 

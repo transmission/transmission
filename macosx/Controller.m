@@ -36,8 +36,9 @@
 #define TOOLBAR_PAUSE_ALL   @"Toolbar Pause All"
 #define TOOLBAR_RESUME_ALL  @"Toolbar Resume All"
 
-#define WEBSITE_URL     @"http://transmission.m0k.org/"
-#define FORUM_URL       @"http://transmission.m0k.org/forum/"
+#define WEBSITE_URL         @"http://transmission.m0k.org/"
+#define FORUM_URL           @"http://transmission.m0k.org/forum/"
+#define VERSION_PLIST_URL   @"http://transmission.m0k.org/version.plist"
 
 #define GROWL_PATH  @"/Library/PreferencePanes/Growl.prefPane/Contents/Resources/GrowlHelperApp.app"
 
@@ -142,12 +143,18 @@ static void sleepCallBack( void * controller, io_service_t y,
     fDownloading = 0;
     fSeeding = 0;
     fCompleted = 0;
-
     fStat  = nil;
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self
         selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
+        forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fTimer
         forMode: NSEventTrackingRunLoopMode];
+
+    [self checkForUpdateTimer: nil];
+    fUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 60.0
+        target: self selector: @selector( checkForUpdateTimer: )
+        userInfo: NULL repeats: YES];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) n
@@ -214,6 +221,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     
     // Stop updating the interface
     [fTimer invalidate];
+    [fUpdateTimer invalidate];
 
     // Save history and stop running torrents
     for( i = 0; i < fCount; i++ )
@@ -1090,6 +1098,133 @@ static void sleepCallBack( void * controller, io_service_t y,
         printf( "finderTrash failed\n" );
     }
     [appleScript release];
+}
+
+- (void) checkForUpdate: (id) sender
+{
+    [self checkForUpdateAuto: NO];
+}
+
+- (void) checkForUpdateTimer: (NSTimer *) timer
+{
+    NSString * check = [fDefaults stringForKey: @"VersionCheck"];
+    if( [check isEqualToString: @"Never"] )
+        return;
+
+    NSTimeInterval interval;
+    if( [check isEqualToString: @"Daily"] )
+        interval = 24 * 3600;
+    else if( [check isEqualToString: @"Weekly"] )
+        interval = 7 * 24 * 3600;
+    else
+        return;
+
+    id lastObject = [fDefaults objectForKey: @"VersionCheckLast"];
+    NSDate * lastDate = [lastObject isKindOfClass: [NSDate class]] ?
+        lastObject : nil;
+    if( lastDate )
+    {
+        NSTimeInterval actualInterval =
+            [[NSDate date] timeIntervalSinceDate: lastDate];
+        if( actualInterval > 0 && actualInterval < interval )
+        {
+            return;
+        }
+    }
+
+    [self checkForUpdateAuto: YES];
+    [fDefaults setObject: [NSDate date] forKey: @"VersionCheckLast"];
+}
+    
+- (void) checkForUpdateAuto: (BOOL) automatic
+{
+    fCheckIsAutomatic = automatic;
+    [[NSURL URLWithString: VERSION_PLIST_URL]
+            loadResourceDataNotifyingClient: self usingCache: NO];
+}
+
+- (void) URLResourceDidFinishLoading: (NSURL *) sender
+{   
+    NSDictionary * dict = [NSPropertyListSerialization
+                            propertyListFromData: [sender resourceDataUsingCache: NO]
+                            mutabilityOption: NSPropertyListImmutable
+                            format: nil errorDescription: nil];
+
+    //check if plist was actually found and contains a version
+    NSString * webVersion = nil;
+    if (dict)
+        webVersion = [dict objectForKey: @"Version"];
+    if (!webVersion)
+    {
+        if (!fCheckIsAutomatic)
+        {
+            NSAlert * dialog = [[NSAlert alloc] init];
+            [dialog addButtonWithTitle: @"OK"];
+            [dialog setMessageText: @"Error checking for updates."];
+            [dialog setInformativeText:
+                    @"Transmission was not able to check the latest version available."];
+            [dialog setAlertStyle: NSInformationalAlertStyle];
+
+            [dialog runModal];
+            [dialog release];
+        }
+        return;
+    }
+
+    NSString * currentVersion = [[[NSBundle mainBundle] infoDictionary]
+                                objectForKey: (NSString *)kCFBundleVersionKey];
+
+    NSEnumerator * webEnum = [[webVersion componentsSeparatedByString: @"."] objectEnumerator],
+            * currentEnum = [[currentVersion componentsSeparatedByString: @"."] objectEnumerator];
+    NSString * webSub, * currentSub;
+
+    BOOL webGreater = NO;
+    NSComparisonResult result;
+    while ((webSub = [webEnum nextObject]))
+    {
+        if (!(currentSub = [currentEnum nextObject]))
+        {
+            webGreater = YES;
+            break;
+        }
+
+        result = [currentSub compare: webSub options: NSNumericSearch];
+        if (result != NSOrderedSame)
+        {
+            if (result == NSOrderedAscending)
+                webGreater = YES;
+            break;
+        }
+    }
+
+    if (webGreater)
+    {
+        NSAlert * dialog = [[NSAlert alloc] init];
+        [dialog addButtonWithTitle: @"Go to Website"];
+        [dialog addButtonWithTitle:@"Cancel"];
+        [dialog setMessageText: @"New version is available!"];
+        [dialog setInformativeText: [NSString stringWithFormat:
+            @"A newer version (%@) is available for download from the Transmission website.", webVersion]];
+        [dialog setAlertStyle: NSInformationalAlertStyle];
+
+        if ([dialog runModal] == NSAlertFirstButtonReturn)
+            [self linkHomepage: nil];
+
+        [dialog release];
+    }
+    else if (!fCheckIsAutomatic)
+    {
+        NSAlert * dialog = [[NSAlert alloc] init];
+        [dialog addButtonWithTitle: @"OK"];
+        [dialog setMessageText: @"No new versions are available."];
+        [dialog setInformativeText: [NSString stringWithFormat:
+            @"You are running the most current version of Transmission (%@).", currentVersion]];
+        [dialog setAlertStyle: NSInformationalAlertStyle];
+
+        [dialog runModal];
+        [dialog release];
+    }
+    else;
 }
 
 @end

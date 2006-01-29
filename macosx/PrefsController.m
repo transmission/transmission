@@ -29,6 +29,10 @@
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
 
+#define UPDATE_DAILY        0
+#define UPDATE_WEEKLY       1
+#define UPDATE_NEVER        2
+
 #define TOOLBAR_GENERAL     @"General"
 #define TOOLBAR_NETWORK     @"Network"
 
@@ -128,6 +132,20 @@
     [fBadgeCompletedCheck setState: [fDefaults boolForKey: @"BadgeCompleted"]];
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
+
+    /* Check for update */
+    NSString * versionCheck  = [fDefaults stringForKey: @"VersionCheck"];
+    if( [versionCheck isEqualToString: @"Daily"] )
+        [fUpdatePopUp selectItemAtIndex: UPDATE_DAILY];
+    else if( [versionCheck isEqualToString: @"Weekly"] )
+        [fUpdatePopUp selectItemAtIndex: UPDATE_WEEKLY];
+    else if( [versionCheck isEqualToString: @"Never"] )
+        [fUpdatePopUp selectItemAtIndex: UPDATE_NEVER];
+    else
+    {
+        [fDefaults setObject: @"Weekly" forKey: @"VersionCheck"];
+        [fUpdatePopUp selectItemAtIndex: UPDATE_WEEKLY];
+    }
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -254,6 +272,22 @@
     else if (sender == fBadgeUploadRateCheck)
         [fDefaults setBool: state forKey: @"BadgeUploadRate"];
     else;
+}
+
+- (void) setUpdate: (id) sender
+{
+    switch( [fUpdatePopUp indexOfSelectedItem] )
+    {
+        case UPDATE_DAILY:
+            [fDefaults setObject: @"Daily" forKey: @"VersionCheck"];
+            break;
+        case UPDATE_WEEKLY:
+            [fDefaults setObject: @"Weekly" forKey: @"VersionCheck"];
+            break;
+        case UPDATE_NEVER:
+            [fDefaults setObject: @"Never" forKey: @"VersionCheck"];
+            break;
+    }
 }
 
 - (void) setDownloadLocation: (id) sender

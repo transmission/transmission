@@ -34,7 +34,7 @@
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
 	<false/>
-	<key>VersionStartupCheck</key>
-	<true/>
+	<key>VersionCheck</key>
+	<string>Weekly</string>
 </dict>
 </plist>

@@ -69,6 +69,7 @@
     io_connect_t                fRootPort;
     NSArray                     * fFilenames;
     NSTimer                     * fTimer;
+    NSTimer                     * fUpdateTimer;
     
     IBOutlet NSPanel            * fPrefsWindow;
     IBOutlet PrefsController    * fPrefsController;
@@ -76,6 +77,7 @@
     
     BOOL                        fHasGrowl;
     Badger                      * fBadger; 
+    BOOL                        fCheckIsAutomatic;
 }
 
 - (void) advancedChanged: (id) sender;
@@ -127,6 +129,10 @@
 - (void) finderReveal:      (NSString *) path;
 - (void) finderTrash:       (NSString *) path;
 - (void) growlRegister:     (id) sender;
+
+- (void) checkForUpdate:      (id) sender;
+- (void) checkForUpdateTimer: (NSTimer *) timer;
+- (void) checkForUpdateAuto:  (BOOL) automatic;
 
 @end
 
