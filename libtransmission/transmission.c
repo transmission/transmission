@@ -580,7 +580,7 @@ static void acceptLoop( void * _h )
     uint64_t      date1, date2, lastchoke = 0;
     int           ii, jj;
     uint8_t     * hash;
-    tr_choking_t * choking = tr_chokingInit( h );
+    //tr_choking_t * choking = tr_chokingInit( h );
 
     tr_dbg( "Accept thread started" );
 
@@ -649,7 +649,7 @@ static void acceptLoop( void * _h )
 
         if( date1 > lastchoke + 2000 )
         {
-            tr_chokingPulse( choking );
+            //tr_chokingPulse( choking );
             lastchoke = date1;
         }
 
@@ -664,7 +664,7 @@ static void acceptLoop( void * _h )
     }
 
     tr_lockUnlock( &h->acceptLock );
-    tr_chokingClose( choking );
+    //tr_chokingClose( choking );
 
     tr_dbg( "Accept thread exited" );
 }
