@@ -161,12 +161,12 @@ case $SYSTEM in
 
   FreeBSD)
     DEFINES="$DEFINES SYS_FREEBSD"
-    LINKLIBS="$LINKLIBS -pthread"
+    LINKLIBS="$LINKLIBS -pthread -lm"
     ;;
 
   NetBSD)
     DEFINES="$DEFINES SYS_NETBSD"
-    LINKLIBS="$LINKLIBS -lpthread"
+    LINKLIBS="$LINKLIBS -lpthread -lm"
     ;;
 
   Linux)
