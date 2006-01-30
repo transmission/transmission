@@ -170,7 +170,8 @@ cf_loadprefs(char **errstr) {
         goto done;
       case G_IO_STATUS_NORMAL:
         if(NULL != line) {
-          if(NULL != (sep = strchr(line, PREF_SEP_KEYVAL)) && sep > line) {
+          if(g_utf8_validate(line, len, NULL) &&
+             NULL != (sep = strchr(line, PREF_SEP_KEYVAL)) && sep > line) {
             *sep = '\0';
             line[termpos] = '\0';
             g_tree_insert(prefs, g_strcompress(line), g_strcompress(sep + 1));
@@ -332,15 +333,17 @@ cf_loadstate(char **errstr) {
         goto done;
       case G_IO_STATUS_NORMAL:
         if(NULL != line) {
-          ts = g_new0(struct cf_torrentstate, 1);
-          ptr = line;
-          while(NULL != (ptr = getstateval(ts, ptr)))
-            ;
+          if(g_utf8_validate(line, -1, NULL)) {
+            ts = g_new0(struct cf_torrentstate, 1);
+            ptr = line;
+            while(NULL != (ptr = getstateval(ts, ptr)))
+              ;
+            if(NULL != ts->ts_torrent && NULL != ts->ts_directory)
+              ret = g_list_append(ret, ts);
+            else
+              cf_freestate(ts);
+          }
           g_free(line);
-          if(NULL != ts->ts_torrent && NULL != ts->ts_directory)
-            ret = g_list_append(ret, ts);
-          else
-            cf_freestate(ts);
         }
         break;
       case G_IO_STATUS_EOF:
@@ -437,8 +440,6 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
 
   io = g_io_channel_unix_new(fd);
   g_io_channel_set_close_on_unref(io, TRUE);
-
-  /* XXX what the hell should I be doing about unicode? */
 
   err = NULL;
   for(ii = 0; ii < count; ii++) {
