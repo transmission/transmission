@@ -20,13 +20,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-typedef struct tr_upload_s tr_upload_t;
+typedef struct tr_ratecontrol_s tr_ratecontrol_t;
 
-tr_upload_t * tr_uploadInit();
-void          tr_uploadSetLimit( tr_upload_t *, int );
-int           tr_uploadCanUnchoke( tr_upload_t * );
-void          tr_uploadChoked( tr_upload_t * );
-void          tr_uploadUnchoked( tr_upload_t * );
-int           tr_uploadCanUpload( tr_upload_t * );
-void          tr_uploadUploaded( tr_upload_t *, int );
-void          tr_uploadClose( tr_upload_t * );
+tr_ratecontrol_t * tr_rcInit();
+void               tr_rcSetLimit( tr_ratecontrol_t *, int );
+int                tr_rcCanTransfer( tr_ratecontrol_t * );
+void               tr_rcTransferred( tr_ratecontrol_t *, int );
+float              tr_rcRate( tr_ratecontrol_t * );
+void               tr_rcClose( tr_ratecontrol_t * );

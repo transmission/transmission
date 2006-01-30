@@ -197,7 +197,7 @@ void tr_peerRem( tr_torrent_t * tor, int i )
     }
     if( !peer->amChoking )
     {
-        tr_uploadChoked( tor->upload );
+        //tr_uploadChoked( tor->upload );
     }
     tr_peerDestroy( tor->fdlimit, peer );
     tor->peerCount--;
@@ -242,6 +242,8 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         peer->pos  += ret;
         if( NULL != tor )
         {
+            tr_rcTransferred( tor->download, ret );
+            tr_rcTransferred( tor->globalDownload, ret );
             if( parseBuf( tor, peer, ret ) )
             {
                 return 1;
@@ -358,7 +360,7 @@ writeBegin:
         /* Send pieces if we can */
         while( ( p = blockPending( tor, peer, &size ) ) )
         {
-            if( !tr_uploadCanUpload( tor->upload ) )
+            if( !tr_rcCanTransfer( tor->globalUpload ) )
             {
                 break;
             }
@@ -374,7 +376,8 @@ writeBegin:
             }
 
             blockSent( peer, ret );
-            tr_uploadUploaded( tor->upload, ret );
+            tr_rcTransferred( tor->upload, ret );
+            tr_rcTransferred( tor->globalUpload, ret );
 
             tor->uploaded[9] += ret;
             peer->outTotal   += ret;

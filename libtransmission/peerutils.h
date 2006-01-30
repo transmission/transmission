@@ -165,13 +165,13 @@ static int checkPeer( tr_torrent_t * tor, int i )
         {
             /* He doesn't need us */
             sendChoke( peer, 1 );
-            tr_uploadChoked( tor->upload );
+            //tr_uploadChoked( tor->upload );
         }
-        if( peer->amChoking && peer->peerInterested &&
-            !peer->outSlow && tr_uploadCanUnchoke( tor->upload ) )
+        if( peer->amChoking && peer->peerInterested /* &&
+            !peer->outSlow && tr_uploadCanUnchoke( tor->upload ) */ )
         {
             sendChoke( peer, 0 );
-            tr_uploadUnchoked( tor->upload );
+            //tr_uploadUnchoked( tor->upload );
         }
     }
 

@@ -27,8 +27,6 @@
  **********************************************************************/
 static void torrentReallyStop( tr_handle_t * h, int t );
 static void  downloadLoop( void * );
-static float rateDownload( tr_torrent_t * );
-static float rateUpload( tr_torrent_t * );
 static void  acceptLoop( void * );
 static void acceptStop( tr_handle_t * h );
 
@@ -65,8 +63,9 @@ tr_handle_t * tr_init()
     signal( SIGPIPE, SIG_IGN );
 
     /* Initialize rate and file descripts controls */
-    h->upload  = tr_uploadInit();
-    h->fdlimit = tr_fdInit();
+    h->upload   = tr_rcInit();
+    h->download = tr_rcInit();
+    h->fdlimit  = tr_fdInit();
 
     h->bindPort = TR_DEFAULT_PORT;
     h->bindSocket = -1;
@@ -145,7 +144,7 @@ void tr_setBindPort( tr_handle_t * h, int port )
  **********************************************************************/
 void tr_setUploadLimit( tr_handle_t * h, int limit )
 {
-    tr_uploadSetLimit( h->upload, limit );
+    tr_rcSetLimit( h->upload, limit );
 }
 
 /***********************************************************************
@@ -155,20 +154,8 @@ void tr_setUploadLimit( tr_handle_t * h, int limit )
  **********************************************************************/
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
-    int            i;
-    tr_torrent_t * tor;
-
-    *dl = 0.0;
-    *ul = 0.0;
-
-    for( i = 0; i < h->torrentCount; i++ )
-    {
-        tor = h->torrents[i];
-        tr_lockLock( &tor->lock );
-        *dl += rateDownload( tor );
-        *ul += rateUpload( tor );
-        tr_lockUnlock( &tor->lock );
-    }
+    *dl = tr_rcRate( h->download );
+    *ul = tr_rcRate( h->upload );
 }
 
 /***********************************************************************
@@ -248,8 +235,11 @@ int tr_torrentInit( tr_handle_t * h, const char * path )
 
     tr_lockInit( &tor->lock );
 
-    tor->upload  = h->upload;
-    tor->fdlimit = h->fdlimit;
+    tor->globalUpload   = h->upload;
+    tor->globalDownload = h->download;
+    tor->fdlimit        = h->fdlimit;
+    tor->upload         = tr_rcInit();
+    tor->download       = tr_rcInit();
  
     /* We have a new torrent */
     tr_lockLock( &h->acceptLock );
@@ -419,8 +409,8 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         }
 
         s[i].progress     = tr_cpCompletionAsFloat( tor->completion );
-        s[i].rateDownload = rateDownload( tor );
-        s[i].rateUpload   = rateUpload( tor );
+        s[i].rateDownload = tr_rcRate( tor->download );
+        s[i].rateUpload   = tr_rcRate( tor->upload );
         
         s[i].seeders	  = tr_trackerSeeders(tor);
 		s[i].leechers	  = tr_trackerLeechers(tor);
@@ -496,6 +486,9 @@ void tr_torrentClose( tr_handle_t * h, int t )
     tr_lockClose( &tor->lock );
     tr_cpClose( tor->completion );
 
+    tr_rcClose( tor->upload );
+    tr_rcClose( tor->download );
+
     if( tor->destination )
     {
         free( tor->destination );
@@ -514,7 +507,7 @@ void tr_close( tr_handle_t * h )
 {
     acceptStop( h );
     tr_fdClose( h->fdlimit );
-    tr_uploadClose( h->upload );
+    tr_rcClose( h->upload );
     free( h );
 }
 
@@ -583,38 +576,6 @@ static void downloadLoop( void * _tor )
     tor->status = TR_STATUS_STOPPED;
 
     tr_dbg( "Thread exited" );
-}
-
-/***********************************************************************
- * rateDownload, rateUpload
- **********************************************************************/
-static float rateGeneric( uint64_t * dates, uint64_t * counts )
-{
-    float ret;
-    int i;
-
-    ret = 0.0;
-    for( i = 0; i < 9; i++ )
-    {
-        if( dates[i+1] == dates[i] )
-        {
-            continue;
-        }
-        ret += (float) ( i + 1 ) * 1000.0 / 1024.0 *
-            (float) ( counts[i+1] - counts[i] ) /
-            (float) ( dates[i+1] - dates[i] );
-    }
-    ret *= 1000.0 / 1024.0 / 45.0;
-
-    return ret;
-}
-static float rateDownload( tr_torrent_t * tor )
-{
-    return rateGeneric( tor->dates, tor->downloaded );
-}
-static float rateUpload( tr_torrent_t * tor )
-{
-    return rateGeneric( tor->dates, tor->uploaded );
 }
 
 /***********************************************************************
