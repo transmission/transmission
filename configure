@@ -171,7 +171,7 @@ case $SYSTEM in
 
   Linux)
     DEFINES="$DEFINES SYS_LINUX"
-    LINKLIBS="$LINKLIBS -lpthread"
+    LINKLIBS="$LINKLIBS -lpthread -lm"
     ;;
 
   *)
