@@ -163,6 +163,7 @@ struct tr_handle_s
     tr_ratecontrol_t * upload;
     tr_ratecontrol_t * download;
     tr_fd_t      * fdlimit;
+    tr_choking_t * choking;
 
     int            bindPort;
     int            bindSocket;

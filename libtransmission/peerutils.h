@@ -135,22 +135,6 @@ static int checkPeer( tr_torrent_t * tor, int i )
         return 1;
     }
 
-    /* TODO: check for bad downloaders */
-
-#if 0
-    /* Choke unchoked peers we are not sending anything to */
-    if( !peer->amChoking && tr_date() > peer->outDate + 10000 )
-    {
-        peer_dbg( "not worth the unchoke" );
-        if( sendChoke( peer, 1 ) )
-        {
-            goto dropPeer;
-        }
-        peer->outSlow = 1;
-        tr_uploadChoked( tor->upload );
-    }
-#endif
-
     if( peer->status & PEER_STATUS_CONNECTED )
     {
         /* Send keep-alive every 2 minutes */
@@ -158,21 +142,6 @@ static int checkPeer( tr_torrent_t * tor, int i )
         {
             sendKeepAlive( peer );
             peer->keepAlive = tr_date();
-        }
-
-        /* Choke or unchoke some people */
-        /* TODO: prefer people who upload to us */
-        if( !peer->amChoking && !peer->peerInterested )
-        {
-            /* He doesn't need us */
-            sendChoke( peer, 1 );
-            //tr_uploadChoked( tor->upload );
-        }
-        if( peer->amChoking && peer->peerInterested /* &&
-            !peer->outSlow && tr_uploadCanUnchoke( tor->upload ) */ )
-        {
-            sendChoke( peer, 0 );
-            //tr_uploadUnchoked( tor->upload );
         }
     }
 

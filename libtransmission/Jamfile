@@ -3,7 +3,7 @@ SubDir TOP libtransmission ;
 LIBTRANSMISSION_SRC =
     transmission.c bencode.c net.c tracker.c peer.c inout.c
     metainfo.c sha1.c utils.c fdlimit.c clients.c completion.c
-    platform.c ratecontrol.c ;
+    platform.c ratecontrol.c choking.c ;
 
 Library       libtransmission.a       : $(LIBTRANSMISSION_SRC) ;
 ObjectDefines $(LIBTRANSMISSION_SRC)  : __TRANSMISSION__ ;

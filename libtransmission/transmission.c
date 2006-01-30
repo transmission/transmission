@@ -66,6 +66,7 @@ tr_handle_t * tr_init()
     h->upload   = tr_rcInit();
     h->download = tr_rcInit();
     h->fdlimit  = tr_fdInit();
+    h->choking  = tr_chokingInit( h );
 
     h->bindPort = TR_DEFAULT_PORT;
     h->bindSocket = -1;
@@ -145,6 +146,7 @@ void tr_setBindPort( tr_handle_t * h, int port )
 void tr_setUploadLimit( tr_handle_t * h, int limit )
 {
     tr_rcSetLimit( h->upload, limit );
+    tr_chokingSetLimit( h->choking, limit );
 }
 
 /***********************************************************************
@@ -499,6 +501,7 @@ void tr_torrentClose( tr_handle_t * h, int t )
 void tr_close( tr_handle_t * h )
 {
     acceptStop( h );
+    tr_chokingClose( h->choking );
     tr_fdClose( h->fdlimit );
     tr_rcClose( h->upload );
     free( h );
@@ -580,7 +583,6 @@ static void acceptLoop( void * _h )
     uint64_t      date1, date2, lastchoke = 0;
     int           ii, jj;
     uint8_t     * hash;
-    //tr_choking_t * choking = tr_chokingInit( h );
 
     tr_dbg( "Accept thread started" );
 
@@ -649,7 +651,7 @@ static void acceptLoop( void * _h )
 
         if( date1 > lastchoke + 2000 )
         {
-            //tr_chokingPulse( choking );
+            tr_chokingPulse( h->choking );
             lastchoke = date1;
         }
 
@@ -664,7 +666,6 @@ static void acceptLoop( void * _h )
     }
 
     tr_lockUnlock( &h->acceptLock );
-    //tr_chokingClose( choking );
 
     tr_dbg( "Accept thread exited" );
 }

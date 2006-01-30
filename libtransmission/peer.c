@@ -53,6 +53,8 @@ struct tr_peer_s
     char           peerChoking;
     char           peerInterested;
 
+    uint64_t       lastChoke;
+
     uint8_t        id[20];
 
     uint8_t      * bitfield;
@@ -197,10 +199,6 @@ void tr_peerRem( tr_torrent_t * tor, int i )
         r     = &peer->inRequests[j];
         block = tr_block( r->index,r->begin );
         tr_cpDownloaderRem( tor->completion, block );
-    }
-    if( !peer->amChoking )
-    {
-        //tr_uploadChoked( tor->upload );
     }
     tr_peerDestroy( tor->fdlimit, peer );
     tor->peerCount--;
@@ -463,4 +461,31 @@ uint8_t * tr_peerBitfield( tr_peer_t * peer )
 float tr_peerDownloadRate( tr_peer_t * peer )
 {
     return tr_rcRate( peer->download );
+}
+
+int tr_peerIsUnchoked( tr_peer_t * peer )
+{
+    return !peer->amChoking;
+}
+
+int tr_peerIsInterested  ( tr_peer_t * peer )
+{
+    return peer->peerInterested;
+}
+
+void tr_peerChoke( tr_peer_t * peer )
+{
+    sendChoke( peer, 1 );
+    peer->lastChoke = tr_date();
+}
+
+void tr_peerUnchoke( tr_peer_t * peer )
+{
+    sendChoke( peer, 0 );
+    peer->lastChoke = tr_date();
+}
+
+uint64_t tr_peerLastChoke( tr_peer_t * peer )
+{
+    return peer->lastChoke;
 }

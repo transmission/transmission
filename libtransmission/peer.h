@@ -39,5 +39,10 @@ int         tr_peerIsUploading   ( tr_peer_t * );
 int         tr_peerIsDownloading ( tr_peer_t * );
 uint8_t *   tr_peerBitfield      ( tr_peer_t * );
 float       tr_peerDownloadRate  ( tr_peer_t * );
+int         tr_peerIsUnchoked    ( tr_peer_t * );
+int         tr_peerIsInterested  ( tr_peer_t * );
+void        tr_peerChoke         ( tr_peer_t * );
+void        tr_peerUnchoke       ( tr_peer_t * );
+uint64_t    tr_peerLastChoke     ( tr_peer_t * );
 
 #endif
