@@ -146,9 +146,9 @@ struct tr_torrent_s
     int               peerCount;
     tr_peer_t       * peers[TR_MAX_PEER_COUNT];
 
-    uint64_t          dates[10];
-    uint64_t          downloaded[10];
-    uint64_t          uploaded[10];
+    uint64_t          date;
+    uint64_t          downloaded;
+    uint64_t          uploaded;
 };
 
 #include "utils.h"

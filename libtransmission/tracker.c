@@ -282,7 +282,7 @@ static void sendQuery( tr_tracker_t * tc )
             "User-Agent: Transmission/%d.%d\r\n"
             "Connection: close\r\n\r\n",
             inf->trackerAnnounce, tor->hashString, tc->id,
-            tc->bindPort, tor->uploaded[9], tor->downloaded[9],
+            tc->bindPort, tor->uploaded, tor->downloaded,
             left, tor->key, event, inf->trackerAddress,
             VERSION_MAJOR, VERSION_MINOR );
 

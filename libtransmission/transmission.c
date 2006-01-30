@@ -278,8 +278,6 @@ char * tr_torrentGetFolder( tr_handle_t * h, int t )
 void tr_torrentStart( tr_handle_t * h, int t )
 {
     tr_torrent_t * tor = h->torrents[t];
-    uint64_t       now;
-    int            i;
 
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
     {
@@ -290,12 +288,7 @@ void tr_torrentStart( tr_handle_t * h, int t )
     tor->status   = TR_STATUS_CHECK;
     tor->tracker  = tr_trackerInit( h, tor );
 
-    now = tr_date();
-    for( i = 0; i < 10; i++ )
-    {
-        tor->dates[i] = now;
-    }
-
+    tor->date = tr_date();
     tor->die = 0;
     tr_threadCreate( &tor->thread, downloadLoop, tor );
 }
@@ -331,8 +324,8 @@ static void torrentReallyStop( tr_handle_t * h, int t )
         tr_peerRem( tor, 0 );
     }
 
-    memset( tor->downloaded, 0, sizeof( tor->downloaded ) );
-    memset( tor->uploaded,   0, sizeof( tor->uploaded ) );
+    tor->downloaded = 0;
+    tor->uploaded   = 0;
 }
 
 /***********************************************************************
@@ -451,8 +444,8 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
             }
         }
 
-        s[i].downloaded = tor->downloaded[9];
-        s[i].uploaded   = tor->uploaded[9];
+        s[i].downloaded = tor->downloaded;
+        s[i].uploaded   = tor->uploaded;
 
         s[i].folder = tor->destination;
 

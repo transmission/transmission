@@ -268,6 +268,8 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return 1;
     }
 
+    tor->downloaded += r->length;
+
     block = tr_block( r->index, r->begin );
     if( tr_cpBlockIsComplete( tor->completion, block ) )
     {
@@ -438,8 +440,7 @@ static uint8_t * parseBufHash( tr_peer_t * peer )
     }
 }
 
-static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer,
-                            int newBytes )
+static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
 {
     tr_info_t * inf = &tor->info;
 
@@ -521,15 +522,6 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer,
             peer_dbg( "GET  keep-alive" );
             peer->pos -= 4;
             continue;
-        }
-
-        /* That's a piece coming */
-        if( p < end && *p == 7 )
-        {
-            /* XXX */
-            tor->downloaded[9] += newBytes;
-            peer->inTotal      += newBytes;
-            newBytes            = 0;
         }
 
         if( &p[len] > end )

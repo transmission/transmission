@@ -244,7 +244,7 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         {
             tr_rcTransferred( tor->download, ret );
             tr_rcTransferred( tor->globalDownload, ret );
-            if( parseBuf( tor, peer, ret ) )
+            if( parseBuf( tor, peer ) )
             {
                 return 1;
             }
@@ -282,15 +282,9 @@ void tr_peerPulse( tr_torrent_t * tor )
     uint8_t * p;
     tr_peer_t * peer;
 
-    tor->dates[9] = tr_date();
-    if( tor->dates[9] > tor->dates[8] + 1000 )
+    if( tr_date() > tor->date + 1000 )
     {
-        memmove( &tor->downloaded[0], &tor->downloaded[1],
-                 9 * sizeof( uint64_t ) );
-        memmove( &tor->uploaded[0], &tor->uploaded[1],
-                 9 * sizeof( uint64_t ) );
-        memmove( &tor->dates[0], &tor->dates[1],
-                 9 * sizeof( uint64_t ) );
+        tor->date = tr_date();
 
         for( i = 0; i < tor->peerCount; )
         {
@@ -379,9 +373,9 @@ writeBegin:
             tr_rcTransferred( tor->upload, ret );
             tr_rcTransferred( tor->globalUpload, ret );
 
-            tor->uploaded[9] += ret;
-            peer->outTotal   += ret;
-            peer->outDate     = tr_date();
+            tor->uploaded  += ret;
+            peer->outTotal += ret;
+            peer->outDate   = tr_date();
 
             /* In case this block is done, you may have messages
                pending. Send them before we start the next block */
