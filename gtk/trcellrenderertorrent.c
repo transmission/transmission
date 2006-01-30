@@ -1,4 +1,4 @@
-/* gtkcellrenderertorrent.c
+/* trcellrenderertorrent.c
  * Copyright (C) 2002 Naba Kumar <kh_naba@users.sourceforge.net>
  * heavily modified by Jörgen Scheibengruber <mfcn@gmx.de>
  * heavily modified by Marco Pesenti Gritti <marco@gnome.org>
@@ -28,12 +28,12 @@
 
 #include <gtk/gtk.h>
 
-#include "gtkcellrenderertorrent.h"
+#include "trcellrenderertorrent.h"
 #include "util.h"
 
 enum { PROP_0, PROP_VALUE, PROP_TEXT, PROP_LABEL }; 
 
-struct _GtkCellRendererTorrentPrivate {
+struct _TrCellRendererTorrentPrivate {
   gfloat value;
   gchar *text;
   PangoAttrList *text_attrs;
@@ -56,10 +56,10 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
        GdkRectangle *bg, GdkRectangle *area, GdkRectangle *exp, guint flags);
 
      
-G_DEFINE_TYPE(GtkCellRendererTorrent, gtk_cell_renderer_torrent, GTK_TYPE_CELL_RENDERER);
+G_DEFINE_TYPE(TrCellRendererTorrent, tr_cell_renderer_torrent, GTK_TYPE_CELL_RENDERER);
 
 static void
-gtk_cell_renderer_torrent_class_init (GtkCellRendererTorrentClass *klass) {
+tr_cell_renderer_torrent_class_init (TrCellRendererTorrentClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkCellRendererClass *cell_class = GTK_CELL_RENDERER_CLASS (klass);
   
@@ -87,13 +87,13 @@ gtk_cell_renderer_torrent_class_init (GtkCellRendererTorrentClass *klass) {
                          NULL, G_PARAM_READWRITE));
 
   g_type_class_add_private (object_class, 
-			    sizeof (GtkCellRendererTorrentPrivate));
+			    sizeof (TrCellRendererTorrentPrivate));
 }
 
 static void
-gtk_cell_renderer_torrent_init(GtkCellRendererTorrent *tcell) {
+tr_cell_renderer_torrent_init(TrCellRendererTorrent *tcell) {
   tcell->priv = G_TYPE_INSTANCE_GET_PRIVATE(
-    tcell, GTK_TYPE_CELL_RENDERER_TORRENT, GtkCellRendererTorrentPrivate);
+    tcell, GTK_TYPE_CELL_RENDERER_TORRENT, TrCellRendererTorrentPrivate);
   tcell->priv->value = 0.0;
   tcell->priv->text = g_strdup("");
   tcell->priv->text_attrs = NULL;
@@ -103,13 +103,13 @@ gtk_cell_renderer_torrent_init(GtkCellRendererTorrent *tcell) {
 }
 
 GtkCellRenderer*
-gtk_cell_renderer_torrent_new(void) {
+tr_cell_renderer_torrent_new(void) {
   return g_object_new (GTK_TYPE_CELL_RENDERER_TORRENT, NULL);
 }
 
 /* XXX need to do this better somehow */
 void
-gtk_cell_renderer_torrent_reset_style(GtkCellRendererTorrent *tor) {
+tr_cell_renderer_torrent_reset_style(TrCellRendererTorrent *tor) {
   if(NULL != tor->priv->style) {
     gtk_style_detach(tor->priv->style);
     gtk_style_unref(tor->priv->style);
@@ -119,7 +119,7 @@ gtk_cell_renderer_torrent_reset_style(GtkCellRendererTorrent *tor) {
 
 static void
 finalize(GObject *object) {
-  GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT(object);
+  TrCellRendererTorrent *tcell = TR_CELL_RENDERER_TORRENT(object);
 
   g_free(tcell->priv->text);
   g_free(tcell->priv->label);
@@ -133,12 +133,12 @@ finalize(GObject *object) {
     gtk_style_unref(tcell->priv->style);
   }
 
-  G_OBJECT_CLASS (gtk_cell_renderer_torrent_parent_class)->finalize(object);
+  G_OBJECT_CLASS (tr_cell_renderer_torrent_parent_class)->finalize(object);
 }
 
 static void
 get_property(GObject *object, guint id, GValue *value, GParamSpec *pspec) {
-  GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT (object);
+  TrCellRendererTorrent *tcell = TR_CELL_RENDERER_TORRENT (object);
   
   switch (id) {
     case PROP_VALUE:
@@ -157,7 +157,7 @@ get_property(GObject *object, guint id, GValue *value, GParamSpec *pspec) {
 
 static void
 set_property(GObject *obj, guint id, const GValue *value, GParamSpec *spec) {
-  GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT(obj);
+  TrCellRendererTorrent *tcell = TR_CELL_RENDERER_TORRENT(obj);
   gchar **prop = NULL; 
   PangoAttrList **attrs = NULL;
   /*GError *err = NULL;*/
@@ -205,7 +205,7 @@ set_property(GObject *obj, guint id, const GValue *value, GParamSpec *spec) {
 static void
 get_size(GtkCellRenderer *cell, GtkWidget *widget, GdkRectangle *area,
          gint *xoff, gint *yoff, gint *width, gint *height) {
-  GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT(cell);
+  TrCellRendererTorrent *tcell = TR_CELL_RENDERER_TORRENT(cell);
   /* XXX do I have to unref the context? */
   PangoLayout *layout = pango_layout_new(gtk_widget_get_pango_context(widget));
   PangoRectangle rect;
@@ -240,7 +240,7 @@ static void
 render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
        GdkRectangle *bg SHUTUP, GdkRectangle *area, GdkRectangle *exp SHUTUP,
        guint flags) {
-  GtkCellRendererTorrent *tcell = GTK_CELL_RENDERER_TORRENT(cell);
+  TrCellRendererTorrent *tcell = TR_CELL_RENDERER_TORRENT(cell);
   PangoContext *ctx = gtk_widget_get_pango_context(widget);
   PangoLayout *llayout, *tlayout;
   PangoRectangle lrect, trect;

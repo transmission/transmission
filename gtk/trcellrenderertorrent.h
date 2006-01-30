@@ -1,4 +1,4 @@
-/* gtkcellrenderertorrent.h
+/* trcellrenderertorrent.h
  * Copyright (C) 2002 Naba Kumar <kh_naba@users.sourceforge.net>
  * modified by Jörgen Scheibengruber <mfcn@gmx.de>
  *
@@ -24,33 +24,33 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-#ifndef __GTK_CELL_RENDERER_TORRENT_H__
-#define __GTK_CELL_RENDERER_TORRENT_H__
+#ifndef __TR_CELL_RENDERER_TORRENT_H__
+#define __TR_CELL_RENDERER_TORRENT_H__
 
 #include <gtk/gtkcellrenderer.h>
 
 G_BEGIN_DECLS
 
-#define GTK_TYPE_CELL_RENDERER_TORRENT (gtk_cell_renderer_torrent_get_type ())
-#define GTK_CELL_RENDERER_TORRENT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_CELL_RENDERER_TORRENT, GtkCellRendererTorrent))
-#define GTK_CELL_RENDERER_TORRENT_CLASS(klass)	  (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_CELL_RENDERER_TORRENT, GtkCellRendererTorrentClass))
+#define GTK_TYPE_CELL_RENDERER_TORRENT (tr_cell_renderer_torrent_get_type ())
+#define TR_CELL_RENDERER_TORRENT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_CELL_RENDERER_TORRENT, TrCellRendererTorrent))
+#define TR_CELL_RENDERER_TORRENT_CLASS(klass)	  (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_CELL_RENDERER_TORRENT, TrCellRendererTorrentClass))
 #define GTK_IS_CELL_RENDERER_TORRENT(obj)	  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_CELL_RENDERER_TORRENT))
 #define GTK_IS_CELL_RENDERER_TORRENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_CELL_RENDERER_TORRENT))
-#define GTK_CELL_RENDERER_TORRENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_CELL_RENDERER_TORRENT, GtkCellRendererTorrentClass))
+#define TR_CELL_RENDERER_TORRENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_CELL_RENDERER_TORRENT, TrCellRendererTorrentClass))
 
-typedef struct _GtkCellRendererTorrent         GtkCellRendererTorrent;
-typedef struct _GtkCellRendererTorrentClass    GtkCellRendererTorrentClass;
-typedef struct _GtkCellRendererTorrentPrivate  GtkCellRendererTorrentPrivate;
+typedef struct _TrCellRendererTorrent         TrCellRendererTorrent;
+typedef struct _TrCellRendererTorrentClass    TrCellRendererTorrentClass;
+typedef struct _TrCellRendererTorrentPrivate  TrCellRendererTorrentPrivate;
 
-struct _GtkCellRendererTorrent
+struct _TrCellRendererTorrent
 {
   GtkCellRenderer parent_instance;
   
   /*< private >*/
-  GtkCellRendererTorrentPrivate *priv;
+  TrCellRendererTorrentPrivate *priv;
 };
 
-struct _GtkCellRendererTorrentClass
+struct _TrCellRendererTorrentClass
 {
   GtkCellRendererClass parent_class;
 
@@ -61,10 +61,10 @@ struct _GtkCellRendererTorrentClass
   void (*_gtk_reserved4) (void);
 };
 
-GType		 gtk_cell_renderer_torrent_get_type (void) G_GNUC_CONST;
-GtkCellRenderer* gtk_cell_renderer_torrent_new      (void);
-void gtk_cell_renderer_torrent_reset_style(GtkCellRendererTorrent *);
+GType		 tr_cell_renderer_torrent_get_type (void) G_GNUC_CONST;
+GtkCellRenderer* tr_cell_renderer_torrent_new      (void);
+void tr_cell_renderer_torrent_reset_style(TrCellRendererTorrent *);
 
 G_END_DECLS
 
-#endif  /* __GTK_CELL_RENDERER_TORRENT_H__ */
+#endif  /* __TR_CELL_RENDERER_TORRENT_H__ */

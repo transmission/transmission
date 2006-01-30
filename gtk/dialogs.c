@@ -32,7 +32,7 @@
 #include <gtk/gtk.h>
 
 #include "conf.h"
-#include "prefs.h"
+#include "dialogs.h"
 #include "transmission.h"
 #include "util.h"
 

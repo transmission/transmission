@@ -36,9 +36,9 @@
 #include <gtk/gtk.h>
 
 #include "conf.h"
-#include "gtkcellrenderertorrent.h"
-#include "prefs.h"
+#include "dialogs.h"
 #include "transmission.h"
+#include "trcellrenderertorrent.h"
 #include "util.h"
 
 #define TRACKER_EXIT_TIMEOUT    5
@@ -466,7 +466,7 @@ makewind_list(struct cbdata *data) {
   gtk_tree_view_column_set_expand(col, TRUE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
-  progrend = gtk_cell_renderer_torrent_new();
+  progrend = tr_cell_renderer_torrent_new();
   g_object_set(progrend, "label", "<big>  fnord    fnord  </big>", NULL);
   col = gtk_tree_view_column_new_with_attributes("Progress", progrend, NULL);
   gtk_tree_view_column_set_cell_data_func(col, progrend, dfprog, NULL, NULL);
@@ -493,7 +493,7 @@ makewind_list(struct cbdata *data) {
 static void
 stylekludge(GObject *obj, GParamSpec *spec, gpointer gdata) {
   if(0 == strcmp("style", spec->name)) {
-    gtk_cell_renderer_torrent_reset_style(GTK_CELL_RENDERER_TORRENT(gdata));
+    tr_cell_renderer_torrent_reset_style(TR_CELL_RENDERER_TORRENT(gdata));
     gtk_widget_queue_draw(GTK_WIDGET(obj));
   }
 }
