@@ -36,6 +36,7 @@ static tr_peer_t * peerInit()
     peer->peerChoking = 1;
     peer->date        = tr_date();
     peer->keepAlive   = peer->date;
+    peer->download    = tr_rcInit();
 
     return peer;
 }

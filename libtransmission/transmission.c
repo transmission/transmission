@@ -577,9 +577,10 @@ static void downloadLoop( void * _tor )
 static void acceptLoop( void * _h )
 {
     tr_handle_t * h = _h;
-    uint64_t      date1, date2;
+    uint64_t      date1, date2, lastchoke = 0;
     int           ii, jj;
     uint8_t     * hash;
+    tr_choking_t * choking = tr_chokingInit( h );
 
     tr_dbg( "Accept thread started" );
 
@@ -646,6 +647,12 @@ static void acceptLoop( void * _h )
                      ( h->acceptPeerCount - ii ) * sizeof( tr_peer_t * ) );
         }
 
+        if( date1 > lastchoke + 2000 )
+        {
+            tr_chokingPulse( choking );
+            lastchoke = date1;
+        }
+
         /* Wait up to 20 ms */
         date2 = tr_date();
         if( date2 < date1 + 20 )
@@ -657,6 +664,7 @@ static void acceptLoop( void * _h )
     }
 
     tr_lockUnlock( &h->acceptLock );
+    tr_chokingClose( choking );
 
     tr_dbg( "Accept thread exited" );
 }

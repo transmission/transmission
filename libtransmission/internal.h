@@ -95,6 +95,7 @@ typedef struct tr_completion_s tr_completion_t;
 #include "inout.h"
 #include "ratecontrol.h"
 #include "clients.h"
+#include "choking.h"
 
 struct tr_torrent_s
 {

@@ -81,6 +81,8 @@ struct tr_peer_s
     uint64_t       outTotal;
     uint64_t       outDate;
     int            outSlow;
+
+    tr_ratecontrol_t * download;
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
@@ -172,6 +174,7 @@ void tr_peerDestroy( tr_fd_t * fdlimit, tr_peer_t * peer )
         tr_netClose( peer->socket );
         tr_fdSocketClosed( fdlimit, 0 );
     }
+    tr_rcClose( peer->download );
     free( peer );
 }
 
@@ -242,6 +245,7 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         peer->pos  += ret;
         if( NULL != tor )
         {
+            tr_rcTransferred( peer->download, ret );
             tr_rcTransferred( tor->download, ret );
             tr_rcTransferred( tor->globalDownload, ret );
             if( parseBuf( tor, peer ) )
@@ -454,4 +458,9 @@ int tr_peerIsDownloading( tr_peer_t * peer )
 uint8_t * tr_peerBitfield( tr_peer_t * peer )
 {
     return peer->bitfield;
+}
+
+float tr_peerDownloadRate( tr_peer_t * peer )
+{
+    return tr_rcRate( peer->download );
 }

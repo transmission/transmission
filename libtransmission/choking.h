@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2006 Eric Petit
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,24 +20,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_PEER_H
-#define TR_PEER_H 1
+typedef struct tr_choking_s tr_choking_t;
 
-typedef struct tr_peer_s tr_peer_t;
-
-void        tr_peerAddOld        ( tr_torrent_t *, char *, int );
-void        tr_peerAddCompact    ( tr_torrent_t *, struct in_addr, in_port_t );
-tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int );
-void        tr_peerAttach        ( tr_torrent_t *, tr_peer_t * );
-void        tr_peerDestroy       ( tr_fd_t *, tr_peer_t * );
-void        tr_peerRem           ( tr_torrent_t *, int );
-int         tr_peerRead          ( tr_torrent_t *, tr_peer_t * );
-uint8_t *   tr_peerHash          ( tr_peer_t * );
-void        tr_peerPulse         ( tr_torrent_t * );
-int         tr_peerIsConnected   ( tr_peer_t * );
-int         tr_peerIsUploading   ( tr_peer_t * );
-int         tr_peerIsDownloading ( tr_peer_t * );
-uint8_t *   tr_peerBitfield      ( tr_peer_t * );
-float       tr_peerDownloadRate  ( tr_peer_t * );
-
-#endif
+tr_choking_t * tr_chokingInit( tr_handle_t * );
+void           tr_chokingSetLimit( tr_choking_t *, int );
+void           tr_chokingPulse( tr_choking_t * );
+void           tr_chokingClose( tr_choking_t * );

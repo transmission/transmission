@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2006 Eric Petit
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,24 +20,48 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TR_PEER_H
-#define TR_PEER_H 1
+#include "transmission.h"
 
-typedef struct tr_peer_s tr_peer_t;
+#define MAX_HISTORY 30
 
-void        tr_peerAddOld        ( tr_torrent_t *, char *, int );
-void        tr_peerAddCompact    ( tr_torrent_t *, struct in_addr, in_port_t );
-tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int );
-void        tr_peerAttach        ( tr_torrent_t *, tr_peer_t * );
-void        tr_peerDestroy       ( tr_fd_t *, tr_peer_t * );
-void        tr_peerRem           ( tr_torrent_t *, int );
-int         tr_peerRead          ( tr_torrent_t *, tr_peer_t * );
-uint8_t *   tr_peerHash          ( tr_peer_t * );
-void        tr_peerPulse         ( tr_torrent_t * );
-int         tr_peerIsConnected   ( tr_peer_t * );
-int         tr_peerIsUploading   ( tr_peer_t * );
-int         tr_peerIsDownloading ( tr_peer_t * );
-uint8_t *   tr_peerBitfield      ( tr_peer_t * );
-float       tr_peerDownloadRate  ( tr_peer_t * );
+struct tr_choking_s
+{
+    tr_lock_t     lock;
+    tr_handle_t * h;
+    int           slotsMax;
+    int           slotsUsed;
+};
 
-#endif
+tr_choking_t * tr_chokingInit( tr_handle_t * h )
+{
+    tr_choking_t * c;
+
+    c           = calloc( sizeof( tr_choking_t ), 1 );
+    c->h        = h;
+    c->slotsMax = 4242;
+    tr_lockInit( &c->lock );
+
+    return c;
+}
+
+void tr_chokingSetLimit( tr_choking_t * c, int limit )
+{
+    tr_lockLock( &c->lock );
+    if( limit < 0 )
+        c->slotsMax = 4242;
+    else
+        c->slotsMax = lrintf( sqrt( 2 * limit ) );
+    tr_lockUnlock( &c->lock );
+}
+
+void tr_chokingPulse( tr_choking_t * c )
+{
+    tr_lockLock( &c->lock );
+    tr_lockUnlock( &c->lock );
+}
+
+void tr_chokingClose( tr_choking_t * c )
+{
+    tr_lockClose( &c->lock );
+    free( c );
+}
