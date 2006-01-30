@@ -504,6 +504,7 @@ void tr_close( tr_handle_t * h )
     tr_chokingClose( h->choking );
     tr_fdClose( h->fdlimit );
     tr_rcClose( h->upload );
+    tr_rcClose( h->download );
     free( h );
 }
 
