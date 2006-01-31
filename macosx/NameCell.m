@@ -34,9 +34,15 @@
     fSizeString  = [NSString stringWithFormat: @" (%@)",
                     [NSString stringForFileSize: stat->info.totalSize]];
 
-    fIcon = [[NSWorkspace sharedWorkspace] iconForFile:
-                [[NSString stringWithUTF8String: stat->folder]
-                stringByAppendingPathComponent: fNameString]];                  
+    if( stat->folder )
+        fIcon = [[NSWorkspace sharedWorkspace] iconForFile:
+                    [[NSString stringWithUTF8String: stat->folder]
+                    stringByAppendingPathComponent: fNameString]];
+    else
+        /* XXX The torrent is still being opened, the destination hasn't
+           been chosen yet. It shouldn't be added to the table view so
+           soon */
+        fIcon = [[NSWorkspace sharedWorkspace] iconForFile: @"/System"];
     [fIcon setFlipped: YES];
 
     fTimeString  = @"";
