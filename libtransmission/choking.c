@@ -140,7 +140,7 @@ void tr_chokingPulse( tr_choking_t * c )
             tr_peerChoke( peersCanChoke[i] );
         peersCanChokeCount -= willChoke;
         memmove( &peersCanChoke[0], &peersCanChoke[willChoke],
-                 peersCanChokeCount );
+                 peersCanChokeCount * sizeof( tr_peer_t * ) );
     }
     else if( unchokedCount < c->slots && peersCanUnchokeCount > 0 )
     {
@@ -161,7 +161,8 @@ void tr_chokingPulse( tr_choking_t * c )
         tr_peerUnchoke( peersCanUnchoke[peersCanUnchokeCount - 1] );
         peersCanChokeCount--;
         peersCanUnchokeCount--;
-        memmove( &peersCanChoke[0], &peersCanChoke[1], peersCanChokeCount );
+        memmove( &peersCanChoke[0], &peersCanChoke[1],
+                 peersCanChokeCount * sizeof( tr_peer_t * ) );
     }
 
     free( peersCanChoke );
