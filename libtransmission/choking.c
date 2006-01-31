@@ -132,7 +132,7 @@ void tr_chokingPulse( tr_choking_t * c )
     sortPeers( peersCanChoke, peersCanChokeCount );
     sortPeers( peersCanUnchoke, peersCanUnchokeCount );
 
-    if( unchokedCount > c->slots )
+    if( unchokedCount > c->slots && peersCanChokeCount > 0 )
     {
         int willChoke;
         willChoke = MIN( peersCanChokeCount, unchokedCount - c->slots );
@@ -142,7 +142,7 @@ void tr_chokingPulse( tr_choking_t * c )
         memmove( &peersCanChoke[0], &peersCanChoke[willChoke],
                  peersCanChokeCount );
     }
-    else if( unchokedCount < c->slots )
+    else if( unchokedCount < c->slots && peersCanUnchokeCount > 0 )
     {
         int willUnchoke;
         willUnchoke = MIN( peersCanUnchokeCount, c->slots - unchokedCount );
@@ -154,7 +154,7 @@ void tr_chokingPulse( tr_choking_t * c )
     while( peersCanChokeCount > 0 && peersCanUnchokeCount > 0 )
     {
         if( tr_peerDownloadRate( peersCanUnchoke[peersCanUnchokeCount - 1] )
-                > tr_peerDownloadRate( peersCanChoke[0] ) )
+                < tr_peerDownloadRate( peersCanChoke[0] ) )
             break;
 
         tr_peerChoke( peersCanChoke[0] );
