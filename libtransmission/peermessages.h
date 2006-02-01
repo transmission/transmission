@@ -51,7 +51,7 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
         uint8_t * p;
         tr_request_t * r;
 
-        if( peer->outRequestCount < 1 )
+        if( peer->amChoking || peer->outRequestCount < 1 )
         {
             /* No piece to send */
             return NULL;
@@ -166,9 +166,10 @@ static void sendChoke( tr_peer_t * peer, int yes )
 
     peer->amChoking = yes;
 
-    if( yes )
+    if( !yes )
     {
-        /* Drop all pending requests */
+        /* Drop older requests from the last time it was unchoked,
+           if any */
         peer->outRequestCount = 0;
     }
 
