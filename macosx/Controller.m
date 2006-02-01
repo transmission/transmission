@@ -189,7 +189,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         NSString * message = active == 1
             ? @"There is an active torrent. Do you really want to quit?"
             : [NSString stringWithFormat:
-                @"There are %d active torrents. Do you really want to quit?", fDownloading];
+                @"There are %d active torrents. Do you really want to quit?",
+                active];
 
         NSBeginAlertSheet(@"Confirm Quit",
                             @"Quit", @"Cancel", nil,
