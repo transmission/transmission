@@ -67,9 +67,13 @@ static inline void cleanOldTransfers( tr_ratecontrol_t * r )
     for( t = r->last; t && t->date < old; )
     {
         prev = t->prev;
-        prev->next = NULL;
+        if( prev )
+            prev->next = NULL;
+        else
+            r->first = NULL;
         free( t );
-        t = prev;
+        t       = prev;
+        r->last = prev;
     }
 }
 
@@ -105,12 +109,19 @@ int tr_rcCanTransfer( tr_ratecontrol_t * r )
 void tr_rcTransferred( tr_ratecontrol_t * r, int size )
 {
     tr_transfer_t * t;
+
+    if( size < 100 )
+    {
+        return;
+    }
     
     tr_lockLock( &r->lock );
     t = malloc( sizeof( tr_transfer_t ) );
 
     if( r->first )
         r->first->prev = t;
+    if( !r->last )
+        r->last = t;
     t->next  = r->first;
     t->prev  = NULL;
     r->first = t;
