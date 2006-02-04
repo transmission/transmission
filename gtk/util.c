@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include "util.h"
 
@@ -58,13 +59,16 @@ strbool(const char *str) {
   return FALSE;
 }
 
+static const char *sizestrs[] = {
+  N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"), N_("PiB"), N_("EiB"),
+};
+
 char *
 readablesize(guint64 size, int decimals) {
-  const char *sizes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"};
   unsigned int ii;
   double small = size;
 
-  for(ii = 0; ii + 1 < ALEN(sizes) && 1024.0 <= small / 1024.0; ii++)
+  for(ii = 0; ii + 1 < ALEN(sizestrs) && 1024.0 <= small / 1024.0; ii++)
     small /= 1024.0;
 
   if(1024.0 <= small) {
@@ -72,7 +76,7 @@ readablesize(guint64 size, int decimals) {
     ii++;
   }
 
-  return g_strdup_printf("%.*f %s", decimals, small, sizes[ii]);
+  return g_strdup_printf("%.*f %s", decimals, small, gettext(sizestrs[ii]));
 }
 
 gboolean

@@ -11,6 +11,7 @@ usage()
     --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
     --openssl-prefix=PATH  Location of OpenSSL headers and library
     --disable-gtk          Don't build the GTK+ GUI
+    --prefix=PATH          Install here instead of $INSTALL_PREFIX
 
   Some influential environment variables:
     CC          C compiler command (default "cc")
@@ -62,6 +63,7 @@ EOF
         GTK=yes
         GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
         GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+        GTKLOCALEDIR="$INSTALL_PREFIX/share/locale"
       else
         echo "GTK+:    no"
         GTK=no
@@ -91,6 +93,12 @@ gtk_disable=0
 GTK=no
 GTKCCFLAGS=
 GTKLINKLIBS=
+GTKLOCALEDIR=
+if [ -n "$PREFIX" ]; then
+    INSTALL_PREFIX=$PREFIX
+else
+    INSTALL_PREFIX=/usr/local
+fi
 
 #
 # Parse options
@@ -107,6 +115,9 @@ while [ $# -ne 0 ]; do
       ;;
     x--disable-gtk)
       gtk_disable="1";
+      ;;
+    x--prefix=*)
+      INSTALL_PREFIX="$param";
       ;;
     x--help)
       usage
@@ -235,6 +246,16 @@ fi
 if [ -n "$CPU" ]; then
 cat >> config.jam << EOF
 CPU        = $CPU ;
+EOF
+fi
+
+if [ xyes = "x$GTK" ]; then
+    rm -f gtk/defines.h
+    cat > gtk/defines.h << EOF
+#ifndef TG_DEFINES_H
+#define TG_DEFINES_H
+#define LOCALEDIR               "$GTKLOCALEDIR"
+#endif
 EOF
 fi
 

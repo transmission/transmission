@@ -44,6 +44,7 @@
 typedef void (*callbackfunc_t)(void*);
 
 /* try to interpret a string as a textual representation of a boolean */
+/* note that this isn't localized */
 gboolean
 strbool(const char *str);
 
