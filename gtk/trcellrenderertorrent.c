@@ -281,13 +281,15 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
   complete.width = (bar.width - style->xthickness * 2) * tcell->priv->value;
   complete.height = bar.height - style->ythickness * 2;
   if(rtl)
-    complete.x += bar.width - complete.width;
+    complete.x += bar.width - (complete.width + style->xthickness * 2);
 
   /* set up the dimensions for the text under the bar */
   text.x = bar.x;
   text.y = bar.y + bar.height;
   text.width = bar.width;
   text.height = area->height - bar.height;
+  if(rtl && text.width > trect.width)
+    text.x += text.width - trect.width;
 
   /* draw the background of the bar */
   if(complete.width < bar.width)
@@ -300,7 +302,7 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
                   NULL, widget, "bar", RECTARGS(complete));
 
   /* draw the text under the bar */
-  gtk_paint_layout(style, window, (GTK_CELL_RENDERER_SELECTED & flags ?
+  gtk_paint_layout(widget->style, window, (GTK_CELL_RENDERER_SELECTED & flags ?
                    GTK_STATE_SELECTED : GTK_STATE_NORMAL), FALSE, &text,
                    widget, "cellrenderertext", text.x, text.y, tlayout);
 
