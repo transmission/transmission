@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
+#import "Utils.h"
 
 #define MIN_PORT            1
 #define MAX_PORT            65535
@@ -73,7 +74,8 @@
     [fPrefsWindow setToolbar: fToolbar];
     [fToolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [fToolbar setSizeMode: NSToolbarSizeModeRegular];
-    [fPrefsWindow setShowsToolbarButton: NO];
+    [[fPrefsWindow standardWindowButton: NSWindowToolbarButton]
+        setFrame: NSZeroRect];
     
     [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
     [self setPrefView: fGeneralView];
