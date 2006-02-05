@@ -100,7 +100,7 @@ int tr_rcCanTransfer( tr_ratecontrol_t * r )
     int ret;
 
     tr_lockLock( &r->lock );
-    ret = ( r->limit < -1 ) || ( rateForInterval( r, 1000 ) < r->limit );
+    ret = ( r->limit < 0 ) || ( rateForInterval( r, 1000 ) < r->limit );
     tr_lockUnlock( &r->lock );
 
     return ret;
