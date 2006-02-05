@@ -105,6 +105,29 @@ mkdir_p(const char *name, mode_t mode) {
   return TRUE;
 }
 
+char *
+joinstrlist(GList *list, char *sep) {
+  GList *ii;
+  int len;
+  char *ret, *dest;
+
+  if(0 > (len = strlen(sep) * (g_list_length(list) - 1)))
+    return NULL;
+
+  for(ii = g_list_first(list); NULL != ii; ii = ii->next)
+    len += strlen(ii->data);
+
+  dest = ret = g_new(char, len + 1);
+
+  for(ii = g_list_first(list); NULL != ii; ii = ii->next) {
+    dest = g_stpcpy(dest, ii->data);
+    if(NULL != ii->next)
+      dest = g_stpcpy(dest, sep);
+  }
+
+  return ret;
+}
+
 static int exit_sigs[] = {SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2};
 static callbackfunc_t exit_func = NULL;
 static void *exit_data = NULL;

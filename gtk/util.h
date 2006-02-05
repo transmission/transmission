@@ -57,6 +57,10 @@ readablesize(guint64 size, int decimals);
 gboolean
 mkdir_p(const char *name, mode_t mode);
 
+/* joins a GList of strings into one string using an optional separator */
+char *
+joinstrlist(GList *list, char *sep);
+
 /* set up a handler for various fatal signals */
 void
 setuphandlers(callbackfunc_t func, void *data);

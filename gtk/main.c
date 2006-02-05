@@ -54,6 +54,7 @@ struct cbdata {
   GtkStatusbar *bar;
   GtkWidget **buttons;
   guint timer;
+  gboolean prefsopen;
 };
 
 struct exitdata {
@@ -117,7 +118,7 @@ doubleclick(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *col,
 
 gboolean
 addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
-           const char *dir, gboolean paused);
+           const char *dir, gboolean paused, GList **errs);
 void
 addedtorrents(void *vdata);
 gboolean
@@ -181,6 +182,14 @@ main(int argc, char **argv) {
   tr = tr_init();
 
   setuphandlers(stoptransmission, tr);
+
+  gtk_rc_parse_string(
+    "style \"transmission-standard\" {\n"
+    " GtkDialog::action-area-border = 6\n"
+    " GtkDialog::button-spacing = 12\n"
+    " GtkDialog::content-area-border = 6\n"
+    "}\n"
+    "widget \"TransmissionDialog\" style \"transmission-standard\"\n");
 
   if(cf_init(tr_getPrefsDirectory(), &err)) {
     if(cf_lock(&err)) {
@@ -254,9 +263,10 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   struct cbdata *data = g_new0(struct cbdata, 1);
   GtkWidget *list;
   GtkRequisition req;
-  GList *ii;
+  GList *loaderrs, *ii;
   struct cf_torrentstate *ts;
   gint height;
+  char *str;
 
   data->tr = tr;
   data->wind = GTK_WINDOW(wind);
@@ -266,6 +276,7 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   data->view = NULL;
   data->bar = GTK_STATUSBAR(status);
   data->buttons = NULL;
+  data->prefsopen = FALSE;
 
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER,
                                  GTK_POLICY_AUTOMATIC);
@@ -283,13 +294,25 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   gtk_window_set_title(data->wind, g_get_application_name());
   g_signal_connect(G_OBJECT(wind), "delete_event", G_CALLBACK(winclose), data);
 
+  loaderrs = NULL;
   for(ii = g_list_first(saved); NULL != ii; ii = ii->next) {
     ts = ii->data;
-    addtorrent(tr, GTK_WINDOW(wind),
-               ts->ts_torrent, ts->ts_directory, ts->ts_paused);
+    addtorrent(tr, GTK_WINDOW(wind), ts->ts_torrent, ts->ts_directory,
+               ts->ts_paused, &loaderrs);
     cf_freestate(ts);
   }
   g_list_free(saved);
+
+  if(NULL != loaderrs) {
+    str = joinstrlist(loaderrs, "\n");
+    errmsg(GTK_WINDOW(wind), ngettext("Failed to load the torrent file %s",
+                                      "Failed to load the torrent files:\n%s",
+                                      g_list_length(loaderrs)), str);
+    g_list_foreach(loaderrs, (GFunc)g_free, NULL);
+    g_list_free(loaderrs);
+    g_free(str);
+    savetorrents(tr, GTK_WINDOW(wind), -1, NULL);
+  }
 
   data->timer = g_timeout_add(500, updatemodel, data);
   updatemodel(data);
@@ -807,7 +830,8 @@ actionclick(GtkWidget *widget, gpointer gdata) {
       makeaddwind(addtorrent, data->wind, data->tr, addedtorrents, data);
       return;
     case ACT_PREF:
-      makeprefwindow(data->wind, data->tr);
+      if(!data->prefsopen)
+        makeprefwindow(data->wind, data->tr, &data->prefsopen);
       return;
     default:
       break;
@@ -915,13 +939,12 @@ doubleclick(GtkWidget *widget SHUTUP, GtkTreePath *path,
 
 gboolean
 addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
-           const char *dir, gboolean paused) {
+           const char *dir, gboolean paused, GList **errs) {
   char *wd;
 
   if(NULL == dir && NULL != (dir = cf_getpref(PREF_DIR))) {
     if(!mkdir_p(dir, 0777)) {
-      errmsg(parentwind,
-             _("An error occurred while creating directory %s:\n%s"),
+      errmsg(parentwind, _("Failed to create the directory %s:\n%s"),
              dir, strerror(errno));
       return FALSE;
     }
@@ -932,8 +955,10 @@ addtorrent(tr_handle_t *tr, GtkWindow *parentwind, const char *torrent,
   if(0 != tr_torrentInit(tr, torrent)) {
     unblocksigs();
     /* XXX would be nice to have errno strings, are they printed to stdout? */
-    errmsg(parentwind,
-           _("An error occurred while opening the torrent file %s"), torrent);
+    if(NULL == errs)
+      errmsg(parentwind, _("Failed to load the torrent file %s"), torrent);
+    else
+      *errs = g_list_append(*errs, g_strdup(torrent));
     return FALSE;
   }
 

@@ -37,11 +37,11 @@
 
 #define DEFAULT_UPLIMIT         20
 
-typedef gboolean (*add_torrent_func_t)(tr_handle_t*, GtkWindow*, const char*, const char *, gboolean);
+typedef gboolean (*add_torrent_func_t)(tr_handle_t*, GtkWindow*, const char*, const char *, gboolean, GList **);
 typedef void (*torrents_added_func_t)(void *);
 
 void
-makeprefwindow(GtkWindow *parent, tr_handle_t *tr);
+makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened);
 
 /* set the upload limit based on saved prefs */
 void

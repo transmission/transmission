@@ -70,8 +70,7 @@ lockfile(const char *file, char **errstr) {
 
   if(0 > (fd = open(file, O_RDWR | O_CREAT, 0666))) {
     savederr = errno;
-    *errstr = g_strdup_printf(
-      _("An error occurred while opening the file %s for writing:\n%s"),
+    *errstr = g_strdup_printf(_("Failed to open the file %s for writing:\n%s"),
       file, strerror(errno));
     errno = savederr;
     return -1;
@@ -88,8 +87,7 @@ lockfile(const char *file, char **errstr) {
       *errstr = g_strdup_printf(_("Another copy of %s is already running."),
                                 g_get_application_name());
     else
-      *errstr = g_strdup_printf(
-        _("An error occurred while locking the file %s:\n%s"),
+      *errstr = g_strdup_printf(_("Failed to lock the file %s:\n%s"),
         file, strerror(errno));
     close(fd);
     errno = savederr;
@@ -108,15 +106,13 @@ cf_init(const char *dir, char **errstr) {
 
   if(0 > stat(dir, &sb)) {
     if(ENOENT != errno)
-      *errstr = g_strdup_printf(
-        _("An error occurred while checking the directory %s:\n%s"),
+      *errstr = g_strdup_printf(_("Failed to check the directory %s:\n%s"),
         dir, strerror(errno));
     else {
       if(0 == mkdir(dir, 0777))
         return TRUE;
       else
-        *errstr = g_strdup_printf(
-          _("An error occurred while creating the directory %s:\n%s"),
+        *errstr = g_strdup_printf(_("Failed to create the directory %s:\n%s"),
           dir, strerror(errno));
     }
     return FALSE;
@@ -160,8 +156,7 @@ cf_loadprefs(char **errstr) {
   if(NULL != err) {
     if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
       *errstr = g_strdup_printf(
-        _("An error occurred while opening the file %s for reading:\n%s"),
-        path, err->message);
+        _("Failed to open the file %s for reading:\n%s"), path, err->message);
     goto done;
   }
   g_io_channel_set_line_term(io, &term, 1);
@@ -172,8 +167,7 @@ cf_loadprefs(char **errstr) {
     switch(g_io_channel_read_line(io, &line, &len, &termpos, &err)) {
       case G_IO_STATUS_ERROR:
         *errstr = g_strdup_printf(
-          _("An error occurred while reading from the file %s:\n%s"),
-          path, err->message);
+          _("Error while reading from the file %s:\n%s"), path, err->message);
         goto done;
       case G_IO_STATUS_NORMAL:
         if(NULL != line) {
@@ -236,9 +230,8 @@ cf_saveprefs(char **errstr) {
 
   if(0 > (fd = lockfile(tmpfile, errstr))) {
     g_free(errstr);
-    *errstr = g_strdup_printf(
-      _("An error occurred while opening or locking the file %s:\n%s"),
-      tmpfile, strerror(errno));
+    *errstr = g_strdup_printf(_("Failed to open or lock the file %s:\n%s"),
+                              tmpfile, strerror(errno));
     goto done;
   }
 
@@ -257,17 +250,15 @@ cf_saveprefs(char **errstr) {
   g_tree_foreach(prefs, writefile_traverse, &info);
   if(NULL != info.err ||
      G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &info.err)) {
-    *errstr = g_strdup_printf(
-      _("An error occurred while writing to the file %s:\n%s"),
-      tmpfile, info.err->message);
+    *errstr = g_strdup_printf(_("Error while writing to the file %s:\n%s"),
+                              tmpfile, info.err->message);
     g_error_free(info.err);
     goto done;
   }
 
   if(0 > rename(tmpfile, file)) {
-    *errstr = g_strdup_printf(
-      _("An error occurred while renaming the file %s to %s:\n%s"),
-      tmpfile, file, strerror(errno));
+    *errstr = g_strdup_printf(_("Failed to rename the file %s to %s:\n%s"),
+                              tmpfile, file, strerror(errno));
     goto done;
   }
 
@@ -328,8 +319,7 @@ cf_loadstate(char **errstr) {
   if(NULL != err) {
     if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
       *errstr = g_strdup_printf(
-        _("An error occurred while opening the file %s for reading:\n%s"),
-        path, err->message);
+        _("Failed to open the file %s for reading:\n%s"), path, err->message);
     goto done;
   }
   g_io_channel_set_line_term(io, &term, 1);
@@ -340,8 +330,7 @@ cf_loadstate(char **errstr) {
     switch(g_io_channel_read_line(io, &line, &len, &termpos, &err)) {
       case G_IO_STATUS_ERROR:
         *errstr = g_strdup_printf(
-          _("An error occurred while reading from the file %s:\n%s"),
-          path, err->message);
+          _("Error while reading from the file %s:\n%s"), path, err->message);
         goto done;
       case G_IO_STATUS_NORMAL:
         if(NULL != line) {
@@ -439,9 +428,8 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
 
   if(0 > (fd = lockfile(tmpfile, errstr))) {
     g_free(errstr);
-    *errstr = g_strdup_printf(
-      _("An error occurred while opening or locking the file %s:\n%s"),
-      tmpfile, strerror(errno));
+    *errstr = g_strdup_printf(_("Failed to open or lock the file %s:\n%s"),
+                              tmpfile, strerror(errno));
     goto done;
   }
 
@@ -480,17 +468,15 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
   }
   if(NULL != err ||
      G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &err)) {
-    *errstr = g_strdup_printf(
-      _("An error occurred while writing to the file %s:\n%s"),
-      tmpfile, err->message);
+    *errstr = g_strdup_printf(_("Error while writing to the file %s:\n%s"),
+                              tmpfile, err->message);
     g_error_free(err);
     goto done;
   }
 
   if(0 > rename(tmpfile, file)) {
-    *errstr = g_strdup_printf(
-      _("An error occurred while renaming the file %s to %s:\n%s"),
-      tmpfile, file, strerror(errno));
+    *errstr = g_strdup_printf(_("Failed to rename the file %s to %s:\n%s"),
+                              tmpfile, file, strerror(errno));
     goto done;
   }
 
