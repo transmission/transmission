@@ -48,6 +48,12 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
     if( limit < 0 )
         c->slots = 4242;
     else
+        /* Reckon a number of slots from the upload limit. There is no
+           official right way to do this, the formula above e.g. gives:
+            10  KB/s -> 4  * 2.50 KB/s
+            20  KB/s -> 6  * 3.33 KB/s
+            50  KB/s -> 10 * 5.00 KB/s
+            100 KB/s -> 14 * 7.14 KB/s */
         c->slots = lrintf( sqrt( 2 * limit ) );
     tr_lockUnlock( &c->lock );
 }
@@ -96,8 +102,6 @@ void tr_chokingPulse( tr_choking_t * c )
     peersCanUnchokeCount = 0;
     unchokedCount        = 0;
 
-    /* Build two lists of interested peers: those who may choke,
-       those who may unchoke */
     for( i = 0; i < c->h->torrentCount; i++ )
     {
         tor = c->h->torrents[i];
@@ -108,6 +112,7 @@ void tr_chokingPulse( tr_choking_t * c )
             if( !tr_peerIsConnected( peer ) )
                 continue;
 
+            /* Choke peers who have lost their interest in us */
             if( !tr_peerIsInterested( peer ) )
             {
                 if( tr_peerIsUnchoked( peer ) )
@@ -115,6 +120,10 @@ void tr_chokingPulse( tr_choking_t * c )
                 continue;
             }
 
+            /* Build two lists of interested peers: those we may choke,
+               those we may unchoke. Whatever happens, we never choke a
+               peer less than 10 seconds after the time we unchoked him
+               (or the other way around). */
             if( tr_peerIsUnchoked( peer ) )
             {
                 unchokedCount++;
@@ -129,11 +138,15 @@ void tr_chokingPulse( tr_choking_t * c )
         }
     }
 
+    /* Sort peers by the rate we are downloading from them. */
     sortPeers( peersCanChoke, peersCanChokeCount );
     sortPeers( peersCanUnchoke, peersCanUnchokeCount );
 
     if( unchokedCount > c->slots && peersCanChokeCount > 0 )
     {
+        /* We have more open slots than what we should have (the user
+           has just lower his upload limit. We need to choke some of the
+           peers we are uploading to. */
         int willChoke;
         willChoke = MIN( peersCanChokeCount, unchokedCount - c->slots );
         for( i = 0; i < willChoke; i++ )
@@ -144,6 +157,7 @@ void tr_chokingPulse( tr_choking_t * c )
     }
     else if( unchokedCount < c->slots && peersCanUnchokeCount > 0 )
     {
+        /* We have unused open slots. Let's unchoke some people. */
         int willUnchoke;
         willUnchoke = MIN( peersCanUnchokeCount, c->slots - unchokedCount );
         for( i = 0; i < willUnchoke; i++ )
@@ -153,6 +167,9 @@ void tr_chokingPulse( tr_choking_t * c )
 
     while( peersCanChokeCount > 0 && peersCanUnchokeCount > 0 )
     {
+        /* All slots are used and more peers are waiting. If
+           applicable, choke some peers in favor of others who are
+           uploading more to us. */
         if( tr_peerDownloadRate( peersCanUnchoke[peersCanUnchokeCount - 1] )
                 < tr_peerDownloadRate( peersCanChoke[0] ) )
             break;
