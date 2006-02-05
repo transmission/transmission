@@ -384,11 +384,11 @@ getstateval(struct cf_torrentstate *state, char *line) {
   char *start, *end;
 
   /* skip any leading whitespace */
-  while(isspace(*line))
+  while(isspace((int)*line))
     line++;
 
   /* walk over the key, which may be alphanumerics as well as - or _ */
-  for(start = line; isalnum(*start) || '_' == *start || '-' == *start; start++)
+  for(start = line; isalnum((int)*start) || '_' == *start || '-' == *start; start++)
     ;
 
   /* they key must be immediately followed by an = */
