@@ -128,6 +128,43 @@ joinstrlist(GList *list, char *sep) {
   return ret;
 }
 
+char *
+urldecode(const char *str, int len) {
+  int ii, jj;
+  char *ret;
+  char buf[3];
+
+  if(0 >= len)
+    len = strlen(str);
+
+  for(ii = jj = 0; ii < len; ii++, jj++)
+    if('%' == str[ii])
+      ii += 2;
+
+  ret = g_new(char, jj + 1);
+
+  buf[2] = '\0';
+  for(ii = jj = 0; ii < len; ii++, jj++) {
+    switch(str[ii]) {
+      case '%':
+        if(ii + 2 < len) {
+          buf[0] = str[ii+1];
+          buf[1] = str[ii+2];
+          ret[jj] = g_ascii_strtoull(buf, NULL, 16);
+        }
+        ii += 2;
+        break;
+      case '+':
+        ret[jj] = ' ';
+      default:
+        ret[jj] = str[ii];
+    }
+  }
+  ret[jj] = '\0';
+
+  return ret;
+}
+
 static int exit_sigs[] = {SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2};
 static callbackfunc_t exit_func = NULL;
 static void *exit_data = NULL;

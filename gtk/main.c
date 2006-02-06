@@ -82,6 +82,11 @@ gboolean
 exitcheck(gpointer gdata);
 void
 stoptransmission(void *tr);
+void
+setupdrag(GtkWidget *widget, struct cbdata *data);
+void
+gotdrag(GtkWidget *widget, GdkDragContext *dc, gint x, gint y,
+        GtkSelectionData *sel, guint info, guint time, gpointer gdata);
 GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
@@ -294,6 +299,8 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   gtk_window_set_title(data->wind, g_get_application_name());
   g_signal_connect(G_OBJECT(wind), "delete_event", G_CALLBACK(winclose), data);
 
+  setupdrag(list, data);
+
   loaderrs = NULL;
   for(ii = g_list_first(saved); NULL != ii; ii = ii->next) {
     ts = ii->data;
@@ -427,6 +434,61 @@ stoptransmission(void *tr) {
   while(0 < tr_torrentCount(tr))
     tr_torrentClose(tr, 0);
   tr_close(tr);
+}
+
+void
+gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
+        gint y SHUTUP, GtkSelectionData *sel, guint info SHUTUP, guint time,
+        gpointer gdata) {
+  struct cbdata *data = gdata;
+  char prefix[] = "file://";
+  char *file, *sele, *targ, *type;
+  int ii;
+
+  if(gdk_atom_intern("XdndSelection", FALSE) == sel->selection &&
+     8 == sel->format && (int)sizeof(prefix) - 1 < sel->length &&
+     0 == strncmp(prefix, sel->data, sizeof(prefix) - 1)) {
+    file = urldecode(sel->data + (sizeof(prefix) - 1),
+                     sel->length - (sizeof(prefix) - 1));
+    if(g_utf8_validate(file, -1, NULL) &&
+       addtorrent(data->tr, data->wind, file, NULL, FALSE, NULL)) {
+      g_free(file);
+      gtk_drag_finish(dc, TRUE, FALSE, time);
+      addedtorrents(data);
+      return;
+    }
+    g_free(file);
+  } else {
+    sele = gdk_atom_name(sel->selection);
+    targ = gdk_atom_name(sel->target);
+    type = gdk_atom_name(sel->type);
+    fprintf(stderr, "unhandled drag: sel=%s targ=%s type=%s fmt=%i len=%i\n",
+            sele, targ, type, sel->format, sel->length);
+    g_free(sele);
+    g_free(targ);
+    g_free(type);
+    if(8 == sel->format) {
+      for(ii = 0; ii < sel->length; ii++)
+        fprintf(stderr, "%02X ", sel->data[ii]);
+      fprintf(stderr, "\n");
+    }
+  }
+
+  gtk_drag_finish(dc, FALSE, FALSE, time);
+}
+
+void
+setupdrag(GtkWidget *widget, struct cbdata *data) {
+  GtkTargetEntry targets[] = {
+    { "STRING",     0, 0 },
+    { "text/plain", 0, 0 },
+    { "text/uri-list", 0, 0 },
+  };
+
+  g_signal_connect(widget, "drag_data_received", G_CALLBACK(gotdrag), data);
+
+  gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL, targets,
+                    ALEN(targets), GDK_ACTION_COPY);
 }
 
 GtkWidget *

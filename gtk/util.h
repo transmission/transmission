@@ -61,6 +61,10 @@ mkdir_p(const char *name, mode_t mode);
 char *
 joinstrlist(GList *list, char *sep);
 
+/* decodes a string that has been urlencoded */
+char *
+urldecode(const char *str, int len);
+
 /* set up a handler for various fatal signals */
 void
 setuphandlers(callbackfunc_t func, void *data);
