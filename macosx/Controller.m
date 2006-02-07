@@ -144,7 +144,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     fSeeding = 0;
     fCompleted = 0;
     fStat  = nil;
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5 target: self
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
         selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
         forMode: NSModalPanelRunLoopMode];

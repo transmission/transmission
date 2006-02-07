@@ -144,15 +144,25 @@ float tr_rcRate( tr_ratecontrol_t * r )
     return ret;
 }
 
-void tr_rcClose( tr_ratecontrol_t * r )
+void tr_rcReset( tr_ratecontrol_t * r )
 {
     tr_transfer_t * t, * next;
+
+    tr_lockLock( &r->lock );
     for( t = r->first; t; )
     {
         next = t->next;
         free( t );
         t = next;
     }
+    r->first = NULL;
+    r->last  = NULL;
+    tr_lockUnlock( &r->lock );
+}
+
+void tr_rcClose( tr_ratecontrol_t * r )
+{
+    tr_rcReset( r );
     tr_lockClose( &r->lock );
     free( r );
 }

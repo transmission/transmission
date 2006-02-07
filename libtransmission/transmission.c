@@ -156,8 +156,20 @@ void tr_setUploadLimit( tr_handle_t * h, int limit )
  **********************************************************************/
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
-    *dl = tr_rcRate( h->download );
-    *ul = tr_rcRate( h->upload );
+    tr_torrent_t * tor;
+    int i;
+
+    *dl = 0.0;
+    *ul = 0.0;
+    for( i = 0; i < h->torrentCount; i++ )
+    {
+        tor = h->torrents[i];
+        tr_lockLock( &tor->lock );
+        if( tor->status & TR_STATUS_DOWNLOAD )
+            *dl += tr_rcRate( tor->download );
+        *ul += tr_rcRate( tor->upload );
+        tr_lockUnlock( &tor->lock );
+    }
 }
 
 /***********************************************************************
@@ -301,6 +313,8 @@ void tr_torrentStop( tr_handle_t * h, int t )
 
     tr_lockLock( &tor->lock );
     tr_trackerStopped( tor->tracker );
+    tr_rcReset( tor->download );
+    tr_rcReset( tor->upload );
     tor->status = TR_STATUS_STOPPING;
     tor->stopDate = tr_date();
     tr_lockUnlock( &tor->lock );
@@ -404,8 +418,15 @@ int tr_torrentStat( tr_handle_t * h, tr_stat_t ** stat )
         }
 
         s[i].progress     = tr_cpCompletionAsFloat( tor->completion );
-        s[i].rateDownload = tr_rcRate( tor->download );
-        s[i].rateUpload   = tr_rcRate( tor->upload );
+        if( tor->status & TR_STATUS_DOWNLOAD )
+            s[i].rateDownload = tr_rcRate( tor->download );
+        else
+            /* tr_rcRate() doesn't make the difference between 'piece'
+               messages and other messages, which causes a non-zero
+               download rate even tough we are not downloading. So we
+               force it to zero not to confuse the user. */
+            s[i].rateDownload = 0.0;
+        s[i].rateUpload = tr_rcRate( tor->upload );
         
         s[i].seeders	  = tr_trackerSeeders(tor);
 		s[i].leechers	  = tr_trackerLeechers(tor);
