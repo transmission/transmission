@@ -53,6 +53,11 @@ strbool(const char *str);
 char *
 readablesize(guint64 size, int decimals);
 
+/* returns a string representing the download ratio.
+   the string must be g_free()d */
+char *
+ratiostr(guint64 down, guint64 up);
+
 /* create a directory and any missing parent directories */
 gboolean
 mkdir_p(const char *name, mode_t mode);

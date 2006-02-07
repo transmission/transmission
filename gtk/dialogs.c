@@ -380,7 +380,7 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   GtkWidget *wind, *label;
   int ii;
   char *str;
-  const int rowcount = 12;
+  const int rowcount = 14;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
 
   /* XXX would be nice to be able to stat just one */
@@ -420,6 +420,8 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   INFOLINEA(table, ii, _("Piece Size:"), readablesize(sb[id].info.pieceSize, 1));
   INFOLINEF(table, ii, "%i", _("Pieces:"), sb[id].info.pieceCount);
   INFOLINEA(table, ii, _("Total Size:"), readablesize(sb[id].info.totalSize, 1));
+  INFOLINEF(table, ii, "%i", _("Seeders:"), sb[id].seeders);
+  INFOLINEF(table, ii, "%i", _("Leechers:"), sb[id].leechers);
 
   INFOSEP(table, ii);
 

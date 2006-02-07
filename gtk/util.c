@@ -79,6 +79,23 @@ readablesize(guint64 size, int decimals) {
   return g_strdup_printf("%.*f %s", decimals, small, gettext(sizestrs[ii]));
 }
 
+char *
+ratiostr(guint64 down, guint64 up) {
+  double ratio;
+
+  if(0 == up && 0 == down)
+    return g_strdup(_("N/A"));
+
+  if(0 == down)
+    /* this is a UTF-8 infinity symbol */
+    return g_strdup(_("\xE2\x88\x9E"));
+
+  ratio = up / down;
+
+  return g_strdup_printf("%.*f", (10.0 > ratio ? 2 : (100.0 > ratio ? 1 : 0)),
+                         ratio);
+}
+
 gboolean
 mkdir_p(const char *name, mode_t mode) {
   struct stat sb;

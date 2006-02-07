@@ -691,9 +691,14 @@ dfprog(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
   else if(1.0 < prog)
     prog = 1.0;
 
-  dlstr = readablesize(dl * 1024.0, 2);
   ulstr = readablesize(ul * 1024.0, 2);
-  str = g_strdup_printf(_("DL: %s/s\nUL: %s/s"), dlstr, ulstr);
+  if(1.0 == prog) {
+    dlstr = ratiostr(dl, ul);
+    str = g_strdup_printf(_("Ratio: %s\nUL: %s/s"), dlstr, ulstr);
+  } else {
+    dlstr = readablesize(dl * 1024.0, 2);
+    str = g_strdup_printf(_("DL: %s/s\nUL: %s/s"), dlstr, ulstr);
+  }
   marked = g_markup_printf_escaped("<small>%s</small>", str);
   g_object_set(rend, "text", str, "value", prog, NULL);
   g_free(dlstr);
