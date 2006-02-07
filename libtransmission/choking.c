@@ -49,7 +49,7 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
         c->slots = 4242;
     else
         /* Reckon a number of slots from the upload limit. There is no
-           official right way to do this, the formula above e.g. gives:
+           official right way to do this, the formula below e.g. gives:
             10  KB/s -> 4  * 2.50 KB/s
             20  KB/s -> 6  * 3.33 KB/s
             50  KB/s -> 10 * 5.00 KB/s
@@ -58,22 +58,32 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
     tr_lockUnlock( &c->lock );
 }
 
-static inline void sortPeers( tr_peer_t ** peers, int count )
+#define sortPeersAscending(p,c)  sortPeers(p,c,0)
+#define sortPeersDescending(p,c) sortPeers(p,c,1)
+static inline void sortPeers( tr_peer_t ** peers, int count, int order )
 {
-    int i, j;
+    int i, j, sorted;
+    float rate1, rate2;
     tr_peer_t * tmp;
 
     for( i = count - 1; i > 0; i-- )
+    {
+        sorted = 1;
         for( j = 0; j < i; j++ )
         {
-            if( tr_peerDownloadRate( peers[j] ) >
-                    tr_peerDownloadRate( peers[j+1] ) )
+            rate1 = tr_peerDownloadRate( peers[j] );
+            rate2 = tr_peerDownloadRate( peers[j+1] );
+            if( order ? ( rate1 < rate2 ) : ( rate1 > rate2 ) )
             {
                 tmp        = peers[j];
                 peers[j]   = peers[j+1];
                 peers[j+1] = tmp;
+                sorted     = 0;
             }
         }
+        if( sorted )
+            break;
+    }
 }
 
 void tr_chokingPulse( tr_choking_t * c )
@@ -139,21 +149,18 @@ void tr_chokingPulse( tr_choking_t * c )
     }
 
     /* Sort peers by the rate we are downloading from them. */
-    sortPeers( peersCanChoke, peersCanChokeCount );
-    sortPeers( peersCanUnchoke, peersCanUnchokeCount );
+    sortPeersDescending( peersCanChoke, peersCanChokeCount );
+    sortPeersAscending( peersCanUnchoke, peersCanUnchokeCount );
 
     if( unchokedCount > c->slots && peersCanChokeCount > 0 )
     {
         /* We have more open slots than what we should have (the user
-           has just lower his upload limit. We need to choke some of the
+           has just lowered his upload limit. We need to choke some of the
            peers we are uploading to. */
         int willChoke;
         willChoke = MIN( peersCanChokeCount, unchokedCount - c->slots );
         for( i = 0; i < willChoke; i++ )
-            tr_peerChoke( peersCanChoke[i] );
-        peersCanChokeCount -= willChoke;
-        memmove( &peersCanChoke[0], &peersCanChoke[willChoke],
-                 peersCanChokeCount * sizeof( tr_peer_t * ) );
+            tr_peerChoke( peersCanChoke[--peersCanChokeCount] );
     }
     else if( unchokedCount < c->slots && peersCanUnchokeCount > 0 )
     {
@@ -161,8 +168,7 @@ void tr_chokingPulse( tr_choking_t * c )
         int willUnchoke;
         willUnchoke = MIN( peersCanUnchokeCount, c->slots - unchokedCount );
         for( i = 0; i < willUnchoke; i++ )
-            tr_peerUnchoke( peersCanUnchoke[peersCanUnchokeCount - i - 1] );
-        peersCanUnchokeCount -= willUnchoke;
+            tr_peerUnchoke( peersCanUnchoke[--peersCanUnchokeCount] );
     }
 
     while( peersCanChokeCount > 0 && peersCanUnchokeCount > 0 )
@@ -171,15 +177,11 @@ void tr_chokingPulse( tr_choking_t * c )
            applicable, choke some peers in favor of others who are
            uploading more to us. */
         if( tr_peerDownloadRate( peersCanUnchoke[peersCanUnchokeCount - 1] )
-                < tr_peerDownloadRate( peersCanChoke[0] ) )
+                < tr_peerDownloadRate( peersCanChoke[peersCanChokeCount - 1] ) )
             break;
 
-        tr_peerChoke( peersCanChoke[0] );
-        tr_peerUnchoke( peersCanUnchoke[peersCanUnchokeCount - 1] );
-        peersCanChokeCount--;
-        peersCanUnchokeCount--;
-        memmove( &peersCanChoke[0], &peersCanChoke[1],
-                 peersCanChokeCount * sizeof( tr_peer_t * ) );
+        tr_peerChoke( peersCanChoke[--peersCanChokeCount] );
+        tr_peerUnchoke( peersCanUnchoke[--peersCanUnchokeCount] );
     }
 
     free( peersCanChoke );
