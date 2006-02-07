@@ -194,7 +194,7 @@ echo "System:  $SYSTEM"
 #
 # Mac OS X check for the Universal SDK
 #
-if [ $SYSTEM = Darwin -a ! -d /Developer/SDKs/MacOSX10.4u.sdk ]; then
+if [ "$SYSTEM" = Darwin -a ! -d /Developer/SDKs/MacOSX10.4u.sdk ]; then
   echo
   echo "You need to install the Universal SDK in order to build Transmission:"
   echo "  Get your Xcode CD or package"

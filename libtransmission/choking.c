@@ -23,6 +23,10 @@
 #include <math.h>
 #include "transmission.h"
 
+#ifdef SYS_BEOS
+#define lrintf(a) ((int)(0.5+(a)))
+#endif
+
 struct tr_choking_s
 {
     tr_lock_t     lock;
