@@ -47,6 +47,7 @@
                 fRemoveItem = NSMenuItem; 
                 fRemoveTorrentItem = NSMenuItem; 
                 fRevealItem = NSMenuItem; 
+                fScrollView = NSScrollView; 
                 fShowHideToolbar = NSMenuItem; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 

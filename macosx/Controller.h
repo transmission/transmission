@@ -49,6 +49,7 @@
     IBOutlet NSMenuItem         * fShowHideToolbar;
 
     IBOutlet NSWindow           * fWindow;
+    IBOutlet NSScrollView       * fScrollView;
     IBOutlet TorrentTableView   * fTableView;
     IBOutlet NSTextField        * fTotalDLField;
     IBOutlet NSTextField        * fTotalULField;

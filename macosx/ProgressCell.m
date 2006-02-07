@@ -122,8 +122,13 @@ static uint32_t kGreen[] =
     fWhiteText = w;
 
     /* Update the strings to be displayed */
-    fDlString = [@"DL: " stringByAppendingString:
-                    [NSString stringForSpeed: fStat->rateDownload]];
+    if( fStat->progress == 1.0 )
+        fDlString = [@"Ratio: " stringByAppendingString:
+                        [NSString stringForRatio: fStat->downloaded
+                            upload: fStat->uploaded]];
+    else
+        fDlString = [@"DL: " stringByAppendingString:
+                        [NSString stringForSpeed: fStat->rateDownload]];
     fUlString = [@"UL: " stringByAppendingString:
                     [NSString stringForSpeed: fStat->rateUpload]];
 

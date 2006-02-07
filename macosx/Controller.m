@@ -965,9 +965,10 @@ static void sleepCallBack( void * controller, io_service_t y,
     float  foo;
 
     rectWin  = [fWindow frame];
-    rectView = [[fWindow contentView] frame];
-    foo      = 47.0 + MAX( 1, tr_torrentCount( fHandle ) ) * 62.0 -
-                  rectView.size.height;
+    rectView = [fScrollView frame];
+    foo      = 25.0 + MAX( 1, fCount ) * ( [fTableView rowHeight] +
+                 [fTableView intercellSpacing].height ) -
+                 rectView.size.height;
 
     rectWin.size.height += foo;
     rectWin.origin.y    -= foo;
