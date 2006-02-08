@@ -488,7 +488,7 @@ setupdrag(GtkWidget *widget, struct cbdata *data) {
   g_signal_connect(widget, "drag_data_received", G_CALLBACK(gotdrag), data);
 
   gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL, targets,
-                    ALEN(targets), GDK_ACTION_COPY);
+                    ALEN(targets), GDK_ACTION_COPY | GDK_ACTION_MOVE);
 }
 
 GtkWidget *
