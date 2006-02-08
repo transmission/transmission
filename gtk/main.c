@@ -682,10 +682,11 @@ dfprog(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
        GtkTreeModel *model, GtkTreeIter *iter, gpointer gdata SHUTUP) {
   char *dlstr, *ulstr, *str, *marked;
   gfloat prog, dl, ul;
+  guint64 down, up;
 
   /* XXX should I worry about gtk_tree_model_get failing? */
-  gtk_tree_model_get(model, iter, MC_PROG, &prog,
-                     MC_DRATE, &dl, MC_URATE, &ul, -1);
+  gtk_tree_model_get(model, iter, MC_PROG, &prog, MC_DRATE, &dl, MC_URATE, &ul,
+                     MC_DOWN, &down, MC_UP, &up, -1);
   if(0.0 > prog)
     prog = 0.0;
   else if(1.0 < prog)
@@ -693,7 +694,7 @@ dfprog(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
 
   ulstr = readablesize(ul * 1024.0, 2);
   if(1.0 == prog) {
-    dlstr = ratiostr(dl, ul);
+    dlstr = ratiostr(down, up);
     str = g_strdup_printf(_("Ratio: %s\nUL: %s/s"), dlstr, ulstr);
   } else {
     dlstr = readablesize(dl * 1024.0, 2);
