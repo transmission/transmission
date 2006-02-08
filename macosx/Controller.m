@@ -223,29 +223,14 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fBadger clearBadge];
     [fBadger release];                                                          
 
-    // Save history and stop running torrents
-    NSMutableArray * history = [NSMutableArray arrayWithCapacity: fCount];
-    BOOL active;
+    // Save history
+    [self updateTorrentHistory];
+    
+    // Stop running torrents
     for( i = 0; i < fCount; i++ )
-    {
-        active = fStat[i].status &
-            ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED );
-
-        [history addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithUTF8String: fStat[i].info.torrent],
-            @"TorrentPath",
-            [NSString stringWithUTF8String: tr_torrentGetFolder( fHandle, i )],
-            @"DownloadFolder",
-            active ? @"NO" : @"YES",
-            @"Paused",
-            NULL]];
-
-        if( active )
-        {
+        if( fStat[i].status & ( TR_STATUS_CHECK | TR_STATUS_DOWNLOAD |
+                    TR_STATUS_SEED ) )
             tr_torrentStop( fHandle, i );
-        }
-    }
-    [fDefaults setObject: history forKey: @"History"];
 
     // Wait for torrents to stop (5 seconds timeout)
     NSDate * start = [NSDate date];
@@ -351,6 +336,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     [self updateUI: NULL];
+    [self updateTorrentHistory];
 }
 
 - (void) advancedChanged: (id) sender
@@ -430,6 +416,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     tr_torrentStart( fHandle, idx );
     [self updateUI: NULL];
+    [self updateTorrentHistory];
 }
 
 - (void) stopTorrent: (id) sender
@@ -454,6 +441,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     tr_torrentStop( fHandle, idx );
     [self updateUI: NULL];
+    [self updateTorrentHistory];
 }
 
 - (void) removeTorrentWithIndex: (int) idx
@@ -527,6 +515,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     
     tr_torrentClose( fHandle, idx );
     [self updateUI: NULL];
+    [self updateTorrentHistory];
 }
 
 - (void) removeTorrent: (id) sender
@@ -616,6 +605,28 @@ static void sleepCallBack( void * controller, io_service_t y,
           ? [NSString stringForSpeedAbbrev: ul] : nil
         downloadRate: dl >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"]
           ? [NSString stringForSpeedAbbrev: dl] : nil];
+}
+
+- (void) updateTorrentHistory
+{
+    if( !fStat )
+        return;
+
+    NSMutableArray * history = [NSMutableArray arrayWithCapacity: fCount];
+
+    int i;
+    for (i = 0; i < fCount; i++)
+        [history addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSString stringWithUTF8String: fStat[i].info.torrent],
+            @"TorrentPath",
+            [NSString stringWithUTF8String: tr_torrentGetFolder( fHandle, i )],
+            @"DownloadFolder",
+            fStat[i].status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD |
+              TR_STATUS_SEED) ? @"NO" : @"YES",
+            @"Paused",
+            nil]];
+
+    [fDefaults setObject: history forKey: @"History"];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

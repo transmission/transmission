@@ -113,6 +113,7 @@
 - (void) showInfo:        (id) sender;
 
 - (void) updateUI:        (NSTimer *) timer;
+- (void) updateTorrentHistory;
 - (void) sleepCallBack:   (natural_t) messageType argument:
                         (void *) messageArgument;
 
