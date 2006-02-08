@@ -12,18 +12,18 @@
 
 @interface Badger : NSObject {
 
-	NSImage			* fBadge, * fDockIcon, * fBadgedDockIcon;
-					
-	NSDictionary	* fBadgeAttributes, * fStringAttributes;
-					
-	NSColor			* fUploadingColor, * fDownloadingColor;
-	
-	int				fCompleted;
+    NSImage         * fDockIcon, * fBadgedDockIcon,
+                    * fBadge, * fUploadBadge, * fDownloadBadge;
+                    
+    NSDictionary    * fAttributes;
+    
+    int             fCompleted;
+    BOOL            fSpeedShown;
 }
 
 - (void) updateBadgeWithCompleted: (int) completed
-					uploadRate: (NSString *) uploadRate
-					downloadRate: (NSString *) downloadRate;
+                    uploadRate: (NSString *) uploadRate
+                    downloadRate: (NSString *) downloadRate;
 - (void) clearBadge;
 
 @end

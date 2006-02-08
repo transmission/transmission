@@ -612,8 +612,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     //badge dock
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [fBadger updateBadgeWithCompleted: [defaults boolForKey: @"BadgeCompleted"] ? fCompleted : 0
-                    uploadRate: ul >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"] ? uploadRate : nil
-                    downloadRate: dl >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"] ? downloadRate : nil];
+                    uploadRate: ul >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"] ? [NSString stringForSpeedAbbrev: ul] : nil
+                    downloadRate: dl >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"] ? [NSString stringForSpeedAbbrev: dl] : nil];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

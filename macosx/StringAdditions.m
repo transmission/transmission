@@ -28,12 +28,18 @@
 
 + (NSString *) stringForSpeed: (float) speed
 {
+    return [[self stringForSpeedAbbrev: speed]
+        stringByAppendingString: @"B/s"];
+}
+
++ (NSString *) stringForSpeedAbbrev: (float) speed
+{
     if (speed < 1024)
-        return [NSString stringWithFormat: @"%.1f KB/s", speed];
+        return [NSString stringWithFormat: @"%.1f K", speed];
     else if (speed < 1048576)
-        return [NSString stringWithFormat: @"%.2f MB/s", speed / 1024];
+        return [NSString stringWithFormat: @"%.2f M", speed / 1024];
     else
-        return [NSString stringWithFormat: @"%.2f GB/s", speed / 1048576];
+        return [NSString stringWithFormat: @"%.2f G", speed / 1048576];
 }
 
 + (NSString *) stringForRatio: (uint64_t) down upload: (uint64_t) up
