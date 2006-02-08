@@ -23,20 +23,41 @@
 /***********************************************************************
  * Fast resume
  ***********************************************************************
- * Format of the resume file:
- *  - 4 bytes: format version (currently 0)
- *  - 4 bytes * number of files: mtimes of files
- *  - 1 bit * number of blocks: whether we have the block or not
- *  - 4 bytes * number of pieces (byte aligned): the pieces that have
- *    been completed or started in each slot
+ * The format of the resume file is a 4 byte format version (currently 1),
+ * followed by several variable-sized blocks of data.  Each block is
+ * preceded by a 1 byte ID and a 4 byte length.  The currently recognized
+ * IDs are defined below by the FR_ID_* macros.  The length does not include
+ * the 5 bytes for the ID and length.
  *
  * The name of the resume file is "resume.<hash>".
  *
  * All values are stored in the native endianness. Moving a
  * libtransmission resume file from an architecture to another will not
- * work, although it will not hurt either (the mtimes will be wrong,
- * so the files will be scanned).
+ * work, although it will not hurt either (the version will be wrong,
+ * so the resume file will not be read).
  **********************************************************************/
+
+/* progress data:
+ *  - 4 bytes * number of files: mtimes of files
+ *  - 1 bit * number of blocks: whether we have the block or not
+ *  - 4 bytes * number of pieces (byte aligned): the pieces that have
+ *    been completed or started in each slot
+ */
+#define FR_ID_PROGRESS          0x01
+/* number of bytes downloaded */
+#define FR_ID_DOWNLOADED        0x02
+/* number of bytes uploaded */
+#define FR_ID_UPLOADED          0x03
+
+/* macros for the length of various pieces of the progress data */
+#define FR_MTIME_LEN( t ) \
+  ( 4 * (t)->info.fileCount )
+#define FR_BLOCK_BITFIELD_LEN( t ) \
+  ( ( (t)->blockCount + 7 ) / 8 )
+#define FR_SLOTPIECE_LEN( t ) \
+  ( 4 * (t)->info.pieceCount )
+#define FR_PROGRESS_LEN( t ) \
+  ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) + FR_SLOTPIECE_LEN( t ) )
 
 static char * fastResumeFileName( tr_io_t * io )
 {
@@ -91,22 +112,31 @@ static int fastResumeMTimes( tr_io_t * io, int * tab )
     return 0;
 }
 
+static inline void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
+                                        uint32_t count, FILE * file )
+{
+    uint32_t  datalen = size * count;
+
+    fwrite( &id, 1, 1, file );
+    fwrite( &datalen, 4, 1, file );
+    fwrite( data, size, count, file );
+}
+
 static void fastResumeSave( tr_io_t * io )
 {
     tr_torrent_t * tor = io->tor;
-    tr_info_t    * inf = &tor->info;
     
     FILE    * file;
-    int       version = 0;
+    int       version = 1;
     char    * path;
-    int     * fileMTimes;
-    uint8_t * blockBitfield;
+    uint8_t * buf;
+
+    buf = malloc( FR_PROGRESS_LEN( tor ) );
 
     /* Get file sizes */
-    fileMTimes = malloc( inf->fileCount * 4 );
-    if( fastResumeMTimes( io, fileMTimes ) )
+    if( fastResumeMTimes( io, (int*)buf ) )
     {
-        free( fileMTimes );
+        free( buf );
         return;
     }
 
@@ -115,7 +145,7 @@ static void fastResumeSave( tr_io_t * io )
     if( !( file = fopen( path, "w" ) ) )
     {
         tr_err( "Could not open '%s' for writing", path );
-        free( fileMTimes );
+        free( buf );
         free( path );
         return;
     }
@@ -123,16 +153,21 @@ static void fastResumeSave( tr_io_t * io )
     /* Write format version */
     fwrite( &version, 4, 1, file );
 
-    /* Write file mtimes */
-    fwrite( fileMTimes, 4, inf->fileCount, file );
-    free( fileMTimes );
+    /* Build and copy the bitfield for blocks */
+    memcpy(buf + FR_MTIME_LEN( tor ), tr_cpBlockBitfield( tor->completion ),
+           FR_BLOCK_BITFIELD_LEN( tor ) );
 
-    /* Build and write the bitfield for blocks */
-    blockBitfield = tr_cpBlockBitfield( tor->completion );
-    fwrite( blockBitfield, ( tor->blockCount + 7 ) / 8, 1, file );
+    /* Copy the 'slotPiece' table */
+    memcpy(buf + FR_MTIME_LEN( tor ) + FR_BLOCK_BITFIELD_LEN( tor ),
+           io->slotPiece, FR_SLOTPIECE_LEN( tor ) );
 
-    /* Write the 'slotPiece' table */
-    fwrite( io->slotPiece, 4, inf->pieceCount, file );
+    /* Write progress data */
+    fastResumeWriteData( FR_ID_PROGRESS, buf, 1, FR_PROGRESS_LEN( tor ), file );
+    free( buf );
+
+    /* Write download and upload totals */
+    fastResumeWriteData( FR_ID_DOWNLOADED, &tor->downloaded, 8, 1, file );
+    fastResumeWriteData( FR_ID_UPLOADED, &tor->uploaded, 8, 1, file );
 
     fclose( file );
 
@@ -140,85 +175,50 @@ static void fastResumeSave( tr_io_t * io )
     free( path );
 }
 
-static int fastResumeLoad( tr_io_t * io )
+static int fastResumeLoadProgress( tr_io_t * io, FILE * file )
 {
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &tor->info;
-    
-    FILE    * file;
-    int       version = 0;
-    char    * path;
-    int     * fileMTimes1, * fileMTimes2;
+
+    int     * fileMTimes;
     int       i, j;
-    uint8_t * blockBitfield;
+    uint8_t * buf;
+    size_t    len;
 
-    int size;
-
-    /* Open resume file */
-    path = fastResumeFileName( io );
-    if( !( file = fopen( path, "r" ) ) )
+    len = FR_PROGRESS_LEN( tor );
+    buf = calloc( len, 1 );
+    if( len != fread( buf, 1, len, file ) )
     {
-        tr_inf( "Could not open '%s' for reading", path );
-        free( path );
-        return 1;
-    }
-    tr_dbg( "Resume file '%s' loaded", path );
-    free( path );
-
-    /* Check the size */
-    size = 4 + 4 * inf->fileCount + 4 * inf->pieceCount +
-        ( tor->blockCount + 7 ) / 8;
-    fseek( file, 0, SEEK_END );
-    if( ftell( file ) != size )
-    {
-        tr_inf( "Wrong size for resume file (%d bytes, %d expected)",
-                ftell( file ), size );
-        fclose( file );
-        return 1;
-    }
-    fseek( file, 0, SEEK_SET );
-
-    /* Check format version */
-    fread( &version, 4, 1, file );
-    if( version != 0 )
-    {
-        tr_inf( "Resume file has version %d, not supported",
-                version );
-        fclose( file );
+        tr_inf( "Could not read from resume file" );
+        free( buf );
         return 1;
     }
 
     /* Compare file mtimes */
-    fileMTimes1 = malloc( inf->fileCount * 4 );
-    if( fastResumeMTimes( io, fileMTimes1 ) )
+    fileMTimes = malloc( FR_MTIME_LEN( tor ) );
+    if( fastResumeMTimes( io, fileMTimes ) )
     {
-        free( fileMTimes1 );
-        fclose( file );
+        free( buf );
+        free( fileMTimes );
         return 1;
     }
-    fileMTimes2 = malloc( inf->fileCount * 4 );
-    fread( fileMTimes2, 4, inf->fileCount, file );
-    if( memcmp( fileMTimes1, fileMTimes2, inf->fileCount * 4 ) )
+    if( memcmp( fileMTimes, buf, FR_MTIME_LEN( tor ) ) )
     {
         tr_inf( "File mtimes don't match" );
-        free( fileMTimes1 );
-        free( fileMTimes2 );
-        fclose( file );
+        free( buf );
+        free( fileMTimes );
         return 1;
     }
-    free( fileMTimes1 );
-    free( fileMTimes2 );
+    free( fileMTimes );
 
-    /* Load the bitfield for blocks and fill blockHave */
-    blockBitfield = calloc( ( tor->blockCount + 7 ) / 8, 1 );
-    fread( blockBitfield, ( tor->blockCount + 7 ) / 8, 1, file );
-    tr_cpBlockBitfieldSet( tor->completion, blockBitfield );
-    free( blockBitfield );
+    /* Copy the bitfield for blocks and fill blockHave */
+    tr_cpBlockBitfieldSet( tor->completion, buf + FR_MTIME_LEN( tor ) );
 
-    /* Load the 'slotPiece' table */
-    fread( io->slotPiece, 4, inf->pieceCount, file );
+    /* Copy the 'slotPiece' table */
+    memcpy( io->slotPiece, buf + FR_MTIME_LEN( tor ) +
+            FR_BLOCK_BITFIELD_LEN( tor ), FR_SLOTPIECE_LEN( tor ) );
 
-    fclose( file );
+    free( buf );
 
     /* Update io->pieceSlot, io->slotsUsed, and tor->bitfield */
     io->slotsUsed = 0;
@@ -238,7 +238,137 @@ static int fastResumeLoad( tr_io_t * io )
     }
     // tr_dbg( "Slot used: %d", io->slotsUsed );
 
-    tr_inf( "Fast resuming successful" );
+    return 0;
+}
+
+static int fastResumeLoadOld( tr_io_t * io, FILE * file )
+{
+    tr_torrent_t * tor = io->tor;
+    
+    int size;
+
+    /* Check the size */
+    size = 4 + FR_PROGRESS_LEN( tor );
+    fseek( file, 0, SEEK_END );
+    if( ftell( file ) != size )
+    {
+        tr_inf( "Wrong size for resume file (%d bytes, %d expected)",
+                ftell( file ), size );
+        fclose( file );
+        return 1;
+    }
+    fseek( file, 0, SEEK_SET );
+
+    /* load progress information */
+    if( fastResumeLoadProgress( io, file ) )
+    {
+        fclose( file );
+        return 1;
+    }
+
+    fclose( file );
+
+    tr_inf( "Fast resuming successful (version 0)" );
     
     return 0;
+}
+
+static int fastResumeLoad( tr_io_t * io )
+{
+    tr_torrent_t * tor = io->tor;
+    
+    FILE    * file;
+    int       version = 0;
+    char    * path;
+    uint8_t   id;
+    uint32_t  len;
+    int       ret;
+
+    /* Open resume file */
+    path = fastResumeFileName( io );
+    if( !( file = fopen( path, "r" ) ) )
+    {
+        tr_inf( "Could not open '%s' for reading", path );
+        free( path );
+        return 1;
+    }
+    tr_dbg( "Resume file '%s' loaded", path );
+    free( path );
+
+    /* Check format version */
+    fread( &version, 4, 1, file );
+    if( 0 == version )
+    {
+        return fastResumeLoadOld( io, file );
+    }
+    if( 1 != version )
+    {
+        tr_inf( "Resume file has version %d, not supported", version );
+        fclose( file );
+        return 1;
+    }
+
+    ret = 1;
+    /* read each block of data */
+    while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
+    {
+        switch( id )
+        {
+            case FR_ID_PROGRESS:
+                /* read progress data */
+                if( (uint32_t)FR_PROGRESS_LEN( tor ) == len )
+                {
+                    if( fastResumeLoadProgress( io, file ) )
+                    {
+                        fclose( file );
+                        return 1;
+                    }
+                    ret = 0;
+                    continue;
+                }
+                break;
+
+            case FR_ID_DOWNLOADED:
+                /* read download total */
+                if( 8 == len)
+                {
+                    if( 1 != fread( &tor->downloaded, 8, 1, file ) )
+                    {
+                      fclose( file );
+                      return 1;
+                    }
+                    continue;
+                }
+                break;
+
+            case FR_ID_UPLOADED:
+                /* read upload total */
+                if( 8 == len)
+                {
+                    if( 1 != fread( &tor->uploaded, 8, 1, file ) )
+                    {
+                      fclose( file );
+                      return 1;
+                    }
+                    continue;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        /* if we didn't read the data, seek past it */
+        tr_inf( "Skipping resume data type %02x, %u bytes", id, len );
+        fseek( file, len, SEEK_CUR );
+    }
+
+    fclose( file );
+
+    if( !ret )
+    {
+        tr_inf( "Fast resuming successful" );
+    }
+    
+    return ret;
 }

@@ -339,9 +339,6 @@ static void torrentReallyStop( tr_handle_t * h, int t )
     {
         tr_peerRem( tor, 0 );
     }
-
-    tor->downloaded = 0;
-    tor->uploaded   = 0;
 }
 
 /***********************************************************************
