@@ -27,6 +27,22 @@
 #define lrintf(a) ((int)(0.5+(a)))
 #endif
 
+/* We may try to allocate and free tables of size 0. Quick and dirty
+   way to handle it... */
+void * __malloc( int size )
+{
+    if( !size )
+        return NULL;
+    return malloc( size );
+}
+void __free( void * p )
+{
+    if( p )
+        free( p );
+}
+#define malloc __malloc
+#define free   __free
+
 struct tr_choking_s
 {
     tr_lock_t     lock;
@@ -62,27 +78,57 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
     tr_lockUnlock( &c->lock );
 }
 
-#define sortPeersAscending(p,c)  sortPeers(p,c,0)
-#define sortPeersDescending(p,c) sortPeers(p,c,1)
-static inline void sortPeers( tr_peer_t ** peers, int count, int order )
+#define sortPeersAscending(a,ac,z,zc,n,nc)  sortPeers(a,ac,z,zc,n,nc,0)
+#define sortPeersDescending(a,ac,z,zc,n,nc) sortPeers(a,ac,z,zc,n,nc,1)
+static inline void sortPeers( tr_peer_t ** all, int allCount,
+                              tr_peer_t ** zero, int * zeroCount,
+                              tr_peer_t ** nonZero, int * nonZeroCount,
+                              int order )
 {
-    int i, j, sorted;
-    float rate1, rate2;
-    tr_peer_t * tmp;
+    int i, shuffle;
 
-    for( i = count - 1; i > 0; i-- )
+    /* Seperate uploaders from non-uploaders */
+    *zeroCount    = 0;
+    *nonZeroCount = 0;
+    for( i = 0; i < allCount; i++ )
     {
+        if( tr_peerDownloadRate( all[i] ) < 0.1 )
+            zero[(*zeroCount)++] = all[i];
+        else
+            nonZero[(*nonZeroCount)++] = all[i];
+    }
+
+    /* Randomly shuffle non-uploaders, so they are treated equally */
+    if( *zeroCount && ( shuffle = tr_rand( *zeroCount ) ) )
+    {
+        tr_peer_t ** bak;
+        bak = malloc( shuffle * sizeof( tr_peer_t * ) );
+        memcpy( bak, zero, shuffle * sizeof( tr_peer_t * ) );
+        memmove( zero, &zero[shuffle],
+                 ( *zeroCount - shuffle ) * sizeof( tr_peer_t * ) );
+        memcpy( &zero[*zeroCount - shuffle], bak,
+                 shuffle * sizeof( tr_peer_t * ) );
+        free( bak );
+    }
+
+    /* Sort uploaders by download rate */
+    for( i = *nonZeroCount - 1; i > 0; i-- )
+    {
+        float rate1, rate2;
+        tr_peer_t * tmp;
+        int j, sorted;
+
         sorted = 1;
         for( j = 0; j < i; j++ )
         {
-            rate1 = tr_peerDownloadRate( peers[j] );
-            rate2 = tr_peerDownloadRate( peers[j+1] );
+            rate1 = tr_peerDownloadRate( nonZero[j] );
+            rate2 = tr_peerDownloadRate( nonZero[j+1] );
             if( order ? ( rate1 < rate2 ) : ( rate1 > rate2 ) )
             {
-                tmp        = peers[j];
-                peers[j]   = peers[j+1];
-                peers[j+1] = tmp;
-                sorted     = 0;
+                tmp          = nonZero[j];
+                nonZero[j]   = nonZero[j+1];
+                nonZero[j+1] = tmp;
+                sorted       = 0;
             }
         }
         if( sorted )
@@ -92,10 +138,13 @@ static inline void sortPeers( tr_peer_t ** peers, int count, int order )
 
 void tr_chokingPulse( tr_choking_t * c )
 {
-    int i, j, peersTotalCount;
-    tr_peer_t * peer;
-    tr_peer_t ** peersCanChoke, ** peersCanUnchoke;
-    int peersCanChokeCount, peersCanUnchokeCount, unchokedCount;
+    int i, peersTotalCount, unchoked;
+    tr_peer_t ** canChoke, ** canUnchoke;
+    tr_peer_t ** canChokeZero, ** canUnchokeZero;
+    tr_peer_t ** canChokeNonZero, ** canUnchokeNonZero;
+    int canChokeCount, canUnchokeCount;
+    int canChokeZeroCount, canUnchokeZeroCount;
+    int canChokeNonZeroCount, canUnchokeNonZeroCount;
     tr_torrent_t * tor;
     uint64_t now = tr_date();
 
@@ -110,14 +159,17 @@ void tr_chokingPulse( tr_choking_t * c )
         peersTotalCount += tor->peerCount;
     }
 
-    peersCanChoke   = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
-    peersCanUnchoke = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
-    peersCanChokeCount   = 0;
-    peersCanUnchokeCount = 0;
-    unchokedCount        = 0;
+    canChoke   = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
+    canUnchoke = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
+    canChokeCount   = 0;
+    canUnchokeCount = 0;
+    unchoked        = 0;
 
     for( i = 0; i < c->h->torrentCount; i++ )
     {
+        tr_peer_t * peer;
+        int j;
+
         tor = c->h->torrents[i];
         for( j = 0; j < tor->peerCount; j++ )
         {
@@ -140,56 +192,93 @@ void tr_chokingPulse( tr_choking_t * c )
                (or the other way around). */
             if( tr_peerIsUnchoked( peer ) )
             {
-                unchokedCount++;
+                unchoked++;
                 if( tr_peerLastChoke( peer ) + 10000 < now )
-                    peersCanChoke[peersCanChokeCount++] = peer;
+                    canChoke[canChokeCount++] = peer;
             }
             else
             {
                 if( tr_peerLastChoke( peer ) + 10000 < now )
-                    peersCanUnchoke[peersCanUnchokeCount++] = peer;
+                    canUnchoke[canUnchokeCount++] = peer;
             }
         }
     }
 
-    /* Sort peers by the rate we are downloading from them. */
-    sortPeersDescending( peersCanChoke, peersCanChokeCount );
-    sortPeersAscending( peersCanUnchoke, peersCanUnchokeCount );
+    canChokeZero      = malloc( canChokeCount * sizeof( tr_peer_t * ) );
+    canChokeNonZero   = malloc( canChokeCount * sizeof( tr_peer_t * ) );
+    canUnchokeZero    = malloc( canUnchokeCount * sizeof( tr_peer_t * ) );
+    canUnchokeNonZero = malloc( canUnchokeCount * sizeof( tr_peer_t * ) );
 
-    if( unchokedCount > c->slots && peersCanChokeCount > 0 )
+    sortPeersDescending( canChoke, canChokeCount,
+                         canChokeZero, &canChokeZeroCount,
+                         canChokeNonZero, &canChokeNonZeroCount);
+    sortPeersAscending( canUnchoke, canUnchokeCount,
+                        canUnchokeZero, &canUnchokeZeroCount,
+                        canUnchokeNonZero, &canUnchokeNonZeroCount);
+
+    free( canChoke );
+    free( canUnchoke );
+
+    /* If we have more open slots than what we should have (the user has
+       just lowered his upload limit), we need to choke some of the
+       peers we are uploading to. We start with the peers who aren't
+       uploading to us, then those we upload the least. */
+    while( unchoked > c->slots && canChokeZeroCount > 0 )
     {
-        /* We have more open slots than what we should have (the user
-           has just lowered his upload limit. We need to choke some of the
-           peers we are uploading to. */
-        int willChoke;
-        willChoke = MIN( peersCanChokeCount, unchokedCount - c->slots );
-        for( i = 0; i < willChoke; i++ )
-            tr_peerChoke( peersCanChoke[--peersCanChokeCount] );
+        tr_peerChoke( canChokeZero[--canChokeZeroCount] );
+        unchoked--;
     }
-    else if( unchokedCount < c->slots && peersCanUnchokeCount > 0 )
+    while( unchoked > c->slots && canChokeNonZeroCount > 0 )
     {
-        /* We have unused open slots. Let's unchoke some people. */
-        int willUnchoke;
-        willUnchoke = MIN( peersCanUnchokeCount, c->slots - unchokedCount );
-        for( i = 0; i < willUnchoke; i++ )
-            tr_peerUnchoke( peersCanUnchoke[--peersCanUnchokeCount] );
+        tr_peerChoke( canChokeNonZero[--canChokeNonZeroCount] );
+        unchoked--;
     }
 
-    while( peersCanChokeCount > 0 && peersCanUnchokeCount > 0 )
+    /* If we have unused open slots, let's unchoke some people. We start
+       with the peers who are uploading to us the most. */
+    while( unchoked < c->slots && canUnchokeNonZeroCount > 0 )
     {
-        /* All slots are used and more peers are waiting. If
-           applicable, choke some peers in favor of others who are
-           uploading more to us. */
-        if( tr_peerDownloadRate( peersCanUnchoke[peersCanUnchokeCount - 1] )
-                < tr_peerDownloadRate( peersCanChoke[peersCanChokeCount - 1] ) )
+        tr_peerUnchoke( canUnchokeNonZero[--canUnchokeNonZeroCount] );
+        unchoked++;
+    }
+    while( unchoked < c->slots && canUnchokeZeroCount > 0 )
+    {
+        tr_peerUnchoke( canUnchokeZero[--canUnchokeZeroCount] );
+        unchoked++;
+    }
+
+    /* Choke peers who aren't uploading if there are good peers waiting
+       for an unchoke */
+    while( canChokeZeroCount > 0 && canUnchokeNonZeroCount > 0 )
+    {
+        tr_peerChoke( canChokeZero[--canChokeZeroCount] );
+        tr_peerUnchoke( canUnchokeNonZero[--canUnchokeNonZeroCount] );
+    }
+
+    /* Choke peers who aren't uploading that much if there are choked
+       peers who are uploading more */
+    while( canChokeNonZeroCount > 0 && canUnchokeNonZeroCount > 0 )
+    {
+        if( tr_peerDownloadRate( canUnchokeNonZero[canUnchokeNonZeroCount - 1] )
+            < tr_peerDownloadRate( canChokeNonZero[canChokeNonZeroCount - 1] ) )
             break;
 
-        tr_peerChoke( peersCanChoke[--peersCanChokeCount] );
-        tr_peerUnchoke( peersCanUnchoke[--peersCanUnchokeCount] );
+        tr_peerChoke( canChokeNonZero[--canChokeNonZeroCount] );
+        tr_peerUnchoke( canUnchokeNonZero[--canUnchokeNonZeroCount] );
     }
 
-    free( peersCanChoke );
-    free( peersCanUnchoke );
+    /* Some unchoked peers still aren't uploading to us, let's give a
+       chance to other non-uploaders */
+    while( canChokeZeroCount > 0 && canUnchokeZeroCount > 0 )
+    {
+        tr_peerChoke( canChokeZero[--canChokeZeroCount] );
+        tr_peerUnchoke( canUnchokeZero[--canUnchokeZeroCount] );
+    }
+
+    free( canChokeZero );
+    free( canChokeNonZero );
+    free( canUnchokeZero );
+    free( canUnchokeNonZero );
 
     /* Unlock all torrents */
     for( i = 0; i < c->h->torrentCount; i++ )
