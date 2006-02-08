@@ -33,9 +33,11 @@ if $(OS) = MACOSX
         macosx/ProgressCell.h
         macosx/ProgressCell.m
         macosx/main.m
+        macosx/StringAdditions.h
+        macosx/StringAdditions.m
         macosx/TorrentTableView.h
         macosx/TorrentTableView.m
-	macosx/Transmission.sdef
+        macosx/Transmission.sdef
         macosx/Transmission.xcodeproj/project.pbxproj
         macosx/Transmission_Prefix.pch
         macosx/Utils.h ;

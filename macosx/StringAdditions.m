@@ -36,12 +36,12 @@
         return [NSString stringWithFormat: @"%.2f GB/s", speed / 1048576];
 }
 
-+ (NSString *) stringForRatio: (uint64_t) down upload: (uint64_t) up;
++ (NSString *) stringForRatio: (uint64_t) down upload: (uint64_t) up
 {
     if( !down && !up )
         return @"N/A";
     if( !down )
-        return @"Inf.";
+        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
 
     float ratio = (float) up / (float) down;
     if( ratio < 10.0 )
