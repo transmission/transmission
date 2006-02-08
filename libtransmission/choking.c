@@ -138,7 +138,7 @@ static inline void sortPeers( tr_peer_t ** all, int allCount,
 
 void tr_chokingPulse( tr_choking_t * c )
 {
-    int i, peersTotalCount, unchoked;
+    int i, peersTotalCount, unchoked, mustOptimistic = 1;
     tr_peer_t ** canChoke, ** canUnchoke;
     tr_peer_t ** canChokeZero, ** canUnchokeZero;
     tr_peer_t ** canChokeNonZero, ** canUnchokeNonZero;
@@ -182,7 +182,10 @@ void tr_chokingPulse( tr_choking_t * c )
             if( !tr_peerIsInterested( peer ) )
             {
                 if( tr_peerIsUnchoked( peer ) )
+                {
                     tr_peerChoke( peer );
+                    tr_peerSetOptimistic( peer, 0 );
+                }
                 continue;
             }
 
@@ -192,6 +195,22 @@ void tr_chokingPulse( tr_choking_t * c )
                (or the other way around). */
             if( tr_peerIsUnchoked( peer ) )
             {
+                if( tr_peerIsOptimistic( peer ) )
+                {
+                    if( tr_peerLastChoke( peer ) + 30000 < now )
+                    {
+                        /* He got his 30 seconds, now we see him like
+                           any other unchoked peer */
+                        tr_peerSetOptimistic( peer, 0 );
+                    }
+                    else
+                    {
+                        /* Keep him unchoked for 30 seconds */
+                        mustOptimistic = 0;
+                        continue;
+                    }
+                }
+
                 unchoked++;
                 if( tr_peerLastChoke( peer ) + 10000 < now )
                     canChoke[canChokeCount++] = peer;
@@ -218,6 +237,26 @@ void tr_chokingPulse( tr_choking_t * c )
 
     free( canChoke );
     free( canUnchoke );
+
+    if( mustOptimistic )
+    {
+        tr_peer_t * peer;
+
+        /* Open an extra slot for optimistic choking */
+        if( canUnchokeZeroCount )
+        {
+            /* TODO: prefer peers with no pieces at all */
+            peer = canUnchokeZero[--canUnchokeZeroCount];
+            tr_peerUnchoke( peer );
+            tr_peerSetOptimistic( peer, 1 );
+        }
+        else if( canUnchokeNonZeroCount )
+        {
+            peer = canUnchokeNonZero[--canUnchokeNonZeroCount];
+            tr_peerUnchoke( peer );
+            tr_peerSetOptimistic( peer, 1 );
+        }
+    }
 
     /* If we have more open slots than what we should have (the user has
        just lowered his upload limit), we need to choke some of the

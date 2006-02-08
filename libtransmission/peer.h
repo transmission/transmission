@@ -44,5 +44,7 @@ int         tr_peerIsInterested  ( tr_peer_t * );
 void        tr_peerChoke         ( tr_peer_t * );
 void        tr_peerUnchoke       ( tr_peer_t * );
 uint64_t    tr_peerLastChoke     ( tr_peer_t * );
+void        tr_peerSetOptimistic ( tr_peer_t *, int );
+int         tr_peerIsOptimistic  ( tr_peer_t * );
 
 #endif

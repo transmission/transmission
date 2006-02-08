@@ -53,6 +53,7 @@ struct tr_peer_s
     char           peerChoking;
     char           peerInterested;
 
+    int            optimistic;
     uint64_t       lastChoke;
 
     uint8_t        id[20];
@@ -488,4 +489,14 @@ void tr_peerUnchoke( tr_peer_t * peer )
 uint64_t tr_peerLastChoke( tr_peer_t * peer )
 {
     return peer->lastChoke;
+}
+
+void tr_peerSetOptimistic( tr_peer_t * peer, int o )
+{
+    peer->optimistic = o;
+}
+
+int tr_peerIsOptimistic( tr_peer_t * peer )
+{
+    return peer->optimistic;
 }
