@@ -131,7 +131,6 @@
         NSOnState : NSOffState];
 
     //set dock badging
-    [fBadgeCompletedCheck setState: [fDefaults boolForKey: @"BadgeCompleted"]];
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
 
@@ -267,9 +266,7 @@
 {   
     BOOL state = [sender state];
     
-    if (sender == fBadgeCompletedCheck)
-        [fDefaults setBool: state forKey: @"BadgeCompleted"];
-    else if (sender == fBadgeDownloadRateCheck)
+    if (sender == fBadgeDownloadRateCheck)
         [fDefaults setBool: state forKey: @"BadgeDownloadRate"];
     else if (sender == fBadgeUploadRateCheck)
         [fDefaults setBool: state forKey: @"BadgeUploadRate"];

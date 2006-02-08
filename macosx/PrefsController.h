@@ -37,7 +37,6 @@
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSButton       * fQuitCheck;
     IBOutlet NSButton       * fRemoveCheck;
-    IBOutlet NSButton       * fBadgeCompletedCheck;
     IBOutlet NSButton       * fBadgeDownloadRateCheck;
     IBOutlet NSButton       * fBadgeUploadRateCheck;                            
     IBOutlet NSPopUpButton  * fUpdatePopUp;

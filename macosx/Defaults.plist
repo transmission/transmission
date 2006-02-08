@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BadgeCompleted</key>
-	<true/>
 	<key>BadgeDownloadRate</key>
 	<false/>
 	<key>BadgeUploadRate</key>

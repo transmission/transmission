@@ -73,7 +73,6 @@
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                fBadgeCompletedCheck = NSButton; 
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
                 fBlankView = NSView; 
