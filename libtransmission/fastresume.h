@@ -257,9 +257,9 @@ static int fastResumeLoadOld( tr_io_t * io, FILE * file )
         fclose( file );
         return 1;
     }
-    fseek( file, 0, SEEK_SET );
 
     /* load progress information */
+    fseek( file, 4, SEEK_SET );
     if( fastResumeLoadProgress( io, file ) )
     {
         fclose( file );
