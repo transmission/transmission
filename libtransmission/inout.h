@@ -29,5 +29,6 @@ tr_io_t * tr_ioInit        ( tr_torrent_t * );
 int       tr_ioRead        ( tr_io_t *, int, int, int, uint8_t * );
 int       tr_ioWrite       ( tr_io_t *, int, int, int, uint8_t * );
 void      tr_ioClose       ( tr_io_t * );
+void      tr_ioSaveResume  ( tr_io_t * );
 
 #endif
