@@ -34,11 +34,13 @@
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
-    if (speed < 1024)
+    if (speed < 1000)         /* 0.0 K to 999.9 K */
         return [NSString stringWithFormat: @"%.1f K", speed];
-    else if (speed < 1048576)
+    else if (speed < 102400)  /* 0.98 M to 99.99 M */
         return [NSString stringWithFormat: @"%.2f M", speed / 1024];
-    else
+    else if (speed < 1024000) /* 100.0 M to 999.9 M */
+        return [NSString stringWithFormat: @"%.1f M", speed / 1024];
+    else                      /* Insane speeds */
         return [NSString stringWithFormat: @"%.2f G", speed / 1048576];
 }
 
