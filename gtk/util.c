@@ -90,7 +90,7 @@ ratiostr(guint64 down, guint64 up) {
     /* this is a UTF-8 infinity symbol */
     return g_strdup(_("\xE2\x88\x9E"));
 
-  ratio = up / down;
+  ratio = (double)up / (double)down;
 
   return g_strdup_printf("%.*f", (10.0 > ratio ? 2 : (100.0 > ratio ? 1 : 0)),
                          ratio);
