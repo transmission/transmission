@@ -63,13 +63,50 @@
 - (NSString *) stringFittingInWidth: (float) width
                     withAttributes: (NSDictionary *) attributes
 {
-    NSString * newString = self;
-    
-    unsigned i;
-    for (i = [self length]; [newString sizeWithAttributes: attributes].width > width; i--)
-        newString = [[self substringToIndex: i] stringByAppendingString: NS_ELLIPSIS];
-    
-    return newString;
+    float w;
+    int i;
+    NSString * newString;
+
+    w = [self sizeWithAttributes: attributes].width;
+    if( w <= width )
+        /* The whole string fits */
+        return self;
+
+    /* Approximate how many characters we'll need to drop... */
+    i = [self length] * width / w - 1;
+
+    /* ... then refine it */
+    newString = [[self substringToIndex: i]
+        stringByAppendingString: NS_ELLIPSIS];
+    w = [newString sizeWithAttributes: attributes].width;
+
+    if( w < width )
+    {
+        NSString * bakString;
+        for( ;; )
+        {
+            bakString = newString;
+            newString = [[self substringToIndex: ++i]
+                stringByAppendingString: NS_ELLIPSIS];
+            if( [newString sizeWithAttributes: attributes].width > width )
+                return bakString;
+        }
+
+    }
+    else if( w > width )
+    {
+        for( ;; )
+        {
+            newString = [[self substringToIndex: --i]
+                stringByAppendingString: NS_ELLIPSIS];
+            if( [newString sizeWithAttributes: attributes].width <= width )
+                return newString;
+        }
+    }
+    else
+    {
+        return newString;
+    }
 }
 
 @end
