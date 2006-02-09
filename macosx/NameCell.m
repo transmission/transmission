@@ -26,6 +26,38 @@
 
 @implementation NameCell
 
+- (id) init
+{
+    [super init];
+
+    fFileTypes = [[NSMutableArray alloc] initWithCapacity: 10];
+    fIcons     = [[NSMutableArray alloc] initWithCapacity: 10];
+
+    return self;
+}
+
+- (NSImage *) iconForFileType: (NSString *) type
+{
+    unsigned i;
+
+    /* See if we have this icon cached */
+    for( i = 0; i < [fFileTypes count]; i++ )
+        if( [[fFileTypes objectAtIndex: i] isEqualToString: type] )
+            break;
+
+    if( i == [fFileTypes count] )
+    {
+        /* Unknown file type, get its icon and cache it */
+        NSImage * icon;
+        icon = [[NSWorkspace sharedWorkspace] iconForFileType: type];
+        [icon setFlipped: YES];
+        [fFileTypes addObject: type];
+        [fIcons     addObject: icon];
+    }
+
+    return [fIcons objectAtIndex: i];
+}
+
 - (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w
 {
     fWhiteText = w;
@@ -34,13 +66,8 @@
     fSizeString  = [NSString stringWithFormat: @" (%@)",
                     [NSString stringForFileSize: stat->info.totalSize]];
 
-    if( stat->info.fileCount > 1 )
-        fIcon = [[NSWorkspace sharedWorkspace] iconForFileType:
-            NSFileTypeForHFSTypeCode('fldr')];
-    else
-        fIcon = [[NSWorkspace sharedWorkspace] iconForFileType:
-            [fNameString pathExtension]];
-    [fIcon setFlipped: YES];
+    fCurrentIcon = [self iconForFileType: stat->info.fileCount > 1 ?
+        NSFileTypeForHFSTypeCode('fldr') : [fNameString pathExtension]];
 
     fTimeString  = @"";
     fPeersString = @"";
@@ -110,8 +137,8 @@
 
     pen.x += 5;
     pen.y += 5;                                                                 
-    [fIcon drawAtPoint: pen fromRect:
-        NSMakeRect(0,0,[fIcon size].width,[fIcon size].height)
+    [fCurrentIcon drawAtPoint: pen fromRect:
+        NSMakeRect(0,0,[fCurrentIcon size].width,[fCurrentIcon size].height)
         operation: NSCompositeSourceOver fraction: 1.0];
 
     attributes = [NSMutableDictionary dictionaryWithCapacity: 2];
