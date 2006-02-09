@@ -44,6 +44,35 @@ EOF
   rm -f testconf.c testconf
 }
 
+gettext_test()
+{
+  cat > testconf.c <<EOF
+  #include <libintl.h>
+  int main()
+  {
+    gettext("");
+  }
+EOF
+  if $CC $GTKCCFLAGS $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
+  then
+    rm -f testconf.c testconf
+    return 0
+  fi
+
+  # XXX there has to be a better way than this
+  for intl_testdir in /usr/local/include /usr/X11R6/include /usr/pkg/include
+  do
+    if $CC $GTKCCFLAGS -I$intl_testdir $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
+    then
+      GTKCCFLAGS="$GTKCCFLAGS -I$intl_testdir"
+      rm -f testconf.c testconf
+      return 0
+    fi
+  done
+  rm -f testconf.c testconf
+  return 1
+}
+
 gtk_test()
 {
   if pkg-config gtk+-2.0 > /dev/null 2>&1
@@ -59,11 +88,19 @@ gtk_test()
 EOF
       if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
       then
-        echo "GTK+:    yes"
-        GTK=yes
         GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
         GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
-        GTKLOCALEDIR="$INSTALL_PREFIX/share/locale"
+        if gettext_test
+        then
+          GTKLOCALEDIR="$INSTALL_PREFIX/share/locale"
+          GTK=yes
+          echo "GTK+:    yes"
+        else
+          GTKCCFLAGS=
+          GTKLINKLIBS=
+          echo "GTK+:    no, could not find libintl.h"
+          GTK=no
+        fi
       else
         echo "GTK+:    no"
         GTK=no
@@ -177,6 +214,11 @@ case $SYSTEM in
 
   NetBSD)
     DEFINES="$DEFINES SYS_NETBSD"
+    LINKLIBS="$LINKLIBS -lpthread -lm"
+    ;;
+
+  OpenBSD)
+    DEFINES="$DEFINES SYS_OPENBSD"
     LINKLIBS="$LINKLIBS -lpthread -lm"
     ;;
 
