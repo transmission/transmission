@@ -254,16 +254,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     //place the window if not open
     if (![fPrefsWindow isVisible])
     {
-        NSRect  prefsFrame, screenRect;
-        NSPoint point;
-
-        prefsFrame = [fPrefsWindow frame];
-        screenRect = [[NSScreen mainScreen] visibleFrame];
-        point.x    = (screenRect.size.width - prefsFrame.size.width) * 0.5;
-        point.y    = screenRect.origin.y + screenRect.size.height * 0.67 +
-                     prefsFrame.size.height * 0.33;
-
-        [fPrefsWindow setFrameTopLeftPoint: point];
+        [fPrefsWindow center];
     }
     
     [fPrefsWindow makeKeyAndOrderFront:NULL];
