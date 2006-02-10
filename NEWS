@@ -4,7 +4,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Only uses one port for all torrents
  - Rewritten choking algorithm
  - Remembers download and upload sizes from one launch to another
- - New GTK interface
+ - New GTK+ interface
  - New BeOS interface
  - OS X: Dock badging
  - OS X: Shows the file icon in the list

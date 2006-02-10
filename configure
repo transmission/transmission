@@ -10,6 +10,7 @@ usage()
   OpenSSL options:
     --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
     --openssl-prefix=PATH  Location of OpenSSL headers and library
+    --gettext-prefix=PATH  Location of the Gettext header and library
     --disable-gtk          Don't build the GTK+ GUI
     --prefix=PATH          Install here instead of $INSTALL_PREFIX
 
@@ -53,14 +54,23 @@ gettext_test()
     gettext("");
   }
 EOF
+
+  if [ -n "$GETTEXT_PREFIX" ] && $CC "-I$GETTEXT_PREFIX/include" "-Wl,-R$GETTEXT_PREFIX/lib" "-L$GETTEXT_PREFIX/lib" -lintl -liconv -o testconf testconf.c >/dev/null 2>&1
+  then
+    GTKCCFLAGS="-I$GETTEXT_PREFIX/include $GTKCCFLAGS"
+    GTKLINKLIBS="-Wl,-R$GETTEXT_PREFIX/lib -L$GETTEXT_PREFIX/lib -lintl -liconv $GTKLINKLIBS"
+    rm -f testconf.c testconf
+    return 0
+  fi
+
   if $CC $GTKCCFLAGS $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
   then
     rm -f testconf.c testconf
     return 0
   fi
 
-  # XXX there has to be a better way than this
-  for intl_testdir in /usr/local/include /usr/X11R6/include /usr/pkg/include
+  for intl_testdir in $INSTALL_PREFIX/include \
+      /usr/local/include /usr/X11R6/include /usr/pkg/include
   do
     if $CC $GTKCCFLAGS -I$intl_testdir $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
     then
@@ -98,7 +108,7 @@ EOF
         else
           GTKCCFLAGS=
           GTKLINKLIBS=
-          echo "GTK+:    no, could not find libintl.h"
+          echo "GTK+:    no, could not find gettext libintl.h"
           GTK=no
         fi
       else
@@ -149,6 +159,9 @@ while [ $# -ne 0 ]; do
       ;;
     x--openssl-prefix=*)
       OPENSSL_PREFIX="$param";
+      ;;
+    x--gettext-prefix=*)
+      GETTEXT_PREFIX="$param";
       ;;
     x--disable-gtk)
       gtk_disable="1";

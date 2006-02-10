@@ -6,7 +6,7 @@ simple, intuitive interface on top on an efficient, cross-platform
 back-end.
 
 Transmission is open source (MIT license) and runs on Mac OS X (Cocoa
-interface), Linux/NetBSD/FreeBSD/OpenBSD (GTK interface) and BeOS
+interface), Linux/NetBSD/FreeBSD/OpenBSD (GTK+ interface) and BeOS
 (native interface).
 
 For more information (including build instructions), please consult the
