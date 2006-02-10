@@ -184,7 +184,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
     int active = fDownloading + fSeeding;
-    if (active > 0 && [[NSUserDefaults standardUserDefaults] boolForKey: @"CheckQuit"])
+    if (active > 0 && [fDefaults boolForKey: @"CheckQuit"])
     {
         NSString * message = active == 1
             ? @"There is an active torrent. Do you really want to quit?"
@@ -590,11 +590,10 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     //badge dock
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [fBadger updateBadgeWithCompleted: fCompleted
-        uploadRate: ul >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"]
+        uploadRate: ul >= 0.1 && [fDefaults boolForKey: @"BadgeUploadRate"]
           ? [NSString stringForSpeedAbbrev: ul] : nil
-        downloadRate: dl >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"]
+        downloadRate: dl >= 0.1 && [fDefaults boolForKey: @"BadgeDownloadRate"]
           ? [NSString stringForSpeedAbbrev: dl] : nil];
 }
 
