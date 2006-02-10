@@ -30,8 +30,8 @@ openssl_test()
       SHA1( 0, 0, 0 );
   }
 EOF
-  if [ -n "$PREFIX" ]; then
-    TMPFLAGS="-I$PREFIX/include -L$PREFIX/lib"
+  if [ -n "$OPENSSL_PREFIX" ]; then
+    TMPFLAGS="-I$OPENSSL_PREFIX/include -L$OPENSSL_PREFIX/lib"
   fi
   if $CC $TMPFLAGS -o testconf testconf.c -lcrypto > /dev/null 2>&1
   then
