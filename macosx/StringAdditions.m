@@ -63,50 +63,48 @@
 - (NSString *) stringFittingInWidth: (float) width
                     withAttributes: (NSDictionary *) attributes
 {
-    float w;
     int i;
-    NSString * newString;
-
-    w = [self sizeWithAttributes: attributes].width;
-    if( w <= width )
-        /* The whole string fits */
+    float realWidth = [self sizeWithAttributes: attributes].width;
+    
+    /* The whole string fits */
+    if( realWidth <= width )
         return self;
+        
+    /* Width is too small */
+    if ( [NS_ELLIPSIS sizeWithAttributes: attributes].width > width )
+        return @"";
+
+    /* Don't worry about ellipsis until the end */
+    width -= [NS_ELLIPSIS sizeWithAttributes: attributes].width;
 
     /* Approximate how many characters we'll need to drop... */
-    i = [self length] * width / w - 1;
+    i = [self length] * (width / realWidth);
 
     /* ... then refine it */
-    newString = [[self substringToIndex: i]
-        stringByAppendingString: NS_ELLIPSIS];
-    w = [newString sizeWithAttributes: attributes].width;
+    NSString * newString = [self substringToIndex: i];
+    realWidth = [newString sizeWithAttributes: attributes].width;
 
-    if( w < width )
+    if( realWidth < width )
     {
-        NSString * bakString;
-        for( ;; )
+        NSString * smallerString;
+        do
         {
-            bakString = newString;
-            newString = [[self substringToIndex: ++i]
-                stringByAppendingString: NS_ELLIPSIS];
-            if( [newString sizeWithAttributes: attributes].width > width )
-                return bakString;
-        }
+            smallerString = newString;
+            newString = [self substringToIndex: ++i];
+        } while ([newString sizeWithAttributes: attributes].width <= width);
+        
+        newString = smallerString;
+    }
+    else if( realWidth > width )
+    {
+        do
+        {
+            newString = [self substringToIndex: --i];
+        } while ([newString sizeWithAttributes: attributes].width > width);
+    }
+    else;
 
-    }
-    else if( w > width )
-    {
-        for( ;; )
-        {
-            newString = [[self substringToIndex: --i]
-                stringByAppendingString: NS_ELLIPSIS];
-            if( [newString sizeWithAttributes: attributes].width <= width )
-                return newString;
-        }
-    }
-    else
-    {
-        return newString;
-    }
+    return [newString stringByAppendingString: NS_ELLIPSIS];
 }
 
 @end
