@@ -35,6 +35,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
 #include "defines.h"
 
@@ -441,40 +442,89 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
         gint y SHUTUP, GtkSelectionData *sel, guint info SHUTUP, guint time,
         gpointer gdata) {
   struct cbdata *data = gdata;
-  char prefix[] = "file://";
-  char *file, *sele, *targ, *type;
-  int ii;
+  char prefix[] = "file:";
+  char *files, *decoded, *deslashed, *hostless;
+  int ii, len;
+  GList *errs;
+  gboolean gotfile;
+  struct stat sb;
+  int prelen = strlen(prefix);
 
+#ifdef DND_DEBUG
+  char *sele = gdk_atom_name(sel->selection);
+  char *targ = gdk_atom_name(sel->target);
+  char *type = gdk_atom_name(sel->type);
+
+  fprintf(stderr, "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i\n",
+          sele, targ, type, sel->format, sel->length);
+  g_free(sele);
+  g_free(targ);
+  g_free(type);
+  if(8 == sel->format) {
+    for(ii = 0; ii < sel->length; ii++)
+      fprintf(stderr, "%02X ", sel->data[ii]);
+    fprintf(stderr, "\n");
+  }
+#endif
+
+  errs = NULL;
+  gotfile = FALSE;
   if(gdk_atom_intern("XdndSelection", FALSE) == sel->selection &&
-     8 == sel->format && (int)sizeof(prefix) - 1 < sel->length &&
-     0 == strncmp(prefix, sel->data, sizeof(prefix) - 1)) {
-    file = urldecode(sel->data + (sizeof(prefix) - 1),
-                     sel->length - (sizeof(prefix) - 1));
-    if(g_utf8_validate(file, -1, NULL) &&
-       addtorrent(data->tr, data->wind, file, NULL, FALSE, NULL)) {
-      g_free(file);
-      gtk_drag_finish(dc, TRUE, FALSE, time);
-      addedtorrents(data);
-      return;
+     8 == sel->format) {
+    /* split file list on carriage returns and linefeeds */
+    files = g_new(char, sel->length + 1);
+    memcpy(files, sel->data, sel->length);
+    files[sel->length] = '\0';
+    for(ii = 0; '\0' != files[ii]; ii++)
+      if('\015' == files[ii] || '\012' == files[ii])
+        files[ii] = '\0';
+
+    /* try to get a usable filename out of the URI supplied and add it */
+    for(ii = 0; ii < sel->length; ii += len + 1) {
+      if('\0' == files[ii])
+        len = 0;
+      else {
+        len = strlen(files + ii);
+        /* de-urlencode the URI */
+        decoded = urldecode(files + ii, len);
+        if(g_utf8_validate(decoded, -1, NULL)) {
+          /* remove the file: prefix */
+          if(prelen < len && 0 == strncmp(prefix, decoded, prelen)) {
+            deslashed = decoded + prelen;
+            /* trim excess / characters from the beginning */
+            while('/' == deslashed[0] && '/' == deslashed[1])
+              deslashed++;
+            /* if the file doesn't exist, the first part might be a hostname */
+            if(0 > g_stat(deslashed, &sb) &&
+               NULL != (hostless = strchr(deslashed + 1, '/')) &&
+               0 == g_stat(hostless, &sb))
+              deslashed = hostless;
+            /* finally, try to add it as a torrent */
+            if(addtorrent(data->tr, data->wind, deslashed, NULL, FALSE, &errs))
+              gotfile = TRUE;
+          }
+        }
+        g_free(decoded);
+      }
     }
-    g_free(file);
-  } else {
-    sele = gdk_atom_name(sel->selection);
-    targ = gdk_atom_name(sel->target);
-    type = gdk_atom_name(sel->type);
-    fprintf(stderr, "unhandled drag: sel=%s targ=%s type=%s fmt=%i len=%i\n",
-            sele, targ, type, sel->format, sel->length);
-    g_free(sele);
-    g_free(targ);
-    g_free(type);
-    if(8 == sel->format) {
-      for(ii = 0; ii < sel->length; ii++)
-        fprintf(stderr, "%02X ", sel->data[ii]);
-      fprintf(stderr, "\n");
+
+    g_free(files);
+    if(gotfile)
+      addedtorrents(data);
+
+    /* print any errors */
+    if(NULL != errs) {
+      files = joinstrlist(errs, "\n");
+      errmsg(data->wind, ngettext("Failed to load the torrent file %s",
+                                  "Failed to load the torrent files:\n%s",
+                                  g_list_length(errs)), files);
+      g_list_foreach(errs, (GFunc)g_free, NULL);
+      g_list_free(errs);
+      g_free(files);
     }
   }
 
-  gtk_drag_finish(dc, FALSE, FALSE, time);
+  gtk_drag_finish(dc, gotfile, FALSE, time);
 }
 
 void
