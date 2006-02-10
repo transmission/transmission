@@ -1,5 +1,17 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.5 (not yet released)
+ - Only uses one port for all torrents
+ - Rewritten choking algorithm
+ - Remembers download and upload sizes from one launch to another
+ - New GTK interface
+ - New BeOS interface
+ - OS X: Dock badging
+ - OS X: Shows the file icon in the list
+ - OS X: Shows ratio once download is completed
+ - OS X: Automatic check for update
+ - OS X: Fixes a display bug on Intel Macs
+
 0.4 (2005/11/18)
  - Uses less CPU downloading torrents with many pieces
  - The UI could freeze when the hard drive was having a hard time - fixed

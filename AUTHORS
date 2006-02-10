@@ -8,24 +8,20 @@ Eric Petit <titer@m0k.org>
  + OS X interface
 
 Josh Elsasser <josh@elsasser.org>
+ + Back-end
  + GTK+ interface
-
-Michael Demars <keul@m0k.org>
- + OS X interface
- + Growl notifications
- + AppleScript support
 
 Bryan Varner <bryan@varnernet.com>
  + BeOS interface
 
+Michael Demars <keul@m0k.org>
+ + OS X interface (Growl notifications, AppleScript)
+
 
 Thanks to:
 
-vi@nwr.jp
- + Free SHA1 implementation (sha1.[ch])
-
-Mike Matas <http://www.mikematas.com/>
- + OS X toolbar icons
+Mitchell Livingston
+ + OS X patches (Badging, preferences, check for update and much more)
 
 Omar and Adrien
  + Beta testing
@@ -33,17 +29,23 @@ Omar and Adrien
 Various people
  + Writing http://wiki.theory.org/BitTorrentSpecification
 
+vi@nwr.jp
+ + Free SHA1 implementation (sha1.[ch])
+
+John Blitch
+ + OS X patch (Contextual menu)
+
 Ahmad M. Afuni
  + NetBSD patch
 
 Jeremy Messenger
  + FreeBSD patch
 
+Mike Matas <http://www.mikematas.com/>
+ + OS X toolbar icons
+
 Martin Stadtmueller
  + Icon tweaking
 
-John Blitch
- + Contextual menu patch
-
-Mitchell Livingston
- + OS X patches
+FOOOD
+ + Badging images
