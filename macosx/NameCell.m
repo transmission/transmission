@@ -28,34 +28,31 @@
 
 - (id) init
 {
-    [super init];
-
-    fFileTypes = [[NSMutableArray alloc] initWithCapacity: 10];
-    fIcons     = [[NSMutableArray alloc] initWithCapacity: 10];
+    if ((self = [super init]))
+        fIcons = [[NSMutableDictionary alloc] initWithCapacity: 10];
 
     return self;
 }
 
+- (void) dealloc
+{
+    [fIcons release];
+    [super dealloc];
+}
+
 - (NSImage *) iconForFileType: (NSString *) type
 {
-    unsigned i;
-
-    /* See if we have this icon cached */
-    for( i = 0; i < [fFileTypes count]; i++ )
-        if( [[fFileTypes objectAtIndex: i] isEqualToString: type] )
-            break;
-
-    if( i == [fFileTypes count] )
+    NSImage * icon;
+    if (!(icon = [fIcons objectForKey: type]))
     {
         /* Unknown file type, get its icon and cache it */
-        NSImage * icon;
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: type];
         [icon setFlipped: YES];
-        [fFileTypes addObject: type];
-        [fIcons     addObject: icon];
+
+        [fIcons setObject: icon forKey: type];
     }
 
-    return [fIcons objectAtIndex: i];
+    return icon;
 }
 
 - (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w
@@ -136,7 +133,7 @@
     float cellWidth = cellFrame.size.width;
 
     pen.x += 5;
-    pen.y += 5;                                                                 
+    pen.y += 5;
     [fCurrentIcon drawAtPoint: pen fromRect:
         NSMakeRect(0,0,[fCurrentIcon size].width,[fCurrentIcon size].height)
         operation: NSCompositeSourceOver fraction: 1.0];

@@ -36,9 +36,8 @@
     NSString * fTimeString;
     NSString * fPeersString;
 
-    NSMutableArray * fFileTypes;
-    NSMutableArray * fIcons;
-    NSImage        * fCurrentIcon;
+    NSMutableDictionary * fIcons;
+    NSImage             * fCurrentIcon;
 }
 - (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
 @end
