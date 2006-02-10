@@ -650,17 +650,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     (id <NSDraggingInfo>) info row: (int) row dropOperation:
     (NSTableViewDropOperation) operation
 {
-    NSPasteboard * pasteboard;
-
-    pasteboard = [info draggingPasteboard];
-    if( ![[pasteboard types] containsObject: NSFilenamesPboardType] )
-    {
-        return NO;
-    }
-
-    [self application: NSApp openFiles:
-        [pasteboard propertyListForType: NSFilenamesPboardType]];
-
+    [self application: NSApp openFiles: [[info draggingPasteboard]
+        propertyListForType: NSFilenamesPboardType]];
     return YES;
 }
 
@@ -668,6 +659,15 @@ static void sleepCallBack( void * controller, io_service_t y,
     (id <NSDraggingInfo>) info proposedRow: (int) row
     proposedDropOperation: (NSTableViewDropOperation) operation
 {
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+
+    if (![[pasteboard types] containsObject: NSFilenamesPboardType]
+            || [[[pasteboard propertyListForType: NSFilenamesPboardType]
+                pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]
+                count] == 0)
+        return NSDragOperationNone;
+
+    [fTableView setDropRow: fCount dropOperation: NSTableViewDropAbove];
     return NSDragOperationGeneric;
 }
 
