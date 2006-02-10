@@ -1,6 +1,13 @@
 README for Transmission
 =======================
 
-This is Transmission, a free BitTorrent client. For more information
-(including build instructions), please consult the website:
-http://transmission.m0k.org/
+Transmission is a free, lightweight BitTorrent client. It features a
+simple, intuitive interface on top on an efficient, cross-platform
+backend.
+
+Transmission is open source (MIT license) and runs on Mac OS X (Cocoa
+interface), Linux/NetBSD/FreeBSD/OpenBSD (GTK interface) and BeOS
+(native interface).
+
+For more information (including build instructions), please consult the
+website: http://transmission.m0k.org/
