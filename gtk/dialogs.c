@@ -420,8 +420,14 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   INFOLINEA(table, ii, _("Piece Size:"), readablesize(sb[id].info.pieceSize, 1));
   INFOLINEF(table, ii, "%i", _("Pieces:"), sb[id].info.pieceCount);
   INFOLINEA(table, ii, _("Total Size:"), readablesize(sb[id].info.totalSize, 1));
-  INFOLINEF(table, ii, "%i", _("Seeders:"), sb[id].seeders);
-  INFOLINEF(table, ii, "%i", _("Leechers:"), sb[id].leechers);
+  if(0 > sb[id].seeders)
+    INFOLINE(table, ii, _("Seeders:"), _("?"));
+  else
+    INFOLINEF(table, ii, "%i", _("Seeders:"), sb[id].seeders);
+  if(0 > sb[id].leechers)
+    INFOLINE(table, ii, _("Leechers:"), _("?"));
+  else
+    INFOLINEF(table, ii, "%i", _("Leechers:"), sb[id].leechers);
 
   INFOSEP(table, ii);
 
