@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.5 (not yet released)
+0.5 (2006/02/11)
  - Only uses one port for all torrents
  - Rewritten choking algorithm
  - Remembers download and upload sizes from one launch to another
