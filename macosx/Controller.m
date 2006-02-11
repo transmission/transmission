@@ -144,8 +144,9 @@ static void sleepCallBack( void * controller, io_service_t y,
     fSeeding = 0;
     fCompleted = 0;
     fStat  = nil;
+    [self updateUI: nil];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
-        selector: @selector( updateUI: ) userInfo: NULL repeats: YES];
+        selector: @selector( updateUI: ) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
         forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer
@@ -154,7 +155,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self checkForUpdateTimer: nil];
     fUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 60.0
         target: self selector: @selector( checkForUpdateTimer: )
-        userInfo: NULL repeats: YES];
+        userInfo: nil repeats: YES];
 }
 
 - (void) windowDidBecomeKey: (NSNotification *) n
@@ -583,7 +584,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         if( !tr_getFinished( fHandle, i ) )
             continue;
 
-        fCompleted++;
+        if( ![fWindow isKeyWindow] )
+            fCompleted++;
         [self notifyGrowl: [NSString stringWithUTF8String: 
             fStat[i].info.name]];
         tr_setFinished( fHandle, i, 0 );
@@ -650,8 +652,9 @@ static void sleepCallBack( void * controller, io_service_t y,
     (id <NSDraggingInfo>) info row: (int) row dropOperation:
     (NSTableViewDropOperation) operation
 {
-    [self application: NSApp openFiles: [[info draggingPasteboard]
-        propertyListForType: NSFilenamesPboardType]];
+    [self application: NSApp openFiles: [[[info draggingPasteboard]
+        propertyListForType: NSFilenamesPboardType]
+        pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
     return YES;
 }
 
