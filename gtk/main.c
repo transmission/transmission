@@ -676,8 +676,6 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     MC_SIZE, &size, MC_PROG, &prog, MC_ETA, &eta, MC_PEERS, &tpeers,
     MC_UPEERS, &upeers, MC_DPEERS, &dpeers, -1);
 
-  if(0 > eta)
-    eta = 0;
   if(0 > tpeers)
     tpeers = 0;
   if(0 > upeers)
@@ -689,9 +687,13 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
 
   if(status & TR_STATUS_CHECK)
     top = g_strdup_printf(_("Checking existing files (%.1f%%)"), prog);
-  else if(status & TR_STATUS_DOWNLOAD)
-    top = g_strdup_printf(_("Finishing in %02i:%02i:%02i (%.1f%%)"),
-                           eta / 60 / 60, eta / 60 % 60, eta % 60, prog);
+  else if(status & TR_STATUS_DOWNLOAD) {
+    if(0 > eta)
+      top = g_strdup_printf(_("Finishing in --:--:-- (%.1f%%)"), prog);
+    else
+      top = g_strdup_printf(_("Finishing in %02i:%02i:%02i (%.1f%%)"),
+                            eta / 60 / 60, eta / 60 % 60, eta % 60, prog);
+  }
   else if(status & TR_STATUS_SEED)
     top = g_strdup_printf(ngettext("Seeding, uploading to %d of %d peer",
                                    "Seeding, uploading to %d of %d peers",
