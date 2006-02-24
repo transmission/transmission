@@ -682,7 +682,7 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     upeers = 0;
   if(0 > dpeers)
     dpeers = 0;
-  mb = readablesize(size, 1);
+  mb = readablesize(size);
   prog *= 100;
 
   if(status & TR_STATUS_CHECK)
@@ -744,12 +744,12 @@ dfprog(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
   else if(1.0 < prog)
     prog = 1.0;
 
-  ulstr = readablesize(ul * 1024.0, 2);
+  ulstr = readablesize(ul * 1024.0);
   if(1.0 == prog) {
     dlstr = ratiostr(down, up);
     str = g_strdup_printf(_("Ratio: %s\nUL: %s/s"), dlstr, ulstr);
   } else {
-    dlstr = readablesize(dl * 1024.0, 2);
+    dlstr = readablesize(dl * 1024.0);
     str = g_strdup_printf(_("DL: %s/s\nUL: %s/s"), dlstr, ulstr);
   }
   marked = g_markup_printf_escaped("<small>%s</small>", str);
@@ -796,8 +796,8 @@ updatemodel(gpointer gdata) {
 
   /* update the status bar */
   tr_torrentRates(data->tr, &up, &down);
-  downstr = readablesize(down * 1024.0, 2);
-  upstr = readablesize(up * 1024.0, 2);
+  downstr = readablesize(down * 1024.0);
+  upstr = readablesize(up * 1024.0);
   str = g_strdup_printf(_("     Total DL: %s/s     Total UL: %s/s"),
                         upstr, downstr);
   gtk_statusbar_pop(data->bar, 0);

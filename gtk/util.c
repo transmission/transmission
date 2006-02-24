@@ -36,6 +36,8 @@
 
 #include "util.h"
 
+#define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
+
 static void
 sigexithandler(int sig);
 static void
@@ -64,7 +66,7 @@ static const char *sizestrs[] = {
 };
 
 char *
-readablesize(guint64 size, int decimals) {
+readablesize(guint64 size) {
   unsigned int ii;
   double small = size;
 
@@ -76,7 +78,8 @@ readablesize(guint64 size, int decimals) {
     ii++;
   }
 
-  return g_strdup_printf("%.*f %s", decimals, small, gettext(sizestrs[ii]));
+  return g_strdup_printf("%.*f %s", BESTDECIMAL(small), small,
+                         gettext(sizestrs[ii]));
 }
 
 char *

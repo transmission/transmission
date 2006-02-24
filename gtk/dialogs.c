@@ -417,9 +417,9 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
     INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s:%i",
               sb[id].info.trackerAddress, sb[id].info.trackerPort));
   INFOLINE(table, ii, _("Announce:"), sb[id].info.trackerAnnounce);
-  INFOLINEA(table, ii, _("Piece Size:"), readablesize(sb[id].info.pieceSize, 1));
+  INFOLINEA(table, ii, _("Piece Size:"), readablesize(sb[id].info.pieceSize));
   INFOLINEF(table, ii, "%i", _("Pieces:"), sb[id].info.pieceCount);
-  INFOLINEA(table, ii, _("Total Size:"), readablesize(sb[id].info.totalSize, 1));
+  INFOLINEA(table, ii, _("Total Size:"), readablesize(sb[id].info.totalSize));
   if(0 > sb[id].seeders)
     INFOLINE(table, ii, _("Seeders:"), _("?"));
   else
@@ -432,8 +432,8 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   INFOSEP(table, ii);
 
   INFOLINE(table, ii, _("Directory:"), sb[id].folder);
-  INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb[id].downloaded, 1));
-  INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb[id].uploaded, 1));
+  INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb[id].downloaded));
+  INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb[id].uploaded));
 
   INFOSEP(table, ii);
 

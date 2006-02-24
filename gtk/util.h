@@ -48,10 +48,10 @@ typedef void (*callbackfunc_t)(void*);
 gboolean
 strbool(const char *str);
 
-/* return a human-readable string for the size given in bytes with the
-   requested number of decimal places.  the string must be g_free()d */
+/* return a human-readable string for the size given in bytes.
+   the string must be g_free()d */
 char *
-readablesize(guint64 size, int decimals);
+readablesize(guint64 size);
 
 /* returns a string representing the download ratio.
    the string must be g_free()d */
