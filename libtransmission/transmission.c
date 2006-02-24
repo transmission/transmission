@@ -68,19 +68,8 @@ tr_handle_t * tr_init()
     h->fdlimit  = tr_fdInit();
     h->choking  = tr_chokingInit( h );
 
-    h->bindPort = TR_DEFAULT_PORT;
+    h->bindPort = -1;
     h->bindSocket = -1;
-
-#ifndef BEOS_NETSERVER
-    /* BeOS net_server seems to be unable to set incoming connections to
-       non-blocking. Too bad. */
-    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
-    {
-        /* XXX should handle failure here in a better way */
-        h->bindSocket = tr_netBind( h->bindPort );
-    }
-#endif
-
 
     h->acceptDie = 0;
     tr_lockInit( &h->acceptLock );
@@ -301,6 +290,11 @@ void tr_torrentStart( tr_handle_t * h, int t )
 
     tor->status   = TR_STATUS_CHECK;
     tor->tracker  = tr_trackerInit( h, tor );
+
+    if( 0 > h->bindPort )
+    {
+        tr_setBindPort( h, TR_DEFAULT_PORT );
+    }
 
     tor->date = tr_date();
     tor->die = 0;
