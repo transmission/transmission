@@ -655,6 +655,12 @@ static void acceptLoop( void * _h )
                 tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
                 goto removePeer;
             }
+            if( date1 > tr_peerDate( h->acceptPeers[ii] ) + 10000 )
+            {
+                /* Give them 10 seconds to send the handshake */
+                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
+                goto removePeer;
+            }
             ii++;
             continue;
            removePeer:

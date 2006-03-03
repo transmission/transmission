@@ -264,6 +264,11 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
     return 0;
 }
 
+uint64_t tr_peerDate( tr_peer_t * peer )
+{
+    return peer->date;
+}
+
 /***********************************************************************
  * tr_peerHash
  ***********************************************************************
