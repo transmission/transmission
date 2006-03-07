@@ -9,7 +9,12 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS += -D__TRANSMISSION__
 
 libtransmission.a: $(OBJS)
+ifeq ($(SYSTEM),Darwin)
 	libtool -static $(OBJS) -o $@
+else
+	ar ru $@ $(OBJS)
+	ranlib $@
+endif
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile
 	$(CC) $(CFLAGS) -o $@ -c $<
