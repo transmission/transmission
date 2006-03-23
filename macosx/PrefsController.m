@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
+#import "StringAdditions.h"
 #import "Utils.h"
 
 #define MIN_PORT            1
@@ -202,7 +203,7 @@
     
     //if value entered is not an int or is not in range do not change
     if (![[fPortField stringValue] isEqualToString:
-            [NSString stringWithFormat: @"%d", bindPort]] 
+            [NSString stringWithInt: bindPort]] 
             || bindPort < MIN_PORT
             || bindPort > MAX_PORT)
     {
@@ -233,8 +234,7 @@
     
     //if value entered is not an int or is less than 0 do not change
     if (![[fUploadField stringValue] isEqualToString:
-            [NSString stringWithFormat: @"%d", uploadLimit]]
-            || uploadLimit < 0)
+            [NSString stringWithInt: uploadLimit]] || uploadLimit < 0)
     {
         NSBeep();
         uploadLimit = [fDefaults integerForKey: @"UploadLimit"];

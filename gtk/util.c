@@ -39,8 +39,6 @@
 #define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
 
 static void
-sigexithandler(int sig);
-static void
 errcb(GtkWidget *wind, int resp, gpointer data);
 
 gboolean
@@ -183,71 +181,6 @@ urldecode(const char *str, int len) {
   ret[jj] = '\0';
 
   return ret;
-}
-
-static int exit_sigs[] = {SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2};
-static callbackfunc_t exit_func = NULL;
-static void *exit_data = NULL;
-static int exit_block_level = 0;
-
-void
-setuphandlers(callbackfunc_t func, void *data) {
-  struct sigaction sa;
-  unsigned int ii;
-
-  exit_data = data;
-  exit_func = func;
-
-  bzero(&sa, sizeof(sa));
-  sa.sa_handler = sigexithandler;
-  for(ii = 0; ii < ALEN(exit_sigs); ii++)
-    sigaction(exit_sigs[ii], &sa, NULL);
-}
-
-void
-clearhandlers(void) {
-  struct sigaction sa;
-  unsigned int ii;
-
-  bzero(&sa, sizeof(sa));
-  sa.sa_handler = SIG_DFL;
-  for(ii = 0; ii < ALEN(exit_sigs); ii++)
-    sigaction(exit_sigs[ii], &sa, NULL);
-}
-
-static void
-sigexithandler(int sig) {
-  exit_func(exit_data);
-  clearhandlers();
-  raise(sig);
-}
-
-void
-blocksigs(void) {
-  sigset_t mask;
-  unsigned int ii;
-
-  if(0 < (exit_block_level++))
-    return;
-
-  sigemptyset(&mask);
-  for(ii = 0; ii < ALEN(exit_sigs); ii++)
-    sigaddset(&mask, exit_sigs[ii]);
-  sigprocmask(SIG_BLOCK, &mask, NULL);
-}
-
-void
-unblocksigs(void) {
-  sigset_t mask;
-  unsigned int ii;
-
-  if(0 < (--exit_block_level))
-    return;
-
-  sigemptyset(&mask);
-  for(ii = 0; ii < ALEN(exit_sigs); ii++)
-    sigaddset(&mask, exit_sigs[ii]);
-  sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 
 GtkWidget *

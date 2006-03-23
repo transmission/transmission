@@ -6,15 +6,14 @@
 @interface TorrentTableView : NSTableView
 
 {
-    IBOutlet Controller  * fController;
+    IBOutlet Controller * fController;
+    NSArray             * fTorrents;
 
-    tr_stat_t            * fStat;
-    NSPoint                fClickPoint;
+    NSPoint               fClickPoint;
     
     IBOutlet NSMenu     * fContextRow;
     IBOutlet NSMenu     * fContextNoRow;
 }
-
-- (void) updateUI: (tr_stat_t *) stat;
+- (void) setTorrents: (NSArray *) torrents;
 
 @end

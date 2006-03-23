@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -82,7 +82,6 @@
 
 #define TR_MAX_PEER_COUNT 60
 
-typedef struct tr_torrent_s tr_torrent_t;
 typedef struct tr_completion_s tr_completion_t;
 
 #include "platform.h"
@@ -108,11 +107,13 @@ struct tr_torrent_s
     tr_fd_t          * fdlimit;
 
     int               status;
-	int				  finished;
-    char              error[128];
+    int               error;
+    char              trackerError[128];
+    int               finished;
 
     char            * id;
     char            * key;
+    int             * bindPort;
 
     /* An escaped string used to include the hash in HTTP queries */
     char              hashString[3*SHA_DIGEST_LENGTH+1];
@@ -126,14 +127,6 @@ struct tr_torrent_s
     int               blockSize;
     int               blockCount;
     
-#if 0
-    /* Status for each block
-       -1 = we have it
-        n = we are downloading it from n peers */
-    char            * blockHave;
-    int               blockHaveCount;
-    uint8_t         * bitfield;
-#endif
     tr_completion_t * completion;
 
     volatile char     die;
@@ -150,6 +143,12 @@ struct tr_torrent_s
     uint64_t          date;
     uint64_t          downloaded;
     uint64_t          uploaded;
+
+    tr_stat_t         stats[2];
+    int               statCur;
+
+    tr_torrent_t    * prev;
+    tr_torrent_t    * next;
 };
 
 #include "utils.h"
@@ -158,7 +157,7 @@ struct tr_torrent_s
 struct tr_handle_s
 {
     int            torrentCount;
-    tr_torrent_t * torrents[TR_MAX_TORRENT_COUNT];
+    tr_torrent_t * torrentList;
 
     tr_ratecontrol_t * upload;
     tr_ratecontrol_t * download;

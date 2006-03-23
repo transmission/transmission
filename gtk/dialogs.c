@@ -49,9 +49,8 @@ struct prefdata {
 struct addcb {
   add_torrent_func_t addfunc;
   GtkWindow *parent;
-  tr_handle_t *tr;
   torrents_added_func_t donefunc;
-  void *donedata;
+  void *data;
   gboolean autostart;
   gboolean usingaltdir;
   GtkFileChooser *altdir;
@@ -219,6 +218,7 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
       g_free(errstr);
     }
 
+    /* XXX would be nice to have errno strings, are they printed to stdout? */
     tr_setBindPort(data->tr, gtk_spin_button_get_value_as_int(data->port));
     setlimit(data->tr);
   }
@@ -240,8 +240,8 @@ setlimit(tr_handle_t *tr) {
 }
 
 void
-makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
-            torrents_added_func_t donefunc, void *donedata) {
+makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
+            torrents_added_func_t donefunc, void *cbdata) {
   GtkWidget *wind = gtk_file_chooser_dialog_new(_("Add a Torrent"), parent,
     GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
@@ -260,9 +260,8 @@ makeaddwind(add_torrent_func_t addfunc, GtkWindow *parent, tr_handle_t *tr,
 
   data->addfunc = addfunc;
   data->parent = parent;
-  data->tr = tr;
   data->donefunc = donefunc;
-  data->donedata = donedata;
+  data->data = cbdata;
   data->autostart = TRUE;
   data->usingaltdir = FALSE;
   data->altdir = GTK_FILE_CHOOSER(getdir);
@@ -326,11 +325,12 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
       dir = gtk_file_chooser_get_filename(data->altdir);
     files = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(widget));
     for(ii = files; NULL != ii; ii = ii->next)
-      if(data->addfunc(data->tr, data->parent, ii->data, dir,
+      if(data->addfunc(data->data, ii->data, dir,
+                       /* XXX need to group errors here */
                        !data->autostart, NULL))
         added = TRUE;
     if(added)
-      data->donefunc(data->donedata);
+      data->donefunc(data->data);
     if(NULL != dir)
       g_free(dir);
   }
@@ -375,18 +375,18 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   } while(0)
 
 void
-makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
+makeinfowind(GtkWindow *parent, tr_torrent_t *tor) {
   tr_stat_t *sb;
+  tr_info_t *in;
   GtkWidget *wind, *label;
   int ii;
   char *str;
   const int rowcount = 14;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
 
-  /* XXX would be nice to be able to stat just one */
-  if(id >= tr_torrentStat(tr, &sb))
-    assert(!"XXX ");
-  str = g_strdup_printf(_("%s Properties"), sb[id].info.name);
+  sb = tr_torrentStat(tor);
+  in = tr_torrentInfo(tor);
+  str = g_strdup_printf(_("%s Properties"), in->name);
   wind = gtk_dialog_new_with_buttons(str, parent,
     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
@@ -401,7 +401,7 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
 
   label = gtk_label_new(NULL);
   gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-  str = g_markup_printf_escaped("<big>%s</big>", sb[id].info.name);
+  str = g_markup_printf_escaped("<big>%s</big>", in->name);
   gtk_label_set_markup(GTK_LABEL(label), str);
   g_free(str);
   gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
@@ -410,30 +410,30 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
 
   INFOSEP(table, ii);
 
-  if(80 == sb[id].info.trackerPort)
+  if(80 == in->trackerPort)
     INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s",
-              sb[id].info.trackerAddress));
+              in->trackerAddress));
   else
     INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s:%i",
-              sb[id].info.trackerAddress, sb[id].info.trackerPort));
-  INFOLINE(table, ii, _("Announce:"), sb[id].info.trackerAnnounce);
-  INFOLINEA(table, ii, _("Piece Size:"), readablesize(sb[id].info.pieceSize));
-  INFOLINEF(table, ii, "%i", _("Pieces:"), sb[id].info.pieceCount);
-  INFOLINEA(table, ii, _("Total Size:"), readablesize(sb[id].info.totalSize));
-  if(0 > sb[id].seeders)
+              in->trackerAddress, in->trackerPort));
+  INFOLINE(table, ii, _("Announce:"), in->trackerAnnounce);
+  INFOLINEA(table, ii, _("Piece Size:"), readablesize(in->pieceSize));
+  INFOLINEF(table, ii, "%i", _("Pieces:"), in->pieceCount);
+  INFOLINEA(table, ii, _("Total Size:"), readablesize(in->totalSize));
+  if(0 > sb->seeders)
     INFOLINE(table, ii, _("Seeders:"), _("?"));
   else
-    INFOLINEF(table, ii, "%i", _("Seeders:"), sb[id].seeders);
-  if(0 > sb[id].leechers)
+    INFOLINEF(table, ii, "%i", _("Seeders:"), sb->seeders);
+  if(0 > sb->leechers)
     INFOLINE(table, ii, _("Leechers:"), _("?"));
   else
-    INFOLINEF(table, ii, "%i", _("Leechers:"), sb[id].leechers);
+    INFOLINEF(table, ii, "%i", _("Leechers:"), sb->leechers);
 
   INFOSEP(table, ii);
 
-  INFOLINE(table, ii, _("Directory:"), sb[id].folder);
-  INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb[id].downloaded));
-  INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb[id].uploaded));
+  INFOLINE(table, ii, _("Directory:"), tr_torrentGetFolder(tor));
+  INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb->downloaded));
+  INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb->uploaded));
 
   INFOSEP(table, ii);
 
@@ -443,5 +443,4 @@ makeinfowind(GtkWindow *parent, tr_handle_t *tr, int id) {
   g_signal_connect(G_OBJECT(wind), "response",
                    G_CALLBACK(gtk_widget_destroy), NULL);
   gtk_widget_show_all(wind);
-  free(sb);
 }

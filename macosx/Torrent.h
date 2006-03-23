@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,26 +20,51 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef NAMECELL_H
-#define NAMECELL_H
-
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
-#import "Controller.h"
 
-@interface NameCell : NSCell
+@interface Torrent : NSObject
 {
-    BOOL       fWhiteText;
+    tr_handle_t  * fLib;
+    tr_torrent_t * fHandle;
+    tr_info_t    * fInfo;
+    tr_stat_t    * fStat;
+    BOOL           fResumeOnWake;
 
-    NSString * fNameString;
-    NSString * fSizeString;
-    NSString * fTimeString;
-    NSString * fPeersString;
-
-    NSMutableDictionary * fIcons;
-    NSImage             * fCurrentIcon;
+    NSImage         * fIcon;
+    NSMutableString * fStatusString;
+    NSMutableString * fInfoString;
+    NSMutableString * fDownloadString;
+    NSMutableString * fUploadString;
 }
-- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
-@end
 
-#endif
+- (id)         initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
+- (void)       setFolder: (NSString *) path;
+- (NSString *) getFolder;
+- (void)       getAvailability: (int8_t *) tab size: (int) size;
+
+- (void)       update;
+- (void)       start;
+- (void)       stop;
+- (void)       sleep;
+- (void)       wakeUp;
+- (void)       reveal;
+- (void)       trashTorrent;
+- (void)       trashData;
+
+- (NSImage *)  icon;
+- (NSString *) path;
+- (NSString *) name;
+- (uint64_t)   size;
+
+- (float)      progress;
+- (BOOL)       isActive;
+- (BOOL)       isSeeding;
+- (BOOL)       isPaused;
+- (BOOL)       justFinished;
+- (NSString *) statusString;
+- (NSString *) infoString;
+- (NSString *) downloadString;
+- (NSString *) uploadString;
+
+@end

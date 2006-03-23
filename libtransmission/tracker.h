@@ -25,7 +25,7 @@
 
 typedef struct tr_tracker_s tr_tracker_t;
 
-tr_tracker_t * tr_trackerInit      ( tr_handle_t *, tr_torrent_t * );
+tr_tracker_t * tr_trackerInit      ( tr_torrent_t * );
 void           tr_trackerChangePort( tr_tracker_t *, int );
 int            tr_trackerPulse     ( tr_tracker_t * );
 void           tr_trackerCompleted ( tr_tracker_t * );

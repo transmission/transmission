@@ -57,13 +57,13 @@ struct tr_tracker_s
 static void sendQuery  ( tr_tracker_t * tc );
 static void recvAnswer ( tr_tracker_t * tc );
 
-tr_tracker_t * tr_trackerInit( tr_handle_t * h, tr_torrent_t * tor )
+tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 {
     tr_tracker_t * tc;
 
     tc           = calloc( 1, sizeof( tr_tracker_t ) );
     tc->tor      = tor;
-    tc->id       = h->id;
+    tc->id       = tor->id;
 
     tc->started  = 1;
 
@@ -74,7 +74,7 @@ tr_tracker_t * tr_trackerInit( tr_handle_t * h, tr_torrent_t * tor )
     tc->size     = 1024;
     tc->buf      = malloc( tc->size );
 
-    tc->bindPort = h->bindPort;
+    tc->bindPort = *(tor->bindPort);
     tc->newPort  = -1;
 
     return tc;
@@ -374,13 +374,12 @@ static void recvAnswer( tr_tracker_t * tc )
     if( ( bePeers = tr_bencDictFind( &beAll, "failure reason" ) ) )
     {
         tr_err( "Tracker: %s", bePeers->val.s.s );
-        tor->status |= TR_TRACKER_ERROR;
-        snprintf( tor->error, sizeof( tor->error ),
+        tor->error |= TR_ETRACKER;
+        snprintf( tor->trackerError, sizeof( tor->trackerError ),
                   "%s", bePeers->val.s.s );
         goto cleanup;
     }
-
-    tor->status &= ~TR_TRACKER_ERROR;
+    tor->error &= ~TR_ETRACKER;
 
     if( !tc->interval )
     {

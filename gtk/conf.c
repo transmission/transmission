@@ -414,16 +414,18 @@ getstateval(struct cf_torrentstate *state, char *line) {
 }
 
 gboolean
-cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
+cf_savestate(GList *torrents, char **errstr) {
   char *file = g_build_filename(confdir, FILE_STATE, NULL);
   char *tmpfile = g_build_filename(confdir, FILE_STATE_TMP, NULL);
   GIOChannel *io = NULL;
   GError *err;
-  int fd, ii;
+  int fd;
   char *torrentfile, *torrentdir, *line;
   gsize written;
   gboolean paused;
   GIOStatus res;
+  tr_stat_t *sb;
+  tr_info_t *in;
 
   *errstr = NULL;
 
@@ -444,11 +446,12 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
   g_io_channel_set_close_on_unref(io, TRUE);
 
   err = NULL;
-  for(ii = 0; ii < count; ii++) {
-    /* XXX need a better way to query running/stopped state */
-    paused = ((TR_STATUS_STOPPING | TR_STATUS_PAUSE) & torrents[ii].status);
-    torrentfile = g_strescape(torrents[ii].info.torrent, "");
-    torrentdir = g_strescape(torrents[ii].folder, "");
+  while(NULL != torrents) {
+    sb = tr_torrentStat(torrents->data);
+    in = tr_torrentInfo(torrents->data);
+    paused = (TR_STATUS_INACTIVE & sb->status);
+    torrentfile = g_strescape(in->torrent, "");
+    torrentdir = g_strescape(tr_torrentGetFolder(torrents->data), "");
     /* g_strcompress */
     line = g_strdup_printf("torrent=\"%s\" dir=\"%s\" paused=\"%s\"%c",
                            torrentfile, torrentdir, (paused ? "yes" : "no"),
@@ -466,6 +469,7 @@ cf_savestate(int count, tr_stat_t *torrents, char **errstr) {
         assert(!"unknown return code");
         goto done;
     }
+    torrents = torrents->next;
   }
   if(NULL != err ||
      G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &err)) {

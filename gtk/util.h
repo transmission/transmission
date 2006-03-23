@@ -70,23 +70,6 @@ joinstrlist(GList *list, char *sep);
 char *
 urldecode(const char *str, int len);
 
-/* set up a handler for various fatal signals */
-void
-setuphandlers(callbackfunc_t func, void *data);
-
-/* clear the handlers for fatal signals */
-void
-clearhandlers(void);
-
-/* blocks and unblocks delivery of fatal signals. calls to these
-   functions can be nested as long as unblocksigs() is called exactly
-   as many times as blocksigs().  only the first blocksigs() will
-   block signals and only the last unblocksigs() will unblock them. */
-void
-blocksigs(void);
-void
-unblocksigs(void);
-
 /* if wind is NULL then you must call gtk_widget_show on the returned widget */
 
 GtkWidget *

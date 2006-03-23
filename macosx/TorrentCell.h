@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,28 +20,23 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef PROGRESSCELL_H
-#define PROGRESSCELL_H
+#ifndef TORRENTCELL_H
+#define TORRENTCELL_H
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
+#import "Torrent.h"
 
-@interface ProgressCell : NSCell
+@interface TorrentCell : NSCell
 {
-    tr_stat_t * fStat;
-    BOOL        fWhiteText;
+    Torrent          * fTorrent;
+    NSColor          * fTextColor;
 
-    NSString  * fDlString;
-    NSString  * fUlString;
-
-    NSBitmapImageRep * fBackgroundBmp;
-    NSBitmapImageRep * fProgressBmp;
+    NSBitmapImageRep * fBitmap;
+    int                fWidth;
+    int8_t           * fPieces;
 }
-- (id)   init;
-- (void) setStat: (tr_stat_t *) stat whiteText: (BOOL) w;
-- (void) buildSimpleBar;
-- (void) buildAdvancedBar;
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view;
+- (void) setTorrent:   (Torrent *) torrent;
+- (void) setTextColor: (NSColor *) color;
 @end
 
 #endif

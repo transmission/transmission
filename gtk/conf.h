@@ -50,7 +50,7 @@ cf_saveprefs(char **errstr);
 GList *
 cf_loadstate(char **errstr);
 gboolean
-cf_savestate(int count, tr_stat_t *torrents, char **errstr);
+cf_savestate(GList *torrents, char **errstr);
 void
 cf_freestate(struct cf_torrentstate *state);
 

@@ -59,9 +59,10 @@ static void sigHandler       ( int signal );
 
 int main( int argc, char ** argv )
 {
-    int           i, count;
-    tr_handle_t * h;
-    tr_stat_t   * s;
+    int i, error;
+    tr_handle_t  * h;
+    tr_torrent_t * tor;
+    tr_stat_t    * s;
 
     printf( "Transmission %s - http://transmission.m0k.org/\n\n",
             VERSION_STRING );
@@ -104,7 +105,7 @@ int main( int argc, char ** argv )
     h = tr_init();
 
     /* Open and parse torrent file */
-    if( tr_torrentInit( h, torrentPath ) )
+    if( !( tor = tr_torrentInit( h, torrentPath, &error ) ) )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         goto failed;
@@ -112,10 +113,7 @@ int main( int argc, char ** argv )
 
     if( showInfo )
     {
-        tr_info_t * info;
-
-        count = tr_torrentStat( h, &s );
-        info  = &s[0].info;
+        tr_info_t * info = tr_torrentInfo( tor );
 
         /* Print torrent info (quite à la btshowmetainfo) */
         printf( "hash:     " );
@@ -137,7 +135,6 @@ int main( int argc, char ** argv )
                     info->files[i].length );
         }
 
-        free( s );
         goto cleanup;
     }
 
@@ -145,7 +142,7 @@ int main( int argc, char ** argv )
     {
         int seeders, leechers;
 
-        if( tr_torrentScrape( h, 0, &seeders, &leechers ) )
+        if( tr_torrentScrape( tor, &seeders, &leechers ) )
         {
             printf( "Scrape failed.\n" );
         }
@@ -162,8 +159,8 @@ int main( int argc, char ** argv )
     tr_setBindPort( h, bindPort );
     tr_setUploadLimit( h, uploadLimit );
     
-    tr_torrentSetFolder( h, 0, "." );
-    tr_torrentStart( h, 0 );
+    tr_torrentSetFolder( tor, "." );
+    tr_torrentStart( tor );
 
     while( !mustDie )
     {
@@ -173,69 +170,64 @@ int main( int argc, char ** argv )
 
         sleep( 1 );
 
-        count = tr_torrentStat( h, &s );
+        s = tr_torrentStat( tor );
 
-        if( s[0].status & TR_STATUS_CHECK )
+        if( s->status & TR_STATUS_CHECK )
         {
             chars = snprintf( string, 80,
-                "Checking files... %.2f %%", 100.0 * s[0].progress );
+                "Checking files... %.2f %%", 100.0 * s->progress );
         }
-        else if( s[0].status & TR_STATUS_DOWNLOAD )
+        else if( s->status & TR_STATUS_DOWNLOAD )
         {
             chars = snprintf( string, 80,
                 "Progress: %.2f %%, %d peer%s, dl from %d (%.2f KB/s), "
-                "ul to %d (%.2f KB/s)", 100.0 * s[0].progress,
-                s[0].peersTotal, ( s[0].peersTotal == 1 ) ? "" : "s",
-                s[0].peersUploading, s[0].rateDownload,
-                s[0].peersDownloading, s[0].rateUpload );
+                "ul to %d (%.2f KB/s)", 100.0 * s->progress,
+                s->peersTotal, ( s->peersTotal == 1 ) ? "" : "s",
+                s->peersUploading, s->rateDownload,
+                s->peersDownloading, s->rateUpload );
         }
-        else if( s[0].status & TR_STATUS_SEED )
+        else if( s->status & TR_STATUS_SEED )
         {
             chars = snprintf( string, 80,
                 "Seeding, uploading to %d of %d peer(s), %.2f KB/s",
-                s[0].peersDownloading, s[0].peersTotal,
-                s[0].rateUpload );
+                s->peersDownloading, s->peersTotal,
+                s->rateUpload );
         }
         memset( &string[chars], ' ', 79 - chars );
         string[79] = '\0';
         fprintf( stderr, "\r%s", string );
 
-        if( s[0].status & TR_TRACKER_ERROR )
+        if( s->error & TR_ETRACKER )
         {
-            fprintf( stderr, "\n%s\n", s[0].error );
+            fprintf( stderr, "\n%s\n", s->trackerError );
         }
         else if( verboseLevel > 0 )
         {
             fprintf( stderr, "\n" );
         }
         
-        if( tr_getFinished( h, 0 ) )
+        if( tr_getFinished( tor ) )
         {
-            tr_setFinished( h, 0, 0 );
             result = system(finishCall);
         }
-
-        free( s );
     }
     fprintf( stderr, "\n" );
 
     /* Try for 5 seconds to notice the tracker that we are leaving */
-    tr_torrentStop( h, 0 );
+    tr_torrentStop( tor );
     for( i = 0; i < 10; i++ )
     {
-        count = tr_torrentStat( h, &s );
-        if( s[0].status & TR_STATUS_PAUSE )
+        s = tr_torrentStat( tor );
+        if( s->status & TR_STATUS_PAUSE )
         {
             /* The 'stopped' message was sent */
-            free( s );
             break;
         }
-        free( s );
         usleep( 500000 );
     }
     
 cleanup:
-    tr_torrentClose( h, 0 );
+    tr_torrentClose( h, tor );
 
 failed:
     tr_close( h );

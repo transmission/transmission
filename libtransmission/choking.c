@@ -138,7 +138,7 @@ static inline void sortPeers( tr_peer_t ** all, int allCount,
 
 void tr_chokingPulse( tr_choking_t * c )
 {
-    int i, peersTotalCount, unchoked, mustOptimistic = 1;
+    int peersTotalCount, unchoked, mustOptimistic = 1;
     tr_peer_t ** canChoke, ** canUnchoke;
     tr_peer_t ** canChokeZero, ** canUnchokeZero;
     tr_peer_t ** canChokeNonZero, ** canUnchokeNonZero;
@@ -152,9 +152,8 @@ void tr_chokingPulse( tr_choking_t * c )
 
     /* Lock all torrents and get the total number of peers */
     peersTotalCount = 0;
-    for( i = 0; i < c->h->torrentCount; i++ )
+    for( tor = c->h->torrentList; tor; tor = tor->next )
     {
-        tor = c->h->torrents[i];
         tr_lockLock( &tor->lock );
         peersTotalCount += tor->peerCount;
     }
@@ -165,15 +164,14 @@ void tr_chokingPulse( tr_choking_t * c )
     canUnchokeCount = 0;
     unchoked        = 0;
 
-    for( i = 0; i < c->h->torrentCount; i++ )
+    for( tor = c->h->torrentList; tor; tor = tor->next )
     {
         tr_peer_t * peer;
-        int j;
+        int i;
 
-        tor = c->h->torrents[i];
-        for( j = 0; j < tor->peerCount; j++ )
+        for( i = 0; i < tor->peerCount; i++ )
         {
-            peer = tor->peers[j];
+            peer = tor->peers[i];
 
             if( !tr_peerIsConnected( peer ) )
                 continue;
@@ -320,9 +318,9 @@ void tr_chokingPulse( tr_choking_t * c )
     free( canUnchokeNonZero );
 
     /* Unlock all torrents */
-    for( i = 0; i < c->h->torrentCount; i++ )
+    for( tor = c->h->torrentList; tor; tor = tor->next )
     {
-        tr_lockUnlock( &c->h->torrents[i]->lock );
+        tr_lockUnlock( &tor->lock );
     }
 
     tr_lockUnlock( &c->lock );
