@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -58,24 +58,97 @@ static int createSocket()
     return makeSocketNonBlocking( s );
 }
 
-int tr_netResolve( char * address, struct in_addr * addr )
+struct tr_resolve_s
 {
+    int            status;
+    char           * address;
+    struct in_addr addr;
+
+    tr_lock_t      lock;
+    tr_thread_t    thread;
+};
+
+static void resolveFunc( void * _r )
+{
+    tr_resolve_t * r = _r;
     struct hostent * host;
 
-    addr->s_addr = inet_addr( address );
-    if( addr->s_addr != 0xFFFFFFFF )
+    tr_lockLock( &r->lock );
+    r->addr.s_addr = inet_addr( r->address );
+    if( r->addr.s_addr != 0xFFFFFFFF )
     {
-        return 0;
+        r->status = TR_RESOLVE_OK;
+        tr_lockUnlock( &r->lock );
+        return;
+    }
+    tr_lockUnlock( &r->lock );
+
+    if( !( host = gethostbyname( r->address ) ) )
+    {
+        tr_lockLock( &r->lock );
+        r->status = TR_RESOLVE_ERROR;
+        tr_lockUnlock( &r->lock );
+        return;
+    }
+    tr_lockLock( &r->lock );
+    memcpy( &r->addr, host->h_addr, host->h_length );
+    r->status = TR_RESOLVE_OK;
+    tr_lockUnlock( &r->lock );
+}
+
+tr_resolve_t * tr_netResolveInit( char * address )
+{
+    tr_resolve_t * r = malloc( sizeof( tr_resolve_t ) );
+
+    r->status  = TR_RESOLVE_WAIT;
+    r->address = address;
+
+    tr_lockInit( &r->lock );
+    tr_threadCreate( &r->thread, resolveFunc, r );
+
+    return r;
+}
+
+int tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
+{
+    int ret;
+
+    tr_lockLock( &r->lock );
+    ret = r->status;
+    if( ret == TR_RESOLVE_OK )
+    {
+        *addr = r->addr;
+    }
+    tr_lockUnlock( &r->lock );
+
+    return ret;
+}
+
+void tr_netResolveClose( tr_resolve_t * r )
+{
+    tr_threadJoin( &r->thread );
+    tr_lockClose( &r->lock );
+    free( r );
+}
+
+/* Blocking version */
+int tr_netResolve( char * address, struct in_addr * addr )
+{
+    tr_resolve_t * r = tr_netResolveInit( address );
+    int ret;
+
+    for( ;; )
+    {
+        ret = tr_netResolvePulse( r, addr );
+        if( ret != TR_RESOLVE_WAIT )
+        {
+            break;
+        }
+        tr_wait( 20 );
     }
 
-    if( !( host = gethostbyname( address ) ) )
-    {
-        tr_err( "Could not resolve (%s)", address );
-        return -1;
-    }
-    memcpy( addr, host->h_addr, host->h_length );
-
-    return 0;
+    tr_netResolveClose( r );
+    return ( ret != TR_RESOLVE_OK );
 }
 
 int tr_netOpen( struct in_addr addr, in_port_t port )

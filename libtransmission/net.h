@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2005 Eric Petit
+ * Copyright (c) 2005-2006 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -19,6 +19,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
+
+#define TR_RESOLVE_WAIT  0
+#define TR_RESOLVE_ERROR 1
+#define TR_RESOLVE_OK    2
+typedef struct tr_resolve_s tr_resolve_t;
+tr_resolve_t * tr_netResolveInit( char * );
+int            tr_netResolvePulse( tr_resolve_t *, struct in_addr * );
+void           tr_netResolveClose( tr_resolve_t * );
 
 int  tr_netResolve ( char *, struct in_addr * );
 int  tr_netOpen    ( struct in_addr addr, in_port_t port );

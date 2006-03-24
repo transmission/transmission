@@ -41,10 +41,12 @@ struct tr_tracker_s
     uint64_t       dateOk;
 
 #define TC_STATUS_IDLE    1
-#define TC_STATUS_CONNECT 2
-#define TC_STATUS_RECV    4
+#define TC_STATUS_RESOLVE 2
+#define TC_STATUS_CONNECT 4
+#define TC_STATUS_RECV    8
     char           status;
 
+    tr_resolve_t * resolve;
     int            socket;
     uint8_t      * buf;
     int            size;
@@ -136,16 +138,43 @@ int tr_trackerPulse( tr_tracker_t * tc )
 
     if( ( tc->status & TC_STATUS_IDLE ) && shouldConnect( tc ) )
     {
+        tc->resolve = tr_netResolveInit( inf->trackerAddress );
+
+        tr_inf( "Tracker: connecting to %s:%d (%s)",
+                inf->trackerAddress, inf->trackerPort,
+                tc->started ? "sending 'started'" :
+                ( tc->completed ? "sending 'completed'" :
+                  ( tc->stopped ? "sending 'stopped'" :
+                    ( 0 < tc->newPort ? "sending 'stopped' to change port" :
+                      "getting peers" ) ) ) );
+
+        tc->status  = TC_STATUS_RESOLVE;
+        tc->dateTry = tr_date();
+    }
+
+    if( tc->status & TC_STATUS_RESOLVE )
+    {
+        int ret;
         struct in_addr addr;
 
-        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
+        ret = tr_netResolvePulse( tc->resolve, &addr );
+        if( ret == TR_RESOLVE_WAIT )
         {
             return 0;
         }
-
-        if( tr_netResolve( inf->trackerAddress, &addr ) )
+        else
         {
-            tr_fdSocketClosed( tor->fdlimit, 1 );
+            tr_netResolveClose( tc->resolve );
+        }
+        
+        if( ret == TR_RESOLVE_ERROR )
+        {
+            tc->status = TC_STATUS_IDLE;
+            return 0;
+        }
+
+        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
+        {
             return 0;
         }
 
@@ -156,16 +185,7 @@ int tr_trackerPulse( tr_tracker_t * tc )
             return 0;
         }
 
-        tr_inf( "Tracker: connecting to %s:%d (%s)",
-                inf->trackerAddress, inf->trackerPort,
-                tc->started ? "sending 'started'" :
-                ( tc->completed ? "sending 'completed'" :
-                  ( tc->stopped ? "sending 'stopped'" :
-                    ( 0 < tc->newPort ? "sending 'stopped' to change port" :
-                      "getting peers" ) ) ) );
-
-        tc->status  = TC_STATUS_CONNECT;
-        tc->dateTry = tr_date();
+        tc->status = TC_STATUS_CONNECT;
     }
 
     if( tc->status & TC_STATUS_CONNECT )
