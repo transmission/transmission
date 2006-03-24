@@ -8,33 +8,43 @@ if $(OS) = MACOSX
 {
     OSXInfoPlist macosx/Info.plist : macosx/Info.plist.in ;
     OSXBundle Transmission.app : libtransmission.a
+        macosx/Badger.h
+        macosx/Badger.m
         macosx/Controller.h
         macosx/Controller.m
+        macosx/Defaults.plist
         macosx/English.lproj/InfoPlist.strings
-        macosx/English.lproj/MainMenu.nib
         macosx/English.lproj/MainMenu.nib/classes.nib
         macosx/English.lproj/MainMenu.nib/info.nib
         macosx/English.lproj/MainMenu.nib/keyedobjects.nib
+        macosx/Images/Badge.png
+        macosx/Images/DownloadBadge.png
         macosx/Images/Info.png
+        macosx/Images/Network.png
         macosx/Images/Open.png
+        macosx/Images/PauseAll.png
         macosx/Images/PauseOff.png
         macosx/Images/PauseOn.png
-        macosx/Images/Progress.png
+        macosx/Images/Preferences.png
         macosx/Images/Remove.png
+        macosx/Images/ResumeAll.png
+        macosx/Images/ResumeOff.png
+        macosx/Images/ResumeOn.png
         macosx/Images/RevealOff.png
         macosx/Images/RevealOn.png
         macosx/Images/Transmission.icns
         macosx/Images/TransmissionDocument.icns
+        macosx/Images/UploadBadge.png
         macosx/Info.plist
-        macosx/NameCell.h
-        macosx/NameCell.m
+        macosx/main.m
         macosx/PrefsController.h
         macosx/PrefsController.m
-        macosx/ProgressCell.h
-        macosx/ProgressCell.m
-        macosx/main.m
         macosx/StringAdditions.h
         macosx/StringAdditions.m
+        macosx/Torrent.h
+        macosx/Torrent.m
+        macosx/TorrentCell.h
+        macosx/TorrentCell.m
         macosx/TorrentTableView.h
         macosx/TorrentTableView.m
         macosx/Transmission.sdef
