@@ -555,6 +555,52 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 }
 
+- (void) updateInfoPanel
+{
+    int row = [fTableView selectedRow];
+
+    if( row < 0 )
+    {
+        [fInfoImageView setImage: [NSApp applicationIconImage]];
+        [fInfoName setStringValue: @"No torrent selected"];
+        [fInfoSize setStringValue: @""];
+        [fInfoTracker setStringValue: @""];
+        [fInfoAnnounce setStringValue: @""];
+        [fInfoPieceSize setStringValue: @""];
+        [fInfoPieces setStringValue: @""];
+        [fInfoHash1 setStringValue: @""];
+        [fInfoHash2 setStringValue: @""];
+        [fInfoSeeders setStringValue: @""];
+        [fInfoLeechers setStringValue: @""];
+        [fInfoDownloaded setStringValue: @""];
+        [fInfoUploaded setStringValue: @""];
+        return;
+    }
+
+    Torrent * torrent = [fTorrents objectAtIndex: row];
+    [fInfoImageView setImage: [torrent iconNonFlipped]];
+    [fInfoName setStringValue: [torrent name]];
+    [fInfoSize setStringValue: [NSString
+        stringForFileSize: [torrent size]]];
+    [fInfoTracker setStringValue: [torrent tracker]];
+    [fInfoAnnounce setStringValue: [torrent announce]];
+    [fInfoPieceSize setStringValue: [NSString
+        stringForFileSize: [torrent pieceSize]]];
+    [fInfoPieces setStringValue: [NSString
+        stringWithInt: [torrent pieceCount]]];
+    [fInfoHash1 setStringValue: [torrent hash1]];
+    [fInfoHash2 setStringValue: [torrent hash2]];
+    int seeders = [torrent seeders], leechers = [torrent leechers];
+    [fInfoSeeders setStringValue: seeders < 0 ?
+        @"?" : [NSString stringWithInt: seeders]];
+    [fInfoLeechers setStringValue: leechers < 0 ?
+        @"?" : [NSString stringWithInt: leechers]];
+    [fInfoDownloaded setStringValue: [NSString
+        stringForFileSize: [torrent downloaded]]];
+    [fInfoUploaded setStringValue: [NSString
+        stringForFileSize: [torrent uploaded]]];
+}
+
 - (void) updateUI: (NSTimer *) t
 {
     float dl, ul;
@@ -586,17 +632,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fTotalDLField setStringValue: downloadRate];
     [fTotalULField setStringValue: uploadRate];
 
-#if 0
-    //Update DL/UL totals in the Info panel
-    row = [fTableView selectedRow];
-    if( row >= 0 )
-    {
-        [fInfoDownloaded setStringValue:
-            [NSString stringForFileSize: fStat[row].downloaded]];
-        [fInfoUploaded setStringValue:
-            [NSString stringForFileSize: fStat[row].uploaded]];
-    }
-#endif
+    [self updateInfoPanel];
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted
@@ -675,54 +711,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) tableViewSelectionDidChange: (NSNotification *) n
 {
-    int row = [fTableView selectedRow];
-
-    if( row < 0 )
-    {
-        [fInfoTitle      setStringValue: @"No torrent selected"];
-        [fInfoTracker    setStringValue: @""];
-        [fInfoAnnounce   setStringValue: @""];
-        [fInfoSize       setStringValue: @""];
-        [fInfoPieces     setStringValue: @""];
-        [fInfoPieceSize  setStringValue: @""];
-        [fInfoFolder     setStringValue: @""];
-        [fInfoDownloaded setStringValue: @""];
-        [fInfoUploaded   setStringValue: @""];
-        [fInfoSeeders    setStringValue: @""];
-        [fInfoLeechers   setStringValue: @""];
-        return;
-    }
-
-#if 0
-    /* Update info window */
-    [fInfoTitle setStringValue: [NSString stringWithUTF8String:
-        fStat[row].info.name]];
-    [fInfoTracker setStringValue: [NSString stringWithFormat:
-        @"%s:%d", fStat[row].info.trackerAddress, fStat[row].info.trackerPort]];
-    [fInfoAnnounce setStringValue: [NSString stringWithCString:
-        fStat[row].info.trackerAnnounce]];
-    [fInfoSize setStringValue:
-        [NSString stringForFileSize: fStat[row].info.totalSize]];
-    [fInfoPieces setStringValue: [NSString stringWithInt:
-        fStat[row].info.pieceCount]];
-    [fInfoPieceSize setStringValue:
-        [NSString stringForFileSize: fStat[row].info.pieceSize]];
-    [fInfoFolder setStringValue: [[NSString stringWithUTF8String:
-        tr_torrentGetFolder( fHandle, row )] lastPathComponent]];
-
-    if ( fStat[row].seeders == -1 ) {
-        [fInfoSeeders setStringValue: [NSString stringWithUTF8String: "?"]];
-    } else {
-        [fInfoSeeders setStringValue: [NSString stringWithInt:
-            fStat[row].seeders]];
-    }
-    if ( fStat[row].leechers == -1 ) {
-        [fInfoLeechers setStringValue: [NSString stringWithUTF8String: "?"]];
-    } else {
-        [fInfoLeechers setStringValue: [NSString stringWithInt:
-            fStat[row].leechers]];
-    }
-#endif
+    [self updateInfoPanel];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:

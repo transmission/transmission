@@ -32,6 +32,7 @@
     BOOL           fResumeOnWake;
 
     NSImage         * fIcon;
+    NSImage         * fIconNonFlipped;
     NSMutableString * fStatusString;
     NSMutableString * fInfoString;
     NSMutableString * fDownloadString;
@@ -53,9 +54,16 @@
 - (void)       trashData;
 
 - (NSImage *)  icon;
+- (NSImage *)  iconNonFlipped;
 - (NSString *) path;
 - (NSString *) name;
 - (uint64_t)   size;
+- (NSString *) tracker;
+- (NSString *) announce;
+- (int)        pieceSize;
+- (int)        pieceCount;
+- (NSString *) hash1;
+- (NSString *) hash2;
 
 - (float)      progress;
 - (BOOL)       isActive;
@@ -66,5 +74,9 @@
 - (NSString *) infoString;
 - (NSString *) downloadString;
 - (NSString *) uploadString;
+- (int)        seeders;
+- (int)        leechers;
+- (uint64_t)   downloaded;
+- (uint64_t)   uploaded;
 
 @end

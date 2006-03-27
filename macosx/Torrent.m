@@ -51,6 +51,8 @@
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
     [fIcon setFlipped: YES];
     [fIcon retain];
+    fIconNonFlipped = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
+    [fIconNonFlipped retain];
 
     fStatusString   = [[NSMutableString alloc] initWithCapacity: 50];
     fInfoString     = [[NSMutableString alloc] initWithCapacity: 50];
@@ -232,6 +234,11 @@
     return fIcon;
 }
 
+- (NSImage *) iconNonFlipped
+{
+    return fIconNonFlipped;
+}
+
 - (NSString *) path
 {
     return [NSString stringWithUTF8String: fInfo->torrent];
@@ -245,6 +252,50 @@
 - (uint64_t) size
 {
     return fInfo->totalSize;
+}
+
+- (NSString *) tracker
+{
+    return [NSString stringWithFormat: @"%s:%d",
+            fInfo->trackerAddress, fInfo->trackerPort];
+}
+
+- (NSString *) announce
+{
+    return [NSString stringWithUTF8String: fInfo->trackerAnnounce];
+}
+
+- (int) pieceSize
+{
+    return fInfo->pieceSize;
+}
+
+- (int) pieceCount
+{
+    return fInfo->pieceCount;
+}
+
+- (NSString *) hash1
+{
+    NSMutableString * string = [NSMutableString
+        stringWithCapacity: SHA_DIGEST_LENGTH];
+    int i;
+    for( i = 0; i < SHA_DIGEST_LENGTH / 2; i++ )
+    {
+        [string appendFormat: @"%02x", fInfo->hash[i]];
+    }
+    return string;
+}
+- (NSString *) hash2
+{
+    NSMutableString * string = [NSMutableString
+        stringWithCapacity: SHA_DIGEST_LENGTH];
+    int i;
+    for( i = SHA_DIGEST_LENGTH / 2; i < SHA_DIGEST_LENGTH; i++ )
+    {
+        [string appendFormat: @"%02x", fInfo->hash[i]];
+    }
+    return string;
 }
 
 - (float) progress
@@ -290,6 +341,26 @@
 - (NSString *) uploadString
 {
     return fUploadString;
+}
+
+- (int) seeders
+{
+    return fStat->seeders;
+}
+
+- (int) leechers
+{
+    return fStat->leechers;
+}
+
+- (uint64_t) downloaded
+{
+    return fStat->downloaded;
+}
+
+- (uint64_t) uploaded
+{
+    return fStat->uploaded;
 }
 
 @end

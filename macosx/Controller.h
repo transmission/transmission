@@ -54,15 +54,17 @@
     IBOutlet NSTextField        * fTotalULField;
 
     IBOutlet NSPanel            * fInfoPanel;
-    IBOutlet NSTextField        * fInfoTitle;
+    IBOutlet NSImageView        * fInfoImageView;
+    IBOutlet NSTextField        * fInfoName;
+    IBOutlet NSTextField        * fInfoSize;
     IBOutlet NSTextField        * fInfoTracker;
     IBOutlet NSTextField        * fInfoAnnounce;
-    IBOutlet NSTextField        * fInfoSize;
-    IBOutlet NSTextField        * fInfoPieces;
     IBOutlet NSTextField        * fInfoPieceSize;
+    IBOutlet NSTextField        * fInfoPieces;
+    IBOutlet NSTextField        * fInfoHash1;
+    IBOutlet NSTextField        * fInfoHash2;
     IBOutlet NSTextField        * fInfoSeeders;
     IBOutlet NSTextField        * fInfoLeechers;
-    IBOutlet NSTextField        * fInfoFolder;
     IBOutlet NSTextField        * fInfoDownloaded;
     IBOutlet NSTextField        * fInfoUploaded;
 
