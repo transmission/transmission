@@ -33,16 +33,41 @@
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)
+    {
+        /* 0 to 1023 bytes */
         return [NSString stringWithFormat: @"%lld bytes", size];
-    else if (size < 1048576)
-        return [NSString stringWithFormat: @"%lld.%lld KB",
-                size / 1024, ( size % 1024 ) / 103];
+    }
+
+    NSString * unit;
+    if (size < 1048576)
+    {
+        unit = @" KB";
+    }
     else if (size < 1073741824)
-        return [NSString stringWithFormat: @"%lld.%lld MB",
-                size / 1048576, ( size % 1048576 ) / 104858];
+    {
+        unit = @" MB";
+        size /= 1024;
+    }
     else
-        return [NSString stringWithFormat: @"%lld.%lld GB",
-                size / 1073741824, ( size % 1073741824 ) / 107374183];
+    {
+        unit = @" GB";
+        size /= 1048576;
+    }
+
+    NSString * value;
+    if (size < 10240)
+        /* 1.00 to 9.99 XB */
+        value = [NSString stringWithFormat: @"%lld.%02lld",
+                    size / 1024, ( size % 1024 ) * 100 / 1024];
+    else if (size < 102400)
+        /* 10.0 to 99.9 XB */
+        value = [NSString stringWithFormat: @"%lld.%lld KB",
+                    size / 1024, ( size % 1024 ) * 10 / 1024];
+    else
+        /* 100+ XB */
+        value = [NSString stringWithFormat: @"%lld", size / 1024];
+
+    return [value stringByAppendingString: unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
