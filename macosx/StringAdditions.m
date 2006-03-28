@@ -61,7 +61,7 @@
                     size / 1024, ( size % 1024 ) * 100 / 1024];
     else if (size < 102400)
         /* 10.0 to 99.9 XB */
-        value = [NSString stringWithFormat: @"%lld.%lld KB",
+        value = [NSString stringWithFormat: @"%lld.%lld",
                     size / 1024, ( size % 1024 ) * 10 / 1024];
     else
         /* 100+ XB */
