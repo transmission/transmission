@@ -137,8 +137,8 @@
     }
     else;
 
-    [self display];
     fClickPoint = NSMakePoint( 0, 0 );
+    [self display];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) e

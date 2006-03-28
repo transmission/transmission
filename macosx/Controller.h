@@ -67,6 +67,7 @@
     IBOutlet NSTextField        * fInfoLeechers;
     IBOutlet NSTextField        * fInfoDownloaded;
     IBOutlet NSTextField        * fInfoUploaded;
+    NSImage                     * fAppIcon;
 
     io_connect_t                fRootPort;
     NSArray                     * fFilenames;

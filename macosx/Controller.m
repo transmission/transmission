@@ -64,17 +64,16 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     [fTorrents release];
     tr_close( fLib );
+    [fAppIcon release];
     [super dealloc];
 }
 
 - (void) awakeFromNib
 {
-    [fWindow setContentMinSize: NSMakeSize( 400, 120 )];
+    fAppIcon = [[NSApp applicationIconImage] copy];
 
     [fPrefsController setPrefsWindow: fLib];
     fDefaults = [NSUserDefaults standardUserDefaults];
-
-    [fInfoPanel setFrameAutosaveName:@"InfoPanel"];
 
     //check advanced bar menu item
     [fAdvancedBarItem setState: [fDefaults
@@ -176,14 +175,14 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (BOOL) windowShouldClose: (id) sender
 {
-    [fWindow orderOut: NULL];
+    [fWindow orderOut: nil];
     return NO;
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app
     hasVisibleWindows: (BOOL) flag
 {
-    [self showMainWindow: NULL];
+    [self showMainWindow: nil];
     return NO;
 }
 
@@ -561,8 +560,8 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     if( row < 0 )
     {
-        [fInfoImageView setImage: [NSApp applicationIconImage]];
-        [fInfoName setStringValue: @"No torrent selected"];
+        [fInfoImageView setImage: fAppIcon];
+        [fInfoName setStringValue: @"No Torrent Selected"];
         [fInfoSize setStringValue: @""];
         [fInfoTracker setStringValue: @""];
         [fInfoAnnounce setStringValue: @""];
@@ -586,8 +585,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fInfoAnnounce setStringValue: [torrent announce]];
     [fInfoPieceSize setStringValue: [NSString
         stringForFileSize: [torrent pieceSize]]];
-    [fInfoPieces setStringValue: [NSString
-        stringWithInt: [torrent pieceCount]]];
+    [fInfoPieces setIntValue: [torrent pieceCount]];
     [fInfoHash1 setStringValue: [torrent hash1]];
     [fInfoHash2 setStringValue: [torrent hash2]];
     int seeders = [torrent seeders], leechers = [torrent leechers];
