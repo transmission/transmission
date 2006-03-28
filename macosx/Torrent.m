@@ -370,21 +370,21 @@
 
 - (void) trashPath: (NSString *) path
 {
-    NSString * string;
-    NSAppleScript * appleScript;
-    NSDictionary * error;
-
-    string = [NSString stringWithFormat:
-        @"tell application \"Finder\"\n"
-         "  move (POSIX file \"%@\") to trash\n"
-         "end tell", path];
-    
-    appleScript = [[NSAppleScript alloc] initWithSource: string];
-    if( ![appleScript executeAndReturnError: &error] )
+    if( ![[NSWorkspace sharedWorkspace] performFileOperation:
+           NSWorkspaceRecycleOperation source:
+           [path stringByDeletingLastPathComponent]
+           destination: @""
+           files: [NSArray arrayWithObject: [path lastPathComponent]]
+           tag: nil] )
     {
-        printf( "trashPath failed\n" );
+        /* We can't move it to the trash, let's try just to delete it
+           (will work if it is on a remote volume) */
+        if( ![[NSFileManager defaultManager]
+                removeFileAtPath: path handler: nil] )
+        {
+            printf( "Could not trash `%s'\n", [path UTF8String] );
+        }
     }
-    [appleScript release];
 }
 
 @end
