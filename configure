@@ -223,6 +223,13 @@ case $SYSTEM in
   FreeBSD)
     DEFINES="$DEFINES SYS_FREEBSD"
     LINKLIBS="$LINKLIBS -pthread -lm"
+
+    RELEASE=`uname -r`
+    case $RELEASE in
+      4.*)
+        DEFINES="$DEFINES SYS_FREEBSD_4"
+        ;;
+    esac
     ;;
 
   NetBSD)

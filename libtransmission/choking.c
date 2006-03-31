@@ -23,7 +23,7 @@
 #include <math.h>
 #include "transmission.h"
 
-#ifdef SYS_BEOS
+#if defined(SYS_BEOS) || defined(SYS_FREEBSD_4)
 #define lrintf(a) ((int)(0.5+(a)))
 #endif
 
