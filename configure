@@ -60,6 +60,7 @@ EOF
       LINKLIBS="$LINKLIBS -lm"
     fi
   fi
+  rm -f testconf.c testconf
 }
 
 lrintf_test()
@@ -74,6 +75,7 @@ EOF
   then
     DEFINES="$DEFINES HAVE_LRINTF"
   fi
+  rm -f testconf.c testconf
 }
 
 gettext_test()
@@ -254,13 +256,6 @@ case $SYSTEM in
   FreeBSD)
     DEFINES="$DEFINES SYS_FREEBSD"
     LINKLIBS="$LINKLIBS -pthread"
-
-    RELEASE=`uname -r`
-    case $RELEASE in
-      4.*)
-        DEFINES="$DEFINES SYS_FREEBSD_4"
-        ;;
-    esac
     ;;
 
   NetBSD)
