@@ -1,10 +1,10 @@
 /.depend
 /Makefile.config
+Transmission.xcodeproj/*.mode1
+Transmission.xcodeproj/*.pbxuser
 libtransmission/*.a
 libtransmission/.depend
 macosx/English.lproj/*~.nib
 macosx/Info.plist
-macosx/Transmission.xcodeproj/*.mode1
-macosx/Transmission.xcodeproj/*.pbxuser
 macosx/build
 /transmissioncli

@@ -21,3 +21,6 @@
  *****************************************************************************/
 
 #define NS_ELLIPSIS [NSString stringWithUTF8String: "\xE2\x80\xA6"]
+#define OSX_VERSION [[[NSDictionary dictionaryWithContentsOfFile: \
+    @"/System/Library/CoreServices/SystemVersion.plist"] \
+    objectForKey: @"ProductVersion"] floatValue]

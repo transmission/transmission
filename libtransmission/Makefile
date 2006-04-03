@@ -9,12 +9,8 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS += -D__TRANSMISSION__
 
 libtransmission.a: $(OBJS)
-ifeq ($(SYSTEM),Darwin)
-	libtool -static $(OBJS) -o $@
-else
 	ar ru $@ $(OBJS)
 	ranlib $@
-endif
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -24,6 +20,6 @@ clean:
 
 .depend: $(SRCS) Makefile
 	$(RM) .depend
-	$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) -D__TRANSMISSION__ >> .depend;)
+	$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) $(CFLAGS) >> .depend;)
 
 include .depend

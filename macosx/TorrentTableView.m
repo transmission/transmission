@@ -23,6 +23,7 @@
 #import "TorrentTableView.h"
 #import "Controller.h"
 #import "Torrent.h"
+#import "Utils.h"
 
 @implementation TorrentTableView
 
@@ -100,8 +101,11 @@
     {
         if( row >= 0 )
         {
-            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                byExtendingSelection: NO];
+            if( OSX_VERSION >= 10.3 )
+                [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+                    byExtendingSelection: NO];
+            else
+                [self selectRow: row byExtendingSelection: NO];
         }
         else
         {
@@ -151,8 +155,11 @@
     
     if( row >= 0 )
     {
-        [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-            byExtendingSelection: NO];
+        if( OSX_VERSION >= 10.3 )
+            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+                byExtendingSelection: NO];
+        else
+            [self selectRow: row byExtendingSelection: NO];
         return fContextRow;
     }
     else

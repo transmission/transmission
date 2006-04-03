@@ -12,13 +12,13 @@
 
 @interface Badger : NSObject {
 
-    NSImage         * fDockIcon, * fBadgedDockIcon,
-                    * fBadge, * fUploadBadge, * fDownloadBadge;
+    NSImage             * fDockIcon, * fBadgedDockIcon,
+                        * fBadge, * fUploadBadge, * fDownloadBadge;
                     
-    NSDictionary    * fAttributes;
+    NSMutableDictionary * fAttributes;
     
-    int             fCompleted;
-    BOOL            fSpeedShown;
+    int                 fCompleted;
+    BOOL                fSpeedShown;
 }
 
 - (void) updateBadgeWithCompleted: (int) completed

@@ -1,22 +1,40 @@
 #! /bin/sh
 
 #
+# Default settings
+#
+SYSTEM=
+BEOS_NETSERVER=no
+MATH=no
+PTHREAD=no
+OPENSSL=
+GTK=
+PREFIX=/usr/local
+CC="${CC-cc}"
+CFLAGS="${CFLAGS}"
+CXX="${CXX-c++}"
+CXXFLAGS="${CXXFLAGS}"
+LDFLAGS="${LDFLAGS}"
+
+
+#
 # Functions
 #
 usage()
 {
   cat << EOF
 
-  OpenSSL options:
-    --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
-    --openssl-prefix=PATH  Location of OpenSSL headers and library
-    --gettext-prefix=PATH  Location of the Gettext header and library
-    --disable-gtk          Don't build the GTK+ GUI
-    --prefix=PATH          Install here instead of $INSTALL_PREFIX
+Options:
+  --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
+  --disable-gtk          Don't build the GTK+ GUI
+  --prefix=PATH          Installation path
 
-  Some influential environment variables:
-    CC          C compiler command (default "cc")
-    CFLAGS      C compiler flags (default "-g -Wall -W")
+Some influential environment variables:
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
+  LDFLAGS     linker flags
 
 EOF
 }
@@ -31,16 +49,13 @@ openssl_test()
       SHA1( 0, 0, 0 );
   }
 EOF
-  if [ -n "$OPENSSL_PREFIX" ]; then
-    TMPFLAGS="-I$OPENSSL_PREFIX/include -L$OPENSSL_PREFIX/lib"
-  fi
-  if $CC $TMPFLAGS -o testconf testconf.c -lcrypto > /dev/null 2>&1
+  if $CC $CFLAGS $LDFLAGS -o testconf testconf.c -lcrypto > /dev/null 2>&1
   then
-    echo "OpenSSL: yes"
-    DEFINES="$DEFINES HAVE_OPENSSL"
-    LINKLIBS="$LINKLIBS -lcrypto"
+    echo "yes"
+    OPENSSL=yes
   else
-    echo "OpenSSL: no, using built-in SHA1 implementation"
+    echo "missing, using built-in SHA1 implementation"
+    OPENSSL=no
   fi
   rm -f testconf.c testconf
 }
@@ -50,14 +65,14 @@ lm_test()
   cat > testconf.c << EOF
   int main()
   {
-    sqrt( 42 );
+    return cos( 42 );
   }
 EOF
   if ! $CC -o testconf testconf.c > /dev/null 2>&1
   then
     if $CC -o testconf testconf.c -lm > /dev/null 2>&1
     then
-      LINKLIBS="$LINKLIBS -lm"
+      LDFLAGS="$LDFLAGS -lm"
     fi
   fi
   rm -f testconf.c testconf
@@ -73,7 +88,7 @@ lrintf_test()
 EOF
   if ( $CC -o testconf testconf.c $LINKLIBS && ./testconf ) > /dev/null 2>&1
   then
-    DEFINES="$DEFINES HAVE_LRINTF"
+    CFLAGS="$CFLAGS -DHAVE_LRINTF"
   fi
   rm -f testconf.c testconf
 }
@@ -88,26 +103,18 @@ gettext_test()
   }
 EOF
 
-  if [ -n "$GETTEXT_PREFIX" ] && $CC "-I$GETTEXT_PREFIX/include" "-Wl,-R$GETTEXT_PREFIX/lib" "-L$GETTEXT_PREFIX/lib" -lintl -liconv -o testconf testconf.c >/dev/null 2>&1
-  then
-    GTKCCFLAGS="-I$GETTEXT_PREFIX/include $GTKCCFLAGS"
-    GTKLINKLIBS="-Wl,-R$GETTEXT_PREFIX/lib -L$GETTEXT_PREFIX/lib -lintl -liconv $GTKLINKLIBS"
-    rm -f testconf.c testconf
-    return 0
-  fi
-
-  if $CC $GTKCCFLAGS $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
+  if $CC $CFLAGS_GTK $LDFLAGS_GTK -o testconf testconf.c > /dev/null 2>&1
   then
     rm -f testconf.c testconf
     return 0
   fi
 
-  for intl_testdir in $INSTALL_PREFIX/include \
+  for intl_testdir in $PREFIX/include \
       /usr/local/include /usr/X11R6/include /usr/pkg/include
   do
-    if $CC $GTKCCFLAGS -I$intl_testdir $GTKLINKLIBS -o testconf testconf.c > /dev/null 2>&1
+    if $CC $CFLAGS_GTK -I$intl_testdir $LDFLAGS_GTK -o testconf testconf.c > /dev/null 2>&1
     then
-      GTKCCFLAGS="$GTKCCFLAGS -I$intl_testdir"
+      CFLAGS_GTK="CFLAGS_GTK -I$intl_testdir"
       rm -f testconf.c testconf
       return 0
     fi
@@ -131,54 +138,31 @@ gtk_test()
 EOF
       if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
       then
-        GTKCCFLAGS=`pkg-config gtk+-2.0 --cflags`
-        GTKLINKLIBS=`pkg-config gtk+-2.0 --libs`
+        CFLAGS_GTK=`pkg-config gtk+-2.0 --cflags`
+        LDFLAGS_GTK=`pkg-config gtk+-2.0 --libs`
         if gettext_test
         then
-          GTKLOCALEDIR="$INSTALL_PREFIX/share/locale"
+          echo "yes"
           GTK=yes
-          echo "GTK+:    yes"
+          GTKLOCALEDIR="$PREFIX/share/locale"
         else
-          GTKCCFLAGS=
-          GTKLINKLIBS=
-          echo "GTK+:    no, could not find gettext libintl.h"
+          echo "no (could not find gettext libintl.h)"
           GTK=no
         fi
       else
-        echo "GTK+:    no"
+        echo "no"
         GTK=no
       fi
       rm -f testconf.c testconf
     else
-      echo "GTK+:    no (2.6.0 or later is required)"
+      echo "no (2.6.0 or later is required)"
       GTK=no
     fi
   else
-    echo "GTK+:    no"
+    echo "no"
     GTK=no
   fi
 }
-
-#
-# Defaults settings
-#
-CC="${CC-cc}"
-CFLAGS="${CFLAGS--g -Wall -W}"
-# For > 2 GB files
-DEFINES="_FILE_OFFSET_BITS=64 _LARGEFILE_SOURCE"
-# For asprintf
-DEFINES="$DEFINES _GNU_SOURCE"
-openssl_disable=0
-gtk_disable=0
-GTK=no
-GTKCCFLAGS=
-GTKLINKLIBS=
-GTKLOCALEDIR=
-if [ -n "$PREFIX" ]; then
-    INSTALL_PREFIX=$PREFIX
-else
-    INSTALL_PREFIX=/usr/local
-fi
 
 #
 # Parse options
@@ -188,19 +172,10 @@ while [ $# -ne 0 ]; do
 
   case "x$1" in
     x--disable-openssl)
-      openssl_disable="1";
-      ;;
-    x--openssl-prefix=*)
-      OPENSSL_PREFIX="$param";
-      ;;
-    x--gettext-prefix=*)
-      GETTEXT_PREFIX="$param";
+      OPENSSL=no
       ;;
     x--disable-gtk)
-      gtk_disable="1";
-      ;;
-    x--prefix=*)
-      INSTALL_PREFIX="$param";
+      GTK=no
       ;;
     x--help)
       usage
@@ -216,30 +191,12 @@ done
 SYSTEM=`uname -s`
 case $SYSTEM in
   BeOS)
-    DEFINES="$DEFINES SYS_BEOS"
-
-    CC="gcc"
-    MACHINE=`uname -m`
-    case $MACHINE in
-      BePC) # BeOS on x86
-    	CPU="x86"
-    	;;
-      *)
-        CPU="ppc"
-        ;;
-    esac
-    SYSTEM="$SYSTEM / $CPU"
-	
     RELEASE=`uname -r`
     case $RELEASE in
       6.0*|5.0.4) # Zeta or R5 / BONE beta 7
-        SYSTEM="$SYSTEM / BONE"
-        LINKLIBS="$LINKLIBS -lbind -lsocket"
         ;;
-      5.0*)      # R5 / net_server
-        SYSTEM="$SYSTEM / net_server"
-        DEFINES="$DEFINES BEOS_NETSERVER"
-        LINKLIBS="$LINKLIBS -lnet"
+      5.0*)       # R5 / net_server
+        BEOS_NETSERVER=yes
         ;;
       *)
         echo "Unsupported BeOS version"
@@ -249,28 +206,23 @@ case $SYSTEM in
     ;;
 
   Darwin)
-    DEFINES="$DEFINES SYS_DARWIN"
-    LINKLIBS="$LINKLIBS -lpthread"
+    # Make sure the Universal SDK is installed
+    if [ ! -d /Developer/SDKs/MacOSX10.4u.sdk ]; then
+      cat << EOF
+You need to install the Universal SDK in order to build Transmission:
+  Get your Xcode CD or package
+  Restart the install
+  When it gets to "Installation Type", select "Customize"
+  Select "Mac OS X 10.4 (Universal) SDL" under "Cross Development"
+  Finish the install.
+EOF
+      exit 1
+    fi
+    PTHREAD=yes
     ;;
 
-  FreeBSD)
-    DEFINES="$DEFINES SYS_FREEBSD"
-    LINKLIBS="$LINKLIBS -pthread"
-    ;;
-
-  NetBSD)
-    DEFINES="$DEFINES SYS_NETBSD"
-    LINKLIBS="$LINKLIBS -lpthread"
-    ;;
-
-  OpenBSD)
-    DEFINES="$DEFINES SYS_OPENBSD"
-    LINKLIBS="$LINKLIBS -lpthread"
-    ;;
-
-  Linux)
-    DEFINES="$DEFINES SYS_LINUX"
-    LINKLIBS="$LINKLIBS -lpthread"
+  FreeBSD|NetBSD|OpenBSD|Linux)
+    PTHREAD=yes
     ;;
 
   *)
@@ -280,35 +232,32 @@ esac
 echo "System:  $SYSTEM"
 
 #
-# Mac OS X check for the Universal SDK
-#
-if [ "$SYSTEM" = Darwin -a ! -d /Developer/SDKs/MacOSX10.4u.sdk ]; then
-  echo
-  echo "You need to install the Universal SDK in order to build Transmission:"
-  echo "  Get your Xcode CD or package"
-  echo "  Restart the install"
-  echo "  When it gets to \"Installation Type\", select \"Customize\""
-  echo "  Select \"Mac OS X 10.4 (Universal) SDL\" under \"Cross Development\""
-  echo "  Finish the install."
-  exit 1
-fi
-
-#
 # OpenSSL settings
 #
-if [ ${openssl_disable} = 1 ]; then
-  echo "OpenSSL: no, using built-in SHA1 implementation"
+echo -n "OpenSSL: "
+if [ "$OPENSSL" = no ]; then
+  echo "disabled, using built-in SHA1 implementation"
 else
-    openssl_test
-fi
+  openssl_test
+fi 
 
 #
-# GTK settings
+# GTK+ settings
 #
-if [ ${gtk_disable} = 1 ]; then
-  echo "GTK+:    no"
+echo -n "GTK+:    "
+if [ "$GTK" = no ]; then
+  echo "disabled"
 else
-    gtk_test
+  gtk_test
+fi
+if [ "$GTK" = yes ]; then
+  rm -f gtk/defines.h
+  cat > gtk/defines.h << EOF
+#ifndef TG_DEFINES_H
+#define TG_DEFINES_H
+#define LOCALEDIR               "$GTKLOCALEDIR"
+#endif
+EOF
 fi
 
 #
@@ -318,40 +267,23 @@ lm_test
 lrintf_test
 
 #
-# Generate config.jam
+# Generate Makefile.config
 #
-rm -f config.jam
-cat > config.jam << EOF
-CC          = $CC ;
-LINK        = $CC ;
-CCFLAGS     = $CFLAGS ;
-DEFINES     = $DEFINES ;
-LINKLIBS    = $LINKLIBS ;
-GTK         = $GTK ;
-GTKCCFLAGS  = $GTKCCFLAGS ;
-GTKLINKLIBS = $GTKLINKLIBS ;
+rm -f Makefile.config
+cat > Makefile.config << EOF
+SYSTEM         = $SYSTEM
+BEOS_NETSERVER = $BEOS_NETSERVER
+PTHREAD        = $PTHREAD
+OPENSSL        = $OPENSSL
+GTK            = $GTK
+CC             = $CC
+CFLAGS         = $CFLAGS
+CXX            = $CXX
+CXXFLAGS       = $CXXFLAGS
+LDFLAGS        = $LDFLAGS
+CFLAGS_GTK     = $CFLAGS_GTK
+LDFLAGS_GTK    = $LDFLAGS_GTK
 EOF
-if [ -n "$OPENSSL_PREFIX" ]; then
-cat >> config.jam << EOF
-HDRS       += $OPENSSL_PREFIX/include ;
-LINKFLAGS  += -L$OPENSSL_PREFIX/lib ;
-EOF
-fi
-if [ -n "$CPU" ]; then
-cat >> config.jam << EOF
-CPU        = $CPU ;
-EOF
-fi
-
-if [ xyes = "x$GTK" ]; then
-    rm -f gtk/defines.h
-    cat > gtk/defines.h << EOF
-#ifndef TG_DEFINES_H
-#define TG_DEFINES_H
-#define LOCALEDIR               "$GTKLOCALEDIR"
-#endif
-EOF
-fi
 
 echo
-echo "To build Transmission, run 'jam'."
+echo "To build Transmission, run 'make'."

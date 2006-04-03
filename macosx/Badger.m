@@ -22,6 +22,7 @@
 
 #import "Badger.h"
 #import "StringAdditions.h"
+#import "Utils.h"
 
 @interface Badger (Private)
 
@@ -41,16 +42,21 @@
         fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
         
-        NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2, -2)];
-        [stringShadow setShadowBlurRadius: 4];
         
-        fAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:
-                            [NSColor whiteColor], NSForegroundColorAttributeName,
-                            [NSFont fontWithName: @"Helvetica-Bold" size: 28], NSFontAttributeName,
-                            stringShadow, NSShadowAttributeName,
-                            nil] retain];
-        [stringShadow release];
+        fAttributes = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+            [NSColor whiteColor], NSForegroundColorAttributeName,
+            [NSFont fontWithName: @"Helvetica-Bold" size: 28], NSFontAttributeName,
+            nil] retain];
+
+        if( OSX_VERSION >= 10.3 )
+        {
+            NSShadow * stringShadow = [[NSShadow alloc] init];
+            [stringShadow setShadowOffset: NSMakeSize(2, -2)];
+            [stringShadow setShadowBlurRadius: 4];
+            [fAttributes setObject: stringShadow
+                forKey: NSShadowAttributeName];
+            [stringShadow release];
+        }
         
         fCompleted = 0;
         fSpeedShown = NO;
