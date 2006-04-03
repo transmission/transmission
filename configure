@@ -45,6 +45,37 @@ EOF
   rm -f testconf.c testconf
 }
 
+lm_test()
+{
+  cat > testconf.c << EOF
+  int main()
+  {
+    sqrt( 42 );
+  }
+EOF
+  if ! $CC -o testconf testconf.c > /dev/null 2>&1
+  then
+    if $CC -o testconf testconf.c -lm > /dev/null 2>&1
+    then
+      LINKLIBS="$LINKLIBS -lm"
+    fi
+  fi
+}
+
+lrintf_test()
+{
+  cat > testconf.c << EOF
+  int main()
+  {
+    return ( lrintf( 3.14 ) != 3 );
+  }
+EOF
+  if ( $CC -o testconf testconf.c $LINKLIBS && ./testconf ) > /dev/null 2>&1
+  then
+    DEFINES="$DEFINES HAVE_LRINTF"
+  fi
+}
+
 gettext_test()
 {
   cat > testconf.c <<EOF
@@ -222,7 +253,7 @@ case $SYSTEM in
 
   FreeBSD)
     DEFINES="$DEFINES SYS_FREEBSD"
-    LINKLIBS="$LINKLIBS -pthread -lm"
+    LINKLIBS="$LINKLIBS -pthread"
 
     RELEASE=`uname -r`
     case $RELEASE in
@@ -234,17 +265,17 @@ case $SYSTEM in
 
   NetBSD)
     DEFINES="$DEFINES SYS_NETBSD"
-    LINKLIBS="$LINKLIBS -lpthread -lm"
+    LINKLIBS="$LINKLIBS -lpthread"
     ;;
 
   OpenBSD)
     DEFINES="$DEFINES SYS_OPENBSD"
-    LINKLIBS="$LINKLIBS -lpthread -lm"
+    LINKLIBS="$LINKLIBS -lpthread"
     ;;
 
   Linux)
     DEFINES="$DEFINES SYS_LINUX"
-    LINKLIBS="$LINKLIBS -lpthread -lm"
+    LINKLIBS="$LINKLIBS -lpthread"
     ;;
 
   *)
@@ -284,6 +315,12 @@ if [ ${gtk_disable} = 1 ]; then
 else
     gtk_test
 fi
+
+#
+# Math functions
+#
+lm_test
+lrintf_test
 
 #
 # Generate config.jam

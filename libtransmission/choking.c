@@ -23,8 +23,8 @@
 #include <math.h>
 #include "transmission.h"
 
-#if defined(SYS_BEOS) || defined(SYS_FREEBSD_4)
-#define lrintf(a) ((int)(0.5+(a)))
+#ifndef HAVE_LRINTF
+#  define lrintf(a) ((int)(0.5+(a)))
 #endif
 
 /* We may try to allocate and free tables of size 0. Quick and dirty
