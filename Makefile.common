@@ -34,3 +34,27 @@ ifeq ($(OPENSSL),yes)
 CFLAGS  += -DHAVE_OPENSSL
 LDFLAGS += -lcrypto
 endif
+
+#
+# Utils
+#
+
+define DEP_RULE
+	@echo "Checking dependencies..."
+	@$(RM) .depend
+	@$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) $(CFLAGS) >> .depend;)
+endef
+
+define CC_RULE
+	@echo "Cc $@"
+	@CMD="$(CC) $(CFLAGS) -o $@ -c $<"; $$CMD || \
+	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+endef
+
+define LINK_RULE
+	@echo "Link $@"
+	@CMD="$(CC) -o $@ $(OBJS) $(LDFLAGS)"; $$CMD || \
+	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+endef
+
+MAKE += --no-print-directory

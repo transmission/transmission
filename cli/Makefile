@@ -1,21 +1,21 @@
 include ../Makefile.config
 include ../Makefile.common
 
-SRCS = conf.c dialogs.c main.c trcellrenderertorrent.c util.c
+SRCS = transmissioncli.c
 OBJS = $(SRCS:%.c=%.o)
 
-CFLAGS  += $(CFLAGS_GTK) -I../libtransmission
-LDFLAGS += $(LDFLAGS_GTK) ../libtransmission/libtransmission.a
+CFLAGS  += -I../libtransmission
+LDFLAGS += ../libtransmission/libtransmission.a
 
-transmission-gtk: $(OBJS)
+transmissioncli: $(OBJS)
 	$(LINK_RULE)
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile
 	$(CC_RULE)
 
 clean:
-	@echo "Clean transmission-gtk"
-	@$(RM) transmission-gtk
+	@echo "Clean transmissioncli"
+	@$(RM) transmissioncli
 	@echo "Clean $(OBJS)"
 	@$(RM) $(OBJS)
 

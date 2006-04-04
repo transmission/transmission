@@ -9,17 +9,19 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS += -D__TRANSMISSION__
 
 libtransmission.a: $(OBJS)
-	ar ru $@ $(OBJS)
-	ranlib $@
+	@echo "Library $@"
+	@ar ru $@ $(OBJS)
+	@ranlib $@
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC_RULE)
 
 clean:
-	$(RM) libtransmission.a $(OBJS)
+	@echo "Clean libtransmission.a"
+	@echo "Clean $(OBJS)"
+	@$(RM) libtransmission.a $(OBJS)
 
-.depend: $(SRCS) Makefile
-	$(RM) .depend
-	$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) $(CFLAGS) >> .depend;)
+.depend: $(SRCS) ../Makefile.config ../Makefile.common Makefile
+	$(DEP_RULE)
 
 include .depend

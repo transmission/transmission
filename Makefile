@@ -3,57 +3,51 @@ include Makefile.common
 
 ifneq ($(SYSTEM),Darwin)
 
-SRCS = transmissioncli.c
-OBJS = $(SRCS:%.c=%.o)
-
-CFLAGS += -Ilibtransmission
-
-all: transmissioncli transmission-gtk transmission-beos
-
-lib:
-	$(MAKE) -C libtransmission
-
-transmissioncli: lib $(OBJS)
-	$(CC) -o $@ $(OBJS) libtransmission/libtransmission.a $(LDFLAGS)
-
-transmission-gtk:
+TARGETS = .cli
 ifeq ($(GTK),yes)
-	$(MAKE) -C gtk
+TARGETS += .gtk
 endif
-
-transmission-beos:
 ifeq ($(SYSTEM),BeOS)
-	$(MAKE) -C beos
+TARGETS += .beos
 endif
 
-%.o: %.c Makefile.config Makefile.common Makefile
-	$(CC) $(CFLAGS) -o $@ -c $<
+all: $(TARGETS)
+
+.lib:
+	@echo "* Building libtransmission"
+	@$(MAKE) -C libtransmission $(MAKESHUTUP)
+
+.cli: .lib
+	@echo "* Building Transmission CLI client"
+	@$(MAKE) -C cli $(MAKESHUTUP)
+
+.gtk: .lib
+	@echo "* Building Transmission GTK+ client"
+	@$(MAKE) -C gtk $(MAKESHUTUP)
+
+.beos: .lib
+	@echo "* Building Transmission BeOS client"
+	@make -C beos $(MAKESHUTUP)
 
 clean:
-	$(RM) transmissioncli $(OBJS)
-	$(MAKE) -C libtransmission clean
+	@$(MAKE) -C libtransmission clean $(MAKESHUTUP)
+	@$(MAKE) -C cli clean $(MAKESHUTUP)
 ifeq ($(GTK),yes)
-	$(MAKE) -C gtk clean
+	@$(MAKE) -C gtk clean $(MAKESHUTUP)
 endif
 ifeq ($(SYSTEM),BeOS)
-	$(MAKE) -C beos clean
+	@$(MAKE) -C beos clean $(MAKESHUTUP)
 endif
-
-.depend: $(SRCS) Makefile
-	$(RM) .depend
-	$(foreach SRC, $(SRCS), $(CC) -MM -Ilibtransmission $(SRC) >> .depend;)
-
-include .depend
 
 else
 
 all:
-	make -C macosx
+	$(MAKE) -C macosx
 	xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
 
 clean:
 	xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
-	make -C macosx clean
+	$(MAKE) -C macosx clean
 
 MAKELINK = printf "[InternetShortcut]\nURL=http://%s\n"
 
@@ -61,7 +55,7 @@ package:
 	$(RM) tmp "Transmission $(VERSION_STRING)" \
 	    Transmission-$(VERSION_STRING).dmg && \
 	  mkdir -p tmp && \
-	  cp -r Transmission.app tmp/ && \
+	  cp -r macosx/Transmission.app tmp/ && \
 	  cp AUTHORS tmp/AUTHORS.txt && \
 	  cp LICENSE tmp/LICENSE.txt && \
 	  cp NEWS tmp/NEWS.txt && \

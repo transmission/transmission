@@ -634,7 +634,7 @@
 		4DDBB71E09E16BF100284745 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/cli";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/debug\"";
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
@@ -654,7 +654,7 @@
 		4DF0C599089918A300DD8943 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/macosx";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libtransmission\"";

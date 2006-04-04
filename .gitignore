@@ -2,9 +2,15 @@
 /Makefile.config
 Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
+beos/.depend
+beos/Transmission
+cli/.depend
+cli/transmissioncli
+gtk/.depend
+gtk/defines.h
+gtk/transmission-gtk
 libtransmission/*.a
 libtransmission/.depend
 macosx/English.lproj/*~.nib
 macosx/Info.plist
 macosx/build
-/transmissioncli
