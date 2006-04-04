@@ -277,11 +277,11 @@ static void sleepCallBack( void * controller, io_service_t y,
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) s returnCode: (int) code
-    contextInfo: (void *) info
+    contextInfo: (Torrent *) torrent
 {
-    Torrent * torrent = [fTorrents lastObject];
     if (code == NSOKButton)
     {
+        [fTorrents addObject: torrent];
         [torrent setFolder: [[s filenames] objectAtIndex: 0]];
         [torrent start];
     }
@@ -307,7 +307,6 @@ static void sleepCallBack( void * controller, io_service_t y,
         torrent = [[Torrent alloc] initWithPath: torrentPath lib: fLib];
         if( !torrent )
             continue;
-        [fTorrents addObject: torrent];
 
         /* Add it to the "File > Open Recent" menu */
         [[NSDocumentController sharedDocumentController]
@@ -315,11 +314,13 @@ static void sleepCallBack( void * controller, io_service_t y,
 
         if( [downloadChoice isEqualToString: @"Constant"] )
         {
+            [fTorrents addObject: torrent];
             [torrent setFolder: [downloadFolder stringByExpandingTildeInPath]];
             [torrent start];
         }
         else if( [downloadChoice isEqualToString: @"Torrent"] )
         {
+            [fTorrents addObject: torrent];
             [torrent setFolder: [torrentPath stringByDeletingLastPathComponent]];
             [torrent start];
         }
@@ -341,12 +342,12 @@ static void sleepCallBack( void * controller, io_service_t y,
             [panel beginSheetForDirectory: NULL file: NULL types: NULL
                 modalForWindow: fWindow modalDelegate: self didEndSelector:
                 @selector( folderChoiceClosed:returnCode:contextInfo: )
-                contextInfo: NULL];
+                contextInfo: torrent];
             [NSApp runModalForWindow: panel];
         }
     }
 
-    [self updateUI: NULL];
+    [self updateUI: nil];
     [self updateTorrentHistory];
 }
 
