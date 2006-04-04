@@ -18,6 +18,6 @@ clean:
 
 .depend: $(SRCS) Makefile
 	$(RM) .depend
-	$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) -D__TRANSMISSION__ >> .depend;)
+	$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) $(CFLAGS) -D__TRANSMISSION__ >> .depend;)
 
 include .depend
