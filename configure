@@ -286,4 +286,5 @@ LDFLAGS_GTK    = $LDFLAGS_GTK
 EOF
 
 echo
-echo "To build Transmission, run 'make'."
+echo "Now use GNU make to build Transmission."
+echo "It may be called 'make' or 'gmake' depending on your system."
