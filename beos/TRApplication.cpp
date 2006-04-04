@@ -203,6 +203,24 @@ void TRApplication::RefsReceived(BMessage *message) {
 }
 
 /**
+ * Needed for browsers or command line interaction
+ */
+void TRApplication::ArgvReceived(int32 _argc, char** _argv) 
+{
+	entry_ref ref;
+	BMessage refs(B_REFS_RECEIVED);
+	for( int32 i = 0; i < _argc; ++i )
+	{
+		if( B_OK == get_ref_for_path(_argv[i], &ref) )
+		{
+			refs.AddRef("refs", &ref);
+		}
+	}
+	
+	be_app_messenger.SendMessage(refs);
+}
+
+/**
  * BMessage handling. 
  */
 void TRApplication::MessageReceived(BMessage *message) {
