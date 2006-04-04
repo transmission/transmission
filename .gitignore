@@ -4,6 +4,7 @@ Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
 beos/.depend
 beos/Transmission
+/build
 cli/.depend
 cli/transmissioncli
 gtk/.depend
@@ -13,4 +14,4 @@ libtransmission/*.a
 libtransmission/.depend
 macosx/English.lproj/*~.nib
 macosx/Info.plist
-macosx/build
+macosx/Transmission.app
