@@ -289,6 +289,11 @@ void tr_torrentStart( tr_torrent_t * tor )
     tor->status  = TR_STATUS_CHECK;
     tor->tracker = tr_trackerInit( tor );
 
+    if( 0 > h->bindPort )
+    {
+        tr_setBindPort( h, TR_DEFAULT_PORT );
+    }
+
     tor->date = tr_date();
     tor->die = 0;
     tr_threadCreate( &tor->thread, downloadLoop, tor );
