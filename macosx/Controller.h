@@ -33,7 +33,7 @@
 @interface Controller : NSObject
 {
     tr_handle_t                 * fLib;
-    int                         fCount, fSeeding, fDownloading, fCompleted;
+    int                         fCount, fCompleted;
     NSMutableArray              * fTorrents;
 
     NSToolbar                   * fToolbar;

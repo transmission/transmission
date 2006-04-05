@@ -145,8 +145,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     fBadger = [[Badger alloc] init];
 
     //update the interface every 500 ms
-    fDownloading = 0;
-    fSeeding = 0;
     fCompleted = 0;
     [self updateUI: nil];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
@@ -943,8 +941,9 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) sleepCallBack: (natural_t) messageType argument:
                           (void *) messageArgument
 {
-    NSEnumerator * enumerator;;
+    NSEnumerator * enumerator;
     Torrent * torrent;
+    BOOL active;
 
     switch( messageType )
     {
@@ -975,7 +974,13 @@ static void sleepCallBack( void * controller, io_service_t y,
 
         case kIOMessageCanSystemSleep:
             /* Prevent idle sleep unless all paused */
-            if (fDownloading > 0 || fSeeding > 0)
+            active = NO;
+            enumerator = [fTorrents objectEnumerator];
+            while( !active && ( torrent = [enumerator nextObject] ) )
+                if( [torrent isActive] )
+                    active = YES;
+
+            if (active)
                 IOCancelPowerChange( fRootPort, (long) messageArgument );
             else
                 IOAllowPowerChange( fRootPort, (long) messageArgument );
