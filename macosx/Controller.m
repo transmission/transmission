@@ -455,9 +455,9 @@ static void sleepCallBack( void * controller, io_service_t y,
     if( [torrent isActive] && [fDefaults boolForKey: @"CheckRemove"] )
     {
         NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithInt: idx], @"Index",
-            [NSString stringWithInt: deleteTorrent], @"DeleteTorrent",
-            [NSString stringWithInt: deleteData], @"DeleteData",
+            [NSNumber numberWithInt: idx], @"Index",
+            [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent",
+            [NSNumber numberWithBool: deleteData], @"DeleteData",
             nil];
         [dict retain];
 
@@ -481,11 +481,10 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     if( returnCode == NSAlertDefaultReturn )
     {
-        int idx = [[dict objectForKey:@"Index"] intValue];
-
-        [self confirmRemoveTorrentWithIndex: idx
-            deleteTorrent: [[dict objectForKey:@"DeleteTorrent"] intValue]
-            deleteData: [[dict objectForKey:@"DeleteData"] intValue]];
+        [self confirmRemoveTorrentWithIndex:
+            [[dict objectForKey:@"Index"] intValue]
+            deleteTorrent: [[dict objectForKey:@"DeleteTorrent"] boolValue]
+            deleteData: [[dict objectForKey:@"DeleteData"] boolValue]];
     }
 
     [dict release];
