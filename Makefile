@@ -1,5 +1,9 @@
-include Makefile.config
+-include Makefile.config
 include Makefile.common
+
+ifndef CONFIGURE_RUN
+$(error You must run ./configure first)
+endif
 
 ifneq ($(SYSTEM),Darwin)
 

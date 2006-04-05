@@ -292,6 +292,7 @@ lrintf_test
 #
 rm -f Makefile.config
 cat > Makefile.config << EOF
+CONFIGURE_RUN  = yes
 SYSTEM         = $SYSTEM
 BEOS_NETSERVER = $BEOS_NETSERVER
 PTHREAD        = $PTHREAD
