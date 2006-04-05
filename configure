@@ -102,7 +102,7 @@ lrintf_test()
     return ( lrintf( 3.14 ) != 3 );
   }
 EOF
-  if ( $CC -o testconf testconf.c $LINKLIBS && ./testconf ) > /dev/null 2>&1
+  if ( $CC -o testconf testconf.c $LDFLAGS && ./testconf ) > /dev/null 2>&1
   then
     CFLAGS="$CFLAGS -DHAVE_LRINTF"
   fi
