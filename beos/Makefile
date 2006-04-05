@@ -25,4 +25,4 @@ clean:
 	$(RM) .depend
 	$(foreach SRC, $(SRCS), $(CXX) $(CXXFLAGS) -MM $(SRC) >> .depend;)
 
-include .depend
+-include .depend

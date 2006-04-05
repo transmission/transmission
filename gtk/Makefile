@@ -22,4 +22,4 @@ clean:
 .depend: $(SRCS) ../Makefile.config ../Makefile.common Makefile
 	$(DEP_RULE)
 
-include .depend
+-include .depend
