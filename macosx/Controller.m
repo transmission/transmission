@@ -361,9 +361,8 @@ static void sleepCallBack( void * controller, io_service_t y,
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    fFilenames = [files retain];
     [self performSelectorOnMainThread: @selector(cantFindAName:)
-                withObject: NULL waitUntilDone: NO];
+                withObject: files waitUntilDone: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -384,24 +383,17 @@ static void sleepCallBack( void * controller, io_service_t y,
         contextInfo: NULL];
 }
 
-- (void) cantFindAName: (id) sender
+- (void) cantFindAName: (NSArray *) filenames
 {
-    [self application: NSApp openFiles: fFilenames];
-    [fFilenames release];
+    [self application: NSApp openFiles: filenames];
 }
 
 - (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
     contextInfo: (void *) info
 {
-    if( code != NSOKButton )
-    {
-        return;
-    }
-
-    fFilenames = [[s filenames] retain];
-
-    [self performSelectorOnMainThread: @selector(cantFindAName:)
-                withObject: NULL waitUntilDone: NO];
+    if( code == NSOKButton )
+        [self performSelectorOnMainThread: @selector(cantFindAName:)
+                    withObject: [s filenames] waitUntilDone: NO];
 }
 
 - (void) resumeTorrent: (id) sender

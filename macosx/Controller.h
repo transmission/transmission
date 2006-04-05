@@ -70,7 +70,6 @@
     NSImage                     * fAppIcon;
 
     io_connect_t                fRootPort;
-    NSArray                     * fFilenames;
     NSTimer                     * fTimer;
     NSTimer                     * fUpdateTimer;
     
