@@ -39,6 +39,22 @@ Some influential environment variables:
 EOF
 }
 
+cc_test()
+{
+  cat > testconf.c <<EOF
+  int main()
+  {
+    return 0;
+  }
+EOF
+  if ! $CC -o testconf testconf.c > /dev/null 2>&1; then
+    rm -f testconf.c testconf
+    echo "Could not find a working compiler"
+    exit 1
+  fi
+  rm -f testconf.c testconf
+}
+
 openssl_test()
 {
   cat > testconf.c << EOF
@@ -230,6 +246,11 @@ EOF
     exit 1 ;;
 esac
 echo "System:  $SYSTEM"
+
+#
+# First things first, check to see if there's a compiler installed
+#
+cc_test
 
 #
 # OpenSSL settings
