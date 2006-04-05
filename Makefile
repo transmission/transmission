@@ -15,39 +15,39 @@ all: $(TARGETS)
 
 .lib:
 	@echo "* Building libtransmission"
-	@$(MAKE) -C libtransmission $(MAKESHUTUP)
+	@$(MAKE) -C libtransmission
 
 .cli: .lib
 	@echo "* Building Transmission CLI client"
-	@$(MAKE) -C cli $(MAKESHUTUP)
+	@$(MAKE) -C cli
 
 .gtk: .lib
 	@echo "* Building Transmission GTK+ client"
-	@$(MAKE) -C gtk $(MAKESHUTUP)
+	@$(MAKE) -C gtk
 
 .beos: .lib
 	@echo "* Building Transmission BeOS client"
-	@make -C beos $(MAKESHUTUP)
+	@make -C beos
 
 clean:
-	@$(MAKE) -C libtransmission clean $(MAKESHUTUP)
-	@$(MAKE) -C cli clean $(MAKESHUTUP)
+	@$(MAKE) -C libtransmission clean
+	@$(MAKE) -C cli clean
 ifeq ($(GTK),yes)
-	@$(MAKE) -C gtk clean $(MAKESHUTUP)
+	@$(MAKE) -C gtk clean
 endif
 ifeq ($(SYSTEM),BeOS)
-	@$(MAKE) -C beos clean $(MAKESHUTUP)
+	@$(MAKE) -C beos clean
 endif
 
 else
 
 all:
-	$(MAKE) -C macosx
-	xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
+	@$(MAKE) -C macosx
+	@xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
 
 clean:
-	xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
-	$(MAKE) -C macosx clean
+	@xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
+	@$(MAKE) -C macosx clean
 
 MAKELINK = printf "[InternetShortcut]\nURL=http://%s\n"
 
