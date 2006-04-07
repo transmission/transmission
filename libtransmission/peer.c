@@ -219,6 +219,11 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
     /* Try to read */
     for( ;; )
     {
+        if( tor && !tr_rcCanTransfer( tor->globalDownload ) )
+        {
+            break;
+        }
+
         if( peer->size < 1 )
         {
             peer->size = 1024;
@@ -229,8 +234,10 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
             peer->size *= 2;
             peer->buf   = realloc( peer->buf, peer->size );
         }
+        /* Never read more than 1K each time, otherwise the rate
+           control is no use */
         ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
-                          peer->size - peer->pos );
+                          MIN( 1024, peer->size - peer->pos ) );
         if( ret & TR_NET_CLOSE )
         {
             peer_dbg( "connection closed" );

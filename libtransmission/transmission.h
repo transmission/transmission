@@ -74,6 +74,13 @@ void tr_setBindPort( tr_handle_t *, int );
 void tr_setUploadLimit( tr_handle_t *, int );
 
 /***********************************************************************
+ * tr_setDownloadLimit
+ ***********************************************************************
+ * Sets the total download rate limit in KB/s
+ **********************************************************************/
+void tr_setDownloadLimit( tr_handle_t *, int );
+
+/***********************************************************************
  * tr_torrentCount
  ***********************************************************************
  * Returns the count of open torrents

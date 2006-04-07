@@ -41,16 +41,18 @@
 "  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n" \
 "  -p, --port <int>     Port we should listen on (default = %d)\n" \
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n" \
+"  -d, --download <int> Maximum download rate (-1 = no limit, default = -1)\n" \
 "  -f, --finish <shell script> Command you wish to run on completion\n"
 
-static int             showHelp     = 0;
-static int             showInfo     = 0;
-static int             showScrape   = 0;
-static int             verboseLevel = 0;
-static int             bindPort     = TR_DEFAULT_PORT;
-static int             uploadLimit  = 20;
-static char          * torrentPath  = NULL;
-static volatile char   mustDie      = 0;
+static int           showHelp      = 0;
+static int           showInfo      = 0;
+static int           showScrape    = 0;
+static int           verboseLevel  = 0;
+static int           bindPort      = TR_DEFAULT_PORT;
+static int           uploadLimit   = 20;
+static int           downloadLimit = -1;
+static char          * torrentPath = NULL;
+static volatile char mustDie       = 0;
 
 static char          * finishCall   = NULL;
 
@@ -158,6 +160,7 @@ int main( int argc, char ** argv )
 
     tr_setBindPort( h, bindPort );
     tr_setUploadLimit( h, uploadLimit );
+    tr_setDownloadLimit( h, downloadLimit );
     
     tr_torrentSetFolder( tor, "." );
     tr_torrentStart( tor );
@@ -240,17 +243,18 @@ static int parseCommandLine( int argc, char ** argv )
     for( ;; )
     {
         static struct option long_options[] =
-          { { "help",    no_argument,       NULL, 'h' },
-            { "info",    no_argument,       NULL, 'i' },
-            { "scrape",  no_argument,       NULL, 's' },
-            { "verbose", required_argument, NULL, 'v' },
-            { "port",    required_argument, NULL, 'p' },
-            { "upload",  required_argument, NULL, 'u' },
-            { "finish",  required_argument, NULL, 'f' },
+          { { "help",     no_argument,       NULL, 'h' },
+            { "info",     no_argument,       NULL, 'i' },
+            { "scrape",   no_argument,       NULL, 's' },
+            { "verbose",  required_argument, NULL, 'v' },
+            { "port",     required_argument, NULL, 'p' },
+            { "upload",   required_argument, NULL, 'u' },
+            { "download", required_argument, NULL, 'd' },
+            { "finish",   required_argument, NULL, 'f' },
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisv:p:u:f:", long_options, &optind );
+        c = getopt_long( argc, argv, "hisv:p:u:d:f:", long_options, &optind );
         if( c < 0 )
         {
             break;
@@ -274,6 +278,9 @@ static int parseCommandLine( int argc, char ** argv )
                 break;
             case 'u':
                 uploadLimit = atoi( optarg );
+                break;
+            case 'd':
+                downloadLimit = atoi( optarg );
                 break;
             case 'f':
                 finishCall = optarg;
