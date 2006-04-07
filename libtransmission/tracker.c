@@ -54,6 +54,9 @@ struct tr_tracker_s
 
     int            bindPort;
     int            newPort;
+
+    uint64_t       download;
+    uint64_t       upload;
 };
 
 static void sendQuery  ( tr_tracker_t * tc );
@@ -78,6 +81,9 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 
     tc->bindPort = *(tor->bindPort);
     tc->newPort  = -1;
+
+    tc->download = tor->downloaded;
+    tc->upload   = tor->uploaded;
 
     return tc;
 }
@@ -267,21 +273,34 @@ static void sendQuery( tr_tracker_t * tc )
     char     * event;
     uint64_t   left;
     int        ret;
+    uint64_t   down;
+    uint64_t   up;
 
-    if( tc->started && 0 < tc->newPort )
-    {
-        tc->bindPort = tc->newPort;
-        tc->newPort = -1;
-    }
-
+    down = tor->downloaded - tc->download;
+    up = tor->uploaded - tc->upload;
     if( tc->started )
+    {
         event = "&event=started";
+        down = up = 0;
+        
+        if( 0 < tc->newPort )
+        {
+            tc->bindPort = tc->newPort;
+            tc->newPort = -1;
+        }
+    }
     else if( tc->completed )
+    {
         event = "&event=completed";
+    }
     else if( tc->stopped || 0 < tc->newPort )
+    {
         event = "&event=stopped";
+    }
     else
+    {
         event = "";
+    }
 
     left = tr_cpLeftBytes( tor->completion );
 
@@ -302,7 +321,7 @@ static void sendQuery( tr_tracker_t * tc )
             "User-Agent: Transmission/%d.%d\r\n"
             "Connection: close\r\n\r\n",
             inf->trackerAnnounce, tor->hashString, tc->id,
-            tc->bindPort, tor->uploaded, tor->downloaded,
+            tc->bindPort, up, down,
             left, tor->key, event, inf->trackerAddress,
             VERSION_MAJOR, VERSION_MINOR );
 
