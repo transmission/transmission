@@ -37,14 +37,14 @@ void           tr_trackerClose     ( tr_tracker_t * );
  ***********************************************************************
  * Looks for the seeders/leechers as returned by the tracker.
  **********************************************************************/
-int			    tr_trackerSeeders  ( tr_torrent_t * );
+int			    tr_trackerSeeders  ( tr_tracker_t * );
 
 /***********************************************************************
  * tr_trackerLeechers
  ***********************************************************************
  * Looks for the seeders/leechers as returned by the tracker.
  **********************************************************************/
-int			    tr_trackerLeechers ( tr_torrent_t * );
+int			    tr_trackerLeechers ( tr_tracker_t * );
 
 int            tr_trackerScrape    ( tr_torrent_t *, int *, int * );
 

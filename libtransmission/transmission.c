@@ -331,6 +331,7 @@ static void torrentReallyStop( tr_torrent_t * tor )
     tr_dbg( "Thread joined" );
 
     tr_trackerClose( tor->tracker );
+    tor->tracker = NULL;
 
     while( tor->peerCount > 0 )
     {
@@ -422,8 +423,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
         s->rateDownload = 0.0;
     s->rateUpload = tr_rcRate( tor->upload );
     
-    s->seeders	  = tr_trackerSeeders(tor);
-	s->leechers	  = tr_trackerLeechers(tor);
+    s->seeders  = tr_trackerSeeders(tor->tracker);
+	s->leechers = tr_trackerLeechers(tor->tracker);
 
     if( s->rateDownload < 0.1 )
     {

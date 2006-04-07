@@ -667,20 +667,20 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
     return 0;
 }
 
-int tr_trackerSeeders( tr_torrent_t * tor)
+int tr_trackerSeeders( tr_tracker_t * tc )
 {
-	if (tor->status != TR_STATUS_PAUSE)
-	{
-		return (tor->tracker)->seeders;
-	}
-	return 0;
+    if( !tc )
+    {
+        return -1;
+    }
+    return tc->seeders;
 }
 
-int tr_trackerLeechers( tr_torrent_t * tor)
+int tr_trackerLeechers( tr_tracker_t * tc )
 {
-	if (tor->status != TR_STATUS_PAUSE) 
-	{
-		return (tor->tracker)->leechers;
-	}
-	return 0;
+    if( !tc )
+    {
+        return -1;
+    }
+    return tc->leechers;
 }
