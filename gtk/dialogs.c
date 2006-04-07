@@ -39,8 +39,10 @@
 
 struct prefdata {
   GtkSpinButton *port;
-  GtkCheckButton *uselimit;
-  GtkSpinButton *limit;
+  GtkCheckButton *use_dlimit;
+  GtkSpinButton *dlimit;
+  GtkCheckButton *use_ulimit;
+  GtkSpinButton *ulimit;
   GtkFileChooser *dir;
   GtkWindow *parent;
   tr_handle_t *tr;
@@ -77,11 +79,9 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
    GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  GtkWidget *table = gtk_table_new(4, 2, FALSE);
+  const unsigned int rowcount = 6;
+  GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
-  GtkWidget *limitbox = gtk_check_button_new_with_mnemonic(
-    _("_Limit upload speed"));
-  GtkWidget *limitnum = gtk_spin_button_new_with_range(0, G_MAXLONG, 1);
   GtkWidget *dirstr = gtk_file_chooser_button_new(
     _("Choose download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
@@ -89,6 +89,18 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   GtkWidget **array;
   const char *pref;
   struct prefdata *data = g_new0(struct prefdata, 1);
+  struct { GtkWidget *on; GtkWidget *num; GtkWidget *label; gboolean first;
+    const char *usepref; const char *numpref; long def; } lim[] = {
+    { gtk_check_button_new_with_mnemonic(_("_Limit download speed")),
+      gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
+      gtk_label_new_with_mnemonic(_("Maximum _download speed:")),
+      FALSE, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEFAULT_DOWNLIMIT, },
+    { gtk_check_button_new_with_mnemonic(_("Li_mit upload speed")),
+      gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
+      gtk_label_new_with_mnemonic(_("Maximum _upload speed:")),
+      TRUE, PREF_USEUPLIMIT, PREF_UPLIMIT, DEFAULT_UPLIMIT, },
+  };
+  unsigned int ii;
 
   *opened = TRUE;
 
@@ -101,43 +113,50 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
 
   data->port = GTK_SPIN_BUTTON(portnum);
-  data->uselimit = GTK_CHECK_BUTTON(limitbox);
-  data->limit = GTK_SPIN_BUTTON(limitnum);
+  data->use_dlimit = GTK_CHECK_BUTTON(lim[0].on);
+  data->dlimit = GTK_SPIN_BUTTON(lim[0].num);
+  data->use_ulimit = GTK_CHECK_BUTTON(lim[1].on);
+  data->ulimit = GTK_SPIN_BUTTON(lim[1].num);
   data->dir = GTK_FILE_CHOOSER(dirstr);
   data->parent = parent;
   data->tr = tr;
 
-  /* limit checkbox */
-  pref = cf_getpref(PREF_USELIMIT);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(limitbox),
-    (NULL == pref ? TRUE : strbool(pref)));
-  array = g_new(GtkWidget*, 2);
-  g_signal_connect_data(limitbox, "clicked", G_CALLBACK(clicklimitbox),
-                        array, (GClosureNotify)g_free, 0);
-  gtk_table_attach_defaults(GTK_TABLE(table), limitbox,         0, 2, 0, 1);
+#define RN(n) (n), (n) + 1
 
-  /* limit label and entry */
-  label = gtk_label_new_with_mnemonic(_("Maximum _upload speed:"));
-  gtk_label_set_mnemonic_widget(GTK_LABEL(label), limitnum);
-  gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-  pref = cf_getpref(PREF_LIMIT);
-  gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(limitnum), TRUE);
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(limitnum),
-    (NULL == pref ? DEFAULT_UPLIMIT : strtol(pref,NULL,10)));
-  gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 1, 2);
-  gtk_table_attach_defaults(GTK_TABLE(table), limitnum,         1, 2, 1, 2);
-  array[0] = label;
-  array[1] = limitnum;
-  clicklimitbox(limitbox, array);
+  for(ii = 0; ii < ALEN(lim); ii++) {
+    /* limit checkbox */
+    pref = cf_getpref(lim[ii].usepref);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lim[ii].on),
+      (NULL == pref ? lim[ii].first : strbool(pref)));
+    array = g_new(GtkWidget*, 2);
+    g_signal_connect_data(lim[ii].on, "clicked", G_CALLBACK(clicklimitbox),
+                          array, (GClosureNotify)g_free, 0);
+    gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].on,    0, 2, RN(ii*2));
+
+    /* limit label and entry */
+    gtk_label_set_mnemonic_widget(GTK_LABEL(lim[ii].label), lim[ii].num);
+    gtk_misc_set_alignment(GTK_MISC(lim[ii].label), 0, .5);
+    pref = cf_getpref(lim[ii].numpref);
+    gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(lim[ii].num), TRUE);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(lim[ii].num),
+      (NULL == pref ? lim[ii].def : strtol(pref, NULL, 10)));
+    gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].label, 0,1,RN(ii*2+1));
+    gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].num,   1,2,RN(ii*2+1));
+    array[0] = lim[ii].label;
+    array[1] = lim[ii].num;
+    clicklimitbox(lim[ii].on, array);
+  }
+  ii *= 2;
 
   /* directory label and chooser */
-  label = gtk_label_new_with_mnemonic(_("_Download directory:"));
+  label = gtk_label_new_with_mnemonic(_("Download di_rectory:"));
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), dirstr);
   gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   if(NULL != (pref = cf_getpref(PREF_DIR)))
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dirstr), pref);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 2, 3);
-  gtk_table_attach_defaults(GTK_TABLE(table), dirstr,           1, 2, 2, 3);
+  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
+  gtk_table_attach_defaults(GTK_TABLE(table), dirstr,          1, 2, RN(ii));
+  ii++;
 
   /* port label and entry */
   label = gtk_label_new_with_mnemonic(_("Listening _port:"));
@@ -147,8 +166,12 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(portnum), TRUE);
   gtk_spin_button_set_value(GTK_SPIN_BUTTON(portnum),
     (NULL == pref ? TR_DEFAULT_PORT : strtol(pref, NULL, 10)));
-  gtk_table_attach_defaults(GTK_TABLE(table), label,            0, 1, 3, 4);
-  gtk_table_attach_defaults(GTK_TABLE(table), portnum,          1, 2, 3, 4);
+  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
+  gtk_table_attach_defaults(GTK_TABLE(table), portnum,         1, 2, RN(ii));
+  ii++;
+
+#undef RN
+  assert(rowcount == ii);
 
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect_data(wind, "response", G_CALLBACK(clickdialog),
@@ -180,7 +203,7 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
   int intval;
   const char *strval;
   char *strnum, *errstr;
-  gboolean boolval;
+  gboolean bval;
 
   if(GTK_RESPONSE_APPLY == resp || GTK_RESPONSE_OK == resp) {
     /* check directory */
@@ -202,14 +225,23 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
     cf_setpref(PREF_PORT, strnum);
     g_free(strnum);
 
-    /* save uselimit pref */
-    boolval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->uselimit));
-    cf_setpref(PREF_USELIMIT, (boolval ? "yes" : "no"));
+    /* save usedownlimit pref */
+    bval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->use_dlimit));
+    cf_setpref(PREF_USEDOWNLIMIT, (bval ? "yes" : "no"));
 
-    /* save limit pref */
-    intval = gtk_spin_button_get_value_as_int(data->limit);
+    /* save downlimit pref */
+    intval = gtk_spin_button_get_value_as_int(data->dlimit);
     strnum = g_strdup_printf("%i", intval);
-    cf_setpref(PREF_LIMIT, strnum);
+    cf_setpref(PREF_DOWNLIMIT, strnum);
+
+    /* save useuplimit pref */
+    bval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->use_ulimit));
+    cf_setpref(PREF_USEUPLIMIT, (bval ? "yes" : "no"));
+
+    /* save downlimit pref */
+    intval = gtk_spin_button_get_value_as_int(data->ulimit);
+    strnum = g_strdup_printf("%i", intval);
+    cf_setpref(PREF_UPLIMIT, strnum);
 
     /* save prefs */
     if(!cf_saveprefs(&errstr)) {
@@ -230,13 +262,21 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
 void
 setlimit(tr_handle_t *tr) {
   const char *pref;
+  struct { void (*func)(tr_handle_t*, int);
+    const char *use; const char *num; long def; } lim[] = {
+    {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,DEFAULT_DOWNLIMIT},
+    {tr_setUploadLimit,   PREF_USEUPLIMIT,   PREF_UPLIMIT,  DEFAULT_UPLIMIT},
+  };
+  unsigned int ii;
 
-  if(NULL != (pref = cf_getpref(PREF_USELIMIT)) && !strbool(pref))
-    tr_setUploadLimit(tr, -1);
-  else if(NULL != (pref = cf_getpref(PREF_LIMIT)))
-    tr_setUploadLimit(tr, strtol(pref, NULL, 10));
-  else
-    tr_setUploadLimit(tr, DEFAULT_UPLIMIT);
+  for(ii = 0; ii < ALEN(lim); ii++) {
+    if(NULL != (pref = cf_getpref(lim[ii].use)) && !strbool(pref))
+      lim[ii].func(tr, -1);
+    else if(NULL != (pref = cf_getpref(lim[ii].num)))
+      lim[ii].func(tr, strtol(pref, NULL, 10));
+    else
+      lim[ii].func(tr, lim[ii].def);
+  }
 }
 
 void

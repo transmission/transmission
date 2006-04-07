@@ -31,10 +31,13 @@
 
 /* macros for names of prefs we use */
 #define PREF_PORT               "listening-port"
-#define PREF_USELIMIT           "use-upload-limit"
-#define PREF_LIMIT              "upload-limit"
+#define PREF_USEDOWNLIMIT       "use-download-limit"
+#define PREF_DOWNLIMIT          "download-limit"
+#define PREF_USEUPLIMIT         "use-upload-limit"
+#define PREF_UPLIMIT            "upload-limit"
 #define PREF_DIR                "download-directory"
 
+#define DEFAULT_DOWNLIMIT       100
 #define DEFAULT_UPLIMIT         20
 
 typedef gboolean (*add_torrent_func_t)(void *, const char *, const char *, gboolean, GList **);
