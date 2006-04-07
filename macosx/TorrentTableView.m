@@ -32,21 +32,6 @@
     fTorrents = torrents;
 }
 
-- (void) pauseOrResume: (int) row
-{
-    Torrent * torrent = [fTorrents objectAtIndex: row];
-
-    if( [torrent isPaused] )
-    {
-        [fController resumeTorrentWithIndex: row];
-    }
-    else if( [torrent isActive] )
-    {
-        [fController stopTorrentWithIndex: row];
-    }
-    else;
-}
-
 - (NSRect) pauseRectForRow: (int) row
 {
     int col;
@@ -99,18 +84,7 @@
     else if( ![self pointInPauseRect: fClickPoint] &&
              ![self pointInRevealRect: fClickPoint] )
     {
-        if( row >= 0 )
-        {
-            if( OSX_VERSION >= 10.3 )
-                [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                    byExtendingSelection: NO];
-            else
-                [self selectRow: row byExtendingSelection: NO];
-        }
-        else
-        {
-            [self deselectAll: self];
-        }
+        [super mouseDown: e];
     }
     else;
 
@@ -131,7 +105,13 @@
     if( sameRow && [self pointInPauseRect: point]
             && [self pointInPauseRect: fClickPoint] )
     {
-        [self pauseOrResume: row];
+        torrent = [fTorrents objectAtIndex: row];
+
+		if( [torrent isPaused] )
+			[fController resumeTorrentWithIndex: [NSIndexSet indexSetWithIndex: row]];
+		else if( [torrent isActive] )
+			[fController stopTorrentWithIndex: [NSIndexSet indexSetWithIndex: row]];
+		else;
     }
     else if( sameRow && [self pointInRevealRect: point]
                 && [self pointInRevealRect: fClickPoint] )
@@ -139,7 +119,9 @@
         torrent = [fTorrents objectAtIndex: row];
         [torrent reveal];
     }
-    else;
+	else;
+    
+	[super mouseUp: e];
 
     fClickPoint = NSMakePoint( 0, 0 );
     [self display];
@@ -157,9 +139,9 @@
     {
         if( OSX_VERSION >= 10.3 )
             [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                byExtendingSelection: NO];
+                byExtendingSelection: [self isRowSelected: row]];
         else
-            [self selectRow: row byExtendingSelection: NO];
+            [self selectRow: row byExtendingSelection: [self isRowSelected: row]];
         return fContextRow;
     }
     else

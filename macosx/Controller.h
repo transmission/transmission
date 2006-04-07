@@ -88,26 +88,26 @@
                         contextInfo: (void *) info;
 
 - (void) quitSheetDidEnd:   (NSWindow *)sheet returnCode:(int)returnCode
-                            contextInfo:(void  *)contextInfo;
+                            contextInfo:(void *)contextInfo;
                         
-- (void) stopTorrent:               (id) sender;
-- (void) stopAllTorrents:           (id) sender;
-- (void) stopTorrentWithIndex:      (int) index;
 - (void) resumeTorrent:             (id) sender;
 - (void) resumeAllTorrents:         (id) sender;
-- (void) resumeTorrentWithIndex:    (int) index;
+- (void) resumeTorrentWithIndex:    (NSIndexSet *) indexSet;
+- (void) stopTorrent:               (id) sender;
+- (void) stopAllTorrents:           (id) sender;
+- (void) stopTorrentWithIndex:      (NSIndexSet *) indexSet;
 
 - (void) removeTorrent:             (id) sender;
 - (void) removeTorrentDeleteFile:   (id) sender;
 - (void) removeTorrentDeleteData:   (id) sender;
 - (void) removeTorrentDeleteBoth:   (id) sender;
-- (void) removeTorrentWithIndex:    (int) idx
+- (void) removeTorrentWithIndex:    (NSIndexSet *) indexSet
                 deleteTorrent:      (BOOL) deleteTorrent
                 deleteData:         (BOOL) deleteData;
                 
 - (void) removeSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-                        contextInfo:(NSDictionary  *)dict;
-- (void) confirmRemoveTorrentWithIndex: (int) idx
+                        contextInfo:(NSDictionary *)dict;
+- (void) confirmRemoveTorrentWithIndex: (NSIndexSet *) indexSet
             deleteTorrent: (BOOL) deleteTorrent
             deleteData: (BOOL) deleteData;
                      

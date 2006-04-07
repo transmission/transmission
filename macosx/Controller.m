@@ -398,91 +398,116 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) resumeTorrent: (id) sender
 {
-    [self resumeTorrentWithIndex: [fTableView selectedRow]];
+    [self resumeTorrentWithIndex: [fTableView selectedRowIndexes]];
 }
 
 - (void) resumeAllTorrents: (id) sender
 {
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while( ( torrent = [enumerator nextObject] ) )
-    {
-        [torrent start];
-    }
-    [self updateUI: nil];
-    [self updateTorrentHistory];
+    [self resumeTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange:
+									NSMakeRange(0, [fTorrents count])]];
 }
 
-- (void) resumeTorrentWithIndex: (int) idx
+- (void) resumeTorrentWithIndex: (NSIndexSet *) indexSet
 {
-    Torrent * torrent = [fTorrents objectAtIndex: idx];
-    [torrent start];
+	Torrent * torrent;
+    unsigned int i;
+	
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+	{
+		torrent = [fTorrents objectAtIndex: i];
+		[torrent start];
+	}
+	
     [self updateUI: nil];
     [self updateTorrentHistory];
 }
 
 - (void) stopTorrent: (id) sender
 {
-    [self stopTorrentWithIndex: [fTableView selectedRow]];
+    [self stopTorrentWithIndex: [fTableView selectedRowIndexes]];
 }
 
 - (void) stopAllTorrents: (id) sender
 {
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while( ( torrent = [enumerator nextObject] ) )
-    {
-        [torrent stop];
-    }
-    [self updateUI: nil];
-    [self updateTorrentHistory];
+    [self stopTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange:
+									NSMakeRange(0, [fTorrents count])]];
 }
 
-- (void) stopTorrentWithIndex: (int) idx
+- (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
 {
-    Torrent * torrent = [fTorrents objectAtIndex: idx];
-    [torrent stop];
+	Torrent * torrent;
+    unsigned int i;
+	
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+	{
+		torrent = [fTorrents objectAtIndex: i];
+		[torrent stop];
+	}
+	
     [self updateUI: nil];
     [self updateTorrentHistory];
 }
 
-- (void) removeTorrentWithIndex: (int) idx
+- (void) removeTorrentWithIndex: (NSIndexSet *) indexSet
                   deleteTorrent: (BOOL) deleteTorrent
                      deleteData: (BOOL) deleteData
 {
-    Torrent * torrent = [fTorrents objectAtIndex: idx];
+	int active = 0;
+    unsigned int i;
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+		if ([[fTorrents objectAtIndex: i] isActive])
+			active++;
 
-    if( [torrent isActive] && [fDefaults boolForKey: @"CheckRemove"] )
+    if( active > 0 && [fDefaults boolForKey: @"CheckRemove"] )
     {
         NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithInt: idx], @"Index",
+            [fTableView selectedRowIndexes], @"Index",
             [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent",
             [NSNumber numberWithBool: deleteData], @"DeleteData",
             nil];
         [dict retain];
 
-        NSBeginAlertSheet(@"Confirm Remove",
+		NSString * title, * message;
+		
+		int selected = [fTableView numberOfSelectedRows];
+		if (selected == 1)
+		{
+			title = [NSString stringWithFormat: @"Comfirm Removal of %@",
+						[[fTorrents objectAtIndex: [fTableView selectedRow]] name]];
+			message = @"This torrent is active. Do you really want to remove it?";
+		}
+		else
+		{
+			title = [NSString stringWithFormat: @"Comfirm Removal of %d Torrents", active];
+			if (selected == active)
+				message = [NSString stringWithFormat:
+					@"There are %d active torrents. Do you really want to remove them?", active];
+			else
+				message = [NSString stringWithFormat:
+					@"There are %d torrents (%d active). Do you really want to remove them?", selected, active];
+		}
+
+        NSBeginAlertSheet(title,
             @"Remove", @"Cancel", nil, fWindow, self,
-            @selector(removeSheetDidEnd:returnCode:contextInfo:),  NULL, dict,
-            @"This torrent is active. Do you really want to remove it?");
+            @selector(removeSheetDidEnd:returnCode:contextInfo:),
+			nil, dict, message);
     }
     else
     {
-        [self confirmRemoveTorrentWithIndex: idx
+        [self confirmRemoveTorrentWithIndex: indexSet
                 deleteTorrent: deleteTorrent
                 deleteData: deleteData];
     }
 }
 
 - (void) removeSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-                        contextInfo:(NSDictionary  *)dict
+                        contextInfo:(NSDictionary *)dict
 {
     [NSApp stopModal];
 
     if( returnCode == NSAlertDefaultReturn )
     {
-        [self confirmRemoveTorrentWithIndex:
-            [[dict objectForKey:@"Index"] intValue]
+        [self confirmRemoveTorrentWithIndex: [dict objectForKey:@"Index"]
             deleteTorrent: [[dict objectForKey:@"DeleteTorrent"] boolValue]
             deleteData: [[dict objectForKey:@"DeleteData"] boolValue]];
     }
@@ -490,26 +515,28 @@ static void sleepCallBack( void * controller, io_service_t y,
     [dict release];
 }
 
-- (void) confirmRemoveTorrentWithIndex: (int) idx
+- (void) confirmRemoveTorrentWithIndex: (NSIndexSet *) indexSet
             deleteTorrent: (BOOL) deleteTorrent
             deleteData: (BOOL) deleteData
 {
-    Torrent * torrent = [fTorrents objectAtIndex: idx];
+    Torrent * torrent;
+	unsigned int i;
+	
+    for (i = [indexSet lastIndex]; i != NSNotFound; i = [indexSet indexLessThanIndex: i])
+	{
+		torrent = [fTorrents objectAtIndex: i];
+	
+		[torrent stop];
 
-    /* Pause if not paused already */
-    [torrent stop];
-
-    if( deleteData )
-    {
-        [torrent trashData];
-    }
-    if( deleteTorrent )
-    {
-        [torrent trashTorrent];
-    }
-
-    [fTorrents removeObject: torrent];
-    [torrent release];
+		if( deleteData )
+			[torrent trashData];
+			
+		if( deleteTorrent )
+			[torrent trashTorrent];
+		
+		[fTorrents removeObject: torrent];
+		[torrent release];
+	}
 
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -517,22 +544,22 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) removeTorrent: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: NO deleteData: NO ];
+    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteTorrent: NO deleteData: NO ];
 }
 
 - (void) removeTorrentDeleteFile: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: YES deleteData: NO];
+    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteTorrent: YES deleteData: NO];
 }
 
 - (void) removeTorrentDeleteData: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: NO deleteData: YES];
+    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteTorrent: NO deleteData: YES];
 }
 
 - (void) removeTorrentDeleteBoth: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRow] deleteTorrent: YES deleteData: YES];
+    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteTorrent: YES deleteData: YES];
 }
 
 - (void) showInfo: (id) sender
@@ -549,12 +576,16 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) updateInfoPanel
 {
-    int row = [fTableView selectedRow];
-
-    if( row < 0 )
+	int numberSelected = [fTableView numberOfSelectedRows];
+    if( numberSelected != 1 )
     {
         [fInfoImageView setImage: fAppIcon];
-        [fInfoName setStringValue: @"No Torrent Selected"];
+		
+        [fInfoName setStringValue: numberSelected == 0
+				? @"No Torrent Selected"
+				: [[NSString stringWithInt: numberSelected]
+					stringByAppendingString: @" Torrents Selected"]];
+					
         [fInfoSize setStringValue: @""];
         [fInfoTracker setStringValue: @""];
         [fInfoAnnounce setStringValue: @""];
@@ -568,6 +599,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         [fInfoUploaded setStringValue: @""];
         return;
     }
+	
+	int row = [fTableView selectedRow];
 
     Torrent * torrent = [fTorrents objectAtIndex: row];
     [fInfoImageView setImage: [torrent iconNonFlipped]];
@@ -663,14 +696,13 @@ static void sleepCallBack( void * controller, io_service_t y,
     return nil;
 }
 
-
 - (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
     forTableColumn: (NSTableColumn *) tableColumn row: (int) rowIndex
 {
     [cell setTorrent: [fTorrents objectAtIndex: rowIndex]];
 
     if( OSX_VERSION >= 10.3 && [fWindow isKeyWindow] &&
-            rowIndex == [fTableView selectedRow] )
+					[fTableView isRowSelected: rowIndex] )
         [cell setTextColor: [NSColor whiteColor]];
     else
         [cell setTextColor: [NSColor blackColor]];
@@ -761,7 +793,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     else
     {
         [item release];
-        return NULL;
+        return nil;
     }
 
     return item;
@@ -807,7 +839,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     //enable remove item
     if (action == @selector(removeTorrent:))
-        return [fTableView selectedRow] >= 0;
+        return [fTableView numberOfSelectedRows] > 0;
 
     Torrent * torrent;
     NSEnumerator * enumerator;
@@ -857,13 +889,11 @@ static void sleepCallBack( void * controller, io_service_t y,
         return YES;
     }
 
-    Torrent * torrent;
-    NSEnumerator * enumerator;
-
     //enable resume all item
     if (action == @selector(resumeAllTorrents:))
     {
-        enumerator = [fTorrents objectEnumerator];
+		Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while( ( torrent = [enumerator nextObject] ) )
             if( [torrent isPaused] )
                 return YES;
@@ -873,19 +903,17 @@ static void sleepCallBack( void * controller, io_service_t y,
     //enable pause all item
     if (action == @selector(stopAllTorrents:))
     {
-        enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while( ( torrent = [enumerator nextObject] ) )
             if( [torrent isActive] )
                 return YES;
         return NO;
     }
 
-    int row = [fTableView selectedRow];
-    torrent = ( row < 0 ) ? nil : [fTorrents objectAtIndex: row];
-
     if (action == @selector(revealFromMenu:))
     {
-        return ( torrent != nil );
+        return [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable remove items
@@ -894,9 +922,23 @@ static void sleepCallBack( void * controller, io_service_t y,
         || action == @selector(removeTorrentDeleteData:)
         || action == @selector(removeTorrentDeleteBoth:))
     {
+		BOOL active = NO;
+		Torrent * torrent;
+		NSIndexSet * indexSet = [fTableView selectedRowIndexes];
+		unsigned int i;
+		
+		for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+		{
+			torrent = [fTorrents objectAtIndex: i];
+			if ([torrent isActive])
+			{
+				active = YES;
+				break;
+			}
+		}
+	
         //append or remove ellipsis when needed
-        if( torrent && [torrent isActive] &&
-            [fDefaults boolForKey: @"CheckRemove"] )
+        if( active && [fDefaults boolForKey: @"CheckRemove"] )
         {
             if (![[menuItem title] hasSuffix:NS_ELLIPSIS])
                 [menuItem setTitle:[[menuItem title] stringByAppendingString:NS_ELLIPSIS]];
@@ -906,24 +948,39 @@ static void sleepCallBack( void * controller, io_service_t y,
             if ([[menuItem title] hasSuffix:NS_ELLIPSIS])
                 [menuItem setTitle:[[menuItem title] substringToIndex:[[menuItem title] length]-[NS_ELLIPSIS length]]];
         }
-        return ( torrent != nil );
+        return [fTableView numberOfSelectedRows] > 0;
     }
 
-    //enable and change pause / remove item
-    if( action == @selector(resumeTorrent:) ||
-        action == @selector(stopTorrent:) )
+    //enable pause item
+    if( action == @selector(stopTorrent:) )
     {
-        if( !torrent || [torrent isActive] )
-        {
-            [menuItem setTitle: @"Pause"];
-            [menuItem setAction: @selector( stopTorrent: )];
-        }
-        else
-        {
-            [menuItem setTitle: @"Resume"];
-            [menuItem setAction: @selector( resumeTorrent: )];
-        }
-        return ( torrent != nil );
+		Torrent * torrent;
+		NSIndexSet * indexSet = [fTableView selectedRowIndexes];
+		unsigned int i;
+		
+		for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+		{
+			torrent = [fTorrents objectAtIndex: i];
+			if ([torrent isActive])
+				return YES;
+		}
+		return NO;
+	}
+	
+	//enable resume item
+    if( action == @selector(resumeTorrent:) )
+    {
+		Torrent * torrent;
+		NSIndexSet * indexSet = [fTableView selectedRowIndexes];
+		unsigned int i;
+		
+		for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+		{
+			torrent = [fTorrents objectAtIndex: i];
+			if ([torrent isPaused])
+				return YES;
+		}
+		return NO;
     }
 
     return YES;
