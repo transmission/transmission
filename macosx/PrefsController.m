@@ -256,7 +256,7 @@
 {
     int limit = [sender intValue];
     NSString * key = ( sender == fUploadField ) ?
-                        @"CheckUpload" : @"CheckDownload";
+                        @"UploadLimit" : @"DownloadLimit";
 
     //if value entered is not an int or is less than 0 do not change
     if (![[sender stringValue] isEqualToString:
@@ -269,13 +269,14 @@
     else
     {
         [fDefaults setInteger: limit forKey: key];
-        if( sender == fUploadField )
-            tr_setUploadLimit( fHandle,
-                ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
-        else
-            tr_setDownloadLimit( fHandle,
-                ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
     }
+
+    if( sender == fUploadField )
+        tr_setUploadLimit( fHandle,
+            ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
+    else
+        tr_setDownloadLimit( fHandle,
+            ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
 }
 
 - (void) setQuitMessage: (id) sender
