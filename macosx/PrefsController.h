@@ -44,6 +44,8 @@
     IBOutlet NSTextField    * fPortField;
     IBOutlet NSButton       * fUploadCheck;
     IBOutlet NSTextField    * fUploadField;
+    IBOutlet NSButton       * fDownloadCheck;
+    IBOutlet NSTextField    * fDownloadField;
     
     IBOutlet NSWindow       * fWindow;
 
@@ -60,8 +62,8 @@
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 
-- (void) setLimitUploadCheck:   (id) sender;
 - (void) setPort:               (id) sender;
-- (void) setUploadLimit:        (id) sender;
+- (void) setLimitCheck:         (id) sender;
+- (void) setLimit:              (id) sender;
 
 @end

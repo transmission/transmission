@@ -12,12 +12,16 @@
 	<true/>
 	<key>CheckRemove</key>
 	<true/>
+	<key>CheckDownload</key>
+	<false/>
 	<key>CheckUpload</key>
 	<true/>
 	<key>DownloadChoice</key>
 	<string>Constant</string>
 	<key>DownloadFolder</key>
 	<string>~/Desktop</string>
+	<key>DownloadLimit</key>
+	<integer>100</integer>
 	<key>InfoVisible</key>
 	<false/>
 	<key>Move</key>

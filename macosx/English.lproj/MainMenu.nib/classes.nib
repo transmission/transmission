@@ -65,12 +65,12 @@
                 folderSheetShow = id; 
                 setBadge = id; 
                 setDownloadLocation = id; 
-                setLimitUploadCheck = id; 
+                setLimit = id; 
+                setLimitCheck = id; 
                 setPort = id; 
                 setQuitMessage = id; 
                 setRemoveMessage = id; 
                 setUpdate = id; 
-                setUploadLimit = id; 
             }; 
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
@@ -78,6 +78,8 @@
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
                 fBlankView = NSView; 
+                fDownloadCheck = NSButton; 
+                fDownloadField = NSTextField; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
                 fNetworkView = NSView; 

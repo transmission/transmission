@@ -125,6 +125,16 @@
     [fUploadField setEnabled: checkUpload];
     
     tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
+
+    //set download limit
+    BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
+    int downloadLimit = [fDefaults integerForKey: @"DownloadLimit"];
+    
+    [fDownloadCheck setState: checkDownload ? NSOnState : NSOffState];
+    [fDownloadField setIntValue: downloadLimit];
+    [fDownloadField setEnabled: checkDownload];
+    
+    tr_setDownloadLimit( fHandle, checkDownload ? downloadLimit : -1 );
     
     //set remove and quit prompts
     [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"] ?
@@ -220,36 +230,52 @@
     }
 }
 
-- (void) setLimitUploadCheck: (id) sender
+- (void) setLimitCheck: (id) sender
 {
-    BOOL checkUpload = [fUploadCheck state] == NSOnState;
-
-    [fDefaults setBool: checkUpload forKey: @"CheckUpload"];
-    
-    [self setUploadLimit: nil];
-    [fUploadField setEnabled: checkUpload];
-}
-
-- (void) setUploadLimit: (id) sender
-{
-    int uploadLimit = [fUploadField intValue];
-    
-    //if value entered is not an int or is less than 0 do not change
-    if (![[fUploadField stringValue] isEqualToString:
-            [NSString stringWithInt: uploadLimit]] || uploadLimit < 0)
+    NSString * key;
+    NSTextField * field;
+    if( sender == fUploadCheck )
     {
-        NSBeep();
-        uploadLimit = [fDefaults integerForKey: @"UploadLimit"];
-        [fUploadField setIntValue: uploadLimit];
+        key = @"CheckUpload";
+        field = fUploadField;
     }
     else
     {
-        [fDefaults setInteger: uploadLimit forKey: @"UploadLimit"];
+        key = @"CheckDownload";
+        field = fDownloadField;
     }
-    
-    if ([fUploadCheck state] == NSOffState || uploadLimit == 0)
-        uploadLimit = -1;
-    tr_setUploadLimit( fHandle, uploadLimit );
+
+    BOOL check = [sender state] == NSOnState;
+    [fDefaults setBool: check forKey: key];
+
+    [self setLimit: field];
+    [field setEnabled: check];
+}
+
+- (void) setLimit: (id) sender
+{
+    int limit = [sender intValue];
+    NSString * key = ( sender == fUploadField ) ?
+                        @"CheckUpload" : @"CheckDownload";
+
+    //if value entered is not an int or is less than 0 do not change
+    if (![[sender stringValue] isEqualToString:
+            [NSString stringWithInt: limit]] || limit < 0)
+    {
+        NSBeep();
+        limit = [fDefaults integerForKey: key];
+        [sender setIntValue: limit];
+    }
+    else
+    {
+        [fDefaults setInteger: limit forKey: key];
+        if( sender == fUploadField )
+            tr_setUploadLimit( fHandle,
+                ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
+        else
+            tr_setDownloadLimit( fHandle,
+                ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
+    }
 }
 
 - (void) setQuitMessage: (id) sender
