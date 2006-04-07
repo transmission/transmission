@@ -42,11 +42,15 @@
 #include "transmission.h"
 #include "util.h"
 
-#define FILE_LOCK               "gtk_lock"
-#define FILE_PREFS              "gtk_prefs"
-#define FILE_PREFS_TMP          "gtk_prefs.tmp"
-#define FILE_STATE              "gtk_state"
-#define FILE_STATE_TMP          "gtk_state.tmp"
+#define CONF_SUBDIR             "gtk"
+#define FILE_LOCK               "lock"
+#define FILE_PREFS              "prefs"
+#define FILE_PREFS_TMP          "prefs.tmp"
+#define FILE_STATE              "state"
+#define FILE_STATE_TMP          "state.tmp"
+#define OLD_FILE_LOCK           "gtk_lock" /* remove this after next release */
+#define OLD_FILE_PREFS          "gtk_prefs"
+#define OLD_FILE_STATE          "gtk_state"
 #define PREF_SEP_KEYVAL         '\t'
 #define PREF_SEP_LINE           '\n'
 #define STATE_SEP               '\n'
@@ -59,6 +63,7 @@ static char *
 getstateval(struct cf_torrentstate *state, char *line);
 
 static char *confdir = NULL;
+static char *old_confdir = NULL;
 static GTree *prefs = NULL;
 
 static int
@@ -99,36 +104,28 @@ lockfile(const char *file, char **errstr) {
 
 gboolean
 cf_init(const char *dir, char **errstr) {
-  struct stat sb;
-
   *errstr = NULL;
-  confdir = g_strdup(dir);
+  old_confdir = g_strdup(dir);
+  confdir = g_build_filename(dir, CONF_SUBDIR, NULL);
 
-  if(0 > stat(dir, &sb)) {
-    if(ENOENT != errno)
-      *errstr = g_strdup_printf(_("Failed to check the directory %s:\n%s"),
-        dir, strerror(errno));
-    else {
-      if(0 == mkdir(dir, 0777))
-        return TRUE;
-      else
-        *errstr = g_strdup_printf(_("Failed to create the directory %s:\n%s"),
-          dir, strerror(errno));
-    }
-    return FALSE;
-  }
-
-  if(S_IFDIR & sb.st_mode)
+  if(mkdir_p(confdir, 0777))
     return TRUE;
 
-  *errstr = g_strdup_printf(_("%s is not a directory"), dir);
+  *errstr = g_strdup_printf(_("Failed to create the directory %s:\n%s"),
+                            confdir, strerror(errno));
   return FALSE;
 }
 
 gboolean
 cf_lock(char **errstr) {
-  char *path = g_build_filename(confdir, FILE_LOCK, NULL);
+  char *path = g_build_filename(old_confdir, OLD_FILE_LOCK, NULL);
   int fd = lockfile(path, errstr);
+
+  if(0 <= fd) {
+    g_free(path);
+    path = g_build_filename(confdir, FILE_LOCK, NULL);
+    fd = lockfile(path, errstr);
+  }
 
   g_free(path);
   return 0 <= fd;
@@ -137,6 +134,7 @@ cf_lock(char **errstr) {
 gboolean
 cf_loadprefs(char **errstr) {
   char *path = g_build_filename(confdir, FILE_PREFS, NULL);
+  char *oldpath;
   GIOChannel *io;
   GError *err;
   char *line, *sep;
@@ -157,7 +155,15 @@ cf_loadprefs(char **errstr) {
     if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
       *errstr = g_strdup_printf(
         _("Failed to open the file %s for reading:\n%s"), path, err->message);
-    goto done;
+    else {
+      g_error_free(err);
+      err = NULL;
+      oldpath = g_build_filename(old_confdir, OLD_FILE_PREFS, NULL);
+      io = g_io_channel_new_file(oldpath, "r", &err);
+      g_free(oldpath);
+    }
+    if(NULL != err)
+      goto done;
   }
   g_io_channel_set_line_term(io, &term, 1);
 
@@ -193,6 +199,7 @@ cf_loadprefs(char **errstr) {
     g_error_free(err);
   if(NULL != io)  
     g_io_channel_unref(io);
+  g_free(path);
   return NULL == *errstr;
 }
 
@@ -306,6 +313,7 @@ writefile_traverse(gpointer key, gpointer value, gpointer data) {
 GList *
 cf_loadstate(char **errstr) {
   char *path = g_build_filename(confdir, FILE_STATE, NULL);
+  char *oldpath;
   GIOChannel *io;
   GError *err;
   char term = STATE_SEP;
@@ -320,7 +328,15 @@ cf_loadstate(char **errstr) {
     if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
       *errstr = g_strdup_printf(
         _("Failed to open the file %s for reading:\n%s"), path, err->message);
-    goto done;
+    else {
+      g_error_free(err);
+      err = NULL;
+      oldpath = g_build_filename(old_confdir, OLD_FILE_STATE, NULL);
+      io = g_io_channel_new_file(oldpath, "r", &err);
+      g_free(oldpath);
+    }
+    if(NULL != err)
+      goto done;
   }
   g_io_channel_set_line_term(io, &term, 1);
 
@@ -365,6 +381,7 @@ cf_loadstate(char **errstr) {
     g_list_free(ret);
     ret = NULL;
   }
+  g_free(path);
   return ret;
 }
 
