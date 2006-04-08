@@ -394,6 +394,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     tr_lockLock( &tor->lock );
 
     s->status = tor->status;
+    s->error  = tor->error;
     memcpy( s->trackerError, tor->trackerError,
             sizeof( s->trackerError ) );
 

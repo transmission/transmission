@@ -144,14 +144,12 @@
             break;
     }
 
-#if 0
-    if( ( stat->status & ( TR_STATUS_DOWNLOAD | TR_STATUS_SEED ) ) &&
-        ( stat->status & TR_TRACKER_ERROR ) )
+    if( fStat->error & TR_ETRACKER )
     {
-        fPeersString = [NSString stringWithFormat: @"%@%@",
-            @"Error: ", [NSString stringWithUTF8String: stat->error]];
+        [fInfoString setString: @"Error: "];
+        [fInfoString appendString: [NSString
+            stringWithUTF8String: fStat->trackerError]];
     }
-#endif
 
     [fUploadString   setString: @""];
     if( fStat->progress == 1.0 )

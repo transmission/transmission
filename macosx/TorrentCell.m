@@ -314,7 +314,7 @@ static uint32_t kGreen[] =
     [[fTorrent statusString] drawAtPoint: pen withAttributes: attributes];
     pen.y += 13;
     string = [[fTorrent infoString] stringFittingInWidth:
-        ( cellFrame.size.width - 77 ) withAttributes: attributes];
+        ( fWidth - 80 ) withAttributes: attributes];
     [string drawAtPoint: pen withAttributes: attributes];
 
     /* Rates */
