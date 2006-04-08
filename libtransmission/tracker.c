@@ -181,6 +181,7 @@ int tr_trackerPulse( tr_tracker_t * tc )
 
         if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
         {
+            tc->status = TC_STATUS_IDLE;
             return 0;
         }
 
@@ -188,6 +189,7 @@ int tr_trackerPulse( tr_tracker_t * tc )
         if( tc->socket < 0 )
         {
             tr_fdSocketClosed( tor->fdlimit, 1 );
+            tc->status = TC_STATUS_IDLE;
             return 0;
         }
 
@@ -256,7 +258,11 @@ void tr_trackerClose( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
 
-    if( tc->status > TC_STATUS_IDLE )
+    if( tc->status == TC_STATUS_RESOLVE )
+    {
+        tr_netResolveClose( tc->resolve );
+    }
+    else if( tc->status > TC_STATUS_RESOLVE )
     {
         tr_netClose( tc->socket );
         tr_fdSocketClosed( tor->fdlimit, 1 );

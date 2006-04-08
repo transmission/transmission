@@ -66,7 +66,11 @@ struct tr_resolve_s
 
     tr_lock_t      lock;
     tr_thread_t    thread;
+    int            orphan;
 };
+
+/* Hem, global variable. Initialized from tr_init(). */
+tr_lock_t gethostbynameLock;
 
 static void resolveFunc( void * _r )
 {
@@ -74,26 +78,42 @@ static void resolveFunc( void * _r )
     struct hostent * host;
 
     tr_lockLock( &r->lock );
+
     r->addr.s_addr = inet_addr( r->address );
     if( r->addr.s_addr != 0xFFFFFFFF )
     {
+        /* This was an IP address, no resolving required */
         r->status = TR_RESOLVE_OK;
-        tr_lockUnlock( &r->lock );
-        return;
+        goto resolveDone;
     }
-    tr_lockUnlock( &r->lock );
 
-    if( !( host = gethostbyname( r->address ) ) )
-    {
-        tr_lockLock( &r->lock );
-        r->status = TR_RESOLVE_ERROR;
-        tr_lockUnlock( &r->lock );
-        return;
-    }
-    tr_lockLock( &r->lock );
-    memcpy( &r->addr, host->h_addr, host->h_length );
-    r->status = TR_RESOLVE_OK;
+    tr_lockLock( &gethostbynameLock );
     tr_lockUnlock( &r->lock );
+    host = gethostbyname( r->address );
+    tr_lockLock( &r->lock );
+    if( host )
+    {
+        memcpy( &r->addr, host->h_addr, host->h_length );
+        r->status = TR_RESOLVE_OK;
+    }
+    else
+    {
+        r->status = TR_RESOLVE_ERROR;
+    }
+    tr_lockUnlock( &gethostbynameLock );
+
+resolveDone:
+    if( r->orphan )
+    {
+        /* tr_netResolveClose was closed already. Free memory */
+        tr_lockUnlock( &r->lock );
+        tr_lockClose( &r->lock );
+        free( r );
+    }
+    else
+    {
+        tr_lockUnlock( &r->lock );
+    }
 }
 
 tr_resolve_t * tr_netResolveInit( char * address )
@@ -105,6 +125,7 @@ tr_resolve_t * tr_netResolveInit( char * address )
 
     tr_lockInit( &r->lock );
     tr_threadCreate( &r->thread, resolveFunc, r );
+    r->orphan = 0;
 
     return r;
 }
@@ -126,6 +147,17 @@ int tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
 
 void tr_netResolveClose( tr_resolve_t * r )
 {
+    tr_lockLock( &r->lock );
+    if( r->status == TR_RESOLVE_WAIT )
+    {
+        /* Let the thread die */
+        r->orphan = 1;
+        tr_lockUnlock( &r->lock );
+        return;
+    }
+    tr_lockUnlock( &r->lock );
+
+    /* Clean up */
     tr_threadJoin( &r->thread );
     tr_lockClose( &r->lock );
     free( r );
