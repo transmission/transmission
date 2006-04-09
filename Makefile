@@ -53,23 +53,33 @@ clean:
 	@xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
 	@$(MAKE) -C macosx clean
 
-MAKELINK = printf "[InternetShortcut]\nURL=http://%s\n"
+MAKELINK = printf "[InternetShortcut]\nURL=http://transmission.m0k.org%s\n"
+define PACKAGE_RULE1
+	$(RM) tmp "Transmission $(VERSION_STRING)" \
+	  Transmission-$(VERSION_STRING).dmg
+	mkdir -p tmp
+	cp -r macosx/Transmission.app tmp/
+	cp AUTHORS tmp/AUTHORS.txt
+	cp LICENSE tmp/LICENSE.txt
+	cp NEWS tmp/NEWS.txt
+	$(MAKELINK) "/" > tmp/Homepage.url
+	$(MAKELINK) "/forum" > tmp/Forums.url
+	$(MAKELINK) "/contribute.php" > tmp/Contribute.url
+endef
+define PACKAGE_RULE2
+	mv tmp "Transmission $(VERSION_STRING)"
+	hdiutil create -format UDZO -srcfolder \
+	  "Transmission $(VERSION_STRING)" Transmission-$(VERSION_STRING).dmg
+	rm -rf "Transmission $(VERSION_STRING)"
+endef
 
 package:
-	$(RM) tmp "Transmission $(VERSION_STRING)" \
-	    Transmission-$(VERSION_STRING).dmg && \
-	  mkdir -p tmp && \
-	  cp -r macosx/Transmission.app tmp/ && \
-	  cp AUTHORS tmp/AUTHORS.txt && \
-	  cp LICENSE tmp/LICENSE.txt && \
-	  cp NEWS tmp/NEWS.txt && \
-	  strip -S tmp/Transmission.app/Contents/MacOS/Transmission && \
-	  $(MAKELINK) "transmission.m0k.org/" > tmp/Homepage.url && \
-	  $(MAKELINK) "transmission.m0k.org/forum" > tmp/Forums.url && \
-	  $(MAKELINK) "transmission.m0k.org/contribute.php" > tmp/Contribute.url && \
-	  mv tmp "Transmission $(VERSION_STRING)" && \
-	  hdiutil create -format UDZO -srcfolder \
-	    "Transmission $(VERSION_STRING)" Transmission-$(VERSION_STRING).dmg && \
-	  rm -rf "Transmission $(VERSION_STRING)"
+	$(PACKAGE_RULE1)
+	$(PACKAGE_RULE2)
+
+package-release:
+	$(PACKAGE_RULE1)
+	strip -S tmp/Transmission.app/Contents/MacOS/Transmission
+	$(PACKAGE_RULE2)
 
 endif
