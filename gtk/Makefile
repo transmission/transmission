@@ -7,7 +7,7 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS  += $(CFLAGS_GTK) -I../libtransmission
 LDFLAGS += $(LDFLAGS_GTK) ../libtransmission/libtransmission.a
 
-transmission-gtk: $(OBJS)
+transmission-gtk: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile

@@ -7,7 +7,7 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS  += -I../libtransmission
 LDFLAGS += ../libtransmission/libtransmission.a
 
-transmissioncli: $(OBJS)
+transmissioncli: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)
 
 %.o: %.c ../Makefile.config ../Makefile.common Makefile
