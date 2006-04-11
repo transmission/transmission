@@ -46,6 +46,11 @@ struct tr_tracker_s
 #define TC_STATUS_RECV    8
     char           status;
 
+#define TC_ATTEMPT_NOREACH 1
+#define TC_ATTEMPT_ERROR   2
+#define TC_ATTEMPT_OK      4
+    char           lastAttempt;
+
     tr_resolve_t * resolve;
     int            socket;
     uint8_t      * buf;
@@ -72,10 +77,12 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 
     tc->started  = 1;
 
+    tc->interval = 300;
     tc->seeders  = -1;
     tc->leechers = -1;
 
     tc->status   = TC_STATUS_IDLE;
+    tc->lastAttempt = TC_ATTEMPT_NOREACH;
     tc->size     = 1024;
     tc->buf      = malloc( tc->size );
 
@@ -92,8 +99,18 @@ static int shouldConnect( tr_tracker_t * tc )
 {
     uint64_t now = tr_date();
 
-    /* In any case, always wait 5 seconds between two requests */
-    if( now < tc->dateTry + 5000 )
+    /* Unreachable tracker, try 10 seconds before trying again */
+    if( tc->lastAttempt == TC_ATTEMPT_NOREACH &&
+        now < tc->dateTry + 10000 )
+    {
+        return 0;
+    }
+
+    /* The tracker rejected us (like 4XX code, unauthorized IP...),
+       don't hammer it - we'll probably get the same answer next time
+       anyway */
+    if( tc->lastAttempt == TC_ATTEMPT_ERROR &&
+        now < tc->dateTry + 1000 * tc->interval )
     {
         return 0;
     }
@@ -355,6 +372,8 @@ static void recvAnswer( tr_tracker_t * tc )
     int i;
     benc_val_t   beAll;
     benc_val_t * bePeers, * beFoo;
+    uint8_t * body;
+    int bodylen;
 
     if( tc->pos == tc->size )
     {
@@ -383,34 +402,70 @@ static void recvAnswer( tr_tracker_t * tc )
     tc->status  = TC_STATUS_IDLE;
     tc->dateTry = tr_date();
 
-    if( tc->pos < 1 )
+    if( tc->pos < 12 || ( 0 != memcmp( tc->buf, "HTTP/1.0 ", 9 ) &&
+                          0 != memcmp( tc->buf, "HTTP/1.1 ", 9 ) ) )
     {
-        /* We got nothing */
+        /* We don't have a complete HTTP status line */
+        tr_inf( "Tracker: incomplete HTTP status line" );
+        tc->lastAttempt = TC_ATTEMPT_NOREACH;
         return;
     }
 
-    /* Find the beginning of the dictionary */
-    for( i = 0; i < tc->pos - 18; i++ )
+    if( '2' != tc->buf[9] )
     {
-        /* Hem */
-        if( !memcmp( &tc->buf[i], "d8:interval", 11 ) ||
-            !memcmp( &tc->buf[i], "d8:complete", 11 ) ||
-            !memcmp( &tc->buf[i], "d14:failure reason", 18 ) )
+        /* we didn't get a 2xx status code */
+        tr_err( "Tracker: invalid HTTP status code: %c%c%c",
+                tc->buf[9], tc->buf[10], tc->buf[11] );
+        tc->lastAttempt = TC_ATTEMPT_ERROR;
+        return;
+    }
+
+    /* find the end of the http headers */
+    body = tr_memmem( tc->buf, tc->pos, "\015\012\015\012", 4 );
+    if( NULL != body )
+    {
+        body += 4;
+    }
+    /* hooray for trackers that violate the HTTP spec */
+    else if( NULL != ( body = tr_memmem( tc->buf, tc->pos, "\015\015", 2 ) ) ||
+             NULL != ( body = tr_memmem( tc->buf, tc->pos, "\012\012", 2 ) ) )
+    {
+        body += 2;
+    }
+    else
+    {
+        tr_err( "Tracker: could not find end of HTTP headers" );
+        tc->lastAttempt = TC_ATTEMPT_NOREACH;
+        return;
+    }
+    bodylen = tc->pos - (body - tc->buf);
+
+    /* Find the beginning of the dictionary */
+    for( i = 0; i < bodylen; i++ )
+    {
+        if( body[i] == 'd' )
         {
+            /* This must be it */
             break;
         }
     }
 
-    if( i >= tc->pos - 18 )
+    if( i >= bodylen )
     {
+        if( tc->stopped || 0 < tc->newPort )
+        {
+            tc->lastAttempt = TC_ATTEMPT_OK;
+            goto nodict;
+        }
         tr_err( "Tracker: no dictionary in answer" );
-        // printf( "%s\n", tc->buf );
+        tc->lastAttempt = TC_ATTEMPT_ERROR;
         return;
     }
 
-    if( tr_bencLoad( &tc->buf[i], &beAll, NULL ) )
+    if( tr_bencLoad( &body[i], &beAll, NULL ) )
     {
         tr_err( "Tracker: error parsing bencoded data" );
+        tc->lastAttempt = TC_ATTEMPT_ERROR;
         return;
     }
 
@@ -422,9 +477,12 @@ static void recvAnswer( tr_tracker_t * tc )
         tor->error |= TR_ETRACKER;
         snprintf( tor->trackerError, sizeof( tor->trackerError ),
                   "%s", bePeers->val.s.s );
+        tc->lastAttempt = TC_ATTEMPT_ERROR;
         goto cleanup;
     }
+
     tor->error &= ~TR_ETRACKER;
+    tc->lastAttempt = TC_ATTEMPT_OK;
 
     if( !tc->interval )
     {
@@ -461,6 +519,10 @@ static void recvAnswer( tr_tracker_t * tc )
 
     if( !( bePeers = tr_bencDictFind( &beAll, "peers" ) ) )
     {
+        if( tc->stopped || 0 < tc->newPort )
+        {
+            goto nodict;
+        }
         tr_err( "Tracker: no \"peers\" field" );
         goto cleanup;
     }
@@ -521,6 +583,7 @@ static void recvAnswer( tr_tracker_t * tc )
         }
     }
 
+nodict:
     /* Success */
     tc->started   = 0;
     tc->completed = 0;

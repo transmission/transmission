@@ -33,6 +33,8 @@ void tr_msg  ( int level, char * msg, ... );
 
 int  tr_rand ( int );
 
+void * tr_memmem( const void *, size_t, const void *, size_t );
+
 /***********************************************************************
  * tr_date
  ***********************************************************************

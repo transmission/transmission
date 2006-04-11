@@ -61,3 +61,33 @@ int tr_rand( int sup )
     }
     return rand() % sup;
 }
+
+void * tr_memmem( const void *vbig, size_t big_len,
+                  const void *vlittle, size_t little_len )
+{
+    const char *big = vbig;
+    const char *little = vlittle;
+    size_t ii, jj;
+
+    if( 0 == big_len || 0 == little_len )
+    {
+        return NULL;
+    }
+
+    for( ii = 0; ii + little_len <= big_len; ii++ )
+    {
+        for( jj = 0; jj < little_len; jj++ )
+        {
+            if( big[ii + jj] != little[jj] )
+            {
+                break;
+            }
+        }
+        if( jj == little_len )
+        {
+            return (char*)big + ii;
+        }
+    }
+
+    return NULL;
+}
