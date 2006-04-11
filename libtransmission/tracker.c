@@ -533,7 +533,9 @@ static void recvAnswer( tr_tracker_t * tc )
     }
     else if( 0 < tc->newPort )
     {
-        tc->started = 1;
+        tc->started  = 1;
+        tc->download = tor->downloaded;
+        tc->upload   = tor->uploaded;
     }
 
 cleanup:
