@@ -37,8 +37,11 @@
 #define PREF_UPLIMIT            "upload-limit"
 #define PREF_DIR                "download-directory"
 
-#define DEFAULT_DOWNLIMIT       100
-#define DEFAULT_UPLIMIT         20
+/* default values for a couple prefs */
+#define DEF_DOWNLIMIT           100
+#define DEF_USEDOWNLIMIT        FALSE
+#define DEF_UPLIMIT             20
+#define DEF_USEUPLIMIT          TRUE
 
 typedef gboolean (*add_torrent_func_t)(void *, const char *, const char *, gboolean, GList **);
 typedef void (*torrents_added_func_t)(void *);

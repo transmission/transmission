@@ -89,16 +89,16 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   GtkWidget **array;
   const char *pref;
   struct prefdata *data = g_new0(struct prefdata, 1);
-  struct { GtkWidget *on; GtkWidget *num; GtkWidget *label; gboolean first;
+  struct { GtkWidget *on; GtkWidget *num; GtkWidget *label; gboolean defuse;
     const char *usepref; const char *numpref; long def; } lim[] = {
     { gtk_check_button_new_with_mnemonic(_("_Limit download speed")),
       gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
       gtk_label_new_with_mnemonic(_("Maximum _download speed:")),
-      FALSE, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEFAULT_DOWNLIMIT, },
+      DEF_USEDOWNLIMIT, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEF_DOWNLIMIT, },
     { gtk_check_button_new_with_mnemonic(_("Li_mit upload speed")),
       gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
       gtk_label_new_with_mnemonic(_("Maximum _upload speed:")),
-      TRUE, PREF_USEUPLIMIT, PREF_UPLIMIT, DEFAULT_UPLIMIT, },
+      DEF_USEUPLIMIT, PREF_USEUPLIMIT, PREF_UPLIMIT, DEF_UPLIMIT, },
   };
   unsigned int ii;
 
@@ -127,7 +127,7 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
     /* limit checkbox */
     pref = cf_getpref(lim[ii].usepref);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lim[ii].on),
-      (NULL == pref ? lim[ii].first : strbool(pref)));
+      (NULL == pref ? lim[ii].defuse : strbool(pref)));
     array = g_new(GtkWidget*, 2);
     g_signal_connect_data(lim[ii].on, "clicked", G_CALLBACK(clicklimitbox),
                           array, (GClosureNotify)g_free, 0);
@@ -261,21 +261,24 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
 
 void
 setlimit(tr_handle_t *tr) {
-  const char *pref;
   struct { void (*func)(tr_handle_t*, int);
-    const char *use; const char *num; long def; } lim[] = {
-    {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,DEFAULT_DOWNLIMIT},
-    {tr_setUploadLimit,   PREF_USEUPLIMIT,   PREF_UPLIMIT,  DEFAULT_UPLIMIT},
+    const char *use; const char *num; gboolean defuse; long def; } lim[] = {
+    {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,
+                          DEF_USEDOWNLIMIT,  DEF_DOWNLIMIT},
+    {tr_setUploadLimit,   PREF_USEUPLIMIT,   PREF_UPLIMIT,
+                          DEF_USEUPLIMIT,    DEF_UPLIMIT},
   };
+  const char *pref;
   unsigned int ii;
 
   for(ii = 0; ii < ALEN(lim); ii++) {
-    if(NULL != (pref = cf_getpref(lim[ii].use)) && !strbool(pref))
+    pref = cf_getpref(lim[ii].use);
+    if(!(NULL == pref ? lim[ii].defuse : strbool(pref)))
       lim[ii].func(tr, -1);
-    else if(NULL != (pref = cf_getpref(lim[ii].num)))
-      lim[ii].func(tr, strtol(pref, NULL, 10));
-    else
-      lim[ii].func(tr, lim[ii].def);
+    else {
+      pref = cf_getpref(lim[ii].num);
+      lim[ii].func(tr, (NULL == pref ? lim[ii].def : strtol(pref, NULL, 10)));
+    }
   }
 }
 
