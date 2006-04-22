@@ -68,8 +68,20 @@
 
 /* Convenient macros to perform uint32_t endian conversions with
    char pointers */
-#define TR_NTOHL(p,a) (a) = ntohl(*((uint32_t*)(p)))
-#define TR_HTONL(a,p) *((uint32_t*)(p)) = htonl((a))
+#define TR_NTOHL(p,a) (a) = tr_ntohl((p))
+#define TR_HTONL(a,p) tr_htonl((a), (p))
+static inline uint32_t tr_ntohl( uint8_t * p )
+{
+	uint32_t u;
+	memcpy( &u, p, sizeof( uint32_t ) );
+	return ntohl( u );
+}
+static inline void tr_htonl( uint32_t a, uint8_t * p )
+{
+	uint32_t u;
+	u = htonl( a );
+	memcpy ( p, &u, sizeof( uint32_t ) );
+}
 
 /* Sometimes the system defines MAX/MIN, sometimes not. In the latter
    case, define those here since we will use them */
