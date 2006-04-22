@@ -30,9 +30,6 @@ static void  downloadLoop( void * );
 static void  acceptLoop( void * );
 static void acceptStop( tr_handle_t * h );
 
-/* Used in tr_netResolve */
-extern tr_lock_t gethostbynameLock;
-
 /***********************************************************************
  * tr_init
  ***********************************************************************
@@ -43,7 +40,7 @@ tr_handle_t * tr_init()
     tr_handle_t * h;
     int           i, r;
 
-    tr_lockInit( &gethostbynameLock );
+    tr_netResolveThreadInit();
 
     h = calloc( sizeof( tr_handle_t ), 1 );
 
@@ -540,7 +537,7 @@ void tr_close( tr_handle_t * h )
     tr_rcClose( h->download );
     free( h );
 
-    tr_lockClose( &gethostbynameLock );
+    tr_netResolveThreadClose();
 }
 
 /***********************************************************************

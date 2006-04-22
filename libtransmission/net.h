@@ -20,19 +20,18 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+
 /***********************************************************************
  * DNS resolution
  **********************************************************************/
-
-/* Synchronous version: only works with character strings representing
-   numbers expressed in the Internet standard `.' notation */
 int tr_netResolve( char *, struct in_addr * );
 
-/* Asynchronous version */
 #define TR_RESOLVE_WAIT  0
 #define TR_RESOLVE_ERROR 1
 #define TR_RESOLVE_OK    2
 typedef struct tr_resolve_s tr_resolve_t;
+void           tr_netResolveThreadInit();
+void           tr_netResolveThreadClose();
 tr_resolve_t * tr_netResolveInit( char * );
 int            tr_netResolvePulse( tr_resolve_t *, struct in_addr * );
 void           tr_netResolveClose( tr_resolve_t * );

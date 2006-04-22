@@ -22,6 +22,211 @@
 
 #include "transmission.h"
 
+/***********************************************************************
+ * DNS resolution
+ **********************************************************************/
+
+/***********************************************************************
+ * tr_netResolve
+ ***********************************************************************
+ * Synchronous "resolution": only works with character strings
+ * representing numbers expressed in the Internet standard `.' notation.
+ * Returns a non-zero value if an error occurs.
+ **********************************************************************/
+int tr_netResolve( char * address, struct in_addr * addr )
+{
+    addr->s_addr = inet_addr( address );
+    return ( addr->s_addr == 0xFFFFFFFF );
+}
+
+/* TODO: Make this code reentrant */
+static tr_thread_t  resolveThread;
+static tr_lock_t    resolveLock;
+static volatile int resolveDie;
+static tr_resolve_t * resolveQueue;
+
+static void resolveRelease ( tr_resolve_t * );
+static void resolveFunc    ( void * );
+
+struct tr_resolve_s
+{
+    int            status;
+    char           * address;
+    struct in_addr addr;
+
+    int            refcount;
+    tr_resolve_t   * next;
+};
+
+/***********************************************************************
+ * tr_netResolveThreadInit
+ ***********************************************************************
+ * Initializes the static variables used for resolution and launch the
+ * gethostbyname thread.
+ **********************************************************************/
+void tr_netResolveThreadInit()
+{
+    resolveDie   = 0;
+    resolveQueue = NULL;
+    tr_lockInit( &resolveLock );
+    tr_threadCreate( &resolveThread, resolveFunc, NULL );
+}
+
+/***********************************************************************
+ * tr_netResolveThreadClose
+ ***********************************************************************
+ * Notices the gethostbyname thread that is should terminate. Doesn't
+ * wait until it does, in case it is stuck in a resolution: we let it
+ * die and clean itself up.
+ **********************************************************************/
+void tr_netResolveThreadClose()
+{
+    tr_lockLock( &resolveLock );
+    resolveDie = 1;
+    tr_lockUnlock( &resolveLock );
+    tr_wait( 200 );
+}
+
+/***********************************************************************
+ * tr_netResolveInit
+ ***********************************************************************
+ * Adds an address to the resolution queue.
+ **********************************************************************/
+tr_resolve_t * tr_netResolveInit( char * address )
+{
+    tr_resolve_t * r;
+
+    r           = malloc( sizeof( tr_resolve_t ) );
+    r->status   = TR_RESOLVE_WAIT;
+    r->address  = strdup( address );
+    r->refcount = 2;
+    r->next     = NULL;
+
+    tr_lockLock( &resolveLock );
+    if( !resolveQueue )
+    {
+        resolveQueue = r;
+    }
+    else
+    {
+        tr_resolve_t * iter;
+        for( iter = resolveQueue; iter->next; iter = iter->next );
+        iter->next = r;
+    }
+    tr_lockUnlock( &resolveLock );
+
+    return r;
+}
+
+/***********************************************************************
+ * tr_netResolvePulse
+ ***********************************************************************
+ * Checks the current status of a resolution.
+ **********************************************************************/
+int tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
+{
+    int ret;
+
+    tr_lockLock( &resolveLock );
+    ret = r->status;
+    if( ret == TR_RESOLVE_OK )
+    {
+        *addr = r->addr;
+    }
+    tr_lockUnlock( &resolveLock );
+
+    return ret;
+}
+
+/***********************************************************************
+ * tr_netResolveClose
+ ***********************************************************************
+ * 
+ **********************************************************************/
+void tr_netResolveClose( tr_resolve_t * r )
+{
+    resolveRelease( r );
+}
+
+/***********************************************************************
+ * resolveRelease
+ ***********************************************************************
+ * The allocated tr_resolve_t structures should be freed when
+ * tr_netResolveClose was called *and* it was removed from the queue.
+ * This can happen in any order, so we use a refcount to know we can
+ * take it out.
+ **********************************************************************/
+static void resolveRelease( tr_resolve_t * r )
+{
+    if( --r->refcount < 1 )
+    {
+        free( r->address );
+        free( r );
+    }
+}
+
+/***********************************************************************
+ * resolveFunc
+ ***********************************************************************
+ * Keeps waiting for addresses to resolve, and removes them from the
+ * queue once resolution is done.
+ **********************************************************************/
+static void resolveFunc( void * unused )
+{
+    tr_resolve_t * r;
+    struct hostent * host;
+
+    tr_dbg( "Resolve thread started" );
+
+    tr_lockLock( &resolveLock );
+
+    while( !resolveDie )
+    {
+        if( !( r = resolveQueue ) )
+        {
+            /* TODO: Use a condition wait */
+            tr_lockUnlock( &resolveLock );
+            tr_wait( 50 );
+            tr_lockLock( &resolveLock );
+            continue;
+        }
+
+        /* Blocking resolution */
+        tr_lockUnlock( &resolveLock );
+        host = gethostbyname( r->address );
+        tr_lockLock( &resolveLock );
+
+        if( host )
+        {
+            memcpy( &r->addr, host->h_addr, host->h_length );
+            r->status = TR_RESOLVE_OK;
+        }
+        else
+        {
+            r->status = TR_RESOLVE_ERROR;
+        }
+        
+        resolveQueue = r->next;
+        resolveRelease( r );
+    }
+
+    /* Clean up  */
+    tr_lockUnlock( &resolveLock );
+    tr_lockClose( &resolveLock );
+    while( ( r = resolveQueue ) )
+    {
+        resolveQueue = r->next;
+        resolveRelease( r );
+    }
+
+    tr_dbg( "Resolve thread exited" );
+}
+
+
+/***********************************************************************
+ * TCP sockets
+ **********************************************************************/
+
 static int makeSocketNonBlocking( int s )
 {
     int flags;
@@ -56,118 +261,6 @@ static int createSocket()
     }
 
     return makeSocketNonBlocking( s );
-}
-
-struct tr_resolve_s
-{
-    int            status;
-    char           * address;
-    struct in_addr addr;
-
-    tr_lock_t      lock;
-    tr_thread_t    thread;
-    int            orphan;
-};
-
-/* Hem, global variable. Initialized from tr_init(). */
-tr_lock_t gethostbynameLock;
-
-static void resolveFunc( void * _r )
-{
-    tr_resolve_t * r = _r;
-    struct hostent * host;
-
-    tr_lockLock( &r->lock );
-
-    r->addr.s_addr = inet_addr( r->address );
-    if( r->addr.s_addr != 0xFFFFFFFF )
-    {
-        /* This was an IP address, no resolving required */
-        r->status = TR_RESOLVE_OK;
-        goto resolveDone;
-    }
-
-    tr_lockLock( &gethostbynameLock );
-    tr_lockUnlock( &r->lock );
-    host = gethostbyname( r->address );
-    tr_lockLock( &r->lock );
-    if( host )
-    {
-        memcpy( &r->addr, host->h_addr, host->h_length );
-        r->status = TR_RESOLVE_OK;
-    }
-    else
-    {
-        r->status = TR_RESOLVE_ERROR;
-    }
-    tr_lockUnlock( &gethostbynameLock );
-
-resolveDone:
-    if( r->orphan )
-    {
-        /* tr_netResolveClose was closed already. Free memory */
-        tr_lockUnlock( &r->lock );
-        tr_lockClose( &r->lock );
-        free( r );
-    }
-    else
-    {
-        tr_lockUnlock( &r->lock );
-    }
-}
-
-tr_resolve_t * tr_netResolveInit( char * address )
-{
-    tr_resolve_t * r = malloc( sizeof( tr_resolve_t ) );
-
-    r->status  = TR_RESOLVE_WAIT;
-    r->address = address;
-
-    tr_lockInit( &r->lock );
-    tr_threadCreate( &r->thread, resolveFunc, r );
-    r->orphan = 0;
-
-    return r;
-}
-
-int tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
-{
-    int ret;
-
-    tr_lockLock( &r->lock );
-    ret = r->status;
-    if( ret == TR_RESOLVE_OK )
-    {
-        *addr = r->addr;
-    }
-    tr_lockUnlock( &r->lock );
-
-    return ret;
-}
-
-void tr_netResolveClose( tr_resolve_t * r )
-{
-    tr_lockLock( &r->lock );
-    if( r->status == TR_RESOLVE_WAIT )
-    {
-        /* Let the thread die */
-        r->orphan = 1;
-        tr_lockUnlock( &r->lock );
-        return;
-    }
-    tr_lockUnlock( &r->lock );
-
-    /* Clean up */
-    tr_threadJoin( &r->thread );
-    tr_lockClose( &r->lock );
-    free( r );
-}
-
-/* Blocking version */
-int tr_netResolve( char * address, struct in_addr * addr )
-{
-    addr->s_addr = inet_addr( address );
-    return ( addr->s_addr == 0xFFFFFFFF );
 }
 
 int tr_netOpen( struct in_addr addr, in_port_t port )
