@@ -201,11 +201,8 @@
 
 - (void) reveal
 {
-    NSString * path = [NSString stringWithFormat: @"%@/%@",
-                        [self getFolder], [self name]];
-    NSURL * url = [NSURL fileURLWithPath: path];
-
-    [[NSWorkspace sharedWorkspace] selectFile: [url path]
+    [[NSWorkspace sharedWorkspace] selectFile: [[self getFolder]
+        stringByAppendingPathComponent: [self name]]
         inFileViewerRootedAtPath: nil];
 }
 
@@ -216,8 +213,8 @@
 
 - (void) trashData
 {
-    [self trashPath: [NSString stringWithFormat: @"%@/%@",
-        [self getFolder], [self name]]];
+    [self trashPath: [[self getFolder]
+        stringByAppendingPathComponent: [self name]]];
 }
 
 - (NSImage *) icon
