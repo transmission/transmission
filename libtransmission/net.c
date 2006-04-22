@@ -166,21 +166,8 @@ void tr_netResolveClose( tr_resolve_t * r )
 /* Blocking version */
 int tr_netResolve( char * address, struct in_addr * addr )
 {
-    tr_resolve_t * r = tr_netResolveInit( address );
-    int ret;
-
-    for( ;; )
-    {
-        ret = tr_netResolvePulse( r, addr );
-        if( ret != TR_RESOLVE_WAIT )
-        {
-            break;
-        }
-        tr_wait( 20 );
-    }
-
-    tr_netResolveClose( r );
-    return ( ret != TR_RESOLVE_OK );
+    addr->s_addr = inet_addr( address );
+    return ( addr->s_addr == 0xFFFFFFFF );
 }
 
 int tr_netOpen( struct in_addr addr, in_port_t port )

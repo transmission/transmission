@@ -20,6 +20,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+/***********************************************************************
+ * DNS resolution
+ **********************************************************************/
+
+/* Synchronous version: only works with character strings representing
+   numbers expressed in the Internet standard `.' notation */
+int tr_netResolve( char *, struct in_addr * );
+
+/* Asynchronous version */
 #define TR_RESOLVE_WAIT  0
 #define TR_RESOLVE_ERROR 1
 #define TR_RESOLVE_OK    2
@@ -28,7 +37,10 @@ tr_resolve_t * tr_netResolveInit( char * );
 int            tr_netResolvePulse( tr_resolve_t *, struct in_addr * );
 void           tr_netResolveClose( tr_resolve_t * );
 
-int  tr_netResolve ( char *, struct in_addr * );
+
+/***********************************************************************
+ * TCP sockets
+ **********************************************************************/
 int  tr_netOpen    ( struct in_addr addr, in_port_t port );
 int  tr_netBind    ( int );
 int  tr_netAccept  ( int s, struct in_addr *, in_port_t * );
@@ -38,3 +50,4 @@ void tr_netClose   ( int s );
 #define TR_NET_CLOSE 0x40000000
 int  tr_netSend    ( int s, uint8_t * buf, int size );
 int  tr_netRecv    ( int s, uint8_t * buf, int size );
+
