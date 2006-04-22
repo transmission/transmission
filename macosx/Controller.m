@@ -106,7 +106,7 @@ static void sleepCallBack( void * controller, io_service_t y,
                             kCFRunLoopCommonModes );
     }
     else
-        printf( "Could not IORegisterForSystemPower\n" );
+        NSLog( @"Could not IORegisterForSystemPower" );
 
     NSString * torrentPath, * downloadFolder, * paused;
     NSDictionary * dic;
@@ -1102,7 +1102,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     if( ![appleScript executeAndReturnError: &error] )
     {
-        printf( "Growl notify failed\n" );
+        NSLog( @"Growl notify failed" );
     }
     [appleScript release];
 }
@@ -1131,7 +1131,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     if( ![appleScript executeAndReturnError: &error] )
     {
-        printf( "Growl registration failed\n" );
+        NSLog( @"Growl registration failed" );
     }
     [appleScript release];
 }

@@ -22,6 +22,7 @@
 
 #import "Torrent.h"
 #import "StringAdditions.h"
+#import "Utils.h"
 
 @interface Torrent (Private)
 
@@ -140,33 +141,30 @@
             break;
 
         case TR_STATUS_STOPPING:
-            [fStatusString setString: @"Stopping..."];
+            [fStatusString setString: [@"Stopping"
+                stringByAppendingString: NS_ELLIPSIS]];
             break;
     }
 
     if( fStat->error & TR_ETRACKER )
     {
-        [fInfoString setString: @"Error: "];
-        [fInfoString appendString: [NSString
-            stringWithUTF8String: fStat->trackerError]];
+        [fInfoString setString: [@"Error: " stringByAppendingString:
+            [NSString stringWithUTF8String: fStat->trackerError]]];
     }
 
-    [fUploadString   setString: @""];
     if( fStat->progress == 1.0 )
     {
-        [fDownloadString setString: @"Ratio: "];
-        [fDownloadString appendString: [NSString stringForRatio:
-            fStat->downloaded upload: fStat->uploaded]];
+        [fDownloadString setString: [@"Ratio: " stringByAppendingString:
+            [NSString stringForRatio: fStat->downloaded
+            upload: fStat->uploaded]]];
     }
     else
     {
-        [fDownloadString setString: @"DL: "];
-        [fDownloadString appendString: [NSString stringForSpeed:
-            fStat->rateDownload]];
+        [fDownloadString setString: [@"DL: " stringByAppendingString:
+            [NSString stringForSpeed: fStat->rateDownload]]];
     }
-    [fUploadString setString: @"UL: "];
-    [fUploadString appendString: [NSString stringForSpeed:
-        fStat->rateUpload]];
+    [fUploadString setString: [@"UL: " stringByAppendingString:
+        [NSString stringForSpeed: fStat->rateUpload]]];
 }
 
 - (void) start
@@ -187,14 +185,9 @@
 
 - (void) sleep
 {
-    if( fStat->status & TR_STATUS_ACTIVE )
+    if( ( fResumeOnWake = ( fStat->status & TR_STATUS_ACTIVE ) ) )
     {
         [self stop];
-        fResumeOnWake = YES;
-    }
-    else
-    {
-        fResumeOnWake = NO;
     }
 }
 
@@ -380,7 +373,7 @@
         if( ![[NSFileManager defaultManager]
                 removeFileAtPath: path handler: nil] )
         {
-            printf( "Could not trash `%s'\n", [path UTF8String] );
+            NSLog( [@"Could not trash " stringByAppendingString: path] );
         }
     }
 }
