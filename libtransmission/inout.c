@@ -22,10 +22,6 @@
 
 #include "transmission.h"
 
-#ifdef SYS_BEOS
-# define fseeko _fseek
-#endif
-
 struct tr_io_s
 {
     tr_torrent_t * tor;
@@ -202,7 +198,7 @@ static int createFiles( tr_io_t * io )
     int           i;
     char        * path, * p;
     struct stat   sb;
-    FILE        * file;
+    int           file;
 
     tr_dbg( "Creating files..." );
 
@@ -234,14 +230,14 @@ static int createFiles( tr_io_t * io )
         if( stat( path, &sb ) )
         {
             /* File doesn't exist yet */
-            if( !( file = fopen( path, "w" ) ) )
+            if( ( file = open( path, O_WRONLY|O_CREAT|O_TRUNC ) ) < 0 )
             {
                 tr_err( "Could not create `%s' (%s)", path,
                         strerror( errno ) );
                 free( path );
                 return 1;
             }
-            fclose( file );
+            close( file );
         }
         else if( ( sb.st_mode & S_IFMT ) != S_IFREG )
         {
@@ -357,19 +353,20 @@ static void closeFiles( tr_io_t * io )
  ***********************************************************************
  *
  **********************************************************************/
-typedef size_t (* iofunc) ( void *, size_t, size_t, FILE * );
+typedef size_t (* iofunc) ( int, void *, size_t );
 static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
-                             uint8_t * buf, int write )
+                             uint8_t * buf, int isWrite )
 {
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &tor->info;
 
     int    piece = offset / inf->pieceSize;
     int    begin = offset % inf->pieceSize;
-    int    i, cur;
+    int    i;
+    size_t cur;
     char * path;
-    FILE * file;
-    iofunc readOrWrite = write ? (iofunc) fwrite : (iofunc) fread;
+    int    file;
+    iofunc readOrWrite = isWrite ? (iofunc) write : (iofunc) read;
 
     /* Release the torrent lock so the UI can still update itself if
        this blocks for a while */
@@ -415,7 +412,7 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         /* Now let's get a stream on the file... */
         asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
         file = tr_fdFileOpen( tor->fdlimit, path );
-        if( !file )
+        if( file < 0 )
         {
             tr_err( "readOrWriteBytes: could not open file '%s'", path );
             free( path );
@@ -424,13 +421,13 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         free( path );
 
         /* seek to the right offset... */
-        if( fseeko( file, offset, SEEK_SET ) )
+        if( lseek( file, offset, SEEK_SET ) < 0 )
         {
             goto fail;
         }
 
         /* do what we are here to do... */
-        if( readOrWrite( buf, cur, 1, file ) != 1 )
+        if( readOrWrite( file, buf, cur ) != cur )
         {
             goto fail;
         }

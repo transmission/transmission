@@ -29,7 +29,7 @@
 typedef struct tr_openFile_s
 {
     char       path[MAX_PATH_LENGTH];
-    FILE     * file;
+    int        file;
 
 #define STATUS_INVALID 1
 #define STATUS_UNUSED  2
@@ -99,7 +99,7 @@ tr_fd_t * tr_fdInit()
 /***********************************************************************
  * tr_fdFileOpen
  **********************************************************************/
-FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
+int tr_fdFileOpen( tr_fd_t * f, char * path )
 {
     int i, winner;
     uint64_t date;
@@ -158,12 +158,12 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
         if( winner >= 0 )
         {
             /* Close the file: we mark it as closing then release the
-               lock while doing so, because fclose may take same time
+               lock while doing so, because close may take same time
                and we don't want to block other threads */
             tr_dbg( "Closing %s", f->open[winner].path );
             f->open[winner].status = STATUS_CLOSING;
             tr_lockUnlock( &f->lock );
-            fclose( f->open[winner].file );
+            close( f->open[winner].file );
             tr_lockLock( &f->lock );
             goto open;
         }
@@ -177,7 +177,7 @@ FILE * tr_fdFileOpen( tr_fd_t * f, char * path )
 open:
     tr_dbg( "Opening %s", path );
     snprintf( f->open[winner].path, MAX_PATH_LENGTH, "%s", path );
-    f->open[winner].file = fopen( path, "r+" );
+    f->open[winner].file = open( path, O_RDWR, 0 );
 
 done:
     f->open[winner].status = STATUS_USED;
@@ -190,7 +190,7 @@ done:
 /***********************************************************************
  * tr_fdFileRelease
  **********************************************************************/
-void tr_fdFileRelease( tr_fd_t * f, FILE * file )
+void tr_fdFileRelease( tr_fd_t * f, int file )
 {
     int i;
     tr_lockLock( &f->lock );
@@ -226,7 +226,7 @@ void tr_fdFileClose( tr_fd_t * f, char * path )
         if( !strcmp( path, f->open[i].path ) )
         {
             tr_dbg( "Closing %s", path );
-            fclose( f->open[i].file );
+            close( f->open[i].file );
             f->open[i].status = STATUS_INVALID;
             break;
         }

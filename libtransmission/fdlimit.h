@@ -24,8 +24,8 @@ typedef struct tr_fd_s tr_fd_t;
 
 tr_fd_t * tr_fdInit();
 
-FILE *    tr_fdFileOpen         ( tr_fd_t *, char * );
-void      tr_fdFileRelease      ( tr_fd_t *, FILE * );
+int       tr_fdFileOpen         ( tr_fd_t *, char * );
+void      tr_fdFileRelease      ( tr_fd_t *, int );
 void      tr_fdFileClose        ( tr_fd_t *, char * );
 
 int       tr_fdSocketWillCreate ( tr_fd_t *, int );
