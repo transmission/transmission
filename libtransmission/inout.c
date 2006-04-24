@@ -214,7 +214,7 @@ static int createFiles( tr_io_t * io )
             if( stat( path, &sb ) )
             {
                 /* Folder doesn't exist yet */
-                mkdir( path, 0755 );
+                mkdir( path, 0777 );
             }
             else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
             {
@@ -230,7 +230,7 @@ static int createFiles( tr_io_t * io )
         if( stat( path, &sb ) )
         {
             /* File doesn't exist yet */
-            if( ( file = open( path, O_WRONLY|O_CREAT|O_TRUNC ) ) < 0 )
+            if( ( file = open( path, O_WRONLY|O_CREAT|O_TRUNC, 0666 ) ) < 0 )
             {
                 tr_err( "Could not create `%s' (%s)", path,
                         strerror( errno ) );
