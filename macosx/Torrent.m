@@ -33,7 +33,7 @@
 
 @implementation Torrent
 
-- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
+- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib date: (NSDate *) date
 {
     fLib = lib;
 
@@ -45,6 +45,7 @@
         return nil;
     }
 
+    fDate = [date retain];
     fInfo = tr_torrentInfo( fHandle );
 
     NSString * fileType = ( fInfo->fileCount > 1 ) ?
@@ -64,12 +65,19 @@
     return self;
 }
 
+- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
+{
+    return [self initWithPath: path lib: lib date: [NSDate date]];
+}
+
 - (void) dealloc
 {
     if( fHandle )
     {
         tr_torrentClose( fLib, fHandle );
+        [fDate release];
         [fIcon release];
+        [fIconNonFlipped release];
         [fStatusString release];
         [fInfoString release];
         [fDownloadString release];
@@ -349,6 +357,11 @@
 - (uint64_t) uploaded
 {
     return fStat->uploaded;
+}
+
+- (NSDate *) date
+{
+    return fDate;
 }
 
 @end

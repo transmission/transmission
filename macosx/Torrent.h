@@ -29,7 +29,8 @@
     tr_torrent_t * fHandle;
     tr_info_t    * fInfo;
     tr_stat_t    * fStat;
-    BOOL           fResumeOnWake;
+    BOOL         fResumeOnWake;
+    NSDate       * fDate;
 
     NSImage         * fIcon;
     NSImage         * fIconNonFlipped;
@@ -40,6 +41,8 @@
 }
 
 - (id)         initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
+- (id)         initWithPath: (NSString *) path lib: (tr_handle_t *) lib
+                        date: (NSDate *) date;
 - (void)       setFolder: (NSString *) path;
 - (NSString *) getFolder;
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
@@ -78,5 +81,6 @@
 - (int)        leechers;
 - (uint64_t)   downloaded;
 - (uint64_t)   uploaded;
+- (NSDate *)   date;
 
 @end
