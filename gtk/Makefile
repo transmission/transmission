@@ -1,7 +1,7 @@
 include ../Makefile.config
 include ../Makefile.common
 
-SRCS = conf.c dialogs.c main.c trcellrenderertorrent.c util.c
+SRCS = conf.c dialogs.c io.c ipc.c main.c trcellrenderertorrent.c util.c
 OBJS = $(SRCS:%.c=%.o)
 
 CFLAGS  += $(CFLAGS_GTK) -I../libtransmission

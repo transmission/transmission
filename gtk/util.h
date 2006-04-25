@@ -37,6 +37,9 @@
 #define SHUTUP
 #endif
 
+typedef gboolean (*add_torrent_func_t)(void *, const char *, const char *, gboolean, GList **);
+typedef void (*torrents_added_func_t)(void *);
+
 /* return number of items in array */
 #define ALEN(a)                 (sizeof(a) / sizeof((a)[0]))
 
@@ -66,9 +69,19 @@ mkdir_p(const char *name, mode_t mode);
 char *
 joinstrlist(GList *list, char *sep);
 
+/* free a GList of strings */
+void
+freestrlist(GList *list);
+
 /* decodes a string that has been urlencoded */
 char *
 urldecode(const char *str, int len);
+
+/* return a list of cleaned-up paths, with invalid directories removed */
+GList *
+checkfilenames(int argc, char **argv);
+
+#ifdef GTK_MAJOR_VERSION
 
 /* if wind is NULL then you must call gtk_widget_show on the returned widget */
 
@@ -90,5 +103,7 @@ errmsg_full(GtkWindow *wind, callbackfunc_t func, void *data,
 GtkWidget *
 verrmsg(GtkWindow *wind, callbackfunc_t func, void *data,
         const char *format, va_list ap);
+
+#endif /* GTK_MAJOR_VERSION */
 
 #endif /* TG_UTIL_H */

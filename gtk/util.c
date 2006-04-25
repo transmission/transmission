@@ -30,6 +30,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -93,8 +94,7 @@ ratiostr(guint64 down, guint64 up) {
 
   ratio = (double)up / (double)down;
 
-  return g_strdup_printf("%.*f", (10.0 > ratio ? 2 : (100.0 > ratio ? 1 : 0)),
-                         ratio);
+  return g_strdup_printf("%.*f", BESTDECIMAL(ratio), ratio);
 }
 
 gboolean
@@ -146,6 +146,17 @@ joinstrlist(GList *list, char *sep) {
   return ret;
 }
 
+void
+freestrlist(GList *list) {
+  GList *ii;
+
+  if(NULL != list) {
+    for(ii = g_list_first(list); NULL != ii; ii = ii->next)
+      g_free(ii->data);
+    g_list_free(list);
+  }
+}
+
 char *
 urldecode(const char *str, int len) {
   int ii, jj;
@@ -179,6 +190,37 @@ urldecode(const char *str, int len) {
     }
   }
   ret[jj] = '\0';
+
+  return ret;
+}
+
+GList *
+checkfilenames(int argc, char **argv) {
+  char *pwd = g_get_current_dir();
+  int ii, cd;
+  char *dirstr, *filestr;
+  GList *ret = NULL;
+
+  for(ii = 0; ii < argc; ii++) {
+    dirstr = g_path_get_dirname(argv[ii]);
+    if(!g_path_is_absolute(argv[ii])) {
+      filestr = g_build_filename(pwd, dirstr, NULL);
+      g_free(dirstr);
+      dirstr = filestr;
+    }
+    cd = chdir(dirstr);
+    g_free(dirstr);
+    if(0 > cd)
+      continue;
+    dirstr = g_get_current_dir();
+    filestr = g_path_get_basename(argv[ii]);
+    ret = g_list_append(ret, g_build_filename(dirstr, filestr, NULL));
+    g_free(dirstr);
+    g_free(filestr);
+  }
+
+  chdir(pwd);
+  g_free(pwd);
 
   return ret;
 }

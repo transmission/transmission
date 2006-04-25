@@ -42,6 +42,7 @@
 
 #include "conf.h"
 #include "dialogs.h"
+#include "ipc.h"
 #include "transmission.h"
 #include "trcellrenderertorrent.h"
 #include "util.h"
@@ -69,6 +70,9 @@ struct pieces {
   char p[120];
 };
 
+GList *
+readargs(int argc, char **argv);
+
 void
 maketypes(void);
 gpointer
@@ -77,7 +81,7 @@ void
 tr_pieces_free(gpointer);
 
 void
-makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved);
+makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved, GList *args);
 GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
@@ -141,6 +145,8 @@ makeidlist(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 void
 maketorrentlist(tr_torrent_t *tor, void *data);
 void
+safepipe(void);
+void
 setupsighandlers(void);
 void
 fatalsig(int sig);
@@ -192,6 +198,17 @@ main(int argc, char **argv) {
   GList *saved;
   const char *pref;
   long intval;
+  GList *argfiles;
+  gboolean didinit, didlock;
+
+  safepipe();
+
+  argfiles = readargs(argc, argv);
+
+  didinit = cf_init(tr_getPrefsDirectory(), NULL);
+  didlock = FALSE;
+  if(NULL != argfiles && didinit && !(didlock = cf_lock(NULL)))
+    return !ipc_sendfiles_blocking(argfiles);
 
   setupsighandlers();
 
@@ -212,8 +229,8 @@ main(int argc, char **argv) {
     "}\n"
     "widget \"TransmissionDialog\" style \"transmission-standard\"\n");
 
-  if(cf_init(tr_getPrefsDirectory(), &err)) {
-    if(cf_lock(&err)) {
+  if(didinit || cf_init(tr_getPrefsDirectory(), &err)) {
+    if(didlock || cf_lock(&err)) {
       /* create main window now so any error dialogs can be it's children */
       mainwind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
       preferr = NULL;
@@ -238,7 +255,7 @@ main(int argc, char **argv) {
         tr_setBindPort(tr, intval);
 
       maketypes();
-      makewind(mainwind, tr, saved);
+      makewind(mainwind, tr, saved, argfiles);
 
       if(NULL != preferr)
         gtk_widget_show_all(preferr);
@@ -255,9 +272,25 @@ main(int argc, char **argv) {
     g_free(err);
   }
 
+  if(NULL != argfiles)
+    freestrlist(argfiles);
+
   gtk_main();
 
   return 0;
+}
+
+GList *
+readargs(int argc, char **argv) {
+  while(0 < --argc) {
+    argv++;
+    if(0 == strcmp("--", *argv))
+      return checkfilenames(argc - 1, argv + 1);
+    else if('-' != argv[0][0])
+      return checkfilenames(argc, argv);
+  }
+
+  return NULL;
 }
 
 void
@@ -277,7 +310,7 @@ tr_pieces_free(gpointer data) {
 }
 
 void
-makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
+makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved, GList *args) {
   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
   GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
   GtkWidget *status = gtk_statusbar_new();
@@ -326,6 +359,9 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
   }
   g_list_free(saved);
 
+  for(ii = g_list_first(args); NULL != ii; ii = ii->next)
+    addtorrent(data, ii->data, NULL, FALSE, &loaderrs);
+
   if(NULL != loaderrs) {
     str = joinstrlist(loaderrs, "\n");
     errmsg(GTK_WINDOW(wind), ngettext("Failed to load the torrent file %s",
@@ -353,6 +389,8 @@ makewind(GtkWidget *wind, tr_handle_t *tr, GList *saved) {
      MIN(height, req.width * 8 / 5) : MAX(height, req.width * 5 / 8)));
 
   gtk_widget_show(wind);
+
+  ipc_socket_setup(GTK_WINDOW(wind), addtorrent, addedtorrents, data);
 }
 
 GtkWidget *
@@ -1190,6 +1228,15 @@ maketorrentlist(tr_torrent_t *tor, void *data) {
   GList **list = data;
 
   *list = g_list_append(*list, tor);
+}
+
+void
+safepipe(void) {
+  struct sigaction sa;
+
+  bzero(&sa, sizeof(sa));
+  sa.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &sa, NULL);
 }
 
 void

@@ -39,6 +39,8 @@ gboolean
 cf_init(const char *confdir, char **errstr);
 gboolean
 cf_lock(char **errstr);
+char *
+cf_sockname(void);
 gboolean
 cf_loadprefs(char **errstr);
 const char *

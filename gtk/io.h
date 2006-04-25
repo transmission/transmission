@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -24,40 +24,26 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TG_PREFS_H
-#define TG_PREFS_H
+#ifndef TG_IO_H
+#define TG_IO_H
 
-#include "transmission.h"
-#include "util.h"
+typedef void (*iofunc_t)(GSource*, void*);
+typedef void (*ioidfunc_t)(GSource*, unsigned int, void*);
+typedef unsigned int (*iodatafunc_t)(GSource*, char*, unsigned int, void*);
+typedef void (*ionewfunc_t)(GSource*, int, struct sockaddr*, socklen_t, void*);
 
-/* macros for names of prefs we use */
-#define PREF_PORT               "listening-port"
-#define PREF_USEDOWNLIMIT       "use-download-limit"
-#define PREF_DOWNLIMIT          "download-limit"
-#define PREF_USEUPLIMIT         "use-upload-limit"
-#define PREF_UPLIMIT            "upload-limit"
-#define PREF_DIR                "download-directory"
+GSource *
+io_new(int fd, ioidfunc_t sent, iodatafunc_t received,
+       iofunc_t closed, void *cbdata);
 
-/* default values for a couple prefs */
-#define DEF_DOWNLIMIT           100
-#define DEF_USEDOWNLIMIT        FALSE
-#define DEF_UPLIMIT             20
-#define DEF_USEUPLIMIT          TRUE
+GSource *
+io_new_listening(int fd, socklen_t len, ionewfunc_t accepted,
+                 iofunc_t closed, void *cbdata);
 
-void
-makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened);
+unsigned int
+io_send(GSource *source, const char *data, unsigned int len);
 
-/* set the upload limit based on saved prefs */
-void
-setlimit(tr_handle_t *tr);
+unsigned int
+io_send_keepdata(GSource *source, char *data, unsigned int len);
 
-/* show the "add a torrent" dialog */
-void
-makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
-            torrents_added_func_t donefunc, void *cbdata);
-
-/* show the info window for a torrent */
-void
-makeinfowind(GtkWindow *parent, tr_torrent_t *tor);
-
-#endif /* TG_PREFS_H */
+#endif /* TG_IO_H */

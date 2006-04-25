@@ -30,12 +30,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pwd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <gtk/gtk.h>
+#include <glib.h>
 #include <glib/gi18n.h>
 
 #include "conf.h"
@@ -44,6 +45,7 @@
 
 #define CONF_SUBDIR             "gtk"
 #define FILE_LOCK               "lock"
+#define FILE_SOCKET             "socket"
 #define FILE_PREFS              "prefs"
 #define FILE_PREFS_TMP          "prefs.tmp"
 #define FILE_STATE              "state"
@@ -57,26 +59,33 @@
 
 static int
 lockfile(const char *file, char **errstr);
+static void
+cf_removelocks(void);
 static gboolean
 writefile_traverse(gpointer key, gpointer value, gpointer data);
 static char *
 getstateval(struct cf_torrentstate *state, char *line);
 
-static char *confdir = NULL;
-static char *old_confdir = NULL;
-static GTree *prefs = NULL;
+static char *gl_confdir = NULL;
+static char *gl_old_confdir = NULL;
+static GTree *gl_prefs = NULL;
+static char *gl_lockpath = NULL;
+static char *gl_old_lockpath = NULL;
 
+/* errstr may be NULL, this might be called before GTK is initialized */
 static int
 lockfile(const char *file, char **errstr) {
   int fd, savederr;
   struct flock lk;
 
-  *errstr = NULL;
+  if(NULL != errstr)
+    *errstr = NULL;
 
   if(0 > (fd = open(file, O_RDWR | O_CREAT, 0666))) {
     savederr = errno;
-    *errstr = g_strdup_printf(_("Failed to open the file %s for writing:\n%s"),
-      file, strerror(errno));
+    if(NULL != errstr)
+      *errstr = g_strdup_printf(_("Failed to open the file %s for writing:\n%s"),
+                                file, strerror(errno));
     errno = savederr;
     return -1;
   }
@@ -88,12 +97,14 @@ lockfile(const char *file, char **errstr) {
   lk.l_whence = SEEK_SET;
   if(-1 == fcntl(fd, F_SETLK, &lk)) {
     savederr = errno;
-    if(EAGAIN == errno)
-      *errstr = g_strdup_printf(_("Another copy of %s is already running."),
-                                g_get_application_name());
-    else
-      *errstr = g_strdup_printf(_("Failed to lock the file %s:\n%s"),
-        file, strerror(errno));
+    if(NULL != errstr) {
+      if(EAGAIN == errno)
+        *errstr = g_strdup_printf(_("Another copy of %s is already running."),
+                                  g_get_application_name());
+      else
+        *errstr = g_strdup_printf(_("Failed to lock the file %s:\n%s"),
+                                  file, strerror(errno));
+    }
     close(fd);
     errno = savederr;
     return -1;
@@ -102,38 +113,67 @@ lockfile(const char *file, char **errstr) {
   return fd;
 }
 
+/* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
 cf_init(const char *dir, char **errstr) {
-  *errstr = NULL;
-  old_confdir = g_strdup(dir);
-  confdir = g_build_filename(dir, CONF_SUBDIR, NULL);
+  if(NULL != errstr)
+    *errstr = NULL;
+  gl_old_confdir = g_strdup(dir);
+  gl_confdir = g_build_filename(dir, CONF_SUBDIR, NULL);
 
-  if(mkdir_p(confdir, 0777))
+  if(mkdir_p(gl_confdir, 0777))
     return TRUE;
 
-  *errstr = g_strdup_printf(_("Failed to create the directory %s:\n%s"),
-                            confdir, strerror(errno));
+  if(NULL != errstr)
+    *errstr = g_strdup_printf(_("Failed to create the directory %s:\n%s"),
+                              gl_confdir, strerror(errno));
   return FALSE;
 }
 
+/* errstr may be NULL, this might be called before GTK is initialized */
 gboolean
 cf_lock(char **errstr) {
-  char *path = g_build_filename(old_confdir, OLD_FILE_LOCK, NULL);
+  char *path = g_build_filename(gl_old_confdir, OLD_FILE_LOCK, NULL);
   int fd = lockfile(path, errstr);
 
-  if(0 <= fd) {
+  if(0 > fd)
     g_free(path);
-    path = g_build_filename(confdir, FILE_LOCK, NULL);
+  else {
+    gl_old_lockpath = path;
+    path = g_build_filename(gl_confdir, FILE_LOCK, NULL);
     fd = lockfile(path, errstr);
+    if(0 > fd)
+      g_free(path);
+    else
+      gl_lockpath = path;
   }
 
-  g_free(path);
+  g_atexit(cf_removelocks);
+
   return 0 <= fd;
+}
+
+static void
+cf_removelocks(void) {
+  if(NULL != gl_lockpath) {
+    unlink(gl_lockpath);
+    g_free(gl_lockpath);
+  }
+
+  if(NULL != gl_old_lockpath) {
+    unlink(gl_old_lockpath);
+    g_free(gl_old_lockpath);
+  }
+}
+
+char *
+cf_sockname(void) {
+  return g_build_filename(gl_confdir, FILE_SOCKET, NULL);
 }
 
 gboolean
 cf_loadprefs(char **errstr) {
-  char *path = g_build_filename(confdir, FILE_PREFS, NULL);
+  char *path = g_build_filename(gl_confdir, FILE_PREFS, NULL);
   char *oldpath;
   GIOChannel *io;
   GError *err;
@@ -143,10 +183,10 @@ cf_loadprefs(char **errstr) {
 
   *errstr = NULL;
 
-  if(NULL != prefs)
-    g_tree_destroy(prefs);
+  if(NULL != gl_prefs)
+    g_tree_destroy(gl_prefs);
 
-  prefs = g_tree_new_full((GCompareDataFunc)g_ascii_strcasecmp, NULL,
+  gl_prefs = g_tree_new_full((GCompareDataFunc)g_ascii_strcasecmp, NULL,
                           g_free, g_free);
 
   err = NULL;
@@ -158,7 +198,7 @@ cf_loadprefs(char **errstr) {
     else {
       g_error_free(err);
       err = NULL;
-      oldpath = g_build_filename(old_confdir, OLD_FILE_PREFS, NULL);
+      oldpath = g_build_filename(gl_old_confdir, OLD_FILE_PREFS, NULL);
       io = g_io_channel_new_file(oldpath, "r", &err);
       g_free(oldpath);
     }
@@ -181,7 +221,7 @@ cf_loadprefs(char **errstr) {
              NULL != (sep = strchr(line, PREF_SEP_KEYVAL)) && sep > line) {
             *sep = '\0';
             line[termpos] = '\0';
-            g_tree_insert(prefs, g_strcompress(line), g_strcompress(sep + 1));
+            g_tree_insert(gl_prefs, g_strcompress(line), g_strcompress(sep + 1));
           }
           g_free(line);
         }
@@ -205,16 +245,16 @@ cf_loadprefs(char **errstr) {
 
 const char *
 cf_getpref(const char *name) {
-  assert(NULL != prefs);
+  assert(NULL != gl_prefs);
 
-  return g_tree_lookup(prefs, name);
+  return g_tree_lookup(gl_prefs, name);
 }
 
 void
 cf_setpref(const char *name, const char *value) {
-  assert(NULL != prefs);
+  assert(NULL != gl_prefs);
 
-  g_tree_insert(prefs, g_strdup(name), g_strdup(value));
+  g_tree_insert(gl_prefs, g_strdup(name), g_strdup(value));
 }
 
 struct writeinfo {
@@ -224,13 +264,13 @@ struct writeinfo {
 
 gboolean
 cf_saveprefs(char **errstr) {
-  char *file = g_build_filename(confdir, FILE_PREFS, NULL);
-  char *tmpfile = g_build_filename(confdir, FILE_PREFS_TMP, NULL);
+  char *file = g_build_filename(gl_confdir, FILE_PREFS, NULL);
+  char *tmpfile = g_build_filename(gl_confdir, FILE_PREFS_TMP, NULL);
   GIOChannel *io = NULL;
   struct writeinfo info;
   int fd;
 
-  assert(NULL != prefs);
+  assert(NULL != gl_prefs);
   assert(NULL != errstr);
 
   *errstr = NULL;
@@ -254,7 +294,7 @@ cf_saveprefs(char **errstr) {
 
   info.io = io;
   info.err = NULL;
-  g_tree_foreach(prefs, writefile_traverse, &info);
+  g_tree_foreach(gl_prefs, writefile_traverse, &info);
   if(NULL != info.err ||
      G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &info.err)) {
     *errstr = g_strdup_printf(_("Error while writing to the file %s:\n%s"),
@@ -312,7 +352,7 @@ writefile_traverse(gpointer key, gpointer value, gpointer data) {
 
 GList *
 cf_loadstate(char **errstr) {
-  char *path = g_build_filename(confdir, FILE_STATE, NULL);
+  char *path = g_build_filename(gl_confdir, FILE_STATE, NULL);
   char *oldpath;
   GIOChannel *io;
   GError *err;
@@ -331,7 +371,7 @@ cf_loadstate(char **errstr) {
     else {
       g_error_free(err);
       err = NULL;
-      oldpath = g_build_filename(old_confdir, OLD_FILE_STATE, NULL);
+      oldpath = g_build_filename(gl_old_confdir, OLD_FILE_STATE, NULL);
       io = g_io_channel_new_file(oldpath, "r", &err);
       g_free(oldpath);
     }
@@ -432,8 +472,8 @@ getstateval(struct cf_torrentstate *state, char *line) {
 
 gboolean
 cf_savestate(GList *torrents, char **errstr) {
-  char *file = g_build_filename(confdir, FILE_STATE, NULL);
-  char *tmpfile = g_build_filename(confdir, FILE_STATE_TMP, NULL);
+  char *file = g_build_filename(gl_confdir, FILE_STATE, NULL);
+  char *tmpfile = g_build_filename(gl_confdir, FILE_STATE_TMP, NULL);
   GIOChannel *io = NULL;
   GError *err;
   int fd;

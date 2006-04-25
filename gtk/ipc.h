@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005-2006 Joshua Elsasser. All rights reserved.
+  Copyright (c) 2006 Joshua Elsasser. All rights reserved.
    
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -24,40 +24,16 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef TG_PREFS_H
-#define TG_PREFS_H
+#ifndef TG_IPC_H
+#define TG_IPC_H
 
-#include "transmission.h"
 #include "util.h"
 
-/* macros for names of prefs we use */
-#define PREF_PORT               "listening-port"
-#define PREF_USEDOWNLIMIT       "use-download-limit"
-#define PREF_DOWNLIMIT          "download-limit"
-#define PREF_USEUPLIMIT         "use-upload-limit"
-#define PREF_UPLIMIT            "upload-limit"
-#define PREF_DIR                "download-directory"
-
-/* default values for a couple prefs */
-#define DEF_DOWNLIMIT           100
-#define DEF_USEDOWNLIMIT        FALSE
-#define DEF_UPLIMIT             20
-#define DEF_USEUPLIMIT          TRUE
-
 void
-makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened);
+ipc_socket_setup(void *wind, add_torrent_func_t addfunc,
+                 torrents_added_func_t donefunc, void *cbdata);
 
-/* set the upload limit based on saved prefs */
-void
-setlimit(tr_handle_t *tr);
+gboolean
+ipc_sendfiles_blocking(GList *files);
 
-/* show the "add a torrent" dialog */
-void
-makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
-            torrents_added_func_t donefunc, void *cbdata);
-
-/* show the info window for a torrent */
-void
-makeinfowind(GtkWindow *parent, tr_torrent_t *tor);
-
-#endif /* TG_PREFS_H */
+#endif /* TG_IPC_H */
