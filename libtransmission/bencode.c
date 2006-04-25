@@ -22,11 +22,24 @@
 
 #include "transmission.h"
 
-#define LIST_SIZE 20
+#define LIST_SIZE   20
+#define OUTBUF_SIZE 100
 
-int _tr_bencLoad( char * buf, benc_val_t * val, char ** end )
+static int tr_bencSprintf( char ** buf, size_t * used, size_t * max,
+                           char * format, ... )
+#ifdef __GNUC__
+    __attribute__ ((format (printf, 4, 5)))
+#endif
+    ;
+
+int _tr_bencLoad( char * buf, size_t len, benc_val_t * val, char ** end )
 {
-    char * p, * foo;
+    char * p, * e, * foo;
+
+    if( 1 >= len )
+    {
+        return 1;
+    }
 
     if( !end )
     {
@@ -38,11 +51,19 @@ int _tr_bencLoad( char * buf, benc_val_t * val, char ** end )
 
     if( buf[0] == 'i' )
     {
+        e = memchr( &buf[1], 'e', len - 1 );
+        if( NULL == e )
+        {
+            return 1;
+        }
+
         /* Integer: i1242e */
         val->type  = TYPE_INT;
+        *e         = '\0';
         val->val.i = strtoll( &buf[1], &p, 10 );
+        *e         = 'e';
 
-        if( p == &buf[1] || p[0] != 'e' )
+        if( p != e )
         {
             return 1;
         }
@@ -66,7 +87,7 @@ int _tr_bencLoad( char * buf, benc_val_t * val, char ** end )
         val->val.l.vals  = malloc( LIST_SIZE * sizeof( benc_val_t ) );
         cur              = &buf[1];
         str_expected     = 1;
-        while( cur[0] != 'e' )
+        while( (size_t)(cur - buf) < len && cur[0] != 'e' )
         {
             if( val->val.l.count == val->val.l.alloc )
             {
@@ -75,7 +96,8 @@ int _tr_bencLoad( char * buf, benc_val_t * val, char ** end )
                 val->val.l.vals   =  realloc( val->val.l.vals,
                         val->val.l.alloc  * sizeof( benc_val_t ) );
             }
-            if( tr_bencLoad( cur, &val->val.l.vals[val->val.l.count], &p ) )
+            if( tr_bencLoad( cur, len - (cur - buf),
+                             &val->val.l.vals[val->val.l.count], &p ) )
             {
                 return 1;
             }
@@ -99,15 +121,24 @@ int _tr_bencLoad( char * buf, benc_val_t * val, char ** end )
     }
     else
     {
-        /* String: 12:whateverword */
-        val->type    = TYPE_STR;
-        val->val.s.i = strtol( buf, &p, 10 );
-
-        if( p == buf || p[0] != ':' )
+        e = memchr( buf, ':', len );
+        if( NULL == e )
         {
             return 1;
         }
-        
+
+        /* String: 12:whateverword */
+        val->type    = TYPE_STR;
+        e[0]         = '\0';
+        val->val.s.i = strtol( buf, &p, 10 );
+        e[0]         = ':';
+
+        if( p != e || 0 > val->val.s.i ||
+            (size_t)(val->val.s.i) > len - ((p + 1) - buf) )
+        {
+            return 1;
+        }
+
         val->val.s.s               = malloc( val->val.s.i + 1 );
         val->val.s.s[val->val.s.i] = 0;
         memcpy( val->val.s.s, p + 1, val->val.s.i );
@@ -202,4 +233,101 @@ benc_val_t * tr_bencDictFind( benc_val_t * val, char * key )
     }
 
     return NULL;
+}
+
+char * tr_bencSaveMalloc( benc_val_t * val, size_t * len )
+{
+    char * buf   = NULL;
+    size_t alloc = 0;
+
+    *len = 0;
+    if( tr_bencSave( val, &buf, len, &alloc ) )
+    {
+        if( NULL != buf )
+        {
+            free(buf);
+        }
+        *len = 0;
+        return NULL;
+    }
+
+    return buf;
+}
+
+int tr_bencSave( benc_val_t * val, char ** buf, size_t * used, size_t * max )
+{
+    int ii;    
+
+    switch( val->type )
+    {
+        case TYPE_INT:
+            if( tr_bencSprintf( buf, used, max, "i%llde", val->val.i ) )
+            {
+                return 1;
+            }
+            break;
+
+        case TYPE_STR:
+            if( (int)strlen(val->val.s.s) != val->val.s.i )
+            {
+                return 1;
+            }
+            if( tr_bencSprintf( buf, used, max, "%i:%s",
+                                val->val.s.i, val->val.s.s ) )
+            {
+                return 1;
+            }
+            break;
+
+        case TYPE_LIST:
+        case TYPE_DICT:
+            if( tr_bencSprintf( buf, used, max,
+                                (TYPE_LIST == val->type ? "l" : "d") ) )
+            {
+                return 1;
+            }
+            for( ii = 0; val->val.l.count > ii; ii++ )
+            {
+                if( tr_bencSave( val->val.l.vals + ii, buf, used, max ) )
+                {
+                    return 1;
+                }
+            }
+            if( tr_bencSprintf( buf, used, max, "e" ) )
+            {
+                return 1;
+            }
+            break;
+    }
+
+    return 0;
+}
+
+static int tr_bencSprintf( char ** buf, size_t * used, size_t * max,
+                           char * format, ... )
+{
+    va_list ap;
+    int     want;
+    char  * newbuf;
+
+    va_start( ap, format );
+    want = vsnprintf( NULL, 0, format, ap );
+    va_end(ap);
+
+    while( *used + want + 1 > *max )
+    {
+        *max += OUTBUF_SIZE;
+        newbuf = realloc( *buf, *max );
+        if( NULL == newbuf )
+        {
+            return 1;
+        }
+        *buf = newbuf;
+    }
+
+    va_start( ap, format );
+    *used += vsnprintf( *buf + *used, *max - *used, format, ap );
+    va_end( ap );
+
+    return 0;
 }

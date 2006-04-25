@@ -78,7 +78,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path )
     fclose( file );
 
     /* Parse bencoded infos */
-    if( tr_bencLoad( buf, &meta, NULL ) )
+    if( tr_bencLoad( buf, sb.st_size, &meta, NULL ) )
     {
         fprintf( stderr, "Error while parsing bencoded data\n" );
         free( buf );

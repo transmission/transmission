@@ -462,7 +462,7 @@ static void recvAnswer( tr_tracker_t * tc )
         return;
     }
 
-    if( tr_bencLoad( &body[i], &beAll, NULL ) )
+    if( tr_bencLoad( &body[i], bodylen - i, &beAll, NULL ) )
     {
         tr_err( "Tracker: error parsing bencoded data" );
         tc->lastAttempt = TC_ATTEMPT_ERROR;
@@ -706,7 +706,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
     {
         return 1;
     }
-    if( tr_bencLoad( &buf[i], &scrape, NULL ) )
+    if( tr_bencLoad( &buf[i], pos - i, &scrape, NULL ) )
     {
         return 1;
     }
