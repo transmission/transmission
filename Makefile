@@ -33,6 +33,18 @@ all: $(TARGETS)
 	@echo "* Building Transmission BeOS client"
 	@make -C beos
 
+install: all $(foreach SUB,$(TARGETS),.install$(SUB))
+
+.install.cli: .cli
+	@echo "* Installing Transmission CLI client"
+	@$(MAKE) -C cli install
+
+.install.gtk: .gtk
+	@echo "* Installing Transmission GTK+ client"
+	@$(MAKE) -C gtk install
+
+.install.beos:
+
 clean:
 	@$(MAKE) -C libtransmission clean
 	@$(MAKE) -C cli clean

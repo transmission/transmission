@@ -38,8 +38,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#include "defines.h"
-
 #include "conf.h"
 #include "dialogs.h"
 #include "ipc.h"
@@ -215,6 +213,7 @@ main(int argc, char **argv) {
   gtk_init(&argc, &argv);
 
   bindtextdomain("transmission-gtk", LOCALEDIR);
+  bind_textdomain_codeset("transmission-gtk", "UTF-8");
   textdomain("transmission-gtk");
 
   g_set_application_name(_("Transmission"));

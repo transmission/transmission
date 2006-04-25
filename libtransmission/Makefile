@@ -8,6 +8,9 @@ OBJS = $(SRCS:%.c=%.o)
 
 CFLAGS += -D__TRANSMISSION__
 
+all: libtransmission.a
+	@true
+
 libtransmission.a: $(OBJS)
 	@echo "Library $@"
 	@ar ru $@ $(OBJS)

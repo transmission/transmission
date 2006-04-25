@@ -161,7 +161,8 @@ EOF
         then
           echo "yes"
           GTK=yes
-          GTKLOCALEDIR="$PREFIX/share/locale"
+          LOCALEDIR="$PREFIX/share/locale"
+          CFLAGS_GTK="$CFLAGS_GTK -DLOCALEDIR=\\"\""$LOCALEDIR\\"\"
         else
           echo "no (could not find gettext libintl.h)"
           GTK=no
@@ -193,6 +194,9 @@ while [ $# -ne 0 ]; do
       ;;
     x--disable-gtk)
       GTK=no
+      ;;
+    x--prefix=*)
+      PREFIX="$param"
       ;;
     x--help)
       usage
@@ -272,15 +276,6 @@ if [ "$GTK" = no ]; then
 else
   gtk_test
 fi
-if [ "$GTK" = yes ]; then
-  rm -f gtk/defines.h
-  cat > gtk/defines.h << EOF
-#ifndef TG_DEFINES_H
-#define TG_DEFINES_H
-#define LOCALEDIR               "$GTKLOCALEDIR"
-#endif
-EOF
-fi
 
 #
 # Math functions
@@ -296,6 +291,8 @@ cat > Makefile.config << EOF
 CONFIGURE_RUN  = yes
 SVN_REVISION   = $SVNREV
 SYSTEM         = $SYSTEM
+PREFIX         = $PREFIX
+LOCALEDIR      = $LOCALEDIR
 BEOS_NETSERVER = $BEOS_NETSERVER
 PTHREAD        = $PTHREAD
 OPENSSL        = $OPENSSL

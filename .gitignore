@@ -9,6 +9,7 @@ cli/.depend
 cli/transmissioncli
 gtk/.depend
 gtk/defines.h
+gtk/po/*.mo
 gtk/transmission-gtk
 libtransmission/*.a
 libtransmission/.depend

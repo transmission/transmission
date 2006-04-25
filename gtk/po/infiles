@@ -1,5 +1,0 @@
-# xgettext --files-from=po/infiles --default-domain=transmission-gtk --output-dir=po --from-code=UTF-8 --add-comments --keyword=_ --keyword=N_
-conf.c
-dialogs.c
-main.c
-util.c

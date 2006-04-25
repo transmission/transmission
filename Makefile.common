@@ -60,5 +60,24 @@ define LINK_RULE
 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
 endef
 
+define MSGFMT_RULE
+       @echo "Msgfmt $<"
+       @msgfmt -f $< -o $@
+endef
+
+define INSTALL_BIN_RULE
+       @echo "Install $<"
+       @$(MKDIR) $(PREFIX)/bin
+       @$(CP) $< $(PREFIX)/bin/
+endef
+
+define INSTALL_LOCALE_RULE
+       @echo "Install $<"
+       @$(MKDIR) $(LOCALEDIR)/$*/LC_MESSAGES
+       @$(CP) $< $(LOCALEDIR)/$*/LC_MESSAGES/transmission-gtk.mo
+endef
+
 RM    = rm -Rf
+CP    = cp -f
+MKDIR = mkdir -p
 MAKE += --no-print-directory

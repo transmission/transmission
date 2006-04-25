@@ -25,4 +25,7 @@ clean:
 	$(RM) .depend
 	$(foreach SRC, $(SRCS), $(CXX) $(CXXFLAGS) -MM $(SRC) >> .depend;)
 
+install:
+	@true
+
 -include .depend

@@ -83,7 +83,7 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
   GtkWidget *dirstr = gtk_file_chooser_button_new(
-    _("Choose download directory"),
+    _("Choose a download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
   GtkWidget *label;
   GtkWidget **array;
