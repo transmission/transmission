@@ -127,13 +127,13 @@ int main( int argc, char ** argv )
         printf( "tracker:  %s:%d\n",
                 info->trackerAddress, info->trackerPort );
         printf( "announce: %s\n", info->trackerAnnounce );
-        printf( "size:     %lld (%lld * %d + %lld)\n",
+        printf( "size:     %"PRIu64" (%"PRIu64" * %d + %"PRIu64")\n",
                 info->totalSize, info->totalSize / info->pieceSize,
                 info->pieceSize, info->totalSize % info->pieceSize );
         printf( "file(s):\n" );
         for( i = 0; i < info->fileCount; i++ )
         {
-            printf( " %s (%lld)\n", info->files[i].name,
+            printf( " %s (%"PRIu64")\n", info->files[i].name,
                     info->files[i].length );
         }
 

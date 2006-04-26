@@ -28,6 +28,9 @@ extern "C" {
 #endif
 
 #include <inttypes.h>
+#ifndef PRIu64
+# define PRIu64 "lld"
+#endif
 
 #define SHA_DIGEST_LENGTH 20
 #ifdef __BEOS__

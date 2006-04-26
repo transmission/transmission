@@ -163,7 +163,7 @@ static void __bencPrint( benc_val_t * val, int space )
     switch( val->type )
     {
         case TYPE_INT:
-            fprintf( stderr, "int:  %lld\n", val->val.i );
+            fprintf( stderr, "int:  %"PRIu64"\n", val->val.i );
             break;
 
         case TYPE_STR:
@@ -261,7 +261,7 @@ int tr_bencSave( benc_val_t * val, char ** buf, size_t * used, size_t * max )
     switch( val->type )
     {
         case TYPE_INT:
-            if( tr_bencSprintf( buf, used, max, "i%llde", val->val.i ) )
+            if( tr_bencSprintf( buf, used, max, "i%"PRIu64"e", val->val.i ) )
             {
                 return 1;
             }

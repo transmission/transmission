@@ -171,7 +171,7 @@ static void resolveRelease( tr_resolve_t * r )
  * Keeps waiting for addresses to resolve, and removes them from the
  * queue once resolution is done.
  **********************************************************************/
-static void resolveFunc( void * unused )
+static void resolveFunc( void * arg UNUSED )
 {
     tr_resolve_t * r;
     struct hostent * host;
