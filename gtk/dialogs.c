@@ -106,8 +106,8 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
 
   g_free(title);
   gtk_widget_set_name(wind, "TransmissionDialog");
-  gtk_table_set_col_spacings(GTK_TABLE(table), 12);
-  gtk_table_set_row_spacings(GTK_TABLE(table), 12);
+  gtk_table_set_col_spacings(GTK_TABLE(table), 8);
+  gtk_table_set_row_spacings(GTK_TABLE(table), 8);
   gtk_dialog_set_default_response(GTK_DIALOG(wind), GTK_RESPONSE_OK);
   gtk_container_set_border_width(GTK_CONTAINER(table), 6);
   gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
@@ -385,7 +385,7 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   do { \
     char *txt = g_markup_printf_escaped("<b>%s</b>", nam); \
     GtkWidget *wid = gtk_label_new(NULL); \
-    gtk_misc_set_alignment(GTK_MISC(wid), 1, .5); \
+    gtk_misc_set_alignment(GTK_MISC(wid), 0, .5); \
     gtk_label_set_markup(GTK_LABEL(wid), txt); \
     gtk_table_attach_defaults(GTK_TABLE(tab), wid, 0, 1, ii, ii + 1); \
     wid = gtk_label_new(val); \

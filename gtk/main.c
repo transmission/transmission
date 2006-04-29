@@ -400,7 +400,6 @@ makewind_toolbar(struct cbdata *data) {
 
   gtk_toolbar_set_tooltips(GTK_TOOLBAR(bar), TRUE);
   gtk_toolbar_set_show_arrow(GTK_TOOLBAR(bar), FALSE);
-  gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
 
   data->buttons = g_new(GtkWidget*, ALEN(actionitems));
 

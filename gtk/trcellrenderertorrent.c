@@ -98,7 +98,7 @@ tr_cell_renderer_torrent_init(TrCellRendererTorrent *tcell) {
   tcell->priv->text = g_strdup("");
   tcell->priv->text_attrs = NULL;
   tcell->priv->label = g_strdup("");
-  tcell->priv->text_attrs = NULL;
+  tcell->priv->label_attrs = NULL;
   tcell->priv->style = NULL;
 }
 
