@@ -124,6 +124,13 @@
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
     
+    [fUploadLimitItem setTitle:
+                [NSString stringWithFormat: @"Limit (%d KB/s)", uploadLimit]];
+    if (checkUpload)
+        [fUploadLimitItem setState: NSOnState];
+    else
+        [fUploadNoLimitItem setState: NSOnState];
+    
     tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
 
     //set download limit
@@ -133,6 +140,13 @@
     [fDownloadCheck setState: checkDownload ? NSOnState : NSOffState];
     [fDownloadField setIntValue: downloadLimit];
     [fDownloadField setEnabled: checkDownload];
+    
+    [fDownloadLimitItem setTitle:
+                [NSString stringWithFormat: @"Limit (%d KB/s)", downloadLimit]];
+    if (checkDownload)
+        [fDownloadLimitItem setState: NSOnState];
+    else
+        [fDownloadNoLimitItem setState: NSOnState];
     
     tr_setDownloadLimit( fHandle, checkDownload ? downloadLimit : -1 );
     
@@ -230,33 +244,22 @@
     }
 }
 
-- (void) setLimitCheck: (id) sender
-{
-    NSString * key;
-    NSTextField * field;
-    if( sender == fUploadCheck )
-    {
-        key = @"CheckUpload";
-        field = fUploadField;
-    }
-    else
-    {
-        key = @"CheckDownload";
-        field = fDownloadField;
-    }
-
-    BOOL check = [sender state] == NSOnState;
-    [fDefaults setBool: check forKey: key];
-
-    [self setLimit: field];
-    [field setEnabled: check];
-}
-
 - (void) setLimit: (id) sender
 {
     int limit = [sender intValue];
-    NSString * key = ( sender == fUploadField ) ?
-                        @"UploadLimit" : @"DownloadLimit";
+    
+    NSString * key;
+    NSMenuItem * menuItem;
+    if (sender == fUploadField)
+    {
+        key = @"UploadLimit";
+        menuItem = fUploadLimitItem;
+    }
+    else
+    {
+        key = @"DownloadLimit";
+        menuItem = fDownloadLimitItem;
+    }
 
     //if value entered is not an int or is less than 0 do not change
     if (![[sender stringValue] isEqualToString:
@@ -268,6 +271,7 @@
     }
     else
     {
+        [menuItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)", limit]];
         [fDefaults setInteger: limit forKey: key];
     }
 
@@ -277,6 +281,65 @@
     else
         tr_setDownloadLimit( fHandle,
             ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
+}
+
+- (void) setLimitCheck: (id) sender
+{
+    NSString * key;
+    NSTextField * field;
+    NSMenuItem * limitItem, * noLimitItem;
+    if( sender == fUploadCheck )
+    {
+        key = @"CheckUpload";
+        field = fUploadField;
+        limitItem = fUploadLimitItem;
+        noLimitItem = fUploadNoLimitItem;
+    }
+    else
+    {
+        key = @"CheckDownload";
+        field = fDownloadField;
+        limitItem = fDownloadLimitItem;
+        noLimitItem = fDownloadNoLimitItem;
+    }
+
+    BOOL check = [sender state] == NSOnState;
+    [limitItem setState: check ? NSOnState : NSOffState];
+    [noLimitItem setState: !check ? NSOnState : NSOffState];
+    
+    [fDefaults setBool: check forKey: key];
+
+    [self setLimit: field];
+    
+    [field setEnabled: check];
+}
+
+- (void) setLimitMenu: (id) sender
+{
+    NSButton * check = (sender == fUploadLimitItem || sender == fUploadNoLimitItem)
+                        ? fUploadCheck : fDownloadCheck;
+    int state = (sender == fUploadLimitItem || sender == fDownloadLimitItem)
+                    ? NSOnState : NSOffState;
+                
+    [check setState: state];
+    [self setLimitCheck: check];
+}
+
+- (void) setQuickSpeed: (id) sender
+{
+    NSString * title = [sender title];
+    int limit = [[title substringToIndex: [title length] - [@" KB/s" length]] intValue];
+    
+    if ([sender menu] == fUploadMenu)
+    {
+        [fUploadField setIntValue: limit];
+        [self setLimitMenu: fUploadLimitItem];
+    }
+    else
+    {
+        [fDownloadField setIntValue: limit];
+        [self setLimitMenu: fDownloadLimitItem];
+    }
 }
 
 - (void) setQuitMessage: (id) sender

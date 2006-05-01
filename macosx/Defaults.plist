@@ -8,12 +8,12 @@
 	<false/>
 	<key>BindPort</key>
 	<integer>9090</integer>
+	<key>CheckDownload</key>
+	<false/>
 	<key>CheckQuit</key>
 	<true/>
 	<key>CheckRemove</key>
 	<true/>
-	<key>CheckDownload</key>
-	<false/>
 	<key>CheckUpload</key>
 	<true/>
 	<key>DownloadChoice</key>
@@ -32,6 +32,8 @@
 	<string>~/Desktop</string>
 	<key>ShowInspector</key>
 	<false/>
+	<key>StatusBar</key>
+	<true/>
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>

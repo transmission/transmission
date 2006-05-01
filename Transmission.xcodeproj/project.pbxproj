@@ -15,7 +15,6 @@
 		4D1838BF09DEC0430047D688 /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838A009DEC0430047D688 /* net.c */; };
 		4D1838C009DEC0430047D688 /* metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A109DEC0430047D688 /* metainfo.h */; };
 		4D1838C109DEC0430047D688 /* metainfo.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838A209DEC0430047D688 /* metainfo.c */; };
-		4D1838C209DEC0430047D688 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
 		4D1838C309DEC0430047D688 /* peer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A409DEC0430047D688 /* peer.h */; };
 		4D1838C409DEC0430047D688 /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838A509DEC0430047D688 /* peer.c */; };
 		4D1838C509DEC0430047D688 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A609DEC0430047D688 /* net.h */; };
@@ -78,6 +77,10 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
+		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
+		A2A84AD00A04FCD000C898D4 /* ActionButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */; };
+		A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -190,6 +193,12 @@
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A21610FA0A050B1700E8E4C1 /* MenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MenuButton.h; path = macosx/MenuButton.h; sourceTree = "<group>"; };
+		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
+		A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButton.tiff; path = macosx/Images/ActionButton.tiff; sourceTree = "<group>"; };
+		A2A84AD10A04FCDC00C898D4 /* ActionButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButton.tiff; path = macosx/Images/ActionButton.tiff; sourceTree = "<group>"; };
+		A2A84AD20A04FCDC00C898D4 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
+		A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +251,8 @@
 				4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
+				A21610FA0A050B1700E8E4C1 /* MenuButton.h */,
+				A21610FB0A050B1700E8E4C1 /* MenuButton.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -271,6 +282,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A2A84AD10A04FCDC00C898D4 /* ActionButton.tiff */,
+				A2A84AD20A04FCDC00C898D4 /* BottomBorder.tiff */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 				4DF7500808A103AD007B0D70 /* Info.png */,
@@ -293,6 +306,8 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */,
+				A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -387,7 +402,6 @@
 				4D1838BC09DEC0430047D688 /* internal.h in Headers */,
 				4D1838BD09DEC0430047D688 /* inout.h in Headers */,
 				4D1838C009DEC0430047D688 /* metainfo.h in Headers */,
-				4D1838C209DEC0430047D688 /* peermessages.h in Headers */,
 				4D1838C309DEC0430047D688 /* peer.h in Headers */,
 				4D1838C509DEC0430047D688 /* net.h in Headers */,
 				4D1838C609DEC0430047D688 /* fdlimit.h in Headers */,
@@ -404,6 +418,7 @@
 				4D1838DA09DEC0430047D688 /* clients.h in Headers */,
 				4D1838FA09DEC4380047D688 /* utils.h in Headers */,
 				4D1838FC09DEC4380047D688 /* transmission.h in Headers */,
+				A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,6 +542,8 @@
 				4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */,
 				4DDFDD22099A5D8E00189D81 /* DownloadBadge.png in Resources */,
 				4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */,
+				A2A84AD00A04FCD000C898D4 /* ActionButton.tiff in Resources */,
+				A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,6 +592,7 @@
 				4DE5CCA70980735700BE280E /* Badger.m in Sources */,
 				4DFBC2DF09C0970D00D5C571 /* Torrent.m in Sources */,
 				4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */,
+				A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

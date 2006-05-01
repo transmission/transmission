@@ -22,6 +22,7 @@
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
                 stopTorrent = id; 
+                toggleStatusBar = id; 
             }; 
             CLASS = Controller; 
             LANGUAGE = ObjC; 
@@ -51,14 +52,18 @@
                 fRevealItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
                 fShowHideToolbar = NSMenuItem; 
+                fStats = NSBox; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
+                fTotalTorrentsField = NSTextField; 
                 fTotalULField = NSTextField; 
                 fWindow = NSWindow; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
         {
             ACTIONS = {
@@ -67,7 +72,9 @@
                 setDownloadLocation = id; 
                 setLimit = id; 
                 setLimitCheck = id; 
+                setLimitMenu = id; 
                 setPort = id; 
+                setQuickSpeed = id; 
                 setQuitMessage = id; 
                 setRemoveMessage = id; 
                 setUpdate = id; 
@@ -80,6 +87,9 @@
                 fBlankView = NSView; 
                 fDownloadCheck = NSButton; 
                 fDownloadField = NSTextField; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
                 fNetworkView = NSView; 
@@ -90,6 +100,9 @@
                 fUpdatePopUp = NSPopUpButton; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
                 fWindow = NSWindow; 
             }; 
             SUPERCLASS = NSObject; 

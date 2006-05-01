@@ -137,11 +137,14 @@
     
     if( row >= 0 )
     {
-        if( OSX_VERSION >= 10.3 )
-            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                byExtendingSelection: [self isRowSelected: row]];
-        else
-            [self selectRow: row byExtendingSelection: [self isRowSelected: row]];
+        if (![self isRowSelected: row])
+        {
+            if( OSX_VERSION >= 10.3 )
+                [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+                    byExtendingSelection: NO];
+            else
+                [self selectRow: row byExtendingSelection: NO];
+        }
         return fContextRow;
     }
     else

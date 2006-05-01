@@ -47,6 +47,10 @@
     IBOutlet NSButton       * fDownloadCheck;
     IBOutlet NSTextField    * fDownloadField;
     
+    IBOutlet NSMenu         * fUploadMenu, * fDownloadMenu;
+    IBOutlet NSMenuItem     * fUploadLimitItem, * fUploadNoLimitItem,
+                            * fDownloadLimitItem, * fDownloadNoLimitItem;
+    
     IBOutlet NSWindow       * fWindow;
 
     NSString                * fDownloadFolder;
@@ -65,5 +69,7 @@
 - (void) setPort:               (id) sender;
 - (void) setLimitCheck:         (id) sender;
 - (void) setLimit:              (id) sender;
+- (void) setLimitMenu:          (id) sender;
+- (void) setQuickSpeed:         (id) sender;
 
 @end

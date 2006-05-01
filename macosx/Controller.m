@@ -85,6 +85,10 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fToolbar setAutosavesConfiguration: YES];
     [fWindow setToolbar: fToolbar];
     [fWindow setDelegate: self];
+    
+    fStatusBar = YES;
+    if (![fDefaults boolForKey: @"StatusBar"])
+        [self toggleStatusBar: nil];
 
     [fTableView setTorrents: fTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell:
@@ -660,6 +664,10 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSString * uploadRate = [NSString stringForSpeed: ul];
     [fTotalDLField setStringValue: downloadRate];
     [fTotalULField setStringValue: uploadRate];
+    
+    int count = [fTorrents count];
+    [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
+            @"%d Torrent%s", count, count == 1 ? "" : "s"]];
 
     [self updateInfoPanel];
 
@@ -839,6 +847,24 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fWindow toggleToolbarShown:sender];
 }
 
+- (void) toggleStatusBar: (id) sender
+{
+    fStatusBar = !fStatusBar;
+
+    NSSize frameSize = [fScrollView frame].size;
+    [fStats setHidden: !fStatusBar];
+    
+    if (fStatusBar)
+        frameSize.height -= 18;
+    else
+        frameSize.height += 18;
+
+    [fScrollView setFrameSize: frameSize];
+    [fWindow display];
+    
+    [fDefaults setBool: fStatusBar forKey: @"StatusBar"];
+}
+
 - (BOOL)validateToolbarItem:(NSToolbarItem *)toolbarItem
 {
     SEL action = [toolbarItem action];
@@ -892,6 +918,13 @@ static void sleepCallBack( void * controller, io_service_t y,
     if (action == @selector(showInfo:))
     {
         [menuItem setTitle: [fInfoPanel isVisible] ? @"Hide Info" : @"Show Info"];
+        return YES;
+    }
+    
+    //enable toggle toolbar
+    if (action == @selector(toggleStatusBar:))
+    {
+        [menuItem setTitle: fStatusBar ? @"Hide Status Bar" : @"Show Status Bar"];
         return YES;
     }
 

@@ -52,6 +52,9 @@
     IBOutlet TorrentTableView   * fTableView;
     IBOutlet NSTextField        * fTotalDLField;
     IBOutlet NSTextField        * fTotalULField;
+    IBOutlet NSTextField        * fTotalTorrentsField;
+    IBOutlet NSBox              * fStats;
+    BOOL                        fStatusBar;
 
     IBOutlet NSPanel            * fInfoPanel;
     IBOutlet NSImageView        * fInfoImageView;
@@ -120,6 +123,7 @@
 
 - (void) runCustomizationPalette: (id) sender;
 - (void) showHideToolbar: (id) sender;
+- (void) toggleStatusBar: (id) sender;
 
 - (void) showPreferenceWindow: (id) sender;
 
