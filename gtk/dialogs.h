@@ -27,7 +27,8 @@
 #ifndef TG_PREFS_H
 #define TG_PREFS_H
 
-#include "transmission.h"
+#include "tr_backend.h"
+#include "tr_torrent.h"
 #include "util.h"
 
 /* macros for names of prefs we use */
@@ -45,19 +46,18 @@
 #define DEF_USEUPLIMIT          TRUE
 
 void
-makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened);
+makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened);
 
 /* set the upload limit based on saved prefs */
 void
-setlimit(tr_handle_t *tr);
+setlimit(TrBackend *back);
 
 /* show the "add a torrent" dialog */
 void
-makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
-            torrents_added_func_t donefunc, void *cbdata);
+makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata);
 
 /* show the info window for a torrent */
 void
-makeinfowind(GtkWindow *parent, tr_torrent_t *tor);
+makeinfowind(GtkWindow *parent, TrTorrent *tor);
 
 #endif /* TG_PREFS_H */

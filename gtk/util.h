@@ -37,8 +37,7 @@
 #define SHUTUP
 #endif
 
-typedef gboolean (*add_torrent_func_t)(void *, const char *, const char *, gboolean, GList **);
-typedef void (*torrents_added_func_t)(void *);
+typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,gboolean*);
 
 /* return number of items in array */
 #define ALEN(a)                 (sizeof(a) / sizeof((a)[0]))

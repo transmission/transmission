@@ -28,12 +28,7 @@
 #define TG_CONF_H
 
 #include "transmission.h"
-
-struct cf_torrentstate {
-  char *ts_torrent;
-  char *ts_directory;
-  gboolean ts_paused;
-};
+#include "bencode.h"
 
 gboolean
 cf_init(const char *confdir, char **errstr);
@@ -41,19 +36,19 @@ gboolean
 cf_lock(char **errstr);
 char *
 cf_sockname(void);
-gboolean
+void
 cf_loadprefs(char **errstr);
 const char *
 cf_getpref(const char *name);
 void
 cf_setpref(const char *name, const char *value);
-gboolean
-cf_saveprefs(char **errstr);
-GList *
-cf_loadstate(char **errstr);
-gboolean
-cf_savestate(GList *torrents, char **errstr);
 void
-cf_freestate(struct cf_torrentstate *state);
+cf_saveprefs(char **errstr);
+benc_val_t *
+cf_loadstate(char **errstr);
+void
+cf_savestate(benc_val_t *state, char **errstr);
+void
+cf_freestate(benc_val_t *state);
 
 #endif /* TG_CONF_H */

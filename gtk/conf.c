@@ -40,7 +40,6 @@
 #include <glib/gi18n.h>
 
 #include "conf.h"
-#include "transmission.h"
 #include "util.h"
 
 #define CONF_SUBDIR             "gtk"
@@ -61,10 +60,18 @@ static int
 lockfile(const char *file, char **errstr);
 static void
 cf_removelocks(void);
+static char *
+cf_readfile(const char *file, const char *oldfile, gsize *len,
+            gboolean *usedold, char **errstr);
+static void
+cf_benc_append(benc_val_t *val, char type, int incsize);
+static void
+cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
+             char **errstr);
 static gboolean
 writefile_traverse(gpointer key, gpointer value, gpointer data);
 static char *
-getstateval(struct cf_torrentstate *state, char *line);
+getstateval(benc_val_t *state, char *line);
 
 static char *gl_confdir = NULL;
 static char *gl_old_confdir = NULL;
@@ -171,15 +178,59 @@ cf_sockname(void) {
   return g_build_filename(gl_confdir, FILE_SOCKET, NULL);
 }
 
-gboolean
-cf_loadprefs(char **errstr) {
-  char *path = g_build_filename(gl_confdir, FILE_PREFS, NULL);
-  char *oldpath;
+static char *
+cf_readfile(const char *file, const char *oldfile, gsize *len,
+            gboolean *usedold, char **errstr) {
+  char *path;
   GIOChannel *io;
   GError *err;
-  char *line, *sep;
-  gsize len, termpos;
-  char term = PREF_SEP_LINE;
+  char *ret;
+
+  *errstr = NULL;
+  *usedold = FALSE;
+  ret = NULL;
+  err = NULL;
+  *len = 0;
+
+  path = g_build_filename(gl_confdir, file, NULL);
+  io = g_io_channel_new_file(path, "r", &err);
+  if(NULL != err && g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT)) {
+    g_error_free(err);
+    err = NULL;
+    g_free(path);
+    path = g_build_filename(gl_old_confdir, oldfile, NULL);
+    io = g_io_channel_new_file(path, "r", &err);
+    *usedold = TRUE;
+  }
+  if(NULL != err) {
+    if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+      *errstr = g_strdup_printf(
+        _("Failed to open the file %s for reading:\n%s"), path, err->message);
+    goto done;
+  }
+  g_io_channel_set_encoding(io, NULL, NULL);
+
+  if(G_IO_STATUS_ERROR == g_io_channel_read_to_end(io, &ret, len, &err)) {
+    *errstr = g_strdup_printf(
+      _("Error while reading from the file %s:\n%s"), path, err->message);
+    goto done;
+  }
+
+ done:
+  if(NULL != err)
+    g_error_free(err);
+  if(NULL != io)  
+    g_io_channel_unref(io);
+  return ret;
+}
+
+void
+cf_loadprefs(char **errstr) {
+  char *data, *line, *eol, *sep, *key;
+  gsize len;
+  benc_val_t val;
+  gboolean usedold;
+  int ii;
 
   *errstr = NULL;
 
@@ -189,58 +240,103 @@ cf_loadprefs(char **errstr) {
   gl_prefs = g_tree_new_full((GCompareDataFunc)g_ascii_strcasecmp, NULL,
                           g_free, g_free);
 
-  err = NULL;
-  io = g_io_channel_new_file(path, "r", &err);
-  if(NULL != err) {
-    if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
-      *errstr = g_strdup_printf(
-        _("Failed to open the file %s for reading:\n%s"), path, err->message);
-    else {
-      g_error_free(err);
-      err = NULL;
-      oldpath = g_build_filename(gl_old_confdir, OLD_FILE_PREFS, NULL);
-      io = g_io_channel_new_file(oldpath, "r", &err);
-      g_free(oldpath);
-    }
-    if(NULL != err)
-      goto done;
+  data = cf_readfile(FILE_PREFS, OLD_FILE_PREFS, &len, &usedold, errstr);
+  if(NULL != *errstr) {
+    g_assert(NULL == data);
+    return;
   }
-  g_io_channel_set_line_term(io, &term, 1);
 
-  err = NULL;
-  for(;;) {
-    assert(NULL == err) ;
-    switch(g_io_channel_read_line(io, &line, &len, &termpos, &err)) {
-      case G_IO_STATUS_ERROR:
-        *errstr = g_strdup_printf(
-          _("Error while reading from the file %s:\n%s"), path, err->message);
-        goto done;
-      case G_IO_STATUS_NORMAL:
-        if(NULL != line) {
-          if(g_utf8_validate(line, len, NULL) &&
-             NULL != (sep = strchr(line, PREF_SEP_KEYVAL)) && sep > line) {
-            *sep = '\0';
-            line[termpos] = '\0';
-            g_tree_insert(gl_prefs, g_strcompress(line), g_strcompress(sep + 1));
-          }
-          g_free(line);
+  if(NULL == data)
+    return;
+
+  bzero(&val, sizeof(val));
+  if(!usedold && !tr_bencLoad(data, len, &val, NULL)) {
+    if(TYPE_DICT == val.type) {
+      key = NULL;
+      for(ii = 0; ii < val.val.l.count; ii++) {
+        if(NULL == key) {
+          g_assert(TYPE_STR == val.val.l.vals[ii].type);
+          key = val.val.l.vals[ii].val.s.s;
+        } else {
+          if(TYPE_INT == val.val.l.vals[ii].type)
+            g_tree_insert(gl_prefs, g_strdup(key),
+                         g_strdup_printf("%"PRIu64, val.val.l.vals[ii].val.i));
+          else if(TYPE_STR == val.val.l.vals[ii].type)
+            g_tree_insert(gl_prefs, g_strdup(key),
+                          g_strdup(val.val.l.vals[ii].val.s.s));
+          key = NULL;
         }
-        break;
-      case G_IO_STATUS_EOF:
-        goto done;
-      default:
-        assert(!"unknown return code");
-        goto done;
+      }
+    }
+
+  } else {
+    /* XXX remove this in a release or two */
+    for(line = data; NULL != (eol = strchr(line, PREF_SEP_LINE));
+        line = eol + 1) {
+      *eol = '\0';
+      if(g_utf8_validate(line, -1, NULL) &&
+         NULL != (sep = strchr(line, PREF_SEP_KEYVAL))) {
+        *sep = '\0';
+        g_tree_insert(gl_prefs, g_strcompress(line), g_strcompress(sep+1));
+      }
+    }
+    cf_saveprefs(errstr);
+  }
+
+  g_free(data);
+}
+
+benc_val_t *
+cf_loadstate(char **errstr) {
+  char *data, *line, *eol, *prog;
+  gsize len;
+  gboolean usedold;
+  benc_val_t *state, *torstate;
+
+  *errstr = NULL;
+
+  data = cf_readfile(FILE_STATE, OLD_FILE_STATE, &len, &usedold, errstr);
+  if(NULL != *errstr) {
+    g_assert(NULL == data);
+    return NULL;
+  }
+
+  if(NULL == data)
+    return NULL;
+
+  state = g_new0(benc_val_t, 1);
+  if(usedold || tr_bencLoad(data, len, state, NULL)) {
+    /* XXX all this evil compat code should go away at some point */
+    tr_bencFree(state);
+    bzero(state, sizeof(benc_val_t));
+    state->type = TYPE_LIST;
+    for(line = data; NULL != (eol = strchr(line, PREF_SEP_LINE));
+        line = eol + 1) {
+      *eol = '\0';
+      if(g_utf8_validate(line, -1, NULL)) {
+        cf_benc_append(state, TYPE_DICT, 10);
+        torstate = state->val.l.vals + state->val.l.count - 1;
+        prog = line;
+        while(NULL != (prog = getstateval(torstate, prog)))
+          ;
+      }
     }
   }
 
- done:
-  if(NULL != err)
-    g_error_free(err);
-  if(NULL != io)  
-    g_io_channel_unref(io);
-  g_free(path);
-  return NULL == *errstr;
+  g_free(data);
+
+  return state;
+}
+
+static void
+cf_benc_append(benc_val_t *val, char type, int incsize) {
+  if(++val->val.l.count > val->val.l.alloc) {
+    val->val.l.alloc += incsize;
+    val->val.l.vals = g_renew(benc_val_t, val->val.l.vals, val->val.l.alloc);
+    bzero(val->val.l.vals + val->val.l.alloc - incsize,
+          incsize * sizeof(benc_val_t));
+  }
+  val->val.l.vals[val->val.l.count-1].type = type;
 }
 
 const char *
@@ -257,176 +353,98 @@ cf_setpref(const char *name, const char *value) {
   g_tree_insert(gl_prefs, g_strdup(name), g_strdup(value));
 }
 
-struct writeinfo {
-  GIOChannel *io;
-  GError *err;
-};
-
-gboolean
-cf_saveprefs(char **errstr) {
-  char *file = g_build_filename(gl_confdir, FILE_PREFS, NULL);
-  char *tmpfile = g_build_filename(gl_confdir, FILE_PREFS_TMP, NULL);
+static void
+cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
+             char **errstr) {
+  char *path = g_build_filename(gl_confdir, file, NULL);
+  char *pathtmp = g_build_filename(gl_confdir, tmp, NULL);
   GIOChannel *io = NULL;
-  struct writeinfo info;
-  int fd;
-
-  assert(NULL != gl_prefs);
-  assert(NULL != errstr);
+  GError *err;
+  char *datastr;
+  size_t len;
+  gsize written;
 
   *errstr = NULL;
+  err = NULL;
+  datastr = NULL;
 
-  if(0 > (fd = lockfile(tmpfile, errstr))) {
-    g_free(errstr);
-    *errstr = g_strdup_printf(_("Failed to open or lock the file %s:\n%s"),
-                              tmpfile, strerror(errno));
+  io = g_io_channel_new_file(pathtmp, "w", &err);
+  if(NULL != err) {
+    *errstr = g_strdup_printf(_("Failed to open the file %s for writing:\n%s"),
+                              pathtmp, err->message);
     goto done;
   }
+  g_io_channel_set_encoding(io, NULL, NULL);
 
-#ifdef NDEBUG
-  ftruncate(fd, 0);
-#else
-  assert(0 == ftruncate(fd, 0));
-#endif
+  len = 0;
+  datastr = tr_bencSaveMalloc(data, &len);
 
-  info.err = NULL;
-  io = g_io_channel_unix_new(fd);
-  g_io_channel_set_close_on_unref(io, TRUE);
-
-  info.io = io;
-  info.err = NULL;
-  g_tree_foreach(gl_prefs, writefile_traverse, &info);
-  if(NULL != info.err ||
-     G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &info.err)) {
+  written = 0;
+  g_io_channel_write_chars(io, datastr, len, &written, &err);
+  if(NULL != err)
+    g_io_channel_flush(io, &err);
+  if(NULL != err) {
     *errstr = g_strdup_printf(_("Error while writing to the file %s:\n%s"),
-                              tmpfile, info.err->message);
-    g_error_free(info.err);
+                              pathtmp, err->message);
     goto done;
   }
 
-  if(0 > rename(tmpfile, file)) {
+  if(0 > rename(pathtmp, path)) {
     *errstr = g_strdup_printf(_("Failed to rename the file %s to %s:\n%s"),
-                              tmpfile, file, strerror(errno));
+                              pathtmp, file, strerror(errno));
     goto done;
   }
 
  done:
-  g_free(file);
-  g_free(tmpfile);
+  g_free(path);
+  g_free(pathtmp);
   if(NULL != io)
     g_io_channel_unref(io);
+  if(NULL != datastr)
+    free(datastr);
+}
 
-  return NULL == *errstr;
+void
+cf_saveprefs(char **errstr) {
+  benc_val_t val;
+  benc_val_t *ptr;
+
+  *errstr = NULL;
+
+  bzero(&val, sizeof(val));
+  val.type = TYPE_DICT;
+  val.val.l.alloc = val.val.l.count = g_tree_nnodes(gl_prefs) * 2;
+  val.val.l.vals = g_new0(benc_val_t, val.val.l.alloc);
+
+  ptr = val.val.l.vals;
+  g_tree_foreach(gl_prefs, writefile_traverse, &ptr);
+  g_assert(ptr - val.val.l.vals == val.val.l.alloc);
+
+  cf_writebenc(FILE_PREFS, FILE_PREFS_TMP, &val, errstr);
+  tr_bencFree(&val);
 }
 
 static gboolean
 writefile_traverse(gpointer key, gpointer value, gpointer data) {
-  struct writeinfo *info = data;
-  char *ekey, *eval, *line;
-  char sep[2];
-  int len;
+  benc_val_t **ptr = data;
+  benc_val_t *bkey = *ptr;
+  benc_val_t *bval = (*ptr) + 1;
 
-  ekey = g_strescape(key, NULL);
-  eval = g_strescape(value, NULL);
-  sep[0] = PREF_SEP_KEYVAL;
-  sep[1] = '\0';
-  line = g_strjoin(sep, ekey, eval, NULL);
-  len = strlen(line);
-  line[len] = PREF_SEP_LINE;
+  *ptr = (*ptr) + 2;
 
-  switch(g_io_channel_write_chars(info->io, line, len + 1, NULL, &info->err)) {
-    case G_IO_STATUS_ERROR:
-      goto done;
-    case G_IO_STATUS_NORMAL:
-      break;
-    default:
-      assert(!"unknown return code");
-      goto done;
-  }
+  bkey->type = TYPE_STR;
+  bkey->val.s.s = key;
+  bkey->val.s.i = strlen(key);
 
- done:
-  g_free(ekey);
-  g_free(eval);
-  g_free(line);
-  return NULL != info->err;
-}
+  bval->type = TYPE_STR;
+  bval->val.s.s = value;
+  bval->val.s.i = strlen(value);
 
-GList *
-cf_loadstate(char **errstr) {
-  char *path = g_build_filename(gl_confdir, FILE_STATE, NULL);
-  char *oldpath;
-  GIOChannel *io;
-  GError *err;
-  char term = STATE_SEP;
-  GList *ret = NULL;
-  char *line, *ptr;
-  gsize len, termpos;
-  struct cf_torrentstate *ts;
-
-  err = NULL;
-  io = g_io_channel_new_file(path, "r", &err);
-  if(NULL != err) {
-    if(!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
-      *errstr = g_strdup_printf(
-        _("Failed to open the file %s for reading:\n%s"), path, err->message);
-    else {
-      g_error_free(err);
-      err = NULL;
-      oldpath = g_build_filename(gl_old_confdir, OLD_FILE_STATE, NULL);
-      io = g_io_channel_new_file(oldpath, "r", &err);
-      g_free(oldpath);
-    }
-    if(NULL != err)
-      goto done;
-  }
-  g_io_channel_set_line_term(io, &term, 1);
-
-  err = NULL;
-  for(;;) {
-    assert(NULL == err);
-    switch(g_io_channel_read_line(io, &line, &len, &termpos, &err)) {
-      case G_IO_STATUS_ERROR:
-        *errstr = g_strdup_printf(
-          _("Error while reading from the file %s:\n%s"), path, err->message);
-        goto done;
-      case G_IO_STATUS_NORMAL:
-        if(NULL != line) {
-          if(g_utf8_validate(line, -1, NULL)) {
-            ts = g_new0(struct cf_torrentstate, 1);
-            ptr = line;
-            while(NULL != (ptr = getstateval(ts, ptr)))
-              ;
-            if(NULL != ts->ts_torrent && NULL != ts->ts_directory)
-              ret = g_list_append(ret, ts);
-            else
-              cf_freestate(ts);
-          }
-          g_free(line);
-        }
-        break;
-      case G_IO_STATUS_EOF:
-        goto done;
-      default:
-        assert(!"unknown return code");
-        goto done;
-    }
-  }
-
- done:
-  if(NULL != err)
-    g_error_free(err);
-  if(NULL != io)  
-    g_io_channel_unref(io);
-  if(NULL != *errstr && NULL != ret) {
-    g_list_foreach(ret, (GFunc)g_free, NULL);
-    g_list_free(ret);
-    ret = NULL;
-  }
-  g_free(path);
-  return ret;
+  return FALSE;
 }
 
 static char *
-getstateval(struct cf_torrentstate *state, char *line) {
+getstateval(benc_val_t *state, char *line) {
   char *start, *end;
 
   /* skip any leading whitespace */
@@ -459,103 +477,33 @@ getstateval(struct cf_torrentstate *state, char *line) {
   *end = '\0';
 
   /* if it's a key we recognize then save the data */
-  if(0 == strcmp(line, "torrent"))
-    state->ts_torrent = g_strcompress(start);
-  else if(0 == strcmp(line, "dir"))
-    state->ts_directory = g_strcompress(start);
-  else if(0 == strcmp(line, "paused"))
-    state->ts_paused = strbool(start);
+  if(0 == strcmp(line, "torrent") || 0 == strcmp(line, "dir") ||
+     0 == strcmp(line, "paused")) {
+    cf_benc_append(state, TYPE_STR, 6);
+    state->val.l.vals[state->val.l.count-1].val.s.s = g_strdup(line);
+    state->val.l.vals[state->val.l.count-1].val.s.i = strlen(line);
+    if('p' == *line) {
+      cf_benc_append(state, TYPE_INT, 6);
+      state->val.l.vals[state->val.l.count-1].val.i = strbool(start);
+    } else {
+      cf_benc_append(state, TYPE_STR, 6);
+      state->val.l.vals[state->val.l.count-1].val.s.s = g_strdup(start);
+      state->val.l.vals[state->val.l.count-1].val.s.i = strlen(start);
+    }
+  }
 
   /* return a pointer to just past the end of the value */
   return end + 1;
 }
 
-gboolean
-cf_savestate(GList *torrents, char **errstr) {
-  char *file = g_build_filename(gl_confdir, FILE_STATE, NULL);
-  char *tmpfile = g_build_filename(gl_confdir, FILE_STATE_TMP, NULL);
-  GIOChannel *io = NULL;
-  GError *err;
-  int fd;
-  char *torrentfile, *torrentdir, *line;
-  gsize written;
-  gboolean paused;
-  GIOStatus res;
-  tr_stat_t *sb;
-  tr_info_t *in;
-
+void
+cf_savestate(benc_val_t *state, char **errstr) {
   *errstr = NULL;
-
-  if(0 > (fd = lockfile(tmpfile, errstr))) {
-    g_free(errstr);
-    *errstr = g_strdup_printf(_("Failed to open or lock the file %s:\n%s"),
-                              tmpfile, strerror(errno));
-    goto done;
-  }
-
-#ifdef NDEBUG
-  ftruncate(fd, 0);
-#else
-  assert(0 == ftruncate(fd, 0));
-#endif
-
-  io = g_io_channel_unix_new(fd);
-  g_io_channel_set_close_on_unref(io, TRUE);
-
-  err = NULL;
-  while(NULL != torrents) {
-    sb = tr_torrentStat(torrents->data);
-    in = tr_torrentInfo(torrents->data);
-    paused = (TR_STATUS_INACTIVE & sb->status);
-    torrentfile = g_strescape(in->torrent, "");
-    torrentdir = g_strescape(tr_torrentGetFolder(torrents->data), "");
-    /* g_strcompress */
-    line = g_strdup_printf("torrent=\"%s\" dir=\"%s\" paused=\"%s\"%c",
-                           torrentfile, torrentdir, (paused ? "yes" : "no"),
-                           STATE_SEP);
-    res = g_io_channel_write_chars(io, line, strlen(line), &written, &err);
-    g_free(torrentfile);
-    g_free(torrentdir);
-    g_free(line);
-    switch(res) {
-      case G_IO_STATUS_ERROR:
-        goto done;
-      case G_IO_STATUS_NORMAL:
-        break;
-      default:
-        assert(!"unknown return code");
-        goto done;
-    }
-    torrents = torrents->next;
-  }
-  if(NULL != err ||
-     G_IO_STATUS_ERROR == g_io_channel_shutdown(io, TRUE, &err)) {
-    *errstr = g_strdup_printf(_("Error while writing to the file %s:\n%s"),
-                              tmpfile, err->message);
-    g_error_free(err);
-    goto done;
-  }
-
-  if(0 > rename(tmpfile, file)) {
-    *errstr = g_strdup_printf(_("Failed to rename the file %s to %s:\n%s"),
-                              tmpfile, file, strerror(errno));
-    goto done;
-  }
-
- done:
-  g_free(file);
-  g_free(tmpfile);
-  if(NULL != io)
-    g_io_channel_unref(io);
-
-  return NULL == *errstr;
+  cf_writebenc(FILE_STATE, FILE_STATE_TMP, state, errstr);
 }
 
 void
-cf_freestate(struct cf_torrentstate *state) {
-  if(NULL != state->ts_torrent)
-    g_free(state->ts_torrent);
-  if(NULL != state->ts_directory)
-    g_free(state->ts_directory);
+cf_freestate(benc_val_t *state) {
+  tr_bencFree(state);
   g_free(state);
 }

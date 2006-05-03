@@ -30,8 +30,7 @@
 #include "util.h"
 
 void
-ipc_socket_setup(void *wind, add_torrent_func_t addfunc,
-                 torrents_added_func_t donefunc, void *cbdata);
+ipc_socket_setup(void *wind, add_torrents_func_t addfunc, void *cbdata);
 
 gboolean
 ipc_sendfiles_blocking(GList *files);

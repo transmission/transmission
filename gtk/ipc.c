@@ -37,7 +37,9 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include "transmission.h"
 #include "bencode.h"
+
 #include "conf.h"
 #include "io.h"
 #include "ipc.h"
@@ -54,8 +56,7 @@ enum contype { CON_SERV, CON_ADDFILE };
 
 struct constate_serv {
   void *wind;
-  add_torrent_func_t addfunc;
-  torrents_added_func_t donefunc;
+  add_torrents_func_t addfunc;
   void *cbdata;
 };
 
@@ -82,8 +83,7 @@ struct constate {
 };
 
 void
-ipc_socket_setup(void *parent, add_torrent_func_t addfunc,
-                 torrents_added_func_t donefunc, void *cbdata);
+ipc_socket_setup(void *parent, add_torrents_func_t addfunc, void *cbdata);
 gboolean
 ipc_sendfiles_blocking(GList *files);
 static void
@@ -126,8 +126,7 @@ static const struct handlerdef gl_funcs_addfile[] = {
 static char *gl_sockpath = NULL;
 
 void
-ipc_socket_setup(void *parent, add_torrent_func_t addfunc,
-                 torrents_added_func_t donefunc, void *cbdata) {
+ipc_socket_setup(void *parent, add_torrents_func_t addfunc, void *cbdata) {
   struct constate *con;
 
   con = g_new0(struct constate, 1);
@@ -137,7 +136,6 @@ ipc_socket_setup(void *parent, add_torrent_func_t addfunc,
   con->type = CON_SERV;
   con->u.serv.wind = parent;
   con->u.serv.addfunc = addfunc;
-  con->u.serv.donefunc = donefunc;
   con->u.serv.cbdata = cbdata;
   
   serv_bind(con);
@@ -378,33 +376,18 @@ all_io_closed(GSource *source SHUTUP, void *vdata) {
 static void
 srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
   struct constate_serv *srv = &con->u.serv;
-  GList *errs = NULL;
-  char *str;
+  GList *files;
   int ii;
-  gboolean added;
-  benc_val_t *file;
 
   if(TYPE_LIST == val->type) {
-    added = FALSE;
-    for(ii = 0; ii < val->val.l.count; ii++) {
-      file = &val->val.l.vals[ii];
-      if(TYPE_STR == file->type && g_utf8_validate(file->val.s.s, -1, NULL)) {
-        /* XXX somehow escape invalid utf-8 */
-        added = TRUE;
-        srv->addfunc(srv->cbdata, file->val.s.s, NULL, FALSE, &errs);
-      }
-    }
-
-    if(NULL != errs) {
-      str = joinstrlist(errs, "\n");
-      errmsg(srv->wind, ngettext("Failed to load the torrent file %s",
-                                 "Failed to load the torrent files:\n%s",
-                                 g_list_length(errs)), str);
-      freestrlist(errs);
-      g_free(str);
-    }
-    if(added)
-      srv->donefunc(srv->cbdata);
+    files = NULL;
+    for(ii = 0; ii < val->val.l.count; ii++)
+      if(TYPE_STR == val->val.l.vals[ii].type &&
+         /* XXX somehow escape invalid utf-8 */
+         g_utf8_validate(val->val.l.vals[ii].val.s.s, -1, NULL))
+        files = g_list_append(files, val->val.l.vals[ii].val.s.s);
+    srv->addfunc(srv->cbdata, NULL, files, NULL, NULL);
+    g_list_free(files);
   }
 }
 

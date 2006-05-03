@@ -45,13 +45,12 @@ struct prefdata {
   GtkSpinButton *ulimit;
   GtkFileChooser *dir;
   GtkWindow *parent;
-  tr_handle_t *tr;
+  TrBackend *back;
 };
 
 struct addcb {
-  add_torrent_func_t addfunc;
+  add_torrents_func_t addfunc;
   GtkWindow *parent;
-  torrents_added_func_t donefunc;
   void *data;
   gboolean autostart;
   gboolean usingaltdir;
@@ -64,6 +63,8 @@ windclosed(GtkWidget *widget SHUTUP, gpointer gdata);
 static void
 clicklimitbox(GtkWidget *widget, gpointer gdata);
 static void
+freedata(gpointer gdata, GClosure *closure);
+static void
 clickdialog(GtkWidget *widget, int resp, gpointer gdata);
 static void
 autoclick(GtkWidget *widget, gpointer gdata);
@@ -73,7 +74,7 @@ static void
 addresp(GtkWidget *widget, gint resp, gpointer gdata);
 
 void
-makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
+makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   char *title = g_strdup_printf(_("%s Preferences"), g_get_application_name());
   GtkWidget *wind = gtk_dialog_new_with_buttons(title, parent,
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
@@ -119,7 +120,8 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
   data->ulimit = GTK_SPIN_BUTTON(lim[1].num);
   data->dir = GTK_FILE_CHOOSER(dirstr);
   data->parent = parent;
-  data->tr = tr;
+  data->back = back;
+  g_object_ref(G_OBJECT(back));
 
 #define RN(n) (n), (n) + 1
 
@@ -175,7 +177,7 @@ makeprefwindow(GtkWindow *parent, tr_handle_t *tr, gboolean *opened) {
 
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect_data(wind, "response", G_CALLBACK(clickdialog),
-                        data, (GClosureNotify)g_free, 0);
+                        data, freedata, 0);
   g_signal_connect(wind, "destroy", G_CALLBACK(windclosed), opened);
   gtk_widget_show_all(wind);
 }
@@ -195,6 +197,14 @@ clicklimitbox(GtkWidget *widget, gpointer gdata) {
   for(ii = 0; 2 > ii; ii++)
     gtk_widget_set_sensitive(widgets[ii],
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
+}
+
+static void
+freedata(gpointer gdata, GClosure *closure SHUTUP) {
+  struct prefdata *data = gdata;
+
+  g_object_unref(G_OBJECT(data->back));
+  g_free(data);
 }
 
 static void
@@ -244,15 +254,17 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
     cf_setpref(PREF_UPLIMIT, strnum);
 
     /* save prefs */
-    if(!cf_saveprefs(&errstr)) {
+    cf_saveprefs(&errstr);
+    if(NULL != errstr) {
       errmsg(data->parent, "%s", errstr);
       g_free(strnum);
       g_free(errstr);
     }
 
     /* XXX would be nice to have errno strings, are they printed to stdout? */
-    tr_setBindPort(data->tr, gtk_spin_button_get_value_as_int(data->port));
-    setlimit(data->tr);
+    tr_setBindPort(tr_backend_handle(data->back),
+                   gtk_spin_button_get_value_as_int(data->port));
+    setlimit(data->back);
   }
 
   if(GTK_RESPONSE_APPLY != resp)
@@ -260,7 +272,7 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
 }
 
 void
-setlimit(tr_handle_t *tr) {
+setlimit(TrBackend *back) {
   struct { void (*func)(tr_handle_t*, int);
     const char *use; const char *num; gboolean defuse; long def; } lim[] = {
     {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,
@@ -270,6 +282,7 @@ setlimit(tr_handle_t *tr) {
   };
   const char *pref;
   unsigned int ii;
+  tr_handle_t *tr = tr_backend_handle(back);
 
   for(ii = 0; ii < ALEN(lim); ii++) {
     pref = cf_getpref(lim[ii].use);
@@ -283,8 +296,7 @@ setlimit(tr_handle_t *tr) {
 }
 
 void
-makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
-            torrents_added_func_t donefunc, void *cbdata) {
+makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   GtkWidget *wind = gtk_file_chooser_dialog_new(_("Add a Torrent"), parent,
     GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
@@ -303,7 +315,6 @@ makeaddwind(GtkWindow *parent, add_torrent_func_t addfunc,
 
   data->addfunc = addfunc;
   data->parent = parent;
-  data->donefunc = donefunc;
   data->data = cbdata;
   data->autostart = TRUE;
   data->usingaltdir = FALSE;
@@ -360,22 +371,24 @@ static void
 addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   struct addcb *data = gdata;
   GSList *files, *ii;
-  gboolean added = FALSE;
-  char *dir = NULL;
+  GList *stupidgtk;
+  gboolean paused;
+  char *dir;
 
   if(GTK_RESPONSE_ACCEPT == resp) {
+    dir = NULL;
     if(data->usingaltdir)
       dir = gtk_file_chooser_get_filename(data->altdir);
     files = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(widget));
+    stupidgtk = NULL;
     for(ii = files; NULL != ii; ii = ii->next)
-      if(data->addfunc(data->data, ii->data, dir,
-                       /* XXX need to group errors here */
-                       !data->autostart, NULL))
-        added = TRUE;
-    if(added)
-      data->donefunc(data->data);
+      stupidgtk = g_list_append(stupidgtk, ii->data);
+    paused = !data->autostart;
+    data->addfunc(data->data, NULL, stupidgtk, dir, &paused);
     if(NULL != dir)
       g_free(dir);
+    g_slist_free(files);
+    freestrlist(stupidgtk);
   }
 
   gtk_widget_destroy(widget);
@@ -418,7 +431,7 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   } while(0)
 
 void
-makeinfowind(GtkWindow *parent, tr_torrent_t *tor) {
+makeinfowind(GtkWindow *parent, TrTorrent *tor) {
   tr_stat_t *sb;
   tr_info_t *in;
   GtkWidget *wind, *label;
@@ -427,8 +440,10 @@ makeinfowind(GtkWindow *parent, tr_torrent_t *tor) {
   const int rowcount = 14;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
 
-  sb = tr_torrentStat(tor);
-  in = tr_torrentInfo(tor);
+  /* XXX should use model and update this window regularly */
+
+  sb = tr_torrent_stat(tor);
+  in = tr_torrent_info(tor);
   str = g_strdup_printf(_("%s Properties"), in->name);
   wind = gtk_dialog_new_with_buttons(str, parent,
     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
@@ -474,7 +489,7 @@ makeinfowind(GtkWindow *parent, tr_torrent_t *tor) {
 
   INFOSEP(table, ii);
 
-  INFOLINE(table, ii, _("Directory:"), tr_torrentGetFolder(tor));
+  INFOLINE(table, ii, _("Directory:"), tr_torrentGetFolder(tr_torrent_handle(tor)));
   INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb->downloaded));
   INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb->uploaded));
 

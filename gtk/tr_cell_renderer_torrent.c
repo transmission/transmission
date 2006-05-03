@@ -28,7 +28,7 @@
 
 #include <gtk/gtk.h>
 
-#include "trcellrenderertorrent.h"
+#include "tr_cell_renderer_torrent.h"
 #include "util.h"
 
 enum { PROP_0, PROP_VALUE, PROP_TEXT, PROP_LABEL }; 
