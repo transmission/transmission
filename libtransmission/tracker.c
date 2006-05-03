@@ -440,12 +440,11 @@ static void recvAnswer( tr_tracker_t * tc )
     }
     bodylen = tc->pos - (body - tc->buf);
 
-    /* Find the beginning of the dictionary */
+    /* Find and load the dictionary */
     for( i = 0; i < bodylen; i++ )
     {
-        if( body[i] == 'd' )
+        if( !tr_bencLoad( &body[i], bodylen - i, &beAll, NULL ) )
         {
-            /* This must be it */
             break;
         }
     }
@@ -457,14 +456,7 @@ static void recvAnswer( tr_tracker_t * tc )
             tc->lastAttempt = TC_ATTEMPT_OK;
             goto nodict;
         }
-        tr_err( "Tracker: no dictionary in answer" );
-        tc->lastAttempt = TC_ATTEMPT_ERROR;
-        return;
-    }
-
-    if( tr_bencLoad( &body[i], bodylen - i, &beAll, NULL ) )
-    {
-        tr_err( "Tracker: error parsing bencoded data" );
+        tr_err( "Tracker: no valid dictionary found in answer" );
         tc->lastAttempt = TC_ATTEMPT_ERROR;
         return;
     }
