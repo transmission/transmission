@@ -24,7 +24,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -173,7 +172,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   ii++;
 
 #undef RN
-  assert(rowcount == ii);
+  g_assert(rowcount == ii);
 
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect_data(wind, "response", G_CALLBACK(clickdialog),
@@ -495,7 +494,7 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
 
   INFOSEP(table, ii);
 
-  assert(rowcount == ii);
+  g_assert(rowcount == ii);
 
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect(G_OBJECT(wind), "response",

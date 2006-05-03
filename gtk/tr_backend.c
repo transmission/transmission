@@ -135,8 +135,6 @@ tr_backend_dispose(GObject *obj) {
     return;
   self->disposed = TRUE;
 
-  fprintf(stderr, "back dispose %p\n", self);
-
   if(NULL != self->torrents) {
     for(ii = self->torrents; NULL != ii; ii = ii->next)
       g_object_weak_unref(ii->data, tr_backend_torrent_finalized, self);
@@ -152,8 +150,6 @@ static void
 tr_backend_finalize(GObject *obj) {
   GObjectClass *parent = g_type_class_peek(g_type_parent(TR_BACKEND_TYPE));
   TrBackend *self = (TrBackend *)obj;
-
-  fprintf(stderr, "back finalize %p\n", self);
 
   if(NULL != self->handle)
     tr_close(self->handle);
@@ -235,4 +231,28 @@ tr_backend_torrent_finalized(gpointer gdata, GObject *tor) {
   TR_IS_BACKEND(back);
 
   back->torrents = g_list_remove(back->torrents, tor);
+}
+
+void
+tr_backend_stop_torrents(TrBackend *back) {
+  GList *ii;
+
+  TR_IS_BACKEND(back);
+
+  for(ii = back->torrents; NULL != ii; ii = ii->next)
+    if(TR_STATUS_ACTIVE & tr_torrent_stat(ii->data)->status)
+      tr_torrentStop(tr_torrent_handle(ii->data));
+}
+
+gboolean
+tr_backend_torrents_stopped(TrBackend *back) {
+  GList *ii;
+
+  TR_IS_BACKEND(back);
+
+  for(ii = back->torrents; NULL != ii; ii = ii->next)
+    if(TR_STATUS_ACTIVE & tr_torrent_stat(ii->data)->status)
+      return FALSE;
+
+  return TRUE;
 }

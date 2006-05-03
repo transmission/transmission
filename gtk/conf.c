@@ -25,7 +25,6 @@
 */
 
 #include <sys/types.h>
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -341,14 +340,14 @@ cf_benc_append(benc_val_t *val, char type, int incsize) {
 
 const char *
 cf_getpref(const char *name) {
-  assert(NULL != gl_prefs);
+  g_assert(NULL != gl_prefs);
 
   return g_tree_lookup(gl_prefs, name);
 }
 
 void
 cf_setpref(const char *name, const char *value) {
-  assert(NULL != gl_prefs);
+  g_assert(NULL != gl_prefs);
 
   g_tree_insert(gl_prefs, g_strdup(name), g_strdup(value));
 }

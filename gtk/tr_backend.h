@@ -48,6 +48,12 @@ tr_backend_save_state(TrBackend *back, char **errstr);
 GList *
 tr_backend_load_state(TrBackend *back, benc_val_t *state, GList **errors);
 
+void
+tr_backend_stop_torrents(TrBackend *back);
+
+gboolean
+tr_backend_torrents_stopped(TrBackend *back);
+
 #ifdef TR_WANT_BACKEND_PRIVATE
 void
 tr_backend_add_torrent(TrBackend *back, GObject *tor);

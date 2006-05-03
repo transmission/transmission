@@ -33,8 +33,6 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data);
 static void
 tr_torrent_dispose(GObject *obj);
 static void
-tr_torrent_finalize(GObject *obj);
-static void
 tr_torrent_set_folder(TrTorrent *tor);
 static gboolean
 tr_torrent_paused(TrTorrent *tor);
@@ -70,7 +68,6 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
   gobject_class->set_property = tr_torrent_set_property;
   gobject_class->get_property = tr_torrent_get_property;
   gobject_class->dispose = tr_torrent_dispose;
-  gobject_class->finalize = tr_torrent_finalize;
 
   pspec = g_param_spec_pointer("torrent-handle", "Torrent handle",
                                "Torrent handle from libtransmission",
@@ -178,8 +175,6 @@ tr_torrent_dispose(GObject *obj) {
     return;
   self->disposed = TRUE;
 
-  fprintf(stderr, "tor dispose %p\n", self);
-
   if(NULL != self->handle) {
     if(!tr_torrent_paused(self))
       tr_torrentStop(self->handle);
@@ -194,17 +189,6 @@ tr_torrent_dispose(GObject *obj) {
 
   /* Chain up to the parent class */
   parent->dispose(obj);
-}
-
-static void
-tr_torrent_finalize(GObject *obj) {
-  GObjectClass *parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
-  TrTorrent *self = (TrTorrent *)obj;
-
-  fprintf(stderr, "tor finalize %p\n", self);
-
-  /* Chain up to the parent class */
-  parent->finalize(obj);
 }
 
 tr_torrent_t *

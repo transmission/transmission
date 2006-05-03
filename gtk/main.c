@@ -25,7 +25,6 @@
 */
 
 #include <sys/param.h>
-#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
@@ -47,7 +46,14 @@
 #include "transmission.h"
 #include "util.h"
 
+/* time in seconds to wait for torrents to stop when exiting */
 #define TRACKER_EXIT_TIMEOUT    5
+
+/* interval in milliseconds to update the torrent list display */
+#define UPDATE_INTERVAL         500
+
+/* interval in milliseconds to check for stopped torrents and update display */
+#define EXIT_CHECK_INTERVAL     500
 
 struct cbdata {
   TrBackend *back;
@@ -72,6 +78,8 @@ readargs(int argc, char **argv);
 
 void
 makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args);
+void
+quittransmission(struct cbdata *data);
 GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
@@ -80,8 +88,6 @@ gboolean
 winclose(GtkWidget *widget, GdkEvent *event, gpointer gdata);
 gboolean
 exitcheck(gpointer gdata);
-void
-stoptransmission(struct cbdata *data);
 void
 setupdrag(GtkWidget *widget, struct cbdata *data);
 void
@@ -162,7 +168,6 @@ actionitems[] = {
 #define SIGCOUNT_MAX            3
 
 static sig_atomic_t global_sigcount = 0;
-static int global_lastsig = 0;
 
 int
 main(int argc, char **argv) {
@@ -285,7 +290,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   g_object_ref(G_OBJECT(back));
   data->back = back;
   data->wind = GTK_WINDOW(wind);
-  data->timer = -1;
+  data->timer = 0;
   /* filled in by makewind_list */
   data->model = NULL;
   data->view = NULL;
@@ -306,6 +311,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   gtk_statusbar_push(GTK_STATUSBAR(status), 0, "");
   gtk_box_pack_start(GTK_BOX(vbox), status, FALSE, FALSE, 0);
 
+  gtk_container_set_focus_child(GTK_CONTAINER(vbox), scroll);
   gtk_container_add(GTK_CONTAINER(wind), vbox);
   gtk_window_set_title(data->wind, g_get_application_name());
   g_signal_connect(G_OBJECT(wind), "delete_event", G_CALLBACK(winclose), data);
@@ -314,7 +320,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
 
   addtorrents(data, state, args, NULL, NULL);
 
-  data->timer = g_timeout_add(500, updatemodel, data);
+  data->timer = g_timeout_add(UPDATE_INTERVAL, updatemodel, data);
   updatemodel(data);
 
   gtk_widget_show_all(vbox);
@@ -332,6 +338,19 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   gtk_widget_show(wind);
 
   ipc_socket_setup(GTK_WINDOW(wind), addtorrents, data);
+}
+
+void
+quittransmission(struct cbdata *data) {
+  g_object_unref(G_OBJECT(data->back));
+  gtk_widget_destroy(GTK_WIDGET(data->wind));
+  if(0 < data->timer)
+    g_source_remove(data->timer);
+  if(NULL != data->stupidpopuphack)
+    gtk_widget_destroy(data->stupidpopuphack);
+  g_free(data->buttons);
+  g_free(data);
+  gtk_main_quit();
 }
 
 GtkWidget *
@@ -388,7 +407,7 @@ makewind_list(struct cbdata *data) {
   GtkCellRenderer *namerend, *progrend;
   char *str;
 
-  assert(MC_ROW_COUNT == ALEN(types));
+  g_assert(MC_ROW_COUNT == ALEN(types));
 
   store = gtk_list_store_newv(MC_ROW_COUNT, types);
   view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -433,35 +452,28 @@ gboolean
 winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
   struct cbdata *data = gdata;
   struct exitdata *edata;
-  tr_stat_t *st;
-  GtkTreeIter iter;
-  TrTorrent *tor;
-  gboolean going;
+  unsigned int ii;
 
-  if(0 >= data->timer)
+  /* stop the update timer */
+  if(0 < data->timer)
     g_source_remove(data->timer);
-  data->timer = -1;
+  data->timer = 0;
 
-  going = gtk_tree_model_get_iter_first(data->model, &iter);
-  while(going) {
-    gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
-    st = tr_torrent_stat(tor);
-    if(TR_STATUS_ACTIVE & st->status) {
-      tr_torrentStop(tr_torrent_handle(tor));
-      going = gtk_tree_model_iter_next(data->model, &iter);
-    } else {
-      going = gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
-    }
-    g_object_unref(G_OBJECT(tor));
-  }
+  /* try to stop all the torrents */
+  tr_backend_stop_torrents(data->back);
 
-  /* XXX should disable widgets or something */
-
-  /* try to wait until torrents stop before exiting */
+  /* set things up to wait for torrents to stop */
   edata = g_new0(struct exitdata, 1);
   edata->cbdata = data;
   edata->started = time(NULL);
-  edata->timer = g_timeout_add(500, exitcheck, edata);
+  /* check if torrents are still running */
+  if(exitcheck(edata)) {
+    /* yes, start the exit timer and disable widgets */
+    edata->timer = g_timeout_add(EXIT_CHECK_INTERVAL, exitcheck, edata);
+    for(ii = 0; ii < ALEN(actionitems); ii++)
+      gtk_widget_set_sensitive(data->buttons[ii], FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(data->view), FALSE);
+  }
 
   /* returning FALSE means to destroy the window */
   return TRUE;
@@ -470,65 +482,21 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
 gboolean
 exitcheck(gpointer gdata) {
   struct exitdata *data = gdata;
-  tr_stat_t *st;
-  GtkTreeIter iter;
-  TrTorrent *tor;
-  gboolean go;
-
-  go = gtk_tree_model_get_iter_first(data->cbdata->model, &iter);
-  while(go) {
-    gtk_tree_model_get(data->cbdata->model, &iter, MC_TORRENT, &tor, -1);
-    st = tr_torrent_stat(tor);
-    if(!(TR_STATUS_PAUSE & st->status))
-      go = gtk_tree_model_iter_next(data->cbdata->model, &iter);
-    else {
-      go = gtk_list_store_remove(GTK_LIST_STORE(data->cbdata->model), &iter);
-    }
-    g_object_unref(G_OBJECT(tor));
-  }
 
   /* keep going if we still have torrents and haven't hit the exit timeout */
-  if(0 < tr_torrentCount(tr_backend_handle(data->cbdata->back)) &&
-     time(NULL) - data->started < TRACKER_EXIT_TIMEOUT) {
-    assert(gtk_tree_model_get_iter_first(data->cbdata->model, &iter));
+  if(time(NULL) - data->started < TRACKER_EXIT_TIMEOUT &&
+     !tr_backend_torrents_stopped(data->cbdata->back)) {
     updatemodel(data->cbdata);
     return TRUE;
   }
 
   /* exit otherwise */
-
-  if(0 >= data->timer)
+  if(0 < data->timer)
     g_source_remove(data->timer);
-  data->timer = -1;
-
-  stoptransmission(data->cbdata);
-
-  gtk_widget_destroy(GTK_WIDGET(data->cbdata->wind));
-  if(NULL != data->cbdata->stupidpopuphack)
-    gtk_widget_destroy(data->cbdata->stupidpopuphack);
-  g_free(data->cbdata->buttons);
-  g_free(data->cbdata);
+  quittransmission(data->cbdata);
   g_free(data);
-  gtk_main_quit();
 
   return FALSE;
-}
-
-void
-stoptransmission(struct cbdata *data) {
-  GtkTreeIter iter;
-  TrTorrent *tor;
-  gboolean go;
-
-  go = gtk_tree_model_get_iter_first(data->model, &iter);
-  while(go) {
-    gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
-    go = gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
-    g_object_unref(G_OBJECT(tor));
-  }
-  g_assert(0 == tr_torrentCount(tr_backend_handle(data->back)));
-
-  g_object_unref(G_OBJECT(data->back));
 }
 
 void
@@ -695,7 +663,7 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     top = g_strdup_printf(_("Stopped (%.1f%%)"), prog);
   else {
     top = g_strdup("");
-    assert("XXX unknown status");
+    g_assert_not_reached();
   }
 
   if(TR_NOERROR != err) {
@@ -762,9 +730,8 @@ updatemodel(gpointer gdata) {
   char *upstr, *downstr, *str;
 
   if(0 < global_sigcount) {
-    stoptransmission(data);
-    global_sigcount = SIGCOUNT_MAX;
-    raise(global_lastsig);
+    quittransmission(data);
+    return FALSE;
   }
 
   if(gtk_tree_model_get_iter_first(data->model, &iter)) {
@@ -928,18 +895,19 @@ actionclick(GtkWidget *widget, gpointer gdata) {
   for(info.off = 0; info.off < ALEN(actionitems); info.off++)
     if(actionitems[info.off].act == info.act)
       break;
-  assert(info.off < ALEN(actionitems));
+  g_assert(info.off < ALEN(actionitems));
 
   gtk_tree_selection_selected_foreach(sel, popupaction, &info);
 
   for(ii = info.dead; NULL != ii; ii = ii->next) {
-    assert(gtk_tree_row_reference_valid(ii->data));
+    g_assert(gtk_tree_row_reference_valid(ii->data));
     path = gtk_tree_row_reference_get_path(ii->data);
     gtk_tree_selection_unselect_path(info.sel, path);
     if(gtk_tree_model_get_iter(data->model, &iter, path))
        gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
-    else
-      assert(!"bad path");
+    else {
+      g_assert_not_reached();
+    }
     gtk_tree_path_free(path);
     gtk_tree_row_reference_free(ii->data);
   }
@@ -1140,8 +1108,6 @@ setupsighandlers(void) {
 void
 fatalsig(int sig) {
   struct sigaction sa;
-
-  global_lastsig = sig;
 
   if(SIGCOUNT_MAX <= ++global_sigcount) {
     bzero(&sa, sizeof(sa));
