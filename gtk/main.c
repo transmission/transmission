@@ -238,7 +238,8 @@ main(int argc, char **argv) {
 
       makewind(mainwind, back, state, argfiles);
 
-      cf_freestate(state);
+      if(NULL != state)
+        cf_freestate(state);
       g_object_unref(back);
 
       if(NULL != preferr)
