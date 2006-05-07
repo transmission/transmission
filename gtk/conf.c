@@ -432,11 +432,11 @@ writefile_traverse(gpointer key, gpointer value, gpointer data) {
   *ptr = (*ptr) + 2;
 
   bkey->type = TYPE_STR;
-  bkey->val.s.s = key;
+  bkey->val.s.s = g_strdup(key);
   bkey->val.s.i = strlen(key);
 
   bval->type = TYPE_STR;
-  bval->val.s.s = value;
+  bval->val.s.s = g_strdup(value);
   bval->val.s.i = strlen(value);
 
   return FALSE;
