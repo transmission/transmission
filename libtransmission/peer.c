@@ -58,7 +58,16 @@ struct tr_peer_s
 
     uint8_t        id[20];
 
+    /* The pieces that the peer has */
     uint8_t      * bitfield;
+
+    int            goodPcs;
+    int            badPcs;
+    int            banned;
+    /* The pieces that the peer is contributing to */
+    uint8_t      * blamefield;
+    /* The bad pieces that the peer has contributed to */
+    uint8_t      * banfield;
 
     uint8_t      * buf;
     int            size;
@@ -163,6 +172,14 @@ void tr_peerDestroy( tr_fd_t * fdlimit, tr_peer_t * peer )
     if( peer->bitfield )
     {
         free( peer->bitfield );
+    }
+    if( peer->blamefield )
+    {
+        free( peer->blamefield );
+    }
+    if( peer->banfield )
+    {
+        free( peer->banfield );
     }
     if( peer->buf )
     {
@@ -409,7 +426,7 @@ writeEnd:
             continue;
         }
 
-        if( peer->amInterested && !peer->peerChoking )
+        if( peer->amInterested && !peer->peerChoking && !peer->banned )
         {
             int block;
             while( peer->inRequestCount < OUR_REQUEST_COUNT )
@@ -511,4 +528,54 @@ void tr_peerSetOptimistic( tr_peer_t * peer, int o )
 int tr_peerIsOptimistic( tr_peer_t * peer )
 {
     return peer->optimistic;
+}
+
+static inline int peerIsBad( tr_peer_t * peer )
+{
+    if( peer->goodPcs >= 5 &&
+        peer->badPcs >= ( peer->goodPcs * 3 ) )
+    {
+        /* need poor success rate if we've successfully downloaded before */
+        return 1;
+    }
+    else if( peer->goodPcs < 5 &&
+             peer->badPcs >= ( 10 + peer->goodPcs ) )
+    {
+        /* need 10 more bad pieces than good before we discard peer */
+        return 1;
+    }
+    return 0;
+}
+
+void tr_peerBlame( tr_torrent_t * tor, tr_peer_t * peer,
+                   int piece, int success )
+{
+    if( !peer->blamefield || !tr_bitfieldHas( peer->blamefield, piece ) )
+    {
+        return;
+    }
+
+    if( success )
+    {
+        peer->goodPcs++;
+    }
+    else
+    {
+        peer->badPcs++;
+
+        if( !peer->banfield )
+        {
+            peer->banfield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
+        }
+        tr_bitfieldAdd( peer->banfield, piece );
+
+        if( peerIsBad( peer ) )
+        {
+            /* Full ban */
+            peer_dbg( "banned (%d / %d)", peer->goodPcs, peer->badPcs );
+            peer->banned = 1;
+            peer->peerInterested = 0;
+        }
+    }
+    tr_bitfieldRem( peer->blamefield, piece );
 }

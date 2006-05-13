@@ -267,6 +267,11 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
             /* The peer doesn't have this piece */
             continue;
         }
+        if( peer->banfield && tr_bitfieldHas( peer->banfield, i ) )
+        {
+            /* The peer is banned for this piece */
+            continue;
+        }
 
         /* We are interested in this piece, remember it */
         if( missingBlocks < minMissing )
@@ -345,6 +350,11 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
         if( !tr_bitfieldHas( peer->bitfield, i ) )
         {
             /* The peer doesn't have this piece */
+            continue;
+        }
+        if( peer->banfield && tr_bitfieldHas( peer->banfield, i ) )
+        {
+            /* The peer is banned for this piece */
             continue;
         }
         if( tr_cpPieceIsComplete( tor->completion, i ) )

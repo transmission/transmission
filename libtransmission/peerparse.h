@@ -280,6 +280,13 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return 0;
     }
 
+    /* set blame/credit for this piece */
+    if( !peer->blamefield )
+    {
+        peer->blamefield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
+    }
+    tr_bitfieldAdd( peer->blamefield, index );
+
     tr_cpBlockAdd( tor->completion, block );
     tr_ioWrite( tor->io, index, begin, len - 9, &p[8] );
     tr_cpDownloaderRem( tor->completion, block );
@@ -448,6 +455,13 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
     int       len;
     uint8_t * p   = peer->buf;
     uint8_t * end = &p[peer->pos];
+
+    if( peer->banned )
+    {
+        /* Don't even parse, we only stay connected */
+        peer->pos = 0;
+        return 0;
+    }
 
     while( peer->pos >= 4 )
     {

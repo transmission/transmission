@@ -107,7 +107,7 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &io->tor->info;
     uint64_t       offset;
-    int            i;
+    int            i, hashFailed;
     uint8_t        hash[SHA_DIGEST_LENGTH];
     uint8_t      * pieceBuf;
     int            pieceSize;
@@ -147,7 +147,8 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
     SHA1( pieceBuf, pieceSize, hash );
     free( pieceBuf );
 
-    if( memcmp( hash, &inf->pieces[20*index], SHA_DIGEST_LENGTH ) )
+    hashFailed = memcmp( hash, &inf->pieces[20*index], SHA_DIGEST_LENGTH );
+    if( hashFailed )
     {
         tr_inf( "Piece %d (slot %d): hash FAILED", index,
                 io->pieceSlot[index] );
@@ -163,6 +164,12 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
         tr_inf( "Piece %d (slot %d): hash OK", index,
                 io->pieceSlot[index] );
         tr_cpPieceAdd( tor->completion, index );
+    }
+
+    /* Assign blame or credit to peers */
+    for( i = 0; i < tor->peerCount; i++ )
+    {
+        tr_peerBlame( tor, tor->peers[i], index, !hashFailed );
     }
 
     return 0;
