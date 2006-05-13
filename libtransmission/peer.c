@@ -532,19 +532,12 @@ int tr_peerIsOptimistic( tr_peer_t * peer )
 
 static inline int peerIsBad( tr_peer_t * peer )
 {
-    if( peer->goodPcs >= 5 &&
-        peer->badPcs >= ( peer->goodPcs * 3 ) )
-    {
-        /* need poor success rate if we've successfully downloaded before */
-        return 1;
-    }
-    else if( peer->goodPcs < 5 &&
-             peer->badPcs >= ( 10 + peer->goodPcs ) )
-    {
-        /* need 10 more bad pieces than good before we discard peer */
-        return 1;
-    }
-    return 0;
+    return ( peer->badPcs > 4 + 2 * peer->goodPcs );
+}
+
+static inline int peerIsGood( tr_peer_t * peer )
+{
+    return ( peer->goodPcs > 3 * peer->badPcs );
 }
 
 void tr_peerBlame( tr_torrent_t * tor, tr_peer_t * peer,
@@ -558,11 +551,19 @@ void tr_peerBlame( tr_torrent_t * tor, tr_peer_t * peer,
     if( success )
     {
         peer->goodPcs++;
+
+        if( peer->banfield && peerIsGood( peer ) )
+        {
+            /* Assume the peer wasn't responsible for the bad pieces
+               we was banned for */
+            memset( peer->banfield, 0x00, ( tor->info.pieceCount + 7 ) / 8 );
+        }
     }
     else
     {
         peer->badPcs++;
 
+        /* Ban the peer for this piece */
         if( !peer->banfield )
         {
             peer->banfield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
