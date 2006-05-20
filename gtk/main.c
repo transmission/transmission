@@ -419,8 +419,10 @@ makewind_list(struct cbdata *data) {
 
   namerend = gtk_cell_renderer_text_new();
   col = gtk_tree_view_column_new_with_attributes(_("Name"), namerend, NULL);
+  g_object_set(namerend, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
   gtk_tree_view_column_set_cell_data_func(col, namerend, dfname, NULL, NULL);
   gtk_tree_view_column_set_expand(col, TRUE);
+  gtk_tree_view_column_set_resizable(col, TRUE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
   progrend = tr_cell_renderer_torrent_new();
@@ -430,6 +432,7 @@ makewind_list(struct cbdata *data) {
   g_free(str);
   col = gtk_tree_view_column_new_with_attributes(_("Progress"), progrend, NULL);
   gtk_tree_view_column_set_cell_data_func(col, progrend, dfprog, NULL, NULL);
+  gtk_tree_view_column_set_resizable(col, TRUE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
   /* XXX this shouldn't be necessary */
