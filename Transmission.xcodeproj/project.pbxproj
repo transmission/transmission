@@ -34,7 +34,6 @@
 		4D1838D309DEC0430047D688 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838B409DEC0430047D688 /* platform.c */; };
 		4D1838D409DEC0430047D688 /* peerutils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B509DEC0430047D688 /* peerutils.h */; };
 		4D1838D509DEC0430047D688 /* peerparse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B609DEC0430047D688 /* peerparse.h */; };
-		4D1838D609DEC0430047D688 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		4D1838D709DEC0430047D688 /* bencode.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838B809DEC0430047D688 /* bencode.c */; };
 		4D1838D809DEC0430047D688 /* completion.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B909DEC0430047D688 /* completion.h */; };
 		4D1838D909DEC0430047D688 /* completion.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838BA09DEC0430047D688 /* completion.c */; };
@@ -77,20 +76,16 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
+		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
+		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
+		A27A53660A06AEDB00E1F16F /* StatusBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.tiff */; };
 		A2A84AD00A04FCD000C898D4 /* ActionButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */; };
+		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildStyle section */
-		4A9504CCFFE6A4B311CA0CBA /* Debug */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-/* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
 		4D1838E509DEC1170047D688 /* PBXContainerItemProxy */ = {
@@ -193,10 +188,16 @@
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
+		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
+		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A21610FA0A050B1700E8E4C1 /* MenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MenuButton.h; path = macosx/MenuButton.h; sourceTree = "<group>"; };
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
+		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
+		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
+		A27A53640A06AED200E1F16F /* StatusBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StatusBorder.tiff; path = macosx/Images/StatusBorder.tiff; sourceTree = "<group>"; };
+		A27A53650A06AEDB00E1F16F /* StatusBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StatusBorder.tiff; path = macosx/Images/StatusBorder.tiff; sourceTree = "<group>"; };
 		A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButton.tiff; path = macosx/Images/ActionButton.tiff; sourceTree = "<group>"; };
-		A2A84AD10A04FCDC00C898D4 /* ActionButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButton.tiff; path = macosx/Images/ActionButton.tiff; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
 		A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -235,6 +236,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
+				A200B83A0A2263BA007BBB1E /* InfoWindowController.m */,
 				4DF0C5A90899190500DD8943 /* Controller.m */,
 				4DF0C5AA0899190500DD8943 /* Controller.h */,
 				4D118E1808CB46B20033958F /* PrefsController.h */,
@@ -282,7 +285,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A2A84AD10A04FCDC00C898D4 /* ActionButton.tiff */,
+				A27A53640A06AED200E1F16F /* StatusBorder.tiff */,
+				A27A53420A06A62500E1F16F /* StatusSep.png */,
 				A2A84AD20A04FCDC00C898D4 /* BottomBorder.tiff */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
@@ -306,8 +310,12 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
-				A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */,
+				A200B9620A227FD0007BBB1E /* InfoWindow.nib */,
 				A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */,
+				A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */,
+				A2A84ACF0A04FCD000C898D4 /* ActionButton.tiff */,
+				A27A53560A06A76400E1F16F /* StatusSep.png */,
+				A27A53650A06AEDB00E1F16F /* StatusBorder.tiff */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -413,12 +421,12 @@
 				4D1838D209DEC0430047D688 /* platform.h in Headers */,
 				4D1838D409DEC0430047D688 /* peerutils.h in Headers */,
 				4D1838D509DEC0430047D688 /* peerparse.h in Headers */,
-				4D1838D609DEC0430047D688 /* bencode.h in Headers */,
 				4D1838D809DEC0430047D688 /* completion.h in Headers */,
 				4D1838DA09DEC0430047D688 /* clients.h in Headers */,
 				4D1838FA09DEC4380047D688 /* utils.h in Headers */,
 				4D1838FC09DEC4380047D688 /* transmission.h in Headers */,
 				A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */,
+				A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,9 +443,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				PRODUCT_NAME = transmission;
-			};
 			dependencies = (
 			);
 			name = libtransmission;
@@ -454,14 +459,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = "$(HOME)/bin";
-				PREBINDING = NO;
-				PRODUCT_NAME = transmissioncli;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 				4D9A2BF509E16D30002D0FF9 /* PBXTargetDependency */,
 			);
@@ -480,11 +477,6 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				INFOPLIST_FILE = Info.plist;
-				PRODUCT_NAME = Transmission;
-				WRAPPER_EXTENSION = app;
-			};
 			dependencies = (
 				4D1838E609DEC1170047D688 /* PBXTargetDependency */,
 			);
@@ -500,11 +492,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				4A9504CCFFE6A4B311CA0CBA /* Debug */,
-			);
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -522,6 +509,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
+				A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				4DF7500C08A103AD007B0D70 /* Open.png in Resources */,
 				4DF7500D08A103AD007B0D70 /* Info.png in Resources */,
@@ -544,6 +532,8 @@
 				4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */,
 				A2A84AD00A04FCD000C898D4 /* ActionButton.tiff in Resources */,
 				A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */,
+				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
+				A27A53660A06AEDB00E1F16F /* StatusBorder.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +583,7 @@
 				4DFBC2DF09C0970D00D5C571 /* Torrent.m in Sources */,
 				4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */,
 				A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */,
+				A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,6 +619,14 @@
 			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
+		A200B9620A227FD0007BBB1E /* InfoWindow.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A200B9630A227FD0007BBB1E /* English */,
+			);
+			name = InfoWindow.nib;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -640,11 +639,12 @@
 					"-D_GNU_SOURCE",
 					"-DVERSION_MAJOR=0",
 					"-DVERSION_MINOR=5",
-					"-DVERSION_STRING=\"0.6-svn\"",
+					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 				);
+				OTHER_CFLAGS_QUOTED_1 = "-DVERSION_STRING=\\\"0.6-svn\\\"";
 				PRODUCT_NAME = transmission;
 			};
 			name = Debug;
@@ -660,11 +660,12 @@
 					"-D_GNU_SOURCE",
 					"-DVERSION_MAJOR=0",
 					"-DVERSION_MINOR=5",
-					"-DVERSION_STRING=\"0.6-svn\"",
+					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 				);
+				OTHER_CFLAGS_QUOTED_1 = "-DVERSION_STRING=\\\"0.6-svn\\\"";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Debug;
