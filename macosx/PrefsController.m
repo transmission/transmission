@@ -24,9 +24,6 @@
 #import "StringAdditions.h"
 #import "Utils.h"
 
-#define MIN_PORT            1
-#define MAX_PORT            65535
-
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
@@ -36,11 +33,13 @@
 #define UPDATE_NEVER        2
 
 #define TOOLBAR_GENERAL     @"General"
+#define TOOLBAR_TRANSFERS    @"Transfers"
 #define TOOLBAR_NETWORK     @"Network"
 
 @interface PrefsController (Private)
 
 - (void) showGeneralPref: (id) sender;
+- (void) showTransfersPref: (id) sender;
 - (void) showNetworkPref: (id) sender;
 
 - (void) setPrefView: (NSView *) view;
@@ -61,7 +60,7 @@
                 ofType: @"plist"]]];
 }
 
-- (void)dealloc
+- (void) dealloc
 {
     [fDownloadFolder release];
     [super dealloc];
@@ -75,14 +74,12 @@
     [fPrefsWindow setToolbar: fToolbar];
     [fToolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [fToolbar setSizeMode: NSToolbarSizeModeRegular];
-    [[fPrefsWindow standardWindowButton: NSWindowToolbarButton]
-        setFrame: NSZeroRect];
 
-    if( [fToolbar respondsToSelector: @selector(setSelectedItemIdentifier:) ] )
-        [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
-    [self setPrefView: fGeneralView];
+    [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
+    [self showGeneralPref: nil];
 
     fDefaults = [NSUserDefaults standardUserDefaults];
+    fHandle = handle;
     
     //set download folder
     NSString * downloadChoice  = [fDefaults stringForKey: @"DownloadChoice"];
@@ -133,7 +130,7 @@
     
     tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
 
-    //set download limit
+	//set download limit
     BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
     int downloadLimit = [fDefaults integerForKey: @"DownloadLimit"];
     
@@ -150,6 +147,20 @@
     
     tr_setDownloadLimit( fHandle, checkDownload ? downloadLimit : -1 );
     
+    //set ratio limit
+    BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
+    float ratioLimit = [fDefaults floatForKey: @"RatioLimit"];
+
+    [fRatioCheck setState: ratioCheck ? NSOnState : NSOffState];
+    [fRatioField setEnabled: ratioCheck];
+    [fRatioField setFloatValue: ratioLimit];
+    
+    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.1f)", ratioLimit]];
+    if (ratioCheck)
+        [fRatioSetItem setState: NSOnState];
+    else
+        [fRatioNotSetItem setState: NSOnState];
+    
     //set remove and quit prompts
     [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"] ?
         NSOnState : NSOffState];
@@ -159,6 +170,9 @@
     //set dock badging
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
+    
+    //set auto start
+    [fAutoStartCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
 
     /* Check for update */
     NSString * versionCheck  = [fDefaults stringForKey: @"VersionCheck"];
@@ -188,6 +202,13 @@
         [item setTarget: self];
         [item setAction: @selector( showGeneralPref: )];
     }
+    else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
+    {
+        [item setLabel: TOOLBAR_TRANSFERS];
+        [item setImage: [NSImage imageNamed: @"Transfers.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( showTransfersPref: )];
+    }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: TOOLBAR_NETWORK];
@@ -204,50 +225,33 @@
     return item;
 }
 
-/* Only used on OS X >= 10.3 */
-- (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *)toolbar
+- (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar
 {
     return [self toolbarDefaultItemIdentifiers: nil];
 }
 
-- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar
+- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
     return [self toolbarAllowedItemIdentifiers: nil];
 }
 
-- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar
+- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
-            TOOLBAR_GENERAL,
-            TOOLBAR_NETWORK,
-            nil];
+            TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
+            TOOLBAR_NETWORK, nil];
 }
 
 - (void) setPort: (id) sender
 {
     int bindPort = [fPortField intValue];
     
-    //if value entered is not an int or is not in range do not change
-    if (![[fPortField stringValue] isEqualToString:
-            [NSString stringWithInt: bindPort]] 
-            || bindPort < MIN_PORT
-            || bindPort > MAX_PORT)
-    {
-        NSBeep();
-        bindPort = [fDefaults integerForKey: @"BindPort"];
-        [fPortField setIntValue: bindPort];
-    }
-    else
-    {
-        tr_setBindPort( fHandle, bindPort );
-        [fDefaults setInteger: bindPort forKey: @"BindPort"];
-    }
+    tr_setBindPort( fHandle, bindPort );
+    [fDefaults setInteger: bindPort forKey: @"BindPort"];
 }
 
 - (void) setLimit: (id) sender
 {
-    int limit = [sender intValue];
-    
     NSString * key;
     NSMenuItem * menuItem;
     if (sender == fUploadField)
@@ -261,19 +265,10 @@
         menuItem = fDownloadLimitItem;
     }
 
-    //if value entered is not an int or is less than 0 do not change
-    if (![[sender stringValue] isEqualToString:
-            [NSString stringWithInt: limit]] || limit < 0)
-    {
-        NSBeep();
-        limit = [fDefaults integerForKey: key];
-        [sender setIntValue: limit];
-    }
-    else
-    {
-        [menuItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)", limit]];
-        [fDefaults setInteger: limit forKey: key];
-    }
+    int limit = [sender intValue];
+    [fDefaults setInteger: limit forKey: key];
+    
+    [menuItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)", limit]];
 
     if( sender == fUploadField )
         tr_setUploadLimit( fHandle,
@@ -308,7 +303,8 @@
     [noLimitItem setState: !check ? NSOnState : NSOffState];
     
     [fDefaults setBool: check forKey: key];
-
+    
+    [field setIntValue: [field intValue]]; //set to valid value
     [self setLimit: field];
     
     [field setEnabled: check];
@@ -342,26 +338,60 @@
     }
 }
 
-- (void) setQuitMessage: (id) sender
+- (void) setRatio: (id) sender
 {
-    [fDefaults setBool: ( [fQuitCheck state] == NSOnState )
-        forKey: @"CheckQuit"];
+    float ratio = [sender floatValue];
+    [fDefaults setFloat: ratio forKey: @"RatioLimit"];
+    
+    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.1f)", ratio]];
 }
 
-- (void) setRemoveMessage: (id) sender
+- (void) setRatioCheck: (id) sender
 {
-    [fDefaults setBool: ( [fRemoveCheck state] == NSOnState )
-        forKey: @"CheckRemove"];
+    BOOL check = [sender state] == NSOnState;
+    
+    [fDefaults setBool: check forKey: @"RatioCheck"];
+    
+    [fRatioField setFloatValue: [fRatioField floatValue]]; //set to valid value
+    [self setRatio: fRatioField];
+    
+    [fRatioField setEnabled: check];
+    
+    [fRatioSetItem setState: check ? NSOnState : NSOffState];
+    [fRatioNotSetItem setState: !check ? NSOnState : NSOffState];
+}
+
+- (void) setRatioMenu: (id) sender
+{
+    int state = sender == fRatioSetItem ? NSOnState : NSOffState;
+                
+    [fRatioCheck setState: state];
+    [self setRatioCheck: fRatioCheck];
+}
+
+- (void) setQuickRatio: (id) sender
+{
+    float limit = [[sender title] floatValue];
+
+    [fRatioField setFloatValue: limit];
+    [self setRatioMenu: fRatioSetItem];
+}
+
+- (void) setShowMessage: (id) sender
+{
+    if (sender == fQuitCheck)
+        [fDefaults setBool: [sender state] forKey: @"CheckQuit"];
+    else if (sender == fRemoveCheck)
+        [fDefaults setBool: [fRemoveCheck state] forKey: @"CheckRemove"];
+    else;
 }
 
 - (void) setBadge: (id) sender
 {   
-    BOOL state = [sender state];
-    
     if (sender == fBadgeDownloadRateCheck)
-        [fDefaults setBool: state forKey: @"BadgeDownloadRate"];
+        [fDefaults setBool: [sender state] forKey: @"BadgeDownloadRate"];
     else if (sender == fBadgeUploadRateCheck)
-        [fDefaults setBool: state forKey: @"BadgeUploadRate"];
+        [fDefaults setBool: [sender state] forKey: @"BadgeUploadRate"];
     else;
 }
 
@@ -379,6 +409,11 @@
             [fDefaults setObject: @"Never" forKey: @"VersionCheck"];
             break;
     }
+}
+
+- (void) setAutoStart: (id) sender
+{
+    [fDefaults setBool: [sender state] forKey: @"AutoStartDownload"];
 }
 
 - (void) setDownloadLocation: (id) sender
@@ -422,6 +457,11 @@
     [self setPrefView: fGeneralView];
 }
 
+- (void) showTransfersPref: (id) sender
+{
+    [self setPrefView: fTransfersView];
+}
+
 - (void) showNetworkPref: (id) sender
 {
     [self setPrefView: fNetworkView];
@@ -435,10 +475,9 @@
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
-    if( [fToolbar respondsToSelector: @selector(selectedItemIdentifier) ] )
-        [fPrefsWindow setTitle: [fToolbar selectedItemIdentifier]];
+    [fPrefsWindow setTitle: [fToolbar selectedItemIdentifier]];
     [fPrefsWindow setContentView: fBlankView];
-    [fPrefsWindow setFrame:windowRect display: YES animate: YES];
+    [fPrefsWindow setFrame: windowRect display: YES animate: YES];
     [fPrefsWindow setContentView: view];
 }
 

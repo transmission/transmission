@@ -32,17 +32,23 @@
     BOOL         fResumeOnWake;
     NSDate       * fDate;
 
+    NSUserDefaults  * fDefaults;
+
     NSImage         * fIcon;
     NSImage         * fIconNonFlipped;
     NSMutableString * fStatusString;
     NSMutableString * fInfoString;
     NSMutableString * fDownloadString;
     NSMutableString * fUploadString;
+    
+    int     fStopRatioSetting;
+    float   fRatioLimit;
 }
 
-- (id)         initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
-- (id)         initWithPath: (NSString *) path lib: (tr_handle_t *) lib
-                        date: (NSDate *) date;
+- (id)          initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
+- (id)          initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
+- (NSDictionary *) history;
+                    
 - (void)       setFolder: (NSString *) path;
 - (NSString *) getFolder;
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
@@ -52,6 +58,15 @@
 - (void)       stop;
 - (void)       sleep;
 - (void)       wakeUp;
+
+- (float)      ratio;
+- (int)        stopRatioSetting;
+- (void)       setStopRatioSetting: (int) setting;
+- (float)      ratioLimit;
+- (void)       setRatioLimit: (float) limit;
+
+- (NSNumber *) stateSortKey;
+
 - (void)       reveal;
 - (void)       trashTorrent;
 - (void)       trashData;
@@ -65,8 +80,7 @@
 - (NSString *) announce;
 - (int)        pieceSize;
 - (int)        pieceCount;
-- (NSString *) hash1;
-- (NSString *) hash2;
+- (NSString *) hash;
 
 - (float)      progress;
 - (BOOL)       isActive;

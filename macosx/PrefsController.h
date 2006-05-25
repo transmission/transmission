@@ -30,15 +30,13 @@
     
     IBOutlet NSPanel        * fPrefsWindow;
     NSToolbar               * fToolbar;
-    IBOutlet NSView         * fGeneralView;
-    IBOutlet NSView         * fNetworkView;
-    IBOutlet NSView         * fBlankView;
+    IBOutlet NSView         * fGeneralView, * fTransfersView,
+                            * fNetworkView, * fBlankView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp;
-    IBOutlet NSButton       * fQuitCheck;
-    IBOutlet NSButton       * fRemoveCheck;
-    IBOutlet NSButton       * fBadgeDownloadRateCheck;
-    IBOutlet NSButton       * fBadgeUploadRateCheck;                            
+    IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
+                            * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
+                            * fAutoStartCheck;                           
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fPortField;
@@ -46,10 +44,13 @@
     IBOutlet NSTextField    * fUploadField;
     IBOutlet NSButton       * fDownloadCheck;
     IBOutlet NSTextField    * fDownloadField;
+    IBOutlet NSButton       * fRatioCheck;
+    IBOutlet NSTextField    * fRatioField;
     
     IBOutlet NSMenu         * fUploadMenu, * fDownloadMenu;
     IBOutlet NSMenuItem     * fUploadLimitItem, * fUploadNoLimitItem,
-                            * fDownloadLimitItem, * fDownloadNoLimitItem;
+                            * fDownloadLimitItem, * fDownloadNoLimitItem,
+                            * fRatioSetItem, * fRatioNotSetItem;
     
     IBOutlet NSWindow       * fWindow;
 
@@ -59,10 +60,10 @@
 
 - (void) setPrefsWindow: (tr_handle_t *) handle;
 
-- (void) setQuitMessage:        (id) sender;
-- (void) setRemoveMessage:      (id) sender;
+- (void) setShowMessage:        (id) sender;
 - (void) setBadge:              (id) sender;
 - (void) setUpdate:             (id) sender;
+- (void) setAutoStart:          (id) sender;
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 
@@ -71,5 +72,10 @@
 - (void) setLimit:              (id) sender;
 - (void) setLimitMenu:          (id) sender;
 - (void) setQuickSpeed:         (id) sender;
+
+- (void) setRatio:              (id) sender;
+- (void) setRatioCheck:			(id) sender;
+- (void) setRatioMenu:          (id) sender;
+- (void) setQuickRatio:         (id) sender;
 
 @end

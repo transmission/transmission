@@ -42,21 +42,17 @@
         fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
         
+        NSShadow * stringShadow = [[NSShadow alloc] init];
+        [stringShadow setShadowOffset: NSMakeSize(2, -2)];
+        [stringShadow setShadowBlurRadius: 4];
         
-        fAttributes = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+        fAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,
             [NSFont fontWithName: @"Helvetica-Bold" size: 28], NSFontAttributeName,
+            stringShadow, NSShadowAttributeName,
             nil] retain];
-
-        if( OSX_VERSION >= 10.3 )
-        {
-            NSShadow * stringShadow = [[NSShadow alloc] init];
-            [stringShadow setShadowOffset: NSMakeSize(2, -2)];
-            [stringShadow setShadowBlurRadius: 4];
-            [fAttributes setObject: stringShadow
-                forKey: NSShadowAttributeName];
-            [stringShadow release];
-        }
+        
+        [stringShadow release];
         
         fCompleted = 0;
         fSpeedShown = NO;
@@ -82,8 +78,8 @@
     NSImage * dockIcon = nil;
     NSSize iconSize = [fDockIcon size];
 
-    //set seeding and downloading badges if there was a change
-    if (completed != fCompleted)
+    //set completed badge
+    if (fCompleted != completed)
     {
         fCompleted = completed;
         
@@ -119,12 +115,10 @@
         fBadgedDockIcon = [dockIcon copy];
     }
 
-    //display upload and download rates
-    BOOL speedShown = NO;
-    if (uploadRate || downloadRate)
+    //set upload and download rate badges
+    BOOL speedShown = uploadRate || downloadRate;
+    if (speedShown)
     {
-        speedShown = YES;
-    
         NSRect badgeRect, stringRect;
         badgeRect.size = [fUploadBadge size];
         badgeRect.origin = NSZeroPoint;

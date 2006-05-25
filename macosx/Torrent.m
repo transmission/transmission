@@ -27,47 +27,53 @@
 @interface Torrent (Private)
 
 - (void) trashPath: (NSString *) path;
+- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib date: (NSDate *) date
+        stopRatioSetting: (NSNumber *) stopRatioSetting ratioLimit: (NSNumber *) ratioLimit;
 
 @end
 
 
 @implementation Torrent
 
-- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib date: (NSDate *) date
+- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
-    fLib = lib;
+    return [self initWithPath: path lib: lib
+            date: nil stopRatioSetting: nil
+            ratioLimit: nil];
+}
 
-    int error;
-    fHandle = tr_torrentInit( fLib, [path UTF8String], &error );
-    if( !fHandle )
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib
+{
+    self = [self initWithPath: [history objectForKey: @"TorrentPath"]
+            lib: lib date: [history objectForKey: @"Date"]
+            stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
+            ratioLimit: [history objectForKey: @"RatioLimit"]];
+            
+    if (self)
     {
-        [self release];
-        return nil;
+        NSString * downloadFolder;
+        if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
+            downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"]
+                                stringByExpandingTildeInPath];
+        [self setFolder: downloadFolder];
+
+        NSString * paused;
+        if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
+            [self start];
     }
-
-    fDate = [date retain];
-    fInfo = tr_torrentInfo( fHandle );
-
-    NSString * fileType = ( fInfo->fileCount > 1 ) ?
-        NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
-    fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
-    [fIcon setFlipped: YES];
-    [fIcon retain];
-    fIconNonFlipped = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
-    [fIconNonFlipped retain];
-
-    fStatusString   = [[NSMutableString alloc] initWithCapacity: 50];
-    fInfoString     = [[NSMutableString alloc] initWithCapacity: 50];
-    fDownloadString = [[NSMutableString alloc] initWithCapacity: 10];
-    fUploadString   = [[NSMutableString alloc] initWithCapacity: 10];
-
-    [self update];
+    
     return self;
 }
 
-- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
+- (NSDictionary *) history
 {
-    return [self initWithPath: path lib: lib date: [NSDate date]];
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+            [self path], @"TorrentPath",
+            [self getFolder], @"DownloadFolder",
+            [self isActive] ? @"NO" : @"YES", @"Paused",
+            [self date], @"Date",
+            [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
+            [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit", nil];
 }
 
 - (void) dealloc
@@ -75,6 +81,7 @@
     if( fHandle )
     {
         tr_torrentClose( fLib, fHandle );
+        
         [fDate release];
         [fIcon release];
         [fIconNonFlipped release];
@@ -104,9 +111,20 @@
 - (void) update
 {
     fStat = tr_torrentStat( fHandle );
+    
+    if ([self isSeeding]) 
+        if ((fStopRatioSetting == 1 && [self ratio] >= fRatioLimit)
+            || (fStopRatioSetting == -1 && [fDefaults boolForKey: @"RatioCheck"]
+                && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"]))
+        {
+            [self stop];
+            [self setStopRatioSetting: 0];
+            
+            fStat = tr_torrentStat( fHandle );
+        }
 
     [fStatusString setString: @""];
-    [fInfoString   setString: @""];
+    [fInfoString setString: @""];
 
     switch( fStat->status )
     {
@@ -207,6 +225,36 @@
     }
 }
 
+- (float) ratio
+{
+    uint64_t downloaded = [self downloaded];
+    return downloaded > 0 ? [self uploaded] / downloaded : -1;
+}
+
+/*  1: Check ratio
+    0: Don't check ratio
+   -1: Use defaults */
+- (int) stopRatioSetting
+{
+	return fStopRatioSetting;
+}
+
+- (void) setStopRatioSetting: (int) setting
+{
+    fStopRatioSetting = setting;
+}
+
+- (float) ratioLimit
+{
+    return fRatioLimit;
+}
+
+- (void) setRatioLimit: (float) limit
+{
+    if (limit >= 0)
+        fRatioLimit = limit;
+}
+
 - (void) reveal
 {
     [[NSWorkspace sharedWorkspace] selectFile: [[self getFolder]
@@ -271,23 +319,12 @@
     return fInfo->pieceCount;
 }
 
-- (NSString *) hash1
+- (NSString *) hash
 {
     NSMutableString * string = [NSMutableString
         stringWithCapacity: SHA_DIGEST_LENGTH];
     int i;
-    for( i = 0; i < SHA_DIGEST_LENGTH / 2; i++ )
-    {
-        [string appendFormat: @"%02x", fInfo->hash[i]];
-    }
-    return string;
-}
-- (NSString *) hash2
-{
-    NSMutableString * string = [NSMutableString
-        stringWithCapacity: SHA_DIGEST_LENGTH];
-    int i;
-    for( i = SHA_DIGEST_LENGTH / 2; i < SHA_DIGEST_LENGTH; i++ )
+    for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
         [string appendFormat: @"%02x", fInfo->hash[i]];
     }
@@ -364,10 +401,60 @@
     return fDate;
 }
 
+- (NSNumber *) stateSortKey
+{
+    if (fStat->status & TR_STATUS_INACTIVE)
+        return [NSNumber numberWithInt: 0];
+    else if (fStat->status == TR_STATUS_SEED)
+        return [NSNumber numberWithInt: 1];
+    else
+        return [NSNumber numberWithInt: 2];
+}
+
 @end
 
 
 @implementation Torrent (Private)
+
+- (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib date: (NSDate *) date
+        stopRatioSetting: (NSNumber *) stopRatioSetting ratioLimit: (NSNumber *) ratioLimit
+{
+    if (!(self = [super init]))
+        return nil;
+
+    fLib = lib;
+
+    int error;
+    if (!path || !(fHandle = tr_torrentInit(fLib, [path UTF8String], &error)))
+    {
+        [self release];
+        return nil;
+    }
+    
+    fInfo = tr_torrentInfo( fHandle );
+    
+    fDefaults = [NSUserDefaults standardUserDefaults];
+
+    fDate = date ? [date retain] : [[NSDate alloc] init];
+    fStopRatioSetting = stopRatioSetting ? [stopRatioSetting intValue] : -1;
+    fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
+    
+    NSString * fileType = ( fInfo->fileCount > 1 ) ?
+        NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
+    fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
+    [fIcon setFlipped: YES];
+    [fIcon retain];
+    fIconNonFlipped = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
+    [fIconNonFlipped retain];
+
+    fStatusString   = [[NSMutableString alloc] initWithCapacity: 50];
+    fInfoString     = [[NSMutableString alloc] initWithCapacity: 50];
+    fDownloadString = [[NSMutableString alloc] initWithCapacity: 10];
+    fUploadString   = [[NSMutableString alloc] initWithCapacity: 10];
+
+    [self update];
+    return self;
+}
 
 - (void) trashPath: (NSString *) path
 {

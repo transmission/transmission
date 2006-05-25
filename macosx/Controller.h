@@ -26,6 +26,7 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 #import "PrefsController.h"
+#import "InfoWindowController.h"
 #import "Badger.h"
 
 @class TorrentTableView;
@@ -35,6 +36,8 @@
     tr_handle_t                 * fLib;
     int                         fCompleted;
     NSMutableArray              * fTorrents;
+    
+    InfoWindowController        * fInfoController;
 
     NSToolbar                   * fToolbar;
 
@@ -55,22 +58,14 @@
     IBOutlet NSTextField        * fTotalTorrentsField;
     IBOutlet NSBox              * fStats;
     BOOL                        fStatusBar;
-
-    IBOutlet NSPanel            * fInfoPanel;
-    IBOutlet NSImageView        * fInfoImageView;
-    IBOutlet NSTextField        * fInfoName;
-    IBOutlet NSTextField        * fInfoSize;
-    IBOutlet NSTextField        * fInfoTracker;
-    IBOutlet NSTextField        * fInfoAnnounce;
-    IBOutlet NSTextField        * fInfoPieceSize;
-    IBOutlet NSTextField        * fInfoPieces;
-    IBOutlet NSTextField        * fInfoHash1;
-    IBOutlet NSTextField        * fInfoHash2;
-    IBOutlet NSTextField        * fInfoSeeders;
-    IBOutlet NSTextField        * fInfoLeechers;
-    IBOutlet NSTextField        * fInfoDownloaded;
-    IBOutlet NSTextField        * fInfoUploaded;
-    NSImage                     * fAppIcon;
+    
+    IBOutlet NSButton           * fActionButton;
+    
+    NSString                    * fSortType;
+    IBOutlet NSMenuItem         * fNameSortItem,
+                                * fStateSortItem,
+                                * fDateSortItem;
+    NSMenuItem                  * fCurrentSortItem;
 
     io_connect_t                fRootPort;
     NSTimer                     * fTimer;
@@ -90,9 +85,12 @@
 - (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
                         contextInfo: (void *) info;
 
-- (void) quitSheetDidEnd:   (NSWindow *)sheet returnCode:(int)returnCode
-                            contextInfo:(void *)contextInfo;
-                        
+- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
+                            contextInfo: (void *) contextInfo;
+
+- (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet;
+- (void) torrentNumberChanged;
+
 - (void) resumeTorrent:             (id) sender;
 - (void) resumeAllTorrents:         (id) sender;
 - (void) resumeTorrentWithIndex:    (NSIndexSet *) indexSet;
@@ -108,21 +106,27 @@
                 deleteTorrent:      (BOOL) deleteTorrent
                 deleteData:         (BOOL) deleteData;
                 
-- (void) removeSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode
-                        contextInfo:(NSDictionary *)dict;
-- (void) confirmRemoveTorrentWithIndex: (NSIndexSet *) indexSet
+- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
+                        contextInfo: (NSDictionary *) dict;
+- (void) confirmRemoveTorrents: (NSArray *) torrents
             deleteTorrent: (BOOL) deleteTorrent
             deleteData: (BOOL) deleteData;
+
+- (void) revealTorrent: (id) sender;
                      
 - (void) showInfo:        (id) sender;
+- (void) updateInfo;
+- (void) updateInfoStats;
 
 - (void) updateUI:        (NSTimer *) timer;
 - (void) updateTorrentHistory;
+
+- (void) sortTorrents;
+- (void) setSort: (id) sender;
+
 - (void) sleepCallBack:   (natural_t) messageType argument:
                         (void *) messageArgument;
 
-- (void) runCustomizationPalette: (id) sender;
-- (void) showHideToolbar: (id) sender;
 - (void) toggleStatusBar: (id) sender;
 
 - (void) showPreferenceWindow: (id) sender;
@@ -131,7 +135,6 @@
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
 - (void) notifyGrowl:       (NSString *) file;
-- (void) revealFromMenu:    (id) sender;
 - (void) growlRegister:     (id) sender;
 
 - (void) checkForUpdate:      (id) sender;

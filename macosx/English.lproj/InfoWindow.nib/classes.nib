@@ -1,0 +1,25 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = InfoWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAnnounce = NSTextField; 
+                fDownloaded = NSTextField; 
+                fHash = NSTextField; 
+                fImageView = NSImageView; 
+                fLeechers = NSTextField; 
+                fName = NSTextField; 
+                fPieceSize = NSTextField; 
+                fPieces = NSTextField; 
+                fSeeders = NSTextField; 
+                fSize = NSTextField; 
+                fTracker = NSTextField; 
+                fUploaded = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

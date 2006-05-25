@@ -70,7 +70,6 @@
                                     [self rowAtPoint: point]] );
 }
 
-
 - (void) mouseDown: (NSEvent *) e
 {
     fClickPoint = [self convertPoint: [e locationInWindow] fromView: nil];
@@ -138,13 +137,9 @@
     if( row >= 0 )
     {
         if (![self isRowSelected: row])
-        {
-            if( OSX_VERSION >= 10.3 )
-                [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                    byExtendingSelection: NO];
-            else
-                [self selectRow: row byExtendingSelection: NO];
-        }
+            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+                byExtendingSelection: NO];
+                
         return fContextRow;
     }
     else
