@@ -4,7 +4,7 @@
 
 REVMAX=0
 
-for pattern in '*.[chm]' '*.cpp' '*.po' 'Makefile*' 'configure' 'version.sh'; do
+for pattern in '*.[chm]' '*.cpp' '*.po' 'Makefile*' 'configure'; do
   for f in `find . -name "$pattern"`; do 
     REV=`grep '\$Id:' $f | sed 's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/'`
     if [ -n "$REV" ]; then
