@@ -1,5 +1,6 @@
 /.depend
 /Makefile.config
+/Makefile.version
 Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
 beos/.depend

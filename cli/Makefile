@@ -1,6 +1,7 @@
 # $Id$
 
 include ../Makefile.config
+include ../Makefile.version
 include ../Makefile.common
 
 SRCS = transmissioncli.c

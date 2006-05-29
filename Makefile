@@ -1,11 +1,12 @@
 # $Id$
 
 -include Makefile.config
-include Makefile.common
-
 ifndef CONFIGURE_RUN
 $(error You must run ./configure first)
 endif
+
+-include Makefile.version
+include Makefile.common
 
 ifneq ($(SYSTEM),Darwin)
 
@@ -19,7 +20,7 @@ endif
 
 all: $(TARGETS)
 
-.lib:
+.lib: .version
 	@echo "* Building libtransmission"
 	@$(MAKE) -C libtransmission
 
@@ -59,7 +60,7 @@ endif
 
 else
 
-all:
+all: .version
 	@$(MAKE) -C macosx
 	@xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
 
@@ -97,3 +98,9 @@ package-release:
 	$(PACKAGE_RULE2)
 
 endif
+
+Makefile.version: .version
+
+.version:
+	@echo "Checking SVN revision..."
+	@./version.sh

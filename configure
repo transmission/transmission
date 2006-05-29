@@ -18,8 +18,6 @@ CXX="${CXX-c++}"
 CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS}"
 
-SVNREV="`echo '$Rev$' | sed 's/[^0-9]*//g'`"
-
 #
 # Functions
 #
@@ -291,7 +289,6 @@ lrintf_test
 rm -f Makefile.config
 cat > Makefile.config << EOF
 CONFIGURE_RUN  = yes
-SVN_REVISION   = $SVNREV
 SYSTEM         = $SYSTEM
 PREFIX         = $PREFIX
 LOCALEDIR      = $LOCALEDIR
