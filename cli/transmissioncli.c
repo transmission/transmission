@@ -68,8 +68,8 @@ int main( int argc, char ** argv )
     tr_torrent_t * tor;
     tr_stat_t    * s;
 
-    printf( "Transmission %s - http://transmission.m0k.org/\n\n",
-            VERSION_STRING );
+    printf( "Transmission %s (%d) - http://transmission.m0k.org/\n\n",
+            VERSION_STRING, VERSION_REVISION );
 
     /* Get options */
     if( parseCommandLine( argc, argv ) )

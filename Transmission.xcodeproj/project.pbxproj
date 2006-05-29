@@ -637,14 +637,10 @@
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGEFILE_SOURCE",
 					"-D_GNU_SOURCE",
-					"-DVERSION_MAJOR=0",
-					"-DVERSION_MINOR=5",
-					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 				);
-				OTHER_CFLAGS_QUOTED_1 = "-DVERSION_STRING=\\\"0.6-svn\\\"";
 				PRODUCT_NAME = transmission;
 			};
 			name = Debug;
@@ -658,14 +654,10 @@
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGEFILE_SOURCE",
 					"-D_GNU_SOURCE",
-					"-DVERSION_MAJOR=0",
-					"-DVERSION_MINOR=5",
-					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
 				);
-				OTHER_CFLAGS_QUOTED_1 = "-DVERSION_STRING=\\\"0.6-svn\\\"";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Debug;

@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#include "version.h"
+
 #include <inttypes.h>
 #ifndef PRIu64
 # define PRIu64 "lld"

@@ -36,9 +36,9 @@
 	<key>CFBundleSignature</key>
 	<string>TR##</string>
 	<key>CFBundleVersion</key>
-	<string>%%VERSION%%</string>
+	<string>%%BUNDLE_VERSION%%</string>
 	<key>CFBundleShortVersionString</key>
-	<string>%%VERSION%%</string>
+	<string>%%SHORT_VERSION_STRING%%</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

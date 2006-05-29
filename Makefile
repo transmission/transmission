@@ -99,8 +99,18 @@ package-release:
 
 endif
 
-Makefile.version: .version
+.version: .version1 .version2
 
-.version:
+.version1:
 	@echo "Checking SVN revision..."
 	@./version.sh
+
+.version2:
+	@$(RM) libtransmission/version.h
+	@( echo "#define VERSION_MAJOR    $(VERSION_MAJOR)" && \
+	   echo "#define VERSION_MINOR    $(VERSION_MINOR)" && \
+	   echo "#define VERSION_STRING   \"$(VERSION_STRING)\"" && \
+	   echo "#define VERSION_REVISION $(VERSION_REVISION)" ) > \
+	   libtransmission/version.h
+
+Makefile.version: .version1

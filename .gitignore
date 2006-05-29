@@ -14,6 +14,7 @@ gtk/po/*.mo
 gtk/transmission-gtk
 libtransmission/*.a
 libtransmission/.depend
+libtransmission/version.h
 macosx/English.lproj/*~.nib
 macosx/Info.plist
 macosx/Transmission.app

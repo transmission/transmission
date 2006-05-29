@@ -16,6 +16,6 @@ for pattern in '*.[chm]' '*.cpp' '*.po' 'Makefile*' 'configure'; do
 done
 
 rm -f Makefile.version
-echo "SVN_REVISION = $REVMAX" > Makefile.version
+echo "VERSION_REVISION = $REVMAX" > Makefile.version
 
 exit 0
