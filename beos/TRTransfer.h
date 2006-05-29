@@ -1,3 +1,5 @@
+// $Id$
+
 #ifndef TR_TRANSFER
 #define TR_TRANSFER
 

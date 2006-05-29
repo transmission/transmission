@@ -1,3 +1,5 @@
+// $Id$
+
 #ifndef TR_WIND
 #define TR_WIND
 

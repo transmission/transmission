@@ -1,3 +1,5 @@
+// $Id$
+
 #ifndef TR_INFO_WIND
 #define TR_INFO_WIND
 

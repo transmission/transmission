@@ -1,3 +1,5 @@
+# $Id$
+
 include ../Makefile.config
 include ../Makefile.common
 
