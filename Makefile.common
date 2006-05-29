@@ -77,6 +77,12 @@ define INSTALL_LOCALE_RULE
        @$(CP) $< $(LOCALEDIR)/$*/LC_MESSAGES/transmission-gtk.mo
 endef
 
+define INSTALL_MAN_RULE
+	@echo "Install $<"
+	@$(MKDIR) $(PREFIX)/man/man1
+	@$(CP) $< $(PREFIX)/man/man1/
+endef
+
 RM    = rm -Rf
 CP    = cp -f
 MKDIR = mkdir -p

@@ -293,7 +293,7 @@ send_msg(struct constate *con, const char *name, benc_val_t *val) {
 
   /* write the bencoded data length into the first 8 bytes of the buffer */
   stupid = buf[8];
-  snprintf(buf, 9, "%08X", used - 8);
+  snprintf(buf, 9, "%08X", (unsigned int)used - 8);
   buf[8] = stupid;
 
   /* send the data */

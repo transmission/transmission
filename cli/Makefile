@@ -25,7 +25,12 @@ clean:
 .depend: $(SRCS) ../Makefile.config ../Makefile.common Makefile
 	$(DEP_RULE)
 
-install: transmissioncli
+install: install-bin install-man
+
+install-bin: transmissioncli
 	$(INSTALL_BIN_RULE)
+
+install-man: transmissioncli.1
+	$(INSTALL_MAN_RULE)
 
 -include .depend
