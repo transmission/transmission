@@ -1,116 +1,38 @@
 # $Id$
 
--include Makefile.config
-ifndef CONFIGURE_RUN
-$(error You must run ./configure first)
-endif
+include mk/common.mk
 
--include Makefile.version
-include Makefile.common
+default: all
 
-ifneq ($(SYSTEM),Darwin)
+# Before we do anything else, make sure we have config.mk and an
+# updated version.mk
 
-TARGETS = .cli
-ifeq ($(GTK),yes)
-TARGETS += .gtk
-endif
-ifeq ($(SYSTEM),BeOS)
-TARGETS += .beos
-endif
-
-all: $(TARGETS)
-
-.lib: .version
-	@echo "* Building libtransmission"
-	@$(MAKE) -C libtransmission
-
-.cli: .lib
-	@echo "* Building Transmission CLI client"
-	@$(MAKE) -C cli
-
-.gtk: .lib
-	@echo "* Building Transmission GTK+ client"
-	@$(MAKE) -C gtk
-
-.beos: .lib
-	@echo "* Building Transmission BeOS client"
-	@make -C beos
-
-install: all $(foreach SUB,$(TARGETS),.install$(SUB))
-
-.install.cli: .cli
-	@echo "* Installing Transmission CLI client"
-	@$(MAKE) -C cli install
-
-.install.gtk: .gtk
-	@echo "* Installing Transmission GTK+ client"
-	@$(MAKE) -C gtk install
-
-.install.beos:
-
-clean:
-	@$(MAKE) -C libtransmission clean
-	@$(MAKE) -C cli clean
-ifeq ($(GTK),yes)
-	@$(MAKE) -C gtk clean
-endif
-ifeq ($(SYSTEM),BeOS)
-	@$(MAKE) -C beos clean
-endif
-
-else
-
-all: .version
-	@$(MAKE) -C macosx
-	@xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
-
-clean:
-	@xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
-	@$(MAKE) -C macosx clean
-
-MAKELINK = printf "[InternetShortcut]\nURL=http://transmission.m0k.org%s\n"
-define PACKAGE_RULE1
-	$(RM) tmp "Transmission $(VERSION_STRING)" \
-	  Transmission-$(VERSION_STRING).dmg
-	mkdir -p tmp
-	cp -r macosx/Transmission.app tmp/
-	cp AUTHORS tmp/AUTHORS.txt
-	cp LICENSE tmp/LICENSE.txt
-	cp NEWS tmp/NEWS.txt
-	$(MAKELINK) "/" > tmp/Homepage.url
-	$(MAKELINK) "/forum" > tmp/Forums.url
-	$(MAKELINK) "/contribute.php" > tmp/Contribute.url
-endef
-define PACKAGE_RULE2
-	mv tmp "Transmission $(VERSION_STRING)"
-	hdiutil create -format UDZO -srcfolder \
-	  "Transmission $(VERSION_STRING)" Transmission-$(VERSION_STRING).dmg
-	rm -rf "Transmission $(VERSION_STRING)"
-endef
-
-package:
-	$(PACKAGE_RULE1)
-	$(PACKAGE_RULE2)
-
-package-release:
-	$(PACKAGE_RULE1)
-	strip -S tmp/Transmission.app/Contents/MacOS/Transmission
-	$(PACKAGE_RULE2)
-
-endif
-
-.version: .version1 .version2
-
-.version1:
+required: mk/config.mk mk/version.mk
+mk/config.mk:
+	@echo "Please run ./configure first."
+	@false
+mk/version.mk: FORCE
 	@echo "Checking SVN revision..."
 	@./version.sh
+FORCE:
 
-.version2:
-	@$(RM) libtransmission/version.h
-	@( echo "#define VERSION_MAJOR    $(VERSION_MAJOR)" && \
-	   echo "#define VERSION_MINOR    $(VERSION_MINOR)" && \
-	   echo "#define VERSION_STRING   \"$(VERSION_STRING)\"" && \
-	   echo "#define VERSION_REVISION $(VERSION_REVISION)" ) > \
-	   libtransmission/version.h
+# Now call the Makefile that'll really build
+# OS X has its special Makefile that wraps to Xcode
 
-Makefile.version: .version1
+-include mk/config.mk
+ifneq ($(SYSTEM),Darwin)
+REALMAKE = $(MAKE) -f mk/default.mk
+else
+REALMAKE = $(MAKE) -f mk/osx.mk
+endif
+
+all: required
+	@$(REALMAKE) all
+clean: required
+	@$(REALMAKE) clean
+install: required
+	@$(REALMAKE) install
+package: required
+	@$(REALMAKE) package
+package-release: required
+	@$(REALMAKE) package-release

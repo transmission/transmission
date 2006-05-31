@@ -284,11 +284,10 @@ lm_test
 lrintf_test
 
 #
-# Generate Makefile.config
+# Generate config.mk
 #
-rm -f Makefile.config
-cat > Makefile.config << EOF
-CONFIGURE_RUN  = yes
+rm -f mk/config.mk
+cat > mk/config.mk << EOF
 SYSTEM         = $SYSTEM
 PREFIX         = $PREFIX
 LOCALEDIR      = $LOCALEDIR

@@ -1,8 +1,7 @@
 # $Id$
 
-include ../Makefile.config
-include ../Makefile.version
-include ../Makefile.common
+include ../mk/config.mk
+include ../mk/common.mk
 
 SRCS = transmissioncli.c
 OBJS = $(SRCS:%.c=%.o)
@@ -10,13 +9,10 @@ OBJS = $(SRCS:%.c=%.o)
 CFLAGS  += -I../libtransmission
 LDFLAGS += ../libtransmission/libtransmission.a
 
-all: transmissioncli
-	@true
-
 transmissioncli: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)
 
-%.o: %.c ../Makefile.config ../Makefile.common Makefile
+%.o: %.c ../mk/config.mk ../mk/common.mk ../mk/cli.mk
 	$(CC_RULE)
 
 clean:
@@ -25,7 +21,7 @@ clean:
 	@echo "Clean $(OBJS)"
 	@$(RM) $(OBJS)
 
-.depend: $(SRCS) ../Makefile.config ../Makefile.common Makefile
+.depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/cli.mk
 	$(DEP_RULE)
 
 install: install-bin install-man

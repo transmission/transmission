@@ -1,7 +1,7 @@
 # $Id$
 
-include ../Makefile.config
-include ../Makefile.common
+include ../mk/config.mk
+include ../mk/common.mk
 
 SRCS = conf.c dialogs.c io.c ipc.c main.c tr_backend.c tr_torrent.c \
 	tr_cell_renderer_torrent.c util.c
@@ -17,9 +17,9 @@ transmission-gtk: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)
 
 .po:
-	@$(MAKE) -C po
+	@$(MAKE) -C po -f ../../mk/po.mk
 
-%.o: %.c ../Makefile.config ../Makefile.common Makefile
+%.o: %.c ../mk/config.mk ../mk/common.mk ../mk/gtk.mk
 	$(CC_RULE)
 
 clean:
@@ -27,14 +27,14 @@ clean:
 	@$(RM) transmission-gtk
 	@echo "Clean $(OBJS)"
 	@$(RM) $(OBJS)
-	@$(MAKE) -C po clean
+	@$(MAKE) -C po -f ../../mk/po.mk clean
 
-.depend: $(SRCS) ../Makefile.config ../Makefile.common Makefile
+.depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/gtk.mk
 	$(DEP_RULE)
 
 install: transmission-gtk .po
 	$(INSTALL_BIN_RULE)
-	@$(MAKE) -C po install
+	@$(MAKE) -C po -f ../../mk/po.mk install
 
 morepot: $(SRCS)
 	xgettext --output=po/transmission-gtk.pot --from-code=UTF-8 --add-comments --keyword=_ --keyword=N_ $^

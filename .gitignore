@@ -1,6 +1,4 @@
 /.depend
-/Makefile.config
-/Makefile.version
 Transmission.xcodeproj/*.mode1
 Transmission.xcodeproj/*.pbxuser
 beos/.depend
@@ -18,3 +16,5 @@ libtransmission/version.h
 macosx/English.lproj/*~.nib
 macosx/Info.plist
 macosx/Transmission.app
+mk/config.mk
+mk/version.mk

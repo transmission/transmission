@@ -1,7 +1,7 @@
 # $Id$
 
-include ../Makefile.config
-include ../Makefile.common
+include ../mk/config.mk
+include ../mk/common.mk
 
 SRCS = TRApplication.cpp TRWindow.cpp TRTransfer.cpp \
        TRPrefsWindow.cpp TRInfoWindow.cpp
@@ -17,13 +17,13 @@ Transmission: $(OBJS) Transmission.rsrc
 	xres -o Transmission Transmission.rsrc
 	mimeset -f Transmission
 
-%.o: %.cpp ../Makefile.config ../Makefile.common Makefile
+%.o: %.cpp ../mk/config.mk ../mk/common.mk ../mk/beos.mk
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 clean:
 	$(RM) Transmission $(OBJS)
 
-.depend: $(SRCS) Makefile
+.depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/beos.mk
 	$(RM) .depend
 	$(foreach SRC, $(SRCS), $(CXX) $(CXXFLAGS) -MM $(SRC) >> .depend;)
 

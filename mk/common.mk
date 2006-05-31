@@ -1,9 +1,5 @@
 # $Id$
 
-VERSION_MAJOR  = 0
-VERSION_MINOR  = 5
-VERSION_STRING = 0.6-svn
-
 TMPCFLAGS   = -g -Wall -W -O3 -funroll-loops -D_FILE_OFFSET_BITS=64 \
               -D_LARGEFILE_SOURCE -D_GNU_SOURCE \
               -DSYS_$(shell echo $(SYSTEM) | tr a-z A-Z)
