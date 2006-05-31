@@ -7,7 +7,8 @@ REVMAX=0
 for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk' 'Makefile' 'configure'; do
   for f in `find . -name "$pattern"`; do 
     REV=`sed -e '/\$Id:/!d' -e \
-         's/.*\$Id$f`
+         's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' \
+         $f`
     if [ -n "$REV" ]; then
       if [ "$REV" -gt "$REVMAX" ]; then
         REVMAX="$REV"
