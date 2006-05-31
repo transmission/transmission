@@ -201,18 +201,20 @@ tr_backend_handle(TrBackend *back) {
 void
 tr_backend_save_state(TrBackend *back, char **errstr) {
   benc_val_t state;
-  int ii;
-  GList *jj;
+  GList *ii;
 
   TR_IS_BACKEND(back);
 
   bzero(&state, sizeof(state));
   state.type = TYPE_LIST;
-  state.val.l.alloc = state.val.l.count = g_list_length(back->torrents);
+  state.val.l.alloc = g_list_length(back->torrents);
   state.val.l.vals = g_new0(benc_val_t, state.val.l.alloc);
 
-  for(ii = 0, jj = back->torrents; NULL != jj; ii++, jj = jj->next)
-    tr_torrent_get_state(jj->data, state.val.l.vals + ii);
+  for(ii = back->torrents; NULL != ii; ii = ii->next) {
+    tr_torrent_get_state(ii->data, state.val.l.vals + state.val.l.count);
+    if(0 != state.val.l.vals[state.val.l.count].type)
+      state.val.l.count++;
+  }
 
   cf_savestate(&state, errstr);
   tr_bencFree(&state);
@@ -268,19 +270,21 @@ tr_backend_stop_torrents(TrBackend *back) {
   TR_IS_BACKEND(back);
 
   for(ii = back->torrents; NULL != ii; ii = ii->next)
-    if(TR_STATUS_ACTIVE & tr_torrent_stat(ii->data)->status)
-      tr_torrentStop(tr_torrent_handle(ii->data));
+    tr_torrent_stop_politely(ii->data);
 }
 
 gboolean
 tr_backend_torrents_stopped(TrBackend *back) {
-  GList *ii;
+  GList *ii, *list;
+  gboolean ret = TRUE;
 
   TR_IS_BACKEND(back);
 
-  for(ii = back->torrents; NULL != ii; ii = ii->next)
-    if(TR_STATUS_ACTIVE & tr_torrent_stat(ii->data)->status)
-      return FALSE;
+  list = g_list_copy(back->torrents);
+  for(ii = list; NULL != ii; ii = ii->next)
+    if(!(TR_STATUS_PAUSE & tr_torrent_stat_polite(ii->data)->status))
+      ret = FALSE;
+  g_list_free(list);
 
-  return TRUE;
+  return ret;
 }

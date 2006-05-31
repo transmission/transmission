@@ -67,6 +67,7 @@ struct cbdata {
   guint timer;
   gboolean prefsopen;
   GtkWidget *stupidpopuphack;
+  gboolean closing;
 };
 
 struct exitdata {
@@ -116,9 +117,6 @@ void
 dopopupmenu(GdkEventButton *event, struct cbdata *data);
 void
 actionclick(GtkWidget *widget, gpointer gdata);
-void
-popupaction(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-            gpointer gdata);
 gint
 intrevcmp(gconstpointer a, gconstpointer b);
 void
@@ -301,6 +299,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   data->buttons = NULL;
   data->prefsopen = FALSE;
   data->stupidpopuphack = NULL;
+  data->closing = FALSE;
 
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER,
                                  GTK_POLICY_AUTOMATIC);
@@ -459,13 +458,29 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
   struct cbdata *data = gdata;
   struct exitdata *edata;
   unsigned int ii;
+  GtkTreeIter iter;
+  TrTorrent *tor;
+
+  data->closing = TRUE;
 
   /* stop the update timer */
   if(0 < data->timer)
     g_source_remove(data->timer);
   data->timer = 0;
 
-  /* try to stop all the torrents */
+  /*
+    Add a reference to all torrents in the list, which will be removed
+    when the politely-stopped signal is emitted.  This is necessary
+    because actionclick() adds a reference when it removes a torrent
+    from the model and calls tr_torrent_stop_polite() on it.
+  */
+  if(gtk_tree_model_get_iter_first(data->model, &iter)) {
+    do
+      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
+    while(gtk_tree_model_iter_next(data->model, &iter));
+  }
+
+  /* try to politely stop all the torrents */
   tr_backend_stop_torrents(data->back);
 
   /* set things up to wait for torrents to stop */
@@ -772,6 +787,10 @@ updatemodel(gpointer gdata) {
   /* the status of the selected item may have changed, so update the buttons */
   fixbuttons(NULL, data);
 
+  /* check for politely stopped torrents unless we're exiting */
+  if(!data->closing)
+    tr_backend_torrents_stopped(data->back);
+
   return TRUE;
 }
 
@@ -856,34 +875,22 @@ dopopupmenu(GdkEventButton *event, struct cbdata *data) {
                  gdk_event_get_time((GdkEvent*)event));
 }
 
-struct actioninfo {
-  GtkWindow *wind;
-  enum listact act;
-  unsigned int off;
-  GtkTreeSelection *sel;
-  TrBackend *back;
-  gboolean changed;
-  GList *dead;
-};
-
 void
 actionclick(GtkWidget *widget, gpointer gdata) {
   struct cbdata *data = gdata;
-  struct actioninfo info = {
-    data->wind,
-    GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_ACTION)),
-    0,
-    gtk_tree_view_get_selection(data->view),
-    data->back,
-    FALSE,
-    NULL,
-  };
-  GtkTreeSelection *sel = gtk_tree_view_get_selection(data->view);
-  GList *ii;
+  enum listact act;
+  GtkTreeSelection *sel;
+  GList *rows, *ii;
+  GtkTreeRowReference *ref;
   GtkTreePath *path;
   GtkTreeIter iter;
+  TrTorrent *tor;
+  unsigned int actoff, status;
+  gboolean changed;
 
-  switch(info.act) {
+  act = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_ACTION));
+
+  switch(act) {
     case ACT_OPEN:
       makeaddwind(data->wind, addtorrents, data);
       return;
@@ -898,69 +905,65 @@ actionclick(GtkWidget *widget, gpointer gdata) {
       break;
   }
 
-  for(info.off = 0; info.off < ALEN(actionitems); info.off++)
-    if(actionitems[info.off].act == info.act)
+  sel = gtk_tree_view_get_selection(data->view);
+  rows = gtk_tree_selection_get_selected_rows(sel, NULL);
+
+  for(ii = rows; NULL != ii; ii = ii->next) {
+    ref = gtk_tree_row_reference_new(data->model, ii->data);
+    gtk_tree_path_free(ii->data);
+    ii->data = ref;
+  }
+
+  for(actoff = 0; actoff < ALEN(actionitems); actoff++)
+    if(actionitems[actoff].act == act)
       break;
-  g_assert(info.off < ALEN(actionitems));
+  g_assert(actoff < ALEN(actionitems));
 
-  gtk_tree_selection_selected_foreach(sel, popupaction, &info);
-
-  for(ii = info.dead; NULL != ii; ii = ii->next) {
-    g_assert(gtk_tree_row_reference_valid(ii->data));
-    path = gtk_tree_row_reference_get_path(ii->data);
-    gtk_tree_selection_unselect_path(info.sel, path);
-    if(gtk_tree_model_get_iter(data->model, &iter, path))
-       gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
-    else {
-      g_assert_not_reached();
+  changed = FALSE;
+  for(ii = rows; NULL != ii; ii = ii->next) {
+    if(NULL != (path = gtk_tree_row_reference_get_path(ii->data)) &&
+       gtk_tree_model_get_iter(data->model, &iter, path)) {
+      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor,
+                         MC_STAT, &status, -1);
+      /* check if this action is valid for this torrent */
+      if((!actionitems[actoff].avail || actionitems[actoff].avail & status) &&
+         !actionitems[actoff].nomenu) {
+        switch(act) {
+          case ACT_START:
+            tr_torrentStart(tr_torrent_handle(tor));
+            changed = TRUE;
+            break;
+          case ACT_STOP:
+            tr_torrentStop(tr_torrent_handle(tor));
+            changed = TRUE;
+            break;
+          case ACT_DELETE:
+            /* tor will be unref'd in the politely_stopped signal handler */
+            g_object_ref(tor);
+            tr_torrent_stop_politely(tor);
+            gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
+            changed = TRUE;
+            break;
+          case ACT_INFO:
+            makeinfowind(data->wind, tor);
+            break;
+          case ACT_OPEN:
+          case ACT_PREF:
+            break;
+        }
+      }
+      g_object_unref(tor);
     }
-    gtk_tree_path_free(path);
+    if(NULL != path)
+      gtk_tree_path_free(path);
     gtk_tree_row_reference_free(ii->data);
   }
-  g_list_free(info.dead);
+  g_list_free(rows);
 
-  if(info.changed) {
+  if(changed) {
     savetorrents(data);
     updatemodel(data);
   }
-}
-
-void
-popupaction(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
-            gpointer gdata) {
-  struct actioninfo *in = gdata;
-  TrTorrent *tor;
-  int status;
-
-  gtk_tree_model_get(model, iter, MC_TORRENT, &tor, MC_STAT, &status, -1);
-
-  /* check if this action is valid for this torrent */
-  if((!actionitems[in->off].avail || actionitems[in->off].avail & status) &&
-     !actionitems[in->off].nomenu) {
-    switch(in->act) {
-      case ACT_START:
-        tr_torrentStart(tr_torrent_handle(tor));
-        in->changed = TRUE;
-        break;
-      case ACT_STOP:
-        tr_torrentStop(tr_torrent_handle(tor));
-        in->changed = TRUE;
-        break;
-      case ACT_DELETE:
-        in->dead = g_list_append(in->dead,
-                                 gtk_tree_row_reference_new(model, path));
-        in->changed = TRUE;
-        break;
-      case ACT_INFO:
-        makeinfowind(in->wind, tor);
-        break;
-      case ACT_OPEN:
-      case ACT_PREF:
-        break;
-    }
-  }
-
-  g_object_unref(tor);
 }
 
 gint
@@ -1034,6 +1037,9 @@ addtorrents(void *vdata, void *state, GList *files,
     gtk_list_store_append(GTK_LIST_STORE(data->model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(data->model), &iter,
                        MC_TORRENT, ii->data, -1);
+    /* we will always ref a torrent before politely stopping it */
+    g_signal_connect(ii->data, "politely_stopped",
+                     G_CALLBACK(g_object_unref), data);
     g_object_unref(ii->data);
   }
 

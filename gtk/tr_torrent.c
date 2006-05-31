@@ -90,7 +90,7 @@ tr_torrent_get_type(void) {
 static void
 tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
   GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
-  //TrTorrentClass *klass = TR_TORRENT_CLASS(g_class);
+  TrTorrentClass *klass = TR_TORRENT_CLASS(g_class);
   GParamSpec *pspec;
 
   gobject_class->set_property = tr_torrent_set_property;
@@ -117,6 +117,12 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
                                "Is the torrent paused or running", TRUE,
                                G_PARAM_READWRITE);
   g_object_class_install_property(gobject_class, TR_TORRENT_PAUSED, pspec);
+
+  klass->paused_signal_id = g_signal_newv("politely-stopped",
+                                          G_TYPE_FROM_CLASS(g_class),
+                                          G_SIGNAL_RUN_LAST, NULL, NULL, NULL,
+                                          g_cclosure_marshal_VOID__VOID,
+                                          G_TYPE_NONE, 0, NULL);
 }
 
 static void
@@ -126,6 +132,7 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   self->handle = NULL;
   self->back = NULL;
   self->dir = NULL;
+  self->closing = FALSE;
   self->disposed = FALSE;
 }
 
@@ -340,6 +347,9 @@ tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
   if(tor->disposed)
     return;
 
+  if(tor->closing)
+    return;
+
   state->type = TYPE_DICT;
   state->val.l.vals = g_new0(benc_val_t, len);
   state->val.l.alloc = state->val.l.count = len;
@@ -377,4 +387,38 @@ tr_torrent_paused(TrTorrent *tor) {
   tr_stat_t *st = tr_torrentStat(tor->handle);
 
   return (TR_STATUS_INACTIVE & st->status ? TRUE : FALSE);
+}
+
+void
+tr_torrent_stop_politely(TrTorrent *tor) {
+  tr_stat_t *st;
+
+  TR_IS_TORRENT(tor);
+
+  if(tor->disposed)
+    return;
+
+  if(!tor->closing) {
+    st = tr_torrent_stat(tor);
+    tor->closing = TRUE;
+    if(TR_STATUS_ACTIVE & st->status)
+      tr_torrentStop(tor->handle);
+  }
+}
+
+tr_stat_t *
+tr_torrent_stat_polite(TrTorrent *tor) {
+  TrTorrentClass *klass;
+  tr_stat_t *st = tr_torrentStat(tor->handle);
+
+  if(tor->disposed)
+    return st;
+
+  if(tor->closing && TR_STATUS_PAUSE & st->status) {
+    tor->closing = FALSE;
+    klass = g_type_class_peek(TR_TORRENT_TYPE);
+    g_signal_emit(tor, klass->paused_signal_id, 0, NULL);
+  }
+
+  return st;
 }
