@@ -4,9 +4,10 @@
 
 # Get current SVN revision from Ids in all source files
 REVMAX=0
-for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk'; do
-  for f in `find . -name "$pattern"` Makefile configure; do 
-    REV=`sed -e '/\$Id:/!d; s/.*\$Id$f`
+for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk' 'Makefile' 'configure'; do
+  for f in `find . -name "$pattern"`; do 
+    REV=`sed -e '/\$Id:/!d' -e \
+         's/.*\$Id$f`
     if [ -n "$REV" ]; then
       if [ "$REV" -gt "$REVMAX" ]; then
         REVMAX="$REV"
