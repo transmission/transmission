@@ -247,6 +247,7 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
   GdkRectangle bar, complete, text;
   gboolean rtl;
   GtkStyle *style;
+  GtkCellRendererState textstate;
 
   /* try to use the style for GtkProgressBar */
   if(NULL == tcell->priv->style)
@@ -291,6 +292,20 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
   if(rtl && text.width > trect.width)
     text.x += text.width - trect.width;
 
+  /* determine the state to render the text as */
+  if(GTK_CELL_RENDERER_INSENSITIVE & flags || !cell->sensitive)
+    textstate = GTK_STATE_INSENSITIVE;
+  else if(GTK_CELL_RENDERER_SELECTED & flags)
+    textstate = (GTK_WIDGET_HAS_FOCUS(widget) ?
+                 GTK_STATE_SELECTED : GTK_STATE_ACTIVE);
+  else if(GTK_CELL_RENDERER_PRELIT & flags &&
+          GTK_STATE_PRELIGHT == GTK_WIDGET_STATE(widget))
+    textstate = GTK_STATE_PRELIGHT;
+  else if(GTK_STATE_INSENSITIVE == GTK_WIDGET_STATE(widget))
+    textstate = GTK_STATE_INSENSITIVE;
+  else
+    textstate = GTK_STATE_NORMAL;
+
   /* draw the background of the bar */
   if(complete.width < bar.width)
     gtk_paint_box(style, window, GTK_STATE_NORMAL, GTK_SHADOW_IN, 
@@ -302,8 +317,7 @@ render(GtkCellRenderer *cell, GdkWindow *window, GtkWidget *widget,
                   NULL, widget, "bar", RECTARGS(complete));
 
   /* draw the text under the bar */
-  gtk_paint_layout(widget->style, window, (GTK_CELL_RENDERER_SELECTED & flags ?
-                   GTK_STATE_SELECTED : GTK_STATE_NORMAL), FALSE, &text,
+  gtk_paint_layout(widget->style, window, textstate, TRUE, &text,
                    widget, "cellrenderertext", text.x, text.y, tlayout);
 
   /* free memory */
