@@ -33,11 +33,11 @@ install: all $(foreach SUB,$(TARGETS),.install$(SUB))
 
 .install.cli: .cli
 	@echo "* Installing Transmission CLI client"
-	@$(MAKE) -C cli -f mk/cli.mk install
+	@$(MAKE) -C cli -f ../mk/cli.mk install
 
 .install.gtk: .gtk
 	@echo "* Installing Transmission GTK+ client"
-	@$(MAKE) -C gtk -f mk/gtk.mk install
+	@$(MAKE) -C gtk -f ../mk/gtk.mk install
 
 .install.beos:
 
