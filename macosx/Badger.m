@@ -24,7 +24,6 @@
 
 #import "Badger.h"
 #import "StringAdditions.h"
-#import "Utils.h"
 
 @interface Badger (Private)
 
@@ -74,8 +73,8 @@
 }
 
 - (void) updateBadgeWithCompleted: (int) completed
-                    uploadRate: (NSString *) uploadRate
-                    downloadRate: (NSString *) downloadRate
+                    uploadRate: (int) uploadRate
+                    downloadRate: (int) downloadRate
 {
     NSImage * dockIcon = nil;
     NSSize iconSize = [fDockIcon size];
@@ -118,7 +117,13 @@
     }
 
     //set upload and download rate badges
-    BOOL speedShown = uploadRate || downloadRate;
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    NSString * uploadRateString = uploadRate >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"]
+                                    ? [NSString stringForSpeedAbbrev: uploadRate] : nil,
+            * downloadRateString = downloadRate >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"]
+                                    ? [NSString stringForSpeedAbbrev: downloadRate] : nil;
+    
+    BOOL speedShown = uploadRateString || downloadRateString;
     if (speedShown)
     {
         NSRect badgeRect, stringRect;
@@ -136,20 +141,20 @@
         
         [dockIcon lockFocus];
         
-        if (uploadRate)
+        if (uploadRateString)
         {
             //place badge
             [fUploadBadge compositeToPoint: badgeRect.origin
                         operation: NSCompositeSourceOver];
             
             //place badge text
-            [self badgeString: uploadRate forRect: stringRect];
+            [self badgeString: uploadRateString forRect: stringRect];
         }
         
-        if (downloadRate)
+        if (downloadRateString)
         {
             //download rate above upload rate
-            if (uploadRate)
+            if (uploadRateString)
             {
                 float spaceBetween = badgeRect.size.height + 2.0;
                 badgeRect.origin.y += spaceBetween;
@@ -161,7 +166,7 @@
                         operation: NSCompositeSourceOver];
             
             //place badge text
-            [self badgeString: downloadRate forRect: stringRect];
+            [self badgeString: downloadRateString forRect: stringRect];
         }
         
         [dockIcon unlockFocus];

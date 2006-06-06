@@ -3,7 +3,7 @@
         {
             ACTIONS = {
                 advancedChanged = id; 
-                checkForUpdate = id; 
+                checkUpdate = id; 
                 growlRegister = id; 
                 linkForums = id; 
                 linkHomepage = id; 
@@ -11,10 +11,15 @@
                 removeTorrent = id; 
                 removeTorrentDeleteBoth = id; 
                 removeTorrentDeleteData = id; 
-                removeTorrentDeleteFile = id; 
+                removeTorrentDeleteTorrent = id; 
                 resumeAllTorrents = id; 
                 resumeTorrent = id; 
-                revealTorrent = id; 
+                revealFile = id; 
+                setInfoTab = id; 
+                setLimitGlobalEnabled = id; 
+                setQuickLimitGlobal = id; 
+                setQuickRatioGlobal = id; 
+                setRatioGlobalEnabled = id; 
                 setSort = id; 
                 showInfo = id; 
                 showMainWindow = id; 
@@ -29,28 +34,35 @@
                 fActionButton = NSButton; 
                 fAdvancedBarItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
                 fNameSortItem = NSMenuItem; 
-                fPauseResumeItem = NSMenuItem; 
-                fPrefsController = PrefsController; 
-                fPrefsWindow = NSPanel; 
-                fRemoveBothItem = NSMenuItem; 
-                fRemoveDataItem = NSMenuItem; 
-                fRemoveItem = NSMenuItem; 
-                fRemoveTorrentItem = NSMenuItem; 
-                fRevealItem = NSMenuItem; 
+                fNextInfoTabItem = NSMenuItem; 
+                fPrevInfoTabItem = NSMenuItem; 
+                fProgressSortItem = NSMenuItem; 
+                fRatioNotSetItem = NSMenuItem; 
+                fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
-                fShowHideToolbar = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
-                fStats = NSBox; 
+                fStatusBar = SmoothAquaView; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
                 fTotalTorrentsField = NSTextField; 
                 fTotalULField = NSTextField; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
                 fWindow = NSWindow; 
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {revealFile = id; setNextTab = id; setPreviousTab = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
         {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
@@ -97,6 +109,7 @@
                 fRemoveCheck = NSButton; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
+                fUpdater = SUUpdater; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
                 fUploadLimitItem = NSMenuItem; 
@@ -107,6 +120,13 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = ProgressCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
+        {
+            ACTIONS = {checkForUpdates = id; }; 
+            CLASS = SUUpdater; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = SmoothAquaView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {
             CLASS = TorrentTableView; 
             LANGUAGE = ObjC; 

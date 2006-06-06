@@ -30,6 +30,7 @@
 #import "PrefsController.h"
 #import "InfoWindowController.h"
 #import "Badger.h"
+#import "SmoothAquaView.h"
 
 @class TorrentTableView;
 
@@ -39,47 +40,41 @@
     int                         fCompleted;
     NSMutableArray              * fTorrents;
     
+    PrefsController             * fPrefsController;
+    NSUserDefaults              * fDefaults;
     InfoWindowController        * fInfoController;
-
-    NSToolbar                   * fToolbar;
-
-    IBOutlet NSMenuItem         * fAdvancedBarItem;
-    IBOutlet NSMenuItem         * fPauseResumeItem;
-    IBOutlet NSMenuItem         * fRemoveItem;
-    IBOutlet NSMenuItem         * fRemoveTorrentItem;
-    IBOutlet NSMenuItem         * fRemoveDataItem;
-    IBOutlet NSMenuItem         * fRemoveBothItem;
-    IBOutlet NSMenuItem         * fRevealItem;
-    IBOutlet NSMenuItem         * fShowHideToolbar;
 
     IBOutlet NSWindow           * fWindow;
     IBOutlet NSScrollView       * fScrollView;
     IBOutlet TorrentTableView   * fTableView;
+    NSToolbar                   * fToolbar;
+    
+    IBOutlet NSMenuItem         * fAdvancedBarItem;
+    IBOutlet NSButton           * fActionButton;
+    
+    IBOutlet SmoothAquaView     * fStatusBar;
+    BOOL                        fStatusBarVisible;
     IBOutlet NSTextField        * fTotalDLField;
     IBOutlet NSTextField        * fTotalULField;
     IBOutlet NSTextField        * fTotalTorrentsField;
-    IBOutlet NSBox              * fStats;
-    BOOL                        fStatusBar;
-    
-    IBOutlet NSButton           * fActionButton;
     
     NSString                    * fSortType;
-    IBOutlet NSMenuItem         * fNameSortItem,
-                                * fStateSortItem,
-                                * fDateSortItem;
-    NSMenuItem                  * fCurrentSortItem;
+    IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem,
+                                * fProgressSortItem, * fDateSortItem;
+                                
+    IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
+    
+    IBOutlet NSMenu             * fUploadMenu, * fDownloadMenu;
+    IBOutlet NSMenuItem         * fUploadLimitItem, * fUploadNoLimitItem,
+                                * fDownloadLimitItem, * fDownloadNoLimitItem,
+                                * fRatioSetItem, * fRatioNotSetItem;
 
     io_connect_t                fRootPort;
     NSTimer                     * fTimer;
-    NSTimer                     * fUpdateTimer;
-    
-    IBOutlet NSPanel            * fPrefsWindow;
-    IBOutlet PrefsController    * fPrefsController;
-    NSUserDefaults              * fDefaults;
     
     BOOL                        fHasGrowl;
-    Badger                      * fBadger; 
-    BOOL                        fCheckIsAutomatic;
+    Badger                      * fBadger;
+    BOOL                        fUpdateInProgress;
 }
 
 - (void) advancedChanged: (id) sender;
@@ -100,13 +95,13 @@
 - (void) stopAllTorrents:           (id) sender;
 - (void) stopTorrentWithIndex:      (NSIndexSet *) indexSet;
 
-- (void) removeTorrent:             (id) sender;
-- (void) removeTorrentDeleteFile:   (id) sender;
-- (void) removeTorrentDeleteData:   (id) sender;
-- (void) removeTorrentDeleteBoth:   (id) sender;
-- (void) removeTorrentWithIndex:    (NSIndexSet *) indexSet
-                deleteTorrent:      (BOOL) deleteTorrent
-                deleteData:         (BOOL) deleteData;
+- (void) removeTorrent:                 (id) sender;
+- (void) removeTorrentDeleteTorrent:    (id) sender;
+- (void) removeTorrentDeleteData:       (id) sender;
+- (void) removeTorrentDeleteBoth:       (id) sender;
+- (void) removeTorrentWithIndex:        (NSIndexSet *) indexSet
+                deleteTorrent:          (BOOL) deleteTorrent
+                deleteData:             (BOOL) deleteData;
                 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
                         contextInfo: (NSDictionary *) dict;
@@ -114,24 +109,33 @@
             deleteTorrent: (BOOL) deleteTorrent
             deleteData: (BOOL) deleteData;
 
-- (void) revealTorrent: (id) sender;
-                     
-- (void) showInfo:        (id) sender;
-- (void) updateInfo;
-- (void) updateInfoStats;
+- (void) revealFile: (id) sender;
 
-- (void) updateUI:        (NSTimer *) timer;
+- (void) showPreferenceWindow: (id) sender;
+
+- (void) showInfo: (id) sender;
+- (void) setInfoTab: (id) sender;
+
+- (void) updateUI: (NSTimer *) timer;
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;
 - (void) setSort: (id) sender;
 
-- (void) sleepCallBack:   (natural_t) messageType argument:
+- (void) setLimitGlobalEnabled: (id) sender;
+- (void) setQuickLimitGlobal: (id) sender;
+- (void) limitGlobalChange: (NSNotification *) notification;
+
+- (void) setRatioGlobalEnabled: (id) sender;
+- (void) setQuickRatioGlobal: (id) sender;
+- (void) ratioGlobalChange: (NSNotification *) notification;
+- (void) ratioSingleChange: (NSNotification *) notification;
+
+- (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;
 
 - (void) toggleStatusBar: (id) sender;
-
-- (void) showPreferenceWindow: (id) sender;
+- (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
 
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
@@ -139,9 +143,8 @@
 - (void) notifyGrowl:       (NSString *) file;
 - (void) growlRegister:     (id) sender;
 
-- (void) checkForUpdate:      (id) sender;
-- (void) checkForUpdateTimer: (NSTimer *) timer;
-- (void) checkForUpdateAuto:  (BOOL) automatic;
+- (void) checkUpdate:       (id) sender;
+- (void) prepareForUpdate:  (NSNotification *) notification;
 
 @end
 

@@ -96,37 +96,16 @@ static uint32_t kGreen[] =
     fTorrent = torrent;
 }
 
-- (void) setTextColor: (NSColor *) color
-{
-    fTextColor = color;
-}
-
-/***********************************************************************
- * init
- ***********************************************************************
- * Prepares the NSBitmapImageReps we are going to need in order to
- * draw.
- **********************************************************************/
-- (id) init
-{
-    self = [super init];
-
-    return self;
-}
-
-/***********************************************************************
- * buildSimpleBar
- **********************************************************************/
-- (void) buildSimpleBar
+- (void) buildSimpleBar: (int) width bitmap: (NSBitmapImageRep *) bitmap
 {
     int        h, w, end, pixelsPerRow;
     uint32_t * p;
     uint32_t * colors;
 
-    pixelsPerRow = [fBitmap bytesPerRow] / 4;
+    pixelsPerRow = [bitmap bytesPerRow] / 4;
 
-    p   = (uint32_t *) [fBitmap bitmapData] + 1;
-    end = lrintf( floor( [fTorrent progress] * ( fWidth - 2 ) ) );
+    p   = (uint32_t *) [bitmap bitmapData] + 1;
+    end = lrintf( floor( [fTorrent progress] * ( width - 2 ) ) );
 
     if( [fTorrent isSeeding] )
         colors = kGreen;
@@ -141,7 +120,7 @@ static uint32_t kGreen[] =
         {
             p[w] = htonl( colors[h] );
         }
-        for( w = end; w < fWidth - 2; w++ )
+        for( w = end; w < width - 2; w++ )
         {
             p[w] = htonl( kBack[h] );
         }
@@ -149,30 +128,27 @@ static uint32_t kGreen[] =
     }
 }
 
-/***********************************************************************
- * buildAdvancedBar
- **********************************************************************/
-- (void) buildAdvancedBar
+- (void) buildAdvancedBar: (int) width bitmap: (NSBitmapImageRep *) bitmap
 {
     int      h, w, end, pixelsPerRow;
     uint32_t * p, * colors;
-    uint8_t  * bitmapData  = [fBitmap bitmapData];
-    int        bytesPerRow = [fBitmap bytesPerRow];
+    uint8_t  * bitmapData  = [bitmap bitmapData];
+    int        bytesPerRow = [bitmap bytesPerRow];
 
-    fPieces = malloc( fWidth );
-    [fTorrent getAvailability: fPieces size: fWidth];
+    int8_t * pieces = malloc( width );
+    [fTorrent getAvailability: pieces size: width];
 
     if( [fTorrent isSeeding] )
     {
         /* All green, same as the simple bar */
-        [self buildSimpleBar];
+        [self buildSimpleBar: width bitmap: bitmap];
         return;
     }
 
-    pixelsPerRow = [fBitmap bytesPerRow] / 4;
+    pixelsPerRow = bytesPerRow / 4;
 
     /* First two lines: dark blue to show progression */
-    end  = lrintf( floor( [fTorrent progress] * ( fWidth - 2 ) ) );
+    end  = lrintf( floor( [fTorrent progress] * ( width - 2 ) ) );
     for( h = 0; h < 2; h++ )
     {
         p = (uint32_t *) ( bitmapData + h * bytesPerRow ) + 1;
@@ -180,7 +156,7 @@ static uint32_t kGreen[] =
         {
             p[w] = htonl( kBlue4[h] );
         }
-        for( w = end; w < fWidth - 2; w++ )
+        for( w = end; w < width - 2; w++ )
         {
             p[w] = htonl( kBack[h] );
         }
@@ -188,25 +164,25 @@ static uint32_t kGreen[] =
 
     /* Lines 2 to 14: blue or grey depending on whether
        we have the piece or not */
-    for( w = 0; w < fWidth - 2; w++ )
+    for( w = 0; w < width - 2; w++ )
     {
         /* Point to pixel ( 2 + w, 2 ). We will then draw
            "vertically" */
         p  = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + 1 + w;
 
-        if( fPieces[w] < 0 )
+        if( pieces[w] < 0 )
         {
             colors = kGray;
         }
-        else if( fPieces[w] < 1 )
+        else if( pieces[w] < 1 )
         {
             colors = kRed;
         }
-        else if( fPieces[w] < 2 )
+        else if( pieces[w] < 2 )
         {
             colors = kBlue1;
         }
-        else if( fPieces[w] < 3 )
+        else if( pieces[w] < 3 )
         {
             colors = kBlue2;
         }
@@ -222,110 +198,105 @@ static uint32_t kGreen[] =
         }
     }
 
-    free( fPieces );
+    free( pieces );
 }
 
-- (void) buildBar
+- (void) buildBarWithWidth: (int) width bitmap: (NSBitmapImageRep *) bitmap
 {
     int h;
     uint32_t * p;
 
     /* Left and right borders */
-    p = (uint32_t *) [fBitmap bitmapData];
+    p = (uint32_t *) [bitmap bitmapData];
     for( h = 0; h < BAR_HEIGHT; h++ )
     {
         p[0]          = htonl( kBorder[h] );
-        p[fWidth - 1] = htonl( kBorder[h] );
-        p += [fBitmap bytesPerRow] / 4;
+        p[width - 1] = htonl( kBorder[h] );
+        p += [bitmap bytesPerRow] / 4;
     }
 
     /* ...and redraw the progress bar on the top of it */
-    if( [[NSUserDefaults standardUserDefaults]
-            boolForKey:@"UseAdvancedBar"])
-    {
-        [self buildAdvancedBar];
-    }
+    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"UseAdvancedBar"])
+        [self buildAdvancedBar: width bitmap: bitmap];
     else
-    {
-        [self buildSimpleBar];
-    }
+        [self buildSimpleBar: width bitmap: bitmap];
 }
 
-/***********************************************************************
- * drawWithFrame
- ***********************************************************************
- * We have the strings, we have the bitmap. Let's just draw them where
- * they belong.
- **********************************************************************/
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
-    if( ![view lockFocusIfCanDraw] )
-    {
-        return;
-    }
-
-    NSMutableDictionary * attributes;
-    attributes = [NSMutableDictionary dictionaryWithCapacity: 2];
-    [attributes setObject: fTextColor
-        forKey: NSForegroundColorAttributeName];
+    BOOL highlighted = [self isHighlighted] && [[view window] isKeyWindow];
+    NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    highlighted ? [NSColor whiteColor] : [NSColor blackColor],
+                    NSForegroundColorAttributeName,
+                    [NSFont messageFontOfSize: 12], NSFontAttributeName, nil];
+    NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor],
+                    NSForegroundColorAttributeName,
+                    [NSFont messageFontOfSize: 9], NSFontAttributeName, nil];
 
     NSPoint pen = cellFrame.origin;
+    float padding = 3.0, linePadding = 2.0;
 
-    /* Draw the icon */
-    pen.x += 5; pen.y += 10;
-    NSImage * icon = [fTorrent icon];
+    //icon
+    NSImage * icon = [fTorrent iconFlipped];
+    NSSize iconSize = [icon size];
+    
+    pen.x += padding;
+    pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
+    
     [icon drawAtPoint: pen fromRect:
-        NSMakeRect( 0, 0, [icon size].width, [icon size].height )
+        NSMakeRect( 0, 0, iconSize.width, iconSize.height )
         operation: NSCompositeSourceOver fraction: 1.0];
 
-    NSString * string;
-    fWidth  = NSWidth( cellFrame ) - [icon size].width - 15;
+    float extraNameShift = 1.0,
+        mainWidth = cellFrame.size.width - iconSize.width - 3.0 * padding - extraNameShift;
 
-    /* Draw file or folder name */
-    pen.x += [icon size].width + 5; pen.y -= 7;
-    [attributes setObject: [NSFont messageFontOfSize: 11]
-        forKey: NSFontAttributeName];
-    NSString * sizeString = [NSString stringWithFormat: @" (%@)",
-        [NSString stringForFileSize: [fTorrent size]]]; 
-    string = [[[fTorrent name] stringFittingInWidth: fWidth - 50 -
-        [sizeString sizeWithAttributes: attributes].width 
-        withAttributes: attributes] stringByAppendingString: sizeString];
-    [string drawAtPoint: pen withAttributes: attributes];
+    //name string
+    pen.x += iconSize.width + padding + extraNameShift;
+    pen.y = cellFrame.origin.y + padding;
+    NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
+                                attributes: nameAttributes];
+    [nameString drawAtPoint: pen];
+    
+    //progress string
+    pen.y += [nameString size].height + linePadding - 1.0;
+    
+    NSAttributedString * progressString = [[fTorrent progressString]
+        attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
+    [progressString drawAtPoint: pen];
 
-    /* Draw the progress bar */
-    pen.y += 17;
-    fBitmap = [[NSBitmapImageRep alloc]
-        initWithBitmapDataPlanes: nil pixelsWide: fWidth
+    //progress bar
+    pen.x -= extraNameShift;
+    pen.y += [progressString size].height + linePadding;
+    
+    float barWidth = mainWidth + extraNameShift - 39.5 - padding;
+    
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
+        initWithBitmapDataPlanes: nil pixelsWide: barWidth
         pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4
         hasAlpha: YES isPlanar: NO colorSpaceName:
         NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
-    NSImage * img = [[NSImage alloc] initWithSize: [fBitmap size]];
-    [img addRepresentation: fBitmap];
+    NSImage * img = [[NSImage alloc] initWithSize: [bitmap size]];
+    [img addRepresentation: bitmap];
     [img setFlipped: YES];
-    [self buildBar];
+    
+    [self buildBarWithWidth: barWidth bitmap: bitmap];
+    
     [img drawAtPoint: pen fromRect: NSMakeRect( 0, 0,
             [img size].width, [img size].height )
         operation: NSCompositeSourceOver fraction: 1.0];
     [img release];
-    [fBitmap release];
+    [bitmap release];
 
-    /* Status strings */
-    [attributes setObject: [NSFont messageFontOfSize: 9]
-            forKey: NSFontAttributeName];
-    pen.y += BAR_HEIGHT + 2;
-    [[fTorrent statusString] drawAtPoint: pen withAttributes: attributes];
-    pen.y += 13;
-    string = [[fTorrent infoString] stringFittingInWidth:
-        ( fWidth - 80 ) withAttributes: attributes];
-    [string drawAtPoint: pen withAttributes: attributes];
-
-    /* Rates */
-    pen.x += fWidth - 70; pen.y -= 13;
-    [[fTorrent downloadString] drawAtPoint: pen withAttributes: attributes];
-    pen.y += 13;
-    [[fTorrent uploadString] drawAtPoint: pen withAttributes: attributes];
-
-    [view unlockFocus];
+    //status strings
+    pen.x += extraNameShift;
+    pen.y += BAR_HEIGHT + linePadding;
+    NSAttributedString * statusString = [[fTorrent statusString]
+        attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
+    [statusString drawAtPoint: pen];
+    
+    [nameAttributes release];
+    [statusAttributes release];
 }
 
 @end

@@ -57,21 +57,20 @@
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
             downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"]
                                 stringByExpandingTildeInPath];
-        [self setFolder: downloadFolder];
+        [self setDownloadFolder: downloadFolder];
 
         NSString * paused;
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
             [self start];
     }
-    
     return self;
 }
 
 - (NSDictionary *) history
 {
     return [NSDictionary dictionaryWithObjectsAndKeys:
-            [self path], @"TorrentPath",
-            [self getFolder], @"DownloadFolder",
+            [self torrentLocation], @"TorrentPath",
+            [self downloadFolder], @"DownloadFolder",
             [self isActive] ? @"NO" : @"YES", @"Paused",
             [self date], @"Date",
             [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
@@ -86,21 +85,19 @@
         
         [fDate release];
         [fIcon release];
-        [fIconNonFlipped release];
+        [fIconFlipped release];
+        [fProgressString release];
         [fStatusString release];
-        [fInfoString release];
-        [fDownloadString release];
-        [fUploadString release];
     }
     [super dealloc];
 }
 
-- (void) setFolder: (NSString *) path
+- (void) setDownloadFolder: (NSString *) path
 {
     tr_torrentSetFolder( fHandle, [path UTF8String] );
 }
 
-- (NSString *) getFolder
+- (NSString *) downloadFolder
 {
     return [NSString stringWithUTF8String: tr_torrentGetFolder( fHandle )];
 }
@@ -115,84 +112,87 @@
     fStat = tr_torrentStat( fHandle );
     
     if ([self isSeeding]) 
-        if ((fStopRatioSetting == 1 && [self ratio] >= fRatioLimit)
-            || (fStopRatioSetting == -1 && [fDefaults boolForKey: @"RatioCheck"]
+        if ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
+            || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
                 && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"]))
         {
             [self stop];
-            [self setStopRatioSetting: 0];
+            [self setStopRatioSetting: RATIO_NO_CHECK];
             
             fStat = tr_torrentStat( fHandle );
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:
+                @"TorrentRatioChanged" object: self];
         }
-
-    [fStatusString setString: @""];
-    [fInfoString setString: @""];
+    
+    [fProgressString setString: @""];
+    if ([self progress] < 1.0)
+        [fProgressString appendFormat: @"%@ of %@ completed (%.2f%%)", [NSString stringForFileSize:
+                [self downloaded]], [NSString stringForFileSize: [self size]], 100 * [self progress]];
+    else
+        [fProgressString appendFormat: @"%@, uploaded %@ (ratio: %@)", [NSString stringForFileSize:
+                [self size]], [NSString stringForFileSize: [self uploaded]],
+                [NSString stringForRatioWithDownload: [self downloaded] upload: [self uploaded]]];
 
     switch( fStat->status )
     {
         case TR_STATUS_PAUSE:
-            [fStatusString appendFormat: @"Paused (%.2f %%)",
-                100 * fStat->progress];
+            [fStatusString setString: @"Paused"];
             break;
 
         case TR_STATUS_CHECK:
-            [fStatusString appendFormat:
-                @"Checking existing files (%.2f %%)",
-                100 * fStat->progress];
+            [fStatusString setString: [@"Checking existing files" stringByAppendingString: NS_ELLIPSIS]];
             break;
 
         case TR_STATUS_DOWNLOAD:
-            if( fStat->eta < 0 )
-            {
-                [fStatusString appendFormat:
-                    @"Finishing in --:--:-- (%.2f %%)",
-                    100 * fStat->progress];
-            }
+            [fStatusString setString: @""];
+            [fStatusString appendFormat:
+                @"Downloading from %d of %d peer%s",
+                [self peersUploading], [self totalPeers],
+                ([self totalPeers] == 1) ? "" : "s"];
+            
+            int eta = fStat->eta;
+            if (eta < 0)
+                [fProgressString appendString: @" - remaining time unknown"];
             else
             {
-                [fStatusString appendFormat:
-                    @"Finishing in %02d:%02d:%02d (%.2f %%)",
-                    fStat->eta / 3600, ( fStat->eta / 60 ) % 60,
-                    fStat->eta % 60, 100 * fStat->progress];
+                if (eta < 60)
+                    [fProgressString appendFormat: @" - %d sec remaining", eta];
+                else if (eta < 3600)
+                    [fProgressString appendFormat: @" - %d min %02d sec remaining",
+                                                    eta / 60, eta % 60];
+                else
+                    [fProgressString appendFormat: @" - %d hr %02d min remaining",
+                                                    eta / 3600, (eta / 60) % 60];
             }
-            [fInfoString appendFormat:
-                @"Downloading from %d of %d peer%s",
-                fStat->peersUploading, fStat->peersTotal,
-                ( fStat->peersTotal == 1 ) ? "" : "s"];
             break;
 
         case TR_STATUS_SEED:
+            [fStatusString setString: @""];
             [fStatusString appendFormat:
-                @"Seeding, uploading to %d of %d peer%s",
-                fStat->peersDownloading, fStat->peersTotal,
-                ( fStat->peersTotal == 1 ) ? "" : "s"];
+                @"Seeding to %d of %d peer%s",
+                [self peersDownloading], [self totalPeers],
+                ([self totalPeers] == 1) ? "" : "s"];
             break;
 
         case TR_STATUS_STOPPING:
-            [fStatusString setString: [@"Stopping"
-                stringByAppendingString: NS_ELLIPSIS]];
+            [fStatusString setString: [@"Stopping" stringByAppendingString: NS_ELLIPSIS]];
             break;
     }
-
+    
     if( fStat->error & TR_ETRACKER )
     {
-        [fInfoString setString: [@"Error: " stringByAppendingString:
+        [fStatusString setString: [@"Error: " stringByAppendingString:
             [NSString stringWithUTF8String: fStat->trackerError]]];
     }
 
-    if( fStat->progress == 1.0 )
+    if ([self isActive])
     {
-        [fDownloadString setString: [@"Ratio: " stringByAppendingString:
-            [NSString stringForRatio: fStat->downloaded
-            upload: fStat->uploaded]]];
+        if ([self progress] < 1.0)
+            [fStatusString appendFormat: @" - DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
+        [fStatusString appendString: [@"UL: " stringByAppendingString:
+                                                [NSString stringForSpeed: [self uploadRate]]]];
     }
-    else
-    {
-        [fDownloadString setString: [@"DL: " stringByAppendingString:
-            [NSString stringForSpeed: fStat->rateDownload]]];
-    }
-    [fUploadString setString: [@"UL: " stringByAppendingString:
-        [NSString stringForSpeed: fStat->rateUpload]]];
 }
 
 - (void) start
@@ -229,13 +229,10 @@
 
 - (float) ratio
 {
-    uint64_t downloaded = [self downloaded];
-    return downloaded > 0 ? [self uploaded] / downloaded : -1;
+    float downloaded = [self downloaded];
+    return downloaded > 0 ? (float)[self uploaded] / downloaded : -1;
 }
 
-/*  1: Check ratio
-    0: Don't check ratio
-   -1: Use defaults */
 - (int) stopRatioSetting
 {
 	return fStopRatioSetting;
@@ -259,20 +256,18 @@
 
 - (void) reveal
 {
-    [[NSWorkspace sharedWorkspace] selectFile: [[self getFolder]
-        stringByAppendingPathComponent: [self name]]
+    [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation]
         inFileViewerRootedAtPath: nil];
 }
 
 - (void) trashTorrent
 {
-    [self trashPath: [self path]];
+    [self trashPath: [self torrentLocation]];
 }
 
 - (void) trashData
 {
-    [self trashPath: [[self getFolder]
-        stringByAppendingPathComponent: [self name]]];
+    [self trashPath: [self dataLocation]];
 }
 
 - (NSImage *) icon
@@ -280,14 +275,9 @@
     return fIcon;
 }
 
-- (NSImage *) iconNonFlipped
+- (NSImage *) iconFlipped
 {
-    return fIconNonFlipped;
-}
-
-- (NSString *) path
-{
-    return [NSString stringWithUTF8String: fInfo->torrent];
+    return fIconFlipped;
 }
 
 - (NSString *) name
@@ -321,7 +311,7 @@
     return fInfo->pieceCount;
 }
 
-- (NSString *) hash
+- (NSString *) hashString
 {
     NSMutableString * string = [NSMutableString
         stringWithCapacity: SHA_DIGEST_LENGTH];
@@ -331,6 +321,45 @@
         [string appendFormat: @"%02x", fInfo->hash[i]];
     }
     return string;
+}
+
+- (NSString *) torrentLocation
+{
+    return [NSString stringWithUTF8String: fInfo->torrent];;
+}
+
+- (NSString *) dataLocation
+{
+    return [[self downloadFolder] stringByAppendingPathComponent: [self name]];
+}
+
+- (NSString *) state
+{
+    switch( fStat->status )
+    {
+        case TR_STATUS_PAUSE:
+            return @"Paused";
+            break;
+
+        case TR_STATUS_CHECK:
+            return [@"Checking existing files" stringByAppendingString: NS_ELLIPSIS];
+            break;
+
+        case TR_STATUS_DOWNLOAD:
+            return @"Downloading";
+            break;
+
+        case TR_STATUS_SEED:
+            return @"Seeding";
+            break;
+
+        case TR_STATUS_STOPPING:
+            return [@"Stopping" stringByAppendingString: NS_ELLIPSIS];
+            break;
+        
+        default:
+            return @"N/A";
+    }
 }
 
 - (float) progress
@@ -358,24 +387,14 @@
     return tr_getFinished( fHandle );
 }
 
+- (NSString *) progressString
+{
+    return fProgressString;
+}
+
 - (NSString *) statusString
 {
     return fStatusString;
-}
-
-- (NSString *) infoString
-{
-    return fInfoString;
-}
-
-- (NSString *) downloadString
-{
-    return fDownloadString;
-}
-
-- (NSString *) uploadString
-{
-    return fUploadString;
 }
 
 - (int) seeders
@@ -388,6 +407,33 @@
     return fStat->leechers;
 }
 
+- (int) totalPeers
+{
+    return fStat->peersTotal;
+}
+
+//peers uploading to you
+- (int) peersUploading
+{
+    return fStat->peersUploading;
+}
+
+//peers downloading from you
+- (int) peersDownloading
+{
+    return fStat->peersDownloading;
+}
+
+- (float) downloadRate
+{
+    return fStat->rateDownload;
+}
+
+- (float) uploadRate
+{
+    return fStat->rateUpload;
+}
+
 - (uint64_t) downloaded
 {
     return fStat->downloaded;
@@ -396,6 +442,16 @@
 - (uint64_t) uploaded
 {
     return fStat->uploaded;
+}
+
+- (NSArray *) fileList
+{
+    int count = fInfo->fileCount, i;
+    NSMutableArray * files = [NSMutableArray arrayWithCapacity: count];
+    for (i = 0; i < count; i++)
+        [files addObject: [[self downloadFolder] stringByAppendingPathComponent:
+            [NSString stringWithUTF8String: fInfo->files[i].name]]];
+    return files;
 }
 
 - (NSDate *) date
@@ -411,6 +467,11 @@
         return [NSNumber numberWithInt: 1];
     else
         return [NSNumber numberWithInt: 2];
+}
+
+- (NSNumber *) progressSortKey
+{
+    return [NSNumber numberWithFloat: [self progress]];
 }
 
 @end
@@ -444,15 +505,13 @@
     NSString * fileType = ( fInfo->fileCount > 1 ) ?
         NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
-    [fIcon setFlipped: YES];
     [fIcon retain];
-    fIconNonFlipped = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
-    [fIconNonFlipped retain];
+    
+    fIconFlipped = [fIcon copy];
+    [fIconFlipped setFlipped: YES];
 
-    fStatusString   = [[NSMutableString alloc] initWithCapacity: 50];
-    fInfoString     = [[NSMutableString alloc] initWithCapacity: 50];
-    fDownloadString = [[NSMutableString alloc] initWithCapacity: 10];
-    fUploadString   = [[NSMutableString alloc] initWithCapacity: 10];
+    fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
+    fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
 
     [self update];
     return self;

@@ -27,23 +27,37 @@
 
 @interface InfoWindowController : NSWindowController
 {
-    IBOutlet NSImageView        * fImageView;
-    IBOutlet NSTextField        * fName;
-    IBOutlet NSTextField        * fSize;
-    IBOutlet NSTextField        * fTracker;
-    IBOutlet NSTextField        * fAnnounce;
-    IBOutlet NSTextField        * fPieceSize;
-    IBOutlet NSTextField        * fPieces;
-    IBOutlet NSTextField        * fHash;
-    IBOutlet NSTextField        * fSeeders;
-    IBOutlet NSTextField        * fLeechers;
-    IBOutlet NSTextField        * fDownloaded;
-    IBOutlet NSTextField        * fUploaded;
+    NSMutableArray * fTorrents, * fFiles;
+    NSImage * fAppIcon;
     
-    NSImage                     * fAppIcon;
+    IBOutlet NSTabView * fTabView;
+
+    IBOutlet NSImageView * fImageView;
+    IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
+                        * fAnnounceField, * fPieceSizeField, * fPiecesField,
+                        * fHashField,
+                        * fTorrentLocationField, * fDataLocationField,
+                        * fDateStartedField,
+                        * fStateField, * fPercentField,
+                        * fDownloadRateField, * fUploadRateField,
+                        * fDownloadedField, * fUploadedField, * fRatioField,
+                        * fSeedersField, * fLeechersField,
+                        * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
+
+    IBOutlet NSTableView * fFileTable;
+    
+    IBOutlet NSMatrix * fRatioMatrix;
+    IBOutlet NSTextField * fRatioLimitField;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
-- (void) updateInfoStatsForTorrents: (NSArray *) torrents;
+- (void) updateInfoStats;
+
+- (void) setNextTab;
+- (void) setPreviousTab;
+- (void) revealFile: (id) sender;
+
+- (void) setRatioCheck: (id) sender;
+- (void) setRatioLimit: (id) sender;
 
 @end

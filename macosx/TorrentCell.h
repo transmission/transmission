@@ -30,15 +30,9 @@
 
 @interface TorrentCell : NSCell
 {
-    Torrent          * fTorrent;
-    NSColor          * fTextColor;
-
-    NSBitmapImageRep * fBitmap;
-    int                fWidth;
-    int8_t           * fPieces;
+    Torrent * fTorrent;
 }
 - (void) setTorrent:   (Torrent *) torrent;
-- (void) setTextColor: (NSColor *) color;
 @end
 
 #endif

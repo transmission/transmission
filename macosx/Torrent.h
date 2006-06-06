@@ -25,6 +25,10 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+#define RATIO_CHECK 1
+#define RATIO_GLOBAL -1
+#define RATIO_NO_CHECK 0
+
 @interface Torrent : NSObject
 {
     tr_handle_t  * fLib;
@@ -36,12 +40,8 @@
 
     NSUserDefaults  * fDefaults;
 
-    NSImage         * fIcon;
-    NSImage         * fIconNonFlipped;
-    NSMutableString * fStatusString;
-    NSMutableString * fInfoString;
-    NSMutableString * fDownloadString;
-    NSMutableString * fUploadString;
+    NSImage         * fIcon, * fIconFlipped;
+    NSMutableString * fNameString, * fProgressString, * fStatusString;
     
     int     fStopRatioSetting;
     float   fRatioLimit;
@@ -51,8 +51,8 @@
 - (id)          initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 - (NSDictionary *) history;
                     
-- (void)       setFolder: (NSString *) path;
-- (NSString *) getFolder;
+- (void)       setDownloadFolder: (NSString *) path;
+- (NSString *) downloadFolder;
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
 
 - (void)       update;
@@ -61,42 +61,55 @@
 - (void)       sleep;
 - (void)       wakeUp;
 
-- (float)      ratio;
-- (int)        stopRatioSetting;
-- (void)       setStopRatioSetting: (int) setting;
-- (float)      ratioLimit;
-- (void)       setRatioLimit: (float) limit;
+- (float)       ratio;
+- (int)         stopRatioSetting;
+- (void)        setStopRatioSetting: (int) setting;
+- (float)       ratioLimit;
+- (void)        setRatioLimit: (float) limit;
 
-- (NSNumber *) stateSortKey;
-
-- (void)       reveal;
-- (void)       trashTorrent;
-- (void)       trashData;
+- (void)        reveal;
+- (void)        trashTorrent;
+- (void)        trashData;
 
 - (NSImage *)  icon;
-- (NSImage *)  iconNonFlipped;
-- (NSString *) path;
+- (NSImage *)  iconFlipped;
+
 - (NSString *) name;
 - (uint64_t)   size;
 - (NSString *) tracker;
 - (NSString *) announce;
 - (int)        pieceSize;
 - (int)        pieceCount;
-- (NSString *) hash;
+- (NSString *) hashString;
+- (NSString *) torrentLocation;
+- (NSString *) dataLocation;
 
-- (float)      progress;
-- (BOOL)       isActive;
-- (BOOL)       isSeeding;
-- (BOOL)       isPaused;
-- (BOOL)       justFinished;
-- (NSString *) statusString;
-- (NSString *) infoString;
-- (NSString *) downloadString;
-- (NSString *) uploadString;
-- (int)        seeders;
-- (int)        leechers;
-- (uint64_t)   downloaded;
-- (uint64_t)   uploaded;
-- (NSDate *)   date;
+- (NSString *) state;
+
+- (float)   progress;
+- (BOOL)    isActive;
+- (BOOL)    isSeeding;
+- (BOOL)    isPaused;
+- (BOOL)    justFinished;
+
+- (NSString *)  progressString;
+- (NSString *)  statusString;
+
+- (int) seeders;
+- (int) leechers;
+- (int) totalPeers;
+- (int) peersUploading;
+- (int) peersDownloading;
+
+- (float)       downloadRate;
+- (float)       uploadRate;
+- (uint64_t)    downloaded;
+- (uint64_t)    uploaded;
+
+- (NSArray *) fileList;
+
+- (NSDate *) date;
+- (NSNumber *) stateSortKey;
+- (NSNumber *) progressSortKey;
 
 @end

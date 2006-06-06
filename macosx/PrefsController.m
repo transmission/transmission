@@ -26,6 +26,9 @@
 #import "StringAdditions.h"
 #import "Utils.h"
 
+#define MIN_PORT            1
+#define MAX_PORT            65535
+
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
@@ -35,7 +38,7 @@
 #define UPDATE_NEVER        2
 
 #define TOOLBAR_GENERAL     @"General"
-#define TOOLBAR_TRANSFERS    @"Transfers"
+#define TOOLBAR_TRANSFERS   @"Transfers"
 #define TOOLBAR_NETWORK     @"Network"
 
 @interface PrefsController (Private)
@@ -73,7 +76,7 @@
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [fToolbar setDelegate: self];
     [fToolbar setAllowsUserCustomization: NO];
-    [fPrefsWindow setToolbar: fToolbar];
+    [[self window] setToolbar: fToolbar];
     [fToolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [fToolbar setSizeMode: NSToolbarSizeModeRegular];
 
@@ -88,18 +91,12 @@
     fDownloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
     [fDownloadFolder retain];
 
-    if( [downloadChoice isEqualToString: @"Constant"] )
-    {
+    if ([downloadChoice isEqualToString: @"Constant"])
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-    }
-    else if( [downloadChoice isEqualToString: @"Torrent"] )
-    {
+    else if ([downloadChoice isEqualToString: @"Torrent"])
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
-    }
     else
-    {
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
-    }
     [self updatePopUp];
 
     //set bind port
@@ -123,13 +120,6 @@
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
     
-    [fUploadLimitItem setTitle:
-                [NSString stringWithFormat: @"Limit (%d KB/s)", uploadLimit]];
-    if (checkUpload)
-        [fUploadLimitItem setState: NSOnState];
-    else
-        [fUploadNoLimitItem setState: NSOnState];
-    
     tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
 
 	//set download limit
@@ -140,28 +130,13 @@
     [fDownloadField setIntValue: downloadLimit];
     [fDownloadField setEnabled: checkDownload];
     
-    [fDownloadLimitItem setTitle:
-                [NSString stringWithFormat: @"Limit (%d KB/s)", downloadLimit]];
-    if (checkDownload)
-        [fDownloadLimitItem setState: NSOnState];
-    else
-        [fDownloadNoLimitItem setState: NSOnState];
-    
     tr_setDownloadLimit( fHandle, checkDownload ? downloadLimit : -1 );
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
-    float ratioLimit = [fDefaults floatForKey: @"RatioLimit"];
-
     [fRatioCheck setState: ratioCheck ? NSOnState : NSOffState];
     [fRatioField setEnabled: ratioCheck];
-    [fRatioField setFloatValue: ratioLimit];
-    
-    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.1f)", ratioLimit]];
-    if (ratioCheck)
-        [fRatioSetItem setState: NSOnState];
-    else
-        [fRatioNotSetItem setState: NSOnState];
+    [fRatioField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
     //set remove and quit prompts
     [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"] ?
@@ -176,19 +151,14 @@
     //set auto start
     [fAutoStartCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
 
-    /* Check for update */
-    NSString * versionCheck  = [fDefaults stringForKey: @"VersionCheck"];
-    if( [versionCheck isEqualToString: @"Daily"] )
-        [fUpdatePopUp selectItemAtIndex: UPDATE_DAILY];
-    else if( [versionCheck isEqualToString: @"Weekly"] )
+    //set update check
+    NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
+    if ([updateCheck isEqualToString: @"Weekly"])
         [fUpdatePopUp selectItemAtIndex: UPDATE_WEEKLY];
-    else if( [versionCheck isEqualToString: @"Never"] )
+    else if ([updateCheck isEqualToString: @"Never"])
         [fUpdatePopUp selectItemAtIndex: UPDATE_NEVER];
     else
-    {
-        [fDefaults setObject: @"Weekly" forKey: @"VersionCheck"];
-        [fUpdatePopUp selectItemAtIndex: UPDATE_WEEKLY];
-    }
+        [fUpdatePopUp selectItemAtIndex: UPDATE_DAILY];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -246,137 +216,159 @@
 
 - (void) setPort: (id) sender
 {
-    int bindPort = [fPortField intValue];
-    
-    tr_setBindPort( fHandle, bindPort );
-    [fDefaults setInteger: bindPort forKey: @"BindPort"];
+    int bindPort = [sender intValue];
+    if (![[NSString stringWithInt: bindPort] isEqualToString: [sender stringValue]]
+            || bindPort < MIN_PORT || bindPort > MAX_PORT)
+    {
+        NSBeep();
+        bindPort = [fDefaults integerForKey: @"BindPort"];
+        [sender setIntValue: bindPort];
+    }
+    else
+    {
+        tr_setBindPort( fHandle, bindPort );
+        [fDefaults setInteger: bindPort forKey: @"BindPort"];
+    }
 }
 
 - (void) setLimit: (id) sender
 {
     NSString * key;
-    NSMenuItem * menuItem;
+    NSButton * check;
+    NSString * type;
     if (sender == fUploadField)
     {
         key = @"UploadLimit";
-        menuItem = fUploadLimitItem;
+        check = fUploadCheck;
+        type = @"Upload";
     }
     else
     {
         key = @"DownloadLimit";
-        menuItem = fDownloadLimitItem;
+        check = fDownloadCheck;
+        type = @"Download";
     }
 
     int limit = [sender intValue];
-    [fDefaults setInteger: limit forKey: key];
-    
-    [menuItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)", limit]];
-
-    if( sender == fUploadField )
-        tr_setUploadLimit( fHandle,
-            ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
+    if (![[sender stringValue] isEqualToString:
+            [NSString stringWithFormat: @"%d", limit]]
+            || limit < 0)
+    {
+        NSBeep();
+        limit = [fDefaults integerForKey: key];
+        [sender setIntValue: limit];
+    }
     else
-        tr_setDownloadLimit( fHandle,
-            ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
+    {
+        if( sender == fUploadField )
+            tr_setUploadLimit( fHandle,
+                ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
+        else
+            tr_setDownloadLimit( fHandle,
+                ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
+        
+        [fDefaults setInteger: limit forKey: key];
+    }
+    
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                    [NSNumber numberWithBool: [check state]], @"Enable",
+                                    [NSNumber numberWithInt: limit], @"Limit",
+                                    type, @"Type", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:
+                            @"LimitGlobalChange" object: dict];
 }
 
 - (void) setLimitCheck: (id) sender
 {
     NSString * key;
     NSTextField * field;
-    NSMenuItem * limitItem, * noLimitItem;
-    if( sender == fUploadCheck )
+    if (sender == fUploadCheck)
     {
         key = @"CheckUpload";
         field = fUploadField;
-        limitItem = fUploadLimitItem;
-        noLimitItem = fUploadNoLimitItem;
     }
     else
     {
         key = @"CheckDownload";
         field = fDownloadField;
-        limitItem = fDownloadLimitItem;
-        noLimitItem = fDownloadNoLimitItem;
     }
-
+    
     BOOL check = [sender state] == NSOnState;
-    [limitItem setState: check ? NSOnState : NSOffState];
-    [noLimitItem setState: !check ? NSOnState : NSOffState];
+    [self setLimit: field];
+    [field setEnabled: check];
     
     [fDefaults setBool: check forKey: key];
-    
-    [field setIntValue: [field intValue]]; //set to valid value
-    [self setLimit: field];
-    
-    [field setEnabled: check];
 }
 
-- (void) setLimitMenu: (id) sender
+- (void) setLimitEnabled: (BOOL) enable type: (NSString *) type
 {
-    NSButton * check = (sender == fUploadLimitItem || sender == fUploadNoLimitItem)
+    NSButton * check = [type isEqualToString: @"Upload"]
                         ? fUploadCheck : fDownloadCheck;
-    int state = (sender == fUploadLimitItem || sender == fDownloadLimitItem)
-                    ? NSOnState : NSOffState;
-                
-    [check setState: state];
+    [check setState: enable ? NSOnState : NSOffState];
     [self setLimitCheck: check];
 }
 
-- (void) setQuickSpeed: (id) sender
+- (void) setQuickLimit: (int) limit type: (NSString *) type
 {
-    NSString * title = [sender title];
-    int limit = [[title substringToIndex: [title length] - [@" KB/s" length]] intValue];
-    
-    if ([sender menu] == fUploadMenu)
+    NSButton * check;
+    if ([type isEqualToString: @"Upload"])
     {
         [fUploadField setIntValue: limit];
-        [self setLimitMenu: fUploadLimitItem];
+        check = fUploadCheck;
     }
     else
     {
         [fDownloadField setIntValue: limit];
-        [self setLimitMenu: fDownloadLimitItem];
+        check = fDownloadCheck;
     }
+    [check setState: NSOnState];
+    [self setLimitCheck: check];
 }
 
 - (void) setRatio: (id) sender
 {
-    float ratio = [sender floatValue];
-    [fDefaults setFloat: ratio forKey: @"RatioLimit"];
+    float ratioLimit = [sender floatValue];
+    if (![[sender stringValue] isEqualToString:
+            [NSString stringWithFormat: @"%.2f", ratioLimit]]
+            || ratioLimit < 0)
+    {
+        NSBeep();
+        ratioLimit = [fDefaults floatForKey: @"RatioLimit"];
+        [sender setFloatValue: ratioLimit];
+    }
+    else
+        [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
     
-    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.1f)", ratio]];
+    NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                    [NSNumber numberWithBool: [fRatioCheck state]], @"Enable",
+                                    [NSNumber numberWithFloat: ratioLimit], @"Ratio", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:
+                                @"RatioGlobalChange" object: dict];
 }
 
 - (void) setRatioCheck: (id) sender
 {
     BOOL check = [sender state] == NSOnState;
-    
-    [fDefaults setBool: check forKey: @"RatioCheck"];
-    
-    [fRatioField setFloatValue: [fRatioField floatValue]]; //set to valid value
     [self setRatio: fRatioField];
-    
     [fRatioField setEnabled: check];
     
-    [fRatioSetItem setState: check ? NSOnState : NSOffState];
-    [fRatioNotSetItem setState: !check ? NSOnState : NSOffState];
+    [fDefaults setBool: check forKey: @"RatioCheck"];
 }
 
-- (void) setRatioMenu: (id) sender
+- (void) setRatioEnabled: (BOOL) enable
 {
-    int state = sender == fRatioSetItem ? NSOnState : NSOffState;
-                
+    int state = enable ? NSOnState : NSOffState;
+    
     [fRatioCheck setState: state];
     [self setRatioCheck: fRatioCheck];
 }
 
-- (void) setQuickRatio: (id) sender
+- (void) setQuickRatio: (float) ratioLimit
 {
-    float limit = [[sender title] floatValue];
-
-    [fRatioField setFloatValue: limit];
-    [self setRatioMenu: fRatioSetItem];
+    [fRatioField setFloatValue: ratioLimit];
+    
+    [fRatioCheck setState: NSOnState];
+    [self setRatioCheck: fRatioCheck];
 }
 
 - (void) setShowMessage: (id) sender
@@ -399,18 +391,27 @@
 
 - (void) setUpdate: (id) sender
 {
-    switch( [fUpdatePopUp indexOfSelectedItem] )
+    NSString * schedule;
+    int index = [fUpdatePopUp indexOfSelectedItem];
+    NSTimeInterval seconds;
+    if (index == UPDATE_DAILY)
     {
-        case UPDATE_DAILY:
-            [fDefaults setObject: @"Daily" forKey: @"VersionCheck"];
-            break;
-        case UPDATE_WEEKLY:
-            [fDefaults setObject: @"Weekly" forKey: @"VersionCheck"];
-            break;
-        case UPDATE_NEVER:
-            [fDefaults setObject: @"Never" forKey: @"VersionCheck"];
-            break;
+        [fDefaults setObject: @"Daily" forKey: @"UpdateCheck"];
+        seconds = 86400;
     }
+    else if (index == UPDATE_WEEKLY)
+    {
+        [fDefaults setObject: @"Weekly" forKey: @"UpdateCheck"];
+        seconds = 604800;
+    }
+    else
+    {
+        [fDefaults setObject: @"Never" forKey: @"UpdateCheck"];
+        seconds = 0;
+    }
+
+    [fDefaults setInteger: seconds forKey: @"SUScheduledCheckInterval"];
+    [fUpdater scheduleCheckWithInterval: seconds];
 }
 
 - (void) setAutoStart: (id) sender
@@ -435,6 +436,11 @@
     }
 }
 
+- (void) checkUpdate
+{
+    [fUpdater checkForUpdates: nil];
+}
+
 - (void) folderSheetShow: (id) sender
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -445,12 +451,12 @@
     [panel setCanChooseDirectories:          YES];
 
     [panel beginSheetForDirectory: NULL file: NULL types: NULL
-        modalForWindow: fPrefsWindow modalDelegate: self didEndSelector:
+        modalForWindow: [self window] modalDelegate: self didEndSelector:
         @selector( folderSheetClosed:returnCode:contextInfo: )
         contextInfo: NULL];
 }
 
-@end // @implementation PrefsController
+@end
 
 @implementation PrefsController (Private)
 
@@ -471,16 +477,19 @@
 
 - (void) setPrefView: (NSView *) view
 {
-    NSRect windowRect = [fPrefsWindow frame];
-    int difference = [view frame].size.height - [[fPrefsWindow contentView] frame].size.height;
-
+    NSWindow * window = [self window];
+    
+    NSRect windowRect = [window frame];
+    int difference = [view frame].size.height - [[window contentView] frame].size.height;
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
+
+    [window setTitle: [fToolbar selectedItemIdentifier]];
     
-    [fPrefsWindow setTitle: [fToolbar selectedItemIdentifier]];
-    [fPrefsWindow setContentView: fBlankView];
-    [fPrefsWindow setFrame: windowRect display: YES animate: YES];
-    [fPrefsWindow setContentView: view];
+    [window setContentView: view];
+    [view setHidden: YES];
+    [window setFrame: windowRect display: YES animate: YES];
+    [view setHidden: NO];
 }
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code
@@ -519,13 +528,10 @@
 
 - (void) updatePopUp
 {
-    NSMenuItem     * menuItem;
-    NSImage        * image32, * image16;
-
     // Get the icon for the folder
-    image32 = [[NSWorkspace sharedWorkspace] iconForFile:
+    NSImage * image32 = [[NSWorkspace sharedWorkspace] iconForFile:
                 fDownloadFolder];
-    image16 = [[NSImage alloc] initWithSize: NSMakeSize(16,16)];
+    NSImage * image16 = [[NSImage alloc] initWithSize: NSMakeSize(16,16)];
 
     // 32x32 -> 16x16 scaling
     [image16 lockFocus];
@@ -537,11 +543,11 @@
     [image16 unlockFocus];
 
     // Update the menu item
-    menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
+    NSMenuItem * menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
     [menuItem setTitle: [fDownloadFolder lastPathComponent]];
     [menuItem setImage: image16];
 
     [image16 release];
 }
 
-@end /* @implementation PrefsController (Private) */
+@end

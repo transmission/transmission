@@ -35,8 +35,7 @@
 
     NSPoint               fClickPoint;
     
-    IBOutlet NSMenu     * fContextRow;
-    IBOutlet NSMenu     * fContextNoRow;
+    IBOutlet NSMenu     * fContextRow, * fContextNoRow;
 }
 - (void) setTorrents: (NSArray *) torrents;
 

@@ -90,12 +90,10 @@
         return [NSString stringWithFormat: @"%.2f G", speed / 1048576];
 }
 
-+ (NSString *) stringForRatio: (uint64_t) down upload: (uint64_t) up
++ (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up
 {
-    if( !down && !up )
-        return @"N/A";
-    if( !down )
-        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
+    if (down == 0)
+        return up == 0 ? @"N/A" : [NSString stringWithUTF8String: "\xE2\x88\x9E"];
 
     float ratio = (float) up / (float) down;
     if( ratio < 10.0 )
@@ -106,22 +104,24 @@
         return [NSString stringWithFormat: @"%.0f", ratio];
 }
 
-- (NSString *) stringFittingInWidth: (float) width
-                    withAttributes: (NSDictionary *) attributes
+- (NSAttributedString *) attributedStringFittingInWidth: (float) width
+                                attributes: (NSDictionary *) attributes
 {
     int i;
     float realWidth = [self sizeWithAttributes: attributes].width;
     
     /* The whole string fits */
     if( realWidth <= width )
-        return self;
-        
+        return [[[NSAttributedString alloc] initWithString: self attributes: attributes] autorelease];
+    
+    float ellipsisWidth = [NS_ELLIPSIS sizeWithAttributes: attributes].width;
+    
     /* Width is too small */
-    if ( [NS_ELLIPSIS sizeWithAttributes: attributes].width > width )
-        return @"";
+    if ( ellipsisWidth > width )
+        return [[[NSAttributedString alloc] initWithString: @"" attributes: attributes] autorelease];
 
     /* Don't worry about ellipsis until the end */
-    width -= [NS_ELLIPSIS sizeWithAttributes: attributes].width;
+    width -= ellipsisWidth;
 
     /* Approximate how many characters we'll need to drop... */
     i = [self length] * (width / realWidth);
@@ -150,7 +150,8 @@
     }
     else;
 
-    return [newString stringByAppendingString: NS_ELLIPSIS];
+    return [[[NSAttributedString alloc] initWithString: [newString stringByAppendingString: NS_ELLIPSIS]
+                                        attributes: attributes] autorelease];
 }
 
 @end

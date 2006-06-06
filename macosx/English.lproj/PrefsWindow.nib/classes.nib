@@ -1,0 +1,57 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {
+            ACTIONS = {
+                folderSheetShow = id; 
+                setAutoStart = id; 
+                setBadge = id; 
+                setDownloadLocation = id; 
+                setLimit = id; 
+                setLimitCheck = id; 
+                setPort = id; 
+                setRatio = id; 
+                setRatioCheck = id; 
+                setShowMessage = id; 
+                setUpdate = id; 
+            }; 
+            CLASS = PrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAutoStartCheck = NSButton; 
+                fBadgeDownloadRateCheck = NSButton; 
+                fBadgeUploadRateCheck = NSButton; 
+                fDownloadCheck = NSButton; 
+                fDownloadField = NSTextField; 
+                fFolderPopUp = NSPopUpButton; 
+                fGeneralView = NSView; 
+                fNetworkView = NSView; 
+                fPortField = NSTextField; 
+                fQuitCheck = NSButton; 
+                fRatioCheck = NSButton; 
+                fRatioField = NSTextField; 
+                fRemoveCheck = NSButton; 
+                fTransfersView = NSView; 
+                fUpdatePopUp = NSPopUpButton; 
+                fUpdater = SUUpdater; 
+                fUploadCheck = NSButton; 
+                fUploadField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {checkForUpdates = id; }; 
+            CLASS = SUUpdater; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = TorrentTableView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fContextNoRow = NSMenu; fContextRow = NSMenu; fController = Controller; }; 
+            SUPERCLASS = NSTableView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

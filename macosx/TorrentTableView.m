@@ -27,6 +27,11 @@
 #import "Torrent.h"
 #import "Utils.h"
 
+#define BUTTON_WIDTH 14.0
+#define BUTTON_TO_TOP 32.5
+#define AREA_CENTER 23.0
+#define DISTANCE_FROM_CENTER 2.5
+
 @implementation TorrentTableView
 
 - (void) setTorrents: (NSArray *) torrents
@@ -36,28 +41,22 @@
 
 - (NSRect) pauseRectForRow: (int) row
 {
-    int col;
-    NSRect cellRect, rect;
-
-    col      = [self columnWithIdentifier: @"Torrent"];
-    cellRect = [self frameOfCellAtColumn: col row: row];
-    rect     = NSMakeRect( cellRect.origin.x + cellRect.size.width - 39,
-                           cellRect.origin.y + 3, 14, 14 );
-
-    return rect;
+    NSRect cellRect = [self frameOfCellAtColumn:
+                [self columnWithIdentifier: @"Torrent"] row: row];
+                
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width
+                        - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
+                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
 - (NSRect) revealRectForRow: (int) row
 {
-    int col;
-    NSRect cellRect, rect;
-
-    col      = [self columnWithIdentifier: @"Torrent"];
-    cellRect = [self frameOfCellAtColumn: col row: row];
-    rect     = NSMakeRect( cellRect.origin.x + cellRect.size.width - 20,
-                           cellRect.origin.y + 3, 14, 14 );
-
-    return rect;
+    NSRect cellRect = [self frameOfCellAtColumn:
+                [self columnWithIdentifier: @"Torrent"] row: row];
+    
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width
+                        - AREA_CENTER + DISTANCE_FROM_CENTER,
+                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
 - (BOOL) pointInPauseRect: (NSPoint) point
@@ -184,7 +183,7 @@
         {
             [image setFlipped: YES];
             [image drawAtPoint: rect.origin fromRect:
-                NSMakeRect( 0, 0, 14, 14 ) operation:
+                NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
                 NSCompositeSourceOver fraction: 1.0];
         }
 
@@ -194,7 +193,7 @@
             [NSImage imageNamed: @"RevealOff.png"];
         [image setFlipped: YES];
         [image drawAtPoint: rect.origin fromRect:
-            NSMakeRect( 0, 0, 14, 14 ) operation:
+            NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
             NSCompositeSourceOver fraction: 1.0];
     }
 }

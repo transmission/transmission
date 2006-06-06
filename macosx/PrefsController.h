@@ -24,16 +24,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
+#import <Sparkle/Sparkle.h>
 
-@interface PrefsController : NSObject
-
+@interface PrefsController : NSWindowController
 {
     tr_handle_t * fHandle;
     
-    IBOutlet NSPanel        * fPrefsWindow;
     NSToolbar               * fToolbar;
-    IBOutlet NSView         * fGeneralView, * fTransfersView,
-                            * fNetworkView, * fBlankView;
+    IBOutlet NSView         * fGeneralView, * fTransfersView, * fNetworkView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
@@ -41,20 +39,13 @@
                             * fAutoStartCheck;                           
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
-    IBOutlet NSTextField    * fPortField;
-    IBOutlet NSButton       * fUploadCheck;
-    IBOutlet NSTextField    * fUploadField;
-    IBOutlet NSButton       * fDownloadCheck;
-    IBOutlet NSTextField    * fDownloadField;
+    IBOutlet NSTextField    * fPortField, * fUploadField, * fDownloadField;
+    IBOutlet NSButton       * fUploadCheck, * fDownloadCheck;
+    
     IBOutlet NSButton       * fRatioCheck;
     IBOutlet NSTextField    * fRatioField;
     
-    IBOutlet NSMenu         * fUploadMenu, * fDownloadMenu;
-    IBOutlet NSMenuItem     * fUploadLimitItem, * fUploadNoLimitItem,
-                            * fDownloadLimitItem, * fDownloadNoLimitItem,
-                            * fRatioSetItem, * fRatioNotSetItem;
-    
-    IBOutlet NSWindow       * fWindow;
+    IBOutlet SUUpdater      * fUpdater;
 
     NSString                * fDownloadFolder;
     NSUserDefaults          * fDefaults;
@@ -65,19 +56,21 @@
 - (void) setShowMessage:        (id) sender;
 - (void) setBadge:              (id) sender;
 - (void) setUpdate:             (id) sender;
+- (void) checkUpdate;
 - (void) setAutoStart:          (id) sender;
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 
 - (void) setPort:               (id) sender;
-- (void) setLimitCheck:         (id) sender;
+
 - (void) setLimit:              (id) sender;
-- (void) setLimitMenu:          (id) sender;
-- (void) setQuickSpeed:         (id) sender;
+- (void) setLimitCheck:         (id) sender;
+- (void) setLimitEnabled:       (BOOL) enable type: (NSString *) type;
+- (void) setQuickLimit:         (int) limit type: (NSString *) type;
 
 - (void) setRatio:              (id) sender;
 - (void) setRatioCheck:			(id) sender;
-- (void) setRatioMenu:          (id) sender;
-- (void) setQuickRatio:         (id) sender;
+- (void) setRatioEnabled:       (BOOL) enable;
+- (void) setQuickRatio:         (float) ratioLimit;
 
 @end

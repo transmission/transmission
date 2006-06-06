@@ -27,11 +27,13 @@
 @interface NSString (StringAdditions)
 
 + (NSString *) stringWithInt: (int) value;
+
 + (NSString *) stringForFileSize: (uint64_t) size;
 + (NSString *) stringForSpeed: (float) speed;
 + (NSString *) stringForSpeedAbbrev: (float) speed;
-+ (NSString *) stringForRatio: (uint64_t) down upload: (uint64_t) up;
-- (NSString *) stringFittingInWidth: (float) width
-					withAttributes: (NSDictionary *) attributes;
++ (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up;
+
+- (NSAttributedString *) attributedStringFittingInWidth: (float) width
+                                attributes: (NSDictionary *) attributes;
 
 @end

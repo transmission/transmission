@@ -39,8 +39,8 @@
 }
 
 - (void) updateBadgeWithCompleted: (int) completed
-                    uploadRate: (NSString *) uploadRate
-                    downloadRate: (NSString *) downloadRate;
+                    uploadRate: (int) uploadRate
+                    downloadRate: (int) downloadRate;
 - (void) clearBadge;
 
 @end

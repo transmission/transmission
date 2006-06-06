@@ -28,12 +28,12 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-   [self setState: NSOnState];
-   [self highlight: YES];
-   
-   NSPoint location = NSMakePoint(3, -2);
-   
-   NSEvent * theEvent= [NSEvent mouseEventWithType: [event type]
+    NSImage * image = [self image];
+    [self setImage: [self alternateImage]];
+
+    NSPoint location = NSMakePoint(3, -2);
+
+    NSEvent * theEvent= [NSEvent mouseEventWithType: [event type]
                         location: location
                         modifierFlags: [event modifierFlags]
                         timestamp: [event timestamp]
@@ -43,10 +43,9 @@
                         clickCount: [event clickCount]
                         pressure: [event pressure]];
 
-   [NSMenu popUpContextMenu: [self menu] withEvent: theEvent forView: self];
-   
-   [self setState: NSOffState];
-   [self highlight: NO];
+    [NSMenu popUpContextMenu: [self menu] withEvent: theEvent forView: self];
+
+    [self setImage: image];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) e

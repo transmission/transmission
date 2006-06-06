@@ -38,17 +38,19 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 	<key>ShowInspector</key>
 	<false/>
 	<key>Sort</key>
 	<string>Date</string>
 	<key>StatusBar</key>
 	<true/>
+	<key>UpdateCheck</key>
+	<string>Daily</string>
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
 	<false/>
-	<key>VersionCheck</key>
-	<string>Weekly</string>
 </dict>
 </plist>
