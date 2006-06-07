@@ -188,8 +188,9 @@
 
     if ([self isActive])
     {
+        [fStatusString appendString: @" - "];
         if ([self progress] < 1.0)
-            [fStatusString appendFormat: @" - DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
+            [fStatusString appendFormat: @"DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
         [fStatusString appendString: [@"UL: " stringByAppendingString:
                                                 [NSString stringForSpeed: [self uploadRate]]]];
     }
