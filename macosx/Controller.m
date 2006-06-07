@@ -1041,7 +1041,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setLabel: @"Pause"];
         [item setPaletteLabel: @"Pause Selected"];
         [item setToolTip: @"Pause selected torrents"];
-        [item setImage: [NSImage imageNamed: @"PauseSelected.tiff"]];
+        [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector( stopTorrent: )];
     }
@@ -1050,7 +1050,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setLabel: @"Resume"];
         [item setPaletteLabel: @"Resume Selected"];
         [item setToolTip: @"Resume selected torrents"];
-        [item setImage: [NSImage imageNamed: @"ResumeSelected.tiff"]];
+        [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector( resumeTorrent: )];
     }
