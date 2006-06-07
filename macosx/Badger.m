@@ -47,11 +47,10 @@
         [stringShadow setShadowOffset: NSMakeSize(2, -2)];
         [stringShadow setShadowBlurRadius: 4];
         
-        fAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:
+        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,
             [NSFont fontWithName: @"Helvetica-Bold" size: 28], NSFontAttributeName,
-            stringShadow, NSShadowAttributeName,
-            nil] retain];
+            stringShadow, NSShadowAttributeName, nil];
         
         [stringShadow release];
         

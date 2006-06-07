@@ -30,9 +30,8 @@
 {
 	if ((self = [super initWithFrame:frameRect]))
     {
-		fBackgroundColor = [NSColor colorWithPatternImage:
-                            [NSImage imageNamed: @"StatusBorder"]];
-        [fBackgroundColor retain];
+		fBackgroundColor = [[NSColor colorWithPatternImage:
+                            [NSImage imageNamed: @"StatusBorder"]] retain];
 	}
 	return self;
 }

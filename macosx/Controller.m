@@ -1012,7 +1012,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Inspector"];
         [item setPaletteLabel: @"Show/Hide Inspector"];
-        [item setToolTip: @"Displays torrent inspector"];
+        [item setToolTip: @"Display torrent inspector"];
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector( showInfo: )];
