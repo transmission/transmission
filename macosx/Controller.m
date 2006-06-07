@@ -403,12 +403,17 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet
 {
-    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
-    unsigned int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [torrents addObject: [fTorrents objectAtIndex: i]];
+    if ([fTorrents respondsToSelector: @selector(objectsAtIndexes:)])
+        return [fTorrents objectsAtIndexes: indexSet];
+    else
+    {
+        NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
+        unsigned int i;
+        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+            [torrents addObject: [fTorrents objectAtIndex: i]];
 
-    return torrents;
+        return torrents;
+    }
 }
 
 - (void) torrentNumberChanged
