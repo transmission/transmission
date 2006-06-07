@@ -83,9 +83,7 @@
     }
     else if( ![self pointInPauseRect: fClickPoint] &&
              ![self pointInRevealRect: fClickPoint] )
-    {
         [super mouseDown: e];
-    }
     else;
 
     [self display];
@@ -119,7 +117,9 @@
         torrent = [fTorrents objectAtIndex: row];
         [torrent reveal];
     }
-	else;
+	else
+        if ([e clickCount] == 2)
+            [fController showInfo: nil];
     
 	[super mouseUp: e];
 
