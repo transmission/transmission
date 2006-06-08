@@ -36,7 +36,7 @@
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
-                            * fAutoStartCheck, * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck;
+                            * fAutoStartCheck;                           
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fPortField, * fUploadField, * fDownloadField;
@@ -58,7 +58,6 @@
 - (void) setUpdate:             (id) sender;
 - (void) checkUpdate;
 - (void) setAutoStart:          (id) sender;
-- (void) setMoveTorrent:        (id) sender;
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 
