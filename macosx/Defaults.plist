@@ -18,6 +18,8 @@
 	<true/>
 	<key>CheckUpload</key>
 	<true/>
+	<key>DeleteOriginalTorrent</key>
+	<false/>
 	<key>DownloadChoice</key>
 	<string>Constant</string>
 	<key>DownloadFolder</key>
@@ -40,6 +42,8 @@
 	<integer>2</integer>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
+	<key>SavePrivateTorrent</key>
+	<true/>
 	<key>ShowInspector</key>
 	<false/>
 	<key>Sort</key>

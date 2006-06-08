@@ -35,8 +35,11 @@
     tr_torrent_t * fHandle;
     tr_info_t    * fInfo;
     tr_stat_t    * fStat;
+    
     BOOL         fResumeOnWake;
     NSDate       * fDate;
+    
+    BOOL        fPrivateSaved;
 
     NSUserDefaults  * fDefaults;
 
@@ -55,11 +58,12 @@
 - (NSString *) downloadFolder;
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
 
-- (void)       update;
-- (void)       start;
-- (void)       stop;
-- (void)       sleep;
-- (void)       wakeUp;
+- (void)        update;
+- (void)        start;
+- (void)        stop;
+- (void)        removeForever;
+- (void)        sleep;
+- (void)        wakeUp;
 
 - (float)       ratio;
 - (int)         stopRatioSetting;
@@ -68,7 +72,6 @@
 - (void)        setRatioLimit: (float) limit;
 
 - (void)        reveal;
-- (void)        trashTorrent;
 - (void)        trashData;
 
 - (NSImage *)  icon;

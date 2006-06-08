@@ -10,6 +10,7 @@
                 setDownloadLocation = id; 
                 setLimit = id; 
                 setLimitCheck = id; 
+                setMoveTorrent = id; 
                 setPort = id; 
                 setRatio = id; 
                 setRatioCheck = id; 
@@ -22,6 +23,8 @@
                 fAutoStartCheck = NSButton; 
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
+                fCopyTorrentCheck = NSButton; 
+                fDeleteOriginalTorrentCheck = NSButton; 
                 fDownloadCheck = NSButton; 
                 fDownloadField = NSTextField; 
                 fFolderPopUp = NSPopUpButton; 
