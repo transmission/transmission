@@ -28,7 +28,7 @@
 
 - (id) initWithFrame: (NSRect) frameRect
 {
-	if ((self = [super initWithFrame:frameRect]))
+	if ((self = [super initWithFrame: frameRect]))
     {
 		fBackgroundColor = [[NSColor colorWithPatternImage:
                             [NSImage imageNamed: @"StatusBorder"]] retain];
