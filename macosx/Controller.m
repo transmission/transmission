@@ -997,7 +997,6 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setImage: [NSImage imageNamed: @"Open.png"]];
         [item setTarget: self];
         [item setAction: @selector( openShowSheet: )];
-        [item setAutovalidates: NO];
     }
     else if( [ident isEqualToString: TOOLBAR_REMOVE] )
     {
@@ -1016,7 +1015,6 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector( showInfo: )];
-        [item setAutovalidates: NO];
     }
     else if( [ident isEqualToString: TOOLBAR_PAUSE_ALL] )
     {
