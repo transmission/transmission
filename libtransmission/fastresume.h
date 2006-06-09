@@ -63,17 +63,10 @@
 
 static char * fastResumeFileName( tr_io_t * io )
 {
-    char * ret, * p;
-    int i;
+    char * ret;
 
-    asprintf( &ret, "%s/resume.%40d", tr_getPrefsDirectory(), 0 );
-
-    p = &ret[ strlen( ret ) - 2 * SHA_DIGEST_LENGTH ];
-    for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
-    {
-        sprintf( p, "%02x", io->tor->info.hash[i] );
-        p += 2;
-    }
+    asprintf( &ret, "%s/resume.%s", tr_getCacheDirectory(),
+              io->tor->info.hashString );
 
     return ret;
 }

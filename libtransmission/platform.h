@@ -34,6 +34,9 @@
   typedef pthread_mutex_t tr_lock_t;
 #endif
 
+char * tr_getCacheDirectory();
+char * tr_getTorrentsDirectory();
+
 void tr_threadCreate ( tr_thread_t *, void (*func)(void *), void * arg );
 void tr_threadJoin   ( tr_thread_t * );
 void tr_lockInit     ( tr_lock_t * );

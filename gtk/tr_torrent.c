@@ -270,7 +270,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
 
   errcode = -1;
   handle = tr_torrentInit(tr_backend_handle(TR_BACKEND(backend)),
-                          torrent, &errcode);
+                          torrent, 0, &errcode);
   if(NULL == handle) {
     switch(errcode) {
       case TR_EINVALID:

@@ -38,6 +38,14 @@ int  tr_rand ( int );
 void * tr_memmem( const void *, size_t, const void *, size_t );
 
 /***********************************************************************
+ * tr_mkdir
+ ***********************************************************************
+ * Create a directory and any needed parent directories.
+ * Note that the string passed in must be writable!
+ **********************************************************************/
+int tr_mkdir( char * path );
+
+/***********************************************************************
  * tr_date
  ***********************************************************************
  * Returns the current date in milliseconds

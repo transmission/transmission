@@ -27,6 +27,8 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
+static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
+                                       int flags, int * error );
 static void torrentReallyStop( tr_torrent_t * );
 static void  downloadLoop( void * );
 static void  acceptLoop( void * );
@@ -174,30 +176,55 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
     }
 }
 
+tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
+                               int flags, int * error )
+{
+    tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
+    int             saveCopy = ( TR_FSAVEPRIVATE & flags );
+
+    /* Parse torrent file */
+    if( tr_metainfoParse( &tor->info, path, NULL, saveCopy ) )
+    {
+        *error = TR_EINVALID;
+        free( tor );
+        return NULL;
+    }
+
+    return torrentRealInit( h, tor, flags, error );
+}
+
+tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
+                                    int flags, int * error )
+{
+    tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
+
+    /* Parse torrent file */
+    if( tr_metainfoParse( &tor->info, NULL, hashStr, 0 ) )
+    {
+        *error = TR_EINVALID;
+        free( tor );
+        return NULL;
+    }
+
+    return torrentRealInit( h, tor, ( TR_FSAVEPRIVATE | flags ), error );
+}
+
 /***********************************************************************
  * tr_torrentInit
  ***********************************************************************
  * Allocates a tr_torrent_t structure, then relies on tr_metainfoParse
  * to fill it.
  **********************************************************************/
-tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
-                               int * error )
+static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
+                                       int flags, int * error )
 {
-    tr_torrent_t  * tor, * tor_tmp;
+    tr_torrent_t  * tor_tmp;
     tr_info_t     * inf;
     int             i;
     char          * s1, * s2;
 
-    tor = calloc( sizeof( tr_torrent_t ), 1 );
-    inf = &tor->info;
-
-    /* Parse torrent file */
-    if( tr_metainfoParse( inf, path ) )
-    {
-        *error = TR_EINVALID;
-        free( tor );
-        return NULL;
-    }
+    inf        = &tor->info;
+    inf->flags = flags;
 
     /* Make sure this torrent is not already open */
     for( tor_tmp = h->torrentList; tor_tmp; tor_tmp = tor_tmp->next )
@@ -479,6 +506,10 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
         }
     }
     tr_lockUnlock( &tor->lock );
+}
+
+void tr_torrentRemoveSaved( tr_torrent_t * tor ) {
+    tr_metainfoRemoveSaved( tor->info.hashString );
 }
 
 /***********************************************************************

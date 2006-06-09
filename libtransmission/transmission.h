@@ -59,9 +59,8 @@ tr_handle_t * tr_init();
 /***********************************************************************
  * tr_getPrefsDirectory
  ***********************************************************************
- * Returns the full path to the directory used by libtransmission to
- * store the resume files. The string belongs to libtransmission, do
- * not free it.
+ * Returns the full path to a directory which can be used to store
+ * preferences. The string belongs to libtransmission, do not free it.
  **********************************************************************/
 char * tr_getPrefsDirectory();
 
@@ -123,14 +122,25 @@ void tr_close( tr_handle_t * );
  * Opens and parses torrent file at 'path'. If the file exists and is a
  * valid torrent file, returns an handle and adds it to the list of
  * torrents (but doesn't start it). Returns NULL and sets *error
- * otherwise.
+ * otherwise.  If the TR_FSAVEPRIVATE flag is passed then a private copy
+ * of the torrent file will be saved.
  **********************************************************************/
 #define TR_EINVALID     1
 #define TR_EUNSUPPORTED 2
 #define TR_EDUPLICATE   3
 #define TR_EOTHER       666
 tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
-                               int * error );
+                               int flags, int * error );
+
+/***********************************************************************
+ * tr_torrentInitSaved
+ ***********************************************************************
+ * Opens and parses a torrent file as with tr_torrentInit, only taking
+ * the hash string of a saved torrent file instead of a filename.  There
+ * are currently no valid flags for this function.
+ **********************************************************************/
+tr_torrent_t * tr_torrentInitSaved( tr_handle_t *, const char * hashStr,
+                                    int flags, int * error );
 
 typedef struct tr_info_s tr_info_t;
 tr_info_t * tr_torrentInfo( tr_torrent_t * );
@@ -201,13 +211,20 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * );
 void tr_torrentAvailability( tr_torrent_t *, int8_t * tab, int size );
 
 /***********************************************************************
+ * tr_torrentRemoveSaved
+ ***********************************************************************
+ * Removes the private saved copy of a torrent file for torrents which
+ * the TR_FSAVEPRIVATE flag is set.
+ **********************************************************************/
+void tr_torrentRemoveSaved( tr_torrent_t * );
+
+/***********************************************************************
  * tr_torrentClose
  ***********************************************************************
  * Frees memory allocated by tr_torrentInit. If the torrent was running,
  * you must call tr_torrentStop() before closing it.
  **********************************************************************/
 void tr_torrentClose( tr_handle_t *, tr_torrent_t * );
-
 
 /***********************************************************************
  * tr_info_s
@@ -225,7 +242,12 @@ struct tr_info_s
 
     /* General info */
     uint8_t     hash[SHA_DIGEST_LENGTH];
+    char        hashString[2*SHA_DIGEST_LENGTH+1];
     char        name[MAX_PATH_LENGTH];
+
+    /* Flags */
+#define TR_FSAVEPRIVATE 0x01    /* save a private copy of the torrent */
+    int         flags;
 
     /* Tracker info */
     char        trackerAddress[256];

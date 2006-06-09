@@ -45,6 +45,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <assert.h>
 #ifdef BEOS_NETSERVER
 #  define in_port_t uint16_t
 #else

@@ -216,24 +216,15 @@ static int createFiles( tr_io_t * io )
         asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
 
         /* Create folders */
-        p = path;
-        while( ( p = strchr( p, '/' ) ) )
+        if( NULL != ( p = strrchr( path, '/' ) ) )
         {
             *p = '\0';
-            if( stat( path, &sb ) )
+            if( tr_mkdir( path ) )
             {
-                /* Folder doesn't exist yet */
-                mkdir( path, 0777 );
-            }
-            else if( ( sb.st_mode & S_IFMT ) != S_IFDIR )
-            {
-                /* Node exists but isn't a folder */
-                printf( "Remove %s, it's in the way.\n", path );
                 free( path );
                 return 1;
             }
             *p = '/';
-            p++;
         }
 
         if( stat( path, &sb ) )

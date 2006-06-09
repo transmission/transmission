@@ -116,7 +116,7 @@
     BOOL checkUpload = [fDefaults boolForKey: @"CheckUpload"];
     int uploadLimit = [fDefaults integerForKey: @"UploadLimit"];
     
-    [fUploadCheck setState: checkUpload ? NSOnState : NSOffState];
+    [fUploadCheck setState: checkUpload];
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
     
@@ -126,7 +126,7 @@
     BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
     int downloadLimit = [fDefaults integerForKey: @"DownloadLimit"];
     
-    [fDownloadCheck setState: checkDownload ? NSOnState : NSOffState];
+    [fDownloadCheck setState: checkDownload];
     [fDownloadField setIntValue: downloadLimit];
     [fDownloadField setEnabled: checkDownload];
     
@@ -134,15 +134,13 @@
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
-    [fRatioCheck setState: ratioCheck ? NSOnState : NSOffState];
+    [fRatioCheck setState: ratioCheck];
     [fRatioField setEnabled: ratioCheck];
     [fRatioField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
     //set remove and quit prompts
-    [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"] ?
-        NSOnState : NSOffState];
-    [fRemoveCheck setState: [fDefaults boolForKey: @"CheckRemove"] ?
-        NSOnState : NSOffState];
+    [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"]];
+    [fRemoveCheck setState: [fDefaults boolForKey: @"CheckRemove"]];
 
     //set dock badging
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
@@ -150,6 +148,13 @@
     
     //set auto start
     [fAutoStartCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
+    
+    //set private torrents
+    BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
+    [fCopyTorrentCheck setState: copyTorrents];
+    
+    [fDeleteOriginalTorrentCheck setEnabled: copyTorrents];
+    [fDeleteOriginalTorrentCheck setState: [fDefaults boolForKey: @"DeleteOriginalTorrent"]];
 
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
@@ -417,6 +422,24 @@
 - (void) setAutoStart: (id) sender
 {
     [fDefaults setBool: [sender state] forKey: @"AutoStartDownload"];
+}
+
+- (void) setMoveTorrent: (id) sender
+{
+    int state = [sender state];
+    if (sender == fCopyTorrentCheck)
+    {
+        [fDefaults setBool: state forKey: @"SavePrivateTorrent"];
+        
+        [fDeleteOriginalTorrentCheck setEnabled: state];
+        if (state == NSOffState)
+        {
+            [fDeleteOriginalTorrentCheck setState: NSOffState];
+            [fDefaults setBool: NO forKey: @"DeleteOriginalTorrent"];
+        }
+    }
+    else
+        [fDefaults setBool: state forKey: @"DeleteOriginalTorrent"];
 }
 
 - (void) setDownloadLocation: (id) sender

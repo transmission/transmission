@@ -9,9 +9,7 @@
                 linkHomepage = id; 
                 openShowSheet = id; 
                 removeTorrent = id; 
-                removeTorrentDeleteBoth = id; 
                 removeTorrentDeleteData = id; 
-                removeTorrentDeleteTorrent = id; 
                 resumeAllTorrents = id; 
                 resumeTorrent = id; 
                 revealFile = id; 

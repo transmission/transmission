@@ -25,6 +25,8 @@
 #ifndef TR_METAINFO_H
 #define TR_METAINFO_H 1
 
-int tr_metainfoParse( tr_info_t *, const char * );
+int tr_metainfoParse( tr_info_t *, const char * path,
+                      const char * savedHash, int saveCopy );
 
+void tr_metainfoRemoveSaved( const char * hashString );
 #endif

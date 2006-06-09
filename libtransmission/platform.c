@@ -26,12 +26,37 @@
   #include <fs_info.h>
   #include <FindDirectory.h>
 #endif
-#ifdef SYS_DARWIN
-  #include <sys/types.h>
-  #include <dirent.h>
-#endif
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "transmission.h"
+
+static void
+tr_migrateResume( const char *oldDirectory, const char *newDirectory )
+{
+    DIR * dirh;
+    struct dirent * dirp;
+    char oldFile[MAX_PATH_LENGTH];
+    char newFile[MAX_PATH_LENGTH];
+
+    if( ( dirh = opendir( oldDirectory ) ) )
+    {
+        while( ( dirp = readdir( dirh ) ) )
+        {
+            if( strncmp( "resume.", dirp->d_name, 7 ) )
+            {
+                continue;
+            }
+            snprintf( oldFile, MAX_PATH_LENGTH, "%s/%s",
+                      oldDirectory, dirp->d_name );
+            snprintf( newFile, MAX_PATH_LENGTH, "%s/%s",
+                      newDirectory, dirp->d_name );
+            rename( oldFile, newFile );
+        }
+
+        closedir( dirh );
+    }
+}
 
 char * tr_getPrefsDirectory()
 {
@@ -55,39 +80,80 @@ char * tr_getPrefsDirectory()
               getenv( "HOME" ) );
 #endif
 
-	mkdir( prefsDirectory, 0755 );
+    tr_mkdir( prefsDirectory );
     init = 1;
 
 #ifdef SYS_DARWIN
-    DIR * dirh;
-    struct dirent * dirp;
     char oldDirectory[MAX_PATH_LENGTH];
-    char oldFile[MAX_PATH_LENGTH];
-    char newFile[MAX_PATH_LENGTH];
     snprintf( oldDirectory, MAX_PATH_LENGTH, "%s/.transmission",
               getenv( "HOME" ) );
-    if( ( dirh = opendir( oldDirectory ) ) )
-    {
-        while( ( dirp = readdir( dirh ) ) )
-        {
-            if( !strcmp( ".", dirp->d_name ) ||
-                !strcmp( "..", dirp->d_name ) )
-            {
-                continue;
-            }
-            snprintf( oldFile, MAX_PATH_LENGTH, "%s/%s",
-                      oldDirectory, dirp->d_name );
-            snprintf( newFile, MAX_PATH_LENGTH, "%s/%s",
-                      prefsDirectory, dirp->d_name );
-            rename( oldFile, newFile );
-        }
-
-        closedir( dirh );
-        rmdir( oldDirectory );
-    }
+    tr_migrateResume( oldDirectory, prefsDirectory );
+    rmdir( oldDirectory );
 #endif
 
     return prefsDirectory;
+}
+
+char * tr_getCacheDirectory()
+{
+    static char cacheDirectory[MAX_PATH_LENGTH];
+    static int  init = 0;
+
+    if( init )
+    {
+        return cacheDirectory;
+    }
+
+#ifdef SYS_BEOS
+    /* XXX hey Bryan, is this fine with you? */
+    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/Cache",
+              tr_getPrefsDirectory() );
+#elif defined( SYS_DARWIN )
+    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s",
+              tr_getPrefsDirectory() );
+#else
+    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/cache",
+              tr_getPrefsDirectory() );
+#endif
+
+    tr_mkdir( cacheDirectory );
+    init = 1;
+
+    if( strcmp( tr_getPrefsDirectory(), cacheDirectory ) )
+    {
+        tr_migrateResume( tr_getPrefsDirectory(), cacheDirectory );
+    }
+
+    return cacheDirectory;
+}
+
+char * tr_getTorrentsDirectory()
+{
+    static char torrentsDirectory[MAX_PATH_LENGTH];
+    static int  init = 0;
+
+    if( init )
+    {
+        return torrentsDirectory;
+    }
+
+#ifdef SYS_BEOS
+    /* XXX hey Bryan, is this fine with you? */
+    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/Torrents",
+              tr_getPrefsDirectory() );
+#elif defined( SYS_DARWIN )
+    snprintf( torrentsDirectory, MAX_PATH_LENGTH,
+              "%s/Library/Application Support/Transmission/Torrents",
+              getenv( "HOME" ) );
+#else
+    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/torrents",
+              tr_getPrefsDirectory() );
+#endif
+
+    tr_mkdir( torrentsDirectory );
+    init = 1;
+
+    return torrentsDirectory;
 }
 
 void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg )
