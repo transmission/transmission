@@ -99,11 +99,12 @@
 - (void) removeTorrentDeleteData:       (id) sender;
 - (void) removeTorrentWithIndex:        (NSIndexSet *) indexSet
                 deleteData:             (BOOL) deleteData;
-                
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
                         contextInfo: (NSDictionary *) dict;
 - (void) confirmRemoveTorrents: (NSArray *) torrents
             deleteData: (BOOL) deleteData;
+
+- (void) copyTorrentFile: (id) sender;
 
 - (void) revealFile: (id) sender;
 

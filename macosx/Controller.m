@@ -630,6 +630,32 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteData: YES];
 }
 
+- (void) copyTorrentFile: (id) sender
+{
+    Torrent * torrent;
+    NSEnumerator * enumerator = [[self torrentsAtIndexes:
+            [fTableView selectedRowIndexes]] objectEnumerator];
+    
+    while ((torrent = [enumerator nextObject]))
+    {
+        //warn user if torrent file can't be found
+        if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
+        {
+            #warning warn user of failure
+            continue;
+        }
+        
+        //ask for copy location and name (save)
+        NSSavePanel * savePanel = [NSSavePanel savePanel];
+        [savePanel setRequiredFileType: @"torrent"];
+        [savePanel setCanSelectHiddenExtension: YES];
+        
+        if ([savePanel runModalForDirectory: nil file: [torrent name]] == NSOKButton)
+            [[NSFileManager defaultManager] copyPath: [torrent torrentLocation]
+                toPath: [savePanel filename] handler: nil];
+    }
+}
+
 - (void) revealFile: (id) sender
 {
     Torrent * torrent;
@@ -1142,7 +1168,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     //only enable some items if it is in a context menu or the window is useable 
     BOOL canUseMenu = [[[menuItem menu] title] isEqualToString: @"Context"]
-                        || ([fWindow isKeyWindow] && ![fToolbar customizationPaletteIsRunning]);
+                        || [fWindow isKeyWindow];
 
     //enable show info
     if (action == @selector(showInfo:))
