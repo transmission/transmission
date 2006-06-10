@@ -1140,9 +1140,9 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     SEL action = [menuItem action];
 
-    //only enable some items if the window is useable or it is in a context menu
-    BOOL canUseWindow = [fWindow isKeyWindow] && ![fToolbar customizationPaletteIsRunning];
-    BOOL fromContext = [[[menuItem menu] title] isEqualToString: @"Context"];
+    //only enable some items if it is in a context menu or the window is useable 
+    BOOL canUseMenu = [[[menuItem menu] title] isEqualToString: @"Context"]
+                        || ([fWindow isKeyWindow] && ![fToolbar customizationPaletteIsRunning]);
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -1164,7 +1164,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
-        return canUseWindow;
+        return canUseMenu;
     }
 
     //enable resume all item
@@ -1191,7 +1191,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     if (action == @selector(revealFile:))
     {
-        return (canUseWindow || fromContext) && [fTableView numberOfSelectedRows] > 0;
+        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable remove items
@@ -1225,13 +1225,13 @@ static void sleepCallBack( void * controller, io_service_t y,
                 [menuItem setTitle: [title substringToIndex:
                             [title rangeOfString: NS_ELLIPSIS].location]];
         }
-        return (canUseWindow || fromContext) && [fTableView numberOfSelectedRows] > 0;
+        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable pause item
     if( action == @selector(stopTorrent:) )
     {
-        if (!canUseWindow && !fromContext)
+        if (!canUseMenu)
             return NO;
     
         Torrent * torrent;
@@ -1250,7 +1250,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     //enable resume item
     if( action == @selector(resumeTorrent:) )
     {
-        if (!canUseWindow && !fromContext)
+        if (!canUseMenu)
             return NO;
     
         Torrent * torrent;
@@ -1268,7 +1268,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     
     //enable resume item
     if (action == @selector(setSort:) || (action == @selector(advancedChanged:)))
-        return canUseWindow;
+        return canUseMenu;
 
     return YES;
 }
