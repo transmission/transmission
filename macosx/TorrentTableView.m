@@ -28,11 +28,17 @@
 #import "Utils.h"
 
 #define BUTTON_WIDTH 14.0
-#define BUTTON_TO_TOP 32.5
-#define AREA_CENTER 23.0
+#define BUTTON_TO_TOP 33.5
+#define AREA_CENTER 21.0
 #define DISTANCE_FROM_CENTER 2.5
 
 @implementation TorrentTableView
+
+- (void) awakeFromNib
+{
+    [fContextRow setTitle: @"Context"];
+    [fContextNoRow setTitle: @"Context"];
+}
 
 - (void) setTorrents: (NSArray *) torrents
 {

@@ -1140,8 +1140,9 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     SEL action = [menuItem action];
 
-    //only enable some menus if window is useable
+    //only enable some items if the window is useable or it is in a context menu
     BOOL canUseWindow = [fWindow isKeyWindow] && ![fToolbar customizationPaletteIsRunning];
+    BOOL fromContext = [[[menuItem menu] title] isEqualToString: @"Context"];
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -1190,7 +1191,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     if (action == @selector(revealFile:))
     {
-        return canUseWindow && [fTableView numberOfSelectedRows] > 0;
+        return (canUseWindow || fromContext) && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable remove items
@@ -1224,13 +1225,13 @@ static void sleepCallBack( void * controller, io_service_t y,
                 [menuItem setTitle: [title substringToIndex:
                             [title rangeOfString: NS_ELLIPSIS].location]];
         }
-        return canUseWindow && [fTableView numberOfSelectedRows] > 0;
+        return (canUseWindow || fromContext) && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable pause item
     if( action == @selector(stopTorrent:) )
     {
-        if (!canUseWindow)
+        if (!canUseWindow && !fromContext)
             return NO;
     
         Torrent * torrent;
@@ -1249,7 +1250,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     //enable resume item
     if( action == @selector(resumeTorrent:) )
     {
-        if (!canUseWindow)
+        if (!canUseWindow && !fromContext)
             return NO;
     
         Torrent * torrent;
