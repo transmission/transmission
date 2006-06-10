@@ -641,15 +641,25 @@ static void sleepCallBack( void * controller, io_service_t y,
         //warn user if torrent file can't be found
         if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
         {
-            #warning warn user of failure
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle: @"OK"];
+            [alert setMessageText: [NSString stringWithFormat: 
+                    @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
+            [alert setInformativeText: [NSString stringWithFormat: 
+                    @"The torrent file (%@) cannot be found.", [torrent torrentLocation]]];
+            [alert setAlertStyle: NSWarningAlertStyle];
+            
+            [alert runModal];
+            
             continue;
         }
         
-        //ask for copy location and name (save)
+        //save with extension
         NSSavePanel * savePanel = [NSSavePanel savePanel];
         [savePanel setRequiredFileType: @"torrent"];
         [savePanel setCanSelectHiddenExtension: YES];
         
+        //if save successful, copy torrent to new location with name of data file
         if ([savePanel runModalForDirectory: nil file: [torrent name]] == NSOKButton)
             [[NSFileManager defaultManager] copyPath: [torrent torrentLocation]
                 toPath: [savePanel filename] handler: nil];
@@ -1295,6 +1305,12 @@ static void sleepCallBack( void * controller, io_service_t y,
     //enable resume item
     if (action == @selector(setSort:) || (action == @selector(advancedChanged:)))
         return canUseMenu;
+    
+    //enable copy torrent file item
+    if( action == @selector(copyTorrentFile:) )
+    {
+        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
+    }
 
     return YES;
 }
