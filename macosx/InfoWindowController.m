@@ -49,7 +49,10 @@
     [fFileTable setDoubleAction: @selector(revealFile:)];
     
     //window location and size
-    NSWindow * window = [self window];
+    NSPanel * window = (NSPanel *)[self window];
+    
+    [window setBecomesKeyOnlyIfNeeded: YES];
+    
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame" force: YES];
     
