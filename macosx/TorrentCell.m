@@ -269,7 +269,7 @@ static uint32_t kGreen[] =
     pen.x -= extraNameShift;
     pen.y += [progressString size].height + linePadding;
     
-    float barWidth = mainWidth + extraNameShift - 42.0 - padding;
+    float barWidth = mainWidth + extraNameShift - 42.0 + padding;
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
         initWithBitmapDataPlanes: nil pixelsWide: barWidth
