@@ -37,6 +37,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include "tr_torrent.h"
 #include "util.h"
 
 #define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
@@ -223,6 +224,47 @@ checkfilenames(int argc, char **argv) {
 
   chdir(pwd);
   g_free(pwd);
+
+  return ret;
+}
+
+guint
+addactionflag(const char *action) {
+  if(NULL == action)
+    return TR_TORNEW_SAVE_COPY;
+  else if(0 == strcmp("copy", action))
+    return TR_TORNEW_SAVE_COPY;
+  else if(0 == strcmp("move", action))
+    return TR_TORNEW_SAVE_MOVE;
+  else
+    return 0;
+}
+
+const char *
+addactionname(guint flag) {
+  static char name[6];
+
+  if(TR_TORNEW_SAVE_COPY & flag)
+    strcpy(name, "copy");
+  else if(TR_TORNEW_SAVE_MOVE & flag)
+    strcpy(name, "move");
+  else
+    strcpy(name, "leave");
+
+  return name;
+}
+
+GList *
+makeglist(void *ptr, ...) {
+  va_list ap;
+  GList *ret;
+
+  ret = g_list_append(NULL, ptr);
+
+  va_start(ap, ptr);  
+  while(NULL != (ptr = va_arg(ap, void*)))
+    ret = g_list_append(ret, ptr);
+  va_end(ap);
 
   return ret;
 }

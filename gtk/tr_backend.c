@@ -218,6 +218,9 @@ tr_backend_save_state(TrBackend *back, char **errstr) {
 
   cf_savestate(&state, errstr);
   tr_bencFree(&state);
+
+  for(ii = back->torrents; NULL != ii; ii = ii->next)
+    tr_torrent_state_saved(ii->data);
 }
 
 GList *

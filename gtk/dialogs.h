@@ -33,20 +33,6 @@
 #include "tr_torrent.h"
 #include "util.h"
 
-/* macros for names of prefs we use */
-#define PREF_PORT               "listening-port"
-#define PREF_USEDOWNLIMIT       "use-download-limit"
-#define PREF_DOWNLIMIT          "download-limit"
-#define PREF_USEUPLIMIT         "use-upload-limit"
-#define PREF_UPLIMIT            "upload-limit"
-#define PREF_DIR                "download-directory"
-
-/* default values for a couple prefs */
-#define DEF_DOWNLIMIT           100
-#define DEF_USEDOWNLIMIT        FALSE
-#define DEF_UPLIMIT             20
-#define DEF_USEUPLIMIT          TRUE
-
 void
 makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened);
 

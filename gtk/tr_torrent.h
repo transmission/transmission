@@ -56,6 +56,7 @@ struct _TrTorrent {
   GObject *back;
   char *dir;
   gboolean closing;
+  char *delfile;
   gboolean disposed;
 };
 
@@ -76,9 +77,19 @@ tr_torrent_stat(TrTorrent *tor);
 tr_info_t *
 tr_torrent_info(TrTorrent *tor);
 
+/* explicitly start the torrent running or paused */
+#define TR_TORNEW_PAUSED        0x01
+#define TR_TORNEW_RUNNING       0x02
+/* load a saved torrent file, torrent param is hash instead of filename */
+#define TR_TORNEW_LOAD_SAVED    0x04
+/* save a private copy of the torrent file */
+#define TR_TORNEW_SAVE_COPY     0x08
+/* save a private copy of the torrent file and remove the original */
+#define TR_TORNEW_SAVE_MOVE     0x10
+
 TrTorrent *
 tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
-               gboolean *paused, char **err);
+               guint flags, char **err);
 
 TrTorrent *
 tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err);
@@ -92,6 +103,8 @@ tr_torrent_stat_polite(TrTorrent *tor);
 #ifdef TR_WANT_TORRENT_PRIVATE
 void
 tr_torrent_get_state(TrTorrent *tor, benc_val_t *state);
+void
+tr_torrent_state_saved(TrTorrent *tor);
 #endif
 
 #endif

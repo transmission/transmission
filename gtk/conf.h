@@ -53,4 +53,15 @@ cf_savestate(benc_val_t *state, char **errstr);
 void
 cf_freestate(benc_val_t *state);
 
+/* macros for names of prefs we use */
+#define PREF_PORT               "listening-port"
+#define PREF_USEDOWNLIMIT       "use-download-limit"
+#define PREF_DOWNLIMIT          "download-limit"
+#define PREF_USEUPLIMIT         "use-upload-limit"
+#define PREF_UPLIMIT            "upload-limit"
+#define PREF_DIR                "download-directory"
+#define PREF_ADDSTD             "add-behavior-standard"
+#define PREF_ADDDND             "add-behavior-dnd"
+#define PREF_ADDIPC             "add-behavior-ipc"
+
 #endif /* TG_CONF_H */

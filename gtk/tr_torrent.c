@@ -133,6 +133,7 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   self->back = NULL;
   self->dir = NULL;
   self->closing = FALSE;
+  self->delfile = NULL;
   self->disposed = FALSE;
 }
 
@@ -222,6 +223,9 @@ tr_torrent_dispose(GObject *obj) {
     self->back = NULL;
   }
 
+  if(NULL != self->delfile)
+    g_free(self->delfile);
+
   /* Chain up to the parent class */
   parent->dispose(obj);
 }
@@ -258,19 +262,28 @@ tr_torrent_info(TrTorrent *tor) {
 
 TrTorrent *
 tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
-               gboolean *paused, char **err) {
+               guint flags, char **err) {
   TrTorrent *ret;
   tr_torrent_t *handle;
-  int errcode;
+  tr_handle_t *back;
+  int errcode, trflags;
 
   TR_IS_BACKEND(backend);
   g_assert(NULL != dir);
 
   *err = NULL;
 
+  back = tr_backend_handle(TR_BACKEND(backend));
+  trflags = 0;
+  if((TR_TORNEW_SAVE_COPY|TR_TORNEW_SAVE_MOVE) & flags)
+    trflags |= TR_FSAVEPRIVATE;
   errcode = -1;
-  handle = tr_torrentInit(tr_backend_handle(TR_BACKEND(backend)),
-                          torrent, 0, &errcode);
+
+  if(TR_TORNEW_LOAD_SAVED & flags)
+    handle = tr_torrentInitSaved(back, torrent, 0, &errcode);
+  else
+    handle = tr_torrentInit(back, torrent, trflags, &errcode);
+
   if(NULL == handle) {
     switch(errcode) {
       case TR_EINVALID:
@@ -289,8 +302,11 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   ret = g_object_new(TR_TORRENT_TYPE, "torrent-handle", handle,
                      "backend", backend, "download-directory", dir, NULL);
   tr_backend_add_torrent(TR_BACKEND(backend), G_OBJECT(ret));
+  
+  g_object_set(ret, "paused", (TR_TORNEW_PAUSED & flags ? TRUE : FALSE), NULL);
 
-  g_object_set(ret, "paused", (NULL == paused ? FALSE : *paused), NULL);
+  if(TR_TORNEW_SAVE_MOVE & flags)
+    ret->delfile = g_strdup(torrent);
 
   return ret;
 }
@@ -299,16 +315,18 @@ TrTorrent *
 tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err) {
   int ii;
   benc_val_t *name, *data;
-  char *torrent, *dir;
+  char *torrent, *hash, *dir;
   gboolean hadpaused, paused;
+  guint flags;
 
   *err = NULL;
 
   if(TYPE_DICT != state->type)
     return NULL;
 
-  torrent = dir = NULL;
+  torrent = hash = dir = NULL;
   hadpaused = FALSE;
+  paused = FALSE;               /* silence stupid compiler warning */
 
   for(ii = 0; ii + 1 < state->val.l.count; ii += 2) {
     name = state->val.l.vals + ii;
@@ -317,6 +335,8 @@ tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err) {
        (TYPE_STR == data->type || TYPE_INT == data->type)) {
       if(0 == strcmp("torrent", name->val.s.s))
         torrent = data->val.s.s;
+      if(0 == strcmp("hash", name->val.s.s))
+        hash = data->val.s.s;
       else if(0 == strcmp("dir", name->val.s.s))
         dir = data->val.s.s;
       else if(0 == strcmp("paused", name->val.s.s)) {
@@ -326,21 +346,31 @@ tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err) {
     }
   }
 
-  if(NULL == torrent || NULL == dir)
+  if((NULL != torrent && NULL != hash) ||
+     (NULL == torrent && NULL == hash) || NULL == dir)
     return NULL;
 
-  return tr_torrent_new(backend, torrent, dir,
-                        (hadpaused ? &paused : NULL), err);
+  flags = 0;
+  if(hadpaused)
+    flags |= (paused ? TR_TORNEW_PAUSED : TR_TORNEW_RUNNING);
+  if(NULL != hash) {
+    flags |= TR_TORNEW_LOAD_SAVED;
+    torrent = hash;
+  }
+
+  return tr_torrent_new(backend, torrent, dir, flags, err);
 }
+
+#define SETSTRVAL(vv, ss) \
+  do { \
+    (vv)->type = TYPE_STR; \
+    (vv)->val.s.s = g_strdup((ss)); \
+    (vv)->val.s.i = strlen((ss)); \
+  } while(0)
 
 void
 tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
   tr_info_t *in = tr_torrentInfo(tor->handle);
-  const char *strs[] = {
-    "torrent", in->torrent, "dir", tr_torrentGetFolder(tor->handle), "paused", 
-  };
-  unsigned int ii;
-  const unsigned int len = 6;
 
   TR_IS_TORRENT(tor);
 
@@ -351,21 +381,36 @@ tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
     return;
 
   state->type = TYPE_DICT;
-  state->val.l.vals = g_new0(benc_val_t, len);
-  state->val.l.alloc = state->val.l.count = len;
+  state->val.l.vals = g_new0(benc_val_t, 6);
+  state->val.l.alloc = state->val.l.count = 6;
 
-  g_assert(len > ALEN(strs));
-  for(ii = 0; ii < ALEN(strs); ii++) {
-    state->val.l.vals[ii].type = TYPE_STR;
-    state->val.l.vals[ii].val.s.s = g_strdup(strs[ii]);
-    state->val.l.vals[ii].val.s.i = strlen(strs[ii]);
+  if(TR_FSAVEPRIVATE & in->flags) {
+    SETSTRVAL(state->val.l.vals + 0, "hash");
+    SETSTRVAL(state->val.l.vals + 1, in->hashString);
+  } else {
+    SETSTRVAL(state->val.l.vals + 0, "torrent");
+    SETSTRVAL(state->val.l.vals + 1, in->torrent);
   }
+  SETSTRVAL(state->val.l.vals + 2, "dir");
+  SETSTRVAL(state->val.l.vals + 3, tr_torrentGetFolder(tor->handle));
+  SETSTRVAL(state->val.l.vals + 4, "paused");
+  state->val.l.vals[5].type = TYPE_INT;
+  state->val.l.vals[5].val.i = tr_torrent_paused(tor);
+}
 
-  state->val.l.vals[ii].type = TYPE_INT;
-  state->val.l.vals[ii].val.i = tr_torrent_paused(tor);
-  ii++;
+/* XXX this should probably be done with a signal */
+void
+tr_torrent_state_saved(TrTorrent *tor) {
+  TR_IS_TORRENT(tor);
 
-  g_assert(len == ii);
+  if(tor->disposed)
+    return;
+
+  if(NULL != tor->delfile) {
+    unlink(tor->delfile);
+    g_free(tor->delfile);
+    tor->delfile = NULL;
+  }
 }
 
 static void

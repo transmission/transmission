@@ -387,7 +387,8 @@ srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
          /* XXX somehow escape invalid utf-8 */
          g_utf8_validate(val->val.l.vals[ii].val.s.s, -1, NULL))
         files = g_list_append(files, val->val.l.vals[ii].val.s.s);
-    srv->addfunc(srv->cbdata, NULL, files, NULL, NULL);
+    srv->addfunc(srv->cbdata, NULL, files, NULL,
+                 addactionflag(cf_getpref(PREF_ADDIPC)));
     g_list_free(files);
   }
 }

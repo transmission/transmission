@@ -125,7 +125,7 @@ doubleclick(GtkWidget *widget, GtkTreePath *path, GtkTreeViewColumn *col,
 
 void
 addtorrents(void *vdata, void *state, GList *files,
-            const char *dir, gboolean *paused);
+            const char *dir, guint flags);
 void
 savetorrents(struct cbdata *data);
 void
@@ -320,7 +320,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
 
   setupdrag(list, data);
 
-  addtorrents(data, state, args, NULL, NULL);
+  addtorrents(data, state, args, NULL, addactionflag(cf_getpref(PREF_ADDIPC)));
 
   data->timer = g_timeout_add(UPDATE_INTERVAL, updatemodel, data);
   updatemodel(data);
@@ -592,7 +592,8 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
 
     /* try to add any torrents we found */
     if(NULL != paths) {
-      addtorrents(data, NULL, paths, NULL, NULL);
+      addtorrents(data, NULL, paths, NULL,
+                  addactionflag(cf_getpref(PREF_ADDDND)));
       freestrlist(paths);
     }
     g_free(files);
@@ -941,6 +942,8 @@ actionclick(GtkWidget *widget, gpointer gdata) {
             /* tor will be unref'd in the politely_stopped signal handler */
             g_object_ref(tor);
             tr_torrent_stop_politely(tor);
+            if(TR_FSAVEPRIVATE & tr_torrent_info(tor)->flags)
+              tr_torrentRemoveSaved(tr_torrent_handle(tor));
             gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
             changed = TRUE;
             break;
@@ -995,7 +998,7 @@ doubleclick(GtkWidget *widget SHUTUP, GtkTreePath *path,
 
 void
 addtorrents(void *vdata, void *state, GList *files,
-            const char *dir, gboolean *paused) {
+            const char *dir, guint flags) {
   struct cbdata *data = vdata;
   GList *torlist, *errlist, *ii;
   char *errstr;
@@ -1022,8 +1025,8 @@ addtorrents(void *vdata, void *state, GList *files,
     }
     for(ii = g_list_first(files); NULL != ii; ii = ii->next) {
       errstr = NULL;
-      tor = tr_torrent_new(G_OBJECT(data->back), ii->data,
-                           dir, paused, &errstr);
+      tor = tr_torrent_new(G_OBJECT(data->back), ii->data, dir,
+                           flags, &errstr);
       if(NULL != tor)
         torlist = g_list_append(torlist, tor);
       if(NULL != errstr)

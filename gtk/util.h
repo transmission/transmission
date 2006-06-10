@@ -39,10 +39,12 @@
 #define SHUTUP
 #endif
 
-typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,gboolean*);
+typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,guint);
 
 /* return number of items in array */
 #define ALEN(a)                 (sizeof(a) / sizeof((a)[0]))
+
+#define ISA(o, t)               (g_type_is_a(G_OBJECT_TYPE(G_OBJECT(o)), (t)))
 
 /* used for a callback function with a data parameter */
 typedef void (*callbackfunc_t)(void*);
@@ -81,6 +83,18 @@ urldecode(const char *str, int len);
 /* return a list of cleaned-up paths, with invalid directories removed */
 GList *
 checkfilenames(int argc, char **argv);
+
+/* returns the flag for an action string */
+guint
+addactionflag(const char *action);
+
+/* returns the action string for a flag */
+const char *
+addactionname(guint flag);
+
+/* turn a NULL-terminated list of void* arguments into a glist */
+GList *
+makeglist(void *ptr, ...);
 
 #ifdef GTK_MAJOR_VERSION
 
