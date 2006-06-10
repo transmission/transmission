@@ -228,11 +228,11 @@ static uint32_t kGreen[] =
     NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor blackColor],
                     NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 12], NSFontAttributeName, nil];
+                    [NSFont messageFontOfSize: 12.0], NSFontAttributeName, nil];
     NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor],
                     NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 9], NSFontAttributeName, nil];
+                    [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
 
     NSPoint pen = cellFrame.origin;
     float padding = 3.0, linePadding = 2.0;
@@ -269,7 +269,7 @@ static uint32_t kGreen[] =
     pen.x -= extraNameShift;
     pen.y += [progressString size].height + linePadding;
     
-    float barWidth = mainWidth + extraNameShift - 39.5 - padding;
+    float barWidth = mainWidth + extraNameShift - 42.0 - padding;
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
         initWithBitmapDataPlanes: nil pixelsWide: barWidth
