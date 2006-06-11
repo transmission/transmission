@@ -632,38 +632,61 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) copyTorrentFile: (id) sender
 {
-    Torrent * torrent;
-    NSEnumerator * enumerator = [[self torrentsAtIndexes:
-            [fTableView selectedRowIndexes]] objectEnumerator];
-    
-    while ((torrent = [enumerator nextObject]))
+    [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray:
+            [self torrentsAtIndexes: [fTableView selectedRowIndexes]]]];
+}
+
+- (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents
+{
+    if ([torrents count] == 0)
     {
-        //warn user if torrent file can't be found
-        if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
-        {
-            NSAlert * alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle: @"OK"];
-            [alert setMessageText: [NSString stringWithFormat: 
-                    @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
-            [alert setInformativeText: [NSString stringWithFormat: 
-                    @"The torrent file (%@) cannot be found.", [torrent torrentLocation]]];
-            [alert setAlertStyle: NSWarningAlertStyle];
-            
-            [alert runModal];
-            
-            continue;
-        }
-        
-        //save with extension
-        NSSavePanel * savePanel = [NSSavePanel savePanel];
-        [savePanel setRequiredFileType: @"torrent"];
-        [savePanel setCanSelectHiddenExtension: YES];
-        
-        //if save successful, copy torrent to new location with name of data file
-        if ([savePanel runModalForDirectory: nil file: [torrent name]] == NSOKButton)
-            [[NSFileManager defaultManager] copyPath: [torrent torrentLocation]
-                toPath: [savePanel filename] handler: nil];
+        [torrents release];
+        return;
     }
+
+    Torrent * torrent = [torrents objectAtIndex: 0];
+
+    //warn user if torrent file can't be found
+    if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle: @"OK"];
+        [alert setMessageText: [NSString stringWithFormat: 
+                @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
+        [alert setInformativeText: [NSString stringWithFormat: 
+                @"The torrent file (%@) cannot be found.", [torrent torrentLocation]]];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        
+        [alert runModal];
+        
+        [torrents removeObjectAtIndex: 0];
+        [self copyTorrentFileForTorrents: torrents];
+    }
+    else
+    {
+        NSSavePanel * panel = [NSSavePanel savePanel];
+        [panel setRequiredFileType: @"torrent"];
+        [panel setExtensionHidden: NO];
+        [panel setCanSelectHiddenExtension: NO];
+        
+        [panel beginSheetForDirectory: nil file: [torrent name]
+            modalForWindow: fWindow modalDelegate: self didEndSelector:
+            @selector( saveTorrentCopySheetClosed:returnCode:contextInfo: )
+            contextInfo: torrents];
+    }
+}
+
+- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code
+    contextInfo: (NSMutableArray *) torrents
+{
+    //if save successful, copy torrent to new location with name of data file
+    if (code == NSOKButton)
+        [[NSFileManager defaultManager] copyPath: [[torrents objectAtIndex: 0] torrentLocation]
+                toPath: [panel filename] handler: nil];
+    
+    [torrents removeObjectAtIndex: 0];
+    [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:)
+                withObject: torrents waitUntilDone: NO];
 }
 
 - (void) revealFile: (id) sender

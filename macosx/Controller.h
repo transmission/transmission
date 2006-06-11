@@ -105,6 +105,9 @@
             deleteData: (BOOL) deleteData;
 
 - (void) copyTorrentFile: (id) sender;
+- (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
+- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code
+    contextInfo: (NSMutableArray *) torrents;
 
 - (void) revealFile: (id) sender;
 
