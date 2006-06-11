@@ -176,14 +176,13 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
    GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  const unsigned int rowcount = 9;
+  const unsigned int rowcount = 8;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
   GtkWidget *dirstr = gtk_file_chooser_button_new(
     _("Choose a download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
   GtkWidget *addstd = gtk_combo_box_new();
-  GtkWidget *adddnd = gtk_combo_box_new();
   GtkWidget *addipc = gtk_combo_box_new();
   GtkWidget *label;
   GtkWidget **array;
@@ -215,7 +214,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
 
   data->prefwidgets = makeglist(portnum, lim[0].on, lim[0].num, lim[1].on,
-    lim[1].num, dirstr, addstd, adddnd, addipc, NULL);
+    lim[1].num, dirstr, addstd, addipc, NULL);
   data->parent = parent;
   data->back = back;
   g_object_ref(G_OBJECT(back));
@@ -287,22 +286,9 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   gtk_table_attach_defaults(GTK_TABLE(table), addstd,          1, 2, RN(ii));
   ii++;
 
-  /* dnd */
-  label = gtk_label_new_with_mnemonic(_("For torrents dra_gged and dropped:"));
-  gtk_label_set_mnemonic_widget(GTK_LABEL(label), adddnd);
-  gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-  gtk_combo_box_set_model(GTK_COMBO_BOX(adddnd), model);
-  rend = gtk_cell_renderer_text_new();
-  gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(adddnd), rend, TRUE);
-  gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(adddnd), rend, "text", 0);
-  setupprefwidget(adddnd, PREF_ADDDND);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
-  gtk_table_attach_defaults(GTK_TABLE(table), adddnd,          1, 2, RN(ii));
-  ii++;
-
   /* ipc */
   label = gtk_label_new_with_mnemonic(
-    _("For torrents added e_xternally:"));
+    _("For torrents added e_xternally\n(via the command-line):"));
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), addipc);
   gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   gtk_combo_box_set_model(GTK_COMBO_BOX(addipc), model);

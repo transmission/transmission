@@ -593,7 +593,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
     /* try to add any torrents we found */
     if(NULL != paths) {
       addtorrents(data, NULL, paths, NULL,
-                  addactionflag(cf_getpref(PREF_ADDDND)));
+                  addactionflag(cf_getpref(PREF_ADDSTD)));
       freestrlist(paths);
     }
     g_free(files);

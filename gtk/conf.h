@@ -61,7 +61,6 @@ cf_freestate(benc_val_t *state);
 #define PREF_UPLIMIT            "upload-limit"
 #define PREF_DIR                "download-directory"
 #define PREF_ADDSTD             "add-behavior-standard"
-#define PREF_ADDDND             "add-behavior-dnd"
 #define PREF_ADDIPC             "add-behavior-ipc"
 
 #endif /* TG_CONF_H */
