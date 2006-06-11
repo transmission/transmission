@@ -331,6 +331,7 @@ static void
 freedata(gpointer gdata, GClosure *closure SHUTUP) {
   struct prefdata *data = gdata;
 
+  g_list_free(data->prefwidgets);
   g_object_unref(G_OBJECT(data->back));
   g_free(data);
 }
