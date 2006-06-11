@@ -267,12 +267,29 @@ main(int argc, char **argv) {
 
 GList *
 readargs(int argc, char **argv) {
+  char *name;
+
+  if(NULL == (name = strrchr(argv[0], '/')) || '\0' == *(++name))
+    name = argv[0];
+
   while(0 < --argc) {
     argv++;
     if(0 == strcmp("--", *argv))
       return checkfilenames(argc - 1, argv + 1);
     else if('-' != argv[0][0])
       return checkfilenames(argc, argv);
+    else if(0 == strcmp("-v", *argv) || 0 == strcmp("--version", *argv)) {
+      printf("%s %s (%d) http://transmission.m0k.org/\n",
+             name, VERSION_STRING, VERSION_REVISION);
+      exit(0);
+    }
+    else if(0 == strcmp("-h", *argv) || 0 == strcmp("--help", *argv)) {
+      printf("usage: %1$s [-hv] [files...]\n\n"
+"If %1$s is already running then a second copy will not be\n"
+"started, any torrents on the command-line will be opened in the first.\n",
+             name);
+      exit(0);
+    }
   }
 
   return NULL;
