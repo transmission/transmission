@@ -315,10 +315,16 @@ static int fastResumeLoad( tr_io_t * io )
                 {
                     if( fastResumeLoadProgress( io, file ) )
                     {
-                        fclose( file );
-                        return 1;
+                        if( feof( file ) || ferror( file ) )
+                        {
+                            fclose( file );
+                            return 1;
+                        }
                     }
-                    ret = 0;
+                    else
+                    {
+                        ret = 0;
+                    }
                     continue;
                 }
                 break;
@@ -329,8 +335,8 @@ static int fastResumeLoad( tr_io_t * io )
                 {
                     if( 1 != fread( &tor->downloaded, 8, 1, file ) )
                     {
-                      fclose( file );
-                      return 1;
+                        fclose( file );
+                        return 1;
                     }
                     continue;
                 }
@@ -342,8 +348,8 @@ static int fastResumeLoad( tr_io_t * io )
                 {
                     if( 1 != fread( &tor->uploaded, 8, 1, file ) )
                     {
-                      fclose( file );
-                      return 1;
+                        fclose( file );
+                        return 1;
                     }
                     continue;
                 }
