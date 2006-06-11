@@ -263,9 +263,9 @@ static void sleepCallBack( void * controller, io_service_t y,
         if (active > 0)
         {
             NSString * message = active == 1
-                ? @"There is an active torrent. Do you really want to quit?"
+                ? @"There is an active transfer. Do you really want to quit?"
                 : [NSString stringWithFormat:
-                    @"There are %d active torrents. Do you really want to quit?",
+                    @"There are %d active transfers. Do you really want to quit?",
                     active];
 
             NSBeginAlertSheet(@"Confirm Quit",
@@ -555,7 +555,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         }
         else
         {
-            title = [NSString stringWithFormat: @"Comfirm Removal of %d Torrents", selected];
+            title = [NSString stringWithFormat: @"Comfirm Removal of %d Transfers", selected];
             if (selected == active)
                 message = [NSString stringWithFormat:
                     @"There are %d active transfers.", active];
