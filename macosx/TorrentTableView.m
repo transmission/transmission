@@ -54,38 +54,6 @@
     fTorrents = torrents;
 }
 
-- (NSRect) pauseRectForRow: (int) row
-{
-    NSRect cellRect = [self frameOfCellAtColumn:
-                [self columnWithIdentifier: @"Torrent"] row: row];
-                
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width
-                        - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
-                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
-}
-
-- (NSRect) revealRectForRow: (int) row
-{
-    NSRect cellRect = [self frameOfCellAtColumn:
-                [self columnWithIdentifier: @"Torrent"] row: row];
-    
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width
-                        - AREA_CENTER + DISTANCE_FROM_CENTER,
-                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
-}
-
-- (BOOL) pointInPauseRect: (NSPoint) point
-{
-    return NSPointInRect( point, [self pauseRectForRow:
-                                    [self rowAtPoint: point]] );
-}
-
-- (BOOL) pointInRevealRect: (NSPoint) point
-{
-    return NSPointInRect( point, [self revealRectForRow:
-                                    [self rowAtPoint: point]] );
-}
-
 - (void) mouseDown: (NSEvent *) e
 {
     fClickPoint = [self convertPoint: [e locationInWindow] fromView: nil];
@@ -211,6 +179,42 @@
             NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
             NSCompositeSourceOver fraction: 1.0];
     }
+}
+
+@end
+
+@implementation TorrentTableView (Private)
+
+- (NSRect) pauseRectForRow: (int) row
+{
+    NSRect cellRect = [self frameOfCellAtColumn:
+                [self columnWithIdentifier: @"Torrent"] row: row];
+                
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width
+                        - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
+                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
+}
+
+- (NSRect) revealRectForRow: (int) row
+{
+    NSRect cellRect = [self frameOfCellAtColumn:
+                [self columnWithIdentifier: @"Torrent"] row: row];
+    
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width
+                        - AREA_CENTER + DISTANCE_FROM_CENTER,
+                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
+}
+
+- (BOOL) pointInPauseRect: (NSPoint) point
+{
+    return NSPointInRect( point, [self pauseRectForRow:
+                                    [self rowAtPoint: point]] );
+}
+
+- (BOOL) pointInRevealRect: (NSPoint) point
+{
+    return NSPointInRect( point, [self revealRectForRow:
+                                    [self rowAtPoint: point]] );
 }
 
 @end
