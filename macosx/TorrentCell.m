@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "TorrentCell.h"
+#import "TorrentTableView.h"
 #import "StringAdditions.h"
 
 #define BAR_HEIGHT 12
@@ -269,7 +270,7 @@ static uint32_t kGreen[] =
     pen.x -= extraNameShift;
     pen.y += [progressString size].height + linePadding;
     
-    float barWidth = mainWidth + extraNameShift - 42.0 + padding;
+    float barWidth = mainWidth + extraNameShift - BUTTONS_TOTAL_WIDTH + padding;
     
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
         initWithBitmapDataPlanes: nil pixelsWide: barWidth

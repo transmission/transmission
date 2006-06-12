@@ -29,8 +29,9 @@
 
 #define BUTTON_WIDTH 14.0
 #define BUTTON_TO_TOP 33.5
-#define AREA_CENTER 21.0
 #define DISTANCE_FROM_CENTER 2.5
+//change BUTTONS_TOTAL_WIDTH when changing this
+#define AREA_CENTER 21.0
 
 @interface TorrentTableView (Private)
 
@@ -38,6 +39,7 @@
 - (NSRect) revealRectForRow: (int) row;
 - (BOOL) pointInPauseRect: (NSPoint) point;
 - (BOOL) pointInRevealRect: (NSPoint) point;
+- (BOOL) pointInIconRect: (NSPoint) point;
 
 @end
 
@@ -96,13 +98,15 @@
     }
     else if( sameRow && [self pointInRevealRect: point]
                 && [self pointInRevealRect: fClickPoint] )
-    {
-        torrent = [fTorrents objectAtIndex: row];
-        [torrent reveal];
-    }
+        [[fTorrents objectAtIndex: row] reveal];
 	else
         if ([e clickCount] == 2)
-            [fController showInfo: nil];
+        {
+            if ([self pointInIconRect: point])
+                [[fTorrents objectAtIndex: row] reveal];
+            else
+                [fController showInfo: nil];
+        }
     
 	[super mouseUp: e];
 
@@ -203,6 +207,20 @@
     return NSMakeRect(cellRect.origin.x + cellRect.size.width
                         - AREA_CENTER + DISTANCE_FROM_CENTER,
                         cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
+}
+
+- (BOOL) pointInIconRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    NSRect cellRect = [self frameOfCellAtColumn:
+                [self columnWithIdentifier: @"Torrent"] row: row];
+    NSSize iconSize = [[[fTorrents objectAtIndex: row] iconFlipped] size];
+    
+    NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y
+                        + (cellRect.size.height - iconSize.height) * 0.5,
+                        iconSize.width, iconSize.height);
+    
+    return NSPointInRect(point, iconRect);
 }
 
 - (BOOL) pointInPauseRect: (NSPoint) point

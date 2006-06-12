@@ -25,6 +25,8 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+#define BUTTONS_TOTAL_WIDTH 42.0
+
 @class Controller;
 
 @interface TorrentTableView : NSTableView
