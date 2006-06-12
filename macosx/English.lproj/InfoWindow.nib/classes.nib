@@ -1,5 +1,6 @@
 {
     IBClasses = (
+        {CLASS = FileTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {revealFile = id; setRatioCheck = id; setRatioLimit = id; }; 

@@ -93,6 +93,8 @@
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.tiff */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.tiff */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
+		A2AF1C380A3D0F6200F1575D /* FileTableView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2AF1C360A3D0F6200F1575D /* FileTableView.h */; };
+		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
 		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
@@ -124,6 +126,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
+				A2AF1C380A3D0F6200F1575D /* FileTableView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +265,8 @@
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButton.tiff; path = macosx/Images/ActionButton.tiff; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
+		A2AF1C360A3D0F6200F1575D /* FileTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileTableView.h; path = macosx/FileTableView.h; sourceTree = "<group>"; };
+		A2AF1C370A3D0F6200F1575D /* FileTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileTableView.m; path = macosx/FileTableView.m; sourceTree = "<group>"; };
 		A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BottomBorder.tiff; path = macosx/Images/BottomBorder.tiff; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -323,6 +328,8 @@
 				A21610FB0A050B1700E8E4C1 /* MenuButton.m */,
 				A2519D470A2FADFC00479D0C /* SmoothAquaView.m */,
 				A2519D480A2FADFC00479D0C /* SmoothAquaView.h */,
+				A2AF1C360A3D0F6200F1575D /* FileTableView.h */,
+				A2AF1C370A3D0F6200F1575D /* FileTableView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -678,6 +685,7 @@
 				A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */,
 				A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */,
+				A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
