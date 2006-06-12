@@ -80,6 +80,16 @@
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.tiff */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
+		A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */; };
+		A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */; };
+		A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */; };
+		A2305A830A3DC9E400AB2D77 /* ProgressBarGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */; };
+		A2305A950A3DCAC500AB2D77 /* ProgressBarAdvanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */; };
+		A2305AA90A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */; };
+		A2305AAA0A3DCCEF00AB2D77 /* ProgressBarEndBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */; };
+		A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */; };
+		A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */; };
+		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2519D470A2FADFC00479D0C /* SmoothAquaView.m */; };
@@ -252,6 +262,16 @@
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ActionButtonPressed.tiff; path = macosx/Images/ActionButtonPressed.tiff; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
+		A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarWhite.png; path = macosx/Images/ProgressBarWhite.png; sourceTree = "<group>"; };
+		A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarBlue.png; path = macosx/Images/ProgressBarBlue.png; sourceTree = "<group>"; };
+		A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGray.png; path = macosx/Images/ProgressBarGray.png; sourceTree = "<group>"; };
+		A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGreen.png; path = macosx/Images/ProgressBarGreen.png; sourceTree = "<group>"; };
+		A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarAdvanced.png; path = macosx/Images/ProgressBarAdvanced.png; sourceTree = "<group>"; };
+		A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndAdvanced.png; path = macosx/Images/ProgressBarEndAdvanced.png; sourceTree = "<group>"; };
+		A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndBlue.png; path = macosx/Images/ProgressBarEndBlue.png; sourceTree = "<group>"; };
+		A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndWhite.png; path = macosx/Images/ProgressBarEndWhite.png; sourceTree = "<group>"; };
+		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
+		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		A2519D470A2FADFC00479D0C /* SmoothAquaView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SmoothAquaView.m; path = macosx/SmoothAquaView.m; sourceTree = "<group>"; };
 		A2519D480A2FADFC00479D0C /* SmoothAquaView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SmoothAquaView.h; path = macosx/SmoothAquaView.h; sourceTree = "<group>"; };
@@ -361,6 +381,16 @@
 			isa = PBXGroup;
 			children = (
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
+				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
+				A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */,
+				A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */,
+				A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */,
+				A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */,
+				A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */,
+				A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */,
+				A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */,
+				A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */,
+				A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
 				A27A53640A06AED200E1F16F /* StatusBorder.tiff */,
 				A27A53420A06A62500E1F16F /* StatusSep.png */,
@@ -634,6 +664,16 @@
 				A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */,
 				A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */,
 				A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */,
+				A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */,
+				A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */,
+				A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */,
+				A2305A830A3DC9E400AB2D77 /* ProgressBarGreen.png in Resources */,
+				A2305A950A3DCAC500AB2D77 /* ProgressBarAdvanced.png in Resources */,
+				A2305AA90A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png in Resources */,
+				A2305AAA0A3DCCEF00AB2D77 /* ProgressBarEndBlue.png in Resources */,
+				A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */,
+				A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */,
+				A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
