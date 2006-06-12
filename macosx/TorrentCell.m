@@ -51,12 +51,12 @@ static uint32_t kBorder[] =
 static uint32_t kBack[] = { 0xB4B4B4FF, 0xE3E3E3FF };
 
 static uint32_t kRed = 0xFF6450FF, //255, 100, 80
-    kBlue1 = 0xA0DCFFFF, //160, 220, 255
-    kBlue2 = 0x78BEFFFF, //120, 190, 255
-    kBlue3 = 0x50A0FFFF, //80, 160, 255
-    kBlue4 = 0x1E46B4FF, //30, 70, 180
-    kGray = 0x828282FF, //130, 130, 130
-    kGreen = 0x00FF00FF; //0, 255, 0
+                kBlue1 = 0xA0DCFFFF, //160, 220, 255
+                kBlue2 = 0x78BEFFFF, //120, 190, 255
+                kBlue3 = 0x50A0FFFF, //80, 160, 255
+                kBlue4 = 0x1E46B4FF, //30, 70, 180
+                kGray = 0x828282FF, //130, 130, 130
+                kGreen = 0x00FF00FF; //0, 255, 0
 
 - (id) init
 {
