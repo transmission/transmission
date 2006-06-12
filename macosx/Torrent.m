@@ -145,6 +145,7 @@
         {
             [self stop];
             [self setStopRatioSetting: RATIO_NO_CHECK];
+            fFinishedSeeding = YES;
             
             fStat = tr_torrentStat( fHandle );
             
@@ -164,7 +165,7 @@
     switch( fStat->status )
     {
         case TR_STATUS_PAUSE:
-            [fStatusString setString: @"Paused"];
+            [fStatusString setString: fFinishedSeeding ? @"Seeding Complete" : @"Paused"];
             break;
 
         case TR_STATUS_CHECK:
@@ -228,6 +229,7 @@
     if( fStat->status & TR_STATUS_INACTIVE )
     {
         tr_torrentStart( fHandle );
+        fFinishedSeeding = NO;
     }
 }
 
@@ -550,8 +552,10 @@
     fInfo = tr_torrentInfo( fHandle );
 
     fDate = date ? [date retain] : [[NSDate alloc] init];
+    
     fStopRatioSetting = stopRatioSetting ? [stopRatioSetting intValue] : -1;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
+    fFinishedSeeding = NO;
     
     NSString * fileType = ( fInfo->fileCount > 1 ) ?
         NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];

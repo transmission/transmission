@@ -48,6 +48,7 @@
     
     int     fStopRatioSetting;
     float   fRatioLimit;
+    BOOL    fFinishedSeeding;
 }
 
 - (id)          initWithPath: (NSString *) path lib: (tr_handle_t *) lib;

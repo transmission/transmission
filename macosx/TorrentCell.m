@@ -137,6 +137,9 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     }
     else
     {
+        float completedWidth = [fTorrent progress] * width,
+                remainingWidth = width - completedWidth;
+    
         NSImage * barActiveEnd, * barActive;
         if ([fTorrent isActive])
         {
@@ -148,14 +151,10 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
             barActiveEnd = fProgressEndGray;
             barActive = fProgressGray;
         }
-        
-        float completedWidth = [fTorrent progress] * width,
-                remainingWidth = width - completedWidth;
+        if (completedWidth < 1.0)
+            barActiveEnd = fProgressEndWhite;
     
-        if (completedWidth >= 1.0)
-            [barActiveEnd compositeToPoint: point operation: NSCompositeSourceOver];
-        else
-            [fProgressEndWhite compositeToPoint: point operation: NSCompositeSourceOver];
+        [barActiveEnd compositeToPoint: point operation: NSCompositeSourceOver];
         
         point.x += 1.0;
         [self placeBar: barActive width: completedWidth point: point];
@@ -164,7 +163,8 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         [self placeBar: fProgressWhite width: remainingWidth point: point];
         
         point.x += remainingWidth;
-        [fProgressEndWhite compositeToPoint: point operation: NSCompositeSourceOver];
+        [[fTorrent progress] < 1.0 ? fProgressEndWhite : fProgressEndGray
+                    compositeToPoint: point operation: NSCompositeSourceOver];
     }
 }
 
@@ -248,7 +248,13 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     [bitmap release];
     
     //draw overlay over advanced bar
-    [self placeBar: fProgressAdvanced width: width point: point];
+    [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
+    
+    point.x += 1.0;
+    [self placeBar: fProgressAdvanced width: width - 2.0 point: point];
+    
+    point.x += width - 2.0;
+    [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
