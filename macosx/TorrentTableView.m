@@ -32,6 +32,15 @@
 #define AREA_CENTER 21.0
 #define DISTANCE_FROM_CENTER 2.5
 
+@interface TorrentTableView (Private)
+
+- (NSRect) pauseRectForRow: (int) row;
+- (NSRect) revealRectForRow: (int) row;
+- (BOOL) pointInPauseRect: (NSPoint) point;
+- (BOOL) pointInRevealRect: (NSPoint) point;
+
+@end
+
 @implementation TorrentTableView
 
 - (void) awakeFromNib
