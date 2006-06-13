@@ -44,6 +44,8 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSAppleScriptEnabled</key>
-    	<string>YES</string>
+	<string>YES</string>
+	<key>SUFeedURL</key>
+	<string>http://transmission.m0k.org/appcast.xml</string>
 </dict>
 </plist>
