@@ -103,7 +103,6 @@
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.tiff */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.tiff */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
-		A2AF1C380A3D0F6200F1575D /* FileTableView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2AF1C360A3D0F6200F1575D /* FileTableView.h */; };
 		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
 		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.tiff */; };
@@ -136,7 +135,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
-				A2AF1C380A3D0F6200F1575D /* FileTableView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
