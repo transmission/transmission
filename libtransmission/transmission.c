@@ -317,6 +317,7 @@ int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l )
 void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
 {
     tor->destination = strdup( path );
+    tr_ioLoadResume( tor );
 }
 
 char * tr_torrentGetFolder( tr_torrent_t * tor )

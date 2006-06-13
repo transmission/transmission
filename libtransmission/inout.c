@@ -61,6 +61,29 @@ static void findSlotForPiece( tr_io_t *, int );
 #define writeSlot(io,sl,b,s) readOrWriteSlot(io,sl,b,s,1)
 
 /***********************************************************************
+ * tr_ioLoadResume
+ ***********************************************************************
+ * Try to load the fast resume file
+ **********************************************************************/
+void tr_ioLoadResume( tr_torrent_t * tor )
+{
+    tr_io_t * io;
+    tr_info_t * inf = &tor->info;
+
+    io      = malloc( sizeof( tr_io_t ) );
+    io->tor = tor;
+
+    io->pieceSlot = malloc( inf->pieceCount * sizeof( int ) );
+    io->slotPiece = malloc( inf->pieceCount * sizeof( int ) );
+
+    fastResumeLoad( io );
+
+    free( io->pieceSlot );
+    free( io->slotPiece );
+    free( io );
+}
+
+/***********************************************************************
  * tr_ioInit
  ***********************************************************************
  * Open all files we are going to write to
