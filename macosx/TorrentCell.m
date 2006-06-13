@@ -67,7 +67,6 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         {
             fProgressWhite = [NSImage imageNamed: @"ProgressBarWhite.png"];
             [fProgressWhite setScalesWhenResized: YES];
-            [fProgressWhite setSize: startSize];
         }
         if (!fProgressBlue)
         {
@@ -85,13 +84,11 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         {
             fProgressGreen = [NSImage imageNamed: @"ProgressBarGreen.png"];
             [fProgressGreen setScalesWhenResized: YES];
-            [fProgressGreen setSize: startSize];
         }
         if (!fProgressAdvanced)
         {
             fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
             [fProgressAdvanced setScalesWhenResized: YES];
-            [fProgressAdvanced setSize: startSize];
         }
         
         if (!fProgressEndWhite)
