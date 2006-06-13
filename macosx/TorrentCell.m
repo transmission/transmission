@@ -248,12 +248,14 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     [bitmap release];
     
     //draw overlay over advanced bar
+    width -= 2.0;
+    
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
     
     point.x += 1.0;
-    [self placeBar: fProgressAdvanced width: width - 2.0 point: point];
+    [self placeBar: fProgressAdvanced width: width point: point];
     
-    point.x += width - 2.0;
+    point.x += width;
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
 }
 

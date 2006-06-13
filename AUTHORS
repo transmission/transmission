@@ -17,11 +17,11 @@ Bryan Varner <bryan@varnernet.com>
 Michael Demars <keul@m0k.org>
  + OS X interface (Growl notifications, AppleScript)
 
+Mitchell Livingston <livings124@gmail.com>
+ + OS X interface
+
 
 Thanks to:
-
-Mitchell Livingston
- + OS X patches (Badging, preferences, check for update and much more)
 
 Omar and Adrien
  + Beta testing
@@ -48,4 +48,4 @@ Martin Stadtmueller
  + Icon tweaking
 
 FOOOD
- + Badging images
+ + Badging images, Progress Bar images
