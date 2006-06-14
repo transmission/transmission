@@ -24,7 +24,6 @@
 
 #import "Torrent.h"
 #import "StringAdditions.h"
-#import "Utils.h"
 
 @interface Torrent (Private)
 
@@ -167,7 +166,7 @@
             break;
 
         case TR_STATUS_CHECK:
-            [fStatusString setString: [@"Checking existing files" stringByAppendingString: NS_ELLIPSIS]];
+            [fStatusString setString: [@"Checking existing files" stringByAppendingEllipsis]];
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -202,7 +201,7 @@
             break;
 
         case TR_STATUS_STOPPING:
-            [fStatusString setString: [@"Stopping" stringByAppendingString: NS_ELLIPSIS]];
+            [fStatusString setString: [@"Stopping" stringByAppendingEllipsis]];
             break;
     }
     
@@ -364,7 +363,7 @@
             break;
 
         case TR_STATUS_CHECK:
-            return [@"Checking existing files" stringByAppendingString: NS_ELLIPSIS];
+            return [@"Checking existing files" stringByAppendingEllipsis];
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -376,7 +375,7 @@
             break;
 
         case TR_STATUS_STOPPING:
-            return [@"Stopping" stringByAppendingString: NS_ELLIPSIS];
+            return [@"Stopping" stringByAppendingEllipsis];
             break;
         
         default:

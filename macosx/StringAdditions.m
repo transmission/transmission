@@ -23,9 +23,18 @@
  *****************************************************************************/
 
 #import "StringAdditions.h"
-#import "Utils.h"
 
 @implementation NSString (StringAdditions)
+
++ (NSString *) ellipsis
+{
+	return [NSString stringWithUTF8String: "\xE2\x80\xA6"];
+}
+
+- (NSString *) stringByAppendingEllipsis
+{
+	return [self stringByAppendingString: [NSString ellipsis]];
+}
 
 + (NSString *) stringWithInt: (int) value
 {
@@ -114,7 +123,7 @@
     if( realWidth <= width )
         return [[[NSAttributedString alloc] initWithString: self attributes: attributes] autorelease];
     
-    float ellipsisWidth = [NS_ELLIPSIS sizeWithAttributes: attributes].width;
+    float ellipsisWidth = [[NSString ellipsis] sizeWithAttributes: attributes].width;
     
     /* Width is too small */
     if ( ellipsisWidth > width )
@@ -150,7 +159,7 @@
     }
     else;
 
-    return [[[NSAttributedString alloc] initWithString: [newString stringByAppendingString: NS_ELLIPSIS]
+    return [[[NSAttributedString alloc] initWithString: [newString stringByAppendingEllipsis]
                                         attributes: attributes] autorelease];
 }
 

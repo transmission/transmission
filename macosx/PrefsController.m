@@ -24,7 +24,6 @@
 
 #import "PrefsController.h"
 #import "StringAdditions.h"
-#import "Utils.h"
 
 #define MIN_PORT            1
 #define MAX_PORT            65535
@@ -472,10 +471,10 @@
     [panel setCanChooseFiles:                 NO];
     [panel setCanChooseDirectories:          YES];
 
-    [panel beginSheetForDirectory: NULL file: NULL types: NULL
+    [panel beginSheetForDirectory: nil file: nil types: nil
         modalForWindow: [self window] modalDelegate: self didEndSelector:
         @selector( folderSheetClosed:returnCode:contextInfo: )
-        contextInfo: NULL];
+        contextInfo: nil];
 }
 
 @end

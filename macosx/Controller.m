@@ -29,7 +29,6 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "StringAdditions.h"
-#import "Utils.h"
 
 #import <Sparkle/Sparkle.h>
 
@@ -1272,17 +1271,17 @@ static void sleepCallBack( void * controller, io_service_t y,
         }
     
         //append or remove ellipsis when needed
-        NSString * title = [menuItem title];
+        NSString * title = [menuItem title], * ellipsis = [NSString ellipsis];
         if (active && [fDefaults boolForKey: @"CheckRemove"])
         {
-            if (![title hasSuffix: NS_ELLIPSIS])
-                [menuItem setTitle: [title stringByAppendingString: NS_ELLIPSIS]];
+            if (![title hasSuffix: ellipsis])
+                [menuItem setTitle: [title stringByAppendingEllipsis]];
         }
         else
         {
-            if ([title hasSuffix: NS_ELLIPSIS])
+            if ([title hasSuffix: ellipsis])
                 [menuItem setTitle: [title substringToIndex:
-                            [title rangeOfString: NS_ELLIPSIS].location]];
+                            [title rangeOfString: ellipsis].location]];
         }
         return canUseMenu && [fTableView numberOfSelectedRows] > 0;
     }

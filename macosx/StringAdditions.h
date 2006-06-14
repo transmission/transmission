@@ -26,6 +26,9 @@
 
 @interface NSString (StringAdditions)
 
++ (NSString *) ellipsis;
+- (NSString *) stringByAppendingEllipsis;
+
 + (NSString *) stringWithInt: (int) value;
 
 + (NSString *) stringForFileSize: (uint64_t) size;
