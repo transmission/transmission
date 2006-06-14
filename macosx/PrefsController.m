@@ -396,7 +396,6 @@
 
 - (void) setUpdate: (id) sender
 {
-    NSString * schedule;
     int index = [fUpdatePopUp indexOfSelectedItem];
     NSTimeInterval seconds;
     if (index == UPDATE_DAILY)
@@ -551,26 +550,15 @@
 
 - (void) updatePopUp
 {
-    // Get the icon for the folder
-    NSImage * image32 = [[NSWorkspace sharedWorkspace] iconForFile:
-                fDownloadFolder];
-    NSImage * image16 = [[NSImage alloc] initWithSize: NSMakeSize(16,16)];
+    //get and resize the icon
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile: fDownloadFolder];
+    [icon setScalesWhenResized: YES];
+    [icon setSize: NSMakeSize(16.0, 16.0)];
 
-    // 32x32 -> 16x16 scaling
-    [image16 lockFocus];
-    [[NSGraphicsContext currentContext]
-        setImageInterpolation: NSImageInterpolationHigh];
-    [image32 drawInRect: NSMakeRect(0,0,16,16)
-        fromRect: NSMakeRect(0,0,32,32) operation: NSCompositeCopy
-        fraction: 1.0];
-    [image16 unlockFocus];
-
-    // Update the menu item
+    //update menu item
     NSMenuItem * menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
     [menuItem setTitle: [fDownloadFolder lastPathComponent]];
-    [menuItem setImage: image16];
-
-    [image16 release];
+    [menuItem setImage: icon];
 }
 
 @end
