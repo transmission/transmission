@@ -211,6 +211,9 @@
 - (BOOL) pointInIconRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
     NSRect cellRect = [self frameOfCellAtColumn:
                 [self columnWithIdentifier: @"Torrent"] row: row];
     NSSize iconSize = [[[fTorrents objectAtIndex: row] iconFlipped] size];
