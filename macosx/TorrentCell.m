@@ -136,32 +136,38 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     {
         float completedWidth = [fTorrent progress] * width,
                 remainingWidth = width - completedWidth;
-    
-        NSImage * barActiveEnd, * barActive;
-        if ([fTorrent isActive])
-        {
-            barActiveEnd = fProgressEndBlue;
-            barActive = fProgressBlue;
-        }
+        
+        NSImage * barLeftEnd, * barRightEnd;
+        BOOL isActive = [fTorrent isActive];
+        
+        //left end
+        if (remainingWidth == width)
+            barLeftEnd = fProgressEndWhite;
+        else if (isActive)
+            barLeftEnd = fProgressEndBlue;
         else
-        {
-            barActiveEnd = fProgressEndGray;
-            barActive = fProgressGray;
-        }
-        if (completedWidth < 1.0)
-            barActiveEnd = fProgressEndWhite;
-    
-        [barActiveEnd compositeToPoint: point operation: NSCompositeSourceOver];
+            barLeftEnd = fProgressEndGray;
         
+        [barLeftEnd compositeToPoint: point operation: NSCompositeSourceOver];
+        
+        //active bar
         point.x += 1.0;
-        [self placeBar: barActive width: completedWidth point: point];
+        [self placeBar: isActive ? fProgressBlue : fProgressGray width: completedWidth point: point];
         
+        //remaining bar
         point.x += completedWidth;
         [self placeBar: fProgressWhite width: remainingWidth point: point];
         
+        //right end
+        if (completedWidth < width)
+            barRightEnd = fProgressEndWhite;
+        else if (isActive)
+            barRightEnd = fProgressEndBlue;
+        else
+            barRightEnd = fProgressEndGray;
+        
         point.x += remainingWidth;
-        [[fTorrent progress] < 1.0 ? fProgressEndWhite : fProgressEndGray
-                    compositeToPoint: point operation: NSCompositeSourceOver];
+        [barRightEnd compositeToPoint: point operation: NSCompositeSourceOver];
     }
 }
 
