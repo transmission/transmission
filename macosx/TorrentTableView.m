@@ -25,7 +25,6 @@
 #import "TorrentTableView.h"
 #import "Controller.h"
 #import "Torrent.h"
-#import "Utils.h"
 
 #define BUTTON_WIDTH 14.0
 #define BUTTON_TO_TOP 33.5
