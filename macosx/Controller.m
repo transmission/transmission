@@ -422,7 +422,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         int count = [fTorrents count];
         [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
-                    @"%d Torrent%s", count, count == 1 ? "" : "s"]];
+                    @"%d Transfer%s", count, count == 1 ? "" : "s"]];
     }
 }
 
