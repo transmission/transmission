@@ -550,7 +550,7 @@ static void sleepCallBack( void * controller, io_service_t y,
             title = [NSString stringWithFormat: @"Comfirm Removal of \"%@\"",
                         [[fTorrents objectAtIndex: [fTableView selectedRow]] name]];
             message = @"This transfer is active."
-                        " Onced removed, continuing the transfer will require the torrent file."
+                        " Once removed, continuing the transfer will require the torrent file."
                         " Do you really want to remove it?";
         }
         else
@@ -563,7 +563,7 @@ static void sleepCallBack( void * controller, io_service_t y,
                 message = [NSString stringWithFormat:
                     @"There are %d transfers (%d active).", selected, active];
             message = [message stringByAppendingString:
-                @" Onced removed, continuing the transfers will require the torrent files."
+                @" Once removed, continuing the transfers will require the torrent files."
                 " Do you really want to remove them?"];
         }
 
