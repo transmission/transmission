@@ -35,7 +35,7 @@
 - (id) initForSuccessWithDate: (NSDate *) date stopRatioSetting: (NSNumber *)
             stopRatioSetting ratioLimit: (NSNumber *) ratioLimit;
 
-- (void) trashPath: (NSString *) path;
+- (void) trashFile: (NSString *) path;
 
 @end
 
@@ -47,11 +47,8 @@
     id torrent = [self initWithPath: path lib: lib date: nil
                     stopRatioSetting: nil ratioLimit: nil];
                     
-    if (!torrent)
-        return nil;
-
-    if (fPrivateTorrent && [fDefaults boolForKey: @"DeleteOriginalTorrent"])
-        [self trashPath: path];
+    if (torrent && fPrivateTorrent && [fDefaults boolForKey: @"DeleteOriginalTorrent"])
+        [self trashFile: path];
     
     return torrent;
 }
@@ -59,19 +56,20 @@
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib
 {
     //load from saved torrent file if set to, otherwise try to load from where torrent file should be
+    id torrent;
     NSNumber * privateCopy;
     if ((privateCopy = [history objectForKey: @"PrivateCopy"]) && [privateCopy boolValue])
-        self = [self initWithHash: [history objectForKey: @"TorrentHash"]
+        torrent = [self initWithHash: [history objectForKey: @"TorrentHash"]
             lib: lib date: [history objectForKey: @"Date"]
             stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
             ratioLimit: [history objectForKey: @"RatioLimit"]];
     else
-        self = [self initWithPath: [history objectForKey: @"TorrentPath"]
+        torrent = [self initWithPath: [history objectForKey: @"TorrentPath"]
             lib: lib date: [history objectForKey: @"Date"]
             stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
             ratioLimit: [history objectForKey: @"RatioLimit"]];
             
-    if (self)
+    if (torrent)
     {
         NSString * downloadFolder;
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
@@ -83,7 +81,7 @@
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
             [self start];
     }
-    return self;
+    return torrent;
 }
 
 - (NSDictionary *) history
@@ -156,11 +154,11 @@
     [fProgressString setString: @""];
     if ([self progress] < 1.0)
         [fProgressString appendFormat: @"%@ of %@ (%.2f%%)", [NSString stringForFileSize:
-                [self downloaded]], [NSString stringForFileSize: [self size]], 100 * [self progress]];
+                [self downloadedValid]], [NSString stringForFileSize: [self size]], 100 * [self progress]];
     else
         [fProgressString appendFormat: @"%@, uploaded %@ (ratio: %@)", [NSString stringForFileSize:
-                [self size]], [NSString stringForFileSize: [self uploaded]],
-                [NSString stringForRatioWithDownload: [self downloaded] upload: [self uploaded]]];
+                [self size]], [NSString stringForFileSize: [self uploadedTotal]],
+                [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]];
 
     switch( fStat->status )
     {
@@ -265,8 +263,8 @@
 
 - (float) ratio
 {
-    float downloaded = [self downloaded];
-    return downloaded > 0 ? (float)[self uploaded] / downloaded : -1;
+    float downloaded = [self downloadedTotal];
+    return downloaded > 0 ? (float)[self uploadedTotal] / downloaded : -1;
 }
 
 - (int) stopRatioSetting
@@ -298,7 +296,7 @@
 
 - (void) trashData
 {
-    [self trashPath: [self dataLocation]];
+    [self trashFile: [self dataLocation]];
 }
 
 - (NSImage *) icon
@@ -458,12 +456,17 @@
     return fStat->rateUpload;
 }
 
-- (uint64_t) downloaded
+- (float) downloadedValid
+{
+    return [self progress] * [self size];
+}
+
+- (uint64_t) downloadedTotal
 {
     return fStat->downloaded;
 }
 
-- (uint64_t) uploaded
+- (uint64_t) uploadedTotal
 {
     return fStat->uploaded;
 }
@@ -573,7 +576,7 @@
 }
 
 
-- (void) trashPath: (NSString *) path
+- (void) trashFile: (NSString *) path
 {
     if( ![[NSWorkspace sharedWorkspace] performFileOperation:
            NSWorkspaceRecycleOperation source:

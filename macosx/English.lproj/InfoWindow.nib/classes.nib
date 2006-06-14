@@ -12,7 +12,8 @@
                 fDataLocationField = NSTextField; 
                 fDateStartedField = NSTextField; 
                 fDownloadRateField = NSTextField; 
-                fDownloadedField = NSTextField; 
+                fDownloadedTotalField = NSTextField; 
+                fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
                 fFileTable = NSTableView; 
                 fHashField = NSTextField; 
@@ -32,7 +33,7 @@
                 fTorrentLocationField = NSTextField; 
                 fTrackerField = NSTextField; 
                 fUploadRateField = NSTextField; 
-                fUploadedField = NSTextField; 
+                fUploadedTotalField = NSTextField; 
                 fUploadingToField = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 

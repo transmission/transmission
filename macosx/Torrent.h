@@ -107,8 +107,9 @@
 
 - (float)       downloadRate;
 - (float)       uploadRate;
-- (uint64_t)    downloaded;
-- (uint64_t)    uploaded;
+- (float)       downloadedValid;
+- (uint64_t)    downloadedTotal;
+- (uint64_t)    uploadedTotal;
 
 - (NSArray *) fileList;
 

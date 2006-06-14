@@ -136,11 +136,10 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     {
         float completedWidth = [fTorrent progress] * width,
                 remainingWidth = width - completedWidth;
-        
-        NSImage * barLeftEnd, * barRightEnd;
         BOOL isActive = [fTorrent isActive];
         
         //left end
+        NSImage * barLeftEnd;
         if (remainingWidth == width)
             barLeftEnd = fProgressEndWhite;
         else if (isActive)
@@ -159,6 +158,7 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         [self placeBar: fProgressWhite width: remainingWidth point: point];
         
         //right end
+        NSImage * barRightEnd;
         if (completedWidth < width)
             barRightEnd = fProgressEndWhite;
         else if (isActive)

@@ -34,8 +34,9 @@
 #define TAB_OPTIONS_IDENT @"Options"
 #define TAB_FILES_IDENT @"Files"
 
-#define TAB_INFO_HEIGHT 191.0
-#define TAB_STATUS_HEIGHT 241.0
+//15 spacing at the bottom of each tab
+#define TAB_INFO_HEIGHT 196.0
+#define TAB_STATUS_HEIGHT 262.0
 #define TAB_OPTIONS_HEIGHT 82.0
 #define TAB_FILES_HEIGHT 250.0
 
@@ -105,8 +106,9 @@
             [fDownloadRateField setStringValue: @""];
             [fUploadRateField setStringValue: @""];
             
-            [fDownloadedField setStringValue: @""];
-            [fUploadedField setStringValue: @""];
+            [fDownloadedValidField setStringValue: @""];
+            [fDownloadedTotalField setStringValue: @""];
+            [fUploadedTotalField setStringValue: @""];
         }
         
         [fImageView setImage: fAppIcon];
@@ -236,8 +238,8 @@
     int numberSelected = [fTorrents count];
     if (numberSelected > 0)
     {
-        float downloadRate = 0, uploadRate = 0;
-        uint64_t downloaded = 0, uploaded = 0;
+        float downloadRate = 0, uploadRate = 0, downloadedValid;
+        uint64_t downloadedTotal = 0, uploadedTotal = 0;
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
@@ -245,15 +247,17 @@
             downloadRate += [torrent downloadRate];
             uploadRate += [torrent uploadRate];
             
-            downloaded += [torrent downloaded];
-            uploaded += [torrent uploaded];
+            downloadedValid += [torrent downloadedValid];
+            downloadedTotal += [torrent downloadedTotal];
+            uploadedTotal += [torrent uploadedTotal];
         }
         
         [fDownloadRateField setStringValue: [NSString stringForSpeed: downloadRate]];
         [fUploadRateField setStringValue: [NSString stringForSpeed: uploadRate]];
         
-        [fDownloadedField setStringValue: [NSString stringForFileSize: downloaded]];
-        [fUploadedField setStringValue: [NSString stringForFileSize: uploaded]];
+        [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
+        [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
+        [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
     
         if (numberSelected == 1)
         {
@@ -279,7 +283,7 @@
                     stringWithInt: [torrent peersDownloading]] : @"N/A"];
             
             [fRatioField setStringValue: [NSString stringForRatioWithDownload:
-                                                        downloaded upload: uploaded]];
+                                        downloadedTotal upload: uploadedTotal]];
         }
     }
 }

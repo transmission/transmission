@@ -40,8 +40,8 @@
                         * fDateStartedField,
                         * fStateField, * fPercentField,
                         * fDownloadRateField, * fUploadRateField,
-                        * fDownloadedField, * fUploadedField, * fRatioField,
-                        * fSeedersField, * fLeechersField,
+                        * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
+                        * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
 
     IBOutlet NSTableView * fFileTable;
