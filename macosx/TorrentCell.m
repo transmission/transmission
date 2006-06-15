@@ -31,7 +31,7 @@
 @interface TorrentCell (Private)
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point;
-- (void) buildSimpleBar: (int) width point: (NSPoint) point;
+- (void) buildSimpleBar: (int) widthInt point: (NSPoint) point;
 - (void) buildAdvancedBar: (int) width point: (NSPoint) point;
 
 @end
@@ -119,9 +119,9 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
                         operation: NSCompositeSourceOver];
 }
 
-- (void) buildSimpleBar: (int) width point: (NSPoint) point
+- (void) buildSimpleBar: (int) widthInt point: (NSPoint) point
 {
-    width -= 2.0;
+    float width = (float)widthInt - 2.0;
     if ([fTorrent isSeeding])
     {
         [fProgressEndGreen compositeToPoint: point operation: NSCompositeSourceOver];

@@ -41,26 +41,29 @@
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
-    if ((self = [self initWithHash: nil path: path lib: lib
-        privateTorrent: nil publicTorrent: nil
-        date: nil stopRatioSetting: nil ratioLimit: nil]))
+    self = [self initWithHash: nil path: path lib: lib
+            privateTorrent: nil publicTorrent: nil
+            date: nil stopRatioSetting: nil ratioLimit: nil];
+    
+    if (self)
     {
         if (!fPublicTorrent)
             [self trashFile: path];
     }
-    
     return self;
 }
 
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib
 {
-    if ((self = [self initWithHash: [history objectForKey: @"TorrentHash"]
+    self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 privateTorrent: [history objectForKey: @"PrivateCopy"]
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 date: [history objectForKey: @"Date"]
                 stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
-                ratioLimit: [history objectForKey: @"RatioLimit"]]))
+                ratioLimit: [history objectForKey: @"RatioLimit"]];
+    
+    if (self)
     {
         NSString * downloadFolder;
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
@@ -72,7 +75,6 @@
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
             [self start];
     }
-    
     return self;
 }
 
@@ -590,11 +592,8 @@
     {
         /* We can't move it to the trash, let's try just to delete it
            (will work if it is on a remote volume) */
-        if( ![[NSFileManager defaultManager]
-                removeFileAtPath: path handler: nil] )
-        {
-            NSLog( [@"Could not trash " stringByAppendingString: path] );
-        }
+        if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
+            NSLog([@"Could not trash " stringByAppendingString: path]);
     }
 }
 
