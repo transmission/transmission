@@ -545,9 +545,9 @@
     int error;
     if (fPrivateTorrent && hashString)
         fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FSAVEPRIVATE, & error);
-    else if (path)
+    
+    if (!fHandle && path)
         fHandle = tr_torrentInit(fLib, [path UTF8String], fPrivateTorrent ? TR_FSAVEPRIVATE : 0, & error);
-    else;
 
     if (!fHandle)
     {
