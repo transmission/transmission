@@ -522,8 +522,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self updateTorrentHistory];
 }
 
-- (void) removeTorrentWithIndex: (NSIndexSet *) indexSet
-                     deleteData: (BOOL) deleteData
+- (void) removeWithIndex: (NSIndexSet *) indexSet
+        deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     NSArray * torrents = [[self torrentsAtIndexes: indexSet] retain];
     int active = 0;
@@ -539,6 +539,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
             torrents, @"Torrents",
             [NSNumber numberWithBool: deleteData], @"DeleteData",
+            [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent",
             nil];
 
         NSString * title, * message;
@@ -573,8 +574,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     else
     {
-        [self confirmRemoveTorrents: torrents
-                deleteData: deleteData];
+        [self confirmRemove: torrents
+            deleteData: deleteData deleteTorrent: deleteTorrent];
     }
 }
 
@@ -584,20 +585,21 @@ static void sleepCallBack( void * controller, io_service_t y,
     [NSApp stopModal];
 
     NSArray * torrents = [dict objectForKey: @"Torrents"];
-    BOOL deleteData = [[dict objectForKey: @"DeleteData"] boolValue];
+    BOOL deleteData = [[dict objectForKey: @"DeleteData"] boolValue],
+        deleteTorrent = [[dict objectForKey: @"DeleteTorrent"] boolValue];
     [dict release];
     
     if (returnCode == NSAlertDefaultReturn)
     {
-        [self confirmRemoveTorrents: torrents
-            deleteData: deleteData];
+        [self confirmRemove: torrents
+            deleteData: deleteData deleteTorrent: deleteTorrent];
     }
     else
         [torrents release];
 }
 
-- (void) confirmRemoveTorrents: (NSArray *) torrents
-            deleteData: (BOOL) deleteData
+- (void) confirmRemove: (NSArray *) torrents
+        deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     Torrent * torrent;
     NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -605,8 +607,10 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [torrent stop];
 
-        if( deleteData )
+        if (deleteData)
             [torrent trashData];
+        if (deleteTorrent)
+            [torrent trashTorrent];
 
         [torrent removeForever];
         [fTorrents removeObject: torrent];
@@ -619,14 +623,24 @@ static void sleepCallBack( void * controller, io_service_t y,
     [self updateTorrentHistory];
 }
 
-- (void) removeTorrent: (id) sender
+- (void) removeNoDelete: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteData: NO];
+    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: NO deleteTorrent: NO];
 }
 
-- (void) removeTorrentDeleteData: (id) sender
+- (void) removeDeleteData: (id) sender
 {
-    [self removeTorrentWithIndex: [fTableView selectedRowIndexes] deleteData: YES];
+    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: YES deleteTorrent: NO];
+}
+
+- (void) removeDeleteTorrent: (id) sender
+{
+    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: NO deleteTorrent: YES];
+}
+
+- (void) removeDeleteBoth: (id) sender
+{
+    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: YES deleteTorrent: YES];
 }
 
 - (void) copyTorrentFile: (id) sender
@@ -1253,9 +1267,12 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     //enable remove items
-    if (action == @selector(removeTorrent:) || action == @selector(removeTorrentDeleteData:))
+    if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
+        || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteBoth:))
     {
-        BOOL active = NO;
+        BOOL active = NO,
+            canDelete = !(action == @selector(removeDeleteTorrent:)
+                            || action == @selector(removeDeleteBoth:));
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
         unsigned int i;
@@ -1264,10 +1281,12 @@ static void sleepCallBack( void * controller, io_service_t y,
         {
             torrent = [fTorrents objectAtIndex: i];
             if ([torrent isActive])
-            {
                 active = YES;
+            if ([torrent publicTorrent])
+                canDelete = YES;
+            
+            if (active && canDelete)
                 break;
-            }
         }
     
         //append or remove ellipsis when needed
@@ -1283,7 +1302,8 @@ static void sleepCallBack( void * controller, io_service_t y,
                 [menuItem setTitle: [title substringToIndex:
                             [title rangeOfString: ellipsis].location]];
         }
-        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
+        
+        return canUseMenu && canDelete && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable pause item

@@ -39,7 +39,8 @@
     BOOL         fResumeOnWake;
     NSDate       * fDate;
     
-    BOOL        fPrivateTorrent;
+    BOOL        fPrivateTorrent, fPublicTorrent;
+    NSString    * fPublicTorrentLocation;
 
     NSUserDefaults  * fDefaults;
 
@@ -51,8 +52,9 @@
     BOOL    fFinishedSeeding;
 }
 
-- (id)          initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
-- (id)          initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
+- (id)  initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
+- (id)  initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
+
 - (NSDictionary *) history;
                     
 - (void)       setDownloadFolder: (NSString *) path;
@@ -72,8 +74,9 @@
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
 
-- (void)        reveal;
-- (void)        trashData;
+- (void)    reveal;
+- (void)    trashData;
+- (void)    trashTorrent;
 
 - (NSImage *)  icon;
 - (NSImage *)  iconFlipped;
@@ -85,8 +88,13 @@
 - (int)        pieceSize;
 - (int)        pieceCount;
 - (NSString *) hashString;
+
 - (NSString *) torrentLocation;
+- (NSString *) publicTorrentLocation;
 - (NSString *) dataLocation;
+
+- (BOOL) publicTorrent;
+- (BOOL) privateTorrent;
 
 - (NSString *) state;
 

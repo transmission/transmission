@@ -29,8 +29,9 @@
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib date: (NSDate *) date
         stopRatioSetting: (NSNumber *) stopRatioSetting ratioLimit: (NSNumber *) ratioLimit;
-- (id) initWithHash: (NSString *) hashString lib: (tr_handle_t *) lib date: (NSDate *) date
-        stopRatioSetting: (NSNumber *) stopRatioSetting ratioLimit: (NSNumber *) ratioLimit;
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
+        date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
+        ratioLimit: (NSNumber *) ratioLimit;
 - (id) initForSuccessWithDate: (NSDate *) date stopRatioSetting: (NSNumber *)
             stopRatioSetting ratioLimit: (NSNumber *) ratioLimit;
 
@@ -45,9 +46,20 @@
 {
     id torrent = [self initWithPath: path lib: lib date: nil
                     stopRatioSetting: nil ratioLimit: nil];
-                    
-    if (torrent && fPrivateTorrent && [fDefaults boolForKey: @"DeleteOriginalTorrent"])
-        [self trashFile: path];
+    
+    if (torrent)
+    {
+        fPrivateTorrent = [fDefaults boolForKey: @"SavePrivateTorrent"];
+        fPublicTorrent = !fPrivateTorrent || ![fDefaults boolForKey: @"DeleteOriginalTorrent"];
+    
+        if (!fPublicTorrent)
+        {
+            [self trashFile: path];
+            fPublicTorrentLocation = nil;
+        }
+        else
+            fPublicTorrentLocation = [path retain];
+    }
     
     return torrent;
 }
@@ -56,10 +68,16 @@
 {
     //load from saved torrent file if set to, otherwise try to load from where torrent file should be
     id torrent;
-    NSNumber * privateCopy;
-    if ((privateCopy = [history objectForKey: @"PrivateCopy"]) && [privateCopy boolValue])
+    NSNumber * privateCopy, * publicCopy;
+    fPrivateTorrent = (privateCopy = [history objectForKey: @"PrivateCopy"]) && [privateCopy boolValue];
+    fPublicTorrent = !fPrivateTorrent || ((publicCopy = [history objectForKey: @"PublicCopy"])
+                                            && [publicCopy boolValue]);
+    NSString * path = [history objectForKey: @"TorrentPath"];
+    
+    if (fPrivateTorrent)
         torrent = [self initWithHash: [history objectForKey: @"TorrentHash"]
-            lib: lib date: [history objectForKey: @"Date"]
+            path: [history objectForKey: @"TorrentPath"] lib: lib
+            date: [history objectForKey: @"Date"]
             stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
             ratioLimit: [history objectForKey: @"RatioLimit"]];
     else
@@ -70,6 +88,9 @@
             
     if (torrent)
     {
+        if (fPublicTorrent)
+            fPublicTorrentLocation = [path retain];
+    
         NSString * downloadFolder;
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
             downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"]
@@ -87,6 +108,7 @@
 {
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                     [NSNumber numberWithBool: fPrivateTorrent], @"PrivateCopy",
+                    [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
                     [self downloadFolder], @"DownloadFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
@@ -95,7 +117,8 @@
             
     if (fPrivateTorrent)
         [history setObject: [self hashString] forKey: @"TorrentHash"];
-    else
+
+    if (fPublicTorrent)
         [history setObject: [self torrentLocation] forKey: @"TorrentPath"];
     
     return history;
@@ -106,6 +129,9 @@
     if( fHandle )
     {
         tr_torrentClose( fLib, fHandle );
+        
+        if (fPublicTorrentLocation)
+            [fPublicTorrentLocation release];
         
         [fDate release];
         [fIcon release];
@@ -135,21 +161,21 @@
 {
     fStat = tr_torrentStat( fHandle );
     
-    if ([self isSeeding]) 
-        if ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
-            || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
-                && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"]))
-        {
-            [self stop];
-            [self setStopRatioSetting: RATIO_NO_CHECK];
-            fFinishedSeeding = YES;
-            
-            fStat = tr_torrentStat( fHandle );
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:
-                @"TorrentRatioChanged" object: self];
-        }
-    
+    if ([self isSeeding]
+        && (fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
+        || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
+            && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"]))
+    {
+        [self stop];
+        [self setStopRatioSetting: RATIO_NO_CHECK];
+        fFinishedSeeding = YES;
+        
+        fStat = tr_torrentStat( fHandle );
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+            @"TorrentRatioChanged" object: self];
+    }
+
     [fProgressString setString: @""];
     if ([self progress] < 1.0)
         [fProgressString appendFormat: @"%@ of %@ (%.2f%%)", [NSString stringForFileSize:
@@ -298,6 +324,12 @@
     [self trashFile: [self dataLocation]];
 }
 
+- (void) trashTorrent
+{
+    if (fPublicTorrent)
+        [self trashFile: [self publicTorrentLocation]];
+}
+
 - (NSImage *) icon
 {
     return fIcon;
@@ -347,6 +379,21 @@
 - (NSString *) torrentLocation
 {
     return [NSString stringWithUTF8String: fInfo->torrent];
+}
+
+- (NSString *) publicTorrentLocation
+{
+    return fPublicTorrentLocation;
+}
+
+- (BOOL) publicTorrent
+{
+    return fPublicTorrent;
+}
+
+- (BOOL) privateTorrent
+{
+    return fPrivateTorrent;
 }
 
 - (NSString *) dataLocation
@@ -513,8 +560,7 @@
 
     fLib = lib;
     fDefaults = [NSUserDefaults standardUserDefaults];
-
-    fPrivateTorrent = [fDefaults boolForKey: @"SavePrivateTorrent"];
+    fPublicTorrentLocation = path;
 
     int error;
     if (!path || !(fHandle = tr_torrentInit(fLib, [path UTF8String],
@@ -527,16 +573,16 @@
     return [self initForSuccessWithDate: date stopRatioSetting: stopRatioSetting ratioLimit: ratioLimit];
 }
 
-- (id) initWithHash: (NSString *) hashString lib: (tr_handle_t *) lib date: (NSDate *) date
-        stopRatioSetting: (NSNumber *) stopRatioSetting ratioLimit: (NSNumber *) ratioLimit
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
+            date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
+            ratioLimit: (NSNumber *) ratioLimit
 {
     if (!(self = [super init]))
         return nil;
 
     fLib = lib;
     fDefaults = [NSUserDefaults standardUserDefaults];
-    
-    fPrivateTorrent = YES;
+    fPublicTorrentLocation = path;
 
     int error;
     if (!hashString || !(fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FSAVEPRIVATE, & error)))
