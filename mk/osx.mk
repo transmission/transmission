@@ -44,7 +44,7 @@ define PACKAGE_RULE1
 endef
 define PACKAGE_RULE2
 	mv tmp "Transmission $(VERSION_PACKAGE)"
-	hdiutil create -format UDZO -srcfolder \
+	hdiutil create -format UDZO -imagekey zlib-level=9 -srcfolder \
 	  "Transmission $(VERSION_PACKAGE)" Transmission-$(VERSION_PACKAGE).dmg
 	rm -rf "Transmission $(VERSION_PACKAGE)"
 endef
