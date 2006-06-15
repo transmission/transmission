@@ -227,14 +227,12 @@
 
 - (BOOL) pointInPauseRect: (NSPoint) point
 {
-    return NSPointInRect( point, [self pauseRectForRow:
-                                    [self rowAtPoint: point]] );
+    return NSPointInRect(point, [self pauseRectForRow: [self rowAtPoint: point]]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
 {
-    return NSPointInRect( point, [self revealRectForRow:
-                                    [self rowAtPoint: point]] );
+    return NSPointInRect(point, [self revealRectForRow: [self rowAtPoint: point]]);
 }
 
 @end
