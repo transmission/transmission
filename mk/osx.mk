@@ -34,7 +34,7 @@ define PACKAGE_RULE1
 	$(RM) tmp "Transmission $(VERSION_PACKAGE)" \
 	  Transmission-$(VERSION_PACKAGE).dmg
 	mkdir -p tmp
-	cp -r macosx/Transmission.app tmp/
+	cp -R macosx/Transmission.app tmp/
 	cp AUTHORS tmp/AUTHORS.txt
 	cp LICENSE tmp/LICENSE.txt
 	cp NEWS tmp/NEWS.txt
