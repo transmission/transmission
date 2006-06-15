@@ -39,8 +39,8 @@
 }
 
 - (void) updateBadgeWithCompleted: (int) completed
-                    uploadRate: (int) uploadRate
-                    downloadRate: (int) downloadRate;
+                    uploadRate: (float) uploadRate
+                    downloadRate: (float) downloadRate;
 - (void) clearBadge;
 
 @end
