@@ -44,6 +44,8 @@
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
+    fDefaults = [NSUserDefaults standardUserDefaults];
+
     fPrivateTorrent = [fDefaults boolForKey: @"SavePrivateTorrent"];
     fPublicTorrent = !fPrivateTorrent || ![fDefaults boolForKey: @"DeleteOriginalTorrent"];
 
@@ -66,6 +68,8 @@
 
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib
 {
+    fDefaults = [NSUserDefaults standardUserDefaults];
+
     id torrent;
     NSNumber * privateCopy, * publicCopy;
     fPrivateTorrent = (privateCopy = [history objectForKey: @"PrivateCopy"]) && [privateCopy boolValue];
@@ -555,7 +559,6 @@
         return nil;
 
     fLib = lib;
-    fDefaults = [NSUserDefaults standardUserDefaults];
 
     int error;
     if (!path || !(fHandle = tr_torrentInit(fLib, [path UTF8String],
@@ -576,7 +579,6 @@
         return nil;
 
     fLib = lib;
-    fDefaults = [NSUserDefaults standardUserDefaults];
 
     int error;
     if (!hashString || !(fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FSAVEPRIVATE, & error)))
