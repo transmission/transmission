@@ -367,8 +367,10 @@
 
 - (void) revealFile: (id) sender
 {
-    if ([fFileTable numberOfSelectedRows] > 0)
-        [[NSWorkspace sharedWorkspace] selectFile: [fFiles objectAtIndex: [fFileTable selectedRow]]
+    NSIndexSet * indexSet = [fFileTable selectedRowIndexes];
+    unsigned int i;
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        [[NSWorkspace sharedWorkspace] selectFile: [fFiles objectAtIndex: i]
             inFileViewerRootedAtPath: nil];
 }
 
