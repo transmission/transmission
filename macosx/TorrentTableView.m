@@ -51,12 +51,18 @@ static NSImage * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIco
 {
     if ((self = [super initWithCoder: decoder]))
     {
-        fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
-        fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
-        fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
-        fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
-        fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
-        fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
+        if (!fResumeOnIcon)
+            fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
+        if (!fResumeOffIcon)
+            fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
+        if (!fPauseOnIcon)
+            fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
+        if (!fPauseOffIcon)
+            fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
+        if (!fRevealOnIcon)
+            fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
+        if (!fRevealOffIcon)
+            fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
     }
     
     return self;
