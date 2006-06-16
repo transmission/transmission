@@ -26,6 +26,7 @@
 
 @interface FileTableView : NSTableView
 {
+    IBOutlet NSMenu * fContextMenu;
 }
 
 @end

@@ -115,13 +115,9 @@
 
 - (NSMenu *) menuForEvent: (NSEvent *) e
 {
-    NSPoint point;
-    int row;
-
-    point = [self convertPoint: [e locationInWindow] fromView: nil];
-    row = [self rowAtPoint: point];
+    int row = [self rowAtPoint: [self convertPoint: [e locationInWindow] fromView: nil]];
     
-    if( row >= 0 )
+    if (row >= 0)
     {
         if (![self isRowSelected: row])
             [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]

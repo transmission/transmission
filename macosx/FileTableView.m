@@ -32,4 +32,20 @@
     [super mouseDown: event];
 }
 
+- (NSMenu *) menuForEvent: (NSEvent *) e
+{
+    int row = [self rowAtPoint: [self convertPoint: [e locationInWindow] fromView: nil]];
+    
+    if (row >= 0)
+    {
+        if (![self isRowSelected: row])
+            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+                byExtendingSelection: NO];
+    }
+    else
+        [self deselectAll: self];
+    
+    return fContextMenu;
+}
+
 @end
