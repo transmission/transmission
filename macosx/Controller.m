@@ -1060,7 +1060,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [item setToolTip: @"Remove selected torrents"];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
-        [item setAction: @selector( removeTorrent: )];
+        [item setAction: @selector( removeNoDelete: )];
     }
     else if( [ident isEqualToString: TOOLBAR_INFO] )
     {
