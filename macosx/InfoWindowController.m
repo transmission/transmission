@@ -265,7 +265,7 @@
             
             [fStateField setStringValue: [torrent state]];
             [fPercentField setStringValue: [NSString stringWithFormat:
-                                            @"%.2f%%", 100 * [torrent progress]]];
+                                            @"%.2f%%", 100.0 * [torrent progress]]];
 
             int seeders = [torrent seeders], leechers = [torrent leechers];
             [fSeedersField setStringValue: seeders < 0 ?

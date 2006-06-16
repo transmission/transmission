@@ -31,8 +31,8 @@
 @interface TorrentCell (Private)
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point;
-- (void) buildSimpleBar: (int) width point: (NSPoint) point;
-- (void) buildAdvancedBar: (int) width point: (NSPoint) point;
+- (void) buildSimpleBar: (float) width point: (NSPoint) point;
+- (void) buildAdvancedBar: (float) width point: (NSPoint) point;
 
 @end
 
@@ -119,7 +119,7 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
                         operation: NSCompositeSourceOver];
 }
 
-- (void) buildSimpleBar: (int) width point: (NSPoint) point
+- (void) buildSimpleBar: (float) width point: (NSPoint) point
 {
     width -= 2.0;
     if ([fTorrent isSeeding])
@@ -134,7 +134,7 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     }
     else
     {
-        int completedWidth = [fTorrent progress] * width,
+        float completedWidth = [fTorrent progress] * width,
                 remainingWidth = width - completedWidth;
         BOOL isActive = [fTorrent isActive];
         
@@ -171,15 +171,17 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     }
 }
 
-- (void) buildAdvancedBar: (int) width point: (NSPoint) point
+- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point
 {
     //if seeding, there's no need for the advanced bar
     if ([fTorrent isSeeding])
     {
-        [self buildSimpleBar: width point: point];
+        [self buildSimpleBar: widthFloat point: point];
         return;
     }
 
+    int width = widthFloat; //integers for bars
+    
     NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
         initWithBitmapDataPlanes: nil pixelsWide: width
         pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4
@@ -246,19 +248,23 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     //actually draw image
     NSImage * img = [[NSImage alloc] initWithSize: [bitmap size]];
     [img addRepresentation: bitmap];
+    
+    //bar size with float, not double, to match standard bar
+    [img setScalesWhenResized: YES];
+    [img setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
+    
     [img compositeToPoint: point operation: NSCompositeSourceOver];
     [img release];
     [bitmap release];
     
     //draw overlay over advanced bar
-    width -= 2.0;
-    
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
     
+    widthFloat -= 2.0;
     point.x += 1.0;
-    [self placeBar: fProgressAdvanced width: width point: point];
+    [self placeBar: fProgressAdvanced width: widthFloat point: point];
     
-    point.x += width;
+    point.x += widthFloat;
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
 }
 
