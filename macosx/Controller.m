@@ -1057,7 +1057,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Remove"];
         [item setPaletteLabel: @"Remove Selected"];
-        [item setToolTip: @"Remove selected torrents"];
+        [item setToolTip: @"Remove selected transfers"];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
         [item setAction: @selector( removeNoDelete: )];
@@ -1075,7 +1075,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Pause All"];
         [item setPaletteLabel: [item label]];
-        [item setToolTip: @"Pause all torrents"];
+        [item setToolTip: @"Pause all transfers"];
         [item setImage: [NSImage imageNamed: @"PauseAll.png"]];
         [item setTarget: self];
         [item setAction: @selector( stopAllTorrents: )];
@@ -1084,7 +1084,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Resume All"];
         [item setPaletteLabel: [item label]];
-        [item setToolTip: @"Resume all torrents"];
+        [item setToolTip: @"Resume all transfers"];
         [item setImage: [NSImage imageNamed: @"ResumeAll.png"]];
         [item setTarget: self];
         [item setAction: @selector( resumeAllTorrents: )];
@@ -1093,7 +1093,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Pause"];
         [item setPaletteLabel: @"Pause Selected"];
-        [item setToolTip: @"Pause selected torrents"];
+        [item setToolTip: @"Pause selected transfers"];
         [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector( stopTorrent: )];
@@ -1102,7 +1102,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         [item setLabel: @"Resume"];
         [item setPaletteLabel: @"Resume Selected"];
-        [item setToolTip: @"Resume selected torrents"];
+        [item setToolTip: @"Resume selected transfers"];
         [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector( resumeTorrent: )];
@@ -1141,14 +1141,14 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
 {
-    SEL action = [toolbarItem action];
+    NSString * ident = [toolbarItem itemIdentifier];
 
     //enable remove item
-    if (action == @selector(removeTorrent:))
+    if ([ident isEqualToString: TOOLBAR_REMOVE])
         return [fTableView numberOfSelectedRows] > 0;
 
     //enable pause all item
-    if (action == @selector(stopAllTorrents:))
+    if ([ident isEqualToString: TOOLBAR_PAUSE_ALL])
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1159,7 +1159,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     //enable resume all item
-    if (action == @selector(resumeAllTorrents:))
+    if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1170,7 +1170,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 
     //enable pause item
-    if( action == @selector(stopTorrent:) )
+    if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
@@ -1186,7 +1186,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     
     //enable resume item
-    if( action == @selector(resumeTorrent:) )
+    if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
