@@ -136,9 +136,9 @@
     fStat = tr_torrentStat( fHandle );
     
     if ([self isSeeding]
-        && (fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
+        && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
         || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
-            && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"]))
+            && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stop];
         [self setStopRatioSetting: RATIO_NO_CHECK];
