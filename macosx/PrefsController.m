@@ -70,7 +70,7 @@
     [super dealloc];
 }
 
-- (void) setPrefsWindow: (tr_handle_t *) handle
+- (void) setPrefs: (tr_handle_t *) handle
 {
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [fToolbar setDelegate: self];

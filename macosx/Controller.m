@@ -85,7 +85,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) awakeFromNib
 {
-    [fPrefsController setPrefsWindow: fLib];
+    [fPrefsController setPrefs: fLib];
     
     [fAdvancedBarItem setState: [fDefaults
         boolForKey: @"UseAdvancedBar"] ? NSOnState : NSOffState];
@@ -417,12 +417,9 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) torrentNumberChanged
 {
-    if (fStatusBarVisible)
-    {
-        int count = [fTorrents count];
-        [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
+    int count = [fTorrents count];
+    [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
                     @"%d Transfer%s", count, count == 1 ? "" : "s"]];
-    }
 }
 
 - (void) advancedChanged: (id) sender
@@ -1022,7 +1019,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     fStatusBarVisible = !fStatusBarVisible;
     
     //reloads stats
-    [self torrentNumberChanged];
     [self updateUI: nil];
     
     //set views to not autoresize

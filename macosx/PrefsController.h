@@ -51,7 +51,7 @@
     NSUserDefaults          * fDefaults;
 }
 
-- (void) setPrefsWindow: (tr_handle_t *) handle;
+- (void) setPrefs: (tr_handle_t *) handle;
 
 - (void) setShowMessage:        (id) sender;
 - (void) setBadge:              (id) sender;
