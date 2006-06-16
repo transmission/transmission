@@ -47,15 +47,23 @@
 static NSImage * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
                 * fRevealOnIcon, * fRevealOffIcon;
 
+- (id) initWithCoder: (NSCoder *) decoder
+{
+    if ((self = [super initWithCoder: decoder]))
+    {
+        fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
+        fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
+        fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
+        fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
+        fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
+        fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
+    }
+    
+    return self;
+}
+    
 - (void) awakeFromNib
 {
-    fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
-    fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
-    fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
-    fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
-    fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
-    fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
-
     [fContextRow setTitle: @"Context"];
     [fContextNoRow setTitle: @"Context"];
 }
