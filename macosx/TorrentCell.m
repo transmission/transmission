@@ -32,7 +32,7 @@
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point;
 - (void) buildSimpleBar: (float) width point: (NSPoint) point;
-- (void) buildAdvancedBar: (float) width point: (NSPoint) point;
+- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point;
 
 @end
 

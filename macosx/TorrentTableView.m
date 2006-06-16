@@ -44,8 +44,18 @@
 
 @implementation TorrentTableView
 
+static NSImage * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
+                * fRevealOnIcon, * fRevealOffIcon;
+
 - (void) awakeFromNib
 {
+    fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
+    fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
+    fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
+    fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
+    fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
+    fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
+
     [fContextRow setTitle: @"Context"];
     [fContextNoRow setTitle: @"Context"];
 }
@@ -145,23 +155,15 @@
     {
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
-        image = nil;
 
-        if( [torrent isPaused] )
-        {
-            image = NSPointInRect( fClickPoint, rect ) ?
-                [NSImage imageNamed: @"ResumeOn.png"] :
-                [NSImage imageNamed: @"ResumeOff.png"];
-        }
-        else if( [torrent isActive] )
-        {
-            image = NSPointInRect( fClickPoint, rect ) ?
-                [NSImage imageNamed: @"PauseOn.png"] :
-                [NSImage imageNamed: @"PauseOff.png"];
-        }
-        else;
+        if ([torrent isPaused])
+            image = NSPointInRect(fClickPoint, rect) ? fResumeOnIcon : fResumeOffIcon;
+        else if ([torrent isActive])
+            image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
+        else
+            image = nil;
 
-        if( image )
+        if (image)
         {
             [image setFlipped: YES];
             [image drawAtPoint: rect.origin fromRect:
@@ -169,10 +171,8 @@
                 NSCompositeSourceOver fraction: 1.0];
         }
 
-        rect  = [self revealRectForRow: i];
-        image = NSPointInRect( fClickPoint, rect ) ?
-            [NSImage imageNamed: @"RevealOn.png"] :
-            [NSImage imageNamed: @"RevealOff.png"];
+        rect = [self revealRectForRow: i];
+        image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
         [image setFlipped: YES];
         [image drawAtPoint: rect.origin fromRect:
             NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
