@@ -137,7 +137,7 @@
     
     if ([self isSeeding]
         && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
-        || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
+            || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
             && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stop];
