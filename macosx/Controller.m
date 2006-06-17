@@ -887,18 +887,13 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) setQuickLimitGlobal: (id) sender
 {
-    NSString * title = [sender title];
-    [fPrefsController setQuickLimit: [[title substringToIndex: [title length]
-                                                    - [@" KB/s" length]] intValue]
-                    type: [sender menu] == fUploadMenu ? @"Upload" : @"Download"];
+    [fPrefsController setQuickLimit: [[sender title] intValue]
+        type: [sender menu] == fUploadMenu ? @"Upload" : @"Download"];
 }
 
 - (void) limitGlobalChange: (NSNotification *) notification
 {
     NSDictionary * dict = [notification object];
-    
-    BOOL enable = [[dict objectForKey: @"Enable"] boolValue];
-    int limit = [[dict objectForKey: @"Limit"] intValue];
     
     NSMenuItem * limitItem, * noLimitItem;
     if ([[dict objectForKey: @"Type"] isEqualToString: @"Upload"])
@@ -911,6 +906,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         limitItem = fDownloadLimitItem;
         noLimitItem = fDownloadNoLimitItem;
     }
+    
+    BOOL enable = [[dict objectForKey: @"Enable"] boolValue];
     [limitItem setState: enable ? NSOnState : NSOffState];
     [noLimitItem setState: !enable ? NSOnState : NSOffState];
     
@@ -1437,14 +1434,12 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) linkHomepage: (id) sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL
-        URLWithString: WEBSITE_URL]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: WEBSITE_URL]];
 }
 
 - (void) linkForums: (id) sender
 {
-    [[NSWorkspace sharedWorkspace] openURL: [NSURL
-        URLWithString: FORUM_URL]];
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
 - (void) notifyGrowl: (NSString * ) file
