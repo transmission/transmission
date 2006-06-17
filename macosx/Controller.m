@@ -1273,13 +1273,18 @@ static void sleepCallBack( void * controller, io_service_t y,
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             torrent = [fTorrents objectAtIndex: i];
-            if ([torrent isActive])
+            if (!active && [torrent isActive])
+            {
                 active = YES;
-            if ([torrent publicTorrent])
+                if (canDelete)
+                    break;
+            }
+            if (!canDelete && [torrent publicTorrent])
+            {
                 canDelete = YES;
-            
-            if (active && canDelete)
-                break;
+                if (active)
+                    break;
+            }
         }
     
         //append or remove ellipsis when needed
