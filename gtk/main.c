@@ -86,7 +86,7 @@ quittransmission(struct cbdata *data);
 GtkWidget *
 makewind_toolbar(struct cbdata *data);
 GtkWidget *
-makewind_list(struct cbdata *data);
+makewind_list(struct cbdata *data, GObject **sizehack);
 gboolean
 winclose(GtkWidget *widget, GdkEvent *event, gpointer gdata);
 gboolean
@@ -303,7 +303,9 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   struct cbdata *data = g_new0(struct cbdata, 1);
   GtkWidget *list;
   GtkRequisition req;
-  gint height;
+  gint width, height;
+  GObject *sizehack;
+  GdkScreen *screen;
 
   g_object_ref(G_OBJECT(back));
   data->back = back;
@@ -323,7 +325,8 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
 
   gtk_box_pack_start(GTK_BOX(vbox), makewind_toolbar(data), FALSE, FALSE, 0);
 
-  list = makewind_list(data);
+  sizehack = NULL;
+  list = makewind_list(data, &sizehack);
   gtk_container_add(GTK_CONTAINER(scroll), list);
   gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
 
@@ -342,20 +345,29 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   data->timer = g_timeout_add(UPDATE_INTERVAL, updatemodel, data);
   updatemodel(data);
 
+  /* some evil magic to try to get a nice initial window size */
   gtk_widget_show_all(vbox);
   gtk_widget_realize(wind);
-
   gtk_widget_size_request(list, &req);
   height = req.height;
   gtk_widget_size_request(scroll, &req);
   height -= req.height;
   gtk_widget_size_request(wind, &req);
   height += req.height;
-  gtk_window_set_default_size(GTK_WINDOW(wind), -1, (height > req.width ?
-     MIN(height, req.width * 8 / 5) : MAX(height, req.width * 5 / 8)));
+  screen = gtk_widget_get_screen(wind);
+  width = MIN(req.width, gdk_screen_get_width(screen) / 2);
+  height = MIN(height, gdk_screen_get_height(screen) / 5 * 4);
+  if(height > req.width)
+    height = MIN(height, width * 8 / 5);
+  else
+    height = MAX(height, width * 5 / 8);
+  height = (height > req.width ?
+            MIN(height, width * 8 / 5) : MAX(height, width * 5 / 8));
+  g_object_set(sizehack, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+  gtk_widget_show_now(wind);
+  gtk_window_resize(GTK_WINDOW(wind), width, height);
 
-  gtk_widget_show(wind);
-
+  /* set up the ipc socket now that we're ready to get torrents from it */
   ipc_socket_setup(GTK_WINDOW(wind), addtorrents, data);
 }
 
@@ -409,7 +421,7 @@ enum {
 };
 
 GtkWidget *
-makewind_list(struct cbdata *data) {
+makewind_list(struct cbdata *data, GObject **sizehack) {
   GType types[] = {
     /* info->name, info->totalSize, status,     error,      trackerError, */
     G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING,
@@ -436,11 +448,12 @@ makewind_list(struct cbdata *data) {
   data->view = GTK_TREE_VIEW(view);
 
   namerend = gtk_cell_renderer_text_new();
+  *sizehack = G_OBJECT(namerend);
+  /* note that this renderer is set to ellipsize, just not here */
   col = gtk_tree_view_column_new_with_attributes(_("Name"), namerend, NULL);
-  g_object_set(namerend, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
   gtk_tree_view_column_set_cell_data_func(col, namerend, dfname, NULL, NULL);
   gtk_tree_view_column_set_expand(col, TRUE);
-  gtk_tree_view_column_set_resizable(col, TRUE);
+  gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
   progrend = tr_cell_renderer_torrent_new();
@@ -450,7 +463,7 @@ makewind_list(struct cbdata *data) {
   g_free(str);
   col = gtk_tree_view_column_new_with_attributes(_("Progress"), progrend, NULL);
   gtk_tree_view_column_set_cell_data_func(col, progrend, dfprog, NULL, NULL);
-  gtk_tree_view_column_set_resizable(col, TRUE);
+  gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
   /* XXX this shouldn't be necessary */
