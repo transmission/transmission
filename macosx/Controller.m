@@ -40,9 +40,8 @@
 #define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
 
-#define WEBSITE_URL         @"http://transmission.m0k.org/"
-#define FORUM_URL           @"http://transmission.m0k.org/forum/"
-#define VERSION_PLIST_URL   @"http://transmission.m0k.org/version.plist"
+#define WEBSITE_URL @"http://transmission.m0k.org/"
+#define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
 #define GROWL_PATH  @"/Library/PreferencePanes/Growl.prefPane/Contents/Resources/GrowlHelperApp.app"
 
@@ -264,8 +263,7 @@ static void sleepCallBack( void * controller, io_service_t y,
             NSString * message = active == 1
                 ? @"There is an active transfer. Do you really want to quit?"
                 : [NSString stringWithFormat:
-                    @"There are %d active transfers. Do you really want to quit?",
-                    active];
+                    @"There are %d active transfers. Do you really want to quit?", active];
 
             NSBeginAlertSheet(@"Confirm Quit",
                                 @"Quit", @"Cancel", nil,
@@ -346,8 +344,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     BOOL autoStart = [fDefaults boolForKey: @"AutoStartDownload"];
     
-    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"],
-            * torrentPath;
+    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"], * torrentPath;
     Torrent * torrent;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
@@ -380,9 +377,8 @@ static void sleepCallBack( void * controller, io_service_t y,
         else
         {
             NSString * folder = [downloadChoice isEqualToString: @"Constant"]
-                                ? [[fDefaults stringForKey: @"DownloadFolder"]
-                                        stringByExpandingTildeInPath]
-                                : [torrentPath stringByDeletingLastPathComponent];
+                ? [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]
+                : [torrentPath stringByDeletingLastPathComponent];
 
             [torrent setDownloadFolder: folder];
             if (autoStart)
@@ -570,10 +566,7 @@ static void sleepCallBack( void * controller, io_service_t y,
             nil, dict, message);
     }
     else
-    {
-        [self confirmRemove: torrents
-            deleteData: deleteData deleteTorrent: deleteTorrent];
-    }
+        [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
 }
 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
@@ -587,10 +580,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     [dict release];
     
     if (returnCode == NSAlertDefaultReturn)
-    {
-        [self confirmRemove: torrents
-            deleteData: deleteData deleteTorrent: deleteTorrent];
-    }
+        [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
     else
         [torrents release];
 }
@@ -1413,9 +1403,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     defaultFrame: (NSRect) defaultFrame
 {
     NSRect windowRect = [fWindow frame];
-    int count = [fTorrents count];
     float newHeight = windowRect.size.height - [fScrollView frame].size.height
-            + count * ([fTableView rowHeight] + [fTableView intercellSpacing].height) + 30.0;
+        + [fTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height) + 30.0;
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)
