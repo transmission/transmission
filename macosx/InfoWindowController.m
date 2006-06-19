@@ -36,7 +36,7 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 196.0
-#define TAB_STATUS_HEIGHT 262.0
+#define TAB_STATUS_HEIGHT 199.0
 #define TAB_OPTIONS_HEIGHT 82.0
 #define TAB_FILES_HEIGHT 250.0
 
@@ -103,8 +103,10 @@
             [fNameField setStringValue: @"No Torrents Selected"];
             [fSizeField setStringValue: @""];
             
+#if 0
             [fDownloadRateField setStringValue: @""];
             [fUploadRateField setStringValue: @""];
+#endif
             
             [fDownloadedValidField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
@@ -129,8 +131,10 @@
         [fDataLocationField setToolTip: nil];
         [fDateStartedField setStringValue: @""];
         
+#if 0
         [fStateField setStringValue: @""];
         [fPercentField setStringValue: @""];
+#endif
         [fRatioField setStringValue: @""];
         
         [fSeedersField setStringValue: @""];
@@ -252,8 +256,10 @@
             uploadedTotal += [torrent uploadedTotal];
         }
         
+#if 0
         [fDownloadRateField setStringValue: [NSString stringForSpeed: downloadRate]];
         [fUploadRateField setStringValue: [NSString stringForSpeed: uploadRate]];
+#endif
         
         [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
         [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
@@ -263,9 +269,11 @@
         {
             torrent = [fTorrents objectAtIndex: 0];
             
+#if 0
             [fStateField setStringValue: [torrent state]];
             [fPercentField setStringValue: [NSString stringWithFormat:
                                             @"%.2f%%", 100.0 * [torrent progress]]];
+#endif
 
             int seeders = [torrent seeders], leechers = [torrent leechers];
             [fSeedersField setStringValue: seeders < 0 ?
