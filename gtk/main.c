@@ -321,7 +321,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   data->closing = FALSE;
 
   gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER,
-                                 GTK_POLICY_AUTOMATIC);
+                                 GTK_POLICY_ALWAYS);
 
   gtk_box_pack_start(GTK_BOX(vbox), makewind_toolbar(data), FALSE, FALSE, 0);
 
