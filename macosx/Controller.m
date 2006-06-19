@@ -847,23 +847,23 @@ static void sleepCallBack( void * controller, io_service_t y,
     else
         prevSortItem = fDateSortItem;
     
-    if (sender == prevSortItem)
-        return;
-    
-    [prevSortItem setState: NSOffState];
-    [sender setState: NSOnState];
+    if (sender != prevSortItem)
+    {
+        [prevSortItem setState: NSOffState];
+        [sender setState: NSOnState];
 
-    [fSortType release];
-    if (sender == fNameSortItem)
-        fSortType = [[NSString alloc] initWithString: @"Name"];
-    else if (sender == fStateSortItem)
-        fSortType = [[NSString alloc] initWithString: @"State"];
-    else if (sender == fProgressSortItem)
-        fSortType = [[NSString alloc] initWithString: @"Progress"];
-    else
-        fSortType = [[NSString alloc] initWithString: @"Date"];
-       
-    [fDefaults setObject: fSortType forKey: @"Sort"];
+        [fSortType release];
+        if (sender == fNameSortItem)
+            fSortType = [[NSString alloc] initWithString: @"Name"];
+        else if (sender == fStateSortItem)
+            fSortType = [[NSString alloc] initWithString: @"State"];
+        else if (sender == fProgressSortItem)
+            fSortType = [[NSString alloc] initWithString: @"Progress"];
+        else
+            fSortType = [[NSString alloc] initWithString: @"Date"];
+           
+        [fDefaults setObject: fSortType forKey: @"Sort"];
+    }
 
     [self sortTorrents];
 }
