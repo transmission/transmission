@@ -360,6 +360,16 @@
     return fPublicTorrentLocation;
 }
 
+- (NSString *) torrentLocationString
+{
+    return fPrivateTorrent ? @"Transmission Support Folder" : fPublicTorrentLocation;
+}
+
+- (NSString *) dataLocation
+{
+    return [[self downloadFolder] stringByAppendingPathComponent: [self name]];
+}
+
 - (BOOL) publicTorrent
 {
     return fPublicTorrent;
@@ -368,11 +378,6 @@
 - (BOOL) privateTorrent
 {
     return fPrivateTorrent;
-}
-
-- (NSString *) dataLocation
-{
-    return [[self downloadFolder] stringByAppendingPathComponent: [self name]];
 }
 
 - (NSString *) state

@@ -91,6 +91,7 @@
 
 - (NSString *) torrentLocation;
 - (NSString *) publicTorrentLocation;
+- (NSString *) torrentLocationString;
 - (NSString *) dataLocation;
 
 - (BOOL) publicTorrent;

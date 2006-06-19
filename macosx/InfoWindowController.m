@@ -163,7 +163,7 @@
         [fPiecesField setIntValue: [torrent pieceCount]];
         [fHashField setStringValue: [torrent hashString]];
         
-        [fTorrentLocationField setStringValue: [[torrent torrentLocation]
+        [fTorrentLocationField setStringValue: [[torrent torrentLocationString]
                                         stringByAbbreviatingWithTildeInPath]];
         [fTorrentLocationField setToolTip: [torrent torrentLocation]];
         [fDataLocationField setStringValue: [[torrent dataLocation]
