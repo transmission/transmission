@@ -142,8 +142,9 @@
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
+
 - (void) notifyGrowl:       (NSString *) file;
-- (void) growlRegister:     (id) sender;
+- (void) growlRegister;
 
 - (void) checkUpdate:       (id) sender;
 - (void) prepareForUpdate:  (NSNotification *) notification;

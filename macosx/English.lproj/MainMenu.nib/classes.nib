@@ -5,7 +5,6 @@
                 advancedChanged = id; 
                 checkUpdate = id; 
                 copyTorrentFile = id; 
-                growlRegister = id; 
                 linkForums = id; 
                 linkHomepage = id; 
                 openShowSheet = id; 

@@ -64,6 +64,13 @@ static void sleepCallBack( void * controller, io_service_t y,
         fDefaults = [NSUserDefaults standardUserDefaults];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow"];
+        fBadger = [[Badger alloc] init];
+        
+        //check and register Growl if it is installed for this user or all users
+        NSFileManager * manager = [NSFileManager defaultManager];
+        fHasGrowl = [manager fileExistsAtPath: GROWL_PATH]
+            || [manager fileExistsAtPath: [NSHomeDirectory() stringByAppendingPathComponent: GROWL_PATH]];
+        [self growlRegister];
     }
     return self;
 }
@@ -139,7 +146,7 @@ static void sleepCallBack( void * controller, io_service_t y,
                             kCFRunLoopCommonModes );
     }
     else
-        NSLog( @"Could not IORegisterForSystemPower" );
+        NSLog(@"Could not IORegisterForSystemPower");
 
     //load torrents from history
     Torrent * torrent;
@@ -167,16 +174,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     else
         currentSortItem = fDateSortItem;
     [currentSortItem setState: NSOnState];
-
-    //check and register Growl if it is installed for this user or all users
-    NSFileManager * manager = [NSFileManager defaultManager];
-    fHasGrowl = [manager fileExistsAtPath: GROWL_PATH]
-                || [manager fileExistsAtPath: [[NSString stringWithFormat: @"~%@",
-                GROWL_PATH] stringByExpandingTildeInPath]];
-    [self growlRegister: self];
-
-    //initialize badging
-    fBadger = [[Badger alloc] init];
     
     //set upload limit action button
     [fUploadLimitItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)",
@@ -233,8 +230,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     //show windows
     [fWindow makeKeyAndOrderFront: nil];
 
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes:
-                                    [fTableView selectedRowIndexes]]];
+    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
 }
@@ -278,7 +274,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 }
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
-                        contextInfo: (void *) contextInfo
+    contextInfo: (void *) contextInfo
 {
     [NSApp stopModal];
     [NSApp replyToApplicationShouldTerminate:
@@ -415,7 +411,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     int count = [fTorrents count];
     [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
-                    @"%d Transfer%s", count, count == 1 ? "" : "s"]];
+        @"%d Transfer%s", count, count == 1 ? "" : "s"]];
 }
 
 - (void) advancedChanged: (id) sender
@@ -666,8 +662,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         NSSavePanel * panel = [NSSavePanel savePanel];
         [panel setRequiredFileType: @"torrent"];
-        [panel setExtensionHidden: NO];
         [panel setCanSelectHiddenExtension: NO];
+        [panel setExtensionHidden: NO];
         
         [panel beginSheetForDirectory: nil file: [torrent name]
             modalForWindow: fWindow modalDelegate: self didEndSelector:
@@ -871,8 +867,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) setLimitGlobalEnabled: (id) sender
 {
     [fPrefsController setLimitEnabled: (sender == fUploadLimitItem || sender == fDownloadLimitItem)
-                        type: (sender == fUploadLimitItem || sender == fUploadNoLimitItem)
-                            ? @"Upload" : @"Download"];
+        type: (sender == fUploadLimitItem || sender == fUploadNoLimitItem) ? @"Upload" : @"Download"];
 }
 
 - (void) setQuickLimitGlobal: (id) sender
@@ -970,8 +965,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if (![[pasteboard types] containsObject: NSFilenamesPboardType]
             || [[[pasteboard propertyListForType: NSFilenamesPboardType]
-                pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]
-                count] == 0)
+        pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]] count] == 0)
         return NSDragOperationNone;
 
     [fTableView setDropRow: [fTableView numberOfRows] dropOperation: NSTableViewDropAbove];
@@ -1345,8 +1339,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     return YES;
 }
 
-- (void) sleepCallBack: (natural_t) messageType argument:
-                          (void *) messageArgument
+- (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
@@ -1399,8 +1392,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 }
 
-- (NSRect) windowWillUseStandardFrame: (NSWindow *) w
-    defaultFrame: (NSRect) defaultFrame
+- (NSRect) windowWillUseStandardFrame: (NSWindow *) w defaultFrame: (NSRect) defaultFrame
 {
     NSRect windowRect = [fWindow frame];
     float newHeight = windowRect.size.height - [fScrollView frame].size.height
@@ -1438,14 +1430,10 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) notifyGrowl: (NSString * ) file
 {
-    NSString * growlScript;
-    NSAppleScript * appleScript;
-    NSDictionary * error;
-
-    if( !fHasGrowl )
+    if (!fHasGrowl)
         return;
 
-    growlScript = [NSString stringWithFormat:
+    NSString * growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n "
@@ -1456,24 +1444,20 @@ static void sleepCallBack( void * controller, io_service_t y,
          "    end tell\n"
          "  end if\n"
          "end tell", file];
-    appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
-    if( ![appleScript executeAndReturnError: &error] )
-    {
-        NSLog( @"Growl notify failed" );
-    }
+    
+    NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
+    NSDictionary * error;
+    if (![appleScript executeAndReturnError: &error])
+        NSLog(@"Growl notify failed");
     [appleScript release];
 }
 
-- (void) growlRegister: (id) sender
+- (void) growlRegister
 {
-    NSString * growlScript;
-    NSAppleScript * appleScript;
-    NSDictionary * error;
-
-    if( !fHasGrowl )
+    if (!fHasGrowl)
         return;
 
-    growlScript = [NSString stringWithFormat:
+    NSString * growlScript = [NSString stringWithFormat:
         @"tell application \"System Events\"\n"
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n"
@@ -1485,11 +1469,10 @@ static void sleepCallBack( void * controller, io_service_t y,
          "  end if\n"
          "end tell"];
 
-    appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
-    if( ![appleScript executeAndReturnError: &error] )
-    {
-        NSLog( @"Growl registration failed" );
-    }
+    NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
+    NSDictionary * error;
+    if (![appleScript executeAndReturnError: &error])
+        NSLog(@"Growl registration failed");
     [appleScript release];
 }
 

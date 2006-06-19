@@ -60,8 +60,7 @@
 {
     [[NSUserDefaults standardUserDefaults] registerDefaults:
         [NSDictionary dictionaryWithContentsOfFile:
-            [[NSBundle mainBundle] pathForResource: @"Defaults"
-                ofType: @"plist"]]];
+        [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
 }
 
 - (void) dealloc
