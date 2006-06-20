@@ -779,6 +779,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [history addObject: [torrent history]];
 
     [fDefaults setObject: history forKey: @"History"];
+    [fDefaults synchronize];
 }
 
 - (void) sortTorrents
