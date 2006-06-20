@@ -334,6 +334,7 @@ void tr_torrentStart( tr_torrent_t * tor )
     }
 
     tor->status  = TR_STATUS_CHECK;
+    tor->tracker = tr_trackerInit( tor );
 
     tor->date = tr_date();
     tor->die = 0;
@@ -596,7 +597,6 @@ static void downloadLoop( void * _tor )
     tor->io     = tr_ioInit( tor );
     tor->status = tr_cpIsSeeding( tor->completion ) ?
                       TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
-    tor->tracker = tr_trackerInit( tor );
 
     while( !tor->die )
     {
