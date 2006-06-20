@@ -571,7 +571,7 @@
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    NSString * fileType = ( fInfo->fileCount > 1 ) ?
+    NSString * fileType = fInfo->multifile ?
         NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
     [fIcon retain];

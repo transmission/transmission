@@ -261,6 +261,7 @@ struct tr_info_s
     uint8_t   * pieces;
 
     /* Files info */
+    int         multifile;
     int         fileCount;
     tr_file_t * files;
 };

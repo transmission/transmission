@@ -221,6 +221,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         val = tr_bencDictFind( beInfo, "name" );
         strcatUTF8( inf->name, val->val.s.s );
 
+        inf->multifile = 1;
         inf->fileCount = list->val.l.count;
         inf->files     = calloc( inf->fileCount * sizeof( tr_file_t ), 1 );
 
@@ -243,6 +244,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     else
     {
         /* Single-file mode */
+        inf->multifile = 0;
         inf->fileCount = 1;
         inf->files     = calloc( sizeof( tr_file_t ), 1 );
 
