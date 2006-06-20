@@ -33,13 +33,13 @@
 #define MAX_WINDOW_WIDTH 2000
 
 #define TAB_INFO_IDENT @"Info"
-#define TAB_STATUS_IDENT @"Status"
+#define TAB_ACTIVITY_IDENT @"Activity"
 #define TAB_OPTIONS_IDENT @"Options"
 #define TAB_FILES_IDENT @"Files"
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 185.0
-#define TAB_STATUS_HEIGHT 199.0
+#define TAB_ACTIVITY_HEIGHT 199.0
 #define TAB_OPTIONS_HEIGHT 82.0
 #define TAB_FILES_HEIGHT 250.0
 
@@ -327,8 +327,8 @@
     NSString * identifier = [tabViewItem identifier];
     if ([identifier isEqualToString: TAB_INFO_IDENT])
         height = TAB_INFO_HEIGHT;
-    else if ([identifier isEqualToString: TAB_STATUS_IDENT])
-        height = TAB_STATUS_HEIGHT;
+    else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
+        height = TAB_ACTIVITY_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
     else
@@ -422,8 +422,7 @@
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
 
     float ratioLimit = [sender floatValue];
-    if (![[sender stringValue] isEqualToString:
-            [NSString stringWithFormat: @"%.2f", ratioLimit]]
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]]
             || ratioLimit < 0)
     {
         NSBeep();

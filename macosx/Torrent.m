@@ -381,7 +381,7 @@
     return fPrivateTorrent;
 }
 
-- (NSString *) state
+/*- (NSString *) state
 {
     switch( fStat->status )
     {
@@ -408,7 +408,7 @@
         default:
             return @"N/A";
     }
-}
+}*/
 
 - (float) progress
 {
