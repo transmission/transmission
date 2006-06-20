@@ -790,9 +790,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"name" ascending: YES] autorelease],
                     * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"date" ascending: YES] autorelease],
-                    * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: YES] autorelease];
+                                            @"date" ascending: YES] autorelease];
 
     NSArray * descriptors;
     if ([fSortType isEqualToString: @"Name"])
@@ -800,12 +798,20 @@ static void sleepCallBack( void * controller, io_service_t y,
     else if ([fSortType isEqualToString: @"State"])
     {
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"stateSortKey" ascending: NO] autorelease];
+                                                @"stateSortKey" ascending: NO] autorelease],
+                        * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"progressSortKey" ascending: NO] autorelease];
+        
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor,
                                                             nameDescriptor, dateDescriptor, nil];
     }
     else if ([fSortType isEqualToString: @"Progress"])
+    {
+        NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"progressSortKey" ascending: YES] autorelease];
+        
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, nameDescriptor, dateDescriptor, nil];
+    }
     else
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
 
