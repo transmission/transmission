@@ -130,6 +130,7 @@
         [fPieceSizeField setStringValue: @""];
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
+        [fHashField setToolTip: nil];
         
         [fTorrentLocationField setStringValue: @""];
         [fTorrentLocationField setToolTip: nil];
@@ -160,14 +161,17 @@
         [fNameField setToolTip: name];
         [fSizeField setStringValue: [NSString stringForFileSize: [torrent size]]];
         
-        NSString * tracker = [torrent tracker], * announce = [torrent announce];
+        NSString * tracker = [torrent tracker],
+                * announce = [torrent announce],
+                * hashString = [torrent hashString];
         [fTrackerField setStringValue: tracker];
         [fTrackerField setToolTip: tracker];
         [fAnnounceField setStringValue: announce];
         [fAnnounceField setToolTip: announce];
         [fPieceSizeField setStringValue: [NSString stringForFileSize: [torrent pieceSize]]];
         [fPiecesField setIntValue: [torrent pieceCount]];
-        [fHashField setStringValue: [torrent hashString]];
+        [fHashField setStringValue: hashString];
+        [fHashField setToolTip: hashString];
         
         [fTorrentLocationField setStringValue: [[torrent torrentLocationString]
                                         stringByAbbreviatingWithTildeInPath]];
