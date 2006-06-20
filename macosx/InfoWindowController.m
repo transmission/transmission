@@ -317,10 +317,10 @@
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
-    NSPoint windowOrigin = [window frame].origin;
-    NSSize minSize = [window minSize];
+    NSRect windowRect = [window frame];
+    windowRect.size.width = [window minSize].width;
     
-    return NSMakeRect(windowOrigin.x, windowOrigin.y, minSize.width, minSize.height);
+    return windowRect;
 }
 
 - (void) tabView: (NSTabView *) tabView didSelectTabViewItem: (NSTabViewItem *) tabViewItem
