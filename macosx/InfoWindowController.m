@@ -58,11 +58,10 @@
     [window setBecomesKeyOnlyIfNeeded: YES];
     
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
-    [window setFrameUsingName: @"InspectorWindowFrame" force: YES];
+    [window setFrameUsingName: @"InspectorWindowFrame"];
     
     NSRect frame = [window frame];
-    float difference = TAB_INFO_HEIGHT - [[[fTabView selectedTabViewItem]
-                                                    view] frame].size.height;
+    float difference = TAB_INFO_HEIGHT - [[[fTabView selectedTabViewItem] view] frame].size.height;
     frame.origin.y -= difference;
     frame.size.height += difference;
     [window setFrame: frame display: YES];

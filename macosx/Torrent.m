@@ -589,12 +589,9 @@
 
 - (void) trashFile: (NSString *) path
 {
-    if( ![[NSWorkspace sharedWorkspace] performFileOperation:
-           NSWorkspaceRecycleOperation source:
-           [path stringByDeletingLastPathComponent]
-           destination: @""
-           files: [NSArray arrayWithObject: [path lastPathComponent]]
-           tag: nil] )
+    if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
+            source: [path stringByDeletingLastPathComponent] destination: @""
+            files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
         /* We can't move it to the trash, let's try just to delete it
            (will work if it is on a remote volume) */
