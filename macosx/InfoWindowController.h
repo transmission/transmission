@@ -38,10 +38,10 @@
                         * fHashField,
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateStartedField,
-#if 0
+/*
                         * fStateField, * fPercentField,
                         * fDownloadRateField, * fUploadRateField,
-#endif
+*/
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
