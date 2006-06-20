@@ -362,7 +362,8 @@
 
 - (NSString *) torrentLocationString
 {
-    return fPrivateTorrent ? @"Transmission Support Folder" : fPublicTorrentLocation;
+    return fPrivateTorrent ? @"Transmission Support Folder"
+            : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
 }
 
 - (NSString *) dataLocation

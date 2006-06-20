@@ -173,11 +173,9 @@
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         
-        [fTorrentLocationField setStringValue: [[torrent torrentLocationString]
-                                        stringByAbbreviatingWithTildeInPath]];
+        [fTorrentLocationField setStringValue: [torrent torrentLocationString]];
         [fTorrentLocationField setToolTip: [torrent torrentLocation]];
-        [fDataLocationField setStringValue: [[torrent dataLocation]
-                                        stringByAbbreviatingWithTildeInPath]];
+        [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
     }
