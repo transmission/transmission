@@ -609,6 +609,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
     struct in_addr addr;
     uint64_t date;
     int pos, len;
+    tr_resolve_t * resolve;
 
     if( !tor->scrape[0] )
     {
@@ -616,10 +617,25 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         return 1;
     }
 
-    if( tr_netResolve( inf->trackerAddress, &addr ) )
+    resolve = tr_netResolveInit( inf->trackerAddress );
+    for( date = tr_date();; )
     {
-        return 0;
+        ret = tr_netResolvePulse( resolve, &addr );
+        if( ret == TR_RESOLVE_OK )
+        {
+            tr_netResolveClose( resolve );
+            break;
+        }
+        if( ret == TR_RESOLVE_ERROR ||
+            ( ret == TR_RESOLVE_WAIT && tr_date() > date + 10000 ) )
+        {
+            fprintf( stderr, "Could not resolve %s\n", inf->trackerAddress );
+            tr_netResolveClose( resolve );
+            return 1;
+        }
+        tr_wait( 10 );
     }
+
     s = tr_netOpen( addr, htons( inf->trackerPort ) );
     if( s < 0 )
     {
