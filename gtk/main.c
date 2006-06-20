@@ -49,13 +49,13 @@
 #include "util.h"
 
 /* time in seconds to wait for torrents to stop when exiting */
-#define TRACKER_EXIT_TIMEOUT    5
+#define TRACKER_EXIT_TIMEOUT    10
 
 /* interval in milliseconds to update the torrent list display */
-#define UPDATE_INTERVAL         500
+#define UPDATE_INTERVAL         1000
 
 /* interval in milliseconds to check for stopped torrents and update display */
-#define EXIT_CHECK_INTERVAL     500
+#define EXIT_CHECK_INTERVAL     1000
 
 struct cbdata {
   TrBackend *back;
