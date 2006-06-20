@@ -611,6 +611,8 @@ static void downloadLoop( void * _tor )
 			tor->finished = 1;
             tr_trackerCompleted( tor->tracker );
             tr_ioSaveResume( tor->io );
+            sync(); /* KLUDGE: all files should be closed and
+                       re-opened in read-only mode instead */
         }
 
         /* Receive/send messages */
