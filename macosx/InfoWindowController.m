@@ -66,8 +66,9 @@
     frame.origin.y -= difference;
     frame.size.height += difference;
     [window setFrame: frame display: YES];
-    [window setMinSize: NSMakeSize( MIN_WINDOW_WIDTH, frame.size.height )];
-    [window setMaxSize: NSMakeSize( MAX_WINDOW_WIDTH, frame.size.height )];
+    
+    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
+    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
 }
 
 - (void) dealloc
@@ -312,6 +313,14 @@
     return YES;
 }
 
+- (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
+{
+    NSPoint windowOrigin = [window frame].origin;
+    NSSize minSize = [window minSize];
+    
+    return NSMakeRect(windowOrigin.x, windowOrigin.y, minSize.width, minSize.height);
+}
+
 - (void) tabView: (NSTabView *) tabView didSelectTabViewItem: (NSTabViewItem *) tabViewItem
 {
     NSWindow * window = [self window];
@@ -336,8 +345,9 @@
     [view setHidden: YES];
     [window setFrame: frame display: YES animate: YES];
     [view setHidden: NO];
-    [window setMinSize: NSMakeSize( MIN_WINDOW_WIDTH, frame.size.height )];
-    [window setMaxSize: NSMakeSize( MAX_WINDOW_WIDTH, frame.size.height )];
+    
+    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
+    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
 }
 
 - (void) setNextTab
