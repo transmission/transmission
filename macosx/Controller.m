@@ -93,8 +93,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
-    [fAdvancedBarItem setState: [fDefaults
-        boolForKey: @"UseAdvancedBar"] ? NSOnState : NSOffState];
+    [fAdvancedBarItem setState: [fDefaults boolForKey: @"UseAdvancedBar"]];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -476,8 +475,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     
     [self updateUI: nil];
-    if ([fSortType isEqualToString: @"State"])
-        [self sortTorrents];
     [self updateTorrentHistory];
 }
 
@@ -503,8 +500,6 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
     
     [self updateUI: nil];
-    if ([fSortType isEqualToString: @"State"])
-        [self sortTorrents];
     [self updateTorrentHistory];
 }
 
@@ -737,13 +732,10 @@ static void sleepCallBack( void * controller, io_service_t y,
             [self notifyGrowl: [torrent name]];
             if( ![fWindow isKeyWindow] )
                 fCompleted++;
-            
-            if ([fSortType isEqualToString: @"State"])
-                [self sortTorrents];
         }
     }
 
-    if ([fSortType isEqualToString: @"Progress"])
+    if ([fSortType isEqualToString: @"Progress"] || [fSortType isEqualToString: @"State"])
         [self sortTorrents];
     else
         [fTableView reloadData];
@@ -932,9 +924,6 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) ratioSingleChange: (NSNotification *) notification
 {
-    if ([fSortType isEqualToString: @"State"])
-        [self sortTorrents];
-    
     //update info for changed ratio setting
     NSArray * torrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
     if ([torrents containsObject: [notification object]])

@@ -113,14 +113,14 @@
     else if( sameRow && [self pointInRevealRect: point]
                 && [self pointInRevealRect: fClickPoint] )
         [[fTorrents objectAtIndex: row] reveal];
-	else
-        if ([e clickCount] == 2)
-        {
-            if ([self pointInIconRect: point])
-                [[fTorrents objectAtIndex: row] reveal];
-            else
-                [fController showInfo: nil];
-        }
+	else if ([e clickCount] == 2)
+    {
+        if ([self pointInIconRect: point])
+            [[fTorrents objectAtIndex: row] reveal];
+        else
+            [fController showInfo: nil];
+    }
+    else;
     
 	[super mouseUp: e];
 
