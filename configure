@@ -17,6 +17,7 @@ CFLAGS="${CFLAGS}"
 CXX="${CXX-c++}"
 CXXFLAGS="${CXXFLAGS}"
 LDFLAGS="${LDFLAGS}"
+VERBOSE=no
 
 #
 # Functions
@@ -29,6 +30,7 @@ Options:
   --disable-openssl      Disable OpenSSL, use built-in SHA1 implementation
   --disable-gtk          Don't build the GTK+ GUI
   --prefix=PATH          Installation path
+  --verbose              Display additional information for debugging
 
 Some influential environment variables:
   CC          C compiler command
@@ -40,15 +42,37 @@ Some influential environment variables:
 EOF
 }
 
+runcmd()
+{
+  if [ "$VERBOSE" = yes ]
+  then
+    echo "$@" >&2
+    "$@"
+  else
+    "$@" > /dev/null 2>&1
+  fi
+  return $!
+}
+
+verbose()
+{
+  if [ "$VERBOSE" = yes ]
+  then
+    echo "$@"
+  fi
+}
+
 cc_test()
 {
+  verbose cc_test
   cat > testconf.c <<EOF
   int main()
   {
     return 0;
   }
 EOF
-  if ! $CC -o testconf testconf.c > /dev/null 2>&1; then
+  if ! runcmd $CC -o testconf testconf.c
+  then
     rm -f testconf.c testconf
     echo "Could not find a working compiler"
     exit 1
@@ -58,6 +82,7 @@ EOF
 
 openssl_test()
 {
+  verbose openssl_test
   cat > testconf.c << EOF
   #include <stdio.h>
   #include <openssl/sha.h>
@@ -66,7 +91,7 @@ openssl_test()
       SHA1( 0, 0, 0 );
   }
 EOF
-  if $CC $CFLAGS $LDFLAGS -o testconf testconf.c -lcrypto > /dev/null 2>&1
+  if runcmd $CC $CFLAGS $LDFLAGS -o testconf testconf.c -lcrypto
   then
     echo "yes"
     OPENSSL=yes
@@ -79,15 +104,16 @@ EOF
 
 lm_test()
 {
+  verbose lm_test
   cat > testconf.c << EOF
   int main()
   {
     return cos( 42 );
   }
 EOF
-  if ! $CC -o testconf testconf.c > /dev/null 2>&1
+  if ! runcmd $CC -o testconf testconf.c
   then
-    if $CC -o testconf testconf.c -lm > /dev/null 2>&1
+    if runcmd $CC -o testconf testconf.c -lm
     then
       LDFLAGS="$LDFLAGS -lm"
     fi
@@ -97,13 +123,14 @@ EOF
 
 lrintf_test()
 {
+  verbose lrintf_test
   cat > testconf.c << EOF
   int main()
   {
     return ( lrintf( 3.14 ) != 3 );
   }
 EOF
-  if ( $CC -o testconf testconf.c $LDFLAGS && ./testconf ) > /dev/null 2>&1
+  if runcmd $CC -o testconf testconf.c $LDFLAGS && runcmd ./testconf
   then
     CFLAGS="$CFLAGS -DHAVE_LRINTF"
   fi
@@ -112,6 +139,7 @@ EOF
 
 gettext_test()
 {
+  verbose gettext_test
   cat > testconf.c <<EOF
   #include <libintl.h>
   int main()
@@ -120,7 +148,7 @@ gettext_test()
   }
 EOF
 
-  if $CC $CFLAGS_GTK $LDFLAGS_GTK -o testconf testconf.c > /dev/null 2>&1
+  if runcmd $CC $CFLAGS_GTK $LDFLAGS_GTK -o testconf testconf.c
   then
     rm -f testconf.c testconf
     return 0
@@ -129,7 +157,7 @@ EOF
   for intl_testdir in $PREFIX/include \
       /usr/local/include /usr/X11R6/include /usr/pkg/include
   do
-    if $CC $CFLAGS_GTK -I$intl_testdir $LDFLAGS_GTK -o testconf testconf.c > /dev/null 2>&1
+    if runcmd $CC $CFLAGS_GTK -I$intl_testdir $LDFLAGS_GTK -o testconf testconf.c
     then
       CFLAGS_GTK="CFLAGS_GTK -I$intl_testdir"
       rm -f testconf.c testconf
@@ -142,9 +170,10 @@ EOF
 
 gtk_test()
 {
-  if pkg-config gtk+-2.0 > /dev/null 2>&1
+  verbose gtk_test
+  if runcmd pkg-config gtk+-2.0
   then
-    if expr `pkg-config --modversion gtk+-2.0` '>=' 2.6.0 > /dev/null 2>&1
+    if runcmd expr `pkg-config --modversion gtk+-2.0` '>=' 2.6.0
     then
       cat > testconf.c << EOF
       #include <gtk/gtk.h>
@@ -153,7 +182,7 @@ gtk_test()
         gtk_main();
       }
 EOF
-      if $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c > /dev/null 2>&1
+      if runcmd $CC `pkg-config gtk+-2.0 --cflags --libs` -o testconf testconf.c
       then
         CFLAGS_GTK=`pkg-config gtk+-2.0 --cflags`
         LDFLAGS_GTK=`pkg-config gtk+-2.0 --libs`
@@ -197,6 +226,9 @@ while [ $# -ne 0 ]; do
       ;;
     x--prefix=*)
       PREFIX="$param"
+      ;;
+    x--verbose)
+      VERBOSE=yes
       ;;
     x--help)
       usage
