@@ -29,13 +29,16 @@
 #define RATIO_GLOBAL_TAG 1
 #define RATIO_CHECK_TAG 2
 
+#define MIN_WINDOW_WIDTH 270
+#define MAX_WINDOW_WIDTH 2000
+
 #define TAB_INFO_IDENT @"Info"
 #define TAB_STATUS_IDENT @"Status"
 #define TAB_OPTIONS_IDENT @"Options"
 #define TAB_FILES_IDENT @"Files"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 196.0
+#define TAB_INFO_HEIGHT 185.0
 #define TAB_STATUS_HEIGHT 199.0
 #define TAB_OPTIONS_HEIGHT 82.0
 #define TAB_FILES_HEIGHT 250.0
@@ -63,6 +66,8 @@
     frame.origin.y -= difference;
     frame.size.height += difference;
     [window setFrame: frame display: YES];
+    [window setMinSize: NSMakeSize( MIN_WINDOW_WIDTH, frame.size.height )];
+    [window setMaxSize: NSMakeSize( MAX_WINDOW_WIDTH, frame.size.height )];
 }
 
 - (void) dealloc
@@ -331,6 +336,8 @@
     [view setHidden: YES];
     [window setFrame: frame display: YES animate: YES];
     [view setHidden: NO];
+    [window setMinSize: NSMakeSize( MIN_WINDOW_WIDTH, frame.size.height )];
+    [window setMaxSize: NSMakeSize( MAX_WINDOW_WIDTH, frame.size.height )];
 }
 
 - (void) setNextTab
