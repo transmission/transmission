@@ -235,8 +235,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         [self showInfo: nil];
 }
 
-- (BOOL) applicationShouldHandleReopen: (NSApplication *) app
-    hasVisibleWindows: (BOOL) visibleWindows
+- (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
 {
     if (!visibleWindows)
         [fWindow makeKeyAndOrderFront: nil];
@@ -277,8 +276,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     contextInfo: (void *) contextInfo
 {
     [NSApp stopModal];
-    [NSApp replyToApplicationShouldTerminate:
-        (returnCode == NSAlertDefaultReturn)];
+    [NSApp replyToApplicationShouldTerminate: returnCode == NSAlertDefaultReturn];
 }
 
 - (void) applicationWillTerminate: (NSNotification *) notification
@@ -440,11 +438,10 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     [panel beginSheetForDirectory: nil file: nil types: fileTypes
         modalForWindow: fWindow modalDelegate: self didEndSelector:
-        @selector( openSheetClosed:returnCode:contextInfo: )
-        contextInfo: nil];
+        @selector(openSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
-- (void) cantFindAName: (NSArray *) filenames
+- (void) openFromSheet: (NSArray *) filenames
 {
     [self application: NSApp openFiles: filenames];
 }
@@ -452,8 +449,8 @@ static void sleepCallBack( void * controller, io_service_t y,
 - (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code
     contextInfo: (void *) info
 {
-    if( code == NSOKButton )
-        [self performSelectorOnMainThread: @selector(cantFindAName:)
+    if (code == NSOKButton)
+        [self performSelectorOnMainThread: @selector(openFromSheet:)
                     withObject: [panel filenames] waitUntilDone: NO];
 }
 
