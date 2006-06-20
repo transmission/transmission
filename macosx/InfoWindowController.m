@@ -248,7 +248,7 @@
     int numberSelected = [fTorrents count];
     if (numberSelected > 0)
     {
-        float downloadRate = 0, uploadRate = 0, downloadedValid;
+        float downloadRate = 0, uploadRate = 0, downloadedValid = 0;
         uint64_t downloadedTotal = 0, uploadedTotal = 0;
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
