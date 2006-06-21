@@ -44,37 +44,30 @@
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)
-    {
-        /* 0 to 1023 bytes */
         return [NSString stringWithFormat: @"%lld bytes", size];
-    }
 
+    float displaySize = (float) size / 1024.0;
     NSString * unit;
     if (size < 1048576)
-    {
         unit = @" KB";
-    }
     else if (size < 1073741824)
     {
+        displaySize /= 1024.0;
         unit = @" MB";
-        size /= 1024;
     }
     else
     {
+        displaySize /= 1048576.0;
         unit = @" GB";
-        size /= 1048576;
     }
 
     NSString * value;
-    if (size < 10240)
-        /* 1.00 to 9.99 XB */
-        value = [NSString stringWithFormat: @"%lld.%02lld", size / 1024, ( size % 1024 ) * 100 / 1024];
-    else if (size < 102400)
-        /* 10.0 to 99.9 XB */
-        value = [NSString stringWithFormat: @"%lld.%lld", size / 1024, ( size % 1024 ) * 10 / 1024];
+    if (displaySize < 10.0)
+        value = [NSString stringWithFormat: @"%.2f", displaySize];
+    else if (displaySize < 100.0)
+        value = [NSString stringWithFormat: @"%.1f", displaySize];
     else
-        /* 100+ XB */
-        value = [NSString stringWithFormat: @"%lld", size / 1024];
+        value = [NSString stringWithFormat: @"%.0f", displaySize];
 
     return [value stringByAppendingString: unit];
 }
@@ -86,14 +79,14 @@
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
-    if (speed < 1000)         /* 0.0 K to 999.9 K */
+    if (speed < 1000.0) //0.0 K to 999.9 K
         return [NSString stringWithFormat: @"%.1f K", speed];
-    else if (speed < 102400)  /* 0.98 M to 99.99 M */
-        return [NSString stringWithFormat: @"%.2f M", speed / 1024];
-    else if (speed < 1024000) /* 100.0 M to 999.9 M */
-        return [NSString stringWithFormat: @"%.1f M", speed / 1024];
-    else                      /* Insane speeds */
-        return [NSString stringWithFormat: @"%.2f G", speed / 1048576];
+    else if (speed < 102400.0) //0.98 M to 99.99 M
+        return [NSString stringWithFormat: @"%.2f M", speed / 1024.0];
+    else if (speed < 1024000.0) //100.0 M to 999.9 M
+        return [NSString stringWithFormat: @"%.1f M", speed / 1024.0];
+    else //insane speeds
+        return [NSString stringWithFormat: @"%.2f G", speed / 1048576.0];
 }
 
 + (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up
@@ -102,9 +95,9 @@
         return up == 0 ? @"N/A" : [NSString stringWithUTF8String: "\xE2\x88\x9E"];
 
     float ratio = (float) up / (float) down;
-    if( ratio < 10.0 )
+    if (ratio < 10.0)
         return [NSString stringWithFormat: @"%.2f", ratio];
-    else if( ratio < 100.0 )
+    else if (ratio < 100.0)
         return [NSString stringWithFormat: @"%.1f", ratio];
     else
         return [NSString stringWithFormat: @"%.0f", ratio];
