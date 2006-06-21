@@ -46,28 +46,32 @@
     if (size < 1024)
         return [NSString stringWithFormat: @"%lld bytes", size];
 
-    float displaySize = (float) size / 1024.0;
+    float convertedSize = (float) size;
     NSString * unit;
     if (size < 1048576)
+    {
+        convertedSize /= 1024.0;
         unit = @" KB";
+    }
     else if (size < 1073741824)
     {
-        displaySize /= 1024.0;
+        convertedSize /= 1048576.0;
         unit = @" MB";
     }
     else
     {
-        displaySize /= 1048576.0;
+        convertedSize /= 1073741824.0;
         unit = @" GB";
     }
 
     NSString * value;
-    if (displaySize < 10.0)
-        value = [NSString stringWithFormat: @"%.2f", displaySize];
-    else if (displaySize < 100.0)
-        value = [NSString stringWithFormat: @"%.1f", displaySize];
+    //attempt to have values with 3 digits
+    if (convertedSize < 10.0)
+        value = [NSString stringWithFormat: @"%.2f", convertedSize];
+    else if (convertedSize < 100.0)
+        value = [NSString stringWithFormat: @"%.1f", convertedSize];
     else
-        value = [NSString stringWithFormat: @"%.0f", displaySize];
+        value = [NSString stringWithFormat: @"%.0f", convertedSize];
 
     return [value stringByAppendingString: unit];
 }
