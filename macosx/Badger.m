@@ -44,12 +44,12 @@
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
         
         NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2, -2)];
-        [stringShadow setShadowBlurRadius: 4];
+        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
+        [stringShadow setShadowBlurRadius: 4.0];
         
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,
-            [NSFont fontWithName: @"Helvetica-Bold" size: 28], NSFontAttributeName,
+            [NSFont fontWithName: @"Helvetica-Bold" size: 28.0], NSFontAttributeName,
             stringShadow, NSShadowAttributeName, nil];
         
         [stringShadow release];
@@ -65,7 +65,6 @@
 {
     [fDockIcon release];
     [fBadgedDockIcon release];
-
     [fAttributes release];
 
     [super dealloc];
@@ -82,7 +81,6 @@
     if (fCompleted != completed)
     {
         fCompleted = completed;
-        
         dockIcon = [fDockIcon copy];
         
         //set completed badge to top right
@@ -125,13 +123,13 @@
     BOOL speedShown = uploadRateString || downloadRateString;
     if (speedShown)
     {
-        NSRect badgeRect, stringRect;
+        NSRect badgeRect;
         badgeRect.size = [fUploadBadge size];
         badgeRect.origin = NSZeroPoint;
         
         //ignore shadow of badge when placing string
+        NSRect stringRect = badgeRect;
         float badgeBottomExtra = 2.0;
-        stringRect = badgeRect;
         stringRect.size.height -= badgeBottomExtra;
         stringRect.origin.y += badgeBottomExtra;
 
@@ -177,7 +175,6 @@
             dockIcon = [fBadgedDockIcon copy];
             
         [NSApp setApplicationIconImage: dockIcon];
-        
         [dockIcon release];
     }
     

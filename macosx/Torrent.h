@@ -62,8 +62,8 @@
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
 
 - (void)        update;
-- (void)        start;
-- (void)        stop;
+- (void)        startTransfer;
+- (void)        stopTransfer;
 - (void)        removeForever;
 - (void)        sleep;
 - (void)        wakeUp;
@@ -74,7 +74,7 @@
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
 
-- (void)    reveal;
+- (void)    revealData;
 - (void)    trashData;
 - (void)    trashTorrent;
 

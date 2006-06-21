@@ -54,6 +54,8 @@
         fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
         fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
         fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
+        
+        fClickPoint = NSZeroPoint;
     }
     
     return self;
@@ -103,11 +105,11 @@
 		else;
     }
     else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
-        [[fTorrents objectAtIndex: row] reveal];
+        [[fTorrents objectAtIndex: row] revealData];
 	else if ([event clickCount] == 2)
     {
         if ([self pointInIconRect: point])
-            [[fTorrents objectAtIndex: row] reveal];
+            [[fTorrents objectAtIndex: row] revealData];
         else
             [fController showInfo: nil];
     }

@@ -319,7 +319,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     {
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
         if ([fDefaults boolForKey: @"AutoStartDownload"])
-            [torrent start];
+            [torrent startTransfer];
         [fTorrents addObject: torrent];
         
         [self torrentNumberChanged];
@@ -371,7 +371,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
             [torrent setDownloadFolder: folder];
             if (autoStart)
-                [torrent start];
+                [torrent startTransfer];
             [fTorrents addObject: torrent];
         }
         
@@ -461,10 +461,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) resumeTorrentWithIndex: (NSIndexSet *) indexSet
 {
-    Torrent * torrent;
     unsigned int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[fTorrents objectAtIndex: i] start];
+        [[fTorrents objectAtIndex: i] startTransfer];
     
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -484,12 +483,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
 {
     unsigned int i;
-    Torrent * torrent;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-    {
-        torrent = [fTorrents objectAtIndex: i];
-        [torrent stop];
-    }
+        [[fTorrents objectAtIndex: i] stopTransfer];
     
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -539,8 +534,7 @@ static void sleepCallBack(void * controller, io_service_t y,
                 " Do you really want to remove them?"];
         }
 
-        NSBeginAlertSheet(title,
-            @"Remove", @"Cancel", nil, fWindow, self,
+        NSBeginAlertSheet(title, @"Remove", @"Cancel", nil, fWindow, self,
             @selector(removeSheetDidEnd:returnCode:contextInfo:), nil, dict, message);
     }
     else
@@ -570,7 +564,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSEnumerator * enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        [torrent stop];
+        [torrent stopTransfer];
 
         if (deleteData)
             [torrent trashData];
@@ -669,15 +663,11 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) revealFile: (id) sender
 {
-    Torrent * torrent;
     NSIndexSet * indexSet = [fTableView selectedRowIndexes];
     unsigned int i;
     
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-    {
-        torrent = [fTorrents objectAtIndex: i];
-        [torrent reveal];
-    }
+        [[fTorrents objectAtIndex: i] revealData];
 }
 
 - (void) showPreferenceWindow: (id) sender

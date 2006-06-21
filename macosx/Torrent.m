@@ -71,7 +71,7 @@
 
         NSString * paused;
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
-            [self start];
+            [self startTransfer];
     }
     return self;
 }
@@ -137,7 +137,7 @@
             || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
             && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
-        [self stop];
+        [self stopTransfer];
         [self setStopRatioSetting: RATIO_NO_CHECK];
         fFinishedSeeding = YES;
         
@@ -216,7 +216,7 @@
     }
 }
 
-- (void) start
+- (void) startTransfer
 {
     if (![self isActive])
     {
@@ -225,7 +225,7 @@
     }
 }
 
-- (void) stop
+- (void) stopTransfer
 {
     if ([self isActive])
         tr_torrentStop(fHandle);
@@ -233,20 +233,20 @@
 
 - (void) removeForever
 {
-    if (fInfo->flags & TR_FSAVEPRIVATE)
+    if (fPrivateTorrent)
         tr_torrentRemoveSaved(fHandle);
 }
 
 - (void) sleep
 {
     if ((fResumeOnWake = [self isActive]))
-        [self stop];
+        [self stopTransfer];
 }
 
 - (void) wakeUp
 {
     if (fResumeOnWake)
-        [self start];
+        [self startTransfer];
 }
 
 - (float) ratio
@@ -276,7 +276,7 @@
         fRatioLimit = limit;
 }
 
-- (void) reveal
+- (void) revealData
 {
     [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation] inFileViewerRootedAtPath: nil];
 }

@@ -64,16 +64,16 @@
         unit = @" GB";
     }
 
-    NSString * value;
+    NSString * sizeString;
     //attempt to have values with 3 digits
     if (convertedSize < 10.0)
-        value = [NSString stringWithFormat: @"%.2f", convertedSize];
+        sizeString = [NSString stringWithFormat: @"%.2f", convertedSize];
     else if (convertedSize < 100.0)
-        value = [NSString stringWithFormat: @"%.1f", convertedSize];
+        sizeString = [NSString stringWithFormat: @"%.1f", convertedSize];
     else
-        value = [NSString stringWithFormat: @"%.0f", convertedSize];
+        sizeString = [NSString stringWithFormat: @"%.0f", convertedSize];
 
-    return [value stringByAppendingString: unit];
+    return [sizeString stringByAppendingString: unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
