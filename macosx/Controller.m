@@ -45,8 +45,8 @@
 
 #define GROWL_PATH  @"/Library/PreferencePanes/Growl.prefPane/Contents/Resources/GrowlHelperApp.app"
 
-static void sleepCallBack( void * controller, io_service_t y,
-        natural_t messageType, void * messageArgument )
+static void sleepCallBack(void * controller, io_service_t y,
+        natural_t messageType, void * messageArgument)
 {
     Controller * c = controller;
     [c sleepCallBack: messageType argument: messageArgument];
@@ -134,15 +134,13 @@ static void sleepCallBack( void * controller, io_service_t y,
     [fTableView registerForDraggedTypes:
         [NSArray arrayWithObject: NSFilenamesPboardType]];
 
-    //Register for sleep notifications
+    //register for sleep notifications
     IONotificationPortRef notify;
-    io_object_t anIterator;
-    if (fRootPort = IORegisterForSystemPower(self, & notify,
-                                sleepCallBack, & anIterator))
+    io_object_t iterator;
+    if (fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator))
     {
-        CFRunLoopAddSource( CFRunLoopGetCurrent(),
-                            IONotificationPortGetRunLoopSource( notify ),
-                            kCFRunLoopCommonModes );
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify),
+                            kCFRunLoopCommonModes);
     }
     else
         NSLog(@"Could not IORegisterForSystemPower");
@@ -259,9 +257,7 @@ static void sleepCallBack( void * controller, io_service_t y,
                 : [NSString stringWithFormat:
                     @"There are %d active transfers. Do you really want to quit?", active];
 
-            NSBeginAlertSheet(@"Confirm Quit",
-                                @"Quit", @"Cancel", nil,
-                                fWindow, self,
+            NSBeginAlertSheet(@"Confirm Quit", @"Quit", @"Cancel", nil, fWindow, self,
                                 @selector(quitSheetDidEnd:returnCode:contextInfo:),
                                 nil, nil, message);
             return NSTerminateLater;
@@ -316,12 +312,12 @@ static void sleepCallBack( void * controller, io_service_t y,
     }
 }
 
-- (void) folderChoiceClosed: (NSOpenPanel *) s returnCode: (int) code
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
     contextInfo: (Torrent *) torrent
 {
     if (code == NSOKButton)
     {
-        [torrent setDownloadFolder: [[s filenames] objectAtIndex: 0]];
+        [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
         if ([fDefaults boolForKey: @"AutoStartDownload"])
             [torrent start];
         [fTorrents addObject: torrent];
@@ -422,8 +418,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    [self performSelectorOnMainThread: @selector(cantFindAName:)
-                withObject: files waitUntilDone: NO];
+    [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: files waitUntilDone: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -469,10 +464,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     Torrent * torrent;
     unsigned int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-    {
-        torrent = [fTorrents objectAtIndex: i];
-        [torrent start];
-    }
+        [[fTorrents objectAtIndex: i] start];
     
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -491,8 +483,8 @@ static void sleepCallBack( void * controller, io_service_t y,
 
 - (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
 {
-    Torrent * torrent;
     unsigned int i;
+    Torrent * torrent;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
     {
         torrent = [fTorrents objectAtIndex: i];
@@ -520,8 +512,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
             torrents, @"Torrents",
             [NSNumber numberWithBool: deleteData], @"DeleteData",
-            [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent",
-            nil];
+            [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent", nil];
 
         NSString * title, * message;
         
@@ -550,8 +541,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
         NSBeginAlertSheet(title,
             @"Remove", @"Cancel", nil, fWindow, self,
-            @selector(removeSheetDidEnd:returnCode:contextInfo:),
-            nil, dict, message);
+            @selector(removeSheetDidEnd:returnCode:contextInfo:), nil, dict, message);
     }
     else
         [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
@@ -722,15 +712,15 @@ static void sleepCallBack( void * controller, io_service_t y,
 {
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    while( ( torrent = [enumerator nextObject] ) )
+    while ((torrent = [enumerator nextObject]))
     {
         [torrent update];
 
-        if( [torrent justFinished] )
+        if ([torrent justFinished])
         {
-            /* Notifications */
+            //notifications
             [self notifyGrowl: [torrent name]];
-            if( ![fWindow isKeyWindow] )
+            if (![fWindow isKeyWindow])
                 fCompleted++;
         }
     }
@@ -740,7 +730,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     else
         [fTableView reloadData];
     
-    //Update the global DL/UL rates
+    //update the global DL/UL rates
     float downloadRate, uploadRate;
     tr_torrentRates(fLib, & downloadRate, & uploadRate);
     if (fStatusBarVisible)
@@ -1126,8 +1116,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while( ( torrent = [enumerator nextObject] ) )
-            if( [torrent isActive] )
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isActive])
                 return YES;
         return NO;
     }
@@ -1137,8 +1127,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while( ( torrent = [enumerator nextObject] ) )
-            if( [torrent isPaused] )
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isPaused])
                 return YES;
         return NO;
     }
@@ -1151,27 +1141,20 @@ static void sleepCallBack( void * controller, io_service_t y,
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        {
-            torrent = [fTorrents objectAtIndex: i];
-            if ([torrent isActive])
+            if ([[fTorrents objectAtIndex: i] isActive])
                 return YES;
-        }
         return NO;
     }
     
     //enable resume item
     if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
-        Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        {
-            torrent = [fTorrents objectAtIndex: i];
-            if ([torrent isPaused])
+            if ([[fTorrents objectAtIndex: i] isPaused])
                 return YES;
-        }
         return NO;
     }
 
@@ -1214,8 +1197,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while( ( torrent = [enumerator nextObject] ) )
-            if( [torrent isPaused] )
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isPaused])
                 return YES;
         return NO;
     }
@@ -1225,8 +1208,8 @@ static void sleepCallBack( void * controller, io_service_t y,
     {
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while( ( torrent = [enumerator nextObject] ) )
-            if( [torrent isActive] )
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isActive])
                 return YES;
         return NO;
     }
@@ -1241,8 +1224,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteBoth:))
     {
         BOOL active = NO,
-            canDelete = !(action == @selector(removeDeleteTorrent:)
-                            || action == @selector(removeDeleteBoth:));
+            canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteBoth:);
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
         unsigned int i;
@@ -1274,8 +1256,7 @@ static void sleepCallBack( void * controller, io_service_t y,
         else
         {
             if ([title hasSuffix: ellipsis])
-                [menuItem setTitle: [title substringToIndex:
-                            [title rangeOfString: ellipsis].location]];
+                [menuItem setTitle: [title substringToIndex: [title rangeOfString: ellipsis].location]];
         }
         
         return canUseMenu && canDelete && [fTableView numberOfSelectedRows] > 0;
@@ -1440,7 +1421,7 @@ static void sleepCallBack( void * controller, io_service_t y,
     
     NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     NSDictionary * error;
-    if (![appleScript executeAndReturnError: &error])
+    if (![appleScript executeAndReturnError: & error])
         NSLog(@"Growl notify failed");
     [appleScript release];
 }
@@ -1464,7 +1445,7 @@ static void sleepCallBack( void * controller, io_service_t y,
 
     NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     NSDictionary * error;
-    if (![appleScript executeAndReturnError: &error])
+    if (![appleScript executeAndReturnError: & error])
         NSLog(@"Growl registration failed");
     [appleScript release];
 }

@@ -25,16 +25,16 @@
 #import "PrefsController.h"
 #import "StringAdditions.h"
 
-#define MIN_PORT            1
-#define MAX_PORT            65535
+#define MIN_PORT    1
+#define MAX_PORT    65535
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
 
-#define UPDATE_DAILY        0
-#define UPDATE_WEEKLY       1
-#define UPDATE_NEVER        2
+#define UPDATE_DAILY    0
+#define UPDATE_WEEKLY   1
+#define UPDATE_NEVER    2
 
 #define TOOLBAR_GENERAL     @"General"
 #define TOOLBAR_TRANSFERS   @"Transfers"
@@ -48,8 +48,7 @@
 
 - (void) setPrefView: (NSView *) view;
 
-- (void) folderSheetClosed: (NSOpenPanel *) s returnCode: (int) code
-                                contextInfo: (void *) info;
+- (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) updatePopUp;
 
 @end
@@ -85,7 +84,7 @@
     fHandle = handle;
     
     //set download folder
-    NSString * downloadChoice  = [fDefaults stringForKey: @"DownloadChoice"];
+    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
     fDownloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
     [fDownloadFolder retain];
 
@@ -100,8 +99,7 @@
     //set bind port
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
-    fHandle = handle;
-    tr_setBindPort( fHandle, bindPort );
+    tr_setBindPort(fHandle, bindPort);
     
     //checks for old version upload speed of -1
     if ([fDefaults integerForKey: @"UploadLimit"] < 0)
@@ -118,7 +116,7 @@
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
     
-    tr_setUploadLimit( fHandle, checkUpload ? uploadLimit : -1 );
+    tr_setUploadLimit(fHandle, checkUpload ? uploadLimit : -1);
 
 	//set download limit
     BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
@@ -128,7 +126,7 @@
     [fDownloadField setIntValue: downloadLimit];
     [fDownloadField setEnabled: checkDownload];
     
-    tr_setDownloadLimit( fHandle, checkDownload ? downloadLimit : -1 );
+    tr_setDownloadLimit(fHandle, checkDownload ? downloadLimit : -1);
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
@@ -253,8 +251,7 @@
     }
 
     int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString:
-            [NSString stringWithFormat: @"%d", limit]]
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]]
             || limit < 0)
     {
         NSBeep();
@@ -263,12 +260,10 @@
     }
     else
     {
-        if( sender == fUploadField )
-            tr_setUploadLimit( fHandle,
-                ( [fUploadCheck state] == NSOffState ) ? -1 : limit );
+        if (sender == fUploadField)
+            tr_setUploadLimit(fHandle, [fUploadCheck state] == NSOffState ? -1 : limit);
         else
-            tr_setDownloadLimit( fHandle,
-                ( [fDownloadCheck state] == NSOffState ) ? -1 : limit );
+            tr_setDownloadLimit(fHandle, [fDownloadCheck state] == NSOffState ? -1 : limit);
         
         [fDefaults setInteger: limit forKey: key];
     }
@@ -277,8 +272,7 @@
                                     [NSNumber numberWithBool: [check state]], @"Enable",
                                     [NSNumber numberWithInt: limit], @"Limit",
                                     type, @"Type", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:
-                            @"LimitGlobalChange" object: dict];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"LimitGlobalChange" object: dict];
 }
 
 - (void) setLimitCheck: (id) sender
@@ -305,8 +299,7 @@
 
 - (void) setLimitEnabled: (BOOL) enable type: (NSString *) type
 {
-    NSButton * check = [type isEqualToString: @"Upload"]
-                        ? fUploadCheck : fDownloadCheck;
+    NSButton * check = [type isEqualToString: @"Upload"] ? fUploadCheck : fDownloadCheck;
     [check setState: enable ? NSOnState : NSOffState];
     [self setLimitCheck: check];
 }
@@ -331,8 +324,7 @@
 - (void) setRatio: (id) sender
 {
     float ratioLimit = [sender floatValue];
-    if (![[sender stringValue] isEqualToString:
-            [NSString stringWithFormat: @"%.2f", ratioLimit]]
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]]
             || ratioLimit < 0)
     {
         NSBeep();
@@ -345,8 +337,7 @@
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                     [NSNumber numberWithBool: [fRatioCheck state]], @"Enable",
                                     [NSNumber numberWithFloat: ratioLimit], @"Ratio", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:
-                                @"RatioGlobalChange" object: dict];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"RatioGlobalChange" object: dict];
 }
 
 - (void) setRatioCheck: (id) sender
@@ -442,7 +433,7 @@
 - (void) setDownloadLocation: (id) sender
 {
     //Download folder
-    switch( [fFolderPopUp indexOfSelectedItem] )
+    switch ([fFolderPopUp indexOfSelectedItem])
     {
         case DOWNLOAD_FOLDER:
             [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
@@ -465,10 +456,10 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt:                  @"Select"];
-    [panel setAllowsMultipleSelection:        NO];
-    [panel setCanChooseFiles:                 NO];
-    [panel setCanChooseDirectories:          YES];
+    [panel setPrompt: @"Select"];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
 
     [panel beginSheetForDirectory: nil file: nil types: nil
         modalForWindow: [self window] modalDelegate: self didEndSelector:
@@ -512,8 +503,7 @@
     [view setHidden: NO];
 }
 
-- (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code
-    contextInfo: (void *) info
+- (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
    if (code == NSOKButton)
    {
@@ -531,18 +521,12 @@
    {
        //reset if cancelled
        NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-       if( [downloadChoice isEqualToString: @"Constant"] )
-       {
+       if ([downloadChoice isEqualToString: @"Constant"])
            [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-       }
-       else if( [downloadChoice isEqualToString: @"Torrent"] )
-       {
+       else if ([downloadChoice isEqualToString: @"Torrent"])
            [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
-       }
        else
-       {
            [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
-       }
    }
 }
 

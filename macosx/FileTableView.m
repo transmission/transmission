@@ -39,8 +39,7 @@
     if (row >= 0)
     {
         if (![self isRowSelected: row])
-            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                byExtendingSelection: NO];
+            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
     }
     else
         [self deselectAll: self];

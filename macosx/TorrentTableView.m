@@ -70,50 +70,41 @@
     fTorrents = torrents;
 }
 
-- (void) mouseDown: (NSEvent *) e
+- (void) mouseDown: (NSEvent *) event
 {
-    fClickPoint = [self convertPoint: [e locationInWindow] fromView: nil];
-    int row = [self rowAtPoint: fClickPoint];
+    fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
-    if( [e modifierFlags] & NSAlternateKeyMask )
+    if ([event modifierFlags] & NSAlternateKeyMask)
     {
         [fController advancedChanged: self];
-        fClickPoint = NSMakePoint( 0, 0 );
+        fClickPoint = NSZeroPoint;
     }
-    else if( ![self pointInPauseRect: fClickPoint] &&
-             ![self pointInRevealRect: fClickPoint] )
-        [super mouseDown: e];
+    else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
+        [super mouseDown: event];
     else;
 
     [self display];
 }
 
-- (void) mouseUp: (NSEvent *) e
+- (void) mouseUp: (NSEvent *) event
 {
-    NSPoint point;
-    int row;
-    bool sameRow;
-    Torrent * torrent;
-
-    point = [self convertPoint: [e locationInWindow] fromView: nil];
-    row   = [self rowAtPoint: point];
-    sameRow = row == [self rowAtPoint: fClickPoint];
+    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    int row = [self rowAtPoint: point];
+    BOOL sameRow = row == [self rowAtPoint: fClickPoint];
     
-    if( sameRow && [self pointInPauseRect: point]
-            && [self pointInPauseRect: fClickPoint] )
+    if (sameRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
     {
-        torrent = [fTorrents objectAtIndex: row];
+        Torrent * torrent = [fTorrents objectAtIndex: row];
 
-		if( [torrent isPaused] )
+		if ([torrent isPaused])
 			[fController resumeTorrentWithIndex: [NSIndexSet indexSetWithIndex: row]];
-		else if( [torrent isActive] )
+		else if ([torrent isActive])
 			[fController stopTorrentWithIndex: [NSIndexSet indexSetWithIndex: row]];
 		else;
     }
-    else if( sameRow && [self pointInRevealRect: point]
-                && [self pointInRevealRect: fClickPoint] )
+    else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] reveal];
-	else if ([e clickCount] == 2)
+	else if ([event clickCount] == 2)
     {
         if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] reveal];
@@ -122,21 +113,20 @@
     }
     else;
     
-	[super mouseUp: e];
+	[super mouseUp: event];
 
-    fClickPoint = NSMakePoint( 0, 0 );
+    fClickPoint = NSZeroPoint;
     [self display];
 }
 
-- (NSMenu *) menuForEvent: (NSEvent *) e
+- (NSMenu *) menuForEvent: (NSEvent *) event
 {
-    int row = [self rowAtPoint: [self convertPoint: [e locationInWindow] fromView: nil]];
+    int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
     
     if (row >= 0)
     {
         if (![self isRowSelected: row])
-            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
-                byExtendingSelection: NO];
+            [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
                 
         return fContextRow;
     }
@@ -149,14 +139,14 @@
 
 - (void) drawRect: (NSRect) r
 {
-    unsigned i;
     NSRect rect;
-    NSImage * image;
     Torrent * torrent;
+    NSImage * image;
 
     [super drawRect: r];
 
-    for( i = 0; i < [fTorrents count]; i++ )
+    int i;
+    for (i = 0; i < [fTorrents count]; i++)
     {
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
@@ -171,17 +161,15 @@
         if (image)
         {
             [image setFlipped: YES];
-            [image drawAtPoint: rect.origin fromRect:
-                NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
-                NSCompositeSourceOver fraction: 1.0];
+            [image drawAtPoint: rect.origin fromRect: NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH)
+                operation: NSCompositeSourceOver fraction: 1.0];
         }
 
         rect = [self revealRectForRow: i];
         image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
         [image setFlipped: YES];
-        [image drawAtPoint: rect.origin fromRect:
-            NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH) operation:
-            NSCompositeSourceOver fraction: 1.0];
+        [image drawAtPoint: rect.origin fromRect: NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH)
+            operation: NSCompositeSourceOver fraction: 1.0];
     }
 }
 
@@ -191,8 +179,7 @@
 
 - (NSRect) pauseRectForRow: (int) row
 {
-    NSRect cellRect = [self frameOfCellAtColumn:
-                [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
                 
     return NSMakeRect(cellRect.origin.x + cellRect.size.width
                         - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
@@ -201,11 +188,9 @@
 
 - (NSRect) revealRectForRow: (int) row
 {
-    NSRect cellRect = [self frameOfCellAtColumn:
-                [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width
-                        - AREA_CENTER + DISTANCE_FROM_CENTER,
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width - AREA_CENTER + DISTANCE_FROM_CENTER,
                         cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
@@ -215,13 +200,11 @@
     if (row < 0)
         return NO;
     
-    NSRect cellRect = [self frameOfCellAtColumn:
-                [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     NSSize iconSize = [[[fTorrents objectAtIndex: row] iconFlipped] size];
     
     NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y
-                        + (cellRect.size.height - iconSize.height) * 0.5,
-                        iconSize.width, iconSize.height);
+            + (cellRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
     
     return NSPointInRect(point, iconRect);
 }

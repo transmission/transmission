@@ -100,6 +100,8 @@
 //- (NSString *) state;
 
 - (float)   progress;
+- (int)     eta;
+
 - (BOOL)    isActive;
 - (BOOL)    isSeeding;
 - (BOOL)    isPaused;

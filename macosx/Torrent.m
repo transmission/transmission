@@ -41,8 +41,7 @@
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
-    self = [self initWithHash: nil path: path lib: lib
-            privateTorrent: nil publicTorrent: nil
+    self = [self initWithHash: nil path: path lib: lib privateTorrent: nil publicTorrent: nil
             date: nil stopRatioSetting: nil ratioLimit: nil];
     
     if (self)
@@ -67,8 +66,7 @@
     {
         NSString * downloadFolder;
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
-            downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"]
-                                stringByExpandingTildeInPath];
+            downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
         [self setDownloadFolder: downloadFolder];
 
         NSString * paused;
@@ -100,9 +98,9 @@
 
 - (void) dealloc
 {
-    if( fHandle )
+    if (fHandle)
     {
-        tr_torrentClose( fLib, fHandle );
+        tr_torrentClose(fLib, fHandle);
         
         if (fPublicTorrentLocation)
             [fPublicTorrentLocation release];
@@ -118,25 +116,24 @@
 
 - (void) setDownloadFolder: (NSString *) path
 {
-    tr_torrentSetFolder( fHandle, [path UTF8String] );
+    tr_torrentSetFolder(fHandle, [path UTF8String]);
 }
 
 - (NSString *) downloadFolder
 {
-    return [NSString stringWithUTF8String: tr_torrentGetFolder( fHandle )];
+    return [NSString stringWithUTF8String: tr_torrentGetFolder(fHandle)];
 }
 
 - (void) getAvailability: (int8_t *) tab size: (int) size
 {
-    tr_torrentAvailability( fHandle, tab, size );
+    tr_torrentAvailability(fHandle, tab, size);
 }
 
 - (void) update
 {
-    fStat = tr_torrentStat( fHandle );
+    fStat = tr_torrentStat(fHandle);
     
-    if ([self isSeeding]
-        && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
+    if ([self isSeeding] && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
             || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
             && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
@@ -144,7 +141,7 @@
         [self setStopRatioSetting: RATIO_NO_CHECK];
         fFinishedSeeding = YES;
         
-        fStat = tr_torrentStat( fHandle );
+        fStat = tr_torrentStat(fHandle);
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRatioChanged" object: self];
     }
@@ -158,7 +155,7 @@
                 [self size]], [NSString stringForFileSize: [self uploadedTotal]],
                 [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]];
 
-    switch( fStat->status )
+    switch (fStat->status)
     {
         case TR_STATUS_PAUSE:
             [fStatusString setString: fFinishedSeeding ? @"Seeding Complete" : @"Paused"];
@@ -171,11 +168,10 @@
         case TR_STATUS_DOWNLOAD:
             [fStatusString setString: @""];
             [fStatusString appendFormat:
-                @"Downloading from %d of %d peer%s",
-                [self peersUploading], [self totalPeers],
+                @"Downloading from %d of %d peer%s", [self peersUploading], [self totalPeers],
                 ([self totalPeers] == 1) ? "" : "s"];
             
-            int eta = fStat->eta;
+            int eta = [self eta];
             if (eta < 0)
                 [fProgressString appendString: @" - remaining time unknown"];
             else
@@ -222,19 +218,17 @@
 
 - (void) start
 {
-    if( fStat->status & TR_STATUS_INACTIVE )
+    if (![self isActive])
     {
-        tr_torrentStart( fHandle );
+        tr_torrentStart(fHandle);
         fFinishedSeeding = NO;
     }
 }
 
 - (void) stop
 {
-    if( fStat->status & TR_STATUS_ACTIVE )
-    {
-        tr_torrentStop( fHandle );
-    }
+    if ([self isActive])
+        tr_torrentStop(fHandle);
 }
 
 - (void) removeForever
@@ -245,18 +239,14 @@
 
 - (void) sleep
 {
-    if( ( fResumeOnWake = ( fStat->status & TR_STATUS_ACTIVE ) ) )
-    {
+    if ((fResumeOnWake = [self isActive]))
         [self stop];
-    }
 }
 
 - (void) wakeUp
 {
-    if( fResumeOnWake )
-    {
+    if (fResumeOnWake)
         [self start];
-    }
 }
 
 - (float) ratio
@@ -288,8 +278,7 @@
 
 - (void) reveal
 {
-    [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation]
-        inFileViewerRootedAtPath: nil];
+    [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation] inFileViewerRootedAtPath: nil];
 }
 
 - (void) trashData
@@ -325,8 +314,7 @@
 
 - (NSString *) tracker
 {
-    return [NSString stringWithFormat: @"%s:%d",
-            fInfo->trackerAddress, fInfo->trackerPort];
+    return [NSString stringWithFormat: @"%s:%d", fInfo->trackerAddress, fInfo->trackerPort];
 }
 
 - (NSString *) announce
@@ -414,24 +402,29 @@
     return fStat->progress;
 }
 
+- (int) eta
+{
+    return fStat->eta;
+}
+
 - (BOOL) isActive
 {
-    return ( fStat->status & TR_STATUS_ACTIVE );
+    return fStat->status & TR_STATUS_ACTIVE;
 }
 
 - (BOOL) isSeeding
 {
-    return ( fStat->status == TR_STATUS_SEED );
+    return fStat->status == TR_STATUS_SEED;
 }
 
 - (BOOL) isPaused
 {
-    return ( fStat->status == TR_STATUS_PAUSE );
+    return fStat->status == TR_STATUS_PAUSE;
 }
 
 - (BOOL) justFinished
 {
-    return tr_getFinished( fHandle );
+    return tr_getFinished(fHandle);
 }
 
 - (NSString *) progressString
@@ -513,9 +506,9 @@
 
 - (NSNumber *) stateSortKey
 {
-    if (fStat->status & TR_STATUS_INACTIVE)
+    if (![self isActive])
         return [NSNumber numberWithInt: 0];
-    else if (fStat->status == TR_STATUS_SEED)
+    else if ([self isSeeding])
         return [NSNumber numberWithInt: 1];
     else
         return [NSNumber numberWithInt: 2];
@@ -571,8 +564,7 @@
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    NSString * fileType = fInfo->multifile ?
-        NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
+    NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
     [fIcon retain];
     

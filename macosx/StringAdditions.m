@@ -68,12 +68,10 @@
     NSString * value;
     if (size < 10240)
         /* 1.00 to 9.99 XB */
-        value = [NSString stringWithFormat: @"%lld.%02lld",
-                    size / 1024, ( size % 1024 ) * 100 / 1024];
+        value = [NSString stringWithFormat: @"%lld.%02lld", size / 1024, ( size % 1024 ) * 100 / 1024];
     else if (size < 102400)
         /* 10.0 to 99.9 XB */
-        value = [NSString stringWithFormat: @"%lld.%lld",
-                    size / 1024, ( size % 1024 ) * 10 / 1024];
+        value = [NSString stringWithFormat: @"%lld.%lld", size / 1024, ( size % 1024 ) * 10 / 1024];
     else
         /* 100+ XB */
         value = [NSString stringWithFormat: @"%lld", size / 1024];
@@ -83,8 +81,7 @@
 
 + (NSString *) stringForSpeed: (float) speed
 {
-    return [[self stringForSpeedAbbrev: speed]
-        stringByAppendingString: @"B/s"];
+    return [[self stringForSpeedAbbrev: speed] stringByAppendingString: @"B/s"];
 }
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
