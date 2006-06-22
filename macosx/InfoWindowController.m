@@ -55,6 +55,7 @@
 {
     fAppIcon = [[NSApp applicationIconImage] copy];
     
+    fTorrents = [[NSArray alloc] init];
     fFiles = [[NSMutableArray alloc] initWithCapacity: 6];
     [fFileTable setDoubleAction: @selector(revealFile:)];
     
@@ -73,8 +74,7 @@
 
 - (void) dealloc
 {
-    if (fTorrents)
-        [fTorrents release];
+    [fTorrents release];
     [fFiles release];
 
     [fAppIcon release];
@@ -83,8 +83,7 @@
 
 - (void) updateInfoForTorrents: (NSArray *) torrents
 {
-    if (fTorrents)
-        [fTorrents release];
+    [fTorrents release];
     fTorrents = [torrents retain];
 
     int numberSelected = [fTorrents count];
@@ -314,8 +313,7 @@
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
     NSRect windowRect = [window frame];
-    windowRect.size.width = [window minSize].width;
-    
+    windowRect.size.width = [window minSize].width;    
     return windowRect;
 }
 
@@ -328,11 +326,7 @@
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
 {
-    NSWindow * window = [self window];
-    NSRect frame = [window frame];
-
     float height;
-    
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
         height = TAB_ACTIVITY_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
@@ -342,7 +336,10 @@
     else
         height = TAB_INFO_HEIGHT;
     
+    NSWindow * window = [self window];
+    NSRect frame = [window frame];
     NSView * view = [[fTabView selectedTabViewItem] view];
+    
     float difference = height - [view frame].size.height;
     frame.origin.y -= difference;
     frame.size.height += difference;

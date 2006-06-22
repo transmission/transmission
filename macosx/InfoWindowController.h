@@ -27,7 +27,8 @@
 
 @interface InfoWindowController : NSWindowController
 {
-    NSMutableArray * fTorrents, * fFiles;
+    NSArray * fTorrents;
+    NSMutableArray * fFiles;
     NSImage * fAppIcon;
     
     IBOutlet NSTabView * fTabView;
