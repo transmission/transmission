@@ -1,5 +1,19 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.6 (2006/06/21)
+ - Ability to limit download rate
+ - Ability to automatically stop seeding at a given ratio
+ - Automatic banning of peers who send bad data
+ - Can keep a copy of the torrent file so the original can be deleted
+ - Many bugfixes
+ - OS X:
+   + Reworked interface
+   + Rate limits can be changed directly from the main window
+   + Allows sorting of the tranfers list
+   + Extended Info Inspector
+   + Automatic updating with Sparkle
+ - GTK+:
+
 0.5 (2006/02/11)
  - Only uses one port for all torrents
  - Rewritten choking algorithm
