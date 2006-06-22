@@ -13,6 +13,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Extended Info Inspector
    + Automatic updating with Sparkle
  - GTK+:
+   + Add torrents via command line. If Transmission already running,
+       add them to running copy
+   + Improved long filename handling
 
 0.5 (2006/02/11)
  - Only uses one port for all torrents
