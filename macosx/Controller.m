@@ -295,7 +295,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         return;
 
     //stop running torrents and wait for them to stop (5 seconds timeout)
-    [fTorrents makeObjectsPerformSelector: @selector(stop)];
+    [fTorrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     NSDate * start = [NSDate date];
     Torrent * torrent;
