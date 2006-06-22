@@ -29,18 +29,11 @@ else
 VERSION_PACKAGE = $(VERSION_STRING)-r$(VERSION_REVISION)
 endif
 	
-URL = printf "[InternetShortcut]\nURL=http://transmission.m0k.org%s\n"
 define PACKAGE_RULE1
 	$(RM) tmp "Transmission $(VERSION_PACKAGE)" \
 	  Transmission-$(VERSION_PACKAGE).dmg
 	mkdir -p tmp
 	cp -R macosx/Transmission.app tmp/
-	cp AUTHORS tmp/AUTHORS.txt
-	cp LICENSE tmp/LICENSE.txt
-	cp NEWS tmp/NEWS.txt
-	$(URL) "/" > tmp/Homepage.url
-	$(URL) "/forum" > tmp/Forums.url
-	$(URL) "/contribute.php" > tmp/Contribute.url
 endef
 define PACKAGE_RULE2
 	mv tmp "Transmission $(VERSION_PACKAGE)"

@@ -4,7 +4,7 @@
 
 # Get current SVN revision from Ids in all source files
 REVMAX=0
-for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk' 'Makefile' 'configure'; do
+for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk' '*.in' 'Makefile' 'configure'; do
   for f in `find . -name "$pattern"`; do 
     REV=`sed -e '/\$Id:/!d' -e \
          's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' \
