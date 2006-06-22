@@ -101,6 +101,7 @@
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
+		A28C43F40A4A5D700091A302 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A28C43EB0A4A5D700091A302 /* Transmission Help */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
@@ -280,6 +281,7 @@
 		A27A53640A06AED200E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A27A53650A06AEDB00E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
+		A28C43EB0A4A5D700091A302 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
@@ -378,6 +380,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A28C43EB0A4A5D700091A302 /* Transmission Help */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
 				A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */,
@@ -672,6 +675,7 @@
 				A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */,
 				A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */,
 				A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */,
+				A28C43F40A4A5D700091A302 /* Transmission Help in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
