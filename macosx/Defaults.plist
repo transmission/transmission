@@ -28,6 +28,8 @@
 	<integer>100</integer>
 	<key>History</key>
 	<array/>
+	<key>InfoTab</key>
+	<string>Info</string>
 	<key>InfoVisible</key>
 	<false/>
 	<key>Move</key>

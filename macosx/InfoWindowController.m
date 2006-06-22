@@ -43,6 +43,12 @@
 #define TAB_OPTIONS_HEIGHT 82.0
 #define TAB_FILES_HEIGHT 250.0
 
+@interface InfoWindowController (Private)
+
+- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
+
+@end
+
 @implementation InfoWindowController
 
 - (void) awakeFromNib
@@ -60,14 +66,9 @@
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
-    NSRect frame = [window frame];
-    float difference = TAB_INFO_HEIGHT - [[[fTabView selectedTabViewItem] view] frame].size.height;
-    frame.origin.y -= difference;
-    frame.size.height += difference;
-    [window setFrame: frame display: YES];
-    
-    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
-    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
+    NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InfoTab"];
+    [fTabView selectTabViewItemWithIdentifier: identifier];
+    [self setWindowForTab: identifier animate: NO];
 }
 
 - (void) dealloc
@@ -320,28 +321,40 @@
 
 - (void) tabView: (NSTabView *) tabView didSelectTabViewItem: (NSTabViewItem *) tabViewItem
 {
+    NSString * identifier = [tabViewItem identifier];
+    [self setWindowForTab: identifier animate: YES];
+    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InfoTab"];
+}
+
+- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
+{
     NSWindow * window = [self window];
     NSRect frame = [window frame];
 
     float height;
-    NSString * identifier = [tabViewItem identifier];
-    if ([identifier isEqualToString: TAB_INFO_IDENT])
-        height = TAB_INFO_HEIGHT;
-    else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
+    
+    if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
         height = TAB_ACTIVITY_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
-    else
+    else if ([identifier isEqualToString: TAB_FILES_IDENT])
         height = TAB_FILES_HEIGHT;
+    else
+        height = TAB_INFO_HEIGHT;
     
-    NSView * view = [tabViewItem view];
+    NSView * view = [[fTabView selectedTabViewItem] view];
     float difference = height - [view frame].size.height;
     frame.origin.y -= difference;
     frame.size.height += difference;
     
-    [view setHidden: YES];
-    [window setFrame: frame display: YES animate: YES];
-    [view setHidden: NO];
+    if (animate)
+    {
+        [view setHidden: YES];
+        [window setFrame: frame display: YES animate: YES];
+        [view setHidden: NO];
+    }
+    else
+        [window setFrame: frame display: YES];
     
     [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
     [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
