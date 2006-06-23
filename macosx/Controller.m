@@ -214,6 +214,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [nc addObserver: self selector: @selector(checkWaitingForFinished:)
                     name: @"TorrentFinishedDownloading" object: nil];
+    
+    [nc addObserver: self selector: @selector(startSettingChange:)
+                    name: @"StartSettingChange" object: nil];
 
     //timer to update the interface
     fCompleted = 0;
@@ -983,6 +986,65 @@ static void sleepCallBack(void * controller, io_service_t y,
         [torrentToStart startTransfer];
         [self updateUI: nil];
     }
+}
+
+- (void) startSettingChange: (NSNotification *) notification
+{
+    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+    
+    if ([startSetting isEqualToString: @"Start"])
+    {
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent waitingToStart])
+                [torrent startTransfer];
+    }
+    else if ([startSetting isEqualToString: @"Wait"])
+    {
+        NSMutableArray * waitingTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
+    
+        int amountToStart = [fDefaults integerForKey: @"WaitToStartNumber"];
+        
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+        {
+            if ([torrent isActive])
+            {
+                if (![torrent isSeeding])
+                    amountToStart--;
+            }
+            else if ([torrent waitingToStart])
+                [waitingTorrents addObject: torrent];
+            else;
+        }
+        
+        int waitingCount = [waitingTorrents count];
+        if (amountToStart > waitingCount)
+            amountToStart = waitingCount;
+        
+        //sort torrents by date to start earliest added
+        if (amountToStart > 0 && amountToStart < waitingCount)
+        {
+            NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                        @"date" ascending: YES] autorelease];
+            NSArray * descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nil];
+            
+            [waitingTorrents sortUsingDescriptors: descriptors];
+            [descriptors release];
+        }
+        
+        int i;
+        for (i = 0; i < amountToStart; i++)
+            [[waitingTorrents objectAtIndex: i] startTransfer];
+        
+        [waitingTorrents release];
+    }
+    else;
+    
+    [self updateUI: nil];
+    #warning reload inspector
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

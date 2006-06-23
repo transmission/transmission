@@ -452,7 +452,7 @@
     else
         [fDefaults setInteger: waitNumber forKey: @"WaitToStartNumber"];
     
-    #warning notification recheck
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"StartSettingChange" object: self];
 }
 
 - (void) setMoveTorrent: (id) sender
