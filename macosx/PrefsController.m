@@ -452,7 +452,7 @@
     else
         [fDefaults setInteger: waitNumber forKey: @"WaitToStartNumber"];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"StartSettingChange" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
 }
 
 - (void) setMoveTorrent: (id) sender

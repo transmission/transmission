@@ -243,9 +243,9 @@
         BOOL wasSeeding = [self isSeeding];
     
         tr_torrentStop(fHandle);
-        
+
         if (!wasSeeding)
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
     }
 }
 
@@ -452,11 +452,7 @@
 
 - (BOOL) justFinished
 {
-    BOOL finished = tr_getFinished(fHandle);
-    if (finished)
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
-    
-    return finished;
+    return tr_getFinished(fHandle);
 }
 
 - (NSString *) progressString
@@ -597,7 +593,7 @@
     fFinishedSeeding = NO;
     
     fWaitToStart = waitToStart ? [waitToStart boolValue]
-                    : [[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"];
+                    : ![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Manual"];
     
     NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];

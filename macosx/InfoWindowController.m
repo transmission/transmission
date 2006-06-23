@@ -197,8 +197,9 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         [fWaitToStartButton setState: [torrent waitingToStart]];
         
-        [fWaitToStartButton setEnabled: ![torrent isActive] && [torrent progress] < 1.0
-            && [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"] isEqualToString: @"Wait"]];
+        #warning disable if actively downloading or finished
+        [fWaitToStartButton setEnabled:
+            [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"] isEqualToString: @"Wait"]];
     }
     else
     {
@@ -470,14 +471,12 @@
 
 - (void) setWaitToStart: (id) sender
 {
-    BOOL wait = [sender state];
-
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        [torrent setWaitToStart: wait];
+        [torrent setWaitToStart: [sender state]];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"StartSettingChange" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStartSettingChange" object: torrent];
 }
 
 @end
