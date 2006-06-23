@@ -145,7 +145,7 @@
         
         fStat = tr_torrentStat(fHandle);
         
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRatioChanged" object: self];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentSettingChange" object: self];
     }
 
     [fProgressString setString: @""];
@@ -231,6 +231,8 @@
 
         fFinishedSeeding = NO;
         fWaitToStart = NO;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentSettingChange" object: self];
     }
 }
 

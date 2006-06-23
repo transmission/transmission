@@ -203,9 +203,6 @@ static void sleepCallBack(void * controller, io_service_t y,
                     name: SUUpdaterWillRestartNotification object: nil];
     fUpdateInProgress = NO;
     
-    [nc addObserver: self selector: @selector(ratioSingleChange:)
-                    name: @"TorrentRatioChanged" object: nil];
-    
     [nc addObserver: self selector: @selector(limitGlobalChange:)
                     name: @"LimitGlobalChange" object: nil];
     
@@ -217,6 +214,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [nc addObserver: self selector: @selector(startSettingChange:)
                     name: @"StartSettingChange" object: nil];
+    
+    [nc addObserver: self selector: @selector(reloadInspector:)
+                    name: @"TorrentSettingChange" object: nil];
 
     //timer to update the interface
     fCompleted = 0;
@@ -233,7 +233,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     //show windows
     [fWindow makeKeyAndOrderFront: nil];
 
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self reloadInspector: nil];
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
 }
@@ -938,14 +938,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     [dict release];
 }
 
-- (void) ratioSingleChange: (NSNotification *) notification
-{
-    //update info for changed ratio setting
-    NSArray * torrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
-    if ([torrents containsObject: [notification object]])
-        [fInfoController updateInfoForTorrents: torrents];
-}
-
 - (void) checkWaitingForFinished: (NSNotification *) notification
 {
     //don't try to start a transfer if there should be none waiting
@@ -1025,7 +1017,6 @@ static void sleepCallBack(void * controller, io_service_t y,
         }
         
         int waitingCount = [waitingTorrents count];
-        
         if (amountToStart > 0 && waitingCount > 0)
         {
             if (amountToStart > waitingCount)
@@ -1052,7 +1043,14 @@ static void sleepCallBack(void * controller, io_service_t y,
     else;
     
     [self updateUI: nil];
-    #warning reload inspector
+    
+    //update info for changed start setting
+    [self reloadInspector: nil];
+}
+
+- (void) reloadInspector: (NSNotification *) notification
+{
+    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
@@ -1092,8 +1090,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes:
-                                    [fTableView selectedRowIndexes]]];
+    [self reloadInspector: nil];
 }
 
 - (void) toggleStatusBar: (id) sender

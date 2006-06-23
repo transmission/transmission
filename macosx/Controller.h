@@ -131,9 +131,11 @@
 - (void) setRatioGlobalEnabled: (id) sender;
 - (void) setQuickRatioGlobal: (id) sender;
 - (void) ratioGlobalChange: (NSNotification *) notification;
-- (void) ratioSingleChange: (NSNotification *) notification;
 
 - (void) checkWaitingForFinished: (NSNotification *) notification;
+- (void) startSettingChange: (NSNotification *) notification;
+
+- (void) reloadInspector: (NSNotification *) notification;
 
 - (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;
