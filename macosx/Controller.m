@@ -492,7 +492,15 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
 {
+    //don't want any of these starting then stopping
     unsigned int i;
+    Torrent * torrent;
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+    {
+        torrent = [fTorrents objectAtIndex: i];
+        [torrent setWaitToStart: NO];
+    }
+
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [[fTorrents objectAtIndex: i] stopTransfer];
     
@@ -1031,7 +1039,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
 {
-    [self attemptToStartAuto: [notification object]];
+    Torrent * torrent = [notification object];
+    [self attemptToStartAuto: torrent];
 
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -1041,9 +1050,10 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
     #warning should check if transfer was already done
+    NSLog([torrent name]);
     if (![torrent waitingToStart])
-        return;
-
+            return;
+    
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
     if ([startSetting isEqualToString: @"Wait"])
     {
