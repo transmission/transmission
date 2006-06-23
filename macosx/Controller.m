@@ -970,7 +970,9 @@ static void sleepCallBack(void * controller, io_service_t y,
         }
         else
         {
-            if (!torrentToStart && [torrent waitingToStart])
+            //use as next if it is waiting to start and either no previous is or the previous has later date
+            if ([torrent waitingToStart] && (!torrentToStart
+                || [[torrentToStart date] compare: [torrent date]] == NSOrderedDescending))
                 torrentToStart = torrent;
         }
     }
