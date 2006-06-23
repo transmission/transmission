@@ -30,7 +30,7 @@
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
-        ratioLimit: (NSNumber *) ratioLimit;
+        ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart;
 
 - (void) trashFile: (NSString *) path;
 
@@ -42,7 +42,7 @@
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
     self = [self initWithHash: nil path: path lib: lib privateTorrent: nil publicTorrent: nil
-            date: nil stopRatioSetting: nil ratioLimit: nil];
+            date: nil stopRatioSetting: nil ratioLimit: nil waitToStart: nil];
     
     if (self)
     {
@@ -60,7 +60,8 @@
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 date: [history objectForKey: @"Date"]
                 stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
-                ratioLimit: [history objectForKey: @"RatioLimit"]];
+                ratioLimit: [history objectForKey: @"RatioLimit"]
+                waitToStart: [history objectForKey: @"WaitToStart"]];
     
     if (self)
     {
@@ -85,7 +86,8 @@
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
                     [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
-                    [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit", nil];
+                    [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
+                    [NSNumber numberWithBool: fWaitToStart], @"WaitToStart", nil];
             
     if (fPrivateTorrent)
         [history setObject: [self hashString] forKey: @"TorrentHash"];
@@ -158,7 +160,12 @@
     switch (fStat->status)
     {
         case TR_STATUS_PAUSE:
-            [fStatusString setString: fFinishedSeeding ? @"Seeding Complete" : @"Paused"];
+            if (fFinishedSeeding)
+                [fStatusString setString: @"Seeding complete"];
+            else if (fWaitToStart)
+                [fStatusString setString: [@"Waiting to start" stringByAppendingEllipsis]];
+            else
+                [fStatusString setString: @"Paused"];
             break;
 
         case TR_STATUS_CHECK:
@@ -221,14 +228,23 @@
     if (![self isActive])
     {
         tr_torrentStart(fHandle);
+
         fFinishedSeeding = NO;
+        fWaitToStart = NO;
     }
 }
 
 - (void) stopTransfer
 {
     if ([self isActive])
+    {
+        BOOL wasSeeding = [self isSeeding];
+    
         tr_torrentStop(fHandle);
+        
+        if (!wasSeeding)
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+    }
 }
 
 - (void) removeForever
@@ -240,13 +256,13 @@
 - (void) sleep
 {
     if ((fResumeOnWake = [self isActive]))
-        [self stopTransfer];
+        tr_torrentStop(fHandle);
 }
 
 - (void) wakeUp
 {
     if (fResumeOnWake)
-        [self startTransfer];
+        tr_torrentStart(fHandle);
 }
 
 - (float) ratio
@@ -274,6 +290,16 @@
 {
     if (limit >= 0)
         fRatioLimit = limit;
+}
+
+- (void) setWaitToStart: (BOOL) wait
+{
+    fWaitToStart = wait;
+}
+
+- (BOOL) waitingToStart
+{
+    return fWaitToStart;
 }
 
 - (void) revealData
@@ -424,7 +450,11 @@
 
 - (BOOL) justFinished
 {
-    return tr_getFinished(fHandle);
+    BOOL finished = tr_getFinished(fHandle);
+    if (finished)
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+    
+    return finished;
 }
 
 - (NSString *) progressString
@@ -528,7 +558,7 @@
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
-        ratioLimit: (NSNumber *) ratioLimit
+        ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
 {
     if (!(self = [super init]))
         return nil;
@@ -563,6 +593,9 @@
     fStopRatioSetting = stopRatioSetting ? [stopRatioSetting intValue] : -1;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
+    
+    fWaitToStart = waitToStart ? [waitToStart boolValue]
+                    : [[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"];
     
     NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];

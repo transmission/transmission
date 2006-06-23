@@ -30,7 +30,11 @@
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
-#define DOWNLOAD_ASK        3
+#define DOWNLOAD_ASK    3
+
+#define START_YES_CHECK_TAG     0
+#define START_WAIT_CHECK_TAG    1
+#define START_NO_CHECK_TAG      2
 
 #define UPDATE_DAILY    0
 #define UPDATE_WEEKLY   1
@@ -142,8 +146,19 @@
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
     
-    //set auto start
-    [fAutoStartCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
+    //set start setting
+    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+    int tag;
+    if ([startSetting isEqualToString: @"Start"])
+        tag = START_YES_CHECK_TAG;
+    else if ([startSetting isEqualToString: @"Wait"])
+        tag = START_WAIT_CHECK_TAG;
+    else
+        tag = START_NO_CHECK_TAG;
+    
+    [fStartMatrix selectCellWithTag: tag];
+    [fWaitToStartField setEnabled: tag == START_WAIT_CHECK_TAG];
+    [fWaitToStartField setIntValue: [fDefaults integerForKey: @"WaitToStartNumber"]];
     
     //set private torrents
     BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
@@ -407,9 +422,37 @@
     [fUpdater scheduleCheckWithInterval: seconds];
 }
 
-- (void) setAutoStart: (id) sender
+- (void) setStartSetting: (id) sender
 {
-    [fDefaults setBool: [sender state] forKey: @"AutoStartDownload"];
+    NSString * startSetting;
+
+    int tag = [[fStartMatrix selectedCell] tag];
+    if (tag == START_YES_CHECK_TAG)
+        startSetting = @"Start";
+    else if (tag == START_WAIT_CHECK_TAG)
+        startSetting = @"Wait";
+    else
+        startSetting = @"Manual";
+    
+    [fDefaults setObject: startSetting forKey: @"StartSetting"];
+    
+    [self setWaitToStart: fWaitToStartField];
+    [fWaitToStartField setEnabled: tag == START_WAIT_CHECK_TAG];
+}
+
+- (void) setWaitToStart: (id) sender
+{
+    int waitNumber = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithInt: waitNumber]] || waitNumber < 1)
+    {
+        NSBeep();
+        waitNumber = [fDefaults floatForKey: @"WaitToStartNumber"];
+        [sender setIntValue: waitNumber];
+    }
+    else
+        [fDefaults setInteger: waitNumber forKey: @"WaitToStartNumber"];
+    
+    #warning notification recheck
 }
 
 - (void) setMoveTorrent: (id) sender

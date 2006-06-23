@@ -408,11 +408,10 @@
 
 - (void) setRatioCheck: (id) sender
 {
-    NSButtonCell * selected = [fRatioMatrix selectedCell];
-    int ratioSetting;
-    if (selected == [fRatioMatrix cellWithTag: RATIO_CHECK_TAG])
+    int ratioSetting, tag = [[fRatioMatrix selectedCell] tag];
+    if (tag == RATIO_CHECK_TAG)
         ratioSetting = RATIO_CHECK;
-    else if (selected == [fRatioMatrix cellWithTag: RATIO_NO_CHECK_TAG])
+    else if (tag == RATIO_NO_CHECK_TAG)
         ratioSetting = RATIO_NO_CHECK;
     else
         ratioSetting = RATIO_GLOBAL;
@@ -423,7 +422,7 @@
         [torrent setStopRatioSetting: ratioSetting];
     
     [self setRatioLimit: fRatioLimitField];
-    [fRatioLimitField setEnabled: selected == [fRatioMatrix cellWithTag: RATIO_CHECK_TAG]];
+    [fRatioLimitField setEnabled: tag == RATIO_CHECK_TAG];
 }
 
 - (void) setRatioLimit: (id) sender

@@ -211,6 +211,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [nc addObserver: self selector: @selector(ratioGlobalChange:)
                     name: @"RatioGlobalChange" object: nil];
+    
+    [nc addObserver: self selector: @selector(checkWaitingForFinished:)
+                    name: @"TorrentFinishedDownloading" object: nil];
 
     //timer to update the interface
     fCompleted = 0;
@@ -317,8 +320,22 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     if (code == NSOKButton)
     {
+        //setup for autostart
+        NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+        BOOL waitToStart = [startSetting isEqualToString: @"Wait"];
+        int desiredActive, active = 0;
+        if (waitToStart)
+        {
+            desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+            Torrent * tempTorrent;
+            NSEnumerator * enumerator = [fTorrents objectEnumerator];
+            while ((tempTorrent = [enumerator nextObject]))
+                if ([tempTorrent isActive] && ![tempTorrent isSeeding])
+                    active++;
+        }
+    
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
-        if ([fDefaults boolForKey: @"AutoStartDownload"])
+        if ((waitToStart && active < desiredActive) || [startSetting isEqualToString: @"Start"])
             [torrent startTransfer];
         [fTorrents addObject: torrent];
         
@@ -328,12 +345,24 @@ static void sleepCallBack(void * controller, io_service_t y,
     [NSApp stopModal];
 }
 
-- (void) application: (NSApplication *) sender
-         openFiles: (NSArray *) filenames
+- (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
 {
-    BOOL autoStart = [fDefaults boolForKey: @"AutoStartDownload"];
-    
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"], * torrentPath;
+    
+    //setup for autostart
+    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+    BOOL waitToStart = [startSetting isEqualToString: @"Wait"];
+    int desiredActive, active = 0;
+    if (waitToStart && ![downloadChoice isEqualToString: @"Ask"])
+    {
+        desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+        Torrent * tempTorrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((tempTorrent = [enumerator nextObject]))
+            if ([tempTorrent isActive] && ![tempTorrent isSeeding])
+                active++;
+    }
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
@@ -341,7 +370,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath lib: fLib]))
             continue;
 
-        /* Add it to the "File > Open Recent" menu */
+        //add it to the "File > Open Recent" menu
         [[NSDocumentController sharedDocumentController]
             noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
 
@@ -370,8 +399,12 @@ static void sleepCallBack(void * controller, io_service_t y,
                 : [torrentPath stringByDeletingLastPathComponent];
 
             [torrent setDownloadFolder: folder];
-            if (autoStart)
+            #warning should check if transfer was already done
+            if ((waitToStart && active < desiredActive) || [startSetting isEqualToString: @"Start"])
+            {
                 [torrent startTransfer];
+                active++;
+            }
             [fTorrents addObject: torrent];
         }
         
@@ -502,7 +535,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         if ([torrent isActive])
             active++;
 
-    if( active > 0 && [fDefaults boolForKey: @"CheckRemove"] )
+    if (active > 0 && [fDefaults boolForKey: @"CheckRemove"])
     {
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
             torrents, @"Torrents",
@@ -908,6 +941,46 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSArray * torrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
     if ([torrents containsObject: [notification object]])
         [fInfoController updateInfoForTorrents: torrents];
+}
+
+- (void) checkWaitingForFinished: (NSNotification *) notification
+{
+    //don't try to start a transfer if there should be none waiting
+    if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
+        return;
+
+    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"], active = 0;
+    
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent, * torrentToStart = nil;
+    while ((torrent = [enumerator nextObject]))
+    {
+        //ignore the torrent just stopped; for some reason it is not marked instantly as not active
+        if (torrent == [notification object])
+            continue;
+    
+        if ([torrent isActive])
+        {
+            if (![torrent isSeeding])
+            {
+                active++;
+                if (active >= desiredActive)
+                    return;
+            }
+        }
+        else
+        {
+            if (!torrentToStart && [torrent waitingToStart])
+                torrentToStart = torrent;
+        }
+    }
+    
+    //since it hasn't returned, the queue amount has not been met
+    if (torrentToStart)
+    {
+        [torrentToStart startTransfer];
+        [self updateUI: nil];
+    }
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

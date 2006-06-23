@@ -49,7 +49,7 @@
     
     int     fStopRatioSetting;
     float   fRatioLimit;
-    BOOL    fFinishedSeeding;
+    BOOL    fFinishedSeeding, fWaitToStart;
 }
 
 - (id)  initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
@@ -73,6 +73,9 @@
 - (void)        setStopRatioSetting: (int) setting;
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
+
+- (void) setWaitToStart: (BOOL) wait;
+- (BOOL) waitingToStart;
 
 - (void)    revealData;
 - (void)    trashData;

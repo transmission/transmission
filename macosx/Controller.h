@@ -133,6 +133,8 @@
 - (void) ratioGlobalChange: (NSNotification *) notification;
 - (void) ratioSingleChange: (NSNotification *) notification;
 
+- (void) checkWaitingForFinished: (NSNotification *) notification;
+
 - (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;
 

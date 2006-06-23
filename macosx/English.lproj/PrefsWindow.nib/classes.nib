@@ -5,7 +5,6 @@
         {
             ACTIONS = {
                 folderSheetShow = id; 
-                setAutoStart = id; 
                 setBadge = id; 
                 setDownloadLocation = id; 
                 setLimit = id; 
@@ -15,12 +14,13 @@
                 setRatio = id; 
                 setRatioCheck = id; 
                 setShowMessage = id; 
+                setStartSetting = id; 
                 setUpdate = id; 
+                setWaitToStart = id; 
             }; 
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                fAutoStartCheck = NSButton; 
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
                 fCopyTorrentCheck = NSButton; 
@@ -35,11 +35,13 @@
                 fRatioCheck = NSButton; 
                 fRatioField = NSTextField; 
                 fRemoveCheck = NSButton; 
+                fStartMatrix = NSMatrix; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
                 fUpdater = SUUpdater; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
+                fWaitToStartField = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
