@@ -1039,8 +1039,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
 {
-    Torrent * torrent = [notification object];
-    [self attemptToStartAuto: torrent];
+    [self attemptToStartAuto: [notification object]];
 
     [self updateUI: nil];
     [self updateTorrentHistory];
@@ -1050,7 +1049,6 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
     #warning should check if transfer was already done
-    NSLog([torrent name]);
     if (![torrent waitingToStart])
             return;
     

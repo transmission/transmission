@@ -471,10 +471,9 @@
 
 - (void) setWaitToStart: (id) sender
 {
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        [torrent setWaitToStart: [sender state]];
+    #warning make work with multiples
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    [torrent setWaitToStart: [sender state]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStartSettingChange" object: torrent];
 }
