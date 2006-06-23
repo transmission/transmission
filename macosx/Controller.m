@@ -1013,7 +1013,11 @@ static void sleepCallBack(void * controller, io_service_t y,
             if ([torrent isActive])
             {
                 if (![torrent isSeeding])
+                {
                     amountToStart--;
+                    if (amountToStart <= 0)
+                        break;
+                }
             }
             else if ([torrent waitingToStart])
                 [waitingTorrents addObject: torrent];
@@ -1021,23 +1025,27 @@ static void sleepCallBack(void * controller, io_service_t y,
         }
         
         int waitingCount = [waitingTorrents count];
-        if (amountToStart > waitingCount)
-            amountToStart = waitingCount;
         
-        //sort torrents by date to start earliest added
-        if (amountToStart > 0 && amountToStart < waitingCount)
+        if (amountToStart > 0 && waitingCount > 0)
         {
-            NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                        @"date" ascending: YES] autorelease];
-            NSArray * descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nil];
+            if (amountToStart > waitingCount)
+                amountToStart = waitingCount;
             
-            [waitingTorrents sortUsingDescriptors: descriptors];
-            [descriptors release];
+            //sort torrents by date to start earliest added
+            if (amountToStart < waitingCount)
+            {
+                NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                            @"date" ascending: YES] autorelease];
+                NSArray * descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nil];
+                
+                [waitingTorrents sortUsingDescriptors: descriptors];
+                [descriptors release];
+            }
+            
+            int i;
+            for (i = 0; i < amountToStart; i++)
+                [[waitingTorrents objectAtIndex: i] startTransfer];
         }
-        
-        int i;
-        for (i = 0; i < amountToStart; i++)
-            [[waitingTorrents objectAtIndex: i] startTransfer];
         
         [waitingTorrents release];
     }
