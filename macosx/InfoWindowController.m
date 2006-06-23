@@ -38,9 +38,9 @@
 #define TAB_FILES_IDENT @"Files"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 185.0
-#define TAB_ACTIVITY_HEIGHT 199.0
-#define TAB_OPTIONS_HEIGHT 82.0
+#define TAB_INFO_HEIGHT 182.0
+#define TAB_ACTIVITY_HEIGHT 198.0
+#define TAB_OPTIONS_HEIGHT 116.0
 #define TAB_FILES_HEIGHT 250.0
 
 @interface InfoWindowController (Private)
@@ -189,6 +189,22 @@
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
+    
+    //set wait to start
+    if (numberSelected == 1)
+    {
+        #warning make work for multiple torrents
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        [fWaitToStartButton setState: [torrent waitingToStart]];
+        
+        [fWaitToStartButton setEnabled: ![torrent isActive] && [torrent progress] < 1.0
+            && [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"] isEqualToString: @"Wait"]];
+    }
+    else
+    {
+        [fWaitToStartButton setState: NSOffState];
+        [fWaitToStartButton setEnabled: NO];
+    }
     
     //set ratio settings
     if (numberSelected > 0)
@@ -450,6 +466,18 @@
         while ((torrent = [enumerator nextObject]))
             [torrent setRatioLimit: ratioLimit];
     }
+}
+
+- (void) setWaitToStart: (id) sender
+{
+    BOOL wait = [sender state];
+
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        [torrent setWaitToStart: wait];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"StartSettingChange" object: self];
 }
 
 @end
