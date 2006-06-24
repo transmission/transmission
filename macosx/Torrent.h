@@ -50,6 +50,8 @@
     int     fStopRatioSetting;
     float   fRatioLimit;
     BOOL    fFinishedSeeding, fWaitToStart;
+    
+    int fOrderValue;
 }
 
 - (id)  initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
@@ -124,6 +126,9 @@
 - (float)       downloadedValid;
 - (uint64_t)    downloadedTotal;
 - (uint64_t)    uploadedTotal;
+
+- (NSNumber *) orderValue;
+- (void) setOrderValue: (int) orderValue;
 
 - (NSArray *) fileList;
 

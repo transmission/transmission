@@ -30,7 +30,8 @@
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
-        ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart;
+        ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
+        orderValue: (NSNumber *) orderValue;
 
 - (void) trashFile: (NSString *) path;
 
@@ -42,7 +43,7 @@
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
     self = [self initWithHash: nil path: path lib: lib privateTorrent: nil publicTorrent: nil
-            date: nil stopRatioSetting: nil ratioLimit: nil waitToStart: nil];
+            date: nil stopRatioSetting: nil ratioLimit: nil waitToStart: nil orderValue: nil];
     
     if (self)
     {
@@ -61,7 +62,8 @@
                 date: [history objectForKey: @"Date"]
                 stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
-                waitToStart: [history objectForKey: @"WaitToStart"]];
+                waitToStart: [history objectForKey: @"WaitToStart"]
+                orderValue: [history objectForKey: @"OrderValue"]];
     
     if (self)
     {
@@ -87,7 +89,8 @@
                     [self date], @"Date",
                     [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
-                    [NSNumber numberWithBool: fWaitToStart], @"WaitToStart", nil];
+                    [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
+                    [self orderValue], @"OrderValue", nil];
             
     if (fPrivateTorrent)
         [history setObject: [self hashString] forKey: @"TorrentHash"];
@@ -517,6 +520,16 @@
     return fStat->uploaded;
 }
 
+- (NSNumber *) orderValue
+{
+    return [NSNumber numberWithInt: fOrderValue];
+}
+
+- (void) setOrderValue: (int) orderValue
+{
+    fOrderValue = orderValue;
+}
+
 - (NSArray *) fileList
 {
     int count = fInfo->fileCount, i;
@@ -557,6 +570,7 @@
         privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
         ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
+        orderValue: (NSNumber *) orderValue
 {
     if (!(self = [super init]))
         return nil;
@@ -604,6 +618,8 @@
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
+    
+    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
 
     [self update];
     return self;
@@ -611,12 +627,12 @@
 
 - (void) trashFile: (NSString *) path
 {
+    //attempt to move to trash
     if (![[NSWorkspace sharedWorkspace] performFileOperation: NSWorkspaceRecycleOperation
             source: [path stringByDeletingLastPathComponent] destination: @""
             files: [NSArray arrayWithObject: [path lastPathComponent]] tag: nil])
     {
-        /* We can't move it to the trash, let's try just to delete it
-           (will work if it is on a remote volume) */
+        //if cannot trash, just delete it (will work if it is on a remote volume)
         if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
             NSLog([@"Could not trash " stringByAppendingString: path]);
     }
