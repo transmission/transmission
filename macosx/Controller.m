@@ -578,8 +578,15 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) confirmRemove: (NSArray *) torrents
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
-    Torrent * torrent;
+    //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent setWaitToStart: NO];
+
+    NSNumber * lowestOrderValue = [NSNumber numberWithInt: [torrents count]], * currentOrederValue;
+
+    enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
         [torrent stopTransfer];
@@ -588,11 +595,31 @@ static void sleepCallBack(void * controller, io_service_t y,
             [torrent trashData];
         if (deleteTorrent)
             [torrent trashTorrent];
+        
+        //determine lowest order value
+        currentOrederValue = [torrent orderValue];
+        if ([lowestOrderValue compare: currentOrederValue] == NSOrderedDescending)
+            lowestOrderValue = currentOrederValue;
 
         [torrent removeForever];
         [fTorrents removeObject: torrent];
     }
     [torrents release];
+
+    //reset the order values if necessary
+    if ([lowestOrderValue intValue] < [fTorrents count])
+    {
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"orderValue" ascending: YES] autorelease];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+
+        NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+        [descriptors release];
+
+        int i;
+        for (i = [lowestOrderValue intValue]; i < [tempTorrents count]; i++)
+            [[tempTorrents objectAtIndex: i] setOrderValue: i];
+    }
     
     [self torrentNumberChanged];
     [fTableView deselectAll: nil];
