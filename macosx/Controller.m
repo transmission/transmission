@@ -954,9 +954,9 @@ static void sleepCallBack(void * controller, io_service_t y,
         }
         else
         {
-            //use as next if it is waiting to start and either no previous is or the previous has later date
+            //use as next if it is waiting to start and either no previous or order value is lower
             if ([torrent waitingToStart] && (!torrentToStart
-                || [[torrentToStart date] compare: [torrent date]] == NSOrderedDescending))
+                || [[torrentToStart orderValue] compare: [torrent orderValue]] == NSOrderedDescending))
                 torrentToStart = torrent;
         }
     }
@@ -1014,9 +1014,9 @@ static void sleepCallBack(void * controller, io_service_t y,
             //sort torrents by date to start earliest added
             if (amountToStart < waitingCount)
             {
-                NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                            @"date" ascending: YES] autorelease];
-                NSArray * descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nil];
+                NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                            @"orderValue" ascending: YES] autorelease];
+                NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
                 
                 [waitingTorrents sortUsingDescriptors: descriptors];
                 [descriptors release];
