@@ -530,6 +530,17 @@
     fOrderValue = orderValue;
 }
 
+//two convenience mutators
+- (void) incrementOrderValue
+{
+    fOrderValue++;
+}
+
+- (void) decrementOrderValue
+{
+    fOrderValue--;
+}
+
 - (NSArray *) fileList
 {
     int count = fInfo->fileCount, i;
