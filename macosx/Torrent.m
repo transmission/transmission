@@ -335,7 +335,7 @@
 
 - (NSString *) name
 {
-    return [[NSString stringWithUTF8String: fInfo->name] stringByAppendingFormat: @" %d", fOrderValue];
+    return [NSString stringWithUTF8String: fInfo->name];
 }
 
 - (uint64_t) size
