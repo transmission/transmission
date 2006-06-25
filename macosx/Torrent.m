@@ -165,7 +165,7 @@
         case TR_STATUS_PAUSE:
             if (fFinishedSeeding)
                 [fStatusString setString: @"Seeding complete"];
-            else if (fWaitToStart)
+            else if (fWaitToStart && [[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
                 [fStatusString setString: [@"Waiting to start" stringByAppendingEllipsis]];
             else
                 [fStatusString setString: @"Paused"];
