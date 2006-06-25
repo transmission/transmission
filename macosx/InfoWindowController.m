@@ -191,14 +191,13 @@
     [fFileTable reloadData];
     
     //set wait to start
-    if (numberSelected == 1)
+    if ([fTorrents count] == 1)
     {
         #warning make work for multiple torrents
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         [fWaitToStartButton setState: [torrent waitingToStart]];
-        
-        #warning disable if actively downloading or finished
-        [fWaitToStartButton setEnabled:
+
+        [fWaitToStartButton setEnabled: ![torrent isActive] && [torrent progress] < 1.0 &&
             [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"] isEqualToString: @"Wait"]];
     }
     else

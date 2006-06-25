@@ -476,6 +476,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [[fTorrents objectAtIndex: i] startTransfer];
     
     [self updateUI: nil];
+    [self reloadInspector: nil];
     [self updateTorrentHistory];
 }
 
@@ -505,6 +506,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [[fTorrents objectAtIndex: i] stopTransfer];
     
     [self updateUI: nil];
+    [self reloadInspector: nil];
     [self updateTorrentHistory];
 }
 
@@ -1069,6 +1071,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self attemptToStartAuto: [notification object]];
 
     [self updateUI: nil];
+    [self reloadInspector: nil];
     [self updateTorrentHistory];
 }
 
