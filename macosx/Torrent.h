@@ -129,8 +129,6 @@
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;
-- (void) incrementOrderValue;
-- (void) decrementOrderValue;
 
 - (NSArray *) fileList;
 

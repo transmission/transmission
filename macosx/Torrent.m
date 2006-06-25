@@ -179,7 +179,7 @@
             [fStatusString setString: @""];
             [fStatusString appendFormat:
                 @"Downloading from %d of %d peer%s", [self peersUploading], [self totalPeers],
-                ([self totalPeers] == 1) ? "" : "s"];
+                [self totalPeers] == 1 ? "" : "s"];
             
             int eta = [self eta];
             if (eta < 0)
@@ -201,8 +201,7 @@
             [fStatusString setString: @""];
             [fStatusString appendFormat:
                 @"Seeding to %d of %d peer%s",
-                [self peersDownloading], [self totalPeers],
-                ([self totalPeers] == 1) ? "" : "s"];
+                [self peersDownloading], [self totalPeers], [self totalPeers] == 1 ? "" : "s"];
             break;
 
         case TR_STATUS_STOPPING:
@@ -528,17 +527,6 @@
 - (void) setOrderValue: (int) orderValue
 {
     fOrderValue = orderValue;
-}
-
-//two convenience mutators
-- (void) incrementOrderValue
-{
-    fOrderValue++;
-}
-
-- (void) decrementOrderValue
-{
-    fOrderValue--;
 }
 
 - (NSArray *) fileList

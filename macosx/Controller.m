@@ -1091,7 +1091,6 @@ static void sleepCallBack(void * controller, io_service_t y,
 //will try to start, taking into consideration the start preference
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
-    #warning should check if transfer was already done
     if (![torrent waitingToStart])
             return;
     
