@@ -10,6 +10,7 @@
 
 id SUInfoValueForKey(NSString *key);
 NSString *SUHostAppName();
+NSString *SUHostAppDisplayName();
 NSString *SUHostAppVersion();
 NSString *SUHostAppVersionString();
 

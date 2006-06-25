@@ -45,6 +45,8 @@
 	<string>NSApplication</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
+	<key>SUCheckAtStartup</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>http://transmission.m0k.org/appcast.xml</string>
 </dict>
