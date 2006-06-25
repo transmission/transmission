@@ -49,6 +49,8 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUCheckAtStartup</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>http://transmission.m0k.org/appcast.xml</string>
 </dict>

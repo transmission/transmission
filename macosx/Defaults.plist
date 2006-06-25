@@ -40,8 +40,6 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
-	<key>SUCheckAtStartup</key>
-	<false/>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 	<key>SavePrivateTorrent</key>
