@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.6a (2006/06/25)
+0.6.1 (2006/06/25)
  - OS X:
    + Fixes a bug in the updater that could cause repeated hits to the
      appcast
