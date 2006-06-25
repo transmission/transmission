@@ -561,7 +561,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
   GList *errs;
   struct stat sb;
   int prelen = strlen(prefix);
-  GList *paths;
+  GList *paths, *freeables;
 
 #ifdef DND_DEBUG
   char *sele = gdk_atom_name(sel->selection);
@@ -582,6 +582,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
 
   errs = NULL;
   paths = NULL;
+  freeables = NULL;
   if(gdk_atom_intern("XdndSelection", FALSE) == sel->selection &&
      8 == sel->format) {
     /* split file list on carriage returns and linefeeds */
@@ -600,6 +601,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
         len = strlen(files + ii);
         /* de-urlencode the URI */
         decoded = urldecode(files + ii, len);
+        freeables = g_list_append(freeables, decoded);
         if(g_utf8_validate(decoded, -1, NULL)) {
           /* remove the file: prefix */
           if(prelen < len && 0 == strncmp(prefix, decoded, prelen)) {
@@ -616,16 +618,14 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
             paths = g_list_append(paths, deslashed);
           }
         }
-        g_free(decoded);
       }
     }
 
     /* try to add any torrents we found */
-    if(NULL != paths) {
+    if(NULL != paths)
       addtorrents(data, NULL, paths, NULL,
                   addactionflag(cf_getpref(PREF_ADDSTD)));
-      freestrlist(paths);
-    }
+    freestrlist(freeables);
     g_free(files);
   }
 
