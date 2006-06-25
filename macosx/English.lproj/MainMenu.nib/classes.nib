@@ -39,6 +39,7 @@
                 fDownloadNoLimitItem = NSMenuItem; 
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
+                fOrderSortItem = NSMenuItem; 
                 fPrevInfoTabItem = NSMenuItem; 
                 fProgressSortItem = NSMenuItem; 
                 fRatioNotSetItem = NSMenuItem; 

@@ -168,8 +168,10 @@ static void sleepCallBack(void * controller, io_service_t y,
         currentSortItem = fStateSortItem;
     else if ([fSortType isEqualToString: @"Progress"])
         currentSortItem = fProgressSortItem;
-    else
+    else if ([fSortType isEqualToString: @"Date"])
         currentSortItem = fDateSortItem;
+    else
+        currentSortItem = fOrderSortItem;
     [currentSortItem setState: NSOnState];
     
     //set upload limit action button
@@ -810,12 +812,12 @@ static void sleepCallBack(void * controller, io_service_t y,
 
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"name" ascending: YES] autorelease],
-                    * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"date" ascending: YES] autorelease];
+                    * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"orderValue" ascending: YES] autorelease];
 
     NSArray * descriptors;
     if ([fSortType isEqualToString: @"Name"])
-        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, dateDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
     else if ([fSortType isEqualToString: @"State"])
     {
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
@@ -824,17 +826,24 @@ static void sleepCallBack(void * controller, io_service_t y,
                                             @"progressSortKey" ascending: NO] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor,
-                                                            nameDescriptor, dateDescriptor, nil];
+                                                            nameDescriptor, orderDescriptor, nil];
     }
     else if ([fSortType isEqualToString: @"Progress"])
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"progressSortKey" ascending: YES] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, nameDescriptor, dateDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, nameDescriptor, orderDescriptor, nil];
+    }
+    else if ([fSortType isEqualToString: @"Date"])
+    {
+        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"date" ascending: YES] autorelease];
+    
+        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
     else
-        descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, nameDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
 
     [fTorrents sortUsingDescriptors: descriptors];
     
@@ -865,8 +874,10 @@ static void sleepCallBack(void * controller, io_service_t y,
         prevSortItem = fStateSortItem;
     else if ([fSortType isEqualToString: @"Progress"])
         prevSortItem = fProgressSortItem;
-    else
+    else if ([fSortType isEqualToString: @"Date"])
         prevSortItem = fDateSortItem;
+    else
+        prevSortItem = fOrderSortItem;
     
     if (sender != prevSortItem)
     {
@@ -880,8 +891,10 @@ static void sleepCallBack(void * controller, io_service_t y,
             fSortType = [[NSString alloc] initWithString: @"State"];
         else if (sender == fProgressSortItem)
             fSortType = [[NSString alloc] initWithString: @"Progress"];
-        else
+        else if (sender == fDateSortItem)
             fSortType = [[NSString alloc] initWithString: @"Date"];
+        else
+            fSortType = [[NSString alloc] initWithString: @"Order"];
            
         [fDefaults setObject: fSortType forKey: @"Sort"];
     }

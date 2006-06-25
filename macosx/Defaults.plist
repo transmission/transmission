@@ -47,7 +47,7 @@
 	<key>ShowInspector</key>
 	<false/>
 	<key>Sort</key>
-	<string>Date</string>
+	<string>Order</string>
 	<key>StartSetting</key>
 	<string>Start</string>
 	<key>StatusBar</key>

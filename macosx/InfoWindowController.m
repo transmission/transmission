@@ -191,7 +191,7 @@
     [fFileTable reloadData];
     
     //set wait to start
-    if ([fTorrents count] == 1)
+    if (numberSelected == 1)
     {
         #warning make work for multiple torrents
         Torrent * torrent = [fTorrents objectAtIndex: 0];

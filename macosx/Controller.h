@@ -59,8 +59,8 @@
     IBOutlet NSTextField        * fTotalTorrentsField;
     
     NSString                    * fSortType;
-    IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem,
-                                * fProgressSortItem, * fDateSortItem;
+    IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
+                                * fDateSortItem, * fOrderSortItem;
                                 
     IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
     
