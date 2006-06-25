@@ -234,7 +234,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
 {
-    if (!visibleWindows)
+    if (![fWindow isVisible] && ![[fPrefsController window] isVisible])
         [fWindow makeKeyAndOrderFront: nil];
     return NO;
 }
