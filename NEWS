@@ -1,5 +1,13 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.6a (2006/06/25)
+ - OS X:
+   + Fixes a bug in the updater that could cause repeated hits to the
+     appcast
+ - GTK+:
+   + Fixes drag-and-drop
+   + Adds Italian and French translations
+
 0.6 (2006/06/21)
  - Ability to limit download rate
  - Automatic banning of peers who send bad data
