@@ -503,6 +503,7 @@
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
 
     [panel beginSheetForDirectory: nil file: nil types: nil
         modalForWindow: [self window] modalDelegate: self didEndSelector:
