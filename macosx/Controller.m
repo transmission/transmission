@@ -258,14 +258,19 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
     {
-        int active = 0;
+        int active = 0, downloading = 0;
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
             if ([torrent isActive])
+            {
                 active++;
+                if (![torrent isSeeding])
+                    downloading++;
+            }
 
-        if (active > 0)
+        BOOL shouldAsk = [fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0;
+        if (shouldAsk)
         {
             NSString * message = active == 1
                 ? @"There is an active transfer. Do you really want to quit?"
@@ -516,15 +521,23 @@ static void sleepCallBack(void * controller, io_service_t y,
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     NSArray * torrents = [[self torrentsAtIndexes: indexSet] retain];
-    int active = 0;
+    int active = 0, downloading = 0;
 
-    Torrent * torrent;
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive])
-            active++;
+    if ([fDefaults boolForKey: @"CheckRemove"])
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [torrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isActive])
+            {
+                active++;
+                if (![torrent isSeeding])
+                    downloading++;
+            }
+    }
 
-    if (active > 0 && [fDefaults boolForKey: @"CheckRemove"])
+    BOOL shouldAsk = [fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0;
+    if (shouldAsk)
     {
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
             torrents, @"Torrents",

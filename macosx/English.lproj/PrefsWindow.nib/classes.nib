@@ -32,9 +32,11 @@
                 fNetworkView = NSView; 
                 fPortField = NSTextField; 
                 fQuitCheck = NSButton; 
+                fQuitDownloadingCheck = NSButton; 
                 fRatioCheck = NSButton; 
                 fRatioField = NSTextField; 
                 fRemoveCheck = NSButton; 
+                fRemoveDownloadingCheck = NSButton; 
                 fStartMatrix = NSMatrix; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 

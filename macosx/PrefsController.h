@@ -35,6 +35,7 @@
     
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
+                            * fQuitDownloadingCheck, * fRemoveDownloadingCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
                             * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck;
     IBOutlet NSPopUpButton  * fUpdatePopUp;

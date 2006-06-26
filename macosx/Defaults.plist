@@ -12,8 +12,12 @@
 	<false/>
 	<key>CheckQuit</key>
 	<true/>
+	<key>CheckQuitDownloading</key>
+	<false/>
 	<key>CheckRemove</key>
 	<true/>
+	<key>CheckRemoveDownloading</key>
+	<false/>
 	<key>CheckUpload</key>
 	<true/>
 	<key>DeleteOriginalTorrent</key>
@@ -29,8 +33,6 @@
 	<key>InfoTab</key>
 	<string>Info</string>
 	<key>InfoVisible</key>
-	<false/>
-	<key>Move</key>
 	<false/>
 	<key>MoveChoice</key>
 	<string>Constant</string>

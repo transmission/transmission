@@ -139,8 +139,16 @@
     [fRatioField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
     
     //set remove and quit prompts
-    [fQuitCheck setState: [fDefaults boolForKey: @"CheckQuit"]];
-    [fRemoveCheck setState: [fDefaults boolForKey: @"CheckRemove"]];
+    BOOL isQuitCheck = [fDefaults boolForKey: @"CheckQuit"],
+        isRemoveCheck = [fDefaults boolForKey: @"CheckRemove"];
+    
+    [fQuitCheck setState: isQuitCheck];
+    [fRemoveCheck setState: isRemoveCheck];
+    
+    [fQuitDownloadingCheck setState: [fDefaults boolForKey: @"CheckQuitDownloading"]];
+    [fQuitDownloadingCheck setEnabled: isQuitCheck];
+    [fRemoveDownloadingCheck setState: [fDefaults boolForKey: @"CheckRemoveDownloading"]];
+    [fRemoveDownloadingCheck setEnabled: isRemoveCheck];
 
     //set dock badging
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
@@ -382,10 +390,22 @@
 
 - (void) setShowMessage: (id) sender
 {
+    BOOL state = [sender state];
+
     if (sender == fQuitCheck)
-        [fDefaults setBool: [sender state] forKey: @"CheckQuit"];
+    {
+        [fDefaults setBool: state forKey: @"CheckQuit"];
+        [fQuitDownloadingCheck setEnabled: state];
+    }
     else if (sender == fRemoveCheck)
-        [fDefaults setBool: [fRemoveCheck state] forKey: @"CheckRemove"];
+    {
+        [fDefaults setBool: state forKey: @"CheckRemove"];
+        [fRemoveDownloadingCheck setEnabled: state];
+    }
+    if (sender == fQuitDownloadingCheck)
+        [fDefaults setBool: state forKey: @"CheckQuitDownloading"];
+    else if (sender == fRemoveDownloadingCheck)
+        [fDefaults setBool: state forKey: @"CheckRemoveDownloading"];
     else;
 }
 
