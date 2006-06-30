@@ -338,9 +338,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (code == NSOKButton)
     {
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
+        [torrent update];
         [self attemptToStartAuto: torrent];
         [fTorrents addObject: torrent];
-        [torrent update];
         
         [self torrentNumberChanged];
     }
@@ -387,9 +387,9 @@ static void sleepCallBack(void * controller, io_service_t y,
                 : [torrentPath stringByDeletingLastPathComponent];
 
             [torrent setDownloadFolder: folder];
+            [torrent update];
             [self attemptToStartAuto: torrent];
             [fTorrents addObject: torrent];
-            [torrent update];
         }
         
         [torrent release];
@@ -1104,8 +1104,15 @@ static void sleepCallBack(void * controller, io_service_t y,
 //will try to start, taking into consideration the start preference
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
+    #warning expand upon
+    if ([torrent progress] >= 1.0)
+    {
+        [torrent startTransfer];
+        return;
+    }
+
     if (![torrent waitingToStart])
-            return;
+        return;
     
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
     if ([startSetting isEqualToString: @"Wait"])
@@ -1436,7 +1443,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
         || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteBoth:))
     {
-        BOOL warning = NO, onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
+        BOOL warning = NO,
+            onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
             canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteBoth:);
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
