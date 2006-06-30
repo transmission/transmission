@@ -121,8 +121,6 @@
     [fUploadCheck setState: checkUpload];
     [fUploadField setIntValue: uploadLimit];
     [fUploadField setEnabled: checkUpload];
-    
-    tr_setUploadLimit(fHandle, checkUpload ? uploadLimit : -1);
 
 	//set download limit
     BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
@@ -132,7 +130,26 @@
     [fDownloadField setIntValue: downloadLimit];
     [fDownloadField setEnabled: checkDownload];
     
-    tr_setDownloadLimit(fHandle, checkDownload ? downloadLimit : -1);
+    //set speed limit
+    fSpeedLimit = [fDefaults boolForKey: @"SpeedLimit"];
+    
+    int speedLimitUploadLimit = [fDefaults integerForKey: @"SpeedLimitUploadLimit"];
+    [fSpeedLimitUploadField setIntValue: speedLimitUploadLimit];
+    
+    int speedLimitDownloadLimit = [fDefaults integerForKey: @"SpeedLimitDownloadLimit"];
+    [fSpeedLimitDownloadField setIntValue: speedLimitDownloadLimit];
+    
+    //actually set bandwidth limits
+    if (fSpeedLimit)
+    {
+        tr_setUploadLimit(fHandle, speedLimitUploadLimit);
+        tr_setDownloadLimit(fHandle, speedLimitDownloadLimit);
+    }
+    else
+    {
+        tr_setUploadLimit(fHandle, checkUpload ? uploadLimit : -1);
+        tr_setDownloadLimit(fHandle, checkDownload ? downloadLimit : -1);
+    }
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
@@ -292,10 +309,13 @@
     }
     else
     {
-        if (sender == fUploadField)
-            tr_setUploadLimit(fHandle, [fUploadCheck state] == NSOffState ? -1 : limit);
-        else
-            tr_setDownloadLimit(fHandle, [fDownloadCheck state] == NSOffState ? -1 : limit);
+        if (!fSpeedLimit)
+        {
+            if (sender == fUploadField)
+                tr_setUploadLimit(fHandle, [fUploadCheck state] ? limit : -1);
+            else
+                tr_setDownloadLimit(fHandle, [fDownloadCheck state] ? limit : -1);
+        }
         
         [fDefaults setInteger: limit forKey: key];
     }
@@ -351,6 +371,56 @@
     }
     [check setState: NSOnState];
     [self setLimitCheck: check];
+}
+
+- (void) enableSpeedLimit: (BOOL) enable
+{
+    if (fSpeedLimit != enable)
+    {
+        fSpeedLimit = enable;
+        [fDefaults setBool: fSpeedLimit forKey: @"SpeedLimit"];
+        
+        if (fSpeedLimit)
+        {
+            tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+            tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        }
+        else
+        {
+            tr_setUploadLimit(fHandle, [fUploadCheck state] ? [fDefaults integerForKey: @"UploadLimit"] : -1);
+            tr_setDownloadLimit(fHandle, [fDownloadCheck state] ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
+        }
+    }
+}
+
+- (void) setSpeedLimit: (id) sender
+{
+    NSString * key;
+    if (sender == fSpeedLimitUploadField)
+        key = @"SpeedLimitUploadLimit";
+    else
+        key = @"SpeedLimitDownloadLimit";
+
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]]
+            || limit < 0)
+    {
+        NSBeep();
+        limit = [fDefaults integerForKey: key];
+        [sender setIntValue: limit];
+    }
+    else
+    {
+        if (fSpeedLimit)
+        {
+            if (sender == fSpeedLimitUploadField)
+                tr_setUploadLimit(fHandle, limit);
+            else
+                tr_setDownloadLimit(fHandle, limit);
+        }
+        
+        [fDefaults setInteger: limit forKey: key];
+    }
 }
 
 - (void) setRatio: (id) sender

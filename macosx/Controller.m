@@ -125,6 +125,10 @@ static void sleepCallBack(void * controller, io_service_t y,
                                                 + [fScrollView frame].size.height)];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
+    //set speed limit
+    BOOL speedLimit = [fDefaults boolForKey: @"SpeedLimit"];
+    [fSpeedLimitItem setState: speedLimit];
+    
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
 
     [fTableView setTorrents: fTorrents];
@@ -913,6 +917,16 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 
     [self sortTorrents];
+}
+
+- (void) toggleSpeedLimit: (id) sender
+{
+    BOOL enable = [fSpeedLimitItem state] == NSOffState;
+
+    [fSpeedLimitItem setState: enable];
+    [fDefaults setBool: enable forKey: @"SpeedLimit"];
+
+    [fPrefsController enableSpeedLimit: enable];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender

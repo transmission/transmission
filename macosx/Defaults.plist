@@ -50,6 +50,12 @@
 	<false/>
 	<key>Sort</key>
 	<string>Order</string>
+	<key>SpeedLimit</key>
+	<false/>
+	<key>SpeedLimitDownloadLimit</key>
+	<integer>10</integer>
+	<key>SpeedLimitUploadLimit</key>
+	<integer>10</integer>
 	<key>StartSetting</key>
 	<string>Start</string>
 	<key>StatusBar</key>

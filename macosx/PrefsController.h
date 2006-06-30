@@ -40,8 +40,11 @@
                             * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck;
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
-    IBOutlet NSTextField    * fPortField, * fUploadField, * fDownloadField;
+    IBOutlet NSTextField    * fUploadField, * fDownloadField,
+                            * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     IBOutlet NSButton       * fUploadCheck, * fDownloadCheck;
+
+    IBOutlet NSTextField    * fPortField;
     
     IBOutlet NSButton       * fRatioCheck;
     IBOutlet NSTextField    * fRatioField;
@@ -52,14 +55,15 @@
     IBOutlet SUUpdater      * fUpdater;
 
     NSString                * fDownloadFolder;
+    BOOL                    fSpeedLimit;
     NSUserDefaults          * fDefaults;
 }
 
 - (void) setPrefs: (tr_handle_t *) handle;
 
-- (void) setShowMessage:        (id) sender;
-- (void) setBadge:              (id) sender;
-- (void) setUpdate:             (id) sender;
+- (void) setShowMessage:    (id) sender;
+- (void) setBadge:          (id) sender;
+- (void) setUpdate:         (id) sender;
 - (void) checkUpdate;
 
 - (void) setStartSetting:   (id) sender;
@@ -69,16 +73,19 @@
 - (void) setDownloadLocation:   (id) sender;
 - (void) folderSheetShow:       (id) sender;
 
-- (void) setPort:               (id) sender;
+- (void) setPort:       (id) sender;
+- (void) setSpeedLimit: (id) sender;
 
-- (void) setLimit:              (id) sender;
-- (void) setLimitCheck:         (id) sender;
-- (void) setLimitEnabled:       (BOOL) enable type: (NSString *) type;
-- (void) setQuickLimit:         (int) limit type: (NSString *) type;
+- (void) setLimit:          (id) sender;
+- (void) setLimitCheck:     (id) sender;
+- (void) setLimitEnabled:   (BOOL) enable type: (NSString *) type;
+- (void) setQuickLimit:     (int) limit type: (NSString *) type;
 
-- (void) setRatio:              (id) sender;
-- (void) setRatioCheck:			(id) sender;
-- (void) setRatioEnabled:       (BOOL) enable;
-- (void) setQuickRatio:         (float) ratioLimit;
+- (void) enableSpeedLimit: (BOOL) enable;
+
+- (void) setRatio:          (id) sender;
+- (void) setRatioCheck:     (id) sender;
+- (void) setRatioEnabled:   (BOOL) enable;
+- (void) setQuickRatio: (float) ratioLimit;
 
 @end

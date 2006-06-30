@@ -14,6 +14,7 @@
                 setRatio = id; 
                 setRatioCheck = id; 
                 setShowMessage = id; 
+                setSpeedLimit = id; 
                 setStartSetting = id; 
                 setUpdate = id; 
                 setWaitToStart = id; 
@@ -38,6 +39,8 @@
                 fRatioField = NSTextField; 
                 fRemoveCheck = NSButton; 
                 fRemoveDownloadingCheck = NSButton; 
+                fSpeedLimitDownloadField = NSTextField; 
+                fSpeedLimitUploadField = NSTextField; 
                 fStartMatrix = NSMatrix; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 

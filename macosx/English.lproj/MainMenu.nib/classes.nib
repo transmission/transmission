@@ -26,6 +26,7 @@
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
                 stopTorrent = id; 
+                toggleSpeedLimit = id; 
                 toggleStatusBar = id; 
             }; 
             CLASS = Controller; 
@@ -45,6 +46,7 @@
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
+                fSpeedLimitItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
                 fStatusBar = SmoothAquaView; 
                 fTableView = TorrentTableView; 

@@ -49,7 +49,7 @@
     IBOutlet TorrentTableView   * fTableView;
     NSToolbar                   * fToolbar;
     
-    IBOutlet NSMenuItem         * fAdvancedBarItem;
+    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSpeedLimitItem;
     IBOutlet NSButton           * fActionButton;
     
     IBOutlet SmoothAquaView     * fStatusBar;
@@ -123,6 +123,8 @@
 
 - (void) sortTorrents;
 - (void) setSort: (id) sender;
+
+- (void) toggleSpeedLimit: (id) sender;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
