@@ -1436,7 +1436,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
         || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteBoth:))
     {
-        BOOL active = NO,
+        BOOL warning = NO, onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
             canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteBoth:);
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
@@ -1445,23 +1445,23 @@ static void sleepCallBack(void * controller, io_service_t y,
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             torrent = [fTorrents objectAtIndex: i];
-            if (!active && [torrent isActive])
+            if (!warning && [torrent isActive])
             {
-                active = YES;
-                if (canDelete)
+                warning = onlyDownloading ? ![torrent isSeeding] : YES;
+                if (warning && canDelete)
                     break;
             }
             if (!canDelete && [torrent publicTorrent])
             {
                 canDelete = YES;
-                if (active)
+                if (warning)
                     break;
             }
         }
     
         //append or remove ellipsis when needed
         NSString * title = [menuItem title], * ellipsis = [NSString ellipsis];
-        if (active && [fDefaults boolForKey: @"CheckRemove"])
+        if (warning && [fDefaults boolForKey: @"CheckRemove"])
         {
             if (![title hasSuffix: ellipsis])
                 [menuItem setTitle: [title stringByAppendingEllipsis]];
