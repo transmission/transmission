@@ -31,7 +31,7 @@
     tr_handle_t * fHandle;
     
     NSToolbar               * fToolbar;
-    IBOutlet NSView         * fGeneralView, * fTransfersView, * fNetworkView;
+    IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
@@ -61,7 +61,6 @@
 - (void) setBadge:              (id) sender;
 - (void) setUpdate:             (id) sender;
 - (void) checkUpdate;
-
 
 - (void) setStartSetting:   (id) sender;
 - (void) setWaitToStart:    (id) sender;

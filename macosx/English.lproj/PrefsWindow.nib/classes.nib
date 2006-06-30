@@ -23,6 +23,7 @@
             OUTLETS = {
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
+                fBandwidthView = NSView; 
                 fCopyTorrentCheck = NSButton; 
                 fDeleteOriginalTorrentCheck = NSButton; 
                 fDownloadCheck = NSButton; 

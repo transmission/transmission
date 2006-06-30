@@ -42,12 +42,14 @@
 
 #define TOOLBAR_GENERAL     @"General"
 #define TOOLBAR_TRANSFERS   @"Transfers"
+#define TOOLBAR_BANDWIDTH   @"Bandwidth"
 #define TOOLBAR_NETWORK     @"Network"
 
 @interface PrefsController (Private)
 
 - (void) showGeneralPref: (id) sender;
 - (void) showTransfersPref: (id) sender;
+- (void) showBandwidthPref: (id) sender;
 - (void) showNetworkPref: (id) sender;
 
 - (void) setPrefView: (NSView *) view;
@@ -205,6 +207,13 @@
         [item setTarget: self];
         [item setAction: @selector( showTransfersPref: )];
     }
+    else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
+    {
+        [item setLabel: TOOLBAR_BANDWIDTH];
+        [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
+        [item setTarget: self];
+        [item setAction: @selector( showBandwidthPref: )];
+    }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: TOOLBAR_NETWORK];
@@ -223,19 +232,19 @@
 
 - (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [self toolbarDefaultItemIdentifiers: nil];
+    return [self toolbarDefaultItemIdentifiers: toolbar];
 }
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [self toolbarAllowedItemIdentifiers: nil];
+    return [self toolbarAllowedItemIdentifiers: toolbar];
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
-            TOOLBAR_NETWORK, nil];
+            TOOLBAR_BANDWIDTH, TOOLBAR_NETWORK, nil];
 }
 
 - (void) setPort: (id) sender
@@ -543,6 +552,11 @@
 - (void) showTransfersPref: (id) sender
 {
     [self setPrefView: fTransfersView];
+}
+
+- (void) showBandwidthPref: (id) sender
+{
+    [self setPrefView: fBandwidthView];
 }
 
 - (void) showNetworkPref: (id) sender
