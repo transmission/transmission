@@ -1032,89 +1032,15 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) globalStartSettingChange: (NSNotification *) notification
 {
-    #warning redo
-    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
-    
-    if ([startSetting isEqualToString: @"Start"])
-    {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-            if ([torrent waitingToStart])
-                [torrent startTransfer];
-    }
-    else if ([startSetting isEqualToString: @"Wait"])
-    {
-        NSMutableArray * waitingTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
-    
-        int amountToStart = [fDefaults integerForKey: @"WaitToStartNumber"];
-        
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-        {
-            if ([torrent isActive])
-            {
-                if (![torrent isSeeding])
-                {
-                    amountToStart--;
-                    if (amountToStart <= 0)
-                        break;
-                }
-            }
-            else if ([torrent waitingToStart])
-                [waitingTorrents addObject: torrent];
-            else;
-        }
-        
-        int waitingCount = [waitingTorrents count];
-        if (amountToStart > 0 && waitingCount > 0)
-        {
-            if (amountToStart > waitingCount)
-                amountToStart = waitingCount;
-            
-            //sort torrents by order
-            if (amountToStart < waitingCount)
-            {
-                NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                            @"orderValue" ascending: YES] autorelease];
-                NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-                
-                [waitingTorrents sortUsingDescriptors: descriptors];
-                [descriptors release];
-            }
-            
-            int i;
-            for (i = 0; i < amountToStart; i++)
-                [[waitingTorrents objectAtIndex: i] startTransfer];
-        }
-        
-        [waitingTorrents release];
-    }
-    else;
+    [self attemptToStartMultipleAuto: fTorrents];
     
     [self updateUI: nil];
-    
-    //update info for changed start setting
     [self reloadInspector: nil];
 }
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
 {
-    //sort torrents by order value
-    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"orderValue" ascending: YES] autorelease];
-    NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-                
-    NSArray * torrents = [[notification object] sortedArrayUsingDescriptors: descriptors];
-    [descriptors release];
-
-    //attempt to start all torrents
-    NSEnumerator * enumerator = [torrents objectEnumerator];
-    Torrent * torrent;
-
-    while ((torrent = [enumerator nextObject]))
-        [self attemptToStartAuto: torrent];
+    [self attemptToStartMultipleAuto: [notification object]];
 
     [self updateUI: nil];
     [self reloadInspector: nil];
@@ -1124,36 +1050,68 @@ static void sleepCallBack(void * controller, io_service_t y,
 //will try to start, taking into consideration the start preference
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
-    if ([torrent progress] >= 1.0)
-        [torrent startTransfer];
-    else
+    [self attemptToStartMultipleAuto: [NSArray arrayWithObject: torrent]];
+}
+
+- (void) attemptToStartMultipleAuto: (NSArray *) torrents
+{
+    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+    if ([startSetting isEqualToString: @"Start"])
     {
-        if (![torrent waitingToStart])
-            return;
+        NSEnumerator * enumerator = [torrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent waitingToStart])
+                [torrent startTransfer];
         
-        NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
-        if ([startSetting isEqualToString: @"Wait"])
-        {
-            int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
-            
-            Torrent * tempTorrent;
-            NSEnumerator * enumerator = [fTorrents objectEnumerator];
-            while ((tempTorrent = [enumerator nextObject]))
-                if ([tempTorrent isActive] && ![tempTorrent isSeeding])
-                {
-                    desiredActive--;
-                    if (desiredActive <= 0)
-                        return;
-                }
-            
-            [torrent startTransfer];
-        }
-        else if ([startSetting isEqualToString: @"Start"])
-            [torrent startTransfer];
-        else;
+        return;
     }
-    
-    [torrent update];
+    else if (![startSetting isEqualToString: @"Wait"])
+        return;
+    else;
+
+    //sort torrents by order value
+    NSArray * sortedTorrents;
+    if ([torrents count] > 1)
+    {
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                    @"orderValue" ascending: YES] autorelease];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+                    
+        sortedTorrents = [torrents sortedArrayUsingDescriptors: descriptors];
+        [descriptors release];
+    }
+    else
+        sortedTorrents = torrents;
+
+    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+            
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive] && ![torrent isSeeding])
+        {
+            desiredActive--;
+            if (desiredActive <= 0)
+                break;
+        }
+
+    enumerator = [sortedTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+    {
+        if ([torrent progress] >= 1.0)
+            [torrent startTransfer];
+        else
+        {
+            if ([torrent waitingToStart] && desiredActive > 0)
+            {
+                [torrent startTransfer];
+                desiredActive--;
+            }
+        }
+        
+        [torrent update];
+    }
 }
 
 - (void) reloadInspector: (NSNotification *) notification

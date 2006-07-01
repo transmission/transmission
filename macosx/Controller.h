@@ -139,6 +139,7 @@
 - (void) globalStartSettingChange: (NSNotification *) notification;
 
 - (void) attemptToStartAuto: (Torrent *) torrent;
+- (void) attemptToStartMultipleAuto: (NSArray *) torrents;
 
 - (void) reloadInspector: (NSNotification *) notification;
 
