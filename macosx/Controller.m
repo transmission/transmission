@@ -128,15 +128,16 @@ static void sleepCallBack(void * controller, io_service_t y,
     //set speed limit
     BOOL speedLimit = [fDefaults boolForKey: @"SpeedLimit"];
     [fSpeedLimitItem setState: speedLimit];
+    if (speedLimit)
+        [fSpeedLimitButton setState: NSOnState];
     
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
+    [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
 
     [fTableView setTorrents: fTorrents];
-    [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell:
-        [[TorrentCell alloc] init]];
+    [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
-    [fTableView registerForDraggedTypes:
-        [NSArray arrayWithObject: NSFilenamesPboardType]];
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -921,12 +922,12 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleSpeedLimit: (id) sender
 {
-    BOOL enable = [fSpeedLimitItem state] == NSOffState;
+    int state = [fSpeedLimitItem state] ? NSOffState : NSOnState;
 
-    [fSpeedLimitItem setState: enable];
-    [fDefaults setBool: enable forKey: @"SpeedLimit"];
-
-    [fPrefsController enableSpeedLimit: enable];
+    [fSpeedLimitItem setState: state];
+    [fSpeedLimitButton setState: state];
+    
+    [fPrefsController enableSpeedLimit: state];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender

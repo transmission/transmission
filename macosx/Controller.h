@@ -50,7 +50,7 @@
     NSToolbar                   * fToolbar;
     
     IBOutlet NSMenuItem         * fAdvancedBarItem, * fSpeedLimitItem;
-    IBOutlet NSButton           * fActionButton;
+    IBOutlet NSButton           * fActionButton, * fSpeedLimitButton;
     
     IBOutlet SmoothAquaView     * fStatusBar;
     BOOL                        fStatusBarVisible;

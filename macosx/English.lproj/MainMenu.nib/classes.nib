@@ -46,6 +46,7 @@
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
+                fSpeedLimitButton = NSButton; 
                 fSpeedLimitItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
                 fStatusBar = SmoothAquaView; 
