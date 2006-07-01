@@ -274,7 +274,7 @@ static void sleepCallBack(void * controller, io_service_t y,
                     downloading++;
             }
 
-        BOOL shouldAsk = [fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0;
+        BOOL shouldAsk = [fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0;
         if (shouldAsk)
         {
             NSString * message = active == 1
