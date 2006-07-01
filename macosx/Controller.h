@@ -49,7 +49,7 @@
     IBOutlet TorrentTableView   * fTableView;
     NSToolbar                   * fToolbar;
     
-    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSpeedLimitItem;
+    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSpeedLimitItem, * fSpeedLimitDockItem;
     IBOutlet NSButton           * fActionButton, * fSpeedLimitButton;
     
     IBOutlet SmoothAquaView     * fStatusBar;
@@ -77,7 +77,6 @@
     BOOL                        fUpdateInProgress;
 }
 
-- (void) advancedChanged: (id) sender;
 - (void) openShowSheet:   (id) sender;
 - (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
                         contextInfo: (void *) info;
@@ -148,6 +147,7 @@
 
 - (void) toggleStatusBar: (id) sender;
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
+- (void) toggleAdvancedBar: (id) sender;
 
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;

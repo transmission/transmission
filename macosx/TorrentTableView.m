@@ -78,7 +78,7 @@
 
     if ([event modifierFlags] & NSAlternateKeyMask)
     {
-        [fController advancedChanged: self];
+        [fController toggleAdvancedBar: self];
         fClickPoint = NSZeroPoint;
     }
     else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])

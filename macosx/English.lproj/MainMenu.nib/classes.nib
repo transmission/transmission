@@ -2,7 +2,6 @@
     IBClasses = (
         {
             ACTIONS = {
-                advancedChanged = id; 
                 checkUpdate = id; 
                 copyTorrentFile = id; 
                 linkForums = id; 
@@ -26,6 +25,7 @@
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
                 stopTorrent = id; 
+                toggleAdvancedBar = id; 
                 toggleSpeedLimit = id; 
                 toggleStatusBar = id; 
             }; 
@@ -47,6 +47,7 @@
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
                 fSpeedLimitButton = NSButton; 
+                fSpeedLimitDockItem = NSMenuItem; 
                 fSpeedLimitItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
                 fStatusBar = SmoothAquaView; 

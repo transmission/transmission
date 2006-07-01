@@ -127,9 +127,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set speed limit
     BOOL speedLimit = [fDefaults boolForKey: @"SpeedLimit"];
-    [fSpeedLimitItem setState: speedLimit];
     if (speedLimit)
+    {
+        [fSpeedLimitItem setState: speedLimit];
+        [fSpeedLimitDockItem setState: speedLimit];
         [fSpeedLimitButton setState: NSOnState];
+    }
     
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
     [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
@@ -427,14 +430,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     int count = [fTorrents count];
     [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
         @"%d Transfer%s", count, count == 1 ? "" : "s"]];
-}
-
-- (void) advancedChanged: (id) sender
-{
-    [fAdvancedBarItem setState: ![fAdvancedBarItem state]];
-    [fDefaults setBool: [fAdvancedBarItem state] forKey: @"UseAdvancedBar"];
-
-    [fTableView display];
 }
 
 //called on by applescript
@@ -925,6 +920,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     int state = [fSpeedLimitItem state] ? NSOffState : NSOnState;
 
     [fSpeedLimitItem setState: state];
+    [fSpeedLimitDockItem setState: state];
     [fSpeedLimitButton setState: state];
     
     [fPrefsController enableSpeedLimit: state];
@@ -1119,7 +1115,6 @@ static void sleepCallBack(void * controller, io_service_t y,
 //will try to start, taking into consideration the start preference
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
-    #warning expand upon
     if ([torrent progress] >= 1.0)
         [torrent startTransfer];
     else
@@ -1218,7 +1213,6 @@ static void sleepCallBack(void * controller, io_service_t y,
         
     fStatusBarVisible = !fStatusBarVisible;
     
-    //reloads stats
     [self updateUI: nil];
     
     //set views to not autoresize
@@ -1237,6 +1231,14 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSSize minSize = [fWindow contentMinSize];
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
+}
+
+- (void) toggleAdvancedBar: (id) sender
+{
+    [fAdvancedBarItem setState: ![fAdvancedBarItem state]];
+    [fDefaults setBool: [fAdvancedBarItem state] forKey: @"UseAdvancedBar"];
+
+    [fTableView display];
 }
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
@@ -1321,8 +1323,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     return [NSArray arrayWithObjects:
             TOOLBAR_OPEN, TOOLBAR_REMOVE,
             TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED,
-            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL,
-            TOOLBAR_INFO,
+            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
             NSToolbarSpaceItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
@@ -1402,8 +1403,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     SEL action = [menuItem action];
 
     //only enable some items if it is in a context menu or the window is useable 
-    BOOL canUseMenu = [[[menuItem menu] title] isEqualToString: @"Context"]
-                        || [fWindow isKeyWindow];
+    BOOL canUseMenu = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -1415,6 +1415,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         return YES;
     }
     
+    //enable prev/next inspector tab
     if (action == @selector(setInfoTab:))
         return [[fInfoController window] isVisible];
     
@@ -1450,10 +1451,9 @@ static void sleepCallBack(void * controller, io_service_t y,
         return NO;
     }
 
+    //enable reveal in finder
     if (action == @selector(revealFile:))
-    {
         return canUseMenu && [fTableView numberOfSelectedRows] > 0;
-    }
 
     //enable remove items
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
@@ -1537,8 +1537,8 @@ static void sleepCallBack(void * controller, io_service_t y,
         return NO;
     }
     
-    //enable resume item
-    if (action == @selector(setSort:) || (action == @selector(advancedChanged:)))
+    //enable sort and advanced bar items
+    if (action == @selector(setSort:) || (action == @selector(toggleAdvancedBar:)))
         return canUseMenu;
     
     //enable copy torrent file item
