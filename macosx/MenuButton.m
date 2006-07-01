@@ -31,10 +31,8 @@
     NSImage * image = [self image];
     [self setImage: [self alternateImage]];
 
-    NSPoint location = NSMakePoint(3, -2);
-
-    NSEvent * theEvent= [NSEvent mouseEventWithType: [event type]
-                        location: location
+    NSEvent * newEvent= [NSEvent mouseEventWithType: [event type]
+                        location: NSMakePoint(3, -2)
                         modifierFlags: [event modifierFlags]
                         timestamp: [event timestamp]
                         windowNumber: [event windowNumber]
@@ -43,12 +41,12 @@
                         clickCount: [event clickCount]
                         pressure: [event pressure]];
 
-    [NSMenu popUpContextMenu: [self menu] withEvent: theEvent forView: self];
+    [NSMenu popUpContextMenu: [self menu] withEvent: newEvent forView: self];
 
     [self setImage: image];
 }
 
-- (NSMenu *) menuForEvent: (NSEvent *) e
+- (NSMenu *) menuForEvent: (NSEvent *) event
 {
     return nil;
 }

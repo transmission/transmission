@@ -121,19 +121,17 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     NSView * contentView = [fWindow contentView];
     [contentView addSubview: fStatusBar];
-    [fStatusBar setFrameOrigin: NSMakePoint(0, [fScrollView frame].origin.y
-                                                + [fScrollView frame].size.height)];
+    [fStatusBar setFrameOrigin: NSMakePoint(0, [fScrollView frame].origin.y + [fScrollView frame].size.height)];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     //set speed limit
-    BOOL speedLimit = [fDefaults boolForKey: @"SpeedLimit"];
-    if (speedLimit)
+    if ([fDefaults boolForKey: @"SpeedLimit"])
     {
-        [fSpeedLimitItem setState: speedLimit];
-        [fSpeedLimitDockItem setState: speedLimit];
+        [fSpeedLimitItem setState: NSOnState];
+        [fSpeedLimitDockItem setState: NSOnState];
         [fSpeedLimitButton setState: NSOnState];
     }
-    
+
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
     [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
 
@@ -240,14 +238,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self updateUI: nil];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
         selector: @selector( updateUI: ) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer
-        forMode: NSModalPanelRunLoopMode];
-    [[NSRunLoop currentRunLoop] addTimer: fTimer
-        forMode: NSEventTrackingRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
     [self sortTorrents];
     
-    //show windows
     [fWindow makeKeyAndOrderFront: nil];
 
     [self reloadInspector: nil];
@@ -1037,6 +1032,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) globalStartSettingChange: (NSNotification *) notification
 {
+    #warning redo
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
     
     if ([startSetting isEqualToString: @"Start"])
@@ -1077,7 +1073,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             if (amountToStart > waitingCount)
                 amountToStart = waitingCount;
             
-            //sort torrents by date to start earliest added
+            //sort torrents by order
             if (amountToStart < waitingCount)
             {
                 NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
@@ -1105,7 +1101,20 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
 {
-    [self attemptToStartAuto: [notification object]];
+    //sort torrents by order value
+    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"orderValue" ascending: YES] autorelease];
+    NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+                
+    NSArray * torrents = [[notification object] sortedArrayUsingDescriptors: descriptors];
+    [descriptors release];
+
+    //attempt to start all torrents
+    NSEnumerator * enumerator = [torrents objectEnumerator];
+    Torrent * torrent;
+
+    while ((torrent = [enumerator nextObject]))
+        [self attemptToStartAuto: torrent];
 
     [self updateUI: nil];
     [self reloadInspector: nil];
