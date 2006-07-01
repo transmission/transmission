@@ -131,8 +131,6 @@
     [fDownloadField setEnabled: checkDownload];
     
     //set speed limit
-    fSpeedLimit = [fDefaults boolForKey: @"SpeedLimit"];
-    
     int speedLimitUploadLimit = [fDefaults integerForKey: @"SpeedLimitUploadLimit"];
     [fSpeedLimitUploadField setIntValue: speedLimitUploadLimit];
     
@@ -140,7 +138,7 @@
     [fSpeedLimitDownloadField setIntValue: speedLimitDownloadLimit];
     
     //actually set bandwidth limits
-    if (fSpeedLimit)
+    if ([fDefaults boolForKey: @"SpeedLimit"])
     {
         tr_setUploadLimit(fHandle, speedLimitUploadLimit);
         tr_setDownloadLimit(fHandle, speedLimitDownloadLimit);
@@ -309,7 +307,7 @@
     }
     else
     {
-        if (!fSpeedLimit)
+        if (![fDefaults boolForKey: @"SpeedLimit"])
         {
             if (sender == fUploadField)
                 tr_setUploadLimit(fHandle, [fUploadCheck state] ? limit : -1);
@@ -375,12 +373,11 @@
 
 - (void) enableSpeedLimit: (BOOL) enable
 {
-    if (fSpeedLimit != enable)
+    if ([fDefaults boolForKey: @"SpeedLimit"] != enable)
     {
-        fSpeedLimit = enable;
-        [fDefaults setBool: fSpeedLimit forKey: @"SpeedLimit"];
+        [fDefaults setBool: enable forKey: @"SpeedLimit"];
         
-        if (fSpeedLimit)
+        if (enable)
         {
             tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
             tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
@@ -395,11 +392,7 @@
 
 - (void) setSpeedLimit: (id) sender
 {
-    NSString * key;
-    if (sender == fSpeedLimitUploadField)
-        key = @"SpeedLimitUploadLimit";
-    else
-        key = @"SpeedLimitDownloadLimit";
+    NSString * key = sender == fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit";
 
     int limit = [sender intValue];
     if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]]
@@ -411,7 +404,7 @@
     }
     else
     {
-        if (fSpeedLimit)
+        if ([fDefaults boolForKey: @"SpeedLimit"])
         {
             if (sender == fSpeedLimitUploadField)
                 tr_setUploadLimit(fHandle, limit);

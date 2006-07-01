@@ -55,7 +55,6 @@
     IBOutlet SUUpdater      * fUpdater;
 
     NSString                * fDownloadFolder;
-    BOOL                    fSpeedLimit;
     NSUserDefaults          * fDefaults;
 }
 
