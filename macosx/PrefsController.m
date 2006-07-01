@@ -298,8 +298,7 @@
     }
 
     int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]]
-            || limit < 0)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
     {
         NSBeep();
         limit = [fDefaults integerForKey: key];
@@ -395,8 +394,7 @@
     NSString * key = sender == fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit";
 
     int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]]
-            || limit < 0)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
     {
         NSBeep();
         limit = [fDefaults integerForKey: key];
@@ -430,8 +428,8 @@
         [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
     
     NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                    [NSNumber numberWithBool: [fRatioCheck state]], @"Enable",
-                                    [NSNumber numberWithFloat: ratioLimit], @"Ratio", nil];
+                                [NSNumber numberWithBool: [fRatioCheck state]], @"Enable",
+                                [NSNumber numberWithFloat: ratioLimit], @"Ratio", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"RatioGlobalChange" object: dict];
 }
 

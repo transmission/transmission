@@ -1121,34 +1121,35 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     #warning expand upon
     if ([torrent progress] >= 1.0)
-    {
         [torrent startTransfer];
-        return;
+    else
+    {
+        if (![torrent waitingToStart])
+            return;
+        
+        NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
+        if ([startSetting isEqualToString: @"Wait"])
+        {
+            int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+            
+            Torrent * tempTorrent;
+            NSEnumerator * enumerator = [fTorrents objectEnumerator];
+            while ((tempTorrent = [enumerator nextObject]))
+                if ([tempTorrent isActive] && ![tempTorrent isSeeding])
+                {
+                    desiredActive--;
+                    if (desiredActive <= 0)
+                        return;
+                }
+            
+            [torrent startTransfer];
+        }
+        else if ([startSetting isEqualToString: @"Start"])
+            [torrent startTransfer];
+        else;
     }
-
-    if (![torrent waitingToStart])
-        return;
     
-    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
-    if ([startSetting isEqualToString: @"Wait"])
-    {
-        int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
-        
-        Torrent * tempTorrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((tempTorrent = [enumerator nextObject]))
-            if ([tempTorrent isActive] && ![tempTorrent isSeeding])
-            {
-                desiredActive--;
-                if (desiredActive <= 0)
-                    return;
-            }
-        
-        [torrent startTransfer];
-    }
-    else if ([startSetting isEqualToString: @"Start"])
-        [torrent startTransfer];
-    else;
+    [torrent update];
 }
 
 - (void) reloadInspector: (NSNotification *) notification
