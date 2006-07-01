@@ -1069,10 +1069,23 @@ static void sleepCallBack(void * controller, io_service_t y,
     else if (![startSetting isEqualToString: @"Wait"])
         return;
     else;
-
+    
+    //determine the number of downloads needed to start
+    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+            
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive] && ![torrent isSeeding])
+        {
+            desiredActive--;
+            if (desiredActive <= 0)
+                break;
+        }
+    
     //sort torrents by order value
     NSArray * sortedTorrents;
-    if ([torrents count] > 1)
+    if ([torrents count] > 1 && desiredActive > 0)
     {
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                     @"orderValue" ascending: YES] autorelease];
@@ -1083,18 +1096,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     else
         sortedTorrents = torrents;
-
-    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
-            
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive] && ![torrent isSeeding])
-        {
-            desiredActive--;
-            if (desiredActive <= 0)
-                break;
-        }
 
     enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
