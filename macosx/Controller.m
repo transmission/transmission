@@ -40,6 +40,8 @@
 #define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
 
+#define TorrentTableViewDataType @"TorrentTableViewDataType"
+
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
@@ -138,7 +140,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fTableView setTorrents: fTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType,
+                                                                TorrentTableViewDataType, nil]];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -1135,28 +1138,87 @@ static void sleepCallBack(void * controller, io_service_t y,
     [cell setTorrent: [fTorrents objectAtIndex: row]];
 }
 
-- (BOOL) tableView: (NSTableView *) t acceptDrop:
-    (id <NSDraggingInfo>) info row: (int) row dropOperation:
-    (NSTableViewDropOperation) operation
+- (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
+    toPasteboard: (NSPasteboard *) pasteboard
 {
-    [self application: NSApp openFiles: [[[info draggingPasteboard]
-        propertyListForType: NSFilenamesPboardType]
-        pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
-    return YES;
+    if ([fSortType isEqualToString: @"Order"])
+    {
+        [pasteboard declareTypes: [NSArray arrayWithObject: TorrentTableViewDataType] owner: self];
+        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes] forType: TorrentTableViewDataType];
+        return YES;
+    }
+    return NO;
 }
 
-- (NSDragOperation) tableView: (NSTableView *) t validateDrop:
-    (id <NSDraggingInfo>) info proposedRow: (int) row
-    proposedDropOperation: (NSTableViewDropOperation) operation
+- (NSDragOperation) tableView: (NSTableView *) t validateDrop: (id <NSDraggingInfo>) info
+    proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
-    if (![[pasteboard types] containsObject: NSFilenamesPboardType]
-            || [[[pasteboard propertyListForType: NSFilenamesPboardType]
-        pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]] count] == 0)
-        return NSDragOperationNone;
+    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
+    {
+        if ([[[pasteboard propertyListForType: NSFilenamesPboardType]
+            pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]] count] > 0)
+        {
+            [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
+            return NSDragOperationGeneric;
+        }
+    }
+    else if ([[pasteboard types] containsObject: TorrentTableViewDataType])
+    {
+        [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
+        return NSDragOperationGeneric;
+    }
+    else;
+    
+    return NSDragOperationNone;
+}
 
-    [fTableView setDropRow: [fTableView numberOfRows] dropOperation: NSTableViewDropAbove];
-    return NSDragOperationGeneric;
+- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
+    row: (int) newRow dropOperation: (NSTableViewDropOperation) operation
+{
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
+        [self application: NSApp openFiles: [[[info draggingPasteboard] propertyListForType: NSFilenamesPboardType]
+            pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
+    else
+    {
+        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
+                                [pasteboard dataForType: TorrentTableViewDataType]];
+        int oldRow = [indexes firstIndex];
+        
+        //move torrent in array
+        if (newRow == oldRow)
+            return;
+        
+        Torrent * torrent = [[fTorrents objectAtIndex: oldRow] retain];
+        
+        int low, high;
+        if (newRow > oldRow)
+        {
+            newRow--;
+            
+            low = oldRow;
+            high = newRow;
+        }
+        else
+        {
+            low = newRow;
+            high = oldRow;
+        }
+        
+        [fTorrents removeObjectAtIndex: oldRow];
+        [fTorrents insertObject: torrent atIndex: newRow];
+        [torrent release];
+        
+        //redo order values
+        int i;
+        for (i = low; i <= high; i++)
+            [[fTorrents objectAtIndex: i] setOrderValue: i];
+        
+        [fTableView reloadData];
+    }
+    
+    return YES;
 }
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
