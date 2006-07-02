@@ -74,7 +74,7 @@
 
         NSString * paused;
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
-            [self startTransfer];
+            tr_torrentStart(fHandle);
     }
     return self;
 }
@@ -249,6 +249,12 @@
         if (!wasSeeding)
             [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
     }
+}
+
+- (void) stopTransferForQuit
+{
+    if ([self isActive])
+        tr_torrentStop(fHandle);
 }
 
 - (void) removeForever
@@ -607,6 +613,7 @@
     
     fWaitToStart = waitToStart ? [waitToStart boolValue]
                     : ![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Manual"];
+    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     
     NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
@@ -617,8 +624,6 @@
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
-    
-    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
 
     [self update];
     return self;

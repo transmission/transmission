@@ -302,7 +302,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
-    // Stop updating the interface
+    //stop updating the interface
     [fTimer invalidate];
     
     //save history
@@ -320,9 +320,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (fUpdateInProgress)
         return;
 
-    //stop running torrents and wait for them to stop (5 seconds timeout)
-    [fTorrents makeObjectsPerformSelector: @selector(stopTransfer)];
-    
+    //stop running transfers and wait for them to stop (5 seconds timeout)
+    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
+
     NSDate * start = [NSDate date];
     Torrent * torrent;
     while ([fTorrents count] > 0)
