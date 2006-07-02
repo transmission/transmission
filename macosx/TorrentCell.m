@@ -324,8 +324,7 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     //status strings
     pen.x += extraNameShift;
     pen.y += linePadding;
-    NSAttributedString * statusString = [[NSString stringWithFormat: @"%@ %@", [fTorrent statusString],
-        [[fTorrent orderValue] stringValue]]
+    NSAttributedString * statusString = [[fTorrent statusString]
         attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
     [statusString drawAtPoint: pen];
     
