@@ -1182,36 +1182,34 @@ static void sleepCallBack(void * controller, io_service_t y,
             pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
     else
     {
+        #warning redo selected torrents
+    
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TorrentTableViewDataType]];
-        int oldRow = [indexes firstIndex];
         
-        //move torrent in array
-        if (newRow == oldRow)
-            return;
+        //move torrent in array 
+        NSArray * movingTorrents = [[self torrentsAtIndexes: indexes] retain];
+        [fTorrents removeObjectsInArray: movingTorrents];
         
-        Torrent * torrent = [[fTorrents objectAtIndex: oldRow] retain];
+        //determine the insertion index now that transfers to move have been removed
+        int i, decrease = 0;
+        for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+            decrease++;
         
-        int low, high;
-        if (newRow > oldRow)
-        {
-            newRow--;
-            
-            low = oldRow;
-            high = newRow;
-        }
-        else
-        {
-            low = newRow;
-            high = oldRow;
-        }
+        //insert objects at new location
+        for (i = 0; i < [movingTorrents count]; i++)
+            [fTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: newRow - decrease + i];
         
-        [fTorrents removeObjectAtIndex: oldRow];
-        [fTorrents insertObject: torrent atIndex: newRow];
-        [torrent release];
+        [movingTorrents release];
         
         //redo order values
-        int i;
+        int low = [indexes firstIndex], high = [indexes lastIndex];
+        if (newRow < low)
+            low = newRow;
+        else if (newRow > high + 1)
+            high = newRow - 1;
+        else;
+        
         for (i = low; i <= high; i++)
             [[fTorrents objectAtIndex: i] setOrderValue: i];
         
