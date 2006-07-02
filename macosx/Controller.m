@@ -1182,7 +1182,11 @@ static void sleepCallBack(void * controller, io_service_t y,
             pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
     else
     {
-        #warning redo selected torrents
+        //remember selected rows if needed
+        NSArray * selectedTorrents = nil;
+        int numSelected = [fTableView numberOfSelectedRows];
+        if (numSelected > 0 && numSelected < [fTorrents count])
+            selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TorrentTableViewDataType]];
@@ -1214,6 +1218,19 @@ static void sleepCallBack(void * controller, io_service_t y,
             [[fTorrents objectAtIndex: i] setOrderValue: i];
         
         [fTableView reloadData];
+        
+        //set selected rows if needed
+        if (selectedTorrents)
+        {
+            Torrent * torrent;
+            NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+            NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+            while ((torrent = [enumerator nextObject]))
+                [indexSet addIndex: [fTorrents indexOfObject: torrent]];
+            
+            [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
+            [indexSet release];
+        }
     }
     
     return YES;
