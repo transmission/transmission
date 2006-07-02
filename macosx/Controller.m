@@ -40,7 +40,7 @@
 #define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
 
-#define TorrentTableViewDataType @"TorrentTableViewDataType"
+#define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
@@ -141,7 +141,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType,
-                                                                TorrentTableViewDataType, nil]];
+                                                        TORRENT_TABLE_VIEW_DATA_TYPE, nil]];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -1143,8 +1143,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     if ([fSortType isEqualToString: @"Order"])
     {
-        [pasteboard declareTypes: [NSArray arrayWithObject: TorrentTableViewDataType] owner: self];
-        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes] forType: TorrentTableViewDataType];
+        [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
+        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]
+                                forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
     return NO;
@@ -1163,7 +1164,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             return NSDragOperationGeneric;
         }
     }
-    else if ([[pasteboard types] containsObject: TorrentTableViewDataType])
+    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
@@ -1189,7 +1190,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
-                                [pasteboard dataForType: TorrentTableViewDataType]];
+                                [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
         //move torrent in array 
         NSArray * movingTorrents = [[self torrentsAtIndexes: indexes] retain];
