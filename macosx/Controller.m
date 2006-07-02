@@ -994,13 +994,13 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
         return;
 
-    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"], active = 0;
+    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
     
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent, * torrentToStart = nil;
     while ((torrent = [enumerator nextObject]))
     {
-        //ignore the torrent just stopped; for some reason it is not marked instantly as not active
+        //ignore the torrent just stopped
         if (torrent == finishedTorrent)
             continue;
     
@@ -1008,8 +1008,8 @@ static void sleepCallBack(void * controller, io_service_t y,
         {
             if (![torrent isSeeding])
             {
-                active++;
-                if (active >= desiredActive)
+                desiredActive--;
+                if (desiredActive <= 0)
                     return;
             }
         }
@@ -1026,7 +1026,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (torrentToStart)
     {
         [torrentToStart startTransfer];
+        
         [self updateUI: nil];
+        [self reloadInspector: nil];
+        [self updateTorrentHistory];
     }
 }
 
@@ -1036,6 +1039,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [self updateUI: nil];
     [self reloadInspector: nil];
+    [self updateTorrentHistory];
 }
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
@@ -1047,12 +1051,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self updateTorrentHistory];
 }
 
-//will try to start, taking into consideration the start preference
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
     [self attemptToStartMultipleAuto: [NSArray arrayWithObject: torrent]];
 }
 
+//will try to start, taking into consideration the start preference
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents
 {
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
@@ -1090,7 +1094,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                     @"orderValue" ascending: YES] autorelease];
         NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-                    
+        
         sortedTorrents = [torrents sortedArrayUsingDescriptors: descriptors];
         [descriptors release];
     }
