@@ -305,8 +305,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     //stop updating the interface
     [fTimer invalidate];
     
-    //save history
+    //save history and stop running torrents
     [self updateTorrentHistory];
+    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
     
     //remember window states
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
@@ -317,9 +318,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //clear badge
     [fBadger clearBadge];
-
-    //stop running transfers
-    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
 
     //end quickly if updated version will open
     if (fUpdateInProgress)
