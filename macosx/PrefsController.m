@@ -601,6 +601,11 @@
         contextInfo: nil];
 }
 
+- (void) windowWillClose: (NSNotification *) notification
+{
+    [[self window] makeFirstResponder: nil];
+}
+
 @end
 
 @implementation PrefsController (Private)
