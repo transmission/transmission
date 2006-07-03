@@ -327,20 +327,20 @@ static void sleepCallBack(void * controller, io_service_t y,
 
     //wait for running transfers to stop (5 seconds timeout)
     NSDate * start = [NSDate date];
-    Torrent * torrent;
     BOOL timeUp = NO;
-    int i;
-    for (i = 0; i < [fTorrents count]; i++)
-    {
-        if (timeUp)
-            break;
     
-        torrent = [fTorrents objectAtIndex: i];
-        while (!(timeUp = [start timeIntervalSinceNow] <= -5.0) && ![torrent isPaused])
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+    {
+        while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
             [torrent update];
         }
+        
+        if (timeUp)
+            break;
     }
     [fTorrents release];
 }
