@@ -310,6 +310,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //remember window states
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
+    [fInfoController close];
+    [fPrefsController close];
     [fWindow close];
     [self showStatusBar: NO animate: NO];
     
@@ -742,7 +744,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) showInfo: (id) sender
 {
     if ([[fInfoController window] isVisible])
-        [[fInfoController window] performClose: nil];
+        [fInfoController close];
     else
     {
         [fInfoController updateInfoStats];
