@@ -318,26 +318,31 @@ static void sleepCallBack(void * controller, io_service_t y,
     //clear badge
     [fBadger clearBadge];
 
+    //stop running transfers
+    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
+
     //end quickly if updated version will open
     if (fUpdateInProgress)
         return;
 
-    //stop running transfers and wait for them to stop (5 seconds timeout)
-    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
-
+    //wait for running transfers to stop (5 seconds timeout)
     NSDate * start = [NSDate date];
     Torrent * torrent;
-    while ([fTorrents count] > 0)
+    BOOL timeUp = NO;
+    int i;
+    for (i = 0; i < [fTorrents count]; i++)
     {
-        torrent = [fTorrents objectAtIndex: 0];
-        while( [[NSDate date] timeIntervalSinceDate: start] < 5 &&
-                ![torrent isPaused] )
+        if (timeUp)
+            break;
+    
+        torrent = [fTorrents objectAtIndex: i];
+        while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] <= -5.0))
         {
-            usleep( 100000 );
+            usleep(100000);
             [torrent update];
         }
-        [fTorrents removeObject: torrent];
     }
+    [fTorrents release];
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
