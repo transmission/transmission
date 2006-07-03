@@ -336,7 +336,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             break;
     
         torrent = [fTorrents objectAtIndex: i];
-        while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] <= -5.0))
+        while (!(timeUp = [start timeIntervalSinceNow] <= -5.0) && ![torrent isPaused])
         {
             usleep(100000);
             [torrent update];
