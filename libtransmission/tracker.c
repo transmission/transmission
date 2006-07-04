@@ -376,6 +376,7 @@ static void recvAnswer( tr_tracker_t * tc )
     benc_val_t * bePeers, * beFoo;
     uint8_t * body;
     int bodylen;
+    int shouldfree;
 
     if( tc->pos == tc->size )
     {
@@ -443,10 +444,12 @@ static void recvAnswer( tr_tracker_t * tc )
     bodylen = tc->pos - (body - tc->buf);
 
     /* Find and load the dictionary */
+    shouldfree = 0;
     for( i = 0; i < bodylen; i++ )
     {
         if( !tr_bencLoad( &body[i], bodylen - i, &beAll, NULL ) )
         {
+            shouldfree = 1;
             break;
         }
     }
@@ -596,7 +599,10 @@ nodict:
     }
 
 cleanup:
-    tr_bencFree( &beAll );
+    if( shouldfree )
+    {
+        tr_bencFree( &beAll );
+    }
 }
 
 int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
