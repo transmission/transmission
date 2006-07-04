@@ -84,6 +84,35 @@ readablesize(guint64 size) {
                          gettext(sizestrs[ii]));
 }
 
+#define SECONDS(s)              ((s) % 60)
+#define MINUTES(s)              ((s) / 60 % 60)
+#define HOURS(s)                ((s) / 60 / 60 % 24)
+#define DAYS(s)                 ((s) / 60 / 60 / 24 % 7)
+#define WEEKS(s)                ((s) / 60 / 60 / 24 / 7)
+
+char *
+readabletime(int secs) {
+  if(60 > secs)
+    return g_strdup_printf(_("%i %s"),
+      SECONDS(secs), ngettext("second", "seconds", SECONDS(secs)));
+  else if(60 * 60 > secs)
+    return g_strdup_printf(_("%i %s %i %s"),
+      MINUTES(secs), ngettext("minute", "minutes", MINUTES(secs)),
+      SECONDS(secs), ngettext("second", "seconds", SECONDS(secs)));
+  else if(60 * 60 * 24 > secs)
+    return g_strdup_printf(_("%i %s %i %s"),
+      HOURS(secs),   ngettext("hour", "hours", HOURS(secs)),
+      MINUTES(secs), ngettext("minute", "minutes", MINUTES(secs)));
+  else if(60 * 60 * 24 * 7 > secs)
+    return g_strdup_printf(_("%i %s %i %s"),
+      DAYS(secs),    ngettext("day", "days", DAYS(secs)),
+      HOURS(secs),   ngettext("hour", "hours", HOURS(secs)));
+  else
+    return g_strdup_printf(_("%i %s %i %s"),
+      WEEKS(secs),   ngettext("week", "weeks", WEEKS(secs)),
+      DAYS(secs),    ngettext("hour", "hours", DAYS(secs)));
+}
+
 char *
 ratiostr(guint64 down, guint64 up) {
   double ratio;

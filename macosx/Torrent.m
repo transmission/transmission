@@ -182,6 +182,10 @@
                 [self totalPeers] == 1 ? "" : "s"];
             
             int eta = [self eta];
+            if( eta > 99 * 3600 + 59 * 60 + 59 )
+            {
+                eta = -1;
+            }
             if (eta < 0)
                 [fProgressString appendString: @" - remaining time unknown"];
             else

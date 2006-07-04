@@ -59,6 +59,11 @@ strbool(const char *str);
 char *
 readablesize(guint64 size);
 
+/* return a human-readable string for the time given in seconds.
+   the string must be g_free()d */
+char *
+readabletime(int secs);
+
 /* returns a string representing the download ratio.
    the string must be g_free()d */
 char *

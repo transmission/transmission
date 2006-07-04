@@ -678,7 +678,7 @@ fixbuttons(GtkTreeSelection *sel, gpointer gdata) {
 void
 dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
        GtkTreeModel *model, GtkTreeIter *iter, gpointer gdata SHUTUP) {
-  char *name, *mb, *terr, *str, *top, *bottom;
+  char *name, *mb, *terr, *str, *top, *bottom, *timestr;
   guint64 size;
   gfloat prog;
   int status, err, eta, tpeers, upeers, dpeers;
@@ -700,10 +700,12 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     top = g_strdup_printf(_("Checking existing files (%.1f%%)"), prog);
   else if(status & TR_STATUS_DOWNLOAD) {
     if(0 > eta)
-      top = g_strdup_printf(_("Finishing in --:--:-- (%.1f%%)"), prog);
-    else
-      top = g_strdup_printf(_("Finishing in %02i:%02i:%02i (%.1f%%)"),
-                            eta / 60 / 60, eta / 60 % 60, eta % 60, prog);
+      top = g_strdup_printf(_("Stalled (%.1f%%)"), prog);
+    else {
+      timestr = readabletime(eta);
+      top = g_strdup_printf(_("Finishing in %s (%.1f%%)"), timestr, prog);
+      g_free(timestr);
+    }
   }
   else if(status & TR_STATUS_SEED)
     top = g_strdup_printf(ngettext("Seeding, uploading to %d of %d peer",
