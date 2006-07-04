@@ -17,7 +17,8 @@ endif
 endif
 
 ifeq ($(PTHREAD),yes)
-ifeq ($(SYSTEM),FreeBSD)
+ifneq ($(filter FreeBSD OpenBSD,$(SYSTEM)),)
+TMPCFLAGS  += -pthread
 TMPLDFLAGS += -pthread
 else
 TMPLDFLAGS += -lpthread
