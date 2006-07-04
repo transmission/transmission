@@ -274,8 +274,7 @@ static void sleepCallBack(void * controller, io_service_t y,
                     downloading++;
             }
 
-        BOOL shouldAsk = [fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0;
-        if (shouldAsk)
+        if ([fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0)
         {
             NSString * message = active == 1
                 ? @"There is an active transfer. Do you really want to quit?"
@@ -531,8 +530,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             }
     }
 
-    BOOL shouldAsk = [fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0;
-    if (shouldAsk)
+    if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
     {
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
             torrents, @"Torrents",
