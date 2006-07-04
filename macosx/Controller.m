@@ -528,49 +528,49 @@ static void sleepCallBack(void * controller, io_service_t y,
                 if (![torrent isSeeding])
                     downloading++;
             }
-    }
 
-    if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
-    {
-        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-            torrents, @"Torrents",
-            [NSNumber numberWithBool: deleteData], @"DeleteData",
-            [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent", nil];
+        if ([fDefaults boolForKey: @"CheckRemoveDownloading"] ? downloading > 0 : active > 0)
+        {
+            NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                torrents, @"Torrents",
+                [NSNumber numberWithBool: deleteData], @"DeleteData",
+                [NSNumber numberWithBool: deleteTorrent], @"DeleteTorrent", nil];
 
-        NSString * title, * message;
-        
-        int selected = [fTableView numberOfSelectedRows];
-        if (selected == 1)
-        {
-            title = [NSString stringWithFormat: @"Comfirm Removal of \"%@\"",
-                        [[fTorrents objectAtIndex: [fTableView selectedRow]] name]];
-            message = @"This transfer is active."
-                        " Once removed, continuing the transfer will require the torrent file."
-                        " Do you really want to remove it?";
-        }
-        else
-        {
-            title = [NSString stringWithFormat: @"Comfirm Removal of %d Transfers", selected];
-            if (selected == active)
-                message = [NSString stringWithFormat:
-                    @"There are %d active transfers.", active];
+            NSString * title, * message;
+            
+            int selected = [fTableView numberOfSelectedRows];
+            if (selected == 1)
+            {
+                title = [NSString stringWithFormat: @"Comfirm Removal of \"%@\"",
+                            [[fTorrents objectAtIndex: [fTableView selectedRow]] name]];
+                message = @"This transfer is active."
+                            " Once removed, continuing the transfer will require the torrent file."
+                            " Do you really want to remove it?";
+            }
             else
-                message = [NSString stringWithFormat:
-                    @"There are %d transfers (%d active).", selected, active];
-            message = [message stringByAppendingString:
-                @" Once removed, continuing the transfers will require the torrent files."
-                " Do you really want to remove them?"];
-        }
+            {
+                title = [NSString stringWithFormat: @"Comfirm Removal of %d Transfers", selected];
+                if (selected == active)
+                    message = [NSString stringWithFormat:
+                        @"There are %d active transfers.", active];
+                else
+                    message = [NSString stringWithFormat:
+                        @"There are %d transfers (%d active).", selected, active];
+                message = [message stringByAppendingString:
+                    @" Once removed, continuing the transfers will require the torrent files."
+                    " Do you really want to remove them?"];
+            }
 
-        NSBeginAlertSheet(title, @"Remove", @"Cancel", nil, fWindow, self,
-            @selector(removeSheetDidEnd:returnCode:contextInfo:), nil, dict, message);
+            NSBeginAlertSheet(title, @"Remove", @"Cancel", nil, fWindow, self,
+                @selector(removeSheetDidEnd:returnCode:contextInfo:), nil, dict, message);
+            return;
+        }
     }
-    else
-        [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
+    
+    [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
 }
 
-- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
-                        contextInfo: (NSDictionary *) dict
+- (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
 {
     [NSApp stopModal];
 
@@ -585,8 +585,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [torrents release];
 }
 
-- (void) confirmRemove: (NSArray *) torrents
-        deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
+- (void) confirmRemove: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
