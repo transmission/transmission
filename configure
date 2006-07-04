@@ -159,7 +159,7 @@ EOF
   do
     if runcmd $CC $CFLAGS_GTK -I$intl_testdir $LDFLAGS_GTK -o testconf testconf.c
     then
-      CFLAGS_GTK="CFLAGS_GTK -I$intl_testdir"
+      CFLAGS_GTK="$CFLAGS_GTK -I$intl_testdir"
       rm -f testconf.c testconf
       return 0
     fi
