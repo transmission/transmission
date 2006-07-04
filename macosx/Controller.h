@@ -141,7 +141,7 @@
 - (void) attemptToStartAuto: (Torrent *) torrent;
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents;
 
-- (void) reloadInspector: (NSNotification *) notification;
+- (void) reloadInspectorSettings: (NSNotification *) notification;
 
 - (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;

@@ -231,7 +231,7 @@ static void sleepCallBack(void * controller, io_service_t y,
                     name: @"TorrentStartSettingChange" object: nil];
     
     //change that just impacts the inspector
-    [nc addObserver: self selector: @selector(reloadInspector:)
+    [nc addObserver: self selector: @selector(reloadInspectorSettings:)
                     name: @"TorrentSettingChange" object: nil];
 
     //timer to update the interface
@@ -246,7 +246,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [fWindow makeKeyAndOrderFront: nil];
 
-    [self reloadInspector: nil];
+    //load info for no torrents
+    [fInfoController updateInfoForTorrents: [NSArray array]];
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
 }
@@ -1121,9 +1122,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 }
 
-- (void) reloadInspector: (NSNotification *) notification
+- (void) reloadInspectorSettings: (NSNotification *) notification
 {
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [fInfoController updateInfoSettings];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
@@ -1238,7 +1239,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [self reloadInspector: nil];
+    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) toggleStatusBar: (id) sender
