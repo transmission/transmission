@@ -147,10 +147,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     IONotificationPortRef notify;
     io_object_t iterator;
     if (fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator))
-    {
         CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify),
                             kCFRunLoopCommonModes);
-    }
     else
         NSLog(@"Could not IORegisterForSystemPower");
 
