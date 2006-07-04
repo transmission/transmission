@@ -470,8 +470,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) resumeAllTorrents: (id) sender
 {
-    [self resumeTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange:
-                                    NSMakeRange(0, [fTorrents count])]];
+    [self resumeTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrents count])]];
 }
 
 - (void) resumeTorrentWithIndex: (NSIndexSet *) indexSet
@@ -492,8 +491,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) stopAllTorrents: (id) sender
 {
-    [self stopTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange:
-                                    NSMakeRange(0, [fTorrents count])]];
+    [self stopTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrents count])]];
 }
 
 - (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
