@@ -56,6 +56,7 @@
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfoStats;
+- (void) updateInfoSettings;
 
 - (void) setNextTab;
 - (void) setPreviousTab;

@@ -178,6 +178,7 @@
         [fDateStartedField setObjectValue: [torrent date]];
     }
     [self updateInfoStats];
+    [self updateInfoSettings];
 
     //set file table
     [fFiles removeAllObjects];
@@ -189,13 +190,75 @@
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
+}
+
+- (void) updateInfoStats
+{
+    int numberSelected = [fTorrents count];
+    if (numberSelected > 0)
+    {
+        //float downloadRate = 0, uploadRate = 0;
+        float downloadedValid = 0;
+        uint64_t downloadedTotal = 0, uploadedTotal = 0;
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+        {
+            /*downloadRate += [torrent downloadRate];
+            uploadRate += [torrent uploadRate];
+            */
+            downloadedValid += [torrent downloadedValid];
+            downloadedTotal += [torrent downloadedTotal];
+            uploadedTotal += [torrent uploadedTotal];
+        }
+/*
+        [fDownloadRateField setStringValue: [NSString stringForSpeed: downloadRate]];
+        [fUploadRateField setStringValue: [NSString stringForSpeed: uploadRate]];
+*/
+        [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
+        [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
+        [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
     
+        if (numberSelected == 1)
+        {
+            torrent = [fTorrents objectAtIndex: 0];
+/*
+            [fStateField setStringValue: [torrent state]];
+            [fPercentField setStringValue: [NSString stringWithFormat:
+                                            @"%.2f%%", 100.0 * [torrent progress]]];
+*/
+            int seeders = [torrent seeders], leechers = [torrent leechers];
+            [fSeedersField setStringValue: seeders < 0 ?
+                @"N/A" : [NSString stringWithInt: seeders]];
+            [fLeechersField setStringValue: leechers < 0 ?
+                @"N/A" : [NSString stringWithInt: leechers]];
+            
+            BOOL active = [torrent isActive];
+            
+            [fConnectedPeersField setStringValue: active ? [NSString
+                    stringWithInt: [torrent totalPeers]] : @"N/A"];
+            [fDownloadingFromField setStringValue: active ? [NSString
+                    stringWithInt: [torrent peersUploading]] : @"N/A"];
+            [fUploadingToField setStringValue: active ? [NSString
+                    stringWithInt: [torrent peersDownloading]] : @"N/A"];
+            
+            [fRatioField setStringValue: [NSString stringForRatioWithDownload:
+                                        downloadedTotal upload: uploadedTotal]];
+        }
+    }
+}
+
+- (void) updateInfoSettings
+{
+    int numberSelected = [fTorrents count];
+
     //set wait to start
     BOOL waiting = NO, notWaiting = NO, canEnableWaiting = numberSelected > 0,
         waitingSettingOn = [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"]
                                 isEqualToString: @"Wait"];
     
-    enumerator = [fTorrents objectEnumerator];
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
     {
         if ([torrent waitingToStart])
@@ -263,62 +326,6 @@
     }
 }
 
-- (void) updateInfoStats
-{
-    int numberSelected = [fTorrents count];
-    if (numberSelected > 0)
-    {
-        //float downloadRate = 0, uploadRate = 0;
-        float downloadedValid = 0;
-        uint64_t downloadedTotal = 0, uploadedTotal = 0;
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-        {
-            /*downloadRate += [torrent downloadRate];
-            uploadRate += [torrent uploadRate];
-            */
-            downloadedValid += [torrent downloadedValid];
-            downloadedTotal += [torrent downloadedTotal];
-            uploadedTotal += [torrent uploadedTotal];
-        }
-/*
-        [fDownloadRateField setStringValue: [NSString stringForSpeed: downloadRate]];
-        [fUploadRateField setStringValue: [NSString stringForSpeed: uploadRate]];
-*/
-        [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
-        [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
-        [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
-    
-        if (numberSelected == 1)
-        {
-            torrent = [fTorrents objectAtIndex: 0];
-/*
-            [fStateField setStringValue: [torrent state]];
-            [fPercentField setStringValue: [NSString stringWithFormat:
-                                            @"%.2f%%", 100.0 * [torrent progress]]];
-*/
-            int seeders = [torrent seeders], leechers = [torrent leechers];
-            [fSeedersField setStringValue: seeders < 0 ?
-                @"N/A" : [NSString stringWithInt: seeders]];
-            [fLeechersField setStringValue: leechers < 0 ?
-                @"N/A" : [NSString stringWithInt: leechers]];
-            
-            BOOL active = [torrent isActive];
-            
-            [fConnectedPeersField setStringValue: active ? [NSString
-                    stringWithInt: [torrent totalPeers]] : @"N/A"];
-            [fDownloadingFromField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersUploading]] : @"N/A"];
-            [fUploadingToField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersDownloading]] : @"N/A"];
-            
-            [fRatioField setStringValue: [NSString stringForRatioWithDownload:
-                                        downloadedTotal upload: uploadedTotal]];
-        }
-    }
-}
-
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
@@ -379,8 +386,7 @@
 
 - (void) setNextTab
 {
-    if ([fTabView indexOfTabViewItem: [fTabView selectedTabViewItem]]
-                                    == [fTabView numberOfTabViewItems] - 1)
+    if ([fTabView indexOfTabViewItem: [fTabView selectedTabViewItem]] == [fTabView numberOfTabViewItems] - 1)
         [fTabView selectFirstTabViewItem: nil];
     else
         [fTabView selectNextTabViewItem: nil];
