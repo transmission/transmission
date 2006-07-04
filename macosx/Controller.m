@@ -377,8 +377,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             [panel setCanChooseFiles: NO];
             [panel setCanChooseDirectories: YES];
 
-            [panel setMessage: [@"Select the download folder for "
-                    stringByAppendingString: [torrentPath lastPathComponent]]];
+            [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
 
             [panel beginSheetForDirectory: nil file: nil types: nil
                 modalForWindow: fWindow modalDelegate: self didEndSelector:
