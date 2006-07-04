@@ -307,21 +307,19 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self updateTorrentHistory];
     [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
     
-    //remember window states
+    //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
-    [fInfoController close];
-    [fPrefsController close];
-    [fWindow close];
+    [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
     
     //clear badge
     [fBadger clearBadge];
 
-    //end quickly if updated version will open
+    //end quickly if the app is updating
     if (fUpdateInProgress)
         return;
 
-    //wait for running transfers to stop (5 seconds timeout)
+    //wait for running transfers to stop (5 second timeout)
     NSDate * start = [NSDate date];
     BOOL timeUp = NO;
     
