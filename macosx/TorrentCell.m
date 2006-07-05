@@ -346,10 +346,10 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         //name and status string
         const float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * padding - extraNameShift;
         
-        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
-                                    attributes: nameAttributes];
-        NSAttributedString * statusString = [[fTorrent shortStatusString] attributedStringFittingInWidth: mainWidth
-                                                attributes: statusAttributes];
+        NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: [fTorrent shortStatusString]
+                                                    attributes: statusAttributes] autorelease];
+        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth:
+                                mainWidth - [statusString size].width - linePadding attributes: nameAttributes];
                      
         //place name string
         pen.x += iconSize.width + padding + extraNameShift;
@@ -359,13 +359,13 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
         
         //place status string
         pen.x = cellFrame.origin.x + cellFrame.size.width - padding - [statusString size].width;
-        pen.y += [nameString size].height - [statusString size].height;
+        pen.y += ([nameString size].height - [statusString size].height) * 0.5;
         
         [statusString drawAtPoint: pen];
         
         //progress bar
         pen.x = cellFrame.origin.x + iconSize.width + 2.0 * padding;
-        pen.y += [statusString size].height + linePadding + BAR_HEIGHT;
+        pen.y = cellFrame.origin.y + [nameString size].height + 2.0 * linePadding + BAR_HEIGHT;
         
         const float barWidth = mainWidth + extraNameShift - BUTTONS_TOTAL_WIDTH + padding;
         
