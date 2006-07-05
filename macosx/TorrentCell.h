@@ -31,6 +31,8 @@
 @interface TorrentCell : NSCell
 {
     Torrent * fTorrent;
+
+    NSUserDefaults * fDefaults;
 }
 - (void) setTorrent:   (Torrent *) torrent;
 @end

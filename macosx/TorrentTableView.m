@@ -26,8 +26,10 @@
 #import "Controller.h"
 #import "Torrent.h"
 
+#define BUTTON_TO_TOP_REGULAR 33.5
+#define BUTTON_TO_TOP_SMALL 19.0
+
 #define BUTTON_WIDTH 14.0
-#define BUTTON_TO_TOP 33.5
 #define DISTANCE_FROM_CENTER 2.5
 //change BUTTONS_TOTAL_WIDTH when changing this
 #define AREA_CENTER 21.0
@@ -56,6 +58,8 @@
         fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
         
         fClickPoint = NSZeroPoint;
+        
+        fDefaults = [NSUserDefaults standardUserDefaults];
     }
     
     return self;
@@ -182,18 +186,21 @@
 - (NSRect) pauseRectForRow: (int) row
 {
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-                
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width
-                        - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
-                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
+    
+    float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
+    
+    return NSMakeRect(cellRect.origin.x + cellRect.size.width - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
+                        cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
 - (NSRect) revealRectForRow: (int) row
 {
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
+    float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
+    
     return NSMakeRect(cellRect.origin.x + cellRect.size.width - AREA_CENTER + DISTANCE_FROM_CENTER,
-                        cellRect.origin.y + BUTTON_TO_TOP, BUTTON_WIDTH, BUTTON_WIDTH);
+                        cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
 - (BOOL) pointInIconRect: (NSPoint) point

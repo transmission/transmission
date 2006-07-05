@@ -111,10 +111,14 @@
             [fPublicTorrentLocation release];
         
         [fDate release];
+        
         [fIcon release];
         [fIconFlipped release];
+        [fIconSmall release];
+        
         [fProgressString release];
         [fStatusString release];
+        [fShortStatusString release];
     }
     [super dealloc];
 }
@@ -162,17 +166,27 @@
 
     switch (fStat->status)
     {
+        NSString * tempString;
+    
         case TR_STATUS_PAUSE:
             if (fFinishedSeeding)
-                [fStatusString setString: @"Seeding complete"];
+                tempString = @"Seeding complete";
             else if (fWaitToStart && [[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
-                [fStatusString setString: [@"Waiting to start" stringByAppendingEllipsis]];
+                tempString = [@"Waiting to start" stringByAppendingEllipsis];
             else
-                [fStatusString setString: @"Paused"];
+                tempString = @"Paused";
+            
+            [fStatusString setString: tempString];
+            [fShortStatusString setString: tempString];
+            
             break;
 
         case TR_STATUS_CHECK:
-            [fStatusString setString: [@"Checking existing files" stringByAppendingEllipsis]];
+            tempString = [@"Checking existing files" stringByAppendingEllipsis];
+            
+            [fStatusString setString: tempString];
+            [fShortStatusString setString: tempString];
+            
             break;
 
         case TR_STATUS_DOWNLOAD:
@@ -201,10 +215,15 @@
             [fStatusString appendFormat:
                 @"Seeding to %d of %d peer%s",
                 [self peersDownloading], [self totalPeers], [self totalPeers] == 1 ? "" : "s"];
+            
             break;
 
         case TR_STATUS_STOPPING:
-            [fStatusString setString: [@"Stopping" stringByAppendingEllipsis]];
+            tempString = [@"Stopping" stringByAppendingEllipsis];
+        
+            [fStatusString setString: tempString];
+            [fShortStatusString setString: tempString];
+            
             break;
     }
     
@@ -216,11 +235,14 @@
 
     if ([self isActive])
     {
-        [fStatusString appendString: @" - "];
+        NSString * stringToAppend = @"";
         if ([self progress] < 1.0)
-            [fStatusString appendFormat: @"DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
-        [fStatusString appendString: [@"UL: " stringByAppendingString:
+            stringToAppend = [NSString stringWithFormat: @"DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
+        stringToAppend = [stringToAppend stringByAppendingString: [@"UL: " stringByAppendingString:
                                                 [NSString stringForSpeed: [self uploadRate]]]];
+
+        [fStatusString appendFormat: @" - %@", stringToAppend];
+        [fShortStatusString setString: stringToAppend];
     }
 }
 
@@ -335,6 +357,11 @@
 - (NSImage *) iconFlipped
 {
     return fIconFlipped;
+}
+
+- (NSImage *) iconSmall
+{
+    return fIconSmall;
 }
 
 - (NSString *) name
@@ -470,6 +497,11 @@
 - (NSString *) statusString
 {
     return fStatusString;
+}
+
+- (NSString *) shortStatusString
+{
+    return fShortStatusString;
 }
 
 - (int) seeders
@@ -620,9 +652,14 @@
     
     fIconFlipped = [fIcon copy];
     [fIconFlipped setFlipped: YES];
+    
+    fIconSmall = [fIconFlipped copy];
+    [fIconSmall setScalesWhenResized: YES];
+    [fIconSmall setSize: NSMakeSize(16.0, 16.0)];
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
+    fShortStatusString = [[NSMutableString alloc] initWithCapacity: 50];
 
     [self update];
     return self;

@@ -26,6 +26,7 @@
                 stopAllTorrents = id; 
                 stopTorrent = id; 
                 toggleAdvancedBar = id; 
+                toggleSmallView = id; 
                 toggleSpeedLimit = id; 
                 toggleStatusBar = id; 
             }; 
@@ -46,6 +47,7 @@
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
+                fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 
                 fSpeedLimitDockItem = NSMenuItem; 
                 fSpeedLimitItem = NSMenuItem; 

@@ -42,6 +42,9 @@
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
+#define ROW_HEIGHT_REGULAR 65.0
+#define ROW_HEIGHT_SMALL 38.0
+
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
@@ -109,6 +112,13 @@ static void sleepCallBack(void * controller, io_service_t y,
     contentMinSize.height = [[fWindow contentView] frame].size.height - [fScrollView frame].size.height
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
+    
+    //set table size
+    if ([fDefaults boolForKey: @"SmallView"])
+    {
+        [fTableView setRowHeight: ROW_HEIGHT_SMALL];
+        [fSmallViewItem setState: NSOnState];
+    }
     
     //set info keyboard shortcuts
     unichar ch = NSRightArrowFunctionKey;
@@ -1232,6 +1242,16 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+}
+
+- (void) toggleSmallView: (id) sender
+{
+    BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
+    
+    [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
+    [fSmallViewItem setState: makeSmall];
+    
+    [fDefaults setBool: makeSmall forKey: @"SmallView"];
 }
 
 - (void) toggleStatusBar: (id) sender

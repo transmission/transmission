@@ -44,8 +44,8 @@
 
     NSUserDefaults  * fDefaults;
 
-    NSImage         * fIcon, * fIconFlipped;
-    NSMutableString * fNameString, * fProgressString, * fStatusString;
+    NSImage         * fIcon, * fIconFlipped, * fIconSmall;
+    NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString;
     
     int     fStopRatioSetting;
     float   fRatioLimit;
@@ -84,8 +84,9 @@
 - (void)    trashData;
 - (void)    trashTorrent;
 
-- (NSImage *)  icon;
-- (NSImage *)  iconFlipped;
+- (NSImage *)   icon;
+- (NSImage *)   iconFlipped;
+- (NSImage *)   iconSmall;
 
 - (NSString *) name;
 - (uint64_t)   size;
@@ -115,6 +116,7 @@
 
 - (NSString *)  progressString;
 - (NSString *)  statusString;
+- (NSString *)  shortStatusString;
 
 - (int) seeders;
 - (int) leechers;

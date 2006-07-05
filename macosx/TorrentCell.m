@@ -62,6 +62,8 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
 {
     if ((self = [super init]))
     {
+        fDefaults = [NSUserDefaults standardUserDefaults];
+    
         NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
         if (!fProgressWhite)
         {
@@ -281,52 +283,97 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
                     [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
 
     NSPoint pen = cellFrame.origin;
-    float padding = 3.0, linePadding = 2.0;
+    const float padding = 3.0, linePadding = 2.0, extraNameShift = 1.0;
 
-    //icon
-    NSImage * icon = [fTorrent iconFlipped];
-    NSSize iconSize = [icon size];
-    
-    pen.x += padding;
-    pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
-    
-    [icon drawAtPoint: pen fromRect: NSMakeRect( 0, 0, iconSize.width, iconSize.height )
-            operation: NSCompositeSourceOver fraction: 1.0];
+    if (![fDefaults boolForKey: @"SmallView"]) //regular size
+    {
+        //icon
+        NSImage * icon = [fTorrent iconFlipped];
+        NSSize iconSize = [icon size];
+        
+        pen.x += padding;
+        pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
+        
+        [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
+                operation: NSCompositeSourceOver fraction: 1.0];
 
-    float extraNameShift = 1.0,
-        mainWidth = cellFrame.size.width - iconSize.width - 3.0 * padding - extraNameShift;
+        const float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * padding - extraNameShift;
 
-    //name string
-    pen.x += iconSize.width + padding + extraNameShift;
-    pen.y = cellFrame.origin.y + padding;
-    NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
-                                attributes: nameAttributes];
-    [nameString drawAtPoint: pen];
-    
-    //progress string
-    pen.y += [nameString size].height + linePadding - 1.0;
-    
-    NSAttributedString * progressString = [[fTorrent progressString]
-        attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
-    [progressString drawAtPoint: pen];
+        //name string
+        pen.x += iconSize.width + padding + extraNameShift;
+        pen.y = cellFrame.origin.y + padding;
+        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
+                                                attributes: nameAttributes];
+        [nameString drawAtPoint: pen];
+        
+        //progress string
+        pen.y += [nameString size].height + linePadding - 1.0;
+        
+        NSAttributedString * progressString = [[fTorrent progressString]
+            attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
+        [progressString drawAtPoint: pen];
 
-    //progress bar
-    pen.x -= extraNameShift;
-    pen.y += [progressString size].height + linePadding + BAR_HEIGHT;
-    
-    float barWidth = mainWidth + extraNameShift - BUTTONS_TOTAL_WIDTH + padding;
-    
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: @"UseAdvancedBar"])
-        [self buildAdvancedBar: barWidth point: pen];
-    else
-        [self buildSimpleBar: barWidth point: pen];
+        //progress bar
+        pen.x -= extraNameShift;
+        pen.y += [progressString size].height + linePadding + BAR_HEIGHT;
+        
+        const float barWidth = mainWidth + extraNameShift - BUTTONS_TOTAL_WIDTH + padding;
+        
+        if ([fDefaults boolForKey: @"UseAdvancedBar"])
+            [self buildAdvancedBar: barWidth point: pen];
+        else
+            [self buildSimpleBar: barWidth point: pen];
 
-    //status strings
-    pen.x += extraNameShift;
-    pen.y += linePadding;
-    NSAttributedString * statusString = [[fTorrent statusString]
-        attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
-    [statusString drawAtPoint: pen];
+        //status string
+        pen.x += extraNameShift;
+        pen.y += linePadding;
+        NSAttributedString * statusString = [[fTorrent statusString]
+            attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
+        [statusString drawAtPoint: pen];
+    }
+    else //small size
+    {
+        //icon
+        NSImage * icon = [fTorrent iconSmall];
+        NSSize iconSize = [icon size];
+        
+        pen.x += padding;
+        pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
+        
+        [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
+                operation: NSCompositeSourceOver fraction: 1.0];
+
+        //name and status string
+        const float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * padding - extraNameShift;
+        
+        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
+                                    attributes: nameAttributes];
+        NSAttributedString * statusString = [[fTorrent shortStatusString] attributedStringFittingInWidth: mainWidth
+                                                attributes: statusAttributes];
+                     
+        //place name string
+        pen.x += iconSize.width + padding + extraNameShift;
+        pen.y = cellFrame.origin.y + linePadding;
+
+        [nameString drawAtPoint: pen];
+        
+        //place status string
+        pen.x = cellFrame.origin.x + cellFrame.size.width - padding - [statusString size].width;
+        pen.y += [nameString size].height - [statusString size].height;
+        
+        [statusString drawAtPoint: pen];
+        
+        //progress bar
+        pen.x = cellFrame.origin.x + iconSize.width + 2.0 * padding;
+        pen.y += [statusString size].height + linePadding + BAR_HEIGHT;
+        
+        const float barWidth = mainWidth + extraNameShift - BUTTONS_TOTAL_WIDTH + padding;
+        
+        if ([fDefaults boolForKey: @"UseAdvancedBar"])
+            [self buildAdvancedBar: barWidth point: pen];
+        else
+            [self buildSimpleBar: barWidth point: pen];
+    }
     
     [nameAttributes release];
     [statusAttributes release];

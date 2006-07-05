@@ -34,11 +34,11 @@
 {
     IBOutlet Controller * fController;
     NSArray             * fTorrents;
-
-    NSPoint               fClickPoint;
+    NSPoint             fClickPoint;
+    
+    NSUserDefaults      * fDefaults;
     
     IBOutlet NSMenu     * fContextRow, * fContextNoRow;
-    
     NSImage             * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
                         * fRevealOnIcon, * fRevealOffIcon;
 }

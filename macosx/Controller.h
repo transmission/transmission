@@ -49,14 +49,13 @@
     IBOutlet TorrentTableView   * fTableView;
     NSToolbar                   * fToolbar;
     
-    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSpeedLimitItem, * fSpeedLimitDockItem;
+    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSmallViewItem,
+                                * fSpeedLimitItem, * fSpeedLimitDockItem;
     IBOutlet NSButton           * fActionButton, * fSpeedLimitButton;
     
     IBOutlet SmoothAquaView     * fStatusBar;
     BOOL                        fStatusBarVisible;
-    IBOutlet NSTextField        * fTotalDLField;
-    IBOutlet NSTextField        * fTotalULField;
-    IBOutlet NSTextField        * fTotalTorrentsField;
+    IBOutlet NSTextField        * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
     NSString                    * fSortType;
     IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
@@ -145,6 +144,8 @@
 
 - (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;
+
+- (void) toggleSmallView: (id) sender;
 
 - (void) toggleStatusBar: (id) sender;
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
