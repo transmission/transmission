@@ -228,10 +228,8 @@
     }
     
     if( fStat->error & TR_ETRACKER )
-    {
         [fStatusString setString: [@"Error: " stringByAppendingString:
-            [NSString stringWithUTF8String: fStat->trackerError]]];
-    }
+                        [NSString stringWithUTF8String: fStat->trackerError]]];
 
     if ([self isActive])
     {
