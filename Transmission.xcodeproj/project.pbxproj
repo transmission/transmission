@@ -77,6 +77,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
+		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
@@ -260,6 +261,7 @@
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
 		A21610FA0A050B1700E8E4C1 /* MenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MenuButton.h; path = macosx/MenuButton.h; sourceTree = "<group>"; };
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
@@ -398,6 +400,7 @@
 				A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */,
 				A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */,
 				A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */,
+				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
 				A27A53640A06AED200E1F16F /* StatusBorder.png */,
@@ -688,6 +691,7 @@
 				A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */,
 				A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */,
 				A27674CF0A5AF1FF00334870 /* SpeedLimitButtonPressed.png in Resources */,
+				A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
