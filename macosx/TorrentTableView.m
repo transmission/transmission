@@ -210,7 +210,8 @@
         return NO;
     
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-    NSSize iconSize = [[[fTorrents objectAtIndex: row] iconFlipped] size];
+    NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
+                                                        : [[[fTorrents objectAtIndex: row] iconFlipped] size];
     
     NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y
             + (cellRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
