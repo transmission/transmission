@@ -1562,7 +1562,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 
     //enable pause item
-    if( action == @selector(stopTorrent:) )
+    if (action == @selector(stopTorrent:))
     {
         if (!canUseMenu)
             return NO;
@@ -1581,7 +1581,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     
     //enable resume item
-    if( action == @selector(resumeTorrent:) )
+    if (action == @selector(resumeTorrent:))
     {
         if (!canUseMenu)
             return NO;
@@ -1600,11 +1600,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     
     //enable sort and advanced bar items
-    if (action == @selector(setSort:) || (action == @selector(toggleAdvancedBar:)))
+    if (action == @selector(setSort:) || action == @selector(toggleAdvancedBar:)
+            || action == @selector(toggleSmallView:))
         return canUseMenu;
     
     //enable copy torrent file item
-    if( action == @selector(copyTorrentFile:) )
+    if (action == @selector(copyTorrentFile:))
     {
         return canUseMenu && [fTableView numberOfSelectedRows] > 0;
     }
