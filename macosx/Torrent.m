@@ -182,23 +182,18 @@
                 [self totalPeers] == 1 ? "" : "s"];
             
             int eta = [self eta];
-            if( eta > 99 * 3600 + 59 * 60 + 59 )
-            {
-                eta = -1;
-            }
             if (eta < 0)
                 [fProgressString appendString: @" - remaining time unknown"];
+            else if (eta < 60)
+                [fProgressString appendFormat: @" - %d sec remaining", eta];
+            else if (eta < 3600) //60 * 60
+            [fProgressString appendFormat: @" - %d min %02d sec remaining", eta / 60, eta % 60];
+            else if (eta < 86400) //24 * 60 * 60
+                [fProgressString appendFormat: @" - %d hr %02d min remaining", eta / 3600, (eta / 60) % 60];
             else
-            {
-                if (eta < 60)
-                    [fProgressString appendFormat: @" - %d sec remaining", eta];
-                else if (eta < 3600)
-                    [fProgressString appendFormat: @" - %d min %02d sec remaining",
-                                                    eta / 60, eta % 60];
-                else
-                    [fProgressString appendFormat: @" - %d hr %02d min remaining",
-                                                    eta / 3600, (eta / 60) % 60];
-            }
+                [fProgressString appendFormat: @" - %d day%s %d hr remaining",
+                                            eta / 86400, eta / 86400 == 1 ? "" : "s", (eta / 3600) % 24];
+            
             break;
 
         case TR_STATUS_SEED:
