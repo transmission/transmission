@@ -486,7 +486,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [[fTorrents objectAtIndex: i] startTransfer];
     
     [self updateUI: nil];
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -515,7 +515,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [[fTorrents objectAtIndex: i] stopTransfer];
     
     [self updateUI: nil];
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -1033,7 +1033,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [torrentToStart startTransfer];
         
         [self updateUI: nil];
-        [fInfoController updateInfoSettings];
+        [fInfoController updateInfoStatsAndSettings];
         [self updateTorrentHistory];
     }
 }
@@ -1043,7 +1043,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self attemptToStartMultipleAuto: fTorrents];
     
     [self updateUI: nil];
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -1052,7 +1052,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self attemptToStartMultipleAuto: [notification object]];
 
     [self updateUI: nil];
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -1126,7 +1126,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) reloadInspectorSettings: (NSNotification *) notification
 {
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStatsAndSettings];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

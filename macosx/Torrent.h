@@ -104,7 +104,7 @@
 - (BOOL) publicTorrent;
 - (BOOL) privateTorrent;
 
-//- (NSString *) state;
+- (NSString *) stateString;
 
 - (float)   progress;
 - (int)     eta;

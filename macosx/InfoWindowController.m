@@ -39,7 +39,7 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
-#define TAB_ACTIVITY_HEIGHT 198.0
+#define TAB_ACTIVITY_HEIGHT 214.0
 #define TAB_OPTIONS_HEIGHT 116.0
 #define TAB_FILES_HEIGHT 250.0
 
@@ -136,8 +136,8 @@
         [fDataLocationField setToolTip: nil];
         [fDateStartedField setStringValue: @""];
         
-/*
         [fStateField setStringValue: @""];
+/*
         [fPercentField setStringValue: @""];
 */
         [fRatioField setStringValue: @""];
@@ -177,8 +177,9 @@
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
     }
-    [self updateInfoStats];
-    [self updateInfoSettings];
+    
+    //update stats and settings
+    [self updateInfoStatsAndSettings];
 
     //set file table
     [fFiles removeAllObjects];
@@ -222,8 +223,9 @@
         if (numberSelected == 1)
         {
             torrent = [fTorrents objectAtIndex: 0];
+
+            [fStateField setStringValue: [torrent stateString]];
 /*
-            [fStateField setStringValue: [torrent state]];
             [fPercentField setStringValue: [NSString stringWithFormat:
                                             @"%.2f%%", 100.0 * [torrent progress]]];
 */
@@ -248,7 +250,7 @@
     }
 }
 
-- (void) updateInfoSettings
+- (void) updateInfoStatsAndSettings
 {
     int numberSelected = [fTorrents count];
 
@@ -324,6 +326,8 @@
         [fRatioLimitField setEnabled: NO];
         [fRatioLimitField setStringValue: @""];
     }
+    
+    [self updateInfoStats];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem

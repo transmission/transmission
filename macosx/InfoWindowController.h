@@ -40,9 +40,10 @@
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateStartedField,
 /*
-                        * fStateField, * fPercentField,
+                        * fPercentField,
                         * fDownloadRateField, * fUploadRateField,
 */
+                        * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
@@ -56,7 +57,7 @@
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfoStats;
-- (void) updateInfoSettings;
+- (void) updateInfoStatsAndSettings;
 
 - (void) setNextTab;
 - (void) setPreviousTab;
