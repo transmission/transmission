@@ -27,7 +27,7 @@
 #import "Torrent.h"
 
 #define BUTTON_TO_TOP_REGULAR 33.5
-#define BUTTON_TO_TOP_SMALL 19.0
+#define BUTTON_TO_TOP_SMALL 20.0
 
 #define BUTTON_WIDTH 14.0
 #define DISTANCE_FROM_CENTER 2.5

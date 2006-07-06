@@ -43,7 +43,7 @@
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
 #define ROW_HEIGHT_REGULAR 65.0
-#define ROW_HEIGHT_SMALL 38.0
+#define ROW_HEIGHT_SMALL 40.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
