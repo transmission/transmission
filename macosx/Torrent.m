@@ -235,12 +235,19 @@
     {
         NSString * stringToAppend = @"";
         if ([self progress] < 1.0)
+        {
             stringToAppend = [NSString stringWithFormat: @"DL: %@, ", [NSString stringForSpeed: [self downloadRate]]];
+            [fShortStatusString setString: @""];
+        }
+        else
+            [fShortStatusString setString: [NSString stringWithFormat: @"ratio: %@, ",
+                [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]]];
+        
         stringToAppend = [stringToAppend stringByAppendingString: [@"UL: " stringByAppendingString:
                                                 [NSString stringForSpeed: [self uploadRate]]]];
 
         [fStatusString appendFormat: @" - %@", stringToAppend];
-        [fShortStatusString setString: stringToAppend];
+        [fShortStatusString appendString: stringToAppend];
     }
 }
 
