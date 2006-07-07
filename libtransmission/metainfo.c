@@ -204,6 +204,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     {
         fprintf( stderr, "Invalid \"piece\" string (size is %d)\n",
                  val->val.s.i );
+        tr_bencFree( &meta );
         return 1;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
@@ -261,6 +262,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
         fprintf( stderr, "Size of hashes and files don't match\n" );
+        free( inf->pieces );
         tr_bencFree( &meta );
         return 1;
     }

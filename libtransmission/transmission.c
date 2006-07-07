@@ -233,6 +233,8 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
                      SHA_DIGEST_LENGTH ) )
         {
             *error = TR_EDUPLICATE;
+            free( inf->pieces );
+            free( inf->files );
             free( tor );
             return NULL;
         }
@@ -754,7 +756,9 @@ static void acceptStop( tr_handle_t * h )
     int ii;
 
     h->acceptDie = 1;
+    tr_lockLock( &h->acceptLock );
     tr_threadJoin( &h->acceptThread );
+    tr_lockUnlock( &h->acceptLock );
     tr_lockClose( &h->acceptLock );
     tr_dbg( "Accept thread joined" );
 
