@@ -101,21 +101,24 @@ int _tr_bencLoad( char * buf, size_t len, benc_val_t * val, char ** end )
             if( tr_bencLoad( cur, len - (cur - buf),
                              &val->val.l.vals[val->val.l.count], &p ) )
             {
+                tr_bencFree( val );
                 return 1;
             }
+            val->val.l.count++;
             if( is_dict && str_expected &&
-                val->val.l.vals[val->val.l.count].type != TYPE_STR )
+                val->val.l.vals[val->val.l.count - 1].type != TYPE_STR )
             {
+                tr_bencFree( val );
                 return 1;
             }
             str_expected = !str_expected;
 
-            val->val.l.count++;
             cur = p;
         }
 
         if( is_dict && ( val->val.l.count & 1 ) )
         {
+            tr_bencFree( val );
             return 1;
         }
 
