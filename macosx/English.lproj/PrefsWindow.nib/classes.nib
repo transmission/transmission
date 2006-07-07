@@ -5,6 +5,8 @@
         {
             ACTIONS = {
                 folderSheetShow = id; 
+                importFolderSheetShow = id; 
+                setAutoImport = id; 
                 setBadge = id; 
                 setDownloadLocation = id; 
                 setLimit = id; 
@@ -22,6 +24,7 @@
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fAutoImportCheck = NSButton; 
                 fBadgeDownloadRateCheck = NSButton; 
                 fBadgeUploadRateCheck = NSButton; 
                 fBandwidthView = NSView; 
@@ -31,6 +34,7 @@
                 fDownloadField = NSTextField; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
+                fImportFolderPopUp = NSPopUpButton; 
                 fNetworkView = NSView; 
                 fPortField = NSTextField; 
                 fQuitCheck = NSButton; 

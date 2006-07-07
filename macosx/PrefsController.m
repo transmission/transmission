@@ -57,6 +57,9 @@
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) updatePopUp;
 
+- (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
+- (void) updateImportPopUp;
+
 @end
 
 @implementation PrefsController
@@ -91,9 +94,7 @@
     
     //set download folder
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-    fDownloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
-    [fDownloadFolder retain];
-
+    fDownloadFolder = [[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] retain];
     if ([downloadChoice isEqualToString: @"Constant"])
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
     else if ([downloadChoice isEqualToString: @"Torrent"])
@@ -101,7 +102,15 @@
     else
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
     [self updatePopUp];
-
+    
+    //set auto import
+    fImportFolder = [[[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath] retain];
+    [self updateImportPopUp];
+ 
+    BOOL autoImport = [fDefaults boolForKey: @"AutoImport"];
+    [fAutoImportCheck setState: autoImport];
+    [fImportFolderPopUp setEnabled: autoImport];
+    
     //set bind port
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
@@ -597,8 +606,31 @@
 
     [panel beginSheetForDirectory: nil file: nil types: nil
         modalForWindow: [self window] modalDelegate: self didEndSelector:
-        @selector( folderSheetClosed:returnCode:contextInfo: )
-        contextInfo: nil];
+        @selector(folderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (void) setAutoImport: (id) sender
+{
+    int state = [fAutoImportCheck state];
+    [fDefaults setBool: state forKey: @"AutoImport"];
+    [fImportFolderPopUp setEnabled: state];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+}
+
+- (void) importFolderSheetShow: (id) sender
+{
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+
+    [panel setPrompt: @"Select"];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
+
+    [panel beginSheetForDirectory: nil file: nil types: nil
+        modalForWindow: [self window] modalDelegate: self didEndSelector:
+        @selector(importFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
 - (void) windowWillClose: (NSNotification *) notification
@@ -652,8 +684,7 @@
    if (code == NSOKButton)
    {
        [fDownloadFolder release];
-       fDownloadFolder = [[openPanel filenames] objectAtIndex: 0];
-       [fDownloadFolder retain];
+       fDownloadFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
 
        [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
        [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
@@ -684,6 +715,35 @@
     //update menu item
     NSMenuItem * menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
     [menuItem setTitle: [fDownloadFolder lastPathComponent]];
+    [menuItem setImage: icon];
+}
+
+- (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
+{
+   if (code == NSOKButton)
+   {
+       [fImportFolder release];
+       fImportFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
+
+       [fDefaults setObject: fImportFolder forKey: @"AutoImportDirectory"];
+
+       [self updateImportPopUp];
+       
+       [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+   }
+   [fImportFolderPopUp selectItemAtIndex: 0];
+}
+
+- (void) updateImportPopUp
+{
+    //get and resize the icon
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile: fImportFolder];
+    [icon setScalesWhenResized: YES];
+    [icon setSize: NSMakeSize(16.0, 16.0)];
+
+    //update menu item
+    NSMenuItem * menuItem = (NSMenuItem *) [fImportFolderPopUp itemAtIndex: 0];
+    [menuItem setTitle: [fImportFolder lastPathComponent]];
     [menuItem setImage: icon];
 }
 

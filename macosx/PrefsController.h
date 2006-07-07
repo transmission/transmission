@@ -33,11 +33,13 @@
     NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
-    IBOutlet NSPopUpButton  * fFolderPopUp;
+    IBOutlet NSPopUpButton  * fFolderPopUp, * fImportFolderPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
                             * fQuitDownloadingCheck, * fRemoveDownloadingCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
-                            * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck;
+                            * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck,
+                            * fAutoImportCheck;
+                            
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
@@ -54,7 +56,7 @@
     
     IBOutlet SUUpdater      * fUpdater;
 
-    NSString                * fDownloadFolder;
+    NSString                * fDownloadFolder, * fImportFolder;
     NSUserDefaults          * fDefaults;
 }
 
@@ -81,6 +83,9 @@
 - (void) setQuickLimit:     (int) limit type: (NSString *) type;
 
 - (void) enableSpeedLimit: (BOOL) enable;
+
+- (void) setAutoImport: (id) sender;
+- (void) importFolderSheetShow: (id) sender;
 
 - (void) setRatio:          (id) sender;
 - (void) setRatioCheck:     (id) sender;

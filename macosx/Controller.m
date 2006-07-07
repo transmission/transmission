@@ -89,6 +89,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fInfoController release];
     [fBadger release];
     [fSortType release];
+    [fAutoImportedNames release];
     
     tr_close( fLib );
     [super dealloc];
@@ -243,14 +244,26 @@ static void sleepCallBack(void * controller, io_service_t y,
     //change that just impacts the inspector
     [nc addObserver: self selector: @selector(reloadInspectorSettings:)
                     name: @"TorrentSettingChange" object: nil];
+    
+    //reset auto import
+    [nc addObserver: self selector: @selector(autoImportChange:)
+                    name: @"AutoImportSettingChange" object: nil];
 
-    //timer to update the interface
+    //timer to update the interface every second
     fCompleted = 0;
     [self updateUI: nil];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
-        selector: @selector( updateUI: ) userInfo: nil repeats: YES];
+        selector: @selector(updateUI:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
+    
+    //timer for auto import, will check every 60 seconds
+    fAutoImportedNames = [[NSArray alloc] init];
+    
+    [self checkAutoImportDirectory: nil];
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self 
+        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
+    [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
     [self sortTorrents];
     
@@ -310,7 +323,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
-    //stop updating the interface
+    //stop timers
+    [fAutoImportTimer invalidate];
     [fTimer invalidate];
     
     //save history and stop running torrents
@@ -456,17 +470,17 @@ static void sleepCallBack(void * controller, io_service_t y,
         @selector(openSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
-- (void) openFromSheet: (NSArray *) filenames
-{
-    [self application: NSApp openFiles: filenames];
-}
-
 - (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code
     contextInfo: (void *) info
 {
     if (code == NSOKButton)
         [self performSelectorOnMainThread: @selector(openFromSheet:)
                     withObject: [panel filenames] waitUntilDone: NO];
+}
+
+- (void) openFromSheet: (NSArray *) filenames
+{
+    [self application: NSApp openFiles: filenames];
 }
 
 - (void) resumeTorrent: (id) sender
@@ -771,7 +785,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             [self checkWaitingForFinished: torrent];
         
             //notifications
-            [self notifyGrowl: [torrent name]];
+            [self notifyGrowl: @"Download Complete" message: [torrent name] notification: @"Download Complete"];
             if (![fWindow isKeyWindow])
                 fCompleted++;
         }
@@ -1125,6 +1139,52 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) reloadInspectorSettings: (NSNotification *) notification
 {
     [fInfoController updateInfoStatsAndSettings];
+}
+
+- (void) checkAutoImportDirectory: (NSTimer *) timer
+{
+    if (![fDefaults boolForKey: @"AutoImport"])
+        return;
+    	
+    NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
+    
+    //if folder cannot be found simply give up
+    NSArray * allFileNames;
+    if (!(allFileNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))
+        return;
+
+    //try to add files that haven't already been added
+    NSMutableArray * newFileNames = [NSMutableArray arrayWithArray: allFileNames];
+    [newFileNames removeObjectsInArray: fAutoImportedNames];
+    
+    //save the current list of files
+    [fAutoImportedNames release];
+    fAutoImportedNames = [allFileNames retain];
+    
+    NSEnumerator * enumerator = [newFileNames objectEnumerator];
+    NSString * file;
+    unsigned oldCount;
+    while ((file = [enumerator nextObject]))
+        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+        {
+            NSString * fullPath = [path stringByAppendingPathComponent: file];
+            
+            oldCount = [fTorrents count];
+            [self openFromSheet: [NSArray arrayWithObject: fullPath]];
+            
+            //import only actually happened if the torrent array is larger
+            if (oldCount < [fTorrents count])
+                [self notifyGrowl: [file stringByAppendingString: @" Imported"] message: @"Torrent file imported"
+                                notification: @"Import Performed"];
+        }
+}
+
+- (void) autoImportChange: (NSNotification *) notification
+{
+    [fAutoImportedNames release];
+    fAutoImportedNames = [[NSArray alloc] init];
+    
+    [self checkAutoImportDirectory: nil];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
@@ -1700,7 +1760,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
-- (void) notifyGrowl: (NSString * ) file
+- (void) notifyGrowl: (NSString * ) title message: (NSString *) message notification: (NSString *) notification
 {
     if (!fHasGrowl)
         return;
@@ -1709,13 +1769,13 @@ static void sleepCallBack(void * controller, io_service_t y,
         @"tell application \"System Events\"\n"
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n "
-         "      notify with name \"Download Complete\""
-         "        title \"Download Complete\""
+         "      notify with name \"%@\""
+         "        title \"%@\""
          "        description \"%@\""
          "        application name \"Transmission\"\n"
          "    end tell\n"
          "  end if\n"
-         "end tell", file];
+         "end tell", notification, title, message];
     
     NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     NSDictionary * error;
@@ -1729,17 +1789,16 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (!fHasGrowl)
         return;
 
-    NSString * growlScript = [NSString stringWithFormat:
-        @"tell application \"System Events\"\n"
+    NSString * growlScript = @"tell application \"System Events\"\n"
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n"
          "      register as application \"Transmission\" "
-         "        all notifications {\"Download Complete\"}"
-         "        default notifications {\"Download Complete\"}"
+         "        all notifications {\"Download Complete\", \"Import Performed\"}"
+         "        default notifications {\"Download Complete\", \"Import Performed\"}"
          "        icon of application \"Transmission\"\n"
          "    end tell\n"
          "  end if\n"
-         "end tell"];
+         "end tell";
 
     NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     NSDictionary * error;

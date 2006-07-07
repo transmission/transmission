@@ -71,6 +71,9 @@
     io_connect_t                fRootPort;
     NSTimer                     * fTimer;
     
+    NSTimer                     * fAutoImportTimer;
+    NSArray              * fAutoImportedNames;
+    
     BOOL                        fHasGrowl;
     Badger                      * fBadger;
     BOOL                        fUpdateInProgress;
@@ -142,6 +145,9 @@
 
 - (void) reloadInspectorSettings: (NSNotification *) notification;
 
+- (void) checkAutoImportDirectory: (NSTimer *) t;
+- (void) autoImportChange: (NSNotification *) notification;
+
 - (void) sleepCallBack: (natural_t) messageType argument:
                         (void *) messageArgument;
 
@@ -155,7 +161,7 @@
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
 
-- (void) notifyGrowl:       (NSString *) file;
+- (void) notifyGrowl: (NSString * ) title message: (NSString *) message notification: (NSString *) notification;
 - (void) growlRegister;
 
 - (void) checkUpdate:       (id) sender;
