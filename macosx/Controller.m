@@ -257,11 +257,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    //timer for auto import, will check every 60 seconds
+    //timer for auto import, will check every 30 seconds
     fAutoImportedNames = [[NSArray alloc] init];
     
     [self checkAutoImportDirectory: nil];
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self 
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 30.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
@@ -1175,7 +1175,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
                 [self notifyGrowl: [file stringByAppendingString: @" Imported"] message: @"Torrent file imported"
-                                notification: @"Import Performed"];
+                                notification: @"Automatically Add Torrent"];
         }
 }
 
@@ -1793,8 +1793,8 @@ static void sleepCallBack(void * controller, io_service_t y,
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n"
          "      register as application \"Transmission\" "
-         "        all notifications {\"Download Complete\", \"Import Performed\"}"
-         "        default notifications {\"Download Complete\", \"Import Performed\"}"
+         "        all notifications {\"Download Complete\", \"Automatically Add Torrent\"}"
+         "        default notifications {\"Download Complete\", \"Automatically Add Torrent\"}"
          "        icon of application \"Transmission\"\n"
          "    end tell\n"
          "  end if\n"
