@@ -1167,14 +1167,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     while ((file = [enumerator nextObject]))
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
-            NSString * fullPath = [path stringByAppendingPathComponent: file];
-            
             oldCount = [fTorrents count];
-            [self openFromSheet: [NSArray arrayWithObject: fullPath]];
+            [self openFromSheet: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [self notifyGrowl: [file stringByAppendingString: @" Imported"] message: @"Torrent file imported"
+                [self notifyGrowl: [file stringByAppendingString: @" Auto Added"] message: @"Torrent file added"
                                 notification: @"Automatically Add Torrent"];
         }
 }
