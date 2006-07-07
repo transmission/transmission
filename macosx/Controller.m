@@ -1216,12 +1216,15 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
-        if ([[[pasteboard propertyListForType: NSFilenamesPboardType]
-            pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]] count] > 0)
-        {
-            [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
-            return NSDragOperationGeneric;
-        }
+        //check if any files to add have "torrent" as an extension
+        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSString * file;
+        while ((file = [enumerator nextObject]))
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+            {
+                [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
+                return NSDragOperationGeneric;
+            }
     }
     else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
@@ -1238,8 +1241,18 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
-        [self application: NSApp openFiles: [[[info draggingPasteboard] propertyListForType: NSFilenamesPboardType]
-            pathsMatchingExtensions: [NSArray arrayWithObject: @"torrent"]]];
+    {
+        //create an array of files with the "torrent" extension
+        NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
+        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSString * file;
+        while ((file = [enumerator nextObject]))
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+                [filesToOpen addObject: file];
+    
+        [self application: NSApp openFiles: filesToOpen];
+        [filesToOpen release];
+    }
     else
     {
         //remember selected rows if needed
