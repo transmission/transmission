@@ -1148,11 +1148,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     	
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
-    //if folder cannot be found simply give up
-    NSArray * allFileNames;
-    if (!(allFileNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))
+    //if folder cannot be found or the contents hasn't changed simply give up
+    NSArray * allFileNames;NSLog(@"first");
+    if (!(allFileNames = [[NSFileManager defaultManager] directoryContentsAtPath: path])
+            || [allFileNames isEqualToArray: fAutoImportedNames])
         return;
-
+NSLog(@"here!");
     //try to add files that haven't already been added
     NSMutableArray * newFileNames = [NSMutableArray arrayWithArray: allFileNames];
     [newFileNames removeObjectsInArray: fAutoImportedNames];
@@ -1364,68 +1365,68 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
-    if( [ident isEqualToString: TOOLBAR_OPEN] )
+    if ([ident isEqualToString: TOOLBAR_OPEN])
     {
         [item setLabel: @"Open"];
         [item setPaletteLabel: @"Open Torrent Files"];
         [item setToolTip: @"Open torrent files"];
         [item setImage: [NSImage imageNamed: @"Open.png"]];
         [item setTarget: self];
-        [item setAction: @selector( openShowSheet: )];
+        [item setAction: @selector(openShowSheet:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_REMOVE] )
+    else if ([ident isEqualToString: TOOLBAR_REMOVE])
     {
         [item setLabel: @"Remove"];
         [item setPaletteLabel: @"Remove Selected"];
         [item setToolTip: @"Remove selected transfers"];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
-        [item setAction: @selector( removeNoDelete: )];
+        [item setAction: @selector(removeNoDelete:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_INFO] )
+    else if ([ident isEqualToString: TOOLBAR_INFO])
     {
         [item setLabel: @"Inspector"];
         [item setPaletteLabel: @"Show/Hide Inspector"];
         [item setToolTip: @"Display torrent inspector"];
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
-        [item setAction: @selector( showInfo: )];
+        [item setAction: @selector(showInfo:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_PAUSE_ALL] )
+    else if ([ident isEqualToString: TOOLBAR_PAUSE_ALL])
     {
         [item setLabel: @"Pause All"];
         [item setPaletteLabel: [item label]];
         [item setToolTip: @"Pause all transfers"];
         [item setImage: [NSImage imageNamed: @"PauseAll.png"]];
         [item setTarget: self];
-        [item setAction: @selector( stopAllTorrents: )];
+        [item setAction: @selector(stopAllTorrents:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_RESUME_ALL] )
+    else if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
     {
         [item setLabel: @"Resume All"];
         [item setPaletteLabel: [item label]];
         [item setToolTip: @"Resume all transfers"];
         [item setImage: [NSImage imageNamed: @"ResumeAll.png"]];
         [item setTarget: self];
-        [item setAction: @selector( resumeAllTorrents: )];
+        [item setAction: @selector(resumeAllTorrents:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_PAUSE_SELECTED] )
+    else if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
         [item setLabel: @"Pause"];
         [item setPaletteLabel: @"Pause Selected"];
         [item setToolTip: @"Pause selected transfers"];
         [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
         [item setTarget: self];
-        [item setAction: @selector( stopTorrent: )];
+        [item setAction: @selector(stopTorrent:)];
     }
-    else if( [ident isEqualToString: TOOLBAR_RESUME_SELECTED] )
+    else if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
         [item setLabel: @"Resume"];
         [item setPaletteLabel: @"Resume Selected"];
         [item setToolTip: @"Resume selected transfers"];
         [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
         [item setTarget: self];
-        [item setAction: @selector( resumeTorrent: )];
+        [item setAction: @selector(resumeTorrent:)];
     }
     else
     {
@@ -1721,7 +1722,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 }
 
-- (NSRect) windowWillUseStandardFrame: (NSWindow *) w defaultFrame: (NSRect) defaultFrame
+- (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
     NSRect windowRect = [fWindow frame];
     float newHeight = windowRect.size.height - [fScrollView frame].size.height
