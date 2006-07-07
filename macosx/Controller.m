@@ -1149,11 +1149,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
     //if folder cannot be found or the contents hasn't changed simply give up
-    NSArray * allFileNames;NSLog(@"first");
+    NSArray * allFileNames;
     if (!(allFileNames = [[NSFileManager defaultManager] directoryContentsAtPath: path])
             || [allFileNames isEqualToArray: fAutoImportedNames])
         return;
-NSLog(@"here!");
+
     //try to add files that haven't already been added
     NSMutableArray * newFileNames = [NSMutableArray arrayWithArray: allFileNames];
     [newFileNames removeObjectsInArray: fAutoImportedNames];
