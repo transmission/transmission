@@ -785,7 +785,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             [self checkWaitingForFinished: torrent];
         
             //notifications
-            [self notifyGrowl: @"Download Complete" message: [torrent name] notification: @"Download Complete"];
+            [self notifyGrowl: @"Download Complete" message: [torrent name] identifier: @"Download Complete"];
             if (![fWindow isKeyWindow])
                 fCompleted++;
         }
@@ -1173,7 +1173,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
                 [self notifyGrowl: [file stringByAppendingString: @" Auto Added"] message: @"Torrent file added"
-                                notification: @"Automatically Add Torrent"];
+                                identifier: @"Automatically Add Torrent"];
         }
 }
 
@@ -1675,27 +1675,26 @@ static void sleepCallBack(void * controller, io_service_t y,
     Torrent * torrent;
     BOOL active;
 
-    switch( messageType )
+    switch (messageType)
     {
         case kIOMessageSystemWillSleep:
-            /* Close all connections before going to sleep and remember
-               we should resume when we wake up */
+            //close all connections before going to sleep and remember we should resume when we wake up
             [fTorrents makeObjectsPerformSelector: @selector(sleep)];
 
-            /* Wait for torrents to stop (5 seconds timeout) */
+            //wait for running transfers to stop (5 second timeout)
             NSDate * start = [NSDate date];
-            enumerator = [fTorrents objectEnumerator];
-            while( ( torrent = [enumerator nextObject] ) )
-            {
-                while( [[NSDate date] timeIntervalSinceDate: start] < 5 &&
-                        ![torrent isPaused] )
+            BOOL timeUp = NO;
+            
+            NSEnumerator * enumerator = [fTorrents objectEnumerator];
+            Torrent * torrent;
+            while (!timeUp && (torrent = [enumerator nextObject]))
+                while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
                 {
-                    usleep( 100000 );
+                    usleep(100000);
                     [torrent update];
                 }
-            }
 
-            IOAllowPowerChange( fRootPort, (long) messageArgument );
+            IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
 
         case kIOMessageCanSystemSleep:
@@ -1710,13 +1709,13 @@ static void sleepCallBack(void * controller, io_service_t y,
                 }
 
             if (active)
-                IOCancelPowerChange( fRootPort, (long) messageArgument );
+                IOCancelPowerChange(fRootPort, (long) messageArgument);
             else
-                IOAllowPowerChange( fRootPort, (long) messageArgument );
+                IOAllowPowerChange(fRootPort, (long) messageArgument);
             break;
 
         case kIOMessageSystemHasPoweredOn:
-            /* Resume download after we wake up */
+            //resume sleeping transfers after we wake up
             [fTorrents makeObjectsPerformSelector: @selector(wakeUp)];
             break;
     }
@@ -1758,7 +1757,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
-- (void) notifyGrowl: (NSString * ) title message: (NSString *) message notification: (NSString *) notification
+- (void) notifyGrowl: (NSString *) title message: (NSString *) message identifier: (NSString *) ident
 {
     if (!fHasGrowl)
         return;
@@ -1773,7 +1772,7 @@ static void sleepCallBack(void * controller, io_service_t y,
          "        application name \"Transmission\"\n"
          "    end tell\n"
          "  end if\n"
-         "end tell", notification, title, message];
+         "end tell", ident, title, message];
     
     NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
     NSDictionary * error;

@@ -161,7 +161,7 @@
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
 
-- (void) notifyGrowl: (NSString * ) title message: (NSString *) message notification: (NSString *) notification;
+- (void) notifyGrowl: (NSString *) title message: (NSString *) message identifier: (NSString *) ident;
 - (void) growlRegister;
 
 - (void) checkUpdate:       (id) sender;
