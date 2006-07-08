@@ -789,7 +789,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         
             //notifications
             [self notifyGrowl: @"Download Complete" message: [[torrent name] stringByAppendingString:
-                                                    @" is finished downloading"] identifier: @"Download Complete"];
+                                                    @" finished downloading"] identifier: @"Download Complete"];
             if (![fWindow isKeyWindow])
                 fCompleted++;
         }
@@ -1077,7 +1077,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fInfoController updateInfoStatsAndSettings];
     
     [self notifyGrowl: @"Seeding Complete" message: [[[notification object] name] stringByAppendingString:
-                                                        @" is finished seeding"] identifier: @"Seeding Complete"];
+                                                        @" finished seeding"] identifier: @"Seeding Complete"];
 }
 
 - (void) attemptToStartAuto: (Torrent *) torrent
