@@ -7,8 +7,8 @@
                 linkForums = id; 
                 linkHomepage = id; 
                 openShowSheet = id; 
-                removeDeleteBoth = id; 
                 removeDeleteData = id; 
+                removeDeleteDataAndTorrent = id; 
                 removeDeleteTorrent = id; 
                 removeNoDelete = id; 
                 resumeAllTorrents = id; 

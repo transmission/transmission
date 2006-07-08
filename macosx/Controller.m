@@ -530,10 +530,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self updateTorrentHistory];
 }
 
-- (void) removeWithIndex: (NSIndexSet *) indexSet
+- (void) removeTorrents: (NSArray *) torrents
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
-    NSArray * torrents = [[self torrentsAtIndexes: indexSet] retain];
+    [torrents retain];
     int active = 0, downloading = 0;
 
     if ([fDefaults boolForKey: @"CheckRemove"])
@@ -586,7 +586,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         }
     }
     
-    [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
+    [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
 }
 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
@@ -599,12 +599,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     [dict release];
     
     if (returnCode == NSAlertDefaultReturn)
-        [self confirmRemove: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
+        [self confirmRemoveTorrents: torrents deleteData: deleteData deleteTorrent: deleteTorrent];
     else
         [torrents release];
 }
 
-- (void) confirmRemove: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
+- (void) confirmRemoveTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -612,7 +612,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
 
-    NSNumber * lowestOrderValue = [NSNumber numberWithInt: [torrents count]], * currentOrederValue;
+    NSNumber * lowestOrderValue = [NSNumber numberWithInt: [torrents count]], * currentOrderValue;
 
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -625,9 +625,9 @@ static void sleepCallBack(void * controller, io_service_t y,
             [torrent trashTorrent];
         
         //determine lowest order value
-        currentOrederValue = [torrent orderValue];
-        if ([lowestOrderValue compare: currentOrederValue] == NSOrderedDescending)
-            lowestOrderValue = currentOrederValue;
+        currentOrderValue = [torrent orderValue];
+        if ([lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
+            lowestOrderValue = currentOrderValue;
 
         [torrent removeForever];
         [fTorrents removeObject: torrent];
@@ -657,22 +657,26 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) removeNoDelete: (id) sender
 {
-    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: NO deleteTorrent: NO];
+    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+                deleteData: NO deleteTorrent: NO];
 }
 
 - (void) removeDeleteData: (id) sender
 {
-    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: YES deleteTorrent: NO];
+    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+                deleteData: YES deleteTorrent: NO];
 }
 
 - (void) removeDeleteTorrent: (id) sender
 {
-    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: NO deleteTorrent: YES];
+    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+                deleteData: NO deleteTorrent: YES];
 }
 
-- (void) removeDeleteBoth: (id) sender
+- (void) removeDeleteDataAndTorrent: (id) sender
 {
-    [self removeWithIndex: [fTableView selectedRowIndexes] deleteData: YES deleteTorrent: YES];
+    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+                deleteData: YES deleteTorrent: YES];
 }
 
 - (void) copyTorrentFile: (id) sender
@@ -1596,11 +1600,11 @@ static void sleepCallBack(void * controller, io_service_t y,
 
     //enable remove items
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
-        || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteBoth:))
+        || action == @selector(removeDeleteTorrent:) || action == @selector(removeDeleteDataAndTorrent:))
     {
         BOOL warning = NO,
             onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
-            canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteBoth:);
+            canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteDataAndTorrent:);
         Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
         unsigned int i;

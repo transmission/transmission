@@ -96,16 +96,16 @@
 - (void) stopAllTorrents:           (id) sender;
 - (void) stopTorrents:              (NSArray *) torrents;
 
-- (void) removeWithIndex: (NSIndexSet *) indexSet
+- (void) removeTorrents: (NSArray *) torrents
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteData;
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
                         contextInfo: (NSDictionary *) dict;
-- (void) confirmRemove: (NSArray *) torrents
+- (void) confirmRemoveTorrents: (NSArray *) torrents
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent;
 - (void) removeNoDelete:                (id) sender;
-- (void) removeDeleteData:       (id) sender;
-- (void) removeDeleteTorrent:    (id) sender;
-- (void) removeDeleteBoth:       (id) sender;
+- (void) removeDeleteData:              (id) sender;
+- (void) removeDeleteTorrent:           (id) sender;
+- (void) removeDeleteDataAndTorrent:    (id) sender;
 
 - (void) copyTorrentFile: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
