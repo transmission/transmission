@@ -261,11 +261,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    //timer for auto import, will check every 30 seconds
+    //timer for auto import, will check every 15 seconds
     fAutoImportedNames = [[NSArray alloc] init];
     
     [self checkAutoImportDirectory: nil];
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 30.0 target: self 
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
