@@ -1379,8 +1379,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleAdvancedBar: (id) sender
 {
-    [fAdvancedBarItem setState: ![fAdvancedBarItem state]];
-    [fDefaults setBool: [fAdvancedBarItem state] forKey: @"UseAdvancedBar"];
+    int state = ![fAdvancedBarItem state];
+    [fAdvancedBarItem setState: state];
+    [fDefaults setBool: state forKey: @"UseAdvancedBar"];
 
     [fTableView display];
 }
