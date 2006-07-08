@@ -486,50 +486,44 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self application: NSApp openFiles: filenames];
 }
 
-- (void) resumeTorrent: (id) sender
+- (void) resumeSelectedTorrents: (id) sender
 {
-    [self resumeTorrentWithIndex: [fTableView selectedRowIndexes]];
+    [self resumeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) resumeAllTorrents: (id) sender
 {
-    [self resumeTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrents count])]];
+    [self resumeTorrents: fTorrents];
 }
 
-- (void) resumeTorrentWithIndex: (NSIndexSet *) indexSet
+- (void) resumeTorrents: (NSArray *) torrents;
 {
-    unsigned int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[fTorrents objectAtIndex: i] startTransfer];
+    [torrents makeObjectsPerformSelector: @selector(startTransfer)];
     
     [self updateUI: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
-- (void) stopTorrent: (id) sender
+- (void) stopSelectedTorrents: (id) sender
 {
-    [self stopTorrentWithIndex: [fTableView selectedRowIndexes]];
+    [self stopTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) stopAllTorrents: (id) sender
 {
-    [self stopTorrentWithIndex: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fTorrents count])]];
+    [self stopTorrents: fTorrents];
 }
 
-- (void) stopTorrentWithIndex: (NSIndexSet *) indexSet
+- (void) stopTorrents: (NSArray *) torrents;
 {
     //don't want any of these starting then stopping
-    unsigned int i;
+    NSEnumerator * enumerator = [torrents objectEnumerator];
     Torrent * torrent;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-    {
-        torrent = [fTorrents objectAtIndex: i];
+    while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
-    }
 
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[fTorrents objectAtIndex: i] stopTransfer];
+    [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     [self updateUI: nil];
     [fInfoController updateInfoStatsAndSettings];
@@ -1443,7 +1437,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [item setToolTip: @"Pause selected transfers"];
         [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
         [item setTarget: self];
-        [item setAction: @selector(stopTorrent:)];
+        [item setAction: @selector(stopSelectedTorrents:)];
     }
     else if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
@@ -1452,7 +1446,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [item setToolTip: @"Resume selected transfers"];
         [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
         [item setTarget: self];
-        [item setAction: @selector(resumeTorrent:)];
+        [item setAction: @selector(resumeSelectedTorrents:)];
     }
     else
     {
@@ -1645,7 +1639,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 
     //enable pause item
-    if (action == @selector(stopTorrent:))
+    if (action == @selector(stopSelectedTorrents:))
     {
         if (!canUseMenu)
             return NO;
@@ -1664,7 +1658,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     
     //enable resume item
-    if (action == @selector(resumeTorrent:))
+    if (action == @selector(resumeSelectedTorrents:))
     {
         if (!canUseMenu)
             return NO;

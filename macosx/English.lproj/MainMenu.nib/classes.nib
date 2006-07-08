@@ -12,7 +12,7 @@
                 removeDeleteTorrent = id; 
                 removeNoDelete = id; 
                 resumeAllTorrents = id; 
-                resumeTorrent = id; 
+                resumeSelectedTorrents = id; 
                 revealFile = id; 
                 setInfoTab = id; 
                 setLimitGlobalEnabled = id; 
@@ -24,7 +24,7 @@
                 showMainWindow = id; 
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
-                stopTorrent = id; 
+                stopSelectedTorrents = id; 
                 toggleAdvancedBar = id; 
                 toggleSmallView = id; 
                 toggleSpeedLimit = id; 

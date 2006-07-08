@@ -89,12 +89,12 @@
 - (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet;
 - (void) torrentNumberChanged;
 
-- (void) resumeTorrent:             (id) sender;
+- (void) resumeSelectedTorrents:    (id) sender;
 - (void) resumeAllTorrents:         (id) sender;
-- (void) resumeTorrentWithIndex:    (NSIndexSet *) indexSet;
-- (void) stopTorrent:               (id) sender;
+- (void) resumeTorrents:            (NSArray *) torrents;
+- (void) stopSelectedTorrents:      (id) sender;
 - (void) stopAllTorrents:           (id) sender;
-- (void) stopTorrentWithIndex:      (NSIndexSet *) indexSet;
+- (void) stopTorrents:              (NSArray *) torrents;
 
 - (void) removeWithIndex: (NSIndexSet *) indexSet
         deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteData;
