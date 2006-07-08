@@ -788,7 +788,8 @@ static void sleepCallBack(void * controller, io_service_t y,
             [self checkWaitingForFinished: torrent];
         
             //notifications
-            [self notifyGrowl: @"Download Complete" message: [torrent name] identifier: @"Download Complete"];
+            [self notifyGrowl: @"Download Complete" message: [[torrent name] stringByAppendingString:
+                                                    @" is finished downloading"] identifier: @"Download Complete"];
             if (![fWindow isKeyWindow])
                 fCompleted++;
         }
@@ -1075,7 +1076,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fInfoController updateInfoStatsAndSettings];
     
-    [self notifyGrowl: @"Seeding Complete" message: [[notification object] name] identifier: @"Seeding Complete"];
+    [self notifyGrowl: @"Seeding Complete" message: [[[notification object] name] stringByAppendingString:
+                                                        @" is finished seeding"] identifier: @"Seeding Complete"];
 }
 
 - (void) attemptToStartAuto: (Torrent *) torrent
@@ -1183,7 +1185,8 @@ static void sleepCallBack(void * controller, io_service_t y,
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [self notifyGrowl: @"Torrent File Auto Added" message: file identifier: @"Torrent Auto Added"];
+                [self notifyGrowl: @"Torrent File Auto Added" message: [file stringByAppendingString:
+                                                    @" added to Transmission"] identifier: @"Torrent Auto Added"];
         }
 }
 
