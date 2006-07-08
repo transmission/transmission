@@ -140,6 +140,8 @@
 - (void) torrentStartSettingChange: (NSNotification *) notification;
 - (void) globalStartSettingChange: (NSNotification *) notification;
 
+- (void) torrentStoppedForRatio: (NSNotification *) notification;
+
 - (void) attemptToStartAuto: (Torrent *) torrent;
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents;
 

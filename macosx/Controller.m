@@ -241,6 +241,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     [nc addObserver: self selector: @selector(torrentStartSettingChange:)
                     name: @"TorrentStartSettingChange" object: nil];
     
+    //check if torrent should now start
+    [nc addObserver: self selector: @selector(torrentStoppedForRatio:)
+                    name: @"TorrentStoppedForRatio" object: nil];
+    
     //change that just impacts the inspector
     [nc addObserver: self selector: @selector(reloadInspectorSettings:)
                     name: @"TorrentSettingChange" object: nil];
@@ -459,13 +463,12 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) openShowSheet: (id) sender
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
-    NSArray * fileTypes = [NSArray arrayWithObject: @"torrent"];
 
     [panel setAllowsMultipleSelection: YES];
     [panel setCanChooseFiles: YES];
     [panel setCanChooseDirectories: NO];
 
-    [panel beginSheetForDirectory: nil file: nil types: fileTypes
+    [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObject: @"torrent"]
         modalForWindow: fWindow modalDelegate: self didEndSelector:
         @selector(openSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
@@ -1050,6 +1053,15 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 }
 
+- (void) torrentStartSettingChange: (NSNotification *) notification
+{
+    [self attemptToStartMultipleAuto: [notification object]];
+
+    [self updateUI: nil];
+    [fInfoController updateInfoStatsAndSettings];
+    [self updateTorrentHistory];
+}
+
 - (void) globalStartSettingChange: (NSNotification *) notification
 {
     [self attemptToStartMultipleAuto: fTorrents];
@@ -1059,13 +1071,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self updateTorrentHistory];
 }
 
-- (void) torrentStartSettingChange: (NSNotification *) notification
+- (void) torrentStoppedForRatio: (NSNotification *) notification
 {
-    [self attemptToStartMultipleAuto: [notification object]];
-
-    [self updateUI: nil];
     [fInfoController updateInfoStatsAndSettings];
-    [self updateTorrentHistory];
+    
+    [self notifyGrowl: @"Seeding Complete" message: [[notification object] name] identifier: @"Seeding Complete"];
 }
 
 - (void) attemptToStartAuto: (Torrent *) torrent
@@ -1173,8 +1183,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [self notifyGrowl: [file stringByAppendingString: @" Auto Added"] message: @"Torrent file added"
-                                identifier: @"Automatically Add Torrent"];
+                [self notifyGrowl: @"Torrent File Auto Added" message: file identifier: @"Torrent Auto Added"];
         }
 }
 
@@ -1804,8 +1813,8 @@ static void sleepCallBack(void * controller, io_service_t y,
          "  if exists application process \"GrowlHelperApp\" then\n"
          "    tell application \"GrowlHelperApp\"\n"
          "      register as application \"Transmission\" "
-         "        all notifications {\"Download Complete\", \"Automatically Add Torrent\"}"
-         "        default notifications {\"Download Complete\", \"Automatically Add Torrent\"}"
+         "        all notifications {\"Download Complete\", \"Seeding Complete\", \"Torrent Auto Added\"}"
+         "        default notifications {\"Download Complete\", \"Seeding Complete\", \"Torrent Auto Added\"}"
          "        icon of application \"Transmission\"\n"
          "    end tell\n"
          "  end if\n"
