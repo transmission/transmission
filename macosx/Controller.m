@@ -783,7 +783,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
         if ([torrent justFinished])
         {
-            [self checkWaitingForFinished: torrent];
+            [self checkToStartWaiting: torrent];
         
             //notifications
             [self notifyGrowl: @"Download Complete" message: [[torrent name] stringByAppendingString:
@@ -1004,10 +1004,10 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) checkWaitingForStopped: (NSNotification *) notification
 {
-    [self checkWaitingForFinished: [notification object]];
+    [self checkToStartWaiting: [notification object]];
 }
 
-- (void) checkWaitingForFinished: (Torrent *) finishedTorrent
+- (void) checkToStartWaiting: (Torrent *) finishedTorrent
 {
     //don't try to start a transfer if there should be none waiting
     if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])

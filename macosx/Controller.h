@@ -72,7 +72,7 @@
     NSTimer                     * fTimer;
     
     NSTimer                     * fAutoImportTimer;
-    NSArray              * fAutoImportedNames;
+    NSArray                     * fAutoImportedNames;
     
     BOOL                        fHasGrowl;
     Badger                      * fBadger;
@@ -136,7 +136,7 @@
 - (void) ratioGlobalChange: (NSNotification *) notification;
 
 - (void) checkWaitingForStopped: (NSNotification *) notification;
-- (void) checkWaitingForFinished: (Torrent *) finishedTorrent;
+- (void) checkToStartWaiting: (Torrent *) finishedTorrent;
 - (void) torrentStartSettingChange: (NSNotification *) notification;
 - (void) globalStartSettingChange: (NSNotification *) notification;
 
