@@ -103,9 +103,9 @@
         Torrent * torrent = [fTorrents objectAtIndex: row];
 
 		if ([torrent isPaused])
-			[fController resumeTorrents: [fController torrentsAtIndexes: [NSIndexSet indexSetWithIndex: row]]];
+			[fController resumeTorrents: [NSArray arrayWithObject: torrent]];
 		else if ([torrent isActive])
-            [fController stopTorrents: [fController torrentsAtIndexes: [NSIndexSet indexSetWithIndex: row]]];
+            [fController stopTorrents: [NSArray arrayWithObject: torrent]];
 		else;
     }
     else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
