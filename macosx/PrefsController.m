@@ -222,28 +222,28 @@
         [item setLabel: TOOLBAR_GENERAL];
         [item setImage: [NSImage imageNamed: @"Preferences.png"]];
         [item setTarget: self];
-        [item setAction: @selector( showGeneralPref: )];
+        [item setAction: @selector(showGeneralPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
         [item setLabel: TOOLBAR_TRANSFERS];
         [item setImage: [NSImage imageNamed: @"Transfers.png"]];
         [item setTarget: self];
-        [item setAction: @selector( showTransfersPref: )];
+        [item setAction: @selector(showTransfersPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
         [item setLabel: TOOLBAR_BANDWIDTH];
         [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
         [item setTarget: self];
-        [item setAction: @selector( showBandwidthPref: )];
+        [item setAction: @selector(showBandwidthPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: TOOLBAR_NETWORK];
         [item setImage: [NSImage imageNamed: @"Network.png"]];
         [item setTarget: self];
-        [item setAction: @selector( showNetworkPref: )];
+        [item setAction: @selector(showNetworkPref:)];
     }
     else
     {

@@ -359,8 +359,6 @@ static void sleepCallBack(void * controller, io_service_t y,
             usleep(100000);
             [torrent update];
         }
-    
-    [fTorrents release];
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
