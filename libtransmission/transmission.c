@@ -756,9 +756,7 @@ static void acceptStop( tr_handle_t * h )
     int ii;
 
     h->acceptDie = 1;
-    tr_lockLock( &h->acceptLock );
     tr_threadJoin( &h->acceptThread );
-    tr_lockUnlock( &h->acceptLock );
     tr_lockClose( &h->acceptLock );
     tr_dbg( "Accept thread joined" );
 
