@@ -173,7 +173,7 @@ gtk_test()
   verbose gtk_test
   if runcmd pkg-config gtk+-2.0
   then
-    if runcmd expr `pkg-config --modversion gtk+-2.0` '>=' 2.6.0
+    if runcmd pkg-config --exists gtk+-2.0 '>=' 2.6.0
     then
       cat > testconf.c << EOF
       #include <gtk/gtk.h>
