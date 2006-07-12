@@ -43,20 +43,21 @@ static NSImage * fProgressWhite, * fProgressBlue, * fProgressGray, * fProgressGr
                 * fProgressEndGray, * fProgressEndGreen, * fProgressEndAdvanced;
 
 // Used to optimize drawing. They contain packed RGBA pixels for every color needed.
+#define BE OSSwapBigToHostConstInt32
 static uint32_t kBorder[] =
-    { 0x00000005, 0x00000010, 0x00000015, 0x00000015,
-      0x00000015, 0x00000015, 0x00000015, 0x00000015,
-      0x00000015, 0x00000015, 0x00000010, 0x00000005 };
+    { BE(0x00000005), BE(0x00000010), BE(0x00000015), BE(0x00000015),
+      BE(0x00000015), BE(0x00000015), BE(0x00000015), BE(0x00000015),
+      BE(0x00000015), BE(0x00000015), BE(0x00000010), BE(0x00000005) };
 
-static uint32_t kBack[] = { 0xB4B4B4FF, 0xE3E3E3FF };
+static uint32_t kBack[] = { BE(0xB4B4B4FF), BE(0xE3E3E3FF) };
 
-static uint32_t kRed = 0xFF6450FF, //255, 100, 80
-                kBlue1 = 0xA0DCFFFF, //160, 220, 255
-                kBlue2 = 0x78BEFFFF, //120, 190, 255
-                kBlue3 = 0x50A0FFFF, //80, 160, 255
-                kBlue4 = 0x1E46B4FF, //30, 70, 180
-                kGray = 0x828282FF, //130, 130, 130
-                kGreen = 0x00FF00FF; //0, 255, 0
+static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
+                kBlue1 = BE(0xA0DCFFFF), //160, 220, 255
+                kBlue2 = BE(0x78BEFFFF), //120, 190, 255
+                kBlue3 = BE(0x50A0FFFF), //80, 160, 255
+                kBlue4 = BE(0x1E46B4FF), //30, 70, 180
+                kGray  = BE(0x828282FF), //130, 130, 130
+                kGreen = BE(0x00FF00FF); //0, 255, 0
 
 - (id) init
 {
@@ -199,8 +200,8 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     p = (uint32_t *) bitmapData;
     for( h = 0; h < BAR_HEIGHT; h++ )
     {
-        p[0] = htonl( kBorder[h] );
-        p[width - 1] = htonl( kBorder[h] );
+        p[0] = kBorder[h];
+        p[width - 1] = kBorder[h];
         p += bytesPerRow / 4;
     }
 
@@ -213,9 +214,9 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
     {
         p = (uint32_t *) ( bitmapData + h * bytesPerRow ) + 1;
         for( w = 0; w < end; w++ )
-            p[w] = htonl( kBlue4 );
+            p[w] = kBlue4;
         for( w = end; w < width - 2; w++ )
-            p[w] = htonl( kBack[h] );
+            p[w] = kBack[h];
     }
 
     /* Lines 2 to 14: blue or grey depending on whether
@@ -240,7 +241,7 @@ static uint32_t kRed = 0xFF6450FF, //255, 100, 80
 
         for( h = 2; h < BAR_HEIGHT; h++ )
         {
-            p[0] = htonl( color );
+            p[0] = color;
             p = (uint32_t *) ( (uint8_t *) p + bytesPerRow );
         }
     }
