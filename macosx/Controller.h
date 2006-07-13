@@ -77,9 +77,8 @@
     NSTimer                     * fAutoImportTimer;
     NSArray                     * fAutoImportedNames;
     
-    BOOL                        fHasGrowl;
+    BOOL                        fHasGrowl, fUpdateInProgress;
     Badger                      * fBadger;
-    BOOL                        fUpdateInProgress;
 }
 
 - (void) openShowSheet:   (id) sender;
@@ -113,7 +112,7 @@
 - (void) copyTorrentFile: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
 - (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code
-    contextInfo: (NSMutableArray *) torrents;
+            contextInfo: (NSMutableArray *) torrents;
 
 - (void) revealFile: (id) sender;
 
@@ -126,7 +125,7 @@
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;
-- (void) sortTorrentsChangeSelected: (BOOL) changeSelected;
+- (void) sortTorrentsRememberSelected: (BOOL) changeSelected;
 - (void) setSort: (id) sender;
 - (void) applyFilter;
 - (void) setFilter: (id) sender;
