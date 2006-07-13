@@ -32,6 +32,8 @@
 	<string>~/Desktop</string>
 	<key>DownloadLimit</key>
 	<integer>100</integer>
+	<key>Filter</key>
+	<string>None</string>
 	<key>History</key>
 	<array/>
 	<key>InfoTab</key>

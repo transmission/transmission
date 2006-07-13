@@ -38,7 +38,8 @@
 {
     tr_handle_t                 * fLib;
     int                         fCompleted;
-    NSMutableArray              * fTorrents;
+    
+    NSMutableArray              * fTorrents, * fFilteredTorrents;
     
     PrefsController             * fPrefsController;
     NSUserDefaults              * fDefaults;
@@ -57,9 +58,11 @@
     BOOL                        fStatusBarVisible;
     IBOutlet NSTextField        * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
-    NSString                    * fSortType;
+    NSString                    * fSortType, * fFilterType;
     IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
-                                * fDateSortItem, * fOrderSortItem;
+                                * fDateSortItem, * fOrderSortItem,
+                                * fNoFilterItem, * fPauseFilterItem,
+                                * fSeedFilterItem, * fDownloadFilterItem;
                                 
     IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
     
@@ -124,6 +127,8 @@
 
 - (void) sortTorrents;
 - (void) setSort: (id) sender;
+- (void) applyFilter;
+- (void) setFilter: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;
 
