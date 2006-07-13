@@ -282,7 +282,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
     //timer for auto import, will check every 15 seconds
-    fAutoImportedNames = [[NSArray alloc] init];
+    fAutoImportedNames = [[NSMutableArray alloc] init];
     
     [self checkAutoImportDirectory: nil];
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
@@ -858,11 +858,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self sortTorrentsRememberSelected: YES];
 }
 
-- (void) sortTorrentsRememberSelected: (BOOL) changeSelected
+- (void) sortTorrentsRememberSelected: (BOOL) rememberSelected
 {
     //remember selected rows if needed
     NSArray * selectedTorrents = nil;
-    if (changeSelected)
+    if (rememberSelected)
     {
         int numSelected = [fTableView numberOfSelectedRows];
         if (numSelected > 0 && numSelected < [fFilteredTorrents count])
@@ -1295,8 +1295,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [newFileNames removeObjectsInArray: fAutoImportedNames];
     
     //save the current list of files
-    [fAutoImportedNames release];
-    fAutoImportedNames = [allFileNames retain];
+    [fAutoImportedNames setArray: allFileNames];
     
     NSEnumerator * enumerator = [newFileNames objectEnumerator];
     NSString * file;
@@ -1316,9 +1315,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) autoImportChange: (NSNotification *) notification
 {
-    [fAutoImportedNames release];
-    fAutoImportedNames = [[NSArray alloc] init];
-    
+    [fAutoImportedNames removeAllObjects];
     [self checkAutoImportDirectory: nil];
 }
 

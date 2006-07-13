@@ -75,7 +75,7 @@
     NSTimer                     * fTimer;
     
     NSTimer                     * fAutoImportTimer;
-    NSArray                     * fAutoImportedNames;
+    NSMutableArray              * fAutoImportedNames;
     
     BOOL                        fHasGrowl, fUpdateInProgress;
     Badger                      * fBadger;
@@ -125,7 +125,7 @@
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;
-- (void) sortTorrentsRememberSelected: (BOOL) changeSelected;
+- (void) sortTorrentsRememberSelected: (BOOL) rememberSelected;
 - (void) setSort: (id) sender;
 - (void) applyFilter;
 - (void) setFilter: (id) sender;
