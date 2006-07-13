@@ -1398,9 +1398,8 @@ static void sleepCallBack(void * controller, io_service_t y,
             high = newRow - 1;
         else;
         
-        #warning change
         for (i = low; i <= high; i++)
-            [[fTorrents objectAtIndex: i] setOrderValue: i];
+            [[fFilteredTorrents objectAtIndex: i] setOrderValue: i];
         
         [fTableView reloadData];
         
