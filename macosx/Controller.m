@@ -1851,7 +1851,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     NSRect windowRect = [fWindow frame];
     float newHeight = windowRect.size.height - [fScrollView frame].size.height
-        + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height) + 30.0;
+        + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)
