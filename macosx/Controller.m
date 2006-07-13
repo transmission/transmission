@@ -856,11 +856,19 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) sortTorrents
 {
+    [self sortTorrentsChangeSelected: YES];
+}
+
+- (void) sortTorrentsChangeSelected: (BOOL) changeSelected
+{
     //remember selected rows if needed
     NSArray * selectedTorrents = nil;
-    int numSelected = [fTableView numberOfSelectedRows];
-    if (numSelected > 0 && numSelected < [fFilteredTorrents count])
-        selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+    if (changeSelected)
+    {
+        int numSelected = [fTableView numberOfSelectedRows];
+        if (numSelected > 0 && numSelected < [fFilteredTorrents count])
+            selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+    }
 
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"name" ascending: YES] autorelease],
@@ -994,7 +1002,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fFilteredTorrents setArray: tempTorrents];
     [tempTorrents release];
     
-    [self sortTorrents];
+    [self sortTorrentsChangeSelected: NO];
     
     //set selected rows if needed...this selecting is more accurate than sort's
     if (selectedTorrents)
