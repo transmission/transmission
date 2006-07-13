@@ -676,7 +676,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self torrentNumberChanged];
     [fTableView deselectAll: nil];
     [self updateUI: nil];
-    [self applyFilter];
     [self updateTorrentHistory];
 }
 
