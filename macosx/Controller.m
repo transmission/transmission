@@ -808,8 +808,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
         if ([torrent justFinished])
         {
-            if (![fFilterType isEqualToString: @"None"])
-                [self applyFilter];
+            [self applyFilter];
             [self checkToStartWaiting: torrent];
         
             //notifications
@@ -1311,7 +1310,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
     toPasteboard: (NSPasteboard *) pasteboard
 {
-    if ([fSortType isEqualToString: @"Order"])
+    //only allow reordering of rows if sorting by order with no filter
+    if ([fSortType isEqualToString: @"Order"] && [fFilterType isEqualToString: @"None"])
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]
