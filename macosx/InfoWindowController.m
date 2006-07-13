@@ -107,11 +107,7 @@
         {
             [fNameField setStringValue: @"No Torrents Selected"];
             [fSizeField setStringValue: @""];
-            
-/*
-            [fDownloadRateField setStringValue: @""];
-            [fUploadRateField setStringValue: @""];
-*/
+
             [fDownloadedValidField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
@@ -198,24 +194,17 @@
     int numberSelected = [fTorrents count];
     if (numberSelected > 0)
     {
-        //float downloadRate = 0, uploadRate = 0;
         float downloadedValid = 0;
         uint64_t downloadedTotal = 0, uploadedTotal = 0;
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
         {
-            /*downloadRate += [torrent downloadRate];
-            uploadRate += [torrent uploadRate];
-            */
             downloadedValid += [torrent downloadedValid];
             downloadedTotal += [torrent downloadedTotal];
             uploadedTotal += [torrent uploadedTotal];
         }
-/*
-        [fDownloadRateField setStringValue: [NSString stringForSpeed: downloadRate]];
-        [fUploadRateField setStringValue: [NSString stringForSpeed: uploadRate]];
-*/
+
         [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
         [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
         [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
