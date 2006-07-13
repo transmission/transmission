@@ -956,6 +956,12 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) applyFilter
 {
+    //remember selected rows if needed
+    NSArray * selectedTorrents = nil;
+    int numSelected = [fTableView numberOfSelectedRows];
+    if (numSelected > 0 && numSelected < [fFilteredTorrents count])
+        selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
 
     if ([fFilterType isEqualToString: @"Pause"])
@@ -989,6 +995,21 @@ static void sleepCallBack(void * controller, io_service_t y,
     [tempTorrents release];
     
     [self sortTorrents];
+    
+    //set selected rows if needed...this selecting is more accurate than sort's
+    if (selectedTorrents)
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+        NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+        unsigned index;
+        while ((torrent = [enumerator nextObject]))
+            if ((index = [fFilteredTorrents indexOfObject: torrent]) != NSNotFound)
+                [indexSet addIndex: index];
+        
+        [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
+        [indexSet release];
+    }
 }
 
 //resets filter and sorts torrents
