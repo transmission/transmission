@@ -73,11 +73,11 @@ cc_test()
 EOF
   if ! runcmd $CC -o testconf testconf.c
   then
-    rm -f testconf.c testconf
+    rm -f testconf*
     echo "Could not find a working compiler"
     exit 1
   fi
-  rm -f testconf.c testconf
+  rm -f testconf*
 }
 
 openssl_test()
@@ -99,7 +99,7 @@ EOF
     echo "missing, using built-in SHA1 implementation"
     OPENSSL=no
   fi
-  rm -f testconf.c testconf
+  rm -f testconf*
 }
 
 lm_test()
@@ -118,7 +118,7 @@ EOF
       LDFLAGS="$LDFLAGS -lm"
     fi
   fi
-  rm -f testconf.c testconf
+  rm -f testconf*
 }
 
 lrintf_test()
@@ -134,7 +134,7 @@ EOF
   then
     CFLAGS="$CFLAGS -DHAVE_LRINTF"
   fi
-  rm -f testconf.c testconf
+  rm -f testconf*
 }
 
 gettext_test()
@@ -150,7 +150,7 @@ EOF
 
   if runcmd $CC $CFLAGS_GTK $LDFLAGS_GTK -o testconf testconf.c
   then
-    rm -f testconf.c testconf
+    rm -f testconf*
     return 0
   fi
 
@@ -160,11 +160,11 @@ EOF
     if runcmd $CC $CFLAGS_GTK -I$intl_testdir $LDFLAGS_GTK -o testconf testconf.c
     then
       CFLAGS_GTK="$CFLAGS_GTK -I$intl_testdir"
-      rm -f testconf.c testconf
+      rm -f testconf*
       return 0
     fi
   done
-  rm -f testconf.c testconf
+  rm -f testconf*
   return 1
 }
 
@@ -200,7 +200,7 @@ EOF
         echo "no"
         GTK=no
       fi
-      rm -f testconf.c testconf
+      rm -f testconf*
     else
       echo "no (2.6.0 or later is required)"
       GTK=no
@@ -276,6 +276,9 @@ EOF
 
   FreeBSD|NetBSD|OpenBSD|Linux)
     PTHREAD=yes
+    ;;
+
+  CYGWIN*)
     ;;
 
   *)
