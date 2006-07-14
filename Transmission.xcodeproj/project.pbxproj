@@ -822,7 +822,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/cli";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/debug\"";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGEFILE_SOURCE",
@@ -850,7 +850,7 @@
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libtransmission\"";
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/debug\"";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
