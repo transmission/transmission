@@ -246,7 +246,7 @@ case $SYSTEM in
   BeOS)
     RELEASE=`uname -r`
     case $RELEASE in
-      6.0*|5.0.4) # Zeta or R5 / BONE beta 7
+      6.*|5.0.4) # Zeta or R5 / BONE beta 7
         ;;
       5.0*)       # R5 / net_server
         BEOS_NETSERVER=yes
