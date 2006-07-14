@@ -55,7 +55,7 @@
 #define UPDATE_INTERVAL         1000
 
 /* interval in milliseconds to check for stopped torrents and update display */
-#define EXIT_CHECK_INTERVAL     1000
+#define EXIT_CHECK_INTERVAL     500
 
 struct cbdata {
   TrBackend *back;
