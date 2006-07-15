@@ -31,6 +31,7 @@
 #import "InfoWindowController.h"
 #import "Badger.h"
 #import "SmoothAquaView.h"
+#import "BarButton.h"
 
 @class TorrentTableView;
 
@@ -63,6 +64,11 @@
                                 * fDateSortItem, * fOrderSortItem,
                                 * fNoFilterItem, * fPauseFilterItem,
                                 * fSeedFilterItem, * fDownloadFilterItem;
+    
+    IBOutlet NSView             * fFilterBar;
+    BOOL                        fFilterBarVisible;
+    IBOutlet BarButton          * fNoFilterButton, * fPauseFilterButton,
+                                * fSeedFilterButton, * fDownloadFilterButton;
                                 
     IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
     
@@ -162,6 +168,9 @@
 
 - (void) toggleStatusBar: (id) sender;
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
+- (void) toggleFilterBar: (id) sender;
+- (void) showFilterBar: (BOOL) show animate: (BOOL) animate;
+
 - (void) toggleAdvancedBar: (id) sender;
 
 - (void) showMainWindow:    (id) sender;

@@ -1,5 +1,6 @@
 {
     IBClasses = (
+        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {
             ACTIONS = {
                 checkUpdate = id; 
@@ -27,6 +28,7 @@
                 stopAllTorrents = id; 
                 stopSelectedTorrents = id; 
                 toggleAdvancedBar = id; 
+                toggleFilterBar = id; 
                 toggleSmallView = id; 
                 toggleSpeedLimit = id; 
                 toggleStatusBar = id; 
@@ -37,20 +39,25 @@
                 fActionButton = NSButton; 
                 fAdvancedBarItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
+                fDownloadFilterButton = BarButton; 
                 fDownloadFilterItem = NSMenuItem; 
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
+                fFilterBar = NSView; 
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
+                fNoFilterButton = BarButton; 
                 fNoFilterItem = NSMenuItem; 
                 fOrderSortItem = NSMenuItem; 
+                fPauseFilterButton = BarButton; 
                 fPauseFilterItem = NSMenuItem; 
                 fPrevInfoTabItem = NSMenuItem; 
                 fProgressSortItem = NSMenuItem; 
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
+                fSeedFilterButton = BarButton; 
                 fSeedFilterItem = NSMenuItem; 
                 fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 

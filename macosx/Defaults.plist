@@ -34,6 +34,8 @@
 	<integer>100</integer>
 	<key>Filter</key>
 	<string>None</string>
+	<key>FilterBar</key>
+	<false/>
 	<key>History</key>
 	<array/>
 	<key>InfoTab</key>

@@ -99,6 +99,7 @@
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
 		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
+		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27674CF0A5AF1FF00334870 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A27674CE0A5AF1FF00334870 /* SpeedLimitButtonPressed.png */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
@@ -281,6 +282,8 @@
 		A2519D480A2FADFC00479D0C /* SmoothAquaView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SmoothAquaView.h; path = macosx/SmoothAquaView.h; sourceTree = "<group>"; };
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
+		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
+		A27431D90A68538400FA780A /* BarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BarButton.m; path = macosx/BarButton.m; sourceTree = "<group>"; };
 		A27674CE0A5AF1FF00334870 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
@@ -358,6 +361,8 @@
 				A2519D480A2FADFC00479D0C /* SmoothAquaView.h */,
 				A2AF1C360A3D0F6200F1575D /* FileTableView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileTableView.m */,
+				A27431D80A68538400FA780A /* BarButton.h */,
+				A27431D90A68538400FA780A /* BarButton.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -744,6 +749,7 @@
 				A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */,
 				A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */,
 				A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */,
+				A27431DB0A68538400FA780A /* BarButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

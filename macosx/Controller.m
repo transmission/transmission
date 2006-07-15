@@ -104,6 +104,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
+    //ensure filter buttons display correctly
+    [fWindow setAcceptsMouseMovedEvents: YES];
+    
     [fAdvancedBarItem setState: [fDefaults boolForKey: @"UseAdvancedBar"]];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
@@ -132,14 +135,26 @@ static void sleepCallBack(void * controller, io_service_t y,
     ch = NSLeftArrowFunctionKey;
     [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & ch length: 1]];
     
+    //set up filter bar
+    NSView * contentView = [fWindow contentView];
+    
+    fFilterBarVisible = NO;
+    NSRect filterBarFrame = [fFilterBar frame];
+    filterBarFrame.size.width = [fWindow frame].size.width;
+    [fFilterBar setFrame: filterBarFrame];
+    
+    [contentView addSubview: fFilterBar];
+    [fFilterBar setFrameOrigin: NSMakePoint(0, [contentView frame].origin.y + [contentView frame].size.height)];
+    [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
+    
     //set up status bar
+    fStatusBarVisible = NO;
     NSRect statusBarFrame = [fStatusBar frame];
     statusBarFrame.size.width = [fWindow frame].size.width;
     [fStatusBar setFrame: statusBarFrame];
     
-    NSView * contentView = [fWindow contentView];
     [contentView addSubview: fStatusBar];
-    [fStatusBar setFrameOrigin: NSMakePoint(0, [fScrollView frame].origin.y + [fScrollView frame].size.height)];
+    [fStatusBar setFrameOrigin: NSMakePoint(0, [contentView frame].origin.y + [contentView frame].size.height)];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     //set speed limit
@@ -200,17 +215,36 @@ static void sleepCallBack(void * controller, io_service_t y,
     //set filter
     fFilterType = [[fDefaults stringForKey: @"Filter"] retain];
 
+    [fNoFilterButton setText: @"All"];
+    [fPauseFilterButton setText: @"Paused"];
+    [fSeedFilterButton setText: @"Seeding"];
+    [fDownloadFilterButton setText: @"Downloading"];
+
     NSMenuItem * currentFilterItem;
+    BarButton * currentFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
+    {
         currentFilterItem = fPauseFilterItem;
+        currentFilterButton = fPauseFilterButton;
+    }
     else if ([fFilterType isEqualToString: @"Seed"])
+    {
         currentFilterItem = fSeedFilterItem;
+        currentFilterButton = fSeedFilterButton;
+    }
     else if ([fFilterType isEqualToString: @"Download"])
+    {
         currentFilterItem = fDownloadFilterItem;
+        currentFilterButton = fDownloadFilterButton;
+    }
     else
+    {
         currentFilterItem = fNoFilterItem;
+        currentFilterButton = fNoFilterButton;
+    }
     
     [currentFilterItem setState: NSOnState];
+    [currentFilterButton setEnabled: YES];
     
     //set upload limit action button
     [fUploadLimitItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)",
@@ -359,6 +393,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
     [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
+    [self showFilterBar: NO animate: NO];
     
     //clear badge
     [fBadger clearBadge];
@@ -1021,30 +1056,63 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) setFilter: (id) sender
 {
     NSMenuItem * prevFilterItem;
+    BarButton * prevFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
+    {
         prevFilterItem = fPauseFilterItem;
+        prevFilterButton = fPauseFilterButton;
+    }
     else if ([fFilterType isEqualToString: @"Seed"])
+    {
         prevFilterItem = fSeedFilterItem;
+        prevFilterButton = fSeedFilterButton;
+    }
     else if ([fFilterType isEqualToString: @"Download"])
+    {
         prevFilterItem = fDownloadFilterItem;
+        prevFilterButton = fDownloadFilterButton;
+    }
     else
+    {
         prevFilterItem = fNoFilterItem;
+        prevFilterButton = fNoFilterButton;
+    }
     
-    if (sender != prevFilterItem)
+    if (sender != prevFilterItem && sender != prevFilterButton)
     {
         [prevFilterItem setState: NSOffState];
-        [sender setState: NSOnState];
+        [prevFilterButton setEnabled: NO];
 
+        NSMenuItem * currentFilterItem;
+        BarButton * currentFilterButton;
         [fFilterType release];
-        if (sender == fNoFilterItem)
-            fFilterType = [[NSString alloc] initWithString: @"None"];
-        else if (sender == fPauseFilterItem)
-            fFilterType = [[NSString alloc] initWithString: @"Pause"];
-        else if (sender == fSeedFilterItem)
-            fFilterType = [[NSString alloc] initWithString: @"Seed"];
-        else
+        if (sender == fDownloadFilterItem || sender == fDownloadFilterButton)
+        {
             fFilterType = [[NSString alloc] initWithString: @"Download"];
-           
+            currentFilterItem = fDownloadFilterItem;
+            currentFilterButton = fDownloadFilterButton;
+        }
+        else if (sender == fPauseFilterItem || sender == fPauseFilterButton)
+        {
+            fFilterType = [[NSString alloc] initWithString: @"Pause"];
+            currentFilterItem = fPauseFilterItem;
+            currentFilterButton = fPauseFilterButton;
+        }
+        else if (sender == fSeedFilterItem || sender == fSeedFilterButton)
+        {
+            fFilterType = [[NSString alloc] initWithString: @"Seed"];
+            currentFilterItem = fSeedFilterItem;
+            currentFilterButton = fSeedFilterButton;
+        }
+        else
+        {
+            fFilterType = [[NSString alloc] initWithString: @"None"];
+            currentFilterItem = fNoFilterItem;
+            currentFilterButton = fNoFilterButton;
+        }
+        
+        [currentFilterItem setState: NSOnState];
+        [currentFilterButton setEnabled: YES];
         [fDefaults setObject: fFilterType forKey: @"Filter"];
     }
 
@@ -1483,14 +1551,56 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set views to not autoresize
     unsigned int statsMask = [fStatusBar autoresizingMask];
+    unsigned int filterMask = [fFilterBar autoresizingMask];
     unsigned int scrollMask = [fScrollView autoresizingMask];
     [fStatusBar setAutoresizingMask: 0];
+    [fFilterBar setAutoresizingMask: 0];
     [fScrollView setAutoresizingMask: 0];
     
     [fWindow setFrame: frame display: YES animate: animate]; 
     
     //re-enable autoresize
     [fStatusBar setAutoresizingMask: statsMask];
+    [fFilterBar setAutoresizingMask: filterMask];
+    [fScrollView setAutoresizingMask: scrollMask];
+    
+    //change min size
+    NSSize minSize = [fWindow contentMinSize];
+    minSize.height += heightChange;
+    [fWindow setContentMinSize: minSize];
+}
+
+- (void) toggleFilterBar: (id) sender
+{
+    [self showFilterBar: !fFilterBarVisible animate: YES];
+    [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
+}
+
+- (void) showFilterBar: (BOOL) show animate: (BOOL) animate
+{
+    if (show == fFilterBarVisible)
+        return;
+
+    NSRect frame = [fWindow frame];
+    float heightChange = [fFilterBar frame].size.height;
+    if (!show)
+        heightChange *= -1;
+
+    frame.size.height += heightChange;
+    frame.origin.y -= heightChange;
+        
+    fFilterBarVisible = !fFilterBarVisible;
+    
+    //set views to not autoresize
+    unsigned int filterMask = [fFilterBar autoresizingMask];
+    unsigned int scrollMask = [fScrollView autoresizingMask];
+    [fFilterBar setAutoresizingMask: 0];
+    [fScrollView setAutoresizingMask: 0];
+    
+    [fWindow setFrame: frame display: YES animate: animate]; 
+    
+    //re-enable autoresize
+    [fFilterBar setAutoresizingMask: filterMask];
     [fScrollView setAutoresizingMask: scrollMask];
     
     //change min size
@@ -1690,6 +1800,16 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (action == @selector(toggleStatusBar:))
     {
         NSString * title = fStatusBarVisible ? @"Hide Status Bar" : @"Show Status Bar";
+        if (![[menuItem title] isEqualToString: title])
+                [menuItem setTitle: title];
+
+        return canUseMenu;
+    }
+    
+    //enable toggle filter bar
+    if (action == @selector(toggleFilterBar:))
+    {
+        NSString * title = fFilterBarVisible ? @"Hide Filter Bar" : @"Show Filter Bar";
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
