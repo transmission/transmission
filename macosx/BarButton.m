@@ -58,6 +58,9 @@
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.6] set];
         [rect fill];
         [fButtonDown unlockFocus];
+        
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resetBounds:)
+                    name: NSViewBoundsDidChangeNotification object: nil];
 	}
 	return self;
 }
@@ -153,6 +156,11 @@
 {
     fEnabled = enable;
     [self setImage: fEnabled ? fButtonIn : fButtonNormal];
+}
+
+- (void) resetBounds: (NSNotification *) notification
+{
+    [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 
 @end
