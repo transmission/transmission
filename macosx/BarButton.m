@@ -26,6 +26,7 @@
 
 @implementation BarButton
 
+//height of button should be made 17.0
 - (id) initWithCoder: (NSCoder *) coder
 {
 	if ((self = [super initWithCoder: coder]))
@@ -34,8 +35,9 @@
         
         NSSize buttonSize = [self frame].size;
         fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonIn = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonDown = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonOver = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonPressed = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonSelected = [[NSImage alloc] initWithSize: buttonSize];
         
         //create shape
         NSBezierPath * rect = [NSBezierPath bezierPath];
@@ -47,17 +49,54 @@
         [rect appendBezierPathWithRect:
                 NSMakeRect(ovalDiamater * 0.5, 0, buttonSize.width - ovalDiamater, buttonSize.height)];
         
-        //create highlighted button
-        [fButtonIn lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.4941 green: 0.5647 blue: 0.6706 alpha: 1.0] set];
-        [rect fill];
-        [fButtonIn unlockFocus];
+        //create rolled over button
+        NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
+                * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
+                * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
         
-        //create pushed button
-        [fButtonDown lockFocus];
-        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.6] set];
-        [rect fill];
-        [fButtonDown unlockFocus];
+        float endWidth = [leftOver size].width,
+                mainWidth = buttonSize.width - 2.0 * endWidth;
+        NSPoint leftPoint = NSMakePoint(0, 0),
+                mainPoint = NSMakePoint(endWidth, 0),
+                rightPoint = NSMakePoint(mainWidth + endWidth, 0);
+        NSSize mainSize = NSMakeSize(mainWidth, [leftOver size].height);
+
+        [mainOver setScalesWhenResized: YES];
+        [mainOver setSize: mainSize];
+        
+        [fButtonOver lockFocus];
+        [leftOver compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+        [mainOver compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+        [rightOver compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+        [fButtonOver unlockFocus];
+        
+        //create pressed button
+        NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
+                * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
+                * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
+        
+        [mainPressed setScalesWhenResized: YES];
+        [mainPressed setSize: mainSize];
+        
+        [fButtonPressed lockFocus];
+        [leftPressed compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+        [mainPressed compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+        [rightPressed compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+        [fButtonPressed unlockFocus];
+        
+        //create selected button
+        NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
+                * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
+                * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
+        
+        [mainSelected setScalesWhenResized: YES];
+        [mainSelected setSize: mainSize];
+        
+        [fButtonSelected lockFocus];
+        [leftSelected compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+        [mainSelected compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+        [rightSelected compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+        [fButtonSelected unlockFocus];
         
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resetBounds:)
                     name: NSViewBoundsDidChangeNotification object: nil];
@@ -73,8 +112,9 @@
 - (void) dealloc
 {
     [fButtonNormal release];
-    [fButtonIn release];
-    [fButtonDown release];
+    [fButtonOver release];
+    [fButtonPressed release];
+    [fButtonSelected release];
     
     [super dealloc];
 }
@@ -107,15 +147,20 @@
     [text drawInRect: textRect withAttributes: normalAttributes];
     [fButtonNormal unlockFocus];
     
-    //create highlighted button
-    [fButtonIn lockFocus];
+    //create rolled over button
+    [fButtonOver lockFocus];
     [text drawInRect: textRect withAttributes: highlightedAttributes];
-    [fButtonIn unlockFocus];
+    [fButtonOver unlockFocus];
     
-    //create pushed button
-    [fButtonDown lockFocus];
+    //create pressed button
+    [fButtonPressed lockFocus];
     [text drawInRect: textRect withAttributes: highlightedAttributes];
-    [fButtonDown unlockFocus];
+    [fButtonPressed unlockFocus];
+    
+    //create selected button
+    [fButtonSelected lockFocus];
+    [text drawInRect: textRect withAttributes: highlightedAttributes];
+    [fButtonSelected unlockFocus];
     
     [self setImage: fButtonNormal];
     
@@ -126,7 +171,7 @@
 - (void) mouseEntered: (NSEvent *) event
 {
     if (!fEnabled)
-        [self setImage: fButtonIn];
+        [self setImage: fButtonOver];
 
     [super mouseEntered: event];
 }
@@ -141,7 +186,7 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    [self setImage: fButtonDown];
+    [self setImage: fButtonPressed];
 
     [super mouseDown: event];
     
@@ -150,13 +195,13 @@
                                 [NSEvent mouseLocation]] fromView: nil], [self bounds]))
         [NSApp sendAction: [self action] to: [self target] from: self];
     
-    [self setImage: fButtonIn];
+    [self setImage: fEnabled ? fButtonSelected : fButtonOver];
 }
 
 - (void) setEnabled: (BOOL) enable
 {
     fEnabled = enable;
-    [self setImage: fEnabled ? fButtonIn : fButtonNormal];
+    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
 }
 
 - (void) resetBounds: (NSNotification *) notification

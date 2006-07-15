@@ -97,6 +97,15 @@
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2519D470A2FADFC00479D0C /* SmoothAquaView.m */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
+		A253F70B0A6990EB008EE24F /* FilterButtonOverMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */; };
+		A253F70C0A6990EB008EE24F /* FilterButtonOverLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */; };
+		A253F70D0A6990EB008EE24F /* FilterButtonOverRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F70A0A6990EB008EE24F /* FilterButtonOverRight.png */; };
+		A253F7150A699178008EE24F /* FilterButtonPressedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7120A699178008EE24F /* FilterButtonPressedRight.png */; };
+		A253F7160A699178008EE24F /* FilterButtonPressedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7130A699178008EE24F /* FilterButtonPressedMain.png */; };
+		A253F7170A699178008EE24F /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
+		A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */; };
+		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
+		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
 		A25FCDDF0A37695F002BCBBE /* PauseSelected.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDE00A37695F002BCBBE /* ResumeSelected.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
@@ -287,6 +296,15 @@
 		A2519D470A2FADFC00479D0C /* SmoothAquaView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SmoothAquaView.m; path = macosx/SmoothAquaView.m; sourceTree = "<group>"; };
 		A2519D480A2FADFC00479D0C /* SmoothAquaView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SmoothAquaView.h; path = macosx/SmoothAquaView.h; sourceTree = "<group>"; };
 		A253F6F20A698970008EE24F /* FilterBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterBarBackground.png; path = macosx/Images/FilterBarBackground.png; sourceTree = "<group>"; };
+		A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverMain.png; path = macosx/Images/FilterButtonOverMain.png; sourceTree = "<group>"; };
+		A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverLeft.png; path = macosx/Images/FilterButtonOverLeft.png; sourceTree = "<group>"; };
+		A253F70A0A6990EB008EE24F /* FilterButtonOverRight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverRight.png; path = macosx/Images/FilterButtonOverRight.png; sourceTree = "<group>"; };
+		A253F7120A699178008EE24F /* FilterButtonPressedRight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonPressedRight.png; path = macosx/Images/FilterButtonPressedRight.png; sourceTree = "<group>"; };
+		A253F7130A699178008EE24F /* FilterButtonPressedMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonPressedMain.png; path = macosx/Images/FilterButtonPressedMain.png; sourceTree = "<group>"; };
+		A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonPressedLeft.png; path = macosx/Images/FilterButtonPressedLeft.png; sourceTree = "<group>"; };
+		A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedLeft.png; path = macosx/Images/FilterButtonSelectedLeft.png; sourceTree = "<group>"; };
+		A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedMain.png; path = macosx/Images/FilterButtonSelectedMain.png; sourceTree = "<group>"; };
+		A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedRight.png; path = macosx/Images/FilterButtonSelectedRight.png; sourceTree = "<group>"; };
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
@@ -454,6 +472,15 @@
 				A27A53560A06A76400E1F16F /* StatusSep.png */,
 				A27A53650A06AEDB00E1F16F /* StatusBorder.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
+				A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */,
+				A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */,
+				A253F70A0A6990EB008EE24F /* FilterButtonOverRight.png */,
+				A253F7120A699178008EE24F /* FilterButtonPressedRight.png */,
+				A253F7130A699178008EE24F /* FilterButtonPressedMain.png */,
+				A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */,
+				A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */,
+				A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */,
+				A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */,
 				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
 			);
 			name = Resources;
@@ -708,6 +735,15 @@
 				A27674CF0A5AF1FF00334870 /* SpeedLimitButtonPressed.png in Resources */,
 				A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */,
 				A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */,
+				A253F70B0A6990EB008EE24F /* FilterButtonOverMain.png in Resources */,
+				A253F70C0A6990EB008EE24F /* FilterButtonOverLeft.png in Resources */,
+				A253F70D0A6990EB008EE24F /* FilterButtonOverRight.png in Resources */,
+				A253F7150A699178008EE24F /* FilterButtonPressedRight.png in Resources */,
+				A253F7160A699178008EE24F /* FilterButtonPressedMain.png in Resources */,
+				A253F7170A699178008EE24F /* FilterButtonPressedLeft.png in Resources */,
+				A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */,
+				A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */,
+				A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
