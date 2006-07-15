@@ -59,14 +59,13 @@
     BOOL                        fStatusBarVisible;
     IBOutlet NSTextField        * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
-    NSString                    * fSortType, * fFilterType;
+    NSString                    * fSortType;
     IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
-                                * fDateSortItem, * fOrderSortItem,
-                                * fNoFilterItem, * fPauseFilterItem,
-                                * fSeedFilterItem, * fDownloadFilterItem;
+                                * fDateSortItem, * fOrderSortItem;
     
     IBOutlet NSView             * fFilterBar;
     BOOL                        fFilterBarVisible;
+    NSString                    * fFilterType;
     IBOutlet BarButton          * fNoFilterButton, * fPauseFilterButton,
                                 * fSeedFilterButton, * fDownloadFilterButton;
                                 

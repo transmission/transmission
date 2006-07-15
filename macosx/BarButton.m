@@ -33,19 +33,20 @@
         fEnabled = NO;
         fMouseIn = NO;
         
-        fButtonNormal = [[NSImage alloc] initWithSize: [self frame].size];
-        fButtonIn = [[NSImage alloc] initWithSize: [self frame].size];
-        fButtonDown = [[NSImage alloc] initWithSize: [self frame].size];
+        NSSize buttonSize = [self frame].size;
+        fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonIn = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonDown = [[NSImage alloc] initWithSize: buttonSize];
         
         //create shape
         NSBezierPath * rect = [NSBezierPath bezierPath];
         float ovalDiamater = 20.0;
         [rect appendBezierPathWithOvalInRect:
-                NSMakeRect(0, 0, ovalDiamater, [self frame].size.height)];
+                NSMakeRect(0, 0, ovalDiamater, buttonSize.height)];
         [rect appendBezierPathWithOvalInRect:
-                NSMakeRect([self frame].size.width - ovalDiamater, 0, ovalDiamater, [self frame].size.height)];
+                NSMakeRect(buttonSize.width - ovalDiamater, 0, ovalDiamater, buttonSize.height)];
         [rect appendBezierPathWithRect:
-                NSMakeRect(ovalDiamater * 0.5, 0, [self frame].size.width - ovalDiamater, [self frame].size.height)];
+                NSMakeRect(ovalDiamater * 0.5, 0, buttonSize.width - ovalDiamater, buttonSize.height)];
         
         //create highlighted button
         [fButtonIn lockFocus];

@@ -223,27 +223,14 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSMenuItem * currentFilterItem;
     BarButton * currentFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
-    {
-        currentFilterItem = fPauseFilterItem;
         currentFilterButton = fPauseFilterButton;
-    }
     else if ([fFilterType isEqualToString: @"Seed"])
-    {
-        currentFilterItem = fSeedFilterItem;
         currentFilterButton = fSeedFilterButton;
-    }
     else if ([fFilterType isEqualToString: @"Download"])
-    {
-        currentFilterItem = fDownloadFilterItem;
         currentFilterButton = fDownloadFilterButton;
-    }
     else
-    {
-        currentFilterItem = fNoFilterItem;
         currentFilterButton = fNoFilterButton;
-    }
-    
-    [currentFilterItem setState: NSOnState];
+
     [currentFilterButton setEnabled: YES];
     
     //set upload limit action button
@@ -1055,64 +1042,31 @@ static void sleepCallBack(void * controller, io_service_t y,
 //resets filter and sorts torrents
 - (void) setFilter: (id) sender
 {
-    NSMenuItem * prevFilterItem;
     BarButton * prevFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
-    {
-        prevFilterItem = fPauseFilterItem;
         prevFilterButton = fPauseFilterButton;
-    }
     else if ([fFilterType isEqualToString: @"Seed"])
-    {
-        prevFilterItem = fSeedFilterItem;
         prevFilterButton = fSeedFilterButton;
-    }
     else if ([fFilterType isEqualToString: @"Download"])
-    {
-        prevFilterItem = fDownloadFilterItem;
         prevFilterButton = fDownloadFilterButton;
-    }
     else
-    {
-        prevFilterItem = fNoFilterItem;
         prevFilterButton = fNoFilterButton;
-    }
     
-    if (sender != prevFilterItem && sender != prevFilterButton)
+    if (sender != prevFilterButton)
     {
-        [prevFilterItem setState: NSOffState];
         [prevFilterButton setEnabled: NO];
+        [sender setEnabled: YES];
 
-        NSMenuItem * currentFilterItem;
-        BarButton * currentFilterButton;
         [fFilterType release];
-        if (sender == fDownloadFilterItem || sender == fDownloadFilterButton)
-        {
+        if (sender == fDownloadFilterButton)
             fFilterType = [[NSString alloc] initWithString: @"Download"];
-            currentFilterItem = fDownloadFilterItem;
-            currentFilterButton = fDownloadFilterButton;
-        }
-        else if (sender == fPauseFilterItem || sender == fPauseFilterButton)
-        {
+        else if (sender == fPauseFilterButton)
             fFilterType = [[NSString alloc] initWithString: @"Pause"];
-            currentFilterItem = fPauseFilterItem;
-            currentFilterButton = fPauseFilterButton;
-        }
-        else if (sender == fSeedFilterItem || sender == fSeedFilterButton)
-        {
+        else if (sender == fSeedFilterButton)
             fFilterType = [[NSString alloc] initWithString: @"Seed"];
-            currentFilterItem = fSeedFilterItem;
-            currentFilterButton = fSeedFilterButton;
-        }
         else
-        {
             fFilterType = [[NSString alloc] initWithString: @"None"];
-            currentFilterItem = fNoFilterItem;
-            currentFilterButton = fNoFilterButton;
-        }
-        
-        [currentFilterItem setState: NSOnState];
-        [currentFilterButton setEnabled: YES];
+
         [fDefaults setObject: fFilterType forKey: @"Filter"];
     }
 

@@ -40,7 +40,6 @@
                 fAdvancedBarItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
                 fDownloadFilterButton = BarButton; 
-                fDownloadFilterItem = NSMenuItem; 
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
@@ -48,17 +47,14 @@
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
                 fNoFilterButton = BarButton; 
-                fNoFilterItem = NSMenuItem; 
                 fOrderSortItem = NSMenuItem; 
                 fPauseFilterButton = BarButton; 
-                fPauseFilterItem = NSMenuItem; 
                 fPrevInfoTabItem = NSMenuItem; 
                 fProgressSortItem = NSMenuItem; 
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
                 fSeedFilterButton = BarButton; 
-                fSeedFilterItem = NSMenuItem; 
                 fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 
                 fSpeedLimitDockItem = NSMenuItem; 
