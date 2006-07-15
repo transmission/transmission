@@ -27,7 +27,6 @@
 @interface BarButton : NSImageView
 {
     NSImage * fButtonNormal, * fButtonIn, * fButtonDown;
-    IBOutlet NSString * fText;
 
     NSString * fPrefString, * fPrefKey;
     BOOL fEnabled;
