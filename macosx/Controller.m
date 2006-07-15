@@ -31,6 +31,7 @@
 #import "StringAdditions.h"
 
 #import <Sparkle/Sparkle.h>
+#import <Growl/GrowlApplicationBridge.h>
 
 #define TOOLBAR_OPEN            @"Toolbar Open"
 #define TOOLBAR_REMOVE          @"Toolbar Remove"
@@ -47,8 +48,6 @@
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
-
-#define GROWL_PATH  @"/Library/PreferencePanes/Growl.prefPane/Contents/Resources/GrowlHelperApp.app"
 
 static void sleepCallBack(void * controller, io_service_t y,
         natural_t messageType, void * messageArgument)
@@ -74,11 +73,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow"];
         fBadger = [[Badger alloc] init];
         
-        //check and register Growl if it is installed for this user or all users
-        NSFileManager * manager = [NSFileManager defaultManager];
-        fHasGrowl = [manager fileExistsAtPath: GROWL_PATH]
-            || [manager fileExistsAtPath: [NSHomeDirectory() stringByAppendingPathComponent: GROWL_PATH]];
-        [self growlRegister];
+        [GrowlApplicationBridge setGrowlDelegate: self];
     }
     return self;
 }
@@ -832,9 +827,10 @@ static void sleepCallBack(void * controller, io_service_t y,
             [self applyFilter];
             [self checkToStartWaiting: torrent];
         
-            //notifications
-            [self notifyGrowl: @"Download Complete" message: [[torrent name] stringByAppendingString:
-                                            @" finished downloading"] identifier: @"Download Complete"];
+            [GrowlApplicationBridge notifyWithTitle: @"Download Complete"
+                description: [torrent name] notificationName: @"Download Complete" iconData: nil
+                priority: 0 isSticky: NO clickContext: nil];
+
             if (![fWindow isKeyWindow])
                 fCompleted++;
         }
@@ -1222,8 +1218,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self applyFilter];
     [fInfoController updateInfoStatsAndSettings];
     
-    [self notifyGrowl: @"Seeding Complete" message: [[[notification object] name] stringByAppendingString:
-                                                        @" finished seeding"] identifier: @"Seeding Complete"];
+    [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete"
+                description: [[notification object] name] notificationName: @"Seeding Complete"
+                iconData: nil priority: 0 isSticky: NO clickContext: nil];
 }
 
 - (void) attemptToStartAuto: (Torrent *) torrent
@@ -1330,8 +1327,9 @@ static void sleepCallBack(void * controller, io_service_t y,
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [self notifyGrowl: @"Torrent File Auto Added" message: [file stringByAppendingString:
-                                                    @" added to Transmission"] identifier: @"Torrent Auto Added"];
+                [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added"
+                    description: file notificationName: @"Torrent Auto Added" iconData: nil
+                    priority: 0 isSticky: NO clickContext: nil];
         }
 }
 
@@ -1990,53 +1988,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
 }
 
-- (void) notifyGrowl: (NSString *) title message: (NSString *) message identifier: (NSString *) ident
-{
-    if (!fHasGrowl)
-        return;
-
-    NSString * growlScript = [NSString stringWithFormat:
-        @"tell application \"System Events\"\n"
-         "  if exists application process \"GrowlHelperApp\" then\n"
-         "    tell application \"GrowlHelperApp\"\n "
-         "      notify with name \"%@\""
-         "        title \"%@\""
-         "        description \"%@\""
-         "        application name \"Transmission\"\n"
-         "    end tell\n"
-         "  end if\n"
-         "end tell", ident, title, message];
-    
-    NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
-    NSDictionary * error;
-    if (![appleScript executeAndReturnError: & error])
-        NSLog(@"Growl notify failed");
-    [appleScript release];
-}
-
-- (void) growlRegister
-{
-    if (!fHasGrowl)
-        return;
-
-    NSString * growlScript = @"tell application \"System Events\"\n"
-         "  if exists application process \"GrowlHelperApp\" then\n"
-         "    tell application \"GrowlHelperApp\"\n"
-         "      register as application \"Transmission\" "
-         "        all notifications {\"Download Complete\", \"Seeding Complete\", \"Torrent Auto Added\"}"
-         "        default notifications {\"Download Complete\", \"Seeding Complete\", \"Torrent Auto Added\"}"
-         "        icon of application \"Transmission\"\n"
-         "    end tell\n"
-         "  end if\n"
-         "end tell";
-
-    NSAppleScript * appleScript = [[NSAppleScript alloc] initWithSource: growlScript];
-    NSDictionary * error;
-    if (![appleScript executeAndReturnError: & error])
-        NSLog(@"Growl registration failed");
-    [appleScript release];
-}
-
 - (void) checkUpdate: (id) sender
 {
     [fPrefsController checkUpdate];
@@ -2045,6 +1996,14 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) prepareForUpdate: (NSNotification *) notification
 {
     fUpdateInProgress = YES;
+}
+
+- (NSDictionary *) registrationDictionaryForGrowl
+{
+    NSArray * notifications = [NSArray arrayWithObjects: @"Download Complete",
+                                @"Seeding Complete", @"Torrent Auto Added", nil];
+    return [NSDictionary dictionaryWithObjectsAndKeys: notifications, GROWL_NOTIFICATIONS_ALL,
+                                notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
 }
 
 @end

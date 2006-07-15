@@ -83,16 +83,14 @@
     NSTimer                     * fAutoImportTimer;
     NSMutableArray              * fAutoImportedNames;
     
-    BOOL                        fHasGrowl, fUpdateInProgress;
+    BOOL                        fUpdateInProgress;
     Badger                      * fBadger;
 }
 
 - (void) openShowSheet:   (id) sender;
-- (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code
-                        contextInfo: (void *) info;
+- (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code contextInfo: (void *) info;
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
-                            contextInfo: (void *) contextInfo;
+- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 
 - (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet;
 - (void) torrentNumberChanged;
@@ -161,8 +159,7 @@
 - (void) checkAutoImportDirectory: (NSTimer *) t;
 - (void) autoImportChange: (NSNotification *) notification;
 
-- (void) sleepCallBack: (natural_t) messageType argument:
-                        (void *) messageArgument;
+- (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 
 - (void) toggleSmallView: (id) sender;
 
@@ -176,9 +173,6 @@
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
-
-- (void) notifyGrowl: (NSString *) title message: (NSString *) message identifier: (NSString *) ident;
-- (void) growlRegister;
 
 - (void) checkUpdate:       (id) sender;
 - (void) prepareForUpdate:  (NSNotification *) notification;
