@@ -58,8 +58,6 @@
         [[NSColor blackColor] set];
         [rect fill];
         [fButtonDown unlockFocus];
-        
-        [self setImage: fButtonNormal];
 	}
 	return self;
 }
@@ -108,6 +106,9 @@
     [fButtonDown unlockFocus];
     
     [self setImage: fButtonNormal];
+    
+    [normalAttributes release];
+    [highlightedAttributes release];
 }
 
 - (void) mouseEntered: (NSEvent *) event
@@ -143,7 +144,6 @@
 - (void) setEnabled: (BOOL) enable
 {
     fEnabled = enable;
-    
     [self setImage: fEnabled ? fButtonIn : fButtonNormal];
 }
 
