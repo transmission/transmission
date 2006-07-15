@@ -1528,6 +1528,10 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self showFilterBar: !fFilterBarVisible animate: YES];
     [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
+    
+    //disable filtering when hiding
+    if (!fFilterBarVisible)
+        [self setFilter: fNoFilterButton];
 }
 
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
