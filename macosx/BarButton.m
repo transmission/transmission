@@ -67,7 +67,7 @@
 
 - (void) awakeFromNib
 {
-    [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
+    trackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 
 - (void) dealloc
@@ -160,6 +160,7 @@
 
 - (void) resetBounds: (NSNotification *) notification
 {
+    [self removeTrackingRect: trackingTag];
     [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 

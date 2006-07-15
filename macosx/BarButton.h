@@ -31,6 +31,8 @@
 
     NSString * fPrefString, * fPrefKey;
     BOOL fEnabled;
+    
+    NSTrackingRectTag trackingTag;
 }
 
 - (void) setText: (NSString *) text;
