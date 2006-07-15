@@ -37,4 +37,6 @@
 - (void) setText: (NSString *) text;
 - (void) setEnabled: (BOOL) enable;
 
+- (void) resetBounds: (NSNotification *) notification;
+
 @end

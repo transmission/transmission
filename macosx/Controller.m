@@ -1522,6 +1522,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSSize minSize = [fWindow contentMinSize];
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
+    
+    //reset tracking rects for filter buttons
+    [fNoFilterButton resetBounds: nil];
+    [fSeedFilterButton resetBounds: nil];
+    [fDownloadFilterButton resetBounds: nil];
+    [fPauseFilterButton resetBounds: nil];
 }
 
 - (void) toggleFilterBar: (id) sender

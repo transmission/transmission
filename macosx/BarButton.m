@@ -162,7 +162,7 @@
 - (void) resetBounds: (NSNotification *) notification
 {
     [self removeTrackingRect: fTrackingTag];
-    [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
+    fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 
 @end
