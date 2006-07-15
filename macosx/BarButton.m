@@ -49,13 +49,13 @@
         
         //create highlighted button
         [fButtonIn lockFocus];
-        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25] set];
+        [[NSColor colorWithCalibratedRed: 0.4941 green: 0.5647 blue: 0.6706 alpha: 1.0] set];
         [rect fill];
         [fButtonIn unlockFocus];
         
         //create pushed button
         [fButtonDown lockFocus];
-        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5] set];
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.6] set];
         [rect fill];
         [fButtonDown unlockFocus];
 	}
@@ -79,12 +79,20 @@
 //call only once to avoid overlap
 - (void) setText: (NSString *) text
 {
+    NSShadow * stringShadow = [[NSShadow alloc] init];
+    [stringShadow setShadowOffset: NSMakeSize(1.0, -1.0)];
+    [stringShadow setShadowBlurRadius: 1.0];
+
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor blackColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 11.0], NSFontAttributeName, nil];
+                [NSFont messageFontOfSize: 11.0], NSFontAttributeName,
+                stringShadow, NSShadowAttributeName, nil];
     NSDictionary * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 11.0], NSFontAttributeName, nil];
+                [NSFont messageFontOfSize: 11.0], NSFontAttributeName,
+                stringShadow, NSShadowAttributeName, nil];
+    
+    [stringShadow release];
     
     NSSize textSize = [text sizeWithAttributes: normalAttributes];
     NSRect textRect = NSMakeRect(([self frame].size.width - textSize.width) * 0.5,
