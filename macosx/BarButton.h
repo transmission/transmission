@@ -30,7 +30,7 @@
     IBOutlet NSString * fText;
 
     NSString * fPrefString, * fPrefKey;
-    BOOL fEnabled, fMouseIn;
+    BOOL fEnabled;
 }
 
 - (void) setText: (NSString *) text;

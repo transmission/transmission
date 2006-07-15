@@ -31,7 +31,6 @@
 	if ((self = [super initWithCoder: coder]))
     {
         fEnabled = NO;
-        fMouseIn = NO;
         
         NSSize buttonSize = [self frame].size;
         fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
@@ -116,7 +115,6 @@
     if (!fEnabled)
         [self setImage: fButtonIn];
 
-    fMouseIn = YES;
     [super mouseEntered: event];
 }
 
@@ -125,14 +123,12 @@
     if (!fEnabled)
         [self setImage: fButtonNormal];
 
-    fMouseIn = NO;
     [super mouseExited: event];
 }
 
 - (void) mouseDown: (NSEvent *) event
 {
-    if (!fEnabled)
-        [self setImage: fButtonDown];
+    [self setImage: fButtonDown];
 
     [super mouseDown: event];
     
@@ -141,8 +137,7 @@
                                 [NSEvent mouseLocation]] fromView: nil], [self bounds]))
         [NSApp sendAction: [self action] to: [self target] from: self];
     
-    if (!fEnabled)
-        [self setImage: fButtonIn];
+    [self setImage: fButtonIn];
 }
 
 - (void) setEnabled: (BOOL) enable
