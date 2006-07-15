@@ -31,7 +31,7 @@
 	if ((self = [super initWithFrame: frameRect]))
     {
 		fBackgroundColor = [[NSColor colorWithPatternImage:
-                            [NSImage imageNamed: @"FilterBarBackground.tiff"]] retain];
+                            [NSImage imageNamed: @"FilterBarBackground.png"]] retain];
 	}
 	return self;
 }
