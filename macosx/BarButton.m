@@ -49,13 +49,13 @@
         
         //create highlighted button
         [fButtonIn lockFocus];
-        [[NSColor grayColor] set];
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25] set];
         [rect fill];
         [fButtonIn unlockFocus];
         
         //create pushed button
         [fButtonDown lockFocus];
-        [[NSColor blackColor] set];
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5] set];
         [rect fill];
         [fButtonDown unlockFocus];
 	}

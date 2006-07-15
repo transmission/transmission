@@ -31,6 +31,7 @@
 #import "InfoWindowController.h"
 #import "Badger.h"
 #import "SmoothAquaView.h"
+#import "FilterBarView.h"
 #import "BarButton.h"
 
 @class TorrentTableView;
@@ -63,7 +64,7 @@
     IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
                                 * fDateSortItem, * fOrderSortItem;
     
-    IBOutlet NSView             * fFilterBar;
+    IBOutlet FilterBarView      * fFilterBar;
     BOOL                        fFilterBarVisible;
     NSString                    * fFilterType;
     IBOutlet BarButton          * fNoFilterButton, * fPauseFilterButton,
