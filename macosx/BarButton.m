@@ -32,6 +32,7 @@
 	if ((self = [super initWithCoder: coder]))
     {
         fEnabled = NO;
+        fTrackingTag = 0;
         
         NSSize buttonSize = [self frame].size;
         fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
@@ -102,11 +103,6 @@
                     name: NSViewBoundsDidChangeNotification object: nil];
 	}
 	return self;
-}
-
-- (void) awakeFromNib
-{
-    fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 
 - (void) dealloc
@@ -206,7 +202,8 @@
 
 - (void) resetBounds: (NSNotification *) notification
 {
-    [self removeTrackingRect: fTrackingTag];
+    if (fTrackingTag)
+        [self removeTrackingRect: fTrackingTag];
     fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
 }
 
