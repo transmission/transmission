@@ -635,7 +635,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         if( ret == TR_RESOLVE_ERROR ||
             ( ret == TR_RESOLVE_WAIT && tr_date() > date + 10000 ) )
         {
-            fprintf( stderr, "Could not resolve %s\n", inf->trackerAddress );
+            tr_err( "Could not resolve %s", inf->trackerAddress );
             tr_netResolveClose( resolve );
             return 1;
         }
@@ -660,7 +660,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         ret = tr_netSend( s, buf, len );
         if( ret & TR_NET_CLOSE )
         {
-            fprintf( stderr, "Could not connect to tracker\n" );
+            tr_err( "Could not connect to tracker" );
             tr_netClose( s );
             return 1;
         }
@@ -668,7 +668,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         {
             if( tr_date() > date + 10000 )
             {
-                fprintf( stderr, "Could not connect to tracker\n" );
+                tr_err( "Could not connect to tracker" );
                 tr_netClose( s );
                 return 1;
             }
@@ -692,7 +692,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         {
             if( tr_date() > date + 10000 )
             {
-                fprintf( stderr, "Could not read from tracker\n" );
+                tr_err( "Could not read from tracker" );
                 tr_netClose( s );
                 return 1;
             }
@@ -706,7 +706,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
 
     if( pos < 1 )
     {
-        fprintf( stderr, "Could not read from tracker\n" );
+        tr_err( "Could not read from tracker" );
         tr_netClose( s );
         return 1;
     }

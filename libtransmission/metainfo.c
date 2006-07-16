@@ -59,12 +59,12 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
 
     if( stat( path, &sb ) )
     {
-        fprintf( stderr, "Could not stat file (%s)\n", path );
+        tr_err( "Could not stat file (%s)", path );
         return 1;
     }
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
     {
-        fprintf( stderr, "Not a regular file (%s)\n", path );
+        tr_err( "Not a regular file (%s)", path );
         return 1;
     }
     if( sb.st_size > TORRENT_MAX_SIZE )
@@ -77,14 +77,14 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     file = fopen( path, "rb" );
     if( !file )
     {
-        fprintf( stderr, "Could not open file (%s)\n", path );
+        tr_err( "Could not open file (%s)", path );
         return 1;
     }
     buf = malloc( sb.st_size );
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        fprintf( stderr, "Read error (%s)\n", path );
+        tr_err( "Read error (%s)", path );
         free( buf );
         fclose( file );
         return 1;
@@ -94,7 +94,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     /* Parse bencoded infos */
     if( tr_bencLoad( buf, sb.st_size, &meta, NULL ) )
     {
-        fprintf( stderr, "Error while parsing bencoded data\n" );
+        tr_err( "Error while parsing bencoded data" );
         free( buf );
         return 1;
     }
@@ -102,7 +102,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     /* Get info hash */
     if( !( beInfo = tr_bencDictFind( &meta, "info" ) ) )
     {
-        fprintf( stderr, "Could not find \"info\" dictionary\n" );
+        tr_err( "Could not find \"info\" dictionary" );
         tr_bencFree( &meta );
         free( buf );
         return 1;
@@ -122,7 +122,8 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         file = fopen( inf->torrent, "wb" );
         if( !file )
         {
-            fprintf( stderr, "Could not open file (%s) (%s)\n", inf->torrent, strerror(errno) );
+            tr_err( "Could not open file (%s) (%s)",
+                    inf->torrent, strerror(errno) );
             tr_bencFree( &meta );
             free( buf );
             return 1;
@@ -130,7 +131,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         fseek( file, 0, SEEK_SET );
         if( fwrite( buf, sb.st_size, 1, file ) != 1 )
         {
-            fprintf( stderr, "Write error (%s)\n", inf->torrent );
+            tr_err( "Write error (%s)", inf->torrent );
             tr_bencFree( &meta );
             free( buf );
             fclose( file );
@@ -148,7 +149,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
 
     if( !( val = tr_bencDictFind( &meta, "announce" ) ) )
     {
-        fprintf( stderr, "No \"announce\" entry\n" );
+        tr_err( "No \"announce\" entry" );
         tr_bencFree( &meta );
         return 1;
     }
@@ -163,8 +164,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     /* Parse announce URL */
     if( strncmp( s3, "http://", 7 ) )
     {
-        fprintf( stderr, "Invalid announce URL (%s)\n",
-                 inf->trackerAddress );
+        tr_err( "Invalid announce URL (%s)", inf->trackerAddress );
         tr_bencFree( &meta );
         return 1;
     }
@@ -184,8 +184,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     }
     else
     {
-        fprintf( stderr, "Invalid announce URL (%s)\n",
-                 inf->trackerAddress );
+        tr_err( "Invalid announce URL (%s)", inf->trackerAddress );
         tr_bencFree( &meta );
         return 1;
     }
@@ -194,7 +193,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     /* Piece length */
     if( !( val = tr_bencDictFind( beInfo, "piece length" ) ) )
     {
-        fprintf( stderr, "No \"piece length\" entry\n" );
+        tr_err( "No \"piece length\" entry" );
         tr_bencFree( &meta );
         return 1;
     }
@@ -204,8 +203,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     val = tr_bencDictFind( beInfo, "pieces" );
     if( val->val.s.i % SHA_DIGEST_LENGTH )
     {
-        fprintf( stderr, "Invalid \"piece\" string (size is %d)\n",
-                 val->val.s.i );
+        tr_err( "Invalid \"piece\" string (size is %d)", val->val.s.i );
         tr_bencFree( &meta );
         return 1;
     }
@@ -263,7 +261,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
-        fprintf( stderr, "Size of hashes and files don't match\n" );
+        tr_err( "Size of hashes and files don't match" );
         free( inf->pieces );
         tr_bencFree( &meta );
         return 1;

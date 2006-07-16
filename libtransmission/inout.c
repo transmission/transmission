@@ -265,7 +265,8 @@ static int createFiles( tr_io_t * io )
         else if( ( sb.st_mode & S_IFMT ) != S_IFREG )
         {
             /* Node exists but isn't a file */
-            printf( "Remove %s, it's in the way.\n", path );
+            /* XXX this should be reported to the frontend somehow */
+            tr_err( "Remove %s, it's in the way.", path );
             free( path );
             return 1;
         }

@@ -57,6 +57,16 @@ typedef struct tr_handle_s tr_handle_t;
 tr_handle_t * tr_init();
 
 /***********************************************************************
+ * tr_setErrorFunction
+ ***********************************************************************
+ * Sets the function used to display libtransmission errors.  A NULL
+ * function means to use the default, which simple prints the message
+ * to stderr.  The function's prototype should look like this:
+ * void myErrFunc( const char * errstr );
+ **********************************************************************/
+void tr_setErrorFunction( void (*func)( const char * ) );
+
+/***********************************************************************
  * tr_getPrefsDirectory
  ***********************************************************************
  * Returns the full path to a directory which can be used to store

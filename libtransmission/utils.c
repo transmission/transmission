@@ -24,6 +24,13 @@
 
 #include "transmission.h"
 
+static void (*errorFunc)( const char * );
+
+void tr_setErrorFunction( void (*func)( const char * ) )
+{
+    errorFunc = func;
+}
+
 void tr_msg( int level, char * msg, ... )
 {
     char         string[256];
@@ -50,7 +57,15 @@ void tr_msg( int level, char * msg, ... )
     va_start( args, msg );
     vsnprintf( string, sizeof( string ), msg, args );
     va_end( args );
-    fprintf( stderr, "%s\n", string );
+
+    if( NULL == errorFunc )
+    {
+        fprintf( stderr, "%s\n", string );
+    }
+    else
+    {
+        errorFunc( string );
+    }
 }
 
 int tr_rand( int sup )
