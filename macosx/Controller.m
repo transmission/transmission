@@ -2032,6 +2032,24 @@ static void sleepCallBack(void * controller, io_service_t y,
     fCompleted = 0;
 }
 
+- (void) windowDidResize: (NSNotification *) notification
+{
+    //hide search filter if it overlaps filter buttons
+    NSRect buttonFrame = [fPauseFilterButton frame];
+    BOOL overlap = buttonFrame.origin.x + buttonFrame.size.width > [fSearchFilterField frame].origin.x;
+    
+    if (![fSearchFilterField isHidden])
+    {
+        if (overlap)
+            [fSearchFilterField setHidden: YES];
+    }
+    else
+    {
+        if (!overlap)
+            [fSearchFilterField setHidden: NO];
+    }
+}
+
 - (void) linkHomepage: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: WEBSITE_URL]];
