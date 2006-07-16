@@ -128,11 +128,11 @@
 
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor blackColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 11.0], NSFontAttributeName,
+                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                 stringShadow, NSShadowAttributeName, nil];
     NSDictionary * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 11.0], NSFontAttributeName,
+                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                 stringShadow, NSShadowAttributeName, nil];
     
     [stringShadow release];

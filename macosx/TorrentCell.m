@@ -185,47 +185,56 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     int width = widthFloat; //integers for bars
     
-    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc]
-        initWithBitmapDataPlanes: nil pixelsWide: width
-        pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4
-        hasAlpha: YES isPlanar: NO colorSpaceName:
-        NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+        pixelsWide: width pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
 
     int h, w;
     uint32_t * p;
     uint8_t * bitmapData = [bitmap bitmapData];
     int bytesPerRow = [bitmap bytesPerRow];
 
-    /* Left and right borders */
+    //left and right borders
     p = (uint32_t *) bitmapData;
-    for( h = 0; h < BAR_HEIGHT; h++ )
+    for(h = 0; h < BAR_HEIGHT; h++)
     {
         p[0] = kBorder[h];
         p[width - 1] = kBorder[h];
         p += bytesPerRow / 4;
     }
 
-    int8_t * pieces = malloc( width );
+    int8_t * pieces = malloc(width);
     [fTorrent getAvailability: pieces size: width];
+    int avail = 0;
+    for (w = 0; w < width; w++)
+        if (pieces[w] != 0)
+            avail++;
 
-    /* First two lines: dark blue to show progression */
-    int end  = lrintf( floor( [fTorrent progress] * ( width - 2 ) ) );
-    for( h = 0; h < 2; h++ )
+    //first two lines: dark blue to show progression, green to show available
+    int end = lrintf(floor([fTorrent progress] * (width - 2)));
+    p = (uint32_t *) (bitmapData) + 1;
+
+    for (w = 0; w < end; w++)
     {
-        p = (uint32_t *) ( bitmapData + h * bytesPerRow ) + 1;
-        for( w = 0; w < end; w++ )
-            p[w] = kBlue4;
-        for( w = end; w < width - 2; w++ )
-            p[w] = kBack[h];
+        p[w] = kBlue4;
+        p[w + bytesPerRow / 4] = kBlue4;
     }
-
-    /* Lines 2 to 14: blue or grey depending on whether
-       we have the piece or not */
+    for (; w < avail; w++)
+    {
+        p[w] = kGreen;
+        p[w + bytesPerRow / 4] = kGreen;
+    }
+    for (; w < width - 2; w++)
+    {
+        p[w] = kBack[0];
+        p[w + bytesPerRow / 4] = kBack[1];
+    }
+    
+    //lines 2 to 14: blue or grey depending on whether we have the piece or not
     uint32_t color;
     for( w = 0; w < width - 2; w++ )
     {
-        /* Point to pixel ( 2 + w, 2 ). We will then draw
-           "vertically" */
+        //point to pixel ( 2 + w, 2 ). We will then draw "vertically"
         p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + 1 + w;
 
         if (pieces[w] < 0)
