@@ -24,6 +24,8 @@
 
 #include "transmission.h"
 
+#define TORRENT_MAX_SIZE (5*1024*1024)
+
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
@@ -65,7 +67,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         fprintf( stderr, "Not a regular file (%s)\n", path );
         return 1;
     }
-    if( sb.st_size > 2097152 )
+    if( sb.st_size > TORRENT_MAX_SIZE )
     {
         tr_err( "Torrent file is too big (%d bytes)", sb.st_size );
         return 1;
