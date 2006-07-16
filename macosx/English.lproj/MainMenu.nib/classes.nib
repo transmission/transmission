@@ -43,7 +43,7 @@
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
-                fFilterBar = NSView; 
+                fFilterBar = FilterBarView; 
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
                 fNoFilterButton = BarButton; 

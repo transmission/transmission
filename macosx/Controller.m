@@ -159,6 +159,8 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fSpeedLimitDockItem setState: NSOnState];
         [fSpeedLimitButton setState: NSOnState];
     }
+    
+    [[fSpeedLimitButton cell] setHighlightsBy: NSNoCellMask];
 
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
     [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
