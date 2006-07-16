@@ -111,18 +111,18 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fWindow setToolbar: fToolbar];
     [fWindow setDelegate: self];
     
-    //window min height
-    NSSize contentMinSize = [fWindow contentMinSize];
-    contentMinSize.height = [[fWindow contentView] frame].size.height - [fScrollView frame].size.height
-                                + [fTableView rowHeight] + [fTableView intercellSpacing].height;
-    [fWindow setContentMinSize: contentMinSize];
-    
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
     {
         [fTableView setRowHeight: ROW_HEIGHT_SMALL];
         [fSmallViewItem setState: NSOnState];
     }
+    
+    //window min height
+    NSSize contentMinSize = [fWindow contentMinSize];
+    contentMinSize.height = [[fWindow contentView] frame].size.height - [fScrollView frame].size.height
+                                + [fTableView rowHeight] + [fTableView intercellSpacing].height;
+    [fWindow setContentMinSize: contentMinSize];
     
     //set info keyboard shortcuts
     unichar ch = NSRightArrowFunctionKey;
@@ -1478,6 +1478,26 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fSmallViewItem setState: makeSmall];
     
     [fDefaults setBool: makeSmall forKey: @"SmallView"];
+    
+    //window min height
+    NSSize contentMinSize = [fWindow contentMinSize],
+            contentSize = [[fWindow contentView] frame].size;
+    contentMinSize.height = contentSize.height - [fScrollView frame].size.height
+                            + [fTableView rowHeight] + [fTableView intercellSpacing].height;
+    [fWindow setContentMinSize: contentMinSize];
+    
+    //resize for larger min height
+    if (!makeSmall && contentSize.height < contentMinSize.height)
+    {
+        NSRect frame = [fWindow frame];
+        float heightChange = contentMinSize.height - contentSize.height;
+        frame.size.height += heightChange;
+        frame.origin.y -= heightChange;
+        
+        [fWindow setFrame: frame display: YES animate: NO];
+        
+        [fTableView reloadData];
+    }
 }
 
 - (void) toggleStatusBar: (id) sender
