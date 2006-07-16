@@ -28,9 +28,7 @@
 {
     NSImage * fButtonNormal, * fButtonOver, * fButtonPressed, * fButtonSelected;
 
-    NSString * fPrefString, * fPrefKey;
     BOOL fEnabled;
-    
     NSTrackingRectTag fTrackingTag;
 }
 

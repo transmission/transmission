@@ -40,17 +40,7 @@
         fButtonPressed = [[NSImage alloc] initWithSize: buttonSize];
         fButtonSelected = [[NSImage alloc] initWithSize: buttonSize];
         
-        //create shape
-        NSBezierPath * rect = [NSBezierPath bezierPath];
-        float ovalDiamater = 20.0;
-        [rect appendBezierPathWithOvalInRect:
-                NSMakeRect(0, 0, ovalDiamater, buttonSize.height)];
-        [rect appendBezierPathWithOvalInRect:
-                NSMakeRect(buttonSize.width - ovalDiamater, 0, ovalDiamater, buttonSize.height)];
-        [rect appendBezierPathWithRect:
-                NSMakeRect(ovalDiamater * 0.5, 0, buttonSize.width - ovalDiamater, buttonSize.height)];
-        
-        //create rolled over button
+        //rolled over button
         NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
                 * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
                 * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
@@ -71,7 +61,7 @@
         [rightOver compositeToPoint: rightPoint operation: NSCompositeSourceOver];
         [fButtonOver unlockFocus];
         
-        //create pressed button
+        //pressed button
         NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
                 * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
                 * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
@@ -85,7 +75,7 @@
         [rightPressed compositeToPoint: rightPoint operation: NSCompositeSourceOver];
         [fButtonPressed unlockFocus];
         
-        //create selected button
+        //selected button
         NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
                 * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
                 * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
@@ -115,7 +105,7 @@
     [super dealloc];
 }
 
-//call only once to avoid overlap
+//call only once to avoid overlapping text
 - (void) setText: (NSString *) text
 {
     NSShadow * stringShadow = [[NSShadow alloc] init];
@@ -138,22 +128,22 @@
     NSRect textRect = NSMakeRect((buttonSize.width - textSize.width) * 0.5,
             (buttonSize.height - textSize.height) * 0.5 + 1.5, textSize.width, textSize.height);
     
-    //create normal button
+    //normal button
     [fButtonNormal lockFocus];
     [text drawInRect: textRect withAttributes: normalAttributes];
     [fButtonNormal unlockFocus];
     
-    //create rolled over button
+    //rolled over button
     [fButtonOver lockFocus];
     [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonOver unlockFocus];
     
-    //create pressed button
+    //pressed button
     [fButtonPressed lockFocus];
     [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonPressed unlockFocus];
     
-    //create selected button
+    //selected button
     [fButtonSelected lockFocus];
     [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonSelected unlockFocus];
