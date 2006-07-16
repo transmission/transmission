@@ -1494,8 +1494,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         frame.size.height += heightChange;
         frame.origin.y -= heightChange;
         
-        [fWindow setFrame: frame display: YES animate: NO];
-        
+        [fWindow setFrame: frame display: YES];
         [fTableView reloadData];
     }
 }
