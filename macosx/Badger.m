@@ -48,7 +48,7 @@
         [stringShadow setShadowBlurRadius: 4.0];
         
         NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
-                            [NSFont fontWithName: @"Helvetica" size: 28.0] toHaveTrait: NSBoldFontMask];
+                                [NSFont fontWithName: @"Helvetica" size: 28.0] toHaveTrait: NSBoldFontMask];
         
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,

@@ -282,7 +282,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
-    BOOL highlighted = [self isHighlighted] && [[view window] isKeyWindow];
+    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
+                                                        isEqual: [NSColor alternateSelectedControlColor]];
     NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor blackColor],
                     NSForegroundColorAttributeName,
