@@ -125,6 +125,8 @@
 - (void) showInfo: (id) sender;
 - (void) setInfoTab: (id) sender;
 
+- (void) updateControlTint: (NSNotification *) notification;
+
 - (void) updateUI: (NSTimer *) timer;
 - (void) updateTorrentHistory;
 

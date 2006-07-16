@@ -155,6 +155,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     //set speed limit
+    [self updateControlTint: nil];
+    
     if ([fDefaults boolForKey: @"SpeedLimit"])
     {
         [fSpeedLimitItem setState: NSOnState];
@@ -258,6 +260,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+    
+    [nc addObserver: self selector: @selector(updateControlTint:)
+                    name: NSControlTintDidChangeNotification object: nil];
     
     [nc addObserver: self selector: @selector(prepareForUpdate:)
                     name: SUUpdaterWillRestartNotification object: nil];
@@ -816,6 +821,13 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fInfoController setNextTab];
     else
         [fInfoController setPreviousTab];
+}
+
+- (void) updateControlTint: (NSNotification *) notification
+{
+    [fSpeedLimitButton setAlternateImage: [fDefaults integerForKey: @"AppleAquaColorVariant"] == NSBlueControlTint
+            ? [NSImage imageNamed: @"SpeedLimitButtonPressedBlue.png"]
+            : [NSImage imageNamed: @"SpeedLimitButtonPressedGraphite.png"]];
 }
 
 - (void) updateUI: (NSTimer *) t
@@ -1954,7 +1966,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             break;
 
         case kIOMessageCanSystemSleep:
-            /* Prevent idle sleep unless all paused */
+            //pevent idle sleep unless all paused
             active = NO;
             enumerator = [fTorrents objectEnumerator];
             while ((torrent = [enumerator nextObject]))
