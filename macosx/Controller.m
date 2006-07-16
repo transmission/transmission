@@ -113,6 +113,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fWindow setToolbar: fToolbar];
     [fWindow setDelegate: self];
     
+    [fWindow makeFirstResponder: fTableView];
+    
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
     {
