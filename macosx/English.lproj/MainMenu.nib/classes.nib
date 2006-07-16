@@ -62,7 +62,7 @@
                 fSpeedLimitDockItem = NSMenuItem; 
                 fSpeedLimitItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
-                fStatusBar = SmoothAquaView; 
+                fStatusBar = ImageBackgroundView; 
                 fTableView = TorrentTableView; 
                 fTotalDLField = NSTextField; 
                 fTotalTorrentsField = NSTextField; 
