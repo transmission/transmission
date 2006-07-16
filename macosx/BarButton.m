@@ -45,12 +45,11 @@
                 * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
                 * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
         
-        float endWidth = [leftOver size].width,
-                mainWidth = buttonSize.width - 2.0 * endWidth;
+        NSSize endSize = [leftOver size],
+                mainSize = NSMakeSize(buttonSize.width - endSize.width * 2.0, endSize.height);
         NSPoint leftPoint = NSMakePoint(0, 0),
-                mainPoint = NSMakePoint(endWidth, 0),
-                rightPoint = NSMakePoint(mainWidth + endWidth, 0);
-        NSSize mainSize = NSMakeSize(mainWidth, [leftOver size].height);
+                mainPoint = NSMakePoint(endSize.width, 0),
+                rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0);
 
         [mainOver setScalesWhenResized: YES];
         [mainOver setSize: mainSize];
