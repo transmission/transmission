@@ -107,44 +107,41 @@
 //call only once to avoid overlapping text
 - (void) setText: (NSString *) text
 {
-    NSShadow * stringShadow = [[NSShadow alloc] init];
-    [stringShadow setShadowOffset: NSMakeSize(1.0, -1.0)];
-    [stringShadow setShadowBlurRadius: 1.0];
-
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor blackColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                stringShadow, NSShadowAttributeName, nil];
+                [NSFont fontWithName: @"Helvetica" size: 12.0], NSFontAttributeName, nil];
+    
     NSDictionary * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
-                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                stringShadow, NSShadowAttributeName, nil];
+                [NSFont fontWithName: @"Helvetica Bold" size: 12.0], NSFontAttributeName, nil];
     
-    [stringShadow release];
-    
-    NSSize textSize = [text sizeWithAttributes: normalAttributes],
+    NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes],
+            textSizeBold = [text sizeWithAttributes: highlightedAttributes],
             buttonSize = [self frame].size;
-    NSRect textRect = NSMakeRect((buttonSize.width - textSize.width) * 0.5,
-            (buttonSize.height - textSize.height) * 0.5 + 1.5, textSize.width, textSize.height);
+    
+    NSRect textRectNormal = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
+            (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height),
+        textRectBold = NSMakeRect((buttonSize.width - textSizeBold.width) * 0.5,
+            (buttonSize.height - textSizeBold.height) * 0.5 + 1.5, textSizeBold.width, textSizeBold.height);
     
     //normal button
     [fButtonNormal lockFocus];
-    [text drawInRect: textRect withAttributes: normalAttributes];
+    [text drawInRect: textRectNormal withAttributes: normalAttributes];
     [fButtonNormal unlockFocus];
     
     //rolled over button
     [fButtonOver lockFocus];
-    [text drawInRect: textRect withAttributes: highlightedAttributes];
+    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
     [fButtonOver unlockFocus];
     
     //pressed button
     [fButtonPressed lockFocus];
-    [text drawInRect: textRect withAttributes: highlightedAttributes];
+    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
     [fButtonPressed unlockFocus];
     
     //selected button
     [fButtonSelected lockFocus];
-    [text drawInRect: textRect withAttributes: highlightedAttributes];
+    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
     [fButtonSelected unlockFocus];
     
     [self setImage: fButtonNormal];
