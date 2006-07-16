@@ -87,11 +87,14 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [fToolbar release];
     [fInfoController release];
+    [fPrefsController release];
     [fBadger release];
+    
     [fSortType release];
+    [fFilterType release];
     [fAutoImportedNames release];
     
-    tr_close( fLib );
+    tr_close(fLib);
     [super dealloc];
 }
 
@@ -99,8 +102,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
-    //ensure filter buttons display correctly
-    [fWindow setAcceptsMouseMovedEvents: YES];
+    [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     
     [fAdvancedBarItem setState: [fDefaults boolForKey: @"UseAdvancedBar"]];
 
