@@ -140,7 +140,7 @@
     NSSize textSize = [text sizeWithAttributes: normalAttributes],
             buttonSize = [self frame].size;
     NSRect textRect = NSMakeRect((buttonSize.width - textSize.width) * 0.5,
-            (buttonSize.height - textSize.height) * 0.5, textSize.width, textSize.height);
+            (buttonSize.height - textSize.height) * 0.5 + 1.5, textSize.width, textSize.height);
     
     //create normal button
     [fButtonNormal lockFocus];
