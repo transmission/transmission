@@ -1573,15 +1573,17 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleFilterBar: (id) sender
 {
+    //first make search filter lose focus
+    if (fFilterBarVisible)
+        [fWindow makeFirstResponder: fTableView];
+
     [self showFilterBar: !fFilterBarVisible animate: YES];
     [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
     
     //disable filtering when hiding
     if (!fFilterBarVisible)
     {
-        [fWindow makeFirstResponder: fTableView];
         [fSearchFilterField setStringValue: @""];
-        
         [self setFilter: fNoFilterButton];
     }
 }
