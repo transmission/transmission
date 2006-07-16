@@ -1,0 +1,156 @@
+{
+    IBClasses = (
+        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
+        {
+            ACTIONS = {
+                applyFilter = id; 
+                checkUpdate = id; 
+                copyTorrentFile = id; 
+                linkForums = id; 
+                linkHomepage = id; 
+                openShowSheet = id; 
+                removeDeleteData = id; 
+                removeDeleteDataAndTorrent = id; 
+                removeDeleteTorrent = id; 
+                removeNoDelete = id; 
+                resumeAllTorrents = id; 
+                resumeSelectedTorrents = id; 
+                revealFile = id; 
+                setFilter = id; 
+                setInfoTab = id; 
+                setLimitGlobalEnabled = id; 
+                setQuickLimitGlobal = id; 
+                setQuickRatioGlobal = id; 
+                setRatioGlobalEnabled = id; 
+                setSort = id; 
+                showInfo = id; 
+                showMainWindow = id; 
+                showPreferenceWindow = id; 
+                stopAllTorrents = id; 
+                stopSelectedTorrents = id; 
+                toggleAdvancedBar = id; 
+                toggleFilterBar = id; 
+                toggleSmallView = id; 
+                toggleSpeedLimit = id; 
+                toggleStatusBar = id; 
+            }; 
+            CLASS = Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fActionButton = NSButton; 
+                fAdvancedBarItem = NSMenuItem; 
+                fDateSortItem = NSMenuItem; 
+                fDownloadFilterButton = BarButton; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
+                fFilterBar = FilterBarView; 
+                fNameSortItem = NSMenuItem; 
+                fNextInfoTabItem = NSMenuItem; 
+                fNoFilterButton = BarButton; 
+                fOrderSortItem = NSMenuItem; 
+                fPauseFilterButton = BarButton; 
+                fPrevInfoTabItem = NSMenuItem; 
+                fProgressSortItem = NSMenuItem; 
+                fRatioNotSetItem = NSMenuItem; 
+                fRatioSetItem = NSMenuItem; 
+                fScrollView = NSScrollView; 
+                fSearchFilterField = NSSearchField; 
+                fSeedFilterButton = BarButton; 
+                fSmallViewItem = NSMenuItem; 
+                fSpeedLimitButton = NSButton; 
+                fSpeedLimitDockItem = NSMenuItem; 
+                fSpeedLimitItem = NSMenuItem; 
+                fStateSortItem = NSMenuItem; 
+                fStatusBar = SmoothAquaView; 
+                fTableView = TorrentTableView; 
+                fTotalDLField = NSTextField; 
+                fTotalTorrentsField = NSTextField; 
+                fTotalULField = NSTextField; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FilterBarView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {revealFile = id; setNextTab = id; setPreviousTab = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
+        {
+            ACTIONS = {
+                folderSheetShow = id; 
+                setAutoStart = id; 
+                setBadge = id; 
+                setDownloadLocation = id; 
+                setLimit = id; 
+                setLimitCheck = id; 
+                setLimitMenu = id; 
+                setPort = id; 
+                setQuickRatio = id; 
+                setQuickSpeed = id; 
+                setRatio = id; 
+                setRatioCheck = id; 
+                setRatioMenu = id; 
+                setShowMessage = id; 
+                setUpdate = id; 
+            }; 
+            CLASS = PrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAutoStartCheck = NSButton; 
+                fBadgeDownloadRateCheck = NSButton; 
+                fBadgeUploadRateCheck = NSButton; 
+                fBlankView = NSView; 
+                fDownloadCheck = NSButton; 
+                fDownloadField = NSTextField; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
+                fFolderPopUp = NSPopUpButton; 
+                fGeneralView = NSView; 
+                fNetworkView = NSView; 
+                fPortField = NSTextField; 
+                fPrefsWindow = NSPanel; 
+                fQuitCheck = NSButton; 
+                fRatioCheck = NSButton; 
+                fRatioField = NSTextField; 
+                fRatioNotSetItem = NSMenuItem; 
+                fRatioSetItem = NSMenuItem; 
+                fRemoveCheck = NSButton; 
+                fTransfersView = NSView; 
+                fUpdatePopUp = NSPopUpButton; 
+                fUpdater = SUUpdater; 
+                fUploadCheck = NSButton; 
+                fUploadField = NSTextField; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = ProgressCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
+        {
+            ACTIONS = {checkForUpdates = id; }; 
+            CLASS = SUUpdater; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = SmoothAquaView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = TorrentTableView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fContextNoRow = NSMenu; fContextRow = NSMenu; fController = Controller; }; 
+            SUPERCLASS = NSTableView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

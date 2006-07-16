@@ -1,0 +1,76 @@
+NEWS file for Transmission <http://transmission.m0k.org/>
+
+0.6.1 (2006/06/25)
+ - OS X:
+   + Fixes a bug in the updater that could cause repeated hits to the
+     appcast
+ - GTK+:
+   + Fixes drag-and-drop
+   + Adds Italian and French translations
+
+0.6 (2006/06/21)
+ - Ability to limit download rate
+ - Automatic banning of peers who send bad data
+ - Can keep a copy of the torrent file so the original can be deleted
+ - Many bugfixes
+ - OS X:
+   + Reworked interface
+   + Rate limits can be changed directly from the main window
+   + Ability to automatically stop seeding at a given ratio
+   + Allows sorting of the tranfers list
+   + Extended Info Inspector
+   + Automatic updating with Sparkle
+ - GTK+:
+   + Add torrents via command line. If Transmission is already running,
+       add them to running copy
+   + Improved long filename handling
+
+0.5 (2006/02/11)
+ - Only uses one port for all torrents
+ - Rewritten choking algorithm
+ - Remembers download and upload sizes from one launch to another
+ - New GTK+ interface
+ - New BeOS interface
+ - OS X: Dock badging
+ - OS X: Shows the file icon in the list
+ - OS X: Shows ratio once download is completed
+ - OS X: Automatic check for update
+ - OS X: Fixes a display bug on Intel Macs
+
+0.4 (2005/11/18)
+ - Uses less CPU downloading torrents with many pieces
+ - The UI could freeze when the hard drive was having a hard time - fixed
+ - Fixes for difficult trackers, which require a 'key' parameter or a
+     User Agent field
+ - OS X: Cleaner look, unified toolbar
+ - OS X: Added a document icon for torrent files
+ - OS X: Added a Pause/Resume button for each torrent, and a
+    "Reveal in Finder" button
+ - OS X: Added a contextual menu
+ - OS X: Sometimes torrents kept "Stopping..." forever - fixed
+ - OS X: Several minor improvements or fixes: allows column reordering,
+    fixed resizing on Panther, remember the position of the window,
+    fixed display of Unicode filenames, added menubar items and
+    keyboard shortcuts, made the simple progress bar switch to green
+    when seeding
+
+0.3 (2005/10/19)
+ - Fixed "Sometimes sends incorrect messages and looses peers"
+ - Fixed "Crashes with many torrents or torrents with many files"
+ - Enhancements in the "End game" mode
+ - Is nicer to the trackers
+ - Asks for the rarest pieces first
+ - OS X: Universal binary for PPC and x86
+ - OS X: Fixed "Progress increases every time I pause then resume"
+ - OS X: Fixed "Sometimes crashes at exit"
+ - OS X: Cleaner icon
+ - OS X: Show all sizes in human readable form
+ - OS X: Keep downloading in the background when the window is closed
+ - Miscellaneus bugfixes and internal enhancements
+
+0.2 (2005/09/22)
+ - Bugfixes
+ - OS X: Users can now choose where the downloads are sent
+
+0.1 (2005/09/15)
+ - First version

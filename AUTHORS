@@ -1,0 +1,70 @@
+AUTHORS for Transmission <http://transmission.m0k.org/>
+=======================================================
+
+Transmission is written and maintained by:
+
+Eric Petit <titer@m0k.org>
+ + Back-end
+ + OS X interface
+
+Josh Elsasser <josh@elsasser.org>
+ + Back-end
+ + GTK+ interface
+
+Bryan Varner <bryan@varnernet.com>
+ + BeOS interface
+
+Michael Demars <keul@m0k.org>
+ + OS X interface (Growl notifications, AppleScript)
+
+Mitchell Livingston <livings124@gmail.com>
+ + OS X interface
+
+
+Translators:
+
+Calorì Alessandro
+ + Italian GTK+ translation
+
+Pierre-Henri Quelen
+ + French GTK+ translation
+
+Vicente Carro Fernandez
+ + Spanish GTK+ translation
+
+
+Thanks to:
+
+Omar and Adrien
+ + Beta testing
+
+Various people
+ + Writing http://wiki.theory.org/BitTorrentSpecification
+
+vi@nwr.jp
+ + Free SHA1 implementation (sha1.[ch])
+
+John Blitch
+ + OS X patch (Contextual menu)
+
+Ahmad M. Afuni
+ + NetBSD patch
+
+Jeremy Messenger
+ + FreeBSD patch
+
+Mike Matas <http://www.mikematas.com/>
+ + OS X toolbar icons
+
+Martin Stadtmueller
+ + Icon tweaking
+
+FOOOD
+ + Badging images, Progress Bar images
+
+Rashid Eissing
+ + Transfers preferences icon
+ + Interface conceptualization
+
+Deanna Phillips
+ + Manpage for transmissioncli

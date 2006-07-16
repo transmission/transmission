@@ -1,0 +1,52 @@
+{
+    IBClasses = (
+        {
+            CLASS = FileTableView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fContextMenu = NSMenu; }; 
+            SUPERCLASS = NSTableView; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                revealFile = id; 
+                setRatioCheck = id; 
+                setRatioLimit = id; 
+                setWaitToStart = id; 
+            }; 
+            CLASS = InfoWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAnnounceField = NSTextField; 
+                fConnectedPeersField = NSTextField; 
+                fDataLocationField = NSTextField; 
+                fDateStartedField = NSTextField; 
+                fDownloadedTotalField = NSTextField; 
+                fDownloadedValidField = NSTextField; 
+                fDownloadingFromField = NSTextField; 
+                fFileTable = NSTableView; 
+                fHashField = NSTextField; 
+                fImageView = NSImageView; 
+                fLeechersField = NSTextField; 
+                fNameField = NSTextField; 
+                fPieceSizeField = NSTextField; 
+                fPiecesField = NSTextField; 
+                fRatioField = NSTextField; 
+                fRatioLimitField = NSTextField; 
+                fRatioMatrix = NSMatrix; 
+                fSeedersField = NSTextField; 
+                fSizeField = NSTextField; 
+                fStateField = NSTextField; 
+                fTabView = NSTabView; 
+                fTorrentLocationField = NSTextField; 
+                fTrackerField = NSTextField; 
+                fUploadedTotalField = NSTextField; 
+                fUploadingToField = NSTextField; 
+                fWaitToStartButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }
+    ); 
+    IBVersion = 1; 
+}
