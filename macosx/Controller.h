@@ -69,6 +69,7 @@
     NSString                    * fFilterType;
     IBOutlet BarButton          * fNoFilterButton, * fPauseFilterButton,
                                 * fSeedFilterButton, * fDownloadFilterButton;
+    IBOutlet NSSearchField      * fSearchFilterField;
                                 
     IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
     
@@ -133,7 +134,7 @@
 - (void) sortTorrents;
 - (void) sortTorrentsIgnoreSelected;
 - (void) setSort: (id) sender;
-- (void) applyFilter;
+- (void) applyFilter: (id) sender;
 - (void) setFilter: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;

@@ -3,6 +3,7 @@
         {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {
             ACTIONS = {
+                applyFilter = id; 
                 checkUpdate = id; 
                 copyTorrentFile = id; 
                 linkForums = id; 
@@ -54,6 +55,7 @@
                 fRatioNotSetItem = NSMenuItem; 
                 fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
+                fSearchFilterField = NSSearchField; 
                 fSeedFilterButton = BarButton; 
                 fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 

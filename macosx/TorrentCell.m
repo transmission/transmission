@@ -285,12 +285,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
                                                         isEqual: [NSColor alternateSelectedControlColor]];
     NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor blackColor],
-                    NSForegroundColorAttributeName,
+                    highlighted ? [NSColor whiteColor] : [NSColor blackColor], NSForegroundColorAttributeName,
                     [NSFont messageFontOfSize: 12.0], NSFontAttributeName, nil];
     NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor],
-                    NSForegroundColorAttributeName,
+                    highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
                     [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
 
     NSPoint pen = cellFrame.origin;

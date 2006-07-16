@@ -314,7 +314,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
-    [self applyFilter];
+    [self applyFilter: nil];
     
     [fWindow makeKeyAndOrderFront: nil];
 
@@ -474,7 +474,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self torrentNumberChanged];
 
     [self updateUI: nil];
-    [self applyFilter];
+    [self applyFilter: nil];
     [self updateTorrentHistory];
 }
 
@@ -547,7 +547,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [torrents makeObjectsPerformSelector: @selector(startTransfer)];
     
     [self updateUI: nil];
-    [self applyFilter];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
@@ -573,7 +573,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
     [self updateUI: nil];
-    [self applyFilter];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
@@ -840,7 +840,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
         if ([torrent justFinished])
         {
-            [self applyFilter];
+            [self applyFilter: nil];
             [self checkToStartWaiting: torrent];
         
             [GrowlApplicationBridge notifyWithTitle: @"Download Complete"
@@ -991,7 +991,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self sortTorrents];
 }
 
-- (void) applyFilter
+- (void) applyFilter: (id) sender
 {
     //remember selected rows if needed
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
@@ -1025,6 +1025,16 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     else
         [tempTorrents setArray: fTorrents];
+    
+    NSString * searchString = [fSearchFilterField stringValue];
+    if (![searchString isEqualToString: @""])
+    {
+        int i;
+        for (i = [tempTorrents count] - 1; i >= 0; i--)
+            if ([[[tempTorrents objectAtIndex: i] name] rangeOfString: searchString
+                                        options: NSCaseInsensitiveSearch].location == NSNotFound)
+                [tempTorrents removeObjectAtIndex: i];
+    }
     
     [fFilteredTorrents setArray: tempTorrents];
     [tempTorrents release];
@@ -1078,7 +1088,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fDefaults setObject: fFilterType forKey: @"Filter"];
     }
 
-    [self applyFilter];
+    [self applyFilter: nil];
 }
 
 - (void) toggleSpeedLimit: (id) sender
@@ -1198,7 +1208,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     {
         [torrentToStart startTransfer];
         
-        [self applyFilter];
+        [self applyFilter: nil];
         [self updateUI: nil];
         [fInfoController updateInfoStatsAndSettings];
         [self updateTorrentHistory];
@@ -1209,7 +1219,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self attemptToStartMultipleAuto: [notification object]];
 
-    [self applyFilter];
+    [self applyFilter: nil];
     [self updateUI: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
@@ -1219,7 +1229,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self attemptToStartMultipleAuto: fTorrents];
     
-    [self applyFilter];
+    [self applyFilter: nil];
     [self updateUI: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
@@ -1227,7 +1237,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification
 {
-    [self applyFilter];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     
     [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete"
@@ -1561,12 +1571,19 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleFilterBar: (id) sender
 {
+    if (!fFilterBarVisible)
+        [fSearchFilterField setEnabled: YES];
+
     [self showFilterBar: !fFilterBarVisible animate: YES];
     [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
     
     //disable filtering when hiding
     if (!fFilterBarVisible)
+    {
+        [fSearchFilterField setEnabled: NO];
+        [fSearchFilterField setStringValue: @""];
         [self setFilter: fNoFilterButton];
+    }
 }
 
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
