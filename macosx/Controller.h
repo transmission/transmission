@@ -30,62 +30,61 @@
 #import "PrefsController.h"
 #import "InfoWindowController.h"
 #import "Badger.h"
-#import "SmoothAquaView.h"
-#import "FilterBarView.h"
+#import "ImageBackgroundView.h"
 #import "BarButton.h"
 
 @class TorrentTableView;
 
 @interface Controller : NSObject
 {
-    tr_handle_t                 * fLib;
-    int                         fCompleted;
+    tr_handle_t                     * fLib;
+    int                             fCompleted;
     
-    NSMutableArray              * fTorrents, * fFilteredTorrents;
+    NSMutableArray                  * fTorrents, * fFilteredTorrents;
     
-    PrefsController             * fPrefsController;
-    NSUserDefaults              * fDefaults;
-    InfoWindowController        * fInfoController;
+    PrefsController                 * fPrefsController;
+    NSUserDefaults                  * fDefaults;
+    InfoWindowController            * fInfoController;
 
-    IBOutlet NSWindow           * fWindow;
-    IBOutlet NSScrollView       * fScrollView;
-    IBOutlet TorrentTableView   * fTableView;
-    NSToolbar                   * fToolbar;
+    IBOutlet NSWindow               * fWindow;
+    IBOutlet NSScrollView           * fScrollView;
+    IBOutlet TorrentTableView       * fTableView;
+    NSToolbar                       * fToolbar;
     
-    IBOutlet NSMenuItem         * fAdvancedBarItem, * fSmallViewItem,
-                                * fSpeedLimitItem, * fSpeedLimitDockItem;
-    IBOutlet NSButton           * fActionButton, * fSpeedLimitButton;
+    IBOutlet NSMenuItem             * fAdvancedBarItem, * fSmallViewItem,
+                                    * fSpeedLimitItem, * fSpeedLimitDockItem;
+    IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     
-    IBOutlet SmoothAquaView     * fStatusBar;
-    BOOL                        fStatusBarVisible;
-    IBOutlet NSTextField        * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
+    IBOutlet ImageBackgroundView    * fStatusBar;
+    BOOL                            fStatusBarVisible;
+    IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
-    NSString                    * fSortType;
-    IBOutlet NSMenuItem         * fNameSortItem, * fStateSortItem, * fProgressSortItem,
-                                * fDateSortItem, * fOrderSortItem;
+    NSString                        * fSortType;
+    IBOutlet NSMenuItem             * fNameSortItem, * fStateSortItem, * fProgressSortItem,
+                                    * fDateSortItem, * fOrderSortItem;
     
-    IBOutlet FilterBarView      * fFilterBar;
-    BOOL                        fFilterBarVisible;
-    NSString                    * fFilterType;
-    IBOutlet BarButton          * fNoFilterButton, * fPauseFilterButton,
-                                * fSeedFilterButton, * fDownloadFilterButton;
-    IBOutlet NSSearchField      * fSearchFilterField;
+    IBOutlet ImageBackgroundView    * fFilterBar;
+    BOOL                            fFilterBarVisible;
+    NSString                        * fFilterType;
+    IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
+                                    * fSeedFilterButton, * fDownloadFilterButton;
+    IBOutlet NSSearchField          * fSearchFilterField;
                                 
-    IBOutlet NSMenuItem         * fNextInfoTabItem, * fPrevInfoTabItem;
+    IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
     
-    IBOutlet NSMenu             * fUploadMenu, * fDownloadMenu;
-    IBOutlet NSMenuItem         * fUploadLimitItem, * fUploadNoLimitItem,
-                                * fDownloadLimitItem, * fDownloadNoLimitItem,
-                                * fRatioSetItem, * fRatioNotSetItem;
+    IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;
+    IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
+                                    * fDownloadLimitItem, * fDownloadNoLimitItem,
+                                    * fRatioSetItem, * fRatioNotSetItem;
 
-    io_connect_t                fRootPort;
-    NSTimer                     * fTimer;
+    io_connect_t                    fRootPort;
+    NSTimer                         * fTimer;
     
-    NSTimer                     * fAutoImportTimer;
-    NSMutableArray              * fAutoImportedNames;
+    NSTimer                         * fAutoImportTimer;
+    NSMutableArray                  * fAutoImportedNames;
     
-    BOOL                        fUpdateInProgress;
-    Badger                      * fBadger;
+    BOOL                            fUpdateInProgress;
+    Badger                          * fBadger;
 }
 
 - (void) openShowSheet:   (id) sender;

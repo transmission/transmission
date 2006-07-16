@@ -102,6 +102,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
+    [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBorder.png"]];
+    [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
+    
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     
     [fAdvancedBarItem setState: [fDefaults boolForKey: @"UseAdvancedBar"]];
@@ -913,6 +916,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
 }
 
+//doesn't remember selected rows
 - (void) sortTorrentsIgnoreSelected
 {
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:

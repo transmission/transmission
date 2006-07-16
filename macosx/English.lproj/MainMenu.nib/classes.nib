@@ -44,7 +44,7 @@
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
-                fFilterBar = FilterBarView; 
+                fFilterBar = ImageBackgroundView; 
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
                 fNoFilterButton = BarButton; 
@@ -74,13 +74,13 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = FilterBarView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {
             ACTIONS = {revealFile = id; setNextTab = id; setPreviousTab = id; }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
@@ -144,7 +144,6 @@
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
         }, 
-        {CLASS = SmoothAquaView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {
             CLASS = TorrentTableView; 
             LANGUAGE = ObjC; 

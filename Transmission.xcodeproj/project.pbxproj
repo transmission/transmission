@@ -78,7 +78,6 @@
 		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
 		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
-		A20B26170A6961780096C9DA /* FilterBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A20B26150A6961780096C9DA /* FilterBarView.m */; };
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
@@ -94,7 +93,6 @@
 		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
-		A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2519D470A2FADFC00479D0C /* SmoothAquaView.m */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
 		A253F70B0A6990EB008EE24F /* FilterButtonOverMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */; };
 		A253F70C0A6990EB008EE24F /* FilterButtonOverLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */; };
@@ -119,6 +117,8 @@
 		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
+		A27ABC230A6ADE410020EC71 /* ImageBackgroundView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */; };
+		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28C43F40A4A5D700091A302 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A28C43EB0A4A5D700091A302 /* Transmission Help */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
@@ -158,6 +158,7 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
+				A27ABC230A6ADE410020EC71 /* ImageBackgroundView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,8 +281,6 @@
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
-		A20B26140A6961780096C9DA /* FilterBarView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilterBarView.h; path = macosx/FilterBarView.h; sourceTree = "<group>"; };
-		A20B26150A6961780096C9DA /* FilterBarView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarView.m; path = macosx/FilterBarView.m; sourceTree = "<group>"; };
 		A21610FA0A050B1700E8E4C1 /* MenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MenuButton.h; path = macosx/MenuButton.h; sourceTree = "<group>"; };
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
@@ -297,8 +296,6 @@
 		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
 		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = macosx/Sparkle.framework; sourceTree = "<group>"; };
-		A2519D470A2FADFC00479D0C /* SmoothAquaView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SmoothAquaView.m; path = macosx/SmoothAquaView.m; sourceTree = "<group>"; };
-		A2519D480A2FADFC00479D0C /* SmoothAquaView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SmoothAquaView.h; path = macosx/SmoothAquaView.h; sourceTree = "<group>"; };
 		A253F6F20A698970008EE24F /* FilterBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterBarBackground.png; path = macosx/Images/FilterBarBackground.png; sourceTree = "<group>"; };
 		A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverMain.png; path = macosx/Images/FilterButtonOverMain.png; sourceTree = "<group>"; };
 		A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverLeft.png; path = macosx/Images/FilterButtonOverLeft.png; sourceTree = "<group>"; };
@@ -322,6 +319,8 @@
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53640A06AED200E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A27A53650A06AEDB00E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
+		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
+		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28C43EB0A4A5D700091A302 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
@@ -391,14 +390,12 @@
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				A21610FA0A050B1700E8E4C1 /* MenuButton.h */,
 				A21610FB0A050B1700E8E4C1 /* MenuButton.m */,
-				A2519D470A2FADFC00479D0C /* SmoothAquaView.m */,
-				A2519D480A2FADFC00479D0C /* SmoothAquaView.h */,
 				A2AF1C360A3D0F6200F1575D /* FileTableView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileTableView.m */,
 				A27431D80A68538400FA780A /* BarButton.h */,
 				A27431D90A68538400FA780A /* BarButton.m */,
-				A20B26140A6961780096C9DA /* FilterBarView.h */,
-				A20B26150A6961780096C9DA /* FilterBarView.m */,
+				A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */,
+				A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -810,10 +807,9 @@
 				4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */,
 				A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */,
-				A2519D490A2FADFC00479D0C /* SmoothAquaView.m in Sources */,
 				A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */,
 				A27431DB0A68538400FA780A /* BarButton.m in Sources */,
-				A20B26170A6961780096C9DA /* FilterBarView.m in Sources */,
+				A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
