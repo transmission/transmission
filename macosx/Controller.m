@@ -877,20 +877,30 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) sortTorrents
 {
-    [self sortTorrentsRememberSelected: YES];
-}
-
-- (void) sortTorrentsRememberSelected: (BOOL) rememberSelected
-{
     //remember selected rows if needed
     NSArray * selectedTorrents = nil;
-    if (rememberSelected)
-    {
-        int numSelected = [fTableView numberOfSelectedRows];
-        if (numSelected > 0 && numSelected < [fFilteredTorrents count])
-            selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
-    }
+    int numSelected = [fTableView numberOfSelectedRows];
+    if (numSelected > 0 && numSelected < [fFilteredTorrents count])
+        selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
 
+    [self sortTorrentsIgnoreSelected]; //actually sort
+    
+    //set selected rows if needed
+    if (selectedTorrents)
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
+        NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+        while ((torrent = [enumerator nextObject]))
+            [indexSet addIndex: [fFilteredTorrents indexOfObject: torrent]];
+        
+        [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
+        [indexSet release];
+    }
+}
+
+- (void) sortTorrentsIgnoreSelected
+{
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"name" ascending: YES] autorelease],
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
@@ -927,23 +937,9 @@ static void sleepCallBack(void * controller, io_service_t y,
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
 
     [fFilteredTorrents sortUsingDescriptors: descriptors];
-    
     [descriptors release];
     
     [fTableView reloadData];
-    
-    //set selected rows if needed
-    if (selectedTorrents)
-    {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
-        NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
-        while ((torrent = [enumerator nextObject]))
-            [indexSet addIndex: [fFilteredTorrents indexOfObject: torrent]];
-        
-        [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
-        [indexSet release];
-    }
 }
 
 - (void) setSort: (id) sender
@@ -1021,7 +1017,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fFilteredTorrents setArray: tempTorrents];
     [tempTorrents release];
     
-    [self sortTorrentsRememberSelected: NO];
+    [self sortTorrentsIgnoreSelected];
     
     //set selected rows if needed
     if (selectedTorrents)

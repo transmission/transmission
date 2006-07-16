@@ -129,7 +129,7 @@
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;
-- (void) sortTorrentsRememberSelected: (BOOL) rememberSelected;
+- (void) sortTorrentsIgnoreSelected;
 - (void) setSort: (id) sender;
 - (void) applyFilter;
 - (void) setFilter: (id) sender;
