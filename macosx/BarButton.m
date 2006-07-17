@@ -109,10 +109,10 @@
 {
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor blackColor], NSForegroundColorAttributeName,
-                [NSFont fontWithName: @"Helvetica" size: 12.0], NSFontAttributeName, nil];
+                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil];
     
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
-                            [NSFont fontWithName: @"Helvetica" size: 12.0] toHaveTrait: NSBoldFontMask];
+                            [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
     
     NSDictionary * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
