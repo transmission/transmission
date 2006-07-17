@@ -112,13 +112,13 @@
 		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
 		A26E6A190A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A170A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png */; };
 		A26E6A1A0A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */; };
-		A26E6A2F0A6A9435007E3C14 /* CircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A2D0A6A9435007E3C14 /* CircleButton.png */; };
-		A26E6A300A6A9435007E3C14 /* CircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A2E0A6A9435007E3C14 /* CircleButtonPressed.png */; };
 		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
 		A27ABC230A6ADE410020EC71 /* ImageBackgroundView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
+		A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */; };
+		A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28C43F40A4A5D700091A302 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A28C43EB0A4A5D700091A302 /* Transmission Help */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
@@ -311,8 +311,6 @@
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
 		A26E6A170A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressedBlue.png; path = macosx/Images/SpeedLimitButtonPressedBlue.png; sourceTree = "<group>"; };
 		A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressedGraphite.png; path = macosx/Images/SpeedLimitButtonPressedGraphite.png; sourceTree = "<group>"; };
-		A26E6A2D0A6A9435007E3C14 /* CircleButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CircleButton.png; path = macosx/Images/CircleButton.png; sourceTree = "<group>"; };
-		A26E6A2E0A6A9435007E3C14 /* CircleButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CircleButtonPressed.png; path = macosx/Images/CircleButtonPressed.png; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
 		A27431D90A68538400FA780A /* BarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BarButton.m; path = macosx/BarButton.m; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
@@ -321,6 +319,8 @@
 		A27A53650A06AEDB00E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
+		A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CloseCircleButton.png; path = macosx/Images/CloseCircleButton.png; sourceTree = "<group>"; };
+		A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CloseCircleButtonPressed.png; path = macosx/Images/CloseCircleButtonPressed.png; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28C43EB0A4A5D700091A302 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
@@ -478,8 +478,8 @@
 				A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */,
 				A27A53560A06A76400E1F16F /* StatusSep.png */,
 				A27A53650A06AEDB00E1F16F /* StatusBorder.png */,
-				A26E6A2D0A6A9435007E3C14 /* CircleButton.png */,
-				A26E6A2E0A6A9435007E3C14 /* CircleButtonPressed.png */,
+				A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */,
+				A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
 				A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */,
 				A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */,
@@ -755,8 +755,8 @@
 				A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */,
 				A26E6A190A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png in Resources */,
 				A26E6A1A0A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png in Resources */,
-				A26E6A2F0A6A9435007E3C14 /* CircleButton.png in Resources */,
-				A26E6A300A6A9435007E3C14 /* CircleButtonPressed.png in Resources */,
+				A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */,
+				A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

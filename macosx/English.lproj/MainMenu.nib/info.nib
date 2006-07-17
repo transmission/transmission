@@ -11,7 +11,7 @@
 		<key>1480</key>
 		<string>364 490 420 60 0 0 1152 842 </string>
 		<key>1603</key>
-		<string>257 544 477 65 0 0 1152 842 </string>
+		<string>229 542 477 65 0 0 1152 842 </string>
 		<key>29</key>
 		<string>9 780 451 44 0 0 1152 842 </string>
 		<key>456</key>
@@ -31,6 +31,7 @@
 	<integer>3</integer>
 	<key>IBOpenObjects</key>
 	<array>
+		<integer>1603</integer>
 		<integer>29</integer>
 	</array>
 	<key>IBSystem Version</key>
