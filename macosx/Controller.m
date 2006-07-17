@@ -1175,8 +1175,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self checkToStartWaiting: [notification object]];
     
-    [self applyFilter: nil];
     [self updateUI: nil];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
@@ -1220,8 +1220,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     {
         [torrentToStart startTransfer];
         
-        [self applyFilter: nil];
         [self updateUI: nil];
+        [self applyFilter: nil];
         [fInfoController updateInfoStatsAndSettings];
         [self updateTorrentHistory];
     }
@@ -1231,8 +1231,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self attemptToStartMultipleAuto: [notification object]];
 
-    [self applyFilter: nil];
     [self updateUI: nil];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
@@ -1241,8 +1241,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [self attemptToStartMultipleAuto: fTorrents];
     
-    [self applyFilter: nil];
     [self updateUI: nil];
+    [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
