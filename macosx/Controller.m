@@ -1383,7 +1383,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order with no filter
-    if ([fSortType isEqualToString: @"Order"] && [fFilterType isEqualToString: @"None"])
+    if ([fSortType isEqualToString: @"Order"] && [fTorrents count] == [fFilteredTorrents count])
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]
@@ -2044,7 +2044,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     //hide search filter if it overlaps filter buttons
     NSRect buttonFrame = [fPauseFilterButton frame];
-    BOOL overlap = buttonFrame.origin.x + buttonFrame.size.width > [fSearchFilterField frame].origin.x;
+    BOOL overlap = buttonFrame.origin.x + buttonFrame.size.width + 2.0 > [fSearchFilterField frame].origin.x;
     
     if (![fSearchFilterField isHidden])
     {
