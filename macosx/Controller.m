@@ -1621,7 +1621,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
     
+    //enable/disable search field
     [fSearchFilterField setEnabled: show];
+    if (!show)
+        [fWindow makeFirstResponder: fTableView];
     
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
