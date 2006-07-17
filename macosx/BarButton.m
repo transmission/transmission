@@ -151,6 +151,8 @@
     
     [normalAttributes release];
     [highlightedAttributes release];
+    
+    //NSLog(@"%@ %f", text, textSizeBold.width);
 }
 
 - (void) mouseEntered: (NSEvent *) event

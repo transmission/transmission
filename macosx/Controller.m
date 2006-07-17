@@ -222,10 +222,11 @@ static void sleepCallBack(void * controller, io_service_t y,
     //set filter
     fFilterType = [[fDefaults stringForKey: @"Filter"] retain];
 
-    [fNoFilterButton setText: @"All"];
-    [fPauseFilterButton setText: @"Paused"];
-    [fSeedFilterButton setText: @"Seeding"];
-    [fDownloadFilterButton setText: @"Downloading"];
+    //button width should be 9 pixels surrounding text length
+    [fNoFilterButton setText: @"All"]; //16.64
+    [fDownloadFilterButton setText: @"Downloading"]; //81.69
+    [fSeedFilterButton setText: @"Seeding"]; //48.57
+    [fPauseFilterButton setText: @"Paused"]; //44.06
 
     NSMenuItem * currentFilterItem;
     BarButton * currentFilterButton;
