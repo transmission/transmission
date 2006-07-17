@@ -1174,6 +1174,11 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) checkWaitingForStopped: (NSNotification *) notification
 {
     [self checkToStartWaiting: [notification object]];
+    
+    [self applyFilter: nil];
+    [self updateUI: nil];
+    [fInfoController updateInfoStatsAndSettings];
+    [self updateTorrentHistory];
 }
 
 - (void) checkToStartWaiting: (Torrent *) finishedTorrent
