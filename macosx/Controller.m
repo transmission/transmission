@@ -147,6 +147,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [contentView addSubview: fFilterBar];
     [fFilterBar setFrameOrigin: NSMakePoint(0, [contentView frame].origin.y + [contentView frame].size.height)];
+    
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
     //set up status bar
@@ -1577,10 +1578,6 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleFilterBar: (id) sender
 {
-    //first make search filter lose focus
-    if (fFilterBarVisible)
-        [fWindow makeFirstResponder: fTableView];
-
     [self showFilterBar: !fFilterBarVisible animate: YES];
     [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
     
@@ -1623,6 +1620,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSSize minSize = [fWindow contentMinSize];
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
+    
+    [fSearchFilterField setEnabled: show];
     
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
