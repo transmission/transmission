@@ -599,7 +599,9 @@
 
 - (NSNumber *) progressSortKey
 {
-    return [NSNumber numberWithFloat: [self progress]];
+    //if finished downloading sort by ratio instead of progress
+    float progress = [self progress];
+    return [NSNumber numberWithFloat: progress < 1.0 ? progress : 2.0 + [self ratio]];
 }
 
 @end
