@@ -70,6 +70,7 @@
     IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
                                     * fSeedFilterButton, * fDownloadFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
+    IBOutlet NSButton               * fHideFilterButton;
                                 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
     

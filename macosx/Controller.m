@@ -142,6 +142,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
+    [fHideFilterButton setToolTip: @"Hide Filter Bar"];
+    [fFilterBar setHidden: YES];
     
     fFilterBarVisible = NO;
     NSRect filterBarFrame = [fFilterBar frame];
@@ -155,6 +157,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set up status bar
     fStatusBarVisible = NO;
+    [fShowFilterButton setToolTip: @"Show Filter Bar"];
+    [fStatusBar setHidden: YES];
+    
     NSRect statusBarFrame = [fStatusBar frame];
     statusBarFrame.size.width = [fWindow frame].size.width;
     [fStatusBar setFrame: statusBarFrame];
@@ -1546,6 +1551,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (show == fStatusBarVisible)
         return;
 
+    if (show)
+        [fStatusBar setHidden: NO];
+
     NSRect frame = [fWindow frame];
     float heightChange = [fStatusBar frame].size.height;
     if (!show)
@@ -1578,6 +1586,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
     
+    if (!show)
+        [fStatusBar setHidden: YES];
+    
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
     [fSeedFilterButton resetBounds: nil];
@@ -1602,6 +1613,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     if (show == fFilterBarVisible)
         return;
+
+    if (show)
+        [fFilterBar setHidden: NO];
 
     NSRect frame = [fWindow frame];
     float heightChange = [fFilterBar frame].size.height;
@@ -1630,10 +1644,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     minSize.height += heightChange;
     [fWindow setContentMinSize: minSize];
     
-    //enable/disable search field
-    [fSearchFilterField setEnabled: show];
     if (!show)
-        [fWindow makeFirstResponder: fTableView];
+        [fFilterBar setHidden: YES];
     
     //enable show filter button in status bar
     [fShowFilterButton setEnabled: !show];

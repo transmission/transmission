@@ -45,6 +45,7 @@
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
                 fFilterBar = ImageBackgroundView; 
+                fHideFilterButton = NSButton; 
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
                 fNoFilterButton = BarButton; 
