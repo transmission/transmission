@@ -116,56 +116,80 @@
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
                             [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
     
+    NSSize shadowOffset = NSMakeSize(0.0, -1.0);
+    
+    NSShadow * shadowNormal = [NSShadow alloc]; 
+    [shadowNormal setShadowOffset: shadowOffset]; 
+    [shadowNormal setShadowBlurRadius: 1.0]; 
+    [shadowNormal setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]]; 
+
+    NSShadow * shadowNormalDim = [NSShadow alloc]; 
+    [shadowNormalDim setShadowOffset: shadowOffset]; 
+    [shadowNormalDim setShadowBlurRadius: 1.0]; 
+    [shadowNormalDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]]; 
+
+    NSShadow * shadowHighlighted = [NSShadow alloc]; 
+    [shadowHighlighted setShadowOffset: shadowOffset]; 
+    [shadowHighlighted setShadowBlurRadius: 1.0]; 
+    [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]]; 
+    
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor controlTextColor], NSForegroundColorAttributeName,
-                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil],
+                [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
+                NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName,
+                shadowNormal, NSShadowAttributeName, nil],
         * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
-                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil],
+                boldFont, NSFontAttributeName,
+                shadowNormalDim, NSShadowAttributeName, nil],
         * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName, nil],
+                boldFont, NSFontAttributeName,
+                shadowHighlighted, NSShadowAttributeName, nil],
         * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName, nil];
+                boldFont, NSFontAttributeName,
+                shadowHighlighted, NSShadowAttributeName, nil];
     
     NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes],
             textSizeBold = [text sizeWithAttributes: highlightedAttributes],
             buttonSize = [self frame].size;
     
-    NSRect textRectNormal = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
-            (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height),
-        textRectBold = NSMakeRect((buttonSize.width - textSizeBold.width) * 0.5,
-            (buttonSize.height - textSizeBold.height) * 0.5 + 1.5, textSizeBold.width, textSizeBold.height);
+    NSRect textRect = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
+            (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height);
+    
+    [shadowNormal release];
+    [shadowNormalDim release];
+    [shadowHighlighted release];
     
     //normal button
     [fButtonNormal lockFocus];
-    [text drawInRect: textRectNormal withAttributes: normalAttributes];
+    [text drawInRect: textRect withAttributes: normalAttributes];
     [fButtonNormal unlockFocus];
     
     //normal and dim button
     [fButtonNormalDim lockFocus];
-    [text drawInRect: textRectNormal withAttributes: normalDimAttributes];
+    [text drawInRect: textRect withAttributes: normalDimAttributes];
     [fButtonNormalDim unlockFocus];
     
     //rolled over button
     [fButtonOver lockFocus];
-    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
+    [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonOver unlockFocus];
     
     //pressed button
     [fButtonPressed lockFocus];
-    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
+    [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonPressed unlockFocus];
     
     //selected button
     [fButtonSelected lockFocus];
-    [text drawInRect: textRectBold withAttributes: highlightedAttributes];
+    [text drawInRect: textRect withAttributes: highlightedAttributes];
     [fButtonSelected unlockFocus];
     
     //selected and dim button
     [fButtonSelectedDim lockFocus];
-    [text drawInRect: textRectBold withAttributes: highlightedDimAttributes];
+    [text drawInRect: textRect withAttributes: highlightedDimAttributes];
     [fButtonSelectedDim unlockFocus];
     
     [self setImage: fButtonNormal];
@@ -175,7 +199,7 @@
     [highlightedAttributes release];
     [highlightedDimAttributes release];
     
-    //NSLog(@"%@ %f", text, textSizeBold.width);
+    //NSLog(@"%@ %f", text, textRect.width);
 }
 
 - (void) mouseEntered: (NSEvent *) event
