@@ -1645,7 +1645,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fWindow setContentMinSize: minSize];
     
     if (!show)
+    {
         [fFilterBar setHidden: YES];
+        [fWindow makeFirstResponder: fTableView];
+    }
     
     //enable show filter button in status bar
     [fShowFilterButton setEnabled: !show];
