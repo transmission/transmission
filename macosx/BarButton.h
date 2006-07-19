@@ -26,7 +26,8 @@
 
 @interface BarButton : NSImageView
 {
-    NSImage * fButtonNormal, * fButtonOver, * fButtonPressed, * fButtonSelected;
+    NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
+            * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;
 
     BOOL fEnabled;
     NSTrackingRectTag fTrackingTag;
@@ -36,5 +37,8 @@
 - (void) setEnabled: (BOOL) enable;
 
 - (void) resetBounds: (NSNotification *) notification;
+
+- (void) setForActive;
+- (void) setForInactive;
 
 @end

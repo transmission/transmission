@@ -36,9 +36,11 @@
         
         NSSize buttonSize = [self frame].size;
         fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonNormalDim = [[NSImage alloc] initWithSize: buttonSize];
         fButtonOver = [[NSImage alloc] initWithSize: buttonSize];
         fButtonPressed = [[NSImage alloc] initWithSize: buttonSize];
         fButtonSelected = [[NSImage alloc] initWithSize: buttonSize];
+        fButtonSelectedDim = [[NSImage alloc] initWithSize: buttonSize];
         
         //rolled over button
         NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
@@ -88,6 +90,9 @@
         [rightSelected compositeToPoint: rightPoint operation: NSCompositeSourceOver];
         [fButtonSelected unlockFocus];
         
+        //selected and dimmed button
+        fButtonSelectedDim = [fButtonSelected copy];
+        
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resetBounds:)
                     name: NSViewBoundsDidChangeNotification object: nil];
 	}
@@ -100,6 +105,7 @@
     [fButtonOver release];
     [fButtonPressed release];
     [fButtonSelected release];
+    [fButtonSelectedDim release];
     
     [super dealloc];
 }
@@ -107,15 +113,20 @@
 //call only once to avoid overlapping text
 - (void) setText: (NSString *) text
 {
-    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor blackColor], NSForegroundColorAttributeName,
-                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil];
-    
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
                             [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
     
-    NSDictionary * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor controlTextColor], NSForegroundColorAttributeName,
+                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil],
+        * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
+                [NSFont fontWithName: @"Lucida Grande" size: 12.0], NSFontAttributeName, nil],
+        * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName, nil],
+        * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName, nil];
     
     NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes],
@@ -132,6 +143,11 @@
     [text drawInRect: textRectNormal withAttributes: normalAttributes];
     [fButtonNormal unlockFocus];
     
+    //normal and dim button
+    [fButtonNormalDim lockFocus];
+    [text drawInRect: textRectNormal withAttributes: normalDimAttributes];
+    [fButtonNormalDim unlockFocus];
+    
     //rolled over button
     [fButtonOver lockFocus];
     [text drawInRect: textRectBold withAttributes: highlightedAttributes];
@@ -147,10 +163,17 @@
     [text drawInRect: textRectBold withAttributes: highlightedAttributes];
     [fButtonSelected unlockFocus];
     
+    //selected and dim button
+    [fButtonSelectedDim lockFocus];
+    [text drawInRect: textRectBold withAttributes: highlightedDimAttributes];
+    [fButtonSelectedDim unlockFocus];
+    
     [self setImage: fButtonNormal];
     
     [normalAttributes release];
+    [normalDimAttributes release];
     [highlightedAttributes release];
+    [highlightedDimAttributes release];
     
     //NSLog(@"%@ %f", text, textSizeBold.width);
 }
@@ -196,6 +219,25 @@
     if (fTrackingTag)
         [self removeTrackingRect: fTrackingTag];
     fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
+}
+
+- (void) setForActive
+{
+    if ([self image] == fButtonSelectedDim)
+        [self setImage: fButtonSelected];
+    else if ([self image] == fButtonNormalDim)
+        [self setImage: fButtonNormal];
+    else;
+    
+    [self resetBounds: nil];
+}
+
+- (void) setForInactive
+{
+    [self setImage: [self image] == fButtonSelected ? fButtonSelectedDim : fButtonNormalDim];
+    
+    if (fTrackingTag)
+        [self removeTrackingRect: fTrackingTag];
 }
 
 @end

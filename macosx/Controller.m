@@ -102,6 +102,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
+    #warning remove eventually
+    NSImage * image = [NSImage imageNamed: @"StatusBorder.png"];
+    [image setName: nil];
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBorder.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
@@ -228,7 +231,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fSeedFilterButton setText: @"Seeding"]; //48.57
     [fPauseFilterButton setText: @"Paused"]; //44.06
 
-    NSMenuItem * currentFilterItem;
     BarButton * currentFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
         currentFilterButton = fPauseFilterButton;
@@ -526,8 +528,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         @selector(openSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
-- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code
-    contextInfo: (void *) info
+- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
         [self performSelectorOnMainThread: @selector(openFromSheet:)
@@ -549,7 +550,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self resumeTorrents: fTorrents];
 }
 
-- (void) resumeTorrents: (NSArray *) torrents;
+- (void) resumeTorrents: (NSArray *) torrents
 {
     [torrents makeObjectsPerformSelector: @selector(startTransfer)];
     
@@ -569,7 +570,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self stopTorrents: fTorrents];
 }
 
-- (void) stopTorrents: (NSArray *) torrents;
+- (void) stopTorrents: (NSArray *) torrents
 {
     //don't want any of these starting then stopping
     NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -832,7 +833,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    [fSpeedLimitButton setAlternateImage: [fDefaults integerForKey: @"AppleAquaColorVariant"] == NSBlueControlTint
+    if ([fWindow isKeyWindow])
+        [fSpeedLimitButton setAlternateImage: [NSColor currentControlTint] == NSBlueControlTint
             ? [NSImage imageNamed: @"SpeedLimitButtonPressedBlue.png"]
             : [NSImage imageNamed: @"SpeedLimitButtonPressedGraphite.png"]];
 }
@@ -869,8 +871,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     tr_torrentRates(fLib, & downloadRate, & uploadRate);
     if (fStatusBarVisible)
     {
-        [fTotalDLField setStringValue: [NSString stringForSpeed: downloadRate]];
-        [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];
+        [fTotalDLField setStringValue: [@"Total DL: " stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
+        [fTotalULField setStringValue: [@"Total UL: " stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
     }
 
     if ([[fInfoController window] isVisible])
@@ -1389,7 +1391,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order with no filter
-    if ([fSortType isEqualToString: @"Order"] && [fTorrents count] == [fFilteredTorrents count])
+    if ([fSortType isEqualToString: @"Order"] && [fFilterType isEqualToString: @"None"]
+            && [[fSearchFilterField stringValue] isEqualToString: @""])
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]
@@ -1631,6 +1634,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fSearchFilterField setEnabled: show];
     if (!show)
         [fWindow makeFirstResponder: fTableView];
+    
+    //enable show filter button in status bar
+    [fShowFilterButton setEnabled: !show];
     
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
@@ -2043,7 +2049,46 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
 {
-    fCompleted = 0;
+    //reset dock badge for completed
+    if (fCompleted > 0)
+    {
+        fCompleted = 0;
+        [self updateUI: nil];
+    }
+    
+    //set status fields inactive color
+    /*NSColor * enabledColor = [NSColor controlTextColor];
+    [fTotalTorrentsField setTextColor: enabledColor];
+    [fTotalDLField setTextColor: enabledColor];
+    [fTotalULField setTextColor: enabledColor];*/
+    
+    //set filter images as active
+    [fNoFilterButton setForActive];
+    [fSeedFilterButton setForActive];
+    [fDownloadFilterButton setForActive];
+    [fPauseFilterButton setForActive];
+    
+    [fSpeedLimitButton setAlternateImage: [NSColor currentControlTint] == NSBlueControlTint
+            ? [NSImage imageNamed: @"SpeedLimitButtonPressedBlue.png"]
+            : [NSImage imageNamed: @"SpeedLimitButtonPressedGraphite.png"]];
+}
+
+- (void) windowDidResignKey: (NSNotification *) notification
+{
+    //set status fields inactive color
+    /*NSColor * disabledColor = [NSColor disabledControlTextColor];
+    [fTotalTorrentsField setTextColor: disabledColor];
+    [fTotalDLField setTextColor: disabledColor];
+    [fTotalULField setTextColor: disabledColor];*/
+
+    //set filter images as inactive
+    [fNoFilterButton setForInactive];
+    [fSeedFilterButton setForInactive];
+    [fDownloadFilterButton setForInactive];
+    [fPauseFilterButton setForInactive];
+    
+    #warning need real inactive image
+    [fSpeedLimitButton setAlternateImage: [NSImage imageNamed: @"SpeedLimitButton.png"]];
 }
 
 - (void) windowDidResize: (NSNotification *) notification

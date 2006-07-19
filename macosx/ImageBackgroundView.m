@@ -30,7 +30,6 @@
 {
     if (fBackgroundColor)
         [fBackgroundColor release];
-    
     fBackgroundColor = [[NSColor colorWithPatternImage: image] retain];
 }
 

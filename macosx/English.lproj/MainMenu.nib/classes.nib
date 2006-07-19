@@ -57,6 +57,7 @@
                 fScrollView = NSScrollView; 
                 fSearchFilterField = NSSearchField; 
                 fSeedFilterButton = BarButton; 
+                fShowFilterButton = NSButton; 
                 fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 
                 fSpeedLimitDockItem = NSMenuItem; 

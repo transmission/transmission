@@ -58,6 +58,7 @@
     IBOutlet ImageBackgroundView    * fStatusBar;
     BOOL                            fStatusBarVisible;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
+    IBOutlet NSButton               * fShowFilterButton;
     
     NSString                        * fSortType;
     IBOutlet NSMenuItem             * fNameSortItem, * fStateSortItem, * fProgressSortItem,

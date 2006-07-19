@@ -115,7 +115,6 @@
 		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
-		A27ABC230A6ADE410020EC71 /* ImageBackgroundView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */; };
 		A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */; };
@@ -158,7 +157,6 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
-				A27ABC230A6ADE410020EC71 /* ImageBackgroundView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
