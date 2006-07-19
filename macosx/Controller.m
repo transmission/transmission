@@ -169,16 +169,20 @@ static void sleepCallBack(void * controller, io_service_t y,
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     //set speed limit
+    fSpeedLimitNormalImage = [fSpeedLimitButton image];
+    fSpeedLimitBlueImage = [NSImage imageNamed: @"SpeedLimitButtonBlue.png"];
+    fSpeedLimitGraphiteImage = [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"];
+    
     [self updateControlTint: nil];
     
-    if ([fDefaults boolForKey: @"SpeedLimit"])
+    if ((fSpeedLimitEnabled = [fDefaults boolForKey: @"SpeedLimit"]))
     {
         [fSpeedLimitItem setState: NSOnState];
         [fSpeedLimitDockItem setState: NSOnState];
-        [fSpeedLimitButton setState: NSOnState];
+        
+        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
+                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
     }
-    
-    [[fSpeedLimitButton cell] setHighlightsBy: NSNoCellMask];
 
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
     [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
@@ -838,10 +842,9 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    if ([fWindow isKeyWindow])
-        [fSpeedLimitButton setAlternateImage: [NSColor currentControlTint] == NSBlueControlTint
-            ? [NSImage imageNamed: @"SpeedLimitButtonPressedBlue.png"]
-            : [NSImage imageNamed: @"SpeedLimitButtonPressedGraphite.png"]];
+    if (fSpeedLimitEnabled && [fWindow isKeyWindow])
+        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
+                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
 }
 
 - (void) updateUI: (NSTimer *) t
@@ -1108,13 +1111,16 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) toggleSpeedLimit: (id) sender
 {
-    int state = [fSpeedLimitItem state] ? NSOffState : NSOnState;
+    fSpeedLimitEnabled = !fSpeedLimitEnabled;
+    int state = fSpeedLimitEnabled ? NSOnState : NSOffState;
 
     [fSpeedLimitItem setState: state];
     [fSpeedLimitDockItem setState: state];
-    [fSpeedLimitButton setState: state];
     
-    [fPrefsController enableSpeedLimit: state];
+    [fSpeedLimitButton setImage: !fSpeedLimitEnabled ? fSpeedLimitNormalImage
+        : ([NSColor currentControlTint] == NSBlueControlTint ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage)];
+    
+    [fPrefsController enableSpeedLimit: fSpeedLimitEnabled];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender
@@ -1562,7 +1568,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
         
-    fStatusBarVisible = !fStatusBarVisible;
+    fStatusBarVisible = show;
     
     [self updateUI: nil];
     
@@ -1625,7 +1631,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
         
-    fFilterBarVisible = !fFilterBarVisible;
+    fFilterBarVisible = show;
     
     //set views to not autoresize
     unsigned int filterMask = [fFilterBar autoresizingMask];
@@ -2083,9 +2089,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fDownloadFilterButton setForActive];
     [fPauseFilterButton setForActive];
     
-    [fSpeedLimitButton setAlternateImage: [NSColor currentControlTint] == NSBlueControlTint
-            ? [NSImage imageNamed: @"SpeedLimitButtonPressedBlue.png"]
-            : [NSImage imageNamed: @"SpeedLimitButtonPressedGraphite.png"]];
+    if (fSpeedLimitEnabled)
+        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
+                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
 }
 
 - (void) windowDidResignKey: (NSNotification *) notification
@@ -2104,7 +2110,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fPauseFilterButton setForInactive];
     
     #warning need real inactive image
-    [fSpeedLimitButton setAlternateImage: [NSImage imageNamed: @"SpeedLimitButton.png"]];
+    if (fSpeedLimitEnabled)
+        [fSpeedLimitButton setImage: fSpeedLimitNormalImage];
 }
 
 - (void) windowDidResize: (NSNotification *) notification

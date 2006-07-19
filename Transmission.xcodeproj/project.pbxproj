@@ -93,6 +93,9 @@
 		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A24600400A6DB58600D19088 /* RevealCircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246003E0A6DB58600D19088 /* RevealCircleButtonPressed.png */; };
 		A24600410A6DB58600D19088 /* RevealCircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A246003F0A6DB58600D19088 /* RevealCircleButton.png */; };
+		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
+		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
+		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
@@ -112,8 +115,6 @@
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
-		A26E6A190A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A170A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png */; };
-		A26E6A1A0A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */; };
 		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
@@ -297,6 +298,9 @@
 		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A246003E0A6DB58600D19088 /* RevealCircleButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealCircleButtonPressed.png; path = macosx/Images/RevealCircleButtonPressed.png; sourceTree = "<group>"; };
 		A246003F0A6DB58600D19088 /* RevealCircleButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealCircleButton.png; path = macosx/Images/RevealCircleButton.png; sourceTree = "<group>"; };
+		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
+		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
+		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
 		A24F19070A3A790800C9C145 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = macosx/Sparkle.framework; sourceTree = "<group>"; };
 		A253F6F20A698970008EE24F /* FilterBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterBarBackground.png; path = macosx/Images/FilterBarBackground.png; sourceTree = "<group>"; };
 		A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonOverMain.png; path = macosx/Images/FilterButtonOverMain.png; sourceTree = "<group>"; };
@@ -311,8 +315,6 @@
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
-		A26E6A170A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressedBlue.png; path = macosx/Images/SpeedLimitButtonPressedBlue.png; sourceTree = "<group>"; };
-		A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressedGraphite.png; path = macosx/Images/SpeedLimitButtonPressedGraphite.png; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
 		A27431D90A68538400FA780A /* BarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BarButton.m; path = macosx/BarButton.m; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
@@ -475,9 +477,10 @@
 				A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */,
 				A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */,
 				A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */,
+				A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */,
+				A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */,
 				A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */,
-				A26E6A170A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png */,
-				A26E6A180A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png */,
+				A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */,
 				A27A53560A06A76400E1F16F /* StatusSep.png */,
 				A27A53650A06AEDB00E1F16F /* StatusBorder.png */,
 				A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */,
@@ -757,12 +760,13 @@
 				A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */,
 				A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */,
 				A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */,
-				A26E6A190A6A8C18007E3C14 /* SpeedLimitButtonPressedBlue.png in Resources */,
-				A26E6A1A0A6A8C18007E3C14 /* SpeedLimitButtonPressedGraphite.png in Resources */,
 				A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */,
 				A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */,
 				A24600400A6DB58600D19088 /* RevealCircleButtonPressed.png in Resources */,
 				A24600410A6DB58600D19088 /* RevealCircleButton.png in Resources */,
+				A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */,
+				A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */,
+				A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
