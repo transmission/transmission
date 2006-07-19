@@ -2090,6 +2090,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) windowDidResignKey: (NSNotification *) notification
 {
+    #warning should it do this?
     //set status fields inactive color
     /*NSColor * disabledColor = [NSColor disabledControlTextColor];
     [fTotalTorrentsField setTextColor: disabledColor];
