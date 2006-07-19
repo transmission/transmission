@@ -2089,9 +2089,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fDownloadFilterButton setForActive];
     [fPauseFilterButton setForActive];
     
-    if (fSpeedLimitEnabled)
+    /*if (fSpeedLimitEnabled)
         [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
-                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
+                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];*/
 }
 
 - (void) windowDidResignKey: (NSNotification *) notification
@@ -2109,9 +2109,9 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fDownloadFilterButton setForInactive];
     [fPauseFilterButton setForInactive];
     
-    #warning need real inactive image
-    if (fSpeedLimitEnabled)
-        [fSpeedLimitButton setImage: fSpeedLimitNormalImage];
+    #warning need real inactive image, or to not do anything at all (?)
+    /*if (fSpeedLimitEnabled)
+        [fSpeedLimitButton setImage: fSpeedLimitNormalImage];*/
 }
 
 - (void) windowDidResize: (NSNotification *) notification
