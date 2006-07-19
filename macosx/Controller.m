@@ -842,7 +842,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    if (fSpeedLimitEnabled && [fWindow isKeyWindow])
+    if (fSpeedLimitEnabled)
         [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
                                         ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
 }
