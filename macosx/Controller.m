@@ -40,6 +40,7 @@
 #define TOOLBAR_RESUME_ALL      @"Toolbar Resume All"
 #define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
+#define TOOLBAR_FILTER   @"Toolbar Toggle Filter"
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
@@ -142,7 +143,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
-    [fHideFilterButton setToolTip: @"Hide Filter Bar"];
     [fFilterBar setHidden: YES];
     
     fFilterBarVisible = NO;
@@ -157,7 +157,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     //set up status bar
     fStatusBarVisible = NO;
-    [fShowFilterButton setToolTip: @"Show Filter Bar"];
     [fStatusBar setHidden: YES];
     
     NSRect statusBarFrame = [fStatusBar frame];
@@ -1656,8 +1655,16 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fWindow makeFirstResponder: fTableView];
     }
     
-    //enable show filter button in status bar
-    [fShowFilterButton setEnabled: !show];
+    //change toolbar filter image
+    NSEnumerator * enumerator = [[[fWindow toolbar] items] objectEnumerator];
+    NSToolbarItem * toolbarItem;
+    while ((toolbarItem = [enumerator nextObject]))
+        if ([[toolbarItem itemIdentifier] isEqualToString: TOOLBAR_FILTER])
+        {
+            [toolbarItem setImage: show ? [NSImage imageNamed: @"FilterShow.png"]
+                                        : [NSImage imageNamed: @"FilterHide.png"]];
+            break;
+        }
     
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
@@ -1701,8 +1708,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     else if ([ident isEqualToString: TOOLBAR_INFO])
     {
         [item setLabel: @"Inspector"];
-        [item setPaletteLabel: @"Show/Hide Inspector"];
-        [item setToolTip: @"Display torrent inspector"];
+        [item setPaletteLabel: @"Toggle Inspector"];
+        [item setToolTip: @"Toggle the torrent inspector"];
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
@@ -1743,6 +1750,15 @@ static void sleepCallBack(void * controller, io_service_t y,
         [item setTarget: self];
         [item setAction: @selector(resumeSelectedTorrents:)];
     }
+    else if ([ident isEqualToString: TOOLBAR_FILTER])
+    {
+        [item setLabel: @"Filter Bar"];
+        [item setPaletteLabel: @"Toggle Filter Bar"];
+        [item setToolTip: @"Toggle the filter bar"];
+        [item setImage: [NSImage imageNamed: @"FilterHide.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(toggleFilterBar:)];
+    }
     else
     {
         [item release];
@@ -1757,7 +1773,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     return [NSArray arrayWithObjects:
             TOOLBAR_OPEN, TOOLBAR_REMOVE,
             TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED,
-            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, TOOLBAR_INFO,
+            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, TOOLBAR_FILTER, TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
             NSToolbarSpaceItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
@@ -1771,7 +1787,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             NSToolbarSeparatorItemIdentifier,
             TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL,
             NSToolbarFlexibleSpaceItemIdentifier,
-            TOOLBAR_INFO, nil];
+            TOOLBAR_FILTER, TOOLBAR_INFO, nil];
 }
 
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem

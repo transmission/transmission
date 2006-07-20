@@ -91,8 +91,6 @@
 		A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */; };
 		A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */; };
 		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
-		A24600400A6DB58600D19088 /* RevealCircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246003E0A6DB58600D19088 /* RevealCircleButtonPressed.png */; };
-		A24600410A6DB58600D19088 /* RevealCircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A246003F0A6DB58600D19088 /* RevealCircleButton.png */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
 		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
 		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
@@ -108,6 +106,8 @@
 		A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */; };
 		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
 		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
+		A25A5FF20A70290900E099DE /* FilterHide.png in Resources */ = {isa = PBXBuildFile; fileRef = A25A5FF00A70290900E099DE /* FilterHide.png */; };
+		A25A5FF30A70290900E099DE /* FilterShow.png in Resources */ = {isa = PBXBuildFile; fileRef = A25A5FF10A70290900E099DE /* FilterShow.png */; };
 		A25FCDDF0A37695F002BCBBE /* PauseSelected.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDE00A37695F002BCBBE /* ResumeSelected.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
@@ -119,8 +119,6 @@
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
-		A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */; };
-		A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28C43F40A4A5D700091A302 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A28C43EB0A4A5D700091A302 /* Transmission Help */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
@@ -296,8 +294,6 @@
 		A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndWhite.png; path = macosx/Images/ProgressBarEndWhite.png; sourceTree = "<group>"; };
 		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
 		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
-		A246003E0A6DB58600D19088 /* RevealCircleButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealCircleButtonPressed.png; path = macosx/Images/RevealCircleButtonPressed.png; sourceTree = "<group>"; };
-		A246003F0A6DB58600D19088 /* RevealCircleButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealCircleButton.png; path = macosx/Images/RevealCircleButton.png; sourceTree = "<group>"; };
 		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
 		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
@@ -312,6 +308,8 @@
 		A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedLeft.png; path = macosx/Images/FilterButtonSelectedLeft.png; sourceTree = "<group>"; };
 		A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedMain.png; path = macosx/Images/FilterButtonSelectedMain.png; sourceTree = "<group>"; };
 		A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedRight.png; path = macosx/Images/FilterButtonSelectedRight.png; sourceTree = "<group>"; };
+		A25A5FF00A70290900E099DE /* FilterHide.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterHide.png; path = macosx/Images/FilterHide.png; sourceTree = "<group>"; };
+		A25A5FF10A70290900E099DE /* FilterShow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterShow.png; path = macosx/Images/FilterShow.png; sourceTree = "<group>"; };
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
@@ -323,8 +321,6 @@
 		A27A53650A06AEDB00E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
-		A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CloseCircleButton.png; path = macosx/Images/CloseCircleButton.png; sourceTree = "<group>"; };
-		A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CloseCircleButtonPressed.png; path = macosx/Images/CloseCircleButtonPressed.png; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28C43EB0A4A5D700091A302 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
@@ -483,10 +479,8 @@
 				A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */,
 				A27A53560A06A76400E1F16F /* StatusSep.png */,
 				A27A53650A06AEDB00E1F16F /* StatusBorder.png */,
-				A27ABC890A6B317D0020EC71 /* CloseCircleButton.png */,
-				A27ABC8A0A6B317D0020EC71 /* CloseCircleButtonPressed.png */,
-				A246003E0A6DB58600D19088 /* RevealCircleButtonPressed.png */,
-				A246003F0A6DB58600D19088 /* RevealCircleButton.png */,
+				A25A5FF00A70290900E099DE /* FilterHide.png */,
+				A25A5FF10A70290900E099DE /* FilterShow.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
 				A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */,
 				A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */,
@@ -760,13 +754,11 @@
 				A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */,
 				A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */,
 				A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */,
-				A27ABC8B0A6B317D0020EC71 /* CloseCircleButton.png in Resources */,
-				A27ABC8C0A6B317D0020EC71 /* CloseCircleButtonPressed.png in Resources */,
-				A24600400A6DB58600D19088 /* RevealCircleButtonPressed.png in Resources */,
-				A24600410A6DB58600D19088 /* RevealCircleButton.png in Resources */,
 				A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */,
 				A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */,
 				A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */,
+				A25A5FF20A70290900E099DE /* FilterHide.png in Resources */,
+				A25A5FF30A70290900E099DE /* FilterShow.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
