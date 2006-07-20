@@ -1752,8 +1752,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
-        [item setLabel: @"Filter Bar"];
-        [item setPaletteLabel: @"Toggle Filter Bar"];
+        [item setLabel: @"Filter"];
+        [item setPaletteLabel: @"Toggle Filter"];
         [item setToolTip: @"Toggle the filter bar"];
         [item setImage: [NSImage imageNamed: @"FilterHide.png"]];
         [item setTarget: self];
