@@ -1655,17 +1655,6 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fWindow makeFirstResponder: fTableView];
     }
     
-    //change toolbar filter image
-    NSEnumerator * enumerator = [[[fWindow toolbar] items] objectEnumerator];
-    NSToolbarItem * toolbarItem;
-    while ((toolbarItem = [enumerator nextObject]))
-        if ([[toolbarItem itemIdentifier] isEqualToString: TOOLBAR_FILTER])
-        {
-            [toolbarItem setImage: show ? [NSImage imageNamed: @"FilterShow.png"]
-                                        : [NSImage imageNamed: @"FilterHide.png"]];
-            break;
-        }
-    
     //reset tracking rects for filter buttons
     [fNoFilterButton resetBounds: nil];
     [fSeedFilterButton resetBounds: nil];
@@ -1755,7 +1744,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [item setLabel: @"Filter"];
         [item setPaletteLabel: @"Toggle Filter"];
         [item setToolTip: @"Toggle the filter bar"];
-        [item setImage: [NSImage imageNamed: @"FilterHide.png"]];
+        [item setImage: [NSImage imageNamed: @"Filter.png"]];
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
     }
