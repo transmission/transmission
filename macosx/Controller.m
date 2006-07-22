@@ -2129,10 +2129,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) setWindowSizeToFit
 {
-    if (![fDefaults boolForKey: @"AutoSize"])
-        return;
-
-    [fWindow setFrame: [self windowFrameFor: [fTorrents count]] display: YES animate: YES];
+    if ([fDefaults boolForKey: @"AutoSize"])
+        [fWindow setFrame: [self windowFrameFor: [fTorrents count]] display: YES animate: YES];
 }
 
 - (NSRect) windowFrameFor: (int) count
