@@ -350,7 +350,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
-    //must do after everything is set up
+    //must do after everything else is set up
     [self checkAutoImportDirectory: nil];
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
@@ -387,8 +387,7 @@ static void sleepCallBack(void * controller, io_service_t y,
                     @"There are %d active transfers. Do you really want to quit?", active];
 
             NSBeginAlertSheet(@"Confirm Quit", @"Quit", @"Cancel", nil, fWindow, self,
-                                @selector(quitSheetDidEnd:returnCode:contextInfo:),
-                                nil, nil, message);
+                                @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, message);
             return NSTerminateLater;
         }
     }
@@ -396,10 +395,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     return NSTerminateNow;
 }
 
-- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode
-    contextInfo: (void *) contextInfo
+- (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
 {
-    [NSApp stopModal];
     [NSApp replyToApplicationShouldTerminate: returnCode == NSAlertDefaultReturn];
 }
 
@@ -905,8 +902,7 @@ static void sleepCallBack(void * controller, io_service_t y,
         [fInfoController updateInfoStats];
 
     //badge dock
-    [fBadger updateBadgeWithCompleted: fCompleted
-        uploadRate: uploadRate downloadRate: downloadRate];
+    [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
 }
 
 - (void) updateTorrentHistory
@@ -2121,8 +2117,14 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) setAutoSize: (NSNotification *) notification
 {
-    [[fWindow standardWindowButton: NSWindowZoomButton] setEnabled: ![fDefaults boolForKey: @"AutoSize"]];
+    #warning will not work because of sheets
+    //[[fWindow standardWindowButton: NSWindowZoomButton] setEnabled: ![fDefaults boolForKey: @"AutoSize"]];
     [self setWindowSizeToFit];
+}
+
+- (BOOL) windowShouldZoom: (NSWindow *) sender toFrame: (NSRect) newFrame
+{
+    return ![fDefaults boolForKey: @"AutoSize"];
 }
 
 - (void) setWindowSizeToFit

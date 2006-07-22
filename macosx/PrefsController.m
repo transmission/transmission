@@ -691,28 +691,28 @@
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
-   if (code == NSOKButton)
-   {
-       [fDownloadFolder release];
-       fDownloadFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
-
-       [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-       [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
-       [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
-
-       [self updatePopUp];
-   }
-   else
-   {
-       //reset if cancelled
-       NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-       if ([downloadChoice isEqualToString: @"Constant"])
-           [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-       else if ([downloadChoice isEqualToString: @"Torrent"])
-           [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
-       else
-           [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
-   }
+    if (code == NSOKButton)
+    {
+        [fDownloadFolder release];
+        fDownloadFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
+        
+        [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+        [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
+        [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
+        
+        [self updatePopUp];
+    }
+    else
+    {
+        //reset if cancelled
+        NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
+        if ([downloadChoice isEqualToString: @"Constant"])
+            [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
+        else if ([downloadChoice isEqualToString: @"Torrent"])
+            [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
+        else
+            [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
+    }
 }
 
 - (void) updatePopUp
