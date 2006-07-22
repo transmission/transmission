@@ -665,7 +665,7 @@ static void sleepCallBack(void * controller, io_service_t y,
             }
 
             NSBeginAlertSheet(title, @"Remove", @"Cancel", nil, fWindow, self,
-                @selector(removeSheetDidEnd:returnCode:contextInfo:), nil, dict, message);
+                nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, message);
             return;
         }
     }
@@ -2120,7 +2120,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
-    return [self windowFrameFor: [fFilteredTorrents count]];
+    return [self windowFrameForAmount: [fFilteredTorrents count]];
 }
 
 - (void) setAutoSize: (NSNotification *) notification
@@ -2132,14 +2132,14 @@ static void sleepCallBack(void * controller, io_service_t y,
 - (void) setWindowSizeToFit
 {
     if ([fDefaults boolForKey: @"AutoSize"])
-        [fWindow setFrame: [self windowFrameFor: [fTorrents count]] display: YES animate: YES];
+        [fWindow setFrame: [self windowFrameForAmount: [fTorrents count]] display: YES animate: YES];
 }
 
-- (NSRect) windowFrameFor: (int) count
+- (NSRect) windowFrameForAmount: (int) amount
 {
     NSRect frame = [fWindow frame];
     float newHeight = frame.size.height - [fScrollView frame].size.height
-        + count * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
+        + amount * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)

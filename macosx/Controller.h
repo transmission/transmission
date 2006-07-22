@@ -180,7 +180,7 @@
 
 - (void) setAutoSize: (NSNotification *) notification;
 - (void) setWindowSizeToFit;
-- (NSRect) windowFrameFor: (int) count;
+- (NSRect) windowFrameForAmount: (int) amount;
 
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
