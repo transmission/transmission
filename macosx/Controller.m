@@ -31,7 +31,6 @@
 #import "StringAdditions.h"
 
 #import <Sparkle/Sparkle.h>
-#import <Growl/GrowlApplicationBridge.h>
 
 #define TOOLBAR_OPEN            @"Toolbar Open"
 #define TOOLBAR_REMOVE          @"Toolbar Remove"

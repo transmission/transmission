@@ -33,9 +33,11 @@
 #import "ImageBackgroundView.h"
 #import "BarButton.h"
 
+#import <Growl/Growl.h>
+
 @class TorrentTableView;
 
-@interface Controller : NSObject
+@interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
     tr_handle_t                     * fLib;
     int                             fCompleted;
