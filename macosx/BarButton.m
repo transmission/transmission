@@ -50,8 +50,8 @@
         NSSize endSize = [leftOver size],
                 mainSize = NSMakeSize(buttonSize.width - endSize.width * 2.0, endSize.height);
         NSPoint leftPoint = NSMakePoint(0, 0),
-                mainPoint = NSMakePoint(endSize.width, 0),
-                rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0);
+                rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0),
+                mainPoint = NSMakePoint(endSize.width, 0);
 
         [mainOver setScalesWhenResized: YES];
         [mainOver setSize: mainSize];
@@ -198,8 +198,6 @@
     [normalDimAttributes release];
     [highlightedAttributes release];
     [highlightedDimAttributes release];
-    
-    //NSLog(@"%@ %f", text, textRect.width);
 }
 
 - (void) mouseEntered: (NSEvent *) event

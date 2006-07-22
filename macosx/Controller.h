@@ -178,6 +178,8 @@
 
 - (void) toggleAdvancedBar: (id) sender;
 
+- (void) setWindowSizeToFit;
+
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;

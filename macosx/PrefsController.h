@@ -38,7 +38,7 @@
                             * fQuitDownloadingCheck, * fRemoveDownloadingCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
                             * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck,
-                            * fAutoImportCheck;
+                            * fAutoImportCheck, * fAutoSizeCheck;
                             
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
@@ -86,6 +86,8 @@
 
 - (void) setAutoImport: (id) sender;
 - (void) importFolderSheetShow: (id) sender;
+
+- (void) setAutoSize: (id) sender;
 
 - (void) setRatio:          (id) sender;
 - (void) setRatioCheck:     (id) sender;

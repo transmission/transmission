@@ -306,6 +306,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     [nc addObserver: self selector: @selector(ratioGlobalChange:)
                     name: @"RatioGlobalChange" object: nil];
     
+    [nc addObserver: self selector: @selector(autoImportChange:)
+                    name: @"AutoImportSettingChange" object: nil];
+    
+    [nc addObserver: self selector: @selector(setWindowSizeToFit)
+                    name: @"AutoSizeSettingChange" object: nil];
+    
     //check to start another because of stopped torrent
     [nc addObserver: self selector: @selector(checkWaitingForStopped:)
                     name: @"StoppedDownloading" object: nil];
@@ -325,10 +331,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     //change that just impacts the inspector
     [nc addObserver: self selector: @selector(reloadInspectorSettings:)
                     name: @"TorrentSettingChange" object: nil];
-    
-    //reset auto import
-    [nc addObserver: self selector: @selector(autoImportChange:)
-                    name: @"AutoImportSettingChange" object: nil];
 
     //timer to update the interface every second
     fCompleted = 0;
@@ -347,6 +349,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
     [self applyFilter: nil];
+    [self setWindowSizeToFit];
     
     [fWindow makeKeyAndOrderFront: nil];
 
@@ -507,6 +510,8 @@ static void sleepCallBack(void * controller, io_service_t y,
 
     [self updateUI: nil];
     [self applyFilter: nil];
+    [self setWindowSizeToFit];
+    
     [self updateTorrentHistory];
 }
 
@@ -732,7 +737,10 @@ static void sleepCallBack(void * controller, io_service_t y,
     
     [self torrentNumberChanged];
     [fTableView deselectAll: nil];
+    
     [self updateUI: nil];
+    [self setWindowSizeToFit];
+    
     [self updateTorrentHistory];
 }
 
@@ -1588,6 +1596,8 @@ static void sleepCallBack(void * controller, io_service_t y,
                             + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
+    [self setWindowSizeToFit];
+    
     //resize for larger min height
     if (!makeSmall && contentSize.height < contentMinSize.height)
     {
@@ -2124,6 +2134,25 @@ static void sleepCallBack(void * controller, io_service_t y,
     return windowRect;
 }
 
+- (void) setWindowSizeToFit
+{
+    if (![fDefaults boolForKey: @"AutoSize"])
+        return;
+
+    NSRect frame = [fWindow frame];
+    float newHeight = frame.size.height - [fScrollView frame].size.height
+        + [fTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
+
+    float minHeight = [fWindow minSize].height;
+    if (newHeight < minHeight)
+        newHeight = minHeight;
+
+    frame.origin.y -= (newHeight - frame.size.height);
+    frame.size.height = newHeight;
+    
+    [fWindow setFrame: frame display: YES animate: YES]; 
+}
+
 - (void) showMainWindow: (id) sender
 {
     [fWindow makeKeyAndOrderFront: nil];
@@ -2152,6 +2181,13 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fSeedFilterButton setForInactive];
     [fDownloadFilterButton setForInactive];
     [fPauseFilterButton setForInactive];
+}
+
+- (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
+{
+    if ([fDefaults boolForKey: @"AutoSize"])
+        proposedFrameSize.height = [fWindow frame].size.height;
+    return proposedFrameSize;
 }
 
 - (void) windowDidResize: (NSNotification *) notification

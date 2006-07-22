@@ -6,6 +6,8 @@
 	<false/>
 	<key>AutoImportDirectory</key>
 	<string>~/Desktop</string>
+	<key>AutoSize</key>
+	<false/>
 	<key>BadgeDownloadRate</key>
 	<false/>
 	<key>BadgeUploadRate</key>

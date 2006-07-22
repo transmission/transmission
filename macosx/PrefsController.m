@@ -111,6 +111,9 @@
     [fAutoImportCheck setState: autoImport];
     [fImportFolderPopUp setEnabled: autoImport];
     
+    //set auto size
+    [fAutoSizeCheck setState: [fDefaults boolForKey: @"AutoSize"]];
+    
     //set bind port
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
@@ -631,6 +634,13 @@
     [panel beginSheetForDirectory: nil file: nil types: nil
         modalForWindow: [self window] modalDelegate: self didEndSelector:
         @selector(importFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (void) setAutoSize: (id) sender
+{
+    [fDefaults setBool: [sender state] forKey: @"AutoSize"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
 - (void) windowWillClose: (NSNotification *) notification
