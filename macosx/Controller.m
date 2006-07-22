@@ -217,18 +217,34 @@ static void sleepCallBack(void * controller, io_service_t y,
     //set sort
     fSortType = [[fDefaults stringForKey: @"Sort"] retain];
     
-    NSMenuItem * currentSortItem;
+    NSMenuItem * currentSortItem, * currentSortActionItem;
     if ([fSortType isEqualToString: @"Name"])
+    {
         currentSortItem = fNameSortItem;
+        currentSortActionItem = fNameSortActionItem;
+    }
     else if ([fSortType isEqualToString: @"State"])
+    {
         currentSortItem = fStateSortItem;
+        currentSortActionItem = fStateSortActionItem;
+    }
     else if ([fSortType isEqualToString: @"Progress"])
+    {
         currentSortItem = fProgressSortItem;
+        currentSortActionItem = fProgressSortActionItem;
+    }
     else if ([fSortType isEqualToString: @"Date"])
+    {
         currentSortItem = fDateSortItem;
+        currentSortActionItem = fDateSortActionItem;
+    }
     else
+    {
         currentSortItem = fOrderSortItem;
+        currentSortActionItem = fOrderSortActionItem;
+    }
     [currentSortItem setState: NSOnState];
+    [currentSortActionItem setState: NSOnState];
     
     //set filter
     fFilterType = [[fDefaults stringForKey: @"Filter"] retain];
@@ -973,35 +989,76 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (void) setSort: (id) sender
 {
-    NSMenuItem * prevSortItem;
+    //get checked items
+    NSMenuItem * prevSortItem, * prevSortActionItem;
     if ([fSortType isEqualToString: @"Name"])
-        prevSortItem = fNameSortItem;
-    else if ([fSortType isEqualToString: @"State"])
-        prevSortItem = fStateSortItem;
-    else if ([fSortType isEqualToString: @"Progress"])
-        prevSortItem = fProgressSortItem;
-    else if ([fSortType isEqualToString: @"Date"])
-        prevSortItem = fDateSortItem;
-    else
-        prevSortItem = fOrderSortItem;
-    
-    if (sender != prevSortItem)
     {
-        [prevSortItem setState: NSOffState];
-        [sender setState: NSOnState];
-
+        prevSortItem = fNameSortItem;
+        prevSortActionItem = fNameSortActionItem;
+    }
+    else if ([fSortType isEqualToString: @"State"])
+    {
+        prevSortItem = fStateSortItem;
+        prevSortActionItem = fStateSortActionItem;
+    }
+    else if ([fSortType isEqualToString: @"Progress"])
+    {
+        prevSortItem = fProgressSortItem;
+        prevSortActionItem = fProgressSortActionItem;
+    }
+    else if ([fSortType isEqualToString: @"Date"])
+    {
+        prevSortItem = fDateSortItem;
+        prevSortActionItem = fDateSortActionItem;
+    }
+    else
+    {
+        prevSortItem = fOrderSortItem;
+        prevSortActionItem = fOrderSortActionItem;
+    }
+    
+    if (sender != prevSortItem && sender != prevSortActionItem)
+    {
         [fSortType release];
-        if (sender == fNameSortItem)
+        
+        //get new items to check
+        NSMenuItem * currentSortItem, * currentSortActionItem;
+        if (sender == fNameSortItem || sender == fNameSortActionItem)
+        {
+            currentSortItem = fNameSortItem;
+            currentSortActionItem = fNameSortActionItem;
             fSortType = [[NSString alloc] initWithString: @"Name"];
-        else if (sender == fStateSortItem)
+        }
+        else if (sender == fStateSortItem || sender == fStateSortActionItem)
+        {
+            currentSortItem = fStateSortItem;
+            currentSortActionItem = fStateSortActionItem;
             fSortType = [[NSString alloc] initWithString: @"State"];
-        else if (sender == fProgressSortItem)
+        }
+        else if (sender == fProgressSortItem || sender == fProgressSortActionItem)
+        {
+            currentSortItem = fProgressSortItem;
+            currentSortActionItem = fProgressSortActionItem;
             fSortType = [[NSString alloc] initWithString: @"Progress"];
-        else if (sender == fDateSortItem)
+        }
+        else if (sender == fDateSortItem || sender == fDateSortActionItem)
+        {
+            currentSortItem = fDateSortItem;
+            currentSortActionItem = fDateSortActionItem;
             fSortType = [[NSString alloc] initWithString: @"Date"];
+        }
         else
+        {
+            currentSortItem = fOrderSortItem;
+            currentSortActionItem = fOrderSortActionItem;
             fSortType = [[NSString alloc] initWithString: @"Order"];
-           
+        }
+    
+        [prevSortItem setState: NSOffState];
+        [prevSortActionItem setState: NSOffState];
+        [currentSortItem setState: NSOnState];
+        [currentSortActionItem setState: NSOnState];
+        
         [fDefaults setObject: fSortType forKey: @"Sort"];
     }
 
@@ -1667,7 +1724,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     int state = ![fAdvancedBarItem state];
     [fAdvancedBarItem setState: state];
     [fDefaults setBool: state forKey: @"UseAdvancedBar"];
-
+    
     [fTableView display];
 }
 

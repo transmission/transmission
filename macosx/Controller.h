@@ -63,7 +63,9 @@
     
     NSString                        * fSortType;
     IBOutlet NSMenuItem             * fNameSortItem, * fStateSortItem, * fProgressSortItem,
-                                    * fDateSortItem, * fOrderSortItem;
+                                    * fDateSortItem, * fOrderSortItem,
+                                    * fNameSortActionItem, * fStateSortActionItem, * fProgressSortActionItem,
+                                    * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet ImageBackgroundView    * fFilterBar;
     BOOL                            fFilterBarVisible;
