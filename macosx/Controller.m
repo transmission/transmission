@@ -2124,18 +2124,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     if ([fDefaults boolForKey: @"AutoSize"])
         return [fWindow frame];
 
-    NSRect windowRect = [fWindow frame];
-    float newHeight = windowRect.size.height - [fScrollView frame].size.height
-        + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
-
-    float minHeight = [fWindow minSize].height;
-    if (newHeight < minHeight)
-        newHeight = minHeight;
-
-    windowRect.origin.y -= (newHeight - windowRect.size.height);
-    windowRect.size.height = newHeight;
-
-    return windowRect;
+    return [self windowFrameFor: [fFilteredTorrents count]];
 }
 
 - (void) setWindowSizeToFit
@@ -2143,9 +2132,14 @@ static void sleepCallBack(void * controller, io_service_t y,
     if (![fDefaults boolForKey: @"AutoSize"])
         return;
 
+    [fWindow setFrame: [self windowFrameFor: [fTorrents count]] display: YES animate: YES];
+}
+
+- (NSRect) windowFrameFor: (int) count
+{
     NSRect frame = [fWindow frame];
     float newHeight = frame.size.height - [fScrollView frame].size.height
-        + [fTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
+        + count * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)
@@ -2154,7 +2148,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     frame.origin.y -= (newHeight - frame.size.height);
     frame.size.height = newHeight;
     
-    [fWindow setFrame: frame display: YES animate: YES]; 
+    return frame;
 }
 
 - (void) showMainWindow: (id) sender

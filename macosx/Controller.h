@@ -179,6 +179,7 @@
 - (void) toggleAdvancedBar: (id) sender;
 
 - (void) setWindowSizeToFit;
+- (NSRect) windowFrameFor: (int) count;
 
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
