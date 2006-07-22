@@ -2138,41 +2138,20 @@ static void sleepCallBack(void * controller, io_service_t y,
         [self updateUI: nil];
     }
     
-    //set status fields inactive color
-    /*NSColor * enabledColor = [NSColor controlTextColor];
-    [fTotalTorrentsField setTextColor: enabledColor];
-    [fTotalDLField setTextColor: enabledColor];
-    [fTotalULField setTextColor: enabledColor];*/
-    
     //set filter images as active
     [fNoFilterButton setForActive];
     [fSeedFilterButton setForActive];
     [fDownloadFilterButton setForActive];
     [fPauseFilterButton setForActive];
-    
-    /*if (fSpeedLimitEnabled)
-        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
-                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];*/
 }
 
 - (void) windowDidResignKey: (NSNotification *) notification
 {
-    #warning should it do this?
-    //set status fields inactive color
-    /*NSColor * disabledColor = [NSColor disabledControlTextColor];
-    [fTotalTorrentsField setTextColor: disabledColor];
-    [fTotalDLField setTextColor: disabledColor];
-    [fTotalULField setTextColor: disabledColor];*/
-
     //set filter images as inactive
     [fNoFilterButton setForInactive];
     [fSeedFilterButton setForInactive];
     [fDownloadFilterButton setForInactive];
     [fPauseFilterButton setForInactive];
-    
-    #warning need real inactive image, or to not do anything at all (?)
-    /*if (fSpeedLimitEnabled)
-        [fSpeedLimitButton setImage: fSpeedLimitNormalImage];*/
 }
 
 - (void) windowDidResize: (NSNotification *) notification
