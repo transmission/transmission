@@ -309,7 +309,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [nc addObserver: self selector: @selector(autoImportChange:)
                     name: @"AutoImportSettingChange" object: nil];
     
-    [nc addObserver: self selector: @selector(setWindowSizeToFit)
+    [nc addObserver: self selector: @selector(setAutoSize:)
                     name: @"AutoSizeSettingChange" object: nil];
     
     //check to start another because of stopped torrent
@@ -349,7 +349,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
     
     [self applyFilter: nil];
-    [self setWindowSizeToFit];
+    [self setAutoSize: nil];
     
     [fWindow makeKeyAndOrderFront: nil];
 
@@ -2120,11 +2120,13 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
-    //don't resize if set to auto size
-    if ([fDefaults boolForKey: @"AutoSize"])
-        return [fWindow frame];
-
     return [self windowFrameFor: [fFilteredTorrents count]];
+}
+
+- (void) setAutoSize: (NSNotification *) notification
+{
+    [[fWindow standardWindowButton: NSWindowZoomButton] setEnabled: ![fDefaults boolForKey: @"AutoSize"]];
+    [self setWindowSizeToFit];
 }
 
 - (void) setWindowSizeToFit
