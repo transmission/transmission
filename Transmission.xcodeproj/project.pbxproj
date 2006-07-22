@@ -116,12 +116,12 @@
 		A26D450B0A0503AC00A10BB3 /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838A309DEC0430047D688 /* peermessages.h */; };
 		A27431DB0A68538400FA780A /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
-		A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53650A06AEDB00E1F16F /* StatusBorder.png */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28C43F40A4A5D700091A302 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A28C43EB0A4A5D700091A302 /* Transmission Help */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
+		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
 		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
 		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.png */; };
@@ -315,14 +315,13 @@
 		A27431D90A68538400FA780A /* BarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BarButton.m; path = macosx/BarButton.m; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
-		A27A53640A06AED200E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
-		A27A53650A06AEDB00E1F16F /* StatusBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBorder.png; path = macosx/Images/StatusBorder.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28C43EB0A4A5D700091A302 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
+		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileTableView.h; path = macosx/FileTableView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileTableView.m; path = macosx/FileTableView.m; sourceTree = "<group>"; };
@@ -439,7 +438,6 @@
 				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
-				A27A53640A06AED200E1F16F /* StatusBorder.png */,
 				A27A53420A06A62500E1F16F /* StatusSep.png */,
 				A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
@@ -475,8 +473,8 @@
 				A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */,
 				A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */,
 				A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */,
+				A29597340A72A9E10057248B /* StatusBarBackground.png */,
 				A27A53560A06A76400E1F16F /* StatusSep.png */,
-				A27A53650A06AEDB00E1F16F /* StatusBorder.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
 				A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */,
@@ -717,7 +715,6 @@
 				4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */,
 				A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */,
 				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
-				A27A53660A06AEDB00E1F16F /* StatusBorder.png in Resources */,
 				A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */,
 				A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */,
 				A2F8951F0A2D4BA500ED2127 /* Credits.rtf in Resources */,
@@ -755,6 +752,7 @@
 				A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */,
 				A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */,
 				A232D29E0A70903E00973B12 /* Filter.png in Resources */,
+				A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -102,10 +102,7 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     [fPrefsController setPrefs: fLib];
     
-    #warning remove eventually
-    NSImage * image = [NSImage imageNamed: @"StatusBorder.png"];
-    [image setName: nil];
-    [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBorder.png"]];
+    [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
