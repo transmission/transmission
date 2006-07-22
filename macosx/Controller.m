@@ -2120,6 +2120,10 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
+    //don't resize if set to auto size
+    if ([fDefaults boolForKey: @"AutoSize"])
+        return [fWindow frame];
+
     NSRect windowRect = [fWindow frame];
     float newHeight = windowRect.size.height - [fScrollView frame].size.height
         + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
