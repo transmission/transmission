@@ -2112,19 +2112,16 @@ static void sleepCallBack(void * controller, io_service_t y,
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
-    return [self windowFrameForAmount: [fFilteredTorrents count]];
+    NSRect frame = [fDefaults boolForKey: @"AutoSize"] ? [window frame]
+                    : [self windowFrameForAmount: [fFilteredTorrents count]];
+    
+    frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : 450.0;
+    return frame;
 }
 
 - (void) setAutoSize: (NSNotification *) notification
 {
-    #warning will not work because of sheets
-    //[[fWindow standardWindowButton: NSWindowZoomButton] setEnabled: ![fDefaults boolForKey: @"AutoSize"]];
     [self setWindowSizeToFit];
-}
-
-- (BOOL) windowShouldZoom: (NSWindow *) sender toFrame: (NSRect) newFrame
-{
-    return ![fDefaults boolForKey: @"AutoSize"];
 }
 
 - (void) setWindowSizeToFit
