@@ -340,11 +340,6 @@ static void sleepCallBack(void * controller, io_service_t y,
     //timer for auto import, will check every 15 seconds
     fAutoImportedNames = [[NSMutableArray alloc] init];
     
-    [self checkAutoImportDirectory: nil];
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
-        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
-    
     [self applyFilter: nil];
     [self setAutoSize: nil];
     
@@ -354,6 +349,12 @@ static void sleepCallBack(void * controller, io_service_t y,
     [fInfoController updateInfoForTorrents: [NSArray array]];
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
+    
+    //must do after everything is set up
+    [self checkAutoImportDirectory: nil];
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
+        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
+    [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
@@ -449,8 +450,6 @@ static void sleepCallBack(void * controller, io_service_t y,
         [self attemptToStartAuto: torrent];
         
         [fTorrents addObject: torrent];
-        
-        [self torrentNumberChanged];
     }
     
     [NSApp stopModal];
@@ -507,7 +506,6 @@ static void sleepCallBack(void * controller, io_service_t y,
 
     [self updateUI: nil];
     [self applyFilter: nil];
-    [self setWindowSizeToFit];
     
     [self updateTorrentHistory];
 }
@@ -532,6 +530,8 @@ static void sleepCallBack(void * controller, io_service_t y,
     int count = [fTorrents count];
     [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
         @"%d Transfer%s", count, count == 1 ? "" : "s"]];
+    
+    [self setWindowSizeToFit];
 }
 
 //called on by applescript
@@ -732,11 +732,10 @@ static void sleepCallBack(void * controller, io_service_t y,
             [[tempTorrents objectAtIndex: i] setOrderValue: i];
     }
     
-    [self torrentNumberChanged];
-    [fTableView deselectAll: nil];
-    
     [self updateUI: nil];
-    [self setWindowSizeToFit];
+    
+    [fTableView deselectAll: nil];
+    [self torrentNumberChanged];
     
     [self updateTorrentHistory];
 }
