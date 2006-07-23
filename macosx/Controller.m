@@ -340,6 +340,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     fAutoImportedNames = [[NSMutableArray alloc] init];
     
     [self applyFilter: nil];
+    
+    #warning repetitive
     [self setAutoSize: nil];
     
     [fWindow makeKeyAndOrderFront: nil];
@@ -526,8 +528,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     int count = [fTorrents count];
     [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
         @"%d Transfer%s", count, count == 1 ? "" : "s"]];
-    
-    [self setWindowSizeToFit];
 }
 
 //called on by applescript
@@ -728,10 +728,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [[tempTorrents objectAtIndex: i] setOrderValue: i];
     }
     
+    [self torrentNumberChanged];
+    
     [self updateUI: nil];
+    [self setWindowSizeToFit];
     
     [fTableView deselectAll: nil];
-    [self torrentNumberChanged];
     
     [self updateTorrentHistory];
 }
@@ -1127,6 +1129,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
         [indexSet release];
     }
+    
+    [self setWindowSizeToFit];
 }
 
 //resets filter and sorts torrents
@@ -2118,6 +2122,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return frame;
 }
 
+#warning remove?
 - (void) setAutoSize: (NSNotification *) notification
 {
     [self setWindowSizeToFit];
@@ -2126,7 +2131,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) setWindowSizeToFit
 {
     if ([fDefaults boolForKey: @"AutoSize"])
-        [fWindow setFrame: [self windowFrameForAmount: [fTorrents count]] display: YES animate: YES];
+        [fWindow setFrame: [self windowFrameForAmount: [fFilteredTorrents count]] display: YES animate: YES];
 }
 
 - (NSRect) windowFrameForAmount: (int) amount

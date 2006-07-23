@@ -26,7 +26,7 @@
 
 @implementation BarButton
 
-//height of button should be made 17.0
+//height of button should be 17.0
 - (id) initWithCoder: (NSCoder *) coder
 {
 	if ((self = [super initWithCoder: coder]))
