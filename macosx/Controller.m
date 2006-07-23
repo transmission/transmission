@@ -39,7 +39,11 @@
 #define TOOLBAR_RESUME_ALL      @"Toolbar Resume All"
 #define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
-#define TOOLBAR_FILTER   @"Toolbar Toggle Filter"
+#define TOOLBAR_FILTER          @"Toolbar Toggle Filter"
+
+#define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
+#define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
+#define GROWL_AUTO_ADD          @"Torrent Auto Added"
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
@@ -874,7 +878,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [self checkToStartWaiting: torrent];
         
             [GrowlApplicationBridge notifyWithTitle: @"Download Complete"
-                description: [torrent name] notificationName: @"Download Complete" iconData: nil
+                description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil
                 priority: 0 isSticky: NO clickContext: nil];
 
             if (![fWindow isKeyWindow])
@@ -1322,7 +1326,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fInfoController updateInfoStatsAndSettings];
     
     [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete"
-                description: [[notification object] name] notificationName: @"Seeding Complete"
+                description: [[notification object] name] notificationName: GROWL_SEEDING_COMPLETE
                 iconData: nil priority: 0 isSticky: NO clickContext: nil];
 }
 
@@ -1431,7 +1435,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
                 [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added"
-                    description: file notificationName: @"Torrent Auto Added" iconData: nil
+                    description: file notificationName: GROWL_AUTO_ADD iconData: nil
                     priority: 0 isSticky: NO clickContext: nil];
         }
 }
@@ -1588,19 +1592,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                             + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
-    [self setWindowSizeToFit];
-    
     //resize for larger min height if not set to auto size
-    if (!makeSmall && ![fDefaults boolForKey: @"AutoSize"] && contentSize.height < contentMinSize.height)
+    if (![fDefaults boolForKey: @"AutoSize"])
     {
-        NSRect frame = [fWindow frame];
-        float heightChange = contentMinSize.height - contentSize.height;
-        frame.size.height += heightChange;
-        frame.origin.y -= heightChange;
-        
-        [fWindow setFrame: frame display: YES];
-        [fTableView reloadData];
+        if (!makeSmall && contentSize.height < contentMinSize.height)
+        {
+            NSRect frame = [fWindow frame];
+            float heightChange = contentMinSize.height - contentSize.height;
+            frame.size.height += heightChange;
+            frame.origin.y -= heightChange;
+            
+            [fWindow setFrame: frame display: YES];
+            [fTableView reloadData];
+        }
     }
+    else
+        [self setWindowSizeToFit];
 }
 
 - (void) toggleStatusBar: (id) sender
@@ -2216,8 +2223,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSDictionary *) registrationDictionaryForGrowl
 {
-    NSArray * notifications = [NSArray arrayWithObjects: @"Download Complete",
-                                @"Seeding Complete", @"Torrent Auto Added", nil];
+    NSArray * notifications = [NSArray arrayWithObjects: GROWL_DOWNLOAD_COMPLETE,
+                                        GROWL_SEEDING_COMPLETE, GROWL_AUTO_ADD, nil];
     return [NSDictionary dictionaryWithObjectsAndKeys: notifications, GROWL_NOTIFICATIONS_ALL,
                                 notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
 }
