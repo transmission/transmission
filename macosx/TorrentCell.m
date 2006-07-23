@@ -367,7 +367,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [nameString drawAtPoint: pen];
         
         //place status string
-        pen.x = cellFrame.origin.x + cellFrame.size.width - PADDING - [statusString size].width;
+        pen.x = NSMaxX(cellFrame) - PADDING - [statusString size].width;
         pen.y += ([nameString size].height - [statusString size].height) * 0.5;
         
         [statusString drawAtPoint: pen];

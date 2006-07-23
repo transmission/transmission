@@ -47,8 +47,9 @@
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
-#define ROW_HEIGHT_REGULAR 65.0
-#define ROW_HEIGHT_SMALL 40.0
+#define ROW_HEIGHT_REGULAR  65.0
+#define ROW_HEIGHT_SMALL    40.0
+#define WINDOW_REGULAR_WIDTH       468.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
@@ -150,7 +151,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setFrame: filterBarFrame];
     
     [contentView addSubview: fFilterBar];
-    [fFilterBar setFrameOrigin: NSMakePoint(0, [contentView frame].origin.y + [contentView frame].size.height)];
+    [fFilterBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
@@ -163,7 +164,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fStatusBar setFrame: statusBarFrame];
     
     [contentView addSubview: fStatusBar];
-    [fStatusBar setFrameOrigin: NSMakePoint(0, [contentView frame].origin.y + [contentView frame].size.height)];
+    [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
     
     //set speed limit
@@ -2119,7 +2120,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSRect frame = [fDefaults boolForKey: @"AutoSize"] ? [window frame]
                     : [self windowFrameForAmount: [fFilteredTorrents count]];
     
-    frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : 468.0;
+    frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : WINDOW_REGULAR_WIDTH;
     return frame;
 }
 
@@ -2186,7 +2187,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //hide search filter if it overlaps filter buttons
     NSRect buttonFrame = [fPauseFilterButton frame];
-    if (buttonFrame.origin.x + buttonFrame.size.width + 2.0 > [fSearchFilterField frame].origin.x)
+    if (NSMaxX(buttonFrame) + 2.0 > [fSearchFilterField frame].origin.x)
     {
         if (![fSearchFilterField isHidden])
             [fSearchFilterField setHidden: YES];

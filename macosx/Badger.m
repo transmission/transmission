@@ -96,8 +96,7 @@
             [dockIcon lockFocus];
             
             //place badge
-            [fBadge compositeToPoint: badgeRect.origin
-                        operation: NSCompositeSourceOver];
+            [fBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
             
             //ignore shadow of badge when placing string
             float badgeBottomExtra = 5.0;
@@ -105,8 +104,7 @@
             badgeRect.origin.y += badgeBottomExtra;
             
             //place badge text
-            [self badgeString: [NSString stringWithInt: completed]
-                        forRect: badgeRect];
+            [self badgeString: [NSString stringWithInt: completed] forRect: badgeRect];
                         
             [dockIcon unlockFocus];
         }
@@ -143,8 +141,7 @@
         if (uploadRateString)
         {
             //place badge
-            [fUploadBadge compositeToPoint: badgeRect.origin
-                        operation: NSCompositeSourceOver];
+            [fUploadBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
             
             //place badge text
             [self badgeString: uploadRateString forRect: stringRect];
@@ -161,8 +158,7 @@
             }
         
             //place badge
-            [fDownloadBadge compositeToPoint: badgeRect.origin
-                        operation: NSCompositeSourceOver];
+            [fDownloadBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
             
             //place badge text
             [self badgeString: downloadRateString forRect: stringRect];

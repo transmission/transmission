@@ -189,7 +189,7 @@
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
+    return NSMakeRect(NSMaxX(cellRect) - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
                         cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
@@ -199,7 +199,7 @@
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     
-    return NSMakeRect(cellRect.origin.x + cellRect.size.width - AREA_CENTER + DISTANCE_FROM_CENTER,
+    return NSMakeRect(NSMaxX(cellRect) - AREA_CENTER + DISTANCE_FROM_CENTER,
                         cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
