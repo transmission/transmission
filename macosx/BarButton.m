@@ -227,20 +227,6 @@
     [super mouseExited: event];
 }
 
-/*- (void) mouseDown: (NSEvent *) event
-{
-    [self setImage: fButtonPressed];
-
-    [super mouseDown: event];
-    
-    //mouse up after mouse down
-    if (NSPointInRect([self convertPoint: [[self window] convertScreenToBase:
-                                [NSEvent mouseLocation]] fromView: nil], [self bounds]))
-        [NSApp sendAction: [self action] to: [self target] from: self];
-    
-    [self setImage: fEnabled ? fButtonSelected : fButtonOver];
-}*/
-
 - (void) setEnabled: (BOOL) enable
 {
     fEnabled = enable;
