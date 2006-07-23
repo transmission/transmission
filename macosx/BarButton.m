@@ -26,7 +26,7 @@
 
 @interface BarButton (Private)
 
-- (void) setText;
+- (void) createButtons;
 
 @end
 
@@ -40,66 +40,7 @@
         fEnabled = NO;
         fTrackingTag = 0;
         
-        NSSize buttonSize = [self frame].size;
-        fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonNormalDim = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonOver = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonPressed = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonSelected = [[NSImage alloc] initWithSize: buttonSize];
-        fButtonSelectedDim = [[NSImage alloc] initWithSize: buttonSize];
-        
-        //rolled over button
-        NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
-                * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
-                * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
-        
-        NSSize endSize = [leftOver size],
-                mainSize = NSMakeSize(buttonSize.width - endSize.width * 2.0, endSize.height);
-        NSPoint leftPoint = NSMakePoint(0, 0),
-                rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0),
-                mainPoint = NSMakePoint(endSize.width, 0);
-
-        [mainOver setScalesWhenResized: YES];
-        [mainOver setSize: mainSize];
-        
-        [fButtonOver lockFocus];
-        [leftOver compositeToPoint: leftPoint operation: NSCompositeSourceOver];
-        [mainOver compositeToPoint: mainPoint operation: NSCompositeSourceOver];
-        [rightOver compositeToPoint: rightPoint operation: NSCompositeSourceOver];
-        [fButtonOver unlockFocus];
-        
-        //pressed button
-        NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
-                * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
-                * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
-        
-        [mainPressed setScalesWhenResized: YES];
-        [mainPressed setSize: mainSize];
-        
-        [fButtonPressed lockFocus];
-        [leftPressed compositeToPoint: leftPoint operation: NSCompositeSourceOver];
-        [mainPressed compositeToPoint: mainPoint operation: NSCompositeSourceOver];
-        [rightPressed compositeToPoint: rightPoint operation: NSCompositeSourceOver];
-        [fButtonPressed unlockFocus];
-        
-        //selected button
-        NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
-                * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
-                * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
-        
-        [mainSelected setScalesWhenResized: YES];
-        [mainSelected setSize: mainSize];
-        
-        [fButtonSelected lockFocus];
-        [leftSelected compositeToPoint: leftPoint operation: NSCompositeSourceOver];
-        [mainSelected compositeToPoint: mainPoint operation: NSCompositeSourceOver];
-        [rightSelected compositeToPoint: rightPoint operation: NSCompositeSourceOver];
-        [fButtonSelected unlockFocus];
-        
-        //selected and dimmed button
-        fButtonSelectedDim = [fButtonSelected copy];
-        
-        [self setText];
+        [self createButtons];
         
         [self setImage: fButtonNormal];
         [self setAlternateImage: fButtonPressed];
@@ -110,9 +51,69 @@
 	return self;
 }
 
-//call only once to avoid overlapping text
-- (void) setText
+//call only once
+- (void) createButtons
 {
+    NSSize buttonSize = [self frame].size;
+    fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
+    fButtonNormalDim = [[NSImage alloc] initWithSize: buttonSize];
+    fButtonOver = [[NSImage alloc] initWithSize: buttonSize];
+    fButtonPressed = [[NSImage alloc] initWithSize: buttonSize];
+    fButtonSelected = [[NSImage alloc] initWithSize: buttonSize];
+    fButtonSelectedDim = [[NSImage alloc] initWithSize: buttonSize];
+    
+    //rolled over button
+    NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
+            * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
+            * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
+    
+    NSSize endSize = [leftOver size],
+            mainSize = NSMakeSize(buttonSize.width - endSize.width * 2.0, endSize.height);
+    NSPoint leftPoint = NSMakePoint(0, 0),
+            rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0),
+            mainPoint = NSMakePoint(endSize.width, 0);
+
+    [mainOver setScalesWhenResized: YES];
+    [mainOver setSize: mainSize];
+    
+    [fButtonOver lockFocus];
+    [leftOver compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+    [mainOver compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+    [rightOver compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+    [fButtonOver unlockFocus];
+    
+    //pressed button
+    NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
+            * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
+            * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
+    
+    [mainPressed setScalesWhenResized: YES];
+    [mainPressed setSize: mainSize];
+    
+    [fButtonPressed lockFocus];
+    [leftPressed compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+    [mainPressed compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+    [rightPressed compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+    [fButtonPressed unlockFocus];
+    
+    //selected button
+    NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
+            * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
+            * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
+    
+    [mainSelected setScalesWhenResized: YES];
+    [mainSelected setSize: mainSize];
+    
+    [fButtonSelected lockFocus];
+    [leftSelected compositeToPoint: leftPoint operation: NSCompositeSourceOver];
+    [mainSelected compositeToPoint: mainPoint operation: NSCompositeSourceOver];
+    [rightSelected compositeToPoint: rightPoint operation: NSCompositeSourceOver];
+    [fButtonSelected unlockFocus];
+    
+    //selected and dimmed button
+    fButtonSelectedDim = [fButtonSelected copy];
+
+    //create button text
     NSString * text = [self title];
 
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
@@ -154,8 +155,7 @@
                 shadowHighlighted, NSShadowAttributeName, nil];
     
     NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes],
-            textSizeBold = [text sizeWithAttributes: highlightedAttributes],
-            buttonSize = [self frame].size;
+            textSizeBold = [text sizeWithAttributes: highlightedAttributes];
     
     NSRect textRect = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
             (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height);
