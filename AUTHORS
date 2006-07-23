@@ -11,14 +11,14 @@ Josh Elsasser <josh@elsasser.org>
  + Back-end
  + GTK+ interface
 
+Mitchell Livingston <livings124@gmail.com>
+ + OS X interface
+
 Bryan Varner <bryan@varnernet.com>
  + BeOS interface
 
 Michael Demars <keul@m0k.org>
  + OS X interface (Growl notifications, AppleScript)
-
-Mitchell Livingston <livings124@gmail.com>
- + OS X interface
 
 
 Translators:
@@ -61,6 +61,9 @@ Martin Stadtmueller
 
 FOOOD
  + Badging images, Progress Bar images
+
+Nick Pucius
+ + Mac OS X Help documentation
 
 Rashid Eissing
  + Transfers preferences icon

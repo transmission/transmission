@@ -1,0 +1,39 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Router</title>
+	</head>
+	<body>
+		<div id="mainbox">
+			<a href="../index.html">Home</a>
+			<div id="pagetitle">
+				<h1>Portforwarding a Router</h1>
+			</div>
+			<p>In this case, it is probably OK to disable the OS X firewall, as you are already being protected by the router. To disable the firewall, open System Prefs >> Sharing >> Firewall. Click Stop.
+
+			<div summary="To do this" id="taskbox">
+				<ol>
+					<li>Find out what your IP address is. You can find your computer's IP address (on Mac OS X) by going to System Prefs >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. It's probably something like 192.168.1.100, or 10.0.1.2.</li>
+					<li>Open T. go to preferences and enter a number for the port. Numbers above 45000 are recommended. Lets use 50001 for now. Then quit T.</li>
+					<li>Go into your router configuration screen. Normally this is done via your web browser using the address <a href="http://192.168.0.1">192.168.0.1</a> etc. Apple's Airport uses an application called 'Airport Admin Utility' to configure it.</li>
+					<li>Find the port forwarding (sometimes called port mapping) screen. While the page will be different for each router generally you will enter something similar to the following:</li>
+
+						<ul>
+							<li>For 'Application' type Trans </li>
+							<li>For 'Start Port' and 'End port' type 50001 </li>
+							<li>For Protocol, choose Both </li>
+							<li>For IP address, type in your IP address you found in Step 1.</li>
+							<li>Tick Enable. </li>
+							<li>Click save settings.</li>
+						</ul>
+				</ol>
+			<p>For more comprehensive instructions specific to your router, click <a href="http://www.portforward.com/english/routers/port_forwarding/routerindex.htm">here</a> and choose your router from the list.
+			<p>
+			</div>
+			<a href="../index.html">Home</a>
+		</div>
+	</body>
+	
+</html>

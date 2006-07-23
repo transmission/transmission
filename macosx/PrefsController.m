@@ -66,8 +66,7 @@
 
 + (void) initialize
 {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:
-        [NSDictionary dictionaryWithContentsOfFile:
+    [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
 }
 

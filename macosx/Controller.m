@@ -49,8 +49,7 @@
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
-static void sleepCallBack(void * controller, io_service_t y,
-        natural_t messageType, void * messageArgument)
+static void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
     Controller * c = controller;
     [c sleepCallBack: messageType argument: messageArgument];
@@ -2115,7 +2114,7 @@ static void sleepCallBack(void * controller, io_service_t y,
     NSRect frame = [fDefaults boolForKey: @"AutoSize"] ? [window frame]
                     : [self windowFrameForAmount: [fFilteredTorrents count]];
     
-    frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : 450.0;
+    frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : 468.0;
     return frame;
 }
 
@@ -2187,16 +2186,14 @@ static void sleepCallBack(void * controller, io_service_t y,
 {
     //hide search filter if it overlaps filter buttons
     NSRect buttonFrame = [fPauseFilterButton frame];
-    BOOL overlap = buttonFrame.origin.x + buttonFrame.size.width + 2.0 > [fSearchFilterField frame].origin.x;
-    
-    if (![fSearchFilterField isHidden])
+    if (buttonFrame.origin.x + buttonFrame.size.width + 2.0 > [fSearchFilterField frame].origin.x)
     {
-        if (overlap)
+        if (![fSearchFilterField isHidden])
             [fSearchFilterField setHidden: YES];
     }
     else
     {
-        if (!overlap)
+        if ([fSearchFilterField isHidden])
             [fSearchFilterField setHidden: NO];
     }
 }
