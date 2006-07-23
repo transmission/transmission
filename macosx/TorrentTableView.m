@@ -187,13 +187,11 @@
     NSEnumerator * enumerator = [tempTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-    {NSLog([[torrent name] lowercaseString]);
         if ([[torrent name] caseInsensitiveCompare: text] != NSOrderedAscending)
         {
             [self selectRow: [fTorrents indexOfObject: torrent] byExtendingSelection: NO];
             break;
         }
-    }
     
     //select last torrent alphabetically if no match found
     if (!torrent)
