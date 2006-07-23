@@ -249,12 +249,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //set filter
     fFilterType = [[fDefaults stringForKey: @"Filter"] retain];
 
-    //button width should be 9 pixels surrounding text length
-    [fNoFilterButton setText: @"All"]; //16.64
-    [fDownloadFilterButton setText: @"Downloading"]; //81.69
-    [fSeedFilterButton setText: @"Seeding"]; //48.57
-    [fPauseFilterButton setText: @"Paused"]; //44.06
-
     BarButton * currentFilterButton;
     if ([fFilterType isEqualToString: @"Pause"])
         currentFilterButton = fPauseFilterButton;

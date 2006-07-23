@@ -1,6 +1,6 @@
 {
     IBClasses = (
-        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
+        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {
                 applyFilter = id; 

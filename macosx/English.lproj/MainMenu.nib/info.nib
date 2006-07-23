@@ -11,7 +11,7 @@
 		<key>1480</key>
 		<string>366 546 420 63 0 0 1152 842 </string>
 		<key>1603</key>
-		<string>360 371 477 67 0 0 1152 842 </string>
+		<string>337 544 477 67 0 0 1152 842 </string>
 		<key>29</key>
 		<string>9 780 451 44 0 0 1152 842 </string>
 		<key>456</key>
@@ -31,7 +31,7 @@
 	<integer>3</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>1480</integer>
+		<integer>1603</integer>
 		<integer>29</integer>
 		<integer>21</integer>
 	</array>

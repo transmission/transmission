@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface BarButton : NSImageView
+@interface BarButton : NSButton
 {
     NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
             * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;
@@ -33,7 +33,6 @@
     NSTrackingRectTag fTrackingTag;
 }
 
-- (void) setText: (NSString *) text;
 - (void) setEnabled: (BOOL) enable;
 
 - (void) resetBounds: (NSNotification *) notification;

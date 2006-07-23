@@ -24,6 +24,12 @@
 
 #import "BarButton.h"
 
+@interface BarButton (Private)
+
+- (void) setText;
+
+@end
+
 @implementation BarButton
 
 //height of button should be 17.0
@@ -93,26 +99,22 @@
         //selected and dimmed button
         fButtonSelectedDim = [fButtonSelected copy];
         
+        [self setText];
+        
+        [self setImage: fButtonNormal];
+        [self setAlternateImage: fButtonPressed];
+        
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resetBounds:)
                     name: NSViewBoundsDidChangeNotification object: nil];
 	}
 	return self;
 }
 
-- (void) dealloc
-{
-    [fButtonNormal release];
-    [fButtonOver release];
-    [fButtonPressed release];
-    [fButtonSelected release];
-    [fButtonSelectedDim release];
-    
-    [super dealloc];
-}
-
 //call only once to avoid overlapping text
-- (void) setText: (NSString *) text
+- (void) setText
 {
+    NSString * text = [self title];
+
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
                             [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
     
@@ -192,12 +194,21 @@
     [text drawInRect: textRect withAttributes: highlightedDimAttributes];
     [fButtonSelectedDim unlockFocus];
     
-    [self setImage: fButtonNormal];
-    
     [normalAttributes release];
     [normalDimAttributes release];
     [highlightedAttributes release];
     [highlightedDimAttributes release];
+}
+
+- (void) dealloc
+{
+    [fButtonNormal release];
+    [fButtonOver release];
+    [fButtonPressed release];
+    [fButtonSelected release];
+    [fButtonSelectedDim release];
+    
+    [super dealloc];
 }
 
 - (void) mouseEntered: (NSEvent *) event
@@ -216,7 +227,7 @@
     [super mouseExited: event];
 }
 
-- (void) mouseDown: (NSEvent *) event
+/*- (void) mouseDown: (NSEvent *) event
 {
     [self setImage: fButtonPressed];
 
@@ -228,7 +239,7 @@
         [NSApp sendAction: [self action] to: [self target] from: self];
     
     [self setImage: fEnabled ? fButtonSelected : fButtonOver];
-}
+}*/
 
 - (void) setEnabled: (BOOL) enable
 {
