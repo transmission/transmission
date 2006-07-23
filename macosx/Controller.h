@@ -178,7 +178,6 @@
 
 - (void) toggleAdvancedBar: (id) sender;
 
-- (void) setAutoSize: (NSNotification *) notification;
 - (void) setWindowSizeToFit;
 - (NSRect) windowFrameForAmount: (int) amount;
 

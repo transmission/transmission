@@ -305,7 +305,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(autoImportChange:)
                     name: @"AutoImportSettingChange" object: nil];
     
-    [nc addObserver: self selector: @selector(setAutoSize:)
+    [nc addObserver: self selector: @selector(setWindowSizeToFit)
                     name: @"AutoSizeSettingChange" object: nil];
     
     //check to start another because of stopped torrent
@@ -340,9 +340,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     fAutoImportedNames = [[NSMutableArray alloc] init];
     
     [self applyFilter: nil];
-    
-    #warning repetitive
-    [self setAutoSize: nil];
     
     [fWindow makeKeyAndOrderFront: nil];
 
@@ -2120,12 +2117,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : 468.0;
     return frame;
-}
-
-#warning remove?
-- (void) setAutoSize: (NSNotification *) notification
-{
-    [self setWindowSizeToFit];
 }
 
 - (void) setWindowSizeToFit
