@@ -70,6 +70,8 @@
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InfoTab"];
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
+    
+    [self updateInfoForTorrents: [NSArray array]];
 }
 
 - (void) dealloc

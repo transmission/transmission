@@ -340,19 +340,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
-    //timer for auto import, will check every 15 seconds
-    fAutoImportedNames = [[NSMutableArray alloc] init];
-    
     [self applyFilter: nil];
     
     [fWindow makeKeyAndOrderFront: nil];
 
-    //load info for no torrents
-    [fInfoController updateInfoForTorrents: [NSArray array]];
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
-    //must do after everything else is set up
+    //timer to check for auto import every 15 seconds, must do after everything else is set up
+    fAutoImportedNames = [[NSMutableArray alloc] init];
+    
     [self checkAutoImportDirectory: nil];
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
