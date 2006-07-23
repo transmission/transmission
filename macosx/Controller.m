@@ -2116,8 +2116,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
-    NSRect frame = [fDefaults boolForKey: @"AutoSize"] ? [window frame]
-                    : [self windowFrameForAmount: [fFilteredTorrents count]];
+    //if auto size is enabled, the current frame shouldn't need to change
+    NSRect frame = [fDefaults boolForKey: @"AutoSize"] ? [window frame] : [self sizedWindowFrame];
     
     frame.size.width = [fDefaults boolForKey: @"SmallView"] ? [fWindow minSize].width : WINDOW_REGULAR_WIDTH;
     return frame;
@@ -2126,14 +2126,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) setWindowSizeToFit
 {
     if ([fDefaults boolForKey: @"AutoSize"])
-        [fWindow setFrame: [self windowFrameForAmount: [fFilteredTorrents count]] display: YES animate: YES];
+        [fWindow setFrame: [self sizedWindowFrame] display: YES animate: YES];
 }
 
-- (NSRect) windowFrameForAmount: (int) amount
+- (NSRect) sizedWindowFrame
 {
     NSRect frame = [fWindow frame];
     float newHeight = frame.size.height - [fScrollView frame].size.height
-        + amount * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
+        + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)

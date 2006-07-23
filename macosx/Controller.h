@@ -179,7 +179,7 @@
 - (void) toggleAdvancedBar: (id) sender;
 
 - (void) setWindowSizeToFit;
-- (NSRect) windowFrameForAmount: (int) amount;
+- (NSRect) sizedWindowFrame;
 
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
