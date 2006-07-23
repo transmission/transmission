@@ -41,6 +41,8 @@
     IBOutlet NSMenu     * fContextRow, * fContextNoRow;
     NSImage             * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
                         * fRevealOnIcon, * fRevealOffIcon;
+    
+    NSMutableArray      * fKeyStrokes;
 }
 - (void) setTorrents: (NSArray *) torrents;
 

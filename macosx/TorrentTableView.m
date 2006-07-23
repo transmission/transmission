@@ -59,6 +59,8 @@
         
         fClickPoint = NSZeroPoint;
         
+        fKeyStrokes = [[NSMutableArray alloc] init];
+        
         fDefaults = [NSUserDefaults standardUserDefaults];
     }
     
@@ -69,6 +71,12 @@
 {
     [fContextRow setTitle: @"Context"];
     [fContextNoRow setTitle: @"Context"];
+}
+
+- (void) dealloc
+{
+    [fKeyStrokes release];
+    [super dealloc];
 }
 
 - (void) setTorrents: (NSArray *) torrents
@@ -141,6 +149,54 @@
         [self deselectAll: self];
         return fContextNoRow;
     }
+}
+
+- (void) keyDown: (NSEvent *) event
+{
+    unichar newChar = [[event characters] characterAtIndex: 0];
+    if (newChar == ' ' || [[NSCharacterSet alphanumericCharacterSet] characterIsMember: newChar])
+    {
+        if ([fKeyStrokes count] > 0 && [event timestamp] - [[fKeyStrokes lastObject] timestamp] > 1.0)
+            [fKeyStrokes removeAllObjects];
+        [fKeyStrokes addObject: event];
+    
+        [self interpretKeyEvents: fKeyStrokes];
+    }
+    else
+    {
+        if ([fKeyStrokes count] > 0)
+            [fKeyStrokes removeAllObjects];
+        
+        [super keyDown: event];
+    }
+}
+
+- (void) insertText: (NSString *) text
+{
+    NSLog(text);
+    
+    //sort torrents by name before finding closest match
+    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES] autorelease];
+    NSArray * descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
+
+    NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+    [descriptors release];
+    
+    //select torrent closest to text that isn't before text alphabetically
+    NSEnumerator * enumerator = [tempTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+    {
+        if ([[torrent name] caseInsensitiveCompare: text] != NSOrderedAscending)
+        {
+            [self selectRow: [fTorrents indexOfObject: torrent] byExtendingSelection: NO];
+            break;
+        }
+    }
+    
+    //select last torrent alphabetically if no match found
+    if (!torrent)
+        [self selectRow: [fTorrents indexOfObject: [tempTorrents lastObject]] byExtendingSelection: NO];
 }
 
 - (void) drawRect: (NSRect) r
