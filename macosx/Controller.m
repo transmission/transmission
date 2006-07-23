@@ -1664,15 +1664,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleFilterBar: (id) sender
 {
-    [self showFilterBar: !fFilterBarVisible animate: YES];
-    [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
-    
     //disable filtering when hiding
-    if (!fFilterBarVisible)
+    if (fFilterBarVisible)
     {
         [fSearchFilterField setStringValue: @""];
         [self setFilter: fNoFilterButton];
     }
+
+    [self showFilterBar: !fFilterBarVisible animate: YES];
+    [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
 }
 
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
