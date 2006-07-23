@@ -945,10 +945,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 //doesn't remember selected rows
 - (void) sortTorrentsIgnoreSelected
 {
-    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"name" ascending: YES] autorelease],
-                    * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"orderValue" ascending: YES] autorelease];
+    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name"
+                            ascending: YES selector: @selector(caseInsensitiveCompare:)] autorelease],
+                    * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
+                                            ascending: YES] autorelease];
 
     NSArray * descriptors;
     if ([fSortType isEqualToString: @"Name"])
@@ -972,8 +972,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     else if ([fSortType isEqualToString: @"Date"])
     {
-        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"date" ascending: YES] autorelease];
+        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"date" ascending: YES] autorelease];
     
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }

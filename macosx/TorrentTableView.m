@@ -154,7 +154,9 @@
 - (void) keyDown: (NSEvent *) event
 {
     unichar newChar = [[event characters] characterAtIndex: 0];
-    if (newChar == ' ' || [[NSCharacterSet alphanumericCharacterSet] characterIsMember: newChar])
+    if (newChar == ' ' || [[NSCharacterSet alphanumericCharacterSet] characterIsMember: newChar]
+        || [[NSCharacterSet symbolCharacterSet] characterIsMember: newChar]
+        || [[NSCharacterSet punctuationCharacterSet] characterIsMember: newChar])
     {
         if ([fKeyStrokes count] > 0 && [event timestamp] - [[fKeyStrokes lastObject] timestamp] > 1.0)
             [fKeyStrokes removeAllObjects];
@@ -173,10 +175,9 @@
 
 - (void) insertText: (NSString *) text
 {
-    NSLog(text);
-    
     //sort torrents by name before finding closest match
-    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES] autorelease];
+    NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
+                                            selector: @selector(caseInsensitiveCompare:)] autorelease];
     NSArray * descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, nil];
 
     NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
@@ -186,7 +187,7 @@
     NSEnumerator * enumerator = [tempTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-    {
+    {NSLog([[torrent name] lowercaseString]);
         if ([[torrent name] caseInsensitiveCompare: text] != NSOrderedAscending)
         {
             [self selectRow: [fTorrents indexOfObject: torrent] byExtendingSelection: NO];
