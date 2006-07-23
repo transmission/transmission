@@ -75,6 +75,8 @@ char * tr_getPrefsDirectory()
 #elif defined( SYS_DARWIN )
     snprintf( prefsDirectory, MAX_PATH_LENGTH,
               "%s/Library/Caches/Transmission", getenv( "HOME" ) );
+#elif defined(__AMIGAOS4__)
+    snprintf( prefsDirectory, MAX_PATH_LENGTH, "PROGDIR:.transmission" );
 #else
     snprintf( prefsDirectory, MAX_PATH_LENGTH, "%s/.transmission",
               getenv( "HOME" ) );
