@@ -1590,8 +1590,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self setWindowSizeToFit];
     
-    //resize for larger min height
-    if (!makeSmall && contentSize.height < contentMinSize.height)
+    //resize for larger min height if not set to auto size
+    if (!makeSmall && ![fDefaults boolForKey: @"AutoSize"] && contentSize.height < contentMinSize.height)
     {
         NSRect frame = [fWindow frame];
         float heightChange = contentMinSize.height - contentSize.height;
