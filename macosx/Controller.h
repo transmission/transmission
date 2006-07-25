@@ -99,7 +99,6 @@
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 
 - (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet;
-- (void) torrentNumberChanged;
 
 - (void) resumeSelectedTorrents:    (id) sender;
 - (void) resumeAllTorrents:         (id) sender;

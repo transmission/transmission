@@ -212,8 +212,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [torrent release];
         }
     
-    [self torrentNumberChanged];
-    
     //set sort
     fSortType = [[fDefaults stringForKey: @"Sort"] retain];
     
@@ -493,8 +491,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [torrent release];
     }
 
-    [self torrentNumberChanged];
-
     [self updateUI: nil];
     [self applyFilter: nil];
     
@@ -514,13 +510,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
         return torrents;
     }
-}
-
-- (void) torrentNumberChanged
-{
-    int count = [fTorrents count];
-    [fTotalTorrentsField setStringValue: [NSString stringWithFormat:
-        @"%d Transfer%s", count, count == 1 ? "" : "s"]];
 }
 
 //called on by applescript
@@ -721,12 +710,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [[tempTorrents objectAtIndex: i] setOrderValue: i];
     }
     
-    [self torrentNumberChanged];
+    [fTableView deselectAll: nil];
     
     [self updateUI: nil];
-    [self setWindowSizeToFit];
-    
-    [fTableView deselectAll: nil];
+    [self applyFilter: nil];
     
     [self updateTorrentHistory];
 }
@@ -1065,6 +1052,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
 
+    BOOL filtering = YES;
     if ([fFilterType isEqualToString: @"Pause"])
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1090,7 +1078,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [tempTorrents addObject: torrent];
     }
     else
+    {
+        filtering = NO;
         [tempTorrents setArray: fTorrents];
+    }
     
     NSString * searchString = [fSearchFilterField stringValue];
     if (![searchString isEqualToString: @""])
@@ -1122,6 +1113,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [indexSet release];
     }
     
+    //set status bar torrents
+    NSMutableString * totalTorrentsString = [NSMutableString stringWithString: @""];
+    if (filtering)
+        [totalTorrentsString appendFormat: @"%d/", [fFilteredTorrents count]];
+    
+    int totalCount = [fTorrents count];
+    [totalTorrentsString appendFormat: @"%d Transfer%s", totalCount, totalCount == 1 ? "" : "s"];
+    
+    [fTotalTorrentsField setStringValue: totalTorrentsString];
+
     [self setWindowSizeToFit];
 }
 
