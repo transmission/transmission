@@ -252,7 +252,7 @@
             [fShortStatusString setString: @""];
         }
         else
-            [fShortStatusString setString: [NSString stringWithFormat: @"ratio: %@, ",
+            [fShortStatusString setString: [NSString stringWithFormat: @"Ratio: %@, ",
                 [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]]];
         
         stringToAppend = [stringToAppend stringByAppendingString: [@"UL: " stringByAppendingString:
