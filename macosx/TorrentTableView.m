@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "TorrentTableView.h"
+#import "TorrentCell.h"
 #import "Controller.h"
 #import "Torrent.h"
 
@@ -41,6 +42,7 @@
 - (BOOL) pointInPauseRect: (NSPoint) point;
 - (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInIconRect: (NSPoint) point;
+- (BOOL) pointInMinimalStatusRect: (NSPoint) point;
 
 @end
 
@@ -94,7 +96,12 @@
         fClickPoint = NSZeroPoint;
     }
     else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
+    {
+        if ([self pointInMinimalStatusRect: fClickPoint])
+            [(TorrentCell *)[[self tableColumnWithIdentifier: @"Torrent"] dataCell] toggleMinimalStatus];
+
         [super mouseDown: event];
+    }
     else;
 
     [self display];
@@ -263,7 +270,7 @@
     int row = [self rowAtPoint: point];
     if (row < 0)
         return NO;
-    
+
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
                                                         : [[[fTorrents objectAtIndex: row] iconFlipped] size];
@@ -272,6 +279,20 @@
             + (cellRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
     
     return NSPointInRect(point, iconRect);
+}
+
+- (BOOL) pointInMinimalStatusRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
+        return NO;
+
+    const STATUS_WIDTH = 130.0;
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect statusRect = NSMakeRect(NSMaxX(cellRect) - STATUS_WIDTH, cellRect.origin.y,
+                            STATUS_WIDTH, cellRect.size.height - BUTTON_WIDTH);
+    
+    return NSPointInRect(point, statusRect);
 }
 
 - (BOOL) pointInPauseRect: (NSPoint) point

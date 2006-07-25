@@ -45,7 +45,7 @@
     NSUserDefaults  * fDefaults;
 
     NSImage         * fIcon, * fIconFlipped, * fIconSmall;
-    NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString;
+    NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
     int     fStopRatioSetting;
     float   fRatioLimit;
@@ -114,9 +114,10 @@
 - (BOOL)    isPaused;
 - (BOOL)    justFinished;
 
-- (NSString *)  progressString;
-- (NSString *)  statusString;
-- (NSString *)  shortStatusString;
+- (NSString *) progressString;
+- (NSString *) statusString;
+- (NSString *) shortStatusString;
+- (NSString *) remainingTimeString;
 
 - (int) seeders;
 - (int) leechers;

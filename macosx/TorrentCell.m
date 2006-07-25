@@ -63,6 +63,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if ((self = [super init]))
     {
+        fNormalStatus = YES;
+    
         fDefaults = [NSUserDefaults standardUserDefaults];
     
         NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
@@ -280,6 +282,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
 }
 
+- (void) toggleMinimalStatus
+{
+    fNormalStatus = !fNormalStatus;
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
 {
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
@@ -355,7 +362,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         //name and status string
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
         
-        NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: [fTorrent shortStatusString]
+        NSString * realStatusString = !fNormalStatus && [fTorrent isActive] && [fTorrent progress] < 1.0
+                                    ? [fTorrent remainingTimeString] : [fTorrent shortStatusString];
+        
+        NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: realStatusString
                                                     attributes: statusAttributes] autorelease];
         NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth:
                                 mainWidth - [statusString size].width - LINE_PADDING attributes: nameAttributes];

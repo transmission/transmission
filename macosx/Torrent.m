@@ -119,6 +119,7 @@
         [fProgressString release];
         [fStatusString release];
         [fShortStatusString release];
+        [fRemainingTimeString release];
     }
     [super dealloc];
 }
@@ -187,6 +188,7 @@
             
             [fStatusString setString: tempString];
             [fShortStatusString setString: tempString];
+            [fRemainingTimeString setString: tempString];
             
             break;
 
@@ -196,18 +198,27 @@
                 @"Downloading from %d of %d peer%s", [self peersUploading], [self totalPeers],
                 [self totalPeers] == 1 ? "" : "s"];
             
+            [fRemainingTimeString setString: @""];
             int eta = [self eta];
             if (eta < 0)
+            {
+                [fRemainingTimeString setString: @"Unknown"];
                 [fProgressString appendString: @" - remaining time unknown"];
-            else if (eta < 60)
-                [fProgressString appendFormat: @" - %d sec remaining", eta];
-            else if (eta < 3600) //60 * 60
-            [fProgressString appendFormat: @" - %d min %02d sec remaining", eta / 60, eta % 60];
-            else if (eta < 86400) //24 * 60 * 60
-                [fProgressString appendFormat: @" - %d hr %02d min remaining", eta / 3600, (eta / 60) % 60];
+            }
             else
-                [fProgressString appendFormat: @" - %d day%s %d hr remaining",
-                                            eta / 86400, eta / 86400 == 1 ? "" : "s", (eta / 3600) % 24];
+            {
+                if (eta < 60)
+                    [fRemainingTimeString appendFormat: @"%d sec", eta];
+                else if (eta < 3600) //60 * 60
+                    [fRemainingTimeString appendFormat: @"%d min %02d sec", eta / 60, eta % 60];
+                else if (eta < 86400) //24 * 60 * 60
+                    [fRemainingTimeString appendFormat: @"%d hr %02d min", eta / 3600, (eta / 60) % 60];
+                else
+                    [fRemainingTimeString appendFormat: @"%d day%s %d hr",
+                                                eta / 86400, eta / 86400 == 1 ? "" : "s", (eta / 3600) % 24];
+                
+                [fProgressString appendFormat: @" - %@ remaining", fRemainingTimeString];
+            }
             
             break;
 
@@ -510,6 +521,11 @@
     return fShortStatusString;
 }
 
+- (NSString *) remainingTimeString
+{
+    return fRemainingTimeString;
+}
+
 - (int) seeders
 {
     return fStat->seeders;
@@ -667,7 +683,8 @@
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
-    fShortStatusString = [[NSMutableString alloc] initWithCapacity: 50];
+    fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
+    fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
 
     [self update];
     return self;

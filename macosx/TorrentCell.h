@@ -31,10 +31,15 @@
 @interface TorrentCell : NSCell
 {
     Torrent * fTorrent;
+    BOOL fNormalStatus;
 
     NSUserDefaults * fDefaults;
 }
-- (void) setTorrent:   (Torrent *) torrent;
+
+- (void) setTorrent: (Torrent *) torrent;
+
+- (void) toggleMinimalStatus;
+
 @end
 
 #endif
