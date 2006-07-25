@@ -80,7 +80,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {revealFile = id; setNextTab = id; setPreviousTab = id; }; 
+            ACTIONS = {deselectAll = id; revealFile = id; setNextTab = id; setPreviousTab = id; }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
