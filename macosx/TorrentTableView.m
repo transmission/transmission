@@ -284,7 +284,7 @@
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || ![self isRowSelected: row] || ![fDefaults boolForKey: @"SmallView"])
         return NO;
 
     const STATUS_WIDTH = 130.0;
