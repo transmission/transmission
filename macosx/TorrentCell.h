@@ -31,7 +31,7 @@
 @interface TorrentCell : NSCell
 {
     Torrent * fTorrent;
-    BOOL fNormalStatus;
+    BOOL fStatusRegular;
 
     NSUserDefaults * fDefaults;
 }

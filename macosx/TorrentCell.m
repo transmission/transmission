@@ -63,9 +63,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if ((self = [super init]))
     {
-        fNormalStatus = YES;
-    
         fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        fStatusRegular = [fDefaults boolForKey: @"SmallStatusRegular"];
     
         NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
         if (!fProgressWhite)
@@ -284,7 +284,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) toggleMinimalStatus
 {
-    fNormalStatus = !fNormalStatus;
+    fStatusRegular = !fStatusRegular;
+    [fDefaults setBool: fStatusRegular forKey: @"SmallStatusRegular"];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
@@ -362,8 +363,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         //name and status string
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
         
-        NSString * realStatusString = !fNormalStatus && [fTorrent isActive] && [fTorrent progress] < 1.0
-                                    ? [fTorrent remainingTimeString] : [fTorrent shortStatusString];
+        NSString * realStatusString = !fStatusRegular && [fTorrent isActive] && [fTorrent progress] < 1.0
+                                        ? [fTorrent remainingTimeString] : [fTorrent shortStatusString];
         
         NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: realStatusString
                                                     attributes: statusAttributes] autorelease];
