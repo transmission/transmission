@@ -284,13 +284,20 @@
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
-    if (row < 0 || ![self isRowSelected: row] || ![fDefaults boolForKey: @"SmallView"])
+    if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
         return NO;
 
-    const STATUS_WIDTH = 130.0;
+    NSDictionary * statusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
+    Torrent * torrent = [fTorrents objectAtIndex: row];
+    NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
+                            && [torrent progress] < 1.0 ? [torrent remainingTimeString] : [torrent shortStatusString];
+    
+    float statusWidth = [statusString sizeWithAttributes: statusAttributes].width + 3.0;
+    
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-    NSRect statusRect = NSMakeRect(NSMaxX(cellRect) - STATUS_WIDTH, cellRect.origin.y,
-                            STATUS_WIDTH, cellRect.size.height - BUTTON_WIDTH);
+    NSRect statusRect = NSMakeRect(NSMaxX(cellRect) - statusWidth, cellRect.origin.y,
+                                    statusWidth, cellRect.size.height - BUTTON_WIDTH);
     
     return NSPointInRect(point, statusRect);
 }

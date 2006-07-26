@@ -1113,7 +1113,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [indexSet release];
     }
     
-    //set status bar torrents
+    //set status bar torrent count text
     NSMutableString * totalTorrentsString = [NSMutableString stringWithString: @""];
     if (filtering)
         [totalTorrentsString appendFormat: @"%d/", [fFilteredTorrents count]];
