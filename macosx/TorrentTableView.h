@@ -43,6 +43,8 @@
                         * fRevealOnIcon, * fRevealOffIcon;
     
     NSMutableArray      * fKeyStrokes;
+    
+    NSDictionary        * fSmallStatusAttributes;
 }
 - (void) setTorrents: (NSArray *) torrents;
 

@@ -63,6 +63,9 @@
         
         fKeyStrokes = [[NSMutableArray alloc] init];
         
+        fSmallStatusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
+        
         fDefaults = [NSUserDefaults standardUserDefaults];
     }
     
@@ -78,6 +81,7 @@
 - (void) dealloc
 {
     [fKeyStrokes release];
+    [fSmallStatusAttributes release];
     [super dealloc];
 }
 
@@ -287,13 +291,11 @@
     if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
         return NO;
 
-    NSDictionary * statusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
     Torrent * torrent = [fTorrents objectAtIndex: row];
     NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
                             && [torrent progress] < 1.0 ? [torrent remainingTimeString] : [torrent shortStatusString];
     
-    float statusWidth = [statusString sizeWithAttributes: statusAttributes].width + 3.0;
+    float statusWidth = [statusString sizeWithAttributes: fSmallStatusAttributes].width + 3.0;
     
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     NSRect statusRect = NSMakeRect(NSMaxX(cellRect) - statusWidth, cellRect.origin.y,
