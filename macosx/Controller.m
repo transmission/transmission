@@ -2127,12 +2127,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     float newHeight = frame.size.height - [fScrollView frame].size.height
         + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
-    float minHeight, maxHeight;
-    if (newHeight < (minHeight = [fWindow minSize].height))
+    float minHeight = [fWindow minSize].height;
+    if (newHeight < minHeight)
         newHeight = minHeight;
-    else if (newHeight > (maxHeight = [[fWindow screen] visibleFrame].size.height))
-        newHeight = maxHeight;
-    else;
+    else
+    {
+        float maxHeight = [[fWindow screen] visibleFrame].size.height;
+        if (!fStatusBarVisible)
+            maxHeight -= [fStatusBar frame].size.height;
+        if (!fFilterBarVisible) 
+            maxHeight -= [fFilterBar frame].size.height;
+        
+        if (newHeight > maxHeight)
+            newHeight = maxHeight;
+    }
 
     frame.origin.y -= (newHeight - frame.size.height);
     frame.size.height = newHeight;
