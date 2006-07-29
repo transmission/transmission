@@ -47,7 +47,7 @@
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
-#define ROW_HEIGHT_REGULAR      65.0
+#define ROW_HEIGHT_REGULAR      165.0
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
@@ -76,6 +76,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow"];
         fBadger = [[Badger alloc] init];
+        
+        fAutoImportedNames = [[NSMutableArray alloc] init];
         
         [GrowlApplicationBridge setGrowlDelegate: self];
     }
@@ -341,8 +343,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self showInfo: nil];
     
     //timer to check for auto import every 15 seconds, must do after everything else is set up
-    fAutoImportedNames = [[NSMutableArray alloc] init];
-    
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
@@ -2130,6 +2130,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)
         newHeight = minHeight;
+    
+    float maxHeight = [[fWindow screen] visibleFrame].size.height;
+    if (newHeight > maxHeight)
+        newHeight = maxHeight;
 
     frame.origin.y -= (newHeight - frame.size.height);
     frame.size.height = newHeight;
