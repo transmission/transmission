@@ -343,7 +343,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //timer to check for auto import every 15 seconds, must do after everything else is set up
     fAutoImportedNames = [[NSMutableArray alloc] init];
     
-    [self checkAutoImportDirectory: nil];
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
