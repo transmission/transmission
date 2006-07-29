@@ -30,7 +30,7 @@
 
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
-#define DOWNLOAD_ASK    3
+#define DOWNLOAD_ASK        3
 
 #define START_YES_CHECK_TAG     0
 #define START_WAIT_CHECK_TAG    1

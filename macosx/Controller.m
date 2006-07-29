@@ -47,9 +47,11 @@
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
-#define ROW_HEIGHT_REGULAR  65.0
-#define ROW_HEIGHT_SMALL    40.0
-#define WINDOW_REGULAR_WIDTH       468.0
+#define ROW_HEIGHT_REGULAR      65.0
+#define ROW_HEIGHT_SMALL        40.0
+#define WINDOW_REGULAR_WIDTH    468.0
+
+#define SEARCH_FILTER_MAX_WIDTH     100.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
@@ -650,8 +652,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (NSDictionary *) dict
 {
-    [NSApp stopModal];
-
     NSArray * torrents = [dict objectForKey: @"Torrents"];
     BOOL deleteData = [[dict objectForKey: @"DeleteData"] boolValue],
         deleteTorrent = [[dict objectForKey: @"DeleteTorrent"] boolValue];
@@ -690,8 +690,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
         [torrent removeForever];
         
-        [fFilteredTorrents removeObject: torrent];
         [fTorrents removeObject: torrent];
+        [fFilteredTorrents removeObject: torrent];
     }
     [torrents release];
 

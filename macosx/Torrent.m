@@ -162,7 +162,7 @@
         [fProgressString appendFormat: @"%@ of %@ (%.2f%%)", [NSString stringForFileSize:
                 [self downloadedValid]], [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     else
-        [fProgressString appendFormat: @"%@, uploaded %@ (ratio: %@)", [NSString stringForFileSize:
+        [fProgressString appendFormat: @"%@, uploaded %@ (Ratio: %@)", [NSString stringForFileSize:
                 [self size]], [NSString stringForFileSize: [self uploadedTotal]],
                 [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]];
 
