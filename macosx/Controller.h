@@ -60,7 +60,6 @@
     NSImage                         * fSpeedLimitNormalImage, * fSpeedLimitBlueImage, * fSpeedLimitGraphiteImage;
     
     IBOutlet ImageBackgroundView    * fStatusBar;
-    BOOL                            fStatusBarVisible;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
     NSString                        * fSortType;
@@ -70,7 +69,6 @@
                                     * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet ImageBackgroundView    * fFilterBar;
-    BOOL                            fFilterBarVisible;
     NSString                        * fFilterType;
     IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
                                     * fSeedFilterButton, * fDownloadFilterButton;

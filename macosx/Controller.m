@@ -60,7 +60,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [c sleepCallBack: messageType argument: messageArgument];
 }
 
-
 @implementation Controller
 
 - (id) init
@@ -147,7 +146,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSView * contentView = [fWindow contentView];
     [fFilterBar setHidden: YES];
     
-    fFilterBarVisible = NO;
     NSRect filterBarFrame = [fFilterBar frame];
     filterBarFrame.size.width = [fWindow frame].size.width;
     [fFilterBar setFrame: filterBarFrame];
@@ -158,7 +156,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
     //set up status bar
-    fStatusBarVisible = NO;
     [fStatusBar setHidden: YES];
     
     NSRect statusBarFrame = [fStatusBar frame];
@@ -870,7 +867,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //update the global DL/UL rates
     float downloadRate, uploadRate;
     tr_torrentRates(fLib, & downloadRate, & uploadRate);
-    if (fStatusBarVisible)
+    if (![fStatusBar isHidden])
     {
         [fTotalDLField setStringValue: [@"Total DL: " stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
         [fTotalULField setStringValue: [@"Total UL: " stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
@@ -1601,13 +1598,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleStatusBar: (id) sender
 {
-    [self showStatusBar: !fStatusBarVisible animate: YES];
-    [fDefaults setBool: fStatusBarVisible forKey: @"StatusBar"];
+    [self showStatusBar: [fStatusBar isHidden] animate: YES];
+    [fDefaults setBool: ![fStatusBar isHidden] forKey: @"StatusBar"];
 }
 
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show == fStatusBarVisible)
+    if (show == ![fStatusBar isHidden])
         return;
 
     if (show)
@@ -1620,8 +1617,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
-        
-    fStatusBarVisible = show;
     
     [self updateUI: nil];
     
@@ -1658,19 +1653,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) toggleFilterBar: (id) sender
 {
     //disable filtering when hiding
-    if (fFilterBarVisible)
+    if (![fFilterBar isHidden])
     {
         [fSearchFilterField setStringValue: @""];
         [self setFilter: fNoFilterButton];
     }
 
-    [self showFilterBar: !fFilterBarVisible animate: YES];
-    [fDefaults setBool: fFilterBarVisible forKey: @"FilterBar"];
+    [self showFilterBar: [fFilterBar isHidden] animate: YES];
+    [fDefaults setBool: ![fFilterBar isHidden] forKey: @"FilterBar"];
 }
 
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show == fFilterBarVisible)
+    if (show == ![fFilterBar isHidden])
         return;
 
     if (show)
@@ -1683,8 +1678,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
-        
-    fFilterBarVisible = show;
     
     //set views to not autoresize
     unsigned int filterMask = [fFilterBar autoresizingMask];
@@ -1915,7 +1908,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable toggle status bar
     if (action == @selector(toggleStatusBar:))
     {
-        NSString * title = fStatusBarVisible ? @"Hide Status Bar" : @"Show Status Bar";
+        NSString * title = [fStatusBar isHidden] ? @"Show Status Bar" : @"Hide Status Bar";
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
@@ -1925,7 +1918,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable toggle filter bar
     if (action == @selector(toggleFilterBar:))
     {
-        NSString * title = fFilterBarVisible ? @"Hide Filter Bar" : @"Show Filter Bar";
+        NSString * title = [fFilterBar isHidden] ? @"Show Filter Bar" : @"Hide Filter Bar";
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
@@ -2133,9 +2126,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
     {
         float maxHeight = [[fWindow screen] visibleFrame].size.height;
-        if (!fStatusBarVisible)
+        if ([fStatusBar isHidden])
             maxHeight -= [fStatusBar frame].size.height;
-        if (!fFilterBarVisible) 
+        if ([fFilterBar isHidden]) 
             maxHeight -= [fFilterBar frame].size.height;
         
         if (newHeight > maxHeight)
