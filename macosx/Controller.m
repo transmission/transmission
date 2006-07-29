@@ -51,8 +51,6 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
-#define SEARCH_FILTER_MAX_WIDTH     100.0
-
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
