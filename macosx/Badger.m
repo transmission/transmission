@@ -82,7 +82,6 @@
     //set completed badge
     if (fCompleted != completed)
     {
-        fCompleted = completed;
         dockIcon = [fDockIcon copy];
         
         //set completed badge to top right
@@ -111,6 +110,8 @@
         
         [fBadgedDockIcon release];
         fBadgedDockIcon = [dockIcon copy];
+        
+        fCompleted = completed;
     }
 
     //set upload and download rate badges
