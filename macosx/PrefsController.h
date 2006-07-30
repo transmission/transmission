@@ -60,7 +60,7 @@
     NSUserDefaults          * fDefaults;
 }
 
-- (void) setPrefs: (tr_handle_t *) handle;
+- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
 
 - (void) setShowMessage:    (id) sender;
 - (void) setBadge:          (id) sender;

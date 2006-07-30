@@ -73,7 +73,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
-        fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow"];
+        fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         fBadger = [[Badger alloc] init];
         
         fAutoImportedNames = [[NSMutableArray alloc] init];
@@ -105,8 +105,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
-    [fPrefsController setPrefs: fLib];
-    
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     

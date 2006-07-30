@@ -70,13 +70,23 @@
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
 }
 
+- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle
+{
+    if ((self = [super initWithWindowNibName: name]))
+    {
+        fDefaults = [NSUserDefaults standardUserDefaults];
+        fHandle = handle;
+    }
+    return self;
+}
+
 - (void) dealloc
 {
     [fDownloadFolder release];
     [super dealloc];
 }
 
-- (void) setPrefs: (tr_handle_t *) handle
+- (void) awakeFromNib
 {
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [fToolbar setDelegate: self];
@@ -87,9 +97,6 @@
 
     [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
     [self showGeneralPref: nil];
-
-    fDefaults = [NSUserDefaults standardUserDefaults];
-    fHandle = handle;
     
     //set download folder
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
@@ -285,7 +292,7 @@
     }
     else
     {
-        tr_setBindPort( fHandle, bindPort );
+        tr_setBindPort(fHandle, bindPort);
         [fDefaults setInteger: bindPort forKey: @"BindPort"];
     }
 }
