@@ -72,7 +72,7 @@
 
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle
 {
-    if ((self = [super initWithWindowNibName: name]))
+    if ((self = [self initWithWindowNibName: name]))
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
