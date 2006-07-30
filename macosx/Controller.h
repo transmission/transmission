@@ -131,6 +131,7 @@
 - (void) updateControlTint: (NSNotification *) notification;
 
 - (void) updateUI: (NSTimer *) timer;
+- (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;

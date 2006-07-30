@@ -143,6 +143,10 @@
 {
     fStat = tr_torrentStat(fHandle);
     
+    //notification when downloading finished
+    if ([self justFinished])
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+    
     //check to stop for ratio
     if ([self isSeeding] && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
             || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]

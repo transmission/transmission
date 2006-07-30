@@ -285,6 +285,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
+    [nc addObserver: self selector: @selector(torrentFinishedDownloading:)
+                    name: @"TorrentFinishedDownloading" object: nil];
+    
     [nc addObserver: self selector: @selector(updateControlTint:)
                     name: NSControlTintDidChangeNotification object: nil];
     
@@ -839,25 +842,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updateUI: (NSTimer *) t
 {
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-    {
-        [torrent update];
-
-        if ([torrent justFinished])
-        {
-            [self applyFilter: nil];
-            [self checkToStartWaiting: torrent];
-        
-            [GrowlApplicationBridge notifyWithTitle: @"Download Complete"
-                description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil
-                priority: 0 isSticky: NO clickContext: nil];
-
-            if (![fWindow isKeyWindow])
-                fCompleted++;
-        }
-    }
+    [fTorrents makeObjectsPerformSelector: @selector(update)];
 
     if ([fSortType isEqualToString: @"Progress"] || [fSortType isEqualToString: @"State"])
         [self sortTorrents];
@@ -878,6 +863,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
+}
+
+- (void) torrentFinishedDownloading: (NSNotification *) notification
+{
+    Torrent * torrent = [notification object];
+
+    [self applyFilter: nil];
+    [self checkToStartWaiting: torrent];
+
+    [GrowlApplicationBridge notifyWithTitle: @"Download Complete" description: [torrent name]
+        notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
+
+    if (![fWindow isKeyWindow])
+        fCompleted++;
 }
 
 - (void) updateTorrentHistory
@@ -1311,9 +1310,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     
-    [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete"
-                description: [[notification object] name] notificationName: GROWL_SEEDING_COMPLETE
-                iconData: nil priority: 0 isSticky: NO clickContext: nil];
+    [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete" description: [[notification object] name]
+        notificationName: GROWL_SEEDING_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
 }
 
 - (void) attemptToStartAuto: (Torrent *) torrent
@@ -1420,9 +1418,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added"
-                    description: file notificationName: GROWL_AUTO_ADD iconData: nil
-                    priority: 0 isSticky: NO clickContext: nil];
+                [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added" description: file
+                    notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
         }
 }
 
