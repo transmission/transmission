@@ -533,8 +533,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
-        [self performSelectorOnMainThread: @selector(openFromSheet:)
-                    withObject: [panel filenames] waitUntilDone: NO];
+        [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: [panel filenames] waitUntilDone: NO];
 }
 
 - (void) openFromSheet: (NSArray *) filenames
@@ -789,7 +788,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //if save successful, copy torrent to new location with name of data file
     if (code == NSOKButton)
         [[NSFileManager defaultManager] copyPath: [[torrents objectAtIndex: 0] torrentLocation]
-                toPath: [panel filename] handler: nil];
+            toPath: [panel filename] handler: nil];
     
     [torrents removeObjectAtIndex: 0];
     [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:)
@@ -800,7 +799,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSIndexSet * indexSet = [fTableView selectedRowIndexes];
     unsigned int i;
-    
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [[fFilteredTorrents objectAtIndex: i] revealData];
 }

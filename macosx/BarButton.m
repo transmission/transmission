@@ -51,6 +51,19 @@
 	return self;
 }
 
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+
+    [fButtonNormal release];
+    [fButtonOver release];
+    [fButtonPressed release];
+    [fButtonSelected release];
+    [fButtonSelectedDim release];
+    
+    [super dealloc];
+}
+
 //call only once
 - (void) createButtons
 {
@@ -198,17 +211,6 @@
     [normalDimAttributes release];
     [highlightedAttributes release];
     [highlightedDimAttributes release];
-}
-
-- (void) dealloc
-{
-    [fButtonNormal release];
-    [fButtonOver release];
-    [fButtonPressed release];
-    [fButtonSelected release];
-    [fButtonSelectedDim release];
-    
-    [super dealloc];
 }
 
 - (void) mouseEntered: (NSEvent *) event
