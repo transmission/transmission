@@ -72,9 +72,7 @@
     [super dealloc];
 }
 
-- (void) updateBadgeWithCompleted: (int) completed
-                    uploadRate: (float) uploadRate
-                    downloadRate: (float) downloadRate
+- (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate
 {
     NSImage * dockIcon = nil;
     NSSize iconSize = [fDockIcon size];
@@ -186,6 +184,9 @@
     fBadgedDockIcon = [fDockIcon copy];
 
     [NSApp setApplicationIconImage: fDockIcon];
+    
+    fCompleted = 0;
+    fSpeedShown = NO;
 }
 
 @end

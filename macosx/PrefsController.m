@@ -497,6 +497,8 @@
     else if (sender == fBadgeUploadRateCheck)
         [fDefaults setBool: [sender state] forKey: @"BadgeUploadRate"];
     else;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
 }
 
 - (void) setUpdate: (id) sender

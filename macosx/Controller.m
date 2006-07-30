@@ -326,6 +326,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //change that just impacts the inspector
     [nc addObserver: self selector: @selector(reloadInspectorSettings:)
                     name: @"TorrentSettingChange" object: nil];
+    
+    //change that just impacts the dock badge
+    [nc addObserver: self selector: @selector(resetDockBadge:)
+                    name: @"DockBadgeChange" object: nil];
 
     //timer to update the interface every second
     fCompleted = 0;
@@ -2096,6 +2100,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+- (void) resetDockBadge: (NSNotification *) notification
+{
+    float downloadRate, uploadRate;
+    tr_torrentRates(fLib, & downloadRate, & uploadRate);
+    
+    [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
+}
+
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
     //if auto size is enabled, the current frame shouldn't need to change
@@ -2149,7 +2161,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (fCompleted > 0)
     {
         fCompleted = 0;
-        [self updateUI: nil];
+        [self resetDockBadge: nil];
     }
     
     //set filter images as active

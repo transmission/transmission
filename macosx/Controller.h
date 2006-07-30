@@ -176,6 +176,8 @@
 
 - (void) toggleAdvancedBar: (id) sender;
 
+- (void) resetDockBadge: (NSNotification *) notification;
+
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
 

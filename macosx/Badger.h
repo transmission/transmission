@@ -38,9 +38,7 @@
     BOOL            fSpeedShown;
 }
 
-- (void) updateBadgeWithCompleted: (int) completed
-                    uploadRate: (float) uploadRate
-                    downloadRate: (float) downloadRate;
+- (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate;
 - (void) clearBadge;
 
 @end
