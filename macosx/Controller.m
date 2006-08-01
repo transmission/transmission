@@ -1382,15 +1382,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        if ([torrent progress] >= 1.0)
-            [torrent startTransfer];
-        else
+        if ([torrent waitingToStart])
         {
-            if ([torrent waitingToStart] && desiredActive > 0)
+            if ([torrent progress] >= 1.0)
+                [torrent startTransfer];
+            else if (desiredActive > 0)
             {
                 [torrent startTransfer];
                 desiredActive--;
             }
+            else;
         }
         
         [torrent update];
