@@ -553,6 +553,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self resumeTorrents: fTorrents];
 }
 
+- (void) resumeWaitingTorrents: (id) sender
+{
+    NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
+    
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent waitingToStart])
+            [torrents addObject: torrent];
+    
+    [self resumeTorrents: torrents];
+}
+
 - (void) resumeTorrents: (NSArray *) torrents
 {
     [torrents makeObjectsPerformSelector: @selector(startTransfer)];
@@ -1924,28 +1937,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return canUseMenu;
     }
 
-    //enable resume all item
-    if (action == @selector(resumeAllTorrents:))
-    {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused])
-                return YES;
-        return NO;
-    }
-
-    //enable pause all item
-    if (action == @selector(stopAllTorrents:))
-    {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive])
-                return YES;
-        return NO;
-    }
-
     //enable reveal in finder
     if (action == @selector(revealFile:))
         return canUseMenu && [fTableView numberOfSelectedRows] > 0;
@@ -1992,6 +1983,42 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
         
         return canUseMenu && canDelete && [fTableView numberOfSelectedRows] > 0;
+    }
+
+    //enable pause all item
+    if (action == @selector(stopAllTorrents:))
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isActive])
+                return YES;
+        return NO;
+    }
+    
+    //enable resume all item
+    if (action == @selector(resumeAllTorrents:))
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isPaused])
+                return YES;
+        return NO;
+    }
+    
+    //enable resume waiting item
+    if (action == @selector(resumeWaitingTorrents:))
+    {
+        if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
+            return NO;
+    
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent waitingToStart])
+                return YES;
+        return NO;
     }
 
     //enable pause item

@@ -15,6 +15,7 @@
                 removeNoDelete = id; 
                 resumeAllTorrents = id; 
                 resumeSelectedTorrents = id; 
+                resumeWaitingTorrents = id; 
                 revealFile = id; 
                 setFilter = id; 
                 setInfoTab = id; 
