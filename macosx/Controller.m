@@ -483,7 +483,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         {
             NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-            [panel setPrompt: @"Select Download Folder"];
+            [panel setPrompt: @"Select"];
             [panel setAllowsMultipleSelection: NO];
             [panel setCanChooseFiles: NO];
             [panel setCanChooseDirectories: YES];
