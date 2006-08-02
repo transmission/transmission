@@ -76,6 +76,8 @@
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
+        
+        [[self window] update]; //makesure nib is loaded right away
     }
     return self;
 }
