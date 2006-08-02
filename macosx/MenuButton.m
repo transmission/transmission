@@ -31,15 +31,21 @@
     NSImage * image = [self image];
     [self setImage: [self alternateImage]];
 
+    //approximate height of menu...alright for now
+    /*float menuHeight = ((float)[[self menu] numberOfItems] + 2.0) * [NSMenuView menuBarHeight];
+    BOOL moveToTop = menuHeight > [[self window] frame].origin.y;*/
+
+    NSPoint point = NSMakePoint(3.0, /*moveToTop ? [self frame].size.height + menuHeight :*/ -2.0);
+
     NSEvent * newEvent= [NSEvent mouseEventWithType: [event type]
-                        location: NSMakePoint(3, -2)
-                        modifierFlags: [event modifierFlags]
-                        timestamp: [event timestamp]
-                        windowNumber: [event windowNumber]
-                        context: [event context]
-                        eventNumber: [event eventNumber]
-                        clickCount: [event clickCount]
-                        pressure: [event pressure]];
+                            location: point
+                            modifierFlags: [event modifierFlags]
+                            timestamp: [event timestamp]
+                            windowNumber: [event windowNumber]
+                            context: [event context]
+                            eventNumber: [event eventNumber]
+                            clickCount: [event clickCount]
+                            pressure: [event pressure]];
 
     [NSMenu popUpContextMenu: [self menu] withEvent: newEvent forView: self];
 
