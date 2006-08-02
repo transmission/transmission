@@ -53,6 +53,8 @@
     IBOutlet TorrentTableView       * fTableView;
     NSToolbar                       * fToolbar;
     
+    IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
+    
     IBOutlet NSMenuItem             * fAdvancedBarItem, * fSmallViewItem,
                                     * fSpeedLimitItem, * fSpeedLimitDockItem;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
@@ -91,8 +93,9 @@
     Badger                          * fBadger;
 }
 
-- (void) openShowSheet:   (id) sender;
-- (void) openSheetClosed: (NSOpenPanel *) s returnCode: (int) code contextInfo: (void *) info;
+- (void) openFiles: (NSArray *) filenames;
+- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore;
+- (void) openShowSheet: (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 

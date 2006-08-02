@@ -430,6 +430,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
 }
 
+- (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet
+{
+    if ([fFilteredTorrents respondsToSelector: @selector(objectsAtIndexes:)])
+        return [fFilteredTorrents objectsAtIndexes: indexSet];
+    else
+    {
+        NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
+        unsigned int i;
+        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+            [torrents addObject: [fFilteredTorrents objectAtIndex: i]];
+
+        return torrents;
+    }
+}
+
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
     contextInfo: (Torrent *) torrent
 {
@@ -447,6 +462,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
 {
+    [self openFiles: filenames ignoreDownloadFolder: NO];
+}
+
+- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
+{
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"], * torrentPath;
     Torrent * torrent;
     NSEnumerator * enumerator = [filenames objectEnumerator];
@@ -459,7 +479,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [[NSDocumentController sharedDocumentController]
             noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
 
-        if ([downloadChoice isEqualToString: @"Ask"])
+        if (ignore || [downloadChoice isEqualToString: @"Ask"])
         {
             NSOpenPanel * panel = [NSOpenPanel openPanel];
 
@@ -498,25 +518,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
-- (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet
-{
-    if ([fFilteredTorrents respondsToSelector: @selector(objectsAtIndexes:)])
-        return [fFilteredTorrents objectsAtIndexes: indexSet];
-    else
-    {
-        NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
-        unsigned int i;
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            [torrents addObject: [fFilteredTorrents objectAtIndex: i]];
-
-        return torrents;
-    }
-}
-
 //called on by applescript
 - (void) open: (NSArray *) files
 {
-    [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: files waitUntilDone: NO];
+    [self performSelectorOnMainThread: @selector(openFiles:) withObject: files waitUntilDone: NO];
+}
+
+- (void) openFiles: (NSArray *) filenames
+{
+    [self openFiles: filenames ignoreDownloadFolder: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -529,18 +539,26 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObject: @"torrent"]
         modalForWindow: fWindow modalDelegate: self didEndSelector:
-        @selector(openSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+        @selector(openSheetClosed:returnCode:contextInfo:)
+        contextInfo: [NSNumber numberWithBool: sender == fOpenIgnoreDownloadFolder]];
 }
 
-- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (void *) info
+- (void) openSheetClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSNumber *) ignore
 {
     if (code == NSOKButton)
-        [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: [panel filenames] waitUntilDone: NO];
+    {
+        NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        [panel filenames], @"Files", ignore, @"Ignore", nil];
+        [self performSelectorOnMainThread: @selector(openFromSheet:) withObject: dictionary waitUntilDone: NO];
+    }
 }
 
-- (void) openFromSheet: (NSArray *) filenames
+- (void) openFromSheet: (NSDictionary *) dictionary
 {
-    [self application: NSApp openFiles: filenames];
+    [self openFiles: [dictionary objectForKey: @"Files"]
+        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue]];
+    
+    [dictionary release];
 }
 
 - (void) resumeSelectedTorrents: (id) sender
@@ -1430,7 +1448,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             oldCount = [fTorrents count];
-            [self openFromSheet: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
+            [self openFiles: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])

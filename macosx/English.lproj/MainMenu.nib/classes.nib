@@ -51,6 +51,7 @@
                 fNameSortItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
                 fNoFilterButton = BarButton; 
+                fOpenIgnoreDownloadFolder = NSMenuItem; 
                 fOrderSortActionItem = NSMenuItem; 
                 fOrderSortItem = NSMenuItem; 
                 fPauseFilterButton = BarButton; 
