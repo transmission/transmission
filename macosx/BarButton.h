@@ -37,7 +37,7 @@
 
 - (void) resetBounds: (NSNotification *) notification;
 
-- (void) setForActive;
-- (void) setForInactive;
+- (void) setForActive: (NSNotification *) notification;
+- (void) setForInactive: (NSNotification *) notification;
 
 @end

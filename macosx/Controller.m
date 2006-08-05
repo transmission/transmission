@@ -2207,21 +2207,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fCompleted = 0;
         [self resetDockBadge: nil];
     }
-    
-    //set filter images as active
-    [fNoFilterButton setForActive];
-    [fSeedFilterButton setForActive];
-    [fDownloadFilterButton setForActive];
-    [fPauseFilterButton setForActive];
-}
-
-- (void) windowDidResignKey: (NSNotification *) notification
-{
-    //set filter images as inactive
-    [fNoFilterButton setForInactive];
-    [fSeedFilterButton setForInactive];
-    [fDownloadFilterButton setForInactive];
-    [fPauseFilterButton setForInactive];
 }
 
 - (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
