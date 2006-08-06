@@ -293,7 +293,7 @@
 
     Torrent * torrent = [fTorrents objectAtIndex: row];
     NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
-                            && [torrent progress] < 1.0 ? [torrent remainingTimeString] : [torrent shortStatusString];
+                                    ? [torrent remainingTimeString] : [torrent shortStatusString];
     
     float statusWidth = [statusString sizeWithAttributes: fSmallStatusAttributes].width + 3.0;
     

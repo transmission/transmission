@@ -1474,7 +1474,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //only allow reordering of rows if sorting by order with no filter
     if ([fSortType isEqualToString: @"Order"] && [fFilterType isEqualToString: @"None"]
-            && [[fSearchFilterField stringValue] isEqualToString: @""])
+            && [[fSearchFilterField stringValue] length] == 0)
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]

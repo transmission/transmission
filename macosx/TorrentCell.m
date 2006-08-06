@@ -363,8 +363,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         //name and status string
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
         
-        NSString * realStatusString = !fStatusRegular && [fTorrent isActive] && [fTorrent progress] < 1.0
-                                        ? [fTorrent remainingTimeString] : [fTorrent shortStatusString];
+        NSString * realStatusString = !fStatusRegular && [fTorrent isActive] ? [fTorrent remainingTimeString]
+                                                                            : [fTorrent shortStatusString];
         
         NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: realStatusString
                                                     attributes: statusAttributes] autorelease];

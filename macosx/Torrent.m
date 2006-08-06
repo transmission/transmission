@@ -256,8 +256,13 @@
             [fShortStatusString setString: @""];
         }
         else
-            [fShortStatusString setString: [NSString stringWithFormat: @"Ratio: %@, ",
-                [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]]];
+        {
+            NSString * ratioString = [NSString stringForRatioWithDownload: [self downloadedTotal]
+                                                upload: [self uploadedTotal]];
+        
+            [fShortStatusString setString: [NSString stringWithFormat: @"Ratio: %@, ", ratioString]];
+            [fRemainingTimeString setString: [@"Ratio: " stringByAppendingString: ratioString]];
+        }
         
         stringToAppend = [stringToAppend stringByAppendingString: [@"UL: " stringByAppendingString:
                                                 [NSString stringForSpeed: [self uploadRate]]]];
