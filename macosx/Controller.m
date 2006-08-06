@@ -654,11 +654,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             {
                 title = [NSString stringWithFormat: @"Comfirm Removal of %d Transfers", selected];
                 if (selected == active)
-                    message = [NSString stringWithFormat:
-                        @"There are %d active transfers.", active];
+                    message = [NSString stringWithFormat: @"There are %d active transfers.", active];
                 else
-                    message = [NSString stringWithFormat:
-                        @"There are %d transfers (%d active).", selected, active];
+                    message = [NSString stringWithFormat: @"There are %d transfers (%d active).", selected, active];
                 message = [message stringByAppendingString:
                     @" Once removed, continuing the transfers will require the torrent files."
                     " Do you really want to remove them?"];
@@ -1104,8 +1102,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     
     NSString * searchString = [fSearchFilterField stringValue];
-    if (![searchString isEqualToString: @""])
+    if ([searchString length] > 0)
     {
+        filtering = YES;
+        
         int i;
         for (i = [tempTorrents count] - 1; i >= 0; i--)
             if ([[[tempTorrents objectAtIndex: i] name] rangeOfString: searchString
@@ -2083,9 +2083,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //enable copy torrent file item
     if (action == @selector(copyTorrentFile:))
-    {
         return canUseMenu && [fTableView numberOfSelectedRows] > 0;
-    }
 
     return YES;
 }
@@ -2188,7 +2186,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     frame.origin.y -= (newHeight - frame.size.height);
     frame.size.height = newHeight;
-    
     return frame;
 }
 
@@ -2209,6 +2206,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
 {
+    //only resize horizontally if autosize is enabled
     if ([fDefaults boolForKey: @"AutoSize"])
         proposedFrameSize.height = [fWindow frame].size.height;
     return proposedFrameSize;
@@ -2217,8 +2215,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) windowDidResize: (NSNotification *) notification
 {
     //hide search filter if it overlaps filter buttons
-    NSRect buttonFrame = [fPauseFilterButton frame];
-    [fSearchFilterField setHidden: NSMaxX(buttonFrame) + 2.0 > [fSearchFilterField frame].origin.x];
+    [fSearchFilterField setHidden: NSMaxX([fPauseFilterButton frame]) + 2.0 > [fSearchFilterField frame].origin.x];
 }
 
 - (void) linkHomepage: (id) sender
