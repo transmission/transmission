@@ -57,6 +57,7 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {CLASS = PrefsWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {checkForUpdates = id; }; 
             CLASS = SUUpdater; 
