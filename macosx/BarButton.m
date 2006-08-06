@@ -252,8 +252,7 @@
 
 - (void) setForActive: (NSNotification *) notification
 {
-    NSWindow * window;
-    if (!(window = [notification object]) || window != [self window])
+    if ([notification object] != [self window])
         return;
 
     if ([self image] == fButtonSelectedDim)
@@ -267,8 +266,7 @@
 
 - (void) setForInactive: (NSNotification *) notification
 {
-    NSWindow * window;
-    if (!(window = [notification object]) || window != [self window])
+    if ([notification object] != [self window])
         return;
 
     [self setImage: [self image] == fButtonSelected ? fButtonSelectedDim : fButtonNormalDim];
