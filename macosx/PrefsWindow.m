@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "PrefsWindow.h"
-#import "StringAdditions.h"
 
 @implementation PrefsWindow
 
