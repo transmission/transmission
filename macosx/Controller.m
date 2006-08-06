@@ -2218,16 +2218,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //hide search filter if it overlaps filter buttons
     NSRect buttonFrame = [fPauseFilterButton frame];
-    if (NSMaxX(buttonFrame) + 2.0 > [fSearchFilterField frame].origin.x)
-    {
-        if (![fSearchFilterField isHidden])
-            [fSearchFilterField setHidden: YES];
-    }
-    else
-    {
-        if ([fSearchFilterField isHidden])
-            [fSearchFilterField setHidden: NO];
-    }
+    [fSearchFilterField setHidden: NSMaxX(buttonFrame) + 2.0 > [fSearchFilterField frame].origin.x];
 }
 
 - (void) linkHomepage: (id) sender
