@@ -533,8 +533,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseDirectories: NO];
 
     [panel beginSheetForDirectory: nil file: nil types: [NSArray arrayWithObject: @"torrent"]
-        modalForWindow: fWindow modalDelegate: self didEndSelector:
-        @selector(openSheetClosed:returnCode:contextInfo:)
+        modalForWindow: fWindow modalDelegate: self didEndSelector: @selector(openSheetClosed:returnCode:contextInfo:)
         contextInfo: [NSNumber numberWithBool: sender == fOpenIgnoreDownloadFolder]];
 }
 
@@ -1404,10 +1403,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [torrent startTransfer];
                 desiredActive--;
             }
-            else;
+            else
+                continue;
+            
+            [torrent update];
         }
-        
-        [torrent update];
     }
 }
 
