@@ -475,11 +475,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
             [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
 
-            [panel beginSheetForDirectory: nil file: nil types: nil
-                modalForWindow: fWindow modalDelegate: self didEndSelector:
-                @selector( folderChoiceClosed:returnCode:contextInfo: )
-                contextInfo: torrent];
-            [NSApp runModalForWindow: panel];
+            [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
+                        didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: torrent];
         }
         else
         {
@@ -514,8 +511,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         [fTorrents addObject: torrent];
     }
-    
-    [NSApp stopModal];
 }
 
 //called on by applescript
