@@ -417,7 +417,7 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
     {
         /* Should not happen */
         tr_err( "readOrWriteBytes: offset out of range (%lld, %d, %d)",
-                offset, size, write );
+                offset, size, isWrite );
         goto fail;
     }
 
