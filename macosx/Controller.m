@@ -69,7 +69,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fLib = tr_init();
         
         fTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
-        fFilteredTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
+        fDisplayedTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
@@ -88,7 +88,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [fTorrents release];
-    [fFilteredTorrents release];
+    [fDisplayedTorrents release];
     
     [fToolbar release];
     [fInfoController release];
@@ -183,7 +183,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fActionButton setToolTip: @"Shortcuts for changing global settings."];
     [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
 
-    [fTableView setTorrents: fFilteredTorrents];
+    [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType,
@@ -432,32 +432,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet
 {
-    if ([fFilteredTorrents respondsToSelector: @selector(objectsAtIndexes:)])
-        return [fFilteredTorrents objectsAtIndexes: indexSet];
+    if ([fDisplayedTorrents respondsToSelector: @selector(objectsAtIndexes:)])
+        return [fDisplayedTorrents objectsAtIndexes: indexSet];
     else
     {
         NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
         unsigned int i;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            [torrents addObject: [fFilteredTorrents objectAtIndex: i]];
+            [torrents addObject: [fDisplayedTorrents objectAtIndex: i]];
 
         return torrents;
     }
-}
-
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
-    contextInfo: (Torrent *) torrent
-{
-    if (code == NSOKButton)
-    {
-        [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
-        [torrent update];
-        [self attemptToStartAuto: torrent];
-        
-        [fTorrents addObject: torrent];
-    }
-    
-    [NSApp stopModal];
 }
 
 - (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
@@ -516,6 +501,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self applyFilter: nil];
     
     [self updateTorrentHistory];
+}
+
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
+    contextInfo: (Torrent *) torrent
+{
+    if (code == NSOKButton)
+    {
+        [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
+        [torrent update];
+        [self attemptToStartAuto: torrent];
+        
+        [fTorrents addObject: torrent];
+    }
+    
+    [NSApp stopModal];
 }
 
 //called on by applescript
@@ -651,7 +651,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             if (selected == 1)
             {
                 title = [NSString stringWithFormat: @"Comfirm Removal of \"%@\"",
-                            [[fFilteredTorrents objectAtIndex: [fTableView selectedRow]] name]];
+                            [[fDisplayedTorrents objectAtIndex: [fTableView selectedRow]] name]];
                 message = @"This transfer is active."
                             " Once removed, continuing the transfer will require the torrent file."
                             " Do you really want to remove it?";
@@ -720,7 +720,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [torrent removeForever];
         
         [fTorrents removeObject: torrent];
-        [fFilteredTorrents removeObject: torrent];
+        [fDisplayedTorrents removeObject: torrent];
     }
     [torrents release];
 
@@ -833,7 +833,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSIndexSet * indexSet = [fTableView selectedRowIndexes];
     unsigned int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[fFilteredTorrents objectAtIndex: i] revealData];
+        [[fDisplayedTorrents objectAtIndex: i] revealData];
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -930,7 +930,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //remember selected rows if needed
     NSArray * selectedTorrents = nil;
     int numSelected = [fTableView numberOfSelectedRows];
-    if (numSelected > 0 && numSelected < [fFilteredTorrents count])
+    if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
         selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
 
     [self sortTorrentsIgnoreSelected]; //actually sort
@@ -942,7 +942,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
         NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
         while ((torrent = [enumerator nextObject]))
-            [indexSet addIndex: [fFilteredTorrents indexOfObject: torrent]];
+            [indexSet addIndex: [fDisplayedTorrents indexOfObject: torrent]];
         
         [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
         [indexSet release];
@@ -986,7 +986,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
 
-    [fFilteredTorrents sortUsingDescriptors: descriptors];
+    [fDisplayedTorrents sortUsingDescriptors: descriptors];
     [descriptors release];
     
     [fTableView reloadData];
@@ -1119,7 +1119,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [tempTorrents removeObjectAtIndex: i];
     }
     
-    [fFilteredTorrents setArray: tempTorrents];
+    [fDisplayedTorrents setArray: tempTorrents];
     [tempTorrents release];
     
     [self sortTorrentsIgnoreSelected];
@@ -1132,7 +1132,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
         unsigned index;
         while ((torrent = [enumerator nextObject]))
-            if ((index = [fFilteredTorrents indexOfObject: torrent]) != NSNotFound)
+            if ((index = [fDisplayedTorrents indexOfObject: torrent]) != NSNotFound)
                 [indexSet addIndex: index];
         
         [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
@@ -1142,7 +1142,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //set status bar torrent count text
     NSMutableString * totalTorrentsString = [NSMutableString stringWithString: @""];
     if (filtering)
-        [totalTorrentsString appendFormat: @"%d/", [fFilteredTorrents count]];
+        [totalTorrentsString appendFormat: @"%d/", [fDisplayedTorrents count]];
     
     int totalCount = [fTorrents count];
     [totalTorrentsString appendFormat: @"%d Transfer%s", totalCount, totalCount == 1 ? "" : "s"];
@@ -1465,13 +1465,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
 {
-    return [fFilteredTorrents count];
+    return [fDisplayedTorrents count];
 }
 
 - (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
     forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
-    [cell setTorrent: [fFilteredTorrents objectAtIndex: row]];
+    [cell setTorrent: [fDisplayedTorrents objectAtIndex: row]];
 }
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
@@ -1510,9 +1510,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
     }
-    else;
-    
-    return NSDragOperationNone;
+    else
+        return NSDragOperationNone;
 }
 
 - (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
@@ -1537,7 +1536,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         //remember selected rows if needed
         NSArray * selectedTorrents = nil;
         int numSelected = [fTableView numberOfSelectedRows];
-        if (numSelected > 0 && numSelected < [fFilteredTorrents count])
+        if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
             selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
@@ -1545,7 +1544,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         //move torrent in array 
         NSArray * movingTorrents = [[self torrentsAtIndexes: indexes] retain];
-        [fFilteredTorrents removeObjectsInArray: movingTorrents];
+        [fDisplayedTorrents removeObjectsInArray: movingTorrents];
         
         //determine the insertion index now that transfers to move have been removed
         int i, decrease = 0;
@@ -1554,7 +1553,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         //insert objects at new location
         for (i = 0; i < [movingTorrents count]; i++)
-            [fFilteredTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: newRow - decrease + i];
+            [fDisplayedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: newRow - decrease + i];
         
         [movingTorrents release];
         
@@ -1567,7 +1566,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         else;
         
         for (i = low; i <= high; i++)
-            [[fFilteredTorrents objectAtIndex: i] setOrderValue: i];
+            [[fDisplayedTorrents objectAtIndex: i] setOrderValue: i];
         
         [fTableView reloadData];
         
@@ -1578,7 +1577,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             NSEnumerator * enumerator = [selectedTorrents objectEnumerator];
             NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
             while ((torrent = [enumerator nextObject]))
-                [indexSet addIndex: [fFilteredTorrents indexOfObject: torrent]];
+                [indexSet addIndex: [fDisplayedTorrents indexOfObject: torrent]];
             
             [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
             [indexSet release];
@@ -1635,7 +1634,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show == ![fStatusBar isHidden])
+    if (show != [fStatusBar isHidden])
         return;
 
     if (show)
@@ -1696,7 +1695,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate
 {
-    if (show == ![fFilterBar isHidden])
+    if (show != [fFilterBar isHidden])
         return;
 
     if (show)
@@ -1895,7 +1894,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            if ([[fFilteredTorrents objectAtIndex: i] isActive])
+            if ([[fDisplayedTorrents objectAtIndex: i] isActive])
                 return YES;
         return NO;
     }
@@ -1907,7 +1906,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            if ([[fFilteredTorrents objectAtIndex: i] isPaused])
+            if ([[fDisplayedTorrents objectAtIndex: i] isPaused])
                 return YES;
         return NO;
     }
@@ -1921,6 +1920,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //only enable some items if it is in a context menu or the window is useable 
     BOOL canUseMenu = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
+
+    //enable open items
+    if (action == @selector(openShowSheet:))
+        return [fWindow attachedSheet] == nil;
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -1973,7 +1976,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
-            torrent = [fFilteredTorrents objectAtIndex: i];
+            torrent = [fDisplayedTorrents objectAtIndex: i];
             if (!warning && [torrent isActive])
             {
                 warning = onlyDownloading ? ![torrent isSeeding] : YES;
@@ -2052,7 +2055,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
-            torrent = [fFilteredTorrents objectAtIndex: i];
+            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isActive])
                 return YES;
         }
@@ -2071,7 +2074,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
-            torrent = [fFilteredTorrents objectAtIndex: i];
+            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isPaused])
                 return YES;
         }
@@ -2171,7 +2174,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSRect frame = [fWindow frame];
     float newHeight = frame.size.height - [fScrollView frame].size.height
-        + [fFilteredTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
+        + [fDisplayedTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
 
     float minHeight = [fWindow minSize].height;
     if (newHeight < minHeight)

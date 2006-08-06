@@ -35,7 +35,7 @@
 //height of button should be 17.0
 - (id) initWithCoder: (NSCoder *) coder
 {
-	if ((self = [super initWithCoder: coder]))
+    if ((self = [super initWithCoder: coder]))
     {
         fEnabled = NO;
         fTrackingTag = 0;
@@ -55,8 +55,8 @@
         
         [nc addObserver: self selector: @selector(resetBounds:)
                     name: NSViewBoundsDidChangeNotification object: nil];
-	}
-	return self;
+    }
+    return self;
 }
 
 - (void) dealloc

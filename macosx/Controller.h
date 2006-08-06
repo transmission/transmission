@@ -42,7 +42,7 @@
     tr_handle_t                     * fLib;
     int                             fCompleted;
     
-    NSMutableArray                  * fTorrents, * fFilteredTorrents;
+    NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     
     PrefsController                 * fPrefsController;
     NSUserDefaults                  * fDefaults;
