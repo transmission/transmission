@@ -20,9 +20,9 @@
                 setShowMessage = id; 
                 setSound = id; 
                 setSpeedLimit = id; 
+                setStartNumber = id; 
                 setStartSetting = id; 
                 setUpdate = id; 
-                setWaitToStart = id; 
             }; 
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
@@ -54,12 +54,12 @@
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 
                 fStartMatrix = NSMatrix; 
+                fStartNumberField = NSTextField; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
                 fUpdater = SUUpdater; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
-                fWaitToStartField = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

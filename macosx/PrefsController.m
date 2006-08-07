@@ -249,8 +249,8 @@
         tag = START_NO_CHECK_TAG;
     
     [fStartMatrix selectCellWithTag: tag];
-    [fWaitToStartField setEnabled: tag == START_WAIT_CHECK_TAG];
-    [fWaitToStartField setIntValue: [fDefaults integerForKey: @"WaitToStartNumber"]];
+    [fStartNumberField setEnabled: tag == START_WAIT_CHECK_TAG];
+    [fStartNumberField setIntValue: [fDefaults integerForKey: @"WaitToStartNumber"]];
     
     //set private torrents
     BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
@@ -627,11 +627,11 @@
     
     [fDefaults setObject: startSetting forKey: @"StartSetting"];
     
-    [self setWaitToStart: fWaitToStartField];
-    [fWaitToStartField setEnabled: tag == START_WAIT_CHECK_TAG];
+    [self setStartNumber: fStartNumberField];
+    [fStartNumberField setEnabled: tag == START_WAIT_CHECK_TAG];
 }
 
-- (void) setWaitToStart: (id) sender
+- (void) setStartNumber: (id) sender
 {
     int waitNumber = [sender intValue];
     if (![[sender stringValue] isEqualToString: [NSString stringWithInt: waitNumber]] || waitNumber < 1)

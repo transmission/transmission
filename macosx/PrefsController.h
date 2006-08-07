@@ -54,7 +54,7 @@
     IBOutlet NSTextField    * fRatioField;
     
     IBOutlet NSMatrix       * fStartMatrix;
-    IBOutlet NSTextField    * fWaitToStartField;
+    IBOutlet NSTextField    * fStartNumberField;
     
     IBOutlet SUUpdater      * fUpdater;
 
@@ -72,7 +72,7 @@
 - (void) checkUpdate;
 
 - (void) setStartSetting:   (id) sender;
-- (void) setWaitToStart:    (id) sender;
+- (void) setStartNumber:    (id) sender;
 
 - (void) setMoveTorrent:        (id) sender;
 - (void) setDownloadLocation:   (id) sender;

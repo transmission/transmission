@@ -7,16 +7,20 @@
 	<key>IBEditorPositions</key>
 	<dict>
 		<key>153</key>
-		<string>155 441 554 217 0 0 1152 842 </string>
+		<string>59 422 582 217 0 0 1152 842 </string>
 		<key>28</key>
-		<string>139 281 538 290 0 0 1152 842 </string>
+		<string>58 372 582 290 0 0 1152 842 </string>
 		<key>41</key>
-		<string>307 386 538 386 0 0 1152 842 </string>
+		<string>84 320 582 304 0 0 1152 842 </string>
 		<key>66</key>
-		<string>353 613 538 104 0 0 1152 842 </string>
+		<string>179 527 582 104 0 0 1152 842 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
+	<key>IBLockedTabItems</key>
+	<array>
+		<integer>253</integer>
+	</array>
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>41</integer>
