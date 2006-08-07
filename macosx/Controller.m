@@ -1667,12 +1667,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (!show)
         [fStatusBar setHidden: YES];
-    
-    //reset tracking rects for filter buttons
-    [fNoFilterButton resetBounds: nil];
-    [fSeedFilterButton resetBounds: nil];
-    [fDownloadFilterButton resetBounds: nil];
-    [fPauseFilterButton resetBounds: nil];
 }
 
 - (void) toggleFilterBar: (id) sender
@@ -1726,12 +1720,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fFilterBar setHidden: YES];
         [fWindow makeFirstResponder: fTableView];
     }
-    
-    //reset tracking rects for filter buttons
-    [fNoFilterButton resetBounds: nil];
-    [fSeedFilterButton resetBounds: nil];
-    [fDownloadFilterButton resetBounds: nil];
-    [fPauseFilterButton resetBounds: nil];
 }
 
 - (void) toggleAdvancedBar: (id) sender

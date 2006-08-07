@@ -54,7 +54,7 @@
                     name: NSWindowDidResignKeyNotification object: nil];
         
         [nc addObserver: self selector: @selector(resetBounds:)
-                    name: NSViewBoundsDidChangeNotification object: nil];
+                    name: NSViewFrameDidChangeNotification object: nil];
     }
     return self;
 }
@@ -225,7 +225,7 @@
 {
     if (!fEnabled)
         [self setImage: fButtonOver];
-
+    
     [super mouseEntered: event];
 }
 
