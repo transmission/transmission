@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key></key>
-	<string></string>
 	<key>AutoImport</key>
 	<false/>
 	<key>AutoImportDirectory</key>
@@ -52,6 +50,8 @@
 	<string>~/Desktop</string>
 	<key>PlayDownloadSound</key>
 	<true/>
+	<key>PlaySeedingSound</key>
+	<false/>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>

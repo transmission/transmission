@@ -37,7 +37,7 @@
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
                             * fQuitDownloadingCheck, * fRemoveDownloadingCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
-                            * fPlayDownloadSoundCheck,
+                            * fPlayDownloadSoundCheck, * fPlaySeedingSoundCheck,
                             * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck,
                             * fAutoImportCheck, * fAutoSizeCheck;
                             

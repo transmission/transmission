@@ -40,6 +40,7 @@
                 fImportFolderPopUp = NSPopUpButton; 
                 fNetworkView = NSView; 
                 fPlayDownloadSoundCheck = NSButton; 
+                fPlaySeedingSoundCheck = NSButton; 
                 fPortField = NSTextField; 
                 fQuitCheck = NSButton; 
                 fQuitDownloadingCheck = NSButton; 

@@ -193,6 +193,7 @@
     
     //set play sound
     [fPlayDownloadSoundCheck setState: [fDefaults boolForKey: @"PlayDownloadSound"]];
+    [fPlaySeedingSoundCheck setState: [fDefaults boolForKey: @"PlaySeedingSound"]];
     
     //set start setting
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
@@ -515,7 +516,11 @@
 
 - (void) setPlaySound: (id) sender
 {
-    [fDefaults setBool: [sender state] forKey: @"PlayDownloadSound"];
+    if (sender == fPlayDownloadSoundCheck)
+        [fDefaults setBool: [sender state] forKey: @"PlayDownloadSound"];
+    else if (sender == fPlaySeedingSoundCheck)
+        [fDefaults setBool: [sender state] forKey: @"PlaySeedingSound"];
+    else;
 }
 
 - (void) setUpdate: (id) sender

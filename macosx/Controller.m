@@ -1344,6 +1344,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self applyFilter: nil];
     [fInfoController updateInfoStatsAndSettings];
     
+    if ([fDefaults boolForKey: @"PlaySeedingSound"])
+    {
+        NSSound * sound;
+        if ((sound = [NSSound soundNamed: @"Submarine"]))
+            [sound play];
+    }
+    
     [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete" description: [[notification object] name]
         notificationName: GROWL_SEEDING_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
 }
