@@ -194,7 +194,7 @@
     //set play sound
     NSMutableArray * sounds = [NSMutableArray array];
     NSEnumerator * soundEnumerator,
-                * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds", @"Library/Sounds",
+                * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds",
                         [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil] objectEnumerator];
     NSString * soundPath, * sound;
     
