@@ -900,7 +900,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"PlayDownloadSound"])
     {
         NSSound * sound;
-        if ((sound = [NSSound soundNamed: @"Glass"]))
+        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
             [sound play];
     }
 
@@ -1347,7 +1347,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {
         NSSound * sound;
-        if ((sound = [NSSound soundNamed: @"Submarine"]))
+        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"SeedingSound"]]))
             [sound play];
     }
     

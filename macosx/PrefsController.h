@@ -33,7 +33,8 @@
     NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
-    IBOutlet NSPopUpButton  * fFolderPopUp, * fImportFolderPopUp;
+    IBOutlet NSPopUpButton  * fFolderPopUp, * fImportFolderPopUp,
+                            * fDownloadSoundPopUp, * fSeedingSoundPopUp;
     IBOutlet NSButton       * fQuitCheck, * fRemoveCheck,
                             * fQuitDownloadingCheck, * fRemoveDownloadingCheck,
                             * fBadgeDownloadRateCheck, * fBadgeUploadRateCheck,
@@ -66,6 +67,7 @@
 - (void) setShowMessage:    (id) sender;
 - (void) setBadge:          (id) sender;
 - (void) setPlaySound:      (id) sender;
+- (void) setSound:          (id) sender;
 - (void) setUpdate:         (id) sender;
 - (void) checkUpdate;
 

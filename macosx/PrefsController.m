@@ -192,8 +192,51 @@
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
     
     //set play sound
-    [fPlayDownloadSoundCheck setState: [fDefaults boolForKey: @"PlayDownloadSound"]];
-    [fPlaySeedingSoundCheck setState: [fDefaults boolForKey: @"PlaySeedingSound"]];
+    NSMutableArray * sounds = [NSMutableArray array];
+    NSEnumerator * soundEnumerator,
+                * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds", @"Library/Sounds",
+                        [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil] objectEnumerator];
+    NSString * soundPath, * sound;
+    
+    //get list of all sounds and sort alphabetically
+    while ((soundPath = [soundDirectoriesEnumerator nextObject]))
+        if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: soundPath])
+            while ((sound = [soundEnumerator nextObject]))
+            {
+                sound = [sound stringByDeletingPathExtension];
+                if ([NSSound soundNamed: sound])
+                    [sounds addObject: sound];
+            }
+    
+    [sounds sortUsingSelector: @selector(caseInsensitiveCompare:)];
+    
+    //set download sound
+    [fDownloadSoundPopUp removeAllItems];
+    [fDownloadSoundPopUp addItemsWithTitles: sounds];
+    
+    BOOL playDownloadSound = [fDefaults boolForKey: @"PlayDownloadSound"];
+    [fPlayDownloadSoundCheck setState: playDownloadSound];
+    [fDownloadSoundPopUp setEnabled: playDownloadSound];
+    
+    int downloadSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"DownloadSound"]];
+    if (downloadSoundIndex >= 0)
+        [fDownloadSoundPopUp selectItemAtIndex: downloadSoundIndex];
+    else
+        [fDefaults setObject: [fDownloadSoundPopUp titleOfSelectedItem] forKey: @"DownloadSound"];
+    
+    //set seeding sound
+    [fSeedingSoundPopUp removeAllItems];
+    [fSeedingSoundPopUp addItemsWithTitles: sounds];
+    
+    BOOL playSeedingSound = [fDefaults boolForKey: @"PlaySeedingSound"];
+    [fPlaySeedingSoundCheck setState: playSeedingSound];
+    [fSeedingSoundPopUp setEnabled: playSeedingSound];
+    
+    int seedingSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"SeedingSound"]];
+    if (seedingSoundIndex >= 0)
+        [fSeedingSoundPopUp selectItemAtIndex: seedingSoundIndex];
+    else
+        [fDefaults setObject: [fSeedingSoundPopUp titleOfSelectedItem] forKey: @"SeedingSound"];
     
     //set start setting
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
@@ -516,10 +559,33 @@
 
 - (void) setPlaySound: (id) sender
 {
+    BOOL state = [sender state];
+
     if (sender == fPlayDownloadSoundCheck)
-        [fDefaults setBool: [sender state] forKey: @"PlayDownloadSound"];
+    {
+        [fDownloadSoundPopUp setEnabled: state];
+        [fDefaults setBool: state forKey: @"PlayDownloadSound"];
+    }
     else if (sender == fPlaySeedingSoundCheck)
-        [fDefaults setBool: [sender state] forKey: @"PlaySeedingSound"];
+    {
+        [fSeedingSoundPopUp setEnabled: state];
+        [fDefaults setBool: state forKey: @"PlaySeedingSound"];
+    }
+    else;
+}
+
+- (void) setSound: (id) sender
+{
+    //play sound when selecting
+    NSString * soundName = [sender titleOfSelectedItem];
+    NSSound * sound;
+    if ((sound = [NSSound soundNamed: soundName]))
+        [sound play];
+
+    if (sender == fDownloadSoundPopUp)
+        [fDefaults setObject: soundName forKey: @"DownloadSound"];
+    else if (sender == fSeedingSoundPopUp)
+        [fDefaults setObject: soundName forKey: @"SeedingSound"];
     else;
 }
 

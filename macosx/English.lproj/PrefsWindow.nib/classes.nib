@@ -18,6 +18,7 @@
                 setRatio = id; 
                 setRatioCheck = id; 
                 setShowMessage = id; 
+                setSound = id; 
                 setSpeedLimit = id; 
                 setStartSetting = id; 
                 setUpdate = id; 
@@ -35,6 +36,7 @@
                 fDeleteOriginalTorrentCheck = NSButton; 
                 fDownloadCheck = NSButton; 
                 fDownloadField = NSTextField; 
+                fDownloadSoundPopUp = NSPopUpButton; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
                 fImportFolderPopUp = NSPopUpButton; 
@@ -48,6 +50,7 @@
                 fRatioField = NSTextField; 
                 fRemoveCheck = NSButton; 
                 fRemoveDownloadingCheck = NSButton; 
+                fSeedingSoundPopUp = NSPopUpButton; 
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 
                 fStartMatrix = NSMatrix; 
