@@ -191,6 +191,9 @@
     [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
     [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
     
+    //set play sound
+    [fPlayDownloadSoundCheck setState: [fDefaults boolForKey: @"PlayDownloadSound"]];
+    
     //set start setting
     NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
     int tag;
@@ -508,6 +511,11 @@
     else;
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
+}
+
+- (void) setPlaySound: (id) sender
+{
+    [fDefaults setBool: [sender state] forKey: @"PlayDownloadSound"];
 }
 
 - (void) setUpdate: (id) sender

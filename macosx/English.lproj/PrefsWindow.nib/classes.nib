@@ -13,6 +13,7 @@
                 setLimit = id; 
                 setLimitCheck = id; 
                 setMoveTorrent = id; 
+                setPlaySound = id; 
                 setPort = id; 
                 setRatio = id; 
                 setRatioCheck = id; 
@@ -38,6 +39,7 @@
                 fGeneralView = NSView; 
                 fImportFolderPopUp = NSPopUpButton; 
                 fNetworkView = NSView; 
+                fPlayDownloadSoundCheck = NSButton; 
                 fPortField = NSTextField; 
                 fQuitCheck = NSButton; 
                 fQuitDownloadingCheck = NSButton; 

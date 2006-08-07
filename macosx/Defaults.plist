@@ -50,6 +50,8 @@
 	<string>Constant</string>
 	<key>MoveFolder</key>
 	<string>~/Desktop</string>
+	<key>PlayDownloadSound</key>
+	<true/>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>

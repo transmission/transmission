@@ -897,6 +897,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self applyFilter: nil];
     [self checkToStartWaiting: torrent];
 
+    if ([fDefaults boolForKey: @"PlayDownloadSound"])
+    {
+        NSSound * sound;
+        if ((sound = [NSSound soundNamed: @"Glass"]))
+            [sound play];
+    }
+
     [GrowlApplicationBridge notifyWithTitle: @"Download Complete" description: [torrent name]
         notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
 
