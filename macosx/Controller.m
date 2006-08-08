@@ -44,6 +44,7 @@
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
+#define GROWL_AUTO_SPEED_LIMIT  @"Speed Limit Auto Changed"
 
 #define TORRENT_TABLE_VIEW_DATA_TYPE    @"TorrentTableViewDataType"
 
@@ -1227,7 +1228,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     
     if ([currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
+    {
         [self toggleSpeedLimit: nil];
+        
+        [GrowlApplicationBridge notifyWithTitle: [@"Speed Limit Auto " stringByAppendingString: 
+            fSpeedLimitEnabled ? @"Enabled" : @"Disabled"] description: @"Bandwidth settings changed"
+            notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
+    }
 }
 
 - (void) setLimitGlobalEnabled: (id) sender
@@ -2271,8 +2278,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSDictionary *) registrationDictionaryForGrowl
 {
-    NSArray * notifications = [NSArray arrayWithObjects: GROWL_DOWNLOAD_COMPLETE,
-                                        GROWL_SEEDING_COMPLETE, GROWL_AUTO_ADD, nil];
+    NSArray * notifications = [NSArray arrayWithObjects: GROWL_DOWNLOAD_COMPLETE, GROWL_SEEDING_COMPLETE,
+                                                            GROWL_AUTO_ADD, GROWL_AUTO_SPEED_LIMIT, nil];
     return [NSDictionary dictionaryWithObjectsAndKeys: notifications, GROWL_NOTIFICATIONS_ALL,
                                 notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
 }
