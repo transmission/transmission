@@ -33,9 +33,10 @@
         [self close];
 }
 
-- (void) windowWillClose: (NSNotification *) notification
+- (void) close
 {
     [self makeFirstResponder: nil]; //essentially saves changes on window close
+    [super close];
 }
 
 @end

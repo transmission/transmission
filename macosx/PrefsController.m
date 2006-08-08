@@ -77,9 +77,7 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
         
-        NSWindow * window = [self window];
-        [window setDelegate: window];
-        [window update]; //make sure nib is loaded right away
+        [[self window] update]; //make sure nib is loaded right away
     }
     return self;
 }
