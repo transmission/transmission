@@ -134,6 +134,13 @@
         [fDataLocationField setToolTip: nil];
         [fDateStartedField setStringValue: @""];
         
+        //don't allow empty strings to be selected
+        [fTrackerField setSelectable: NO];
+        [fAnnounceField setSelectable: NO];
+        [fHashField setSelectable: NO];
+        [fTorrentLocationField setSelectable: NO];
+        [fDataLocationField setSelectable: NO];
+        
         [fStateField setStringValue: @""];
 /*
         [fPercentField setStringValue: @""];
@@ -174,6 +181,13 @@
         [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
+        
+        //don't allow empty strings to be selected
+        [fTrackerField setSelectable: YES];
+        [fAnnounceField setSelectable: YES];
+        [fHashField setSelectable: YES];
+        [fTorrentLocationField setSelectable: YES];
+        [fDataLocationField setSelectable: YES];
     }
     
     //update stats and settings
