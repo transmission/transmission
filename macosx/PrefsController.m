@@ -785,6 +785,12 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
+- (void) helpForNetwork: (id) sender
+{
+    [[NSHelpManager sharedHelpManager] openHelpAnchor: @"PortForwarding"
+        inBook: [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleHelpBookName"]];
+}
+
 @end
 
 @implementation PrefsController (Private)

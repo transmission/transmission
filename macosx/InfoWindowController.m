@@ -134,7 +134,7 @@
         [fDataLocationField setToolTip: nil];
         [fDateStartedField setStringValue: @""];
         
-        //don't allow empty strings to be selected
+        //don't allow empty fields to be selected
         [fTrackerField setSelectable: NO];
         [fAnnounceField setSelectable: NO];
         [fHashField setSelectable: NO];
@@ -182,7 +182,7 @@
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
         
-        //allow these strings to be selected
+        //allow these fields to be selected
         [fTrackerField setSelectable: YES];
         [fAnnounceField setSelectable: YES];
         [fHashField setSelectable: YES];

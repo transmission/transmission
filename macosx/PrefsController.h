@@ -103,4 +103,6 @@
 - (void) setRatioEnabled:   (BOOL) enable;
 - (void) setQuickRatio: (float) ratioLimit;
 
+- (void) helpForNetwork: (id) sender;
+
 @end

@@ -6,6 +6,7 @@
         {
             ACTIONS = {
                 folderSheetShow = id; 
+                helpForNetwork = id; 
                 importFolderSheetShow = id; 
                 setAutoImport = id; 
                 setAutoSize = id; 
