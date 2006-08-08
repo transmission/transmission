@@ -221,18 +221,18 @@
 */
             int seeders = [torrent seeders], leechers = [torrent leechers];
             [fSeedersField setStringValue: seeders < 0 ?
-                @"N/A" : [NSString stringWithInt: seeders]];
+                @"" : [NSString stringWithInt: seeders]];
             [fLeechersField setStringValue: leechers < 0 ?
-                @"N/A" : [NSString stringWithInt: leechers]];
+                @"" : [NSString stringWithInt: leechers]];
             
             BOOL active = [torrent isActive];
             
             [fConnectedPeersField setStringValue: active ? [NSString
-                    stringWithInt: [torrent totalPeers]] : @"N/A"];
+                    stringWithInt: [torrent totalPeers]] : @""];
             [fDownloadingFromField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersUploading]] : @"N/A"];
+                    stringWithInt: [torrent peersUploading]] : @""];
             [fUploadingToField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersDownloading]] : @"N/A"];
+                    stringWithInt: [torrent peersDownloading]] : @""];
             
             [fRatioField setStringValue: [NSString stringForRatioWithDownload:
                                         downloadedTotal upload: uploadedTotal]];
