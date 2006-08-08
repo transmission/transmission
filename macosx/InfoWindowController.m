@@ -182,7 +182,7 @@
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
         
-        //don't allow empty strings to be selected
+        //allow these strings to be selected
         [fTrackerField setSelectable: YES];
         [fAnnounceField setSelectable: YES];
         [fHashField setSelectable: YES];

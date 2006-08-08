@@ -123,6 +123,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fWindow setDelegate: self];
     
     [fWindow makeFirstResponder: fTableView];
+    [fWindow setExcludedFromWindowsMenu: YES];
     
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
@@ -1223,11 +1224,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     
     NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
-    //do nothing if not within first few seconds of hour
-    if ([currentDate minuteOfHour] > 0 || [currentDate secondOfMinute] >= AUTO_SPEED_LIMIT_SECONDS)
-        return;
-    
-    if ([currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
+    //toggle if within first few seconds of hour
+    if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
+            && [currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
     {
         [self toggleSpeedLimit: nil];
         

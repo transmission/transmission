@@ -35,7 +35,7 @@
 
 - (void) close
 {
-    [self makeFirstResponder: nil]; //essentially saves changes on window close
+    [self makeFirstResponder: nil]; //essentially saves pref changes on window close
     [super close];
 }
 
