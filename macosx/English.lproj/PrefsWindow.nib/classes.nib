@@ -2,12 +2,15 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {CLASS = NSDatePicker; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {
                 folderSheetShow = id; 
                 importFolderSheetShow = id; 
                 setAutoImport = id; 
                 setAutoSize = id; 
+                setAutoSpeedLimitCheck = id; 
+                setAutoSpeedLimitHour = id; 
                 setBadge = id; 
                 setDownloadLocation = id; 
                 setLimit = id; 
@@ -51,6 +54,10 @@
                 fRemoveCheck = NSButton; 
                 fRemoveDownloadingCheck = NSButton; 
                 fSeedingSoundPopUp = NSPopUpButton; 
+                fSpeedLimitAutoOffCheck = NSButton; 
+                fSpeedLimitAutoOffField = NSTextField; 
+                fSpeedLimitAutoOnCheck = NSButton; 
+                fSpeedLimitAutoOnField = NSTextField; 
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 
                 fStartMatrix = NSMatrix; 

@@ -77,7 +77,9 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
         
-        [[self window] update]; //make sure nib is loaded right away
+        NSWindow * window = [self window];
+        [window setDelegate: window];
+        [window update]; //make sure nib is loaded right away
     }
     return self;
 }
@@ -168,6 +170,21 @@
         tr_setUploadLimit(fHandle, checkUpload ? uploadLimit : -1);
         tr_setDownloadLimit(fHandle, checkDownload ? downloadLimit : -1);
     }
+    
+    //set auto speed limit
+    BOOL speedLimitAutoOn = [fDefaults boolForKey: @"SpeedLimitAutoOn"];
+    int speedLimitAutoOnHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"];
+    
+    [fSpeedLimitAutoOnCheck setState: speedLimitAutoOn];
+    [fSpeedLimitAutoOnField setIntValue: speedLimitAutoOnHour];
+    [fSpeedLimitAutoOnField setEnabled: speedLimitAutoOn];
+    
+    BOOL speedLimitAutoOff = [fDefaults boolForKey: @"SpeedLimitAutoOff"];
+    int speedLimitAutoOffHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
+    
+    [fSpeedLimitAutoOffCheck setState: speedLimitAutoOff];
+    [fSpeedLimitAutoOffField setIntValue: speedLimitAutoOffHour];
+    [fSpeedLimitAutoOffField setEnabled: speedLimitAutoOff];
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
@@ -375,10 +392,11 @@
     {
         if (![fDefaults boolForKey: @"SpeedLimit"])
         {
+            int realLimit = [check state] ? limit : -1;
             if (sender == fUploadField)
-                tr_setUploadLimit(fHandle, [fUploadCheck state] ? limit : -1);
+                tr_setUploadLimit(fHandle, realLimit);
             else
-                tr_setDownloadLimit(fHandle, [fDownloadCheck state] ? limit : -1);
+                tr_setDownloadLimit(fHandle, realLimit);
         }
         
         [fDefaults setInteger: limit forKey: key];
@@ -479,6 +497,43 @@
         
         [fDefaults setInteger: limit forKey: key];
     }
+}
+
+- (void) setAutoSpeedLimitCheck: (id) sender
+{
+    NSString * key;
+    NSTextField * field;
+    if (sender == fSpeedLimitAutoOnCheck)
+    {
+        key = @"SpeedLimitAutoOn";
+        field = fSpeedLimitAutoOnField;
+    }
+    else
+    {
+        key = @"SpeedLimitAutoOff";
+        field = fSpeedLimitAutoOffField;
+    }
+    
+    BOOL check = [sender state] == NSOnState;
+    [self setAutoSpeedLimitHour: field];
+    [field setEnabled: check];
+    
+    [fDefaults setBool: check forKey: key];
+}
+
+- (void) setAutoSpeedLimitHour: (id) sender
+{
+    NSString * key = (sender == fSpeedLimitAutoOnField) ? @"SpeedLimitAutoOnHour" : @"SpeedLimitAutoOffHour";
+
+    int hour = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]] || hour < 0 || hour > 23)
+    {
+        NSBeep();
+        hour = [fDefaults integerForKey: key];
+        [sender setIntValue: hour];
+    }
+    else
+        [fDefaults setInteger: hour forKey: key];
 }
 
 - (void) setRatio: (id) sender
@@ -730,11 +785,6 @@
     [fDefaults setBool: [sender state] forKey: @"AutoSize"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
-}
-
-- (void) windowWillClose: (NSNotification *) notification
-{
-    [[self window] makeFirstResponder: nil];
 }
 
 @end

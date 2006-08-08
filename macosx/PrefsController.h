@@ -45,8 +45,10 @@
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
-                            * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
-    IBOutlet NSButton       * fUploadCheck, * fDownloadCheck;
+                            * fSpeedLimitUploadField, * fSpeedLimitDownloadField,
+                            * fSpeedLimitAutoOnField, * fSpeedLimitAutoOffField;
+    IBOutlet NSButton       * fUploadCheck, * fDownloadCheck,
+                            * fSpeedLimitAutoOnCheck, * fSpeedLimitAutoOffCheck;
 
     IBOutlet NSTextField    * fPortField;
     
@@ -80,6 +82,9 @@
 
 - (void) setPort:       (id) sender;
 - (void) setSpeedLimit: (id) sender;
+
+- (void) setAutoSpeedLimitCheck: (id) sender;
+- (void) setAutoSpeedLimitHour: (id) sender;
 
 - (void) setLimit:          (id) sender;
 - (void) setLimitCheck:     (id) sender;

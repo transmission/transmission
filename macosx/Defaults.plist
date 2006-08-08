@@ -74,6 +74,14 @@
 	<string>Order</string>
 	<key>SpeedLimit</key>
 	<false/>
+	<key>SpeedLimitAutoOff</key>
+	<false/>
+	<key>SpeedLimitAutoOffHour</key>
+	<integer>0</integer>
+	<key>SpeedLimitAutoOn</key>
+	<false/>
+	<key>SpeedLimitAutoOnHour</key>
+	<integer>12</integer>
 	<key>SpeedLimitDownloadLimit</key>
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>

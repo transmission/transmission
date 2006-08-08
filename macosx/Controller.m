@@ -51,6 +51,8 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
+#define AUTO_SPEED_LIMIT_SECONDS    10.0
+
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
@@ -344,6 +346,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
+    //timer to auto toggle speed limit
+    fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
+        selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
+    
     //timer to check for auto import every 15 seconds, must do after everything else is set up
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
@@ -397,6 +403,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //stop timers
     [fAutoImportTimer invalidate];
+    [fSpeedLimitTimer invalidate];
     [fTimer invalidate];
     
     //save history and stop running torrents
@@ -1199,6 +1206,28 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         : ([NSColor currentControlTint] == NSBlueControlTint ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage)];
     
     [fPrefsController enableSpeedLimit: fSpeedLimitEnabled];
+}
+
+- (void) autoSpeedLimit: (NSTimer *) timer
+{
+    BOOL autoOn, autoOff;
+    if (!(autoOn = [fDefaults boolForKey: @"SpeedLimitAutoOn"])
+            && !(autoOff = [fDefaults boolForKey: @"SpeedLimitAutoOff"]))
+        return;
+ 
+    //do nothing if time to turn on and off are equal
+    int onHour, offHour;
+    if ((onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"])
+            == (offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]) && autoOn && autoOff)
+        return;
+    
+    NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
+    //do nothing if not within first few seconds of hour
+    if ([currentDate minuteOfHour] > 0 || [currentDate secondOfMinute] >= AUTO_SPEED_LIMIT_SECONDS)
+        return;
+    
+    if ([currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
+        [self toggleSpeedLimit: nil];
 }
 
 - (void) setLimitGlobalEnabled: (id) sender

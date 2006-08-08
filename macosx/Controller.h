@@ -60,6 +60,7 @@
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     BOOL                            fSpeedLimitEnabled;
     NSImage                         * fSpeedLimitNormalImage, * fSpeedLimitBlueImage, * fSpeedLimitGraphiteImage;
+    NSTimer                         * fSpeedLimitTimer;
     
     IBOutlet ImageBackgroundView    * fStatusBar;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
@@ -146,6 +147,7 @@
 - (void) setFilter: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;
+- (void) autoSpeedLimit: (NSTimer *) timer;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;

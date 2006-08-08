@@ -26,10 +26,16 @@
 
 @implementation PrefsWindow
 
--(void) keyDown: (NSEvent *) event
+- (void) keyDown: (NSEvent *) event
 {
+    [super keyDown: event];
     if ([event keyCode] == 53) //esc key
         [self close];
+}
+
+- (void) windowWillClose: (NSNotification *) notification
+{
+    [self makeFirstResponder: nil]; //essentially saves changes on window close
 }
 
 @end
