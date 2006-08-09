@@ -462,6 +462,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
 {
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"], * torrentPath;
+    
+    if (ignore || [downloadChoice isEqualToString: @"Ask"])
+    {
+        [self openFilesAsk: [[filenames mutableCopy] retain]];
+        return;
+    }
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
@@ -470,36 +477,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             continue;
 
         //add it to the "File > Open Recent" menu
-        [[NSDocumentController sharedDocumentController]
-            noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
+        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
 
-        if (ignore || [downloadChoice isEqualToString: @"Ask"])
-        {
-            NSOpenPanel * panel = [NSOpenPanel openPanel];
-
-            [panel setPrompt: @"Select"];
-            [panel setAllowsMultipleSelection: NO];
-            [panel setCanChooseFiles: NO];
-            [panel setCanChooseDirectories: YES];
-
-            [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
-
-            [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
-                    didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: [torrent retain]];
-        }
-        else
-        {
-            NSString * folder = [downloadChoice isEqualToString: @"Constant"]
-                ? [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]
-                : [torrentPath stringByDeletingLastPathComponent];
-
-            [torrent setDownloadFolder: folder];
-            [torrent update];
-            [self attemptToStartAuto: torrent];
-            
-            [fTorrents addObject: torrent];
-        }
+        NSString * folder = [downloadChoice isEqualToString: @"Constant"]
+            ? [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]
+            : [torrentPath stringByDeletingLastPathComponent];
         
+        [torrent setDownloadFolder: folder];
+        [torrent update];
+        [self attemptToStartAuto: torrent];
+        
+        [fTorrents addObject: torrent];
         [torrent release];
     }
 
@@ -509,9 +497,49 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
-    contextInfo: (Torrent *) torrent
+//called by the main open method to show sheet for choosing download location
+- (void) openFilesAsk: (NSMutableArray *) files
 {
+    NSString * torrentPath;
+    Torrent * torrent;
+    do
+    {
+        if ([files count] == 0) //recursive base case
+        {
+            [files release];
+            return;
+        }
+    
+        torrentPath = [files objectAtIndex: 0];
+        torrent = [[Torrent alloc] initWithPath: torrentPath lib: fLib];
+        
+        [files removeObjectAtIndex: 0];
+    } while (!torrent);
+
+    //add it to the "File > Open Recent" menu
+    [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
+
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+
+    [panel setPrompt: @"Select"];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
+
+    [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
+    
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                    torrent, @"Torrent", files, @"Files", nil];
+
+    [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
+            didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
+}
+
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
+    contextInfo: (NSDictionary *) dictionary
+{
+    Torrent * torrent = [dictionary objectForKey: @"Torrent"];
+
     if (code == NSOKButton)
     {
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
@@ -523,7 +551,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self updateUI: nil];
         [self applyFilter: nil];
     }
+    
     [torrent release];
+    
+    [self performSelectorOnMainThread: @selector(openFilesAsk:) withObject: [dictionary objectForKey: @"Files"]
+                        waitUntilDone: NO];
+    
+    [dictionary release];
 }
 
 //called on by applescript

@@ -96,6 +96,7 @@
 
 - (void) openFiles: (NSArray *) filenames;
 - (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore;
+- (void) openFilesAsk: (NSMutableArray *) files;
 - (void) openShowSheet: (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
