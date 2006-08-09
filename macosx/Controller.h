@@ -94,9 +94,9 @@
     Badger                          * fBadger;
 }
 
-- (void) openFiles: (NSArray *) filenames;
-- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore;
-- (void) openFilesAsk: (NSMutableArray *) files;
+- (void) openFiles:     (NSArray *) filenames;
+- (void) openFiles:     (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore;
+- (void) openFilesAsk:  (NSMutableArray *) files;
 - (void) openShowSheet: (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
@@ -170,7 +170,7 @@
 
 - (void) reloadInspectorSettings: (NSNotification *) notification;
 
-- (void) checkAutoImportDirectory: (NSTimer *) t;
+- (void) checkAutoImportDirectory: (NSTimer *) timer;
 - (void) autoImportChange: (NSNotification *) notification;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;

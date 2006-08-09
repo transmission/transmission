@@ -52,6 +52,8 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
+#define UPDATE_UI_SECONDS           1.0
+#define AUTO_IMPORT_SECONDS         15.0
 #define AUTO_SPEED_LIMIT_SECONDS    10.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
@@ -336,7 +338,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //timer to update the interface every second
     fCompleted = 0;
     [self updateUI: nil];
-    fTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 target: self
+    fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
         selector: @selector(updateUI:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
@@ -353,7 +355,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
     
     //timer to check for auto import every 15 seconds, must do after everything else is set up
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 15.0 target: self 
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_IMPORT_SECONDS target: self 
         selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
 }
@@ -465,7 +467,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (ignore || [downloadChoice isEqualToString: @"Ask"])
     {
-        [self openFilesAsk: [[filenames mutableCopy] retain]];
+        [self openFilesAsk: [filenames mutableCopy]];
         return;
     }
     
@@ -554,11 +556,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self applyFilter: nil];
     }
     
-    [torrent release];
-    
     [self performSelectorOnMainThread: @selector(openFilesAsk:) withObject: [dictionary objectForKey: @"Files"]
                         waitUntilDone: NO];
     
+    [torrent release];
     [dictionary release];
 }
 
