@@ -386,10 +386,11 @@ int tr_torrentCount( tr_handle_t * h )
 
 void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
 {
-    tr_torrent_t * tor;
+    tr_torrent_t * tor, * next;
 
-    for( tor = h->torrentList; tor; tor = tor->next )
+    for( tor = h->torrentList; tor; tor = next )
     {
+        next = tor->next;
         func( tor, d );
     }
 }
