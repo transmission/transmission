@@ -507,6 +507,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([files count] == 0) //recursive base case
         {
             [files release];
+            
+            [self updateTorrentHistory];
             return;
         }
     
