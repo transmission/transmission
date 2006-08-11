@@ -1266,23 +1266,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             == (offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]))
         return;
     
-    BOOL rangeForOn = onHour < offHour;
-    int min, max;
-    if (rangeForOn)
-    {
-        min = onHour;
-        max = offHour;
-    }
-    else
-    {
-        min = offHour;
-        max = onHour;
-    }
-    
+    BOOL shouldBeOn;
     int hour = [[NSCalendarDate calendarDate] hourOfDay];
-    BOOL inRange = hour >= min && hour < max;
+    if (onHour < offHour)
+        shouldBeOn = hour >= onHour && hour < offHour;
+    else
+        shouldBeOn = hour < offHour || hour >= onHour;
     
-    if ((!fSpeedLimitEnabled && (rangeForOn == inRange)) || (fSpeedLimitEnabled && (rangeForOn != inRange)))
+    if ((!fSpeedLimitEnabled && shouldBeOn) || (fSpeedLimitEnabled && !shouldBeOn))
     {
         [self toggleSpeedLimit: nil];
         
