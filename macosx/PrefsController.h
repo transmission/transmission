@@ -48,7 +48,7 @@
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField,
                             * fSpeedLimitAutoOnField, * fSpeedLimitAutoOffField;
     IBOutlet NSButton       * fUploadCheck, * fDownloadCheck,
-                            * fSpeedLimitAutoOnCheck, * fSpeedLimitAutoOffCheck;
+                            * fSpeedLimitAutoCheck;
 
     IBOutlet NSTextField    * fPortField;
     

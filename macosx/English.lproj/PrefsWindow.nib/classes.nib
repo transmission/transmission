@@ -55,9 +55,8 @@
                 fRemoveCheck = NSButton; 
                 fRemoveDownloadingCheck = NSButton; 
                 fSeedingSoundPopUp = NSPopUpButton; 
-                fSpeedLimitAutoOffCheck = NSButton; 
+                fSpeedLimitAutoCheck = NSButton; 
                 fSpeedLimitAutoOffField = NSTextField; 
-                fSpeedLimitAutoOnCheck = NSButton; 
                 fSpeedLimitAutoOnField = NSTextField; 
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 

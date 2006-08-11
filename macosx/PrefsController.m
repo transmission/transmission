@@ -170,19 +170,16 @@
     }
     
     //set auto speed limit
-    BOOL speedLimitAutoOn = [fDefaults boolForKey: @"SpeedLimitAutoOn"];
+    BOOL speedLimitAuto = [fDefaults boolForKey: @"SpeedLimitAuto"];
+    [fSpeedLimitAutoCheck setState: speedLimitAuto];
+    
     int speedLimitAutoOnHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"];
-    
-    [fSpeedLimitAutoOnCheck setState: speedLimitAutoOn];
     [fSpeedLimitAutoOnField setIntValue: speedLimitAutoOnHour];
-    [fSpeedLimitAutoOnField setEnabled: speedLimitAutoOn];
+    [fSpeedLimitAutoOnField setEnabled: speedLimitAuto];
     
-    BOOL speedLimitAutoOff = [fDefaults boolForKey: @"SpeedLimitAutoOff"];
     int speedLimitAutoOffHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
-    
-    [fSpeedLimitAutoOffCheck setState: speedLimitAutoOff];
     [fSpeedLimitAutoOffField setIntValue: speedLimitAutoOffHour];
-    [fSpeedLimitAutoOffField setEnabled: speedLimitAutoOff];
+    [fSpeedLimitAutoOffField setEnabled: speedLimitAuto];
     
     //set ratio limit
     BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
@@ -499,24 +496,15 @@
 
 - (void) setAutoSpeedLimitCheck: (id) sender
 {
-    NSString * key;
-    NSTextField * field;
-    if (sender == fSpeedLimitAutoOnCheck)
-    {
-        key = @"SpeedLimitAutoOn";
-        field = fSpeedLimitAutoOnField;
-    }
-    else
-    {
-        key = @"SpeedLimitAutoOff";
-        field = fSpeedLimitAutoOffField;
-    }
-    
     BOOL check = [sender state] == NSOnState;
-    [self setAutoSpeedLimitHour: field];
-    [field setEnabled: check];
     
-    [fDefaults setBool: check forKey: key];
+    [fDefaults setBool: check forKey: @"SpeedLimitAuto"];
+
+    [self setAutoSpeedLimitHour: fSpeedLimitAutoOnField];
+    [fSpeedLimitAutoOnField setEnabled: check];
+    
+    [self setAutoSpeedLimitHour: fSpeedLimitAutoOffField];
+    [fSpeedLimitAutoOffField setEnabled: check];
 }
 
 - (void) setAutoSpeedLimitHour: (id) sender
@@ -532,6 +520,8 @@
     }
     else
         [fDefaults setInteger: hour forKey: key];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }
 
 - (void) setRatio: (id) sender
