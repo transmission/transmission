@@ -405,6 +405,13 @@ int tr_getFinished( tr_torrent_t * tor )
     return 0;
 }
 
+tr_peer_t * tr_getPeer( tr_torrent_t * tor, int peerNum)
+{
+    if (peerNum < 0 || peerNum >= tor->peerCount)
+        return NULL;
+    return tor->peers[peerNum];
+}
+
 tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;

@@ -1273,7 +1273,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         shouldBeOn = hour < offHour || hour >= onHour;
     
-    if ((!fSpeedLimitEnabled && shouldBeOn) || (fSpeedLimitEnabled && !shouldBeOn))
+    if (fSpeedLimitEnabled != shouldBeOn)
     {
         [self toggleSpeedLimit: nil];
         

@@ -198,6 +198,15 @@ void tr_torrentStop( tr_torrent_t * );
 int tr_getFinished( tr_torrent_t * );
 
 /***********************************************************************
+ * tr_getPeer
+ ***********************************************************************
+ * Returns the peer at peerNum. Returns NULL if peerNum is not greater
+ * than 0 and less than peerCount.
+ **********************************************************************/
+typedef struct tr_peer_s tr_peer_t;
+tr_peer_t * tr_getPeer( tr_torrent_t *, int peerNum );
+
+/***********************************************************************
  * tr_torrentStat
  ***********************************************************************
  * Returns a pointer to an tr_stat_t structure with updated information
