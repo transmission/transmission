@@ -1260,12 +1260,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
  
-    //do nothing if time to turn on and off are equal
-    int onHour, offHour;
-    if ((onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"])
-            == (offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]))
-        return;
+    int onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"],
+        offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
     
+    //check if should be on if within range
     BOOL shouldBeOn;
     int hour = [[NSCalendarDate calendarDate] hourOfDay];
     if (onHour < offHour)
@@ -1279,21 +1277,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) autoSpeedLimit: (NSTimer *) timer
 {
-    BOOL autoOn, autoOff;
-    if (!(autoOn = [fDefaults boolForKey: @"SpeedLimitAutoOn"])
-            && !(autoOff = [fDefaults boolForKey: @"SpeedLimitAutoOff"]))
+    if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
  
-    //do nothing if time to turn on and off are equal
-    int onHour, offHour;
-    if ((onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"])
-            == (offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]) && autoOn && autoOff)
-        return;
-    
-    NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
     //toggle if within first few seconds of hour
+    NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
     if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
-            && [currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
+            && [currentDate hourOfDay] == (fSpeedLimitEnabled ? [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]
+                                            : [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]))
     {
         [self toggleSpeedLimit: nil];
         

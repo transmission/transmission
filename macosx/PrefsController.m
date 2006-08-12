@@ -512,7 +512,8 @@
     NSString * key = (sender == fSpeedLimitAutoOnField) ? @"SpeedLimitAutoOnHour" : @"SpeedLimitAutoOffHour";
 
     int hour = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]] || hour < 0 || hour > 23)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]] || hour < 0 || hour > 23
+        || [fSpeedLimitAutoOnField intValue] == [fSpeedLimitAutoOffField intValue])
     {
         NSBeep();
         hour = [fDefaults integerForKey: key];
