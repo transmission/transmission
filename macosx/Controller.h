@@ -148,7 +148,8 @@
 - (void) setFilter: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;
-- (void) autoSpeedLimit: (id) sender;
+- (void) autoSpeedLimitChange: (NSNotification *) notification;
+- (void) autoSpeedLimit: (NSTimer *) timer;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;

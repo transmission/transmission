@@ -305,7 +305,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(ratioGlobalChange:)
                     name: @"RatioGlobalChange" object: nil];
     
-    [nc addObserver: self selector: @selector(autoSpeedLimit:)
+    [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
                     name: @"AutoSpeedLimitChange" object: nil];
     
     [nc addObserver: self selector: @selector(autoImportChange:)
@@ -354,7 +354,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self showInfo: nil];
     
     //timer to auto toggle speed limit
-    [self autoSpeedLimit: nil];
+    [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
     
@@ -1255,7 +1255,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fPrefsController enableSpeedLimit: fSpeedLimitEnabled];
 }
 
-- (void) autoSpeedLimit: (id) sender
+- (void) autoSpeedLimitChange: (NSNotification *) notification
 {
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
@@ -1274,6 +1274,26 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         shouldBeOn = hour < offHour || hour >= onHour;
     
     if (fSpeedLimitEnabled != shouldBeOn)
+        [self toggleSpeedLimit: nil];
+}
+
+- (void) autoSpeedLimit: (NSTimer *) timer
+{
+    BOOL autoOn, autoOff;
+    if (!(autoOn = [fDefaults boolForKey: @"SpeedLimitAutoOn"])
+            && !(autoOff = [fDefaults boolForKey: @"SpeedLimitAutoOff"]))
+        return;
+ 
+    //do nothing if time to turn on and off are equal
+    int onHour, offHour;
+    if ((onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"])
+            == (offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]) && autoOn && autoOff)
+        return;
+    
+    NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
+    //toggle if within first few seconds of hour
+    if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
+            && [currentDate hourOfDay] == (fSpeedLimitEnabled ? offHour : onHour))
     {
         [self toggleSpeedLimit: nil];
         
