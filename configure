@@ -274,7 +274,7 @@ EOF
     PTHREAD=yes
     ;;
 
-  FreeBSD|NetBSD|OpenBSD|Linux)
+  FreeBSD|NetBSD|OpenBSD|Linux|skyos)
     PTHREAD=yes
     ;;
 
