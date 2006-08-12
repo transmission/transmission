@@ -219,7 +219,11 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         /* Multi-file mode */
         int j;
 
-        val = tr_bencDictFind( beInfo, "name" );
+        val = tr_bencDictFind( beInfo, "name.utf-8" );
+        if( NULL == val )
+        {
+            val = tr_bencDictFind( beInfo, "name" );
+        }
         strcatUTF8( inf->name, val->val.s.s );
 
         inf->multifile = 1;
@@ -228,7 +232,11 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
 
         for( i = 0; i < list->val.l.count; i++ )
         {
-            val = tr_bencDictFind( &list->val.l.vals[i], "path" );
+            val = tr_bencDictFind( &list->val.l.vals[i], "path.utf-8" );
+            if( NULL == val )
+            {
+                val = tr_bencDictFind( &list->val.l.vals[i], "path" );
+            }
             strcatUTF8( inf->files[i].name, inf->name );
             for( j = 0; j < val->val.l.count; j++ )
             {
