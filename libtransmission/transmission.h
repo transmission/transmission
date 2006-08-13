@@ -198,15 +198,6 @@ void tr_torrentStop( tr_torrent_t * );
 int tr_getFinished( tr_torrent_t * );
 
 /***********************************************************************
- * tr_getPeer
- ***********************************************************************
- * Returns the peer at peerNum. Returns NULL if peerNum is not greater
- * than 0 and less than peerCount.
- **********************************************************************/
-typedef struct tr_peer_s tr_peer_t;
-tr_peer_t * tr_getPeer( tr_torrent_t *, int peerNum );
-
-/***********************************************************************
  * tr_torrentStat
  ***********************************************************************
  * Returns a pointer to an tr_stat_t structure with updated information
@@ -288,6 +279,14 @@ struct tr_info_s
 /***********************************************************************
  * tr_stat_s
  **********************************************************************/
+typedef struct tr_peer_stat_s
+{
+    char    client[25];
+    
+    int     isDownloading;
+    int     isUploading;
+}
+tr_peer_stat_t;
 struct tr_stat_s
 {
 #define TR_STATUS_CHECK    0x001 /* Checking files */
@@ -300,25 +299,26 @@ struct tr_stat_s
 
 #define TR_STATUS_ACTIVE   (TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_SEED)
 #define TR_STATUS_INACTIVE (TR_STATUS_STOPPING|TR_STATUS_STOPPED|TR_STATUS_PAUSE)
-    int         status;
+    int                 status;
 
 #define TR_ETRACKER 1
 #define TR_EINOUT   2
-    int         error;
-    char        trackerError[128];
+    int                 error;
+    char                trackerError[128];
 
-    float       progress;
-    float       rateDownload;
-    float       rateUpload;
-    int         eta;
-    int         peersTotal;
-    int         peersUploading;
-    int         peersDownloading;
-    int         seeders;
-    int         leechers;
+    float               progress;
+    float               rateDownload;
+    float               rateUpload;
+    int                 eta;
+    int                 peersTotal;
+    tr_peer_stat_t *    peers;
+    int                 peersUploading;
+    int                 peersDownloading;
+    int                 seeders;
+    int                 leechers;
 
-    uint64_t    downloaded;
-    uint64_t    uploaded;
+    uint64_t            downloaded;
+    uint64_t            uploaded;
 };
 
 #ifdef __TRANSMISSION__

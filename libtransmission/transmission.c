@@ -405,22 +405,6 @@ int tr_getFinished( tr_torrent_t * tor )
     return 0;
 }
 
-tr_peer_t * tr_getPeer( tr_torrent_t * tor, int peerNum)
-{
-    tr_peer_t * peer;
-
-    tr_lockLock( &tor->lock );
-    
-    if (peerNum < 0 || peerNum >= tor->peerCount)
-        peer = NULL;
-    else
-        peer = tor->peers[peerNum];
-        
-    tr_lockUnlock( &tor->lock );
-    
-    return peer;
-}
-
 tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;
@@ -448,17 +432,34 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->peersTotal       = 0;
     s->peersUploading   = 0;
     s->peersDownloading = 0;
+    
+    tr_peer_t * peer;
+    s->peers = (tr_peer_stat_t *) calloc( tor->peerCount, sizeof( tr_peer_stat_t ) );
 
     for( i = 0; i < tor->peerCount; i++ )
     {
-        if( tr_peerIsConnected( tor->peers[i] ) )
+        peer = tor->peers[i];
+        
+        char * client = tr_clientForId(tr_peerId(peer));
+        char clientChar;
+        int j = 0;
+        while (j < 25 && (clientChar = client[j]) != 0)
+        {
+            s->peers[i].client[j] = clientChar;
+            j++;
+        }
+        
+        s->peers[i].isDownloading = tr_peerIsDownloading(peer);
+        s->peers[i].isUploading = tr_peerIsUploading(peer);
+    
+        if( tr_peerIsConnected( peer ) )
         {
             (s->peersTotal)++;
-            if( tr_peerIsUploading( tor->peers[i] ) )
+            if( tr_peerIsUploading( peer ) )
             {
                 (s->peersUploading)++;
             }
-            if( tr_peerIsDownloading( tor->peers[i] ) )
+            if( tr_peerIsDownloading( peer ) )
             {
                 (s->peersDownloading)++;
             }

@@ -517,19 +517,25 @@
 
 - (NSArray *) peers
 {
-    tr_peer_t * peer;
     int totalPeers = [self totalPeers], i;
+    tr_peer_stat_t peer;
     
     NSMutableArray * peers = [NSMutableArray arrayWithCapacity: totalPeers];
     for (i = 0; i < totalPeers; i++)
     {
-        peer = tr_getPeer(fHandle, i);
+        peer = fStat->peers[i];
+    
         [peers addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithCString: (char *) tr_clientForId(tr_peerId(peer)) encoding: NSUTF8StringEncoding],
+            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding],
                 @"Client",
-            [NSNumber numberWithBool: tr_peerIsDownloading(peer)], @"UL To",
-            [NSNumber numberWithBool: tr_peerIsUploading(peer)], @"DL From", nil]];
+            [NSNumber numberWithBool: peer.isDownloading], @"UL To",
+            [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
+        /*[peers addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+            @"Client", @"Client",
+            [NSNumber numberWithBool: YES], @"UL To",
+            [NSNumber numberWithBool: YES], @"DL From", nil]];*/
     }
+    //NSLog(@"%d", tr_peerId(peer));
     
     return peers;
 }
