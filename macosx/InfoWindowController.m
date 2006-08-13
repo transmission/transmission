@@ -35,15 +35,15 @@
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
 #define TAB_PEERS_IDENT @"Peers"
-#define TAB_OPTIONS_IDENT @"Options"
 #define TAB_FILES_IDENT @"Files"
+#define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
 #define TAB_ACTIVITY_HEIGHT 214.0
 #define TAB_PEERS_HEIGHT 250.0
-#define TAB_OPTIONS_HEIGHT 116.0
 #define TAB_FILES_HEIGHT 250.0
+#define TAB_OPTIONS_HEIGHT 116.0
 
 @interface InfoWindowController (Private)
 
@@ -386,10 +386,10 @@
         height = TAB_ACTIVITY_HEIGHT;
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
         height = TAB_PEERS_HEIGHT;
-    else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
-        height = TAB_OPTIONS_HEIGHT;
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
         height = TAB_FILES_HEIGHT;
+    else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
+        height = TAB_OPTIONS_HEIGHT;
     else
         height = TAB_INFO_HEIGHT;
     
@@ -471,6 +471,11 @@
         [fPeers sortUsingDescriptors: [tableView sortDescriptors]];
         [tableView reloadData];
     }
+}
+
+- (BOOL) tableView: (NSTableView *) tableView shouldSelectRow:(int) row
+{
+    return tableView != fPeerTable;
 }
 
 //only called on >= 10.4
