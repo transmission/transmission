@@ -508,9 +508,12 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
 
 void tr_torrentPeersFree( tr_peer_stat_t * peers, int peerCount )
 {
+    if (peers == NULL)
+        return;
+
     int i;
     for (i = 0; i < peerCount; i++)
-        free(peers[i].client);
+        free( peers[i].client );
 
     free( peers );
 }

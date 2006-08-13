@@ -57,6 +57,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "Shareaza %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "UT", 2 ) )
+        {
+            asprintf( &ret, "uTorrent %c.%d", id[3],
+                        ( id[4] - '0' ) * 10 + ( id[5] - '0' )  );
+        }
     }
     else if( !memcmp( &id[4], "----", 4 ) )
     {
