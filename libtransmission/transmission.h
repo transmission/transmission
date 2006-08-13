@@ -281,7 +281,7 @@ struct tr_info_s
  **********************************************************************/
 typedef struct tr_peer_stat_s
 {
-    char    client[25];
+    char *  client;
     
     int     isDownloading;
     int     isUploading;

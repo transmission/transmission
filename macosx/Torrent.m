@@ -526,14 +526,9 @@
         peer = fStat->peers[i];
     
         [peers addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding],
-                @"Client",
+            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
-        /*[peers addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            @"Client", @"Client",
-            [NSNumber numberWithBool: YES], @"UL To",
-            [NSNumber numberWithBool: YES], @"DL From", nil]];*/
     }
     //NSLog(@"%d", tr_peerId(peer));
     

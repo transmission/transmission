@@ -440,15 +440,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     {
         peer = tor->peers[i];
         
-        char * client = tr_clientForId(tr_peerId(peer));
-        char clientChar;
-        int j = 0;
-        while (j < 25 && (clientChar = client[j]) != 0)
-        {
-            s->peers[i].client[j] = clientChar;
-            j++;
-        }
-        
+        s->peers[i].client = tr_clientForId(tr_peerId(peer));
         s->peers[i].isDownloading = tr_peerIsDownloading(peer);
         s->peers[i].isUploading = tr_peerIsUploading(peer);
     
