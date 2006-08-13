@@ -44,7 +44,7 @@
 #include "ipc.h"
 #include "tr_backend.h"
 #include "tr_torrent.h"
-#include "tr_cell_renderer_torrent.h"
+#include "tr_cell_renderer_progress.h"
 #include "transmission.h"
 #include "util.h"
 
@@ -456,10 +456,10 @@ makewind_list(struct cbdata *data, GObject **sizehack) {
   gtk_tree_view_column_set_sizing(col, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
   gtk_tree_view_append_column(GTK_TREE_VIEW(view), col);
 
-  progrend = tr_cell_renderer_torrent_new();
+  progrend = tr_cell_renderer_progress_new();
   /* this string is only used to determing the size of the progress bar */
   str = g_markup_printf_escaped("<big>%s</big>", _("  fnord    fnord  "));
-  g_object_set(progrend, "label", str, NULL);
+  g_object_set(progrend, "bar-sizing", str, NULL);
   g_free(str);
   col = gtk_tree_view_column_new_with_attributes(_("Progress"), progrend, NULL);
   gtk_tree_view_column_set_cell_data_func(col, progrend, dfprog, NULL, NULL);
@@ -650,7 +650,7 @@ setupdrag(GtkWidget *widget, struct cbdata *data) {
 static void
 stylekludge(GObject *obj, GParamSpec *spec, gpointer gdata) {
   if(0 == strcmp("style", spec->name)) {
-    tr_cell_renderer_torrent_reset_style(TR_CELL_RENDERER_TORRENT(gdata));
+    tr_cell_renderer_progress_reset_style(TR_CELL_RENDERER_PROGRESS(gdata));
     gtk_widget_queue_draw(GTK_WIDGET(obj));
   }
 }
@@ -766,7 +766,7 @@ dfprog(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     str = g_strdup_printf(_("DL: %s/s\nUL: %s/s"), dlstr, ulstr);
   }
   marked = g_markup_printf_escaped("<small>%s</small>", str);
-  g_object_set(rend, "text", str, "value", prog, NULL);
+  g_object_set(rend, "markup", str, "progress", prog, NULL);
   g_free(dlstr);
   g_free(ulstr);
   g_free(str);
