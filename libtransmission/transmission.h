@@ -215,7 +215,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * );
  ***********************************************************************/
 typedef struct tr_peer_stat_s tr_peer_stat_t;
 tr_peer_stat_t * tr_torrentPeers( tr_torrent_t *, int * peerCount );
-void tr_torrentPeersFree( tr_peer_stat_t * );
+void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
 
 /***********************************************************************
  * tr_torrentAvailability

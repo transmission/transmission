@@ -534,6 +534,8 @@
     }
     //NSLog(@"%d", tr_peerId(peer));
     
+    tr_torrentPeersFree(peers, totalPeers);
+    
     return peerDics;
 }
 
