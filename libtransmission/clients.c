@@ -59,7 +59,7 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "UT", 2 ) )
         {
-            asprintf( &ret, "uTorrent %c.%d", id[3],
+            asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
                         ( id[4] - '0' ) * 10 + ( id[5] - '0' )  );
         }
     }
