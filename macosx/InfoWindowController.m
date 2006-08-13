@@ -34,12 +34,14 @@
 
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
+#define TAB_PEERS_IDENT @"Peers"
 #define TAB_OPTIONS_IDENT @"Options"
 #define TAB_FILES_IDENT @"Files"
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
 #define TAB_ACTIVITY_HEIGHT 214.0
+#define TAB_PEERS_HEIGHT 250.0
 #define TAB_OPTIONS_HEIGHT 116.0
 #define TAB_FILES_HEIGHT 250.0
 
@@ -56,6 +58,7 @@
     fAppIcon = [[NSApp applicationIconImage] copy];
     
     fTorrents = [[NSArray alloc] init];
+    fPeers = [[NSMutableArray alloc] initWithCapacity: 6];
     fFiles = [[NSMutableArray alloc] initWithCapacity: 6];
     [fFileTable setDoubleAction: @selector(revealFile:)];
     
@@ -67,7 +70,11 @@
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
+    //select tab
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InfoTab"];
+    if ([fTabView indexOfTabViewItemWithIdentifier: identifier] == NSNotFound)
+        identifier = TAB_INFO_IDENT;
+    
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
     
@@ -77,6 +84,7 @@
 - (void) dealloc
 {
     [fTorrents release];
+    [fPeers release];
     [fFiles release];
 
     [fAppIcon release];
@@ -252,6 +260,18 @@
                                         downloadedTotal upload: uploadedTotal]];
         }
     }
+    
+    //set peers table
+    if (numberSelected == 1)
+    {
+        [fPeers setArray: [[fTorrents objectAtIndex: 0] peers]];
+        [fPeers sortUsingDescriptors: [fPeerTable sortDescriptors]];
+    }
+    else
+        [fPeers removeAllObjects];
+    
+    [fPeerTable deselectAll: nil];
+    [fPeerTable reloadData];
 }
 
 - (void) updateInfoStatsAndSettings
@@ -364,6 +384,8 @@
     float height;
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
         height = TAB_ACTIVITY_HEIGHT;
+    else if ([identifier isEqualToString: TAB_PEERS_IDENT])
+        height = TAB_PEERS_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
@@ -410,17 +432,45 @@
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
 {
-    return [fFiles count];
+    if (tableView == fPeerTable)
+        return [fTorrents count] == 1 ? [[fTorrents objectAtIndex: 0] totalPeers] : 0;
+    else if (tableView == fFileTable)
+        return [fFiles count];
+    else
+        return 0;
 }
 
-- (id) tableView: (NSTableView *) tableView objectValueForTableColumn:
-                    (NSTableColumn *) column row: (int) row
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
 {
-    NSString * file = [fFiles objectAtIndex: row];
-    if ([[column identifier] isEqualToString: @"Icon"])
-        return [[NSWorkspace sharedWorkspace] iconForFileType: [file pathExtension]];
+    NSString * ident = [column identifier];
+    if (tableView == fPeerTable)
+    {
+        NSDictionary * peer = [fPeers objectAtIndex: row];
+        
+        if ([ident isEqualToString: @"UL To"])
+            return [[peer objectForKey: @"UL To"] boolValue] ? @"Y" : @"";
+        else if ([ident isEqualToString: @"DL From"])
+            return [[peer objectForKey: @"DL From"] boolValue] ? @"Y" : @"";
+        else
+            return [peer objectForKey: @"Client"];
+    }
     else
-        return [file lastPathComponent];
+    {
+        NSString * file = [fFiles objectAtIndex: row];
+        if ([ident isEqualToString: @"Icon"])
+            return [[NSWorkspace sharedWorkspace] iconForFileType: [file pathExtension]];
+        else
+            return [file lastPathComponent];
+    }
+}
+
+- (void) tableView: (NSTableView *) tableView didClickTableColumn: (NSTableColumn *) tableColumn
+{
+    if (tableView == fPeerTable)
+    {
+        [fPeers sortUsingDescriptors: [tableView sortDescriptors]];
+        [tableView reloadData];
+    }
 }
 
 //only called on >= 10.4
@@ -428,7 +478,7 @@
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    return [fFiles objectAtIndex: row];
+    return tableView == fFileTable ? [fFiles objectAtIndex: row] : nil;
 }
 
 - (void) revealFile: (id) sender

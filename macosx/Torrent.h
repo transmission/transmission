@@ -114,6 +114,8 @@
 - (BOOL)    isPaused;
 - (BOOL)    justFinished;
 
+- (NSArray *) peers;
+
 - (NSString *) progressString;
 - (NSString *) statusString;
 - (NSString *) shortStatusString;

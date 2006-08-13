@@ -24,11 +24,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
+#import <transmission.h>
 
 @interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents;
-    NSMutableArray * fFiles;
+    NSMutableArray * fPeers, * fFiles;
     NSImage * fAppIcon;
     
     IBOutlet NSTabView * fTabView;
@@ -45,7 +46,7 @@
                         * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
 
-    IBOutlet NSTableView * fFileTable;
+    IBOutlet NSTableView * fPeerTable, * fFileTable;
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;

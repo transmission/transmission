@@ -22,12 +22,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
 #import "InfoTableView.h"
 
-@interface FileTableView : InfoTableView
+@implementation InfoTableView
+
+- (void) mouseDown: (NSEvent *) event
 {
-    IBOutlet NSMenu * fContextMenu;
+    [[self window] makeKeyWindow];
+    [super mouseDown: event];
 }
 
 @end

@@ -4,9 +4,10 @@
             CLASS = FileTableView; 
             LANGUAGE = ObjC; 
             OUTLETS = {fContextMenu = NSMenu; }; 
-            SUPERCLASS = NSTableView; 
+            SUPERCLASS = InfoTableView; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = InfoTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {
             ACTIONS = {
                 revealFile = id; 
@@ -29,6 +30,7 @@
                 fImageView = NSImageView; 
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 
+                fPeerTable = NSTableView; 
                 fPieceSizeField = NSTextField; 
                 fPiecesField = NSTextField; 
                 fRatioField = NSTextField; 

@@ -26,12 +26,6 @@
 
 @implementation FileTableView
 
-- (void) mouseDown: (NSEvent *) event
-{
-    [[self window] makeKeyWindow];
-    [super mouseDown: event];
-}
-
 - (NSMenu *) menuForEvent: (NSEvent *) e
 {
     int row = [self rowAtPoint: [self convertPoint: [e locationInWindow] fromView: nil]];
