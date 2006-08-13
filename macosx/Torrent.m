@@ -517,22 +517,24 @@
 
 - (NSArray *) peers
 {
-    int totalPeers = [self totalPeers], i;
+    int totalPeers, i;
+    
+    tr_peer_stat_t * peers = tr_torrentPeers(fHandle, & totalPeers);
     tr_peer_stat_t peer;
     
-    NSMutableArray * peers = [NSMutableArray arrayWithCapacity: totalPeers];
+    NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
     for (i = 0; i < totalPeers; i++)
     {
-        peer = fStat->peers[i];
+        peer = peers[i];
     
-        [peers addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+        [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
     }
     //NSLog(@"%d", tr_peerId(peer));
     
-    return peers;
+    return peerDics;
 }
 
 - (NSString *) progressString

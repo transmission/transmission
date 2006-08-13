@@ -211,6 +211,13 @@ typedef struct tr_stat_s tr_stat_t;
 tr_stat_t * tr_torrentStat( tr_torrent_t * );
 
 /***********************************************************************
+ * tr_torrentPeers
+ ***********************************************************************/
+typedef struct tr_peer_stat_s tr_peer_stat_t;
+tr_peer_stat_t * tr_torrentPeers( tr_torrent_t *, int * peerCount );
+void tr_torrentPeersFree( tr_peer_stat_t * );
+
+/***********************************************************************
  * tr_torrentAvailability
  ***********************************************************************
  * Use this to draw an advanced progress bar which is 'size' pixels
@@ -279,14 +286,6 @@ struct tr_info_s
 /***********************************************************************
  * tr_stat_s
  **********************************************************************/
-typedef struct tr_peer_stat_s
-{
-    char *  client;
-    
-    int     isDownloading;
-    int     isUploading;
-}
-tr_peer_stat_t;
 struct tr_stat_s
 {
 #define TR_STATUS_CHECK    0x001 /* Checking files */
@@ -311,7 +310,6 @@ struct tr_stat_s
     float               rateUpload;
     int                 eta;
     int                 peersTotal;
-    tr_peer_stat_t *    peers;
     int                 peersUploading;
     int                 peersDownloading;
     int                 seeders;
@@ -319,6 +317,14 @@ struct tr_stat_s
 
     uint64_t            downloaded;
     uint64_t            uploaded;
+};
+
+struct tr_peer_stat_s
+{
+    char *  client;
+    
+    int     isDownloading;
+    int     isUploading;
 };
 
 #ifdef __TRANSMISSION__
