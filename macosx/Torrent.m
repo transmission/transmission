@@ -523,12 +523,18 @@
     tr_peer_stat_t peer;
     
     NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
+    NSString * client;
     for (i = 0; i < totalPeers; i++)
     {
         peer = peers[i];
     
+        client = [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding];
+        //get rid of strange returned client strings
+        if ([client hasPrefix: @"unknown client ("] && ![client hasSuffix: @")"])
+            client = @"unknown client";
+    
         [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
+            client, @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
     }

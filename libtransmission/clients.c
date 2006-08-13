@@ -87,7 +87,7 @@ char * tr_clientForId( uint8_t * id )
 
     if( !ret )
     {
-        asprintf( &ret, "Unknown client (%c%c%c%c%c%c%c%c)",
+        asprintf( &ret, "unknown client (%c%c%c%c%c%c%c%c)",
                   id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
     }
 
