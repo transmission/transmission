@@ -451,8 +451,10 @@
             return [[peer objectForKey: @"UL To"] boolValue] ? @"Y" : @"";
         else if ([ident isEqualToString: @"DL From"])
             return [[peer objectForKey: @"DL From"] boolValue] ? @"Y" : @"";
-        else
+        else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
+        else
+            return [peer objectForKey: @"IP"];
     }
     else
     {

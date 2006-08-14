@@ -528,6 +528,7 @@
         peer = peers[i];
         
         [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSString stringWithCString: (char *) peer.addr encoding: NSUTF8StringEncoding], @"IP",
             [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
