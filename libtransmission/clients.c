@@ -60,7 +60,12 @@ char * tr_clientForId( uint8_t * id )
         else if( !memcmp( &id[1], "UT", 2 ) )
         {
             asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
-                        ( id[4] - '0' ) * 10 + ( id[5] - '0' )  );
+                      ( id[4] - '0' ) * 10 + ( id[5] - '0' )  );
+        }
+        else if( !memcmp( &id[1], "BOW", 3 ) )
+        {
+            asprintf( &ret, "Bits on Wheels (%c%c)",
+                      id[5], id[6] );
         }
     }
     else if( !memcmp( &id[4], "----", 4 ) )
