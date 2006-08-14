@@ -39,4 +39,6 @@
 - (NSAttributedString *) attributedStringFittingInWidth: (float) width
                                 attributes: (NSDictionary *) attributes;
 
+- (NSComparisonResult) compareIP: (NSString *) string;
+
 @end

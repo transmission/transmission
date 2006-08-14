@@ -157,4 +157,31 @@
                                         attributes: attributes] autorelease];
 }
 
+- (NSComparisonResult) compareIP: (NSString *) string
+{
+    if ([self isEqualToString: string])
+        return NSOrderedSame;
+
+    NSEnumerator * selfSections = [[self componentsSeparatedByString: @"."] objectEnumerator],
+            * newSections = [[string componentsSeparatedByString: @"."] objectEnumerator];
+    
+    NSComparisonResult result;
+    NSString * selfString = [selfSections nextObject], * newString = [newSections nextObject];
+    while (selfString && newString)
+    {
+        if ((result = [selfString compare: newString options: NSNumericSearch]) != NSOrderedSame)
+            return result;
+        
+        selfString = [selfSections nextObject];
+        newString = [newSections nextObject];
+    }
+    
+    if (selfString)
+        return NSOrderedDescending;
+    else if (newString)
+        return NSOrderedAscending;
+    else
+        return NSOrderedSame;
+}
+
 @end
