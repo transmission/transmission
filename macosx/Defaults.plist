@@ -9,9 +9,9 @@
 	<key>AutoSize</key>
 	<false/>
 	<key>BadgeDownloadRate</key>
-	<false/>
+	<true/>
 	<key>BadgeUploadRate</key>
-	<false/>
+	<true/>
 	<key>BindPort</key>
 	<integer>9090</integer>
 	<key>CheckDownload</key>
@@ -77,9 +77,9 @@
 	<key>SpeedLimitAuto</key>
 	<false/>
 	<key>SpeedLimitAutoOffHour</key>
-	<integer>0</integer>
+	<integer>21</integer>
 	<key>SpeedLimitAutoOnHour</key>
-	<integer>12</integer>
+	<integer>9</integer>
 	<key>SpeedLimitDownloadLimit</key>
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
