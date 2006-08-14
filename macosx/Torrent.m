@@ -518,11 +518,10 @@
 - (NSArray *) peers
 {
     int totalPeers, i;
-    
     tr_peer_stat_t * peers = tr_torrentPeers(fHandle, & totalPeers);
-    tr_peer_stat_t peer;
     
     NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
+    tr_peer_stat_t peer;
     NSString * client;
     for (i = 0; i < totalPeers; i++)
     {
@@ -538,7 +537,6 @@
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
     }
-    //NSLog(@"%d", tr_peerId(peer));
     
     tr_torrentPeersFree(peers, totalPeers);
     

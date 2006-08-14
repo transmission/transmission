@@ -23,9 +23,8 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "InfoTableView.h"
 
-@interface FileTableView : InfoTableView
+@interface FileTableView : NSTableView
 {
     IBOutlet NSMenu * fContextMenu;
 }

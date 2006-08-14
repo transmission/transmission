@@ -4,10 +4,9 @@
             CLASS = FileTableView; 
             LANGUAGE = ObjC; 
             OUTLETS = {fContextMenu = NSMenu; }; 
-            SUPERCLASS = InfoTableView; 
+            SUPERCLASS = NSTableView; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = InfoTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {
             ACTIONS = {
                 revealFile = id; 

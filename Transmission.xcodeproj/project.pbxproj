@@ -81,7 +81,6 @@
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
-		A221DA8A0A8F7E7E0011E98E /* InfoTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A221DA880A8F7E7E0011E98E /* InfoTableView.m */; };
 		A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */; };
 		A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */; };
 		A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */; };
@@ -285,8 +284,6 @@
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
-		A221DA870A8F7E7E0011E98E /* InfoTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTableView.h; path = macosx/InfoTableView.h; sourceTree = "<group>"; };
-		A221DA880A8F7E7E0011E98E /* InfoTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTableView.m; path = macosx/InfoTableView.m; sourceTree = "<group>"; };
 		A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarWhite.png; path = macosx/Images/ProgressBarWhite.png; sourceTree = "<group>"; };
 		A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarBlue.png; path = macosx/Images/ProgressBarBlue.png; sourceTree = "<group>"; };
 		A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGray.png; path = macosx/Images/ProgressBarGray.png; sourceTree = "<group>"; };
@@ -401,8 +398,6 @@
 				A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */,
 				A2710E740A86796000CE4F7D /* PrefsWindow.h */,
 				A2710E750A86796000CE4F7D /* PrefsWindow.m */,
-				A221DA870A8F7E7E0011E98E /* InfoTableView.h */,
-				A221DA880A8F7E7E0011E98E /* InfoTableView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -817,7 +812,6 @@
 				A27431DB0A68538400FA780A /* BarButton.m in Sources */,
 				A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */,
 				A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */,
-				A221DA8A0A8F7E7E0011E98E /* InfoTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
