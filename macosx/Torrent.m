@@ -526,14 +526,9 @@
     for (i = 0; i < totalPeers; i++)
     {
         peer = peers[i];
-    
-        client = [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding];
-        //get rid of strange returned client strings
-        if ([client hasPrefix: @"unknown client ("] && ![client hasSuffix: @")"])
-            client = @"unknown client";
-    
+        
         [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            client, @"Client",
+            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
             [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
     }

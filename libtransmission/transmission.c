@@ -486,6 +486,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
 tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
 {
+    tr_lockLock( &tor->lock );
+
     *peerCount = tor->peerCount;
     
     tr_peer_stat_t * peers = (tr_peer_stat_t *) calloc( tor->peerCount, sizeof( tr_peer_stat_t ) );
@@ -502,6 +504,8 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             peers[i].isUploading = tr_peerIsUploading(peer);
         }
     }
+    
+    tr_lockUnlock( &tor->lock );
     
     return peers;
 }
