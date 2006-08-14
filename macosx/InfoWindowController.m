@@ -265,7 +265,7 @@
     if (numberSelected == 1)
     {
         [fPeers setArray: [[fTorrents objectAtIndex: 0] peers]];
-        [fPeers sortUsingDescriptors: [fPeerTable sortDescriptors]];
+        [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
     }
     else
         [fPeers removeAllObjects];
@@ -470,7 +470,7 @@
 {
     if (tableView == fPeerTable)
     {
-        [fPeers sortUsingDescriptors: [tableView sortDescriptors]];
+        [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
         [tableView reloadData];
     }
 }
@@ -486,6 +486,20 @@
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
     return tableView == fFileTable ? [fFiles objectAtIndex: row] : nil;
+}
+
+- (NSArray *) peerSortDescriptors
+{
+    NSMutableArray * descriptors = [NSMutableArray array];
+    
+    NSArray * oldDescriptors = [fPeerTable sortDescriptors];
+    if ([oldDescriptors count] > 0)
+        [descriptors addObject: [oldDescriptors objectAtIndex: 0]];
+    
+    [descriptors addObject: [[[fPeerTable tableColumns] objectAtIndex: [fPeerTable columnWithIdentifier: @"IP"]]
+                                sortDescriptorPrototype]];
+    
+    return descriptors;
 }
 
 - (void) revealFile: (id) sender
