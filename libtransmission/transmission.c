@@ -494,11 +494,18 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
     if (peers != NULL)
     {
         tr_peer_t * peer;
+        struct in_addr * addr;
         int i = 0;
         for( i = 0; i < tor->peerCount; i++ )
         {
             peer = tor->peers[i];
             
+            addr = tr_peerAddress( peer );
+            if( NULL != addr )
+            {
+                inet_ntop( AF_INET, addr, peers[i].addr,
+                           sizeof( peers[i].addr ) );
+            }
             peers[i].client = tr_clientForId(tr_peerId(peer));
             peers[i].isDownloading = tr_peerIsDownloading(peer);
             peers[i].isUploading = tr_peerIsUploading(peer);

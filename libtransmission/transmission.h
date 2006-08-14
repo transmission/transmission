@@ -44,6 +44,10 @@ extern "C" {
 # define MAX_PATH_LENGTH  1024
 #endif
 
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN 16
+#endif
+
 #define TR_DEFAULT_PORT   9090
 #define TR_NOERROR        0
 
@@ -321,6 +325,7 @@ struct tr_stat_s
 
 struct tr_peer_stat_s
 {
+    char    addr[INET_ADDRSTRLEN];
     char *  client;
     
     int     isDownloading;

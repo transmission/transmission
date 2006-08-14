@@ -52,5 +52,6 @@ void        tr_peerSetOptimistic ( tr_peer_t *, int );
 int         tr_peerIsOptimistic  ( tr_peer_t * );
 void        tr_peerBlame         ( tr_torrent_t *, tr_peer_t *,
                                    int piece, int success );
+struct in_addr * tr_peerAddress  ( tr_peer_t * );
 
 #endif
