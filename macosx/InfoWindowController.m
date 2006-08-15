@@ -79,6 +79,10 @@
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
     
+    if ([[fPeerTable sortDescriptors] count] == 0)
+        [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
+                                            sortDescriptorPrototype]]];
+    
     [self updateInfoForTorrents: [NSArray array]];
 }
 
@@ -499,8 +503,7 @@
     if ([oldDescriptors count] > 0)
         [descriptors addObject: [oldDescriptors objectAtIndex: 0]];
     
-    [descriptors addObject: [[[fPeerTable tableColumns] objectAtIndex: [fPeerTable columnWithIdentifier: @"IP"]]
-                                sortDescriptorPrototype]];
+    [descriptors addObject: [[fPeerTable tableColumnWithIdentifier: @"IP"] sortDescriptorPrototype]];
     
     return descriptors;
 }
