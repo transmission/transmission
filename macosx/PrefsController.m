@@ -810,6 +810,9 @@
 {
     NSWindow * window = [self window];
     
+    if ([window contentView] == view)
+        return;
+    
     NSRect windowRect = [window frame];
     int difference = [view frame].size.height - [[window contentView] frame].size.height;
     windowRect.origin.y -= difference;
@@ -817,8 +820,8 @@
 
     [window setTitle: [fToolbar selectedItemIdentifier]];
     
-    [window setContentView: view];
     [view setHidden: YES];
+    [window setContentView: view];
     [window setFrame: windowRect display: YES animate: YES];
     [view setHidden: NO];
 }
