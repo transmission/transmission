@@ -56,7 +56,8 @@
 - (void) awakeFromNib
 {
     fAppIcon = [[NSApp applicationIconImage] copy];
-    fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];
+    fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
+    fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
     
     fTorrents = [[NSArray alloc] init];
     fPeers = [[NSMutableArray alloc] initWithCapacity: 6];
@@ -453,7 +454,7 @@
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
         if ([ident isEqualToString: @"Connected"])
-            return [[peer objectForKey: @"Connected"] boolValue] ? fCheckImage : nil;
+            return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
         else if ([ident isEqualToString: @"UL To"])
             return [[peer objectForKey: @"UL To"] boolValue] ? @"Y" : @"";
         else if ([ident isEqualToString: @"DL From"])

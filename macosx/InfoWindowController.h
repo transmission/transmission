@@ -30,7 +30,7 @@
 {
     NSArray * fTorrents;
     NSMutableArray * fPeers, * fFiles;
-    NSImage * fAppIcon, * fCheckImage;
+    NSImage * fAppIcon, * fDotGreen, * fDotRed;
     
     IBOutlet NSTabView * fTabView;
 
