@@ -58,6 +58,7 @@
     fAppIcon = [[NSApp applicationIconImage] copy];
     fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
     fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
+    fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];
     
     fTorrents = [[NSArray alloc] init];
     fPeers = [[NSMutableArray alloc] initWithCapacity: 6];
@@ -452,9 +453,9 @@
         if ([ident isEqualToString: @"Connected"])
             return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
         else if ([ident isEqualToString: @"UL To"])
-            return [[peer objectForKey: @"UL To"] boolValue] ? @"Y" : @"";
+            return [[peer objectForKey: @"UL To"] boolValue] ? fCheckImage : nil;
         else if ([ident isEqualToString: @"DL From"])
-            return [[peer objectForKey: @"DL From"] boolValue] ? @"Y" : @"";
+            return [[peer objectForKey: @"DL From"] boolValue] ? fCheckImage : nil;
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else
