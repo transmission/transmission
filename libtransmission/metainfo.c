@@ -257,7 +257,11 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         inf->fileCount = 1;
         inf->files     = calloc( sizeof( tr_file_t ), 1 );
 
-        val = tr_bencDictFind( beInfo, "name" );
+        val = tr_bencDictFind( beInfo, "name.utf-8" );
+        if( NULL == val )
+        {
+            val = tr_bencDictFind( beInfo, "name" );
+        }
         strcatUTF8( inf->files[0].name, val->val.s.s );
         strcatUTF8( inf->name, val->val.s.s );
         
