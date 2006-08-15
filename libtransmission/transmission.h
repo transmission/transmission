@@ -328,6 +328,7 @@ struct tr_peer_stat_s
     char    addr[INET_ADDRSTRLEN];
     char *  client;
     
+    int     isConnected;
     int     isDownloading;
     int     isUploading;
 };

@@ -506,7 +506,10 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
                 inet_ntop( AF_INET, addr, peers[i].addr,
                            sizeof( peers[i].addr ) );
             }
+            
             peers[i].client = tr_clientForId(tr_peerId(peer));
+            
+            peers[i].isConnected = tr_peerIsConnected(peer);
             peers[i].isDownloading = tr_peerIsDownloading(peer);
             peers[i].isUploading = tr_peerIsUploading(peer);
         }

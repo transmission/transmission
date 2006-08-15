@@ -56,6 +56,7 @@
 - (void) awakeFromNib
 {
     fAppIcon = [[NSApp applicationIconImage] copy];
+    fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];
     
     fTorrents = [[NSArray alloc] init];
     fPeers = [[NSMutableArray alloc] initWithCapacity: 6];
@@ -433,7 +434,7 @@
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
 {
     if (tableView == fPeerTable)
-        return [fTorrents count] == 1 ? [[fTorrents objectAtIndex: 0] totalPeers] : 0;
+        return [fPeers count];
     else if (tableView == fFileTable)
         return [fFiles count];
     else
@@ -447,7 +448,9 @@
     {
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
-        if ([ident isEqualToString: @"UL To"])
+        if ([ident isEqualToString: @"Connected"])
+            return [[peer objectForKey: @"Connected"] boolValue] ? fCheckImage : nil;
+        else if ([ident isEqualToString: @"UL To"])
             return [[peer objectForKey: @"UL To"] boolValue] ? @"Y" : @"";
         else if ([ident isEqualToString: @"DL From"])
             return [[peer objectForKey: @"DL From"] boolValue] ? @"Y" : @"";
