@@ -30,6 +30,7 @@
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 
                 fPeerTable = NSTableView; 
+                fPeerTableStatusField = NSTextField; 
                 fPieceSizeField = NSTextField; 
                 fPiecesField = NSTextField; 
                 fRatioField = NSTextField; 

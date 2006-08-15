@@ -46,7 +46,10 @@
                         * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
 
-    IBOutlet NSTableView * fPeerTable, * fFileTable;
+    IBOutlet NSTableView * fPeerTable;
+    IBOutlet NSTextField * fPeerTableStatusField;
+    
+    IBOutlet NSTableView * fFileTable;
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;

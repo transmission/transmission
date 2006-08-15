@@ -41,8 +41,8 @@
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
 #define TAB_ACTIVITY_HEIGHT 214.0
-#define TAB_PEERS_HEIGHT 250.0
-#define TAB_FILES_HEIGHT 250.0
+#define TAB_PEERS_HEIGHT 255.0
+#define TAB_FILES_HEIGHT 255.0
 #define TAB_OPTIONS_HEIGHT 116.0
 
 @interface InfoWindowController (Private)
@@ -107,8 +107,7 @@
     {
         if (numberSelected > 0)
         {
-            [fNameField setStringValue: [NSString stringWithFormat:
-                            @"%d Torrents Selected", numberSelected]];
+            [fNameField setStringValue: [NSString stringWithFormat: @"%d Torrents Selected", numberSelected]];
         
             uint64_t size = 0;
             NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -166,6 +165,10 @@
         [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
+        
+        [fPeers removeAllObjects];
+        [fPeerTable reloadData];
+        [fPeerTableStatusField setStringValue: @"info not available"];
     }
     else
     {    
@@ -222,62 +225,55 @@
 - (void) updateInfoStats
 {
     int numberSelected = [fTorrents count];
-    if (numberSelected > 0)
+    if (numberSelected == 0)
+        return;
+    
+    float downloadedValid = 0;
+    uint64_t downloadedTotal = 0, uploadedTotal = 0;
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
     {
-        float downloadedValid = 0;
-        uint64_t downloadedTotal = 0, uploadedTotal = 0;
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-        {
-            downloadedValid += [torrent downloadedValid];
-            downloadedTotal += [torrent downloadedTotal];
-            uploadedTotal += [torrent uploadedTotal];
-        }
-
-        [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
-        [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
-        [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
-    
-        if (numberSelected == 1)
-        {
-            torrent = [fTorrents objectAtIndex: 0];
-
-            [fStateField setStringValue: [torrent stateString]];
-/*
-            [fPercentField setStringValue: [NSString stringWithFormat: @"%.2f%%", 100.0 * [torrent progress]]];
-*/
-            int seeders = [torrent seeders], leechers = [torrent leechers];
-            [fSeedersField setStringValue: seeders < 0 ?
-                @"" : [NSString stringWithInt: seeders]];
-            [fLeechersField setStringValue: leechers < 0 ?
-                @"" : [NSString stringWithInt: leechers]];
-            
-            BOOL active = [torrent isActive];
-            
-            [fConnectedPeersField setStringValue: active ? [NSString
-                    stringWithInt: [torrent totalPeers]] : @""];
-            [fDownloadingFromField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersUploading]] : @""];
-            [fUploadingToField setStringValue: active ? [NSString
-                    stringWithInt: [torrent peersDownloading]] : @""];
-            
-            [fRatioField setStringValue: [NSString stringForRatioWithDownload:
-                                        downloadedTotal upload: uploadedTotal]];
-        }
+        downloadedValid += [torrent downloadedValid];
+        downloadedTotal += [torrent downloadedTotal];
+        uploadedTotal += [torrent uploadedTotal];
     }
-    
-    //set peers table
+
+    [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
+    [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
+    [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
+
     if (numberSelected == 1)
     {
-        [fPeers setArray: [[fTorrents objectAtIndex: 0] peers]];
+        torrent = [fTorrents objectAtIndex: 0];
+
+        [fStateField setStringValue: [torrent stateString]];
+/*
+        [fPercentField setStringValue: [NSString stringWithFormat: @"%.2f%%", 100.0 * [torrent progress]]];
+*/
+        int seeders = [torrent seeders], leechers = [torrent leechers];
+        [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
+        [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
+        
+        BOOL active = [torrent isActive];
+        
+        [fConnectedPeersField setStringValue: active ? [NSString
+                stringWithInt: [torrent totalPeers]] : @""];
+        [fDownloadingFromField setStringValue: active ? [NSString
+                stringWithInt: [torrent peersUploading]] : @""];
+        [fUploadingToField setStringValue: active ? [NSString
+                stringWithInt: [torrent peersDownloading]] : @""];
+        
+        [fRatioField setStringValue: [NSString stringForRatioWithDownload: downloadedTotal upload: uploadedTotal]];
+        
+        //set peers table
+        [fPeers setArray: [torrent peers]];
         [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
-    }
-    else
-        [fPeers removeAllObjects];
     
-    [fPeerTable deselectAll: nil];
-    [fPeerTable reloadData];
+        [fPeerTable reloadData];
+        [fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
+                                                [torrent totalPeers], [fPeers count]]];
+    }
 }
 
 - (void) updateInfoStatsAndSettings
