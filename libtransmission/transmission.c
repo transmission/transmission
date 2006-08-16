@@ -282,6 +282,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->fdlimit        = h->fdlimit;
     tor->upload         = tr_rcInit();
     tor->download       = tr_rcInit();
+    tor->swarmspeed     = tr_rcInit();
  
     /* We have a new torrent */
     tr_lockLock( &h->acceptLock );
@@ -349,6 +350,7 @@ void tr_torrentStop( tr_torrent_t * tor )
     tr_trackerStopped( tor->tracker );
     tr_rcReset( tor->download );
     tr_rcReset( tor->upload );
+    tr_rcReset( tor->swarmspeed );
     tor->status = TR_STATUS_STOPPING;
     tor->stopDate = tr_date();
     tr_lockUnlock( &tor->lock );
@@ -454,17 +456,23 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
     s->progress = tr_cpCompletionAsFloat( tor->completion );
     if( tor->status & TR_STATUS_DOWNLOAD )
+    {
         s->rateDownload = tr_rcRate( tor->download );
+    }
     else
+    {
         /* tr_rcRate() doesn't make the difference between 'piece'
            messages and other messages, which causes a non-zero
            download rate even tough we are not downloading. So we
            force it to zero not to confuse the user. */
         s->rateDownload = 0.0;
+    }
     s->rateUpload = tr_rcRate( tor->upload );
     
     s->seeders  = tr_trackerSeeders(tor->tracker);
-	s->leechers = tr_trackerLeechers(tor->tracker);
+    s->leechers = tr_trackerLeechers(tor->tracker);
+
+    s->swarmspeed = tr_rcRate( tor->swarmspeed );
 
     if( s->rateDownload < 0.1 )
     {
@@ -588,6 +596,7 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
 
     tr_rcClose( tor->upload );
     tr_rcClose( tor->download );
+    tr_rcClose( tor->swarmspeed );
 
     if( tor->destination )
     {

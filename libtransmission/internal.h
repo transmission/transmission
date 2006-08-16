@@ -127,6 +127,7 @@ struct tr_torrent_s
     tr_ratecontrol_t * globalDownload;
     tr_ratecontrol_t * upload;
     tr_ratecontrol_t * download;
+    tr_ratecontrol_t * swarmspeed;
     tr_fd_t          * fdlimit;
 
     int               status;

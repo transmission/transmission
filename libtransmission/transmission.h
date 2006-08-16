@@ -321,6 +321,7 @@ struct tr_stat_s
 
     uint64_t            downloaded;
     uint64_t            uploaded;
+    float               swarmspeed;
 };
 
 struct tr_peer_stat_s

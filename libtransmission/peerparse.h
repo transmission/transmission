@@ -109,6 +109,8 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
     tr_bitfieldAdd( peer->bitfield, piece );
     updateInterest( tor, peer );
 
+    tr_rcTransferred( tor->swarmspeed, tor->info.pieceSize );
+
     return 0;
 }
 
