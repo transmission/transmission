@@ -917,7 +917,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                         ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
 }
 
-- (void) updateUI: (NSTimer *) t
+- (void) updateUI: (NSTimer *) timer
 {
     [fTorrents makeObjectsPerformSelector: @selector(update)];
 
