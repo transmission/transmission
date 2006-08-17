@@ -39,9 +39,7 @@
                         * fAnnounceField, * fPieceSizeField, * fPiecesField,
                         * fHashField,
                         * fTorrentLocationField, * fDataLocationField,
-                        * fDateStartedField,
-                        //* fPercentField,
-                        * fStateField,
+                        * fDateStartedField, * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSeedersField, * fLeechersField,
                         * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fSwarmSpeedField;

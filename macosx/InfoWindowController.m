@@ -156,9 +156,6 @@
         [fDataLocationField setSelectable: NO];
         
         [fStateField setStringValue: @""];
-/*
-        [fPercentField setStringValue: @""];
-*/
         [fRatioField setStringValue: @""];
         
         [fSeedersField setStringValue: @""];
@@ -248,11 +245,13 @@
     if (numberSelected == 1)
     {
         torrent = [fTorrents objectAtIndex: 0];
-
+        
+        //append percentage to amount downloaded if 1 torrent
+        [fDownloadedValidField setStringValue: [[fDownloadedValidField stringValue]
+                                        stringByAppendingFormat: @" (%.2f%%)", 100.0 * [torrent progress]]];
+        
         [fStateField setStringValue: [torrent stateString]];
-/*
-        [fPercentField setStringValue: [NSString stringWithFormat: @"%.2f%%", 100.0 * [torrent progress]]];
-*/
+        
         int seeders = [torrent seeders], leechers = [torrent leechers];
         [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
         [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
