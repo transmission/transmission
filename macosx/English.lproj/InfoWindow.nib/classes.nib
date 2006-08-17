@@ -39,6 +39,7 @@
                 fSeedersField = NSTextField; 
                 fSizeField = NSTextField; 
                 fStateField = NSTextField; 
+                fSwarmSpeedField = NSTextField; 
                 fTabView = NSTabView; 
                 fTorrentLocationField = NSTextField; 
                 fTrackerField = NSTextField; 

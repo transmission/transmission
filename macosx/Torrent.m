@@ -612,6 +612,11 @@
     return fStat->uploaded;
 }
 
+- (float) swarmSpeed
+{
+    return fStat->swarmspeed;
+}
+
 - (NSNumber *) orderValue
 {
     return [NSNumber numberWithInt: fOrderValue];

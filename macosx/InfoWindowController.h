@@ -44,7 +44,7 @@
                         * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSeedersField, * fLeechersField,
-                        * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField;
+                        * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fSwarmSpeedField;
 
     IBOutlet NSTableView * fPeerTable;
     IBOutlet NSTextField * fPeerTableStatusField;

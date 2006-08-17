@@ -40,7 +40,7 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
-#define TAB_ACTIVITY_HEIGHT 214.0
+#define TAB_ACTIVITY_HEIGHT 230.0
 #define TAB_PEERS_HEIGHT 255.0
 #define TAB_FILES_HEIGHT 255.0
 #define TAB_OPTIONS_HEIGHT 116.0
@@ -166,6 +166,7 @@
         [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
+        [fSwarmSpeedField setStringValue: @""];
         
         [fPeers removeAllObjects];
         [fPeerTable reloadData];
@@ -266,6 +267,8 @@
                 stringWithInt: [torrent peersDownloading]] : @""];
         
         [fRatioField setStringValue: [NSString stringForRatioWithDownload: downloadedTotal upload: uploadedTotal]];
+        
+        [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
         //set peers table
         [fPeers setArray: [torrent peers]];
