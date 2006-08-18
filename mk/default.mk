@@ -8,7 +8,7 @@ ifeq ($(GTK),yes)
 TARGETS += .gtk
 endif
 ifeq ($(SYSTEM),BeOS)
-TARGETS += .beos
+#TARGETS += .beos
 endif
 
 all: $(TARGETS)
