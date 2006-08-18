@@ -403,3 +403,12 @@ void tr_netClose( int s )
     close( s );
 #endif
 }
+
+void tr_netNtop( const struct in_addr * addr, char * buf, int len )
+{
+    const uint8_t * cast;
+
+    cast = (const uint8_t *)addr;
+    snprintf( buf, len, "%hhu.%hhu.%hhu.%hhu",
+              cast[0], cast[1], cast[2], cast[3] );
+}

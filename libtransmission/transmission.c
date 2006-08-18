@@ -410,6 +410,7 @@ int tr_getFinished( tr_torrent_t * tor )
 tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;
+    tr_peer_t * peer;
     tr_info_t * inf = &tor->info;
     int i;
 
@@ -435,7 +436,6 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->peersUploading   = 0;
     s->peersDownloading = 0;
     
-    tr_peer_t * peer;
     for( i = 0; i < tor->peerCount; i++ )
     {
         peer = tor->peers[i];
@@ -494,11 +494,13 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
 tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
 {
+    tr_peer_stat_t * peers;
+
     tr_lockLock( &tor->lock );
 
     *peerCount = tor->peerCount;
     
-    tr_peer_stat_t * peers = (tr_peer_stat_t *) calloc( tor->peerCount, sizeof( tr_peer_stat_t ) );
+    peers = (tr_peer_stat_t *) calloc( tor->peerCount, sizeof( tr_peer_stat_t ) );
     if (peers != NULL)
     {
         tr_peer_t * peer;
@@ -511,7 +513,7 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             addr = tr_peerAddress( peer );
             if( NULL != addr )
             {
-                inet_ntop( AF_INET, addr, peers[i].addr,
+                tr_netNtop( addr, peers[i].addr,
                            sizeof( peers[i].addr ) );
             }
             
@@ -530,10 +532,11 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
 
 void tr_torrentPeersFree( tr_peer_stat_t * peers, int peerCount )
 {
+    int i;
+
     if (peers == NULL)
         return;
 
-    int i;
     for (i = 0; i < peerCount; i++)
         free( peers[i].client );
 

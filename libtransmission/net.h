@@ -52,3 +52,4 @@ void tr_netClose   ( int s );
 int  tr_netSend    ( int s, uint8_t * buf, int size );
 int  tr_netRecv    ( int s, uint8_t * buf, int size );
 
+void tr_netNtop( const struct in_addr * addr, char * buf, int len );
