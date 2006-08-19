@@ -56,6 +56,8 @@
         
         [stringShadow release];
         
+        fLock = [[NSLock alloc] init];
+        
         fCompleted = 0;
         fSpeedShown = NO;
     }
@@ -68,6 +70,7 @@
     [fDockIcon release];
     [fBadgedDockIcon release];
     [fAttributes release];
+    [fLock release];
 
     [super dealloc];
 }
@@ -76,6 +79,8 @@
 {
     NSImage * dockIcon = nil;
     NSSize iconSize = [fDockIcon size];
+
+    [fLock lock]; //acquire lock to ensure completed badge is accurate
 
     //set completed badge
     if (fCompleted != completed)
@@ -111,6 +116,8 @@
         
         fCompleted = completed;
     }
+    
+    [fLock unlock];
 
     //set upload and download rate badges
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];

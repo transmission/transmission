@@ -34,6 +34,8 @@
                     
     NSDictionary    * fAttributes;
     
+    NSLock          * fLock;
+    
     int             fCompleted;
     BOOL            fSpeedShown;
 }
