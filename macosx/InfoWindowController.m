@@ -117,8 +117,7 @@
             while ((torrent = [enumerator nextObject]))
                 size += [torrent size];
             
-            [fSizeField setStringValue: [[NSString stringForFileSize: size]
-                                stringByAppendingString: @" Total"]];
+            [fSizeField setStringValue: [[NSString stringForFileSize: size] stringByAppendingString: @" Total"]];
         }
         else
         {
@@ -448,10 +447,8 @@
 {
     if (tableView == fPeerTable)
         return [fPeers count];
-    else if (tableView == fFileTable)
-        return [fFiles count];
     else
-        return 0;
+        return [fFiles count];
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
@@ -553,8 +550,7 @@
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
 
     float ratioLimit = [sender floatValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]]
-            || ratioLimit < 0)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]] || ratioLimit < 0)
     {
         NSBeep();
         float ratioLimit = [[enumerator nextObject] ratioLimit]; //use first torrent

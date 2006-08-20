@@ -174,11 +174,11 @@
     [fSpeedLimitAutoCheck setState: speedLimitAuto];
     
     int speedLimitAutoOnHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"];
-    [fSpeedLimitAutoOnField setIntValue: speedLimitAutoOnHour];
+    [fSpeedLimitAutoOnField setStringValue: [NSString stringWithFormat: @"%02d", speedLimitAutoOnHour]];
     [fSpeedLimitAutoOnField setEnabled: speedLimitAuto];
     
     int speedLimitAutoOffHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
-    [fSpeedLimitAutoOffField setIntValue: speedLimitAutoOffHour];
+    [fSpeedLimitAutoOffField setStringValue: [NSString stringWithFormat: @"%02d", speedLimitAutoOffHour]];
     [fSpeedLimitAutoOffField setEnabled: speedLimitAuto];
     
     //set ratio limit
@@ -512,15 +512,20 @@
     NSString * key = (sender == fSpeedLimitAutoOnField) ? @"SpeedLimitAutoOnHour" : @"SpeedLimitAutoOffHour";
 
     int hour = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]] || hour < 0 || hour > 23
+    
+    //allow numbers under ten in the format 0x
+    if (!([[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]]
+        || [[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%02d", hour]]) || hour < 0 || hour > 23
         || [fSpeedLimitAutoOnField intValue] == [fSpeedLimitAutoOffField intValue])
     {
         NSBeep();
         hour = [fDefaults integerForKey: key];
-        [sender setIntValue: hour];
+        [sender setStringValue: [NSString stringWithFormat: @"%02d", hour]];
     }
     else
         [fDefaults setInteger: hour forKey: key];
+    
+    [sender setStringValue: [NSString stringWithFormat: @"%02d", hour]]; //ensure number has 2 digits
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }
