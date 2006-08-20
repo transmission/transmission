@@ -48,6 +48,7 @@
     IBOutlet NSTextField * fPeerTableStatusField;
     
     IBOutlet NSTableView * fFileTable;
+    IBOutlet NSTextField * fFileTableStatusField;
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;

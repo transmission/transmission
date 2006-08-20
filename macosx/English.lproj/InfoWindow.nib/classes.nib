@@ -25,6 +25,7 @@
                 fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
                 fFileTable = NSTableView; 
+                fFileTableStatusField = NSTextField; 
                 fHashField = NSTextField; 
                 fImageView = NSImageView; 
                 fLeechersField = NSTextField; 

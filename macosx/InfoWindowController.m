@@ -220,6 +220,9 @@
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
+    
+    [fFileTableStatusField setStringValue: [NSString stringWithFormat: @"%d file%s", [fFiles count],
+                                            [fFiles count] == 1 ? "" : "s"]];
 }
 
 - (void) updateInfoStats
