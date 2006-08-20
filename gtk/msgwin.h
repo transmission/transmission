@@ -22,26 +22,19 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TG_PREFS_H
-#define TG_PREFS_H
+#ifndef TG_MSGWIN_H
+#define TG_MSGWIN_H
 
-#include "tr_backend.h"
-#include "tr_torrent.h"
-#include "util.h"
+void
+msgwin_init( void );
 
 GtkWidget *
-makeprefwindow(GtkWindow *parent, TrBackend *back);
+msgwin_create( void );
 
-/* set the upload limit based on saved prefs */
 void
-setlimit(TrBackend *back);
+msgwin_update( void );
 
-/* show the "add a torrent" dialog */
 void
-makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata);
+msgwin_loadpref( void );
 
-/* show the info window for a torrent */
-void
-makeinfowind(GtkWindow *parent, TrTorrent *tor);
-
-#endif /* TG_PREFS_H */
+#endif /* TG_MSGWIN_H */

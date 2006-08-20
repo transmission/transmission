@@ -59,8 +59,6 @@ struct addcb {
 };
 
 static void
-windclosed(GtkWidget *widget SHUTUP, gpointer gdata);
-static void
 clicklimitbox(GtkWidget *widget, gpointer gdata);
 static void
 freedata(gpointer gdata, GClosure *closure);
@@ -165,8 +163,8 @@ saveprefwidget(GtkWindow *parent, GtkWidget *widget) {
   }
 }
 
-void
-makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
+GtkWidget *
+makeprefwindow(GtkWindow *parent, TrBackend *back) {
   char *title = g_strdup_printf(_("%s Preferences"), g_get_application_name());
   GtkWidget *wind = gtk_dialog_new_with_buttons(title, parent,
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
@@ -198,8 +196,6 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkCellRenderer *rend;
-
-  *opened = TRUE;
 
   g_free(title);
   gtk_widget_set_name(wind, "TransmissionDialog");
@@ -302,15 +298,9 @@ makeprefwindow(GtkWindow *parent, TrBackend *back, gboolean *opened) {
   gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
   g_signal_connect_data(wind, "response", G_CALLBACK(clickdialog),
                         data, freedata, 0);
-  g_signal_connect(wind, "destroy", G_CALLBACK(windclosed), opened);
   gtk_widget_show_all(wind);
-}
 
-static void
-windclosed(GtkWidget *widget SHUTUP, gpointer gdata) {
-  gboolean *preachy_gcc = gdata;
-  
-  *preachy_gcc = FALSE;
+  return wind;
 }
 
 static void

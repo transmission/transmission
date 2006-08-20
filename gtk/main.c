@@ -38,6 +38,7 @@
 #include "conf.h"
 #include "dialogs.h"
 #include "ipc.h"
+#include "msgwin.h"
 #include "tr_backend.h"
 #include "tr_torrent.h"
 #include "tr_cell_renderer_progress.h"
@@ -62,6 +63,7 @@ struct cbdata {
   GtkWidget **buttons;
   guint timer;
   gboolean prefsopen;
+  gboolean msgwinopen;
   GtkWidget *stupidpopuphack;
   gboolean closing;
 };
@@ -112,6 +114,8 @@ listpopup(GtkWidget *widget, gpointer gdata);
 void
 dopopupmenu(GdkEventButton *event, struct cbdata *data);
 void
+boolwindclosed(GtkWidget *widget SHUTUP, gpointer gdata);
+void
 actionclick(GtkWidget *widget, gpointer gdata);
 gint
 intrevcmp(gconstpointer a, gconstpointer b);
@@ -138,7 +142,8 @@ void
 fatalsig(int sig);
 
 #define LIST_ACTION           "torrent-list-action"
-enum listact { ACT_OPEN, ACT_START, ACT_STOP, ACT_DELETE, ACT_INFO, ACT_PREF };
+enum listact {
+  ACT_OPEN, ACT_START, ACT_STOP, ACT_DELETE, ACT_INFO, ACT_PREF, ACT_DEBUG };
 
 struct { const gchar *name; const gchar *id; enum listact act; gboolean nomenu;
   int avail; const char *ttext; const char *tpriv; }
@@ -157,6 +162,7 @@ actionitems[] = {
    N_("Show additional information about a torrent"), "XXX"},
   {N_("Preferences"), GTK_STOCK_PREFERENCES,  ACT_PREF,   TRUE,   0,
    N_("Customize application behavior"), "XXX"},
+  {N_("Open debug window"), NULL, ACT_DEBUG,  FALSE,  0, NULL, NULL},
 };
 
 #define CBDATA_PTR              "callback-data-pointer"
@@ -177,6 +183,7 @@ main(int argc, char **argv) {
   gboolean didinit, didlock;
 
   safepipe();
+  msgwin_init();
 
   argfiles = readargs(argc, argv);
 
@@ -221,6 +228,9 @@ main(int argc, char **argv) {
         stateerr = errmsg(GTK_WINDOW(mainwind), "%s", err);
         g_free(err);
       }
+
+      /* set libT message level */
+      msgwin_loadpref();
 
       back = tr_backend_new();
 
@@ -313,6 +323,7 @@ makewind(GtkWidget *wind, TrBackend *back, benc_val_t *state, GList *args) {
   data->bar = GTK_STATUSBAR(status);
   data->buttons = NULL;
   data->prefsopen = FALSE;
+  data->msgwinopen = FALSE;
   data->stupidpopuphack = NULL;
   data->closing = FALSE;
 
@@ -392,6 +403,10 @@ makewind_toolbar(struct cbdata *data) {
   data->buttons = g_new(GtkWidget*, ALEN(actionitems));
 
   for(ii = 0; ii < ALEN(actionitems); ii++) {
+    if( NULL == actionitems[ii].id ) {
+      data->buttons[ii] = NULL;
+      continue;
+    }
     item = gtk_tool_button_new_from_stock(actionitems[ii].id);
     data->buttons[ii] = GTK_WIDGET(item);
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(item),
@@ -518,7 +533,8 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
     /* yes, start the exit timer and disable widgets */
     edata->timer = g_timeout_add(EXIT_CHECK_INTERVAL, exitcheck, edata);
     for(ii = 0; ii < ALEN(actionitems); ii++)
-      gtk_widget_set_sensitive(data->buttons[ii], FALSE);
+      if( NULL != data->buttons[ii] )
+        gtk_widget_set_sensitive(data->buttons[ii], FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(data->view), FALSE);
   }
 
@@ -820,6 +836,9 @@ updatemodel(gpointer gdata) {
   if(!data->closing)
     tr_backend_torrents_stopped(data->back);
 
+  /* update the message window */
+  msgwin_update();
+
   return TRUE;
 }
 
@@ -905,6 +924,13 @@ dopopupmenu(GdkEventButton *event, struct cbdata *data) {
 }
 
 void
+boolwindclosed(GtkWidget *widget SHUTUP, gpointer gdata) {
+  gboolean *preachy_gcc = gdata;
+  
+  *preachy_gcc = FALSE;
+}
+
+void
 actionclick(GtkWidget *widget, gpointer gdata) {
   struct cbdata *data = gdata;
   enum listact act;
@@ -916,6 +942,7 @@ actionclick(GtkWidget *widget, gpointer gdata) {
   TrTorrent *tor;
   unsigned int actoff, status;
   gboolean changed;
+  GtkWidget * win;
 
   act = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), LIST_ACTION));
 
@@ -924,8 +951,20 @@ actionclick(GtkWidget *widget, gpointer gdata) {
       makeaddwind(data->wind, addtorrents, data);
       return;
     case ACT_PREF:
-      if(!data->prefsopen)
-        makeprefwindow(data->wind, data->back, &data->prefsopen);
+      if( !data->prefsopen ) {
+        data->prefsopen = TRUE;
+        win = makeprefwindow( data->wind, data->back );
+        g_signal_connect( win, "destroy", G_CALLBACK( boolwindclosed ),
+                          &data->prefsopen );
+      }
+      return;
+    case ACT_DEBUG:
+      if( !data->msgwinopen ) {
+        data->msgwinopen = TRUE;
+        win = msgwin_create();
+        g_signal_connect( win, "destroy", G_CALLBACK( boolwindclosed ),
+                          &data->msgwinopen );
+      }
       return;
     case ACT_START:
     case ACT_STOP:
@@ -980,6 +1019,7 @@ actionclick(GtkWidget *widget, gpointer gdata) {
             break;
           case ACT_OPEN:
           case ACT_PREF:
+          case ACT_DEBUG:
             break;
         }
       }
