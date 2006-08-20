@@ -519,7 +519,8 @@
     NSIndexSet * indexSet = [fFileTable selectedRowIndexes];
     unsigned int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[NSWorkspace sharedWorkspace] selectFile: [fFiles objectAtIndex: i] inFileViewerRootedAtPath: nil];
+        [[NSWorkspace sharedWorkspace] selectFile: [[fFiles objectAtIndex: i] objectForKey: @"Name"]
+                                        inFileViewerRootedAtPath: nil];
 }
 
 - (void) setRatioCheck: (id) sender
