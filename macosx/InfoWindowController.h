@@ -67,6 +67,4 @@
 
 - (void) setWaitToStart: (id) sender;
 
-- (NSArray *) peerSortDescriptors;
-
 @end

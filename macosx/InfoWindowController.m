@@ -48,6 +48,7 @@
 @interface InfoWindowController (Private)
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
+- (NSArray *) peerSortDescriptors;
 
 @end
 
