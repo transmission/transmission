@@ -630,10 +630,17 @@
 - (NSArray *) fileList
 {
     int count = fInfo->fileCount, i;
+    tr_file_t file;
     NSMutableArray * files = [NSMutableArray arrayWithCapacity: count];
+    
     for (i = 0; i < count; i++)
-        [files addObject: [[self downloadFolder] stringByAppendingPathComponent:
-            [NSString stringWithUTF8String: fInfo->files[i].name]]];
+    {
+        file = fInfo->files[i];
+        [files addObject: [NSDictionary dictionaryWithObjectsAndKeys: [[self downloadFolder]
+            stringByAppendingPathComponent: [NSString stringWithUTF8String: file.name]], @"Name",
+            [NSNumber numberWithUnsignedInt: file.length], @"Size", nil]];
+    }
+    
     return files;
 }
 

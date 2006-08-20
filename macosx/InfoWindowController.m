@@ -469,11 +469,13 @@
     }
     else
     {
-        NSString * file = [fFiles objectAtIndex: row];
+        NSDictionary * file = [fFiles objectAtIndex: row];
         if ([ident isEqualToString: @"Icon"])
-            return [[NSWorkspace sharedWorkspace] iconForFileType: [file pathExtension]];
+            return [[NSWorkspace sharedWorkspace] iconForFileType: [[file objectForKey: @"Name"] pathExtension]];
+        else if ([ident isEqualToString: @"Size"])
+            return [NSString stringForFileSize: [[file objectForKey: @"Size"] unsignedIntValue]];
         else
-            return [file lastPathComponent];
+            return [[file objectForKey: @"Name"] lastPathComponent];
     }
 }
 
@@ -496,7 +498,7 @@
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    return tableView == fFileTable ? [fFiles objectAtIndex: row] : nil;
+    return tableView == fFileTable ? [[fFiles objectAtIndex: row] objectForKey: @"Name"] : nil;
 }
 
 - (NSArray *) peerSortDescriptors
