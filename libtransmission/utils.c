@@ -24,18 +24,29 @@
 
 #include "transmission.h"
 
-static void (*errorFunc)( const char * );
+static void (*messageFunc)( const char * );
 
-void tr_setErrorFunction( void (*func)( const char * ) )
+static int verboseLevel = 0;
+
+void tr_setMessageFunction( void (*func)( const char * ) )
 {
-    errorFunc = func;
+    messageFunc = func;
+}
+
+void tr_setMessageLevel( int level )
+{
+    verboseLevel = level;
+}
+
+int tr_getMessageLevel( void )
+{
+    return verboseLevel;
 }
 
 void tr_msg( int level, char * msg, ... )
 {
     char         string[256];
     va_list      args;
-    static int   verboseLevel = 0;
 
     if( !verboseLevel )
     {
@@ -58,13 +69,13 @@ void tr_msg( int level, char * msg, ... )
     vsnprintf( string, sizeof( string ), msg, args );
     va_end( args );
 
-    if( NULL == errorFunc )
+    if( NULL == messageFunc )
     {
         fprintf( stderr, "%s\n", string );
     }
     else
     {
-        errorFunc( string );
+        messageFunc( string );
     }
 }
 

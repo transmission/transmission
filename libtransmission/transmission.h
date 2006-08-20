@@ -61,14 +61,25 @@ typedef struct tr_handle_s tr_handle_t;
 tr_handle_t * tr_init();
 
 /***********************************************************************
- * tr_setErrorFunction
+ * tr_setMessageFunction
  ***********************************************************************
- * Sets the function used to display libtransmission errors.  A NULL
- * function means to use the default, which simple prints the message
- * to stderr.  The function's prototype should look like this:
- * void myErrFunc( const char * errstr );
+ * Sets the function used to display libtransmission messages.  This
+ * function must be reentrant, it may be called from different threads.
+ * A NULL argument means to print messages to stderr.  The function's
+ * prototype should look like this: void myErrFunc( const char * );
  **********************************************************************/
-void tr_setErrorFunction( void (*func)( const char * ) );
+void tr_setMessageFunction( void (*func)( const char * ) );
+
+/***********************************************************************
+ * tr_setMessageLevel
+ ***********************************************************************
+ * Set the level of messages to be output
+ **********************************************************************/
+#define TR_MSG_ERR 1
+#define TR_MSG_INF 2
+#define TR_MSG_DBG 4
+void tr_setMessageLevel( int );
+int tr_getMessageLevel( void );
 
 /***********************************************************************
  * tr_getPrefsDirectory
@@ -81,8 +92,7 @@ char * tr_getPrefsDirectory();
 /***********************************************************************
  * tr_setBindPort
  ***********************************************************************
- * Sets a "start" port: everytime we start a torrent, we try to bind
- * this port, then the next one and so on until we are successful.
+ * Sets the port to listen for incoming peer connections
  **********************************************************************/
 void tr_setBindPort( tr_handle_t *, int );
 

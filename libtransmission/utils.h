@@ -25,9 +25,6 @@
 #ifndef TR_UTILS_H
 #define TR_UTILS_H 1
 
-#define TR_MSG_ERR 1
-#define TR_MSG_INF 2
-#define TR_MSG_DBG 4
 #define tr_err( a... ) tr_msg( TR_MSG_ERR, ## a )
 #define tr_inf( a... ) tr_msg( TR_MSG_INF, ## a )
 #define tr_dbg( a... ) tr_msg( TR_MSG_DBG, ## a )
