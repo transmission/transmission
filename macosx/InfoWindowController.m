@@ -213,16 +213,21 @@
     //set file table
     [fFiles removeAllObjects];
     
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        [fFiles addObjectsFromArray: [torrent fileList]];
+    if (numberSelected > 0)
+    {
+        Torrent * torrent;
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            [fFiles addObjectsFromArray: [torrent fileList]];
+    
+        [fFileTableStatusField setStringValue: [NSString stringWithFormat: @"%d file%s", [fFiles count],
+                                                [fFiles count] == 1 ? "" : "s"]];
+    }
+    else
+        [fFileTableStatusField setStringValue: @"info not available"];
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
-    
-    [fFileTableStatusField setStringValue: [NSString stringWithFormat: @"%d file%s", [fFiles count],
-                                            [fFiles count] == 1 ? "" : "s"]];
 }
 
 - (void) updateInfoStats
