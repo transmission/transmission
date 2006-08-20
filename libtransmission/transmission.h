@@ -66,9 +66,9 @@ tr_handle_t * tr_init();
  * Sets the function used to display libtransmission messages.  This
  * function must be reentrant, it may be called from different threads.
  * A NULL argument means to print messages to stderr.  The function's
- * prototype should look like this: void myErrFunc( const char * );
+ * prototype should look like this: void myMsgFunc( int, const char * );
  **********************************************************************/
-void tr_setMessageFunction( void (*func)( const char * ) );
+void tr_setMessageFunction( void (*func)( int, const char * ) );
 
 /***********************************************************************
  * tr_setMessageLevel
@@ -77,7 +77,7 @@ void tr_setMessageFunction( void (*func)( const char * ) );
  **********************************************************************/
 #define TR_MSG_ERR 1
 #define TR_MSG_INF 2
-#define TR_MSG_DBG 4
+#define TR_MSG_DBG 3
 void tr_setMessageLevel( int );
 int tr_getMessageLevel( void );
 

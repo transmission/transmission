@@ -24,18 +24,18 @@
 
 #include "transmission.h"
 
-static void (*messageFunc)( const char * );
+static void (*messageFunc)( int, const char * );
 
 static int verboseLevel = 0;
 
-void tr_setMessageFunction( void (*func)( const char * ) )
+void tr_setMessageFunction( void (*func)( int, const char * ) )
 {
     messageFunc = func;
 }
 
 void tr_setMessageLevel( int level )
 {
-    verboseLevel = level;
+    verboseLevel = MAX( 0, level );
 }
 
 int tr_getMessageLevel( void )
@@ -52,15 +52,11 @@ void tr_msg( int level, char * msg, ... )
     {
         char * env;
         env          = getenv( "TR_DEBUG" );
-        verboseLevel = env ? atoi( env ) : -1;
-        verboseLevel = verboseLevel ? verboseLevel : -1;
+        verboseLevel = ( env ? atoi( env ) : 0 ) + 1;
+        verboseLevel = MAX( 1, verboseLevel );
     }
 
-    if( verboseLevel < 1 && level > TR_MSG_ERR )
-    {
-        return;
-    }
-    if( verboseLevel < 2 && level > TR_MSG_INF )
+    if( verboseLevel < level )
     {
         return;
     }
@@ -75,7 +71,7 @@ void tr_msg( int level, char * msg, ... )
     }
     else
     {
-        messageFunc( string );
+        messageFunc( level, string );
     }
 }
 
