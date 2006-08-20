@@ -257,7 +257,7 @@ case $SYSTEM in
         exit 1 
         ;;
     esac
-    GCCVER=`$CC --version`
+    GCCVER=`$CC -dumpversion`
     case $GCCVER in
       2.95.3*|3*|4*)
         ;;
