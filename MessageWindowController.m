@@ -122,7 +122,9 @@ void addMessage(int level, const char * message)
 
 - (void) clearLog: (id) sender
 {
+    [fLock lock];
     [fTextView setString: @""];
+    [fLock unlock];
 }
 
 @end
