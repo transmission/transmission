@@ -29,6 +29,8 @@
 #define LEVEL_INFO  1
 #define LEVEL_DEBUG 2
 
+#define UPDATE_SECONDS 1.0
+
 @interface MessageWindowController (Private)
 
 MessageWindowController * selfReference; //I'm not sure why I can't use self directly
@@ -44,6 +46,10 @@ MessageWindowController * selfReference; //I'm not sure why I can't use self dir
         selfReference = self;
         
         fLock = [[NSLock alloc] init];
+        fBufferArray = [[NSMutableArray alloc] init];
+        
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
         
         [[self window] update]; //make sure nib is loaded right away
     }
@@ -52,7 +58,11 @@ MessageWindowController * selfReference; //I'm not sure why I can't use self dir
 
 - (void) dealloc
 {
+    [fTimer invalidate];
+    
     [fLock release];
+    [fBufferArray release];
+    
     [super dealloc];
 }
 
@@ -100,10 +110,24 @@ void addMessage(int level, const char * message)
                             [NSString stringWithFormat: @"%@: %s\n", levelString, message]] autorelease];
     
     [fLock lock];
-    [[fTextView textStorage] appendAttributedString: messageString];
+    [fBufferArray addObject: messageString];
     [fLock unlock];
     
     [pool release];
+}
+
+- (void) updateLog: (NSTimer *) timer
+{
+    [fLock lock];
+    
+    NSEnumerator * enumerator = [fBufferArray objectEnumerator];
+    NSAttributedString * messageString;
+    while ((messageString = [enumerator nextObject]))
+        [[fTextView textStorage] appendAttributedString: messageString];
+    
+    [fBufferArray removeAllObjects];
+    
+    [fLock unlock];
 }
 
 - (void) changeLevel: (id) sender

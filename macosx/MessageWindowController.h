@@ -30,10 +30,13 @@
     IBOutlet NSPopUpButton * fLevelButton;
     
     NSLock * fLock;
+    NSMutableArray * fBufferArray;
+    NSTimer * fTimer;
 }
 
 void addMessage(int level, const char * message);
 - (void) addMessage: (const char *) message level: (int) level;
+- (void) updateLog: (NSTimer *) timer;
 
 - (void) changeLevel: (id) sender;
 - (void) clearLog: (id) sender;
