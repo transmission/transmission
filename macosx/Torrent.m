@@ -37,7 +37,6 @@
 
 @end
 
-
 @implementation Torrent
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
@@ -638,7 +637,7 @@
         file = fInfo->files[i];
         [files addObject: [NSDictionary dictionaryWithObjectsAndKeys: [[self downloadFolder]
             stringByAppendingPathComponent: [NSString stringWithUTF8String: file.name]], @"Name",
-            [NSNumber numberWithUnsignedInt: file.length], @"Size", nil]];
+            [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];
     }
     
     return files;

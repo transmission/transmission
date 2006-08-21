@@ -475,7 +475,7 @@
         if ([ident isEqualToString: @"Icon"])
             return [[NSWorkspace sharedWorkspace] iconForFileType: [[file objectForKey: @"Name"] pathExtension]];
         else if ([ident isEqualToString: @"Size"])
-            return [NSString stringForFileSize: [[file objectForKey: @"Size"] unsignedIntValue]];
+            return [NSString stringForFileSize: [[file objectForKey: @"Size"] unsignedLongLongValue]];
         else
             return [[file objectForKey: @"Name"] lastPathComponent];
     }
