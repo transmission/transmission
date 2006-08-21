@@ -64,12 +64,6 @@
 
 @implementation PrefsController
 
-+ (void) initialize
-{
-    [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
-        [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
-}
-
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle
 {
     if ((self = [self initWithWindowNibName: name]))

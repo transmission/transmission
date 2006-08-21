@@ -82,6 +82,7 @@
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
     
+    //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
                                             sortDescriptorPrototype]]];
@@ -423,8 +424,9 @@
     else
         [window setFrame: frame display: YES];
     
-    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
-    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
+    NSSize windowSize = NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height);
+    [window setMinSize: windowSize];
+    [window setMaxSize: windowSize];
 }
 
 - (void) setNextTab

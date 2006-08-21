@@ -46,6 +46,8 @@
 	<string>Info</string>
 	<key>InfoVisible</key>
 	<false/>
+	<key>MessageLevel</key>
+	<integer>1</integer>
 	<key>MoveChoice</key>
 	<string>Constant</string>
 	<key>MoveFolder</key>

@@ -26,6 +26,7 @@
                 setSort = id; 
                 showInfo = id; 
                 showMainWindow = id; 
+                showMessageWindow = id; 
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
                 stopSelectedTorrents = id; 

@@ -67,6 +67,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 @implementation Controller
 
++ (void) initialize
+{
+    [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
+        [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
+}
+
 - (id) init
 {
     if ((self = [super init]))
@@ -77,8 +83,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fDisplayedTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        fMessageController = [[MessageWindowController alloc] initWithWindowNibName: @"MessageWindow"];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
+        
         fBadger = [[Badger alloc] init];
         
         fAutoImportedNames = [[NSMutableArray alloc] init];
@@ -908,6 +917,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fInfoController setNextTab];
     else
         [fInfoController setPreviousTab];
+}
+
+- (void) showMessageWindow: (id) sender
+{
+    [fMessageController showWindow: nil];
 }
 
 - (void) updateControlTint: (NSNotification *) notification

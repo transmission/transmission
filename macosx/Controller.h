@@ -29,6 +29,7 @@
 #import <transmission.h>
 #import "PrefsController.h"
 #import "InfoWindowController.h"
+#import "MessageWindowController.h"
 #import "Badger.h"
 #import "ImageBackgroundView.h"
 #import "BarButton.h"
@@ -47,6 +48,7 @@
     PrefsController                 * fPrefsController;
     NSUserDefaults                  * fDefaults;
     InfoWindowController            * fInfoController;
+    MessageWindowController         * fMessageController;
 
     IBOutlet NSWindow               * fWindow;
     IBOutlet NSScrollView           * fScrollView;
@@ -134,6 +136,8 @@
 
 - (void) showInfo: (id) sender;
 - (void) setInfoTab: (id) sender;
+
+- (void) showMessageWindow: (id) sender;
 
 - (void) updateControlTint: (NSNotification *) notification;
 

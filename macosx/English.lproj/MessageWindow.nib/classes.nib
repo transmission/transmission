@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {changeLevel = id; clearLog = id; }; 
+            CLASS = MessageWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fLevelButton = NSPopUpButton; fTextView = NSTextView; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
