@@ -424,9 +424,8 @@
     else
         [window setFrame: frame display: YES];
     
-    NSSize windowSize = NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height);
-    [window setMinSize: windowSize];
-    [window setMaxSize: windowSize];
+    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
+    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
 }
 
 - (void) setNextTab
