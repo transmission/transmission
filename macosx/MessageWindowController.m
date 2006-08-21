@@ -43,9 +43,9 @@ MessageWindowController * selfReference; //I'm not sure why I can't use self dir
     {
         selfReference = self;
         
-        [[self window] update]; //make sure nib is loaded right away
-        
         fLock = [[NSLock alloc] init];
+        
+        [[self window] update]; //make sure nib is loaded right away
     }
     return self;
 }
@@ -78,10 +78,10 @@ MessageWindowController * selfReference; //I'm not sure why I can't use self dir
 
 void addMessage(int level, const char * message)
 {
-    [selfReference addMessageLevel: level message: message];
+    [selfReference addMessage: message level: level];
 }
 
-- (void) addMessageLevel: (int) level message: (const char *) message
+- (void) addMessage: (const char *) message level: (int) level
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 

@@ -33,7 +33,7 @@
 }
 
 void addMessage(int level, const char * message);
-- (void) addMessageLevel: (int) level message: (const char *) message;
+- (void) addMessage: (const char *) message level: (int) level;
 
 - (void) changeLevel: (id) sender;
 - (void) clearLog: (id) sender;
