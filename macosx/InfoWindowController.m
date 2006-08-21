@@ -500,7 +500,16 @@
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    return tableView == fFileTable ? [[fFiles objectAtIndex: row] objectForKey: @"Name"] : nil;
+    if (tableView == fFileTable)
+    {
+        NSDictionary * file = [fFiles objectAtIndex: row];
+        if ([[column identifier] isEqualToString: @"Size"])
+            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: @" bytes"];
+        else
+            return [file objectForKey: @"Name"];
+    }
+    else
+        return nil;
 }
 
 - (NSArray *) peerSortDescriptors
