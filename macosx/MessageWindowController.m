@@ -106,7 +106,7 @@
             levelString = @"???";
         
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
-                            dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S" timeZone: nil];
+                            dateWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil];
         messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
                             dateString, levelString, currentMessage->message] attributes: fAttributes] autorelease];
         
