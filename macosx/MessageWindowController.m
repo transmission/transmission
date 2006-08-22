@@ -29,11 +29,11 @@
 #define LEVEL_INFO  1
 #define LEVEL_DEBUG 2
 
-#define UPDATE_SECONDS 1.0
+#define UPDATE_SECONDS 0.5
 
 @interface MessageWindowController (Private)
 
-MessageWindowController * selfReference; //I'm not sure why I can't use self directly
+MessageWindowController * selfReference; //I'm not sure why "self" can't be used directly
 
 @end
 
@@ -59,6 +59,8 @@ MessageWindowController * selfReference; //I'm not sure why I can't use self dir
 - (void) dealloc
 {
     [fTimer invalidate];
+    
+    tr_setMessageFunction(NULL);
     
     [fLock release];
     [fBufferArray release];
@@ -118,6 +120,9 @@ void addMessage(int level, const char * message)
 
 - (void) updateLog: (NSTimer *) timer
 {
+    if ([fBufferArray count] == 0)
+        return;
+    
     [fLock lock];
     
     NSEnumerator * enumerator = [fBufferArray objectEnumerator];
