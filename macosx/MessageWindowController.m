@@ -86,6 +86,11 @@
     NSCalendarDate * dateString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
+        //new line if text view is not empty
+        if (currentMessage != messages || ![[fTextView string] isEqualToString: @""])
+            [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc]
+                                                                initWithString: @"\n"] autorelease]];
+        
         int level = currentMessage->level;
         if (level == TR_MSG_ERR)
             levelString = @"ERR";
@@ -98,7 +103,7 @@
         
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
                             dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S" timeZone: nil];
-        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s\n",
+        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
                             dateString, levelString, currentMessage->message]] autorelease];
         
         [[fTextView textStorage] appendAttributedString: messageString];
