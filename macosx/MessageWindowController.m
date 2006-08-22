@@ -29,7 +29,7 @@
 #define LEVEL_INFO  1
 #define LEVEL_DEBUG 2
 
-#define UPDATE_SECONDS 0.5
+#define UPDATE_SECONDS 0.35
 
 @interface MessageWindowController (Private)
 
@@ -123,16 +123,24 @@ void addMessage(int level, const char * message)
     if ([fBufferArray count] == 0)
         return;
     
+    //keep scrolled to bottom if already at bottom or there is no scroll bar yet
+    BOOL shouldScroll = NO;
+    NSScroller * scroller = [fScrollView verticalScroller];
+    if ([scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0)
+        shouldScroll = YES;
+    
     [fLock lock];
     
     NSEnumerator * enumerator = [fBufferArray objectEnumerator];
     NSAttributedString * messageString;
     while ((messageString = [enumerator nextObject]))
         [[fTextView textStorage] appendAttributedString: messageString];
-    
     [fBufferArray removeAllObjects];
     
     [fLock unlock];
+    
+    if (shouldScroll)
+        [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];
 }
 
 - (void) changeLevel: (id) sender
@@ -144,6 +152,8 @@ void addMessage(int level, const char * message)
         level = TR_MSG_DBG;
     else
         level = TR_MSG_ERR;
+    
+    [self updateLog: nil];
     
     tr_setMessageLevel(level);
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];

@@ -5,7 +5,11 @@
             ACTIONS = {changeLevel = id; clearLog = id; }; 
             CLASS = MessageWindowController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {fLevelButton = NSPopUpButton; fTextView = NSTextView; }; 
+            OUTLETS = {
+                fLevelButton = NSPopUpButton; 
+                fScrollView = NSScrollView; 
+                fTextView = NSTextView; 
+            }; 
             SUPERCLASS = NSWindowController; 
         }
     ); 
