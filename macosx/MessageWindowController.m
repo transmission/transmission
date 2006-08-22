@@ -98,7 +98,7 @@ void addMessage(int level, const char * message)
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     NSString * levelString;
-    
+
     if (level == TR_MSG_ERR)
         levelString = @"ERR";
     else if (level == TR_MSG_INF)
@@ -109,7 +109,8 @@ void addMessage(int level, const char * message)
         levelString = @"???";
     
     NSAttributedString * messageString = [[[NSAttributedString alloc] initWithString:
-                            [NSString stringWithFormat: @"%@: %s\n", levelString, message]] autorelease];
+            [NSString stringWithFormat: @"(%@ %@) %s\n", [[NSDate date] dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S.%F"
+                                timeZone: nil], levelString, message]] autorelease];
     
     [fLock lock];
     [fBufferArray addObject: messageString];
@@ -123,13 +124,13 @@ void addMessage(int level, const char * message)
     if ([fBufferArray count] == 0)
         return;
     
+    [fLock lock];
+    
     //keep scrolled to bottom if already at bottom or there is no scroll bar yet
     BOOL shouldScroll = NO;
     NSScroller * scroller = [fScrollView verticalScroller];
     if ([scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0)
         shouldScroll = YES;
-    
-    [fLock lock];
     
     NSEnumerator * enumerator = [fBufferArray objectEnumerator];
     NSAttributedString * messageString;
@@ -137,10 +138,12 @@ void addMessage(int level, const char * message)
         [[fTextView textStorage] appendAttributedString: messageString];
     [fBufferArray removeAllObjects];
     
-    [fLock unlock];
+    [fTextView setFont: [NSFont fontWithName: @"Monaco" size: 10]]; //find a way to set this permanently
     
     if (shouldScroll)
         [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];
+    
+    [fLock unlock];
 }
 
 - (void) changeLevel: (id) sender
