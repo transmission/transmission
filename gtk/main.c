@@ -183,7 +183,6 @@ main(int argc, char **argv) {
   gboolean didinit, didlock;
 
   safepipe();
-  msgwin_init();
 
   argfiles = readargs(argc, argv);
 

@@ -37,21 +37,8 @@
 
 static void
 changelevel( GtkToggleButton * button, gpointer data );
-static void
-addmsg( int level, const char * msg );
 
-
-static GMutex * listmutex = NULL;
-static GSList * messages = NULL;
 static GtkTextBuffer * textbuf = NULL;
-
-void
-msgwin_init( void ) {
-  if( !g_thread_supported() )
-    g_thread_init( NULL );
-  listmutex = g_mutex_new();
-  tr_setMessageFunction( addmsg );
-}
 
 GtkWidget *
 msgwin_create( void ) {
@@ -146,6 +133,7 @@ void
 msgwin_loadpref( void ) {
   const char * pref;
 
+  tr_setMessageQueuing( 1 );
   pref = cf_getpref( PREF_MSGLEVEL );
   if( NULL == pref )
     return;
@@ -160,51 +148,34 @@ msgwin_loadpref( void ) {
 
 void
 msgwin_update( void ) {
-  GSList    * ii;
-  GtkTextIter iter;
+  tr_msg_list_t * msgs, * ii;
+  GtkTextIter     iter;
+  char          * label;
 
   if( NULL == textbuf )
     return;
 
-  g_mutex_lock( listmutex );
-
-  if( NULL != messages ) {
-    for( ii = messages; NULL != ii; ii = ii->next ) {
-      gtk_text_buffer_get_end_iter( textbuf, &iter );
-      gtk_text_buffer_insert( textbuf, &iter, ii->data, -1 );
-      g_free( ii->data );
+  msgs = tr_getQueuedMessages();
+  for( ii = msgs; NULL != ii; ii = ii->next ) {
+    switch( ii->level )
+    {
+      case TR_MSG_ERR:
+        label = _( "ERR " );
+        break;
+      case TR_MSG_INF:
+        label = _( "INF " );
+        break;
+      case TR_MSG_DBG:
+        label = _( "DBG " );
+        break;
+      default:
+        label = _( "??? " );
+        break;
     }
-    g_slist_free( messages );
-    messages = NULL;
+    gtk_text_buffer_get_end_iter( textbuf, &iter );
+    gtk_text_buffer_insert( textbuf, &iter, label, -1 );
+    gtk_text_buffer_insert( textbuf, &iter, ii->message, -1 );
+    gtk_text_buffer_insert( textbuf, &iter, "\n", -1 );
   }
-
-  g_mutex_unlock( listmutex );
-}
-
-static void
-addmsg( int level, const char * msg ) {
-  char * str;
-
-  g_mutex_lock( listmutex );
-
-  switch( level )
-  {
-    case TR_MSG_ERR:
-      str = _( "ERR" );
-      break;
-    case TR_MSG_INF:
-      str = _( "INF" );
-      break;
-    case TR_MSG_DBG:
-      str = _( "DBG" );
-      break;
-    default:
-      str = _( "???" );
-      break;
-  }
-
-  str = g_strdup_printf( "%s: %s\n", str, msg );
-  messages = g_slist_append( messages, str );
-
-  g_mutex_unlock( listmutex );
+  tr_freeMessageList( msgs );
 }

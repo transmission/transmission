@@ -44,6 +44,7 @@ tr_handle_t * tr_init()
     tr_handle_t * h;
     int           i, r;
 
+    tr_msgInit();
     tr_netResolveThreadInit();
 
     h = calloc( sizeof( tr_handle_t ), 1 );
