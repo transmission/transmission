@@ -864,14 +864,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [panel setRequiredFileType: @"torrent"];
         [panel setCanSelectHiddenExtension: YES];
         
-        [panel beginSheetForDirectory: nil file: [torrent name]
-            modalForWindow: fWindow modalDelegate: self didEndSelector:
-            @selector(saveTorrentCopySheetClosed:returnCode:contextInfo:) contextInfo: torrents];
+        [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
+            didEndSelector: @selector(saveTorrentCopySheetClosed:returnCode:contextInfo:) contextInfo: torrents];
     }
 }
 
-- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code
-    contextInfo: (NSMutableArray *) torrents
+- (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSMutableArray *) torrents
 {
     //if save successful, copy torrent to new location with name of data file
     if (code == NSOKButton)
@@ -879,8 +877,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             toPath: [panel filename] handler: nil];
     
     [torrents removeObjectAtIndex: 0];
-    [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:)
-                withObject: torrents waitUntilDone: NO];
+    [self performSelectorOnMainThread: @selector(copyTorrentFileForTorrents:) withObject: torrents waitUntilDone: NO];
 }
 
 - (void) revealFile: (id) sender

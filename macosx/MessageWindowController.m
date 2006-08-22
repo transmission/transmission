@@ -145,4 +145,24 @@
     [fTextView setString: @""];
 }
 
+- (void) writeToFile: (id) sender
+{
+    NSString * string = [[fTextView string] retain];
+    
+    NSSavePanel * panel = [NSSavePanel savePanel];
+    [panel setRequiredFileType: @"txt"];
+    [panel setCanSelectHiddenExtension: YES];
+    
+    [panel beginSheetForDirectory: nil file: @"untitled" modalForWindow: [self window] modalDelegate: self
+        didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];
+}
+
+- (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
+{
+    if (code == NSOKButton)
+        [string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil];
+    
+    [string release];
+}
+
 @end

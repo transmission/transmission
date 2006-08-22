@@ -2,7 +2,7 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {changeLevel = id; clearLog = id; }; 
+            ACTIONS = {changeLevel = id; clearLog = id; writeToFile = id; }; 
             CLASS = MessageWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {

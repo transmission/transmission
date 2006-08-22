@@ -40,4 +40,6 @@
 - (void) changeLevel: (id) sender;
 - (void) clearLog: (id) sender;
 
+- (void) writeToFile: (id) sender;
+
 @end
