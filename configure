@@ -187,11 +187,6 @@ EOF
       then
         CFLAGS_GTK=`pkg-config gtk+-2.0 --cflags`
         LDFLAGS_GTK=`pkg-config gtk+-2.0 --libs`
-        if runcmd pkg-config gthread-2.0
-        then
-          CFLAGS_GTK="$CFLAGS_GTK `pkg-config gthread-2.0 --cflags`"
-          LDFLAGS_GTK="$LDFLAGS_GTK `pkg-config gthread-2.0 --libs`"
-        fi
         if gettext_test
         then
           echo "yes"
