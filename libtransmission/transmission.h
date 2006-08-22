@@ -35,6 +35,7 @@ extern "C" {
 #ifndef PRIu64
 # define PRIu64 "lld"
 #endif
+#include <time.h>
 
 #define SHA_DIGEST_LENGTH 20
 #ifdef __BEOS__
@@ -353,6 +354,7 @@ struct tr_peer_stat_s
 struct tr_msg_list_s
 {
     int                    level;
+    time_t                 when;
     char                 * message;
     struct tr_msg_list_s * next;
 };

@@ -114,6 +114,7 @@ void tr_msg( int level, char * msg, ... )
             if( NULL != newmsg )
             {
                 newmsg->level = level;
+                newmsg->when = time( NULL );
                 vasprintf( &newmsg->message, msg, args );
                 if( NULL == newmsg->message )
                 {
