@@ -39,6 +39,8 @@
     {
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
+        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont fontWithName: @"Monaco" size: 10],
+                                                                        NSFontAttributeName, nil];
         
         [[self window] update]; //make sure nib is loaded right away
     }
@@ -48,6 +50,8 @@
 - (void) dealloc
 {
     [fTimer invalidate];
+    [fAttributes release];
+    
     [super dealloc];
 }
 
@@ -89,7 +93,7 @@
         //new line if text view is not empty
         if (currentMessage != messages || ![[fTextView string] isEqualToString: @""])
             [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc]
-                                                                initWithString: @"\n"] autorelease]];
+                                        initWithString: @"\n" attributes: fAttributes] autorelease]];
         
         int level = currentMessage->level;
         if (level == TR_MSG_ERR)
@@ -104,14 +108,12 @@
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
                             dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S" timeZone: nil];
         messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
-                            dateString, levelString, currentMessage->message]] autorelease];
+                            dateString, levelString, currentMessage->message] attributes: fAttributes] autorelease];
         
         [[fTextView textStorage] appendAttributedString: messageString];
     }
     
-    tr_freeMessageList(messages); 
-    
-    [fTextView setFont: [NSFont fontWithName: @"Monaco" size: 10]]; //find a way to set this permanently
+    tr_freeMessageList(messages);
     
     if (shouldScroll)
         [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];

@@ -32,6 +32,7 @@
     IBOutlet NSPopUpButton * fLevelButton;
     
     NSTimer * fTimer;
+    NSDictionary * fAttributes;
 }
 
 - (void) updateLog: (NSTimer *) timer;
