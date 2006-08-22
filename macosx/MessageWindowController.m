@@ -73,8 +73,8 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
-    tr_msg_list_t * messages = tr_getQueuedMessages(), * currentMessage;
-    if (!messages)
+    tr_msg_list_t * messages, * currentMessage;
+    if (!(messages = tr_getQueuedMessages()))
         return;
     
     //keep scrolled to bottom if already at bottom or there is no scroll bar yet
@@ -83,6 +83,7 @@
     
     NSAttributedString * messageString;
     NSString * levelString;
+    NSCalendarDate * dateString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         int level = currentMessage->level;
@@ -95,8 +96,11 @@
         else
             levelString = @"???";
         
-        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %s\n",
-                                                            levelString, currentMessage->message]] autorelease];
+        dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
+                            dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S" timeZone: nil];
+        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s\n",
+                            dateString, levelString, currentMessage->message]] autorelease];
+        
         [[fTextView textStorage] appendAttributedString: messageString];
     }
     
