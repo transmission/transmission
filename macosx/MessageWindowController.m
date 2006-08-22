@@ -31,23 +31,12 @@
 
 #define UPDATE_SECONDS 0.35
 
-@interface MessageWindowController (Private)
-
-MessageWindowController * selfReference; //I'm not sure why "self" can't be used directly
-
-@end
-
 @implementation MessageWindowController
 
 - (id) initWithWindowNibName: (NSString *) name
 {
     if ((self = [super initWithWindowNibName: name]))
     {
-        selfReference = self;
-        
-        fLock = [[NSLock alloc] init];
-        fBufferArray = [[NSMutableArray alloc] init];
-        
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
         
@@ -59,12 +48,6 @@ MessageWindowController * selfReference; //I'm not sure why "self" can't be used
 - (void) dealloc
 {
     [fTimer invalidate];
-    
-    tr_setMessageFunction(NULL);
-    
-    [fLock release];
-    [fBufferArray release];
-    
     [super dealloc];
 }
 
@@ -85,65 +68,44 @@ MessageWindowController * selfReference; //I'm not sure why "self" can't be used
     }
     
     tr_setMessageLevel(level);
-    tr_setMessageFunction(addMessage);
-}
-
-void addMessage(int level, const char * message)
-{
-    [selfReference addMessage: message level: level];
-}
-
-- (void) addMessage: (const char *) message level: (int) level
-{
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
-    NSString * levelString;
-
-    if (level == TR_MSG_ERR)
-        levelString = @"ERR";
-    else if (level == TR_MSG_INF)
-        levelString = @"INF";
-    else if (level == TR_MSG_DBG)
-        levelString = @"DBG";
-    else
-        levelString = @"???";
-    
-    NSAttributedString * messageString = [[[NSAttributedString alloc] initWithString:
-            [NSString stringWithFormat: @"(%@ %@) %s\n", [[NSDate date] dateWithCalendarFormat: @"%Y-%m-%d %H:%M:%S.%F"
-                                timeZone: nil], levelString, message]] autorelease];
-    
-    [fLock lock];
-    [fBufferArray addObject: messageString];
-    [fLock unlock];
-    
-    [pool release];
+    tr_setMessageQueuing(1);
 }
 
 - (void) updateLog: (NSTimer *) timer
 {
-    if ([fBufferArray count] == 0)
+    tr_msg_list_t * messages = tr_getQueuedMessages(), * currentMessage;
+    if (!messages)
         return;
     
-    [fLock lock];
-    
     //keep scrolled to bottom if already at bottom or there is no scroll bar yet
-    BOOL shouldScroll = NO;
     NSScroller * scroller = [fScrollView verticalScroller];
-    if ([scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0)
-        shouldScroll = YES;
+    BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
-    NSEnumerator * enumerator = [fBufferArray objectEnumerator];
     NSAttributedString * messageString;
-    while ((messageString = [enumerator nextObject]))
+    NSString * levelString;
+    for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
+    {
+        int level = currentMessage->level;
+        if (level == TR_MSG_ERR)
+            levelString = @"ERR";
+        else if (level == TR_MSG_INF)
+            levelString = @"INF";
+        else if (level == TR_MSG_DBG)
+            levelString = @"DBG";
+        else
+            levelString = @"???";
+        
+        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %s\n",
+                                                            levelString, currentMessage->message]] autorelease];
         [[fTextView textStorage] appendAttributedString: messageString];
-    [fBufferArray removeAllObjects];
+    }
+    
+    tr_freeMessageList(messages); 
     
     [fTextView setFont: [NSFont fontWithName: @"Monaco" size: 10]]; //find a way to set this permanently
     
     if (shouldScroll)
         [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];
-    
-    [fLock unlock];
 }
 
 - (void) changeLevel: (id) sender
@@ -164,9 +126,7 @@ void addMessage(int level, const char * message)
 
 - (void) clearLog: (id) sender
 {
-    [fLock lock];
     [fTextView setString: @""];
-    [fLock unlock];
 }
 
 @end
