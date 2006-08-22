@@ -39,8 +39,13 @@
     {
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
-        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont fontWithName: @"Monaco" size: 10],
-                                                                        NSFontAttributeName, nil];
+        
+        NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraph setHeadIndent: 20.0];
+        
+        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                        [NSFont fontWithName: @"Monaco" size: 10], NSFontAttributeName,
+                        paragraph, NSParagraphStyleAttributeName, nil];
         
         [[self window] update]; //make sure nib is loaded right away
     }
@@ -85,9 +90,8 @@
     NSScroller * scroller = [fScrollView verticalScroller];
     BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
-    NSAttributedString * messageString;
-    NSString * levelString;
-    NSCalendarDate * dateString;
+    NSMutableAttributedString * messageString;
+    NSString * levelString, * dateString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         //new line if text view is not empty
@@ -106,8 +110,8 @@
             levelString = @"???";
         
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
-                            dateWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil];
-        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
+                            descriptionWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil locale: nil];
+        messageString = [[[NSMutableAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
                             dateString, levelString, currentMessage->message] attributes: fAttributes] autorelease];
         
         [[fTextView textStorage] appendAttributedString: messageString];
