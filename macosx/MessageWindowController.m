@@ -46,6 +46,7 @@
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                         [NSFont fontWithName: @"Monaco" size: 10], NSFontAttributeName,
                         paragraph, NSParagraphStyleAttributeName, nil];
+        [paragraph release];
         
         [[self window] update]; //make sure nib is loaded right away
     }
@@ -90,7 +91,7 @@
     NSScroller * scroller = [fScrollView verticalScroller];
     BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
-    NSMutableAttributedString * messageString;
+    NSAttributedString * messageString;
     NSString * levelString, * dateString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
@@ -111,7 +112,7 @@
         
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
                             descriptionWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil locale: nil];
-        messageString = [[[NSMutableAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
+        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
                             dateString, levelString, currentMessage->message] attributes: fAttributes] autorelease];
         
         [[fTextView textStorage] appendAttributedString: messageString];
