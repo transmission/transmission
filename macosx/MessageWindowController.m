@@ -29,7 +29,8 @@
 #define LEVEL_INFO  1
 #define LEVEL_DEBUG 2
 
-#define UPDATE_SECONDS 0.35
+#define UPDATE_SECONDS  0.35
+#define MAX_LINES       1000
 
 @implementation MessageWindowController
 
@@ -37,9 +38,6 @@
 {
     if ((self = [super initWithWindowNibName: name]))
     {
-        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
-                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
-        
         NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraph setHeadIndent: 20.0];
         
@@ -47,6 +45,11 @@
                         [NSFont fontWithName: @"Monaco" size: 10], NSFontAttributeName,
                         paragraph, NSParagraphStyleAttributeName, nil];
         [paragraph release];
+        
+        fLines = 0;
+        
+        fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
+                    selector: @selector(updateLog:) userInfo: nil repeats: YES];
         
         [[self window] update]; //make sure nib is loaded right away
     }
@@ -91,15 +94,9 @@
     NSScroller * scroller = [fScrollView verticalScroller];
     BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
     
-    NSAttributedString * messageString;
-    NSString * levelString, * dateString;
+    NSString * levelString, * dateString, * messageString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
-        //new line if text view is not empty
-        if (currentMessage != messages || ![[fTextView string] isEqualToString: @""])
-            [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc]
-                                        initWithString: @"\n" attributes: fAttributes] autorelease]];
-        
         int level = currentMessage->level;
         if (level == TR_MSG_ERR)
             levelString = @"ERR";
@@ -112,10 +109,23 @@
         
         dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
                             descriptionWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil locale: nil];
-        messageString = [[[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%@ %@ %s",
-                            dateString, levelString, currentMessage->message] attributes: fAttributes] autorelease];
+        messageString = [NSString stringWithFormat: @"%s%@ %@ %s",
+                            fLines > 0 ? "\n" : "", dateString, levelString, currentMessage->message];
         
-        [[fTextView textStorage] appendAttributedString: messageString];
+        //remove the first line if at max number of lines
+        if (fLines == MAX_LINES)
+        {
+            NSString * text = [fTextView string];
+            unsigned int loc = [text rangeOfString: @"\n"].location;
+            if (loc != NSNotFound)
+                [fTextView setString: [[text substringFromIndex: loc + 1] stringByAppendingString: messageString]];
+        }
+        else
+        {
+            [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc] initWithString:
+                                        messageString attributes: fAttributes] autorelease]];
+            fLines++;
+        }
     }
     
     tr_freeMessageList(messages);
@@ -143,6 +153,7 @@
 - (void) clearLog: (id) sender
 {
     [fTextView setString: @""];
+    fLines = 0;
 }
 
 - (void) writeToFile: (id) sender

@@ -33,6 +33,8 @@
     
     NSTimer * fTimer;
     NSDictionary * fAttributes;
+    
+    int fLines;
 }
 
 - (void) updateLog: (NSTimer *) timer;
