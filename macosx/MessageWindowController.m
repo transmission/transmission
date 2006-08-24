@@ -118,14 +118,13 @@
             NSString * text = [fTextView string];
             unsigned int loc = [text rangeOfString: @"\n"].location;
             if (loc != NSNotFound)
-                [fTextView setString: [[text substringFromIndex: loc + 1] stringByAppendingString: messageString]];
+                [[fTextView textStorage] deleteCharactersInRange: NSMakeRange(0, loc + 1)];
         }
         else
-        {
-            [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc] initWithString:
-                                        messageString attributes: fAttributes] autorelease]];
             fLines++;
-        }
+        
+        [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc] initWithString:
+                                        messageString attributes: fAttributes] autorelease]];
     }
     
     tr_freeMessageList(messages);
