@@ -170,7 +170,19 @@
 - (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
 {
     if (code == NSOKButton)
-        [string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil];
+    {
+        if (![string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle: @"OK"];
+            [alert setMessageText: [NSString stringWithFormat: @"Log Could Not Be Saved"]];
+            [alert setInformativeText: [NSString stringWithFormat: 
+                    @"There was a problem creating the file \"%@\".", [[panel filename] lastPathComponent]]];
+            [alert setAlertStyle: NSWarningAlertStyle];
+            
+            [alert runModal];
+        }
+    }
     
     [string release];
 }

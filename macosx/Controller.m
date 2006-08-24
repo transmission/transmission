@@ -847,8 +847,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle: @"OK"];
-        [alert setMessageText: [NSString stringWithFormat: 
-                @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
+        [alert setMessageText: [NSString stringWithFormat: @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
         [alert setInformativeText: [NSString stringWithFormat: 
                 @"The torrent file (%@) cannot be found.", [torrent torrentLocation]]];
         [alert setAlertStyle: NSWarningAlertStyle];
