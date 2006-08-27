@@ -1,19 +1,19 @@
-# $Id$
-# French translation of PACKAGE.
-# Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# French translation of Transmission.
+# Copyright (C) 2006 The Free Software Foundation, Inc.
+# This file is distributed under the same license as the Transmission package.
+#
 # Pierre-Henri Quelen <pierrehenri.quelen@gmail.com>, 2006.
-# , fuzzy
+# Robert-André Mauchin <zebob.m@gmail.com>, 2006.
 # 
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-06-18 00:33-0700\n"
 "PO-Revision-Date: 2006-06-24 04:09+0200\n"
-"Last-Translator: Pierre-Henri Quelen <pierrehenri.quelen@gmail.com>\n"
-"Language-Team: French <pierrehenri.quelen@gmail.com>\n"
+"Last-Translator: Robert-André Mauchin <zebob.m@gmail.com>\n"
+"Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid ""
 "Failed to open the file %s for writing:\n"
 "%s"
-msgstr "Échec d'ouverture du fichier %s en écriture :"
+msgstr "L'ouverture du fichier %s en écriture a échoué :"
 "%s"
 
 #: conf.c:110
@@ -37,7 +37,7 @@ msgstr "Une autre instance de %s est déjà en cours d'exécution."
 msgid ""
 "Failed to lock the file %s:\n"
 "%s"
-msgstr "Échec au verrouillage du fichier %s :\n"
+msgstr "Le verrouillage du fichier %s a échoué :\n"
 "%s"
 
 #: conf.c:136 dialogs.c:137
@@ -45,7 +45,7 @@ msgstr "Échec au verrouillage du fichier %s :\n"
 msgid ""
 "Failed to create the directory %s:\n"
 "%s"
-msgstr "Échec à la création du dossier %s :\n"
+msgstr "La création du dossier %s a échoué :\n"
 "%s"
 
 #: conf.c:209
@@ -53,7 +53,7 @@ msgstr "Échec à la création du dossier %s :\n"
 msgid ""
 "Failed to open the file %s for reading:\n"
 "%s"
-msgstr "Échec à l'ouverture du fichier %s en lecture :\n"
+msgstr "L'ouverture du fichier %s en lecture a échoué :\n"
 "%s"
 
 #: conf.c:216
@@ -61,7 +61,7 @@ msgstr "Échec à l'ouverture du fichier %s en lecture :\n"
 msgid ""
 "Error while reading from the file %s:\n"
 "%s"
-msgstr "Erreur lors de la lecture du fichier %s :\n"
+msgstr "Erreur lors de la lecture du fichier %s :\n"
 "%s"
 
 #: conf.c:388
@@ -69,7 +69,7 @@ msgstr "Erreur lors de la lecture du fichier %s :\n"
 msgid ""
 "Error while writing to the file %s:\n"
 "%s"
-msgstr "Erreur lors de l'écriture du fichier %s :\n"
+msgstr "Erreur lors de l'écriture du fichier %s :\n"
 "%s"
 
 #: conf.c:394
@@ -77,7 +77,7 @@ msgstr "Erreur lors de l'écriture du fichier %s :\n"
 msgid ""
 "Failed to rename the file %s to %s:\n"
 "%s"
-msgstr "Échec au renommage du fichier %s en %s :\n"
+msgstr "Le renommage du fichier %s en %s a échoué :\n"
 "%s"
 
 #: dialogs.c:174
@@ -87,7 +87,7 @@ msgstr "%s Préférences"
 
 #: dialogs.c:183 dialogs.c:407
 msgid "Choose a download directory"
-msgstr "Choisissez un dossier cible"
+msgstr "Choisissez un répertoire cible"
 
 #: dialogs.c:192
 msgid "_Limit download speed"
@@ -95,7 +95,7 @@ msgstr "_Limiter le taux de réception"
 
 #: dialogs.c:194
 msgid "Maximum _download speed:"
-msgstr "Taux maximum de _réception :"
+msgstr "Taux maximum de _réception :"
 
 #: dialogs.c:196
 msgid "Li_mit upload speed"
@@ -103,17 +103,17 @@ msgstr "Li_miter le taux d'émission"
 
 #: dialogs.c:198
 msgid "Maximum _upload speed:"
-msgstr "Taux maximum d'_émission :"
+msgstr "Taux maximum d'_émission :"
 
 #. directory label and chooser
 #: dialogs.c:246
 msgid "Download di_rectory:"
-msgstr "Dossier _cible :"
+msgstr "Dossier _cible :"
 
 #. port label and entry
 #: dialogs.c:255
 msgid "Listening _port:"
-msgstr "P_ort d'écoute :"
+msgstr "P_ort d'écoute :"
 
 #: dialogs.c:268
 msgid "Use the torrent file where it is"
@@ -130,14 +130,14 @@ msgstr "Garder une copie et supprimer l'original"
 #. std
 #: dialogs.c:277
 msgid "For torrents added _normally:"
-msgstr "Pour les torrents _ajoutés normalement :"
+msgstr "Pour les torrents _ajoutés normalement :"
 
 #: dialogs.c:291
 msgid ""
 "For torrents added e_xternally\n"
 "(via the command-line):"
 msgstr "Pour les torrents ajoutés a_utrement\n"
-"(via la ligne de commande):"
+"(via la ligne de commande) :"
 
 #: dialogs.c:394
 msgid "Add a Torrent"
@@ -166,27 +166,27 @@ msgstr "%s Propriétés"
 
 #: dialogs.c:567 dialogs.c:570
 msgid "Tracker:"
-msgstr "Tracker :"
+msgstr "Tracker :"
 
 #: dialogs.c:572
 msgid "Announce:"
-msgstr "Annonce :"
+msgstr "Annonce :"
 
 #: dialogs.c:573
 msgid "Piece Size:"
-msgstr "Taille des pièces :"
+msgstr "Taille des pièces :"
 
 #: dialogs.c:574
 msgid "Pieces:"
-msgstr "Nombre de pièce :"
+msgstr "Nombre de pièce :"
 
 #: dialogs.c:575
 msgid "Total Size:"
-msgstr "Taille totale :"
+msgstr "Taille totale :"
 
 #: dialogs.c:577 dialogs.c:579
 msgid "Seeders:"
-msgstr "Seeders :"
+msgstr "Seeders :"
 
 #: dialogs.c:577 dialogs.c:581
 msgid "?"
@@ -194,37 +194,37 @@ msgstr "?"
 
 #: dialogs.c:581 dialogs.c:583
 msgid "Leechers:"
-msgstr "Leechers :"
+msgstr "Leechers :"
 
 #: dialogs.c:587
 msgid "Directory:"
-msgstr "Dossier :"
+msgstr "Répertoire :"
 
 #: dialogs.c:588
 msgid "Downloaded:"
-msgstr "Reçu :"
+msgstr "Reçu :"
 
 #: dialogs.c:589
 msgid "Uploaded:"
-msgstr "Émis :"
+msgstr "Émis :"
 
 #: ipc.c:208
 #, c-format
 msgid ""
 "Failed to set up socket:\n"
 "%s"
-msgstr "Échec à la configuration du socket :\n"
+msgstr "La configuration du socket a échoué :\n"
 "%s"
 
 #: ipc.c:229
 #, c-format
 msgid "failed to create socket: %s\n"
-msgstr "Échec à la création du socket : %s\n"
+msgstr "La création du socket a échoué : %s\n"
 
 #: ipc.c:238
 #, c-format
 msgid "failed to connect to %s: %s\n"
-msgstr "Échec à la connexion à %s : %s\n"
+msgstr "La connexion à %s a échoué : %s\n"
 
 #: ipc.c:403
 #, c-format
@@ -304,12 +304,12 @@ msgstr "Vérification des fichiers existants (%.1f%%)"
 #: main.c:703
 #, c-format
 msgid "Finishing in --:--:-- (%.1f%%)"
-msgstr "Temps restant : --:--:--·(%.1f%%)"
+msgstr "Temps restant : --:--:--·(%.1f%%)"
 
 #: main.c:705
 #, c-format
 msgid "Finishing in %02i:%02i:%02i (%.1f%%)"
-msgstr "Temps restant : %02i:%02i:%02i (%.1f%%)"
+msgstr "Temps restant : %02i:%02i:%02i (%.1f%%)"
 
 #: main.c:709
 #, c-format
@@ -329,7 +329,7 @@ msgstr "Arrêté (%.1f%%)"
 
 #: main.c:723
 msgid "Error: "
-msgstr "Erreur : "
+msgstr "Erreur : "
 
 #: main.c:727
 #, c-format
@@ -344,8 +344,8 @@ msgid ""
 "Ratio: %s\n"
 "UL: %s/s"
 msgstr ""
-"Ratio : %s\n"
-"Émission : %s/s"
+"Ratio : %s\n"
+"Émission : %s/s"
 
 #: main.c:764
 #, c-format
@@ -353,13 +353,13 @@ msgid ""
 "DL: %s/s\n"
 "UL: %s/s"
 msgstr ""
-"Réception : %s/s\n"
-"Émission : %s/s"
+"Réception : %s/s\n"
+"Émission : %s/s"
 
 #: main.c:810
 #, c-format
 msgid "     Total DL: %s/s     Total UL: %s/s"
-msgstr "     Taux global de réception : %s/s     Taux global d'émission : %s/s"
+msgstr "     Taux global de réception : %s/s     Taux global d'émission : %s/s"
 
 #: main.c:1081
 #, c-format
@@ -370,10 +370,10 @@ msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
 msgstr[0] ""
-"Échec de chargement du ficher .torrent :\n"
+"Échec de chargement du ficher .torrent :\n"
 "%s"
 msgstr[1] ""
-"Échec du chargement des fichiers .torrent :\n"
+"Échec du chargement des fichiers .torrent :\n"
 "%s"
 
 #: tr_torrent.c:290
@@ -384,7 +384,7 @@ msgstr "%s n'est pas un fichier .torrent valide"
 #: tr_torrent.c:293
 #, c-format
 msgid "%s: torrent is already open"
-msgstr "%s : ce torrent est déjà ouvert"
+msgstr "%s : ce torrent est déjà ouvert"
 
 #: util.c:67
 msgid "B"
@@ -392,27 +392,27 @@ msgstr "o"
 
 #: util.c:67
 msgid "KiB"
-msgstr "ko"
+msgstr "Kio"
 
 #: util.c:67
 msgid "MiB"
-msgstr "Mo"
+msgstr "Mio"
 
 #: util.c:67
 msgid "GiB"
-msgstr "Go"
+msgstr "Gio"
 
 #: util.c:67
 msgid "TiB"
-msgstr "To"
+msgstr "Tio"
 
 #: util.c:67
 msgid "PiB"
-msgstr "Po"
+msgstr "Pio"
 
 #: util.c:67
 msgid "EiB"
-msgstr "Eo"
+msgstr "Eio"
 
 #: util.c:92
 msgid "N/A"
