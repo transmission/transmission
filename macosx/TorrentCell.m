@@ -92,8 +92,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         fErrorImage = [NSImage imageNamed: @"Error.tiff"];
         [fErrorImage setFlipped: YES];
-        [fErrorImage setScalesWhenResized: YES];
-        [fErrorImage setSize: NSMakeSize(16.0, 16.0)];
     }
     return self;
 }
