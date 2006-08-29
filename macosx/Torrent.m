@@ -509,6 +509,11 @@
     return fStat->status == TR_STATUS_PAUSE;
 }
 
+- (BOOL) isError
+{
+    return fStat->error & TR_ETRACKER;
+}
+
 - (BOOL) justFinished
 {
     return tr_getFinished(fHandle);

@@ -38,10 +38,6 @@
 
 @implementation TorrentCell
 
-static NSImage * fProgressWhite, * fProgressBlue, * fProgressGray, * fProgressGreen,
-                * fProgressAdvanced, * fProgressEndWhite, * fProgressEndBlue,
-                * fProgressEndGray, * fProgressEndGreen, * fProgressEndAdvanced;
-
 // Used to optimize drawing. They contain packed RGBA pixels for every color needed.
 #define BE OSSwapBigToHostConstInt32
 static uint32_t kBorder[] =
@@ -68,44 +64,36 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fStatusRegular = [fDefaults boolForKey: @"SmallStatusRegular"];
     
         NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
-        if (!fProgressWhite)
-        {
-            fProgressWhite = [NSImage imageNamed: @"ProgressBarWhite.png"];
-            [fProgressWhite setScalesWhenResized: YES];
-        }
-        if (!fProgressBlue)
-        {
-            fProgressBlue = [NSImage imageNamed: @"ProgressBarBlue.png"];
-            [fProgressBlue setScalesWhenResized: YES];
-            [fProgressBlue setSize: startSize];
-        }
-        if (!fProgressGray)
-        {
-            fProgressGray = [NSImage imageNamed: @"ProgressBarGray.png"];
-            [fProgressGray setScalesWhenResized: YES];
-            [fProgressGray setSize: startSize];
-        }
-        if (!fProgressGreen)
-        {
-            fProgressGreen = [NSImage imageNamed: @"ProgressBarGreen.png"];
-            [fProgressGreen setScalesWhenResized: YES];
-        }
-        if (!fProgressAdvanced)
-        {
-            fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
-            [fProgressAdvanced setScalesWhenResized: YES];
-        }
         
-        if (!fProgressEndWhite)
-            fProgressEndWhite = [NSImage imageNamed: @"ProgressBarEndWhite.png"];
-        if (!fProgressEndBlue)
-            fProgressEndBlue = [NSImage imageNamed: @"ProgressBarEndBlue.png"];
-        if (!fProgressEndGray)
-            fProgressEndGray = [NSImage imageNamed: @"ProgressBarEndGray.png"];
-        if (!fProgressEndGreen)
-            fProgressEndGreen = [NSImage imageNamed: @"ProgressBarEndGreen.png"];
-        if (!fProgressEndAdvanced)
-            fProgressEndAdvanced = [NSImage imageNamed: @"ProgressBarEndAdvanced.png"];
+        fProgressWhite = [NSImage imageNamed: @"ProgressBarWhite.png"];
+        [fProgressWhite setScalesWhenResized: YES];
+        
+        
+        fProgressBlue = [NSImage imageNamed: @"ProgressBarBlue.png"];
+        [fProgressBlue setScalesWhenResized: YES];
+        [fProgressBlue setSize: startSize];
+        
+        fProgressGray = [NSImage imageNamed: @"ProgressBarGray.png"];
+        [fProgressGray setScalesWhenResized: YES];
+        [fProgressGray setSize: startSize];
+        
+        fProgressGreen = [NSImage imageNamed: @"ProgressBarGreen.png"];
+        [fProgressGreen setScalesWhenResized: YES];
+        
+        fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
+        [fProgressAdvanced setScalesWhenResized: YES];
+        
+        
+        fProgressEndWhite = [NSImage imageNamed: @"ProgressBarEndWhite.png"];
+        fProgressEndBlue = [NSImage imageNamed: @"ProgressBarEndBlue.png"];
+        fProgressEndGray = [NSImage imageNamed: @"ProgressBarEndGray.png"];
+        fProgressEndGreen = [NSImage imageNamed: @"ProgressBarEndGreen.png"];
+        fProgressEndAdvanced = [NSImage imageNamed: @"ProgressBarEndAdvanced.png"];
+        
+        fErrorImage = [NSImage imageNamed: @"Error.tiff"];
+        [fErrorImage setFlipped: YES];
+        [fErrorImage setScalesWhenResized: YES];
+        [fErrorImage setSize: NSMakeSize(16.0, 16.0)];
     }
     return self;
 }
@@ -313,6 +301,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
                 operation: NSCompositeSourceOver fraction: 1.0];
+        
+        //error badge
+        if ([fTorrent isError])
+        {
+            NSSize errorIconSize = [fErrorImage size];
+            [fErrorImage drawAtPoint: NSMakePoint(pen.x + iconSize.width - errorIconSize.width,
+                                                    pen.y + iconSize.height  - errorIconSize.height)
+                fromRect: NSMakeRect(0, 0, errorIconSize.width, errorIconSize.height)
+                operation: NSCompositeSourceOver fraction: 1.0];
+        }
 
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
 
@@ -351,7 +349,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     else //small size
     {
         //icon
-        NSImage * icon = [fTorrent iconSmall];
+        NSImage * icon = ![fTorrent isError] ? [fTorrent iconSmall] : fErrorImage;
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;

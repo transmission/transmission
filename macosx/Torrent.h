@@ -112,6 +112,7 @@
 - (BOOL)    isActive;
 - (BOOL)    isSeeding;
 - (BOOL)    isPaused;
+- (BOOL)    isError;
 - (BOOL)    justFinished;
 
 - (NSArray *) peers;
