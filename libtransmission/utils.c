@@ -41,6 +41,7 @@ void tr_msgInit( void )
 
 void tr_setMessageLevel( int level )
 {
+    tr_msgInit();
     tr_lockLock( messageLock );
     messageLevel = MAX( 0, level );
     tr_lockUnlock( messageLock );
@@ -50,6 +51,7 @@ int tr_getMessageLevel( void )
 {
     int ret;
 
+    tr_msgInit();
     tr_lockLock( messageLock );
     ret = messageLevel;
     tr_lockUnlock( messageLock );
@@ -59,6 +61,7 @@ int tr_getMessageLevel( void )
 
 void tr_setMessageQueuing( int enabled )
 {
+    tr_msgInit();
     tr_lockLock( messageLock );
     messageQueuing = enabled;
     tr_lockUnlock( messageLock );
@@ -68,6 +71,7 @@ tr_msg_list_t * tr_getQueuedMessages( void )
 {
     tr_msg_list_t * ret;
 
+    assert( NULL != messageLock );
     tr_lockLock( messageLock );
     ret = messageQueue;
     messageQueue = NULL;
@@ -95,6 +99,7 @@ void tr_msg( int level, char * msg, ... )
     va_list          args;
     tr_msg_list_t * newmsg;
 
+    assert( NULL != messageLock );
     tr_lockLock( messageLock );
 
     if( !messageLevel )
