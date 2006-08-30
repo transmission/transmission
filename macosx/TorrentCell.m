@@ -106,8 +106,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([barImage size].width < width)
         [barImage setSize: NSMakeSize(width * 1.5, BAR_HEIGHT)];
 
-    [barImage compositeToPoint: point fromRect: NSMakeRect(0, 0, width, BAR_HEIGHT)
-                        operation: NSCompositeSourceOver];
+    [barImage compositeToPoint: point fromRect: NSMakeRect(0, 0, width, BAR_HEIGHT) operation: NSCompositeSourceOver];
 }
 
 - (void) buildSimpleBar: (float) width point: (NSPoint) point

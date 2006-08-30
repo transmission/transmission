@@ -161,27 +161,22 @@
 {
     if ([self isEqualToString: string])
         return NSOrderedSame;
-
-    NSEnumerator * selfSections = [[self componentsSeparatedByString: @"."] objectEnumerator],
-            * newSections = [[string componentsSeparatedByString: @"."] objectEnumerator];
     
+    NSArray * selfSections = [self componentsSeparatedByString: @"."],
+            * newSections = [string componentsSeparatedByString: @"."];
+    
+    if ([selfSections count] != [newSections count])
+        return [[NSNumber numberWithUnsignedInt: [selfSections count]] compare:
+                            [NSNumber numberWithUnsignedInt: [newSections count]]];
+
+    NSEnumerator * selfSectionsEnum = [selfSections objectEnumerator], * newSectionsEnum = [newSections objectEnumerator];
+    NSString * selfString, * newString;
     NSComparisonResult result;
-    NSString * selfString = [selfSections nextObject], * newString = [newSections nextObject];
-    while (selfString && newString)
-    {
+    while ((selfString = [selfSectionsEnum nextObject]) && (newString = [newSectionsEnum nextObject]))
         if ((result = [selfString compare: newString options: NSNumericSearch]) != NSOrderedSame)
             return result;
-        
-        selfString = [selfSections nextObject];
-        newString = [newSections nextObject];
-    }
     
-    if (selfString)
-        return NSOrderedDescending;
-    else if (newString)
-        return NSOrderedAscending;
-    else
-        return NSOrderedSame;
+    return NSOrderedSame;
 }
 
 @end
