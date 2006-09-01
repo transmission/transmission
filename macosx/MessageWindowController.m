@@ -135,6 +135,8 @@
 
 - (void) changeLevel: (id) sender
 {
+    [self updateLog: nil];
+    
     int selection = [fLevelButton indexOfSelectedItem], level;
     if (selection == LEVEL_INFO)
         level = TR_MSG_INF;
@@ -142,8 +144,6 @@
         level = TR_MSG_DBG;
     else
         level = TR_MSG_ERR;
-    
-    [self updateLog: nil];
     
     tr_setMessageLevel(level);
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
