@@ -38,7 +38,7 @@
 {
     if ((self = [super initWithWindowNibName: name]))
     {
-        NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+        NSMutableParagraphStyle * paragraph = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraph setHeadIndent: 20.0];
         
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -87,7 +87,7 @@
 - (void) updateLog: (NSTimer *) timer
 {
     tr_msg_list_t * messages, * currentMessage;
-    if (!(messages = tr_getQueuedMessages()))
+    if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
     //keep scrolled to bottom if already at bottom or there is no scroll bar yet

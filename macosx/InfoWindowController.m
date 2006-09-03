@@ -47,6 +47,7 @@
 
 @interface InfoWindowController (Private)
 
+- (void) reloadPeerTable;
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
@@ -267,24 +268,17 @@
         
         BOOL active = [torrent isActive];
         
-        [fConnectedPeersField setStringValue: active ? [NSString
-                stringWithInt: [torrent totalPeers]] : @""];
-        [fDownloadingFromField setStringValue: active ? [NSString
-                stringWithInt: [torrent peersUploading]] : @""];
-        [fUploadingToField setStringValue: active ? [NSString
-                stringWithInt: [torrent peersDownloading]] : @""];
+        [fConnectedPeersField setStringValue: active ? [NSString stringWithInt: [torrent totalPeers]] : @""];
+        [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
+        [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
         
         [fRatioField setStringValue: [NSString stringForRatioWithDownload: downloadedTotal upload: uploadedTotal]];
         
         [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
-        //set peers table
-        [fPeers setArray: [torrent peers]];
-        [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
-    
-        [fPeerTable reloadData];
-        [fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
-                                                [torrent totalPeers], [fPeers count]]];
+        //set peers table if visible
+        if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_PEERS_IDENT])
+            [self reloadPeerTable];
     }
 }
 
@@ -368,6 +362,19 @@
     [self updateInfoStats];
 }
 
+//requires a non-empty torrent array
+- (void) reloadPeerTable
+{
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    [fPeers setArray: [torrent peers]];
+    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+    
+    [fPeerTable reloadData];
+    [fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
+                                            [torrent totalPeers], [fPeers count]]];
+}
+
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
@@ -399,7 +406,12 @@
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
         height = TAB_ACTIVITY_HEIGHT;
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
+    {
         height = TAB_PEERS_HEIGHT;
+        
+        if ([fTorrents count] == 1)
+            [self reloadPeerTable]; //initial update of peer table
+    }
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
         height = TAB_FILES_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
