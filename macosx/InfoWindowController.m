@@ -63,7 +63,7 @@
     fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];
     
     fTorrents = [[NSArray alloc] init];
-    fPeers = [[NSMutableArray alloc] initWithCapacity: 6];
+    fPeers = [[NSMutableArray alloc] initWithCapacity: 30];
     fFiles = [[NSMutableArray alloc] initWithCapacity: 6];
     [fFileTable setDoubleAction: @selector(revealFile:)];
     

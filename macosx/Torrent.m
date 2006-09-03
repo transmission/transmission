@@ -436,8 +436,7 @@
 
 - (NSString *) torrentLocationString
 {
-    return fPrivateTorrent ? @"Transmission Support Folder"
-            : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
+    return fPrivateTorrent ? @"Transmission Support Folder" : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
 }
 
 - (NSString *) dataLocation
@@ -530,7 +529,6 @@
     for (i = 0; i < totalPeers; i++)
     {
         peer = peers[i];
-        
         [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithBool: peer.isConnected], @"Connected",
             [NSString stringWithCString: (char *) peer.addr encoding: NSUTF8StringEncoding], @"IP",
@@ -640,8 +638,8 @@
     for (i = 0; i < count; i++)
     {
         file = fInfo->files[i];
-        [files addObject: [NSDictionary dictionaryWithObjectsAndKeys: [[self downloadFolder]
-            stringByAppendingPathComponent: [NSString stringWithUTF8String: file.name]], @"Name",
+        [files addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+            [[self downloadFolder] stringByAppendingPathComponent: [NSString stringWithUTF8String: file.name]], @"Name",
             [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];
     }
     

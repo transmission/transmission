@@ -6,6 +6,8 @@
             CLASS = MessageWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fDebugWarningField = NSTextField; 
+                fDebugWarningIcon = NSImageView; 
                 fLevelButton = NSPopUpButton; 
                 fScrollView = NSScrollView; 
                 fTextView = NSTextView; 

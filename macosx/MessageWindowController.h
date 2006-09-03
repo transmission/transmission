@@ -35,6 +35,9 @@
     NSDictionary * fAttributes;
     
     int fLines;
+    
+    IBOutlet NSTextField * fDebugWarningField;
+    IBOutlet NSImageView * fDebugWarningIcon;
 }
 
 - (void) updateLog: (NSTimer *) timer;

@@ -29,8 +29,14 @@
 #define LEVEL_INFO  1
 #define LEVEL_DEBUG 2
 
-#define UPDATE_SECONDS  0.35
+#define UPDATE_SECONDS  0.4
 #define MAX_LINES       1000
+
+@interface MessageWindowController (Private)
+
+- (void) setDebugWarningHidden: (BOOL) hide;
+
+@end
 
 @implementation MessageWindowController
 
@@ -80,6 +86,8 @@
         [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
     }
     
+    [self setDebugWarningHidden: level != TR_MSG_DBG];
+    
     tr_setMessageLevel(level);
     tr_setMessageQueuing(1);
 }
@@ -115,8 +123,7 @@
         //remove the first line if at max number of lines
         if (fLines == MAX_LINES)
         {
-            NSString * text = [fTextView string];
-            unsigned int loc = [text rangeOfString: @"\n"].location;
+            unsigned int loc = [[fTextView string] rangeOfString: @"\n"].location;
             if (loc != NSNotFound)
                 [[fTextView textStorage] deleteCharactersInRange: NSMakeRange(0, loc + 1)];
         }
@@ -144,6 +151,8 @@
         level = TR_MSG_DBG;
     else
         level = TR_MSG_ERR;
+    
+    [self setDebugWarningHidden: level != TR_MSG_DBG];
     
     tr_setMessageLevel(level);
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
@@ -185,6 +194,12 @@
     }
     
     [string release];
+}
+
+- (void) setDebugWarningHidden: (BOOL) hide
+{
+    [fDebugWarningField setHidden: hide];
+    [fDebugWarningIcon setHidden: hide];
 }
 
 @end

@@ -90,10 +90,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fProgressEndGreen = [NSImage imageNamed: @"ProgressBarEndGreen.png"];
         fProgressEndAdvanced = [NSImage imageNamed: @"ProgressBarEndAdvanced.png"];
         
-        fErrorImage = [NSImage imageNamed: @"Error.tiff"];
+        fErrorImage = [[NSImage imageNamed: @"Error.tiff"] copy];
         [fErrorImage setFlipped: YES];
     }
     return self;
+}
+
+- (void) dealloc
+{
+    [fErrorImage release];
+    [super dealloc];
 }
 
 - (void) setTorrent: (Torrent *) torrent
