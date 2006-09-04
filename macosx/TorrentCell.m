@@ -68,7 +68,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fProgressWhite = [NSImage imageNamed: @"ProgressBarWhite.png"];
         [fProgressWhite setScalesWhenResized: YES];
         
-        
         fProgressBlue = [NSImage imageNamed: @"ProgressBarBlue.png"];
         [fProgressBlue setScalesWhenResized: YES];
         [fProgressBlue setSize: startSize];
@@ -82,7 +81,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
         [fProgressAdvanced setScalesWhenResized: YES];
-        
         
         fProgressEndWhite = [NSImage imageNamed: @"ProgressBarEndWhite.png"];
         fProgressEndBlue = [NSImage imageNamed: @"ProgressBarEndBlue.png"];
@@ -98,7 +96,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
-    [fErrorImage release];
+    #warning make work
+    //[fErrorImage release];
     [super dealloc];
 }
 
