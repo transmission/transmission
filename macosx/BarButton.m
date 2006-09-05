@@ -263,7 +263,7 @@
 
 - (void) setForInactive: (NSNotification *) notification
 {
-    [self setImage: [self image] == fButtonSelected ? fButtonSelectedDim : fButtonNormalDim];
+    [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
     
     if (fTrackingTag)
     {
