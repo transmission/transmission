@@ -89,9 +89,6 @@
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
     
-    NSTimer                         * fAutoImportTimer;
-    NSMutableArray                  * fAutoImportedNames;
-    
     BOOL                            fUpdateInProgress;
     Badger                          * fBadger;
 }
@@ -175,8 +172,7 @@
 
 - (void) reloadInspectorSettings: (NSNotification *) notification;
 
-- (void) checkAutoImportDirectory: (NSTimer *) timer;
-- (void) autoImportChange: (NSNotification *) notification;
+- (void) checkAutoImportDirectory;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 

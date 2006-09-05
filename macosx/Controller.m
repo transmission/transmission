@@ -29,6 +29,7 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "StringAdditions.h"
+#import "UKKQueue.h"
 
 #import <Sparkle/Sparkle.h>
 
@@ -90,9 +91,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fBadger = [[Badger alloc] init];
         
-        fAutoImportedNames = [[NSMutableArray alloc] init];
-        
         [GrowlApplicationBridge setGrowlDelegate: self];
+        
+        [[UKKQueue sharedFileWatcher] setDelegate: self];
     }
     return self;
 }
@@ -111,7 +112,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fSortType release];
     [fFilterType release];
-    [fAutoImportedNames release];
     
     tr_close(fLib);
     [super dealloc];
@@ -317,7 +317,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
                     name: @"AutoSpeedLimitChange" object: nil];
     
-    [nc addObserver: self selector: @selector(autoImportChange:)
+    [nc addObserver: self selector: @selector(checkAutoImportDirectory)
                     name: @"AutoImportSettingChange" object: nil];
     
     [nc addObserver: self selector: @selector(setWindowSizeToFit)
@@ -366,11 +366,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
-    
-    //timer to check for auto import every 15 seconds, must do after everything else is set up
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_IMPORT_SECONDS target: self 
-        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: YES];
-    [[NSRunLoop currentRunLoop] addTimer: fAutoImportTimer forMode: NSDefaultRunLoopMode];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
@@ -419,7 +414,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
     //stop timers
-    [fAutoImportTimer invalidate];
     [fSpeedLimitTimer invalidate];
     [fTimer invalidate];
     
@@ -1533,27 +1527,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fInfoController updateInfoStatsAndSettings];
 }
 
-- (void) checkAutoImportDirectory: (NSTimer *) timer
+-(void) watcher: (id<UKFileWatcher>) kq receivedNotification: (NSString*) nm forPath: (NSString*) fpath
+{
+    if ([nm isEqualToString: UKFileWatcherWriteNotification])
+        [self checkAutoImportDirectory];
+}
+
+- (void) checkAutoImportDirectory
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
     	
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
-    //if folder cannot be found or the contents hasn't changed simply give up
-    NSArray * allFileNames;
-    if (!(allFileNames = [[NSFileManager defaultManager] directoryContentsAtPath: path])
-            || [allFileNames isEqualToArray: fAutoImportedNames])
+    NSArray * importedNames;
+    if (!(importedNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))
         return;
-
-    //try to add files that haven't already been added
-    NSMutableArray * newFileNames = [NSMutableArray arrayWithArray: allFileNames];
-    [newFileNames removeObjectsInArray: fAutoImportedNames];
     
-    //save the current list of files
-    [fAutoImportedNames setArray: allFileNames];
-    
-    NSEnumerator * enumerator = [newFileNames objectEnumerator];
+    NSEnumerator * enumerator = [importedNames objectEnumerator];
     NSString * file;
     unsigned oldCount;
     while ((file = [enumerator nextObject]))
@@ -1567,12 +1558,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added" description: file
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
         }
-}
-
-- (void) autoImportChange: (NSNotification *) notification
-{
-    [fAutoImportedNames removeAllObjects];
-    [self checkAutoImportDirectory: nil];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t

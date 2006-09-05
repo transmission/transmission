@@ -24,6 +24,7 @@
 
 #import "PrefsController.h"
 #import "StringAdditions.h"
+#import "UKKQueue.h"
 
 #define MIN_PORT    1
 #define MAX_PORT    65535
@@ -112,6 +113,9 @@
     BOOL autoImport = [fDefaults boolForKey: @"AutoImport"];
     [fAutoImportCheck setState: autoImport];
     [fImportFolderPopUp setEnabled: autoImport];
+    
+    if (autoImport)
+        [[UKKQueue sharedFileWatcher] addPath: fImportFolder];
     
     //set auto size
     [fAutoSizeCheck setState: [fDefaults boolForKey: @"AutoSize"]];
@@ -750,6 +754,11 @@
     [fDefaults setBool: state forKey: @"AutoImport"];
     [fImportFolderPopUp setEnabled: state];
     
+    if (state == NSOnState)
+        [[UKKQueue sharedFileWatcher] addPath: fImportFolder];
+    else
+        [[UKKQueue sharedFileWatcher] removePathFromQueue: fImportFolder];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
 }
 
@@ -866,18 +875,23 @@
 
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
-   if (code == NSOKButton)
-   {
-       [fImportFolder release];
-       fImportFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
-
-       [fDefaults setObject: fImportFolder forKey: @"AutoImportDirectory"];
-
-       [self updateImportPopUp];
-       
-       [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
-   }
-   [fImportFolderPopUp selectItemAtIndex: 0];
+    if (code == NSOKButton)
+    {
+        UKKQueue * sharedQueue = [UKKQueue sharedFileWatcher];
+        [sharedQueue removePathFromQueue: fImportFolder];
+        
+        [fImportFolder release];
+        fImportFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
+        
+        [fDefaults setObject: fImportFolder forKey: @"AutoImportDirectory"];
+        
+        [self updateImportPopUp];
+        
+        [sharedQueue addPath: fImportFolder];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+    }
+    [fImportFolderPopUp selectItemAtIndex: 0];
 }
 
 - (void) updateImportPopUp

@@ -127,6 +127,14 @@
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
+		A2A3065B0AAD24A80049E2AC /* UKFileWatcher.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2A306530AAD24A80049E2AC /* UKFileWatcher.h */; };
+		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
+		A2A3065D0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2A306550AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h */; };
+		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
+		A2A3065F0AAD24A80049E2AC /* UKKQueue.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2A306570AAD24A80049E2AC /* UKKQueue.h */; };
+		A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306580AAD24A80049E2AC /* UKKQueue.m */; };
+		A2A306610AAD24A80049E2AC /* UKMainThreadProxy.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */; };
+		A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */; };
 		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
 		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.png */; };
@@ -165,6 +173,10 @@
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
 				A256588C0A9A695400E8A03B /* MessageWindowController.h in CopyFiles */,
+				A2A3065B0AAD24A80049E2AC /* UKFileWatcher.h in CopyFiles */,
+				A2A3065D0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h in CopyFiles */,
+				A2A3065F0AAD24A80049E2AC /* UKKQueue.h in CopyFiles */,
+				A2A306610AAD24A80049E2AC /* UKMainThreadProxy.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +348,14 @@
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
+		A2A306530AAD24A80049E2AC /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFileWatcher.h; path = macosx/UKKQueue/UKFileWatcher.h; sourceTree = "<group>"; };
+		A2A306540AAD24A80049E2AC /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKFileWatcher.m; path = macosx/UKKQueue/UKFileWatcher.m; sourceTree = "<group>"; };
+		A2A306550AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFNSubscribeFileWatcher.h; path = macosx/UKKQueue/UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
+		A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKFNSubscribeFileWatcher.m; path = macosx/UKKQueue/UKFNSubscribeFileWatcher.m; sourceTree = "<group>"; };
+		A2A306570AAD24A80049E2AC /* UKKQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKKQueue.h; path = macosx/UKKQueue/UKKQueue.h; sourceTree = "<group>"; };
+		A2A306580AAD24A80049E2AC /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKKQueue.m; path = macosx/UKKQueue/UKKQueue.m; sourceTree = "<group>"; };
+		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
+		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileTableView.h; path = macosx/FileTableView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileTableView.m; path = macosx/FileTableView.m; sourceTree = "<group>"; };
@@ -383,6 +403,14 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A2A306530AAD24A80049E2AC /* UKFileWatcher.h */,
+				A2A306540AAD24A80049E2AC /* UKFileWatcher.m */,
+				A2A306550AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h */,
+				A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */,
+				A2A306570AAD24A80049E2AC /* UKKQueue.h */,
+				A2A306580AAD24A80049E2AC /* UKKQueue.m */,
+				A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */,
+				A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */,
 				A256588A0A9A695400E8A03B /* MessageWindowController.h */,
 				A256588B0A9A695400E8A03B /* MessageWindowController.m */,
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
@@ -836,6 +864,10 @@
 				A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */,
 				A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */,
 				A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */,
+				A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */,
+				A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */,
+				A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */,
+				A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
