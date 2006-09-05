@@ -252,12 +252,7 @@
 
 - (void) setForActive: (NSNotification *) notification
 {
-    if ([self image] == fButtonSelectedDim)
-        [self setImage: fButtonSelected];
-    else if ([self image] == fButtonNormalDim)
-        [self setImage: fButtonNormal];
-    else;
-    
+    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
     [self resetBounds: nil];
 }
 
