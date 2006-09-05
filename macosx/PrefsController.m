@@ -80,6 +80,7 @@
 - (void) dealloc
 {
     [fDownloadFolder release];
+    [fImportFolder release];
     [super dealloc];
 }
 

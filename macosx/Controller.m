@@ -1527,9 +1527,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fInfoController updateInfoStatsAndSettings];
 }
 
--(void) watcher: (id<UKFileWatcher>) kq receivedNotification: (NSString*) nm forPath: (NSString*) fpath
+-(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
-    if ([nm isEqualToString: UKFileWatcherWriteNotification])
+    if ([notification isEqualToString: UKFileWatcherWriteNotification])
         [self checkAutoImportDirectory];
 }
 
