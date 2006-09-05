@@ -48,10 +48,10 @@
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         
         [nc addObserver: self selector: @selector(setForActive:)
-                    name: NSWindowDidBecomeKeyNotification object: nil];
+                    name: NSWindowDidBecomeKeyNotification object: [self window]];
         
         [nc addObserver: self selector: @selector(setForInactive:)
-                    name: NSWindowDidResignKeyNotification object: nil];
+                    name: NSWindowDidResignKeyNotification object: [self window]];
         
         [nc addObserver: self selector: @selector(resetBounds:)
                     name: NSViewFrameDidChangeNotification object: nil];
@@ -252,9 +252,6 @@
 
 - (void) setForActive: (NSNotification *) notification
 {
-    if ([notification object] != [self window])
-        return;
-
     if ([self image] == fButtonSelectedDim)
         [self setImage: fButtonSelected];
     else if ([self image] == fButtonNormalDim)
@@ -266,13 +263,13 @@
 
 - (void) setForInactive: (NSNotification *) notification
 {
-    if ([notification object] != [self window])
-        return;
-
     [self setImage: [self image] == fButtonSelected ? fButtonSelectedDim : fButtonNormalDim];
     
     if (fTrackingTag)
+    {
         [self removeTrackingRect: fTrackingTag];
+        fTrackingTag = 0;
+    }
 }
 
 @end
