@@ -54,7 +54,6 @@
 #define WINDOW_REGULAR_WIDTH    468.0
 
 #define UPDATE_UI_SECONDS           1.0
-#define AUTO_IMPORT_SECONDS         15.0
 #define AUTO_SPEED_LIMIT_SECONDS    10.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
