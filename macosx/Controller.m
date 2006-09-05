@@ -207,8 +207,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     IONotificationPortRef notify;
     io_object_t iterator;
     if (fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator))
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify),
-                            kCFRunLoopCommonModes);
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
     else
         NSLog(@"Could not IORegisterForSystemPower");
 
@@ -365,6 +364,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
+    
+    [self checkAutoImportDirectory];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
