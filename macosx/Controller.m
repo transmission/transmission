@@ -2054,7 +2054,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSString * title = [fStatusBar isHidden] ? @"Show Status Bar" : @"Hide Status Bar";
         if (![[menuItem title] isEqualToString: title])
-                [menuItem setTitle: title];
+            [menuItem setTitle: title];
 
         return [fWindow isVisible];
     }
@@ -2064,14 +2064,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSString * title = [fFilterBar isHidden] ? @"Show Filter Bar" : @"Hide Filter Bar";
         if (![[menuItem title] isEqualToString: title])
-                [menuItem setTitle: title];
+            [menuItem setTitle: title];
 
         return [fWindow isVisible];
     }
     
     //enable prev/next filter button
     if (action == @selector(switchFilter:))
-        return [fWindow isVisible];
+        return [fWindow isVisible] && ![fFilterBar isHidden];
 
     //enable reveal in finder
     if (action == @selector(revealFile:))
