@@ -301,6 +301,7 @@ static void sendQuery( tr_tracker_t * tc )
     uint64_t   down;
     uint64_t   up;
 
+    assert( tor->downloaded >= tc->download && tor->uploaded >= tc->upload );
     down = tor->downloaded - tc->download;
     up = tor->uploaded - tc->upload;
     if( tc->started )
