@@ -148,11 +148,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
-    //set info keyboard shortcuts
-    unichar ch = NSRightArrowFunctionKey;
-    [fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & ch length: 1]];
-    ch = NSLeftArrowFunctionKey;
-    [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & ch length: 1]];
+    //set info and filter keyboard shortcuts
+    unichar rightChar = NSRightArrowFunctionKey, leftChar = NSLeftArrowFunctionKey;
+    [fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
+    [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
+    
+    [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
+    [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask + NSAlternateKeyMask];
+    [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
+    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask + NSAlternateKeyMask];
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
@@ -1245,6 +1249,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self applyFilter: nil];
 }
 
+- (void) switchFilter: (id) sender
+{
+    NSButton * button;
+    if ([fFilterType isEqualToString: @"None"])
+        button = sender == fNextFilterItem ? fDownloadFilterButton : fPauseFilterButton;
+    else if ([fFilterType isEqualToString: @"Download"])
+        button = sender == fNextFilterItem ? fSeedFilterButton : fNoFilterButton;
+    else if ([fFilterType isEqualToString: @"Seed"])
+        button = sender == fNextFilterItem ? fPauseFilterButton : fDownloadFilterButton;
+    else if ([fFilterType isEqualToString: @"Pause"])
+        button = sender == fNextFilterItem ? fNoFilterButton : fSeedFilterButton;
+    else
+        button = fNoFilterButton;
+    
+    [self setFilter: button];
+}
+
 - (void) toggleSpeedLimit: (id) sender
 {
     fSpeedLimitEnabled = !fSpeedLimitEnabled;
@@ -2004,11 +2025,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     SEL action = [menuItem action];
 
     //only enable some items if it is in a context menu or the window is useable 
-    BOOL canUseMenu = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
+    BOOL canUseTable = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
 
     //enable open items
     if (action == @selector(openShowSheet:))
         return [fWindow attachedSheet] == nil;
+    
+    //enable sort and advanced bar items
+    if (action == @selector(setSort:) || action == @selector(toggleAdvancedBar:) || action == @selector(toggleSmallView:))
+        return [fWindow isVisible];
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -2031,7 +2056,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
-        return canUseMenu;
+        return [fWindow isVisible];
     }
     
     //enable toggle filter bar
@@ -2041,12 +2066,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
-        return canUseMenu;
+        return [fWindow isVisible];
     }
+    
+    //enable prev/next filter button
+    if (action == @selector(switchFilter:))
+        return [fWindow isVisible];
 
     //enable reveal in finder
     if (action == @selector(revealFile:))
-        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
 
     //enable remove items
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:)
@@ -2089,7 +2118,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [menuItem setTitle: [title substringToIndex: [title rangeOfString: ellipsis].location]];
         }
         
-        return canUseMenu && canDelete && [fTableView numberOfSelectedRows] > 0;
+        return canUseTable && canDelete && [fTableView numberOfSelectedRows] > 0;
     }
 
     //enable pause all item
@@ -2131,7 +2160,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable pause item
     if (action == @selector(stopSelectedTorrents:))
     {
-        if (!canUseMenu)
+        if (!canUseTable)
             return NO;
     
         Torrent * torrent;
@@ -2150,7 +2179,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable resume item
     if (action == @selector(resumeSelectedTorrents:))
     {
-        if (!canUseMenu)
+        if (!canUseTable)
             return NO;
     
         Torrent * torrent;
@@ -2166,14 +2195,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return NO;
     }
     
-    //enable sort and advanced bar items
-    if (action == @selector(setSort:) || action == @selector(toggleAdvancedBar:)
-            || action == @selector(toggleSmallView:))
-        return canUseMenu;
-    
     //enable copy torrent file item
     if (action == @selector(copyTorrentFile:))
-        return canUseMenu && [fTableView numberOfSelectedRows] > 0;
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
 
     return YES;
 }

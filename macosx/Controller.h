@@ -78,6 +78,7 @@
     IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
                                     * fSeedFilterButton, * fDownloadFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
+    IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
                                 
     IBOutlet NSMenuItem             * fNextInfoTabItem, * fPrevInfoTabItem;
     
@@ -147,6 +148,7 @@
 - (void) setSort: (id) sender;
 - (void) applyFilter: (id) sender;
 - (void) setFilter: (id) sender;
+- (void) switchFilter: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
