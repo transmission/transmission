@@ -30,7 +30,6 @@
 
 @interface TorrentCell : NSCell
 {
-    Torrent * fTorrent;
     BOOL fStatusRegular;
     
     NSImage * fProgressWhite, * fProgressBlue, * fProgressGray, * fProgressGreen,
@@ -40,8 +39,6 @@
 
     NSUserDefaults * fDefaults;
 }
-
-- (void) setTorrent: (Torrent *) torrent;
 
 - (void) toggleMinimalStatus;
 

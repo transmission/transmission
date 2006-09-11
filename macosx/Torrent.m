@@ -271,6 +271,31 @@
     }
 }
 
+- (NSDictionary *) infoForCurrentView
+{
+    NSMutableDictionary * info = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                    [self name], @"Name",
+                                    [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
+                                    [NSNumber numberWithFloat: [self progress]], @"Progress",
+                                    [NSNumber numberWithBool: [self isActive]], @"Active",
+                                    [NSNumber numberWithBool: [self isError]], @"Error", nil];
+    
+    if (![fDefaults boolForKey: @"SmallView"])
+    {
+        [info setObject: fIconFlipped forKey: @"Icon"];
+        [info setObject: [self progressString] forKey: @"ProgressString"];
+        [info setObject: [self statusString] forKey: @"StatusString"];
+    }
+    else
+    {
+        [info setObject: fIconSmall forKey: @"Icon"];
+        [info setObject: [self remainingTimeString] forKey: @"RemainingTimeString"];
+        [info setObject: [self shortStatusString] forKey: @"ShortStatusString"];
+    }
+    
+    return info;
+}
+
 - (void) startTransfer
 {
     if (![self isActive])

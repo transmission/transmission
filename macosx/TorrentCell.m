@@ -32,7 +32,7 @@
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point;
 - (void) buildSimpleBar: (float) width point: (NSPoint) point;
-- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point;
+//- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point;
 
 @end
 
@@ -101,11 +101,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [super dealloc];
 }
 
-- (void) setTorrent: (Torrent *) torrent
-{
-    fTorrent = torrent;
-}
-
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point
 {
     if ([barImage size].width < width)
@@ -116,8 +111,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) buildSimpleBar: (float) width point: (NSPoint) point
 {
+    NSDictionary * info = [self objectValue];
+
     width -= 2.0;
-    if ([fTorrent isSeeding])
+    if ([[info objectForKey: @"Seeding"] boolValue])
     {
         [fProgressEndGreen compositeToPoint: point operation: NSCompositeSourceOver];
         
@@ -129,9 +126,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     else
     {
-        float completedWidth = [fTorrent progress] * width,
+        float completedWidth = [[info objectForKey: @"Progress"] floatValue] * width,
                 remainingWidth = width - completedWidth;
-        BOOL isActive = [fTorrent isActive];
+        BOOL isActive = [[info objectForKey: @"Active"] boolValue];
         
         //left end
         NSImage * barLeftEnd;
@@ -166,7 +163,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
 }
 
-- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point
+/*- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point
 {
     //if seeding, there's no need for the advanced bar
     if ([fTorrent isSeeding])
@@ -270,7 +267,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     point.x += widthFloat;
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
-}
+}*/
 
 - (void) toggleMinimalStatus
 {
@@ -291,11 +288,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     NSPoint pen = cellFrame.origin;
     const float PADDING = 3.0, LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0;
-
+    
+    NSDictionary * info = [self objectValue];
+    
     if (![fDefaults boolForKey: @"SmallView"]) //regular size
     {
         //icon
-        NSImage * icon = [fTorrent iconFlipped];
+        NSImage * icon = [info objectForKey: @"Icon"];
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
@@ -305,7 +304,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 operation: NSCompositeSourceOver fraction: 1.0];
         
         //error badge
-        if ([fTorrent isError])
+        if ([[info objectForKey: @"Error"] boolValue])
         {
             NSSize errorIconSize = [fErrorImage size];
             [fErrorImage drawAtPoint: NSMakePoint(pen.x + iconSize.width - errorIconSize.width,
@@ -319,14 +318,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         //name string
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + PADDING;
-        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth: mainWidth
+        NSAttributedString * nameString = [[info objectForKey: @"Name"] attributedStringFittingInWidth: mainWidth
                                                 attributes: nameAttributes];
         [nameString drawAtPoint: pen];
         
         //progress string
         pen.y += [nameString size].height + LINE_PADDING - 1.0;
         
-        NSAttributedString * progressString = [[fTorrent progressString]
+        NSAttributedString * progressString = [[info objectForKey: @"ProgressString"]
             attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
         [progressString drawAtPoint: pen];
 
@@ -336,22 +335,22 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
         
-        if ([fDefaults boolForKey: @"UseAdvancedBar"])
+        /*if ([fDefaults boolForKey: @"UseAdvancedBar"])
             [self buildAdvancedBar: barWidth point: pen];
-        else
+        else*/
             [self buildSimpleBar: barWidth point: pen];
 
         //status string
         pen.x += EXTRA_NAME_SHIFT;
         pen.y += LINE_PADDING;
-        NSAttributedString * statusString = [[fTorrent statusString]
+        NSAttributedString * statusString = [[info objectForKey: @"StatusString"]
             attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
         [statusString drawAtPoint: pen];
     }
     else //small size
     {
         //icon
-        NSImage * icon = ![fTorrent isError] ? [fTorrent iconSmall] : fErrorImage;
+        NSImage * icon = ![[info objectForKey: @"Error"] boolValue] ? [info objectForKey: @"Icon"] : fErrorImage;
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
@@ -363,12 +362,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         //name and status string
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
         
-        NSString * realStatusString = !fStatusRegular && [fTorrent isActive] ? [fTorrent remainingTimeString]
-                                                                            : [fTorrent shortStatusString];
+        NSString * realStatusString = !fStatusRegular && [[info objectForKey: @"Active"] boolValue]
+                                        ? [info objectForKey: @"RemainingTimeString"]
+                                        : [info objectForKey: @"ShortStatusString"];
         
         NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: realStatusString
                                                     attributes: statusAttributes] autorelease];
-        NSAttributedString * nameString = [[fTorrent name] attributedStringFittingInWidth:
+        NSAttributedString * nameString = [[info objectForKey: @"Name"] attributedStringFittingInWidth:
                                 mainWidth - [statusString size].width - LINE_PADDING attributes: nameAttributes];
                      
         //place name string
@@ -389,9 +389,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
         
-        if ([fDefaults boolForKey: @"UseAdvancedBar"])
+        /*if ([fDefaults boolForKey: @"UseAdvancedBar"])
             [self buildAdvancedBar: barWidth point: pen];
-        else
+        else*/
             [self buildSimpleBar: barWidth point: pen];
     }
     

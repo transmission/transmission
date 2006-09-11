@@ -63,7 +63,9 @@
 - (NSString *) downloadFolder;
 - (void)       getAvailability: (int8_t *) tab size: (int) size;
 
-- (void)        update;
+- (void)            update;
+- (NSDictionary *)  infoForCurrentView;
+
 - (void)        startTransfer;
 - (void)        stopTransfer;
 - (void)        stopTransferForQuit;

@@ -1586,10 +1586,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return [fDisplayedTorrents count];
 }
 
-- (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
+/*- (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
     forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     [cell setTorrent: [fDisplayedTorrents objectAtIndex: row]];
+}*/
+
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
+{
+    return [[fDisplayedTorrents objectAtIndex: row] infoForCurrentView];
 }
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
