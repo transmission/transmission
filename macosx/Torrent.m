@@ -50,8 +50,6 @@ static uint32_t kBorder[] =
       BE(0x00000015), BE(0x00000015), BE(0x00000015), BE(0x00000015),
       BE(0x00000015), BE(0x00000015), BE(0x00000010), BE(0x00000005) };
 
-static uint32_t kBack[] = { BE(0xB4B4B4FF), BE(0xE3E3E3FF) };
-
 static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kBlue1 = BE(0xA0DCFFFF), //160, 220, 255
                 kBlue2 = BE(0x78BEFFFF), //120, 190, 255
@@ -335,15 +333,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     uint8_t * bitmapData = [bitmap bitmapData];
     int bytesPerRow = [bitmap bytesPerRow];
 
-    //left and right borders
-    /*p = (uint32_t *) bitmapData;
-    for(h = 0; h < BAR_HEIGHT; h++)
-    {
-        p[0] = kBorder[h];
-        p[width - 1] = kBorder[h];
-        p += bytesPerRow / 4;
-    }*/
-
     int8_t * pieces = malloc(width);
     [self getAvailability: pieces size: width];
     int avail = 0;
@@ -386,7 +375,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             color = kBlue3;
         
-        //point to pixel ( w, 2 ) and draw "vertically"
+        //point to pixel (w, 2) and draw "vertically"
         p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + w;
         for( h = 2; h < BAR_HEIGHT; h++ )
         {
