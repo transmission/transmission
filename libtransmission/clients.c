@@ -100,6 +100,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "BitComet %d.%02d", id[4], id[5] );
     }
+    else if( !memcmp( id, "OP", 2 ) )
+    {
+        asprintf( &ret, "Opera (%c%c%c)", id[2], id[3], id[4], id[5] );
+    }
 
     if( !ret )
     {

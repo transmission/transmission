@@ -45,10 +45,6 @@
 
 // Used to optimize drawing. They contain packed RGBA pixels for every color needed.
 #define BE OSSwapBigToHostConstInt32
-static uint32_t kBorder[] =
-    { BE(0x00000005), BE(0x00000010), BE(0x00000015), BE(0x00000015),
-      BE(0x00000015), BE(0x00000015), BE(0x00000015), BE(0x00000015),
-      BE(0x00000015), BE(0x00000015), BE(0x00000010), BE(0x00000005) };
 
 static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kBlue1 = BE(0xA0DCFFFF), //160, 220, 255
