@@ -58,7 +58,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kBlue3 = BE(0x50A0FFFF), //80, 160, 255
                 kBlue4 = BE(0x1E46B4FF), //30, 70, 180
                 kGray  = BE(0x828282FF), //130, 130, 130
-                kGreen = BE(0x00FF00FF); //0, 255, 0
+                kGreen = BE(0x00FF00FF), //0, 255, 0
+                kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
@@ -366,8 +367,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     for (; w < width - 2; w++)
     {
-        p[w] = kBack[0];
-        p[w + bytesPerRow / 4] = kBack[1];
+        p[w] = kWhite;
+        p[w + bytesPerRow / 4] = kWhite;
     }
     
     //lines 2 to 14: blue or grey depending on whether we have the piece or not
