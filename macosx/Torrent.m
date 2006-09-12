@@ -335,13 +335,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int bytesPerRow = [bitmap bytesPerRow];
 
     //left and right borders
-    p = (uint32_t *) bitmapData;
+    /*p = (uint32_t *) bitmapData;
     for(h = 0; h < BAR_HEIGHT; h++)
     {
         p[0] = kBorder[h];
         p[width - 1] = kBorder[h];
         p += bytesPerRow / 4;
-    }
+    }*/
 
     int8_t * pieces = malloc(width);
     [self getAvailability: pieces size: width];
@@ -351,8 +351,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             avail++;
 
     //first two lines: dark blue to show progression, green to show available
-    int end = lrintf(floor([self progress] * (width - 2)));
-    p = (uint32_t *) (bitmapData) + 1;
+    int end = lrintf(floor([self progress] * width));
+    p = (uint32_t *) bitmapData;
 
     for (w = 0; w < end; w++)
     {
@@ -372,11 +372,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //lines 2 to 14: blue or grey depending on whether we have the piece or not
     uint32_t color;
-    for( w = 0; w < width - 2; w++ )
+    for( w = 0; w < width; w++ )
     {
-        //point to pixel ( 2 + w, 2 ). We will then draw "vertically"
-        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + 1 + w;
-
         if (pieces[w] < 0)
             color = kGray;
         else if (pieces[w] == 0)
@@ -387,7 +384,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             color = kBlue2;
         else
             color = kBlue3;
-
+        
+        //point to pixel ( w, 2 ) and draw "vertically"
+        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + w;
         for( h = 2; h < BAR_HEIGHT; h++ )
         {
             p[0] = color;

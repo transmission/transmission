@@ -157,17 +157,18 @@
         [self buildSimpleBar: widthFloat point: point];
         return;
     }
-
-    NSImage * img = [info objectForKey: @"AdvancedBar"];
-    [img setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
-
-    [img compositeToPoint: point operation: NSCompositeSourceOver];
     
     //draw overlay over advanced bar
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
     
     widthFloat -= 2.0;
     point.x += 1.0;
+    
+    //place actual advanced bar
+    NSImage * img = [info objectForKey: @"AdvancedBar"];
+    [img setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
+    [img compositeToPoint: point operation: NSCompositeSourceOver];
+    
     [self placeBar: fProgressAdvanced width: widthFloat point: point];
     
     point.x += widthFloat;
