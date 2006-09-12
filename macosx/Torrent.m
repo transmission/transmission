@@ -25,6 +25,8 @@
 #import "Torrent.h"
 #import "StringAdditions.h"
 
+#define BAR_HEIGHT 12.0
+
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
@@ -33,11 +35,30 @@
         ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
         orderValue: (NSNumber *) orderValue;
 
+- (NSImage *) advancedBar;
+
 - (void) trashFile: (NSString *) path;
 
 @end
 
 @implementation Torrent
+
+// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
+#define BE OSSwapBigToHostConstInt32
+static uint32_t kBorder[] =
+    { BE(0x00000005), BE(0x00000010), BE(0x00000015), BE(0x00000015),
+      BE(0x00000015), BE(0x00000015), BE(0x00000015), BE(0x00000015),
+      BE(0x00000015), BE(0x00000015), BE(0x00000010), BE(0x00000005) };
+
+static uint32_t kBack[] = { BE(0xB4B4B4FF), BE(0xE3E3E3FF) };
+
+static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
+                kBlue1 = BE(0xA0DCFFFF), //160, 220, 255
+                kBlue2 = BE(0x78BEFFFF), //120, 190, 255
+                kBlue3 = BE(0x50A0FFFF), //80, 160, 255
+                kBlue4 = BE(0x1E46B4FF), //30, 70, 180
+                kGray  = BE(0x828282FF), //130, 130, 130
+                kGreen = BE(0x00FF00FF); //0, 255, 0
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
@@ -293,7 +314,96 @@
         [info setObject: [self shortStatusString] forKey: @"ShortStatusString"];
     }
     
+    if ([fDefaults boolForKey: @"UseAdvancedBar"])
+        [info setObject: [self advancedBar] forKey: @"AdvancedBar"];
+    
     return info;
+}
+
+- (NSImage *) advancedBar
+{
+    int width = 100; //integers for bars
+    
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+        pixelsWide: width pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+
+    int h, w;
+    uint32_t * p;
+    uint8_t * bitmapData = [bitmap bitmapData];
+    int bytesPerRow = [bitmap bytesPerRow];
+
+    //left and right borders
+    p = (uint32_t *) bitmapData;
+    for(h = 0; h < BAR_HEIGHT; h++)
+    {
+        p[0] = kBorder[h];
+        p[width - 1] = kBorder[h];
+        p += bytesPerRow / 4;
+    }
+
+    int8_t * pieces = malloc(width);
+    [self getAvailability: pieces size: width];
+    int avail = 0;
+    for (w = 0; w < width; w++)
+        if (pieces[w] != 0)
+            avail++;
+
+    //first two lines: dark blue to show progression, green to show available
+    int end = lrintf(floor([self progress] * (width - 2)));
+    p = (uint32_t *) (bitmapData) + 1;
+
+    for (w = 0; w < end; w++)
+    {
+        p[w] = kBlue4;
+        p[w + bytesPerRow / 4] = kBlue4;
+    }
+    for (; w < avail; w++)
+    {
+        p[w] = kGreen;
+        p[w + bytesPerRow / 4] = kGreen;
+    }
+    for (; w < width - 2; w++)
+    {
+        p[w] = kBack[0];
+        p[w + bytesPerRow / 4] = kBack[1];
+    }
+    
+    //lines 2 to 14: blue or grey depending on whether we have the piece or not
+    uint32_t color;
+    for( w = 0; w < width - 2; w++ )
+    {
+        //point to pixel ( 2 + w, 2 ). We will then draw "vertically"
+        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + 1 + w;
+
+        if (pieces[w] < 0)
+            color = kGray;
+        else if (pieces[w] == 0)
+            color = kRed;
+        else if (pieces[w] == 1)
+            color = kBlue1;
+        else if (pieces[w] == 2)
+            color = kBlue2;
+        else
+            color = kBlue3;
+
+        for( h = 2; h < BAR_HEIGHT; h++ )
+        {
+            p[0] = color;
+            p = (uint32_t *) ( (uint8_t *) p + bytesPerRow );
+        }
+    }
+
+    free(pieces);
+    
+    //actually draw image
+    NSImage * bar = [[NSImage alloc] initWithSize: [bitmap size]];
+    [bar addRepresentation: bitmap];
+    [bitmap release];
+    
+    [bar setScalesWhenResized: YES];
+    
+    return [bar autorelease];
 }
 
 - (void) startTransfer
