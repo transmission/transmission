@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <errno.h>
 #include <string.h>
 
 #include <gtk/gtk.h>
@@ -32,18 +33,35 @@
 #include "transmission.h"
 #include "util.h"
 
+#define MAX_MSGCOUNT 5000
+
 #define COL_LVL 0
 #define COL_MSG 1
 
 static void
-changelevel( GtkToggleButton * button, gpointer data );
+changelevel( GtkWidget * widget, gpointer data );
+static void
+asksave( GtkWidget * widget, gpointer data );
+static void
+dosave( GtkWidget * widget, gint resp, gpointer gdata );
+static void
+doclear( GtkWidget * widget, gpointer data );
 
 static GtkTextBuffer * textbuf = NULL;
+
+static struct { char * label; char * pref; char * text; int id; } levels[] = {
+  { N_("Error"), "error", "ERR", TR_MSG_ERR },
+  { N_("Info"),  "info",  "INF", TR_MSG_INF },
+  { N_("Debug"), "debug", "DBG", TR_MSG_DBG },
+};
 
 GtkWidget *
 msgwin_create( void ) {
   GtkWidget * win, * vbox, * scroll, * text;
-  GtkWidget * frame, * bbox, * err, * inf, * dbg;
+  GtkWidget * frame, * bbox, * save, * clear, * menu;
+  PangoFontDescription * desc;
+  unsigned int ii;
+  int curlevel;
 
   if( NULL == textbuf )
     textbuf = gtk_text_buffer_new( NULL );
@@ -54,13 +72,15 @@ msgwin_create( void ) {
   text = gtk_text_view_new_with_buffer( textbuf );
   frame = gtk_frame_new( NULL );
   bbox = gtk_hbutton_box_new();
-  err = gtk_radio_button_new_with_label( NULL, _( "Error" ) );
-  inf = gtk_radio_button_new_with_label_from_widget(
-    GTK_RADIO_BUTTON( err ), _( "Info" ) );
-  dbg = gtk_radio_button_new_with_label_from_widget(
-    GTK_RADIO_BUTTON( err ), _( "Debug" ) );
+  save = gtk_button_new_from_stock( GTK_STOCK_SAVE );
+  clear = gtk_button_new_from_stock( GTK_STOCK_CLEAR );
+  menu = gtk_combo_box_new_text();
 
   gtk_text_view_set_editable( GTK_TEXT_VIEW( text ), FALSE );
+  desc = pango_font_description_new();
+  pango_font_description_set_family( desc, "Monospace" );
+  gtk_widget_modify_font( text, desc );
+  pango_font_description_free( desc );
 
   gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
@@ -73,31 +93,24 @@ msgwin_create( void ) {
 
   gtk_button_box_set_layout( GTK_BUTTON_BOX( bbox), GTK_BUTTONBOX_SPREAD );
 
-  gtk_container_add( GTK_CONTAINER( bbox ), err );
-  gtk_container_add( GTK_CONTAINER( bbox ), inf );
-  gtk_container_add( GTK_CONTAINER( bbox ), dbg );
+  curlevel = tr_getMessageLevel();
+  for( ii = 0; ALEN( levels ) > ii; ii++ ) {
+    gtk_combo_box_append_text( GTK_COMBO_BOX( menu ),
+                               gettext( levels[ii].label ) );
+    if( levels[ii].id == curlevel )
+      gtk_combo_box_set_active( GTK_COMBO_BOX( menu ), ii );
+  }
+
+  gtk_container_add( GTK_CONTAINER( bbox ), clear );
+  gtk_container_add( GTK_CONTAINER( bbox ), save );
+  gtk_container_add( GTK_CONTAINER( bbox ), menu );
   gtk_box_pack_start( GTK_BOX( vbox ), bbox, FALSE, FALSE, 0 );
 
   gtk_container_add( GTK_CONTAINER( win ), vbox );
 
-  switch( tr_getMessageLevel() ) {
-    case TR_MSG_ERR:
-      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( err ), TRUE );
-      break;
-    case TR_MSG_INF:
-      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( inf ), TRUE );
-      break;
-    case TR_MSG_DBG:
-      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( dbg ), TRUE );
-      break;
-  }
-
-  g_signal_connect( err, "toggled", G_CALLBACK( changelevel ),
-                    GINT_TO_POINTER( TR_MSG_ERR ) );
-  g_signal_connect( inf, "toggled", G_CALLBACK( changelevel ),
-                    GINT_TO_POINTER( TR_MSG_INF ) );
-  g_signal_connect( dbg, "toggled", G_CALLBACK( changelevel ),
-                    GINT_TO_POINTER( TR_MSG_DBG ) );
+  g_signal_connect( save, "clicked", G_CALLBACK( asksave ), win );
+  g_signal_connect( clear, "clicked", G_CALLBACK( doclear ), NULL );
+  g_signal_connect( menu, "changed", G_CALLBACK( changelevel ), NULL );
 
   gtk_widget_show_all( win );
 
@@ -105,77 +118,133 @@ msgwin_create( void ) {
 }
 
 static void
-changelevel( GtkToggleButton * button, gpointer data ) {
-  int    level;
+changelevel( GtkWidget * widget, gpointer data SHUTUP ) {
+  int    index;
   char * ignored;
 
-  if( gtk_toggle_button_get_active( button ) ) {
-    level = GPOINTER_TO_INT( data );
-    tr_setMessageLevel( level );
-    switch( level ) {
-      case TR_MSG_ERR:
-        cf_setpref( PREF_MSGLEVEL, "error" );
-        break;
-      case TR_MSG_INF:
-        cf_setpref( PREF_MSGLEVEL, "info" );
-        break;
-      case TR_MSG_DBG:
-        cf_setpref( PREF_MSGLEVEL, "debug" );
-        break;
-    }
+  index = gtk_combo_box_get_active( GTK_COMBO_BOX( widget ) );
+  if( 0 <= index && (int) ALEN( levels ) > index &&
+      tr_getMessageLevel() != levels[index].id ) {
+    tr_setMessageLevel( levels[index].id );
+    cf_setpref( PREF_MSGLEVEL, levels[index].pref );
     cf_saveprefs( &ignored );
     g_free( ignored );
     msgwin_update();
   }
 }
 
+static void
+asksave( GtkWidget * widget SHUTUP, gpointer data ) {
+  GtkWidget * wind;
+
+  wind = gtk_file_chooser_dialog_new( _("Save Log"), GTK_WINDOW( data ),
+                                      GTK_FILE_CHOOSER_ACTION_SAVE,
+                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                      NULL );
+  g_signal_connect( G_OBJECT( wind ), "response", G_CALLBACK( dosave ), NULL );
+  gtk_widget_show( wind );
+}
+
+static void
+dosave( GtkWidget * widget, gint resp, gpointer gdata SHUTUP ) {
+  char      * path, * buf;
+  FILE      * fptr;
+  GtkTextIter front, back;
+  size_t      len;
+
+  if( GTK_RESPONSE_ACCEPT == resp ) {
+    path = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( widget ) );
+    if( NULL != path ) {
+      fptr = fopen( path, "w" );
+      if( NULL == fptr ) {
+        errmsg( GTK_WINDOW( widget ),
+                _("Failed to open the file %s for writing:\n%s"),
+                path, strerror( errno ) );
+      }
+      else {
+        gtk_text_buffer_get_start_iter( textbuf, &front );
+        gtk_text_buffer_get_end_iter( textbuf, &back );
+        buf = gtk_text_buffer_get_text( textbuf, &front, &back, FALSE );
+        if( NULL != buf ) {
+          len = strlen( buf );
+          if( len > fwrite( buf, 1, len, fptr ) ) {
+            errmsg( GTK_WINDOW( widget ),
+                    _("Error while writing to the file %s:\n%s"),
+                    path, strerror( errno ) );
+          }
+          g_free( buf );
+        }
+        fclose( fptr );
+      }
+    }
+    g_free( path );
+  }
+
+  gtk_widget_destroy( widget );
+}
+
+static void
+doclear( GtkWidget * widget SHUTUP, gpointer data SHUTUP ) {
+  GtkTextIter front, back;
+
+  gtk_text_buffer_get_start_iter( textbuf, &front );
+  gtk_text_buffer_get_end_iter( textbuf, &back );
+  gtk_text_buffer_delete( textbuf, &front, &back );
+}
+
 void
 msgwin_loadpref( void ) {
   const char * pref;
+  unsigned int ii;
 
   tr_setMessageQueuing( 1 );
   pref = cf_getpref( PREF_MSGLEVEL );
   if( NULL == pref )
     return;
 
-  if( 0 == strcmp( "error", pref ) )
-    tr_setMessageLevel( TR_MSG_ERR );
-  else if( 0 == strcmp( "info", pref ) )
-    tr_setMessageLevel( TR_MSG_INF );
-  else if( 0 == strcmp( "debug", pref ) )
-    tr_setMessageLevel( TR_MSG_DBG );
+  for( ii = 0; ALEN( levels ) > ii; ii++ ) {
+    if( 0 == strcmp( pref, levels[ii].pref ) ) {
+      tr_setMessageLevel( levels[ii].id );
+      break;
+    }
+  }
 }
 
 void
 msgwin_update( void ) {
   tr_msg_list_t * msgs, * ii;
-  GtkTextIter     iter;
-  char          * label;
+  GtkTextIter     iter, front;
+  char          * label, * line;
+  int             count;
+  struct tm     * tm;
+  unsigned int    jj;
 
   if( NULL == textbuf )
     return;
 
   msgs = tr_getQueuedMessages();
   for( ii = msgs; NULL != ii; ii = ii->next ) {
-    switch( ii->level )
-    {
-      case TR_MSG_ERR:
-        label = _( "ERR " );
+    label = _("???");
+    for( jj = 0; ALEN( levels ) > jj; jj++ ) {
+      if( levels[jj].id == ii->level ) {
+        label = levels[jj].text;
         break;
-      case TR_MSG_INF:
-        label = _( "INF " );
-        break;
-      case TR_MSG_DBG:
-        label = _( "DBG " );
-        break;
-      default:
-        label = _( "??? " );
-        break;
+      }
     }
+    tm = localtime( &ii->when );
+    line = g_strdup_printf( "%02i:%02i:%02i %s %s\n", tm->tm_hour, tm->tm_min,
+                            tm->tm_sec, label, ii->message );
     gtk_text_buffer_get_end_iter( textbuf, &iter );
-    gtk_text_buffer_insert( textbuf, &iter, label, -1 );
-    gtk_text_buffer_insert( textbuf, &iter, ii->message, -1 );
-    gtk_text_buffer_insert( textbuf, &iter, "\n", -1 );
+    gtk_text_buffer_insert( textbuf, &iter, line, -1 );
+    g_free( line );
   }
   tr_freeMessageList( msgs );
+
+  count = gtk_text_buffer_get_line_count( textbuf );
+  if( MAX_MSGCOUNT < count ) {
+    gtk_text_buffer_get_iter_at_line( textbuf, &front, 0 );
+    gtk_text_buffer_get_iter_at_line( textbuf, &iter, count - MAX_MSGCOUNT );
+    gtk_text_buffer_delete( textbuf, &front, &iter );
+  }
 }
