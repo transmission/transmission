@@ -72,6 +72,16 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "BitRocket %c.%c (%d)",
                       id[3], id[4], ( id[5] - '0' ) * 10 + ( id[6] - '0' ) );
         }
+        else if( !memcmp( &id[1], "KT", 2 ) )
+        {
+            asprintf( &ret, "KTorrent %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "lt", 2 ) )
+        {
+            asprintf( &ret, "libTorrent %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
     }
     else if( !memcmp( &id[4], "----", 4 ) )
     {
@@ -103,6 +113,11 @@ char * tr_clientForId( uint8_t * id )
     else if( !memcmp( id, "OP", 2 ) )
     {
         asprintf( &ret, "Opera (%c%c%c%c)", id[2], id[3], id[4], id[5] );
+    }
+    else if( !memcmp( id, "-ML", 3 ) )
+    {
+        asprintf( &ret, "MLDonkey %c%c%c%c%c",
+                  id[3], id[4], id[5], id[6], id[7] );
     }
 
     if( !ret )
