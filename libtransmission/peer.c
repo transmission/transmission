@@ -47,6 +47,7 @@ struct tr_peer_s
 #define PEER_STATUS_CONNECTED  8 /* Got peer's handshake */
     int            status;
     int            socket;
+    char           incoming;
     uint64_t       date;
     uint64_t       keepAlive;
 
@@ -158,10 +159,11 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s )
 {
     tr_peer_t * peer = peerInit();
 
-    peer->socket = s;
-    peer->addr   = addr;
-    peer->port   = port;
-    peer->status = PEER_STATUS_CONNECTING;
+    peer->socket   = s;
+    peer->addr     = addr;
+    peer->port     = port;
+    peer->status   = PEER_STATUS_CONNECTING;
+    peer->incoming = 1;
 
     return peer;
 }
@@ -480,6 +482,16 @@ dropPeer:
 int tr_peerIsConnected( tr_peer_t * peer )
 {
     return peer->status & PEER_STATUS_CONNECTED;
+}
+
+/***********************************************************************
+ * tr_peerIsIncoming
+ ***********************************************************************
+ *
+ **********************************************************************/
+int tr_peerIsIncoming( tr_peer_t * peer )
+{
+    return peer->incoming;
 }
 
 /***********************************************************************

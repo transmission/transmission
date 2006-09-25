@@ -372,6 +372,7 @@ struct tr_peer_stat_s
     char *  client;
     
     int     isConnected;
+    int     isIncoming;
     int     isDownloading;
     int     isUploading;
 };
