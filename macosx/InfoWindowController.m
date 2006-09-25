@@ -40,8 +40,8 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
-#define TAB_ACTIVITY_HEIGHT 230.0
-#define TAB_PEERS_HEIGHT 255.0
+#define TAB_ACTIVITY_HEIGHT 109.0
+#define TAB_PEERS_HEIGHT 236.0
 #define TAB_FILES_HEIGHT 255.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
@@ -169,7 +169,6 @@
         
         [fPeers removeAllObjects];
         [fPeerTable reloadData];
-        [fPeerTableStatusField setStringValue: @"info not available"];
     }
     else
     {    
@@ -351,8 +350,9 @@
     [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
     
     [fPeerTable reloadData];
-    [fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
-                                            [torrent totalPeers], [fPeers count]]];
+    #warning use [fpeers count]
+    //[fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
+    //                                        [torrent totalPeers], [fPeers count]]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem

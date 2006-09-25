@@ -41,11 +41,11 @@
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateStartedField, * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
-                        * fRatioField, * fSeedersField, * fLeechersField,
-                        * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fSwarmSpeedField;
+                        * fRatioField, * fSwarmSpeedField; 
 
     IBOutlet NSTableView * fPeerTable;
-    IBOutlet NSTextField * fPeerTableStatusField;
+    IBOutlet NSTextField * fSeedersField, * fLeechersField, * fConnectedPeersField,
+                        * fDownloadingFromField, * fUploadingToField;
     
     IBOutlet NSTableView * fFileTable;
     IBOutlet NSTextField * fFileTableStatusField;
