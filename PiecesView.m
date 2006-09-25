@@ -48,8 +48,6 @@
         fBlue3Piece = [NSImage imageNamed: @"BoxBlue3.tiff"];
         [fBlue3Piece setScalesWhenResized: YES];
         [fBlue3Piece setSize: size];
-        
-        fExistingImage = [fBack copy];
     }
     
     return self;
@@ -61,7 +59,6 @@
     
     if (fTorrent)
         [fTorrent release];
-    [fExistingImage release];
     [super dealloc];
 }
 
@@ -74,7 +71,7 @@
         if (!torrent)
         {
             fTorrent = nil;
-            [fImageView setImage: fBack];
+            [fImageView setImage: [[fBack copy] autorelease]];
         }
     }
     
@@ -95,8 +92,8 @@
         else
             fAcross = MAX_ACROSS;
         
-        fWidth = ([fExistingImage size].width - (fAcross + 1) * BETWEEN) / fAcross;
-        fExtraBorder = ([fExistingImage size].width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
+        fWidth = ([[fImageView image] size].width - (fAcross + 1) * BETWEEN) / fAcross;
+        fExtraBorder = ([[fImageView image] size].width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
         
         [self updateView: YES];
     }
@@ -108,10 +105,9 @@
         return;
     
     if (first)
-    {
-        [fExistingImage release];
-        fExistingImage = [fBack copy];
-    }
+        [fImageView setImage: [[fBack copy] autorelease]];
+    
+    NSImage * image = [fImageView image];
     
     int8_t * pieces = malloc(fNumPieces);
     [fTorrent getAvailability: pieces size: fNumPieces];
@@ -178,12 +174,12 @@
                 //drawing actually will occur, so figure out values
                 if (!change)
                 {
-                    [fExistingImage lockFocus];
+                    [image lockFocus];
                     change = YES;
                 }
                 
                 point = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                    [fExistingImage size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
+                                    [[fImageView image] size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
                 
                 [pieceImage compositeToPoint: point fromRect: rect operation: NSCompositeSourceOver];
             }
@@ -191,10 +187,8 @@
     
     if (change)
     {
-        [fExistingImage unlockFocus];
-        
-        [fImageView setImage: nil];
-        [fImageView setImage: fExistingImage];
+        [image unlockFocus];
+        [fImageView setNeedsDisplay];
     }
     
     free(pieces);
