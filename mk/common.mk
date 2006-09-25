@@ -63,20 +63,20 @@ endef
 
 define INSTALL_BIN_RULE
        @echo "Install $<"
-       @$(MKDIR) $(PREFIX)/bin
-       @$(CP) $< $(PREFIX)/bin/
+       @$(MKDIR) $(DESTDIR)$(PREFIX)/bin
+       @$(CP) $< $(DESTDIR)$(PREFIX)/bin/
 endef
 
 define INSTALL_LOCALE_RULE
        @echo "Install $<"
-       @$(MKDIR) $(LOCALEDIR)/$*/LC_MESSAGES
-       @$(CP) $< $(LOCALEDIR)/$*/LC_MESSAGES/transmission-gtk.mo
+       @$(MKDIR) $(DESTDIR)$(LOCALEDIR)/$*/LC_MESSAGES
+       @$(CP) $< $(DESTDIR)$(LOCALEDIR)/$*/LC_MESSAGES/transmission-gtk.mo
 endef
 
 define INSTALL_MAN_RULE
 	@echo "Install $<"
-	@$(MKDIR) $(PREFIX)/man/man1
-	@$(CP) $< $(PREFIX)/man/man1/
+	@$(MKDIR) $(DESTDIR)$(PREFIX)/man/man1
+	@$(CP) $< $(DESTDIR)$(PREFIX)/man/man1/
 endef
 
 RM    = rm -Rf
