@@ -28,6 +28,7 @@
                 fPeerTable = NSTableView; 
                 fPieceSizeField = NSTextField; 
                 fPiecesField = NSTextField; 
+                fPiecesView = PiecesView; 
                 fRatioField = NSTextField; 
                 fRatioLimitField = NSTextField; 
                 fRatioMatrix = NSMatrix; 
@@ -43,7 +44,13 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
-        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {
+            CLASS = PiecesView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fImageView = NSImageView; }; 
+            SUPERCLASS = NSObject; 
+        }
     ); 
     IBVersion = 1; 
 }

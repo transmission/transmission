@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
 
-@interface PiecesWindowController : NSWindowController
+@interface PiecesView : NSObject
 {
     int8_t  * fPieces;
     

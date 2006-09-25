@@ -169,6 +169,8 @@
         
         [fPeers removeAllObjects];
         [fPeerTable reloadData];
+        
+        [fPiecesView setTorrent: nil];
     }
     else
     {    
@@ -205,6 +207,8 @@
         [fHashField setSelectable: YES];
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
+        
+        [fPiecesView setTorrent: torrent];
     }
     
     //update stats and settings
@@ -279,6 +283,10 @@
         //set peers table if visible
         if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_PEERS_IDENT])
             [self reloadPeerTable];
+        
+        //update pieces view if visible
+        if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_ACTIVITY_IDENT])
+            [fPiecesView updateView: NO];
     }
 }
 
@@ -384,7 +392,11 @@
 {
     float height;
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
+    {
         height = TAB_ACTIVITY_HEIGHT;
+        
+        [fPiecesView updateView: NO];
+    }
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
     {
         height = TAB_PEERS_HEIGHT;

@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
+#import "PiecesView.h"
 #import <transmission.h>
 
 @interface InfoWindowController : NSWindowController
@@ -52,6 +53,8 @@
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;
+    
+    IBOutlet PiecesView * fPiecesView;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;

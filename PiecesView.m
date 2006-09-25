@@ -6,18 +6,18 @@
 //  Copyright 2006 __MyCompanyName__. All rights reserved.
 //
 
-#import "PiecesWindowController.h"
+#import "PiecesView.h"
 
-#define MAX_ACROSS 20
+#define MAX_ACROSS 18
 #define BETWEEN 1.0
 
 #define BLANK -99
 
-@implementation PiecesWindowController
+@implementation PiecesView
 
-- (id) initWithWindowNibName: (NSString *) name
+- (id) init
 {
-    if ((self = [super initWithWindowNibName: name]))
+    if ((self = [super init]))
     {
         fTorrent = nil;
         int numPieces = MAX_ACROSS * MAX_ACROSS;
@@ -53,17 +53,6 @@
     }
     
     return self;
-}
-
-- (void) awakeFromNib
-{
-    //window location and size
-    NSPanel * window = (NSPanel *)[self window];
-    
-    [window setBecomesKeyOnlyIfNeeded: YES];
-    
-    [window setFrameAutosaveName: @"PiecesWindowFrame"];
-    [window setFrameUsingName: @"PiecesWindowFrame"];
 }
 
 - (void) dealloc

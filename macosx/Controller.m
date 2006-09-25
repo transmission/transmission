@@ -86,7 +86,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fMessageController = [[MessageWindowController alloc] initWithWindowNibName: @"MessageWindow"];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
-        fPiecesWindowController = [[PiecesWindowController alloc] initWithWindowNibName: @"PiecesWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         
         fBadger = [[Badger alloc] init];
@@ -104,7 +103,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fInfoController release];
     [fMessageController release];
-    [fPiecesWindowController release];
     [fPrefsController release];
     
     [fToolbar release];
@@ -359,9 +357,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
-    if ([fDefaults boolForKey: @"PiecesViewerVisible"])
-        [self showPiecesView: nil];
-    
     //timer to auto toggle speed limit
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
@@ -428,7 +423,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
-    [fDefaults setBool: [[fPiecesWindowController window] isVisible] forKey: @"PiecesViewerVisible"];
     [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
@@ -936,17 +930,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fMessageController showWindow: nil];
 }
 
-- (void) showPiecesView: (id) sender
-{
-    if ([[fPiecesWindowController window] isVisible])
-        [fPiecesWindowController close];
-    else
-    {
-        [fPiecesWindowController updateView: NO];
-        [[fPiecesWindowController window] orderFront: nil];
-    }
-}
-
 - (void) updateControlTint: (NSNotification *) notification
 {
     if (fSpeedLimitEnabled)
@@ -976,10 +959,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //update non-constant parts of info window
     if ([[fInfoController window] isVisible])
         [fInfoController updateInfoStats];
-    
-    //update pieces viewer
-    if ([[fPiecesWindowController window] isVisible])
-        [fPiecesWindowController updateView: NO];
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
@@ -1727,11 +1706,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    NSArray * torrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
-    [fInfoController updateInfoForTorrents: torrents];
-    
-    Torrent * torrent = [torrents count] == 1 ? [torrents objectAtIndex: 0] : nil;
-    [fPiecesWindowController setTorrent: torrent];
+    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) toggleSmallView: (id) sender
@@ -2070,16 +2045,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (action == @selector(showInfo:))
     {
         NSString * title = [[fInfoController window] isVisible] ? @"Hide Inspector" : @"Show Inspector";
-        if (![[menuItem title] isEqualToString: title])
-                [menuItem setTitle: title];
-
-        return YES;
-    }
-    
-    //enable show pieces window
-    if (action == @selector(showPiecesView:))
-    {
-        NSString * title = [[fPiecesWindowController window] isVisible] ? @"Hide Pieces Viewer" : @"Show Pieces Viewer";
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
