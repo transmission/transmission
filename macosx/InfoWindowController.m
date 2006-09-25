@@ -29,8 +29,8 @@
 #define RATIO_GLOBAL_TAG 1
 #define RATIO_CHECK_TAG 2
 
-#define MIN_WINDOW_WIDTH 270
-#define MAX_WINDOW_WIDTH 2000
+#define MIN_WINDOW_WIDTH 300
+#define MAX_WINDOW_WIDTH 5000
 
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
@@ -41,8 +41,8 @@
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 182.0
 #define TAB_ACTIVITY_HEIGHT 109.0
-#define TAB_PEERS_HEIGHT 236.0
-#define TAB_FILES_HEIGHT 255.0
+#define TAB_PEERS_HEIGHT 260.0
+#define TAB_FILES_HEIGHT 260.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
 @interface InfoWindowController (Private)
