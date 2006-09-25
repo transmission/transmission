@@ -74,6 +74,8 @@ tr_handle_t * tr_init()
     h->download = tr_rcInit();
     h->fdlimit  = tr_fdInit();
     h->choking  = tr_chokingInit( h );
+    h->natpmp   = tr_natpmpInit( h->fdlimit );
+    h->upnp     = tr_upnpInit( h->fdlimit );
 
     h->bindPort = -1;
     h->bindSocket = -1;
@@ -104,7 +106,16 @@ void tr_setBindPort( tr_handle_t * h, int port )
     if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
     {
         /* XXX should handle failure here in a better way */
-        sock = tr_netBind( port );
+        sock = tr_netBindTCP( port );
+        if( 0 > sock)
+        {
+            tr_fdSocketClosed( h->fdlimit, 0 );
+        }
+        else
+        {   
+            tr_inf( "Bound listening port %d", port );
+            listen( sock, 5 );
+        }
     }
 #else
     return;
@@ -132,7 +143,51 @@ void tr_setBindPort( tr_handle_t * h, int port )
 
     h->bindSocket = sock;
 
+    tr_natpmpForwardPort( h->natpmp, port );
+    tr_upnpForwardPort( h->upnp, port );
+
     tr_lockUnlock( &h->acceptLock );
+}
+
+void tr_natTraversalEnable( tr_handle_t * h )
+{
+    tr_natpmpStart( h->natpmp );
+    tr_upnpStart( h->upnp );
+}
+
+void tr_natTraversalDisable( tr_handle_t * h )
+{
+    tr_natpmpStop( h->natpmp );
+    tr_upnpStop( h->upnp );
+}
+
+int tr_natTraversalStatus( tr_handle_t * h )
+{
+    int statuses[] = {
+        TR_NAT_TRAVERSAL_MAPPED,
+        TR_NAT_TRAVERSAL_MAPPING,
+        TR_NAT_TRAVERSAL_UNMAPPING,
+        TR_NAT_TRAVERSAL_ERROR,
+        TR_NAT_TRAVERSAL_NOTFOUND,
+        TR_NAT_TRAVERSAL_DISABLED,
+        -1,
+    };
+    int natpmp, upnp, ii;
+
+    natpmp = tr_natpmpStatus( h->natpmp );
+    upnp = tr_upnpStatus( h->upnp );
+
+    for( ii = 0; 0 <= statuses[ii]; ii++ )
+    {
+        if( statuses[ii] == natpmp || statuses[ii] == upnp )
+        {
+            return statuses[ii];
+        }
+    }
+
+    assert( 0 );
+
+    return TR_NAT_TRAVERSAL_ERROR;
 }
 
 /***********************************************************************
@@ -629,6 +684,8 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
 void tr_close( tr_handle_t * h )
 {
     acceptStop( h );
+    tr_natpmpClose( h->natpmp );
+    tr_upnpClose( h->upnp );
     tr_chokingClose( h->choking );
     tr_fdClose( h->fdlimit );
     tr_rcClose( h->upload );
@@ -734,6 +791,10 @@ static void acceptLoop( void * _h )
     while( !h->acceptDie )
     {
         date1 = tr_date();
+
+        /* do NAT-PMP and UPnP pulses here since there's nowhere better */
+        tr_natpmpPulse( h->natpmp );
+        tr_upnpPulse( h->upnp );
 
         /* Check for incoming connections */
         if( h->bindSocket > -1 &&

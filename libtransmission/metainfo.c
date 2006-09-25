@@ -69,7 +69,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     }
     if( sb.st_size > TORRENT_MAX_SIZE )
     {
-        tr_err( "Torrent file is too big (%d bytes)", sb.st_size );
+        tr_err( "Torrent file is too big (%d bytes)", (int)sb.st_size );
         return 1;
     }
 

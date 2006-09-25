@@ -30,7 +30,7 @@ void tr_msgInit( void );
 #define tr_err( a... ) tr_msg( TR_MSG_ERR, ## a )
 #define tr_inf( a... ) tr_msg( TR_MSG_INF, ## a )
 #define tr_dbg( a... ) tr_msg( TR_MSG_DBG, ## a )
-void tr_msg  ( int level, char * msg, ... );
+void tr_msg  ( int level, char * msg, ... ) PRINTF( 2, 3 );
 
 int  tr_rand ( int );
 
@@ -43,6 +43,32 @@ void * tr_memmem( const void *, size_t, const void *, size_t );
  * Note that the string passed in must be writable!
  **********************************************************************/
 int tr_mkdir( char * path );
+
+/***********************************************************************
+ * tr_strcasecmp
+ ***********************************************************************
+ * A case-insensitive strncmp()
+ **********************************************************************/
+#define tr_strcasecmp( ff, ss ) ( tr_strncasecmp( (ff), (ss), -1 ) )
+int tr_strncasecmp( const char * first, const char * second, int len );
+
+/***********************************************************************
+ * tr_sprintf
+ ***********************************************************************
+ * Appends to the end of a buffer using printf formatting,
+ * growing the buffer if needed
+ **********************************************************************/
+int tr_sprintf( char ** buf, int * used, int * max,
+                const char * format, ... ) PRINTF( 4, 5 );
+/* gee, it sure would be nice if BeOS had va_copy() */
+int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
+
+/***********************************************************************
+ * tr_dupstr
+ ***********************************************************************
+ * Creates a nul-terminated string 
+ **********************************************************************/
+char * tr_dupstr( const char * base, int len );
 
 /***********************************************************************
  * tr_date

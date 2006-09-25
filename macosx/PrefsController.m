@@ -33,10 +33,6 @@
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
 
-#define START_YES_CHECK_TAG     0
-#define START_WAIT_CHECK_TAG    1
-#define START_NO_CHECK_TAG      2
-
 #define UPDATE_DAILY    0
 #define UPDATE_WEEKLY   1
 #define UPDATE_NEVER    2
@@ -79,6 +75,8 @@
 
 - (void) dealloc
 {
+    [fNatStatusTimer invalidate];
+
     [fDownloadFolder release];
     [fImportFolder release];
     [super dealloc];
@@ -125,6 +123,17 @@
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
     tr_setBindPort(fHandle, bindPort);
+    
+    //set NAT
+    BOOL natShouldEnable = [fDefaults boolForKey: @"NatTraversal"];
+    if (natShouldEnable)
+        tr_natTraversalEnable(fHandle);
+    [fNatCheck setState: natShouldEnable];
+    
+    fNatStatus = -1;
+    [self updateNatStatus];
+    fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
+                        selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
     
     //checks for old version upload speed of -1
     if ([fDefaults integerForKey: @"UploadLimit"] < 0)
@@ -249,19 +258,13 @@
     else
         [fDefaults setObject: [fSeedingSoundPopUp titleOfSelectedItem] forKey: @"SeedingSound"];
     
-    //set start setting
-    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
-    int tag;
-    if ([startSetting isEqualToString: @"Start"])
-        tag = START_YES_CHECK_TAG;
-    else if ([startSetting isEqualToString: @"Wait"])
-        tag = START_WAIT_CHECK_TAG;
-    else
-        tag = START_NO_CHECK_TAG;
+    //set start settings
+    BOOL useQueue = [fDefaults boolForKey: @"Queue"];
+    [fQueueCheck setState: useQueue];
+    [fQueueNumberField setEnabled: useQueue];
+    [fQueueNumberField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     
-    [fStartMatrix selectCellWithTag: tag];
-    [fStartNumberField setEnabled: tag == START_WAIT_CHECK_TAG];
-    [fStartNumberField setIntValue: [fDefaults integerForKey: @"WaitToStartNumber"]];
+    [fStartAtOpenCheck setState: [fDefaults boolForKey: @"StartAtOpen"]];
     
     //set private torrents
     BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
@@ -354,6 +357,41 @@
     {
         tr_setBindPort(fHandle, bindPort);
         [fDefaults setInteger: bindPort forKey: @"BindPort"];
+        
+        [self updateNatStatus];
+    }
+}
+
+- (void) setNat: (id) sender
+{
+    BOOL enable = [sender state] == NSOnState;
+    enable ? tr_natTraversalEnable(fHandle) : tr_natTraversalDisable(fHandle);
+    [fDefaults setBool: enable forKey: @"NatTraversal"];
+    
+    [self updateNatStatus];
+}
+
+- (void) updateNatStatus
+{
+    int status = tr_natTraversalStatus(fHandle);
+    if (fNatStatus == status)
+        return;
+    fNatStatus = status;
+    
+    if (status == 2)
+    {
+        [fNatStatusField setStringValue: @"Ports successfully mapped"];
+        [fNatStatusImage setImage: [NSImage imageNamed: @"Check.png"]];
+    }
+    else if (status == 3 || status == 4)
+    {
+        [fNatStatusField setStringValue: @"Error mapping ports"];
+        [fNatStatusImage setImage: [NSImage imageNamed: @"Error.tiff"]];
+    }
+    else
+    {
+        [fNatStatusField setStringValue: @""];
+        [fNatStatusImage setImage: nil];
     }
 }
 
@@ -661,35 +699,31 @@
     [fUpdater scheduleCheckWithInterval: seconds];
 }
 
-- (void) setStartSetting: (id) sender
+- (void) setStartAtOpen: (id) sender
 {
-    NSString * startSetting;
-
-    int tag = [[fStartMatrix selectedCell] tag];
-    if (tag == START_YES_CHECK_TAG)
-        startSetting = @"Start";
-    else if (tag == START_WAIT_CHECK_TAG)
-        startSetting = @"Wait";
-    else
-        startSetting = @"Manual";
-    
-    [fDefaults setObject: startSetting forKey: @"StartSetting"];
-    
-    [self setStartNumber: fStartNumberField];
-    [fStartNumberField setEnabled: tag == START_WAIT_CHECK_TAG];
+    [fDefaults setBool: [sender state] == NSOnState forKey: @"StartAtOpen"];
 }
 
-- (void) setStartNumber: (id) sender
+- (void) setUseQueue: (id) sender
 {
-    int waitNumber = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithInt: waitNumber]] || waitNumber < 1)
+    BOOL useQueue = [sender state] == NSOnState;
+    
+    [fDefaults setBool: useQueue forKey: @"Queue"];
+    [self setQueueNumber: fQueueNumberField];
+    [fQueueNumberField setEnabled: useQueue];
+}
+
+- (void) setQueueNumber: (id) sender
+{
+    int queueNumber = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithInt: queueNumber]] || queueNumber < 1)
     {
         NSBeep();
-        waitNumber = [fDefaults floatForKey: @"WaitToStartNumber"];
-        [sender setIntValue: waitNumber];
+        queueNumber = [fDefaults integerForKey: @"QueueDownloadNumber"];
+        [sender setIntValue: queueNumber];
     }
     else
-        [fDefaults setInteger: waitNumber forKey: @"WaitToStartNumber"];
+        [fDefaults setInteger: queueNumber forKey: @"QueueDownloadNumber"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
 }

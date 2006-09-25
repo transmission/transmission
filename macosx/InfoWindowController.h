@@ -52,12 +52,11 @@
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;
-    IBOutlet NSButton * fWaitToStartButton;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfoStats;
-- (void) updateInfoStatsAndSettings;
+- (void) updateInfoSettings;
 
 - (void) setNextTab;
 - (void) setPreviousTab;
@@ -65,7 +64,5 @@
 
 - (void) setRatioCheck: (id) sender;
 - (void) setRatioLimit: (id) sender;
-
-- (void) setWaitToStart: (id) sender;
 
 @end

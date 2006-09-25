@@ -24,6 +24,8 @@
 
 #include "transmission.h"
 
+#define SPRINTF_BUFSIZE         100
+
 static tr_lock_t      * messageLock = NULL;
 static int              messageLevel = 0;
 static int              messageQueuing = 0;
@@ -96,8 +98,9 @@ void tr_freeMessageList( tr_msg_list_t * list )
 
 void tr_msg( int level, char * msg, ... )
 {
-    va_list          args;
+    va_list         args1, args2;
     tr_msg_list_t * newmsg;
+    int             len1, len2;
 
     assert( NULL != messageLock );
     tr_lockLock( messageLock );
@@ -112,7 +115,7 @@ void tr_msg( int level, char * msg, ... )
 
     if( messageLevel >= level )
     {
-        va_start( args, msg );
+        va_start( args1, msg );
         if( messageQueuing )
         {
             newmsg = calloc( 1, sizeof( *newmsg ) );
@@ -120,7 +123,11 @@ void tr_msg( int level, char * msg, ... )
             {
                 newmsg->level = level;
                 newmsg->when = time( NULL );
-                vasprintf( &newmsg->message, msg, args );
+                len1 = len2 = 0;
+                va_start( args2, msg );
+                tr_vsprintf( &newmsg->message, &len1, &len2, msg,
+                             args1, args2 );
+                va_end( args2 );
                 if( NULL == newmsg->message )
                 {
                     free( newmsg );
@@ -134,10 +141,10 @@ void tr_msg( int level, char * msg, ... )
         }
         else
         {
-            vfprintf( stderr, msg, args );
+            vfprintf( stderr, msg, args1 );
             fputc( '\n', stderr );
         }
-        va_end( args );
+        va_end( args1 );
     }
 
     tr_lockUnlock( messageLock );
@@ -233,4 +240,97 @@ int tr_mkdir( char * path )
     }
 
     return 0;
+}
+
+#define UPPER( cc ) \
+    ( 'a' <= (cc) && 'z' >= (cc) ? (cc) - ( 'a' - 'A' ) : (cc) )
+
+int tr_strncasecmp( const char * first, const char * second, int len )
+{
+    int ii;
+    char firstchar, secondchar;
+
+    if( 0 > len )
+    {
+        len = strlen( first );
+        ii = strlen( second );
+        len = MIN( len, ii );
+    }
+
+    for( ii = 0; ii < len; ii++ )
+    {
+        if( first[ii] != second[ii] )
+        {
+            firstchar = UPPER( first[ii] );
+            secondchar = UPPER( second[ii] );
+            if( firstchar > secondchar )
+            {
+                return 1;
+            }
+            else if( firstchar < secondchar )
+            {
+                return -1;
+            }
+        }
+        if( '\0' == first[ii] )
+        {
+            /* if first[ii] is '\0' then second[ii] is too */
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+int tr_sprintf( char ** buf, int * used, int * max, const char * format, ... )
+{
+    va_list ap1, ap2;
+    int     ret;
+
+    va_start( ap1, format );
+    va_start( ap2, format );
+    ret = tr_vsprintf( buf, used, max, format, ap1, ap2 );
+    va_end( ap2 );
+    va_end( ap1 );
+
+    return ret;
+}
+
+int tr_vsprintf( char ** buf, int * used, int * max, const char * fmt,
+                 va_list ap1, va_list ap2 )
+{
+    int     want;
+    char  * newbuf;
+
+    want = vsnprintf( NULL, 0, fmt, ap1 );
+
+    while( *used + want + 1 > *max )
+    {
+        *max += SPRINTF_BUFSIZE;
+        newbuf = realloc( *buf, *max );
+        if( NULL == newbuf )
+        {
+            return 1;
+        }
+        *buf = newbuf;
+    }
+
+    *used += vsnprintf( *buf + *used, *max - *used, fmt, ap2 );
+
+    return 0;
+}
+
+char *
+tr_dupstr( const char * base, int len )
+{
+    char * ret;
+
+    ret = malloc( len + 1 );
+    if( NULL != ret )
+    {
+        memcpy( ret, base, len );
+        ret[len] = '\0';
+    }
+
+    return ret;
 }

@@ -51,7 +51,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kBlue2 = BE(0x78BEFFFF), //120, 190, 255
                 kBlue3 = BE(0x50A0FFFF), //80, 160, 255
                 kBlue4 = BE(0x1E46B4FF), //30, 70, 180
-                kGray  = BE(0x828282FF), //130, 130, 130
+                kGray  = BE(0x969696FF), //150, 150, 150
                 kGreen = BE(0x00FF00FF), //0, 255, 0
                 kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
@@ -192,7 +192,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_PAUSE:
             if (fFinishedSeeding)
                 tempString = @"Seeding complete";
-            else if (fWaitToStart && [[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
+            else if (fWaitToStart)
                 tempString = [@"Waiting to start" stringByAppendingEllipsis];
             else
                 tempString = @"Paused";
@@ -315,83 +315,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return info;
 }
 
-- (NSImage *) advancedBar
-{
-    #warning figure out length
-    int width = 250; //integers for bars
-    
-    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-        pixelsWide: width pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
-        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
-
-    int h, w;
-    uint32_t * p;
-    uint8_t * bitmapData = [bitmap bitmapData];
-    int bytesPerRow = [bitmap bytesPerRow];
-
-    int8_t * pieces = malloc(width);
-    [self getAvailability: pieces size: width];
-    int avail = 0;
-    for (w = 0; w < width; w++)
-        if (pieces[w] != 0)
-            avail++;
-
-    //first two lines: dark blue to show progression, green to show available
-    int end = lrintf(floor([self progress] * width));
-    p = (uint32_t *) bitmapData;
-
-    for (w = 0; w < end; w++)
-    {
-        p[w] = kBlue4;
-        p[w + bytesPerRow / 4] = kBlue4;
-    }
-    for (; w < avail; w++)
-    {
-        p[w] = kGreen;
-        p[w + bytesPerRow / 4] = kGreen;
-    }
-    for (; w < width - 2; w++)
-    {
-        p[w] = kWhite;
-        p[w + bytesPerRow / 4] = kWhite;
-    }
-    
-    //lines 2 to 14: blue or grey depending on whether we have the piece or not
-    uint32_t color;
-    for( w = 0; w < width; w++ )
-    {
-        if (pieces[w] < 0)
-            color = kGray;
-        else if (pieces[w] == 0)
-            color = kRed;
-        else if (pieces[w] == 1)
-            color = kBlue1;
-        else if (pieces[w] == 2)
-            color = kBlue2;
-        else
-            color = kBlue3;
-        
-        //point to pixel (w, 2) and draw "vertically"
-        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + w;
-        for( h = 2; h < BAR_HEIGHT; h++ )
-        {
-            p[0] = color;
-            p = (uint32_t *) ( (uint8_t *) p + bytesPerRow );
-        }
-    }
-
-    free(pieces);
-    
-    //actually draw image
-    NSImage * bar = [[NSImage alloc] initWithSize: [bitmap size]];
-    [bar addRepresentation: bitmap];
-    [bitmap release];
-    
-    [bar setScalesWhenResized: YES];
-    
-    return [bar autorelease];
-}
-
 - (void) startTransfer
 {
     if (![self isActive])
@@ -400,8 +323,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         fFinishedSeeding = NO;
         fWaitToStart = NO;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentSettingChange" object: self];
     }
 }
 
@@ -835,8 +756,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    fWaitToStart = waitToStart ? [waitToStart boolValue]
-                    : ![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Manual"];
+    fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"StartAtOpen"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     
     NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
@@ -857,6 +777,82 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     [self update];
     return self;
+}
+
+- (NSImage *) advancedBar
+{
+    int width = 250; //integers for bars
+    
+    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+        pixelsWide: width pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+
+    int h, w;
+    uint32_t * p;
+    uint8_t * bitmapData = [bitmap bitmapData];
+    int bytesPerRow = [bitmap bytesPerRow];
+
+    int8_t * pieces = malloc(width);
+    [self getAvailability: pieces size: width];
+    int avail = 0;
+    for (w = 0; w < width; w++)
+        if (pieces[w] != 0)
+            avail++;
+
+    //first two lines: dark blue to show progression, green to show available
+    int end = lrintf(floor([self progress] * width));
+    p = (uint32_t *) bitmapData;
+
+    for (w = 0; w < end; w++)
+    {
+        p[w] = kBlue4;
+        p[w + bytesPerRow / 4] = kBlue4;
+    }
+    for (; w < avail; w++)
+    {
+        p[w] = kGreen;
+        p[w + bytesPerRow / 4] = kGreen;
+    }
+    for (; w < width; w++)
+    {
+        p[w] = kWhite;
+        p[w + bytesPerRow / 4] = kWhite;
+    }
+    
+    //lines 2 to 14: blue or grey depending on whether we have the piece or not
+    uint32_t color;
+    for( w = 0; w < width; w++ )
+    {
+        if (pieces[w] < 0)
+            color = kGreen;
+        else if (pieces[w] == 0)
+            color = kGray;
+        else if (pieces[w] == 1)
+            color = kBlue1;
+        else if (pieces[w] == 2)
+            color = kBlue2;
+        else
+            color = kBlue3;
+        
+        //point to pixel (w, 2) and draw "vertically"
+        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + w;
+        for( h = 2; h < BAR_HEIGHT; h++ )
+        {
+            p[0] = color;
+            p = (uint32_t *) ( (uint8_t *) p + bytesPerRow );
+        }
+    }
+
+    free(pieces);
+    
+    //actually draw image
+    NSImage * bar = [[NSImage alloc] initWithSize: [bitmap size]];
+    [bar addRepresentation: bitmap];
+    [bitmap release];
+    
+    [bar setScalesWhenResized: YES];
+    
+    return [bar autorelease];
 }
 
 - (void) trashFile: (NSString *) path

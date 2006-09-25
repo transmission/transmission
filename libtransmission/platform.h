@@ -60,4 +60,7 @@ static inline void tr_lockUnlock( tr_lock_t * l )
 #endif
 }
 
+int
+tr_getDefaultRoute( struct in_addr * addr );
+
 #endif

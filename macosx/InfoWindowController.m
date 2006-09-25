@@ -43,7 +43,7 @@
 #define TAB_ACTIVITY_HEIGHT 230.0
 #define TAB_PEERS_HEIGHT 255.0
 #define TAB_FILES_HEIGHT 255.0
-#define TAB_OPTIONS_HEIGHT 116.0
+#define TAB_OPTIONS_HEIGHT 83.0
 
 @interface InfoWindowController (Private)
 
@@ -209,7 +209,8 @@
     }
     
     //update stats and settings
-    [self updateInfoStatsAndSettings];
+    [self updateInfoStats];
+    [self updateInfoSettings];
 
     //set file table
     [fFiles removeAllObjects];
@@ -282,36 +283,15 @@
     }
 }
 
-- (void) updateInfoStatsAndSettings
+- (void) updateInfoSettings
 {
     int numberSelected = [fTorrents count];
-
-    //set wait to start
-    BOOL waiting = NO, notWaiting = NO, canEnableWaiting = numberSelected > 0,
-        waitingSettingOn = [[[NSUserDefaults standardUserDefaults] stringForKey: @"StartSetting"]
-                                isEqualToString: @"Wait"];
-    
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-    {
-        if ([torrent waitingToStart])
-            waiting = YES;
-        else
-            notWaiting = YES;
-        
-        if (canEnableWaiting && !(![torrent isActive] && [torrent progress] < 1.0 && waitingSettingOn))
-            canEnableWaiting = NO;
-    }
-    
-    [fWaitToStartButton setState: waiting && notWaiting ? NSMixedState : (waiting ? NSOnState : NSOffState)];
-    [fWaitToStartButton setEnabled: canEnableWaiting];
 
     //set ratio settings
     if (numberSelected > 0)
     {
-        enumerator = [fTorrents objectEnumerator];
-        torrent = [enumerator nextObject]; //first torrent
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent = [enumerator nextObject]; //first torrent
         const int INVALID = -99;
         int ratioSetting = [torrent stopRatioSetting];
         float ratioLimit = [torrent ratioLimit];
@@ -590,18 +570,6 @@
         while ((torrent = [enumerator nextObject]))
             [torrent setRatioLimit: ratioLimit];
     }
-}
-
-- (void) setWaitToStart: (id) sender
-{
-    int state = [sender state];
-
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        [torrent setWaitToStart: state];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStartSettingChange" object: fTorrents];
 }
 
 @end

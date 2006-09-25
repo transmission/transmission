@@ -99,9 +99,34 @@ char * tr_getPrefsDirectory();
 /***********************************************************************
  * tr_setBindPort
  ***********************************************************************
- * Sets the port to listen for incoming peer connections
+ * Sets the port to listen for incoming peer connections.
+ * This can be safely called even with active torrents.
  **********************************************************************/
 void tr_setBindPort( tr_handle_t *, int );
+
+/***********************************************************************
+ * tr_natTraversalEnable
+ * tr_natTraversalDisable
+ ***********************************************************************
+ * Enable or disable NAT traversal using NAT-PMP or UPnP IGD.
+ **********************************************************************/
+void tr_natTraversalEnable( tr_handle_t * );
+void tr_natTraversalDisable( tr_handle_t * );
+
+/***********************************************************************
+ * tr_natTraversalStatus
+ ***********************************************************************
+ * Return the status of NAT traversal
+ **********************************************************************/
+#define TR_NAT_TRAVERSAL_MAPPING        1
+#define TR_NAT_TRAVERSAL_MAPPED         2
+#define TR_NAT_TRAVERSAL_NOTFOUND       3
+#define TR_NAT_TRAVERSAL_ERROR          4
+#define TR_NAT_TRAVERSAL_UNMAPPING      5
+#define TR_NAT_TRAVERSAL_DISABLED       6
+#define TR_NAT_TRAVERSAL_IS_DISABLED( st ) \
+  ( TR_NAT_TRAVERSAL_DISABLED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
+int tr_natTraversalStatus( tr_handle_t * );
 
 /***********************************************************************
  * tr_setUploadLimit

@@ -52,13 +52,13 @@ typedef struct benc_val_s
 } benc_val_t;
 
 #define tr_bencLoad(b,l,v,e) _tr_bencLoad((char*)(b),(l),(v),(char**)(e))
-int          _tr_bencLoad( char * buf, size_t len, benc_val_t * val,
+int          _tr_bencLoad( char * buf, int len, benc_val_t * val,
                            char ** end );
 void         tr_bencPrint( benc_val_t * val );
 void         tr_bencFree( benc_val_t * val );
 benc_val_t * tr_bencDictFind( benc_val_t * val, char * key );
-char *       tr_bencSaveMalloc( benc_val_t * val, size_t * len );
+char *       tr_bencSaveMalloc( benc_val_t * val, int * len );
 int          tr_bencSave( benc_val_t * val, char ** buf,
-                          size_t * used, size_t * max );
+                          int * used, int * max );
 
 #endif

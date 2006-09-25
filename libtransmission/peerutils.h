@@ -151,7 +151,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
     if( ( peer->status & PEER_STATUS_IDLE ) &&
         !tr_fdSocketWillCreate( tor->fdlimit, 0 ) )
     {
-        peer->socket = tr_netOpen( peer->addr, peer->port );
+        peer->socket = tr_netOpenTCP( peer->addr, peer->port );
         if( peer->socket < 0 )
         {
             peer_dbg( "connection failed" );

@@ -30,7 +30,7 @@
 #define LEVEL_DEBUG 2
 
 #define UPDATE_SECONDS  0.6
-#define MAX_LINES       1000
+#define MAX_LINES       2500
 
 @interface MessageWindowController (Private)
 

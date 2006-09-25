@@ -37,14 +37,15 @@
 #define USAGE \
 "Usage: %s [options] file.torrent [options]\n\n" \
 "Options:\n" \
+"  -d, --download <int> Maximum download rate (-1 = no limit, default = -1)\n"\
+"  -f, --finish <shell script> Command you wish to run on completion\n" \
 "  -h, --help           Print this help and exit\n" \
 "  -i, --info           Print metainfo and exit\n" \
-"  -s, --scrape         Print counts of seeders/leechers and exit\n" \
-"  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n" \
+"  -n  --nat-traversal  Attempt NAT traversal using NAT-PMP or UPnP IGD\n" \
 "  -p, --port <int>     Port we should listen on (default = %d)\n" \
+"  -s, --scrape         Print counts of seeders/leechers and exit\n" \
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n" \
-"  -d, --download <int> Maximum download rate (-1 = no limit, default = -1)\n" \
-"  -f, --finish <shell script> Command you wish to run on completion\n"
+"  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n"
 
 static int           showHelp      = 0;
 static int           showInfo      = 0;
@@ -55,6 +56,7 @@ static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
 static char          * torrentPath = NULL;
 static volatile char mustDie       = 0;
+static int           natTraversal  = 0;
 
 static char          * finishCall   = NULL;
 
@@ -63,7 +65,7 @@ static void sigHandler       ( int signal );
 
 int main( int argc, char ** argv )
 {
-    int i, error;
+    int i, error, nat;
     tr_handle_t  * h;
     tr_torrent_t * tor;
     tr_stat_t    * s;
@@ -163,6 +165,15 @@ int main( int argc, char ** argv )
     tr_setBindPort( h, bindPort );
     tr_setUploadLimit( h, uploadLimit );
     tr_setDownloadLimit( h, downloadLimit );
+
+    if( natTraversal )
+    {
+        tr_natTraversalEnable( h );
+    }
+    else
+    {
+        tr_natTraversalDisable( h );
+    }
     
     tr_torrentSetFolder( tor, "." );
     tr_torrentStart( tor );
@@ -200,7 +211,7 @@ int main( int argc, char ** argv )
         }
         memset( &string[chars], ' ', 79 - chars );
         string[79] = '\0';
-        fprintf( stderr, "\r%s", string );
+        //fprintf( stderr, "\r%s", string );
 
         if( s->error & TR_ETRACKER )
         {
@@ -218,14 +229,18 @@ int main( int argc, char ** argv )
     }
     fprintf( stderr, "\n" );
 
-    /* Try for 5 seconds to notice the tracker that we are leaving */
+    /* Try for 5 seconds to notify the tracker that we are leaving
+       and to delete any port mappings for nat traversal */
     tr_torrentStop( tor );
+    tr_natTraversalDisable( h );
     for( i = 0; i < 10; i++ )
     {
         s = tr_torrentStat( tor );
-        if( s->status & TR_STATUS_PAUSE )
+        nat = tr_natTraversalStatus( h );
+        if( s->status & TR_STATUS_PAUSE && TR_NAT_TRAVERSAL_DISABLED == nat )
         {
-            /* The 'stopped' message was sent */
+            /* The 'stopped' tracker message was sent
+               and port mappings were deleted */
             break;
         }
         usleep( 500000 );
@@ -253,10 +268,11 @@ static int parseCommandLine( int argc, char ** argv )
             { "upload",   required_argument, NULL, 'u' },
             { "download", required_argument, NULL, 'd' },
             { "finish",   required_argument, NULL, 'f' },
+            { "nat-traversal", no_argument,  NULL, 'n' },
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisv:p:u:d:f:", long_options, &optind );
+        c = getopt_long( argc, argv, "hisv:p:u:d:f:n", long_options, &optind );
         if( c < 0 )
         {
             break;
@@ -286,6 +302,9 @@ static int parseCommandLine( int argc, char ** argv )
                 break;
             case 'f':
                 finishCall = optarg;
+                break;
+            case 'n':
+                natTraversal = 1;
                 break;
             default:
                 return 1;

@@ -263,7 +263,7 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
 static int
 send_msg(struct constate *con, const char *name, benc_val_t *val) {
   char *buf;
-  size_t used, total;
+  int used, total;
   benc_val_t dict;
   char stupid;
 

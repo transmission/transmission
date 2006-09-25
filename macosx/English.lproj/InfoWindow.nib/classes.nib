@@ -8,12 +8,7 @@
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {
-                revealFile = id; 
-                setRatioCheck = id; 
-                setRatioLimit = id; 
-                setWaitToStart = id; 
-            }; 
+            ACTIONS = {revealFile = id; setRatioCheck = id; setRatioLimit = id; }; 
             CLASS = InfoWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -46,7 +41,6 @@
                 fTrackerField = NSTextField; 
                 fUploadedTotalField = NSTextField; 
                 fUploadingToField = NSTextField; 
-                fWaitToStartButton = NSButton; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

@@ -177,8 +177,6 @@ main(int argc, char **argv) {
   char *err;
   TrBackend *back;
   benc_val_t *state;
-  const char *pref;
-  long intval;
   GList *argfiles;
   gboolean didinit, didlock;
 
@@ -233,13 +231,8 @@ main(int argc, char **argv) {
 
       back = tr_backend_new();
 
-      /* set the upload limit */
-      setlimit(back);
-
-      /* set the listening port */
-      if(NULL != (pref = cf_getpref(PREF_PORT)) &&
-         0 < (intval = strtol(pref, NULL, 10)) && 0xffff >= intval)
-        tr_setBindPort(tr_backend_handle(back), intval);
+      /* apply a few prefs */
+      applyprefs(back);
 
       makewind(mainwind, back, state, argfiles);
 
@@ -523,6 +516,9 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
   /* try to politely stop all the torrents */
   tr_backend_stop_torrents(data->back);
 
+  /* shut down nat traversal */
+  tr_natTraversalDisable(tr_backend_handle(data->back));
+
   /* set things up to wait for torrents to stop */
   edata = g_new0(struct exitdata, 1);
   edata->cbdata = data;
@@ -544,10 +540,13 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
 gboolean
 exitcheck(gpointer gdata) {
   struct exitdata *data = gdata;
+  int natstat = tr_natTraversalStatus(tr_backend_handle(data->cbdata->back));
 
-  /* keep going if we still have torrents and haven't hit the exit timeout */
-  if(time(NULL) - data->started < TRACKER_EXIT_TIMEOUT &&
-     !tr_backend_torrents_stopped(data->cbdata->back)) {
+  /* keep going if we haven't hit the exit timeout and
+     we either have torrents left or nat traversal is stopping */
+  if( time( NULL ) - data->started < TRACKER_EXIT_TIMEOUT &&
+      ( !tr_backend_torrents_stopped( data->cbdata->back ) &&
+        TR_NAT_TRAVERSAL_DISABLED != natstat ) ) {
     updatemodel(data->cbdata);
     return TRUE;
   }

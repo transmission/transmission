@@ -55,6 +55,8 @@
         fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
         fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
         fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
+        fResumeNoWaitOnIcon = [NSImage imageNamed: @"ResumeNoWaitOn.png"];
+        fResumeNoWaitOffIcon = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
         fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
         fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
         fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
@@ -94,17 +96,20 @@
 {
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
-    if ([event modifierFlags] & NSAlternateKeyMask)
+    if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
     {
-        [fController toggleAdvancedBar: self];
-        fClickPoint = NSZeroPoint;
-    }
-    else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
-    {
-        if ([self pointInMinimalStatusRect: fClickPoint])
-            [(TorrentCell *)[[self tableColumnWithIdentifier: @"Torrent"] dataCell] toggleMinimalStatus];
+        if ([event modifierFlags] & NSAlternateKeyMask)
+        {
+            [fController toggleAdvancedBar: self];
+            fClickPoint = NSZeroPoint;
+        }
+        else
+        {
+            if ([self pointInMinimalStatusRect: fClickPoint])
+                [(TorrentCell *)[[self tableColumnWithIdentifier: @"Torrent"] dataCell] toggleMinimalStatus];
 
-        [super mouseDown: event];
+            [super mouseDown: event];
+        }
     }
     else;
 
@@ -121,15 +126,22 @@
     {
         Torrent * torrent = [fTorrents objectAtIndex: row];
 
-		if ([torrent isPaused])
-			[fController resumeTorrents: [NSArray arrayWithObject: torrent]];
-		else if ([torrent isActive])
+        if ([torrent isActive])
             [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-		else;
+        else if ([torrent isPaused])
+        {
+            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+                [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
+            else if ([torrent waitingToStart])
+                [fController stopTorrents: [NSArray arrayWithObject: torrent]];
+            else
+                [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
+        }
+        else;
     }
     else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] revealData];
-	else if ([event clickCount] == 2)
+    else if ([event clickCount] == 2)
     {
         if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] revealData];
@@ -138,7 +150,7 @@
     }
     else;
     
-	[super mouseUp: event];
+    [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
     [self display];
@@ -184,6 +196,12 @@
     }
 }
 
+- (void) flagsChanged: (NSEvent *) event
+{
+    [self display];
+    [super flagsChanged: event];
+}
+
 - (void) insertText: (NSString *) text
 {
     //sort torrents by name before finding closest match
@@ -223,10 +241,17 @@
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
 
-        if ([torrent isPaused])
-            image = NSPointInRect(fClickPoint, rect) ? fResumeOnIcon : fResumeOffIcon;
-        else if ([torrent isActive])
+        if ([torrent isActive])
             image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
+        else if ([torrent isPaused])
+        {
+            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+                image = NSPointInRect(fClickPoint, rect) ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
+            else if ([torrent waitingToStart])
+                image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
+            else
+                image = NSPointInRect(fClickPoint, rect) ? fResumeOnIcon : fResumeOffIcon;
+        }
         else
             image = nil;
 

@@ -358,7 +358,7 @@ cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
   GIOChannel *io = NULL;
   GError *err;
   char *datastr;
-  size_t len;
+  int len;
   gsize written;
 
   *errstr = NULL;

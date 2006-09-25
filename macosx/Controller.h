@@ -30,6 +30,7 @@
 #import "PrefsController.h"
 #import "InfoWindowController.h"
 #import "MessageWindowController.h"
+#import "PiecesWindowController.h"
 #import "Badger.h"
 #import "ImageBackgroundView.h"
 #import "BarButton.h"
@@ -49,6 +50,7 @@
     NSUserDefaults                  * fDefaults;
     InfoWindowController            * fInfoController;
     MessageWindowController         * fMessageController;
+    PiecesWindowController          * fPiecesWindowController;
 
     IBOutlet NSWindow               * fWindow;
     IBOutlet NSScrollView           * fScrollView;
@@ -105,8 +107,11 @@
 
 - (void) resumeSelectedTorrents:    (id) sender;
 - (void) resumeAllTorrents:         (id) sender;
-- (void) resumeWaitingTorrents:     (id) sender;
 - (void) resumeTorrents:            (NSArray *) torrents;
+
+- (void) resumeSelectedTorrentsNoWait:  (id) sender;
+- (void) resumeWaitingTorrents:         (id) sender;
+- (void) resumeTorrentsNoWait:          (NSArray *) torrents;
 
 - (void) stopSelectedTorrents:      (id) sender;
 - (void) stopAllTorrents:           (id) sender;
@@ -136,6 +141,7 @@
 - (void) setInfoTab: (id) sender;
 
 - (void) showMessageWindow: (id) sender;
+- (void) showPiecesView: (id) sender;
 
 - (void) updateControlTint: (NSNotification *) notification;
 
@@ -171,8 +177,6 @@
 
 - (void) attemptToStartAuto: (Torrent *) torrent;
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents;
-
-- (void) reloadInspectorSettings: (NSNotification *) notification;
 
 - (void) checkAutoImportDirectory;
 

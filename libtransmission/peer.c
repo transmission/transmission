@@ -100,6 +100,8 @@ struct tr_peer_s
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
+static void __peer_dbg( tr_peer_t * peer, char * msg, ... ) PRINTF( 2, 3 );
+
 static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
 {
     char    string[256];

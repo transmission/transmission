@@ -42,22 +42,12 @@ struct tr_tracker_s
     uint64_t       dateTry;
     uint64_t       dateOk;
 
-#define TC_STATUS_IDLE    1
-#define TC_STATUS_RESOLVE 2
-#define TC_STATUS_CONNECT 4
-#define TC_STATUS_RECV    8
-    char           status;
-
 #define TC_ATTEMPT_NOREACH 1
 #define TC_ATTEMPT_ERROR   2
 #define TC_ATTEMPT_OK      4
     char           lastAttempt;
 
-    tr_resolve_t * resolve;
-    int            socket;
-    uint8_t      * buf;
-    int            size;
-    int            pos;
+    tr_http_t    * http;
 
     int            bindPort;
     int            newPort;
@@ -66,8 +56,8 @@ struct tr_tracker_s
     uint64_t       upload;
 };
 
-static void sendQuery  ( tr_tracker_t * tc );
-static void recvAnswer ( tr_tracker_t * tc );
+static tr_http_t * getQuery   ( tr_tracker_t * tc );
+static void        readAnswer ( tr_tracker_t * tc, const char *, int );
 
 tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 {
@@ -83,10 +73,7 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     tc->seeders  = -1;
     tc->leechers = -1;
 
-    tc->status   = TC_STATUS_IDLE;
     tc->lastAttempt = TC_ATTEMPT_NOREACH;
-    tc->size     = 1024;
-    tc->buf      = malloc( tc->size );
 
     tc->bindPort = *(tor->bindPort);
     tc->newPort  = -1;
@@ -159,11 +146,17 @@ int tr_trackerPulse( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
     tr_info_t    * inf = &tor->info;
-    uint64_t       now = tr_date();
+    const char   * data;
+    int            len;
 
-    if( ( tc->status & TC_STATUS_IDLE ) && shouldConnect( tc ) )
+    if( ( NULL == tc->http ) && shouldConnect( tc ) )
     {
-        tc->resolve = tr_netResolveInit( inf->trackerAddress );
+        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
+        {
+            return 0;
+        }
+        tc->dateTry = tr_date();
+        tc->http = getQuery( tc );
 
         tr_inf( "Tracker: connecting to %s:%d (%s)",
                 inf->trackerAddress, inf->trackerPort,
@@ -172,71 +165,29 @@ int tr_trackerPulse( tr_tracker_t * tc )
                   ( tc->stopped ? "sending 'stopped'" :
                     ( 0 < tc->newPort ? "sending 'stopped' to change port" :
                       "getting peers" ) ) ) );
-
-        tc->status  = TC_STATUS_RESOLVE;
-        tc->dateTry = tr_date();
     }
 
-    if( tc->status & TC_STATUS_RESOLVE )
+    if( NULL != tc->http )
     {
-        int ret;
-        struct in_addr addr;
-
-        ret = tr_netResolvePulse( tc->resolve, &addr );
-        if( ret == TR_RESOLVE_WAIT )
+        switch( tr_httpPulse( tc->http, &data, &len ) )
         {
-            return 0;
+            case TR_WAIT:
+                return 0;
+
+            case TR_ERROR:
+                tr_httpClose( tc->http );
+                tr_fdSocketClosed( tor->fdlimit, 1 );
+                tc->http    = NULL;
+                tc->dateTry = tr_date();
+                return 0;
+
+            case TR_OK:
+                readAnswer( tc, data, len );
+                tr_httpClose( tc->http );
+                tc->http = NULL;
+                tr_fdSocketClosed( tor->fdlimit, 1 );
+                break;
         }
-        else
-        {
-            tr_netResolveClose( tc->resolve );
-        }
-        
-        if( ret == TR_RESOLVE_ERROR )
-        {
-            tc->status = TC_STATUS_IDLE;
-            return 0;
-        }
-
-        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
-        {
-            tc->status = TC_STATUS_IDLE;
-            return 0;
-        }
-
-        tc->socket = tr_netOpen( addr, htons( inf->trackerPort ) );
-        if( tc->socket < 0 )
-        {
-            tr_fdSocketClosed( tor->fdlimit, 1 );
-            tc->status = TC_STATUS_IDLE;
-            return 0;
-        }
-
-        tc->status = TC_STATUS_CONNECT;
-    }
-
-    if( tc->status & TC_STATUS_CONNECT )
-    {
-        /* We are connecting to the tracker. Try to send the query */
-        sendQuery( tc );
-    }
-
-    if( tc->status & TC_STATUS_RECV )
-    {
-        /* Try to get something */
-        recvAnswer( tc );
-    }
-
-    if( tc->status > TC_STATUS_IDLE && now > tc->dateTry + 60000 )
-    {
-        /* Give up if the request wasn't successful within 60 seconds */
-        tr_inf( "Tracker: timeout reached (60 s)" );
-
-        tr_netClose( tc->socket );
-        tr_fdSocketClosed( tor->fdlimit, 1 );
-
-        tc->status  = TC_STATUS_IDLE;
-        tc->dateTry = tr_date();
     }
 
     return 0;
@@ -253,13 +204,13 @@ void tr_trackerStopped( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
 
-    if( tc->status > TC_STATUS_CONNECT )
+    if( NULL != tc->http )
     {
         /* If we are already sendy a query at the moment, we need to
            reconnect */
-        tr_netClose( tc->socket );
+        tr_httpClose( tc->http );
+        tc->http = NULL;
         tr_fdSocketClosed( tor->fdlimit, 1 );
-        tc->status = TC_STATUS_IDLE;
     }
 
     tc->started   = 0;
@@ -267,39 +218,30 @@ void tr_trackerStopped( tr_tracker_t * tc )
     tc->stopped   = 1;
 
     /* Even if we have connected recently, reconnect right now */
-    if( tc->status & TC_STATUS_IDLE )
-    {
-        tc->dateTry = 0;
-    }
+    tc->dateTry = 0;
 }
 
 void tr_trackerClose( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
 
-    if( tc->status == TC_STATUS_RESOLVE )
+    if( NULL != tc->http )
     {
-        tr_netResolveClose( tc->resolve );
-    }
-    else if( tc->status > TC_STATUS_RESOLVE )
-    {
-        tr_netClose( tc->socket );
+        tr_httpClose( tc->http );
         tr_fdSocketClosed( tor->fdlimit, 1 );
     }
-    free( tc->buf );
     free( tc );
 }
 
-static void sendQuery( tr_tracker_t * tc )
+static tr_http_t * getQuery( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
     tr_info_t    * inf = &tor->info;
 
-    char     * event;
-    uint64_t   left;
-    int        ret;
-    uint64_t   down;
-    uint64_t   up;
+    char         * event;
+    uint64_t       left;
+    uint64_t       down;
+    uint64_t       up;
 
     assert( tor->downloaded >= tc->download && tor->uploaded >= tc->upload );
     down = tor->downloaded - tc->download;
@@ -330,119 +272,61 @@ static void sendQuery( tr_tracker_t * tc )
 
     left = tr_cpLeftBytes( tor->completion );
 
-    ret = snprintf( (char *) tc->buf, tc->size,
-            "GET %s?"
-            "info_hash=%s&"
-            "peer_id=%s&"
-            "port=%d&"
-            "uploaded=%"PRIu64"&"
-            "downloaded=%"PRIu64"&"
-            "left=%"PRIu64"&"
-            "compact=1&"
-            "numwant=50&"
-            "key=%s"
-            "%s "
-            "HTTP/1.1\r\n"
-            "Host: %s\r\n"
-            "User-Agent: Transmission/%d.%d\r\n"
-            "Connection: close\r\n\r\n",
-            inf->trackerAnnounce, tor->hashString, tc->id,
-            tc->bindPort, up, down,
-            left, tor->key, event, inf->trackerAddress,
-            VERSION_MAJOR, VERSION_MINOR );
-
-    ret = tr_netSend( tc->socket, tc->buf, ret );
-    if( ret & TR_NET_CLOSE )
-    {
-        tr_inf( "Tracker: connection failed" );
-        tr_netClose( tc->socket );
-        tr_fdSocketClosed( tor->fdlimit, 1 );
-        tc->status  = TC_STATUS_IDLE;
-        tc->dateTry = tr_date();
-    }
-    else if( !( ret & TR_NET_BLOCK ) )
-    {
-        // printf( "Tracker: sent %s", tc->buf );
-        tc->status = TC_STATUS_RECV;
-        tc->pos    = 0;
-    }
+    return tr_httpClient( TR_HTTP_GET, inf->trackerAddress,
+                          inf->trackerPort,
+                          "%s?"
+                          "info_hash=%s&"
+                          "peer_id=%s&"
+                          "port=%d&"
+                          "uploaded=%"PRIu64"&"
+                          "downloaded=%"PRIu64"&"
+                          "left=%"PRIu64"&"
+                          "compact=1&"
+                          "numwant=50&"
+                          "key=%s"
+                          "%s ",
+                          inf->trackerAnnounce, tor->hashString, tc->id,
+                          tc->bindPort, up, down, left, tor->key, event );
 }
 
-static void recvAnswer( tr_tracker_t * tc )
+static void readAnswer( tr_tracker_t * tc, const char * data, int len )
 {
     tr_torrent_t * tor = tc->tor;
-    int ret;
     int i;
+    int code;
     benc_val_t   beAll;
     benc_val_t * bePeers, * beFoo;
-    uint8_t * body;
+    const uint8_t * body;
     int bodylen;
     int shouldfree;
 
-    if( tc->pos == tc->size )
-    {
-        tc->size *= 2;
-        tc->buf   = realloc( tc->buf, tc->size );
-    }
-    
-    ret = tr_netRecv( tc->socket, &tc->buf[tc->pos],
-                    tc->size - tc->pos );
-
-    if( ret & TR_NET_BLOCK )
-    {
-        return;
-    }
-    if( !( ret & TR_NET_CLOSE ) )
-    {
-        // printf( "got %d bytes\n", ret );
-        tc->pos += ret;
-        return;
-    }
-
-    tr_netClose( tc->socket );
-    tr_fdSocketClosed( tor->fdlimit, 1 );
-    // printf( "connection closed, got total %d bytes\n", tc->pos );
-
-    tc->status  = TC_STATUS_IDLE;
     tc->dateTry = tr_date();
-
-    if( tc->pos < 12 || ( 0 != memcmp( tc->buf, "HTTP/1.0 ", 9 ) &&
-                          0 != memcmp( tc->buf, "HTTP/1.1 ", 9 ) ) )
+    code = tr_httpResponseCode( data, len );
+    if( 0 > code )
     {
-        /* We don't have a complete HTTP status line */
-        tr_inf( "Tracker: incomplete HTTP status line" );
+        /* We don't have a valid HTTP status line */
+        tr_inf( "Tracker: invalid HTTP status line" );
         tc->lastAttempt = TC_ATTEMPT_NOREACH;
         return;
     }
 
-    if( '2' != tc->buf[9] )
+    if( !TR_HTTP_STATUS_OK( code ) )
     {
         /* we didn't get a 2xx status code */
-        tr_err( "Tracker: invalid HTTP status code: %c%c%c",
-                tc->buf[9], tc->buf[10], tc->buf[11] );
+        tr_err( "Tracker: invalid HTTP status code: %i", code );
         tc->lastAttempt = TC_ATTEMPT_ERROR;
         return;
     }
 
     /* find the end of the http headers */
-    body = tr_memmem( tc->buf, tc->pos, "\015\012\015\012", 4 );
-    if( NULL != body )
-    {
-        body += 4;
-    }
-    /* hooray for trackers that violate the HTTP spec */
-    else if( NULL != ( body = tr_memmem( tc->buf, tc->pos, "\015\015", 2 ) ) ||
-             NULL != ( body = tr_memmem( tc->buf, tc->pos, "\012\012", 2 ) ) )
-    {
-        body += 2;
-    }
-    else
+    body = (uint8_t *) tr_httpParse( data, len, NULL );
+    if( NULL == body )
     {
         tr_err( "Tracker: could not find end of HTTP headers" );
         tc->lastAttempt = TC_ATTEMPT_NOREACH;
         return;
     }
-    bodylen = tc->pos - (body - tc->buf);
+    bodylen = len - (body - (const uint8_t*)data);
 
     /* Find and load the dictionary */
     shouldfree = 0;
@@ -610,13 +494,11 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
 {
     tr_info_t * inf = &tor->info;
 
-    int s, i, ret;
-    uint8_t buf[1024];
-    benc_val_t scrape, * val1, * val2;
-    struct in_addr addr;
-    uint64_t date;
-    int pos, len;
-    tr_resolve_t * resolve;
+    tr_http_t  * http;
+    const char * data, * body;
+    int          datalen, bodylen;
+    int          code, ii;
+    benc_val_t   scrape, * val1, * val2;
 
     if( !tor->scrape[0] )
     {
@@ -624,133 +506,97 @@ int tr_trackerScrape( tr_torrent_t * tor, int * seeders, int * leechers )
         return 1;
     }
 
-    resolve = tr_netResolveInit( inf->trackerAddress );
-    for( date = tr_date();; )
-    {
-        ret = tr_netResolvePulse( resolve, &addr );
-        if( ret == TR_RESOLVE_OK )
-        {
-            tr_netResolveClose( resolve );
-            break;
-        }
-        if( ret == TR_RESOLVE_ERROR ||
-            ( ret == TR_RESOLVE_WAIT && tr_date() > date + 10000 ) )
-        {
-            tr_err( "Could not resolve %s", inf->trackerAddress );
-            tr_netResolveClose( resolve );
-            return 1;
-        }
-        tr_wait( 10 );
-    }
+    http = tr_httpClient( TR_HTTP_GET, inf->trackerAddress, inf->trackerPort,
+                          "%s?info_hash=%s", tor->scrape, tor->hashString );
 
-    s = tr_netOpen( addr, htons( inf->trackerPort ) );
-    if( s < 0 )
+    data = NULL;
+    while( NULL == data )
     {
-        return 1;
-    }
-
-    len = snprintf( (char *) buf, sizeof( buf ),
-              "GET %s?info_hash=%s HTTP/1.1\r\n"
-              "Host: %s\r\n"
-              "Connection: close\r\n\r\n",
-              tor->scrape, tor->hashString,
-              inf->trackerAddress );
-
-    for( date = tr_date();; )
-    {
-        ret = tr_netSend( s, buf, len );
-        if( ret & TR_NET_CLOSE )
+        switch( tr_httpPulse( http, &data, &datalen ) )
         {
-            tr_err( "Could not connect to tracker" );
-            tr_netClose( s );
-            return 1;
-        }
-        else if( ret & TR_NET_BLOCK )
-        {
-            if( tr_date() > date + 10000 )
-            {
-                tr_err( "Could not connect to tracker" );
-                tr_netClose( s );
+            case TR_WAIT:
+                break;
+
+            case TR_ERROR:
+                tr_httpClose( http );
                 return 1;
-            }
-        }
-        else
-        {
-            break;
+
+            case TR_OK:
+                if( NULL == data || 0 >= datalen )
+                {
+                    tr_httpClose( http );
+                    return 1;
+                }
+                break;
         }
         tr_wait( 10 );
     }
 
-    pos = 0;
-    for( date = tr_date();; )
+    code = tr_httpResponseCode( data, datalen );
+    if( !TR_HTTP_STATUS_OK( code ) )
     {
-        ret = tr_netRecv( s, &buf[pos], sizeof( buf ) - pos );
-        if( ret & TR_NET_CLOSE )
-        {
-            break;
-        }
-        else if( ret & TR_NET_BLOCK )
-        {
-            if( tr_date() > date + 10000 )
-            {
-                tr_err( "Could not read from tracker" );
-                tr_netClose( s );
-                return 1;
-            }
-        }
-        else
-        {
-            pos += ret;
-        }
-        tr_wait( 10 );
-    }
-
-    if( pos < 1 )
-    {
-        tr_err( "Could not read from tracker" );
-        tr_netClose( s );
+        tr_httpClose( http );
         return 1;
     }
 
-    for( i = 0; i < pos - 8; i++ )
+    body = tr_httpParse( data, datalen , NULL );
+    if( NULL == body )
     {
-        if( !memcmp( &buf[i], "d5:files", 8 ) )
+        tr_httpClose( http );
+        return 1;
+    }
+    bodylen = datalen - ( body - data );
+
+    for( ii = 0; ii < bodylen - 8; ii++ )
+    {
+        if( !memcmp( body + ii, "d5:files", 8 ) )
         {
             break;
         }
     }
-    if( i >= pos - 8 )
+    if( ii >= bodylen - 8 )
     {
+        tr_httpClose( http );
         return 1;
     }
-    if( tr_bencLoad( &buf[i], pos - i, &scrape, NULL ) )
+    if( tr_bencLoad( body + ii, bodylen - ii, &scrape, NULL ) )
     {
+        tr_httpClose( http );
         return 1;
     }
 
     val1 = tr_bencDictFind( &scrape, "files" );
     if( !val1 )
     {
+        tr_bencFree( &scrape );
+        tr_httpClose( http );
         return 1;
     }
     val1 = &val1->val.l.vals[1];
     if( !val1 )
     {
+        tr_bencFree( &scrape );
+        tr_httpClose( http );
         return 1;
     }
     val2 = tr_bencDictFind( val1, "complete" );
     if( !val2 )
     {
+        tr_bencFree( &scrape );
+        tr_httpClose( http );
         return 1;
     }
     *seeders = val2->val.i;
     val2 = tr_bencDictFind( val1, "incomplete" );
     if( !val2 )
     {
+        tr_bencFree( &scrape );
+        tr_httpClose( http );
         return 1;
     }
     *leechers = val2->val.i;
     tr_bencFree( &scrape );
+    tr_httpClose( http );
 
     return 0;
 }

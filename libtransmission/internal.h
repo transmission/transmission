@@ -28,6 +28,9 @@
 /* Standard headers used here and there.
    That is probably ugly to put them all here, but it is sooo
    convenient */
+#if ( defined( __unix__ ) || defined( unix ) ) && !defined( USG )
+#include <sys/param.h>
+#endif
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -50,14 +53,21 @@
 #include <assert.h>
 #ifdef BEOS_NETSERVER
 #  define in_port_t uint16_t
+#  define socklen_t uint32_t
 #else
 #  include <arpa/inet.h>
 #endif
 
+#ifndef INADDR_NONE
+#define INADDR_NONE             0xffffffff
+#endif
+
 #ifdef __GNUC__
 #  define UNUSED __attribute__((unused))
+#  define PRINTF( fmt, args ) __attribute__((format (printf, fmt, args)))
 #else
 #  define UNUSED
+#  define PRINTF( fmt, args )
 #endif
 
 /* We use OpenSSL whenever possible, since it is likely to be more
@@ -107,6 +117,8 @@ static inline void tr_htonl( uint32_t a, uint8_t * p )
 
 typedef struct tr_completion_s tr_completion_t;
 
+typedef enum { TR_OK, TR_ERROR, TR_WAIT } tr_tristate_t;
+
 #include "platform.h"
 #include "bencode.h"
 #include "metainfo.h"
@@ -118,6 +130,10 @@ typedef struct tr_completion_s tr_completion_t;
 #include "ratecontrol.h"
 #include "clients.h"
 #include "choking.h"
+#include "natpmp.h"
+#include "upnp.h"
+#include "http.h"
+#include "xml.h"
 
 struct tr_torrent_s
 {
@@ -187,6 +203,8 @@ struct tr_handle_s
     tr_ratecontrol_t * download;
     tr_fd_t      * fdlimit;
     tr_choking_t * choking;
+    tr_natpmp_t  * natpmp;
+    tr_upnp_t    * upnp;
 
     int            bindPort;
     int            bindSocket;

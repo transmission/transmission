@@ -151,13 +151,6 @@
 {
     NSDictionary * info = [self objectValue];
     
-    //if seeding, there's no need for the advanced bar
-    if ([[info objectForKey: @"Seeding"] boolValue])
-    {
-        [self buildSimpleBar: widthFloat point: point];
-        return;
-    }
-    
     //draw overlay over advanced bar
     [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
     

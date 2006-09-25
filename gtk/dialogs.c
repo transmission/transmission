@@ -41,6 +41,7 @@
 #define DEF_USEDOWNLIMIT        FALSE
 #define DEF_UPLIMIT             20
 #define DEF_USEUPLIMIT          TRUE
+#define DEF_NAT                 TRUE
 
 struct prefdata {
   GList *prefwidgets;
@@ -170,9 +171,11 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
    GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  const unsigned int rowcount = 8;
+  const unsigned int rowcount = 9;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
+  GtkWidget *natcheck = gtk_check_button_new_with_mnemonic(
+    _("Use NAT _Traversal (NAT-PMP and UPnP)"));
   GtkWidget *dirstr = gtk_file_chooser_button_new(
     _("Choose a download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
@@ -196,6 +199,8 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   GtkTreeModel *model;
   GtkTreeIter iter;
   GtkCellRenderer *rend;
+  gboolean boolval;
+  int intval;
 
   g_free(title);
   gtk_widget_set_name(wind, "TransmissionDialog");
@@ -206,7 +211,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
 
   data->prefwidgets = makeglist(portnum, lim[0].on, lim[0].num, lim[1].on,
-    lim[1].num, dirstr, addstd, addipc, NULL);
+    lim[1].num, dirstr, addstd, addipc, natcheck, NULL);
   data->parent = parent;
   data->back = back;
   g_object_ref(G_OBJECT(back));
@@ -251,6 +256,13 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   setupprefwidget(portnum, PREF_PORT, (long)TR_DEFAULT_PORT);
   gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
   gtk_table_attach_defaults(GTK_TABLE(table), portnum,         1, 2, RN(ii));
+  ii++;
+
+  /* NAT traversal checkbox */
+  intval = tr_natTraversalStatus(tr_backend_handle(back));
+  boolval = !TR_NAT_TRAVERSAL_IS_DISABLED( intval );
+  setupprefwidget(natcheck, PREF_NAT, boolval);
+  gtk_table_attach_defaults(GTK_TABLE(table), natcheck,        0, 2, RN(ii));
   ii++;
 
   /* create the model used by the three popup menus */
@@ -340,11 +352,8 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
       g_free(errstr);
     }
 
+    applyprefs(data->back);
     /* XXX would be nice to have errno strings, are they printed to stdout? */
-
-    tr_setBindPort(tr_backend_handle(data->back),
-                   strtol(cf_getpref(PREF_PORT), NULL, 10));
-    setlimit(data->back);
   }
 
   if(GTK_RESPONSE_APPLY != resp)
@@ -352,7 +361,7 @@ clickdialog(GtkWidget *widget, int resp, gpointer gdata) {
 }
 
 void
-setlimit(TrBackend *back) {
+applyprefs(TrBackend *back) {
   struct { void (*func)(tr_handle_t*, int);
     const char *use; const char *num; gboolean defuse; long def; } lim[] = {
     {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,
@@ -361,10 +370,12 @@ setlimit(TrBackend *back) {
                           DEF_USEUPLIMIT,    DEF_UPLIMIT},
   };
   const char *pref;
-  unsigned int ii;
+  int ii;
   tr_handle_t *tr = tr_backend_handle(back);
+  gboolean boolval;
 
-  for(ii = 0; ii < ALEN(lim); ii++) {
+  /* set upload and download limits */
+  for(ii = 0; ii < (int)ALEN(lim); ii++) {
     pref = cf_getpref(lim[ii].use);
     if(!(NULL == pref ? lim[ii].defuse : strbool(pref)))
       lim[ii].func(tr, -1);
@@ -373,6 +384,18 @@ setlimit(TrBackend *back) {
       lim[ii].func(tr, (NULL == pref ? lim[ii].def : strtol(pref, NULL, 10)));
     }
   }
+
+  /* set the listening port */
+  if(NULL != (pref = cf_getpref(PREF_PORT)) &&
+     0 < (ii = strtol(pref, NULL, 10)) && 0xffff >= ii)
+    tr_setBindPort(tr, ii);
+
+  /* enable/disable NAT traversal */
+  boolval = (NULL == (pref = cf_getpref(PREF_NAT)) ? DEF_NAT : strbool(pref));
+  if( boolval )
+    tr_natTraversalEnable(tr);
+  else
+    tr_natTraversalDisable(tr);
 }
 
 void

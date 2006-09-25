@@ -59,5 +59,6 @@ cf_freestate(benc_val_t *state);
 #define PREF_ADDSTD             "add-behavior-standard"
 #define PREF_ADDIPC             "add-behavior-ipc"
 #define PREF_MSGLEVEL           "message-level"
+#define PREF_NAT                "use-nat-traversal"
 
 #endif /* TG_CONF_H */

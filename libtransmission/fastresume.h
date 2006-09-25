@@ -248,7 +248,7 @@ static int fastResumeLoadOld( tr_io_t * io, FILE * file )
     if( ftell( file ) != size )
     {
         tr_inf( "Wrong size for resume file (%d bytes, %d expected)",
-                ftell( file ), size );
+                (int)ftell( file ), size );
         fclose( file );
         return 1;
     }

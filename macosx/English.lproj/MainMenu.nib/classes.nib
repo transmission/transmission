@@ -15,6 +15,7 @@
                 removeNoDelete = id; 
                 resumeAllTorrents = id; 
                 resumeSelectedTorrents = id; 
+                resumeSelectedTorrentsNoWait = id; 
                 resumeWaitingTorrents = id; 
                 revealFile = id; 
                 setFilter = id; 
@@ -27,6 +28,7 @@
                 showInfo = id; 
                 showMainWindow = id; 
                 showMessageWindow = id; 
+                showPiecesView = id; 
                 showPreferenceWindow = id; 
                 stopAllTorrents = id; 
                 stopSelectedTorrents = id; 

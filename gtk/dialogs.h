@@ -32,9 +32,9 @@
 GtkWidget *
 makeprefwindow(GtkWindow *parent, TrBackend *back);
 
-/* set the upload limit based on saved prefs */
+/* set various things based on saved prefs */
 void
-setlimit(TrBackend *back);
+applyprefs(TrBackend *back);
 
 /* show the "add a torrent" dialog */
 void

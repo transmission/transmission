@@ -86,6 +86,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fMessageController = [[MessageWindowController alloc] initWithWindowNibName: @"MessageWindow"];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
+        fPiecesWindowController = [[PiecesWindowController alloc] initWithWindowNibName: @"PiecesWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         
         fBadger = [[Badger alloc] init];
@@ -100,13 +101,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-    [fTorrents release];
-    [fDisplayedTorrents release];
+    
+    [fInfoController release];
+    [fMessageController release];
+    [fPiecesWindowController release];
+    [fPrefsController release];
     
     [fToolbar release];
-    [fInfoController release];
-    [fPrefsController release];
+    [fTorrents release];
+    [fDisplayedTorrents release];
     [fBadger release];
     
     [fSortType release];
@@ -332,18 +335,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //check all torrents for starting
     [nc addObserver: self selector: @selector(globalStartSettingChange:)
                     name: @"GlobalStartSettingChange" object: nil];
-
-    //check if torrent should now start
-    [nc addObserver: self selector: @selector(torrentStartSettingChange:)
-                    name: @"TorrentStartSettingChange" object: nil];
     
     //check if torrent should now start
     [nc addObserver: self selector: @selector(torrentStoppedForRatio:)
                     name: @"TorrentStoppedForRatio" object: nil];
-    
-    //change that just impacts the inspector
-    [nc addObserver: self selector: @selector(reloadInspectorSettings:)
-                    name: @"TorrentSettingChange" object: nil];
     
     //change that just impacts the dock badge
     [nc addObserver: self selector: @selector(resetDockBadge:)
@@ -363,6 +358,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
+    
+    if ([fDefaults boolForKey: @"PiecesViewerVisible"])
+        [self showPiecesView: nil];
     
     //timer to auto toggle speed limit
     [self autoSpeedLimitChange: nil];
@@ -425,8 +423,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
     [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
     
+    //disable NAT traversal
+    tr_natTraversalDisable(fLib);
+    
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
+    [fDefaults setBool: [[fPiecesWindowController window] isVisible] forKey: @"PiecesViewerVisible"];
     [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
@@ -438,13 +440,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (fUpdateInProgress)
         return;
 
-    //wait for running transfers to stop (5 second timeout)
+    //wait for running transfers to stop (5 second timeout) and for NAT to be disabled
     NSDate * start = [NSDate date];
     BOOL timeUp = NO;
     
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    while (!timeUp && (torrent = [enumerator nextObject]))
+    while (!timeUp && ((torrent = [enumerator nextObject]) || tr_natTraversalStatus(fLib) != TR_NAT_TRAVERSAL_DISABLED))
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
@@ -543,8 +545,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
     
-    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                    torrent, @"Torrent", files, @"Files", nil];
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrent, @"Torrent", files, @"Files", nil];
 
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
@@ -626,6 +627,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self resumeTorrents: fTorrents];
 }
 
+- (void) resumeTorrents: (NSArray *) torrents
+{
+    NSEnumerator * enumerator = [torrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent setWaitToStart: YES];
+    
+    [self attemptToStartMultipleAuto: torrents];
+    
+    [self updateUI: nil];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
+}
+
+- (void) resumeSelectedTorrentsNoWait:  (id) sender
+{
+    [self resumeTorrentsNoWait: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+}
+
 - (void) resumeWaitingTorrents: (id) sender
 {
     NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
@@ -636,16 +656,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([torrent waitingToStart])
             [torrents addObject: torrent];
     
-    [self resumeTorrents: torrents];
+    [self resumeTorrentsNoWait: torrents];
 }
 
-- (void) resumeTorrents: (NSArray *) torrents
+- (void) resumeTorrentsNoWait: (NSArray *) torrents
 {
     [torrents makeObjectsPerformSelector: @selector(startTransfer)];
     
     [self updateUI: nil];
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -671,7 +690,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI: nil];
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -918,6 +936,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fMessageController showWindow: nil];
 }
 
+- (void) showPiecesView: (id) sender
+{
+    if ([[fPiecesWindowController window] isVisible])
+        [fPiecesWindowController close];
+    else
+    {
+        [fPiecesWindowController updateView: NO];
+        [[fPiecesWindowController window] orderFront: nil];
+    }
+}
+
 - (void) updateControlTint: (NSNotification *) notification
 {
     if (fSpeedLimitEnabled)
@@ -947,6 +976,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //update non-constant parts of info window
     if ([[fInfoController window] isVisible])
         [fInfoController updateInfoStats];
+    
+    //update pieces viewer
+    if ([[fPiecesWindowController window] isVisible])
+        [fPiecesWindowController updateView: NO];
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
@@ -1387,17 +1420,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI: nil];
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
 - (void) checkToStartWaiting: (Torrent *) finishedTorrent
 {
     //don't try to start a transfer if there should be none waiting
-    if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
+    if (![fDefaults boolForKey: @"Queue"])
         return;
 
-    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+    int desiredActive = [fDefaults integerForKey: @"QueueDownloadNumber"];
     
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent, * torrentToStart = nil;
@@ -1432,7 +1464,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         [self updateUI: nil];
         [self applyFilter: nil];
-        [fInfoController updateInfoStatsAndSettings];
         [self updateTorrentHistory];
     }
 }
@@ -1443,7 +1474,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [self updateUI: nil];
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
@@ -1453,14 +1483,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI: nil];
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
     [self updateTorrentHistory];
 }
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification
 {
     [self applyFilter: nil];
-    [fInfoController updateInfoStatsAndSettings];
+    [fInfoController updateInfoStats];
+    [fInfoController updateInfoSettings];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {
@@ -1481,8 +1511,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 //will try to start, taking into consideration the start preference
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents
 {
-    NSString * startSetting = [fDefaults stringForKey: @"StartSetting"];
-    if ([startSetting isEqualToString: @"Start"])
+    if (![fDefaults boolForKey: @"Queue"])
     {
         NSEnumerator * enumerator = [torrents objectEnumerator];
         Torrent * torrent;
@@ -1492,12 +1521,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         return;
     }
-    else if (![startSetting isEqualToString: @"Wait"])
-        return;
-    else;
     
     //determine the number of downloads needed to start
-    int desiredActive = [fDefaults integerForKey: @"WaitToStartNumber"];
+    int desiredActive = [fDefaults integerForKey: @"QueueDownloadNumber"];
             
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
@@ -1543,11 +1569,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
-- (void) reloadInspectorSettings: (NSNotification *) notification
-{
-    [fInfoController updateInfoStatsAndSettings];
-}
-
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
@@ -1585,12 +1606,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     return [fDisplayedTorrents count];
 }
-
-/*- (void) tableView: (NSTableView *) t willDisplayCell: (id) cell
-    forTableColumn: (NSTableColumn *) tableColumn row: (int) row
-{
-    [cell setTorrent: [fDisplayedTorrents objectAtIndex: row]];
-}*/
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
@@ -1712,7 +1727,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    NSArray * torrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+    [fInfoController updateInfoForTorrents: torrents];
+    
+    Torrent * torrent = [torrents count] == 1 ? [torrents objectAtIndex: 0] : nil;
+    [fPiecesWindowController setTorrent: torrent];
 }
 
 - (void) toggleSmallView: (id) sender
@@ -1981,7 +2000,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive])
+            if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -1992,7 +2011,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused])
+            if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2005,20 +2024,27 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            if ([[fDisplayedTorrents objectAtIndex: i] isActive])
+        {
+            torrent = [fDisplayedTorrents objectAtIndex: i];
+            if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
+        }
         return NO;
     }
     
     //enable resume item
     if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
+        Torrent * torrent;
         NSIndexSet * indexSet = [fTableView selectedRowIndexes];
         unsigned int i;
         
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            if ([[fDisplayedTorrents objectAtIndex: i] isPaused])
+        {
+            torrent = [fDisplayedTorrents objectAtIndex: i];
+            if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
+        }
         return NO;
     }
 
@@ -2044,6 +2070,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (action == @selector(showInfo:))
     {
         NSString * title = [[fInfoController window] isVisible] ? @"Hide Inspector" : @"Show Inspector";
+        if (![[menuItem title] isEqualToString: title])
+                [menuItem setTitle: title];
+
+        return YES;
+    }
+    
+    //enable show pieces window
+    if (action == @selector(showPiecesView:))
+    {
+        NSString * title = [[fPiecesWindowController window] isVisible] ? @"Hide Pieces Viewer" : @"Show Pieces Viewer";
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
@@ -2132,7 +2168,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive])
+            if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2143,15 +2179,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused])
+            if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
     
-    //enable resume waiting item
+    //enable resume all waiting item
     if (action == @selector(resumeWaitingTorrents:))
     {
-        if (![[fDefaults stringForKey: @"StartSetting"] isEqualToString: @"Wait"])
+        if (![fDefaults boolForKey: @"Queue"])
             return NO;
     
         Torrent * torrent;
@@ -2159,6 +2195,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         while ((torrent = [enumerator nextObject]))
             if ([torrent waitingToStart])
                 return YES;
+        return NO;
+    }
+    
+    //enable resume selected waiting item
+    if (action == @selector(resumeSelectedTorrentsNoWait:))
+    {
+        if (![fDefaults boolForKey: @"Queue"])
+            return NO;
+    
+        Torrent * torrent;
+        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
+        unsigned int i;
+        
+        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        {
+            torrent = [fDisplayedTorrents objectAtIndex: i];
+            if ([torrent isPaused])
+                return YES;
+        }
         return NO;
     }
 
@@ -2175,7 +2230,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             torrent = [fDisplayedTorrents objectAtIndex: i];
-            if ([torrent isActive])
+            if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         }
         return NO;
@@ -2194,7 +2249,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             torrent = [fDisplayedTorrents objectAtIndex: i];
-            if ([torrent isPaused])
+            if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
         }
         return NO;

@@ -52,10 +52,18 @@
 	<string>Constant</string>
 	<key>MoveFolder</key>
 	<string>~/Desktop</string>
+	<key>NatTraversal</key>
+	<true/>
+	<key>PiecesViewerVisible</key>
+	<false/>
 	<key>PlayDownloadSound</key>
 	<true/>
 	<key>PlaySeedingSound</key>
 	<false/>
+	<key>Queue</key>
+	<false/>
+	<key>QueueDownloadNumber</key>
+	<integer>3</integer>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>
@@ -86,8 +94,8 @@
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
 	<integer>10</integer>
-	<key>StartSetting</key>
-	<string>Start</string>
+	<key>StartAtOpen</key>
+	<true/>
 	<key>StatusBar</key>
 	<true/>
 	<key>UpdateCheck</key>
@@ -96,7 +104,5 @@
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
 	<false/>
-	<key>WaitToStartNumber</key>
-	<integer>3</integer>
 </dict>
 </plist>

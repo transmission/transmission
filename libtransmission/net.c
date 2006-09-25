@@ -35,7 +35,7 @@
  * representing numbers expressed in the Internet standard `.' notation.
  * Returns a non-zero value if an error occurs.
  **********************************************************************/
-int tr_netResolve( char * address, struct in_addr * addr )
+int tr_netResolve( const char * address, struct in_addr * addr )
 {
     addr->s_addr = inet_addr( address );
     return ( addr->s_addr == 0xFFFFFFFF );
@@ -52,7 +52,7 @@ static void resolveFunc    ( void * );
 
 struct tr_resolve_s
 {
-    int            status;
+    tr_tristate_t  status;
     char           * address;
     struct in_addr addr;
 
@@ -94,12 +94,12 @@ void tr_netResolveThreadClose()
  ***********************************************************************
  * Adds an address to the resolution queue.
  **********************************************************************/
-tr_resolve_t * tr_netResolveInit( char * address )
+tr_resolve_t * tr_netResolveInit( const char * address )
 {
     tr_resolve_t * r;
 
     r           = malloc( sizeof( tr_resolve_t ) );
-    r->status   = TR_RESOLVE_WAIT;
+    r->status   = TR_WAIT;
     r->address  = strdup( address );
     r->refcount = 2;
     r->next     = NULL;
@@ -125,13 +125,13 @@ tr_resolve_t * tr_netResolveInit( char * address )
  ***********************************************************************
  * Checks the current status of a resolution.
  **********************************************************************/
-int tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
+tr_tristate_t tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
 {
-    int ret;
+    tr_tristate_t ret;
 
     tr_lockLock( &resolveLock );
     ret = r->status;
-    if( ret == TR_RESOLVE_OK )
+    if( ret == TR_OK )
     {
         *addr = r->addr;
     }
@@ -201,11 +201,11 @@ static void resolveFunc( void * arg UNUSED )
         if( host )
         {
             memcpy( &r->addr, host->h_addr, host->h_length );
-            r->status = TR_RESOLVE_OK;
+            r->status = TR_OK;
         }
         else
         {
-            r->status = TR_RESOLVE_ERROR;
+            r->status = TR_ERROR;
         }
         
         resolveQueue = r->next;
@@ -251,11 +251,11 @@ static int makeSocketNonBlocking( int s )
     return s;
 }
 
-static int createSocket()
+static int createSocket( int type )
 {
     int s;
 
-    s = socket( AF_INET, SOCK_STREAM, 0 );
+    s = socket( AF_INET, type, 0 );
     if( s < 0 )
     {
         tr_err( "Could not create socket (%s)", strerror( errno ) );
@@ -265,12 +265,12 @@ static int createSocket()
     return makeSocketNonBlocking( s );
 }
 
-int tr_netOpen( struct in_addr addr, in_port_t port )
+int tr_netOpen( struct in_addr addr, in_port_t port, int type )
 {
     int s;
     struct sockaddr_in sock;
 
-    s = createSocket();
+    s = createSocket( type );
     if( s < 0 )
     {
         return -1;
@@ -293,15 +293,46 @@ int tr_netOpen( struct in_addr addr, in_port_t port )
     return s;
 }
 
-int tr_netBind( int port )
+#ifdef IP_ADD_MEMBERSHIP
+int tr_netMcastOpen( int port, struct in_addr addr )
+{
+    int fd;
+    struct ip_mreq req;
+
+    fd = tr_netBindUDP( port );
+    if( 0 > fd )
+    {
+        return -1;
+    }
+
+    memset( &req, 0, sizeof( req ) );
+    req.imr_multiaddr.s_addr = addr.s_addr;
+    req.imr_interface.s_addr = htonl( INADDR_ANY );
+    if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &req, sizeof ( req ) ) )
+    {
+        tr_err( "Could not join multicast group (%s)", strerror( errno ) );
+        tr_netClose( fd );
+        return -1;
+    }
+
+    return fd;
+}
+#else /* IP_ADD_MEMBERSHIP */
+int tr_netMcastOpen( int port UNUSED, struct in_addr addr UNUSED )
+{
+    return -1;
+}
+#endif /* IP_ADD_MEMBERSHIP */
+
+int tr_netBind( int port, int type )
 {
     int s;
     struct sockaddr_in sock;
-#ifdef SO_REUSEADDR
+#if defined( SO_REUSEADDR ) || defined( SO_REUSEPORT )
     int optval;
 #endif
 
-    s = createSocket();
+    s = createSocket( type );
     if( s < 0 )
     {
         return -1;
@@ -310,6 +341,14 @@ int tr_netBind( int port )
 #ifdef SO_REUSEADDR
     optval = 1;
     setsockopt( s, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof( optval ) );
+#endif
+
+#ifdef SO_REUSEPORT
+    if( SOCK_DGRAM == type )
+    {
+        optval = 1;
+        setsockopt( s, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof( optval ) );
+    }
 #endif
 
     memset( &sock, 0, sizeof( sock ) );
@@ -324,9 +363,6 @@ int tr_netBind( int port )
         tr_netClose( s );
         return -1;
     }
-   
-    tr_inf( "Binded port %d", port );
-    listen( s, 5 );
 
     return s;
 }
@@ -371,11 +407,13 @@ int tr_netSend( int s, uint8_t * buf, int size )
     return ret;
 }
 
-int tr_netRecv( int s, uint8_t * buf, int size )
+int tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * addr )
 {
-    int ret;
+    socklen_t len;
+    int       ret;
 
-    ret = recv( s, buf, size, 0 );
+    len = ( NULL == addr ? 0 : sizeof( *addr ) );
+    ret = recvfrom( s, buf, size, 0, ( struct sockaddr * ) addr, &len );
     if( ret < 0 )
     {
         if( errno == EAGAIN || errno == EWOULDBLOCK )
