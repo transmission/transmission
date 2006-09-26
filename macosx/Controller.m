@@ -2176,7 +2176,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         {
             torrent = [fDisplayedTorrents objectAtIndex: i];
-            if ([torrent isPaused])
+            if ([torrent isPaused] && [torrent progress] < 1.0)
                 return YES;
         }
         return NO;
