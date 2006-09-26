@@ -679,6 +679,8 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
                 dev->host, dev->state );
         dev->state = UPNPDEV_STATE_ERROR;
         dev->looping = 0;
+        killHttp( fdlimit, &dev->http );
+        return 1;
     }
 
     laststate = dev->state;
