@@ -828,6 +828,12 @@ static void acceptLoop( void * _h )
                 for( tor = h->torrentList; tor; tor = tor->next )
                 {
                     tr_lockLock( &tor->lock );
+                    if( tor->status & TR_STATUS_INACTIVE )
+                    {
+                        tr_lockUnlock( &tor->lock );
+                        continue;
+                    }
+
                     if( 0 == memcmp( tor->info.hash, hash,
                                      SHA_DIGEST_LENGTH ) )
                     {
