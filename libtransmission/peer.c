@@ -431,9 +431,9 @@ writeBegin:
             tr_rcTransferred( tor->upload, ret );
             tr_rcTransferred( tor->globalUpload, ret );
 
-            tor->uploaded  += ret;
-            peer->outTotal += ret;
-            peer->outDate   = tr_date();
+            tor->uploadedCur += ret;
+            peer->outTotal   += ret;
+            peer->outDate     = tr_date();
 
             /* In case this block is done, you may have messages
                pending. Send them before we start the next block */

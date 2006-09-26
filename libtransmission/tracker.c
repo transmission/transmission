@@ -51,9 +51,6 @@ struct tr_tracker_s
 
     int            bindPort;
     int            newPort;
-
-    uint64_t       download;
-    uint64_t       upload;
 };
 
 static tr_http_t * getQuery   ( tr_tracker_t * tc );
@@ -77,9 +74,6 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 
     tc->bindPort = *(tor->bindPort);
     tc->newPort  = -1;
-
-    tc->download = tor->downloaded;
-    tc->upload   = tor->uploaded;
 
     return tc;
 }
@@ -243,9 +237,8 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
     uint64_t       down;
     uint64_t       up;
 
-    assert( tor->downloaded >= tc->download && tor->uploaded >= tc->upload );
-    down = tor->downloaded - tc->download;
-    up = tor->uploaded - tc->upload;
+    down = tor->downloadedCur;
+    up = tor->uploadedCur;
     if( tc->started )
     {
         event = "&event=started";
@@ -479,8 +472,6 @@ nodict:
     else if( 0 < tc->newPort )
     {
         tc->started  = 1;
-        tc->download = tor->downloaded;
-        tc->upload   = tor->uploaded;
     }
 
 cleanup:

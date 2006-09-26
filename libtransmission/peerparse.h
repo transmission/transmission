@@ -272,7 +272,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return 1;
     }
 
-    tor->downloaded += r->length;
+    tor->downloadedCur += r->length;
 
     block = tr_block( r->index, r->begin );
     if( tr_cpBlockIsComplete( tor->completion, block ) )

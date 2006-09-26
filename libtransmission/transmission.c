@@ -392,6 +392,11 @@ void tr_torrentStart( tr_torrent_t * tor )
         torrentReallyStop( tor );
     }
 
+    tor->downloadedPrev += tor->downloadedCur;
+    tor->downloadedCur   = 0;
+    tor->uploadedPrev   += tor->uploadedCur;
+    tor->uploadedCur     = 0;
+
     tor->status  = TR_STATUS_CHECK;
     tor->tracker = tr_trackerInit( tor );
 
@@ -540,8 +545,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             (float) inf->totalSize / s->rateDownload / 1024.0;
     }
 
-    s->downloaded = tor->downloaded;
-    s->uploaded   = tor->uploaded;
+    s->downloaded = tor->downloadedCur + tor->downloadedPrev;
+    s->uploaded   = tor->uploadedCur   + tor->uploadedPrev;
 
     tr_lockUnlock( &tor->lock );
 
