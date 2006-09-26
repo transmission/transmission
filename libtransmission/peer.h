@@ -39,6 +39,7 @@ uint8_t *   tr_peerId            ( tr_peer_t * );
 uint8_t *   tr_peerHash          ( tr_peer_t * );
 void        tr_peerPulse         ( tr_torrent_t * );
 int         tr_peerIsConnected   ( tr_peer_t * );
+int         tr_peerIsIncoming    ( tr_peer_t * );
 int         tr_peerIsUploading   ( tr_peer_t * );
 int         tr_peerIsDownloading ( tr_peer_t * );
 uint8_t *   tr_peerBitfield      ( tr_peer_t * );
