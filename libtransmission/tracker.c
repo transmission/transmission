@@ -277,7 +277,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
                           "compact=1&"
                           "numwant=50&"
                           "key=%s"
-                          "%s ",
+                          "%s",
                           inf->trackerAnnounce, tor->hashString, tc->id,
                           tc->bindPort, up, down, left, tor->key, event );
 }
