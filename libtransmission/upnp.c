@@ -582,7 +582,8 @@ deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
     ii->next = *first;
     *first = ii;
 
-    tr_inf( "new upnp device %s", ii->host );
+    tr_inf( "new upnp device %s, port %i, path %s",
+            ii->host, ii->port, ii->root );
 }
 
 static void
@@ -688,8 +689,16 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
     switch( laststate ) 
     {
         case UPNPDEV_STATE_ROOT:
-            if( TR_HTTP_STATUS_OK( code ) &&
-                !parseRoot( body, len, &dev->soap, &dev->scpd ) )
+            if( !TR_HTTP_STATUS_OK( code ) )
+            {
+                tr_dbg( "upnp device %s: fetch root failed with http code %i",
+                        dev->host, code );
+            }
+            else if( parseRoot( body, len, &dev->soap, &dev->scpd ) )
+            {
+                tr_dbg( "upnp device %s: parse root failed", dev->host );
+            }
+            else
             {
                 tr_dbg( "upnp device %s: parsed root, state root -> scpd",
                         dev->host );
@@ -698,9 +707,17 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
             break;
 
         case UPNPDEV_STATE_SCPD:
-            if( TR_HTTP_STATUS_OK( code ) &&
-                !parseScpd( body, len, &dev->getcmd,
-                            &dev->addcmd, &dev->delcmd ) )
+            if( !TR_HTTP_STATUS_OK( code ) )
+            {
+                tr_dbg( "upnp device %s: fetch scpd failed with http code %i",
+                        dev->host, code );
+            }
+            else if( parseScpd( body, len, &dev->getcmd,
+                                &dev->addcmd, &dev->delcmd ) )
+            {
+                tr_dbg( "upnp device %s: parse scpd failed", dev->host );
+            }
+            else
             {
                 tr_dbg( "upnp device %s: parsed scpd, state scpd -> ready",
                         dev->host );
@@ -723,6 +740,11 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
                 tr_dbg( "upnp device %s: add attempt, state add -> get",
                         dev->host );
                 dev->state = UPNPDEV_STATE_GET;
+            }
+            else
+            {
+                tr_dbg( "upnp device %s: add failed with http code %i",
+                        dev->host, code );
             }
             break;
 
@@ -760,6 +782,11 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
                         dev->host );
                 dev->state = UPNPDEV_STATE_ADD;
             }
+            else
+            {
+                tr_dbg( "upnp device %s: get failed with http code %i",
+                        dev->host, code );
+            }
             break;
 
         case UPNPDEV_STATE_DEL:
@@ -771,6 +798,11 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
                         dev->host );
                 dev->state = UPNPDEV_STATE_READY;
                 dev->looping = 0;
+            }
+            else
+            {
+                tr_dbg( "upnp device %s: del failed with http code %i",
+                        dev->host, code );
             }
             break;
 
@@ -887,8 +919,8 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
         dev->http = devicePulseGetHttp( dev, fdlimit );
         if( NULL == dev->http )
         {
-            tr_dbg( "upnp device %s: http init failed, state ? -> error",
-                    dev->host );
+            tr_dbg( "upnp device %s: http init failed, state %hhu -> error",
+                    dev->host, dev->state );
             dev->state = UPNPDEV_STATE_ERROR;
             dev->soapretry = 0;
             return -1;
@@ -918,8 +950,8 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
             killHttp( fdlimit, &dev->http );
             if( dev->soapretry )
             {
-                tr_dbg( "upnp device %s: http pulse failed, state ? -> error",
-                        dev->host );
+                tr_dbg( "upnp device %s: http pulse failed, state %hhu -> error",
+                        dev->host, dev->state );
                 dev->state = UPNPDEV_STATE_ERROR;
                 dev->soapretry = 0;
             }
