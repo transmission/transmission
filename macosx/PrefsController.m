@@ -264,7 +264,7 @@
     [fQueueNumberField setEnabled: useQueue];
     [fQueueNumberField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     
-    [fStartAtOpenCheck setState: [fDefaults boolForKey: @"StartAtOpen"]];
+    [fStartAtOpenCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
     
     //set private torrents
     BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
@@ -701,7 +701,7 @@
 
 - (void) setStartAtOpen: (id) sender
 {
-    [fDefaults setBool: [sender state] == NSOnState forKey: @"StartAtOpen"];
+    [fDefaults setBool: [sender state] == NSOnState forKey: @"AutoStartDownload"];
 }
 
 - (void) setUseQueue: (id) sender

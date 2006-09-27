@@ -8,6 +8,8 @@
 	<string>~/Desktop</string>
 	<key>AutoSize</key>
 	<false/>
+	<key>AutoStartDownload</key>
+	<true/>
 	<key>BadgeDownloadRate</key>
 	<true/>
 	<key>BadgeUploadRate</key>
@@ -92,8 +94,6 @@
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
 	<integer>10</integer>
-	<key>StartAtOpen</key>
-	<true/>
 	<key>StatusBar</key>
 	<true/>
 	<key>UpdateCheck</key>
