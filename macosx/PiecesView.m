@@ -25,34 +25,66 @@
         int i;
         for (i = 0; i < numPieces; i++)
             fPieces[i] = BLANK;
-        
-        fBack = [NSImage imageNamed: @"PiecesBack.tiff"];
-        NSSize size = [fBack size];
-        
-        fWhitePiece = [NSImage imageNamed: @"BoxWhite.tiff"];
-        [fWhitePiece setScalesWhenResized: YES];
-        [fWhitePiece setSize: size];
-        
-        fGreenPiece = [NSImage imageNamed: @"BoxGreen.tiff"];
-        [fGreenPiece setScalesWhenResized: YES];
-        [fGreenPiece setSize: size];
-        
-        fBlue1Piece = [NSImage imageNamed: @"BoxBlue1.tiff"];
-        [fBlue1Piece setScalesWhenResized: YES];
-        [fBlue1Piece setSize: size];
-        
-        fBlue2Piece = [NSImage imageNamed: @"BoxBlue2.tiff"];
-        [fBlue2Piece setScalesWhenResized: YES];
-        [fBlue2Piece setSize: size];
-        
-        fBlue3Piece = [NSImage imageNamed: @"BoxBlue3.tiff"];
-        [fBlue3Piece setScalesWhenResized: YES];
-        [fBlue3Piece setSize: size];
-        
-        [self setTorrent: nil];
     }
     
     return self;
+}
+
+- (void) awakeFromNib
+{
+        NSSize size = [fImageView frame].size;
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [fImageView bounds]];
+        
+        //back image
+        fBack = [[NSImage alloc] initWithSize: size];
+        
+        [fBack lockFocus];
+        [[NSColor blackColor] set];
+        [bp fill];
+        [fBack unlockFocus];
+        
+        //white box image
+        fWhitePiece = [[NSImage alloc] initWithSize: size];
+        
+        [fWhitePiece lockFocus];
+        [[NSColor whiteColor] set];
+        [bp fill];
+        [fWhitePiece unlockFocus];
+        
+        //green box image
+        fGreenPiece = [[NSImage alloc] initWithSize: size];
+        
+        [fGreenPiece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.557 green: 0.992 blue: 0.639 alpha: 1.0] set];
+        [bp fill];
+        [fGreenPiece unlockFocus];
+        
+        //blue 1 box image
+        fBlue1Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue1Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.777 green: 0.906 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue1Piece unlockFocus];
+        
+        //blue 2 box image
+        fBlue2Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue2Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.682 green: 0.839 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue2Piece unlockFocus];
+        
+        //blue 3 box image
+        fBlue3Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue3Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.506 green: 0.745 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue3Piece unlockFocus];
+        
+        //actually draw the box
+        [self setTorrent: nil];
 }
 
 - (void) dealloc
