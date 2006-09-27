@@ -48,6 +48,8 @@
         fBlue3Piece = [NSImage imageNamed: @"BoxBlue3.tiff"];
         [fBlue3Piece setScalesWhenResized: YES];
         [fBlue3Piece setSize: size];
+        
+        [self setTorrent: nil];
     }
     
     return self;
@@ -97,6 +99,8 @@
         
         [self updateView: YES];
     }
+    
+    [fImageView setHidden: torrent == nil];
 }
 
 - (void) updateView: (BOOL) first
