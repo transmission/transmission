@@ -35,6 +35,7 @@
 #define LOOP_DETECT_THRESHOLD   10 /* error on 10 add/get/del state changes */
 #define MAPPING_CHECK_INTERVAL  900000 /* 15 minutes */
 #define HTTP_REQUEST_INTERVAL   500 /* half a second */
+#define SOAP_METHOD_NOT_ALLOWED 405
 #define IGD_GENERIC_ERROR       500
 #define IGD_GENERIC_FAILED      501
 #define IGD_NO_MAPPING_EXISTS   714
@@ -835,6 +836,7 @@ devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit )
         return NULL;
     }
 
+    ret = NULL;
     switch( dev->state ) 
     {
         case UPNPDEV_STATE_ROOT:
@@ -936,7 +938,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
     {
         case TR_OK:
             code = tr_httpResponseCode( headers, hlen );
-            if( TR_HTTP_STATUS_FAIL( code ) && !dev->soapretry )
+            if( SOAP_METHOD_NOT_ALLOWED == code && !dev->soapretry )
             {
                 dev->soapretry = 1;
                 killHttp( fdlimit, &dev->http );
@@ -1228,7 +1230,7 @@ soapRequest( int retry, const char * host, int port, const char * path,
         }
         tr_httpAddBody( http, 
 "<s:Envelope"
-"    xmlns:s=\"" SOAP_ENVELOPE "'\""
+"    xmlns:s=\"" SOAP_ENVELOPE "\""
 "    s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
 "  <s:Body>"
 "    <u:%s xmlns:u=\"" UPNP_SERVICE_TYPE "\">", action->name );
