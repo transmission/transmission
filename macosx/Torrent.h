@@ -86,6 +86,8 @@
 - (void)    trashData;
 - (void)    trashTorrent;
 
+- (BOOL) remainingDiskSpaceForTorrent;
+
 - (NSImage *)   icon;
 - (NSImage *)   iconFlipped;
 - (NSImage *)   iconSmall;

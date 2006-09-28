@@ -317,13 +317,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) startTransfer
 {
-    if (![self isActive])
-    {
+    fWaitToStart = NO;
+    fFinishedSeeding = NO;
+    
+    if (![self isActive] && [self remainingDiskSpaceForTorrent])
         tr_torrentStart(fHandle);
-
-        fFinishedSeeding = NO;
-        fWaitToStart = NO;
-    }
 }
 
 - (void) stopTransfer
@@ -414,6 +412,33 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if (fPublicTorrent)
         [self trashFile: [self publicTorrentLocation]];
+}
+
+- (BOOL) remainingDiskSpaceForTorrent
+{
+    if ([self progress] >= 1.0)
+        return YES;
+    
+    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self dataLocation]];
+    float remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] floatValue],
+            torrentRemaining = (float)[self size] * (1.0 - [self progress]);
+    
+    NSLog(@"Remaining disk space: %f", remainingSpace);
+    NSLog(@"Torrent remaining size: %f", torrentRemaining);
+    
+    if (remainingSpace - torrentRemaining <= 10240.0)
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: [NSString stringWithFormat: @"Not enough remaining disk space to download \"%@\" completely.",
+                                    [self name]]];
+        [alert setInformativeText: @"The transfer has been paused. Clear up space on your disk to continue."];
+        
+        [alert runModal];
+        
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (NSImage *) icon
