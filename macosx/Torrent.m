@@ -423,8 +423,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
             torrentRemaining = [self size] * (uint64_t)(1.0 - [self progress]);
     
-    NSLog(@"Remaining disk space: %qu", remainingSpace);
-    NSLog(@"Torrent remaining size: %qu", torrentRemaining);
+    NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
+    NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);
     
     if (remainingSpace <= torrentRemaining)
     {
