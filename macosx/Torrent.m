@@ -419,22 +419,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([self progress] >= 1.0)
         return YES;
     
-    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self dataLocation]];
+    NSString * location = [self dataLocation],
+                * volume = [[[NSFileManager defaultManager] componentsToDisplayForPath: location] objectAtIndex: 0];
+    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: location];
     uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
             torrentRemaining = [self size] * (uint64_t)(1.0 - [self progress]);
     
-    NSLog(@"Volume: %@", [[[NSFileManager defaultManager] componentsToDisplayForPath: [self dataLocation]] objectAtIndex: 0]);
+    NSLog(@"Volume: %@", volume);
     NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
     NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);
     
-    if (remainingSpace <= torrentRemaining)
+    if (volume && remainingSpace <= torrentRemaining)
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat: @"Not enough remaining disk space to download \"%@\" completely.",
                                     [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        @"The transfer has been paused. Clear up space on %@ to continue.",
-                        [[[NSFileManager defaultManager] componentsToDisplayForPath: [self dataLocation]] objectAtIndex: 0]]];
+                        @"The transfer has been paused. Clear up space on %@ to continue.", volume]];
         [alert runModal];
         
         return NO;
