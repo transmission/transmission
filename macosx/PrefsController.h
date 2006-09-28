@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 #import <Sparkle/Sparkle.h>
+#import "PortChecker.h"
 
 @interface PrefsController : NSWindowController
 {
@@ -50,9 +51,10 @@
     IBOutlet NSButton       * fUploadCheck, * fDownloadCheck,
                             * fSpeedLimitAutoCheck;
 
-    IBOutlet NSTextField    * fPortField, * fNatStatusField;
+    IBOutlet NSTextField    * fPortField, * fNatStatusField, * fPortStatusField;
     IBOutlet NSButton       * fNatCheck;
-    IBOutlet NSImageView    * fNatStatusImage;
+    IBOutlet NSImageView    * fNatStatusImage, * fPortStatusImage;
+    IBOutlet NSProgressIndicator * fPortStatusProgress;
     NSTimer                 * fNatStatusTimer;
     int                     fNatStatus;
     
@@ -87,6 +89,8 @@
 - (void) folderSheetShow:       (id) sender;
 
 - (void) setPort:   (id) sender;
+- (void) updatePortStatus;
+- (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
 - (void) setNat:    (id) sender;
 - (void) updateNatStatus;
 

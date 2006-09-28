@@ -53,6 +53,9 @@
                 fPlayDownloadSoundCheck = NSButton; 
                 fPlaySeedingSoundCheck = NSButton; 
                 fPortField = NSTextField; 
+                fPortStatusField = NSTextField; 
+                fPortStatusImage = NSImageView; 
+                fPortStatusProgress = NSProgressIndicator; 
                 fQueueCheck = NSButton; 
                 fQueueNumberField = NSTextField; 
                 fQuitCheck = NSButton; 

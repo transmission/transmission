@@ -137,6 +137,8 @@
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
+		A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */; };
+		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
 		A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306580AAD24A80049E2AC /* UKKQueue.m */; };
@@ -361,6 +363,9 @@
 		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A291DAAD0AC8BEB6003385E9 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
+		A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = YellowDot.tiff; path = macosx/Images/YellowDot.tiff; sourceTree = "<group>"; };
+		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
+		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
 		A2A306530AAD24A80049E2AC /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFileWatcher.h; path = macosx/UKKQueue/UKFileWatcher.h; sourceTree = "<group>"; };
 		A2A306540AAD24A80049E2AC /* UKFileWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKFileWatcher.m; path = macosx/UKKQueue/UKFileWatcher.m; sourceTree = "<group>"; };
 		A2A306550AAD24A80049E2AC /* UKFNSubscribeFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFNSubscribeFileWatcher.h; path = macosx/UKKQueue/UKFNSubscribeFileWatcher.h; sourceTree = "<group>"; };
@@ -424,6 +429,8 @@
 				A2A306580AAD24A80049E2AC /* UKKQueue.m */,
 				A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */,
 				A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */,
+				A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */,
+				A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */,
 				A291DAAC0AC8BEB6003385E9 /* PiecesView.h */,
 				A291DAAD0AC8BEB6003385E9 /* PiecesView.m */,
 				A256588A0A9A695400E8A03B /* MessageWindowController.h */,
@@ -500,6 +507,7 @@
 				A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */,
 				35B037A60AC59BC600A10FDF /* Check.png */,
 				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
+				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
 				A2D4F0820A915F6600890C32 /* RedDot.tiff */,
 				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
@@ -842,6 +850,7 @@
 				35B037B60AC59C4000A10FDF /* Check.png in Resources */,
 				35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */,
 				35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */,
+				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -906,6 +915,7 @@
 				A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */,
 				A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */,
 				A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */,
+				A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

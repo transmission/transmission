@@ -213,7 +213,6 @@
                 
                 point = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                     [[fImageView image] size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
-                
                 [pieceImage compositeToPoint: point fromRect: rect operation: NSCompositeSourceOver];
             }
         }

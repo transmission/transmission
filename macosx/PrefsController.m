@@ -123,6 +123,7 @@
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
     tr_setBindPort(fHandle, bindPort);
+    [self updatePortStatus];
     
     //set NAT
     BOOL natShouldEnable = [fDefaults boolForKey: @"NatTraversal"];
@@ -359,7 +360,52 @@
         [fDefaults setInteger: bindPort forKey: @"BindPort"];
         
         [self updateNatStatus];
+        [self updatePortStatus];
     }
+}
+
+- (void) updatePortStatus
+{
+    long sytemVersion;
+    [fPortStatusField setStringValue: @""];
+    [fPortStatusImage setImage: nil];
+    
+    Gestalt('sysv', & sytemVersion);
+    if (sytemVersion >= 0x1040)
+    {
+        //NSXML features are unfortunately only available since Mac OS X v10.4
+        PortChecker * checker = [[PortChecker alloc] initWithDelegate: self];
+
+        [fPortStatusField setStringValue: [@"Checking port status" stringByAppendingEllipsis]];
+        [fPortStatusProgress startAnimation: self];
+        
+        [checker probePort: [fDefaults integerForKey: @"BindPort"]];
+    }
+}
+
+- (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
+{
+    [fPortStatusProgress stopAnimation: self];
+    switch ([portChecker status])
+    {
+        case PORT_STATUS_OPEN:
+            [fPortStatusField setStringValue: @"Port is open"];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
+            break;
+        case PORT_STATUS_STEALTH:
+            [fPortStatusField setStringValue: @"Port is stealth"];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+            break;
+        case PORT_STATUS_CLOSED:
+            [fPortStatusField setStringValue: @"Port is closed"];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+            break;
+        case PORT_STATUS_ERROR:
+            [fPortStatusField setStringValue: @"Unable to check port status"];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.tiff"]];
+            break;
+    }
+    [portChecker release];
 }
 
 - (void) setNat: (id) sender
