@@ -8,12 +8,13 @@ SRCS = TRApplication.cpp TRWindow.cpp TRTransfer.cpp \
 OBJS = $(SRCS:%.cpp=%.o)
 
 CXXFLAGS += -I../libtransmission
-LDFLAGS  += ../libtransmission/libtransmission.a
+LDLIBS   += ../libtransmission/libtransmission.a
 CXXFLAGS += -IlibPrefs
-LDFLAGS  += -lbe -ltracker libPrefs/libPrefs.a
+LDFLAGS  += -lbe -ltracker
+LDLIBS   += libPrefs/libPrefs.a
 
 Transmission: $(OBJS) Transmission.rsrc
-	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	$(CXX) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 	xres -o Transmission Transmission.rsrc
 	mimeset -f Transmission
 

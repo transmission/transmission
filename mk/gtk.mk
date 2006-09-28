@@ -8,7 +8,8 @@ SRCS = conf.c dialogs.c io.c ipc.c main.c msgwin.c tr_backend.c tr_torrent.c \
 OBJS = $(SRCS:%.c=%.o)
 
 CFLAGS  += $(CFLAGS_GTK) -I../libtransmission
-LDFLAGS += $(LDFLAGS_GTK) ../libtransmission/libtransmission.a
+LDFLAGS += $(LDFLAGS_GTK)
+LDLIBS  += ../libtransmission/libtransmission.a
 
 all: transmission-gtk .po
 	@true

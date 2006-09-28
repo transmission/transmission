@@ -7,7 +7,7 @@ SRCS = transmissioncli.c
 OBJS = $(SRCS:%.c=%.o)
 
 CFLAGS  += -I../libtransmission
-LDFLAGS += ../libtransmission/libtransmission.a
+LDLIBS  += ../libtransmission/libtransmission.a
 
 transmissioncli: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)

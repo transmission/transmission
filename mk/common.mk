@@ -52,7 +52,7 @@ endef
 
 define LINK_RULE
 	@echo "Link $@"
-	@CMD="$(CC) -o $@ $(OBJS) $(LDFLAGS)"; $$CMD || \
+	@CMD="$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
 endef
 
