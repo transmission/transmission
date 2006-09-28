@@ -426,7 +426,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSLog(@"Remaining disk space: %qu", remainingSpace);
     NSLog(@"Torrent remaining size: %qu", torrentRemaining);
     
-    if (remainingSpace - torrentRemaining <= 10240.0)
+    if (remainingSpace <= torrentRemaining)
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat: @"Not enough remaining disk space to download \"%@\" completely.",
