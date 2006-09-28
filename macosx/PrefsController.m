@@ -895,7 +895,7 @@
 {
     [self setPrefView: fNetworkView];
     
-    //get around bug in apple code
+    //make sure progress indicator hides itself
     if ([fPortStatusImage image])
         [fPortStatusProgress setDisplayedWhenStopped: NO];
 }

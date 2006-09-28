@@ -27,10 +27,12 @@
 
 @implementation PortChecker
 
-- (id) initWithDelegate: (id) delegate {
-    self = [super init];
-    if (self != nil)
+- (id) initWithDelegate: (id) delegate
+{
+    if ((self = [super init]))
+    {
         fDelegate = delegate;
+    }
     
     return self;
 }
@@ -42,15 +44,12 @@
 
 - (void) probePort: (int) portNumber
 {
-    NSURLRequest * portProbeRequest;
+    NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
+                                [NSString stringWithFormat: @"https://www.grc.com/x/portprobe=%d", portNumber]]
+                                cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval: 15.0];
     
-    portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString: [NSString stringWithFormat: @"https://www.grc.com/x/portprobe=%d", portNumber]]
-                                        cachePolicy: NSURLRequestReloadIgnoringCacheData
-                                    timeoutInterval: 15.0];
-    
-    NSURLConnection *portProbeConnection = [NSURLConnection connectionWithRequest: portProbeRequest delegate: self];
-    
-    if (portProbeConnection)
+    NSURLConnection * portProbeConnection;
+    if ((portProbeConnection = [NSURLConnection connectionWithRequest: portProbeRequest delegate: self]))
         fPortProbeData = [[NSMutableData data] retain];
     else
     {
@@ -59,7 +58,8 @@
     }
 }
 
-- (void) callBackWithStatus: (port_status_t) status {
+- (void) callBackWithStatus: (port_status_t) status
+{
     fStatus = status;
     
     if (fDelegate && [fDelegate respondsToSelector: @selector(portCheckerDidFinishProbing:)])
@@ -68,36 +68,31 @@
 
 #pragma mark NSURLConnection delegate methods
 
-- (void)connection: (NSURLConnection *) connection didReceiveResponse: (NSURLResponse *) response
+- (void) connection: (NSURLConnection *) connection didReceiveResponse: (NSURLResponse *) response
 {
     [fPortProbeData setLength: 0];
 }
 
-- (void)connection: (NSURLConnection *) connection didReceiveData: (NSData *) data
+- (void) connection: (NSURLConnection *) connection didReceiveData: (NSData *) data
 {
     [fPortProbeData appendData: data];
 }
 
-- (void)connection: (NSURLConnection *) connection didFailWithError: (NSError *) error
+- (void) connection: (NSURLConnection *) connection didFailWithError: (NSError *) error
 {
     NSLog(@"Unable to get port status: connection failed (%@)", [error localizedDescription]);
     [self callBackWithStatus: PORT_STATUS_ERROR];
     [fPortProbeData release];
 }
 
-- (void)connectionDidFinishLoading: (NSURLConnection *) connection
+- (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
-    NSXMLDocument *shieldsUpProbe;
-    shieldsUpProbe = [[NSXMLDocument alloc] initWithData: fPortProbeData options: NSXMLDocumentTidyHTML error: nil];
+    NSXMLDocument * shieldsUpProbe = [[NSXMLDocument alloc] initWithData: fPortProbeData
+                                        options: NSXMLDocumentTidyHTML error: nil];
     
-    if (shieldsUpProbe == nil)
+    if (shieldsUpProbe)
     {
-        NSLog(@"Unable to get port status: failed to create xml document");
-        [self callBackWithStatus: PORT_STATUS_ERROR];
-    }
-    else
-    {
-        NSArray *nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
+        NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
         if ([nodes count] != 1)
         {
             NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
@@ -105,7 +100,7 @@
         }
         else
         {
-            NSString *portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
+            NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
                                                 [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
             
             if ([portStatus isEqualToString: @"open"])
@@ -119,6 +114,11 @@
                 [self callBackWithStatus: PORT_STATUS_ERROR];
             }
         }
+    }
+    else
+    {
+        NSLog(@"Unable to get port status: failed to create xml document");
+        [self callBackWithStatus: PORT_STATUS_ERROR];
     }
 
     [fPortProbeData release];
