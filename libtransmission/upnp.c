@@ -1228,10 +1228,10 @@ soapRequest( int retry, const char * host, int port, const char * path,
         }
         tr_httpAddBody( http, 
 "<s:Envelope"
-"    xmlns:s='" SOAP_ENVELOPE "'"
-"    s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'>"
+"    xmlns:s=\"" SOAP_ENVELOPE "'\""
+"    s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
 "  <s:Body>"
-"    <u:%s xmlns:u='" UPNP_SERVICE_TYPE "'>", action->name );
+"    <u:%s xmlns:u=\"" UPNP_SERVICE_TYPE "\">", action->name );
 
         va_start( ap, action );
         do
@@ -1269,7 +1269,8 @@ static void
 actionSetup( tr_upnp_action_t * action, const char * name, int prealloc )
 {
     action->name = strdup( name );
-    action->action = joinstrs( UPNP_SERVICE_TYPE, "#", name );
+    action->action = NULL;
+    asprintf( &action->action, "\"%s#%s\"", UPNP_SERVICE_TYPE, name );
     assert( NULL == action->args );
     action->args = malloc( sizeof( *action->args ) * prealloc );
     memset( action->args, 0, sizeof( *action->args ) * prealloc );
