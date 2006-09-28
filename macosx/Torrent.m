@@ -420,8 +420,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return YES;
     
     NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self dataLocation]];
-    float remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] floatValue],
-            torrentRemaining = (float)[self size] * (1.0 - [self progress]);
+    uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
+            torrentRemaining = [self size] * (uint64_t)(1.0 - [self progress]);
+    
+    NSLog(@"Remaining disk space: %qu", remainingSpace);
+    NSLog(@"Torrent remaining size: %qu", torrentRemaining);
     
     if (remainingSpace - torrentRemaining <= 10240.0)
     {
@@ -435,7 +438,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         return NO;
     }
-    
     return YES;
 }
 
