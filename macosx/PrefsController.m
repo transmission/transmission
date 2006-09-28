@@ -123,6 +123,7 @@
     int bindPort = [fDefaults integerForKey: @"BindPort"];
     [fPortField setIntValue: bindPort];
     tr_setBindPort(fHandle, bindPort);
+    
     [self updatePortStatus];
     
     //set NAT
@@ -893,6 +894,10 @@
 - (void) showNetworkPref: (id) sender
 {
     [self setPrefView: fNetworkView];
+    
+    //get around bug in apple code
+    if ([fPortStatusImage image])
+        [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 
 - (void) setPrefView: (NSView *) view

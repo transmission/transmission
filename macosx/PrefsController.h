@@ -51,12 +51,12 @@
     IBOutlet NSButton       * fUploadCheck, * fDownloadCheck,
                             * fSpeedLimitAutoCheck;
 
-    IBOutlet NSTextField    * fPortField, * fNatStatusField, * fPortStatusField;
-    IBOutlet NSButton       * fNatCheck;
-    IBOutlet NSImageView    * fNatStatusImage, * fPortStatusImage;
-    IBOutlet NSProgressIndicator * fPortStatusProgress;
-    NSTimer                 * fNatStatusTimer;
-    int                     fNatStatus;
+    IBOutlet NSTextField            * fPortField, * fNatStatusField, * fPortStatusField;
+    IBOutlet NSButton               * fNatCheck;
+    IBOutlet NSImageView            * fNatStatusImage, * fPortStatusImage;
+    IBOutlet NSProgressIndicator    * fPortStatusProgress;
+    NSTimer                         * fNatStatusTimer;
+    int                             fNatStatus;
     
     IBOutlet NSButton       * fRatioCheck;
     IBOutlet NSTextField    * fRatioField;
