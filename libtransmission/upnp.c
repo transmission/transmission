@@ -1222,13 +1222,15 @@ soapRequest( int retry, const char * host, int port, const char * path,
     http = tr_httpClient( method, host, port, "%s", path );
     if( NULL != http )
     {
-        tr_httpAddHeader( http, "Content-type", "text/xml" );
+        tr_httpAddHeader( http, "Content-type",
+                          "text/xml; encoding=\"utf-8\"" );
         tr_httpAddHeader( http, "SOAPAction", action->action );
         if( retry )
         {
             tr_httpAddHeader( http, "Man", "\"" SOAP_ENVELOPE "\"" );
         }
         tr_httpAddBody( http, 
+"<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
 "<s:Envelope"
 "    xmlns:s=\"" SOAP_ENVELOPE "\""
 "    s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
