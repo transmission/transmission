@@ -427,6 +427,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSLog(@"Volume: %@", volume);
     NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
+    NSLog(@"Progress: %f", [self progress]);
     NSLog(@"Torrent total size: %qu (%@)", [self size], [NSString stringForFileSize: [self size]]);
     NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);
     
