@@ -89,7 +89,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         NSString * paused;
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
+        {
+            fStat = tr_torrentStat(fHandle);
             [self startTransfer];
+        }
     }
     return self;
 }
