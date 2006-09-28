@@ -103,10 +103,7 @@
         [fTorrent release];
         
         if (!torrent)
-        {
             fTorrent = nil;
-            [fImageView setImage: [[fBack copy] autorelease]];
-        }
     }
     
     if (torrent)
