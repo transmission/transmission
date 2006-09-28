@@ -1014,9 +1014,7 @@ parseRoot(const char *buf, int len, char ** soap, char ** scpd )
                 kk = tr_xmlFindTag( kk, end, "service" );
                 buf = tr_xmlTagContents( kk, end );
                 if( !tr_xmlFindTagVerifyContents( buf, end, "serviceType",
-                                                  UPNP_SERVICE_TYPE, 1 ) &&
-                    !tr_xmlFindTagVerifyContents( buf, end, "serviceId",
-                        "urn:upnp-org:serviceId:WANIPConn1", 1 ) )
+                                                  UPNP_SERVICE_TYPE, 1 ) )
                 {
                     *soap = tr_xmlDupTagContents( buf, end, "controlURL");
                     *scpd = tr_xmlDupTagContents( buf, end, "SCPDURL");
