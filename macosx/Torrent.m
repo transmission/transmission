@@ -89,7 +89,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         NSString * paused;
         if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
-            tr_torrentStart(fHandle);
+            [self startTransfer];
     }
     return self;
 }
@@ -423,16 +423,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     float remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] floatValue],
             torrentRemaining = (float)[self size] * (1.0 - [self progress]);
     
-    NSLog(@"Remaining disk space: %f", remainingSpace);
-    NSLog(@"Torrent remaining size: %f", torrentRemaining);
-    
     if (remainingSpace - torrentRemaining <= 10240.0)
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat: @"Not enough remaining disk space to download \"%@\" completely.",
                                     [self name]]];
-        [alert setInformativeText: @"The transfer has been paused. Clear up space on your disk to continue."];
-        
+        [alert setInformativeText: [NSString stringWithFormat:
+                        @"The transfer has been paused. Clear up space on %@ to continue.",
+                        [[[NSFileManager defaultManager] componentsToDisplayForPath: [self dataLocation]] objectAtIndex: 0]]];
         [alert runModal];
         
         return NO;
