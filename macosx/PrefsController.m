@@ -427,12 +427,12 @@
     
     if (status == 2)
     {
-        [fNatStatusField setStringValue: @"Ports successfully mapped"];
+        [fNatStatusField setStringValue: @"Port successfully mapped"];
         [fNatStatusImage setImage: [NSImage imageNamed: @"Check.png"]];
     }
     else if (status == 3 || status == 4)
     {
-        [fNatStatusField setStringValue: @"Error mapping ports"];
+        [fNatStatusField setStringValue: @"Error mapping port"];
         [fNatStatusImage setImage: [NSImage imageNamed: @"Error.tiff"]];
     }
     else
