@@ -1248,12 +1248,12 @@ soapRequest( int retry, const char * host, int port, const char * path,
                 if( NULL != value )
                 {
                     tr_httpAddBody( http,
-"      <u:%s>%s</u:%s>", name, value, name );
+"      <%s>%s</%s>", name, value, name );
                 }
                 else 
                 {
                     tr_httpAddBody( http,
-"      <u:%s></u:%s>", name, name );
+"      <%s></%s>", name, name );
                 }
             }
         }
