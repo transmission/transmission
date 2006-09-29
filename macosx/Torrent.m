@@ -452,10 +452,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert setMessageText: [NSString stringWithFormat: @"Not enough remaining disk space to download \"%@\" completely.",
                                     [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        @"The transfer has been paused. Clear up space on %@ to continue.", volume]];
-        [alert runModal];
+                        @"The transfer will be paused. Clear up space on %@ to continue.", volume]];
+        [alert addButtonWithTitle: @"OK"];
+        [alert addButtonWithTitle: @"Download Anyway"];
         
-        return NO;
+        return [alert runModal] != NSAlertFirstButtonReturn;
     }
     return YES;
 }
