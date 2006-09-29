@@ -261,9 +261,21 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
     }
     
-    if( fStat->error & TR_ETRACKER )
-        [fStatusString setString: [@"Error: " stringByAppendingString:
-                        [NSString stringWithUTF8String: fStat->trackerError]]];
+    if (fStat->error & TR_ETRACKER)
+    {
+        [fStatusString setString: [@"Error: " stringByAppendingString: [NSString stringWithUTF8String: fStat->trackerError]]];
+        if (!fError && [self isActive])
+        {
+            fError = YES;
+            if (![self isSeeding])
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+        }
+    }
+    else
+    {
+        if (fError)
+            fError = NO;
+    }
 
     if ([self isActive])
     {
@@ -329,6 +341,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) stopTransfer
 {
+    fError = NO;
+    
     if ([self isActive])
     {
         BOOL wasSeeding = [self isSeeding];
@@ -430,8 +444,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSLog(@"Volume: %@", volume);
     NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
-    NSLog(@"Progress: %f", [self progress]);
-    NSLog(@"Torrent total size: %qu (%@)", [self size], [NSString stringForFileSize: [self size]]);
     NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);
     
     if (volume && remainingSpace <= torrentRemaining)
@@ -790,6 +802,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
+    fError = NO;
     
     NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
     fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];

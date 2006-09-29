@@ -49,7 +49,7 @@
     
     int     fStopRatioSetting;
     float   fRatioLimit;
-    BOOL    fFinishedSeeding, fWaitToStart;
+    BOOL    fFinishedSeeding, fWaitToStart, fError;
     
     int fOrderValue;
 }
