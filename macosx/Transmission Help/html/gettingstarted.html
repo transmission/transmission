@@ -1,0 +1,53 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Getting Started</title>
+	</head>
+	<body>
+		<div id="mainbox">
+		<A NAME="GettingStarted"></A>
+		<a href="../index.html">Home</a>
+			<div id="pagetitle">
+				<h1>What does Transmission do? </h1>
+			</div>
+				<p>Transmission is a BitTorrent client. It is used for peer to peer filesharing over the internet. BitTorrent is a fast way of transferring files, because everyone who downloads must also upload to others, thus creating much more bandwidth than a single server offering the file may have been able to provide. 
+				<p>
+			<div id="pagetitle">
+				<h1>How do I use it? </h1>
+			</div>
+				<p>You'll need to download a torrent file (extension .torrent). These are commonly found at <a href="http://www.google.com/search?hl=en&q=bittorrent+tracker&btnG=Google+Search">'tracker' websites</a>. Torrent files contain information about the actual file you want to download (eg a movie). Once you have the torrent file, open it in Transmission.
+				You can also set Transmission to open torrent files automatically via Preferences >> Transfers >> General.
+				<p>It is good etiquette to 'seed' the file for a while (ie leave it uploading) once your download is complete. You can set a default ratio to automatically seed to, and then pause. This can be adjusted in Preferences >> Transfers >> Management, or in real time using the Action menu.
+				<p>
+			<div id="pagetitle">
+				<h1>How do I maximize my download speed? </h1>
+			</div>
+				<ol>
+				<li>Make sure Transmission's <a href="portforward.html">port is forwarded</a>. If your router supports UPnP or you have Apple Airport, Transmission can do this automatically; just tick the checkbox in Preferences >> Network.
+				Port forwarding makes it easier for others to connect to you, which therefore increases your speed.</li>
+				
+				<li>Make sure you cap your upload speed, so that it isn't flooded. A good rule of thumb is about about 60-70% of your maximum upload bandwidth. This can be adjusted in Preferences >> Bandwidth, or in real time using the Action menu.
+				<p>eg. If your upload connection is 256 Kilobits/sec, then you should cap it at 21 KB/sec ((<b>256</b> / 8) * 0.66 = <b>21</b>).</li>
+				</ol>
+				
+			<div id="pagetitle">
+				<h1>Can I schedule my transfers? </h1>
+			</div>
+				<p>Yes, by using 'Speed Limit Mode'. Simply go to Preferences >> Bandwidth, and then set both the speed you would like Transmission to be limited to, as well as the period of time you would like the limits applied.
+				<p>When Speed Limit Mode is enabled, the turtle will be illuminated in blue.
+				
+			<div id="pagetitle">
+				<h1>Can I queue my transfers? </h1>
+			</div>
+				<p>Yes, via Preferences >> Transfers >> Management.
+				<p>The queue system is very simple: You start and pause torrents as usual, but if you're over the queue limit starting a torrent will instead make it "waiting to start".
+				You can force a torrent to start without going in the queue by holding down option and clicking resume or using the Transfers menu item "start without waiting".
+			
+		</p>
+		<a href="../index.html">Home</a>
+		</div>
+	</body>
+	
+</html>

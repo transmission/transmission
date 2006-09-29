@@ -10,31 +10,22 @@
 		<A NAME="TransFAQ"></A>
 		<a href="../index.html">Home</a>
 			<div id="pagetitle">
-				<h1>What does Transmission do? </h1>
-			</div>
-				<p>Transmission is a BitTorrent client. It is used for peer to peer filesharing over the internet. BitTorrent is a fast way of transferring files, because everyone who downloads must also upload to others, thus creating much more bandwidth than a single server offering the file may have been able to provide. 
-				<p>
-			<div id="pagetitle">
-				<h1>How do I use it? </h1>
-			</div>
-				<p>You'll need to download a torrent file (extension .torrent).These are commonly found at <a href="http://www.google.com/search?hl=en&q=bittorrent+tracker&btnG=Google+Search">'tracker' websites</a>. Torrent files contain information about the actual file you want to download (eg a movie). Once you have the torrent file, open it in Transmission.
-				<p>It is good etiquette to 'seed' the file for a while (ie leave it uploading) once your download is complete. You can set a default ratio to automatically seed to, and then pause. This can be adjusted in Preferences >> Transfers, or in real time using the Action menu.
-				<p>
-			<div id="pagetitle">
 				<h1>Why is my download so slow? </h1>
 			</div>
-				<p>Make sure Transmission's <a href="portforward.html">port is forwarded</a>. If this is not done, others cannot connect to you, and thus your speed will be hampered. 
+				<p>Make sure Transmission's <a href="portforward.html">port is forwarded</a>. You can check this in Preferences >> Network. Also make sure your upload is capped at an appropriate level.
+				<p>Some Internet Service Providers (ISPs) block traffic on well known peer to peer ports. If this applies to your ISP, try changing the port Transmission uses. 
+				Some ISPs also throttle all peer to peer (esp BitTorrent) traffic, which can slow or even stop your transfers. Protocol encryption is not a feature at the moment, however is slated for a future release.
 				
-				<p>You also need to ensure you cap your upload speed to about 60-70% of its maximum, so that it isn't flooded. This can be adjusted in Preferences >> Bandwidth, or in real time using the Action menu.
-				<br>eg. If your upload connection is 256 Kilobits/sec, then you should cap it at 21 KB/sec ((<b>256</b> / 8) * 0.66 = <b>21</b>).
-				
-				<p>Ultimately, the speed you get depends on the quality of the peers you are downloading from. If they have dial up connections, you are only going to be able to download at dial up speeds. Furthermore, if there are few seeds and many peers, more people will be fighting for the same scarce pieces and thus will slow things down. Best results are achieved when the torrent has more seeds than peers. Finally, you can only download what others are willing to send to you, and if they don't have it, they can't send it. 
+				<p>Ultimately, the speed you get depends on the quality of the peers you are downloading from. If they have dial up connections, you are only going to be able to download at dial up speeds. 
+				Furthermore, if there are few seeds and many peers, more people will be fighting for the same scarce pieces which will slow things down. 
+				Best results are achieved when the torrent has more seeds than peers. 
 				<p>
 			<div id="pagetitle">
 				<h1>Why isn't my torrent downloading at all? </h1>
 			</div>
 				<p>Normally this is because the tracker is down, and thus Transmission is unable to interact with other peers. DHT (trackerless torrents) is not a feature at the moment, however is slated for a future release. 
-				Torrents take a while to get going and so may not download much (if at all) initially. Most torrents are downloading at some rate after 15 or so minutes. 
+				<p>If there are no seeders in the swarm, and all the other peers have sent you what they have, you (and everyone else) will not be able to complete the download, and your speed will drop to zero.
+				<p>Torrents take a while to get going and so may not download much (if at all) initially. Most torrents are downloading at some rate after 15 or so minutes. 
 				<p>
 			<div id="pagetitle">
 				<h1>Why can I only connect to around 60 peers? </h1>
@@ -48,7 +39,7 @@
 				<a href="http://growl.info">http://growl.info</a> 
 				<p>
 			<div id="pagetitle">
-				<h1>What do the colours mean in the advanced progress bar? </h1>
+				<h1>What do the colours mean in the advanced progress bar/pieces box? </h1>
 			</div>
 				<p>Black: we have this piece <br>
 				<font color="red">Red</font>: no connected peers have this piece <br>
@@ -59,7 +50,7 @@
 				<p><font color="green">Green</font>: we are seeding the file <br>
 				<p>
 			<div id="pagetitle">
-				<h1>What are seeds/peers? </h1>
+				<h1>What are seeds/peers/leechers? </h1>
 			</div>
 				<p>Peers are people you are connected to. If they have the whole file and are only uploading, they are referred to as a 'seeder'. If they only have part of the torrent, and are downloading and uploading, they are referred to as a 'leecher'. 
 				<p>

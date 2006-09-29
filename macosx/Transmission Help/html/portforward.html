@@ -3,7 +3,7 @@
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
-		<title>Port Forwarding</title>
+		<title>Port Forwarding FAQ</title>
 	</head>
 	<body>
 		<div id="mainbox">
@@ -21,11 +21,17 @@
 			<div id="pagetitle">
 				<h1>How do I Port Forward?</h1>
 			</div>
-			<p>The process is fairly straightforward.
-			<p>If your modem is directly connected to your computer, and you have the OS X firewall running (which is highly recommended in this case), you'll need to open a port in the firewall.<br>
-			For instructions <a href="pffirewall.html">click here</a>.
-			<p>If your modem is connected to your computer via a router (wired/wireless) you'll need to open a port in the router.<br>
-			For instructions <a href="pfrouter.html">click here</a>.
+			<p>If you have an Apple Airport, or a UPnP compatible router, Transmission can map your ports automatically. Most routers manufactured since 2001 have this feature. Go to Preferences >> Network, and check the box.
+			If the port mapping is unsuccessful, <a href="upnp.html">click here</a>.
+			
+			<p>Forwarding Transmission's port manually is fairly straightforward:
+			
+			<ul>
+				<li>If your modem is directly connected to your computer, and you have the OS X firewall running (which is highly recommended in this case), you'll need to open a port in the firewall.<br>
+				For instructions <a href="pffirewall.html">click here</a>. </li>
+				<li>If your modem is connected to your computer via a router (wired/wireless) you'll need to open a port in the router.<br>
+				For instructions <a href="pfrouter.html">click here</a>. </li>
+			</ul>
 			<p>
 			<div id="pagetitle">
 				<h1>How do I know if i've done it right?</h1>
@@ -33,23 +39,23 @@
 			
 			<div summary="To do this" id="taskbox">
 				<ol>
-					<li>Open Transmission.</li>
-					<li>Go to this website, <a href="https://www.grc.com/x/portprobe=50001">https://www.grc.com/x/portprobe=50001</a> </li>
-
-					Replace the '50001' bit of the URL with what ever port you have forwarded. 
+					<li>Open Transmission. </li>
+					<li>Go to Preferences >> Network. </li>
+					<li>Check the notification. </li>
 				</ol>
 			</div>
 			<p>
 			<ul>
-				<li>If you get 'Stealth' or 'Closed' then you haven't forwarded correctly. </li>
-				<li>If you get 'Open' then you have successfully port forwarded!</li>
+				<li>If you get 'Stealth' or 'Closed' then you haven't forwarded correctly.
+				 If Transmission has successfully mapped the port automatically, make sure the OS X firewall is either disabled, or you have <a href="pffirewall.html">allowed Transmission's port</a>. </li>
+				<li>If you get 'Open' then you have successfully port forwarded! </li>
 			</ul>
 			<p>
 			<div id="pagetitle">
 				<h1>What is a static IP?</h1>
 			</div>
 			<p>Where your computer is assigned an IP address which does not change. This can be helpful if you have a laptop or have multiple computers on your network. While it makes things a bit simpler, you don't have to have a static IP for BitTorrent or Port Forwarding to work.
-			<p>A dynamic IP address assigned by your wireless router for example will most likely not change unless you reboot your computer, or leave and rejoin the network. Thus, having a static IP isn't really necessary and most people should be alright with a dynamic one.
+			<p>A dynamic IP address assigned by your wireless router for example will most likely not change unless you reboot your computer, or leave and rejoin the network. Thus, having a static IP isn't really necessary, especially if your router supports UPnP.
 			<p>
 			<div id="pagetitle">
 				<h1>How do I get a static IP address?</h1>
