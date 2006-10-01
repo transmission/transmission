@@ -107,6 +107,13 @@
 {
     free(fPieces);
     
+    [fBack release];
+    [fWhitePiece release];
+    [fGreenPiece release];
+    [fBlue1Piece release];
+    [fBlue2Piece release];
+    [fBlue3Piece release];
+    
     if (fTorrent)
         [fTorrent release];
     [super dealloc];
