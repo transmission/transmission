@@ -655,7 +655,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeTorrentsNoWait: (NSArray *) torrents
 {
-    [torrents makeObjectsPerformSelector: @selector(startTransfer)];
+    NSEnumerator * enumerator = [torrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent startTransfer];
     
     [self updateUI: nil];
     [self applyFilter: nil];
