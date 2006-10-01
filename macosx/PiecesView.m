@@ -135,9 +135,10 @@
         
         //determine relevant values
         fNumPieces = MAX_ACROSS * MAX_ACROSS;
-        if ([fTorrent pieceCount] < fNumPieces)
+        int pieceCount = [fTorrent pieceCount];
+        if (pieceCount < fNumPieces)
         {
-            fNumPieces = [fTorrent pieceCount];
+            fNumPieces = pieceCount;
             
             fAcross = sqrt(fNumPieces);
             if (fAcross * fAcross < fNumPieces)
@@ -160,10 +161,7 @@
     if (!fTorrent)
         return;
     
-    if (first)
-        [fImageView setImage: [[fBack copy] autorelease]];
-    
-    NSImage * image = [fImageView image];
+    NSImage * image = first ? [fBack copy] : [fImageView image];
     
     int8_t * pieces = malloc(fNumPieces);
     [fTorrent getAvailability: pieces size: fNumPieces];
@@ -179,7 +177,10 @@
         {
             index++;
             if (index >= fNumPieces)
+            {
+                i = fAcross;
                 break;
+            }
             
             pieceImage = nil;
             
@@ -243,7 +244,14 @@
     if (change)
     {
         [image unlockFocus];
-        [fImageView setNeedsDisplay];
+    
+        if (first)
+        {
+            [fImageView setImage: image];
+            [image release];
+        }
+        else
+            [fImageView setNeedsDisplay];
     }
     
     free(pieces);
