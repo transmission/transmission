@@ -27,13 +27,13 @@
 #import "Controller.h"
 #import "Torrent.h"
 
-#define BUTTON_TO_TOP_REGULAR 33.5
+#define BUTTON_TO_TOP_REGULAR 33.0
 #define BUTTON_TO_TOP_SMALL 20.0
 
+//button layout (from end of bar) is: padding, button, padding, button, padding
+//change BUTTONS_TOTAL_WIDTH in .h when changing these values, add 2.0 to that value
 #define BUTTON_WIDTH 14.0
-#define DISTANCE_FROM_CENTER 2.5
-//change BUTTONS_TOTAL_WIDTH when changing this
-#define AREA_CENTER 21.0
+#define PADDING 3.0
 
 @interface TorrentTableView (Private)
 
@@ -232,6 +232,7 @@
     NSRect rect;
     Torrent * torrent;
     NSImage * image;
+    NSRect buttonRect = NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH);
 
     [super drawRect: r];
 
@@ -256,17 +257,13 @@
             image = nil;
 
         if (image)
-        {
-            [image setFlipped: YES];
-            [image drawAtPoint: rect.origin fromRect: NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH)
-                operation: NSCompositeSourceOver fraction: 1.0];
-        }
+            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) fromRect: buttonRect
+                    operation: NSCompositeSourceOver];
 
         rect = [self revealRectForRow: i];
         image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
-        [image setFlipped: YES];
-        [image drawAtPoint: rect.origin fromRect: NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH)
-            operation: NSCompositeSourceOver fraction: 1.0];
+        [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) fromRect: buttonRect
+                    operation: NSCompositeSourceOver];
     }
 }
 
@@ -280,7 +277,7 @@
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     
-    return NSMakeRect(NSMaxX(cellRect) - AREA_CENTER - DISTANCE_FROM_CENTER - BUTTON_WIDTH,
+    return NSMakeRect(NSMaxX(cellRect) - PADDING - BUTTON_WIDTH - PADDING - BUTTON_WIDTH,
                         cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
@@ -290,7 +287,7 @@
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     
-    return NSMakeRect(NSMaxX(cellRect) - AREA_CENTER + DISTANCE_FROM_CENTER,
+    return NSMakeRect(NSMaxX(cellRect) - PADDING - BUTTON_WIDTH,
                         cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 

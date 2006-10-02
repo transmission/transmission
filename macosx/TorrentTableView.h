@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
-#define BUTTONS_TOTAL_WIDTH 42.0
+#define BUTTONS_TOTAL_WIDTH 39.0
 
 @class Controller;
 

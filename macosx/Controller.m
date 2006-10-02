@@ -655,6 +655,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeTorrentsNoWait: (NSArray *) torrents
 {
+    //iterate through instead of all at once to ensure no conflicts
     NSEnumerator * enumerator = [torrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
