@@ -358,9 +358,6 @@
     [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
     
     [fPeerTable reloadData];
-    #warning use [fpeers count]
-    //[fPeerTableStatusField setStringValue: [NSString stringWithFormat: @"%d of %d connected",
-    //                                        [torrent totalPeers], [fPeers count]]];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem

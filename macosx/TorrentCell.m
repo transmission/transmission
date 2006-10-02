@@ -33,7 +33,7 @@
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point;
 - (void) buildSimpleBar: (float) width point: (NSPoint) point;
-//- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point;
+- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point;
 
 @end
 
@@ -158,9 +158,9 @@
     point.x += 1.0;
     
     //place actual advanced bar
-    NSImage * img = [info objectForKey: @"AdvancedBar"];
-    [img setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
-    [img compositeToPoint: point operation: NSCompositeSourceOver];
+    NSImage * image = [info objectForKey: @"AdvancedBar"];
+    [image setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
+    [image compositeToPoint: point operation: NSCompositeSourceOver];
     
     [self placeBar: fProgressAdvanced width: widthFloat point: point];
     
