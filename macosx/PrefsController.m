@@ -428,7 +428,7 @@
     if (status == 2)
     {
         [fNatStatusField setStringValue: @"Port successfully mapped"];
-        [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
+        [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
     }
     else if (status == 3 || status == 4)
     {
