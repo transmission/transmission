@@ -12,7 +12,9 @@
 				<h1>Portforwarding a Router</h1>
 			</div>
 			<p>In this case, it is probably OK to disable the OS X firewall, as you are already being protected by the router. To disable the firewall, open System Prefs >> Sharing >> Firewall. Click Stop.
-
+			
+			<p>To forward a port in your router manually:
+			
 			<div summary="To do this" id="taskbox">
 				<ol>
 					<li>Find out what your IP address is. You can find your computer's IP address by going to System Prefs >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. It's probably something like 192.168.1.100, or 10.0.1.2.</li>
@@ -33,6 +35,32 @@
 			<p>For more comprehensive instructions specific to your router, click <a href="http://www.portforward.com/english/routers/port_forwarding/routerindex.htm">here</a> and choose your router from the list.
 			<p>
 			</div>
+			
+			<p>If you find yourself having to change your router settings all the time, a static IP address might be beneficial.
+			
+			<div id="pagetitle">
+				<h1>What is a static IP?</h1>
+			</div>
+			<p>Where your computer is assigned an IP address which does not change. This can be helpful if you have a laptop or have multiple computers on your network. While it makes things a bit simpler, you don't have to have a static IP for BitTorrent or Port Forwarding to work.
+			<p>A dynamic IP address assigned by your wireless router for example will most likely not change unless you reboot your computer, or leave and rejoin the network. Thus, having a static IP isn't really necessary, especially if your router supports UPnP.
+			<p>
+			<div id="pagetitle">
+				<h1>How do I get a static IP address?</h1>
+			</div>
+			<div summary="To do this" id="taskbox">
+				<ol>
+					<li>Go to System Prefs >> Network, double-click on your connection (for instance, Built-in Ethernet), and click the TCP/IP tab. 
+					<li>Write down the IP, Subnet Mask and Router addresses. 
+					<li>Go to your router 'status' page via your web browser (Airport Admin Utility if you are using an Airport BS), and write down the DNS Server addresses. Alternatively, you can enter your router's internal IP (e.g. 192.168.0.1). This is sometimes quicker, as it refers to the router instead of the server. 
+					<li>Then, return to the TCP/IP page in System Prefs. 
+					<li>Choose "Manually" from the Configure IPv4 drop down menu. 
+					<li>Enter the IP address you wish to have, eg 192.168.0.100, or 10.0.1.100. It should be of a similar format to the IP address you found in step 2, with only the last number changing. 
+					<br>NB: You cannot have a static IP address that's within the DHCP range. Thus it is recommended that you make the last digit of your address large enough to discount this possibility, like we have done in our examples. 
+					<li>Fill in the other boxes using the addresses you wrote down in steps 2 and 3. 
+					<li>Click 'Apply Now'.
+				</ol>
+			</div>
+			
 			<a href="../index.html">Home</a>
 		</div>
 	</body>
