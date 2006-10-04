@@ -27,8 +27,6 @@
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
 
-#define BLANK -99
-
 @implementation PiecesView
 
 - (id) init
@@ -38,9 +36,6 @@
         fTorrent = nil;
         int numPieces = MAX_ACROSS * MAX_ACROSS;
         fPieces = malloc(numPieces);
-        int i;
-        for (i = 0; i < numPieces; i++)
-            fPieces[i] = BLANK;
     }
     
     return self;
@@ -161,7 +156,13 @@
     if (!fTorrent)
         return;
     
-    NSImage * image = first ? [fBack copy] : [fImageView image];
+    if (first)
+    {
+        NSImage * back = [fBack copy];
+        [fImageView setImage: back];
+        [back release];
+    }
+    NSImage * image = [fImageView image];
     
     int8_t * pieces = malloc(fNumPieces);
     [fTorrent getAvailability: pieces size: fNumPieces];
@@ -244,14 +245,7 @@
     if (change)
     {
         [image unlockFocus];
-    
-        if (first)
-        {
-            [fImageView setImage: image];
-            [image release];
-        }
-        else
-            [fImageView setNeedsDisplay];
+        [fImageView setNeedsDisplay];
     }
     
     free(pieces);
