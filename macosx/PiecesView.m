@@ -142,8 +142,9 @@
         else
             fAcross = MAX_ACROSS;
         
-        fWidth = ([fImageView bounds].size.width - (fAcross + 1) * BETWEEN) / fAcross;
-        fExtraBorder = ([fImageView bounds].size.width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
+        float width = [fImageView bounds].size.width;
+        fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
+        fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
         
         [self updateView: YES];
     }
