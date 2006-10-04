@@ -43,7 +43,7 @@
 
 - (void) awakeFromNib
 {
-        NSSize size = [fImageView frame].size;
+        NSSize size = [fImageView bounds].size;
         NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [fImageView bounds]];
         
         //back image
@@ -142,8 +142,8 @@
         else
             fAcross = MAX_ACROSS;
         
-        fWidth = ([[fImageView image] size].width - (fAcross + 1) * BETWEEN) / fAcross;
-        fExtraBorder = ([[fImageView image] size].width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
+        fWidth = ([fImageView bounds].size.width - (fAcross + 1) * BETWEEN) / fAcross;
+        fExtraBorder = ([fImageView bounds].size.width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
         
         [self updateView: YES];
     }
@@ -157,11 +157,7 @@
         return;
     
     if (first)
-    {
-        NSImage * back = [fBack copy];
-        [fImageView setImage: back];
-        [back release];
-    }
+        [fImageView setImage: [[fBack copy] autorelease]];
     NSImage * image = [fImageView image];
     
     int8_t * pieces = malloc(fNumPieces);
@@ -237,7 +233,7 @@
                 }
                 
                 point = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                                    [[fImageView image] size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
+                                    [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
                 [pieceImage compositeToPoint: point fromRect: rect operation: NSCompositeSourceOver];
             }
         }
