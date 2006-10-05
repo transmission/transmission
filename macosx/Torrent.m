@@ -851,32 +851,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     int8_t * pieces = malloc(MAX_PIECES);
     [self getAvailability: pieces size: MAX_PIECES];
-    int avail = 0;
-    for (w = 0; w < MAX_PIECES; w++)
-        if (pieces[w] != 0)
-            avail++;
-
-    //first two lines: dark blue to show progression, green to show available
-    int end = [self progress] * MAX_PIECES;
-    p = (uint32_t *) bitmapData;
-
-    for (w = 0; w < end; w++)
-    {
-        p[w] = kBlue4;
-        p[w + bytesPerRow / 4] = kBlue4;
-    }
-    for (; w < avail; w++)
-    {
-        p[w] = kGreen;
-        p[w + bytesPerRow / 4] = kGreen;
-    }
-    for (; w < MAX_PIECES; w++)
-    {
-        p[w] = kWhite;
-        p[w + bytesPerRow / 4] = kWhite;
-    }
     
     //lines 2 to 14: blue or grey depending on whether we have the piece or not
+    int have = 0, avail = 0;
     uint32_t color;
     BOOL change;
     for (w = 0; w < MAX_PIECES; w++)
@@ -890,6 +867,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 fPieces[w] = -1;
                 change = YES;
             }
+            have++;
         }
         else if (pieces[w] == 0)
         {
@@ -900,32 +878,36 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 change = YES;
             }
         }
-        else if (pieces[w] == 1)
-        {
-            if (fPieces[w] != 1)
-            {
-                color = kBlue1;
-                fPieces[w] = 1;
-                change = YES;
-            }
-        }
-        else if (pieces[w] == 2)
-        {
-            if (fPieces[w] != 2)
-            {
-                color = kBlue2;
-                fPieces[w] = 2;
-                change = YES;
-            }
-        }
         else
         {
-            if (fPieces[w] != 3)
+            if (pieces[w] == 1)
             {
-                color = kBlue3;
-                fPieces[w] = 3;
-                change = YES;
+                if (fPieces[w] != 1)
+                {
+                    color = kBlue1;
+                    fPieces[w] = 1;
+                    change = YES;
+                }
             }
+            else if (pieces[w] == 2)
+            {
+                if (fPieces[w] != 2)
+                {
+                    color = kBlue2;
+                    fPieces[w] = 2;
+                    change = YES;
+                }
+            }
+            else
+            {
+                if (fPieces[w] != 3)
+                {
+                    color = kBlue3;
+                    fPieces[w] = 3;
+                    change = YES;
+                }
+            }
+            avail++;
         }
         
         if (change)
@@ -939,7 +921,25 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             }
         }
     }
-
+    
+    //first two lines: dark blue to show progression, green to show available
+    p = (uint32_t *) bitmapData;
+    for (w = 0; w < have; w++)
+    {
+        p[w] = kBlue4;
+        p[w + bytesPerRow / 4] = kBlue4;
+    }
+    for (; w < avail + have; w++)
+    {
+        p[w] = kGreen;
+        p[w + bytesPerRow / 4] = kGreen;
+    }
+    for (; w < MAX_PIECES; w++)
+    {
+        p[w] = kWhite;
+        p[w + bytesPerRow / 4] = kWhite;
+    }
+    
     free(pieces);
     
     //actually draw image
