@@ -211,7 +211,7 @@ int main( int argc, char ** argv )
         }
         memset( &string[chars], ' ', 79 - chars );
         string[79] = '\0';
-        //fprintf( stderr, "\r%s", string );
+        fprintf( stderr, "\r%s", string );
 
         if( s->error & TR_ETRACKER )
         {
