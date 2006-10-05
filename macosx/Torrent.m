@@ -27,6 +27,9 @@
 
 #define BAR_HEIGHT 12.0
 
+#define MAX_PIECES 324
+#define BLANK_PIECE -99
+
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
@@ -138,6 +141,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fStatusString release];
         [fShortStatusString release];
         [fRemainingTimeString release];
+        
+        
+        [fBitmap release];
+        free(fPieces);
     }
     [super dealloc];
 }
@@ -820,6 +827,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
     fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
     fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
+    
+    //set up advanced bar
+    fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+        pixelsWide: MAX_PIECES pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
+    
+    fPieces = malloc(MAX_PIECES);
+    int i;
+    for (i = 0; i < MAX_PIECES; i++)
+        fPieces[i] = BLANK_PIECE;
 
     [self update];
     return self;
@@ -827,26 +844,20 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSImage *) advancedBar
 {
-    int width = 225; //amount of pixels/"pieces"
-    
-    NSBitmapImageRep * bitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-        pixelsWide: width pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
-        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
-
     int h, w;
     uint32_t * p;
-    uint8_t * bitmapData = [bitmap bitmapData];
-    int bytesPerRow = [bitmap bytesPerRow];
+    uint8_t * bitmapData = [fBitmap bitmapData];
+    int bytesPerRow = [fBitmap bytesPerRow];
 
-    int8_t * pieces = malloc(width);
-    [self getAvailability: pieces size: width];
+    int8_t * pieces = malloc(MAX_PIECES);
+    [self getAvailability: pieces size: MAX_PIECES];
     int avail = 0;
-    for (w = 0; w < width; w++)
+    for (w = 0; w < MAX_PIECES; w++)
         if (pieces[w] != 0)
             avail++;
 
     //first two lines: dark blue to show progression, green to show available
-    int end = lrintf(floor([self progress] * width));
+    int end = [self progress] * MAX_PIECES;
     p = (uint32_t *) bitmapData;
 
     for (w = 0; w < end; w++)
@@ -859,7 +870,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         p[w] = kGreen;
         p[w + bytesPerRow / 4] = kGreen;
     }
-    for (; w < width; w++)
+    for (; w < MAX_PIECES; w++)
     {
         p[w] = kWhite;
         p[w + bytesPerRow / 4] = kWhite;
@@ -867,35 +878,73 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //lines 2 to 14: blue or grey depending on whether we have the piece or not
     uint32_t color;
-    for( w = 0; w < width; w++ )
+    BOOL change;
+    for (w = 0; w < MAX_PIECES; w++)
     {
+        change = NO;
         if (pieces[w] < 0)
-            color = kGreen;
-        else if (pieces[w] == 0)
-            color = kGray;
-        else if (pieces[w] == 1)
-            color = kBlue1;
-        else if (pieces[w] == 2)
-            color = kBlue2;
-        else
-            color = kBlue3;
-        
-        //point to pixel (w, 2) and draw "vertically"
-        p = (uint32_t *) ( bitmapData + 2 * bytesPerRow ) + w;
-        for( h = 2; h < BAR_HEIGHT; h++ )
         {
-            p[0] = color;
-            p = (uint32_t *) ( (uint8_t *) p + bytesPerRow );
+            if (fPieces[w] != -1)
+            {
+                color = kGreen;
+                fPieces[w] = -1;
+                change = YES;
+            }
+        }
+        else if (pieces[w] == 0)
+        {
+            if (fPieces[w] != 0)
+            {
+                color = kGray;
+                fPieces[w] = 0;
+                change = YES;
+            }
+        }
+        else if (pieces[w] == 1)
+        {
+            if (fPieces[w] != 1)
+            {
+                color = kBlue1;
+                fPieces[w] = 1;
+                change = YES;
+            }
+        }
+        else if (pieces[w] == 2)
+        {
+            if (fPieces[w] != 2)
+            {
+                color = kBlue2;
+                fPieces[w] = 2;
+                change = YES;
+            }
+        }
+        else
+        {
+            if (fPieces[w] != 3)
+            {
+                color = kBlue3;
+                fPieces[w] = 3;
+                change = YES;
+            }
+        }
+        
+        if (change)
+        {
+            //point to pixel (w, 2) and draw "vertically"
+            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + w;
+            for (h = 2; h < BAR_HEIGHT; h++)
+            {
+                p[0] = color;
+                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
+            }
         }
     }
 
     free(pieces);
     
     //actually draw image
-    NSImage * bar = [[NSImage alloc] initWithSize: [bitmap size]];
-    [bar addRepresentation: bitmap];
-    [bitmap release];
-    
+    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
+    [bar addRepresentation: fBitmap];
     [bar setScalesWhenResized: YES];
     
     return [bar autorelease];

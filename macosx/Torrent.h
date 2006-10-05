@@ -52,6 +52,9 @@
     BOOL    fFinishedSeeding, fWaitToStart, fError;
     
     int fOrderValue;
+    
+    NSBitmapImageRep * fBitmap;
+    int8_t * fPieces;
 }
 
 - (id)  initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
