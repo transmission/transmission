@@ -70,11 +70,19 @@
         [bp fill];
         [fGreenPiece unlockFocus];
         
+        //green box image
+        fRedPiece = [[NSImage alloc] initWithSize: size];
+        
+        [fRedPiece lockFocus];
+        [[NSColor redColor] set];
+        [bp fill];
+        [fRedPiece unlockFocus];
+        
         //blue 1 box image
         fBlue1Piece = [[NSImage alloc] initWithSize: size];
         
         [fBlue1Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.777 green: 0.906 blue: 1.0 alpha: 1.0] set];
+        [[NSColor colorWithCalibratedRed: 0.682 green: 0.839 blue: 1.0 alpha: 1.0] set];
         [bp fill];
         [fBlue1Piece unlockFocus];
         
@@ -82,7 +90,7 @@
         fBlue2Piece = [[NSImage alloc] initWithSize: size];
         
         [fBlue2Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.682 green: 0.839 blue: 1.0 alpha: 1.0] set];
+        [[NSColor colorWithCalibratedRed: 0.506 green: 0.745 blue: 1.0 alpha: 1.0] set];
         [bp fill];
         [fBlue2Piece unlockFocus];
         
@@ -90,7 +98,7 @@
         fBlue3Piece = [[NSImage alloc] initWithSize: size];
         
         [fBlue3Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.506 green: 0.745 blue: 1.0 alpha: 1.0] set];
+        [[NSColor colorWithCalibratedRed: 0.35 green: 0.65 blue: 1.0 alpha: 1.0] set];
         [bp fill];
         [fBlue3Piece unlockFocus];
         
@@ -104,6 +112,7 @@
     
     [fBack release];
     [fWhitePiece release];
+    [fRedPiece release];
     [fGreenPiece release];
     [fBlue1Piece release];
     [fBlue2Piece release];
@@ -181,15 +190,20 @@
             }
             
             pieceImage = nil;
-            
             piece = pieces[index];
             if (piece < 0)
             {
-                if (first || fPieces[index] != -1)
+                if (first || fPieces[index] == -2)
                 {
                     fPieces[index] = -1;
                     pieceImage = fGreenPiece;
                 }
+                else if (fPieces[index] != -1)
+                {
+                    fPieces[index] = -2;
+                    pieceImage = fRedPiece;
+                }
+                else;
             }
             else if (piece == 0)
             {

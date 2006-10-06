@@ -392,7 +392,7 @@
     {
         height = TAB_ACTIVITY_HEIGHT;
         
-        [fPiecesView updateView: NO];
+        [fPiecesView updateView: YES];
     }
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
     {

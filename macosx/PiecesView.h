@@ -29,7 +29,7 @@
 {
     int8_t  * fPieces;
     
-    NSImage * fBack, * fWhitePiece, * fGreenPiece,
+    NSImage * fBack, * fWhitePiece, * fGreenPiece, * fRedPiece,
             * fBlue1Piece, * fBlue2Piece, * fBlue3Piece;
     
     Torrent * fTorrent;
