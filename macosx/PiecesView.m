@@ -62,15 +62,15 @@
         [bp fill];
         [fWhitePiece unlockFocus];
         
-        //green box image
-        fGreenPiece = [[NSImage alloc] initWithSize: size];
+        //blue box image
+        fBluePiece = [[NSImage alloc] initWithSize: size];
         
-        [fGreenPiece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.557 green: 0.992 blue: 0.639 alpha: 1.0] set];
+        [fBluePiece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.35 green: 0.65 blue: 1.0 alpha: 1.0] set];
         [bp fill];
-        [fGreenPiece unlockFocus];
+        [fBluePiece unlockFocus];
         
-        //green box image
+        //red box image
         fRedPiece = [[NSImage alloc] initWithSize: size];
         
         [fRedPiece lockFocus];
@@ -78,29 +78,29 @@
         [bp fill];
         [fRedPiece unlockFocus];
         
-        //blue 1 box image
-        fBlue1Piece = [[NSImage alloc] initWithSize: size];
+        //green 1 box image
+        fGreen1Piece = [[NSImage alloc] initWithSize: size];
         
-        [fBlue1Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.682 green: 0.839 blue: 1.0 alpha: 1.0] set];
+        [fGreen1Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 0.8 alpha: 1.0] set];
         [bp fill];
-        [fBlue1Piece unlockFocus];
+        [fGreen1Piece unlockFocus];
         
-        //blue 2 box image
-        fBlue2Piece = [[NSImage alloc] initWithSize: size];
+        //green 2 box image
+        fGreen2Piece = [[NSImage alloc] initWithSize: size];
         
-        [fBlue2Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.506 green: 0.745 blue: 1.0 alpha: 1.0] set];
+        [fGreen2Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.4 green: 1.0 blue: 0.6 alpha: 1.0] set];
         [bp fill];
-        [fBlue2Piece unlockFocus];
+        [fGreen2Piece unlockFocus];
         
-        //blue 3 box image
-        fBlue3Piece = [[NSImage alloc] initWithSize: size];
+        //green 3 box image
+        fGreen3Piece = [[NSImage alloc] initWithSize: size];
         
-        [fBlue3Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.35 green: 0.65 blue: 1.0 alpha: 1.0] set];
+        [fGreen3Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] set];
         [bp fill];
-        [fBlue3Piece unlockFocus];
+        [fGreen3Piece unlockFocus];
         
         //actually draw the box
         [self setTorrent: nil];
@@ -113,10 +113,10 @@
     [fBack release];
     [fWhitePiece release];
     [fRedPiece release];
-    [fGreenPiece release];
-    [fBlue1Piece release];
-    [fBlue2Piece release];
-    [fBlue3Piece release];
+    [fBluePiece release];
+    [fGreen1Piece release];
+    [fGreen2Piece release];
+    [fGreen3Piece release];
     
     if (fTorrent)
         [fTorrent release];
@@ -196,7 +196,7 @@
                 if (first || fPieces[index] == -2)
                 {
                     fPieces[index] = -1;
-                    pieceImage = fGreenPiece;
+                    pieceImage = fBluePiece;
                 }
                 else if (fPieces[index] != -1)
                 {
@@ -218,7 +218,7 @@
                 if (first || fPieces[index] != 1)
                 {
                     fPieces[index] = 1;
-                    pieceImage = fBlue1Piece;
+                    pieceImage = fGreen1Piece;
                 }
             }
             else if (piece == 2)
@@ -226,7 +226,7 @@
                 if (first || fPieces[index] != 2)
                 {
                     fPieces[index] = 2;
-                    pieceImage = fBlue2Piece;
+                    pieceImage = fGreen2Piece;
                 }
             }
             else
@@ -234,7 +234,7 @@
                 if (first || fPieces[index] != 3)
                 {
                     fPieces[index] = 3;
-                    pieceImage = fBlue3Piece;
+                    pieceImage = fGreen3Piece;
                 }
             }
             

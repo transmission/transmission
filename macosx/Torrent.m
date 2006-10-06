@@ -50,12 +50,12 @@
 #define BE OSSwapBigToHostConstInt32
 
 static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
-                kBlue1 = BE(0xA0DCFFFF), //160, 220, 255
-                kBlue2 = BE(0x78BEFFFF), //120, 190, 255
-                kBlue3 = BE(0x50A0FFFF), //80, 160, 255
-                kBlue4 = BE(0x1E46B4FF), //30, 70, 180
+                kBlue = BE(0x50A0FFFF), //80, 160, 255
+                kBlue2 = BE(0x1E46B4FF), //30, 70, 180
                 kGray  = BE(0x969696FF), //150, 150, 150
-                kGreen = BE(0x00FF00FF), //0, 255, 0
+                kGreen1 = BE(0x99FFCCFF), //153, 255, 204
+                kGreen2 = BE(0x66FF99FF), //102, 255, 153
+                kGreen3 = BE(0x00FF66FF), //0, 255, 102
                 kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
@@ -853,7 +853,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int8_t * pieces = malloc(MAX_PIECES);
     [self getAvailability: pieces size: MAX_PIECES];
     
-    //lines 2 to 14: blue or grey depending on whether we have the piece or not
+    //lines 2 to 14: blue, green, or gray depending on whether we have the piece or not
     int have = 0, avail = 0;
     uint32_t color;
     BOOL change;
@@ -864,7 +864,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             if (fPieces[w] != -1)
             {
-                color = kGreen;
+                color = kBlue;
                 fPieces[w] = -1;
                 change = YES;
             }
@@ -885,7 +885,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             {
                 if (fPieces[w] != 1)
                 {
-                    color = kBlue1;
+                    color = kGreen1;
                     fPieces[w] = 1;
                     change = YES;
                 }
@@ -894,7 +894,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             {
                 if (fPieces[w] != 2)
                 {
-                    color = kBlue2;
+                    color = kGreen2;
                     fPieces[w] = 2;
                     change = YES;
                 }
@@ -903,7 +903,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             {
                 if (fPieces[w] != 3)
                 {
-                    color = kBlue3;
+                    color = kGreen3;
                     fPieces[w] = 3;
                     change = YES;
                 }
@@ -927,13 +927,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     p = (uint32_t *) bitmapData;
     for (w = 0; w < have; w++)
     {
-        p[w] = kBlue4;
-        p[w + bytesPerRow / 4] = kBlue4;
+        p[w] = kBlue2;
+        p[w + bytesPerRow / 4] = kBlue2;
     }
     for (; w < avail + have; w++)
     {
-        p[w] = kGreen;
-        p[w + bytesPerRow / 4] = kGreen;
+        p[w] = kGreen3;
+        p[w + bytesPerRow / 4] = kGreen3;
     }
     for (; w < MAX_PIECES; w++)
     {
