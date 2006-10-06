@@ -625,6 +625,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         peer = peers[i];
         [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithBool: peer.isConnected], @"Connected",
+            [NSNumber numberWithBool: peer.isIncoming], @"Incoming",
             [NSString stringWithCString: (char *) peer.addr encoding: NSUTF8StringEncoding], @"IP",
             [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",

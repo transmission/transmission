@@ -510,6 +510,9 @@
         else
             return [file objectForKey: @"Name"];
     }
+    else if (tableView == fPeerTable)
+        return [NSString stringWithFormat: @"From %@ connection",
+                [[[fPeers objectAtIndex: row] objectForKey: @"Incoming"] boolValue] ? @"incoming" : @"outgoing"];
     else
         return nil;
 }
