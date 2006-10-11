@@ -463,7 +463,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert addButtonWithTitle: @"OK"];
         [alert addButtonWithTitle: @"Download Anyway"];
         
-        return [alert runModal] != NSAlertFirstButtonReturn;
+        if ([alert runModal] == NSAlertFirstButtonReturn)
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+            return NO;
+        }
+        else
+            return YES;
     }
     return YES;
 }
