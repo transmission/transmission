@@ -440,6 +440,8 @@
         [fNatStatusField setStringValue: @""];
         [fNatStatusImage setImage: nil];
     }
+    
+    [self updatePortStatus];
 }
 
 - (void) setLimit: (id) sender
