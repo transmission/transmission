@@ -273,6 +273,8 @@ void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
  **********************************************************************/
 void tr_torrentAvailability( tr_torrent_t *, int8_t * tab, int size );
 
+void tr_torrentAmountFinished( tr_torrent_t * tor, int8_t * tab, int size );
+
 /***********************************************************************
  * tr_torrentRemoveSaved
  ***********************************************************************

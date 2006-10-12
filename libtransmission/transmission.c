@@ -633,6 +633,19 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
     tr_lockUnlock( &tor->lock );
 }
 
+void tr_torrentAmountFinished( tr_torrent_t * tor, int8_t * tab, int size )
+{
+    int i, piece;
+
+    tr_lockLock( &tor->lock );
+    for( i = 0; i < size; i++ )
+    {
+        piece = i * tor->info.pieceCount / size;
+        tab[i] = tr_cpPercentBlocksInPiece( tor->completion, piece );
+    }
+    tr_lockUnlock( &tor->lock );
+}
+
 void tr_torrentRemoveSaved( tr_torrent_t * tor ) {
     tr_metainfoRemoveSaved( tor->info.hashString );
 }

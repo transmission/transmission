@@ -64,7 +64,9 @@
                     
 - (void)       setDownloadFolder: (NSString *) path;
 - (NSString *) downloadFolder;
-- (void)       getAvailability: (int8_t *) tab size: (int) size;
+
+- (void) getAvailability: (int8_t *) tab size: (int) size;
+- (void) getAmountFinished: (int8_t *) tab size: (int) size;
 
 - (void)            update;
 - (NSDictionary *)  infoForCurrentView;

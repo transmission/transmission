@@ -257,6 +257,12 @@
     {
         [image unlockFocus];
         [fImageView setNeedsDisplay];
+        
+        /*int8_t * piecesC = malloc(fNumPieces);
+        [fTorrent getAmountFinished: piecesC size: fNumPieces];
+        for (i = 0; i < fNumPieces; i++)
+            NSLog(@"%d", piecesC[i]);
+        free(piecesC);*/
     }
     
     free(pieces);

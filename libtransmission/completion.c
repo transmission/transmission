@@ -200,6 +200,28 @@ void tr_cpBlockBitfieldSet( tr_completion_t * cp, uint8_t * bitfield )
     }
 }
 
+uint8_t tr_cpPercentBlocksInPiece( tr_completion_t * cp, int piece )
+{
+    tr_torrent_t * tor = cp->tor;
+    int i;
+    int blockCount, startBlock, endBlock;
+    int complete;
+    uint8_t * bitfield;
+    
+    blockCount  = tr_pieceCountBlocks( piece );
+    startBlock  = tr_pieceStartBlock( piece );
+    endBlock    = startBlock + blockCount;
+    complete    = 0;
+    
+    bitfield = cp->blockBitfield;
+
+    for( i = startBlock; i < endBlock; i++ )
+        if( tr_bitfieldHas( bitfield, i ) )
+            complete++;
+    
+    return (complete * 100.0) / blockCount;
+}
+
 int tr_cpMissingBlockInPiece( tr_completion_t * cp, int piece )
 {
     tr_torrent_t * tor = cp->tor;
@@ -210,13 +232,8 @@ int tr_cpMissingBlockInPiece( tr_completion_t * cp, int piece )
     end   = start + count;
 
     for( i = start; i < end; i++ )
-    {
-        if( tr_cpBlockIsComplete( cp, i ) || cp->blockDownloaders[i] )
-        {
-            continue;
-        }
-        return i;
-    }
+        if( !tr_cpBlockIsComplete( cp, i ) && !cp->blockDownloaders[i] )
+            return i;
 
     return -1;
 }
