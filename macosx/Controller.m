@@ -2303,7 +2303,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) setWindowSizeToFit
 {
     if ([fDefaults boolForKey: @"AutoSize"])
+    {
+        [fScrollView setHasVerticalScroller: NO];
         [fWindow setFrame: [self sizedWindowFrame] display: YES animate: YES];
+        [fScrollView setHasVerticalScroller: YES];
+    }
 }
 
 - (NSRect) sizedWindowFrame
