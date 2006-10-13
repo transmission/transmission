@@ -215,10 +215,6 @@
     {   
         piecesPercent = malloc(fNumPieces * sizeof(float));
         [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
-        
-        int i;
-        for (i = 0; i < fNumPieces; i++)
-            NSLog(@"%f", piecesPercent[i]);
     }
     
     int i, j, piece, index = -1;
