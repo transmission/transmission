@@ -29,7 +29,8 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static void strcatUTF8( char *, char * );
+#define strcatUTF8( dst, src) _strcatUTF8( (dst), sizeof( dst ), (src) )
+static void _strcatUTF8( char *, int, char * );
 
 /***********************************************************************
  * tr_metainfoParse
@@ -300,7 +301,9 @@ void tr_metainfoRemoveSaved( const char * hashString )
  * non-compliant torrents around... If we encounter an invalid UTF-8
  * character, we assume it is ISO 8859-1 and convert it to UTF-8.
  **********************************************************************/
-static void strcatUTF8( char * s, char * append )
+#define WANTBYTES( want, got ) \
+    if( (want) > (got) ) { return; } else { (got) -= (want); }
+static void _strcatUTF8( char * s, int len, char * append )
 {
     char * p;
 
@@ -308,6 +311,7 @@ static void strcatUTF8( char * s, char * append )
     while( s[0] )
     {
         s++;
+        len--;
     }
 
     /* Now start appending, converting on the fly if necessary */
@@ -316,6 +320,7 @@ static void strcatUTF8( char * s, char * append )
         if( !( p[0] & 0x80 ) )
         {
             /* ASCII character */
+            WANTBYTES( 1, len );
             *(s++) = *(p++);
             continue;
         }
@@ -323,6 +328,7 @@ static void strcatUTF8( char * s, char * append )
         if( ( p[0] & 0xE0 ) == 0xC0 && ( p[1] & 0xC0 ) == 0x80 )
         {
             /* 2-bytes UTF-8 character */
+            WANTBYTES( 2, len );
             *(s++) = *(p++); *(s++) = *(p++);
             continue;
         }
@@ -331,6 +337,7 @@ static void strcatUTF8( char * s, char * append )
             ( p[2] & 0xC0 ) == 0x80 )
         {
             /* 3-bytes UTF-8 character */
+            WANTBYTES( 3, len );
             *(s++) = *(p++); *(s++) = *(p++);
             *(s++) = *(p++);
             continue;
@@ -340,12 +347,14 @@ static void strcatUTF8( char * s, char * append )
             ( p[2] & 0xC0 ) == 0x80 && ( p[3] & 0xC0 ) == 0x80 )
         {
             /* 4-bytes UTF-8 character */
+            WANTBYTES( 4, len );
             *(s++) = *(p++); *(s++) = *(p++);
             *(s++) = *(p++); *(s++) = *(p++);
             continue;
         }
 
         /* ISO 8859-1 -> UTF-8 conversion */
+        WANTBYTES( 2, len );
         *(s++) = 0xC0 | ( ( *p & 0xFF ) >> 6 );
         *(s++) = 0x80 | ( *(p++) & 0x3F );
     }
