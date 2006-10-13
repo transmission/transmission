@@ -494,6 +494,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             sizeof( s->trackerError ) );
 
     s->peersTotal       = 0;
+    s->peersIncoming    = 0;
     s->peersUploading   = 0;
     s->peersDownloading = 0;
     
@@ -504,6 +505,17 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
         if( tr_peerIsConnected( peer ) )
         {
             (s->peersTotal)++;
+            
+            if( tr_peerIsIncoming( peer ) )
+            {
+                (s->peersIncoming)++;
+            }
+            
+            if( tr_peerIsUploading( peer ) )
+            {
+                (s->peersUploading)++;
+            }
+            
             if( tr_peerIsUploading( peer ) )
             {
                 (s->peersUploading)++;

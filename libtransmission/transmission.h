@@ -358,6 +358,7 @@ struct tr_stat_s
     float               rateUpload;
     int                 eta;
     int                 peersTotal;
+    int                 peersIncoming;
     int                 peersUploading;
     int                 peersDownloading;
     int                 seeders;

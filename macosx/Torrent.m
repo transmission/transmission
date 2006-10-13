@@ -683,6 +683,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->peersTotal;
 }
 
+- (int) totalPeersIncoming
+{
+    return fStat->peersIncoming;
+}
+
+- (int) totalPeersOutgoing
+{
+    return [self totalPeers] - [self totalPeersIncoming];
+}
+
 //peers uploading to you
 - (int) peersUploading
 {

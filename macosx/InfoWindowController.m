@@ -272,7 +272,8 @@
         
         BOOL active = [torrent isActive];
         
-        [fConnectedPeersField setStringValue: active ? [NSString stringWithInt: [torrent totalPeers]] : @""];
+        [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: @"%d (%d incoming)",
+                                                        [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
         [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
         [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
         

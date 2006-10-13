@@ -134,6 +134,8 @@
 - (int) seeders;
 - (int) leechers;
 - (int) totalPeers;
+- (int) totalPeersIncoming;
+- (int) totalPeersOutgoing;
 - (int) peersUploading;
 - (int) peersDownloading;
 
