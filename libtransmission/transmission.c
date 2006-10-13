@@ -515,11 +515,6 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             {
                 (s->peersUploading)++;
             }
-            
-            if( tr_peerIsUploading( peer ) )
-            {
-                (s->peersUploading)++;
-            }
             if( tr_peerIsDownloading( peer ) )
             {
                 (s->peersDownloading)++;
