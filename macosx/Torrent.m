@@ -164,7 +164,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     tr_torrentAvailability(fHandle, tab, size);
 }
 
-- (void) getAmountFinished: (int8_t *) tab size: (int) size
+- (void) getAmountFinished: (float *) tab size: (int) size
 {
     tr_torrentAmountFinished(fHandle, tab, size);
 }

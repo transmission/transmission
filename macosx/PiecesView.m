@@ -202,16 +202,27 @@
         [fImageView setImage: [[fBack copy] autorelease]];
     NSImage * image = [fImageView image];
 
-    int8_t * pieces = malloc(fNumPieces);
+    int8_t * pieces;
+    float * piecesPercent;
     
     BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
-    
     if (showAvailablity)
+    {   
+        pieces = malloc(fNumPieces);
         [fTorrent getAvailability: pieces size: fNumPieces];
+    }
     else
-        [fTorrent getAmountFinished: pieces size: fNumPieces];
+    {   
+        piecesPercent = malloc(fNumPieces * sizeof(float));
+        [fTorrent getAmountFinished: piecesPercent size: fNumPieces];
+        
+        int i;
+        for (i = 0; i < fNumPieces; i++)
+            NSLog(@"%f", piecesPercent[i]);
+    }
     
     int i, j, piece, index = -1;
+    float piecePercent;
     NSPoint point;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     NSImage * pieceImage;
@@ -228,10 +239,10 @@
             }
             
             pieceImage = nil;
-            piece = pieces[index];
             
             if (showAvailablity)
             {
+                piece = pieces[index];
                 if (piece < 0)
                 {
                     if (first || fPieces[index] == -2)
@@ -281,6 +292,7 @@
             }
             else
             {
+                piecePercent = piecesPercent[index];
                 /*if (i==0)
                     pieceImage = fBlue1Piece;
                 else if (i==1)
@@ -292,7 +304,7 @@
                 else if (i==4)
                     pieceImage = fBluePiece;
                 
-                else */if (piece <= 0)
+                else */if (piecePercent <= 0.0)
                 {
                     if (first || fPieces[index] != 0)
                     {
@@ -300,7 +312,7 @@
                         pieceImage = fWhitePiece;
                     }
                 }
-                else if (piece < 25)
+                else if (piecePercent < 0.25)
                 {
                     if (first || fPieces[index] != 1)
                     {
@@ -308,7 +320,7 @@
                         pieceImage = fBlue1Piece;
                     }
                 }
-                else if (piece < 50)
+                else if (piecePercent < 0.50)
                 {
                     if (first || fPieces[index] != 2)
                     {
@@ -316,7 +328,7 @@
                         pieceImage = fBlue2Piece;
                     }
                 }
-                else if (piece < 75)
+                else if (piecePercent < 0.75)
                 {
                     if (first || fPieces[index] != 3)
                     {
@@ -324,7 +336,7 @@
                         pieceImage = fBlue3Piece;
                     }
                 }
-                else if (piece < 100)
+                else if (piecePercent < 1.0)
                 {
                     if (first || fPieces[index] != 4)
                     {
@@ -363,7 +375,19 @@
         [fImageView setNeedsDisplay];
     }
     
-    free(pieces);
+    if (showAvailablity)
+        free(pieces);
+    else
+        free(piecesPercent);
 }
+
+/*- (void) toggleView: (id) sender
+{
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool: ![defaults boolForKey: @"PiecesViewShowAvailability"]
+                forKey: @"PiecesViewShowAvailability"];
+    
+    [self updateView: YES];
+}*/
 
 @end

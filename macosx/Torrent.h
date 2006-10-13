@@ -66,7 +66,7 @@
 - (NSString *) downloadFolder;
 
 - (void) getAvailability: (int8_t *) tab size: (int) size;
-- (void) getAmountFinished: (int8_t *) tab size: (int) size;
+- (void) getAmountFinished: (float *) tab size: (int) size;
 
 - (void)            update;
 - (NSDictionary *)  infoForCurrentView;
