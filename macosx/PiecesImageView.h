@@ -29,4 +29,5 @@
 {
     IBOutlet PiecesView * fPiecesView;
 }
+
 @end
