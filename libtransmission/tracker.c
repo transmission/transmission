@@ -236,6 +236,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
     uint64_t       left;
     uint64_t       down;
     uint64_t       up;
+    char         * start;
 
     down = tor->downloadedCur;
     up = tor->uploadedCur;
@@ -263,11 +264,20 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
         event = "";
     }
 
+    if( NULL == strchr( inf->trackerAnnounce, '?' ) )
+    {
+        start = "?";
+    }
+    else
+    {
+        start = "&";
+    }
+
     left = tr_cpLeftBytes( tor->completion );
 
     return tr_httpClient( TR_HTTP_GET, inf->trackerAddress,
                           inf->trackerPort,
-                          "%s?"
+                          "%s%s"
                           "info_hash=%s&"
                           "peer_id=%s&"
                           "port=%d&"
@@ -278,7 +288,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
                           "numwant=50&"
                           "key=%s"
                           "%s",
-                          inf->trackerAnnounce, tor->hashString, tc->id,
+                          inf->trackerAnnounce, start, tor->hashString, tc->id,
                           tc->bindPort, up, down, left, tor->key, event );
 }
 
