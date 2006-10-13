@@ -633,7 +633,7 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
     tr_lockUnlock( &tor->lock );
 }
 
-void tr_torrentAmountFinished( tr_torrent_t * tor, int8_t * tab, int size )
+void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size )
 {
     int i, piece;
 
