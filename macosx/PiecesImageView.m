@@ -22,25 +22,19 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-#import "Torrent.h"
+#import "PiecesImageView.h"
 
-@interface PiecesView : NSObject
+@implementation PiecesImageView
+
+- (BOOL) acceptsFirstMouse: (NSEvent *) event
 {
-    int8_t  * fPieces;
-    
-    NSImage * fBack, * fWhitePiece, * fBluePiece, * fRedPiece,
-            * fGreen1Piece, * fGreen2Piece, * fGreen3Piece,
-            * fBlue1Piece, * fBlue2Piece, * fBlue3Piece, * fBlue4Piece;
-    
-    Torrent * fTorrent;
-    int     fNumPieces, fAcross, fWidth, fExtraBorder;
-    
-    IBOutlet NSImageView * fImageView;
+    return YES;
 }
 
-- (void) setTorrent: (Torrent *) torrent;
-- (void) updateView: (BOOL) first;
-- (void) toggleView;
+- (void) mouseDown: (NSEvent *) event
+{
+    [fPiecesView toggleView];
+    [super mouseDown: event];
+}
 
 @end

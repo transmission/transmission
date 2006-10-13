@@ -134,6 +134,9 @@
         [bp fill];
         [fBluePiece unlockFocus];
         
+        [fImageView setToolTip: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
+                            ? @"Piece Availability" : @"Piece Progress"];
+        
         //actually draw the box
         [self setTorrent: nil];
 }
@@ -377,13 +380,16 @@
         free(piecesPercent);
 }
 
-/*- (void) toggleView: (id) sender
+- (void) toggleView
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool: ![defaults boolForKey: @"PiecesViewShowAvailability"]
-                forKey: @"PiecesViewShowAvailability"];
+    BOOL showAvailability = ![defaults boolForKey: @"PiecesViewShowAvailability"];
+    
+    [defaults setBool: showAvailability forKey: @"PiecesViewShowAvailability"];
+    
+    [fImageView setToolTip: showAvailability ? @"Piece Availability" : @"Piece Progress"];
     
     [self updateView: YES];
-}*/
+}
 
 @end
