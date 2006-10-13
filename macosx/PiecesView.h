@@ -30,7 +30,8 @@
     int8_t  * fPieces;
     
     NSImage * fBack, * fWhitePiece, * fBluePiece, * fRedPiece,
-            * fGreen1Piece, * fGreen2Piece, * fGreen3Piece;
+            * fGreen1Piece, * fGreen2Piece, * fGreen3Piece,
+            * fBlue1Piece, * fBlue2Piece, * fBlue3Piece, * fBlue4Piece;
     
     Torrent * fTorrent;
     int     fNumPieces, fAcross, fWidth, fExtraBorder;

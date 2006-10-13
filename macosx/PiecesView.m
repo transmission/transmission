@@ -62,14 +62,6 @@
         [bp fill];
         [fWhitePiece unlockFocus];
         
-        //blue box image
-        fBluePiece = [[NSImage alloc] initWithSize: size];
-        
-        [fBluePiece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.35 green: 0.65 blue: 1.0 alpha: 1.0] set];
-        [bp fill];
-        [fBluePiece unlockFocus];
-        
         //red box image
         fRedPiece = [[NSImage alloc] initWithSize: size];
         
@@ -101,6 +93,46 @@
         [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] set];
         [bp fill];
         [fGreen3Piece unlockFocus];
+        
+        //blue 1 box image
+        fBlue1Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue1Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue1Piece unlockFocus];
+        
+        //blue 2 box image
+        fBlue2Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue2Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue2Piece unlockFocus];
+        
+        //blue 3 box image
+        fBlue3Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue3Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue3Piece unlockFocus];
+        
+        //blue 4 box image
+        fBlue4Piece = [[NSImage alloc] initWithSize: size];
+        
+        [fBlue4Piece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] set];
+        [bp fill];
+        [fBlue4Piece unlockFocus];
+        
+        //blue box image
+        fBluePiece = [[NSImage alloc] initWithSize: size];
+        
+        [fBluePiece lockFocus];
+        [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] set];
+        [bp fill];
+        [fBluePiece unlockFocus];
         
         //actually draw the box
         [self setTorrent: nil];
@@ -169,9 +201,15 @@
     if (first)
         [fImageView setImage: [[fBack copy] autorelease]];
     NSImage * image = [fImageView image];
-    
+
     int8_t * pieces = malloc(fNumPieces);
-    [fTorrent getAvailability: pieces size: fNumPieces];
+    
+    BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+    
+    if (showAvailablity)
+        [fTorrent getAvailability: pieces size: fNumPieces];
+    else
+        [fTorrent getAmountFinished: pieces size: fNumPieces];
     
     int i, j, piece, index = -1;
     NSPoint point;
@@ -191,50 +229,116 @@
             
             pieceImage = nil;
             piece = pieces[index];
-            if (piece < 0)
+            
+            if (showAvailablity)
             {
-                if (first || fPieces[index] == -2)
+                if (piece < 0)
                 {
-                    fPieces[index] = -1;
-                    pieceImage = fBluePiece;
+                    if (first || fPieces[index] == -2)
+                    {
+                        fPieces[index] = -1;
+                        pieceImage = fBluePiece;
+                    }
+                    else if (fPieces[index] != -1)
+                    {
+                        fPieces[index] = -2;
+                        pieceImage = fRedPiece;
+                    }
+                    else;
                 }
-                else if (fPieces[index] != -1)
+                else if (piece == 0)
                 {
-                    fPieces[index] = -2;
-                    pieceImage = fRedPiece;
+                    if (first || fPieces[index] != 0)
+                    {
+                        fPieces[index] = 0;
+                        pieceImage = fWhitePiece;
+                    }
                 }
-                else;
-            }
-            else if (piece == 0)
-            {
-                if (first || fPieces[index] != 0)
+                else if (piece == 1)
                 {
-                    fPieces[index] = 0;
-                    pieceImage = fWhitePiece;
+                    if (first || fPieces[index] != 1)
+                    {
+                        fPieces[index] = 1;
+                        pieceImage = fGreen1Piece;
+                    }
                 }
-            }
-            else if (piece == 1)
-            {
-                if (first || fPieces[index] != 1)
+                else if (piece == 2)
                 {
-                    fPieces[index] = 1;
-                    pieceImage = fGreen1Piece;
+                    if (first || fPieces[index] != 2)
+                    {
+                        fPieces[index] = 2;
+                        pieceImage = fGreen2Piece;
+                    }
                 }
-            }
-            else if (piece == 2)
-            {
-                if (first || fPieces[index] != 2)
+                else
                 {
-                    fPieces[index] = 2;
-                    pieceImage = fGreen2Piece;
+                    if (first || fPieces[index] != 3)
+                    {
+                        fPieces[index] = 3;
+                        pieceImage = fGreen3Piece;
+                    }
                 }
             }
             else
             {
-                if (first || fPieces[index] != 3)
+                /*if (i==0)
+                    pieceImage = fBlue1Piece;
+                else if (i==1)
+                    pieceImage = fBlue2Piece;
+                else if (i==2)
+                    pieceImage = fBlue3Piece;
+                else if (i==3)
+                    pieceImage = fBlue4Piece;
+                else if (i==4)
+                    pieceImage = fBluePiece;
+                
+                else */if (piece <= 0)
                 {
-                    fPieces[index] = 3;
-                    pieceImage = fGreen3Piece;
+                    if (first || fPieces[index] != 0)
+                    {
+                        fPieces[index] = 0;
+                        pieceImage = fWhitePiece;
+                    }
+                }
+                else if (piece < 25)
+                {
+                    if (first || fPieces[index] != 1)
+                    {
+                        fPieces[index] = 1;
+                        pieceImage = fBlue1Piece;
+                    }
+                }
+                else if (piece < 50)
+                {
+                    if (first || fPieces[index] != 2)
+                    {
+                        fPieces[index] = 2;
+                        pieceImage = fBlue2Piece;
+                    }
+                }
+                else if (piece < 75)
+                {
+                    if (first || fPieces[index] != 3)
+                    {
+                        fPieces[index] = 3;
+                        pieceImage = fBlue3Piece;
+                    }
+                }
+                else if (piece < 100)
+                {
+                    if (first || fPieces[index] != 4)
+                    {
+                        fPieces[index] = 4;
+                        pieceImage = fBlue4Piece;
+                    }
+                }
+                else
+                {
+                    if (first || fPieces[index] != 5)
+                    {
+                        fPieces[index] = 5;
+                        pieceImage = fBluePiece;
+                    }
                 }
             }
             
@@ -257,12 +361,6 @@
     {
         [image unlockFocus];
         [fImageView setNeedsDisplay];
-        
-        /*int8_t * piecesC = malloc(fNumPieces);
-        [fTorrent getAmountFinished: piecesC size: fNumPieces];
-        for (i = 0; i < fNumPieces; i++)
-            NSLog(@"%d", piecesC[i]);
-        free(piecesC);*/
     }
     
     free(pieces);
