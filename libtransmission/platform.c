@@ -31,6 +31,42 @@
 
 #include "transmission.h"
 
+#if !defined( SYS_BEOS ) && !defined( __AMIGAOS4__ )
+
+#include <pwd.h>
+
+static char * tr_getHomeDirectory()
+{
+    static char     homeDirectory[MAX_PATH_LENGTH];
+    static int      init = 0;
+    char          * envHome;
+    struct passwd * pw;
+
+    if( init )
+    {
+        return homeDirectory;
+    }
+
+    envHome = getenv( "HOME" );
+    if( NULL == envHome )
+    {
+        pw = getpwuid( getuid() );
+        endpwent();
+        if( NULL == pw )
+        {
+            /* XXX need to handle this case */
+            return NULL;
+        }
+        envHome = pw->pw_dir;
+    }
+
+    snprintf( homeDirectory, MAX_PATH_LENGTH, "%s", envHome );
+    init = 1;
+
+    return homeDirectory;
+}
+#endif /* !SYS_BEOS && !__AMIGAOS4__ */
+
 static void
 tr_migrateResume( const char *oldDirectory, const char *newDirectory )
 {
@@ -74,12 +110,12 @@ char * tr_getPrefsDirectory()
 	strcat( prefsDirectory, "/Transmission" );
 #elif defined( SYS_DARWIN )
     snprintf( prefsDirectory, MAX_PATH_LENGTH,
-              "%s/Library/Caches/Transmission", getenv( "HOME" ) );
+              "%s/Library/Caches/Transmission", tr_getHomeDirectory() );
 #elif defined(__AMIGAOS4__)
     snprintf( prefsDirectory, MAX_PATH_LENGTH, "PROGDIR:.transmission" );
 #else
     snprintf( prefsDirectory, MAX_PATH_LENGTH, "%s/.transmission",
-              getenv( "HOME" ) );
+              tr_getHomeDirectory() );
 #endif
 
     tr_mkdir( prefsDirectory );
@@ -88,7 +124,7 @@ char * tr_getPrefsDirectory()
 #ifdef SYS_DARWIN
     char oldDirectory[MAX_PATH_LENGTH];
     snprintf( oldDirectory, MAX_PATH_LENGTH, "%s/.transmission",
-              getenv( "HOME" ) );
+              tr_getHomeDirectory() );
     tr_migrateResume( oldDirectory, prefsDirectory );
     rmdir( oldDirectory );
 #endif
@@ -146,7 +182,7 @@ char * tr_getTorrentsDirectory()
 #elif defined( SYS_DARWIN )
     snprintf( torrentsDirectory, MAX_PATH_LENGTH,
               "%s/Library/Application Support/Transmission/Torrents",
-              getenv( "HOME" ) );
+              tr_getHomeDirectory() );
 #else
     snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/torrents",
               tr_getPrefsDirectory() );
