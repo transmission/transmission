@@ -8,7 +8,13 @@
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {revealFile = id; setRatioCheck = id; setRatioLimit = id; }; 
+            ACTIONS = {
+                revealDataFile = id; 
+                revealFile = id; 
+                revealTorrentFile = id; 
+                setRatioCheck = id; 
+                setRatioLimit = id; 
+            }; 
             CLASS = InfoWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -32,6 +38,8 @@
                 fRatioField = NSTextField; 
                 fRatioLimitField = NSTextField; 
                 fRatioMatrix = NSMatrix; 
+                fRevealDataButton = NSButton; 
+                fRevealTorrentButton = NSButton; 
                 fSeedersField = NSTextField; 
                 fSizeField = NSTextField; 
                 fStateField = NSTextField; 

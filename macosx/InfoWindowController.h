@@ -43,6 +43,7 @@
                         * fDateStartedField, * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSwarmSpeedField; 
+    IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
 
     IBOutlet NSTableView * fPeerTable;
     IBOutlet NSTextField * fSeedersField, * fLeechersField, * fConnectedPeersField,
@@ -63,6 +64,9 @@
 
 - (void) setNextTab;
 - (void) setPreviousTab;
+
+- (void) revealTorrentFile: (id) sender;
+- (void) revealDataFile: (id) sender;
 - (void) revealFile: (id) sender;
 
 - (void) setRatioCheck: (id) sender;

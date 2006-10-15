@@ -150,6 +150,9 @@
         [fDataLocationField setToolTip: nil];
         [fDateStartedField setStringValue: @""];
         
+        [fRevealDataButton setHidden: YES];
+        [fRevealTorrentButton setHidden: YES];
+        
         //don't allow empty fields to be selected
         [fTrackerField setSelectable: NO];
         [fAnnounceField setSelectable: NO];
@@ -200,6 +203,9 @@
         [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
         [fDataLocationField setToolTip: [torrent dataLocation]];
         [fDateStartedField setObjectValue: [torrent date]];
+        
+        [fRevealDataButton setHidden: NO];
+        [fRevealTorrentButton setHidden: ![torrent publicTorrent]];
         
         //allow these fields to be selected
         [fTrackerField setSelectable: YES];
@@ -529,6 +535,16 @@
     [descriptors addObject: [[fPeerTable tableColumnWithIdentifier: @"IP"] sortDescriptorPrototype]];
     
     return descriptors;
+}
+
+- (void) revealTorrentFile: (id) sender
+{
+    [[fTorrents objectAtIndex: 0] revealPublicTorrent];
+}
+
+- (void) revealDataFile: (id) sender
+{
+    [[fTorrents objectAtIndex: 0] revealData];
 }
 
 - (void) revealFile: (id) sender

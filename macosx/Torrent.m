@@ -432,6 +432,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [[NSWorkspace sharedWorkspace] selectFile: [self dataLocation] inFileViewerRootedAtPath: nil];
 }
 
+- (void) revealPublicTorrent
+{
+    if (fPublicTorrent)
+        [[NSWorkspace sharedWorkspace] selectFile: fPublicTorrentLocation inFileViewerRootedAtPath: nil];
+}
+
 - (void) trashData
 {
     [self trashFile: [self dataLocation]];

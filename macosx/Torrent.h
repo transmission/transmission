@@ -88,6 +88,7 @@
 - (BOOL) waitingToStart;
 
 - (void)    revealData;
+- (void)    revealPublicTorrent;
 - (void)    trashData;
 - (void)    trashTorrent;
 
