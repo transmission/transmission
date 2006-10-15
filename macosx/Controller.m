@@ -1765,6 +1765,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     float heightChange = [fStatusBar frame].size.height;
     if (!show)
         heightChange *= -1;
+    
+    //allow bar to show even if not enough room
+    if (show && ![fDefaults boolForKey: @"AutoSize"])
+    {
+        float maxHeight = [[fWindow screen] visibleFrame].size.height - heightChange;
+        if (frame.size.height > maxHeight)
+        {
+            float change = maxHeight - frame.size.height;
+            frame.size.height += change;
+            frame.origin.y -= change;
+            
+            [fWindow setFrame: frame display: NO animate: NO];
+        }
+    }
 
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
@@ -1820,6 +1834,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     float heightChange = [fFilterBar frame].size.height;
     if (!show)
         heightChange *= -1;
+    
+    //allow bar to show even if not enough room
+    if (show && ![fDefaults boolForKey: @"AutoSize"])
+    {
+        float maxHeight = [[fWindow screen] visibleFrame].size.height - heightChange;
+        if (frame.size.height > maxHeight)
+        {
+            float change = maxHeight - frame.size.height;
+            frame.size.height += change;
+            frame.origin.y -= change;
+            
+            [fWindow setFrame: frame display: NO animate: NO];
+        }
+    }
 
     frame.size.height += heightChange;
     frame.origin.y -= heightChange;
@@ -1830,7 +1858,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setAutoresizingMask: 0];
     [fScrollView setAutoresizingMask: 0];
     
-    [fWindow setFrame: frame display: YES animate: animate]; 
+    [fWindow setFrame: frame display: YES animate: animate];
     
     //re-enable autoresize
     [fFilterBar setAutoresizingMask: filterMask];
