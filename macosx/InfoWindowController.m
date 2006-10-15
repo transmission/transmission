@@ -25,8 +25,8 @@
 #import "InfoWindowController.h"
 #import "StringAdditions.h"
 
-#define RATIO_NO_CHECK_TAG 0
-#define RATIO_GLOBAL_TAG 1
+#define RATIO_GLOBAL_TAG 0
+#define RATIO_NO_CHECK_TAG 1
 #define RATIO_CHECK_TAG 2
 
 #define MIN_WINDOW_WIDTH 300
