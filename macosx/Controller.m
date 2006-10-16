@@ -364,6 +364,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
     
+    //auto importing
+    fAutoImportedNames = [[NSMutableArray alloc] init];
     [self checkAutoImportDirectory];
 }
 
@@ -1582,7 +1584,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //only import those that have not been imported yet
     NSMutableArray * newNames = [importedNames mutableCopy];
     [newNames removeObjectsInArray: fAutoImportedNames];
-    [fAutoImportedNames addObjectsFromArray: newNames];
+    [fAutoImportedNames setArray: importedNames];
     
     NSEnumerator * enumerator = [newNames objectEnumerator];
     NSString * file;
