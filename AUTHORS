@@ -43,6 +43,7 @@ Thanks to:
 
 Hugo van Heuven, madebysofa
  + Icon design
+ + Mac OS X toolbar icons
 
 Omar and Adrien
  + Beta testing
@@ -54,7 +55,7 @@ vi@nwr.jp
  + Free SHA1 implementation (sha1.[ch])
 
 John Blitch
- + OS X patch (Contextual menu)
+ + Mac OS X patch (Contextual menu)
 
 Ahmad M. Afuni
  + NetBSD patch
@@ -63,7 +64,7 @@ Jeremy Messenger
  + FreeBSD patch
 
 Mike Matas <http://www.mikematas.com/>
- + OS X toolbar icons
+ + Previous Mac OS X toolbar icons
 
 Martin Stadtmueller
  + Icon tweaking
