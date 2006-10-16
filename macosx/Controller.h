@@ -92,6 +92,8 @@
     
     BOOL                            fUpdateInProgress;
     Badger                          * fBadger;
+    
+    NSArray                         * fAutoImportedNames;
 }
 
 - (void) openFiles:     (NSArray *) filenames;
@@ -175,6 +177,7 @@
 - (void) attemptToStartAuto: (Torrent *) torrent;
 - (void) attemptToStartMultipleAuto: (NSArray *) torrents;
 
+- (void) changeAutoImport;
 - (void) checkAutoImportDirectory;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;

@@ -113,6 +113,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fSortType release];
     [fFilterType release];
     
+    if (fAutoImportedNames)
+        [fAutoImportedNames release];
+    
     tr_close(fLib);
     [super dealloc];
 }
@@ -320,7 +323,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
                     name: @"AutoSpeedLimitChange" object: nil];
     
-    [nc addObserver: self selector: @selector(checkAutoImportDirectory)
+    [nc addObserver: self selector: @selector(changeAutoImport)
                     name: @"AutoImportSettingChange" object: nil];
     
     [nc addObserver: self selector: @selector(setWindowSizeToFit)
@@ -1558,6 +1561,18 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self checkAutoImportDirectory];
 }
 
+- (void) changeAutoImport
+{
+    if (fAutoImportedNames)
+    {
+        [fAutoImportedNames release];
+        fAutoImportedNames = nil;
+    }
+    
+    if ([fDefaults boolForKey: @"AutoImport"])
+        [self checkAutoImportDirectory];
+}
+
 - (void) checkAutoImportDirectory
 {
     if (![fDefaults boolForKey: @"AutoImport"])
@@ -1569,10 +1584,18 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (!(importedNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))
         return;
     
-    NSEnumerator * enumerator = [importedNames objectEnumerator];
+    //only import those that have not been imported yet
+    NSMutableArray * newNames = [importedNames mutableCopy];
+    [newNames removeObjectsInArray: fAutoImportedNames];
+    if (fAutoImportedNames)
+        [fAutoImportedNames release];
+    fAutoImportedNames = [importedNames retain];
+    
+    NSEnumerator * enumerator = [newNames objectEnumerator];
     NSString * file;
     unsigned oldCount;
     while ((file = [enumerator nextObject]))
+    {
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             oldCount = [fTorrents count];
@@ -1583,6 +1606,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added" description: file
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
         }
+    }
+    
+    [newNames release];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) t
