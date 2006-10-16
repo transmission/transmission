@@ -1565,9 +1565,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) changeAutoImport
 {
     [fAutoImportedNames removeAllObjects];
-    
-    if ([fDefaults boolForKey: @"AutoImport"])
-        [self checkAutoImportDirectory];
+    [self checkAutoImportDirectory];
 }
 
 - (void) checkAutoImportDirectory
