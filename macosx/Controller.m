@@ -113,8 +113,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fSortType release];
     [fFilterType release];
     
-    if (fAutoImportedNames)
-        [fAutoImportedNames release];
+    [fAutoImportedNames release];
     
     tr_close(fLib);
     [super dealloc];
@@ -1563,11 +1562,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) changeAutoImport
 {
-    if (fAutoImportedNames)
-    {
-        [fAutoImportedNames release];
-        fAutoImportedNames = nil;
-    }
+    [fAutoImportedNames removeAllObjects];
     
     if ([fDefaults boolForKey: @"AutoImport"])
         [self checkAutoImportDirectory];
@@ -1587,9 +1582,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //only import those that have not been imported yet
     NSMutableArray * newNames = [importedNames mutableCopy];
     [newNames removeObjectsInArray: fAutoImportedNames];
-    if (fAutoImportedNames)
-        [fAutoImportedNames release];
-    fAutoImportedNames = [importedNames retain];
+    [fAutoImportedNames addObjectsFromArray: newNames];
     
     NSEnumerator * enumerator = [newNames objectEnumerator];
     NSString * file;

@@ -93,7 +93,7 @@
     BOOL                            fUpdateInProgress;
     Badger                          * fBadger;
     
-    NSArray                         * fAutoImportedNames;
+    NSMutableArray                  * fAutoImportedNames;
 }
 
 - (void) openFiles:     (NSArray *) filenames;
