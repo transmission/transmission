@@ -51,9 +51,11 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <assert.h>
+#ifdef SYS_BEOS
+#  define socklen_t uint32_t
+#endif
 #ifdef BEOS_NETSERVER
 #  define in_port_t uint16_t
-#  define socklen_t uint32_t
 #else
 #  include <arpa/inet.h>
 #endif
