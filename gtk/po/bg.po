@@ -1,0 +1,431 @@
+# $Id$
+#
+# Bulgarian translation of Transmission.
+# This file is distributed under the same license as the Transmission package.
+# Lubomir Marinov <lubomir.marinov@gmail.com>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Transmission HEAD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-06-18 00:33-0700\n"
+"PO-Revision-Date: 2006-09-27 00:20+0200\n"
+"Last-Translator: Lubomir Marinov <lubomir.marinov@gmail.com>\n"
+"Language-Team: Bulgarian <bg@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: conf.c:95 conf.c:374
+#, c-format
+msgid ""
+"Failed to open the file %s for writing:\n"
+"%s"
+msgstr ""
+"Файлът %s не може да бъде отворен за писане:\n"
+"%s"
+
+#: conf.c:110
+#, c-format
+msgid "Another copy of %s is already running."
+msgstr "Друго копие на %s вече се изпълнява."
+
+#: conf.c:113
+#, c-format
+msgid ""
+"Failed to lock the file %s:\n"
+"%s"
+msgstr ""
+"Файлът %s не може да бъде заключен:\n"
+"%s"
+
+#: conf.c:136 dialogs.c:137
+#, c-format
+msgid ""
+"Failed to create the directory %s:\n"
+"%s"
+msgstr ""
+"Папката %s не може да бъде създадена:\n"
+"%s"
+
+#: conf.c:209
+#, c-format
+msgid ""
+"Failed to open the file %s for reading:\n"
+"%s"
+msgstr ""
+"Файлът %s не може да бъде отворен за четене:\n"
+"%s"
+
+#: conf.c:216
+#, c-format
+msgid ""
+"Error while reading from the file %s:\n"
+"%s"
+msgstr ""
+"Грешка при четене от файла %s:\n"
+"%s"
+
+#: conf.c:388
+#, c-format
+msgid ""
+"Error while writing to the file %s:\n"
+"%s"
+msgstr ""
+"Грешка при писане във файла %s:\n"
+"%s"
+
+#: conf.c:394
+#, c-format
+msgid ""
+"Failed to rename the file %s to %s:\n"
+"%s"
+msgstr ""
+"Файлът %s не може да бъде преименуван на %s:\n"
+"%s"
+
+#: dialogs.c:174
+#, c-format
+msgid "%s Preferences"
+msgstr "Настройки на %s"
+
+#: dialogs.c:183 dialogs.c:407
+msgid "Choose a download directory"
+msgstr "Избиране на папка на изтегляне"
+
+#: dialogs.c:192
+msgid "_Limit download speed"
+msgstr "Огранича_ване на скорост на изтегляне"
+
+#: dialogs.c:194
+msgid "Maximum _download speed:"
+msgstr "М_аксимална скорост на изтегляне:"
+
+#: dialogs.c:196
+msgid "Li_mit upload speed"
+msgstr "Ог_pаничаване на скорост на качване"
+
+#: dialogs.c:198
+msgid "Maximum _upload speed:"
+msgstr "Ма_ксимална скорост на качване:"
+
+#. directory label and chooser
+#: dialogs.c:246
+msgid "Download di_rectory:"
+msgstr "Папка на _изтегляне:"
+
+#. port label and entry
+#: dialogs.c:255
+msgid "Listening _port:"
+msgstr "_Порт:"
+
+#: dialogs.c:268
+msgid "Use the torrent file where it is"
+msgstr "Използване на файла с описание на потока, където се намира"
+
+#: dialogs.c:271
+msgid "Keep a copy of the torrent file"
+msgstr "Запазване на копие на файла с описание на потока"
+
+#: dialogs.c:274
+msgid "Keep a copy and remove the original"
+msgstr "Запазване на копие на файла с описание на потока и премахване на оригинала"
+
+#. std
+#: dialogs.c:277
+msgid "For torrents added _normally:"
+msgstr "За _добавяне на потоци по подразбиране:"
+
+#: dialogs.c:291
+msgid ""
+"For torrents added e_xternally\n"
+"(via the command-line):"
+msgstr ""
+"За по_тоци, добавени отвън\n"
+"(чрез командния ред):"
+
+#: dialogs.c:394
+msgid "Add a Torrent"
+msgstr "Добавяне на поток"
+
+#: dialogs.c:401
+msgid "Automatically _start torrent"
+msgstr "Автоматично п_ускане на поток"
+
+#: dialogs.c:403
+msgid "Use alternate _download directory"
+msgstr "Използв_ане на друга папка на изтегляне"
+
+#: dialogs.c:432
+msgid "Torrent files"
+msgstr "Файлове с описания на потоци"
+
+#: dialogs.c:434
+msgid "All files"
+msgstr "Всички файлове"
+
+#: dialogs.c:542
+#, c-format
+msgid "%s Properties"
+msgstr "Свойства на %s"
+
+#: dialogs.c:567 dialogs.c:570
+msgid "Tracker:"
+msgstr ""
+
+#: dialogs.c:572
+msgid "Announce:"
+msgstr ""
+
+#: dialogs.c:573
+msgid "Piece Size:"
+msgstr "Размер на част:"
+
+#: dialogs.c:574
+msgid "Pieces:"
+msgstr "Части:"
+
+#: dialogs.c:575
+msgid "Total Size:"
+msgstr "Общ размер:"
+
+#: dialogs.c:577 dialogs.c:579
+msgid "Seeders:"
+msgstr ""
+
+#: dialogs.c:577 dialogs.c:581
+msgid "?"
+msgstr "?"
+
+#: dialogs.c:581 dialogs.c:583
+msgid "Leechers:"
+msgstr ""
+
+#: dialogs.c:587
+msgid "Directory:"
+msgstr "Папка:"
+
+#: dialogs.c:588
+msgid "Downloaded:"
+msgstr "Изтеглени:"
+
+#: dialogs.c:589
+msgid "Uploaded:"
+msgstr "Качени:"
+
+#: ipc.c:208
+#, c-format
+msgid ""
+"Failed to set up socket:\n"
+"%s"
+msgstr ""
+"Сокет не може да бъде настроен:\n"
+"%s"
+
+#: ipc.c:229
+#, c-format
+msgid "failed to create socket: %s\n"
+msgstr "сокет не може да бъде създаден: %s\n"
+
+#: ipc.c:238
+#, c-format
+msgid "failed to connect to %s: %s\n"
+msgstr "свързване с %s не може да бъде направено: %s\n"
+
+#: ipc.c:403
+#, c-format
+msgid "bad IPC protocol version\n"
+msgstr "некоректна версия на протокола за взаимодействие\n"
+
+#: main.c:150
+msgid "Add"
+msgstr "Добавяне"
+
+#: main.c:151
+msgid "Add a new torrent"
+msgstr "Добавяне на нов поток"
+
+#: main.c:152
+msgid "Start"
+msgstr "Пускане"
+
+#: main.c:154
+msgid "Start a torrent that is not running"
+msgstr "Пускане на поток"
+
+#: main.c:155
+msgid "Stop"
+msgstr "Спиране"
+
+#: main.c:157
+msgid "Stop a torrent that is running"
+msgstr "Спиране на пуснат поток"
+
+#: main.c:158
+msgid "Remove"
+msgstr "Премахване"
+
+#: main.c:159
+msgid "Remove a torrent"
+msgstr "Премахване на поток"
+
+#: main.c:160
+msgid "Properties"
+msgstr "Свойства"
+
+#: main.c:161
+msgid "Show additional information about a torrent"
+msgstr "Показване на допълнителна информация за поток"
+
+#: main.c:162
+msgid "Preferences"
+msgstr "Настройки"
+
+#: main.c:163
+msgid "Customize application behavior"
+msgstr "Промяна на настройките на приложението"
+
+#: main.c:200
+msgid "Transmission"
+msgstr ""
+
+#: main.c:453
+msgid "Name"
+msgstr "Име"
+
+#. this string is only used to determing the size of the progress bar
+#: main.c:461
+msgid "  fnord    fnord  "
+msgstr "  размер    размер  "
+
+#: main.c:464
+msgid "Progress"
+msgstr "Статус"
+
+#: main.c:700
+#, c-format
+msgid "Checking existing files (%.1f%%)"
+msgstr "Проверка на съществуващ файл (%.1f%%)"
+
+#: main.c:703
+#, c-format
+msgid "Finishing in --:--:-- (%.1f%%)"
+msgstr "Приключване след --:--:-- (%.1f%%)"
+
+#: main.c:705
+#, c-format
+msgid "Finishing in %02i:%02i:%02i (%.1f%%)"
+msgstr "Приключване след %02i:%02i:%02i (%.1f%%)"
+
+#: main.c:709
+#, c-format
+msgid "Seeding, uploading to %d of %d peer"
+msgid_plural "Seeding, uploading to %d of %d peers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: main.c:713
+msgid "Stopping..."
+msgstr "Спиране..."
+
+#: main.c:715
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Спрян (%.1f%%)"
+
+#: main.c:723
+msgid "Error: "
+msgstr "Грешка: "
+
+#: main.c:727
+#, c-format
+msgid "Downloading from %i of %i peer"
+msgid_plural "Downloading from %i of %i peers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: main.c:761
+#, c-format
+msgid ""
+"Ratio: %s\n"
+"UL: %s/s"
+msgstr ""
+"Съотношение: %s\n"
+"Качване: %s/s"
+
+#: main.c:764
+#, c-format
+msgid ""
+"DL: %s/s\n"
+"UL: %s/s"
+msgstr ""
+"Изтегляне: %s/s\n"
+"Качване: %s/s"
+
+#: main.c:810
+#, c-format
+msgid "     Total DL: %s/s     Total UL: %s/s"
+msgstr "     Общо изтегляне: %s/s     Общо качване: %s/s"
+
+#: main.c:1081
+#, c-format
+msgid ""
+"Failed to load torrent file:\n"
+"%s"
+msgid_plural ""
+"Failed to load torrent files:\n"
+"%s"
+msgstr[0] ""
+"Файл с описание на поток не може да бъде зареден:\n"
+"%s"
+msgstr[1] ""
+"Файлове с описания на потоци не могат да бъдат заредени:\n"
+"%s"
+
+#: tr_torrent.c:290
+#, c-format
+msgid "%s: not a valid torrent file"
+msgstr "%s: невалиден файл с описание на поток"
+
+#: tr_torrent.c:293
+#, c-format
+msgid "%s: torrent is already open"
+msgstr "%s: потокът вече е отворен"
+
+#: util.c:67
+msgid "B"
+msgstr "B"
+
+#: util.c:67
+msgid "KiB"
+msgstr "KiB"
+
+#: util.c:67
+msgid "MiB"
+msgstr "MiB"
+
+#: util.c:67
+msgid "GiB"
+msgstr "GiB"
+
+#: util.c:67
+msgid "TiB"
+msgstr "TiB"
+
+#: util.c:67
+msgid "PiB"
+msgstr "PiB"
+
+#: util.c:67
+msgid "EiB"
+msgstr "EiB"
+
+#: util.c:92
+msgid "N/A"
+msgstr "Неизвестен"
+
+#. this is a UTF-8 infinity symbol
+#: util.c:96
+msgid "∞"
+msgstr "∞"
