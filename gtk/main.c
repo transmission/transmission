@@ -545,7 +545,7 @@ exitcheck(gpointer gdata) {
   /* keep going if we haven't hit the exit timeout and
      we either have torrents left or nat traversal is stopping */
   if( time( NULL ) - data->started < TRACKER_EXIT_TIMEOUT &&
-      ( !tr_backend_torrents_stopped( data->cbdata->back ) &&
+      ( !tr_backend_torrents_stopped( data->cbdata->back ) ||
         TR_NAT_TRAVERSAL_DISABLED != natstat ) ) {
     updatemodel(data->cbdata);
     return TRUE;
