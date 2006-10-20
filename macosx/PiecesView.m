@@ -292,18 +292,21 @@
             else
             {
                 piecePercent = piecesPercent[index];
-                /*if (i==0)
-                    pieceImage = fBlue1Piece;
-                else if (i==1)
-                    pieceImage = fBlue2Piece;
-                else if (i==2)
-                    pieceImage = fBlue3Piece;
-                else if (i==3)
-                    pieceImage = fBlue4Piece;
-                else if (i==4)
-                    pieceImage = fBluePiece;
-                
-                else */if (piecePercent <= 0.0)
+                if (piecePercent >= 1.0)
+                {
+                    if (first || fPieces[index] == -2)
+                    {
+                        fPieces[index] = -1;
+                        pieceImage = fBluePiece;
+                    }
+                    else if (fPieces[index] != -1)
+                    {
+                        fPieces[index] = -2;
+                        pieceImage = fRedPiece;
+                    }
+                    else;
+                }
+                else if (piecePercent <= 0.0)
                 {
                     if (first || fPieces[index] != 0)
                     {
@@ -335,20 +338,12 @@
                         pieceImage = fBlue3Piece;
                     }
                 }
-                else if (piecePercent < 1.0)
+                else
                 {
                     if (first || fPieces[index] != 4)
                     {
                         fPieces[index] = 4;
                         pieceImage = fBlue4Piece;
-                    }
-                }
-                else
-                {
-                    if (first || fPieces[index] != 5)
-                    {
-                        fPieces[index] = 5;
-                        pieceImage = fBluePiece;
                     }
                 }
             }
