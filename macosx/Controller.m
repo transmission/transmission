@@ -54,7 +54,7 @@
 #define WINDOW_REGULAR_WIDTH    468.0
 
 #define UPDATE_UI_SECONDS           1.0
-#define AUTO_SPEED_LIMIT_SECONDS    10.0
+#define AUTO_SPEED_LIMIT_SECONDS    5.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
@@ -1328,13 +1328,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //toggle if within first few seconds of hour
     NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
     if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
-            && [currentDate hourOfDay] == (fSpeedLimitEnabled ? [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]
-                                            : [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]))
+            && [currentDate hourOfDay] == [fDefaults integerForKey: fSpeedLimitEnabled
+                                            ? @"SpeedLimitAutoOffHour" : @"SpeedLimitAutoOnHour"])
     {
         [self toggleSpeedLimit: nil];
         
-        [GrowlApplicationBridge notifyWithTitle: [@"Speed Limit Auto " stringByAppendingString: 
-            fSpeedLimitEnabled ? @"Enabled" : @"Disabled"] description: @"Bandwidth settings changed"
+        [GrowlApplicationBridge notifyWithTitle: fSpeedLimitEnabled
+            ? @"Speed Limit Auto Enabled" : @"Speed Limit Auto Disabled"
+            description: @"Bandwidth settings changed"
             notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
     }
 }

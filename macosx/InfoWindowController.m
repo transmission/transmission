@@ -45,6 +45,8 @@
 #define TAB_FILES_HEIGHT 260.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
+#define INVALID -99
+
 @interface InfoWindowController (Private)
 
 - (void) updateInfoActivity;
@@ -322,7 +324,7 @@
     {
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent = [enumerator nextObject]; //first torrent
-        const int INVALID = -99;
+        
         int ratioSetting = [torrent stopRatioSetting];
         float ratioLimit = [torrent ratioLimit];
         
