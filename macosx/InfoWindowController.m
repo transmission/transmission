@@ -47,7 +47,9 @@
 
 @interface InfoWindowController (Private)
 
-- (void) reloadPeerTable;
+- (void) updateInfoActivity;
+- (void) updateInfoPeers;
+
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
@@ -243,6 +245,15 @@
 
 - (void) updateInfoStats
 {
+    if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_ACTIVITY_IDENT])
+        [self updateInfoActivity];
+    else if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_PEERS_IDENT])
+        [self updateInfoPeers];
+    else;
+}
+
+- (void) updateInfoActivity
+{
     int numberSelected = [fTorrents count];
     if (numberSelected == 0)
         return;
@@ -261,7 +272,7 @@
     [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
-
+    
     if (numberSelected == 1)
     {
         torrent = [fTorrents objectAtIndex: 0];
@@ -272,29 +283,34 @@
         
         [fStateField setStringValue: [torrent stateString]];
         
-        int seeders = [torrent seeders], leechers = [torrent leechers];
-        [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
-        [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
-        
-        BOOL active = [torrent isActive];
-        
-        [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: @"%d (%d incoming)",
-                                                        [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
-        [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
-        [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
-        
         [fRatioField setStringValue: [NSString stringForRatioWithDownload: downloadedTotal upload: uploadedTotal]];
         
         [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
-        //set peers table if visible
-        if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_PEERS_IDENT])
-            [self reloadPeerTable];
-        
-        //update pieces view if visible
-        if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_ACTIVITY_IDENT])
-            [fPiecesView updateView: NO];
+        [fPiecesView updateView: NO];
     }
+}
+
+- (void) updateInfoPeers
+{
+    if ([fTorrents count] != 1)
+        return;
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    int seeders = [torrent seeders], leechers = [torrent leechers];
+    [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
+    [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
+    
+    BOOL active = [torrent isActive];
+    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: @"%d (%d incoming)",
+                                                    [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
+    [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
+    [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
+    
+    [fPeers setArray: [torrent peers]];
+    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+    
+    [fPeerTable reloadData];
 }
 
 - (void) updateInfoSettings
@@ -356,17 +372,6 @@
     [self updateInfoStats];
 }
 
-//requires a non-empty torrent array
-- (void) reloadPeerTable
-{
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    [fPeers setArray: [torrent peers]];
-    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
-    
-    [fPeerTable reloadData];
-}
-
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
@@ -394,19 +399,17 @@
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
 {
+    [self updateInfoStats];
+    
     float height;
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
     {
         height = TAB_ACTIVITY_HEIGHT;
-        
         [fPiecesView updateView: YES];
     }
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
     {
         height = TAB_PEERS_HEIGHT;
-        
-        if ([fTorrents count] == 1)
-            [self reloadPeerTable]; //initial update of peer table
     }
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
         height = TAB_FILES_HEIGHT;
