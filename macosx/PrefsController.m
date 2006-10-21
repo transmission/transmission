@@ -68,6 +68,13 @@
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;
         
+        //checks for old version upload speed of -1
+        if ([fDefaults integerForKey: @"UploadLimit"] < 0)
+        {
+            [fDefaults setInteger: 20 forKey: @"UploadLimit"];
+            [fDefaults setBool: NO forKey: @"CheckUpload"];
+        }
+        
         [[self window] update]; //make sure nib is loaded right away
     }
     return self;
@@ -136,13 +143,6 @@
     [self updateNatStatus];
     fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
-    
-    //checks for old version upload speed of -1
-    if ([fDefaults integerForKey: @"UploadLimit"] < 0)
-    {
-        [fDefaults setInteger: 20 forKey: @"UploadLimit"];
-        [fDefaults setBool: NO forKey: @"CheckUpload"];
-    }
     
     //set upload limit
     BOOL checkUpload = [fDefaults boolForKey: @"CheckUpload"];

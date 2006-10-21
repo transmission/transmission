@@ -59,14 +59,20 @@
 
 @implementation InfoWindowController
 
+- (id) initWithWindowNibName: (NSString *) name
+{
+    if ((self = [super initWithWindowNibName: name]))
+    {
+        fAppIcon = [[NSApp applicationIconImage] copy];
+        fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
+        fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
+        fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];    
+    }
+    return self;
+}
+
 - (void) awakeFromNib
 {
-    fAppIcon = [[NSApp applicationIconImage] copy];
-    fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
-    fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
-    fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];
-    
-    fTorrents = [[NSArray alloc] init];
     fPeers = [[NSMutableArray alloc] initWithCapacity: 30];
     fFiles = [[NSMutableArray alloc] initWithCapacity: 6];
     [fFileTable setDoubleAction: @selector(revealFile:)];
@@ -107,7 +113,8 @@
 
 - (void) updateInfoForTorrents: (NSArray *) torrents
 {
-    [fTorrents release];
+    if (fTorrents)
+        [fTorrents release];
     fTorrents = [torrents retain];
 
     int numberSelected = [fTorrents count];

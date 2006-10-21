@@ -72,6 +72,8 @@
 
 - (void) awakeFromNib
 {
+    [[self window] center];
+    
     int level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
     if (level == TR_MSG_ERR)
         [fLevelButton selectItemAtIndex: LEVEL_ERROR];
