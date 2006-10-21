@@ -1,0 +1,433 @@
+# $Id$
+#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-06-18 00:33-0700\n"
+"PO-Revision-Date: 2006-10-21 04:41+0200\n"
+"Last-Translator: Mircea Suciu <mircea@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: conf.c:95 conf.c:374
+#, c-format
+msgid ""
+"Failed to open the file %s for writing:\n"
+"%s"
+msgstr ""
+"Nu s-a putut deschide fişierul %s pentru scriere:\n"
+"%s"
+
+#: conf.c:110
+#, c-format
+msgid "Another copy of %s is already running."
+msgstr "Deja rulează o instanţă a %s."
+
+#: conf.c:113
+#, c-format
+msgid ""
+"Failed to lock the file %s:\n"
+"%s"
+msgstr ""
+"Nu s-a putut bloca fişierul %s:\n"
+"%s"
+
+#: conf.c:136 dialogs.c:137
+#, c-format
+msgid ""
+"Failed to create the directory %s:\n"
+"%s"
+msgstr ""
+"Nu s-a putut crea directorul %s:\n"
+"%s"
+
+#: conf.c:209
+#, c-format
+msgid ""
+"Failed to open the file %s for reading:\n"
+"%s"
+msgstr ""
+"Nu s-a putut deschide fişierul %s pentru citire:\n"
+"%s"
+
+#: conf.c:216
+#, c-format
+msgid ""
+"Error while reading from the file %s:\n"
+"%s"
+msgstr ""
+"Eroare la citire din fişierul %s:\n"
+"%s"
+
+#: conf.c:388
+#, c-format
+msgid ""
+"Error while writing to the file %s:\n"
+"%s"
+msgstr ""
+"Eroare la scriere în fişierul %s:\n"
+"%s"
+
+#: conf.c:394
+#, c-format
+msgid ""
+"Failed to rename the file %s to %s:\n"
+"%s"
+msgstr ""
+"Nu s-a putut redenumi fişierul %s în %s:\n"
+"%s"
+
+#: dialogs.c:174
+#, c-format
+msgid "%s Preferences"
+msgstr "Preferinţe %s"
+
+#: dialogs.c:183 dialogs.c:407
+msgid "Choose a download directory"
+msgstr "Alegeţi un director pentru downloaduri"
+
+#: dialogs.c:192
+msgid "_Limit download speed"
+msgstr "_Limitaţi viteza de download"
+
+#: dialogs.c:194
+msgid "Maximum _download speed:"
+msgstr "Viteza maximă de _download:"
+
+#: dialogs.c:196
+msgid "Li_mit upload speed"
+msgstr "Li_mitaţi viteza de upload"
+
+#: dialogs.c:198
+msgid "Maximum _upload speed:"
+msgstr "Viteza maximă de _upload:"
+
+#. directory label and chooser
+#: dialogs.c:246
+msgid "Download di_rectory:"
+msgstr "Director downloaduri:"
+
+#. port label and entry
+#: dialogs.c:255
+msgid "Listening _port:"
+msgstr "Port:"
+
+#: dialogs.c:268
+msgid "Use the torrent file where it is"
+msgstr "Foloseşte torrent-ul din locaţia curentă"
+
+#: dialogs.c:271
+msgid "Keep a copy of the torrent file"
+msgstr "Păstrează o copie a torrent-ului"
+
+#: dialogs.c:274
+msgid "Keep a copy and remove the original"
+msgstr "Păstrează o copie şi şterge din locaţia curentă"
+
+#. std
+#: dialogs.c:277
+msgid "For torrents added _normally:"
+msgstr "Pentru torrente adăugate _normal:"
+
+#: dialogs.c:291
+msgid ""
+"For torrents added e_xternally\n"
+"(via the command-line):"
+msgstr ""
+"Pnetru torrente adăugate e_xtern\n"
+"(via linie de comandă):"
+
+#: dialogs.c:394
+msgid "Add a Torrent"
+msgstr "Adăugaţi un torrent"
+
+#: dialogs.c:401
+msgid "Automatically _start torrent"
+msgstr "Porniţi automat torrent-ul"
+
+#: dialogs.c:403
+msgid "Use alternate _download directory"
+msgstr "Folosiţi director alternativ pentru downloaduri"
+
+#: dialogs.c:432
+msgid "Torrent files"
+msgstr "Torrente"
+
+#: dialogs.c:434
+msgid "All files"
+msgstr "Toate fişierele"
+
+#: dialogs.c:542
+#, c-format
+msgid "%s Properties"
+msgstr "Proprietăţi %s"
+
+#: dialogs.c:567 dialogs.c:570
+msgid "Tracker:"
+msgstr "Tracker:"
+
+#: dialogs.c:572
+msgid "Announce:"
+msgstr "Announce:"
+
+#: dialogs.c:573
+msgid "Piece Size:"
+msgstr "Dimensiune piesă:"
+
+#: dialogs.c:574
+msgid "Pieces:"
+msgstr "Piese:"
+
+#: dialogs.c:575
+msgid "Total Size:"
+msgstr "Dimensiune totală:"
+
+#: dialogs.c:577 dialogs.c:579
+msgid "Seeders:"
+msgstr "Seederi:"
+
+#: dialogs.c:577 dialogs.c:581
+msgid "?"
+msgstr "?"
+
+#: dialogs.c:581 dialogs.c:583
+msgid "Leechers:"
+msgstr "Leecheri:"
+
+#: dialogs.c:587
+msgid "Directory:"
+msgstr "Director:"
+
+#: dialogs.c:588
+msgid "Downloaded:"
+msgstr "Downloadat:"
+
+#: dialogs.c:589
+msgid "Uploaded:"
+msgstr "Uploadat:"
+
+#: ipc.c:208
+#, c-format
+msgid ""
+"Failed to set up socket:\n"
+"%s"
+msgstr ""
+"Nu s-a putut seta socket-ul:\n"
+"%s"
+
+#: ipc.c:229
+#, c-format
+msgid "failed to create socket: %s\n"
+msgstr "nu s-a putut crea socket-ul: %s\n"
+
+#: ipc.c:238
+#, c-format
+msgid "failed to connect to %s: %s\n"
+msgstr "nu s-a putut efectua conexiunea la %s\n"
+
+#: ipc.c:403
+#, c-format
+msgid "bad IPC protocol version\n"
+msgstr "versiune incorectă a protocolului IPC\n"
+
+#: main.c:150
+msgid "Add"
+msgstr "Adăugaţi"
+
+#: main.c:151
+msgid "Add a new torrent"
+msgstr "Adaugă un torrent nou"
+
+#: main.c:152
+msgid "Start"
+msgstr "Porniţi"
+
+#: main.c:154
+msgid "Start a torrent that is not running"
+msgstr "Porneşte un torrent ce nu rulează"
+
+#: main.c:155
+msgid "Stop"
+msgstr "Opriţi"
+
+#: main.c:157
+msgid "Stop a torrent that is running"
+msgstr "Opreşte un torrent ce rulează"
+
+#: main.c:158
+msgid "Remove"
+msgstr "Ştergeţi"
+
+#: main.c:159
+msgid "Remove a torrent"
+msgstr "Şterge un torrent"
+
+#: main.c:160
+msgid "Properties"
+msgstr "Proprietăţi"
+
+#: main.c:161
+msgid "Show additional information about a torrent"
+msgstr "Afişează informaţii suplimentare despre un torrent"
+
+#: main.c:162
+msgid "Preferences"
+msgstr "Preferinţe"
+
+#: main.c:163
+msgid "Customize application behavior"
+msgstr "Personalizează comportamentul aplicaţiei"
+
+#: main.c:200
+msgid "Transmission"
+msgstr "Transmission"
+
+#: main.c:453
+msgid "Name"
+msgstr "Nume"
+
+#. this string is only used to determing the size of the progress bar
+#: main.c:461
+msgid "  fnord    fnord  "
+msgstr "i can see the fnords"
+
+#: main.c:464
+msgid "Progress"
+msgstr "Progres"
+
+#: main.c:700
+#, c-format
+msgid "Checking existing files (%.1f%%)"
+msgstr "Se verifică fişierele existente (%.1f%%)"
+
+#: main.c:703
+#, c-format
+msgid "Finishing in --:--:-- (%.1f%%)"
+msgstr "Închieiere în --:--:-- (%.1f%%)"
+
+#: main.c:705
+#, c-format
+msgid "Finishing in %02i:%02i:%02i (%.1f%%)"
+msgstr "Închieiere în %02i:%02i:%02i (%.1f%%)"
+
+#: main.c:709
+#, c-format
+msgid "Seeding, uploading to %d of %d peer"
+msgid_plural "Seeding, uploading to %d of %d peers"
+msgstr[0] "La seed, se uploadează către %d din %d peer"
+msgstr[1] "La seed, se uploadează către %d din %d peeri"
+
+#: main.c:713
+msgid "Stopping..."
+msgstr "Se opreşte..."
+
+#: main.c:715
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Oprit (%.1f%%)"
+
+#: main.c:723
+msgid "Error: "
+msgstr "Eroare:"
+
+#: main.c:727
+#, c-format
+msgid "Downloading from %i of %i peer"
+msgid_plural "Downloading from %i of %i peers"
+msgstr[0] "La leech, se downloadează de la %i din %i peer"
+msgstr[1] "La leech, se downloadează de la %i din %i peeri"
+
+#: main.c:761
+#, c-format
+msgid ""
+"Ratio: %s\n"
+"UL: %s/s"
+msgstr ""
+"Ratio: %s\n"
+"UL: %s/s"
+
+#: main.c:764
+#, c-format
+msgid ""
+"DL: %s/s\n"
+"UL: %s/s"
+msgstr ""
+"DL: %s/s\n"
+"UL: %s/s"
+
+#: main.c:810
+#, c-format
+msgid "     Total DL: %s/s     Total UL: %s/s"
+msgstr "     Total DL: %s/s     Total UL: %s/s"
+
+#: main.c:1081
+#, c-format
+msgid ""
+"Failed to load torrent file:\n"
+"%s"
+msgid_plural ""
+"Failed to load torrent files:\n"
+"%s"
+msgstr[0] ""
+"Nu s-a putut încărca torrent-ul:\n"
+"%s"
+msgstr[1] ""
+"Nu s-au putut încărca torrentele:\n"
+"%s"
+
+#: tr_torrent.c:290
+#, c-format
+msgid "%s: not a valid torrent file"
+msgstr "%s: torrent invalid"
+
+#: tr_torrent.c:293
+#, c-format
+msgid "%s: torrent is already open"
+msgstr "%s: torrent-ul este deja deschis"
+
+#: util.c:67
+msgid "B"
+msgstr "B"
+
+#: util.c:67
+msgid "KiB"
+msgstr "KiB"
+
+#: util.c:67
+msgid "MiB"
+msgstr "MiB"
+
+#: util.c:67
+msgid "GiB"
+msgstr "GiB"
+
+#: util.c:67
+msgid "TiB"
+msgstr "TiB"
+
+#: util.c:67
+msgid "PiB"
+msgstr "PiB"
+
+#: util.c:67
+msgid "EiB"
+msgstr "EiB"
+
+#: util.c:92
+msgid "N/A"
+msgstr "indisp."
+
+#. this is a UTF-8 infinity symbol
+#: util.c:96
+msgid "∞"
+msgstr "∞"
+
