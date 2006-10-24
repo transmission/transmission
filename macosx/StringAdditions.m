@@ -44,24 +44,24 @@
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)
-        return [NSString stringWithFormat: @"%lld bytes", size];
+        return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
 
     float convertedSize = (float) size;
     NSString * unit;
     if (size < 1048576)
     {
         convertedSize /= 1024.0;
-        unit = @" KB";
+        unit = NSLocalizedString(@" KB", "File size (beware of leading space)");
     }
     else if (size < 1073741824)
     {
         convertedSize /= 1048576.0;
-        unit = @" MB";
+        unit = NSLocalizedString(@" MB", "File size (beware of leading space)");
     }
     else
     {
         convertedSize /= 1073741824.0;
-        unit = @" GB";
+        unit = NSLocalizedString(@" GB", "File size (beware of leading space)");
     }
 
     NSString * sizeString;
@@ -78,7 +78,7 @@
 
 + (NSString *) stringForSpeed: (float) speed
 {
-    return [[self stringForSpeedAbbrev: speed] stringByAppendingString: @"B/s"];
+    return [[self stringForSpeedAbbrev: speed] stringByAppendingString: NSLocalizedString(@"B/s", "Transfer speed (Bytes per second)")];
 }
 
 + (NSString *) stringForSpeedAbbrev: (float) speed

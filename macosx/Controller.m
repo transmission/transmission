@@ -201,8 +201,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                         ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
     }
 
-    [fActionButton setToolTip: @"Shortcuts for changing global settings."];
-    [fSpeedLimitButton setToolTip: @"Speed Limit overrides the total bandwidth limits with its own limits."];
+    [fActionButton setToolTip: NSLocalizedString(@"Shortcuts for changing global settings.", "Main window -> 1st bottom left button (action) tooltip")];
+    [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.", "Main window -> 2nd bottom left button (turtle) tooltip")];
 
     [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
@@ -277,7 +277,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [currentFilterButton setEnabled: YES];
     
     //set upload limit action button
-    [fUploadLimitItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)",
+    [fUploadLimitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)", "Action context menu -> upload limit"),
                     [fDefaults integerForKey: @"UploadLimit"]]];
     if ([fDefaults boolForKey: @"CheckUpload"])
         [fUploadLimitItem setState: NSOnState];
@@ -285,7 +285,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fUploadNoLimitItem setState: NSOnState];
 
 	//set download limit action menu
-    [fDownloadLimitItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)",
+    [fDownloadLimitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)", "Action context menu -> download limit"),
                     [fDefaults integerForKey: @"DownloadLimit"]]];
     if ([fDefaults boolForKey: @"CheckDownload"])
         [fDownloadLimitItem setState: NSOnState];
@@ -293,7 +293,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fDownloadNoLimitItem setState: NSOnState];
     
     //set ratio action menu
-    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.2f)",
+    [fRatioSetItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)", "Action context menu -> ratio stop"),
                                 [fDefaults floatForKey: @"RatioLimit"]]];
     if ([fDefaults boolForKey: @"RatioCheck"])
         [fRatioSetItem setState: NSOnState];
@@ -394,11 +394,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0)
         {
             NSString * message = active == 1
-                ? @"There is an active transfer. Do you really want to quit?"
+                ? NSLocalizedString(@"There is an active transfer. Do you really want to quit?", "Confirm Quit panel -> message")
                 : [NSString stringWithFormat:
-                    @"There are %d active transfers. Do you really want to quit?", active];
+                    NSLocalizedString(@"There are %d active transfers. Do you really want to quit?", "Confirm Quit panel -> message"), active];
 
-            NSBeginAlertSheet(@"Confirm Quit", @"Quit", @"Cancel", nil, fWindow, self,
+            NSBeginAlertSheet(NSLocalizedString(@"Confirm Quit", "Confirm Quit panel -> title"), NSLocalizedString(@"Quit", "Confirm Quit panel -> button"), NSLocalizedString(@"Cancel", "Confirm Quit panel -> button"), nil, fWindow, self,
                                 @selector(quitSheetDidEnd:returnCode:contextInfo:), nil, nil, message);
             return NSTerminateLater;
         }
@@ -541,7 +541,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
 
-    [panel setMessage: [NSString stringWithFormat: @"Select the download folder for \"%@\"", [torrent name]]];
+    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"", "Open torrent -> select destination folder"), [torrent name]]];
     
     NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrent, @"Torrent", files, @"Files", nil];
 
@@ -725,25 +725,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             int selected = [fTableView numberOfSelectedRows];
             if (selected == 1)
             {
-                title = [NSString stringWithFormat: @"Comfirm Removal of \"%@\"",
+                title = [NSString stringWithFormat: NSLocalizedString(@"Confirm Removal of \"%@\"", "Removal confirm panel -> title"),
                             [[fDisplayedTorrents objectAtIndex: [fTableView selectedRow]] name]];
-                message = @"This transfer is active."
+                message = NSLocalizedString(@"This transfer is active."
                             " Once removed, continuing the transfer will require the torrent file."
-                            " Do you really want to remove it?";
+                            " Do you really want to remove it?", "Removal confirm panel -> message");
             }
             else
             {
-                title = [NSString stringWithFormat: @"Comfirm Removal of %d Transfers", selected];
+                title = [NSString stringWithFormat: NSLocalizedString(@"Confirm Removal of %d Transfers", "Removal confirm panel -> title"), selected];
                 if (selected == active)
-                    message = [NSString stringWithFormat: @"There are %d active transfers.", active];
+                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers.", "Removal confirm panel -> message part 1"), active];
                 else
-                    message = [NSString stringWithFormat: @"There are %d transfers (%d active).", selected, active];
+                    message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).", "Removal confirm panel -> message part 1"), selected, active];
                 message = [message stringByAppendingString:
-                    @" Once removed, continuing the transfers will require the torrent files."
-                    " Do you really want to remove them?"];
+                    NSLocalizedString(@" Once removed, continuing the transfers will require the torrent files."
+                    " Do you really want to remove them?", "Removal confirm panel -> message part 2")];
             }
 
-            NSBeginAlertSheet(title, @"Remove", @"Cancel", nil, fWindow, self,
+            NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"), NSLocalizedString(@"Cancel", "Removal confirm panel -> button"), nil, fWindow, self,
                 nil, @selector(removeSheetDidEnd:returnCode:contextInfo:), dict, message);
             return;
         }
@@ -864,10 +864,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![[NSFileManager defaultManager] fileExistsAtPath: [torrent torrentLocation]])
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle: @"OK"];
-        [alert setMessageText: [NSString stringWithFormat: @"Copy of \"%@\" Cannot Be Created", [torrent name]]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file copy alert -> button")];
+        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Copy of \"%@\" Cannot Be Created", "Torrent file copy alert -> title"), [torrent name]]];
         [alert setInformativeText: [NSString stringWithFormat: 
-                @"The torrent file (%@) cannot be found.", [torrent torrentLocation]]];
+                NSLocalizedString(@"The torrent file (%@) cannot be found.", "Torrent file copy alert -> message"), [torrent torrentLocation]]];
         [alert setAlertStyle: NSWarningAlertStyle];
         
         [alert runModal];
@@ -960,8 +960,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     tr_torrentRates(fLib, & downloadRate, & uploadRate);
     if (![fStatusBar isHidden])
     {
-        [fTotalDLField setStringValue: [@"Total DL: " stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
-        [fTotalULField setStringValue: [@"Total UL: " stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
+        [fTotalDLField setStringValue: [NSLocalizedString(@"Total DL: ", "Status bar -> total download") stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
+        [fTotalULField setStringValue: [NSLocalizedString(@"Total UL: ", "Status bar -> total upload") stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
     }
 
     //update non-constant parts of info window
@@ -986,7 +986,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [sound play];
     }
 
-    [GrowlApplicationBridge notifyWithTitle: @"Download Complete" description: [torrent name]
+    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title") description: [torrent name]
         notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
 
     if (![fWindow isKeyWindow])
@@ -1228,7 +1228,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [totalTorrentsString appendFormat: @"%d/", [fDisplayedTorrents count]];
     
     int totalCount = [fTorrents count];
-    [totalTorrentsString appendFormat: @"%d Transfer%s", totalCount, totalCount == 1 ? "" : "s"];
+    if (totalCount > 1)
+        [totalTorrentsString appendFormat: NSLocalizedString(@"%d Transfers", "Status bar transfer count"), totalCount];
+    else
+        [totalTorrentsString appendFormat: NSLocalizedString(@"%d Transfer", "Status bar transfer count"), totalCount];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
 
@@ -1334,8 +1337,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self toggleSpeedLimit: nil];
         
         [GrowlApplicationBridge notifyWithTitle: fSpeedLimitEnabled
-            ? @"Speed Limit Auto Enabled" : @"Speed Limit Auto Disabled"
-            description: @"Bandwidth settings changed"
+                ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
+                : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
+            description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
             notificationName: GROWL_AUTO_SPEED_LIMIT iconData: nil priority: 0 isSticky: NO clickContext: nil];
     }
 }
@@ -1372,7 +1376,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [limitItem setState: enable ? NSOnState : NSOffState];
     [noLimitItem setState: !enable ? NSOnState : NSOffState];
     
-    [limitItem setTitle: [NSString stringWithFormat: @"Limit (%d KB/s)",
+    [limitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)", "Action context menu -> upload/download limit"),
                             [[dict objectForKey: @"Limit"] intValue]]];
 
     [dict release];
@@ -1396,7 +1400,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fRatioSetItem setState: enable ? NSOnState : NSOffState];
     [fRatioNotSetItem setState: !enable ? NSOnState : NSOffState];
     
-    [fRatioSetItem setTitle: [NSString stringWithFormat: @"Stop at Ratio (%.2f)",
+    [fRatioSetItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)", "Action context menu -> ratio stop"),
                             [[dict objectForKey: @"Ratio"] floatValue]]];
 
     [dict release];
@@ -1487,7 +1491,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [sound play];
     }
     
-    [GrowlApplicationBridge notifyWithTitle: @"Seeding Complete" description: [[notification object] name]
+    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title") description: [[notification object] name]
         notificationName: GROWL_SEEDING_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
 }
 
@@ -1597,7 +1601,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
-                [GrowlApplicationBridge notifyWithTitle: @"Torrent File Auto Added" description: file
+                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added", "Growl notification title") description: file
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
         }
     }
@@ -1912,72 +1916,72 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     if ([ident isEqualToString: TOOLBAR_OPEN])
     {
-        [item setLabel: @"Open"];
-        [item setPaletteLabel: @"Open Torrent Files"];
-        [item setToolTip: @"Open torrent files"];
+        [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"Open.png"]];
         [item setTarget: self];
         [item setAction: @selector(openShowSheet:)];
     }
     else if ([ident isEqualToString: TOOLBAR_REMOVE])
     {
-        [item setLabel: @"Remove"];
-        [item setPaletteLabel: @"Remove Selected"];
-        [item setToolTip: @"Remove selected transfers"];
+        [item setLabel: NSLocalizedString(@"Remove", "Remove toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
         [item setAction: @selector(removeNoDelete:)];
     }
     else if ([ident isEqualToString: TOOLBAR_INFO])
     {
-        [item setLabel: @"Inspector"];
-        [item setPaletteLabel: @"Toggle Inspector"];
-        [item setToolTip: @"Toggle the torrent inspector"];
+        [item setLabel: NSLocalizedString(@"Inspector", "Inspector toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_ALL])
     {
-        [item setLabel: @"Pause All"];
+        [item setLabel: NSLocalizedString(@"Pause All", "Pause All toolbar item -> label")];
         [item setPaletteLabel: [item label]];
-        [item setToolTip: @"Pause all transfers"];
+        [item setToolTip: NSLocalizedString(@"Pause all transfers", "Pause All toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"PauseAll.png"]];
         [item setTarget: self];
         [item setAction: @selector(stopAllTorrents:)];
     }
     else if ([ident isEqualToString: TOOLBAR_RESUME_ALL])
     {
-        [item setLabel: @"Resume All"];
+        [item setLabel: NSLocalizedString(@"Resume All", "Resume All toolbar item -> label")];
         [item setPaletteLabel: [item label]];
-        [item setToolTip: @"Resume all transfers"];
+        [item setToolTip: NSLocalizedString(@"Resume all transfers", "Resume All toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"ResumeAll.png"]];
         [item setTarget: self];
         [item setAction: @selector(resumeAllTorrents:)];
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
-        [item setLabel: @"Pause"];
-        [item setPaletteLabel: @"Pause Selected"];
-        [item setToolTip: @"Pause selected transfers"];
+        [item setLabel: NSLocalizedString(@"Pause", "Pause toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Pause Selected", "Pause toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Pause selected transfers", "Pause toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector(stopSelectedTorrents:)];
     }
     else if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
-        [item setLabel: @"Resume"];
-        [item setPaletteLabel: @"Resume Selected"];
-        [item setToolTip: @"Resume selected transfers"];
+        [item setLabel: NSLocalizedString(@"Resume", "Resume toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Resume Selected", "Resume toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Resume selected transfers", "Resume toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
         [item setTarget: self];
         [item setAction: @selector(resumeSelectedTorrents:)];
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
-        [item setLabel: @"Filter"];
-        [item setPaletteLabel: @"Toggle Filter"];
-        [item setToolTip: @"Toggle the filter bar"];
+        [item setLabel: NSLocalizedString(@"Filter", "Filter toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"Filter.png"]];
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
@@ -2096,7 +2100,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable show info
     if (action == @selector(showInfo:))
     {
-        NSString * title = [[fInfoController window] isVisible] ? @"Hide Inspector" : @"Show Inspector";
+        NSString * title = [[fInfoController window] isVisible] ? NSLocalizedString(@"Hide Inspector", "View menu -> Inspector") : NSLocalizedString(@"Show Inspector", "View menu -> Inspector");
         if (![[menuItem title] isEqualToString: title])
                 [menuItem setTitle: title];
 
@@ -2110,7 +2114,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable toggle status bar
     if (action == @selector(toggleStatusBar:))
     {
-        NSString * title = [fStatusBar isHidden] ? @"Show Status Bar" : @"Hide Status Bar";
+        NSString * title = [fStatusBar isHidden] ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar") : NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
         if (![[menuItem title] isEqualToString: title])
             [menuItem setTitle: title];
 
@@ -2120,7 +2124,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable toggle filter bar
     if (action == @selector(toggleFilterBar:))
     {
-        NSString * title = [fFilterBar isHidden] ? @"Show Filter Bar" : @"Hide Filter Bar";
+        NSString * title = [fFilterBar isHidden] ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") : NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
         if (![[menuItem title] isEqualToString: title])
             [menuItem setTitle: title];
 

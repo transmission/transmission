@@ -37,10 +37,10 @@
 #define UPDATE_WEEKLY   1
 #define UPDATE_NEVER    2
 
-#define TOOLBAR_GENERAL     @"General"
-#define TOOLBAR_TRANSFERS   @"Transfers"
-#define TOOLBAR_BANDWIDTH   @"Bandwidth"
-#define TOOLBAR_NETWORK     @"Network"
+#define TOOLBAR_GENERAL     NSLocalizedString(@"General", "Preferences -> General toolbar item title")
+#define TOOLBAR_TRANSFERS   NSLocalizedString(@"Transfers", "Preferences -> Transfers toolbar item title")
+#define TOOLBAR_BANDWIDTH   NSLocalizedString(@"Bandwidth", "Preferences -> Bandwidth toolbar item title")
+#define TOOLBAR_NETWORK     NSLocalizedString(@"Network", "Preferences -> Network toolbar item title")
 
 @interface PrefsController (Private)
 
@@ -377,7 +377,7 @@
         //NSXML features are unfortunately only available since Mac OS X v10.4
         PortChecker * checker = [[PortChecker alloc] initWithDelegate: self];
 
-        [fPortStatusField setStringValue: [@"Checking port status" stringByAppendingEllipsis]];
+        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status") stringByAppendingEllipsis]];
         [fPortStatusProgress startAnimation: self];
         
         [checker probePort: [fDefaults integerForKey: @"BindPort"]];
@@ -390,19 +390,19 @@
     switch ([portChecker status])
     {
         case PORT_STATUS_OPEN:
-            [fPortStatusField setStringValue: @"Port is open"];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
             break;
         case PORT_STATUS_STEALTH:
-            [fPortStatusField setStringValue: @"Port is stealth"];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
             break;
         case PORT_STATUS_CLOSED:
-            [fPortStatusField setStringValue: @"Port is closed"];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: @"Unable to check port status"];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status", "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.tiff"]];
             break;
     }
@@ -427,12 +427,12 @@
     
     if (status == 2)
     {
-        [fNatStatusField setStringValue: @"Port successfully mapped"];
+        [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped", "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
     }
     else if (status == 3 || status == 4)
     {
-        [fNatStatusField setStringValue: @"Error mapping port"];
+        [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port", "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
     }
     else

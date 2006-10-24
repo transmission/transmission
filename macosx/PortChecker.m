@@ -95,8 +95,15 @@
         NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
         if ([nodes count] != 1)
         {
-            NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
-            [self callBackWithStatus: PORT_STATUS_ERROR];
+            NSArray * title = [shieldsUpProbe nodesForXPath: @"/html/head/title" error: nil];
+            // This may happen when we probe twice too quickly
+            if ([title count] > 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
+                                                                    @"NanoProbe System Already In Use"])
+            {
+                NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
+                [[shieldsUpProbe XMLData] writeToFile: @"/tmp/shieldsUpProbe.html" atomically: YES];
+                [self callBackWithStatus: PORT_STATUS_ERROR];
+            }
         }
         else
         {

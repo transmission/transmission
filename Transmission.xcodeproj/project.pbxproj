@@ -92,6 +92,7 @@
 		A21610FC0A050B1700E8E4C1 /* MenuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A21610FB0A050B1700E8E4C1 /* MenuButton.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
+		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */; };
 		A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */; };
 		A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */; };
@@ -316,6 +317,7 @@
 		A21610FB0A050B1700E8E4C1 /* MenuButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MenuButton.m; path = macosx/MenuButton.m; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
+		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarWhite.png; path = macosx/Images/ProgressBarWhite.png; sourceTree = "<group>"; };
 		A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarBlue.png; path = macosx/Images/ProgressBarBlue.png; sourceTree = "<group>"; };
 		A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGray.png; path = macosx/Images/ProgressBarGray.png; sourceTree = "<group>"; };
@@ -496,6 +498,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
@@ -852,6 +855,7 @@
 				35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */,
 				35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */,
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
+				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,6 +971,14 @@
 				A21567EC0A9A5034004DECD6 /* English */,
 			);
 			name = MessageWindow.nib;
+			sourceTree = "<group>";
+		};
+		A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A22A8D550AEEAFA5007E9CB9 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		A2912C520A2956E80097A0CA /* PrefsWindow.nib */ = {

@@ -122,7 +122,7 @@
     {
         if (numberSelected > 0)
         {
-            [fNameField setStringValue: [NSString stringWithFormat: @"%d Torrents Selected", numberSelected]];
+            [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected", "Inspector -> above tabs -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
             NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -130,13 +130,13 @@
             while ((torrent = [enumerator nextObject]))
                 size += [torrent size];
             
-            [fSizeField setStringValue: [[NSString stringForFileSize: size] stringByAppendingString: @" Total"]];
+            [fSizeField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ Total", "Inspector -> above tabs -> total size (several torrents selected)"), [NSString stringForFileSize: size]]];
         }
         else
         {
-            [fNameField setStringValue: @"No Torrents Selected"];
+            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
             [fSizeField setStringValue: @""];
-
+    
             [fDownloadedValidField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
@@ -241,12 +241,14 @@
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
             [fFiles addObjectsFromArray: [torrent fileList]];
-    
-        [fFileTableStatusField setStringValue: [NSString stringWithFormat: @"%d file%s", [fFiles count],
-                                                [fFiles count] == 1 ? "" : "s"]];
+        
+        if ([fFiles count] > 1)
+            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
+        else
+            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d file", "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
     }
     else
-        [fFileTableStatusField setStringValue: @"info not available"];
+        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Files tab -> bottom text (number of files)")];
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
@@ -311,7 +313,7 @@
     [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
     
     BOOL active = [torrent isActive];
-    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: @"%d (%d incoming)",
+    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: NSLocalizedString(@"%d (%d incoming)", "Inspector -> Peers tab -> connected"),
                                                     [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
     [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
@@ -525,13 +527,17 @@
     {
         NSDictionary * file = [fFiles objectAtIndex: row];
         if ([[column identifier] isEqualToString: @"Size"])
-            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: @" bytes"];
+            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes", "Inspector -> Files tab -> table row tooltip")];
         else
             return [file objectForKey: @"Name"];
     }
     else if (tableView == fPeerTable)
-        return [NSString stringWithFormat: @"From %@ connection",
-                [[[fPeers objectAtIndex: row] objectForKey: @"Incoming"] boolValue] ? @"incoming" : @"outgoing"];
+    {
+        if ([[[fPeers objectAtIndex: row] objectForKey: @"Incoming"] boolValue])
+            return NSLocalizedString(@"From incoming connection", "Inspector -> Peers tab -> table row tooltip");
+        else
+            return NSLocalizedString(@"From outgoing connection", "Inspector -> Peers tab -> table row tooltip"); 
+    }
     else
         return nil;
 }

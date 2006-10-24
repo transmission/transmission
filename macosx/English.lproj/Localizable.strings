@@ -1,0 +1,362 @@
+/* Action context menu -> ratio stop */
+"Stop at Ratio (%.2f)" = "Stop at Ratio (%.2f)";
+
+/* Action context menu -> upload/download limit
+   Action context menu -> upload limit
+   Action context menu -> download limit */
+"Limit (%d KB/s)" = "Limit (%d KB/s)";
+
+/* Confirm Quit panel -> button */
+"Quit" = "Quit";
+
+/* Confirm Quit panel -> message */
+"There are %d active transfers. Do you really want to quit?" = "There are %d active transfers. Do you really want to quit?";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer. Do you really want to quit?" = "There is an active transfer. Do you really want to quit?";
+
+/* Confirm Quit panel -> title */
+"Confirm Quit" = "Confirm Quit";
+
+/* File size (beware of leading space) */
+" GB" = " GB";
+
+/* File size (beware of leading space) */
+" KB" = " KB";
+
+/* File size (beware of leading space) */
+" MB" = " MB";
+
+/* File size */
+"%lld bytes" = "%lld bytes";
+
+/* Filter toolbar item -> label */
+"Filter" = "Filter";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Toggle Filter";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Toggle the filter bar";
+
+/* Growl notification description */
+"Bandwidth settings changed" = "Bandwidth settings changed";
+
+/* Growl notification title */
+"Download Complete" = "Download Complete";
+
+/* Growl notification title */
+"Seeding Complete" = "Seeding Complete";
+
+/* Growl notification title */
+"Speed Limit Auto Disabled" = "Speed Limit Auto Disabled";
+
+/* Growl notification title */
+"Speed Limit Auto Enabled" = "Speed Limit Auto Enabled";
+
+/* Growl notification title */
+"Torrent File Auto Added" = "Torrent File Auto Added";
+
+/* Inspector -> Activity -> detailed pieces view tooltip */
+"Piece Availability" = "Piece Availability";
+
+/* Inspector -> Activity -> detailed pieces view tooltip */
+"Piece Progress" = "Piece Progress";
+
+/* Inspector -> Files tab -> bottom text (number of files) */
+"%d file" = "%d file";
+
+/* Inspector -> Files tab -> bottom text (number of files) */
+"%d files" = "%d files";
+
+/* Inspector -> Files tab -> bottom text (number of files) */
+"info not available" = "info not available";
+
+/* Inspector -> Files tab -> table row tooltip */
+" bytes" = " bytes";
+
+/* Inspector -> Peers tab -> connected */
+"%d (%d incoming)" = "%1$d (%2$d incoming)";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From incoming connection" = "From incoming connection";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From outgoing connection" = "From outgoing connection";
+
+/* Inspector -> above tabs -> selected torrents */
+"%d Torrents Selected" = "%d Torrents Selected";
+
+/* Inspector -> above tabs -> selected torrents */
+"No Torrents Selected" = "No Torrents Selected";
+
+/* Inspector -> above tabs -> total size (several torrents selected) */
+"%@ Total" = "%@ Total";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Inspector";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Toggle Inspector";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Toggle the torrent inspector";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Shortcuts for changing global settings.";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Speed Limit overrides the total bandwidth limits with its own limits.";
+
+/* Open toolbar item -> label */
+"Open" = "Open";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Open Torrent Files";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Open torrent files";
+
+/* Open torrent -> select destination folder */
+"Select the download folder for \"%@\"" = "Select the download folder for \"%@\"";
+
+/* Pause All toolbar item -> label */
+"Pause All" = "Pause All";
+
+/* Pause All toolbar item -> tooltip */
+"Pause all transfers" = "Pause all transfers";
+
+/* Pause toolbar item -> label */
+"Pause" = "Pause";
+
+/* Pause toolbar item -> palette label */
+"Pause Selected" = "Pause Selected";
+
+/* Pause toolbar item -> tooltip */
+"Pause selected transfers" = "Pause selected transfers";
+
+/* Preferences -> Bandwidth toolbar item title */
+"Bandwidth" = "Bandwidth";
+
+/* Preferences -> General toolbar item title */
+"General" = "General";
+
+/* Preferences -> Network -> port map status */
+"Error mapping port" = "Error mapping port";
+
+/* Preferences -> Network -> port map status */
+"Port successfully mapped" = "Port successfully mapped";
+
+/* Preferences -> Network -> port status */
+"Checking port status" = "Checking port status";
+
+/* Preferences -> Network -> port status */
+"Port is closed" = "Port is closed";
+
+/* Preferences -> Network -> port status */
+"Port is open" = "Port is open";
+
+/* Preferences -> Network -> port status */
+"Port is stealth" = "Port is stealth";
+
+/* Preferences -> Network -> port status */
+"Unable to check port status" = "Unable to check port status";
+
+/* Preferences -> Network toolbar item title */
+"Network" = "Network";
+
+/* Preferences -> Transfers toolbar item title */
+"Transfers" = "Transfers";
+
+/* Removal confirm panel -> button
+   Confirm Quit panel -> button */
+"Cancel" = "Cancel";
+
+/* Removal confirm panel -> button
+   Remove toolbar item -> label */
+"Remove" = "Remove";
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file. Do you really want to remove it?" = "This transfer is active. Once removed, continuing the transfer will require the torrent file. Do you really want to remove it?";
+
+/* Removal confirm panel -> message part 1 */
+"There are %d active transfers." = "There are %d active transfers.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %d transfers (%d active)." = "There are %1$d transfers (%2$d active).";
+
+/* Removal confirm panel -> message part 2 */
+" Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?" = " Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?";
+
+/* Removal confirm panel -> title */
+"Comfirm Removal of %d Transfers" = "Comfirm Removal of %d Transfers";
+
+/* Removal confirm panel -> title */
+"Comfirm Removal of \"%@\"" = "Comfirm Removal of \"%@\"";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Remove Selected";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Remove selected transfers";
+
+/* Resume All toolbar item -> label */
+"Resume All" = "Resume All";
+
+/* Resume All toolbar item -> tooltip */
+"Resume all transfers" = "Resume all transfers";
+
+/* Resume toolbar item -> label */
+"Resume" = "Resume";
+
+/* Resume toolbar item -> palette label */
+"Resume Selected" = "Resume Selected";
+
+/* Resume toolbar item -> tooltip */
+"Resume selected transfers" = "Resume selected transfers";
+
+/* Save log alert panel -> button
+   Torrent file copy alert -> button
+   Torrent file disk space alert -> button */
+"OK" = "OK";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "There was a problem creating the file \"%@\".";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Log Could Not Be Saved";
+
+/* Save log panel -> default file name */
+"untitled" = "untitled";
+
+/* Status bar -> total download */
+"Total DL: " = "Total DL: ";
+
+/* Status bar -> total upload */
+"Total UL: " = "Total UL: ";
+
+/* Status bar transfer count */
+"%d Transfer" = "%d Transfer";
+
+/* Status bar transfer count */
+"%d Transfers" = "%d Transfers";
+
+/* Torrent -> location */
+"Transmission Support Folder" = "Transmission Support Folder";
+
+/* Torrent -> progress string */
+" - %@ remaining" = " - %@ remaining";
+
+/* Torrent -> progress string */
+" - remaining time unknown" = " - remaining time unknown";
+
+/* Torrent -> progress string */
+"%@ of %@ (%.2f%%)" = "%1$@ of %2$@ (%3$.2f%%)";
+
+/* Torrent -> progress string */
+"%@, uploaded %@ (Ratio: %@)" = "%1$@, uploaded %2$@ (Ratio: %3$@)";
+
+/* Torrent -> remaining time */
+"%d day %d hr" = "%1$d day %2$d hr";
+
+/* Torrent -> remaining time */
+"%d days %d hr" = "%1$d days %2$d hr";
+
+/* Torrent -> remaining time */
+"%d hr %02d min" = "%1$d hr %2$d min";
+
+/* Torrent -> remaining time */
+"%d min %02d sec" = "%1$d min %2$d sec";
+
+/* Torrent -> remaining time */
+"%d sec" = "%d sec";
+
+/* Torrent -> remaining time */
+"Unknown" = "Unknown";
+
+/* Torrent -> status string */
+"Checking existing files" = "Checking existing files";
+
+/* Torrent -> status string */
+"DL: %@, " = "DL: %@, ";
+
+/* Torrent -> status string */
+"Downloading" = "Downloading";
+
+/* Torrent -> status string */
+"Downloading from %d of %d peer" = "Downloading from %1$d of %2$d peer";
+
+/* Torrent -> status string */
+"Downloading from %d of %d peers" = "Downloading from %1$d of %2$d peers";
+
+/* Torrent -> status string */
+"Error: " = "Error: ";
+
+/* Torrent -> status string */
+"N/A" = "N/A";
+
+/* Torrent -> status string */
+"Paused" = "Paused";
+
+/* Torrent -> status string */
+"Ratio: " = "Ratio: ";
+
+/* Torrent -> status string */
+"Ratio: %@, " = "Ratio: %@, ";
+
+/* Torrent -> status string */
+"Seeding" = "Seeding";
+
+/* Torrent -> status string */
+"Seeding complete" = "Seeding complete";
+
+/* Torrent -> status string */
+"Seeding to %d of %d peer" = "Seeding to %1$d of %2$d peer";
+
+/* Torrent -> status string */
+"Seeding to %d of %d peers" = "Seeding to %1$d of %2$d peers";
+
+/* Torrent -> status string */
+"Stopping" = "Stopping";
+
+/* Torrent -> status string */
+"UL: " = "UL: ";
+
+/* Torrent -> status string */
+"Waiting to start" = "Waiting to start";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "The torrent file (%@) cannot be found.";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "Copy of \"%@\" Cannot Be Created";
+
+/* Torrent file disk space alert -> button */
+"Download Anyway" = "Download Anyway";
+
+/* Torrent file disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ to continue." = "The transfer will be paused. Clear up space on %@ to continue.";
+
+/* Torrent file disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Not enough remaining disk space to download \"%@\" completely.";
+
+/* Transfer speed (Bytes per second) */
+"B/s" = "B/s";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Hide Filter Bar";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Show Filter Bar";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Hide Inspector";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Show Inspector";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Hide Status Bar";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Show Status Bar";
