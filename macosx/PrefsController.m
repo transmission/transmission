@@ -916,13 +916,20 @@
     int difference = [view frame].size.height - [[window contentView] frame].size.height;
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
-
-    [window setTitle: [fToolbar selectedItemIdentifier]];
     
     [view setHidden: YES];
     [window setContentView: view];
     [window setFrame: windowRect display: YES animate: YES];
     [view setHidden: NO];
+    
+    NSToolbarItem * item;
+    NSEnumerator * enumerator = [[fToolbar items] objectEnumerator];
+    while ((item = [enumerator nextObject]))
+        if ([[item itemIdentifier] isEqualToString: [fToolbar selectedItemIdentifier]])
+        {
+            [window setTitle: [item label]];
+            break;
+        }
 }
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
