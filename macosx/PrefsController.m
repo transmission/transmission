@@ -44,12 +44,7 @@
 
 @interface PrefsController (Private)
 
-- (void) showGeneralPref: (id) sender;
-- (void) showTransfersPref: (id) sender;
-- (void) showBandwidthPref: (id) sender;
-- (void) showNetworkPref: (id) sender;
-
-- (void) setPrefView: (NSView *) view;
+- (void) setPrefView: (id) sender;
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) updatePopUp;
@@ -99,7 +94,7 @@
     [fToolbar setSizeMode: NSToolbarSizeModeRegular];
 
     [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
-    [self showGeneralPref: nil];
+    [self setPrefView: nil];
     
     //set download folder
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
@@ -296,28 +291,28 @@
         [item setLabel: NSLocalizedString(@"General", "Preferences -> General toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Preferences.png"]];
         [item setTarget: self];
-        [item setAction: @selector(showGeneralPref:)];
+        [item setAction: @selector(setPrefView:)];
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
         [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> Transfers toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Transfers.png"]];
         [item setTarget: self];
-        [item setAction: @selector(showTransfersPref:)];
+        [item setAction: @selector(setPrefView:)];
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
         [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> Bandwidth toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
         [item setTarget: self];
-        [item setAction: @selector(showBandwidthPref:)];
+        [item setAction: @selector(setPrefView:)];
     }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
         [item setLabel: NSLocalizedString(@"Network", "Preferences -> Network toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Network.png"]];
         [item setTarget: self];
-        [item setAction: @selector(showNetworkPref:)];
+        [item setAction: @selector(setPrefView:)];
     }
     else
     {
@@ -881,34 +876,22 @@
 
 @implementation PrefsController (Private)
 
-- (void) showGeneralPref: (id) sender
+- (void) setPrefView: (id) sender
 {
-    [self setPrefView: fGeneralView];
-}
-
-- (void) showTransfersPref: (id) sender
-{
-    [self setPrefView: fTransfersView];
-}
-
-- (void) showBandwidthPref: (id) sender
-{
-    [self setPrefView: fBandwidthView];
-}
-
-- (void) showNetworkPref: (id) sender
-{
-    [self setPrefView: fNetworkView];
+    NSView * view = fGeneralView;
+    if (sender)
+    {
+        NSString * identifier = [sender itemIdentifier];
+        if ([identifier isEqualToString: TOOLBAR_TRANSFERS])
+            view = fTransfersView;
+        else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
+            view = fBandwidthView;
+        else if ([identifier isEqualToString: TOOLBAR_NETWORK])
+            view = fNetworkView;
+        else;
+    }
     
-    //make sure progress indicator hides itself
-    if ([fPortStatusImage image])
-        [fPortStatusProgress setDisplayedWhenStopped: NO];
-}
-
-- (void) setPrefView: (NSView *) view
-{
     NSWindow * window = [self window];
-    
     if ([window contentView] == view)
         return;
     
@@ -922,14 +905,24 @@
     [window setFrame: windowRect display: YES animate: YES];
     [view setHidden: NO];
     
-    NSToolbarItem * item;
-    NSEnumerator * enumerator = [[fToolbar items] objectEnumerator];
-    while ((item = [enumerator nextObject]))
-        if ([[item itemIdentifier] isEqualToString: [fToolbar selectedItemIdentifier]])
-        {
-            [window setTitle: [item label]];
-            break;
-        }
+    //set title label
+    if (sender)
+        [window setTitle: [sender label]];
+    else
+    {
+        NSToolbarItem * item;
+        NSEnumerator * enumerator = [[fToolbar items] objectEnumerator];
+        while ((item = [enumerator nextObject]))
+            if ([[item itemIdentifier] isEqualToString: [fToolbar selectedItemIdentifier]])
+            {
+                [window setTitle: [item label]];
+                break;
+            }
+    }
+    
+    //for network view make sure progress indicator hides itself
+    if (view == fNetworkView && [fPortStatusImage image])
+        [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
