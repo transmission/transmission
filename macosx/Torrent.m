@@ -193,11 +193,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     [fProgressString setString: @""];
     if ([self progress] < 1.0)
-        [fProgressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"), [NSString stringForFileSize:
-                [self downloadedValid]], [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+        [fProgressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
+                            [NSString stringForFileSize: [self downloadedValid]],
+                            [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     else
-        [fProgressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"), [NSString stringForFileSize:
-                [self size]], [NSString stringForFileSize: [self uploadedTotal]],
+        [fProgressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
+                [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
                 [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]];
 
     switch (fStat->status)
@@ -229,9 +230,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_DOWNLOAD:
             [fStatusString setString: @""];
             if ([self totalPeers] > 1)
-                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers", "Torrent -> status string"), [self peersUploading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
+                                                "Torrent -> status string"), [self peersUploading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peer", "Torrent -> status string"), [self peersUploading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peer",
+                                                "Torrent -> status string"), [self peersUploading], [self totalPeers]];
             
             [fRemainingTimeString setString: @""];
             int eta = [self eta];
@@ -245,20 +248,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 if (eta < 60)
                     [fRemainingTimeString appendFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
                 else if (eta < 3600) //60 * 60
-                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"), eta / 60, eta % 60];
+                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"),
+                                                            eta / 60, eta % 60];
                 else if (eta < 86400) //24 * 60 * 60
-                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"), eta / 3600, (eta / 60) % 60];
+                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"),
+                                                            eta / 3600, (eta / 60) % 60];
                 else
                 {
                     if (eta / 86400 > 1)
                         [fRemainingTimeString appendFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
-                                                eta / 86400, (eta / 3600) % 24];
+                                                                eta / 86400, (eta / 3600) % 24];
                     else
                         [fRemainingTimeString appendFormat: NSLocalizedString(@"%d day %d hr", "Torrent -> remaining time"),
-                                                eta / 86400, (eta / 3600) % 24];
+                                                                eta / 86400, (eta / 3600) % 24];
                 }
                 
-                [fProgressString appendFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"), fRemainingTimeString];
+                [fProgressString appendFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
+                                                                    fRemainingTimeString];
             }
             
             break;
@@ -266,9 +272,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_SEED:
             [fStatusString setString: @""];
             if ([self totalPeers] > 1)
-                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"), [self peersDownloading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
+                                                [self peersDownloading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peer", "Torrent -> status string"), [self peersDownloading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peer", "Torrent -> status string"),
+                                                [self peersDownloading], [self totalPeers]];
             
             break;
 
@@ -283,7 +291,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (fStat->error & TR_ETRACKER)
     {
-        [fStatusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString: [NSString stringWithUTF8String: fStat->trackerError]]];
+        [fStatusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
+                                    [NSString stringWithUTF8String: fStat->trackerError]]];
         if (!fError && [self isActive])
         {
             fError = YES;
@@ -302,7 +311,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         NSString * stringToAppend = @"";
         if ([self progress] < 1.0)
         {
-            stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"), [NSString stringForSpeed: [self downloadRate]]];
+            stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
+                                [NSString stringForSpeed: [self downloadRate]]];
             [fShortStatusString setString: @""];
         }
         else
@@ -310,12 +320,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             NSString * ratioString = [NSString stringForRatioWithDownload: [self downloadedTotal]
                                                 upload: [self uploadedTotal]];
         
-            [fShortStatusString setString: [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ", "Torrent -> status string"), ratioString]];
-            [fRemainingTimeString setString: [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString: ratioString]];
+            [fShortStatusString setString: [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ",
+                                            "Torrent -> status string"), ratioString]];
+            [fRemainingTimeString setString: [NSLocalizedString(@"Ratio: ", "Torrent -> status string")
+                                                stringByAppendingString: ratioString]];
         }
         
-        stringToAppend = [stringToAppend stringByAppendingString: [NSLocalizedString(@"UL: ", "Torrent -> status string") stringByAppendingString:
-                                                [NSString stringForSpeed: [self uploadRate]]]];
+        stringToAppend = [stringToAppend stringByAppendingString: [NSLocalizedString(@"UL: ", "Torrent -> status string")
+                                            stringByAppendingString: [NSString stringForSpeed: [self uploadRate]]]];
 
         [fStatusString appendFormat: @" - %@", stringToAppend];
         [fShortStatusString appendString: stringToAppend];
@@ -475,10 +487,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (volume && remainingSpace <= torrentRemaining)
     {
         NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.", "Torrent file disk space alert -> title"),
-                                    [self name]]];
+        [alert setMessageText: [NSString stringWithFormat:
+                                NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
+                                    "Torrent file disk space alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The transfer will be paused. Clear up space on %@ to continue.", "Torrent file disk space alert -> message"), volume]];
+                        NSLocalizedString(@"The transfer will be paused. Clear up space on %@ to continue.",
+                                            "Torrent file disk space alert -> message"), volume]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
         
@@ -555,7 +569,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSString *) torrentLocationString
 {
-    return fPrivateTorrent ? NSLocalizedString(@"Transmission Support Folder", "Torrent -> location") : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
+    return fPrivateTorrent ? NSLocalizedString(@"Transmission Support Folder", "Torrent -> location")
+                            : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
 }
 
 - (NSString *) dataLocation

@@ -174,8 +174,9 @@
     [panel setRequiredFileType: @"txt"];
     [panel setCanSelectHiddenExtension: YES];
     
-    [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name") modalForWindow: [self window] modalDelegate: self
-        didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];
+    [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
+            modalForWindow: [self window] modalDelegate: self
+            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];
 }
 
 - (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
@@ -186,9 +187,11 @@
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Save log alert panel -> button")];
-            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Log Could Not Be Saved", "Save log alert panel -> title")]];
+            [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Log Could Not Be Saved",
+                                    "Save log alert panel -> title")]];
             [alert setInformativeText: [NSString stringWithFormat: 
-                    NSLocalizedString(@"There was a problem creating the file \"%@\".", "Save log alert panel -> message"), [[panel filename] lastPathComponent]]];
+                    NSLocalizedString(@"There was a problem creating the file \"%@\".",
+                                        "Save log alert panel -> message"), [[panel filename] lastPathComponent]]];
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];

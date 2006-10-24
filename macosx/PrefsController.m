@@ -37,10 +37,10 @@
 #define UPDATE_WEEKLY   1
 #define UPDATE_NEVER    2
 
-#define TOOLBAR_GENERAL     NSLocalizedString(@"General", "Preferences -> General toolbar item title")
-#define TOOLBAR_TRANSFERS   NSLocalizedString(@"Transfers", "Preferences -> Transfers toolbar item title")
-#define TOOLBAR_BANDWIDTH   NSLocalizedString(@"Bandwidth", "Preferences -> Bandwidth toolbar item title")
-#define TOOLBAR_NETWORK     NSLocalizedString(@"Network", "Preferences -> Network toolbar item title")
+#define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
+#define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
+#define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
+#define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
 
 @interface PrefsController (Private)
 
@@ -293,28 +293,28 @@
 
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
-        [item setLabel: TOOLBAR_GENERAL];
+        [item setLabel: NSLocalizedString(@"General", "Preferences -> General toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Preferences.png"]];
         [item setTarget: self];
         [item setAction: @selector(showGeneralPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
-        [item setLabel: TOOLBAR_TRANSFERS];
+        [item setLabel: NSLocalizedString(@"Transfers", "Preferences -> Transfers toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Transfers.png"]];
         [item setTarget: self];
         [item setAction: @selector(showTransfersPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
-        [item setLabel: TOOLBAR_BANDWIDTH];
+        [item setLabel: NSLocalizedString(@"Bandwidth", "Preferences -> Bandwidth toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
         [item setTarget: self];
         [item setAction: @selector(showBandwidthPref:)];
     }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
-        [item setLabel: TOOLBAR_NETWORK];
+        [item setLabel: NSLocalizedString(@"Network", "Preferences -> Network toolbar item title")];
         [item setImage: [NSImage imageNamed: @"Network.png"]];
         [item setTarget: self];
         [item setAction: @selector(showNetworkPref:)];
@@ -340,9 +340,8 @@
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects:
-            TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
-            TOOLBAR_BANDWIDTH, TOOLBAR_NETWORK, nil];
+    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
+                                        TOOLBAR_BANDWIDTH, TOOLBAR_NETWORK, nil];
 }
 
 - (void) setPort: (id) sender
@@ -377,7 +376,8 @@
         //NSXML features are unfortunately only available since Mac OS X v10.4
         PortChecker * checker = [[PortChecker alloc] initWithDelegate: self];
 
-        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status", "Preferences -> Network -> port status") stringByAppendingEllipsis]];
+        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
+                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
         [fPortStatusProgress startAnimation: self];
         
         [checker probePort: [fDefaults integerForKey: @"BindPort"]];
@@ -402,7 +402,8 @@
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
             break;
         case PORT_STATUS_ERROR:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
+                                                "Preferences -> Network -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.tiff"]];
             break;
     }
@@ -427,12 +428,14 @@
     
     if (status == 2)
     {
-        [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped", "Preferences -> Network -> port map status")];
+        [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
+                                            "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
     }
     else if (status == 3 || status == 4)
     {
-        [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port", "Preferences -> Network -> port map status")];
+        [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
+                                            "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
     }
     else

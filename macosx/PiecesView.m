@@ -135,8 +135,8 @@
         [fBluePiece unlockFocus];
         
         [fImageView setToolTip: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
-                            ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
-                            : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
+                        ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
+                        : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
         
         //actually draw the box
         [self setTorrent: nil];
@@ -383,8 +383,9 @@
     
     [defaults setBool: showAvailability forKey: @"PiecesViewShowAvailability"];
     
-    [fImageView setToolTip: showAvailability ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
-                                             : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
+    [fImageView setToolTip: showAvailability
+        ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
+        : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
     
     [self updateView: YES];
 }
