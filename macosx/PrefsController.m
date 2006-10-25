@@ -535,7 +535,6 @@
 - (void) setQuickLimit: (int) limit type: (NSString *) type
 {
     //if interface is loaded, perform change as if user performed it
-    #warning better way?
     if (fToolbar)
     {
         NSButton * check;
@@ -673,7 +672,6 @@
 - (void) setQuickRatioEnabled: (BOOL) enable
 {
     //if interface is loaded, perform change as if user performed it
-    #warning better way?
     if (fToolbar)
     {
         int state = enable ? NSOnState : NSOffState;
@@ -692,7 +690,6 @@
 - (void) setQuickRatio: (float) ratioLimit
 {
     //if interface is loaded, perform change as if user performed it
-    #warning better way?
     if (fToolbar)
     {
         [fRatioField setFloatValue: ratioLimit];
