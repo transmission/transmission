@@ -506,10 +506,10 @@
     }
     
     BOOL check = [sender state] == NSOnState;
+    [fDefaults setBool: check forKey: key];
+    
     [self setLimit: field];
     [field setEnabled: check];
-    
-    [fDefaults setBool: check forKey: key];
 }
 
 - (void) setQuickLimitEnabled: (BOOL) enable type: (NSString *) type
@@ -664,10 +664,10 @@
 - (void) setRatioCheck: (id) sender
 {
     BOOL check = [sender state] == NSOnState;
+    [fDefaults setBool: check forKey: @"RatioCheck"];
+    
     [self setRatio: fRatioField];
     [fRatioField setEnabled: check];
-    
-    [fDefaults setBool: check forKey: @"RatioCheck"];
 }
 
 - (void) setQuickRatioEnabled: (BOOL) enable

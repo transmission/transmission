@@ -116,7 +116,8 @@
                 [self callBackWithStatus: PORT_STATUS_STEALTH];
             else if ([portStatus isEqualToString: @"closed"])
                 [self callBackWithStatus: PORT_STATUS_CLOSED];
-            else {
+            else
+            {
                 NSLog(@"Unable to get port status: unknown port state");
                 [self callBackWithStatus: PORT_STATUS_ERROR];
             }
