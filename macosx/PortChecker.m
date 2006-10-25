@@ -97,7 +97,7 @@
         {
             NSArray * title = [shieldsUpProbe nodesForXPath: @"/html/head/title" error: nil];
             // This may happen when we probe twice too quickly
-            if ([title count] > 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
+            if ([title count] != 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
                                                                     @"NanoProbe System Already In Use"])
             {
                 NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
