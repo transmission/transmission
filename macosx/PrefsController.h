@@ -42,7 +42,8 @@
                             * fPlayDownloadSoundCheck, * fPlaySeedingSoundCheck,
                             * fCopyTorrentCheck, * fDeleteOriginalTorrentCheck,
                             * fAutoImportCheck, * fAutoSizeCheck;
-                            
+    
+    SUUpdater               * fUpdater;
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
@@ -63,21 +64,19 @@
     
     IBOutlet NSButton       * fQueueCheck, * fStartAtOpenCheck;
     IBOutlet NSTextField    * fQueueNumberField;
-    
-    IBOutlet SUUpdater      * fUpdater;
 
     NSString                * fDownloadFolder, * fImportFolder;
     NSUserDefaults          * fDefaults;
 }
 
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
+- (void) setUpdater: (SUUpdater *) updater;
 
 - (void) setShowMessage:    (id) sender;
 - (void) setBadge:          (id) sender;
 - (void) setPlaySound:      (id) sender;
 - (void) setSound:          (id) sender;
 - (void) setUpdate:         (id) sender;
-- (void) checkUpdate;
 
 - (void) setStartAtOpen:    (id) sender;
 
@@ -101,7 +100,7 @@
 
 - (void) setLimit:          (id) sender;
 - (void) setLimitCheck:     (id) sender;
-- (void) setLimitEnabled:   (BOOL) enable type: (NSString *) type;
+- (void) setQuickLimitEnabled:   (BOOL) enable type: (NSString *) type;
 - (void) setQuickLimit:     (int) limit type: (NSString *) type;
 
 - (void) enableSpeedLimit: (BOOL) enable;
@@ -113,7 +112,7 @@
 
 - (void) setRatio:          (id) sender;
 - (void) setRatioCheck:     (id) sender;
-- (void) setRatioEnabled:   (BOOL) enable;
+- (void) setQuickRatioEnabled:   (BOOL) enable;
 - (void) setQuickRatio: (float) ratioLimit;
 
 - (void) helpForNetwork: (id) sender;

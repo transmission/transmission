@@ -13,17 +13,13 @@
 		<key>41</key>
 		<string>213 415 563 317 0 0 1152 842 </string>
 		<key>66</key>
-		<string>162 503 563 144 0 0 1152 842 </string>
+		<string>294 507 563 144 0 0 1152 842 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
 	<key>IBLockedTabItems</key>
 	<array>
 		<integer>253</integer>
-	</array>
-	<key>IBOpenObjects</key>
-	<array>
-		<integer>66</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8L127</string>

@@ -73,7 +73,6 @@
                 fStartAtOpenCheck = NSButton; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
-                fUpdater = SUUpdater; 
                 fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
             }; 

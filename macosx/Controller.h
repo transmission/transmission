@@ -90,7 +90,9 @@
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
     
+    IBOutlet SUUpdater              * fUpdater;
     BOOL                            fUpdateInProgress;
+    
     Badger                          * fBadger;
     
     NSMutableArray                  * fAutoImportedNames;
@@ -200,7 +202,6 @@
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;
 
-- (void) checkUpdate:       (id) sender;
 - (void) prepareForUpdate:  (NSNotification *) notification;
 
 @end

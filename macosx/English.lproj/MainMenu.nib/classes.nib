@@ -4,7 +4,6 @@
         {
             ACTIONS = {
                 applyFilter = id; 
-                checkUpdate = id; 
                 copyTorrentFile = id; 
                 linkForums = id; 
                 linkHomepage = id; 
@@ -79,6 +78,7 @@
                 fTotalDLField = NSTextField; 
                 fTotalTorrentsField = NSTextField; 
                 fTotalULField = NSTextField; 
+                fUpdater = SUUpdater; 
                 fUploadLimitItem = NSMenuItem; 
                 fUploadMenu = NSMenu; 
                 fUploadNoLimitItem = NSMenuItem; 

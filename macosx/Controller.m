@@ -205,7 +205,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                 "Main window -> 1st bottom left button (action) tooltip")];
     [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
                                 "Main window -> 2nd bottom left button (turtle) tooltip")];
-
+    
+    [fPrefsController setUpdater: fUpdater];
+    
     [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
@@ -1362,7 +1364,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) setLimitGlobalEnabled: (id) sender
 {
-    [fPrefsController setLimitEnabled: (sender == fUploadLimitItem || sender == fDownloadLimitItem)
+    [fPrefsController setQuickLimitEnabled: (sender == fUploadLimitItem || sender == fDownloadLimitItem)
         type: (sender == fUploadLimitItem || sender == fUploadNoLimitItem) ? @"Upload" : @"Download"];
 }
 
@@ -1374,33 +1376,38 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) limitGlobalChange: (NSNotification *) notification
 {
-    NSDictionary * dict = [notification object];
-    
     NSMenuItem * limitItem, * noLimitItem;
-    if ([[dict objectForKey: @"Type"] isEqualToString: @"Upload"])
+    BOOL enable;
+    int limit;
+    if ([[notification object] boolValue])
     {
         limitItem = fUploadLimitItem;
         noLimitItem = fUploadNoLimitItem;
+        
+        enable = [fDefaults boolForKey: @"CheckUpload"];
+        limit = [fDefaults integerForKey: @"UploadLimit"];
     }
     else
     {
         limitItem = fDownloadLimitItem;
         noLimitItem = fDownloadNoLimitItem;
+        
+        enable = [fDefaults boolForKey: @"CheckDownload"];
+        limit = [fDefaults integerForKey: @"DownloadLimit"];
     }
     
-    BOOL enable = [[dict objectForKey: @"Enable"] boolValue];
     [limitItem setState: enable ? NSOnState : NSOffState];
     [noLimitItem setState: !enable ? NSOnState : NSOffState];
     
     [limitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                            "Action context menu -> upload/download limit"), [[dict objectForKey: @"Limit"] intValue]]];
-
-    [dict release];
+                            "Action context menu -> upload/download limit"), limit]];
+    
+    [[notification object] release];
 }
 
 - (void) setRatioGlobalEnabled: (id) sender
 {
-    [fPrefsController setRatioEnabled: sender == fRatioSetItem];
+    [fPrefsController setQuickRatioEnabled: sender == fRatioSetItem];
 }
 
 - (void) setQuickRatioGlobal: (id) sender
@@ -1410,16 +1417,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) ratioGlobalChange: (NSNotification *) notification
 {
-    NSDictionary * dict = [notification object];
-    
-    BOOL enable = [[dict objectForKey: @"Enable"] boolValue];
+    BOOL enable = [fDefaults boolForKey: @"RatioCheck"];
     [fRatioSetItem setState: enable ? NSOnState : NSOffState];
     [fRatioNotSetItem setState: !enable ? NSOnState : NSOffState];
     
     [fRatioSetItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                                "Action context menu -> ratio stop"), [[dict objectForKey: @"Ratio"] floatValue]]];
-
-    [dict release];
+                                "Action context menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
 }
 
 - (void) checkWaitingForStopped: (NSNotification *) notification
@@ -2446,11 +2449,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) linkForums: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
-}
-
-- (void) checkUpdate: (id) sender
-{
-    [fPrefsController checkUpdate];
 }
 
 - (void) prepareForUpdate: (NSNotification *) notification
