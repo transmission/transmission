@@ -22,7 +22,6 @@
                 setLimitGlobalEnabled = id; 
                 setQuickLimitGlobal = id; 
                 setQuickRatioGlobal = id; 
-                setRatioGlobalEnabled = id; 
                 setSort = id; 
                 showInfo = id; 
                 showMainWindow = id; 

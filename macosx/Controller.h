@@ -163,11 +163,8 @@
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
-- (void) limitGlobalChange: (NSNotification *) notification;
 
-- (void) setRatioGlobalEnabled: (id) sender;
 - (void) setQuickRatioGlobal: (id) sender;
-- (void) ratioGlobalChange: (NSNotification *) notification;
 
 - (void) checkWaitingForStopped: (NSNotification *) notification;
 - (void) checkToStartWaiting: (Torrent *) finishedTorrent;

@@ -26,9 +26,6 @@
 #import "StringAdditions.h"
 #import "UKKQueue.h"
 
-#define MIN_PORT    1
-#define MAX_PORT    65535
-
 #define DOWNLOAD_FOLDER     0
 #define DOWNLOAD_TORRENT    2
 #define DOWNLOAD_ASK        3
@@ -70,13 +67,10 @@
             [fDefaults setBool: NO forKey: @"CheckUpload"];
         }
         
-        //set download folder and import folder
-        fDownloadFolder = [[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] retain];
-        fImportFolder = [[[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath] retain];
-        
         //set auto import
         if ([fDefaults boolForKey: @"AutoImport"])
-            [[UKKQueue sharedFileWatcher] addPath: fImportFolder];
+            [[UKKQueue sharedFileWatcher] addPath:
+                [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
         
         //set bind port
         int bindPort = [fDefaults integerForKey: @"BindPort"];
@@ -87,18 +81,7 @@
             tr_natTraversalEnable(fHandle);
         
         //actually set bandwidth limits
-        if ([fDefaults boolForKey: @"SpeedLimit"])
-        {
-            tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-            tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
-        }
-        else
-        {
-            tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
-                                            ? [fDefaults integerForKey: @"UploadLimit"] : -1);
-            tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
-                                            ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
-        }
+        [self applySpeedSettings: nil];
     }
     return self;
 }
@@ -107,9 +90,7 @@
 {
     if (fNatStatusTimer)
         [fNatStatusTimer invalidate];
-
-    [fDownloadFolder release];
-    [fImportFolder release];
+    
     [super dealloc];
 }
 
@@ -137,76 +118,13 @@
     
     //set auto import
     [self updateImportPopUp];
- 
-    BOOL autoImport = [fDefaults boolForKey: @"AutoImport"];
-    [fAutoImportCheck setState: autoImport];
-    [fImportFolderPopUp setEnabled: autoImport];
     
-    //set auto size
-    [fAutoSizeCheck setState: [fDefaults boolForKey: @"AutoSize"]];
-    
-    //set bind port
-    int bindPort = [fDefaults integerForKey: @"BindPort"];
-    [fPortField setIntValue: bindPort];
     [self updatePortStatus];
-    
-    //set NAT
-    [fNatCheck setState: [fDefaults boolForKey: @"NatTraversal"]];
     
     fNatStatus = -1;
     [self updateNatStatus];
     fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
-    
-    //set upload limit
-    BOOL checkUpload = [fDefaults boolForKey: @"CheckUpload"];
-    [fUploadCheck setState: checkUpload];
-    [fUploadField setIntValue: [fDefaults integerForKey: @"UploadLimit"]];
-    [fUploadField setEnabled: checkUpload];
-
-	//set download limit
-    BOOL checkDownload = [fDefaults boolForKey: @"CheckDownload"];
-    [fDownloadCheck setState: checkDownload];
-    [fDownloadField setIntValue: [fDefaults integerForKey: @"DownloadLimit"]];
-    [fDownloadField setEnabled: checkDownload];
-    
-    //set speed limit
-    [fSpeedLimitUploadField setIntValue: [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
-    [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
-    
-    //set auto speed limit
-    BOOL speedLimitAuto = [fDefaults boolForKey: @"SpeedLimitAuto"];
-    [fSpeedLimitAutoCheck setState: speedLimitAuto];
-    
-    int speedLimitAutoOnHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"];
-    [fSpeedLimitAutoOnField setStringValue: [NSString stringWithFormat: @"%02d", speedLimitAutoOnHour]];
-    [fSpeedLimitAutoOnField setEnabled: speedLimitAuto];
-    
-    int speedLimitAutoOffHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
-    [fSpeedLimitAutoOffField setStringValue: [NSString stringWithFormat: @"%02d", speedLimitAutoOffHour]];
-    [fSpeedLimitAutoOffField setEnabled: speedLimitAuto];
-    
-    //set ratio limit
-    BOOL ratioCheck = [fDefaults boolForKey: @"RatioCheck"];
-    [fRatioCheck setState: ratioCheck];
-    [fRatioField setEnabled: ratioCheck];
-    [fRatioField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
-    
-    //set remove and quit prompts
-    BOOL isQuitCheck = [fDefaults boolForKey: @"CheckQuit"],
-        isRemoveCheck = [fDefaults boolForKey: @"CheckRemove"];
-    
-    [fQuitCheck setState: isQuitCheck];
-    [fRemoveCheck setState: isRemoveCheck];
-    
-    [fQuitDownloadingCheck setState: [fDefaults boolForKey: @"CheckQuitDownloading"]];
-    [fQuitDownloadingCheck setEnabled: isQuitCheck];
-    [fRemoveDownloadingCheck setState: [fDefaults boolForKey: @"CheckRemoveDownloading"]];
-    [fRemoveDownloadingCheck setEnabled: isRemoveCheck];
-
-    //set dock badging
-    [fBadgeDownloadRateCheck setState: [fDefaults boolForKey: @"BadgeDownloadRate"]];
-    [fBadgeUploadRateCheck setState: [fDefaults boolForKey: @"BadgeUploadRate"]];
     
     //set play sound
     NSMutableArray * sounds = [NSMutableArray array];
@@ -231,10 +149,6 @@
     [fDownloadSoundPopUp removeAllItems];
     [fDownloadSoundPopUp addItemsWithTitles: sounds];
     
-    BOOL playDownloadSound = [fDefaults boolForKey: @"PlayDownloadSound"];
-    [fPlayDownloadSoundCheck setState: playDownloadSound];
-    [fDownloadSoundPopUp setEnabled: playDownloadSound];
-    
     int downloadSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"DownloadSound"]];
     if (downloadSoundIndex >= 0)
         [fDownloadSoundPopUp selectItemAtIndex: downloadSoundIndex];
@@ -245,30 +159,11 @@
     [fSeedingSoundPopUp removeAllItems];
     [fSeedingSoundPopUp addItemsWithTitles: sounds];
     
-    BOOL playSeedingSound = [fDefaults boolForKey: @"PlaySeedingSound"];
-    [fPlaySeedingSoundCheck setState: playSeedingSound];
-    [fSeedingSoundPopUp setEnabled: playSeedingSound];
-    
     int seedingSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"SeedingSound"]];
     if (seedingSoundIndex >= 0)
         [fSeedingSoundPopUp selectItemAtIndex: seedingSoundIndex];
     else
         [fDefaults setObject: [fSeedingSoundPopUp titleOfSelectedItem] forKey: @"SeedingSound"];
-    
-    //set start settings
-    BOOL useQueue = [fDefaults boolForKey: @"Queue"];
-    [fQueueCheck setState: useQueue];
-    [fQueueNumberField setEnabled: useQueue];
-    [fQueueNumberField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
-    
-    [fStartAtOpenCheck setState: [fDefaults boolForKey: @"AutoStartDownload"]];
-    
-    //set private torrents
-    BOOL copyTorrents = [fDefaults boolForKey: @"SavePrivateTorrent"];
-    [fCopyTorrentCheck setState: copyTorrents];
-    
-    [fDeleteOriginalTorrentCheck setEnabled: copyTorrents];
-    [fDeleteOriginalTorrentCheck setState: [fDefaults boolForKey: @"DeleteOriginalTorrent"]];
 
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
@@ -285,8 +180,8 @@
     fUpdater = updater;
 }
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
-    (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident
+                    willBeInsertedIntoToolbar: (BOOL) flag
 {
     NSToolbarItem * item;
     item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
@@ -346,22 +241,9 @@
 
 - (void) setPort: (id) sender
 {
-    int bindPort = [sender intValue];
-    if (![[NSString stringWithInt: bindPort] isEqualToString: [sender stringValue]]
-            || bindPort < MIN_PORT || bindPort > MAX_PORT)
-    {
-        NSBeep();
-        bindPort = [fDefaults integerForKey: @"BindPort"];
-        [sender setIntValue: bindPort];
-    }
-    else
-    {
-        tr_setBindPort(fHandle, bindPort);
-        [fDefaults setInteger: bindPort forKey: @"BindPort"];
-        
-        [self updateNatStatus];
-        [self updatePortStatus];
-    }
+    tr_setBindPort(fHandle, [fDefaults integerForKey: @"BindPort"]);
+    [self updateNatStatus];
+    [self updatePortStatus];
 }
 
 - (void) updatePortStatus
@@ -412,10 +294,7 @@
 
 - (void) setNat: (id) sender
 {
-    BOOL enable = [sender state] == NSOnState;
-    enable ? tr_natTraversalEnable(fHandle) : tr_natTraversalDisable(fHandle);
-    [fDefaults setBool: enable forKey: @"NatTraversal"];
-    
+    [fDefaults boolForKey: @"NatTraversal"] ? tr_natTraversalEnable(fHandle) : tr_natTraversalDisable(fHandle);
     [self updateNatStatus];
 }
 
@@ -447,312 +326,36 @@
     [self updatePortStatus];
 }
 
-- (void) setLimit: (id) sender
+- (void) applySpeedSettings: (id) sender
 {
-    NSString * key;
-    NSButton * check;
-    NSString * type;
-    if (sender == fUploadField)
+    if ([fDefaults boolForKey: @"SpeedLimit"])
     {
-        key = @"UploadLimit";
-        check = fUploadCheck;
-        type = @"Upload";
+        tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
     {
-        key = @"DownloadLimit";
-        check = fDownloadCheck;
-        type = @"Download";
-    }
-
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
-    {
-        NSBeep();
-        limit = [fDefaults integerForKey: key];
-        [sender setIntValue: limit];
-    }
-    else
-    {
-        if (![fDefaults boolForKey: @"SpeedLimit"])
-        {
-            int realLimit = [check state] ? limit : -1;
-            if (sender == fUploadField)
-                tr_setUploadLimit(fHandle, realLimit);
-            else
-                tr_setDownloadLimit(fHandle, realLimit);
-        }
-        
-        [fDefaults setInteger: limit forKey: key];
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"LimitGlobalChange"
-                                            object: [[NSNumber alloc] initWithBool: sender == fUploadField]];
-}
-
-- (void) setLimitCheck: (id) sender
-{
-    NSString * key;
-    NSTextField * field;
-    if (sender == fUploadCheck)
-    {
-        key = @"CheckUpload";
-        field = fUploadField;
-    }
-    else
-    {
-        key = @"CheckDownload";
-        field = fDownloadField;
-    }
-    
-    BOOL check = [sender state] == NSOnState;
-    [fDefaults setBool: check forKey: key];
-    
-    [self setLimit: field];
-    [field setEnabled: check];
-}
-
-- (void) setQuickLimitEnabled: (BOOL) enable type: (NSString *) type
-{
-    //if interface is loaded, perform change as if user performed it
-    #warning better way?
-    if (fToolbar)
-    {
-        NSButton * check = [type isEqualToString: @"Upload"] ? fUploadCheck : fDownloadCheck;
-        [check setState: enable ? NSOnState : NSOffState];
-        [self setLimitCheck: check];
-    }
-    else
-    {
-        BOOL upload = [type isEqualToString: @"Upload"];
-        [fDefaults setBool: enable forKey: upload ? @"CheckUpload" : @"CheckDownload"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"LimitGlobalChange"
-                                                object: [[NSNumber alloc] initWithBool: upload]];
-    }
-}
-
-- (void) setQuickLimit: (int) limit type: (NSString *) type
-{
-    //if interface is loaded, perform change as if user performed it
-    if (fToolbar)
-    {
-        NSButton * check;
-        if ([type isEqualToString: @"Upload"])
-        {
-            [fUploadField setIntValue: limit];
-            check = fUploadCheck;
-        }
-        else
-        {
-            [fDownloadField setIntValue: limit];
-            check = fDownloadCheck;
-        }
-        [check setState: NSOnState];
-        [self setLimitCheck: check];
-    }
-    else
-    {
-        BOOL upload = [type isEqualToString: @"Upload"];
-        [fDefaults setBool: YES forKey: upload ? @"CheckUpload" : @"CheckDownload"];
-        [fDefaults setInteger: limit forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"LimitGlobalChange"
-                                                object: [[NSNumber alloc] initWithBool: upload]];
-    }
-}
-
-- (void) enableSpeedLimit: (BOOL) enable
-{
-    if ([fDefaults boolForKey: @"SpeedLimit"] != enable)
-    {
-        [fDefaults setBool: enable forKey: @"SpeedLimit"];
-        
-        if (enable)
-        {
-            tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-            tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
-        }
-        else
-        {
-            tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
+        tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
                                         ? [fDefaults integerForKey: @"UploadLimit"] : -1);
-            tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
-                                            ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
-        }
-    }
-}
-
-- (void) setSpeedLimit: (id) sender
-{
-    NSString * key = sender == fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit";
-
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
-    {
-        NSBeep();
-        limit = [fDefaults integerForKey: key];
-        [sender setIntValue: limit];
-    }
-    else
-    {
-        if ([fDefaults boolForKey: @"SpeedLimit"])
-        {
-            if (sender == fSpeedLimitUploadField)
-                tr_setUploadLimit(fHandle, limit);
-            else
-                tr_setDownloadLimit(fHandle, limit);
-        }
-        
-        [fDefaults setInteger: limit forKey: key];
+        tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
+                                        ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
     }
 }
 
 - (void) setAutoSpeedLimitCheck: (id) sender
 {
-    BOOL check = [sender state] == NSOnState;
-    
-    [fDefaults setBool: check forKey: @"SpeedLimitAuto"];
-
-    [self setAutoSpeedLimitHour: fSpeedLimitAutoOnField];
-    [fSpeedLimitAutoOnField setEnabled: check];
-    
-    [self setAutoSpeedLimitHour: fSpeedLimitAutoOffField];
-    [fSpeedLimitAutoOffField setEnabled: check];
-}
-
-- (void) setAutoSpeedLimitHour: (id) sender
-{
-    NSString * key = (sender == fSpeedLimitAutoOnField) ? @"SpeedLimitAutoOnHour" : @"SpeedLimitAutoOffHour";
-
-    int hour = [sender intValue];
-    
-    //allow numbers under ten in the format 0x
-    if (!([[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", hour]]
-        || [[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%02d", hour]]) || hour < 0 || hour > 23
-        || [fSpeedLimitAutoOnField intValue] == [fSpeedLimitAutoOffField intValue])
-    {
-        NSBeep();
-        hour = [fDefaults integerForKey: key];
-        [sender setStringValue: [NSString stringWithFormat: @"%02d", hour]];
-    }
-    else
-        [fDefaults setInteger: hour forKey: key];
-    
-    [sender setStringValue: [NSString stringWithFormat: @"%02d", hour]]; //ensure number has 2 digits
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }
 
-- (void) setRatio: (id) sender
+#warning check if same value
+- (void) setAutoSpeedLimitHour: (id) sender
 {
-    float ratioLimit = [sender floatValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratioLimit]]
-            || ratioLimit < 0)
-    {
-        NSBeep();
-        ratioLimit = [fDefaults floatForKey: @"RatioLimit"];
-        [sender setFloatValue: ratioLimit];
-    }
-    else
-        [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"RatioGlobalChange" object: nil];
-}
-
-- (void) setRatioCheck: (id) sender
-{
-    BOOL check = [sender state] == NSOnState;
-    [fDefaults setBool: check forKey: @"RatioCheck"];
-    
-    [self setRatio: fRatioField];
-    [fRatioField setEnabled: check];
-}
-
-- (void) setQuickRatioEnabled: (BOOL) enable
-{
-    //if interface is loaded, perform change as if user performed it
-    if (fToolbar)
-    {
-        int state = enable ? NSOnState : NSOffState;
-        
-        [fRatioCheck setState: state];
-        [self setRatioCheck: fRatioCheck];
-    }
-    else
-    {
-        [fDefaults setBool: enable forKey: @"RatioCheck"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"RatioGlobalChange" object: nil];
-    }
-}
-
-- (void) setQuickRatio: (float) ratioLimit
-{
-    //if interface is loaded, perform change as if user performed it
-    if (fToolbar)
-    {
-        [fRatioField setFloatValue: ratioLimit];
-        
-        [fRatioCheck setState: NSOnState];
-        [self setRatioCheck: fRatioCheck];
-    }
-    else
-    {
-        [fDefaults setBool: YES forKey: @"RatioCheck"];
-        [fDefaults setFloat: ratioLimit forKey: @"RatioLimit"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"RatioGlobalChange" object: nil];
-    }
-}
-
-- (void) setShowMessage: (id) sender
-{
-    BOOL state = [sender state];
-
-    if (sender == fQuitCheck)
-    {
-        [fDefaults setBool: state forKey: @"CheckQuit"];
-        [fQuitDownloadingCheck setEnabled: state];
-    }
-    else if (sender == fRemoveCheck)
-    {
-        [fDefaults setBool: state forKey: @"CheckRemove"];
-        [fRemoveDownloadingCheck setEnabled: state];
-    }
-    if (sender == fQuitDownloadingCheck)
-        [fDefaults setBool: state forKey: @"CheckQuitDownloading"];
-    else if (sender == fRemoveDownloadingCheck)
-        [fDefaults setBool: state forKey: @"CheckRemoveDownloading"];
-    else;
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }
 
 - (void) setBadge: (id) sender
 {   
-    if (sender == fBadgeDownloadRateCheck)
-        [fDefaults setBool: [sender state] forKey: @"BadgeDownloadRate"];
-    else if (sender == fBadgeUploadRateCheck)
-        [fDefaults setBool: [sender state] forKey: @"BadgeUploadRate"];
-    else;
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
-}
-
-- (void) setPlaySound: (id) sender
-{
-    BOOL state = [sender state];
-
-    if (sender == fPlayDownloadSoundCheck)
-    {
-        [fDownloadSoundPopUp setEnabled: state];
-        [fDefaults setBool: state forKey: @"PlayDownloadSound"];
-    }
-    else if (sender == fPlaySeedingSoundCheck)
-    {
-        [fSeedingSoundPopUp setEnabled: state];
-        [fDefaults setBool: state forKey: @"PlaySeedingSound"];
-    }
-    else;
 }
 
 - (void) setSound: (id) sender
@@ -763,6 +366,7 @@
     if ((sound = [NSSound soundNamed: soundName]))
         [sound play];
 
+    #warning use bindings
     if (sender == fDownloadSoundPopUp)
         [fDefaults setObject: soundName forKey: @"DownloadSound"];
     else if (sender == fSeedingSoundPopUp)
@@ -796,56 +400,15 @@
         [fUpdater scheduleCheckWithInterval: seconds];
 }
 
-- (void) setStartAtOpen: (id) sender
-{
-    [fDefaults setBool: [sender state] == NSOnState forKey: @"AutoStartDownload"];
-}
-
-- (void) setUseQueue: (id) sender
-{
-    BOOL useQueue = [sender state] == NSOnState;
-    
-    [fDefaults setBool: useQueue forKey: @"Queue"];
-    [self setQueueNumber: fQueueNumberField];
-    [fQueueNumberField setEnabled: useQueue];
-}
-
+#warning out of range/wrong value
 - (void) setQueueNumber: (id) sender
 {
-    int queueNumber = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithInt: queueNumber]] || queueNumber < 1)
-    {
-        NSBeep();
-        queueNumber = [fDefaults integerForKey: @"QueueDownloadNumber"];
-        [sender setIntValue: queueNumber];
-    }
-    else
-        [fDefaults setInteger: queueNumber forKey: @"QueueDownloadNumber"];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
-}
-
-- (void) setMoveTorrent: (id) sender
-{
-    int state = [sender state];
-    if (sender == fCopyTorrentCheck)
-    {
-        [fDefaults setBool: state forKey: @"SavePrivateTorrent"];
-        
-        [fDeleteOriginalTorrentCheck setEnabled: state];
-        if (state == NSOffState)
-        {
-            [fDeleteOriginalTorrentCheck setState: NSOffState];
-            [fDefaults setBool: NO forKey: @"DeleteOriginalTorrent"];
-        }
-    }
-    else
-        [fDefaults setBool: state forKey: @"DeleteOriginalTorrent"];
 }
 
 - (void) setDownloadLocation: (id) sender
 {
-    //Download folder
+    //download folder
     switch ([fFolderPopUp indexOfSelectedItem])
     {
         case DOWNLOAD_FOLDER:
@@ -877,14 +440,12 @@
 
 - (void) setAutoImport: (id) sender
 {
-    int state = [fAutoImportCheck state];
-    [fDefaults setBool: state forKey: @"AutoImport"];
-    [fImportFolderPopUp setEnabled: state];
-    
-    if (state == NSOnState)
-        [[UKKQueue sharedFileWatcher] addPath: fImportFolder];
+    if ([fDefaults boolForKey: @"AutoImport"])
+        [[UKKQueue sharedFileWatcher] addPath:
+            [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
     else
-        [[UKKQueue sharedFileWatcher] removePathFromQueue: fImportFolder];
+        [[UKKQueue sharedFileWatcher] removePathFromQueue:
+            [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
 }
@@ -906,8 +467,6 @@
 
 - (void) setAutoSize: (id) sender
 {
-    [fDefaults setBool: [sender state] forKey: @"AutoSize"];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSizeSettingChange" object: self];
 }
 
@@ -974,11 +533,8 @@
 {
     if (code == NSOKButton)
     {
-        [fDownloadFolder release];
-        fDownloadFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
-        
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
-        [fDefaults setObject: fDownloadFolder forKey: @"DownloadFolder"];
+        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"DownloadFolder"];
         [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
         
         [self updatePopUp];
@@ -999,13 +555,14 @@
 - (void) updatePopUp
 {
     //get and resize the icon
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile: fDownloadFolder];
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile:
+                        [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]];
     [icon setScalesWhenResized: YES];
     [icon setSize: NSMakeSize(16.0, 16.0)];
 
     //update menu item
     NSMenuItem * menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
-    [menuItem setTitle: [fDownloadFolder lastPathComponent]];
+    [menuItem setTitle: [[fDefaults stringForKey: @"DownloadFolder"] lastPathComponent]];
     [menuItem setImage: icon];
 }
 
@@ -1014,16 +571,13 @@
     if (code == NSOKButton)
     {
         UKKQueue * sharedQueue = [UKKQueue sharedFileWatcher];
-        [sharedQueue removePathFromQueue: fImportFolder];
+        [sharedQueue removePathFromQueue: [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
         
-        [fImportFolder release];
-        fImportFolder = [[[openPanel filenames] objectAtIndex: 0] retain];
-        
-        [fDefaults setObject: fImportFolder forKey: @"AutoImportDirectory"];
+        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"AutoImportDirectory"];
         
         [self updateImportPopUp];
         
-        [sharedQueue addPath: fImportFolder];
+        [sharedQueue addPath: [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
     }
@@ -1033,13 +587,14 @@
 - (void) updateImportPopUp
 {
     //get and resize the icon
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile: fImportFolder];
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile:
+                        [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
     [icon setScalesWhenResized: YES];
     [icon setSize: NSMakeSize(16.0, 16.0)];
 
     //update menu item
     NSMenuItem * menuItem = (NSMenuItem *) [fImportFolderPopUp itemAtIndex: 0];
-    [menuItem setTitle: [fImportFolder lastPathComponent]];
+    [menuItem setTitle: [[fDefaults stringForKey: @"AutoImportDirectory"] lastPathComponent]];
     [menuItem setImage: icon];
 }
 

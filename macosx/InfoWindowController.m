@@ -557,12 +557,14 @@
 
 - (void) revealTorrentFile: (id) sender
 {
-    [[fTorrents objectAtIndex: 0] revealPublicTorrent];
+    if ([fTorrents count] > 0)
+        [[fTorrents objectAtIndex: 0] revealPublicTorrent];
 }
 
 - (void) revealDataFile: (id) sender
 {
-    [[fTorrents objectAtIndex: 0] revealData];
+    if ([fTorrents count] > 0)
+        [[fTorrents objectAtIndex: 0] revealData];
 }
 
 - (void) revealFile: (id) sender

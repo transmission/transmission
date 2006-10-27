@@ -30,6 +30,8 @@
 #import "TorrentTableView.h"
 #import "StringAdditions.h"
 #import "UKKQueue.h"
+#import "ActionMenuSpeedToDisplayLimitTransformer.h"
+#import "ActionMenuRatioToDisplayRatioTransformer.h"
 
 #import <Sparkle/Sparkle.h>
 
@@ -71,6 +73,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
+    
+    //set custom value transformers
+    ActionMenuSpeedToDisplayLimitTransformer * limitTransformer =
+                        [[[ActionMenuSpeedToDisplayLimitTransformer alloc] init] autorelease]; 
+    [NSValueTransformer setValueTransformer: limitTransformer forName: @"ActionMenuSpeedToDisplayLimitTransformer"]; 
+    
+    ActionMenuRatioToDisplayRatioTransformer * ratioTransformer =
+                        [[[ActionMenuRatioToDisplayRatioTransformer alloc] init] autorelease]; 
+    [NSValueTransformer setValueTransformer: ratioTransformer forName: @"ActionMenuRatioToDisplayRatioTransformer"]; 
 }
 
 - (id) init
@@ -280,30 +291,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [currentFilterButton setEnabled: YES];
     
-    //set upload limit action button
-    [fUploadLimitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                    "Action context menu -> upload limit"), [fDefaults integerForKey: @"UploadLimit"]]];
-    if ([fDefaults boolForKey: @"CheckUpload"])
-        [fUploadLimitItem setState: NSOnState];
-    else
-        [fUploadNoLimitItem setState: NSOnState];
-
-	//set download limit action menu
-    [fDownloadLimitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                    "Action context menu -> download limit"), [fDefaults integerForKey: @"DownloadLimit"]]];
-    if ([fDefaults boolForKey: @"CheckDownload"])
-        [fDownloadLimitItem setState: NSOnState];
-    else
-        [fDownloadNoLimitItem setState: NSOnState];
-    
-    //set ratio action menu
-    [fRatioSetItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                                "Action context menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
-    if ([fDefaults boolForKey: @"RatioCheck"])
-        [fRatioSetItem setState: NSOnState];
-    else
-        [fRatioNotSetItem setState: NSOnState];
-    
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
@@ -316,12 +303,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(prepareForUpdate:)
                     name: SUUpdaterWillRestartNotification object: nil];
     fUpdateInProgress = NO;
-    
-    [nc addObserver: self selector: @selector(limitGlobalChange:)
-                    name: @"LimitGlobalChange" object: nil];
-    
-    [nc addObserver: self selector: @selector(ratioGlobalChange:)
-                    name: @"RatioGlobalChange" object: nil];
     
     [nc addObserver: self selector: @selector(autoSpeedLimitChange:)
                     name: @"AutoSpeedLimitChange" object: nil];
@@ -1318,7 +1299,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fSpeedLimitButton setImage: !fSpeedLimitEnabled ? fSpeedLimitNormalImage
         : ([NSColor currentControlTint] == NSBlueControlTint ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage)];
     
-    [fPrefsController enableSpeedLimit: fSpeedLimitEnabled];
+    [fPrefsController applySpeedSettings: nil];
 }
 
 - (void) autoSpeedLimitChange: (NSNotification *) notification
@@ -1362,67 +1343,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+#warning get rid of
 - (void) setLimitGlobalEnabled: (id) sender
 {
-    [fPrefsController setQuickLimitEnabled: (sender == fUploadLimitItem || sender == fDownloadLimitItem)
-        type: (sender == fUploadLimitItem || sender == fUploadNoLimitItem) ? @"Upload" : @"Download"];
+    [fPrefsController applySpeedSettings: nil];
 }
 
 - (void) setQuickLimitGlobal: (id) sender
 {
-    [fPrefsController setQuickLimit: [[sender title] intValue]
-        type: [sender menu] == fUploadMenu ? @"Upload" : @"Download"];
-}
-
-- (void) limitGlobalChange: (NSNotification *) notification
-{
-    NSMenuItem * limitItem, * noLimitItem;
-    BOOL enable;
-    int limit;
-    if ([[notification object] boolValue])
-    {
-        limitItem = fUploadLimitItem;
-        noLimitItem = fUploadNoLimitItem;
-        
-        enable = [fDefaults boolForKey: @"CheckUpload"];
-        limit = [fDefaults integerForKey: @"UploadLimit"];
-    }
-    else
-    {
-        limitItem = fDownloadLimitItem;
-        noLimitItem = fDownloadNoLimitItem;
-        
-        enable = [fDefaults boolForKey: @"CheckDownload"];
-        limit = [fDefaults integerForKey: @"DownloadLimit"];
-    }
+    [fDefaults setInteger: [[sender title] intValue] forKey: [sender menu] == fUploadMenu ? @"UploadLimit" : @"DownloadLimit"];
+    [fDefaults setBool: YES forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
     
-    [limitItem setState: enable ? NSOnState : NSOffState];
-    [noLimitItem setState: !enable ? NSOnState : NSOffState];
-    
-    [limitItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
-                            "Action context menu -> upload/download limit"), limit]];
-    
-    [[notification object] release];
-}
-
-- (void) setRatioGlobalEnabled: (id) sender
-{
-    [fPrefsController setQuickRatioEnabled: sender == fRatioSetItem];
+    [fPrefsController applySpeedSettings: nil];
 }
 
 - (void) setQuickRatioGlobal: (id) sender
 {
-    [fPrefsController setQuickRatio: [[sender title] floatValue]];
-}
-
-- (void) ratioGlobalChange: (NSNotification *) notification
-{
-    BOOL enable = [fDefaults boolForKey: @"RatioCheck"];
-    [fRatioSetItem setState: enable ? NSOnState : NSOffState];
-    [fRatioNotSetItem setState: !enable ? NSOnState : NSOffState];
-    
-    [fRatioSetItem setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
-                                "Action context menu -> ratio stop"), [fDefaults floatForKey: @"RatioLimit"]]];
+    [fDefaults setBool: YES forKey: @"RatioCheck"];
+    [fDefaults setFloat: [[sender title] floatValue] forKey: @"RatioLimit"];
 }
 
 - (void) checkWaitingForStopped: (NSNotification *) notification
