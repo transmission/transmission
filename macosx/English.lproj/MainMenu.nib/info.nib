@@ -27,6 +27,10 @@
 	<array/>
 	<key>IBOldestOS</key>
 	<integer>3</integer>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>1041</integer>
+	</array>
 	<key>IBSystem Version</key>
 	<string>8L127</string>
 </dict>

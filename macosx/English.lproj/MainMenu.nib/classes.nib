@@ -5,6 +5,7 @@
             ACTIONS = {
                 applyFilter = id; 
                 copyTorrentFile = id; 
+                doNothing = id; 
                 linkForums = id; 
                 linkHomepage = id; 
                 openShowSheet = id; 
@@ -61,8 +62,6 @@
                 fPrevInfoTabItem = NSMenuItem; 
                 fProgressSortActionItem = NSMenuItem; 
                 fProgressSortItem = NSMenuItem; 
-                fRatioNotSetItem = NSMenuItem; 
-                fRatioSetItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
                 fSearchFilterField = NSSearchField; 
                 fSeedFilterButton = BarButton; 

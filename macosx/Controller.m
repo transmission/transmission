@@ -1343,7 +1343,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
-#warning get rid of
 - (void) setLimitGlobalEnabled: (id) sender
 {
     [fPrefsController applySpeedSettings: nil];
@@ -1867,6 +1866,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView display];
 }
+
+- (void) doNothing: (id) sender {}
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
     (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag

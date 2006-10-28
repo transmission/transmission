@@ -84,8 +84,7 @@
     
     IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
-                                    * fDownloadLimitItem, * fDownloadNoLimitItem,
-                                    * fRatioSetItem, * fRatioNotSetItem;
+                                    * fDownloadLimitItem, * fDownloadNoLimitItem;
 
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
@@ -189,6 +188,8 @@
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate;
 
 - (void) toggleAdvancedBar: (id) sender;
+
+- (void) doNothing: (id) sender; //needed for menu items that use bindings with no associated action
 
 - (void) resetDockBadge: (NSNotification *) notification;
 
