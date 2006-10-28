@@ -3,20 +3,15 @@
 # $Id$
 
 # Get current SVN revision from Ids in all source files
-REVMAX=0
-for pattern in '*.[chm]' '*.cpp' '*.po' '*.mk' '*.in' 'Makefile' 'configure'; do
-  for f in `find . -name "$pattern"`; do 
-    REV=`sed -e '/\$Id:/!d' -e \
-         's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' \
-         $f`
-    if [ -n "$REV" ]; then
-      if [ "$REV" -gt "$REVMAX" ]; then
-        REVMAX="$REV"
-      fi
-    fi
-  done
-done
-
+REVMAX=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
+            -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
+            -o -name 'configure' ')' -exec cat '{}' ';' ) | \
+          sed -e '/\$Id:/!d' -e \
+            's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' |
+          awk 'BEGIN { REV=0 }
+               //    { if ( $1 > REV ) REV=$1 }
+               END   { print REV }'`
+  
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
 replace_if_differs ()
