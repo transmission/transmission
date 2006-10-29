@@ -79,6 +79,25 @@
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
+        
+        //set play sound
+        NSMutableArray * sounds = [NSMutableArray array];
+        NSEnumerator * soundEnumerator,
+                    * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds",
+                            [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil] objectEnumerator];
+        NSString * soundPath, * sound;
+        
+        //get list of all sounds and sort alphabetically
+        while ((soundPath = [soundDirectoriesEnumerator nextObject]))
+            if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: soundPath])
+                while ((sound = [soundEnumerator nextObject]))
+                {
+                    sound = [sound stringByDeletingPathExtension];
+                    if ([NSSound soundNamed: sound])
+                        [sounds addObject: sound];
+                }
+        
+        fSounds = [[sounds sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)] retain];
     }
     return self;
 }
@@ -87,6 +106,7 @@
 {
     if (fNatStatusTimer)
         [fNatStatusTimer invalidate];
+    [fSounds release];
     
     [super dealloc];
 }
@@ -118,45 +138,6 @@
     [self updateNatStatus];
     fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
-    
-    //set play sound
-    NSMutableArray * sounds = [NSMutableArray array];
-    NSEnumerator * soundEnumerator,
-                * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds",
-                        [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil] objectEnumerator];
-    NSString * soundPath, * sound;
-    
-    //get list of all sounds and sort alphabetically
-    while ((soundPath = [soundDirectoriesEnumerator nextObject]))
-        if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: soundPath])
-            while ((sound = [soundEnumerator nextObject]))
-            {
-                sound = [sound stringByDeletingPathExtension];
-                if ([NSSound soundNamed: sound])
-                    [sounds addObject: sound];
-            }
-    
-    [sounds sortUsingSelector: @selector(caseInsensitiveCompare:)];
-    
-    //set download sound
-    [fDownloadSoundPopUp removeAllItems];
-    [fDownloadSoundPopUp addItemsWithTitles: sounds];
-    
-    int downloadSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"DownloadSound"]];
-    if (downloadSoundIndex >= 0)
-        [fDownloadSoundPopUp selectItemAtIndex: downloadSoundIndex];
-    else
-        [fDefaults setObject: [fDownloadSoundPopUp titleOfSelectedItem] forKey: @"DownloadSound"];
-    
-    //set seeding sound
-    [fSeedingSoundPopUp removeAllItems];
-    [fSeedingSoundPopUp addItemsWithTitles: sounds];
-    
-    int seedingSoundIndex = [fDownloadSoundPopUp indexOfItemWithTitle: [fDefaults stringForKey: @"SeedingSound"]];
-    if (seedingSoundIndex >= 0)
-        [fSeedingSoundPopUp selectItemAtIndex: seedingSoundIndex];
-    else
-        [fDefaults setObject: [fSeedingSoundPopUp titleOfSelectedItem] forKey: @"SeedingSound"];
 
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
@@ -358,13 +339,6 @@
     NSSound * sound;
     if ((sound = [NSSound soundNamed: soundName]))
         [sound play];
-
-    #warning use bindings
-    if (sender == fDownloadSoundPopUp)
-        [fDefaults setObject: soundName forKey: @"DownloadSound"];
-    else if (sender == fSeedingSoundPopUp)
-        [fDefaults setObject: soundName forKey: @"SeedingSound"];
-    else;
 }
 
 - (void) setUpdate: (id) sender

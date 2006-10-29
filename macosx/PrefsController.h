@@ -39,6 +39,8 @@
     IBOutlet NSPopUpButton  * fFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
     
+    NSArray                 * fSounds;
+    
     SUUpdater               * fUpdater;
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 

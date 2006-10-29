@@ -1323,7 +1323,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //check if should be on if within range
     BOOL shouldBeOn;
     int hour = [[NSCalendarDate calendarDate] hourOfDay];
-    if (onHour < offHour)
+    
+    if (onHour == offHour)
+        shouldBeOn = NO;
+    else if (onHour < offHour)
         shouldBeOn = hour >= onHour && hour < offHour;
     else
         shouldBeOn = hour < offHour || hour >= onHour;
@@ -1340,8 +1343,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //toggle if within first few seconds of hour
     NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
     if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
-            && [currentDate hourOfDay] == [fDefaults integerForKey: fSpeedLimitEnabled
-                                            ? @"SpeedLimitAutoOffHour" : @"SpeedLimitAutoOnHour"])
+        && [currentDate hourOfDay] == [fDefaults integerForKey: fSpeedLimitEnabled
+                                        ? @"SpeedLimitAutoOffHour" : @"SpeedLimitAutoOnHour"]
+        && (fSpeedLimitEnabled || [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]
+                                    != [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]))
     {
         [self toggleSpeedLimit: nil];
         
