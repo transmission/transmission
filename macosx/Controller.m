@@ -32,6 +32,8 @@
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
 #import "ActionMenuRatioToDisplayRatioTransformer.h"
+#import "ExpandedPathToPathTransformer.h"
+#import "ExpandedPathToIconTransformer.h"
 
 #import <Sparkle/Sparkle.h>
 
@@ -77,11 +79,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //set custom value transformers
     ActionMenuSpeedToDisplayLimitTransformer * limitTransformer =
                         [[[ActionMenuSpeedToDisplayLimitTransformer alloc] init] autorelease]; 
-    [NSValueTransformer setValueTransformer: limitTransformer forName: @"ActionMenuSpeedToDisplayLimitTransformer"]; 
+    [NSValueTransformer setValueTransformer: limitTransformer forName: @"ActionMenuSpeedToDisplayLimitTransformer"];
     
     ActionMenuRatioToDisplayRatioTransformer * ratioTransformer =
-                        [[[ActionMenuRatioToDisplayRatioTransformer alloc] init] autorelease]; 
-    [NSValueTransformer setValueTransformer: ratioTransformer forName: @"ActionMenuRatioToDisplayRatioTransformer"]; 
+                        [[[ActionMenuRatioToDisplayRatioTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer: ratioTransformer forName: @"ActionMenuRatioToDisplayRatioTransformer"];
+    
+    ExpandedPathToPathTransformer * pathTransformer =
+                        [[[ExpandedPathToPathTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer: pathTransformer forName: @"ExpandedPathToPathTransformer"];
+    
+    ExpandedPathToIconTransformer * iconTransformer =
+                        [[[ExpandedPathToIconTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
 }
 
 - (id) init

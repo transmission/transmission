@@ -44,10 +44,7 @@
 - (void) setPrefView: (id) sender;
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-- (void) updatePopUp;
-
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
-- (void) updateImportPopUp;
 
 @end
 
@@ -114,10 +111,6 @@
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_TORRENT];
     else
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
-    [self updatePopUp];
-    
-    //set auto import
-    [self updateImportPopUp];
     
     [self updatePortStatus];
     
@@ -536,8 +529,6 @@
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_FOLDER];
         [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"DownloadFolder"];
         [fDefaults setObject: @"Constant" forKey: @"DownloadChoice"];
-        
-        [self updatePopUp];
     }
     else
     {
@@ -552,20 +543,6 @@
     }
 }
 
-- (void) updatePopUp
-{
-    //get and resize the icon
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile:
-                        [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]];
-    [icon setScalesWhenResized: YES];
-    [icon setSize: NSMakeSize(16.0, 16.0)];
-
-    //update menu item
-    NSMenuItem * menuItem = (NSMenuItem *) [fFolderPopUp itemAtIndex: 0];
-    [menuItem setTitle: [[fDefaults stringForKey: @"DownloadFolder"] lastPathComponent]];
-    [menuItem setImage: icon];
-}
-
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
     if (code == NSOKButton)
@@ -575,27 +552,11 @@
         
         [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"AutoImportDirectory"];
         
-        [self updateImportPopUp];
-        
         [sharedQueue addPath: [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
     }
     [fImportFolderPopUp selectItemAtIndex: 0];
-}
-
-- (void) updateImportPopUp
-{
-    //get and resize the icon
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFile:
-                        [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
-    [icon setScalesWhenResized: YES];
-    [icon setSize: NSMakeSize(16.0, 16.0)];
-
-    //update menu item
-    NSMenuItem * menuItem = (NSMenuItem *) [fImportFolderPopUp itemAtIndex: 0];
-    [menuItem setTitle: [[fDefaults stringForKey: @"AutoImportDirectory"] lastPathComponent]];
-    [menuItem setImage: icon];
 }
 
 @end
