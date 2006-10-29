@@ -321,7 +321,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }
 
-#warning check if same value
 - (void) setAutoSpeedLimitHour: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
@@ -367,10 +366,15 @@
         [fUpdater scheduleCheckWithInterval: seconds];
 }
 
-#warning out of range/wrong value
 - (void) setQueueNumber: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
+}
+
+- (void) setCopyTorrents: (id) sender
+{
+    if (![fDefaults boolForKey: @"SavePrivateTorrent"])
+        [fDefaults setBool: NO forKey: @"DeleteOriginalTorrent"];
 }
 
 - (void) setDownloadLocation: (id) sender
