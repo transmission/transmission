@@ -215,6 +215,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if ((fSpeedLimitEnabled = [fDefaults boolForKey: @"SpeedLimit"]))
     {
+        #warning get rid of
         [fSpeedLimitItem setState: NSOnState];
         [fSpeedLimitDockItem setState: NSOnState];
         
@@ -1302,7 +1303,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     fSpeedLimitEnabled = !fSpeedLimitEnabled;
     int state = fSpeedLimitEnabled ? NSOnState : NSOffState;
+    
+    [fDefaults setBool: fSpeedLimitEnabled forKey: @"SpeedLimit"]
 
+    #warning get rid of
     [fSpeedLimitItem setState: state];
     [fSpeedLimitDockItem setState: state];
     
