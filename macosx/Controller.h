@@ -60,7 +60,6 @@
     IBOutlet NSMenuItem             * fAdvancedBarItem, * fSmallViewItem,
                                     * fSpeedLimitItem, * fSpeedLimitDockItem;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
-    BOOL                            fSpeedLimitEnabled;
     NSImage                         * fSpeedLimitNormalImage, * fSpeedLimitBlueImage, * fSpeedLimitGraphiteImage;
     NSTimer                         * fSpeedLimitTimer;
     

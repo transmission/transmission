@@ -213,7 +213,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateControlTint: nil];
     
-    if ((fSpeedLimitEnabled = [fDefaults boolForKey: @"SpeedLimit"]))
+    if ([fDefaults boolForKey: @"SpeedLimit"])
     {
         #warning get rid of
         [fSpeedLimitItem setState: NSOnState];
@@ -947,7 +947,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) updateControlTint: (NSNotification *) notification
 {
-    if (fSpeedLimitEnabled)
+    if ([fDefaults boolForKey: @"SpeedLimit"])
         [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
                                         ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
 }
@@ -1301,16 +1301,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleSpeedLimit: (id) sender
 {
-    fSpeedLimitEnabled = !fSpeedLimitEnabled;
-    int state = fSpeedLimitEnabled ? NSOnState : NSOffState;
+    BOOL setEnabled = ![fDefaults boolForKey: @"SpeedLimit"];
+    int state = setEnabled ? NSOnState : NSOffState;
     
-    [fDefaults setBool: fSpeedLimitEnabled forKey: @"SpeedLimit"];
+    [fDefaults setBool: setEnabled forKey: @"SpeedLimit"];
 
     #warning get rid of
     [fSpeedLimitItem setState: state];
     [fSpeedLimitDockItem setState: state];
     
-    [fSpeedLimitButton setImage: !fSpeedLimitEnabled ? fSpeedLimitNormalImage
+    [fSpeedLimitButton setImage: !setEnabled ? fSpeedLimitNormalImage
         : ([NSColor currentControlTint] == NSBlueControlTint ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage)];
     
     [fPrefsController applySpeedSettings: nil];
@@ -1335,7 +1335,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         shouldBeOn = hour < offHour || hour >= onHour;
     
-    if (fSpeedLimitEnabled != shouldBeOn)
+    if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
         [self toggleSpeedLimit: nil];
 }
 
@@ -1343,18 +1343,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
- 
+
+    BOOL limited = [fDefaults boolForKey: @"SpeedLimit"];
+    
     //toggle if within first few seconds of hour
     NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
     if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
-        && [currentDate hourOfDay] == [fDefaults integerForKey: fSpeedLimitEnabled
+        && [currentDate hourOfDay] == [fDefaults integerForKey: limited
                                         ? @"SpeedLimitAutoOffHour" : @"SpeedLimitAutoOnHour"]
-        && (fSpeedLimitEnabled || [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]
+        && (limited || [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]
                                     != [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]))
     {
         [self toggleSpeedLimit: nil];
         
-        [GrowlApplicationBridge notifyWithTitle: fSpeedLimitEnabled
+        [GrowlApplicationBridge notifyWithTitle: limited
                 ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
                 : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
             description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")
