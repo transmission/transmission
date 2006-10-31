@@ -1574,16 +1574,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             
             //import only actually happened if the torrent array is larger
             if (oldCount < [fTorrents count])
+            {
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
                     "Growl notification title") description: file
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+            }
+            else
+                [fAutoImportedNames removeObjectIdenticalTo: file]; //failed to import, possibly because not fully downloaded
         }
     }
     
     [newNames release];
 }
 
-- (int) numberOfRowsInTableView: (NSTableView *) t
+- (int) numberOfRowsInTableView: (NSTableView *) tableview
 {
     return [fDisplayedTorrents count];
 }
