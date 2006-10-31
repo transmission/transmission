@@ -509,6 +509,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * torrentPath;
     Torrent * torrent;
+    
+    //determine next file that can be opened
     do
     {
         if ([files count] == 0) //recursive base case
@@ -1569,28 +1571,29 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
-            int error;
-            tr_torrent_t * tempTor = tr_torrentInit(fLib, [[path stringByAppendingPathComponent: file] UTF8String],
-                                                        0, & error);
+            int count = [fTorrents count];
+            [self openFiles: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
             
-            if (tempTor)
+            //check if torrent was opened
+            if ([fTorrents count] > count)
             {
-                tr_torrentClose(fLib, tempTor);
-                
-                int count = [fTorrents count];
-                [self openFiles: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
-                
-                //check if torrent was opened
-                if ([fTorrents count] > count)
-                {
-                    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
-                        "Growl notification title") description: file
-                        notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
-                }
+                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
+                    "Growl notification title") description: file
+                    notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
             }
-            else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
-                [fAutoImportedNames removeObjectIdenticalTo: file]; //failed to import for unknown reason, so try again later
-            else;
+            else
+            {
+                //create a temporary torrent to check if it didn't import because of error
+                int error;
+                tr_torrent_t * tempTor = tr_torrentInit(fLib, [[path stringByAppendingPathComponent: file] UTF8String],
+                                                    0, & error);
+                
+                if (tempTor)
+                    tr_torrentClose(fLib, tempTor);
+                else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
+                    [fAutoImportedNames removeObjectIdenticalTo: file]; //can try to import later
+                else;
+            }
         }
     }
     
