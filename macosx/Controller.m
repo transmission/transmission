@@ -1570,7 +1570,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
             int error;
-            tr_torrent_t * tempTor = tr_torrentInit(fLib, [path UTF8String], 0, & error);
+            tr_torrent_t * tempTor = tr_torrentInit(fLib, [[path stringByAppendingPathComponent: file] UTF8String],
+                                                        0, & error);
             
             if (tempTor)
             {
@@ -1587,7 +1588,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                         notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
                 }
             }
-            else if (error != TR_EUNSUPPORTED || error != TR_EDUPLICATE)
+            else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
                 [fAutoImportedNames removeObjectIdenticalTo: file]; //failed to import for unknown reason, so try again later
             else;
         }
