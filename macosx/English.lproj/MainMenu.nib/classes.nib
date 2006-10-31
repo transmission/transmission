@@ -41,7 +41,6 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fActionButton = NSButton; 
-                fAdvancedBarItem = NSMenuItem; 
                 fDateSortActionItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
                 fDownloadFilterButton = BarButton; 
@@ -65,7 +64,6 @@
                 fScrollView = NSScrollView; 
                 fSearchFilterField = NSSearchField; 
                 fSeedFilterButton = BarButton; 
-                fSmallViewItem = NSMenuItem; 
                 fSpeedLimitButton = NSButton; 
                 fSpeedLimitDockItem = NSMenuItem; 
                 fSpeedLimitItem = NSMenuItem; 

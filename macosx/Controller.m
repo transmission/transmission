@@ -146,8 +146,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
-    
-    [fAdvancedBarItem setState: [fDefaults boolForKey: @"UseAdvancedBar"]];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -161,10 +159,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
-    {
         [fTableView setRowHeight: ROW_HEIGHT_SMALL];
-        [fSmallViewItem setState: NSOnState];
-    }
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize];
@@ -1718,12 +1713,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleSmallView: (id) sender
 {
-    BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
+    BOOL makeSmall = [fDefaults boolForKey: @"SmallView"];
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
-    [fSmallViewItem setState: makeSmall];
-    
-    [fDefaults setBool: makeSmall forKey: @"SmallView"];
     
     //window min height
     NSSize contentMinSize = [fWindow contentMinSize],
@@ -1881,10 +1873,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) toggleAdvancedBar: (id) sender
 {
-    int state = ![fAdvancedBarItem state];
-    [fAdvancedBarItem setState: state];
-    [fDefaults setBool: state forKey: @"UseAdvancedBar"];
-    
     [fTableView display];
 }
 

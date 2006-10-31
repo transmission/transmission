@@ -100,7 +100,7 @@
     {
         if ([event modifierFlags] & NSAlternateKeyMask)
         {
-            [fController toggleAdvancedBar: self];
+            [fDefaults setBool: ![fDefaults boolForKey: @"UseAdvancedBar"] forKey: @"UseAdvancedBar"];
             fClickPoint = NSZeroPoint;
         }
         else
