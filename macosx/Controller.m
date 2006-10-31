@@ -1569,18 +1569,27 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
         {
-            oldCount = [fTorrents count];
-            [self openFiles: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
+            int error;
+            tr_torrent_t * tempTor = tr_torrentInit(fLib, [path UTF8String], 0, & error);
             
-            //import only actually happened if the torrent array is larger
-            if (oldCount < [fTorrents count])
+            if (tempTor)
             {
-                [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
-                    "Growl notification title") description: file
-                    notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                tr_torrentClose(fLib, tempTor);
+                
+                int count = [fTorrents count];
+                [self openFiles: [NSArray arrayWithObject: [path stringByAppendingPathComponent: file]]];
+                
+                //check if torrent was opened
+                if ([fTorrents count] > count)
+                {
+                    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
+                        "Growl notification title") description: file
+                        notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                }
             }
-            else
-                [fAutoImportedNames removeObjectIdenticalTo: file]; //failed to import, possibly because not fully downloaded
+            else if (error != TR_EUNSUPPORTED || error != TR_EDUPLICATE)
+                [fAutoImportedNames removeObjectIdenticalTo: file]; //failed to import for unknown reason, so try again later
+            else;
         }
     }
     
