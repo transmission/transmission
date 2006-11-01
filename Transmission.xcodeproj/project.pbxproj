@@ -107,6 +107,7 @@
 		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
+		A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
 		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
 		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
@@ -118,7 +119,6 @@
 		A253F70D0A6990EB008EE24F /* FilterButtonOverRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F70A0A6990EB008EE24F /* FilterButtonOverRight.png */; };
 		A253F7150A699178008EE24F /* FilterButtonPressedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7120A699178008EE24F /* FilterButtonPressedRight.png */; };
 		A253F7160A699178008EE24F /* FilterButtonPressedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7130A699178008EE24F /* FilterButtonPressedMain.png */; };
-		A253F7170A699178008EE24F /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
 		A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */; };
 		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
 		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
@@ -858,7 +858,6 @@
 				A253F70D0A6990EB008EE24F /* FilterButtonOverRight.png in Resources */,
 				A253F7150A699178008EE24F /* FilterButtonPressedRight.png in Resources */,
 				A253F7160A699178008EE24F /* FilterButtonPressedMain.png in Resources */,
-				A253F7170A699178008EE24F /* FilterButtonPressedLeft.png in Resources */,
 				A253F72A0A699373008EE24F /* FilterButtonSelectedLeft.png in Resources */,
 				A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */,
 				A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */,
@@ -876,6 +875,7 @@
 				35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */,
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
+				A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

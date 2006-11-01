@@ -11,8 +11,7 @@
                 importFolderSheetShow = id; 
                 setAutoImport = id; 
                 setAutoSize = id; 
-                setAutoSpeedLimitCheck = id; 
-                setAutoSpeedLimitHour = id; 
+                setAutoSpeedLimit = id; 
                 setBadge = id; 
                 setCopyTorrents = id; 
                 setDownloadLocation = id; 

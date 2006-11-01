@@ -77,8 +77,7 @@
 - (void) setNat:    (id) sender;
 - (void) updateNatStatus;
 
-- (void) setAutoSpeedLimitCheck: (id) sender;
-- (void) setAutoSpeedLimitHour: (id) sender;
+- (void) setAutoSpeedLimit: (id) sender;
 
 - (void) applySpeedSettings: (id) sender;
 

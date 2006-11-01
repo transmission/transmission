@@ -19,5 +19,4 @@
                                                 "Action context menu -> ratio stop"), [value floatValue]];
 }
 
-
 @end

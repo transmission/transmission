@@ -316,12 +316,7 @@
     }
 }
 
-- (void) setAutoSpeedLimitCheck: (id) sender
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
-}
-
-- (void) setAutoSpeedLimitHour: (id) sender
+- (void) setAutoSpeedLimit: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
 }

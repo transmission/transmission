@@ -1318,19 +1318,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
  
-    int onHour = [fDefaults integerForKey: @"SpeedLimitAutoOnHour"],
-        offHour = [fDefaults integerForKey: @"SpeedLimitAutoOffHour"];
+    NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]],
+        * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]],
+        * nowDate = [NSCalendarDate calendarDate];
     
     //check if should be on if within range
     BOOL shouldBeOn;
-    int hour = [[NSCalendarDate calendarDate] hourOfDay];
     
-    if (onHour == offHour)
+    int onTime = [onDate hourOfDay] * 60 + [onDate minuteOfHour],
+        offTime = [offDate hourOfDay] * 60 + [offDate minuteOfHour],
+        nowTime = [nowDate hourOfDay] * 60 + [nowDate minuteOfHour];
+    
+    if (onTime == offTime)
         shouldBeOn = NO;
-    else if (onHour < offHour)
-        shouldBeOn = hour >= onHour && hour < offHour;
+    else if (onTime < offTime)
+        shouldBeOn = onTime <= nowTime && nowTime < offTime;
     else
-        shouldBeOn = hour < offHour || hour >= onHour;
+        shouldBeOn = onTime <= nowTime || nowTime < offTime;
     
     if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
         [self toggleSpeedLimit: nil];
@@ -1340,20 +1346,31 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
-
-    BOOL limited = [fDefaults boolForKey: @"SpeedLimit"];
     
-    //toggle if within first few seconds of hour
-    NSCalendarDate * currentDate = [NSCalendarDate calendarDate];
-    if ([currentDate minuteOfHour] == 0 && [currentDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS
-        && [currentDate hourOfDay] == [fDefaults integerForKey: limited
-                                        ? @"SpeedLimitAutoOffHour" : @"SpeedLimitAutoOnHour"]
-        && (limited || [fDefaults integerForKey: @"SpeedLimitAutoOnHour"]
-                                    != [fDefaults integerForKey: @"SpeedLimitAutoOffHour"]))
+    //only toggle if within first few seconds of minutes
+    NSCalendarDate * nowDate = [NSCalendarDate calendarDate];
+    if ([nowDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS)
+        return;
+    
+    NSCalendarDate * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOffDate"] timeIntervalSinceReferenceDate]];
+    
+    BOOL toggle;
+    if ([fDefaults boolForKey: @"SpeedLimit"])
+        toggle = [nowDate hourOfDay] == [offDate hourOfDay] && [nowDate minuteOfHour] == [offDate minuteOfHour];
+    else
+    {
+        NSCalendarDate * onDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
+                        [[fDefaults objectForKey: @"SpeedLimitAutoOnDate"] timeIntervalSinceReferenceDate]];
+        toggle = ([nowDate hourOfDay] == [onDate hourOfDay] && [nowDate minuteOfHour] == [onDate minuteOfHour])
+                    && !([onDate hourOfDay] == [offDate hourOfDay] && [onDate minuteOfHour] == [offDate minuteOfHour]);
+    }
+    
+    if (toggle)
     {
         [self toggleSpeedLimit: nil];
         
-        [GrowlApplicationBridge notifyWithTitle: limited
+        [GrowlApplicationBridge notifyWithTitle: [fDefaults boolForKey: @"SpeedLimit"]
                 ? NSLocalizedString(@"Speed Limit Auto Enabled", "Growl notification title")
                 : NSLocalizedString(@"Speed Limit Auto Disabled", "Growl notification title")
             description: NSLocalizedString(@"Bandwidth settings changed", "Growl notification description")

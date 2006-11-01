@@ -88,10 +88,10 @@
 	<false/>
 	<key>SpeedLimitAuto</key>
 	<false/>
-	<key>SpeedLimitAutoOffHour</key>
-	<integer>21</integer>
-	<key>SpeedLimitAutoOnHour</key>
-	<integer>9</integer>
+	<key>SpeedLimitAutoOffDate</key>
+	<date>2000-01-01T13:00:00Z</date>
+	<key>SpeedLimitAutoOnDate</key>
+	<date>2000-01-01T03:00:00Z</date>
 	<key>SpeedLimitDownloadLimit</key>
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
