@@ -36,7 +36,7 @@
     NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
-    IBOutlet NSPopUpButton  * fFolderPopUp, * fImportFolderPopUp,
+    IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
     
     NSArray                 * fSounds;
@@ -68,8 +68,9 @@
 
 - (void) setCopyTorrents: (id) sender;
 
-- (void) setDownloadLocation:   (id) sender;
-- (void) folderSheetShow:       (id) sender;
+- (void) setDownloadLocation:       (id) sender;
+- (void) folderSheetShow:           (id) sender;
+- (void) incompleteFolderSheetShow: (id) sender;
 
 - (void) setPort:   (id) sender;
 - (void) updatePortStatus;

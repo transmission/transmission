@@ -65,6 +65,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (self)
     {
+        fUseIncompleteFolder = [fDefaults boolForKey: @"UseIncompleteDownloadFolder"];
+        fIncompleteFolder = [[fDefaults stringForKey: @"IncompleteDownloadFolder"] copy];
+        
         if (!fPublicTorrent)
             [self trashFile: path];
     }
@@ -85,9 +88,27 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (self)
     {
+        //download folders
         NSString * downloadFolder;
         if (!(downloadFolder = [history objectForKey: @"DownloadFolder"]))
             downloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
+        
+        NSNumber * useIncompleteFolder;
+        if ((useIncompleteFolder = [history objectForKey: @"UseIncompleteFolder"]))
+        {
+            if ((fUseIncompleteFolder = [useIncompleteFolder boolValue]))
+            {
+                NSString * incompleteFolder;
+                if (incompleteFolder = [history objectForKey: @"IncompleteFolder"])
+                    fIncompleteFolder = [incompleteFolder copy];
+                else
+                    fIncompleteFolder = [[[fDefaults stringForKey: @"IncompleteDownloadFolder"]
+                                            stringByExpandingTildeInPath] copy];
+            }
+        }
+        else
+            fUseIncompleteFolder = NO;
+        
         [self setDownloadFolder: downloadFolder];
 
         NSString * paused;
@@ -105,14 +126,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                     [NSNumber numberWithBool: fPrivateTorrent], @"PrivateCopy",
                     [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
-                    [self downloadFolder], @"DownloadFolder",
+                    fDownloadFolder, @"DownloadFolder",
+                    [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
                     [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [self orderValue], @"OrderValue", nil];
-            
+    
+    if (fUseIncompleteFolder)
+        [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
+    
     if (fPrivateTorrent)
         [history setObject: [self hashString] forKey: @"TorrentHash"];
 
@@ -127,6 +152,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (fHandle)
     {
         tr_torrentClose(fLib, fHandle);
+        
+        if (fDownloadFolder)
+            [fDownloadFolder release];
+        if (fIncompleteFolder)
+            [fIncompleteFolder release];
         
         if (fPublicTorrentLocation)
             [fPublicTorrentLocation release];
@@ -151,7 +181,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setDownloadFolder: (NSString *) path
 {
-    tr_torrentSetFolder(fHandle, [path UTF8String]);
+    fDownloadFolder = [path copy];
+    
+    if (!fUseIncompleteFolder || [[NSFileManager defaultManager] fileExistsAtPath:
+                                    [path stringByAppendingPathComponent: [self name]]])
+        tr_torrentSetFolder(fHandle, [path UTF8String]);
+    else
+        tr_torrentSetFolder(fHandle, [fIncompleteFolder UTF8String]);
 }
 
 - (NSString *) downloadFolder
@@ -175,7 +211,19 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //notification when downloading finished
     if ([self justFinished])
+    {
+        //move file from incomplete folder to download folder
+        if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder])
+        {
+            tr_torrentStop(fHandle);
+            if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
+                                    toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
+                tr_torrentSetFolder(fHandle, [fDownloadFolder UTF8String]);
+            tr_torrentStart(fHandle);
+        }
+        
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+    }
     
     //check to stop for ratio
     if ([self isSeeding] && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)

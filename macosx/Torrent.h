@@ -39,6 +39,9 @@
     BOOL         fResumeOnWake;
     NSDate       * fDate;
     
+    BOOL        fUseIncompleteFolder;
+    NSString    * fDownloadFolder, * fIncompleteFolder;
+    
     BOOL        fPrivateTorrent, fPublicTorrent;
     NSString    * fPublicTorrentLocation;
 

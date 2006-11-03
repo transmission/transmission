@@ -44,6 +44,7 @@
 - (void) setPrefView: (id) sender;
 
 - (void) folderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
+- (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info;
 
 @end
@@ -396,6 +397,21 @@
         @selector(folderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
 }
 
+- (void) incompleteFolderSheetShow: (id) sender
+{
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+
+    [panel setPrompt: @"Select"];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
+
+    [panel beginSheetForDirectory: nil file: nil types: nil
+        modalForWindow: [self window] modalDelegate: self didEndSelector:
+        @selector(incompleteFolderSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+}
+
 - (void) setAutoImport: (id) sender
 {
     if ([fDefaults boolForKey: @"AutoImport"])
@@ -506,6 +522,13 @@
         else
             [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
     }
+}
+
+- (void) incompleteFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
+{
+    if (code == NSOKButton)
+        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"IncompleteDownloadFolder"];
+    [fIncompleteFolderPopUp selectItemAtIndex: 0];
 }
 
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info

@@ -44,6 +44,8 @@
 	<false/>
 	<key>History</key>
 	<array/>
+	<key>IncompleteDownloadFolder</key>
+	<string>~/Desktop</string>
 	<key>InfoTab</key>
 	<string>Info</string>
 	<key>InfoVisible</key>
@@ -103,6 +105,8 @@
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
+	<false/>
+	<key>UseIncompleteDownloadFolder</key>
 	<false/>
 </dict>
 </plist>
