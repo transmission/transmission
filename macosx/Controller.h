@@ -102,8 +102,6 @@
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 
-- (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet;
-
 - (void) resumeSelectedTorrents:    (id) sender;
 - (void) resumeAllTorrents:         (id) sender;
 - (void) resumeTorrents:            (NSArray *) torrents;

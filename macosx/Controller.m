@@ -446,21 +446,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
 }
 
-- (NSArray *) torrentsAtIndexes: (NSIndexSet *) indexSet
-{
-    if ([fDisplayedTorrents respondsToSelector: @selector(objectsAtIndexes:)])
-        return [fDisplayedTorrents objectsAtIndexes: indexSet];
-    else
-    {
-        NSMutableArray * torrents = [NSMutableArray arrayWithCapacity: [indexSet count]];
-        unsigned int i;
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-            [torrents addObject: [fDisplayedTorrents objectAtIndex: i]];
-
-        return torrents;
-    }
-}
-
 - (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
 {
     [self openFiles: filenames ignoreDownloadFolder: NO];
@@ -614,7 +599,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeSelectedTorrents: (id) sender
 {
-    [self resumeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self resumeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) resumeAllTorrents: (id) sender
@@ -638,7 +623,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resumeSelectedTorrentsNoWait:  (id) sender
 {
-    [self resumeTorrentsNoWait: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self resumeTorrentsNoWait: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) resumeWaitingTorrents: (id) sender
@@ -669,7 +654,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) stopSelectedTorrents: (id) sender
 {
-    [self stopTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [self stopTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) stopAllTorrents: (id) sender
@@ -824,32 +809,32 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) removeNoDelete: (id) sender
 {
-    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
                 deleteData: NO deleteTorrent: NO];
 }
 
 - (void) removeDeleteData: (id) sender
 {
-    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
                 deleteData: YES deleteTorrent: NO];
 }
 
 - (void) removeDeleteTorrent: (id) sender
 {
-    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
                 deleteData: NO deleteTorrent: YES];
 }
 
 - (void) removeDeleteDataAndTorrent: (id) sender
 {
-    [self removeTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]
+    [self removeTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]
                 deleteData: YES deleteTorrent: YES];
 }
 
 - (void) copyTorrentFile: (id) sender
 {
     [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray:
-            [self torrentsAtIndexes: [fTableView selectedRowIndexes]]]];
+            [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]]];
 }
 
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents
@@ -1019,7 +1004,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSArray * selectedTorrents = nil;
     int numSelected = [fTableView numberOfSelectedRows];
     if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
-        selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+        selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
 
     [self sortTorrentsIgnoreSelected]; //actually sort
     
@@ -1162,7 +1147,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //remember selected rows if needed
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
-                ? [self torrentsAtIndexes: [fTableView selectedRowIndexes]] : nil;
+                ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
 
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
 
@@ -1690,13 +1675,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSArray * selectedTorrents = nil;
         int numSelected = [fTableView numberOfSelectedRows];
         if (numSelected > 0 && numSelected < [fDisplayedTorrents count])
-            selectedTorrents = [self torrentsAtIndexes: [fTableView selectedRowIndexes]];
+            selectedTorrents = [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]];
     
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
         //move torrent in array 
-        NSArray * movingTorrents = [[self torrentsAtIndexes: indexes] retain];
+        NSArray * movingTorrents = [[fDisplayedTorrents objectsAtIndexes: indexes] retain];
         [fDisplayedTorrents removeObjectsInArray: movingTorrents];
         
         //determine the insertion index now that transfers to move have been removed
@@ -1742,7 +1727,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController updateInfoForTorrents: [self torrentsAtIndexes: [fTableView selectedRowIndexes]]];
+    [fInfoController updateInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (void) toggleSmallView: (id) sender

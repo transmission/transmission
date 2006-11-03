@@ -222,22 +222,14 @@
 
 - (void) updatePortStatus
 {
-    long sytemVersion;
-    [fPortStatusField setStringValue: @""];
-    [fPortStatusImage setImage: nil];
-    
-    Gestalt('sysv', & sytemVersion);
-    if (sytemVersion >= 0x1040)
-    {
-        //NSXML features are unfortunately only available since Mac OS X v10.4
-        PortChecker * checker = [[PortChecker alloc] initWithDelegate: self];
+    PortChecker * portChecker = [[PortChecker alloc] initWithDelegate: self];
 
-        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
-                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
-        [fPortStatusProgress startAnimation: self];
+    [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
+                                        "Preferences -> Network -> port status") stringByAppendingEllipsis]];
+    [fPortStatusImage setImage: nil];
+    [fPortStatusProgress startAnimation: self];
         
-        [checker probePort: [fDefaults integerForKey: @"BindPort"]];
-    }
+    [portChecker probePort: [fDefaults integerForKey: @"BindPort"]];
 }
 
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
