@@ -211,8 +211,7 @@
         
         [fTorrentLocationField setStringValue: [torrent torrentLocationString]];
         [fTorrentLocationField setToolTip: [torrent torrentLocation]];
-        [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
-        [fDataLocationField setToolTip: [torrent dataLocation]];
+        
         [fDateStartedField setObjectValue: [torrent date]];
         
         [fRevealDataButton setHidden: NO];
@@ -328,11 +327,20 @@
 {
     int numberSelected = [fTorrents count];
 
-    //set ratio settings
     if (numberSelected > 0)
     {
+        Torrent * torrent;
+        
+        if (numberSelected == 1)
+        {
+            torrent = [fTorrents objectAtIndex: 0];
+            [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
+            [fDataLocationField setToolTip: [torrent dataLocation]];
+        }
+        
+        //set ratio settings
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent = [enumerator nextObject]; //first torrent
+        torrent = [enumerator nextObject]; //first torrent
         
         int ratioSetting = [torrent stopRatioSetting];
         float ratioLimit = [torrent ratioLimit];
@@ -518,7 +526,6 @@
     return tableView != fPeerTable;
 }
 
-//only called on >= 10.4
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation

@@ -966,21 +966,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
-
+    
+    [fInfoController updateInfoSettings];
+    
     [self applyFilter: nil];
     [self checkToStartWaiting: torrent];
-
+    
     if ([fDefaults boolForKey: @"PlayDownloadSound"])
     {
         NSSound * sound;
         if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
             [sound play];
     }
-
+    
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
         description: [torrent name]
         notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
-
+    
     if (![fWindow isKeyWindow])
         fCompleted++;
 }
