@@ -359,12 +359,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
 }
 
-- (void) setCopyTorrents: (id) sender
-{
-    if (![fDefaults boolForKey: @"SavePrivateTorrent"])
-        [fDefaults setBool: NO forKey: @"DeleteOriginalTorrent"];
-}
-
 - (void) setDownloadLocation: (id) sender
 {
     //download folder

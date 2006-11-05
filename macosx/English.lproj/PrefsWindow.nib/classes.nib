@@ -14,7 +14,6 @@
                 setAutoSize = id; 
                 setAutoSpeedLimit = id; 
                 setBadge = id; 
-                setCopyTorrents = id; 
                 setDownloadLocation = id; 
                 setNat = id; 
                 setPort = id; 

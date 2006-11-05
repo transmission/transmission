@@ -122,7 +122,8 @@
     {
         if (numberSelected > 0)
         {
-            [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected", "Inspector -> above tabs -> selected torrents"), numberSelected]];
+            [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected",
+                                            "Inspector -> above tabs -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
             NSEnumerator * enumerator = [torrents objectEnumerator];
@@ -130,11 +131,13 @@
             while ((torrent = [enumerator nextObject]))
                 size += [torrent size];
             
-            [fSizeField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ Total", "Inspector -> above tabs -> total size (several torrents selected)"), [NSString stringForFileSize: size]]];
+            [fSizeField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ Total",
+                "Inspector -> above tabs -> total size (several torrents selected)"), [NSString stringForFileSize: size]]];
         }
         else
         {
-            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
+            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected",
+                                                            "Inspector -> above tabs -> selected torrents")];
             [fSizeField setStringValue: @""];
     
             [fDownloadedValidField setStringValue: @""];
@@ -209,8 +212,15 @@
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         
-        [fTorrentLocationField setStringValue: [torrent torrentLocationString]];
-        [fTorrentLocationField setToolTip: [torrent torrentLocation]];
+        BOOL publicTorrent = [torrent publicTorrent];
+        [fTorrentLocationField setStringValue: publicTorrent
+                    ? [[torrent publicTorrentLocation] stringByAbbreviatingWithTildeInPath]
+                    : NSLocalizedString(@"Transmission Support Folder", "Torrent -> location when deleting original")];
+        if (publicTorrent)
+            [fTorrentLocationField setToolTip: [NSString stringWithFormat: @"%@\n\n%@",
+                        [torrent publicTorrentLocation], [torrent torrentLocation]]];
+        else
+            [fTorrentLocationField setToolTip: [torrent torrentLocation]];
         
         [fDateStartedField setObjectValue: [torrent date]];
         
@@ -242,12 +252,15 @@
             [fFiles addObjectsFromArray: [torrent fileList]];
         
         if ([fFiles count] > 1)
-            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files", "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
+            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files",
+                                        "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
         else
-            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d file", "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
+            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d file",
+                                        "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
     }
     else
-        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Files tab -> bottom text (number of files)")];
+        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available",
+                                        "Inspector -> Files tab -> bottom text (number of files)")];
     
     [fFileTable deselectAll: nil];
     [fFileTable reloadData];
@@ -312,7 +325,8 @@
     [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
     
     BOOL active = [torrent isActive];
-    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: NSLocalizedString(@"%d (%d incoming)", "Inspector -> Peers tab -> connected"),
+    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: NSLocalizedString(@"%d (%d incoming)",
+                                                                                "Inspector -> Peers tab -> connected"),
                                                     [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
     [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
@@ -534,7 +548,8 @@
     {
         NSDictionary * file = [fFiles objectAtIndex: row];
         if ([[column identifier] isEqualToString: @"Size"])
-            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes", "Inspector -> Files tab -> table row tooltip")];
+            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
+                                                                        "Inspector -> Files tab -> table row tooltip")];
         else
             return [file objectForKey: @"Name"];
     }

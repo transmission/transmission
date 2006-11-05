@@ -33,7 +33,7 @@
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
-        privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
+        publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
         ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
         orderValue: (NSNumber *) orderValue;
@@ -60,7 +60,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (id) initWithPath: (NSString *) path lib: (tr_handle_t *) lib
 {
-    self = [self initWithHash: nil path: path lib: lib privateTorrent: nil publicTorrent: nil
+    self = [self initWithHash: nil path: path lib: lib publicTorrent: nil
             date: nil stopRatioSetting: nil ratioLimit: nil waitToStart: nil orderValue: nil];
     
     if (self)
@@ -78,7 +78,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] lib: lib
-                privateTorrent: [history objectForKey: @"PrivateCopy"]
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 date: [history objectForKey: @"Date"]
                 stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
@@ -124,8 +123,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSDictionary *) history
 {
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                    [NSNumber numberWithBool: fPrivateTorrent], @"PrivateCopy",
                     [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
+                    [self hashString], @"TorrentHash",
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
@@ -137,9 +136,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (fUseIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
-    
-    if (fPrivateTorrent)
-        [history setObject: [self hashString] forKey: @"TorrentHash"];
 
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
@@ -442,8 +438,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) removeForever
 {
-    if (fPrivateTorrent)
-        tr_torrentRemoveSaved(fHandle);
+    tr_torrentRemoveSaved(fHandle);
 }
 
 - (void) sleep
@@ -615,12 +610,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fPublicTorrentLocation;
 }
 
-- (NSString *) torrentLocationString
-{
-    return fPrivateTorrent ? NSLocalizedString(@"Transmission Support Folder", "Torrent -> location")
-                            : [fPublicTorrentLocation stringByAbbreviatingWithTildeInPath];
-}
-
 - (NSString *) dataLocation
 {
     return [[self downloadFolder] stringByAppendingPathComponent: [self name]];
@@ -629,11 +618,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (BOOL) publicTorrent
 {
     return fPublicTorrent;
-}
-
-- (BOOL) privateTorrent
-{
-    return fPrivateTorrent;
 }
 
 - (NSString *) stateString
@@ -868,7 +852,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
-        privateTorrent: (NSNumber *) privateTorrent publicTorrent: (NSNumber *) publicTorrent
+        publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
         ratioLimit: (NSNumber *) ratioLimit waitToStart: (NSNumber *) waitToStart
         orderValue: (NSNumber *) orderValue
@@ -879,16 +863,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fLib = lib;
     fDefaults = [NSUserDefaults standardUserDefaults];
 
-    fPrivateTorrent = privateTorrent ? [privateTorrent boolValue] : [fDefaults boolForKey: @"SavePrivateTorrent"];
-    fPublicTorrent = !fPrivateTorrent || (publicTorrent ? [publicTorrent boolValue]
-                                            : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
+    fPublicTorrent = path && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
+    if (fPublicTorrent)
+        fPublicTorrentLocation = [path retain];
 
     int error;
-    if (fPrivateTorrent && hashString)
+    if (hashString)
         fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FSAVEPRIVATE, & error);
     
     if (!fHandle && path)
-        fHandle = tr_torrentInit(fLib, [path UTF8String], fPrivateTorrent ? TR_FSAVEPRIVATE : 0, & error);
+        fHandle = tr_torrentInit(fLib, [path UTF8String], TR_FSAVEPRIVATE, & error);
 
     if (!fHandle)
     {
@@ -897,9 +881,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     fInfo = tr_torrentInfo( fHandle );
-
-    if (fPublicTorrent)
-        fPublicTorrentLocation = [path retain];
 
     fDate = date ? [date retain] : [[NSDate alloc] init];
     

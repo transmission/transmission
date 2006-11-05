@@ -66,8 +66,6 @@
 
 - (void) setQueueNumber:    (id) sender;
 
-- (void) setCopyTorrents: (id) sender;
-
 - (void) setDownloadLocation:       (id) sender;
 - (void) folderSheetShow:           (id) sender;
 - (void) incompleteFolderSheetShow: (id) sender;

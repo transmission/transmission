@@ -241,7 +241,7 @@
 /* Status bar transfer count */
 "%d Transfers" = "%d Transfers";
 
-/* Torrent -> location */
+/* Torrent -> location when deleting original */
 "Transmission Support Folder" = "Transmission Support Folder";
 
 /* Torrent -> progress string */

@@ -42,7 +42,7 @@
     BOOL        fUseIncompleteFolder;
     NSString    * fDownloadFolder, * fIncompleteFolder;
     
-    BOOL        fPrivateTorrent, fPublicTorrent;
+    BOOL        fPublicTorrent;
     NSString    * fPublicTorrentLocation;
 
     NSUserDefaults  * fDefaults;
@@ -111,11 +111,9 @@
 
 - (NSString *) torrentLocation;
 - (NSString *) publicTorrentLocation;
-- (NSString *) torrentLocationString;
 - (NSString *) dataLocation;
 
 - (BOOL) publicTorrent;
-- (BOOL) privateTorrent;
 
 - (NSString *) stateString;
 

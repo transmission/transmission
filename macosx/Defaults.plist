@@ -74,8 +74,6 @@
 	<integer>2</integer>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
-	<key>SavePrivateTorrent</key>
-	<true/>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>
