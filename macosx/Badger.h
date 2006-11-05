@@ -29,15 +29,10 @@
 
 @interface Badger : NSObject {
 
-    NSImage         * fDockIcon, * fBadgedDockIcon,
-                    * fBadge, * fUploadBadge, * fDownloadBadge;
+    NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
                     
     NSDictionary    * fAttributes;
-    
-    NSLock          * fLock;
-    
-    int             fCompleted;
-    BOOL            fSpeedShown;
+    BOOL            fNonDefault;
 }
 
 - (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate;
