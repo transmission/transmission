@@ -167,6 +167,7 @@
         [item setImage: [NSImage imageNamed: @"Preferences.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
     }
     else if ([ident isEqualToString: TOOLBAR_TRANSFERS])
     {
@@ -174,6 +175,7 @@
         [item setImage: [NSImage imageNamed: @"Transfers.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
     }
     else if ([ident isEqualToString: TOOLBAR_BANDWIDTH])
     {
@@ -181,6 +183,7 @@
         [item setImage: [NSImage imageNamed: @"Bandwidth.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
     }
     else if ([ident isEqualToString: TOOLBAR_NETWORK])
     {
@@ -188,6 +191,7 @@
         [item setImage: [NSImage imageNamed: @"Network.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
+        [item setAutovalidates: NO];
     }
     else
     {
