@@ -50,6 +50,8 @@
 #define FR_ID_DOWNLOADED        0x02
 /* number of bytes uploaded */
 #define FR_ID_UPLOADED          0x03
+/* IPs and ports of connectable peers */
+#define FR_ID_PEERS             0x04
 
 /* macros for the length of various pieces of the progress data */
 #define FR_MTIME_LEN( t ) \
@@ -126,6 +128,7 @@ static void fastResumeSave( tr_io_t * io )
     char    * path;
     uint8_t * buf;
     uint64_t  total;
+    int       size;
 
     buf = malloc( FR_PROGRESS_LEN( tor ) );
 
@@ -166,6 +169,13 @@ static void fastResumeSave( tr_io_t * io )
     fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
     total = tor->uploadedCur + tor->uploadedPrev;
     fastResumeWriteData( FR_ID_UPLOADED, &total, 8, 1, file );
+
+    /* Write IPs and ports of connectable peers, if any */
+    if( ( size = tr_peerGetConnectable( tor, &buf ) ) > 0 )
+    {
+        fastResumeWriteData( FR_ID_PEERS, buf, size, 1, file );
+        free( buf );
+    }
 
     fclose( file );
 
@@ -357,6 +367,20 @@ static int fastResumeLoad( tr_io_t * io )
                     continue;
                 }
                 break;
+
+            case FR_ID_PEERS:
+            {
+                uint8_t * buf = malloc( len );
+                if( 1 != fread( buf, len, 1, file ) )
+                {
+                    free( buf );
+                    fclose( file );
+                    return 1;
+                }
+                tr_peerAddCompactMany( tor, buf, len );
+                free( buf );
+                continue;
+            }
 
             default:
                 break;
