@@ -83,7 +83,7 @@ char * tr_clientForId( uint8_t * id )
                       id[3], id[4], id[5], id[6] );
         }
     }
-    else if( !memcmp( &id[4], "----", 4 ) )
+    else if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
     {
         if( id[0] == 'T' )
         {
@@ -91,7 +91,7 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( id[0] == 'A' )
         {
-            asprintf( &ret, "ABC (%c%c%c)", id[1], id[2], id[3] );
+            asprintf( &ret, "ABC %c.%c.%c", id[1], id[2], id[3] );
         }
     }
     else if( id[0] == 'M' && id[2] == '-' &&
