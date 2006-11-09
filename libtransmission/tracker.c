@@ -237,6 +237,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
     uint64_t       down;
     uint64_t       up;
     char         * start;
+    int            numwant = 50;
 
     down = tor->downloadedCur;
     up = tor->uploadedCur;
@@ -258,6 +259,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
     else if( tc->stopped || 0 < tc->newPort )
     {
         event = "&event=stopped";
+        numwant = 0;
     }
     else
     {
@@ -285,11 +287,11 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
                           "downloaded=%"PRIu64"&"
                           "left=%"PRIu64"&"
                           "compact=1&"
-                          "numwant=50&"
+                          "numwant=%d&"
                           "key=%s"
                           "%s",
                           inf->trackerAnnounce, start, tor->hashString, tc->id,
-                          tc->bindPort, up, down, left, tor->key, event );
+                          tc->bindPort, up, down, left, numwant, tor->key, event );
 }
 
 static void readAnswer( tr_tracker_t * tc, const char * data, int len )

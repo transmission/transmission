@@ -1039,7 +1039,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         //if cannot trash, just delete it (will work if it is on a remote volume)
         if (![[NSFileManager defaultManager] removeFileAtPath: path handler: nil])
-            NSLog([@"Could not trash " stringByAppendingString: path]);
+            NSLog(@"Could not trash %@", path);
     }
 }
 
