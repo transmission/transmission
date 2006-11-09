@@ -1572,17 +1572,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     int i;
     for (i = [newNames count] - 1; i >= 0; i--)
     {
-        if ([[[newNames objectAtIndex: i] pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
+        file = [newNames objectAtIndex: i];
+        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
             [newNames removeObjectAtIndex: i];
         else
-            [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: [newNames objectAtIndex: i]]];
+            [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: file]];
     }
     
     NSEnumerator * enumerator;
     if (![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"])
     {
         enumerator = [newNames objectEnumerator];
-        unsigned oldCount;
         while ((file = [enumerator nextObject]))
         {
             int count = [fTorrents count];
@@ -1590,17 +1590,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             
             //check if torrent was opened
             if ([fTorrents count] > count)
-            {
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
                     "Growl notification title") description: [file lastPathComponent]
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
-            }
         }
     }
     else
-    {
         [self openFiles: newNames];
-    }
     
     //create temporary torrents to check if an import fails because of an error
     enumerator = [newNames objectEnumerator];
