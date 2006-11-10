@@ -250,6 +250,13 @@ static int createFiles( tr_io_t * io )
             *p = '/';
         }
 
+        /* Empty folders use a dummy "" file, skip those */
+        if( p == &path[strlen( path ) - 1] )
+        {
+            free( path );
+            continue;
+        }
+
         if( stat( path, &sb ) )
         {
             /* File doesn't exist yet */
@@ -433,31 +440,34 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
             cur = size;
         }
 
-        /* Now let's get a stream on the file... */
-        asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
-        file = tr_fdFileOpen( tor->fdlimit, path );
-        if( file < 0 )
+        if( cur > 0 )
         {
-            tr_err( "readOrWriteBytes: could not open file '%s'", path );
+            /* Now let's get a stream on the file... */
+            asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
+            file = tr_fdFileOpen( tor->fdlimit, path );
+            if( file < 0 )
+            {
+                tr_err( "readOrWriteBytes: could not open file '%s'", path );
+                free( path );
+                goto fail;
+            }
             free( path );
-            goto fail;
-        }
-        free( path );
 
-        /* seek to the right offset... */
-        if( lseek( file, offset, SEEK_SET ) < 0 )
-        {
-            goto fail;
-        }
+            /* seek to the right offset... */
+            if( lseek( file, offset, SEEK_SET ) < 0 )
+            {
+                goto fail;
+            }
 
-        /* do what we are here to do... */
-        if( readOrWrite( file, buf, cur ) != cur )
-        {
-            goto fail;
-        }
+            /* do what we are here to do... */
+            if( readOrWrite( file, buf, cur ) != cur )
+            {
+                goto fail;
+            }
 
-        /* and close the stream. */
-        tr_fdFileRelease( tor->fdlimit, file );
+            /* and close the stream. */
+            tr_fdFileRelease( tor->fdlimit, file );
+        }
 
         /* 'cur' bytes done, 'size - cur' bytes to go with the next file */
         i      += 1;

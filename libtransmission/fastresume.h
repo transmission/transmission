@@ -91,19 +91,20 @@ static int fastResumeMTimes( tr_io_t * io, int * tab )
             free( path );
             return 1;
         }
-        if( ( sb.st_mode & S_IFMT ) != S_IFREG )
+        if( ( sb.st_mode & S_IFMT ) == S_IFREG )
         {
-            tr_err( "Wrong st_mode for '%s'", path );
-            free( path );
-            return 1;
+#ifdef SYS_DARWIN
+            tab[i] = ( sb.st_mtimespec.tv_sec & 0x7FFFFFFF );
+#else
+            tab[i] = ( sb.st_mtime & 0x7FFFFFFF );
+#endif
+        }
+        else
+        {
+            /* Empty folder */
+            tab[i] = 0;
         }
         free( path );
-
-#ifdef SYS_DARWIN
-        tab[i] = ( sb.st_mtimespec.tv_sec & 0x7FFFFFFF );
-#else
-        tab[i] = ( sb.st_mtime & 0x7FFFFFFF );
-#endif
     }
 
     return 0;
