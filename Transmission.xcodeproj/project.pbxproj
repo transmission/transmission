@@ -47,13 +47,13 @@
 		4D1838FD09DEC4380047D688 /* transmission.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D1838F909DEC4380047D688 /* transmission.c */; };
 		4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D364D9F091FBB2C00377D12 /* TorrentTableView.m */; };
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
-		4D4B7F6109E055660053C1EB /* libcrypto.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.dylib */; };
+		4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		4D6DAAC6090CE00500F43C22 /* RevealOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC4090CE00500F43C22 /* RevealOff.png */; };
 		4D6DAAC7090CE00500F43C22 /* RevealOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC5090CE00500F43C22 /* RevealOn.png */; };
 		4D752E930913C949008EAAD4 /* Preferences.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D752E920913C949008EAAD4 /* Preferences.png */; };
 		4D8CEF91095870E00063BAEA /* Network.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D8CEF90095870E00063BAEA /* Network.png */; };
 		4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.dylib */; };
+		4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		4DA6FDBA0911233800450CB1 /* PauseOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDB80911233800450CB1 /* PauseOn.png */; };
 		4DA6FDBB0911233800450CB1 /* PauseOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDB90911233800450CB1 /* PauseOff.png */; };
 		4DA6FDC5091141AD00450CB1 /* ResumeOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DA6FDC3091141AD00450CB1 /* ResumeOff.png */; };
@@ -126,7 +126,6 @@
 		A259317E0A73B2CC002F4FE7 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* Transmission Help */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
-		A25FCDDF0A37695F002BCBBE /* PauseSelected.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
 		A260C9AC0AA3B8D700FDC1B7 /* Error.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */; };
@@ -188,34 +187,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A2D5CCDD0A265F790089A8C2 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				A25FCDDF0A37695F002BCBBE /* PauseSelected.png in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2D5CCF80A2660660089A8C2 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A2D5CD110A2661660089A8C2 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 7;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -268,7 +239,7 @@
 		4D1838F709DEC4380047D688 /* utils.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = utils.c; path = libtransmission/utils.c; sourceTree = SOURCE_ROOT; };
 		4D1838F809DEC4380047D688 /* transmission.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = transmission.h; path = libtransmission/transmission.h; sourceTree = SOURCE_ROOT; };
 		4D1838F909DEC4380047D688 /* transmission.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = transmission.c; path = libtransmission/transmission.c; sourceTree = SOURCE_ROOT; };
-		4D2617F709DECE3D00D08EFA /* libcrypto.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.dylib; path = /usr/lib/libcrypto.0.9.dylib; sourceTree = "<absolute>"; };
+		4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.7.dylib; path = /usr/lib/libcrypto.0.9.7.dylib; sourceTree = "<absolute>"; };
 		4D2784360905709500687951 /* Transmission.icns */ = {isa = PBXFileReference; explicitFileType = image.icns; name = Transmission.icns; path = macosx/Images/Transmission.icns; sourceTree = "<group>"; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TorrentTableView.h; path = macosx/TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = TorrentTableView.m; path = macosx/TorrentTableView.m; sourceTree = "<group>"; };
@@ -413,7 +384,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */,
-				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.dylib in Frameworks */,
+				4D9A2BF909E16D4F002D0FF9 /* libcrypto.0.9.7.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,7 +395,7 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */,
 				4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */,
-				4D4B7F6109E055660053C1EB /* libcrypto.0.9.dylib in Frameworks */,
+				4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
 			);
@@ -669,7 +640,7 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.dylib */,
+				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -735,9 +706,6 @@
 				4D18389309DEC0030047D688 /* Headers */,
 				4D18389409DEC0030047D688 /* Sources */,
 				4D18389509DEC0030047D688 /* Frameworks */,
-				A2D5CCDD0A265F790089A8C2 /* CopyFiles */,
-				A2D5CCF80A2660660089A8C2 /* CopyFiles */,
-				A2D5CD110A2661660089A8C2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
