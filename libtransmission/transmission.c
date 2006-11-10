@@ -591,6 +591,7 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             peers[i].isIncoming = tr_peerIsIncoming(peer);
             peers[i].isDownloading = tr_peerIsDownloading(peer);
             peers[i].isUploading = tr_peerIsUploading(peer);
+            peers[i].progress = tr_peerProgress(peer);
         }
     }
     

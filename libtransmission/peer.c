@@ -63,6 +63,8 @@ struct tr_peer_s
 
     /* The pieces that the peer has */
     uint8_t      * bitfield;
+    int            pieceCount;
+    float          progress;
 
     int            goodPcs;
     int            badPcs;
@@ -532,6 +534,16 @@ int tr_peerIsUploading( tr_peer_t * peer )
 int tr_peerIsDownloading( tr_peer_t * peer )
 {
     return peer->outBlockSending;
+}
+
+/***********************************************************************
+ * tr_peerIsDownloading
+ ***********************************************************************
+ *
+ **********************************************************************/
+float tr_peerProgress( tr_peer_t * peer )
+{
+    return peer->progress;
 }
 
 /***********************************************************************

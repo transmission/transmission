@@ -106,6 +106,11 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
     {
         peer->bitfield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
     }
+    if( !tr_bitfieldHas( peer->bitfield, piece ) )
+    {
+        peer->pieceCount++;
+        peer->progress = (float) peer->pieceCount / tor->info.pieceCount;
+    }
     tr_bitfieldAdd( peer->bitfield, piece );
     updateInterest( tor, peer );
 
@@ -119,6 +124,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
 {
     tr_info_t * inf = &tor->info;
     int bitfieldSize;
+    int i;
 
     bitfieldSize = ( inf->pieceCount + 7 ) / 8;
     
@@ -151,6 +157,17 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
         peer->bitfield = malloc( bitfieldSize );
     }
     memcpy( peer->bitfield, p, bitfieldSize );
+
+    peer->pieceCount = 0;
+    for( i = 0; i < inf->pieceCount; i++ )
+    {
+        if( tr_bitfieldHas( peer->bitfield, i ) )
+        {
+            peer->pieceCount++;
+        }
+    }
+    peer->progress = (float) peer->pieceCount / inf->pieceCount;
+
     updateInterest( tor, peer );
 
     return 0;
