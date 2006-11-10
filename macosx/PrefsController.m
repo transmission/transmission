@@ -412,12 +412,11 @@
 
 - (void) setAutoImport: (id) sender
 {
+    NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     if ([fDefaults boolForKey: @"AutoImport"])
-        [[UKKQueue sharedFileWatcher] addPath:
-            [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
+        [[UKKQueue sharedFileWatcher] addPath: path];
     else
-        [[UKKQueue sharedFileWatcher] removePathFromQueue:
-            [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
+        [[UKKQueue sharedFileWatcher] removePathFromQueue: path];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
 }

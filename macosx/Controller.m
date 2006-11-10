@@ -1583,9 +1583,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"])
     {
         enumerator = [newNames objectEnumerator];
+        int count;
         while ((file = [enumerator nextObject]))
         {
-            int count = [fTorrents count];
+            count = [fTorrents count];
             [self openFiles: [NSArray arrayWithObject: file]];
             
             //check if torrent was opened
@@ -1600,9 +1601,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //create temporary torrents to check if an import fails because of an error
     enumerator = [newNames objectEnumerator];
+    int error;
     while ((file = [enumerator nextObject]))
     {
-        int error;
         tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], 0, & error);
         
         if (tempTor)

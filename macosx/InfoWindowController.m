@@ -505,12 +505,14 @@
         
         if ([ident isEqualToString: @"Connected"])
             return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
+        else if ([ident isEqualToString: @"Client"])
+            return [peer objectForKey: @"Client"];
+        else if  ([ident isEqualToString: @"Progress"])
+            return [peer objectForKey: @"Progress"];
         else if ([ident isEqualToString: @"UL To"])
             return [[peer objectForKey: @"UL To"] boolValue] ? fCheckImage : nil;
         else if ([ident isEqualToString: @"DL From"])
             return [[peer objectForKey: @"DL From"] boolValue] ? fCheckImage : nil;
-        else if ([ident isEqualToString: @"Client"])
-            return [peer objectForKey: @"Client"];
         else
             return [peer objectForKey: @"IP"];
     }
