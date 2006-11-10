@@ -24,6 +24,7 @@
 
 #import "PortChecker.h"
 #import "transmission.h"
+#import "PrefsController.h"
 
 @implementation PortChecker
 
