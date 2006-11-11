@@ -2,8 +2,12 @@
 #
 # $Id$
 
+MAJOR=0
+MINOR=6
+STRING=0.7-svn
+
 # Get current SVN revision from Ids in all source files
-REVMAX=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
+REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
             -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
             -o -name 'configure' ')' -exec cat '{}' ';' ) | \
           sed -e '/\$Id:/!d' -e \
@@ -24,14 +28,26 @@ replace_if_differs ()
 }
 
 # Generate version.mk
-cp -f mk/version.mk.in mk/version.mk.new
-echo "VERSION_REVISION = $REVMAX" >> mk/version.mk.new
+cat > mk/version.mk.new << EOF
+VERSION_MAJOR    = $MAJOR
+VERSION_MINOR    = $MINOR
+VERSION_STRING   = $STRING
+VERSION_REVISION = $REV
+EOF
 replace_if_differs mk/version.mk.new mk/version.mk
 
-# Generate version.h from version.mk
-grep "^VER" mk/version.mk | sed -e 's/^/#define /g' -e 's/= //g' \
-    -e 's/\(VERSION_STRING[ ]*\)\(.*\)/\1"\2"/' > \
-    libtransmission/version.h.new
+# Generate version.h
+cat > libtransmission/version.h.new << EOF
+#define VERSION_MAJOR    $MAJOR
+#define VERSION_MINOR    $MINOR
+#define VERSION_STRING   "$STRING"
+#define VERSION_REVISION $REV
+EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
+
+# Generate Info.plist from Info.plist.in
+sed -e "s/%%BUNDLE_VERSION%%/$REV/" -e "s/%%SHORT_VERSION_STRING%%/$STRING/" \
+        < macosx/Info.plist.in > macosx/Info.plist.new
+replace_if_differs macosx/Info.plist.new macosx/Info.plist
 
 exit 0
