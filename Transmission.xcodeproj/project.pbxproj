@@ -467,8 +467,8 @@
 			isa = PBXGroup;
 			children = (
 				8D1107320486CEB800E47090 /* Transmission.app */,
-				4D18389709DEC0030047D688 /* libtransmission.a */,
 				4DDBB71909E16BAE00284745 /* transmissioncli */,
+				4D18389709DEC0030047D688 /* libtransmission.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -480,7 +480,6 @@
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
-				A250C8590A27511C000F3E9F /* Linked Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = Transmission;
@@ -573,6 +572,8 @@
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+				A261F1DB0A69A1610002815A /* Growl.framework */,
+				A24F19070A3A790800C9C145 /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -651,15 +652,6 @@
 				4DDBB71B09E16BF100284745 /* transmissioncli.c */,
 			);
 			name = CLI;
-			sourceTree = "<group>";
-		};
-		A250C8590A27511C000F3E9F /* Linked Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				A261F1DB0A69A1610002815A /* Growl.framework */,
-				A24F19070A3A790800C9C145 /* Sparkle.framework */,
-			);
-			name = "Linked Frameworks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -764,9 +756,9 @@
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
 			targets = (
-				4D18389609DEC0030047D688 /* libtransmission */,
-				4DDBB71809E16BAE00284745 /* transmissioncli */,
 				8D1107260486CEB800E47090 /* Transmission */,
+				4DDBB71809E16BAE00284745 /* transmissioncli */,
+				4D18389609DEC0030047D688 /* libtransmission */,
 			);
 		};
 /* End PBXProject section */
