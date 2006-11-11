@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 applyFilter = id; 
+                applySpeedLimit = id; 
                 copyTorrentFile = id; 
                 doNothing = id; 
                 linkForums = id; 
@@ -65,8 +66,6 @@
                 fSearchFilterField = NSSearchField; 
                 fSeedFilterButton = BarButton; 
                 fSpeedLimitButton = NSButton; 
-                fSpeedLimitDockItem = NSMenuItem; 
-                fSpeedLimitItem = NSMenuItem; 
                 fStateSortActionItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
                 fStatusBar = ImageBackgroundView; 

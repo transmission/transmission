@@ -57,9 +57,7 @@
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
-    IBOutlet NSMenuItem             * fSpeedLimitItem, * fSpeedLimitDockItem;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
-    NSImage                         * fSpeedLimitNormalImage, * fSpeedLimitBlueImage, * fSpeedLimitGraphiteImage;
     NSTimer                         * fSpeedLimitTimer;
     
     IBOutlet ImageBackgroundView    * fStatusBar;
@@ -152,6 +150,7 @@
 - (void) setFilter: (id) sender;
 - (void) switchFilter: (id) sender;
 
+- (void) applySpeedLimit: (id) sender;
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
 - (void) autoSpeedLimit: (NSTimer *) timer;

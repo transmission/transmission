@@ -34,6 +34,7 @@
 #import "ActionMenuRatioToDisplayRatioTransformer.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "SpeedLimitToTurtleIconTransformer.h"
 
 #import <Sparkle/Sparkle.h>
 
@@ -92,6 +93,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     ExpandedPathToIconTransformer * iconTransformer =
                         [[[ExpandedPathToIconTransformer alloc] init] autorelease];
     [NSValueTransformer setValueTransformer: iconTransformer forName: @"ExpandedPathToIconTransformer"];
+    
+    SpeedLimitToTurtleIconTransformer * speedLimitIconTransformer =
+                        [[[SpeedLimitToTurtleIconTransformer alloc] init] autorelease];
+    [NSValueTransformer setValueTransformer: speedLimitIconTransformer forName: @"SpeedLimitToTurtleIconTransformer"];
 }
 
 - (id) init
@@ -200,23 +205,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [contentView addSubview: fStatusBar];
     [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
-    
-    //set speed limit
-    fSpeedLimitNormalImage = [fSpeedLimitButton image];
-    fSpeedLimitBlueImage = [NSImage imageNamed: @"SpeedLimitButtonBlue.png"];
-    fSpeedLimitGraphiteImage = [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"];
-    
-    [self updateControlTint: nil];
-    
-    if ([fDefaults boolForKey: @"SpeedLimit"])
-    {
-        #warning get rid of
-        [fSpeedLimitItem setState: NSOnState];
-        [fSpeedLimitDockItem setState: NSOnState];
-        
-        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
-                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
-    }
 
     [fActionButton setToolTip: NSLocalizedString(@"Shortcuts for changing global settings.",
                                 "Main window -> 1st bottom left button (action) tooltip")];
@@ -927,13 +915,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fMessageController showWindow: nil];
 }
 
-- (void) updateControlTint: (NSNotification *) notification
-{
-    if ([fDefaults boolForKey: @"SpeedLimit"])
-        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
-                                        ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage];
-}
-
 - (void) updateUI: (NSTimer *) timer
 {
     [fTorrents makeObjectsPerformSelector: @selector(update)];
@@ -1283,21 +1264,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self setFilter: button];
 }
 
+- (void) updateControlTint: (NSNotification *) notification
+{
+    if ([fDefaults boolForKey: @"SpeedLimit"])
+        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
+            ? [NSImage imageNamed: @"SpeedLimitButtonBlue.png"] : [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"]];
+}
+
+- (void) applySpeedLimit: (id) sender
+{
+    [fPrefsController applySpeedSettings: nil];
+}
+
 - (void) toggleSpeedLimit: (id) sender
 {
-    BOOL setEnabled = ![fDefaults boolForKey: @"SpeedLimit"];
-    int state = setEnabled ? NSOnState : NSOffState;
-    
-    [fDefaults setBool: setEnabled forKey: @"SpeedLimit"];
-
-    #warning get rid of
-    [fSpeedLimitItem setState: state];
-    [fSpeedLimitDockItem setState: state];
-    
-    [fSpeedLimitButton setImage: !setEnabled ? fSpeedLimitNormalImage
-        : ([NSColor currentControlTint] == NSBlueControlTint ? fSpeedLimitBlueImage : fSpeedLimitGraphiteImage)];
-    
-    [fPrefsController applySpeedSettings: nil];
+    [fDefaults setBool: ![fDefaults boolForKey: @"SpeedLimit"] forKey: @"SpeedLimit"];
+    [self applySpeedLimit: nil];
 }
 
 - (void) autoSpeedLimitChange: (NSNotification *) notification
