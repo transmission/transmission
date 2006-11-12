@@ -454,7 +454,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
 {
-    NSURL * url;
     NSString * urlString;
 
     NSAppleEventDescriptor * directObject = [event paramDescriptorForKeyword: keyDirectObject];
@@ -463,51 +462,62 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         unsigned i;
         for (i = 1; i <= [directObject numberOfItems]; i++)
             if ((urlString = [[directObject descriptorAtIndex: i] stringValue]))
-            {
-                url = [[NSURL alloc] initWithString: urlString];
                 break;
-            }
     }
-    else if ((urlString = [directObject stringValue]))
-        url = [[NSURL alloc] initWithString: urlString];
-    else;
+    else
+        urlString = [directObject stringValue];
     
-    if (url)
-    {
-        [self openURL: url];
-        [url release];
-    }
+    if (urlString)
+        [self openURL: [[[NSURL alloc] initWithString: urlString] autorelease]];
 }
 
 - (void) openURL: (NSURL *) url
 {
-    #warning check for .torrent
+    #warning remove when quitting
     NSURLDownload * torrentDownload = [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url]
                                         delegate: self];
-    
-    NSString * tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent: [[url path] lastPathComponent]];
-    NSLog(tempPath);[torrentDownload setDestination: tempPath allowOverwrite: NO];
-    [fPendingTorrentDownloads setObject: tempPath forKey: url];
-    [torrentDownload release];
 }
 
-- (void) download: (NSURLDownload *)download didFailWithError: (NSError *) error
+- (void) download: (NSURLDownload *) download didReceiveResponse: (NSURLResponse *) response
 {
-    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    NSString * suggestedName = [response suggestedFilename];
     
+    if ([[suggestedName pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
+    {
+        NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
+            @"Download not a torrent -> title"), [NSString stringWithFormat:
+            NSLocalizedString(@"It appears that the file from %@ is not a torrent file",
+            @"Download not a torrent -> message"), [[[download request] URL] absoluteString]],
+            NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
+        
+        [download cancel];
+    }
+    else
+    {
+        NSString * path = [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]];
+        [download setDestination: path allowOverwrite: NO];
+        [fPendingTorrentDownloads setObject: path forKey: [[download request] URL]];
+    }
+}
+
+- (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
+{
     NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
         @"Torrent download error -> title"), [NSString stringWithFormat:
         NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@)",
         @"Torrent download failed -> message"), [[[download request] URL] absoluteString],
         [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
+    
+    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
 }
 
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
     #warning try to open, if not delete
-    
     [self openFiles: [NSArray arrayWithObject: [fPendingTorrentDownloads objectForKey: [[download request] URL]]]
             ignoreDownloadFolder: NO];
+    
+    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
 }
 
 - (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
