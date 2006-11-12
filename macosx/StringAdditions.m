@@ -96,7 +96,7 @@
 + (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up
 {
     if (down == 0)
-        return up == 0 ? @"N/A" : [NSString stringWithUTF8String: "\xE2\x88\x9E"];
+        return up == 0 ? NSLocalizedString(@"N/A", "No Ratio") : [NSString stringWithUTF8String: "\xE2\x88\x9E"];
 
     float ratio = (float) up / (float) down;
     if (ratio < 10.0)

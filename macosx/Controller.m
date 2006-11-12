@@ -107,6 +107,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
         fDisplayedTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
+        fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         
@@ -140,6 +141,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterType release];
     
     [fAutoImportedNames release];
+    [fPendingTorrentDownloads release];
     
     tr_close(fLib);
     [super dealloc];
@@ -216,7 +218,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType,
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                                        NSURLPboardType,
                                                         TORRENT_TABLE_VIEW_DATA_TYPE, nil]];
 
     //register for sleep notifications
@@ -348,6 +351,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self checkAutoImportDirectory];
 }
 
+- (void) applicationDidFinishLaunching: (NSNotification *) notification
+{
+    [NSApp setServicesProvider:self];
+    
+    //register for dock icon drags
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
+        andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+        forEventClass: kCoreEventClass andEventID: kAEOpenContents];
+}
+
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
 {
     if (![fWindow isVisible] && ![[fPrefsController window] isVisible])
@@ -439,10 +452,67 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self openFiles: filenames ignoreDownloadFolder: NO];
 }
 
+- (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
+{
+    NSURL * url;
+    NSString * urlString;
+
+    NSAppleEventDescriptor * directObject = [event paramDescriptorForKeyword: keyDirectObject];
+    if ([directObject descriptorType] == typeAEList)
+    {
+        unsigned i;
+        for (i = 1; i <= [directObject numberOfItems]; i++)
+            if ((urlString = [[directObject descriptorAtIndex: i] stringValue]))
+            {
+                url = [[NSURL alloc] initWithString: urlString];
+                break;
+            }
+    }
+    else if ((urlString = [directObject stringValue]))
+        url = [[NSURL alloc] initWithString: urlString];
+    else;
+    
+    if (url)
+    {
+        [self openURL: url];
+        [url release];
+    }
+}
+
+- (void) openURL: (NSURL *) url
+{
+    #warning check for .torrent
+    NSURLDownload * torrentDownload = [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url]
+                                        delegate: self];
+    
+    NSString * tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent: [[url path] lastPathComponent]];
+    NSLog(tempPath);[torrentDownload setDestination: tempPath allowOverwrite: NO];
+    [fPendingTorrentDownloads setObject: tempPath forKey: url];
+    [torrentDownload release];
+}
+
+- (void) download: (NSURLDownload *)download didFailWithError: (NSError *) error
+{
+    [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    
+    NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
+        @"Torrent download error -> title"), [NSString stringWithFormat:
+        NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@)",
+        @"Torrent download failed -> message"), [[[download request] URL] absoluteString],
+        [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
+}
+
+- (void) downloadDidFinish: (NSURLDownload *) download
+{
+    #warning try to open, if not delete
+    
+    [self openFiles: [NSArray arrayWithObject: [fPendingTorrentDownloads objectForKey: [[download request] URL]]]
+            ignoreDownloadFolder: NO];
+}
+
 - (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
 {
-    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"], * torrentPath;
-    
+    NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
     if (ignore || [downloadChoice isEqualToString: @"Ask"])
     {
         [self openFilesAsk: [filenames mutableCopy]];
@@ -450,6 +520,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     
     Torrent * torrent;
+    NSString * torrentPath;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
@@ -1538,7 +1609,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
-    	
+        
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
     NSArray * importedNames;
@@ -1639,6 +1710,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 return NSDragOperationGeneric;
             }
     }
+    else if ([[pasteboard types] containsObject: NSURLPboardType])
+    {
+        [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
+        return NSDragOperationGeneric;
+    }
     else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
@@ -1665,7 +1741,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self application: NSApp openFiles: filesToOpen];
         [filesToOpen release];
     }
-    else
+    else if ([[pasteboard types] containsObject: NSURLPboardType])
+    {
+        NSURL * url;
+        if ((url = [NSURL URLFromPasteboard:pasteboard]))
+            [self openURL: url];
+    }
+    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
         NSArray * selectedTorrents = nil;
@@ -1717,6 +1799,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [indexSet release];
         }
     }
+    else;
     
     return YES;
 }
