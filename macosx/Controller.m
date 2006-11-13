@@ -409,6 +409,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    //remove all torrent downloads
+    NSEnumerator * enumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
+    NSURLDownload * download;
+    while ((download = [enumerator nextObject]))
+    {
+        [download cancel];
+        [download release];
+    }
+    [fPendingTorrentDownloads removeAllObjects];
+    
     //stop timers
     [fSpeedLimitTimer invalidate];
     [fTimer invalidate];
@@ -437,7 +447,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSDate * start = [NSDate date];
     BOOL timeUp = NO;
     
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while (!timeUp && ((torrent = [enumerator nextObject]) || tr_natTraversalStatus(fLib) != TR_NAT_TRAVERSAL_DISABLED))
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
@@ -478,25 +488,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                         delegate: self];
 }
 
-- (void) download: (NSURLDownload *) download didReceiveResponse: (NSURLResponse *) response
+- (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName
 {
-    NSString * suggestedName = [response suggestedFilename];
-    
     if ([[suggestedName pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
     {
+        [download cancel];
+        
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
             @"Download not a torrent -> title"), [NSString stringWithFormat:
             NSLocalizedString(@"It appears that the file from %@ is not a torrent file",
             @"Download not a torrent -> message"), [[[download request] URL] absoluteString]],
             NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
         
-        [download cancel];
+        [download release];
     }
     else
     {
         NSString * path = [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]];
         [download setDestination: path allowOverwrite: NO];
-        [fPendingTorrentDownloads setObject: path forKey: [[download request] URL]];
+        [fPendingTorrentDownloads setObject: download forKey: [[download request] URL]];
     }
 }
 
@@ -509,6 +519,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    [download release];
 }
 
 - (void) downloadDidFinish: (NSURLDownload *) download
@@ -518,6 +529,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             ignoreDownloadFolder: NO];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
+    [download release];
 }
 
 - (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
