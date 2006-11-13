@@ -499,12 +499,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [download release];
     }
     else
-    {
-        NSString * path = [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]];
-        [download setDestination: path allowOverwrite: NO];
-        [fPendingTorrentDownloads setObject: [NSDictionary dictionaryWithObjectsAndKeys:
+        [download setDestination: [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]]
+                    allowOverwrite: NO];
+}
+
+-(void) download: (NSURLDownload *) download didCreateDestination: (NSString *) path
+{
+    [fPendingTorrentDownloads setObject: [NSDictionary dictionaryWithObjectsAndKeys:
                     path, @"Path", download, @"Download", nil] forKey: [[download request] URL]];
-    }
 }
 
 - (void) download: (NSURLDownload *) download didFailWithError: (NSError *) error
@@ -521,12 +523,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
-    #warning try to open, if not delete
-    [self openFiles: [NSArray arrayWithObject: [[fPendingTorrentDownloads objectForKey:
-            [[download request] URL]] objectForKey: @"Path"]] ignoreDownloadFolder: NO forceDeleteTorrent: YES];
+    NSString * path = [[fPendingTorrentDownloads objectForKey: [[download request] URL]] objectForKey: @"Path"];
+    
+    [self openFiles: [NSArray arrayWithObject: path] ignoreDownloadFolder: NO forceDeleteTorrent: YES];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
+    
+    //delete torrent file if it wasn't already
+    [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
 }
 
 - (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
