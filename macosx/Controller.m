@@ -461,7 +461,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
 {
-    NSString * urlString;
+    NSString * urlString = nil;
 
     NSAppleEventDescriptor * directObject = [event paramDescriptorForKeyword: keyDirectObject];
     if ([directObject descriptorType] == typeAEList)

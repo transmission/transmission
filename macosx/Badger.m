@@ -69,8 +69,7 @@
 
 - (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate
 {
-    NSImage * dockIcon;
-    NSSize iconSize = [fDockIcon size];
+    NSImage * dockIcon = nil;
         
     //set completed badge to top right
     if (completed > 0)
@@ -78,6 +77,7 @@
         dockIcon = [fDockIcon copy];
     
         NSRect badgeRect;
+        NSSize iconSize = [dockIcon size];
         badgeRect.size = [fBadge size];
         badgeRect.origin.x = iconSize.width - badgeRect.size.width;
         badgeRect.origin.y = iconSize.height - badgeRect.size.height;

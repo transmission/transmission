@@ -18,5 +18,4 @@
     return value == nil ?  nil : [value lastPathComponent];
 }
 
-
 @end

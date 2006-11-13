@@ -32,5 +32,4 @@
     return icon;
 }
 
-
 @end
