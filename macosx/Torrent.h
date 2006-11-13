@@ -60,7 +60,7 @@
     int8_t * fPieces;
 }
 
-- (id)  initWithPath: (NSString *) path lib: (tr_handle_t *) lib;
+- (id)  initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
 - (id)  initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 
 - (NSDictionary *) history;

@@ -353,7 +353,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
 {
-    [NSApp setServicesProvider:self];
+    [NSApp setServicesProvider: self];
     
     //register for dock icon drags
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
@@ -411,9 +411,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     //remove all torrent downloads
     NSEnumerator * enumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
+    NSDictionary * downloadDict;
     NSURLDownload * download;
-    while ((download = [enumerator nextObject]))
+    while ((downloadDict = [enumerator nextObject]))
     {
+        download = [downloadDict objectForKey: @"Download"];
         [download cancel];
         [download release];
     }
@@ -457,11 +459,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
 }
 
-- (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
-{
-    [self openFiles: filenames ignoreDownloadFolder: NO];
-}
-
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
 {
     NSString * urlString;
@@ -483,7 +480,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openURL: (NSURL *) url
 {
-    #warning remove when quitting
     NSURLDownload * torrentDownload = [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url]
                                         delegate: self];
 }
@@ -506,7 +502,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSString * path = [NSTemporaryDirectory() stringByAppendingPathComponent: [suggestedName lastPathComponent]];
         [download setDestination: path allowOverwrite: NO];
-        [fPendingTorrentDownloads setObject: download forKey: [[download request] URL]];
+        [fPendingTorrentDownloads setObject: [NSDictionary dictionaryWithObjectsAndKeys:
+                    path, @"Path", download, @"Download", nil] forKey: [[download request] URL]];
     }
 }
 
@@ -525,19 +522,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) downloadDidFinish: (NSURLDownload *) download
 {
     #warning try to open, if not delete
-    [self openFiles: [NSArray arrayWithObject: [fPendingTorrentDownloads objectForKey: [[download request] URL]]]
-            ignoreDownloadFolder: NO];
+    [self openFiles: [NSArray arrayWithObject: [[fPendingTorrentDownloads objectForKey:
+            [[download request] URL]] objectForKey: @"Path"]] ignoreDownloadFolder: NO forceDeleteTorrent: YES];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
 }
 
-- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore
+- (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
+{
+    [self openFiles: filenames ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+}
+
+- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore forceDeleteTorrent: (BOOL) delete
 {
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
     if (ignore || [downloadChoice isEqualToString: @"Ask"])
     {
-        [self openFilesAsk: [filenames mutableCopy]];
+        [self openFilesAsk: [filenames mutableCopy] forceDeleteTorrent: delete];
         return;
     }
     
@@ -546,7 +548,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
-        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath lib: fLib]))
+        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent: delete lib: fLib]))
             continue;
 
         //add it to the "File > Open Recent" menu
@@ -571,7 +573,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 }
 
 //called by the main open method to show sheet for choosing download location
-- (void) openFilesAsk: (NSMutableArray *) files
+- (void) openFilesAsk: (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete
 {
     NSString * torrentPath;
     Torrent * torrent;
@@ -588,7 +590,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     
         torrentPath = [files objectAtIndex: 0];
-        torrent = [[Torrent alloc] initWithPath: torrentPath lib: fLib];
+        torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent: delete lib: fLib];
         
         [files removeObjectAtIndex: 0];
     } while (!torrent);
@@ -606,14 +608,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Open torrent -> select destination folder"), [torrent name]]];
     
-    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrent, @"Torrent", files, @"Files", nil];
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrent, @"Torrent", files, @"Files",
+                                            [NSNumber numberWithBool: delete], @"Delete", nil];
 
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
+    [torrent release];
 }
 
-- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code
-    contextInfo: (NSDictionary *) dictionary
+- (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
 {
     Torrent * torrent = [dictionary objectForKey: @"Torrent"];
 
@@ -629,10 +632,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self applyFilter: nil];
     }
     
-    [self performSelectorOnMainThread: @selector(openFilesAsk:) withObject: [dictionary objectForKey: @"Files"]
-                        waitUntilDone: NO];
-    
-    [torrent release];
+    [self performSelectorOnMainThread: @selector(openFilesAskWithDict:) withObject: dictionary waitUntilDone: NO];
+}
+
+- (void) openFilesAskWithDict: (NSDictionary *) dictionary
+{
+    [self openFilesAsk: [dictionary objectForKey: @"Files"]
+            forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue]];
     [dictionary release];
 }
 
@@ -644,7 +650,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames ignoreDownloadFolder: NO];
+    [self openFiles: filenames ignoreDownloadFolder: NO forceDeleteTorrent: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -673,7 +679,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openFromSheet: (NSDictionary *) dictionary
 {
     [self openFiles: [dictionary objectForKey: @"Files"]
-        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue]];
+        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] forceDeleteTorrent: NO];
     
     [dictionary release];
 }

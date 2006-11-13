@@ -94,11 +94,12 @@
 	NSMutableDictionary				* fPendingTorrentDownloads;
 }
 
-- (void) openFiles:     (NSArray *) filenames;
-- (void) openFiles:     (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore;
-- (void) openFilesAsk:  (NSMutableArray *) files;
-- (void) openShowSheet: (id) sender;
-- (void) openURL:		(NSURL *) torrentURL;
+- (void) openFiles:             (NSArray *) filenames;
+- (void) openFiles:             (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore forceDeleteTorrent: (BOOL) delete;
+- (void) openFilesAsk:          (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete;
+- (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
+- (void) openShowSheet:         (id) sender;
+- (void) openURL:               (NSURL *) torrentURL;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 
