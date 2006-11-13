@@ -37,8 +37,8 @@
 {
     if ((self = [super init]))
     {
-        fBadge = [NSImage imageNamed: @"Badge"];
         fDockIcon = [[NSApp applicationIconImage] copy];
+        fBadge = [NSImage imageNamed: @"Badge"];
         fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
         
@@ -54,8 +54,6 @@
             boldFont, NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
         
         [stringShadow release];
-        
-        fNonDefault = NO;
     }
     
     return self;
@@ -71,9 +69,8 @@
 
 - (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate
 {
+    NSImage * dockIcon;
     NSSize iconSize = [fDockIcon size];
-
-    NSImage * dockIcon = nil;
         
     //set completed badge to top right
     if (completed > 0)
@@ -108,8 +105,7 @@
             * downloadRateString = downloadRate >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"]
                                     ? [NSString stringForSpeedAbbrev: downloadRate] : nil;
     
-    BOOL speedShown = uploadRateString || downloadRateString;
-    if (speedShown)
+    if (uploadRateString || downloadRateString)
     {
         if (!dockIcon)
             dockIcon = [fDockIcon copy];
@@ -155,25 +151,17 @@
         [dockIcon unlockFocus];
     }
     
-    if (fNonDefault || dockIcon)
-    {
-        if (!dockIcon)
-        {
-            fNonDefault = NO;
-            dockIcon = [fDockIcon retain];
-        }
-        else
-            fNonDefault = YES;
-        
-        [NSApp setApplicationIconImage: dockIcon];
-        [dockIcon release];
-    }
+    //update dock badge
+    if (!dockIcon)
+        dockIcon = [fDockIcon retain];
+    
+    [NSApp setApplicationIconImage: dockIcon];
+    [dockIcon release];
 }
 
 - (void) clearBadge
 {
     [NSApp setApplicationIconImage: fDockIcon];
-    fNonDefault = NO;
 }
 
 @end

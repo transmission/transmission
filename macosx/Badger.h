@@ -30,9 +30,7 @@
 @interface Badger : NSObject {
 
     NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
-                    
     NSDictionary    * fAttributes;
-    BOOL            fNonDefault;
 }
 
 - (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate;
