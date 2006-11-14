@@ -123,6 +123,7 @@
 		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
 		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
+		A258EAEF0B0A507D0012C6F3 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A258EAEE0B0A507D0012C6F3 /* Credits.rtf */; };
 		A259317E0A73B2CC002F4FE7 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* Transmission Help */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
@@ -156,7 +157,6 @@
 		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
-		A2F8951F0A2D4BA500ED2127 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -371,7 +371,7 @@
 		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
-		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
+		A2F8951E0A2D4BA500ED2127 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = macosx/English.lproj/Credits.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -495,7 +495,7 @@
 			children = (
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
-				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
+				A258EAEE0B0A507D0012C6F3 /* Credits.rtf */,
 				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
 				A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */,
 				A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */,
@@ -798,7 +798,7 @@
 				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
 				A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */,
 				A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */,
-				A2F8951F0A2D4BA500ED2127 /* Credits.rtf in Resources */,
+				A258EAEF0B0A507D0012C6F3 /* Credits.rtf in Resources */,
 				A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */,
 				A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */,
 				A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */,
@@ -986,6 +986,14 @@
 				A22A8D550AEEAFA5007E9CB9 /* English */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A258EAEE0B0A507D0012C6F3 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A2F8951E0A2D4BA500ED2127 /* English */,
+			);
+			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
 		A2912C520A2956E80097A0CA /* PrefsWindow.nib */ = {
