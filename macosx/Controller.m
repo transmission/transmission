@@ -525,7 +525,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * path = [[fPendingTorrentDownloads objectForKey: [[download request] URL]] objectForKey: @"Path"];
     
-    [self openFiles: [NSArray arrayWithObject: path] ignoreDownloadFolder: NO forceDeleteTorrent: YES];
+    [self openFiles: [NSArray arrayWithObject: path] ignoreDownloadFolder:
+        ![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Constant"] forceDeleteTorrent: YES];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
@@ -1774,13 +1775,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self application: NSApp openFiles: filesToOpen];
         [filesToOpen release];
     }
-    else if ([[pasteboard types] containsObject: NSURLPboardType])
+    
+    if ([[pasteboard types] containsObject: NSURLPboardType])
     {
         NSURL * url;
-        if ((url = [NSURL URLFromPasteboard:pasteboard]))
+        if ((url = [NSURL URLFromPasteboard: pasteboard]))
             [self openURL: url];
     }
-    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    
+    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
         NSArray * selectedTorrents = nil;
@@ -1832,7 +1835,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [indexSet release];
         }
     }
-    else;
     
     return YES;
 }

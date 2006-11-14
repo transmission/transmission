@@ -99,11 +99,10 @@
     }
 
     //set upload and download rate badges
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    NSString * uploadRateString = uploadRate >= 0.1 && [defaults boolForKey: @"BadgeUploadRate"]
-                                    ? [NSString stringForSpeedAbbrev: uploadRate] : nil,
-            * downloadRateString = downloadRate >= 0.1 && [defaults boolForKey: @"BadgeDownloadRate"]
-                                    ? [NSString stringForSpeedAbbrev: downloadRate] : nil;
+    NSString * uploadRateString = uploadRate >= 0.1 && [[NSUserDefaults standardUserDefaults]
+                    boolForKey: @"BadgeUploadRate"] ? [NSString stringForSpeedAbbrev: uploadRate] : nil,
+            * downloadRateString = downloadRate >= 0.1 && [[NSUserDefaults standardUserDefaults]
+                    boolForKey: @"BadgeDownloadRate"] ? [NSString stringForSpeedAbbrev: downloadRate] : nil;
     
     if (uploadRateString || downloadRateString)
     {
