@@ -956,6 +956,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [alert setAlertStyle: NSWarningAlertStyle];
         
         [alert runModal];
+        [alert release];
         
         [torrents removeObjectAtIndex: 0];
         [self copyTorrentFileForTorrents: torrents];

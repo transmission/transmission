@@ -97,6 +97,7 @@
 
 - (BOOL) alertForRemainingDiskSpace;
 - (BOOL) alertForVolumeAvailable;
+- (BOOL) alertForMoveVolumeAvailable;
 
 - (NSImage *)   icon;
 - (NSImage *)   iconFlipped;

@@ -169,7 +169,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fShortStatusString release];
         [fRemainingTimeString release];
         
-        
         [fBitmap release];
         free(fPieces);
     }
@@ -210,15 +209,26 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     //notification when downloading finished
     if ([self justFinished])
     {
+        BOOL canMove = YES;
+        
         //move file from incomplete folder to download folder
-        #warning check if volume exists
-        if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder])
+        if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
+            && (canMove = [self alertForMoveVolumeAvailable]))
         {
             tr_torrentStop(fHandle);
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
                 tr_torrentSetFolder(fHandle, [fDownloadFolder UTF8String]);
             tr_torrentStart(fHandle);
+        }
+        
+        if (!canMove)
+        {
+            fUseIncompleteFolder = NO;
+            
+            [fDownloadFolder release];
+            fDownloadFolder = fIncompleteFolder;
+            fIncompleteFolder = nil;
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
@@ -549,6 +559,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         }
         else
             return YES;
+        
+        [alert release];
     }
     return YES;
 }
@@ -561,13 +573,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSString * volume = [[[pathComponents objectAtIndex: 0] stringByAppendingPathComponent:
                     [pathComponents objectAtIndex: 1]] stringByAppendingPathComponent: [pathComponents objectAtIndex: 2]];
-    NSString * volumeName = [pathComponents objectAtIndex: 2];
     
     /*NSLog(@"%@", [self downloadFolder]);
     NSLog(@"Volume: %@", volume);*/
     
     if (![[NSFileManager defaultManager] fileExistsAtPath: volume])
     {
+        NSString * volumeName = [pathComponents objectAtIndex: 2];
+        
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
                                 NSLocalizedString(@"The volume for downloading \"%@\" cannot be found.",
@@ -598,6 +611,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     didEndSelector: @selector(destinationChoiceClosed:returnCode:contextInfo:) contextInfo: nil];
         }
         
+        [alert release];
+        
         return NO;
     }
     
@@ -607,7 +622,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) context
 {
     NSString * folder = [[openPanel filenames] objectAtIndex: 0];
-    NSLog(@"%@", folder);
     if (code == NSOKButton)
     {
         if (fUseIncompleteFolder)
@@ -625,11 +639,46 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         [self startTransfer];
         [self update];
+        
+        #warning reload inspector
     }
     else
         [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
 }
 
+- (BOOL) alertForMoveVolumeAvailable
+{
+    NSArray * pathComponents = [fDownloadFolder pathComponents];
+    if ([pathComponents count] < 3)
+        return YES;
+    
+    NSString * volume = [[[pathComponents objectAtIndex: 0] stringByAppendingPathComponent:
+                    [pathComponents objectAtIndex: 1]] stringByAppendingPathComponent: [pathComponents objectAtIndex: 2]];
+    
+    /*NSLog(@"%@", [self downloadFolder]);
+    NSLog(@"Volume: %@", volume);*/
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath: volume])
+    {
+        NSString * volumeName = [pathComponents objectAtIndex: 2];
+        
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: [NSString stringWithFormat:
+                                NSLocalizedString(@"The volume for moving the completed \"%@\" cannot be found.",
+                                    "Move volume cannot be found alert -> title"), [self name]]];
+        [alert setInformativeText: [NSString stringWithFormat:
+                        NSLocalizedString(@"The file will remain in its current location",
+                                            "Move volume cannot be found alert -> message"), volumeName]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move volume cannot be found alert -> button")];
+        
+        [alert runModal];
+        [alert release];
+        
+        return NO;
+    }
+    
+    return YES;
+}
 
 - (NSImage *) icon
 {
