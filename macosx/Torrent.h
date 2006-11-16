@@ -96,7 +96,7 @@
 - (void)    trashTorrent;
 
 - (BOOL) alertForRemainingDiskSpace;
-- (BOOL) alertForDriveAvailable;
+- (BOOL) alertForVolumeAvailable;
 
 - (NSImage *)   icon;
 - (NSImage *)   iconFlipped;

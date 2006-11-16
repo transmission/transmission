@@ -310,6 +310,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(setWindowSizeToFit)
                     name: @"AutoSizeSettingChange" object: nil];
     
+    [nc addObserver: self selector: @selector(makeWindowKey)
+                    name: @"MakeWindowKey" object: nil];
+    
     //check to start another because of stopped torrent
     [nc addObserver: self selector: @selector(checkWaitingForStopped:)
                     name: @"StoppedDownloading" object: nil];
@@ -994,6 +997,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [window center];
 
     [window makeKeyAndOrderFront: nil];
+}
+
+- (void) makeWindowKey
+{
+    [fWindow makeKeyWindow];
 }
 
 - (void) showInfo: (id) sender

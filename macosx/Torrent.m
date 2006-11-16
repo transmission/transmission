@@ -178,7 +178,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setDownloadFolder: (NSString *) path
 {
-    fDownloadFolder = [path copy];
+    if (path)
+        fDownloadFolder = [path copy];
     
     if (!fUseIncompleteFolder || [[NSFileManager defaultManager] fileExistsAtPath:
                                     [path stringByAppendingPathComponent: [self name]]])
@@ -413,7 +414,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fWaitToStart = NO;
     fFinishedSeeding = NO;
     
-    if (![self isActive] && [self alertForDriveAvailable] && [self alertForRemainingDiskSpace])
+    if (![self isActive] && [self alertForVolumeAvailable] && [self alertForRemainingDiskSpace])
         tr_torrentStart(fHandle);
 }
 
@@ -552,7 +553,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return YES;
 }
 
-- (BOOL) alertForDriveAvailable
+- (BOOL) alertForVolumeAvailable
 {
     NSArray * pathComponents = [[self downloadFolder] pathComponents];
     if ([pathComponents count] < 3)
@@ -575,20 +576,60 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                         NSLocalizedString(@"The transfer will be paused. Mount the volume \"%@\" to continue.",
                                             "Volume cannot be found alert -> message"), volumeName]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Volume cannot be found alert -> button")];
-        #warning should choose new directory
-        [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Volume cannot be found alert -> button")];
+        [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Directory",
+                                    "Volume cannot be found alert -> directory button") stringByAppendingEllipsis]];
         
         if ([alert runModal] == NSAlertFirstButtonReturn)
-        {
             [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
-            return NO;
-        }
         else
-            return YES;
+        {
+            NSOpenPanel * panel = [NSOpenPanel openPanel];
+            
+            [panel setPrompt: @"Select"];
+            [panel setAllowsMultipleSelection: NO];
+            [panel setCanChooseFiles: NO];
+            [panel setCanChooseDirectories: YES];
+
+            [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
+                                "Open torrent -> select destination folder"), [self name]]];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"MakeWindowKey" object: nil];
+            [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [NSApp keyWindow] modalDelegate: self
+                    didEndSelector: @selector(destinationChoiceClosed:returnCode:contextInfo:) contextInfo: nil];
+        }
+        
+        return NO;
     }
     
     return YES;
 }
+
+- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) context
+{
+    NSString * folder = [[openPanel filenames] objectAtIndex: 0];
+    NSLog(@"%@", folder);
+    if (code == NSOKButton)
+    {
+        if (fUseIncompleteFolder)
+        {
+            [fIncompleteFolder release];
+            fIncompleteFolder = [folder retain];
+            [self setDownloadFolder: nil];
+        }
+        else
+        {
+            [fDownloadFolder release];
+            fDownloadFolder = folder;
+            [self setDownloadFolder: fDownloadFolder];
+        }
+        
+        [self startTransfer];
+        [self update];
+    }
+    else
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+}
+
 
 - (NSImage *) icon
 {

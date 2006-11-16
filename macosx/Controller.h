@@ -135,6 +135,7 @@
 
 - (void) showPreferenceWindow: (id) sender;
 
+- (void) makeWindowKey;
 - (void) showInfo: (id) sender;
 - (void) setInfoTab: (id) sender;
 
