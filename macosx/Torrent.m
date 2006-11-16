@@ -664,7 +664,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert setMessageText: [NSString stringWithFormat:
                                 NSLocalizedString(@"The volume for moving the completed \"%@\" cannot be found.",
                                     "Move volume cannot be found alert -> title"), [self name]]];
-        [alert setInformativeText: @"The file will remain in its current location",
+        [alert setInformativeText: NSLocalizedString(@"The file will remain in its current location",
                                     "Move volume cannot be found alert -> message")];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move volume cannot be found alert -> button")];
         
