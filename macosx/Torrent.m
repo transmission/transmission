@@ -640,7 +640,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [self startTransfer];
         [self update];
         
-        #warning reload inspector
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
     }
     else
         [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
