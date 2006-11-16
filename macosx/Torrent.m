@@ -210,6 +210,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([self justFinished])
     {
         //move file from incomplete folder to download folder
+        #warning check if volume exists
         if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder])
         {
             tr_torrentStop(fHandle);
@@ -412,7 +413,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fWaitToStart = NO;
     fFinishedSeeding = NO;
     
-    if (![self isActive] && [self remainingDiskSpaceForTorrent])
+    if (![self isActive] && [self alertForDriveAvailable] && [self alertForRemainingDiskSpace])
         tr_torrentStart(fHandle);
 }
 
@@ -513,30 +514,30 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [self trashFile: [self publicTorrentLocation]];
 }
 
-- (BOOL) remainingDiskSpaceForTorrent
+- (BOOL) alertForRemainingDiskSpace
 {
     if ([self progress] >= 1.0)
         return YES;
     
-    NSString * location = [self dataLocation],
-                * volume = [[[NSFileManager defaultManager] componentsToDisplayForPath: location] objectAtIndex: 0];
-    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: location];
+    NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
+                                                                                                objectAtIndex: 0];
+    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self dataLocation]];
     uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
             torrentRemaining = [self size] - (uint64_t)[self downloadedValid];
     
-    /*NSLog(@"Volume: %@", volume);
+    /*NSLog(@"Volume: %@", volumeName);
     NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
     NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);*/
     
-    if (volume && remainingSpace <= torrentRemaining)
+    if (volumeName && remainingSpace <= torrentRemaining)
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
                                 NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
                                     "Torrent file disk space alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The transfer will be paused. Clear up space on %@ to continue.",
-                                            "Torrent file disk space alert -> message"), volume]];
+                        NSLocalizedString(@"The transfer will be paused. Clear up space on \"%@\" to continue.",
+                                            "Torrent file disk space alert -> message"), volumeName]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
         
@@ -548,6 +549,44 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             return YES;
     }
+    return YES;
+}
+
+- (BOOL) alertForDriveAvailable
+{
+    NSArray * pathComponents = [[self downloadFolder] pathComponents];
+    if ([pathComponents count] < 3)
+        return YES;
+    
+    NSString * volume = [[[pathComponents objectAtIndex: 0] stringByAppendingPathComponent:
+                    [pathComponents objectAtIndex: 1]] stringByAppendingPathComponent: [pathComponents objectAtIndex: 2]];
+    NSString * volumeName = [pathComponents objectAtIndex: 2];
+    
+    /*NSLog(@"%@", [self downloadFolder]);
+    NSLog(@"Volume: %@", volume);*/
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath: volume])
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: [NSString stringWithFormat:
+                                NSLocalizedString(@"The volume for downloading \"%@\" cannot be found.",
+                                    "Volume cannot be found alert -> title"), [self name]]];
+        [alert setInformativeText: [NSString stringWithFormat:
+                        NSLocalizedString(@"The transfer will be paused. Mount the volume \"%@\" to continue.",
+                                            "Volume cannot be found alert -> message"), volumeName]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Volume cannot be found alert -> button")];
+        #warning should choose new directory
+        [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Volume cannot be found alert -> button")];
+        
+        if ([alert runModal] == NSAlertFirstButtonReturn)
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+            return NO;
+        }
+        else
+            return YES;
+    }
+    
     return YES;
 }
 
