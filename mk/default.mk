@@ -29,7 +29,7 @@ all: $(TARGETS)
 	@echo "* Building Transmission BeOS client"
 	@make -C beos -f ../mk/beos.mk
 
-install: all $(foreach SUB,$(TARGETS),.install$(SUB))
+install: all $(foreach SUB,$(TARGETS),.install$(SUB)) .install.misc
 
 .install.cli: .cli
 	@echo "* Installing Transmission CLI client"
@@ -40,6 +40,11 @@ install: all $(foreach SUB,$(TARGETS),.install$(SUB))
 	@$(MAKE) -C gtk -f ../mk/gtk.mk install
 
 .install.beos:
+
+.install.misc:
+	@echo "* Installing Zsh completion file"
+	@$(MKDIR) $(DESTDIR)$(PREFIX)/share/zsh/site-functions
+	@$(CP) misc/transmissioncli.zsh $(DESTDIR)$(PREFIX)/share/zsh/site-functions/_transmissioncli
 
 clean:
 	@$(MAKE) -C libtransmission -f ../mk/lib.mk clean
