@@ -351,7 +351,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             fError = NO;
     }
 
-    if ([self isActive])
+    if ([self isActive] && fStat->status != TR_STATUS_CHECK )
     {
         NSString * stringToAppend = @"";
         if ([self progress] < 1.0)
