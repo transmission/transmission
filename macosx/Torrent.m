@@ -532,7 +532,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
                                                                                                 objectAtIndex: 0];
-    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self dataLocation]];
+    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
     uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
             torrentRemaining = [self size] - (uint64_t)[self downloadedValid];
     
