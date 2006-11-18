@@ -619,7 +619,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return YES;
 }
 
-- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) context
+- (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) context
 {
     NSString * folder = [[openPanel filenames] objectAtIndex: 0];
     if (code == NSOKButton)

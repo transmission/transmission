@@ -484,12 +484,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self openURL: [[[NSURL alloc] initWithString: urlString] autorelease]];
 }
 
-- (void) openURL: (NSURL *) url
-{
-    NSURLDownload * torrentDownload = [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url]
-                                        delegate: self];
-}
-
 - (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName
 {
     if ([[suggestedName pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
@@ -498,7 +492,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
             @"Download not a torrent -> title"), [NSString stringWithFormat:
-            NSLocalizedString(@"It appears that the file from %@ is not a torrent file",
+            NSLocalizedString(@"It appears that the file from %@ is not a torrent file.",
             @"Download not a torrent -> message"), [[[download request] URL] absoluteString]],
             NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
         
@@ -519,7 +513,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
         @"Torrent download error -> title"), [NSString stringWithFormat:
-        NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@)",
+        NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@).",
         @"Torrent download failed -> message"), [[[download request] URL] absoluteString],
         [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
     
@@ -694,6 +688,53 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] forceDeleteTorrent: NO];
     
     [dictionary release];
+}
+
+- (void) openURL: (NSURL *) url
+{
+    [[NSURLDownload alloc] initWithRequest: [NSURLRequest requestWithURL: url] delegate: self];
+}
+
+- (void) openURLShowSheet: (id) sender
+{
+    [NSApp beginSheet: fURLSheetWindow modalForWindow: fWindow modalDelegate: self
+            didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (void) openURLEndSheet: (id) sender
+{
+    [fURLSheetWindow orderOut: sender];
+    [NSApp endSheet: fURLSheetWindow returnCode: 1];
+}
+
+- (void) openURLCancelEndSheet: (id) sender
+{
+    [fURLSheetWindow orderOut: sender];
+    [NSApp endSheet: fURLSheetWindow returnCode: 0];
+}
+
+- (void) urlSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo
+{
+    [fURLSheetTextField selectText: self];
+    if (returnCode != 1)
+        return;
+    
+    NSString * urlString = [fURLSheetTextField stringValue];
+    if (![urlString isEqualToString: @""])
+    {
+        if ([urlString rangeOfString: @"://"].location == NSNotFound)
+            urlString = [@"http://" stringByAppendingString: urlString];
+        
+        if ([urlString rangeOfString: @"."].location == NSNotFound)
+        {
+            int start = NSMaxRange([urlString rangeOfString: @"://"]);
+            urlString = [NSString stringWithFormat: @"%@www.%@.com", [urlString substringToIndex: start],
+                                    [urlString substringFromIndex: start]];
+        }
+        
+        NSURL * url = [NSURL URLWithString: urlString];
+        [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
+    }
 }
 
 - (void) resumeSelectedTorrents: (id) sender
@@ -2207,7 +2248,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     BOOL canUseTable = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
 
     //enable open items
-    if (action == @selector(openShowSheet:))
+    if (action == @selector(openShowSheet:) || action == @selector(openURLShowSheet:))
         return [fWindow attachedSheet] == nil;
     
     //enable sort and advanced bar items

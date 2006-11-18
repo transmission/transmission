@@ -81,6 +81,9 @@
     IBOutlet NSMenu                 * fUploadMenu, * fDownloadMenu;
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
+    
+    IBOutlet NSWindow               * fURLSheetWindow;
+    IBOutlet NSTextField            * fURLSheetTextField;
 
     io_connect_t                    fRootPort;
     NSTimer                         * fTimer;
@@ -100,6 +103,9 @@
 - (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;
 - (void) openURL:               (NSURL *) torrentURL;
+- (void) openURLEndSheet:       (id) sender;
+- (void) openURLCancelEndSheet: (id) sender;
+- (void) openURLShowSheet:      (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
 

@@ -10,6 +10,9 @@
                 linkForums = id; 
                 linkHomepage = id; 
                 openShowSheet = id; 
+                openURLCancelEndSheet = id; 
+                openURLEndSheet = id; 
+                openURLShowSheet = id; 
                 removeDeleteData = id; 
                 removeDeleteDataAndTorrent = id; 
                 removeDeleteTorrent = id; 
@@ -73,6 +76,8 @@
                 fTotalDLField = NSTextField; 
                 fTotalTorrentsField = NSTextField; 
                 fTotalULField = NSTextField; 
+                fURLSheetTextField = NSTextField; 
+                fURLSheetWindow = NSWindow; 
                 fUpdater = SUUpdater; 
                 fUploadLimitItem = NSMenuItem; 
                 fUploadMenu = NSMenu; 
