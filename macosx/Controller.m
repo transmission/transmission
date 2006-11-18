@@ -58,6 +58,8 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
+#define MAX_URL_WINDOW_WIDTH    5000
+
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
 
@@ -287,6 +289,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentFilterButton = fNoFilterButton;
 
     [currentFilterButton setEnabled: YES];
+    
+    //url sheet
+    [fURLSheetWindow setMaxSize: NSMakeSize(MAX_URL_WINDOW_WIDTH, [fURLSheetWindow minSize].height)];
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
