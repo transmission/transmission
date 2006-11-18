@@ -29,7 +29,7 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-#define strcatUTF8( dst, src) _strcatUTF8( (dst), sizeof( dst ), (src) )
+#define strcatUTF8( dst, src) _strcatUTF8( (dst), sizeof( dst ) - 1, (src) )
 static void _strcatUTF8( char *, int, char * );
 
 /***********************************************************************
