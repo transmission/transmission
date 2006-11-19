@@ -733,10 +733,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ([urlString rangeOfString: @"."].location == NSNotFound)
         {
             int start = NSMaxRange([urlString rangeOfString: @"://"]);
-            urlString = [NSString stringWithFormat: @"%@www.%@.com", [urlString substringToIndex: start],
+            int beforeCom;
+            if ((beforeCom = [urlString rangeOfString: @"/" options: 0
+                                range: NSMakeRange(start, [urlString length] - start)].location) != NSNotFound)
+                urlString = [NSString stringWithFormat: @"%@www.%@.com/%@", [urlString substringToIndex: start],
+                                    [urlString substringWithRange: NSMakeRange(start, beforeCom - start)],
+                                    [urlString substringFromIndex: beforeCom + 1]];
+            else
+                urlString = [NSString stringWithFormat: @"%@www.%@.com", [urlString substringToIndex: start],
                                     [urlString substringFromIndex: start]];
         }
-        
+        NSLog(urlString);
         NSURL * url = [NSURL URLWithString: urlString];
         [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
     }
