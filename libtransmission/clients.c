@@ -82,6 +82,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "libTorrent %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "ES", 2 ) )
+        {
+            asprintf( &ret, "Electric Sheep %c.%c.%c",
+                      id[3], id[4], id[5] );
+        }
     }
     else if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
     {
