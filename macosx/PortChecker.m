@@ -23,8 +23,6 @@
  *****************************************************************************/
 
 #import "PortChecker.h"
-#import "transmission.h"
-#import "PrefsController.h"
 
 @implementation PortChecker
 
@@ -64,7 +62,7 @@
     fStatus = status;
     
     if (fDelegate && [fDelegate respondsToSelector: @selector(portCheckerDidFinishProbing:)])
-        [fDelegate portCheckerDidFinishProbing: self];
+        [fDelegate performSelectorOnMainThread: @selector(portCheckerDidFinishProbing:) withObject: self waitUntilDone: NO];
 }
 
 #pragma mark NSURLConnection delegate methods
