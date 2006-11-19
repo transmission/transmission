@@ -728,20 +728,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![urlString isEqualToString: @""])
     {
         if ([urlString rangeOfString: @"://"].location == NSNotFound)
-            urlString = [@"http://" stringByAppendingString: urlString];
-        
-        if ([urlString rangeOfString: @"."].location == NSNotFound)
         {
-            int start = NSMaxRange([urlString rangeOfString: @"://"]);
-            int beforeCom;
-            if ((beforeCom = [urlString rangeOfString: @"/" options: 0
-                                range: NSMakeRange(start, [urlString length] - start)].location) != NSNotFound)
-                urlString = [NSString stringWithFormat: @"%@www.%@.com/%@", [urlString substringToIndex: start],
-                                    [urlString substringWithRange: NSMakeRange(start, beforeCom - start)],
+            if ([urlString rangeOfString: @"."].location == NSNotFound)
+            {
+                int beforeCom;
+                if ((beforeCom = [urlString rangeOfString: @"/"].location) != NSNotFound)
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com/%@",
+                                    [urlString substringToIndex: beforeCom],
                                     [urlString substringFromIndex: beforeCom + 1]];
+                else
+                    urlString = [NSString stringWithFormat: @"http://www.%@.com", urlString];
+            }
             else
-                urlString = [NSString stringWithFormat: @"%@www.%@.com", [urlString substringToIndex: start],
-                                    [urlString substringFromIndex: start]];
+                urlString = [@"http://" stringByAppendingString: urlString];
         }
         
         NSURL * url = [NSURL URLWithString: urlString];
