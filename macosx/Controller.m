@@ -490,7 +490,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName
-{NSLog(suggestedName);
+{
     if ([[suggestedName pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
     {
         [download cancel];
