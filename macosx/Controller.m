@@ -490,15 +490,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) download: (NSURLDownload *) download decideDestinationWithSuggestedFilename: (NSString *) suggestedName
-{
+{NSLog(suggestedName);
     if ([[suggestedName pathExtension] caseInsensitiveCompare: @"torrent"] != NSOrderedSame)
     {
         [download cancel];
         
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
             @"Download not a torrent -> title"), [NSString stringWithFormat:
-            NSLocalizedString(@"It appears that the file from %@ is not a torrent file.",
-            @"Download not a torrent -> message"), [[[download request] URL] absoluteString]],
+            NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
+            @"Download not a torrent -> message"), suggestedName, [[[download request] URL] absoluteString]],
             NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
         
         [download release];
