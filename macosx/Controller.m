@@ -1818,8 +1818,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
     }
-    else
-        return NSDragOperationNone;
+    else;
+    
+    return NSDragOperationNone;
 }
 
 - (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
