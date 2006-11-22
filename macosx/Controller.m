@@ -498,7 +498,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
             @"Download not a torrent -> title"), [NSString stringWithFormat:
             NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.",
-            @"Download not a torrent -> message"), suggestedName, [[[download request] URL] absoluteString]],
+            @"Download not a torrent -> message"), suggestedName,
+            [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding]],
             NSLocalizedString(@"OK", @"Download not a torrent -> button"), nil, nil);
         
         [download release];
@@ -519,7 +520,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSRunAlertPanel(NSLocalizedString(@"Torrent download failed",
         @"Torrent download error -> title"), [NSString stringWithFormat:
         NSLocalizedString(@"The torrent could not be downloaded from %@ because an error occurred (%@).",
-        @"Torrent download failed -> message"), [[[download request] URL] absoluteString],
+        @"Torrent download failed -> message"),
+        [[[[download request] URL] absoluteString] stringByReplacingPercentEscapesUsingEncoding: NSUTF8StringEncoding],
         [error localizedDescription]], NSLocalizedString(@"OK", @"Torrent download failed -> button"), nil, nil);
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
@@ -1840,15 +1842,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self application: NSApp openFiles: filesToOpen];
         [filesToOpen release];
     }
-    
-    if ([[pasteboard types] containsObject: NSURLPboardType])
+    else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
         NSURL * url;
         if ((url = [NSURL URLFromPasteboard: pasteboard]))
             [self openURL: url];
     }
-    
-    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
         NSArray * selectedTorrents = nil;
@@ -1900,6 +1900,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [indexSet release];
         }
     }
+    else;
     
     return YES;
 }
