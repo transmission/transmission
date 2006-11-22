@@ -290,9 +290,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [currentFilterButton setEnabled: YES];
     
-    //url sheet
-    [fURLSheetWindow setMaxSize: NSMakeSize(MAX_URL_WINDOW_WIDTH, [fURLSheetWindow minSize].height)];
-    
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
