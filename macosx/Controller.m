@@ -58,8 +58,6 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
-#define MAX_URL_WINDOW_WIDTH    5000
-
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
 
@@ -221,8 +219,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                                        NSURLPboardType,
-                                                        TORRENT_TABLE_VIEW_DATA_TYPE, nil]];
+                                            NSURLPboardType, TORRENT_TABLE_VIEW_DATA_TYPE, nil]];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -539,7 +536,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
 }
 
-- (void) application: (NSApplication *) sender openFiles: (NSArray *) filenames
+- (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
 {
     [self openFiles: filenames ignoreDownloadFolder: NO forceDeleteTorrent: NO];
 }
