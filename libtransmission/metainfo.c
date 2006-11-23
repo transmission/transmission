@@ -192,13 +192,13 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     snprintf( inf->trackerAnnounce, MAX_PATH_LENGTH, "%s", s2 );
     
     /* Comment info */
-    if( ( val = tr_bencDictFind( beInfo, "comment.utf-8" ) ) || ( val = tr_bencDictFind( &meta, "comment" ) ) )
+    if( ( val = tr_bencDictFind( &meta, "comment.utf-8" ) ) || ( val = tr_bencDictFind( &meta, "comment" ) ) )
     {
         strcatUTF8( inf->comment, val->val.s.s );
     }
     
     /* Creator info */
-    if( ( val = tr_bencDictFind( beInfo, "created by.utf-8" ) ) || ( val = tr_bencDictFind( &meta, "created by" ) ) )
+    if( ( val = tr_bencDictFind( &meta, "created by.utf-8" ) ) || ( val = tr_bencDictFind( &meta, "created by" ) ) )
     {
         strcatUTF8( inf->creator, val->val.s.s );
     }
