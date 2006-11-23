@@ -39,10 +39,10 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 300.0
+#define TAB_INFO_HEIGHT 284.0
 #define TAB_ACTIVITY_HEIGHT 109.0
-#define TAB_PEERS_HEIGHT 300.0
-#define TAB_FILES_HEIGHT 300.0
+#define TAB_PEERS_HEIGHT 284.0
+#define TAB_FILES_HEIGHT 284.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
 #define INVALID -99
@@ -153,7 +153,6 @@
         [fTrackerField setToolTip: nil];
         [fAnnounceField setStringValue: @""];
         [fAnnounceField setToolTip: nil];
-        [fPieceSizeField setStringValue: @""];
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
@@ -213,8 +212,8 @@
         [fTrackerField setToolTip: tracker];
         [fAnnounceField setStringValue: announce];
         [fAnnounceField setToolTip: announce];
-        [fPieceSizeField setStringValue: [NSString stringForFileSize: [torrent pieceSize]]];
-        [fPiecesField setIntValue: [torrent pieceCount]];
+        [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
+                                        [NSString stringForFileSize: [torrent pieceSize]]]];
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         [fCommentView setString: commentString];

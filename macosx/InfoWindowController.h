@@ -37,7 +37,7 @@
 
     IBOutlet NSImageView * fImageView;
     IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
-                        * fAnnounceField, * fPieceSizeField, * fPiecesField,
+                        * fAnnounceField, * fPiecesField,
                         * fHashField,
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateStartedField,
