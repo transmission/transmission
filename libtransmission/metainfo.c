@@ -190,6 +190,24 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         return 1;
     }
     snprintf( inf->trackerAnnounce, MAX_PATH_LENGTH, "%s", s2 );
+    
+    /* Comment info */
+    if( ( val = tr_bencDictFind( &meta, "comment" ) ) )
+    {
+        strcatUTF8( inf->comment, val->val.s.s );
+    }
+    
+    /* Creator info */
+    if( ( val = tr_bencDictFind( &meta, "created by" ) ) )
+    {
+        strcatUTF8( inf->creator, val->val.s.s );
+    }
+    
+    /* Date created */
+    if( ( val = tr_bencDictFind( &meta, "creation date" ) ) )
+    {
+        inf->dateCreated = val->val.i;
+    }
 
     /* Piece length */
     if( !( val = tr_bencDictFind( beInfo, "piece length" ) ) )

@@ -318,6 +318,11 @@ struct tr_info_s
     char        trackerAddress[256];
     int         trackerPort;
     char        trackerAnnounce[MAX_PATH_LENGTH];
+    
+    /* Torrent info */
+    char        comment[MAX_PATH_LENGTH];
+    char        creator[MAX_PATH_LENGTH];
+    int         dateCreated;
 
     /* Pieces info */
     int         pieceSize;

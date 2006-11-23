@@ -94,7 +94,7 @@
     Badger                          * fBadger;
     
     NSMutableArray                  * fAutoImportedNames;
-	NSMutableDictionary				* fPendingTorrentDownloads;
+    NSMutableDictionary             * fPendingTorrentDownloads;
 }
 
 - (void) openFiles:             (NSArray *) filenames;

@@ -107,6 +107,11 @@
 - (uint64_t)   size;
 - (NSString *) tracker;
 - (NSString *) announce;
+
+- (NSString *) comment;
+- (NSString *) creator;
+- (NSDate *)   dateCreated;
+
 - (int)        pieceSize;
 - (int)        pieceCount;
 - (NSString *) hashString;

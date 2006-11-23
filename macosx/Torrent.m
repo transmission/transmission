@@ -712,6 +712,22 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [NSString stringWithUTF8String: fInfo->trackerAnnounce];
 }
 
+- (NSString *) comment
+{
+    return [NSString stringWithUTF8String: fInfo->comment];
+}
+
+- (NSString *) creator
+{
+    return [NSString stringWithUTF8String: fInfo->creator];
+}
+
+- (NSDate *) dateCreated
+{
+    int date = fInfo->dateCreated;
+    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: fInfo->dateCreated] : nil;
+}
+
 - (int) pieceSize
 {
     return fInfo->pieceSize;

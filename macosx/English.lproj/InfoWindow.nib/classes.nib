@@ -19,8 +19,11 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fAnnounceField = NSTextField; 
+                fCommentField = NSTextField; 
                 fConnectedPeersField = NSTextField; 
+                fCreatorField = NSTextField; 
                 fDataLocationField = NSTextField; 
+                fDateCreatedField = NSTextField; 
                 fDateStartedField = NSTextField; 
                 fDownloadedTotalField = NSTextField; 
                 fDownloadedValidField = NSTextField; 

@@ -39,7 +39,7 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 182.0
+#define TAB_INFO_HEIGHT 255.0
 #define TAB_ACTIVITY_HEIGHT 109.0
 #define TAB_PEERS_HEIGHT 260.0
 #define TAB_FILES_HEIGHT 260.0
@@ -157,6 +157,11 @@
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
+        [fCommentField setStringValue: @""];
+        [fCommentField setToolTip: @""];
+        
+        [fCreatorField setStringValue: @""];
+        [fDateCreatedField setStringValue: @""];
         
         [fTorrentLocationField setStringValue: @""];
         [fTorrentLocationField setToolTip: nil];
@@ -171,6 +176,8 @@
         [fTrackerField setSelectable: NO];
         [fAnnounceField setSelectable: NO];
         [fHashField setSelectable: NO];
+        [fCommentField setSelectable: NO];
+        [fCreatorField setSelectable: NO];
         [fTorrentLocationField setSelectable: NO];
         [fDataLocationField setSelectable: NO];
         
@@ -202,7 +209,8 @@
         
         NSString * tracker = [torrent tracker],
                 * announce = [torrent announce],
-                * hashString = [torrent hashString];
+                * hashString = [torrent hashString],
+                * commentString = [torrent comment];
         [fTrackerField setStringValue: tracker];
         [fTrackerField setToolTip: tracker];
         [fAnnounceField setStringValue: announce];
@@ -211,6 +219,11 @@
         [fPiecesField setIntValue: [torrent pieceCount]];
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
+        [fCommentField setStringValue: commentString];
+        [fCommentField setToolTip: commentString];
+        
+        [fCreatorField setStringValue: [torrent creator]];
+        [fDateCreatedField setObjectValue: [torrent dateCreated]];
         
         BOOL publicTorrent = [torrent publicTorrent];
         [fTorrentLocationField setStringValue: publicTorrent
@@ -231,6 +244,8 @@
         [fTrackerField setSelectable: YES];
         [fAnnounceField setSelectable: YES];
         [fHashField setSelectable: YES];
+        [fCommentField setSelectable: YES];
+        [fCreatorField setSelectable: YES];
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
         
