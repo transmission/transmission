@@ -39,10 +39,10 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 297.0
+#define TAB_INFO_HEIGHT 300.0
 #define TAB_ACTIVITY_HEIGHT 109.0
-#define TAB_PEERS_HEIGHT 260.0
-#define TAB_FILES_HEIGHT 260.0
+#define TAB_PEERS_HEIGHT 300.0
+#define TAB_FILES_HEIGHT 300.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
 #define INVALID -99
