@@ -155,6 +155,7 @@
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
         [fCommentView setString: @""];
+        [fCommentView setSelectable: NO];
         
         [fCreatorField setStringValue: @""];
         [fDateCreatedField setStringValue: @""];
@@ -211,6 +212,7 @@
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         [fCommentView setString: commentString];
+        [fCommentView setSelectable: YES];
         
         [fCreatorField setStringValue: [torrent creator]];
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
