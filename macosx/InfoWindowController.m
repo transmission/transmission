@@ -39,10 +39,10 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 284.0
+#define TAB_INFO_HEIGHT 268.0
 #define TAB_ACTIVITY_HEIGHT 109.0
-#define TAB_PEERS_HEIGHT 284.0
-#define TAB_FILES_HEIGHT 284.0
+#define TAB_PEERS_HEIGHT 268.0
+#define TAB_FILES_HEIGHT 268.0
 #define TAB_OPTIONS_HEIGHT 83.0
 
 #define INVALID -99
@@ -151,8 +151,6 @@
 
         [fTrackerField setStringValue: @""];
         [fTrackerField setToolTip: nil];
-        [fAnnounceField setStringValue: @""];
-        [fAnnounceField setToolTip: nil];
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
@@ -172,7 +170,6 @@
         
         //don't allow empty fields to be selected
         [fTrackerField setSelectable: NO];
-        [fAnnounceField setSelectable: NO];
         [fHashField setSelectable: NO];
         [fCreatorField setSelectable: NO];
         [fTorrentLocationField setSelectable: NO];
@@ -204,14 +201,11 @@
         [fNameField setToolTip: name];
         [fSizeField setStringValue: [NSString stringForFileSize: [torrent size]]];
         
-        NSString * tracker = [torrent tracker],
-                * announce = [torrent announce],
+        NSString * tracker = [[torrent tracker] stringByAppendingString: [torrent announce]],
                 * hashString = [torrent hashString],
                 * commentString = [torrent comment];
         [fTrackerField setStringValue: tracker];
         [fTrackerField setToolTip: tracker];
-        [fAnnounceField setStringValue: announce];
-        [fAnnounceField setToolTip: announce];
         [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]]];
         [fHashField setStringValue: hashString];
@@ -238,7 +232,6 @@
         
         //allow these fields to be selected
         [fTrackerField setSelectable: YES];
-        [fAnnounceField setSelectable: YES];
         [fHashField setSelectable: YES];
         [fCommentView setSelectable: YES];
         [fCreatorField setSelectable: YES];

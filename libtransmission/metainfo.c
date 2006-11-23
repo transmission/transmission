@@ -208,6 +208,10 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     {
         inf->dateCreated = val->val.i;
     }
+    else
+    {
+        inf->dateCreated = 0;
+    }
 
     /* Piece length */
     if( !( val = tr_bencDictFind( beInfo, "piece length" ) ) )
