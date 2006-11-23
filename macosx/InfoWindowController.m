@@ -39,7 +39,7 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 255.0
+#define TAB_INFO_HEIGHT 297.0
 #define TAB_ACTIVITY_HEIGHT 109.0
 #define TAB_PEERS_HEIGHT 260.0
 #define TAB_FILES_HEIGHT 260.0
@@ -157,8 +157,7 @@
         [fPiecesField setStringValue: @""];
         [fHashField setStringValue: @""];
         [fHashField setToolTip: nil];
-        [fCommentField setStringValue: @""];
-        [fCommentField setToolTip: @""];
+        [fCommentView setString: @""];
         
         [fCreatorField setStringValue: @""];
         [fDateCreatedField setStringValue: @""];
@@ -176,7 +175,6 @@
         [fTrackerField setSelectable: NO];
         [fAnnounceField setSelectable: NO];
         [fHashField setSelectable: NO];
-        [fCommentField setSelectable: NO];
         [fCreatorField setSelectable: NO];
         [fTorrentLocationField setSelectable: NO];
         [fDataLocationField setSelectable: NO];
@@ -219,8 +217,7 @@
         [fPiecesField setIntValue: [torrent pieceCount]];
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
-        [fCommentField setStringValue: commentString];
-        [fCommentField setToolTip: commentString];
+        [fCommentView setString: commentString];
         
         [fCreatorField setStringValue: [torrent creator]];
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
@@ -244,7 +241,7 @@
         [fTrackerField setSelectable: YES];
         [fAnnounceField setSelectable: YES];
         [fHashField setSelectable: YES];
-        [fCommentField setSelectable: YES];
+        [fCommentView setSelectable: YES];
         [fCreatorField setSelectable: YES];
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];

@@ -19,7 +19,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fAnnounceField = NSTextField; 
-                fCommentField = NSTextField; 
+                fCommentView = NSTextView; 
                 fConnectedPeersField = NSTextField; 
                 fCreatorField = NSTextField; 
                 fDataLocationField = NSTextField; 
