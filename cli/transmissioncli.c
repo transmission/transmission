@@ -134,9 +134,13 @@ int main( int argc, char ** argv )
         printf( "size:     %"PRIu64" (%"PRIu64" * %d + %"PRIu64")\n",
                 info->totalSize, info->totalSize / info->pieceSize,
                 info->pieceSize, info->totalSize % info->pieceSize );
-        if( info->comment && info->comment[0] )
+        if( info->comment[0] )
         {
             printf( "comment:  %s\n", info->comment );
+        }
+        if( info->creator[0] )
+        {
+            printf( "creator:  %s\n", info->creator );
         }
         printf( "file(s):\n" );
         for( i = 0; i < info->fileCount; i++ )
