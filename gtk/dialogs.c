@@ -541,7 +541,7 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
   GtkWidget *wind, *label;
   int ii;
   char *str;
-  const int rowcount = 14;
+  const int rowcount = 15;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
 
   /* XXX should use model and update this window regularly */
@@ -590,6 +590,10 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
     INFOLINE(table, ii, _("Leechers:"), _("?"));
   else
     INFOLINEF(table, ii, "%i", _("Leechers:"), sb->leechers);
+  if(0 > sb->completedFromTracker)
+    INFOLINE(table, ii, _("Completed:"), _("?"));
+  else
+    INFOLINEF(table, ii, "%i", _("Completed:"), sb->completedFromTracker);
 
   INFOSEP(table, ii);
 
