@@ -322,7 +322,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     /* Escaped info hash for HTTP queries */
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
-        sprintf( &tor->hashString[3*i], "%%%02x", inf->hash[i] );
+        sprintf( &tor->escapedHashString[3*i], "%%%02x", inf->hash[i] );
     }
 
     /* Block size: usually 16 ko, or less if we have to */
@@ -366,11 +366,11 @@ tr_info_t * tr_torrentInfo( tr_torrent_t * tor )
 }
 
 /***********************************************************************
- * tr_torrentScrape
+ * tr_torrentScrape     
  **********************************************************************/
-int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l )
+int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 {
-    return tr_trackerScrape( tor, s, l );
+    return tr_trackerScrape( tor, s, l, d );
 }
 
 void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
@@ -539,6 +539,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     
     s->seeders  = tr_trackerSeeders(tor->tracker);
     s->leechers = tr_trackerLeechers(tor->tracker);
+    s->completedFromTracker = tr_trackerDownloaded(tor->tracker);
 
     s->swarmspeed = tr_rcRate( tor->swarmspeed );
 

@@ -19,6 +19,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fCommentView = NSTextView; 
+                fCompletedFromTrackerField = NSTextField; 
                 fConnectedPeersField = NSTextField; 
                 fCreatorField = NSTextField; 
                 fDataLocationField = NSTextField; 

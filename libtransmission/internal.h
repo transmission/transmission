@@ -158,7 +158,7 @@ struct tr_torrent_s
     int             * bindPort;
 
     /* An escaped string used to include the hash in HTTP queries */
-    char              hashString[3*SHA_DIGEST_LENGTH+1];
+    char              escapedHashString[3*SHA_DIGEST_LENGTH+1];
 
     char              scrape[MAX_PATH_LENGTH];
 

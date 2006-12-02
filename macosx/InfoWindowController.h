@@ -49,7 +49,7 @@
 
     IBOutlet NSTableView * fPeerTable;
     IBOutlet NSTextField * fSeedersField, * fLeechersField, * fConnectedPeersField,
-                        * fDownloadingFromField, * fUploadingToField;
+                        * fDownloadingFromField, * fUploadingToField, * fCompletedFromTrackerField;
     
     IBOutlet NSTableView * fFileTable;
     IBOutlet NSTextField * fFileTableStatusField;

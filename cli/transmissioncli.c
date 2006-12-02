@@ -146,15 +146,16 @@ int main( int argc, char ** argv )
 
     if( showScrape )
     {
-        int seeders, leechers;
+        int seeders, leechers, downloaded;
 
-        if( tr_torrentScrape( tor, &seeders, &leechers ) )
+        if( tr_torrentScrape( tor, &seeders, &leechers, &downloaded ) )
         {
             printf( "Scrape failed.\n" );
         }
         else
         {
-            printf( "%d seeder(s), %d leecher(s).\n", seeders, leechers );
+            printf( "%d seeder(s), %d leecher(s), %d download(s).\n",
+                    seeders, leechers, downloaded );
         }
 
         goto cleanup;

@@ -37,17 +37,31 @@ void           tr_trackerClose     ( tr_tracker_t * );
 /***********************************************************************
  * tr_trackerSeeders
  ***********************************************************************
- * Looks for the seeders/leechers as returned by the tracker.
+ * Looks for the seeders as returned by the tracker.
  **********************************************************************/
-int			    tr_trackerSeeders  ( tr_tracker_t * );
+int tr_trackerSeeders  ( tr_tracker_t * );
 
 /***********************************************************************
  * tr_trackerLeechers
  ***********************************************************************
- * Looks for the seeders/leechers as returned by the tracker.
+ * Looks for the leechers as returned by the tracker.
  **********************************************************************/
-int			    tr_trackerLeechers ( tr_tracker_t * );
+int tr_trackerLeechers ( tr_tracker_t * );
 
-int            tr_trackerScrape    ( tr_torrent_t *, int *, int * );
+/***********************************************************************
+ * tr_trackerDownloaded
+ ***********************************************************************
+ * Looks for number of completed downloads as returned by the tracker
+ * (from scrape).
+ **********************************************************************/
+int tr_trackerDownloaded( tr_tracker_t * tc );
+
+/***********************************************************************
+ * tr_trackerScrape
+ ***********************************************************************
+ * Attempt a blocking scrape and return the seeders, leechers, and
+ * completed downloads if successful.
+ **********************************************************************/
+int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d );
 
 #endif

@@ -181,6 +181,7 @@
         
         [fSeedersField setStringValue: @""];
         [fLeechersField setStringValue: @""];
+        [fCompletedFromTrackerField setStringValue: @""];
         [fConnectedPeersField setStringValue: @""];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
@@ -326,9 +327,10 @@
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    int seeders = [torrent seeders], leechers = [torrent leechers];
+    int seeders = [torrent seeders], leechers = [torrent leechers], downloaded = [torrent completedFromTracker];
     [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
     [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
+    [fCompletedFromTrackerField setStringValue: downloaded < 0 ? @"" : [NSString stringWithInt: downloaded]];
     
     BOOL active = [torrent isActive];
     [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: NSLocalizedString(@"%d (%d incoming)",

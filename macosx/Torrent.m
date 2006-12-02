@@ -725,7 +725,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSDate *) dateCreated
 {
     int date = fInfo->dateCreated;
-    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: fInfo->dateCreated] : nil;
+    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : nil;
 }
 
 - (int) pieceSize
@@ -881,6 +881,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (int) leechers
 {
     return fStat->leechers;
+}
+
+- (int) completedFromTracker
+{
+    return fStat->completedFromTracker;
 }
 
 - (int) totalPeers

@@ -210,7 +210,7 @@ tr_info_t * tr_torrentInfo( tr_torrent_t * );
  * replied with some error. tr_torrentScrape may block up to 20 seconds
  * before returning.
  **********************************************************************/
-int tr_torrentScrape( tr_torrent_t *, int * s, int * l );
+int tr_torrentScrape( tr_torrent_t *, int * s, int * l, int * d );
 
 /***********************************************************************
  * tr_torrentStart
@@ -368,6 +368,7 @@ struct tr_stat_s
     int                 peersDownloading;
     int                 seeders;
     int                 leechers;
+    int                 completedFromTracker;
 
     uint64_t            downloaded;
     uint64_t            uploaded;
