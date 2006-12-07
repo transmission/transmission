@@ -92,7 +92,7 @@ char * tr_clientForId( uint8_t * id )
     {
         if( id[0] == 'T' )
         {
-            asprintf( &ret, "BitTornado (%c%c%c)", id[1], id[2], id[3] );
+            asprintf( &ret, "BitTornado %d.%d.%d", ( id[1] - '0'), ( id[2] - '0'), ( id[3] - '0') );
         }
         else if( id[0] == 'A' )
         {
