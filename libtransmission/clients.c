@@ -26,7 +26,7 @@
 
 static int charToInt( char character );
 
-int charToInt( char character )
+static int charToInt( char character )
 {
     int value = character - '0';
     
