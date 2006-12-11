@@ -450,15 +450,17 @@ tr_torrent_stop_politely(TrTorrent *tor) {
 tr_stat_t *
 tr_torrent_stat_polite(TrTorrent *tor) {
   TrTorrentClass *klass;
-  tr_stat_t *st = tr_torrentStat(tor->handle);
+  tr_stat_t *st;
 
   if(tor->disposed)
-    return st;
+    return NULL;
 
+  st = tr_torrentStat(tor->handle);
   if(tor->closing && TR_STATUS_PAUSE & st->status) {
     tor->closing = FALSE;
     klass = g_type_class_peek(TR_TORRENT_TYPE);
     g_signal_emit(tor, klass->paused_signal_id, 0, NULL);
+    return tr_torrent_stat_polite(tor);
   }
 
   return st;

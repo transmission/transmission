@@ -275,14 +275,17 @@ tr_backend_stop_torrents(TrBackend *back) {
 gboolean
 tr_backend_torrents_stopped(TrBackend *back) {
   GList *ii, *list;
+  tr_stat_t *st;
   gboolean ret = TRUE;
 
   TR_IS_BACKEND(back);
 
   list = g_list_copy(back->torrents);
-  for(ii = list; NULL != ii; ii = ii->next)
-    if(!(TR_STATUS_PAUSE & tr_torrent_stat_polite(ii->data)->status))
+  for(ii = list; NULL != ii; ii = ii->next) {
+    st = tr_torrent_stat_polite(ii->data);
+    if(NULL == st || !(TR_STATUS_PAUSE & st->status))
       ret = FALSE;
+  }
   g_list_free(list);
 
   return ret;
