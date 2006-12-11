@@ -1241,6 +1241,7 @@ soapRequest( int retry, const char * host, int port, const char * path,
         do
         {
             name = va_arg( ap, const char * );
+            value = NULL;
             name = actionLookupName( action, name, -1, 'i' );
             if( NULL != name )
             {
