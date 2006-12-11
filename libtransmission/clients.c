@@ -24,6 +24,18 @@
 
 #include "transmission.h"
 
+static int charToInt( char character );
+
+int charToInt( char character )
+{
+    int value = character - '0';
+    
+    if( character >= 'A' && character <= 'Z' )
+        value -= 7;
+    
+    return value;
+}
+
 char * tr_clientForId( uint8_t * id )
 {
     char * ret = NULL;
@@ -33,8 +45,8 @@ char * tr_clientForId( uint8_t * id )
         if( !memcmp( &id[1], "TR", 2 ) )
         {
             asprintf( &ret, "Transmission %d.%d",
-                      ( id[3] - '0' ) * 10 + ( id[4] - '0' ),
-                      ( id[5] - '0' ) * 10 + ( id[6] - '0' ) );
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      charToInt( id[5] ) * 10 + charToInt( id[6] ) );
         }
         else if( !memcmp( &id[1], "AZ", 2 ) )
         {
@@ -49,7 +61,7 @@ char * tr_clientForId( uint8_t * id )
         else if( !memcmp( &id[1], "BC", 2 ) )
         {
             asprintf( &ret, "BitComet %d.%c%c",
-                      ( id[3] - '0' ) * 10 + ( id[4] - '0' ),
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       id[5], id[6] );
         }
         else if( !memcmp( &id[1], "SZ", 2 ) )
@@ -60,7 +72,7 @@ char * tr_clientForId( uint8_t * id )
         else if( !memcmp( &id[1], "UT", 2 ) )
         {
             asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
-                      ( id[4] - '0' ) * 10 + ( id[5] - '0' )  );
+                      charToInt( id[4] ) * 10 + charToInt( id[5] ) );
         }
         else if( !memcmp( &id[1], "BOW", 3 ) )
         {
@@ -70,7 +82,7 @@ char * tr_clientForId( uint8_t * id )
         else if( !memcmp( &id[1], "BR", 2 ) )
         {
             asprintf( &ret, "BitRocket %c.%c (%d)",
-                      id[3], id[4], ( id[5] - '0' ) * 10 + ( id[6] - '0' ) );
+                      id[3], id[4], charToInt( id[5] ) * 10 + charToInt( id[6] ) );
         }
         else if( !memcmp( &id[1], "KT", 2 ) )
         {
@@ -79,8 +91,9 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "lt", 2 ) )
         {
-            asprintf( &ret, "libTorrent %c.%c.%c.%c",
-                      id[3], id[4], id[5], id[6] );
+            asprintf( &ret, "libTorrent %d.%d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ), charToInt( id[6] ) );
         }
         else if( !memcmp( &id[1], "ES", 2 ) )
         {
@@ -92,8 +105,8 @@ char * tr_clientForId( uint8_t * id )
     {
         if( id[0] == 'T' )
         {
-            asprintf( &ret, "BitTornado %d.%d.%d", ( id[1] - '0' - ( id[1] < 'A' ? 0 : 7 ) ),
-                 ( id[2] - '0' - ( id[2] < 'A' ? 0 : 7 ) ),  ( id[3] - '0' - ( id[3] < 'A' ? 0 : 7 ) ) );
+            asprintf( &ret, "BitTornado %d.%d.%d", charToInt( id[1] ),
+                 charToInt( id[2] ), charToInt( id[3] ) );
         }
         else if( id[0] == 'A' )
         {
