@@ -279,14 +279,17 @@ int tr_cpMostMissingBlockInPiece( tr_completion_t * cp, int piece,
         }
     }
 
-    if( poolSize < 1 )
+    if( poolSize > 0 )
     {
-        return -1;
+        ret = pool[0];
+        *downloaders = min;
+    }
+    else
+    {
+        ret = -1;
     }
 
-    ret = pool[0];
     free( pool );
-    *downloaders = min;
     return ret;
 }
 
