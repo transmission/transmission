@@ -74,6 +74,32 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 + (void) initialize
 {
+    /* Make sure another Transmission.app isn't running already */
+    NSString * myBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    int myProcessIdentifier = [[NSProcessInfo processInfo] processIdentifier];
+
+    NSDictionary * dico;
+    NSEnumerator * enumerator = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
+    while( ( dico = [enumerator nextObject] ) )
+    {
+        if( ![[dico objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: myBundleIdentifier] )
+        {
+            /* This isn't Transmission */
+            continue;
+        }
+        if( [[dico objectForKey: @"NSApplicationProcessIdentifier"] intValue] == myProcessIdentifier )
+        {
+            /* This is ourselves */
+            continue;
+        }
+        
+        /* Activate the already running instance, then kill ourselves right away */
+        NSLog( @"Another instance of Transmission is already running, aborting" );
+        [[NSWorkspace sharedWorkspace] launchApplication: [dico objectForKey: @"NSApplicationPath"]];
+        exit( 0 );
+    }
+
+
     [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     
