@@ -21,18 +21,18 @@ FORCE:
 
 -include mk/config.mk
 ifneq ($(SYSTEM),Darwin)
-REALMAKE = $(MAKE) -f mk/default.mk
+MAKEARGS += -f mk/default.mk
 else
-REALMAKE = $(MAKE) -f mk/osx.mk
+MAKEARGS += -f mk/osx.mk
 endif
 
 all: required
-	@$(REALMAKE) all
+	@$(MAKE) $(MAKEARGS) all
 clean: required
-	@$(REALMAKE) clean
-install: required
-	@$(REALMAKE) install
-package: required
-	@$(REALMAKE) package
-package-release: required
-	@$(REALMAKE) package-release
+	@$(MAKE) $(MAKEARGS) clean
+install: all
+	@$(MAKE) $(MAKEARGS) install
+package: all
+	@$(MAKE) $(MAKEARGS) package
+package-release: all
+	@$(MAKE) $(MAKEARGS) package-release

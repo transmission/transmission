@@ -79,7 +79,7 @@ define INSTALL_MAN_RULE
 	@$(CP) $< $(DESTDIR)$(PREFIX)/man/man1/
 endef
 
-RM    = rm -Rf
-CP    = cp -f
-MKDIR = mkdir -p
-MAKE += --no-print-directory
+RM       = rm -Rf
+CP       = cp -f
+MKDIR    = mkdir -p
+MAKEARGS = --no-print-directory

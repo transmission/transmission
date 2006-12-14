@@ -18,7 +18,7 @@ transmission-gtk: $(OBJS) ../libtransmission/libtransmission.a
 	$(LINK_RULE)
 
 .po:
-	@$(MAKE) -C po -f ../../mk/po.mk
+	@$(MAKE) $(MAKEARGS) -C po -f ../../mk/po.mk
 
 %.o: %.c ../mk/config.mk ../mk/common.mk ../mk/gtk.mk
 	$(CC_RULE)
@@ -28,14 +28,14 @@ clean:
 	@$(RM) transmission-gtk
 	@echo "Clean $(OBJS)"
 	@$(RM) $(OBJS)
-	@$(MAKE) -C po -f ../../mk/po.mk clean
+	@$(MAKE) $(MAKEARGS) -C po -f ../../mk/po.mk clean
 
 .depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/gtk.mk
 	$(DEP_RULE)
 
 install: transmission-gtk .po
 	$(INSTALL_BIN_RULE)
-	@$(MAKE) -C po -f ../../mk/po.mk install
+	@$(MAKE) $(MAKEARGS) -C po -f ../../mk/po.mk install
 
 morepot: $(SRCS)
 	xgettext --output=po/transmission-gtk.pot --from-code=UTF-8 --add-comments --keyword=_ --keyword=N_ $^
