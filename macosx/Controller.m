@@ -101,8 +101,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             exit(0);
         }
     }
-
-
+    
     [[NSUserDefaults standardUserDefaults] registerDefaults: [NSDictionary dictionaryWithContentsOfFile:
         [[NSBundle mainBundle] pathForResource: @"Defaults" ofType: @"plist"]]];
     

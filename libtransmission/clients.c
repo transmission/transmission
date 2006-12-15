@@ -127,7 +127,7 @@ char * tr_clientForId( uint8_t * id )
     }
     else if( !memcmp( id, "exbc", 4 ) )
     {
-        asprintf( &ret, "BitComet %d.%02d", id[4], id[5] );
+        asprintf( &ret, "%s %d.%02d", !memcmp( &id[6], "LORD", 4 ) ? "BitLord" : "BitComet", id[4], id[5] );
     }
     else if( !memcmp( id, "OP", 2 ) )
     {
