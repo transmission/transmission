@@ -74,29 +74,32 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 + (void) initialize
 {
-    /* Make sure another Transmission.app isn't running already */
-    NSString * myBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    int myProcessIdentifier = [[NSProcessInfo processInfo] processIdentifier];
+    //make sure another Transmission.app isn't running already
+    NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
 
-    NSDictionary * dico;
+    NSDictionary * dic;
     NSEnumerator * enumerator = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
-    while( ( dico = [enumerator nextObject] ) )
+    while ((dic = [enumerator nextObject]))
     {
-        if( ![[dico objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: myBundleIdentifier] )
+        if ([[dic objectForKey: @"NSApplicationBundleIdentifier"] isEqualToString: bundleIdentifier]
+            && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
         {
-            /* This isn't Transmission */
-            continue;
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
+            [alert setMessageText: NSLocalizedString(@"Transmission is already running",
+                                                    "Transmission already running alert -> title")];
+            [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
+                "Please quit that instance before opening another.", "Transmission already running alert -> message")];
+            [alert setAlertStyle: NSWarningAlertStyle];
+            
+            [alert runModal];
+            [alert release];
+            
+            //activate the already running instance, then kill ourselves right away
+            [[NSWorkspace sharedWorkspace] launchApplication: [dic objectForKey: @"NSApplicationPath"]];
+            exit(0);
         }
-        if( [[dico objectForKey: @"NSApplicationProcessIdentifier"] intValue] == myProcessIdentifier )
-        {
-            /* This is ourselves */
-            continue;
-        }
-        
-        /* Activate the already running instance, then kill ourselves right away */
-        NSLog( @"Another instance of Transmission is already running, aborting" );
-        [[NSWorkspace sharedWorkspace] launchApplication: [dico objectForKey: @"NSApplicationPath"]];
-        exit( 0 );
     }
 
 
