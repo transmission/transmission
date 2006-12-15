@@ -127,7 +127,9 @@ char * tr_clientForId( uint8_t * id )
     }
     else if( !memcmp( id, "exbc", 4 ) )
     {
-        asprintf( &ret, "%s %d.%02d", !memcmp( &id[6], "LORD", 4 ) ? "BitLord" : "BitComet", id[4], id[5] );
+        asprintf( &ret, "%s %d.%02d",
+                    !memcmp( &id[6], "LORD", 4 ) ? "BitLord" : "BitComet",
+                    id[4], id[5] );
     }
     else if( !memcmp( id, "OP", 2 ) )
     {
@@ -137,6 +139,12 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "MLDonkey %c%c%c%c%c",
                   id[3], id[4], id[5], id[6], id[7] );
+    }
+    else if( !memcmp( id, "XBT", 3 ) )
+    {
+        asprintf( &ret, "XBT Client %c%c%c%s",
+                  id[3], id[4], id[5],
+                  id[6] == 'd' ? " (debug)" : "" );
     }
 
     if( !ret )
