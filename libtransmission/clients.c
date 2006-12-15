@@ -106,11 +106,12 @@ char * tr_clientForId( uint8_t * id )
         if( id[0] == 'T' )
         {
             asprintf( &ret, "BitTornado %d.%d.%d", charToInt( id[1] ),
-                 charToInt( id[2] ), charToInt( id[3] ) );
+                        charToInt( id[2] ), charToInt( id[3] ) );
         }
         else if( id[0] == 'A' )
         {
-            asprintf( &ret, "ABC %c.%c.%c", id[1], id[2], id[3] );
+            asprintf( &ret, "ABC %d.%d.%d", charToInt( id[1] ),
+                        charToInt( id[2] ), charToInt( id[3] ) );
         }
     }
     else if( id[0] == 'M' && id[2] == '-' && id[7] == '-' )
