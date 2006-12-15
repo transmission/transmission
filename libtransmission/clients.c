@@ -113,17 +113,16 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "ABC %c.%c.%c", id[1], id[2], id[3] );
         }
     }
-    else if( id[0] == 'M' && id[2] == '-' &&
-             id[4] == '-' && id[6] == '-' &&
-             id[7] == '-' )
+    else if( id[0] == 'M' && id[2] == '-' && id[7] == '-' )
     {
-        asprintf( &ret, "BitTorrent %c.%c.%c", id[1], id[3], id[5] );
-    }
-    
-    else if( id[0] == 'M' && id[2] == '-' &&
-             id[5] == '-' && id[7] == '-' )
-    {
-        asprintf( &ret, "BitTorrent %c.%c%c.%c", id[1], id[3], id[4], id[6] );
+        if( id[4] == '-' && id[6] == '-' )
+        {
+            asprintf( &ret, "BitTorrent %c.%c.%c", id[1], id[3], id[5] );
+        }
+        else if( id[5] == '-' )
+        {
+            asprintf( &ret, "BitTorrent %c.%c%c.%c", id[1], id[3], id[4], id[6] );
+        }
     }
     else if( !memcmp( id, "exbc", 4 ) )
     {
@@ -142,8 +141,7 @@ char * tr_clientForId( uint8_t * id )
     }
     else if( !memcmp( id, "XBT", 3 ) )
     {
-        asprintf( &ret, "XBT Client %c%c%c%s",
-                  id[3], id[4], id[5],
+        asprintf( &ret, "XBT Client %c%c%c%s", id[3], id[4], id[5],
                   id[6] == 'd' ? " (debug)" : "" );
     }
 
