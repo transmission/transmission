@@ -106,7 +106,10 @@
         else
         {
             if ([self pointInMinimalStatusRect: fClickPoint])
+            {
                 [(TorrentCell *)[[self tableColumnWithIdentifier: @"Torrent"] dataCell] toggleMinimalStatus];
+                fClickPoint = NSZeroPoint;
+            }
 
             [super mouseDown: event];
         }
@@ -141,7 +144,7 @@
     }
     else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] revealData];
-    else if ([event clickCount] == 2)
+    else if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
     {
         if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] revealData];
