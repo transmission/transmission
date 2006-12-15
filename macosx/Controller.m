@@ -90,7 +90,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [alert setMessageText: NSLocalizedString(@"Transmission is already running",
                                                     "Transmission already running alert -> title")];
             [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
-                "This copy cannot open until that instance is quit.", "Transmission already running alert -> message")];
+                "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];
