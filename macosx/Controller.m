@@ -86,11 +86,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
         {
             NSAlert * alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Transmission already running alert -> button")];
             [alert setMessageText: NSLocalizedString(@"Transmission is already running",
                                                     "Transmission already running alert -> title")];
             [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
-                "Please quit that instance before opening another.", "Transmission already running alert -> message")];
+                "This copy cannot open until that instance is quit.", "Transmission already running alert -> message")];
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];
