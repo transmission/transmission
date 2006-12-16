@@ -125,6 +125,17 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "BitTorrent %c.%c%c.%c", id[1], id[3], id[4], id[6] );
         }
     }
+    else if( id[0] == 'Q' && id[2] == '-' && id[7] == '-' )
+    {
+        if( id[4] == '-' && id[6] == '-' )
+        {
+            asprintf( &ret, "Queen Bee %c.%c.%c", id[1], id[3], id[5] );
+        }
+        else if( id[5] == '-' )
+        {
+            asprintf( &ret, "Queen Bee %c.%c%c.%c", id[1], id[3], id[4], id[6] );
+        }
+    }
     else if( !memcmp( id, "exbc", 4 ) )
     {
         asprintf( &ret, "%s %d.%02d",
