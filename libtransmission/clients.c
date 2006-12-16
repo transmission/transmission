@@ -28,10 +28,11 @@ static int charToInt( char character );
 
 static int charToInt( char character )
 {
-    int value = character - '0';
-    
+    int value;
     if( character >= 'A' && character <= 'Z' )
-        value -= 7;
+        value = 10 + character - 'A';
+    else
+        value = character - '0';
     
     return value;
 }
