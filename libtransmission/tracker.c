@@ -291,7 +291,7 @@ static int shouldScrape( tr_tracker_t * tc )
     uint64_t now, interval;
 
     /* in process of changing tracker or scrape not supported */
-    if( tc->shouldChangeAnnounce != TC_CHANGE_NO || !tc->trackerCanScrape )
+    if( tc->shouldChangeAnnounce != TC_CHANGE_NO || !tc->trackerCanScrape || tc->stopped )
     {
         return 0;
     }
