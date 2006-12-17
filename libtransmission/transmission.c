@@ -476,11 +476,11 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             sizeof( s->trackerError ) );
     s->cannotConnect = tr_trackerCannotConnect( tc );
     
-    if( tor->tracker )
+    if( tc )
     {
-        s->trackerAddress  = tr_trackerAddress(  tor->tracker );
-        s->trackerPort     = tr_trackerPort(     tor->tracker );
-        s->trackerAnnounce = tr_trackerAnnounce( tor->tracker );
+        s->trackerAddress  = tr_trackerAddress(  tc );
+        s->trackerPort     = tr_trackerPort(     tc );
+        s->trackerAnnounce = tr_trackerAnnounce( tc );
     }
     else
     {
@@ -535,8 +535,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     
     s->seeders  = tr_trackerSeeders( tc );
     s->leechers = tr_trackerLeechers( tc );
-    s->completedFromTracker = tr_trackerDownloaded( tor->tracker );
-    s->completedFromTracker = tr_trackerDownloaded(tor->tracker);
+    s->completedFromTracker = tr_trackerDownloaded( tc );
 
     s->swarmspeed = tr_rcRate( tor->swarmspeed );
 
