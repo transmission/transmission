@@ -27,6 +27,7 @@
 
 int tr_metainfoParse( tr_info_t *, const char * path,
                       const char * savedHash, int saveCopy );
-
+void tr_metainfoFree( tr_info_t * inf );
 void tr_metainfoRemoveSaved( const char * hashString );
+
 #endif

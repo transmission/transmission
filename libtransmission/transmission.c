@@ -30,8 +30,8 @@
 static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
                                        int flags, int * error );
 static void torrentReallyStop( tr_torrent_t * );
-static void  downloadLoop( void * );
-static void  acceptLoop( void * );
+static void downloadLoop( void * );
+static void acceptLoop( void * );
 static void acceptStop( tr_handle_t * h );
 
 /***********************************************************************
@@ -277,7 +277,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tr_torrent_t  * tor_tmp;
     tr_info_t     * inf;
     int             i;
-    char          * s1, * s2;
 
     inf        = &tor->info;
     inf->flags = flags;
@@ -289,8 +288,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
                      SHA_DIGEST_LENGTH ) )
         {
             *error = TR_EDUPLICATE;
-            free( inf->pieces );
-            free( inf->files );
+            tr_metainfoFree( &tor->info );
             free( tor );
             return NULL;
         }
@@ -301,23 +299,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->key    = h->key;
     tor->bindPort = &h->bindPort;
 	tor->finished = 0;
-
-
-    /* Guess scrape URL */
-    s1 = strchr( inf->trackerAnnounce, '/' );
-    while( ( s2 = strchr( s1 + 1, '/' ) ) )
-    {
-        s1 = s2;
-    }
-    s1++;
-    if( !strncmp( s1, "announce", 8 ) )
-    {
-        int pre  = (long) s1 - (long) inf->trackerAnnounce;
-        int post = strlen( inf->trackerAnnounce ) - pre - 8;
-        memcpy( tor->scrape, inf->trackerAnnounce, pre );
-        sprintf( &tor->scrape[pre], "scrape" );
-        memcpy( &tor->scrape[pre+6], &inf->trackerAnnounce[pre+8], post );
-    }
 
     /* Escaped info hash for HTTP queries */
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
@@ -473,6 +454,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     tr_stat_t * s;
     tr_peer_t * peer;
     tr_info_t * inf = &tor->info;
+    tr_tracker_t * tc = tor->tracker;
     int i;
 
     tor->statCur = ( tor->statCur + 1 ) % 2;
@@ -492,6 +474,20 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->error  = tor->error;
     memcpy( s->trackerError, tor->trackerError,
             sizeof( s->trackerError ) );
+    s->cannotConnect = tr_trackerCannotConnecting( tc );
+    
+    if( tor->tracker )
+    {
+        s->trackerAddress  = tr_trackerAddress(  tor->tracker );
+        s->trackerPort     = tr_trackerPort(     tor->tracker );
+        s->trackerAnnounce = tr_trackerAnnounce( tor->tracker );
+    }
+    else
+    {
+        s->trackerAddress  = inf->trackerList[0].list[0].address;
+        s->trackerPort     = inf->trackerList[0].list[0].port;
+        s->trackerAnnounce = inf->trackerList[0].list[0].announce;
+    }
 
     s->peersTotal       = 0;
     s->peersIncoming    = 0;
@@ -537,8 +533,9 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     }
     s->rateUpload = tr_rcRate( tor->upload );
     
-    s->seeders  = tr_trackerSeeders(tor->tracker);
-    s->leechers = tr_trackerLeechers(tor->tracker);
+    s->seeders  = tr_trackerSeeders( tc );
+    s->leechers = tr_trackerLeechers( tc );
+    s->completedFromTracker = tr_trackerDownloaded( tor->tracker );
     s->completedFromTracker = tr_trackerDownloaded(tor->tracker);
 
     s->swarmspeed = tr_rcRate( tor->swarmspeed );
@@ -689,8 +686,8 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
     {
         free( tor->destination );
     }
-    free( inf->pieces );
-    free( inf->files );
+
+    tr_metainfoFree( inf );
 
     if( tor->prev )
     {

@@ -572,13 +572,13 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
 
   INFOSEP(table, ii);
 
-  if(80 == in->trackerPort)
+  if(80 == sb->trackerPort)
     INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s",
-              in->trackerAddress));
+              sb->trackerAddress));
   else
     INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s:%i",
-              in->trackerAddress, in->trackerPort));
-  INFOLINE(table, ii, _("Announce:"), in->trackerAnnounce);
+              sb->trackerAddress, sb->trackerPort));
+  INFOLINE(table, ii, _("Announce:"), sb->trackerAnnounce);
   INFOLINEA(table, ii, _("Piece Size:"), readablesize(in->pieceSize));
   INFOLINEF(table, ii, "%i", _("Pieces:"), in->pieceCount);
   INFOLINEA(table, ii, _("Total Size:"), readablesize(in->totalSize));

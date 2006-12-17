@@ -37,7 +37,7 @@
 
     IBOutlet NSImageView * fImageView;
     IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
-                        * fPiecesField, * fHashField,
+                        * fPiecesField, * fHashField, * fSecureField,
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateStartedField,
                         * fCreatorField, * fDateCreatedField,
@@ -50,14 +50,14 @@
     IBOutlet NSTableView * fPeerTable;
     IBOutlet NSTextField * fSeedersField, * fLeechersField, * fConnectedPeersField,
                         * fDownloadingFromField, * fUploadingToField, * fCompletedFromTrackerField;
+    IBOutlet NSTextView * fErrorMessageView;
+    IBOutlet PiecesView * fPiecesView;
     
     IBOutlet NSTableView * fFileTable;
     IBOutlet NSTextField * fFileTableStatusField;
     
     IBOutlet NSMatrix * fRatioMatrix;
     IBOutlet NSTextField * fRatioLimitField;
-    
-    IBOutlet PiecesView * fPiecesView;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;

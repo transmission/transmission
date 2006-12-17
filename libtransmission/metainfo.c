@@ -29,6 +29,7 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
+static int getannounce( tr_info_t * inf, benc_val_t * meta );
 #define strcatUTF8( dst, src) _strcatUTF8( (dst), sizeof( dst ) - 1, (src) )
 static void _strcatUTF8( char *, int, char * );
 
@@ -43,15 +44,14 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     FILE       * file;
     char       * buf;
     benc_val_t   meta, * beInfo, * list, * val;
-    char * s, * s2, * s3;
     int          i;
-    struct stat sb;
+    struct stat  sb;
 
     assert( NULL == path || NULL == savedHash );
     /* if savedHash isn't null, saveCopy should be false */
     assert( NULL == savedHash || !saveCopy );
 
-    if ( NULL != savedHash )
+    if( NULL != savedHash )
     {
         snprintf( inf->torrent, MAX_PATH_LENGTH, "%s/%s",
                   tr_getTorrentsDirectory(), savedHash );
@@ -147,50 +147,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
 
     /* We won't need this anymore */
     free( buf );
-
-    if( !( val = tr_bencDictFind( &meta, "announce" ) ) )
-    {
-        tr_err( "No \"announce\" entry" );
-        tr_bencFree( &meta );
-        return 1;
-    }
-    
-    /* Skip spaces */
-    s3 = val->val.s.s;
-    while( *s3 && *s3 == ' ' )
-    {
-        s3++;
-    }
-
-    /* Parse announce URL */
-    if( strncmp( s3, "http://", 7 ) )
-    {
-        tr_err( "Invalid announce URL (%s)", inf->trackerAddress );
-        tr_bencFree( &meta );
-        return 1;
-    }
-    s  = strchr( s3 + 7, ':' );
-    s2 = strchr( s3 + 7, '/' );
-    if( s && s < s2 )
-    {
-        memcpy( inf->trackerAddress, s3 + 7,
-                (long) s - (long) s3 - 7 );
-        inf->trackerPort = atoi( s + 1 );
-    }
-    else if( s2 )
-    {
-        memcpy( inf->trackerAddress, s3 + 7,
-                (long) s2 - (long) s3 - 7 );
-        inf->trackerPort = 80;
-    }
-    else
-    {
-        tr_err( "Invalid announce URL (%s)", inf->trackerAddress );
-        tr_bencFree( &meta );
-        return 1;
-    }
-    snprintf( inf->trackerAnnounce, MAX_PATH_LENGTH, "%s", s2 );
-    
+        
     /* Comment info */
     if( ( val = tr_bencDictFind( &meta, "comment.utf-8" ) ) || ( val = tr_bencDictFind( &meta, "comment" ) ) )
     {
@@ -212,7 +169,13 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     {
         inf->dateCreated = 0;
     }
-
+    
+    /* Private torrent */
+    if( ( val = tr_bencDictFind( beInfo, "private" ) ) && TYPE_INT == val->type )
+    {
+        inf->privateTorrent = val->val.i;
+    }
+    
     /* Piece length */
     if( !( val = tr_bencDictFind( beInfo, "piece length" ) ) )
     {
@@ -297,12 +260,163 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
     {
         tr_err( "Size of hashes and files don't match" );
-        free( inf->pieces );
+        tr_metainfoFree( inf );
+        tr_bencFree( &meta );
+        return 1;
+    }
+
+    /* get announce or announce-list */
+    if( getannounce( inf, &meta ) )
+    {
+        tr_metainfoFree( inf );
         tr_bencFree( &meta );
         return 1;
     }
 
     tr_bencFree( &meta );
+    return 0;
+}
+
+void tr_metainfoFree( tr_info_t * inf )
+{
+    int ii, jj;
+
+    free( inf->pieces );
+    free( inf->files );
+    
+    for( ii = 0; ii < inf->trackerTiers; ii++ )
+    {
+        for( jj = 0; jj < inf->trackerList[ii].count; jj++ )
+        {
+            free( inf->trackerList[ii].list[jj].address );
+            free( inf->trackerList[ii].list[jj].announce );
+        }
+        free( inf->trackerList[ii].list );
+    }
+    free( inf->trackerList );
+}
+
+static int getannounce( tr_info_t * inf, benc_val_t * meta )
+{
+    benc_val_t              * val, * subval, * urlval;
+    char                    * address, * announce;
+    int                       ii, jj, port, random;
+    tr_tracker_info_t * sublist;
+    int subcount;
+    void * swapping;
+
+    /* Announce-list */
+    val = tr_bencDictFind( meta, "announce-list" );
+    if( NULL != val && TYPE_LIST == val->type && 0 < val->val.l.count )
+    {
+        inf->trackerTiers = 0;
+        inf->trackerList = calloc( sizeof( inf->trackerList[0] ),
+                                   val->val.l.count );
+
+        /* iterate through the announce-list's tiers */
+        for( ii = 0; ii < val->val.l.count; ii++ )
+        {
+            subval = &val->val.l.vals[ii];
+            if( TYPE_LIST != subval->type || 0 >= subval->val.l.count )
+            {
+                continue;
+            }
+            subcount = 0;
+            sublist = calloc( sizeof( sublist[0] ), subval->val.l.count );
+
+            /* iterate through the tier's items */
+            for( jj = 0; jj < subval->val.l.count; jj++ )
+            {
+                urlval = &subval->val.l.vals[jj];
+                if( TYPE_STR != urlval->type ||
+                    tr_httpParseUrl( urlval->val.s.s, urlval->val.s.i,
+                                     &address, &port, &announce ) )
+                {
+                    continue;
+                }
+
+                /* place the item info in a random location in the sublist */
+                random = tr_rand( subcount + 1 );
+                if( random != subcount )
+                {
+                    sublist[subcount] = sublist[random];
+                }
+                sublist[random].address  = address;
+                sublist[random].port     = port;
+                sublist[random].announce = announce;
+                subcount++;
+            }
+
+            /* just use sublist as is if it's full */
+            if( subcount == subval->val.l.count )
+            {
+                inf->trackerList[inf->trackerTiers].list = sublist;
+                inf->trackerList[inf->trackerTiers].count = subcount;
+                inf->trackerTiers++;
+            }
+            /* if we skipped some of the tier's items then trim the sublist */
+            else if( 0 < subcount )
+            {
+                inf->trackerList[inf->trackerTiers].list = calloc( sizeof( sublist[0] ), subcount );
+                memcpy( inf->trackerList[inf->trackerTiers].list, sublist,
+                        sizeof( sublist[0] ) * subcount );
+                inf->trackerList[inf->trackerTiers].count = subcount;
+                inf->trackerTiers++;
+                free( sublist );
+            }
+            /* drop the whole sublist if we didn't use any items at all */
+            else
+            {
+                free( sublist );
+            }
+        }
+
+        /* did we use any of the tiers? */
+        if( 0 == inf->trackerTiers )
+        {
+            tr_inf( "No valid entries in \"announce-list\"" );
+            free( inf->trackerList );
+            inf->trackerList = NULL;
+        }
+        /* trim unused sublist pointers */
+        else if( inf->trackerTiers < val->val.l.count )
+        {
+            swapping = inf->trackerList;
+            inf->trackerList = calloc( sizeof( inf->trackerList[0] ),
+                                       inf->trackerTiers );
+            memcpy( inf->trackerList, swapping,
+                    sizeof( inf->trackerList[0] ) * inf->trackerTiers );
+            free( swapping );
+        }
+    }
+
+    /* Regular announce value */
+    if( 0 == inf->trackerTiers )
+    {
+        val = tr_bencDictFind( meta, "announce" );
+        if( NULL == val || TYPE_STR != val->type )
+        {
+            tr_err( "No \"announce\" entry" );
+            return 1;
+        }
+
+        if( tr_httpParseUrl( val->val.s.s, val->val.s.i,
+                             &address, &port, &announce ) )
+        {
+            tr_err( "Invalid announce URL (%s)", val->val.s.s );
+            return 1;
+        }
+
+        sublist                   = calloc( sizeof( sublist[0] ), 1 );
+        sublist[0].address        = address;
+        sublist[0].port           = port;
+        sublist[0].announce       = announce;
+        inf->trackerList          = calloc( sizeof( inf->trackerList[0] ), 1 );
+        inf->trackerList[0].list  = sublist;
+        inf->trackerList[0].count = 1;
+        inf->trackerTiers         = 1;
+    }
+
     return 0;
 }
 

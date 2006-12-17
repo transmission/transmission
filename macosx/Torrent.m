@@ -349,18 +349,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (fStat->error & TR_ETRACKER)
     {
         [fStatusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
-                                    [NSString stringWithUTF8String: fStat->trackerError]]];
-        if (!fError && [self isActive])
-        {
-            fError = YES;
-            if (![self isSeeding])
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
-        }
+                                    [self errorMessage]]];
     }
-    else
+    
+    BOOL wasError = fError;
+    if ((fError = fStat->cannotConnect))
     {
-        if (fError)
-            fError = NO;
+        if (!wasError && [self isActive] && ![self isSeeding])
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
     }
 
     if ([self isActive] && fStat->status != TR_STATUS_CHECK )
@@ -704,12 +700,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSString *) tracker
 {
-    return [NSString stringWithFormat: @"%s:%d", fInfo->trackerAddress, fInfo->trackerPort];
+    return [NSString stringWithFormat: @"http://%s:%d", fStat->trackerAddress, fStat->trackerPort];
 }
 
 - (NSString *) announce
 {
-    return [NSString stringWithUTF8String: fInfo->trackerAnnounce];
+    return [NSString stringWithUTF8String: fStat->trackerAnnounce];
 }
 
 - (NSString *) comment
@@ -741,6 +737,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSString *) hashString
 {
     return [NSString stringWithUTF8String: fInfo->hashString];
+}
+
+- (BOOL) privateTorrent
+{
+    return fInfo->privateTorrent;
 }
 
 - (NSString *) torrentLocation
@@ -820,6 +821,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (BOOL) isError
 {
     return fStat->error & TR_ETRACKER;
+}
+
+- (NSString *) errorMessage
+{
+    [NSString stringWithUTF8String: fStat->trackerError];
 }
 
 - (BOOL) justFinished

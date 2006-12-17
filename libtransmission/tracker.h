@@ -29,7 +29,7 @@ typedef struct tr_tracker_s tr_tracker_t;
 
 tr_tracker_t * tr_trackerInit      ( tr_torrent_t * );
 void           tr_trackerChangePort( tr_tracker_t *, int );
-int            tr_trackerPulse     ( tr_tracker_t * );
+void           tr_trackerPulse     ( tr_tracker_t * );
 void           tr_trackerCompleted ( tr_tracker_t * );
 void           tr_trackerStopped   ( tr_tracker_t * );
 void           tr_trackerClose     ( tr_tracker_t * );
@@ -55,6 +55,12 @@ int tr_trackerLeechers ( tr_tracker_t * );
  * (from scrape).
  **********************************************************************/
 int tr_trackerDownloaded( tr_tracker_t * tc );
+
+const char * tr_trackerAddress ( tr_tracker_t * tc );
+int          tr_trackerPort    ( tr_tracker_t * tc );
+const char * tr_trackerAnnounce( tr_tracker_t * tc );
+
+int tr_trackerCannotConnecting( tr_tracker_t * tc );
 
 /***********************************************************************
  * tr_trackerScrape
