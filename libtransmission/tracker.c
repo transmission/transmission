@@ -1072,7 +1072,7 @@ const char * tr_trackerAnnounce( tr_tracker_t * tc )
     return tc->trackerAnnounce;
 }
 
-int tr_trackerCannotConnecting( tr_tracker_t * tc )
+int tr_trackerCannotConnect( tr_tracker_t * tc )
 {
     if( !tc )
     {

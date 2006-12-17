@@ -474,7 +474,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->error  = tor->error;
     memcpy( s->trackerError, tor->trackerError,
             sizeof( s->trackerError ) );
-    s->cannotConnect = tr_trackerCannotConnecting( tc );
+    s->cannotConnect = tr_trackerCannotConnect( tc );
     
     if( tor->tracker )
     {
