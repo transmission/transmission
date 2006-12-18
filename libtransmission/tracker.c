@@ -384,6 +384,7 @@ void tr_trackerPulse( tr_tracker_t * tc )
                 if( tc->shouldChangeAnnounce == TC_CHANGE_NO && tc->announceTierLast != 0 )
                 {
                     announcePtr = tc->trackerAnnounceListPtr[tc->announceTier];
+                    prevAnnouncePtr = NULL;
                     for( i = 0; i < tc->announceTierLast; i++ )
                     {
                         prevAnnouncePtr = announcePtr;
