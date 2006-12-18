@@ -1834,7 +1834,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
-        [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
+        [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
         return NSDragOperationGeneric;
     }
     else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
