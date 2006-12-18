@@ -839,20 +839,30 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     tr_peer_stat_t * peers = tr_torrentPeers(fHandle, & totalPeers);
     
     NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
-    tr_peer_stat_t peer;
+    NSMutableDictionary * dic;
+    
+    tr_peer_stat_t * peer;
     NSString * client;
     for (i = 0; i < totalPeers; i++)
     {
-        peer = peers[i];
-        [peerDics addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithBool: peer.isConnected], @"Connected",
-            [NSNumber numberWithBool: peer.isIncoming], @"Incoming",
-            [NSString stringWithCString: (char *) peer.addr encoding: NSUTF8StringEncoding], @"IP",
-            [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
-            [NSNumber numberWithFloat: peer.progress], @"Progress",
-            [NSNumber numberWithBool: peer.isDownloading], @"UL To",
-            [NSNumber numberWithBool: peer.isUploading], @"DL From",
-            [NSNumber numberWithInt: peer.port], @"Port", nil]];
+        peer = &peers[i];
+        
+        dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+            [NSNumber numberWithBool: peer->isConnected], @"Connected",
+            [NSNumber numberWithBool: peer->isIncoming], @"Incoming",
+            [NSString stringWithCString: (char *) peer->addr encoding: NSUTF8StringEncoding], @"IP",
+            [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding], @"Client",
+            [NSNumber numberWithFloat: peer->progress], @"Progress",
+            [NSNumber numberWithBool: peer->isDownloading], @"UL To",
+            [NSNumber numberWithBool: peer->isUploading], @"DL From",
+            [NSNumber numberWithInt: peer->port], @"Port", nil];
+        
+        if (peer->isDownloading)
+            [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
+        if (peer->isUploading)
+            [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
+        
+        [peerDics addObject: dic];
     }
     
     tr_torrentPeersFree(peers, totalPeers);

@@ -67,7 +67,6 @@
         fAppIcon = [[NSApp applicationIconImage] copy];
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
-        fCheckImage = [NSImage imageNamed: @"NSMenuCheckmark"];    
     }
     return self;
 }
@@ -540,9 +539,11 @@
         else if  ([ident isEqualToString: @"Progress"])
             return [peer objectForKey: @"Progress"];
         else if ([ident isEqualToString: @"UL To"])
-            return [[peer objectForKey: @"UL To"] boolValue] ? fCheckImage : nil;
+            return [[peer objectForKey: @"UL To"] boolValue]
+                    ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"UL To Rate"] floatValue]] : @"";
         else if ([ident isEqualToString: @"DL From"])
-            return [[peer objectForKey: @"DL From"] boolValue] ? fCheckImage : nil;
+            return [[peer objectForKey: @"DL From"] boolValue]
+                    ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"DL From Rate"] floatValue]] : @"";
         else
             return [peer objectForKey: @"IP"];
     }
