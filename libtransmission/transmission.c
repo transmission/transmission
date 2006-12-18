@@ -412,10 +412,12 @@ static void torrentReallyStop( tr_torrent_t * tor )
     tr_trackerClose( tor->tracker );
     tor->tracker = NULL;
 
+    tr_lockLock( &tor->lock );
     while( tor->peerCount > 0 )
     {
         tr_peerRem( tor, 0 );
     }
+    tr_lockUnlock( &tor->lock );
 }
 
 /***********************************************************************
@@ -454,7 +456,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     tr_stat_t * s;
     tr_peer_t * peer;
     tr_info_t * inf = &tor->info;
-    tr_tracker_t * tc = tor->tracker;
+    tr_tracker_t * tc;
     int i;
 
     tor->statCur = ( tor->statCur + 1 ) % 2;
@@ -474,6 +476,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->error  = tor->error;
     memcpy( s->trackerError, tor->trackerError,
             sizeof( s->trackerError ) );
+
+    tc = tor->tracker;
     s->cannotConnect = tr_trackerCannotConnect( tc );
     
     if( tc )
