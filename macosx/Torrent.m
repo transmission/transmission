@@ -851,7 +851,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [NSString stringWithCString: (char *) peer.client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithFloat: peer.progress], @"Progress",
             [NSNumber numberWithBool: peer.isDownloading], @"UL To",
-            [NSNumber numberWithBool: peer.isUploading], @"DL From", nil]];
+            [NSNumber numberWithBool: peer.isUploading], @"DL From",
+            [NSNumber numberWithInt: peer.port], @"Port", nil]];
     }
     
     tr_torrentPeersFree(peers, totalPeers);

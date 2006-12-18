@@ -587,16 +587,15 @@
     }
     else if (tableView == fPeerTable)
     {
-        if ([[column identifier] isEqualToString: @"Progress"])
-            return [NSString stringWithFormat: @"%.1f%%", [[[fPeers objectAtIndex: row]
-                                                objectForKey: @"Progress"] floatValue] * 100.0];
-        else
-        {
-            if ([[[fPeers objectAtIndex: row] objectForKey: @"Incoming"] boolValue])
-                return NSLocalizedString(@"From incoming connection", "Inspector -> Peers tab -> table row tooltip");
-            else
-                return NSLocalizedString(@"From outgoing connection", "Inspector -> Peers tab -> table row tooltip");
-        }
+        NSDictionary * peerDic = [fPeers objectAtIndex: row];
+        return [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%"
+                    "\nPort: %@"
+                    "\nFrom %@ connection", "Inspector -> Peers tab -> table row tooltip"),
+                    [[peerDic objectForKey: @"Progress"] floatValue] * 100.0,
+                    [peerDic objectForKey: @"Port"],
+                    [[peerDic objectForKey: @"Incoming"] boolValue]
+                        ? NSLocalizedString(@"incoming", "Inspector -> Peers tab -> table row tooltip")
+                        : NSLocalizedString(@"outgoing", "Inspector -> Peers tab -> table row tooltip")];
     }
     else
         return nil;
