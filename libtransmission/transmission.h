@@ -393,10 +393,13 @@ struct tr_peer_stat_s
     
     int     isConnected;
     int     isIncoming;
-    int     isDownloading;
-    int     isUploading;
     float   progress;
     int     port;
+    
+    int     isDownloading;
+    int     isUploading;
+    float   downloadRate;
+    float   uploadRate;
 };
 
 struct tr_msg_list_s
