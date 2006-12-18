@@ -100,6 +100,7 @@ struct tr_peer_s
     int            outSlow;
 
     tr_ratecontrol_t * download;
+    tr_ratecontrol_t * upload;
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
@@ -223,6 +224,7 @@ void tr_peerDestroy( tr_fd_t * fdlimit, tr_peer_t * peer )
         tr_fdSocketClosed( fdlimit, 0 );
     }
     tr_rcClose( peer->download );
+    tr_rcClose( peer->upload );
     free( peer );
 }
 
@@ -450,6 +452,7 @@ writeBegin:
             }
 
             blockSent( peer, ret );
+            tr_rcTransferred( peer->upload, ret );
             tr_rcTransferred( tor->upload, ret );
             tr_rcTransferred( tor->globalUpload, ret );
 
@@ -569,6 +572,11 @@ uint8_t * tr_peerBitfield( tr_peer_t * peer )
 float tr_peerDownloadRate( tr_peer_t * peer )
 {
     return tr_rcRate( peer->download );
+}
+
+float tr_peerUploadRate( tr_peer_t * peer )
+{
+    return tr_rcRate( peer->upload );
 }
 
 int tr_peerIsUnchoked( tr_peer_t * peer )
