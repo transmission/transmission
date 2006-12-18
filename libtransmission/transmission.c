@@ -591,11 +591,11 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             
             if( ( peers[i].isDownloading = tr_peerIsDownloading( peer ) ) )
             {
-                peers[i].downloadRate  = tr_peerDownloadRate( peer );
+                peers[i].uploadToRate = tr_peerUploadRate( peer );
             }
             if( ( peers[i].isUploading = tr_peerIsUploading( peer ) ) )
             {
-                peers[i].uploadRate  = tr_peerUploadRate( peer );
+                peers[i].downloadFromRate = tr_peerDownloadRate( peer );
             }
         }
     }

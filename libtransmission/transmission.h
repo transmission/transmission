@@ -398,8 +398,8 @@ struct tr_peer_stat_s
     
     int     isDownloading;
     int     isUploading;
-    float   downloadRate;
-    float   uploadRate;
+    float   downloadFromRate;
+    float   uploadToRate;
 };
 
 struct tr_msg_list_s
