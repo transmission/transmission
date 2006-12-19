@@ -121,7 +121,7 @@ char * tr_clientForId( uint8_t * id )
         }
     }
     
-    /* Different formatting per client */
+    /* Tornado-style */
     if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
     {
         if( id[0] == 'T' )
@@ -140,6 +140,8 @@ char * tr_clientForId( uint8_t * id )
             return ret;
         }
     }
+    
+    /* Different formatting per client */
     if( id[0] == 'M' && id[2] == '-' && id[7] == '-' )
     {
         if( id[4] == '-' && id[6] == '-' )
@@ -201,6 +203,10 @@ char * tr_clientForId( uint8_t * id )
     else if( !memcmp( id, "-G3", 3 ) )
     {
         asprintf( &ret, "G3 Torrent" );
+    }
+    else if( !memcmp( id, "10-------", 9 ) )
+    {
+        asprintf( &ret, "JVtorrent" );
     }
 
     /* No match */
