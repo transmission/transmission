@@ -97,6 +97,12 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ), charToInt( id[4] ),
                       charToInt( id[5] ), charToInt( id[6] ) );
         }
+        else if( !memcmp( &id[1], "LT", 2 ) )
+        {
+            asprintf( &ret, "libtorrent %d.%d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ), charToInt( id[6] ) );
+        }
         else if( !memcmp( &id[1], "ES", 2 ) )
         {
             asprintf( &ret, "Electric Sheep %c.%c.%c",
