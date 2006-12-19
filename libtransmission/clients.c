@@ -40,7 +40,8 @@ static int charToInt( char character )
 char * tr_clientForId( uint8_t * id )
 {
     char * ret = NULL;
-
+    
+    /* Azureus style */
     if( id[0] == '-' && id[7] == '-' )
     {
         if( !memcmp( &id[1], "TR", 2 ) )
@@ -107,8 +108,15 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       charToInt( id[5] ) * 10 + charToInt( id[6] ) );
         }
+        
+        if( ret )
+        {
+            return ret;
+        }
     }
-    else if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
+    
+    /* Different formatting per client */
+    if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
     {
         if( id[0] == 'T' )
         {
@@ -120,8 +128,13 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "ABC %d.%d.%d", charToInt( id[1] ),
                         charToInt( id[2] ), charToInt( id[3] ) );
         }
+        
+        if( ret )
+        {
+            return ret;
+        }
     }
-    else if( id[0] == 'M' && id[2] == '-' && id[7] == '-' )
+    if( id[0] == 'M' && id[2] == '-' && id[7] == '-' )
     {
         if( id[4] == '-' && id[6] == '-' )
         {
@@ -131,8 +144,13 @@ char * tr_clientForId( uint8_t * id )
         {
             asprintf( &ret, "BitTorrent %c.%c%c.%c", id[1], id[3], id[4], id[6] );
         }
+        
+        if( ret )
+        {
+            return ret;
+        }
     }
-    else if( id[0] == 'Q' && id[2] == '-' && id[7] == '-' )
+    if( id[0] == 'Q' && id[2] == '-' && id[7] == '-' )
     {
         if( id[4] == '-' && id[6] == '-' )
         {
@@ -142,8 +160,15 @@ char * tr_clientForId( uint8_t * id )
         {
             asprintf( &ret, "Queen Bee %c.%c%c.%c", id[1], id[3], id[4], id[6] );
         }
+        
+        if( ret )
+        {
+            return ret;
+        }
     }
-    else if( !memcmp( id, "exbc", 4 ) )
+    
+    /* All versions of each client are formatted the same */
+    if( !memcmp( id, "exbc", 4 ) )
     {
         asprintf( &ret, "%s %d.%02d",
                     !memcmp( &id[6], "LORD", 4 ) ? "BitLord" : "BitComet",
@@ -172,6 +197,7 @@ char * tr_clientForId( uint8_t * id )
         asprintf( &ret, "G3 Torrent" );
     }
 
+    /* No match */
     if( !ret )
     {
         if( id[0] != 0 )
