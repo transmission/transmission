@@ -167,6 +167,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "Limewire (%c%c%c%c)", id[4], id[5], id[6], id[7] );
     }
+    else if( !memcmp( id, "-G3", 3 ) )
+    {
+        asprintf( &ret, "G3 Torrent" );
+    }
 
     if( !ret )
     {
