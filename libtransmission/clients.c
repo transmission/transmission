@@ -191,6 +191,12 @@ char * tr_clientForId( uint8_t * id )
         asprintf( &ret, "MLDonkey %c%c%c%c%c",
                   id[3], id[4], id[5], id[6], id[7] );
     }
+    else if( !memcmp( id, "-FG", 3 ) )
+    {
+        asprintf( &ret, "FlashGet %d.%c%c",
+                  charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+    }
     else if( !memcmp( id, "XBT", 3 ) )
     {
         asprintf( &ret, "XBT Client %c%c%c%s", id[3], id[4], id[5],
