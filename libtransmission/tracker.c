@@ -433,6 +433,7 @@ void tr_trackerPulse( tr_tracker_t * tc )
                     tr_trackerPulse( tc );
                     return;
                 }
+                tc->lastAttempt = TC_ATTEMPT_NOREACH;
                 
                 break;
 
