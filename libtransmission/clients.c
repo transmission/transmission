@@ -114,6 +114,12 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       charToInt( id[5] ) * 10 + charToInt( id[6] ) );
         }
+        else if( !memcmp( &id[1], "LP", 2 ) )
+        {
+            asprintf( &ret, "Lphant %d.%c%c",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+        }
         
         if( ret )
         {
