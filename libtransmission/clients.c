@@ -203,6 +203,10 @@ char * tr_clientForId( uint8_t * id )
                   charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       id[5], id[6] );
     }
+    else if( !memcmp( id, "Plus", 4 ) )
+    {
+        asprintf( &ret, "Plus! %c.%c%c", id[4], id[5], id[6] );
+    }
     else if( !memcmp( id, "XBT", 3 ) )
     {
         asprintf( &ret, "XBT Client %c%c%c%s", id[3], id[4], id[5],
