@@ -73,16 +73,13 @@ struct tr_tracker_s
     int            randOffset;
     
     int            completelyUnconnectable;
+    int            allUnreachIfError;
+    int            lastError;
 
     uint64_t       dateTry;
     uint64_t       dateOk;
     uint64_t       dateScrape;
     int            lastScrapeFailed;
-
-#define TC_ATTEMPT_NOREACH 1
-#define TC_ATTEMPT_ERROR   2
-#define TC_ATTEMPT_OK      4
-    char           lastAttempt;
     int            scrapeNeeded;
 
     tr_http_t    * http;
@@ -121,7 +118,8 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     tc->interval       = 300;
     tc->scrapeInterval = 600;
 
-    tc->lastAttempt    = TC_ATTEMPT_NOREACH;
+    tc->lastError      = 1;
+    tc->allUnreachIfError = 1;
 
     tc->bindPort       = *(tor->bindPort);
     tc->newPort        = -1;
@@ -224,21 +222,32 @@ static int shouldConnect( tr_tracker_t * tc )
     }
     
     now = tr_date();
-
-    /* Unreachable tracker, wait 10 seconds + random value before trying again */
-    if( tc->lastAttempt == TC_ATTEMPT_NOREACH &&
-        now < tc->dateTry + tc->randOffset + 10000 )
+    
+    /* If last was an error and it should not change trackers, then all must have been errors */
+    if( tc->lastError )
     {
-        return 0;
-    }
-
-    /* The tracker rejected us (like 4XX code, unauthorized IP...),
-       don't hammer it - we'll probably get the same answer next time
-       anyway */
-    if( tc->lastAttempt == TC_ATTEMPT_ERROR &&
-        now < tc->dateTry + 1000 * tc->interval + tc->randOffset )
-    {
-        return 0;
+        /* Unreachable trackers, wait 10 seconds + random value before trying again */
+        if( tc->allUnreachIfError )
+        {
+            if( now < tc->dateTry + tc->randOffset + 10000 )
+            {
+                return 0;
+            }
+        }
+        /* The tracker rejected us (like 4XX code, unauthorized IP...),
+            don't hammer it - we'll probably get the same answer next time
+            anyway */
+        else
+        {
+            if( now < tc->dateTry + 1000 * tc->interval + tc->randOffset )
+            {
+                return 0;
+            }
+            else
+            {
+                tc->allUnreachIfError = 1;
+            }
+        }
     }
 
     /* Do we need to send an event? */
@@ -428,12 +437,14 @@ void tr_trackerPulse( tr_tracker_t * tc )
                 tc->dateTry = tr_date();
                 
                 failureAnnouncing( tc );
+                
+                tc->lastError = 1;
+                
                 if ( tc->shouldChangeAnnounce == TC_CHANGE_NEXT )
                 {
                     tr_trackerPulse( tc );
                     return;
                 }
-                tc->lastAttempt = TC_ATTEMPT_NOREACH;
                 
                 break;
 
@@ -640,7 +651,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     {
         /* We don't have a valid HTTP status line */
         tr_inf( "Tracker: invalid HTTP status line" );
-        tc->lastAttempt = TC_ATTEMPT_NOREACH;
+        tc->lastError = 1;
         failureAnnouncing( tc );
         return;
     }
@@ -667,7 +678,8 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     {
         /* we didn't get a 2xx status code */
         tr_err( "Tracker: invalid HTTP status code: %i", code );
-        tc->lastAttempt = TC_ATTEMPT_ERROR;
+        tc->lastError = 1;
+        tc->allUnreachIfError = 0;
         failureAnnouncing( tc );
         return;
     }
@@ -677,7 +689,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     if( NULL == body )
     {
         tr_err( "Tracker: could not find end of HTTP headers" );
-        tc->lastAttempt = TC_ATTEMPT_NOREACH;
+        tc->lastError = 1;
         failureAnnouncing( tc );
         return;
     }
@@ -698,11 +710,12 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     {
         if( tc->stopped || 0 < tc->newPort )
         {
-            tc->lastAttempt = TC_ATTEMPT_OK;
+            tc->lastError = 0;
             goto nodict;
         }
         tr_err( "Tracker: no valid dictionary found in answer" );
-        tc->lastAttempt = TC_ATTEMPT_ERROR;
+        tc->lastError = 1;
+        tc->allUnreachIfError = 0;
         failureAnnouncing( tc );
         return;
     }
@@ -715,7 +728,8 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
         tor->error |= TR_ETRACKER;
         snprintf( tor->trackerError, sizeof( tor->trackerError ),
                   "%s", bePeers->val.s.s );
-        tc->lastAttempt = TC_ATTEMPT_ERROR;
+        tc->lastError = 1;
+        tc->allUnreachIfError = 0;
         failureAnnouncing( tc );
         goto cleanup;
     }
@@ -731,7 +745,8 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     }
 
     tor->error &= ~TR_ETRACKER;
-    tc->lastAttempt = TC_ATTEMPT_OK;
+    tc->lastError = 0;
+    tc->allUnreachIfError = 0;
 
     /* Get the tracker interval, force to between
        10 sec and 5 mins */
