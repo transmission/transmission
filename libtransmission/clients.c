@@ -126,6 +126,10 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "AR", 2 ) )
+        {
+            asprintf( &ret, "Arctic Torrent" );
+        }
         
         if( ret )
         {
@@ -221,10 +225,6 @@ char * tr_clientForId( uint8_t * id )
     else if( !memcmp( id, "LIME", 4 ) )
     {
         asprintf( &ret, "Limewire (%c%c%c%c)", id[4], id[5], id[6], id[7] );
-    }
-    else if( !memcmp( id, "-AR", 3 ) )
-    {
-        asprintf( &ret, "Arctic Torrent" );
     }
     else if( !memcmp( id, "-G3", 3 ) )
     {
