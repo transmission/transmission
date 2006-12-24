@@ -73,8 +73,8 @@
 
 - (void) awakeFromNib
 {
-    fPeers = [[NSMutableArray alloc] initWithCapacity: 30];
-    fFiles = [[NSMutableArray alloc] initWithCapacity: 6];
+    fPeers = [[NSMutableArray alloc] initWithCapacity: 75];
+    fFiles = [[NSMutableArray alloc] initWithCapacity: 15];
     [fFileTable setDoubleAction: @selector(revealFile:)];
     
     //window location and size
