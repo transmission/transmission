@@ -37,7 +37,8 @@
 
 - (void) dealloc
 {
-    [fBackgroundColor release];
+    if (fBackgroundColor)
+        [fBackgroundColor release];
     [super dealloc];
 }
 
