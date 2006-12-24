@@ -88,7 +88,7 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "XX", 2 ) )
         {
-            asprintf( &ret, "XTorrent (%d)",
+            asprintf( &ret, "Xtorrent (%d)",
                       charToInt( id[3] ) * 1000 + charToInt( id[4] ) * 100
                       + charToInt( id[5] ) * 10 + charToInt( id[6] ) );
         }
