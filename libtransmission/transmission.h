@@ -246,6 +246,13 @@ void tr_torrentStop( tr_torrent_t * );
 int tr_getFinished( tr_torrent_t * );
 
 /***********************************************************************
+ * tr_manualUpdate
+ ***********************************************************************
+ * Reannounce to tracker regardless of wait interval
+ **********************************************************************/
+void tr_manualUpdate( tr_torrent_t * );
+
+/***********************************************************************
  * tr_torrentStat
  ***********************************************************************
  * Returns a pointer to an tr_stat_t structure with updated information

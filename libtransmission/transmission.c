@@ -451,6 +451,11 @@ int tr_getFinished( tr_torrent_t * tor )
     return 0;
 }
 
+void tr_manualUpdate( tr_torrent_t * tor )
+{
+    tr_trackerAnnouncePulse( tor->tracker, 1 );
+}
+
 tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;

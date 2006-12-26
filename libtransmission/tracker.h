@@ -30,12 +30,12 @@ typedef struct tr_tracker_s tr_tracker_t;
 tr_tracker_t * tr_trackerInit      ( tr_torrent_t * );
 void           tr_trackerChangePort( tr_tracker_t *, int );
 
-#define tr_trackerPulse( tc ) trackerPulse( (tc), 0 )
-#define tr_trackerPulseManual( tc ) trackerPulse( (tc), 1 )
+#define tr_trackerPulse( tc ) tr_trackerAnnouncePulse( (tc), 0 )
+void           tr_trackerAnnouncePulse( tr_tracker_t *, int );
 
-void           tr_trackerCompleted ( tr_tracker_t * );
-void           tr_trackerStopped   ( tr_tracker_t * );
-void           tr_trackerClose     ( tr_tracker_t * );
+void           tr_trackerCompleted( tr_tracker_t * );
+void           tr_trackerStopped  ( tr_tracker_t * );
+void           tr_trackerClose    ( tr_tracker_t * );
 
 /***********************************************************************
  * tr_trackerSeeders

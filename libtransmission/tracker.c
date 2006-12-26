@@ -92,7 +92,6 @@ struct tr_tracker_s
 static int         announceToScrape ( char * announce, char * scrape );
 static void        setAnnounce      ( tr_tracker_t * tc, tr_announce_list_ptr_t * announceItem );
 static void        failureAnnouncing( tr_tracker_t * tc );
-void               trackerPulse     ( tr_tracker_t *, int );
 static tr_http_t * getQuery         ( tr_tracker_t * tc );
 static tr_http_t * getScrapeQuery   ( tr_tracker_t * tc );
 static void        readAnswer       ( tr_tracker_t * tc, const char *, int );
@@ -323,7 +322,7 @@ void tr_trackerChangePort( tr_tracker_t * tc, int port )
     tc->newPort = port;
 }
 
-void trackerPulse( tr_tracker_t * tc, int manual )
+void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
 {
     tr_torrent_t * tor = tc->tor;
     tr_info_t    * inf = &tor->info;
