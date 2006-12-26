@@ -293,7 +293,7 @@
         return;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSString * tracker = [[torrent tracker] stringByAppendingString: [torrent announce]];
+    NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
     [fTrackerField setStringValue: tracker];
     [fTrackerField setToolTip: tracker];
 }

@@ -160,6 +160,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         [fDate release];
         
+        if (fAnnounceDate)
+            [fAnnounceDate release];
+        
         [fIcon release];
         [fIconFlipped release];
         [fIconSmall release];
@@ -462,6 +465,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         tr_torrentStart(fHandle);
 }
 
+- (void) announce
+{
+    if (![self isActive])
+        return;
+    
+    tr_manualUpdate(fHandle);
+    
+    if (fAnnounceDate)
+        [fAnnounceDate release];
+    fAnnounceDate = [[NSDate date] retain];
+}
+
+- (NSDate *) announceDate
+{
+    return fAnnounceDate;
+}
+
 - (float) ratio
 {
     float downloaded = [self downloadedTotal];
@@ -698,12 +718,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fInfo->totalSize;
 }
 
-- (NSString *) tracker
+- (NSString *) trackerAddress
 {
     return [NSString stringWithFormat: @"http://%s:%d", fStat->trackerAddress, fStat->trackerPort];
 }
 
-- (NSString *) announce
+- (NSString *) trackerAddressAnnounce
 {
     return [NSString stringWithUTF8String: fStat->trackerAnnounce];
 }

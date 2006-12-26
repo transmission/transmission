@@ -139,6 +139,8 @@
 
 - (void) revealFile: (id) sender;
 
+- (void) announceSelectedTorrents: (id) sender;
+
 - (void) showPreferenceWindow: (id) sender;
 
 - (void) makeWindowKey;

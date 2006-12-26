@@ -61,6 +61,8 @@
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
 
+#define ANNOUNCE_WAIT_INTERVAL_SECONDS  -60.0
+
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
@@ -1064,10 +1066,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) revealFile: (id) sender
 {
-    NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-    unsigned int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[fDisplayedTorrents objectAtIndex: i] revealData];
+    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent revealData];
+}
+
+- (void) announceSelectedTorrents: (id) sender
+{
+    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    Torrent * torrent;
+    NSDate * date;
+    while ((torrent = [enumerator nextObject]))
+    {
+        //time interval returned will be negative
+        if (!(date = [torrent announceDate]) || [date timeIntervalSinceNow] <= ANNOUNCE_WAIT_INTERVAL_SECONDS)
+            [torrent announce];
+    }
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -2467,6 +2482,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         {
             torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isPaused] && ![torrent waitingToStart])
+                return YES;
+        }
+        return NO;
+    }
+    
+    //enable announce item
+    if (action == @selector(announceSelectedTorrents:))
+    {
+        if (!canUseTable)
+            return NO;
+        
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        Torrent * torrent;
+        NSDate * date;
+        while ((torrent = [enumerator nextObject]))
+        {
+            //time interval returned will be negative
+            if ([torrent isActive] &&
+                    (!(date = [torrent announceDate]) || [date timeIntervalSinceNow] <= ANNOUNCE_WAIT_INTERVAL_SECONDS))
                 return YES;
         }
         return NO;

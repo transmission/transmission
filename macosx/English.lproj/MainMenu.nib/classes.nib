@@ -3,6 +3,7 @@
         {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {
+                announceSelectedTorrents = id; 
                 applyFilter = id; 
                 applySpeedLimit = id; 
                 copyTorrentFile = id; 

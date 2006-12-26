@@ -37,7 +37,7 @@
     tr_stat_t    * fStat;
     
     BOOL         fResumeOnWake;
-    NSDate       * fDate;
+    NSDate       * fDate, * fAnnounceDate;
     
     BOOL        fUseIncompleteFolder;
     NSString    * fDownloadFolder, * fIncompleteFolder;
@@ -81,6 +81,9 @@
 - (void)        sleep;
 - (void)        wakeUp;
 
+- (void)        announce;
+- (NSDate *)    announceDate;
+
 - (float)       ratio;
 - (int)         stopRatioSetting;
 - (void)        setStopRatioSetting: (int) setting;
@@ -105,8 +108,8 @@
 
 - (NSString *) name;
 - (uint64_t)   size;
-- (NSString *) tracker;
-- (NSString *) announce;
+- (NSString *) trackerAddress;
+- (NSString *) trackerAddressAnnounce;
 
 - (NSString *) comment;
 - (NSString *) creator;
