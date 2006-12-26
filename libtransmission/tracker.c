@@ -92,6 +92,7 @@ struct tr_tracker_s
 static int         announceToScrape ( char * announce, char * scrape );
 static void        setAnnounce      ( tr_tracker_t * tc, tr_announce_list_ptr_t * announceItem );
 static void        failureAnnouncing( tr_tracker_t * tc );
+void               trackerPulse     ( tr_tracker_t *, int );
 static tr_http_t * getQuery         ( tr_tracker_t * tc );
 static tr_http_t * getScrapeQuery   ( tr_tracker_t * tc );
 static void        readAnswer       ( tr_tracker_t * tc, const char *, int );
@@ -322,7 +323,7 @@ void tr_trackerChangePort( tr_tracker_t * tc, int port )
     tc->newPort = port;
 }
 
-void tr_trackerPulse( tr_tracker_t * tc )
+void trackerPulse( tr_tracker_t * tc, int manual )
 {
     tr_torrent_t * tor = tc->tor;
     tr_info_t    * inf = &tor->info;
@@ -330,10 +331,15 @@ void tr_trackerPulse( tr_tracker_t * tc )
     char         * address, * announce;
     int            len, i, port;
     tr_announce_list_ptr_t * announcePtr, * prevAnnouncePtr;
-
-    if( ( NULL == tc->http ) && shouldConnect( tc ) )
+    
+    if( ( NULL == tc->http ) && ( manual || shouldConnect( tc ) ) )
     {
+        if( manual )
+        {
+            tc->allUnreachIfError = 0;
+        }
         tc->completelyUnconnectable = 0;
+        
         tc->randOffset = tr_rand( 60000 );
         
         if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
