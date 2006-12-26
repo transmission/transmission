@@ -453,6 +453,9 @@ int tr_getFinished( tr_torrent_t * tor )
 
 void tr_manualUpdate( tr_torrent_t * tor )
 {
+    if( !( tor->status & TR_STATUS_ACTIVE ) )
+        return;
+    
     tr_lockLock( &tor->lock );
     tr_trackerAnnouncePulse( tor->tracker, 1 );
     tr_lockUnlock( &tor->lock );
