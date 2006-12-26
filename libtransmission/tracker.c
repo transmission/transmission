@@ -648,6 +648,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     benc_val_t * bePeers, * beFoo;
     const uint8_t * body;
     int bodylen, shouldfree, scrapeNeeded;
+    char * address;
 
     tc->dateTry = tr_date();
     code = tr_httpResponseCode( data, len );
@@ -669,7 +670,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
         
         tr_httpParse( data, len, hdr );
         
-        char * address = calloc( sizeof( char ), hdr->len+1 );
+        address = calloc( sizeof( char ), hdr->len+1 );
         snprintf( address, hdr->len+1, "%s", hdr->data );
         
         tc->shouldChangeAnnounce = TC_CHANGE_REDIRECT;
@@ -924,6 +925,7 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
     const uint8_t * body;
     int bodylen, ii;
     benc_val_t scrape, * val1, * val2;
+    char * address;
 
     code = tr_httpResponseCode( data, len );
     if( 0 > code )
@@ -942,7 +944,7 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
         
         tr_httpParse( data, len, hdr );
         
-        char * address = calloc( sizeof( char ), hdr->len+1 );
+        address = calloc( sizeof( char ), hdr->len+1 );
         snprintf( address, hdr->len+1, "%s", hdr->data );
         
         /* Needs a new scrape */
