@@ -953,8 +953,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentOrderValue = [torrent orderValue];
         if ([lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
-
-        [torrent removeForever];
         
         [fTorrents removeObject: torrent];
         [fDisplayedTorrents removeObject: torrent];

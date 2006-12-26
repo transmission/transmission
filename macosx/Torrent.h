@@ -77,7 +77,6 @@
 - (void)        startTransfer;
 - (void)        stopTransfer;
 - (void)        stopTransferForQuit;
-- (void)        removeForever;
 - (void)        sleep;
 - (void)        wakeUp;
 

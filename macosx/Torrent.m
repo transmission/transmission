@@ -158,6 +158,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fPublicTorrentLocation)
             [fPublicTorrentLocation release];
         
+        tr_torrentRemoveSaved(fHandle);
+        
         [fDate release];
         
         if (fAnnounceDate)
@@ -446,11 +448,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if ([self isActive])
         tr_torrentStop(fHandle);
-}
-
-- (void) removeForever
-{
-    tr_torrentRemoveSaved(fHandle);
 }
 
 - (void) sleep
