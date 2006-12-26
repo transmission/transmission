@@ -2258,13 +2258,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable pause item
     if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
     {
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
-        
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         }
@@ -2274,13 +2271,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable resume item
     if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
     {
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
-        
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
         }
@@ -2357,13 +2351,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         BOOL warning = NO,
             onlyDownloading = [fDefaults boolForKey: @"CheckRemoveDownloading"],
             canDelete = action != @selector(removeDeleteTorrent:) && action != @selector(removeDeleteDataAndTorrent:);
-        Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
         
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
             if (!warning && [torrent isActive])
             {
                 warning = onlyDownloading ? ![torrent isSeeding] : YES;
@@ -2436,13 +2428,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (![fDefaults boolForKey: @"Queue"])
             return NO;
     
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
-        
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isPaused] && [torrent progress] < 1.0)
                 return YES;
         }
@@ -2455,13 +2444,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
     
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
-        
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        while ((torrent = [enumerator nextObject]))
         {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
         }
