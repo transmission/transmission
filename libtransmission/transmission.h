@@ -131,18 +131,18 @@ void tr_natTraversalDisable( tr_handle_t * );
 int tr_natTraversalStatus( tr_handle_t * );
 
 /***********************************************************************
- * tr_setUploadLimit
+ * tr_setGlobalUploadLimit
  ***********************************************************************
  * Sets the total upload rate limit in KB/s
  **********************************************************************/
-void tr_setUploadLimit( tr_handle_t *, int );
+void tr_setGlobalUploadLimit( tr_handle_t *, int );
 
 /***********************************************************************
- * tr_setDownloadLimit
+ * tr_setGlobalDownloadLimit
  ***********************************************************************
  * Sets the total download rate limit in KB/s
  **********************************************************************/
-void tr_setDownloadLimit( tr_handle_t *, int );
+void tr_setGlobalDownloadLimit( tr_handle_t *, int );
 
 /***********************************************************************
  * tr_torrentCount

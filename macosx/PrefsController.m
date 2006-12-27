@@ -301,14 +301,14 @@
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
     {
-        tr_setUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-        tr_setDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        tr_setGlobalUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        tr_setGlobalDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
     {
-        tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
+        tr_setGlobalUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
                                         ? [fDefaults integerForKey: @"UploadLimit"] : -1);
-        tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
+        tr_setGlobalDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
                                         ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
     }
 }

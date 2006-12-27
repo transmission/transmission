@@ -190,32 +190,17 @@ int tr_natTraversalStatus( tr_handle_t * h )
     return TR_NAT_TRAVERSAL_ERROR;
 }
 
-/***********************************************************************
- * tr_setUploadLimit
- ***********************************************************************
- * 
- **********************************************************************/
-void tr_setUploadLimit( tr_handle_t * h, int limit )
+void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )
 {
     tr_rcSetLimit( h->upload, limit );
     tr_chokingSetLimit( h->choking, limit );
 }
 
-/***********************************************************************
- * tr_setDownloadLimit
- ***********************************************************************
- * 
- **********************************************************************/
-void tr_setDownloadLimit( tr_handle_t * h, int limit )
+void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
 {
     tr_rcSetLimit( h->download, limit );
 }
 
-/***********************************************************************
- * tr_torrentRates
- ***********************************************************************
- *
- **********************************************************************/
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
     tr_torrent_t * tor;
