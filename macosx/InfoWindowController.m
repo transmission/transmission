@@ -43,7 +43,7 @@
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 268.0
 #define TAB_FILES_HEIGHT 268.0
-#define TAB_OPTIONS_HEIGHT 83.0
+#define TAB_OPTIONS_HEIGHT 147.0
 
 #define INVALID -99
 
@@ -52,6 +52,7 @@
 - (void) updateInfoGeneral;
 - (void) updateInfoActivity;
 - (void) updateInfoPeers;
+- (void) updateInfoSettings;
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
@@ -293,9 +294,14 @@
         return;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
     NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
     [fTrackerField setStringValue: tracker];
     [fTrackerField setToolTip: tracker];
+    
+    NSString * location = [torrent dataLocation];
+    [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
+    [fDataLocationField setToolTip: location];
 }
 
 - (void) updateInfoActivity
@@ -374,15 +380,56 @@
     {
         Torrent * torrent;
         
-        if (numberSelected == 1)
+        //set bandwidth limits
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        torrent = [enumerator nextObject]; //first torrent
+        
+        int checkUpload = [torrent checkUpload] ? 1 : 0,
+            checkDownload = [torrent checkDownload] ? 1 : 0,
+            uploadLimit = [torrent uploadLimit],
+            downloadLimit = [torrent downloadLimit];
+        
+        while ((checkUpload != INVALID || uploadLimit != INVALID
+                || checkDownload != INVALID || downloadLimit != INVALID)
+                && (torrent = [enumerator nextObject]))
         {
-            torrent = [fTorrents objectAtIndex: 0];
-            [fDataLocationField setStringValue: [[torrent dataLocation] stringByAbbreviatingWithTildeInPath]];
-            [fDataLocationField setToolTip: [torrent dataLocation]];
+            if (checkUpload != INVALID && checkUpload != ([torrent checkUpload] ? 1 : 0))
+                checkUpload = INVALID;
+            
+            if (uploadLimit != INVALID && uploadLimit != [torrent uploadLimit])
+                uploadLimit = INVALID;
+            
+            if (checkDownload != INVALID && checkDownload != ([torrent checkDownload] ? 1 : 0))
+                checkDownload = INVALID;
+            
+            if (downloadLimit != INVALID && downloadLimit != [torrent downloadLimit])
+                downloadLimit = INVALID;
         }
         
+        [fUploadLimitCheck setEnabled: YES];
+        [fDownloadLimitCheck setEnabled: YES];
+        
+        [fUploadLimitField setEnabled: checkUpload != 0];
+        [fDownloadLimitField setEnabled: checkDownload != 0];
+        
+        [fUploadLimitCheck setState: checkUpload == INVALID ? NSMixedState
+                                : (checkUpload == 1 ? NSOnState : NSOffState)];
+        
+        if (uploadLimit != INVALID)
+            [fUploadLimitField setIntValue: uploadLimit];
+        else
+            [fUploadLimitField setStringValue: @""];
+        
+        [fDownloadLimitCheck setState: checkDownload == INVALID ? NSMixedState
+                                : (checkDownload == 1 ? NSOnState : NSOffState)];
+        
+        if (downloadLimit != INVALID)
+            [fDownloadLimitField setIntValue: downloadLimit];
+        else
+            [fDownloadLimitField setStringValue: @""];
+        
         //set ratio settings
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
         int ratioSetting = [torrent stopRatioSetting];
@@ -429,6 +476,16 @@
         
         [fRatioLimitField setEnabled: NO];
         [fRatioLimitField setStringValue: @""];
+        
+        [fUploadLimitCheck setState: NSOffState];
+        [fUploadLimitCheck setEnabled: NO];
+        [fUploadLimitField setEnabled: NO];
+        [fUploadLimitField setStringValue: @""];
+        
+        [fDownloadLimitCheck setState: NSOffState];
+        [fDownloadLimitCheck setEnabled: NO];
+        [fDownloadLimitField setEnabled: NO];
+        [fDownloadLimitField setStringValue: @""];
     }
     
     [self updateInfoStats];
@@ -470,9 +527,7 @@
         [fPiecesView updateView: YES];
     }
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
-    {
         height = TAB_PEERS_HEIGHT;
-    }
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
         height = TAB_FILES_HEIGHT;
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
@@ -634,6 +689,58 @@
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
         [[NSWorkspace sharedWorkspace] selectFile: [[fFiles objectAtIndex: i] objectForKey: @"Name"]
                                         inFileViewerRootedAtPath: nil];
+}
+
+- (void) setLimitCheck: (id) sender
+{
+    BOOL upload = sender == fUploadLimitCheck,
+        limit = [sender state] != NSOffState;
+    
+    if (limit)
+        [sender setState: NSOnState];
+    
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        upload ? [torrent setLimitUpload: limit] : [torrent setLimitDownload: limit];
+    
+    NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
+    
+    if (![[field stringValue] isEqualToString: @""])
+        [self setSpeedLimit: field];
+    
+    [field setEnabled: limit];
+}
+
+- (void) setSpeedLimit: (id) sender
+{
+    BOOL upload = sender == fUploadLimitField;
+    
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%i", limit]] || limit < 0)
+    {
+        NSBeep();
+        
+        torrent = [enumerator nextObject]; //use first torrent
+        
+        limit = upload ? [torrent uploadLimit] : [torrent downloadLimit];
+        while ((torrent = [enumerator nextObject]))
+            if (limit != upload ? [torrent uploadLimit] : [torrent downloadLimit])
+            {
+                [sender setStringValue: @""];
+                return;
+            }
+        
+        [sender setIntValue: limit];
+    }
+    else
+    {
+        while ((torrent = [enumerator nextObject]))
+            upload ? [torrent setUploadLimit: limit] : [torrent setDownloadLimit: limit];
+    }
 }
 
 - (void) setRatioCheck: (id) sender

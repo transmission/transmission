@@ -12,8 +12,10 @@
                 revealDataFile = id; 
                 revealFile = id; 
                 revealTorrentFile = id; 
+                setLimitCheck = id; 
                 setRatioCheck = id; 
                 setRatioLimit = id; 
+                setSpeedLimit = id; 
             }; 
             CLASS = InfoWindowController; 
             LANGUAGE = ObjC; 
@@ -25,6 +27,8 @@
                 fDataLocationField = NSTextField; 
                 fDateCreatedField = NSTextField; 
                 fDateStartedField = NSTextField; 
+                fDownloadLimitCheck = NSButton; 
+                fDownloadLimitField = NSTextField; 
                 fDownloadedTotalField = NSTextField; 
                 fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
@@ -51,6 +55,8 @@
                 fTabView = NSTabView; 
                 fTorrentLocationField = NSTextField; 
                 fTrackerField = NSTextField; 
+                fUploadLimitCheck = NSButton; 
+                fUploadLimitField = NSTextField; 
                 fUploadedTotalField = NSTextField; 
                 fUploadingToField = NSTextField; 
             }; 

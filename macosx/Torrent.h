@@ -50,9 +50,10 @@
     NSImage         * fIcon, * fIconFlipped, * fIconSmall;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
-    int     fStopRatioSetting;
+    
+    int     fUploadLimit, fDownloadLimit, fStopRatioSetting;
     float   fRatioLimit;
-    BOOL    fFinishedSeeding, fWaitToStart, fError;
+    BOOL    fCheckUpload, fCheckDownload, fFinishedSeeding, fWaitToStart, fError;
     
     int fOrderValue;
     
@@ -88,6 +89,15 @@
 - (void)        setStopRatioSetting: (int) setting;
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
+
+- (void) setLimitUpload: (BOOL) limit;
+- (void) setUploadLimit: (int) limit;
+- (void) setLimitDownload: (BOOL) limit;
+- (void) setDownloadLimit: (int) limit;
+- (BOOL) checkUpload;
+- (int) uploadLimit;
+- (BOOL) checkDownload;
+- (int) downloadLimit;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;

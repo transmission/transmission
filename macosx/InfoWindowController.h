@@ -56,13 +56,13 @@
     IBOutlet NSTableView * fFileTable;
     IBOutlet NSTextField * fFileTableStatusField;
     
+    IBOutlet NSButton * fUploadLimitCheck, * fDownloadLimitCheck;
     IBOutlet NSMatrix * fRatioMatrix;
-    IBOutlet NSTextField * fRatioLimitField;
+    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfoStats;
-- (void) updateInfoSettings;
 
 - (void) setNextTab;
 - (void) setPreviousTab;
@@ -70,6 +70,9 @@
 - (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;
 - (void) revealFile: (id) sender;
+
+- (void) setLimitCheck: (id) sender;
+- (void) setSpeedLimit: (id) sender;
 
 - (void) setRatioCheck: (id) sender;
 - (void) setRatioLimit: (id) sender;

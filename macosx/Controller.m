@@ -1154,7 +1154,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     Torrent * torrent = [notification object];
     
-    [fInfoController updateInfoSettings];
+    [fInfoController updateInfoStats];
     
     [self applyFilter: nil];
     [self checkToStartWaiting: torrent];
@@ -1648,7 +1648,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     [self applyFilter: nil];
     [fInfoController updateInfoStats];
-    [fInfoController updateInfoSettings];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {
