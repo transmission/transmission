@@ -981,6 +981,7 @@ parseRoot(const char *buf, int len, char ** soap, char ** scpd )
 
     buf = tr_xmlFindTagContents( buf, end, "root" );
     urlbase = tr_xmlFindTag( buf, end, "urlBase" );
+    urlbase = tr_xmlTagContents( urlbase, end );
     buf = tr_xmlFindTagContents( buf, end, "device" );
     if( tr_xmlFindTagVerifyContents( buf, end, "deviceType",
             "urn:schemas-upnp-org:device:InternetGatewayDevice:1", 1 ) )
