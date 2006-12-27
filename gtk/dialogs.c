@@ -364,10 +364,10 @@ void
 applyprefs(TrBackend *back) {
   struct { void (*func)(tr_handle_t*, int);
     const char *use; const char *num; gboolean defuse; long def; } lim[] = {
-    {tr_setDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,
-                          DEF_USEDOWNLIMIT,  DEF_DOWNLIMIT},
-    {tr_setUploadLimit,   PREF_USEUPLIMIT,   PREF_UPLIMIT,
-                          DEF_USEUPLIMIT,    DEF_UPLIMIT},
+    {tr_setGlobalDownloadLimit, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT,
+                                DEF_USEDOWNLIMIT,  DEF_DOWNLIMIT},
+    {tr_setGlobalUploadLimit,   PREF_USEUPLIMIT,   PREF_UPLIMIT,
+                                DEF_USEUPLIMIT,    DEF_UPLIMIT},
   };
   const char *pref;
   int ii;
