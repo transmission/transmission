@@ -50,6 +50,7 @@ typedef struct { const char * name; const char * data; int len; }
 tr_http_header_t;
 char *      tr_httpParse( const char * data, int len, tr_http_header_t *headers );
 
+int         tr_httpIsUrl( const char *, int );
 int         tr_httpParseUrl( const char *, int, char **, int *, char ** );
 
 /* fetch a file via HTTP from a standard http:// url */
@@ -59,6 +60,8 @@ typedef struct tr_http_s tr_http_t;
 #define TR_HTTP_M_POST          3
 tr_http_t   * tr_httpClient( int, const char *, int, const char *, ... )
               PRINTF( 4, 5 );
+tr_http_t   * tr_httpClientUrl( int, const char *, ... )
+              PRINTF( 2, 3 );
 /* only add headers or body before first pulse */
 void          tr_httpAddHeader( tr_http_t *, const char *, const char * );
 void          tr_httpAddBody( tr_http_t *, const char *, ... ) PRINTF( 2, 3 );

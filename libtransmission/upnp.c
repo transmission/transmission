@@ -124,6 +124,8 @@ static tr_http_t *
 devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit );
 static int
 parseRoot( const char *buf, int len, char ** soap, char ** scpd );
+static void
+addUrlbase( const char * base, char ** path );
 static int
 parseScpd( const char *buf, int len, tr_upnp_action_t * getcmd,
            tr_upnp_action_t * addcmd, tr_upnp_action_t * delcmd );
@@ -701,6 +703,8 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
             }
             else
             {
+                tr_dbg( "upnp device %s: found scpd \"%s\" and soap \"%s\"",
+                        dev->root, dev->scpd, dev->soap );
                 tr_dbg( "upnp device %s: parsed root, state root -> scpd",
                         dev->host );
                 dev->state = UPNPDEV_STATE_SCPD;
@@ -826,6 +830,19 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
 }
 
 static tr_http_t *
+makeHttp( int method, const char * host, int port, const char * path )
+{
+    if( tr_httpIsUrl( path, -1 ) )
+    {
+        return tr_httpClientUrl( method, "%s", path );
+    }
+    else
+    {
+        return tr_httpClient( method, host, port, "%s", path );
+    }
+}
+
+static tr_http_t *
 devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit )
 {
     tr_http_t  * ret;
@@ -842,15 +859,13 @@ devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit )
         case UPNPDEV_STATE_ROOT:
             if( !dev->soapretry )
             {
-                ret = tr_httpClient( TR_HTTP_GET, dev->host,
-                                     dev->port, "%s", dev->root );
+                ret = makeHttp( TR_HTTP_GET, dev->host, dev->port, dev->root );
             }
             break;
         case UPNPDEV_STATE_SCPD:
             if( !dev->soapretry )
             {
-                ret = tr_httpClient( TR_HTTP_GET, dev->host,
-                                     dev->port, "%s", dev->scpd );
+                ret = makeHttp( TR_HTTP_GET, dev->host, dev->port, dev->scpd );
             }
             break;
         case UPNPDEV_STATE_ADD:
@@ -973,7 +988,7 @@ static int
 parseRoot(const char *buf, int len, char ** soap, char ** scpd )
 {
     const char * end, * ii, * jj, * kk, * urlbase;
-    char       * joined;
+    char       * basedup;
 
     *soap = NULL;
     *scpd = NULL;
@@ -1027,32 +1042,37 @@ parseRoot(const char *buf, int len, char ** soap, char ** scpd )
         }
     }
 
+    basedup = tr_xmlDupContents( urlbase, end );
+    addUrlbase( basedup, soap );
+    addUrlbase( basedup, scpd );
+    free( basedup );
+
     if( NULL != *soap && NULL != *scpd )
     {
-        if( '/' != **soap || '/' != **scpd )
-        {
-            urlbase = tr_xmlDupContents( urlbase, end );
-            if( NULL != urlbase )
-            {
-                if( '/' != **soap )
-                {
-                    joined = joinstrs( urlbase, "/", *soap );
-                    free( *soap );
-                    *soap = joined;
-                }
-                if( '/' != **scpd )
-                {
-                    joined = joinstrs( urlbase, "/", *scpd );
-                    free( *scpd );
-                    *scpd = joined;
-                }
-                free( (char*)urlbase );
-            }
-        }
         return 0;
     }
 
     return 1;
+}
+
+static void
+addUrlbase( const char * base, char ** path )
+{
+    const char * middle;
+    int          len;
+    char       * joined;
+
+    if( NULL == base || NULL == *path ||
+        '/' == **path || tr_httpIsUrl( *path, -1 ) )
+    {
+        return;
+    }
+
+    len = strlen( base );
+    middle = ( 0 >= len || '/' != base[len-1] ? "/" : "" );
+    joined = joinstrs( base, middle, *path );
+    free( *path );
+    *path = joined;
 }
 
 static int
@@ -1220,7 +1240,7 @@ soapRequest( int retry, const char * host, int port, const char * path,
     int          method;
 
     method = ( retry ? TR_HTTP_M_POST : TR_HTTP_POST );
-    http = tr_httpClient( method, host, port, "%s", path );
+    http = makeHttp( method, host, port, path );
     if( NULL != http )
     {
         tr_httpAddHeader( http, "Content-type",

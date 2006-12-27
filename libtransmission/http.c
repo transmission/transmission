@@ -305,6 +305,23 @@ slice( const char * data, int * len, const char * delim )
 }
 
 int
+tr_httpIsUrl( const char * url, int len )
+{
+    if( 0 > len )
+    {
+        len = strlen( url );
+    }
+
+    /* check for protocol */
+    if( 7 > len || 0 != tr_strncasecmp( url, "http://", 7 ) )
+    {
+        return 0;
+    }
+
+    return 7;
+}
+
+int
 tr_httpParseUrl( const char * url, int len,
                  char ** host, int * port, char ** path )
 {
@@ -317,14 +334,14 @@ tr_httpParseUrl( const char * url, int len,
         len = strlen( url );
     }
 
-    /* check for protocol */
-    if( 7 > len || 0 != tr_strncasecmp( url, "http://", 7 ) )
+    ii = tr_httpIsUrl( url, len );
+    if( 0 >= ii )
     {
         tr_err( "Invalid HTTP URL" );
         return 1;
     }
-    url += 7;
-    len -= 7;
+    url += ii;
+    len -= ii;
 
     /* find the hostname and port */
     colon = -1;
@@ -445,6 +462,33 @@ tr_httpClient( int method, const char * host, int port, const char * fmt, ... )
   err:
     tr_httpClose( http );
     return NULL;
+}
+
+tr_http_t *
+tr_httpClientUrl( int method, const char * fmt, ... )
+{
+    char      * url, * host, * path;
+    int         port;
+    va_list     ap;
+    tr_http_t * ret;
+
+    va_start( ap, fmt );
+    url = NULL;
+    vasprintf( &url, fmt, ap );
+    va_end( ap );
+
+    if( tr_httpParseUrl( url, -1, &host, &port, &path ) )
+    {
+        free( url );
+        return NULL;
+    }
+    free( url );
+
+    ret = tr_httpClient( method, host, port, "%s", path );
+    free( host );
+    free( path );
+
+    return ret;
 }
 
 void
