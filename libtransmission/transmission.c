@@ -201,6 +201,16 @@ void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
     tr_rcSetLimit( h->download, limit );
 }
 
+void tr_setUploadLimit( tr_torrent_t * tor, int limit )
+{
+    tr_rcSetLimit( tor->upload, limit );
+}
+
+void tr_setDownloadLimit( tr_torrent_t * tor, int limit )
+{
+    tr_rcSetLimit( tor->download, limit );
+}
+
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
     tr_torrent_t * tor;
