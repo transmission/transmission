@@ -269,10 +269,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stopTransfer];
+        fStat = tr_torrentStat(fHandle);
         
         fFinishedSeeding = YES;
-        
-        fStat = tr_torrentStat(fHandle);
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
