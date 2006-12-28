@@ -25,10 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
-#define RATIO_CHECK 1
-#define RATIO_GLOBAL -1
-#define RATIO_NO_CHECK 0
-
 @interface Torrent : NSObject
 {
     tr_handle_t  * fLib;
@@ -51,9 +47,11 @@
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
     
-    int     fUploadLimit, fDownloadLimit, fStopRatioSetting;
+    int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
-    BOOL    fCheckUpload, fCheckDownload, fFinishedSeeding, fWaitToStart, fError;
+    BOOL    fLimitCustom, fCheckUpload, fCheckDownload,
+            fRatioCustom, fShouldStopAtRatio,
+            fFinishedSeeding, fWaitToStart, fError;
     
     int fOrderValue;
     
@@ -85,19 +83,25 @@
 - (NSDate *)    announceDate;
 
 - (float)       ratio;
-- (int)         stopRatioSetting;
-- (void)        setStopRatioSetting: (int) setting;
+- (BOOL)        customRatioSetting;
+- (void)        setCustomRatioSetting: (BOOL) setting;
+- (BOOL)        shouldStopAtRatio;
+- (void)        setShouldStopAtRatio: (BOOL) setting;
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
 
-- (void) setLimitUpload: (BOOL) limit;
-- (void) setUploadLimit: (int) limit;
-- (void) setLimitDownload: (BOOL) limit;
-- (void) setDownloadLimit: (int) limit;
-- (BOOL) checkUpload;
-- (int) uploadLimit;
-- (BOOL) checkDownload;
-- (int) downloadLimit;
+- (BOOL)    checkUpload;
+- (void)    setLimitUpload: (BOOL) limit;
+- (int)     uploadLimit;
+- (void)    setUploadLimit: (int) limit;
+- (BOOL)    checkDownload;
+- (void)    setLimitDownload: (BOOL) limit;
+- (int)     downloadLimit;
+- (void)    setDownloadLimit: (int) limit;
+
+- (BOOL)    customLimitSetting;
+- (void)    setCustomLimitSetting: (BOOL) setting;
+- (void)    updateSpeedSetting: (NSNotification *) notification;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;

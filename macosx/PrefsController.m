@@ -313,6 +313,11 @@
     }
 }
 
+- (void) applyTorrentSpeedSetting: (id) sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedSetting" object: self];
+}
+
 - (void) setAutoSpeedLimit: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];

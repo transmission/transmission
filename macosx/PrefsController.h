@@ -79,6 +79,7 @@
 - (void) setAutoSpeedLimit: (id) sender;
 
 - (void) applySpeedSettings: (id) sender;
+- (void) applyTorrentSpeedSetting: (id) sender;
 
 - (void) setAutoImport: (id) sender;
 - (void) importFolderSheetShow: (id) sender;

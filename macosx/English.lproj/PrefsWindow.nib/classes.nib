@@ -6,6 +6,7 @@
         {
             ACTIONS = {
                 applySpeedSettings = id; 
+                applyTorrentSpeedSetting = id; 
                 folderSheetShow = id; 
                 helpForNetwork = id; 
                 importFolderSheetShow = id; 

@@ -34,8 +34,11 @@
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
+        date: (NSDate *) date
+        stopRatioCustom: (NSNumber *) ratioCustom
+        shouldStopAtRatio: (NSNumber *) shouldStopAtRatio
         ratioLimit: (NSNumber *) ratioLimit
+        limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
@@ -64,7 +67,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
-            date: nil stopRatioSetting: nil ratioLimit: nil 
+            date: nil
+            stopRatioCustom: nil shouldStopAtRatio: nil ratioLimit: nil
+            limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
             checkDownload: nil downloadLimit: nil
             waitToStart: nil orderValue: nil];
@@ -86,8 +91,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 date: [history objectForKey: @"Date"]
-                stopRatioSetting: [history objectForKey: @"StopRatioSetting"]
+                stopRatioCustom: [history objectForKey: @"StopRatioCustom"]
+                shouldStopAtRatio: [history objectForKey: @"ShouldStopAtRatio"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
+                limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
                 checkUpload: [history objectForKey: @"CheckUpload"]
                 uploadLimit: [history objectForKey: @"UploadLimit"]
                 checkDownload: [history objectForKey: @"CheckDownload"]
@@ -139,8 +146,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
-                    [NSNumber numberWithInt: fStopRatioSetting], @"StopRatioSetting",
+                    [NSNumber numberWithBool: fRatioCustom], @"StopRatioCustom",
+                    [NSNumber numberWithBool: fShouldStopAtRatio], @"ShouldStopAtRatio",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
+                    [NSNumber numberWithBool: fLimitCustom], @"LimitSpeedCustom",
                     [NSNumber numberWithBool: fCheckUpload], @"CheckUpload",
                     [NSNumber numberWithInt: fUploadLimit], @"UploadLimit",
                     [NSNumber numberWithBool: fCheckDownload], @"CheckDownload",
@@ -162,6 +171,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (fHandle)
     {
         tr_torrentClose(fLib, fHandle);
+        
+        [[NSNotificationCenter defaultCenter] removeObserver: self];
         
         if (fDownloadFolder)
             [fDownloadFolder release];
@@ -253,12 +264,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    if ([self isSeeding] && ((fStopRatioSetting == RATIO_CHECK && [self ratio] >= fRatioLimit)
-            || (fStopRatioSetting == RATIO_GLOBAL && [fDefaults boolForKey: @"RatioCheck"]
-            && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
+    if ([self isSeeding] && ((fRatioCustom && fShouldStopAtRatio && [self ratio] >= fRatioLimit)
+            || (!fRatioCustom && [fDefaults boolForKey: @"RatioCheck"]
+                && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stopTransfer];
-        [self setStopRatioSetting: RATIO_NO_CHECK];
+        
         fFinishedSeeding = YES;
         
         fStat = tr_torrentStat(fHandle);
@@ -498,14 +509,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return downloaded > 0 ? (float)[self uploadedTotal] / downloaded : -1;
 }
 
-- (int) stopRatioSetting
+- (BOOL) customRatioSetting
 {
-	return fStopRatioSetting;
+	return fRatioCustom;
 }
 
-- (void) setStopRatioSetting: (int) setting
+- (void) setCustomRatioSetting: (BOOL) setting
 {
-    fStopRatioSetting = setting;
+    fRatioCustom = setting;
+}
+
+- (BOOL) shouldStopAtRatio
+{
+	return fShouldStopAtRatio;
+}
+
+- (void) setShouldStopAtRatio: (BOOL) setting
+{
+    fShouldStopAtRatio = setting;
 }
 
 - (float) ratioLimit
@@ -519,33 +540,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fRatioLimit = limit;
 }
 
-- (void) setLimitUpload: (BOOL) limit
-{
-    fCheckUpload = limit;
-    tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
-}
-
-- (void) setUploadLimit: (int) limit
-{
-    fUploadLimit = limit;
-    tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
-}
-
-- (void) setLimitDownload: (BOOL) limit
-{
-    fCheckDownload = limit;
-    tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
-}
-
-- (void) setDownloadLimit: (int) limit
-{
-    fDownloadLimit = limit;
-    tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
-}
-
 - (BOOL) checkUpload
 {
     return fCheckUpload;
+}
+
+- (void) setLimitUpload: (BOOL) limit
+{
+    fCheckUpload = limit;
+    [self updateSpeedSetting: nil];
 }
 
 - (int) uploadLimit
@@ -553,14 +556,59 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fUploadLimit;
 }
 
+- (void) setUploadLimit: (int) limit
+{
+    fUploadLimit = limit;
+    [self updateSpeedSetting: nil];
+}
+
 - (BOOL) checkDownload
 {
     return fCheckDownload;
 }
 
+- (void) setLimitDownload: (BOOL) limit
+{
+    fCheckDownload = limit;
+    [self updateSpeedSetting: nil];
+}
+
 - (int) downloadLimit
 {
     return fDownloadLimit;
+}
+
+- (void) setDownloadLimit: (int) limit
+{
+    fDownloadLimit = limit;
+    [self updateSpeedSetting: nil];
+}
+
+- (BOOL) customLimitSetting
+{
+    return fLimitCustom;
+}
+
+- (void) setCustomLimitSetting: (BOOL) setting
+{
+    fLimitCustom = setting;
+    [self updateSpeedSetting: nil];
+}
+
+- (void) updateSpeedSetting: (NSNotification *) notification
+{
+    if (fLimitCustom)
+    {
+        tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
+        tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
+    }
+    else
+    {
+        tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUploadTorrent"]
+                                        ? [fDefaults integerForKey: @"UploadLimitTorrent"] : -1);
+        tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownloadTorrent"]
+                                        ? [fDefaults integerForKey: @"DownloadLimitTorrent"] : -1);
+    }
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -1093,8 +1141,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        date: (NSDate *) date stopRatioSetting: (NSNumber *) stopRatioSetting
+        date: (NSDate *) date
+        stopRatioCustom: (NSNumber *) ratioCustom
+        shouldStopAtRatio: (NSNumber *) shouldStopAtRatio
         ratioLimit: (NSNumber *) ratioLimit
+        limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
@@ -1122,21 +1173,25 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return nil;
     }
     
+    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver: self selector: @selector(updateSpeedSetting:)
+                name: @"UpdateSpeedSetting" object: nil];
+    
     fInfo = tr_torrentInfo( fHandle );
 
     fDate = date ? [date retain] : [[NSDate alloc] init];
     
-    fStopRatioSetting = stopRatioSetting ? [stopRatioSetting intValue] : -1;
+    fRatioCustom = ratioCustom ? [ratioCustom boolValue] : NO;
+    fShouldStopAtRatio = shouldStopAtRatio ? [shouldStopAtRatio boolValue] : [fDefaults boolForKey: @"RatioCheck"];
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    fCheckUpload = checkUpload && [checkUpload boolValue];
-    fUploadLimit = uploadLimit ? [uploadLimit intValue] : 10;
-    tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
-    
-    fCheckDownload = checkDownload && [checkDownload boolValue];
-    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : 10;
-    tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
+    fLimitCustom = limitCustom ? [limitCustom boolValue] : NO;
+    fCheckUpload = checkUpload ? [checkUpload boolValue] : [fDefaults boolForKey: @"CheckUploadTorrent"];
+    fUploadLimit = uploadLimit ? [uploadLimit intValue] : [fDefaults integerForKey: @"UploadLimitTorrent"];
+    fCheckDownload = checkDownload ? [checkDownload boolValue] : [fDefaults boolForKey: @"CheckDownloadTorrent"];
+    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimitTorrent"];
+    [self updateSpeedSetting: nil];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
