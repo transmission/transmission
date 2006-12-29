@@ -222,6 +222,10 @@ char * tr_clientForId( uint8_t * id )
         asprintf( &ret, "XBT Client %c%c%c%s", id[3], id[4], id[5],
                   id[6] == 'd' ? " (debug)" : "" );
     }
+    else if( !memcmp( id, "Mbrst", 5 ) )
+    {
+        asprintf( &ret, "burst! %c.%c.%c", id[5], id[7], id[9] );
+    }
     else if( !memcmp( id, "LIME", 4 ) )
     {
         asprintf( &ret, "Limewire (%c%c%c%c)", id[4], id[5], id[6], id[7] );
