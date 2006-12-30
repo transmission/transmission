@@ -238,6 +238,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "JVtorrent" );
     }
+    else if( !memcmp( id, "346-", 4 ) )
+    {
+        asprintf( &ret, "TorrentTopia" );
+    }
 
     /* No match */
     if( !ret )
