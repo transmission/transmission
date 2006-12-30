@@ -31,19 +31,19 @@
 
 /* We may try to allocate and free tables of size 0. Quick and dirty
    way to handle it... */
-void * __malloc( int size )
+void * tr_malloc( size_t size )
 {
     if( !size )
         return NULL;
     return malloc( size );
 }
-void __free( void * p )
+void tr_free( void * p )
 {
     if( p )
         free( p );
 }
-#define malloc __malloc
-#define free   __free
+#define malloc tr_malloc
+#define free   tr_free
 
 struct tr_choking_s
 {
