@@ -34,7 +34,7 @@
 + (NSString *) stringForFileSize: (uint64_t) size;
 + (NSString *) stringForSpeed: (float) speed;
 + (NSString *) stringForSpeedAbbrev: (float) speed;
-+ (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up;
++ (NSString *) stringForRatio: (float) ratio;
 
 - (NSAttributedString *) attributedStringFittingInWidth: (float) width
                                 attributes: (NSDictionary *) attributes;

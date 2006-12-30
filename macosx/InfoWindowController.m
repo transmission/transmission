@@ -330,7 +330,7 @@
                                         stringByAppendingFormat: @" (%.2f%%)", 100.0 * [torrent progress]]];
         
         [fStateField setStringValue: [torrent stateString]];
-        [fRatioField setStringValue: [NSString stringForRatioWithDownload: downloadedTotal upload: uploadedTotal]];
+        [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
         [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
         NSString * errorMessage = [torrent errorMessage];

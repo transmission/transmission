@@ -391,6 +391,10 @@ struct tr_stat_s
     uint64_t            downloaded;
     uint64_t            uploaded;
     float               swarmspeed;
+
+#define TR_RATIO_NA  -1
+#define TR_RATIO_INF -2
+    float               ratio;
 };
 
 struct tr_peer_stat_s

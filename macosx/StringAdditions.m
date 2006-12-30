@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "StringAdditions.h"
+#import <transmission.h>
 
 @implementation NSString (StringAdditions)
 
@@ -93,13 +94,13 @@
         return [NSString stringWithFormat: @"%.2f G", speed / 1048576.0];
 }
 
-+ (NSString *) stringForRatioWithDownload: (uint64_t) down upload: (uint64_t) up
++ (NSString *) stringForRatio: (float) ratio
 {
-    if (down == 0)
-        return up == 0 ? NSLocalizedString(@"N/A", "No Ratio") : [NSString stringWithUTF8String: "\xE2\x88\x9E"];
-
-    float ratio = (float) up / (float) down;
-    if (ratio < 10.0)
+    if (ratio == TR_RATIO_NA)
+        return NSLocalizedString(@"N/A", "No Ratio");
+    else if (ratio == TR_RATIO_INF)
+        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
+    else if (ratio < 10.0)
         return [NSString stringWithFormat: @"%.2f", ratio];
     else if (ratio < 100.0)
         return [NSString stringWithFormat: @"%.1f", ratio];

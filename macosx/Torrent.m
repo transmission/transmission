@@ -284,7 +284,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     else
         [fProgressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
-                [NSString stringForRatioWithDownload: [self downloadedTotal] upload: [self uploadedTotal]]];
+                [NSString stringForRatio: [self ratio]]];
 
     switch (fStat->status)
     {
@@ -398,8 +398,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         }
         else
         {
-            NSString * ratioString = [NSString stringForRatioWithDownload: [self downloadedTotal]
-                                                upload: [self uploadedTotal]];
+            NSString * ratioString = [NSString stringForRatio: [self ratio]];
         
             [fShortStatusString setString: [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ",
                                             "Torrent -> status string"), ratioString]];
@@ -504,8 +503,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (float) ratio
 {
-    float downloaded = [self downloadedTotal];
-    return downloaded > 0 ? (float)[self uploadedTotal] / downloaded : -1;
+    return fStat->ratio;
 }
 
 - (BOOL) customRatioSetting
@@ -1129,7 +1127,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     //if finished downloading sort by ratio instead of progress
     float progress = [self progress];
-    return [NSNumber numberWithFloat: progress < 1.0 ? progress : 2.0 + [self ratio]];
+    return [NSNumber numberWithFloat: progress < 1.0 ? progress : 100.0 + [self ratio]];
 }
 
 @end
