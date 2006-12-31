@@ -16,9 +16,11 @@
                 setAutoSpeedLimit = id; 
                 setBadge = id; 
                 setDownloadLocation = id; 
+                setGlobalLimit = id; 
                 setNat = id; 
                 setPort = id; 
                 setQueueNumber = id; 
+                setRatioStop = id; 
                 setSound = id; 
                 setSpeedLimit = id; 
                 setTorrentLimit = id; 
@@ -44,6 +46,8 @@
                 fPortStatusField = NSTextField; 
                 fPortStatusImage = NSImageView; 
                 fPortStatusProgress = NSProgressIndicator; 
+                fQueueField = NSTextField; 
+                fRatioStopField = NSTextField; 
                 fSeedingSoundPopUp = NSPopUpButton; 
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 

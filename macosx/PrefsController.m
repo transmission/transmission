@@ -114,6 +114,8 @@
 
 - (void) awakeFromNib
 {
+    hasLoaded = YES;
+    
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [fToolbar setDelegate: self];
     [fToolbar setAllowsUserCustomization: NO];
@@ -133,6 +135,12 @@
     else
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
     
+    //set stop ratio
+    [self updateRatioStopField];
+    
+    //set limits
+    [self updateLimitFields];
+    
     //set torrent limits
     [fUploadTorrentField setIntValue: [fDefaults integerForKey: @"UploadLimitTorrent"]];
     [fDownloadTorrentField setIntValue: [fDefaults integerForKey: @"DownloadLimitTorrent"]];
@@ -150,7 +158,10 @@
     [self updateNatStatus];
     fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
-
+    
+    //set queue values
+    [fQueueField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
+    
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
     if ([updateCheck isEqualToString: @"Weekly"])
@@ -334,6 +345,53 @@
     }
 }
 
+- (void) updateRatioStopField
+{
+    if (!hasLoaded)
+        return;
+    
+    [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
+}
+
+- (void) setRatioStop: (id) sender
+{
+    float ratio = [sender floatValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratio]] || ratio < 0)
+    {
+        NSBeep();
+        [sender setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
+        return;
+    }
+    
+    [fDefaults setFloat: ratio forKey: @"RatioLimit"];
+}
+
+- (void) updateLimitFields
+{
+    if (!hasLoaded)
+        return;
+    
+    [fUploadField setIntValue: [fDefaults integerForKey: @"UploadLimit"]];
+    [fDownloadField setIntValue: [fDefaults integerForKey: @"DownloadLimit"]];
+}
+
+- (void) setGlobalLimit: (id) sender
+{
+    BOOL upload = sender == fUploadField;
+    
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]];
+        return;
+    }
+    
+    [fDefaults setInteger: limit forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
+    
+    [self applySpeedSettings: self];
+}
+
 - (void) applyTorrentLimitSetting: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedSetting" object: self];
@@ -344,7 +402,7 @@
     BOOL upload = sender == fUploadTorrentField;
     
     int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]])
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
     {
         NSBeep();
         [sender setIntValue: [fDefaults integerForKey: upload ? @"UploadLimitTorrent" : @"DownloadLimitTorrent"]];
@@ -420,6 +478,16 @@
 
 - (void) setQueueNumber: (id) sender
 {
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
+        return;
+    }
+    
+    [fDefaults setInteger: limit forKey: @"QueueDownloadNumber"];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
 }
 

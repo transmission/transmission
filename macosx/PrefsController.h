@@ -32,12 +32,14 @@
     tr_handle_t * fHandle;
     
     NSUserDefaults          * fDefaults;
+    BOOL                    hasLoaded;
     
     NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
+    IBOutlet NSTextField    * fRatioStopField, * fQueueField;
     
     NSArray                 * fSounds;
     
@@ -76,7 +78,13 @@
 - (void) setNat:    (id) sender;
 - (void) updateNatStatus;
 
+- (void) updateRatioStopField;
+- (void) setRatioStop: (id) sender;
+
 - (void) applySpeedSettings: (id) sender;
+
+- (void) updateLimitFields;
+- (void) setGlobalLimit: (id) sender;
 
 - (void) applyTorrentLimitSetting: (id) sender;
 - (void) setTorrentLimit: (id) sender;

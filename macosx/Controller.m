@@ -1563,6 +1563,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDefaults setInteger: [[sender title] intValue] forKey: [sender menu] == fUploadMenu ? @"UploadLimit" : @"DownloadLimit"];
     [fDefaults setBool: YES forKey: [sender menu] == fUploadMenu ? @"CheckUpload" : @"CheckDownload"];
     
+    [fPrefsController updateLimitFields];
     [fPrefsController applySpeedSettings: nil];
 }
 
@@ -1570,6 +1571,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     [fDefaults setBool: YES forKey: @"RatioCheck"];
     [fDefaults setFloat: [[sender title] floatValue] forKey: @"RatioLimit"];
+    
+    [fPrefsController updateRatioStopField];
 }
 
 - (void) checkWaitingForStopped: (NSNotification *) notification
