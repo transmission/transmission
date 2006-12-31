@@ -45,11 +45,11 @@
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
+                            * fUploadTorrentField, * fDownloadTorrentField,
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
     IBOutlet NSButton       * fUploadCheck, * fDownloadCheck;
 
-    IBOutlet NSTextField            * fNatStatusField,
-                                    * fPortStatusField;
+    IBOutlet NSTextField            * fPortField, * fNatStatusField, * fPortStatusField;
     IBOutlet NSButton               * fNatCheck;
     IBOutlet NSImageView            * fNatStatusImage, * fPortStatusImage;
     IBOutlet NSProgressIndicator    * fPortStatusProgress;
@@ -76,10 +76,13 @@
 - (void) setNat:    (id) sender;
 - (void) updateNatStatus;
 
-- (void) setAutoSpeedLimit: (id) sender;
-
 - (void) applySpeedSettings: (id) sender;
-- (void) applyTorrentSpeedSetting: (id) sender;
+
+- (void) applyTorrentLimitSetting: (id) sender;
+- (void) setTorrentLimit: (id) sender;
+
+- (void) setSpeedLimit: (id) sender;
+- (void) setAutoSpeedLimit: (id) sender;
 
 - (void) setAutoImport: (id) sender;
 - (void) importFolderSheetShow: (id) sender;

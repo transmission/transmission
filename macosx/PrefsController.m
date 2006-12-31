@@ -133,6 +133,17 @@
     else
         [fFolderPopUp selectItemAtIndex: DOWNLOAD_ASK];
     
+    //set torrent limits
+    [fUploadTorrentField setIntValue: [fDefaults integerForKey: @"UploadLimitTorrent"]];
+    [fDownloadTorrentField setIntValue: [fDefaults integerForKey: @"DownloadLimitTorrent"]];
+    
+    //set speed limit
+    [fSpeedLimitUploadField setIntValue: [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
+    [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
+    
+    //set port
+    [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
+    
     [self updatePortStatus];
     
     fNatStatus = -1;
@@ -220,6 +231,16 @@
 
 - (void) setPort: (id) sender
 {
+    int port = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", port]])
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: @"BindPort"]];
+        return;
+    }
+    
+    [fDefaults setInteger: port forKey: @"BindPort"];
+    
     tr_setBindPort(fHandle, [fDefaults integerForKey: @"BindPort"]);
     [self updateNatStatus];
     [self updatePortStatus];
@@ -313,9 +334,43 @@
     }
 }
 
-- (void) applyTorrentSpeedSetting: (id) sender
+- (void) applyTorrentLimitSetting: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedSetting" object: self];
+}
+
+- (void) setTorrentLimit: (id) sender
+{
+    BOOL upload = sender == fUploadTorrentField;
+    
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]])
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: upload ? @"UploadLimitTorrent" : @"DownloadLimitTorrent"]];
+        return;
+    }
+    
+    [fDefaults setInteger: limit forKey: upload ? @"UploadLimitTorrent" : @"DownloadLimitTorrent"];
+    
+    [self applyTorrentLimitSetting: self];
+}
+
+- (void) setSpeedLimit: (id) sender
+{
+    BOOL upload = sender == fSpeedLimitUploadField;
+    
+    int limit = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]])
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: upload ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"]];
+        return;
+    }
+    
+    [fDefaults setInteger: limit forKey: upload ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
+    
+    [self applySpeedSettings: self];
 }
 
 - (void) setAutoSpeedLimit: (id) sender

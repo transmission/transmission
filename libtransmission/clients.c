@@ -78,8 +78,8 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "BOW", 3 ) )
         {
-            asprintf( &ret, "Bits on Wheels (%c%c)",
-                      id[5], id[6] );
+            asprintf( &ret, "Bits on Wheels (%c%c%c)",
+                      id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "BR", 2 ) )
         {
