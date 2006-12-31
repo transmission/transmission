@@ -47,6 +47,7 @@ struct prefdata {
   GList *prefwidgets;
   GtkWindow *parent;
   TrBackend *back;
+  GtkTooltips * tips;
 };
 
 struct addcb {
@@ -164,6 +165,19 @@ saveprefwidget(GtkWindow *parent, GtkWidget *widget) {
   }
 }
 
+/* wrap a widget in an event box with a tooltip */
+static GtkWidget *
+tipbox( GtkWidget * widget, GtkTooltips * tips, const char * tip )
+{
+    GtkWidget * box;
+
+    box = gtk_event_box_new();
+    gtk_container_add( GTK_CONTAINER( box ), widget );
+    gtk_tooltips_set_tip( tips, box, tip, "" );
+
+    return box;
+}
+
 GtkWidget *
 makeprefwindow(GtkWindow *parent, TrBackend *back) {
   char *title = g_strdup_printf(_("%s Preferences"), g_get_application_name());
@@ -175,7 +189,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
   GtkWidget *natcheck = gtk_check_button_new_with_mnemonic(
-    _("Use NAT _Traversal (NAT-PMP and UPnP)"));
+    _("Au_tomatic port mapping via NAT-PMP or UPnP"));
   GtkWidget *dirstr = gtk_file_chooser_button_new(
     _("Choose a download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
@@ -185,15 +199,20 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   GtkWidget **array;
   struct prefdata *data = g_new0(struct prefdata, 1);
   struct { GtkWidget *on; GtkWidget *num; GtkWidget *label; gboolean defuse;
-    const char *usepref; const char *numpref; long def; } lim[] = {
+    const char *usepref; const char *numpref; long def;
+      const char *ontip; const char *numtip; } lim[] = {
     { gtk_check_button_new_with_mnemonic(_("_Limit download speed")),
       gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
       gtk_label_new_with_mnemonic(_("Maximum _download speed:")),
-      DEF_USEDOWNLIMIT, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEF_DOWNLIMIT, },
+      DEF_USEDOWNLIMIT, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEF_DOWNLIMIT,
+      N_("Restrict the download rate"),
+      N_("Speed in KiB/sec to restrict download rate to")},
     { gtk_check_button_new_with_mnemonic(_("Li_mit upload speed")),
       gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
       gtk_label_new_with_mnemonic(_("Maximum _upload speed:")),
-      DEF_USEUPLIMIT, PREF_USEUPLIMIT, PREF_UPLIMIT, DEF_UPLIMIT, },
+      DEF_USEUPLIMIT, PREF_USEUPLIMIT, PREF_UPLIMIT, DEF_UPLIMIT,
+      N_("Restrict the upload rate"),
+      N_("Speed in KiB/sec to restrict upload rate to")},
   };
   unsigned int ii;
   GtkTreeModel *model;
@@ -201,6 +220,8 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   GtkCellRenderer *rend;
   gboolean boolval;
   int intval;
+  GtkTooltips * tips;
+  GtkWidget   * event;
 
   g_free(title);
   gtk_widget_set_name(wind, "TransmissionDialog");
@@ -210,10 +231,16 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_container_set_border_width(GTK_CONTAINER(table), 6);
   gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
 
+  tips = gtk_tooltips_new();
+  g_object_ref( tips );
+  gtk_object_sink( GTK_OBJECT( tips ) );
+  gtk_tooltips_enable( tips );
+
   data->prefwidgets = makeglist(portnum, lim[0].on, lim[0].num, lim[1].on,
     lim[1].num, dirstr, addstd, addipc, natcheck, NULL);
   data->parent = parent;
   data->back = back;
+  data->tips = tips;
   g_object_ref(G_OBJECT(back));
 
 #define RN(n) (n), (n) + 1
@@ -225,17 +252,20 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
     g_signal_connect_data(lim[ii].on, "clicked", G_CALLBACK(clicklimitbox),
                           array, (GClosureNotify)g_free, 0);
     gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].on,    0, 2, RN(ii*2));
+    gtk_tooltips_set_tip( tips, lim[ii].on, gettext( lim[ii].ontip ), "" );
 
     /* limit label and entry */
     gtk_label_set_mnemonic_widget(GTK_LABEL(lim[ii].label), lim[ii].num);
     gtk_misc_set_alignment(GTK_MISC(lim[ii].label), 0, .5);
     gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(lim[ii].num), TRUE);
     setupprefwidget(lim[ii].num, lim[ii].numpref, (long)lim[ii].def);
-    gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].label, 0,1,RN(ii*2+1));
+    event = tipbox( lim[ii].label, tips, gettext( lim[ii].numtip ) );
+    gtk_table_attach_defaults(GTK_TABLE(table), event,         0,1,RN(ii*2+1));
     gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].num,   1,2,RN(ii*2+1));
     array[0] = lim[ii].label;
     array[1] = lim[ii].num;
     clicklimitbox(lim[ii].on, array);
+    gtk_tooltips_set_tip( tips, lim[ii].num, gettext( lim[ii].numtip ), "" );
   }
   ii *= 2;
 
@@ -244,8 +274,12 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), dirstr);
   gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   setupprefwidget(dirstr, PREF_DIR);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
-  gtk_table_attach_defaults(GTK_TABLE(table), dirstr,          1, 2, RN(ii));
+  event = tipbox( label, tips,
+                  _("Directory which data files are downloaded into") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
+  event = tipbox( dirstr, tips,
+                  _("Directory which data files are downloaded into") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           1, 2, RN(ii));
   ii++;
 
   /* port label and entry */
@@ -254,8 +288,12 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(portnum), TRUE);
   setupprefwidget(portnum, PREF_PORT, (long)TR_DEFAULT_PORT);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
+  event = tipbox( label, tips,
+      _("TCP port number to listen for peer connections on") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
   gtk_table_attach_defaults(GTK_TABLE(table), portnum,         1, 2, RN(ii));
+  gtk_tooltips_set_tip( tips, portnum,
+      _("TCP port number to listen for peer connections on"), "" );
   ii++;
 
   /* NAT traversal checkbox */
@@ -263,9 +301,11 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   boolval = !TR_NAT_TRAVERSAL_IS_DISABLED( intval );
   setupprefwidget(natcheck, PREF_NAT, boolval);
   gtk_table_attach_defaults(GTK_TABLE(table), natcheck,        0, 2, RN(ii));
+  gtk_tooltips_set_tip( tips, natcheck,
+      _("Attempt to bypass NAT or firewall to allow incoming peer connections"), "" );
   ii++;
 
-  /* create the model used by the three popup menus */
+  /* create the model used by the two popup menus */
   model = GTK_TREE_MODEL(gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT));
   gtk_list_store_append(GTK_LIST_STORE(model), &iter);
   gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1, 0, 0,
@@ -286,8 +326,12 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(addstd), rend, TRUE);
   gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(addstd), rend, "text", 0);
   setupprefwidget(addstd, PREF_ADDSTD);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
-  gtk_table_attach_defaults(GTK_TABLE(table), addstd,          1, 2, RN(ii));
+  event = tipbox( label, tips,
+      _("Torrent files added via the toolbar, popup menu, and drag-and-drop") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
+  event = tipbox( addstd, tips,
+      _("Torrent files added via the toolbar, popup menu, and drag-and-drop") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           1, 2, RN(ii));
   ii++;
 
   /* ipc */
@@ -300,8 +344,12 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(addipc), rend, TRUE);
   gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(addipc), rend, "text", 0);
   setupprefwidget(addipc, PREF_ADDIPC);
-  gtk_table_attach_defaults(GTK_TABLE(table), label,           0, 1, RN(ii));
-  gtk_table_attach_defaults(GTK_TABLE(table), addipc,          1, 2, RN(ii));
+  event = tipbox( label, tips,
+      _("For torrents added via the command-line only") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
+  event = tipbox( addipc, tips,
+      _("For torrents added via the command-line only") );
+  gtk_table_attach_defaults(GTK_TABLE(table), event,           1, 2, RN(ii));
   ii++;
 
 #undef RN
@@ -331,6 +379,7 @@ freedata(gpointer gdata, GClosure *closure SHUTUP) {
 
   g_list_free(data->prefwidgets);
   g_object_unref(G_OBJECT(data->back));
+  g_object_unref( data->tips );
   g_free(data);
 }
 
