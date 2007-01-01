@@ -242,6 +242,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "TorrentTopia" );
     }
+    else if( !memcmp( id, "eX", 2 ) )
+    {
+        asprintf( &ret, "eXeem" );
+    }
 
     /* No match */
     if( !ret )
