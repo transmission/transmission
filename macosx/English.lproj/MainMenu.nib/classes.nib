@@ -1,11 +1,6 @@
 {
     IBClasses = (
         {CLASS = ActionPopUpButton; LANGUAGE = ObjC; SUPERCLASS = NSPopUpButton; }, 
-        {
-            CLASS = ActionPopUpButtonCell; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSPopUpButtonCell; 
-        }, 
         {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {
