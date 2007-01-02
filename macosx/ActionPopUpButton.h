@@ -4,5 +4,6 @@
 
 @interface ActionPopUpButton : NSPopUpButton
 {
+    NSImage * fImage, * fImagePressed;
 }
 @end
