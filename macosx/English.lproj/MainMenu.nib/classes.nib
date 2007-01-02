@@ -1,5 +1,11 @@
 {
     IBClasses = (
+        {CLASS = ActionPopUpButton; LANGUAGE = ObjC; SUPERCLASS = NSPopUpButton; }, 
+        {
+            CLASS = ActionPopUpButtonCell; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSPopUpButtonCell; 
+        }, 
         {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {
@@ -94,7 +100,6 @@
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
         {
