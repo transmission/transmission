@@ -41,7 +41,7 @@ char * tr_clientForId( uint8_t * id )
 {
     char * ret = NULL;
     
-    /* Azureus style */
+    /* Azureus-style */
     if( id[0] == '-' && id[7] == '-' )
     {
         if( !memcmp( &id[1], "TR", 2 ) )
@@ -138,7 +138,7 @@ char * tr_clientForId( uint8_t * id )
     }
     
     /* Tornado-style */
-    if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--00", 4 ) )
+    if( !memcmp( &id[4], "-----", 5 ) || !memcmp( &id[4], "--0", 3 ) )
     {
         if( id[0] == 'T' )
         {
