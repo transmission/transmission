@@ -3,11 +3,6 @@
 
 @implementation ActionPopUpButton
 
-+ (Class) cellClass
-{
-	return [ActionPopUpButtonCell class];
-}
-
 - (id) initWithCoder: (NSCoder *) coder
 {
 	if (self = [super initWithCoder: coder])

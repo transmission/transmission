@@ -4,7 +4,7 @@
 
 - (id) initTextCell: (NSString *) string pullsDown: (BOOL) pullDown
 {
-	if (self = [super initTextCell: string pullsDown: YES])
+	if ((self = [super initTextCell: string pullsDown: YES]))
     {
         fImage = [NSImage imageNamed: @"ActionButton.png"];
         [fImage setFlipped: YES];
