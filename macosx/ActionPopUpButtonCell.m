@@ -9,7 +9,7 @@
         fImage = [NSImage imageNamed: @"ActionButton.png"];
         [fImage setFlipped: YES];
         fImagePressed = [NSImage imageNamed: @"ActionButtonPressed.png"];
-        [fImage setFlipped: YES];
+        [fImagePressed setFlipped: YES];
     }
 	return self;
 }
