@@ -226,6 +226,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "burst! %c.%c.%c", id[5], id[7], id[9] );
     }
+    else if( !memcmp( id, "btpd", 4 ) )
+    {
+        asprintf( &ret, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7] );
+    }
     else if( !memcmp( id, "LIME", 4 ) )
     {
         asprintf( &ret, "Limewire (%c%c%c%c)", id[4], id[5], id[6], id[7] );
