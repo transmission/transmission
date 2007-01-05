@@ -206,13 +206,13 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
       gtk_label_new_with_mnemonic(_("Maximum _download speed:")),
       DEF_USEDOWNLIMIT, PREF_USEDOWNLIMIT, PREF_DOWNLIMIT, DEF_DOWNLIMIT,
       N_("Restrict the download rate"),
-      N_("Speed in KiB/sec to restrict download rate to")},
+      N_("Speed in KiB/sec for restricted download rate")},
     { gtk_check_button_new_with_mnemonic(_("Li_mit upload speed")),
       gtk_spin_button_new_with_range(0, G_MAXLONG, 1),
       gtk_label_new_with_mnemonic(_("Maximum _upload speed:")),
       DEF_USEUPLIMIT, PREF_USEUPLIMIT, PREF_UPLIMIT, DEF_UPLIMIT,
       N_("Restrict the upload rate"),
-      N_("Speed in KiB/sec to restrict upload rate to")},
+      N_("Speed in KiB/sec for restricted upload rate")},
   };
   unsigned int ii;
   GtkTreeModel *model;
@@ -275,10 +275,10 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
   setupprefwidget(dirstr, PREF_DIR);
   event = tipbox( label, tips,
-                  _("Directory which data files are downloaded into") );
+                  _("Destination directory for downloaded data files") );
   gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
   event = tipbox( dirstr, tips,
-                  _("Directory which data files are downloaded into") );
+                  _("Destination directory for downloaded data files") );
   gtk_table_attach_defaults(GTK_TABLE(table), event,           1, 2, RN(ii));
   ii++;
 
@@ -289,11 +289,11 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(portnum), TRUE);
   setupprefwidget(portnum, PREF_PORT, (long)TR_DEFAULT_PORT);
   event = tipbox( label, tips,
-      _("TCP port number to listen for peer connections on") );
+      _("TCP port number to listen for peer connections") );
   gtk_table_attach_defaults(GTK_TABLE(table), event,           0, 1, RN(ii));
   gtk_table_attach_defaults(GTK_TABLE(table), portnum,         1, 2, RN(ii));
   gtk_tooltips_set_tip( tips, portnum,
-      _("TCP port number to listen for peer connections on"), "" );
+      _("TCP port number to listen for peer connections"), "" );
   ii++;
 
   /* NAT traversal checkbox */
