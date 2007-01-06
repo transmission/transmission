@@ -116,7 +116,7 @@ EOF
   then
     if runcmd $CC -o testconf testconf.c -lm
     then
-      LDFLAGS="$LDFLAGS -lm"
+      LDFLAGS="-lm $LDFLAGS"
     fi
   fi
   rm -f testconf*
