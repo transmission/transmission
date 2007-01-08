@@ -595,16 +595,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) updateSpeedSetting
 {
-    if (fLimitCustom)
-    {
-        tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
-        tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
-    }
-    else
-    {
-        tr_setUploadLimit(fHandle, -1);
-        tr_setDownloadLimit(fHandle, -1);
-    }
+    tr_setUploadLimit(fHandle, fLimitCustom && fCheckUpload ? fUploadLimit : -1);
+    tr_setDownloadLimit(fHandle, fLimitCustom && fCheckDownload ? fDownloadLimit : -1);
 }
 
 - (void) setWaitToStart: (BOOL) wait
