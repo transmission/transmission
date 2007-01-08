@@ -25,9 +25,6 @@
 #import "Torrent.h"
 #import "StringAdditions.h"
 
-#define DOWNLOAD_LIMIT_DEFAULT 50
-#define UPLOAD_LIMIT_DEFAULT 20
-
 #define BAR_HEIGHT 12.0
 
 #define MAX_PIECES 324
@@ -1176,9 +1173,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     fLimitCustom = limitCustom ? [limitCustom boolValue] : NO;
     fCheckUpload = checkUpload ? [checkUpload boolValue] : NO;
-    fUploadLimit = uploadLimit ? [uploadLimit intValue] : UPLOAD_LIMIT_DEFAULT;
+    fUploadLimit = uploadLimit ? [uploadLimit intValue] : [fDefaults integerForKey: @"UploadLimit"];
     fCheckDownload = checkDownload ? [checkDownload boolValue] : NO;
-    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : DOWNLOAD_LIMIT_DEFAULT;
+    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimit"];
     [self updateSpeedSetting];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
