@@ -6,7 +6,6 @@
         {
             ACTIONS = {
                 applySpeedSettings = id; 
-                applyTorrentLimitSetting = id; 
                 folderSheetShow = id; 
                 helpForNetwork = id; 
                 importFolderSheetShow = id; 
@@ -23,17 +22,14 @@
                 setRatioStop = id; 
                 setSound = id; 
                 setSpeedLimit = id; 
-                setTorrentLimit = id; 
                 setUpdate = id; 
             }; 
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fBandwidthView = NSView; 
-                fDownloadCheck = NSButton; 
                 fDownloadField = NSTextField; 
                 fDownloadSoundPopUp = NSPopUpButton; 
-                fDownloadTorrentField = NSTextField; 
                 fFolderPopUp = NSPopUpButton; 
                 fGeneralView = NSView; 
                 fImportFolderPopUp = NSPopUpButton; 
@@ -53,9 +49,7 @@
                 fSpeedLimitUploadField = NSTextField; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
-                fUploadCheck = NSButton; 
                 fUploadField = NSTextField; 
-                fUploadTorrentField = NSTextField; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 

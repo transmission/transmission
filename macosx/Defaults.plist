@@ -18,8 +18,6 @@
 	<integer>9090</integer>
 	<key>CheckDownload</key>
 	<false/>
-	<key>CheckDownloadTorrent</key>
-	<false/>
 	<key>CheckQuit</key>
 	<true/>
 	<key>CheckQuitDownloading</key>
@@ -30,8 +28,6 @@
 	<false/>
 	<key>CheckUpload</key>
 	<true/>
-	<key>CheckUploadTorrent</key>
-	<false/>
 	<key>DeleteOriginalTorrent</key>
 	<false/>
 	<key>DownloadChoice</key>
@@ -40,8 +36,6 @@
 	<string>~/Desktop</string>
 	<key>DownloadLimit</key>
 	<integer>100</integer>
-	<key>DownloadLimitTorrent</key>
-	<integer>50</integer>
 	<key>DownloadSound</key>
 	<string>Glass</string>
 	<key>Filter</key>
@@ -107,8 +101,6 @@
 	<key>UpdateCheck</key>
 	<string>Daily</string>
 	<key>UploadLimit</key>
-	<integer>20</integer>
-	<key>UploadLimitTorrent</key>
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
 	<false/>

@@ -47,9 +47,7 @@
     IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
-                            * fUploadTorrentField, * fDownloadTorrentField,
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
-    IBOutlet NSButton       * fUploadCheck, * fDownloadCheck;
 
     IBOutlet NSTextField            * fPortField, * fNatStatusField, * fPortStatusField;
     IBOutlet NSButton               * fNatCheck;
@@ -85,9 +83,6 @@
 
 - (void) updateLimitFields;
 - (void) setGlobalLimit: (id) sender;
-
-- (void) applyTorrentLimitSetting: (id) sender;
-- (void) setTorrentLimit: (id) sender;
 
 - (void) setSpeedLimit: (id) sender;
 - (void) setAutoSpeedLimit: (id) sender;

@@ -25,6 +25,9 @@
 #import "Torrent.h"
 #import "StringAdditions.h"
 
+#define DOWNLOAD_LIMIT_DEFAULT 50
+#define UPLOAD_LIMIT_DEFAULT 20
+
 #define BAR_HEIGHT 12.0
 
 #define MAX_PIECES 324
@@ -171,8 +174,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (fHandle)
     {
         tr_torrentClose(fLib, fHandle);
-        
-        [[NSNotificationCenter defaultCenter] removeObserver: self];
         
         if (fDownloadFolder)
             [fDownloadFolder release];
@@ -545,7 +546,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) setLimitUpload: (BOOL) limit
 {
     fCheckUpload = limit;
-    [self updateSpeedSetting: nil];
+    [self updateSpeedSetting];
 }
 
 - (int) uploadLimit
@@ -556,7 +557,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) setUploadLimit: (int) limit
 {
     fUploadLimit = limit;
-    [self updateSpeedSetting: nil];
+    [self updateSpeedSetting];
 }
 
 - (BOOL) checkDownload
@@ -567,7 +568,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) setLimitDownload: (BOOL) limit
 {
     fCheckDownload = limit;
-    [self updateSpeedSetting: nil];
+    [self updateSpeedSetting];
 }
 
 - (int) downloadLimit
@@ -578,7 +579,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) setDownloadLimit: (int) limit
 {
     fDownloadLimit = limit;
-    [self updateSpeedSetting: nil];
+    [self updateSpeedSetting];
 }
 
 - (BOOL) customLimitSetting
@@ -589,10 +590,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) setCustomLimitSetting: (BOOL) setting
 {
     fLimitCustom = setting;
-    [self updateSpeedSetting: nil];
+    [self updateSpeedSetting];
 }
 
-- (void) updateSpeedSetting: (NSNotification *) notification
+- (void) updateSpeedSetting
 {
     if (fLimitCustom)
     {
@@ -601,10 +602,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     else
     {
-        tr_setUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUploadTorrent"]
-                                        ? [fDefaults integerForKey: @"UploadLimitTorrent"] : -1);
-        tr_setDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownloadTorrent"]
-                                        ? [fDefaults integerForKey: @"DownloadLimitTorrent"] : -1);
+        tr_setUploadLimit(fHandle, -1);
+        tr_setDownloadLimit(fHandle, -1);
     }
 }
 
@@ -1184,11 +1183,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fFinishedSeeding = NO;
     
     fLimitCustom = limitCustom ? [limitCustom boolValue] : NO;
-    fCheckUpload = checkUpload ? [checkUpload boolValue] : [fDefaults boolForKey: @"CheckUploadTorrent"];
-    fUploadLimit = uploadLimit ? [uploadLimit intValue] : [fDefaults integerForKey: @"UploadLimitTorrent"];
-    fCheckDownload = checkDownload ? [checkDownload boolValue] : [fDefaults boolForKey: @"CheckDownloadTorrent"];
-    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimitTorrent"];
-    [self updateSpeedSetting: nil];
+    fCheckUpload = checkUpload ? [checkUpload boolValue] : NO;
+    fUploadLimit = uploadLimit ? [uploadLimit intValue] : UPLOAD_LIMIT_DEFAULT;
+    fCheckDownload = checkDownload ? [checkDownload boolValue] : NO;
+    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : DOWNLOAD_LIMIT_DEFAULT;
+    [self updateSpeedSetting];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;

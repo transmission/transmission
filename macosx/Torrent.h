@@ -101,7 +101,7 @@
 
 - (BOOL)    customLimitSetting;
 - (void)    setCustomLimitSetting: (BOOL) setting;
-- (void)    updateSpeedSetting: (NSNotification *) notification;
+- (void)    updateSpeedSetting;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;

@@ -141,10 +141,6 @@
     //set limits
     [self updateLimitFields];
     
-    //set torrent limits
-    [fUploadTorrentField setIntValue: [fDefaults integerForKey: @"UploadLimitTorrent"]];
-    [fDownloadTorrentField setIntValue: [fDefaults integerForKey: @"DownloadLimitTorrent"]];
-    
     //set speed limit
     [fSpeedLimitUploadField setIntValue: [fDefaults integerForKey: @"SpeedLimitUploadLimit"]];
     [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
@@ -390,28 +386,6 @@
     [fDefaults setInteger: limit forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
     
     [self applySpeedSettings: self];
-}
-
-- (void) applyTorrentLimitSetting: (id) sender
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSpeedSetting" object: self];
-}
-
-- (void) setTorrentLimit: (id) sender
-{
-    BOOL upload = sender == fUploadTorrentField;
-    
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: upload ? @"UploadLimitTorrent" : @"DownloadLimitTorrent"]];
-        return;
-    }
-    
-    [fDefaults setInteger: limit forKey: upload ? @"UploadLimitTorrent" : @"DownloadLimitTorrent"];
-    
-    [self applyTorrentLimitSetting: self];
 }
 
 - (void) setSpeedLimit: (id) sender
