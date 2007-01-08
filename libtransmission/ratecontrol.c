@@ -90,6 +90,32 @@ tr_ratecontrol_t * tr_rcInit()
     return r;
 }
 
+int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
+{
+    tr_torrent_t * tor;
+    tr_ratecontrol_t * r;
+    float rate = 0;
+    int limit = isUpload ? h->uploadLimit : h->downloadLimit;
+    
+    if( limit < 0 )
+    {
+        return 1;
+    }
+    
+    for( tor = h->torrentList; tor && rate < (float)limit; tor = tor->next )
+    {
+        if( !tor->customSpeedLimit )
+        {
+            r = isUpload ? tor->upload : tor->download;
+            tr_lockLock( &r->lock );
+            rate += rateForInterval( r, 1000 );
+            tr_lockUnlock( &r->lock );
+        }
+    }
+    
+    return rate < (float)limit;
+}
+
 void tr_rcSetLimit( tr_ratecontrol_t * r, int limit )
 {
     tr_lockLock( &r->lock );

@@ -266,8 +266,8 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
     /* Try to read */
     for( ;; )
     {
-        if( tor && (!tr_rcCanTransfer( tor->globalDownload )
-                    || !tr_rcCanTransfer( tor->download ) ) )
+        if( tor && ( ( !tor->customSpeedLimit && !tr_rcCanGlobalTransfer( tor->handle, 0 ) )
+            || ( tor->customSpeedLimit && !tr_rcCanTransfer( tor->download ) ) ) )
         {
             break;
         }
@@ -301,7 +301,6 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         {
             tr_rcTransferred( peer->download, ret );
             tr_rcTransferred( tor->download, ret );
-            tr_rcTransferred( tor->globalDownload, ret );
             if( parseBuf( tor, peer ) )
             {
                 return 1;
@@ -437,8 +436,8 @@ writeBegin:
         /* Send pieces if we can */
         while( ( p = blockPending( tor, peer, &size ) ) )
         {
-            if( !tr_rcCanTransfer( tor->globalUpload )
-                || !tr_rcCanTransfer( tor->upload ) )
+            if( ( !tor->customSpeedLimit && !tr_rcCanGlobalTransfer( tor->handle, 1 ) )
+                    || ( tor->customSpeedLimit && !tr_rcCanTransfer( tor->upload ) ) )
             {
                 break;
             }
@@ -456,7 +455,6 @@ writeBegin:
             blockSent( peer, ret );
             tr_rcTransferred( peer->upload, ret );
             tr_rcTransferred( tor->upload, ret );
-            tr_rcTransferred( tor->globalUpload, ret );
 
             tor->uploadedCur += ret;
             peer->outTotal   += ret;

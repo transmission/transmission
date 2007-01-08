@@ -70,8 +70,9 @@ tr_handle_t * tr_init()
     signal( SIGPIPE, SIG_IGN );
 
     /* Initialize rate and file descripts controls */
-    h->upload   = tr_rcInit();
-    h->download = tr_rcInit();
+    h->uploadLimit   = -1;
+    h->downloadLimit = -1;
+    
     h->fdlimit  = tr_fdInit();
     h->choking  = tr_chokingInit( h );
     h->natpmp   = tr_natpmpInit( h->fdlimit );
@@ -192,13 +193,18 @@ int tr_natTraversalStatus( tr_handle_t * h )
 
 void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )
 {
-    tr_rcSetLimit( h->upload, limit );
+    h->uploadLimit = limit;
     tr_chokingSetLimit( h->choking, limit );
 }
 
 void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
 {
-    tr_rcSetLimit( h->download, limit );
+    h->downloadLimit = limit;
+}
+
+void tr_setUseCustomLimit( tr_torrent_t * tor, int limit )
+{
+    tor->customSpeedLimit = limit;
 }
 
 void tr_setUploadLimit( tr_torrent_t * tor, int limit )
@@ -272,7 +278,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tr_torrent_t  * tor_tmp;
     tr_info_t     * inf;
     int             i;
-
+    
     inf        = &tor->info;
     inf->flags = flags;
 
@@ -289,6 +295,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
         }
     }
 
+    tor->handle = h;
     tor->status = TR_STATUS_PAUSE;
     tor->id     = h->id;
     tor->key    = h->key;
@@ -309,8 +316,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
 
     tr_lockInit( &tor->lock );
 
-    tor->globalUpload   = h->upload;
-    tor->globalDownload = h->download;
     tor->fdlimit        = h->fdlimit;
     tor->upload         = tr_rcInit();
     tor->download       = tr_rcInit();
@@ -738,8 +743,6 @@ void tr_close( tr_handle_t * h )
     tr_upnpClose( h->upnp );
     tr_chokingClose( h->choking );
     tr_fdClose( h->fdlimit );
-    tr_rcClose( h->upload );
-    tr_rcClose( h->download );
     free( h );
 
     tr_netResolveThreadClose();

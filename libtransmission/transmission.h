@@ -160,6 +160,10 @@ typedef struct tr_torrent_s tr_torrent_t;
 typedef void (*tr_callback_t) ( tr_torrent_t *, void * );
 void tr_torrentIterate( tr_handle_t *, tr_callback_t, void * );
 
+void tr_setUseCustomLimit( tr_torrent_t * tor, int limit );
+void tr_setUploadLimit( tr_torrent_t * tor, int limit );
+void tr_setDownloadLimit( tr_torrent_t * tor, int limit );
+
 /***********************************************************************
  * tr_torrentRates
  ***********************************************************************
