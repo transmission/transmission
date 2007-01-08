@@ -207,6 +207,11 @@ char * tr_clientForId( uint8_t * id )
         asprintf( &ret, "MLDonkey %c%c%c%c%c",
                   id[3], id[4], id[5], id[6], id[7] );
     }
+    else if( !memcmp( id, "AZ", 2 ) && !memcmp( &id[6], "BT", 2 ) )
+    {
+        asprintf( &ret, "BitTyrant (%c.%c.%c.%c)",
+                    id[2], id[3], id[4], id[5] );
+    }
     else if( !memcmp( id, "-FG", 3 ) )
     {
         asprintf( &ret, "FlashGet %d.%c%c",
