@@ -1561,7 +1561,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification
 {
-    [self applyFilter: nil];
+    [self updateTorrentsInQueue];
     [fInfoController updateInfoStats];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
@@ -1581,7 +1581,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
-//will try to start, taking into consideration the start preference
 - (void) updateTorrentsInQueue
 {
     if (![fDefaults boolForKey: @"Queue"])
@@ -1600,38 +1599,44 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     
     //determine the number of downloads needed to start
-    int desiredActive = [fDefaults integerForKey: @"QueueDownloadNumber"];
+    int desiredDownloadActive = [fDefaults integerForKey: @"QueueDownloadNumber"];
             
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         if ([torrent isActive] && ![torrent isSeeding] && ![torrent isError])
         {
-            desiredActive--;
-            if (desiredActive <= 0)
+            desiredDownloadActive--;
+            if (desiredDownloadActive <= 0)
                 break;
         }
     
     //sort torrents by order value
-    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+    NSArray * sortedTorrents;
+    if ([fTorrents count] > 1 && desiredDownloadActive > 0)
+    {
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"orderValue" ascending: YES] autorelease];
-    NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
         
-    NSArray * sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
-    [descriptors release];
+        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+        [descriptors release];
+    }
+    else
+        sortedTorrents = fTorrents;
 
     enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        if ([torrent waitingToStart])
+        if (![torrent isActive] && [torrent waitingToStart])
         {
             if ([torrent progress] >= 1.0)
                 [torrent startTransfer];
-            else if (desiredActive > 0)
+            else if (desiredDownloadActive > 0)
             {
                 [torrent startTransfer];
                 if ([torrent isActive])
-                    desiredActive--;
+                    desiredDownloadActive--;
             }
             else
                 continue;
