@@ -1135,13 +1135,96 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
 }
 
+- (void) updateTorrentsInQueue
+{
+    BOOL download = [fDefaults boolForKey: @"Queue"],
+        seed = [fDefaults boolForKey: @"QueueSeed"];
+    
+    if (!download && !seed)
+    {
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if (![torrent isActive] && [torrent waitingToStart])
+                [torrent startTransfer];
+        
+        [self updateUI: nil];
+        [self applyFilter: nil];
+        [self updateTorrentHistory];
+        
+        return;
+    }
+    
+    //determine the number of downloads needed to start
+    int desiredDownloadActive = download ? [fDefaults integerForKey: @"QueueDownloadNumber"] : 0,
+        desiredSeedActive = seed ? [fDefaults integerForKey: @"QueueSeedNumber"] : 0;
+            
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive] && ![torrent isError])
+        {
+            if (![torrent isSeeding])
+                desiredDownloadActive--;
+            else
+                desiredSeedActive--;
+            
+            if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
+                break;
+        }
+    
+    //sort torrents by order value
+    NSArray * sortedTorrents;
+    if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
+    {
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"orderValue" ascending: YES] autorelease];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+        
+        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+        [descriptors release];
+    }
+    else
+        sortedTorrents = fTorrents;
+
+    enumerator = [sortedTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+    {
+        if (![torrent isActive] && [torrent waitingToStart])
+        {
+            if ([torrent progress] < 1.0)
+            {
+                if (!download || desiredDownloadActive > 0)
+                {
+                    [torrent startTransfer];
+                    if ([torrent isActive])
+                        desiredDownloadActive--;
+                    [torrent update];
+                }
+            }
+            else
+            {
+                if (!seed || desiredSeedActive > 0)
+                {
+                    [torrent startTransfer];
+                    if ([torrent isActive])
+                        desiredSeedActive--;
+                    [torrent update];
+                }
+            }
+        }
+    }
+    
+    [self updateUI: nil];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
+}
+
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
     
     [fInfoController updateInfoStats];
-    
-    [self updateTorrentsInQueue];
     
     if ([fDefaults boolForKey: @"PlayDownloadSound"])
     {
@@ -1156,6 +1239,33 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (![fWindow isKeyWindow])
         fCompleted++;
+    
+    //update queue if there is a seeding queue
+    if ([fDefaults boolForKey: @"QueueSeed"])
+    {
+        int desiredSeedActive = [fDefaults integerForKey: @"QueueSeedNumber"];
+            
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
+        Torrent * otherTorrent;
+        while ((otherTorrent = [enumerator nextObject]))
+            if (otherTorrent != torrent && [otherTorrent isSeeding] && [otherTorrent isActive] && ![otherTorrent isError])
+            {
+                desiredSeedActive--;
+                if (desiredSeedActive <= 0)
+                    break;
+            }
+
+        if (desiredSeedActive <= 0)
+        {
+            [torrent stopTransfer];
+            [torrent setWaitToStart: YES];
+            [torrent update];
+        }
+    }
+    
+    [self updateUI: nil];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
 }
 
 - (void) updateTorrentHistory
@@ -1574,91 +1684,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
         description: [[notification object] name]
         notificationName: GROWL_SEEDING_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
-}
-
-- (void) updateTorrentsInQueue
-{
-    BOOL download = [fDefaults boolForKey: @"Queue"],
-        seed = [fDefaults boolForKey: @"QueueSeed"];
-    
-    if (!download && !seed)
-    {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-            if (![torrent isActive] && [torrent waitingToStart])
-                [torrent startTransfer];
-        
-        [self updateUI: nil];
-        [self applyFilter: nil];
-        [self updateTorrentHistory];
-        
-        return;
-    }
-    
-    //determine the number of downloads needed to start
-    int desiredDownloadActive = download ? [fDefaults integerForKey: @"QueueDownloadNumber"] : 0,
-        desiredSeedActive = seed ? [fDefaults integerForKey: @"QueueSeedNumber"] : 0;
-            
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive] && ![torrent isError])
-        {
-            if (![torrent isSeeding])
-                desiredDownloadActive--;
-            else
-                desiredSeedActive--;
-            
-            if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
-                break;
-        }
-    
-    //sort torrents by order value
-    NSArray * sortedTorrents;
-    if ([fTorrents count] > 1 && (desiredDownloadActive > 0 || desiredSeedActive > 0))
-    {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
-        
-        sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
-        [descriptors release];
-    }
-    else
-        sortedTorrents = fTorrents;
-
-    enumerator = [sortedTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-    {
-        if (![torrent isActive] && [torrent waitingToStart])
-        {
-            if ([torrent progress] < 1.0)
-            {
-                if (!download || desiredDownloadActive > 0)
-                {
-                    [torrent startTransfer];
-                    if ([torrent isActive])
-                        desiredDownloadActive--;
-                    [torrent update];
-                }
-            }
-            else
-            {
-                if (!seed || desiredSeedActive > 0)
-                {
-                    [torrent startTransfer];
-                    if ([torrent isActive])
-                        desiredSeedActive--;
-                    [torrent update];
-                }
-            }
-        }
-    }
-    
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
 }
 
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path

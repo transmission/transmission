@@ -152,6 +152,9 @@
 - (void) updateControlTint: (NSNotification *) notification;
 
 - (void) updateUI: (NSTimer *) timer;
+
+- (void) updateTorrentsInQueue;
+
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) updateTorrentHistory;
 
@@ -173,7 +176,6 @@
 - (void) setQuickRatioGlobal: (id) sender;
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification;
-- (void) updateTorrentsInQueue;
 
 - (void) changeAutoImport;
 - (void) checkAutoImportDirectory;

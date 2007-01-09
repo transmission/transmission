@@ -290,11 +290,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         NSString * tempString;
     
         case TR_STATUS_PAUSE:
-            if (fFinishedSeeding)
+            if (fWaitToStart)
+            {
+                tempString = [self progress] < 1.0
+                        ? [NSLocalizedString(@"Waiting to start", "Torrent -> status string") stringByAppendingEllipsis]
+                        : [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
+            }
+            else if (fFinishedSeeding)
                 tempString = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
-            #warning differentiate seed waiting
-            else if (fWaitToStart)
-                tempString = [NSLocalizedString(@"Waiting to start", "Torrent -> status string") stringByAppendingEllipsis];
             else
                 tempString = NSLocalizedString(@"Paused", "Torrent -> status string");
             
