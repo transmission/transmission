@@ -1592,6 +1592,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             if ([torrent waitingToStart])
                 [torrent startTransfer];
         
+        [self updateUI: nil];
+        [self applyFilter: nil];
+        [self updateTorrentHistory];
+        
         return;
     }
     
