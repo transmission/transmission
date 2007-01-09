@@ -447,7 +447,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) startTransfer
 {
-    fWaitToStart = YES;
+    fWaitToStart = NO;
     fFinishedSeeding = NO;
     
     if (![self isActive] && [self alertForVolumeAvailable] && [self alertForRemainingDiskSpace])
