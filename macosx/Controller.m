@@ -2355,13 +2355,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable resume all waiting item
     if (action == @selector(resumeWaitingTorrents:))
     {
-        if (![fDefaults boolForKey: @"Queue"])
+        if (![fDefaults boolForKey: @"Queue"] && ![fDefaults boolForKey: @"QueueSeed"])
             return NO;
     
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent waitingToStart])
+            if (![torrent isActive] && [torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2369,14 +2369,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable resume selected waiting item
     if (action == @selector(resumeSelectedTorrentsNoWait:))
     {
-        if (![fDefaults boolForKey: @"Queue"])
+        if (![fDefaults boolForKey: @"Queue"] && ![fDefaults boolForKey: @"QueueSeed"])
             return NO;
     
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
         {
-            if ([torrent isPaused] && [torrent progress] < 1.0)
+            if (![torrent isActive])
                 return YES;
         }
         return NO;
