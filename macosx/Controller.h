@@ -172,11 +172,6 @@
 
 - (void) setQuickRatioGlobal: (id) sender;
 
-#warning simplify?
-- (void) checkWaitingForStopped: (NSNotification *) notification;
-- (void) torrentStartSettingChange: (NSNotification *) notification;
-- (void) globalStartSettingChange: (NSNotification *) notification;
-
 - (void) torrentStoppedForRatio: (NSNotification *) notification;
 - (void) updateTorrentsInQueue;
 

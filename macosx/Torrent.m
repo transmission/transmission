@@ -382,8 +382,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     BOOL wasError = fError;
     if ((fError = fStat->cannotConnect))
     {
-        if (!wasError && [self isActive] && ![self isSeeding])
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+        if (!wasError && [self isActive])
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
 
     if ([self isActive] && fStat->status != TR_STATUS_CHECK )
@@ -443,7 +443,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) startTransfer
 {
-    fWaitToStart = NO;
+    fWaitToStart = YES;
     fFinishedSeeding = NO;
     
     if (![self isActive] && [self alertForVolumeAvailable] && [self alertForRemainingDiskSpace])
@@ -456,16 +456,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) stopTransfer
 {
     fError = NO;
+    fWaitToStart = NO;
     
     if ([self isActive])
     {
-        BOOL wasSeeding = [self isSeeding];
-    
         tr_torrentStop(fHandle);
         [self update];
 
-        if (!wasSeeding)
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
 }
 
@@ -661,15 +659,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
         
-        if ([alert runModal] == NSAlertFirstButtonReturn)
-        {
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
-            return NO;
-        }
-        else
-            return YES;
+        BOOL ret = [alert runModal] != NSAlertFirstButtonReturn;
         
         [alert release];
+        
+        return ret;
     }
     return YES;
 }
@@ -701,9 +695,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Directory",
                                     "Volume cannot be found alert -> directory button") stringByAppendingEllipsis]];
         
-        if ([alert runModal] == NSAlertFirstButtonReturn)
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
-        else
+        if ([alert runModal] != NSAlertFirstButtonReturn)
         {
             NSOpenPanel * panel = [NSOpenPanel openPanel];
             
@@ -751,8 +743,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
     }
-    else
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
 }
 
 - (BOOL) alertForMoveVolumeAvailable

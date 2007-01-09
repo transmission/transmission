@@ -345,17 +345,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(makeWindowKey)
                     name: @"MakeWindowKey" object: nil];
     
-    //check to start another because of stopped torrent
-    [nc addObserver: self selector: @selector(checkWaitingForStopped:)
-                    name: @"StoppedDownloading" object: nil];
-    
-    //check all torrents for starting
-    [nc addObserver: self selector: @selector(globalStartSettingChange:)
-                    name: @"GlobalStartSettingChange" object: nil];
-    
     //check if torrent should now start
     [nc addObserver: self selector: @selector(torrentStoppedForRatio:)
                     name: @"TorrentStoppedForRatio" object: nil];
+    
+    [nc addObserver: self selector: @selector(updateTorrentsInQueue)
+                    name: @"UpdateQueue" object: nil];
     
     //change that just impacts the dock badge
     [nc addObserver: self selector: @selector(resetDockBadge:)
@@ -1562,25 +1557,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDefaults setFloat: [[sender title] floatValue] forKey: @"RatioLimit"];
     
     [fPrefsController updateRatioStopField];
-}
-
-- (void) checkWaitingForStopped: (NSNotification *) notification
-{
-    [self updateTorrentsInQueue];
-    
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
-}
-
-- (void) torrentStartSettingChange: (NSNotification *) notification
-{
-    [self updateTorrentsInQueue];
-}
-
-- (void) globalStartSettingChange: (NSNotification *) notification
-{
-    [self updateTorrentsInQueue];
 }
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification

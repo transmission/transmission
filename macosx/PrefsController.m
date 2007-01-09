@@ -462,7 +462,7 @@
     
     [fDefaults setInteger: limit forKey: @"QueueDownloadNumber"];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"GlobalStartSettingChange" object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
 - (void) setDownloadLocation: (id) sender
