@@ -2361,7 +2361,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if (![torrent isActive] && [torrent waitingToStart])
+            if ([torrent isPaused] && [torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2375,10 +2375,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-        {
-            if (![torrent isActive])
+            if ([torrent isPaused])
                 return YES;
-        }
         return NO;
     }
 
@@ -2391,10 +2389,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-        {
             if ([torrent isActive] || [torrent waitingToStart])
                 return YES;
-        }
         return NO;
     }
     
@@ -2404,16 +2400,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (!canUseTable)
             return NO;
     
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSIndexSet * indexSet = [fTableView selectedRowIndexes];
-        unsigned int i;
-        
-        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        {
-            torrent = [fDisplayedTorrents objectAtIndex: i];
+        while ((torrent = [enumerator nextObject]))
             if ([torrent isPaused] && ![torrent waitingToStart])
                 return YES;
-        }
         return NO;
     }
     
