@@ -156,7 +156,8 @@
                         selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
     
     //set queue values
-    [fQueueField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
+    [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
+    [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
@@ -450,24 +451,30 @@
         [fUpdater scheduleCheckWithInterval: seconds];
 }
 
+- (void) setQueue: (id) sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+}
+
 - (void) setQueueNumber: (id) sender
 {
+    BOOL download = sender == fQueueDownloadField;
+    
     int limit = [sender intValue];
     if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
     {
         NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
+        [sender setIntValue: [fDefaults integerForKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"]];
         return;
     }
     
-    [fDefaults setInteger: limit forKey: @"QueueDownloadNumber"];
+    [fDefaults setInteger: limit forKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    [self setQueue: nil];
 }
 
 - (void) setDownloadLocation: (id) sender
 {
-    //download folder
     switch ([fFolderPopUp indexOfSelectedItem])
     {
         case DOWNLOAD_FOLDER:

@@ -18,6 +18,7 @@
                 setGlobalLimit = id; 
                 setNat = id; 
                 setPort = id; 
+                setQueue = id; 
                 setQueueNumber = id; 
                 setRatioStop = id; 
                 setSound = id; 
@@ -42,7 +43,8 @@
                 fPortStatusField = NSTextField; 
                 fPortStatusImage = NSImageView; 
                 fPortStatusProgress = NSProgressIndicator; 
-                fQueueField = NSTextField; 
+                fQueueDownloadField = NSTextField; 
+                fQueueSeedField = NSTextField; 
                 fRatioStopField = NSTextField; 
                 fSeedingSoundPopUp = NSPopUpButton; 
                 fSpeedLimitDownloadField = NSTextField; 

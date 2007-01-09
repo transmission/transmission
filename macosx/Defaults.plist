@@ -68,6 +68,10 @@
 	<false/>
 	<key>QueueDownloadNumber</key>
 	<integer>3</integer>
+    <key>QueueSeed</key>
+	<false/>
+    <key>QueueSeedNumber</key>
+	<integer>3</integer>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>
