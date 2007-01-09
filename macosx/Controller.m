@@ -1589,7 +1589,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent waitingToStart])
+            if (![torrent isActive] && [torrent waitingToStart])
                 [torrent startTransfer];
         
         [self updateUI: nil];
