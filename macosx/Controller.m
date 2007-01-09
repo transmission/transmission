@@ -597,16 +597,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         [torrent setDownloadFolder: folder];
         [torrent update];
-        [self attemptToStartAuto: torrent];
         
         [fTorrents addObject: torrent];
         [torrent release];
     }
 
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 //called by the main open method to show sheet for choosing download location
@@ -661,12 +657,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
         [torrent update];
-        [self attemptToStartAuto: torrent];
         
         [fTorrents addObject: torrent];
         
-        [self updateUI: nil];
-        [self applyFilter: nil];
+        [self updateTorrentsInQueue];
     }
     
     [self performSelectorOnMainThread: @selector(openFilesAskWithDict:) withObject: dictionary waitUntilDone: NO];
@@ -791,11 +785,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: YES];
     
-    [self attemptToStartMultipleAuto: torrents];
-    
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) resumeSelectedTorrentsNoWait:  (id) sender
@@ -1156,8 +1146,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fInfoController updateInfoStats];
     
-    [self applyFilter: nil];
-    [self checkToStartWaiting: torrent];
+    [self updateTorrentsInQueue];
     
     if ([fDefaults boolForKey: @"PlayDownloadSound"])
     {
@@ -1577,74 +1566,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) checkWaitingForStopped: (NSNotification *) notification
 {
-    [self checkToStartWaiting: [notification object]];
+    [self updateTorrentsInQueue];
     
     [self updateUI: nil];
     [self applyFilter: nil];
     [self updateTorrentHistory];
-}
-
-- (void) checkToStartWaiting: (Torrent *) finishedTorrent
-{
-    //don't try to start a transfer if there should be none waiting
-    if (![fDefaults boolForKey: @"Queue"])
-        return;
-
-    int desiredActive = [fDefaults integerForKey: @"QueueDownloadNumber"];
-    
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent, * torrentToStart = nil;
-    while ((torrent = [enumerator nextObject]))
-    {
-        //ignore the torrent just stopped
-        if (torrent == finishedTorrent)
-            continue;
-    
-        if ([torrent isActive])
-        {
-            if (![torrent isSeeding] && ![torrent isError])
-            {
-                desiredActive--;
-                if (desiredActive <= 0)
-                    return;
-            }
-        }
-        else
-        {
-            //use as next if it is waiting to start and either no previous or order value is lower
-            if ([torrent waitingToStart] && (!torrentToStart
-                || [[torrentToStart orderValue] compare: [torrent orderValue]] == NSOrderedDescending))
-                torrentToStart = torrent;
-        }
-    }
-    
-    //since it hasn't returned, the queue amount has not been met
-    if (torrentToStart)
-    {
-        [torrentToStart startTransfer];
-        
-        [self updateUI: nil];
-        [self applyFilter: nil];
-        [self updateTorrentHistory];
-    }
 }
 
 - (void) torrentStartSettingChange: (NSNotification *) notification
 {
-    [self attemptToStartMultipleAuto: [notification object]];
-
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) globalStartSettingChange: (NSNotification *) notification
 {
-    [self attemptToStartMultipleAuto: fTorrents];
-    
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification
@@ -1666,15 +1602,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) attemptToStartAuto: (Torrent *) torrent
 {
-    [self attemptToStartMultipleAuto: [NSArray arrayWithObject: torrent]];
+    [self updateTorrentsInQueue];
 }
 
 //will try to start, taking into consideration the start preference
-- (void) attemptToStartMultipleAuto: (NSArray *) torrents
+- (void) updateTorrentsInQueue
 {
     if (![fDefaults boolForKey: @"Queue"])
     {
-        NSEnumerator * enumerator = [torrents objectEnumerator];
+        NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
             if ([torrent waitingToStart])
@@ -1697,18 +1633,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     
     //sort torrents by order value
-    NSArray * sortedTorrents;
-    if ([torrents count] > 1 && desiredActive > 0)
-    {
-        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                    @"orderValue" ascending: YES] autorelease];
-        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+    NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"orderValue" ascending: YES] autorelease];
+    NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
         
-        sortedTorrents = [torrents sortedArrayUsingDescriptors: descriptors];
-        [descriptors release];
-    }
-    else
-        sortedTorrents = torrents;
+    NSArray * sortedTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
+    [descriptors release];
 
     enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -1720,7 +1650,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             else if (desiredActive > 0)
             {
                 [torrent startTransfer];
-                desiredActive--;
+                if ([torrent isActive])
+                    desiredActive--;
             }
             else
                 continue;
@@ -1728,6 +1659,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [torrent update];
         }
     }
+    
+    [self updateUI: nil];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
 }
 
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path

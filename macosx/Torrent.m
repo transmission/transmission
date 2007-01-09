@@ -258,6 +258,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             fIncompleteFolder = nil;
         }
         
+        fStat = tr_torrentStat(fHandle);
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
     }
     
@@ -446,7 +447,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fFinishedSeeding = NO;
     
     if (![self isActive] && [self alertForVolumeAvailable] && [self alertForRemainingDiskSpace])
+    {
         tr_torrentStart(fHandle);
+        [self update];
+    }
 }
 
 - (void) stopTransfer
@@ -458,6 +462,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         BOOL wasSeeding = [self isSeeding];
     
         tr_torrentStop(fHandle);
+        [self update];
 
         if (!wasSeeding)
             [[NSNotificationCenter defaultCenter] postNotificationName: @"StoppedDownloading" object: self];
