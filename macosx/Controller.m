@@ -1140,38 +1140,27 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     BOOL download = [fDefaults boolForKey: @"Queue"],
         seed = [fDefaults boolForKey: @"QueueSeed"];
     
-    if (!download && !seed)
-    {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-            if (![torrent isActive] && [torrent waitingToStart])
-                [torrent startTransfer];
-        
-        [self updateUI: nil];
-        [self applyFilter: nil];
-        [self updateTorrentHistory];
-        
-        return;
-    }
-    
     //determine the number of downloads needed to start
     int desiredDownloadActive = download ? [fDefaults integerForKey: @"QueueDownloadNumber"] : 0,
         desiredSeedActive = seed ? [fDefaults integerForKey: @"QueueSeedNumber"] : 0;
-            
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    
     Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive] && ![torrent isError])
-        {
-            if ([torrent progress] < 1.0)
-                desiredDownloadActive--;
-            else
-                desiredSeedActive--;
-            
-            if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
-                break;
-        }
+    NSEnumerator * enumerator;
+    if (download || seed)
+    {
+        enumerator = [fTorrents objectEnumerator];
+        while ((torrent = [enumerator nextObject]))
+            if ([torrent isActive] && ![torrent isError])
+            {
+                if ([torrent progress] < 1.0)
+                    desiredDownloadActive--;
+                else
+                    desiredSeedActive--;
+                
+                if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
+                    break;
+            }
+    }
     
     //sort torrents by order value
     NSArray * sortedTorrents;
@@ -1259,7 +1248,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         {
             [torrent stopTransfer];
             [torrent setWaitToStart: YES];
-            [torrent update];
         }
     }
     
