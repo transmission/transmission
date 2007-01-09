@@ -1491,7 +1491,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [totalTorrentsString appendFormat: @"%d/", [fDisplayedTorrents count]];
     
     int totalCount = [fTorrents count];
-    if (totalCount > 1)
+    if (totalCount != 1)
         [totalTorrentsString appendFormat: NSLocalizedString(@"%d Transfers", "Status bar transfer count"), totalCount];
     else
         [totalTorrentsString appendFormat: NSLocalizedString(@"%d Transfer", "Status bar transfer count"), totalCount];
