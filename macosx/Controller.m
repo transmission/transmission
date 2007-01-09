@@ -1164,7 +1164,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         if ([torrent isActive] && ![torrent isError])
         {
-            if (![torrent isSeeding])
+            if ([torrent progress] < 1.0)
                 desiredDownloadActive--;
             else
                 desiredSeedActive--;
@@ -1248,7 +1248,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * otherTorrent;
         while ((otherTorrent = [enumerator nextObject]))
-            if (otherTorrent != torrent && [otherTorrent isSeeding] && [otherTorrent isActive] && ![otherTorrent isError])
+            if (otherTorrent != torrent && [otherTorrent isSeeding] && ![otherTorrent isError])
             {
                 desiredSeedActive--;
                 if (desiredSeedActive <= 0)
