@@ -2232,8 +2232,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     SEL action = [menuItem action];
 
-    //only enable some items if it is in a context menu or the window is useable 
-    BOOL canUseTable = [fWindow isKeyWindow] || [[[menuItem menu] title] isEqualToString: @"Context"];
+    //only enable some items if it is in a context menu or the window is useable
+    BOOL canUseTable = [fWindow isKeyWindow] || [[menuItem menu] supermenu] != [NSApp mainMenu];
 
     //enable open items
     if (action == @selector(openShowSheet:) || action == @selector(openURLShowSheet:))
