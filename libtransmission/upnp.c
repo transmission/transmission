@@ -671,6 +671,10 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
             return 0;
     }
 
+    /* gcc can be pretty annoying about it's warnings sometimes */
+    len = 0;
+    body = NULL;
+
     code = devicePulseHttp( dev, fdlimit, &body, &len );
     if( 0 > code )
     {
