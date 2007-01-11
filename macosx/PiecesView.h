@@ -29,7 +29,7 @@
 {
     int8_t  * fPieces;
     
-    NSImage * fBack, * fWhitePiece, * fBluePiece, * fRedPiece,
+    NSImage * fBack, * fWhitePiece, * fBluePiece, * fOrangePiece,
             * fGreen1Piece, * fGreen2Piece, * fGreen3Piece,
             * fBlue1Piece, * fBlue2Piece, * fBlue3Piece, * fBlue4Piece;
     

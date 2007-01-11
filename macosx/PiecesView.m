@@ -62,13 +62,13 @@
         [bp fill];
         [fWhitePiece unlockFocus];
         
-        //red box image
-        fRedPiece = [[NSImage alloc] initWithSize: size];
+        //orange box image
+        fOrangePiece = [[NSImage alloc] initWithSize: size];
         
-        [fRedPiece lockFocus];
-        [[NSColor redColor] set];
+        [fOrangePiece lockFocus];
+        [[NSColor orangeColor] set];
         [bp fill];
-        [fRedPiece unlockFocus];
+        [fOrangePiece unlockFocus];
         
         //green 1 box image
         fGreen1Piece = [[NSImage alloc] initWithSize: size];
@@ -148,7 +148,7 @@
     
     [fBack release];
     [fWhitePiece release];
-    [fRedPiece release];
+    [fOrangePiece release];
     [fBluePiece release];
     [fGreen1Piece release];
     [fGreen2Piece release];
@@ -253,7 +253,7 @@
                     else if (fPieces[index] != -1)
                     {
                         fPieces[index] = -2;
-                        pieceImage = fRedPiece;
+                        pieceImage = fOrangePiece;
                     }
                     else;
                 }
@@ -303,7 +303,7 @@
                     else if (fPieces[index] != -1)
                     {
                         fPieces[index] = -2;
-                        pieceImage = fRedPiece;
+                        pieceImage = fOrangePiece;
                     }
                     else;
                 }
