@@ -2481,6 +2481,45 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+- (NSMenu *) applicationDockMenu: (NSApplication *) sender
+{
+    int seeding = 0, downloading = 0;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive])
+        {
+            if ([torrent progress] < 1.0)
+                downloading++;
+            else
+                seeding++;
+        }
+    
+    NSMenu * menu;
+    if (seeding > 0 || downloading > 0)
+    {
+        menu = [[fDockMenu copy] autorelease];
+        
+        [menu insertItem: [NSMenuItem separatorItem] atIndex: 0];
+        if (downloading > 0)
+        {
+            NSMenuItem * item = [[[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d Downloading", downloading]
+                                                        action: nil keyEquivalent: @""] autorelease];
+            [menu insertItem: item atIndex: 0];
+        }
+        if (seeding > 0)
+        {
+            NSMenuItem * item = [[[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d Seeding", seeding]
+                                                        action: nil keyEquivalent: @""] autorelease];
+            [menu insertItem: item atIndex: 0];
+        }
+    }
+    else
+        menu = fDockMenu;
+    
+    return menu;
+}
+
 - (void) resetDockBadge: (NSNotification *) notification
 {
     float downloadRate, uploadRate;

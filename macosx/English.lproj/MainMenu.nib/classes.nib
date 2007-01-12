@@ -49,6 +49,7 @@
                 fActionButton = NSButton; 
                 fDateSortActionItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
+                fDockMenu = NSMenu; 
                 fDownloadFilterButton = BarButton; 
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 

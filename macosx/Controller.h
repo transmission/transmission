@@ -92,6 +92,7 @@
     BOOL                            fUpdateInProgress;
     
     Badger                          * fBadger;
+    IBOutlet NSMenu                 * fDockMenu;
     
     NSMutableArray                  * fAutoImportedNames;
     NSMutableDictionary             * fPendingTorrentDownloads;
