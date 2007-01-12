@@ -1027,13 +1027,14 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
     }
     tc->complete = val2->val.i;
     
-    val2 = tr_bencDictFind( val1, "flags" );
+    val2 = tr_bencDictFind( &scrape, "flags" );
     if( val2 )
     {
         val2 = tr_bencDictFind( val2, "min_request_interval" );
         if( val2 )
         {
             tc->scrapeInterval = val2->val.i;
+            tr_inf( "Scrape: min_request_interval = %d seconds", tc->scrapeInterval );
         }
     }
     
