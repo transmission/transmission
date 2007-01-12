@@ -58,7 +58,8 @@
     
     IBOutlet NSButton * fRatioCustomCheck, * fRatioStopCheck,
                     * fLimitCustomCheck, * fUploadLimitCheck, * fDownloadLimitCheck;
-    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField;
+    IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
+                        * fUploadLimitLabel, * fDownloadLimitLabel;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;

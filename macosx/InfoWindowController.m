@@ -412,10 +412,12 @@
                                 : (limitCustom == 1 ? NSOnState : NSOffState)];
         
         [fUploadLimitCheck setEnabled: limitCustom == 1];
+        [fUploadLimitLabel setEnabled: limitCustom == 1];
         [fUploadLimitCheck setState: checkUpload == INVALID ? NSMixedState
                                 : (checkUpload == 1 ? NSOnState : NSOffState)];
         
         [fDownloadLimitCheck setEnabled: limitCustom == 1];
+        [fDownloadLimitLabel setEnabled: limitCustom == 1];
         [fDownloadLimitCheck setState: checkDownload == INVALID ? NSMixedState
                                 : (checkDownload == 1 ? NSOnState : NSOffState)];
         
@@ -475,11 +477,13 @@
         [fUploadLimitCheck setState: NSOffState];
         [fUploadLimitField setEnabled: NO];
         [fUploadLimitField setStringValue: @""];
+        [fUploadLimitLabel setEnabled: NO];
         
         [fDownloadLimitCheck setEnabled: NO];
         [fDownloadLimitCheck setState: NSOffState];
         [fDownloadLimitField setEnabled: NO];
         [fDownloadLimitField setStringValue: @""];
+        [fDownloadLimitLabel setEnabled: NO];
         
         [fRatioCustomCheck setEnabled: NO];
         [fRatioCustomCheck setState: NSOffState];
@@ -704,9 +708,11 @@
         [torrent setCustomLimitSetting: custom];
     
     [fUploadLimitCheck setEnabled: custom];
+    [fUploadLimitLabel setEnabled: custom];
     [fUploadLimitField setEnabled: custom && [fUploadLimitCheck state] == NSOnState];
     
     [fDownloadLimitCheck setEnabled: custom];
+    [fDownloadLimitLabel setEnabled: custom];
     [fDownloadLimitField setEnabled: custom && [fDownloadLimitCheck state] == NSOnState];
 }
 

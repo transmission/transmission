@@ -1,5 +1,6 @@
 {
     IBClasses = (
+        {CLASS = DisableTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {
             CLASS = FileTableView; 
             LANGUAGE = ObjC; 
@@ -31,6 +32,7 @@
                 fDateStartedField = NSTextField; 
                 fDownloadLimitCheck = NSButton; 
                 fDownloadLimitField = NSTextField; 
+                fDownloadLimitLabel = NSTextField; 
                 fDownloadedTotalField = NSTextField; 
                 fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
@@ -61,6 +63,7 @@
                 fTrackerField = NSTextField; 
                 fUploadLimitCheck = NSButton; 
                 fUploadLimitField = NSTextField; 
+                fUploadLimitLabel = NSTextField; 
                 fUploadedTotalField = NSTextField; 
                 fUploadingToField = NSTextField; 
             }; 
