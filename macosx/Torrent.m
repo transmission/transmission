@@ -743,7 +743,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"The volume for moving the completed \"%@\" cannot be found.",
+                                NSLocalizedString(@"The folder for moving the completed \"%@\" cannot be found.",
                                     "Move folder cannot be found alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
                                 NSLocalizedString(@"\"%@\" cannot be found. The file will remain in its current location.",
