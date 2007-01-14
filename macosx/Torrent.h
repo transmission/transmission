@@ -112,8 +112,8 @@
 - (void)    trashTorrent;
 
 - (BOOL) alertForRemainingDiskSpace;
-- (BOOL) alertForVolumeAvailable;
-- (BOOL) alertForMoveVolumeAvailable;
+- (BOOL) alertForFolderAvailable;
+- (BOOL) alertForMoveFolderAvailable;
 
 - (NSImage *)   icon;
 - (NSImage *)   iconFlipped;

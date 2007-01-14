@@ -240,7 +240,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         //move file from incomplete folder to download folder
         if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
-            && (canMove = [self alertForMoveVolumeAvailable]))
+            && (canMove = [self alertForMoveFolderAvailable]))
         {
             tr_torrentStop(fHandle);
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
@@ -450,7 +450,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fWaitToStart = NO;
     fFinishedSeeding = NO;
     
-    if (![self isActive] && [self alertForVolumeAvailable] && [self alertForRemainingDiskSpace])
+    if (![self isActive] && [self alertForFolderAvailable] && [self alertForRemainingDiskSpace])
     {
         tr_torrentStart(fHandle);
         [self update];
@@ -672,32 +672,20 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return YES;
 }
 
-- (BOOL) alertForVolumeAvailable
+- (BOOL) alertForFolderAvailable
 {
-    NSArray * pathComponents = [[self downloadFolder] pathComponents];
-    if ([pathComponents count] < 3)
-        return YES;
-    
-    NSString * volume = [[[pathComponents objectAtIndex: 0] stringByAppendingPathComponent:
-                    [pathComponents objectAtIndex: 1]] stringByAppendingPathComponent: [pathComponents objectAtIndex: 2]];
-    
-    /*NSLog(@"%@", [self downloadFolder]);
-    NSLog(@"Volume: %@", volume);*/
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath: volume])
+    if (access(tr_torrentGetFolder(fHandle), 0))
     {
-        NSString * volumeName = [pathComponents objectAtIndex: 2];
-        
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"The volume for downloading \"%@\" cannot be found.",
-                                    "Volume cannot be found alert -> title"), [self name]]];
+                                NSLocalizedString(@"The folder for downloading \"%@\" cannot be found.",
+                                    "Folder cannot be found alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The transfer will be paused. Mount the volume \"%@\" to continue.",
-                                            "Volume cannot be found alert -> message"), volumeName]];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Volume cannot be found alert -> button")];
-        [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Directory",
-                                    "Volume cannot be found alert -> directory button") stringByAppendingEllipsis]];
+                        NSLocalizedString(@"\"%@\" cannot be found. The transfer will be paused.",
+                                            "Folder cannot be found alert -> message"), [self downloadFolder]]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Folder cannot be found alert -> button")];
+        [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Location",
+                                    "Folder cannot be found alert -> location button") stringByAppendingEllipsis]];
         
         if ([alert runModal] != NSAlertFirstButtonReturn)
         {
@@ -749,27 +737,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
 }
 
-- (BOOL) alertForMoveVolumeAvailable
+- (BOOL) alertForMoveFolderAvailable
 {
-    NSArray * pathComponents = [fDownloadFolder pathComponents];
-    if ([pathComponents count] < 3)
-        return YES;
-    
-    NSString * volume = [[[pathComponents objectAtIndex: 0] stringByAppendingPathComponent:
-                    [pathComponents objectAtIndex: 1]] stringByAppendingPathComponent: [pathComponents objectAtIndex: 2]];
-    
-    /*NSLog(@"%@", [self downloadFolder]);
-    NSLog(@"Volume: %@", volume);*/
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath: volume])
+    if (access([fDownloadFolder UTF8String], 0))
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
                                 NSLocalizedString(@"The volume for moving the completed \"%@\" cannot be found.",
-                                    "Move volume cannot be found alert -> title"), [self name]]];
-        [alert setInformativeText: NSLocalizedString(@"The file will remain in its current location",
-                                    "Move volume cannot be found alert -> message")];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move volume cannot be found alert -> button")];
+                                    "Move folder cannot be found alert -> title"), [self name]]];
+        [alert setInformativeText: [NSString stringWithFormat:
+                                NSLocalizedString(@"\"%@\" cannot be found. The file will remain in its current location.",
+                                    "Move folder cannot be found alert -> message"), fDownloadFolder]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move folder cannot be found alert -> button")];
         
         [alert runModal];
         [alert release];
