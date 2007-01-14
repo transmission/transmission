@@ -664,9 +664,9 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     
     if( code == 301 || code == 302 )
     {
-        tr_err( "Tracker: HTTP status code: %i", code );
-        
         tr_http_header_t hdr[] = { { "Location", NULL, 0 }, { NULL, NULL, 0 } };
+
+        tr_err( "Tracker: HTTP status code: %i", code );
         
         tr_httpParse( data, len, hdr );
         
@@ -938,10 +938,10 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
     
     if( code == 301 || code == 302 )
     {
-        tr_err( "Scrape: HTTP status code: %i", code );
-        
         tr_http_header_t hdr[] = { { "Location", NULL, 0 }, { NULL, NULL, 0 } };
         
+        tr_err( "Scrape: HTTP status code: %i", code );
+
         tr_httpParse( data, len, hdr );
         
         address = calloc( sizeof( char ), hdr->len+1 );
