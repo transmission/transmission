@@ -317,7 +317,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         case TR_STATUS_DOWNLOAD:
             [fStatusString setString: @""];
-            if ([self totalPeers] > 1)
+            if ([self totalPeers] != 1)
                 [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
                                                 "Torrent -> status string"), [self peersUploading], [self totalPeers]];
             else
@@ -359,7 +359,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         case TR_STATUS_SEED:
             [fStatusString setString: @""];
-            if ([self totalPeers] > 1)
+            if ([self totalPeers] != 1)
                 [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
                                                 [self peersDownloading], [self totalPeers]];
             else
