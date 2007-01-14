@@ -349,7 +349,7 @@ tr_errorString( int code )
         case TR_ERROR_IO_PARENT:
             return "Download folder does not exist";
         case TR_ERROR_IO_PERMISSIONS:
-            return "Unsufficient permissions";
+            return "Insufficient permissions";
         case TR_ERROR_IO_OTHER:
             return "Generic I/O error";
     }
