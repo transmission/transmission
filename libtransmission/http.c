@@ -560,11 +560,11 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
         case HTTP_STATE_RESOLVE:
             switch( tr_netResolvePulse( http->resolve, &addr ) )
             {
-                case TR_WAIT:
-                    return TR_WAIT;
-                case TR_ERROR:
+                case TR_NET_WAIT:
+                    return TR_NET_WAIT;
+                case TR_NET_ERROR:
                     goto err;
-                case TR_OK:
+                case TR_NET_OK:
                     tr_netResolveClose( http->resolve );
                     http->resolve = NULL;
                     http->sock = tr_netOpenTCP( addr, htons( http->port ) );
@@ -575,11 +575,11 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
         case HTTP_STATE_CONNECT:
             switch( sendrequest( http ) )
             {
-                case TR_WAIT:
-                    return TR_WAIT;
-                case TR_ERROR:
+                case TR_NET_WAIT:
+                    return TR_NET_WAIT;
+                case TR_NET_ERROR:
                     goto err;
-                case TR_OK:
+                case TR_NET_OK:
                     http->state = HTTP_STATE_RECEIVE;
             }
             /* fallthrough */
@@ -587,11 +587,11 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
         case HTTP_STATE_RECEIVE:
             switch( receiveresponse( http ) )
             {
-                case TR_WAIT:
-                    return TR_WAIT;
-                case TR_ERROR:
+                case TR_NET_WAIT:
+                    return TR_NET_WAIT;
+                case TR_NET_ERROR:
                     goto err;
-                case TR_OK:
+                case TR_NET_OK:
                     goto ok;
             }
             break;
@@ -603,11 +603,11 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
             goto err;
     }
 
-    return TR_WAIT;
+    return TR_NET_WAIT;
 
   err:
     http->state = HTTP_STATE_ERROR;
-    return TR_ERROR;
+    return TR_NET_ERROR;
 
   ok:
     http->state = HTTP_STATE_DONE;
@@ -619,7 +619,7 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
     {
         *len = http->header.used;
     }
-    return TR_OK;
+    return TR_NET_OK;
 }
 
 static tr_tristate_t
@@ -635,7 +635,7 @@ sendrequest( tr_http_t * http )
 
     if( 0 > http->sock || tr_date() > http->date + HTTP_TIMEOUT )
     {
-        return TR_ERROR;
+        return TR_NET_ERROR;
     }
 
     buf = ( 0 < http->header.used ? &http->header : &http->body );
@@ -644,11 +644,11 @@ sendrequest( tr_http_t * http )
       ret = tr_netSend( http->sock, (uint8_t *) buf->buf, buf->used );
         if( ret & TR_NET_CLOSE )
         {
-            return TR_ERROR;
+            return TR_NET_ERROR;
         }
         else if( ret & TR_NET_BLOCK )
         {
-            return TR_WAIT;
+            return TR_NET_WAIT;
         }
         buf->used = 0;
         buf = &http->body;
@@ -659,7 +659,7 @@ sendrequest( tr_http_t * http )
     http->body.size = 0;
     http->date = 0;
 
-    return TR_OK;
+    return TR_NET_OK;
 }
 
 static tr_tristate_t
@@ -682,7 +682,7 @@ receiveresponse( tr_http_t * http )
                               http->header.size + HTTP_BUFSIZE );
             if( NULL == newbuf )
             {
-                return TR_ERROR;
+                return TR_NET_ERROR;
             }
             http->header.buf = newbuf;
             http->header.size += HTTP_BUFSIZE;
@@ -694,7 +694,7 @@ receiveresponse( tr_http_t * http )
         if( ret & TR_NET_CLOSE )
         {
             checklength( http );
-            return TR_OK;
+            return TR_NET_OK;
         }
         else if( ret & TR_NET_BLOCK )
         {
@@ -708,15 +708,15 @@ receiveresponse( tr_http_t * http )
 
     if( before < http->header.used && checklength( http ) )
     {
-        return TR_OK;
+        return TR_NET_OK;
     }
 
     if( tr_date() > HTTP_TIMEOUT + http->date )
     {
-        return TR_ERROR;
+        return TR_NET_ERROR;
     }
 
-    return TR_WAIT;
+    return TR_NET_WAIT;
 }
 
 static int

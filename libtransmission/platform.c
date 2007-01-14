@@ -232,6 +232,56 @@ void tr_lockClose( tr_lock_t * l )
 #endif
 }
 
+
+void tr_condInit( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    *c = -1;
+#else
+    pthread_cond_init( c, NULL );
+#endif
+}
+
+void tr_condWait( tr_cond_t * c, tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    *c = find_thread( NULL );
+    release_sem( *l );
+    suspend_thread( *c );
+    acquire_sem( *l );
+    *c = -1;
+#else
+    pthread_cond_wait( c, l );
+#endif
+}
+
+void tr_condSignal( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    while( *c != -1 )
+    {
+        thread_info info;
+        get_thread_info( *c, &info );
+        if( info.state == B_THREAD_SUSPENDED )
+        {
+            resume_thread( *c );
+            break;
+        }
+        snooze( 5000 );
+    }
+#else
+    pthread_cond_signal( c );
+#endif
+}
+
+void tr_condClose( tr_cond_t * c )
+{
+#ifndef SYS_BEOS
+    pthread_cond_destroy( c );
+#endif
+}
+
+
 #if defined( BSD )
 
 #include <sys/sysctl.h>

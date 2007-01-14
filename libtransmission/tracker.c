@@ -434,10 +434,10 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
     {
         switch( tr_httpPulse( tc->http, &data, &len ) )
         {
-            case TR_WAIT:
+            case TR_NET_WAIT:
                 break;
 
-            case TR_ERROR:
+            case TR_NET_ERROR:
                 killHttp( &tc->http, tor->fdlimit );
                 tc->dateTry = tr_date();
                 
@@ -453,7 +453,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
                 
                 break;
 
-            case TR_OK:
+            case TR_NET_OK:
                 readAnswer( tc, data, len );
                 killHttp( &tc->http, tor->fdlimit );
                 
@@ -504,15 +504,15 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
     {
         switch( tr_httpPulse( tc->httpScrape, &data, &len ) )
         {
-            case TR_WAIT:
+            case TR_NET_WAIT:
                 break;
 
-            case TR_ERROR:
+            case TR_NET_ERROR:
                 killHttp( &tc->httpScrape, tor->fdlimit );
                 tc->lastScrapeFailed = 1;
                 break;
 
-            case TR_OK:
+            case TR_NET_OK:
                 readScrapeAnswer( tc, data, len );
                 killHttp( &tc->httpScrape, tor->fdlimit );
                 break;
@@ -731,8 +731,8 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     if( ( bePeers = tr_bencDictFind( &beAll, "failure reason" ) ) )
     {
         tr_err( "Tracker: Error - %s", bePeers->val.s.s );
-        tor->error |= TR_ETRACKER;
-        snprintf( tor->trackerError, sizeof( tor->trackerError ),
+        tor->error = TR_ERROR_TC_ERROR;
+        snprintf( tor->errorString, sizeof( tor->errorString ),
                   "%s", bePeers->val.s.s );
         tc->lastError = 1;
         tc->allUnreachIfError = 0;
@@ -742,15 +742,15 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     else if( ( bePeers = tr_bencDictFind( &beAll, "warning message" ) ) )
     {
         tr_err( "Tracker: Warning - %s", bePeers->val.s.s );
-        snprintf( tor->trackerError, sizeof( tor->trackerError ),
+        tor->error = TR_ERROR_TC_WARNING;
+        snprintf( tor->errorString, sizeof( tor->errorString ),
                   "%s", bePeers->val.s.s );
     }
-    else
+    else if( tor->error & TR_ERROR_TC_MASK )
     {
-        tor->trackerError[0] = '\0';
+        tor->error = TR_OK;
     }
 
-    tor->error &= ~TR_ETRACKER;
     tc->lastError = 0;
     tc->allUnreachIfError = 0;
 
@@ -1128,13 +1128,13 @@ int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d )
     {
         switch( tr_httpPulse( http, &data, &len ) )
         {
-            case TR_WAIT:
+            case TR_NET_WAIT:
                 break;
 
-            case TR_ERROR:
+            case TR_NET_ERROR:
                 goto scrapeDone;
 
-            case TR_OK:
+            case TR_NET_OK:
                 readScrapeAnswer( tc, data, len );
                 goto scrapeDone;
         }

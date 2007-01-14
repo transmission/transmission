@@ -40,7 +40,7 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
     if( len != 1 )
     {
         peer_dbg( "GET  %schoke, invalid", choking ? "" : "un" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     peer_dbg( "GET  %schoke", choking ? "" : "un" );
@@ -58,7 +58,7 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
         peer->inRequestCount = 0;
     }
 
-    return 0;
+    return TR_OK;
 }
 
 /***********************************************************************
@@ -72,14 +72,14 @@ static inline int parseInterested( tr_peer_t * peer, int len,
     if( len != 1 )
     {
         peer_dbg( "GET  %sinterested, invalid", interested ? "" : "un" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     peer_dbg( "GET  %sinterested", interested ? "" : "un" );
 
     peer->peerInterested = interested;
 
-    return 0;
+    return TR_OK;
 }
 
 /***********************************************************************
@@ -95,7 +95,7 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
     if( len != 5 )
     {
         peer_dbg( "GET  have, invalid" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     TR_NTOHL( p, piece );
@@ -116,7 +116,7 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
 
     tr_rcTransferred( tor->swarmspeed, tor->info.pieceSize );
 
-    return 0;
+    return TR_OK;
 }
 
 static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
@@ -131,7 +131,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
     if( len != 1 + bitfieldSize )
     {
         peer_dbg( "GET  bitfield, wrong size" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     /* Make sure the spare bits are unset */
@@ -146,7 +146,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
         if( lastByte )
         {
             peer_dbg( "GET  bitfield, spare bits set" );
-            return 1;
+            return TR_ERROR_ASSERT;
         }
     }
 
@@ -170,7 +170,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
 
     updateInterest( tor, peer );
 
-    return 0;
+    return TR_OK;
 }
 
 static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
@@ -181,14 +181,14 @@ static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
     if( len != 13 )
     {
         peer_dbg( "GET  request, invalid" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     if( peer->amChoking )
     {
         /* Didn't he get it? */
         sendChoke( peer, 1 );
-        return 0;
+        return TR_OK;
     }
     
     TR_NTOHL( p,     index );
@@ -203,13 +203,13 @@ static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
     if( length > 16384 )
     {
         /* Sorry mate */
-        return 1;
+        return TR_ERROR;
     }
 
     if( peer->outRequestCount >= MAX_REQUEST_COUNT )
     {
         tr_err( "Too many requests" );
-        return 1;
+        return TR_ERROR;
     }
 
     r         = &peer->outRequests[peer->outRequestCount];
@@ -219,124 +219,122 @@ static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
 
     (peer->outRequestCount)++;
 
-    return 0;
+    return TR_OK;
+}
+
+static inline void updateRequests( tr_torrent_t * tor, tr_peer_t * peer,
+                                   int index, int begin )
+{
+    tr_request_t * r;
+    int i, j;
+
+    /* Find this block in the requests list */
+    for( i = 0; i < peer->inRequestCount; i++ )
+    {
+        r = &peer->inRequests[i];
+        if( index == r->index && begin == r->begin )
+        {
+            break;
+        }
+    }
+
+    /* Usually i should be 0, but some clients don't handle multiple
+       request well and drop previous requests */
+    if( i < peer->inRequestCount )
+    {
+        if( i > 0 )
+        {
+            peer_dbg( "not expecting this block yet (%d requests dropped)", i );
+        }
+        i++;
+        for( j = 0; j < i; j++ )
+        {
+            r = &peer->inRequests[j];
+            tr_cpDownloaderRem( tor->completion,
+                                tr_block( r->index, r->begin ) );
+        }
+        peer->inRequestCount -= i;
+        memmove( &peer->inRequests[0], &peer->inRequests[i],
+                 peer->inRequestCount * sizeof( tr_request_t ) );
+    }
+    else
+    {
+        /* Not in the list. Probably because of a cancel that arrived
+           too late */
+    }
 }
 
 static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
                               uint8_t * p, int len )
 {
-    int index, begin, block, i, j;
-    tr_request_t * r;
+    int index, begin, block, i, ret;
 
     TR_NTOHL( p,     index );
     TR_NTOHL( &p[4], begin );
+    block = tr_block( index, begin );
 
     peer_dbg( "GET  piece %d/%d (%d bytes)",
               index, begin, len - 9 );
 
-    if( peer->inRequestCount < 1 )
+    updateRequests( tor, peer, index, begin );
+    tor->downloadedCur += len;
+
+    /* Sanity checks */
+    if( len - 9 != tr_blockSize( block ) )
     {
-        /* Our "cancel" was probably late */
-        peer_dbg( "not expecting a block" );
-        return 0;
+        peer_dbg( "wrong size (expecting %d)", tr_blockSize( block ) );
+        return TR_ERROR_ASSERT;
     }
-    
-    r = &peer->inRequests[0];
-    if( index != r->index || begin != r->begin )
-    {
-        int suckyClient;
-
-        /* Either our "cancel" was late, or this is a sucky
-           client that cannot deal with multiple requests */
-        suckyClient = 0;
-        for( i = 0; i < peer->inRequestCount; i++ )
-        {
-            r = &peer->inRequests[i];
-
-            if( index != r->index || begin != r->begin )
-            {
-                continue;
-            }
-
-            /* Sucky client, he dropped the previous requests */
-            peer_dbg( "block was expected later" );
-            for( j = 0; j < i; j++ )
-            {
-                r = &peer->inRequests[j];
-                tr_cpDownloaderRem( tor->completion,
-                                    tr_block(r->index,r->begin) );
-            }
-            suckyClient = 1;
-            peer->inRequestCount -= i;
-            memmove( &peer->inRequests[0], &peer->inRequests[i],
-                     peer->inRequestCount * sizeof( tr_request_t ) );
-            r = &peer->inRequests[0];
-            break;
-        }
-
-        if( !suckyClient )
-        {
-            r = &peer->inRequests[0];
-            peer_dbg( "wrong block (expecting %d/%d)",
-                      r->index, r->begin );
-            return 0;
-        }
-    }
-
-    if( len - 9 != r->length )
-    {
-        peer_dbg( "wrong size (expecting %d)", r->length );
-        return 1;
-    }
-
-    tor->downloadedCur += r->length;
-
-    block = tr_block( r->index, r->begin );
     if( tr_cpBlockIsComplete( tor->completion, block ) )
     {
         peer_dbg( "have this block already" );
-        (peer->inRequestCount)--;
-        memmove( &peer->inRequests[0], &peer->inRequests[1],
-                 peer->inRequestCount * sizeof( tr_request_t ) );
-        return 0;
+        return TR_OK;
     }
 
-    /* set blame/credit for this piece */
+    /* Set blame/credit for this piece */
     if( !peer->blamefield )
     {
         peer->blamefield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
     }
     tr_bitfieldAdd( peer->blamefield, index );
 
+    /* Write to disk */
+    if( ( ret = tr_ioWrite( tor->io, index, begin, len - 9, &p[8] ) ) )
+    {
+        return ret;
+    }
     tr_cpBlockAdd( tor->completion, block );
-    tr_ioWrite( tor->io, index, begin, len - 9, &p[8] );
-    tr_cpDownloaderRem( tor->completion, block );
-
     sendCancel( tor, block );
 
-    if( tr_cpPieceIsComplete( tor->completion, index ) )
+    if( !tr_cpPieceHasAllBlocks( tor->completion, index ) )
     {
-        tr_peer_t * otherPeer;
-
-        for( i = 0; i < tor->peerCount; i++ )
-        {
-            otherPeer = tor->peers[i];
-
-            if( otherPeer->status < PEER_STATUS_CONNECTED )
-            {
-                continue;
-            }
-
-            sendHave( otherPeer, index );
-            updateInterest( tor, otherPeer );
-        }
+        return TR_OK;
     }
 
-    (peer->inRequestCount)--;
-    memmove( &peer->inRequests[0], &peer->inRequests[1],
-             peer->inRequestCount * sizeof( tr_request_t ) );
+    /* Piece is complete, check it */
+    if( ( ret = tr_ioHash( tor->io, index ) ) )
+    {
+        return ret;
+    }
+    if( !tr_cpPieceIsComplete( tor->completion, index ) )
+    {
+        return TR_OK;
+    }
 
-    return 0;
+    /* Hash OK */
+    for( i = 0; i < tor->peerCount; i++ )
+    {
+        tr_peer_t * otherPeer;
+        otherPeer = tor->peers[i];
+
+        if( otherPeer->status < PEER_STATUS_CONNECTED )
+            continue;
+
+        sendHave( otherPeer, index );
+        updateInterest( tor, otherPeer );
+    }
+
+    return TR_OK;
 }
 
 static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
@@ -348,7 +346,7 @@ static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
     if( len != 13 )
     {
         peer_dbg( "GET  cancel, invalid" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     TR_NTOHL( p,     index );
@@ -371,7 +369,7 @@ static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
         }
     }
 
-    return 0;
+    return TR_OK;
 }
 
 static inline int parsePort( tr_peer_t * peer, uint8_t * p, int len )
@@ -381,13 +379,13 @@ static inline int parsePort( tr_peer_t * peer, uint8_t * p, int len )
     if( len != 3 )
     {
         peer_dbg( "GET  port, invalid" );
-        return 1;
+        return TR_ERROR_ASSERT;
     }
 
     port = *( (in_port_t *) p );
     peer_dbg( "GET  port %d", ntohs( port ) );
 
-    return 0;
+    return TR_OK;
 }
 
 static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
@@ -423,7 +421,7 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
     }
 
     peer_dbg( "Unknown message '%d'", id );
-    return 1;
+    return TR_ERROR;
 }
 
 static inline int parseBufHeader( tr_peer_t * peer )
@@ -432,7 +430,7 @@ static inline int parseBufHeader( tr_peer_t * peer )
 
     if( 4 > peer->pos )
     {
-        return 0;
+        return TR_OK;
     }
 
     if( p[0] != 19 || memcmp( &p[1], "Bit", 3 ) )
@@ -441,19 +439,19 @@ static inline int parseBufHeader( tr_peer_t * peer )
            already */
         peer_dbg( "GET  handshake, invalid" );
         tr_netSend( peer->socket, (uint8_t *) "Nice try...\r\n", 13 );
-        return 1;
+        return TR_ERROR;
     }
     if( peer->pos < 68 )
     {
-        return 0;
+        return TR_OK;
     }
     if( memcmp( &p[4], "Torrent protocol", 16 ) )
     {
         peer_dbg( "GET  handshake, invalid" );
-        return 1;
+        return TR_ERROR;
     }
 
-    return 0;
+    return TR_OK;
 }
 
 static uint8_t * parseBufHash( tr_peer_t * peer )
@@ -476,12 +474,13 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
     int       len;
     uint8_t * p   = peer->buf;
     uint8_t * end = &p[peer->pos];
+    int       ret;
 
     if( peer->banned )
     {
         /* Don't even parse, we only stay connected */
         peer->pos = 0;
-        return 0;
+        return TR_OK;
     }
 
     while( peer->pos >= 4 )
@@ -490,9 +489,9 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
         {
             char * client;
 
-            if( parseBufHeader( peer ) )
+            if( ( ret = parseBufHeader( peer ) ) )
             {
-                return 1;
+                return ret;
             }
 
             if( peer->pos < 68 )
@@ -503,14 +502,14 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
             if( memcmp( &p[28], inf->hash, 20 ) )
             {
                 peer_dbg( "GET  handshake, wrong torrent hash" );
-                return 1;
+                return TR_ERROR;
             }
 
             if( !memcmp( &p[48], tor->id, 20 ) )
             {
                 /* We are connected to ourselves... */
                 peer_dbg( "GET  handshake, that is us" );
-                return 1;
+                return TR_ERROR;
             }
 
             peer->status  = PEER_STATUS_CONNECTED;
@@ -527,7 +526,7 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
                 if( !peerCmp( peer, tor->peers[i] ) )
                 {
                     peer_dbg( "GET  handshake, duplicate" );
-                    return 1;
+                    return TR_ERROR;
                 }
             }
 
@@ -548,7 +547,7 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
         {
             /* This should never happen. Drop that peer */
             peer_dbg( "message too large (%d bytes)", len );
-            return 1;
+            return TR_ERROR;
         }
 
         if( !len )
@@ -569,9 +568,9 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
         /* Remaining data after this message */
         peer->pos -= 4 + len;
 
-        if( parseMessage( tor, peer, p, len ) )
+        if( ( ret = parseMessage( tor, peer, p, len ) ) )
         {
-            return 1;
+            return ret;
         }
 
         p += len;
@@ -579,5 +578,5 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
 
     memmove( peer->buf, p, peer->pos );
 
-    return 0;
+    return TR_OK;
 }

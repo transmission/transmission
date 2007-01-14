@@ -379,6 +379,7 @@ void tr_torrentStart( tr_torrent_t * tor )
     tor->uploadedCur     = 0;
 
     tor->status  = TR_STATUS_CHECK;
+    tor->error   = TR_OK;
     tor->tracker = tr_trackerInit( tor );
 
     tor->date = tr_date();
@@ -386,15 +387,20 @@ void tr_torrentStart( tr_torrent_t * tor )
     tr_threadCreate( &tor->thread, downloadLoop, tor );
 }
 
-void tr_torrentStop( tr_torrent_t * tor )
+static void torrentStop( tr_torrent_t * tor )
 {
-    tr_lockLock( &tor->lock );
     tr_trackerStopped( tor->tracker );
     tr_rcReset( tor->download );
     tr_rcReset( tor->upload );
     tr_rcReset( tor->swarmspeed );
     tor->status = TR_STATUS_STOPPING;
     tor->stopDate = tr_date();
+}
+
+void tr_torrentStop( tr_torrent_t * tor )
+{
+    tr_lockLock( &tor->lock );
+    torrentStop( tor );
     tr_lockUnlock( &tor->lock );
 }
 
@@ -484,8 +490,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
     s->status = tor->status;
     s->error  = tor->error;
-    memcpy( s->trackerError, tor->trackerError,
-            sizeof( s->trackerError ) );
+    memcpy( s->errorString, tor->errorString,
+            sizeof( s->errorString ) );
 
     tc = tor->tracker;
     s->cannotConnect = tr_trackerCannotConnect( tc );
@@ -755,6 +761,7 @@ static void downloadLoop( void * _tor )
 {
     tr_torrent_t * tor = _tor;
     uint64_t       date1, date2;
+    int            ret;
 
     tr_dbg( "Thread started" );
 
@@ -783,15 +790,18 @@ static void downloadLoop( void * _tor )
             tor->status = TR_STATUS_SEED;
 			tor->finished = 1;
             tr_trackerCompleted( tor->tracker );
-            tr_ioSaveResume( tor->io );
-#ifndef __AMIGAOS4__ 
-            sync(); /* KLUDGE: all files should be closed and
-                       re-opened in read-only mode instead */
-#endif
+            tr_ioSync( tor->io );
         }
 
         /* Receive/send messages */
-        tr_peerPulse( tor );
+        if( ( ret = tr_peerPulse( tor ) ) )
+        {
+            tr_err( "Fatal error, stopping download (%d)", ret );
+            torrentStop( tor );
+            tor->error = ret;
+            snprintf( tor->errorString, sizeof( tor->errorString ),
+                      "%s", tr_errorString( ret ) );
+        }
 
         /* Try to get new peers or to send a message to the tracker */
         tr_trackerPulse( tor->tracker );

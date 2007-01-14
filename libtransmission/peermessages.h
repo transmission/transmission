@@ -254,15 +254,7 @@ static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
     r->index  = block / ( inf->pieceSize / tor->blockSize );
     r->begin  = ( block % ( inf->pieceSize / tor->blockSize ) ) *
                     tor->blockSize;
-    r->length = tor->blockSize;
-    if( block == tor->blockCount - 1 )
-    {
-        int lastSize = inf->totalSize % tor->blockSize;
-        if( lastSize )
-        {
-            r->length = lastSize;
-        }
-    }
+    r->length = tr_blockSize( block );
     (peer->inRequestCount)++;
 
     /* Build the "ask" message */

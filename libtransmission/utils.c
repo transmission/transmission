@@ -334,3 +334,25 @@ tr_dupstr( const char * base, int len )
 
     return ret;
 }
+
+char *
+tr_errorString( int code )
+{
+    switch( code )
+    {
+        case TR_OK:
+            return "No error";
+        case TR_ERROR:
+            return "Generic error";
+        case TR_ERROR_ASSERT:
+            return "Assert error";
+        case TR_ERROR_IO_PARENT:
+            return "Download folder does not exist";
+        case TR_ERROR_IO_PERMISSIONS:
+            return "Unsufficient permissions";
+        case TR_ERROR_IO_OTHER:
+            return "Generic I/O error";
+    }
+    return "Unknown error";
+}
+

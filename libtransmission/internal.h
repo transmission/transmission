@@ -119,7 +119,7 @@ static inline void tr_htonl( uint32_t a, uint8_t * p )
 
 typedef struct tr_completion_s tr_completion_t;
 
-typedef enum { TR_OK, TR_ERROR, TR_WAIT } tr_tristate_t;
+typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
 #include "platform.h"
 #include "bencode.h"
@@ -150,7 +150,7 @@ struct tr_torrent_s
 
     int               status;
     int               error;
-    char              trackerError[128];
+    char              errorString[128];
     int               finished;
 
     char            * id;

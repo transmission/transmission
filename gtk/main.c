@@ -426,7 +426,7 @@ enum {
 GtkWidget *
 makewind_list(struct cbdata *data, GObject **sizehack) {
   GType types[] = {
-    /* info->name, info->totalSize, status,     error,      trackerError, */
+    /* info->name, info->totalSize, status,     error,      errorString, */
     G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING,
     /* progress,  rateDownload, rateUpload,   eta,        peersTotal, */
     G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_INT, G_TYPE_INT,
@@ -730,7 +730,7 @@ dfname(GtkTreeViewColumn *col SHUTUP, GtkCellRenderer *rend,
     g_assert_not_reached();
   }
 
-  if(TR_NOERROR != err) {
+  if(TR_OK != err) {
     gtk_tree_model_get(model, iter, MC_TERR, &terr, -1);
     bottom = g_strconcat(_("Error: "), terr, NULL);
     g_free(terr);
@@ -807,7 +807,7 @@ updatemodel(gpointer gdata) {
       /* XXX find out if setting the same data emits changed signal */
       gtk_list_store_set(GTK_LIST_STORE(data->model), &iter, MC_NAME, in->name,
         MC_SIZE, in->totalSize, MC_STAT, st->status, MC_ERR, st->error,
-        MC_TERR, st->trackerError, MC_PROG, st->progress,
+        MC_TERR, st->errorString, MC_PROG, st->progress,
         MC_DRATE, st->rateDownload, MC_URATE, st->rateUpload, MC_ETA, st->eta,
         MC_PEERS, st->peersTotal, MC_UPEERS, st->peersUploading,
         MC_DPEERS, st->peersDownloading, MC_DOWN, st->downloaded,

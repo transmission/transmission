@@ -30,9 +30,33 @@ typedef struct tr_io_s tr_io_t;
 void      tr_ioLoadResume  ( tr_torrent_t * );
 
 tr_io_t * tr_ioInit        ( tr_torrent_t * );
-int       tr_ioRead        ( tr_io_t *, int, int, int, uint8_t * );
-int       tr_ioWrite       ( tr_io_t *, int, int, int, uint8_t * );
+
+/***********************************************************************
+ * tr_ioRead, tr_ioWrite
+ ***********************************************************************
+ * Reads or writes the block specified by the piece index, the offset in
+ * that piece and the size of the block. Returns 0 if successful, 
+ * TR_ERROR_ASSERT if the parameters are incorrect, one of the
+ * TR_ERROR_IO_* otherwise.
+ **********************************************************************/
+int tr_ioRead  ( tr_io_t *, int index, int begin, int len, uint8_t * );
+int tr_ioWrite ( tr_io_t *, int index, int begin, int len, uint8_t * );
+
+/***********************************************************************
+ * tr_ioHash
+ ***********************************************************************
+ * Hashes the specified piece and updates the completion accordingly.
+ **********************************************************************/
+int tr_ioHash ( tr_io_t *, int piece );
+
+/***********************************************************************
+ * tr_ioSync
+ ***********************************************************************
+ * Flush all data on disc by closing all files, and update the cache
+ * file.
+ **********************************************************************/
+void tr_ioSync( tr_io_t * );
+
 void      tr_ioClose       ( tr_io_t * );
-void      tr_ioSaveResume  ( tr_io_t * );
 
 #endif

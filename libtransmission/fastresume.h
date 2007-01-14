@@ -87,11 +87,9 @@ static int fastResumeMTimes( tr_io_t * io, int * tab )
         asprintf( &path, "%s/%s", tor->destination, inf->files[i].name );
         if( stat( path, &sb ) )
         {
-            tr_err( "Could not stat '%s'", path );
-            free( path );
-            return 1;
+            tab[i] = 0xFFFFFFFF;
         }
-        if( ( sb.st_mode & S_IFMT ) == S_IFREG )
+        else if( !S_ISREG( sb.st_mode ) )
         {
 #ifdef SYS_DARWIN
             tab[i] = ( sb.st_mtimespec.tv_sec & 0x7FFFFFFF );

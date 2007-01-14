@@ -45,9 +45,11 @@ static inline int tr_cpIsSeeding( tr_completion_t * cp )
 uint64_t          tr_cpLeftBytes( tr_completion_t * );
 
 /* Pieces */
+int               tr_cpPieceHasAllBlocks( tr_completion_t *, int piece );
 int               tr_cpPieceIsComplete( tr_completion_t *, int piece );
 uint8_t         * tr_cpPieceBitfield( tr_completion_t * );
 void              tr_cpPieceAdd( tr_completion_t *, int piece );
+void              tr_cpPieceRem( tr_completion_t *, int piece );
 
 /* Blocks */
 void              tr_cpDownloaderAdd( tr_completion_t *, int block );

@@ -289,7 +289,7 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         if( ret & TR_NET_CLOSE )
         {
             peer_dbg( "connection closed" );
-            return 1;
+            return TR_ERROR;
         }
         else if( ret & TR_NET_BLOCK )
         {
@@ -301,16 +301,16 @@ int tr_peerRead( tr_torrent_t * tor, tr_peer_t * peer )
         {
             tr_rcTransferred( peer->download, ret );
             tr_rcTransferred( tor->download, ret );
-            if( parseBuf( tor, peer ) )
+            if( ( ret = parseBuf( tor, peer ) ) )
             {
-                return 1;
+                return ret;
             }
         }
         else
         {
-            if( parseBufHeader( peer ) )
+            if( ( ret = parseBufHeader( peer ) ) )
             {
-                return 1;
+                return ret;
             }
         }
     }
@@ -358,7 +358,7 @@ uint8_t * tr_peerHash( tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-void tr_peerPulse( tr_torrent_t * tor )
+int tr_peerPulse( tr_torrent_t * tor )
 {
     int i, ret, size;
     uint8_t * p;
@@ -381,7 +381,7 @@ void tr_peerPulse( tr_torrent_t * tor )
 
     if( tor->status & TR_STATUS_STOPPING )
     {
-        return;
+        return 0;
     }
     
     /* Shuffle peers */
@@ -404,10 +404,11 @@ void tr_peerPulse( tr_torrent_t * tor )
             continue;
         }
 
-        if( tr_peerRead( tor, tor->peers[i] ) )
-        {
+        ret = tr_peerRead( tor, tor->peers[i] );
+        if( ret & TR_ERROR_IO_MASK )
+            return ret;
+        if( ret )
             goto dropPeer;
-        }
 
         if( peer->status < PEER_STATUS_CONNECTED )
         {
@@ -497,6 +498,7 @@ writeEnd:
 dropPeer:
         tr_peerRem( tor, i );
     }
+    return 0;
 }
 
 /***********************************************************************

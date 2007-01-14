@@ -453,11 +453,11 @@ watchSSDP( tr_upnp_device_t ** devices, int fd )
         len = sizeof( buf );
         switch( recvSSDP( fd, buf, &len ) )
         {
-            case TR_WAIT:
+            case TR_NET_WAIT:
                 return ret;
-            case TR_ERROR:
+            case TR_NET_ERROR:
                 return 1;
-            case TR_OK:
+            case TR_NET_OK:
                 ret = 1;
                 if( parseSSDP( buf, len, hdr ) &&
                     NULL != hdr[OFF_LOC].data &&
@@ -475,22 +475,22 @@ recvSSDP( int fd, char * buf, int * len )
 {
     if( 0 > fd )
     {
-        return TR_ERROR;
+        return TR_NET_ERROR;
     }
 
     *len = tr_netRecv( fd, ( uint8_t * ) buf, *len );
     if( TR_NET_BLOCK & *len )
     {
-        return TR_WAIT;
+        return TR_NET_WAIT;
     }
     else if( TR_NET_CLOSE & *len )
     {
         tr_err( "Could not receive SSDP message (%s)", strerror( errno ) );
-        return TR_ERROR;
+        return TR_NET_ERROR;
     }
     else
     {
-        return TR_OK;
+        return TR_NET_OK;
     }
 }
 
@@ -955,7 +955,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
 
     switch( tr_httpPulse( dev->http, &headers, &hlen ) )
     {
-        case TR_OK:
+        case TR_NET_OK:
             code = tr_httpResponseCode( headers, hlen );
             if( SOAP_METHOD_NOT_ALLOWED == code && !dev->soapretry )
             {
@@ -967,7 +967,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
             *body = tr_httpParse( headers, hlen, NULL );
             *len = ( NULL == body ? 0 : hlen - ( *body - headers ) );
             return code;
-        case TR_ERROR:
+        case TR_NET_ERROR:
             killHttp( fdlimit, &dev->http );
             if( dev->soapretry )
             {
@@ -981,7 +981,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
                 dev->soapretry = 1;
             }
             break;
-        case TR_WAIT:
+        case TR_NET_WAIT:
             break;
     }
 

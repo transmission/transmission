@@ -99,7 +99,7 @@ tr_resolve_t * tr_netResolveInit( const char * address )
     tr_resolve_t * r;
 
     r           = malloc( sizeof( tr_resolve_t ) );
-    r->status   = TR_WAIT;
+    r->status   = TR_NET_WAIT;
     r->address  = strdup( address );
     r->refcount = 2;
     r->next     = NULL;
@@ -131,7 +131,7 @@ tr_tristate_t tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
 
     tr_lockLock( &resolveLock );
     ret = r->status;
-    if( ret == TR_OK )
+    if( ret == TR_NET_OK )
     {
         *addr = r->addr;
     }
@@ -201,11 +201,11 @@ static void resolveFunc( void * arg UNUSED )
         if( host )
         {
             memcpy( &r->addr, host->h_addr, host->h_length );
-            r->status = TR_OK;
+            r->status = TR_NET_OK;
         }
         else
         {
-            r->status = TR_ERROR;
+            r->status = TR_NET_ERROR;
         }
         
         resolveQueue = r->next;

@@ -377,7 +377,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
     }
     
-    if (fStat->error & TR_ETRACKER)
+    if (fStat->error)
     {
         [fStatusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
                                     [self errorMessage]]];
@@ -927,12 +927,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) isError
 {
-    return fStat->error & TR_ETRACKER;
+    return fStat->error;
 }
 
 - (NSString *) errorMessage
 {
-    [NSString stringWithUTF8String: fStat->trackerError];
+    [NSString stringWithUTF8String: fStat->errorString];
 }
 
 - (BOOL) justFinished
