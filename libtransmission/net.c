@@ -44,6 +44,7 @@ int tr_netResolve( const char * address, struct in_addr * addr )
 /* TODO: Make this code reentrant */
 static tr_thread_t  resolveThread;
 static tr_lock_t    resolveLock;
+static tr_cond_t    resolveCond;
 static volatile int resolveDie;
 static tr_resolve_t * resolveQueue;
 
@@ -71,6 +72,7 @@ void tr_netResolveThreadInit()
     resolveDie   = 0;
     resolveQueue = NULL;
     tr_lockInit( &resolveLock );
+    tr_condInit( &resolveCond );
     tr_threadCreate( &resolveThread, resolveFunc, NULL );
 }
 
@@ -86,6 +88,7 @@ void tr_netResolveThreadClose()
     tr_lockLock( &resolveLock );
     resolveDie = 1;
     tr_lockUnlock( &resolveLock );
+    tr_condSignal( &resolveCond );
     tr_wait( 200 );
 }
 
@@ -116,6 +119,7 @@ tr_resolve_t * tr_netResolveInit( const char * address )
         iter->next = r;
     }
     tr_lockUnlock( &resolveLock );
+    tr_condSignal( &resolveCond );
 
     return r;
 }
@@ -186,10 +190,7 @@ static void resolveFunc( void * arg UNUSED )
     {
         if( !( r = resolveQueue ) )
         {
-            /* TODO: Use a condition wait */
-            tr_lockUnlock( &resolveLock );
-            tr_wait( 50 );
-            tr_lockLock( &resolveLock );
+            tr_condWait( &resolveCond, &resolveLock );
             continue;
         }
 
