@@ -276,7 +276,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
 
     [fProgressString setString: @""];
-    if ([![self allDownloaded])
+    if (![self allDownloaded])
         [fProgressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
