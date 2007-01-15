@@ -154,11 +154,6 @@ int tr_ioHash( tr_io_t * io, int index )
     int            ret;
     int            i;
 
-    if( !tr_cpPieceIsComplete( tor->completion, index ) )
-    {
-        return TR_ERROR_ASSERT;
-    }
-
     pieceSize = tr_pieceSize( index );
     pieceBuf  = malloc( pieceSize );
     if( ( ret = readBytes( io, (uint64_t) io->pieceSlot[index] *
