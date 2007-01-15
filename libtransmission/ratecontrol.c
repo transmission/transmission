@@ -97,9 +97,9 @@ int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
     float rate = 0;
     int limit = isUpload ? h->uploadLimit : h->downloadLimit;
     
-    if( limit < 0 )
+    if( limit <= 0 )
     {
-        return 1;
+        return limit < 0;
     }
     
     for( tor = h->torrentList; tor; tor = tor->next )
@@ -135,7 +135,7 @@ int tr_rcCanTransfer( tr_ratecontrol_t * r )
     int ret;
 
     tr_lockLock( &r->lock );
-    ret = ( r->limit < 0 ) || ( rateForInterval( r, 1000 ) < r->limit );
+    ret = ( r->limit <= 0 ) ? ( r->limit < 0 ) : ( rateForInterval( r, 1000 ) < r->limit );
     tr_lockUnlock( &r->lock );
 
     return ret;
