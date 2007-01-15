@@ -580,14 +580,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
         
-        [panel setPrompt: @"Select"];
+        [panel setPrompt: NSLocalizedString(@"Select", "Default incomplete folder cannot be found alert -> prompt")];
         [panel setAllowsMultipleSelection: NO];
         [panel setCanChooseFiles: NO];
         [panel setCanChooseDirectories: YES];
         [panel setCanCreateDirectories: YES];
 
-        [panel setMessage: NSLocalizedString(@"The incomplete download folder cannot be found."
-                                        " Choose a new incomplete folder or cancel to not use an incomplete folder.",
+        [panel setMessage: NSLocalizedString(@"The incomplete folder cannot be found."
+                                        " Choose a new location or cancel for none.",
                                         "Default incomplete folder cannot be found alert -> message")];
         
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -604,15 +604,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
         
-        [panel setPrompt: @"Select"];
+        [panel setPrompt: NSLocalizedString(@"Select", "Default folder cannot be found alert -> prompt")];
         [panel setAllowsMultipleSelection: NO];
         [panel setCanChooseFiles: NO];
         [panel setCanChooseDirectories: YES];
         [panel setCanCreateDirectories: YES];
 
-        [panel setMessage: NSLocalizedString(@"The download folder cannot be found."
-                                        " Choose a new download folder to start the transfer.",
-                                        "Default incomplete folder cannot be found alert -> message")];
+        [panel setMessage: NSLocalizedString(@"The download folder cannot be found. Choose a new location.",
+                                        "Default folder cannot be found alert -> message")];
         
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         filenames, @"Filenames",
