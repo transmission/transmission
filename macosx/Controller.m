@@ -575,6 +575,55 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
+    if ([fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
+        && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
+    {
+        NSOpenPanel * panel = [NSOpenPanel openPanel];
+        
+        [panel setPrompt: @"Select"];
+        [panel setAllowsMultipleSelection: NO];
+        [panel setCanChooseFiles: NO];
+        [panel setCanChooseDirectories: YES];
+        [panel setCanCreateDirectories: YES];
+
+        [panel setMessage: NSLocalizedString(@"The incomplete download folder cannot be found."
+                                        " Choose a new incomplete folder or cancel to not use an incomplete folder.",
+                                        "Default incomplete folder cannot be found alert -> message")];
+        
+        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        filenames, @"Filenames",
+                                        [NSNumber numberWithBool: ignore], @"Ignore",
+                                        [NSNumber numberWithBool: delete], @"Delete", nil];
+        
+        [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
+                didEndSelector: @selector(incompleteChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
+        return;
+    }
+    if ([downloadChoice isEqualToString: @"Constant"]
+        && access([[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
+    {
+        NSOpenPanel * panel = [NSOpenPanel openPanel];
+        
+        [panel setPrompt: @"Select"];
+        [panel setAllowsMultipleSelection: NO];
+        [panel setCanChooseFiles: NO];
+        [panel setCanChooseDirectories: YES];
+        [panel setCanCreateDirectories: YES];
+
+        [panel setMessage: NSLocalizedString(@"The download folder cannot be found."
+                                        " Choose a new download folder to start the transfer.",
+                                        "Default incomplete folder cannot be found alert -> message")];
+        
+        NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        filenames, @"Filenames",
+                                        [NSNumber numberWithBool: ignore], @"Ignore",
+                                        [NSNumber numberWithBool: delete], @"Delete", nil];
+        
+        [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
+                didEndSelector: @selector(downloadChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
+        return;
+    }
+    
     Torrent * torrent;
     NSString * torrentPath;
     NSEnumerator * enumerator = [filenames objectEnumerator];
@@ -598,6 +647,36 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 
     [self updateTorrentsInQueue];
+}
+
+- (void) incompleteChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
+{
+    if (code == NSOKButton)
+        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"IncompleteDownloadFolder"];
+    else
+        [fDefaults setBool: NO forKey: @"UseIncompleteDownloadFolder"];
+    
+    [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
+}
+
+- (void) downloadChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
+{
+    if (code == NSOKButton)
+    {
+        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"DownloadFolder"];
+        [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
+    }
+    else
+        [dictionary release];
+}
+
+- (void) openFilesWithDict: (NSDictionary *) dictionary
+{
+    [self openFiles: [dictionary objectForKey: @"Filenames"]
+        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue]
+        forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue]];
+    
+    [dictionary release];
 }
 
 //called by the main open method to show sheet for choosing download location

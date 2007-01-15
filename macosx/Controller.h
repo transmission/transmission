@@ -100,6 +100,7 @@
 
 - (void) openFiles:             (NSArray *) filenames;
 - (void) openFiles:             (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore forceDeleteTorrent: (BOOL) delete;
+- (void) openFilesWithDict:     (NSDictionary *) dictionary;
 - (void) openFilesAsk:          (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete;
 - (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;

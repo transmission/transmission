@@ -700,6 +700,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [panel setAllowsMultipleSelection: NO];
             [panel setCanChooseFiles: NO];
             [panel setCanChooseDirectories: YES];
+            [panel setCanCreateDirectories: YES];
 
             [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                                 "Open torrent -> select destination folder"), [self name]]];
@@ -719,27 +720,27 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) destinationChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) context
 {
+    if (code != NSOKButton)
+        return;
+    
     NSString * folder = [[openPanel filenames] objectAtIndex: 0];
-    if (code == NSOKButton)
+    if (fUseIncompleteFolder)
     {
-        if (fUseIncompleteFolder)
-        {
-            [fIncompleteFolder release];
-            fIncompleteFolder = [folder retain];
-            [self setDownloadFolder: nil];
-        }
-        else
-        {
-            [fDownloadFolder release];
-            fDownloadFolder = folder;
-            [self setDownloadFolder: fDownloadFolder];
-        }
-        
-        [self startTransfer];
-        [self update];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
+        [fIncompleteFolder release];
+        fIncompleteFolder = [folder retain];
+        [self setDownloadFolder: nil];
     }
+    else
+    {
+        [fDownloadFolder release];
+        fDownloadFolder = folder;
+        [self setDownloadFolder: fDownloadFolder];
+    }
+    
+    [self startTransfer];
+    [self update];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
 }
 
 - (BOOL) alertForMoveFolderAvailable
