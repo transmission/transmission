@@ -116,10 +116,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             {
                 NSString * incompleteFolder;
                 if (incompleteFolder = [history objectForKey: @"IncompleteFolder"])
-                    fIncompleteFolder = [incompleteFolder copy];
+                    fIncompleteFolder = [incompleteFolder retain];
                 else
                     fIncompleteFolder = [[[fDefaults stringForKey: @"IncompleteDownloadFolder"]
-                                            stringByExpandingTildeInPath] copy];
+                                            stringByExpandingTildeInPath] retain];
             }
         }
         else
@@ -276,7 +276,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
 
     [fProgressString setString: @""];
-    if ([self progress] < 1.0)
+    if ([![self allDownloaded])
         [fProgressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
@@ -292,7 +292,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_PAUSE:
             if (fWaitToStart)
             {
-                tempString = [self progress] < 1.0
+                tempString = ![self allDownloaded]
                         ? [NSLocalizedString(@"Waiting to download", "Torrent -> status string") stringByAppendingEllipsis]
                         : [NSLocalizedString(@"Waiting to seed", "Torrent -> status string") stringByAppendingEllipsis];
             }
@@ -393,7 +393,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([self isActive] && fStat->status != TR_STATUS_CHECK )
     {
         NSString * stringToAppend = @"";
-        if ([self progress] < 1.0)
+        if (![self allDownloaded])
         {
             stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
                                 [NSString stringForSpeed: [self downloadRate]]];
@@ -504,6 +504,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSDate *) announceDate
 {
     return fAnnounceDate;
+}
+
+- (BOOL) allDownloaded
+{
+    return [self progress] >= 1.0;
 }
 
 - (float) ratio
@@ -638,7 +643,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) alertForRemainingDiskSpace
 {
-    if ([self progress] >= 1.0)
+    if ([self allDownloaded])
         return YES;
     
     NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
@@ -1094,7 +1099,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     //if finished downloading sort by ratio instead of progress
     float progress = [self progress];
-    return [NSNumber numberWithFloat: progress < 1.0 ? progress : 100.0 + [self ratio]];
+    return [NSNumber numberWithFloat: ![self allDownloaded] ? progress : 100.0 + [self ratio]];
 }
 
 @end

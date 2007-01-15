@@ -82,6 +82,8 @@
 - (void)        announce;
 - (NSDate *)    announceDate;
 
+- (BOOL)        allDownloaded;
+
 - (float)       ratio;
 - (BOOL)        customRatioSetting;
 - (void)        setCustomRatioSetting: (BOOL) setting;

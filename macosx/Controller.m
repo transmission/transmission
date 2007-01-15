@@ -1147,10 +1147,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         while ((torrent = [enumerator nextObject]))
             if ([torrent isActive] && ![torrent isError])
             {
-                if ([torrent progress] < 1.0)
-                    desiredDownloadActive--;
-                else
+                if ([torrent allDownloaded])
                     desiredSeedActive--;
+                else
+                    desiredDownloadActive--;
                 
                 if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
                     break;
@@ -1176,7 +1176,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         if (![torrent isActive] && [torrent waitingToStart])
         {
-            if ([torrent progress] < 1.0)
+            if (![torrent allDownloaded])
             {
                 if (!download || desiredDownloadActive > 0)
                 {
@@ -1431,7 +1431,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive] && [torrent progress] >= 1.0)
+            if ([torrent isActive] && [torrent allDownloaded])
                 [tempTorrents addObject: torrent];
     }
     else if ([fFilterType isEqualToString: @"Download"])
@@ -1439,7 +1439,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive] && [torrent progress] < 1.0)
+            if ([torrent isActive] && ![torrent allDownloaded])
                 [tempTorrents addObject: torrent];
     }
     else
@@ -2489,10 +2489,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         if ([torrent isActive])
         {
-            if ([torrent progress] < 1.0)
-                downloading++;
-            else
+            if ([torrent allDownloaded])
                 seeding++;
+            else
+                downloading++;
         }
     
     NSMenu * menu;
