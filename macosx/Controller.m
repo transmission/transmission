@@ -1304,17 +1304,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"stateSortKey" ascending: NO] autorelease],
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: NO] autorelease];
+                                            @"progressSortKey" ascending: NO] autorelease],
+                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"ratioSortKey" ascending: NO] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor,
+        descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
     }
     else if ([fSortType isEqualToString: @"Progress"])
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: YES] autorelease];
+                                            @"progressSortKey" ascending: YES] autorelease],
+                        * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"ratioSortKey" ascending: YES] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, nameDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioDescriptor,
+                                                            nameDescriptor, orderDescriptor, nil];
     }
     else if ([fSortType isEqualToString: @"Date"])
     {

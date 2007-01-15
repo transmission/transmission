@@ -1097,9 +1097,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) progressSortKey
 {
-    //if finished downloading sort by ratio instead of progress
-    float progress = [self progress];
-    return [NSNumber numberWithFloat: ![self allDownloaded] ? progress : 100.0 + [self ratio]];
+    return [NSNumber numberWithFloat: [self progress]];
+}
+
+- (NSNumber *) ratioSortKey
+{
+    float ratio = [self ratio];
+    if (ratio == TR_RATIO_INF)
+        return [NSNumber numberWithInt: 999999999]; //this should hopefully be big enough
+    else
+        return [NSNumber numberWithFloat: [self ratio]];
 }
 
 @end

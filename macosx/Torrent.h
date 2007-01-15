@@ -184,5 +184,6 @@
 - (NSDate *) date;
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
+- (NSNumber *) ratioSortKey;
 
 @end
