@@ -696,14 +696,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             NSOpenPanel * panel = [NSOpenPanel openPanel];
             
-            [panel setPrompt: @"Select"];
+            [panel setPrompt: NSLocalizedString(@"Select", "Folder cannot be found alert -> prompt")];
             [panel setAllowsMultipleSelection: NO];
             [panel setCanChooseFiles: NO];
             [panel setCanChooseDirectories: YES];
             [panel setCanCreateDirectories: YES];
 
             [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                                "Open torrent -> select destination folder"), [self name]]];
+                                "Folder cannot be found alert -> select destination folder"), [self name]]];
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"MakeWindowKey" object: nil];
             [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [NSApp keyWindow] modalDelegate: self
