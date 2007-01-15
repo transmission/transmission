@@ -354,7 +354,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
                                      &address, &port, &announce ) )
             {
                 tr_err( "Tracker: redirected URL: %s:%d", address, port );
-                tc->http = tr_httpClient( TR_HTTP_GET, address, port, announce );
+                tc->http = tr_httpClient( TR_HTTP_GET, address, port, "%s", announce );
                 
                 free( address );
                 free( announce );
@@ -484,7 +484,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
                                      &address, &port, &announce ) )
             {
                 tr_err( "Scrape: redirected URL: %s:%d", address, port );
-                tc->httpScrape = tr_httpClient( TR_HTTP_GET, address, port, announce );
+                tc->httpScrape = tr_httpClient( TR_HTTP_GET, address, port, "%s", announce );
                 
                 free( address );
                 free( announce );
