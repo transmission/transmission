@@ -706,7 +706,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
-    [panel setPrompt: @"Select"];
+    [panel setPrompt: NSLocalizedString(@"Select", "Open torrent -> prompt")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
