@@ -126,6 +126,12 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "AX", 2 ) )
+        {
+            asprintf( &ret, "BitPump %d.%c%c",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+        }
         else if( !memcmp( &id[1], "AR", 2 ) )
         {
             asprintf( &ret, "Arctic Torrent" );
