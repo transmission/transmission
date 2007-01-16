@@ -72,17 +72,10 @@
         fProgressEndGreen = [NSImage imageNamed: @"ProgressBarEndGreen.png"];
         fProgressEndAdvanced = [NSImage imageNamed: @"ProgressBarEndAdvanced.png"];
         
-        fErrorImage = [[NSImage imageNamed: @"Error.tiff"] copy];
+        fErrorImage = [[NSImage imageNamed: @"Error.tiff"] copy]; //no need to release for some reason
         [fErrorImage setFlipped: YES];
     }
     return self;
-}
-
-- (void) dealloc
-{
-    #warning should work?
-    //[fErrorImage release];
-    [super dealloc];
 }
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point

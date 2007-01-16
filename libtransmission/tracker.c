@@ -235,8 +235,7 @@ static int shouldConnect( tr_tracker_t * tc )
             }
         }
         /* The tracker rejected us (like 4XX code, unauthorized IP...),
-            don't hammer it - we'll probably get the same answer next time
-            anyway */
+            don't hammer it - we'll probably get the same answer next time anyway */
         else
         {
             if( now < tc->dateTry + 1000 * tc->interval + tc->randOffset )
