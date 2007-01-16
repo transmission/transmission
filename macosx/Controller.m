@@ -1000,7 +1000,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
 
-    NSNumber * lowestOrderValue = [NSNumber numberWithInt: [torrents count]], * currentOrderValue;
+    NSNumber * lowestOrderValue = nil, * currentOrderValue;
 
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -1014,7 +1014,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         //determine lowest order value
         currentOrderValue = [torrent orderValue];
-        if ([lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
+        if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
         
         [fTorrents removeObject: torrent];
