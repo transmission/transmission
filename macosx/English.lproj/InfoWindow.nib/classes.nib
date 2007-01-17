@@ -1,12 +1,7 @@
 {
     IBClasses = (
         {CLASS = DisableTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            CLASS = FileTableView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {fContextMenu = NSMenu; }; 
-            SUPERCLASS = NSTableView; 
-        }, 
+        {CLASS = FileOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {

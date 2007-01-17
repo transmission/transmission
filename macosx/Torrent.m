@@ -1070,6 +1070,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int count = [self fileCount], i;
     tr_file_t * file;
     NSMutableArray * files = [NSMutableArray array], * pathComponents;
+    NSString * path;
     
     for (i = 0; i < count; i++)
     {
@@ -1077,9 +1078,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
         if (fInfo->multifile)
+        {
+            path = [pathComponents objectAtIndex: 0];
             [pathComponents removeObjectAtIndex: 0];
+        }
+        else
+            path = @"";
         
-        [self insertPath: pathComponents withParent: files previousPath: @"" fileSize: file->length];
+        [self insertPath: pathComponents withParent: files previousPath: path fileSize: file->length];
         [pathComponents autorelease];
     }
     return files;

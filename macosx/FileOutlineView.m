@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: FileTableView.m 771 2006-08-14 03:13:34Z livings124 $
  * 
  * Copyright (c) 2005-2006 Transmission authors and contributors
  *
@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "FileTableView.h"
+#import "FileOutlineView.h"
 
-@implementation FileTableView
+@implementation FileOutlineView
 
 - (void) mouseDown: (NSEvent *) event
 {
@@ -44,7 +44,7 @@
     else
         [self deselectAll: self];
     
-    return fContextMenu;
+    return [self menu];
 }
 
 @end

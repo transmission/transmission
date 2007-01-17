@@ -149,7 +149,7 @@
 		A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306580AAD24A80049E2AC /* UKKQueue.m */; };
 		A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */; };
-		A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileTableView.m */; };
+		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2BD40070A09BBEA008CCE96 /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1838B709DEC0430047D688 /* bencode.h */; };
 		A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */; };
 		A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.png */; };
@@ -365,8 +365,8 @@
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesImageView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesImageView.h; path = macosx/PiecesImageView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesImageView.m; path = macosx/PiecesImageView.m; sourceTree = "<group>"; };
-		A2AF1C360A3D0F6200F1575D /* FileTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileTableView.h; path = macosx/FileTableView.h; sourceTree = "<group>"; };
-		A2AF1C370A3D0F6200F1575D /* FileTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileTableView.m; path = macosx/FileTableView.m; sourceTree = "<group>"; };
+		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
+		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2C655640A04FEDC00E9FD82 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
@@ -455,8 +455,8 @@
 				4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
-				A2AF1C360A3D0F6200F1575D /* FileTableView.h */,
-				A2AF1C370A3D0F6200F1575D /* FileTableView.m */,
+				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
+				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
 				A27431D80A68538400FA780A /* BarButton.h */,
 				A27431D90A68538400FA780A /* BarButton.m */,
 				A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */,
@@ -916,7 +916,7 @@
 				4DFBC2DF09C0970D00D5C571 /* Torrent.m in Sources */,
 				4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */,
-				A2AF1C390A3D0F6200F1575D /* FileTableView.m in Sources */,
+				A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */,
 				A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */,
 				A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */,
 				A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */,

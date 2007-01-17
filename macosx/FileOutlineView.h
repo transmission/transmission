@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: FileTableView.h 771 2006-08-14 03:13:34Z livings124 $
  * 
  * Copyright (c) 2005-2006 Transmission authors and contributors
  *
@@ -24,9 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FileTableView : NSTableView
+@interface FileOutlineView : NSOutlineView
 {
-    IBOutlet NSMenu * fContextMenu;
 }
 
 @end
