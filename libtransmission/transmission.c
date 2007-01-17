@@ -565,7 +565,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     }
     else
     {
-        s->eta = (float) ( 1.0 - s->progress ) *
+        s->eta = ( 1.0 - s->progress ) *
             (float) inf->totalSize / s->rateDownload / 1024.0;
     }
 
