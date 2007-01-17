@@ -92,11 +92,6 @@
                                             sortDescriptorPrototype]]];
     
     //set file table
-    NSBrowserCell * browserCell = [[[NSBrowserCell alloc] init] autorelease];
-    [browserCell setLeaf: YES];
-    [[fFileOutline tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
-    
-    [fFileOutline setAutoresizesOutlineColumn: NO];
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
     //set blank inspector

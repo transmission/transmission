@@ -26,6 +26,15 @@
 
 @implementation FileOutlineView
 
+- (void) awakeFromNib
+{
+    NSBrowserCell * browserCell = [[[NSBrowserCell alloc] init] autorelease];
+    [browserCell setLeaf: YES];
+    [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
+    
+    [self setAutoresizesOutlineColumn: NO];
+}
+
 - (void) mouseDown: (NSEvent *) event
 {
     [[self window] makeKeyWindow];
