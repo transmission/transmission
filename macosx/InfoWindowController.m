@@ -96,6 +96,7 @@
     [browserCell setLeaf: YES];
     [[fFileOutline tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
     
+    [fFileOutline setAutoresizesOutlineColumn: NO];
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
     //set blank inspector
@@ -680,12 +681,19 @@
             byItem: (id) item
 {
     NSString * ident = [tableColumn identifier];
-    return [item objectForKey: @"Name"];
+    if ([ident isEqualToString: @"Size"])
+        return ![[item objectForKey: @"IsFolder"] boolValue]
+                ? [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]] : @"";
+    else
+        return [item objectForKey: @"Name"];
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
             forTableColumn: (NSTableColumn *) tableColumn item:(id) item
 {
+    if (![[tableColumn identifier] isEqualToString: @"Name"])
+        return;
+    
     NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
                         ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
     [icon setScalesWhenResized: YES];

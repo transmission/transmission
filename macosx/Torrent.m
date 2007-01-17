@@ -43,7 +43,7 @@
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent;
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent fileSize: (uint64_t) size;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -1067,22 +1067,22 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSArray *) fileList
 {
     int count = [self fileCount], i;
-    tr_file_t file;
+    tr_file_t * file;
     NSMutableArray * files = [NSMutableArray array], * pathComponents;
     
     for (i = 0; i < count; i++)
     {
-        file = fInfo->files[i];
+        file = &fInfo->files[i];
         
         /*[files addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSString stringWithUTF8String: file.name], @"Name",
-            [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];*/
+            [NSString stringWithUTF8String: file->name], @"Name",
+            [NSNumber numberWithUnsignedLongLong: file->length], @"Size", nil]];*/
         
-        pathComponents = [[[NSString stringWithUTF8String: file.name] pathComponents] mutableCopy];
+        pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
         if (fInfo->multifile)
             [pathComponents removeObjectAtIndex: 0];
         
-        [self insertPath: pathComponents withParent: files];
+        [self insertPath: pathComponents withParent: files fileSize: file->length];
         [pathComponents autorelease];
     }
     return files;
@@ -1216,7 +1216,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return self;
 }
 
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent fileSize: (uint64_t) size
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1233,11 +1233,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     //create new folder or item if it doesn't already exist
     if (!dict)
     {
-        #warning put size and full path here for item later
+        #warning put full path for item
         dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
                                 [NSNumber numberWithBool: isFolder], @"IsFolder", nil];
         if (isFolder)
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
+        else
+            [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
         
         [parent addObject: dict];
     }
@@ -1245,7 +1247,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
-        [self insertPath: components withParent: [dict objectForKey: @"Children"]];
+        [self insertPath: components withParent: [dict objectForKey: @"Children"] fileSize: size];
     }
 }
 
