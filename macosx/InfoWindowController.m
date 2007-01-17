@@ -644,7 +644,6 @@
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    #warning tooltip for file table?
     if (tableView == fPeerTable)
     {
         NSDictionary * peerDic = [fPeers objectAtIndex: row];
@@ -680,8 +679,7 @@
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn
             byItem: (id) item
 {
-    NSString * ident = [tableColumn identifier];
-    if ([ident isEqualToString: @"Size"])
+    if ([[tableColumn identifier] isEqualToString: @"Size"])
         return ![[item objectForKey: @"IsFolder"] boolValue]
                 ? [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]] : @"";
     else
@@ -699,6 +697,17 @@
     [icon setScalesWhenResized: YES];
     [icon setSize: NSMakeSize(16.0, 16.0)];
     [cell setImage: icon];
+}
+
+- (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+                tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
+{
+    if ([[tableColumn identifier] isEqualToString: @"Size"])
+        return ![[item objectForKey: @"IsFolder"] boolValue]
+                    ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
+                            "Inspector -> Files tab -> table row tooltip")] : @"";
+    else
+        return [item objectForKey: @"Name"];
 }
 
 - (NSArray *) peerSortDescriptors
