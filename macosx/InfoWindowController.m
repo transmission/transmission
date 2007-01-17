@@ -763,12 +763,15 @@
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
                 tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
-    if ([[tableColumn identifier] isEqualToString: @"Size"])
+    NSString * ident = [tableColumn identifier];
+    if ([ident isEqualToString: @"Size"])
         return ![[item objectForKey: @"IsFolder"] boolValue]
                     ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
                             "Inspector -> Files tab -> table row tooltip")] : nil;
-    else
+    else if ([ident isEqualToString: @"Name"])
         return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];
+    else
+        return nil;
 }
 
 - (NSArray *) peerSortDescriptors
