@@ -41,11 +41,12 @@
     BOOL        fPublicTorrent;
     NSString    * fPublicTorrentLocation;
 
-    NSUserDefaults  * fDefaults;
+    NSUserDefaults * fDefaults;
 
-    NSImage         * fIcon, * fIconFlipped, * fIconSmall;
+    NSImage * fIcon, * fIconFlipped, * fIconSmall;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
+    NSArray * fFileList;
     
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;

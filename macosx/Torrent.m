@@ -43,8 +43,9 @@
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
+- (NSArray *) createFileList;
 - (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
-            previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
+        previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -196,6 +197,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fStatusString release];
         [fShortStatusString release];
         [fRemainingTimeString release];
+        
+        [fFileList release];
         
         [fBitmap release];
         free(fPieces);
@@ -1067,28 +1070,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSArray *) fileList
 {
-    int count = [self fileCount], i;
-    tr_file_t * file;
-    NSMutableArray * files = [NSMutableArray array], * pathComponents;
-    NSString * path;
-    
-    for (i = 0; i < count; i++)
-    {
-        file = &fInfo->files[i];
-        
-        pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
-        if (fInfo->multifile)
-        {
-            path = [pathComponents objectAtIndex: 0];
-            [pathComponents removeObjectAtIndex: 0];
-        }
-        else
-            path = @"";
-        
-        [self insertPath: pathComponents withParent: files previousPath: path fileSize: file->length];
-        [pathComponents autorelease];
-    }
-    return files;
+    return fFileList;
 }
 
 - (int) fileCount
@@ -1205,6 +1187,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
     fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
     
+    fFileList = [self createFileList];
+    
     //set up advanced bar
     fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
         pixelsWide: MAX_PIECES pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
@@ -1217,6 +1201,32 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     [self update];
     return self;
+}
+
+- (NSArray *) createFileList
+{
+    int count = [self fileCount], i;
+    tr_file_t * file;
+    NSMutableArray * files = [[NSMutableArray alloc] init], * pathComponents;
+    NSString * path;
+    
+    for (i = 0; i < count; i++)
+    {
+        file = &fInfo->files[i];
+        
+        pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
+        if (fInfo->multifile)
+        {
+            path = [pathComponents objectAtIndex: 0];
+            [pathComponents removeObjectAtIndex: 0];
+        }
+        else
+            path = @"";
+        
+        [self insertPath: pathComponents withParent: files previousPath: path fileSize: file->length];
+        [pathComponents autorelease];
+    }
+    return files;
 }
 
 - (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent

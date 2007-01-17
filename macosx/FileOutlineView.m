@@ -33,6 +33,7 @@
     [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
     
     [self setAutoresizesOutlineColumn: NO];
+    [self setIndentationPerLevel: 14.0];
 }
 
 - (void) mouseDown: (NSEvent *) event
