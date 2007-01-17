@@ -706,7 +706,7 @@
                     ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
                             "Inspector -> Files tab -> table row tooltip")] : nil;
     else
-        return [item objectForKey: @"Name"];
+        return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];
 }
 
 - (NSArray *) peerSortDescriptors
