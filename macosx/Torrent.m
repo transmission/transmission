@@ -44,8 +44,8 @@
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
 - (NSArray *) createFileList;
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
-        previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
+        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -1109,7 +1109,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 @end
 
-
 @implementation Torrent (Private)
 
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
@@ -1223,14 +1222,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             path = @"";
         
-        [self insertPath: pathComponents withParent: files previousPath: path fileSize: file->length];
+        [self insertPath: pathComponents forSiblings: files withParent: nil previousPath: path fileSize: file->length];
         [pathComponents autorelease];
     }
     return files;
 }
 
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
-            previousPath: (NSString *) previousPath fileSize: (uint64_t) size
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
+        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath fileSize: (uint64_t) size
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1238,7 +1237,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSMutableDictionary * dict = nil;
     if (isFolder)
     {
-        NSEnumerator * enumerator = [parent objectEnumerator];
+        NSEnumerator * enumerator = [siblings objectEnumerator];
         while ((dict = [enumerator nextObject]))
             if ([[dict objectForKey: @"Name"] isEqualToString: name] && [[dict objectForKey: @"IsFolder"] boolValue])
                 break;
@@ -1257,13 +1256,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
         
-        [parent addObject: dict];
+        if (parent)
+            [dict setObject: parent forKey: @"Parent"];
+        [dict setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
+        
+        [siblings addObject: dict];
     }
     
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
-        [self insertPath: components withParent: [dict objectForKey: @"Children"] previousPath: currentPath fileSize: size];
+        [self insertPath: components forSiblings: [dict objectForKey: @"Children"]
+                withParent: dict previousPath: currentPath fileSize: size];
     }
 }
 

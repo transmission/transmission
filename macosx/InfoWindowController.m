@@ -53,6 +53,9 @@
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
+- (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
+- (void) resetFileCheckStateForItem: (NSMutableDictionary *) item;
+
 @end
 
 @implementation InfoWindowController
@@ -676,21 +679,85 @@
     if ([[tableColumn identifier] isEqualToString: @"Size"])
         return ![[item objectForKey: @"IsFolder"] boolValue]
                 ? [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]] : @"";
+    else if ([[tableColumn identifier] isEqualToString: @"Check"])
+        return [item objectForKey: @"Check"];
     else
         return [item objectForKey: @"Name"];
+}
+
+- (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
+        forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
+{
+    int state = [object intValue] != NSOffState;
+    
+    [self setFileCheckState: state forItem: item];
+    [self resetFileCheckStateForItem: [item objectForKey: @"Parent"]];
+    
+    [fFileOutline reloadData];
+}
+
+- (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item
+{
+    [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
+    
+    if (![[item objectForKey: @"IsFolder"] boolValue])
+        return;
+    
+    NSMutableDictionary * child;
+    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
+    while ((child = [enumerator nextObject]))
+    {
+        if ([[child objectForKey: @"Check"] intValue] != state)
+            [self setFileCheckState: state forItem: child];
+    }
+}
+
+- (void) resetFileCheckStateForItem: (NSMutableDictionary *) item
+{
+    if (!item)
+        return;
+    
+    int state = INVALID;
+    
+    NSMutableDictionary * child;
+    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
+    while ((child = [enumerator nextObject]))
+    {
+        if (state == INVALID)
+        {
+            state = [[child objectForKey: @"Check"] intValue];
+            if (state == NSMixedState)
+                break;
+        }
+        else if (state != [[child objectForKey: @"Check"] intValue])
+        {
+            state = NSMixedState;
+            break;
+        }
+        else;
+    }
+    
+    if ([[item objectForKey: @"Check"] intValue] != state)
+    {
+        [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
+        [self resetFileCheckStateForItem: [item objectForKey: @"Parent"]];
+    }
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
             forTableColumn: (NSTableColumn *) tableColumn item:(id) item
 {
-    if (![[tableColumn identifier] isEqualToString: @"Name"])
-        return;
-    
-    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
-                        ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
-    [icon setScalesWhenResized: YES];
-    [icon setSize: NSMakeSize(16.0, 16.0)];
-    [cell setImage: icon];
+    if ([[tableColumn identifier] isEqualToString: @"Name"])
+    {
+        NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
+                            ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
+        [icon setScalesWhenResized: YES];
+        [icon setSize: NSMakeSize(16.0, 16.0)];
+        [cell setImage: icon];
+    }
+    else if ([[tableColumn identifier] isEqualToString: @"Check"])
+        [cell setEnabled: NO];
+    else;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
