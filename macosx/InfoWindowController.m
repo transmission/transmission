@@ -54,7 +54,7 @@
 - (NSArray *) peerSortDescriptors;
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
-- (void) resetFileCheckStateForItem: (NSMutableDictionary *) item;
+- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
 
 @end
 
@@ -691,9 +691,9 @@
     int state = [object intValue] != NSOffState;
     
     [self setFileCheckState: state forItem: item];
-    [self resetFileCheckStateForItem: [item objectForKey: @"Parent"]];
+    NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
     
-    [fFileOutline reloadData];
+    [fFileOutline reloadItem: topItem reloadChildren: YES];
 }
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item
@@ -712,10 +712,11 @@
     }
 }
 
-- (void) resetFileCheckStateForItem: (NSMutableDictionary *) item
+- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild
 {
-    if (!item)
-        return;
+    NSMutableDictionary * item;
+    if (!(item = [originalChild objectForKey: @"Parent"]))
+        return originalChild;
     
     int state = INVALID;
     
@@ -740,8 +741,10 @@
     if ([[item objectForKey: @"Check"] intValue] != state)
     {
         [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-        [self resetFileCheckStateForItem: [item objectForKey: @"Parent"]];
+        return [self resetFileCheckStateForItemParent: item];
     }
+    else
+        return originalChild;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
