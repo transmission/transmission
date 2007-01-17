@@ -70,8 +70,6 @@
 
 - (void) awakeFromNib
 {
-    [fFileTable setDoubleAction: @selector(revealFile:)];
-    
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
@@ -92,6 +90,12 @@
     if ([[fPeerTable sortDescriptors] count] == 0)
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
                                             sortDescriptorPrototype]]];
+    
+    //set file table
+    NSBrowserCell * browserCell = [[[NSBrowserCell alloc] init] autorelease];
+    [browserCell setLeaf: YES];
+    [[fFileOutline tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
+    [fFileOutline setDoubleAction: @selector(revealFile:)];
     
     [self updateInfoForTorrents: [NSArray array]];
 }
@@ -254,11 +258,12 @@
         [fPiecesView setTorrent: torrent];
         
         //set file table
-        [fFileTable deselectAll: nil];
+        [fFileOutline deselectAll: nil];
         if (fFiles)
             [fFiles release];
         fFiles = [[torrent fileList] retain];
         
+        #warning change!
         if ([fFiles count] > 1)
             [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files",
                                         "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
@@ -272,7 +277,7 @@
     [self updateInfoSettings];
     
     [fPeerTable reloadData];
-    [fFileTable reloadData];
+    [fFileOutline reloadData];
 }
 
 - (void) updateInfoStats
@@ -505,7 +510,7 @@
     SEL action = [menuItem action];
     
     if (action == @selector(revealFile:))
-        return [fFileTable numberOfSelectedRows] > 0 &&
+        return [fFileOutline numberOfSelectedRows] > 0 &&
             [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT];
         
     return YES;
@@ -585,15 +590,14 @@
 {
     if (tableView == fPeerTable)
         return fPeers ? [fPeers count] : 0;
-    else
-        return fFiles ? [fFiles count] : 0;
+    return 0;
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
 {
-    NSString * ident = [column identifier];
     if (tableView == fPeerTable)
     {
+        NSString * ident = [column identifier];
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
         if ([ident isEqualToString: @"Connected"])
@@ -611,16 +615,7 @@
         else
             return [peer objectForKey: @"IP"];
     }
-    else
-    {
-        NSDictionary * file = [fFiles objectAtIndex: row];
-        if ([ident isEqualToString: @"Icon"])
-            return [[NSWorkspace sharedWorkspace] iconForFileType: [[file objectForKey: @"Name"] pathExtension]];
-        else if ([ident isEqualToString: @"Size"])
-            return [NSString stringForFileSize: [[file objectForKey: @"Size"] unsignedLongLongValue]];
-        else
-            return [file objectForKey: @"Name"];
-    }
+    return nil;
 }
 
 - (void) tableView: (NSTableView *) tableView didClickTableColumn: (NSTableColumn *) tableColumn
@@ -646,16 +641,8 @@
         rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
         row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
-    if (tableView == fFileTable)
-    {
-        NSDictionary * file = [fFiles objectAtIndex: row];
-        if ([[column identifier] isEqualToString: @"Size"])
-            return [[[file objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
-                                                                        "Inspector -> Files tab -> table row tooltip")];
-        else
-            return [file objectForKey: @"Name"];
-    }
-    else if (tableView == fPeerTable)
+    #warning tooltip for file table?
+    if (tableView == fPeerTable)
     {
         NSDictionary * peerDic = [fPeers objectAtIndex: row];
         return [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%"
@@ -667,8 +654,41 @@
                         ? NSLocalizedString(@"incoming", "Inspector -> Peers tab -> table row tooltip")
                         : NSLocalizedString(@"outgoing", "Inspector -> Peers tab -> table row tooltip")];
     }
-    else
-        return nil;
+    return nil;
+}
+
+- (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
+{
+    if (!item)
+        return [fFiles count];
+    return [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Children"] count] : 0;
+}
+
+- (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item 
+{
+    return [[item objectForKey: @"IsFolder"] boolValue];
+}
+
+- (id) outlineView: (NSOutlineView *) outlineView child: (int) index ofItem: (id) item
+{
+    return [(item ? [item objectForKey: @"Children"] : fFiles) objectAtIndex: index];
+}
+
+- (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn
+            byItem: (id) item
+{
+    NSString * ident = [tableColumn identifier];
+    return [item objectForKey: @"Name"];
+}
+
+- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
+            forTableColumn: (NSTableColumn *) tableColumn item:(id) item
+{
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
+                        ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
+    [icon setScalesWhenResized: YES];
+    [icon setSize: NSMakeSize(16.0, 16.0)];
+    [cell setImage: icon];
 }
 
 - (NSArray *) peerSortDescriptors
@@ -698,12 +718,16 @@
 
 - (void) revealFile: (id) sender
 {
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSEnumerator * enumerator = [[fFiles objectsAtIndexes: [fFileTable selectedRowIndexes]] objectEnumerator];
+    if (!fFiles)
+        return;
+    
+    #warning get working
+    /*Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSEnumerator * enumerator = [[fFiles objectsAtIndexes: [fFileOutline selectedRowIndexes]] objectEnumerator];
     NSDictionary * file;
     while ((file = [enumerator nextObject]))
         [[NSWorkspace sharedWorkspace] selectFile: [[torrent downloadFolder]
-            stringByAppendingPathComponent: [file objectForKey: @"Name"]] inFileViewerRootedAtPath: nil];
+            stringByAppendingPathComponent: [file objectForKey: @"Name"]] inFileViewerRootedAtPath: nil];*/
 }
 
 - (void) setLimitCustom: (id) sender

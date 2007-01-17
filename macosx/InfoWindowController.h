@@ -53,7 +53,7 @@
     IBOutlet NSTextView * fErrorMessageView;
     IBOutlet PiecesView * fPiecesView;
     
-    IBOutlet NSTableView * fFileTable;
+    IBOutlet NSOutlineView * fFileOutline;
     IBOutlet NSTextField * fFileTableStatusField;
     
     IBOutlet NSButton * fRatioCustomCheck, * fRatioStopCheck,

@@ -43,8 +43,8 @@
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent;
 - (NSImage *) advancedBar;
-
 - (void) trashFile: (NSString *) path;
 
 @end
@@ -1068,16 +1068,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     int count = fInfo->fileCount, i;
     tr_file_t file;
-    NSMutableArray * files = [NSMutableArray arrayWithCapacity: count];
+    NSMutableArray * files = [NSMutableArray array];
     
     for (i = 0; i < count; i++)
     {
         file = fInfo->files[i];
-        [files addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+        
+        [self insertPath: [[[NSString stringWithUTF8String: file.name] pathComponents] mutableCopy] withParent: files];
+        /*[files addObject: [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: file.name], @"Name",
-            [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];
+            [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];*/
     }
-    
     return files;
 }
 
@@ -1202,6 +1203,39 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     [self update];
     return self;
+}
+
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
+{
+    NSString * name = [components objectAtIndex: 0];
+    BOOL isFolder = [components count] > 1;
+    
+    NSMutableDictionary * dict = nil;
+    if (isFolder)
+    {
+        NSEnumerator * enumerator = [parent objectEnumerator];
+        while ((dict = [enumerator nextObject]))
+            if ([[dict objectForKey: @"Name"] isEqualToString: name] && [[dict objectForKey: @"IsFolder"] boolValue])
+                break;
+    }
+    
+    //create new folder or item if it doesn't already exist
+    if (!dict)
+    {
+        #warning put size and full path here for item later
+        dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
+                                [NSNumber numberWithBool: isFolder], @"IsFolder", nil];
+        if (isFolder)
+            [dict setObject: [NSMutableArray array] forKey: @"Children"];
+        
+        [parent addObject: dict];
+    }
+    
+    if (isFolder)
+    {
+        [components removeObjectAtIndex: 0];
+        [self insertPath: components withParent: [dict objectForKey: @"Children"]];
+    }
 }
 
 - (NSImage *) advancedBar
