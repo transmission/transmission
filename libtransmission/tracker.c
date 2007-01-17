@@ -116,7 +116,7 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     tc->redirectAddress = NULL;
 
     tc->interval       = 300;
-    tc->scrapeInterval = 600;
+    tc->scrapeInterval = 1200;
 
     tc->lastError      = 1;
     tc->allUnreachIfError = 1;
@@ -305,12 +305,12 @@ static int shouldScrape( tr_tracker_t * tc )
     }
 
     now      = tr_date();
-    interval = 1000 * MAX( tc->scrapeInterval, 60 );
+    interval = 1000 * MAX( tc->scrapeInterval, 600 );
 
-    /* scrape half as often if there is no need to */
-    if( !tc->scrapeNeeded && !tc->lastScrapeFailed )
+    /* scrape more often if needed */
+    if( tc->scrapeNeeded || tc->lastScrapeFailed )
     {
-        interval *= 2;
+        interval /= 2;
     }
 
     return now > tc->dateScrape + interval;
