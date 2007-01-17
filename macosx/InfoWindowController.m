@@ -640,9 +640,8 @@
     return tableView != fPeerTable;
 }
 
-- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell
-        rect: (NSRectPointer) rect tableColumn: (NSTableColumn *) column
-        row: (int) row mouseLocation: (NSPoint) mouseLocation
+- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
 {
     if (tableView == fPeerTable)
     {
@@ -705,7 +704,7 @@
     if ([[tableColumn identifier] isEqualToString: @"Size"])
         return ![[item objectForKey: @"IsFolder"] boolValue]
                     ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
-                            "Inspector -> Files tab -> table row tooltip")] : @"";
+                            "Inspector -> Files tab -> table row tooltip")] : nil;
     else
         return [item objectForKey: @"Name"];
 }
@@ -740,13 +739,12 @@
     if (!fFiles)
         return;
     
-    #warning get working
-    /*Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSEnumerator * enumerator = [[fFiles objectsAtIndexes: [fFileOutline selectedRowIndexes]] objectEnumerator];
-    NSDictionary * file;
-    while ((file = [enumerator nextObject]))
-        [[NSWorkspace sharedWorkspace] selectFile: [[torrent downloadFolder]
-            stringByAppendingPathComponent: [file objectForKey: @"Name"]] inFileViewerRootedAtPath: nil];*/
+    NSString * folder = [[fTorrents objectAtIndex: 0] downloadFolder];
+    NSIndexSet * indexes = [fFileOutline selectedRowIndexes];
+    int i;
+    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        [[NSWorkspace sharedWorkspace] selectFile: [folder stringByAppendingPathComponent:
+                [[fFileOutline itemAtRow: i] objectForKey: @"Path"]] inFileViewerRootedAtPath: nil];
 }
 
 - (void) setLimitCustom: (id) sender

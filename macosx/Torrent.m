@@ -43,7 +43,8 @@
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent fileSize: (uint64_t) size;
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
+            previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -1078,7 +1079,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fInfo->multifile)
             [pathComponents removeObjectAtIndex: 0];
         
-        [self insertPath: pathComponents withParent: files fileSize: file->length];
+        [self insertPath: pathComponents withParent: files previousPath: @"" fileSize: file->length];
         [pathComponents autorelease];
     }
     return files;
@@ -1212,7 +1213,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return self;
 }
 
-- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent fileSize: (uint64_t) size
+- (void) insertPath: (NSMutableArray *) components withParent: (NSMutableArray *) parent
+            previousPath: (NSString *) previousPath fileSize: (uint64_t) size
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1226,12 +1228,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 break;
     }
     
+    NSString * currentPath = [previousPath stringByAppendingPathComponent: name];
+    
     //create new folder or item if it doesn't already exist
     if (!dict)
     {
-        #warning put full path for item
         dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
-                                [NSNumber numberWithBool: isFolder], @"IsFolder", nil];
+                                [NSNumber numberWithBool: isFolder], @"IsFolder",
+                                currentPath, @"Path", nil];
         if (isFolder)
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
         else
@@ -1243,7 +1247,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
-        [self insertPath: components withParent: [dict objectForKey: @"Children"] fileSize: size];
+        [self insertPath: components withParent: [dict objectForKey: @"Children"] previousPath: currentPath fileSize: size];
     }
 }
 
