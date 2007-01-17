@@ -30,7 +30,7 @@
 @interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents;
-    NSMutableArray * fPeers, * fFiles;
+    NSArray * fPeers, * fFiles;
     NSImage * fAppIcon, * fDotGreen, * fDotRed;
     
     IBOutlet NSTabView * fTabView;

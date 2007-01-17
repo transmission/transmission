@@ -1074,7 +1074,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         file = fInfo->files[i];
         [files addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-            [[self downloadFolder] stringByAppendingPathComponent: [NSString stringWithUTF8String: file.name]], @"Name",
+            [NSString stringWithUTF8String: file.name], @"Name",
             [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];
     }
     

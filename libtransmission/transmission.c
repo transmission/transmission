@@ -599,7 +599,7 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
     {
         tr_peer_t * peer;
         struct in_addr * addr;
-        int i = 0;
+        int i;
         for( i = 0; i < tor->peerCount; i++ )
         {
             peer = tor->peers[i];

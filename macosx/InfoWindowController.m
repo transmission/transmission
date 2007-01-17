@@ -70,8 +70,6 @@
 
 - (void) awakeFromNib
 {
-    fPeers = [[NSMutableArray alloc] initWithCapacity: 75];
-    fFiles = [[NSMutableArray alloc] initWithCapacity: 15];
     [fFileTable setDoubleAction: @selector(revealFile:)];
     
     //window location and size
@@ -101,8 +99,10 @@
 - (void) dealloc
 {
     [fTorrents release];
-    [fPeers release];
-    [fFiles release];
+    if (fPeers)
+        [fPeers release];
+    if (fFiles)
+        [fFiles release];
 
     [fAppIcon release];
     [super dealloc];
@@ -187,10 +187,21 @@
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
         
-        [fPeers removeAllObjects];
-        [fPeerTable reloadData];
-        
         [fPiecesView setTorrent: nil];
+        
+        if (fPeers)
+        {
+            [fPeers release];
+            fPeers = nil;
+        }
+        
+        if (fFiles)
+        {
+            [fFiles release];
+            fFiles = nil;
+        }
+        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available",
+                                        "Inspector -> Files tab -> bottom text (number of files)")];
     }
     else
     {    
@@ -241,21 +252,12 @@
         [fDataLocationField setSelectable: YES];
         
         [fPiecesView setTorrent: torrent];
-    }
-    
-    //update stats and settings
-    [self updateInfoStats];
-    [self updateInfoSettings];
-
-    //set file table
-    [fFiles removeAllObjects];
-    
-    if (numberSelected > 0)
-    {
-        Torrent * torrent;
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-            [fFiles addObjectsFromArray: [torrent fileList]];
+        
+        //set file table
+        [fFileTable deselectAll: nil];
+        if (fFiles)
+            [fFiles release];
+        fFiles = [[torrent fileList] retain];
         
         if ([fFiles count] > 1)
             [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files",
@@ -264,11 +266,12 @@
             [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d file",
                                         "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
     }
-    else
-        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available",
-                                        "Inspector -> Files tab -> bottom text (number of files)")];
     
-    [fFileTable deselectAll: nil];
+    //update stats and settings
+    [self updateInfoStats];
+    [self updateInfoSettings];
+    
+    [fPeerTable reloadData];
     [fFileTable reloadData];
 }
 
@@ -362,8 +365,9 @@
     [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
     
-    [fPeers setArray: [torrent peers]];
-    [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
+    if (fPeers)
+        [fPeers release];
+    fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
     
     [fPeerTable reloadData];
 }
@@ -580,9 +584,9 @@
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
 {
     if (tableView == fPeerTable)
-        return [fPeers count];
+        return fPeers ? [fPeers count] : 0;
     else
-        return [fFiles count];
+        return fFiles ? [fFiles count] : 0;
 }
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
@@ -615,7 +619,7 @@
         else if ([ident isEqualToString: @"Size"])
             return [NSString stringForFileSize: [[file objectForKey: @"Size"] unsignedLongLongValue]];
         else
-            return [[file objectForKey: @"Name"] lastPathComponent];
+            return [file objectForKey: @"Name"];
     }
 }
 
@@ -623,8 +627,13 @@
 {
     if (tableView == fPeerTable)
     {
-        [fPeers sortUsingDescriptors: [self peerSortDescriptors]];
-        [tableView reloadData];
+        if (fPeers)
+        {
+            NSArray * oldPeers = fPeers;
+            fPeers = [[fPeers sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
+            [oldPeers release];
+            [tableView reloadData];
+        }
     }
 }
 
@@ -689,11 +698,12 @@
 
 - (void) revealFile: (id) sender
 {
-    NSIndexSet * indexSet = [fFileTable selectedRowIndexes];
-    unsigned int i;
-    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [[NSWorkspace sharedWorkspace] selectFile: [[fFiles objectAtIndex: i] objectForKey: @"Name"]
-                                        inFileViewerRootedAtPath: nil];
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSEnumerator * enumerator = [[fFiles objectsAtIndexes: [fFileTable selectedRowIndexes]] objectEnumerator];
+    NSDictionary * file;
+    while ((file = [enumerator nextObject]))
+        [[NSWorkspace sharedWorkspace] selectFile: [[torrent downloadFolder]
+            stringByAppendingPathComponent: [file objectForKey: @"Name"]] inFileViewerRootedAtPath: nil];
 }
 
 - (void) setLimitCustom: (id) sender
