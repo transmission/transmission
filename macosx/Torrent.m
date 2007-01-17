@@ -1066,7 +1066,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSArray *) fileList
 {
-    int count = fInfo->fileCount, i;
+    int count = [self fileCount], i;
     tr_file_t file;
     NSMutableArray * files = [NSMutableArray array];
     
@@ -1080,6 +1080,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [NSNumber numberWithUnsignedLongLong: file.length], @"Size", nil]];*/
     }
     return files;
+}
+
+- (int) fileCount
+{
+    return fInfo->fileCount;
 }
 
 - (NSDate *) date

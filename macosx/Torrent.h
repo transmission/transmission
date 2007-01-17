@@ -180,6 +180,7 @@
 - (void) setOrderValue: (int) orderValue;
 
 - (NSArray *) fileList;
+- (int) fileCount;
 
 - (NSDate *) date;
 - (NSNumber *) stateSortKey;

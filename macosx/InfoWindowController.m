@@ -95,8 +95,10 @@
     NSBrowserCell * browserCell = [[[NSBrowserCell alloc] init] autorelease];
     [browserCell setLeaf: YES];
     [[fFileOutline tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
+    
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
+    //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
 }
 
@@ -263,13 +265,13 @@
             [fFiles release];
         fFiles = [[torrent fileList] retain];
         
-        #warning change!
-        if ([fFiles count] > 1)
-            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files",
-                                        "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
+        int fileCount = [torrent fileCount];
+        if (fileCount != 1)
+            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files total",
+                                "Inspector -> Files tab -> bottom text (number of files)"), fileCount]];
         else
-            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d file",
-                                        "Inspector -> Files tab -> bottom text (number of files)"), [fFiles count]]];
+            [fFileTableStatusField setStringValue: NSLocalizedString(@"1 file total",
+                                "Inspector -> Files tab -> bottom text (number of files)")];
     }
     
     //update stats and settings
