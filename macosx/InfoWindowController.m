@@ -676,13 +676,16 @@
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn
             byItem: (id) item
 {
-    if ([[tableColumn identifier] isEqualToString: @"Size"])
-        return ![[item objectForKey: @"IsFolder"] boolValue]
-                ? [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]] : @"";
-    else if ([[tableColumn identifier] isEqualToString: @"Check"])
+    if ([[tableColumn identifier] isEqualToString: @"Check"])
         return [item objectForKey: @"Check"];
     else
-        return [item objectForKey: @"Name"];
+    {
+        if ([[item objectForKey: @"IsFolder"] boolValue])
+            return [item objectForKey: @"Name"];
+        else
+            return [NSString stringWithFormat: @"%@\n%@", [item objectForKey: @"Name"],
+                        [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
+    }
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
@@ -752,8 +755,6 @@
     {
         NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
                             ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
-        [icon setScalesWhenResized: YES];
-        [icon setSize: NSMakeSize(16.0, 16.0)];
         [cell setImage: icon];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
@@ -768,14 +769,23 @@
                 tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
     NSString * ident = [tableColumn identifier];
-    if ([ident isEqualToString: @"Size"])
+    #warning change
+    /*if ([ident isEqualToString: @"Size"])
         return ![[item objectForKey: @"IsFolder"] boolValue]
                     ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
                             "Inspector -> Files tab -> table row tooltip")] : nil;
-    else if ([ident isEqualToString: @"Name"])
+    else*/ if ([ident isEqualToString: @"Name"])
         return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];
     else
         return nil;
+}
+
+- (float) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
+{
+    float height = [outlineView rowHeight];
+    if (![[item objectForKey: @"IsFolder"] boolValue])
+        height = 34.0;
+    return height;
 }
 
 - (NSArray *) peerSortDescriptors
