@@ -89,7 +89,7 @@ static int fastResumeMTimes( tr_io_t * io, int * tab )
         {
             tab[i] = 0xFFFFFFFF;
         }
-        else if( !S_ISREG( sb.st_mode ) )
+        else if( S_ISREG( sb.st_mode ) )
         {
 #ifdef SYS_DARWIN
             tab[i] = ( sb.st_mtimespec.tv_sec & 0x7FFFFFFF );
