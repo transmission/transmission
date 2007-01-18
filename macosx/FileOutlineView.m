@@ -30,7 +30,6 @@
 - (void) awakeFromNib
 {
     NSBrowserCell * browserCell = [[[FileBrowserCell alloc] init] autorelease];
-    [browserCell setLeaf: YES];
     [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
     
     [self setAutoresizesOutlineColumn: NO];

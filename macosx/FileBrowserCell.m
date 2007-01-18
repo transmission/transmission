@@ -4,6 +4,11 @@
 
 @implementation FileBrowserCell
 
+- (void) awakeFromNib
+{
+    [self setLeaf: YES];
+}
+
 - (void) setImage: (NSImage *) image
 {
     [image setFlipped: YES];

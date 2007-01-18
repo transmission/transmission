@@ -45,7 +45,8 @@
 
 - (NSArray *) createFileList;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
-        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath fileSize: (uint64_t) size;
+        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
+        fileSize: (uint64_t) size state: (int) state;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -1222,14 +1223,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             path = @"";
         
-        [self insertPath: pathComponents forSiblings: files withParent: nil previousPath: path fileSize: file->length];
+        [self insertPath: pathComponents forSiblings: files withParent: nil previousPath: path
+                fileSize: file->length state: NSOnState];
         [pathComponents autorelease];
     }
     return files;
 }
 
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
-        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath fileSize: (uint64_t) size
+        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
+        fileSize: (uint64_t) size state: (int) state
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1258,16 +1261,22 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         if (parent)
             [dict setObject: parent forKey: @"Parent"];
-        [dict setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
+        [dict setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
         
         [siblings addObject: dict];
+    }
+    else
+    {
+        int dictState = [[dict objectForKey: @"Check"] intValue];
+        if (dictState != NSMixedState && dictState != state)
+            [dict setObject: [NSNumber numberWithInt: NSMixedState] forKey: @"Check"];
     }
     
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
         [self insertPath: components forSiblings: [dict objectForKey: @"Children"]
-                withParent: dict previousPath: currentPath fileSize: size];
+                withParent: dict previousPath: currentPath fileSize: size state: state];
     }
 }
 
