@@ -23,12 +23,13 @@
  *****************************************************************************/
 
 #import "FileOutlineView.h"
+#import "FileBrowserCell.h"
 
 @implementation FileOutlineView
 
 - (void) awakeFromNib
 {
-    NSBrowserCell * browserCell = [[[NSBrowserCell alloc] init] autorelease];
+    NSBrowserCell * browserCell = [[[FileBrowserCell alloc] init] autorelease];
     [browserCell setLeaf: YES];
     [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
     

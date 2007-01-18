@@ -93,6 +93,7 @@
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */; };
 		A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */; };
+		A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */; };
 		A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */; };
@@ -296,6 +297,8 @@
 		A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuRatioToDisplayRatioTransformer.m; path = macosx/ActionMenuRatioToDisplayRatioTransformer.m; sourceTree = "<group>"; };
 		A21F5C010AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ActionMenuSpeedToDisplayLimitTransformer.h; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.h; sourceTree = "<group>"; };
 		A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuSpeedToDisplayLimitTransformer.m; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.m; sourceTree = "<group>"; };
+		A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileBrowserCell.h; path = macosx/FileBrowserCell.h; sourceTree = "<group>"; };
+		A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileBrowserCell.m; path = macosx/FileBrowserCell.m; sourceTree = "<group>"; };
 		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarWhite.png; path = macosx/Images/ProgressBarWhite.png; sourceTree = "<group>"; };
 		A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarBlue.png; path = macosx/Images/ProgressBarBlue.png; sourceTree = "<group>"; };
@@ -413,6 +416,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */,
+				A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */,
 				A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */,
 				A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */,
 				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
@@ -935,6 +940,7 @@
 				A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */,
 				A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */,
 				A28D565A0B57F1CC008E0DF1 /* DisableTextField.m in Sources */,
+				A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
