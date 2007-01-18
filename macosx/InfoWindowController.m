@@ -55,7 +55,6 @@
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
 - (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
-- (BOOL) otherFilesWithCheckEnabled: (NSMutableDictionary *) item;
 
 @end
 
@@ -694,7 +693,7 @@
     [self setFileCheckState: state forItem: item];
     NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
     
-    [fFileOutline reloadData];
+    [fFileOutline reloadItem: topItem reloadChildren: YES];
 }
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item
@@ -760,26 +759,9 @@
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
         //always enable if mixed or off because clicking will turn on
-        [cell setEnabled: /*[cell intValue] != NSOnState || [self otherFilesWithCheckEnabled: item]*/ NO];
+        [cell setEnabled: NO];
     }
     else;
-}
-
-- (BOOL) otherFilesWithCheckEnabled: (NSMutableDictionary *) item
-{
-    NSMutableDictionary * parent = [item objectForKey: @"Parent"], * sibling;
-    NSEnumerator * enumerator = [(parent ? [parent objectForKey: @"Children"] : fFiles) objectEnumerator];
-        
-    while ((sibling = [enumerator nextObject]))
-    {
-        if (sibling == item)
-            continue;
-        else if ([[sibling objectForKey: @"Check"] intValue] != NSOffState)
-            return YES;
-        else;
-    }
-    
-    return parent ? [self otherFilesWithCheckEnabled: parent] : NO;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
