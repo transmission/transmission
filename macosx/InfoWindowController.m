@@ -55,6 +55,7 @@
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
 - (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
+- (BOOL) otherFilesWithCheckEnabled: (NSMutableDictionary *) item;
 
 @end
 
@@ -693,7 +694,7 @@
     [self setFileCheckState: state forItem: item];
     NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
     
-    [fFileOutline reloadItem: topItem reloadChildren: YES];
+    [fFileOutline reloadData];
 }
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item
@@ -706,10 +707,8 @@
     NSMutableDictionary * child;
     NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
     while ((child = [enumerator nextObject]))
-    {
         if ([[child objectForKey: @"Check"] intValue] != state)
             [self setFileCheckState: state forItem: child];
-    }
 }
 
 - (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild
@@ -759,8 +758,28 @@
         [cell setImage: icon];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
-        [cell setEnabled: NO];
+    {
+        //always enable if mixed or off because clicking will turn on
+        [cell setEnabled: /*[cell intValue] != NSOnState || [self otherFilesWithCheckEnabled: item]*/ NO];
+    }
     else;
+}
+
+- (BOOL) otherFilesWithCheckEnabled: (NSMutableDictionary *) item
+{
+    NSMutableDictionary * parent = [item objectForKey: @"Parent"], * sibling;
+    NSEnumerator * enumerator = [(parent ? [parent objectForKey: @"Children"] : fFiles) objectEnumerator];
+        
+    while ((sibling = [enumerator nextObject]))
+    {
+        if (sibling == item)
+            continue;
+        else if ([[sibling objectForKey: @"Check"] intValue] != NSOffState)
+            return YES;
+        else;
+    }
+    
+    return parent ? [self otherFilesWithCheckEnabled: parent] : NO;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
