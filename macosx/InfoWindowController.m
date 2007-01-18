@@ -681,13 +681,7 @@
     if ([[tableColumn identifier] isEqualToString: @"Check"])
         return [item objectForKey: @"Check"];
     else
-    {
-        if ([[item objectForKey: @"IsFolder"] boolValue])
-            return [item objectForKey: @"Name"];
-        else
-            return [NSString stringWithFormat: @"%@\n%@", [item objectForKey: @"Name"],
-                        [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
-    }
+        return item;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object

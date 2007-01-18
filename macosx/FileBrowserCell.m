@@ -1,4 +1,5 @@
 #import "FileBrowserCell.h"
+#import "StringAdditions.h"
 
 #define SPACE 2.0
 
@@ -30,7 +31,7 @@
     [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     //text
-    NSArray * strings = [[self stringValue] componentsSeparatedByString: @"\n"];
+    NSMutableDictionary * item = [self objectValue];
     
     NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
@@ -46,13 +47,13 @@
     NSRect textRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 1.0,
                                     NSMaxX(cellFrame) - NSMaxX(imageRect) - 2.0 * SPACE, textHeight);
     
-    NSAttributedString * text = [[NSAttributedString alloc] initWithString: [strings objectAtIndex: 0]
+    NSAttributedString * text = [[NSAttributedString alloc] initWithString: [item objectForKey: @"Name"]
                                                                 attributes: nameAttributes];
     [text drawInRect: textRect];
     [text release];
     
     //bottomText
-    if ([strings count] > 1)
+    if (![[item objectForKey: @"IsFolder"] boolValue])
     {
         NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
@@ -63,8 +64,9 @@
         bottomTextRect.origin.y += textHeight;
         bottomTextRect.size.height = cellFrame.size.height - textHeight;
         
-        NSMutableAttributedString * bottomText = [[NSMutableAttributedString alloc] initWithString: [strings objectAtIndex: 1]
-                                                                                        attributes: statusAttributes];
+        NSMutableAttributedString * bottomText = [[NSMutableAttributedString alloc] initWithString:
+                                [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]
+                                attributes: statusAttributes];
         
         [bottomText drawInRect: bottomTextRect];
         [bottomText release];
