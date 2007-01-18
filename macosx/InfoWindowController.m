@@ -28,6 +28,8 @@
 #define MIN_WINDOW_WIDTH 300
 #define MAX_WINDOW_WIDTH 5000
 
+#define FILE_ROW_LARGE_HEIGHT 34.0
+
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
 #define TAB_PEERS_IDENT @"Peers"
@@ -784,7 +786,7 @@
 {
     float height = [outlineView rowHeight];
     if (![[item objectForKey: @"IsFolder"] boolValue])
-        height = 34.0;
+        height = FILE_ROW_LARGE_HEIGHT;
     return height;
 }
 

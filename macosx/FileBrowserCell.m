@@ -43,7 +43,7 @@
                     paragraphStyle, NSParagraphStyleAttributeName, nil];
     
     float textHeight = [(NSTableView *)controlView rowHeight];
-    NSRect textRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 2.0,
+    NSRect textRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 1.0,
                                     NSMaxX(cellFrame) - NSMaxX(imageRect) - 2.0 * SPACE, textHeight);
     
     NSAttributedString * text = [[NSAttributedString alloc] initWithString: [strings objectAtIndex: 0]
