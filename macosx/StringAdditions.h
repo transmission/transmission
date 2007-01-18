@@ -36,9 +36,6 @@
 + (NSString *) stringForSpeedAbbrev: (float) speed;
 + (NSString *) stringForRatio: (float) ratio;
 
-- (NSAttributedString *) attributedStringFittingInWidth: (float) width
-                                attributes: (NSDictionary *) attributes;
-
 - (NSComparisonResult) compareIP: (NSString *) string;
 
 @end

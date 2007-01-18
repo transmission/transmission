@@ -171,12 +171,19 @@
 {
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
                                                         isEqual: [NSColor alternateSelectedControlColor]];
+    
+    NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+    [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+    
     NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor controlTextColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 12.0], NSFontAttributeName, nil];
+                    [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                    paragraphStyle, NSParagraphStyleAttributeName, nil];
     NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
+                    [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                    paragraphStyle, NSParagraphStyleAttributeName, nil];
+    [paragraphStyle release];
 
     NSPoint pen = cellFrame.origin;
     const float PADDING = 3.0, LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0;
@@ -210,16 +217,17 @@
         //name string
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + PADDING;
-        NSAttributedString * nameString = [[info objectForKey: @"Name"] attributedStringFittingInWidth: mainWidth
-                                                attributes: nameAttributes];
-        [nameString drawAtPoint: pen];
+        
+        NSAttributedString * nameString = [[NSAttributedString alloc] initWithString: [info objectForKey: @"Name"]
+                                                        attributes: nameAttributes];
+        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [nameString size].height)];
         
         //progress string
         pen.y += [nameString size].height + LINE_PADDING - 1.0;
         
-        NSAttributedString * progressString = [[info objectForKey: @"ProgressString"]
-            attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
-        [progressString drawAtPoint: pen];
+        NSAttributedString * progressString = [[NSAttributedString alloc] initWithString:
+                                                [info objectForKey: @"ProgressString"] attributes: statusAttributes];
+        [progressString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [progressString size].height)];
 
         //progress bar
         pen.x -= EXTRA_NAME_SHIFT;
@@ -235,9 +243,14 @@
         //status string
         pen.x += EXTRA_NAME_SHIFT;
         pen.y += LINE_PADDING;
-        NSAttributedString * statusString = [[info objectForKey: @"StatusString"]
-            attributedStringFittingInWidth: mainWidth attributes: statusAttributes];
-        [statusString drawAtPoint: pen];
+        
+        NSAttributedString * statusString = [[NSAttributedString alloc] initWithString:
+                                                [info objectForKey: @"StatusString"] attributes: statusAttributes];
+        [statusString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [statusString size].height)];
+        
+        [nameString release];
+        [progressString release];
+        [statusString release];
     }
     else //small size
     {
@@ -258,16 +271,17 @@
                                         ? [info objectForKey: @"RemainingTimeString"]
                                         : [info objectForKey: @"ShortStatusString"];
         
-        NSAttributedString * statusString = [[[NSAttributedString alloc] initWithString: realStatusString
-                                                    attributes: statusAttributes] autorelease];
-        NSAttributedString * nameString = [[info objectForKey: @"Name"] attributedStringFittingInWidth:
-                                mainWidth - [statusString size].width - LINE_PADDING attributes: nameAttributes];
+        NSAttributedString * statusString = [[NSAttributedString alloc] initWithString: realStatusString
+                                                    attributes: statusAttributes];
+        NSAttributedString * nameString = [[NSAttributedString alloc] initWithString:
+                                                [info objectForKey: @"Name"] attributes: nameAttributes];
                      
         //place name string
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + LINE_PADDING;
 
-        [nameString drawAtPoint: pen];
+        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth - [statusString size].width - LINE_PADDING,
+                                                [nameString size].height)];
         
         //place status string
         pen.x = NSMaxX(cellFrame) - PADDING - [statusString size].width;
@@ -285,6 +299,9 @@
             [self buildAdvancedBar: barWidth point: pen];
         else
             [self buildSimpleBar: barWidth point: pen];
+        
+        [nameString release];
+        [statusString release];
     }
     
     [nameAttributes release];

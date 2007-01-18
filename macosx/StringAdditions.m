@@ -79,7 +79,8 @@
 
 + (NSString *) stringForSpeed: (float) speed
 {
-    return [[self stringForSpeedAbbrev: speed] stringByAppendingString: NSLocalizedString(@"B/s", "Transfer speed (Bytes per second)")];
+    return [[self stringForSpeedAbbrev: speed] stringByAppendingString:
+                    NSLocalizedString(@"B/s", "Transfer speed (Bytes per second)")];
 }
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
@@ -106,56 +107,6 @@
         return [NSString stringWithFormat: @"%.1f", ratio];
     else
         return [NSString stringWithFormat: @"%.0f", ratio];
-}
-
-- (NSAttributedString *) attributedStringFittingInWidth: (float) width
-                                attributes: (NSDictionary *) attributes
-{
-    int i;
-    float realWidth = [self sizeWithAttributes: attributes].width;
-    
-    /* The whole string fits */
-    if( realWidth <= width )
-        return [[[NSAttributedString alloc] initWithString: self attributes: attributes] autorelease];
-    
-    float ellipsisWidth = [[NSString ellipsis] sizeWithAttributes: attributes].width;
-    
-    /* Width is too small */
-    if ( ellipsisWidth > width )
-        return [[[NSAttributedString alloc] initWithString: @"" attributes: attributes] autorelease];
-
-    /* Don't worry about ellipsis until the end */
-    width -= ellipsisWidth;
-
-    /* Approximate how many characters we'll need to drop... */
-    i = [self length] * (width / realWidth);
-
-    /* ... then refine it */
-    NSString * newString = [self substringToIndex: i];
-    realWidth = [newString sizeWithAttributes: attributes].width;
-
-    if( realWidth < width )
-    {
-        NSString * smallerString;
-        do
-        {
-            smallerString = newString;
-            newString = [self substringToIndex: ++i];
-        } while ([newString sizeWithAttributes: attributes].width <= width);
-        
-        newString = smallerString;
-    }
-    else if( realWidth > width )
-    {
-        do
-        {
-            newString = [self substringToIndex: --i];
-        } while ([newString sizeWithAttributes: attributes].width > width);
-    }
-    else;
-
-    return [[[NSAttributedString alloc] initWithString: [newString stringByAppendingEllipsis]
-                                        attributes: attributes] autorelease];
 }
 
 - (NSComparisonResult) compareIP: (NSString *) string
