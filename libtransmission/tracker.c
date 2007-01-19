@@ -94,7 +94,8 @@ static void        setAnnounce      ( tr_tracker_t * tc, tr_announce_list_ptr_t 
 static void        failureAnnouncing( tr_tracker_t * tc );
 static tr_http_t * getQuery         ( tr_tracker_t * tc );
 static tr_http_t * getScrapeQuery   ( tr_tracker_t * tc );
-static void        readAnswer       ( tr_tracker_t * tc, const char *, int );
+static void        readAnswer       ( tr_tracker_t * tc, const char *, int,
+                                      int * peerCount, uint8_t ** peerCompact );
 static void        readScrapeAnswer ( tr_tracker_t * tc, const char *, int );
 static void        killHttp         ( tr_http_t ** http, tr_fd_t * fdlimit );
 
@@ -321,7 +322,8 @@ void tr_trackerChangePort( tr_tracker_t * tc, int port )
     tc->newPort = port;
 }
 
-void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
+void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
+                              uint8_t ** peerCompact, int manual )
 {
     tr_torrent_t * tor = tc->tor;
     tr_info_t    * inf = &tor->info;
@@ -329,6 +331,9 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
     char         * address, * announce;
     int            len, i, port;
     tr_announce_list_ptr_t * announcePtr, * prevAnnouncePtr;
+
+    *peerCount = 0;
+    *peerCompact = NULL;
     
     if( ( NULL == tc->http ) && ( manual || shouldConnect( tc ) ) )
     {
@@ -443,27 +448,11 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int manual )
                 failureAnnouncing( tc );
                 
                 tc->lastError = 1;
-                
-                if ( tc->shouldChangeAnnounce == TC_CHANGE_NEXT )
-                {
-                    tr_trackerPulse( tc );
-                    return;
-                }
-                
                 break;
 
             case TR_NET_OK:
-                readAnswer( tc, data, len );
+                readAnswer( tc, data, len, peerCount, peerCompact );
                 killHttp( &tc->http, tor->fdlimit );
-                
-                /* Something happened to need to try next address */
-                if ( tc->shouldChangeAnnounce == TC_CHANGE_NEXT
-                    || tc->shouldChangeAnnounce == TC_CHANGE_REDIRECT )
-                {
-                    tr_trackerPulse( tc );
-                    return;
-                }
-                
                 break;
         }
     }
@@ -638,7 +627,8 @@ static tr_http_t * getScrapeQuery( tr_tracker_t * tc )
                           tc->trackerScrape, start, tor->escapedHashString );
 }
 
-static void readAnswer( tr_tracker_t * tc, const char * data, int len )
+static void readAnswer( tr_tracker_t * tc, const char * data, int len,
+                        int * _peerCount, uint8_t ** _peerCompact )
 {
     tr_torrent_t * tor = tc->tor;
     int i;
@@ -648,6 +638,11 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
     const uint8_t * body;
     int bodylen, shouldfree, scrapeNeeded;
     char * address;
+    int peerCount;
+    uint8_t * peerCompact;
+
+    *_peerCount = peerCount = 0;
+    *_peerCompact = peerCompact = NULL;
 
     tc->dateTry = tr_date();
     code = tr_httpResponseCode( data, len );
@@ -841,58 +836,55 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len )
 
     if( bePeers->type & TYPE_LIST )
     {
-        char * ip;
-        int    port;
-
         /* Original protocol */
-        tr_inf( "Tracker: got %d peers", bePeers->val.l.count );
-
-        for( i = 0; i < bePeers->val.l.count; i++ )
+        if( bePeers->val.l.count > 0 )
         {
-            beFoo = tr_bencDictFind( &bePeers->val.l.vals[i], "ip" );
-            if( !beFoo )
-                continue;
-            ip = beFoo->val.s.s;
-            beFoo = tr_bencDictFind( &bePeers->val.l.vals[i], "port" );
-            if( !beFoo )
-                continue;
-            port = beFoo->val.i;
+            struct in_addr addr;
+            in_port_t port;
 
-            tr_peerAddOld( tor, ip, port );
-        }
+            peerCount = 0;
+            peerCompact = malloc( 6 * bePeers->val.l.count );
 
-        if( bePeers->val.l.count >= 50 )
-        {
-            tc->hasManyPeers = 1;
+            /* Convert to compact form */
+            for( i = 0; i < bePeers->val.l.count; i++ )
+            {
+                if( !( beFoo = tr_bencDictFind(
+                    &bePeers->val.l.vals[i], "ip" ) ) )
+                    continue;
+                if( tr_netResolve( beFoo->val.s.s, &addr ) )
+                    continue;
+                memcpy( &peerCompact[6 * peerCount], &addr, 4 );
+
+                if( !( beFoo = tr_bencDictFind(
+                    &bePeers->val.l.vals[i], "port" ) ) )
+                    continue;
+                port = htons( beFoo->val.i );
+                memcpy( &peerCompact[6 * peerCount + 4], &port, 2 );
+
+                peerCount++;
+            }
         }
     }
     else if( bePeers->type & TYPE_STR )
     {
-        struct in_addr addr;
-        in_port_t      port;
-
         /* "Compact" extension */
-        if( bePeers->val.s.i % 6 )
+        if( bePeers->val.s.i >= 6 )
         {
-            tr_err( "Tracker: \"peers\" of size %d",
-                    bePeers->val.s.i );
-            tr_lockUnlock( &tor->lock );
-            goto cleanup;
+            peerCount = bePeers->val.s.i / 6;
+            peerCompact = malloc( bePeers->val.s.i );
+            memcpy( peerCompact, bePeers->val.s.s, bePeers->val.s.i );
         }
+    }
 
-        tr_inf( "Tracker: got %d peers", bePeers->val.s.i / 6 );
-        for( i = 0; i < bePeers->val.s.i / 6; i++ )
-        {
-            memcpy( &addr, &bePeers->val.s.s[6*i],   4 );
-            memcpy( &port, &bePeers->val.s.s[6*i+4], 2 );
-
-            tr_peerAddCompact( tor, addr, port );
-        }
-
-        if( bePeers->val.s.i / 6 >= 50 )
+    if( peerCount > 0 )
+    {
+        tr_inf( "Tracker: got %d peers", peerCount );
+        if( peerCount >= 50 )
         {
             tc->hasManyPeers = 1;
         }
+        *_peerCount = peerCount;
+        *_peerCompact = peerCompact;
     }
 
 nodict:

@@ -30,8 +30,9 @@ typedef struct tr_tracker_s tr_tracker_t;
 tr_tracker_t * tr_trackerInit      ( tr_torrent_t * );
 void           tr_trackerChangePort( tr_tracker_t *, int );
 
-#define tr_trackerPulse( tc ) tr_trackerAnnouncePulse( (tc), 0 )
-void           tr_trackerAnnouncePulse( tr_tracker_t *, int );
+#define tr_trackerPulse(tc,a,b) tr_trackerAnnouncePulse((tc),(a),(b),0)
+void           tr_trackerAnnouncePulse( tr_tracker_t *, int * peerCount,
+                                        uint8_t ** peerCompact, int );
 
 void           tr_trackerCompleted( tr_tracker_t * );
 void           tr_trackerStopped  ( tr_tracker_t * );

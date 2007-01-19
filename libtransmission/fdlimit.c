@@ -370,6 +370,7 @@ static int OpenFile( tr_fd_t * f, int i, char * folder, char * name,
             {
                 if( mkdir( path, 0777 ) )
                 {
+                    tr_err( "Could not create folder '%s'", path );
                     free( path );
                     return ErrorFromErrno();
                 }
@@ -378,6 +379,7 @@ static int OpenFile( tr_fd_t * f, int i, char * folder, char * name,
             {
                 if( !S_ISDIR( sb.st_mode ) )
                 {
+                    tr_err( "Is not a folder: '%s'", path );
                     free( path );
                     return TR_ERROR_IO_OTHER;
                 }

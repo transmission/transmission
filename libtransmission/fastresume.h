@@ -376,7 +376,7 @@ static int fastResumeLoad( tr_io_t * io )
                     fclose( file );
                     return 1;
                 }
-                tr_peerAddCompactMany( tor, buf, len );
+                tr_peerAddCompact( tor, buf, len / 6 );
                 free( buf );
                 continue;
             }

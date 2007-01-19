@@ -255,11 +255,19 @@ int tr_getFinished( tr_torrent_t * tor )
 
 void tr_manualUpdate( tr_torrent_t * tor )
 {
+    int peerCount;
+    uint8_t * peerCompact;
+
     if( !( tor->status & TR_STATUS_ACTIVE ) )
         return;
     
     tr_lockLock( &tor->lock );
-    tr_trackerAnnouncePulse( tor->tracker, 1 );
+    tr_trackerAnnouncePulse( tor->tracker, &peerCount, &peerCompact, 1 );
+    if( peerCount > 0 )
+    {
+        tr_peerAddCompact( tor, peerCompact, peerCount );
+        free( peerCompact );
+    }
     tr_lockUnlock( &tor->lock );
 }
 
@@ -545,6 +553,8 @@ static void downloadLoop( void * _tor )
     tr_torrent_t * tor = _tor;
     uint64_t       date1, date2;
     int            ret;
+    int            peerCount;
+    uint8_t      * peerCompact;
 
     tr_lockLock( &tor->lock );
 
@@ -579,7 +589,12 @@ static void downloadLoop( void * _tor )
         }
 
         /* Try to get new peers or to send a message to the tracker */
-        tr_trackerPulse( tor->tracker );
+        tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+        if( peerCount > 0 )
+        {
+            tr_peerAddCompact( tor, peerCompact, peerCount );
+            free( peerCompact );
+        }
 
         if( tor->status & TR_STATUS_STOPPED )
         {

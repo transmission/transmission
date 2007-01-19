@@ -125,51 +125,21 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
 #include "peerparse.h"
 
 /***********************************************************************
- * tr_peerAddOld
- ***********************************************************************
- * Tries to add a peer given its IP and port (received from a tracker
- * which doesn't support the "compact" extension).
- **********************************************************************/
-void tr_peerAddOld( tr_torrent_t * tor, char * ip, int port )
-{
-    struct in_addr addr;
-
-    if( tr_netResolve( ip, &addr ) )
-    {
-        return;
-    }
-
-    addWithAddr( tor, addr, htons( port ) );
-}
-
-/***********************************************************************
  * tr_peerAddCompact
- ***********************************************************************
- * Tries to add a peer, using 'addr' and 'port' to connect to the peer.
- **********************************************************************/
-void tr_peerAddCompact( tr_torrent_t * tor, struct in_addr addr,
-                        in_port_t port )
-{
-    addWithAddr( tor, addr, port );
-}
-
-/***********************************************************************
- * tr_peerAddCompactMany
  ***********************************************************************
  * Adds several peers in compact form
  **********************************************************************/
-void tr_peerAddCompactMany( tr_torrent_t * tor, uint8_t * buf, int len )
+void tr_peerAddCompact( tr_torrent_t * tor, uint8_t * buf, int count )
 {
     struct in_addr addr;
     in_port_t port;
     int i;
 
-    len /= 6;
-    for( i = 0; i < len; i++ )
+    for( i = 0; i < count; i++ )
     {
         memcpy( &addr, buf, 4 ); buf += 4;
         memcpy( &port, buf, 2 ); buf += 2;
-        tr_peerAddCompact( tor, addr, port );
+        addWithAddr( tor, addr, port );
     }
 }
 
