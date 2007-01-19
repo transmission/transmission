@@ -436,12 +436,11 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             {
                 (s->peersIncoming)++;
             }
-            
-            if( tr_peerIsUploading( peer ) )
+            if( !tr_peerIsChoking( peer ) )
             {
                 (s->peersUploading)++;
             }
-            if( tr_peerIsDownloading( peer ) )
+            if( tr_peerIsUnchoked( peer ) )
             {
                 (s->peersDownloading)++;
             }
@@ -528,11 +527,11 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             peers[i].progress      = tr_peerProgress( peer );
             peers[i].port          = tr_peerPort( peer );
             
-            if( ( peers[i].isDownloading = tr_peerIsDownloading( peer ) ) )
+            if( ( peers[i].isDownloading = tr_peerIsUnchoked( peer ) ) )
             {
                 peers[i].uploadToRate = tr_peerUploadRate( peer );
             }
-            if( ( peers[i].isUploading = tr_peerIsUploading( peer ) ) )
+            if( ( peers[i].isUploading = !tr_peerIsChoking( peer ) ) )
             {
                 peers[i].downloadFromRate = tr_peerDownloadRate( peer );
             }
