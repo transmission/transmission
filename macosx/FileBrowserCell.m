@@ -54,9 +54,9 @@
     if (![[item objectForKey: @"IsFolder"] boolValue])
     {
         NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                    paragraphStyle, NSParagraphStyleAttributeName, nil];
+                        highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
+                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                        paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         NSString * statusString = [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]];
         

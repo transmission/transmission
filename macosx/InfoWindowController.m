@@ -28,7 +28,7 @@
 #define MIN_WINDOW_WIDTH 300
 #define MAX_WINDOW_WIDTH 5000
 
-#define FILE_ROW_LARGE_HEIGHT 34.0
+#define FILE_ROW_SMALL_HEIGHT 18.0
 
 #define TAB_INFO_IDENT @"Info"
 #define TAB_ACTIVITY_IDENT @"Activity"
@@ -754,10 +754,7 @@
         [cell setImage: icon];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
-    {
-        //always enable if mixed or off because clicking will turn on
         [cell setEnabled: NO];
-    }
     else;
 }
 
@@ -765,12 +762,7 @@
                 tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
     NSString * ident = [tableColumn identifier];
-    #warning change
-    /*if ([ident isEqualToString: @"Size"])
-        return ![[item objectForKey: @"IsFolder"] boolValue]
-                    ? [[[item objectForKey: @"Size"] stringValue] stringByAppendingString: NSLocalizedString(@" bytes",
-                            "Inspector -> Files tab -> table row tooltip")] : nil;
-    else*/ if ([ident isEqualToString: @"Name"])
+    if ([ident isEqualToString: @"Name"])
         return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];
     else
         return nil;
@@ -778,10 +770,10 @@
 
 - (float) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
-    float height = [outlineView rowHeight];
-    if (![[item objectForKey: @"IsFolder"] boolValue])
-        height = FILE_ROW_LARGE_HEIGHT;
-    return height;
+    if ([[item objectForKey: @"IsFolder"] boolValue])
+        return FILE_ROW_SMALL_HEIGHT;
+    else
+        return [outlineView rowHeight];
 }
 
 - (NSArray *) peerSortDescriptors
