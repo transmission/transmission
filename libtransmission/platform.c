@@ -194,13 +194,33 @@ char * tr_getTorrentsDirectory()
     return torrentsDirectory;
 }
 
-void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg )
+static void ThreadFunc( void * _t )
 {
+    tr_thread_t * t = _t;
+
 #ifdef SYS_BEOS
-    *t = spawn_thread( (void *) func, "torrent-tx", B_NORMAL_PRIORITY, arg );
-    resume_thread( *t );
+    /* This is required because on BeOS, SIGINT is sent to each thread,
+       which kills them not nicely */
+    signal( SIGINT, SIG_IGN );
+#endif
+
+    tr_dbg( "Thread '%s' started", t->name );
+    t->func( t->arg );
+    tr_dbg( "Thread '%s' exited", t->name );
+}
+
+void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg,
+                      char * name )
+{
+    t->func = func;
+    t->arg  = arg;
+    t->name = strdup( name );
+#ifdef SYS_BEOS
+    t->thread = spawn_thread( (void *) ThreadFunc, name,
+                              B_NORMAL_PRIORITY, t );
+    resume_thread( t->thread );
 #else
-    pthread_create( t, NULL, (void *) func, arg );
+    pthread_create( &t->thread, NULL, (void *) ThreadFunc, t );
 #endif
 }
 
@@ -208,10 +228,12 @@ void tr_threadJoin( tr_thread_t * t )
 {
 #ifdef SYS_BEOS
     long exit;
-    wait_for_thread( *t, &exit );
+    wait_for_thread( t->thread, &exit );
 #else
-    pthread_join( *t, NULL );
+    pthread_join( t->thread, NULL );
 #endif
+    tr_dbg( "Thread '%s' joined", t->name );
+    free( t->name );
 }
 
 void tr_lockInit( tr_lock_t * l )

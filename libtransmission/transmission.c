@@ -83,7 +83,7 @@ tr_handle_t * tr_init()
 
     h->acceptDie = 0;
     tr_lockInit( &h->acceptLock );
-    tr_threadCreate( &h->acceptThread, acceptLoop, h );
+    tr_threadCreate( &h->acceptThread, acceptLoop, h, "accept" );
 
     return h;
 }
@@ -367,6 +367,8 @@ char * tr_torrentGetFolder( tr_torrent_t * tor )
 
 void tr_torrentStart( tr_torrent_t * tor )
 {
+    char name[32];
+
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
     {
         /* Join the thread first */
@@ -384,7 +386,8 @@ void tr_torrentStart( tr_torrent_t * tor )
 
     tor->date = tr_date();
     tor->die = 0;
-    tr_threadCreate( &tor->thread, downloadLoop, tor );
+    snprintf( name, sizeof( name ), "torrent %p", tor );
+    tr_threadCreate( &tor->thread, downloadLoop, tor, name );
 }
 
 static void torrentStop( tr_torrent_t * tor )
@@ -413,7 +416,6 @@ static void torrentReallyStop( tr_torrent_t * tor )
 {
     tor->die = 1;
     tr_threadJoin( &tor->thread );
-    tr_dbg( "Thread joined" );
 
     tr_trackerClose( tor->tracker );
     tor->tracker = NULL;
@@ -763,14 +765,6 @@ static void downloadLoop( void * _tor )
     uint64_t       date1, date2;
     int            ret;
 
-    tr_dbg( "Thread started" );
-
-#ifdef SYS_BEOS
-    /* This is required because on BeOS, SIGINT is sent to each thread,
-       which kills them not nicely */
-    signal( SIGINT, SIG_IGN );
-#endif
-
     tr_lockLock( &tor->lock );
 
     tr_cpReset( tor->completion );
@@ -826,8 +820,6 @@ static void downloadLoop( void * _tor )
     tr_ioClose( tor->io );
 
     tor->status = TR_STATUS_STOPPED;
-
-    tr_dbg( "Thread exited" );
 }
 
 /***********************************************************************
@@ -840,14 +832,6 @@ static void acceptLoop( void * _h )
     int           ii;
     uint8_t     * hash;
     tr_torrent_t * tor;
-
-    tr_dbg( "Accept thread started" );
-
-#ifdef SYS_BEOS
-    /* This is required because on BeOS, SIGINT is sent to each thread,
-       which kills them not nicely */
-    signal( SIGINT, SIG_IGN );
-#endif
 
     tr_lockLock( &h->acceptLock );
 
@@ -939,8 +923,6 @@ static void acceptLoop( void * _h )
     }
 
     tr_lockUnlock( &h->acceptLock );
-
-    tr_dbg( "Accept thread exited" );
 }
 
 /***********************************************************************
@@ -955,7 +937,6 @@ static void acceptStop( tr_handle_t * h )
     h->acceptDie = 1;
     tr_threadJoin( &h->acceptThread );
     tr_lockClose( &h->acceptLock );
-    tr_dbg( "Accept thread joined" );
 
     for( ii = 0; ii < h->acceptPeerCount; ii++ )
     {

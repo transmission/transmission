@@ -73,7 +73,7 @@ void tr_netResolveThreadInit()
     resolveQueue = NULL;
     tr_lockInit( &resolveLock );
     tr_condInit( &resolveCond );
-    tr_threadCreate( &resolveThread, resolveFunc, NULL );
+    tr_threadCreate( &resolveThread, resolveFunc, NULL, "resolve" );
 }
 
 /***********************************************************************
@@ -182,8 +182,6 @@ static void resolveFunc( void * arg UNUSED )
     tr_resolve_t * r;
     struct hostent * host;
 
-    tr_dbg( "Resolve thread started" );
-
     tr_lockLock( &resolveLock );
 
     while( !resolveDie )
@@ -221,8 +219,6 @@ static void resolveFunc( void * arg UNUSED )
         resolveQueue = r->next;
         resolveRelease( r );
     }
-
-    tr_dbg( "Resolve thread exited" );
 }
 
 
