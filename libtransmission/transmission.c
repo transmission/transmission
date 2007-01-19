@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "shared.h"
 
 /***********************************************************************
  * Local prototypes
@@ -31,8 +32,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
                                        int flags, int * error );
 static void torrentReallyStop( tr_torrent_t * );
 static void downloadLoop( void * );
-static void acceptLoop( void * );
-static void acceptStop( tr_handle_t * h );
 
 /***********************************************************************
  * tr_init
@@ -73,17 +72,8 @@ tr_handle_t * tr_init()
     h->uploadLimit   = -1;
     h->downloadLimit = -1;
     
-    h->fdlimit  = tr_fdInit();
-    h->choking  = tr_chokingInit( h );
-    h->natpmp   = tr_natpmpInit( h->fdlimit );
-    h->upnp     = tr_upnpInit( h->fdlimit );
-
-    h->bindPort = -1;
-    h->bindSocket = -1;
-
-    h->acceptDie = 0;
-    tr_lockInit( &h->acceptLock );
-    tr_threadCreate( &h->acceptThread, acceptLoop, h, "accept" );
+    h->fdlimit = tr_fdInit();
+    h->shared = tr_sharedInit( h );
 
     return h;
 }
@@ -95,106 +85,24 @@ tr_handle_t * tr_init()
  **********************************************************************/
 void tr_setBindPort( tr_handle_t * h, int port )
 {
-    int sock = -1;
-    tr_torrent_t * tor;
-
-    if( h->bindPort == port )
-      return;
-
-#ifndef BEOS_NETSERVER
-    /* BeOS net_server seems to be unable to set incoming connections to
-       non-blocking. Too bad. */
-    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
-    {
-        /* XXX should handle failure here in a better way */
-        sock = tr_netBindTCP( port );
-        if( 0 > sock)
-        {
-            tr_fdSocketClosed( h->fdlimit, 0 );
-        }
-        else
-        {   
-            tr_inf( "Bound listening port %d", port );
-            listen( sock, 5 );
-        }
-    }
-#else
-    return;
-#endif
-
-    tr_lockLock( &h->acceptLock );
-
     h->bindPort = port;
-
-    for( tor = h->torrentList; tor; tor = tor->next )
-    {
-        tr_lockLock( &tor->lock );
-        if( NULL != tor->tracker )
-        {
-            tr_trackerChangePort( tor->tracker, port );
-        }
-        tr_lockUnlock( &tor->lock );
-    }
-
-    if( h->bindSocket > -1 )
-    {
-        tr_netClose( h->bindSocket );
-        tr_fdSocketClosed( h->fdlimit, 0 );
-    }
-
-    h->bindSocket = sock;
-
-    tr_natpmpForwardPort( h->natpmp, port );
-    tr_upnpForwardPort( h->upnp, port );
-
-    tr_lockUnlock( &h->acceptLock );
+    tr_sharedSetPort( h->shared, port );
 }
 
-void tr_natTraversalEnable( tr_handle_t * h )
+void tr_natTraversalEnable( tr_handle_t * h, int enable )
 {
-    tr_natpmpStart( h->natpmp );
-    tr_upnpStart( h->upnp );
-}
-
-void tr_natTraversalDisable( tr_handle_t * h )
-{
-    tr_natpmpStop( h->natpmp );
-    tr_upnpStop( h->upnp );
+    tr_sharedTraversalEnable( h->shared, enable );
 }
 
 int tr_natTraversalStatus( tr_handle_t * h )
 {
-    int statuses[] = {
-        TR_NAT_TRAVERSAL_MAPPED,
-        TR_NAT_TRAVERSAL_MAPPING,
-        TR_NAT_TRAVERSAL_UNMAPPING,
-        TR_NAT_TRAVERSAL_ERROR,
-        TR_NAT_TRAVERSAL_NOTFOUND,
-        TR_NAT_TRAVERSAL_DISABLED,
-        -1,
-    };
-    int natpmp, upnp, ii;
-
-    natpmp = tr_natpmpStatus( h->natpmp );
-    upnp = tr_upnpStatus( h->upnp );
-
-    for( ii = 0; 0 <= statuses[ii]; ii++ )
-    {
-        if( statuses[ii] == natpmp || statuses[ii] == upnp )
-        {
-            return statuses[ii];
-        }
-    }
-
-    assert( 0 );
-
-    return TR_NAT_TRAVERSAL_ERROR;
+    return tr_sharedTraversalStatus( h->shared );
 }
 
 void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )
 {
     h->uploadLimit = limit;
-    tr_chokingSetLimit( h->choking, limit );
+    tr_sharedSetLimit( h->shared, limit );
 }
 
 void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
@@ -322,7 +230,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->swarmspeed     = tr_rcInit();
  
     /* We have a new torrent */
-    tr_lockLock( &h->acceptLock );
+    tr_sharedLock( h->shared );
     tor->prev = NULL;
     tor->next = h->torrentList;
     if( tor->next )
@@ -331,7 +239,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     }
     h->torrentList = tor;
     (h->torrentCount)++;
-    tr_lockUnlock( &h->acceptLock );
+    tr_sharedUnlock( h->shared );
 
     if( 0 > h->bindPort )
     {
@@ -709,7 +617,7 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
         torrentReallyStop( tor );
     }
 
-    tr_lockLock( &h->acceptLock );
+    tr_sharedLock( h->shared );
 
     h->torrentCount--;
 
@@ -741,15 +649,12 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
     }
     free( tor );
 
-    tr_lockUnlock( &h->acceptLock );
+    tr_sharedUnlock( h->shared );
 }
 
 void tr_close( tr_handle_t * h )
 {
-    acceptStop( h );
-    tr_natpmpClose( h->natpmp );
-    tr_upnpClose( h->upnp );
-    tr_chokingClose( h->choking );
+    tr_sharedClose( h->shared );
     tr_fdClose( h->fdlimit );
     free( h );
 
@@ -822,130 +727,3 @@ static void downloadLoop( void * _tor )
     tor->status = TR_STATUS_STOPPED;
 }
 
-/***********************************************************************
- * acceptLoop
- **********************************************************************/
-static void acceptLoop( void * _h )
-{
-    tr_handle_t * h = _h;
-    uint64_t      date1, date2, lastchoke = 0;
-    int           ii;
-    uint8_t     * hash;
-    tr_torrent_t * tor;
-
-    tr_lockLock( &h->acceptLock );
-
-    while( !h->acceptDie )
-    {
-        date1 = tr_date();
-
-        /* do NAT-PMP and UPnP pulses here since there's nowhere better */
-        tr_natpmpPulse( h->natpmp );
-        tr_upnpPulse( h->upnp );
-
-        /* Check for incoming connections */
-        if( h->bindSocket > -1 &&
-            h->acceptPeerCount < TR_MAX_PEER_COUNT &&
-            !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
-        {
-            int            s;
-            struct in_addr addr;
-            in_port_t      port;
-            s = tr_netAccept( h->bindSocket, &addr, &port );
-            if( s > -1 )
-            {
-                h->acceptPeers[h->acceptPeerCount++] = tr_peerInit( addr, port, s );
-            }
-            else
-            {
-                tr_fdSocketClosed( h->fdlimit, 0 );
-            }
-        }
-
-        for( ii = 0; ii < h->acceptPeerCount; )
-        {
-            if( tr_peerRead( NULL, h->acceptPeers[ii] ) )
-            {
-                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
-                goto removePeer;
-            }
-            if( NULL != ( hash = tr_peerHash( h->acceptPeers[ii] ) ) )
-            {
-                for( tor = h->torrentList; tor; tor = tor->next )
-                {
-                    tr_lockLock( &tor->lock );
-                    if( tor->status & TR_STATUS_INACTIVE )
-                    {
-                        tr_lockUnlock( &tor->lock );
-                        continue;
-                    }
-
-                    if( 0 == memcmp( tor->info.hash, hash,
-                                     SHA_DIGEST_LENGTH ) )
-                    {
-                      tr_peerAttach( tor, h->acceptPeers[ii] );
-                      tr_lockUnlock( &tor->lock );
-                      goto removePeer;
-                    }
-                    tr_lockUnlock( &tor->lock );
-                }
-                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
-                goto removePeer;
-            }
-            if( date1 > tr_peerDate( h->acceptPeers[ii] ) + 10000 )
-            {
-                /* Give them 10 seconds to send the handshake */
-                tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
-                goto removePeer;
-            }
-            ii++;
-            continue;
-           removePeer:
-            h->acceptPeerCount--;
-            memmove( &h->acceptPeers[ii], &h->acceptPeers[ii+1],
-                     ( h->acceptPeerCount - ii ) * sizeof( tr_peer_t * ) );
-        }
-
-        if( date1 > lastchoke + 2000 )
-        {
-            tr_chokingPulse( h->choking );
-            lastchoke = date1;
-        }
-
-        /* Wait up to 20 ms */
-        date2 = tr_date();
-        if( date2 < date1 + 20 )
-        {
-            tr_lockUnlock( &h->acceptLock );
-            tr_wait( date1 + 20 - date2 );
-            tr_lockLock( &h->acceptLock );
-        }
-    }
-
-    tr_lockUnlock( &h->acceptLock );
-}
-
-/***********************************************************************
- * acceptStop
- ***********************************************************************
- * Joins the accept thread and frees/closes everything related to it.
- **********************************************************************/
-static void acceptStop( tr_handle_t * h )
-{
-    int ii;
-
-    h->acceptDie = 1;
-    tr_threadJoin( &h->acceptThread );
-    tr_lockClose( &h->acceptLock );
-
-    for( ii = 0; ii < h->acceptPeerCount; ii++ )
-    {
-        tr_peerDestroy( h->fdlimit, h->acceptPeers[ii] );
-    }
-
-    if( h->bindSocket > -1 )
-    {
-        tr_netClose( h->bindSocket );
-        tr_fdSocketClosed( h->fdlimit, 0 );
-    }
-}

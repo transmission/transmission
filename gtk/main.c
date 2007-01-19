@@ -517,7 +517,7 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
   tr_backend_stop_torrents(data->back);
 
   /* shut down nat traversal */
-  tr_natTraversalDisable(tr_backend_handle(data->back));
+  tr_natTraversalEnable(tr_backend_handle(data->back), 0);
 
   /* set things up to wait for torrents to stop */
   edata = g_new0(struct exitdata, 1);

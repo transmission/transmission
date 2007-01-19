@@ -25,6 +25,8 @@
 #ifndef TR_PEER_H
 #define TR_PEER_H 1
 
+#include "transmission.h"
+
 typedef struct tr_peer_s tr_peer_t; 
 
 void        tr_peerAddOld        ( tr_torrent_t *, char *, int );

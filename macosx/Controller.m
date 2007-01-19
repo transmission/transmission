@@ -460,7 +460,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
     
     //disable NAT traversal
-    tr_natTraversalDisable(fLib);
+    tr_natTraversalEnable(fLib, 0);
     
     //remember window states and close all windows
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];

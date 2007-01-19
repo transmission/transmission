@@ -441,10 +441,7 @@ applyprefs(TrBackend *back) {
 
   /* enable/disable NAT traversal */
   boolval = (NULL == (pref = cf_getpref(PREF_NAT)) ? DEF_NAT : strbool(pref));
-  if( boolval )
-    tr_natTraversalEnable(tr);
-  else
-    tr_natTraversalDisable(tr);
+  tr_natTraversalEnable(tr, boolval);
 }
 
 void

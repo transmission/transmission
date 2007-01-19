@@ -118,6 +118,7 @@ static inline void tr_htonl( uint32_t a, uint8_t * p )
 #define TR_MAX_PEER_COUNT 60
 
 typedef struct tr_completion_s tr_completion_t;
+typedef struct tr_shared_s tr_shared_t;
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -201,25 +202,14 @@ struct tr_handle_s
     int            torrentCount;
     tr_torrent_t * torrentList;
 
+    int            bindPort;
     int            uploadLimit;
     int            downloadLimit;
     tr_fd_t      * fdlimit;
-    tr_choking_t * choking;
-    tr_natpmp_t  * natpmp;
-    tr_upnp_t    * upnp;
-
-    int            bindPort;
-    int            bindSocket;
-
-    int            acceptPeerCount;
-    tr_peer_t    * acceptPeers[TR_MAX_PEER_COUNT];
+    tr_shared_t  * shared;
 
     char           id[21];
     char           key[21];
-
-    volatile char  acceptDie;
-    tr_thread_t    acceptThread;
-    tr_lock_t      acceptLock;
 };
 
 #endif

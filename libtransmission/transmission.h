@@ -128,8 +128,7 @@ void tr_setBindPort( tr_handle_t *, int );
  ***********************************************************************
  * Enable or disable NAT traversal using NAT-PMP or UPnP IGD.
  **********************************************************************/
-void tr_natTraversalEnable( tr_handle_t * );
-void tr_natTraversalDisable( tr_handle_t * );
+void tr_natTraversalEnable( tr_handle_t *, int enable );
 
 /***********************************************************************
  * tr_natTraversalStatus

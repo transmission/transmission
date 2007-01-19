@@ -5,7 +5,9 @@ include ../mk/common.mk
 
 SRCS = transmission.c bencode.c net.c tracker.c peer.c inout.c \
        metainfo.c sha1.c utils.c fdlimit.c clients.c completion.c \
-       platform.c ratecontrol.c choking.c natpmp.c upnp.c http.c xml.c
+       platform.c ratecontrol.c choking.c natpmp.c upnp.c http.c xml.c \
+       shared.c
+
 OBJS = $(SRCS:%.c=%.o)
 
 CFLAGS += -D__TRANSMISSION__

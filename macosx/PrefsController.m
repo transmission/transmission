@@ -75,8 +75,7 @@
         tr_setBindPort(fHandle, bindPort);
         
         //set NAT
-        if ([fDefaults boolForKey: @"NatTraversal"])
-            tr_natTraversalEnable(fHandle);
+        tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
@@ -294,7 +293,7 @@
 
 - (void) setNat: (id) sender
 {
-    [fDefaults boolForKey: @"NatTraversal"] ? tr_natTraversalEnable(fHandle) : tr_natTraversalDisable(fHandle);
+    tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
     [self updateNatStatus];
 }
 

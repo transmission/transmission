@@ -176,14 +176,7 @@ int main( int argc, char ** argv )
     tr_setGlobalUploadLimit( h, uploadLimit );
     tr_setGlobalDownloadLimit( h, downloadLimit );
 
-    if( natTraversal )
-    {
-        tr_natTraversalEnable( h );
-    }
-    else
-    {
-        tr_natTraversalDisable( h );
-    }
+    tr_natTraversalEnable( h, natTraversal );
     
     tr_torrentSetFolder( tor, "." );
     tr_torrentStart( tor );
@@ -244,7 +237,7 @@ int main( int argc, char ** argv )
     fprintf( stderr, "\n" );
 
     /* Try for 5 seconds to delete any port mappings for nat traversal */
-    tr_natTraversalDisable( h );
+    tr_natTraversalEnable( h, 0 );
     for( i = 0; i < 10; i++ )
     {
         nat = tr_natTraversalStatus( h );
