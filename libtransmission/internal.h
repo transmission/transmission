@@ -173,6 +173,7 @@ struct tr_torrent_s
     volatile char     die;
     tr_thread_t       thread;
     tr_lock_t         lock;
+    tr_cond_t         cond;
 
     tr_tracker_t    * tracker;
     tr_io_t         * io;

@@ -130,6 +130,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->completion = tr_cpInit( tor );
 
     tr_lockInit( &tor->lock );
+    tr_condInit( &tor->cond );
 
     tor->fdlimit        = h->fdlimit;
     tor->upload         = tr_rcInit();
@@ -219,6 +220,10 @@ void tr_torrentStop( tr_torrent_t * tor )
 {
     tr_lockLock( &tor->lock );
     torrentStop( tor );
+
+    /* Don't return until the files are closed, so the UI can trash
+     * them if requested */
+    tr_condWait( &tor->cond, &tor->lock );
     tr_lockUnlock( &tor->lock );
 }
 
@@ -491,7 +496,8 @@ void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size )
     tr_lockUnlock( &tor->lock );
 }
 
-void tr_torrentRemoveSaved( tr_torrent_t * tor ) {
+void tr_torrentRemoveSaved( tr_torrent_t * tor )
+{
     tr_metainfoRemoveSaved( tor->info.hashString );
 }
 
@@ -515,6 +521,7 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
     h->torrentCount--;
 
     tr_lockClose( &tor->lock );
+    tr_condClose( &tor->cond );
     tr_cpClose( tor->completion );
 
     tr_rcClose( tor->upload );
@@ -578,14 +585,25 @@ static void downloadLoop( void * _tor )
             tr_ioSync( tor->io );
         }
 
-        /* Receive/send messages */
-        if( ( ret = tr_peerPulse( tor ) ) )
+        if( tor->status & TR_STATUS_STOPPING )
         {
-            tr_err( "Fatal error, stopping download (%d)", ret );
-            torrentStop( tor );
-            tor->error = ret;
-            snprintf( tor->errorString, sizeof( tor->errorString ),
-                      "%s", tr_errorString( ret ) );
+            if( tor->io )
+            {
+                tr_ioClose( tor->io ); tor->io = NULL;
+                tr_condSignal( &tor->cond );
+            }
+        }
+        else
+        {
+            /* Receive/send messages */
+            if( ( ret = tr_peerPulse( tor ) ) )
+            {
+                tr_err( "Fatal error, stopping download (%d)", ret );
+                torrentStop( tor );
+                tor->error = ret;
+                snprintf( tor->errorString, sizeof( tor->errorString ),
+                          "%s", tr_errorString( ret ) );
+            }
         }
 
         /* Try to get new peers or to send a message to the tracker */
@@ -613,7 +631,11 @@ static void downloadLoop( void * _tor )
 
     tr_lockUnlock( &tor->lock );
 
-    tr_ioClose( tor->io );
+    if( tor->io )
+    {
+        tr_ioClose( tor->io ); tor->io = NULL;
+        tr_condSignal( &tor->cond );
+    }
 
     tor->status = TR_STATUS_STOPPED;
 }
