@@ -43,16 +43,14 @@
                     [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
                     paragraphStyle, NSParagraphStyleAttributeName, nil];
     
-    float textHeight = [(NSTableView *)controlView rowHeight];
-    NSRect textRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 1.0,
-                                    NSMaxX(cellFrame) - NSMaxX(imageRect) - 2.0 * SPACE, textHeight);
+    NSString * nameString = [item objectForKey: @"Name"];
+    NSRect nameTextRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 1.0,
+            NSMaxX(cellFrame) - NSMaxX(imageRect) - 2.0 * SPACE, [nameString sizeWithAttributes: nameAttributes].height);
     
-    NSAttributedString * text = [[NSAttributedString alloc] initWithString: [item objectForKey: @"Name"]
-                                                                attributes: nameAttributes];
-    [text drawInRect: textRect];
-    [text release];
+    [nameString drawInRect: nameTextRect withAttributes: nameAttributes];
+    [nameAttributes release];
     
-    //bottomText
+    //status text
     if (![[item objectForKey: @"IsFolder"] boolValue])
     {
         NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -60,22 +58,17 @@
                     [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
                     paragraphStyle, NSParagraphStyleAttributeName, nil];
         
-        NSRect bottomTextRect = textRect;
-        bottomTextRect.origin.y += textHeight;
-        bottomTextRect.size.height = cellFrame.size.height - textHeight;
+        NSString * statusString = [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]];
         
-        NSMutableAttributedString * bottomText = [[NSMutableAttributedString alloc] initWithString:
-                                [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]
-                                attributes: statusAttributes];
+        NSRect statusTextRect = nameTextRect;
+        statusTextRect.size.height = [statusString sizeWithAttributes: statusAttributes].height;
+        statusTextRect.origin.y += (cellFrame.size.height + nameTextRect.size.height - statusTextRect.size.height) * 0.5 - 1.0;
         
-        [bottomText drawInRect: bottomTextRect];
-        [bottomText release];
-        
+        [statusString drawInRect: statusTextRect withAttributes: statusAttributes];
         [statusAttributes release];
     }
     
     [paragraphStyle release];
-    [nameAttributes release];
 }
 
 @end

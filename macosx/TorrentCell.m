@@ -218,20 +218,20 @@
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + PADDING;
         
-        NSAttributedString * nameString = [[NSAttributedString alloc] initWithString: [info objectForKey: @"Name"]
-                                                        attributes: nameAttributes];
-        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [nameString size].height)];
+        NSString * nameString = [info objectForKey: @"Name"];
+        NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
+        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, nameSize.height) withAttributes: nameAttributes];
         
         //progress string
-        pen.y += [nameString size].height + LINE_PADDING - 1.0;
+        pen.y += nameSize.height + LINE_PADDING - 1.0;
         
-        NSAttributedString * progressString = [[NSAttributedString alloc] initWithString:
-                                                [info objectForKey: @"ProgressString"] attributes: statusAttributes];
-        [progressString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [progressString size].height)];
+        NSString * progressString = [info objectForKey: @"ProgressString"];
+        NSSize progressSize = [progressString sizeWithAttributes: statusAttributes];
+        [progressString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, progressSize.height) withAttributes: statusAttributes];
 
         //progress bar
         pen.x -= EXTRA_NAME_SHIFT;
-        pen.y += [progressString size].height + LINE_PADDING + BAR_HEIGHT;
+        pen.y += progressSize.height + LINE_PADDING + BAR_HEIGHT;
         
         float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
         
@@ -244,13 +244,9 @@
         pen.x += EXTRA_NAME_SHIFT;
         pen.y += LINE_PADDING;
         
-        NSAttributedString * statusString = [[NSAttributedString alloc] initWithString:
-                                                [info objectForKey: @"StatusString"] attributes: statusAttributes];
-        [statusString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, [statusString size].height)];
-        
-        [nameString release];
-        [progressString release];
-        [statusString release];
+        NSString * statusString = [info objectForKey: @"StatusString"];
+        NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
+        [statusString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, statusSize.height) withAttributes: statusAttributes];
     }
     else //small size
     {
@@ -266,32 +262,32 @@
 
         //name and status string
         float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
-        
-        NSString * realStatusString = !fStatusRegular && [[info objectForKey: @"Active"] boolValue]
-                                        ? [info objectForKey: @"RemainingTimeString"]
-                                        : [info objectForKey: @"ShortStatusString"];
-        
-        NSAttributedString * statusString = [[NSAttributedString alloc] initWithString: realStatusString
-                                                    attributes: statusAttributes];
-        NSAttributedString * nameString = [[NSAttributedString alloc] initWithString:
-                                                [info objectForKey: @"Name"] attributes: nameAttributes];
                      
         //place name string
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + LINE_PADDING;
 
-        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth - [statusString size].width - LINE_PADDING,
-                                                [nameString size].height)];
+        NSString * nameString = [info objectForKey: @"Name"];
+        NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
+        
+        NSString * statusString = !fStatusRegular && [[info objectForKey: @"Active"] boolValue]
+                                        ? [info objectForKey: @"RemainingTimeString"]
+                                        : [info objectForKey: @"ShortStatusString"];
+        NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
+        
+        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth - statusSize.width - 2.0 * LINE_PADDING, nameSize.height)
+                        withAttributes: nameAttributes];
         
         //place status string
-        pen.x = NSMaxX(cellFrame) - PADDING - [statusString size].width;
-        pen.y += ([nameString size].height - [statusString size].height) * 0.5;
+        pen.x = NSMaxX(cellFrame) - PADDING - statusSize.width;
+        pen.y += (nameSize.height - statusSize.height) * 0.5;
         
-        [statusString drawAtPoint: pen];
+        [statusString drawInRect: NSMakeRect(pen.x, pen.y, statusSize.width, statusSize.height)
+                        withAttributes: statusAttributes];
         
         //progress bar
         pen.x = cellFrame.origin.x + iconSize.width + 2.0 * PADDING;
-        pen.y = cellFrame.origin.y + [nameString size].height + LINE_PADDING + PADDING + BAR_HEIGHT;
+        pen.y = cellFrame.origin.y + nameSize.height + LINE_PADDING + PADDING + BAR_HEIGHT;
         
         float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
         
@@ -299,9 +295,6 @@
             [self buildAdvancedBar: barWidth point: pen];
         else
             [self buildSimpleBar: barWidth point: pen];
-        
-        [nameString release];
-        [statusString release];
     }
     
     [nameAttributes release];
