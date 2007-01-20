@@ -632,18 +632,22 @@ void tr_peerBlame( tr_torrent_t * tor, tr_peer_t * peer,
 int tr_peerGetConnectable( tr_torrent_t * tor, uint8_t ** _buf )
 {
     int count = 0;
-    uint8_t * buf = malloc( 6 * tor->peerCount );
+    uint8_t * buf;
     tr_peer_t * peer;
     int i;
 
+    if( tor->peerCount < 1 )
+    {
+        *_buf = NULL;
+        return 0;
+    }
+
+    buf = malloc( 6 * tor->peerCount );
     for( i = 0; i < tor->peerCount; i++ )
     {
         peer = tor->peers[i];
 
-        /* Skip peers for which the connection isn't established,
-         * and peers that came from incoming connections */
-        if( peer->status < PEER_STATUS_CONNECTED )
-            continue;
+        /* Skip peers that came from incoming connections */
         if( peer->incoming )
             continue;
 
@@ -654,13 +658,9 @@ int tr_peerGetConnectable( tr_torrent_t * tor, uint8_t ** _buf )
 
     if( count < 1 )
     {
-        free( buf );
-        *_buf = NULL;
+        free( buf ); buf = NULL;
     }
-    else
-    {
-        *_buf = buf;
-    }
+    *_buf = buf;
 
     return count * 6;
 }
