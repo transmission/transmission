@@ -280,6 +280,7 @@
     [self updateInfoSettings];
     
     [fPeerTable reloadData];
+    [fFileOutline deselectAll: nil];
     [fFileOutline reloadData];
 }
 
