@@ -111,6 +111,7 @@ void tr_sharedClose( tr_shared_t * s )
     tr_natpmpClose( s->natpmp );
     tr_upnpClose( s->upnp );
     tr_chokingClose( s->choking );
+    free( s );
 }
 
 /***********************************************************************

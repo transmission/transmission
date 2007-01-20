@@ -536,9 +536,24 @@ void tr_trackerStopped( tr_tracker_t * tc )
 void tr_trackerClose( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
+    tr_info_t * inf = &tor->info;
+    tr_announce_list_ptr_t * cur, * curFree;
+    int ii;
 
     killHttp( &tc->http, tor->fdlimit );
     killHttp( &tc->httpScrape, tor->fdlimit );
+
+    for( ii = 0; ii < inf->trackerTiers; ii++ )
+    {
+        for( cur = tc->trackerAnnounceListPtr[ii]; cur; )
+        {
+            curFree = cur;
+            cur = cur->nextItem;
+            free( curFree );
+        }
+    }
+    free( tc->trackerAnnounceListPtr );
+
     free( tc->trackerid );
     free( tc );
 }
