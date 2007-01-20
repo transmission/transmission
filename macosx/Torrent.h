@@ -50,9 +50,8 @@
     
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
-    BOOL    fLimitCustom, fCheckUpload, fCheckDownload,
-            fRatioCustom, fShouldStopAtRatio,
-            fFinishedSeeding, fWaitToStart, fError;
+    BOOL    fLimitCustom, fCheckUpload, fCheckDownload, fRatioCustom, fShouldStopAtRatio,
+            fFinishedSeeding, fWaitToStart, fError, fChecking;
     
     int fOrderValue;
     

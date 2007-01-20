@@ -290,10 +290,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
                 [NSString stringForRatio: [self ratio]]];
 
+    BOOL wasChecking = fChecking;
+    fChecking = NO;
     switch (fStat->status)
     {
         NSString * tempString;
-    
+        
         case TR_STATUS_PAUSE:
             if (fWaitToStart)
             {
@@ -317,6 +319,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [fStatusString setString: tempString];
             [fShortStatusString setString: tempString];
             [fRemainingTimeString setString: tempString];
+            
+            fChecking = YES;
             
             break;
 
@@ -368,8 +372,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
                                                 [self peersDownloading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peer", "Torrent -> status string"),
-                                                [self peersDownloading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
+                                                [self peersDownloading]];
             
             break;
 
@@ -381,6 +385,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             
             break;
     }
+    
+    if (wasChecking && !fChecking)
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
     if (fStat->error)
     {
