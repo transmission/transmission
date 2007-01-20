@@ -791,6 +791,11 @@
         return [outlineView rowHeight];
 }
 
+- (BOOL) outlineView: (NSOutlineView *) outlineView shouldSelectItem: (id) item
+{
+    return item != nil;
+}
+
 - (NSArray *) peerSortDescriptors
 {
     NSMutableArray * descriptors = [NSMutableArray array];
