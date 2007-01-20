@@ -661,27 +661,53 @@
 - (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
 {
     if (!item)
-        return [fFiles count];
+        return fFiles ? [fFiles count] : 1;
     return [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Children"] count] : 0;
 }
 
 - (BOOL) outlineView: (NSOutlineView *) outlineView isItemExpandable: (id) item 
 {
-    return [[item objectForKey: @"IsFolder"] boolValue];
+    return item && [[item objectForKey: @"IsFolder"] boolValue];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView child: (int) index ofItem: (id) item
 {
+    if (!fFiles)
+        return nil;
+    
     return [(item ? [item objectForKey: @"Children"] : fFiles) objectAtIndex: index];
 }
 
 - (id) outlineView: (NSOutlineView *) outlineView objectValueForTableColumn: (NSTableColumn *) tableColumn
             byItem: (id) item
 {
+    if (!item)
+        return nil;
+    
     if ([[tableColumn identifier] isEqualToString: @"Check"])
         return [item objectForKey: @"Check"];
     else
         return item;
+}
+
+- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
+            forTableColumn: (NSTableColumn *) tableColumn item:(id) item
+{
+    if ([[tableColumn identifier] isEqualToString: @"Name"])
+    {
+        if (!item)
+            return;
+        
+        NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
+                            ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
+        [cell setImage: icon];
+    }
+    else if ([[tableColumn identifier] isEqualToString: @"Check"])
+    {
+        [(NSButtonCell *)cell setImagePosition: item ? NSImageOnly : NSNoImage];
+        [cell setEnabled: NO];
+    }
+    else;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
@@ -744,23 +770,12 @@
         return originalChild;
 }
 
-- (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
-            forTableColumn: (NSTableColumn *) tableColumn item:(id) item
-{
-    if ([[tableColumn identifier] isEqualToString: @"Name"])
-    {
-        NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
-                            ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
-        [cell setImage: icon];
-    }
-    else if ([[tableColumn identifier] isEqualToString: @"Check"])
-        [cell setEnabled: NO];
-    else;
-}
-
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
                 tableColumn: (NSTableColumn *) tableColumn item: (id) item mouseLocation: (NSPoint) mouseLocation
 {
+    if (!item)
+        return nil;
+    
     NSString * ident = [tableColumn identifier];
     if ([ident isEqualToString: @"Name"])
         return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];

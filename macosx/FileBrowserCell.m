@@ -19,6 +19,10 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
+    NSMutableDictionary * item;
+    if (!(item = [self objectValue]))
+        return;
+    
     //image
     float imageHeight = cellFrame.size.height - 2.0;
     
@@ -31,8 +35,6 @@
     [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     //text
-    NSMutableDictionary * item = [self objectValue];
-    
     NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
     
