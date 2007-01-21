@@ -484,11 +484,6 @@ float tr_peerUploadRate( tr_peer_t * peer )
     return tr_rcRate( peer->upload );
 }
 
-int tr_peerIsInterested  ( tr_peer_t * peer )
-{
-    return peer->peerInterested;
-}
-
 void tr_peerChoke( tr_peer_t * peer )
 {
     sendChoke( peer, 1 );
