@@ -427,14 +427,21 @@ int tr_peerIsIncoming( tr_peer_t * peer )
     return peer->incoming;
 }
 
-/***********************************************************************
- * tr_peerIsChoking
- ***********************************************************************
- *
- **********************************************************************/
+int tr_peerAmChoking( tr_peer_t * peer )
+{
+    return peer->amChoking;
+}
+int tr_peerAmInterested( tr_peer_t * peer )
+{
+    return peer->amInterested;
+}
 int tr_peerIsChoking( tr_peer_t * peer )
 {
     return peer->peerChoking;
+}
+int tr_peerIsInterested( tr_peer_t * peer )
+{
+    return peer->peerInterested;
 }
 
 /***********************************************************************
@@ -475,11 +482,6 @@ float tr_peerDownloadRate( tr_peer_t * peer )
 float tr_peerUploadRate( tr_peer_t * peer )
 {
     return tr_rcRate( peer->upload );
-}
-
-int tr_peerIsUnchoked( tr_peer_t * peer )
-{
-    return !peer->amChoking;
 }
 
 int tr_peerIsInterested  ( tr_peer_t * peer )

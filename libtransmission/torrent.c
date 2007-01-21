@@ -337,11 +337,11 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             {
                 (s->peersIncoming)++;
             }
-            if( !tr_peerIsChoking( peer ) )
+            if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
             {
                 (s->peersUploading)++;
             }
-            if( tr_peerIsUnchoked( peer ) )
+            if( !tr_peerAmChoking( peer ) )
             {
                 (s->peersDownloading)++;
             }
