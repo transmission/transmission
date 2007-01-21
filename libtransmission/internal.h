@@ -33,6 +33,11 @@
 #endif
 #include <stdio.h>
 #include <stdarg.h>
+#ifdef SYS_BEOS
+/* BeOS doesn't declare vasprintf in its headers, but actually
+ * implements it */
+int vasprintf( char **, const char *, va_list );
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

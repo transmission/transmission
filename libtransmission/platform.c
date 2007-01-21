@@ -298,7 +298,9 @@ void tr_condSignal( tr_cond_t * c )
 
 void tr_condClose( tr_cond_t * c )
 {
-#ifndef SYS_BEOS
+#ifdef SYS_BEOS
+    *c = -1; /* Shut up gcc */
+#else
     pthread_cond_destroy( c );
 #endif
 }
