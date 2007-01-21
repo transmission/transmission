@@ -58,8 +58,6 @@ static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 
 static int checkPeer( tr_peer_t * peer )
 {
-    tr_torrent_t * tor = peer->tor;
-
     if( peer->status < PEER_STATUS_CONNECTED &&
         tr_date() > peer->date + 8000 )
     {

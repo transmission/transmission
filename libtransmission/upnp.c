@@ -334,14 +334,9 @@ sendSSDP( int fd )
 
     if( 0 > fd )
     {
-        if( tr_fdSocketWillCreate( 0 ) )
-        {
-            return -1;
-        }
         fd = tr_netBindUDP( 0 );
         if( 0 > fd )
         {
-            tr_fdSocketClosed( 0 );
             return -1;
         }
     }
@@ -386,16 +381,10 @@ mcastStart()
     int fd;
     struct in_addr addr;
 
-    if( tr_fdSocketWillCreate( 0 ) )
-    {
-        return -1;
-    }
-
     addr.s_addr = inet_addr( SSDP_ADDR );
     fd = tr_netMcastOpen( SSDP_PORT, addr );
     if( 0 > fd )
     {
-        tr_fdSocketClosed( 0 );
         return -1;
     }
 
@@ -409,7 +398,6 @@ killSock( int * sock )
     {
         tr_netClose( *sock );
         *sock = -1;
-        tr_fdSocketClosed( 0 );
     }
 }
 
@@ -418,7 +406,6 @@ killHttp( tr_http_t ** http )
 {
     tr_httpClose( *http );
     *http = NULL;
-    tr_fdSocketClosed( 0 );
 }
 
 static int
@@ -850,11 +837,6 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
     tr_http_t  * ret;
     char numstr[6];
 
-    if( tr_fdSocketWillCreate( 0 ) )
-    {
-        return NULL;
-    }
-
     ret = NULL;
     switch( dev->state ) 
     {
@@ -911,11 +893,6 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
         default:
             assert( 0 );
             break;
-    }
-
-    if( NULL == ret )
-    {
-        tr_fdSocketClosed( 0 );
     }
 
     return ret;

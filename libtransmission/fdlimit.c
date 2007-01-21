@@ -101,7 +101,11 @@ void tr_fdInit()
     }
     for( j = 0; j < i; j++ )
     {
-        tr_netClose( s[j] );
+#ifdef BEOS_NETSERVER
+	    closesocket( s[j] );
+#else
+	    close( s[j] );
+#endif
     }
 
     tr_dbg( "%d usable file descriptors", i );
@@ -260,61 +264,123 @@ void tr_fdFileClose( char * folder, char * name )
     tr_lockUnlock( &gFd->lock );
 }
 
+
 /***********************************************************************
- * tr_fdSocketWillCreate
+ * Sockets
  **********************************************************************/
-int tr_fdSocketWillCreate( int reserved )
+typedef struct
 {
-    int ret;
+    int socket;
+    int priority;
+}
+tr_socket_t;
 
-    tr_lockLock( &gFd->lock );
-
-    if( reserved )
+/* Remember the priority of every socket we open, so that we can keep
+ * track of how many reserved file descriptors we are using */
+static tr_socket_t * gSockets = NULL;
+static int gSocketsSize = 0;
+static int gSocketsCount = 0;
+static void SocketSetPriority( int s, int priority )
+{
+    if( gSocketsSize < 1 )
     {
-        if( gFd->reserved < TR_RESERVED_FDS )
-        {
-            ret = 0;
-            (gFd->reserved)++;
-        }
-        else
-        {
-            ret = 1;
-        }
+        gSocketsSize = 256;
+        gSockets = malloc( gSocketsSize * sizeof( tr_socket_t ) );
     }
-    else
+    if( gSocketsSize <= gSocketsCount )
     {
-        if( gFd->normal < gFd->normalMax )
-        {
-            ret = 0;
-            (gFd->normal)++;
-        }
-        else
-        {
-            ret = 1;
-        }
+        gSocketsSize *= 2;
+        gSockets = realloc( gSockets, gSocketsSize * sizeof( tr_socket_t ) );
     }
-
-    tr_lockUnlock( &gFd->lock );
-
-    return ret;
+    gSockets[gSocketsCount].socket = s;
+    gSockets[gSocketsCount].priority = priority;
+    gSocketsCount++;
+}
+static int SocketGetPriority( int s )
+{
+    int i, ret;
+    for( i = 0; i < gSocketsCount; i++ )
+        if( gSockets[i].socket == s )
+            break;
+    if( i >= gSocketsCount )
+    {
+        tr_err( "could not find that socket (%d)!", s );
+        return -1;
+    }
+    ret = gSockets[i].priority;
+    gSocketsCount--;
+    memmove( &gSockets[i], &gSockets[i+1],
+            ( gSocketsCount - i ) * sizeof( tr_socket_t ) );
 }
 
 /***********************************************************************
- * tr_fdSocketClosed
+ * tr_fdSocketCreate
  **********************************************************************/
-void tr_fdSocketClosed( int reserved )
+int tr_fdSocketCreate( int type, int priority )
+{
+    int s = -1;
+
+    tr_lockLock( &gFd->lock );
+    if( ( priority && gFd->reserved < TR_RESERVED_FDS ) ||
+        ( !priority && gFd->normal < gFd->normalMax ) )
+    {
+       if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
+       {
+           tr_err( "Could not create socket (%s)", strerror( errno ) );
+       }
+    }
+    if( s > -1 )
+    {
+        SocketSetPriority( s, priority );
+        if( priority )
+            gFd->reserved++;
+        else
+            gFd->normal++;
+    }
+    tr_lockUnlock( &gFd->lock );
+
+    return s;
+}
+
+int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
+{
+    int s = -1;
+    unsigned len;
+    struct sockaddr_in sock;
+
+    tr_lockLock( &gFd->lock );
+    if( gFd->normal < gFd->normalMax )
+    {
+        len = sizeof( sock );
+        s = accept( b, (struct sockaddr *) &sock, &len );
+    }
+    if( s > -1 )
+    {
+        SocketSetPriority( s, 0 );
+        *addr = sock.sin_addr;
+        *port = sock.sin_port;
+        gFd->normal++;
+    }
+    tr_lockUnlock( &gFd->lock );
+
+    return s;
+}
+
+/***********************************************************************
+ * tr_fdSocketClose
+ **********************************************************************/
+void tr_fdSocketClose( int s )
 {
     tr_lockLock( &gFd->lock );
-
-    if( reserved )
-    {
-        (gFd->reserved)--;
-    }
+#ifdef BEOS_NETSERVER
+    closesocket( s );
+#else
+    close( s );
+#endif
+    if( SocketGetPriority( s ) )
+        gFd->reserved--;
     else
-    {
-        (gFd->normal)--;
-    }
-
+        gFd->normal--;
     tr_lockUnlock( &gFd->lock );
 }
 

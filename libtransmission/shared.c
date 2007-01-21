@@ -104,7 +104,6 @@ void tr_sharedClose( tr_shared_t * s )
     if( s->bindSocket > -1 )
     {
         tr_netClose( s->bindSocket );
-        tr_fdSocketClosed( 0 );
     }
     tr_lockClose( &s->lock );
     tr_natpmpClose( s->natpmp );
@@ -156,23 +155,15 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
     if( s->bindSocket > -1 )
     {
         tr_netClose( s->bindSocket );
-        tr_fdSocketClosed( 0 );
     }
 
     /* Create the new one */
-    if( !tr_fdSocketWillCreate( 0 ) )
+    /* XXX should handle failure here in a better way */
+    s->bindSocket = tr_netBindTCP( port );
+    if( s->bindSocket >= 0 )
     {
-        /* XXX should handle failure here in a better way */
-        s->bindSocket = tr_netBindTCP( port );
-        if( 0 > s->bindSocket )
-        {
-            tr_fdSocketClosed( 0 );
-        }
-        else
-        {
-            tr_inf( "Bound listening port %d", port );
-            listen( s->bindSocket, 5 );
-        }
+        tr_inf( "Bound listening port %d", port );
+        listen( s->bindSocket, 5 );
     }
 
     /* Notify the trackers */
@@ -311,16 +302,14 @@ static void AcceptPeers( tr_shared_t * s )
 
     for( ;; )
     {
-        if( s->bindSocket < 0 || s->peerCount >= MAX_PEER_COUNT ||
-            tr_fdSocketWillCreate( 0 ) )
+        if( s->bindSocket < 0 || s->peerCount >= MAX_PEER_COUNT )
         {
-            break;;
+            break;
         }
 
         socket = tr_netAccept( s->bindSocket, &addr, &port );
         if( socket < 0 )
         {
-            tr_fdSocketClosed( 0 );
             break;
         }
         s->peers[s->peerCount++] = tr_peerInit( addr, port, socket );

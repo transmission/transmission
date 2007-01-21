@@ -58,15 +58,11 @@ void tr_fdFileRelease( int file );
 void tr_fdFileClose( char * folder, char * name );
 
 /***********************************************************************
- * tr_fdSocketWillCreate
+ * Sockets
  **********************************************************************/
-int tr_fdSocketWillCreate( int );
-
-/***********************************************************************
- * tr_fdSocketClosed
- **********************************************************************/
-void tr_fdSocketClosed( int );
-
+int  tr_fdSocketCreate( int type, int priority );
+int  tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port );
+void tr_fdSocketClose( int s );
 
 /***********************************************************************
  * tr_fdClose

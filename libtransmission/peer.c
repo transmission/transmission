@@ -185,7 +185,6 @@ void tr_peerDestroy( tr_peer_t * peer )
     if( peer->status > PEER_STATUS_IDLE )
     {
         tr_netClose( peer->socket );
-        tr_fdSocketClosed( 0 );
     }
     tr_rcClose( peer->download );
     tr_rcClose( peer->upload );
@@ -314,14 +313,11 @@ int tr_peerPulse( tr_peer_t * peer )
     }
 
     /* Connect */
-    if( ( peer->status & PEER_STATUS_IDLE ) &&
-            !tr_fdSocketWillCreate( 0 ) )
+    if( peer->status & PEER_STATUS_IDLE )
     {
-        peer->socket = tr_netOpenTCP( peer->addr, peer->port );
+        peer->socket = tr_netOpenTCP( peer->addr, peer->port, 0 );
         if( peer->socket < 0 )
         {
-            peer_dbg( "connection failed" );
-            tr_fdSocketClosed( 0 );
             return TR_ERROR;
         }
         peer->status = PEER_STATUS_CONNECTING;
@@ -332,7 +328,6 @@ int tr_peerPulse( tr_peer_t * peer )
     {
         uint8_t buf[68];
         tr_info_t * inf = &tor->info;
-        int ret;
 
         buf[0] = 19;
         memcpy( &buf[1], "BitTorrent protocol", 19 );

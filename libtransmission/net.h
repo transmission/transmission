@@ -37,11 +37,14 @@ void           tr_netResolveClose( tr_resolve_t * );
 
 
 /***********************************************************************
- * TCP sockets
+ * TCP and UDP sockets
  **********************************************************************/
-#define tr_netOpenTCP( addr, port ) tr_netOpen( (addr), (port), SOCK_STREAM )
-#define tr_netOpenUDP( addr, port ) tr_netOpen( (addr), (port), SOCK_DGRAM )
-int  tr_netOpen    ( struct in_addr addr, in_port_t port, int type );
+#define tr_netOpenTCP( addr, port, priority ) \
+    tr_netOpen( (addr), (port), SOCK_STREAM, (priority) )
+#define tr_netOpenUDP( addr, port, priority ) \
+    tr_netOpen( (addr), (port), SOCK_DGRAM, (priority) )
+int  tr_netOpen    ( struct in_addr addr, in_port_t port, int type,
+                     int priority );
 int  tr_netMcastOpen( int port, struct in_addr addr );
 #define tr_netBindTCP( port ) tr_netBind( (port), SOCK_STREAM )
 #define tr_netBindUDP( port ) tr_netBind( (port), SOCK_DGRAM )

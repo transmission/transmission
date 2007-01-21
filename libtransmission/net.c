@@ -222,7 +222,7 @@ static void resolveFunc( void * arg UNUSED )
 
 
 /***********************************************************************
- * TCP sockets
+ * TCP/UDP sockets
  **********************************************************************/
 
 static int makeSocketNonBlocking( int s )
@@ -247,27 +247,22 @@ static int makeSocketNonBlocking( int s )
     return s;
 }
 
-static int createSocket( int type )
+static int createSocket( int type, int priority )
 {
     int s;
-
-    s = socket( AF_INET, type, 0 );
-    if( s < 0 )
+    if( ( s = tr_fdSocketCreate( type, priority ) ) < 0 )
     {
-        tr_err( "Could not create socket (%s)", strerror( errno ) );
         return -1;
     }
-
     return makeSocketNonBlocking( s );
 }
 
-int tr_netOpen( struct in_addr addr, in_port_t port, int type )
+int tr_netOpen( struct in_addr addr, in_port_t port, int type, int priority )
 {
     int s;
     struct sockaddr_in sock;
 
-    s = createSocket( type );
-    if( s < 0 )
+    if( ( s = createSocket( type, priority ) ) < 0 )
     {
         return -1;
     }
@@ -328,8 +323,7 @@ int tr_netBind( int port, int type )
     int optval;
 #endif
 
-    s = createSocket( type );
-    if( s < 0 )
+    if( ( s = createSocket( type, 1 ) ) < 0 )
     {
         return -1;
     }
@@ -363,24 +357,14 @@ int tr_netBind( int port, int type )
     return s;
 }
 
-int tr_netAccept( int s, struct in_addr * addr, in_port_t * port )
+int tr_netAccept( int b, struct in_addr * addr, in_port_t * port )
 {
-    int t;
-    unsigned len;
-    struct sockaddr_in sock;
-
-    len = sizeof( sock );
-    t   = accept( s, (struct sockaddr *) &sock, &len );
-
-    if( t < 0 )
+    int s;
+    if( ( s = tr_fdSocketAccept( b, addr, port ) ) < 0 )
     {
         return -1;
     }
-    
-    *addr = sock.sin_addr;
-    *port = sock.sin_port;
-
-    return makeSocketNonBlocking( t );
+    return makeSocketNonBlocking( s );
 }
 
 int tr_netSend( int s, uint8_t * buf, int size )
@@ -431,11 +415,7 @@ int tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * addr )
 
 void tr_netClose( int s )
 {
-#ifdef BEOS_NETSERVER
-    closesocket( s );
-#else
-    close( s );
-#endif
+    tr_fdSocketClose( s );
 }
 
 void tr_netNtop( const struct in_addr * addr, char * buf, int len )
