@@ -29,7 +29,6 @@
 
 typedef struct tr_peer_s tr_peer_t; 
 
-void        tr_peerAddOld        ( tr_torrent_t *, char *, int );
 void        tr_peerAddCompact    ( tr_torrent_t *, uint8_t *, int );
 tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int );
 void        tr_peerAttach        ( tr_torrent_t *, tr_peer_t * );

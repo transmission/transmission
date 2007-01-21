@@ -97,7 +97,6 @@ struct tr_peer_s
     tr_request_t   outRequests[MAX_REQUEST_COUNT];
     uint64_t       outTotal;
     uint64_t       outDate;
-    int            outSlow;
 
     tr_ratecontrol_t * download;
     tr_ratecontrol_t * upload;
