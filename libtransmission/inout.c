@@ -182,7 +182,7 @@ int tr_ioHash( tr_io_t * io, int index )
     /* Assign blame or credit to peers */
     for( i = 0; i < tor->peerCount; i++ )
     {
-        tr_peerBlame( tor, tor->peers[i], index, !hashFailed );
+        tr_peerBlame( tor->peers[i], index, !hashFailed );
     }
 
     return 0;

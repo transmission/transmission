@@ -44,25 +44,6 @@ static tr_peer_t * peerInit()
     return peer;
 }
 
-/***********************************************************************
- * peerAttach
- ***********************************************************************
- * Deallocates the tr_peer_t and returns 0 if we reached the maximum
- * authorized number of peers. Otherwise, adds the tr_peer_t to the
- * peers list.
- **********************************************************************/
-static int peerAttach( tr_torrent_t * tor, tr_peer_t * peer )
-{
-    if( tor->peerCount >= TR_MAX_PEER_COUNT )
-    {
-        tr_peerDestroy( tor->fdlimit, peer );
-        return 0;
-    }
-
-    tor->peers[tor->peerCount++] = peer;
-    return 1;
-}
-
 static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 {
     /* Wait until we got the peers' ids */
@@ -75,43 +56,9 @@ static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
     return memcmp( peer1->id, peer2->id, 20 );
 }
 
-/***********************************************************************
- * addWithAddr
- ***********************************************************************
- * Does nothing if we already have a peer matching 'addr' and 'port'.
- * Otherwise adds such a new peer.
- **********************************************************************/
-static void addWithAddr( tr_torrent_t * tor, struct in_addr addr,
-                         in_port_t port )
+static int checkPeer( tr_peer_t * peer )
 {
-    int i;
-    tr_peer_t * peer;
-
-    for( i = 0; i < tor->peerCount; i++ )
-    {
-        peer = tor->peers[i];
-        if( peer->addr.s_addr == addr.s_addr &&
-            peer->port        == port )
-        {
-            /* We are already connected to this peer */
-            return;
-        }
-    }
-
-    peer = peerInit();
-    if( !peerAttach( tor, peer ) )
-    {
-        return;
-    }
-
-    peer->addr   = addr;
-    peer->port   = port;
-    peer->status = PEER_STATUS_IDLE;
-}
-
-static int checkPeer( tr_torrent_t * tor, int i )
-{
-    tr_peer_t * peer = tor->peers[i];
+    tr_torrent_t * tor = peer->tor;
 
     if( peer->status < PEER_STATUS_CONNECTED &&
         tr_date() > peer->date + 8000 )
@@ -119,7 +66,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
         /* If it has been too long, don't wait for the socket
            to timeout - forget about it now */
         peer_dbg( "connection timeout" );
-        return 1;
+        return TR_ERROR;
     }
 
     /* Drop peers who haven't even sent a keep-alive within the
@@ -127,7 +74,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
     if( tr_date() > peer->date + 180000 )
     {
         peer_dbg( "read timeout" );
-        return 1;
+        return TR_ERROR;
     }
 
     /* Drop peers which are supposed to upload but actually
@@ -135,7 +82,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
     if( peer->inRequestCount && tr_date() > peer->date + 60000 )
     {
         peer_dbg( "bad uploader" );
-        return 1;
+        return TR_ERROR;
     }
 
     if( peer->status & PEER_STATUS_CONNECTED )
@@ -157,7 +104,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
         {
             peer_dbg( "connection failed" );
             tr_fdSocketClosed( tor->fdlimit, 0 );
-            return 1;
+            return TR_ERROR;
         }
         peer->status = PEER_STATUS_CONNECTING;
     }
@@ -179,7 +126,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
         if( ret & TR_NET_CLOSE )
         {
             peer_dbg( "connection closed" );
-            return 1;
+            return TR_ERROR;
         }
         else if( !( ret & TR_NET_BLOCK ) )
         {
@@ -188,7 +135,7 @@ static int checkPeer( tr_torrent_t * tor, int i )
         }
     }
 
-    return 0;
+    return TR_OK;
 }
 
 /***********************************************************************

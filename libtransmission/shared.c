@@ -100,7 +100,7 @@ void tr_sharedClose( tr_shared_t * s )
     /* Clean up */
     for( ii = 0; ii < s->peerCount; ii++ )
     {
-        tr_peerDestroy( h->fdlimit, s->peers[ii] );
+        tr_peerDestroy( s->peers[ii] );
     }
     if( s->bindSocket > -1 )
     {
@@ -336,14 +336,13 @@ static void AcceptPeers( tr_shared_t * s )
  **********************************************************************/
 static void ReadPeers( tr_shared_t * s )
 {
-    tr_handle_t * h = s->h;
     int ii;
 
     for( ii = 0; ii < s->peerCount; )
     {
-        if( tr_peerRead( NULL, s->peers[ii] ) )
+        if( tr_peerRead( s->peers[ii] ) )
         {
-            tr_peerDestroy( h->fdlimit, s->peers[ii] );
+            tr_peerDestroy( s->peers[ii] );
             s->peerCount--;
             memmove( &s->peers[ii], &s->peers[ii+1],
                      ( s->peerCount - ii ) * sizeof( tr_peer_t * ) );
@@ -373,7 +372,7 @@ static void DispatchPeers( tr_shared_t * s )
         if( !hash && now > tr_peerDate( s->peers[ii] ) + 10000 )
         {
             /* 10 seconds and no handshake, drop it */
-            tr_peerDestroy( h->fdlimit, s->peers[ii] );
+            tr_peerDestroy( s->peers[ii] );
             goto removePeer;
         }
         if( hash )
@@ -391,7 +390,7 @@ static void DispatchPeers( tr_shared_t * s )
                             SHA_DIGEST_LENGTH ) )
                 {
                     /* Found it! */
-                    tr_peerAttach( tor, s->peers[ii] );
+                    tr_torrentAttachPeer( tor, s->peers[ii] );
                     tr_lockUnlock( &tor->lock );
                     goto removePeer;
                 }
@@ -399,7 +398,7 @@ static void DispatchPeers( tr_shared_t * s )
             }
 
             /* Couldn't find a torrent, we probably removed it */
-            tr_peerDestroy( h->fdlimit, s->peers[ii] );
+            tr_peerDestroy( s->peers[ii] );
             goto removePeer;
         }
         ii++;

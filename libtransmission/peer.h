@@ -29,16 +29,14 @@
 
 typedef struct tr_peer_s tr_peer_t; 
 
-void        tr_peerAddCompact    ( tr_torrent_t *, uint8_t *, int );
-tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int );
-void        tr_peerAttach        ( tr_torrent_t *, tr_peer_t * );
-void        tr_peerDestroy       ( tr_fd_t *, tr_peer_t * );
-void        tr_peerRem           ( tr_torrent_t *, int );
-int         tr_peerRead          ( tr_torrent_t *, tr_peer_t * );
+tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int socket );
+void        tr_peerDestroy       ( tr_peer_t * );
+void        tr_peerSetTorrent    ( tr_peer_t *, tr_torrent_t * );
+int         tr_peerRead          ( tr_peer_t * );
 uint64_t    tr_peerDate          ( tr_peer_t * );
 uint8_t *   tr_peerId            ( tr_peer_t * );
 uint8_t *   tr_peerHash          ( tr_peer_t * );
-int         tr_peerPulse         ( tr_torrent_t * );
+int         tr_peerPulse         ( tr_peer_t * );
 int         tr_peerIsConnected   ( tr_peer_t * );
 int         tr_peerIsIncoming    ( tr_peer_t * );
 int         tr_peerIsChoking     ( tr_peer_t * );
@@ -54,8 +52,7 @@ void        tr_peerUnchoke       ( tr_peer_t * );
 uint64_t    tr_peerLastChoke     ( tr_peer_t * );
 void        tr_peerSetOptimistic ( tr_peer_t *, int );
 int         tr_peerIsOptimistic  ( tr_peer_t * );
-void        tr_peerBlame         ( tr_torrent_t *, tr_peer_t *,
-                                   int piece, int success );
+void        tr_peerBlame         ( tr_peer_t *, int piece, int success );
 struct in_addr * tr_peerAddress  ( tr_peer_t * );
 int         tr_peerGetConnectable( tr_torrent_t *, uint8_t ** );
 

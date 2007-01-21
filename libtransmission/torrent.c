@@ -234,6 +234,8 @@ void tr_torrentStop( tr_torrent_t * tor )
  **********************************************************************/
 static void torrentReallyStop( tr_torrent_t * tor )
 {
+    int i;
+
     tor->die = 1;
     tr_threadJoin( &tor->thread );
 
@@ -241,10 +243,11 @@ static void torrentReallyStop( tr_torrent_t * tor )
     tor->tracker = NULL;
 
     tr_lockLock( &tor->lock );
-    while( tor->peerCount > 0 )
+    for( i = 0; i < tor->peerCount; i++ )
     {
-        tr_peerRem( tor, 0 );
+        tr_peerDestroy( tor->peers[i] );
     }
+    tor->peerCount = 0;
     tr_lockUnlock( &tor->lock );
 }
 
@@ -270,7 +273,7 @@ void tr_manualUpdate( tr_torrent_t * tor )
     tr_trackerAnnouncePulse( tor->tracker, &peerCount, &peerCompact, 1 );
     if( peerCount > 0 )
     {
-        tr_peerAddCompact( tor, peerCompact, peerCount );
+        tr_torrentAddCompact( tor, peerCompact, peerCount );
         free( peerCompact );
     }
     tr_lockUnlock( &tor->lock );
@@ -552,16 +555,59 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
     tr_sharedUnlock( h->shared );
 }
 
+void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    int i;
+    tr_peer_t * otherPeer;
+
+    if( tor->peerCount >= TR_MAX_PEER_COUNT )
+    {
+        tr_peerDestroy(  peer );
+        return;
+    }
+
+    /* Don't accept two connections from the same IP */
+    for( i = 0; i < tor->peerCount; i++ )
+    {
+        otherPeer = tor->peers[i];
+        if( !memcmp( tr_peerAddress( peer ), tr_peerAddress( otherPeer ), 4 ) )
+        {
+            tr_peerDestroy(  peer );
+            return;
+        }
+    }
+
+    tr_peerSetTorrent( peer, tor );
+    tor->peers[tor->peerCount++] = peer;
+}
+
+void tr_torrentAddCompact( tr_torrent_t * tor, uint8_t * buf, int count )
+{
+    struct in_addr addr;
+    in_port_t port;
+    int i;
+    tr_peer_t * peer;
+
+    for( i = 0; i < count; i++ )
+    {
+        memcpy( &addr, buf, 4 ); buf += 4;
+        memcpy( &port, buf, 2 ); buf += 2;
+
+        peer = tr_peerInit( addr, port, -1 );
+        tr_torrentAttachPeer( tor, peer );
+    }
+}
+
 /***********************************************************************
  * downloadLoop
  **********************************************************************/
 static void downloadLoop( void * _tor )
 {
     tr_torrent_t * tor = _tor;
-    uint64_t       date1, date2;
-    int            ret;
+    int            i, ret;
     int            peerCount;
     uint8_t      * peerCompact;
+    tr_peer_t    * peer;
 
     tr_lockLock( &tor->lock );
 
@@ -572,7 +618,9 @@ static void downloadLoop( void * _tor )
 
     while( !tor->die )
     {
-        date1 = tr_date();
+        tr_lockUnlock( &tor->lock );
+        tr_wait( 20 );
+        tr_lockLock( &tor->lock );
 
         /* Are we finished ? */
         if( ( tor->status & TR_STATUS_DOWNLOAD ) &&
@@ -585,6 +633,20 @@ static void downloadLoop( void * _tor )
             tr_ioSync( tor->io );
         }
 
+        /* Try to get new peers or to send a message to the tracker */
+        tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+        if( peerCount > 0 )
+        {
+            tr_torrentAddCompact( tor, peerCompact, peerCount );
+            free( peerCompact );
+        }
+        if( tor->status & TR_STATUS_STOPPED )
+        {
+            break;
+        }
+
+        /* Stopping: make sure all files are closed and stop talking
+           to peers */
         if( tor->status & TR_STATUS_STOPPING )
         {
             if( tor->io )
@@ -592,40 +654,42 @@ static void downloadLoop( void * _tor )
                 tr_ioClose( tor->io ); tor->io = NULL;
                 tr_condSignal( &tor->cond );
             }
+            continue;
         }
-        else
+
+        /* Shuffle peers */
+        if( tor->peerCount > 1 )
         {
-            /* Receive/send messages */
-            if( ( ret = tr_peerPulse( tor ) ) )
+            peer = tor->peers[0];
+            memmove( &tor->peers[0], &tor->peers[1],
+                    ( tor->peerCount - 1 ) * sizeof( void * ) );
+            tor->peers[tor->peerCount - 1] = peer;
+        }
+
+        /* Receive/send messages */
+        for( i = 0; i < tor->peerCount; )
+        {
+            peer = tor->peers[i];
+
+            ret = tr_peerPulse( peer );
+            if( ret & TR_ERROR_IO_MASK )
             {
                 tr_err( "Fatal error, stopping download (%d)", ret );
                 torrentStop( tor );
                 tor->error = ret;
                 snprintf( tor->errorString, sizeof( tor->errorString ),
                           "%s", tr_errorString( ret ) );
+                break;
             }
-        }
-
-        /* Try to get new peers or to send a message to the tracker */
-        tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
-        if( peerCount > 0 )
-        {
-            tr_peerAddCompact( tor, peerCompact, peerCount );
-            free( peerCompact );
-        }
-
-        if( tor->status & TR_STATUS_STOPPED )
-        {
-            break;
-        }
-
-        /* Wait up to 20 ms */
-        date2 = tr_date();
-        if( date2 < date1 + 20 )
-        {
-            tr_lockUnlock( &tor->lock );
-            tr_wait( date1 + 20 - date2 );
-            tr_lockLock( &tor->lock );
+            if( ret )
+            {
+                tr_peerDestroy( peer );
+                tor->peerCount--;
+                memmove( &tor->peers[i], &tor->peers[i+1],
+                         ( tor->peerCount - i ) * sizeof( void * ) );
+                continue;
+            }
+            i++;
         }
     }
 

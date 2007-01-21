@@ -138,6 +138,9 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #include "http.h"
 #include "xml.h"
 
+void tr_torrentAddCompact( tr_torrent_t * tor, uint8_t * buf, int count );
+void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer );
+
 struct tr_torrent_s
 {
     tr_handle_t * handle;
