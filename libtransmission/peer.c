@@ -313,19 +313,60 @@ int tr_peerPulse( tr_peer_t * peer )
         return ret;
     }
 
-    /* Handle peers */
-    if( peer->status < PEER_STATUS_HANDSHAKE )
+    /* Connect */
+    if( ( peer->status & PEER_STATUS_IDLE ) &&
+            !tr_fdSocketWillCreate( 0 ) )
     {
-        return TR_OK;;
+        peer->socket = tr_netOpenTCP( peer->addr, peer->port );
+        if( peer->socket < 0 )
+        {
+            peer_dbg( "connection failed" );
+            tr_fdSocketClosed( 0 );
+            return TR_ERROR;
+        }
+        peer->status = PEER_STATUS_CONNECTING;
     }
 
+    /* Try to send handshake */
+    if( peer->status & PEER_STATUS_CONNECTING )
+    {
+        uint8_t buf[68];
+        tr_info_t * inf = &tor->info;
+        int ret;
+
+        buf[0] = 19;
+        memcpy( &buf[1], "BitTorrent protocol", 19 );
+        memset( &buf[20], 0, 8 );
+        memcpy( &buf[28], inf->hash, 20 );
+        memcpy( &buf[48], tor->id, 20 );
+
+        switch( tr_netSend( peer->socket, buf, 68 ) )
+        {
+            case 68:
+                peer_dbg( "SEND handshake" );
+                peer->status = PEER_STATUS_HANDSHAKE;
+                break;
+            case TR_NET_BLOCK:
+                break;
+            default:
+                peer_dbg( "connection closed" );
+                return TR_ERROR;
+        }
+    }
+    if( peer->status < PEER_STATUS_HANDSHAKE )
+    {
+        /* Nothing more we can do till we sent the handshake */
+        return TR_OK;
+    }
+
+    /* Read incoming messages */
     if( ( ret = tr_peerRead( peer ) ) )
     {
         return ret;
     }
-
     if( peer->status < PEER_STATUS_CONNECTED )
     {
+        /* Nothing more we can do till we got the other guy's handshake */
         return TR_OK;
     }
 
