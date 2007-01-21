@@ -41,7 +41,6 @@ int tr_netResolve( const char * address, struct in_addr * addr )
     return ( addr->s_addr == 0xFFFFFFFF );
 }
 
-/* TODO: Make this code reentrant */
 static tr_thread_t  resolveThread;
 static tr_lock_t    resolveLock;
 static tr_cond_t    resolveCond;

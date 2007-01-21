@@ -97,13 +97,13 @@ static int checkPeer( tr_peer_t * peer )
 
     /* Connect */
     if( ( peer->status & PEER_STATUS_IDLE ) &&
-        !tr_fdSocketWillCreate( tor->fdlimit, 0 ) )
+        !tr_fdSocketWillCreate( 0 ) )
     {
         peer->socket = tr_netOpenTCP( peer->addr, peer->port );
         if( peer->socket < 0 )
         {
             peer_dbg( "connection failed" );
-            tr_fdSocketClosed( tor->fdlimit, 0 );
+            tr_fdSocketClosed( 0 );
             return TR_ERROR;
         }
         peer->status = PEER_STATUS_CONNECTING;

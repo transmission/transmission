@@ -150,7 +150,6 @@ struct tr_torrent_s
     tr_ratecontrol_t * upload;
     tr_ratecontrol_t * download;
     tr_ratecontrol_t * swarmspeed;
-    tr_fd_t          * fdlimit;
 
     int               status;
     int               error;
@@ -209,7 +208,6 @@ struct tr_handle_s
     int            bindPort;
     int            uploadLimit;
     int            downloadLimit;
-    tr_fd_t      * fdlimit;
     tr_shared_t  * shared;
 
     char           id[21];

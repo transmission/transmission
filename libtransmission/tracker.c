@@ -97,7 +97,7 @@ static tr_http_t * getScrapeQuery   ( tr_tracker_t * tc );
 static void        readAnswer       ( tr_tracker_t * tc, const char *, int,
                                       int * peerCount, uint8_t ** peerCompact );
 static void        readScrapeAnswer ( tr_tracker_t * tc, const char *, int );
-static void        killHttp         ( tr_http_t ** http, tr_fd_t * fdlimit );
+static void        killHttp         ( tr_http_t ** http );
 
 tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 {
@@ -345,7 +345,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
         
         tc->randOffset = tr_rand( 60000 );
         
-        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
+        if( tr_fdSocketWillCreate( 1 ) )
         {
             return;
         }
@@ -442,7 +442,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
                 break;
 
             case TR_NET_ERROR:
-                killHttp( &tc->http, tor->fdlimit );
+                killHttp( &tc->http );
                 tc->dateTry = tr_date();
                 
                 failureAnnouncing( tc );
@@ -452,14 +452,14 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
 
             case TR_NET_OK:
                 readAnswer( tc, data, len, peerCount, peerCompact );
-                killHttp( &tc->http, tor->fdlimit );
+                killHttp( &tc->http );
                 break;
         }
     }
     
     if( ( NULL == tc->httpScrape ) && shouldScrape( tc ) )
     {
-        if( tr_fdSocketWillCreate( tor->fdlimit, 1 ) )
+        if( tr_fdSocketWillCreate( 1 ) )
         {
             return;
         }
@@ -496,13 +496,13 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
                 break;
 
             case TR_NET_ERROR:
-                killHttp( &tc->httpScrape, tor->fdlimit );
+                killHttp( &tc->httpScrape );
                 tc->lastScrapeFailed = 1;
                 break;
 
             case TR_NET_OK:
                 readScrapeAnswer( tc, data, len );
-                killHttp( &tc->httpScrape, tor->fdlimit );
+                killHttp( &tc->httpScrape );
                 break;
         }
     }
@@ -519,11 +519,9 @@ void tr_trackerCompleted( tr_tracker_t * tc )
 
 void tr_trackerStopped( tr_tracker_t * tc )
 {
-    tr_torrent_t * tor = tc->tor;
-
     /* If we are already sending a query at the moment, we need to
        reconnect */
-    killHttp( &tc->http, tor->fdlimit );
+    killHttp( &tc->http );
 
     tc->started   = 0;
     tc->completed = 0;
@@ -540,8 +538,8 @@ void tr_trackerClose( tr_tracker_t * tc )
     tr_announce_list_ptr_t * cur, * curFree;
     int ii;
 
-    killHttp( &tc->http, tor->fdlimit );
-    killHttp( &tc->httpScrape, tor->fdlimit );
+    killHttp( &tc->http );
+    killHttp( &tc->httpScrape );
 
     for( ii = 0; ii < inf->trackerTiers; ii++ )
     {
@@ -1162,12 +1160,12 @@ scrapeDone:
     return ret;
 }
 
-static void killHttp( tr_http_t ** http, tr_fd_t * fdlimit )
+static void killHttp( tr_http_t ** http )
 {
     if( NULL != *http )
     {
         tr_httpClose( *http );
-        tr_fdSocketClosed( fdlimit, 1 );
+        tr_fdSocketClosed( 1 );
         *http = NULL;
     }
 }

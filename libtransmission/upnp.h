@@ -27,7 +27,7 @@
 
 typedef struct tr_upnp_s tr_upnp_t; 
 
-tr_upnp_t * tr_upnpInit( tr_fd_t * );
+tr_upnp_t * tr_upnpInit();
 void        tr_upnpStart( tr_upnp_t * );
 void        tr_upnpStop( tr_upnp_t * );
 int         tr_upnpStatus( tr_upnp_t * );

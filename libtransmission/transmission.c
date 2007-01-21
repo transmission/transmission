@@ -64,7 +64,7 @@ tr_handle_t * tr_init()
     h->uploadLimit   = -1;
     h->downloadLimit = -1;
     
-    h->fdlimit = tr_fdInit();
+    tr_fdInit();
     h->shared = tr_sharedInit( h );
 
     return h;
@@ -137,7 +137,7 @@ void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
 void tr_close( tr_handle_t * h )
 {
     tr_sharedClose( h->shared );
-    tr_fdClose( h->fdlimit );
+    tr_fdClose();
     free( h );
 
     tr_netResolveThreadClose();

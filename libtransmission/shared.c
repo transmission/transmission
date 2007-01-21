@@ -72,8 +72,8 @@ tr_shared_t * tr_sharedInit( tr_handle_t * h )
 
     s->bindPort = -1;
     s->bindSocket = -1;
-    s->natpmp = tr_natpmpInit( h->fdlimit );
-    s->upnp = tr_upnpInit( h->fdlimit );
+    s->natpmp = tr_natpmpInit();
+    s->upnp = tr_upnpInit();
     s->choking = tr_chokingInit( h );
 
     /* Launch the thread */
@@ -90,7 +90,6 @@ tr_shared_t * tr_sharedInit( tr_handle_t * h )
  **********************************************************************/
 void tr_sharedClose( tr_shared_t * s )
 {
-    tr_handle_t * h = s->h;
     int ii;
 
     /* Stop the thread */
@@ -105,7 +104,7 @@ void tr_sharedClose( tr_shared_t * s )
     if( s->bindSocket > -1 )
     {
         tr_netClose( s->bindSocket );
-        tr_fdSocketClosed( h->fdlimit, 0 );
+        tr_fdSocketClosed( 0 );
     }
     tr_lockClose( &s->lock );
     tr_natpmpClose( s->natpmp );
@@ -157,17 +156,17 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
     if( s->bindSocket > -1 )
     {
         tr_netClose( s->bindSocket );
-        tr_fdSocketClosed( h->fdlimit, 0 );
+        tr_fdSocketClosed( 0 );
     }
 
     /* Create the new one */
-    if( !tr_fdSocketWillCreate( h->fdlimit, 0 ) )
+    if( !tr_fdSocketWillCreate( 0 ) )
     {
         /* XXX should handle failure here in a better way */
         s->bindSocket = tr_netBindTCP( port );
         if( 0 > s->bindSocket )
         {
-            tr_fdSocketClosed( h->fdlimit, 0 );
+            tr_fdSocketClosed( 0 );
         }
         else
         {
@@ -306,7 +305,6 @@ static void SharedLoop( void * _s )
  **********************************************************************/
 static void AcceptPeers( tr_shared_t * s )
 {
-    tr_handle_t * h = s->h;
     int socket;
     in_port_t port;
     struct in_addr addr;
@@ -314,7 +312,7 @@ static void AcceptPeers( tr_shared_t * s )
     for( ;; )
     {
         if( s->bindSocket < 0 || s->peerCount >= MAX_PEER_COUNT ||
-            tr_fdSocketWillCreate( h->fdlimit, 0 ) )
+            tr_fdSocketWillCreate( 0 ) )
         {
             break;;
         }
@@ -322,7 +320,7 @@ static void AcceptPeers( tr_shared_t * s )
         socket = tr_netAccept( s->bindSocket, &addr, &port );
         if( socket < 0 )
         {
-            tr_fdSocketClosed( h->fdlimit, 0 );
+            tr_fdSocketClosed( 0 );
             break;
         }
         s->peers[s->peerCount++] = tr_peerInit( addr, port, socket );

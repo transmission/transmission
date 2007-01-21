@@ -90,18 +90,17 @@ struct tr_upnp_s
     unsigned int       active : 1;
     unsigned int       discovering : 1;
     tr_upnp_device_t * devices;
-    tr_fd_t          * fdlimit;
     tr_lock_t          lock;
 };
 
 static int
-sendSSDP( tr_fd_t * fdlimit, int fd );
+sendSSDP( int fd );
 static int
-mcastStart( tr_fd_t * fdlimit );
+mcastStart();
 static void
-killSock( tr_fd_t * fdlimit, int * sock );
+killSock( int * sock );
 static void
-killHttp( tr_fd_t * fdlimit, tr_http_t ** http );
+killHttp( tr_http_t ** http );
 static int
 watchSSDP( tr_upnp_device_t ** devices, int fd );
 static tr_tristate_t
@@ -112,16 +111,16 @@ static void
 deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
            const char * url, int urlLen );
 static void
-deviceRemove( tr_upnp_device_t ** prevptr, tr_fd_t * fdlimit );
+deviceRemove( tr_upnp_device_t ** prevptr );
 static int
 deviceStop( tr_upnp_device_t * dev );
 static int
-devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port );
+devicePulse( tr_upnp_device_t * dev, int port );
 static int
-devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
+devicePulseHttp( tr_upnp_device_t * dev,
                  const char ** body, int * len );
 static tr_http_t *
-devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit );
+devicePulseGetHttp( tr_upnp_device_t * dev );
 static int
 parseRoot( const char *buf, int len, char ** soap, char ** scpd );
 static void
@@ -155,7 +154,7 @@ actionLookup( tr_upnp_action_t * action, const char * key, int len,
               char dir, int getname );
 
 tr_upnp_t *
-tr_upnpInit( tr_fd_t * fdlimit )
+tr_upnpInit()
 {
     tr_upnp_t * upnp;
 
@@ -167,7 +166,6 @@ tr_upnpInit( tr_fd_t * fdlimit )
 
     upnp->infd     = -1;
     upnp->outfd    = -1;
-    upnp->fdlimit  = fdlimit;
 
     tr_lockInit( &upnp->lock );
 
@@ -184,7 +182,7 @@ tr_upnpStart( tr_upnp_t * upnp )
         tr_inf( "starting upnp" );
         upnp->active = 1;
         upnp->discovering = 1;
-        upnp->infd = mcastStart( upnp->fdlimit );
+        upnp->infd = mcastStart();
         upnp->lastdiscover = 0;
         upnp->lastdelay = SSDP_FIRST_DELAY / 2;
     }
@@ -201,8 +199,8 @@ tr_upnpStop( tr_upnp_t * upnp )
     {
         tr_inf( "stopping upnp" );
         upnp->active = 0;
-        killSock( upnp->fdlimit, &upnp->infd );
-        killSock( upnp->fdlimit, &upnp->outfd );
+        killSock( &upnp->infd );
+        killSock( &upnp->outfd );
     }
 
     tr_lockUnlock( &upnp->lock );
@@ -264,7 +262,7 @@ tr_upnpClose( tr_upnp_t * upnp )
     tr_lockLock( &upnp->lock );
     while( NULL != upnp->devices )
     {
-        deviceRemove( &upnp->devices, upnp->fdlimit );
+        deviceRemove( &upnp->devices );
     }
 
     tr_lockClose( &upnp->lock );
@@ -284,7 +282,7 @@ tr_upnpPulse( tr_upnp_t * upnp )
         upnp->discovering = 1;
         for( ii = &upnp->devices; NULL != *ii; ii = &(*ii)->next )
         {
-            if( devicePulse( *ii, upnp->fdlimit, upnp->port ) )
+            if( devicePulse( *ii, upnp->port ) )
             {
                 upnp->discovering = 0;
             }
@@ -294,7 +292,7 @@ tr_upnpPulse( tr_upnp_t * upnp )
         if( upnp->discovering &&
             upnp->lastdelay + upnp->lastdiscover < tr_date() )
         {
-            upnp->outfd = sendSSDP( upnp->fdlimit, upnp->outfd );
+            upnp->outfd = sendSSDP( upnp->outfd );
             upnp->lastdiscover = tr_date();
             upnp->lastdelay = MIN( upnp->lastdelay * 2, SSDP_MAX_DELAY );
         }
@@ -303,7 +301,7 @@ tr_upnpPulse( tr_upnp_t * upnp )
         watchSSDP( &upnp->devices, upnp->infd );
         if( watchSSDP( &upnp->devices, upnp->outfd ) )
         {
-            killSock( upnp->fdlimit, &upnp->outfd );
+            killSock( &upnp->outfd );
         }
     }
     else
@@ -314,11 +312,11 @@ tr_upnpPulse( tr_upnp_t * upnp )
         {
             if( deviceStop( *ii ) )
             {
-                deviceRemove( ii, upnp->fdlimit );
+                deviceRemove( ii );
             }
             else
             {
-                devicePulse( *ii, upnp->fdlimit, 0 );
+                devicePulse( *ii, 0 );
                 ii = &(*ii)->next;
             }
         }
@@ -328,7 +326,7 @@ tr_upnpPulse( tr_upnp_t * upnp )
 }
 
 static int
-sendSSDP( tr_fd_t * fdlimit, int fd )
+sendSSDP( int fd )
 {
     char buf[102];
     int  len;
@@ -336,14 +334,14 @@ sendSSDP( tr_fd_t * fdlimit, int fd )
 
     if( 0 > fd )
     {
-        if( tr_fdSocketWillCreate( fdlimit, 0 ) )
+        if( tr_fdSocketWillCreate( 0 ) )
         {
             return -1;
         }
         fd = tr_netBindUDP( 0 );
         if( 0 > fd )
         {
-            tr_fdSocketClosed( fdlimit, 0 );
+            tr_fdSocketClosed( 0 );
             return -1;
         }
     }
@@ -375,7 +373,7 @@ sendSSDP( tr_fd_t * fdlimit, int fd )
             tr_err( "Could not send SSDP discover message (%s)",
                     strerror( errno ) );
         }
-        killSock( fdlimit, &fd );
+        killSock( &fd );
         return -1;
     }
 
@@ -383,12 +381,12 @@ sendSSDP( tr_fd_t * fdlimit, int fd )
 }
 
 static int
-mcastStart( tr_fd_t * fdlimit )
+mcastStart()
 {
     int fd;
     struct in_addr addr;
 
-    if( tr_fdSocketWillCreate( fdlimit, 0 ) )
+    if( tr_fdSocketWillCreate( 0 ) )
     {
         return -1;
     }
@@ -397,7 +395,7 @@ mcastStart( tr_fd_t * fdlimit )
     fd = tr_netMcastOpen( SSDP_PORT, addr );
     if( 0 > fd )
     {
-        tr_fdSocketClosed( fdlimit, 0 );
+        tr_fdSocketClosed( 0 );
         return -1;
     }
 
@@ -405,22 +403,22 @@ mcastStart( tr_fd_t * fdlimit )
 }
 
 static void
-killSock( tr_fd_t * fdlimit, int * sock )
+killSock( int * sock )
 {
     if( 0 <= *sock )
     {
         tr_netClose( *sock );
         *sock = -1;
-        tr_fdSocketClosed( fdlimit, 0 );
+        tr_fdSocketClosed( 0 );
     }
 }
 
 static void
-killHttp( tr_fd_t * fdlimit, tr_http_t ** http )
+killHttp( tr_http_t ** http )
 {
     tr_httpClose( *http );
     *http = NULL;
-    tr_fdSocketClosed( fdlimit, 0 );
+    tr_fdSocketClosed( 0 );
 }
 
 static int
@@ -590,7 +588,7 @@ deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
 }
 
 static void
-deviceRemove( tr_upnp_device_t ** prevptr, tr_fd_t * fdlimit )
+deviceRemove( tr_upnp_device_t ** prevptr )
 {
     tr_upnp_device_t * dead;
 
@@ -607,7 +605,7 @@ deviceRemove( tr_upnp_device_t ** prevptr, tr_fd_t * fdlimit )
     free( dead->myaddr );
     if( NULL != dead->http )
     {
-        killHttp( fdlimit, &dead->http );
+        killHttp( &dead->http );
     }
     actionFree( &dead->getcmd );
     actionFree( &dead->addcmd );
@@ -634,7 +632,7 @@ deviceStop( tr_upnp_device_t * dev )
 }
 
 static int
-devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
+devicePulse( tr_upnp_device_t * dev, int port )
 {
     const char * body;
     int          len, code;
@@ -675,7 +673,7 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
     len = 0;
     body = NULL;
 
-    code = devicePulseHttp( dev, fdlimit, &body, &len );
+    code = devicePulseHttp( dev, &body, &len );
     if( 0 > code )
     {
         return 1;
@@ -687,7 +685,7 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
                 dev->host, dev->state );
         dev->state = UPNPDEV_STATE_ERROR;
         dev->looping = 0;
-        killHttp( fdlimit, &dev->http );
+        killHttp( &dev->http );
         return 1;
     }
 
@@ -821,7 +819,7 @@ devicePulse( tr_upnp_device_t * dev, tr_fd_t * fdlimit, int port )
     }
 
     dev->lastrequest = tr_date();
-    killHttp( fdlimit, &dev->http );
+    killHttp( &dev->http );
 
     if( UPNPDEV_STATE_ERROR == dev->state )
     {
@@ -847,12 +845,12 @@ makeHttp( int method, const char * host, int port, const char * path )
 }
 
 static tr_http_t *
-devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit )
+devicePulseGetHttp( tr_upnp_device_t * dev )
 {
     tr_http_t  * ret;
     char numstr[6];
 
-    if( tr_fdSocketWillCreate( fdlimit, 0 ) )
+    if( tr_fdSocketWillCreate( 0 ) )
     {
         return NULL;
     }
@@ -917,14 +915,14 @@ devicePulseGetHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit )
 
     if( NULL == ret )
     {
-        tr_fdSocketClosed( fdlimit, 0 );
+        tr_fdSocketClosed( 0 );
     }
 
     return ret;
 }
 
 static int
-devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
+devicePulseHttp( tr_upnp_device_t * dev,
                  const char ** body, int * len )
 {
     const char * headers;
@@ -937,7 +935,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
             return -1;
         }
         dev->lastrequest = tr_date();
-        dev->http = devicePulseGetHttp( dev, fdlimit );
+        dev->http = devicePulseGetHttp( dev );
         if( NULL == dev->http )
         {
             tr_dbg( "upnp device %s: http init failed, state %hhu -> error",
@@ -960,7 +958,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
             if( SOAP_METHOD_NOT_ALLOWED == code && !dev->soapretry )
             {
                 dev->soapretry = 1;
-                killHttp( fdlimit, &dev->http );
+                killHttp( &dev->http );
                 break;
             }
             dev->soapretry = 0;
@@ -968,7 +966,7 @@ devicePulseHttp( tr_upnp_device_t * dev, tr_fd_t * fdlimit,
             *len = ( NULL == body ? 0 : hlen - ( *body - headers ) );
             return code;
         case TR_NET_ERROR:
-            killHttp( fdlimit, &dev->http );
+            killHttp( &dev->http );
             if( dev->soapretry )
             {
                 tr_dbg( "upnp device %s: http pulse failed, state %hhu -> error",

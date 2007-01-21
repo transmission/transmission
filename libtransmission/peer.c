@@ -185,8 +185,7 @@ void tr_peerDestroy( tr_peer_t * peer )
     if( peer->status > PEER_STATUS_IDLE )
     {
         tr_netClose( peer->socket );
-	if( tor )
-           tr_fdSocketClosed( tor->fdlimit, 0 ); /* XXX */
+        tr_fdSocketClosed( 0 );
     }
     tr_rcClose( peer->download );
     tr_rcClose( peer->upload );

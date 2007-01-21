@@ -27,7 +27,7 @@
 
 typedef struct tr_natpmp_s tr_natpmp_t; 
 
-tr_natpmp_t * tr_natpmpInit( tr_fd_t * );
+tr_natpmp_t * tr_natpmpInit();
 void        tr_natpmpStart( tr_natpmp_t * );
 void        tr_natpmpStop( tr_natpmp_t * );
 int         tr_natpmpStatus( tr_natpmp_t * );

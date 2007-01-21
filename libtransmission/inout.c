@@ -297,8 +297,7 @@ static void closeFiles( tr_io_t * io )
 
     for( i = 0; i < inf->fileCount; i++ )
     {
-        tr_fdFileClose( tor->fdlimit, tor->destination,
-                        inf->files[i].name );
+        tr_fdFileClose( tor->destination, inf->files[i].name );
     }
 }
 
@@ -368,8 +367,8 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
         if( cur > 0 )
         {
             /* Now let's get a descriptor on the file... */
-            file = tr_fdFileOpen( tor->fdlimit, tor->destination,
-                                  inf->files[i].name, isWrite );
+            file = tr_fdFileOpen( tor->destination, inf->files[i].name,
+                                  isWrite );
             if( file < 0 )
             {
                 ret = file;
@@ -379,7 +378,7 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
             /* seek to the right offset... */
             if( lseek( file, offset, SEEK_SET ) < 0 )
             {
-                tr_fdFileRelease( tor->fdlimit, file );
+                tr_fdFileRelease( file );
                 ret = TR_ERROR_IO_OTHER;
                 goto cleanup;
             }
@@ -387,13 +386,13 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
             /* do what we are here to do... */
             if( readOrWrite( file, buf, cur ) != cur )
             {
-                tr_fdFileRelease( tor->fdlimit, file );
+                tr_fdFileRelease( file );
                 ret = TR_ERROR_IO_OTHER;
                 goto cleanup;
             }
 
             /* and release the descriptor. */
-            tr_fdFileRelease( tor->fdlimit, file );
+            tr_fdFileRelease( file );
         }
 
         /* 'cur' bytes done, 'size - cur' bytes to go with the next file */

@@ -22,14 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-typedef struct tr_fd_s tr_fd_t;
-
 /***********************************************************************
  * tr_fdInit
  ***********************************************************************
  * Detect the maximum number of open files and initializes things.
  **********************************************************************/
-tr_fd_t * tr_fdInit();
+void tr_fdInit();
 
 /***********************************************************************
  * tr_fdFileOpen
@@ -41,7 +39,7 @@ tr_fd_t * tr_fdInit();
  * Returns the file descriptor if successful, otherwise returns
  * one of the TR_ERROR_IO_*.
  **********************************************************************/
-int tr_fdFileOpen( tr_fd_t *, char * folder, char * name, int write );
+int tr_fdFileOpen( char * folder, char * name, int write );
 
 /***********************************************************************
  * tr_fdFileRelease
@@ -49,7 +47,7 @@ int tr_fdFileOpen( tr_fd_t *, char * folder, char * name, int write );
  * Indicates that the file whose descriptor is 'file' is unused at the
  * moment and can safely be closed.
  **********************************************************************/
-void tr_fdFileRelease( tr_fd_t *, int file );
+void tr_fdFileRelease( int file );
 
 /***********************************************************************
  * tr_fdFileClose
@@ -57,21 +55,17 @@ void tr_fdFileRelease( tr_fd_t *, int file );
  * If the file 'name' in directory 'folder' was open, closes it,
  * flushing data on disk.
  **********************************************************************/
-void tr_fdFileClose( tr_fd_t *, char * folder, char * name );
+void tr_fdFileClose( char * folder, char * name );
 
 /***********************************************************************
  * tr_fdSocketWillCreate
- ***********************************************************************
- *
  **********************************************************************/
-int tr_fdSocketWillCreate( tr_fd_t *, int );
+int tr_fdSocketWillCreate( int );
 
 /***********************************************************************
  * tr_fdSocketClosed
- ***********************************************************************
- *
  **********************************************************************/
-void tr_fdSocketClosed( tr_fd_t *, int );
+void tr_fdSocketClosed( int );
 
 
 /***********************************************************************
@@ -79,4 +73,5 @@ void tr_fdSocketClosed( tr_fd_t *, int );
  ***********************************************************************
  * Frees resources allocated by tr_fdInit.
  **********************************************************************/
-void tr_fdClose( tr_fd_t * );
+void tr_fdClose();
+

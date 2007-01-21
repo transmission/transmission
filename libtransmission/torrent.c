@@ -132,7 +132,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tr_lockInit( &tor->lock );
     tr_condInit( &tor->cond );
 
-    tor->fdlimit        = h->fdlimit;
     tor->upload         = tr_rcInit();
     tor->download       = tr_rcInit();
     tor->swarmspeed     = tr_rcInit();
