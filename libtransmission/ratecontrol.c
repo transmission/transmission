@@ -24,60 +24,51 @@
 
 #include "transmission.h"
 
-#define MAX_HISTORY 30
+/* Maximum number of packets we keep track of. Since most packets are
+ * 1 KB, it means we remember the last 2 MB transferred */
+#define HISTORY_SIZE 2048
 
-typedef struct tr_transfer_s tr_transfer_t;
-struct tr_ratecontrol_s
-{
-    tr_lock_t       lock;
-    int             limit;
-    tr_transfer_t * first;
-    tr_transfer_t * last;
-};
-struct tr_transfer_s
-{
-    uint64_t        date;
-    int             size;
-    tr_transfer_t * next;
-    tr_transfer_t * prev;
-};
+/* How far back we go to calculate rates to be displayed in the 
+ * interface */
+#define LONG_INTERVAL 30000 /* 30 secs */
+
+/* How far back we go to calculate pseudo-instantaneous transfer rates,
+ * for the actual rate control */
+#define SHORT_INTERVAL 1000 /* 1 sec */
+
 
 /***********************************************************************
- * rateForInterval
- ***********************************************************************
- * Returns the transfer rate on the last 'interval' milliseconds
+ * Structures
  **********************************************************************/
-static inline float rateForInterval( tr_ratecontrol_t * r, int interval )
+typedef struct tr_transfer_s
 {
-    tr_transfer_t * t;
-    uint64_t        start = tr_date() - interval;
-    int             total = 0;
-
-    for( t = r->first; t && t->date > start; t = t->next )
-    {
-        total += t->size;
-    }
-
-    return ( 1000.0 / 1024.0 ) * total / interval;
+    uint64_t date;
+    int      size;
 }
+tr_transfer_t;
 
-static inline void cleanOldTransfers( tr_ratecontrol_t * r )
+struct tr_ratecontrol_s
 {
-    tr_transfer_t * t, * prev;
-    uint64_t        old = tr_date() - MAX_HISTORY * 1000;
+    tr_lock_t     lock;
+    int           limit;
 
-    for( t = r->last; t && t->date < old; )
-    {
-        prev = t->prev;
-        if( prev )
-            prev->next = NULL;
-        else
-            r->first = NULL;
-        free( t );
-        t       = prev;
-        r->last = prev;
-    }
-}
+    /* Circular history: it's empty if transferStop == transferStart,
+     * full if ( transferStop + 1 ) % HISTORY_SIZE == transferStart */
+    tr_transfer_t transfers[HISTORY_SIZE];
+    int           transferStart;
+    int           transferStop;
+};
+
+
+/***********************************************************************
+ * Local prototypes
+ **********************************************************************/
+static float rateForInterval( tr_ratecontrol_t * r, int interval );
+
+
+/***********************************************************************
+ * Exported functions
+ **********************************************************************/
 
 tr_ratecontrol_t * tr_rcInit()
 {
@@ -111,7 +102,7 @@ int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
         
         r = isUpload ? tor->upload : tor->download;
         tr_lockLock( &r->lock );
-        rate += rateForInterval( r, 1000 );
+        rate += rateForInterval( r, SHORT_INTERVAL );
         tr_lockUnlock( &r->lock );
         
         if( rate >= (float)limit )
@@ -135,7 +126,8 @@ int tr_rcCanTransfer( tr_ratecontrol_t * r )
     int ret;
 
     tr_lockLock( &r->lock );
-    ret = ( r->limit <= 0 ) ? ( r->limit < 0 ) : ( rateForInterval( r, 1000 ) < r->limit );
+    ret = ( r->limit <= 0 ) ? ( r->limit < 0 ) :
+            ( rateForInterval( r, SHORT_INTERVAL ) < r->limit );
     tr_lockUnlock( &r->lock );
 
     return ret;
@@ -147,24 +139,21 @@ void tr_rcTransferred( tr_ratecontrol_t * r, int size )
 
     if( size < 100 )
     {
+        /* Don't count small messages */
         return;
     }
     
     tr_lockLock( &r->lock );
-    t = malloc( sizeof( tr_transfer_t ) );
 
-    if( r->first )
-        r->first->prev = t;
-    if( !r->last )
-        r->last = t;
-    t->next  = r->first;
-    t->prev  = NULL;
-    r->first = t;
+    r->transferStop = ( r->transferStop + 1 ) % HISTORY_SIZE;
+    if( r->transferStop == r->transferStart )
+        /* History is full, forget about the first (oldest) item */
+        r->transferStart = ( r->transferStart + 1 ) % HISTORY_SIZE;
 
-    t->date  = tr_date();
-    t->size  = size;
+    t = &r->transfers[r->transferStop];
+    t->date = tr_date();
+    t->size = size;
 
-    cleanOldTransfers( r );
     tr_lockUnlock( &r->lock );
 }
 
@@ -173,7 +162,7 @@ float tr_rcRate( tr_ratecontrol_t * r )
     float ret;
 
     tr_lockLock( &r->lock );
-    ret = rateForInterval( r, MAX_HISTORY * 1000 );
+    ret = rateForInterval( r, LONG_INTERVAL );
     tr_lockUnlock( &r->lock );
 
     return ret;
@@ -181,17 +170,9 @@ float tr_rcRate( tr_ratecontrol_t * r )
 
 void tr_rcReset( tr_ratecontrol_t * r )
 {
-    tr_transfer_t * t, * next;
-
     tr_lockLock( &r->lock );
-    for( t = r->first; t; )
-    {
-        next = t->next;
-        free( t );
-        t = next;
-    }
-    r->first = NULL;
-    r->last  = NULL;
+    r->transferStart = 0;
+    r->transferStop = 0;
     tr_lockUnlock( &r->lock );
 }
 
@@ -201,3 +182,49 @@ void tr_rcClose( tr_ratecontrol_t * r )
     tr_lockClose( &r->lock );
     free( r );
 }
+
+
+/***********************************************************************
+ * Local functions
+ **********************************************************************/
+
+/***********************************************************************
+ * rateForInterval
+ ***********************************************************************
+ * Returns the transfer rate in KB/s on the last 'interval'
+ * milliseconds
+ **********************************************************************/
+static float rateForInterval( tr_ratecontrol_t * r, int interval )
+{
+    tr_transfer_t * t = NULL;
+    uint64_t now, start;
+    int i, total;
+
+    now = tr_date();
+    start = now - interval;
+
+    /* Browse the history back in time */
+    total = 0;
+    for( i = r->transferStop; i != r->transferStart; i-- )
+    {
+        t = &r->transfers[i];
+        if( t->date < start )
+            break;
+
+        total += t->size;
+
+        if( !i )
+            i = HISTORY_SIZE; /* Loop */
+    }
+    if( ( r->transferStop + 1 ) % HISTORY_SIZE == r->transferStart
+        && i == r->transferStart )
+    {
+        /* High bandwidth -> the history isn't big enough to remember
+         * everything transferred since 'interval' ms ago. Correct the
+         * interval so that we return the correct rate */
+        interval = now - t->date;
+    }
+
+    return ( 1000.0f / 1024.0f ) * total / interval;
+}
+
