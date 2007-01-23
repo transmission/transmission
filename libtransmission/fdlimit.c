@@ -311,6 +311,7 @@ static int SocketGetPriority( int s )
     gSocketsCount--;
     memmove( &gSockets[i], &gSockets[i+1],
             ( gSocketsCount - i ) * sizeof( tr_socket_t ) );
+    return ret;
 }
 
 /***********************************************************************
