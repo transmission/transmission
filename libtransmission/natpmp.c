@@ -182,8 +182,8 @@ tr_natpmpStop( tr_natpmp_t * pmp )
                 tr_dbg( "nat-pmp state add -> idle" );
                 if( NULL != pmp->req )
                 {
-                    killreq( &pmp->req );
                     pmp->mappedport = pmp->req->port;
+                    killreq( &pmp->req );
                     pmp->state = PMP_STATE_DELETING;
                     tr_dbg( "nat-pmp state idle -> del" );
                 }
