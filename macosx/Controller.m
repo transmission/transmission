@@ -1302,6 +1302,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fWindow isKeyWindow])
         fCompleted++;
     
+    if ([fDefaults boolForKey: @"QueueSeed"])
+    {
+        [torrent stopTransfer];
+        [torrent setWaitToStart: YES];
+    }
+    
     [self updateTorrentsInQueue];
 }
 
