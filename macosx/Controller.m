@@ -1302,31 +1302,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fWindow isKeyWindow])
         fCompleted++;
     
-    //update queue if there is a seeding queue
-    if ([fDefaults boolForKey: @"QueueSeed"])
-    {
-        int desiredSeedActive = [fDefaults integerForKey: @"QueueSeedNumber"];
-            
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * otherTorrent;
-        while ((otherTorrent = [enumerator nextObject]))
-            if (otherTorrent != torrent && [otherTorrent isSeeding] && ![otherTorrent isError])
-            {
-                desiredSeedActive--;
-                if (desiredSeedActive <= 0)
-                    break;
-            }
-
-        if (desiredSeedActive <= 0)
-        {
-            [torrent stopTransfer];
-            [torrent setWaitToStart: YES];
-        }
-    }
-    
-    [self updateUI: nil];
-    [self applyFilter: nil];
-    [self updateTorrentHistory];
+    [self updateTorrentsInQueue];
 }
 
 - (void) updateTorrentHistory
@@ -1564,7 +1540,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     
     //set status bar torrent count text
-    NSMutableString * totalTorrentsString = [NSMutableString stringWithString: @""];
+    NSMutableString * totalTorrentsString = [[NSMutableString alloc] initWithString: @""];
     if (filtering)
         [totalTorrentsString appendFormat: @"%d/", [fDisplayedTorrents count]];
     
@@ -1575,6 +1551,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [totalTorrentsString appendFormat: NSLocalizedString(@"1 Transfer", "Status bar transfer count")];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
+    [totalTorrentsString release];
 
     [self setWindowSizeToFit];
 }
