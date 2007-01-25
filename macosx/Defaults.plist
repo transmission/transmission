@@ -57,7 +57,7 @@
 	<key>MoveFolder</key>
 	<string>~/Desktop</string>
 	<key>NatTraversal</key>
-	<false/>
+	<true/>
 	<key>PiecesViewShowAvailability</key>
 	<false/>
 	<key>PlayDownloadSound</key>
