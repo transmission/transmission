@@ -61,6 +61,9 @@
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
 
+#define DOCK_SEEDING_TAG        101
+#define DOCK_DOWNLOADING_TAG    102
+
 #define ANNOUNCE_WAIT_INTERVAL_SECONDS  -60.0
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
@@ -2561,29 +2564,59 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 downloading++;
         }
     
-    NSMenu * menu;
-    if (seeding > 0 || downloading > 0)
+    NSMenuItem * seedingItem = [fDockMenu itemWithTag: DOCK_SEEDING_TAG],
+            * downloadingItem = [fDockMenu itemWithTag: DOCK_DOWNLOADING_TAG];
+    
+    BOOL hasSeparator = seedingItem || downloadingItem;
+    
+    if (seeding > 0)
     {
-        menu = [[fDockMenu copy] autorelease];
-        
-        [menu insertItem: [NSMenuItem separatorItem] atIndex: 0];
-        if (downloading > 0)
+        NSString * title = [NSString stringWithFormat: @"%d Seeding", seeding];
+        if (!seedingItem)
         {
-            NSMenuItem * item = [[[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d Downloading", downloading]
-                                                        action: nil keyEquivalent: @""] autorelease];
-            [menu insertItem: item atIndex: 0];
+            seedingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
+            [seedingItem setTag: DOCK_SEEDING_TAG];
+            [fDockMenu insertItem: seedingItem atIndex: 0];
         }
-        if (seeding > 0)
-        {
-            NSMenuItem * item = [[[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d Seeding", seeding]
-                                                        action: nil keyEquivalent: @""] autorelease];
-            [menu insertItem: item atIndex: 0];
-        }
+        else
+            [seedingItem setTitle: title];
     }
     else
-        menu = fDockMenu;
+    {
+        if (seedingItem)
+            [fDockMenu removeItem: seedingItem];
+    }
     
-    return menu;
+    if (downloading > 0)
+    {
+        NSString * title = [NSString stringWithFormat: @"%d Downloading", downloading];
+        if (!downloadingItem)
+        {
+            downloadingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
+            [downloadingItem setTag: DOCK_DOWNLOADING_TAG];
+            [fDockMenu insertItem: downloadingItem atIndex: seeding > 0 ? 1 : 0];
+        }
+        else
+            [downloadingItem setTitle: title];
+    }
+    else
+    {
+        if (downloadingItem)
+            [fDockMenu removeItem: downloadingItem];
+    }
+    
+    if (seeding > 0 || downloading > 0)
+    {
+        if (!hasSeparator)
+            [fDockMenu insertItem: [NSMenuItem separatorItem] atIndex: seeding > 0 && downloading > 0 ? 2 : 1];
+    }
+    else
+    {
+        if (hasSeparator)
+            [fDockMenu removeItemAtIndex: 0];
+    }
+    
+    return fDockMenu;
 }
 
 - (void) resetDockBadge: (NSNotification *) notification
