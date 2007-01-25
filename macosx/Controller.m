@@ -219,24 +219,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
+    NSSize windowSize = [contentView convertSize: [fWindow frame].size fromView: nil];
     [fFilterBar setHidden: YES];
     
     NSRect filterBarFrame = [fFilterBar frame];
-    filterBarFrame.size.width = [fWindow frame].size.width;
+    filterBarFrame.size.width = windowSize.width;
     [fFilterBar setFrame: filterBarFrame];
     
     [contentView addSubview: fFilterBar];
     [fFilterBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
-    
+
     [self showFilterBar: [fDefaults boolForKey: @"FilterBar"] animate: NO];
     
     //set up status bar
     [fStatusBar setHidden: YES];
     
     NSRect statusBarFrame = [fStatusBar frame];
-    statusBarFrame.size.width = [fWindow frame].size.width;
+    statusBarFrame.size.width = windowSize.width;
     [fStatusBar setFrame: statusBarFrame];
-    
+
     [contentView addSubview: fStatusBar];
     [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
@@ -1992,6 +1993,43 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDefaults setBool: ![fStatusBar isHidden] forKey: @"StatusBar"];
 }
 
+- (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
+{
+    NSRect windowFrame = [fWindow frame];
+    NSSize windowSize = windowFrame.size;
+    NSSize minSize = [fWindow minSize];
+    NSSize maxSize = [[fWindow screen] visibleFrame].size;
+
+    /* Convert pixels to points */
+    windowSize = [fScrollView convertSize: windowSize fromView: nil];
+    minSize = [fScrollView convertSize: minSize fromView: nil];
+    maxSize = [fScrollView convertSize: maxSize fromView: nil];
+
+    windowSize.height += height;
+
+    if( check )
+    {
+        if (windowSize.height < minSize.height)
+            windowSize.height = minSize.height;
+        else
+        {
+            if ([fStatusBar isHidden])
+                maxSize.height -= [fStatusBar frame].size.height;
+            if ([fFilterBar isHidden]) 
+                maxSize.height -= [fFilterBar frame].size.height;
+            if (windowSize.height > maxSize.height)
+                windowSize.height = maxSize.height;
+        }
+    }
+
+    /* Convert points to pixels */
+    windowSize = [fScrollView convertSize: windowSize toView: nil];
+
+    windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
+    windowFrame.size.height = windowSize.height;
+    return windowFrame;
+}
+
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate
 {
     if (show != [fStatusBar isHidden])
@@ -2000,7 +2038,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (show)
         [fStatusBar setHidden: NO];
 
-    NSRect frame = [fWindow frame];
+    NSRect frame;
     float heightChange = [fStatusBar frame].size.height;
     if (!show)
         heightChange *= -1;
@@ -2008,20 +2046,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //allow bar to show even if not enough room
     if (show && ![fDefaults boolForKey: @"AutoSize"])
     {
-        float maxHeight = [[fWindow screen] visibleFrame].size.height - heightChange;
-        if (frame.size.height > maxHeight)
+        frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
+        float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
+        if( change < 0.0 )
         {
-            float change = maxHeight - frame.size.height;
+            frame = [fWindow frame];
             frame.size.height += change;
             frame.origin.y -= change;
-            
             [fWindow setFrame: frame display: NO animate: NO];
         }
     }
 
-    frame.size.height += heightChange;
-    frame.origin.y -= heightChange;
-    
     [self updateUI: nil];
     
     //set views to not autoresize
@@ -2032,6 +2067,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setAutoresizingMask: 0];
     [fScrollView setAutoresizingMask: 0];
     
+    frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate]; 
     
     //re-enable autoresize
@@ -2069,7 +2105,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (show)
         [fFilterBar setHidden: NO];
 
-    NSRect frame = [fWindow frame];
+    NSRect frame;
     float heightChange = [fFilterBar frame].size.height;
     if (!show)
         heightChange *= -1;
@@ -2077,26 +2113,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //allow bar to show even if not enough room
     if (show && ![fDefaults boolForKey: @"AutoSize"])
     {
-        float maxHeight = [[fWindow screen] visibleFrame].size.height - heightChange;
-        if (frame.size.height > maxHeight)
+        frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
+        float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
+        if( change < 0.0 )
         {
-            float change = maxHeight - frame.size.height;
+            frame = [fWindow frame];
             frame.size.height += change;
             frame.origin.y -= change;
-            
             [fWindow setFrame: frame display: NO animate: NO];
         }
     }
 
-    frame.size.height += heightChange;
-    frame.origin.y -= heightChange;
-    
     //set views to not autoresize
     unsigned int filterMask = [fFilterBar autoresizingMask];
     unsigned int scrollMask = [fScrollView autoresizingMask];
     [fFilterBar setAutoresizingMask: 0];
     [fScrollView setAutoresizingMask: 0];
     
+    frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate];
     
     //re-enable autoresize
@@ -2648,28 +2682,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSRect) sizedWindowFrame
 {
-    NSRect frame = [fWindow frame];
-    float newHeight = frame.size.height - [fScrollView frame].size.height
-        + [fDisplayedTorrents count] * ([fTableView rowHeight] + [fTableView intercellSpacing].height);
-
-    float minHeight = [fWindow minSize].height;
-    if (newHeight < minHeight)
-        newHeight = minHeight;
-    else
-    {
-        float maxHeight = [[fWindow screen] visibleFrame].size.height;
-        if ([fStatusBar isHidden])
-            maxHeight -= [fStatusBar frame].size.height;
-        if ([fFilterBar isHidden]) 
-            maxHeight -= [fFilterBar frame].size.height;
-        
-        if (newHeight > maxHeight)
-            newHeight = maxHeight;
-    }
-
-    frame.origin.y -= (newHeight - frame.size.height);
-    frame.size.height = newHeight;
-    return frame;
+    float heightChange = [fDisplayedTorrents count] * ([fTableView rowHeight] +
+            [fTableView intercellSpacing].height) - [fScrollView frame].size.height;
+    return [self windowFrameByAddingHeight: heightChange checkLimits: YES];
 }
 
 - (void) showMainWindow: (id) sender
