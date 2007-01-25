@@ -78,6 +78,7 @@ struct tr_natpmp_s
 #define PMP_STATE_TMPFAIL       7
     char               state;
     unsigned int       active : 1;
+    unsigned int       mapped : 1;
     struct in_addr     dest;
     int                newport;
     int                mappedport;
@@ -220,7 +221,7 @@ tr_natpmpStatus( tr_natpmp_t * pmp )
         ret = ( PMP_STATE_DELETING == pmp->state ?
                 TR_NAT_TRAVERSAL_UNMAPPING : TR_NAT_TRAVERSAL_DISABLED );
     }
-    else if( 0 < pmp->mappedport )
+    else if( pmp->mapped )
     {
         ret = TR_NAT_TRAVERSAL_MAPPED;
     }
@@ -242,6 +243,8 @@ tr_natpmpStatus( tr_natpmp_t * pmp )
                 break;
             case PMP_STATE_MAPPED:
             default:
+                /* if pmp->state is PMP_STATE_MAPPED then pmp->mapped
+                   should be true */
                 assert( 0 );
                 ret = TR_NAT_TRAVERSAL_ERROR;
                 break;
@@ -354,6 +357,7 @@ tr_natpmpPulse( tr_natpmp_t * pmp )
                             pmp->mappedport = pmp->req->port;
                             killreq( &pmp->req );
                             pmp->state = PMP_STATE_MAPPED;
+                            pmp->mapped = 1;
                             tr_dbg( "nat-pmp state add -> mapped with port %i",
                                     pmp->mappedport);
                             tr_inf( "nat-pmp mapped port %i", pmp->mappedport );
@@ -383,11 +387,13 @@ tr_natpmpPulse( tr_natpmp_t * pmp )
                         case TR_NET_ERROR:
                             if( pmp->req->nobodyhome )
                             {
+                                pmp->mapped = 0;
                                 pmp->state = PMP_STATE_NOBODYHOME;
                                 tr_dbg( "nat-pmp state del -> nobodyhome on pulse" );
                             }
                             else if( pmp->req->tmpfail )
                             {
+                                pmp->mapped = 0;
                                 pmp->state = PMP_STATE_TMPFAIL;
                                 tr_dbg( "nat-pmp state del -> err on pulse" );
                                 pmp->mappedport = -1;
@@ -403,6 +409,7 @@ tr_natpmpPulse( tr_natpmp_t * pmp )
                             tr_dbg( "nat-pmp state del -> idle with port %i",
                                     pmp->req->port);
                             tr_inf( "nat-pmp unmapped port %i", pmp->req->port );
+                            pmp->mapped = 0;
                             pmp->mappedport = -1;
                             killreq( &pmp->req );
                             pmp->state = PMP_STATE_IDLE;
