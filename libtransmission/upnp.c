@@ -559,6 +559,7 @@ deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
     memset( ii, 0, sizeof( *ii ) );
     if( tr_httpParseUrl( url, urlLen, &ii->host, &ii->port, &ii->root ) )
     {
+        tr_err( "Invalid HTTP URL from UPnP" );
         free( ii );
         return;
     }
