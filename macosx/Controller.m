@@ -670,7 +670,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
     else
+    {
+        [[dictionary objectForKey: @"Filenames"] release];
         [dictionary release];
+    }
 }
 
 - (void) openFilesWithDict: (NSDictionary *) dictionary
@@ -686,12 +689,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openFilesAsk: (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete
 {
     NSString * torrentPath;
-    Torrent * torrent;
+    tr_torrent_t * tempTor;
+    int error;
     
     //determine next file that can be opened
     do
     {
-        if ([files count] == 0) //recursive base case
+        if ([files count] == 0) //no files left to open
         {
             [files release];
             
@@ -699,14 +703,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             return;
         }
     
-        torrentPath = [files objectAtIndex: 0];
-        torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent: delete lib: fLib];
+        torrentPath = [[files objectAtIndex: 0] retain];
+        tempTor = tr_torrentInit(fLib, [torrentPath UTF8String], 0, &error);
         
         [files removeObjectAtIndex: 0];
-    } while (!torrent);
-
-    //add it to the "File > Open Recent" menu
-    [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
+    } while (!tempTor);
 
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
@@ -716,26 +717,34 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseDirectories: YES];
 
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                        "Open torrent -> select destination folder"), [torrent name]]];
+                        "Open torrent -> select destination folder"),
+                        [NSString stringWithUTF8String: tr_torrentInfo(tempTor)->name]]];
     
-    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrent, @"Torrent", files, @"Files",
-                                            [NSNumber numberWithBool: delete], @"Delete", nil];
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrentPath, @"Path",
+                                    files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
+    [torrentPath release];
 
+    tr_torrentClose(fLib, tempTor);
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
-    [torrent release];
 }
 
 - (void) folderChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
 {
-    Torrent * torrent = [dictionary objectForKey: @"Torrent"];
-
     if (code == NSOKButton)
     {
+        NSString * torrentPath = [dictionary objectForKey: @"Path"];
+        Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent:
+                                [[dictionary objectForKey: @"Delete"] boolValue] lib: fLib];
+        
+        //add it to the "File > Open Recent" menu
+        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
+        
         [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
         [torrent update];
         
         [fTorrents addObject: torrent];
+        [torrent release];
         
         [self updateTorrentsInQueue];
     }
@@ -1803,7 +1812,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     int error;
     while ((file = [enumerator nextObject]))
     {
-        tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], 0, & error);
+        tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], 0, &error);
         
         if (tempTor)
             tr_torrentClose(fLib, tempTor);
@@ -1995,24 +2004,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSRect) windowFrameByAddingHeight: (float) height checkLimits: (BOOL) check
 {
+    //convert pixels to points
     NSRect windowFrame = [fWindow frame];
-    NSSize windowSize = windowFrame.size;
-    NSSize minSize = [fWindow minSize];
-    NSSize maxSize = [[fWindow screen] visibleFrame].size;
-
-    /* Convert pixels to points */
-    windowSize = [fScrollView convertSize: windowSize fromView: nil];
-    minSize = [fScrollView convertSize: minSize fromView: nil];
-    maxSize = [fScrollView convertSize: maxSize fromView: nil];
-
+    NSSize windowSize = [fScrollView convertSize: windowFrame.size fromView: nil];
     windowSize.height += height;
-
-    if( check )
+    
+    if (check)
     {
+        NSSize minSize = [fScrollView convertSize: [fWindow minSize] fromView: nil];
+        
         if (windowSize.height < minSize.height)
             windowSize.height = minSize.height;
         else
         {
+            NSSize maxSize = [fScrollView convertSize: [[fWindow screen] visibleFrame].size fromView: nil];
             if ([fStatusBar isHidden])
                 maxSize.height -= [fStatusBar frame].size.height;
             if ([fFilterBar isHidden]) 
@@ -2022,7 +2027,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     }
 
-    /* Convert points to pixels */
+    //convert points to pixels
     windowSize = [fScrollView convertSize: windowSize toView: nil];
 
     windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
@@ -2048,7 +2053,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
         float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
-        if( change < 0.0 )
+        if (change < 0.0)
         {
             frame = [fWindow frame];
             frame.size.height += change;
@@ -2115,7 +2120,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
         float change = [[fWindow screen] visibleFrame].size.height - frame.size.height;
-        if( change < 0.0 )
+        if (change < 0.0)
         {
             frame = [fWindow frame];
             frame.size.height += change;
