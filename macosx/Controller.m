@@ -670,10 +670,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self performSelectorOnMainThread: @selector(openFilesWithDict:) withObject: dictionary waitUntilDone: NO];
     }
     else
-    {
-        [[dictionary objectForKey: @"Filenames"] release];
         [dictionary release];
-    }
 }
 
 - (void) openFilesWithDict: (NSDictionary *) dictionary
