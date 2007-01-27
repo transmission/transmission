@@ -199,8 +199,8 @@ void tr_close( tr_handle_t * );
  * Opens and parses torrent file at 'path'. If the file exists and is a
  * valid torrent file, returns an handle and adds it to the list of
  * torrents (but doesn't start it). Returns NULL and sets *error
- * otherwise.  If the TR_FSAVEPRIVATE flag is passed then a private copy
- * of the torrent file will be saved.
+ * otherwise.  If the TR_FLAG_SAVE flag is passed then a copy of the
+ * torrent file will be saved.
  **********************************************************************/
 #define TR_EINVALID     1
 #define TR_EUNSUPPORTED 2
@@ -306,8 +306,8 @@ void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size );
 /***********************************************************************
  * tr_torrentRemoveSaved
  ***********************************************************************
- * Removes the private saved copy of a torrent file for torrents which
- * the TR_FSAVEPRIVATE flag is set.
+ * Removes the saved copy of a torrent file for torrents which the
+ * TR_FLAG_SAVE flag is set.
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent_t * );
 
@@ -339,7 +339,8 @@ struct tr_info_s
     char                 name[MAX_PATH_LENGTH];
 
     /* Flags */
-#define TR_FSAVEPRIVATE 0x01    /* save a private copy of the torrent */
+#define TR_FLAG_SAVE    0x01 /* save a copy of the torrent file */
+#define TR_FLAG_PRIVATE 0x02 /* do not share information for this torrent */
     int                  flags;
 
     /* Tracker info */
@@ -354,7 +355,6 @@ struct tr_info_s
     char                 comment[MAX_PATH_LENGTH];
     char                 creator[MAX_PATH_LENGTH];
     int                  dateCreated;
-    int                  privateTorrent;
 
     /* Pieces info */
     int                  pieceSize;

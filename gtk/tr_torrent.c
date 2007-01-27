@@ -272,7 +272,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   back = tr_backend_handle(TR_BACKEND(backend));
   trflags = 0;
   if((TR_TORNEW_SAVE_COPY|TR_TORNEW_SAVE_MOVE) & flags)
-    trflags |= TR_FSAVEPRIVATE;
+    trflags |= TR_FLAG_SAVE;
   errcode = -1;
 
   if(TR_TORNEW_LOAD_SAVED & flags)
@@ -380,7 +380,7 @@ tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
   state->val.l.vals = g_new0(benc_val_t, 6);
   state->val.l.alloc = state->val.l.count = 6;
 
-  if(TR_FSAVEPRIVATE & in->flags) {
+  if(TR_FLAG_SAVE & in->flags) {
     SETSTRVAL(state->val.l.vals + 0, "hash");
     SETSTRVAL(state->val.l.vals + 1, in->hashString);
   } else {

@@ -171,9 +171,12 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     }
     
     /* Private torrent */
-    if( ( val = tr_bencDictFind( beInfo, "private" ) ) && TYPE_INT == val->type )
+    if( ( NULL != ( val = tr_bencDictFind( beInfo, "private" ) ) &&
+          TYPE_INT == val->type && val->val.i ) ||
+        ( NULL != ( val = tr_bencDictFind( &meta, "private" ) ) &&
+          TYPE_INT == val->type && val->val.i ) )
     {
-        inf->privateTorrent = val->val.i;
+        inf->flags |= TR_FLAG_PRIVATE;
     }
     
     /* Piece length */

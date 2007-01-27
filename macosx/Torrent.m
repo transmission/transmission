@@ -845,7 +845,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) privateTorrent
 {
-    return fInfo->privateTorrent;
+    return TR_FLAG_PRIVATE & fInfo->flags;
 }
 
 - (NSString *) torrentLocation
@@ -1143,10 +1143,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     int error;
     if (hashString)
-        fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FSAVEPRIVATE, & error);
+        fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FLAG_SAVE, & error);
     
     if (!fHandle && path)
-        fHandle = tr_torrentInit(fLib, [path UTF8String], TR_FSAVEPRIVATE, & error);
+        fHandle = tr_torrentInit(fLib, [path UTF8String], TR_FLAG_SAVE, & error);
 
     if (!fHandle)
     {

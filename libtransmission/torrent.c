@@ -52,7 +52,7 @@ tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
                                int flags, int * error )
 {
     tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
-    int             saveCopy = ( TR_FSAVEPRIVATE & flags );
+    int             saveCopy = ( TR_FLAG_SAVE & flags );
 
     /* Parse torrent file */
     if( tr_metainfoParse( &tor->info, path, NULL, saveCopy ) )
@@ -78,7 +78,7 @@ tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
         return NULL;
     }
 
-    return torrentRealInit( h, tor, ( TR_FSAVEPRIVATE | flags ), error );
+    return torrentRealInit( h, tor, ( TR_FLAG_SAVE | flags ), error );
 }
 
 /***********************************************************************

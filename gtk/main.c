@@ -1007,7 +1007,7 @@ actionclick(GtkWidget *widget, gpointer gdata) {
             /* tor will be unref'd in the politely_stopped signal handler */
             g_object_ref(tor);
             tr_torrent_stop_politely(tor);
-            if(TR_FSAVEPRIVATE & tr_torrent_info(tor)->flags)
+            if(TR_FLAG_SAVE & tr_torrent_info(tor)->flags)
               tr_torrentRemoveSaved(tr_torrent_handle(tor));
             gtk_list_store_remove(GTK_LIST_STORE(data->model), &iter);
             changed = TRUE;
