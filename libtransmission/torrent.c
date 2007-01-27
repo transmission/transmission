@@ -110,12 +110,11 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
         }
     }
 
-    tor->handle = h;
-    tor->status = TR_STATUS_PAUSE;
-    tor->id     = h->id;
-    tor->key    = h->key;
-    tor->bindPort = &h->bindPort;
-	tor->finished = 0;
+    tor->handle   = h;
+    tor->status   = TR_STATUS_PAUSE;
+    tor->id       = h->id;
+    tor->key      = h->key;
+    tor->finished = 0;
 
     /* Escaped info hash for HTTP queries */
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
@@ -138,8 +137,9 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
  
     /* We have a new torrent */
     tr_sharedLock( h->shared );
-    tor->prev = NULL;
-    tor->next = h->torrentList;
+    tor->publicPort = tr_sharedGetPublicPort( h->shared );
+    tor->prev       = NULL;
+    tor->next       = h->torrentList;
     if( tor->next )
     {
         tor->next->prev = tor;
@@ -148,7 +148,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     (h->torrentCount)++;
     tr_sharedUnlock( h->shared );
 
-    if( 0 > h->bindPort )
+    if( !h->isPortSet )
     {
         tr_setBindPort( h, TR_DEFAULT_PORT );
     }
@@ -190,6 +190,8 @@ void tr_torrentStart( tr_torrent_t * tor )
         torrentReallyStop( tor );
     }
 
+    tr_lockLock( &tor->lock );
+
     tor->downloadedPrev += tor->downloadedCur;
     tor->downloadedCur   = 0;
     tor->uploadedPrev   += tor->uploadedCur;
@@ -202,6 +204,9 @@ void tr_torrentStart( tr_torrent_t * tor )
     tor->date = tr_date();
     tor->die = 0;
     snprintf( name, sizeof( name ), "torrent %p", tor );
+
+    tr_lockUnlock( &tor->lock );
+
     tr_threadCreate( &tor->thread, downloadLoop, tor, name );
 }
 

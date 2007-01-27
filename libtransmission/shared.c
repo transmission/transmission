@@ -36,6 +36,7 @@ struct tr_shared_s
     tr_lock_t    lock;
 
     /* Incoming connections */
+    int          publicPort;
     int          bindPort;
     int          bindSocket;
     int          peerCount;
@@ -53,6 +54,7 @@ struct tr_shared_s
  * Local prototypes
  **********************************************************************/
 static void SharedLoop( void * );
+static void SetPublicPort( tr_shared_t *, int );
 static void AcceptPeers( tr_shared_t * );
 static void ReadPeers( tr_shared_t * );
 static void DispatchPeers( tr_shared_t * );
@@ -70,11 +72,12 @@ tr_shared_t * tr_sharedInit( tr_handle_t * h )
     s->h = h;
     tr_lockInit( &s->lock );
 
-    s->bindPort = -1;
+    s->publicPort = -1;
+    s->bindPort   = -1;
     s->bindSocket = -1;
-    s->natpmp = tr_natpmpInit();
-    s->upnp = tr_upnpInit();
-    s->choking = tr_chokingInit( h );
+    s->natpmp     = tr_natpmpInit();
+    s->upnp       = tr_upnpInit();
+    s->choking    = tr_chokingInit( h );
 
     /* Launch the thread */
     s->die = 0;
@@ -133,9 +136,6 @@ void tr_sharedUnlock( tr_shared_t * s )
  **********************************************************************/
 void tr_sharedSetPort( tr_shared_t * s, int port )
 {
-    tr_handle_t * h = s->h;
-    tr_torrent_t * tor;
-
 #ifdef BEOS_NETSERVER
     /* BeOS net_server seems to be unable to set incoming connections
      * to non-blocking. Too bad. */
@@ -167,14 +167,9 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
     }
 
     /* Notify the trackers */
-    for( tor = h->torrentList; tor; tor = tor->next )
+    if( port != s->publicPort )
     {
-        tr_lockLock( &tor->lock );
-        if( NULL != tor->tracker )
-        {
-            tr_trackerChangePort( tor->tracker, port );
-        }
-        tr_lockUnlock( &tor->lock );
+        SetPublicPort( s, port );
     }
 
     /* Forward the new port */
@@ -182,6 +177,16 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
     tr_upnpForwardPort( s->upnp, port );
 
     tr_sharedUnlock( s );
+}
+
+/***********************************************************************
+ * tr_sharedGetPublicPort
+ ***********************************************************************
+ *
+ **********************************************************************/
+int tr_sharedGetPublicPort( tr_shared_t * s )
+{
+    return s->publicPort;
 }
 
 /***********************************************************************
@@ -287,6 +292,24 @@ static void SharedLoop( void * _s )
     }
 
     tr_sharedUnlock( s );
+}
+
+/***********************************************************************
+ * SetPublicPort
+ **********************************************************************/
+static void SetPublicPort( tr_shared_t * s, int port )
+{
+    tr_handle_t * h = s->h;
+    tr_torrent_t * tor;
+
+    s->publicPort = port;
+
+    for( tor = h->torrentList; tor; tor = tor->next )
+    {
+        tr_lockLock( &tor->lock );
+        tor->publicPort = port;
+        tr_lockUnlock( &tor->lock );
+    }
 }
 
 /***********************************************************************

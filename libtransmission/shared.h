@@ -51,6 +51,7 @@ void          tr_sharedUnlock         ( tr_shared_t * );
  * Changes the port for incoming connections
  **********************************************************************/
 void         tr_sharedSetPort         ( tr_shared_t *, int port );
+int          tr_sharedGetPublicPort   ( tr_shared_t * s );
 
 /***********************************************************************
  * tr_sharedTraversalEnable, tr_natTraversalStatus

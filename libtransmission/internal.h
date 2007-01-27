@@ -163,7 +163,7 @@ struct tr_torrent_s
 
     char            * id;
     char            * key;
-    int             * bindPort;
+    int               publicPort;
 
     /* An escaped string used to include the hash in HTTP queries */
     char              escapedHashString[3*SHA_DIGEST_LENGTH+1];
@@ -210,7 +210,7 @@ struct tr_handle_s
     int            torrentCount;
     tr_torrent_t * torrentList;
 
-    int            bindPort;
+    int            isPortSet;
     int            uploadLimit;
     int            downloadLimit;
     tr_shared_t  * shared;

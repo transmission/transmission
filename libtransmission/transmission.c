@@ -77,7 +77,7 @@ tr_handle_t * tr_init()
  **********************************************************************/
 void tr_setBindPort( tr_handle_t * h, int port )
 {
-    h->bindPort = port;
+    h->isPortSet = 1;
     tr_sharedSetPort( h->shared, port );
 }
 

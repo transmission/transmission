@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "shared.h"
 
 typedef struct tr_announce_list_ptr_s tr_announce_list_ptr_t;
 struct tr_announce_list_ptr_s
@@ -85,8 +86,7 @@ struct tr_tracker_s
     tr_http_t    * http;
     tr_http_t    * httpScrape;
 
-    int            bindPort;
-    int            newPort;
+    int            publicPort;
 };
 
 static int         announceToScrape ( char * announce, char * scrape );
@@ -98,6 +98,7 @@ static void        readAnswer       ( tr_tracker_t * tc, const char *, int,
                                       int * peerCount, uint8_t ** peerCompact );
 static void        readScrapeAnswer ( tr_tracker_t * tc, const char *, int );
 static void        killHttp         ( tr_http_t ** http );
+static int         shouldChangePort( tr_tracker_t * tc );
 
 tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 {
@@ -122,8 +123,7 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     tc->lastError      = 1;
     tc->allUnreachIfError = 1;
 
-    tc->bindPort       = *(tor->bindPort);
-    tc->newPort        = -1;
+    tc->publicPort     = tor->publicPort;
     
     tc->trackerAnnounceListPtr = calloc( sizeof( int ), inf->trackerTiers );
     for( ii = 0; ii < inf->trackerTiers; ii++ )
@@ -251,7 +251,7 @@ static int shouldConnect( tr_tracker_t * tc )
     }
 
     /* Do we need to send an event? */
-    if( tc->started || tc->completed || tc->stopped || 0 < tc->newPort )
+    if( tc->started || tc->completed || tc->stopped || shouldChangePort( tc ) )
     {
         return 1;
     }
@@ -315,11 +315,6 @@ static int shouldScrape( tr_tracker_t * tc )
     }
 
     return now > tc->dateScrape + interval;
-}
-
-void tr_trackerChangePort( tr_tracker_t * tc, int port )
-{
-    tc->newPort = port;
 }
 
 void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
@@ -423,7 +418,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
                     tc->started ? "sending 'started'" :
                     ( tc->completed ? "sending 'completed'" :
                       ( tc->stopped ? "sending 'stopped'" :
-                        ( 0 < tc->newPort ? "sending 'stopped' to change port" :
+                        ( shouldChangePort( tc ) ? "sending 'stopped' to change port" :
                           "getting peers" ) ) ) );
         }
         
@@ -567,17 +562,16 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
         down  = 0;
         up    = 0;
 
-        if( 0 < tc->newPort )
+        if( shouldChangePort( tc ) )
         {
-            tc->bindPort = tc->newPort;
-            tc->newPort  = -1;
+            tc->publicPort = tor->publicPort;
         }
     }
     else if( tc->completed )
     {
         event = "&event=completed";
     }
-    else if( tc->stopped || 0 < tc->newPort )
+    else if( tc->stopped || shouldChangePort( tc ) )
     {
         event = "&event=stopped";
         numwant = 0;
@@ -615,7 +609,7 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
                           "%s%s"
                           "%s",
                           tc->trackerAnnounce, start, tor->escapedHashString,
-                          tc->id, tc->bindPort, up, down, left, numwant,
+                          tc->id, tc->publicPort, up, down, left, numwant,
                           tor->key, idparam, trackerid, event );
 }
 
@@ -713,7 +707,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
 
     if( i >= bodylen )
     {
-        if( tc->stopped || 0 < tc->newPort )
+        if( tc->stopped || shouldChangePort( tc ) )
         {
             tc->lastError = 0;
             goto nodict;
@@ -830,7 +824,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
     bePeers = tr_bencDictFind( &beAll, "peers" );
     if( !bePeers )
     {
-        if( tc->stopped || 0 < tc->newPort )
+        if( tc->stopped || shouldChangePort( tc ) )
         {
             goto nodict;
         }
@@ -903,7 +897,7 @@ nodict:
         tor->status = TR_STATUS_STOPPED;
         tc->stopped = 0;
     }
-    else if( 0 < tc->newPort )
+    else if( shouldChangePort( tc ) )
     {
         tc->started  = 1;
     }
@@ -1154,4 +1148,11 @@ static void killHttp( tr_http_t ** http )
         tr_httpClose( *http );
         *http = NULL;
     }
+}
+
+static int shouldChangePort( tr_tracker_t * tc )
+{
+    tr_torrent_t * tor = tc->tor;
+
+    return ( tor->publicPort != tc->publicPort );
 }
