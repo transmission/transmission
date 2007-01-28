@@ -62,6 +62,9 @@ int tr_sprintf( char ** buf, int * used, int * max,
                 const char * format, ... ) PRINTF( 4, 5 );
 /* gee, it sure would be nice if BeOS had va_copy() */
 int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
+/* this concatenates some binary data onto the end of a buffer */
+int tr_concat( char ** buf, int * used, int * max,
+               const char * data, int len );
 
 /***********************************************************************
  * tr_dupstr
