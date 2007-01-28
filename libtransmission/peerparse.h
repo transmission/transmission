@@ -37,7 +37,7 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
     tr_request_t * r;
     int i;
 
-    if( len != 1 )
+    if( len != 0 )
     {
         peer_dbg( "GET  %schoke, invalid", choking ? "" : "un" );
         return TR_ERROR_ASSERT;
@@ -69,7 +69,7 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
 static inline int parseInterested( tr_peer_t * peer, int len,
                                    int interested )
 {
-    if( len != 1 )
+    if( len != 0 )
     {
         peer_dbg( "GET  %sinterested, invalid", interested ? "" : "un" );
         return TR_ERROR_ASSERT;
@@ -92,7 +92,7 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
 {
     uint32_t piece;
 
-    if( len != 5 )
+    if( len != 4 )
     {
         peer_dbg( "GET  have, invalid" );
         return TR_ERROR_ASSERT;
@@ -128,7 +128,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
 
     bitfieldSize = ( inf->pieceCount + 7 ) / 8;
     
-    if( len != 1 + bitfieldSize )
+    if( len != bitfieldSize )
     {
         peer_dbg( "GET  bitfield, wrong size" );
         return TR_ERROR_ASSERT;
@@ -178,7 +178,7 @@ static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
     int index, begin, length;
     tr_request_t * r;
 
-    if( len != 13 )
+    if( len != 12 )
     {
         peer_dbg( "GET  request, invalid" );
         return TR_ERROR_ASSERT;
@@ -274,13 +274,13 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     block = tr_block( index, begin );
 
     peer_dbg( "GET  piece %d/%d (%d bytes)",
-              index, begin, len - 9 );
+              index, begin, len - 8 );
 
     updateRequests( tor, peer, index, begin );
     tor->downloadedCur += len;
 
     /* Sanity checks */
-    if( len - 9 != tr_blockSize( block ) )
+    if( len - 8 != tr_blockSize( block ) )
     {
         peer_dbg( "wrong size (expecting %d)", tr_blockSize( block ) );
         return TR_ERROR_ASSERT;
@@ -299,7 +299,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     tr_bitfieldAdd( peer->blamefield, index );
 
     /* Write to disk */
-    if( ( ret = tr_ioWrite( tor->io, index, begin, len - 9, &p[8] ) ) )
+    if( ( ret = tr_ioWrite( tor->io, index, begin, len - 8, &p[8] ) ) )
     {
         return ret;
     }
@@ -343,7 +343,7 @@ static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
     int i;
     tr_request_t * r;
 
-    if( len != 13 )
+    if( len != 12 )
     {
         peer_dbg( "GET  cancel, invalid" );
         return TR_ERROR_ASSERT;
@@ -376,7 +376,7 @@ static inline int parsePort( tr_peer_t * peer, uint8_t * p, int len )
 {
     in_port_t port;
 
-    if( len != 3 )
+    if( len != 2 )
     {
         peer_dbg( "GET  port, invalid" );
         return TR_ERROR_ASSERT;
@@ -395,28 +395,29 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
 
     /* Type of the message */
     id = *(p++);
+    len--;
 
     switch( id )
     {
-        case 0:
+        case PEER_MSG_CHOKE:
             return parseChoke( tor, peer, len, 1 );
-        case 1:
+        case PEER_MSG_UNCHOKE:
             return parseChoke( tor, peer, len, 0 );
-        case 2:
+        case PEER_MSG_INTERESTED:
             return parseInterested( peer, len, 1 );
-        case 3:
+        case PEER_MSG_UNINTERESTED:
             return parseInterested( peer, len, 0 );
-        case 4:
+        case PEER_MSG_HAVE:
             return parseHave( tor, peer, p, len );
-        case 5:
+        case PEER_MSG_BITFIELD:
             return parseBitfield( tor, peer, p, len );
-        case 6:
+        case PEER_MSG_REQUEST:
             return parseRequest( peer, p, len );
-        case 7:
+        case PEER_MSG_PIECE:
             return parsePiece( tor, peer, p, len );
-        case 8:
+        case PEER_MSG_CANCEL:
             return parseCancel( peer, p, len );
-        case 9:
+        case PEER_MSG_PORT:
             return parsePort( peer, p, len );
     }
 

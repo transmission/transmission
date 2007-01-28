@@ -26,6 +26,17 @@
  * This file handles all outgoing messages
  **********************************************************************/
 
+#define PEER_MSG_CHOKE          0
+#define PEER_MSG_UNCHOKE        1
+#define PEER_MSG_INTERESTED     2
+#define PEER_MSG_UNINTERESTED   3
+#define PEER_MSG_HAVE           4
+#define PEER_MSG_BITFIELD       5
+#define PEER_MSG_REQUEST        6
+#define PEER_MSG_PIECE          7
+#define PEER_MSG_CANCEL         8
+#define PEER_MSG_PORT           9
+
 static uint8_t * messagesPending( tr_peer_t * peer, int * size )
 {
     if( peer->outBlockSending || peer->outMessagesPos < 1 )
@@ -78,7 +89,7 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
         p = (uint8_t *) peer->outBlock;
 
         TR_HTONL( 9 + r->length, p );
-        p[4] = 7;
+        p[4] = PEER_MSG_PIECE;
         TR_HTONL( r->index, p + 5 );
         TR_HTONL( r->begin, p + 9 );
 
@@ -118,9 +129,15 @@ static void blockSent( tr_peer_t * peer, int size )
     }
 }
 
-static uint8_t * getPointerForSize( tr_peer_t * peer, int size )
+static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
 {
     uint8_t * p;
+
+    size += 4;
+    if( 0 <= id )
+    {
+        size++;
+    }
 
     if( peer->outMessagesPos + size > peer->outMessagesSize )
     {
@@ -131,6 +148,14 @@ static uint8_t * getPointerForSize( tr_peer_t * peer, int size )
 
     p                     = &peer->outMessages[peer->outMessagesPos];
     peer->outMessagesPos += size;
+
+    TR_HTONL( size - 4, p );
+    p += 4;
+    if( 0 <= id )
+    {
+        *p = id;
+        p++;
+    }
 
     return p;
 }
@@ -144,9 +169,7 @@ static void sendKeepAlive( tr_peer_t * peer )
 {
     uint8_t * p;
 
-    p = getPointerForSize( peer, 4 );
-
-    TR_HTONL( 0, p );
+    p = getMessagePointer( peer, 0, -1 );
 
     peer_dbg( "SEND keep-alive" );
 }
@@ -160,11 +183,10 @@ static void sendKeepAlive( tr_peer_t * peer )
 static void sendChoke( tr_peer_t * peer, int yes )
 {
     uint8_t * p;
+    int       id;
 
-    p = getPointerForSize( peer, 5 );
-
-    TR_HTONL( 1, p );
-    p[4] = yes ? 0 : 1;
+    id = ( yes ? PEER_MSG_CHOKE : PEER_MSG_UNCHOKE );
+    p = getMessagePointer( peer, 0, id );
 
     peer->amChoking = yes;
 
@@ -186,11 +208,10 @@ static void sendChoke( tr_peer_t * peer, int yes )
 static void sendInterest( tr_peer_t * peer, int yes )
 {
     uint8_t * p;
+    int       id;
 
-    p = getPointerForSize( peer, 5 );
-    
-    TR_HTONL( 1, p );
-    p[4] = yes ? 2 : 3;
+    id = ( yes ? PEER_MSG_INTERESTED : PEER_MSG_UNINTERESTED );
+    p = getMessagePointer( peer, 0, id );
 
     peer->amInterested = yes;
 
@@ -206,11 +227,9 @@ static void sendHave( tr_peer_t * peer, int piece )
 {
     uint8_t * p;
 
-    p = getPointerForSize( peer, 9 );
+    p = getMessagePointer( peer, 4, PEER_MSG_HAVE );
 
-    TR_HTONL( 5, &p[0] );
-    p[4] = 4;
-    TR_HTONL( piece, &p[5] );
+    TR_HTONL( piece, p );
 
     peer_dbg( "SEND have %d", piece );
 }
@@ -228,11 +247,9 @@ static void sendBitfield( tr_torrent_t * tor, tr_peer_t * peer )
     uint8_t * p;
     int       bitfieldSize = ( tor->info.pieceCount + 7 ) / 8;
 
-    p = getPointerForSize( peer, 5 + bitfieldSize );
+    p = getMessagePointer( peer, bitfieldSize, PEER_MSG_BITFIELD );
 
-    TR_HTONL( 1 + bitfieldSize, p );
-    p[4] = 5;
-    memcpy( &p[5], tr_cpPieceBitfield( tor->completion ), bitfieldSize );
+    memcpy( p, tr_cpPieceBitfield( tor->completion ), bitfieldSize );
 
     peer_dbg( "SEND bitfield" );
 }
@@ -258,13 +275,11 @@ static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
     (peer->inRequestCount)++;
 
     /* Build the "ask" message */
-    p = getPointerForSize( peer, 17 );
+    p = getMessagePointer( peer, 12, PEER_MSG_REQUEST );
 
-    TR_HTONL( 13, p );
-    p[4] = 6;
-    TR_HTONL( r->index, p + 5 );
-    TR_HTONL( r->begin, p + 9 );
-    TR_HTONL( r->length, p + 13 );
+    TR_HTONL( r->index,  p     );
+    TR_HTONL( r->begin,  p + 4 );
+    TR_HTONL( r->length, p + 8 );
 
     tr_cpDownloaderAdd( tor->completion, block );
 
@@ -297,14 +312,12 @@ static void sendCancel( tr_torrent_t * tor, int block )
                 continue;
             }
 
-            p = getPointerForSize( peer, 17 );
+            p = getMessagePointer( peer, 12, PEER_MSG_CANCEL );
         
             /* Build the "cancel" message */
-            TR_HTONL( 13, p );
-            p[4] = 8;
-            TR_HTONL( r->index,  p + 5  );
-            TR_HTONL( r->begin,  p + 9  );
-            TR_HTONL( r->length, p + 13 );
+            TR_HTONL( r->index,  p     );
+            TR_HTONL( r->begin,  p + 4 );
+            TR_HTONL( r->length, p + 8 );
 
             peer_dbg( "SEND cancel %d/%d (%d bytes)",
                       r->index, r->begin, r->length );
