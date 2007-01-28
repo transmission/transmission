@@ -669,6 +669,10 @@ sendrequest( int adding, int fd, int port )
     }
 
     res = tr_netSend( fd, buf, sizeof( buf ) );
+    if( TR_NET_CLOSE & res && EHOSTUNREACH == errno )
+    {
+        res = TR_NET_BLOCK;
+    }
     /* XXX is it all right to assume the entire thing is written? */
 
     /* XXX I should handle blocking here */
