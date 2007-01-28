@@ -358,8 +358,14 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
     if( s > -1 )
     {
         SocketSetPriority( s, 0 );
-        *addr = sock.sin_addr;
-        *port = sock.sin_port;
+        if( NULL != addr )
+        {
+            *addr = sock.sin_addr;
+        }
+        if( NULL != port )
+        {
+            *port = sock.sin_port;
+        }
         gFd->normal++;
     }
     tr_lockUnlock( &gFd->lock );

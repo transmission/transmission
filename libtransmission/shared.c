@@ -320,7 +320,6 @@ static void SetPublicPort( tr_shared_t * s, int port )
 static void AcceptPeers( tr_shared_t * s )
 {
     int socket;
-    in_port_t port;
     struct in_addr addr;
 
     for( ;; )
@@ -330,12 +329,12 @@ static void AcceptPeers( tr_shared_t * s )
             break;
         }
 
-        socket = tr_netAccept( s->bindSocket, &addr, &port );
+        socket = tr_netAccept( s->bindSocket, &addr, NULL );
         if( socket < 0 )
         {
             break;
         }
-        s->peers[s->peerCount++] = tr_peerInit( addr, port, socket );
+        s->peers[s->peerCount++] = tr_peerInit( addr, 0, socket );
     }
 }
 
