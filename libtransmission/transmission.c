@@ -108,6 +108,7 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 
     *dl = 0.0;
     *ul = 0.0;
+    tr_sharedLock( h->shared );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
         tr_lockLock( &tor->lock );
@@ -116,6 +117,7 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
         *ul += tr_rcRate( tor->upload );
         tr_lockUnlock( &tor->lock );
     }
+    tr_sharedUnlock( h->shared );
 }
 
 int tr_torrentCount( tr_handle_t * h )

@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "shared.h"
 
 /* Maximum number of packets we keep track of. Since most packets are
  * 1 KB, it means we remember the last 2 MB transferred */
@@ -93,6 +94,7 @@ int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
         return limit < 0;
     }
     
+    tr_sharedLock( h->shared );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
         if( tor->customSpeedLimit )
@@ -107,9 +109,11 @@ int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
         
         if( rate >= (float)limit )
         {
+            tr_sharedUnlock( h->shared );
             return 0;
         }
     }
+    tr_sharedUnlock( h->shared );
     
     return 1;
 }

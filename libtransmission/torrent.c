@@ -97,6 +97,8 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     inf        = &tor->info;
     inf->flags = flags;
 
+    tr_sharedLock( h->shared );
+
     /* Make sure this torrent is not already open */
     for( tor_tmp = h->torrentList; tor_tmp; tor_tmp = tor_tmp->next )
     {
@@ -106,6 +108,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
             *error = TR_EDUPLICATE;
             tr_metainfoFree( &tor->info );
             free( tor );
+            tr_sharedUnlock( h->shared );
             return NULL;
         }
     }
@@ -136,7 +139,6 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->swarmspeed     = tr_rcInit();
  
     /* We have a new torrent */
-    tr_sharedLock( h->shared );
     tor->publicPort = tr_sharedGetPublicPort( h->shared );
     tor->prev       = NULL;
     tor->next       = h->torrentList;
@@ -146,6 +148,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     }
     h->torrentList = tor;
     (h->torrentCount)++;
+
     tr_sharedUnlock( h->shared );
 
     if( !h->isPortSet )
