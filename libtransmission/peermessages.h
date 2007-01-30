@@ -95,6 +95,12 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
 
         tr_ioRead( tor->io, r->index, r->begin, r->length, &p[13] );
 
+        if( peer->outRequestCount < 1 )
+        {
+            /* We were choked during the read */
+            return NULL;
+        }
+
         peer_dbg( "SEND piece %d/%d (%d bytes)",
                   r->index, r->begin, r->length );
 
