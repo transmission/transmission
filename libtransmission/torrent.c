@@ -469,11 +469,13 @@ void tr_torrentPeersFree( tr_peer_stat_t * peers, int peerCount )
 void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
 {
     int i, j, piece;
+    float interval;
 
     tr_lockLock( &tor->lock );
+    interval = (float)tor->info.pieceCount / (float)size;
     for( i = 0; i < size; i++ )
     {
-        piece = i * tor->info.pieceCount / size;
+        piece = i * interval;
 
         if( tr_cpPieceIsComplete( tor->completion, piece ) )
         {
@@ -497,11 +499,13 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
 void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size )
 {
     int i, piece;
+    float interval;
 
     tr_lockLock( &tor->lock );
+    interval = (float)tor->info.pieceCount / (float)size;
     for( i = 0; i < size; i++ )
     {
-        piece = i * tor->info.pieceCount / size;
+        piece = i * interval;
         tab[i] = tr_cpPercentBlocksInPiece( tor->completion, piece );
     }
     tr_lockUnlock( &tor->lock );
