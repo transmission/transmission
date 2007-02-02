@@ -286,11 +286,12 @@
 
 - (void) updateInfoStats
 {
-    if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_ACTIVITY_IDENT])
+    NSString * ident = [[fTabView selectedTabViewItem] identifier];
+    if ([ident isEqualToString: TAB_ACTIVITY_IDENT])
         [self updateInfoActivity];
-    else if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_PEERS_IDENT])
+    else if ([ident isEqualToString: TAB_PEERS_IDENT])
         [self updateInfoPeers];
-    else if ([[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_INFO_IDENT])
+    else if ([ident isEqualToString: TAB_INFO_IDENT])
         [self updateInfoGeneral];
     else;
 }
@@ -834,7 +835,6 @@
         NSBeep();
         
         torrent = [enumerator nextObject]; //use first torrent
-        
         limit = upload ? [torrent uploadLimit] : [torrent downloadLimit];
         while ((torrent = [enumerator nextObject]))
             if (limit != (upload ? [torrent uploadLimit] : [torrent downloadLimit]))
