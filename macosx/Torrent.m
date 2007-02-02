@@ -152,10 +152,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithBool: fRatioCustom], @"StopRatioCustom",
                     [NSNumber numberWithBool: fShouldStopAtRatio], @"ShouldStopAtRatio",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
-                    [NSNumber numberWithBool: fLimitCustom], @"LimitSpeedCustom",
-                    [NSNumber numberWithBool: fCheckUpload], @"CheckUpload",
+                    [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
                     [NSNumber numberWithInt: fUploadLimit], @"UploadLimit",
-                    [NSNumber numberWithBool: fCheckDownload], @"CheckDownload",
+                    [NSNumber numberWithInt: fCheckDownload], @"CheckDownload",
                     [NSNumber numberWithInt: fDownloadLimit], @"DownloadLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [self orderValue], @"OrderValue", nil];
@@ -559,14 +558,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fRatioLimit = limit;
 }
 
-- (BOOL) checkUpload
+- (int) checkUpload
 {
     return fCheckUpload;
 }
 
-- (void) setLimitUpload: (BOOL) limit
+- (void) setCheckUpload: (int) setting
 {
-    fCheckUpload = limit;
+    fCheckUpload = setting;
     [self updateSpeedSetting];
 }
 
@@ -581,14 +580,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [self updateSpeedSetting];
 }
 
-- (BOOL) checkDownload
+- (int) checkDownload
 {
     return fCheckDownload;
 }
 
-- (void) setLimitDownload: (BOOL) limit
+- (void) setCheckDownload: (int) setting
 {
-    fCheckDownload = limit;
+    fCheckDownload = setting;
     [self updateSpeedSetting];
 }
 
@@ -603,22 +602,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [self updateSpeedSetting];
 }
 
-- (BOOL) customLimitSetting
-{
-    return fLimitCustom;
-}
-
-- (void) setCustomLimitSetting: (BOOL) setting
-{
-    fLimitCustom = setting;
-    [self updateSpeedSetting];
-}
-
 - (void) updateSpeedSetting
 {
-    tr_setUseCustomLimit(fHandle, fLimitCustom);
-    tr_setUploadLimit(fHandle, fCheckUpload ? fUploadLimit : -1);
-    tr_setDownloadLimit(fHandle, fCheckDownload ? fDownloadLimit : -1);
+    tr_setUseCustomUpload(fHandle, fCheckUpload != NSMixedState);
+    tr_setUploadLimit(fHandle, fCheckUpload == NSOnState ? fUploadLimit : -1);
+    
+    tr_setUseCustomDownload(fHandle, fCheckDownload != NSMixedState);
+    tr_setDownloadLimit(fHandle, fCheckDownload == NSOnState ? fDownloadLimit : -1);
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -1167,10 +1157,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
-    fLimitCustom = limitCustom ? [limitCustom boolValue] : NO;
-    fCheckUpload = checkUpload ? [checkUpload boolValue] : NO;
+    fCheckUpload = checkUpload ? [checkUpload intValue] : NSMixedState;
     fUploadLimit = uploadLimit ? [uploadLimit intValue] : [fDefaults integerForKey: @"UploadLimit"];
-    fCheckDownload = checkDownload ? [checkDownload boolValue] : NO;
+    fCheckDownload = checkDownload ? [checkDownload intValue] : NSMixedState;
     fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimit"];
     [self updateSpeedSetting];
     

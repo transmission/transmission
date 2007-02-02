@@ -50,7 +50,8 @@
     
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
-    BOOL    fLimitCustom, fCheckUpload, fCheckDownload, fRatioCustom, fShouldStopAtRatio,
+    int     fCheckUpload, fCheckDownload;
+    BOOL    fRatioCustom, fShouldStopAtRatio,
             fFinishedSeeding, fWaitToStart, fError, fChecking;
     
     int fOrderValue;
@@ -92,17 +93,15 @@
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
 
-- (BOOL)    checkUpload;
-- (void)    setLimitUpload: (BOOL) limit;
+- (int)     checkUpload;
+- (void)    setCheckUpload: (int) setting;
 - (int)     uploadLimit;
 - (void)    setUploadLimit: (int) limit;
-- (BOOL)    checkDownload;
-- (void)    setLimitDownload: (BOOL) limit;
+- (int)     checkDownload;
+- (void)    setCheckDownload: (int) setting;
 - (int)     downloadLimit;
 - (void)    setDownloadLimit: (int) limit;
 
-- (BOOL)    customLimitSetting;
-- (void)    setCustomLimitSetting: (BOOL) setting;
 - (void)    updateSpeedSetting;
 
 - (void) setWaitToStart: (BOOL) wait;

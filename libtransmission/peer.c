@@ -211,7 +211,14 @@ int tr_peerRead( tr_peer_t * peer )
     {
         if( tor )
         {
-            if( !tor->customSpeedLimit )
+            if( tor->customDownloadLimit )
+            {
+                if( !tr_rcCanTransfer( tor->download ) )
+                {
+                    break;
+                }
+            }
+            else
             {
                 tr_lockUnlock( &tor->lock );
                 if( !tr_rcCanGlobalTransfer( tor->handle, 0 ) )
@@ -220,10 +227,6 @@ int tr_peerRead( tr_peer_t * peer )
                     break;
                 }
                 tr_lockLock( &tor->lock );
-            }
-            else if( !tr_rcCanTransfer( tor->download ) )
-            {
-                break;
             }
         }
 
@@ -398,7 +401,14 @@ writeBegin:
     /* Send pieces if we can */
     while( ( p = blockPending( tor, peer, &size ) ) )
     {
-        if( !tor->customSpeedLimit )
+        if( tor->customUploadLimit )
+        {
+            if( !tr_rcCanTransfer( tor->upload ) )
+            {
+                break;
+            }
+        }
+        else
         {
             tr_lockUnlock( &tor->lock );
             if( !tr_rcCanGlobalTransfer( tor->handle, 1 ) )
@@ -407,10 +417,6 @@ writeBegin:
                 break;
             }
             tr_lockLock( &tor->lock );
-        }
-        else if( !tr_rcCanTransfer( tor->upload ) )
-        {
-            break;
         }
 
         ret = tr_netSend( peer->socket, p, size );

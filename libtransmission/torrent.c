@@ -33,9 +33,14 @@ static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
 static void torrentReallyStop( tr_torrent_t * );
 static void downloadLoop( void * );
 
-void tr_setUseCustomLimit( tr_torrent_t * tor, int limit )
+void tr_setUseCustomUpload( tr_torrent_t * tor, int limit )
 {
-    tor->customSpeedLimit = limit;
+    tor->customUploadLimit = limit;
+}
+
+void tr_setUseCustomDownload( tr_torrent_t * tor, int limit )
+{
+    tor->customDownloadLimit = limit;
 }
 
 void tr_setUploadLimit( tr_torrent_t * tor, int limit )

@@ -41,7 +41,7 @@
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 268.0
 #define TAB_FILES_HEIGHT 268.0
-#define TAB_OPTIONS_HEIGHT 142.0
+#define TAB_OPTIONS_HEIGHT 127.0
 
 #define INVALID -99
 
@@ -393,54 +393,41 @@
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
-        int limitCustom = [torrent customLimitSetting] ? 1 : 0,
-            checkUpload = [torrent checkUpload] ? 1 : 0,
-            checkDownload = [torrent checkDownload] ? 1 : 0,
+        int checkUpload = [torrent checkUpload],
+            checkDownload = [torrent checkDownload],
             uploadLimit = [torrent uploadLimit],
             downloadLimit = [torrent downloadLimit];
         
-        while ((limitCustom != INVALID
-                || checkUpload != INVALID || uploadLimit != INVALID
-                || checkDownload != INVALID || downloadLimit != INVALID)
+        while ((checkUpload != NSMixedState || uploadLimit != INVALID
+                || checkDownload != NSMixedState || downloadLimit != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (limitCustom != INVALID && limitCustom != ([torrent customLimitSetting] ? 1 : 0))
-                limitCustom = INVALID;
-            
-            if (checkUpload != INVALID && checkUpload != ([torrent checkUpload] ? 1 : 0))
-                checkUpload = INVALID;
+            if (checkUpload != NSMixedState && checkUpload != [torrent checkUpload])
+                checkUpload = NSMixedState;
             
             if (uploadLimit != INVALID && uploadLimit != [torrent uploadLimit])
                 uploadLimit = INVALID;
             
-            if (checkDownload != INVALID && checkDownload != ([torrent checkDownload] ? 1 : 0))
-                checkDownload = INVALID;
+            if (checkDownload != NSMixedState && checkDownload != [torrent checkDownload])
+                checkDownload = NSMixedState;
             
             if (downloadLimit != INVALID && downloadLimit != [torrent downloadLimit])
                 downloadLimit = INVALID;
         }
         
-        [fLimitCustomCheck setEnabled: YES];
-        [fLimitCustomCheck setState: limitCustom == INVALID ? NSMixedState
-                                : (limitCustom == 1 ? NSOnState : NSOffState)];
-        
-        [fUploadLimitCheck setEnabled: limitCustom == 1];
-        [fUploadLimitLabel setEnabled: limitCustom == 1];
-        [fUploadLimitCheck setState: checkUpload == INVALID ? NSMixedState
-                                : (checkUpload == 1 ? NSOnState : NSOffState)];
-        
-        [fDownloadLimitCheck setEnabled: limitCustom == 1];
-        [fDownloadLimitLabel setEnabled: limitCustom == 1];
-        [fDownloadLimitCheck setState: checkDownload == INVALID ? NSMixedState
-                                : (checkDownload == 1 ? NSOnState : NSOffState)];
-        
-        [fUploadLimitField setEnabled: limitCustom == 1 && checkUpload == 1];
+        [fUploadLimitCheck setEnabled: YES];
+        [fUploadLimitCheck setState: checkUpload];
+        [fUploadLimitLabel setEnabled: checkUpload == NSOnState];
+        [fUploadLimitField setEnabled: checkUpload == NSOnState];
         if (uploadLimit != INVALID)
             [fUploadLimitField setIntValue: uploadLimit];
         else
             [fUploadLimitField setStringValue: @""];
-
-        [fDownloadLimitField setEnabled: limitCustom == 1 && checkDownload == 1];
+        
+        [fDownloadLimitCheck setEnabled: YES];
+        [fDownloadLimitCheck setState: checkDownload];
+        [fDownloadLimitLabel setEnabled: checkDownload == NSOnState];
+        [fDownloadLimitField setEnabled: checkDownload == NSOnState];
         if (downloadLimit != INVALID)
             [fDownloadLimitField setIntValue: downloadLimit];
         else
@@ -483,9 +470,6 @@
     }
     else
     {
-        [fLimitCustomCheck setEnabled: NO];
-        [fLimitCustomCheck setState: NSOffState];
-        
         [fUploadLimitCheck setEnabled: NO];
         [fUploadLimitCheck setState: NSOffState];
         [fUploadLimitField setEnabled: NO];
@@ -835,42 +819,19 @@
                 [[fFileOutline itemAtRow: i] objectForKey: @"Path"]] inFileViewerRootedAtPath: nil];
 }
 
-- (void) setLimitCustom: (id) sender
-{
-    BOOL custom = [sender state] != NSOffState;
-    if (custom)
-        [sender setState: NSOnState];
-
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        [torrent setCustomLimitSetting: custom];
-    
-    [fUploadLimitCheck setEnabled: custom];
-    [fUploadLimitLabel setEnabled: custom];
-    [fUploadLimitField setEnabled: custom && [fUploadLimitCheck state] == NSOnState];
-    
-    [fDownloadLimitCheck setEnabled: custom];
-    [fDownloadLimitLabel setEnabled: custom];
-    [fDownloadLimitField setEnabled: custom && [fDownloadLimitCheck state] == NSOnState];
-}
-
 - (void) setLimitCheck: (id) sender
 {
-    BOOL upload = sender == fUploadLimitCheck,
-        limit = [sender state] != NSOffState;
-    
-    if (limit)
-        [sender setState: NSOnState];
+    BOOL upload = sender == fUploadLimitCheck;
+    int state = [sender state];
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        upload ? [torrent setLimitUpload: limit] : [torrent setLimitDownload: limit];
+        upload ? [torrent setCheckUpload: state] : [torrent setCheckDownload: state];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
     
-    [field setEnabled: limit];
+    [field setEnabled: state == NSOnState];
 }
 
 - (void) setSpeedLimit: (id) sender

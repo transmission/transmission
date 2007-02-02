@@ -56,8 +56,7 @@
     IBOutlet NSOutlineView * fFileOutline;
     IBOutlet NSTextField * fFileTableStatusField;
     
-    IBOutlet NSButton * fRatioCustomCheck, * fRatioStopCheck,
-                    * fLimitCustomCheck, * fUploadLimitCheck, * fDownloadLimitCheck;
+    IBOutlet NSButton * fRatioCustomCheck, * fRatioStopCheck, * fUploadLimitCheck, * fDownloadLimitCheck;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
 }
@@ -72,7 +71,6 @@
 - (void) revealDataFile: (id) sender;
 - (void) revealFile: (id) sender;
 
-- (void) setLimitCustom: (id) sender;
 - (void) setLimitCheck: (id) sender;
 - (void) setSpeedLimit: (id) sender;
 

@@ -151,7 +151,8 @@ struct tr_torrent_s
     tr_handle_t * handle;
     tr_info_t info;
 
-    int                customSpeedLimit;
+    int                customUploadLimit;
+    int                customDownloadLimit;
     tr_ratecontrol_t * upload;
     tr_ratecontrol_t * download;
     tr_ratecontrol_t * swarmspeed;

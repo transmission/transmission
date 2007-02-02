@@ -97,7 +97,7 @@ int tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload )
     tr_sharedLock( h->shared );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        if( tor->customSpeedLimit )
+        if( isUpload ? tor->customUploadLimit : tor->customDownloadLimit )
         {
             continue;
         }

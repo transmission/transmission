@@ -9,7 +9,6 @@
                 revealFile = id; 
                 revealTorrentFile = id; 
                 setLimitCheck = id; 
-                setLimitCustom = id; 
                 setRatioCustom = id; 
                 setRatioLimit = id; 
                 setRatioSetting = id; 
@@ -37,7 +36,6 @@
                 fHashField = NSTextField; 
                 fImageView = NSImageView; 
                 fLeechersField = NSTextField; 
-                fLimitCustomCheck = NSButton; 
                 fNameField = NSTextField; 
                 fPeerTable = NSTableView; 
                 fPiecesField = NSTextField; 
