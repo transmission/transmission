@@ -889,7 +889,7 @@
         
         limit = upload ? [torrent uploadLimit] : [torrent downloadLimit];
         while ((torrent = [enumerator nextObject]))
-            if (limit != upload ? [torrent uploadLimit] : [torrent downloadLimit])
+            if (limit != (upload ? [torrent uploadLimit] : [torrent downloadLimit]))
             {
                 [sender setStringValue: @""];
                 return;
