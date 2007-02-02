@@ -41,7 +41,7 @@
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 268.0
 #define TAB_FILES_HEIGHT 268.0
-#define TAB_OPTIONS_HEIGHT 127.0
+#define TAB_OPTIONS_HEIGHT 112.0
 
 #define INVALID -99
 
@@ -437,32 +437,22 @@
         enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
-        int ratioCustom = [torrent customRatioSetting] ? 1 : 0,
-            ratioStop = [torrent shouldStopAtRatio];
+        int ratioSetting = [torrent ratioSetting];
         float ratioLimit = [torrent ratioLimit];
         
-        while ((ratioCustom != INVALID || ratioStop != INVALID || ratioLimit != INVALID)
+        while ((ratioSetting != NSMixedState || ratioLimit != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (ratioCustom != INVALID && ratioCustom != ([torrent customRatioSetting] ? 1 : 0))
-                ratioCustom = INVALID;
-            
-            if (ratioStop != INVALID && ratioStop != ([torrent shouldStopAtRatio] ? 1 : 0))
-                ratioStop = INVALID;
+            if (ratioSetting != NSMixedState && ratioSetting != [torrent ratioSetting])
+                ratioSetting = NSMixedState;
             
             if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
                 ratioLimit = INVALID;
         }
         
-        [fRatioCustomCheck setEnabled: YES];
-        [fRatioCustomCheck setState: ratioCustom == INVALID ? NSMixedState
-                                : (ratioCustom == 1 ? NSOnState : NSOffState)];
-        
-        [fRatioStopCheck setEnabled: ratioCustom == 1];
-        [fRatioStopCheck setState: ratioStop == INVALID ? NSMixedState
-                                : (ratioStop == 1 ? NSOnState : NSOffState)];
-        
-        [fRatioLimitField setEnabled: ratioCustom == 1 && ratioStop == 1];
+        [fRatioCheck setEnabled: YES];
+        [fRatioCheck setState: ratioSetting];
+        [fRatioLimitField setEnabled: ratioSetting == NSOnState];
         if (ratioLimit != INVALID)
             [fRatioLimitField setFloatValue: ratioLimit];
         else
@@ -482,10 +472,8 @@
         [fDownloadLimitField setStringValue: @""];
         [fDownloadLimitLabel setEnabled: NO];
         
-        [fRatioCustomCheck setEnabled: NO];
-        [fRatioCustomCheck setState: NSOffState];
-        [fRatioStopCheck setEnabled: NO];
-        [fRatioStopCheck setState: NSOffState];
+        [fRatioCheck setEnabled: NO];
+        [fRatioCheck setState: NSOffState];
         [fRatioLimitField setEnabled: NO];
         [fRatioLimitField setStringValue: @""];
     }
@@ -830,7 +818,6 @@
         upload ? [torrent setCheckUpload: state] : [torrent setCheckDownload: state];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
-    
     [field setEnabled: state == NSOnState];
 }
 
@@ -865,33 +852,16 @@
     }
 }
 
-- (void) setRatioCustom: (id) sender
-{
-    BOOL custom = [sender state] != NSOffState;
-    if (custom)
-        [sender setState: NSOnState];
-
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-        [torrent setCustomRatioSetting: custom];
-    
-    [fRatioStopCheck setEnabled: custom];
-    [fRatioLimitField setEnabled: custom && [fRatioStopCheck state] == NSOnState];
-}
-
 - (void) setRatioSetting: (id) sender
 {
-    BOOL enabled = [sender state] != NSOffState;
-    if (enabled)
-        [sender setState: NSOnState];
-
+    int state = [sender state];
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        [torrent setShouldStopAtRatio: enabled];
+        [torrent setRatioSetting: state];
     
-    [fRatioLimitField setEnabled: enabled && [fRatioCustomCheck state] == NSOnState];
+    [fRatioLimitField setEnabled: state == NSOnState];
 }
 
 - (void) setRatioLimit: (id) sender

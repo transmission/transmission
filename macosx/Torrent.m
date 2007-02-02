@@ -35,9 +35,7 @@
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date
-        stopRatioCustom: (NSNumber *) ratioCustom
-        shouldStopAtRatio: (NSNumber *) shouldStopAtRatio
-        ratioLimit: (NSNumber *) ratioLimit
+        ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
@@ -94,8 +92,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 date: [history objectForKey: @"Date"]
-                stopRatioCustom: [history objectForKey: @"StopRatioCustom"]
-                shouldStopAtRatio: [history objectForKey: @"ShouldStopAtRatio"]
+                ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
                 checkUpload: [history objectForKey: @"CheckUpload"]
@@ -149,8 +146,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
-                    [NSNumber numberWithBool: fRatioCustom], @"StopRatioCustom",
-                    [NSNumber numberWithBool: fShouldStopAtRatio], @"ShouldStopAtRatio",
+                    [NSNumber numberWithBool: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
                     [NSNumber numberWithInt: fUploadLimit], @"UploadLimit",
@@ -267,8 +263,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    if ([self isSeeding] && ((fRatioCustom && fShouldStopAtRatio && [self ratio] >= fRatioLimit)
-            || (!fRatioCustom && [fDefaults boolForKey: @"RatioCheck"]
+    if ([self isSeeding] && ((fRatioSetting == NSOnState && [self ratio] >= fRatioLimit)
+            || (!fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]
                 && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stopTransfer];
@@ -527,24 +523,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->ratio;
 }
 
-- (BOOL) customRatioSetting
+- (int) ratioSetting
 {
-	return fRatioCustom;
+	return fRatioSetting;
 }
 
-- (void) setCustomRatioSetting: (BOOL) setting
+- (void) setRatioSetting: (int) setting
 {
-    fRatioCustom = setting;
-}
-
-- (BOOL) shouldStopAtRatio
-{
-	return fShouldStopAtRatio;
-}
-
-- (void) setShouldStopAtRatio: (BOOL) setting
-{
-    fShouldStopAtRatio = setting;
+    fRatioSetting = setting;
 }
 
 - (float) ratioLimit
@@ -1113,9 +1099,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
         date: (NSDate *) date
-        stopRatioCustom: (NSNumber *) ratioCustom
-        shouldStopAtRatio: (NSNumber *) shouldStopAtRatio
-        ratioLimit: (NSNumber *) ratioLimit
+        ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
@@ -1152,8 +1136,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     fDate = date ? [date retain] : [[NSDate alloc] init];
     
-    fRatioCustom = ratioCustom ? [ratioCustom boolValue] : NO;
-    fShouldStopAtRatio = shouldStopAtRatio ? [shouldStopAtRatio boolValue] : [fDefaults boolForKey: @"RatioCheck"];
+    fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
     
