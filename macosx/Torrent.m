@@ -69,7 +69,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
             date: nil
-            stopRatioCustom: nil shouldStopAtRatio: nil ratioLimit: nil
+            ratioSetting: nil ratioLimit: nil
             limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
             checkDownload: nil downloadLimit: nil
