@@ -264,7 +264,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //check to stop for ratio
     if ([self isSeeding] && ((fRatioSetting == NSOnState && [self ratio] >= fRatioLimit)
-            || (!fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]
+            || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]
                 && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
     {
         [self stopTransfer];
