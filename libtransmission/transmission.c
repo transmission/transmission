@@ -83,7 +83,9 @@ void tr_setBindPort( tr_handle_t * h, int port )
 
 void tr_natTraversalEnable( tr_handle_t * h, int enable )
 {
+    tr_sharedLock( h->shared );
     tr_sharedTraversalEnable( h->shared, enable );
+    tr_sharedUnlock( h->shared );
 }
 
 tr_handle_status_t * tr_handleStatus( tr_handle_t * h )

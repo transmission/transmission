@@ -48,7 +48,8 @@ void          tr_sharedUnlock         ( tr_shared_t * );
 /***********************************************************************
  * tr_sharedSetPort
  ***********************************************************************
- * Changes the port for incoming connections
+ * Changes the port for incoming connections.  tr_sharedGetPublicPort
+ * should be called with the shared lock held.
  **********************************************************************/
 void         tr_sharedSetPort         ( tr_shared_t *, int port );
 int          tr_sharedGetPublicPort   ( tr_shared_t * s );
@@ -56,7 +57,8 @@ int          tr_sharedGetPublicPort   ( tr_shared_t * s );
 /***********************************************************************
  * tr_sharedTraversalEnable, tr_sharedTraversalStatus
  ***********************************************************************
- *
+ * Enables/disables and retrieves the status of NAT traversal.  Should
+ * be called with the shared lock held.
  **********************************************************************/
 void         tr_sharedTraversalEnable ( tr_shared_t *, int enable );
 int          tr_sharedTraversalStatus ( tr_shared_t * );

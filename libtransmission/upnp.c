@@ -90,7 +90,6 @@ struct tr_upnp_s
     unsigned int       active : 1;
     unsigned int       discovering : 1;
     tr_upnp_device_t * devices;
-    tr_lock_t          lock;
 };
 
 static int
@@ -167,16 +166,12 @@ tr_upnpInit()
     upnp->infd     = -1;
     upnp->outfd    = -1;
 
-    tr_lockInit( &upnp->lock );
-
     return upnp;
 }
 
 void
 tr_upnpStart( tr_upnp_t * upnp )
 {
-    tr_lockLock( &upnp->lock );
-
     if( !upnp->active )
     {
         tr_inf( "starting upnp" );
@@ -186,15 +181,11 @@ tr_upnpStart( tr_upnp_t * upnp )
         upnp->lastdiscover = 0;
         upnp->lastdelay = SSDP_FIRST_DELAY / 2;
     }
-
-    tr_lockUnlock( &upnp->lock );
 }
 
 void
 tr_upnpStop( tr_upnp_t * upnp )
 {
-    tr_lockLock( &upnp->lock );
-
     if( upnp->active )
     {
         tr_inf( "stopping upnp" );
@@ -202,8 +193,6 @@ tr_upnpStop( tr_upnp_t * upnp )
         killSock( &upnp->infd );
         killSock( &upnp->outfd );
     }
-
-    tr_lockUnlock( &upnp->lock );
 }
 
 int
@@ -211,8 +200,6 @@ tr_upnpStatus( tr_upnp_t * upnp )
 {
     tr_upnp_device_t * ii;
     int                ret;
-
-    tr_lockLock( &upnp->lock );
 
     if( !upnp->active )
     {
@@ -240,18 +227,14 @@ tr_upnpStatus( tr_upnp_t * upnp )
         }
     }
 
-    tr_lockUnlock( &upnp->lock );
-
     return ret;
 }
 
 void
 tr_upnpForwardPort( tr_upnp_t * upnp, int port )
 {
-    tr_lockLock( &upnp->lock );
     tr_dbg( "upnp port changed from %i to %i", upnp->port, port );
     upnp->port = port;
-    tr_lockUnlock( &upnp->lock );
 }
 
 void
@@ -259,13 +242,11 @@ tr_upnpClose( tr_upnp_t * upnp )
 {
     tr_upnpStop( upnp );
 
-    tr_lockLock( &upnp->lock );
     while( NULL != upnp->devices )
     {
         deviceRemove( &upnp->devices );
     }
 
-    tr_lockClose( &upnp->lock );
     free( upnp );
 }
 
@@ -273,8 +254,6 @@ void
 tr_upnpPulse( tr_upnp_t * upnp )
 {
     tr_upnp_device_t ** ii;
-
-    tr_lockLock( &upnp->lock );
 
     if( upnp->active )
     {
@@ -321,8 +300,6 @@ tr_upnpPulse( tr_upnp_t * upnp )
             }
         }
     }
-
-    tr_lockUnlock( &upnp->lock );
 }
 
 static int

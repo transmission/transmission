@@ -82,7 +82,6 @@ struct tr_natpmp_s
     struct in_addr     dest;
     int                newport;
     int                mappedport;
-    tr_lock_t          lock;
     uint64_t           renew;
     tr_natpmp_req_t *  req;
     tr_natpmp_uptime_t uptime;
@@ -149,16 +148,12 @@ tr_natpmpInit()
         tr_dbg( "nat-pmp device is %s", addrstr );
     }
 
-    tr_lockInit( &pmp->lock );
-
     return pmp;
 }
 
 void
 tr_natpmpStart( tr_natpmp_t * pmp )
 {
-    tr_lockLock( &pmp->lock );
-
     if( !pmp->active )
     {
         tr_inf( "starting nat-pmp" );
@@ -168,15 +163,11 @@ tr_natpmpStart( tr_natpmp_t * pmp )
             pmp->mcastfd = mcastsetup();
         }
     }
-
-    tr_lockUnlock( &pmp->lock );
 }
 
 void
 tr_natpmpStop( tr_natpmp_t * pmp )
 {
-    tr_lockLock( &pmp->lock );
-
     if( pmp->active )
     {
         tr_inf( "stopping nat-pmp" );
@@ -212,17 +203,12 @@ tr_natpmpStop( tr_natpmp_t * pmp )
                 break;
         }
     }
-
-    tr_lockUnlock( &pmp->lock );
 }
 
 int
 tr_natpmpStatus( tr_natpmp_t * pmp )
 {
     int ret;
-
-    tr_lockLock( &pmp->lock );
-
     
     if( !pmp->active )
     {
@@ -259,18 +245,14 @@ tr_natpmpStatus( tr_natpmp_t * pmp )
         }
     }
 
-    tr_lockUnlock( &pmp->lock );
-
     return ret;
 }
 
 void
 tr_natpmpForwardPort( tr_natpmp_t * pmp, int port )
 {
-    tr_lockLock( &pmp->lock );
     tr_inf( "nat-pmp set port %i", port );
     pmp->newport = port;
-    tr_lockUnlock( &pmp->lock );
 }
 
 void
@@ -280,17 +262,13 @@ tr_natpmpClose( tr_natpmp_t * pmp )
     tr_natpmpStop( pmp );
     tr_natpmpPulse( pmp, NULL );
 
-    tr_lockLock( &pmp->lock );
     killreq( &pmp->req );
-    tr_lockClose( &pmp->lock );
     free( pmp );
 }
 
 void
 tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
 {
-    tr_lockLock( &pmp->lock );
-
     if( 0 <= pmp->mcastfd )
     {
         mcastpulse( pmp );
@@ -460,8 +438,6 @@ tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
     {
         *publicPort = -1;
     }
-
-    tr_lockUnlock( &pmp->lock );
 }
 
 static int
