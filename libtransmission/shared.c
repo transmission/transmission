@@ -258,6 +258,7 @@ static void SharedLoop( void * _s )
 {
     tr_shared_t * s = _s;
     uint64_t      date1, date2, lastchoke = 0;
+    int           newPort;
 
     tr_sharedLock( s );
 
@@ -266,7 +267,12 @@ static void SharedLoop( void * _s )
         date1 = tr_date();
 
         /* NAT-PMP and UPnP pulses */
-        tr_natpmpPulse( s->natpmp );
+        newPort = -1;
+        tr_natpmpPulse( s->natpmp, &newPort );
+        if( 0 < newPort && newPort != s->publicPort )
+        {
+            SetPublicPort( s, newPort );
+        }
         tr_upnpPulse( s->upnp );
 
         /* Handle incoming connections */
