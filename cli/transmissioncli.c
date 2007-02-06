@@ -77,13 +77,13 @@ int main( int argc, char ** argv )
     if( parseCommandLine( argc, argv ) )
     {
         printf( USAGE, argv[0], TR_DEFAULT_PORT );
-        return 1;
+        return EXIT_FAILURE;
     }
 
     if( showHelp )
     {
         printf( USAGE, argv[0], TR_DEFAULT_PORT );
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     if( verboseLevel < 0 )
@@ -104,7 +104,7 @@ int main( int argc, char ** argv )
     if( bindPort < 1 || bindPort > 65535 )
     {
         printf( "Invalid port '%d'\n", bindPort );
-        return 1;
+        return EXIT_FAILURE;
     }
 
     /* Initialize libtransmission */
@@ -114,7 +114,8 @@ int main( int argc, char ** argv )
     if( !( tor = tr_torrentInit( h, torrentPath, 0, &error ) ) )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
-        goto failed;
+        tr_close( h );
+        return EXIT_FAILURE;
     }
 
     if( showInfo )
@@ -252,11 +253,9 @@ int main( int argc, char ** argv )
     
 cleanup:
     tr_torrentClose( h, tor );
-
-failed:
     tr_close( h );
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 static int parseCommandLine( int argc, char ** argv )
