@@ -540,13 +540,15 @@ winclose(GtkWidget *widget SHUTUP, GdkEvent *event SHUTUP, gpointer gdata) {
 gboolean
 exitcheck(gpointer gdata) {
   struct exitdata *data = gdata;
-  int natstat = tr_natTraversalStatus(tr_backend_handle(data->cbdata->back));
+  tr_handle_status_t * hstat;
+
+  hstat = tr_handleStatus( tr_backend_handle( data->cbdata->back ) );
 
   /* keep going if we haven't hit the exit timeout and
      we either have torrents left or nat traversal is stopping */
   if( time( NULL ) - data->started < TRACKER_EXIT_TIMEOUT &&
       ( !tr_backend_torrents_stopped( data->cbdata->back ) ||
-        TR_NAT_TRAVERSAL_DISABLED != natstat ) ) {
+        TR_NAT_TRAVERSAL_DISABLED != hstat->natTraversalStatus ) ) {
     updatemodel(data->cbdata);
     return TRUE;
   }

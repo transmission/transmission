@@ -86,9 +86,21 @@ void tr_natTraversalEnable( tr_handle_t * h, int enable )
     tr_sharedTraversalEnable( h->shared, enable );
 }
 
-int tr_natTraversalStatus( tr_handle_t * h )
+tr_handle_status_t * tr_handleStatus( tr_handle_t * h )
 {
-    return tr_sharedTraversalStatus( h->shared );
+    tr_handle_status_t * s;
+
+    h->statCur = ( h->statCur + 1 ) % 2;
+    s = &h->stats[h->statCur];
+
+    tr_sharedLock( h->shared );
+
+    s->natTraversalStatus = tr_sharedTraversalStatus( h->shared );
+    s->publicPort = tr_sharedGetPublicPort( h->shared );
+
+    tr_sharedUnlock( h->shared );
+
+    return s;
 }
 
 void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )

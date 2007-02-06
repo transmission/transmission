@@ -299,18 +299,18 @@
 
 - (void) updateNatStatus
 {
-    int status = tr_natTraversalStatus(fHandle);
-    if (fNatStatus == status)
+    tr_handle_status_t * hstat = tr_handleStatus(fHandle);
+    if (fNatStatus == hstat->natTraversalStatus)
         return;
-    fNatStatus = status;
+    fNatStatus = hstat->natTraversalStatus;
     
-    if (status == 2)
+    if (hstat->natTraversalStatus == TR_NAT_TRAVERSAL_MAPPED)
     {
         [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
                                             "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
     }
-    else if (status == 3 || status == 4)
+    else if (hstat->natTraversalStatus == TR_NAT_TRAVERSAL_NOTFOUND || hstat->natTraversalStatus == TR_NAT_TRAVERSAL_ERROR)
     {
         [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
                                             "Preferences -> Network -> port map status")];

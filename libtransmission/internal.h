@@ -218,6 +218,9 @@ struct tr_handle_s
 
     char           id[21];
     char           key[21];
+
+    tr_handle_status_t stats[2];
+    int                statCur;
 };
 
 #endif

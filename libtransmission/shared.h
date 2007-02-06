@@ -54,7 +54,7 @@ void         tr_sharedSetPort         ( tr_shared_t *, int port );
 int          tr_sharedGetPublicPort   ( tr_shared_t * s );
 
 /***********************************************************************
- * tr_sharedTraversalEnable, tr_natTraversalStatus
+ * tr_sharedTraversalEnable, tr_sharedTraversalStatus
  ***********************************************************************
  *
  **********************************************************************/

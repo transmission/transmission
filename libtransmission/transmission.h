@@ -131,19 +131,12 @@ void tr_setBindPort( tr_handle_t *, int );
 void tr_natTraversalEnable( tr_handle_t *, int enable );
 
 /***********************************************************************
- * tr_natTraversalStatus
+ * tr_handleStatus
  ***********************************************************************
- * Return the status of NAT traversal
+ * Returns some status info for the given handle.
  **********************************************************************/
-#define TR_NAT_TRAVERSAL_MAPPING        1
-#define TR_NAT_TRAVERSAL_MAPPED         2
-#define TR_NAT_TRAVERSAL_NOTFOUND       3
-#define TR_NAT_TRAVERSAL_ERROR          4
-#define TR_NAT_TRAVERSAL_UNMAPPING      5
-#define TR_NAT_TRAVERSAL_DISABLED       6
-#define TR_NAT_TRAVERSAL_IS_DISABLED( st ) \
-  ( TR_NAT_TRAVERSAL_DISABLED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
-int tr_natTraversalStatus( tr_handle_t * );
+typedef struct tr_handle_status_s tr_handle_status_t;
+tr_handle_status_t * tr_handleStatus( tr_handle_t * );
 
 /***********************************************************************
  * tr_setGlobalUploadLimit
@@ -443,6 +436,20 @@ struct tr_tracker_info_s
     char * address;
     int    port;
     char * announce;
+};
+
+struct tr_handle_status_s
+{
+#define TR_NAT_TRAVERSAL_MAPPING        1
+#define TR_NAT_TRAVERSAL_MAPPED         2
+#define TR_NAT_TRAVERSAL_NOTFOUND       3
+#define TR_NAT_TRAVERSAL_ERROR          4
+#define TR_NAT_TRAVERSAL_UNMAPPING      5
+#define TR_NAT_TRAVERSAL_DISABLED       6
+#define TR_NAT_TRAVERSAL_IS_DISABLED( st ) \
+  ( TR_NAT_TRAVERSAL_DISABLED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
+    int natTraversalStatus;
+    int publicPort;
 };
 
 #ifdef __TRANSMISSION__

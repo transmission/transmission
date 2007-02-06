@@ -65,9 +65,10 @@ static void sigHandler       ( int signal );
 
 int main( int argc, char ** argv )
 {
-    int i, error, nat;
+    int i, error;
     tr_handle_t  * h;
     tr_stat_t    * s;
+    tr_handle_status_t * hstat;
 
     printf( "Transmission %s (%d) - http://transmission.m0k.org/\n\n",
             VERSION_STRING, VERSION_REVISION );
@@ -240,8 +241,8 @@ int main( int argc, char ** argv )
     tr_natTraversalEnable( h, 0 );
     for( i = 0; i < 10; i++ )
     {
-        nat = tr_natTraversalStatus( h );
-        if( TR_NAT_TRAVERSAL_DISABLED == nat )
+        hstat = tr_handleStatus( h );
+        if( TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus )
         {
             /* Port mappings were deleted */
             break;

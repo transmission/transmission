@@ -190,7 +190,7 @@ int tr_sharedGetPublicPort( tr_shared_t * s )
 }
 
 /***********************************************************************
- * tr_sharedTraversalEnable, tr_natTraversalStatus
+ * tr_sharedTraversalEnable, tr_sharedTraversalStatus
  ***********************************************************************
  *
  **********************************************************************/

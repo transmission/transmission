@@ -297,7 +297,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   ii++;
 
   /* NAT traversal checkbox */
-  intval = tr_natTraversalStatus(tr_backend_handle(back));
+  intval = tr_handleStatus(tr_backend_handle(back))->natTraversalStatus;
   boolval = !TR_NAT_TRAVERSAL_IS_DISABLED( intval );
   setupprefwidget(natcheck, PREF_NAT, boolval);
   gtk_table_attach_defaults(GTK_TABLE(table), natcheck,        0, 2, RN(ii));

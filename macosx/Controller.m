@@ -485,7 +485,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    while (!timeUp && ((torrent = [enumerator nextObject]) || tr_natTraversalStatus(fLib) != TR_NAT_TRAVERSAL_DISABLED))
+    while (!timeUp && ((torrent = [enumerator nextObject]) || tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED))
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
