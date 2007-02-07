@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -78,7 +78,7 @@ tr_torrent_get_type(void) {
       tr_torrent_init, /* instance_init */
       NULL,
     };
-    type = g_type_register_static(G_TYPE_OBJECT, "TrTorrentType", &info, 0);
+    type = g_type_register_static(G_TYPE_OBJECT, "TrTorrent", &info, 0);
   }
   return type;
 }

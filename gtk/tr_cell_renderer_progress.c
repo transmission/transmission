@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -77,7 +77,7 @@ tr_cell_renderer_progress_get_type(void) {
       NULL,
     };
     type = g_type_register_static(GTK_TYPE_CELL_RENDERER,
-                                  "TrCellRendererProgressType", &info, 0);
+                                  "TrCellRendererProgress", &info, 0);
   }
   return type;
 }
