@@ -45,6 +45,8 @@
 #include "transmission.h"
 #include "util.h"
 
+#include "img_icon_full.h"
+
 /* time in seconds to wait for torrents to stop when exiting */
 #define TRACKER_EXIT_TIMEOUT    10
 
@@ -179,6 +181,7 @@ main(int argc, char **argv) {
   benc_val_t *state;
   GList *argfiles;
   gboolean didinit, didlock;
+  GdkPixbuf * icon;
 
   safepipe();
 
@@ -212,6 +215,10 @@ main(int argc, char **argv) {
     " GtkDialog::content-area-border = 6\n"
     "}\n"
     "widget \"TransmissionDialog\" style \"transmission-standard\"\n");
+
+  icon = gdk_pixbuf_new_from_inline( -1, tr_icon_full, FALSE, NULL );
+  gtk_window_set_default_icon( icon );
+  g_object_unref( icon );
 
   if(didinit || cf_init(tr_getPrefsDirectory(), &err)) {
     if(didlock || cf_lock(&err)) {
