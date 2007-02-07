@@ -79,6 +79,18 @@ define INSTALL_MAN_RULE
 	@$(CP) $< $(DESTDIR)$(PREFIX)/man/man1/
 endef
 
+define INSTALL_DESKTOP_RULE
+	@echo "Install $<"
+	@$(MKDIR) $(DESTDIR)$(PREFIX)/share/applications
+	@$(CP) $< $(DESTDIR)$(PREFIX)/share/applications/
+endef
+
+define INSTALL_ICON_RULE
+	@echo "Install $<"
+	@$(MKDIR) $(DESTDIR)$(PREFIX)/share/pixmaps
+	@$(CP) $< $(DESTDIR)$(PREFIX)/share/pixmaps/
+endef
+
 RM       = rm -Rf
 CP       = cp -f
 MKDIR    = mkdir -p

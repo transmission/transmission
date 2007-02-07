@@ -198,6 +198,12 @@ main(int argc, char **argv) {
   textdomain("transmission-gtk");
 
   g_set_application_name(_("Transmission"));
+#if 0
+  /* this isn't used in transmission-gtk itself, it's for the .desktop file */
+  N_("BitTorrent Client");
+  /* this too */
+  N_("A free, lightweight client with a simple, intuitive interface");
+#endif
 
   gtk_rc_parse_string(
     "style \"transmission-standard\" {\n"
