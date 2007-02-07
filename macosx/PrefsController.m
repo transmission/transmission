@@ -261,8 +261,9 @@
                                         "Preferences -> Network -> port status") stringByAppendingEllipsis]];
     [fPortStatusImage setImage: nil];
     [fPortStatusProgress startAnimation: self];
-        
-    [portChecker probePort: [fDefaults integerForKey: @"BindPort"]];
+    
+    tr_handle_status_t * stat = tr_handleStatus(fHandle);
+    [portChecker probePort: stat->publicPort];
 }
 
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
@@ -299,18 +300,18 @@
 
 - (void) updateNatStatus
 {
-    tr_handle_status_t * hstat = tr_handleStatus(fHandle);
-    if (fNatStatus == hstat->natTraversalStatus)
+    tr_handle_status_t * stat = tr_handleStatus(fHandle);
+    if (fNatStatus == stat->natTraversalStatus)
         return;
-    fNatStatus = hstat->natTraversalStatus;
+    fNatStatus = stat->natTraversalStatus;
     
-    if (hstat->natTraversalStatus == TR_NAT_TRAVERSAL_MAPPED)
+    if (fNatStatus == TR_NAT_TRAVERSAL_MAPPED)
     {
         [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
                                             "Preferences -> Network -> port map status")];
         [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
     }
-    else if (hstat->natTraversalStatus == TR_NAT_TRAVERSAL_NOTFOUND || hstat->natTraversalStatus == TR_NAT_TRAVERSAL_ERROR)
+    else if (fNatStatus == TR_NAT_TRAVERSAL_NOTFOUND || fNatStatus == TR_NAT_TRAVERSAL_ERROR)
     {
         [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
                                             "Preferences -> Network -> port map status")];
