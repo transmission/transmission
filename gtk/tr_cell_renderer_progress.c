@@ -34,6 +34,7 @@ enum {
   P_MARKUP,
   P_SPACER,
   P_PROG,
+  P_SINGLE,
 };
 
 static void
@@ -106,6 +107,10 @@ class_init(gpointer gclass, gpointer gdata SHUTUP) {
   pspec = g_param_spec_float("progress", "Progress", "Progress",
                              0.0, 1.0, 0.0, G_PARAM_READWRITE);
   g_object_class_install_property(gobjclass, P_PROG, pspec);
+
+  pspec = g_param_spec_boolean("show-text", "Show text", "Show marked up text",
+                               TRUE, G_PARAM_READWRITE);
+  g_object_class_install_property(gobjclass, P_SINGLE, pspec);
 }
 
 static void
@@ -119,6 +124,7 @@ init(GTypeInstance *instance, gpointer gclass SHUTUP) {
   self->barwidth  = -1;
   self->barheight = -1;
   self->progress  = 0.0;
+  self->single    = FALSE;
   self->disposed  = FALSE;
 
   g_object_ref(self->rend);
@@ -148,6 +154,11 @@ set_property(GObject *obj, guint id, const GValue *val,
     case P_PROG:
       self->progress = g_value_get_float(val);
       break;
+    case P_SINGLE:
+      self->single = !g_value_get_boolean(val);
+      self->barwidth  = -1;
+      self->barheight = -1;
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
       break;
@@ -171,6 +182,9 @@ get_property(GObject *obj, guint id, GValue *val,
       break;
     case P_PROG:
       g_value_set_float(val, self->progress);
+      break;
+    case P_SINGLE:
+      g_value_set_boolean(val, !self->single);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(obj, id, pspec);
@@ -219,9 +233,12 @@ get_size(GtkCellRenderer *rend, GtkWidget *wid, GdkRectangle *cell,
   TrCellRendererProgress *self;
   GdkRectangle rect;
   int xpad, ypad;
+  char *sizing;
 
   TR_IS_CELL_RENDERER_PROGRESS(rend);
   self = TR_CELL_RENDERER_PROGRESS(rend);
+
+  sizing = (self->single ? self->spacer : self->text);
 
   /* calculate and cache minimum bar width and height */
   if(0 > self->barwidth || 0 > self->barheight) {
@@ -231,22 +248,28 @@ get_size(GtkCellRenderer *rend, GtkWidget *wid, GdkRectangle *cell,
                  NULL);
     gtk_cell_renderer_get_size(self->rend, wid, NULL, NULL, NULL,
                                &self->barwidth, &self->barheight);
-    g_object_set(self->rend, "markup", self->text, "xpad", xpad, "ypad", ypad,
+    g_object_set(self->rend, "markup", sizing, "xpad", xpad, "ypad", ypad,
                  NULL);
   }
 
-  /* get the text size */
-  if(NULL != cell) {
-    rect = *cell;
-    rect.height -= self->barheight;
-    cell = &rect;
-  }
-  gtk_cell_renderer_get_size(self->rend, wid, cell, xoff, yoff, width, height);
+  if(self->single) {
+    gtk_cell_renderer_get_size(self->rend, wid, cell,
+                                 xoff, yoff, width, height);
+  } else {
+    /* get the text size */
+    if(NULL != cell) {
+      rect = *cell;
+      rect.height -= self->barheight;
+      cell = &rect;
+    }
+    gtk_cell_renderer_get_size(self->rend, wid, cell,
+                               xoff, yoff, width, height);
 
-  if(NULL != width && self->barwidth > *width)
-    *width = self->barwidth;
-  if(NULL != height)
-    *height += self->barheight + (NULL == yoff ? 0 : *yoff);
+    if(NULL != width && self->barwidth > *width)
+      *width = self->barwidth;
+    if(NULL != height)
+      *height += self->barheight + (NULL == yoff ? 0 : *yoff);
+  }
 }
 
 static void
@@ -298,7 +321,7 @@ render(GtkCellRenderer *rend, GdkWindow *win, GtkWidget *wid, GdkRectangle *bg,
                   wid, "bar", full.x, full.y, full.width, full.height);
 
   /* draw the text */
-  if(0 < rect.height)
+  if(!self->single && 0 < rect.height)
     gtk_cell_renderer_render(self->rend, win, wid, bg, &rect, expose, flags);
 }
 

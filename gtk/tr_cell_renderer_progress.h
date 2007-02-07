@@ -56,6 +56,7 @@ struct _TrCellRendererProgress {
   int barwidth;
   int barheight;
   gfloat progress;
+  gboolean single;
   gboolean disposed;
 };
 
