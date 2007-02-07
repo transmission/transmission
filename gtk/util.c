@@ -151,6 +151,20 @@ mkdir_p(const char *name, mode_t mode) {
   return TRUE;
 }
 
+GList *
+dupstrlist( GList * list )
+{
+    GList * ii, * ret;
+
+    ret = NULL;
+    for( ii = g_list_first( list ); NULL != ii; ii = ii->next )
+    {
+        ret = g_list_append( ret, g_strdup( ii->data ) );
+    }
+
+    return ret;
+}
+
 char *
 joinstrlist(GList *list, char *sep) {
   GList *ii;

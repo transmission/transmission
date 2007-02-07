@@ -41,6 +41,7 @@
 #define DEF_USEDOWNLIMIT        FALSE
 #define DEF_UPLIMIT             20
 #define DEF_USEUPLIMIT          TRUE
+#define DEF_ASKDIR              FALSE
 #define DEF_NAT                 TRUE
 
 struct prefdata {
@@ -52,12 +53,19 @@ struct prefdata {
 
 struct addcb {
   add_torrents_func_t addfunc;
-  GtkWindow *parent;
   void *data;
   gboolean autostart;
   gboolean usingaltdir;
   GtkFileChooser *altdir;
   GtkButtonBox *altbox;
+};
+
+struct dirdata
+{
+    add_torrents_func_t addfunc;
+    void              * cbdata;
+    GList             * files;
+    guint               flags;
 };
 
 static void
@@ -72,6 +80,8 @@ static void
 dirclick(GtkWidget *widget, gpointer gdata);
 static void
 addresp(GtkWidget *widget, gint resp, gpointer gdata);
+static void
+promptresp( GtkWidget * widget, gint resp, gpointer data );
 
 static void
 setupprefwidget(GtkWidget *widget, const char *prefname, ...) {
@@ -185,11 +195,13 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
    GTK_STOCK_APPLY, GTK_RESPONSE_APPLY, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
    GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
-  const unsigned int rowcount = 9;
+  const unsigned int rowcount = 10;
   GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
   GtkWidget *portnum = gtk_spin_button_new_with_range(1, 0xffff, 1);
   GtkWidget *natcheck = gtk_check_button_new_with_mnemonic(
     _("Au_tomatic port mapping via NAT-PMP or UPnP"));
+  GtkWidget *askdir = gtk_check_button_new_with_mnemonic(
+    _("Al_ways prompt for download directory"));
   GtkWidget *dirstr = gtk_file_chooser_button_new(
     _("Choose a download directory"),
     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
@@ -237,7 +249,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   gtk_tooltips_enable( tips );
 
   data->prefwidgets = makeglist(portnum, lim[0].on, lim[0].num, lim[1].on,
-    lim[1].num, dirstr, addstd, addipc, natcheck, NULL);
+    lim[1].num, askdir, dirstr, addstd, addipc, natcheck, NULL);
   data->parent = parent;
   data->back = back;
   data->tips = tips;
@@ -248,7 +260,7 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   for(ii = 0; ii < ALEN(lim); ii++) {
     /* limit checkbox */
     setupprefwidget(lim[ii].on, lim[ii].usepref, (gboolean)lim[ii].defuse);
-    array = g_new(GtkWidget*, 2);
+    array = g_new(GtkWidget*, 3);
     g_signal_connect_data(lim[ii].on, "clicked", G_CALLBACK(clicklimitbox),
                           array, (GClosureNotify)g_free, 0);
     gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].on,    0, 2, RN(ii*2));
@@ -264,10 +276,21 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
     gtk_table_attach_defaults(GTK_TABLE(table), lim[ii].num,   1,2,RN(ii*2+1));
     array[0] = lim[ii].label;
     array[1] = lim[ii].num;
+    array[2] = GINT_TO_POINTER( TRUE );
     clicklimitbox(lim[ii].on, array);
     gtk_tooltips_set_tip( tips, lim[ii].num, gettext( lim[ii].numtip ), "" );
   }
   ii *= 2;
+
+  /* always ask for download dir */
+  setupprefwidget( askdir, PREF_ASKDIR, ( gboolean )DEF_ASKDIR );
+  array = g_new( GtkWidget *, 3 );
+  g_signal_connect_data( askdir, "clicked", G_CALLBACK( clicklimitbox ),
+                         array, ( GClosureNotify )g_free, 0 );
+  gtk_table_attach_defaults(GTK_TABLE(table), askdir,        0, 2, RN(ii));
+  gtk_tooltips_set_tip( tips, askdir,
+      _("When adding a torrent, always prompt for a directory to download data files into"), "" );
+  ii++;
 
   /* directory label and chooser */
   label = gtk_label_new_with_mnemonic(_("Download di_rectory:"));
@@ -280,6 +303,10 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
   event = tipbox( dirstr, tips,
                   _("Destination directory for downloaded data files") );
   gtk_table_attach_defaults(GTK_TABLE(table), event,           1, 2, RN(ii));
+  array[0] = label;
+  array[1] = dirstr;
+  array[2] = GINT_TO_POINTER( FALSE );
+  clicklimitbox( askdir, array );
   ii++;
 
   /* port label and entry */
@@ -364,13 +391,20 @@ makeprefwindow(GtkWindow *parent, TrBackend *back) {
 }
 
 static void
-clicklimitbox(GtkWidget *widget, gpointer gdata) {
-  GtkWidget **widgets = gdata;
-  int ii;
+clicklimitbox( GtkWidget * widget, gpointer gdata )
+{
+    GtkWidget ** widgets;
+    gboolean     with, active;
+    int          ii;
 
-  for(ii = 0; 2 > ii; ii++)
-    gtk_widget_set_sensitive(widgets[ii],
-      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)));
+    widgets = gdata;
+    with = ( gboolean )GPOINTER_TO_INT( widgets[2] );
+
+    for(ii = 0; 2 > ii; ii++)
+    {
+        active = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( widget ) );
+        gtk_widget_set_sensitive( widgets[ii], ( with ? active : !active ) );
+    }
 }
 
 static void
@@ -463,7 +497,6 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   const char *pref;
 
   data->addfunc = addfunc;
-  data->parent = parent;
   data->data = cbdata;
   data->autostart = TRUE;
   data->usingaltdir = FALSE;
@@ -541,6 +574,7 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     freestrlist(stupidgtk);
   }
 
+  g_free( data );
   gtk_widget_destroy(widget);
 }
 
@@ -655,4 +689,54 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
   g_signal_connect(G_OBJECT(wind), "response",
                    G_CALLBACK(gtk_widget_destroy), NULL);
   gtk_widget_show_all(wind);
+}
+
+void
+promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
+              GList * files, guint flags, const char * defaultdir )
+{
+    struct dirdata * stuff;
+    GtkWidget      * wind;
+
+    stuff = g_new( struct dirdata, 1 );
+    stuff->addfunc = addfunc;
+    stuff->cbdata  = cbdata;
+    stuff->files   = dupstrlist( files );
+    stuff->flags   = flags;
+
+    wind =  gtk_file_chooser_dialog_new( _("Choose a directory"), parent,
+                                         GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                         GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                         NULL );
+    gtk_file_chooser_set_local_only( GTK_FILE_CHOOSER( wind ), TRUE );
+    gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( wind ), FALSE );
+    gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( wind ), defaultdir );
+
+    g_signal_connect( G_OBJECT( wind ), "response",
+                      G_CALLBACK( promptresp ), stuff );
+
+    gtk_widget_show_all(wind);
+}
+
+static void
+promptresp( GtkWidget * widget, gint resp, gpointer data )
+{
+    struct dirdata * stuff;
+    char           * dir;
+
+    stuff = data;
+
+    if( GTK_RESPONSE_ACCEPT == resp )
+    {
+        dir = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( widget ) );
+        /* it seems that we will always get a directory */
+        g_assert( NULL != dir );
+        stuff->addfunc( stuff->cbdata, NULL, stuff->files, dir, stuff->flags );
+        g_free( dir );
+    }
+
+    freestrlist( stuff->files );
+    g_free( stuff );
+    gtk_widget_destroy( widget );
 }

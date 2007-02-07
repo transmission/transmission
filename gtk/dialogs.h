@@ -44,4 +44,9 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata);
 void
 makeinfowind(GtkWindow *parent, TrTorrent *tor);
 
+/* prompt for a download directory for torrents, then add them */
+void
+promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
+              GList * files, guint flags, const char * defaultdir );
+
 #endif /* TG_PREFS_H */

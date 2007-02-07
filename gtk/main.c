@@ -1064,6 +1064,29 @@ doubleclick(GtkWidget *widget SHUTUP, GtkTreePath *path,
   }
 }
 
+static const char *
+defaultdir( void )
+{
+    static char * wd = NULL;
+    const char  * dir;
+
+    dir = cf_getpref( PREF_DIR );
+    if( NULL == dir )
+    {
+        if( NULL == wd )
+        {
+            wd = g_new( char, MAX_PATH_LENGTH + 1 );
+            if( NULL == getcwd( wd, MAX_PATH_LENGTH + 1 ) )
+            {
+                strcpy( wd, "." );
+            }
+        }
+        dir = wd;
+    }
+
+    return dir;
+}
+
 void
 addtorrents(void *vdata, void *state, GList *files,
             const char *dir, guint flags) {
@@ -1072,7 +1095,7 @@ addtorrents(void *vdata, void *state, GList *files,
   char *errstr;
   TrTorrent *tor;
   GtkTreeIter iter;
-  char *wd;
+  const char * pref;
 
   errlist = NULL;
   torlist = NULL;
@@ -1081,15 +1104,16 @@ addtorrents(void *vdata, void *state, GList *files,
     torlist = tr_backend_load_state(data->back, state, &errlist);
 
   if(NULL != files) {
-    if(NULL == dir)
-      dir = cf_getpref(PREF_DIR);
-    wd = NULL;
-    if(NULL == dir) {
-      wd = g_new(char, MAX_PATH_LENGTH + 1);
-      if(NULL == getcwd(wd, MAX_PATH_LENGTH + 1))
-        dir = ".";
-      else
-        dir = wd;
+    if( NULL == dir )
+    {
+        pref = cf_getpref( PREF_ASKDIR );
+        if( NULL != pref && strbool( pref ) )
+        {
+            promptfordir( data->wind, addtorrents, data,
+                          files, flags, defaultdir() );
+            files = NULL;
+        }
+        dir = defaultdir();
     }
     for(ii = g_list_first(files); NULL != ii; ii = ii->next) {
       errstr = NULL;
@@ -1100,8 +1124,6 @@ addtorrents(void *vdata, void *state, GList *files,
       if(NULL != errstr)
         errlist = g_list_append(errlist, errstr);
     }
-    if(NULL != wd)
-      g_free(wd);
   }
 
   for(ii = g_list_first(torlist); NULL != ii; ii = ii->next) {

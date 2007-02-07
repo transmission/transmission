@@ -69,6 +69,10 @@ ratiostr(guint64 down, guint64 up);
 gboolean
 mkdir_p(const char *name, mode_t mode);
 
+/* create a copy of a GList of strings, this dups the actual strings too */
+GList *
+dupstrlist( GList * list );
+
 /* joins a GList of strings into one string using an optional separator */
 char *
 joinstrlist(GList *list, char *sep);
