@@ -41,7 +41,11 @@
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 268.0
 #define TAB_FILES_HEIGHT 268.0
-#define TAB_OPTIONS_HEIGHT 112.0
+#define TAB_OPTIONS_HEIGHT 117.0
+
+#define OPTION_POPUP_GLOBAL 0
+#define OPTION_POPUP_NO_LIMIT 1
+#define OPTION_POPUP_LIMIT 2
 
 #define INVALID -99
 
@@ -57,6 +61,9 @@
 
 - (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
 - (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
+
+- (int) stateSettingToPopUpIndex: (int) index;
+- (int) popUpIndexToStateSetting: (int) index;
 
 @end
 
@@ -399,36 +406,36 @@
             uploadLimit = [torrent uploadLimit],
             downloadLimit = [torrent downloadLimit];
         
-        while ((checkUpload != NSMixedState || uploadLimit != INVALID
-                || checkDownload != NSMixedState || downloadLimit != INVALID)
+        while ((checkUpload != INVALID || uploadLimit != INVALID
+                || checkDownload != INVALID || downloadLimit != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (checkUpload != NSMixedState && checkUpload != [torrent checkUpload])
-                checkUpload = NSMixedState;
+            if (checkUpload != INVALID && checkUpload != [torrent checkUpload])
+                checkUpload = INVALID;
             
             if (uploadLimit != INVALID && uploadLimit != [torrent uploadLimit])
                 uploadLimit = INVALID;
             
-            if (checkDownload != NSMixedState && checkDownload != [torrent checkDownload])
-                checkDownload = NSMixedState;
+            if (checkDownload != INVALID && checkDownload != [torrent checkDownload])
+                checkDownload = INVALID;
             
             if (downloadLimit != INVALID && downloadLimit != [torrent downloadLimit])
                 downloadLimit = INVALID;
         }
         
-        [fUploadLimitCheck setEnabled: YES];
-        [fUploadLimitCheck setState: checkUpload];
-        [fUploadLimitLabel setEnabled: checkUpload == NSOnState];
-        [fUploadLimitField setEnabled: checkUpload == NSOnState];
+        [fUploadLimitPopUp setEnabled: YES];
+        [fUploadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkUpload]];
+        [fUploadLimitLabel setHidden: checkUpload != NSOnState];
+        [fUploadLimitField setHidden: checkUpload != NSOnState];
         if (uploadLimit != INVALID)
             [fUploadLimitField setIntValue: uploadLimit];
         else
             [fUploadLimitField setStringValue: @""];
         
-        [fDownloadLimitCheck setEnabled: YES];
-        [fDownloadLimitCheck setState: checkDownload];
-        [fDownloadLimitLabel setEnabled: checkDownload == NSOnState];
-        [fDownloadLimitField setEnabled: checkDownload == NSOnState];
+        [fDownloadLimitPopUp setEnabled: YES];
+        [fDownloadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkDownload]];
+        [fDownloadLimitLabel setHidden: checkDownload != NSOnState];
+        [fDownloadLimitField setHidden: checkDownload != NSOnState];
         if (downloadLimit != INVALID)
             [fDownloadLimitField setIntValue: downloadLimit];
         else
@@ -438,22 +445,22 @@
         enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
-        int ratioSetting = [torrent ratioSetting];
+        int checkRatio = [torrent ratioSetting];
         float ratioLimit = [torrent ratioLimit];
         
-        while ((ratioSetting != NSMixedState || ratioLimit != INVALID)
+        while ((checkRatio != INVALID || checkRatio != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (ratioSetting != NSMixedState && ratioSetting != [torrent ratioSetting])
-                ratioSetting = NSMixedState;
+            if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
+                checkRatio = INVALID;
             
             if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
                 ratioLimit = INVALID;
         }
         
-        [fRatioCheck setEnabled: YES];
-        [fRatioCheck setState: ratioSetting];
-        [fRatioLimitField setEnabled: ratioSetting == NSOnState];
+        [fRatioPopUp setEnabled: YES];
+        [fRatioPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkRatio]];
+        [fRatioLimitField setHidden: checkRatio != NSOnState];
         if (ratioLimit != INVALID)
             [fRatioLimitField setFloatValue: ratioLimit];
         else
@@ -461,25 +468,49 @@
     }
     else
     {
-        [fUploadLimitCheck setEnabled: NO];
-        [fUploadLimitCheck setState: NSOffState];
-        [fUploadLimitField setEnabled: NO];
+        [fUploadLimitPopUp setEnabled: NO];
+        [fUploadLimitPopUp selectItemAtIndex: -1];
+        [fUploadLimitField setHidden: YES];
+        [fUploadLimitLabel setHidden: YES];
         [fUploadLimitField setStringValue: @""];
-        [fUploadLimitLabel setEnabled: NO];
         
-        [fDownloadLimitCheck setEnabled: NO];
-        [fDownloadLimitCheck setState: NSOffState];
-        [fDownloadLimitField setEnabled: NO];
+        [fDownloadLimitPopUp setEnabled: NO];
+        [fDownloadLimitPopUp selectItemAtIndex: -1];
+        [fDownloadLimitField setHidden: YES];
+        [fDownloadLimitLabel setHidden: YES];
         [fDownloadLimitField setStringValue: @""];
-        [fDownloadLimitLabel setEnabled: NO];
         
-        [fRatioCheck setEnabled: NO];
-        [fRatioCheck setState: NSOffState];
-        [fRatioLimitField setEnabled: NO];
+        [fRatioPopUp setEnabled: NO];
+        [fRatioPopUp selectItemAtIndex: -1];
+        [fRatioLimitField setHidden: YES];
         [fRatioLimitField setStringValue: @""];
     }
     
     [self updateInfoStats];
+}
+
+- (int) stateSettingToPopUpIndex: (int) index
+{
+    if (index == NSOnState)
+        return OPTION_POPUP_LIMIT;
+    else if (index == NSOffState)
+        return OPTION_POPUP_NO_LIMIT;
+    else if (index == NSMixedState)
+        return OPTION_POPUP_GLOBAL;
+    else
+        return -1;
+}
+
+- (int) popUpIndexToStateSetting: (int) index
+{
+    if (index == OPTION_POPUP_LIMIT)
+        return NSOnState;
+    else if (index == OPTION_POPUP_NO_LIMIT)
+        return NSOffState;
+    else if (index == OPTION_POPUP_GLOBAL)
+        return NSMixedState;
+    else
+        return INVALID;
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -808,18 +839,22 @@
                 [[fFileOutline itemAtRow: i] objectForKey: @"Path"]] inFileViewerRootedAtPath: nil];
 }
 
-- (void) setLimitCheck: (id) sender
+- (void) setLimitSetting: (id) sender
 {
-    BOOL upload = sender == fUploadLimitCheck;
-    int state = [sender state];
+    BOOL upload = sender == fUploadLimitPopUp;
+    int setting;
+    if ((setting = [self popUpIndexToStateSetting: [sender indexOfSelectedItem]]) == INVALID)
+        return;
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        upload ? [torrent setCheckUpload: state] : [torrent setCheckDownload: state];
+        upload ? [torrent setCheckUpload: setting] : [torrent setCheckDownload: setting];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
-    [field setEnabled: state == NSOnState];
+    [field setHidden: setting != NSOnState];
+    NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
+    [label setHidden: setting != NSOnState];
 }
 
 - (void) setSpeedLimit: (id) sender
@@ -854,14 +889,16 @@
 
 - (void) setRatioSetting: (id) sender
 {
-    int state = [sender state];
+    int setting;
+    if ((setting = [self popUpIndexToStateSetting: [sender indexOfSelectedItem]]) == INVALID)
+        return;
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        [torrent setRatioSetting: state];
+        [torrent setRatioSetting: setting];
     
-    [fRatioLimitField setEnabled: state == NSOnState];
+    [fRatioLimitField setHidden: setting != NSOnState];
 }
 
 - (void) setRatioLimit: (id) sender
