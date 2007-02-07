@@ -521,7 +521,7 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   struct addcb *data = gdata;
   GSList *files, *ii;
   GList *stupidgtk;
-  gboolean paused;
+  int flags;
   char *dir;
 
   if(GTK_RESPONSE_ACCEPT == resp) {
@@ -532,9 +532,9 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     stupidgtk = NULL;
     for(ii = files; NULL != ii; ii = ii->next)
       stupidgtk = g_list_append(stupidgtk, ii->data);
-    paused = !data->autostart;
-    data->addfunc(data->data, NULL, stupidgtk, dir,
-                  addactionflag(cf_getpref(PREF_ADDSTD)));
+    flags = ( data->autostart ? TR_TORNEW_RUNNING : TR_TORNEW_PAUSED );
+    flags |= addactionflag( cf_getpref( PREF_ADDSTD ) );
+    data->addfunc( data->data, NULL, stupidgtk, dir, flags );
     if(NULL != dir)
       g_free(dir);
     g_slist_free(files);
