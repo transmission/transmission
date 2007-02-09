@@ -1261,103 +1261,124 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSImage *) advancedBar
 {
-    int h, w;
+    int h;
     uint32_t * p;
     uint8_t * bitmapData = [fBitmap bitmapData];
     int bytesPerRow = [fBitmap bytesPerRow];
-
-    int8_t * pieces = malloc(MAX_PIECES);
-    [self getAvailability: pieces size: MAX_PIECES];
+    
+    int pieceCount = [self pieceCount];
+    int8_t * piecesAvailablity = malloc(pieceCount);
+    [self getAvailability: piecesAvailablity size: pieceCount];
     
     //lines 2 to 14: blue, green, or gray depending on whether we have the piece or not
-    int have = 0, avail = 0;
+    int i, index = 0;
+    float increment = (float)pieceCount / (float)MAX_PIECES, indexValue = 0;
     uint32_t color;
     BOOL change;
-    for (w = 0; w < MAX_PIECES; w++)
+    for (i = 0; i < MAX_PIECES; i++)
     {
         change = NO;
-        if (pieces[w] < 0)
+        if (piecesAvailablity[index] < 0)
         {
-            if (fPieces[w] != -1)
+            if (fPieces[i] != -1)
             {
                 color = kBlue;
-                fPieces[w] = -1;
+                fPieces[i] = -1;
                 change = YES;
             }
-            have++;
         }
-        else if (pieces[w] == 0)
+        else if (piecesAvailablity[index] == 0)
         {
-            if (fPieces[w] != 0)
+            if (fPieces[i] != 0)
             {
                 color = kGray;
-                fPieces[w] = 0;
+                fPieces[i] = 0;
                 change = YES;
             }
         }
         else
         {
-            if (pieces[w] == 1)
+            if (piecesAvailablity[index] == 1)
             {
-                if (fPieces[w] != 1)
+                if (fPieces[i] != 1)
                 {
                     color = kGreen1;
-                    fPieces[w] = 1;
+                    fPieces[i] = 1;
                     change = YES;
                 }
             }
-            else if (pieces[w] == 2)
+            else if (piecesAvailablity[index] == 2)
             {
-                if (fPieces[w] != 2)
+                if (fPieces[i] != 2)
                 {
                     color = kGreen2;
-                    fPieces[w] = 2;
+                    fPieces[i] = 2;
                     change = YES;
                 }
             }
             else
             {
-                if (fPieces[w] != 3)
+                if (fPieces[i] != 3)
                 {
                     color = kGreen3;
-                    fPieces[w] = 3;
+                    fPieces[i] = 3;
                     change = YES;
                 }
             }
-            avail++;
         }
         
         if (change)
         {
-            //point to pixel (w, 2) and draw "vertically"
-            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + w;
+            //point to pixel (i, 2) and draw "vertically"
+            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + i;
             for (h = 2; h < BAR_HEIGHT; h++)
             {
                 p[0] = color;
                 p = (uint32_t *)((uint8_t *)p + bytesPerRow);
             }
         }
+        
+        indexValue += increment;
+        index = (int)indexValue;
     }
+    
+    //determine percentage finished and available
+    float * piecesFinished = malloc(pieceCount * sizeof(float));
+    [self getAmountFinished: piecesFinished size: pieceCount];
+    
+    float finished = 0, available = 0;
+    for (i = 0; i < pieceCount; i++)
+    {
+        finished += piecesFinished[i];
+        if (piecesAvailablity[i] > 0)
+            available += 1.0 - piecesFinished[i];
+    }
+    
+    int have = rintf((float)MAX_PIECES * finished / (float)pieceCount),
+        avail = rintf((float)MAX_PIECES * available / (float)pieceCount);
+    if (have + avail > MAX_PIECES) //case if both end in .5 and all pieces are available
+        avail--;
     
     //first two lines: dark blue to show progression, green to show available
-    p = (uint32_t *) bitmapData;
-    for (w = 0; w < have; w++)
+    p = (uint32_t *)bitmapData;
+    for (i = 0; i < have; i++)
     {
-        p[w] = kBlue2;
-        p[w + bytesPerRow / 4] = kBlue2;
+        p[i] = kBlue2;
+        p[i + bytesPerRow / 4] = kBlue2;
     }
-    for (; w < avail + have; w++)
+    for (; i < avail + have; i++)
     {
-        p[w] = kGreen3;
-        p[w + bytesPerRow / 4] = kGreen3;
+        p[i] = kGreen3;
+        p[i + bytesPerRow / 4] = kGreen3;
     }
-    for (; w < MAX_PIECES; w++)
+    for (; i < MAX_PIECES; i++)
     {
-        p[w] = kWhite;
-        p[w + bytesPerRow / 4] = kWhite;
+        p[i] = kWhite;
+        p[i + bytesPerRow / 4] = kWhite;
     }
     
-    free(pieces);
+    free(piecesAvailablity);
+    free(piecesFinished);
     
     //actually draw image
     NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
