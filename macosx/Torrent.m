@@ -146,7 +146,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [self isActive] ? @"NO" : @"YES", @"Paused",
                     [self date], @"Date",
-                    [NSNumber numberWithBool: fRatioSetting], @"RatioSetting",
+                    [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
                     [NSNumber numberWithInt: fUploadLimit], @"UploadLimit",
