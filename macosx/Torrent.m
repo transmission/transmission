@@ -1261,7 +1261,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSImage *) advancedBar
 {
-    int h;
     uint32_t * p;
     uint8_t * bitmapData = [fBitmap bitmapData];
     int bytesPerRow = [fBitmap bytesPerRow];
@@ -1271,7 +1270,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [self getAvailability: piecesAvailablity size: pieceCount];
     
     //lines 2 to 14: blue, green, or gray depending on whether we have the piece or not
-    int i, index = 0;
+    int i, h, index = 0;
     float increment = (float)pieceCount / (float)MAX_PIECES, indexValue = 0;
     uint32_t color;
     BOOL change;

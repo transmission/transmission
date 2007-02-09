@@ -82,20 +82,19 @@
         
         //set play sound
         NSMutableArray * sounds = [NSMutableArray array];
-        NSEnumerator * soundEnumerator,
-                    * soundDirectoriesEnumerator = [[NSArray arrayWithObjects: @"System/Library/Sounds",
-                            [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil] objectEnumerator];
-        NSString * soundPath, * sound;
+        NSEnumerator * soundEnumerator;
         
         //get list of all sounds and sort alphabetically
-        while ((soundPath = [soundDirectoriesEnumerator nextObject]))
-            if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: soundPath])
-                while ((sound = [soundEnumerator nextObject]))
-                {
-                    sound = [sound stringByDeletingPathExtension];
-                    if ([NSSound soundNamed: sound])
-                        [sounds addObject: sound];
-                }
+        if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: @"System/Library/Sounds"])
+        {
+            NSString * sound;
+            while ((sound = [soundEnumerator nextObject]))
+            {
+                sound = [sound stringByDeletingPathExtension];
+                if ([NSSound soundNamed: sound])
+                    [sounds addObject: sound];
+            }
+        }
         
         fSounds = [[sounds sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)] retain];
     }
@@ -146,7 +145,6 @@
     
     //set port
     [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
-    
     [self updatePortStatus];
     
     fNatStatus = -1;
@@ -419,32 +417,33 @@
 - (void) setSound: (id) sender
 {
     //play sound when selecting
-    NSString * soundName = [sender titleOfSelectedItem];
     NSSound * sound;
-    if ((sound = [NSSound soundNamed: soundName]))
+    if ((sound = [NSSound soundNamed: [sender titleOfSelectedItem]]))
         [sound play];
 }
 
 - (void) setUpdate: (id) sender
 {
     int index = [fUpdatePopUp indexOfSelectedItem];
+    NSString * update;
     NSTimeInterval seconds;
     if (index == UPDATE_DAILY)
     {
-        [fDefaults setObject: @"Daily" forKey: @"UpdateCheck"];
+        update = @"Daily";
         seconds = 86400;
     }
     else if (index == UPDATE_WEEKLY)
     {
-        [fDefaults setObject: @"Weekly" forKey: @"UpdateCheck"];
+        update = @"Weekly";
         seconds = 604800;
     }
     else
     {
-        [fDefaults setObject: @"Never" forKey: @"UpdateCheck"];
+        update = @"Never";
         seconds = 0;
     }
-
+    
+    [fDefaults setObject: update forKey: @"UpdateCheck"];
     [fDefaults setInteger: seconds forKey: @"SUScheduledCheckInterval"];
     
     if (fUpdater)
