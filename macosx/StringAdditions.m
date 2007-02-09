@@ -111,15 +111,11 @@
 
 - (NSComparisonResult) compareIP: (NSString *) string
 {
-    if ([self isEqualToString: string])
-        return NSOrderedSame;
-    
     NSArray * selfSections = [self componentsSeparatedByString: @"."],
             * newSections = [string componentsSeparatedByString: @"."];
     
     if ([selfSections count] != [newSections count])
-        return [[NSNumber numberWithUnsignedInt: [selfSections count]] compare:
-                            [NSNumber numberWithUnsignedInt: [newSections count]]];
+        return [selfSections count] > [newSections count] ? NSOrderedDescending : NSOrderedAscending;
 
     NSEnumerator * selfSectionsEnum = [selfSections objectEnumerator], * newSectionsEnum = [newSections objectEnumerator];
     NSString * selfString, * newString;
