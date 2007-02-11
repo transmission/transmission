@@ -325,8 +325,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
                                                 "Torrent -> status string"), [self peersUploading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peer",
-                                                "Torrent -> status string"), [self peersUploading], [self totalPeers]];
+                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
+                                                "Torrent -> status string"), [self peersUploading]];
             
             [fRemainingTimeString setString: @""];
             int eta = [self eta];

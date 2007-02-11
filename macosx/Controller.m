@@ -1306,9 +1306,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [sound play];
     }
     
+    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
+                                    [torrent dataLocation] , @"Location", nil];
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
-        description: [torrent name]
-        notificationName: GROWL_DOWNLOAD_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                                description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
+                                iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
     
     if (![fWindow isKeyWindow])
         fCompleted++;
@@ -1731,6 +1733,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) torrentStoppedForRatio: (NSNotification *) notification
 {
+    Torrent * torrent = [notification object];
+    
     [self updateTorrentsInQueue];
     [fInfoController updateInfoStats];
     
@@ -1741,9 +1745,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [sound play];
     }
     
+    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_SEEDING_COMPLETE, @"Type",
+                                    [torrent dataLocation], @"Location", nil];
     [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Seeding Complete", "Growl notification title")
-        description: [[notification object] name]
-        notificationName: GROWL_SEEDING_COMPLETE iconData: nil priority: 0 isSticky: NO clickContext: nil];
+                        description: [torrent name] notificationName: GROWL_SEEDING_COMPLETE
+                        iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
 }
 
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
@@ -2740,6 +2746,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                                             GROWL_AUTO_ADD, GROWL_AUTO_SPEED_LIMIT, nil];
     return [NSDictionary dictionaryWithObjectsAndKeys: notifications, GROWL_NOTIFICATIONS_ALL,
                                 notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
+}
+
+- (void) growlNotificationWasClicked: (id) clickContext
+{
+    if (!clickContext || ![clickContext isKindOfClass: [NSDictionary class]])
+        return;
+    
+    NSString * type = [clickContext objectForKey: @"Type"], * location;
+    if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
+            && (location = [clickContext objectForKey: @"Location"]))
+        [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
 }
 
 @end
