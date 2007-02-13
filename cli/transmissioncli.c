@@ -218,7 +218,10 @@ int main( int argc, char ** argv )
                 s->peersDownloading, s->peersTotal,
                 s->rateUpload );
         }
-        memset( &string[chars], ' ', 79 - chars );
+        if( 79 > chars )
+        {
+            memset( &string[chars], ' ', 79 - chars );
+        }
         string[79] = '\0';
         fprintf( stderr, "\r%s", string );
 
