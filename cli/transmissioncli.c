@@ -56,6 +56,7 @@ static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
 static char          * torrentPath = NULL;
 static int           natTraversal  = 0;
+static sig_atomic_t  gotsig        = 0;
 static tr_torrent_t  * tor;
 
 static char          * finishCall   = NULL;
@@ -191,6 +192,12 @@ int main( int argc, char ** argv )
 
         sleep( 1 );
 
+        if( gotsig )
+        {
+            gotsig = 0;
+            tr_torrentStop( tor );
+        }
+
         s = tr_torrentStat( tor );
 
         if( s->status & TR_STATUS_PAUSE )
@@ -217,6 +224,10 @@ int main( int argc, char ** argv )
                 "Seeding, uploading to %d of %d peer(s), %.2f KB/s",
                 s->peersDownloading, s->peersTotal,
                 s->rateUpload );
+        }
+        else if( s->status & TR_STATUS_STOPPING )
+        {
+            chars = snprintf( string, 80, "Stopping..." );
         }
         if( 79 > chars )
         {
@@ -332,7 +343,7 @@ static void sigHandler( int signal )
     switch( signal )
     {
         case SIGINT:
-            tr_torrentStop( tor );
+            gotsig = 1;
             break;
 
         default:
