@@ -172,6 +172,11 @@ char * tr_clientForId( uint8_t * id )
         {
             asprintf( &ret, "Tribler %c.%c", id[1], id[2] );
         }
+        else if( id[0] == 'S' )
+        {
+            asprintf( &ret, "Shad0w's Client %d.%d.%d", charToInt( id[1] ),
+                        charToInt( id[2] ), charToInt( id[3] ) );
+        }
         
         if( ret )
         {
