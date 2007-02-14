@@ -62,7 +62,7 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "TS", 2 ) )
         {
-            asprintf( &ret, "TorrentStorm (%c%c%c%c)",
+            asprintf( &ret, "TorrentStorm %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "BC", 2 ) )
