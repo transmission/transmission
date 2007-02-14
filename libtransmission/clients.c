@@ -156,7 +156,7 @@ char * tr_clientForId( uint8_t * id )
     }
     
     /* Tornado-style */
-    if( !memcmp( &id[4], "-----", 5 ) || !memcmp( &id[4], "--0", 3 ) )
+    if( !memcmp( &id[4], "----", 4 ) || !memcmp( &id[4], "--0", 3 ) )
     {
         if( id[0] == 'T' )
         {
@@ -167,6 +167,10 @@ char * tr_clientForId( uint8_t * id )
         {
             asprintf( &ret, "ABC %d.%d.%d", charToInt( id[1] ),
                         charToInt( id[2] ), charToInt( id[3] ) );
+        }
+        else if( id[0] == 'R' )
+        {
+            asprintf( &ret, "Tribler %c.%c", id[1], id[2] );
         }
         
         if( ret )
