@@ -1341,8 +1341,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         index = (int)indexValue;
     }
     
-    free(piecesAvailablity);
-    
     //determine percentage finished and available
     int have, avail;
     if ([self progress] >= 1.0)
@@ -1362,7 +1360,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         float available = 0;
         for (i = 0; i < pieceCount; i++)
-            available += 1.0 - piecesFinished[i];
+        {
+            if (piecesAvailablity[i] > 0)
+                available += 1.0 - piecesFinished[i];
+        }
         
         have = rintf((float)MAX_PIECES * [self progress]);
         avail = rintf((float)MAX_PIECES * available / (float)pieceCount);
@@ -1371,6 +1372,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         free(piecesFinished);
     }
+    
+    free(piecesAvailablity);
     
     //first two lines: dark blue to show progression, green to show available
     p = (uint32_t *)bitmapData;
