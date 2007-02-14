@@ -1348,7 +1348,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         have = MAX_PIECES;
         avail = 0;
     }
-    else if (![self isActive])
+    else if (![self isActive] || [self totalPeers] <= 0)
     {
         have = rintf((float)MAX_PIECES * [self progress]);
         avail = 0;
