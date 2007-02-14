@@ -1343,12 +1343,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //determine percentage finished and available
     int have, avail;
-    if ([self progress] >= 1.0)
-    {
-        have = MAX_PIECES;
-        avail = 0;
-    }
-    else if (![self isActive] || [self totalPeers] <= 0)
+    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeers] <= 0)
     {
         have = rintf((float)MAX_PIECES * [self progress]);
         avail = 0;
@@ -1360,10 +1355,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         float available = 0;
         for (i = 0; i < pieceCount; i++)
-        {
             if (piecesAvailablity[i] > 0)
                 available += 1.0 - piecesFinished[i];
-        }
         
         have = rintf((float)MAX_PIECES * [self progress]);
         avail = rintf((float)MAX_PIECES * available / (float)pieceCount);
