@@ -450,7 +450,7 @@ makeview( TrWindow * self )
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
     progrend = tr_cell_renderer_progress_new();
-    /* this string is only used to determing the size of the progress bar */
+    /* this string is only used to determine the size of the progress bar */
     str = g_markup_printf_escaped( "<big>%s</big>", _("  fnord    fnord  ") );
     g_object_set( progrend, "bar-sizing", str, NULL );
     g_free(str);
