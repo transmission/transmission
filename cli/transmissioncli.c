@@ -64,6 +64,20 @@ static char          * finishCall   = NULL;
 static int  parseCommandLine ( int argc, char ** argv );
 static void sigHandler       ( int signal );
 
+char * getStringRatio( float ratio )
+{
+    static char string[20];
+
+    if( ratio == TR_RATIO_NA )
+        return "n/a";
+    if( ratio == TR_RATIO_INF )
+        return "inf";
+    snprintf( string, sizeof string, "%.3f", ratio );
+    return string;
+}
+
+#define LINEWIDTH 80
+
 int main( int argc, char ** argv )
 {
     int i, error;
@@ -186,7 +200,7 @@ int main( int argc, char ** argv )
 
     for( ;; )
     {
-        char string[80];
+        char string[LINEWIDTH];
         int  chars = 0;
         int result;
 
@@ -206,34 +220,35 @@ int main( int argc, char ** argv )
         }
         else if( s->status & TR_STATUS_CHECK )
         {
-            chars = snprintf( string, 80,
+            chars = snprintf( string, sizeof string,
                 "Checking files... %.2f %%", 100.0 * s->progress );
         }
         else if( s->status & TR_STATUS_DOWNLOAD )
         {
-            chars = snprintf( string, 80,
+            chars = snprintf( string, sizeof string,
                 "Progress: %.2f %%, %d peer%s, dl from %d (%.2f KB/s), "
-                "ul to %d (%.2f KB/s)", 100.0 * s->progress,
+                "ul to %d (%.2f KB/s) [%s]", 100.0 * s->progress,
                 s->peersTotal, ( s->peersTotal == 1 ) ? "" : "s",
                 s->peersUploading, s->rateDownload,
-                s->peersDownloading, s->rateUpload );
+                s->peersDownloading, s->rateUpload,
+                getStringRatio(s->ratio) );
         }
         else if( s->status & TR_STATUS_SEED )
         {
-            chars = snprintf( string, 80,
-                "Seeding, uploading to %d of %d peer(s), %.2f KB/s",
+            chars = snprintf( string, sizeof string,
+                "Seeding, uploading to %d of %d peer(s), %.2f KB/s [%s]",
                 s->peersDownloading, s->peersTotal,
-                s->rateUpload );
+                s->rateUpload, getStringRatio(s->ratio) );
         }
         else if( s->status & TR_STATUS_STOPPING )
         {
-            chars = snprintf( string, 80, "Stopping..." );
+            chars = snprintf( string, sizeof string, "Stopping..." );
         }
-        if( 79 > chars )
+        if( ( signed )sizeof string > chars )
         {
-            memset( &string[chars], ' ', 79 - chars );
+            memset( &string[chars], ' ', sizeof string - 1 - chars );
         }
-        string[79] = '\0';
+        string[sizeof string - 1] = '\0';
         fprintf( stderr, "\r%s", string );
 
         if( s->error )
