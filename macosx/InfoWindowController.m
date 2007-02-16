@@ -718,7 +718,7 @@
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
         forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
-    int state = [object intValue] != NSOffState;
+    int state = [object intValue] != NSOffState ? NSOnState : NSOffState;
     
     [self setFileCheckState: state forItem: item];
     NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
@@ -736,7 +736,7 @@
     NSMutableDictionary * child;
     NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
     while ((child = [enumerator nextObject]))
-        if ([[child objectForKey: @"Check"] intValue] != state)
+        if (state != [[child objectForKey: @"Check"] intValue])
             [self setFileCheckState: state forItem: child];
 }
 
@@ -766,7 +766,7 @@
         else;
     }
     
-    if ([[item objectForKey: @"Check"] intValue] != state)
+    if (state != [[item objectForKey: @"Check"] intValue])
     {
         [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
         return [self resetFileCheckStateForItemParent: item];
