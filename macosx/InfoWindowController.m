@@ -709,8 +709,9 @@
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
-        [(NSButtonCell *)cell setImagePosition: item ? NSImageOnly : NSNoImage];
-        [cell setEnabled: NO];
+        /*[(NSButtonCell *)cell setImagePosition: item ? NSImageOnly : NSNoImage];
+        [cell setEnabled: NO];*/
+        [(NSButtonCell *)cell setImagePosition: NSNoImage];
     }
     else;
 }
