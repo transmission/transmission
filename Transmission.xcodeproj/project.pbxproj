@@ -141,7 +141,6 @@
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
-		A28D565A0B57F1CC008E0DF1 /* DisableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = A28D56580B57F1CC008E0DF1 /* DisableTextField.m */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
@@ -353,8 +352,6 @@
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
-		A28D56570B57F1CC008E0DF1 /* DisableTextField.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DisableTextField.h; path = macosx/DisableTextField.h; sourceTree = "<group>"; };
-		A28D56580B57F1CC008E0DF1 /* DisableTextField.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DisableTextField.m; path = macosx/DisableTextField.m; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
@@ -478,8 +475,6 @@
 				A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */,
 				A24999200B49F1B5001EADA3 /* ActionPopUpButton.h */,
 				A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */,
-				A28D56570B57F1CC008E0DF1 /* DisableTextField.h */,
-				A28D56580B57F1CC008E0DF1 /* DisableTextField.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -951,7 +946,6 @@
 				A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */,
 				A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */,
 				A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */,
-				A28D565A0B57F1CC008E0DF1 /* DisableTextField.m in Sources */,
 				A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

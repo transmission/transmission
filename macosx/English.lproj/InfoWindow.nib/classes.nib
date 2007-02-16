@@ -1,6 +1,5 @@
 {
     IBClasses = (
-        {CLASS = DisableTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
         {CLASS = FileOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {

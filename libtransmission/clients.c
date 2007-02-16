@@ -60,11 +60,6 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
                       charToInt( id[4] ) * 10 + charToInt( id[5] ) );
         }
-        else if( !memcmp( &id[1], "TS", 2 ) )
-        {
-            asprintf( &ret, "TorrentStorm %c.%c.%c.%c",
-                      id[3], id[4], id[5], id[6] );
-        }
         else if( !memcmp( &id[1], "BC", 2 ) )
         {
             asprintf( &ret, "BitComet %d.%c%c",
@@ -91,6 +86,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "Xtorrent (%d)",
                       charToInt( id[3] ) * 1000 + charToInt( id[4] ) * 100
                       + charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "TS", 2 ) )
+        {
+            asprintf( &ret, "TorrentStorm %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "KT", 2 ) )
         {
