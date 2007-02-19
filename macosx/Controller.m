@@ -713,6 +713,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
 
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Open torrent -> select destination folder"),
