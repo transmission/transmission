@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,9 +28,13 @@
 #include "util.h"
 
 void
-ipc_socket_setup(void *wind, add_torrents_func_t addfunc, void *cbdata);
+ipc_socket_setup( void * wind, add_torrents_func_t addfunc,
+                  callbackfunc_t quitfunc, void * cbdata );
 
 gboolean
-ipc_sendfiles_blocking(GList *files);
+ipc_sendfiles_blocking( GList * files );
+
+gboolean
+ipc_sendquit_blocking( void );
 
 #endif /* TG_IPC_H */

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -500,7 +500,11 @@ cf_savestate(benc_val_t *state, char **errstr) {
 }
 
 void
-cf_freestate(benc_val_t *state) {
-  tr_bencFree(state);
-  g_free(state);
+cf_freestate( benc_val_t * state )
+{
+    if( NULL != state )
+    {
+        tr_bencFree( state );
+        g_free( state );
+    }
 }

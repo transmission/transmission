@@ -90,33 +90,8 @@ void
 tr_window_update( TrWindow * wind, float downspeed, float upspeed );
 
 /* some evil magic to show the window with a nice initial window size */
+/* note that the gtk main loop runs in this function */
 void
 tr_window_size_hack( TrWindow * wind );
-
-/* XXX these should be somewhere else */
-#define ACTF_TOOL       ( 1 << 0 ) /* appear in the toolbar */
-#define ACTF_MENU       ( 1 << 1 ) /* appear in the popup menu */
-#define ACTF_ALWAYS     ( 1 << 2 ) /* available regardless of selection */
-#define ACTF_ACTIVE     ( 1 << 3 ) /* available for active torrent */
-#define ACTF_INACTIVE   ( 1 << 4 ) /* available for inactive torrent */
-/* appear in the toolbar and the popup menu */
-#define ACTF_WHEREVER   ( ACTF_TOOL | ACTF_MENU )
-/* available if there is something selected */
-#define ACTF_WHATEVER   ( ACTF_ACTIVE | ACTF_INACTIVE )
-
-/* XXX this too*/
-#define ACT_ISAVAIL( flags, status ) \
-    ( ( ACTF_ACTIVE   & (flags) && TR_STATUS_ACTIVE   & (status) ) || \
-      ( ACTF_INACTIVE & (flags) && TR_STATUS_INACTIVE & (status) ) || \
-        ACTF_ALWAYS   & (flags) )
-
-/* XXX and this */
-/* model column names */
-enum {
-  MC_NAME, MC_SIZE, MC_STAT, MC_ERR, MC_TERR,
-  MC_PROG, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
-  MC_UPEERS, MC_DPEERS, MC_DOWN, MC_UP,
-  MC_TORRENT, MC_ROW_COUNT,
-};
 
 #endif

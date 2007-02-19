@@ -308,7 +308,9 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
 }
 
 TrTorrent *
-tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err) {
+tr_torrent_new_with_state( GObject * backend, benc_val_t * state,
+                           guint forcedflags, char ** err)
+{
   int ii;
   benc_val_t *name, *data;
   char *torrent, *hash, *dir;
@@ -352,6 +354,12 @@ tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err) {
   if(NULL != hash) {
     flags |= TR_TORNEW_LOAD_SAVED;
     torrent = hash;
+  }
+  forcedflags &= TR_TORNEW_PAUSED | TR_TORNEW_RUNNING;
+  if( forcedflags )
+  {
+      flags &= ~( TR_TORNEW_PAUSED | TR_TORNEW_RUNNING );
+      flags |= forcedflags;
   }
 
   return tr_torrent_new(backend, torrent, dir, flags, err);
@@ -448,20 +456,26 @@ tr_torrent_stop_politely(TrTorrent *tor) {
 }
 
 tr_stat_t *
-tr_torrent_stat_polite(TrTorrent *tor) {
-  TrTorrentClass *klass;
-  tr_stat_t *st;
+tr_torrent_stat_polite( TrTorrent * tor, gboolean timeout )
+{
+    TrTorrentClass * klass;
+    tr_stat_t      * st;
 
-  if(tor->disposed)
-    return NULL;
+    TR_IS_TORRENT( tor );
 
-  st = tr_torrentStat(tor->handle);
-  if(tor->closing && TR_STATUS_PAUSE & st->status) {
-    tor->closing = FALSE;
-    klass = g_type_class_peek(TR_TORRENT_TYPE);
-    g_signal_emit(tor, klass->paused_signal_id, 0, NULL);
-    return tr_torrent_stat_polite(tor);
-  }
+    if( tor->disposed )
+    {
+        return NULL;
+    }
 
-  return st;
+    st = tr_torrentStat( tor->handle );
+    if( tor->closing && ( TR_STATUS_PAUSE & st->status || timeout ) )
+    {
+        tor->closing = FALSE;
+        klass = g_type_class_peek( TR_TORRENT_TYPE );
+        g_signal_emit( tor, klass->paused_signal_id, 0, NULL );
+        return tr_torrent_stat_polite( tor, FALSE );
+    }
+
+    return st;
 }

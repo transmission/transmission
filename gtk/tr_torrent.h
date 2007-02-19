@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -88,13 +88,14 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
                guint flags, char **err);
 
 TrTorrent *
-tr_torrent_new_with_state(GObject *backend, benc_val_t *state, char **err);
+tr_torrent_new_with_state( GObject * backend, benc_val_t * state,
+                           guint flags, char ** err );
 
 void
 tr_torrent_stop_politely(TrTorrent *tor);
 
 tr_stat_t *
-tr_torrent_stat_polite(TrTorrent *tor);
+tr_torrent_stat_polite( TrTorrent * tor, gboolean timeout );
 
 #ifdef TR_WANT_TORRENT_PRIVATE
 void

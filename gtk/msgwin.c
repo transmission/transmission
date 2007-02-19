@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 
 #include "conf.h"
 #include "msgwin.h"
+#include "tr_prefs.h"
 #include "transmission.h"
 #include "util.h"
 
@@ -60,8 +61,7 @@ msgwin_create( void ) {
   GtkWidget * win, * vbox, * scroll, * text;
   GtkWidget * frame, * bbox, * save, * clear, * menu;
   PangoFontDescription * desc;
-  unsigned int ii;
-  int curlevel;
+  int ii, curlevel;
 
   if( NULL == textbuf )
     textbuf = gtk_text_buffer_new( NULL );
@@ -126,7 +126,7 @@ changelevel( GtkWidget * widget, gpointer data SHUTUP ) {
   if( 0 <= index && (int) ALEN( levels ) > index &&
       tr_getMessageLevel() != levels[index].id ) {
     tr_setMessageLevel( levels[index].id );
-    cf_setpref( PREF_MSGLEVEL, levels[index].pref );
+    cf_setpref( tr_prefs_name( PREF_ID_MSGLEVEL ), levels[index].pref );
     cf_saveprefs( &ignored );
     g_free( ignored );
     msgwin_update();
@@ -196,10 +196,10 @@ doclear( GtkWidget * widget SHUTUP, gpointer data SHUTUP ) {
 void
 msgwin_loadpref( void ) {
   const char * pref;
-  unsigned int ii;
+  int ii;
 
   tr_setMessageQueuing( 1 );
-  pref = cf_getpref( PREF_MSGLEVEL );
+  pref = tr_prefs_get( PREF_ID_MSGLEVEL );
   if( NULL == pref )
     return;
 
@@ -216,9 +216,8 @@ msgwin_update( void ) {
   tr_msg_list_t * msgs, * ii;
   GtkTextIter     iter, front;
   char          * label, * line;
-  int             count;
+  int             count, jj;
   struct tm     * tm;
-  unsigned int    jj;
 
   if( NULL == textbuf )
     return;

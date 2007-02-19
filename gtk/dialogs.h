@@ -47,6 +47,10 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor);
 /* prompt for a download directory for torrents, then add them */
 void
 promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
-              GList * files, guint flags, const char * defaultdir );
+              GList * files, guint flags );
+
+/* prompt if the user wants to quit, calls func with cbdata if they do */
+void
+askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata );
 
 #endif /* TG_PREFS_H */

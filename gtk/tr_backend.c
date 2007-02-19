@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -220,7 +220,9 @@ tr_backend_save_state(TrBackend *back, char **errstr) {
 }
 
 GList *
-tr_backend_load_state(TrBackend *back, benc_val_t *state, GList **errors) {
+tr_backend_load_state( TrBackend * back, benc_val_t * state,
+                       guint flags, GList ** errors )
+{
   GList *ret = NULL;
   int ii;
   TrTorrent *tor;
@@ -233,8 +235,8 @@ tr_backend_load_state(TrBackend *back, benc_val_t *state, GList **errors) {
 
   for(ii = 0; ii < state->val.l.count; ii++) {
     errstr = NULL;
-    tor = tr_torrent_new_with_state(G_OBJECT(back), state->val.l.vals + ii,
-                                    &errstr);
+    tor = tr_torrent_new_with_state( G_OBJECT( back ), state->val.l.vals + ii,
+                                     flags, &errstr );
     if(NULL != errstr)
       *errors = g_list_append(*errors, errstr);
     if(NULL != tor)
@@ -273,20 +275,25 @@ tr_backend_stop_torrents(TrBackend *back) {
 }
 
 gboolean
-tr_backend_torrents_stopped(TrBackend *back) {
-  GList *ii, *list;
-  tr_stat_t *st;
-  gboolean ret = TRUE;
+tr_backend_torrents_stopped( TrBackend * back, gboolean timeout )
+{
+    GList     * ii, * list;
+    tr_stat_t * st;
+    gboolean  ret;
 
-  TR_IS_BACKEND(back);
+    TR_IS_BACKEND( back );
 
-  list = g_list_copy(back->torrents);
-  for(ii = list; NULL != ii; ii = ii->next) {
-    st = tr_torrent_stat_polite(ii->data);
-    if(NULL == st || !(TR_STATUS_PAUSE & st->status))
-      ret = FALSE;
-  }
-  g_list_free(list);
+    ret  = TRUE;
+    list = g_list_copy( back->torrents );
+    for( ii = list; NULL != ii; ii = ii->next )
+    {
+        st = tr_torrent_stat_polite( ii->data, timeout );
+        if( NULL == st || !( TR_STATUS_PAUSE & st->status ) )
+        {
+            ret = FALSE;
+        }
+    }
+    g_list_free( list );
 
-  return ret;
+    return ret;
 }

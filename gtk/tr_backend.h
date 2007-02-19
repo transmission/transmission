@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -70,13 +70,14 @@ void
 tr_backend_save_state(TrBackend *back, char **errstr);
 
 GList *
-tr_backend_load_state(TrBackend *back, benc_val_t *state, GList **errors);
+tr_backend_load_state( TrBackend * back, benc_val_t * state,
+                       guint flags, GList ** errors );
 
 void
 tr_backend_stop_torrents(TrBackend *back);
 
 gboolean
-tr_backend_torrents_stopped(TrBackend *back);
+tr_backend_torrents_stopped( TrBackend * back, gboolean timeout );
 
 #ifdef TR_WANT_BACKEND_PRIVATE
 void

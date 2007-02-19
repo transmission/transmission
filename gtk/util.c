@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
 
@@ -65,7 +66,7 @@ static const char *sizestrs[] = {
 
 char *
 readablesize(guint64 size) {
-  unsigned int ii;
+  int ii;
   double small = size;
 
   for(ii = 0; ii + 1 < ALEN(sizestrs) && 1024.0 <= small / 1024.0; ii++)
@@ -308,34 +309,68 @@ makeglist(void *ptr, ...) {
   return ret;
 }
 
-GtkWidget *
-errmsg(GtkWindow *wind, const char *format, ...) {
-  GtkWidget *dialog;
-  va_list ap;
+const char *
+getdownloaddir( void )
+{
+    static char * wd = NULL;
+    const char  * dir;
 
-  va_start(ap, format);
-  dialog = verrmsg(wind, NULL, NULL, format, ap);
-  va_end(ap);
+    dir = tr_prefs_get( PREF_ID_DIR );
+    if( NULL == dir )
+    {
+        if( NULL == wd )
+        {
+            wd = g_new( char, MAX_PATH_LENGTH + 1 );
+            if( NULL == getcwd( wd, MAX_PATH_LENGTH + 1 ) )
+            {
+                strcpy( wd, "." );
+            }
+        }
+        dir = wd;
+    }
 
-  return dialog;
+    return dir;
+}
+
+void
+errmsg( GtkWindow * wind, const char * format, ... )
+{
+    GtkWidget * dialog;
+    va_list     ap;
+
+    va_start( ap, format );
+    dialog = verrmsg_full( wind, NULL, NULL, format, ap );
+    va_end( ap );
+
+    if( NULL != wind && !GTK_WIDGET_MAPPED( GTK_WIDGET( wind ) ) )
+    {
+        g_signal_connect_swapped( wind, "map",
+                                  G_CALLBACK( gtk_widget_show ), dialog );
+    }
+    else
+    {
+        gtk_widget_show( dialog );
+    }
 }
 
 GtkWidget *
-errmsg_full(GtkWindow *wind, callbackfunc_t func, void *data,
-            const char *format, ...) {
-  GtkWidget *dialog;
-  va_list ap;
+errmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
+             const char * format, ... )
+{
+    GtkWidget * dialog;
+    va_list     ap;
 
-  va_start(ap, format);
-  dialog = verrmsg(wind, func, data, format, ap);
-  va_end(ap);
+    va_start( ap, format );
+    dialog = verrmsg_full( wind, func, data, format, ap );
+    va_end( ap );
 
-  return dialog;
+    return dialog;
 }
 
 GtkWidget *
-verrmsg(GtkWindow *wind, callbackfunc_t func, void *data,
-        const char *format, va_list ap) {
+verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
+              const char * format, va_list ap )
+{
   GtkWidget *dialog;
   char *msg;
   GList *funcdata;
@@ -355,8 +390,6 @@ verrmsg(GtkWindow *wind, callbackfunc_t func, void *data,
   else
     funcdata = g_list_append(g_list_append(NULL, func), data);
   g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
-  if(NULL != wind)
-    gtk_widget_show(dialog);
   g_free(msg);
 
   return dialog;

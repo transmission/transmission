@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -40,6 +40,7 @@
 #include "conf.h"
 #include "io.h"
 #include "ipc.h"
+#include "tr_prefs.h"
 #include "util.h"
 
 #define PROTOVERS               1       /* IPC protocol version */
@@ -48,20 +49,26 @@
 #define MSG_VERSION             ("version")
 /* list of strings, full paths to torrent files to load */
 #define MSG_ADDFILES            ("addfiles")
+/* request that the server quit */
+#define MSG_QUIT                ("quit")
 
-enum contype { CON_SERV, CON_ADDFILE };
+enum contype { CON_SERV, CON_CLIENT };
 
 struct constate_serv {
   void *wind;
   add_torrents_func_t addfunc;
+  callbackfunc_t quitfunc;
   void *cbdata;
 };
 
-struct constate_addfile {
+enum client_cmd { CCMD_ADD, CCMD_QUIT };
+
+struct constate_client {
   GMainLoop *loop;
+  enum client_cmd cmd;
   GList *files;
   gboolean *succeeded;
-  unsigned int addid;
+  unsigned int msgid;
 };
 
 struct constate;
@@ -75,14 +82,10 @@ struct constate {
   enum contype type;
   union {
     struct constate_serv serv;
-    struct constate_addfile addfile;
+    struct constate_client client;
   } u;
 };
 
-void
-ipc_socket_setup(void *parent, add_torrents_func_t addfunc, void *cbdata);
-gboolean
-ipc_sendfiles_blocking(GList *files);
 static void
 serv_bind(struct constate *con);
 static void
@@ -105,16 +108,19 @@ all_io_closed(GSource *source, void *vdata);
 static void
 srv_addfile(struct constate *con, const char *name, benc_val_t *val);
 static void
+srv_quit( struct constate * con, const char * name, benc_val_t * val );
+static void
 afc_version(struct constate *con, const char *name, benc_val_t *val);
 static void
 afc_io_sent(GSource *source, unsigned int id, void *vdata);
 
 static const struct handlerdef gl_funcs_serv[] = {
   {MSG_ADDFILES, srv_addfile},
+  {MSG_QUIT,     srv_quit},
   {NULL, NULL}
 };
 
-static const struct handlerdef gl_funcs_addfile[] = {
+static const struct handlerdef gl_funcs_client[] = {
   {MSG_VERSION, afc_version},
   {NULL, NULL}
 };
@@ -123,7 +129,9 @@ static const struct handlerdef gl_funcs_addfile[] = {
 static char *gl_sockpath = NULL;
 
 void
-ipc_socket_setup(void *parent, add_torrents_func_t addfunc, void *cbdata) {
+ipc_socket_setup( void * parent, add_torrents_func_t addfunc,
+                  callbackfunc_t quitfunc, void * cbdata )
+{
   struct constate *con;
 
   con = g_new0(struct constate, 1);
@@ -133,13 +141,16 @@ ipc_socket_setup(void *parent, add_torrents_func_t addfunc, void *cbdata) {
   con->type = CON_SERV;
   con->u.serv.wind = parent;
   con->u.serv.addfunc = addfunc;
+  con->u.serv.quitfunc = quitfunc;
   con->u.serv.cbdata = cbdata;
   
   serv_bind(con);
 }
 
-gboolean
-ipc_sendfiles_blocking(GList *files) {
+static gboolean
+blocking_client( enum client_cmd cmd, GList * files )
+{
+
   struct constate *con;
   char *path;
   gboolean ret = FALSE;
@@ -147,12 +158,13 @@ ipc_sendfiles_blocking(GList *files) {
   con = g_new0(struct constate, 1);
   con->source = NULL;
   con->fd = -1;
-  con->funcs = gl_funcs_addfile;
-  con->type = CON_ADDFILE;
-  con->u.addfile.loop = g_main_loop_new(NULL, TRUE);
-  con->u.addfile.files = files;
-  con->u.addfile.succeeded = &ret;
-  con->u.addfile.addid = 0;
+  con->funcs = gl_funcs_client;
+  con->type = CON_CLIENT;
+  con->u.client.loop = g_main_loop_new(NULL, TRUE);
+  con->u.client.cmd = cmd;
+  con->u.client.files = files;
+  con->u.client.succeeded = &ret;
+  con->u.client.msgid = 0;
 
   path = cf_sockname();
   if(!client_connect(path, con)) {
@@ -161,9 +173,21 @@ ipc_sendfiles_blocking(GList *files) {
     return FALSE;
   }
 
-  g_main_loop_run(con->u.addfile.loop);
+  g_main_loop_run(con->u.client.loop);
 
   return ret;
+}
+
+gboolean
+ipc_sendfiles_blocking( GList * files )
+{
+    return blocking_client( CCMD_ADD, files );
+}
+
+gboolean
+ipc_sendquit_blocking( void )
+{
+    return blocking_client( CCMD_QUIT, NULL );
 }
 
 /* open a local socket for clients connections */
@@ -356,9 +380,9 @@ destroycon(struct constate *con) {
   switch(con->type) {
     case CON_SERV:
       break;
-    case CON_ADDFILE:
-      freestrlist(con->u.addfile.files);
-      g_main_loop_quit(con->u.addfile.loop);
+    case CON_CLIENT:
+      freestrlist(con->u.client.files);
+      g_main_loop_quit(con->u.client.loop);
       break;
   }
 }
@@ -375,6 +399,7 @@ srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
   struct constate_serv *srv = &con->u.serv;
   GList *files;
   int ii;
+  guint flags;
 
   if(TYPE_LIST == val->type) {
     files = NULL;
@@ -383,47 +408,68 @@ srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
          /* XXX somehow escape invalid utf-8 */
          g_utf8_validate(val->val.l.vals[ii].val.s.s, -1, NULL))
         files = g_list_append(files, val->val.l.vals[ii].val.s.s);
-    srv->addfunc(srv->cbdata, NULL, files, NULL,
-                 addactionflag(cf_getpref(PREF_ADDIPC)));
+    flags = addactionflag( tr_prefs_get( PREF_ID_ADDIPC ) );
+    srv->addfunc( srv->cbdata, NULL, files, NULL, flags );
     g_list_free(files);
   }
 }
 
 static void
+srv_quit( struct constate * con, const char * name SHUTUP,
+          benc_val_t * val SHUTUP )
+{
+    struct constate_serv * srv;
+
+    srv = &con->u.serv;
+    srv->quitfunc( srv->cbdata );
+}
+
+static void
 afc_version(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
-  struct constate_addfile *afc = &con->u.addfile;
+  struct constate_client *afc = &con->u.client;
   GList *file;
   benc_val_t list, *str;
 
   if(TYPE_INT != val->type || PROTOVERS != val->val.i) {
     fprintf(stderr, _("bad IPC protocol version\n"));
     destroycon(con);
-  } else {
-    /* XXX handle getting a non-version tag, invalid data,
-           or nothing (read timeout) */
-    bzero(&list, sizeof(list));
-    list.type = TYPE_LIST;
-    list.val.l.alloc = g_list_length(afc->files);
-    list.val.l.vals = g_new0(benc_val_t, list.val.l.alloc);
-    for(file = afc->files; NULL != file; file = file->next) {
-      str = list.val.l.vals + list.val.l.count;
-      str->type = TYPE_STR;
-      str->val.s.i = strlen(file->data);
-      str->val.s.s = file->data;
-      list.val.l.count++;
-    }
-    g_list_free(afc->files);
-    afc->files = NULL;
-    afc->addid = send_msg(con, MSG_ADDFILES, &list);
-    tr_bencFree(&list);
+    return;
+  }
+
+  /* XXX handle getting a non-version tag, invalid data,
+     or nothing (read timeout) */
+  switch( afc->cmd )
+  {
+      case CCMD_ADD:
+          list.type = TYPE_LIST;
+          list.val.l.alloc = g_list_length(afc->files);
+          list.val.l.count = 0;
+          list.val.l.vals = g_new0(benc_val_t, list.val.l.alloc);
+          for(file = afc->files; NULL != file; file = file->next) {
+              str = list.val.l.vals + list.val.l.count;
+              str->type = TYPE_STR;
+              str->val.s.i = strlen(file->data);
+              str->val.s.s = file->data;
+              list.val.l.count++;
+          }
+          g_list_free(afc->files);
+          afc->files = NULL;
+          afc->msgid = send_msg(con, MSG_ADDFILES, &list);
+          tr_bencFree(&list);
+          break;
+      case CCMD_QUIT:
+          bzero( &list, sizeof( list ) );
+          list.type  = TYPE_STR;
+          afc->msgid = send_msg( con, MSG_QUIT, &list );
+          break;
   }
 }
 
 static void
 afc_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
-  struct constate_addfile *afc = &((struct constate*)vdata)->u.addfile;
+  struct constate_client *afc = &((struct constate*)vdata)->u.client;
 
-  if(0 < id && afc->addid == id) {
+  if(0 < id && afc->msgid == id) {
     *(afc->succeeded) = TRUE;
     destroycon(vdata);
   }
