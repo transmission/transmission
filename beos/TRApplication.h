@@ -27,6 +27,7 @@ class TRApplication : public BApplication {
 		virtual void Pulse();
 		virtual void ReadyToRun();
 		virtual void RefsReceived(BMessage *message);
+		virtual void ArgvReceived(int32 _argc, char** _argv);
 		virtual bool QuitRequested();
 
 		virtual void MessageReceived(BMessage *message);

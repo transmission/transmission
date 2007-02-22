@@ -13,32 +13,24 @@
 
 class TRTransfer : public BListItem {
 public: // Construction and Controll methods.
-	TRTransfer(const char *fullpath, node_ref node);
+	TRTransfer(const char *fullpath, node_ref node, tr_torrent_t *torrentRef);
 	~TRTransfer();
 
 	inline node_ref GetCachedNodeRef() { return cachedNodeRef; };
 	inline const char* GetCachedPath() { return cachedPath->String(); };
+	inline tr_torrent_t* GetTorrent()  { return torrent; };
 	
-	bool SetStatus(tr_stat_t *stat, bool shade);
+	bool UpdateStatus(tr_stat_t *stat, bool shade);
+	bool IsRunning();
 	
 public: // BListItem
 	virtual void Update(BView *owner, const BFont *font);
 	virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
 
 private: 
-	/* 
-	 * Cached data. The items stored here are _NOT_ necessairly
-	 * the torrent we'll be rendering. It's likely they will be,
-	 * but NOT guaranteed. They are not used for anything relating
-	 * to rendering.
-	 * 
-	 * Specifically we needed a way to cache the node_ref and
-	 * reverse-lookup the node from the string path in the 
-	 * transmission structs. This seemed the logical place to store
-	 * that information, since it ends up in a BList(View).
-	 */
 	node_ref cachedNodeRef;
 	BString *cachedPath;
+	tr_torrent_t *torrent;
 
 private: // Private members used for rendering.
 	float fBaselineOffset;
@@ -46,6 +38,7 @@ private: // Private members used for rendering.
 	
 	BLocker *fStatusLock;
 	tr_stat_t *fStatus;
+	BString *fName;
 	
 	rgb_color fBarColor;
 	

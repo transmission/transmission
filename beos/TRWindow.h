@@ -6,6 +6,7 @@
 #include <Entry.h>
 #include <FilePanel.h>
 #include <ListView.h>
+#include <ListItem.h>
 #include <Window.h>
 
 #include "transmission.h"
@@ -41,8 +42,8 @@ public:	// TRWindow
 	
 	void LoadSettings();
 	
-	void StopTorrent(int index);
-	void StartTorrent(int index);
+	void StopTorrent(tr_torrent_t *torrent);
+	void StartTorrent(tr_torrent_t *torrent);
 	
 	static int32 AsynchStopTorrent(void *data);
 	static int32 AsynchStartTorrent(void *data);
@@ -50,20 +51,41 @@ public:	// TRWindow
 	void RescanTorrents();
 
 private:
-	BListView *transfers;
+	static BListView *transfers;
 	BFilePanel *openPanel;
 	
 	tr_handle_t *engine;
 	
 	TRPrefsWindow *fSettings;
+	
+	static bool RemovePath(BListItem *item, void *data);
+	static bool CheckQuitStatus(BListItem *item, void *data);
+	static bool UpdateStats(BListItem *item, void *data);
 };
 
 /**
  * Used to pass info off to the worker thread that runs AsynchStopTorrent
  */
 struct worker_info {
+	TRWindow     *window;
+	tr_torrent_t *torrent;
+};
+
+struct remove_info {
 	TRWindow *window;
-	int      index;
+	char     path[B_FILE_NAME_LENGTH];
+};
+
+struct quit_info {
+	TRWindow *window;
+	int       running;
+};
+
+struct update_info {
+	TRWindow *window;
+	bool     running;
+	int      selected;
+	int      invalid;
 };
 
 #endif /* TR_WIND */

@@ -20,6 +20,8 @@
 #include "TRTransfer.h"
 #include "TRInfoWindow.h"
 
+BListView *TRWindow::transfers = NULL;
+
 /**
  * The Transmission Window! Yay!
  */
@@ -72,8 +74,8 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 	
 	// Setup the transfers ListView
 	viewRect.Set(2, menubar->Frame().bottom + 3, rectFrame->Width() - 2 - B_V_SCROLL_BAR_WIDTH, rectFrame->Height() - 2);
-	transfers = new BListView(viewRect, "TorrentList", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
-	transfers->SetSelectionMessage(new BMessage(TR_SELECT));
+	TRWindow::transfers = new BListView(viewRect, "TorrentList", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
+	TRWindow::transfers->SetSelectionMessage(new BMessage(TR_SELECT));
 	AddChild(new BScrollView("TransferScroller", transfers, B_FOLLOW_ALL, 0, false, true));
 	
 	Unlock();
@@ -112,7 +114,7 @@ void TRWindow::LoadSettings() {
 			uploadLimit = 20;
 			prefs.SetInt32("transmission.uploadLimit", uploadLimit);
 		}
-		tr_setUploadLimit(engine, (int)uploadLimit);
+		tr_setGlobalUploadLimit(engine, (int)uploadLimit);
 	}
 }
 
@@ -157,9 +159,10 @@ void TRWindow::AddEntry(BEntry *torrent) {
 			torrent->GetPath(&path);
 			
 			// Try adding the torrent to the engine.
-			int addStatus = tr_torrentInit(engine, path.Path());
-			if (addStatus == 0 && Lock()) { // Success. Add the TRTorrent item.
-				transfers->AddItem(new TRTransfer(path.Path(), node));
+			int error;
+			tr_torrent_t *nTorrent = tr_torrentInit(engine, path.Path(), 0, &error);
+			if (nTorrent != NULL && Lock()) { // Success. Add the TRTorrent item.
+				transfers->AddItem(new TRTransfer(path.Path(), node, nTorrent));
 				
 				bool autoStart = true;
 				
@@ -177,13 +180,13 @@ void TRWindow::AddEntry(BEntry *torrent) {
 					// Start the newly added torrent.
 					worker_info *startData = (worker_info*)calloc(1, sizeof(worker_info));
 					startData->window = this;
-					startData->index = tr_torrentCount(engine) - 1;
+					startData->torrent = nTorrent;
 					thread_id start_thread = spawn_thread(TRWindow::AsynchStartTorrent, "BirthCanal",
 					                                      B_NORMAL_PRIORITY, (void *)startData);
 					if (!((start_thread) < B_OK)) {
 						resume_thread(start_thread);
 					} else { // Fallback and start the old way.
-						StartTorrent(startData->index);
+						StartTorrent(startData->torrent);
 						free(startData);
 					}
 				}
@@ -250,36 +253,28 @@ void TRWindow::MessageReceived(BMessage *msg) {
 				 * IS NOT the index of the torrent in the engine. These are
 				 * Totally decoupled, due to the way transmission is written.
 				 */
-				char path[B_FILE_NAME_LENGTH];
+				remove_info *removeData = (remove_info*)calloc(1, sizeof(remove_info));
+				removeData->window = this;
 				TRTransfer* item;
 				for (int32 i = 0; i < transfers->CountItems(); i++) {
 					item = (TRTransfer*)transfers->ItemAt(i);
 					if (item->GetCachedNodeRef() == node) {
-						strcpy(path, item->GetCachedPath());
+						strcpy(removeData->path, item->GetCachedPath());
 					}
 				}
 				
-				// Look for the torrent info in the engine with the matching
-				// path name.
-				tr_stat_t *stats;
-				int max = tr_torrentStat(engine, &stats);
-				int index;
-				for (index = 0; index < max; index++) {
-					if (strcmp(stats[index].info.torrent, path) == 0) {
-						tr_torrentClose(engine, index);
-						transfers->RemoveItem(index);
-						break;
-					}
-				}
-				free(stats);
+				transfers->DoForEach(TRWindow::RemovePath, (void *)removeData);
+				
+				free(removeData);
 			}
 		}
 	} else if (msg->what == TR_INFO) {
 		// Display an Info Window.
-		tr_stat_t *s;
-		tr_torrentStat(engine, &s);
+		TRTransfer *transfer = dynamic_cast<TRTransfer*>(transfers->ItemAt(transfers->CurrentSelection()));
+		tr_stat_t *s = tr_torrentStat(transfer->GetTorrent());
+		tr_info_t *i = tr_torrentInfo(transfer->GetTorrent());
 		
-		TRInfoWindow *info = new TRInfoWindow(s[transfers->CurrentSelection()]);
+		TRInfoWindow *info = new TRInfoWindow(s, i, tr_torrentGetFolder(transfer->GetTorrent()));
 		info->MoveTo(Frame().LeftTop() + BPoint(20, 25));
 		info->Show();
 	} else if (msg->what == TR_SELECT) {
@@ -290,34 +285,33 @@ void TRWindow::MessageReceived(BMessage *msg) {
 	} else if (msg->what == TR_RESUME) {
 		worker_info *startData = (worker_info*)calloc(1, sizeof(worker_info));
 		startData->window = this;
-		startData->index = (int)transfers->CurrentSelection();
+		startData->torrent = (dynamic_cast<TRTransfer*>(transfers->ItemAt(transfers->CurrentSelection())))->GetTorrent();
 		thread_id start_thread = spawn_thread(TRWindow::AsynchStartTorrent, "BirthCanal",
 		                                      B_NORMAL_PRIORITY, (void *)startData);
 		if (!((start_thread) < B_OK)) {
 			resume_thread(start_thread);
 		} else { // Fallback and start the old way.
-			StartTorrent(startData->index);
+			StartTorrent(startData->torrent);
 			free(startData);
 		}
 	} else if (msg->what == TR_PAUSE) {
 		worker_info *stopData = (worker_info*)calloc(1, sizeof(worker_info));
 		stopData->window = this;
-		stopData->index = (int)transfers->CurrentSelection();
+		stopData->torrent = (dynamic_cast<TRTransfer*>(transfers->ItemAt(transfers->CurrentSelection())))->GetTorrent();
 		thread_id stop_thread = spawn_thread(TRWindow::AsynchStopTorrent, "InUtero",
 		                                     B_NORMAL_PRIORITY, (void *)stopData);
 		if (!((stop_thread) < B_OK)) {
 			resume_thread(stop_thread);
 		} else { // Fallback and stop it the old way.
-			StopTorrent(stopData->index);
+			StopTorrent(stopData->torrent);
 			free(stopData);
 		}
 	} else if (msg->what == TR_REMOVE) {
 		int32 index = transfers->CurrentSelection();
 		
-		tr_torrentClose(engine, (int)index);
-		
 		// Remove the file from the filesystem.
 		TRTransfer *item = (TRTransfer*)transfers->RemoveItem(index);
+		tr_torrentClose(engine, item->GetTorrent());
 		BEntry *entry = new BEntry(item->GetCachedPath(), true);
 		entry->Remove();
 		delete entry;
@@ -341,19 +335,14 @@ void TRWindow::MessageReceived(BMessage *msg) {
 bool TRWindow::QuitRequested() {
 	bool quit = false;
 	
-	bool running = false;
-	tr_stat_t *s;
-	int max = tr_torrentStat(engine, &s);
-	for (int i = 0; i < max && !running; i++) {
-		running = (s[i].status &
-		          (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED));
-	}
-	free(s);
+	quit_info *quitData = (quit_info*)calloc(1, sizeof(quit_info));
+	quitData->running = 0;
+	transfers->DoForEach(TRWindow::CheckQuitStatus, (void *)quitData);
 	
-	if (running) {
+	if (quitData->running > 0) {
 		BString quitMsg("");
-		quitMsg << "There's " << max << " torrent";
-		if (max > 1) {
+		quitMsg << "There's " << quitData->running << " torrent";
+		if (quitData->running > 1) {
 			quitMsg << "s";
 		}
 		quitMsg << " currently running.\n"
@@ -366,23 +355,27 @@ bool TRWindow::QuitRequested() {
 	} else {
 		quit = true;
 	}
+	free(quitData);
 	
 	if (quit) {
 		Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
 		prefs->SetRect("window.frame", Frame());
 		
 		BString strItem("");
-		for (int i = 0; i < tr_torrentStat(engine, &s); i++) {
+		for (int i = 0; i < transfers->CountItems(); i++) {
 			strItem = "download.";
-			strItem << s[i].info.torrent << ".running";
-			if (s[i].status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {
+			tr_torrent_t *torrent = (dynamic_cast<TRTransfer*>(transfers->ItemAt(i)))->GetTorrent(); 
+			tr_info_t *info = tr_torrentInfo(torrent);
+			tr_stat_t *stat = tr_torrentStat(torrent);
+			
+			strItem << info->torrent << ".running";
+			if (stat->status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {
 				prefs->SetBool(strItem.String(), true);
-				tr_torrentStop(engine, i);
+				tr_torrentStop(torrent);
 			} else {
 				prefs->SetBool(strItem.String(), false);
 			}
 		}
-		free(s);
 		delete prefs;
 		
 		be_app->PostMessage(new BMessage(B_QUIT_REQUESTED));
@@ -398,16 +391,16 @@ void TRWindow::FrameResized(float width, float height) {
 /**
  * Called from the StopTorrent thread.
  */
-void TRWindow::StopTorrent(int index) {
-	tr_torrentStop(engine, index);
+void TRWindow::StopTorrent(tr_torrent_t *torrent) {
+	tr_torrentStop(torrent);
 	
-	UpdateList(index, true);
+	UpdateList(transfers->CurrentSelection(), true);
 }
 
 /**
  * Called from StartTorrent thread.
  */
-void TRWindow::StartTorrent(int index) {
+void TRWindow::StartTorrent(tr_torrent_t *torrent) {
 	// Read the settings.
 	BString folder("");
 	Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
@@ -415,11 +408,11 @@ void TRWindow::StartTorrent(int index) {
 		prefs->SetString("download.folder", "/boot/home/Downloads");
 		folder << "/boot/home/Downloads";
 	}
-	tr_torrentSetFolder(engine, index, folder.String());
-	tr_torrentStart(engine, index);
+	tr_torrentSetFolder(torrent, folder.String());
+	tr_torrentStart(torrent);
 	
 	if (transfers->CurrentSelection() >= 0) {
-		UpdateList(index, true);
+		UpdateList(transfers->CurrentSelection(), true);
 	}
 	
 	delete prefs;
@@ -431,39 +424,29 @@ void TRWindow::StartTorrent(int index) {
  * and invalidate the view.
  */
 void TRWindow::UpdateList(int32 selection = -1, bool menus = true) {
-	bool running = false;
+	update_info *upData = (update_info*)calloc(1, sizeof(update_info));
+	upData->running = false;
+	upData->selected = selection;
+	upData->invalid = 0;
 	
-	tr_stat_t * s;
-	int i = 0;
-	int max = tr_torrentStat(engine, &s);
-	bool invalid[max];
-	
-	for (i = 0; i < max; i++) {
-		invalid[i] = ((TRTransfer*)transfers->ItemAt(i))->SetStatus(&(s[i]), (i % 2 != 0));
-		
-		if (menus && i == (int)selection) {
-			running = (s[selection].status & 
-			          (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED));
-		}
-	}
-	free(s);
+	transfers->DoForEach(TRWindow::UpdateStats, (void *)upData);
 	
 	if (menus) {
 		KeyMenuBar()->FindItem(TR_INFO)->SetEnabled(selection >= 0);
-		KeyMenuBar()->FindItem(TR_RESUME)->SetEnabled(selection >= 0 && !running);
-		KeyMenuBar()->FindItem(TR_PAUSE)->SetEnabled(selection >= 0 && running);
-		KeyMenuBar()->FindItem(TR_REMOVE)->SetEnabled(selection >= 0 && !running);
+		KeyMenuBar()->FindItem(TR_RESUME)->SetEnabled(selection >= 0 && !upData->running);
+		KeyMenuBar()->FindItem(TR_PAUSE)->SetEnabled(selection >= 0 && upData->running);
+		KeyMenuBar()->FindItem(TR_REMOVE)->SetEnabled(selection >= 0 && !upData->running);
 	}
 	
-	if (Lock()) {
-		for (i = 0; i < max; i++) {
-			if (invalid[i]) {
-				transfers->InvalidateItem(i);
-			}
-		}
-		Unlock();
+	if (upData->invalid > 0 && transfers->LockLooper()) {
+		transfers->Invalidate();
+		transfers->UnlockLooper();
 	}
+	
+	free(upData);
 }
+
+
 
 /**
  * Thread Function to stop Torrents. This can be expensive and causes the event loop to
@@ -471,7 +454,7 @@ void TRWindow::UpdateList(int32 selection = -1, bool menus = true) {
  */
 int32 TRWindow::AsynchStopTorrent(void *data) {
 	worker_info* stopData = (worker_info*)data;
-	stopData->window->StopTorrent(stopData->index);
+	stopData->window->StopTorrent(stopData->torrent);
 	free(stopData);
 	return B_OK;
 }
@@ -482,7 +465,56 @@ int32 TRWindow::AsynchStopTorrent(void *data) {
  */
 int32 TRWindow::AsynchStartTorrent(void *data) {
 	worker_info* startData = (worker_info*)data;
-	startData->window->StartTorrent(startData->index);
+	startData->window->StartTorrent(startData->torrent);
 	free(startData);
 	return B_OK;
+}
+
+/**
+ * Invoked by DoForEach upon the transfers list. This will
+ * remove the item that is caching the path specified by 
+ * path.
+ */
+bool TRWindow::RemovePath(BListItem *item, void *data) {
+	remove_info* removeData = (remove_info*)data;
+	TRTransfer *transfer = dynamic_cast<TRTransfer*>(item);
+	
+	if (strcmp(transfer->GetCachedPath(), removeData->path) == 0) {
+		removeData->window->transfers->RemoveItem(transfer);
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Invoked during QuitRequested, iterates all Transfers and 
+ * checks to see how many are running.
+ */
+bool TRWindow::CheckQuitStatus(BListItem *item, void *data) {
+	quit_info* quitData = (quit_info*)data;
+	TRTransfer *transfer = dynamic_cast<TRTransfer*>(item);
+	
+	if (transfer->IsRunning()) {
+		quitData->running++;
+	}
+	return false;
+}
+
+/**
+ * Invoked during UpdateList()
+ */
+bool TRWindow::UpdateStats(BListItem *item, void *data) {
+	update_info* upData = (update_info*)data;
+	TRTransfer *transfer = dynamic_cast<TRTransfer*>(item);
+	
+	int32 index = transfers->IndexOf(transfer);
+	if (transfer->UpdateStatus(tr_torrentStat(transfer->GetTorrent()), index % 2 == 0)) {
+		upData->invalid++;
+	}
+	
+	if (index == upData->selected) {
+		upData->running = transfer->IsRunning();
+	}
+	
+	return false;
 }

@@ -219,7 +219,7 @@ void TRApplication::ArgvReceived(int32 _argc, char** _argv)
 		}
 	}
 	
-	be_app_messenger.SendMessage(refs);
+	be_app_messenger.SendMessage(&refs);
 }
 
 /**

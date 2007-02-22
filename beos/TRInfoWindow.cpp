@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 
-TRInfoWindow::TRInfoWindow(tr_stat_t status) : BWindow(BRect(0, 0, 250, 175), "Info", 
+TRInfoWindow::TRInfoWindow(tr_stat_t *status, tr_info_t *info, char *folder) : BWindow(BRect(0, 0, 250, 175), "Info", 
                           B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS | /*B_NOT_RESIZABLE*/  B_NOT_ZOOMABLE,
                           B_CURRENT_WORKSPACE)
 {
@@ -22,13 +22,13 @@ TRInfoWindow::TRInfoWindow(tr_stat_t status) : BWindow(BRect(0, 0, 250, 175), "I
 	headerFont.SetSize(14.0f);
 	font_height fh;
 	headerFont.GetHeight(&fh);
-	if (headerFont.StringWidth(status.info.name) > Bounds().Width() - 10) {
-		ResizeBy(headerFont.StringWidth(status.info.name) - Bounds().Width() + 10, 0);
+	if (headerFont.StringWidth(info->name) > Bounds().Width() - 10) {
+		ResizeBy(headerFont.StringWidth(info->name) - Bounds().Width() + 10, 0);
 	}
 	
 	viewRect = Bounds();
 	viewRect.bottom = fh.ascent + fh.descent;
-	BStringView *strView = new BStringView(viewRect, "header", status.info.name, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	BStringView *strView = new BStringView(viewRect, "header", info->name, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	strView->SetFont(&headerFont);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	
@@ -38,32 +38,32 @@ TRInfoWindow::TRInfoWindow(tr_stat_t status) : BWindow(BRect(0, 0, 250, 175), "I
 	BTextView *txtView = new BTextView(viewRect, "infoText", viewRect, B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	txtView->MakeEditable(false);
 	
-	BString strTracker(status.info.trackerAddress);
-	strTracker << ":" << status.info.trackerPort;
+	BString strTracker(status->trackerAddress);
+	strTracker << ":" << status->trackerPort;
 
 	BString strPieceSize("");
-	StringForFileSize(status.info.pieceSize, &strPieceSize);
+	StringForFileSize(info->pieceSize, &strPieceSize);
 
 	BString strTotalSize("");
-	StringForFileSize(status.info.totalSize, &strTotalSize);
+	StringForFileSize(info->totalSize, &strTotalSize);
 
 	BString strDownloaded("");
-	StringForFileSize(status.downloaded, &strDownloaded);
+	StringForFileSize(status->downloaded, &strDownloaded);
 
 	BString strUploaded("");
-	StringForFileSize(status.uploaded, &strUploaded);
+	StringForFileSize(status->uploaded, &strUploaded);
 
-	BString info("");
-	info << "Tracker: " << strTracker << "\n"
-	     << "Announce: " << status.info.trackerAnnounce << "\n"
-	     << "Piece Size: " << strPieceSize << "\n"
-	     << "Pieces: " << status.info.pieceCount << "\n"
-	     << "Total Size: " << strTotalSize << "\n"
-	     << "\n"
-	     << "Folder: " << status.folder << "\n"
-	     << "Downloaded: " << strDownloaded << "\n"
-	     << "Uploaded: " << strUploaded << "\n";
-	txtView->SetText(info.String());
+	BString infoStr("");
+	infoStr << "Tracker: " << strTracker << "\n"
+	        << "Announce: " << status->trackerAnnounce << "\n"
+	        << "Piece Size: " << strPieceSize << "\n"
+	        << "Pieces: " << info->pieceCount << "\n"
+	        << "Total Size: " << strTotalSize << "\n"
+	        << "\n"
+	        << "Folder: " << folder << "\n"
+	        << "Downloaded: " << strDownloaded << "\n"
+	        << "Uploaded: " << strUploaded << "\n";
+	txtView->SetText(infoStr.String());
 	
 	Lock();
 	AddChild(strView);

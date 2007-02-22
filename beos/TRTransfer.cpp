@@ -10,14 +10,18 @@
 /**
  * BListItem that renders Transfer status.
  */
-TRTransfer::TRTransfer(const char *fullpath, node_ref node) : BListItem(0, false), cachedNodeRef(node) {
+TRTransfer::TRTransfer(const char *fullpath, node_ref node, tr_torrent_t *torrentRef) : BListItem(0, false), cachedNodeRef(node) {
 	fBaselineOffset = 0.0f;
 	fLineSpacing = 0.0f;
+	torrent = torrentRef;
 	
 	cachedPath = new BString(fullpath);
 	fStatusLock = new BLocker("Status Locker", true);
 	
 	fStatus = (tr_stat_t*)calloc(1, sizeof(tr_stat_t));
+	tr_info_t *info = tr_torrentInfo(torrent);
+	fName = new BString("<unknown name>");
+	fName->SetTo(info->name);
 	
 	fBarColor.red = 50;
 	fBarColor.green = 150;
@@ -36,6 +40,7 @@ TRTransfer::~TRTransfer() {
 		delete fStatusLock;
 	}
 	delete cachedPath;
+	delete fName;
 }
 
 
@@ -64,7 +69,7 @@ void TRTransfer::Update(BView *owner, const BFont *font) {
  * This is a thread-safe function, as all writing to the 
  * local fStatus requires a successful Lock on fStatusLock.
  */
-bool TRTransfer::SetStatus(tr_stat_t *stat, bool shade) {
+bool TRTransfer::UpdateStatus(tr_stat_t *stat, bool shade) {
 	bool dirty = false;
 	if (fStatusLock->Lock()) {
 		if (fStatus->status != stat->status ||
@@ -79,6 +84,12 @@ bool TRTransfer::SetStatus(tr_stat_t *stat, bool shade) {
 		fShade = shade;
 	}
 	return dirty;
+}
+
+bool TRTransfer::IsRunning() {
+	return (fStatus != NULL && 
+			(fStatus->status &
+			          (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)));
 }
 
 
@@ -110,7 +121,7 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool complete) {
 	textLoc += BPoint(2, fBaselineOffset);
 	
 	if (fStatus != NULL && fStatusLock->Lock()) {
-		owner->DrawString(fStatus->info.name, textLoc);
+		owner->DrawString(fName->String(), textLoc);
 		
 		if (fStatus->status & TR_STATUS_PAUSE ) {
 			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->progress);

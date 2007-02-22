@@ -11,7 +11,7 @@
 
 class TRInfoWindow : public BWindow {
 public:
-	TRInfoWindow(tr_stat_t status);
+	TRInfoWindow(tr_stat_t *status, tr_info_t *info, char *folder);
 	~TRInfoWindow();
 	
 	virtual void FrameResized(float width, float height);
