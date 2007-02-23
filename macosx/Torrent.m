@@ -1043,15 +1043,38 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->swarmspeed;
 }
 
-- (void) updateFileProgress
+- (BOOL) updateFileProgress
 {
-    float * progress = tr_torrentCompletion( fHandle );
+    BOOL change = NO;
+    float * progress = tr_torrentCompletion(fHandle);
+    NSNumber * progressNum;
+    NSMutableDictionary * item, * dict;
     
     int i, fileCount = [self fileCount];
     for (i = 0; i < fileCount; i++)
-        [[fFileFlatList objectAtIndex: i] setObject: [NSNumber numberWithFloat: progress[i]] forKey: @"Progress"];
+    {
+        if (!(progressNum = [[fFileFlatList objectAtIndex: i] objectForKey: @"Progress"])
+                || [progressNum floatValue] != progress[i])
+        {
+            item = [fFileFlatList objectAtIndex: i];
+            [item setObject: [NSNumber numberWithFloat: progress[i]] forKey: @"Progress"];
+            change = YES;
+            
+            if (progress[i] == 1.0)
+            {
+                dict = item;
+                while ((dict = [dict objectForKey: @"Parent"]))
+                    [dict setObject: [NSNumber numberWithInt: [[dict objectForKey: @"Remaining"] intValue]-1]
+                            forKey: @"Remaining"];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName: @"FileFinished" object: item];
+            }
+        }
+    }
     
     free(progress);
+    
+    return change;
 }
 
 - (NSNumber *) orderValue
@@ -1256,7 +1279,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [siblings addObject: dict];
         
         if (isFolder)
+        {
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
+            [dict setObject: [NSNumber numberWithInt: 1] forKey: @"Remaining"];
+        }
         else
         {
             [flatList addObject: dict];
@@ -1269,6 +1295,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     else
     {
+        if (isFolder)
+            [dict setObject: [NSNumber numberWithInt: [[dict objectForKey: @"Remaining"] intValue]+1] forKey: @"Remaining"];
+        
         int dictState = [[dict objectForKey: @"Check"] intValue];
         if (dictState != NSMixedState && dictState != state)
             [dict setObject: [NSNumber numberWithInt: NSMixedState] forKey: @"Check"];

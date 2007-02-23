@@ -172,7 +172,7 @@
 - (uint64_t)    uploadedTotal;
 - (float)       swarmSpeed;
 
-- (void) updateFileProgress;
+- (BOOL) updateFileProgress;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;

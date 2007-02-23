@@ -107,13 +107,19 @@
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
+    [[NSNotificationCenter defaultCenter] addObserver: self
+            selector: @selector(fileFinished:) name: @"FileFinished" object: nil];
+    
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
 }
 
 - (void) dealloc
 {
-    [fTorrents release];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    if (fTorrents)
+        [fTorrents release];
     if (fPeers)
         [fPeers release];
     if (fFiles)
@@ -399,8 +405,8 @@
     if ([fTorrents count] != 1)
         return;
     
-    [[fTorrents objectAtIndex: 0] updateFileProgress];
-    [fFileOutline reloadData];
+    if ([[fTorrents objectAtIndex: 0] updateFileProgress])
+        [fFileOutline reloadData];
 }
 
 - (void) updateInfoSettings
@@ -710,7 +716,7 @@
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView willDisplayCell: (id) cell
-            forTableColumn: (NSTableColumn *) tableColumn item:(id) item
+            forTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     if ([[tableColumn identifier] isEqualToString: @"Name"])
     {
@@ -723,8 +729,16 @@
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
-        /*[(NSButtonCell *)cell setImagePosition: item ? NSImageOnly : NSNoImage];
-        [cell setEnabled: NO];*/
+        /*if (!item)
+        {
+            [(NSButtonCell *)cell setImagePosition: NSNoImage];
+            [cell setEnabled: NO];
+            return;
+        }
+        
+        [(NSButtonCell *)cell setImagePosition: NSImageOnly];
+        [cell setEnabled: [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Remaining"] intValue] > 0
+                                                                    : [[item objectForKey: @"Progress"] floatValue] < 1.0];*/
         [(NSButtonCell *)cell setImagePosition: NSNoImage];
     }
     else;
@@ -736,6 +750,16 @@
     int state = [object intValue] != NSOffState ? NSOnState : NSOffState;
     
     [self setFileCheckState: state forItem: item];
+    NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
+    
+    [fFileOutline reloadItem: topItem reloadChildren: YES];
+}
+
+- (void) fileFinished: (NSNotification *) notification
+{
+    NSMutableDictionary * item = [notification object];
+    
+    [item setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
     NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
     
     [fFileOutline reloadItem: topItem reloadChildren: YES];
