@@ -563,7 +563,7 @@ parsepath( GtkTreeStore * store, GtkTreeIter * ret,
 {
     GtkTreeModel * model;
     GtkTreeIter  * parent, start, iter;
-    char         * file, * dir, * mykey, * modelkey;
+    char         * file, * dir, * lower, * mykey, * modelkey;
     const char   * stock;
 
     model  = GTK_TREE_MODEL( store );
@@ -577,7 +577,8 @@ parsepath( GtkTreeStore * store, GtkTreeIter * ret,
         parent = &start;
     }
 
-    mykey = g_utf8_collate_key( file, -1 );
+    lower = g_utf8_casefold( file, -1 );
+    mykey = g_utf8_collate_key( lower, -1 );
     if( gtk_tree_model_iter_children( model, &iter, parent ) )
     {
         do
@@ -606,6 +607,7 @@ parsepath( GtkTreeStore * store, GtkTreeIter * ret,
                         FC_KEY, mykey, FC_STOCK, stock, FC_SIZE, size, -1 );
   done:
     g_free( mykey );
+    g_free( lower );
     g_free( file );
     if( NULL != ret )
     {
