@@ -56,18 +56,13 @@ struct _TrWindow
     GtkTreeView       * view;
     GtkStatusbar      * status;
     GtkToolbar        * toolbar;
+    GtkMenuShell      * menu;
     GObject           * namerend;
     int                 doubleclick;
-    struct
-    {
-        char          * label;
-        GtkWidget     * tool;
-        int             id;
-        int             flags;
-    }                * actions;
-    int                count;
-    GtkWidget        * stupidpopuphack;
-    gboolean           disposed;
+    GList             * actions;
+    GtkAccelGroup     * accel;
+    GtkWidget         * stupidpopuphack;
+    gboolean            disposed;
 };
 
 struct _TrWindowClass
@@ -84,7 +79,7 @@ tr_window_new( void );
 
 void
 tr_window_action_add( TrWindow * wind, int id, int flags, const char * name,
-                      const char * icon, const char * description );
+                      const char * icon, const char * description, guint key );
 
 void
 tr_window_update( TrWindow * wind, float downspeed, float upspeed );

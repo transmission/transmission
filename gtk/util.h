@@ -49,6 +49,7 @@ typedef void (*callbackfunc_t)(void*);
 #define ACTF_ALWAYS     ( 1 << 2 ) /* available regardless of selection */
 #define ACTF_ACTIVE     ( 1 << 3 ) /* available for active torrent */
 #define ACTF_INACTIVE   ( 1 << 4 ) /* available for inactive torrent */
+#define ACTF_SEPARATOR  ( 1 << 5 ) /* dummy action to create menu separator */
 /* appear in the toolbar and the popup menu */
 #define ACTF_WHEREVER   ( ACTF_TOOL | ACTF_MENU )
 /* available if there is something selected */
@@ -129,6 +130,30 @@ const char *
 getdownloaddir( void );
 
 #ifdef GTK_MAJOR_VERSION
+
+/* action handling */
+struct action
+{
+    int            id;
+    int            flags;
+    char         * label;
+    char         * stock;
+    GtkWidget    * tool;
+    GtkWidget    * menu;
+    callbackfunc_t func;
+    gpointer       data;
+};
+struct action *
+action_new( int id, int flags, const char * label, const char * stock );
+void
+action_free( struct action * act );
+GtkWidget *
+action_maketool( struct action * act, const char * key,
+                 GCallback func, gpointer data );
+GtkWidget *
+action_makemenu( struct action * act, const char * actkey,
+                 GtkAccelGroup * accel, const char * path, guint keyval,
+                 GCallback func, gpointer data );
 
 /* here there be dragons */
 void

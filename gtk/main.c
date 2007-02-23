@@ -81,16 +81,21 @@ struct exitdata {
     guint           timer;
 };
 
-enum action
+enum
 {
     ACT_OPEN = 0,
     ACT_START,
     ACT_STOP,
     ACT_DELETE,
+    ACT_SEPARATOR1,
     ACT_INFO,
     ACT_FILES,
-    ACT_PREF,
     ACT_DEBUG,
+    ACT_SEPARATOR2,
+    ACT_PREF,
+    ACT_SEPARATOR3,
+    ACT_CLOSE,
+    ACT_QUIT,
     ACT_ICON,
     ACTION_COUNT,
 };
@@ -99,29 +104,37 @@ struct
 {
     const char * label;
     const char * icon;
+    guint        key;
     int          flags;
     const char * tooltip;
 }
 actions[] =
 {
-    { N_("Add"),         GTK_STOCK_ADD,         ACTF_WHEREVER | ACTF_ALWAYS,
+    { NULL,        GTK_STOCK_ADD,       'o', ACTF_WHEREVER | ACTF_ALWAYS,
       N_("Add a new torrent") },
-    { N_("Start"),       GTK_STOCK_EXECUTE,     ACTF_WHEREVER | ACTF_INACTIVE,
+    { N_("Start"), GTK_STOCK_EXECUTE,     0, ACTF_WHEREVER | ACTF_INACTIVE,
       N_("Start a torrent that is not running") },
-    { N_("Stop"),        GTK_STOCK_STOP,        ACTF_WHEREVER | ACTF_ACTIVE,
+    { NULL,        GTK_STOCK_STOP,        0, ACTF_WHEREVER | ACTF_ACTIVE,
       N_("Stop a torrent that is running") },
-    { N_("Remove"),      GTK_STOCK_REMOVE,      ACTF_WHEREVER | ACTF_WHATEVER,
+    { NULL,        GTK_STOCK_REMOVE,      0, ACTF_WHEREVER | ACTF_WHATEVER,
       N_("Remove a torrent") },
-    { N_("Properties"),  GTK_STOCK_PROPERTIES,  ACTF_WHEREVER | ACTF_WHATEVER,
+    { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
+    { NULL,        GTK_STOCK_PROPERTIES,  0, ACTF_WHEREVER | ACTF_WHATEVER,
       N_("Show additional information about a torrent") },
-    { N_("Files"),       NULL,                  ACTF_MENU     | ACTF_WHATEVER,
+    { N_("Files"), NULL,                  0, ACTF_MENU     | ACTF_WHATEVER,
       N_("Show a list of the files in a torrent"), },
-    { N_("Preferences"), GTK_STOCK_PREFERENCES, ACTF_WHEREVER | ACTF_ALWAYS,
-      N_("Customize application behavior") },
-    { N_("Open debug window"), NULL,            ACTF_MENU     | ACTF_ALWAYS,
+    { N_("Open debug window"), NULL,      0, ACTF_MENU     | ACTF_ALWAYS,
       NULL },
+    { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
+    { NULL,        GTK_STOCK_PREFERENCES, 0, ACTF_WHEREVER | ACTF_ALWAYS,
+      N_("Customize application behavior") },
+    { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
+    { NULL,        GTK_STOCK_CLOSE,       0, ACTF_MENU     | ACTF_ALWAYS,
+      N_("Close the main window") },
+    { NULL,        GTK_STOCK_QUIT,        0, ACTF_MENU     | ACTF_ALWAYS,
+      N_("Exit the program") },
     /* this isn't a terminator for the list, it's ACT_ICON */
-    { NULL,              NULL,                  0, NULL },
+    { NULL,        NULL,                  0, 0, NULL },
 };
 
 #define CBDATA_PTR              "callback-data-pointer"
@@ -167,7 +180,7 @@ windact(GtkWidget *widget, int action, gpointer gdata);
 static GList *
 getselection( struct cbdata * cbdata );
 static void
-handleaction(struct cbdata *data, enum action action);
+handleaction( struct cbdata *data, int action );
 
 static void
 addtorrents(void *vdata, void *state, GList *files,
@@ -425,7 +438,8 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     {
         tr_window_action_add( wind, ii, actions[ii].flags,
                               gettext( actions[ii].label ), actions[ii].icon,
-                              gettext( actions[ii].tooltip ) );
+                              gettext( actions[ii].tooltip ),
+                              actions[ii].key );
     }
     g_object_set( wind, "model", cbdata->model,
                         "double-click-action", ACT_INFO, NULL);
@@ -459,6 +473,7 @@ static void
 makeicon( struct cbdata * cbdata )
 {
     TrIcon * icon;
+    int      ii;
 
     if( NULL != cbdata->icon )
     {
@@ -466,8 +481,13 @@ makeicon( struct cbdata * cbdata )
     }
 
     icon = tr_icon_new();
+    for( ii = 0; ii < ALEN( actions ); ii++ )
+    {
+        tr_icon_action_add( TR_ICON( icon ), ii, actions[ii].flags,
+                              gettext( actions[ii].label ), actions[ii].icon );
+    }
     g_object_set( icon, "activate-action", ACT_ICON, NULL);
-    g_signal_connect( icon, "action", G_CALLBACK( windact  ), cbdata );
+    g_signal_connect( icon, "action", G_CALLBACK( windact ), cbdata );
 
     cbdata->icon = icon;
 }
@@ -872,7 +892,7 @@ getselection( struct cbdata * cbdata )
 }
 
 static void
-handleaction( struct cbdata * data, enum action act )
+handleaction( struct cbdata * data, int act )
 {
   GList *rows, *ii;
   GtkTreePath *path;
@@ -912,6 +932,19 @@ handleaction( struct cbdata * data, enum action act )
           return;
       case ACT_ICON:
           remakewind( data );
+          return;
+      case ACT_CLOSE:
+          if( NULL != data->wind )
+          {
+              winclose( NULL, NULL, data );
+          }
+          return;
+      case ACT_QUIT:
+          askquit( data->wind, wannaquit, data );
+          return;
+      case ACT_SEPARATOR1:
+      case ACT_SEPARATOR2:
+      case ACT_SEPARATOR3:
           return;
       case ACT_START:
       case ACT_STOP:
@@ -966,6 +999,11 @@ handleaction( struct cbdata * data, enum action act )
               case ACT_PREF:
               case ACT_DEBUG:
               case ACT_ICON:
+              case ACT_CLOSE:
+              case ACT_QUIT:
+              case ACT_SEPARATOR1:
+              case ACT_SEPARATOR2:
+              case ACT_SEPARATOR3:
               case ACTION_COUNT:
                   break;
           }

@@ -63,6 +63,8 @@ struct _TrIcon
 #else
     GObject       parent;
 #endif
+    GtkWidget   * menu;
+    GList       * actions;
     int           clickact;
     gboolean      disposed;
 };
@@ -85,5 +87,9 @@ tr_icon_new( void );
 
 gboolean
 tr_icon_docked( TrIcon * icon );
+
+void
+tr_icon_action_add( TrIcon * icon, int id, int flags, const char * label,
+                    const char * stock );
 
 #endif

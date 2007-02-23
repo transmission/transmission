@@ -375,6 +375,102 @@ windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
     gtk_window_set_focus( GTK_WINDOW( wind ), NULL );
 }
 
+struct action *
+action_new( int id, int flags, const char * label, const char * stock )
+{
+    struct action * act;
+
+    act        = g_new0( struct action, 1 );
+    act->id    = id;
+    act->flags = flags;
+    act->label = g_strdup( label );
+    act->stock = g_strdup( stock );
+    act->tool  = NULL;
+    act->menu  = NULL;
+
+    return act;
+}
+
+void
+action_free( struct action * act )
+{
+    g_free( act->label );
+    g_free( act->stock );
+    g_free( act );
+}
+
+GtkWidget *
+action_maketool( struct action * act, const char * key,
+                 GCallback func, gpointer data )
+{
+    GtkToolItem * item;
+
+    item = gtk_tool_button_new_from_stock( act->stock );
+    if( NULL != act->label )
+    {
+        gtk_tool_button_set_label( GTK_TOOL_BUTTON( item ), act->label );
+    }
+    g_object_set_data( G_OBJECT( item ), key, act );
+    g_signal_connect( item, "clicked", func, data );
+    gtk_widget_show( GTK_WIDGET( item ) );
+
+    return GTK_WIDGET( item );
+}
+
+GtkWidget *
+action_makemenu( struct action * act, const char * actkey,
+                 GtkAccelGroup * accel, const char * path, guint keyval,
+                 GCallback func, gpointer data )
+{
+    GtkWidget  * item, * label;
+    GdkModifierType mod;
+    GtkStockItem stock;
+    const char * name;
+    char       * joined;
+
+    mod = GDK_CONTROL_MASK;
+    name = act->label;
+    if( NULL == act->stock )
+    {
+        item = gtk_menu_item_new_with_label( act->label );
+    }
+    else
+    {
+        item = gtk_image_menu_item_new_from_stock( act->stock, NULL );
+        if( NULL == act->label )
+        {
+            if( gtk_stock_lookup( act->stock, &stock ) )
+            {
+                name = stock.label;
+                if( 0 == keyval )
+                {
+                    keyval = stock.keyval;
+                    mod    = stock.modifier;
+                }
+            }
+        }
+        else
+        {
+            label = gtk_bin_get_child( GTK_BIN( item ) );
+            gtk_label_set_text( GTK_LABEL( label ), act->label );
+            
+        }
+    }
+
+    if( NULL != accel && 0 < keyval && NULL != name )
+    {
+        joined = g_strjoin( "/", path, name, NULL );
+        gtk_accel_map_add_entry( joined, keyval, mod );
+        gtk_widget_set_accel_path( item, joined, accel );
+        g_free( joined );
+    }
+    g_object_set_data( G_OBJECT( item ), actkey, act );
+    g_signal_connect( item, "activate", func, data );
+    gtk_widget_show( item );
+
+    return item;
+}
+
 void
 errmsg( GtkWindow * wind, const char * format, ... )
 {

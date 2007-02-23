@@ -28,6 +28,8 @@
 #include "tr_icon.h"
 #include "util.h"
 
+#define ITEM_ACTION             "tr-icon-item-action"
+
 enum
 {
     PROP_ICON = 1,
@@ -48,10 +50,14 @@ tr_icon_class_init( gpointer g_class, gpointer g_class_data );
 static void
 tr_icon_dispose( GObject * obj );
 static void
-tr_icon_finalize( GObject * obj );
+itemclick( GObject * obj, gpointer data );
+static void
+emitaction( TrIcon * self, int id );
 #ifdef TR_ICON_SUPPORTED
 static void
-clicked( GObject * obj, gpointer data );
+clicked( TrIcon * self, gpointer data );
+static void
+popup( TrIcon * self, guint button, guint when, gpointer data );
 #endif
 
 GType
@@ -96,7 +102,6 @@ tr_icon_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->set_property = tr_icon_set_property;
     gobject_class->get_property = tr_icon_get_property;
     gobject_class->dispose      = tr_icon_dispose;
-    gobject_class->finalize     = tr_icon_finalize;
 
     pspec = g_param_spec_boolean( "icon", _("Icon"),
                                  _("Icon has been set from default window icon."),
@@ -127,10 +132,15 @@ tr_icon_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     TrIcon * self = ( TrIcon * )instance;
 
     self->clickact  = -1;
+    self->menu      = NULL;
+    self->actions   = NULL;
     self->disposed  = FALSE;
 
 #ifdef TR_ICON_SUPPORTED
+    self->menu = gtk_menu_new();
+    gtk_widget_show( self->menu );
     g_signal_connect( self, "activate", G_CALLBACK( clicked ), NULL );
+    g_signal_connect( self, "popup-menu", G_CALLBACK( popup ), NULL );
 #endif
 }
 
@@ -239,19 +249,12 @@ tr_icon_dispose( GObject * obj )
     }
     self->disposed = TRUE;
 
+    g_list_foreach( self->actions, ( GFunc )action_free, NULL );
+    g_list_free( self->actions );
+
     /* Chain up to the parent class */
     parent = g_type_class_peek( g_type_parent( TR_ICON_TYPE ) );
     parent->dispose( obj );
-}
-
-static void
-tr_icon_finalize( GObject * obj )
-{
-    GObjectClass * parent;
-
-    /* Chain up to the parent class */
-    parent = g_type_class_peek( g_type_parent( TR_ICON_TYPE ) );
-    parent->finalize( obj );
 }
 
 TrIcon *
@@ -270,24 +273,90 @@ tr_icon_docked( TrIcon * self )
     return ret;
 }
 
+void
+tr_icon_action_add( TrIcon * self, int id, int flags, const char * name,
+                    const char * icon )
+{
+    struct action * act;
+    GtkWidget     * item;
+
+    TR_IS_ICON( self );
+    if( self->disposed )
+    {
+        return;
+    }
+
+    act = action_new( id, flags, name, icon );
+
+    if( NULL != self->menu )
+    {
+        if( ACTF_MENU & flags && ACTF_ALWAYS & flags )
+        {
+            item = action_makemenu( act, ITEM_ACTION, NULL, NULL, 0,
+                                    G_CALLBACK( itemclick ), self );
+            gtk_menu_shell_append( GTK_MENU_SHELL( self->menu ), item );
+            act->menu = item;
+        }
+        else if( ACTF_SEPARATOR & flags )
+        {
+            item = gtk_separator_menu_item_new();
+            gtk_widget_show( item );
+            gtk_menu_shell_append( GTK_MENU_SHELL( self->menu ), item );
+        }
+    }
+
+    self->actions = g_list_append( self->actions, act );
+}
+
+static void
+itemclick( GObject * obj, gpointer data )
+{
+    TrIcon        * self;
+    struct action * act;
+
+    TR_IS_ICON( data );
+    self = TR_ICON( data );
+    act = g_object_get_data( obj, ITEM_ACTION );
+
+    emitaction( self, act->id );
+}
+
+static void
+emitaction( TrIcon * self, int id )
+{
+    TrIconClass * class;
+
+    class = g_type_class_peek( TR_ICON_TYPE );
+    g_signal_emit( self, class->actionsig, 0, id );
+}
+
 #ifdef TR_ICON_SUPPORTED
 
 static void
-clicked( GObject * obj, gpointer data SHUTUP )
+clicked( TrIcon * self, gpointer data SHUTUP )
 {
-    TrIcon      * self;
-    TrIconClass * class;
-
-    TR_IS_ICON( obj );
-    self = TR_ICON( obj );
+    TR_IS_ICON( self );
 
     if( self->disposed || 0 > self->clickact )
     {
         return;
     }
 
-    class = g_type_class_peek( TR_ICON_TYPE );
-    g_signal_emit( self, class->actionsig, 0, self->clickact );
+    emitaction( self, self->clickact );
+}
+
+static void
+popup( TrIcon * self, guint button, guint when, gpointer data SHUTUP )
+{
+    TR_IS_ICON( self );
+
+    if( self->disposed )
+    {
+        return;
+    }
+
+    gtk_menu_popup( GTK_MENU( self->menu ), NULL, NULL,
+                    gtk_status_icon_position_menu, self, button, when );
 }
 
 #endif /* TR_ICON_SUPPORTED */

@@ -34,7 +34,7 @@
 #include "tr_window.h"
 #include "util.h"
 
-#define MENU_ITEM_ACTION        "tr-menu-item-action"
+#define ITEM_ACTION             "tr-window-item-action"
 
 enum
 {
@@ -57,14 +57,10 @@ static void
 tr_window_class_init( gpointer g_class, gpointer g_class_data );
 static void
 tr_window_dispose( GObject * obj );
-static void
-tr_window_finalize( GObject * obj );
 static GtkTreeView *
 makeview( TrWindow * self );
 static void
 stylekludge( GObject * obj, GParamSpec * spec, gpointer data );
-static void
-toolclick( GtkWidget * item, gpointer data );
 static void
 fixbuttons( GtkTreeSelection *sel, TrWindow * self );
 static void
@@ -80,7 +76,7 @@ listpopup( GtkWidget * view SHUTUP, gpointer data );
 static void
 popupmenu( TrWindow * self, GdkEventButton * event );
 static void
-menuclick( GtkWidget * item, gpointer data );
+itemclick( GObject * obj, gpointer data );
 static void
 doubleclick( GtkWidget * view, GtkTreePath * path,
              GtkTreeViewColumn * col SHUTUP, gpointer data );
@@ -130,7 +126,6 @@ tr_window_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->set_property = tr_window_set_property;
     gobject_class->get_property = tr_window_get_property;
     gobject_class->dispose      = tr_window_dispose;
-    gobject_class->finalize     = tr_window_finalize;
 
     pspec = g_param_spec_object( "model", _("Model"),
                                  _("The GtkTreeModel for the list view."),
@@ -169,32 +164,43 @@ static void
 tr_window_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 {
     TrWindow * self = ( TrWindow * )instance;
-    GtkWidget * vbox, * scroll, * status, * tools;
+    GtkWidget * vbox, * scroll, * status, * tools, * menu, * file, * item;
 
     vbox   = gtk_vbox_new( FALSE, 0 );
     scroll = gtk_scrolled_window_new( NULL, NULL );
     status = gtk_statusbar_new();
     tools  = gtk_toolbar_new();
+    menu   = gtk_menu_bar_new();
+    file   = gtk_menu_new();
+    item   = gtk_menu_item_new_with_mnemonic( _("_File") );
 
     self->scroll          = GTK_SCROLLED_WINDOW( scroll );
     self->view            = makeview( self );
     self->status          = GTK_STATUSBAR( status );
     self->toolbar         = GTK_TOOLBAR( tools );
+    self->menu            = GTK_MENU_SHELL( file );
     /* this should have been set by makeview() */
     g_assert( NULL != self->namerend );
     self->doubleclick     = -1;
     self->actions         = NULL;
-    self->count           = 0;
+    self->accel           = gtk_accel_group_new();
     self->stupidpopuphack = NULL;
     self->disposed        = FALSE;
 
+    gtk_window_add_accel_group( GTK_WINDOW( self ), self->accel );
+    gtk_menu_set_accel_group( GTK_MENU( self->menu ), self->accel );
+
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM( item ), file );
+    gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
+    gtk_box_pack_start( GTK_BOX( vbox ), menu, FALSE, FALSE, 0 );
+
     gtk_toolbar_set_tooltips( self->toolbar, TRUE );
     gtk_toolbar_set_show_arrow( self->toolbar, FALSE );
-    gtk_scrolled_window_set_policy( self->scroll,
-                                    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
-    gtk_box_pack_start( GTK_BOX( vbox ), GTK_WIDGET( self->toolbar) ,
+    gtk_box_pack_start( GTK_BOX( vbox ), GTK_WIDGET( self->toolbar ),
                         FALSE, FALSE, 0 );
 
+    gtk_scrolled_window_set_policy( self->scroll,
+                                    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
     gtk_container_add( GTK_CONTAINER( scroll ), GTK_WIDGET( self->view ) );
     gtk_box_pack_start( GTK_BOX( vbox ), scroll, TRUE, TRUE, 0 );
 
@@ -290,6 +296,9 @@ tr_window_dispose( GObject * obj )
     }
     self->disposed = TRUE;
 
+    g_list_foreach( self->actions, ( GFunc )action_free, NULL );
+    g_list_free( self->actions );
+    g_object_unref( self->accel );
     if( NULL != self->stupidpopuphack )
     {
         gtk_widget_destroy( self->stupidpopuphack );
@@ -301,24 +310,6 @@ tr_window_dispose( GObject * obj )
     parent->dispose( obj );
 }
 
-static void
-tr_window_finalize( GObject * obj )
-{
-    TrWindow     * self = ( TrWindow * )obj;
-    GObjectClass * parent;
-    int            ii;
-
-    for( ii = 0; ii < self->count; ii++ )
-    {
-        g_free( self->actions[ii].label );
-    }
-    g_free( self->actions );
-
-    /* Chain up to the parent class */
-    parent = g_type_class_peek( g_type_parent( TR_WINDOW_TYPE ) );
-    parent->finalize( obj );
-}
-
 GtkWidget *
 tr_window_new( void )
 {
@@ -327,10 +318,10 @@ tr_window_new( void )
 
 void
 tr_window_action_add( TrWindow * self, int id, int flags, const char * name,
-                      const char * icon, const char * description )
+                      const char * icon, const char * description, guint key )
 {
-    GtkWidget   * widget;
-    GtkToolItem * item;
+    struct action * act;
+    GtkWidget     * sep;
 
     TR_IS_WINDOW( self );
     if( self->disposed )
@@ -338,26 +329,33 @@ tr_window_action_add( TrWindow * self, int id, int flags, const char * name,
         return;
     }
 
-    widget = NULL;
+    act = action_new( id, flags, name, icon );
+
     if( ACTF_TOOL & flags )
     {
-        item = gtk_tool_button_new_from_stock( icon );
-        gtk_tool_button_set_label( GTK_TOOL_BUTTON( item ), name );
-        gtk_tool_item_set_tooltip( item, self->toolbar->tooltips,
-                                   description, "" );
-        g_signal_connect( item, "clicked", G_CALLBACK( toolclick ), self );
-        gtk_toolbar_insert( self->toolbar, item, -1 );
-        widget = GTK_WIDGET( item );
-        gtk_widget_show( widget );
+        act->tool = action_maketool( act, ITEM_ACTION,
+                                     G_CALLBACK( itemclick ), self );
+        gtk_tool_item_set_tooltip( GTK_TOOL_ITEM( act->tool ),
+                                   self->toolbar->tooltips, description, "" );
+        gtk_toolbar_insert( self->toolbar, GTK_TOOL_ITEM( act->tool ), -1 );
     }
 
-    self->count++;
-    self->actions = g_realloc( self->actions,
-                               sizeof( self->actions[0] ) * self->count );
-    self->actions[self->count-1].label = g_strdup( name );
-    self->actions[self->count-1].tool  = widget;
-    self->actions[self->count-1].id    = id;
-    self->actions[self->count-1].flags = flags;
+    if( ACTF_MENU & flags )
+    {
+        act->menu = action_makemenu( act, ITEM_ACTION, self->accel,
+                                     "<transmission-mainwind>/file", key,
+                                     G_CALLBACK( itemclick ), self );
+        gtk_menu_shell_append( self->menu, act->menu );
+    }
+
+    if( ACTF_SEPARATOR & flags )
+    {
+        sep = gtk_separator_menu_item_new();
+        gtk_widget_show( sep );
+        gtk_menu_shell_append( self->menu, sep );
+    }
+
+    self->actions = g_list_append( self->actions, act );
 }
 
 void
@@ -469,37 +467,13 @@ stylekludge( GObject * obj, GParamSpec * spec, gpointer data )
     }
 }
 
-static void
-toolclick( GtkWidget * item, gpointer data )
-{
-    TrWindow * self;
-    int        ii;
-
-    TR_IS_WINDOW( data );
-    self = TR_WINDOW( data );
-    if( self->disposed )
-    {
-        return;
-    }
-
-    for( ii = 0; ii < self->count; ii++ )
-    {
-        if( item == self->actions[ii].tool )
-        {
-            goto foundit;
-        }
-    }
-    g_assert_not_reached();
-  foundit:
-
-    emitaction( self, self->actions[ii].id );
-}
-
-/* disable buttons the user shouldn't be able to click on */
+/* disable buttons and menuitems the user shouldn't be able to click on */
 static void
 fixbuttons( GtkTreeSelection *sel, TrWindow * self ) {
-    gboolean selected, avail;
-    int      ii, status;
+    gboolean        selected, avail;
+    GList         * ii;
+    int             status;
+    struct action * act;
 
     TR_IS_WINDOW( self );
     if( self->disposed )
@@ -515,15 +489,23 @@ fixbuttons( GtkTreeSelection *sel, TrWindow * self ) {
     gtk_tree_selection_selected_foreach( sel, orstatus, &status );
     selected = ( 0 < gtk_tree_selection_count_selected_rows( sel ) );
 
-    for( ii = 0; ii < self->count; ii++ )
+    for( ii = g_list_first( self->actions ); NULL != ii; ii = ii->next )
     {
-        if( !( ACTF_ALWAYS & self->actions[ii].flags ) &&
-               ACTF_TOOL   & self->actions[ii].flags )
+        act = ii->data;
+        if( ACTF_ALWAYS & act->flags )
         {
-            g_assert( NULL != self->actions[ii].tool );
-            avail = ACT_ISAVAIL( self->actions[ii].flags, status );
-            gtk_widget_set_sensitive( self->actions[ii].tool,
-                                      selected && avail );
+            continue;
+        }
+        avail = ACT_ISAVAIL( act->flags, status );
+        if( ACTF_TOOL & act->flags )
+        {
+            g_assert( NULL != act->tool );
+            gtk_widget_set_sensitive( act->tool, selected && avail );
+        }
+        if( ACTF_MENU & act->flags )
+        {
+            g_assert( NULL != act->menu );
+            gtk_widget_set_sensitive( act->menu, selected && avail );
         }
     }
 }
@@ -717,8 +699,10 @@ static void
 popupmenu( TrWindow * self, GdkEventButton * event )
 {
     GtkTreeSelection * sel;
-    int count, ii, status;
-    GtkWidget * menu, * item;
+    int                count, status;
+    GtkWidget        * menu, * item;
+    GList            * ii;
+    struct action    * act;
 
     TR_IS_WINDOW( self );
     if( self->disposed )
@@ -739,22 +723,24 @@ popupmenu( TrWindow * self, GdkEventButton * event )
     status = 0;
     gtk_tree_selection_selected_foreach( sel, orstatus, &status );
 
-    for( ii = 0; ii < self->count; ii++ )
+    for( ii = g_list_first( self->actions ); NULL != ii; ii = ii->next )
     {
-        if( !( ACTF_MENU & self->actions[ii].flags ) ||
-            !ACT_ISAVAIL( self->actions[ii].flags, status ) )
+        act = ii->data;
+        if( ACTF_SEPARATOR & act->flags )
         {
-            continue;
+            item = gtk_separator_menu_item_new();
+            gtk_widget_show( item );
+            gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
         }
-        item = gtk_menu_item_new_with_label( self->actions[ii].label );
-        /* set the action for the menu item */
-        g_object_set_data( G_OBJECT( item ), MENU_ITEM_ACTION,
-                           GINT_TO_POINTER( self->actions[ii].id ) );
-        g_signal_connect( item, "activate", G_CALLBACK( menuclick ), self );
-        gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
+        else if( ACTF_MENU & act->flags && ACT_ISAVAIL( act->flags, status ) )
+        {
+            item = action_makemenu( act, ITEM_ACTION, NULL, NULL, 0,
+                                    G_CALLBACK( itemclick ), self );
+            gtk_menu_shell_append( GTK_MENU_SHELL( menu ), item );
+        }
     }
 
-    gtk_widget_show_all( menu );
+    gtk_widget_show( menu );
 
     gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, NULL, NULL,
                     ( NULL == event ? 0 : event->button ),
@@ -762,12 +748,16 @@ popupmenu( TrWindow * self, GdkEventButton * event )
 }
 
 static void
-menuclick( GtkWidget * item, gpointer data )
+itemclick( GObject * obj, gpointer data )
 {
-    gpointer action;
+    TrWindow      * self;
+    struct action * act;
 
-    action = g_object_get_data( G_OBJECT( item ), MENU_ITEM_ACTION );
-    emitaction( data, GPOINTER_TO_INT( action ) );
+    TR_IS_WINDOW( data );
+    self = TR_WINDOW( data );
+    act = g_object_get_data( obj, ITEM_ACTION );
+
+    emitaction( self, act->id );
 }
 
 static void
