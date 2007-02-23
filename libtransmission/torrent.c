@@ -533,6 +533,8 @@ float * tr_torrentCompletion( tr_torrent_t * tor )
         assert( -0.1 < weight && 1.1 > weight );
         if( fileoff == filelen )
         {
+            ret[file] = MIN( 1.0, ret[file] );
+            ret[file] = MAX( 0.0, ret[file] );
             filestart += fileoff;
             fileoff    = 0;
             file++;

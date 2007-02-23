@@ -372,6 +372,7 @@ windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
     }
     gtk_widget_show_now( wind  );
     gtk_window_resize( GTK_WINDOW( wind ), width, height );
+    gtk_window_set_focus( GTK_WINDOW( wind ), NULL );
 }
 
 void
