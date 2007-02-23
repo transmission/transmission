@@ -87,6 +87,8 @@ promptresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 quitresp( GtkWidget * widget, gint resp, gpointer data );
 static void
+stylekludge( GObject * obj, GParamSpec * spec, gpointer data );
+static void
 setscroll( void * arg );
 static void
 fileswindresp( GtkWidget * widget, gint resp, gpointer data );
@@ -465,6 +467,8 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     gtk_tree_view_column_pack_start( col, rend, FALSE );
     gtk_tree_view_column_add_attribute( col, rend, "progress", FC_PROG );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+    /* XXX this shouldn't be necessary */
+    g_signal_connect( view, "notify::style", G_CALLBACK( stylekludge ), rend );
     /* set up view */
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     gtk_tree_selection_set_mode( sel, GTK_SELECTION_NONE );
@@ -511,6 +515,19 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
 
     /* show the window with a nice initial size */
     windowsizehack( wind, scroll, view, setscroll, scroll );
+}
+
+/* kludge to have the progress bars notice theme changes */
+static void
+stylekludge( GObject * obj, GParamSpec * spec, gpointer data )
+{
+    TrCellRendererProgress * rend = TR_CELL_RENDERER_PROGRESS( data );
+
+    if( 0 == strcmp( "style", spec->name ) )
+    {
+        tr_cell_renderer_progress_reset_style( rend );
+        gtk_widget_queue_draw( GTK_WIDGET( obj ) );
+    }
 }
 
 static void
