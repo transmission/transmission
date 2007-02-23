@@ -386,44 +386,19 @@ tr_window_update( TrWindow * self, float downspeed, float upspeed )
     fixbuttons( NULL, self );
 }
 
+static void
+setelip( void * arg )
+{
+    g_object_set( arg, "ellipsize", TRUE, NULL );
+}
+
 void
 tr_window_size_hack( TrWindow * self )
 {
-    GtkRequisition req;
-    gint           width, height;
-    GdkScreen    * screen;
-
     TR_IS_WINDOW( self );
 
-    gtk_widget_realize( GTK_WIDGET( self ) );
-    gtk_widget_size_request( GTK_WIDGET( self->view ), &req );
-    height = req.height;
-    gtk_widget_size_request( GTK_WIDGET( self->scroll ), &req );
-    height -= req.height;
-    gtk_widget_size_request( GTK_WIDGET( self ), &req );
-    height += req.height;
-    screen  = gtk_widget_get_screen( GTK_WIDGET( self ) );
-    width   = MIN( req.width, gdk_screen_get_width( screen  ) / 2 );
-    height  = MIN( height,    gdk_screen_get_height( screen ) / 5 * 4 );
-    if( height > req.width )
-    {
-        height = MIN( height, width * 8 / 5 );
-    }
-    else
-    {
-        height = MAX( height, width * 5 / 8 );
-    }
-    if( height > req.width )
-    {
-        height = MIN( height, width * 8 / 5 );
-    }
-    else
-    {
-        height = MAX( height, width * 5 / 8 );
-    }
-    g_object_set( self, "ellipsize", TRUE, NULL );
-    gtk_widget_show_now( GTK_WIDGET( self ) );
-    gtk_window_resize( GTK_WINDOW( self ), width, height );
+    windowsizehack( GTK_WIDGET( self ), GTK_WIDGET( self->scroll ),
+                    GTK_WIDGET( self->view ), setelip, self );
 }
 
 static GtkTreeView *

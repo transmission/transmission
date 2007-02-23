@@ -38,6 +38,10 @@
 #include "transmission.h"
 
 #define PREFNAME                "transmission-dialog-pref-name"
+#define FILESWIND_EXTRA_INDENT  4
+
+#define STRIPROOT( path )                                                     \
+    ( g_path_is_absolute( (path) ) ? g_path_skip_root( (path) ) : (path) )
 
 struct addcb {
   add_torrents_func_t addfunc;
@@ -62,6 +66,12 @@ struct quitdata
     void         * cbdata;
 };
 
+struct fileswind
+{
+    TrTorrent    * tor;
+    GtkTreeModel * model;
+};
+
 static void
 autoclick(GtkWidget *widget, gpointer gdata);
 static void
@@ -72,6 +82,13 @@ static void
 promptresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 quitresp( GtkWidget * widget, gint resp, gpointer data );
+static void
+parsepath( GtkTreeStore * store, GtkTreeIter * ret,
+           const char * path, int index, uint64_t size );
+static void
+setscroll( void * arg );
+static void
+fileswindresp( GtkWidget * widget, gint resp SHUTUP, gpointer data );
 
 void
 makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
@@ -370,5 +387,171 @@ quitresp( GtkWidget * widget, gint resp, gpointer data )
     }
 
     g_free( stuff );
+    gtk_widget_destroy( widget );
+}
+
+enum filescols { FC_INDEX = 0, FC_LABEL, FC_KEY, FC_STOCK, FC__COUNT };
+
+void
+makefileswind( GtkWindow * parent, TrTorrent * tor )
+{
+    GType cols[] = { G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING };
+    tr_info_t         * inf;
+    GtkTreeStore      * store;
+    int                 ii;
+    GtkWidget         * view, * scroll, * frame, * wind;
+    GtkCellRenderer   * rend;
+    GtkTreeViewColumn * col;
+    GtkTreeSelection  * sel;
+    char              * label;
+    struct fileswind  * fw;
+
+    g_assert( ALEN( cols ) == FC__COUNT );
+
+    /* set up the model */
+    inf   = tr_torrent_info( tor );
+    store = gtk_tree_store_newv( FC__COUNT, cols );
+    for( ii = 0; ii < inf->fileCount; ii++ )
+    {
+        parsepath( store, NULL, STRIPROOT( inf->files[ii].name ),
+                   ii, inf->files[ii].length );
+    }
+    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( store ),
+                                          FC_KEY, GTK_SORT_ASCENDING );
+
+    /* create the view */
+    view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
+    col = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_title( col, _("File") );
+    /* add icon renderer */
+    rend = gtk_cell_renderer_pixbuf_new();
+    gtk_tree_view_column_pack_start( col, rend, FALSE );
+    gtk_tree_view_column_add_attribute( col, rend, "stock-id", FC_STOCK );
+    /* add text renderer */
+    rend = gtk_cell_renderer_text_new();
+    gtk_tree_view_column_pack_start( col, rend, TRUE );
+    gtk_tree_view_column_add_attribute( col, rend, "markup", FC_LABEL );
+    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+    /* set up view */
+    sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
+    gtk_tree_selection_set_mode( sel, GTK_SELECTION_NONE );
+    gtk_tree_view_expand_all( GTK_TREE_VIEW( view ) );
+    gtk_tree_view_set_search_column( GTK_TREE_VIEW( view ), FC_LABEL );
+    gtk_widget_show( view );
+
+    /* create the scrolled window and stick the view in it */
+    scroll = gtk_scrolled_window_new( NULL, NULL );
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),
+                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
+    gtk_container_add( GTK_CONTAINER( scroll ), view );
+    gtk_widget_show( scroll );
+
+    /* create a frame around the scroll to make it look a little better */
+    frame = gtk_frame_new( NULL );
+    gtk_frame_set_shadow_type( GTK_FRAME( frame ), GTK_SHADOW_IN );
+    gtk_container_add( GTK_CONTAINER( frame ), scroll );
+    gtk_widget_show( frame );
+
+    /* create the window */
+    label = g_strdup_printf( _("Files for %s"), inf->name );
+    wind = gtk_dialog_new_with_buttons( label, parent,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        GTK_DIALOG_NO_SEPARATOR, 
+                                        GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                        NULL );
+    g_free( label );
+    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
+    gtk_window_set_resizable( GTK_WINDOW( wind ), TRUE );
+    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( wind )->vbox ), frame );
+
+    /* set up the callback data */
+    fw        = g_new0( struct fileswind, 1 );
+    fw->tor   = tor;
+    fw->model = GTK_TREE_MODEL( store );
+    g_object_add_weak_pointer( G_OBJECT( tor ), ( gpointer * )&fw->tor );
+    g_signal_connect( wind, "response", G_CALLBACK( fileswindresp ), fw );
+
+    /* show the window with a nice initial size */
+    windowsizehack( wind, scroll, view, setscroll, scroll );
+}
+
+static void
+parsepath( GtkTreeStore * store, GtkTreeIter * ret,
+           const char * path, int index, uint64_t size )
+{
+    GtkTreeModel * model;
+    GtkTreeIter  * parent, start, iter;
+    char         * file, * dir, * mykey, * modelkey, * label, * sizestr;
+    const char   * stock;
+
+    model  = GTK_TREE_MODEL( store );
+    parent = NULL;
+    file   = g_path_get_basename( path );
+    if( 0 != strcmp( file, path ) )
+    {
+        dir = g_path_get_dirname( path );
+        parsepath( store, &start, dir, index, size );
+        g_free( dir );
+        parent = &start;
+    }
+
+    mykey = g_utf8_collate_key( file, -1 );
+    if( gtk_tree_model_iter_children( model, &iter, parent ) )
+    {
+        do
+        {
+            gtk_tree_model_get( model, &iter, FC_KEY, &modelkey, -1 );
+            if( NULL != modelkey && 0 == strcmp( mykey, modelkey ) )
+            {
+                goto done;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
+    }
+
+    gtk_tree_store_append( store, &iter, parent );
+    if( NULL == ret )
+    {
+        sizestr = readablesize( size );
+        label = g_markup_printf_escaped( _("<small>%s (%s)</small>"),
+                                         file, sizestr );
+        g_free( sizestr );
+        stock = GTK_STOCK_FILE;
+    }
+    else
+    {
+        label = g_markup_printf_escaped( _("<small>%s</small>"), file );
+        stock = GTK_STOCK_DIRECTORY;
+    }
+    gtk_tree_store_set( store, &iter, FC_INDEX, index, FC_LABEL, label,
+                        FC_KEY, mykey, FC_STOCK, stock, -1 );
+    g_free( label );
+  done:
+    g_free( mykey );
+    g_free( file );
+    if( NULL != ret )
+    {
+        memcpy( ret, &iter, sizeof( iter ) );
+    }
+}
+
+static void
+setscroll( void * arg )
+{
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( arg ),
+        GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+}
+
+static void
+fileswindresp( GtkWidget * widget, gint resp SHUTUP, gpointer data )
+{
+    struct fileswind * fw;
+
+    fw = data;
+
+    g_object_unref( fw->model );
+    g_object_remove_weak_pointer( G_OBJECT( fw->tor ),
+                                  ( gpointer * )&fw->tor );
+    g_free( fw );
     gtk_widget_destroy( widget );
 }

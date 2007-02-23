@@ -130,6 +130,11 @@ getdownloaddir( void );
 
 #ifdef GTK_MAJOR_VERSION
 
+/* here there be dragons */
+void
+windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
+                callbackfunc_t func, void * arg );
+
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
 void

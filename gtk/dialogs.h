@@ -53,4 +53,8 @@ promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
 void
 askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata );
 
+/* create a window listing a torrent's files */
+void
+makefileswind( GtkWindow * parent, TrTorrent * tor );
+
 #endif /* TG_PREFS_H */

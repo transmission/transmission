@@ -88,6 +88,7 @@ enum action
     ACT_STOP,
     ACT_DELETE,
     ACT_INFO,
+    ACT_FILES,
     ACT_PREF,
     ACT_DEBUG,
     ACT_ICON,
@@ -113,6 +114,8 @@ actions[] =
       N_("Remove a torrent") },
     { N_("Properties"),  GTK_STOCK_PROPERTIES,  ACTF_WHEREVER | ACTF_WHATEVER,
       N_("Show additional information about a torrent") },
+    { N_("Files"),       NULL,                  ACTF_MENU     | ACTF_WHATEVER,
+      N_("Show a list of the files in a torrent"), },
     { N_("Preferences"), GTK_STOCK_PREFERENCES, ACTF_WHEREVER | ACTF_ALWAYS,
       N_("Customize application behavior") },
     { N_("Open debug window"), NULL,            ACTF_MENU     | ACTF_ALWAYS,
@@ -914,6 +917,7 @@ handleaction( struct cbdata * data, enum action act )
       case ACT_STOP:
       case ACT_DELETE:
       case ACT_INFO:
+      case ACT_FILES:
       case ACTION_COUNT:
           break;
   }
@@ -954,6 +958,9 @@ handleaction( struct cbdata * data, enum action act )
                   break;
               case ACT_INFO:
                   makeinfowind( data->wind, tor );
+                  break;
+              case ACT_FILES:
+                  makefileswind( data->wind, tor );
                   break;
               case ACT_OPEN:
               case ACT_PREF:

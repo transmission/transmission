@@ -333,6 +333,48 @@ getdownloaddir( void )
 }
 
 void
+windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
+                callbackfunc_t func, void * arg )
+{
+    GtkRequisition req;
+    gint           width, height;
+    GdkScreen    * screen;
+
+    gtk_widget_realize( wind );
+    gtk_widget_size_request( view, &req );
+    height = req.height;
+    gtk_widget_size_request( scroll, &req );
+    height -= req.height;
+    gtk_widget_size_request( wind, &req );
+    height += req.height;
+    screen  = gtk_widget_get_screen( wind );
+    width   = MIN( req.width, gdk_screen_get_width( screen  ) / 2 );
+    height  = MIN( height,    gdk_screen_get_height( screen ) / 5 * 4 );
+    if( height > req.width )
+    {
+        height = MIN( height, width * 8 / 5 );
+    }
+    else
+    {
+        height = MAX( height, width * 5 / 8 );
+    }
+    if( height > req.width )
+    {
+        height = MIN( height, width * 8 / 5 );
+    }
+    else
+    {
+        height = MAX( height, width * 5 / 8 );
+    }
+    if( NULL != func )
+    {
+        func( arg );
+    }
+    gtk_widget_show_now( wind  );
+    gtk_window_resize( GTK_WINDOW( wind ), width, height );
+}
+
+void
 errmsg( GtkWindow * wind, const char * format, ... )
 {
     GtkWidget * dialog;
