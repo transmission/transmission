@@ -60,7 +60,8 @@
                         [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
                         paragraphStyle, NSParagraphStyleAttributeName, nil];
         
-        NSString * statusString = [NSString stringWithFormat: @"%.2f%% of %@",
+        NSString * statusString = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
+                                                                "Inspector -> Files tab -> file status string"),
                                     100.0 * [[item objectForKey: @"Progress"] floatValue],
                                     [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
         
