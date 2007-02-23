@@ -60,7 +60,9 @@
                         [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
                         paragraphStyle, NSParagraphStyleAttributeName, nil];
         
-        NSString * statusString = [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]];
+        NSString * statusString = [NSString stringWithFormat: @"%.2f%% of %@",
+                                    100.0 * [[item objectForKey: @"Progress"] floatValue],
+                                    [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
         
         NSRect statusTextRect = nameTextRect;
         statusTextRect.size.height = [statusString sizeWithAttributes: statusAttributes].height;

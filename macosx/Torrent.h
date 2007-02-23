@@ -46,7 +46,7 @@
     NSImage * fIcon, * fIconFlipped, * fIconSmall;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
-    NSArray * fFileList;
+    NSArray * fFileList, * fFileFlatList;
     
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
@@ -171,6 +171,8 @@
 - (uint64_t)    downloadedTotal;
 - (uint64_t)    uploadedTotal;
 - (float)       swarmSpeed;
+
+- (void) updateFileProgress;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;

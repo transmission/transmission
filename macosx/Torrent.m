@@ -41,10 +41,10 @@
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
-- (NSArray *) createFileList;
+- (void) createFileList;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
         withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-        fileSize: (uint64_t) size state: (int) state;
+        fileSize: (uint64_t) size state: (int) state flatList: (NSMutableArray *) flatList;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -195,6 +195,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fRemainingTimeString release];
         
         [fFileList release];
+        [fFileFlatList release];
         
         [fBitmap release];
         free(fPieces);
@@ -1042,6 +1043,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->swarmspeed;
 }
 
+- (void) updateFileProgress
+{
+    float * progress = tr_torrentCompletion( fHandle );
+    
+    int i, fileCount = [self fileCount];
+    for (i = 0; i < fileCount; i++)
+        [[fFileFlatList objectAtIndex: i] setObject: [NSNumber numberWithFloat: progress[i]] forKey: @"Progress"];
+    
+    free(progress);
+}
+
 - (NSNumber *) orderValue
 {
     return [NSNumber numberWithInt: fOrderValue];
@@ -1166,7 +1178,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
     fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
     
-    fFileList = [self createFileList];
+    [self createFileList];
     
     //set up advanced bar
     fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
@@ -1182,12 +1194,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return self;
 }
 
-- (NSArray *) createFileList
+- (void) createFileList
 {
     int count = [self fileCount], i;
     tr_file_t * file;
-    NSMutableArray * files = [[NSMutableArray alloc] init], * pathComponents;
+    NSMutableArray * pathComponents;
     NSString * path;
+    
+    NSMutableArray * fileList = [[NSMutableArray alloc] init],
+                    * fileFlatList = [[NSMutableArray alloc] initWithCapacity: count];
     
     for (i = 0; i < count; i++)
     {
@@ -1202,16 +1217,20 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             path = @"";
         
-        [self insertPath: pathComponents forSiblings: files withParent: nil previousPath: path
-                fileSize: file->length state: NSOnState];
+        [self insertPath: pathComponents forSiblings: fileList withParent: nil previousPath: path
+                fileSize: file->length state: NSOnState flatList: fileFlatList];
         [pathComponents autorelease];
     }
-    return files;
+    
+    fFileList = [[NSArray alloc] initWithArray: fileList];
+    [fileList release];
+    fFileFlatList = [[NSArray alloc] initWithArray: fileFlatList];
+    [fileFlatList release];
 }
 
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
         withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-        fileSize: (uint64_t) size state: (int) state
+        fileSize: (uint64_t) size state: (int) state flatList: (NSMutableArray *) flatList
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1233,16 +1252,20 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
                                 [NSNumber numberWithBool: isFolder], @"IsFolder",
                                 currentPath, @"Path", nil];
+        
+        [siblings addObject: dict];
+        
         if (isFolder)
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
         else
+        {
+            [flatList addObject: dict];
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
+        }
         
         if (parent)
             [dict setObject: parent forKey: @"Parent"];
         [dict setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-        
-        [siblings addObject: dict];
     }
     else
     {
@@ -1255,7 +1278,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         [components removeObjectAtIndex: 0];
         [self insertPath: components forSiblings: [dict objectForKey: @"Children"]
-                withParent: dict previousPath: currentPath fileSize: size state: state];
+            withParent: dict previousPath: currentPath fileSize: size state: state flatList: flatList];
     }
 }
 

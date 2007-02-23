@@ -54,6 +54,7 @@
 - (void) updateInfoGeneral;
 - (void) updateInfoActivity;
 - (void) updateInfoPeers;
+- (void) updateInfoFiles;
 - (void) updateInfoSettings;
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
@@ -273,6 +274,8 @@
             [fFiles release];
         fFiles = [[torrent fileList] retain];
         
+        [self updateInfoFiles];
+        
         int fileCount = [torrent fileCount];
         if (fileCount != 1)
             [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files total",
@@ -300,6 +303,8 @@
         [self updateInfoPeers];
     else if ([ident isEqualToString: TAB_INFO_IDENT])
         [self updateInfoGeneral];
+    else if ([ident isEqualToString: TAB_FILES_IDENT])
+        [self updateInfoFiles];
     else;
 }
 
@@ -387,6 +392,15 @@
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
     
     [fPeerTable reloadData];
+}
+
+- (void) updateInfoFiles
+{
+    if ([fTorrents count] != 1)
+        return;
+    
+    [[fTorrents objectAtIndex: 0] updateFileProgress];
+    [fFileOutline reloadData];
 }
 
 - (void) updateInfoSettings
