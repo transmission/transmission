@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -295,6 +295,15 @@ void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
 void tr_torrentAvailability( tr_torrent_t *, int8_t * tab, int size );
 
 void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size );
+
+/***********************************************************************
+ * tr_torrentCompletion
+ ***********************************************************************
+ * Returns the completion progress for each file in the torrent as an
+ * array of floats the same size and order as in tr_info_t. Free the
+ * array when done.
+ **********************************************************************/
+float * tr_torrentCompletion( tr_torrent_t * tor );
 
 /***********************************************************************
  * tr_torrentRemoveSaved
