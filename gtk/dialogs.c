@@ -85,6 +85,8 @@ quitresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 parsepath( GtkTreeStore * store, GtkTreeIter * ret,
            const char * path, int index, uint64_t size );
+static uint64_t
+getdirtotals( GtkTreeStore * store, GtkTreeIter * parent, tr_file_t * files );
 static void
 setscroll( void * arg );
 static void
@@ -416,6 +418,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
         parsepath( store, NULL, STRIPROOT( inf->files[ii].name ),
                    ii, inf->files[ii].length );
     }
+    getdirtotals( store, NULL, inf->files );
     gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( store ),
                                           FC_KEY, GTK_SORT_ASCENDING );
 
@@ -515,17 +518,18 @@ parsepath( GtkTreeStore * store, GtkTreeIter * ret,
         sizestr = readablesize( size );
         label = g_markup_printf_escaped( _("<small>%s (%s)</small>"),
                                          file, sizestr );
+        g_free( file );
+        file = label;
         g_free( sizestr );
         stock = GTK_STOCK_FILE;
     }
     else
     {
-        label = g_markup_printf_escaped( _("<small>%s</small>"), file );
         stock = GTK_STOCK_DIRECTORY;
+        index = -1;
     }
-    gtk_tree_store_set( store, &iter, FC_INDEX, index, FC_LABEL, label,
+    gtk_tree_store_set( store, &iter, FC_INDEX, index, FC_LABEL, file,
                         FC_KEY, mykey, FC_STOCK, stock, -1 );
-    g_free( label );
   done:
     g_free( mykey );
     g_free( file );
@@ -533,6 +537,47 @@ parsepath( GtkTreeStore * store, GtkTreeIter * ret,
     {
         memcpy( ret, &iter, sizeof( iter ) );
     }
+}
+
+static uint64_t
+getdirtotals( GtkTreeStore * store, GtkTreeIter * parent, tr_file_t * files )
+{
+    GtkTreeModel * model;
+    GtkTreeIter    iter;
+    int            index;
+    uint64_t       mysize, subsize;
+    char         * sizestr, * name, * label;
+
+    model  = GTK_TREE_MODEL( store );
+    mysize = 0;
+    if( gtk_tree_model_iter_children( model, &iter, parent ) )
+    {
+        do
+        {
+            if( gtk_tree_model_iter_has_child( model, &iter ) )
+            {
+                subsize = getdirtotals( store, &iter, files );
+                mysize += subsize;
+                gtk_tree_model_get( model, &iter, FC_LABEL, &name, -1 );
+                sizestr = readablesize( subsize );
+                label = g_markup_printf_escaped( _("<small>%s (%s)</small>"),
+                                                 name, sizestr );
+                g_free( sizestr );
+                g_free( name );
+                gtk_tree_store_set( store, &iter, FC_LABEL, label, -1 );
+                g_free( label );
+            }
+            else
+            {
+                gtk_tree_model_get( model, &iter, FC_INDEX, &index, -1 );
+                g_assert( 0 <= index );
+                mysize += files[index].length;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
+    }
+
+    return mysize;
 }
 
 static void
