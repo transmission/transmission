@@ -30,6 +30,7 @@
  * Local prototypes
  **********************************************************************/
 static int getannounce( tr_info_t * inf, benc_val_t * meta );
+static char * announceToScrape( const char * announce );
 #define strcatUTF8( dst, src) _strcatUTF8( (dst), sizeof( dst ) - 1, (src) )
 static void _strcatUTF8( char *, int, char * );
 
@@ -293,6 +294,7 @@ void tr_metainfoFree( tr_info_t * inf )
         {
             free( inf->trackerList[ii].list[jj].address );
             free( inf->trackerList[ii].list[jj].announce );
+            free( inf->trackerList[ii].list[jj].scrape );
         }
         free( inf->trackerList[ii].list );
     }
@@ -347,6 +349,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                 sublist[random].address  = address;
                 sublist[random].port     = port;
                 sublist[random].announce = announce;
+                sublist[random].scrape   = announceToScrape( announce );
                 subcount++;
             }
 
@@ -414,6 +417,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
         sublist[0].address        = address;
         sublist[0].port           = port;
         sublist[0].announce       = announce;
+        sublist[0].scrape         = announceToScrape( announce );
         inf->trackerList          = calloc( sizeof( inf->trackerList[0] ), 1 );
         inf->trackerList[0].list  = sublist;
         inf->trackerList[0].count = 1;
@@ -421,6 +425,34 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
     }
 
     return 0;
+}
+
+static char * announceToScrape( const char * announce )
+{   
+    char old[]  = "announce";
+    int  oldlen = 8;
+    char new[]  = "scrape";
+    int  newlen = 6;
+    char * slash, * scrape;
+    
+    slash = strrchr( announce, '/' );
+    if( NULL == slash )
+    {
+        return NULL;
+    }
+    slash++;
+    
+    if( 0 != strncmp( slash, old, oldlen ) )
+    {
+        return NULL;
+    }
+
+    scrape = calloc( strlen( announce ) - oldlen + newlen + 1, 1 );
+    strncat( scrape, announce, slash - announce );
+    strcat(  scrape, new );
+    strcat(  scrape, slash + oldlen );
+
+    return scrape;
 }
 
 void tr_metainfoRemoveSaved( const char * hashString )

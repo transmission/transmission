@@ -38,8 +38,8 @@ TRInfoWindow::TRInfoWindow(tr_stat_t *status, tr_info_t *info, char *folder) : B
 	BTextView *txtView = new BTextView(viewRect, "infoText", viewRect, B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	txtView->MakeEditable(false);
 	
-	BString strTracker(status->trackerAddress);
-	strTracker << ":" << status->trackerPort;
+	BString strTracker(status->tracker->address);
+	strTracker << ":" << status->tracker->port;
 
 	BString strPieceSize("");
 	StringForFileSize(info->pieceSize, &strPieceSize);
@@ -55,7 +55,7 @@ TRInfoWindow::TRInfoWindow(tr_stat_t *status, tr_info_t *info, char *folder) : B
 
 	BString infoStr("");
 	infoStr << "Tracker: " << strTracker << "\n"
-	        << "Announce: " << status->trackerAnnounce << "\n"
+	        << "Announce: " << status->tracker->announce << "\n"
 	        << "Piece Size: " << strPieceSize << "\n"
 	        << "Pieces: " << info->pieceCount << "\n"
 	        << "Total Size: " << strTotalSize << "\n"

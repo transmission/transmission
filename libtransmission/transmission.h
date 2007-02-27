@@ -390,10 +390,8 @@ struct tr_stat_s
     int                 error;
     char                errorString[128];
     int                 cannotConnect;
-    
-    const char        * trackerAddress;
-    int                 trackerPort;
-    const char        * trackerAnnounce;
+
+    tr_tracker_info_t * tracker;
 
     float               progress;
     float               rateDownload;
@@ -445,6 +443,7 @@ struct tr_tracker_info_s
     char * address;
     int    port;
     char * announce;
+    char * scrape;
 };
 
 struct tr_handle_status_s

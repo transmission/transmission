@@ -319,19 +319,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
     tc = tor->tracker;
     s->cannotConnect = tr_trackerCannotConnect( tc );
-    
-    if( tc )
-    {
-        s->trackerAddress  = tr_trackerAddress(  tc );
-        s->trackerPort     = tr_trackerPort(     tc );
-        s->trackerAnnounce = tr_trackerAnnounce( tc );
-    }
-    else
-    {
-        s->trackerAddress  = inf->trackerList[0].list[0].address;
-        s->trackerPort     = inf->trackerList[0].list[0].port;
-        s->trackerAnnounce = inf->trackerList[0].list[0].announce;
-    }
+    s->tracker = ( tc ? tr_trackerGet( tc ) : &inf->trackerList[0].list[0] );
 
     s->peersTotal       = 0;
     s->peersIncoming    = 0;

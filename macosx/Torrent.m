@@ -781,12 +781,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSString *) trackerAddress
 {
-    return [NSString stringWithFormat: @"http://%s:%d", fStat->trackerAddress, fStat->trackerPort];
+    return [NSString stringWithFormat: @"http://%s:%d", fStat->tracker->address, fStat->tracker->port];
 }
 
 - (NSString *) trackerAddressAnnounce
 {
-    return [NSString stringWithUTF8String: fStat->trackerAnnounce];
+    return [NSString stringWithUTF8String: fStat->tracker->announce];
 }
 
 - (NSString *) comment
