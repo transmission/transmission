@@ -121,6 +121,7 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   GtkFileFilter *unfilter = gtk_file_filter_new();
   GtkWidget *getdir = gtk_file_chooser_button_new(
     _("Choose a download directory"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  const char * pref;
 
   data->addfunc = addfunc;
   data->data = cbdata;
@@ -137,8 +138,11 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   gtk_box_pack_start_defaults(GTK_BOX(vbox), bbox);
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(autocheck), TRUE);
-  gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( getdir ),
-                                       getdownloaddir() );
+  pref = tr_prefs_get( PREF_ID_DIR );
+  if( NULL != pref )
+  {
+      gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( getdir ), pref );
+  }
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dircheck), FALSE);
   gtk_widget_set_sensitive(getdir, FALSE);
