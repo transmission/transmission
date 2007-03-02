@@ -60,9 +60,6 @@
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
-- (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item;
-- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
-
 - (int) stateSettingToPopUpIndex: (int) index;
 - (int) popUpIndexToStateSetting: (int) index;
 
@@ -107,17 +104,12 @@
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
-    [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(fileFinished:) name: @"FileFinished" object: nil];
-    
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
     if (fTorrents)
         [fTorrents release];
     if (fPeers)
@@ -729,7 +721,7 @@
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
-        /*if (!item)
+        if (!item)
         {
             [(NSButtonCell *)cell setImagePosition: NSNoImage];
             [cell setEnabled: NO];
@@ -738,8 +730,8 @@
         
         [(NSButtonCell *)cell setImagePosition: NSImageOnly];
         [cell setEnabled: [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Remaining"] intValue] > 0
-                                                                    : [[item objectForKey: @"Progress"] floatValue] < 1.0];*/
-        [(NSButtonCell *)cell setImagePosition: NSNoImage];
+                                                                    : [[item objectForKey: @"Progress"] floatValue] < 1.0];
+        //[(NSButtonCell *)cell setImagePosition: NSNoImage];
     }
     else;
 }
@@ -747,71 +739,13 @@
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
         forTableColumn: (NSTableColumn *) tableColumn byItem: (id) item
 {
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
     int state = [object intValue] != NSOffState ? NSOnState : NSOffState;
     
-    [self setFileCheckState: state forItem: item];
-    NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
+    [torrent setFileCheckState: state forFileItem: item];
+    NSMutableDictionary * topItem = [torrent resetFileCheckStateForItemParent: item];
     
     [fFileOutline reloadItem: topItem reloadChildren: YES];
-}
-
-- (void) fileFinished: (NSNotification *) notification
-{
-    NSMutableDictionary * item = [notification object];
-    
-    [item setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
-    NSMutableDictionary * topItem = [self resetFileCheckStateForItemParent: item];
-    
-    [fFileOutline reloadItem: topItem reloadChildren: YES];
-}
-
-- (void) setFileCheckState: (int) state forItem: (NSMutableDictionary *) item
-{
-    [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-    
-    if (![[item objectForKey: @"IsFolder"] boolValue])
-        return;
-    
-    NSMutableDictionary * child;
-    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
-    while ((child = [enumerator nextObject]))
-        if (state != [[child objectForKey: @"Check"] intValue])
-            [self setFileCheckState: state forItem: child];
-}
-
-- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild
-{
-    NSMutableDictionary * item;
-    if (!(item = [originalChild objectForKey: @"Parent"]))
-        return originalChild;
-    
-    int state = INVALID;
-    
-    NSMutableDictionary * child;
-    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
-    while ((child = [enumerator nextObject]))
-    {
-        if (state == INVALID)
-        {
-            state = [[child objectForKey: @"Check"] intValue];
-            if (state == NSMixedState)
-                break;
-        }
-        else if (state != [[child objectForKey: @"Check"] intValue])
-        {
-            state = NSMixedState;
-            break;
-        }
-        else;
-    }
-    
-    if (state != [[item objectForKey: @"Check"] intValue])
-    {
-        [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-        return [self resetFileCheckStateForItemParent: item];
-    }
-    else
-        return originalChild;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect

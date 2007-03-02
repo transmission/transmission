@@ -30,6 +30,8 @@
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
 
+#define INVALID -99
+
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
@@ -1043,6 +1045,26 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->swarmspeed;
 }
 
+- (NSNumber *) orderValue
+{
+    return [NSNumber numberWithInt: fOrderValue];
+}
+
+- (void) setOrderValue: (int) orderValue
+{
+    fOrderValue = orderValue;
+}
+
+- (NSArray *) fileList
+{
+    return fFileList;
+}
+
+- (int) fileCount
+{
+    return fInfo->fileCount;
+}
+
 - (BOOL) updateFileProgress
 {
     BOOL change = NO;
@@ -1067,7 +1089,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [dict setObject: [NSNumber numberWithInt: [[dict objectForKey: @"Remaining"] intValue]-1]
                             forKey: @"Remaining"];
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName: @"FileFinished" object: item];
+                [item setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
+                [self resetFileCheckStateForItemParent: item];
             }
         }
     }
@@ -1077,24 +1100,53 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return change;
 }
 
-- (NSNumber *) orderValue
+- (void) setFileCheckState: (int) state forFileItem: (NSMutableDictionary *) item
 {
-    return [NSNumber numberWithInt: fOrderValue];
+    [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
+    
+    if (![[item objectForKey: @"IsFolder"] boolValue])
+        return;
+    
+    NSMutableDictionary * child;
+    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
+    while ((child = [enumerator nextObject]))
+        if (state != [[child objectForKey: @"Check"] intValue])
+            [self setFileCheckState: state forFileItem: child];
 }
 
-- (void) setOrderValue: (int) orderValue
+- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild
 {
-    fOrderValue = orderValue;
-}
-
-- (NSArray *) fileList
-{
-    return fFileList;
-}
-
-- (int) fileCount
-{
-    return fInfo->fileCount;
+    NSMutableDictionary * item;
+    if (!(item = [originalChild objectForKey: @"Parent"]))
+        return originalChild;
+    
+    int state = INVALID;
+    
+    NSMutableDictionary * child;
+    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
+    while ((child = [enumerator nextObject]))
+    {
+        if (state == INVALID)
+        {
+            state = [[child objectForKey: @"Check"] intValue];
+            if (state == NSMixedState)
+                break;
+        }
+        else if (state != [[child objectForKey: @"Check"] intValue])
+        {
+            state = NSMixedState;
+            break;
+        }
+        else;
+    }
+    
+    if (state != [[item objectForKey: @"Check"] intValue])
+    {
+        [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
+        return [self resetFileCheckStateForItemParent: item];
+    }
+    else
+        return originalChild;
 }
 
 - (NSDate *) date

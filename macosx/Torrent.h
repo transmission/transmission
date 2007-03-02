@@ -172,13 +172,14 @@
 - (uint64_t)    uploadedTotal;
 - (float)       swarmSpeed;
 
-- (BOOL) updateFileProgress;
-
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;
 
 - (NSArray *) fileList;
 - (int) fileCount;
+- (BOOL) updateFileProgress;
+- (void) setFileCheckState: (int) state forFileItem: (NSMutableDictionary *) item;
+- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
 
 - (NSDate *) date;
 - (NSNumber *) stateSortKey;
