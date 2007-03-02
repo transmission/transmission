@@ -908,7 +908,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSString *) errorMessage
 {
-    [NSString stringWithUTF8String: fStat->errorString];
+    [self isError] ? [NSString stringWithUTF8String: fStat->errorString] : @"";
 }
 
 - (BOOL) justFinished
