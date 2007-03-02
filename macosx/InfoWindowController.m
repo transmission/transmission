@@ -721,7 +721,7 @@
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
-        if (!item)
+        /*if (!item)
         {
             [(NSButtonCell *)cell setImagePosition: NSNoImage];
             [cell setEnabled: NO];
@@ -730,8 +730,8 @@
         
         [(NSButtonCell *)cell setImagePosition: NSImageOnly];
         [cell setEnabled: [[item objectForKey: @"IsFolder"] boolValue] ? [[item objectForKey: @"Remaining"] intValue] > 0
-                                                                    : [[item objectForKey: @"Progress"] floatValue] < 1.0];
-        //[(NSButtonCell *)cell setImagePosition: NSNoImage];
+                                                                    : [[item objectForKey: @"Progress"] floatValue] < 1.0];*/
+        [(NSButtonCell *)cell setImagePosition: NSNoImage];
     }
     else;
 }
