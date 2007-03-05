@@ -45,7 +45,7 @@ int         tr_peerIsChoking     ( tr_peer_t * );
 int         tr_peerIsInterested  ( tr_peer_t * );
 float       tr_peerProgress      ( tr_peer_t * );
 int         tr_peerPort          ( tr_peer_t * );
-uint8_t *   tr_peerBitfield      ( tr_peer_t * );
+tr_bitfield_t * tr_peerBitfield  ( tr_peer_t * );
 float       tr_peerDownloadRate  ( tr_peer_t * );
 float       tr_peerUploadRate    ( tr_peer_t * );
 void        tr_peerChoke         ( tr_peer_t * );

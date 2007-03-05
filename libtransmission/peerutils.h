@@ -104,11 +104,8 @@ static int checkPeer( tr_peer_t * peer )
  **********************************************************************/
 static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
 {
-    tr_info_t * inf = &tor->info;
-
-    int i;
-    int bitfieldSize = ( inf->pieceCount + 7 ) / 8;
-    uint8_t * bitfield = tr_cpPieceBitfield( tor->completion );
+    int ii;
+    tr_bitfield_t * bitfield = tr_cpPieceBitfield( tor->completion );
 
     if( !peer->bitfield )
     {
@@ -116,9 +113,10 @@ static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
         return 0;
     }
 
-    for( i = 0; i < bitfieldSize; i++ )
+    assert( bitfield->len == peer->bitfield->len );
+    for( ii = 0; ii < bitfield->len; ii++ )
     {
-        if( ( peer->bitfield[i] & ~(bitfield[i]) ) & 0xFF )
+        if( ( peer->bitfield->bits[ii] & ~(bitfield->bits[ii]) ) & 0xFF )
         {
             return 1;
         }
@@ -197,7 +195,7 @@ static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
     {
         /* All pieces in 'pool' have 'minMissing' missing blocks. Find
            the rarest ones. */
-        uint8_t * bitfield;
+        tr_bitfield_t * bitfield;
         int piece;
         int min, foo, j;
         int * pool2;

@@ -104,7 +104,7 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
 
     if( !peer->bitfield )
     {
-        peer->bitfield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
+        peer->bitfield = tr_bitfieldNew( tor->info.pieceCount );
     }
     if( !tr_bitfieldHas( peer->bitfield, piece ) )
     {
@@ -154,9 +154,10 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
 
     if( !peer->bitfield )
     {
-        peer->bitfield = malloc( bitfieldSize );
+        peer->bitfield = tr_bitfieldNew( inf->pieceCount );
     }
-    memcpy( peer->bitfield, p, bitfieldSize );
+    assert( bitfieldSize == peer->bitfield->len );
+    memcpy( peer->bitfield->bits, p, bitfieldSize );
 
     peer->pieceCount = 0;
     for( i = 0; i < inf->pieceCount; i++ )
@@ -294,7 +295,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     /* Set blame/credit for this piece */
     if( !peer->blamefield )
     {
-        peer->blamefield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
+        peer->blamefield = tr_bitfieldNew( tor->info.pieceCount );
     }
     tr_bitfieldAdd( peer->blamefield, index );
 

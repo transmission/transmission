@@ -124,6 +124,7 @@ static inline void tr_htonl( uint32_t a, uint8_t * p )
 
 typedef struct tr_completion_s tr_completion_t;
 typedef struct tr_shared_s tr_shared_t;
+typedef struct tr_bitfield_s tr_bitfield_t;
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 

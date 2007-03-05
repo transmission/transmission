@@ -24,12 +24,12 @@
 
 struct tr_completion_s
 {
-    tr_torrent_t * tor;
-    uint8_t      * blockBitfield;
-    uint8_t      * blockDownloaders;
-    int            blockCount;
-    uint8_t      * pieceBitfield;
-    int          * missingBlocks;
+    tr_torrent_t      * tor;
+    tr_bitfield_t     * blockBitfield;
+    uint8_t           * blockDownloaders;
+    int                 blockCount;
+    tr_bitfield_t     * pieceBitfield;
+    int               * missingBlocks;
 };
 
 tr_completion_t * tr_cpInit( tr_torrent_t * );
@@ -47,7 +47,7 @@ uint64_t          tr_cpLeftBytes( tr_completion_t * );
 /* Pieces */
 int               tr_cpPieceHasAllBlocks( tr_completion_t *, int piece );
 int               tr_cpPieceIsComplete( tr_completion_t *, int piece );
-uint8_t         * tr_cpPieceBitfield( tr_completion_t * );
+tr_bitfield_t   * tr_cpPieceBitfield( tr_completion_t * );
 void              tr_cpPieceAdd( tr_completion_t *, int piece );
 void              tr_cpPieceRem( tr_completion_t *, int piece );
 
@@ -57,8 +57,8 @@ void              tr_cpDownloaderRem( tr_completion_t *, int block );
 int               tr_cpBlockIsComplete( tr_completion_t *, int block );
 void              tr_cpBlockAdd( tr_completion_t *, int block );
 void              tr_cpBlockRem( tr_completion_t *, int block );
-uint8_t         * tr_cpBlockBitfield( tr_completion_t * );
-void              tr_cpBlockBitfieldSet( tr_completion_t *, uint8_t * );
+tr_bitfield_t   * tr_cpBlockBitfield( tr_completion_t * );
+void              tr_cpBlockBitfieldSet( tr_completion_t *, tr_bitfield_t * );
 float             tr_cpPercentBlocksInPiece( tr_completion_t * cp, int piece );
 /* Missing = we don't have it and we are not getting it from any peer yet */
 static inline int tr_cpMissingBlocksForPiece( tr_completion_t * cp, int piece )

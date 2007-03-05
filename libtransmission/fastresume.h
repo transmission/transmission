@@ -191,6 +191,7 @@ static int fastResumeLoadProgress( tr_io_t * io, FILE * file )
     int       i, j;
     uint8_t * buf;
     size_t    len;
+    tr_bitfield_t bitfield;
 
     len = FR_PROGRESS_LEN( tor );
     buf = calloc( len, 1 );
@@ -219,7 +220,10 @@ static int fastResumeLoadProgress( tr_io_t * io, FILE * file )
     free( fileMTimes );
 
     /* Copy the bitfield for blocks and fill blockHave */
-    tr_cpBlockBitfieldSet( tor->completion, buf + FR_MTIME_LEN( tor ) );
+    memset( &bitfield, 0, sizeof bitfield );
+    bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
+    bitfield.bits = buf + FR_MTIME_LEN( tor );
+    tr_cpBlockBitfieldSet( tor->completion, &bitfield );
 
     /* Copy the 'slotPiece' table */
     memcpy( io->slotPiece, buf + FR_MTIME_LEN( tor ) +

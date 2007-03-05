@@ -38,70 +38,70 @@ typedef struct tr_request_s
 
 struct tr_peer_s
 {
-    tr_torrent_t   * tor;
+    tr_torrent_t      * tor;
 
-    struct in_addr addr;
-    in_port_t      port;  /* peer's listening port, 0 if not known */
+    struct in_addr      addr;
+    in_port_t           port;  /* peer's listening port, 0 if not known */
 
-#define PEER_STATUS_IDLE       1 /* Need to connect */
-#define PEER_STATUS_CONNECTING 2 /* Trying to send handshake */
-#define PEER_STATUS_HANDSHAKE  4 /* Waiting for peer's handshake */
-#define PEER_STATUS_CONNECTED  8 /* Got peer's handshake */
-    int            status;
-    int            socket;
-    char           incoming;
-    uint64_t       date;
-    uint64_t       keepAlive;
+#define PEER_STATUS_IDLE        1 /* Need to connect */
+#define PEER_STATUS_CONNECTING  2 /* Trying to send handshake */
+#define PEER_STATUS_HANDSHAKE   4 /* Waiting for peer's handshake */
+#define PEER_STATUS_CONNECTED   8 /* Got peer's handshake */
+    int                 status;
+    int                 socket;
+    char                incoming;
+    uint64_t            date;
+    uint64_t            keepAlive;
 
-    char           amChoking;
-    char           amInterested;
-    char           peerChoking;
-    char           peerInterested;
+    char                amChoking;
+    char                amInterested;
+    char                peerChoking;
+    char                peerInterested;
 
-    int            optimistic;
-    uint64_t       lastChoke;
+    int                 optimistic;
+    uint64_t            lastChoke;
 
-    uint8_t        id[20];
+    uint8_t             id[20];
 
     /* The pieces that the peer has */
-    uint8_t      * bitfield;
-    int            pieceCount;
-    float          progress;
+    tr_bitfield_t     * bitfield;
+    int                 pieceCount;
+    float               progress;
 
-    int            goodPcs;
-    int            badPcs;
-    int            banned;
+    int                 goodPcs;
+    int                 badPcs;
+    int                 banned;
     /* The pieces that the peer is contributing to */
-    uint8_t      * blamefield;
+    tr_bitfield_t     * blamefield;
     /* The bad pieces that the peer has contributed to */
-    uint8_t      * banfield;
+    tr_bitfield_t     * banfield;
 
-    uint8_t      * buf;
-    int            size;
-    int            pos;
+    uint8_t           * buf;
+    int                 size;
+    int                 pos;
 
-    uint8_t      * outMessages;
-    int            outMessagesSize;
-    int            outMessagesPos;
-    uint8_t        outBlock[13+16384];
-    int            outBlockSize;
-    int            outBlockLoaded;
-    int            outBlockSending;
+    uint8_t           * outMessages;
+    int                 outMessagesSize;
+    int                 outMessagesPos;
+    uint8_t             outBlock[13+16384];
+    int                 outBlockSize;
+    int                 outBlockLoaded;
+    int                 outBlockSending;
 
-    int            inRequestCount;
-    tr_request_t   inRequests[OUR_REQUEST_COUNT];
-    int            inIndex;
-    int            inBegin;
-    int            inLength;
-    uint64_t       inTotal;
+    int                 inRequestCount;
+    tr_request_t        inRequests[OUR_REQUEST_COUNT];
+    int                 inIndex;
+    int                 inBegin;
+    int                 inLength;
+    uint64_t            inTotal;
 
-    int            outRequestCount;
-    tr_request_t   outRequests[MAX_REQUEST_COUNT];
-    uint64_t       outTotal;
-    uint64_t       outDate;
+    int                 outRequestCount;
+    tr_request_t        outRequests[MAX_REQUEST_COUNT];
+    uint64_t            outTotal;
+    uint64_t            outDate;
 
-    tr_ratecontrol_t * download;
-    tr_ratecontrol_t * upload;
+    tr_ratecontrol_t  * download;
+    tr_ratecontrol_t  * upload;
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
@@ -162,18 +162,9 @@ void tr_peerDestroy( tr_peer_t * peer )
         block = tr_block( r->index, r->begin );
         tr_cpDownloaderRem( tor->completion, block );
     }
-    if( peer->bitfield )
-    {
-        free( peer->bitfield );
-    }
-    if( peer->blamefield )
-    {
-        free( peer->blamefield );
-    }
-    if( peer->banfield )
-    {
-        free( peer->banfield );
-    }
+    tr_bitfieldFree( peer->bitfield );
+    tr_bitfieldFree( peer->blamefield );
+    tr_bitfieldFree( peer->banfield );
     if( peer->buf )
     {
         free( peer->buf );
@@ -532,7 +523,7 @@ int tr_peerPort( tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-uint8_t * tr_peerBitfield( tr_peer_t * peer )
+tr_bitfield_t * tr_peerBitfield( tr_peer_t * peer )
 {
     return peer->bitfield;
 }
@@ -601,7 +592,7 @@ void tr_peerBlame( tr_peer_t * peer, int piece, int success )
         {
             /* Assume the peer wasn't responsible for the bad pieces
                we was banned for */
-            memset( peer->banfield, 0x00, ( tor->info.pieceCount + 7 ) / 8 );
+            tr_bitfieldClear( peer->banfield );
         }
     }
     else
@@ -611,7 +602,7 @@ void tr_peerBlame( tr_peer_t * peer, int piece, int success )
         /* Ban the peer for this piece */
         if( !peer->banfield )
         {
-            peer->banfield = calloc( ( tor->info.pieceCount + 7 ) / 8, 1 );
+            peer->banfield = tr_bitfieldNew( tor->info.pieceCount );
         }
         tr_bitfieldAdd( peer->banfield, piece );
 

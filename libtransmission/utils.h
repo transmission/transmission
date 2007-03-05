@@ -101,25 +101,69 @@ static inline void tr_wait( uint64_t delay )
 #endif
 }
 
+struct tr_bitfield_s
+{
+    uint8_t * bits;
+    int       len;
+};
+
+/* note that the argument is how many bits are needed, not bytes */
+static inline tr_bitfield_t * tr_bitfieldNew( int bitcount )
+{
+    tr_bitfield_t * ret;
+
+    ret = calloc( 1, sizeof *ret );
+    if( NULL == ret )
+    {
+        return NULL;
+    }
+    ret->len = ( bitcount + 7 ) / 8;
+    ret->bits = calloc( ret->len, 1 );
+    if( NULL == ret->bits )
+    {
+        free( ret );
+        return NULL;
+    }
+
+    return ret;
+}
+
+static inline void tr_bitfieldFree( tr_bitfield_t * bitfield )
+{
+    if( bitfield )
+    {
+        free( bitfield->bits );
+        free( bitfield );
+    }
+}
+
+static inline void tr_bitfieldClear( tr_bitfield_t * bitfield )
+{
+    memset( bitfield->bits, 0, bitfield->len );
+}
+
 /***********************************************************************
  * tr_bitfieldHas
  **********************************************************************/
-static inline int tr_bitfieldHas( uint8_t * bitfield, int piece )
+static inline int tr_bitfieldHas( tr_bitfield_t * bitfield, int piece )
 {
-    return ( bitfield[ piece / 8 ] & ( 1 << ( 7 - ( piece % 8 ) ) ) );
+    assert( piece / 8 < bitfield->len );
+    return ( bitfield->bits[ piece / 8 ] & ( 1 << ( 7 - ( piece % 8 ) ) ) );
 }
 
 /***********************************************************************
  * tr_bitfieldAdd
  **********************************************************************/
-static inline void tr_bitfieldAdd( uint8_t * bitfield, int piece )
+static inline void tr_bitfieldAdd( tr_bitfield_t * bitfield, int piece )
 {
-    bitfield[ piece / 8 ] |= ( 1 << ( 7 - ( piece % 8 ) ) );
+    assert( piece / 8 < bitfield->len );
+    bitfield->bits[ piece / 8 ] |= ( 1 << ( 7 - ( piece % 8 ) ) );
 }
 
-static inline void tr_bitfieldRem( uint8_t * bitfield, int piece )
+static inline void tr_bitfieldRem( tr_bitfield_t * bitfield, int piece )
 {
-    bitfield[ piece / 8 ] &= ~( 1 << ( 7 - ( piece % 8 ) ) );
+    assert( piece / 8 < bitfield->len );
+    bitfield->bits[ piece / 8 ] &= ~( 1 << ( 7 - ( piece % 8 ) ) );
 }
 
 #define tr_blockPiece(a) _tr_blockPiece(tor,a)

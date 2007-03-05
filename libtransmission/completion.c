@@ -30,9 +30,9 @@ tr_completion_t * tr_cpInit( tr_torrent_t * tor )
 
     cp                   = malloc( sizeof( tr_completion_t ) );
     cp->tor              = tor;
-    cp->blockBitfield    = malloc( ( tor->blockCount + 7 ) / 8 );
+    cp->blockBitfield    = tr_bitfieldNew( tor->blockCount );
     cp->blockDownloaders = malloc( tor->blockCount );
-    cp->pieceBitfield    = malloc( ( tor->info.pieceCount + 7 ) / 8 );
+    cp->pieceBitfield    = tr_bitfieldNew( tor->info.pieceCount );
     cp->missingBlocks    = malloc( tor->info.pieceCount * sizeof( int ) );
 
     tr_cpReset( cp );
@@ -42,11 +42,11 @@ tr_completion_t * tr_cpInit( tr_torrent_t * tor )
 
 void tr_cpClose( tr_completion_t * cp )
 {
-    free( cp->blockBitfield );
-    free( cp->blockDownloaders );
-    free( cp->pieceBitfield );
-    free( cp->missingBlocks );
-    free( cp );
+    tr_bitfieldFree( cp->blockBitfield );
+    free(            cp->blockDownloaders );
+    tr_bitfieldFree( cp->pieceBitfield );
+    free(            cp->missingBlocks );
+    free(            cp );
 }
 
 void tr_cpReset( tr_completion_t * cp )
@@ -55,9 +55,9 @@ void tr_cpReset( tr_completion_t * cp )
     int i;
 
     cp->blockCount = 0;
-    memset( cp->blockBitfield,    0, ( tor->blockCount + 7 ) / 8 );
+    tr_bitfieldClear( cp->blockBitfield );
     memset( cp->blockDownloaders, 0, tor->blockCount );
-    memset( cp->pieceBitfield,    0, ( tor->info.pieceCount + 7 ) / 8 );
+    tr_bitfieldClear( cp->pieceBitfield );
     for( i = 0; i < tor->info.pieceCount; i++ )
     {
         cp->missingBlocks[i] = tr_pieceCountBlocks( i );
@@ -106,7 +106,7 @@ int tr_cpPieceIsComplete( tr_completion_t * cp, int piece )
     return tr_bitfieldHas( cp->pieceBitfield, piece );
 }
 
-uint8_t * tr_cpPieceBitfield( tr_completion_t * cp )
+tr_bitfield_t * tr_cpPieceBitfield( tr_completion_t * cp )
 {
     return cp->pieceBitfield;
 }
@@ -195,12 +195,12 @@ void tr_cpBlockRem( tr_completion_t * cp, int block )
     tr_bitfieldRem( cp->blockBitfield, block );
 }
 
-uint8_t * tr_cpBlockBitfield( tr_completion_t * cp )
+tr_bitfield_t * tr_cpBlockBitfield( tr_completion_t * cp )
 {
     return cp->blockBitfield;
 }
 
-void tr_cpBlockBitfieldSet( tr_completion_t * cp, uint8_t * bitfield )
+void tr_cpBlockBitfieldSet( tr_completion_t * cp, tr_bitfield_t * bitfield )
 {
     tr_torrent_t * tor = cp->tor;
     int i, j;
@@ -237,7 +237,7 @@ float tr_cpPercentBlocksInPiece( tr_completion_t * cp, int piece )
     int i;
     int blockCount, startBlock, endBlock;
     int complete;
-    uint8_t * bitfield;
+    tr_bitfield_t * bitfield;
     
     blockCount  = tr_pieceCountBlocks( piece );
     startBlock  = tr_pieceStartBlock( piece );
