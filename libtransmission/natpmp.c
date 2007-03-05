@@ -605,7 +605,7 @@ sendreq( tr_natpmp_req_t * req )
     uint8_t buf[12];
     int res;
 
-    bzero( buf, sizeof( buf ) );
+    memset( buf, 0, sizeof( buf ) );
     buf[0] = PMP_VERSION;
     buf[1] = PMP_OPCODE_ADDTCP;
     PMP_TOBUF16( buf + 4, req->askport );
@@ -707,7 +707,7 @@ parseresponse( uint8_t * buf, int len, int port, tr_natpmp_parse_t * parse )
 {
     int version, respopcode, opcode, wantedopcode, rescode, privport;
 
-    bzero( parse, sizeof( *parse ) );
+    memset( parse, 0, sizeof( *parse ) );
 
     if( 8 > len )
     {
