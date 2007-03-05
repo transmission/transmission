@@ -13,20 +13,22 @@ CXXFLAGS += -IlibPrefs
 LDFLAGS  += -lbe -ltracker
 LDLIBS   += ../beos/libPrefs/libPrefs.a
 
-Transmission: $(OBJS) ../beos/Transmission.rsrc
-	$(CXX) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
-	xres -o Transmission ../beos/Transmission.rsrc
-	mimeset -f Transmission
+Transmission: $(OBJS) ../libtransmission/libtransmission.a ../beos/Transmission.rsrc
+	$(LINK_RULE_CXX)
+	$(XRES_RULE)
+	$(MIMESET_RULE)
 
 %.o: %.cpp ../mk/config.mk ../mk/common.mk ../mk/beos.mk
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX_RULE)
 
 clean:
-	$(RM) Transmission $(OBJS)
+	@echo "Clean Transmission"
+	@$(RM) Transmission
+	@echo "Clean $(OBJS)"
+	@$(RM) $(OBJS)
 
 .depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/beos.mk
-	$(RM) .depend
-	$(foreach SRC, $(SRCS), $(CXX) $(CXXFLAGS) -MM $(SRC) >> .depend;)
+	$(DEP_RULE_CXX)
 
 install:
 	@true

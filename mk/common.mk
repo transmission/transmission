@@ -44,9 +44,21 @@ define DEP_RULE
 	@$(foreach SRC, $(SRCS), $(CC) -MM $(SRC) $(CFLAGS) >> .depend;)
 endef
 
+define DEP_RULE_CXX
+	@echo "Checking dependencies..."
+	@$(RM) .depend
+	@$(foreach SRC, $(SRCS), $(CXX) -MM $(SRC) $(CXXFLAGS) >> .depend;)
+endef
+
 define CC_RULE
 	@echo "Cc $@"
 	@CMD="$(CC) $(CFLAGS) -o $@ -c $<"; $$CMD || \
+	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+endef
+
+define CXX_RULE
+	@echo "C++ $@"
+	@CMD="$(CXX) $(CXXFLAGS) -o $@ -c $<"; $$CMD || \
 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
 endef
 
@@ -56,9 +68,25 @@ define LINK_RULE
 	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
 endef
 
+define LINK_RULE_CXX
+	@echo "Link $@"
+	@CMD="$(CXX) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)"; $$CMD || \
+	  ( echo "Compile line for $@ was:"; echo $$CMD; false )
+endef
+
 define MSGFMT_RULE
        @echo "Msgfmt $<"
        @msgfmt -f $< -o $@
+endef
+
+define XRES_RULE
+	@echo "Xres $@"
+	@xres -o $@ $@.rsrc
+endef
+
+define MIMESET_RULE
+	@echo "Mimeset $@"
+	@mimeset -f $@
 endef
 
 define INSTALL_BIN_RULE
