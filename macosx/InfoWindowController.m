@@ -74,6 +74,8 @@
         fAppIcon = [[NSApp applicationIconImage] copy];
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
+        
+        fFolderIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
     }
     return self;
 }
@@ -118,6 +120,7 @@
         [fFiles release];
 
     [fAppIcon release];
+    [fFolderIcon release];
     [super dealloc];
 }
 
@@ -715,7 +718,7 @@
         if (!item)
             return;
         
-        [cell setImage: [item objectForKey: @"Icon"]];
+        [cell setImage: [[item objectForKey: @"IsFolder"] boolValue] ? fFolderIcon : [item objectForKey: @"Icon"]];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {
