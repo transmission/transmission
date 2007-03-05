@@ -215,6 +215,11 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         goto fail;
     }
     strcatUTF8( inf->name, sizeof( inf->name ), val->val.s.s, 1 );
+    if( '\0' == inf->name[0] )
+    {
+        tr_err( "Invalid \"name\" string" );
+        goto fail;
+    }
     inf->totalSize = 0;
 
     if( ( list = tr_bencDictFind( beInfo, "files" ) ) )
