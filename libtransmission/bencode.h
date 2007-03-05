@@ -56,7 +56,8 @@ int          _tr_bencLoad( char * buf, int len, benc_val_t * val,
                            char ** end );
 void         tr_bencPrint( benc_val_t * val );
 void         tr_bencFree( benc_val_t * val );
-benc_val_t * tr_bencDictFind( benc_val_t * val, char * key );
+benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key );
+benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... );
 char *       tr_bencSaveMalloc( benc_val_t * val, int * len );
 int          tr_bencSave( benc_val_t * val, char ** buf,
                           int * used, int * max );
