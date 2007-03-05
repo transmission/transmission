@@ -715,9 +715,7 @@
         if (!item)
             return;
         
-        NSImage * icon = [[item objectForKey: @"IsFolder"] boolValue] ? [[fTorrents objectAtIndex: 0] icon]
-                                                                        : [item objectForKey: @"Icon"];
-        [cell setImage: icon];
+        [cell setImage: [item objectForKey: @"Icon"]];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
     {

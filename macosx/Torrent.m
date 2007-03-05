@@ -1334,6 +1334,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
             [dict setObject: [NSNumber numberWithInt: 1] forKey: @"Remaining"];
+            [dict setObject: [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] forKey: @"Icon"];
         }
         else
         {
