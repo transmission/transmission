@@ -1339,6 +1339,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             [flatList addObject: dict];
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
+            [dict setObject: [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]] forKey: @"Icon"];
         }
         
         if (parent)

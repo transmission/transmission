@@ -715,8 +715,8 @@
         if (!item)
             return;
         
-        NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: ![[item objectForKey: @"IsFolder"] boolValue]
-                            ? [[item objectForKey: @"Name"] pathExtension] : NSFileTypeForHFSTypeCode('fldr')];
+        NSImage * icon = [[item objectForKey: @"IsFolder"] boolValue] ? [[fTorrents objectAtIndex: 0] icon]
+                                                                        : [item objectForKey: @"Icon"];
         [cell setImage: icon];
     }
     else if ([[tableColumn identifier] isEqualToString: @"Check"])
