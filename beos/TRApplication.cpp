@@ -18,7 +18,7 @@
 #include <Resources.h>
 #include <Roster.h>
 
-int main(int argc, char** argv) {
+int main(int, char**) {
 	TRApplication *app = new TRApplication();
 	if (app->InitCheck() == B_OK) {
 		app->Run();
@@ -310,7 +310,7 @@ int32 TRApplication::Copy(void *data) {
 /**
  * Filters the FilePanel for torrent files and directories.
  */
-bool TRFilter::Filter(const entry_ref *ref, BNode *node, struct stat *st, const char *mimetype) {
+bool TRFilter::Filter(const entry_ref *ref, BNode *node, struct stat *, const char *mimetype) {
 	return (node->IsDirectory() || 
            (strcmp(mimetype, "application/x-bittorrent") == 0) ||
            (strstr(ref->name, ".torrent") != NULL));

@@ -75,7 +75,7 @@ TRInfoWindow::~TRInfoWindow() {
 	
 }
 
-void TRInfoWindow::FrameResized(float width, float height) {
+void TRInfoWindow::FrameResized(float, float) {
 }
 
 void TRInfoWindow::StringForFileSize(uint64_t size, BString *str) {

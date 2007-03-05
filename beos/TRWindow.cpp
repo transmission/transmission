@@ -383,7 +383,7 @@ bool TRWindow::QuitRequested() {
 	return quit;
 }
 
-void TRWindow::FrameResized(float width, float height) {
+void TRWindow::FrameResized(float, float) {
 	transfers->Invalidate();
 }
 

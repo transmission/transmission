@@ -96,7 +96,7 @@ bool TRTransfer::IsRunning() {
 /**
  * Renders (Draws) the current status into the BListView.
  */
-void TRTransfer::DrawItem(BView *owner, BRect frame, bool complete) {
+void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 	rgb_color col;
 	col.red = 255;
 	col.green = 255;
