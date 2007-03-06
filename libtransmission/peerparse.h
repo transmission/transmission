@@ -90,6 +90,7 @@ static inline int parseInterested( tr_peer_t * peer, int len,
 static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
                              uint8_t * p, int len )
 {
+    tr_info_t * inf = &tor->info;
     uint32_t piece;
 
     if( len != 4 )
@@ -99,17 +100,22 @@ static inline int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
     }
 
     TR_NTOHL( p, piece );
+    if( ( uint32_t )inf->pieceCount <= piece )
+    {
+        peer_dbg( "GET  have, invalid piece" );
+        return TR_ERROR_ASSERT;
+    }
 
     peer_dbg( "GET  have %d", piece );
 
     if( !peer->bitfield )
     {
-        peer->bitfield = tr_bitfieldNew( tor->info.pieceCount );
+        peer->bitfield = tr_bitfieldNew( inf->pieceCount );
     }
     if( !tr_bitfieldHas( peer->bitfield, piece ) )
     {
         peer->pieceCount++;
-        peer->progress = (float) peer->pieceCount / tor->info.pieceCount;
+        peer->progress = (float) peer->pieceCount / inf->pieceCount;
     }
     tr_bitfieldAdd( peer->bitfield, piece );
     updateInterest( tor, peer );
@@ -174,8 +180,10 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
     return TR_OK;
 }
 
-static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
+static inline int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
+                                uint8_t * p, int len )
 {
+    tr_info_t * inf = &tor->info;
     int index, begin, length;
     tr_request_t * r;
 
@@ -195,6 +203,17 @@ static inline int parseRequest( tr_peer_t * peer, uint8_t * p, int len )
     TR_NTOHL( p,     index );
     TR_NTOHL( &p[4], begin );
     TR_NTOHL( &p[8], length );
+
+    if( inf->pieceCount <= index )
+    {
+        peer_dbg( "GET  request, invalid index" );
+        return TR_ERROR_ASSERT;
+    }
+    if( tr_pieceSize( index ) < begin + length )
+    {
+        peer_dbg( "GET  request, invalid begin/length" );
+        return TR_ERROR_ASSERT;
+    }
 
     peer_dbg( "GET  request %d/%d (%d bytes)",
               index, begin, length );
@@ -268,10 +287,29 @@ static inline void updateRequests( tr_torrent_t * tor, tr_peer_t * peer,
 static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
                               uint8_t * p, int len )
 {
+    tr_info_t * inf = &tor->info;
     int index, begin, block, i, ret;
+
+    if( 8 > len )
+    {
+        peer_dbg( "GET  piece, too short (8 > %i)", len );
+        return TR_ERROR_ASSERT;
+    }
 
     TR_NTOHL( p,     index );
     TR_NTOHL( &p[4], begin );
+
+    if( inf->pieceCount <= index )
+    {
+        peer_dbg( "GET  piece, invalid index" );
+        return TR_ERROR_ASSERT;
+    }
+    if( tr_pieceSize( index ) < begin + len - 8 )
+    {
+        peer_dbg( "GET  piece, invalid begin/length" );
+        return TR_ERROR_ASSERT;
+    }
+
     block = tr_block( index, begin );
 
     peer_dbg( "GET  piece %d/%d (%d bytes)",
@@ -295,7 +333,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     /* Set blame/credit for this piece */
     if( !peer->blamefield )
     {
-        peer->blamefield = tr_bitfieldNew( tor->info.pieceCount );
+        peer->blamefield = tr_bitfieldNew( inf->pieceCount );
     }
     tr_bitfieldAdd( peer->blamefield, index );
 
@@ -338,8 +376,10 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     return TR_OK;
 }
 
-static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
+static inline int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
+                               uint8_t * p, int len )
 {
+    tr_info_t * inf = &tor->info;
     int index, begin, length;
     int i;
     tr_request_t * r;
@@ -353,6 +393,17 @@ static inline int parseCancel( tr_peer_t * peer, uint8_t * p, int len )
     TR_NTOHL( p,     index );
     TR_NTOHL( &p[4], begin );
     TR_NTOHL( &p[8], length );
+
+    if( inf->pieceCount <= index )
+    {
+        peer_dbg( "GET  cancel, invalid index" );
+        return TR_ERROR_ASSERT;
+    }
+    if( tr_pieceSize( index ) < begin + length )
+    {
+        peer_dbg( "GET  cancel, invalid begin/length" );
+        return TR_ERROR_ASSERT;
+    }
 
     peer_dbg( "GET  cancel %d/%d (%d bytes)",
               index, begin, length );
@@ -413,11 +464,11 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
         case PEER_MSG_BITFIELD:
             return parseBitfield( tor, peer, p, len );
         case PEER_MSG_REQUEST:
-            return parseRequest( peer, p, len );
+            return parseRequest( tor, peer, p, len );
         case PEER_MSG_PIECE:
             return parsePiece( tor, peer, p, len );
         case PEER_MSG_CANCEL:
-            return parseCancel( peer, p, len );
+            return parseCancel( tor, peer, p, len );
         case PEER_MSG_PORT:
             return parsePort( peer, p, len );
     }
