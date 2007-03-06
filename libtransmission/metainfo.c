@@ -159,7 +159,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
     }
     
     /* Creator info */
-    tr_bencDictFindFirst( &meta, "created by.utf-8", "created by", NULL );
+    val = tr_bencDictFindFirst( &meta, "created by.utf-8", "created by", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
         strcatUTF8( inf->creator, sizeof( inf->creator ), val->val.s.s, 0 );

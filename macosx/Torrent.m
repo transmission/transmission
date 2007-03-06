@@ -1219,7 +1219,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [nc addObserver: self selector: @selector(updateSpeedSetting:)
                 name: @"UpdateSpeedSetting" object: nil];
     
-    fInfo = tr_torrentInfo( fHandle );
+    fInfo = tr_torrentInfo(fHandle);
 
     fDate = date ? [date retain] : [[NSDate alloc] init];
     
