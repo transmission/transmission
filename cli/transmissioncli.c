@@ -160,6 +160,10 @@ int main( int argc, char ** argv )
         {
             printf( "creator:  %s\n", info->creator );
         }
+        if( TR_FLAG_PRIVATE & info->flags )
+        {
+            printf( "private flag set\n" );
+        }
         printf( "file(s):\n" );
         for( i = 0; i < info->fileCount; i++ )
         {

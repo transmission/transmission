@@ -99,8 +99,8 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tr_info_t     * inf;
     int             i;
     
-    inf        = &tor->info;
-    inf->flags = flags;
+    inf         = &tor->info;
+    inf->flags |= flags;
 
     tr_sharedLock( h->shared );
 
