@@ -227,7 +227,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
         /* Multi-file mode */
         inf->multifile = 1;
         inf->fileCount = list->val.l.count;
-        inf->files     = calloc( inf->fileCount * sizeof( tr_file_t ), 1 );
+        inf->files     = calloc( inf->fileCount, sizeof( tr_file_t ) );
 
         for( i = 0; i < list->val.l.count; i++ )
         {
