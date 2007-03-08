@@ -128,6 +128,7 @@ static void fastResumeSave( tr_io_t * io )
     uint8_t * buf;
     uint64_t  total;
     int       size;
+    tr_bitfield_t * bitfield;
 
     buf = malloc( FR_PROGRESS_LEN( tor ) );
 
@@ -152,8 +153,9 @@ static void fastResumeSave( tr_io_t * io )
     fwrite( &version, 4, 1, file );
 
     /* Build and copy the bitfield for blocks */
-    memcpy(buf + FR_MTIME_LEN( tor ), tr_cpBlockBitfield( tor->completion ),
-           FR_BLOCK_BITFIELD_LEN( tor ) );
+    bitfield = tr_cpBlockBitfield( tor->completion );
+    assert( FR_BLOCK_BITFIELD_LEN( tor ) == bitfield->len );
+    memcpy(buf + FR_MTIME_LEN( tor ), bitfield->bits, bitfield->len );
 
     /* Copy the 'slotPiece' table */
     memcpy(buf + FR_MTIME_LEN( tor ) + FR_BLOCK_BITFIELD_LEN( tor ),
