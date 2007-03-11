@@ -1237,9 +1237,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fError = NO;
     
-    NSString * fileType = fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr') : [[self name] pathExtension];
-    fIcon = [[NSWorkspace sharedWorkspace] iconForFileType: fileType];
-    [fIcon retain];
+    fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr')
+                                                : [[self name] pathExtension]] retain];
     
     fIconFlipped = [fIcon copy];
     [fIconFlipped setFlipped: YES];

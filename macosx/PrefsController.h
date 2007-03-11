@@ -32,7 +32,7 @@
     tr_handle_t * fHandle;
     
     NSUserDefaults          * fDefaults;
-    BOOL                    hasLoaded;
+    BOOL                    fHasLoaded;
     
     NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;

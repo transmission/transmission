@@ -112,7 +112,7 @@
 
 - (void) awakeFromNib
 {
-    hasLoaded = YES;
+    fHasLoaded = YES;
     
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
     [fToolbar setDelegate: self];
@@ -342,7 +342,7 @@
 
 - (void) updateRatioStopField
 {
-    if (!hasLoaded)
+    if (!fHasLoaded)
         return;
     
     [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
@@ -363,7 +363,7 @@
 
 - (void) updateLimitFields
 {
-    if (!hasLoaded)
+    if (!fHasLoaded)
         return;
     
     [fUploadField setIntValue: [fDefaults integerForKey: @"UploadLimit"]];
