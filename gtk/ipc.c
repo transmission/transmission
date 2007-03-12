@@ -43,7 +43,9 @@
 #include "tr_prefs.h"
 #include "util.h"
 
-#define PROTOVERS               1       /* IPC protocol version */
+/* IPC protocol version */
+#define PROTO_VERS_MIN          ( 1 )
+#define PROTO_VERS_MAX          ( 1 )
 
 /* int, IPC protocol version */
 #define MSG_VERSION             ("version")
@@ -78,6 +80,7 @@ struct handlerdef {char *name; handler_func_t func;};
 struct constate {
   GSource *source;
   int fd;
+  int vers;
   const struct handlerdef *funcs;
   enum contype type;
   union {
@@ -98,13 +101,17 @@ srv_io_accept(GSource *source, int fd, struct sockaddr *sa, socklen_t len,
 static int
 send_msg(struct constate *con, const char *name, benc_val_t *val);
 static int
-send_msg_int(struct constate *con, const char *name, int num);
+send_msg_vers_new(struct constate *con);
+static int
+send_msg_vers_old(struct constate *con);
 static unsigned int
 all_io_received(GSource *source, char *data, unsigned int len, void *vdata);
 static void
 destroycon(struct constate *con);
 static void
 all_io_closed(GSource *source, void *vdata);
+static void
+srv_vers(struct constate *con, const char *name, benc_val_t *val);
 static void
 srv_addfile(struct constate *con, const char *name, benc_val_t *val);
 static void
@@ -113,8 +120,13 @@ static void
 afc_version(struct constate *con, const char *name, benc_val_t *val);
 static void
 afc_io_sent(GSource *source, unsigned int id, void *vdata);
+static int
+ipc_checkversion( benc_val_t * vers );
+static int
+getvers( benc_val_t * dict, const char * key );
 
 static const struct handlerdef gl_funcs_serv[] = {
+  {MSG_VERSION,  srv_vers},
   {MSG_ADDFILES, srv_addfile},
   {MSG_QUIT,     srv_quit},
   {NULL, NULL}
@@ -137,6 +149,7 @@ ipc_socket_setup( void * parent, add_torrents_func_t addfunc,
   con = g_new0(struct constate, 1);
   con->source = NULL;
   con->fd = -1;
+  con->vers = -1;
   con->funcs = gl_funcs_serv;
   con->type = CON_SERV;
   con->u.serv.wind = parent;
@@ -158,6 +171,7 @@ blocking_client( enum client_cmd cmd, GList * files )
   con = g_new0(struct constate, 1);
   con->source = NULL;
   con->fd = -1;
+  con->vers = -1;
   con->funcs = gl_funcs_client;
   con->type = CON_CLIENT;
   con->u.client.loop = g_main_loop_new(NULL, TRUE);
@@ -262,6 +276,11 @@ client_connect(char *path, struct constate *con) {
   con->source = io_new(con->fd, afc_io_sent, all_io_received,
                        all_io_closed, con);
 
+  if( NULL != con->source )
+  {
+      send_msg_vers_new( con );
+  }
+
   return TRUE;
 }
 
@@ -276,8 +295,11 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
   newcon->fd = fd;
   newcon->source = io_new(fd, NULL, all_io_received, all_io_closed, newcon);
 
+  /* XXX need to check for incoming version from client */
+
   if(NULL != newcon->source)
-    send_msg_int(newcon, MSG_VERSION, PROTOVERS);
+    /* XXX need to switch to new version scheme after the next release */
+    send_msg_vers_old( newcon );
   else {
     g_free(newcon);
     close(fd);
@@ -323,14 +345,40 @@ send_msg(struct constate *con, const char *name, benc_val_t *val) {
 }
 
 static int
-send_msg_int(struct constate *con, const char *name, int num) {
-  benc_val_t val;
+send_msg_vers_new( struct constate * con )
+{
+    benc_val_t dict;
 
-  bzero(&val, sizeof(val));
-  val.type = TYPE_INT;
-  val.val.i = num;
+    /* XXX ugh, I need to merge the pex branch and use it's benc funcs */
+    bzero( &dict, sizeof dict );
+    dict.type                  = TYPE_DICT;
+    dict.val.l.alloc           = 4;
+    dict.val.l.count           = 4;
+    dict.val.l.vals            = g_new0( benc_val_t, 4 );
+    dict.val.l.vals[0].type    = TYPE_STR;
+    dict.val.l.vals[0].val.s.i = 3;
+    dict.val.l.vals[0].val.s.s = "min";
+    dict.val.l.vals[1].type    = TYPE_INT;
+    dict.val.l.vals[1].val.i   = PROTO_VERS_MIN;
+    dict.val.l.vals[2].type    = TYPE_STR;
+    dict.val.l.vals[2].val.s.i = 3;
+    dict.val.l.vals[2].val.s.s = "max";
+    dict.val.l.vals[3].type    = TYPE_INT;
+    dict.val.l.vals[3].val.i   = PROTO_VERS_MAX;
 
-  return send_msg(con, name, &val);
+    return send_msg( con, MSG_VERSION, &dict );
+}
+
+static int
+send_msg_vers_old( struct constate * con )
+{
+    benc_val_t val;
+
+    bzero( &val, sizeof val );
+    val.type  = TYPE_INT;
+    val.val.i = PROTO_VERS_MIN;
+
+    return send_msg( con, MSG_VERSION, &val );
 }
 
 static unsigned int
@@ -395,6 +443,21 @@ all_io_closed(GSource *source SHUTUP, void *vdata) {
 }
 
 static void
+srv_vers( struct constate * con, const char * name SHUTUP, benc_val_t * val )
+{
+    if( 0 > con->vers )
+    {
+        con->vers = ipc_checkversion( val );
+        if( 0 > con->vers )
+        {
+            fprintf( stderr, _("bad IPC protocol version\n") );
+            destroycon( con );
+            return;
+        }
+    }
+}
+
+static void
 srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
   struct constate_serv *srv = &con->u.serv;
   GList *files;
@@ -430,10 +493,19 @@ afc_version(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
   GList *file;
   benc_val_t list, *str;
 
-  if(TYPE_INT != val->type || PROTOVERS != val->val.i) {
-    fprintf(stderr, _("bad IPC protocol version\n"));
-    destroycon(con);
-    return;
+  if( 0 > con->vers )
+  {
+      con->vers = ipc_checkversion( val );
+      if( 0 > con->vers )
+      {
+          fprintf( stderr, _("bad IPC protocol version\n") );
+          destroycon( con );
+          return;
+      }
+  }
+  else
+  {
+      return;
   }
 
   /* XXX handle getting a non-version tag, invalid data,
@@ -473,4 +545,54 @@ afc_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
     *(afc->succeeded) = TRUE;
     destroycon(vdata);
   }
+}
+
+int
+ipc_checkversion( benc_val_t * vers )
+{
+    int min, max;
+
+    if( TYPE_INT == vers->type )
+    {
+        if( 0 > vers->val.i )
+        {
+            return -1;
+        }
+        min = max = vers->val.i;
+    }
+    else if( TYPE_DICT == vers->type )
+    {
+        min = getvers( vers, "min" );
+        max = getvers( vers, "max" );
+        if( 0 > min || 0 > max )
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        return -1;
+    }
+
+    g_assert( PROTO_VERS_MIN <= PROTO_VERS_MAX );
+    if( min > max || PROTO_VERS_MAX < min || PROTO_VERS_MIN > max )
+    {
+        return -1;
+    }
+
+    return MIN( PROTO_VERS_MAX, max );
+}
+
+int
+getvers( benc_val_t * dict, const char * key )
+{
+    benc_val_t * val;
+
+    val = tr_bencDictFind( dict, key );
+    if( NULL == val || TYPE_INT != val->type || 0 > val->val.i )
+    {
+        return -1;
+    }
+
+    return val->val.i;
 }
