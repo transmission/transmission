@@ -43,7 +43,8 @@ tr_handle_t * tr_init()
     /* Generate a peer id : "-TRxxyy-" + 12 random alphanumeric
        characters, where xx is the major version number and yy the
        minor version number (Azureus-style) */
-    sprintf( h->id, "-TR%02d%02d-", VERSION_MAJOR, VERSION_MINOR );
+    snprintf( h->id, sizeof h->id, "-TR%02d%02d-",
+              VERSION_MAJOR, VERSION_MINOR );
     for( i = 8; i < 20; i++ )
     {
         r        = tr_rand( 36 );

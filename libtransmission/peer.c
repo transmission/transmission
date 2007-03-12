@@ -113,7 +113,7 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
     va_list args;
 
     va_start( args, msg );
-    sprintf( string, "%08x:%04x ",
+    snprintf( string, sizeof string, "%08x:%04x ",
              (uint32_t) peer->addr.s_addr, peer->port );
     vsnprintf( &string[14], sizeof( string ) - 14, msg, args );
     va_end( args ); 

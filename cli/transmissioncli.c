@@ -112,7 +112,7 @@ int main( int argc, char ** argv )
     if( verboseLevel )
     {
         static char env[11];
-        sprintf( env, "TR_DEBUG=%d", verboseLevel );
+        snprintf( env, sizeof env, "TR_DEBUG=%d", verboseLevel );
         putenv( env );
     }
 

@@ -127,7 +127,9 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     /* Escaped info hash for HTTP queries */
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
-        sprintf( &tor->escapedHashString[3*i], "%%%02x", inf->hash[i] );
+        snprintf( &tor->escapedHashString[3*i],
+                  sizeof( tor->escapedHashString ) - 3 * i,
+                  "%%%02x", inf->hash[i] );
     }
 
     /* Block size: usually 16 ko, or less if we have to */

@@ -115,7 +115,8 @@ int tr_metainfoParse( tr_info_t * inf, const char * path,
           (long) beInfo->end - (long) beInfo->begin, inf->hash );
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
-        sprintf( inf->hashString + i * 2, "%02x", inf->hash[i] );
+        snprintf( inf->hashString + i * 2, sizeof( inf->hashString ) - i * 2,
+                  "%02x", inf->hash[i] );
     }
 
     if( saveCopy )
@@ -494,7 +495,8 @@ static char * announceToScrape( const char * announce )
     char new[]  = "scrape";
     int  newlen = 6;
     char * slash, * scrape;
-    
+    size_t scrapelen, used;
+
     slash = strrchr( announce, '/' );
     if( NULL == slash )
     {
@@ -507,10 +509,23 @@ static char * announceToScrape( const char * announce )
         return NULL;
     }
 
-    scrape = calloc( strlen( announce ) - oldlen + newlen + 1, 1 );
-    strncat( scrape, announce, slash - announce );
-    strcat(  scrape, new );
-    strcat(  scrape, slash + oldlen );
+    scrapelen = strlen( announce ) - oldlen + newlen;
+    scrape = calloc( scrapelen + 1, 1 );
+    if( NULL == scrape )
+    {
+        return NULL;
+    }
+    assert( ( size_t )( slash - announce ) < scrapelen );
+    memcpy( scrape, announce, slash - announce );
+    used = slash - announce;
+    strncat( scrape, new, scrapelen - used );
+    used += newlen;
+    assert( strlen( scrape ) == used );
+    if( used < scrapelen )
+    {
+        assert( strlen( slash + oldlen ) == scrapelen - used );
+        strncat( scrape, slash + oldlen, scrapelen - used );
+    }
 
     return scrape;
 }

@@ -281,17 +281,16 @@ addactionflag(const char *action) {
 }
 
 const char *
-addactionname(guint flag) {
-  static char name[6];
+addactionname( guint flag )
+{
+    static char name[6];
 
-  if(TR_TORNEW_SAVE_COPY & flag)
-    strcpy(name, "copy");
-  else if(TR_TORNEW_SAVE_MOVE & flag)
-    strcpy(name, "move");
-  else
-    strcpy(name, "leave");
+    snprintf( name, sizeof name, "%s",
+              ( TR_TORNEW_SAVE_COPY & flag ? "copy" :
+              ( TR_TORNEW_SAVE_MOVE & flag ? "move" :
+                                             "leave" ) ) );
 
-  return name;
+    return name;
 }
 
 GList *
@@ -323,7 +322,7 @@ getdownloaddir( void )
             wd = g_new( char, MAX_PATH_LENGTH + 1 );
             if( NULL == getcwd( wd, MAX_PATH_LENGTH + 1 ) )
             {
-                strcpy( wd, "." );
+                snprintf( wd, MAX_PATH_LENGTH + 1, "." );
             }
         }
         dir = wd;
