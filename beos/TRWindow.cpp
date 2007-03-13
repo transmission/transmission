@@ -82,7 +82,7 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 	delete rectFrame;
 	
 	// Bring up the Transmission Engine
-	engine = tr_init();
+	engine = tr_init( "beos" );
 	LoadSettings();
 	
 	UpdateList(-1, true);

@@ -30,7 +30,7 @@
  ***********************************************************************
  * Allocates a tr_handle_t structure and initializes a few things
  **********************************************************************/
-tr_handle_t * tr_init()
+tr_handle_t * tr_init( const char * tag )
 {
     tr_handle_t * h;
     int           i, r;
@@ -39,6 +39,17 @@ tr_handle_t * tr_init()
     tr_netResolveThreadInit();
 
     h = calloc( sizeof( tr_handle_t ), 1 );
+    if( NULL == h )
+    {
+        return NULL;
+    }
+
+    h->tag = strdup( tag );
+    if( NULL == h->tag )
+    {
+        free( h );
+        return NULL;
+    }
 
     /* Generate a peer id : "-TRxxyy-" + 12 random alphanumeric
        characters, where xx is the major version number and yy the

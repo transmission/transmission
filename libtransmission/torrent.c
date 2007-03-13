@@ -60,7 +60,7 @@ tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
     int             saveCopy = ( TR_FLAG_SAVE & flags );
 
     /* Parse torrent file */
-    if( tr_metainfoParse( &tor->info, path, NULL, saveCopy ) )
+    if( tr_metainfoParse( &tor->info, h->tag, path, NULL, saveCopy ) )
     {
         *error = TR_EINVALID;
         free( tor );
@@ -76,7 +76,7 @@ tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
     tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
 
     /* Parse torrent file */
-    if( tr_metainfoParse( &tor->info, NULL, hashStr, 0 ) )
+    if( tr_metainfoParse( &tor->info, h->tag, NULL, hashStr, 0 ) )
     {
         *error = TR_EINVALID;
         free( tor );
@@ -557,7 +557,7 @@ void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size )
 
 void tr_torrentRemoveSaved( tr_torrent_t * tor )
 {
-    tr_metainfoRemoveSaved( tor->info.hashString );
+    tr_metainfoRemoveSaved( tor->info.hashString, tor->handle->tag );
 }
 
 /***********************************************************************

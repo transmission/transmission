@@ -136,7 +136,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if ((self = [super init]))
     {
-        fLib = tr_init();
+        fLib = tr_init( "macosx" );
         
         fTorrents = [[NSMutableArray alloc] initWithCapacity: 10];
         fDisplayedTorrents = [[NSMutableArray alloc] initWithCapacity: 10];

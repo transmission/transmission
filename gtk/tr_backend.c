@@ -104,7 +104,7 @@ static void
 tr_backend_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   TrBackend *self = (TrBackend *)instance;
 
-  self->handle = tr_init();
+  self->handle = tr_init( "gtk" );
   self->disposed = FALSE;
 }
 

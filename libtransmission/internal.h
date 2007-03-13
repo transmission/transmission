@@ -212,6 +212,7 @@ struct tr_handle_s
     int            torrentCount;
     tr_torrent_t * torrentList;
 
+    char         * tag;
     int            isPortSet;
     int            uploadLimit;
     int            downloadLimit;

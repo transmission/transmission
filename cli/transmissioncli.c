@@ -123,7 +123,7 @@ int main( int argc, char ** argv )
     }
 
     /* Initialize libtransmission */
-    h = tr_init();
+    h = tr_init( "cli" );
 
     /* Open and parse torrent file */
     if( !( tor = tr_torrentInit( h, torrentPath, 0, &error ) ) )
