@@ -93,7 +93,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
     /* Save a copy of the torrent file */
     if( saveCopy )
     {
-        if( savetorrent( inf->hashString, tag, buf, len ) )
+        if( savetorrent( inf->hashString, tag, (uint8_t *) buf, len ) )
         {
             tr_bencFree( &meta );
             free( buf );
@@ -586,7 +586,7 @@ char * readtorrent( const char * path, const char * hash, const char * tag,
     /* save a new tagged copy of the old untagged torrent */
     if( save )
     {
-        savetorrent( hash, tag, buf, sb.st_size );
+        savetorrent( hash, tag, (uint8_t *) buf, sb.st_size );
     }
 
     *len = sb.st_size;
