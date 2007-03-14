@@ -148,6 +148,11 @@ char * tr_clientForId( uint8_t * id )
         {
             asprintf( &ret, "Arctic Torrent" );
         }
+        else if( !memcmp( &id[1], "BG", 2 ) )
+        {
+            asprintf( &ret, "BTG %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
         
         if( ret )
         {
