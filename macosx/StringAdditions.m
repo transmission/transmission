@@ -79,12 +79,18 @@
 
 + (NSString *) stringForSpeed: (float) speed
 {
+    if (speed < 0)
+        return NSLocalizedString(@"error", "Transfer speed invalid");
+    
     return [[self stringForSpeedAbbrev: speed] stringByAppendingString:
                     NSLocalizedString(@"B/s", "Transfer speed (Bytes per second)")];
 }
 
 + (NSString *) stringForSpeedAbbrev: (float) speed
 {
+    if (speed < 0)
+        return NSLocalizedString(@"error", "Transfer speed invalid");
+    
     if (speed < 1000.0) //0.0 K to 999.9 K
         return [NSString stringWithFormat: @"%.1f K", speed];
     else if (speed < 102400.0) //0.98 M to 99.99 M
@@ -101,7 +107,10 @@
         return NSLocalizedString(@"N/A", "No Ratio");
     else if (ratio == TR_RATIO_INF)
         return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
-    else if (ratio < 10.0)
+    else if (ratio < 0)
+        return NSLocalizedString(@"error", "Ratio invalid");
+    
+    if (ratio < 10.0)
         return [NSString stringWithFormat: @"%.2f", ratio];
     else if (ratio < 100.0)
         return [NSString stringWithFormat: @"%.1f", ratio];
