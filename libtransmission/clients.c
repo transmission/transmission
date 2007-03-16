@@ -94,9 +94,21 @@ char * tr_clientForId( uint8_t * id )
         }
         else if( !memcmp( &id[1], "KT", 2 ) )
         {
-            asprintf( &ret, "KTorrent %c.%c%s",
-                      id[3], id[4],
-                      ( id[5] == 'R' ? " RC" : ( id[5] == 'D' ? " Dev" : "") ) );
+            if( id[5] == 'R' )
+            {
+                asprintf( &ret, "KTorrent %c.%c RC %c",
+                        id[3], id[4], id[6] );
+            }
+            else if( id[5] == 'D' )
+            {
+                asprintf( &ret, "KTorrent %c.%c Dev",
+                        id[3], id[4] );
+            }
+            else
+            {
+                asprintf( &ret, "KTorrent %c.%c.%c",
+                        id[3], id[4], id[5] );
+            }
         }
         else if( !memcmp( &id[1], "lt", 2 ) )
         {
