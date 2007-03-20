@@ -37,7 +37,7 @@
 {
     if ((self = [super init]))
     {
-        fDockIcon = [[NSApp applicationIconImage] copy];
+        fDockIcon = [NSImage imageNamed: @"NSApplicationIcon"];
         fBadge = [NSImage imageNamed: @"Badge"];
         fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
@@ -61,9 +61,7 @@
 
 - (void) dealloc
 {
-    [fDockIcon release];
     [fAttributes release];
-
     [super dealloc];
 }
 

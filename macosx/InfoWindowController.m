@@ -71,7 +71,7 @@
 {
     if ((self = [super initWithWindowNibName: name]))
     {
-        fAppIcon = [[NSApp applicationIconImage] copy];
+        fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
         
@@ -118,8 +118,7 @@
         [fPeers release];
     if (fFiles)
         [fFiles release];
-
-    [fAppIcon release];
+    
     [fFolderIcon release];
     [super dealloc];
 }
