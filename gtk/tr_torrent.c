@@ -278,7 +278,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   if(TR_TORNEW_LOAD_SAVED & flags)
     handle = tr_torrentInitSaved(back, torrent, 0, &errcode);
   else
-    handle = tr_torrentInit(back, torrent, trflags, &errcode);
+    handle = tr_torrentInit(back, torrent, NULL, trflags, &errcode);
 
   if(NULL == handle) {
     switch(errcode) {

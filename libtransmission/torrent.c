@@ -29,7 +29,7 @@
  * Local prototypes
  **********************************************************************/
 static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
-                                       int flags, int * error );
+                                       uint8_t *, int flags, int * error );
 static void torrentReallyStop( tr_torrent_t * );
 static void downloadLoop( void * );
 
@@ -54,7 +54,7 @@ void tr_setDownloadLimit( tr_torrent_t * tor, int limit )
 }
 
 tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
-                               int flags, int * error )
+                               uint8_t * hash, int flags, int * error )
 {
     tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
     int             saveCopy = ( TR_FLAG_SAVE & flags );
@@ -67,7 +67,7 @@ tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
         return NULL;
     }
 
-    return torrentRealInit( h, tor, flags, error );
+    return torrentRealInit( h, tor, hash, flags, error );
 }
 
 tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
@@ -83,7 +83,7 @@ tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
         return NULL;
     }
 
-    return torrentRealInit( h, tor, ( TR_FLAG_SAVE | flags ), error );
+    return torrentRealInit( h, tor, NULL, ( TR_FLAG_SAVE | flags ), error );
 }
 
 /***********************************************************************
@@ -93,7 +93,7 @@ tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
  * to fill it.
  **********************************************************************/
 static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
-                                       int flags, int * error )
+                                       uint8_t * hash, int flags, int * error )
 {
     tr_torrent_t  * tor_tmp;
     tr_info_t     * inf;
@@ -110,6 +110,10 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
         if( !memcmp( tor->info.hash, tor_tmp->info.hash,
                      SHA_DIGEST_LENGTH ) )
         {
+            if( NULL != hash )
+            {
+                memcpy( hash, tor->info.hash, SHA_DIGEST_LENGTH );
+            }
             *error = TR_EDUPLICATE;
             tr_metainfoFree( &tor->info );
             free( tor );

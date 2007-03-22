@@ -193,24 +193,25 @@ void tr_close( tr_handle_t * );
 /***********************************************************************
  * tr_torrentInit
  ***********************************************************************
- * Opens and parses torrent file at 'path'. If the file exists and is a
- * valid torrent file, returns an handle and adds it to the list of
+ * Opens and parses torrent file at 'path'. If the file exists and is
+ * a valid torrent file, returns an handle and adds it to the list of
  * torrents (but doesn't start it). Returns NULL and sets *error
- * otherwise.  If the TR_FLAG_SAVE flag is passed then a copy of the
- * torrent file will be saved.
+ * otherwise. If hash is not NULL and the torrent is already loaded
+ * then it's 20-byte hash will be copied in. If the TR_FLAG_SAVE flag
+ * is passed then a copy of the torrent file will be saved.
  **********************************************************************/
 #define TR_EINVALID     1
 #define TR_EUNSUPPORTED 2
 #define TR_EDUPLICATE   3
 #define TR_EOTHER       666
 tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
-                               int flags, int * error );
+                               uint8_t * hash, int flags, int * error );
 
 /***********************************************************************
  * tr_torrentInitSaved
  ***********************************************************************
  * Opens and parses a torrent file as with tr_torrentInit, only taking
- * the hash string of a saved torrent file instead of a filename.  There
+ * the hash string of a saved torrent file instead of a filename. There
  * are currently no valid flags for this function.
  **********************************************************************/
 tr_torrent_t * tr_torrentInitSaved( tr_handle_t *, const char * hashStr,

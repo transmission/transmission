@@ -1220,7 +1220,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FLAG_SAVE, & error);
     
     if (!fHandle && path)
-        fHandle = tr_torrentInit(fLib, [path UTF8String], TR_FLAG_SAVE, & error);
+        fHandle = tr_torrentInit(fLib, [path UTF8String], NULL, TR_FLAG_SAVE, & error);
 
     if (!fHandle)
     {

@@ -160,7 +160,7 @@ void TRWindow::AddEntry(BEntry *torrent) {
 			
 			// Try adding the torrent to the engine.
 			int error;
-			tr_torrent_t *nTorrent = tr_torrentInit(engine, path.Path(), 0, &error);
+			tr_torrent_t *nTorrent = tr_torrentInit(engine, path.Path(), NULL, 0, &error);
 			if (nTorrent != NULL && Lock()) { // Success. Add the TRTorrent item.
 				transfers->AddItem(new TRTransfer(path.Path(), node, nTorrent));
 				

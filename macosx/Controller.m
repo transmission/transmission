@@ -702,7 +702,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     
         torrentPath = [[files objectAtIndex: 0] retain];
-        tempTor = tr_torrentInit(fLib, [torrentPath UTF8String], 0, &error);
+        tempTor = tr_torrentInit(fLib, [torrentPath UTF8String], NULL, 0, &error);
         
         [files removeObjectAtIndex: 0];
     } while (!tempTor);
@@ -1817,7 +1817,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     int error;
     while ((file = [enumerator nextObject]))
     {
-        tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], 0, &error);
+        tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error);
         
         if (tempTor)
             tr_torrentClose(fLib, tempTor);
