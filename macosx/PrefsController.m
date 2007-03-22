@@ -340,12 +340,19 @@
     }
 }
 
+- (void) applyRatioSetting: (id) sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+}
+
 - (void) updateRatioStopField
 {
     if (!fHasLoaded)
         return;
     
     [fRatioStopField setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
+    
+    [self applyRatioSetting: nil];
 }
 
 - (void) setRatioStop: (id) sender
@@ -359,6 +366,8 @@
     }
     
     [fDefaults setFloat: ratio forKey: @"RatioLimit"];
+    
+    [self applyRatioSetting: nil];
 }
 
 - (void) updateLimitFields

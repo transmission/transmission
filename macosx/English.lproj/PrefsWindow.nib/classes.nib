@@ -5,6 +5,7 @@
         {CLASS = NSDatePicker; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {
+                applyRatioSetting = id; 
                 applySpeedSettings = id; 
                 folderSheetShow = id; 
                 helpForNetwork = id; 

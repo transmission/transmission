@@ -872,6 +872,8 @@
         [torrent setRatioSetting: setting];
     
     [fRatioLimitField setHidden: setting != NSOnState];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 - (void) setRatioLimit: (id) sender
@@ -898,6 +900,8 @@
         while ((torrent = [enumerator nextObject]))
             [torrent setRatioLimit: ratioLimit];
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
 
 @end

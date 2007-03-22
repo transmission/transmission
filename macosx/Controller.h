@@ -152,7 +152,7 @@
 
 - (void) updateControlTint: (NSNotification *) notification;
 
-- (void) updateUI: (NSTimer *) timer;
+- (void) updateUI;
 
 - (void) updateTorrentsInQueue;
 

@@ -77,6 +77,7 @@
 - (void) setNat:    (id) sender;
 - (void) updateNatStatus;
 
+- (void) applyRatioSetting: (id) sender;
 - (void) updateRatioStopField;
 - (void) setRatioStop: (id) sender;
 

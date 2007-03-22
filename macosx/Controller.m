@@ -324,6 +324,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
+    [nc addObserver: self selector: @selector(updateUI)
+                    name: @"UpdateUI" object: nil];
+    
     [nc addObserver: fInfoController selector: @selector(updateInfoSettings)
                     name: @"UpdateInfoSettings" object: nil];
     
@@ -362,9 +365,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //timer to update the interface every second
     fCompleted = 0;
-    [self updateUI: nil];
+    [self updateUI];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
-        selector: @selector(updateUI:) userInfo: nil repeats: YES];
+        selector: @selector(updateUI) userInfo: nil repeats: YES];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSModalPanelRunLoopMode];
     [[NSRunLoop currentRunLoop] addTimer: fTimer forMode: NSEventTrackingRunLoopMode];
     
@@ -899,7 +902,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         [torrent startTransfer];
     
-    [self updateUI: nil];
+    [self updateUI];
     [self applyFilter: nil];
     [self updateTorrentHistory];
 }
@@ -924,7 +927,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [torrents makeObjectsPerformSelector: @selector(stopTransfer)];
     
-    [self updateUI: nil];
+    [self updateUI];
     [self applyFilter: nil];
     [self updateTorrentHistory];
 }
@@ -1051,7 +1054,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fTableView deselectAll: nil];
     
-    [self updateUI: nil];
+    [self updateUI];
     [self applyFilter: nil];
     
     [self updateTorrentHistory];
@@ -1191,7 +1194,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fMessageController showWindow: nil];
 }
 
-- (void) updateUI: (NSTimer *) timer
+- (void) updateUI
 {
     [fTorrents makeObjectsPerformSelector: @selector(update)];
 
@@ -1289,7 +1292,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     }
     
-    [self updateUI: nil];
+    [self updateUI];
     [self applyFilter: nil];
     [self updateTorrentHistory];
 }
@@ -2067,7 +2070,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     }
 
-    [self updateUI: nil];
+    [self updateUI];
     
     //set views to not autoresize
     unsigned int statsMask = [fStatusBar autoresizingMask];

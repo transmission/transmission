@@ -99,7 +99,7 @@
         isActive = [[info objectForKey: @"Active"] boolValue];
     float completedWidth, remainingWidth;
     
-    //bar images
+    //bar images and widths
     NSImage * barLeftEnd, * barRightEnd, * barComplete, * barRemaining;
     if (seeding)
     {
@@ -139,13 +139,12 @@
         barRemaining = fProgressWhite;
     }
     
+    //place bar
     [barLeftEnd compositeToPoint: point operation: NSCompositeSourceOver];
     
-    //active bar
     point.x += 1.0;
     [self placeBar: barComplete width: completedWidth point: point];
     
-    //remaining bar
     point.x += completedWidth;
     [self placeBar: barRemaining width: remainingWidth point: point];
     
