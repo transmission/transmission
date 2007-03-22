@@ -34,8 +34,8 @@
     
     NSImage * fProgressWhite, * fProgressBlue, * fProgressGray, * fProgressGreen,
                     * fProgressAdvanced, * fProgressEndWhite, * fProgressEndBlue,
-                    * fProgressEndGray, * fProgressEndGreen, * fProgressEndAdvanced,
-                    * fErrorImage;
+                    * fProgressEndGray, * fProgressEndGreen, * fProgressLightGreen,
+                    * fProgressEndAdvanced, * fErrorImage;
 
     NSUserDefaults * fDefaults;
 }

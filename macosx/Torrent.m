@@ -30,8 +30,6 @@
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
 
-#define INVALID -99
-
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
@@ -266,9 +264,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    if ([self isSeeding] && ((fRatioSetting == NSOnState && [self ratio] >= fRatioLimit)
-            || (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"]
-                && [self ratio] >= [fDefaults floatForKey: @"RatioLimit"])))
+    float stopRatio;
+    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
@@ -436,6 +433,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                     [NSNumber numberWithBool: [self isActive]], @"Active",
                                     [NSNumber numberWithBool: [self isError]], @"Error", nil];
     
+    if ([self isSeeding])
+    {
+        [info setObject: [NSNumber numberWithFloat: [self ratio]] forKey: @"Ratio"];
+        [info setObject: [NSNumber numberWithFloat: [self actualStopRatio]] forKey: @"StopRatio"];
+    }
+    
     if (![fDefaults boolForKey: @"SmallView"])
     {
         [info setObject: fIconFlipped forKey: @"Icon"];
@@ -545,6 +548,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if (limit >= 0)
         fRatioLimit = limit;
+}
+
+- (float) actualStopRatio
+{
+    if (fRatioSetting == NSOnState)
+        return fRatioLimit;
+    else if (fRatioSetting == NSMixedState && [fDefaults boolForKey: @"RatioCheck"])
+        return [fDefaults floatForKey: @"RatioLimit"];
+    else
+        return INVALID;
 }
 
 - (int) checkUpload

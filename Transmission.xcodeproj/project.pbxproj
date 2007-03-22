@@ -142,6 +142,7 @@
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
+		A28FF34E0BB23A4E001F5010 /* ProgressBarLightGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
@@ -353,6 +354,7 @@
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
+		A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarLightGreen.png; path = macosx/Images/ProgressBarLightGreen.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A291DAAD0AC8BEB6003385E9 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
@@ -517,6 +519,7 @@
 				A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */,
 				A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */,
 				A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */,
+				A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */,
 				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
@@ -857,6 +860,7 @@
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */,
+				A28FF34E0BB23A4E001F5010 /* ProgressBarLightGreen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

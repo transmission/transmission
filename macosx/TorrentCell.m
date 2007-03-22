@@ -63,6 +63,9 @@
         fProgressGreen = [NSImage imageNamed: @"ProgressBarGreen.png"];
         [fProgressGreen setScalesWhenResized: YES];
         
+        fProgressLightGreen = [NSImage imageNamed: @"ProgressBarLightGreen.png"];
+        [fProgressLightGreen setScalesWhenResized: YES];
+        
         fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
         [fProgressAdvanced setScalesWhenResized: YES];
         
@@ -91,24 +94,33 @@
     NSDictionary * info = [self objectValue];
 
     width -= 2.0;
-    if ([[info objectForKey: @"Seeding"] boolValue])
+    
+    BOOL seeding = [[info objectForKey: @"Seeding"] boolValue],
+        isActive = [[info objectForKey: @"Active"] boolValue];
+    float completedWidth, remainingWidth;
+    
+    //bar images
+    NSImage * barLeftEnd, * barRightEnd, * barComplete, * barRemaining;
+    if (seeding)
     {
-        [fProgressEndGreen compositeToPoint: point operation: NSCompositeSourceOver];
+        float stopRatio, ratio;
+        if ((stopRatio = [[info objectForKey: @"StopRatio"] floatValue]) != INVALID
+                && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio)
+            completedWidth = width * ratio / stopRatio;
+        else
+            completedWidth = width;
+        remainingWidth = width - completedWidth;
         
-        point.x += 1.0;
-        [self placeBar: fProgressGreen width: width point: point];
-        
-        point.x += width;
-        [fProgressEndGreen compositeToPoint: point operation: NSCompositeSourceOver];
+        barLeftEnd = fProgressEndGreen;
+        barRightEnd = fProgressEndGreen;
+        barComplete = fProgressGreen;
+        barRemaining = fProgressLightGreen;
     }
     else
     {
-        float completedWidth = [[info objectForKey: @"Progress"] floatValue] * width,
-                remainingWidth = width - completedWidth;
-        BOOL isActive = [[info objectForKey: @"Active"] boolValue];
+        completedWidth = [[info objectForKey: @"Progress"] floatValue] * width;
+        remainingWidth = width - completedWidth;
         
-        //left end
-        NSImage * barLeftEnd;
         if (remainingWidth == width)
             barLeftEnd = fProgressEndWhite;
         else if (isActive)
@@ -116,18 +128,6 @@
         else
             barLeftEnd = fProgressEndGray;
         
-        [barLeftEnd compositeToPoint: point operation: NSCompositeSourceOver];
-        
-        //active bar
-        point.x += 1.0;
-        [self placeBar: isActive ? fProgressBlue : fProgressGray width: completedWidth point: point];
-        
-        //remaining bar
-        point.x += completedWidth;
-        [self placeBar: fProgressWhite width: remainingWidth point: point];
-        
-        //right end
-        NSImage * barRightEnd;
         if (completedWidth < width)
             barRightEnd = fProgressEndWhite;
         else if (isActive)
@@ -135,9 +135,22 @@
         else
             barRightEnd = fProgressEndGray;
         
-        point.x += remainingWidth;
-        [barRightEnd compositeToPoint: point operation: NSCompositeSourceOver];
+        barComplete = isActive ? fProgressBlue : fProgressGray;
+        barRemaining = fProgressWhite;
     }
+    
+    [barLeftEnd compositeToPoint: point operation: NSCompositeSourceOver];
+    
+    //active bar
+    point.x += 1.0;
+    [self placeBar: barComplete width: completedWidth point: point];
+    
+    //remaining bar
+    point.x += completedWidth;
+    [self placeBar: barRemaining width: remainingWidth point: point];
+    
+    point.x += remainingWidth;
+    [barRightEnd compositeToPoint: point operation: NSCompositeSourceOver];
 }
 
 - (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point

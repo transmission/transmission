@@ -25,6 +25,8 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+#define INVALID -99
+
 @interface Torrent : NSObject
 {
     tr_handle_t  * fLib;
@@ -89,6 +91,7 @@
 - (void)        setRatioSetting: (int) setting;
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
+- (float)       actualStopRatio; //returns INVALID if will not stop
 
 - (int)     checkUpload;
 - (void)    setCheckUpload: (int) setting;
