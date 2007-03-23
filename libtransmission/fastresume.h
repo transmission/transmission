@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -382,7 +382,7 @@ static int fastResumeLoad( tr_io_t * io )
                     fclose( file );
                     return 1;
                 }
-                tr_torrentAddCompact( tor, buf, len / 6 );
+                tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE, buf, len / 6 );
                 free( buf );
                 continue;
             }

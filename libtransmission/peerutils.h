@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -34,6 +34,7 @@ static tr_peer_t * peerInit()
     tr_peer_t * peer;
 
     peer              = calloc( sizeof( tr_peer_t ), 1 );
+    peertreeInit( &peer->sentPeers );
     peer->amChoking   = 1;
     peer->peerChoking = 1;
     peer->date        = tr_date();
@@ -47,8 +48,8 @@ static tr_peer_t * peerInit()
 static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 {
     /* Wait until we got the peers' ids */
-    if( peer1->status < PEER_STATUS_CONNECTED ||
-        peer2->status < PEER_STATUS_CONNECTED )
+    if( peer1->status <= PEER_STATUS_HANDSHAKE ||
+        peer2->status <= PEER_STATUS_HANDSHAKE )
     {
         return 1;
     }
@@ -58,8 +59,13 @@ static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 
 static int checkPeer( tr_peer_t * peer )
 {
+    tr_torrent_t * tor = peer->tor;
+    uint64_t       now;
+
+    now = tr_date();
+
     if( peer->status < PEER_STATUS_CONNECTED &&
-        tr_date() > peer->date + 8000 )
+        now > peer->date + 8000 )
     {
         /* If it has been too long, don't wait for the socket
            to timeout - forget about it now */
@@ -69,7 +75,7 @@ static int checkPeer( tr_peer_t * peer )
 
     /* Drop peers who haven't even sent a keep-alive within the
        last 3 minutes */
-    if( tr_date() > peer->date + 180000 )
+    if( now > peer->date + 180000 )
     {
         peer_dbg( "read timeout" );
         return TR_ERROR;
@@ -77,19 +83,45 @@ static int checkPeer( tr_peer_t * peer )
 
     /* Drop peers which are supposed to upload but actually
        haven't sent anything within the last minute */
-    if( peer->inRequestCount && tr_date() > peer->date + 60000 )
+    if( peer->inRequestCount && now > peer->date + 60000 )
     {
         peer_dbg( "bad uploader" );
         return TR_ERROR;
     }
 
-    if( peer->status & PEER_STATUS_CONNECTED )
+    if( PEER_STATUS_CONNECTED == peer->status )
     {
         /* Send keep-alive every 2 minutes */
-        if( tr_date() > peer->keepAlive + 120000 )
+        if( now > peer->keepAlive + 120000 )
         {
             sendKeepAlive( peer );
-            peer->keepAlive = tr_date();
+            peer->keepAlive = now;
+        }
+
+        /* Resend extended handshake if our public port changed */
+        if( EXTENDED_HANDSHAKE == peer->extStatus && 
+            tor->publicPort != peer->advertisedPort )
+        {
+            sendExtended( tor, peer, EXTENDED_HANDSHAKE_ID );
+        }
+
+        /* Send peer list */
+        if( !peer->private && 0 < peer->pexStatus )
+        {
+            if( 0 == peer->lastPex )
+            {
+                /* randomize time when first pex message is sent */
+                peer->lastPex = now - 1000 * tr_rand( PEX_INTERVAL );
+            }
+            if( now > peer->lastPex + 1000 * PEX_INTERVAL )
+            {
+                if( ( EXTENDED_HANDSHAKE == peer->extStatus &&
+                      !sendExtended( tor, peer, EXTENDED_PEX_ID ) ) ||
+                    ( peer->azproto && !sendAZPex( tor, peer ) ) )
+                {
+                    peer->lastPex = now + 1000 * tr_rand( PEX_INTERVAL / 10 );
+                }
+            }
         }
     }
 

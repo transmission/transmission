@@ -126,6 +126,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
     tor->status   = TR_STATUS_PAUSE;
     tor->id       = h->id;
     tor->key      = h->key;
+    tor->azId     = h->azId;
     tor->finished = 0;
 
     /* Escaped info hash for HTTP queries */
@@ -291,7 +292,8 @@ void tr_manualUpdate( tr_torrent_t * tor )
     tr_trackerAnnouncePulse( tor->tracker, &peerCount, &peerCompact, 1 );
     if( peerCount > 0 )
     {
-        tr_torrentAddCompact( tor, peerCompact, peerCount );
+        tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
+                              peerCompact, peerCount );
         free( peerCompact );
     }
     tr_lockUnlock( &tor->lock );
@@ -328,7 +330,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->tracker = ( tc ? tr_trackerGet( tc ) : &inf->trackerList[0].list[0] );
 
     s->peersTotal       = 0;
-    s->peersIncoming    = 0;
+    memset( s->peersFrom, 0, sizeof( s->peersFrom ) );
     s->peersUploading   = 0;
     s->peersDownloading = 0;
     
@@ -339,11 +341,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
         if( tr_peerIsConnected( peer ) )
         {
             (s->peersTotal)++;
-            
-            if( tr_peerIsIncoming( peer ) )
-            {
-                (s->peersIncoming)++;
-            }
+            (s->peersFrom[ tr_peerIsFrom( peer ) ])++;
             if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
             {
                 (s->peersUploading)++;
@@ -431,7 +429,7 @@ tr_peer_stat_t * tr_torrentPeers( tr_torrent_t * tor, int * peerCount )
             peers[i].client = tr_clientForId(tr_peerId(peer));
             
             peers[i].isConnected   = tr_peerIsConnected( peer );
-            peers[i].isIncoming    = tr_peerIsIncoming( peer );
+            peers[i].from          = tr_peerIsFrom( peer );
             peers[i].progress      = tr_peerProgress( peer );
             peers[i].port          = tr_peerPort( peer );
             
@@ -637,11 +635,13 @@ void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
         }
     }
 
+    tr_peerSetPrivate( peer, tor->info.flags & TR_FLAG_PRIVATE );
     tr_peerSetTorrent( peer, tor );
     tor->peers[tor->peerCount++] = peer;
 }
 
-void tr_torrentAddCompact( tr_torrent_t * tor, uint8_t * buf, int count )
+void tr_torrentAddCompact( tr_torrent_t * tor, int from,
+                           uint8_t * buf, int count )
 {
     struct in_addr addr;
     in_port_t port;
@@ -653,7 +653,7 @@ void tr_torrentAddCompact( tr_torrent_t * tor, uint8_t * buf, int count )
         memcpy( &addr, buf, 4 ); buf += 4;
         memcpy( &port, buf, 2 ); buf += 2;
 
-        peer = tr_peerInit( addr, port, -1 );
+        peer = tr_peerInit( addr, port, -1, from );
         tr_torrentAttachPeer( tor, peer );
     }
 }
@@ -697,7 +697,8 @@ static void downloadLoop( void * _tor )
         tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
         if( peerCount > 0 )
         {
-            tr_torrentAddCompact( tor, peerCompact, peerCount );
+            tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
+                                  peerCompact, peerCount );
             free( peerCompact );
         }
         if( tor->status & TR_STATUS_STOPPED )

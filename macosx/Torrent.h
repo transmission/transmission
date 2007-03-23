@@ -162,9 +162,13 @@
 - (int) seeders;
 - (int) leechers;
 - (int) completedFromTracker;
+
 - (int) totalPeers;
+- (int) totalPeersTracker;
 - (int) totalPeersIncoming;
-- (int) totalPeersOutgoing;
+- (int) totalPeersCache;
+- (int) totalPeersPex;
+
 - (int) peersUploading;
 - (int) peersDownloading;
 

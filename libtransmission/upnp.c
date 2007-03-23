@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -846,8 +846,7 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
                                "InternalPort", numstr,
                                "PortMappingProtocol", "TCP",
                                "InternalClient", dev->myaddr,
-                               "PortMappingDescription",
-                                   "Added by Transmission",
+                               "PortMappingDescription", "Added by " TR_NAME,
                                NULL );
             break;
         case UPNPDEV_STATE_GET:

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -65,6 +65,8 @@ int vasprintf( char **, const char *, va_list );
 #  include <arpa/inet.h>
 #endif
 
+#define TR_NAME                 "Transmission"
+
 #ifndef INADDR_NONE
 #define INADDR_NONE             0xffffffff
 #endif
@@ -97,7 +99,7 @@ int vasprintf( char **, const char *, va_list );
 /* Convenient macros to perform uint32_t endian conversions with
    char pointers */
 #define TR_NTOHL(p,a) (a) = tr_ntohl((p))
-#define TR_HTONL(a,p) tr_htonl((a), (p))
+#define TR_HTONL(a,p) tr_htonl((a), ( uint8_t * )(p))
 static inline uint32_t tr_ntohl( uint8_t * p )
 {
 	uint32_t u;
@@ -144,7 +146,8 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #include "http.h"
 #include "xml.h"
 
-void tr_torrentAddCompact( tr_torrent_t * tor, uint8_t * buf, int count );
+void tr_torrentAddCompact( tr_torrent_t * tor, int from,
+                           uint8_t * buf, int count );
 void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer );
 
 struct tr_torrent_s
@@ -165,6 +168,7 @@ struct tr_torrent_s
 
     char            * id;
     char            * key;
+    uint8_t         * azId;
     int               publicPort;
 
     /* An escaped string used to include the hash in HTTP queries */
@@ -223,6 +227,8 @@ struct tr_handle_s
 
     tr_handle_status_t stats[2];
     int                statCur;
+#define TR_AZ_ID_LEN            20
+    uint8_t        azId[TR_AZ_ID_LEN];
 };
 
 #endif

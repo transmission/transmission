@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -165,8 +165,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
         goto fail;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
-    inf->pieces = (uint8_t *) val->val.s.s; /* Ugly, but avoids a memcpy */
-    val->val.s.s = NULL;
+    inf->pieces = (uint8_t *) tr_bencStealStr( val );
 
     /* TODO add more tests so we don't crash on weird files */
 

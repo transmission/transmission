@@ -1,5 +1,32 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.7 ()
+ - New icon
+ - Automatic port configuration (NAT-PMP and UPnP)
+ - Peer exchange (PEX) compatible with Azureus and uTorrent
+ - Multitracker support
+ - Listen to tracker's announce and min-announce intervals
+ - Fix for sending invalid stats to trackers
+ - Better scrape support
+ - Bugfixes and improvements
+ - OS X:
+   + Download and seeding queue that can be user-arranged
+   + Speed Limit: Second set of bandwidth limits that can be toggled or 
+     scheduled
+   + Individual torrent bandwidth limits
+   + Separate complete and incomplete download folders
+   + Filter and search bar
+   + Expanded Inspector with many additional views and stats
+   + Fragment status view in Inspector shows downloaded or availability
+   + Watch folder to auto add torrent files
+   + Auto resizing of the main window
+   + Minimal view to take up less space
+   + Sounds when downloading and seeding complete
+   + Warnings for directory unavailable or not enough space
+   + Message log window
+   + New toolbar icons
+   + Built-in help files
+
 0.6.1 (2006/06/25)
  - OS X:
    + Fixes a bug in the updater that could cause repeated hits to the

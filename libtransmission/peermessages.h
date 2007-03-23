@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -138,9 +138,16 @@ static void blockSent( tr_peer_t * peer, int size )
 static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
 {
     uint8_t * p;
+    int       index = 0;
 
     size += 4;
-    if( 0 <= id )
+    if( peer->azproto )
+    {
+        index = azmsgIdIndex( id );
+        assert( 0 <= index );
+        size += 4 + azmsgLen( index ) + 1;
+    }
+    else if( 0 <= id )
     {
         size++;
     }
@@ -157,7 +164,14 @@ static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
 
     TR_HTONL( size - 4, p );
     p += 4;
-    if( 0 <= id )
+    if( peer->azproto )
+    {
+        TR_HTONL( azmsgLen( index ), p );
+        memcpy( p + 4, azmsgStr( index ), azmsgLen( index ) );
+        p[ 4 + azmsgLen( index ) ] = AZ_EXT_VERSION;
+        p += 4 + azmsgLen( index ) + 1;
+    }
+    else if( 0 <= id )
     {
         *p = id;
         p++;
@@ -173,9 +187,7 @@ static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
  **********************************************************************/
 static void sendKeepAlive( tr_peer_t * peer )
 {
-    uint8_t * p;
-
-    p = getMessagePointer( peer, 0, -1 );
+    getMessagePointer( peer, 0, AZ_MSG_BT_KEEP_ALIVE );
 
     peer_dbg( "SEND keep-alive" );
 }
@@ -188,11 +200,10 @@ static void sendKeepAlive( tr_peer_t * peer )
  **********************************************************************/
 static void sendChoke( tr_peer_t * peer, int yes )
 {
-    uint8_t * p;
-    int       id;
+    int id;
 
     id = ( yes ? PEER_MSG_CHOKE : PEER_MSG_UNCHOKE );
-    p = getMessagePointer( peer, 0, id );
+    getMessagePointer( peer, 0, id );
 
     peer->amChoking = yes;
 
@@ -213,11 +224,10 @@ static void sendChoke( tr_peer_t * peer, int yes )
  **********************************************************************/
 static void sendInterest( tr_peer_t * peer, int yes )
 {
-    uint8_t * p;
-    int       id;
+    int id;
 
     id = ( yes ? PEER_MSG_INTERESTED : PEER_MSG_UNINTERESTED );
-    p = getMessagePointer( peer, 0, id );
+    getMessagePointer( peer, 0, id );
 
     peer->amInterested = yes;
 
@@ -335,4 +345,71 @@ static void sendCancel( tr_torrent_t * tor, int block )
             break;
         }
     }
+}
+
+/***********************************************************************
+ * sendExtended
+ ***********************************************************************
+ * Builds an extended message:
+ *  - size = 6 + X (4 bytes)
+ *  - id   = 20    (1 byte)
+ *  - eid  = Y     (1 byte)
+ *  - data         (X bytes)
+ **********************************************************************/
+static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
+{
+    uint8_t * p;
+    char    * buf;
+    int       len;
+
+    buf = NULL;
+    switch( id )
+    {
+        case EXTENDED_HANDSHAKE_ID:
+            buf = makeExtendedHandshake( tor, peer, &len );
+            break;
+        case EXTENDED_PEX_ID:
+            buf = makeUTPex( tor, peer, &len );
+            break;
+        default:
+            assert( 0 );
+            break;
+    }
+    if( NULL == buf )
+    {
+        return 1;
+    }
+
+    /* add header and queue it to be sent */
+    p = getMessagePointer( peer, 1 + len, PEER_MSG_EXTENDED );
+    p[0] = id;
+    memcpy( p + 1, buf, len );
+    free( buf );
+
+    return 0;
+}
+
+/***********************************************************************
+ * sendAZPex
+ ***********************************************************************
+ *
+ **********************************************************************/
+static int sendAZPex( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    uint8_t * p;
+    char    * buf;
+    int       len;
+
+    buf = makeAZPex( tor, peer, &len );
+    if( NULL == buf )
+    {
+        return 1;
+    }
+
+    /* add header and queue it to be sent */
+    p = getMessagePointer( peer, len, AZ_MSG_AZ_PEER_EXCHANGE );
+    memcpy( p, buf, len );
+    free( buf );
+
+    return 0;
 }

@@ -39,8 +39,8 @@
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 284.0
 #define TAB_ACTIVITY_HEIGHT 170.0
-#define TAB_PEERS_HEIGHT 268.0
-#define TAB_FILES_HEIGHT 268.0
+#define TAB_PEERS_HEIGHT 279.0
+#define TAB_FILES_HEIGHT 279.0
 #define TAB_OPTIONS_HEIGHT 117.0
 
 #define OPTION_POPUP_GLOBAL 0
@@ -195,7 +195,7 @@
         [fSeedersField setStringValue: @""];
         [fLeechersField setStringValue: @""];
         [fCompletedFromTrackerField setStringValue: @""];
-        [fConnectedPeersField setStringValue: @""];
+        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
         [fDownloadingFromField setStringValue: @""];
         [fUploadingToField setStringValue: @""];
         [fSwarmSpeedField setStringValue: @""];
@@ -236,7 +236,7 @@
         [fHashField setStringValue: hashString];
         [fHashField setToolTip: hashString];
         [fSecureField setStringValue: [torrent privateTorrent]
-                        ? NSLocalizedString(@"Private Torrent", "Inspector -> is private torrent")
+                        ? NSLocalizedString(@"Private Torrent, PEX disabled", "Inspector -> is private torrent")
                         : NSLocalizedString(@"Public Torrent", "Inspector -> is not private torrent")];
         [fCommentView setString: commentString];
         
@@ -381,9 +381,38 @@
     [fCompletedFromTrackerField setStringValue: downloaded < 0 ? @"" : [NSString stringWithInt: downloaded]];
     
     BOOL active = [torrent isActive];
-    [fConnectedPeersField setStringValue: active ? [NSString stringWithFormat: NSLocalizedString(@"%d (%d incoming)",
-                                                                                "Inspector -> Peers tab -> connected"),
-                                                    [torrent totalPeers], [torrent totalPeersIncoming]]: @""];
+    
+    if (active)
+    {
+        int total = [torrent totalPeers];
+        NSString * connected = [NSString stringWithFormat:
+                                NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
+        
+        if (total > 0)
+        {
+            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
+            int count;
+            if ((count = [torrent totalPeersTracker]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersIncoming]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersPex]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersCache]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
+            
+            connected = [NSString stringWithFormat: @"%@: %@", connected, [components componentsJoinedByString: @", "]];
+        }
+        
+        [fConnectedPeersField setStringValue: connected];
+    }
+    else
+        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+    
     [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
     
@@ -665,14 +694,23 @@
     if (tableView == fPeerTable)
     {
         NSDictionary * peerDic = [fPeers objectAtIndex: row];
+        
+        NSString * fromString;
+        int from = [[peerDic objectForKey: @"From"] intValue];
+        if (from == TR_PEER_FROM_INCOMING)
+            fromString = NSLocalizedString(@"incoming connection", "Inspector -> Peers tab -> table row tooltip");
+        else if (from == TR_PEER_FROM_CACHE)
+            fromString = NSLocalizedString(@"cache", "Inspector -> Peers tab -> table row tooltip");
+        else if (from == TR_PEER_FROM_PEX)
+            fromString = NSLocalizedString(@"peer exchange", "Inspector -> Peers tab -> table row tooltip");
+        else
+            fromString = NSLocalizedString(@"tracker", "Inspector -> Peers tab -> table row tooltip");
+        
         return [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%"
                     "\nPort: %@"
-                    "\nFrom %@ connection", "Inspector -> Peers tab -> table row tooltip"),
+                    "\nFrom: %@", "Inspector -> Peers tab -> table row tooltip"),
                     [[peerDic objectForKey: @"Progress"] floatValue] * 100.0,
-                    [peerDic objectForKey: @"Port"],
-                    [[peerDic objectForKey: @"Incoming"] boolValue]
-                        ? NSLocalizedString(@"incoming", "Inspector -> Peers tab -> table row tooltip")
-                        : NSLocalizedString(@"outgoing", "Inspector -> Peers tab -> table row tooltip")];
+                    [peerDic objectForKey: @"Port"], fromString];
     }
     return nil;
 }

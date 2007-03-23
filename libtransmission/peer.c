@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,10 +23,30 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "peertree.h"
 
-#define MAX_REQUEST_COUNT 32
-#define OUR_REQUEST_COUNT 8  /* TODO: we should detect if we are on a
-                                high-speed network and adapt */
+#define MAX_REQUEST_COUNT       32
+#define OUR_REQUEST_COUNT       8  /* TODO: we should detect if we are on a
+                                      high-speed network and adapt */
+#define PEX_PEER_CUTOFF         50 /* only try to add new peers from pex if
+                                      we have fewer existing peers than this */
+#define PEX_INTERVAL            60 /* don't send pex messages more frequently
+                                      than PEX_INTERVAL +
+                                      rand( PEX_INTERVAL / 10 ) seconds */
+#define PEER_SUPPORTS_EXTENDED_MESSAGES( bits ) ( (bits)[5] & 0x10 )
+#define PEER_SUPPORTS_AZUREUS_PROTOCOL( bits )  ( (bits)[0] & 0x80 )
+
+#define PEER_MSG_CHOKE          0
+#define PEER_MSG_UNCHOKE        1
+#define PEER_MSG_INTERESTED     2
+#define PEER_MSG_UNINTERESTED   3
+#define PEER_MSG_HAVE           4
+#define PEER_MSG_BITFIELD       5
+#define PEER_MSG_REQUEST        6
+#define PEER_MSG_PIECE          7
+#define PEER_MSG_CANCEL         8
+#define PEER_MSG_PORT           9
+#define PEER_MSG_EXTENDED       20
 
 typedef struct tr_request_s
 {
@@ -45,13 +65,26 @@ struct tr_peer_s
 
 #define PEER_STATUS_IDLE        1 /* Need to connect */
 #define PEER_STATUS_CONNECTING  2 /* Trying to send handshake */
-#define PEER_STATUS_HANDSHAKE   4 /* Waiting for peer's handshake */
-#define PEER_STATUS_CONNECTED   8 /* Got peer's handshake */
+#define PEER_STATUS_HANDSHAKE   3 /* Waiting for peer's handshake */
+#define PEER_STATUS_AZ_GIVER    4 /* Sending Azureus handshake */
+#define PEER_STATUS_AZ_RECEIVER 5 /* Receiving Azureus handshake */
+#define PEER_STATUS_CONNECTED   6 /* Got peer's handshake */
     int                 status;
     int                 socket;
-    char                incoming;
+    char                from;
+    char                private;
+    char                azproto;  /* azureus peer protocol is being used */
     uint64_t            date;
     uint64_t            keepAlive;
+
+#define EXTENDED_NOT_SUPPORTED   0 /* extended messages not supported */
+#define EXTENDED_SUPPORTED       1 /* waiting to send extended handshake */
+#define EXTENDED_HANDSHAKE       2 /* sent extended handshake */
+    uint8_t             extStatus;
+    uint8_t             pexStatus;   /* peer's ut_pex id, 0 if not supported */
+    uint64_t            lastPex;     /* time when last pex packet was sent */
+    int                 advertisedPort; /* listening port we last told peer */
+    tr_peertree_t       sentPeers;
 
     char                amChoking;
     char                amInterested;
@@ -121,6 +154,8 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
     tr_dbg( "%s", string );
 }
 
+#include "peerext.h"
+#include "peeraz.h"
 #include "peermessages.h"
 #include "peerutils.h"
 #include "peerparse.h"
@@ -130,17 +165,20 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
  ***********************************************************************
  * Initializes a new peer.
  **********************************************************************/
-tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s )
+tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
 {
     tr_peer_t * peer = peerInit();
+
+    assert( 0 <= from && TR_PEER_FROM__MAX > from );
 
     peer->socket = s;
     peer->addr = addr;
     peer->port = port;
+    peer->from = from;
     if( s >= 0 )
     {
+        assert( TR_PEER_FROM_INCOMING == from );
         peer->status = PEER_STATUS_CONNECTING;
-        peer->incoming = 1;
     }
     else
     {
@@ -156,6 +194,7 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_request_t * r;
     int i, block;
 
+    peertreeFree( &peer->sentPeers );
     for( i = 0; i < peer->inRequestCount; i++ )
     {
         r = &peer->inRequests[i];
@@ -180,6 +219,11 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_rcClose( peer->download );
     tr_rcClose( peer->upload );
     free( peer );
+}
+
+void tr_peerSetPrivate( tr_peer_t * peer, int private )
+{
+    peer->private = private;
 }
 
 void tr_peerSetTorrent( tr_peer_t * peer, tr_torrent_t * tor )
@@ -319,7 +363,7 @@ int tr_peerPulse( tr_peer_t * peer )
     }
 
     /* Connect */
-    if( peer->status & PEER_STATUS_IDLE )
+    if( PEER_STATUS_IDLE == peer->status )
     {
         peer->socket = tr_netOpenTCP( peer->addr, peer->port, 0 );
         if( peer->socket < 0 )
@@ -330,7 +374,7 @@ int tr_peerPulse( tr_peer_t * peer )
     }
 
     /* Try to send handshake */
-    if( peer->status & PEER_STATUS_CONNECTING )
+    if( PEER_STATUS_CONNECTING == peer->status )
     {
         uint8_t buf[68];
         tr_info_t * inf = &tor->info;
@@ -338,6 +382,8 @@ int tr_peerPulse( tr_peer_t * peer )
         buf[0] = 19;
         memcpy( &buf[1], "BitTorrent protocol", 19 );
         memset( &buf[20], 0, 8 );
+        buf[20] = 0x80;         /* azureus protocol */
+        buf[25] = 0x10;         /* extended messages */
         memcpy( &buf[28], inf->hash, 20 );
         memcpy( &buf[48], tor->id, 20 );
 
@@ -365,6 +411,23 @@ int tr_peerPulse( tr_peer_t * peer )
     {
         return ret;
     }
+
+    /* Try to send Azureus handshake */
+    if( PEER_STATUS_AZ_GIVER == peer->status )
+    {
+        switch( sendAZHandshake( tor, peer ) )
+        {
+            case TR_NET_BLOCK:
+                break;
+            case TR_NET_CLOSE:
+                peer_dbg( "connection closed" );
+                return TR_ERROR;
+            default:
+                peer->status = PEER_STATUS_AZ_RECEIVER;
+                break;
+        }
+    }
+
     if( peer->status < PEER_STATUS_CONNECTED )
     {
         /* Nothing more we can do till we got the other guy's handshake */
@@ -468,7 +531,7 @@ writeEnd:
  **********************************************************************/
 int tr_peerIsConnected( tr_peer_t * peer )
 {
-    return peer->status & PEER_STATUS_CONNECTED;
+    return PEER_STATUS_CONNECTED == peer->status;
 }
 
 /***********************************************************************
@@ -476,9 +539,9 @@ int tr_peerIsConnected( tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-int tr_peerIsIncoming( tr_peer_t * peer )
+int tr_peerIsFrom( tr_peer_t * peer )
 {
-    return peer->incoming;
+    return peer->from;
 }
 
 int tr_peerAmChoking( tr_peer_t * peer )

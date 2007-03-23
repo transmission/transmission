@@ -340,7 +340,8 @@ static void AcceptPeers( tr_shared_t * s )
         {
             break;
         }
-        s->peers[s->peerCount++] = tr_peerInit( addr, 0, socket );
+        s->peers[s->peerCount++] = tr_peerInit( addr, 0, socket,
+                                                TR_PEER_FROM_INCOMING );
     }
 }
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -440,14 +440,44 @@ static inline int parsePort( tr_peer_t * peer, uint8_t * p, int len )
     return TR_OK;
 }
 
-static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
-                                uint8_t * p, int len )
+static inline int
+parseMessageHeader( tr_peer_t * peer, uint8_t * buf, int buflen,
+                    int * msgid, int * msglen )
 {
-    char id;
+    if( 4 > buflen )
+    {
+        return TR_NET_BLOCK;
+    }
 
-    /* Type of the message */
-    id = *(p++);
-    len--;
+    /* Get payload size */
+    TR_NTOHL( buf, *msglen );
+
+    if( 4 + *msglen > buflen )
+    {
+        /* We do not have the entire message */
+        return TR_NET_BLOCK;
+    }
+
+    if( 0 == *msglen )
+    {
+        /* keep-alive */
+        peer_dbg( "GET  keep-alive" );
+        *msgid = AZ_MSG_BT_KEEP_ALIVE;
+        return 4;
+    }
+    else
+    {
+        /* Type of the message */
+        *msgid = buf[4];
+        (*msglen)--;
+        return 5;
+    }
+}
+
+static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
+                                int id, uint8_t * p, int len )
+{
+    int extid;
 
     switch( id )
     {
@@ -471,6 +501,37 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
             return parseCancel( tor, peer, p, len );
         case PEER_MSG_PORT:
             return parsePort( peer, p, len );
+        case PEER_MSG_EXTENDED:
+            if( EXTENDED_NOT_SUPPORTED == peer->extStatus )
+            {
+                break;
+            }
+            if( 0 < len )
+            {
+                extid = p[0];
+                p++;
+                len--;
+                if( EXTENDED_HANDSHAKE_ID == extid )
+                {
+                    return parseExtendedHandshake( peer, p, len );
+                }
+                else if( 0 < peer->pexStatus && extid == peer->pexStatus )
+                {
+                    return parseUTPex( tor, peer, p, len );
+                }
+                peer_dbg( "Unknown extended message '%hhu'", extid );
+            }
+            return 1;
+        case AZ_MSG_BT_KEEP_ALIVE:
+            return TR_OK;
+        case AZ_MSG_AZ_PEER_EXCHANGE:
+            if( peer->azproto && peer->pexStatus )
+            {
+                return parseAZPex( tor, peer, p, len );
+            }
+            break;
+        case AZ_MSG_INVALID:
+            return 0;
     }
 
     peer_dbg( "Unknown message '%d'", id );
@@ -526,8 +587,8 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
     int       i;
     int       len;
     uint8_t * p   = peer->buf;
-    uint8_t * end = &p[peer->pos];
     int       ret;
+    int       msgid;
 
     if( peer->banned )
     {
@@ -538,7 +599,7 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
 
     while( peer->pos >= 4 )
     {
-        if( peer->status & PEER_STATUS_HANDSHAKE )
+        if( PEER_STATUS_HANDSHAKE == peer->status )
         {
             char * client;
 
@@ -565,7 +626,18 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
                 return TR_ERROR;
             }
 
-            peer->status  = PEER_STATUS_CONNECTED;
+            peer->status = PEER_STATUS_CONNECTED;
+            if( PEER_SUPPORTS_EXTENDED_MESSAGES( &p[20] ) )
+            {
+                peer_dbg( "extended messages supported" );
+                peer->extStatus = EXTENDED_SUPPORTED;
+            }
+            else if( PEER_SUPPORTS_AZUREUS_PROTOCOL( &p[20] ) )
+            {
+                peer->azproto = 1;
+                peer->status  = PEER_STATUS_AZ_GIVER;
+                peer->date    = tr_date();
+            }
             memcpy( peer->id, &p[48], 20 );
             p            += 68;
             peer->pos    -= 68;
@@ -587,46 +659,88 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
             peer_dbg( "GET  handshake, ok (%s)", client );
             free( client );
 
-            sendBitfield( tor, peer );
+          justconnected:
+            if( PEER_STATUS_CONNECTED == peer->status )
+            {
+                if( EXTENDED_SUPPORTED == peer->extStatus )
+                {
+                    if( sendExtended( tor, peer, EXTENDED_HANDSHAKE_ID ) )
+                    {
+                        return TR_ERROR;
+                    }
+                    peer->extStatus = EXTENDED_HANDSHAKE;
+                }
+                sendBitfield( tor, peer );
+            }
 
             continue;
         }
-        
-        /* Get payload size */
-        TR_NTOHL( p, len );
-        p += 4;
+        else if( peer->status < PEER_STATUS_CONNECTED )
+        {
+            ret = parseAZMessageHeader( peer, p, peer->pos, &msgid, &len );
+            if( TR_NET_BLOCK & ret )
+            {
+                break;
+            }
+            else if( TR_NET_CLOSE & ret )
+            {
+                return TR_ERROR;
+            }
+            else
+            {
+                p         += ret;
+                peer->pos -= ret;
+                assert( len <= peer->pos );
+                if( AZ_MSG_AZ_HANDSHAKE != msgid ||
+                    parseAZHandshake( peer, p, len ) )
+                {
+                    return TR_ERROR;
+                }
+                p           += len;
+                peer->pos   -= len;
+                assert( 0 <= peer->pos );
+                peer->status = PEER_STATUS_CONNECTED;
+                goto justconnected;
+            }
+        }
 
-        if( len > 9 + tor->blockSize )
+        if( peer->azproto )
+        {
+            ret = parseAZMessageHeader( peer, p, peer->pos, &msgid, &len );
+        }
+        else
+        {
+            ret = parseMessageHeader( peer, p, peer->pos, &msgid, &len );
+        }
+        if( TR_NET_BLOCK & ret )
+        {
+            break;
+        }
+        else if( TR_NET_CLOSE & ret )
+        {
+            return TR_ERROR;
+        }
+
+        if( len > 8 + tor->blockSize )
         {
             /* This should never happen. Drop that peer */
+            /* XXX could an extended message be longer than this? */
             peer_dbg( "message too large (%d bytes)", len );
             return TR_ERROR;
         }
 
-        if( !len )
-        {
-            /* keep-alive */
-            peer_dbg( "GET  keep-alive" );
-            peer->pos -= 4;
-            continue;
-        }
+        p         += ret;
+        peer->pos -= ret;
+        assert( 0 <= peer->pos );
 
-        if( &p[len] > end )
-        {
-            /* We do not have the entire message */
-            p -= 4;
-            break;
-        }
-
-        /* Remaining data after this message */
-        peer->pos -= 4 + len;
-
-        if( ( ret = parseMessage( tor, peer, p, len ) ) )
+        if( ( ret = parseMessage( tor, peer, msgid, p, len ) ) )
         {
             return ret;
         }
 
-        p += len;
+        p         += len;
+        peer->pos -= len;
+        assert( 0 <= peer->pos );
     }
 
     memmove( peer->buf, p, peer->pos );

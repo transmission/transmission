@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006 Transmission authors and contributors
+ * Copyright (c) 2006-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -449,9 +449,9 @@ tr_httpClient( int method, const char * host, int port, const char * fmt, ... )
 
     if( tr_sprintf( EXPANDBUF( http->header ), " HTTP/1.1" CR LF
                     "Host: %s" CR LF
-                    "User-Agent: Transmission/%d.%d" CR LF
+                    "User-Agent: %s/%d.%d" CR LF
                     "Connection: close" CR LF,
-                    http->host, VERSION_MAJOR, VERSION_MINOR ) )
+                    http->host, TR_NAME, VERSION_MAJOR, VERSION_MINOR ) )
     {
         goto err;
     }

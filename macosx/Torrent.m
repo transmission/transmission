@@ -945,7 +945,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithBool: peer->isConnected], @"Connected",
-            [NSNumber numberWithBool: peer->isIncoming], @"Incoming",
+            [NSNumber numberWithInt: peer->from], @"From",
             [NSString stringWithCString: (char *) peer->addr encoding: NSUTF8StringEncoding], @"IP",
             [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithFloat: peer->progress], @"Progress",
@@ -1006,14 +1006,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->peersTotal;
 }
 
-- (int) totalPeersIncoming
+- (int) totalPeersTracker
 {
-    return fStat->peersIncoming;
+    return fStat->peersFrom[TR_PEER_FROM_TRACKER];
 }
 
-- (int) totalPeersOutgoing
+- (int) totalPeersIncoming
 {
-    return [self totalPeers] - [self totalPeersIncoming];
+    return fStat->peersFrom[TR_PEER_FROM_INCOMING];
+}
+
+- (int) totalPeersCache
+{
+    return fStat->peersFrom[TR_PEER_FROM_CACHE];
+}
+
+- (int) totalPeersPex
+{
+    return fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
 //peers uploading to you

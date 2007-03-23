@@ -482,19 +482,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (fUpdateInProgress)
         return;
 
-    //wait for running transfers to stop (5 second timeout) and for NAT to be disabled
+    //wait for running transfers to stop (5 second timeout)
     NSDate * start = [NSDate date];
     BOOL timeUp = NO;
     
     enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
-    while (!timeUp && ((torrent = [enumerator nextObject])
-            || tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED))
+    while (!timeUp && (torrent = [enumerator nextObject]))
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
             [torrent update];
         }
+    
+    //wait for NAT to be disabled (same 5 second timeout)
+    while (!([start timeIntervalSinceNow] < -5.0)
+                && tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED)
+        usleep(100000);
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent

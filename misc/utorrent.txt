@@ -1,0 +1,36 @@
+A client that understands extended messages should set the 5th
+bit of the 6th byte of the reserved area in the handshake.  For
+example: reserved[5] = 0x10
+
+If the above bit is set in both peers' handshakes then they may
+exchange extended messages, which use id 20.  The first byte of an
+extended message (after the 4-byte length and 1-byte id, of course) is
+the extended message id.  The first extended message that should be
+sent is a handshake message, which always has an extended id of 0.
+
+The handshake message informs the peer which extended messages are
+supported and what their extended id will be.  The message payload is
+a bencoded dictionary which may have some of the following keys:
+    v
+        string, client name and version.  eg: Transmission 0.7
+    p
+        int, tcp port for incoming peer connections
+    m
+        dict containing supported extended messages and the extended id used
+
+A peer may re-send the handshake message at any time to add new
+extended message, or to disable previous messages by sending 0 as
+their extended id.
+
+µTorrent peer exchange messages use the key ut_pex in the m
+dictionary.  Peer exchanges messages should be sent approximately once
+every minute.  The payload of a peer exchange message is a bencoded
+dictionary with the following keys:
+    added
+        string, contains peers in the compact tracker format
+        (ie: 6 bytes for IPv4 address and port in network byte order)
+        added since the last peer exchange message
+    added.f
+        string, one byte of flags for each peer in the above added string
+    dropped
+        same format as added, contains peers dropped since last peer exchange

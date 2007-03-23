@@ -51,6 +51,12 @@ extern "C" {
 
 #define TR_DEFAULT_PORT   9090
 
+#define TR_PEER_FROM__MAX       4
+#define TR_PEER_FROM_INCOMING   0 /* connections made to the listening port */
+#define TR_PEER_FROM_TRACKER    1 /* peers received from a tracker */
+#define TR_PEER_FROM_CACHE      2 /* peers read from the peer cache */
+#define TR_PEER_FROM_PEX        3 /* peers discovered via PEX */
+
 /***********************************************************************
  * Error codes
  **********************************************************************/
@@ -403,7 +409,7 @@ struct tr_stat_s
     float               rateUpload;
     int                 eta;
     int                 peersTotal;
-    int                 peersIncoming;
+    int                 peersFrom[TR_PEER_FROM__MAX];
     int                 peersUploading;
     int                 peersDownloading;
     int                 seeders;
@@ -425,7 +431,7 @@ struct tr_peer_stat_s
     char *  client;
     
     int     isConnected;
-    int     isIncoming;
+    int     from;
     float   progress;
     int     port;
     
