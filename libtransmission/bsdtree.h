@@ -30,7 +30,11 @@
 #define	_SYS_TREE_H_
 
 #ifndef __unused
+#ifdef __GNUC__
+#define __unused __attribute__((__unused__))
+#else
 #define __unused
+#endif
 #endif
 
 /*
@@ -315,6 +319,9 @@ struct {								\
 	struct type *rbe_parent;	/* parent element */		\
 	int rbe_color;			/* node color */		\
 }
+
+#define RB_ENTRY_INITIALIZER()						\
+	{ NULL, NULL, NULL, 0 }
 
 #define RB_LEFT(elm, field)		(elm)->field.rbe_left
 #define RB_RIGHT(elm, field)		(elm)->field.rbe_right
