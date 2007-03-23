@@ -79,6 +79,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 + (void) initialize
 {
+    //make sure system requirements are met
+    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_3)
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle: NSLocalizedString(@"Quit", "OS update needed -> button")];
+        [alert setMessageText: NSLocalizedString(@"Transmission requires Mac OS X 10.4 or greater.",
+                                                "OS update needed -> title")];
+        [alert setInformativeText: NSLocalizedString(@"Transmission has features that require a more "
+            "up-to-date operating system. The operating system must be updated before this version can run.",
+            "OS update needed -> message")];
+        [alert setAlertStyle: NSWarningAlertStyle];
+        
+        [alert runModal];
+        [alert release];
+        
+        exit(0);
+    }
+    
     //make sure another Transmission.app isn't running already
     NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
@@ -91,8 +109,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             && [[dic objectForKey: @"NSApplicationProcessIdentifier"] intValue] != processIdentifier)
         {
             NSAlert * alert = [[NSAlert alloc] init];
-            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Transmission already running alert -> button")];
-            [alert setMessageText: NSLocalizedString(@"Transmission is already running",
+            [alert addButtonWithTitle: NSLocalizedString(@"Quit", "Transmission already running alert -> button")];
+            [alert setMessageText: NSLocalizedString(@"Transmission is already running.",
                                                     "Transmission already running alert -> title")];
             [alert setInformativeText: NSLocalizedString(@"There is already a copy of Transmission running. "
                 "This copy cannot be opened until that instance is quit.", "Transmission already running alert -> message")];
