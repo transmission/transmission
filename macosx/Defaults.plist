@@ -68,14 +68,16 @@
 	<false/>
 	<key>QueueDownloadNumber</key>
 	<integer>3</integer>
-    <key>QueueSeed</key>
+	<key>QueueSeed</key>
 	<false/>
-    <key>QueueSeedNumber</key>
+	<key>QueueSeedNumber</key>
 	<integer>3</integer>
 	<key>RatioCheck</key>
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
+	<key>RemainingSpaceWarning</key>
+	<true/>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 	<key>SeedingSound</key>

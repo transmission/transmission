@@ -647,7 +647,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) alertForRemainingDiskSpace
 {
-    if ([self allDownloaded])
+    if ([self allDownloaded] || ![fDefaults boolForKey: @"RemainingSpaceWarning"])
         return YES;
     
     NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
@@ -655,10 +655,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
     uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
             torrentRemaining = [self size] - (uint64_t)[self downloadedValid];
-    
-    /*NSLog(@"Volume: %@", volumeName);
-    NSLog(@"Remaining disk space: %qu (%@)", remainingSpace, [NSString stringForFileSize: remainingSpace]);
-    NSLog(@"Torrent remaining size: %qu (%@)", torrentRemaining, [NSString stringForFileSize: torrentRemaining]);*/
     
     if (volumeName && remainingSpace <= torrentRemaining)
     {

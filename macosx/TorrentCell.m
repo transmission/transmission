@@ -83,6 +83,9 @@
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point
 {
+    if (width <= 0.0)
+        return;
+    
     if ([barImage size].width < width)
         [barImage setSize: NSMakeSize(width * 2.0, BAR_HEIGHT)];
 

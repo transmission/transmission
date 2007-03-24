@@ -60,21 +60,21 @@
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
-- (void) setBadge:          (id) sender;
-- (void) setSound:          (id) sender;
-- (void) setUpdate:         (id) sender;
+- (void) setBadge: (id) sender;
+- (void) setSound: (id) sender;
+- (void) setUpdate: (id) sender;
 
-- (void) setQueue:          (id) sender;
-- (void) setQueueNumber:    (id) sender;
+- (void) setQueue: (id) sender;
+- (void) setQueueNumber: (id) sender;
 
-- (void) setDownloadLocation:       (id) sender;
-- (void) folderSheetShow:           (id) sender;
+- (void) setDownloadLocation: (id) sender;
+- (void) folderSheetShow: (id) sender;
 - (void) incompleteFolderSheetShow: (id) sender;
 
-- (void) setPort:   (id) sender;
+- (void) setPort: (id) sender;
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
-- (void) setNat:    (id) sender;
+- (void) setNat: (id) sender;
 - (void) updateNatStatus;
 
 - (void) applyRatioSetting: (id) sender;
