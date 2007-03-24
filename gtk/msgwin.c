@@ -112,6 +112,8 @@ msgwin_create( void ) {
   g_signal_connect( clear, "clicked", G_CALLBACK( doclear ), NULL );
   g_signal_connect( menu, "changed", G_CALLBACK( changelevel ), NULL );
 
+  gtk_window_set_role( GTK_WINDOW( win ), "tr-messages" );
+
   gtk_widget_show_all( win );
 
   return win;

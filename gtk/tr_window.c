@@ -212,6 +212,7 @@ tr_window_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     gtk_widget_show_all( vbox );
     gtk_container_add( GTK_CONTAINER( self ), vbox );
     gtk_window_set_title( GTK_WINDOW( self ), g_get_application_name());
+    gtk_window_set_role( GTK_WINDOW( self ), "tr-main" );
 }
 
 static void

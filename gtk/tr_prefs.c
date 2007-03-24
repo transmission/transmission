@@ -324,6 +324,7 @@ tr_prefs_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     self->combomodel = makecombomodel();
     self->disposed   = FALSE;
 
+    gtk_window_set_role( GTK_WINDOW( self ), "tr-prefs" );
     title = g_strdup_printf( _("%s Preferences"), g_get_application_name() );
     gtk_window_set_title( GTK_WINDOW( self ), title );
     g_free( title );

@@ -264,6 +264,7 @@ makeinfowind(GtkWindow *parent, TrTorrent *tor) {
     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
   g_free(str);
 
+  gtk_window_set_role( GTK_WINDOW( wind ), "tr-info" );
   gtk_widget_set_name(wind, "TransmissionDialog");
   gtk_table_set_col_spacings(GTK_TABLE(table), 12);
   gtk_table_set_row_spacings(GTK_TABLE(table), 12);
@@ -505,6 +506,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
     gtk_window_set_resizable( GTK_WINDOW( wind ), TRUE );
     gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( wind )->vbox ), frame );
+    gtk_window_set_role( GTK_WINDOW( wind ), "tr-files" );
 
     /* set up the callback data */
     fw         = g_new0( struct fileswind, 1 );
