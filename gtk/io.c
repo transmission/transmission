@@ -278,6 +278,7 @@ io_accept(struct iosource *io) {
   int fd;
   socklen_t len;
 
+  len = io->inmax;
   if(0 > (fd = accept(io->infd.fd, (struct sockaddr*)io->inbuf, &len))) {
     if(EAGAIN == errno || ECONNABORTED == errno || EWOULDBLOCK == errno)
       return;
