@@ -1,0 +1,47 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Troubleshooting Manual Recheck</title>
+	</head>
+	<body>
+		<div id="mainbox">
+			<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>How do I manually recheck my files?</h1>
+			</div>
+			<p>If Transmission crashes, you may want to manually recheck your files:
+				<ul>
+					<li>to verify that the download has not been corrupted </li>
+					<li>to ensure Transmission continues where it left off and doesn't start over </li>
+				</ul>
+				
+			<p>To do this:
+				<div summary="To do this" id="taskbox">
+				<ol>
+					<li>In Transmission, click on the magnifying glass next to the torrent in question.
+					<p>This should open a Finder window which displays all the files in your torrent.</li>
+					<li>Select the torrent in Transmission and click "Remove". 
+					<p>NB: make sure you keep a copy of the torrent file - you'll need it later! </li>
+					<li>Open the Terminal. You can find it in /Applications/Utilities. </li>
+					<li>Once inside the Terminal, type "touch " (including a space). Do not hit Enter yet. </li>
+					<li>Drag any one of the files you are downloading into the Terminal window (from the Finder window you opened in step 1).
+					<p>The file path should automagically appear. </li>
+					<li>Now hit "Enter" inside the terminal. </li>
+					<li>Quit Terminal. </li>
+					<li>Reload the torrent file in question into Transmission.
+					<p>Transmission should start rechecking your files!</li>
+				</ol>
+				</div>
+				
+			</div>
+
+		</div>
+	</body>
+	
+</html>
