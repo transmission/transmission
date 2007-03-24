@@ -667,12 +667,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                             "Torrent file disk space alert -> message"), volumeName]];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
         [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
         
-        BOOL ret = [alert runModal] != NSAlertFirstButtonReturn;
-        
+        int result = [alert runModal];
         [alert release];
         
-        return ret;
+        if (result == NSAlertThirdButtonReturn)
+            [fDefaults setBool: NO forKey: @"RemainingSpaceWarning"];
+        
+        return result != NSAlertFirstButtonReturn;
     }
     return YES;
 }
