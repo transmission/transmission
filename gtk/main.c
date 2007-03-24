@@ -264,12 +264,14 @@ readargs( int argc, char ** argv, gboolean * sendquit, gboolean * startpaused )
         { "version", no_argument, NULL, 'v' },
         { NULL, 0, NULL, 0 }
     };
-    int opt;
+    int          opt;
+    const char * name;
 
     *sendquit    = FALSE;
     *startpaused = FALSE;
 
     gtk_parse_args( &argc, &argv );
+    name = g_get_prgname();
 
     while( 0 <= ( opt = getopt_long( argc, argv, "hpqv", opts, NULL ) ) )
     {
@@ -284,20 +286,21 @@ readargs( int argc, char ** argv, gboolean * sendquit, gboolean * startpaused )
             case 'v':
             case 'h':
                 printf(
-_("usage: %1$s [-hpq] [files...]\n"
+_("usage: %s [-hpq] [files...]\n"
   "\n"
-  "Transmission %2$s (r%3$d) http://transmission.m0k.org/\n"
+  "Transmission %s (r%d) http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
   "\n"
   "  -h --help    display this message and exit\n"
   "  -p --paused  start with all torrents paused\n"
-  "  -q --quit    request that the running %1$s instance quit\n"
+  "  -q --quit    request that the running %s instance quit\n"
   "\n"
-  "Only one instance of %1$s may run at one time. Multiple\n"
+  "Only one instance of %s may run at one time. Multiple\n"
   "torrent files may be loaded at startup by adding them to the command\n"
-  "line. If %1$s is already running, those torrents will be\n"
+  "line. If %s is already running, those torrents will be\n"
   "opened in the running instance.\n"),
-                        g_get_prgname(), VERSION_STRING, VERSION_REVISION );
+                        name, VERSION_STRING, VERSION_REVISION,
+                        name, name, name );
                 exit(0);
                 break;
         }
