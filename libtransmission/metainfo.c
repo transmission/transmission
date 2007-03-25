@@ -50,7 +50,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
                       const char * savedHash, int saveCopy )
 {
     char       * buf;
-    benc_val_t   meta, * beInfo, * list, * val;
+    benc_val_t   meta, * beInfo, * list, * val, * val2;
     int          i;
     size_t       len;
 
@@ -137,8 +137,10 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
     }
     
     /* Private torrent */
-    if( tr_bencDictFind( beInfo, "private" ) ||
-        tr_bencDictFind( &meta, "private" ) )
+    val  = tr_bencDictFind( beInfo, "private" );
+    val2 = tr_bencDictFind( &meta,  "private" );
+    if( ( NULL != val  && ( TYPE_INT != val->type  || 0 != val->val.i ) ) ||
+        ( NULL != val2 && ( TYPE_INT != val2->type || 0 != val2->val.i ) ) )
     {
         inf->flags |= TR_FLAG_PRIVATE;
     }
