@@ -223,20 +223,6 @@ tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
 tr_torrent_t * tr_torrentInitSaved( tr_handle_t *, const char * hashStr,
                                     int flags, int * error );
 
-/***********************************************************************
- * tr_torrentDisablePex
- ***********************************************************************
- * Disable or enable peer exchange for this torrent. Peer exchange is
- * enabled by default, except for private torrents where pex is
- * disabled and cannot be enabled.
- **********************************************************************/
-void tr_torrentDisablePex( tr_torrent_t *, int disable );
-
-/***********************************************************************
- * tr_torrentScrape
- ***********************************************************************
- * Return torrent metainfo.
- **********************************************************************/
 typedef struct tr_info_s tr_info_t;
 tr_info_t * tr_torrentInfo( tr_torrent_t * );
 

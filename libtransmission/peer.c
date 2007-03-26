@@ -223,22 +223,7 @@ void tr_peerDestroy( tr_peer_t * peer )
 
 void tr_peerSetPrivate( tr_peer_t * peer, int private )
 {
-    if( peer->private == private )
-    {
-        return;
-    }
-
     peer->private = private;
-
-    if( !private )
-    {
-        peer->lastPex = 0;
-    }
-
-    if( EXTENDED_HANDSHAKE == peer->extStatus )
-    {
-        sendExtended( peer->tor, peer, EXTENDED_HANDSHAKE_ID );
-    }
 }
 
 void tr_peerSetTorrent( tr_peer_t * peer, tr_torrent_t * tor )

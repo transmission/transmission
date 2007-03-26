@@ -201,8 +201,6 @@ struct tr_torrent_s
     uint64_t          uploadedCur;
     uint64_t          uploadedPrev;
 
-    uint8_t           pexDisabled;
-
     tr_stat_t         stats[2];
     int               statCur;
 

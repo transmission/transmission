@@ -127,13 +127,16 @@ makeExtendedHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * len )
 
     /* create dict of supported extended messages */
     tr_bencInit( msgsval, TYPE_DICT );
-    if( tr_bencDictAppendNofree( msgsval, "ut_pex", &pexval, NULL ) )
+    if( !peer->private )
     {
-        tr_bencFree( &val );
-        return NULL;
+        /* for public torrents advertise utorrent pex message */
+        if( tr_bencDictAppendNofree( msgsval, "ut_pex", &pexval, NULL ) )
+        {
+            tr_bencFree( &val );
+            return NULL;
+        }
+        tr_bencInitInt( pexval, EXTENDED_PEX_ID );
     }
-    /* for public torrents advertise utorrent pex message */
-    tr_bencInitInt( pexval, ( peer->private ? 0 : EXTENDED_PEX_ID ) );
 
     /* our listening port */
     if( 0 < tor->publicPort )
@@ -229,7 +232,7 @@ parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         if( NULL != sub && TYPE_INT == sub->type )
         {
             peer->pexStatus = 0;
-            if( 0x0 < sub->val.i && 0xff >= sub->val.i )
+            if( !peer->private && 0x0 < sub->val.i && 0xff >= sub->val.i )
             {
                 peer->pexStatus = sub->val.i;
             }
