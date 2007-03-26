@@ -151,6 +151,7 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
         {
             continue;
         }
+        /* XXX azureus sucks, we can't enable or disable pex after handshake */
         if( AZ_MSG_AZ_PEER_EXCHANGE == azmsgId( idx ) && peer->private )
         {
             /* no point in saying we can do pex if the torrent is private */
