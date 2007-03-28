@@ -126,9 +126,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             fUseIncompleteFolder = NO;
         
         [self setDownloadFolder: downloadFolder];
-
+        
+        //start transfer
+        BOOL start = YES;
+        NSNumber * active;
         NSString * paused;
-        if (!(paused = [history objectForKey: @"Paused"]) || [paused isEqualToString: @"NO"])
+        if ((active = [history objectForKey: @"Active"]))
+            start = [active boolValue];
+        else if ((paused = [history objectForKey: @"Paused"])) //old way of storing if active
+            start = [paused isEqualToString: @"NO"];
+        else;
+        
+        if (start)
         {
             fStat = tr_torrentStat(fHandle);
             [self startTransfer];
@@ -144,7 +153,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [self hashString], @"TorrentHash",
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
-                    [self isActive] ? @"NO" : @"YES", @"Paused",
+                    [NSNumber numberWithBool: [self isActive]], @"Active",
                     [self date], @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
