@@ -115,7 +115,7 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     tc->interval       = 300;
     tc->scrapeInterval = 1200;
 
-    tc->lastError      = 1;
+    tc->lastError      = 0;
     tc->allUnreachIfError = 1;
 
     tc->publicPort     = tor->publicPort;
@@ -184,7 +184,7 @@ static int shouldConnect( tr_tracker_t * tc )
     
     now = tr_date();
     
-    /* If last was an error and it should not change trackers, then all must have been errors */
+    /* If last attempt was an error and it did not change trackers, then all must have been errors */
     if( tc->lastError )
     {
         /* Unreachable trackers, wait 10 seconds + random value before trying again */
@@ -205,7 +205,7 @@ static int shouldConnect( tr_tracker_t * tc )
             }
             else
             {
-                tc->allUnreachIfError = 1;
+                tc->allUnreachIfError = 1; //since starting at the top of the list, reset if any were reached previously
             }
         }
     }
@@ -293,6 +293,7 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
     
     if( ( NULL == tc->http ) && ( manual || shouldConnect( tc ) ) )
     {
+        //if announcing manually, don't consider not reaching a tracker an error
         if( manual )
         {
             tc->allUnreachIfError = 0;
