@@ -282,7 +282,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSLog(@"Could not IORegisterForSystemPower");
 
     //load previous transfers
-    NSLog([self applicationSupportFolder]);
     NSArray * history = [[NSArray alloc] initWithContentsOfFile: [[self applicationSupportFolder]
                                                 stringByAppendingPathComponent: @"Transfers.plist"]];
     
