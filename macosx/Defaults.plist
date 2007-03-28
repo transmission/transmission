@@ -42,8 +42,6 @@
 	<string>None</string>
 	<key>FilterBar</key>
 	<false/>
-	<key>History</key>
-	<array/>
 	<key>IncompleteDownloadFolder</key>
 	<string>~/Desktop</string>
 	<key>InfoTab</key>
