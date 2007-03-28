@@ -222,8 +222,10 @@ struct tr_handle_s
     int            downloadLimit;
     tr_shared_t  * shared;
 
-    char           id[21];
-    char           key[21];
+#define TR_ID_LEN               20
+    char           id[TR_ID_LEN+1];
+#define TR_KEY_LEN              20
+    char           key[TR_KEY_LEN+1];
 
     tr_handle_status_t stats[2];
     int                statCur;

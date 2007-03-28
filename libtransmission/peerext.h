@@ -104,6 +104,9 @@ makeExtendedHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * len )
     benc_val_t val, * msgsval, * portval, * versval, * pexval;
     char * buf, * vers;
 
+    peer_dbg( "SEND extended-handshake, %s pex",
+              ( peer->private ? "without" : "with" ) );
+
     /* get human-readable version string */
     vers = NULL;
     asprintf( &vers, "%s %s", TR_NAME, VERSION_STRING );
@@ -200,6 +203,8 @@ makeUTPex( tr_torrent_t * tor, tr_peer_t * peer, int * len )
     benc_val_t val;
     char     * ret;
 
+    peer_dbg( "SEND extended-pex" );
+
     assert( !peer->private );
     tr_bencInitStr( &val, NULL, 0, 1 );
     ret = makeCommonPex( tor, peer, len, peertreeToBencUT, "added.f", &val );
@@ -210,22 +215,24 @@ makeUTPex( tr_torrent_t * tor, tr_peer_t * peer, int * len )
 static inline int
 parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
-    benc_val_t     val, * sub;
+    benc_val_t val, * sub;
+    int dbgport, dbgpex;
 
     if( tr_bencLoad( buf, len, &val, NULL ) )
     {
-        peer_dbg( "invalid bencoding in extended handshake" );
+        peer_dbg( "GET  extended-handshake, invalid bencoding" );
         return TR_ERROR;
     }
     if( TYPE_DICT != val.type )
     {
-        peer_dbg( "extended handshake is not a dictionary" );
+        peer_dbg( "GET  extended-handshake, not a dictionary" );
         tr_bencFree( &val );
         return TR_ERROR;
     }
 
     /* check supported messages for utorrent pex */
     sub = tr_bencDictFind( &val, "m" );
+    dbgpex = -1;
     if( NULL != sub && TYPE_DICT == sub->type )
     {
         sub = tr_bencDictFind( sub, "ut_pex" );
@@ -235,18 +242,22 @@ parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
             if( !peer->private && 0x0 < sub->val.i && 0xff >= sub->val.i )
             {
                 peer->pexStatus = sub->val.i;
+                dbgpex = sub->val.i;
             }
         }
     }
 
     /* get peer's listening port */
     sub = tr_bencDictFind( &val, "p" );
+    dbgport = -1;
     if( NULL != sub && TYPE_INT == sub->type &&
         0x0 < sub->val.i && 0xffff >= sub->val.i )
     {
         peer->port = htons( (uint16_t) sub->val.i );
-        peer_dbg( "got listening port %i", ntohs( peer->port ) );
+        dbgport = sub->val.i;
     }
+
+    peer_dbg( "GET  extended-handshake, ok port=%i pex=%i", dbgport, dbgpex );
 
     tr_bencFree( &val );
     return TR_OK;
@@ -259,26 +270,33 @@ parseUTPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
 
     if( peer->private || PEX_PEER_CUTOFF <= tor->peerCount )
     {
+        peer_dbg( "GET  extended-pex, ignoring p=%i c=(%i<=%i)",
+                  peer->private, PEX_PEER_CUTOFF, tor->peerCount );
         return TR_OK;
     }
 
     if( tr_bencLoad( buf, len, &val, NULL ) )
     {
-        peer_dbg( "invalid bencoding in extended peer exchange" );
+        peer_dbg( "GET  extended-pex, invalid bencoding" );
         return TR_ERROR;
     }
     if( TYPE_DICT != val.type )
     {
         tr_bencFree( &val );
-        peer_dbg( "extended peer exchange is not a dictionary" );
+        peer_dbg( "GET  extended-pex, not a dictionary" );
         return TR_ERROR;
     }
 
     sub = tr_bencDictFind( &val, "added" );
     if( NULL != sub && TYPE_STR == sub->type && 0 == sub->val.s.i % 6 )
     {
+        peer_dbg( "GET  extended-pex, %i peers", sub->val.s.i / 6 );
         tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,
                               ( uint8_t * )sub->val.s.s, sub->val.s.i / 6 );
+    }
+    else
+    {
+        peer_dbg( "GET  extended-pex, no peers" );
     }
 
     return TR_OK;

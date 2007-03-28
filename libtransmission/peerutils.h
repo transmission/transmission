@@ -61,6 +61,7 @@ static int checkPeer( tr_peer_t * peer )
 {
     tr_torrent_t * tor = peer->tor;
     uint64_t       now;
+    int            ret;
 
     now = tr_date();
 
@@ -115,12 +116,25 @@ static int checkPeer( tr_peer_t * peer )
             }
             if( now > peer->lastPex + 1000 * PEX_INTERVAL )
             {
-                if( ( EXTENDED_HANDSHAKE == peer->extStatus &&
-                      !sendExtended( tor, peer, EXTENDED_PEX_ID ) ) ||
-                    ( peer->azproto && !sendAZPex( tor, peer ) ) )
+                if( EXTENDED_HANDSHAKE == peer->extStatus )
                 {
-                    peer->lastPex = now + 1000 * tr_rand( PEX_INTERVAL / 10 );
+                    ret = sendExtended( tor, peer, EXTENDED_PEX_ID );
                 }
+                else if( peer->azproto )
+                {
+                    ret = sendAZPex( tor, peer );
+                }
+                else
+                {
+                    assert( 0 );
+                    ret = TR_ERROR;
+                }
+                if( ret )
+                {
+                    return ret;
+                }
+                peer->lastPex = now + 1000 *
+                    ( PEX_INTERVAL + tr_rand( PEX_INTERVAL / 10 ) );
             }
         }
     }

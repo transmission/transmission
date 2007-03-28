@@ -94,7 +94,7 @@ struct tr_peer_s
     int                 optimistic;
     uint64_t            lastChoke;
 
-    uint8_t             id[20];
+    uint8_t             id[TR_ID_LEN];
 
     /* The pieces that the peer has */
     tr_bitfield_t     * bitfield;
@@ -116,7 +116,7 @@ struct tr_peer_s
     uint8_t           * outMessages;
     int                 outMessagesSize;
     int                 outMessagesPos;
-    uint8_t             outBlock[13+16384];
+    uint8_t             outBlock[25+16384];
     int                 outBlockSize;
     int                 outBlockLoaded;
     int                 outBlockSending;

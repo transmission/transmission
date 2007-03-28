@@ -519,7 +519,7 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
                 {
                     return parseUTPex( tor, peer, p, len );
                 }
-                peer_dbg( "Unknown extended message '%hhu'", extid );
+                peer_dbg( "GET  unknown extended message '%hhu'", extid );
             }
             return 1;
         case AZ_MSG_BT_KEEP_ALIVE:
@@ -534,7 +534,7 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
             return 0;
     }
 
-    peer_dbg( "Unknown message '%d'", id );
+    peer_dbg( "GET  unknown message '%d'", id );
     return TR_ERROR;
 }
 
@@ -580,15 +580,93 @@ static uint8_t * parseBufHash( tr_peer_t * peer )
     }
 }
 
-static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
+static inline int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
 {
     tr_info_t * inf = &tor->info;
+    int         ii;
+    char      * client;
 
-    int       i;
-    int       len;
-    uint8_t * p   = peer->buf;
-    int       ret;
-    int       msgid;
+    if( memcmp( &peer->buf[28], inf->hash, SHA_DIGEST_LENGTH ) )
+    {
+        peer_dbg( "GET  handshake, wrong torrent hash" );
+        return TR_ERROR;
+    }
+
+    if( !memcmp( &peer->buf[48], tor->id, TR_ID_LEN ) )
+    {
+        /* We are connected to ourselves... */
+        peer_dbg( "GET  handshake, that is us" );
+        return TR_ERROR;
+    }
+
+    memcpy( peer->id, &peer->buf[48], TR_ID_LEN );
+
+    for( ii = 0; ii < tor->peerCount; ii++ )
+    {
+        if( tor->peers[ii] == peer )
+        {
+            continue;
+        }
+        if( !peerCmp( peer, tor->peers[ii] ) )
+        {
+            peer_dbg( "GET  handshake, duplicate" );
+            return TR_ERROR;
+        }
+    }
+
+    client = tr_clientForId( (uint8_t *) peer->id );
+    if( PEER_SUPPORTS_EXTENDED_MESSAGES( &peer->buf[20] ) )
+    {
+        peer->status = PEER_STATUS_CONNECTED;
+        peer->extStatus = EXTENDED_SUPPORTED;
+        peer_dbg( "GET  handshake, ok (%s) extended messaging supported",
+                  client );
+    }
+    else if( PEER_SUPPORTS_AZUREUS_PROTOCOL( &peer->buf[20] ) )
+    {
+        peer->status  = PEER_STATUS_AZ_GIVER;
+        peer->azproto = 1;
+        peer->date    = tr_date();
+        peer_dbg( "GET  handshake, ok (%s) will use azureus protocol",
+                  client );
+    }
+    else
+    {
+        peer->status = PEER_STATUS_CONNECTED;
+        peer_dbg( "GET  handshake, ok (%s)", client );
+    }
+    free( client );
+
+    return TR_OK;
+}
+
+static inline int sendInitial( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    if( PEER_STATUS_CONNECTED != peer->status )
+    {
+        return TR_OK;
+    }
+
+    if( EXTENDED_SUPPORTED == peer->extStatus )
+    {
+        if( sendExtended( tor, peer, EXTENDED_HANDSHAKE_ID ) )
+        {
+            return TR_ERROR;
+        }
+        peer->extStatus = EXTENDED_HANDSHAKE;
+    }
+
+    sendBitfield( tor, peer );
+
+    return TR_OK;
+}
+
+static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    int       len, ret, msgid;
+    uint8_t * buf;
+
+    buf = peer->buf;
 
     if( peer->banned )
     {
@@ -601,9 +679,8 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
     {
         if( PEER_STATUS_HANDSHAKE == peer->status )
         {
-            char * client;
-
-            if( ( ret = parseBufHeader( peer ) ) )
+            ret = parseBufHeader( peer );
+            if( ret )
             {
                 return ret;
             }
@@ -613,71 +690,26 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
                 break;
             }
 
-            if( memcmp( &p[28], inf->hash, 20 ) )
+            ret = parseHandshake( tor, peer );
+            if( 0 > ret )
             {
-                peer_dbg( "GET  handshake, wrong torrent hash" );
-                return TR_ERROR;
+                return ret;
             }
+            buf       += 68;
+            peer->pos -= 68;
 
-            if( !memcmp( &p[48], tor->id, 20 ) )
+            ret = sendInitial( tor, peer );
+            if( ret )
             {
-                /* We are connected to ourselves... */
-                peer_dbg( "GET  handshake, that is us" );
-                return TR_ERROR;
-            }
-
-            peer->status = PEER_STATUS_CONNECTED;
-            if( PEER_SUPPORTS_EXTENDED_MESSAGES( &p[20] ) )
-            {
-                peer_dbg( "extended messages supported" );
-                peer->extStatus = EXTENDED_SUPPORTED;
-            }
-            else if( PEER_SUPPORTS_AZUREUS_PROTOCOL( &p[20] ) )
-            {
-                peer->azproto = 1;
-                peer->status  = PEER_STATUS_AZ_GIVER;
-                peer->date    = tr_date();
-            }
-            memcpy( peer->id, &p[48], 20 );
-            p            += 68;
-            peer->pos    -= 68;
-
-            for( i = 0; i < tor->peerCount; i++ )
-            {
-                if( tor->peers[i] == peer )
-                {
-                    continue;
-                }
-                if( !peerCmp( peer, tor->peers[i] ) )
-                {
-                    peer_dbg( "GET  handshake, duplicate" );
-                    return TR_ERROR;
-                }
-            }
-
-            client = tr_clientForId( (uint8_t *) peer->id );
-            peer_dbg( "GET  handshake, ok (%s)", client );
-            free( client );
-
-          justconnected:
-            if( PEER_STATUS_CONNECTED == peer->status )
-            {
-                if( EXTENDED_SUPPORTED == peer->extStatus )
-                {
-                    if( sendExtended( tor, peer, EXTENDED_HANDSHAKE_ID ) )
-                    {
-                        return TR_ERROR;
-                    }
-                    peer->extStatus = EXTENDED_HANDSHAKE;
-                }
-                sendBitfield( tor, peer );
+                return ret;
             }
 
             continue;
         }
-        else if( peer->status < PEER_STATUS_CONNECTED )
+
+        if( PEER_STATUS_AZ_RECEIVER == peer->status )
         {
-            ret = parseAZMessageHeader( peer, p, peer->pos, &msgid, &len );
+            ret = parseAZMessageHeader( peer, buf, peer->pos, &msgid, &len );
             if( TR_NET_BLOCK & ret )
             {
                 break;
@@ -686,31 +718,41 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
             {
                 return TR_ERROR;
             }
-            else
+
+            buf       += ret;
+            peer->pos -= ret;
+            assert( len <= peer->pos );
+            if( AZ_MSG_AZ_HANDSHAKE != msgid ||
+                parseAZHandshake( peer, buf, len ) )
             {
-                p         += ret;
-                peer->pos -= ret;
-                assert( len <= peer->pos );
-                if( AZ_MSG_AZ_HANDSHAKE != msgid ||
-                    parseAZHandshake( peer, p, len ) )
-                {
-                    return TR_ERROR;
-                }
-                p           += len;
-                peer->pos   -= len;
-                assert( 0 <= peer->pos );
-                peer->status = PEER_STATUS_CONNECTED;
-                goto justconnected;
+                return TR_ERROR;
             }
+            buf         += len;
+            peer->pos   -= len;
+            assert( 0 <= peer->pos );
+            peer->status = PEER_STATUS_CONNECTED;
+
+            ret = sendInitial( tor, peer );
+            if( ret )
+            {
+                return ret;
+            }
+
+            continue;
+        }
+
+        if( PEER_STATUS_CONNECTED != peer->status )
+        {
+            break;
         }
 
         if( peer->azproto )
         {
-            ret = parseAZMessageHeader( peer, p, peer->pos, &msgid, &len );
+            ret = parseAZMessageHeader( peer, buf, peer->pos, &msgid, &len );
         }
         else
         {
-            ret = parseMessageHeader( peer, p, peer->pos, &msgid, &len );
+            ret = parseMessageHeader( peer, buf, peer->pos, &msgid, &len );
         }
         if( TR_NET_BLOCK & ret )
         {
@@ -721,6 +763,7 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
             return TR_ERROR;
         }
 
+#if 0
         if( len > 8 + tor->blockSize )
         {
             /* This should never happen. Drop that peer */
@@ -728,22 +771,26 @@ static inline int parseBuf( tr_torrent_t * tor, tr_peer_t * peer )
             peer_dbg( "message too large (%d bytes)", len );
             return TR_ERROR;
         }
+#endif
 
-        p         += ret;
+        buf       += ret;
         peer->pos -= ret;
         assert( 0 <= peer->pos );
 
-        if( ( ret = parseMessage( tor, peer, msgid, p, len ) ) )
+        if( ( ret = parseMessage( tor, peer, msgid, buf, len ) ) )
         {
             return ret;
         }
 
-        p         += len;
+        buf       += len;
         peer->pos -= len;
         assert( 0 <= peer->pos );
     }
 
-    memmove( peer->buf, p, peer->pos );
+    if( 0 < peer->pos )
+    {
+        memmove( peer->buf, buf, peer->pos );
+    }
 
     return TR_OK;
 }

@@ -56,13 +56,62 @@ static void messagesSent( tr_peer_t * peer, int size )
              peer->outMessagesPos );
 }
 
+static int
+getHeaderSize( tr_peer_t * peer, int id )
+{
+    int size, index;
+
+    size = 4;
+    if( peer->azproto )
+    {
+        index = azmsgIdIndex( id );
+        assert( 0 <= index );
+        size += 4 + azmsgLen( index ) + 1;
+    }
+    else if( 0 <= id )
+    {
+        size++;
+    }
+
+    return size;
+}
+
+static uint8_t *
+fillHeader( tr_peer_t * peer, int size, int id, uint8_t * buf )
+{
+    int index;
+
+    TR_HTONL( size - 4, buf );
+    buf += 4;
+    if( peer->azproto )
+    {
+        index = azmsgIdIndex( id );
+        assert( 0 <= index );
+        TR_HTONL( azmsgLen( index ), buf );
+        buf += 4;
+        memcpy( buf, azmsgStr( index ), azmsgLen( index ) );
+        buf += azmsgLen( index );
+        buf[0] = AZ_EXT_VERSION;
+        buf++;
+    }
+    else if( 0 <= id )
+    {
+        assert( 0 <= id && 0xff > id );
+        *buf = id;
+        buf++;
+    }
+
+    return buf;
+}
+
 static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
                                int * size )
 {
     if( !peer->outBlockLoaded )
     {
-        uint8_t * p;
+        uint8_t      * buf;
         tr_request_t * r;
+        int            hdrlen;
 
         if( peer->amChoking || peer->outRequestCount < 1 )
         {
@@ -85,15 +134,17 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
                      peer->outRequestCount * sizeof( tr_request_t ) );
             return NULL;
         }
-        
-        p = (uint8_t *) peer->outBlock;
 
-        TR_HTONL( 9 + r->length, p );
-        p[4] = PEER_MSG_PIECE;
-        TR_HTONL( r->index, p + 5 );
-        TR_HTONL( r->begin, p + 9 );
+        hdrlen = 4 + 4 + r->length + getHeaderSize( peer, PEER_MSG_PIECE );
+        assert( hdrlen <= ( signed )sizeof peer->outBlock );
+        buf = fillHeader( peer, hdrlen, PEER_MSG_PIECE, peer->outBlock );
 
-        tr_ioRead( tor->io, r->index, r->begin, r->length, &p[13] );
+        TR_HTONL( r->index, buf );
+        buf += 4;
+        TR_HTONL( r->begin, buf );
+        buf += 4;
+
+        tr_ioRead( tor->io, r->index, r->begin, r->length, buf );
 
         if( peer->outRequestCount < 1 )
         {
@@ -104,7 +155,7 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
         peer_dbg( "SEND piece %d/%d (%d bytes)",
                   r->index, r->begin, r->length );
 
-        peer->outBlockSize   = 13 + r->length;
+        peer->outBlockSize   = hdrlen;
         peer->outBlockLoaded = 1;
 
         (peer->outRequestCount)--;
@@ -137,20 +188,9 @@ static void blockSent( tr_peer_t * peer, int size )
 
 static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
 {
-    uint8_t * p;
-    int       index = 0;
+    uint8_t * buf;
 
-    size += 4;
-    if( peer->azproto )
-    {
-        index = azmsgIdIndex( id );
-        assert( 0 <= index );
-        size += 4 + azmsgLen( index ) + 1;
-    }
-    else if( 0 <= id )
-    {
-        size++;
-    }
+    size += getHeaderSize( peer, id );
 
     if( peer->outMessagesPos + size > peer->outMessagesSize )
     {
@@ -159,25 +199,10 @@ static uint8_t * getMessagePointer( tr_peer_t * peer, int size, int id )
                                          peer->outMessagesSize );
     }
 
-    p                     = &peer->outMessages[peer->outMessagesPos];
+    buf                   = &peer->outMessages[peer->outMessagesPos];
     peer->outMessagesPos += size;
 
-    TR_HTONL( size - 4, p );
-    p += 4;
-    if( peer->azproto )
-    {
-        TR_HTONL( azmsgLen( index ), p );
-        memcpy( p + 4, azmsgStr( index ), azmsgLen( index ) );
-        p[ 4 + azmsgLen( index ) ] = AZ_EXT_VERSION;
-        p += 4 + azmsgLen( index ) + 1;
-    }
-    else if( 0 <= id )
-    {
-        *p = id;
-        p++;
-    }
-
-    return p;
+    return fillHeader( peer, size, id, buf );
 }
 
 /***********************************************************************
@@ -377,7 +402,7 @@ static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
     }
     if( NULL == buf )
     {
-        return 1;
+        return TR_ERROR;
     }
 
     /* add header and queue it to be sent */
@@ -386,7 +411,7 @@ static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
     memcpy( p + 1, buf, len );
     free( buf );
 
-    return 0;
+    return TR_OK;
 }
 
 /***********************************************************************
@@ -403,7 +428,7 @@ static int sendAZPex( tr_torrent_t * tor, tr_peer_t * peer )
     buf = makeAZPex( tor, peer, &len );
     if( NULL == buf )
     {
-        return 1;
+        return TR_ERROR;
     }
 
     /* add header and queue it to be sent */
@@ -411,5 +436,5 @@ static int sendAZPex( tr_torrent_t * tor, tr_peer_t * peer )
     memcpy( p, buf, len );
     free( buf );
 
-    return 0;
+    return TR_OK;
 }
