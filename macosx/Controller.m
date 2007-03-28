@@ -281,16 +281,31 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         NSLog(@"Could not IORegisterForSystemPower");
 
-    //load torrents from history
-    Torrent * torrent;
-    NSDictionary * historyItem;
-    NSEnumerator * enumerator = [[fDefaults arrayForKey: @"History"] objectEnumerator];
-    while ((historyItem = [enumerator nextObject]))
-        if ((torrent = [[Torrent alloc] initWithHistory: historyItem lib: fLib]))
-        {
-            [fTorrents addObject: torrent];
-            [torrent release];
-        }
+    //load previous transfers
+    NSLog([self applicationSupportFolder]);
+    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [[self applicationSupportFolder]
+                                                stringByAppendingPathComponent: @"Transfers.plist"]];
+    
+    //old version saved transfer info in prefs file
+    if (!history)
+        if ((history = [fDefaults arrayForKey: @"History"]))
+            [history retain];
+    [fDefaults removeObjectForKey: @"History"];
+    
+    if (history)
+    {
+        Torrent * torrent;
+        NSDictionary * historyItem;
+        NSEnumerator * enumerator = [history objectEnumerator];
+        while ((historyItem = [enumerator nextObject]))
+            if ((torrent = [[Torrent alloc] initWithHistory: historyItem lib: fLib]))
+            {
+                [fTorrents addObject: torrent];
+                [torrent release];
+            }
+        
+        [history release];
+    }
     
     //set sort
     fSortType = [[fDefaults stringForKey: @"Sort"] retain];
@@ -1359,8 +1374,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ((torrent = [enumerator nextObject]))
         [history addObject: [torrent history]];
 
-    [fDefaults setObject: history forKey: @"History"];
-    [fDefaults synchronize];
+    [history writeToFile: [[self applicationSupportFolder] stringByAppendingPathComponent: @"Transfers.plist"] atomically: YES];
 }
 
 - (void) sortTorrents
@@ -2783,6 +2797,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
             && (location = [clickContext objectForKey: @"Location"]))
         [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
+}
+
+- (NSString *) applicationSupportFolder
+{
+    return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex: 0] 
+                stringByAppendingPathComponent: [[NSProcessInfo processInfo] processName]];
 }
 
 @end
