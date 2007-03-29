@@ -76,15 +76,12 @@ static inline void tr_bencInit( benc_val_t * val, int type )
 void   _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree );
 int    tr_bencInitStrDup( benc_val_t * val, const char * str );
 void   tr_bencInitInt( benc_val_t * val, int64_t num );
-/* args are a NULL terminated list of benc_val_t** */
-int    tr_bencListAppend( benc_val_t * val, ... );
-/* args are a NULL terminated list of pairs of char * key, benc_val_t ** val */
-int    tr_bencDictAppend( benc_val_t * val, ... );
-/* like tr_bencDictAppend but char * key args are marked nofree */
-int    tr_bencDictAppendNofree( benc_val_t * val, ... );
-
-/* insure val has room for at least count more items */
-int tr_bencListExtend( benc_val_t * val, int count );
+int   tr_bencListReserve( benc_val_t * list, int count );
+/* note that for one key-value pair, count should be 1, not 2 */
+int   tr_bencDictReserve( benc_val_t * dict, int count );
+benc_val_t * tr_bencListAdd( benc_val_t * list );
+/* note: key must not be freed or modified while val is in use */
+benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key );
 
 char * tr_bencSaveMalloc( benc_val_t * val, int * len );
 int    tr_bencSave( benc_val_t * val, char ** buf,

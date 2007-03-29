@@ -318,40 +318,7 @@ void tr_bencInitInt( benc_val_t * val, int64_t num )
     val->val.i = num;
 }
 
-int tr_bencListAppend( benc_val_t * val, ... )
-{
-    va_list ap;
-    int len;
-    benc_val_t ** ptr;
-
-    assert( TYPE_LIST == val->type );
-
-    len = 0;
-    va_start( ap, val );
-    while( NULL != va_arg( ap, benc_val_t ** ) )
-    {
-        len++;
-    }
-    va_end( ap );
-
-    if( makeroom( val, len ) )
-    {
-        return 1;
-    }
-
-    va_start( ap, val );
-    while( NULL != ( ptr = va_arg( ap, benc_val_t ** ) ) )
-    {
-        *ptr = &val->val.l.vals[val->val.l.count];
-        tr_bencInit( *ptr, TYPE_INT );
-        val->val.l.count++;
-    }
-    va_end( ap );
-
-    return 0;
-}
-
-int tr_bencListExtend( benc_val_t * val, int count )
+int tr_bencListReserve( benc_val_t * val, int count )
 {
     assert( TYPE_LIST == val->type );
 
@@ -363,75 +330,48 @@ int tr_bencListExtend( benc_val_t * val, int count )
     return 0;
 }
 
-static inline int _tr_bencDictAppend( benc_val_t * val, va_list ap,
-                                      va_list ap2, int nofree )
+int tr_bencDictReserve( benc_val_t * val, int count )
 {
-    int len;
-    char * key;
-    benc_val_t ** ptr;
-
     assert( TYPE_DICT == val->type );
 
-    len = 0;
-    while( NULL != va_arg( ap, char * ) )
-    {
-        ptr = va_arg( ap, benc_val_t ** );
-        assert( NULL != ptr );
-        len += 2;
-    }
-
-    if( makeroom( val, len ) )
+    if( makeroom( val, count * 2 ) )
     {
         return 1;
-    }
-
-    while( NULL != ( key = va_arg( ap2, char * ) ) )
-    {
-        if( !nofree )
-        {
-            key = strdup( key );
-            if( NULL == key )
-            {
-                return 1;
-            }
-        }
-        ptr = va_arg( ap2, benc_val_t ** );
-        tr_bencInitStr( &val->val.l.vals[val->val.l.count], key, 0, nofree );
-        val->val.l.count++;
-        *ptr = &val->val.l.vals[val->val.l.count];
-        tr_bencInit( *ptr, TYPE_INT );
-        val->val.l.count++;
     }
 
     return 0;
 }
 
-int tr_bencDictAppend( benc_val_t * val, ... )
+benc_val_t * tr_bencListAdd( benc_val_t * list )
 {
-    va_list ap, ap2;
-    int     ret;
+    benc_val_t * item;
 
-    va_start( ap, val );
-    va_start( ap2, val );
-    ret = _tr_bencDictAppend( val, ap, ap2, 0 );
-    va_end( ap2 );
-    va_end( ap );
+    assert( TYPE_LIST == list->type );
+    assert( list->val.l.count < list->val.l.alloc );
 
-    return ret;
+    item = &list->val.l.vals[list->val.l.count];
+    list->val.l.count++;
+    tr_bencInit( item, TYPE_INT );
+
+    return item;
 }
 
-int tr_bencDictAppendNofree( benc_val_t * val, ... )
+benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
 {
-    va_list ap, ap2;
-    int     ret;
+    benc_val_t * keyval, * itemval;
 
-    va_start( ap, val );
-    va_start( ap2, val );
-    ret = _tr_bencDictAppend( val, ap, ap2, 1 );
-    va_end( ap2 );
-    va_end( ap );
+    assert( TYPE_DICT == dict->type );
+    assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
-    return ret;
+    keyval  = &dict->val.l.vals[dict->val.l.count];
+    dict->val.l.count++;
+    itemval = &dict->val.l.vals[dict->val.l.count];
+    dict->val.l.count++;
+
+    tr_bencInitStr( keyval, key, -1, 1 );
+    tr_bencInit( itemval, TYPE_INT );
+
+    return itemval;
 }
 
 char * tr_bencSaveMalloc( benc_val_t * val, int * len )

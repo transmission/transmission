@@ -100,8 +100,7 @@ static uint8_t *
 makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
 {
     char       * buf;
-    benc_val_t   val, * idval, * clientval, * versval;
-    benc_val_t * tcpval, * msgsval, * msgdictval, * msgidval, * msgversval;
+    benc_val_t   val, * msgsval, * msgdictval;
     int          len, max, idx;
     uint8_t      vers;
 
@@ -123,13 +122,7 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
 
     /* start building a dictionary for handshake data */
     tr_bencInit( &val, TYPE_DICT );
-    if( tr_bencDictAppendNofree( &val,
-                                 "identity",       &idval,
-                                 "client",         &clientval,
-                                 "version",        &versval,
-                                 "tcp_port",       &tcpval,
-                                 "messages",       &msgsval,
-                                 NULL ) )
+    if( tr_bencDictReserve( &val, 5 ) )
     {
         free( buf );
         tr_bencFree( &val );
@@ -137,13 +130,23 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
     }
 
     /* fill in the dictionary values */
-    tr_bencInitStr( idval,     tor->azId,      TR_AZ_ID_LEN, 1 );
-    tr_bencInitStr( clientval, TR_NAME,        0,            1 );
-    tr_bencInitStr( versval,   VERSION_STRING, 0,            1 );
-    tr_bencInitInt( tcpval,    tor->publicPort );
-    tr_bencInit(    msgsval,   TYPE_LIST );
+    tr_bencInitStr( tr_bencDictAdd( &val, "identity" ),
+                    tor->azId, TR_AZ_ID_LEN, 1 );
+    tr_bencInitStr( tr_bencDictAdd( &val, "client" ),   TR_NAME, 0, 1 );
+    tr_bencInitStr( tr_bencDictAdd( &val, "version" ),  VERSION_STRING, 0, 1 );
+    tr_bencInitInt( tr_bencDictAdd( &val, "tcp_port" ), tor->publicPort );
 
-    /* fill in the supported message list */
+    /* initialize supported message list */
+    msgsval = tr_bencDictAdd( &val, "messages" );
+    tr_bencInit( msgsval, TYPE_LIST );
+    if( tr_bencListReserve( msgsval, azmsgCount() ) )
+    {
+        tr_bencFree( &val );
+        free( buf );
+        return NULL;
+    }
+
+    /* fill in the message list */
     vers = AZ_EXT_VERSION;
     for( idx = 0; azmsgCount() > idx; idx++ )
     {
@@ -156,25 +159,18 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
             /* no point in saying we can do pex if the torrent is private */
             continue;
         }
-        if( tr_bencListAppend( msgsval, &msgdictval, NULL ) )
-        {
-            tr_bencFree( &val );
-            free( buf );
-            return NULL;
-        }
         /* each item in the list is a dict with id and ver keys */
+        msgdictval = tr_bencListAdd( msgsval );
         tr_bencInit( msgdictval, TYPE_DICT );
-        if( tr_bencDictAppendNofree( msgdictval,
-                                     "id",  &msgidval,
-                                     "ver", &msgversval,
-                                     NULL ) )
+        if( tr_bencDictReserve( msgdictval, 2 ) )
         {
             tr_bencFree( &val );
             free( buf );
             return NULL;
         }
-        tr_bencInitStr( msgidval,   azmsgStr( idx ), azmsgLen( idx ), 1 );
-        tr_bencInitStr( msgversval, &vers,           1,               1 );
+        tr_bencInitStr( tr_bencDictAdd( msgdictval, "id" ),
+                        azmsgStr( idx ), azmsgLen( idx ), 1 );
+        tr_bencInitStr( tr_bencDictAdd( msgdictval, "ver" ), &vers, 1, 1 );
     }
 
     /* bencode the dictionary and append it to the buffer */
@@ -200,7 +196,7 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
 static int
 peertreeToBencAZ( tr_peertree_t * tree, benc_val_t * val )
 {
-    int                   count, jj;
+    int                   count;
     tr_peertree_entry_t * ii;
 
     tr_bencInit( val, TYPE_LIST );
@@ -209,20 +205,16 @@ peertreeToBencAZ( tr_peertree_t * tree, benc_val_t * val )
     {
         return 0;
     }
-    if( tr_bencListExtend( val, count ) )
+    if( tr_bencListReserve( val, count ) )
     {
         return 1;
     }
 
     ii = peertreeFirst( tree );
-    jj = val->val.l.count;
     while( NULL != ii )
     {
-        assert( jj < val->val.l.alloc );
-        tr_bencInitStr( &val->val.l.vals[jj], ii->peer, 6, 1 );
-        val->val.l.count++;
+        tr_bencInitStr( tr_bencListAdd( val ), ii->peer, 6, 1 );
         ii = peertreeNext( tree, ii );
-        jj++;
     }
 
     return 0;
