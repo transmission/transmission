@@ -379,6 +379,7 @@ static int fastResumeLoad( tr_io_t * io )
             case FR_ID_PEERS:
                 if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
                 {
+                    int used;
                     uint8_t * buf = malloc( len );
                     if( 1 != fread( buf, len, 1, file ) )
                     {
@@ -386,8 +387,10 @@ static int fastResumeLoad( tr_io_t * io )
                         fclose( file );
                         return 1;
                     }
-                    tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE,
-                                          buf, len / 6 );
+                    used = tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE,
+                                                 buf, len / 6 );
+                    tr_dbg( "found %i peers in resume file, used %i",
+                            len / 6, used );
                     free( buf );
                 }
                 continue;

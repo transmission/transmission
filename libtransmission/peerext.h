@@ -267,6 +267,7 @@ static inline int
 parseUTPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t val, * sub;
+    int used;
 
     if( peer->private || PEX_PEER_CUTOFF <= tor->peerCount )
     {
@@ -290,9 +291,11 @@ parseUTPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
     sub = tr_bencDictFind( &val, "added" );
     if( NULL != sub && TYPE_STR == sub->type && 0 == sub->val.s.i % 6 )
     {
-        peer_dbg( "GET  extended-pex, %i peers", sub->val.s.i / 6 );
-        tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,
-                              ( uint8_t * )sub->val.s.s, sub->val.s.i / 6 );
+        used = tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,
+                                     ( uint8_t * )sub->val.s.s,
+                                     sub->val.s.i / 6 );
+        peer_dbg( "GET  extended-pex, got %i peers, used %i",
+                  sub->val.s.i / 6, used );
     }
     else
     {

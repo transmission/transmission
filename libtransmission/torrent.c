@@ -282,7 +282,7 @@ int tr_getFinished( tr_torrent_t * tor )
 
 void tr_manualUpdate( tr_torrent_t * tor )
 {
-    int peerCount;
+    int peerCount, new;
     uint8_t * peerCompact;
 
     if( !( tor->status & TR_STATUS_ACTIVE ) )
@@ -290,12 +290,14 @@ void tr_manualUpdate( tr_torrent_t * tor )
     
     tr_lockLock( &tor->lock );
     tr_trackerAnnouncePulse( tor->tracker, &peerCount, &peerCompact, 1 );
+    new = 0;
     if( peerCount > 0 )
     {
-        tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
+        new = tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
                               peerCompact, peerCount );
         free( peerCompact );
     }
+    tr_dbg( "got %i peers from manual announce, used %i", peerCount, new );
     tr_lockUnlock( &tor->lock );
 }
 
@@ -613,7 +615,7 @@ void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
     tr_sharedUnlock( h->shared );
 }
 
-void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
+int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
 {
     int i;
     tr_peer_t * otherPeer;
@@ -621,7 +623,7 @@ void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
     if( tor->peerCount >= TR_MAX_PEER_COUNT )
     {
         tr_peerDestroy(  peer );
-        return;
+        return 0;
     }
 
     /* Don't accept two connections from the same IP */
@@ -631,31 +633,36 @@ void tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
         if( !memcmp( tr_peerAddress( peer ), tr_peerAddress( otherPeer ), 4 ) )
         {
             tr_peerDestroy(  peer );
-            return;
+            return 0;
         }
     }
 
     tr_peerSetPrivate( peer, tor->info.flags & TR_FLAG_PRIVATE );
     tr_peerSetTorrent( peer, tor );
     tor->peers[tor->peerCount++] = peer;
+
+    return 1;
 }
 
-void tr_torrentAddCompact( tr_torrent_t * tor, int from,
+int tr_torrentAddCompact( tr_torrent_t * tor, int from,
                            uint8_t * buf, int count )
 {
     struct in_addr addr;
     in_port_t port;
-    int i;
+    int i, added;
     tr_peer_t * peer;
 
+    added = 0;
     for( i = 0; i < count; i++ )
     {
         memcpy( &addr, buf, 4 ); buf += 4;
         memcpy( &port, buf, 2 ); buf += 2;
 
         peer = tr_peerInit( addr, port, -1, from );
-        tr_torrentAttachPeer( tor, peer );
+        added += tr_torrentAttachPeer( tor, peer );
     }
+
+    return added;
 }
 
 /***********************************************************************
@@ -665,7 +672,7 @@ static void downloadLoop( void * _tor )
 {
     tr_torrent_t * tor = _tor;
     int            i, ret;
-    int            peerCount;
+    int            peerCount, used;
     uint8_t      * peerCompact;
     tr_peer_t    * peer;
 
@@ -695,12 +702,14 @@ static void downloadLoop( void * _tor )
 
         /* Try to get new peers or to send a message to the tracker */
         tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+        used = 0;
         if( peerCount > 0 )
         {
-            tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
-                                  peerCompact, peerCount );
+            used = tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
+                                         peerCompact, peerCount );
             free( peerCompact );
         }
+        tr_dbg( "got %i peers from announce, used %i", peerCount, used );
         if( tor->status & TR_STATUS_STOPPED )
         {
             break;

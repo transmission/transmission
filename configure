@@ -219,10 +219,10 @@ while [ $# -ne 0 ]; do
   param=`expr "opt$1" : 'opt[^=]*=\(.*\)'`
 
   case "x$1" in
-    x--disable-openssl)
+    x--disable-openssl|x--without-openssl)
       OPENSSL=no
       ;;
-    x--disable-gtk)
+    x--disable-gtk|x--without-gtk)
       GTK=no
       ;;
     x--prefix=*)

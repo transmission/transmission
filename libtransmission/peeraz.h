@@ -444,7 +444,7 @@ parseAZPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
 {
     tr_info_t * info = &tor->info;
     benc_val_t  val, * list, * pair;
-    int         ii;
+    int         ii, used;
 
     if( peer->private || PEX_PEER_CUTOFF <= tor->peerCount )
     {
@@ -483,17 +483,19 @@ parseAZPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
         return TR_OK;
     }
 
-    peer_dbg( "GET  azureus-pex, %i peers", list->val.l.count );
-
+    used = 0;
     for( ii = 0; ii < list->val.l.count; ii++ )
     {
         pair = &list->val.l.vals[ii];
         if( TYPE_STR == pair->type && 6 == pair->val.s.i )
         {
-            tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,
-                                  ( uint8_t * )pair->val.s.s, 1 );
+            used += tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,
+                                          ( uint8_t * )pair->val.s.s, 1 );
         }
     }
+
+    peer_dbg( "GET  azureus-pex, found %i peers, using %i",
+              list->val.l.count, used );
 
     tr_bencFree( &val );
 
