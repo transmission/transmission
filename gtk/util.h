@@ -121,10 +121,6 @@ addactionflag(const char *action);
 const char *
 addactionname(guint flag);
 
-/* turn a NULL-terminated list of void* arguments into a glist */
-GList *
-makeglist(void *ptr, ...);
-
 /* retrieve the global download directory */
 const char *
 getdownloaddir( void );

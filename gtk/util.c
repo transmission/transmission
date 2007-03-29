@@ -293,21 +293,6 @@ addactionname( guint flag )
     return name;
 }
 
-GList *
-makeglist(void *ptr, ...) {
-  va_list ap;
-  GList *ret;
-
-  ret = g_list_append(NULL, ptr);
-
-  va_start(ap, ptr);  
-  while(NULL != (ptr = va_arg(ap, void*)))
-    ret = g_list_append(ret, ptr);
-  va_end(ap);
-
-  return ret;
-}
-
 const char *
 getdownloaddir( void )
 {
