@@ -702,14 +702,13 @@ static void downloadLoop( void * _tor )
 
         /* Try to get new peers or to send a message to the tracker */
         tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
-        used = 0;
         if( peerCount > 0 )
         {
             used = tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
                                          peerCompact, peerCount );
             free( peerCompact );
+            tr_dbg( "got %i peers from announce, used %i", peerCount, used );
         }
-        tr_dbg( "got %i peers from announce, used %i", peerCount, used );
         if( tor->status & TR_STATUS_STOPPED )
         {
             break;
