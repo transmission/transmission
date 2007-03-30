@@ -253,7 +253,7 @@
         else
             [fTorrentLocationField setToolTip: [torrent torrentLocation]];
         
-        [fDateStartedField setObjectValue: [torrent date]];
+        [fDateStartedField setObjectValue: [torrent dateAdded]];
         
         [fRevealDataButton setHidden: NO];
         [fRevealTorrentButton setHidden: ![torrent publicTorrent]];

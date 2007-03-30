@@ -34,7 +34,7 @@
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        date: (NSDate *) date
+        dateAdded: (NSDate *) dateAdded
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -68,7 +68,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
-            date: nil
+            dateAdded: nil
             ratioSetting: nil ratioLimit: nil
             limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
@@ -91,7 +91,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
-                date: [history objectForKey: @"Date"]
+                dateAdded: [history objectForKey: @"Date"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
@@ -154,7 +154,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
-                    [self date], @"Date",
+                    [self dateAdded], @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
@@ -189,7 +189,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         tr_torrentRemoveSaved(fHandle);
         
-        [fDate release];
+        [fDateAdded release];
         
         if (fAnnounceDate)
             [fAnnounceDate release];
@@ -1180,9 +1180,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return originalChild;
 }
 
-- (NSDate *) date
+- (NSDate *) dateAdded
 {
-    return fDate;
+    return fDateAdded;
 }
 
 - (NSNumber *) stateSortKey
@@ -1216,7 +1216,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        date: (NSDate *) date
+        dateAdded: (NSDate *) dateAdded
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -1252,7 +1252,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     fInfo = tr_torrentInfo(fHandle);
 
-    fDate = date ? [date retain] : [[NSDate alloc] init];
+    fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
     
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
