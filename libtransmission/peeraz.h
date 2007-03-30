@@ -382,9 +382,9 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 
     /* fill bitmask with supported message info */
     msgs = tr_bitfieldNew( azmsgCount() );
-    for( ii = 0; ii < sub->val.l.count; ii++ )
+    ii = -1;
+    while( NULL != ( dict = tr_bencListIter( sub, &ii ) ) )
     {
-        dict = &sub->val.l.vals[ii];
         if( TYPE_DICT != dict->type )
         {
             continue;
@@ -475,10 +475,9 @@ parseAZPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
         return TR_OK;
     }
 
-    used = 0;
-    for( ii = 0; ii < list->val.l.count; ii++ )
+    ii = used = 0;
+    while( NULL != ( pair = tr_bencListIter( list, &ii ) ) )
     {
-        pair = &list->val.l.vals[ii];
         if( TYPE_STR == pair->type && 6 == pair->val.s.i )
         {
             used += tr_torrentAddCompact( tor, TR_PEER_FROM_PEX,

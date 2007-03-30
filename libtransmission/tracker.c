@@ -94,6 +94,7 @@ static void        readAnswer       ( tr_tracker_t * tc, const char *, int,
 static void        readScrapeAnswer ( tr_tracker_t * tc, const char *, int );
 static void        killHttp         ( tr_http_t ** http );
 static int         shouldChangePort( tr_tracker_t * tc );
+static uint8_t *   parseOriginalPeers( benc_val_t * bePeers, int * peerCount );
 
 tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
 {
@@ -793,38 +794,15 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
         goto cleanup;
     }
 
-    if( bePeers->type & TYPE_LIST )
+    if( TYPE_LIST == bePeers->type )
     {
         /* Original protocol */
         if( bePeers->val.l.count > 0 )
         {
-            struct in_addr addr;
-            in_port_t port;
-
-            peerCount = 0;
-            peerCompact = malloc( 6 * bePeers->val.l.count );
-
-            /* Convert to compact form */
-            for( i = 0; i < bePeers->val.l.count; i++ )
-            {
-                if( !( beFoo = tr_bencDictFind(
-                    &bePeers->val.l.vals[i], "ip" ) ) )
-                    continue;
-                if( tr_netResolve( beFoo->val.s.s, &addr ) )
-                    continue;
-                memcpy( &peerCompact[6 * peerCount], &addr, 4 );
-
-                if( !( beFoo = tr_bencDictFind(
-                    &bePeers->val.l.vals[i], "port" ) ) )
-                    continue;
-                port = htons( beFoo->val.i );
-                memcpy( &peerCompact[6 * peerCount + 4], &port, 2 );
-
-                peerCount++;
-            }
+            peerCompact = parseOriginalPeers( bePeers, &peerCount );
         }
     }
-    else if( bePeers->type & TYPE_STR )
+    else if( TYPE_STR == bePeers->type )
     {
         /* "Compact" extension */
         if( bePeers->val.s.i >= 6 )
@@ -1100,4 +1078,51 @@ static int shouldChangePort( tr_tracker_t * tc )
     tr_torrent_t * tor = tc->tor;
 
     return ( tor->publicPort != tc->publicPort );
+}
+
+/* Convert to compact form */
+static uint8_t *
+parseOriginalPeers( benc_val_t * bePeers, int * peerCount )
+{
+    struct in_addr addr;
+    in_port_t      port;
+    uint8_t      * peerCompact;
+    benc_val_t   * peer, * addrval, * portval;
+    int            ii, count;
+
+    assert( TYPE_LIST == bePeers->type );
+
+    count  = 0;
+    peerCompact = malloc( 6 * bePeers->val.l.count );
+    if( NULL == peerCompact )
+    {
+        return NULL;
+    }
+
+    ii = -1;
+    while( NULL != ( peer = tr_bencListIter( bePeers, &ii ) ) )
+    {
+        addrval = tr_bencDictFind( peer, "ip" );
+        if( NULL == addrval || TYPE_STR != addrval->type ||
+            tr_netResolve( addrval->val.s.s, &addr ) )
+        {
+            continue;
+        }
+        memcpy( &peerCompact[6 * count], &addr, 4 );
+
+        portval = tr_bencDictFind( peer, "port" );
+        if( NULL == portval || TYPE_INT != portval->type ||
+            0 > portval->val.i || 0xffff < portval->val.i )
+        {
+            continue;
+        }
+        port = htons( portval->val.i );
+        memcpy( &peerCompact[6 * count + 4], &port, 2 );
+
+        count++;
+    }
+
+    *peerCount = count;
+
+    return peerCompact;
 }

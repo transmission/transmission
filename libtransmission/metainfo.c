@@ -36,9 +36,11 @@ static char * readtorrent( const char * path, const char * hash,
 static int savetorrent( const char * hash, const char * tag,
                         const uint8_t * buf, size_t buflen );
 static int getfile( char * buf, int size,
-                    const char * prefix, const benc_val_t * name );
+                    const char * prefix, benc_val_t * name );
 static int getannounce( tr_info_t * inf, benc_val_t * meta );
 static char * announceToScrape( const char * announce );
+static int parseFiles( tr_info_t * inf, benc_val_t * name,
+                       benc_val_t * files, benc_val_t * length );
 static void strcatUTF8( char *, int, const char *, int );
 
 /***********************************************************************
@@ -50,7 +52,7 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
                       const char * savedHash, int saveCopy )
 {
     char       * buf;
-    benc_val_t   meta, * beInfo, * list, * val, * val2;
+    benc_val_t   meta, * beInfo, * val, * val2;
     int          i;
     size_t       len;
 
@@ -173,59 +175,12 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
 
     /* get file or top directory name */
     val = tr_bencDictFindFirst( beInfo, "name.utf-8", "name", NULL );
-    if( NULL == val || TYPE_STR != val->type )
+    if( parseFiles( inf, tr_bencDictFindFirst( beInfo,
+                                               "name.utf-8", "name", NULL ),
+                    tr_bencDictFind( beInfo, "files" ),
+                    tr_bencDictFind( beInfo, "length" ) ) )
     {
-        tr_err( "%s \"name\" string", ( val ? "Invalid" : "Missing" ) );
         goto fail;
-    }
-    strcatUTF8( inf->name, sizeof( inf->name ), val->val.s.s, 1 );
-    if( '\0' == inf->name[0] )
-    {
-        tr_err( "Invalid \"name\" string" );
-        goto fail;
-    }
-    inf->totalSize = 0;
-
-    if( ( list = tr_bencDictFind( beInfo, "files" ) ) )
-    {
-        /* Multi-file mode */
-        inf->multifile = 1;
-        inf->fileCount = list->val.l.count;
-        inf->files     = calloc( inf->fileCount, sizeof( tr_file_t ) );
-
-        for( i = 0; i < list->val.l.count; i++ )
-        {
-            val = tr_bencDictFindFirst( &list->val.l.vals[i],
-                                        "path.utf-8", "path", NULL );
-            if( getfile( inf->files[i].name, sizeof( inf->files[i].name ),
-                         inf->name, val ) )
-            {
-                tr_err( "%s \"path\" entry", ( val ? "Invalid" : "Missing" ) );
-                goto fail;
-            }
-            val = tr_bencDictFind( &list->val.l.vals[i], "length" );
-            inf->files[i].length  = val->val.i;
-            inf->totalSize       += val->val.i;
-        }
-    }
-    else
-    {
-        /* Single-file mode */
-        inf->multifile = 0;
-        inf->fileCount = 1;
-        inf->files     = calloc( sizeof( tr_file_t ), 1 );
-
-        strcatUTF8( inf->files[0].name, sizeof( inf->files[0].name),
-                    val->val.s.s, 1 );
-        
-        val = tr_bencDictFind( beInfo, "length" );
-        if( NULL == val || TYPE_INT != val->type )
-        {
-            tr_err( "%s \"length\" entry", ( val ? "Invalid" : "Missing" ) );
-            goto fail;
-        }
-        inf->files[0].length  = val->val.i;
-        inf->totalSize       += val->val.i;
     }
 
     if( (uint64_t) inf->pieceCount !=
@@ -271,11 +226,11 @@ void tr_metainfoFree( tr_info_t * inf )
 }
 
 static int getfile( char * buf, int size,
-                    const char * prefix, const benc_val_t * name )
+                    const char * prefix, benc_val_t * name )
 {
-    const benc_val_t * dir;
-    const char      ** list;
-    int                ii, jj;
+    benc_val_t  * dir;
+    const char ** list;
+    int           ii, jj;
 
     if( TYPE_LIST != name->type )
     {
@@ -288,13 +243,13 @@ static int getfile( char * buf, int size,
         return 1;
     }
 
-    for( ii = jj = 0; name->val.l.count > ii; ii++ )
+    ii = jj = 0;
+    while( NULL != ( dir = tr_bencListIter( name, &ii ) ) )
     {
-        if( TYPE_STR != name->val.l.vals[ii].type )
+        if( TYPE_STR != dir->type )
         {
             continue;
         }
-        dir = &name->val.l.vals[ii];
         if( 0 == strcmp( "..", dir->val.s.s ) )
         {
             if( 0 < jj )
@@ -327,11 +282,10 @@ static int getfile( char * buf, int size,
 
 static int getannounce( tr_info_t * inf, benc_val_t * meta )
 {
-    benc_val_t              * val, * subval, * urlval;
-    char                    * address, * announce;
-    int                       ii, jj, port, random;
+    benc_val_t        * val, * subval, * urlval;
+    char              * address, * announce;
+    int                 ii, jj, port, random, subcount;
     tr_tracker_info_t * sublist;
-    int subcount;
     void * swapping;
 
     /* Announce-list */
@@ -343,9 +297,9 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                                    val->val.l.count );
 
         /* iterate through the announce-list's tiers */
-        for( ii = 0; ii < val->val.l.count; ii++ )
+        ii = 0;
+        while( NULL != ( subval = tr_bencListIter( val, &ii ) ) )
         {
-            subval = &val->val.l.vals[ii];
             if( TYPE_LIST != subval->type || 0 >= subval->val.l.count )
             {
                 continue;
@@ -354,9 +308,9 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             sublist = calloc( sizeof( sublist[0] ), subval->val.l.count );
 
             /* iterate through the tier's items */
-            for( jj = 0; jj < subval->val.l.count; jj++ )
+            jj = 0;
+            while( NULL != ( urlval = tr_bencListIter( subval, &jj ) ) )
             {
-                urlval = &subval->val.l.vals[jj];
                 if( TYPE_STR != urlval->type ||
                     tr_httpParseUrl( urlval->val.s.s, urlval->val.s.i,
                                      &address, &port, &announce ) )
@@ -377,7 +331,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                 subcount++;
             }
 
-            /* just use sublist as is if it's full */
+            /* just use sublist as-is if it's full */
             if( subcount == subval->val.l.count )
             {
                 inf->trackerList[inf->trackerTiers].list = sublist;
@@ -617,6 +571,90 @@ int savetorrent( const char * hash, const char * tag,
         return 1;
     }
     fclose( file );
+
+    return 0;
+}
+
+int
+parseFiles( tr_info_t * inf, benc_val_t * name,
+            benc_val_t * files, benc_val_t * length )
+{
+    benc_val_t * item, * path;
+    int ii;
+
+    if( NULL == name || TYPE_STR != name->type )
+    {
+        tr_err( "%s \"name\" string", ( name ? "Invalid" : "Missing" ) );
+        return 1;
+    }
+
+    strcatUTF8( inf->name, sizeof( inf->name ), name->val.s.s, 1 );
+    if( '\0' == inf->name[0] )
+    {
+        tr_err( "Invalid \"name\" string" );
+        return 1;
+    }
+    inf->totalSize = 0;
+
+    if( files && TYPE_LIST == files->type )
+    {
+        /* Multi-file mode */
+        inf->multifile = 1;
+        inf->fileCount = files->val.l.count;
+        inf->files     = calloc( inf->fileCount, sizeof( inf->files[0] ) );
+
+        if( NULL == inf->files )
+        {
+            return 1;
+        }
+
+        item = NULL;
+        ii   = 0;
+        while( NULL != ( item = tr_bencListIter( files, &ii ) ) )
+        {
+            path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
+            if( getfile( inf->files[ii-1].name, sizeof( inf->files[ii-1].name ),
+                         inf->name, path ) )
+            {
+                tr_err( "%s \"path\" entry",
+                        ( path ? "Invalid" : "Missing" ) );
+                return 1;
+            }
+            length = tr_bencDictFind( item, "length" );
+            if( NULL == length || TYPE_INT != length->type )
+            {
+                tr_err( "%s \"length\" entry",
+                        ( length ? "Invalid" : "Missing" ) );
+                return 1;
+            }
+            inf->files[ii-1].length = length->val.i;
+            inf->totalSize         += length->val.i;
+        }
+    }
+    else if( NULL != length && TYPE_INT == length->type )
+    {
+        /* Single-file mode */
+        inf->multifile = 0;
+        inf->fileCount = 1;
+        inf->files     = calloc( 1, sizeof( inf->files[0] ) );
+
+        if( NULL == inf->files )
+        {
+            return 1;
+        }
+
+        strcatUTF8( inf->files[0].name, sizeof( inf->files[0].name ),
+                    name->val.s.s, 1 );
+
+        inf->files[0].length = length->val.i;
+        inf->totalSize      += length->val.i;
+    }
+    else
+    {
+        tr_err( "%s \"files\" entry and %s \"length\" entry",
+                ( files ? "Invalid" : "Missing" ),
+                ( length ? "invalid" : "missing" ) );
+    }
 
     return 0;
 }

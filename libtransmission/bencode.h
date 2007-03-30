@@ -60,6 +60,8 @@ void         tr_bencFree( benc_val_t * val );
 benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key );
 benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... );
 
+benc_val_t * tr_bencListIter( benc_val_t * list, int * pos );
+
 /* marks a string as 'do not free' and returns it */
 char *       tr_bencStealStr( benc_val_t * val );
 
