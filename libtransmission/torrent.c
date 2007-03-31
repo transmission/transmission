@@ -137,6 +137,8 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
                   "%%%02x", inf->hash[i] );
     }
 
+    tor->pexDisabled = 0;
+
     /* Block size: usually 16 ko, or less if we have to */
     tor->blockSize  = MIN( inf->pieceSize, 1 << 14 );
     tor->blockCount = ( inf->totalSize + tor->blockSize - 1 ) /
@@ -267,6 +269,32 @@ static void torrentReallyStop( tr_torrent_t * tor )
         tr_peerDestroy( tor->peers[i] );
     }
     tor->peerCount = 0;
+    tr_lockUnlock( &tor->lock );
+}
+
+void tr_torrentDisablePex( tr_torrent_t * tor, int disable )
+{
+    int ii;
+
+    if( TR_FLAG_PRIVATE & tor->info.flags )
+    {
+        return;
+    }
+
+    tr_lockLock( &tor->lock );
+
+    if( tor->pexDisabled == disable )
+    {
+        tr_lockUnlock( &tor->lock );
+        return;
+    }
+
+    tor->pexDisabled = disable;
+    for( ii = 0; ii < tor->peerCount; ii++ )
+    {
+        tr_peerSetPrivate( tor->peers[ii], disable );
+    }
+
     tr_lockUnlock( &tor->lock );
 }
 
@@ -637,7 +665,8 @@ int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
         }
     }
 
-    tr_peerSetPrivate( peer, tor->info.flags & TR_FLAG_PRIVATE );
+    tr_peerSetPrivate( peer, tor->info.flags & TR_FLAG_PRIVATE ||
+                       tor->pexDisabled );
     tr_peerSetTorrent( peer, tor );
     tor->peers[tor->peerCount++] = peer;
 
