@@ -39,6 +39,7 @@
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
+		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
 - (void) createFileList;
@@ -73,6 +74,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
             checkDownload: nil downloadLimit: nil
+			pex: nil
             waitToStart: nil orderValue: nil];
     
     if (self)
@@ -100,6 +102,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 uploadLimit: [history objectForKey: @"UploadLimit"]
                 checkDownload: [history objectForKey: @"CheckDownload"]
                 downloadLimit: [history objectForKey: @"DownloadLimit"]
+				pex: [history objectForKey: @"Pex"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 orderValue: [history objectForKey: @"OrderValue"]];
     
@@ -170,6 +173,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
+	
+	if (![self privateTorrent])
+		[history setObject: [NSNumber numberWithBool: fPex] forKey: @"Pex"];
 	
 	if (fDateCompleted)
 		[history setObject: [self dateAdded] forKey: @"DateCompleted"];
@@ -1086,6 +1092,20 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->swarmspeed;
 }
 
+- (BOOL) pex
+{
+	return fPex;
+}
+
+- (void) setPex: (BOOL) pex
+{
+	if (![self privateTorrent])
+	{
+		fPex = pex;
+		tr_torrentDisablePex(fHandle, pex);
+	}
+}
+
 - (NSNumber *) orderValue
 {
     return [NSNumber numberWithInt: fOrderValue];
@@ -1236,6 +1256,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
+		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
 {
     if (!(self = [super init]))
@@ -1280,6 +1301,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fCheckDownload = checkDownload ? [checkDownload intValue] : NSMixedState;
     fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimit"];
     [self updateSpeedSetting];
+	
+	if ([self privateTorrent])
+		fPex = NO;
+	else
+		fPex = pex ? [pex boolValue] : YES;
+	tr_torrentDisablePex(fHandle, !fPex);
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;

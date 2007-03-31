@@ -58,6 +58,7 @@
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
+	IBOutlet NSButton * fPexCheck;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
@@ -75,5 +76,7 @@
 
 - (void) setRatioSetting: (id) sender;
 - (void) setRatioLimit: (id) sender;
+
+- (void) setPex: (id) sender;
 
 @end

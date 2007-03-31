@@ -8,6 +8,7 @@
                 revealFile = id; 
                 revealTorrentFile = id; 
                 setLimitSetting = id; 
+                setPex = id; 
                 setRatioLimit = id; 
                 setRatioSetting = id; 
                 setSpeedLimit = id; 
@@ -36,6 +37,7 @@
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 
                 fPeerTable = NSTableView; 
+                fPexCheck = NSButton; 
                 fPiecesField = NSTextField; 
                 fPiecesView = PiecesView; 
                 fRatioField = NSTextField; 

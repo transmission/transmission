@@ -42,6 +42,8 @@
     
     BOOL        fPublicTorrent;
     NSString    * fPublicTorrentLocation;
+	
+	BOOL fPex;
 
     NSUserDefaults * fDefaults;
 
@@ -178,6 +180,9 @@
 - (uint64_t)    downloadedTotal;
 - (uint64_t)    uploadedTotal;
 - (float)       swarmSpeed;
+
+- (BOOL) pex;
+- (void) setPex: (BOOL) set;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;

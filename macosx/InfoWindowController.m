@@ -41,7 +41,7 @@
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 279.0
 #define TAB_FILES_HEIGHT 279.0
-#define TAB_OPTIONS_HEIGHT 117.0
+#define TAB_OPTIONS_HEIGHT 156.0
 
 #define OPTION_POPUP_GLOBAL 0
 #define OPTION_POPUP_NO_LIMIT 1
@@ -508,6 +508,26 @@
             [fRatioLimitField setFloatValue: ratioLimit];
         else
             [fRatioLimitField setStringValue: @""];
+		
+		//set pex check
+		enumerator = [fTorrents objectEnumerator];
+        torrent = [enumerator nextObject]; //first torrent
+		
+		BOOL pexEnabled = ![torrent privateTorrent];
+		int pexState = [torrent pex] ? NSOnState : NSOffState;
+		
+		while ((pexEnabled || pexState != NSMixedState)
+                && (torrent = [enumerator nextObject]))
+        {
+            if (pexEnabled)
+                pexEnabled = ![torrent privateTorrent];
+            
+            if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
+                pexState = NSMixedState;
+        }
+		
+		[fPexCheck setEnabled: pexEnabled];
+		[fPexCheck setState: pexState];
     }
     else
     {
@@ -527,6 +547,8 @@
         [fRatioPopUp selectItemAtIndex: -1];
         [fRatioLimitField setHidden: YES];
         [fRatioLimitField setStringValue: @""];
+		
+		[fPexCheck setEnabled: NO];
     }
     
     [self updateInfoStats];
@@ -940,6 +962,22 @@
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
+}
+
+- (void) setPex: (id) sender
+{
+	int state = [sender state];
+	if (state == NSMixedState)
+	{
+		state = NSOnState;
+		[sender setState: state];
+	}
+	
+	Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+	
+	while ((torrent = [enumerator nextObject]))
+		[torrent setPex: state == NSOnState];
 }
 
 @end
