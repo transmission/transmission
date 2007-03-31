@@ -34,7 +34,7 @@
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        dateAdded: (NSDate *) dateAdded
+        dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -68,7 +68,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
-            dateAdded: nil
+            dateAdded: nil dateCompleted: nil
             ratioSetting: nil ratioLimit: nil
             limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
@@ -92,6 +92,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 dateAdded: [history objectForKey: @"Date"]
+				dateCompleted: [history objectForKey: @"DateCompleted"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
@@ -169,7 +170,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
-    
+	
+	if (fDateCompleted)
+		[history setObject: [self dateAdded] forKey: @"DateCompleted"];
+	
     return history;
 }
 
@@ -190,6 +194,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         tr_torrentRemoveSaved(fHandle);
         
         [fDateAdded release];
+		if (fDateCompleted)
+			[fDateCompleted release];
         
         if (fAnnounceDate)
             [fAnnounceDate release];
@@ -267,6 +273,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             fDownloadFolder = fIncompleteFolder;
             fIncompleteFolder = nil;
         }
+		
+		if (fDateCompleted)
+			[fDateCompleted release];
+		fDateCompleted = [[NSDate alloc] init];
         
         fStat = tr_torrentStat(fHandle);
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
@@ -1185,6 +1195,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fDateAdded;
 }
 
+- (NSDate *) dateCompleted
+{
+    return fDateCompleted;
+}
+
 - (NSNumber *) stateSortKey
 {
     if (![self isActive])
@@ -1216,7 +1231,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
-        dateAdded: (NSDate *) dateAdded
+        dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -1253,7 +1268,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fInfo = tr_torrentInfo(fHandle);
 
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
-    
+	if (dateCompleted)
+		fDateCompleted = [dateCompleted retain];
+	
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;

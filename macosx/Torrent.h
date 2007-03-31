@@ -35,7 +35,7 @@
     tr_stat_t    * fStat;
     
     BOOL         fResumeOnWake;
-    NSDate       * fDateAdded, * fAnnounceDate;
+    NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate;
     
     BOOL        fUseIncompleteFolder;
     NSString    * fDownloadFolder, * fIncompleteFolder;
@@ -189,6 +189,8 @@
 - (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
 
 - (NSDate *) dateAdded;
+- (NSDate *) dateCompleted;
+
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
