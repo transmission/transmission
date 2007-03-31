@@ -83,6 +83,7 @@ enum
     PREF_ID_DIR,
     PREF_ID_PORT,
     PREF_ID_NAT,
+    PREF_ID_PEX,
     PREF_ID_ICON,
     PREF_ID_ADDSTD,
     PREF_ID_ADDIPC,

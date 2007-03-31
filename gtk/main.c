@@ -171,6 +171,8 @@ static void
 readinitialprefs( struct cbdata * cbdata );
 static void
 prefschanged( GtkWidget * widget, int id, gpointer data );
+static void
+setpex( tr_torrent_t * tor, void * arg );
 static gboolean
 updatemodel(gpointer gdata);
 static void
@@ -734,6 +736,7 @@ readinitialprefs( struct cbdata * cbdata )
         PREF_ID_USEUPLIMIT,
         PREF_ID_NAT,
         PREF_ID_ICON,
+        PREF_ID_PEX,
     };
     int ii;
 
@@ -749,6 +752,7 @@ prefschanged( GtkWidget * widget SHUTUP, int id, gpointer data )
     struct cbdata * cbdata;
     tr_handle_t   * tr;
     int             num;
+    gboolean        boolval;
 
     cbdata = data;
     tr     = tr_backend_handle( cbdata->back );
@@ -795,6 +799,11 @@ prefschanged( GtkWidget * widget SHUTUP, int id, gpointer data )
             }
             break;
 
+        case PREF_ID_PEX:
+            boolval = tr_prefs_get_bool_with_default( id );
+            tr_torrentIterate( tr, setpex, &boolval );
+            break;
+
         case PREF_ID_DIR:
         case PREF_ID_ASKDIR:
         case PREF_ID_ADDSTD:
@@ -803,6 +812,15 @@ prefschanged( GtkWidget * widget SHUTUP, int id, gpointer data )
         case PREF_MAX_ID:
             break;
     }
+}
+
+void
+setpex( tr_torrent_t * tor, void * arg )
+{
+    gboolean * val;
+
+    val = arg;
+    tr_torrentDisablePex( tor, !(*val) );
 }
 
 gboolean

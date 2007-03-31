@@ -34,6 +34,7 @@
 #include "bencode.h"
 
 #include "tr_backend.h"
+#include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
 
@@ -263,6 +264,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   tr_torrent_t *handle;
   tr_handle_t *back;
   int errcode, trflags;
+  gboolean boolval;
 
   TR_IS_BACKEND(backend);
   g_assert(NULL != dir);
@@ -294,6 +296,11 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
     }
     return NULL;
   }
+
+  /* I should probably add a property for this but I've had enough
+     with adding useless gtk glue to this program */
+  boolval = tr_prefs_get_bool_with_default( PREF_ID_PEX );
+  tr_torrentDisablePex( handle, !boolval );
 
   ret = g_object_new(TR_TORRENT_TYPE, "torrent-handle", handle,
                      "backend", backend, "download-directory", dir, NULL);

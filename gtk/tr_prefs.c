@@ -118,6 +118,11 @@ defs[] =
       N_("Au_tomatic port mapping via NAT-PMP or UPnP"),
       N_("Attempt to bypass NAT or firewall to allow incoming peer connections") },
 
+    /* PREF_ID_PEX */
+    { "use-peer-exchange",      G_TYPE_BOOLEAN, PR_ENABLED,  NULL,
+      N_("Use peer _exchange if possible"),
+      N_("Perform Azureus or \xc2\xb5Torrent compatible peer exchange with any peers which support it") },
+
     /* PREF_ID_ICON */
     { "use-tray-icon",          G_TYPE_BOOLEAN,
       ( tr_icon_supported() ? PR_ENABLED : PR_DISABLED ),    NULL,
@@ -177,6 +182,8 @@ defs_bool[] =
     { FALSE, PREF_ID_DIR,       FALSE },
     { FALSE, -1, FALSE }, { FALSE, -1, FALSE },
     /* PREF_ID_NAT */
+    { TRUE,  -1,                FALSE },
+    /* PREF_ID_PEX */
     { TRUE,  -1,                FALSE },
     /* PREF_ID_ICON */
     { TRUE,  -1,                FALSE },
