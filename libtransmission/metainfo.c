@@ -612,7 +612,7 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
         {
             item = &files->val.l.vals[ii];
             path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
-            if( getfile( inf->files[ii-1].name, sizeof( inf->files[0].name ),
+            if( getfile( inf->files[ii].name, sizeof( inf->files[0].name ),
                          inf->name, path ) )
             {
                 tr_err( "%s \"path\" entry",
@@ -626,7 +626,7 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
                         ( length ? "Invalid" : "Missing" ) );
                 return 1;
             }
-            inf->files[ii-1].length = length->val.i;
+            inf->files[ii].length = length->val.i;
             inf->totalSize         += length->val.i;
         }
     }
