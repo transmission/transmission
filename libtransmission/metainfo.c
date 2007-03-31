@@ -243,9 +243,9 @@ static int getfile( char * buf, int size,
         return 1;
     }
 
-    ii = jj = 0;
-    while( NULL != ( dir = tr_bencListIter( name, &ii ) ) )
+    for( ii = jj = 0; name->val.l.count > ii; ii++ )
     {
+        dir = &name->val.l.vals[ii];
         if( TYPE_STR != dir->type )
         {
             continue;
@@ -297,9 +297,9 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                                    val->val.l.count );
 
         /* iterate through the announce-list's tiers */
-        ii = 0;
-        while( NULL != ( subval = tr_bencListIter( val, &ii ) ) )
+        for( ii = 0; ii < val->val.l.count; ii++ )
         {
+            subval = &val->val.l.vals[ii];
             if( TYPE_LIST != subval->type || 0 >= subval->val.l.count )
             {
                 continue;
@@ -308,9 +308,9 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             sublist = calloc( sizeof( sublist[0] ), subval->val.l.count );
 
             /* iterate through the tier's items */
-            jj = 0;
-            while( NULL != ( urlval = tr_bencListIter( subval, &jj ) ) )
+            for( jj = 0; jj < subval->val.l.count; jj++ )
             {
+                urlval = &subval->val.l.vals[jj];
                 if( TYPE_STR != urlval->type ||
                     tr_httpParseUrl( urlval->val.s.s, urlval->val.s.i,
                                      &address, &port, &announce ) )
@@ -608,12 +608,11 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
             return 1;
         }
 
-        item = NULL;
-        ii   = 0;
-        while( NULL != ( item = tr_bencListIter( files, &ii ) ) )
+        for( ii = 0; files->val.l.count > ii; ii++ )
         {
+            item = &files->val.l.vals[ii];
             path = tr_bencDictFindFirst( item, "path.utf-8", "path", NULL );
-            if( getfile( inf->files[ii-1].name, sizeof( inf->files[ii-1].name ),
+            if( getfile( inf->files[ii-1].name, sizeof( inf->files[0].name ),
                          inf->name, path ) )
             {
                 tr_err( "%s \"path\" entry",

@@ -90,7 +90,7 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
         }
 
         tr_bencInitInt( val, num );
-        val->end = p + 1;
+        *end = p + 1;
     }
     else if( buf[0] == 'l' || buf[0] == 'd' )
     {
@@ -133,7 +133,7 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
             return 1;
         }
 
-        val->end = cur + 1;
+        *end = cur + 1;
     }
     else
     {
@@ -166,11 +166,11 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
         sbuf[slen] = '\0';
         tr_bencInitStr( val, sbuf, slen, 0 );
 
-        val->end = p + 1 + val->val.s.i;
+        *end = p + 1 + val->val.s.i;
     }
 
     val->begin = buf;
-    *end = val->end;
+    val->end   = *end;
 
     return 0;
 }
@@ -243,7 +243,7 @@ void tr_bencFree( benc_val_t * val )
 
 benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key )
 {
-    int len, i;
+    int len, ii;
 
     if( val->type != TYPE_DICT )
     {
@@ -252,17 +252,15 @@ benc_val_t * tr_bencDictFind( benc_val_t * val, const char * key )
 
     len = strlen( key );
     
-    for( i = 0; i < val->val.l.count; i += 2 )
+    for( ii = 0; ii + 1 < val->val.l.count; ii += 2 )
     {
-        if( TYPE_STR != val->val.l.vals[i].type || 
-            len != val->val.l.vals[i].val.s.i )
+        if( TYPE_STR  != val->val.l.vals[ii].type ||
+            len       != val->val.l.vals[ii].val.s.i ||
+            0 != memcmp( val->val.l.vals[ii].val.s.s, key, len ) )
         {
             continue;
         }
-        if( 0 == memcmp(val->val.l.vals[i].val.s.s, key, len ) )
-        {
-            return &val->val.l.vals[i+1];
-        }
+        return &val->val.l.vals[ii+1];
     }
 
     return NULL;
@@ -286,30 +284,6 @@ benc_val_t * tr_bencDictFindFirst( benc_val_t * val, ... )
     va_end( ap );
 
     return ret;
-}
-
-benc_val_t * tr_bencListIter( benc_val_t * list, int * pos )
-{
-    assert( TYPE_LIST == list->type );
-
-    if( NULL == list->val.l.vals )
-    {
-        return NULL;
-    }
-
-    if( 0 > *pos )
-    {
-        *pos = 0;
-    }
-
-    if( list->val.l.count <= *pos )
-    {
-        return NULL;
-    }
-
-    (*pos)++;
-
-    return &list->val.l.vals[ (*pos) - 1 ];
 }
 
 char * tr_bencStealStr( benc_val_t * val )

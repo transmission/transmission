@@ -1099,9 +1099,9 @@ parseOriginalPeers( benc_val_t * bePeers, int * peerCount )
         return NULL;
     }
 
-    ii = -1;
-    while( NULL != ( peer = tr_bencListIter( bePeers, &ii ) ) )
+    for( ii = 0; bePeers->val.l.count > ii; ii++ )
     {
+        peer = &bePeers->val.l.vals[ii];
         addrval = tr_bencDictFind( peer, "ip" );
         if( NULL == addrval || TYPE_STR != addrval->type ||
             tr_netResolve( addrval->val.s.s, &addr ) )
