@@ -182,7 +182,7 @@
 - (float)       swarmSpeed;
 
 - (BOOL) pex;
-- (void) setPex: (BOOL) set;
+- (void) setPex: (BOOL) setting;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;

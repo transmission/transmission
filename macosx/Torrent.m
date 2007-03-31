@@ -1097,12 +1097,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 	return fPex;
 }
 
-- (void) setPex: (BOOL) pex
+- (void) setPex: (BOOL) setting
 {
 	if (![self privateTorrent])
 	{
-		fPex = pex;
-		tr_torrentDisablePex(fHandle, !pex);
+		fPex = setting;
+		tr_torrentDisablePex(fHandle, !setting);
 	}
 }
 
