@@ -372,12 +372,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                                             eta / 3600, (eta / 60) % 60];
                 else
                 {
-                    if (eta / 86400 > 1)
+					int days = eta / 86400;
+                    if (days > 1)
                         [fRemainingTimeString appendFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
-                                                                eta / 86400, (eta / 3600) % 24];
+                                                                days, (eta / 3600) % 24];
                     else
-                        [fRemainingTimeString appendFormat: NSLocalizedString(@"%d day %d hr", "Torrent -> remaining time"),
-                                                                eta / 86400, (eta / 3600) % 24];
+                        [fRemainingTimeString appendFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
+                                                                (eta / 3600) % 24];
                 }
                 
                 [fProgressString appendFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
