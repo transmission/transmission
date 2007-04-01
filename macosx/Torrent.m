@@ -299,14 +299,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
+	
+	NSMutableString * progressString = [NSMutableString stringWithString: @""],
+					* remainingTimeString = [NSMutableString stringWithString: @""],
+					* statusString = [NSMutableString string],
+					* shortStatusString = [NSMutableString string];
 
-    [fProgressString setString: @""];
     if (![self allDownloaded])
-        [fProgressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
+        [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     else
-        [fProgressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
+        [progressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
                 [NSString stringForRatio: [self ratio]]];
 
@@ -328,72 +332,71 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             else
                 tempString = NSLocalizedString(@"Paused", "Torrent -> status string");
             
-            [fStatusString setString: tempString];
-            [fShortStatusString setString: tempString];
+            [statusString setString: tempString];
+            [shortStatusString setString: tempString];
             
             break;
 
         case TR_STATUS_CHECK:
             tempString = [NSLocalizedString(@"Checking existing files", "Torrent -> status string") stringByAppendingEllipsis];
             
-            [fStatusString setString: tempString];
-            [fShortStatusString setString: tempString];
-            [fRemainingTimeString setString: tempString];
+            [statusString setString: tempString];
+            [shortStatusString setString: tempString];
+            [remainingTimeString setString: tempString];
             
             fChecking = YES;
             
             break;
 
         case TR_STATUS_DOWNLOAD:
-            [fStatusString setString: @""];
+            [statusString setString: @""];
             if ([self totalPeers] != 1)
-                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
+                [statusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
                                                 "Torrent -> status string"), [self peersUploading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
+                [statusString appendFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                 "Torrent -> status string"), [self peersUploading]];
             
-            [fRemainingTimeString setString: @""];
             int eta = [self eta];
             if (eta < 0)
             {
-                [fRemainingTimeString setString: NSLocalizedString(@"Unknown", "Torrent -> remaining time")];
-                [fProgressString appendString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
+                [remainingTimeString setString: NSLocalizedString(@"Unknown", "Torrent -> remaining time")];
+                [progressString appendString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
             }
             else
             {
                 if (eta < 60)
-                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
+                    [remainingTimeString appendFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
                 else if (eta < 3600) //60 * 60
-                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"),
+                    [remainingTimeString appendFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"),
                                                             eta / 60, eta % 60];
                 else if (eta < 86400) //24 * 60 * 60
-                    [fRemainingTimeString appendFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"),
+                    [remainingTimeString appendFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"),
                                                             eta / 3600, (eta / 60) % 60];
                 else
                 {
 					int days = eta / 86400;
                     if (days > 1)
-                        [fRemainingTimeString appendFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
+                        [remainingTimeString appendFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
                                                                 days, (eta / 3600) % 24];
                     else
-                        [fRemainingTimeString appendFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
+                        [remainingTimeString appendFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
                                                                 (eta / 3600) % 24];
                 }
                 
-                [fProgressString appendFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
-                                                                    fRemainingTimeString];
+                [progressString appendFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
+                                                                    remainingTimeString];
             }
             
             break;
 
         case TR_STATUS_SEED:
-            [fStatusString setString: @""];
+            [statusString setString: @""];
             if ([self totalPeers] != 1)
-                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
+                [statusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
                                                 [self peersDownloading], [self totalPeers]];
             else
-                [fStatusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
+                [statusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                 [self peersDownloading]];
             
             break;
@@ -401,8 +404,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_STOPPING:
             tempString = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
         
-            [fStatusString setString: tempString];
-            [fShortStatusString setString: tempString];
+            [statusString setString: tempString];
+            [shortStatusString setString: tempString];
             
             break;
     }
@@ -412,7 +415,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (fStat->error)
     {
-        [fStatusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
+        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
                                     [self errorMessage]]];
     }
     
@@ -430,24 +433,29 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
                                 [NSString stringForSpeed: [self downloadRate]]];
-            [fShortStatusString setString: @""];
+            [shortStatusString setString: @""];
         }
         else
         {
             NSString * ratioString = [NSString stringForRatio: [self ratio]];
         
-            [fShortStatusString setString: [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ",
+            [shortStatusString setString: [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ",
                                             "Torrent -> status string"), ratioString]];
-            [fRemainingTimeString setString: [NSLocalizedString(@"Ratio: ", "Torrent -> status string")
+            [remainingTimeString setString: [NSLocalizedString(@"Ratio: ", "Torrent -> status string")
                                                 stringByAppendingString: ratioString]];
         }
         
         stringToAppend = [stringToAppend stringByAppendingString: [NSLocalizedString(@"UL: ", "Torrent -> status string")
                                             stringByAppendingString: [NSString stringForSpeed: [self uploadRate]]]];
 
-        [fStatusString appendFormat: @" - %@", stringToAppend];
-        [fShortStatusString appendString: stringToAppend];
+        [statusString appendFormat: @" - %@", stringToAppend];
+        [shortStatusString appendString: stringToAppend];
     }
+	
+	[fProgressString setString: progressString];
+	[fStatusString setString: statusString];
+	[fShortStatusString setString: shortStatusString];
+	[fRemainingTimeString setString: remainingTimeString];
 }
 
 - (NSDictionary *) infoForCurrentView
