@@ -32,7 +32,7 @@
 static int realparse( tr_info_t * inf, uint8_t * buf, size_t len );
 static void savedname( char * name, size_t len, const char * hash,
                        const char * tag );
-static char * readtorrent( const char * path, size_t * len );
+static uint8_t * readtorrent( const char * path, size_t * len );
 static int savetorrent( const char * hash, const char * tag,
                         const uint8_t * buf, size_t buflen );
 static int getfile( char * buf, int size,
@@ -534,9 +534,9 @@ void tr_metainfoRemoveSaved( const char * hashString, const char * tag )
     unlink(file);
 }
 
-char * readtorrent( const char * path, size_t * size )
+uint8_t * readtorrent( const char * path, size_t * size )
 {
-    char       * buf;
+    uint8_t    * buf;
     struct stat  sb;
     FILE       * file;
 
