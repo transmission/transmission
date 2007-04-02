@@ -13,7 +13,7 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
  - Cache connected peers
  - Bugfixes and improvements
  - OS X:
-   + Download and seeding queue that can be user-arranged
+   + Download and seeding queues that can be user-ordered
    + Speed Limit: Second set of bandwidth limits that can be toggled or 
      scheduled
    + Individual torrent bandwidth limits

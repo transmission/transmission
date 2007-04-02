@@ -323,7 +323,7 @@
                         pieceImage = fBlue1Piece;
                     }
                 }
-                else if (piecePercent < 0.50)
+                else if (piecePercent < 0.5)
                 {
                     if (first || fPieces[index] != 2)
                     {
