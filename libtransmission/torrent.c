@@ -53,14 +53,22 @@ void tr_setDownloadLimit( tr_torrent_t * tor, int limit )
     tr_rcSetLimit( tor->download, limit );
 }
 
-tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
-                               uint8_t * hash, int flags, int * error )
+tr_torrent_t *
+tr_torrentInit( tr_handle_t * h, const char * path,
+                uint8_t * hash, int flags, int * error )
 {
-    tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
-    int             saveCopy = ( TR_FLAG_SAVE & flags );
+    tr_torrent_t * tor;
+
+    tor  = calloc( 1, sizeof *tor );
+    if( NULL == tor )
+    {
+        *error = TR_EOTHER;
+        return NULL;
+    }
 
     /* Parse torrent file */
-    if( tr_metainfoParse( &tor->info, h->tag, path, NULL, saveCopy ) )
+    if( tr_metainfoParseFile( &tor->info, h->tag, path,
+                              TR_FLAG_SAVE & flags ) )
     {
         *error = TR_EINVALID;
         free( tor );
@@ -70,13 +78,46 @@ tr_torrent_t * tr_torrentInit( tr_handle_t * h, const char * path,
     return torrentRealInit( h, tor, hash, flags, error );
 }
 
-tr_torrent_t * tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
-                                    int flags, int * error )
+tr_torrent_t *
+tr_torrentInitData( tr_handle_t * h, uint8_t * data, size_t size,
+                    uint8_t * hash, int flags, int * error )
 {
-    tr_torrent_t  * tor = calloc( sizeof( tr_torrent_t ), 1 );
+    tr_torrent_t * tor;
+
+    tor  = calloc( 1, sizeof *tor );
+    if( NULL == tor )
+    {
+        *error = TR_EOTHER;
+        return NULL;
+    }
 
     /* Parse torrent file */
-    if( tr_metainfoParse( &tor->info, h->tag, NULL, hashStr, 0 ) )
+    if( tr_metainfoParseData( &tor->info, h->tag, data, size,
+                              TR_FLAG_SAVE & flags ) )
+    {
+        *error = TR_EINVALID;
+        free( tor );
+        return NULL;
+    }
+
+    return torrentRealInit( h, tor, hash, flags, error );
+}
+
+tr_torrent_t *
+tr_torrentInitSaved( tr_handle_t * h, const char * hashStr,
+                     int flags, int * error )
+{
+    tr_torrent_t * tor;
+
+    tor  = calloc( 1, sizeof *tor );
+    if( NULL == tor )
+    {
+        *error = TR_EOTHER;
+        return NULL;
+    }
+
+    /* Parse torrent file */
+    if( tr_metainfoParseHash( &tor->info, h->tag, hashStr ) )
     {
         *error = TR_EINVALID;
         free( tor );

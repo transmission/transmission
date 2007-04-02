@@ -29,10 +29,10 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
+static int realparse( tr_info_t * inf, uint8_t * buf, size_t len );
 static void savedname( char * name, size_t len, const char * hash,
                        const char * tag );
-static char * readtorrent( const char * path, const char * hash,
-                           const char * tag, size_t * len );
+static char * readtorrent( const char * path, size_t * len );
 static int savetorrent( const char * hash, const char * tag,
                         const uint8_t * buf, size_t buflen );
 static int getfile( char * buf, int size,
@@ -48,30 +48,121 @@ static void strcatUTF8( char *, int, const char *, int );
  ***********************************************************************
  *
  **********************************************************************/
-int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
-                      const char * savedHash, int saveCopy )
+int
+tr_metainfoParseFile( tr_info_t * inf, const char * tag,
+                      const char * path, int save )
 {
-    char       * buf;
-    benc_val_t   meta, * beInfo, * val, * val2;
-    int          i;
-    size_t       len;
-
-    assert( NULL == path || NULL == savedHash );
-    /* if savedHash isn't null, saveCopy should be false */
-    assert( NULL == savedHash || !saveCopy );
+    uint8_t * buf;
+    size_t    size;
 
     /* read the torrent data */
-    buf = readtorrent( path, savedHash, tag, &len );
+    buf = readtorrent( path, &size );
     if( NULL == buf )
     {
         return 1;
     }
 
+    if( realparse( inf, buf, size ) )
+    {
+        free( buf );
+        return 1;
+    }
+
+    if( save )
+    {
+        if( savetorrent( inf->hashString, tag, buf, size ) )
+        {
+            free( buf );
+            return 1;
+        }
+        savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
+    }
+
+    free( buf );
+
+    return 0;
+}
+
+int
+tr_metainfoParseData( tr_info_t * inf, const char * tag,
+                      uint8_t * data, size_t size, int save )
+{
+    if( realparse( inf, data, size ) )
+    {
+        return 1;
+    }
+
+    if( save )
+    {
+        if( savetorrent( inf->hashString, tag, data, size ) )
+        {
+            return 1;
+        }
+        savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
+    }
+
+    return 0;
+}
+
+int
+tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
+{
+    struct stat sb;
+    uint8_t   * buf;
+    size_t      size;
+    int         save;
+
+    /* check it we should use an old file without a tag */
+    /* XXX this should go away at some point */
+    save = 0;
+    savedname( inf->torrent, sizeof inf->torrent, hash, tag );
+    if( 0 > stat( inf->torrent, &sb ) && ENOENT == errno )
+    {
+        savedname( inf->torrent, sizeof inf->torrent, hash, NULL );
+        if( 0 == stat( inf->torrent, &sb ))
+        {
+            save = 1;
+        }
+    }
+
+    buf = readtorrent( inf->torrent, &size );
+    if( NULL == buf )
+    {
+        return 1;
+    }
+
+    if( realparse( inf, buf, size ) )
+    {
+        free( buf );
+        return 1;
+    }
+
+    /* save a new tagged copy of the old untagged torrent */
+    if( save )
+    {
+        if( savetorrent( hash, tag, buf, size ) )
+        {
+            free( buf );
+            return 1;
+        }
+        savedname( inf->torrent, sizeof inf->torrent, hash, tag );
+    }
+
+    free( buf );
+
+    return 0;
+}
+
+int
+realparse( tr_info_t * inf, uint8_t * buf, size_t size )
+{
+    benc_val_t   meta, * beInfo, * val, * val2;
+    int          i;
+
     /* Parse bencoded infos */
-    if( tr_bencLoad( buf, len, &meta, NULL ) )
+    if( tr_bencLoad( buf, size, &meta, NULL ) )
     {
         tr_err( "Error while parsing bencoded data" );
-        free( buf );
         return 1;
     }
 
@@ -81,7 +172,6 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
     {
         tr_err( "%s \"info\" dictionary", ( beInfo ? "Invalid" : "Missing" ) );
         tr_bencFree( &meta );
-        free( buf );
         return 1;
     }
     SHA1( (uint8_t *) beInfo->begin,
@@ -90,30 +180,6 @@ int tr_metainfoParse( tr_info_t * inf, const char * tag, const char * path,
     {
         snprintf( inf->hashString + i * 2, sizeof( inf->hashString ) - i * 2,
                   "%02x", inf->hash[i] );
-    }
-
-    /* Save a copy of the torrent file */
-    if( saveCopy )
-    {
-        if( savetorrent( inf->hashString, tag, (uint8_t *) buf, len ) )
-        {
-            tr_bencFree( &meta );
-            free( buf );
-            return 1;
-        }
-    }
-
-    /* We won't need this anymore */
-    free( buf );
-
-    /* Torrent file name */
-    if( NULL == path || saveCopy )
-    {
-        savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
-    }
-    else
-    {
-        snprintf( inf->torrent, MAX_PATH_LENGTH, "%s", path );
     }
 
     /* Comment info */
@@ -468,41 +534,17 @@ void tr_metainfoRemoveSaved( const char * hashString, const char * tag )
     unlink(file);
 }
 
-char * readtorrent( const char * path, const char * hash, const char * tag,
-                    size_t * len )
+char * readtorrent( const char * path, size_t * size )
 {
-    char         hashpath[MAX_PATH_LENGTH], * buf;
+    char       * buf;
     struct stat  sb;
     FILE       * file;
-    int          lasterr, save;
-
-    if( NULL != hash )
-    {
-        savedname( hashpath, sizeof hashpath, hash, tag );
-        path = hashpath;
-    }
 
     /* try to stat the file */
-    save = 0;
     if( stat( path, &sb ) )
     {
-        if( ENOENT != errno || NULL == hash )
-        {
-            tr_err( "Could not stat file (%s)", path );
-            return NULL;
-        }
-        /* it doesn't exist, check for an old file without a tag */
-        /* XXX this should go away at some point */
-        lasterr = errno;
-        savedname( hashpath, sizeof hashpath, hash, NULL );
-        if( stat( path, &sb ) )
-        {
-            savedname( hashpath, sizeof hashpath, hash, tag );
-            errno = lasterr;
-            tr_err( "Could not stat file (%s)", path );
-            return NULL;
-        }
-        save = 1;
+        tr_err( "Could not stat file (%s)", path );
+        return NULL;
     }
 
     if( ( sb.st_mode & S_IFMT ) != S_IFREG )
@@ -512,7 +554,8 @@ char * readtorrent( const char * path, const char * hash, const char * tag,
     }
     if( sb.st_size > TORRENT_MAX_SIZE )
     {
-        tr_err( "Torrent file is too big (%d bytes)", ( int )sb.st_size );
+        tr_err( "Torrent file is too big (%"PRIu64" bytes)",
+                ( uint64_t )sb.st_size );
         return NULL;
     }
 
@@ -526,7 +569,8 @@ char * readtorrent( const char * path, const char * hash, const char * tag,
     buf = malloc( sb.st_size );
     if( NULL == buf )
     {
-        tr_err( "Could not allocate memory (%d bytes)", ( int )sb.st_size );
+        tr_err( "Could not allocate memory (%"PRIu64" bytes)",
+                ( uint64_t )sb.st_size );
     }
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
@@ -538,13 +582,7 @@ char * readtorrent( const char * path, const char * hash, const char * tag,
     }
     fclose( file );
 
-    /* save a new tagged copy of the old untagged torrent */
-    if( save )
-    {
-        savetorrent( hash, tag, (uint8_t *) buf, sb.st_size );
-    }
-
-    *len = sb.st_size;
+    *size = sb.st_size;
 
     return buf;
 }

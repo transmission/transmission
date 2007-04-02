@@ -214,6 +214,16 @@ tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
                                uint8_t * hash, int flags, int * error );
 
 /***********************************************************************
+ * tr_torrentInitData
+ ***********************************************************************
+ * Like tr_torrentInit, except the actual torrent data is passed in
+ * instead of the filename.
+ **********************************************************************/
+tr_torrent_t * tr_torrentInitData( tr_handle_t *, uint8_t * data,
+                                   size_t size, uint8_t * hash,
+                                   int flags, int * error );
+
+/***********************************************************************
  * tr_torrentInitSaved
  ***********************************************************************
  * Opens and parses a torrent file as with tr_torrentInit, only taking
