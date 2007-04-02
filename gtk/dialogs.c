@@ -141,7 +141,7 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   pref = tr_prefs_get( PREF_ID_DIR );
   if( NULL != pref )
   {
-      gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( getdir ), pref );
+      gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( wind ), pref );
   }
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dircheck), FALSE);
