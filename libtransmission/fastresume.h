@@ -31,7 +31,9 @@
  * IDs are defined below by the FR_ID_* macros.  The length does not include
  * the 5 bytes for the ID and length.
  *
- * The name of the resume file is "resume.<hash>".
+ * The name of the resume file is "resume.<hash>-<tag>", although
+ * older files with a name of "resume.<hash>" will be recognized if
+ * the former doesn't exist.
  *
  * All values are stored in the native endianness. Moving a
  * libtransmission resume file from an architecture to another will not
@@ -63,14 +65,19 @@
 #define FR_PROGRESS_LEN( t ) \
   ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) + FR_SLOTPIECE_LEN( t ) )
 
-static char * fastResumeFileName( tr_io_t * io )
+static void
+fastResumeFileName( char * path, size_t size, tr_torrent_t * tor, int tag )
 {
-    char * ret;
-
-    asprintf( &ret, "%s/resume.%s", tr_getCacheDirectory(),
-              io->tor->info.hashString );
-
-    return ret;
+    if( tag )
+    {
+        snprintf( path, size, "%s/resume.%s-%s", tr_getCacheDirectory(),
+                  tor->info.hashString, tor->handle->tag );
+    }
+    else
+    {
+        snprintf( path, size, "%s/resume.%s", tr_getCacheDirectory(),
+                  tor->info.hashString );
+    }
 }
 
 static int fastResumeMTimes( tr_io_t * io, int * tab )
@@ -121,10 +128,10 @@ static inline void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
 static void fastResumeSave( tr_io_t * io )
 {
     tr_torrent_t * tor = io->tor;
-    
+
+    char      path[MAX_PATH_LENGTH];
     FILE    * file;
     int       version = 1;
-    char    * path;
     uint8_t * buf;
     uint64_t  total;
     int       size;
@@ -140,12 +147,12 @@ static void fastResumeSave( tr_io_t * io )
     }
 
     /* Create/overwrite the resume file */
-    path = fastResumeFileName( io );
-    if( !( file = fopen( path, "w" ) ) )
+    fastResumeFileName( path, sizeof path, tor, 1 );
+    file = fopen( path, "w" );
+    if( NULL == file )
     {
         tr_err( "Could not open '%s' for writing", path );
         free( buf );
-        free( path );
         return;
     }
     
@@ -184,7 +191,6 @@ static void fastResumeSave( tr_io_t * io )
     fclose( file );
 
     tr_dbg( "Resume file '%s' written", path );
-    free( path );
 }
 
 static int fastResumeLoadProgress( tr_io_t * io, FILE * file )
@@ -292,24 +298,34 @@ static int fastResumeLoadOld( tr_io_t * io, FILE * file )
 static int fastResumeLoad( tr_io_t * io )
 {
     tr_torrent_t * tor = io->tor;
-    
+
+    char      path[MAX_PATH_LENGTH];
     FILE    * file;
     int       version = 0;
-    char    * path;
     uint8_t   id;
     uint32_t  len;
     int       ret;
 
     /* Open resume file */
-    path = fastResumeFileName( io );
-    if( !( file = fopen( path, "r" ) ) )
+    fastResumeFileName( path, sizeof path, tor, 1 );
+    file = fopen( path, "r" );
+    if( NULL == file )
     {
+        if( ENOENT == errno )
+        {
+            fastResumeFileName( path, sizeof path, tor, 0 );
+            file = fopen( path, "r" );
+            if( NULL != file )
+            {
+                goto good;
+            }
+            fastResumeFileName( path, sizeof path, tor, 1 );
+        }
         tr_inf( "Could not open '%s' for reading", path );
-        free( path );
         return 1;
     }
+  good:
     tr_dbg( "Resume file '%s' loaded", path );
-    free( path );
 
     /* Check format version */
     fread( &version, 4, 1, file );
