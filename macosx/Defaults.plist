@@ -44,7 +44,7 @@
 	<false/>
 	<key>IncompleteDownloadFolder</key>
 	<string>~/Desktop</string>
-	<key>InfoTab</key>
+	<key>InspectorSelected</key>
 	<string>Info</string>
 	<key>InfoVisible</key>
 	<false/>

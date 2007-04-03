@@ -91,7 +91,7 @@
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
     //select tab
-    NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InfoTab"];
+    NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
     if ([fTabView indexOfTabViewItemWithIdentifier: identifier] == NSNotFound)
         identifier = TAB_INFO_IDENT;
     
@@ -592,7 +592,7 @@
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
 {
     NSRect windowRect = [window frame];
-    windowRect.size.width = [window minSize].width;    
+    windowRect.size.width = [window minSize].width;
     return windowRect;
 }
 
@@ -600,7 +600,7 @@
 {
     NSString * identifier = [tabViewItem identifier];
     [self setWindowForTab: identifier animate: YES];
-    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InfoTab"];
+    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
 }
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
