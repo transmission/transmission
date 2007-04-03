@@ -227,7 +227,7 @@ void tr_peerDestroy( tr_peer_t * peer )
 const char *
 tr_peerClient( tr_peer_t * peer )
 {
-    if( PEER_STATUS_HANDSHAKE < peer->status )
+    if( PEER_STATUS_HANDSHAKE >= peer->status )
     {
         return "not connected";
     }
