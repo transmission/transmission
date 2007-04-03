@@ -227,7 +227,7 @@ void tr_peerDestroy( tr_peer_t * peer )
 const char *
 tr_peerClient( tr_peer_t * peer )
 {
-    if( NULL == peer->client )
+    if( NULL == peer->client && PEER_STATUS_HANDSHAKE < peer->status )
     {
         peer->client = tr_clientForId( peer->id );
     }
