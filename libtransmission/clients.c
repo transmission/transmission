@@ -177,6 +177,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "BTG %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
+		else if( !memcmp( &id[1], "BB", 2 ) )
+        {
+            asprintf( &ret, "BitBuddy %c.%c%c%c",
+                      id[3], id[4], id[5], id[6] );
+        }
         
         if( ret )
         {
