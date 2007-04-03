@@ -84,9 +84,8 @@ tr_window_action_add( TrWindow * wind, int id, int flags, const char * name,
 void
 tr_window_update( TrWindow * wind, float downspeed, float upspeed );
 
-/* some evil magic to show the window with a nice initial window size */
-/* note that the gtk main loop runs in this function */
+/* some magic to show the window with a nice initial size */
 void
-tr_window_size_hack( TrWindow * wind );
+tr_window_show( TrWindow * wind );
 
 #endif

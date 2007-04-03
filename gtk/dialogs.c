@@ -89,9 +89,7 @@ quitresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 stylekludge( GObject * obj, GParamSpec * spec, gpointer data );
 static void
-setscroll( void * arg );
-static void
-fileswindresp( GtkWidget * widget, gint resp, gpointer data );
+fileswinddead( GtkWidget * widget, gpointer data );
 static void
 filestorclosed( gpointer data, GObject * tor );
 static void
@@ -427,7 +425,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     GtkTreeStore      * store;
     int                 ii;
     GtkWidget         * view, * scroll, * frame, * wind;
-    GtkCellRenderer   * rend;
+    GtkCellRenderer   * rend, * elip;
     GtkTreeViewColumn * col;
     GtkTreeSelection  * sel;
     char              * label;
@@ -451,6 +449,8 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
     /* add file column */
     col = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_expand( col, TRUE );
+    gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
     gtk_tree_view_column_set_title( col, _("File") );
     /* add icon renderer */
     rend = gtk_cell_renderer_pixbuf_new();
@@ -458,6 +458,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     gtk_tree_view_column_add_attribute( col, rend, "stock-id", FC_STOCK );
     /* add text renderer */
     rend = gtk_cell_renderer_text_new();
+    elip = rend;
     gtk_tree_view_column_pack_start( col, rend, TRUE );
     gtk_tree_view_column_add_attribute( col, rend, "markup", FC_LABEL );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
@@ -483,8 +484,6 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
-    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),
-                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
     gtk_container_add( GTK_CONTAINER( scroll ), view );
     gtk_widget_show( scroll );
 
@@ -516,11 +515,14 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     fw->timer  = g_timeout_add( UPDATE_INTERVAL, fileswindupdate, fw );
 
     g_object_weak_ref( G_OBJECT( tor ), filestorclosed, fw );
-    g_signal_connect( wind, "response", G_CALLBACK( fileswindresp ), fw );
+    g_signal_connect( wind, "destroy", G_CALLBACK( fileswinddead ), fw );
+    g_signal_connect( wind, "response", G_CALLBACK( gtk_widget_destroy ), 0 );
     fileswindupdate( fw );
 
-    /* show the window with a nice initial size */
-    windowsizehack( wind, scroll, view, setscroll, scroll );
+    sizingmagic( GTK_WINDOW( wind ), GTK_SCROLLED_WINDOW( scroll ),
+                 GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+    g_object_set( elip, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    gtk_widget_show( wind );
 }
 
 /* kludge to have the progress bars notice theme changes */
@@ -537,14 +539,7 @@ stylekludge( GObject * obj, GParamSpec * spec, gpointer data )
 }
 
 static void
-setscroll( void * arg )
-{
-    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( arg ),
-        GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-}
-
-static void
-fileswindresp( GtkWidget * widget SHUTUP, gint resp SHUTUP, gpointer data )
+fileswinddead( GtkWidget * widget SHUTUP, gpointer data )
 {
     struct fileswind * fw = data;
 

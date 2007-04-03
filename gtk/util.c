@@ -317,46 +317,29 @@ getdownloaddir( void )
 }
 
 void
-windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
-                callbackfunc_t func, void * arg )
+sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
+             GtkPolicyType hscroll, GtkPolicyType vscroll )
 {
     GtkRequisition req;
-    gint           width, height;
     GdkScreen    * screen;
+    int            width, height;
 
-    gtk_widget_realize( wind );
-    gtk_widget_size_request( view, &req );
-    height = req.height;
-    gtk_widget_size_request( scroll, &req );
-    height -= req.height;
-    gtk_widget_size_request( wind, &req );
-    height += req.height;
-    screen  = gtk_widget_get_screen( wind );
-    width   = MIN( req.width, gdk_screen_get_width( screen  ) / 2 );
-    height  = MIN( height,    gdk_screen_get_height( screen ) / 5 * 4 );
-    if( height > req.width )
-    {
-        height = MIN( height, width * 8 / 5 );
-    }
-    else
-    {
-        height = MAX( height, width * 5 / 8 );
-    }
-    if( height > req.width )
-    {
-        height = MIN( height, width * 8 / 5 );
-    }
-    else
-    {
-        height = MAX( height, width * 5 / 8 );
-    }
-    if( NULL != func )
-    {
-        func( arg );
-    }
-    gtk_widget_show_now( wind  );
-    gtk_window_resize( GTK_WINDOW( wind ), width, height );
-    gtk_window_set_focus( GTK_WINDOW( wind ), NULL );
+    screen = gtk_widget_get_screen( GTK_WIDGET( wind ) );
+
+    gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER,
+                                    GTK_POLICY_NEVER );
+
+    gtk_widget_size_request( GTK_WIDGET( wind ), &req );
+    height = MIN( req.height, gdk_screen_get_height( screen ) / 5 * 4 );
+
+    gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER, vscroll );
+
+    gtk_widget_size_request( GTK_WIDGET( wind ), &req );
+    width = MIN( req.width, gdk_screen_get_width( screen ) / 2 );
+
+    gtk_window_set_default_size( wind, width, height );
+
+    gtk_scrolled_window_set_policy( scroll, hscroll, vscroll );
 }
 
 struct action *

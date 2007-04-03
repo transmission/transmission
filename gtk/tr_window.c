@@ -39,7 +39,6 @@
 enum
 {
     PROP_MODEL = 1,
-    PROP_ELLIPSIZE,
     PROP_SELECTION,
     PROP_DOUBLECLICK,
     PROP_DRAG,
@@ -132,11 +131,6 @@ tr_window_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
                                  GTK_TYPE_TREE_MODEL, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_MODEL, pspec );
 
-    pspec = g_param_spec_boolean( "ellipsize", _("Ellipsize"),
-                                 _("Ellipsize torrent names."),
-                                 FALSE, G_PARAM_READWRITE );
-    g_object_class_install_property( gobject_class, PROP_ELLIPSIZE, pspec );
-
     pspec = g_param_spec_object( "selection", _("Selection"),
                                  _("The GtkTreeSelection for the list view."),
                                  GTK_TYPE_TREE_SELECTION, G_PARAM_READABLE );
@@ -199,8 +193,6 @@ tr_window_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     gtk_box_pack_start( GTK_BOX( vbox ), GTK_WIDGET( self->toolbar ),
                         FALSE, FALSE, 0 );
 
-    gtk_scrolled_window_set_policy( self->scroll,
-                                    GTK_POLICY_NEVER, GTK_POLICY_ALWAYS );
     gtk_container_add( GTK_CONTAINER( scroll ), GTK_WIDGET( self->view ) );
     gtk_box_pack_start( GTK_BOX( vbox ), scroll, TRUE, TRUE, 0 );
 
@@ -220,7 +212,6 @@ tr_window_set_property( GObject * object, guint property_id,
                         const GValue * value SHUTUP, GParamSpec * pspec)
 {
     TrWindow         * self = ( TrWindow * )object;
-    PangoEllipsizeMode elip;
 
     if( self->disposed )
     {
@@ -231,12 +222,6 @@ tr_window_set_property( GObject * object, guint property_id,
     {
         case PROP_MODEL:
             gtk_tree_view_set_model( self->view, g_value_get_object( value ) );
-            break;
-        case PROP_ELLIPSIZE:
-            g_assert( NULL != self->namerend );
-            elip = ( g_value_get_boolean( value ) ?
-                     PANGO_ELLIPSIZE_END : PANGO_ELLIPSIZE_NONE );
-            g_object_set( self->namerend, "ellipsize", elip, NULL );
             break;
         case PROP_DOUBLECLICK:
             self->doubleclick = g_value_get_int( value );
@@ -252,7 +237,6 @@ tr_window_get_property( GObject * object, guint property_id,
                         GValue * value SHUTUP, GParamSpec * pspec )
 {
     TrWindow         * self = ( TrWindow * )object;
-    PangoEllipsizeMode elip;
 
     if( self->disposed )
     {
@@ -263,11 +247,6 @@ tr_window_get_property( GObject * object, guint property_id,
     {
         case PROP_MODEL:
             g_value_set_object( value, gtk_tree_view_get_model( self->view ) );
-            break;
-        case PROP_ELLIPSIZE:
-            g_assert( NULL != self->namerend );
-            g_object_get( self->namerend, "ellipsize", &elip, NULL);
-            g_value_set_boolean( value, ( PANGO_ELLIPSIZE_NONE != elip ) );
             break;
         case PROP_SELECTION:
             g_value_set_object( value,
@@ -385,19 +364,15 @@ tr_window_update( TrWindow * self, float downspeed, float upspeed )
     fixbuttons( NULL, self );
 }
 
-static void
-setelip( void * arg )
-{
-    g_object_set( arg, "ellipsize", TRUE, NULL );
-}
-
 void
-tr_window_size_hack( TrWindow * self )
+tr_window_show( TrWindow * self )
 {
     TR_IS_WINDOW( self );
 
-    windowsizehack( GTK_WIDGET( self ), GTK_WIDGET( self->scroll ),
-                    GTK_WIDGET( self->view ), setelip, self );
+    sizingmagic( GTK_WINDOW( self ), self->scroll,
+                 GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS );
+    g_object_set( self->namerend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
+    gtk_widget_show( GTK_WIDGET( self ) );
 }
 
 static GtkTreeView *

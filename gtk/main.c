@@ -423,11 +423,11 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
     updatemodel( cbdata );
 
-    /* this shows the window */
-    tr_window_size_hack( wind );
-
     /* set up the ipc socket now that we're ready to get torrents from it */
     ipc_socket_setup( GTK_WINDOW( wind ), addtorrents, wannaquit, cbdata );
+
+    /* show the window */
+    tr_window_show( wind );
 }
 
 static void
@@ -469,9 +469,7 @@ remakewind( struct cbdata * cbdata )
     /* create window */
     win = tr_window_new();
     winsetup( cbdata, TR_WINDOW( win ) );
-
-    /* this shows the window */
-    tr_window_size_hack( TR_WINDOW( win ) );
+    tr_window_show( TR_WINDOW( win ) );
 }
 
 static void

@@ -153,8 +153,8 @@ action_makemenu( struct action * act, const char * actkey,
 
 /* here there be dragons */
 void
-windowsizehack( GtkWidget * wind, GtkWidget * scroll, GtkWidget * view,
-                callbackfunc_t func, void * arg );
+sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
+             GtkPolicyType hscroll, GtkPolicyType vscroll );
 
 /* create an error dialog, if wind is NULL or mapped then show dialog now,
    otherwise show it when wind becomes mapped */
