@@ -40,9 +40,8 @@ static int makeroom( benc_val_t * val, int count )
     }
 
     /* We need a bigger boat */
-
-    len = val->val.l.alloc + ( count / LIST_SIZE ) +
-        ( count % LIST_SIZE ? LIST_SIZE : 0 );
+    len = val->val.l.alloc + count +
+        ( count % LIST_SIZE ? LIST_SIZE - ( count % LIST_SIZE ) : 0 );
     new = realloc( val->val.l.vals, len * sizeof( benc_val_t ) );
     if( NULL == new )
     {
