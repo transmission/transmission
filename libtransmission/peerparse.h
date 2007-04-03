@@ -584,7 +584,6 @@ static inline int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
 {
     tr_info_t * inf = &tor->info;
     int         ii;
-    char      * client;
 
     if( memcmp( &peer->buf[28], inf->hash, SHA_DIGEST_LENGTH ) )
     {
@@ -614,13 +613,12 @@ static inline int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
         }
     }
 
-    client = tr_clientForId( (uint8_t *) peer->id );
     if( PEER_SUPPORTS_EXTENDED_MESSAGES( &peer->buf[20] ) )
     {
         peer->status = PEER_STATUS_CONNECTED;
         peer->extStatus = EXTENDED_SUPPORTED;
         peer_dbg( "GET  handshake, ok (%s) extended messaging supported",
-                  client );
+                  tr_peerClient( peer ) );
     }
     else if( PEER_SUPPORTS_AZUREUS_PROTOCOL( &peer->buf[20] ) )
     {
@@ -628,14 +626,13 @@ static inline int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
         peer->azproto = 1;
         peer->date    = tr_date();
         peer_dbg( "GET  handshake, ok (%s) will use azureus protocol",
-                  client );
+                  tr_peerClient( peer ) );
     }
     else
     {
         peer->status = PEER_STATUS_CONNECTED;
-        peer_dbg( "GET  handshake, ok (%s)", client );
+        peer_dbg( "GET  handshake, ok (%s)", tr_peerClient( peer ) );
     }
-    free( client );
 
     return TR_OK;
 }

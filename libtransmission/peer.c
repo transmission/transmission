@@ -135,6 +135,8 @@ struct tr_peer_s
 
     tr_ratecontrol_t  * download;
     tr_ratecontrol_t  * upload;
+
+    char              * client;
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
@@ -218,7 +220,19 @@ void tr_peerDestroy( tr_peer_t * peer )
     }
     tr_rcClose( peer->download );
     tr_rcClose( peer->upload );
+    free( peer->client );
     free( peer );
+}
+
+const char *
+tr_peerClient( tr_peer_t * peer )
+{
+    if( NULL == peer->client )
+    {
+        peer->client = tr_clientForId( peer->id );
+    }
+
+    return peer->client;
 }
 
 void tr_peerSetPrivate( tr_peer_t * peer, int private )

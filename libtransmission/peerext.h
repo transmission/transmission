@@ -219,7 +219,7 @@ static inline int
 parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t val, * sub;
-    int dbgport, dbgpex;
+    int        dbgport, dbgpex;
 
     if( tr_bencLoad( buf, len, &val, NULL ) )
     {
@@ -249,6 +249,21 @@ parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
             }
         }
     }
+
+#if 0 /* ugh, we have to deal with encoding if we do this */
+    /* get peer's client name */
+    sub = tr_bencDictFind( &val, "v" );
+    if( NULL != sub && TYPE_STR == sub->type &&
+        ( NULL == peer->client || 0 != strcmp( sub->val.s.s, peer->client ) ) )
+    {
+        client = tr_bencStealStr( sub );
+        if( NULL != client )
+        {
+            free( peer->client );
+            peer->client = client;
+        }
+    }
+#endif
 
     /* get peer's listening port */
     sub = tr_bencDictFind( &val, "p" );

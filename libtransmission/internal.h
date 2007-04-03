@@ -41,6 +41,7 @@ int vasprintf( char **, const char *, va_list );
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <signal.h>

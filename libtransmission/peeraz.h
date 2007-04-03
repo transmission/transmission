@@ -359,6 +359,29 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         return TR_ERROR;
     }
 
+#if 0 /* ugh, we have to deal with encoding if we do this */
+    /* get peer's client name */
+    sub  = tr_bencDictFind( &val, "client" );
+    sub2 = tr_bencDictFind( &val, "version" );
+    if( NULL != sub  && TYPE_STR == sub->type &&
+        NULL != sub2 && TYPE_STR == sub->type )
+    {
+        if( NULL == peer->client ||
+            ( 0 != strncmp( peer->client, sub->val.s.s, sub->val.s.i ) ||
+              ' ' != peer->client[sub->val.s.i] ||
+              0 != strcmp( peer->client + sub->val.s.i + 1, sub2->val.s.s ) ) )
+        {
+            client = NULL;
+            asprintf( &client, "%s %s", sub->val.s.s, sub2->val.s.s );
+            if( NULL != client )
+            {
+                free( peer->client );
+                peer->client = client;
+            }
+        }
+    }
+#endif
+
     /* get the peer's listening port */
     sub = tr_bencDictFind( &val, "tcp_port" );
     if( NULL != sub )

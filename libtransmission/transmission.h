@@ -452,7 +452,7 @@ struct tr_stat_s
 struct tr_peer_stat_s
 {
     char    addr[INET_ADDRSTRLEN];
-    char *  client;
+    const char * client;
     
     int     isConnected;
     int     from;
