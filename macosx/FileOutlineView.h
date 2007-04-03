@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: FileTableView.h 771 2006-08-14 03:13:34Z livings124 $
+ * $Id$
  * 
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
