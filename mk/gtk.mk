@@ -34,7 +34,7 @@ clean:
 .depend: $(SRCS) ../mk/config.mk ../mk/common.mk ../mk/gtk.mk
 	$(DEP_RULE)
 
-install: transmission-gtk .po desktop.install icon.install
+install: transmission-gtk man.install desktop.install icon.install .po
 	$(INSTALL_BIN_RULE)
 	@$(MAKE) $(MAKEARGS) -C po -f ../../mk/po.mk install
 
@@ -43,6 +43,9 @@ desktop.install: transmission-gtk.desktop
 
 icon.install: transmission.png
 	$(INSTALL_ICON_RULE)
+
+man.install: transmission-gtk.1
+	$(INSTALL_MAN_RULE)
 
 morepot: $(SRCS)
 	xgettext --output=po/transmission-gtk.pot --from-code=UTF-8 --add-comments --keyword=_ --keyword=N_ $^

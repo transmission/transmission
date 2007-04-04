@@ -13,39 +13,48 @@
 .\"  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\"  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd April 22, 2006
+.Dd April 3, 2007
 .Dt TRANSMISSIONCLI 1
 .Os
 .Sh NAME
 .Nm transmissioncli
-.Nd a lightweight bittorrent client
+.Nd a bittorrent client
 .Sh SYNOPSIS
 .Nm transmissioncli
 .Bk -words
-.Op Fl h
-.Op Fl i Ar torrent-file
-.Op Fl s Ar torrent-file
+.Fl h
+.Nm
 .Op Fl v Ar level
-.Op Fl n
+.Fl i
+.Ar torrent-file
+.Nm
+.Op Fl v Ar level
+.Fl s
+.Ar torrent-file
+.Nm
+.Op Fl v Ar level
 .Op Fl p Ar port
+.Op Fl d Ar download-rate
 .Op Fl u Ar upload-rate
-.Op Fl u Ar download-rate
 .Op Fl f Ar script
+.Op Fl n
+.Ar torrent-file
 .Ek
 .Sh DESCRIPTION
 The
 .Nm
 program is a lightweight, command-line BitTorrent client with
-scripting capabilities.  The options are as follows:
+scripting capabilities.
 .Pp
+The options are as follows:
 .Bl -tag -width Ds
 .It Fl h, Fl -help
 Prints a short usage summary.
-.It Fl i, Fl -info Ar torrent-file
+.It Fl i, Fl -info
 Shows information from the specified torrent file, such as the
 cryptographic hash, the tracker, announcement, file size and file
 name.
-.It Fl s, -scrape Ar torrent-file
+.It Fl s, -scrape
 Prints the number of seeders and leechers for the specified torrent
 file, and exits.
 .It Fl v, -verbose Ar level
@@ -58,7 +67,7 @@ mapping for allowing incoming peer connections.
 Specifies an alternate port for the client to listen on.  The default is
 9090.
 .It Fl u, -upload Ar upload-rate
-Specifies the maximum upload rate in kB/s, which defaults to 20. The
+Specifies the maximum upload rate in kB/s, which defaults to 20.  The
 level -1 may be used for unlimited uploads.
 .It Fl d, -download Ar download-rate
 Specifies the maximum download rate in kB/s, which defaults to -1 for
@@ -77,15 +86,11 @@ The
 .Nm
 program was written by 
 .An -nosplit
-.An Eric Petit Aq titer@m0k.org
-.An Josh Elsasser Aq josh@elsasser.org
-.An Bryan Varner Aq bryan@varnernet.com
+.An Eric Petit Aq titer@m0k.org ,
+.An Josh Elsasser Aq josh@elsasser.org ,
 and
-.An Michael Demars Aq keul@m0k.org .
+.An Mitchell Livingston Aq livings124@gmail.com .
 .Sh SEE ALSO
+.Xr transmission-gtk 1
+.Pp
 http://transmission.m0k.org
-.Sh CAVEATS 
-.Nm
-currently saves its downloads into the directory from which it was
-called.  If this directory is not writeable by the user, the program
-will terminate unexpectedly.
