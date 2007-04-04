@@ -39,10 +39,9 @@ program is a lightweight BitTorrent client with a simple, intuitive
 GTK+ interface.
 .Pp
 BitTorrent is a peer-to-peer file transfer protocol which uses a
-torrent metainfo file (usually with the .torrent file extension) and a
-central tracker to distribute file data amongst a group of peers. For
-more information on the BitTorrent protocol see
-http://www.bittorrent.org/
+metainfo file (usually with the .torrent file extension) and a central
+tracker to distribute file data amongst a group of peers.  For more
+information on the BitTorrent protocol see http://www.bittorrent.org/
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -58,8 +57,8 @@ instance
 .Pp
 Only one instance of
 .Nm
-may run at one time.  Multiple torrent files may be loaded at startup
-by adding them to the command line.  If
+may be run at one time.  Multiple .torrent files may be loaded at
+startup by adding them to the command line.  If
 .Nm
 is already running, those torrents will be opened in the running
 instance.
@@ -69,7 +68,7 @@ instance.
 The directory which
 .Nm
 uses to store user preferences, resume information and state, and the
-socket file used for IPC.
+socket file used for interprocess communication (IPC).
 .El
 .Sh AUTHORS
 .An -nosplit
