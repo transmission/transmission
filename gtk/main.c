@@ -379,8 +379,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
         G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_INT, G_TYPE_INT,
         /* peersUploading, peersDownloading, seeders,    leechers */
         G_TYPE_INT,        G_TYPE_INT,       G_TYPE_INT, G_TYPE_INT,
-        /* completedFromTracker, downloaded,    uploaded */
-        G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64,
+        /* completedFromTracker, downloaded,    uploaded       left */
+        G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_UINT64,
         /* tracker,            the TrTorrent object */
         TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,
     };
@@ -848,7 +848,8 @@ updatemodel(gpointer gdata) {
           MC_UPEERS, st->peersUploading,       MC_DPEERS,  st->peersDownloading,
           MC_SEED,   st->seeders,              MC_LEECH,   st->leechers,
           MC_DONE,   st->completedFromTracker, MC_TRACKER, st->tracker,
-          MC_DOWN,   st->downloaded,           MC_UP,      st->uploaded, -1);
+          MC_DOWN,   st->downloaded,           MC_UP,      st->uploaded,
+          MC_LEFT,   st->left, -1);
     } while(gtk_tree_model_iter_next(data->model, &iter));
   }
 

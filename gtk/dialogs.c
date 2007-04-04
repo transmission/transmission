@@ -93,6 +93,8 @@ struct infowind
         GtkLabel          * upwid;
         uint64_t            down;
         GtkLabel          * downwid;
+        uint64_t            left;
+        GtkLabel          * leftwid;
     }                       inf;
 };
 
@@ -372,7 +374,7 @@ makeinfowind( GtkWindow * parent, GtkTreeModel * model, GtkTreePath * path,
 GtkWidget *
 makeinfotab( TrTorrent * tor, struct infowind * iw )
 {
-    const int   rowcount = 16;
+    const int   rowcount = 17;
     tr_info_t * inf;
     int         ii;
     GtkWidget * table;
@@ -402,6 +404,7 @@ makeinfotab( TrTorrent * tor, struct infowind * iw )
                tr_torrentGetFolder( tr_torrent_handle( tor ) ) );
     INFOLINEU( table, ii, _("Downloaded:"),   iw->inf.downwid );
     INFOLINEU( table, ii, _("Uploaded:"),     iw->inf.upwid );
+    INFOLINEU( table, ii, _("Remaining:"),    iw->inf.leftwid );
 
     g_assert( rowcount == ii );
 
@@ -414,7 +417,7 @@ void
 infoupdate( struct infowind * iw, int force )
 {
     int                 seed, leech, done;
-    uint64_t            up, down;
+    uint64_t            up, down, left;
     tr_tracker_info_t * track;
     GtkTreePath       * path;
     GtkTreeIter         iter;
@@ -428,7 +431,7 @@ infoupdate( struct infowind * iw, int force )
     }
     gtk_tree_model_get( iw->model, &iter, MC_TRACKER, &track,
                         MC_SEED, &seed, MC_LEECH, &leech, MC_DONE, &done,
-                        MC_DOWN, &down, MC_UP, &up, -1 );
+                        MC_DOWN, &down, MC_UP, &up, MC_LEFT, &left, -1 );
 
     if( track != iw->inf.track || force )
     {
@@ -474,6 +477,13 @@ infoupdate( struct infowind * iw, int force )
         gtk_label_set_text( iw->inf.upwid, str );
         g_free( str );
         iw->inf.up = up;
+    }
+    if( left != iw->inf.left || force )
+    {
+        str = readablesize( left );
+        gtk_label_set_text( iw->inf.leftwid, str );
+        g_free( str );
+        iw->inf.left = left;
     }
 }
 
