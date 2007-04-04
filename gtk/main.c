@@ -89,7 +89,6 @@ enum
     ACT_DELETE,
     ACT_SEPARATOR1,
     ACT_INFO,
-    ACT_FILES,
     ACT_DEBUG,
     ACT_SEPARATOR2,
     ACT_PREF,
@@ -121,8 +120,6 @@ actions[] =
     { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
     { NULL,        GTK_STOCK_PROPERTIES,  0, ACTF_WHEREVER | ACTF_WHATEVER,
       N_("Show additional information about a torrent") },
-    { N_("Files"), NULL,                  0, ACTF_MENU     | ACTF_WHATEVER,
-      N_("Show a list of the files in a torrent"), },
     { N_("Open debug window"), NULL,      0, ACTF_MENU     | ACTF_ALWAYS,
       NULL },
     { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
@@ -380,10 +377,12 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
         G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING,
         /* progress,  rateDownload, rateUpload,   eta,        peersTotal, */
         G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_INT, G_TYPE_INT,
-        /* peersUploading, peersDownloading, downloaded,    uploaded */
-        G_TYPE_INT,        G_TYPE_INT,       G_TYPE_UINT64, G_TYPE_UINT64,
-        /* the TrTorrent object */
-        TR_TORRENT_TYPE,
+        /* peersUploading, peersDownloading, seeders,    leechers */
+        G_TYPE_INT,        G_TYPE_INT,       G_TYPE_INT, G_TYPE_INT,
+        /* completedFromTracker, downloaded,    uploaded */
+        G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64,
+        /* tracker,            the TrTorrent object */
+        TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,
     };
     struct cbdata * cbdata;
     GtkListStore  * store;
@@ -826,7 +825,6 @@ updatemodel(gpointer gdata) {
   struct cbdata *data = gdata;
   TrTorrent *tor;
   tr_stat_t *st;
-  tr_info_t *in;
   GtkTreeIter iter;
   float up, down;
 
@@ -840,16 +838,17 @@ updatemodel(gpointer gdata) {
     do {
       gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
       st = tr_torrent_stat(tor);
-      in = tr_torrent_info(tor);
       g_object_unref(tor);
       /* XXX find out if setting the same data emits changed signal */
-      gtk_list_store_set(GTK_LIST_STORE(data->model), &iter, MC_NAME, in->name,
-        MC_SIZE, in->totalSize, MC_STAT, st->status, MC_ERR, st->error,
-        MC_TERR, st->errorString, MC_PROG, st->progress,
-        MC_DRATE, st->rateDownload, MC_URATE, st->rateUpload, MC_ETA, st->eta,
-        MC_PEERS, st->peersTotal, MC_UPEERS, st->peersUploading,
-        MC_DPEERS, st->peersDownloading, MC_DOWN, st->downloaded,
-        MC_UP, st->uploaded, -1);
+      gtk_list_store_set( GTK_LIST_STORE( data->model ), &iter,
+          MC_STAT,   st->status,               MC_ERR,     st->error,
+          MC_TERR,   st->errorString,          MC_PROG,    st->progress,
+          MC_DRATE,  st->rateDownload,         MC_URATE,   st->rateUpload,
+          MC_ETA,    st->eta,                  MC_PEERS,   st->peersTotal,
+          MC_UPEERS, st->peersUploading,       MC_DPEERS,  st->peersDownloading,
+          MC_SEED,   st->seeders,              MC_LEECH,   st->leechers,
+          MC_DONE,   st->completedFromTracker, MC_TRACKER, st->tracker,
+          MC_DOWN,   st->downloaded,           MC_UP,      st->uploaded, -1);
     } while(gtk_tree_model_iter_next(data->model, &iter));
   }
 
@@ -969,7 +968,6 @@ handleaction( struct cbdata * data, int act )
       case ACT_STOP:
       case ACT_DELETE:
       case ACT_INFO:
-      case ACT_FILES:
       case ACTION_COUNT:
           break;
   }
@@ -1009,10 +1007,7 @@ handleaction( struct cbdata * data, int act )
                   changed = TRUE;
                   break;
               case ACT_INFO:
-                  makeinfowind( data->wind, tor );
-                  break;
-              case ACT_FILES:
-                  makefileswind( data->wind, tor );
+                  makeinfowind( data->wind, data->model, path, tor );
                   break;
               case ACT_OPEN:
               case ACT_PREF:
@@ -1050,6 +1045,7 @@ addtorrents(void *vdata, void *state, GList *files,
   TrTorrent *tor;
   GtkTreeIter iter;
   const char * pref;
+  tr_info_t *in;
 
   errlist = NULL;
   torlist = NULL;
@@ -1081,14 +1077,18 @@ addtorrents(void *vdata, void *state, GList *files,
     }
   }
 
-  for(ii = g_list_first(torlist); NULL != ii; ii = ii->next) {
-    gtk_list_store_append(GTK_LIST_STORE(data->model), &iter);
-    gtk_list_store_set(GTK_LIST_STORE(data->model), &iter,
-                       MC_TORRENT, ii->data, -1);
-    /* we will always ref a torrent before politely stopping it */
-    g_signal_connect(ii->data, "politely_stopped",
-                     G_CALLBACK(g_object_unref), data);
-    g_object_unref(ii->data);
+  for( ii = g_list_first( torlist ); NULL != ii; ii = ii->next )
+  {
+      gtk_list_store_append( GTK_LIST_STORE( data->model ), &iter );
+      in = tr_torrent_info( ii->data );
+      gtk_list_store_set( GTK_LIST_STORE( data->model ), &iter,
+                          MC_NAME,    in->name,
+                          MC_SIZE,    in->totalSize,
+                          MC_TORRENT, ii->data, -1);
+      /* we will always ref a torrent before politely stopping it */
+      g_signal_connect( ii->data, "politely_stopped",
+                        G_CALLBACK( g_object_unref ), data );
+      g_object_unref( ii->data );
   }
 
   if(NULL != errlist) {

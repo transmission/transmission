@@ -68,12 +68,32 @@ struct quitdata
     void         * cbdata;
 };
 
-struct fileswind
+struct infowind
 {
-    GtkWidget    * widget;
-    TrTorrent    * tor;
-    GtkTreeModel * model;
-    guint          timer;
+    GtkWidget             * widget;
+    TrTorrent             * tor;
+    int64_t                 size;
+    GtkTreeModel          * model;
+    GtkTreeRowReference   * row;
+    GtkTreeModel          * filesmodel;
+    guint                   timer;
+    struct
+    {
+        tr_tracker_info_t * track;
+        GtkLabel          * trackwid;
+        GtkLabel          * annwid;
+        GtkLabel          * scrwid;
+        int                 seed;
+        GtkLabel          * seedwid;
+        int                 leech;
+        GtkLabel          * leechwid;
+        int                 done;
+        GtkLabel          * donewid;
+        uint64_t            up;
+        GtkLabel          * upwid;
+        uint64_t            down;
+        GtkLabel          * downwid;
+    }                       inf;
 };
 
 static void
@@ -82,23 +102,31 @@ static void
 dirclick(GtkWidget *widget, gpointer gdata);
 static void
 addresp(GtkWidget *widget, gint resp, gpointer gdata);
+static GtkWidget *
+makeinfotab( TrTorrent * tor, struct infowind * iw );
+static void
+infoupdate( struct infowind * iw, int force );
+void
+fmtpeercount( GtkLabel * label, int count );
 static void
 promptresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 quitresp( GtkWidget * widget, gint resp, gpointer data );
+GtkWidget *
+makefilestab( TrTorrent * tor, GtkTreeModel ** modelret );
 static void
 stylekludge( GObject * obj, GParamSpec * spec, gpointer data );
 static void
-fileswinddead( GtkWidget * widget, gpointer data );
+infowinddead( GtkWidget * widget, gpointer data );
 static void
-filestorclosed( gpointer data, GObject * tor );
+infotorclosed( gpointer data, GObject * tor );
 static void
 parsepath( GtkTreeStore * store, GtkTreeIter * ret,
            const char * path, int index, uint64_t size );
 static uint64_t
 getdirtotals( GtkTreeStore * store, GtkTreeIter * parent );
 static gboolean
-fileswindupdate( gpointer data );
+infowindupdate( gpointer data );
 static float
 updateprogress( GtkTreeModel * model, GtkTreeIter * parent,
                 uint64_t total, float * progress );
@@ -206,118 +234,263 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   gtk_widget_destroy(widget);
 }
 
-#define INFOLINE(tab, ii, nam, val) \
-  do { \
-    char *txt = g_markup_printf_escaped("<b>%s</b>", nam); \
-    GtkWidget *wid = gtk_label_new(NULL); \
-    gtk_misc_set_alignment(GTK_MISC(wid), 0, .5); \
-    gtk_label_set_markup(GTK_LABEL(wid), txt); \
-    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 0, 1, ii, ii + 1); \
-    wid = gtk_label_new(val); \
-    gtk_label_set_selectable(GTK_LABEL(wid), TRUE); \
-    gtk_misc_set_alignment(GTK_MISC(wid), 0, .5); \
-    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 1, 2, ii, ii + 1); \
-    ii++; \
-    g_free(txt); \
-  } while(0)
+void
+makeinfowind( GtkWindow * parent, GtkTreeModel * model, GtkTreePath * path,
+              TrTorrent * tor )
+{
+    struct infowind   * iw;
+    GtkWidget         * wind, * box, * label, * sep, * tabs, * page;
+    tr_info_t         * inf;
+    char              * name, * size;
 
-#define INFOLINEF(tab, ii, fmt, nam, val) \
-  do { \
-    char *buf = g_strdup_printf(fmt, val); \
-    INFOLINE(tab, ii, nam, buf); \
-    g_free(buf); \
-  } while(0)
+    iw   = g_new0( struct infowind, 1 );
+    inf  = tr_torrent_info( tor );
+    name = g_strdup_printf( _("%s - Properties for %s"),
+                            g_get_application_name(), inf->name );
+    wind = gtk_dialog_new_with_buttons( name, parent,
+                                        GTK_DIALOG_DESTROY_WITH_PARENT |
+                                        GTK_DIALOG_NO_SEPARATOR,
+                                        GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                        NULL );
+    g_free( name );
+    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
+    gtk_window_set_resizable( GTK_WINDOW( wind ), TRUE );
+    gtk_window_set_role( GTK_WINDOW( wind ), "tr-info" );
+    gtk_widget_set_name( wind, "TransmissionDialog" );
+    box = GTK_DIALOG( wind )->vbox;
 
-#define INFOLINEA(tab, ii, nam, val) \
-  do { \
-    char *buf = val; \
-    INFOLINE(tab, ii, nam, buf); \
-    g_free(buf); \
-  } while(0)
+    /* add label with file name and size */
+    label = gtk_label_new( NULL );
+    size = readablesize( inf->totalSize );
+    name = g_markup_printf_escaped( "<big>%s (%s)</big>", inf->name, size );
+    free( size );
+    gtk_label_set_markup( GTK_LABEL( label ), name );
+    g_free( name );
+    gtk_label_set_selectable( GTK_LABEL( label ), TRUE );
+    gtk_widget_show( label );
+    gtk_box_pack_start( GTK_BOX( box ), label, FALSE, FALSE, 6 );
 
-#define INFOSEP(tab, ii) \
-  do { \
-    GtkWidget *wid = gtk_hseparator_new(); \
-    gtk_table_attach_defaults(GTK_TABLE(tab), wid, 0, 2, ii, ii + 1); \
-    ii++; \
-  } while(0)
+    /* add separator */
+    sep = gtk_hseparator_new();
+    gtk_widget_show( sep );
+    gtk_box_pack_start( GTK_BOX( box ), sep, FALSE, FALSE, 6 );
+
+    /* add tab bar */
+    tabs = gtk_notebook_new();
+    gtk_widget_show( tabs );
+    gtk_box_pack_start( GTK_BOX( box ), tabs, TRUE, TRUE, 6 );
+
+    /* add general tab */
+    label = gtk_label_new( _("General") );
+    gtk_widget_show( label );
+    page = makeinfotab( tor, iw );
+    gtk_notebook_append_page( GTK_NOTEBOOK( tabs ), page, label );
+
+    /* add files tab */
+    label = gtk_label_new( _("Files") );
+    gtk_widget_show( label );
+    /* XXX should use sizingmagic() here */
+    page = makefilestab( tor, &iw->filesmodel );
+    gtk_notebook_append_page( GTK_NOTEBOOK( tabs ), page, label );
+
+    /* set up the callback data */
+    iw->widget     = wind;
+    iw->tor        = tor;
+    iw->size       = inf->totalSize;
+    iw->model      = model;
+    iw->row        = gtk_tree_row_reference_new( model, path );
+    iw->timer      = g_timeout_add( UPDATE_INTERVAL, infowindupdate, iw );
+
+    g_object_ref( model );
+    g_object_weak_ref( G_OBJECT( tor ), infotorclosed, iw );
+    g_signal_connect( wind, "destroy", G_CALLBACK( infowinddead ), iw );
+    g_signal_connect( wind, "response", G_CALLBACK( gtk_widget_destroy ), 0 );
+    infoupdate( iw, 1 );
+    infowindupdate( iw );
+
+    gtk_widget_show( wind );
+}
+
+#define INFOLINE( tab, ii, nam, val )                                         \
+    do                                                                        \
+    {                                                                         \
+        char     * txt = g_markup_printf_escaped( "<b>%s</b>", (nam) );       \
+        GtkWidget * wid = gtk_label_new( NULL );                              \
+        gtk_misc_set_alignment( GTK_MISC( wid ), 0, .5 );                     \
+        gtk_label_set_markup( GTK_LABEL( wid ), txt );                        \
+        gtk_table_attach( GTK_TABLE( (tab) ), wid, 0, 1, (ii), (ii) + 1,      \
+                          GTK_FILL, GTK_FILL, 0, 0 );                         \
+        gtk_label_set_selectable( GTK_LABEL( (val) ), TRUE );                 \
+        gtk_misc_set_alignment( GTK_MISC( (val) ), 0, .5 );                   \
+        gtk_table_attach( GTK_TABLE( (tab) ), (val), 1, 2, (ii), (ii) + 1,    \
+                          GTK_FILL, GTK_FILL, 0, 0);                          \
+        (ii)++;                                                               \
+        g_free( txt );                                                        \
+    } while( 0 )
+
+#define INFOLINEF( tab, ii, fmt, nam, val )                                   \
+    do                                                                        \
+    {                                                                         \
+        char      * buf = g_strdup_printf( fmt, val );                        \
+        GtkWidget * lwid = gtk_label_new( buf );                              \
+        g_free( buf );                                                        \
+        INFOLINE( tab, ii, nam, lwid );                                       \
+    } while( 0 )
+
+#define INFOLINEW( tab, ii, nam, val )                                        \
+    do                                                                        \
+    {                                                                         \
+        GtkWidget * lwid = gtk_label_new( (val) );                            \
+        INFOLINE( (tab), (ii), (nam), lwid );                                 \
+    } while( 0 )
+
+#define INFOLINEA( tab, ii, nam, val )                                        \
+    do                                                                        \
+    {                                                                         \
+        GtkWidget * lwid = gtk_label_new( (val) );                            \
+        g_free( val );                                                        \
+        INFOLINE( (tab), (ii), (nam), lwid );                                 \
+    } while( 0 )
+
+#define INFOLINEU( tab, ii, nam, stor )                                       \
+    do                                                                        \
+    {                                                                         \
+        GtkWidget * lwid = gtk_label_new( NULL );                             \
+        (stor) = GTK_LABEL( lwid );                                           \
+        INFOLINE( (tab), (ii), (nam), lwid);                                  \
+    } while( 0 )
+
+#define INFOSEP( tab, ii )                                                    \
+    do                                                                        \
+    {                                                                         \
+        GtkWidget * wid = gtk_hseparator_new();                               \
+        gtk_table_attach( GTK_TABLE( (tab) ), wid, 0, 2, (ii), (ii) + 1,      \
+                          GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0 );            \
+        (ii)++;                                                               \
+    } while( 0 )
+
+GtkWidget *
+makeinfotab( TrTorrent * tor, struct infowind * iw )
+{
+    const int   rowcount = 16;
+    tr_info_t * inf;
+    int         ii;
+    GtkWidget * table;
+
+    inf   = tr_torrent_info( tor );
+    table = gtk_table_new( rowcount, 2, FALSE );
+    gtk_table_set_col_spacings( GTK_TABLE( table ), 12 );
+    gtk_table_set_row_spacings( GTK_TABLE( table ), 12 );
+    gtk_container_set_border_width( GTK_CONTAINER( table ), 6 );
+
+    ii = 0;
+
+    INFOLINEU( table, ii, _("Tracker:"),      iw->inf.trackwid );
+    INFOLINEU( table, ii, _("Announce:"),     iw->inf.annwid );
+    INFOLINEU( table, ii, _("Scrape:"),       iw->inf.scrwid );
+    INFOSEP(   table, ii );
+    INFOLINEW( table, ii, _("Info Hash:"),    inf->hashString );
+    INFOLINEA( table, ii, _("Piece Size:"),   readablesize( inf->pieceSize ) );
+    INFOLINEF( table, ii, "%i", _("Pieces:"), inf->pieceCount );
+    INFOLINEA( table, ii, _("Total Size:"),   readablesize( inf->totalSize ) );
+    INFOSEP(   table, ii );
+    INFOLINEU( table, ii, _("Seeders:"),      iw->inf.seedwid );
+    INFOLINEU( table, ii, _("Leechers:"),     iw->inf.leechwid );
+    INFOLINEU( table, ii, _("Completed:"),    iw->inf.donewid );
+    INFOSEP(   table, ii );
+    INFOLINEW( table, ii, _("Directory:"),
+               tr_torrentGetFolder( tr_torrent_handle( tor ) ) );
+    INFOLINEU( table, ii, _("Downloaded:"),   iw->inf.downwid );
+    INFOLINEU( table, ii, _("Uploaded:"),     iw->inf.upwid );
+
+    g_assert( rowcount == ii );
+
+    gtk_widget_show_all( table );
+
+    return table;
+}
 
 void
-makeinfowind(GtkWindow *parent, TrTorrent *tor) {
-  tr_stat_t *sb;
-  tr_info_t *in;
-  GtkWidget *wind, *label;
-  int ii;
-  char *str;
-  const int rowcount = 15;
-  GtkWidget *table = gtk_table_new(rowcount, 2, FALSE);
+infoupdate( struct infowind * iw, int force )
+{
+    int                 seed, leech, done;
+    uint64_t            up, down;
+    tr_tracker_info_t * track;
+    GtkTreePath       * path;
+    GtkTreeIter         iter;
+    char              * str;
 
-  /* XXX should use model and update this window regularly */
+    path = gtk_tree_row_reference_get_path( iw->row );
+    if( NULL == path || !gtk_tree_model_get_iter( iw->model, &iter, path ) )
+    {
+        g_free( path );
+        return;
+    }
+    gtk_tree_model_get( iw->model, &iter, MC_TRACKER, &track,
+                        MC_SEED, &seed, MC_LEECH, &leech, MC_DONE, &done,
+                        MC_DOWN, &down, MC_UP, &up, -1 );
 
-  sb = tr_torrent_stat(tor);
-  in = tr_torrent_info(tor);
-  str = g_strdup_printf(_("%s Properties"), in->name);
-  wind = gtk_dialog_new_with_buttons(str, parent,
-    GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
-    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
-  g_free(str);
+    if( track != iw->inf.track || force )
+    {
+        if( 80 == track->port )
+        {
+            str = g_strdup_printf( "http://%s", track->address );
+        }
+        else
+        {
+            str = g_strdup_printf( "http://%s:%i",
+                                   track->address, track->port );
+        }
+        gtk_label_set_text( iw->inf.trackwid, str );
+        g_free( str );
+        gtk_label_set_text( iw->inf.annwid, track->announce );
+        gtk_label_set_text( iw->inf.scrwid, track->scrape );
+    }
+    if( seed != iw->inf.seed || force )
+    {
+        fmtpeercount( iw->inf.seedwid, seed );
+        iw->inf.seed = seed;
+    }
+    if( leech != iw->inf.leech || force )
+    {
+        fmtpeercount( iw->inf.leechwid, leech );
+        iw->inf.leech = leech;
+    }
+    if( done != iw->inf.done || force )
+    {
+        fmtpeercount( iw->inf.donewid, done );
+        iw->inf.done = done;
+    }
+    if( down != iw->inf.down || force )
+    {
+        str = readablesize( down );
+        gtk_label_set_text( iw->inf.downwid, str );
+        g_free( str );
+        iw->inf.down = down;
+    }
+    if( up != iw->inf.up || force )
+    {
+        str = readablesize( up );
+        gtk_label_set_text( iw->inf.upwid, str );
+        g_free( str );
+        iw->inf.up = up;
+    }
+}
 
-  gtk_window_set_role( GTK_WINDOW( wind ), "tr-info" );
-  gtk_widget_set_name(wind, "TransmissionDialog");
-  gtk_table_set_col_spacings(GTK_TABLE(table), 12);
-  gtk_table_set_row_spacings(GTK_TABLE(table), 12);
-  gtk_dialog_set_default_response(GTK_DIALOG(wind), GTK_RESPONSE_ACCEPT);
-  gtk_container_set_border_width(GTK_CONTAINER(table), 6);
-  gtk_window_set_resizable(GTK_WINDOW(wind), FALSE);
+void
+fmtpeercount( GtkLabel * label, int count )
+{
+    char str[16];
 
-  label = gtk_label_new(NULL);
-  gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-  str = g_markup_printf_escaped("<big>%s</big>", in->name);
-  gtk_label_set_markup(GTK_LABEL(label), str);
-  g_free(str);
-  gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
-
-  ii = 1;
-
-  INFOSEP(table, ii);
-
-  if(80 == sb->tracker->port)
-    INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s",
-              sb->tracker->address));
-  else
-    INFOLINEA(table, ii, _("Tracker:"), g_strdup_printf("http://%s:%i",
-              sb->tracker->address, sb->tracker->port));
-  INFOLINE(table, ii, _("Announce:"), sb->tracker->announce);
-  INFOLINEA(table, ii, _("Piece Size:"), readablesize(in->pieceSize));
-  INFOLINEF(table, ii, "%i", _("Pieces:"), in->pieceCount);
-  INFOLINEA(table, ii, _("Total Size:"), readablesize(in->totalSize));
-  if(0 > sb->seeders)
-    INFOLINE(table, ii, _("Seeders:"), _("?"));
-  else
-    INFOLINEF(table, ii, "%i", _("Seeders:"), sb->seeders);
-  if(0 > sb->leechers)
-    INFOLINE(table, ii, _("Leechers:"), _("?"));
-  else
-    INFOLINEF(table, ii, "%i", _("Leechers:"), sb->leechers);
-  if(0 > sb->completedFromTracker)
-    INFOLINE(table, ii, _("Completed:"), _("?"));
-  else
-    INFOLINEF(table, ii, "%i", _("Completed:"), sb->completedFromTracker);
-
-  INFOSEP(table, ii);
-
-  INFOLINE(table, ii, _("Directory:"), tr_torrentGetFolder(tr_torrent_handle(tor)));
-  INFOLINEA(table, ii, _("Downloaded:"), readablesize(sb->downloaded));
-  INFOLINEA(table, ii, _("Uploaded:"), readablesize(sb->uploaded));
-
-  INFOSEP(table, ii);
-
-  g_assert(rowcount == ii);
-
-  gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(wind)->vbox), table);
-  g_signal_connect(G_OBJECT(wind), "response",
-                   G_CALLBACK(gtk_widget_destroy), NULL);
-  gtk_widget_show_all(wind);
+    if( 0 > count )
+    {
+        gtk_label_set_text( label, _("?") );
+    }
+    else
+    {
+        snprintf( str, sizeof str, "%i", count );
+        gtk_label_set_text( label, str );
+    }
 }
 
 void
@@ -413,8 +586,8 @@ enum filescols
     FC_STOCK = 0, FC_LABEL, FC_PROG, FC_KEY, FC_INDEX, FC_SIZE, FC__MAX
 };
 
-void
-makefileswind( GtkWindow * parent, TrTorrent * tor )
+GtkWidget *
+makefilestab( TrTorrent * tor, GtkTreeModel ** modelret )
 {
     GType cols[] =
     {
@@ -424,18 +597,18 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     tr_info_t         * inf;
     GtkTreeStore      * store;
     int                 ii;
-    GtkWidget         * view, * scroll, * frame, * wind;
-    GtkCellRenderer   * rend, * elip;
+    GtkWidget         * view, * scroll, * frame;
+    GtkCellRenderer   * rend;
     GtkTreeViewColumn * col;
     GtkTreeSelection  * sel;
     char              * label;
-    struct fileswind  * fw;
 
     g_assert( ALEN( cols ) == FC__MAX );
 
     /* set up the model */
-    inf   = tr_torrent_info( tor );
-    store = gtk_tree_store_newv( FC__MAX, cols );
+    inf       = tr_torrent_info( tor );
+    store     = gtk_tree_store_newv( FC__MAX, cols );
+    *modelret = GTK_TREE_MODEL( store );
     for( ii = 0; ii < inf->fileCount; ii++ )
     {
         parsepath( store, NULL, STRIPROOT( inf->files[ii].name ),
@@ -458,7 +631,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     gtk_tree_view_column_add_attribute( col, rend, "stock-id", FC_STOCK );
     /* add text renderer */
     rend = gtk_cell_renderer_text_new();
-    elip = rend;
+    g_object_set( rend, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
     gtk_tree_view_column_pack_start( col, rend, TRUE );
     gtk_tree_view_column_add_attribute( col, rend, "markup", FC_LABEL );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
@@ -484,6 +657,8 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),
+                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC );
     gtk_container_add( GTK_CONTAINER( scroll ), view );
     gtk_widget_show( scroll );
 
@@ -493,36 +668,7 @@ makefileswind( GtkWindow * parent, TrTorrent * tor )
     gtk_container_add( GTK_CONTAINER( frame ), scroll );
     gtk_widget_show( frame );
 
-    /* create the window */
-    label = g_strdup_printf( _("%s - Files for %s"),
-                             g_get_application_name(), inf->name );
-    wind = gtk_dialog_new_with_buttons( label, parent,
-                                        GTK_DIALOG_DESTROY_WITH_PARENT |
-                                        GTK_DIALOG_NO_SEPARATOR, 
-                                        GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-                                        NULL );
-    g_free( label );
-    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
-    gtk_window_set_resizable( GTK_WINDOW( wind ), TRUE );
-    gtk_box_pack_start_defaults( GTK_BOX( GTK_DIALOG( wind )->vbox ), frame );
-    gtk_window_set_role( GTK_WINDOW( wind ), "tr-files" );
-
-    /* set up the callback data */
-    fw         = g_new0( struct fileswind, 1 );
-    fw->widget = wind;
-    fw->tor    = tor;
-    fw->model  = GTK_TREE_MODEL( store );
-    fw->timer  = g_timeout_add( UPDATE_INTERVAL, fileswindupdate, fw );
-
-    g_object_weak_ref( G_OBJECT( tor ), filestorclosed, fw );
-    g_signal_connect( wind, "destroy", G_CALLBACK( fileswinddead ), fw );
-    g_signal_connect( wind, "response", G_CALLBACK( gtk_widget_destroy ), 0 );
-    fileswindupdate( fw );
-
-    sizingmagic( GTK_WINDOW( wind ), GTK_SCROLLED_WINDOW( scroll ),
-                 GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-    g_object_set( elip, "ellipsize", PANGO_ELLIPSIZE_END, NULL );
-    gtk_widget_show( wind );
+    return frame;
 }
 
 /* kludge to have the progress bars notice theme changes */
@@ -539,23 +685,25 @@ stylekludge( GObject * obj, GParamSpec * spec, gpointer data )
 }
 
 static void
-fileswinddead( GtkWidget * widget SHUTUP, gpointer data )
+infowinddead( GtkWidget * widget SHUTUP, gpointer data )
 {
-    struct fileswind * fw = data;
+    struct infowind * iw = data;
 
-    g_object_weak_unref( G_OBJECT( fw->tor ), filestorclosed, fw );
-    filestorclosed( fw, G_OBJECT( fw->tor ) );
+    g_object_weak_unref( G_OBJECT( iw->tor ), infotorclosed, iw );
+    infotorclosed( iw, G_OBJECT( iw->tor ) );
 }
 
 static void
-filestorclosed( gpointer data, GObject * tor SHUTUP )
+infotorclosed( gpointer data, GObject * tor SHUTUP )
 {
-    struct fileswind * fw = data;
+    struct infowind * iw = data;
 
-    g_source_remove( fw->timer );
-    g_object_unref( fw->model );
-    gtk_widget_destroy( fw->widget );
-    g_free( fw );
+    g_source_remove( iw->timer );
+    g_object_unref( iw->filesmodel );
+    g_object_unref( iw->model );
+    gtk_tree_row_reference_free( iw->row );
+    gtk_widget_destroy( iw->widget );
+    g_free( iw );
 }
 
 static void
@@ -656,17 +804,16 @@ getdirtotals( GtkTreeStore * store, GtkTreeIter * parent )
 }
 
 static gboolean
-fileswindupdate( gpointer data )
+infowindupdate( gpointer data )
 {
-    struct fileswind * fw;
-    tr_info_t        * inf;
+    struct infowind  * iw;
     float            * progress;
 
-    fw       = data;
-    inf      = tr_torrent_info( fw->tor );
-    progress = tr_torrentCompletion( tr_torrent_handle( fw->tor ) );
-    updateprogress( fw->model, NULL, inf->totalSize, progress );
+    iw       = data;
+    progress = tr_torrentCompletion( tr_torrent_handle( iw->tor ) );
+    updateprogress( iw->filesmodel, NULL, iw->size, progress );
     free( progress );
+    infoupdate( iw, 0 );
 
     return TRUE;
 }

@@ -42,7 +42,8 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata);
 
 /* show the info window for a torrent */
 void
-makeinfowind(GtkWindow *parent, TrTorrent *tor);
+makeinfowind( GtkWindow * parent, GtkTreeModel * model, GtkTreePath * path,
+              TrTorrent * tor );
 
 /* prompt for a download directory for torrents, then add them */
 void
@@ -52,9 +53,5 @@ promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void
 askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata );
-
-/* create a window listing a torrent's files */
-void
-makefileswind( GtkWindow * parent, TrTorrent * tor );
 
 #endif /* TG_PREFS_H */

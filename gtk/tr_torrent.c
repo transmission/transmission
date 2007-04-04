@@ -62,6 +62,32 @@ tr_torrent_set_folder(TrTorrent *tor);
 static gboolean
 tr_torrent_paused(TrTorrent *tor);
 
+static gpointer
+tracker_boxed_fake_copy( gpointer boxed )
+{
+    return boxed;
+}
+
+static void
+tracker_boxed_fake_free( gpointer boxed SHUTUP )
+{
+}
+
+GType
+tr_tracker_boxed_get_type( void )
+{
+    static GType type = 0;
+
+    if( 0 == type )
+    {
+        type = g_boxed_type_register_static( "TrTrackerBoxed",
+                                             tracker_boxed_fake_copy,
+                                             tracker_boxed_fake_free );
+    }
+
+    return type;
+}
+
 GType
 tr_torrent_get_type(void) {
   static GType type = 0;

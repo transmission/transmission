@@ -30,6 +30,11 @@
 #include "transmission.h"
 #include "bencode.h"
 
+/* boxed type for tr_tracker_info_t */
+#define TR_TRACKER_BOXED_TYPE (tr_tracker_boxed_get_type ())
+GType
+tr_tracker_boxed_get_type( void );
+
 #define TR_TORRENT_TYPE		  (tr_torrent_get_type ())
 #define TR_TORRENT(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), TR_TORRENT_TYPE, TrTorrent))
