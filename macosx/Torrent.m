@@ -1081,9 +1081,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->rateUpload;
 }
 
-- (float) downloadedValid
+- (uint64_t) downloadedValid
 {
-    return [self progress] * [self size];
+    return fInfo->totalSize - fStat->left;
 }
 
 - (uint64_t) downloadedTotal

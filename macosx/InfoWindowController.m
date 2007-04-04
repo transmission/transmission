@@ -331,8 +331,7 @@
     if (numberSelected == 0)
         return;
     
-    float downloadedValid = 0;
-    uint64_t downloadedTotal = 0, uploadedTotal = 0;
+    uint64_t  downloadedValid = 0, downloadedTotal = 0, uploadedTotal = 0;
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
