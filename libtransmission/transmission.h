@@ -440,6 +440,7 @@ struct tr_stat_s
     int                 leechers;
     int                 completedFromTracker;
 
+    uint64_t            left;
     uint64_t            downloaded;
     uint64_t            uploaded;
     float               swarmspeed;
