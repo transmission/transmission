@@ -20,7 +20,7 @@
 .\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 .\" DEALINGS IN THE SOFTWARE.
 
-.Dd March 30, 2007
+.Dd April 3, 2007
 .Dt TRANSMISSION-GTK 1
 .Os
 .Sh NAME
@@ -37,6 +37,12 @@ The
 .Nm
 program is a lightweight BitTorrent client with a simple, intuitive
 GTK+ interface.
+.Pp
+BitTorrent is a peer-to-peer file transfer protocol which uses a
+torrent metainfo file (usually with the .torrent file extension) and a
+central tracker to distribute file data amongst a group of peers. For
+more information on the BitTorrent protocol see
+http://www.bittorrent.org/
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -58,7 +64,13 @@ by adding them to the command line.  If
 is already running, those torrents will be opened in the running
 instance.
 .Sh FILES
-.Pa ~/.transmission
+.Bl -tag -width Ds -compact
+.It ~/.transmission
+The directory which
+.Nm
+uses to store user preferences, resume information and state, and the
+socket file used for IPC.
+.El
 .Sh AUTHORS
 .An -nosplit
 The
@@ -69,9 +81,6 @@ program was written by
 and
 .An Mitchell Livingston Aq livings124@gmail.com .
 .Sh SEE ALSO
-.Xr transmissioncli 1 ,
-.Xr transmission-daemon 1 ,
-.Xr transmission-proxy 1 ,
-.Xr transmission-remote 1
+.Xr transmissioncli 1
 .Pp
 http://transmission.m0k.org
