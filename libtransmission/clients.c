@@ -182,6 +182,12 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "BitBuddy %c.%c%c%c",
                       id[3], id[4], id[5], id[6] );
         }
+		else if( !memcmp( &id[1], "qB", 2 ) )
+        {
+            asprintf( &ret, "qBittorrent %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
+        }
         
         if( ret )
         {
