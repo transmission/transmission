@@ -126,23 +126,23 @@ tr_window_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->get_property = tr_window_get_property;
     gobject_class->dispose      = tr_window_dispose;
 
-    pspec = g_param_spec_object( "model", _("Model"),
-                                 _("The GtkTreeModel for the list view."),
+    pspec = g_param_spec_object( "model", "Model",
+                                 "The GtkTreeModel for the list view.",
                                  GTK_TYPE_TREE_MODEL, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_MODEL, pspec );
 
-    pspec = g_param_spec_object( "selection", _("Selection"),
-                                 _("The GtkTreeSelection for the list view."),
+    pspec = g_param_spec_object( "selection", "Selection",
+                                 "The GtkTreeSelection for the list view.",
                                  GTK_TYPE_TREE_SELECTION, G_PARAM_READABLE );
     g_object_class_install_property( gobject_class, PROP_SELECTION, pspec );
 
-    pspec = g_param_spec_int( "double-click-action", _("Double-click action"),
-                              _("The action id to signal on a double click."),
+    pspec = g_param_spec_int( "double-click-action", "Double-click action",
+                              "The action id to signal on a double click.",
                               G_MININT, G_MAXINT, -1, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_DOUBLECLICK, pspec );
 
-    pspec = g_param_spec_object( "drag-widget", _("Drag widget"),
-                                 _("The GtkWidget used for drag-and-drop."),
+    pspec = g_param_spec_object( "drag-widget", "Drag widget",
+                                 "The GtkWidget used for drag-and-drop.",
                                  GTK_TYPE_WIDGET, G_PARAM_READABLE );
     g_object_class_install_property( gobject_class, PROP_DRAG, pspec );
 

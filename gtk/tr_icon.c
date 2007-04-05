@@ -103,18 +103,18 @@ tr_icon_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->get_property = tr_icon_get_property;
     gobject_class->dispose      = tr_icon_dispose;
 
-    pspec = g_param_spec_boolean( "icon", _("Icon"),
-                                 _("Icon has been set from default window icon."),
+    pspec = g_param_spec_boolean( "icon", "Icon",
+                                  "Icon has been set from default window icon.",
                                   TRUE, G_PARAM_CONSTRUCT|G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_ICON, pspec );
 
-    pspec = g_param_spec_boolean( "docked", _("Docked"),
-                                 _("Icon is docked in a system tray."),
+    pspec = g_param_spec_boolean( "docked", "Docked",
+                                 "Icon is docked in a system tray.",
                                   FALSE, G_PARAM_READABLE );
     g_object_class_install_property( gobject_class, PROP_DOCKED, pspec );
 
-    pspec = g_param_spec_int( "activate-action", _("Activate action"),
-                              _("The action id to signal when icon is activated."),
+    pspec = g_param_spec_int( "activate-action", "Activate action",
+                              "The action id to signal when icon is activated.",
                               G_MININT, G_MAXINT, -1, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_CLICK, pspec );
 

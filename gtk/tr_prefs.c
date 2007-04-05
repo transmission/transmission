@@ -312,8 +312,8 @@ tr_prefs_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->get_property = tr_prefs_get_property;
     gobject_class->dispose      = tr_prefs_dispose;
 
-    pspec = g_param_spec_object( "parent", _("Parent"),
-                                 _("The parent GtkWindow."),
+    pspec = g_param_spec_object( "parent", "Parent",
+                                 "The parent GtkWindow.",
                                  GTK_TYPE_WINDOW, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_PARENT, pspec );
 

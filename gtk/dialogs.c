@@ -655,7 +655,7 @@ makefilestab( TrTorrent * tor, GtkTreeModel ** modelret )
     col = gtk_tree_view_column_new();
     gtk_tree_view_column_set_title( col, _("Progress") );
     rend = tr_cell_renderer_progress_new();
-    /* this string is only used to determing the size of the progress bar */
+    /* this string is only used to determine the size of the progress bar */
     label = g_markup_printf_escaped( "<small>%s</small>", _("  fnord    fnord  ") );
     g_object_set( rend, "show-text", FALSE, "bar-sizing", label, NULL );
     g_free( label );
