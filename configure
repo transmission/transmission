@@ -333,9 +333,10 @@ else
 
 *** GTK+ was not found, transmission-gtk will *NOT* be built. If you
 *** wish to use the graphical version of Transmission then you will
-*** need to install GTK+ headers and libraries. Try looking for a
-*** package called libgtk2.0-dev or gtk2-devel and installing it, then
-*** re-running this script.
+*** need to install GTK+ headers and libraries. Try using your
+*** distribution's package management utility to find a package called
+*** libgtk2.0-dev, gtk2-devel, or something similar; then install it
+*** and re-run this script.
 EOF
   fi
 fi
