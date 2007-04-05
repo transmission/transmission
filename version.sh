@@ -9,7 +9,7 @@ MAINT=1
 # 0 for release, 1 otherwise
 DEV=1
 
-STRING=0.7-svn
+STRING=0.7.0-svn
 
 # Get current SVN revision from Ids in all source files
 REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
