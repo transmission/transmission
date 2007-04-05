@@ -54,6 +54,17 @@ static inline int parseChoke( tr_torrent_t * tor, tr_peer_t * peer,
         {
             r = &peer->inRequests[i];
             tr_cpDownloaderRem( tor->completion, tr_block(r->index,r->begin) );
+
+            /* According to the spec, all requests are dropped when you
+               are choked, however some clients seem to remember those
+               the next time they unchoke you. Also, if you get quickly
+               choked and unchoked while you are sending requests, you
+               can't know when the other peer received them and how it
+               handled it.
+               This can cause us to receive blocks multiple times and
+               overdownload, so we send 'cancel' messages to try and
+               reduce that. */
+            sendCancel( peer, r->index, r->begin, r->length );
         }
         peer->inRequestCount = 0;
     }
@@ -281,6 +292,7 @@ static inline void updateRequests( tr_torrent_t * tor, tr_peer_t * peer,
     {
         /* Not in the list. Probably because of a cancel that arrived
            too late */
+        peer_dbg( "wasn't expecting this block" );
     }
 }
 
@@ -316,7 +328,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
               index, begin, len - 8 );
 
     updateRequests( tor, peer, index, begin );
-    tor->downloadedCur += len;
+    tor->downloadedCur += len - 8;
 
     /* Sanity checks */
     if( len - 8 != tr_blockSize( block ) )
@@ -343,7 +355,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return ret;
     }
     tr_cpBlockAdd( tor->completion, block );
-    sendCancel( tor, block );
+    broadcastCancel( tor, index, begin, len - 8 );
 
     if( !tr_cpPieceHasAllBlocks( tor->completion, index ) )
     {

@@ -334,10 +334,28 @@ static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
  ***********************************************************************
  *
  **********************************************************************/
-static void sendCancel( tr_torrent_t * tor, int block )
+static void sendCancel( tr_peer_t * peer, int index, int begin,
+                        int length )
+{
+    uint8_t * p;
+    p = getMessagePointer( peer, 12, PEER_MSG_CANCEL );
+
+    TR_HTONL( index,  p     );
+    TR_HTONL( begin,  p + 4 );
+    TR_HTONL( length, p + 8 );
+
+    peer_dbg( "SEND cancel %d/%d (%d bytes)", index, begin, length );
+}
+
+/***********************************************************************
+ * broadcastCancel
+ ***********************************************************************
+ *
+ **********************************************************************/
+static void broadcastCancel( tr_torrent_t * tor, int index, int begin,
+                             int length )
 {
     int i, j;
-    uint8_t * p;
     tr_peer_t * peer;
     tr_request_t * r;
 
@@ -345,24 +363,17 @@ static void sendCancel( tr_torrent_t * tor, int block )
     {
         peer = tor->peers[i];
 
-        for( j = 1; j < peer->inRequestCount; j++ )
+        for( j = 0; j < peer->inRequestCount; j++ )
         {
             r = &peer->inRequests[j];
 
-            if( block != tr_block( r->index, r->begin ) )
+            if( r->index != index || r->begin != begin ||
+                r->length != length )
             {
                 continue;
             }
 
-            p = getMessagePointer( peer, 12, PEER_MSG_CANCEL );
-        
-            /* Build the "cancel" message */
-            TR_HTONL( r->index,  p     );
-            TR_HTONL( r->begin,  p + 4 );
-            TR_HTONL( r->length, p + 8 );
-
-            peer_dbg( "SEND cancel %d/%d (%d bytes)",
-                      r->index, r->begin, r->length );
+            sendCancel( peer, index, begin, length );
 
             (peer->inRequestCount)--;
             memmove( &peer->inRequests[j], &peer->inRequests[j+1],
@@ -371,6 +382,8 @@ static void sendCancel( tr_torrent_t * tor, int block )
         }
     }
 }
+
+
 
 /***********************************************************************
  * sendExtended
