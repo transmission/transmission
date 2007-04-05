@@ -253,11 +253,10 @@ static inline int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
     return TR_OK;
 }
 
-static inline void updateRequests( tr_torrent_t * tor, tr_peer_t * peer,
-                                   int index, int begin )
+static inline void updateRequests( tr_peer_t * peer, int index, int begin )
 {
     tr_request_t * r;
-    int i, j;
+    int i;
 
     /* Find this block in the requests list */
     for( i = 0; i < peer->inRequestCount; i++ )
@@ -269,24 +268,14 @@ static inline void updateRequests( tr_torrent_t * tor, tr_peer_t * peer,
         }
     }
 
-    /* Usually i should be 0, but some clients don't handle multiple
-       request well and drop previous requests */
+    /* Usually 'i' would be 0, but some clients don't handle multiple
+       requests and drop previous requests, some other clients don't
+       send blocks in the same order we sent the requests */
     if( i < peer->inRequestCount )
     {
-        if( i > 0 )
-        {
-            peer_dbg( "not expecting this block yet (%d requests dropped)", i );
-        }
-        i++;
-        for( j = 0; j < i; j++ )
-        {
-            r = &peer->inRequests[j];
-            tr_cpDownloaderRem( tor->completion,
-                                tr_block( r->index, r->begin ) );
-        }
-        peer->inRequestCount -= i;
-        memmove( &peer->inRequests[0], &peer->inRequests[i],
-                 peer->inRequestCount * sizeof( tr_request_t ) );
+        peer->inRequestCount--;
+        memmove( &peer->inRequests[i], &peer->inRequests[i+1],
+                 ( peer->inRequestCount - i ) * sizeof( tr_request_t ) );
     }
     else
     {
@@ -327,7 +316,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     peer_dbg( "GET  piece %d/%d (%d bytes)",
               index, begin, len - 8 );
 
-    updateRequests( tor, peer, index, begin );
+    updateRequests( peer, index, begin );
     tor->downloadedCur += len - 8;
 
     /* Sanity checks */
