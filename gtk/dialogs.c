@@ -560,6 +560,12 @@ askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata )
     struct quitdata * stuff;
     GtkWidget * wind;
 
+    if( !tr_prefs_get_bool_with_default( PREF_ID_ASKQUIT ) )
+    {
+        func( cbdata );
+        return;
+    }
+
     stuff          = g_new( struct quitdata, 1 );
     stuff->func    = func;
     stuff->cbdata  = cbdata;

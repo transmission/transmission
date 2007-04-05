@@ -129,6 +129,11 @@ defs[] =
       N_("Display an _icon in the system tray"),
       N_("Use a system tray / dock / notification area icon") },
 
+    /* PREF_ID_ASKQUIT */
+    { "ask-quit",               G_TYPE_BOOLEAN, PR_ENABLED,  NULL,
+      N_("Confirm _quit"),
+      N_("Prompt for confirmation when quitting") },
+
     /* PREF_ID_ADDSTD */
     { "add-behavior-standard",  G_TYPE_NONE,    PR_ENABLED,
       gtk_combo_box_get_type,
@@ -186,6 +191,8 @@ defs_bool[] =
     /* PREF_ID_PEX */
     { TRUE,  -1,                FALSE },
     /* PREF_ID_ICON */
+    { TRUE,  -1,                FALSE },
+    /* PREF_ID_ASKQUIT */
     { TRUE,  -1,                FALSE },
 };
 
