@@ -1,0 +1,169 @@
+{
+    IBClasses = (
+        {CLASS = ActionPopUpButton; LANGUAGE = ObjC; SUPERCLASS = NSPopUpButton; }, 
+        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
+        {
+            ACTIONS = {
+                announceSelectedTorrents = id; 
+                applyFilter = id; 
+                applySpeedLimit = id; 
+                copyTorrentFile = id; 
+                doNothing = id; 
+                linkForums = id; 
+                linkHomepage = id; 
+                openShowSheet = id; 
+                openURLCancelEndSheet = id; 
+                openURLEndSheet = id; 
+                openURLShowSheet = id; 
+                removeDeleteData = id; 
+                removeDeleteDataAndTorrent = id; 
+                removeDeleteTorrent = id; 
+                removeNoDelete = id; 
+                resumeAllTorrents = id; 
+                resumeSelectedTorrents = id; 
+                resumeSelectedTorrentsNoWait = id; 
+                resumeWaitingTorrents = id; 
+                revealFile = id; 
+                setFilter = id; 
+                setInfoTab = id; 
+                setLimitGlobalEnabled = id; 
+                setQuickLimitGlobal = id; 
+                setQuickRatioGlobal = id; 
+                setSort = id; 
+                showInfo = id; 
+                showMainWindow = id; 
+                showMessageWindow = id; 
+                showPreferenceWindow = id; 
+                stopAllTorrents = id; 
+                stopSelectedTorrents = id; 
+                switchFilter = id; 
+                toggleAdvancedBar = id; 
+                toggleFilterBar = id; 
+                toggleSmallView = id; 
+                toggleSpeedLimit = id; 
+                toggleStatusBar = id; 
+            }; 
+            CLASS = Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fActionButton = NSButton; 
+                fDateSortActionItem = NSMenuItem; 
+                fDateSortItem = NSMenuItem; 
+                fDockMenu = NSMenu; 
+                fDownloadFilterButton = BarButton; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
+                fFilterBar = ImageBackgroundView; 
+                fNameSortActionItem = NSMenuItem; 
+                fNameSortItem = NSMenuItem; 
+                fNextFilterItem = NSMenuItem; 
+                fNextInfoTabItem = NSMenuItem; 
+                fNoFilterButton = BarButton; 
+                fOpenIgnoreDownloadFolder = NSMenuItem; 
+                fOrderSortActionItem = NSMenuItem; 
+                fOrderSortItem = NSMenuItem; 
+                fPauseFilterButton = BarButton; 
+                fPrevFilterItem = NSMenuItem; 
+                fPrevInfoTabItem = NSMenuItem; 
+                fProgressSortActionItem = NSMenuItem; 
+                fProgressSortItem = NSMenuItem; 
+                fScrollView = NSScrollView; 
+                fSearchFilterField = NSSearchField; 
+                fSeedFilterButton = BarButton; 
+                fSpeedLimitButton = NSButton; 
+                fStateSortActionItem = NSMenuItem; 
+                fStateSortItem = NSMenuItem; 
+                fStatusBar = ImageBackgroundView; 
+                fTableView = TorrentTableView; 
+                fTotalDLField = NSTextField; 
+                fTotalTorrentsField = NSTextField; 
+                fTotalULField = NSTextField; 
+                fURLSheetTextField = NSTextField; 
+                fURLSheetWindow = NSWindow; 
+                fUpdater = SUUpdater; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {deselectAll = id; revealFile = id; setNextTab = id; setPreviousTab = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = NameCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
+        {
+            ACTIONS = {
+                folderSheetShow = id; 
+                setAutoStart = id; 
+                setBadge = id; 
+                setDownloadLocation = id; 
+                setLimit = id; 
+                setLimitCheck = id; 
+                setLimitMenu = id; 
+                setPort = id; 
+                setQuickRatio = id; 
+                setQuickSpeed = id; 
+                setRatio = id; 
+                setRatioCheck = id; 
+                setRatioMenu = id; 
+                setShowMessage = id; 
+                setUpdate = id; 
+            }; 
+            CLASS = PrefsController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fAutoStartCheck = NSButton; 
+                fBadgeDownloadRateCheck = NSButton; 
+                fBadgeUploadRateCheck = NSButton; 
+                fBlankView = NSView; 
+                fDownloadCheck = NSButton; 
+                fDownloadField = NSTextField; 
+                fDownloadLimitItem = NSMenuItem; 
+                fDownloadMenu = NSMenu; 
+                fDownloadNoLimitItem = NSMenuItem; 
+                fFolderPopUp = NSPopUpButton; 
+                fGeneralView = NSView; 
+                fNetworkView = NSView; 
+                fPortField = NSTextField; 
+                fPrefsWindow = NSPanel; 
+                fQuitCheck = NSButton; 
+                fRatioCheck = NSButton; 
+                fRatioField = NSTextField; 
+                fRatioNotSetItem = NSMenuItem; 
+                fRatioSetItem = NSMenuItem; 
+                fRemoveCheck = NSButton; 
+                fTransfersView = NSView; 
+                fUpdatePopUp = NSPopUpButton; 
+                fUpdater = SUUpdater; 
+                fUploadCheck = NSButton; 
+                fUploadField = NSTextField; 
+                fUploadLimitItem = NSMenuItem; 
+                fUploadMenu = NSMenu; 
+                fUploadNoLimitItem = NSMenuItem; 
+                fWindow = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = ProgressCell; LANGUAGE = ObjC; SUPERCLASS = NSCell; }, 
+        {
+            ACTIONS = {checkForUpdates = id; }; 
+            CLASS = SUUpdater; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = TorrentTableView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fContextNoRow = NSMenu; fContextRow = NSMenu; fController = Controller; }; 
+            SUPERCLASS = NSTableView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

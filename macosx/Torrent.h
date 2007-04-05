@@ -176,7 +176,7 @@
 
 - (float)       downloadRate;
 - (float)       uploadRate;
-- (uint64_t)       downloadedValid;
+- (uint64_t)	downloadedValid;
 - (uint64_t)    downloadedTotal;
 - (uint64_t)    uploadedTotal;
 - (float)       swarmSpeed;

@@ -206,6 +206,13 @@
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Transmission_Prefix.pch; path = macosx/Transmission_Prefix.pch; sourceTree = "<group>"; };
 		35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOn.png; path = macosx/Images/ResumeNoWaitOn.png; sourceTree = "<group>"; };
 		35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOff.png; path = macosx/Images/ResumeNoWaitOff.png; sourceTree = "<group>"; };
+		4C9F8EFA0BC5B629002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = French; path = macosx/French.lproj/Credits.rtf; sourceTree = "<group>"; };
+		4C9F8F060BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4C9F8F070BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		4C9F8F080BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4C9F8F090BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		4C9F8F0A0BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		4C9F8F0B0BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsController.h; path = macosx/PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsController.m; path = macosx/PrefsController.m; sourceTree = "<group>"; };
@@ -974,6 +981,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
+				4C9F8F060BC5B68A002E5433 /* French */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -982,6 +990,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
+				4C9F8F090BC5B68A002E5433 /* French */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -990,6 +999,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A200B9630A227FD0007BBB1E /* English */,
+				4C9F8F070BC5B68A002E5433 /* French */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -998,6 +1008,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A21567EC0A9A5034004DECD6 /* English */,
+				4C9F8F0A0BC5B68A002E5433 /* French */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1006,6 +1017,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A22A8D550AEEAFA5007E9CB9 /* English */,
+				4C9F8F080BC5B68A002E5433 /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1014,6 +1026,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2F8951E0A2D4BA500ED2127 /* English */,
+				4C9F8EFA0BC5B629002E5433 /* French */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
@@ -1022,6 +1035,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2912C530A2956E80097A0CA /* English */,
+				4C9F8F0B0BC5B68A002E5433 /* French */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
