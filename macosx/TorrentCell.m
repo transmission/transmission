@@ -97,19 +97,20 @@
     NSDictionary * info = [self objectValue];
 
     width -= 2.0;
-    
-    BOOL seeding = [[info objectForKey: @"Seeding"] boolValue],
-        isActive = [[info objectForKey: @"Active"] boolValue];
     float completedWidth, remainingWidth;
     
     //bar images and widths
     NSImage * barLeftEnd, * barRightEnd, * barComplete, * barRemaining;
-    if (seeding)
+    if ([[info objectForKey: @"Seeding"] boolValue])
     {
         float stopRatio, ratio;
         if ((stopRatio = [[info objectForKey: @"StopRatio"] floatValue]) != INVALID
                 && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio)
+		{
+			if (ratio < 0)
+				ratio = 0;
             completedWidth = width * ratio / stopRatio;
+		}
         else
             completedWidth = width;
         remainingWidth = width - completedWidth;
@@ -124,6 +125,8 @@
         completedWidth = [[info objectForKey: @"Progress"] floatValue] * width;
         remainingWidth = width - completedWidth;
         
+		BOOL isActive = [[info objectForKey: @"Active"] boolValue];
+		
         if (remainingWidth == width)
             barLeftEnd = fProgressEndWhite;
         else if (isActive)
