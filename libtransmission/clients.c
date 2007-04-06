@@ -335,7 +335,7 @@ char * tr_clientForId( uint8_t * id )
         }
         else
         {
-            asprintf( &ret, "unknown client (0x%02x%02x%02x%02x%02x%02x%02x%02x",
+            asprintf( &ret, "unknown client (0x%02x%02x%02x%02x%02x%02x%02x%02x)",
                   id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
         }
     }
