@@ -44,8 +44,6 @@
     if ((self = [super init]))
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
-        
-        fStatusRegular = [fDefaults boolForKey: @"SmallStatusRegular"];
     
         NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
         
@@ -181,8 +179,7 @@
 
 - (void) toggleMinimalStatus
 {
-    fStatusRegular = !fStatusRegular;
-    [fDefaults setBool: fStatusRegular forKey: @"SmallStatusRegular"];
+    [fDefaults setBool: ![fDefaults boolForKey: @"SmallStatusRegular"] forKey: @"SmallStatusRegular"];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) view
@@ -288,7 +285,7 @@
         NSString * nameString = [info objectForKey: @"Name"];
         NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
         
-        NSString * statusString = !fStatusRegular && [[info objectForKey: @"Active"] boolValue]
+        NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [[info objectForKey: @"Active"] boolValue]
                                         ? [info objectForKey: @"RemainingTimeString"]
                                         : [info objectForKey: @"ShortStatusString"];
         NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];

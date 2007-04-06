@@ -30,8 +30,6 @@
 
 @interface TorrentCell : NSCell
 {
-    BOOL fStatusRegular;
-    
     NSImage * fProgressWhite, * fProgressBlue, * fProgressGray, * fProgressGreen,
                     * fProgressAdvanced, * fProgressEndWhite, * fProgressEndBlue,
                     * fProgressEndGray, * fProgressEndGreen, * fProgressLightGreen,
