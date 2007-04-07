@@ -430,4 +430,3 @@ msgstr "indisp."
 #: util.c:96
 msgid "∞"
 msgstr "∞"
-

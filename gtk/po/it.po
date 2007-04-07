@@ -429,4 +429,3 @@ msgstr "N/D"
 #: util.c:96
 msgid "∞"
 msgstr "∞"
-

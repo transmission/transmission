@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: conf.c:95 conf.c:374
 #, c-format
@@ -38,7 +38,8 @@ msgstr "Ya se está ejecutando otra copia de %s"
 msgid ""
 "Failed to lock the file %s:\n"
 "%s"
-msgstr "Falló intentando bloquear el archivo %s:\n"
+msgstr ""
+"Falló intentando bloquear el archivo %s:\n"
 "%s"
 
 #: conf.c:136 dialogs.c:137
@@ -377,9 +378,11 @@ msgid ""
 msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
-msgstr[0] "Error cargando archivo torrent:\n"
+msgstr[0] ""
+"Error cargando archivo torrent:\n"
 "%s"
-msgstr[1] "Error cargando archivos torrent:\n"
+msgstr[1] ""
+"Error cargando archivos torrent:\n"
 "%s"
 
 #: tr_torrent.c:290
