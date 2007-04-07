@@ -5,11 +5,7 @@
 MAJOR=0
 MINOR=6
 MAINT=1
-
-# 0 for release, 1 otherwise
-DEV=1
-
-STRING=0.7.0-svn
+STRING=0.70-svn
 
 # Get current SVN revision from Ids in all source files
 REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
@@ -37,7 +33,6 @@ cat > mk/version.mk.new << EOF
 VERSION_MAJOR       = $MAJOR
 VERSION_MINOR       = $MINOR
 VERSION_MAINTENANCE = $MAINT
-VERSION_DEV         = $DEV
 VERSION_STRING      = $STRING
 VERSION_REVISION    = $REV
 EOF
@@ -48,7 +43,6 @@ cat > libtransmission/version.h.new << EOF
 #define VERSION_MAJOR       $MAJOR
 #define VERSION_MINOR       $MINOR
 #define VERSION_MAINTENANCE $MAINT
-#define VERSION_DEV         $DEV
 #define VERSION_STRING      "$STRING"
 #define VERSION_REVISION    $REV
 EOF
