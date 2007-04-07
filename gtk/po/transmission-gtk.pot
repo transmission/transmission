@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-05 15:52-0700\n"
+"POT-Creation-Date: 2007-04-07 12:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -377,7 +377,7 @@ msgstr ""
 
 #: tr_prefs.c:124
 msgid ""
-"Perform Azureus or ��Torrent compatible peer exchange with any peers which "
+"Perform Azureus or ÂµTorrent compatible peer exchange with any peers which "
 "support it"
 msgstr ""
 
@@ -586,5 +586,5 @@ msgstr ""
 
 #. this is a UTF-8 infinity symbol
 #: util.c:122
-msgid "∞"
+msgid "â"
 msgstr ""
