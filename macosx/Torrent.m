@@ -289,8 +289,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    float stopRatio;
-    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
+    float stopRatio, ratio;
+    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID
+			&& ((ratio = [self ratio]) >= stopRatio || ratio == TR_RATIO_INF))
     {
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
