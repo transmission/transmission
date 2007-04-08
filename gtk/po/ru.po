@@ -3,6 +3,7 @@
 # Russian translation of Transmission.
 # This file is distributed under the same license as the Transmission package.
 # Nickolay V. Shmyrev <nshmyrev@yandex.ru>, 2006.
+# Pavel Shevchuk <stlwrt@gmail.com>, 2007
 #
 msgid ""
 msgstr ""
