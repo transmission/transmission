@@ -77,6 +77,10 @@ tr_metainfoParseFile( tr_info_t * inf, const char * tag,
         }
         savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
     }
+    else
+    {
+        snprintf( inf->torrent, sizeof inf->torrent, "%s", path );
+    }
 
     free( buf );
 
