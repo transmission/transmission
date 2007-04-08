@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-07 13:35-0700\n"
-"PO-Revision-Date: 2006-10-21 04:41+0200\n"
+"PO-Revision-Date: 2007-04-08 15:48+0200\n"
 "Last-Translator: Mircea Suciu <mircea@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -114,17 +114,17 @@ msgstr "Toate fişierele"
 #: dialogs.c:250
 #, fuzzy, c-format
 msgid "%s - Properties for %s"
-msgstr ""
+msgstr "%s - Proprietăţi pentru %s"
 
 #. add general tab
 #: dialogs.c:286
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #. add files tab
 #: dialogs.c:292
 msgid "Files"
-msgstr ""
+msgstr "Fişiere"
 
 #: dialogs.c:390
 msgid "Tracker:"
@@ -136,11 +136,11 @@ msgstr "Announce:"
 
 #: dialogs.c:392
 msgid "Scrape:"
-msgstr ""
+msgstr "Scrape:"
 
 #: dialogs.c:394
 msgid "Info Hash:"
-msgstr ""
+msgstr "Info Hash:"
 
 #: dialogs.c:395
 msgid "Piece Size:"
@@ -164,7 +164,7 @@ msgstr "Leecheri:"
 
 #: dialogs.c:401
 msgid "Completed:"
-msgstr ""
+msgstr "Completaţi"
 
 #: dialogs.c:403
 msgid "Directory:"
@@ -180,7 +180,7 @@ msgstr "Uploadat:"
 
 #: dialogs.c:407
 msgid "Remaining:"
-msgstr ""
+msgstr "Rămas:"
 
 #: dialogs.c:497
 msgid "?"
@@ -194,11 +194,11 @@ msgstr "Alegeţi un director pentru downloaduri"
 #: dialogs.c:575
 #, c-format
 msgid "Are you sure you want to quit %s?"
-msgstr ""
+msgstr "Sunteţi sigur ca vreţi să închideţi %s?"
 
 #: dialogs.c:643
 msgid "File"
-msgstr ""
+msgstr "Fişier"
 
 #: dialogs.c:656 tr_window.c:406
 msgid "Progress"
@@ -259,7 +259,7 @@ msgstr "Afişează informaţii suplimentare despre un torrent"
 
 #: main.c:123
 msgid "Open debug window"
-msgstr ""
+msgstr "Fereastră debug"
 
 #: main.c:127
 msgid "Customize application behavior"
@@ -267,11 +267,11 @@ msgstr "Personalizează comportamentul aplicaţiei"
 
 #: main.c:130
 msgid "Close the main window"
-msgstr ""
+msgstr "Închide fereastra principală"
 
 #: main.c:132
 msgid "Exit the program"
-msgstr ""
+msgstr "Iese din program"
 
 #: main.c:288
 #, c-format
@@ -290,6 +290,19 @@ msgid ""
 "line. If %s is already running, those torrents will be\n"
 "opened in the running instance.\n"
 msgstr ""
+"folosire: %s [-hpq] [fişiere...]\n"
+"\n"
+"Transmission %s (r%d) http://transmission.m0k.org/\n"
+"Un client BitTorrent liber, neîncărcat, cu o interfaţă simplă şi intuitivă"
+"\n"
+"  -h --help    afişează acest mesaj şi iese\n"
+"  -p --paused  porneşte cu toate torrentele în pauză\n"
+"  -q --quit    cere ca instanţa %s să se încheie\n"
+"\n"
+"Poate rula doar o singură instanţă de %s. Pot fi adăugate\n"
+"mai multe torrente la pornire adăugându-le la linia de comandă\n"
+"Dacă deja rulează %s, aceste torrente vor fi\n"
+"deschise în instanţa ce deja rulează.\n"
 
 #: main.c:354
 msgid "Transmission"
@@ -317,19 +330,19 @@ msgstr "Eroare:"
 
 #: msgwin.c:55
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: msgwin.c:56
 msgid "Debug"
-msgstr ""
+msgstr "Debug"
 
 #: msgwin.c:142
 msgid "Save Log"
-msgstr ""
+msgstr "Salvaţi log-ul"
 
 #: msgwin.c:229
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: tr_prefs.c:82
 msgid "_Limit download speed"
@@ -337,7 +350,7 @@ msgstr "_Limitaţi viteza de download"
 
 #: tr_prefs.c:83
 msgid "Restrict the download rate"
-msgstr ""
+msgstr "Limitaţi rata de download"
 
 #: tr_prefs.c:87
 msgid "Maximum _download speed:"
@@ -345,7 +358,7 @@ msgstr "Viteza maximă de _download:"
 
 #: tr_prefs.c:88
 msgid "Speed in KiB/sec for restricted download rate"
-msgstr ""
+msgstr "Viteza în KiB/s pentru rata limitată de download"
 
 #: tr_prefs.c:92
 msgid "Li_mit upload speed"
@@ -353,7 +366,7 @@ msgstr "Li_mitaţi viteza de upload"
 
 #: tr_prefs.c:93
 msgid "Restrict the upload rate"
-msgstr ""
+msgstr "Limitaţi rata de upload"
 
 #: tr_prefs.c:97
 msgid "Maximum _upload speed:"
@@ -361,18 +374,20 @@ msgstr "Viteza maximă de _upload:"
 
 #: tr_prefs.c:98
 msgid "Speed in KiB/sec for restricted upload rate"
-msgstr ""
+msgstr "Viteza în KiB/s pentru rata limitată de download"
 
 #: tr_prefs.c:102
 #, fuzzy
 msgid "Al_ways prompt for download directory"
-msgstr "Folosiţi director alternativ pentru downloaduri"
+msgstr "Cere întodeauna directorul pentru download"
 
 #: tr_prefs.c:103
 msgid ""
 "When adding a torrent, always prompt for a directory to download data files "
 "into"
 msgstr ""
+"Când se adaugă un torrent, cere întodeauna calea unde să se salveze fişierele"
+"torrentului"
 
 #: tr_prefs.c:108
 msgid "Download di_rectory:"
@@ -380,7 +395,7 @@ msgstr "Director downloaduri:"
 
 #: tr_prefs.c:109
 msgid "Destination directory for downloaded data files"
-msgstr ""
+msgstr "Calea de salvare a fişierelor downloadate"
 
 #: tr_prefs.c:113
 msgid "Listening _port:"
@@ -388,41 +403,43 @@ msgstr "Port:"
 
 #: tr_prefs.c:114
 msgid "TCP port number to listen for peer connections"
-msgstr ""
+msgstr "Port TCP pentru conexiuni"
 
 #: tr_prefs.c:118
 msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-msgstr ""
+msgstr "Mapare automată de port via NAT-PMP sau UPnP"
 
 #: tr_prefs.c:119
 msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-msgstr ""
+msgstr "Încearcă ocolirea NAT-ului sau firewall-ului pentru a putea primi conexiuni"
 
 #: tr_prefs.c:123
 msgid "Use peer _exchange if possible"
-msgstr ""
+msgstr "Foloseşte peer exchange dacă este permis"
 
 #: tr_prefs.c:124
 msgid ""
 "Perform Azureus or µTorrent compatible peer exchange with any peers which "
 "support it"
 msgstr ""
+"Utilizează algoritmul de peer exchange al Azureus/µTorrent cu orice peer"
+"care îl înţelege"
 
 #: tr_prefs.c:129
 msgid "Display an _icon in the system tray"
-msgstr ""
+msgstr "Afişează icon în zona de notificare"
 
 #: tr_prefs.c:130
 msgid "Use a system tray / dock / notification area icon"
-msgstr ""
+msgstr "Afişează iconiţă în system tray / zona de notificare"
 
 #: tr_prefs.c:134
 msgid "Confirm _quit"
-msgstr ""
+msgstr "Confirmarea ieşirii"
 
 #: tr_prefs.c:135
 msgid "Prompt for confirmation when quitting"
-msgstr ""
+msgstr "Cere o confirmare la ieşire"
 
 #: tr_prefs.c:140
 msgid "For torrents added _normally:"
@@ -430,22 +447,20 @@ msgstr "Pentru torrente adăugate _normal:"
 
 #: tr_prefs.c:141
 msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-msgstr ""
+msgstr "Torrente adăugate din toolbar, meniu sau prin drag-and-drop"
 
 #: tr_prefs.c:146
 msgid ""
 "For torrents added e_xternally\n"
 "(via the command-line):"
 msgstr ""
-"Pnetru torrente adăugate e_xtern\n"
+"Pentru torrente adăugate e_xtern\n"
 "(via linie de comandă):"
 
 #: tr_prefs.c:147
 #, fuzzy
 msgid "For torrents added via the command-line only"
-msgstr ""
-"Pnetru torrente adăugate e_xtern\n"
-"(via linie de comandă):"
+msgstr "Pentru torrente adăugate doar via linia de comandă"
 
 #: tr_prefs.c:342
 #, c-format
@@ -467,7 +482,7 @@ msgstr "Păstrează o copie şi şterge din locaţia curentă"
 #: tr_torrent.c:314
 #, c-format
 msgid "%s: not a valid torrent file"
-msgstr "%s: torrent invalid"
+msgstr "%s: torrent nevalid"
 
 #: tr_torrent.c:317
 #, c-format
@@ -476,7 +491,7 @@ msgstr "%s: torrent-ul este deja deschis"
 
 #: tr_window.c:169
 msgid "_File"
-msgstr ""
+msgstr "_Fişier"
 
 #: tr_window.c:355
 #, c-format
@@ -496,7 +511,7 @@ msgstr "Se verifică fişierele existente (%.1f%%)"
 #: tr_window.c:517
 #, fuzzy, c-format
 msgid "Stalled (%.1f%%)"
-msgstr ""
+msgstr "Împotmolit (%.1f%%)"
 
 #: tr_window.c:522
 #, fuzzy, c-format
@@ -521,7 +536,7 @@ msgstr "Oprit (%.1f%%)"
 
 #: tr_window.c:551
 msgid "Error: "
-msgstr "Eroare:"
+msgstr "Eroare: "
 
 #: tr_window.c:556
 #, c-format
@@ -579,42 +594,42 @@ msgstr "EiB"
 #: util.c:93
 #, c-format
 msgid "%i %s"
-msgstr ""
+msgstr "%i %s"
 
 #: util.c:94 util.c:98
 msgid "second"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "secundă"
+msgstr[1] "secunde"
 
 #: util.c:96 util.c:100 util.c:104 util.c:108
 #, c-format
 msgid "%i %s %i %s"
-msgstr ""
+msgstr "%i %s %i %s"
 
 #: util.c:97 util.c:102
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minut"
+msgstr[1] "minute"
 
 #: util.c:101 util.c:106 util.c:110
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "oră"
+msgstr[1] "ore"
 
 #: util.c:105
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "zi"
+msgstr[1] "zile"
 
 #: util.c:109
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "săptămână"
+msgstr[1] "săptămâni"
 
 #: util.c:118
 msgid "N/A"
