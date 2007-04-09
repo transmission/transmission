@@ -121,7 +121,8 @@ devicePulseHttp( tr_upnp_device_t * dev,
 static tr_http_t *
 devicePulseGetHttp( tr_upnp_device_t * dev );
 static int
-parseRoot( const char *buf, int len, char ** soap, char ** scpd );
+parseRoot( const char * root, const char *buf, int len,
+           char ** soap, char ** scpd );
 static void
 addUrlbase( const char * base, char ** path );
 static int
@@ -664,7 +665,8 @@ devicePulse( tr_upnp_device_t * dev, int port )
                 tr_dbg( "upnp device %s: fetch root failed with http code %i",
                         dev->host, code );
             }
-            else if( parseRoot( body, len, &dev->soap, &dev->scpd ) )
+            else if( parseRoot( dev->root, body, len,
+                                &dev->soap, &dev->scpd ) )
             {
                 tr_dbg( "upnp device %s: parse root failed", dev->host );
             }
@@ -941,7 +943,8 @@ devicePulseHttp( tr_upnp_device_t * dev,
 }
 
 static int
-parseRoot(const char *buf, int len, char ** soap, char ** scpd )
+parseRoot( const char * root, const char *buf, int len,
+           char ** soap, char ** scpd )
 {
     const char * end, * ii, * jj, * kk, * urlbase;
     char       * basedup;
@@ -998,7 +1001,16 @@ parseRoot(const char *buf, int len, char ** soap, char ** scpd )
         }
     }
 
-    basedup = tr_xmlDupContents( urlbase, end );
+    if( NULL == urlbase )
+    {
+        basedup = strrchr( root, '/' );
+        assert( NULL != basedup );
+        basedup = tr_dupstr( root, basedup - root + 1 );
+    }
+    else
+    {
+        basedup = tr_xmlDupContents( urlbase, end );
+    }
     addUrlbase( basedup, soap );
     addUrlbase( basedup, scpd );
     free( basedup );
