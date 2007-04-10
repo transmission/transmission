@@ -4,7 +4,7 @@
 # This file is distributed under the same license as the Transmission package.
 #
 # Pierre-Henri Quelen <pierrehenri.quelen@gmail.com>, 2006.
-# Robert-André Mauchin <zebob.m@gmail.com>, 2006.
+# Robert-André Mauchin <zebob.m@gmail.com>, 2006-2007.
 # 
 # 
 msgid ""
@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-07 13:35-0700\n"
-"PO-Revision-Date: 2006-06-24 04:09+0200\n"
+"PO-Revision-Date: 2007-04-09 11:26+0200\n"
 "Last-Translator: Robert-André Mauchin <zebob.m@gmail.com>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -98,7 +98,7 @@ msgstr "_Démarrer le torrent automatiquement"
 
 #: dialogs.c:147
 msgid "Use alternate _download directory"
-msgstr "Utilisez un _dossier cible différent"
+msgstr "Utiliser un _dossier cible différent"
 
 #. PREF_ID_DIR
 #: dialogs.c:151 tr_prefs.c:210
@@ -114,19 +114,19 @@ msgid "All files"
 msgstr "Tous les fichiers"
 
 #: dialogs.c:250
-#, fuzzy, c-format
+#, c-format
 msgid "%s - Properties for %s"
-msgstr ""
+msgstr "%s - Propriétés de %s"
 
 #. add general tab
 #: dialogs.c:286
 msgid "General"
-msgstr ""
+msgstr "Général"
 
 #. add files tab
 #: dialogs.c:292
 msgid "Files"
-msgstr ""
+msgstr "Fichiers"
 
 #: dialogs.c:390
 msgid "Tracker:"
@@ -138,11 +138,11 @@ msgstr "Annonce :"
 
 #: dialogs.c:392
 msgid "Scrape:"
-msgstr ""
+msgstr "Scrape :"
 
 #: dialogs.c:394
 msgid "Info Hash:"
-msgstr ""
+msgstr "Info Hash :"
 
 #: dialogs.c:395
 msgid "Piece Size:"
@@ -166,7 +166,7 @@ msgstr "Leechers :"
 
 #: dialogs.c:401
 msgid "Completed:"
-msgstr ""
+msgstr "Effectué :"
 
 #: dialogs.c:403
 msgid "Directory:"
@@ -182,25 +182,24 @@ msgstr "Émis :"
 
 #: dialogs.c:407
 msgid "Remaining:"
-msgstr ""
+msgstr "Restant :"
 
 #: dialogs.c:497
 msgid "?"
 msgstr "?"
 
 #: dialogs.c:519
-#, fuzzy
 msgid "Choose a directory"
-msgstr "Choisissez un répertoire cible"
+msgstr "Choisissez un répertoire"
 
 #: dialogs.c:575
 #, c-format
 msgid "Are you sure you want to quit %s?"
-msgstr ""
+msgstr "Voulez-vous vraiment quitter %s ?"
 
 #: dialogs.c:643
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 #: dialogs.c:656 tr_window.c:406
 msgid "Progress"
@@ -261,7 +260,7 @@ msgstr "Afficher des informations supplémentaires concernant un torrent"
 
 #: main.c:123
 msgid "Open debug window"
-msgstr ""
+msgstr "Ouvrir la fenêtre de débogage"
 
 #: main.c:127
 msgid "Customize application behavior"
@@ -269,11 +268,11 @@ msgstr "Personnaliser le comportement de l'application"
 
 #: main.c:130
 msgid "Close the main window"
-msgstr ""
+msgstr "Fermer la fenêtre principale"
 
 #: main.c:132
 msgid "Exit the program"
-msgstr ""
+msgstr "Quitter le programme"
 
 #: main.c:288
 #, c-format
@@ -292,6 +291,19 @@ msgid ""
 "line. If %s is already running, those torrents will be\n"
 "opened in the running instance.\n"
 msgstr ""
+"utilisation : %s [-hpq] [fichiers...]\n"
+"\n"
+"Transmission %s (r%d) http://transmission.m0k.org/\n"
+"Un client BitTorrent léger, libre, avec une interface simple et intuitive\n"
+"\n"
+"  -h --help    affiche ce message et quitte\n"
+"  -p --paused  démarre avec tous les torrents en pause\n"
+"  -q --quit    demande la fermeture de l'instance active %s\n"
+"\n"
+"Une seule instance de %s peut être lancée en même temps. De multiples \n"
+"fichiers torrent peuvent être chargés au démarrage en les ajoutant via la \n"
+"ligne de commande. Si %s est déjà lancée, ces torrents seront ouverts dans \n"
+"l'instance active.\n"
 
 #: main.c:354
 msgid "Transmission"
@@ -306,32 +318,31 @@ msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
 msgstr[0] ""
-"Échec de chargement du ficher .torrent :\n"
+"Le chargement du ficher .torrent a échoué :\n"
 "%s"
 msgstr[1] ""
-"Échec du chargement des fichiers .torrent :\n"
+"Le chargement des fichiers .torrent a échoué :\n"
 "%s"
 
 #: msgwin.c:54
-#, fuzzy
 msgid "Error"
-msgstr "Erreur : "
+msgstr "Erreur"
 
 #: msgwin.c:55
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: msgwin.c:56
 msgid "Debug"
-msgstr ""
+msgstr "Débogage"
 
 #: msgwin.c:142
 msgid "Save Log"
-msgstr ""
+msgstr "Enregistrer le journal"
 
 #: msgwin.c:229
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: tr_prefs.c:82
 msgid "_Limit download speed"
@@ -339,7 +350,7 @@ msgstr "_Limiter le taux de réception"
 
 #: tr_prefs.c:83
 msgid "Restrict the download rate"
-msgstr ""
+msgstr "Restreint le taux de reception"
 
 #: tr_prefs.c:87
 msgid "Maximum _download speed:"
@@ -347,7 +358,7 @@ msgstr "Taux maximum de _réception :"
 
 #: tr_prefs.c:88
 msgid "Speed in KiB/sec for restricted download rate"
-msgstr ""
+msgstr "Vitesse en KiO/s pour le taux de réception restreint"
 
 #: tr_prefs.c:92
 msgid "Li_mit upload speed"
@@ -355,7 +366,7 @@ msgstr "Li_miter le taux d'émission"
 
 #: tr_prefs.c:93
 msgid "Restrict the upload rate"
-msgstr ""
+msgstr "Restreint le taux d'émission"
 
 #: tr_prefs.c:97
 msgid "Maximum _upload speed:"
@@ -363,18 +374,19 @@ msgstr "Taux maximum d'_émission :"
 
 #: tr_prefs.c:98
 msgid "Speed in KiB/sec for restricted upload rate"
-msgstr ""
+msgstr "Vitesse en KiO/s pour le taux d'émission restreint"
 
 #: tr_prefs.c:102
-#, fuzzy
 msgid "Al_ways prompt for download directory"
-msgstr "Utilisez un _dossier cible différent"
+msgstr "Toujours demander le _dossier cible"
 
 #: tr_prefs.c:103
 msgid ""
 "When adding a torrent, always prompt for a directory to download data files "
 "into"
 msgstr ""
+"Lors de l'ajout d'un torrent, toujours demander le répertoire où télécharger "
+"les fichiers de données"
 
 #: tr_prefs.c:108
 msgid "Download di_rectory:"
@@ -382,7 +394,7 @@ msgstr "Dossier _cible :"
 
 #: tr_prefs.c:109
 msgid "Destination directory for downloaded data files"
-msgstr ""
+msgstr "Répertoire cible où les données seront téléchargées"
 
 #: tr_prefs.c:113
 msgid "Listening _port:"
@@ -390,41 +402,43 @@ msgstr "P_ort d'écoute :"
 
 #: tr_prefs.c:114
 msgid "TCP port number to listen for peer connections"
-msgstr ""
+msgstr "Numéro du port TCP où écouter les connexions des pairs"
 
 #: tr_prefs.c:118
 msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-msgstr ""
+msgstr "Mappage de port au_tomatique via NAT-PMP ou UPnP"
 
 #: tr_prefs.c:119
 msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-msgstr ""
+msgstr "Essaye de passer outre un NAT ou un parefeu pour autoriser les connexions entrantes des pairs"
 
 #: tr_prefs.c:123
 msgid "Use peer _exchange if possible"
-msgstr ""
+msgstr "Utiliser l'é_change de pairs si possible"
 
 #: tr_prefs.c:124
 msgid ""
 "Perform Azureus or µTorrent compatible peer exchange with any peers which "
 "support it"
 msgstr ""
+"Effectue l'échange de pairs compatible Azureus et µTorrent avec n'importe quel pair "
+"qui le prend en charge"
 
 #: tr_prefs.c:129
 msgid "Display an _icon in the system tray"
-msgstr ""
+msgstr "Afficher une icône dans la zone de notification"
 
 #: tr_prefs.c:130
 msgid "Use a system tray / dock / notification area icon"
-msgstr ""
+msgstr "Place une icône dans la barre des tâches / le dock / la zone de notification"
 
 #: tr_prefs.c:134
 msgid "Confirm _quit"
-msgstr ""
+msgstr "Confirmer la _fermeture"
 
 #: tr_prefs.c:135
 msgid "Prompt for confirmation when quitting"
-msgstr ""
+msgstr "Demande une confirmation avant de quitter"
 
 #: tr_prefs.c:140
 msgid "For torrents added _normally:"
@@ -432,7 +446,7 @@ msgstr "Pour les torrents _ajoutés normalement :"
 
 #: tr_prefs.c:141
 msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-msgstr ""
+msgstr "Torrents ajoutés via la barre d'outils, le menu contextuel, et par glisser-déposer"
 
 #: tr_prefs.c:146
 msgid ""
@@ -443,11 +457,9 @@ msgstr ""
 "(via la ligne de commande) :"
 
 #: tr_prefs.c:147
-#, fuzzy
 msgid "For torrents added via the command-line only"
 msgstr ""
-"Pour les torrents ajoutés a_utrement\n"
-"(via la ligne de commande) :"
+"Pour les torrents ajoutés en la ligne de commande"
 
 #: tr_prefs.c:342
 #, c-format
@@ -469,7 +481,7 @@ msgstr "Garder une copie et supprimer l'original"
 #: tr_torrent.c:314
 #, c-format
 msgid "%s: not a valid torrent file"
-msgstr "%s n'est pas un fichier .torrent valide"
+msgstr "%s : n'est pas un fichier .torrent valide"
 
 #: tr_torrent.c:317
 #, c-format
@@ -478,7 +490,7 @@ msgstr "%s : ce torrent est déjà ouvert"
 
 #: tr_window.c:169
 msgid "_File"
-msgstr ""
+msgstr "_Fichier"
 
 #: tr_window.c:355
 #, c-format
@@ -496,14 +508,14 @@ msgid "Checking existing files (%.1f%%)"
 msgstr "Vérification des fichiers existants (%.1f%%)"
 
 #: tr_window.c:517
-#, fuzzy, c-format
+#, c-format
 msgid "Stalled (%.1f%%)"
-msgstr ""
+msgstr "Bloqué (%.1f%%)"
 
 #: tr_window.c:522
-#, fuzzy, c-format
+#, c-format
 msgid "Finishing in %s (%.1f%%)"
-msgstr "Temps restant : %s·(%.1f%%)"
+msgstr "Terminé dans %s·(%.1f%%)"
 
 #: tr_window.c:530
 #, c-format
@@ -581,42 +593,42 @@ msgstr "Eio"
 #: util.c:93
 #, c-format
 msgid "%i %s"
-msgstr ""
+msgstr "%i %s"
 
 #: util.c:94 util.c:98
 msgid "second"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "seconde"
+msgstr[1] "secondes"
 
 #: util.c:96 util.c:100 util.c:104 util.c:108
 #, c-format
 msgid "%i %s %i %s"
-msgstr ""
+msgstr "%i %s %i %s"
 
 #: util.c:97 util.c:102
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minute"
+msgstr[1] "minutes"
 
 #: util.c:101 util.c:106 util.c:110
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "heure"
+msgstr[1] "heures"
 
 #: util.c:105
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "jour"
+msgstr[1] "jours"
 
 #: util.c:109
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "semaine"
+msgstr[1] "semaines"
 
 #: util.c:118
 msgid "N/A"
