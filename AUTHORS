@@ -18,9 +18,6 @@ Mitchell Livingston <livings124@gmail.com>
 Bryan Varner <bryan@varnernet.com>
  + BeOS interface
 
-Michael Demars <keul@m0k.org>
- + OS X interface (Growl notifications, AppleScript)
-
 
 Translators:
 
@@ -92,6 +89,9 @@ FOOOD
 
 Nick Pucius
  + Mac OS X Help documentation
+
+Michael Demars <keul@m0k.org>
+ + OS X interface (Growl notifications, AppleScript)
 
 Rashid Eissing
  + Transfers preferences icon
