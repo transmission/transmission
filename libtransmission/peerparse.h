@@ -546,7 +546,7 @@ static inline int parseBufHeader( tr_peer_t * peer )
 "Content-type: text/plain\015\012"
 "\015\012";
     static uint8_t badproto_tinfoil[] =
-"This is a not a rootkit or other backdoor, it's a bittorrent\015\012"
+"This is not a rootkit or other backdoor, it's a BitTorrent\015\012"
 "client. Really. Why should you be worried, can't you read this\015\012"
 "reassuring message? Now just listen to this social engi, er, I mean,\015\012"
 "completely truthful statement, and go about your business. Your box is\015\012"
