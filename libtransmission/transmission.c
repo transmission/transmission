@@ -51,11 +51,11 @@ tr_handle_t * tr_init( const char * tag )
         return NULL;
     }
 
-    /* Generate a peer id : "-TRxxyy-" + 12 random alphanumeric
-       characters, where xx is the major version number and yy the
-       minor version number (Azureus-style) */
-    snprintf( h->id, sizeof h->id, "-TR%02d%02d-",
-              VERSION_MAJOR, VERSION_MINOR );
+    /* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
+       characters, where xx is the major version number, y is the
+       minor version number, and z is the maintenance number (Azureus-style) */
+    snprintf( h->id, sizeof h->id, "-TR%02d%01d%01d-",
+              VERSION_MAJOR, VERSION_MINOR, VERSION_MAINTENANCE );
     for( i = 8; i < TR_ID_LEN; i++ )
     {
         r        = tr_rand( 36 );
