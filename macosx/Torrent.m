@@ -955,7 +955,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSString *) errorMessage
 {
-    return [self isError] ? [NSString stringWithUTF8String: fStat->errorString] : @"";
+    if (![self isError])
+        return @"";
+    
+    #warning localize string after release
+    NSString * error;
+    if (!(error = [NSString stringWithUTF8String: fStat->errorString])
+        && !(error = [NSString stringWithCString: fStat->errorString encoding: NSISOLatin1StringEncoding]))
+        error = @"";
+        //error = NSLocalizedString(@"(unreadable error)", "Torrent -> error string unreadable");
+    
+    return error;
 }
 
 - (BOOL) justFinished
