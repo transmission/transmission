@@ -541,6 +541,18 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
 
 static inline int parseBufHeader( tr_peer_t * peer )
 {
+    static uint8_t badproto_http[] =
+"HTTP/1.0 400 Nice try...\015\012"
+"Content-type: text/plain\015\012"
+"\015\012";
+    static uint8_t badproto_tinfoil[] =
+"This is a not a rootkit or other backdoor, it's a bittorrent\015\012"
+"client. Really. Why should you be worried, can't you read this\015\012"
+"reassuring message? Now just listen to this social engi, er, I mean,\015\012"
+"completely truthful statement, and go about your business. Your box is\015\012"
+"safe and completely impregnable, the marketing hype for your OS even\015\012"
+"says so. You can believe everything you read. Now move along, nothing\015\012"
+"to see here.";
     uint8_t * p   = peer->buf;
 
     if( 4 > peer->pos )
@@ -553,7 +565,11 @@ static inline int parseBufHeader( tr_peer_t * peer )
         /* Don't wait until we get 68 bytes, this is wrong
            already */
         peer_dbg( "GET  handshake, invalid" );
-        tr_netSend( peer->socket, (uint8_t *) "Nice try...\r\n", 13 );
+        if( 0 == memcmp( p, "GET ", 4 ) || 0 == memcmp( p, "HEAD", 4 ) )
+        {
+            tr_netSend( peer->socket, badproto_http, sizeof badproto_http - 1 );
+        }
+        tr_netSend( peer->socket, badproto_tinfoil, sizeof badproto_tinfoil - 1 );
         return TR_ERROR;
     }
     if( peer->pos < 68 )
