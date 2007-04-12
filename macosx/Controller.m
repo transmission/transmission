@@ -1435,7 +1435,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     else if ([fSortType isEqualToString: @"Date"])
     {
-        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"date" ascending: YES] autorelease];
+        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: YES] autorelease];
     
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
