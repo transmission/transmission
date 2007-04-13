@@ -351,6 +351,13 @@
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Error.tiff; path = macosx/Images/Error.tiff; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
+		A26B0B430BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A26B0B440BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A26B0B450BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A26B0B460BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
+		A26B0B4B0BCFD7A0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A26B0B4F0BCFD7B0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A26B0B540BCFD7BA008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Greek; path = macosx/Greek.lproj/Credits.rtf; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
@@ -783,6 +790,13 @@
 			isa = PBXProject;
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				Greek,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
 			targets = (
@@ -982,6 +996,7 @@
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
 				4C9F8F060BC5B68A002E5433 /* French */,
+				A26B0B4F0BCFD7B0008C1579 /* Greek */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -991,6 +1006,7 @@
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 				4C9F8F090BC5B68A002E5433 /* French */,
+				A26B0B440BCFD760008C1579 /* Greek */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1000,6 +1016,7 @@
 			children = (
 				A200B9630A227FD0007BBB1E /* English */,
 				4C9F8F070BC5B68A002E5433 /* French */,
+				A26B0B430BCFD760008C1579 /* Greek */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1009,6 +1026,7 @@
 			children = (
 				A21567EC0A9A5034004DECD6 /* English */,
 				4C9F8F0A0BC5B68A002E5433 /* French */,
+				A26B0B450BCFD760008C1579 /* Greek */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1018,6 +1036,7 @@
 			children = (
 				A22A8D550AEEAFA5007E9CB9 /* English */,
 				4C9F8F080BC5B68A002E5433 /* French */,
+				A26B0B4B0BCFD7A0008C1579 /* Greek */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1027,6 +1046,7 @@
 			children = (
 				A2F8951E0A2D4BA500ED2127 /* English */,
 				4C9F8EFA0BC5B629002E5433 /* French */,
+				A26B0B540BCFD7BA008C1579 /* Greek */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
@@ -1036,6 +1056,7 @@
 			children = (
 				A2912C530A2956E80097A0CA /* English */,
 				4C9F8F0B0BC5B68A002E5433 /* French */,
+				A26B0B460BCFD760008C1579 /* Greek */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
