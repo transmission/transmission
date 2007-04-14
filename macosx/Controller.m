@@ -2653,7 +2653,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (seeding > 0)
     {
-        NSString * title = [NSString stringWithFormat: @"%d Seeding", seeding];
+        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Seeding",
+                                                        "Dock item - Seeding"), seeding];
         if (!seedingItem)
         {
             seedingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
@@ -2671,7 +2672,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (downloading > 0)
     {
-        NSString * title = [NSString stringWithFormat: @"%d Downloading", downloading];
+        NSString * title = [NSString stringWithFormat: NSLocalizedString(@"%d Downloading",
+                                                        "Dock item - Downloading"), downloading];
         if (!downloadingItem)
         {
             downloadingItem = [[[NSMenuItem alloc] initWithTitle: title action: nil keyEquivalent: @""] autorelease];
