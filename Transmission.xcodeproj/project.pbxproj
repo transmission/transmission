@@ -127,7 +127,6 @@
 		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
 		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
-		A258EAEF0B0A507D0012C6F3 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A258EAEE0B0A507D0012C6F3 /* Credits.rtf */; };
 		A259317E0A73B2CC002F4FE7 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* Transmission Help */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
@@ -146,6 +145,7 @@
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
+		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 		A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */; };
 		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
@@ -206,7 +206,6 @@
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Transmission_Prefix.pch; path = macosx/Transmission_Prefix.pch; sourceTree = "<group>"; };
 		35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOn.png; path = macosx/Images/ResumeNoWaitOn.png; sourceTree = "<group>"; };
 		35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOff.png; path = macosx/Images/ResumeNoWaitOff.png; sourceTree = "<group>"; };
-		4C9F8EFA0BC5B629002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = French; path = macosx/French.lproj/Credits.rtf; sourceTree = "<group>"; };
 		4C9F8F060BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4C9F8F070BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		4C9F8F080BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -298,7 +297,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -357,7 +356,6 @@
 		A26B0B460BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A26B0B4B0BCFD7A0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A26B0B4F0BCFD7B0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A26B0B540BCFD7BA008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Greek; path = macosx/Greek.lproj/Credits.rtf; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
@@ -373,6 +371,12 @@
 		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A291DAAD0AC8BEB6003385E9 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
+		A29B0C130BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A29B0C140BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A29B0C150BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A29B0C160BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
+		A29B0C1B0BD15FCB0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A29B0C200BD15FD70006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = YellowDot.tiff; path = macosx/Images/YellowDot.tiff; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
 		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
@@ -396,7 +400,7 @@
 		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
-		A2F8951E0A2D4BA500ED2127 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = macosx/English.lproj/Credits.rtf; sourceTree = "<group>"; };
+		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -522,7 +526,7 @@
 			children = (
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
-				A258EAEE0B0A507D0012C6F3 /* Credits.rtf */,
+				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
 				A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */,
 				A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */,
@@ -796,6 +800,7 @@
 				French,
 				German,
 				Greek,
+				Spanish,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -837,7 +842,7 @@
 				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
 				A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */,
 				A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */,
-				A258EAEF0B0A507D0012C6F3 /* Credits.rtf in Resources */,
+				A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */,
 				A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */,
 				A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */,
 				A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */,
@@ -997,6 +1002,7 @@
 				089C165DFE840E0CC02AAC07 /* English */,
 				4C9F8F060BC5B68A002E5433 /* French */,
 				A26B0B4F0BCFD7B0008C1579 /* Greek */,
+				A29B0C200BD15FD70006F230 /* Spanish */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1007,6 +1013,7 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 				4C9F8F090BC5B68A002E5433 /* French */,
 				A26B0B440BCFD760008C1579 /* Greek */,
+				A29B0C140BD15F9D0006F230 /* Spanish */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1017,6 +1024,7 @@
 				A200B9630A227FD0007BBB1E /* English */,
 				4C9F8F070BC5B68A002E5433 /* French */,
 				A26B0B430BCFD760008C1579 /* Greek */,
+				A29B0C130BD15F9D0006F230 /* Spanish */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1027,6 +1035,7 @@
 				A21567EC0A9A5034004DECD6 /* English */,
 				4C9F8F0A0BC5B68A002E5433 /* French */,
 				A26B0B450BCFD760008C1579 /* Greek */,
+				A29B0C150BD15F9D0006F230 /* Spanish */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1037,18 +1046,9 @@
 				A22A8D550AEEAFA5007E9CB9 /* English */,
 				4C9F8F080BC5B68A002E5433 /* French */,
 				A26B0B4B0BCFD7A0008C1579 /* Greek */,
+				A29B0C1B0BD15FCB0006F230 /* Spanish */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		A258EAEE0B0A507D0012C6F3 /* Credits.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A2F8951E0A2D4BA500ED2127 /* English */,
-				4C9F8EFA0BC5B629002E5433 /* French */,
-				A26B0B540BCFD7BA008C1579 /* Greek */,
-			);
-			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
 		A2912C520A2956E80097A0CA /* PrefsWindow.nib */ = {
@@ -1057,6 +1057,7 @@
 				A2912C530A2956E80097A0CA /* English */,
 				4C9F8F0B0BC5B68A002E5433 /* French */,
 				A26B0B460BCFD760008C1579 /* Greek */,
+				A29B0C160BD15F9D0006F230 /* Spanish */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
