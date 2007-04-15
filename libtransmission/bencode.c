@@ -177,11 +177,11 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
 
 static void __bencPrint( benc_val_t * val, int space )
 {
-    int i;
+    int ii;
 
-    for( i = 0; i < space; i++ )
+    for( ii = 0; ii < space; ii++ )
     {
-        fprintf( stderr, " " );
+        putc( ' ', stderr );
     }
 
     switch( val->type )
@@ -191,20 +191,39 @@ static void __bencPrint( benc_val_t * val, int space )
             break;
 
         case TYPE_STR:
-            fwrite( val->val.s.s, 1, val->val.s.i, stderr );
+            for( ii = 0; val->val.s.i > ii; ii++ )
+            {
+                if( '\\' == val->val.s.s[ii] )
+                {
+                    putc( '\\', stderr );
+                    putc( '\\', stderr );
+                }
+                else if( isprint( val->val.s.s[ii] ) )
+                {
+                    putc( val->val.s.s[ii], stderr );
+                }
+                else
+                {
+                    fprintf( stderr, "\\x%02x", val->val.s.s[ii] );
+                }
+            }
             putc( '\n', stderr );
             break;
 
         case TYPE_LIST:
             fprintf( stderr, "list\n" );
-            for( i = 0; i < val->val.l.count; i++ )
-                __bencPrint( &val->val.l.vals[i], space + 1 );
+            for( ii = 0; ii < val->val.l.count; ii++ )
+            {
+                __bencPrint( &val->val.l.vals[ii], space + 1 );
+            }
             break;
 
         case TYPE_DICT:
             fprintf( stderr, "dict\n" );
-            for( i = 0; i < val->val.l.count; i++ )
-                __bencPrint( &val->val.l.vals[i], space + 1 );
+            for( ii = 0; ii < val->val.l.count; ii++ )
+            {
+                __bencPrint( &val->val.l.vals[ii], space + 1 );
+            }
             break;
     }
 }
