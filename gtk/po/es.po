@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-07 13:35-0700\n"
-"PO-Revision-Date: 2006-06-27 02:51+0100E\n"
+"PO-Revision-Date: 2007-04-15 19:35+0100E\n"
 "Last-Translator: vicente carro fernandez <vicentecarro@andaluciajunta.es>\n"
 "Language-Team: Spanish <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -84,20 +84,20 @@ msgid ""
 "Failed to rename the file %s to %s:\n"
 "%s"
 msgstr ""
-"Error renombrando %s a %s:\n"
+"Error renombrando %s como %s:\n"
 "%s"
 
 #: dialogs.c:138
 msgid "Add a Torrent"
-msgstr "Añade un torrent"
+msgstr "Añadir un Torrent"
 
 #: dialogs.c:145
 msgid "Automatically _start torrent"
-msgstr "Inicia torrent automáticamente "
+msgstr "Iniciar Torrent automáticamente"
 
 #: dialogs.c:147
 msgid "Use alternate _download directory"
-msgstr "Usa otra carpeta para la descarga"
+msgstr "Usar otra carpeta para la descarga"
 
 #. PREF_ID_DIR
 #: dialogs.c:151 tr_prefs.c:210
@@ -106,7 +106,7 @@ msgstr "Elije una carpeta de descargas"
 
 #: dialogs.c:178
 msgid "Torrent files"
-msgstr "Archivos torrent"
+msgstr "Archivos Torrent"
 
 #: dialogs.c:180
 msgid "All files"
@@ -115,17 +115,17 @@ msgstr "Todos los archivos"
 #: dialogs.c:250
 #, fuzzy, c-format
 msgid "%s - Properties for %s"
-msgstr ""
+msgstr "%s - Propiedades de %s"
 
 #. add general tab
 #: dialogs.c:286
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #. add files tab
 #: dialogs.c:292
 msgid "Files"
-msgstr ""
+msgstr "Archivos"
 
 #: dialogs.c:390
 msgid "Tracker:"
@@ -137,11 +137,11 @@ msgstr "Anuncio:"
 
 #: dialogs.c:392
 msgid "Scrape:"
-msgstr ""
+msgstr "Conectados al Torrent:"
 
 #: dialogs.c:394
 msgid "Info Hash:"
-msgstr ""
+msgstr "Info del Hash:"
 
 #: dialogs.c:395
 msgid "Piece Size:"
@@ -157,15 +157,15 @@ msgstr "Tamaño total:"
 
 #: dialogs.c:399
 msgid "Seeders:"
-msgstr "Seeders:"
+msgstr "Peers que comparten:"
 
 #: dialogs.c:400
 msgid "Leechers:"
-msgstr "Leechers:"
+msgstr "Peers que descargan:"
 
 #: dialogs.c:401
 msgid "Completed:"
-msgstr ""
+msgstr "Finalizado:"
 
 #: dialogs.c:403
 msgid "Directory:"
@@ -181,7 +181,7 @@ msgstr "Subido:"
 
 #: dialogs.c:407
 msgid "Remaining:"
-msgstr ""
+msgstr "Quedan:"
 
 #: dialogs.c:497
 msgid "?"
@@ -195,11 +195,11 @@ msgstr "Elije una carpeta de descargas"
 #: dialogs.c:575
 #, c-format
 msgid "Are you sure you want to quit %s?"
-msgstr ""
+msgstr "¿Seguro que quieres salir?"
 
 #: dialogs.c:643
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #: dialogs.c:656 tr_window.c:406
 msgid "Progress"
@@ -236,7 +236,7 @@ msgstr "versión de protocolo IPC incorrecta\n"
 
 #: main.c:113
 msgid "Add a new torrent"
-msgstr "Añadir un nuevo torrent"
+msgstr "Añadir un nuevo Torrent"
 
 #: main.c:114
 msgid "Start"
@@ -244,23 +244,23 @@ msgstr "Comenzar"
 
 #: main.c:115
 msgid "Start a torrent that is not running"
-msgstr "Comenzar un torrent que no esté ejecutándose"
+msgstr "Comenzar un Torrent que no esté ejecutándose"
 
 #: main.c:117
 msgid "Stop a torrent that is running"
-msgstr "Parar un torrent que está ejecutándose"
+msgstr "Parar un Torrent que está ejecutándose"
 
 #: main.c:119
 msgid "Remove a torrent"
-msgstr "Eliminar un torrent"
+msgstr "Eliminar un Torrent"
 
 #: main.c:122
 msgid "Show additional information about a torrent"
-msgstr "Mostrar información adicional sobre un torrent"
+msgstr "Mostrar información adicional sobre un Torrent"
 
 #: main.c:123
 msgid "Open debug window"
-msgstr ""
+msgstr "Abrir ventana de depuración"
 
 #: main.c:127
 msgid "Customize application behavior"
@@ -268,11 +268,11 @@ msgstr "Personalizar comportamiento de la aplicación"
 
 #: main.c:130
 msgid "Close the main window"
-msgstr ""
+msgstr "Cerrar ventana principal"
 
 #: main.c:132
 msgid "Exit the program"
-msgstr ""
+msgstr "Salir del programa"
 
 #: main.c:288
 #, c-format
@@ -291,6 +291,19 @@ msgid ""
 "line. If %s is already running, those torrents will be\n"
 "opened in the running instance.\n"
 msgstr ""
+"uso: %s [-hpq] [archivos...]\n"
+"\n"
+"Transmission %s (r%d) http://transmission.m0k.org/\n"
+"Un cliente libre, ligero de BitTorrent con una interfaz simple e intuitiva.\n"
+"\n"
+"  -h --help    muestra este mensaje y termina\n"
+"  -p --paused  comienza con todos los Torrents pausados\n"
+"  -q --quit    intenta cerrar la instancia %s que estaba abierta\n"
+"\n"
+"Solo se puede ejecutar una instancia a la vez. Se pueden añadir\n"
+"múltiples archivos Torrent al inicio añadiéndolos a la línea de comando.\n"
+"Si %s ya está ejecutándose, esos Torrents se añadirán en la instancia\n"
+"que estuviera abierta.\n"
 
 #: main.c:354
 msgid "Transmission"
@@ -305,10 +318,10 @@ msgid_plural ""
 "Failed to load torrent files:\n"
 "%s"
 msgstr[0] ""
-"Error cargando archivo torrent:\n"
+"Error cargando archivo Torrent:\n"
 "%s"
 msgstr[1] ""
-"Error cargando archivos torrent:\n"
+"Error cargando archivos Torrent:\n"
 "%s"
 
 #: msgwin.c:54
@@ -318,19 +331,19 @@ msgstr "Error: "
 
 #: msgwin.c:55
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: msgwin.c:56
 msgid "Debug"
-msgstr ""
+msgstr "Depurado"
 
 #: msgwin.c:142
 msgid "Save Log"
-msgstr ""
+msgstr "Guardar historial"
 
 #: msgwin.c:229
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: tr_prefs.c:82
 msgid "_Limit download speed"
@@ -338,7 +351,7 @@ msgstr "_Limitar velocidad de descarga"
 
 #: tr_prefs.c:83
 msgid "Restrict the download rate"
-msgstr ""
+msgstr "Limitar la velocidad de bajada"
 
 #: tr_prefs.c:87
 msgid "Maximum _download speed:"
@@ -346,7 +359,7 @@ msgstr "Máxima velocidad de _descarga"
 
 #: tr_prefs.c:88
 msgid "Speed in KiB/sec for restricted download rate"
-msgstr ""
+msgstr "Velocidad en KiB/seg para la descarga limitada"
 
 #: tr_prefs.c:92
 msgid "Li_mit upload speed"
@@ -354,7 +367,7 @@ msgstr "Li_mitar la velocidad de subida"
 
 #: tr_prefs.c:93
 msgid "Restrict the upload rate"
-msgstr ""
+msgstr "Limitar la velocidad de subida"
 
 #: tr_prefs.c:97
 msgid "Maximum _upload speed:"
@@ -362,26 +375,27 @@ msgstr "Máxima velocidad de s_ubida"
 
 #: tr_prefs.c:98
 msgid "Speed in KiB/sec for restricted upload rate"
-msgstr ""
+msgstr "Velocidad en KiB/seg para la subida limitada"
 
 #: tr_prefs.c:102
 #, fuzzy
 msgid "Al_ways prompt for download directory"
-msgstr "Usa otra carpeta para la descarga"
+msgstr "Usar otra carpeta para la descarga"
 
 #: tr_prefs.c:103
 msgid ""
 "When adding a torrent, always prompt for a directory to download data files "
 "into"
-msgstr ""
+msgstr "Cuando se añada un Torrent, preguntar siempre la carpeta donde descargar "
+"los datos"
 
 #: tr_prefs.c:108
 msgid "Download di_rectory:"
-msgstr "Carpeta de descarga:"
+msgstr "Ca_rpeta de descarga:"
 
 #: tr_prefs.c:109
 msgid "Destination directory for downloaded data files"
-msgstr ""
+msgstr "Carpeta de destino donde se guardarán los datos"
 
 #: tr_prefs.c:113
 msgid "Listening _port:"
@@ -389,64 +403,63 @@ msgstr "Escuchando el _puerto:"
 
 #: tr_prefs.c:114
 msgid "TCP port number to listen for peer connections"
-msgstr ""
+msgstr "Número de puerto TCP que escuchará conexiones P2P"
 
 #: tr_prefs.c:118
 msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-msgstr ""
+msgstr "Mapeo de puertos au_tomático por NAT-PMP o UPnP"
 
 #: tr_prefs.c:119
 msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
-msgstr ""
+msgstr "Intentar evitar NAT o firewall para permitir conexiones P2P entrantes"
 
 #: tr_prefs.c:123
 msgid "Use peer _exchange if possible"
-msgstr ""
+msgstr "Usar cambio de peer si es posible"
 
 #: tr_prefs.c:124
 msgid ""
 "Perform Azureus or µTorrent compatible peer exchange with any peers which "
 "support it"
-msgstr ""
+msgstr "Realizar cambio de peer compatible con Azureus o µTorrent con los peers "
+"que lo soporten"
 
 #: tr_prefs.c:129
 msgid "Display an _icon in the system tray"
-msgstr ""
+msgstr "Mostrar icono en el aŕea de notificación del sistema"
 
 #: tr_prefs.c:130
 msgid "Use a system tray / dock / notification area icon"
-msgstr ""
+msgstr "Usar un icono en el aŕea de notificación del sistema"
 
 #: tr_prefs.c:134
 msgid "Confirm _quit"
-msgstr ""
+msgstr "Confirmar _que se quiere salir"
 
 #: tr_prefs.c:135
 msgid "Prompt for confirmation when quitting"
-msgstr ""
+msgstr "Pedir confirmación al salir"
 
 #: tr_prefs.c:140
 msgid "For torrents added _normally:"
-msgstr "Para torrents añadidos _normalmente"
+msgstr "Para Torrents añadidos _normalmente:"
 
 #: tr_prefs.c:141
 msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
-msgstr ""
+msgstr "Archivos Torrent añadidos por la barra de herramientas, el menú, y arrastrándolos"
 
 #: tr_prefs.c:146
 msgid ""
 "For torrents added e_xternally\n"
 "(via the command-line):"
 msgstr ""
-"Para torrents añadidos e_xternamente\n"
-"(Vía terminal):"
+"Para Torrents añadidos e_xternamente\n"
+"(A través de línea de comandos):"
 
 #: tr_prefs.c:147
 #, fuzzy
 msgid "For torrents added via the command-line only"
-msgstr ""
-"Para torrents añadidos e_xternamente\n"
-"(Vía terminal):"
+msgstr "Para Torrents añadidos por línea de comandos"
 
 #: tr_prefs.c:342
 #, c-format
@@ -455,29 +468,29 @@ msgstr "%s Preferencias"
 
 #: tr_prefs.c:858
 msgid "Use the torrent file where it is"
-msgstr "Usa el archivotorrent donde esté"
+msgstr "Usar el archivo Torrent donde esté"
 
 #: tr_prefs.c:861
 msgid "Keep a copy of the torrent file"
-msgstr "Guarda una copia del archivotorrent"
+msgstr "Guardar una copia del archivo Torrent"
 
 #: tr_prefs.c:864
 msgid "Keep a copy and remove the original"
-msgstr "Guarda una copia y borra el original"
+msgstr "Guardar una copia y borrar el original"
 
 #: tr_torrent.c:314
 #, c-format
 msgid "%s: not a valid torrent file"
-msgstr "%s: no es un archivo torrent correcto"
+msgstr "%s: no es un archivo Torrent correcto"
 
 #: tr_torrent.c:317
 #, c-format
 msgid "%s: torrent is already open"
-msgstr "%s: el torrent ya está abierto"
+msgstr "%s: el Torrent ya está abierto"
 
 #: tr_window.c:169
 msgid "_File"
-msgstr ""
+msgstr "_Archivo"
 
 #: tr_window.c:355
 #, c-format
@@ -497,7 +510,7 @@ msgstr "Comprobando ficheros existentes (%.1f%%)"
 #: tr_window.c:517
 #, fuzzy, c-format
 msgid "Stalled (%.1f%%)"
-msgstr ""
+msgstr "Colgado (%.1f%%)"
 
 #: tr_window.c:522
 #, fuzzy, c-format
@@ -575,47 +588,47 @@ msgstr "PiB"
 
 #: util.c:64
 msgid "EiB"
-msgstr ""
+msgstr "EiB"
 
 #: util.c:93
 #, c-format
 msgid "%i %s"
-msgstr ""
+msgstr "%i %s"
 
 #: util.c:94 util.c:98
 msgid "second"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "segundo"
+msgstr[1] "segundos"
 
 #: util.c:96 util.c:100 util.c:104 util.c:108
 #, c-format
 msgid "%i %s %i %s"
-msgstr ""
+msgstr "%i %s %i %s"
 
 #: util.c:97 util.c:102
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minuto"
+msgstr[1] "minutos"
 
 #: util.c:101 util.c:106 util.c:110
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hora"
+msgstr[1] "horas"
 
 #: util.c:105
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "día"
+msgstr[1] "días"
 
 #: util.c:109
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "semana"
+msgstr[1] "semanas"
 
 #: util.c:118
 msgid "N/A"
@@ -624,4 +637,4 @@ msgstr "N/D"
 #. this is a UTF-8 infinity symbol
 #: util.c:122
 msgid "∞"
-msgstr ""
+msgstr "∞"
