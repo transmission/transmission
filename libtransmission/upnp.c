@@ -239,6 +239,13 @@ tr_upnpForwardPort( tr_upnp_t * upnp, int port )
 }
 
 void
+tr_upnpRemoveForwarding( tr_upnp_t * upnp )
+{
+    tr_dbg( "upnp port unset" );
+    upnp->port = 0;
+}
+
+void
 tr_upnpClose( tr_upnp_t * upnp )
 {
     tr_upnpStop( upnp );

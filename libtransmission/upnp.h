@@ -32,6 +32,7 @@ void        tr_upnpStart( tr_upnp_t * );
 void        tr_upnpStop( tr_upnp_t * );
 int         tr_upnpStatus( tr_upnp_t * );
 void        tr_upnpForwardPort( tr_upnp_t *, int );
+void        tr_upnpRemoveForwarding( tr_upnp_t * );
 void        tr_upnpPulse( tr_upnp_t * );
 void        tr_upnpClose( tr_upnp_t * );
 

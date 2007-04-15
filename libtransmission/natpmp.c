@@ -97,6 +97,8 @@ typedef struct tr_natpmp_parse_s
 }
 tr_natpmp_parse_t;
 
+static void
+unmap( tr_natpmp_t * pmp );
 static int
 checktime( tr_natpmp_uptime_t * uptime, uint32_t seen );
 static void
@@ -173,35 +175,7 @@ tr_natpmpStop( tr_natpmp_t * pmp )
         tr_inf( "stopping nat-pmp" );
         pmp->active = 0;
         killsock( &pmp->mcastfd );
-        switch( pmp->state )
-        {
-            case PMP_STATE_IDLE:
-                break;
-            case PMP_STATE_ADDING:
-                pmp->state = PMP_STATE_IDLE;
-                tr_dbg( "nat-pmp state add -> idle" );
-                if( NULL != pmp->req )
-                {
-                    pmp->mappedport = pmp->req->gotport;
-                    killreq( &pmp->req );
-                    pmp->state = PMP_STATE_DELETING;
-                    tr_dbg( "nat-pmp state idle -> del" );
-                }
-                break;
-            case PMP_STATE_DELETING:
-                break;
-            case PMP_STATE_MAPPED:
-                pmp->state = PMP_STATE_DELETING;
-                tr_dbg( "nat-pmp state mapped -> del" );
-                break;
-            case PMP_STATE_FAILED:
-            case PMP_STATE_NOBODYHOME:
-            case PMP_STATE_TMPFAIL:
-                break;
-            default:
-                assert( 0 );
-                break;
-        }
+        unmap( pmp );
     }
 }
 
@@ -253,6 +227,14 @@ tr_natpmpForwardPort( tr_natpmp_t * pmp, int port )
 {
     tr_inf( "nat-pmp set port %i", port );
     pmp->newport = port;
+}
+
+void
+tr_natpmpRemoveForwarding( tr_natpmp_t * pmp )
+{
+    tr_inf( "nat-pmp unset port" );
+    pmp->newport = -1;
+    unmap( pmp );
 }
 
 void
@@ -437,6 +419,43 @@ tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
     if( NULL != publicPort )
     {
         *publicPort = -1;
+    }
+}
+
+void
+unmap( tr_natpmp_t * pmp )
+{
+    switch( pmp->state )
+    {
+        case PMP_STATE_IDLE:
+            break;
+        case PMP_STATE_ADDING:
+            if( NULL == pmp->req )
+            {
+                pmp->state = PMP_STATE_IDLE;
+                tr_dbg( "nat-pmp state add -> idle" );
+            }
+            else
+            {
+                pmp->mappedport = pmp->req->gotport;
+                killreq( &pmp->req );
+                pmp->state = PMP_STATE_DELETING;
+                tr_dbg( "nat-pmp state add -> del" );
+            }
+            break;
+        case PMP_STATE_DELETING:
+            break;
+        case PMP_STATE_MAPPED:
+            pmp->state = PMP_STATE_DELETING;
+            tr_dbg( "nat-pmp state mapped -> del" );
+            break;
+        case PMP_STATE_FAILED:
+        case PMP_STATE_NOBODYHOME:
+        case PMP_STATE_TMPFAIL:
+            break;
+        default:
+            assert( 0 );
+            break;
     }
 }
 

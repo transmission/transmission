@@ -160,21 +160,27 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
     /* Create the new one */
     /* XXX should handle failure here in a better way */
     s->bindSocket = tr_netBindTCP( port );
-    if( s->bindSocket >= 0 )
+    if( 0 > s->bindSocket )
+    {
+        /* Notify the trackers */
+        SetPublicPort( s, 0 );
+        /* Remove the forwarding for the old port */
+        tr_natpmpRemoveForwarding( s->natpmp );
+        tr_upnpRemoveForwarding( s->upnp );
+    }
+    else
     {
         tr_inf( "Bound listening port %d", port );
         listen( s->bindSocket, 5 );
+        if( port != s->publicPort )
+        {
+            /* Notify the trackers */
+            SetPublicPort( s, port );
+            /* Forward the new port */
+            tr_natpmpForwardPort( s->natpmp, port );
+            tr_upnpForwardPort( s->upnp, port );
+        }
     }
-
-    /* Notify the trackers */
-    if( port != s->publicPort )
-    {
-        SetPublicPort( s, port );
-    }
-
-    /* Forward the new port */
-    tr_natpmpForwardPort( s->natpmp, port );
-    tr_upnpForwardPort( s->upnp, port );
 
     tr_sharedUnlock( s );
 }

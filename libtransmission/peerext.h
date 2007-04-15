@@ -148,6 +148,7 @@ makeExtendedHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * len )
     /* our listening port */
     if( 0 < tor->publicPort )
     {
+        /* XXX should inform peer when we no longer have a valid port */
         tr_bencInitInt( tr_bencDictAdd( &val, "p" ), tor->publicPort );
     }
 

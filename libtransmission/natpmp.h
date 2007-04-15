@@ -32,6 +32,7 @@ void        tr_natpmpStart( tr_natpmp_t * );
 void        tr_natpmpStop( tr_natpmp_t * );
 int         tr_natpmpStatus( tr_natpmp_t * );
 void        tr_natpmpForwardPort( tr_natpmp_t *, int );
+void        tr_natpmpRemoveForwarding( tr_natpmp_t * );
 void        tr_natpmpPulse( tr_natpmp_t *, int * );
 void        tr_natpmpClose( tr_natpmp_t * );
 
