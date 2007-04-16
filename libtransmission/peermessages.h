@@ -405,17 +405,27 @@ static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
     {
         case EXTENDED_HANDSHAKE_ID:
             buf = makeExtendedHandshake( tor, peer, &len );
+            if( NULL == buf )
+            {
+                return TR_ERROR;
+            }
+            peer_dbg( "SEND extended-handshake, %s pex",
+                      ( peer->private ? "without" : "with" ) );
             break;
         case EXTENDED_PEX_ID:
-            buf = makeUTPex( tor, peer, &len );
+            if( makeUTPex( tor, peer, &buf, &len ) )
+            {
+                return TR_ERROR;
+            }
+            else if( NULL == buf )
+            {
+                return TR_OK;
+            }
+            peer_dbg( "SEND extended-pex" );
             break;
         default:
             assert( 0 );
             break;
-    }
-    if( NULL == buf )
-    {
-        return TR_ERROR;
     }
 
     /* add header and queue it to be sent */
@@ -438,16 +448,21 @@ static int sendAZPex( tr_torrent_t * tor, tr_peer_t * peer )
     char    * buf;
     int       len;
 
-    buf = makeAZPex( tor, peer, &len );
-    if( NULL == buf )
+    if( makeAZPex( tor, peer, &buf, &len ) )
     {
         return TR_ERROR;
+    }
+    else if( NULL == buf )
+    {
+        return TR_OK;
     }
 
     /* add header and queue it to be sent */
     p = getMessagePointer( peer, len, AZ_MSG_AZ_PEER_EXCHANGE );
     memcpy( p, buf, len );
     free( buf );
+
+    peer_dbg( "SEND azureus-pex" );
 
     return TR_OK;
 }

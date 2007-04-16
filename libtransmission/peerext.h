@@ -25,19 +25,20 @@
 #define EXTENDED_HANDSHAKE_ID   0
 #define EXTENDED_PEX_ID         1
 
-static char *
-makeCommonPex( tr_torrent_t * tor, tr_peer_t * peer, int * len,
+static int
+makeCommonPex( tr_torrent_t * tor, tr_peer_t * peer,
                int ( *peerfunc )( tr_peertree_t *, benc_val_t * ),
-               const char * extrakey, benc_val_t * extraval )
+               const char * extrakey, benc_val_t * extraval,
+               char ** retbuf, int * retlen )
 {
     tr_peertree_t       * sent, added, common;
     int                   ii;
     tr_peer_t           * pp;
     tr_peertree_entry_t * found;
     benc_val_t            val, * addval, * delval, * extra;
-    char                * buf;
 
-    *len = 0;
+    *retbuf = NULL;
+    *retlen = 0;
     sent = &peer->sentPeers;
     peertreeInit( &added );
     peertreeInit( &common );
@@ -60,20 +61,28 @@ makeCommonPex( tr_torrent_t * tor, tr_peer_t * peer, int * len,
             peertreeMerge( sent, &common );
             peertreeFree( &added );
             tr_bencFree( extraval );
-            return NULL;
+            return 1;
         }
+    }
+
+    /* check if there were any added or deleted peers */
+    if( peertreeEmpty( &added ) && peertreeEmpty( sent ) )
+    {
+        peertreeMerge( sent, &common );
+        peertreeFree( &added );
+        tr_bencFree( extraval );
+        return 0;
     }
 
     /* build the dictionaries */
     tr_bencInit( &val, TYPE_DICT );
-    if( ( peertreeEmpty( &added ) && peertreeEmpty( sent ) ) ||
-        tr_bencDictReserve( &val, 3 ) )
+    if( tr_bencDictReserve( &val, 3 ) )
     {
         tr_bencFree( &val );
         peertreeMerge( sent, &common );
         peertreeFree( &added );
         tr_bencFree( extraval );
-        return NULL;
+        return 1;
     }
     extra  = tr_bencDictAdd( &val, extrakey );
     addval = tr_bencDictAdd( &val, "added" );
@@ -85,26 +94,26 @@ makeCommonPex( tr_torrent_t * tor, tr_peer_t * peer, int * len,
         peertreeMerge( sent, &common );
         peertreeFree( &added );
         tr_bencFree( extraval );
-        return NULL;
+        return 1;
     }
     *extra = *extraval;
     memset( extraval, 0, sizeof( extraval ) );
 
     /* bencode it */
-    buf = tr_bencSaveMalloc( &val, len );
+    *retbuf = tr_bencSaveMalloc( &val, retlen );
     tr_bencFree( &val );
-    if( NULL == buf )
+    if( NULL == *retbuf )
     {
         peertreeMerge( sent, &common );
         peertreeFree( &added );
-        return NULL;
+        return 1;
     }
 
     peertreeSwap( sent, &common );
     peertreeMerge( sent, &added );
     peertreeFree( &common );
 
-    return buf;
+    return 0;
 }
 
 static char *
@@ -162,9 +171,6 @@ makeExtendedHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * len )
 
     peer->advertisedPort = tor->publicPort;
 
-    peer_dbg( "SEND extended-handshake, %s pex",
-              ( peer->private ? "without" : "with" ) );
-
     return buf;
 }
 
@@ -201,19 +207,15 @@ peertreeToBencUT( tr_peertree_t * tree, benc_val_t * val )
     return 0;
 }
 
-static char *
-makeUTPex( tr_torrent_t * tor, tr_peer_t * peer, int * len )
+static int
+makeUTPex( tr_torrent_t * tor, tr_peer_t * peer, char ** buf, int * len )
 {
     benc_val_t val;
-    char     * ret;
-
-    peer_dbg( "SEND extended-pex" );
 
     assert( !peer->private );
     tr_bencInitStr( &val, NULL, 0, 1 );
-    ret = makeCommonPex( tor, peer, len, peertreeToBencUT, "added.f", &val );
-
-    return ret;
+    return makeCommonPex( tor, peer, peertreeToBencUT, "added.f", &val,
+                          buf, len );
 }
 
 static inline int

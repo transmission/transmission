@@ -223,19 +223,15 @@ peertreeToBencAZ( tr_peertree_t * tree, benc_val_t * val )
     return 0;
 }
 
-static char *
-makeAZPex( tr_torrent_t * tor, tr_peer_t * peer, int * len )
+static int
+makeAZPex( tr_torrent_t * tor, tr_peer_t * peer, char ** buf, int * len )
 {
     benc_val_t val;
-    char * buf;
-
-    peer_dbg( "SEND azureus-pex" );
 
     assert( !peer->private );
     tr_bencInitStr( &val, tor->info.hash, sizeof( tor->info.hash ), 1 );
-    buf = makeCommonPex( tor, peer, len, peertreeToBencAZ, "infohash", &val );
-
-    return buf;
+    return makeCommonPex( tor, peer, peertreeToBencAZ, "infohash", &val,
+                          buf, len);
 }
 
 static int
@@ -427,7 +423,7 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         }
         subsub = tr_bencDictFind( dict, "ver" );
         if( NULL == subsub || TYPE_STR != subsub->type ||
-            1 != subsub->val.s.i || AZ_EXT_VERSION != subsub->val.s.s[0] )
+            1 != subsub->val.s.i || AZ_EXT_VERSION > subsub->val.s.s[0] )
         {
             continue;
         }
