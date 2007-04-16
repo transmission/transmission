@@ -4,14 +4,14 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
 
 0.7 ()
  - New icon
- - Automatic port configuration (NAT-PMP and UPnP)
+ - Automatic port mapping (NAT-PMP and UPnP IGD)
  - Peer exchange (PEX) compatible with Azureus and uTorrent
  - Multitracker support
- - Listen to tracker's announce and min-announce intervals
- - Fix for sending invalid stats to trackers
- - Better scrape support
+ - Better handling of tracker announce interval
+ - Fixes bug where absurdly huge upload/download totals could be sent
+ - Automatic tracker scraping
  - Cache connected peers
- - Bugfixes and improvements
+ - Many miscellaneous bugfixes and small improvements
  - OS X:
    + Download and seeding queues that can be user-ordered
    + Speed Limit: Second set of bandwidth limits that can be toggled or 
@@ -31,6 +31,12 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
    + New toolbar icons
    + Built-in help files
    + French, Spanish, German, and Greek translations
+ - GTK+:
+   + Adds Spanish, Polish, Russian, Bulgarian, Romanian, and Swedish
+     translations
+   + Message window
+   + Better window manager integration
+   + Add file view to properties dialog
 
 0.6.1 (2006/06/25)
  - OS X:
