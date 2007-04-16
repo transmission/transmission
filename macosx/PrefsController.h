@@ -72,10 +72,9 @@
 - (void) incompleteFolderSheetShow: (id) sender;
 
 - (void) setPort: (id) sender;
+- (void) setNat: (id) sender;
 - (void) updatePortStatus;
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
-- (void) setNat: (id) sender;
-- (void) updateNatStatus;
 
 - (void) applyRatioSetting: (id) sender;
 - (void) updateRatioStopField;

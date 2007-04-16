@@ -145,12 +145,11 @@
     
     //set port
     [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
-    [self updatePortStatus];
-    
     fNatStatus = -1;
-    [self updateNatStatus];
+    
+    [self updatePortStatus];
     fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
-                        selector: @selector(updateNatStatus) userInfo: nil repeats: YES];
+                        selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
     
     //set queue values
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
@@ -236,8 +235,8 @@
 
 - (void) setPort: (id) sender
 {
-    fPublicPort = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", fPublicPort]])
+    int port = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", port]])
     {
         NSBeep();
         [sender setIntValue: [fDefaults integerForKey: @"BindPort"]];
@@ -246,23 +245,58 @@
     
     [fDefaults setInteger: fPublicPort forKey: @"BindPort"];
     
-    tr_setBindPort(fHandle, fPublicPort);
-    [self updateNatStatus];
+    tr_setBindPort(fHandle, port);
+    
+    fPublicPort = -1;
+    [self updatePortStatus];
+}
+
+- (void) setNat: (id) sender
+{
+    tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
     [self updatePortStatus];
 }
 
 - (void) updatePortStatus
 {
-    [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
-                                        "Preferences -> Network -> port status") stringByAppendingEllipsis]];
-    [fPortStatusImage setImage: nil];
-    [fPortStatusProgress startAnimation: self];
-    
     tr_handle_status_t * stat = tr_handleStatus(fHandle);
-    fPublicPort = stat->publicPort;
     
-    PortChecker * portChecker = [[PortChecker alloc] initWithDelegate: self];
-    [portChecker probePort: fPublicPort];
+    BOOL change;
+    if (change = (fNatStatus != stat->natTraversalStatus))
+    {
+        fNatStatus = stat->natTraversalStatus;
+        
+        if (fNatStatus == TR_NAT_TRAVERSAL_MAPPED)
+        {
+            [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
+                                                "Preferences -> Network -> port map status")];
+            [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
+        }
+        else if (fNatStatus == TR_NAT_TRAVERSAL_NOTFOUND || fNatStatus == TR_NAT_TRAVERSAL_ERROR)
+        {
+            [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
+                                                "Preferences -> Network -> port map status")];
+            [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+        }
+        else
+        {
+            [fNatStatusField setStringValue: @""];
+            [fNatStatusImage setImage: nil];
+        }
+    }
+    
+    if (change || fPublicPort != stat->publicPort)
+    {
+        fPublicPort = stat->publicPort;
+        
+        [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
+                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
+        [fPortStatusImage setImage: nil];
+        [fPortStatusProgress startAnimation: self];
+        
+        PortChecker * portChecker = [[PortChecker alloc] initWithDelegate: self];
+        [portChecker probePort: fPublicPort];
+    }
 }
 
 - (void) portCheckerDidFinishProbing: (PortChecker *) portChecker
@@ -289,46 +323,6 @@
             break;
     }
     [portChecker release];
-}
-
-- (void) setNat: (id) sender
-{
-    tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
-    [self updateNatStatus];
-}
-
-- (void) updateNatStatus
-{
-    tr_handle_status_t * stat = tr_handleStatus(fHandle);
-    if (fNatStatus != stat->natTraversalStatus)
-    {
-        fNatStatus = stat->natTraversalStatus;
-        
-        if (fNatStatus == TR_NAT_TRAVERSAL_MAPPED)
-        {
-            [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
-                                                "Preferences -> Network -> port map status")];
-            [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
-        }
-        else if (fNatStatus == TR_NAT_TRAVERSAL_NOTFOUND || fNatStatus == TR_NAT_TRAVERSAL_ERROR)
-        {
-            [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
-                                                "Preferences -> Network -> port map status")];
-            [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
-        }
-        else
-        {
-            [fNatStatusField setStringValue: @""];
-            [fNatStatusImage setImage: nil];
-        }
-        
-        [self updatePortStatus];
-    }
-    else if (fPublicPort != stat->publicPort)
-    {
-        [self updatePortStatus];
-    }
-    else;
 }
 
 - (void) applySpeedSettings: (id) sender
