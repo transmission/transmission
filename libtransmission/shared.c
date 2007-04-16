@@ -176,10 +176,10 @@ void tr_sharedSetPort( tr_shared_t * s, int port )
         {
             /* Notify the trackers */
             SetPublicPort( s, port );
-            /* Forward the new port */
-            tr_natpmpForwardPort( s->natpmp, port );
-            tr_upnpForwardPort( s->upnp, port );
         }
+        /* Forward the new port */
+        tr_natpmpForwardPort( s->natpmp, port );
+        tr_upnpForwardPort( s->upnp, port );
     }
 
     tr_sharedUnlock( s );
