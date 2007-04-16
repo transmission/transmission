@@ -323,6 +323,12 @@
 		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
 		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
+		A2440F9C0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2440F9D0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A2440F9E0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2440F9F0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A2440FA00BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A2440FA10BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
 		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
@@ -1003,6 +1009,7 @@
 				4C9F8F060BC5B68A002E5433 /* French */,
 				A26B0B4F0BCFD7B0008C1579 /* Greek */,
 				A29B0C200BD15FD70006F230 /* Spanish */,
+				A2440F9C0BD331A2006A687A /* German */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1014,6 +1021,7 @@
 				4C9F8F090BC5B68A002E5433 /* French */,
 				A26B0B440BCFD760008C1579 /* Greek */,
 				A29B0C140BD15F9D0006F230 /* Spanish */,
+				A2440F9F0BD331A2006A687A /* German */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1025,6 +1033,7 @@
 				4C9F8F070BC5B68A002E5433 /* French */,
 				A26B0B430BCFD760008C1579 /* Greek */,
 				A29B0C130BD15F9D0006F230 /* Spanish */,
+				A2440F9D0BD331A2006A687A /* German */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1036,6 +1045,7 @@
 				4C9F8F0A0BC5B68A002E5433 /* French */,
 				A26B0B450BCFD760008C1579 /* Greek */,
 				A29B0C150BD15F9D0006F230 /* Spanish */,
+				A2440FA00BD331A2006A687A /* German */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1047,6 +1057,7 @@
 				4C9F8F080BC5B68A002E5433 /* French */,
 				A26B0B4B0BCFD7A0008C1579 /* Greek */,
 				A29B0C1B0BD15FCB0006F230 /* Spanish */,
+				A2440F9E0BD331A2006A687A /* German */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1058,6 +1069,7 @@
 				4C9F8F0B0BC5B68A002E5433 /* French */,
 				A26B0B460BCFD760008C1579 /* Greek */,
 				A29B0C160BD15F9D0006F230 /* Spanish */,
+				A2440FA10BD331A2006A687A /* German */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
