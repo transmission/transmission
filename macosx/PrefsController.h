@@ -54,7 +54,7 @@
     IBOutlet NSImageView            * fNatStatusImage, * fPortStatusImage;
     IBOutlet NSProgressIndicator    * fPortStatusProgress;
     NSTimer                         * fNatStatusTimer;
-    int                             fNatStatus;
+    int                             fPublicPort, fNatStatus;
 }
 
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
