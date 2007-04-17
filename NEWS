@@ -32,8 +32,8 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
    + Built-in help files
    + French, Spanish, German, and Greek translations
  - GTK+:
-   + Adds Spanish, Polish, Russian, Bulgarian, Romanian, and Swedish
-     translations
+   + Adds Spanish, Polish, Russian, Bulgarian, Romanian, Swedish, and
+     Finnish translations
    + Message window
    + Better window manager integration
    + Add file view to properties dialog
