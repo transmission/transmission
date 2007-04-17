@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Transmission Appcast</title>
+    <link>http://transmission.m0k.org/appcast.xml</link>
+    <description>Most recent version available.</description>
+    <language>en</language>
+    <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
+    <lastBuildDate>Sun, 25 Jun 2006 17:44:58 -0400</lastBuildDate>
+    <item>
+      <title>Transmission 0.6.1 Released</title>
+      <description><![CDATA[Changes since Transmission 0.6:
+<ul>
+ <li>Fixes a bug in the updater that could cause repeated hits to the appcast</li>
+</ul>]]></description>
+      <pubDate>Sun, 25 Jun 2006 17:44:58 -0400</pubDate>
+      <enclosure sparkle:version="480" sparkle:shortVersionString="0.6.1" url="http://download.m0k.org/transmission/files/Transmission-0.6.1.dmg" length="653351" type="application/octet-stream"/>
+    </item>
+    <item>
+      <title>Transmission 0.6 Released</title>
+      <description><![CDATA[Changes since Transmission 0.5:
+<ul>
+ <li>Ability to limit download rate</li>
+ <li>Automatic banning of peers who send bad data</li>
+ <li>Can keep a copy of the torrent file so the original can be deleted</li>
+ <li>Many bugfixes</li>
+ <li>Reworked interface</li>
+ <li>Rate limits can be changed directly from the main window</li>
+ <li>Ability to automatically stop seeding at a given ratio</li>
+ <li>Allows sorting of the tranfers list</li>
+ <li>Extended Info Inspector</li>
+ <li>Automatic updating with Sparkle</li>
+</ul>]]></description>
+      <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
+      <enclosure sparkle:version="437" sparkle:shortVersionString="0.6" url="http://download.m0k.org/transmission/files/Transmission-0.6.dmg" length="494954" type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
