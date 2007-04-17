@@ -256,6 +256,11 @@ tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
         mcastpulse( pmp );
     }
 
+    if( NULL != publicPort )
+    {
+        *publicPort = -1;
+    }
+
     if( pmp->active || PMP_STATE_DELETING == pmp->state )
     {
         switch( pmp->state )
@@ -418,11 +423,6 @@ tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
                 assert( 0 );
                 break;
         }
-    }
-
-    if( NULL != publicPort )
-    {
-        *publicPort = -1;
     }
 }
 
