@@ -26,7 +26,7 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
    + Minimal view to take up less space
    + Seeding bar shows progress in finishing seeding
    + Sounds when downloading and seeding complete
-   + Warnings for directory unavailable or not enough space
+   + Warnings for directory unavailable and not enough space
    + Message log window
    + New toolbar icons
    + Built-in help files

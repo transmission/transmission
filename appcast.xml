@@ -7,6 +7,49 @@
     <language>en</language>
     <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
     <lastBuildDate>Sun, 25 Jun 2006 17:44:58 -0400</lastBuildDate>
+    
+    <item>
+      <title>Transmission 0.7 Released</title>
+      <description><![CDATA[Changes since Transmission 0.61:
+<h3>TRANSMISSION 0.7 REQUIRES MAC OS X 10.4 OR GREATER. DO NOT UPDATE ON EARLIER SYSTEMS</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>New icon</li>
+ <li>Automatic port mapping (NAT-PMP and UPnP IGD)</li>
+ <li>Peer exchange (PEX) compatible with Azureus and uTorrent</li>
+ <li>Multitracker support</li>
+ <li>Better handling of tracker announce interval</li>
+ <li>Fixes bug where absurdly huge upload/download totals could be sent</li>
+ <li>Automatic tracker scraping</li>
+ <li>Cache connected peers</li>
+ <li>Many miscellaneous bugfixes and small improvements</li>
+</ul>
+<h4>Mac-Specific Changes:</h4>
+<ul>
+ <li>Download and seeding queues that can be user-ordered</li>
+ <li>Speed Limit: Second set of bandwidth limits that can be toggled or 
+     scheduled</li>
+ <li>Individual torrent bandwidth limits</li>
+ <li>Separate complete and incomplete download folders</li>
+ <li>Filter and search bar</li>
+ <li>Expanded Inspector with many additional views and stats</li>
+ <li>Fragment status view in Inspector shows downloaded or availability</li>
+ <li>Watch folder to auto add torrent files</li>
+ <li>Auto resizing of the main window</li>
+ <li>Minimal view to take up less space</li>
+ <li>Seeding bar shows progress in finishing seeding</li>
+ <li>Sounds when downloading and seeding complete</li>
+ <li>Warnings for directory unavailable and not enough space</li>
+ <li>Message log window</li>
+ <li>New toolbar icons</li>
+ <li>Built-in help files</li>
+ <li>French, Spanish, German, and Greek translations</li>
+</ul>]]></description>
+      <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
+      <enclosure sparkle:version="437" sparkle:shortVersionString="0.6" url="http://download.m0k.org/transmission/files/Transmission-0.6.dmg" length="494954" type="application/octet-stream"/>
+    </item>
+    
     <item>
       <title>Transmission 0.6.1 Released</title>
       <description><![CDATA[Changes since Transmission 0.6:
@@ -16,6 +59,7 @@
       <pubDate>Sun, 25 Jun 2006 17:44:58 -0400</pubDate>
       <enclosure sparkle:version="480" sparkle:shortVersionString="0.6.1" url="http://download.m0k.org/transmission/files/Transmission-0.6.1.dmg" length="653351" type="application/octet-stream"/>
     </item>
+    
     <item>
       <title>Transmission 0.6 Released</title>
       <description><![CDATA[Changes since Transmission 0.5:
@@ -34,5 +78,6 @@
       <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
       <enclosure sparkle:version="437" sparkle:shortVersionString="0.6" url="http://download.m0k.org/transmission/files/Transmission-0.6.dmg" length="494954" type="application/octet-stream"/>
     </item>
+    
   </channel>
 </rss>
