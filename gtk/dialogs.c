@@ -429,6 +429,7 @@ infoupdate( struct infowind * iw, int force )
         g_free( path );
         return;
     }
+    g_free( path );
     gtk_tree_model_get( iw->model, &iter, MC_TRACKER, &track,
                         MC_SEED, &seed, MC_LEECH, &leech, MC_DONE, &done,
                         MC_DOWN, &down, MC_UP, &up, MC_LEFT, &left, -1 );
