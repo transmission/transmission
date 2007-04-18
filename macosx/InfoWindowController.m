@@ -548,6 +548,7 @@
         [fRatioLimitField setStringValue: @""];
 		
 		[fPexCheck setEnabled: NO];
+        [fPexCheck setState: NSOffState];
     }
     
     [self updateInfoStats];
