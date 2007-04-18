@@ -876,7 +876,7 @@ infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     assert( IPC_MSG_INFO == msgid );
 
-    if( TYPE_LIST != list->type || NULL == resp->infocb )
+    if( TYPE_LIST != list->type )
     {
         return;
     }
@@ -884,7 +884,7 @@ infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
     bzero( &key, sizeof key );
     key.tag = tag;
     resp = RB_FIND( resptree, &gl_resps, &key );
-    if( NULL == resp )
+    if( NULL == resp || NULL == resp->infocb )
     {
         return;
     }
@@ -928,7 +928,7 @@ statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
 
     assert( IPC_MSG_STAT == msgid );
 
-    if( TYPE_LIST != list->type || NULL == resp->statcb )
+    if( TYPE_LIST != list->type )
     {
         return;
     }
@@ -936,7 +936,7 @@ statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
     bzero( &key, sizeof key );
     key.tag = tag;
     resp = RB_FIND( resptree, &gl_resps, &key );
-    if( NULL == resp )
+    if( NULL == resp || NULL == resp->statcb )
     {
         return;
     }
