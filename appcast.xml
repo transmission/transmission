@@ -5,13 +5,13 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
-    <lastBuildDate>Sun, 25 Jun 2006 17:44:58 -0400</lastBuildDate>
+    <pubDate>Wed, 18 Apr 2007 00:00:00 -0400</pubDate>
+    <lastBuildDate>Wed, 18 Apr 2007 00:00:00 -0400</lastBuildDate>
     
     <item>
       <title>Transmission 0.7 Released</title>
-      <description><![CDATA[Changes since Transmission 0.61:
-<h3>TRANSMISSION 0.7 REQUIRES MAC OS X 10.4 OR GREATER. DO NOT UPDATE ON EARLIER SYSTEMS</h3>
+      <description><![CDATA[
+<h3>TRANSMISSION 0.7 REQUIRES MAC OS X 10.4 OR GREATER. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
 
 <h4>Transmission Changes:</h4>
 <ul>
@@ -46,8 +46,8 @@
  <li>Built-in help files</li>
  <li>French, Spanish, German, and Greek translations</li>
 </ul>]]></description>
-      <pubDate>Wed, 21 Jun 2006 23:27:29 -0400</pubDate>
-      <enclosure sparkle:version="437" sparkle:shortVersionString="0.6" url="http://download.m0k.org/transmission/files/Transmission-0.6.dmg" length="494954" type="application/octet-stream"/>
+      <pubDate>Wed, 18 Apr 2007 00:00:00 -0400</pubDate>
+      <enclosure sparkle:version="2000" sparkle:shortVersionString="0.70" url="http://download.m0k.org/transmission/files/Transmission-0.7.dmg" length="494954" type="application/octet-stream"/>
     </item>
     
     <item>
@@ -62,7 +62,7 @@
     
     <item>
       <title>Transmission 0.6 Released</title>
-      <description><![CDATA[Changes since Transmission 0.5:
+      <description><![CDATA[
 <ul>
  <li>Ability to limit download rate</li>
  <li>Automatic banning of peers who send bad data</li>
