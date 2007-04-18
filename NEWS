@@ -1,8 +1,8 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or better.
+Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or newer.
 
-0.7 ()
+0.7 (2007/04/18)
  - New icon
  - Automatic port mapping (NAT-PMP and UPnP IGD)
  - Peer exchange (PEX) compatible with Azureus and uTorrent

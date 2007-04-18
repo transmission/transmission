@@ -3,9 +3,9 @@
 # $Id$
 
 MAJOR=0
-MINOR=6
-MAINT=1
-STRING=0.70-svn
+MINOR=7
+MAINT=0
+STRING=0.70
 
 # Get current SVN revision from Ids in all source files
 REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
