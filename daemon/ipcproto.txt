@@ -1,0 +1,454 @@
+It is assumed the reader is familiar with bencoding, as described in
+the BitTorrent protocol specification at
+http://www.bittorrent.org/protocol.html
+
+Dictionary keys used below will be enclosed in quotation marks, these
+are used for clarity and are not part of the actual key.
+
+The IPC protocol is used to allow processes to control or retrieve
+information from a Transmission frontend, such as transmission-daemon
+or transmission-gtk. This communication is done over a unix-domain
+socket file, such as ~/.transmission/daemon/socket. In this document
+the Transmission frontend will be referred to as the server and the
+process connecting to it as the client.
+
+Once a client connects to the server's socket, messages may be
+exchanged until either end closes the connection. Messages contain an
+32-bit payload length, encoded as 8 bytes of ASCII hexidecimal,
+followed by the payload. Upper, lower, or mixed case for the length
+are all accpetable and must be handled correctly. Payload lengths
+greater than 2^31 - 8 (ie: 2147483640) are not allowed.
+
+For version 1, the message payload is a bencoded dictionary, the
+valid keys and value formats for which are described below. Multiple
+keys may be used in one message.
+
+An example version 1 message:
+
+0000000Ed4:porti9090ee
+
+For version 2 the message payload is a bencoded list containing a
+message id string followed by a bencoded value, the format of which is
+the same for version 1. The value may be followed by an optional
+bencoded integer, this is a message tag and is described in more
+detail below.
+
+An example version 2 message:
+
+0000001El12:get-info-alll4:hashee
+
+The same message with a tag:
+
+00000021l12:get-info-alll4:hashei5ee
+
+Once the connection is made both the client and server must send a
+version 1 style message (ie: the payload is a dictionary and may not
+contain a tag) with the dictionary key "version" and a value formatted
+as described below. The version should be the first but not
+necessarily only key in the dictionary. Any other keys should be
+ignored and not processed as messages. Neither the client nor the
+server should wait to receive a version message before sending one, it
+must be sent immediately. No other messages should be sent until the
+version is received.
+
+The version value should be a bencoded dictionary containing two keys,
+"max" and "min". These are the minimum and maximum supported protocol
+versions, respectively. Communication will take place using the
+highest protocol version supported by both the client and the server,
+and is not possible at all if there is no common version. A client may
+receive a version value that is an integer instead of a dictionary
+with "min" and "max" keys. This deprecated version format indicates
+the only version supported by the server.
+
+An example message containing minimum and maximum versions 1 and 2:
+
+0000001Dd7:versiond3:mini1e3:maxi2eee
+
+Tagged messages, only supported in version 2, allow a client to tag a
+message with a positive non-zero integer. The server is then required
+to send a response to the message even if none would normally be
+required, and to tag the response with the same integer. When the
+server receives a tagged message it must send exactly one message back
+with the same tag. The client is allowed to use the same tag for
+multiple messages, even if a response to the first is not received
+before the second it sent. If a tagged message does not normally
+require a response then a "succeeded", "failed" or "not-supported"
+message will be sent back.
+
+An example tagged message and response:
+
+00000010l5:startli8eei15ee
+00000011l8:succeeded0:i15ee
+
+Some example sessions, including version handshake, are found at the
+end of this file.
+
+Dictionary keys are encoded in UTF-8 and case sensitive. Any character
+except a NUL (0x00) is valid. A server or client need not support
+every possible key and should silently ignore any that it does not
+understand.
+
+If a reference to a boolean is seen, it should be taken to mean an
+integer with a value of 0 representing false, 1 representing true, and
+any other value undefined.
+
+Individual torrents are identified by a unique integer. This integer
+is only valid for the current connection and may be invalid or refer
+to another torrent in a future connection. If a torrent is closed it's
+ID will never be reused to refer to another torrent for at least the
+duration of the connection. Negative integers or 0 are not valid IDs.
+
+A list of keys and the format of their values follows. Also listed is
+the minimum protocol version that the key may be used with.
+
+
+Key:     "addfiles"
+Version: 1
+Format:  list of strings
+Example: 8:addfilesl21:/torrents/foo.torrent20:/home/me/bar.torrente
+Details: Each string is the absolute path to a torrent metainfo file
+         for the server to add. Note that whether or not the torrent
+         metainfo file is copied (allowing the original to be moved or
+         deleted safely) is implementation dependent and may not
+         currently be known or changed with this protocol.
+
+Key:     "addfile-detailed"
+Version: 2
+Format:  dict
+Example: 16:addfile-detailedde
+Details: Dictionary containing information about a torrent for the
+         server to add. Valid keys include:
+           "file"       string, filename of torrent metainfo file
+           "data"       string, contents of a torrent metainfo file
+           "directory"  string, directory for data files for the torrent
+           "autostart"  boolean, start the torrent automatically
+         Either "file" or "data" is required, but both are not allowed.
+
+Key:     "automap"
+Version: 2
+Format:  boolean
+Example: 7:automapi1e
+Details: Enable (1) or disable (0) automatic port mapping on the
+         server. Other integer values will likely be treated as 1 but
+         this shold not be relied upon.
+
+Key:     "autostart"
+Version: 2
+Format:  boolean
+Example: 9:autostarti0e
+Details: Enable (1) or disable (0) automatic starting of new torrents
+         added via "addfiles" message.
+
+Key:     "directory"
+Version: 2
+Format:  string
+Example: 9:directory21:/home/roger/downloads
+Details: Set the default directory used for any torrents added in the future.
+
+Key:     "downlimit"
+Version: 2
+Format:  int
+Example: 9:downlimiti100e
+Details: Set the server's download limit in kilobytes per second.
+         Negative values are interpreted as no limit.
+
+Key:     "failed"
+Version: 2
+Format:  string
+Example: 6:failed17:permission denied
+Details: Sent in response to a tagged message to indicate failure.
+
+Key:     "get-automap"
+Version: 2
+Format:  value is ignored
+Example: 11:get-automap0:
+Details: Requests that an "automap" message be sent back.
+
+Key:     "get-autostart"
+Version: 2
+Format:  value is ignored
+Example: 13:get-autostart0:
+Details: Requests that an "autostart" message be sent back.
+
+Key:     "get-directory"
+Version: 2
+Format:  value is ignored
+Example: 13:get-directory
+Details: Requests that an "directory" message be sent back.
+
+Key:     "get-downlimit"
+Version: 2
+Format:  value is ignored
+Example: 13:get-downlimit0:
+Details: Requests that a "downlimit" message be sent back.
+
+Key:     "get-info"
+Version: 2
+Format:  dict with keys "id" and "type" for lists of ints and strings
+Example: 8:get-infod2:idli4ei7ei2ee4:typel4:hash4:nameee
+Details: Requests that the server send back an "info" message with
+         info on all the torrent IDs in "id". The "type" key requests
+         what info will be returned. See below for valid values to use
+         here. Since the torrent ID is always included in an "info"
+         message an empty or missing "type" key will cause only the ID
+         to be returned. An "info" message will always be sent back,
+         even if it is empty.
+
+Key:     "get-info-all"
+Version: 2
+Format:  list of strings
+Example: 12:get-info-alll4:hash4:namee
+Details: Same as "getinfo" message with all torrent IDs specified.
+
+Key:     "get-pex"
+Version: 2
+Format:  value is ignored
+Example: 7:get-pex0:
+Details: Requests that a "pex" message be sent back.
+
+Key:     "get-port"
+Version: 2
+Format:  value is ignored
+Example: 8:get-port0:
+Details: Requests that a "port" message be sent back.
+
+Key:     "get-status"
+Version: 2
+Format:  dict with keys "id" and "type" for lists of ints and strings
+Example: 10:get-statusd2:idli4ei7ei2ee4:typel4:hash4:nameee
+Details: Same as "get-info" message except status type strings are used
+         instead and the server sends back a "status" message.
+
+Key:     "get-status-all"
+Version: 2
+Format:  list of strings
+Example: 14:get-status-alll4:hash4:namee
+Details: Same as "get-status" message with all torrent IDs specified.
+
+Key:     "get-supported"
+Version: 2
+Format:  list of strings
+Example: 13:get-supportedl6:lookup8:get-porte
+Details: Request that a "supported" message be returned with whichever
+         of the given message keys are supported.
+
+Key:     "get-uplimit"
+Version: 2
+Format:  value is ignored
+Example: 11:get-uplimit0:
+Details: Requests that an "uplimit" message be sent back.
+
+Key:     "lookup"
+Version: 2
+Format:  list of strings
+Example: 6:lookupl40:0f16ea6965ee5133ea4dbb1e7f516e9fcf3d899ee
+Details: Request that the server send back an "info" message with "id"
+         and "hash" keys for any torrents with the given hashes.
+
+Key:     "info"
+Version: 2
+Format:  list of dictionaries
+Example: 4:infold2:idi3e4:name3:fooed2:idi9e4:name3:baree
+Details: A list containing information for several torrents. The
+         dictionaries always contain at least an "id" key with the
+         integer ID for the torrent, other possible values are listed
+         below.
+
+Key:     "noop"
+Version: 2
+Format:  value is ignored
+Example: 4:noop0:
+Details: This does nothing but keep the connection alive. With a tag
+         it may be used as a ping.
+
+Key:     "not-supported"
+Version: 2
+Format:  value is ignored
+Example: 13:not-supported0:
+Details: Sent in response to a tagged message to indicated that the
+         message was not supported.
+
+Key:     "pex"
+Version: 2
+Format:  boolean
+Example: 3:pexi0e
+Details: Enables or disables peer exchange.
+
+Key:     "port"
+Version: 2
+Format:  int between 0 and 65535
+Example: 4:porti9090e
+Details: Change the port the server uses to listen for incoming peer
+         connections.
+
+Key:     "quit"
+Version: 1
+Format:  value is ignored
+Example: 4:quit0:
+Details: Cause the server to quit.
+
+Key:     "remove"
+Version: 2
+Format:  list of torrent ID ints
+Example: 5:removeli3ei8ei6ee
+Details: Stop and remove the specified torrents. Note that whether or
+         not the downloaded data or the original torrent files will be
+         removed is implementation dependent and may not currently be
+         known or changed with this protocol. If a saved copy of the
+         torrent file has been made then it will always be deleted.
+
+Key:     "remove-all"
+Version: 2
+Format:  value is ignored
+Example: 10:remove-all0:
+Details: Like "remove" with all torrent IDs specified.
+
+Key:     "start"
+Version: 2
+Format:  list of torrent ID ints
+Example: 5:startli3ei8ei6ee
+Details: List of torrent IDs to start.
+
+Key:     "start-all"
+Version: 2
+Format:  value is ignored
+Example: 9:start-all0:
+Details: Start all torrents.
+
+Key:     "status"
+Version: 2
+Format:  list of dictionaries
+Example: 4:infold2:idi3e4:name3:fooed2:idi9e4:name3:baree
+Details: Same as "info" message except status type keys are used.
+
+Key:     "stop"
+Version: 2
+Format:  list of torrent ID ints
+Example: 4:stopli3ei8ei6ee
+Details: List of torrent IDs to stop.
+
+Key:     "stop-all"
+Version: 2
+Format:  value is ignored
+Example: 8:stop-all0:
+Details: Stop all torrents.
+
+Key:     "succeeded"
+Version: 2
+Format:  value is ignored
+Example: 8:succeeded0:
+Details: This is used to indicate that a tagged message was processed
+         successfully.
+
+Key:     "supported"
+Version: 2
+Format:  list of strings
+Example: 9:supportedl6:lookupe
+Details: Sent in response to a "get-supported" message, indicates that
+         the given messages ate supported.
+
+Key:     "uplimit"
+Version: 2
+Format:  int
+Example: 7:uplimiti20e
+Details: Set the server's upload limit in kilobytes per second.
+         Negative values are interpreted as no limit.
+
+
+Info types for "get-info" and "info" messages. The only type for which
+support is mandatory is "id".
+
+"id"       integer, torrent's ID for this connection
+"hash"     SHA-1 info hash as a 40-char hex string
+"name"     string, torrent name
+"path"     string, path to .torrent file
+"saved"    boolean, true if a copy of this torrent was saved
+"private"  boolean, true if the torrent is private
+"trackers" a list of lists of dictionaries containing tracker info:
+             "address"  string, hostname or ip address of tracker
+             "port"     integer, port for tracker
+             "announce" string, announce url on tracker
+             "scrape"   string, scrape url on tracker, may be absent
+"comment"  string, comment from torrent file
+"creator"  string, creator of torrent file
+"date"     integer, date of torrent creation (unix time_t format)
+"size"     integer, total size of all files in bytes
+"files"    list of dictionaries for the files in this torrent:
+             "name" string, name of file
+             "size" integer, size of file in bytes
+
+
+Status types for "get-status" and "status" messages. The only type for
+which support is mandatory is "id".
+
+"completed"         integer, bytes of data downloaded and verified
+"download-speed"    integer, download speed in bytes per second
+"download-total"    integer, total bytes downloaded so far
+"error"             string, one of the following:
+                      "assert"          something happened that shouldn't
+                      "io-parent"       I dunno
+                      "io-permissions"  filesystem permission error probably
+                      "io-other"        other filesystem i/o error
+                      "tracker-error"   tracker returned error message
+                      "tracker-warning" tracker returned warning message
+                      "other"           other error
+                      zero-length or missing string indicates no error
+"error-message"     string, printable error message
+"eta"               integer, estimated seconds until downloading is finished
+"id"                integer, torrent's ID for this connection
+"peers-downloading" integer, peers downloading from us
+"peers-from"        dict with the following int keys, peer connection sources:
+                      "incoming"    peers connected to our listening port
+                      "tracker"     peers discovered from tracker
+                      "cache"       peers retrieved from on-disk cache
+                      "pex"         peers discovered via peer exchange
+"peers-total"       integer, total connected peers
+"peers-uploading"   integer, peers uploading to us
+"running"           boolean, false if torrent is stopped or stopping
+"state"             string, one of the following:
+                      "checking"    performing hash check on file data
+                      "downloading" downloading file data
+                      "seeding"     seeding file data to peers
+                      "stopping"    contacting tracker to send 'stopped' event
+                      "paused"      torrent is not active
+"swarm-speed"       integer, swarm speed in bytes per second
+"tracker"           dict with the following keys, current active tracker
+                      "address"     string, hostname or ip address of tracker
+                      "port"        integer, port for tracker
+                      "announce"    string, tracker announce url
+                      "scrape"      string, tracker scrape url, may be absent
+"scrape-completed"  integer, total completed peers as reported by tracker
+"scrape-leechers"   integer, current leechers as reported by tracker
+"scrape-seeders"    integer, current, seeders as reported by tracker
+"upload-speed"      integer, upload speed in bytes per second
+"upload-total"      integer, total bytes uploaded so far
+
+
+Examples:
+
+Data from the client to the server is prefixed with >>> and from
+server to client with <<<. These prefixes and newlines are added for
+clarity, they are not actually sent over the socket.
+
+Quit the server. Note that this is a version 1 client and so version 1
+messages are used. The value for the quit message here is i0e instead
+of 0: as used above, however since it it unused any value is allowed.
+>>> 0000001Dd7:versiond3:mini1e3:maxi1eee
+<<< 0000001Dd7:versiond3:mini1e3:maxi2eee
+>>> 0000000Bd4:quiti0ee
+
+Pause all torrents and disable automapping. Note the server happens to
+have sendt it's version before the client.
+<<< 0000001Dd7:versiond3:mini1e3:maxi2eee
+>>> 0000001Dd7:versiond3:mini1e3:maxi2eee
+>>> 0000000El8:stop-all0:e
+
+Change upload and download limits with tagged responses. Note that the
+server is allowed to return responses out of order, even when the
+messages are not tagged.
+>>> 0000001Dd7:versiond3:mini1e3:maxi2eee
+<<< 0000001Dd7:versiond3:mini1e3:maxi2eee
+>>> 00000017l9:downlimiti100ei100el
+>>> 00000017l9:downlimiti100ei101el
+<<< 00000014l8:succeeded0:i101el
+<<< 00000014l8:succeeded0:i100el

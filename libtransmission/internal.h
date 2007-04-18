@@ -131,6 +131,7 @@ typedef struct tr_bitfield_s tr_bitfield_t;
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
+#include "trcompat.h"
 #include "bsdqueue.h"
 #include "bsdtree.h"
 #include "platform.h"

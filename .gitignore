@@ -6,6 +6,10 @@ beos/Transmission
 /build
 cli/.depend
 cli/transmissioncli
+daemon/.depend
+daemon/transmission-daemon
+daemon/transmission-proxy
+daemon/transmission-remote
 gtk/.depend
 gtk/defines.h
 gtk/po/*.mo

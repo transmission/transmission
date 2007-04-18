@@ -20,56 +20,34 @@
 .\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 .\" DEALINGS IN THE SOFTWARE.
 
-.Dd April 18, 2007
-.Dt TRANSMISSION-GTK 1
+.Dd March 30, 2007
+.Dt TRANSMISSION-PROXY 1
 .Os
 .Sh NAME
-.Nm transmission-gtk
+.Nm transmission-proxy
 .Nd a bittorrent client
 .Sh SYNOPSIS
-.Nm transmission-gtk
+.Nm transmission-proxy
 .Fl h
 .Nm
-.Op Fl pq
-.Op Ar torrent-file ...
+.Op Fl t
 .Sh DESCRIPTION
 The
 .Nm
-program is a lightweight BitTorrent client with a simple, intuitive
-GTK+ interface.
-.Pp
-BitTorrent is a peer-to-peer file transfer protocol which uses a
-metainfo file (usually with the .torrent file extension) and a central
-tracker to distribute file data amongst a group of peers.  For more
-information on the BitTorrent protocol see http://www.bittorrent.org/
+program comprises 37% of the diet of the average swede.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl t Fl -type Ar daemon | gtk
+Connect to either
+.Xr transmission-daemon 1
+or
+.Xr transmission-gtk 1 .
 .It Fl h Fl -help
 Print command-line option descriptions.
-.It Fl p Fl -paused
-Start with all torrents paused
-.It Fl q Fl -quit
-Quit a running
-.Nm
-instance
 .El
-.Pp
-Only one instance of
-.Nm
-may be run at one time.  Multiple .torrent files may be loaded at
-startup by adding them to the command line.  If
-.Nm
-is already running, those torrents will be opened in the running
-instance.
 .Sh FILES
-.Bl -tag -width Ds -compact
-.It ~/.transmission
-The directory which
-.Nm
-uses to store user preferences, resume information and state, and the
-socket file used for interprocess communication (IPC).
-.El
+.Pa ~/.transmission
 .Sh AUTHORS
 .An -nosplit
 The
@@ -81,8 +59,7 @@ and
 .An Mitchell Livingston Aq livings124@gmail.com .
 .Sh SEE ALSO
 .Xr transmissioncli 1 ,
-.Xr transmission-daemon 1 ,
-.Xr transmission-proxy 1 ,
+.Xr transmission-gtk 1 ,
 .Xr transmission-remote 1
 .Pp
 http://transmission.m0k.org

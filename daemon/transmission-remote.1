@@ -1,0 +1,206 @@
+.\" $Id$
+.\"
+.\" Copyright (c) 2007 Joshua Elsasser
+.\"
+.\" Permission is hereby granted, free of charge, to any person obtaining a
+.\" copy of this software and associated documentation files (the "Software"),
+.\" to deal in the Software without restriction, including without limitation
+.\" the rights to use, copy, modify, merge, publish, distribute, sublicense,
+.\" and/or sell copies of the Software, and to permit persons to whom the
+.\" Software is furnished to do so, subject to the following conditions:
+.\"
+.\" The above copyright notice and this permission notice shall be included in
+.\" all copies or substantial portions of the Software.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+.\" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+.\" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+.\" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+.\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+.\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+.\" DEALINGS IN THE SOFTWARE.
+
+.Dd March 30, 2007
+.Dt TRANSMISSION-REMOTE 1
+.Os
+.Sh NAME
+.Nm transmission-remote
+.Nd a remote control utility for
+.Xr transmission-daemon 1
+and
+.Xr transmission-gtk 1
+.Sh SYNOPSIS
+.Bk -words
+.Nm transmission-remote
+.Fl h
+.Nm
+.Oo
+.Fl t Ar daemon | Ar gtk
+.Oc
+.Op Fl a Ar torrent-file
+.Op Fl d Ar download-rate
+.Op Fl D
+.Op Fl e
+.Op Fl E
+.Op Fl f Ar directory
+.Op Fl i
+.Op Fl l
+.Op Fl m
+.Op Fl M
+.Op Fl p Ar port
+.Op Fl q
+.Oo
+.Fl r Ar all | Ar info-hash
+.Oc
+.Oo
+.Fl s Ar all | Ar info-hash
+.Oc
+.Oo
+.Fl S Ar all | Ar info-hash
+.Oc
+.Op Fl u Ar upload-rate
+.Op Fl U
+.Op Ar torrent-file ...
+.Nm
+.Fl x
+.Op Fl a Ar torrent-file
+.Op Fl d Ar download-rate
+.Op Fl D
+.Op Fl e
+.Op Fl E
+.Op Fl f Ar directory
+.Op Fl i
+.Op Fl l
+.Op Fl m
+.Op Fl M
+.Op Fl p Ar port
+.Op Fl q
+.Oo
+.Fl r Ar all | Ar info-hash
+.Oc
+.Oo
+.Fl s Ar all | Ar info-hash
+.Oc
+.Oo
+.Fl S Ar all | Ar info-hash
+.Oc
+.Op Fl u Ar upload-rate
+.Op Fl U
+.Ar command
+.Op Ar argument ...
+.Ek
+.Sh DESCRIPTION
+The
+.Nm
+program is a vile scoundral lacking the most fundamental principles of
+morality and decency.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl a Fl -add Ar torrent-file
+Add the torrent metainfo file
+.Ar torrent-file .
+.It Fl d Fl -download-limit Ar download-rate
+Set maximum download rate to
+.Ar download-rate
+in kilobytes per second.
+.It Fl D Fl -download-unlimited
+Remove the download limit.
+.It Fl e
+Enable peer exchange.
+.It Fl E
+Disable peer exchange.
+.It Fl f Fl -folder Ar directory
+Use
+.Ar directory
+as the default location for newly added torrents to download files to.
+.It Fl h Fl -help
+Print command-line option descriptions.
+.It Fl i Fl -info
+Print a listing of all torrent info hashes and names.
+.It Fl l Fl -list
+Print a listing of all torrent names with size and current status.
+.It Fl m Fl -port-mapping
+Enable automatic port mapping via NAT-PMP or UPnP IGD.
+.It Fl M Fl -no-port-mapping
+Disable automatic port mapping.
+.It Fl p Fl -port Ar port
+Attempt to bind to
+.Ar port
+for use as a listening port to accept incoming peer connections.
+.It Fl q Fl -quit
+Quit the running instance.
+.It Fl r Fl -remove Ar all | info-hash
+Remove all torrents, or the torrent with an info hash of
+.Ar info-hash .
+Neither the downloaded data nor the original torrent metainfo file
+will be deleted.
+.It Fl s Fl -start Ar all | info-hash
+Stop all torrents from downloading or seeding, or the torrent with an
+info hash of
+.Ar info-hash .
+.It Fl S Fl -stop Ar all | info-hash
+Start all torrents downloading or seeding, or the torrent with an info
+hash of
+.Ar info-hash .
+.It Fl t Fl -type Ar daemon | gtk
+Connect to either
+.Xr transmission-daemon 1
+or
+.Xr transmission-gtk 1 .
+.It Fl u Fl -upload-limit Ar upload-rate
+Set maximum upload rate to
+.Ar upload-rate
+in kilobytes per second.
+.It Fl U Fl -upload-unlimited
+Remove the upload limit.
+.It Fl x Fl -proxy
+Proxy the connection to
+.Xr transmission-daemon 1
+or
+.Xr transmission-gtk 1
+through
+.Ar command .
+.El
+.Sh FILES
+.Pa ~/.transmission
+.Sh EXAMPLES
+Show status for all torrents:
+.Pp
+.Dl transmission-remote -l
+.Pp
+Pause a torrent:
+.Pp
+.Dl transmission-remote -S ca6ac4bbd971d3902935dbcfc2d3ea25b428a547
+.Pp
+Set download and upload limits to 100 KiB/sec and 20 KiB/sec:
+.Pp
+.Dl transmission-remote -d 100 -u 20
+.Pp
+Quit the GTK+ frontend:
+.Pp
+.Dl transmission-remote -t gtk -q
+.Pp
+Add two torrents:
+.Pp
+.Dl transmission-remote foo.torrent bar.torrent
+.Pp
+Show the info hashes of all the torrents on jade:
+.Pp
+.Dl transmission-remote -x -i ssh jade transmission-proxy
+.Sh AUTHORS
+.An -nosplit
+The
+.Nm
+program was written by
+.An Josh Elsasser Aq josh@elsasser.org ,
+.An Eric Petit Aq titer@m0k.org ,
+and
+.An Mitchell Livingston Aq livings124@gmail.com .
+.Sh SEE ALSO
+.Xr transmissioncli 1 ,
+.Xr transmission-daemon 1 ,
+.Xr transmission-gtk 1 ,
+.Xr transmission-proxy 1
+.Pp
+http://transmission.m0k.org

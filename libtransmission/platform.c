@@ -110,7 +110,8 @@ char * tr_getPrefsDirectory()
 	strcat( prefsDirectory, "/Transmission" );
 #elif defined( SYS_DARWIN )
     snprintf( prefsDirectory, MAX_PATH_LENGTH,
-              "%s/Library/Caches/Transmission", tr_getHomeDirectory() );
+              "%s/Library/Application Support/Transmission",
+              tr_getHomeDirectory() );
 #elif defined(__AMIGAOS4__)
     snprintf( prefsDirectory, MAX_PATH_LENGTH, "PROGDIR:.transmission" );
 #else
@@ -147,8 +148,8 @@ char * tr_getCacheDirectory()
     snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/Cache",
               tr_getPrefsDirectory() );
 #elif defined( SYS_DARWIN )
-    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s",
-              tr_getPrefsDirectory() );
+    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/Caches/Transmission",
+              tr_getHomeDirectory() );
 #else
     snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/cache",
               tr_getPrefsDirectory() );
@@ -180,8 +181,7 @@ char * tr_getTorrentsDirectory()
     snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/Torrents",
               tr_getPrefsDirectory() );
 #elif defined( SYS_DARWIN )
-    snprintf( torrentsDirectory, MAX_PATH_LENGTH,
-              "%s/Library/Application Support/Transmission/Torrents",
+    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/Torrents",
               tr_getHomeDirectory() );
 #else
     snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/torrents",
