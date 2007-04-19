@@ -2,7 +2,6 @@
 Encoding=UTF-8
 Version=1.0
 Name=Transmission
-Name[ru]=Передача
 Type=Application
 Comment=A free, lightweight BitTorrent client with a simple, intuitive interface
 Exec=transmission-gtk %F
