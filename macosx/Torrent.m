@@ -80,7 +80,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (self)
     {
         fUseIncompleteFolder = [fDefaults boolForKey: @"UseIncompleteDownloadFolder"];
-        fIncompleteFolder = [[fDefaults stringForKey: @"IncompleteDownloadFolder"] copy];
+        fIncompleteFolder = [[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] retain];
         
         if (!fPublicTorrent)
             [self trashFile: path];
