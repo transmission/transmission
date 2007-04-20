@@ -2628,6 +2628,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         case kIOMessageSystemHasPoweredOn:
             //resume sleeping transfers after we wake up
             [fTorrents makeObjectsPerformSelector: @selector(wakeUp)];
+            [self autoSpeedLimitChange: nil];
             break;
     }
 }
