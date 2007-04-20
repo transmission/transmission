@@ -461,14 +461,14 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     
     if( s->downloaded == 0 )
     {
-        //if seeding without ever downloading, calculate ratio from total size
-        if( s->progress >= 1.0 )
+        //if some is downloaded without a downloaded value, calculate ratio from total size
+        if( s->progress > 0.0 )
         {
-            s->ratio = (float)s->uploaded / (float)inf->totalSize;
+            s->ratio = (float)s->uploaded / ((float)inf->totalSize * s->progress);
         }
         else
         {
-            s->ratio = s->uploaded == 0 ? TR_RATIO_NA : TR_RATIO_INF;
+            s->ratio = TR_RATIO_NA;
         }
     }
     else

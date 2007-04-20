@@ -289,9 +289,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    float stopRatio, ratio;
+    float stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID
-			&& ((ratio = [self ratio]) >= stopRatio || ratio == TR_RATIO_INF))
+			&& [self ratio] >= stopRatio)
     {
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
@@ -1256,11 +1256,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) ratioSortKey
 {
-    float ratio = [self ratio];
-    if (ratio == TR_RATIO_INF)
-        return [NSNumber numberWithInt: 999999999]; //this should hopefully be big enough
-    else
-        return [NSNumber numberWithFloat: [self ratio]];
+    return [NSNumber numberWithFloat: [self ratio]];
 }
 
 @end
