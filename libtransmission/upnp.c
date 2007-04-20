@@ -1360,3 +1360,95 @@ actionLookup( tr_upnp_action_t * act, const char * key, int len,
 
     return NULL;
 }
+
+#if 0
+/* this code is used for standalone root parsing for debugging purposes */
+/* cc -g -Wall -D__TRANSMISSION__ -o upnp upnp.c xml.c utils.c */
+int
+main( int argc, char * argv[] )
+{
+    struct stat sb;
+    char      * data, * soap, * scpd;
+    int         fd;
+    ssize_t     res;
+
+    if( 3 != argc )
+    {
+        printf( "usage: %s root-url root-file\n", argv[0] );
+        return 0;
+    }
+
+    tr_msgInit();
+    tr_setMessageLevel( 9 );
+
+    if( 0 > stat( argv[2], &sb ) )
+    {
+        tr_err( "failed to stat file %s: %s", argv[2], strerror( errno ) );
+        return 1;
+    }
+
+    data = malloc( sb.st_size );
+    if( NULL == data )
+    {
+        tr_err( "failed to malloc %zd bytes", ( size_t )sb.st_size );
+        return 1;
+    }
+
+    fd = open( argv[2], O_RDONLY );
+    if( 0 > fd )
+    {
+        tr_err( "failed to open file %s: %s", argv[2], strerror( errno ) );
+        free( data );
+        return 1;
+    }
+
+    res = read( fd, data, sb.st_size );
+    if( sb.st_size > res )
+    {
+        tr_err( "failed to read file %s: %s", argv[2],
+                ( 0 > res ? strerror( errno ) : "short read count" ) );
+        close( fd );
+        free( data );
+        return 1;
+    }
+
+    close( fd );
+
+    if( parseRoot( argv[1], data, sb.st_size, &soap, &scpd ) )
+    {
+        tr_err( "root parsing failed" );
+    }
+    else
+    {
+        tr_err( "soap=%s scpd=%s", soap, scpd );
+        free( soap );
+        free( scpd );
+    }
+    free( data );
+
+    return 0;
+}
+
+int  tr_netMcastOpen( int port, struct in_addr addr ) { assert( 0 ); }
+int  tr_netBind    ( int port, int type ) { assert( 0 ); }
+void tr_netClose   ( int s ) { assert( 0 ); }
+int  tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * sin ) { assert( 0 ); }
+int         tr_httpRequestType( const char * data, int len,
+                                char ** method, char ** uri ) { assert( 0 ); }
+int         tr_httpResponseCode( const char * data, int len ) { assert( 0 ); }
+char *      tr_httpParse( const char * data, int len, tr_http_header_t *headers ) { assert( 0 ); }
+int         tr_httpIsUrl( const char * u, int l ) { assert( 0 ); }
+int         tr_httpParseUrl( const char * u, int l, char ** h, int * p, char ** q ) { assert( 0 ); }
+tr_http_t   * tr_httpClient( int t, const char * h, int p, const char * u, ... ) { assert( 0 ); }
+tr_http_t   * tr_httpClientUrl( int t, const char * u, ... ) { assert( 0 ); }
+void          tr_httpAddHeader( tr_http_t * h, const char * n, const char * v ) { assert( 0 ); }
+void          tr_httpAddBody( tr_http_t * h, const char * b, ... ) { assert( 0 ); }
+tr_tristate_t tr_httpPulse( tr_http_t * h, const char ** b, int * l ) { assert( 0 ); }
+char        * tr_httpWhatsMyAddress( tr_http_t * h ) { assert( 0 ); }
+void          tr_httpClose( tr_http_t * h ) { assert( 0 ); }
+
+void tr_lockInit     ( tr_lock_t * l ) {}
+int  pthread_mutex_lock( pthread_mutex_t * m ) { return 0; }
+int  pthread_mutex_unlock( pthread_mutex_t * m ) { return 0; }
+
+#endif
