@@ -67,7 +67,6 @@ static tr_fd_t * gFd = NULL;
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int  ErrorFromErrno();
 static int  OpenFile( int i, char * folder, char * name, int write );
 static void CloseFile( int i );
 
@@ -407,16 +406,6 @@ void tr_fdClose()
  **********************************************************************/
 
 /***********************************************************************
- * ErrorFromErrno
- **********************************************************************/
-static int ErrorFromErrno()
-{
-    if( errno == EACCES || errno == EROFS )
-        return TR_ERROR_IO_PERMISSIONS;
-    return TR_ERROR_IO_OTHER;
-}
-
-/***********************************************************************
  * CheckFolder
  ***********************************************************************
  *
@@ -426,6 +415,7 @@ static int OpenFile( int i, char * folder, char * name, int write )
     tr_openFile_t * file = &gFd->open[i];
     struct stat sb;
     char * path;
+    int ret;
 
     tr_dbg( "Opening %s in %s (%d)", name, folder, write );
 
@@ -450,9 +440,10 @@ static int OpenFile( int i, char * folder, char * name, int write )
             {
                 if( mkdir( path, 0777 ) )
                 {
+                    ret = tr_ioErrorFromErrno();
                     tr_err( "Could not create folder '%s'", path );
                     free( path );
-                    return ErrorFromErrno();
+                    return ret;
                 }
             }
             else
@@ -471,14 +462,14 @@ static int OpenFile( int i, char * folder, char * name, int write )
 
     /* Now try to really open the file */
     file->file = open( path, write ? ( O_RDWR | O_CREAT ) : O_RDONLY, 0666 );
-    free( path );
-
     if( file->file < 0 )
     {
-        int ret = ErrorFromErrno();
+        ret = tr_ioErrorFromErrno();
+        free( path );
         tr_err( "Could not open %s in %s (%d, %d)", name, folder, write, ret );
         return ret;
     }
+    free( path );
 
     return TR_OK;
 }

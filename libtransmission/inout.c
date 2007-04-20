@@ -409,8 +409,8 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
             /* do what we are here to do... */
             if( readOrWrite( file, buf, cur ) != cur )
             {
+                ret = tr_ioErrorFromErrno();
                 tr_fdFileRelease( file );
-                ret = TR_ERROR_IO_OTHER;
                 goto cleanup;
             }
 
