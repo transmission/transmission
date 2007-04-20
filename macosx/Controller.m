@@ -1776,6 +1776,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateTorrentsInQueue];
     [fInfoController updateInfoStats];
+    [fInfoController updateRatioForTorrent: torrent];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {
