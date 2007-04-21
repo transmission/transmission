@@ -70,8 +70,6 @@ char * getStringRatio( float ratio )
 
     if( ratio == TR_RATIO_NA )
         return "n/a";
-    if( ratio == TR_RATIO_INF )
-        return "inf";
     snprintf( string, sizeof string, "%.3f", ratio );
     return string;
 }
