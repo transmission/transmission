@@ -465,7 +465,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     }
     else
     {
-        s->ratio = (float)s->uploaded / MAX((float)s->downloaded, (float)inf->totalSize * s->progress);
+        s->ratio = (float)s->uploaded / (float)MAX(s->downloaded, inf->totalSize - s->left);
     }
     
     tr_lockUnlock( &tor->lock );
