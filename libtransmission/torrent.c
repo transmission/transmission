@@ -459,21 +459,13 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->downloaded = tor->downloadedCur + tor->downloadedPrev;
     s->uploaded   = tor->uploadedCur   + tor->uploadedPrev;
     
-    if( s->downloaded == 0 )
+    if( s->downloaded == 0 && s->progress == 0.0 )
     {
-        //if some is downloaded without a downloaded value, calculate ratio from total size
-        if( s->progress > 0.0 )
-        {
-            s->ratio = (float)s->uploaded / ((float)inf->totalSize * s->progress);
-        }
-        else
-        {
-            s->ratio = TR_RATIO_NA;
-        }
+        s->ratio = TR_RATIO_NA;
     }
     else
     {
-        s->ratio = (float)s->uploaded / (float)s->downloaded;
+        s->ratio = (float)s->uploaded / MAX((float)s->downloaded, (float)inf->totalSize * s->progress);
     }
     
     tr_lockUnlock( &tor->lock );
