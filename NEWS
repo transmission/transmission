@@ -1,8 +1,15 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or newer.
+0.71 ()
+ - Send port info when sending requests
+ - Calculate ratio differently when seeding without ever downloading
+ - Add additional error messages and debug info
+ - OS X:
+   + Fix error when using default incomplete folder
+   + Disable the stop ratio once it is reached (while seeding)
+   + Small interface adjustments
 
-0.7 (2007/04/18)
+0.70 (2007/04/18)
  - New icon
  - Automatic port mapping (NAT-PMP and UPnP IGD)
  - Peer exchange (PEX) compatible with Azureus and uTorrent
@@ -13,6 +20,7 @@ Note: From 0.7 on, Transmission for Mac OS X requires 10.4 Tiger or newer.
  - Cache connected peers
  - Many miscellaneous bugfixes and small improvements
  - OS X:
+   + Requires 10.4 Tiger or newer
    + Download and seeding queues that can be user-ordered
    + Speed Limit: Second set of bandwidth limits that can be toggled or 
      scheduled
