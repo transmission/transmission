@@ -446,7 +446,6 @@ struct tr_stat_s
     float               swarmspeed;
 
 #define TR_RATIO_NA  -1
-#define TR_RATIO_INF -2
     float               ratio;
 };
 

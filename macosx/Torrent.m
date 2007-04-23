@@ -289,15 +289,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     //check to stop for ratio
-    float stopRatio, ratio;
+    float stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID
-			&& ((ratio = [self ratio]) >= stopRatio || ratio == TR_RATIO_INF))
+			&& [self ratio] >= stopRatio)
     {
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
         
         fFinishedSeeding = YES;
         
+        [self setRatioSetting: NSOffState];
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
 	
@@ -414,7 +415,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (wasChecking && !fChecking)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
-    if (fStat->error)
+    if ([self isError])
     {
         [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
                                     [self errorMessage]]];
@@ -950,7 +951,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) isError
 {
-    return fStat->error;
+    return fStat->error != 0;
 }
 
 - (NSString *) errorMessage
@@ -1255,11 +1256,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) ratioSortKey
 {
-    float ratio = [self ratio];
-    if (ratio == TR_RATIO_INF)
-        return [NSNumber numberWithInt: 999999999]; //this should hopefully be big enough
-    else
-        return [NSNumber numberWithFloat: [self ratio]];
+    return [NSNumber numberWithFloat: [self ratio]];
 }
 
 @end

@@ -105,10 +105,9 @@
 {
     if (ratio == TR_RATIO_NA)
         return NSLocalizedString(@"N/A", "No Ratio");
-    else if (ratio == TR_RATIO_INF)
-        return [NSString stringWithUTF8String: "\xE2\x88\x9E"];
     else if (ratio < 0)
         return NSLocalizedString(@"error", "Ratio invalid");
+    else;
     
     if (ratio < 10.0)
         return [NSString stringWithFormat: @"%.2f", ratio];

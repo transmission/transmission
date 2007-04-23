@@ -433,9 +433,7 @@
 
 - (void) updateInfoSettings
 {
-    int numberSelected = [fTorrents count];
-
-    if (numberSelected > 0)
+    if ([fTorrents count] > 0)
     {
         Torrent * torrent;
         
@@ -552,6 +550,12 @@
     }
     
     [self updateInfoStats];
+}
+
+- (void) updateRatioForTorrent: (Torrent *) torrent
+{
+    if ([fTorrents containsObject: torrent])
+        [self updateInfoSettings];
 }
 
 - (int) stateSettingToPopUpIndex: (int) index

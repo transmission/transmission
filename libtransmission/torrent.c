@@ -452,20 +452,19 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     }
     else
     {
-        s->eta = ( 1.0 - s->progress ) *
-            (float) inf->totalSize / s->rateDownload / 1024.0;
+        s->eta = (float) s->left / s->rateDownload / 1024.0;
     }
 
     s->downloaded = tor->downloadedCur + tor->downloadedPrev;
     s->uploaded   = tor->uploadedCur   + tor->uploadedPrev;
     
-    if( s->downloaded == 0 )
+    if( s->downloaded == 0 && s->progress == 0.0 )
     {
-        s->ratio = s->uploaded == 0 ? TR_RATIO_NA : TR_RATIO_INF;
+        s->ratio = TR_RATIO_NA;
     }
     else
     {
-        s->ratio = (float)s->uploaded / (float)s->downloaded;
+        s->ratio = (float)s->uploaded / (float)MAX(s->downloaded, inf->totalSize - s->left);
     }
     
     tr_lockUnlock( &tor->lock );
