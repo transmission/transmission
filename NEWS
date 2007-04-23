@@ -4,6 +4,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Send port info when sending requests
  - Calculate ratio differently when seeding without ever downloading
  - Add additional error messages and debug info
+ - Improved UPnP support
  - OS X:
    + Fix error when using default incomplete folder
    + Disable the stop ratio once it is reached (while seeding)
