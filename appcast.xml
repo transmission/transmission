@@ -9,9 +9,30 @@
     <lastBuildDate>Wed, 18 Apr 2007 10:09:00 -0400</lastBuildDate>
     
     <item>
-      <title>Transmission 0.7 Released</title>
+      <title>Transmission 0.71 Released</title>
       <description><![CDATA[
-<h3>TRANSMISSION 0.7 REQUIRES MAC OS X 10.4 OR GREATER. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
+<h3>TRANSMISSION 0.70 AND GREATER REQUIRES MAC OS X 10.4. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Send port info when sending requests</li>
+ <li>Calculate ratio differently when seeding without ever downloading</li>
+ <li>Add additional error messages and debug info</li>
+</ul>
+<h4>Mac-Specific Changes:</h4>
+<ul>
+ <li>Fix error when using default incomplete folder</li>
+ <li>Disable the stop ratio once it is reached (while seeding)</li>
+ <li>Small interface adjustments</li>
+</ul>]]></description>
+      <pubDate>Wed, 18 Apr 2007 10:09:00 -0400</pubDate>
+      <enclosure sparkle:version="1739" sparkle:shortVersionString="0.70" url="http://download.m0k.org/transmission/files/Transmission-0.7.dmg" length="1434737" type="application/octet-stream"/>
+    </item>
+    
+    <item>
+      <title>Transmission 0.70 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION 0.70 REQUIRES MAC OS X 10.4 OR GREATER. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
 
 <h4>Transmission Changes:</h4>
 <ul>
