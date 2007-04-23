@@ -415,7 +415,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (wasChecking && !fChecking)
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     
-    if (fStat->error)
+    if ([self isError])
     {
         [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
                                     [self errorMessage]]];
@@ -951,7 +951,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) isError
 {
-    return fStat->error;
+    return fStat->error != 0;
 }
 
 - (NSString *) errorMessage
