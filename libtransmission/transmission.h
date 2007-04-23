@@ -65,14 +65,16 @@ extern "C" {
 #define TR_ERROR                0x81000000
 #define TR_ERROR_ASSERT         0x82000000
 /* I/O errors */
-#define TR_ERROR_IO_MASK        0x0000000F
+#define TR_ERROR_IO_MASK        0x000000FF
 #define TR_ERROR_IO_PARENT      0x80000001
 #define TR_ERROR_IO_PERMISSIONS 0x80000002
-#define TR_ERROR_IO_OTHER       0x80000008
+#define TR_ERROR_IO_SPACE       0x80000004
+#define TR_ERROR_IO_RESOURCES   0x80000008
+#define TR_ERROR_IO_OTHER       0x80000010
 /* Misc */
-#define TR_ERROR_TC_MASK        0x000000F0
-#define TR_ERROR_TC_ERROR       0x80000010
-#define TR_ERROR_TC_WARNING     0x80000020
+#define TR_ERROR_TC_MASK        0x00000F00
+#define TR_ERROR_TC_ERROR       0x80000100
+#define TR_ERROR_TC_WARNING     0x80000200
 
 /***********************************************************************
  * tr_init

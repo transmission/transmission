@@ -73,6 +73,8 @@ int tr_concat( char ** buf, int * used, int * max,
  **********************************************************************/
 char * tr_dupstr( const char * base, int len );
 
+int    tr_ioErrorFromErrno( void );
+
 char * tr_errorString( int code );
 
 /***********************************************************************
