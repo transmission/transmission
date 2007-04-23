@@ -4,7 +4,7 @@
 
 MAJOR=0
 MINOR=7
-MAINT=0
+MAINT=1
 STRING=0.80-svn
 
 # Get current SVN revision from Ids in all source files
