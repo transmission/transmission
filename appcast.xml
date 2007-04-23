@@ -5,8 +5,8 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Wed, 18 Apr 2007 10:09:00 -0400</pubDate>
-    <lastBuildDate>Wed, 18 Apr 2007 10:09:00 -0400</lastBuildDate>
+    <pubDate>Mon, 23 Apr 2007 19:30:00 -0400</pubDate>
+    <lastBuildDate>Mon, 23 Apr 2007 19:30:00 -0400</lastBuildDate>
     
     <item>
       <title>Transmission 0.71 Released</title>
@@ -25,8 +25,8 @@
  <li>Disable the stop ratio once it is reached (while seeding)</li>
  <li>Small interface adjustments</li>
 </ul>]]></description>
-      <pubDate>Wed, 18 Apr 2007 10:09:00 -0400</pubDate>
-      <enclosure sparkle:version="1739" sparkle:shortVersionString="0.70" url="http://download.m0k.org/transmission/files/Transmission-0.7.dmg" length="1434737" type="application/octet-stream"/>
+      <pubDate>Mon, 23 Apr 2007 19:30:00 -0400</pubDate>
+      <enclosure sparkle:version="1787" sparkle:shortVersionString="0.71" url="http://transmission.m0k.org/download_rotate.php" length="1435119" type="application/octet-stream"/>
     </item>
     
     <item>
