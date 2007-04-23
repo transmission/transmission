@@ -554,31 +554,31 @@ msgstr ""
 
 #: util.c:64
 msgid "B"
-msgstr "t"
+msgstr ""
 
 #: util.c:64
 msgid "KiB"
-msgstr "kt"
+msgstr ""
 
 #: util.c:64
 msgid "MiB"
-msgstr "Mt"
+msgstr ""
 
 #: util.c:64
 msgid "GiB"
-msgstr "Gt"
+msgstr ""
 
 #: util.c:64
 msgid "TiB"
-msgstr "Tt"
+msgstr ""
 
 #: util.c:64
 msgid "PiB"
-msgstr "Pt"
+msgstr ""
 
 #: util.c:64
 msgid "EiB"
-msgstr "Et"
+msgstr ""
 
 #: util.c:93
 #, c-format
