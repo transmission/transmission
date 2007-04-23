@@ -149,7 +149,7 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused );
 static void
 winsetup( struct cbdata * cbdata, TrWindow * wind );
 static void
-remakewind( struct cbdata * cbdata );
+iconclick( struct cbdata * cbdata );
 static void
 makeicon( struct cbdata * cbdata );
 static gboolean
@@ -456,19 +456,22 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
 }
 
 static void
-remakewind( struct cbdata * cbdata )
+iconclick( struct cbdata * cbdata )
 {
     GtkWidget * win;
 
     if( NULL != cbdata->wind )
     {
-        return;
+        /* close window  */
+        winclose( NULL, NULL, cbdata );
     }
-
-    /* create window */
-    win = tr_window_new();
-    winsetup( cbdata, TR_WINDOW( win ) );
-    tr_window_show( TR_WINDOW( win ) );
+    else
+    {
+        /* create window */
+        win = tr_window_new();
+        winsetup( cbdata, TR_WINDOW( win ) );
+        tr_window_show( TR_WINDOW( win ) );
+    }
 }
 
 static void
@@ -950,7 +953,7 @@ handleaction( struct cbdata * data, int act )
           }
           return;
       case ACT_ICON:
-          remakewind( data );
+          iconclick( data );
           return;
       case ACT_CLOSE:
           if( NULL != data->wind )
