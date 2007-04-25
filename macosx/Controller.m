@@ -418,6 +418,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //auto importing
     fAutoImportedNames = [[NSMutableArray alloc] init];
     [self checkAutoImportDirectory];
+}
+
+- (void) applicationDidFinishLaunching: (NSNotification *) notification
+{
+    [NSApp setServicesProvider: self];
+    
+    //register for dock icon drags
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
+        andSelector: @selector(handleOpenContentsEvent:replyEvent:)
+        forEventClass: kCoreEventClass andEventID: kAEOpenContents];
     
     //debug warning
     if ([fDefaults boolForKey: @"WarningDebug"] && [fDefaults integerForKey: @"MessageLevel"] == TR_MSG_DBG)
@@ -434,16 +444,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [fDefaults setBool: NO forKey: @"WarningDebug"];
         [alert release];
     }
-}
-
-- (void) applicationDidFinishLaunching: (NSNotification *) notification
-{
-    [NSApp setServicesProvider: self];
-    
-    //register for dock icon drags
-    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
-        andSelector: @selector(handleOpenContentsEvent:replyEvent:)
-        forEventClass: kCoreEventClass andEventID: kAEOpenContents];
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows
