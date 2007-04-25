@@ -683,7 +683,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) alertForRemainingDiskSpace
 {
-    if ([self allDownloaded] || ![fDefaults boolForKey: @"RemainingSpaceWarning"])
+    if ([self allDownloaded] || ![fDefaults boolForKey: @"WarningRemainingSpace"])
         return YES;
     
     NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
