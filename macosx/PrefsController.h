@@ -62,6 +62,7 @@
 
 - (void) setBadge: (id) sender;
 - (void) setSound: (id) sender;
+- (void) resetWarnings: (id) sender;
 - (void) setUpdate: (id) sender;
 
 - (void) setQueue: (id) sender;

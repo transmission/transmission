@@ -11,6 +11,7 @@
                 helpForNetwork = id; 
                 importFolderSheetShow = id; 
                 incompleteFolderSheetShow = id; 
+                resetWarnings = id; 
                 setAutoImport = id; 
                 setAutoSize = id; 
                 setAutoSpeedLimit = id; 

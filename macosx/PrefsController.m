@@ -432,6 +432,12 @@
         [sound play];
 }
 
+- (void) resetWarnings: (id) sender
+{
+    [fDefaults setBool: YES forKey: @"WarningDebug"];
+    [fDefaults setBool: YES forKey: @"WarningRemainingSpace"];
+}
+
 - (void) setUpdate: (id) sender
 {
     int index = [fUpdatePopUp indexOfSelectedItem];
