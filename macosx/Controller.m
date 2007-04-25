@@ -418,6 +418,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //auto importing
     fAutoImportedNames = [[NSMutableArray alloc] init];
     [self checkAutoImportDirectory];
+    
+    //debug warning
+    if ([fDefaults boolForKey: @"WarningDebug"] && [fDefaults integerForKey: @"MessageLevel"] == TR_MSG_DBG)
+    {
+        NSAlert * alert = [[NSAlert alloc] init];
+        [alert setMessageText: NSLocalizedString(@"The Message Log is set to \"Debug\"", "Debug log alert -> message")];
+        [alert setInformativeText: NSLocalizedString(@"Continuous use at this level might increase memory usage."
+                                    " This setting can be changed in the Message Log window (accessible from the Window menu).",
+                                    "Debug log alert -> informative message")];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Debug log alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Remind Again", "Debug log alert -> button")];
+        
+        if ([alert runModal] == NSAlertSecondButtonReturn)
+            [fDefaults setBool: NO forKey: @"WarningDebug"];
+        [alert release];
+    }
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification

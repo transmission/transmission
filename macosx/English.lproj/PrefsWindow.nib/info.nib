@@ -9,7 +9,7 @@
 		<key>153</key>
 		<string>294 444 563 268 0 0 1152 842 </string>
 		<key>28</key>
-		<string>139 407 563 307 0 0 1152 842 </string>
+		<string>294 424 563 307 0 0 1152 842 </string>
 		<key>41</key>
 		<string>294 425 563 305 0 0 1152 842 </string>
 		<key>66</key>
@@ -20,6 +20,10 @@
 	<key>IBLockedTabItems</key>
 	<array>
 		<integer>253</integer>
+	</array>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>28</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8P135</string>

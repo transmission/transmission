@@ -44,10 +44,10 @@
 	<false/>
 	<key>IncompleteDownloadFolder</key>
 	<string>~/Desktop</string>
-	<key>InspectorSelected</key>
-	<string>Info</string>
 	<key>InfoVisible</key>
 	<false/>
+	<key>InspectorSelected</key>
+	<string>Info</string>
 	<key>MessageLevel</key>
 	<integer>1</integer>
 	<key>MoveChoice</key>
@@ -74,8 +74,6 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
-	<key>RemainingSpaceWarning</key>
-	<true/>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 	<key>SeedingSound</key>
@@ -110,5 +108,9 @@
 	<false/>
 	<key>UseIncompleteDownloadFolder</key>
 	<false/>
+	<key>WarningDebug</key>
+	<true/>
+	<key>WarningRemainingSpace</key>
+	<true/>
 </dict>
 </plist>

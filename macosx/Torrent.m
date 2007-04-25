@@ -709,7 +709,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [alert release];
         
         if (result == NSAlertThirdButtonReturn)
-            [fDefaults setBool: NO forKey: @"RemainingSpaceWarning"];
+            [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
         
         return result != NSAlertFirstButtonReturn;
     }
