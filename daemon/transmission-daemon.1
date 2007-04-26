@@ -30,7 +30,7 @@
 .Nm transmission-daemon
 .Fl h
 .Nm
-.Op Fl f
+.Op Fl df
 .Sh DESCRIPTION
 The
 .Nm
@@ -38,6 +38,9 @@ program cures baldness, obesity and gout.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl d Fl -debug
+Print data send and received to and from clients to stdout, also implies
+.Fl f .
 .It Fl f Fl -foreground
 Run in the foreground and print errors to stderr instead of forking
 and logging errors with syslog.

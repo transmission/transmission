@@ -84,6 +84,7 @@ INTCMP_FUNC( clientcmp, client, ev )
 
 static struct event_base * gl_base    = NULL;
 static struct ipc_funcs  * gl_tree    = NULL;
+static int                 gl_debug   = 0;
 static int                 gl_exiting = 0;
 static struct allclients   gl_clients = RB_INITIALIZER( &gl_clients );
 
@@ -135,6 +136,12 @@ server_init( struct event_base * base )
     ipc_setdefmsg( gl_tree, defmsg );
 
     return 0;
+}
+
+void
+server_debug( int enable )
+{
+    gl_debug = enable;
 }
 
 int
@@ -233,6 +240,11 @@ newclient( int fd, short event UNUSED, void * arg )
         old = RB_INSERT( allclients, &gl_clients, client );
         assert( NULL == old );
 
+        if( gl_debug )
+        {
+            printf( "*** new client %i\n", clfd );
+        }
+
         bufferevent_enable( clev, EV_READ );
         buf = ipc_mkvers( &buflen );
         if( 0 > queuemsg( client, buf, buflen ) )
@@ -286,6 +298,10 @@ byebye( struct bufferevent * ev, short what, void * arg UNUSED )
     RB_REMOVE( allclients, &gl_clients, client );
     bufferevent_free( ev );
     close( client->fd );
+    if( gl_debug )
+    {
+        printf( "*** client %i went bye-bye\n", client->fd );
+    }
     free( client );
 }
 
@@ -301,6 +317,13 @@ doread( struct bufferevent * ev, void * arg )
 
     buf = EVBUFFER_DATA( EVBUFFER_INPUT( ev ) );
     len = EVBUFFER_LENGTH( EVBUFFER_INPUT( ev ) );
+
+    if( gl_debug )
+    {
+        printf( "<<< %zu bytes from client %i: ", len, client->fd );
+        fwrite( buf, 1, len, stdout );
+        putc( '\n', stdout );
+    }
 
     if( IPC_MIN_MSG_LEN > len )
     {
@@ -347,6 +370,13 @@ queuemsg( struct client * client, uint8_t * buf, size_t buflen )
             byebye( client->ev, EVBUFFER_EOF, NULL );
         }
         return -1;
+    }
+
+    if( gl_debug )
+    {
+        printf( ">>> %zu bytes to client %i: ", buflen, client->fd );
+        fwrite( buf, 1, buflen, stdout );
+        putc( '\n', stdout );
     }
 
     if( 0 > bufferevent_write( client->ev, buf, buflen ) )

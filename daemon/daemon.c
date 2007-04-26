@@ -49,7 +49,7 @@
 #include "version.h"
 
 static void usage       ( const char *, ... );
-static int  readargs    ( int, char ** );
+static void readargs    ( int, char **, int *, int * );
 static int  trylocksock ( void );
 static int  getlock     ( const char * );
 static int  getsock     ( const char * );
@@ -66,10 +66,10 @@ int
 main( int argc, char ** argv )
 {
     struct event_base * evbase;
-    int                 nofork, sockfd;
+    int                 nofork, debug, sockfd;
 
     setmyname( argv[0] );
-    nofork = readargs( argc, argv );
+    readargs( argc, argv, &nofork, &debug );
 
     if( !nofork )
     {
@@ -92,6 +92,7 @@ main( int argc, char ** argv )
     setupsigs( evbase );
     torrent_init( evbase );
     server_init( evbase );
+    server_debug( debug );
     server_listen( sockfd );
 
     event_dispatch();
@@ -115,11 +116,12 @@ usage( const char * msg, ... )
     }
 
     printf(
-  "usage: %s [-fh]\n"
+  "usage: %s [-dfh]\n"
   "\n"
   "Transmission %s (r%d) http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
   "\n"
+  "  -d --debug                Print data send and received, implies -f\n"
   "  -f --foreground           Run in the foreground and log to stderr\n"
   "  -h --help                 Display this message and exit\n"
   "\n"
@@ -128,34 +130,37 @@ usage( const char * msg, ... )
     exit( 0 );
 }
 
-int
-readargs( int argc, char ** argv )
+void
+readargs( int argc, char ** argv, int * nofork, int * debug )
 {
-    char optstr[] = "fh";
+    char optstr[] = "dfh";
     struct option longopts[] =
     {
+        { "debug",              no_argument,       NULL, 'd' },
         { "foreground",         no_argument,       NULL, 'f' },
         { "help",               no_argument,       NULL, 'h' },
         { NULL, 0, NULL, 0 }
     };
-    int opt, nofork;
+    int opt;
 
-    nofork = 0;
+    *nofork = 0;
+    *debug  = 0;
 
     while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
     {
         switch( opt )
         {
+            case 'd':
+                *debug = 1;
+                /* FALLTHROUGH */
             case 'f':
-                nofork = 1;
+                *nofork = 1;
                 break;
             default:
                 usage( NULL );
                 break;
         }
     }
-
-    return nofork;
 }
 
 int
