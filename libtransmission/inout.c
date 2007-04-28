@@ -472,8 +472,8 @@ static void invertSlots( tr_io_t * io, int slot1, int slot2 )
     uint8_t * buf1, * buf2;
     int piece1, piece2, foo;
 
-    buf1 = calloc( inf->pieceSize, 1 );
-    buf2 = calloc( inf->pieceSize, 1 );
+    buf1 = malloc( inf->pieceSize );
+    buf2 = malloc( inf->pieceSize );
 
     readSlot( io, slot1, buf1, &foo );
     readSlot( io, slot2, buf2, &foo );
