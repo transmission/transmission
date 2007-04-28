@@ -19,6 +19,7 @@
                 removeDeleteDataAndTorrent = id; 
                 removeDeleteTorrent = id; 
                 removeNoDelete = id; 
+                resetCacheForSelectedTorrents = id; 
                 resumeAllTorrents = id; 
                 resumeSelectedTorrents = id; 
                 resumeSelectedTorrentsNoWait = id; 

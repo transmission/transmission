@@ -350,6 +350,8 @@ float * tr_torrentCompletion( tr_torrent_t * tor );
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent_t * );
 
+void tr_torrentRemoveFastResume( tr_torrent_t * tor );
+
 /***********************************************************************
  * tr_torrentClose
  ***********************************************************************

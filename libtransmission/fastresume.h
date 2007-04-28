@@ -429,3 +429,14 @@ static int fastResumeLoad( tr_io_t * io )
     
     return ret;
 }
+
+static void fastResumeRemove( tr_torrent_t * tor )
+{
+    char file[MAX_PATH_LENGTH];
+    fastResumeFileName( file, sizeof file, tor, NULL != tor->handle->tag );
+    
+    if ( unlink( file ) )
+    {
+        tr_inf( "Removing fast resume file failed" );
+    }
+}

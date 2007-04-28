@@ -103,6 +103,14 @@ tr_io_t * tr_ioInit( tr_torrent_t * tor )
     return io;
 }
 
+void tr_ioRemoveResume( tr_torrent_t * tor )
+{
+    if( !tor->io )
+    {
+        fastResumeRemove( tor );
+    }
+}
+
 /***********************************************************************
  * tr_ioRead
  **********************************************************************/

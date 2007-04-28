@@ -1213,6 +1213,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 }
 
+- (void) resetCacheForSelectedTorrents: (id) sender
+{
+    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+    {
+        [torrent resetCache];
+    }
+}
+
 - (void) showPreferenceWindow: (id) sender
 {
     NSWindow * window = [fPrefsController window];
@@ -2585,6 +2595,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             //time interval returned will be negative
             if ([torrent isActive] &&
                     (!(date = [torrent announceDate]) || [date timeIntervalSinceNow] <= ANNOUNCE_WAIT_INTERVAL_SECONDS))
+                return YES;
+        }
+        return NO;
+    }
+    
+    //enable reset cache item
+    if (action == @selector(resetCacheForSelectedTorrents:))
+    {
+        if (!canUseTable)
+            return NO;
+        
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+        {
+            if (![torrent isActive])
                 return YES;
         }
         return NO;

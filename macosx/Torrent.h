@@ -86,6 +86,8 @@
 - (void)        announce;
 - (NSDate *)    announceDate;
 
+- (void)        resetCache;
+
 - (BOOL)        allDownloaded;
 
 - (float)       ratio;

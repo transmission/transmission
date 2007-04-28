@@ -555,6 +555,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fAnnounceDate;
 }
 
+- (void) resetCache
+{
+    tr_torrentRemoveFastResume(fHandle);
+}
+
 - (BOOL) allDownloaded
 {
     return [self progress] >= 1.0;

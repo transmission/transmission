@@ -117,6 +117,7 @@
 		A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
+		A251EAB80BE1A2370023D908 /* Controller.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DF0C5AA0899190500DD8943 /* Controller.h */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
 		A253F70B0A6990EB008EE24F /* FilterButtonOverMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */; };
 		A253F70C0A6990EB008EE24F /* FilterButtonOverLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */; };
@@ -190,6 +191,7 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
+				A251EAB80BE1A2370023D908 /* Controller.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

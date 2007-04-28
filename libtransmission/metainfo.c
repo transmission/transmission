@@ -535,7 +535,7 @@ void tr_metainfoRemoveSaved( const char * hashString, const char * tag )
     char file[MAX_PATH_LENGTH];
 
     savedname( file, sizeof file, hashString, tag );
-    unlink(file);
+    unlink( file );
 }
 
 uint8_t * readtorrent( const char * path, size_t * size )

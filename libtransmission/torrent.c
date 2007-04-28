@@ -627,6 +627,11 @@ void tr_torrentRemoveSaved( tr_torrent_t * tor )
     tr_metainfoRemoveSaved( tor->info.hashString, tor->handle->tag );
 }
 
+void tr_torrentRemoveFastResume( tr_torrent_t * tor )
+{
+    tr_ioRemoveResume( tor );
+}
+
 /***********************************************************************
  * tr_torrentClose
  ***********************************************************************
