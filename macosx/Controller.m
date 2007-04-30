@@ -526,10 +526,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //clear badge
     [fBadger clearBadge];
 
-    //end quickly if the app is updating
-    if (fUpdateInProgress)
-        return;
-
     //wait for running transfers to stop (5 second timeout)
     NSDate * start = [NSDate date];
     BOOL timeUp = NO;
@@ -537,11 +533,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while (!timeUp && (torrent = [enumerator nextObject]))
+    {
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
             [torrent update];
         }
+    }
     
     //wait for NAT to be disabled (same 5 second timeout)
     while (!([start timeIntervalSinceNow] < -5.0)

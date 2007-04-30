@@ -15,7 +15,7 @@
 
 <h4>Transmission Changes:</h4>
 <ul>
- <li>Reset download/upload rates when sending "started"</li>
+ <li>Reset download/upload amounts when sending "started"</li>
  <li>Fix rare XML parsing bug</li>
 </ul>]]></description>
       <pubDate>Mon, 30 Apr 2007 11:39:00 -0400</pubDate>
