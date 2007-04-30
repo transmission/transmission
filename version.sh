@@ -4,8 +4,8 @@
 
 MAJOR=0
 MINOR=7
-MAINT=1
-STRING=0.71
+MAINT=2
+STRING=0.72
 
 # Get current SVN revision from Ids in all source files
 REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
