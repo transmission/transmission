@@ -533,13 +533,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while (!timeUp && (torrent = [enumerator nextObject]))
-    {
         while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
         {
             usleep(100000);
             [torrent update];
         }
-    }
     
     //wait for NAT to be disabled (same 5 second timeout)
     while (!([start timeIntervalSinceNow] < -5.0)

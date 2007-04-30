@@ -28,6 +28,7 @@
 typedef struct tr_io_s tr_io_t;
 
 void      tr_ioLoadResume  ( tr_torrent_t * );
+void      tr_ioRemoveResume( tr_torrent_t * tor );
 
 tr_io_t * tr_ioInit        ( tr_torrent_t * );
 
