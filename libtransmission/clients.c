@@ -365,4 +365,3 @@ char * tr_clientForId( uint8_t * id )
 
     return ret;
 }
-s
