@@ -161,6 +161,7 @@ tr_xmlSkipTag( const char * begin, const char * end )
             }
             else
             {
+                CHECKNULL( begin, end, NULL );
                 overtag( begin, end, &begin );
                 return begin;
             }
@@ -258,6 +259,7 @@ skipall( const char * begin, const char * end, const char ** afterpos )
 static int
 nexttag( const char * begin, const char * end, const char ** tagpos )
 {
+    *tagpos = NULL;
     CHECKNULL( begin, end, 0 );
 
     while( end > begin )
@@ -271,15 +273,10 @@ nexttag( const char * begin, const char * end, const char ** tagpos )
         {
             *tagpos = begin;
             begin++;
-            if( end > begin )
-            {
-                return ( TAGCLOSE != *begin );
-            }
-            break;
+            return ( end > begin && TAGCLOSE != *begin );
         }
     }
 
-    *tagpos = NULL;
     return 0;
 }
 

@@ -1719,7 +1719,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //only toggle if within first few seconds of minutes
     NSCalendarDate * nowDate = [NSCalendarDate calendarDate];
-    if ([nowDate secondOfMinute] < AUTO_SPEED_LIMIT_SECONDS)
+    if ([nowDate secondOfMinute] > AUTO_SPEED_LIMIT_SECONDS)
         return;
     
     NSCalendarDate * offDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:
