@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.72 ()
+0.72 (2007/04/30)
  - Reset download/upload rates when sending "started"
  - Fix rare XML parsing bug
 
