@@ -5,8 +5,22 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Mon, 23 Apr 2007 19:30:00 -0400</pubDate>
-    <lastBuildDate>Mon, 23 Apr 2007 19:30:00 -0400</lastBuildDate>
+    <pubDate>Mon, 30 Apr 2007 11:39:00 -0400</pubDate>
+    <lastBuildDate>Mon, 30 Apr 2007 11:39:00 -0400</lastBuildDate>
+
+    <item>
+      <title>Transmission 0.72 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION NOW REQUIRES MAC OS X 10.4. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Reset download/upload rates when sending "started"</li>
+ <li>Fix rare XML parsing bug</li>
+</ul]]></description>
+      <pubDate>Mon, 30 Apr 2007 11:39:00 -0400</pubDate>
+      <enclosure sparkle:version="1814" sparkle:shortVersionString="0.72" url="http://mirrors.m0k.org/transmission/files/Transmission-0.72.dmg" length="1435881" type="application/octet-stream"/>
+    </item>
     
     <item>
       <title>Transmission 0.71 Released</title>
