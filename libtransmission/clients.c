@@ -199,6 +199,18 @@ char * tr_clientForId( uint8_t * id )
                       charToInt( id[3] ), charToInt( id[4] ),
                       charToInt( id[5] ) );
         }
+        else if( !memcmp( &id[1], "BF", 2 ) )
+        {
+            asprintf( &ret, "Bitflu (%d/%d/%02d)",
+                      charToInt( id[6] ),
+                      charToInt( id[4] ) * 10 + charToInt( id[5] ),
+                      charToInt( id[3] ) );
+        }
+        else if( !memcmp( &id[1], "FT", 2 ) )
+        {
+            asprintf( &ret, "FoxTorrent (%c%c%c%c)",
+                      id[3], id[4], id[5], id[6] );
+        }
         
         if( ret )
         {
