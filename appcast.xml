@@ -17,7 +17,7 @@
 <ul>
  <li>Reset download/upload rates when sending "started"</li>
  <li>Fix rare XML parsing bug</li>
-</ul]]></description>
+</ul>]]></description>
       <pubDate>Mon, 30 Apr 2007 11:39:00 -0400</pubDate>
       <enclosure sparkle:version="1814" sparkle:shortVersionString="0.72" url="http://mirrors.m0k.org/transmission/files/Transmission-0.72.dmg" length="1435881" type="application/octet-stream"/>
     </item>
