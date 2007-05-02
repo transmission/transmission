@@ -31,6 +31,7 @@
                 setQuickLimitGlobal = id; 
                 setQuickRatioGlobal = id; 
                 setSort = id; 
+                setSortReverse = id; 
                 showInfo = id; 
                 showMainWindow = id; 
                 showMessageWindow = id; 

@@ -86,6 +86,8 @@
 	<false/>
 	<key>Sort</key>
 	<string>Order</string>
+	<key>SortReverse</key>
+	<false/>
 	<key>SpeedLimit</key>
 	<false/>
 	<key>SpeedLimitAuto</key>

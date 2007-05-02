@@ -322,15 +322,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentSortItem = fProgressSortItem;
         currentSortActionItem = fProgressSortActionItem;
     }
-    else if ([sortType isEqualToString: @"Date"])
-    {
-        currentSortItem = fDateSortItem;
-        currentSortActionItem = fDateSortActionItem;
-    }
-    else
+    else if ([sortType isEqualToString: @"Order"])
     {
         currentSortItem = fOrderSortItem;
         currentSortActionItem = fOrderSortActionItem;
+    }
+    else
+    {
+        currentSortItem = fDateSortItem;
+        currentSortActionItem = fDateSortActionItem;
     }
     [currentSortItem setState: NSOnState];
     [currentSortActionItem setState: NSOnState];
@@ -1424,23 +1424,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) sortTorrentsIgnoreSelected
 {
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
+    BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name"
-                            ascending: YES selector: @selector(caseInsensitiveCompare:)] autorelease],
+                            ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
-                                            ascending: YES] autorelease];
-
+                                            ascending: asc] autorelease];
+    
     NSArray * descriptors;
     if ([sortType isEqualToString: @"Name"])
         descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
     else if ([sortType isEqualToString: @"State"])
     {
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                                @"stateSortKey" ascending: NO] autorelease],
+                                                @"stateSortKey" ascending: !asc] autorelease],
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: NO] autorelease],
+                                            @"progressSortKey" ascending: !asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratioSortKey" ascending: NO] autorelease];
+                                            @"ratioSortKey" ascending: !asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
@@ -1448,21 +1449,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else if ([sortType isEqualToString: @"Progress"])
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: YES] autorelease],
+                                            @"progressSortKey" ascending: asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratioSortKey" ascending: YES] autorelease];
+                                            @"ratioSortKey" ascending: asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
     }
-    else if ([sortType isEqualToString: @"Date"])
+    else if ([sortType isEqualToString: @"Order"])
+        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+    else
     {
-        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: YES] autorelease];
+        NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
     
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
-    else
-        descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
 
     [fDisplayedTorrents sortUsingDescriptors: descriptors];
     [descriptors release];
@@ -1491,15 +1492,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         prevSortItem = fProgressSortItem;
         prevSortActionItem = fProgressSortActionItem;
     }
-    else if ([oldSortType isEqualToString: @"Date"])
-    {
-        prevSortItem = fDateSortItem;
-        prevSortActionItem = fDateSortActionItem;
-    }
-    else
+    else if ([oldSortType isEqualToString: @"Order"])
     {
         prevSortItem = fOrderSortItem;
         prevSortActionItem = fOrderSortActionItem;
+    }
+    else
+    {
+        prevSortItem = fDateSortItem;
+        prevSortActionItem = fDateSortActionItem;
     }
     
     if (sender != prevSortItem && sender != prevSortActionItem)
@@ -1525,17 +1526,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             currentSortActionItem = fProgressSortActionItem;
             sortType = @"Progress";
         }
-        else if (sender == fDateSortItem || sender == fDateSortActionItem)
-        {
-            currentSortItem = fDateSortItem;
-            currentSortActionItem = fDateSortActionItem;
-            sortType = @"Date";
-        }
-        else
+        else if (sender == fOrderSortItem || sender == fOrderSortActionItem)
         {
             currentSortItem = fOrderSortItem;
             currentSortActionItem = fOrderSortActionItem;
             sortType = @"Order";
+            
+            [fDefaults setBool: NO forKey: @"SortReverse"];
+        }
+        else
+        {
+            currentSortItem = fDateSortItem;
+            currentSortActionItem = fDateSortActionItem;
+            sortType = @"Date";
         }
         
         [fDefaults setObject: sortType forKey: @"Sort"];
@@ -1546,6 +1549,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [currentSortActionItem setState: NSOnState];
     }
 
+    [self sortTorrents];
+}
+
+- (void) setSortReverse: (id) sender
+{
     [self sortTorrents];
 }
 
@@ -2622,6 +2630,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable copy torrent file item
     if (action == @selector(copyTorrentFile:))
         return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    
+    //enable reverse sort item
+    if (action == @selector(setSortReverse:))
+        return ![[fDefaults stringForKey: @"Sort"] isEqualToString: @"Order"];
 
     return YES;
 }
