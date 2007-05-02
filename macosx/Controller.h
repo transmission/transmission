@@ -63,14 +63,12 @@
     IBOutlet ImageBackgroundView    * fStatusBar;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
-    NSString                        * fSortType;
     IBOutlet NSMenuItem             * fNameSortItem, * fStateSortItem, * fProgressSortItem,
                                     * fDateSortItem, * fOrderSortItem,
                                     * fNameSortActionItem, * fStateSortActionItem, * fProgressSortActionItem,
                                     * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet ImageBackgroundView    * fFilterBar;
-    NSString                        * fFilterType;
     IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
                                     * fSeedFilterButton, * fDownloadFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
