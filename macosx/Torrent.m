@@ -986,7 +986,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSMutableDictionary * dic;
     
     tr_peer_stat_t * peer;
-    NSString * client;
     for (i = 0; i < totalPeers; i++)
     {
         peer = &peers[i];
@@ -1009,7 +1008,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [dic setObject: [NSNumber numberWithBool: peer->isUploading] forKey: @"DL From"];
             if (peer->isUploading)
                 [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
+            
+            [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         }
+        else
+            [dic setObject: NSLocalizedString(@"not connected", "Peer -> client") forKey: @"Client"];
         
         [peerDics addObject: dic];
     }
