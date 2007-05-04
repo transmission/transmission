@@ -713,8 +713,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
     tc->lastError = 0;
     tc->allUnreachIfError = 0;
 
-    /* Get the tracker interval, force to between
-       10 sec and 5 mins */
+    /* Get the tracker interval */
     beFoo = tr_bencDictFind( &beAll, "interval" );
     if( !beFoo || TYPE_INT != beFoo->type )
     {
@@ -726,8 +725,7 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
     tr_inf( "Tracker: interval = %d seconds", tc->interval );
     tc->interval = MAX( 10, tc->interval );
 
-    /* Get the tracker minimum interval, force to between
-       10 sec and 5 mins  */
+    /* Get the tracker minimum interval */
     beFoo = tr_bencDictFind( &beAll, "min interval" );
     if( beFoo && TYPE_INT == beFoo->type )
     {
