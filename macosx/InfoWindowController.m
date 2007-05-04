@@ -682,12 +682,12 @@
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-            return [peer objectForKey: @"Progress"];
+            return [[peer objectForKey: @"Connected"] boolValue] ? [peer objectForKey: @"Progress"] : 0;
         else if ([ident isEqualToString: @"UL To"])
-            return [[peer objectForKey: @"UL To"] boolValue]
+            return [[peer objectForKey: @"Connected"] boolValue] && [[peer objectForKey: @"UL To"] boolValue]
                     ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"UL To Rate"] floatValue]] : @"";
         else if ([ident isEqualToString: @"DL From"])
-            return [[peer objectForKey: @"DL From"] boolValue]
+            return [[peer objectForKey: @"Connected"] boolValue] && [[peer objectForKey: @"DL From"] boolValue]
                     ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"DL From Rate"] floatValue]] : @"";
         else
             return [peer objectForKey: @"IP"];
@@ -719,24 +719,33 @@
 {
     if (tableView == fPeerTable)
     {
-        NSDictionary * peerDic = [fPeers objectAtIndex: row];
+        NSDictionary * peer = [fPeers objectAtIndex: row];
         
-        NSString * fromString;
-        int from = [[peerDic objectForKey: @"From"] intValue];
-        if (from == TR_PEER_FROM_INCOMING)
-            fromString = NSLocalizedString(@"incoming connection", "Inspector -> Peers tab -> table row tooltip");
-        else if (from == TR_PEER_FROM_CACHE)
-            fromString = NSLocalizedString(@"cache", "Inspector -> Peers tab -> table row tooltip");
-        else if (from == TR_PEER_FROM_PEX)
-            fromString = NSLocalizedString(@"peer exchange", "Inspector -> Peers tab -> table row tooltip");
+        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 3];
+        
+        if ([[peer objectForKey: @"Connected"] boolValue])
+            [components addObject: [NSString stringWithFormat:
+                                    NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
+                                    [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
+        
+        int port;
+        if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
+            [components addObject: [NSString stringWithFormat:
+                                    NSLocalizedString(@"Port: %d", "Inspector -> Peers tab -> table row tooltip"), port]];
         else
-            fromString = NSLocalizedString(@"tracker", "Inspector -> Peers tab -> table row tooltip");
+            [components addObject: NSLocalizedString(@"Port: N/A", "Inspector -> Peers tab -> table row tooltip")];
         
-        return [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%"
-                    "\nPort: %@"
-                    "\nFrom: %@", "Inspector -> Peers tab -> table row tooltip"),
-                    [[peerDic objectForKey: @"Progress"] floatValue] * 100.0,
-                    [peerDic objectForKey: @"Port"], fromString];
+        int from = [[peer objectForKey: @"From"] intValue];
+        if (from == TR_PEER_FROM_INCOMING)
+            [components addObject: NSLocalizedString(@"From: incoming connection", "Inspector -> Peers tab -> table row tooltip")];
+        else if (from == TR_PEER_FROM_CACHE)
+            [components addObject: NSLocalizedString(@"From: cache", "Inspector -> Peers tab -> table row tooltip")];
+        else if (from == TR_PEER_FROM_PEX)
+            [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
+        else
+            [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
+        
+        return [components componentsJoinedByString: @"\n"];
     }
     return nil;
 }
