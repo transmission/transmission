@@ -395,6 +395,8 @@ tr_errorString( int code )
             return "Insufficient permissions";
         case TR_ERROR_IO_SPACE:
             return "Insufficient free space";
+        case TR_ERROR_IO_DUP_NAME:
+            return "Already active transfer with same name and download folder";
         case TR_ERROR_IO_RESOURCES:
             return "Insufficient resources";
         case TR_ERROR_IO_OTHER:
