@@ -504,9 +504,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fPendingTorrentDownloads removeAllObjects];
     
     //stop timers
-    [fSpeedLimitTimer invalidate];
     [fTimer invalidate];
-    if (fAutoImportTimer)
+    [fSpeedLimitTimer invalidate];
+    if (fAutoImportTimer && [fAutoImportTimer isValid])
         [fAutoImportTimer invalidate];
     
     //save history and stop running torrents
@@ -1841,26 +1841,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
     
-    if (fAutoImportTimer)
-    {
+    if (fAutoImportTimer && [fAutoImportTimer isValid])
         [fAutoImportTimer invalidate];
-        fAutoImportTimer = nil;
-    }
     
     //check again in 10 seconds in case torrent file wasn't complete
-    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-        selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO];
+    fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+        selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
     
     [self checkAutoImportDirectory];
 }
 
 - (void) changeAutoImport
 {
-    if (fAutoImportTimer)
-    {
+    if (fAutoImportTimer && [fAutoImportTimer isValid])
         [fAutoImportTimer invalidate];
-        fAutoImportTimer = nil;
-    }
     
     [fAutoImportedNames removeAllObjects];
     [self checkAutoImportDirectory];
@@ -1870,7 +1864,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
-        
+    NSLog(@"checking");
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
     NSArray * importedNames;
