@@ -410,11 +410,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //timer to auto toggle speed limit
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
-        selector: @selector(autoSpeedLimit:) userInfo: nil repeats: YES];
+        selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
     
     //auto importing
     fAutoImportedNames = [[NSMutableArray alloc] init];
-    [self checkAutoImportDirectory: nil];
+    [self checkAutoImportDirectory];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -1750,7 +1750,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self toggleSpeedLimit: nil];
 }
 
-- (void) autoSpeedLimit: (NSTimer *) timer
+- (void) autoSpeedLimit
 {
     if (![fDefaults boolForKey: @"SpeedLimitAuto"])
         return;
@@ -1836,15 +1836,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self newCheckAutoImportDirectory];
 }
 
-- (void) changeAutoImport
-{
-    if (fAutoImportTimer)
-        [fAutoImportTimer invalidate];
-    
-    [fAutoImportedNames removeAllObjects];
-    [self checkAutoImportDirectory: nil];
-}
-
 - (void) newCheckAutoImportDirectory
 {
     if (![fDefaults boolForKey: @"AutoImport"])
@@ -1855,12 +1846,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //check again in 10 seconds in case torrent file wasn't complete
     fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: NO];
+        selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO];
     
-    [self checkAutoImportDirectory: nil];
+    [self checkAutoImportDirectory];
 }
 
-- (void) checkAutoImportDirectory: (NSTimer *) timer
+- (void) changeAutoImport
+{
+    if (fAutoImportTimer)
+        [fAutoImportTimer invalidate];
+    
+    [fAutoImportedNames removeAllObjects];
+    [self checkAutoImportDirectory];
+}
+
+- (void) checkAutoImportDirectory
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;

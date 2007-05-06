@@ -171,7 +171,7 @@
 - (void) applySpeedLimit: (id) sender;
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
-- (void) autoSpeedLimit: (NSTimer *) timer;
+- (void) autoSpeedLimit;
 
 - (void) setLimitGlobalEnabled: (id) sender;
 - (void) setQuickLimitGlobal: (id) sender;
@@ -182,7 +182,7 @@
 
 - (void) changeAutoImport;
 - (void) newCheckAutoImportDirectory;
-- (void) checkAutoImportDirectory: (NSTimer *) timer;
+- (void) checkAutoImportDirectory;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 
