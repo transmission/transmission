@@ -1833,7 +1833,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
-        [self checkAutoImportDirectory: nil];
+        [self newCheckAutoImportDirectory];
 }
 
 - (void) changeAutoImport
