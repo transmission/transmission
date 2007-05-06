@@ -1864,7 +1864,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
-    NSLog(@"checking");
+    
     NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
     
     NSArray * importedNames;
