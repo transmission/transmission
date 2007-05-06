@@ -994,7 +994,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [NSNumber numberWithBool: peer->isConnected], @"Connected",
             [NSNumber numberWithInt: peer->from], @"From",
             [NSString stringWithCString: (char *) peer->addr encoding: NSUTF8StringEncoding], @"IP",
-            [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding], @"Client",
             [NSNumber numberWithInt: peer->port], @"Port", nil];
         
         if (peer->isConnected)

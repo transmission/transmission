@@ -682,7 +682,7 @@
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-            return [[peer objectForKey: @"Connected"] boolValue] ? [peer objectForKey: @"Progress"] : 0;
+            return [[peer objectForKey: @"Connected"] boolValue] ? [peer objectForKey: @"Progress"] : -1;
         else if ([ident isEqualToString: @"UL To"])
             return [[peer objectForKey: @"Connected"] boolValue] && [[peer objectForKey: @"UL To"] boolValue]
                     ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"UL To Rate"] floatValue]] : @"";

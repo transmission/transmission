@@ -1871,8 +1871,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (!(importedNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))
         return;
     
-    //only import those that have not been imported yet
-    #warning no mutable array
+    //only check files that have not been checked yet
     NSMutableArray * newNames = [importedNames mutableCopy];
     [newNames removeObjectsInArray: fAutoImportedNames];
     [fAutoImportedNames setArray: importedNames];
