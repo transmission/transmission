@@ -414,7 +414,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //auto importing
     fAutoImportedNames = [[NSMutableArray alloc] init];
-    [self checkAutoImportDirectory];
+    [self checkAutoImportDirectory: nil];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -506,6 +506,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //stop timers
     [fSpeedLimitTimer invalidate];
     [fTimer invalidate];
+    if (fAutoImportTimer)
+        [fAutoImportTimer invalidate];
     
     //save history and stop running torrents
     [self updateTorrentHistory];
@@ -1831,16 +1833,34 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
-        [self checkAutoImportDirectory];
+        [self checkAutoImportDirectory: nil];
 }
 
 - (void) changeAutoImport
 {
+    if (fAutoImportTimer)
+        [fAutoImportTimer invalidate];
+    
     [fAutoImportedNames removeAllObjects];
-    [self checkAutoImportDirectory];
+    [self checkAutoImportDirectory: nil];
 }
 
-- (void) checkAutoImportDirectory
+- (void) newCheckAutoImportDirectory
+{
+    if (![fDefaults boolForKey: @"AutoImport"])
+        return;
+    
+    if (fAutoImportTimer)
+        [fAutoImportTimer invalidate];
+    
+    //check again in 10 seconds in case torrent file wasn't complete
+    fAutoImportTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+        selector: @selector(checkAutoImportDirectory:) userInfo: nil repeats: NO];
+    
+    [self checkAutoImportDirectory: nil];
+}
+
+- (void) checkAutoImportDirectory: (NSTimer *) timer
 {
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
@@ -1852,6 +1872,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     
     //only import those that have not been imported yet
+    #warning no mutable array
     NSMutableArray * newNames = [importedNames mutableCopy];
     [newNames removeObjectsInArray: fAutoImportedNames];
     [fAutoImportedNames setArray: importedNames];

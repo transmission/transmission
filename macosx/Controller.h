@@ -94,6 +94,7 @@
     
     NSMutableArray                  * fAutoImportedNames;
     NSMutableDictionary             * fPendingTorrentDownloads;
+    NSTimer                         * fAutoImportTimer;
 }
 
 - (void) openFiles:             (NSArray *) filenames;
@@ -180,7 +181,7 @@
 - (void) torrentStoppedForRatio: (NSNotification *) notification;
 
 - (void) changeAutoImport;
-- (void) checkAutoImportDirectory;
+- (void) checkAutoImportDirectory: (NSTimer *) timer;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 
