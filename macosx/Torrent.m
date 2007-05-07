@@ -1480,7 +1480,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int8_t * piecesAvailablity = malloc(pieceCount);
     [self getAvailability: piecesAvailablity size: pieceCount];
     
-    //lines 2 to 14: blue, green, or gray depending on whether we have the piece or not
+    //lines 2 to 14: blue, green, or gray depending on piece availability
     int i, h, index = 0;
     float increment = (float)pieceCount / (float)MAX_PIECES, indexValue = 0;
     uint32_t color;
@@ -1506,34 +1506,31 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 change = YES;
             }
         }
+        else if (piecesAvailablity[index] <= 4)
+        {
+            if (fPieces[i] != 1)
+            {
+                color = kGreen1;
+                fPieces[i] = 1;
+                change = YES;
+            }
+        }
+        else if (piecesAvailablity[index] <= 8)
+        {
+            if (fPieces[i] != 2)
+            {
+                color = kGreen2;
+                fPieces[i] = 2;
+                change = YES;
+            }
+        }
         else
         {
-            if (piecesAvailablity[index] == 1)
+            if (fPieces[i] != 3)
             {
-                if (fPieces[i] != 1)
-                {
-                    color = kGreen1;
-                    fPieces[i] = 1;
-                    change = YES;
-                }
-            }
-            else if (piecesAvailablity[index] == 2)
-            {
-                if (fPieces[i] != 2)
-                {
-                    color = kGreen2;
-                    fPieces[i] = 2;
-                    change = YES;
-                }
-            }
-            else
-            {
-                if (fPieces[i] != 3)
-                {
-                    color = kGreen3;
-                    fPieces[i] = 3;
-                    change = YES;
-                }
+                color = kGreen3;
+                fPieces[i] = 3;
+                change = YES;
             }
         }
         

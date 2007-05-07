@@ -265,7 +265,7 @@
                         pieceImage = fWhitePiece;
                     }
                 }
-                else if (piece == 1)
+                else if (piece <= 4)
                 {
                     if (first || fPieces[index] != 1)
                     {
@@ -273,7 +273,7 @@
                         pieceImage = fGreen1Piece;
                     }
                 }
-                else if (piece == 2)
+                else if (piece <= 8)
                 {
                     if (first || fPieces[index] != 2)
                     {
