@@ -506,8 +506,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //stop timers
     [fTimer invalidate];
     [fSpeedLimitTimer invalidate];
-    if (fAutoImportTimer && [fAutoImportTimer isValid])
-        [fAutoImportTimer invalidate];
+    if (fAutoImportTimer)
+    {   
+        if ([fAutoImportTimer isValid])
+            [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
+    }
     
     //save history and stop running torrents
     [self updateTorrentHistory];
