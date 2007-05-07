@@ -1841,8 +1841,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fDefaults boolForKey: @"AutoImport"])
         return;
     
-    if (fAutoImportTimer && [fAutoImportTimer isValid])
-        [fAutoImportTimer invalidate];
+    if (fAutoImportTimer)
+    {
+        if ([fAutoImportTimer isValid])
+            [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
+        fAutoImportTimer = nil;
+    }
     
     //check again in 10 seconds in case torrent file wasn't complete
     fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
@@ -1853,8 +1858,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) changeAutoImport
 {
-    if (fAutoImportTimer && [fAutoImportTimer isValid])
-        [fAutoImportTimer invalidate];
+    if (fAutoImportTimer)
+    {
+        if ([fAutoImportTimer isValid])
+            [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
+        fAutoImportTimer = nil;
+    }
     
     [fAutoImportedNames removeAllObjects];
     [self checkAutoImportDirectory];
