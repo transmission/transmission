@@ -1837,27 +1837,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 -(void) watcher: (id<UKFileWatcher>) watcher receivedNotification: (NSString *) notification forPath: (NSString *) path
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
-        [self newCheckAutoImportDirectory];
-}
-
-- (void) newCheckAutoImportDirectory
-{
-    if (![fDefaults boolForKey: @"AutoImport"])
-        return;
-    
-    if (fAutoImportTimer)
     {
-        if ([fAutoImportTimer isValid])
-            [fAutoImportTimer invalidate];
-        [fAutoImportTimer release];
-        fAutoImportTimer = nil;
+        if (![fDefaults boolForKey: @"AutoImport"])
+            return;
+        
+        if (fAutoImportTimer)
+        {
+            if ([fAutoImportTimer isValid])
+                [fAutoImportTimer invalidate];
+            [fAutoImportTimer release];
+            fAutoImportTimer = nil;
+        }
+        
+        //check again in 10 seconds in case torrent file wasn't complete
+        fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+            selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
+        
+        [self checkAutoImportDirectory];
     }
-    
-    //check again in 10 seconds in case torrent file wasn't complete
-    fAutoImportTimer = [[NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-        selector: @selector(checkAutoImportDirectory) userInfo: nil repeats: NO] retain];
-    
-    [self checkAutoImportDirectory];
 }
 
 - (void) changeAutoImport

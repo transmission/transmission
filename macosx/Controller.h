@@ -181,7 +181,6 @@
 - (void) torrentStoppedForRatio: (NSNotification *) notification;
 
 - (void) changeAutoImport;
-- (void) newCheckAutoImportDirectory;
 - (void) checkAutoImportDirectory;
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
