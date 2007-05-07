@@ -1928,7 +1928,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (tempTor)
             tr_torrentClose(fLib, tempTor);
         else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
-            [fAutoImportedNames removeObjectIdenticalTo: [file lastPathComponent]]; //can try to import later
+            [fAutoImportedNames removeObject: [file lastPathComponent]]; //can try to import later
         else;
     }
     
