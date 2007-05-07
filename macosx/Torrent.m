@@ -511,7 +511,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fError = NO;
     fWaitToStart = NO;
     
-    if ([self isActive])
+    if ([self isActive] && ![self isChecking])
     {
         tr_torrentStop(fHandle);
         [self update];
@@ -522,7 +522,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) stopTransferForQuit
 {
-    if ([self isActive])
+    if ([self isActive] && ![self isChecking])
         tr_torrentStop(fHandle);
 }
 
@@ -952,6 +952,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (BOOL) isPaused
 {
     return fStat->status == TR_STATUS_PAUSE;
+}
+
+- (BOOL) isChecking
+{
+    return fStat->status == TR_STATUS_CHECK;
 }
 
 - (BOOL) isError
