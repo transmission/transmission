@@ -4,8 +4,6 @@
 <dict>
 	<key>AutoImport</key>
 	<false/>
-	<key>AutoImportDirectory</key>
-	<string>~/Desktop</string>
 	<key>AutoSize</key>
 	<false/>
 	<key>AutoStartDownload</key>

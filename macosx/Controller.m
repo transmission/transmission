@@ -1838,7 +1838,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if ([notification isEqualToString: UKFileWatcherWriteNotification])
     {
-        if (![fDefaults boolForKey: @"AutoImport"])
+        if (![fDefaults boolForKey: @"AutoImport"] || ![fDefaults stringForKey: @"AutoImportDirectory"])
             return;
         
         if (fAutoImportTimer)
@@ -1873,10 +1873,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) checkAutoImportDirectory
 {
-    if (![fDefaults boolForKey: @"AutoImport"])
+    NSString * path;
+    if (![fDefaults boolForKey: @"AutoImport"] || !(path = [fDefaults stringForKey: @"AutoImportDirectory"]))
         return;
     
-    NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
+    path = [path stringByExpandingTildeInPath];
     
     NSArray * importedNames;
     if (!(importedNames = [[NSFileManager defaultManager] directoryContentsAtPath: path]))

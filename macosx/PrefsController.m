@@ -66,9 +66,9 @@
         }
         
         //set auto import
-        if ([fDefaults boolForKey: @"AutoImport"])
-            [[UKKQueue sharedFileWatcher] addPath:
-                [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
+        NSString * autoPath;
+        if ([fDefaults boolForKey: @"AutoImport"] && (autoPath = [fDefaults stringForKey: @"AutoImportDirectory"]))
+            [[UKKQueue sharedFileWatcher] addPath: [autoPath stringByExpandingTildeInPath]];
         
         //set bind port
         int bindPort = [fDefaults integerForKey: @"BindPort"];
@@ -536,13 +536,19 @@
 
 - (void) setAutoImport: (id) sender
 {
-    NSString * path = [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath];
-    if ([fDefaults boolForKey: @"AutoImport"])
-        [[UKKQueue sharedFileWatcher] addPath: path];
+    NSString * path;
+    if ((path = [fDefaults stringForKey: @"AutoImportDirectory"]))
+    {
+        path = [path stringByExpandingTildeInPath];
+        if ([fDefaults boolForKey: @"AutoImport"])
+            [[UKKQueue sharedFileWatcher] addPath: path];
+        else
+            [[UKKQueue sharedFileWatcher] removePathFromQueue: path];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+    }
     else
-        [[UKKQueue sharedFileWatcher] removePathFromQueue: path];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
+        [self importFolderSheetShow: nil];
 }
 
 - (void) importFolderSheetShow: (id) sender
@@ -654,17 +660,22 @@
 
 - (void) importFolderSheetClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) info
 {
+    NSString * path = [fDefaults stringForKey: @"AutoImportDirectory"];
     if (code == NSOKButton)
     {
         UKKQueue * sharedQueue = [UKKQueue sharedFileWatcher];
-        [sharedQueue removePathFromQueue: [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
+        if (path)
+            [sharedQueue removePathFromQueue: [path stringByExpandingTildeInPath]];
         
-        [fDefaults setObject: [[openPanel filenames] objectAtIndex: 0] forKey: @"AutoImportDirectory"];
-        
-        [sharedQueue addPath: [[fDefaults stringForKey: @"AutoImportDirectory"] stringByExpandingTildeInPath]];
+        path = [[openPanel filenames] objectAtIndex: 0];
+        [fDefaults setObject: path forKey: @"AutoImportDirectory"];
+        [sharedQueue addPath: [path stringByExpandingTildeInPath]];
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoImportSettingChange" object: self];
     }
+    else if (!path)
+        [fDefaults setBool: NO forKey: @"AutoImport"];
+    
     [fImportFolderPopUp selectItemAtIndex: 0];
 }
 
