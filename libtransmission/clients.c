@@ -315,7 +315,7 @@ char * tr_clientForId( uint8_t * id )
     else if( !memcmp( id, "XBT", 3 ) )
     {
         asprintf( &ret, "XBT Client %c%c%c%s", id[3], id[4], id[5],
-                  id[6] == 'd' ? " (debug)" : "" );
+                    id[6] == 'd' ? " (debug)" : "" );
     }
     else if( !memcmp( id, "Mbrst", 5 ) )
     {
@@ -324,6 +324,11 @@ char * tr_clientForId( uint8_t * id )
     else if( !memcmp( id, "btpd", 4 ) )
     {
         asprintf( &ret, "BT Protocol Daemon %c%c%c", id[5], id[6], id[7] );
+    }
+    else if( id[0] == 'Q' && !memcmp( &id[4], "--", 2 ) )
+    {
+        asprintf( &ret, "BTQueue %d.%d.%d", charToInt( id[1] ),
+                    charToInt( id[2] ), charToInt( id[3] ) );
     }
     else if( !memcmp( id, "LIME", 4 ) )
     {
