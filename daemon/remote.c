@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include <event.h>
 #include <getopt.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -143,6 +144,8 @@ main( int argc, char ** argv )
     {
         exit( 1 );
     }
+
+    signal( SIGPIPE, SIG_IGN );
 
     evbase = event_init();
     client_init( evbase );

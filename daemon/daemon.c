@@ -220,7 +220,7 @@ getlock( const char * path )
     {
         if( EAGAIN == errno )
         {
-            errnomsg( "another copy of %s is already running", getmyname() );
+            errmsg( "another copy of %s is already running", getmyname() );
         }
         else
         {
