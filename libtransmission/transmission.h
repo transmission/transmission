@@ -80,6 +80,8 @@ extern "C" {
 #define TR_ERROR_TC_ERROR       0x80000100
 #define TR_ERROR_TC_WARNING     0x80000200
 
+#define TR_ERROR_ISSET( num, code ) ( (code) == ( (code) & (num) ) )
+
 /***********************************************************************
  * tr_init
  ***********************************************************************

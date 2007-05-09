@@ -700,27 +700,35 @@ ipc_addstat( benc_val_t * list, int tor, tr_info_t * inf,
                 {
                     tr_bencInitStr( item, NULL, 0, 1 );
                 }
-                else if( TR_ERROR_ASSERT & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_ASSERT, st->error ) )
                 {
                     tr_bencInitStr( item, "assert", -1, 1 );
                 }
-                else if( TR_ERROR_IO_PARENT & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_PARENT, st->error ) )
                 {
                     tr_bencInitStr( item, "io-parent", -1, 1 );
                 }
-                else if( TR_ERROR_IO_PERMISSIONS & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_PERMISSIONS, st->error ) )
                 {
                     tr_bencInitStr( item, "io-permissions", -1, 1 );
                 }
-                else if( TR_ERROR_IO_MASK & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_SPACE, st->error ) )
+                {
+                    tr_bencInitStr( item, "io-space", -1, 1 );
+                }
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_RESOURCES, st->error ) )
+                {
+                    tr_bencInitStr( item, "io-resources", -1, 1 );
+                }
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_MASK, st->error ) )
                 {
                     tr_bencInitStr( item, "io-other", -1, 1 );
                 }
-                else if( TR_ERROR_TC_ERROR & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_TC_ERROR, st->error ) )
                 {
                     tr_bencInitStr( item, "tracker-error", -1, 1 );
                 }
-                else if( TR_ERROR_TC_WARNING & st->error )
+                else if( TR_ERROR_ISSET( TR_ERROR_TC_WARNING, st->error ) )
                 {
                     tr_bencInitStr( item, "tracker-warning", -1, 1 );
                 }

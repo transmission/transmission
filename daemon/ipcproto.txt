@@ -386,8 +386,10 @@ which support is mandatory is "id".
 "download-total"    integer, total bytes downloaded so far
 "error"             string, one of the following:
                       "assert"          something happened that shouldn't
-                      "io-parent"       I dunno
-                      "io-permissions"  filesystem permission error probably
+                      "io-parent"       missing parent directory
+                      "io-permissions"  filesystem permission error
+                      "io-space"        not enough free space in filesystem
+                      "io-resource"     insufficient resources
                       "io-other"        other filesystem i/o error
                       "tracker-error"   tracker returned error message
                       "tracker-warning" tracker returned warning message
