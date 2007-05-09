@@ -224,6 +224,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [super dealloc];
 }
 
+#warning make less confusing
 - (void) setDownloadFolder: (NSString *) path
 {
     if (path)
@@ -264,11 +265,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
             && (canMove = [self alertForMoveFolderAvailable]))
         {
-            tr_torrentStop(fHandle);
+            //pause without actually stopping
+            tr_setDownloadLimit(fHandle, 0);
+            tr_setUploadLimit(fHandle, 0);
+            
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
                 tr_torrentSetFolder(fHandle, [fDownloadFolder UTF8String]);
-            tr_torrentStart(fHandle);
+            
+            [self updateSpeedSetting];
         }
         
         if (!canMove)
@@ -777,8 +782,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     else
     {
         [fDownloadFolder release];
-        fDownloadFolder = folder;
-        [self setDownloadFolder: fDownloadFolder];
+        [self setDownloadFolder: folder];
     }
     
     [self startTransfer];
