@@ -46,9 +46,18 @@ char * tr_clientForId( uint8_t * id )
     {
         if( !memcmp( &id[1], "TR", 2 ) )
         {
-            asprintf( &ret, "Transmission %d.%d",
-                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
-                      charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+            /* support old-style Transmission id without maintenance number */
+            if ( !memcmp( &id[3], "00", 2 ) )
+            {
+                asprintf( &ret, "Transmission 0.%d",
+                        charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+            }
+            else
+            {
+                asprintf( &ret, "Transmission %d.%c%c",
+                        charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                        id[5], id[6] );
+            }
         }
         else if( !memcmp( &id[1], "AZ", 2 ) )
         {
