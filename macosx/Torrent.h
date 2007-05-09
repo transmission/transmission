@@ -115,7 +115,8 @@
 - (void) revealPublicTorrent;
 - (void) trashData;
 - (void) trashTorrent;
-- (void) moveTorrent;
+- (void) moveTorrentDataFileTo: (NSString *) folder;
+- (void) copyTorrentFileTo: (NSString *) path;
 
 - (BOOL) alertForRemainingDiskSpace;
 - (BOOL) alertForFolderAvailable;

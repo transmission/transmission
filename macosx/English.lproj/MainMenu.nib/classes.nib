@@ -7,7 +7,7 @@
                 announceSelectedTorrents = id; 
                 applyFilter = id; 
                 applySpeedLimit = id; 
-                copyTorrentFile = id; 
+                copyTorrentFiles = id; 
                 doNothing = id; 
                 linkForums = id; 
                 linkHomepage = id; 
