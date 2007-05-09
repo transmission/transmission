@@ -133,6 +133,8 @@
 - (void) removeDeleteTorrent:           (id) sender;
 - (void) removeDeleteDataAndTorrent:    (id) sender;
 
+- (void) moveDataFiles: (id) sender;
+
 - (void) copyTorrentFile: (id) sender;
 - (void) copyTorrentFileForTorrents: (NSMutableArray *) torrents;
 - (void) saveTorrentCopySheetClosed: (NSSavePanel *) panel returnCode: (int) code

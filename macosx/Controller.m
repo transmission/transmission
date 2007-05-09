@@ -983,8 +983,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
-- (void) removeTorrents: (NSArray *) torrents
-        deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
+- (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData deleteTorrent: (BOOL) deleteTorrent
 {
     [torrents retain];
     int active = 0, downloading = 0;
@@ -1135,6 +1134,15 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 deleteData: YES deleteTorrent: YES];
 }
 
+- (void) moveDataFiles: (id) sender
+{
+    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent moveTorrent];
+}
+
+#warning move to Torrent
 - (void) copyTorrentFile: (id) sender
 {
     [self copyTorrentFileForTorrents: [[NSMutableArray alloc] initWithArray:
@@ -2658,6 +2666,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
         return NO;
     }
+    
+    //enable move torrent file item
+    if (action == @selector(moveDataFiles:))
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable copy torrent file item
     if (action == @selector(copyTorrentFile:))

@@ -106,15 +106,16 @@
 - (int)     downloadLimit;
 - (void)    setDownloadLimit: (int) limit;
 
-- (void)    updateSpeedSetting;
+- (void) updateSpeedSetting;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;
 
-- (void)    revealData;
-- (void)    revealPublicTorrent;
-- (void)    trashData;
-- (void)    trashTorrent;
+- (void) revealData;
+- (void) revealPublicTorrent;
+- (void) trashData;
+- (void) trashTorrent;
+- (void) moveTorrent;
 
 - (BOOL) alertForRemainingDiskSpace;
 - (BOOL) alertForFolderAvailable;

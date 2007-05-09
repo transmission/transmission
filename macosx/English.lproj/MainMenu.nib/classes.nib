@@ -11,6 +11,7 @@
                 doNothing = id; 
                 linkForums = id; 
                 linkHomepage = id; 
+                moveDataFiles = id; 
                 openShowSheet = id; 
                 openURLCancelEndSheet = id; 
                 openURLEndSheet = id; 

@@ -691,6 +691,58 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [self trashFile: [self publicTorrentLocation]];
 }
 
+- (void) moveTorrent
+{
+    NSOpenPanel * panel = [NSOpenPanel openPanel];
+    
+    [panel setPrompt: NSLocalizedString(@"Select", "Move torrent -> prompt")];
+    [panel setAllowsMultipleSelection: NO];
+    [panel setCanChooseFiles: NO];
+    [panel setCanChooseDirectories: YES];
+    [panel setCanCreateDirectories: YES];
+
+    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\"",
+                        "Move torrent -> select destination folder"), [self name]]];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"MakeWindowKey" object: nil];
+    [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [NSApp keyWindow] modalDelegate: self
+            didEndSelector: @selector(moveTorrentChoiceClosed:returnCode:contextInfo:) contextInfo: nil];
+}
+
+- (void) moveTorrentChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (void *) context
+{
+    if (code != NSOKButton)
+        return;
+    
+    NSString * folder = [[openPanel filenames] objectAtIndex: 0];
+    if (![[self downloadFolder] isEqualToString: folder] || ![fDownloadFolder isEqualToString: folder])
+    {
+        //pause without actually stopping
+        tr_setDownloadLimit(fHandle, 0);
+        tr_setUploadLimit(fHandle, 0);
+        
+        if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
+                                toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
+        {
+            //get rid of both incomplete folder and download folder
+            fUseIncompleteFolder = NO;
+            if (fIncompleteFolder)
+            {
+                [fIncompleteFolder release];
+                fIncompleteFolder = nil;
+            }
+            [fDownloadFolder release];
+            fDownloadFolder = [folder retain];
+            
+            tr_torrentSetFolder(fHandle, [fDownloadFolder UTF8String]);
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
+        }
+        
+        [self updateSpeedSetting];
+    }
+}
+
 - (BOOL) alertForRemainingDiskSpace
 {
     if ([self allDownloaded] || ![fDefaults boolForKey: @"WarningRemainingSpace"])
