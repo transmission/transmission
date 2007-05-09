@@ -693,14 +693,38 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) moveTorrentDataFileTo: (NSString *) folder
 {
-    if (![[self downloadFolder] isEqualToString: folder] || ![fDownloadFolder isEqualToString: folder])
+    NSString * oldFolder = [self downloadFolder];
+    if (![oldFolder isEqualToString: folder] || ![fDownloadFolder isEqualToString: folder])
     {
+        //check if moving inside itself
+        NSArray * oldComponents = [oldFolder pathComponents],
+                * newComponents = [folder pathComponents];
+        int count;
+        
+        if ((count = [oldComponents count]) < [newComponents count]
+                && [[newComponents objectAtIndex: count] isEqualToString: [self name]]
+                && [oldComponents isEqualToArray:
+                        [newComponents objectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, count)]]])
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: NSLocalizedString(@"A folder cannot be moved to inside itself.",
+                                                        "Move inside iteself alert -> title")];
+            [alert setInformativeText: [NSString stringWithFormat:
+                            NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
+                                                "Move inside iteself alert -> message"), [self name]]];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside iteself alert -> button")];
+            
+            [alert runModal];
+            [alert release];
+            
+            return;
+        }
+        
         //pause without actually stopping
         tr_setDownloadLimit(fHandle, 0);
         tr_setUploadLimit(fHandle, 0);
         
-        #warning check if moving inside itself
-        [[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
+        [[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
                             toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil];
 
         //get rid of both incomplete folder and old download folder, even if move failed
