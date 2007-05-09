@@ -50,6 +50,7 @@ struct opts
     int               proxy;
     char           ** proxycmd;
     enum confpathtype type;
+    const char      * sock;
     struct strlist    files;
     int               sendquit;
     int               port;
@@ -152,8 +153,15 @@ main( int argc, char ** argv )
     }
     else
     {
-        confpath( sockpath, sizeof sockpath, CONF_FILE_SOCKET, o.type );
-        client_new_sock( sockpath );
+        if( NULL == o.sock )
+        {
+            confpath( sockpath, sizeof sockpath, CONF_FILE_SOCKET, o.type );
+            client_new_sock( sockpath );
+        }
+        else
+        {
+            client_new_sock( o.sock );
+        }
     }
 
     if( ( o.sendquit                &&   0 > client_quit     (           ) ) ||
@@ -352,14 +360,16 @@ readargs( int argc, char ** argv, struct opts * opts )
                 if( 0 == strcasecmp( "daemon", optarg ) )
                 {
                     opts->type  = CONF_PATH_TYPE_DAEMON;
+                    opts->sock  = NULL;
                 }
                 else if( 0 == strcasecmp( "gtk", optarg ) )
                 {
                     opts->type  = CONF_PATH_TYPE_GTK;
+                    opts->sock  = NULL;
                 }
                 else
                 {
-                    usage( "invalid type: %s", optarg );
+                    opts->sock  = optarg;
                 }
                 break;
             case 'u':

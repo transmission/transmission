@@ -40,8 +40,8 @@
 #include "transmission.h"
 
 static void              usage    ( const char *, ... );
-static enum confpathtype readargs ( int, char ** );
-static int               makesock ( enum confpathtype );
+static enum confpathtype readargs ( int, char **, char ** );
+static int               makesock ( enum confpathtype, const char * );
 static void              inread   ( struct bufferevent *, void * );
 static void              noop     ( struct bufferevent *, void * );
 static void              inerr    ( struct bufferevent *, short, void * );
@@ -60,13 +60,14 @@ main( int argc, char ** argv )
 {
     struct event_base  * base;
     enum confpathtype    type;
+    char               * sockpath;
     int                  sockfd;
 
     setmyname( argv[0] );
-    type = readargs( argc, argv );
+    type = readargs( argc, argv, &sockpath );
     base = event_init();
 
-    sockfd = makesock( type );
+    sockfd = makesock( type, sockpath );
     if( 0 > sockfd )
     {
         return EXIT_FAILURE;
@@ -136,7 +137,7 @@ usage( const char * msg, ... )
 }
 
 enum confpathtype
-readargs( int argc, char ** argv )
+readargs( int argc, char ** argv, char ** sockpath )
 {
     char optstr[] = "ht:";
     struct option longopts[] =
@@ -148,7 +149,8 @@ readargs( int argc, char ** argv )
     enum confpathtype type;
     int opt;
 
-    type = CONF_PATH_TYPE_DAEMON;
+    type      = CONF_PATH_TYPE_DAEMON;
+    *sockpath = NULL;
 
     while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
     {
@@ -157,15 +159,17 @@ readargs( int argc, char ** argv )
             case 't':
                 if( 0 == strcasecmp( "daemon", optarg ) )
                 {
-                    type = CONF_PATH_TYPE_DAEMON;
+                    type      = CONF_PATH_TYPE_DAEMON;
+                    *sockpath = NULL;
                 }
                 else if( 0 == strcasecmp( "gtk", optarg ) )
                 {
-                    type = CONF_PATH_TYPE_GTK;
+                    type      = CONF_PATH_TYPE_GTK;
+                    *sockpath = NULL;
                 }
                 else
                 {
-                    usage( "invalid type: %s", optarg );
+                    *sockpath = optarg;
                 }
                 break;
             default:
@@ -178,14 +182,21 @@ readargs( int argc, char ** argv )
 }
 
 int
-makesock( enum confpathtype type )
+makesock( enum confpathtype type, const char * path )
 {
     struct sockaddr_un sun;
     int                fd;
 
     bzero( &sun, sizeof sun );
     sun.sun_family = AF_LOCAL;
-    confpath( sun.sun_path, sizeof sun.sun_path, CONF_FILE_SOCKET, type );
+    if( NULL == path )
+    {
+        confpath( sun.sun_path, sizeof sun.sun_path, CONF_FILE_SOCKET, type );
+    }
+    else
+    {
+        strlcpy( sun.sun_path, path, sizeof sun.sun_path );
+    }
 
     fd = socket( AF_UNIX, SOCK_STREAM, 0 );
     if( 0 > fd )
