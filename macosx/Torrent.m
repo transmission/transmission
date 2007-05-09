@@ -370,10 +370,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 if (eta < 60)
                     [remainingTimeString appendFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
                 else if (eta < 3600) //60 * 60
-                    [remainingTimeString appendFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"),
+                    [remainingTimeString appendFormat: NSLocalizedString(@"%d min %d sec", "Torrent -> remaining time"),
                                                             eta / 60, eta % 60];
                 else if (eta < 86400) //24 * 60 * 60
-                    [remainingTimeString appendFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"),
+                    [remainingTimeString appendFormat: NSLocalizedString(@"%d hr %d min", "Torrent -> remaining time"),
                                                             eta / 3600, (eta / 60) % 60];
                 else
                 {
