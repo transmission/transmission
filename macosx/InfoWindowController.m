@@ -682,13 +682,20 @@
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-            return [[peer objectForKey: @"Connected"] boolValue] ? [peer objectForKey: @"Progress"] : [NSNumber numberWithInt: 0];
+        {
+            NSNumber * progress;
+            return (progress = [peer objectForKey: @"Progress"]) ? progress : [NSNumber numberWithInt: 0];
+        }
         else if ([ident isEqualToString: @"UL To"])
-            return [[peer objectForKey: @"Connected"] boolValue] && [[peer objectForKey: @"UL To"] boolValue]
-                    ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"UL To Rate"] floatValue]] : @"";
+        {
+            NSNumber * rate;
+            return (rate = [peer objectForKey: @"UL To Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+        }
         else if ([ident isEqualToString: @"DL From"])
-            return [[peer objectForKey: @"Connected"] boolValue] && [[peer objectForKey: @"DL From"] boolValue]
-                    ? [NSString stringForSpeedAbbrev: [[peer objectForKey: @"DL From Rate"] floatValue]] : @"";
+        {
+            NSNumber * rate;
+            return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
+        }
         else
             return [peer objectForKey: @"IP"];
     }
