@@ -684,7 +684,7 @@
         else if  ([ident isEqualToString: @"Progress"])
         {
             NSNumber * progress;
-            return (progress = [peer objectForKey: @"Progress"]) ? progress : [NSNumber numberWithInt: 0];
+            return (progress = [peer objectForKey: @"Progress"]) ? progress : nil;
         }
         else if ([ident isEqualToString: @"UL To"])
         {
@@ -700,6 +700,16 @@
             return [peer objectForKey: @"IP"];
     }
     return nil;
+}
+
+- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell
+            forTableColumn: (NSTableColumn *) tableColumn row: (int) row
+{
+    if (tableView == fPeerTable)
+    {
+        if ([[tableColumn identifier] isEqualToString: @"Progress"])
+            [cell setHidden: ![[[fPeers objectAtIndex: row] objectForKey: @"Connected"] boolValue]];
+    }
 }
 
 - (void) tableView: (NSTableView *) tableView didClickTableColumn: (NSTableColumn *) tableColumn

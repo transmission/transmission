@@ -61,7 +61,13 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {CLASS = NSLevelIndicatorCell; LANGUAGE = ObjC; SUPERCLASS = NSActionCell; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {
+            CLASS = PeerProgressIndicatorCell; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSLevelIndicatorCell; 
+        }, 
         {
             CLASS = PiecesImageView; 
             LANGUAGE = ObjC; 
