@@ -1076,7 +1076,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         }
         else
-            [dic setObject: NSLocalizedString(@"not connected", "Peer -> client") forKey: @"Client"];
+            [dic setObject: @"" forKey: @"Client"];
         
         [peerDics addObject: dic];
     }
