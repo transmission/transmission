@@ -740,21 +740,36 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         tr_setDownloadLimit(fHandle, 0);
         tr_setUploadLimit(fHandle, 0);
         
-        [[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
-                            toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil];
-
-        //get rid of both incomplete folder and old download folder, even if move failed
-        fUseIncompleteFolder = NO;
-        if (fIncompleteFolder)
+        if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
+                            toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
         {
-            [fIncompleteFolder release];
-            fIncompleteFolder = nil;
+            //get rid of both incomplete folder and old download folder, even if move failed
+            fUseIncompleteFolder = NO;
+            if (fIncompleteFolder)
+            {
+                [fIncompleteFolder release];
+                fIncompleteFolder = nil;
+            }
+            [self setDownloadFolder: folder];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
+            
+            [self updateSpeedSetting];
         }
-        [self setDownloadFolder: folder];
+        else
+        {
+            [self updateSpeedSetting]; //restart before showing the alert
         
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
-        
-        [self updateSpeedSetting];
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
+            [alert setInformativeText: [NSString stringWithFormat:
+                            NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
+                                                "   Move error alert -> message"), [self name]]];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
+            
+            [alert runModal];
+            [alert release];
+        }
     }
 }
 

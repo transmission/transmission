@@ -37,5 +37,6 @@
 + (NSString *) stringForRatio: (float) ratio;
 
 - (NSComparisonResult) compareIP: (NSString *) string;
+- (NSComparisonResult) clientCompare: (NSString *) string;
 
 @end
