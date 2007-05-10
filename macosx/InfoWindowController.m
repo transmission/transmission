@@ -684,7 +684,7 @@
         else if  ([ident isEqualToString: @"Progress"])
         {
             NSNumber * progress;
-            return (progress = [peer objectForKey: @"Progress"]) ? progress : nil;
+            return [peer objectForKey: @"Progress"]; //returning nil is fine
         }
         else if ([ident isEqualToString: @"UL To"])
         {

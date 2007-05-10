@@ -63,19 +63,21 @@
     int8_t * fPieces;
 }
 
-- (id)  initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
-- (id)  initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
+- (id) initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 
 - (NSDictionary *) history;
-                    
-- (void)       setDownloadFolder: (NSString *) path;
+
+- (void) setIncompleteFolder: (NSString *) folder;
+- (void) setDownloadFolder: (NSString *) folder;
+- (void) updateDownloadFolder;
 - (NSString *) downloadFolder;
 
 - (void) getAvailability: (int8_t *) tab size: (int) size;
 - (void) getAmountFinished: (float *) tab size: (int) size;
 
-- (void)            update;
-- (NSDictionary *)  infoForCurrentView;
+- (void) update;
+- (NSDictionary *) infoForCurrentView;
 
 - (void)        startTransfer;
 - (void)        stopTransfer;
