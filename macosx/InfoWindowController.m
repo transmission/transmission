@@ -869,10 +869,25 @@
     NSMutableArray * descriptors = [NSMutableArray array];
     
     NSArray * oldDescriptors = [fPeerTable sortDescriptors];
+    BOOL useSecond = YES, asc = YES;
     if ([oldDescriptors count] > 0)
-        [descriptors addObject: [oldDescriptors objectAtIndex: 0]];
+    {
+        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
+        [descriptors addObject: descriptor];
+        
+        useSecond = ![[descriptor key] isEqualToString: @"IP"];
+        asc = [descriptor ascending];
+    }
     
-    [descriptors addObject: [[fPeerTable tableColumnWithIdentifier: @"IP"] sortDescriptorPrototype]];
+    //sort by IP after primary sort
+    if (useSecond)
+    {
+        #warning different for different sorts
+        NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
+                                                                        selector: @selector(compareIP:)];
+        [descriptors addObject: secondDescriptor];
+        [secondDescriptor release];
+    }
     
     return descriptors;
 }
