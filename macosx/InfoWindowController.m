@@ -875,14 +875,18 @@
         NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
         [descriptors addObject: descriptor];
         
-        useSecond = ![[descriptor key] isEqualToString: @"IP"];
-        asc = [descriptor ascending];
+        if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
+        {
+            #warning different for different sorts
+            NSLog(@"%@", [[fPeerTable highlightedTableColumn] identifier]);
+            
+            asc = [descriptor ascending];
+        }
     }
     
     //sort by IP after primary sort
     if (useSecond)
     {
-        #warning different for different sorts
         NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
                                                                         selector: @selector(compareIP:)];
         [descriptors addObject: secondDescriptor];

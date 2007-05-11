@@ -764,7 +764,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
             [alert setInformativeText: [NSString stringWithFormat:
                             NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
-                                                "   Move error alert -> message"), [self name]]];
+                                                "Move error alert -> message"), [self name]]];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move error alert -> button")];
             
             [alert runModal];

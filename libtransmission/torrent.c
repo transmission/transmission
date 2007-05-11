@@ -238,10 +238,26 @@ char * tr_torrentGetFolder( tr_torrent_t * tor )
     return tor->destination;
 }
 
+int tr_torrentDuplicateDownload( tr_torrent_t * tor )
+{
+    tr_torrent_t * current, * next;
+    
+    /* Check if a torrent with the same name and destination is already active */
+    for( current = tor->handle->torrentList; current; current = current->next )
+    {
+        if( current != tor && current->status != TR_STATUS_PAUSE
+            && !strcmp( tor->destination, current->destination )
+            && !strcmp( tor->info.name, current->info.name ) )
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void tr_torrentStart( tr_torrent_t * tor )
 {
     char name[32];
-    tr_torrent_t * current, * next;
     
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
     {
@@ -250,17 +266,12 @@ void tr_torrentStart( tr_torrent_t * tor )
     }
     
     /* Don't start if a torrent with the same name and destination is already active */
-    for( current = tor->handle->torrentList; current; current = current->next )
+    if( tr_torrentDuplicateDownload( tor ) )
     {
-        if( current != tor && current->status != TR_STATUS_PAUSE
-            && !strcmp( tor->destination, current->destination )
-            && !strcmp( tor->info.name, current->info.name ) )
-        {
-            tor->error = TR_ERROR_IO_DUP_NAME;
-            snprintf( tor->errorString, sizeof( tor->errorString ),
-                          "%s", tr_errorString( TR_ERROR_IO_DUP_NAME ) );
-            return;
-        }
+        tor->error = TR_ERROR_IO_DUP_DOWNLOAD;
+        snprintf( tor->errorString, sizeof( tor->errorString ),
+                    "%s", tr_errorString( TR_ERROR_IO_DUP_DOWNLOAD ) );
+        return;
     }
 
     tr_lockLock( &tor->lock );
