@@ -219,14 +219,16 @@ struct tr_torrent_s
 
 struct tr_handle_s
 {
-    int            torrentCount;
-    tr_torrent_t * torrentList;
+    int                torrentCount;
+    tr_torrent_t     * torrentList;
 
-    char         * tag;
-    int            isPortSet;
-    int            uploadLimit;
-    int            downloadLimit;
-    tr_shared_t  * shared;
+    char             * tag;
+    int                isPortSet;
+
+    tr_ratecontrol_t * upload;
+    tr_ratecontrol_t * download;
+
+    tr_shared_t      * shared;
 
 #define TR_ID_LEN               20
     char           id[TR_ID_LEN+1];

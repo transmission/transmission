@@ -79,9 +79,9 @@ tr_handle_t * tr_init( const char * tag )
     signal( SIGPIPE, SIG_IGN );
 
     /* Initialize rate and file descripts controls */
-    h->uploadLimit   = -1;
-    h->downloadLimit = -1;
-    
+    h->upload   = tr_rcInit();
+    h->download = tr_rcInit();
+
     tr_fdInit();
     h->shared = tr_sharedInit( h );
 
@@ -125,13 +125,13 @@ tr_handle_status_t * tr_handleStatus( tr_handle_t * h )
 
 void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )
 {
-    h->uploadLimit = limit;
+    tr_rcSetLimit( h->upload, limit );
     tr_sharedSetLimit( h->shared, limit );
 }
 
 void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
 {
-    h->downloadLimit = limit;
+    tr_rcSetLimit( h->download, limit );
 }
 
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
@@ -170,6 +170,9 @@ void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
 
 void tr_close( tr_handle_t * h )
 {
+    tr_rcClose( h->upload );
+    tr_rcClose( h->download );
+    
     tr_sharedClose( h->shared );
     tr_fdClose();
     free( h );

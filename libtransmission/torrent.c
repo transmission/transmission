@@ -240,7 +240,7 @@ char * tr_torrentGetFolder( tr_torrent_t * tor )
 
 int tr_torrentDuplicateDownload( tr_torrent_t * tor )
 {
-    tr_torrent_t * current, * next;
+    tr_torrent_t * current;
     
     /* Check if a torrent with the same name and destination is already active */
     for( current = tor->handle->torrentList; current; current = current->next )

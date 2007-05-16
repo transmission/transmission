@@ -280,22 +280,11 @@ int tr_peerRead( tr_peer_t * peer )
     {
         if( tor )
         {
-            if( tor->customDownloadLimit )
+            if( tor->customDownloadLimit
+                ? !tr_rcCanTransfer( tor->download )
+                : !tr_rcCanTransfer( tor->handle->download ) )
             {
-                if( !tr_rcCanTransfer( tor->download ) )
-                {
-                    break;
-                }
-            }
-            else
-            {
-                tr_lockUnlock( &tor->lock );
-                if( !tr_rcCanGlobalTransfer( tor->handle, 0 ) )
-                {
-                    tr_lockLock( &tor->lock );
-                    break;
-                }
-                tr_lockLock( &tor->lock );
+                break;
             }
         }
 
@@ -328,6 +317,11 @@ int tr_peerRead( tr_peer_t * peer )
         {
             tr_rcTransferred( peer->download, ret );
             tr_rcTransferred( tor->download, ret );
+            if ( !tor->customDownloadLimit )
+            {
+                tr_rcTransferred( tor->handle->download, ret );
+            }
+            
             if( ( ret = parseBuf( tor, peer ) ) )
             {
                 return ret;
@@ -489,22 +483,11 @@ writeBegin:
     /* Send pieces if we can */
     while( ( p = blockPending( tor, peer, &size ) ) )
     {
-        if( tor->customUploadLimit )
+        if( tor->customUploadLimit
+            ? !tr_rcCanTransfer( tor->upload )
+            : !tr_rcCanTransfer( tor->handle->upload ) )
         {
-            if( !tr_rcCanTransfer( tor->upload ) )
-            {
-                break;
-            }
-        }
-        else
-        {
-            tr_lockUnlock( &tor->lock );
-            if( !tr_rcCanGlobalTransfer( tor->handle, 1 ) )
-            {
-                tr_lockLock( &tor->lock );
-                break;
-            }
-            tr_lockLock( &tor->lock );
+            break;
         }
 
         ret = tr_netSend( peer->socket, p, size );
@@ -520,6 +503,10 @@ writeBegin:
         blockSent( peer, ret );
         tr_rcTransferred( peer->upload, ret );
         tr_rcTransferred( tor->upload, ret );
+        if ( !tor->customUploadLimit )
+        {
+            tr_rcTransferred( tor->handle->upload, ret );
+        }
 
         tor->uploadedCur += ret;
         peer->outTotal   += ret;

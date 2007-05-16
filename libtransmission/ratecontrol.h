@@ -25,7 +25,6 @@
 typedef struct tr_ratecontrol_s tr_ratecontrol_t;
 
 tr_ratecontrol_t * tr_rcInit();
-int                tr_rcCanGlobalTransfer( tr_handle_t * h, int isUpload );
 void               tr_rcSetLimit( tr_ratecontrol_t *, int );
 int                tr_rcCanTransfer( tr_ratecontrol_t * );
 void               tr_rcTransferred( tr_ratecontrol_t *, int );
