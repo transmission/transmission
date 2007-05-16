@@ -282,8 +282,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             && (canMove = [self alertForMoveFolderAvailable]))
         {
             //pause without actually stopping
-            tr_setDownloadLimit(fHandle, 0);
+            tr_setUseCustomUpload(fHandle, 1);
             tr_setUploadLimit(fHandle, 0);
+            
+            tr_setUseCustomDownload(fHandle, 1);
+            tr_setDownloadLimit(fHandle, 0);
             
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
