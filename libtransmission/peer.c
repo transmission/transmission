@@ -400,6 +400,12 @@ int tr_peerPulse( tr_peer_t * peer )
         }
         peer->status = PEER_STATUS_CONNECTING;
     }
+    
+    /* Disconnect if seeder and torrent is seeding */
+    if( peer->tor->status == TR_STATUS_SEED && peer->progress >= 1.0 )
+    {
+        return TR_ERROR;
+    }
 
     /* Try to send handshake */
     if( PEER_STATUS_CONNECTING == peer->status )
