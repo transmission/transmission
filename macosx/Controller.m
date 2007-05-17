@@ -2007,15 +2007,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
-        //check if any files to add have "torrent" as an extension
+        //check if any files can be added
         NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
         NSString * file;
         while ((file = [enumerator nextObject]))
-            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+        {
+            tr_torrent_t * tempTor;
+            int error;
+            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
             {
+                tr_torrentClose(fLib, tempTor);
+                
                 [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
                 return NSDragOperationGeneric;
             }
+        }
     }
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
@@ -2038,13 +2044,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
-        //create an array of files with the "torrent" extension
+        //create an array of files that can be opened
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
         NSString * file;
         while ((file = [enumerator nextObject]))
-            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
+        {
+            tr_torrent_t * tempTor;
+            int error;
+            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+            {
+                tr_torrentClose(fLib, tempTor);
                 [filesToOpen addObject: file];
+            }
+        }
     
         [self application: NSApp openFiles: filesToOpen];
         [filesToOpen release];

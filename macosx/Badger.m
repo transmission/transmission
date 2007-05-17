@@ -124,8 +124,8 @@
             * uploadRateString = checkUpload && uploadRate >= 0.1 ? [NSString stringForSpeedAbbrev: uploadRate] : nil;
     
     NSImage * dockIcon = nil;
-    BOOL speedBadge;
-    if (speedBadge = (uploadRateString || downloadRateString))
+    BOOL speedChange;
+    if (speedChange = (uploadRateString || downloadRateString))
     {
         dockIcon = [fDockIcon copy];
         
@@ -171,14 +171,15 @@
     }
     
     //update dock badge
-    if (baseChange || fSpeedBadge || speedBadge)
+    if (baseChange || fSpeedBadge || speedChange)
     {
         if (!dockIcon)
             dockIcon = [fDockIcon retain];
         [NSApp setApplicationIconImage: dockIcon];
         [dockIcon release];
+        
+        fSpeedBadge = speedChange;
     }
-    fSpeedBadge = speedBadge;
     
     [fLock unlock];
 }
