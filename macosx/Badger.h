@@ -26,14 +26,22 @@
 #define BADGER_H
 
 #import <Cocoa/Cocoa.h>
+#import <transmission.h>
 
-@interface Badger : NSObject {
+@interface Badger : NSObject
+{
+    tr_handle_t     * fLib;
 
     NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
     NSDictionary    * fAttributes;
+    int             fCompleted;
+    BOOL            fSpeedBadge;
+    
+    NSLock          * fLock;
 }
 
-- (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate;
+- (id) initWithLib: (tr_handle_t *) lib;
+- (void) updateBadgeWithCompleted: (int) completed;
 - (void) clearBadge;
 
 @end

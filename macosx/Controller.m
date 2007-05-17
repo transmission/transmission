@@ -166,7 +166,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         
-        fBadger = [[Badger alloc] init];
+        fBadger = [[Badger alloc] initWithLib: fLib];
         
         [GrowlApplicationBridge setGrowlDelegate: self];
         
@@ -1321,7 +1321,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats];
 
     //badge dock
-    [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
+    [fBadger updateBadgeWithCompleted: fCompleted];
 }
 
 - (void) updateTorrentsInQueue
@@ -2839,10 +2839,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) resetDockBadge: (NSNotification *) notification
 {
-    float downloadRate, uploadRate;
-    tr_torrentRates(fLib, & downloadRate, & uploadRate);
-    
-    [fBadger updateBadgeWithCompleted: fCompleted uploadRate: uploadRate downloadRate: downloadRate];
+    [fBadger updateBadgeWithCompleted: fCompleted];
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame

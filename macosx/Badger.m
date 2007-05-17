@@ -33,11 +33,13 @@
 
 @implementation Badger
 
-- (id) init
+- (id) initWithLib: (tr_handle_t *) lib
 {
     if ((self = [super init]))
     {
-        fDockIcon = [NSImage imageNamed: @"NSApplicationIcon"];
+        fLib = lib;
+        
+        fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         fBadge = [NSImage imageNamed: @"Badge"];
         fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
         fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
@@ -54,6 +56,11 @@
             boldFont, NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
         
         [stringShadow release];
+        
+        fCompleted = 0;
+        fSpeedBadge = NO;
+        
+        fLock = [[NSLock alloc] init];
     }
     
     return self;
@@ -61,51 +68,66 @@
 
 - (void) dealloc
 {
+    [fDockIcon release];
     [fAttributes release];
+    [fLock release];
     [super dealloc];
 }
 
-- (void) updateBadgeWithCompleted: (int) completed uploadRate: (float) uploadRate downloadRate: (float) downloadRate
+- (void) updateBadgeWithCompleted: (int) completed
 {
-    NSImage * dockIcon = nil;
-        
-    //set completed badge to top right
-    if (completed > 0)
-    {
-        dockIcon = [fDockIcon copy];
+    [fLock lock];
     
-        NSRect badgeRect;
-        NSSize iconSize = [dockIcon size];
-        badgeRect.size = [fBadge size];
-        badgeRect.origin.x = iconSize.width - badgeRect.size.width;
-        badgeRect.origin.y = iconSize.height - badgeRect.size.height;
-                                    
-        [dockIcon lockFocus];
+    //set completed badge to top right
+    BOOL baseChange;
+    if (baseChange = (fCompleted != completed))
+    {
+        fCompleted = completed;
         
-        //place badge
-        [fBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+        [fDockIcon release];
+        fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         
-        //ignore shadow of badge when placing string
-        float badgeBottomExtra = 5.0;
-        badgeRect.size.height -= badgeBottomExtra;
-        badgeRect.origin.y += badgeBottomExtra;
-        
-        //place badge text
-        [self badgeString: [NSString stringWithInt: completed] forRect: badgeRect];
-                    
-        [dockIcon unlockFocus];
+        if (completed > 0)
+        {
+            NSRect badgeRect;
+            NSSize iconSize = [fDockIcon size];
+            badgeRect.size = [fBadge size];
+            badgeRect.origin.x = iconSize.width - badgeRect.size.width;
+            badgeRect.origin.y = iconSize.height - badgeRect.size.height;
+                                        
+            [fDockIcon lockFocus];
+            
+            //place badge
+            [fBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+            
+            //ignore shadow of badge when placing string
+            float badgeBottomExtra = 5.0;
+            badgeRect.size.height -= badgeBottomExtra;
+            badgeRect.origin.y += badgeBottomExtra;
+            
+            //place badge text
+            [self badgeString: [NSString stringWithInt: completed] forRect: badgeRect];
+                        
+            [fDockIcon unlockFocus];
+        }
     }
 
     //set upload and download rate badges
-    NSString * uploadRateString = uploadRate >= 0.1 && [[NSUserDefaults standardUserDefaults]
-                    boolForKey: @"BadgeUploadRate"] ? [NSString stringForSpeedAbbrev: uploadRate] : nil,
-            * downloadRateString = downloadRate >= 0.1 && [[NSUserDefaults standardUserDefaults]
-                    boolForKey: @"BadgeDownloadRate"] ? [NSString stringForSpeedAbbrev: downloadRate] : nil;
+    BOOL checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"],
+        checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"];
+    float downloadRate, uploadRate;
     
-    if (uploadRateString || downloadRateString)
+    if (checkUpload || checkDownload)
+        tr_torrentRates(fLib, & downloadRate, & uploadRate);
+    
+    NSString * downloadRateString = checkDownload && downloadRate >= 0.1 ? [NSString stringForSpeedAbbrev: downloadRate] : nil,
+            * uploadRateString = checkUpload && uploadRate >= 0.1 ? [NSString stringForSpeedAbbrev: uploadRate] : nil;
+    
+    NSImage * dockIcon = nil;
+    BOOL speedBadge;
+    if (speedBadge = (uploadRateString || downloadRateString))
     {
-        if (!dockIcon)
-            dockIcon = [fDockIcon copy];
+        dockIcon = [fDockIcon copy];
         
         NSRect badgeRect;
         badgeRect.size = [fUploadBadge size];
@@ -149,16 +171,22 @@
     }
     
     //update dock badge
-    if (!dockIcon)
-        dockIcon = [fDockIcon retain];
+    if (baseChange || fSpeedBadge || speedBadge)
+    {
+        if (!dockIcon)
+            dockIcon = [fDockIcon retain];
+        [NSApp setApplicationIconImage: dockIcon];
+        [dockIcon release];
+    }
+    fSpeedBadge = speedBadge;
     
-    [NSApp setApplicationIconImage: dockIcon];
-    [dockIcon release];
+    [fLock unlock];
 }
 
 - (void) clearBadge
 {
-    [NSApp setApplicationIconImage: fDockIcon];
+    [NSApp setApplicationIconImage: [NSImage imageNamed: @"NSApplicationIcon"]];
+    fCompleted = 0;
 }
 
 @end
