@@ -111,17 +111,22 @@
             [fDockIcon unlockFocus];
         }
     }
-
+    
     //set upload and download rate badges
-    BOOL checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"],
-        checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"];
-    float downloadRate, uploadRate;
+    NSString * downloadRateString = nil, * uploadRateString = nil;
     
-    if (checkUpload || checkDownload)
-        tr_torrentRates(fLib, & downloadRate, & uploadRate);
-    
-    NSString * downloadRateString = checkDownload && downloadRate >= 0.1 ? [NSString stringForSpeedAbbrev: downloadRate] : nil,
-            * uploadRateString = checkUpload && uploadRate >= 0.1 ? [NSString stringForSpeedAbbrev: uploadRate] : nil;
+    BOOL checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
+        checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
+    if (checkDownload || checkUpload)
+    {
+        float downloadRate, uploadRate;
+        tr_torrentRates(fLib, &downloadRate, &uploadRate);
+        
+        if (checkDownload && downloadRate >= 0.1)
+            downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];
+        if (checkUpload && uploadRate >= 0.1)
+            uploadRateString = [NSString stringForSpeedAbbrev: uploadRate];
+    }
     
     NSImage * dockIcon = nil;
     BOOL speedChange;
