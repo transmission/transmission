@@ -167,6 +167,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         
         fBadger = [[Badger alloc] initWithLib: fLib];
+        fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib];
         
         [GrowlApplicationBridge setGrowlDelegate: self];
         
@@ -202,7 +203,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
-    fOverlayWindow = [[DragOverlayWindow alloc] init];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -2090,16 +2090,18 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
         //check if any files can be added
-        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
+        NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
+        tr_torrent_t * tempTor;
         while ((file = [enumerator nextObject]))
         {
-            tr_torrent_t * tempTor;
             int error;
             if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
             {
                 tr_torrentClose(fLib, tempTor);
                 
+                [fOverlayWindow setFiles: files];
                 [fOverlayWindow setFrame: [fWindow frame] display: YES];
                 [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
                 
@@ -2137,9 +2139,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
         NSString * file;
+        tr_torrent_t * tempTor;
         while ((file = [enumerator nextObject]))
         {
-            tr_torrent_t * tempTor;
             int error;
             if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
             {

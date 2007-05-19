@@ -23,13 +23,14 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <transmission.h>
 
-@interface DragOverlayWindow : NSWindow
+@interface DragOverlayView : NSView
 {
-    tr_handle_t * fLib;
+    NSImage * fImage, * fAppIcon;
+    
+    NSDictionary * fMainLineAttributes, * fSubLineAttributes;
 }
 
-- (void) setFiles: (NSArray *) files;
+- (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine;
 
 @end

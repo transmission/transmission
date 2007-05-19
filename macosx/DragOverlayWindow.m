@@ -23,24 +23,83 @@
  *****************************************************************************/
 
 #import "DragOverlayWindow.h"
+#import "DragOverlayView.h"
+#import "StringAdditions.h"
 
 @implementation DragOverlayWindow
 
-- (id) init
+- (id) initWithLib: (tr_handle_t *) lib
 {
-    if (self = ([super initWithContentRect: NSMakeRect(0, 0, 0, 0) styleMask: NSBorderlessWindowMask
+    if (self = ([super initWithContentRect: NSMakeRect(0, 0, 1.0, 1.0) styleMask: NSBorderlessWindowMask
                     backing: NSBackingStoreBuffered defer: NO]))
     {
-        [self setBackgroundColor: [NSColor blackColor]];
-        [self setLevel: NSStatusWindowLevel];
-        [self setAlphaValue: 0.5];
+        fLib = lib;
+        
+        [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
+        [self setAlphaValue: 1.0];
         [self setOpaque: NO];
         [self setHasShadow: NO];
+        [self setLevel: NSStatusWindowLevel];
+        
+        DragOverlayView * backgroundView = [[DragOverlayView alloc] initWithFrame: [self frame]];
+        [self setContentView: backgroundView];
+        [backgroundView release];
         
         [self setReleasedWhenClosed: NO];
         [self setIgnoresMouseEvents: YES];
     }
     return self;
+}
+
+- (void) dealloc
+{
+    [super dealloc];
+}
+
+- (void) setFiles: (NSArray *) files
+{
+    uint64_t size = 0;
+    int count = 0;
+    
+    NSString * name;
+    BOOL folder;
+    
+    NSString * file;
+    NSEnumerator * enumerator = [files objectEnumerator];
+    tr_torrent_t * tempTor;
+    tr_info_t * info;
+    while ((file = [enumerator nextObject]))
+    {
+        int error;
+        if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+        {
+            info = tr_torrentInfo(tempTor);
+            
+            count++;
+            size += info->totalSize;
+            
+            //only useful when one torrent
+            if (count == 1)
+            {
+                name = [NSString stringWithUTF8String: info->name];
+                folder = info->multifile;
+            }
+            
+            tr_torrentClose(fLib, tempTor);
+        }
+    }
+    
+    NSImage * icon = nil;
+    NSString * sizeString = [NSString stringForFileSize: size];
+    if (count == 1)
+        icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
+    else
+    {
+        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> multiple drag files"), count];
+        sizeString = [sizeString stringByAppendingString: @" Total"];
+    }
+    
+    [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
 }
 
 @end

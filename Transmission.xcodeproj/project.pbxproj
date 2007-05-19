@@ -118,7 +118,6 @@
 		A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
-		A251EAB80BE1A2370023D908 /* Controller.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DF0C5AA0899190500DD8943 /* Controller.h */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
 		A253F70B0A6990EB008EE24F /* FilterButtonOverMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7080A6990EB008EE24F /* FilterButtonOverMain.png */; };
 		A253F70C0A6990EB008EE24F /* FilterButtonOverLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7090A6990EB008EE24F /* FilterButtonOverLeft.png */; };
@@ -150,7 +149,6 @@
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 		A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */; };
 		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
-		A2A1CB790BF29D5500AE959F /* PeerProgressIndicatorCell.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
@@ -166,6 +164,7 @@
 		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
+		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,8 +193,6 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
-				A251EAB80BE1A2370023D908 /* Controller.h in CopyFiles */,
-				A2A1CB790BF29D5500AE959F /* PeerProgressIndicatorCell.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,6 +414,8 @@
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
+		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
+		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -455,6 +454,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A2FB057C0BFEB6800095564D /* DragOverlayView.h */,
+				A2FB057D0BFEB6800095564D /* DragOverlayView.m */,
 				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
 				A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */,
 				A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */,
@@ -999,6 +1000,7 @@
 				A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */,
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */,
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */,
+				A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
