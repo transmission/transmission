@@ -50,11 +50,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [super dealloc];
-}
-
 - (void) setFiles: (NSArray *) files
 {
     uint64_t size = 0;
@@ -103,10 +98,8 @@
 
 - (void) setURL: (NSString *) url
 {
-    #warning get globe icon
-    NSImage * icon = nil;
-    
-    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"] mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
+    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
+        mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
 }
 
 @end
