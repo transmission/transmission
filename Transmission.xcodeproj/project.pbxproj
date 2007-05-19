@@ -109,6 +109,7 @@
 		A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */; };
 		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
+		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
 		A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
@@ -328,6 +329,8 @@
 		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
 		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
+		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
+		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A2440F9C0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2440F9D0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A2440F9E0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -452,6 +455,8 @@
 		080E96DDFE201D6D7F000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
+				A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */,
 				A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */,
 				A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */,
 				A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */,
@@ -993,6 +998,7 @@
 				A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */,
 				A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */,
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */,
+				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

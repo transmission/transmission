@@ -30,6 +30,7 @@
 #import "PrefsController.h"
 #import "InfoWindowController.h"
 #import "MessageWindowController.h"
+#import "DragOverlayWindow.h"
 #import "Badger.h"
 #import "ImageBackgroundView.h"
 #import "BarButton.h"
@@ -51,6 +52,7 @@
     MessageWindowController         * fMessageController;
 
     IBOutlet NSWindow               * fWindow;
+    DragOverlayWindow               * fOverlayWindow;
     IBOutlet NSScrollView           * fScrollView;
     IBOutlet TorrentTableView       * fTableView;
     NSToolbar                       * fToolbar;

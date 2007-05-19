@@ -187,6 +187,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTorrents release];
     [fDisplayedTorrents release];
     [fBadger release];
+    [fOverlayWindow release];
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
@@ -201,6 +202,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
+    fOverlayWindow = [[DragOverlayWindow alloc] init];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -267,8 +269,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
-    [fTableView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                            NSURLPboardType, TORRENT_TABLE_VIEW_DATA_TYPE, nil]];
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
+    [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                            NSURLPboardType, nil]];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -521,6 +524,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     tr_natTraversalEnable(fLib, 0);
     
     //remember window states and close all windows
+    #warning needed here?
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
     [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
@@ -2005,30 +2009,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
-    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
-    {
-        //check if any files can be added
-        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
-        NSString * file;
-        while ((file = [enumerator nextObject]))
-        {
-            tr_torrent_t * tempTor;
-            int error;
-            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
-            {
-                tr_torrentClose(fLib, tempTor);
-                
-                [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
-                return NSDragOperationGeneric;
-            }
-        }
-    }
-    else if ([[pasteboard types] containsObject: NSURLPboardType])
-    {
-        [fTableView setDropRow: -1 dropOperation: NSTableViewDropOn];
-        return NSDragOperationGeneric;
-    }
-    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
@@ -2042,33 +2023,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     row: (int) newRow dropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
-    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
-    {
-        //create an array of files that can be opened
-        NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
-        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
-        NSString * file;
-        while ((file = [enumerator nextObject]))
-        {
-            tr_torrent_t * tempTor;
-            int error;
-            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
-            {
-                tr_torrentClose(fLib, tempTor);
-                [filesToOpen addObject: file];
-            }
-        }
-    
-        [self application: NSApp openFiles: filesToOpen];
-        [filesToOpen release];
-    }
-    else if ([[pasteboard types] containsObject: NSURLPboardType])
-    {
-        NSURL * url;
-        if ((url = [NSURL URLFromPasteboard: pasteboard]))
-            [self openURL: url];
-    }
-    else if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
+    if ([[pasteboard types] containsObject: TORRENT_TABLE_VIEW_DATA_TYPE])
     {
         //remember selected rows if needed
         NSArray * selectedTorrents = nil;
@@ -2128,6 +2083,87 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fInfoController updateInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+}
+
+- (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info
+{
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
+    {
+        //check if any files can be added
+        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSString * file;
+        while ((file = [enumerator nextObject]))
+        {
+            tr_torrent_t * tempTor;
+            int error;
+            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+            {
+                tr_torrentClose(fLib, tempTor);
+                
+                [fOverlayWindow setFrame: [fWindow frame] display: YES];
+                [fOverlayWindow orderWindow: NSWindowAbove relativeTo: [fWindow windowNumber]];
+                
+                return NSDragOperationGeneric;
+            }
+        }
+    }
+    else if ([[pasteboard types] containsObject: NSURLPboardType])
+    {
+        [fOverlayWindow setFrame: [fWindow frame] display: YES];
+        [fOverlayWindow orderWindow: NSWindowAbove relativeTo: [fWindow windowNumber]];
+        
+        return NSDragOperationGeneric;
+    }
+    else;
+    
+    return NSDragOperationNone;
+}
+
+- (void) draggingExited: (id <NSDraggingInfo>) sender
+{
+    [fOverlayWindow close];
+}
+
+- (BOOL) performDragOperation: (id <NSDraggingInfo>) info
+{
+    [fOverlayWindow close];
+    
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+    if ([[pasteboard types] containsObject: NSFilenamesPboardType])
+    {
+        //create an array of files that can be opened
+        NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
+        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSString * file;
+        while ((file = [enumerator nextObject]))
+        {
+            tr_torrent_t * tempTor;
+            int error;
+            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+            {
+                tr_torrentClose(fLib, tempTor);
+                [filesToOpen addObject: file];
+            }
+        }
+    
+        [self application: NSApp openFiles: filesToOpen];
+        [filesToOpen release];
+        
+        return YES;
+    }
+    else if ([[pasteboard types] containsObject: NSURLPboardType])
+    {
+        NSURL * url;
+        if ((url = [NSURL URLFromPasteboard: pasteboard]))
+        {
+            [self openURL: url];
+            return YES;
+        }
+    }
+    else;
+    
+    return NO;
 }
 
 - (void) toggleSmallView: (id) sender
