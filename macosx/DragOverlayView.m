@@ -31,12 +31,13 @@
     if ((self = [super initWithFrame: frame]))
     {
         //create badge
-        fBackBadge = [[NSImage alloc] initWithSize: NSMakeSize(300.0, 84.0)];
+        NSRect badgeRect = NSMakeRect(0, 0, 325.0, 84.0);
+        
+        fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
         [fBackBadge lockFocus];
         
-        [NSBezierPath setDefaultLineWidth: 3.0];
+        [NSBezierPath setDefaultLineWidth: 5.0];
         
-        NSRect badgeRect = NSMakeRect(0, 0, 300.0, 80.0);
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
         [NSBezierPath fillRect: badgeRect];
         
