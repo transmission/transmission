@@ -59,6 +59,7 @@
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
+    IBOutlet ImageBackgroundView    * fBottomBar;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     NSTimer                         * fSpeedLimitTimer;
     

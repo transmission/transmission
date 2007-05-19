@@ -199,6 +199,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) awakeFromNib
 {
+    [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     

@@ -50,6 +50,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fActionButton = NSButton; 
+                fBottomBar = ImageBackgroundView; 
                 fDateSortActionItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
                 fDockMenu = NSMenu; 
