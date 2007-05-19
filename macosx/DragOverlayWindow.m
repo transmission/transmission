@@ -41,9 +41,9 @@
         [self setHasShadow: NO];
         [self setLevel: NSStatusWindowLevel];
         
-        DragOverlayView * backgroundView = [[DragOverlayView alloc] initWithFrame: [self frame]];
-        [self setContentView: backgroundView];
-        [backgroundView release];
+        DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: [self frame]];
+        [self setContentView: view];
+        [view release];
         
         [self setReleasedWhenClosed: NO];
         [self setIgnoresMouseEvents: YES];

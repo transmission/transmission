@@ -30,6 +30,21 @@
 {
     if ((self = [super initWithFrame: frame]))
     {
+        //create badge
+        fBackBadge = [[NSImage alloc] initWithSize: NSMakeSize(300.0, 84.0)];
+        [fBackBadge lockFocus];
+        
+        NSRect badgeRect = NSMakeRect(0, 0, 300.0, 80.0);
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
+        [NSBezierPath fillRect: badgeRect];
+        
+        [[NSColor whiteColor] set];
+        [NSBezierPath setDefaultLineWidth: 3.0];
+        [NSBezierPath strokeRect: badgeRect];
+        
+        [fBackBadge unlockFocus];
+        
+        //create attributes
         NSShadow * stringShadow = [[NSShadow alloc] init];
         [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
         [stringShadow setShadowBlurRadius: 4.0];
@@ -58,8 +73,10 @@
 
 - (void) dealloc
 {
-    if (fImage)
-        [fImage release];
+    [fBackBadge release];
+    
+    if (fBadge)
+        [fBadge release];
     if (fAppIcon)
         [fAppIcon release];
     
@@ -71,6 +88,12 @@
 
 - (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine
 {
+    if (fBadge)
+        [fBadge release];
+    fBadge = [fBackBadge copy];
+    NSSize badgeSize = [fBadge size];
+    
+    //get icon
     NSSize iconSize = NSMakeSize(64.0, 64.0);
     if (!icon)
     {
@@ -89,26 +112,12 @@
         [icon setSize: iconSize];
     }
     
-    if (fImage)
-        [fImage release];
-    fImage = [[NSImage alloc] initWithSize: NSMakeSize(300.0, 84.0)];
-    
-    [fImage lockFocus];
-    
-    //create oval
-    #warning don't do each time
-    NSRect badgeRect = NSMakeRect(0, 0, 300.0, 80.0);
-    [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
-    [NSBezierPath fillRect: badgeRect];
-    
-    [[NSColor whiteColor] set];
-    [NSBezierPath setDefaultLineWidth: 3.0];
-    [NSBezierPath strokeRect: badgeRect];
-    
     float padding = 10.0;
     
+    [fBadge lockFocus];
+    
     //place icon
-    [icon compositeToPoint: NSMakePoint(padding, (badgeRect.size.height - iconSize.height) * 0.5)
+    [icon compositeToPoint: NSMakePoint(padding, (badgeSize.height - iconSize.height) * 0.5)
                 operation: NSCompositeSourceOver];
     
     //place main text
@@ -116,8 +125,8 @@
     NSSize subLineSize = [subLine sizeWithAttributes: fSubLineAttributes];
     
     NSRect lineRect = NSMakeRect(padding + iconSize.width + 5.0,
-                        (badgeRect.size.height + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
-                        badgeRect.size.width - (padding + iconSize.width + 2.0) - padding, mainLineSize.height);
+                        (badgeSize.height + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
+                        badgeSize.width - (padding + iconSize.width + 2.0) - padding, mainLineSize.height);
     [mainLine drawInRect: lineRect withAttributes: fMainLineAttributes];
     
     //place sub text
@@ -125,20 +134,20 @@
     lineRect.size.height = subLineSize.height;
     [subLine drawInRect: lineRect withAttributes: fSubLineAttributes];
     
-    [fImage unlockFocus];
+    [fBadge unlockFocus];
     
     [icon release];
     
-    [self setNeedsDisplay:YES];
+    [self setNeedsDisplay: YES];
 }
 
 -(void) drawRect: (NSRect) rect
 {
-    if (fImage)
+    if (fBadge)
     {
         NSRect frame = [self frame];
-        NSSize imageSize = [fImage size];
-        [fImage compositeToPoint: NSMakePoint((frame.size.width - imageSize.width) * 0.5,
+        NSSize imageSize = [fBadge size];
+        [fBadge compositeToPoint: NSMakePoint((frame.size.width - imageSize.width) * 0.5,
                     (frame.size.height - imageSize.height) * 0.5) operation: NSCompositeSourceOver];
     }
 }
