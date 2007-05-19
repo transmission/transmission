@@ -121,6 +121,7 @@
     //place icon
     [icon compositeToPoint: NSMakePoint(padding, (badgeSize.height - iconSize.height) * 0.5)
                 operation: NSCompositeSourceOver];
+    [icon release];
     
     //place main text
     NSSize mainLineSize = [mainLine sizeWithAttributes: fMainLineAttributes];
@@ -137,8 +138,6 @@
     [subLine drawInRect: lineRect withAttributes: fSubLineAttributes];
     
     [fBadge unlockFocus];
-    
-    [icon release];
     
     [self setNeedsDisplay: YES];
 }

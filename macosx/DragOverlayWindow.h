@@ -29,12 +29,12 @@
 {
     tr_handle_t * fLib;
     
-    NSTimer * fFadeTimer;
+    NSTimer * fFadeInTimer, * fFadeOutTimer;
 }
 
 - (void) setFiles: (NSArray *) files;
 - (void) setURL: (NSString *) url;
 
-- (void) fadeOut;
+- (void) closeFadeOut;
 
 @end

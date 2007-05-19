@@ -2126,13 +2126,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) draggingExited: (id <NSDraggingInfo>) sender
 {
     [fWindow removeChildWindow: fOverlayWindow];
-    [fOverlayWindow fadeOut];
+    [fOverlayWindow closeFadeOut];
 }
 
 - (BOOL) performDragOperation: (id <NSDraggingInfo>) info
 {
     [fWindow removeChildWindow: fOverlayWindow];
-    [fOverlayWindow fadeOut];
+    [fOverlayWindow closeFadeOut];
     
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])

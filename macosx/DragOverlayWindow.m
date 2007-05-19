@@ -28,7 +28,8 @@
 
 @interface DragOverlayWindow (Private)
 
-- (void) fade;
+- (void) fadeIn;
+- (void) fadeOut;
 
 @end
 
@@ -57,19 +58,27 @@
 
 - (void) dealloc
 {
-    if (fFadeTimer)
-        [fFadeTimer invalidate];
+    if (fFadeInTimer)
+        [fFadeOutTimer invalidate];
+    if (fFadeOutTimer)
+        [fFadeOutTimer invalidate];
+    
     [super dealloc];
 }
 
 - (void) setFiles: (NSArray *) files
 {
-    if (fFadeTimer)
+    [self setAlphaValue: 0.0];
+    if (fFadeInTimer)
     {
-        [fFadeTimer invalidate];
-        fFadeTimer = nil;
+        [fFadeInTimer invalidate];
+        fFadeInTimer = nil;
     }
-    [self setAlphaValue: 1.0];
+    if (fFadeOutTimer)
+    {
+        [fFadeOutTimer invalidate];
+        fFadeOutTimer = nil;
+    }
     
     uint64_t size = 0;
     int count = 0;
@@ -113,38 +122,71 @@
     }
     
     [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
+    
+    fFadeInTimer = [NSTimer scheduledTimerWithTimeInterval: 0.0075 target: self 
+            selector: @selector(fadeIn) userInfo: nil repeats: YES];
 }
 
+#warning combine
 - (void) setURL: (NSString *) url
 {
-    if (fFadeTimer)
+    [self setAlphaValue: 0.0];
+    if (fFadeInTimer)
     {
-        [fFadeTimer invalidate];
-        fFadeTimer = nil;
+        [fFadeInTimer invalidate];
+        fFadeInTimer = nil;
     }
-    [self setAlphaValue: 1.0];
+    if (fFadeOutTimer)
+    {
+        [fFadeOutTimer invalidate];
+        fFadeOutTimer = nil;
+    }
     
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
+    
+    fFadeInTimer = [NSTimer scheduledTimerWithTimeInterval: 0.0075 target: self 
+            selector: @selector(fadeIn) userInfo: nil repeats: YES];
 }
 
-- (void) fadeOut
+- (void) closeFadeOut
 {
-    fFadeTimer = [NSTimer scheduledTimerWithTimeInterval: 0.015 target: self 
-            selector: @selector(fade) userInfo: nil repeats: YES];
+    if (fFadeInTimer)
+    {
+        [fFadeInTimer invalidate];
+        fFadeInTimer = nil;
+    }
+    if (fFadeOutTimer)
+    {
+        [fFadeOutTimer invalidate];
+        fFadeOutTimer = nil;
+    }
+    
+    fFadeOutTimer = [NSTimer scheduledTimerWithTimeInterval: 0.015 target: self 
+            selector: @selector(fadeOut) userInfo: nil repeats: YES];
 }
 
 @end
 
 @implementation DragOverlayWindow (Private)
 
-- (void) fade
+- (void) fadeIn
+{
+    [self setAlphaValue: [self alphaValue] + 0.1];
+    if ([self alphaValue] >= 1.0)
+    {
+        [fFadeInTimer invalidate];
+        fFadeInTimer = nil;
+    }
+}
+
+- (void) fadeOut
 {
     [self setAlphaValue: [self alphaValue] - 0.1];
     if ([self alphaValue] <= 0.0)
     {
-        [fFadeTimer invalidate];
-        fFadeTimer = nil;
+        [fFadeOutTimer invalidate];
+        fFadeOutTimer = nil;
         
         [self close];
     }
