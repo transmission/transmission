@@ -32,17 +32,32 @@
     {
         //create badge
         NSRect badgeRect = NSMakeRect(0, 0, 325.0, 84.0);
-        
         fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
         [fBackBadge lockFocus];
         
-        [NSBezierPath setDefaultLineWidth: 5.0];
+        float minX = NSMinX(badgeRect),
+            minY = NSMinY(badgeRect),
+            maxX = NSMaxX(badgeRect),
+            maxY = NSMaxY(badgeRect),
+            midX = NSMidX(badgeRect),
+            midY = NSMidY(badgeRect),
+            radius = 15.0;
         
+        NSBezierPath * bp = [NSBezierPath bezierPath];
+        [bp moveToPoint: NSMakePoint(maxX, midY)];
+        [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, maxY) toPoint: NSMakePoint(midX, maxY) radius: radius];
+        [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, maxY) toPoint: NSMakePoint(minX, midY) radius: radius];
+        [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, minY) toPoint: NSMakePoint(midX, minY) radius: radius];
+        [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
+        [bp closePath];
+        
+        [NSBezierPath setDefaultLineWidth: 20.0];
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
-        [NSBezierPath fillRect: badgeRect];
+        [bp fill];
         
-        [[NSColor whiteColor] set];
-        [NSBezierPath strokeRect: badgeRect];
+        /*[[NSColor whiteColor] set];
+        [bp stroke];
+        [NSBezierPath strokeLineFromPoint: NSMakePoint(minX, minY + radius) toPoint: NSMakePoint(minX, maxY - radius)];*/
         
         [fBackBadge unlockFocus];
         
