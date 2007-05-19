@@ -2111,6 +2111,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
+        [fOverlayWindow setURL: [[NSURL URLFromPasteboard: pasteboard] relativeString]];
         [fOverlayWindow setFrame: [fWindow frame] display: YES];
         [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
         

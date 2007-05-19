@@ -102,4 +102,12 @@
     [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
 }
 
+- (void) setURL: (NSString *) url
+{
+    #warning get globe icon
+    NSImage * icon = nil;
+    
+    [[self contentView] setOverlay: icon mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
+}
+
 @end

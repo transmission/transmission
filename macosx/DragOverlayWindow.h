@@ -31,5 +31,6 @@
 }
 
 - (void) setFiles: (NSArray *) files;
+- (void) setURL: (NSString *) url;
 
 @end
