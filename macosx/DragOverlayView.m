@@ -34,12 +34,13 @@
         fBackBadge = [[NSImage alloc] initWithSize: NSMakeSize(300.0, 84.0)];
         [fBackBadge lockFocus];
         
+        [NSBezierPath setDefaultLineWidth: 3.0];
+        
         NSRect badgeRect = NSMakeRect(0, 0, 300.0, 80.0);
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
         [NSBezierPath fillRect: badgeRect];
         
         [[NSColor whiteColor] set];
-        [NSBezierPath setDefaultLineWidth: 3.0];
         [NSBezierPath strokeRect: badgeRect];
         
         [fBackBadge unlockFocus];

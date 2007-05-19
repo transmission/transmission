@@ -39,7 +39,6 @@
         [self setAlphaValue: 1.0];
         [self setOpaque: NO];
         [self setHasShadow: NO];
-        [self setLevel: NSStatusWindowLevel];
         
         DragOverlayView * view = [[DragOverlayView alloc] initWithFrame: [self frame]];
         [self setContentView: view];
@@ -107,7 +106,7 @@
     #warning get globe icon
     NSImage * icon = nil;
     
-    [[self contentView] setOverlay: icon mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
+    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"] mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
 }
 
 @end
