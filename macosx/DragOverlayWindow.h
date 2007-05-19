@@ -28,9 +28,13 @@
 @interface DragOverlayWindow : NSWindow
 {
     tr_handle_t * fLib;
+    
+    NSTimer * fFadeTimer;
 }
 
 - (void) setFiles: (NSArray *) files;
 - (void) setURL: (NSString *) url;
+
+- (void) fadeOut;
 
 @end

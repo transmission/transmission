@@ -26,6 +26,12 @@
 #import "DragOverlayView.h"
 #import "StringAdditions.h"
 
+@interface DragOverlayWindow (Private)
+
+- (void) fade;
+
+@end
+
 @implementation DragOverlayWindow
 
 - (id) initWithLib: (tr_handle_t *) lib
@@ -36,7 +42,6 @@
         fLib = lib;
         
         [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
-        [self setAlphaValue: 1.0];
         [self setOpaque: NO];
         [self setHasShadow: NO];
         
@@ -50,8 +55,22 @@
     return self;
 }
 
+- (void) dealloc
+{
+    if (fFadeTimer)
+        [fFadeTimer invalidate];
+    [super dealloc];
+}
+
 - (void) setFiles: (NSArray *) files
 {
+    if (fFadeTimer)
+    {
+        [fFadeTimer invalidate];
+        fFadeTimer = nil;
+    }
+    [self setAlphaValue: 1.0];
+    
     uint64_t size = 0;
     int count = 0;
     
@@ -98,8 +117,37 @@
 
 - (void) setURL: (NSString *) url
 {
+    if (fFadeTimer)
+    {
+        [fFadeTimer invalidate];
+        fFadeTimer = nil;
+    }
+    [self setAlphaValue: 1.0];
+    
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
+}
+
+- (void) fadeOut
+{
+    fFadeTimer = [NSTimer scheduledTimerWithTimeInterval: 0.015 target: self 
+            selector: @selector(fade) userInfo: nil repeats: YES];
+}
+
+@end
+
+@implementation DragOverlayWindow (Private)
+
+- (void) fade
+{
+    [self setAlphaValue: [self alphaValue] - 0.1];
+    if ([self alphaValue] <= 0.0)
+    {
+        [fFadeTimer invalidate];
+        fFadeTimer = nil;
+        
+        [self close];
+    }
 }
 
 @end
