@@ -51,11 +51,12 @@
         [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
         [bp closePath];
         
-        [NSBezierPath setDefaultLineWidth: 20.0];
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
         [bp fill];
         
-        /*[[NSColor whiteColor] set];
+        /*
+        [NSBezierPath setDefaultLineWidth: 5.0];
+        [[NSColor whiteColor] set];
         [bp stroke];
         [NSBezierPath strokeLineFromPoint: NSMakePoint(minX, minY + radius) toPoint: NSMakePoint(minX, maxY - radius)];*/
         
@@ -153,6 +154,8 @@
     [subLine drawInRect: lineRect withAttributes: fSubLineAttributes];
     
     [fBadge unlockFocus];
+    
+    [self setNeedsDisplay: YES];
 }
 
 -(void) drawRect: (NSRect) rect
