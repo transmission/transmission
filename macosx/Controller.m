@@ -524,7 +524,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     tr_natTraversalEnable(fLib, 0);
     
     //remember window states and close all windows
-    #warning needed here?
     [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
     [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
     [self showStatusBar: NO animate: NO];
