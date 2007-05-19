@@ -2102,7 +2102,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 tr_torrentClose(fLib, tempTor);
                 
                 [fOverlayWindow setFrame: [fWindow frame] display: YES];
-                [fOverlayWindow orderWindow: NSWindowAbove relativeTo: [fWindow windowNumber]];
+                [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
                 
                 return NSDragOperationGeneric;
             }
@@ -2111,7 +2111,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
         [fOverlayWindow setFrame: [fWindow frame] display: YES];
-        [fOverlayWindow orderWindow: NSWindowAbove relativeTo: [fWindow windowNumber]];
+        [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
         
         return NSDragOperationGeneric;
     }
@@ -2122,11 +2122,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) draggingExited: (id <NSDraggingInfo>) sender
 {
+    [fWindow removeChildWindow: fOverlayWindow];
     [fOverlayWindow close];
 }
 
 - (BOOL) performDragOperation: (id <NSDraggingInfo>) info
 {
+    [fWindow removeChildWindow: fOverlayWindow];
     [fOverlayWindow close];
     
     NSPasteboard * pasteboard = [info draggingPasteboard];
