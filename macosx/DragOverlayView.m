@@ -138,8 +138,6 @@
     [subLine drawInRect: lineRect withAttributes: fSubLineAttributes];
     
     [fBadge unlockFocus];
-    
-    [self setNeedsDisplay: YES];
 }
 
 -(void) drawRect: (NSRect) rect

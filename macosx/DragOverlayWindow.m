@@ -28,6 +28,7 @@
 
 @interface DragOverlayWindow (Private)
 
+- (void) beginFadeIn;
 - (void) fadeIn;
 - (void) fadeOut;
 
@@ -68,18 +69,6 @@
 
 - (void) setFiles: (NSArray *) files
 {
-    [self setAlphaValue: 0.0];
-    if (fFadeInTimer)
-    {
-        [fFadeInTimer invalidate];
-        fFadeInTimer = nil;
-    }
-    if (fFadeOutTimer)
-    {
-        [fFadeOutTimer invalidate];
-        fFadeOutTimer = nil;
-    }
-    
     uint64_t size = 0;
     int count = 0;
     
@@ -123,30 +112,15 @@
     
     [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
     
-    fFadeInTimer = [NSTimer scheduledTimerWithTimeInterval: 0.0075 target: self 
-            selector: @selector(fadeIn) userInfo: nil repeats: YES];
+    [self beginFadeIn];
 }
 
-#warning combine
 - (void) setURL: (NSString *) url
 {
-    [self setAlphaValue: 0.0];
-    if (fFadeInTimer)
-    {
-        [fFadeInTimer invalidate];
-        fFadeInTimer = nil;
-    }
-    if (fFadeOutTimer)
-    {
-        [fFadeOutTimer invalidate];
-        fFadeOutTimer = nil;
-    }
-    
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     
-    fFadeInTimer = [NSTimer scheduledTimerWithTimeInterval: 0.0075 target: self 
-            selector: @selector(fadeIn) userInfo: nil repeats: YES];
+    [self beginFadeIn];
 }
 
 - (void) closeFadeOut
@@ -169,6 +143,24 @@
 @end
 
 @implementation DragOverlayWindow (Private)
+
+- (void) beginFadeIn
+{
+    [self setAlphaValue: 0.0];
+    if (fFadeInTimer)
+    {
+        [fFadeInTimer invalidate];
+        fFadeInTimer = nil;
+    }
+    if (fFadeOutTimer)
+    {
+        [fFadeOutTimer invalidate];
+        fFadeOutTimer = nil;
+    }
+    
+    fFadeInTimer = [NSTimer scheduledTimerWithTimeInterval: 0.0075 target: self 
+            selector: @selector(fadeIn) userInfo: nil repeats: YES];
+}
 
 - (void) fadeIn
 {
