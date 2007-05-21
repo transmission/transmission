@@ -647,7 +647,7 @@
                             NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil],
                             [NSDictionary dictionaryWithObjectsAndKeys: window, NSViewAnimationTargetKey,
                             [NSValue valueWithRect: frame], NSViewAnimationEndFrameKey, nil], nil]] autorelease];
-        [fadeInAnimation setDuration: 0.08];
+        [fadeInAnimation setDuration: 0.1];
         [fadeInAnimation setAnimationBlockingMode: NSAnimationNonblocking];
         [fadeInAnimation startAnimation];
     }
