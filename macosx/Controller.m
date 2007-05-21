@@ -1326,6 +1326,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted];
+    NSLog([NSString stringWithInt: fCompleted]);
 }
 
 - (void) updateTorrentsInQueue
@@ -2947,6 +2948,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) windowDidResize: (NSNotification *) notification
 {
+    [fOverlayWindow setFrame: [fWindow frame] display: YES];
+    
     //hide search filter if it overlaps filter buttons
     [fSearchFilterField setHidden: NSMaxX([fPauseFilterButton frame]) + 2.0 > [fSearchFilterField frame].origin.x];
 }

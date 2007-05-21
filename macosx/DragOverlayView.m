@@ -32,8 +32,6 @@
     {
         //create badge
         NSRect badgeRect = NSMakeRect(0, 0, 325.0, 84.0);
-        fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
-        [fBackBadge lockFocus];
         
         float minX = NSMinX(badgeRect),
             minY = NSMinY(badgeRect),
@@ -51,14 +49,11 @@
         [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
         [bp closePath];
         
+        fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
+        [fBackBadge lockFocus];
+        
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.75] set];
         [bp fill];
-        
-        /*
-        [NSBezierPath setDefaultLineWidth: 5.0];
-        [[NSColor whiteColor] set];
-        [bp stroke];
-        [NSBezierPath strokeLineFromPoint: NSMakePoint(minX, minY + radius) toPoint: NSMakePoint(minX, maxY - radius)];*/
         
         [fBackBadge unlockFocus];
         
