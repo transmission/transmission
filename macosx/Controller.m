@@ -2122,12 +2122,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) draggingExited: (id <NSDraggingInfo>) info
 {
-    [fOverlayWindow closeFadeOut];
+    [fOverlayWindow fadeOut];
 }
 
 - (BOOL) performDragOperation: (id <NSDraggingInfo>) info
 {
-    [fOverlayWindow closeFadeOut];
+    [fOverlayWindow fadeOut];
     
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
@@ -2158,7 +2158,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ((url = [NSURL URLFromPasteboard: pasteboard]))
         {
             [self openURL: url];
-            
             return YES;
         }
     }
