@@ -179,8 +179,6 @@
     {
         [fFadeOutTimer invalidate];
         fFadeOutTimer = nil;
-        
-        [self close];
     }
 }
 

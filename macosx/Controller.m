@@ -204,6 +204,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
+    [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
 
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -2103,8 +2104,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 tr_torrentClose(fLib, tempTor);
                 
                 [fOverlayWindow setFiles: files];
-                [fOverlayWindow setFrame: [fWindow frame] display: YES];
-                [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
                 
                 return NSDragOperationCopy;
             }
@@ -2113,8 +2112,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
         [fOverlayWindow setURL: [[NSURL URLFromPasteboard: pasteboard] relativeString]];
-        [fOverlayWindow setFrame: [fWindow frame] display: YES];
-        [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
         
         return NSDragOperationCopy;
     }
@@ -2123,15 +2120,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return NSDragOperationNone;
 }
 
-- (void) draggingExited: (id <NSDraggingInfo>) sender
+- (void) draggingExited: (id <NSDraggingInfo>) info
 {
-    [fWindow removeChildWindow: fOverlayWindow];
     [fOverlayWindow closeFadeOut];
 }
 
 - (BOOL) performDragOperation: (id <NSDraggingInfo>) info
 {
-    [fWindow removeChildWindow: fOverlayWindow];
     [fOverlayWindow closeFadeOut];
     
     NSPasteboard * pasteboard = [info draggingPasteboard];
@@ -2151,7 +2146,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [filesToOpen addObject: file];
             }
         }
-    
+        
         [self application: NSApp openFiles: filesToOpen];
         [filesToOpen release];
         
@@ -2163,6 +2158,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if ((url = [NSURL URLFromPasteboard: pasteboard]))
         {
             [self openURL: url];
+            
             return YES;
         }
     }
