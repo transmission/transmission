@@ -44,6 +44,7 @@
         fLib = lib;
         
         [self setBackgroundColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.5]];
+        [self setAlphaValue: 0.0];
         [self setOpaque: NO];
         [self setHasShadow: NO];
         
@@ -146,7 +147,6 @@
 
 - (void) beginFadeIn
 {
-    [self setAlphaValue: 0.0];
     if (fFadeInTimer)
     {
         [fFadeInTimer invalidate];
