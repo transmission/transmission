@@ -115,6 +115,7 @@
     [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
     
     [fFadeOutAnimation stopAnimation];
+    [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
 
@@ -124,6 +125,7 @@
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     
     [fFadeOutAnimation stopAnimation];
+    [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
 

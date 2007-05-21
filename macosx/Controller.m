@@ -205,7 +205,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
-
+    
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
     [fToolbar setAllowsUserCustomization: YES];
@@ -2942,8 +2942,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) windowDidResize: (NSNotification *) notification
 {
-    [fOverlayWindow setFrame: [fWindow frame] display: YES];
-    
     //hide search filter if it overlaps filter buttons
     [fSearchFilterField setHidden: NSMaxX([fPauseFilterButton frame]) + 2.0 > [fSearchFilterField frame].origin.x];
 }
