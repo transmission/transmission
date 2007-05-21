@@ -339,6 +339,10 @@ char * tr_clientForId( uint8_t * id )
         asprintf( &ret, "BTQueue %d.%d.%d", charToInt( id[1] ),
                     charToInt( id[2] ), charToInt( id[3] ) );
     }
+    else if( !memcmp( id, "BLZ", 3 ) ) /* 07 is 1.7, check later to find out how version is encoded */
+    {
+        asprintf( &ret, "Blizzard Downloader (%d%d)", id[3], id[4] );
+    }
     else if( !memcmp( id, "LIME", 4 ) )
     {
         asprintf( &ret, "Limewire" );
