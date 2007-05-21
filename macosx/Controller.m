@@ -1326,7 +1326,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //badge dock
     [fBadger updateBadgeWithCompleted: fCompleted];
-    NSLog([NSString stringWithInt: fCompleted]);
 }
 
 - (void) updateTorrentsInQueue
@@ -2107,7 +2106,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 [fOverlayWindow setFrame: [fWindow frame] display: YES];
                 [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
                 
-                return NSDragOperationGeneric;
+                return NSDragOperationCopy;
             }
         }
     }
@@ -2117,7 +2116,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fOverlayWindow setFrame: [fWindow frame] display: YES];
         [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
         
-        return NSDragOperationGeneric;
+        return NSDragOperationCopy;
     }
     else;
     
