@@ -50,7 +50,7 @@
         fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations: [NSArray arrayWithObject:
                                 [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
                                 NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil]]];
-        [fFadeInAnimation setDuration: 0.2];
+        [fFadeInAnimation setDuration: 0.15];
         
         fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations: [NSArray arrayWithObject:
                                 [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
@@ -129,7 +129,6 @@
     [fFadeInAnimation startAnimation];
 }
 
-#warning use delegate?
 - (void) fadeOut
 {
     if ([self alphaValue] > 0.0)
