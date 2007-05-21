@@ -56,7 +56,7 @@
                                 [NSDictionary dictionaryWithObjectsAndKeys: self, NSViewAnimationTargetKey,
                                 NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, nil]]];
         [fFadeOutAnimation setDuration: 0.5];
-        [fFadeOutAnimation setAnimationBlockingMode: NSAnimationBlocking];
+        [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
     }
     return self;
 }
@@ -130,8 +130,11 @@
 #warning use delegate?
 - (void) fadeOut
 {
-    [fFadeInAnimation stopAnimation];
-    [fFadeOutAnimation startAnimation];
+    if ([self alphaValue] > 0.0)
+    {
+        [fFadeInAnimation stopAnimation];
+        [fFadeOutAnimation startAnimation];
+    }
 }
 
 @end
