@@ -114,7 +114,12 @@
     
     [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
     
-    [fFadeOutAnimation stopAnimation];
+    //stop other animation and set to same progress
+    if ([fFadeOutAnimation isAnimating])
+    {
+        [fFadeOutAnimation stopAnimation];
+        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
+    }
     [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
@@ -124,7 +129,12 @@
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     
-    [fFadeOutAnimation stopAnimation];
+    //stop other animation and set to same progress
+    if ([fFadeOutAnimation isAnimating])
+    {
+        [fFadeOutAnimation stopAnimation];
+        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
+    }
     [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
@@ -133,7 +143,12 @@
 {
     if ([self alphaValue] > 0.0)
     {
-        [fFadeInAnimation stopAnimation];
+        //stop other animation and set to same progress
+        if ([fFadeInAnimation isAnimating])
+        {
+            [fFadeInAnimation stopAnimation];
+            [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
+        }
         [fFadeOutAnimation startAnimation];
     }
 }
