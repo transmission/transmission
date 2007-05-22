@@ -636,20 +636,9 @@
     
     if (animate)
     {
-        //the animation won't resize the view correctly, so do it here
-        NSRect viewFrame = [view frame];
-        viewFrame.size.height += difference;
-        [view setFrame: viewFrame];
-        [view setNeedsDisplay: YES];
-        
-        NSViewAnimation * fadeInAnimation = [[[NSViewAnimation alloc] initWithViewAnimations:
-                        [NSArray arrayWithObjects: [NSDictionary dictionaryWithObjectsAndKeys: view, NSViewAnimationTargetKey,
-                            NSViewAnimationFadeInEffect, NSViewAnimationEffectKey, nil],
-                            [NSDictionary dictionaryWithObjectsAndKeys: window, NSViewAnimationTargetKey,
-                            [NSValue valueWithRect: frame], NSViewAnimationEndFrameKey, nil], nil]] autorelease];
-        [fadeInAnimation setDuration: 0.1];
-        [fadeInAnimation setAnimationBlockingMode: NSAnimationNonblocking];
-        [fadeInAnimation startAnimation];
+        [view setHidden: YES];
+        [window setFrame: frame display: YES animate: YES];
+        [view setHidden: NO];
     }
     else
         [window setFrame: frame display: YES];
