@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
- *
- * Copyright (c) 2006-2007 Transmission authors and contributors
+ * 
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,22 +22,23 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TORRENTCELL_H
-#define TORRENTCELL_H
-
-#import "Torrent.h"
 #import "CTGradient.h"
 
-@interface TorrentCell : NSCell
-{
-    NSImage * fErrorImage;
-    CTGradient * fWhiteGradient, * fGreyGradient, * fLightGreenGradient,
-                * fGreenGradient, * fBlueGradient, * fTransparentGradient;
-    NSUserDefaults * fDefaults;
-}
-
-- (void) toggleMinimalStatus;
-
+@interface CTGradient (ActionBarView)
++ (CTGradient *)actionNormalGradient;
++ (CTGradient *)actionPressedGradient;
 @end
 
-#endif
+@interface CTGradient (ProgressBar)
++ (CTGradient *)progressWhiteGradient;
++ (CTGradient *)progressGreyGradient;
++ (CTGradient *)progressBlueGradient;
++ (CTGradient *)progressGreenGradient;
++ (CTGradient *)progressLightGreenGradient;
++ (CTGradient *)progressTransparentGradient;
+@end
+
+@interface CTGradient (MiddleColour)
++ (CTGradient *)gradientWithBeginningColor:(NSColor *)begin middleColor:(NSColor *)middle endingColor:(NSColor *)end;
++ (CTGradient *)gradientWithBeginningColor:(NSColor *)begin middleColor1:(NSColor *)middle1 middleColor2:(NSColor *)middle2 endingColor:(NSColor *)end;
+@end

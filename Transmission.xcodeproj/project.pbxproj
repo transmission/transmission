@@ -98,16 +98,6 @@
 		A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
-		A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */; };
-		A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */; };
-		A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */; };
-		A2305A830A3DC9E400AB2D77 /* ProgressBarGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */; };
-		A2305A950A3DCAC500AB2D77 /* ProgressBarAdvanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */; };
-		A2305AA90A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */; };
-		A2305AAA0A3DCCEF00AB2D77 /* ProgressBarEndBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */; };
-		A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */; };
-		A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */; };
-		A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */ = {isa = PBXBuildFile; fileRef = A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
@@ -143,7 +133,6 @@
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
-		A28FF34E0BB23A4E001F5010 /* ProgressBarLightGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
@@ -166,6 +155,8 @@
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
+		E138A9770C04D88F00C5426C /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9740C04D88F00C5426C /* CTGradient.m */; };
+		E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* CTGradientAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -316,16 +307,6 @@
 		A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileBrowserCell.h; path = macosx/FileBrowserCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileBrowserCell.m; path = macosx/FileBrowserCell.m; sourceTree = "<group>"; };
 		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarWhite.png; path = macosx/Images/ProgressBarWhite.png; sourceTree = "<group>"; };
-		A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarBlue.png; path = macosx/Images/ProgressBarBlue.png; sourceTree = "<group>"; };
-		A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGray.png; path = macosx/Images/ProgressBarGray.png; sourceTree = "<group>"; };
-		A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarGreen.png; path = macosx/Images/ProgressBarGreen.png; sourceTree = "<group>"; };
-		A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarAdvanced.png; path = macosx/Images/ProgressBarAdvanced.png; sourceTree = "<group>"; };
-		A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndAdvanced.png; path = macosx/Images/ProgressBarEndAdvanced.png; sourceTree = "<group>"; };
-		A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndBlue.png; path = macosx/Images/ProgressBarEndBlue.png; sourceTree = "<group>"; };
-		A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndWhite.png; path = macosx/Images/ProgressBarEndWhite.png; sourceTree = "<group>"; };
-		A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGreen.png; path = macosx/Images/ProgressBarEndGreen.png; sourceTree = "<group>"; };
-		A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarEndGray.png; path = macosx/Images/ProgressBarEndGray.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
@@ -378,7 +359,6 @@
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
-		A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ProgressBarLightGreen.png; path = macosx/Images/ProgressBarLightGreen.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A291DAAD0AC8BEB6003385E9 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
@@ -418,6 +398,10 @@
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Globe.tiff; path = macosx/Images/Globe.tiff; sourceTree = "<group>"; };
+		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = "<group>"; };
+		E138A9740C04D88F00C5426C /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradient.m; sourceTree = "<group>"; };
+		E138A9750C04D88F00C5426C /* CTGradientAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradientAdditions.h; sourceTree = "<group>"; };
+		E138A9760C04D88F00C5426C /* CTGradientAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradientAdditions.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -518,6 +502,7 @@
 				A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */,
 				A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */,
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
+				E138A9720C04D88F00C5426C /* CTGradient */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -551,17 +536,6 @@
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2FB06950BFF484A0095564D /* Globe.tiff */,
-				A2305AA40A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png */,
-				A2305AA50A3DCCEF00AB2D77 /* ProgressBarEndBlue.png */,
-				A2305AA60A3DCCEF00AB2D77 /* ProgressBarEndWhite.png */,
-				A2305AA70A3DCCEF00AB2D77 /* ProgressBarEndGreen.png */,
-				A2305AA80A3DCCEF00AB2D77 /* ProgressBarEndGray.png */,
-				A2305A940A3DCAC500AB2D77 /* ProgressBarAdvanced.png */,
-				A2305A7C0A3DC9E400AB2D77 /* ProgressBarWhite.png */,
-				A2305A7D0A3DC9E400AB2D77 /* ProgressBarBlue.png */,
-				A2305A7E0A3DC9E400AB2D77 /* ProgressBarGray.png */,
-				A2305A7F0A3DC9E400AB2D77 /* ProgressBarGreen.png */,
-				A28FF34D0BB23A4E001F5010 /* ProgressBarLightGreen.png */,
 				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
@@ -718,6 +692,18 @@
 			name = CLI;
 			sourceTree = "<group>";
 		};
+		E138A9720C04D88F00C5426C /* CTGradient */ = {
+			isa = PBXGroup;
+			children = (
+				E138A9730C04D88F00C5426C /* CTGradient.h */,
+				E138A9740C04D88F00C5426C /* CTGradient.m */,
+				E138A9750C04D88F00C5426C /* CTGradientAdditions.h */,
+				E138A9760C04D88F00C5426C /* CTGradientAdditions.m */,
+			);
+			name = CTGradient;
+			path = macosx/CTGradient;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -828,6 +814,7 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* Transmission */,
 				4DDBB71809E16BAE00284745 /* transmissioncli */,
@@ -873,16 +860,6 @@
 				A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */,
 				A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */,
 				A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */,
-				A2305A800A3DC9E400AB2D77 /* ProgressBarWhite.png in Resources */,
-				A2305A810A3DC9E400AB2D77 /* ProgressBarBlue.png in Resources */,
-				A2305A820A3DC9E400AB2D77 /* ProgressBarGray.png in Resources */,
-				A2305A830A3DC9E400AB2D77 /* ProgressBarGreen.png in Resources */,
-				A2305A950A3DCAC500AB2D77 /* ProgressBarAdvanced.png in Resources */,
-				A2305AA90A3DCCEF00AB2D77 /* ProgressBarEndAdvanced.png in Resources */,
-				A2305AAA0A3DCCEF00AB2D77 /* ProgressBarEndBlue.png in Resources */,
-				A2305AAB0A3DCCEF00AB2D77 /* ProgressBarEndWhite.png in Resources */,
-				A2305AAC0A3DCCEF00AB2D77 /* ProgressBarEndGreen.png in Resources */,
-				A2305AAD0A3DCCEF00AB2D77 /* ProgressBarEndGray.png in Resources */,
 				A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */,
 				A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */,
 				A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */,
@@ -910,7 +887,6 @@
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */,
-				A28FF34E0BB23A4E001F5010 /* ProgressBarLightGreen.png in Resources */,
 				A241528B0C0261B8007DD3B4 /* Globe.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1005,6 +981,8 @@
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */,
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */,
+				E138A9770C04D88F00C5426C /* CTGradient.m in Sources */,
+				E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,6 +25,7 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "StringAdditions.h"
+#import "CTGradientAdditions.h"
 
 //also defined in Torrent.m
 #define BAR_HEIGHT 12.0
@@ -41,42 +42,21 @@
 
 - (id) init
 {
-    if ((self = [super init]))
-    {
+    if((self = [super init]))
+	{
         fDefaults = [NSUserDefaults standardUserDefaults];
-    
-        NSSize startSize = NSMakeSize(100.0, BAR_HEIGHT);
         
-        fProgressWhite = [NSImage imageNamed: @"ProgressBarWhite.png"];
-        [fProgressWhite setScalesWhenResized: YES];
+		fWhiteGradient = [[CTGradient aquaNormalGradient] retain];
+		fGreyGradient = [[CTGradient progressGrayGradient] retain];
+        fBlueGradient = [[CTGradient progressBlueGradient] retain];
+		fGreenGradient = [[CTGradient progressGreenGradient] retain];
+		fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
+        fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
         
-        fProgressBlue = [NSImage imageNamed: @"ProgressBarBlue.png"];
-        [fProgressBlue setScalesWhenResized: YES];
-        [fProgressBlue setSize: startSize];
-        
-        fProgressGray = [NSImage imageNamed: @"ProgressBarGray.png"];
-        [fProgressGray setScalesWhenResized: YES];
-        [fProgressGray setSize: startSize];
-        
-        fProgressGreen = [NSImage imageNamed: @"ProgressBarGreen.png"];
-        [fProgressGreen setScalesWhenResized: YES];
-        
-        fProgressLightGreen = [NSImage imageNamed: @"ProgressBarLightGreen.png"];
-        [fProgressLightGreen setScalesWhenResized: YES];
-        
-        fProgressAdvanced = [NSImage imageNamed: @"ProgressBarAdvanced.png"];
-        [fProgressAdvanced setScalesWhenResized: YES];
-        
-        fProgressEndWhite = [NSImage imageNamed: @"ProgressBarEndWhite.png"];
-        fProgressEndBlue = [NSImage imageNamed: @"ProgressBarEndBlue.png"];
-        fProgressEndGray = [NSImage imageNamed: @"ProgressBarEndGray.png"];
-        fProgressEndGreen = [NSImage imageNamed: @"ProgressBarEndGreen.png"];
-        fProgressEndAdvanced = [NSImage imageNamed: @"ProgressBarEndAdvanced.png"];
-        
-        fErrorImage = [[NSImage imageNamed: @"Error.tiff"] copy]; //no need to release for some reason
-        [fErrorImage setFlipped: YES];
+		fErrorImage = [[NSImage imageNamed: @"Error"] copy];
+		[fErrorImage setFlipped: YES];
     }
-    return self;
+	return self;
 }
 
 - (void) placeBar: (NSImage *) barImage width: (float) width point: (NSPoint) point
@@ -93,88 +73,61 @@
 - (void) buildSimpleBar: (float) width point: (NSPoint) point
 {
     NSDictionary * info = [self objectValue];
-
-    width -= 2.0;
-    float completedWidth, remainingWidth;
     
-    //bar images and widths
-    NSImage * barLeftEnd, * barRightEnd, * barComplete, * barRemaining;
+    NSRect barBounds, completeBounds;
+    if([[self controlView] isFlipped])
+        barBounds = NSMakeRect(point.x, point.y, width, BAR_HEIGHT);
+    else
+        barBounds = NSMakeRect(point.x, point.y - BAR_HEIGHT, width, BAR_HEIGHT);
+    completeBounds = barBounds;
+    
     if ([[info objectForKey: @"Seeding"] boolValue])
     {
         float stopRatio, ratio;
         if ((stopRatio = [[info objectForKey: @"StopRatio"] floatValue]) != INVALID
                 && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio)
-		{
-			if (ratio < 0)
-				ratio = 0;
-            completedWidth = width * ratio / stopRatio;
-		}
-        else
-            completedWidth = width;
-        remainingWidth = width - completedWidth;
+        {
+            if (ratio < 0)
+                ratio = 0;
+            completeBounds.size.width = width * ratio / stopRatio;
+        }
         
-        barLeftEnd = fProgressEndGreen;
-        barRightEnd = fProgressEndGreen;
-        barComplete = fProgressGreen;
-        barRemaining = fProgressLightGreen;
+        if (completeBounds.size.width < barBounds.size.width)
+            [fLightGreenGradient fillRect: barBounds angle: -90];
+        [fGreenGradient fillRect: completeBounds angle: -90];
     }
     else
     {
-        completedWidth = [[info objectForKey: @"Progress"] floatValue] * width;
-        remainingWidth = width - completedWidth;
+        completeBounds.size.width = [[info objectForKey: @"Progress"] floatValue] * width;
+        if (completeBounds.size.width < barBounds.size.width)
+            [fWhiteGradient fillRect: barBounds angle: -90];
         
-		BOOL isActive = [[info objectForKey: @"Active"] boolValue];
-		
-        if (remainingWidth == width)
-            barLeftEnd = fProgressEndWhite;
-        else if (isActive)
-            barLeftEnd = fProgressEndBlue;
+        if ([[info objectForKey: @"Active"] boolValue])
+            [fBlueGradient fillRect: completeBounds angle: -90];
         else
-            barLeftEnd = fProgressEndGray;
-        
-        if (completedWidth < width)
-            barRightEnd = fProgressEndWhite;
-        else if (isActive)
-            barRightEnd = fProgressEndBlue;
-        else
-            barRightEnd = fProgressEndGray;
-        
-        barComplete = isActive ? fProgressBlue : fProgressGray;
-        barRemaining = fProgressWhite;
+            [fGreyGradient fillRect: completeBounds angle: -90];
     }
-    
-    //place bar
-    [barLeftEnd compositeToPoint: point operation: NSCompositeSourceOver];
-    
-    point.x += 1.0;
-    [self placeBar: barComplete width: completedWidth point: point];
-    
-    point.x += completedWidth;
-    [self placeBar: barRemaining width: remainingWidth point: point];
-    
-    point.x += remainingWidth;
-    [barRightEnd compositeToPoint: point operation: NSCompositeSourceOver];
+    [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
+    [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
 }
 
-- (void) buildAdvancedBar: (float) widthFloat point: (NSPoint) point
+- (void) buildAdvancedBar: (float) width point: (NSPoint) point
 {
     NSDictionary * info = [self objectValue];
     
-    //draw overlay over advanced bar
-    [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
-    
-    widthFloat -= 2.0;
-    point.x += 1.0;
-    
     //place actual advanced bar
     NSImage * image = [info objectForKey: @"AdvancedBar"];
-    [image setSize: NSMakeSize(widthFloat, BAR_HEIGHT)];
+    [image setSize: NSMakeSize(width, BAR_HEIGHT)];
     [image compositeToPoint: point operation: NSCompositeSourceOver];
     
-    [self placeBar: fProgressAdvanced width: widthFloat point: point];
-    
-    point.x += widthFloat;
-    [fProgressEndAdvanced compositeToPoint: point operation: NSCompositeSourceOver];
+    NSRect barBounds;
+    if([[self controlView] isFlipped])
+         barBounds = NSMakeRect(point.x, point.y, width, BAR_HEIGHT);
+    else
+        barBounds = NSMakeRect(point.x, point.y - BAR_HEIGHT, width, BAR_HEIGHT);
+    [fTransparentGradient fillRect: barBounds angle: -90];
+    [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
+    [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
 }
 
 - (void) toggleMinimalStatus
