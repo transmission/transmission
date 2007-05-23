@@ -707,20 +707,28 @@ infowinddead( GtkWidget * widget SHUTUP, gpointer data )
 {
     struct infowind * iw = data;
 
-    g_object_weak_unref( G_OBJECT( iw->tor ), infotorclosed, iw );
-    infotorclosed( iw, G_OBJECT( iw->tor ) );
+    if( NULL != iw->widget )
+    {
+        g_object_weak_unref( G_OBJECT( iw->tor ), infotorclosed, iw );
+        infotorclosed( iw, G_OBJECT( iw->tor ) );
+    }
 }
 
 static void
 infotorclosed( gpointer data, GObject * tor SHUTUP )
 {
     struct infowind * iw = data;
+    GtkWidget       * widget;
+
+    /* neuter the widget's destroy callback */
+    widget = iw->widget;
+    iw->widget = NULL;
 
     g_source_remove( iw->timer );
     g_object_unref( iw->filesmodel );
     g_object_unref( iw->model );
     gtk_tree_row_reference_free( iw->row );
-    gtk_widget_destroy( iw->widget );
+    gtk_widget_destroy( widget );
     g_free( iw );
 }
 
