@@ -784,10 +784,6 @@ setpex( tr_torrent_t * tor, void * arg )
 gboolean
 updatemodel(gpointer gdata) {
   struct cbdata *data = gdata;
-  GtkTreeModel * model;
-  TrTorrent *tor;
-  tr_stat_t *st;
-  GtkTreeIter iter;
   float up, down;
 
   if( !data->closing && 0 < global_sigcount )
@@ -796,27 +792,8 @@ updatemodel(gpointer gdata) {
       return FALSE;
   }
 
-  model = tr_core_model( data->core );
-  if( gtk_tree_model_get_iter_first( model, &iter ) )
-  {
-    do {
-      gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1);
-      st = tr_torrent_stat(tor);
-      g_object_unref(tor);
-      /* XXX find out if setting the same data emits changed signal */
-      gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
-          MC_STAT,   st->status,               MC_ERR,     st->error,
-          MC_TERR,   st->errorString,          MC_PROG,    st->progress,
-          MC_DRATE,  st->rateDownload,         MC_URATE,   st->rateUpload,
-          MC_ETA,    st->eta,                  MC_PEERS,   st->peersTotal,
-          MC_UPEERS, st->peersUploading,       MC_DPEERS,  st->peersDownloading,
-          MC_SEED,   st->seeders,              MC_LEECH,   st->leechers,
-          MC_DONE,   st->completedFromTracker, MC_TRACKER, st->tracker,
-          MC_DOWN,   st->downloaded,           MC_UP,      st->uploaded,
-          MC_LEFT,   st->left, -1);
-    }
-    while( gtk_tree_model_iter_next( model, &iter ) );
-  }
+  /* update the torrent data in the model */
+  tr_core_update( data->core );
 
   /* update the main window's statusbar and toolbar buttons */
   if( NULL != data->wind )
@@ -825,7 +802,7 @@ updatemodel(gpointer gdata) {
       tr_window_update( TR_WINDOW( data->wind ), down, up );
   }
 
-  /* check for politely stopped torrents unless we're exiting */
+  /* check for stopped torrents unless we're exiting */
   if( !data->closing )
   {
       tr_core_reap( data->core );
@@ -964,14 +941,7 @@ handleaction( struct cbdata * data, int act )
                   changed = TRUE;
                   break;
               case ACT_DELETE:
-                  /* tor will be unref'd in the politely_stopped handler */
-                  g_object_ref( tor );
-                  tr_torrent_stop_politely( tor );
-                  if( TR_FLAG_SAVE & tr_torrent_info( tor )->flags )
-                  {
-                      tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
-                  }
-                  gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
+                  tr_core_delete_torrent( data->core, tor, &iter );
                   changed = TRUE;
                   break;
               case ACT_INFO:
@@ -1008,20 +978,17 @@ static void
 addtorrents(void *vdata, void *state, GList *files,
             const char *dir, guint flags) {
   struct cbdata *data = vdata;
-  GList *torlist, *errlist, *ii;
+  GList *errlist, *ii;
   char *errstr;
-  TrTorrent *tor;
-  GtkTreeModel * model;
-  GtkTreeIter iter;
   const char * pref;
-  tr_info_t *in;
+  int added;
 
   errlist = NULL;
-  torlist = NULL;
+  added   = 0;
 
   if( NULL != state )
   {
-      torlist = tr_core_load( data->core, state, &errlist );
+      added += tr_core_load( data->core, state, &errlist );
   }
 
   if(NULL != files) {
@@ -1037,27 +1004,13 @@ addtorrents(void *vdata, void *state, GList *files,
     }
     for(ii = g_list_first(files); NULL != ii; ii = ii->next) {
       errstr = NULL;
-      tor = tr_core_new_torrent( data->core, ii->data, dir, flags, &errstr);
-      if(NULL != tor)
-        torlist = g_list_append(torlist, tor);
+      if( tr_core_add_torrent( data->core, ii->data, dir, flags, &errstr ) )
+      {
+          added++;
+      }
       if(NULL != errstr)
         errlist = g_list_append(errlist, errstr);
     }
-  }
-
-  model = tr_core_model( data->core );
-  for( ii = g_list_first( torlist ); NULL != ii; ii = ii->next )
-  {
-      gtk_list_store_append( GTK_LIST_STORE( model ), &iter );
-      in = tr_torrent_info( ii->data );
-      gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
-                          MC_NAME,    in->name,
-                          MC_SIZE,    in->totalSize,
-                          MC_TORRENT, ii->data, -1);
-      /* we will always ref a torrent before politely stopping it */
-      g_signal_connect( ii->data, "politely_stopped",
-                        G_CALLBACK( g_object_unref ), data );
-      g_object_unref( ii->data );
   }
 
   if(NULL != errlist) {
@@ -1070,7 +1023,8 @@ addtorrents(void *vdata, void *state, GList *files,
     g_free(errstr);
   }
 
-  if(NULL != torlist) {
+  if( 0 < added )
+  {
     updatemodel(data);
     savetorrents(data);
   }

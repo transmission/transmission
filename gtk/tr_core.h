@@ -93,23 +93,34 @@ tr_core_did_quit( TrCore * self );
 void
 tr_core_force_quit( TrCore * self );
 
-/* Reap any dead torrents */
+/* Check for stopped torrents */
 void
 tr_core_reap( TrCore * self );
 
-/* Load saved state, return list of TrTorrent*. A char* is appended to
-   *errors for each error which occurs, these must be freed. */
-GList *
-tr_core_load( TrCore * self, benc_val_t * state, GList ** errors );
-
-/* Save state. Set *error to any error which occurs, this must be freed. */
+/* Save state. If error is not NULL is will be set to any error which
+   occurs, this must be freed. */
 void
 tr_core_save( TrCore * self, char ** error );
 
-/* XXX temporary hack for transition away from TrBackend */
-struct _TrTorrent *
-tr_core_new_torrent( TrCore * self, const char * torrent, const char * dir,
+/* Load saved state, return number of torrents added. If errors is not
+   NULL then a char* is appended for each error which occurs, these
+   must be freed. */
+int
+tr_core_load( TrCore * self, benc_val_t * state, GList ** errors );
+
+/* Add a torrent. Torrent, dir, flags, and err arguments are the same
+   as tr_torrent_new() */
+gboolean
+tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
                      guint flags, char ** err );
+
+/* remove a torrent, waiting for it to pause if necessary */
+void
+tr_core_delete_torrent( TrCore * self, void * torrent,
+                        GtkTreeIter * iter /* XXX */ );
+
+void
+tr_core_update( TrCore * self );
 
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */

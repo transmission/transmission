@@ -28,6 +28,7 @@
 #include <glib/gi18n.h>
 
 #include "bencode.h"
+#include "transmission.h"
 
 #include "tr_backend.h"
 #include "tr_core.h"
@@ -40,6 +41,8 @@ static void
 tr_core_class_init( gpointer g_class, gpointer g_class_data );
 static void
 tr_core_dispose( GObject * obj );
+static void
+tr_core_insert( TrCore * self, TrTorrent * tor );
 
 GType
 tr_core_get_type( void )
@@ -67,7 +70,7 @@ tr_core_get_type( void )
     return type;
 }
 
-static void
+void
 tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
 {
     GObjectClass * gobject_class;
@@ -76,7 +79,7 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     gobject_class->dispose = tr_core_dispose;
 }
 
-static void
+void
 tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 {
     TrCore * self = (TrCore *) instance;
@@ -108,7 +111,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     self->disposed = FALSE;
 }
 
-static void
+void
 tr_core_dispose( GObject * obj )
 {
     TrCore * self = (TrCore *) obj;
@@ -212,15 +215,6 @@ tr_core_reap( TrCore * self )
 {
     TR_IS_CORE( self );
 
-    tr_backend_torrents_stopped( self->backend, FALSE );
-}
-
-GList *
-tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
-{
-    TR_IS_CORE( self );
-
-    return tr_backend_load_state( self->backend, state, 0, errors );
 }
 
 void
@@ -231,12 +225,123 @@ tr_core_save( TrCore * self, char ** error )
     tr_backend_save_state( self->backend, error );
 }
 
-TrTorrent *
-tr_core_new_torrent( TrCore * self, const char * torrent, const char * dir,
+int
+tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
+{
+    GList * tors, * ii;
+    int     count;
+
+    TR_IS_CORE( self );
+
+    count = 0;
+    tors  = tr_backend_load_state( self->backend, state, 0, errors );
+    for( ii = g_list_first( tors ); NULL != ii; ii = ii->next )
+    {
+        tr_core_insert( self, ii->data );
+        count++;
+    }
+    g_list_free( tors );
+
+    return count;
+}
+
+gboolean
+tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
                      guint flags, char ** err )
+{
+    TrTorrent * tor;
+
+    TR_IS_CORE( self );
+
+    tor = tr_torrent_new( G_OBJECT( self->backend ),
+                          torrent, dir, flags, err );
+    if( NULL == tor )
+    {
+        return FALSE;
+    }
+
+    tr_core_insert( self, tor );
+
+    return TRUE;
+}
+
+void
+tr_core_delete_torrent( TrCore * self, void * torrent,
+                        GtkTreeIter * iter )
 {
     TR_IS_CORE( self );
 
-    return tr_torrent_new( G_OBJECT( self->backend ),
-                           torrent, dir, flags, err );
+    /* tor will be unref'd in the politely_stopped handler */
+    g_object_ref( torrent );
+    tr_torrent_stop_politely( torrent );
+    if( TR_FLAG_SAVE & tr_torrent_info( torrent )->flags )
+    {
+        tr_torrentRemoveSaved( tr_torrent_handle( torrent ) );
+    }
+    gtk_list_store_remove( GTK_LIST_STORE( self->model ), iter );
+}
+
+void
+tr_core_insert( TrCore * self, TrTorrent * tor )
+{
+    GtkTreeIter iter;
+    tr_info_t * inf;
+
+    gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
+    inf = tr_torrent_info( tor );
+
+    /* inserting the torrent into the model adds a reference */
+    gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
+                        MC_NAME,    inf->name,
+                        MC_SIZE,    inf->totalSize,
+                        MC_TORRENT, tor,
+                        -1);
+
+    /* we will always ref a torrent before politely stopping it */
+    g_signal_connect( tor, "politely_stopped",
+                      G_CALLBACK( g_object_unref ), NULL );
+
+    g_object_unref( tor );
+}
+
+void
+tr_core_update( TrCore * self )
+{
+    GtkTreeIter iter;
+    TrTorrent * tor;
+    tr_stat_t * st;
+
+    TR_IS_CORE( self );
+
+    if( gtk_tree_model_get_iter_first( self->model, &iter ) )
+    {
+        do
+        {
+            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+            st = tr_torrent_stat( tor );
+            g_object_unref( tor );
+
+            /* XXX find out if setting the same data emits changed signal */
+            gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
+                                MC_STAT,        st->status,
+                                MC_ERR,         st->error,
+                                MC_TERR,        st->errorString,
+                                MC_PROG,        st->progress,
+                                MC_DRATE,       st->rateDownload,
+                                MC_URATE,       st->rateUpload,
+                                MC_ETA,         st->eta,
+                                MC_PEERS,       st->peersTotal,
+                                MC_UPEERS,      st->peersUploading,
+                                MC_DPEERS,      st->peersDownloading,
+                                MC_SEED,        st->seeders,
+                                MC_LEECH,       st->leechers,
+                                MC_DONE,        st->completedFromTracker,
+                                MC_TRACKER,     st->tracker,
+                                MC_DOWN,        st->downloaded,
+                                MC_UP,          st->uploaded,
+                                MC_LEFT,        st->left,
+                                -1 );
+        }
+        while( gtk_tree_model_iter_next( self->model, &iter ) );
+    }
 }
