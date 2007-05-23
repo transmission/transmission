@@ -34,14 +34,12 @@
 /* XXX */
 #define TR_WANT_TORRENT_PRIVATE
 
-#include "tr_core.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
 
 enum {
   TR_TORRENT_HANDLE = 1,
-  TR_TORRENT_BACKEND,
   TR_TORRENT_DIR,
   TR_TORRENT_PAUSED,
 };
@@ -114,7 +112,6 @@ tr_torrent_get_type(void) {
 static void
 tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
   GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
-  TrTorrentClass *klass = TR_TORRENT_CLASS(g_class);
   GParamSpec *pspec;
 
   gobject_class->set_property = tr_torrent_set_property;
@@ -126,12 +123,6 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
                                G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property(gobject_class, TR_TORRENT_HANDLE, pspec);
 
-  pspec = g_param_spec_object("backend", "Backend",
-                              "Libtransmission backend object",
-                              TR_CORE_TYPE,
-                              G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
-  g_object_class_install_property(gobject_class, TR_TORRENT_BACKEND, pspec);
-
   pspec = g_param_spec_string("download-directory", "Download directory",
                               "Directory to download files to", NULL,
                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
@@ -141,23 +132,20 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
                                "Is the torrent paused or running", TRUE,
                                G_PARAM_READWRITE);
   g_object_class_install_property(gobject_class, TR_TORRENT_PAUSED, pspec);
-
-  klass->paused_signal_id = g_signal_newv("politely-stopped",
-                                          G_TYPE_FROM_CLASS(g_class),
-                                          G_SIGNAL_RUN_LAST, NULL, NULL, NULL,
-                                          g_cclosure_marshal_VOID__VOID,
-                                          G_TYPE_NONE, 0, NULL);
 }
 
 static void
 tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   TrTorrent *self = (TrTorrent *)instance;
 
+#ifdef REFDBG
+  fprintf( stderr, "torrent %p init\n", self );
+#endif
+
   self->handle = NULL;
-  self->core = NULL;
   self->dir = NULL;
-  self->closing = FALSE;
   self->delfile = NULL;
+  self->severed = FALSE;
   self->disposed = FALSE;
 }
 
@@ -166,7 +154,7 @@ tr_torrent_set_property(GObject *object, guint property_id,
                         const GValue *value, GParamSpec *pspec) {
   TrTorrent *self = (TrTorrent*)object;
 
-  if(self->disposed)
+  if(self->severed)
     return;
 
   switch(property_id) {
@@ -175,10 +163,6 @@ tr_torrent_set_property(GObject *object, guint property_id,
       self->handle = g_value_get_pointer(value);
       if(NULL != self->handle && NULL != self->dir)
         tr_torrent_set_folder(self);
-      break;
-    case TR_TORRENT_BACKEND:
-      g_assert(NULL == self->core);
-      self->core = g_object_ref( g_value_get_object( value ) );
       break;
     case TR_TORRENT_DIR:
       g_assert(NULL == self->dir);
@@ -203,15 +187,12 @@ tr_torrent_get_property(GObject *object, guint property_id,
                         GValue *value, GParamSpec *pspec) {
   TrTorrent *self = (TrTorrent*)object;
 
-  if(self->disposed)
+  if(self->severed)
     return;
 
   switch(property_id) {
     case TR_TORRENT_HANDLE:
       g_value_set_pointer(value, self->handle);
-      break;
-    case TR_TORRENT_BACKEND:
-      g_value_set_object( value, self->core );
       break;
     case TR_TORRENT_DIR:
       g_value_set_string(value, (NULL != self->dir ? self->dir :
@@ -235,17 +216,13 @@ tr_torrent_dispose(GObject *obj) {
     return;
   self->disposed = TRUE;
 
-  if(NULL != self->handle) {
-    if(!tr_torrent_paused(self))
-      tr_torrentStop(self->handle);
-    tr_torrentClose( self->handle );
-    self->handle = NULL;
-  }
+#ifdef REFDBG
+  fprintf( stderr, "torrent %p dispose\n", self );
+#endif
 
-  if( NULL != self->core )
+  if( !self->severed )
   {
-      g_object_unref( self->core );
-      self->core = NULL;
+      tr_torrent_sever( self );
   }
 
   if(NULL != self->delfile)
@@ -255,11 +232,39 @@ tr_torrent_dispose(GObject *obj) {
   parent->dispose(obj);
 }
 
+void
+tr_torrent_sever( TrTorrent * self )
+{
+    TR_IS_TORRENT( self );
+
+    if( self->severed )
+    {
+        return;
+    }
+
+#ifdef REFDBG
+    fprintf( stderr, "torrent %p sever\n", self );
+#endif
+
+    if( NULL == self->handle )
+    {
+        self->severed = TRUE;
+        return;
+    }
+
+    if( !tr_torrent_paused( self ) )
+    {
+        tr_torrentStop( self->handle );
+    }
+    tr_torrentClose( self->handle );
+    self->severed = TRUE;
+}
+
 tr_torrent_t *
 tr_torrent_handle(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
-  if(tor->disposed)
+  if(tor->severed)
     return NULL;
 
   return tor->handle;
@@ -269,7 +274,7 @@ tr_stat_t *
 tr_torrent_stat(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
-  if(tor->disposed)
+  if(tor->severed)
     return NULL;
 
   return tr_torrentStat(tor->handle);
@@ -279,27 +284,24 @@ tr_info_t *
 tr_torrent_info(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
-  if(tor->disposed)
+  if(tor->severed)
     return NULL;
 
   return tr_torrentInfo(tor->handle);
 }
 
 TrTorrent *
-tr_torrent_new( GObject * core, const char *torrent, const char *dir,
+tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
                guint flags, char **err) {
   TrTorrent *ret;
   tr_torrent_t *handle;
-  tr_handle_t *back;
   int errcode, trflags;
   gboolean boolval;
 
-  TR_IS_CORE( core );
   g_assert(NULL != dir);
 
   *err = NULL;
 
-  back = tr_core_handle( TR_CORE( core ) );
   trflags = 0;
   if((TR_TORNEW_SAVE_COPY|TR_TORNEW_SAVE_MOVE) & flags)
     trflags |= TR_FLAG_SAVE;
@@ -331,7 +333,7 @@ tr_torrent_new( GObject * core, const char *torrent, const char *dir,
   tr_torrentDisablePex( handle, !boolval );
 
   ret = g_object_new(TR_TORRENT_TYPE, "torrent-handle", handle,
-                     "backend", core, "download-directory", dir, NULL);
+                     "download-directory", dir, NULL);
   
   g_object_set(ret, "paused", (TR_TORNEW_PAUSED & flags ? TRUE : FALSE), NULL);
 
@@ -342,7 +344,7 @@ tr_torrent_new( GObject * core, const char *torrent, const char *dir,
 }
 
 TrTorrent *
-tr_torrent_new_with_state( GObject * core, benc_val_t * state,
+tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
                            guint forcedflags, char ** err)
 {
   int ii;
@@ -396,7 +398,7 @@ tr_torrent_new_with_state( GObject * core, benc_val_t * state,
       flags |= forcedflags;
   }
 
-  return tr_torrent_new( core, torrent, dir, flags, err );
+  return tr_torrent_new( back, torrent, dir, flags, err );
 }
 
 #define SETSTRVAL(vv, ss) \
@@ -412,10 +414,7 @@ tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
 
   TR_IS_TORRENT(tor);
 
-  if(tor->disposed)
-    return;
-
-  if(tor->closing)
+  if(tor->severed)
     return;
 
   state->type = TYPE_DICT;
@@ -441,7 +440,7 @@ void
 tr_torrent_state_saved(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
-  if(tor->disposed)
+  if(tor->severed)
     return;
 
   if(NULL != tor->delfile) {
@@ -470,46 +469,4 @@ tr_torrent_paused(TrTorrent *tor) {
   tr_stat_t *st = tr_torrentStat(tor->handle);
 
   return (TR_STATUS_INACTIVE & st->status ? TRUE : FALSE);
-}
-
-void
-tr_torrent_stop_politely(TrTorrent *tor) {
-  tr_stat_t *st;
-
-  TR_IS_TORRENT(tor);
-
-  if(tor->disposed)
-    return;
-
-  if(!tor->closing) {
-    st = tr_torrent_stat(tor);
-    tor->closing = TRUE;
-    if(TR_STATUS_ACTIVE & st->status)
-      tr_torrentStop(tor->handle);
-  }
-}
-
-tr_stat_t *
-tr_torrent_stat_polite( TrTorrent * tor, gboolean timeout )
-{
-    TrTorrentClass * klass;
-    tr_stat_t      * st;
-
-    TR_IS_TORRENT( tor );
-
-    if( tor->disposed )
-    {
-        return NULL;
-    }
-
-    st = tr_torrentStat( tor->handle );
-    if( tor->closing && ( TR_STATUS_PAUSE & st->status || timeout ) )
-    {
-        tor->closing = FALSE;
-        klass = g_type_class_peek( TR_TORRENT_TYPE );
-        g_signal_emit( tor, klass->paused_signal_id, 0, NULL );
-        return tr_torrent_stat_polite( tor, FALSE );
-    }
-
-    return st;
 }

@@ -54,16 +54,14 @@ typedef struct _TrTorrentClass TrTorrentClass;
 struct _TrTorrent {
   GObject parent;
   tr_torrent_t *handle;
-  GObject *core;
   char *dir;
-  gboolean closing;
   char *delfile;
+  gboolean severed;
   gboolean disposed;
 };
 
 struct _TrTorrentClass {
   GObjectClass parent;
-  int paused_signal_id;
 };
 
 GType
@@ -91,24 +89,21 @@ tr_torrent_info(TrTorrent *tor);
 #ifdef TR_WANT_TORRENT_PRIVATE
 
 TrTorrent *
-tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
-               guint flags, char **err);
+tr_torrent_new( tr_handle_t * handle, const char *torrent, const char *dir,
+                guint flags, char **err);
 
 TrTorrent *
-tr_torrent_new_with_state( GObject * backend, benc_val_t * state,
+tr_torrent_new_with_state( tr_handle_t * handle, benc_val_t * state,
                            guint flags, char ** err );
-
-void
-tr_torrent_stop_politely(TrTorrent *tor);
-
-tr_stat_t *
-tr_torrent_stat_polite( TrTorrent * tor, gboolean timeout );
 
 void
 tr_torrent_get_state(TrTorrent *tor, benc_val_t *state);
 
 void
 tr_torrent_state_saved(TrTorrent *tor);
+
+void
+tr_torrent_sever( TrTorrent * tor );
 
 #endif /* TR_WANT_TORRENT_PRIVATE */
 

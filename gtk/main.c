@@ -517,7 +517,7 @@ wannaquit( void * vdata )
   data->timer = 0;
 
   /* pause torrents and stop nat traversal */
-  tr_core_quit( data->core );
+  tr_core_shutdown( data->core );
 
   /* set things up to wait for torrents to stop */
   edata = g_new0(struct exitdata, 1);
@@ -546,16 +546,11 @@ exitcheck( gpointer gdata )
     /* keep waiting until we're ready to quit or we hit the exit timeout */
     if( time( NULL ) - edata->started < TRACKER_EXIT_TIMEOUT )
     {
-        if( !tr_core_did_quit( cbdata->core ) )
+        if( !tr_core_quiescent( cbdata->core ) )
         {
             updatemodel( cbdata );
             return TRUE;
         }
-    }
-    else
-    {
-        /* oh well */
-        tr_core_force_quit( cbdata->core );
     }
 
     /* exit otherwise */
@@ -574,7 +569,6 @@ exitcheck( gpointer gdata )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
     }
-    tr_core_clear( cbdata->core ); /* XXX god these circular references suck */
     g_object_unref( cbdata->core );
     if( NULL != cbdata->icon )
     {
@@ -803,12 +797,6 @@ updatemodel(gpointer gdata) {
       tr_window_update( TR_WINDOW( data->wind ), down, up );
   }
 
-  /* check for stopped torrents unless we're exiting */
-  if( !data->closing )
-  {
-      tr_core_reap( data->core );
-  }
-
   /* update the message window */
   msgwin_update();
 
@@ -942,7 +930,7 @@ handleaction( struct cbdata * data, int act )
                   changed = TRUE;
                   break;
               case ACT_DELETE:
-                  tr_core_delete_torrent( data->core, tor, &iter );
+                  tr_core_delete_torrent( data->core, &iter );
                   changed = TRUE;
                   break;
               case ACT_INFO:

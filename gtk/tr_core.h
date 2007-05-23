@@ -58,14 +58,14 @@ struct _TrCore
     GObject             parent;
     GtkTreeModel      * model;
     tr_handle_t       * handle;
-    GList             * torrents;
+    GList             * zombies;
     gboolean            quitting;
     gboolean            disposed;
 };
 
 struct _TrCoreClass
 {
-  GObjectClass          parent;
+    GObjectClass        parent;
 };
 
 GType
@@ -84,23 +84,11 @@ tr_core_handle( TrCore * self );
 
 /* Try to politely stop all torrents and nat traversal */
 void
-tr_core_quit( TrCore * self );
+tr_core_shutdown( TrCore * self );
 
-/* Returns true if tr_core_quit() has been called and we are ready to quit */
+/* Returns true if the shutdown has completed */
 gboolean
-tr_core_did_quit( TrCore * self );
-
-/* Destroy any torrents that haven't stopped already */
-void
-tr_core_force_quit( TrCore * self );
-
-/* XXX temporary hack to deal with circular references */
-void
-tr_core_clear( TrCore * self );
-
-/* Check for stopped torrents */
-void
-tr_core_reap( TrCore * self );
+tr_core_quiescent( TrCore * self );
 
 /* Save state. If error is not NULL is will be set to any error which
    occurs, this must be freed. */
@@ -121,9 +109,9 @@ tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
 
 /* remove a torrent, waiting for it to pause if necessary */
 void
-tr_core_delete_torrent( TrCore * self, void * torrent,
-                        GtkTreeIter * iter /* XXX */ );
+tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter /* XXX */ );
 
+/* update the model with current torrent status */
 void
 tr_core_update( TrCore * self );
 
