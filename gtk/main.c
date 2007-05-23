@@ -574,6 +574,7 @@ exitcheck( gpointer gdata )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
     }
+    tr_core_clear( cbdata->core ); /* XXX god these circular references suck */
     g_object_unref( cbdata->core );
     if( NULL != cbdata->icon )
     {

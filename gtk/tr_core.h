@@ -57,7 +57,8 @@ struct _TrCore
 {
     GObject             parent;
     GtkTreeModel      * model;
-    struct _TrBackend * backend;
+    tr_handle_t       * handle;
+    GList             * torrents;
     gboolean            quitting;
     gboolean            disposed;
 };
@@ -92,6 +93,10 @@ tr_core_did_quit( TrCore * self );
 /* Destroy any torrents that haven't stopped already */
 void
 tr_core_force_quit( TrCore * self );
+
+/* XXX temporary hack to deal with circular references */
+void
+tr_core_clear( TrCore * self );
 
 /* Check for stopped torrents */
 void

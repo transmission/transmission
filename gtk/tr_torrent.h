@@ -54,7 +54,7 @@ typedef struct _TrTorrentClass TrTorrentClass;
 struct _TrTorrent {
   GObject parent;
   tr_torrent_t *handle;
-  GObject *back;
+  GObject *core;
   char *dir;
   gboolean closing;
   char *delfile;
@@ -88,6 +88,8 @@ tr_torrent_info(TrTorrent *tor);
 /* save a private copy of the torrent file and remove the original */
 #define TR_TORNEW_SAVE_MOVE     0x10
 
+#ifdef TR_WANT_TORRENT_PRIVATE
+
 TrTorrent *
 tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
                guint flags, char **err);
@@ -102,11 +104,12 @@ tr_torrent_stop_politely(TrTorrent *tor);
 tr_stat_t *
 tr_torrent_stat_polite( TrTorrent * tor, gboolean timeout );
 
-#ifdef TR_WANT_TORRENT_PRIVATE
 void
 tr_torrent_get_state(TrTorrent *tor, benc_val_t *state);
+
 void
 tr_torrent_state_saved(TrTorrent *tor);
-#endif
+
+#endif /* TR_WANT_TORRENT_PRIVATE */
 
 #endif

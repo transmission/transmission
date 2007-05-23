@@ -30,7 +30,10 @@
 #include "bencode.h"
 #include "transmission.h"
 
-#include "tr_backend.h"
+/* XXX */
+#define TR_WANT_TORRENT_PRIVATE
+
+#include "conf.h"
 #include "tr_core.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -41,6 +44,10 @@ static void
 tr_core_class_init( gpointer g_class, gpointer g_class_data );
 static void
 tr_core_dispose( GObject * obj );
+static void
+tr_core_torrent_finalized( gpointer gdata, GObject * tor );
+static int
+tr_core_check_torrents( TrCore * self, gboolean timeout );
 static void
 tr_core_insert( TrCore * self, TrTorrent * tor );
 
@@ -106,7 +113,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     self->model    = GTK_TREE_MODEL( store );
-    self->backend  = tr_backend_new();
+    self->handle   = tr_init( "gtk" );
+    self->torrents = NULL;
     self->quitting = FALSE;
     self->disposed = FALSE;
 }
@@ -114,8 +122,9 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 void
 tr_core_dispose( GObject * obj )
 {
-    TrCore * self = (TrCore *) obj;
+    TrCore       * self = (TrCore *) obj;
     GObjectClass * parent;
+    GList        * ii;
 
     if( self->disposed )
     {
@@ -123,12 +132,37 @@ tr_core_dispose( GObject * obj )
     }
     self->disposed = TRUE;
 
-    g_object_unref( self->model );
-    g_object_unref( self->backend );
+    if( NULL != self->model )
+    {
+        g_object_unref( self->model );
+        self->model = NULL;
+    }
+
+    if( NULL != self->torrents )
+    {
+        for( ii = g_list_first( self->torrents ); NULL != ii; ii = ii->next )
+        {
+            g_object_weak_unref( ii->data, tr_core_torrent_finalized, self );
+        }
+        g_list_free( self->torrents );
+        self->torrents = NULL;
+    }
+
+    tr_close( self->handle );
 
     /* Chain up to the parent class */
     parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
     parent->dispose( obj );
+}
+
+void
+tr_core_torrent_finalized( gpointer gdata, GObject * tor )
+{
+    TrCore * self = gdata;
+
+    TR_IS_CORE( self );
+
+    self->torrents = g_list_remove( self->torrents, tor );
 }
 
 TrCore *
@@ -150,7 +184,7 @@ tr_core_handle( TrCore * self )
 {
     TR_IS_CORE( self );
 
-    return tr_backend_handle( self->backend );
+    return self->handle;
 }
 
 void
@@ -158,6 +192,7 @@ tr_core_quit( TrCore * self )
 {
     GtkTreeIter iter;
     TrTorrent * tor;
+    GList     * ii;
 
     TR_IS_CORE( self );
 
@@ -180,10 +215,13 @@ tr_core_quit( TrCore * self )
     }
 
     /* try to politely stop all the torrents */
-    tr_backend_stop_torrents( self->backend );
+    for( ii = g_list_first( self->torrents ); NULL != ii; ii = ii->next )
+    {
+        tr_torrent_stop_politely( ii->data );
+    }
 
     /* shut down nat traversal */
-    tr_natTraversalEnable( tr_backend_handle( self->backend ), 0 );
+    tr_natTraversalEnable( self->handle, 0 );
 }
 
 gboolean
@@ -194,9 +232,9 @@ tr_core_did_quit( TrCore * self )
     TR_IS_CORE( self );
     g_assert( self->quitting );
 
-    hstat = tr_handleStatus( tr_backend_handle( self->backend ) );
+    hstat = tr_handleStatus( self->handle );
 
-    return ( tr_backend_torrents_stopped( self->backend, FALSE ) &&
+    return ( 0 == tr_core_check_torrents( self, FALSE ) &&
              TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus );
 }
 
@@ -207,7 +245,19 @@ tr_core_force_quit( TrCore * self )
     g_assert( self->quitting );
 
     /* time the remaining torrents out so they signal politely-stopped */
-    tr_backend_torrents_stopped( self->backend, TRUE );
+    tr_core_check_torrents( self, TRUE );
+}
+
+void
+tr_core_clear( TrCore * self )
+{
+    TR_IS_CORE( self );
+
+    if( NULL != self->model )
+    {
+        g_object_unref( self->model );
+        self->model = NULL;
+    }
 }
 
 void
@@ -215,32 +265,93 @@ tr_core_reap( TrCore * self )
 {
     TR_IS_CORE( self );
 
+    tr_core_check_torrents( self, FALSE );
+}
+
+int
+tr_core_check_torrents( TrCore * self, gboolean timeout )
+{
+    tr_stat_t * st;
+    GList     * ii, * list;
+    int         count;
+
+    count = 0;
+    list  = g_list_copy( self->torrents );
+    for( ii = g_list_first( list ); NULL != ii; ii = ii->next )
+    {
+        st = tr_torrent_stat_polite( ii->data, timeout );
+        if( NULL == st || !( TR_STATUS_PAUSE & st->status ) )
+        {
+            count++;
+        }
+    }
+    g_list_free( list );
+
+    return count;
 }
 
 void
 tr_core_save( TrCore * self, char ** error )
 {
+    benc_val_t state;
+    GList    * ii;
+
     TR_IS_CORE( self );
 
-    tr_backend_save_state( self->backend, error );
+    tr_bencInit( &state, TYPE_LIST );
+    if( tr_bencListReserve( &state, g_list_length( self->torrents ) ) )
+    {
+        if( NULL != error )
+        {
+            *error = g_strdup( "malloc failure" );
+        }
+        return;
+    }
+
+    for( ii = g_list_first( self->torrents ); NULL != ii; ii = ii->next )
+    {
+        tr_torrent_get_state( ii->data, tr_bencListAdd( &state ) );
+    }
+
+    cf_savestate( &state, error );
+    tr_bencFree( &state );
+
+    for( ii = g_list_first( self->torrents ); NULL != ii; ii = ii->next )
+    {
+        tr_torrent_state_saved( ii->data );
+    }
 }
 
 int
 tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
 {
-    GList * tors, * ii;
-    int     count;
+    int         ii, count;
+    char      * errstr;
+    TrTorrent * tor;
 
     TR_IS_CORE( self );
 
-    count = 0;
-    tors  = tr_backend_load_state( self->backend, state, 0, errors );
-    for( ii = g_list_first( tors ); NULL != ii; ii = ii->next )
+    if( TYPE_LIST != state->type )
     {
-        tr_core_insert( self, ii->data );
-        count++;
+        return 0;
     }
-    g_list_free( tors );
+
+    count = 0;
+    for( ii = 0; ii < state->val.l.count; ii++ )
+    {
+        errstr = NULL;
+        tor = tr_torrent_new_with_state( G_OBJECT( self ),
+                                         state->val.l.vals + ii, 0, &errstr );
+        if( NULL != errstr )
+        {
+            *errors = g_list_append( *errors, errstr );
+        }
+        if( NULL != tor )
+        {
+            tr_core_insert( self, tor );
+            count++;
+        }
+    }
 
     return count;
 }
@@ -253,8 +364,7 @@ tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
 
     TR_IS_CORE( self );
 
-    tor = tr_torrent_new( G_OBJECT( self->backend ),
-                          torrent, dir, flags, err );
+    tor = tr_torrent_new( G_OBJECT( self ), torrent, dir, flags, err );
     if( NULL == tor )
     {
         return FALSE;
@@ -286,6 +396,9 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
 {
     GtkTreeIter iter;
     tr_info_t * inf;
+
+    g_object_weak_ref( G_OBJECT( tor ), tr_core_torrent_finalized, self );
+    self->torrents = g_list_append( self->torrents, tor );
 
     gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
     inf = tr_torrent_info( tor );

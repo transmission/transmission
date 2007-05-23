@@ -3,7 +3,7 @@
 include ../mk/config.mk
 include ../mk/common.mk
 
-SRCS = conf.c dialogs.c io.c ipc.c main.c msgwin.c tr_backend.c \
+SRCS = conf.c dialogs.c io.c ipc.c main.c msgwin.c \
 	tr_cell_renderer_progress.c tr_core.c tr_icon.c tr_prefs.c \
 	tr_torrent.c tr_window.c util.c
 OBJS = $(SRCS:%.c=%.o)

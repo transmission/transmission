@@ -28,12 +28,13 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#define TR_WANT_BACKEND_PRIVATE
-
 #include "transmission.h"
 #include "bencode.h"
 
-#include "tr_backend.h"
+/* XXX */
+#define TR_WANT_TORRENT_PRIVATE
+
+#include "tr_core.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -127,7 +128,7 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
 
   pspec = g_param_spec_object("backend", "Backend",
                               "Libtransmission backend object",
-                              TR_BACKEND_TYPE,
+                              TR_CORE_TYPE,
                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property(gobject_class, TR_TORRENT_BACKEND, pspec);
 
@@ -153,7 +154,7 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   TrTorrent *self = (TrTorrent *)instance;
 
   self->handle = NULL;
-  self->back = NULL;
+  self->core = NULL;
   self->dir = NULL;
   self->closing = FALSE;
   self->delfile = NULL;
@@ -176,8 +177,8 @@ tr_torrent_set_property(GObject *object, guint property_id,
         tr_torrent_set_folder(self);
       break;
     case TR_TORRENT_BACKEND:
-      g_assert(NULL == self->back);
-      self->back = g_object_ref(g_value_get_object(value));
+      g_assert(NULL == self->core);
+      self->core = g_object_ref( g_value_get_object( value ) );
       break;
     case TR_TORRENT_DIR:
       g_assert(NULL == self->dir);
@@ -210,7 +211,7 @@ tr_torrent_get_property(GObject *object, guint property_id,
       g_value_set_pointer(value, self->handle);
       break;
     case TR_TORRENT_BACKEND:
-      g_value_set_object(value, self->back);
+      g_value_set_object( value, self->core );
       break;
     case TR_TORRENT_DIR:
       g_value_set_string(value, (NULL != self->dir ? self->dir :
@@ -237,13 +238,14 @@ tr_torrent_dispose(GObject *obj) {
   if(NULL != self->handle) {
     if(!tr_torrent_paused(self))
       tr_torrentStop(self->handle);
-    tr_torrentClose(tr_backend_handle(TR_BACKEND(self->back)), self->handle);
+    tr_torrentClose( tr_core_handle( TR_CORE( self->core) ) , self->handle );
     self->handle = NULL;
   }
 
-  if(NULL != self->back) {
-    g_object_unref(self->back);
-    self->back = NULL;
+  if( NULL != self->core )
+  {
+      g_object_unref( self->core );
+      self->core = NULL;
   }
 
   if(NULL != self->delfile)
@@ -284,7 +286,7 @@ tr_torrent_info(TrTorrent *tor) {
 }
 
 TrTorrent *
-tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
+tr_torrent_new( GObject * core, const char *torrent, const char *dir,
                guint flags, char **err) {
   TrTorrent *ret;
   tr_torrent_t *handle;
@@ -292,12 +294,12 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   int errcode, trflags;
   gboolean boolval;
 
-  TR_IS_BACKEND(backend);
+  TR_IS_CORE( core );
   g_assert(NULL != dir);
 
   *err = NULL;
 
-  back = tr_backend_handle(TR_BACKEND(backend));
+  back = tr_core_handle( TR_CORE( core ) );
   trflags = 0;
   if((TR_TORNEW_SAVE_COPY|TR_TORNEW_SAVE_MOVE) & flags)
     trflags |= TR_FLAG_SAVE;
@@ -329,8 +331,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
   tr_torrentDisablePex( handle, !boolval );
 
   ret = g_object_new(TR_TORRENT_TYPE, "torrent-handle", handle,
-                     "backend", backend, "download-directory", dir, NULL);
-  tr_backend_add_torrent(TR_BACKEND(backend), G_OBJECT(ret));
+                     "backend", core, "download-directory", dir, NULL);
   
   g_object_set(ret, "paused", (TR_TORNEW_PAUSED & flags ? TRUE : FALSE), NULL);
 
@@ -341,7 +342,7 @@ tr_torrent_new(GObject *backend, const char *torrent, const char *dir,
 }
 
 TrTorrent *
-tr_torrent_new_with_state( GObject * backend, benc_val_t * state,
+tr_torrent_new_with_state( GObject * core, benc_val_t * state,
                            guint forcedflags, char ** err)
 {
   int ii;
@@ -395,7 +396,7 @@ tr_torrent_new_with_state( GObject * backend, benc_val_t * state,
       flags |= forcedflags;
   }
 
-  return tr_torrent_new(backend, torrent, dir, flags, err);
+  return tr_torrent_new( core, torrent, dir, flags, err );
 }
 
 #define SETSTRVAL(vv, ss) \
