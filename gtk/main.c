@@ -42,6 +42,7 @@
 #include "msgwin.h"
 #include "tr_backend.h"
 #include "tr_cell_renderer_progress.h"
+#include "tr_core.h"
 #include "tr_icon.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
@@ -67,7 +68,7 @@
 struct cbdata {
     TrBackend    * back;
     GtkWindow    * wind;
-    GtkTreeModel * model;
+    TrCore       * core;
     TrIcon       * icon;
     TrPrefs      * prefs;
     guint          timer;
@@ -371,32 +372,14 @@ gtksetup( int * argc, char *** argv )
 static void
 appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
 {
-    GType types[] =
-    {
-        /* info->name, info->totalSize, status,     error,      errorString, */
-        G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING,
-        /* progress,  rateDownload, rateUpload,   eta,        peersTotal, */
-        G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_INT, G_TYPE_INT,
-        /* peersUploading, peersDownloading, seeders,    leechers */
-        G_TYPE_INT,        G_TYPE_INT,       G_TYPE_INT, G_TYPE_INT,
-        /* completedFromTracker, downloaded,    uploaded       left */
-        G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_UINT64,
-        /* tracker,            the TrTorrent object */
-        TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,
-    };
     struct cbdata * cbdata;
-    GtkListStore  * store;
     guint           flags;
-
-    /* create the model used to store torrent data */
-    g_assert( ALEN( types ) == MC_ROW_COUNT );
-    store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     /* fill out cbdata */
     cbdata = g_new0( struct cbdata, 1 );
     cbdata->back       = tr_backend_new();
     cbdata->wind       = NULL;
-    cbdata->model      = GTK_TREE_MODEL(store);
+    cbdata->core       = tr_core_new();
     cbdata->icon       = NULL;
     cbdata->prefs      = NULL;
     cbdata->timer      = 0;
@@ -445,7 +428,7 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
                               gettext( actions[ii].tooltip ),
                               actions[ii].key );
     }
-    g_object_set( wind, "model", cbdata->model,
+    g_object_set( wind, "model", tr_core_model( cbdata->core ),
                         "double-click-action", ACT_INFO, NULL);
 
     g_signal_connect( wind, "action",       G_CALLBACK( windact  ), cbdata );
@@ -523,6 +506,7 @@ wannaquit( void * vdata )
 {
   struct cbdata * data;
   struct exitdata *edata;
+  GtkTreeModel * model;
   GtkTreeIter iter;
   TrTorrent *tor;
 
@@ -544,10 +528,14 @@ wannaquit( void * vdata )
     because a reference is added when a torrent is removed
     from the model and tr_torrent_stop_polite() is called on it.
   */
-  if(gtk_tree_model_get_iter_first(data->model, &iter)) {
-    do
-      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
-    while(gtk_tree_model_iter_next(data->model, &iter));
+  model = tr_core_model( data->core );
+  if( gtk_tree_model_get_iter_first( model, &iter) )
+  {
+      do
+      {
+          gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1 );
+      }
+      while( gtk_tree_model_iter_next( model, &iter ) );
   }
 
   /* try to politely stop all the torrents */
@@ -616,7 +604,7 @@ exitcheck( gpointer gdata )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
     }
-    g_object_unref( cbdata->model );
+    g_object_unref( cbdata->core );
     if( NULL != cbdata->icon )
     {
         g_object_unref( cbdata->icon );
@@ -826,6 +814,7 @@ setpex( tr_torrent_t * tor, void * arg )
 gboolean
 updatemodel(gpointer gdata) {
   struct cbdata *data = gdata;
+  GtkTreeModel * model;
   TrTorrent *tor;
   tr_stat_t *st;
   GtkTreeIter iter;
@@ -837,13 +826,15 @@ updatemodel(gpointer gdata) {
       return FALSE;
   }
 
-  if(gtk_tree_model_get_iter_first(data->model, &iter)) {
+  model = tr_core_model( data->core );
+  if( gtk_tree_model_get_iter_first( model, &iter ) )
+  {
     do {
-      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor, -1);
+      gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1);
       st = tr_torrent_stat(tor);
       g_object_unref(tor);
       /* XXX find out if setting the same data emits changed signal */
-      gtk_list_store_set( GTK_LIST_STORE( data->model ), &iter,
+      gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
           MC_STAT,   st->status,               MC_ERR,     st->error,
           MC_TERR,   st->errorString,          MC_PROG,    st->progress,
           MC_DRATE,  st->rateDownload,         MC_URATE,   st->rateUpload,
@@ -853,7 +844,8 @@ updatemodel(gpointer gdata) {
           MC_DONE,   st->completedFromTracker, MC_TRACKER, st->tracker,
           MC_DOWN,   st->downloaded,           MC_UP,      st->uploaded,
           MC_LEFT,   st->left, -1);
-    } while(gtk_tree_model_iter_next(data->model, &iter));
+    }
+    while( gtk_tree_model_iter_next( model, &iter ) );
   }
 
   /* update the main window's statusbar and toolbar buttons */
@@ -905,7 +897,7 @@ getselection( struct cbdata * cbdata )
     rows = gtk_tree_selection_get_selected_rows( sel, NULL );
     for( ii = rows; NULL != ii; ii = ii->next )
     {
-        ref = gtk_tree_row_reference_new( cbdata->model, ii->data );
+        ref = gtk_tree_row_reference_new( tr_core_model( cbdata->core ), ii->data );
         gtk_tree_path_free( ii->data );
         ii->data = ref;
     }
@@ -917,6 +909,7 @@ static void
 handleaction( struct cbdata * data, int act )
 {
   GList *rows, *ii;
+  GtkTreeModel * model;
   GtkTreePath *path;
   GtkTreeIter iter;
   TrTorrent *tor;
@@ -979,12 +972,14 @@ handleaction( struct cbdata * data, int act )
   /* get a list of references to selected rows */
   rows = getselection( data );
 
+  model = tr_core_model( data->core );
   changed = FALSE;
   for(ii = rows; NULL != ii; ii = ii->next) {
     if(NULL != (path = gtk_tree_row_reference_get_path(ii->data)) &&
-       gtk_tree_model_get_iter(data->model, &iter, path)) {
-      gtk_tree_model_get(data->model, &iter, MC_TORRENT, &tor,
-                         MC_STAT, &status, -1);
+       gtk_tree_model_get_iter( model, &iter, path ) )
+    {
+      gtk_tree_model_get( model , &iter, MC_TORRENT, &tor,
+                          MC_STAT, &status, -1 );
       if( ACT_ISAVAIL( actions[act].flags, status ) )
 
       {
@@ -1006,12 +1001,11 @@ handleaction( struct cbdata * data, int act )
                   {
                       tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
                   }
-                  gtk_list_store_remove( GTK_LIST_STORE( data->model ),
-                                         &iter );
+                  gtk_list_store_remove( GTK_LIST_STORE( model ), &iter );
                   changed = TRUE;
                   break;
               case ACT_INFO:
-                  makeinfowind( data->wind, data->model, path, tor );
+                  makeinfowind( data->wind, model, path, tor );
                   break;
               case ACT_OPEN:
               case ACT_PREF:
@@ -1047,6 +1041,7 @@ addtorrents(void *vdata, void *state, GList *files,
   GList *torlist, *errlist, *ii;
   char *errstr;
   TrTorrent *tor;
+  GtkTreeModel * model;
   GtkTreeIter iter;
   const char * pref;
   tr_info_t *in;
@@ -1081,11 +1076,12 @@ addtorrents(void *vdata, void *state, GList *files,
     }
   }
 
+  model = tr_core_model( data->core );
   for( ii = g_list_first( torlist ); NULL != ii; ii = ii->next )
   {
-      gtk_list_store_append( GTK_LIST_STORE( data->model ), &iter );
+      gtk_list_store_append( GTK_LIST_STORE( model ), &iter );
       in = tr_torrent_info( ii->data );
-      gtk_list_store_set( GTK_LIST_STORE( data->model ), &iter,
+      gtk_list_store_set( GTK_LIST_STORE( model ), &iter,
                           MC_NAME,    in->name,
                           MC_SIZE,    in->totalSize,
                           MC_TORRENT, ii->data, -1);

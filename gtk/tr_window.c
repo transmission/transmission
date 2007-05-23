@@ -30,6 +30,7 @@
 #include "transmission.h"
 
 #include "tr_cell_renderer_progress.h"
+#include "tr_core.h"
 #include "tr_torrent.h"
 #include "tr_window.h"
 #include "util.h"

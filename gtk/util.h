@@ -61,14 +61,6 @@ typedef void (*callbackfunc_t)(void*);
       ( ACTF_INACTIVE & (flags) && TR_STATUS_INACTIVE & (status) ) || \
         ACTF_ALWAYS   & (flags) )
 
-/* column names for the model used to store torrent information */
-enum {
-  MC_NAME, MC_SIZE, MC_STAT, MC_ERR, MC_TERR,
-  MC_PROG, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
-  MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
-  MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ROW_COUNT,
-};
-
 /* try to interpret a string as a textual representation of a boolean */
 /* note that this isn't localized */
 gboolean
