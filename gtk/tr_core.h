@@ -66,6 +66,17 @@ struct _TrCore
 struct _TrCoreClass
 {
     GObjectClass        parent;
+    /* "error" signal:
+       void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
+    int                 errsig;
+};
+
+enum tr_core_err
+{
+    TR_CORE_ERR_ADD_TORRENT,    /* adding a torrent failed */
+    /* no more torrents to be added, used for grouping torrent add errors */
+    TR_CORE_ERR_NO_MORE_TORRENTS,
+    TR_CORE_ERR_SAVE_STATE      /* error saving state */
 };
 
 GType
@@ -90,22 +101,24 @@ tr_core_shutdown( TrCore * self );
 gboolean
 tr_core_quiescent( TrCore * self );
 
-/* Save state. If error is not NULL is will be set to any error which
-   occurs, this must be freed. */
+/* Save state. May trigger "error" signal with TR_CORE_ERR_SAVE_STATE */
 void
-tr_core_save( TrCore * self, char ** error );
+tr_core_save( TrCore * self );
 
-/* Load saved state, return number of torrents added. If errors is not
-   NULL then a char* is appended for each error which occurs, these
-   must be freed. */
+/* Load saved state, return number of torrents added. May trigger one
+   or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
-tr_core_load( TrCore * self, benc_val_t * state, GList ** errors );
+tr_core_load( TrCore * self, benc_val_t * state );
 
-/* Add a torrent. Torrent, dir, flags, and err arguments are the same
-   as tr_torrent_new() */
+/* Add a torrent. Torrent, dir and flags arguments are the same as
+   tr_torrent_new(). May trigger "error" signal with TR_CORE_ERR_ADD_TORRENT */
 gboolean
 tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
-                     guint flags, char ** err );
+                     guint flags );
+
+/* Trigger "error" signal with TR_CORE_ERR_NO_MORE_TORRENTS */
+void
+tr_core_torrents_added( TrCore * self );
 
 /* remove a torrent, waiting for it to pause if necessary */
 void

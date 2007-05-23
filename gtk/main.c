@@ -72,6 +72,7 @@ struct cbdata {
     guint          timer;
     gboolean       msgwinopen;
     gboolean       closing;
+    GList        * errqueue;
 };
 
 struct exitdata {
@@ -164,6 +165,9 @@ gotdrag(GtkWidget *widget, GdkDragContext *dc, gint x, gint y,
         GtkSelectionData *sel, guint info, guint time, gpointer gdata);
 
 static void
+coreerr( TrCore * core, enum tr_core_err code, const char * msg,
+         gpointer gdata );
+static void
 readinitialprefs( struct cbdata * cbdata );
 static void
 prefschanged( GtkWidget * widget, int id, gpointer data );
@@ -183,8 +187,6 @@ handleaction( struct cbdata *data, int action );
 static void
 addtorrents(void *vdata, void *state, GList *files,
             const char *dir, guint flags);
-static void
-savetorrents(struct cbdata *data);
 static void
 safepipe(void);
 static void
@@ -382,6 +384,10 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     cbdata->timer      = 0;
     cbdata->msgwinopen = FALSE;
     cbdata->closing    = FALSE;
+    cbdata->errqueue   = NULL;
+
+    /* set up error message handler */
+    g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
 
     /* apply a few prefs */
     readinitialprefs( cbdata );
@@ -575,6 +581,11 @@ exitcheck( gpointer gdata )
         g_object_unref( cbdata->icon );
     }
     g_assert( 0 == cbdata->timer );
+    if( NULL != cbdata->errqueue )
+    {
+        g_list_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
+        g_list_free( cbdata->errqueue );
+    }
     g_free( cbdata );
     gtk_main_quit();
 
@@ -677,6 +688,42 @@ setupdrag(GtkWidget *widget, struct cbdata *data) {
 
   gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL, targets,
                     ALEN(targets), GDK_ACTION_COPY | GDK_ACTION_MOVE);
+}
+
+static void
+coreerr( TrCore * core SHUTUP, enum tr_core_err code, const char * msg,
+         gpointer gdata )
+{
+    struct cbdata * cbdata = gdata;
+    char          * joined;
+
+    switch( code )
+    {
+        case TR_CORE_ERR_ADD_TORRENT:
+            cbdata->errqueue = g_list_append( cbdata->errqueue,
+                                              g_strdup( msg ) );
+            return;
+        case TR_CORE_ERR_NO_MORE_TORRENTS:
+            if( NULL != cbdata->errqueue )
+            {
+                joined = joinstrlist( cbdata->errqueue, "\n" );
+                errmsg( cbdata->wind,
+                        ngettext( "Failed to load torrent file:\n%s",
+                                  "Failed to load torrent files:\n%s",
+                                  g_list_length( cbdata->errqueue ) ),
+                        joined );
+                g_list_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
+                g_list_free( cbdata->errqueue );
+                cbdata->errqueue = NULL;
+                g_free( joined );
+            }
+            return;
+        case TR_CORE_ERR_SAVE_STATE:
+            errmsg( cbdata->wind, "%s", msg );
+            return;
+    }
+
+    g_assert_not_reached();
 }
 
 static void
@@ -958,8 +1005,8 @@ handleaction( struct cbdata * data, int act )
   g_list_free(rows);
 
   if(changed) {
-    savetorrents(data);
     updatemodel(data);
+    tr_core_save( data->core );
   }
 }
 
@@ -967,17 +1014,14 @@ static void
 addtorrents(void *vdata, void *state, GList *files,
             const char *dir, guint flags) {
   struct cbdata *data = vdata;
-  GList *errlist, *ii;
-  char *errstr;
   const char * pref;
   int added;
 
-  errlist = NULL;
   added   = 0;
 
   if( NULL != state )
   {
-      added += tr_core_load( data->core, state, &errlist );
+      added += tr_core_load( data->core, state );
   }
 
   if(NULL != files) {
@@ -991,45 +1035,22 @@ addtorrents(void *vdata, void *state, GList *files,
         }
         dir = getdownloaddir();
     }
-    for(ii = g_list_first(files); NULL != ii; ii = ii->next) {
-      errstr = NULL;
-      if( tr_core_add_torrent( data->core, ii->data, dir, flags, &errstr ) )
+    for( files = g_list_first( files ); NULL != files; files = files->next )
+    {
+      if( tr_core_add_torrent( data->core, files->data, dir, flags ) )
       {
           added++;
       }
-      if(NULL != errstr)
-        errlist = g_list_append(errlist, errstr);
     }
   }
 
-  if(NULL != errlist) {
-    errstr = joinstrlist(errlist, "\n");
-    errmsg( data->wind, ngettext( "Failed to load torrent file:\n%s",
-                                  "Failed to load torrent files:\n%s",
-                                  g_list_length( errlist ) ), errstr );
-    g_list_foreach(errlist, (GFunc)g_free, NULL);
-    g_list_free(errlist);
-    g_free(errstr);
-  }
+  tr_core_torrents_added( data->core );
 
   if( 0 < added )
   {
     updatemodel(data);
-    savetorrents(data);
+    tr_core_save( data->core );
   }
-}
-
-static void
-savetorrents( struct cbdata *data )
-{
-    char * errstr;
-
-    tr_core_save( data->core, &errstr );
-    if( NULL != errstr )
-    {
-        errmsg( data->wind, "%s", errstr );
-        g_free( errstr );
-    }
 }
 
 static void

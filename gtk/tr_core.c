@@ -43,6 +43,9 @@ tr_core_init( GTypeInstance * instance, gpointer g_class );
 static void
 tr_core_class_init( gpointer g_class, gpointer g_class_data );
 static void
+tr_core_marshal_err( GClosure * closure, GValue * ret, guint count,
+                     const GValue * vals, gpointer hint, gpointer marshal );
+static void
 tr_core_dispose( GObject * obj );
 static int
 tr_core_check_torrents( TrCore * self );
@@ -50,6 +53,8 @@ static int
 tr_core_check_zombies( TrCore * self );
 static void
 tr_core_insert( TrCore * self, TrTorrent * tor );
+static void
+tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg );
 
 GType
 tr_core_get_type( void )
@@ -81,9 +86,41 @@ void
 tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
 {
     GObjectClass * gobject_class;
+    TrCoreClass  * core_class;
 
     gobject_class = G_OBJECT_CLASS( g_class );
     gobject_class->dispose = tr_core_dispose;
+
+    core_class = TR_CORE_CLASS( g_class );
+    core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
+                                       G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                       tr_core_marshal_err, G_TYPE_NONE,
+                                       2, G_TYPE_INT, G_TYPE_STRING );
+}
+
+void
+tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
+                     const GValue * vals, gpointer hint SHUTUP,
+                     gpointer marshal )
+{
+    typedef void (*TRMarshalErr) ( gpointer, enum tr_core_err, const char *,
+                                   gpointer );
+    TRMarshalErr     callback;
+    GCClosure      * cclosure = (GCClosure*) closure;
+    enum tr_core_err errcode;
+    const char     * errstr;
+    gpointer         inst, gdata;
+
+    g_return_if_fail( 3 == count );
+
+    inst    = g_value_peek_pointer( vals );
+    errcode = g_value_get_int( vals + 1 );
+    errstr  = g_value_get_string( vals + 2 );
+    gdata   = closure->data;
+
+    callback = (TRMarshalErr) ( NULL == marshal ?
+                                cclosure->callback : marshal );
+    callback( inst, errcode, errstr, gdata );
 }
 
 void
@@ -325,12 +362,14 @@ tr_core_check_zombies( TrCore * self )
 }
 
 void
-tr_core_save( TrCore * self, char ** error )
+tr_core_save( TrCore * self )
 {
-    benc_val_t  state;
+    benc_val_t  state, * item;
     int         count;
     GtkTreeIter iter;
     TrTorrent * tor;
+    char      * errstr;
+    GList     * saved, * ii;
 
     TR_IS_CORE( self );
 
@@ -346,41 +385,54 @@ tr_core_save( TrCore * self, char ** error )
     tr_bencInit( &state, TYPE_LIST );
     if( tr_bencListReserve( &state, count ) )
     {
-        if( NULL != error )
-        {
-            *error = g_strdup( "malloc failure" );
-        }
+        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, "malloc failure" );
         return;
     }
 
+    saved = NULL;
     if( gtk_tree_model_get_iter_first( self->model, &iter) )
     {
         do
         {
+            item = tr_bencListAdd( &state );
             gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            tr_torrent_get_state( tor, tr_bencListAdd( &state ) );
+            if( tr_torrent_get_state( tor, item ) )
+            {
+                saved = g_list_append( saved, tor );
+            }
+            else
+            {
+                tr_bencFree( item );
+                tr_bencInitStr( item, NULL, 0, 1 );
+            }
             g_object_unref( tor );
         }
         while( gtk_tree_model_iter_next( self->model, &iter ) );
     }
 
-    cf_savestate( &state, error );
+    errstr = NULL;
+    cf_savestate( &state, &errstr );
     tr_bencFree( &state );
-
-    if( gtk_tree_model_get_iter_first( self->model, &iter) )
+    if( NULL != errstr )
     {
-        do
+        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, errstr );
+        g_free( errstr );
+    }
+    else
+    {
+        for( ii = saved; NULL != ii; ii = ii->next )
         {
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            tr_torrent_state_saved( tor );
-            g_object_unref( tor );
+            tr_torrent_state_saved( ii->data );
         }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
+    }
+    if( NULL != saved )
+    {
+        g_list_free( saved );
     }
 }
 
 int
-tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
+tr_core_load( TrCore * self, benc_val_t * state )
 {
     int         ii, count;
     char      * errstr;
@@ -399,12 +451,14 @@ tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
         errstr = NULL;
         tor = tr_torrent_new_with_state( self->handle, state->val.l.vals + ii,
                                          0, &errstr );
-        if( NULL != errstr )
+        if( NULL == tor )
         {
-            *errors = g_list_append( *errors, errstr );
+            tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
+            g_free( errstr );
         }
-        if( NULL != tor )
+        else
         {
+            g_assert( NULL == errstr );
             tr_core_insert( self, tor );
             count++;
         }
@@ -415,21 +469,34 @@ tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
 
 gboolean
 tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
-                     guint flags, char ** err )
+                     guint flags )
 {
     TrTorrent * tor;
+    char      * errstr;
 
     TR_IS_CORE( self );
 
-    tor = tr_torrent_new( self->handle, torrent, dir, flags, err );
+    errstr = NULL;
+    tor = tr_torrent_new( self->handle, torrent, dir, flags, &errstr );
     if( NULL == tor )
     {
+        tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
+        g_free( errstr );
         return FALSE;
     }
+    g_assert( NULL == errstr );
 
     tr_core_insert( self, tor );
 
     return TRUE;
+}
+
+void
+tr_core_torrents_added( TrCore * self )
+{
+    TR_IS_CORE( self );
+
+    tr_core_errsig( self, TR_CORE_ERR_NO_MORE_TORRENTS, NULL );
 }
 
 void
@@ -522,4 +589,13 @@ tr_core_update( TrCore * self )
     {
         tr_core_check_zombies( self );
     }
+}
+
+void
+tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
+{
+    TrCoreClass * class;
+
+    class = g_type_class_peek( TR_CORE_TYPE );
+    g_signal_emit( self, class->errsig, 0, type, msg );
 }

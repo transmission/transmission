@@ -96,8 +96,8 @@ TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * handle, benc_val_t * state,
                            guint flags, char ** err );
 
-void
-tr_torrent_get_state(TrTorrent *tor, benc_val_t *state);
+gboolean
+tr_torrent_get_state( TrTorrent * tor, benc_val_t * state );
 
 void
 tr_torrent_state_saved(TrTorrent *tor);

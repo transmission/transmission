@@ -401,38 +401,42 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
   return tr_torrent_new( back, torrent, dir, flags, err );
 }
 
-#define SETSTRVAL(vv, ss) \
-  do { \
-    (vv)->type = TYPE_STR; \
-    (vv)->val.s.s = g_strdup((ss)); \
-    (vv)->val.s.i = strlen((ss)); \
-  } while(0)
+gboolean
+tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
+{
+    tr_info_t  * inf;
 
-void
-tr_torrent_get_state(TrTorrent *tor, benc_val_t *state) {
-  tr_info_t *in = tr_torrentInfo(tor->handle);
+    TR_IS_TORRENT( tor );
 
-  TR_IS_TORRENT(tor);
+    if( tor->severed )
+    {
+        return FALSE;
+    }
 
-  if(tor->severed)
-    return;
+    inf = tr_torrentInfo( tor->handle );
 
-  state->type = TYPE_DICT;
-  state->val.l.vals = g_new0(benc_val_t, 6);
-  state->val.l.alloc = state->val.l.count = 6;
+    tr_bencInit( state, TYPE_DICT );
+    if( tr_bencDictReserve( state, 3 ) )
+    {
+        return FALSE;
+    }
 
-  if(TR_FLAG_SAVE & in->flags) {
-    SETSTRVAL(state->val.l.vals + 0, "hash");
-    SETSTRVAL(state->val.l.vals + 1, in->hashString);
-  } else {
-    SETSTRVAL(state->val.l.vals + 0, "torrent");
-    SETSTRVAL(state->val.l.vals + 1, in->torrent);
-  }
-  SETSTRVAL(state->val.l.vals + 2, "dir");
-  SETSTRVAL(state->val.l.vals + 3, tr_torrentGetFolder(tor->handle));
-  SETSTRVAL(state->val.l.vals + 4, "paused");
-  state->val.l.vals[5].type = TYPE_INT;
-  state->val.l.vals[5].val.i = tr_torrent_paused(tor);
+    if( TR_FLAG_SAVE & inf->flags )
+    {
+        tr_bencInitStr( tr_bencDictAdd( state, "hash" ),
+                        inf->hashString, -1, 1 );
+    }
+    else
+    {
+        tr_bencInitStr( tr_bencDictAdd( state, "torrent" ),
+                        inf->torrent, -1, 1 );
+    }
+    tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
+                    tr_torrentGetFolder( tor->handle ), -1, 1 );
+    tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
+                    ( tr_torrent_paused( tor ) ? 1 : 0 ) );
+
+    return TRUE;
 }
 
 /* XXX this should probably be done with a signal */
