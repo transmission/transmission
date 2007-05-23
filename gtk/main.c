@@ -40,7 +40,6 @@
 #include "dialogs.h"
 #include "ipc.h"
 #include "msgwin.h"
-#include "tr_backend.h"
 #include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
 #include "tr_icon.h"
@@ -66,7 +65,6 @@
 #define SIGCOUNT_MAX            3
 
 struct cbdata {
-    TrBackend    * back;
     GtkWindow    * wind;
     TrCore       * core;
     TrIcon       * icon;
@@ -377,7 +375,6 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
 
     /* fill out cbdata */
     cbdata = g_new0( struct cbdata, 1 );
-    cbdata->back       = tr_backend_new();
     cbdata->wind       = NULL;
     cbdata->core       = tr_core_new();
     cbdata->icon       = NULL;
@@ -506,9 +503,6 @@ wannaquit( void * vdata )
 {
   struct cbdata * data;
   struct exitdata *edata;
-  GtkTreeModel * model;
-  GtkTreeIter iter;
-  TrTorrent *tor;
 
   data = vdata;
   if( data->closing )
@@ -522,27 +516,8 @@ wannaquit( void * vdata )
     g_source_remove(data->timer);
   data->timer = 0;
 
-  /*
-    Add a reference to all torrents in the list, which will be removed
-    when the politely-stopped signal is emitted.  This is necessary
-    because a reference is added when a torrent is removed
-    from the model and tr_torrent_stop_polite() is called on it.
-  */
-  model = tr_core_model( data->core );
-  if( gtk_tree_model_get_iter_first( model, &iter) )
-  {
-      do
-      {
-          gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1 );
-      }
-      while( gtk_tree_model_iter_next( model, &iter ) );
-  }
-
-  /* try to politely stop all the torrents */
-  tr_backend_stop_torrents(data->back);
-
-  /* shut down nat traversal */
-  tr_natTraversalEnable(tr_backend_handle(data->back), 0);
+  /* pause torrents and stop nat traversal */
+  tr_core_quit( data->core );
 
   /* set things up to wait for torrents to stop */
   edata = g_new0(struct exitdata, 1);
@@ -564,18 +539,14 @@ exitcheck( gpointer gdata )
 {
     struct exitdata    * edata;
     struct cbdata      * cbdata;
-    tr_handle_status_t * hstat;
 
     edata  = gdata;
     cbdata = edata->cbdata;
-    hstat  = tr_handleStatus( tr_backend_handle( cbdata->back ) );
 
-    /* keep going if we haven't hit the exit timeout and
-       we either have torrents left or nat traversal is active */
+    /* keep waiting until we're ready to quit or we hit the exit timeout */
     if( time( NULL ) - edata->started < TRACKER_EXIT_TIMEOUT )
     {
-        if( !tr_backend_torrents_stopped( cbdata->back, FALSE ) ||
-            TR_NAT_TRAVERSAL_DISABLED != hstat->natTraversalStatus )
+        if( !tr_core_did_quit( cbdata->core ) )
         {
             updatemodel( cbdata );
             return TRUE;
@@ -583,8 +554,8 @@ exitcheck( gpointer gdata )
     }
     else
     {
-        /* time the remaining torrents out so they signal politely-stopped */
-        tr_backend_torrents_stopped( cbdata->back, TRUE );
+        /* oh well */
+        tr_core_force_quit( cbdata->core );
     }
 
     /* exit otherwise */
@@ -594,12 +565,11 @@ exitcheck( gpointer gdata )
     }
     g_free( edata );
     /* The prefs window need to be destroyed first as destroying it may
-       trigger callbacks that use cbdata->back. Ick. */
+       trigger callbacks that use cbdata->core. Ick. */
     if( NULL != cbdata->prefs )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
     }
-    g_object_unref( G_OBJECT( cbdata->back ) );
     if( NULL != cbdata->wind )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
@@ -743,7 +713,7 @@ prefschanged( GtkWidget * widget SHUTUP, int id, gpointer data )
     gboolean        boolval;
 
     cbdata = data;
-    tr     = tr_backend_handle( cbdata->back );
+    tr     = tr_core_handle( cbdata->core );
 
     switch( id )
     {
@@ -851,14 +821,14 @@ updatemodel(gpointer gdata) {
   /* update the main window's statusbar and toolbar buttons */
   if( NULL != data->wind )
   {
-      tr_torrentRates( tr_backend_handle( data->back ), &down, &up );
+      tr_torrentRates( tr_core_handle( data->core ), &down, &up );
       tr_window_update( TR_WINDOW( data->wind ), down, up );
   }
 
   /* check for politely stopped torrents unless we're exiting */
   if( !data->closing )
   {
-      tr_backend_torrents_stopped( data->back, FALSE );
+      tr_core_reap( data->core );
   }
 
   /* update the message window */
@@ -1051,7 +1021,7 @@ addtorrents(void *vdata, void *state, GList *files,
 
   if( NULL != state )
   {
-      torlist = tr_backend_load_state( data->back, state, flags, &errlist );
+      torlist = tr_core_load( data->core, state, &errlist );
   }
 
   if(NULL != files) {
@@ -1067,8 +1037,7 @@ addtorrents(void *vdata, void *state, GList *files,
     }
     for(ii = g_list_first(files); NULL != ii; ii = ii->next) {
       errstr = NULL;
-      tor = tr_torrent_new(G_OBJECT(data->back), ii->data, dir,
-                           flags, &errstr);
+      tor = tr_core_new_torrent( data->core, ii->data, dir, flags, &errstr);
       if(NULL != tor)
         torlist = g_list_append(torlist, tor);
       if(NULL != errstr)
@@ -1112,7 +1081,7 @@ savetorrents( struct cbdata *data )
 {
     char * errstr;
 
-    tr_backend_save_state( data->back, &errstr );
+    tr_core_save( data->core, &errstr );
     if( NULL != errstr )
     {
         errmsg( data->wind, "%s", errstr );

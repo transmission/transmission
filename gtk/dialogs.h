@@ -25,16 +25,8 @@
 #ifndef TG_PREFS_H
 #define TG_PREFS_H
 
-#include "tr_backend.h"
 #include "tr_torrent.h"
 #include "util.h"
-
-GtkWidget *
-makeprefwindow(GtkWindow *parent, TrBackend *back);
-
-/* set various things based on saved prefs */
-void
-applyprefs(TrBackend *back);
 
 /* show the "add a torrent" dialog */
 void

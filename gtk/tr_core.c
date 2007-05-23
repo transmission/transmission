@@ -27,6 +27,9 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include "bencode.h"
+
+#include "tr_backend.h"
 #include "tr_core.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -100,6 +103,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
 
     self->model    = GTK_TREE_MODEL( store );
+    self->backend  = tr_backend_new();
+    self->quitting = FALSE;
     self->disposed = FALSE;
 }
 
@@ -116,6 +121,7 @@ tr_core_dispose( GObject * obj )
     self->disposed = TRUE;
 
     g_object_unref( self->model );
+    g_object_unref( self->backend );
 
     /* Chain up to the parent class */
     parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
@@ -134,4 +140,103 @@ tr_core_model( TrCore * self )
     TR_IS_CORE( self );
 
     return self->model;
+}
+
+tr_handle_t *
+tr_core_handle( TrCore * self )
+{
+    TR_IS_CORE( self );
+
+    return tr_backend_handle( self->backend );
+}
+
+void
+tr_core_quit( TrCore * self )
+{
+    GtkTreeIter iter;
+    TrTorrent * tor;
+
+    TR_IS_CORE( self );
+
+    g_assert( !self->quitting );
+    self->quitting = TRUE;
+
+    /*
+      Add a reference to all torrents in the list, which will be
+      removed when the politely-stopped signal is emitted. This is
+      necessary because a reference is added when a torrent is removed
+      from the model and tr_torrent_stop_polite() is called on it.
+    */
+    if( gtk_tree_model_get_iter_first( self->model, &iter) )
+    {
+        do
+        {
+            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+        }
+        while( gtk_tree_model_iter_next( self->model, &iter ) );
+    }
+
+    /* try to politely stop all the torrents */
+    tr_backend_stop_torrents( self->backend );
+
+    /* shut down nat traversal */
+    tr_natTraversalEnable( tr_backend_handle( self->backend ), 0 );
+}
+
+gboolean
+tr_core_did_quit( TrCore * self )
+{
+    tr_handle_status_t * hstat;
+
+    TR_IS_CORE( self );
+    g_assert( self->quitting );
+
+    hstat = tr_handleStatus( tr_backend_handle( self->backend ) );
+
+    return ( tr_backend_torrents_stopped( self->backend, FALSE ) &&
+             TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus );
+}
+
+void
+tr_core_force_quit( TrCore * self )
+{
+    TR_IS_CORE( self );
+    g_assert( self->quitting );
+
+    /* time the remaining torrents out so they signal politely-stopped */
+    tr_backend_torrents_stopped( self->backend, TRUE );
+}
+
+void
+tr_core_reap( TrCore * self )
+{
+    TR_IS_CORE( self );
+
+    tr_backend_torrents_stopped( self->backend, FALSE );
+}
+
+GList *
+tr_core_load( TrCore * self, benc_val_t * state, GList ** errors )
+{
+    TR_IS_CORE( self );
+
+    return tr_backend_load_state( self->backend, state, 0, errors );
+}
+
+void
+tr_core_save( TrCore * self, char ** error )
+{
+    TR_IS_CORE( self );
+
+    tr_backend_save_state( self->backend, error );
+}
+
+TrTorrent *
+tr_core_new_torrent( TrCore * self, const char * torrent, const char * dir,
+                     guint flags, char ** err )
+{
+    TR_IS_CORE( self );
+
+    return tr_torrent_new( G_OBJECT( self->backend ),
+                           torrent, dir, flags, err );
 }
