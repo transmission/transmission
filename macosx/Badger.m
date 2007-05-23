@@ -80,8 +80,11 @@
     {
         fCompletedBadged = fCompleted;
         
+        //force image to reload - copy does not work
+        NSSize iconSize = [fDockIcon size];
         [fDockIcon release];
-        fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
+        fDockIcon = [[NSImage alloc] initWithSize: iconSize];
+        [fDockIcon addRepresentation: [[NSImage imageNamed: @"NSApplicationIcon"] bestRepresentationForDevice: nil]];
         
         if (fCompleted > 0)
         {
