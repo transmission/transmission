@@ -34,12 +34,15 @@
 
     NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
     NSDictionary    * fAttributes;
-    int             fCompleted;
+    int             fCompleted, fCompletedBadged;
     BOOL            fSpeedBadge;
 }
 
 - (id) initWithLib: (tr_handle_t *) lib;
-- (void) updateBadgeWithCompleted: (int) completed;
+
+- (void) updateBadge;
+- (void) incrementCompleted;
+- (void) clearCompleted;
 - (void) clearBadge;
 
 @end

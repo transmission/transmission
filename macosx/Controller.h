@@ -42,7 +42,6 @@
 @interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
     tr_handle_t                     * fLib;
-    int                             fCompleted;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     
@@ -200,7 +199,7 @@
 
 - (void) doNothing: (id) sender; //needed for menu items that use bindings with no associated action
 
-- (void) resetDockBadge: (NSNotification *) notification;
+- (void) updateDockBadge: (NSNotification *) notification;
 
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;

@@ -58,6 +58,7 @@
         [stringShadow release];
         
         fCompleted = 0;
+        fCompletedBadged = 0;
         fSpeedBadge = NO;
     }
     
@@ -71,18 +72,18 @@
     [super dealloc];
 }
 
-- (void) updateBadgeWithCompleted: (int) completed
+- (void) updateBadge
 {
     //set completed badge to top right
     BOOL baseChange;
-    if (baseChange = (fCompleted != completed))
+    if (baseChange = (fCompleted != fCompletedBadged))
     {
-        fCompleted = completed;
+        fCompletedBadged = fCompleted;
         
         [fDockIcon release];
         fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         
-        if (completed > 0)
+        if (fCompleted > 0)
         {
             NSRect badgeRect;
             NSSize iconSize = [fDockIcon size];
@@ -101,7 +102,7 @@
             badgeRect.origin.y += badgeBottomExtra;
             
             //place badge text
-            [self badgeString: [NSString stringWithInt: completed] forRect: badgeRect];
+            [self badgeString: [NSString stringWithInt: fCompleted] forRect: badgeRect];
                         
             [fDockIcon unlockFocus];
         }
@@ -182,10 +183,26 @@
     }
 }
 
+- (void) incrementCompleted
+{
+    fCompleted++;
+    [self updateBadge];
+}
+
+- (void) clearCompleted
+{
+    if (fCompleted != 0)
+    {
+        fCompleted = 0;
+        [self updateBadge];
+    }
+}
+
 - (void) clearBadge
 {
-    [NSApp setApplicationIconImage: [NSImage imageNamed: @"NSApplicationIcon"]];
     fCompleted = 0;
+    fCompletedBadged = 0;
+    [NSApp setApplicationIconImage: [NSImage imageNamed: @"NSApplicationIcon"]];
 }
 
 @end

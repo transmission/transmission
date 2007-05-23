@@ -394,11 +394,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                     name: @"UpdateQueue" object: nil];
     
     //change that just impacts the dock badge
-    [nc addObserver: self selector: @selector(resetDockBadge:)
+    [nc addObserver: self selector: @selector(updateDockBadge:)
                     name: @"DockBadgeChange" object: nil];
 
     //timer to update the interface every second
-    fCompleted = 0;
     [self updateUI];
     fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_UI_SECONDS target: self
         selector: @selector(updateUI) userInfo: nil repeats: YES];
@@ -1326,7 +1325,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fInfoController updateInfoStats];
 
     //badge dock
-    [fBadger updateBadgeWithCompleted: fCompleted];
+    [fBadger updateBadge];
 }
 
 - (void) updateTorrentsInQueue
@@ -1423,7 +1422,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                 iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
     
     if (![fWindow isKeyWindow])
-        fCompleted++;
+        [fBadger incrementCompleted];
     
     if ([fDefaults boolForKey: @"QueueSeed"])
     {
@@ -2886,9 +2885,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return fDockMenu;
 }
 
-- (void) resetDockBadge: (NSNotification *) notification
+- (void) updateDockBadge: (NSNotification *) notification
 {
-    [fBadger updateBadgeWithCompleted: fCompleted];
+    [fBadger updateBadge];
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame
@@ -2924,12 +2923,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
 {
-    //reset dock badge for completed
-    if (fCompleted > 0)
-    {
-        fCompleted = 0;
-        [self resetDockBadge: nil];
-    }
+    [fBadger clearCompleted];
 }
 
 - (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
