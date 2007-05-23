@@ -36,8 +36,6 @@
     NSDictionary    * fAttributes;
     int             fCompleted;
     BOOL            fSpeedBadge;
-    
-    NSLock          * fLock;
 }
 
 - (id) initWithLib: (tr_handle_t *) lib;

@@ -59,8 +59,6 @@
         
         fCompleted = 0;
         fSpeedBadge = NO;
-        
-        fLock = [[NSLock alloc] init];
     }
     
     return self;
@@ -70,14 +68,11 @@
 {
     [fDockIcon release];
     [fAttributes release];
-    [fLock release];
     [super dealloc];
 }
 
 - (void) updateBadgeWithCompleted: (int) completed
 {
-    [fLock lock];
-    
     //set completed badge to top right
     BOOL baseChange;
     if (baseChange = (fCompleted != completed))
@@ -185,8 +180,6 @@
         
         fSpeedBadge = speedChange;
     }
-    
-    [fLock unlock];
 }
 
 - (void) clearBadge

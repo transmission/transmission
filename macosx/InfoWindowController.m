@@ -878,7 +878,7 @@
         if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
         {
             #warning different for different sorts
-            //NSLog(@"%@", [[fPeerTable highlightedTableColumn] identifier]);
+            //NSLog(@"%@", [fPeerTable highlightedTableColumn]);
             
             asc = [descriptor ascending];
         }
