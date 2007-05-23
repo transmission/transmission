@@ -782,7 +782,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                     files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
     [torrentPath release];
 
-    tr_torrentClose(fLib, tempTor);
+    tr_torrentClose(tempTor);
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
 }
@@ -1971,7 +1971,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error);
         
         if (tempTor)
-            tr_torrentClose(fLib, tempTor);
+            tr_torrentClose(tempTor);
         else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
             [fAutoImportedNames removeObject: [file lastPathComponent]]; //can try to import later
         else;
@@ -2101,7 +2101,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             int error;
             if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
             {
-                tr_torrentClose(fLib, tempTor);
+                tr_torrentClose(tempTor);
                 
                 [fOverlayWindow setFiles: files];
                 
@@ -2142,7 +2142,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             int error;
             if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
             {
-                tr_torrentClose(fLib, tempTor);
+                tr_torrentClose(tempTor);
                 [filesToOpen addObject: file];
             }
         }

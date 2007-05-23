@@ -98,7 +98,7 @@
                 folder = info->multifile;
             }
             
-            tr_torrentClose(fLib, tempTor);
+            tr_torrentClose(tempTor);
         }
     }
     

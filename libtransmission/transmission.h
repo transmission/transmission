@@ -367,7 +367,7 @@ void tr_torrentRemoveFastResume( tr_torrent_t * tor );
  * Frees memory allocated by tr_torrentInit. If the torrent was running,
  * you must call tr_torrentStop() before closing it.
  **********************************************************************/
-void tr_torrentClose( tr_handle_t *, tr_torrent_t * );
+void tr_torrentClose( tr_torrent_t * );
 
 /***********************************************************************
  * tr_info_s

@@ -642,7 +642,7 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
         st = tr_torrentStat( tor->tor );
         if( TR_STATUS_PAUSE & st->status )
         {
-            tr_torrentClose( gl_handle, tor->tor );
+            tr_torrentClose( tor->tor );
             RB_REMOVE( tortree, &gl_tree, tor );
             RB_REMOVE( hashtree, &gl_hashes, tor );
             free( tor );
@@ -673,7 +673,7 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
             for( tor = RB_MIN( tortree, &gl_tree ); NULL != tor; tor = next )
             {
                 next = RB_NEXT( tortree, &gl_tree, tor );
-                tr_torrentClose( gl_handle, tor->tor );
+                tr_torrentClose( tor->tor );
                 RB_REMOVE( tortree, &gl_tree, tor );
                 RB_REMOVE( hashtree, &gl_hashes, tor );
                 free( tor );

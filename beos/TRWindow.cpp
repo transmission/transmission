@@ -311,7 +311,7 @@ void TRWindow::MessageReceived(BMessage *msg) {
 		
 		// Remove the file from the filesystem.
 		TRTransfer *item = (TRTransfer*)transfers->RemoveItem(index);
-		tr_torrentClose(engine, item->GetTorrent());
+		tr_torrentClose(item->GetTorrent());
 		BEntry *entry = new BEntry(item->GetCachedPath(), true);
 		entry->Remove();
 		delete entry;

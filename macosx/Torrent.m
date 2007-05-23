@@ -183,7 +183,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if (fHandle)
     {
-        tr_torrentClose(fLib, fHandle);
+        tr_torrentClose(fHandle);
         
         if (fDownloadFolder)
             [fDownloadFolder release];

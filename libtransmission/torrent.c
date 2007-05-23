@@ -663,8 +663,9 @@ void tr_torrentRemoveFastResume( tr_torrent_t * tor )
  ***********************************************************************
  * Frees memory allocated by tr_torrentInit.
  **********************************************************************/
-void tr_torrentClose( tr_handle_t * h, tr_torrent_t * tor )
+void tr_torrentClose( tr_torrent_t * tor )
 {
+    tr_handle_t * h = tor->handle;
     tr_info_t * inf = &tor->info;
 
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )

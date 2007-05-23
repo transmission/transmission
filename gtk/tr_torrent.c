@@ -238,7 +238,7 @@ tr_torrent_dispose(GObject *obj) {
   if(NULL != self->handle) {
     if(!tr_torrent_paused(self))
       tr_torrentStop(self->handle);
-    tr_torrentClose( tr_core_handle( TR_CORE( self->core) ) , self->handle );
+    tr_torrentClose( self->handle );
     self->handle = NULL;
   }
 
