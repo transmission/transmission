@@ -854,13 +854,13 @@ makecombomodel( void )
     /* create the model used by the two popup menus */
     list = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
     gtk_list_store_append( list, &iter );
-    gtk_list_store_set( list, &iter, 1, 0, 0,
+    gtk_list_store_set( list, &iter, 1, TR_TOR_LEAVE, 0,
                         _("Use the torrent file where it is"), -1 );
     gtk_list_store_append( list, &iter );
-    gtk_list_store_set( list, &iter, 1, TR_TORNEW_SAVE_COPY, 0,
+    gtk_list_store_set( list, &iter, 1, TR_TOR_COPY, 0,
                         _("Keep a copy of the torrent file"), -1 );
     gtk_list_store_append( list, &iter );
-    gtk_list_store_set( list, &iter, 1, TR_TORNEW_SAVE_MOVE, 0,
+    gtk_list_store_set( list, &iter, 1, TR_TOR_MOVE, 0,
                         _("Keep a copy and remove the original"), -1 );
 
     return GTK_TREE_MODEL( list );
@@ -873,7 +873,7 @@ addwid_combo( TrPrefs * self, int id, GtkTooltips * tips,
     GtkWidget       * combo, * label;
     GtkCellRenderer * rend;
     GtkTreeIter       iter;
-    guint             prefsflag, modelflag;
+    enum tr_torrent_action prefsact, modelact;
 
     g_assert( ALEN( defs ) > id && GTK_TYPE_COMBO_BOX == PTYPE( id ) );
     combo = gtk_combo_box_new();
@@ -885,13 +885,13 @@ addwid_combo( TrPrefs * self, int id, GtkTooltips * tips,
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( combo ), rend, TRUE );
     gtk_cell_layout_add_attribute( GTK_CELL_LAYOUT( combo ), rend, "text", 0 );
 
-    prefsflag = addactionflag( tr_prefs_get( id ) );
+    prefsact = toraddaction( tr_prefs_get( id ) );
     if( gtk_tree_model_get_iter_first( self->combomodel, &iter ) )
     {
         do
         {
-            gtk_tree_model_get( self->combomodel, &iter, 1, &modelflag, -1 );
-            if( modelflag == prefsflag)
+            gtk_tree_model_get( self->combomodel, &iter, 1, &modelact, -1 );
+            if( modelact == prefsact )
             {
                 gtk_combo_box_set_active_iter( GTK_COMBO_BOX( combo ), &iter );
                 break;
@@ -912,7 +912,7 @@ combochosen( GtkWidget * widget, gpointer data )
     TrPrefs      * self;
     GtkTreeIter    iter;
     GtkTreeModel * model;
-    guint          flags;
+    enum tr_torrent_action action;
     int            id;
 
     TR_IS_PREFS( data );
@@ -920,9 +920,9 @@ combochosen( GtkWidget * widget, gpointer data )
     if( gtk_combo_box_get_active_iter( GTK_COMBO_BOX( widget ), &iter ) )
     {
         model = gtk_combo_box_get_model( GTK_COMBO_BOX( widget ) );
-        gtk_tree_model_get( model, &iter, 1, &flags, -1 );
+        gtk_tree_model_get( model, &iter, 1, &action, -1 );
         GETPREFID( widget, id );
-        savepref( self, id, addactionname( flags ) );
+        savepref( self, id, toractionname( action ) );
     }
 }
 

@@ -432,7 +432,7 @@ tr_core_save( TrCore * self )
 }
 
 int
-tr_core_load( TrCore * self, benc_val_t * state )
+tr_core_load( TrCore * self, benc_val_t * state, gboolean forcepaused )
 {
     int         ii, count;
     char      * errstr;
@@ -450,7 +450,7 @@ tr_core_load( TrCore * self, benc_val_t * state )
     {
         errstr = NULL;
         tor = tr_torrent_new_with_state( self->handle, state->val.l.vals + ii,
-                                         0, &errstr );
+                                         forcepaused, &errstr );
         if( NULL == tor )
         {
             tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
@@ -468,8 +468,8 @@ tr_core_load( TrCore * self, benc_val_t * state )
 }
 
 gboolean
-tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
-                     guint flags )
+tr_core_add_torrent( TrCore * self, const char * path, const char * dir,
+                     enum tr_torrent_action act, gboolean paused )
 {
     TrTorrent * tor;
     char      * errstr;
@@ -477,7 +477,7 @@ tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
     TR_IS_CORE( self );
 
     errstr = NULL;
-    tor = tr_torrent_new( self->handle, torrent, dir, flags, &errstr );
+    tor = tr_torrent_new( self->handle, path, dir, act, paused, &errstr );
     if( NULL == tor )
     {
         tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );

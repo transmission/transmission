@@ -268,29 +268,35 @@ checkfilenames(int argc, char **argv) {
   return ret;
 }
 
-guint
-addactionflag(const char *action) {
-  if(NULL == action)
-    return TR_TORNEW_SAVE_COPY;
-  else if(0 == strcmp("copy", action))
-    return TR_TORNEW_SAVE_COPY;
-  else if(0 == strcmp("move", action))
-    return TR_TORNEW_SAVE_MOVE;
-  else
-    return 0;
+enum tr_torrent_action
+toraddaction( const char * action )
+{
+    if( NULL == action || 0 == strcmp( "copy", action ) )
+    {
+        return TR_TOR_COPY;
+    }
+    else if( 0 == strcmp( "move", action ) )
+    {
+        return TR_TOR_MOVE;
+    }
+    else
+    {
+        return TR_TOR_LEAVE;
+    }
 }
 
 const char *
-addactionname( guint flag )
+toractionname( enum tr_torrent_action action )
 {
-    static char name[6];
-
-    snprintf( name, sizeof name, "%s",
-              ( TR_TORNEW_SAVE_COPY & flag ? "copy" :
-              ( TR_TORNEW_SAVE_MOVE & flag ? "move" :
-                                             "leave" ) ) );
-
-    return name;
+    switch( action )
+    {
+        case TR_TOR_COPY:
+            return "copy";
+        case TR_TOR_MOVE:
+            return "move";
+        default:
+            return "leave";
+    }
 }
 
 const char *

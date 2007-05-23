@@ -290,27 +290,38 @@ tr_torrent_info(TrTorrent *tor) {
   return tr_torrentInfo(tor->handle);
 }
 
+static TrTorrent *
+maketorrent( tr_torrent_t * handle, const char * dir, gboolean paused )
+{
+    TrTorrent * tor;
+
+    tr_torrentDisablePex( handle,
+                          !tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
+
+    tor = g_object_new( TR_TORRENT_TYPE, "torrent-handle", handle,
+                        "download-directory", dir, NULL);
+  
+    g_object_set( tor, "paused", paused, NULL );
+
+    return tor;
+}
+
 TrTorrent *
 tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
-               guint flags, char **err) {
+                enum tr_torrent_action act, gboolean paused, char **err )
+{
   TrTorrent *ret;
   tr_torrent_t *handle;
-  int errcode, trflags;
-  gboolean boolval;
+  int errcode, flag;
 
   g_assert(NULL != dir);
 
   *err = NULL;
 
-  trflags = 0;
-  if((TR_TORNEW_SAVE_COPY|TR_TORNEW_SAVE_MOVE) & flags)
-    trflags |= TR_FLAG_SAVE;
+  flag    = ( TR_TOR_COPY == act || TR_TOR_MOVE == act ? TR_FLAG_SAVE : 0 );
   errcode = -1;
 
-  if(TR_TORNEW_LOAD_SAVED & flags)
-    handle = tr_torrentInitSaved(back, torrent, 0, &errcode);
-  else
-    handle = tr_torrentInit(back, torrent, NULL, trflags, &errcode);
+  handle = tr_torrentInit( back, torrent, NULL, flag, &errcode );
 
   if(NULL == handle) {
     switch(errcode) {
@@ -327,17 +338,9 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
     return NULL;
   }
 
-  /* I should probably add a property for this but I've had enough
-     with adding useless gtk glue to this program */
-  boolval = tr_prefs_get_bool_with_default( PREF_ID_PEX );
-  tr_torrentDisablePex( handle, !boolval );
+  ret = maketorrent( handle, dir, paused );
 
-  ret = g_object_new(TR_TORRENT_TYPE, "torrent-handle", handle,
-                     "download-directory", dir, NULL);
-  
-  g_object_set(ret, "paused", (TR_TORNEW_PAUSED & flags ? TRUE : FALSE), NULL);
-
-  if(TR_TORNEW_SAVE_MOVE & flags)
+  if( TR_TOR_MOVE == act )
     ret->delfile = g_strdup(torrent);
 
   return ret;
@@ -345,13 +348,13 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
 
 TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
-                           guint forcedflags, char ** err)
+                           gboolean forcedpause, char ** err )
 {
-  int ii;
+  tr_torrent_t * handle;
+  int ii, errcode;
   benc_val_t *name, *data;
   char *torrent, *hash, *dir;
-  gboolean hadpaused, paused;
-  guint flags;
+  gboolean paused;
 
   *err = NULL;
 
@@ -359,8 +362,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     return NULL;
 
   torrent = hash = dir = NULL;
-  hadpaused = FALSE;
-  paused = FALSE;               /* silence stupid compiler warning */
+  paused = FALSE;
 
   for(ii = 0; ii + 1 < state->val.l.count; ii += 2) {
     name = state->val.l.vals + ii;
@@ -374,7 +376,6 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
       else if(0 == strcmp("dir", name->val.s.s))
         dir = data->val.s.s;
       else if(0 == strcmp("paused", name->val.s.s)) {
-        hadpaused = TRUE;
         paused = (data->val.i ? TRUE : FALSE);
       }
     }
@@ -384,21 +385,28 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
      (NULL == torrent && NULL == hash) || NULL == dir)
     return NULL;
 
-  flags = 0;
-  if(hadpaused)
-    flags |= (paused ? TR_TORNEW_PAUSED : TR_TORNEW_RUNNING);
-  if(NULL != hash) {
-    flags |= TR_TORNEW_LOAD_SAVED;
-    torrent = hash;
-  }
-  forcedflags &= TR_TORNEW_PAUSED | TR_TORNEW_RUNNING;
-  if( forcedflags )
-  {
-      flags &= ~( TR_TORNEW_PAUSED | TR_TORNEW_RUNNING );
-      flags |= forcedflags;
+  if( NULL != hash )
+    handle = tr_torrentInitSaved(back, hash, 0, &errcode);
+  else
+    handle = tr_torrentInit(back, torrent, NULL, 0, &errcode);
+
+  if(NULL == handle) {
+    torrent = ( NULL == hash ? torrent : hash );
+    switch(errcode) {
+      case TR_EINVALID:
+        *err = g_strdup_printf(_("%s: not a valid torrent file"), torrent);
+        break;
+      case TR_EDUPLICATE:
+        *err = g_strdup_printf(_("%s: torrent is already open"), torrent);
+        break;
+      default:
+        *err = g_strdup(torrent);
+        break;
+    }
+    return NULL;
   }
 
-  return tr_torrent_new( back, torrent, dir, flags, err );
+  return maketorrent( handle, dir, paused || forcedpause );
 }
 
 gboolean

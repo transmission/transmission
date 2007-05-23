@@ -32,6 +32,8 @@
 
 #include "bencode.h"
 
+#include "util.h"
+
 #define TR_CORE_TYPE		( tr_core_get_type() )
 
 #define TR_CORE( obj )                                                        \
@@ -108,13 +110,12 @@ tr_core_save( TrCore * self );
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
-tr_core_load( TrCore * self, benc_val_t * state );
+tr_core_load( TrCore * self, benc_val_t * state, gboolean forcepaused );
 
-/* Add a torrent. Torrent, dir and flags arguments are the same as
-   tr_torrent_new(). May trigger "error" signal with TR_CORE_ERR_ADD_TORRENT */
+/* Add a torrent. May trigger "error" signal with TR_CORE_ERR_ADD_TORRENT */
 gboolean
-tr_core_add_torrent( TrCore * self, const char * torrent, const char * dir,
-                     guint flags );
+tr_core_add_torrent( TrCore * self, const char * path, const char * dir,
+                     enum tr_torrent_action act, gboolean paused );
 
 /* Trigger "error" signal with TR_CORE_ERR_NO_MORE_TORRENTS */
 void

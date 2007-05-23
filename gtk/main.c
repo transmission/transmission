@@ -186,7 +186,7 @@ handleaction( struct cbdata *data, int action );
 
 static void
 addtorrents(void *vdata, void *state, GList *files,
-            const char *dir, guint flags);
+            const char *dir, enum tr_torrent_action act, gboolean paused);
 static void
 safepipe(void);
 static void
@@ -373,7 +373,6 @@ static void
 appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
 {
     struct cbdata * cbdata;
-    guint           flags;
 
     /* fill out cbdata */
     cbdata = g_new0( struct cbdata, 1 );
@@ -396,13 +395,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     winsetup( cbdata, wind );
 
     /* add torrents from command-line and saved state */
-    flags = addactionflag( tr_prefs_get( PREF_ID_ADDIPC ) );
-    g_assert( !( flags & ( TR_TORNEW_PAUSED | TR_TORNEW_RUNNING ) ) );
-    if( paused )
-    {
-        flags |= TR_TORNEW_PAUSED;
-    }
-    addtorrents( cbdata, state, args, NULL, flags );
+    addtorrents( cbdata, state, args, NULL,
+                 toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) ), paused );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
@@ -667,7 +661,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
     if( NULL != paths )
     {
         addtorrents( data, NULL, paths, NULL,
-                     addactionflag( tr_prefs_get( PREF_ID_ADDSTD ) ) );
+                     toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) ), FALSE );
     }
     freestrlist(freeables);
     g_free(files);
@@ -1011,8 +1005,9 @@ handleaction( struct cbdata * data, int act )
 }
 
 static void
-addtorrents(void *vdata, void *state, GList *files,
-            const char *dir, guint flags) {
+addtorrents( void * vdata, void * state, GList * files, const char * dir,
+             enum tr_torrent_action act, gboolean paused )
+{
   struct cbdata *data = vdata;
   const char * pref;
   int added;
@@ -1021,7 +1016,7 @@ addtorrents(void *vdata, void *state, GList *files,
 
   if( NULL != state )
   {
-      added += tr_core_load( data->core, state );
+      added += tr_core_load( data->core, state, paused );
   }
 
   if(NULL != files) {
@@ -1030,14 +1025,14 @@ addtorrents(void *vdata, void *state, GList *files,
         pref = tr_prefs_get( PREF_ID_ASKDIR );
         if( NULL != pref && strbool( pref ) )
         {
-            promptfordir( data->wind, addtorrents, data, files, flags );
+            promptfordir( data->wind, addtorrents, data, files, act, paused );
             files = NULL;
         }
         dir = getdownloaddir();
     }
     for( files = g_list_first( files ); NULL != files; files = files->next )
     {
-      if( tr_core_add_torrent( data->core, files->data, dir, flags ) )
+      if( tr_core_add_torrent( data->core, files->data, dir, act, paused ) )
       {
           added++;
       }

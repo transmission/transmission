@@ -35,7 +35,11 @@
 #define SHUTUP
 #endif
 
-typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,guint);
+/* XXX this shouldn't be here */
+enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
+
+typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,
+                                    enum tr_torrent_action,gboolean);
 
 /* return number of items in array */
 #define ALEN( a )               ( ( signed )( sizeof(a) / sizeof( (a)[0] ) ) )
@@ -106,12 +110,12 @@ GList *
 checkfilenames(int argc, char **argv);
 
 /* returns the flag for an action string */
-guint
-addactionflag(const char *action);
+enum tr_torrent_action
+toraddaction( const char * action );
 
 /* returns the action string for a flag */
 const char *
-addactionname(guint flag);
+toractionname( enum tr_torrent_action action );
 
 /* retrieve the global download directory */
 const char *

@@ -57,10 +57,11 @@ struct addcb {
 
 struct dirdata
 {
-    add_torrents_func_t addfunc;
-    void              * cbdata;
-    GList             * files;
-    guint               flags;
+    add_torrents_func_t     addfunc;
+    void                  * cbdata;
+    GList                 * files;
+    enum tr_torrent_action  action;
+    gboolean                paused;
 };
 
 struct quitdata
@@ -213,8 +214,8 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
   struct addcb *data = gdata;
   GSList *files, *ii;
   GList *stupidgtk;
-  int flags;
   char *dir;
+  enum tr_torrent_action action;
 
   if(GTK_RESPONSE_ACCEPT == resp) {
     dir = NULL;
@@ -224,9 +225,9 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     stupidgtk = NULL;
     for(ii = files; NULL != ii; ii = ii->next)
       stupidgtk = g_list_append(stupidgtk, ii->data);
-    flags = ( data->autostart ? TR_TORNEW_RUNNING : TR_TORNEW_PAUSED );
-    flags |= addactionflag( tr_prefs_get( PREF_ID_ADDSTD ) );
-    data->addfunc( data->data, NULL, stupidgtk, dir, flags );
+    action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
+    data->addfunc( data->data, NULL, stupidgtk, dir,
+                   action, !data->autostart );
     if(NULL != dir)
       g_free(dir);
     g_slist_free(files);
@@ -507,7 +508,7 @@ fmtpeercount( GtkLabel * label, int count )
 
 void
 promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
-              GList * files, guint flags )
+              GList * files, enum tr_torrent_action act, gboolean paused )
 {
     struct dirdata * stuff;
     GtkWidget      * wind;
@@ -516,7 +517,8 @@ promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
     stuff->addfunc = addfunc;
     stuff->cbdata  = cbdata;
     stuff->files   = dupstrlist( files );
-    stuff->flags   = flags;
+    stuff->action  = act;
+    stuff->paused  = paused;
 
     wind =  gtk_file_chooser_dialog_new( _("Choose a directory"), parent,
                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -547,7 +549,8 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
         dir = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( widget ) );
         /* it seems that we will always get a directory */
         g_assert( NULL != dir );
-        stuff->addfunc( stuff->cbdata, NULL, stuff->files, dir, stuff->flags );
+        stuff->addfunc( stuff->cbdata, NULL, stuff->files, dir,
+                        stuff->action, stuff->paused );
         g_free( dir );
     }
 

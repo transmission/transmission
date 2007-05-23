@@ -30,6 +30,8 @@
 #include "transmission.h"
 #include "bencode.h"
 
+#include "util.h"
+
 /* boxed type for tr_tracker_info_t */
 #define TR_TRACKER_BOXED_TYPE (tr_tracker_boxed_get_type ())
 GType
@@ -76,25 +78,15 @@ tr_torrent_stat(TrTorrent *tor);
 tr_info_t *
 tr_torrent_info(TrTorrent *tor);
 
-/* explicitly start the torrent running or paused */
-#define TR_TORNEW_PAUSED        0x01
-#define TR_TORNEW_RUNNING       0x02
-/* load a saved torrent file, torrent param is hash instead of filename */
-#define TR_TORNEW_LOAD_SAVED    0x04
-/* save a private copy of the torrent file */
-#define TR_TORNEW_SAVE_COPY     0x08
-/* save a private copy of the torrent file and remove the original */
-#define TR_TORNEW_SAVE_MOVE     0x10
-
 #ifdef TR_WANT_TORRENT_PRIVATE
 
 TrTorrent *
-tr_torrent_new( tr_handle_t * handle, const char *torrent, const char *dir,
-                guint flags, char **err);
+tr_torrent_new( tr_handle_t * handle, const char * path, const char * dir,
+                enum tr_torrent_action act, gboolean paused, char ** err);
 
 TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * handle, benc_val_t * state,
-                           guint flags, char ** err );
+                           gboolean forcepaused, char ** err );
 
 gboolean
 tr_torrent_get_state( TrTorrent * tor, benc_val_t * state );
