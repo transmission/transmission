@@ -46,7 +46,7 @@
 #include "tr_torrent.h"
 #include "util.h"
 
-/* XXX error handling throught this file is pretty bogus */
+/* XXX error handling throughout this file is pretty bogus */
 
 enum contype { CON_SERV, CON_CLIENT };
 
@@ -122,6 +122,10 @@ smsg_torall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_pref( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
+smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
+smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static gboolean
 simpleresp( struct constate * con, int64_t tag, enum ipc_msg id );
@@ -147,6 +151,10 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   if( NULL == con->msgs ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOMAP,      smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_AUTOSTART,    smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_DIR,          smsg_str ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_DOWNLIMIT,    smsg_int ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref ) ||
@@ -159,13 +167,16 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) )
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
               strerror( errno ) );
@@ -985,6 +996,87 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
     if( NULL != buf )
     {
         io_send_keepdata( con->source, buf, size );
+    }
+}
+
+static void
+smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+
+    if( NULL == val || TYPE_INT != val->type || INT_MAX < val->val.i )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    switch( id )
+    {
+        case IPC_MSG_AUTOMAP:
+            tr_core_set_pref_bool( srv->core, PREF_ID_NAT, val->val.i );
+            break;
+        case IPC_MSG_AUTOSTART:
+            simpleresp( con, tag, IPC_MSG_NOTSUP );
+            return;
+        case IPC_MSG_DOWNLIMIT:
+            if( 0 > val->val.i )
+            {
+                tr_core_set_pref_bool( srv->core, PREF_ID_USEDOWNLIMIT,
+                                       FALSE );
+            }
+            else
+            {
+                tr_core_set_pref_int( srv->core, PREF_ID_DOWNLIMIT,
+                                      val->val.i );
+                tr_core_set_pref_bool( srv->core, PREF_ID_USEDOWNLIMIT, TRUE );
+            }
+            break;
+        case IPC_MSG_PEX:
+            tr_core_set_pref_bool( srv->core, PREF_ID_PEX, val->val.i );
+            break;
+        case IPC_MSG_PORT:
+            tr_core_set_pref_int( srv->core, PREF_ID_PORT, val->val.i );
+            break;
+        case IPC_MSG_UPLIMIT:
+            if( 0 > val->val.i )
+            {
+                tr_core_set_pref_bool( srv->core, PREF_ID_USEUPLIMIT,
+                                       FALSE );
+            }
+            else
+            {
+                tr_core_set_pref_int( srv->core, PREF_ID_UPLIMIT,
+                                      val->val.i );
+                tr_core_set_pref_bool( srv->core, PREF_ID_USEUPLIMIT, TRUE );
+            }
+            break;
+        default:
+            g_assert_not_reached();
+            return;
+    }
+}
+
+static void
+smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+
+    if( NULL == val || TYPE_STR != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    switch( id )
+    {
+        case IPC_MSG_DIR:
+            tr_core_set_pref( srv->core, PREF_ID_DIR, val->val.s.s );
+            break;
+        default:
+            g_assert_not_reached();
+            return;
     }
 }
 
