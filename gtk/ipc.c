@@ -120,6 +120,8 @@ smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_torall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
+smsg_pref( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static gboolean
 simpleresp( struct constate * con, int64_t tag, enum ipc_msg id );
@@ -145,18 +147,25 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   if( NULL == con->msgs ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOMAP,   smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETAUTOSTART, smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDIR,       smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETDOWNLIMIT, smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPEX,       smsg_pref ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETPORT,      smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
-      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) )
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
               strerror( errno ) );
@@ -914,6 +923,69 @@ smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
 
     /* XXX this is a lie */
     simpleresp( con, tag, IPC_MSG_OK );
+}
+
+static void
+smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    uint8_t              * buf;
+    size_t                 size;
+    tr_handle_status_t   * hstat;
+    const char           * pref;
+    int                    num;
+
+    switch( id )
+    {
+        case IPC_MSG_GETAUTOMAP:
+            hstat = tr_handleStatus( tr_core_handle( srv->core ) );
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_AUTOMAP, tag,
+                             !TR_NAT_TRAVERSAL_IS_DISABLED(
+                                 hstat->natTraversalStatus ) );
+            break;
+        case IPC_MSG_GETAUTOSTART:
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_AUTOSTART, tag, 1 );
+            break;
+        case IPC_MSG_GETDIR:
+            pref = tr_prefs_get( PREF_ID_ASKDIR );
+            /* XXX sending back "" when we're prompting is kind of bogus */
+            pref = ( NULL != pref && strbool( pref ) ? "" : getdownloaddir() );
+            buf = ipc_mkstr( &con->ipc, &size, IPC_MSG_DIR, tag, pref );
+            break;
+        case IPC_MSG_GETDOWNLIMIT:
+            num = -1;
+            if( tr_prefs_get_bool_with_default( PREF_ID_USEDOWNLIMIT ) )
+            {
+                num = tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT );
+            }
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_DOWNLIMIT, tag, num );
+            break;
+        case IPC_MSG_GETPEX:
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_PEX, tag,
+                             tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
+            break;
+        case IPC_MSG_GETPORT:
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_PORT, tag,
+                             tr_prefs_get_int_with_default( PREF_ID_PORT ) );
+            break;
+        case IPC_MSG_GETUPLIMIT:
+            num = -1;
+            if( tr_prefs_get_bool_with_default( PREF_ID_USEUPLIMIT ) )
+            {
+                num = tr_prefs_get_int_with_default( PREF_ID_UPLIMIT );
+            }
+            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_UPLIMIT, tag, num );
+            break;
+        default:
+            g_assert_not_reached();
+            return;
+    }
+
+    if( NULL != buf )
+    {
+        io_send_keepdata( con->source, buf, size );
+    }
 }
 
 static void
