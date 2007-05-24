@@ -103,6 +103,8 @@ static void
 smsg_quit( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static gboolean
+simpleresp( struct constate * con, enum ipc_msg id, int64_t tag );
 
 /* this is only used on the server */
 static char *gl_sockpath = NULL;
@@ -480,8 +482,7 @@ cli_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
 }
 
 static void
-smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag SHUTUP,
-          void * arg )
+smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
     struct constate_serv * srv = &con->u.serv;
@@ -489,8 +490,14 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag SHUTUP,
     benc_val_t           * path;
     int                    ii;
 
-    if( NULL == srv->core || TYPE_LIST != val->type )
+    if( NULL == srv->core )
     {
+        return;
+    }
+
+    if( NULL == val || TYPE_LIST != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
         return;
     }
 
@@ -506,6 +513,9 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag SHUTUP,
         }
     }
     tr_core_torrents_added( TR_CORE( srv->core ) );
+
+    /* XXX should send info response back with torrent ids */
+    simpleresp( con, IPC_MSG_OK, tag );
 }
 
 static void
@@ -519,16 +529,36 @@ smsg_quit( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag SHUTUP,
 }
 
 static void
-all_default( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag,
-              void * arg )
+all_default( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
 {
-    struct constate * con = arg;
+    switch( id )
+    {
+        case IPC_MSG_FAIL:
+        case IPC_MSG_NOTSUP:
+        case IPC_MSG_OK:
+            break;
+        case IPC_MSG_NOOP:
+            simpleresp( arg, IPC_MSG_OK, tag );
+            break;
+        default:
+            simpleresp( arg, IPC_MSG_NOTSUP, tag );
+            break;
+    }
+}
+
+static gboolean
+simpleresp( struct constate * con, enum ipc_msg id, int64_t tag )
+{
     uint8_t         * buf;
     size_t            size;
 
-    buf = ipc_mkempty( &con->ipc, &size, IPC_MSG_NOTSUP, tag );
-    if( NULL != buf )
+    buf = ipc_mkempty( &con->ipc, &size, id, tag );
+    if( NULL == buf )
     {
-        io_send_keepdata( con->source, buf, size );
+        return FALSE;
     }
+
+    io_send_keepdata( con->source, buf, size );
+
+    return TRUE;
 }
