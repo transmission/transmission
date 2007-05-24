@@ -46,6 +46,8 @@
 #include "tr_torrent.h"
 #include "util.h"
 
+/* XXX error handling throught this file is pretty bogus */
+
 enum contype { CON_SERV, CON_CLIENT };
 
 struct constate_serv
@@ -110,11 +112,17 @@ static int
 addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
          benc_val_t * val );
 static void
+smsg_look( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
+smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static gboolean
-simpleresp( struct constate * con, enum ipc_msg id, int64_t tag );
+simpleresp( struct constate * con, int64_t tag, enum ipc_msg id );
 static TrTorrent *
-findtor( TrCore * core, int id );
+findtorid( TrCore * core, int id, GtkTreeIter * iter );
+static TrTorrent *
+findtorhash( TrCore * core, const char * hash, int * id );
 
 /* this is only used on the server */
 static char *gl_sockpath = NULL;
@@ -136,6 +144,10 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
@@ -335,12 +347,18 @@ static unsigned int
 srv_io_received( GSource * source SHUTUP, char * data, unsigned int len,
                  void * vdata)
 {
-    struct constate * con = vdata;
-    ssize_t           res;
+    struct constate      * con = vdata;
+    struct constate_serv * srv = &con->u.serv;
+    ssize_t                res;
 
     if( IPC_MIN_MSG_LEN > len )
     {
         return 0;
+    }
+
+    if( NULL == srv->core )
+    {
+        destroycon( con );
     }
 
     res = ipc_parse( &con->ipc, data, len, con );
@@ -504,11 +522,6 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
     benc_val_t           * path;
     int                    ii;
 
-    if( NULL == srv->core )
-    {
-        return;
-    }
-
     if( NULL == val || TYPE_LIST != val->type )
     {
         simpleresp( con, tag, IPC_MSG_NOTSUP );
@@ -529,7 +542,7 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
     tr_core_torrents_added( TR_CORE( srv->core ) );
 
     /* XXX should send info response back with torrent ids */
-    simpleresp( con, IPC_MSG_OK, tag );
+    simpleresp( con, tag, IPC_MSG_OK );
 }
 
 static void
@@ -553,11 +566,6 @@ smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     TrTorrent            * tor;
     uint8_t              * buf;
     size_t                 size;
-
-    if( NULL == srv->core )
-    {
-        return;
-    }
 
     if( NULL == val || TYPE_DICT != val->type )
     {
@@ -586,7 +594,7 @@ smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     {
         idval = &ids->val.l.vals[ii];
         if( TYPE_INT != idval->type || !TORRENT_ID_VALID( idval->val.i ) ||
-            NULL == ( tor = findtor( srv->core, idval->val.i ) ) )
+            NULL == ( tor = findtorid( srv->core, idval->val.i, NULL ) ) )
         {
             continue;
         }
@@ -624,11 +632,6 @@ smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     TrTorrent            * tor;
     uint8_t              * buf;
     size_t                 size;
-
-    if( NULL == srv->core )
-    {
-        return;
-    }
 
     if( NULL == val || TYPE_LIST != val->type )
     {
@@ -696,6 +699,110 @@ addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
 }
 
 static void
+smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
+             void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    benc_val_t             packet, * pkval, * hash;
+    int                    ii, torid;
+    TrTorrent            * tor;
+    tr_info_t            * inf;
+    uint8_t              * buf;
+    size_t                 size;
+
+    if( NULL == val || TYPE_LIST != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    pkval = ipc_initval( &con->ipc, IPC_MSG_INFO, tag, &packet, TYPE_LIST );
+    if( NULL == pkval )
+    {
+        simpleresp( con, tag, IPC_MSG_FAIL );
+        return;
+    }
+
+    for( ii = 0; val->val.l.count > ii; ii++ )
+    {
+        hash = &val->val.l.vals[ii];
+        if( NULL == hash || TYPE_STR != hash->type ||
+            SHA_DIGEST_LENGTH * 2 != hash->val.s.i ||
+            NULL == ( tor = findtorhash( srv->core, hash->val.s.s, &torid ) ) )
+        {
+            continue;
+        }
+        inf = tr_torrent_info( tor );
+        if( 0 > ipc_addinfo( pkval, torid, inf, IPC_INF_HASH ) )
+        {
+            tr_bencFree( &packet );
+            simpleresp( con, tag, IPC_MSG_FAIL );
+            return;
+        }
+    }
+
+    buf = ipc_mkval( &packet, &size );
+    tr_bencFree( &packet );
+    if( NULL == buf )
+    {
+        simpleresp( con, tag, IPC_MSG_FAIL );
+    }
+    else
+    {
+        io_send_keepdata( con->source, buf, size );
+    }
+}
+
+static void
+smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    benc_val_t           * idval;
+    TrTorrent            * tor;
+    GtkTreeIter            iter;
+    int                    ii;
+
+    if( NULL == val || TYPE_LIST != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    for( ii = 0; val->val.l.count > ii; ii++ )
+    {
+        idval = &val->val.l.vals[ii];
+        if( TYPE_INT != idval->type || !TORRENT_ID_VALID( idval->val.i ) ||
+            NULL == ( tor = findtorid( srv->core, idval->val.i, &iter ) ) )
+        {
+            continue;
+        }
+        switch( id )
+        {
+            case IPC_MSG_REMOVE:
+                tr_core_delete_torrent( srv->core, &iter );
+                break;
+            case IPC_MSG_START:
+                tr_torrent_start( tor );
+                break;
+            case IPC_MSG_STOP:
+                tr_torrent_stop( tor );
+                break;
+            default:
+                g_assert_not_reached();
+                break;
+        }
+    }
+
+    tr_core_update( srv->core );
+    tr_core_save( srv->core );
+
+    /* XXX this is a lie */
+    simpleresp( con, tag, IPC_MSG_OK );
+}
+
+static void
 all_default( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
 {
     switch( id )
@@ -705,16 +812,16 @@ all_default( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
         case IPC_MSG_OK:
             break;
         case IPC_MSG_NOOP:
-            simpleresp( arg, IPC_MSG_OK, tag );
+            simpleresp( arg, tag, IPC_MSG_OK );
             break;
         default:
-            simpleresp( arg, IPC_MSG_NOTSUP, tag );
+            simpleresp( arg, tag, IPC_MSG_NOTSUP );
             break;
     }
 }
 
 static gboolean
-simpleresp( struct constate * con, enum ipc_msg id, int64_t tag )
+simpleresp( struct constate * con, int64_t tag, enum ipc_msg id )
 {
     uint8_t         * buf;
     size_t            size;
@@ -731,11 +838,43 @@ simpleresp( struct constate * con, enum ipc_msg id, int64_t tag )
 }
 
 static TrTorrent *
-findtor( TrCore * core, int id )
+findtorid( TrCore * core, int id, GtkTreeIter * iter )
+{
+    GtkTreeModel * model;
+    GtkTreeIter    myiter;
+    int            rowid;
+    TrTorrent    * tor;
+
+    if( NULL == iter )
+    {
+        iter = &myiter;
+    }
+
+    model = tr_core_model( core );
+    if( gtk_tree_model_get_iter_first( model, iter ) )
+    {
+        do
+        {
+            gtk_tree_model_get( model, iter, MC_ID, &rowid, -1 );
+            if( rowid == id )
+            {
+                gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+                g_object_unref( tor );
+                return tor;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, iter ) );
+    }
+
+    return NULL;
+}
+
+static TrTorrent *
+findtorhash( TrCore * core, const char * hash, int * torid )
 {
     GtkTreeModel * model;
     GtkTreeIter    iter;
-    int            rowid;
+    char         * rowhash;
     TrTorrent    * tor;
 
     model = tr_core_model( core );
@@ -743,10 +882,11 @@ findtor( TrCore * core, int id )
     {
         do
         {
-            gtk_tree_model_get( model, &iter, MC_ID, &rowid, -1 );
-            if( rowid == id )
+            gtk_tree_model_get( model, &iter, MC_HASH, &rowhash, -1 );
+            if( 0 == strcmp( hash, rowhash ) )
             {
-                gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1 );
+                gtk_tree_model_get( model, &iter, MC_ID, torid,
+                                    MC_TORRENT, &tor, -1 );
                 g_object_unref( tor );
                 return tor;
             }

@@ -157,7 +157,7 @@ tr_core_quit( TrCore * self );
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */
 enum {
-  MC_NAME, MC_SIZE, MC_STAT, MC_ERR, MC_TERR,
+  MC_NAME, MC_SIZE, MC_HASH, MC_STAT, MC_ERR, MC_TERR,
   MC_PROG, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
   MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
   MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ID,

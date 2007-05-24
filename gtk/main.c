@@ -986,11 +986,11 @@ handleaction( struct cbdata * data, int act )
           switch( act )
           {
               case ACT_START:
-                  tr_torrentStart( tr_torrent_handle( tor ) );
+                  tr_torrent_start( tor );
                   changed = TRUE;
                   break;
               case ACT_STOP:
-                  tr_torrentStop( tr_torrent_handle( tor ) );
+                  tr_torrent_stop( tor );
                   changed = TRUE;
                   break;
               case ACT_DELETE:

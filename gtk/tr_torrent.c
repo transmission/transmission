@@ -290,6 +290,32 @@ tr_torrent_info(TrTorrent *tor) {
   return tr_torrentInfo(tor->handle);
 }
 
+void
+tr_torrent_start( TrTorrent * self )
+{
+    TR_IS_TORRENT( self );
+
+    if( self->severed || !tr_torrent_paused( self ) )
+    {
+        return;
+    }
+
+    tr_torrentStart( self->handle );
+}
+
+void
+tr_torrent_stop( TrTorrent * self )
+{
+    TR_IS_TORRENT( self );
+
+    if( self->severed || tr_torrent_paused( self ) )
+    {
+        return;
+    }
+
+    tr_torrentStop( self->handle );
+}
+
 static TrTorrent *
 maketorrent( tr_torrent_t * handle, const char * dir, gboolean paused )
 {

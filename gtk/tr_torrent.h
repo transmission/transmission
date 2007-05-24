@@ -78,6 +78,12 @@ tr_torrent_stat(TrTorrent *tor);
 tr_info_t *
 tr_torrent_info(TrTorrent *tor);
 
+void
+tr_torrent_start( TrTorrent * tor );
+
+void
+tr_torrent_stop( TrTorrent * tor );
+
 #ifdef TR_WANT_TORRENT_PRIVATE
 
 TrTorrent *

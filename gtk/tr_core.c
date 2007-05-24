@@ -178,16 +178,16 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     /* keep this in sync with the enum near the bottom of tr_core.h */
     GType types[] =
     {
-        /* info->name, info->totalSize, status,     error,      errorString, */
-        G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING,
-        /* progress,  rateDownload, rateUpload,   eta,        peersTotal, */
-        G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_INT, G_TYPE_INT,
-        /* peersUploading, peersDownloading, seeders,    leechers */
-        G_TYPE_INT,        G_TYPE_INT,       G_TYPE_INT, G_TYPE_INT,
-        /* completedFromTracker, downloaded,    uploaded       left */
-        G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_UINT64,
-        /* tracker,            the TrTorrent object, the ID for IPC */
-        TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,      G_TYPE_INT,
+        /* info->name, info->totalSize, info->hashString, status, */
+        G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_STRING,    G_TYPE_INT,
+        /* error,   errorString,   progress,     rateDownload, rateUpload, */
+        G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
+        /* eta,     peersTotal, peersUploading, peersDownloading, seeders, */
+        G_TYPE_INT, G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
+        /* leechers, completedFromTracker, downloaded,    uploaded */
+        G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
+        /* left,       tracker,               TrTorrent object, ID for IPC */
+        G_TYPE_UINT64, TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,  G_TYPE_INT,
     };
 
 #ifdef REFDBG
@@ -298,7 +298,6 @@ tr_core_shutdown( TrCore * self )
 {
     GtkTreeIter iter;
     TrTorrent * tor;
-    tr_stat_t * st;
 
     TR_IS_CORE( self );
 
@@ -316,11 +315,7 @@ tr_core_shutdown( TrCore * self )
         do
         {
             gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            st = tr_torrent_stat( tor );
-            if( TR_STATUS_ACTIVE & st->status )
-            {
-                tr_torrentStop( tr_torrent_handle( tor ) );
-            }
+            tr_torrent_stop( tor );
             g_object_unref( tor );
         }
         while( gtk_tree_model_iter_next( self->model, &iter ) );
@@ -638,6 +633,7 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
     gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
                         MC_NAME,    inf->name,
                         MC_SIZE,    inf->totalSize,
+                        MC_HASH,    inf->hashString,
                         MC_TORRENT, tor,
                         MC_ID,      self->nextid,
                         -1);
