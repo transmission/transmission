@@ -75,6 +75,9 @@ struct _TrCoreClass
        void handler( TrCore *, GList *, enum tr_torrent_action, gboolean,
                      gpointer ) */
     int                 promptsig;
+    /* "quit" signal:
+       void handler( TrCore *, gpointer ) */
+    int                 quitsig;
 };
 
 enum tr_core_err
@@ -145,6 +148,10 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter /* XXX */ );
 /* update the model with current torrent status */
 void
 tr_core_update( TrCore * self );
+
+/* emit the "quit" signal */
+void
+tr_core_quit( TrCore * self );
 
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */

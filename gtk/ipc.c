@@ -57,11 +57,10 @@
 
 enum contype { CON_SERV, CON_CLIENT };
 
-struct constate_serv {
-  void *wind;
-  gpointer core;
-  callbackfunc_t quitfunc;
-  void *cbdata;
+struct constate_serv
+{
+    GtkWindow * wind;
+    gpointer    core;
 };
 
 enum client_cmd { CCMD_ADD, CCMD_QUIT };
@@ -142,8 +141,7 @@ static const struct handlerdef gl_funcs_client[] = {
 static char *gl_sockpath = NULL;
 
 void
-ipc_socket_setup( void * parent, TrCore * core,
-                  callbackfunc_t quitfunc, void * cbdata )
+ipc_socket_setup( GtkWindow * parent, TrCore * core )
 {
   struct constate *con;
 
@@ -155,8 +153,6 @@ ipc_socket_setup( void * parent, TrCore * core,
   con->type = CON_SERV;
   con->u.serv.wind = parent;
   con->u.serv.core = core;
-  con->u.serv.quitfunc = quitfunc;
-  con->u.serv.cbdata = cbdata;
 
   g_object_add_weak_pointer( G_OBJECT( core ), &con->u.serv.core );
 
@@ -488,7 +484,7 @@ srv_quit( struct constate * con, const char * name SHUTUP,
     struct constate_serv * srv;
 
     srv = &con->u.serv;
-    srv->quitfunc( srv->cbdata );
+    tr_core_quit( srv->core );
 }
 
 static void

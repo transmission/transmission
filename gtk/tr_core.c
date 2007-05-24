@@ -108,6 +108,12 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
                                           tr_core_marshal_prompt, G_TYPE_NONE,
                                           3, G_TYPE_POINTER, G_TYPE_INT,
                                           G_TYPE_BOOLEAN );
+
+    core_class = TR_CORE_CLASS( g_class );
+    core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
+                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                        g_cclosure_marshal_VOID__VOID,
+                                        G_TYPE_NONE, 0 );
 }
 
 void
@@ -412,6 +418,8 @@ tr_core_save( TrCore * self )
 
     TR_IS_CORE( self );
 
+    count = 0;
+
     if( gtk_tree_model_get_iter_first( self->model, &iter) )
     {
         do
@@ -688,4 +696,15 @@ tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
 
     class = g_type_class_peek( TR_CORE_TYPE );
     g_signal_emit( self, class->errsig, 0, type, msg );
+}
+
+void
+tr_core_quit( TrCore * self )
+{
+    TrCoreClass * class;
+
+    TR_IS_CORE( self );
+
+    class = g_type_class_peek( TR_CORE_TYPE );
+    g_signal_emit( self, class->quitsig, 0 );
 }

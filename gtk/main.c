@@ -389,6 +389,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
     g_signal_connect( cbdata->core, "directory-prompt",
                       G_CALLBACK( coreprompt ), cbdata );
+    g_signal_connect_swapped( cbdata->core, "quit",
+                              G_CALLBACK( wannaquit ), cbdata );
 
     /* apply a few prefs */
     readinitialprefs( cbdata );
@@ -406,7 +408,7 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     tr_core_torrents_added( cbdata->core );
 
     /* set up the ipc socket */
-    ipc_socket_setup( GTK_WINDOW( wind ), cbdata->core, wannaquit, cbdata );
+    ipc_socket_setup( GTK_WINDOW( wind ), cbdata->core );
 
     /* set up main window */
     winsetup( cbdata, wind );

@@ -25,12 +25,12 @@
 #ifndef TG_IPC_H
 #define TG_IPC_H
 
+#include <gtk/gtk.h>
+
 #include "tr_core.h"
-#include "util.h"
 
 void
-ipc_socket_setup( void * wind, TrCore * core,
-                  callbackfunc_t quitfunc, void * cbdata );
+ipc_socket_setup( GtkWindow * wind, TrCore * core );
 
 gboolean
 ipc_sendfiles_blocking( GList * files );
