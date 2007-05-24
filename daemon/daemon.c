@@ -49,8 +49,8 @@
 #include "version.h"
 
 static void usage       ( const char *, ... );
-static void readargs    ( int, char **, int *, int * );
-static int  trylocksock ( void );
+static void readargs    ( int, char **, int *, int *, char ** );
+static int  trylocksock ( const char * );
 static int  getlock     ( const char * );
 static int  getsock     ( const char * );
 static void exitcleanup ( void );
@@ -67,9 +67,10 @@ main( int argc, char ** argv )
 {
     struct event_base * evbase;
     int                 nofork, debug, sockfd;
+    char              * sockpath;
 
     setmyname( argv[0] );
-    readargs( argc, argv, &nofork, &debug );
+    readargs( argc, argv, &nofork, &debug, &sockpath );
 
     if( !nofork )
     {
@@ -82,7 +83,7 @@ main( int argc, char ** argv )
     }
 
     atexit( exitcleanup );
-    sockfd = trylocksock();
+    sockfd = trylocksock( sockpath );
     if( 0 > sockfd )
     {
         exit( 1 );
@@ -124,6 +125,7 @@ usage( const char * msg, ... )
   "  -d --debug                Print data send and received, implies -f\n"
   "  -f --foreground           Run in the foreground and log to stderr\n"
   "  -h --help                 Display this message and exit\n"
+  "  -s --socket <path>        Place the socket file at <path>\n"
   "\n"
   "To add torrents or set options, use the transmission-remote program.\n",
             getmyname(), VERSION_STRING, VERSION_REVISION );
@@ -131,20 +133,22 @@ usage( const char * msg, ... )
 }
 
 void
-readargs( int argc, char ** argv, int * nofork, int * debug )
+readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock )
 {
-    char optstr[] = "dfh";
+    char optstr[] = "dfhs:";
     struct option longopts[] =
     {
         { "debug",              no_argument,       NULL, 'd' },
         { "foreground",         no_argument,       NULL, 'f' },
         { "help",               no_argument,       NULL, 'h' },
+        { "socket",             required_argument, NULL, 's' },
         { NULL, 0, NULL, 0 }
     };
     int opt;
 
     *nofork = 0;
     *debug  = 0;
+    *sock   = NULL;
 
     while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
     {
@@ -156,6 +160,9 @@ readargs( int argc, char ** argv, int * nofork, int * debug )
             case 'f':
                 *nofork = 1;
                 break;
+            case 's':
+                *sock   = optarg;
+                break;
             default:
                 usage( NULL );
                 break;
@@ -164,7 +171,7 @@ readargs( int argc, char ** argv, int * nofork, int * debug )
 }
 
 int
-trylocksock( void )
+trylocksock( const char * sockpath )
 {
     char path[MAXPATHLEN];
     int  fd;
@@ -185,8 +192,15 @@ trylocksock( void )
     gl_lockfd = fd;
     strlcpy( gl_lockpath, path, sizeof gl_lockpath );
 
-    confpath( path, sizeof path, CONF_FILE_SOCKET, 0 );
-    fd = getsock( path );
+    if( NULL == sockpath )
+    {
+        confpath( path, sizeof path, CONF_FILE_SOCKET, 0 );
+        fd = getsock( path );
+    }
+    else
+    {
+        fd = getsock( sockpath );
+    }
     if( 0 > fd )
     {
         return -1;
