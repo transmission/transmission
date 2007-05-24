@@ -125,6 +125,8 @@ struct ipc_info
 
 #define HASVERS( info )         ( 0 < (info)->vers )
 
+#define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
+
 typedef void ( *trd_msgfunc )( enum ipc_msg, benc_val_t *, int64_t, void * );
 
 /* any of these functions that can fail may set errno for any of the

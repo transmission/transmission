@@ -48,8 +48,6 @@
 #undef NULL
 #define NULL                    ( ( void * )0 )
 
-#define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
-
 #define SAFEFREE( ptr )                                                       \
     do                                                                        \
     {                                                                         \
