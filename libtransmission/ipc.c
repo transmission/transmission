@@ -712,6 +712,7 @@ ipc_addstat( benc_val_t * list, int tor, tr_info_t * inf,
 {
     benc_val_t  * dict, * item;
     int           ii, used;
+    unsigned int  error;
 
     /* always send torrent id */
     types |= IPC_ST_ID;
@@ -756,39 +757,40 @@ ipc_addstat( benc_val_t * list, int tor, tr_info_t * inf,
                 tr_bencInitInt( item, st->downloaded );
                 break;
             case IPC_ST_ERROR:
-                if( TR_OK == st->error )
+                error = st->error;
+                if( TR_OK == error )
                 {
                     tr_bencInitStr( item, NULL, 0, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_ASSERT, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_ASSERT, error ) )
                 {
                     tr_bencInitStr( item, "assert", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_PARENT, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_PARENT, error ) )
                 {
                     tr_bencInitStr( item, "io-parent", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_PERMISSIONS, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_PERMISSIONS, error ) )
                 {
                     tr_bencInitStr( item, "io-permissions", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_SPACE, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_SPACE, error ) )
                 {
                     tr_bencInitStr( item, "io-space", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_RESOURCES, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_RESOURCES, error ) )
                 {
                     tr_bencInitStr( item, "io-resources", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_MASK, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_MASK, error ) )
                 {
                     tr_bencInitStr( item, "io-other", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_TC_ERROR, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_TC_ERROR, error ) )
                 {
                     tr_bencInitStr( item, "tracker-error", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_TC_WARNING, st->error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_TC_WARNING, error ) )
                 {
                     tr_bencInitStr( item, "tracker-warning", -1, 1 );
                 }
