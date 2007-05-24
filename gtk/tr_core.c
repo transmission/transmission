@@ -186,8 +186,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT,        G_TYPE_INT,       G_TYPE_INT, G_TYPE_INT,
         /* completedFromTracker, downloaded,    uploaded       left */
         G_TYPE_INT,              G_TYPE_UINT64, G_TYPE_UINT64, G_TYPE_UINT64,
-        /* tracker,            the TrTorrent object */
-        TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,
+        /* tracker,            the TrTorrent object, the ID for IPC */
+        TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,      G_TYPE_INT,
     };
 
 #ifdef REFDBG
@@ -201,6 +201,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     self->model    = GTK_TREE_MODEL( store );
     self->handle   = tr_init( "gtk" );
     self->zombies  = NULL;
+    self->nextid   = 1;
     self->quitting = FALSE;
     self->disposed = FALSE;
 }
@@ -638,8 +639,10 @@ tr_core_insert( TrCore * self, TrTorrent * tor )
                         MC_NAME,    inf->name,
                         MC_SIZE,    inf->totalSize,
                         MC_TORRENT, tor,
+                        MC_ID,      self->nextid,
                         -1);
     g_object_unref( tor );
+    self->nextid++;
 }
 
 void

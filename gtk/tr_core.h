@@ -61,6 +61,7 @@ struct _TrCore
     GtkTreeModel      * model;
     tr_handle_t       * handle;
     GList             * zombies;
+    int                 nextid;
     gboolean            quitting;
     gboolean            disposed;
 };
@@ -159,7 +160,8 @@ enum {
   MC_NAME, MC_SIZE, MC_STAT, MC_ERR, MC_TERR,
   MC_PROG, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
   MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
-  MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ROW_COUNT,
+  MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ID,
+  MC_ROW_COUNT
 };
 
 #endif
