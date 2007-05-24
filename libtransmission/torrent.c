@@ -230,7 +230,15 @@ int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
 {
     tor->destination = strdup( path );
-    tr_ioLoadResume( tor );
+    if ( !tor->ioLoaded )
+    {
+        tr_ioLoadResume( tor );
+    }
+}
+
+void tr_torrentChangeFolder( tr_torrent_t * tor, const char * path )
+{
+    tor->destination = strdup( path );
 }
 
 char * tr_torrentGetFolder( tr_torrent_t * tor )

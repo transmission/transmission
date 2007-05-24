@@ -76,6 +76,7 @@ void tr_ioLoadResume( tr_torrent_t * tor )
     io->slotPiece = malloc( inf->pieceCount * sizeof( int ) );
 
     fastResumeLoad( io );
+    tor->ioLoaded = 1;
 
     free( io->pieceSlot );
     free( io->slotPiece );
