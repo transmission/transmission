@@ -40,7 +40,7 @@
 #include "client.h"
 #include "bencode.h"
 #include "errors.h"
-#include "ipc.h"
+#include "ipcparse.h"
 #include "misc.h"
 #include "trcompat.h"
 

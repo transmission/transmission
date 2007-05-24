@@ -29,7 +29,7 @@
 #include <string.h>
 
 #include "bsdtree.h"
-#include "ipc.h"
+#include "ipcparse.h"
 
 #include "transmission.h"
 #include "bencode.h"
