@@ -103,28 +103,27 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
                                        2, G_TYPE_INT, G_TYPE_STRING );
-
-    core_class = TR_CORE_CLASS( g_class );
     core_class->promptsig = g_signal_new( "directory-prompt",
                                           G_TYPE_FROM_CLASS( g_class ),
                                           G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                           tr_core_marshal_prompt, G_TYPE_NONE,
                                           3, G_TYPE_POINTER, G_TYPE_INT,
                                           G_TYPE_BOOLEAN );
-
-    core_class = TR_CORE_CLASS( g_class );
     core_class->promptdatasig = g_signal_new( "directory-prompt-data",
                                               G_TYPE_FROM_CLASS( g_class ),
                                               G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                               tr_core_marshal_data,
                                               G_TYPE_NONE, 3, G_TYPE_STRING,
                                               G_TYPE_UINT, G_TYPE_BOOLEAN );
-
-    core_class = TR_CORE_CLASS( g_class );
     core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                         g_cclosure_marshal_VOID__VOID,
                                         G_TYPE_NONE, 0 );
+    core_class->prefsig = g_signal_new( "prefs-changed",
+                                        G_TYPE_FROM_CLASS( g_class ),
+                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                        g_cclosure_marshal_VOID__INT,
+                                        G_TYPE_NONE, 1, G_TYPE_INT );
 }
 
 void
@@ -788,4 +787,60 @@ tr_core_quit( TrCore * self )
 
     class = g_type_class_peek( TR_CORE_TYPE );
     g_signal_emit( self, class->quitsig, 0 );
+}
+
+void
+tr_core_set_pref( TrCore * self, int id, const char * val )
+{
+    const char  * name, * old;
+    char        * errstr;
+    TrCoreClass * class;
+
+    TR_IS_CORE( self );
+
+    name = tr_prefs_name( id );
+    old = cf_getpref( name );
+    if( NULL == old )
+    {
+        if( old == val )
+        {
+            return;
+        }
+    }
+    else
+    {
+        if( 0 == strcmp( old, val ) )
+        {
+            return;
+        }
+    }
+    cf_setpref( name, val );
+
+    /* write prefs to disk */
+    cf_saveprefs( &errstr );
+    if( NULL != errstr )
+    {
+        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, errstr );
+        g_free( errstr );
+    }
+
+    /* signal a pref change */
+    class = g_type_class_peek( TR_CORE_TYPE );
+    g_signal_emit( self, class->prefsig, 0, id );
+}
+
+void
+tr_core_set_pref_bool( TrCore * self, int id, gboolean val )
+{
+    tr_core_set_pref( self, id, ( val ? "yes" : "no" ) );
+}
+
+void
+tr_core_set_pref_int( TrCore * self, int id, int val )
+{
+    char buf[32];
+
+    snprintf( buf, sizeof buf, "%i", val );
+
+    tr_core_set_pref( self, id, buf );
 }

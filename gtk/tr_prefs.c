@@ -31,6 +31,7 @@
 
 #include "conf.h"
 #include "tr_icon.h"
+#include "tr_core.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -58,6 +59,7 @@
 enum
 {
     PROP_PARENT = 1,
+    PROP_CORE,
 };
 
 #define PTYPE( id )                                                           \
@@ -244,35 +246,37 @@ static void
 pokelink( struct checkctl * link );
 static void
 addwidget( TrPrefs * self, int id, GtkTable * table, int off,
-           GtkTooltips * tips, struct checkctl ** links );
+           GtkTooltips * tips, struct checkctl ** links, GtkWidget ** wids );
 static GtkWidget *
 tipbox( GtkWidget * widget, GtkTooltips * tips, const char * tip );
 static void
 addwid_bool( TrPrefs * self, int id, GtkTooltips * tips,
-             GtkWidget ** wid1, struct checkctl ** links );
+             GtkWidget ** wid1, struct checkctl ** links, GtkWidget ** wids );
 static void
 checkclick( GtkWidget * widget, gpointer data );
 static void
 addwid_int( TrPrefs * self, int id, GtkTooltips * tips,
-            GtkWidget ** wid1, GtkWidget ** wid2 );
+            GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids );
 static gboolean
 spinfocus( GtkWidget * widget, GdkEventFocus *event, gpointer data );
 static void
 spindie( GtkWidget * widget, gpointer data );
 static void
 addwid_file( TrPrefs * self, int id, GtkTooltips * tips,
-             GtkWidget ** wid1, GtkWidget ** wid2 );
+             GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids );
 static void
 filechosen( GtkWidget * widget, gpointer data );
 static GtkTreeModel *
 makecombomodel( void );
 static void
 addwid_combo( TrPrefs * self, int id, GtkTooltips * tips,
-              GtkWidget ** wid1, GtkWidget ** wid2 );
+              GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids );
+static void
+setcombosel( GtkTreeModel * model, GtkComboBox * combo, int id );
 static void
 combochosen( GtkWidget * widget, gpointer data );
 static void
-savepref( TrPrefs * self, int id, const char * val );
+prefschanged( TrCore * core, int id, gpointer data );
 
 GType
 tr_prefs_get_type( void )
@@ -304,7 +308,6 @@ static void
 tr_prefs_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
 {
     GObjectClass * gobject_class;
-    TrPrefsClass  * trprefs_class;
     GParamSpec   * pspec;
 
     gobject_class = G_OBJECT_CLASS( g_class );
@@ -317,12 +320,10 @@ tr_prefs_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
                                  GTK_TYPE_WINDOW, G_PARAM_READWRITE );
     g_object_class_install_property( gobject_class, PROP_PARENT, pspec );
 
-    trprefs_class = TR_PREFS_CLASS( g_class );
-    trprefs_class->changesig =
-        g_signal_new( "prefs-changed", G_TYPE_FROM_CLASS( g_class ),
-                       G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                       g_cclosure_marshal_VOID__INT,
-                       G_TYPE_NONE, 1, G_TYPE_INT );
+    pspec = g_param_spec_object( "core", "Parent",
+                                 "The TrCore object.",
+                                 TR_CORE_TYPE, G_PARAM_READWRITE );
+    g_object_class_install_property( gobject_class, PROP_CORE, pspec );
 }
 
 static void
@@ -336,7 +337,10 @@ tr_prefs_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     int           rows, ii, off;
 
     self->combomodel = makecombomodel();
+    self->core       = NULL;
+    self->prefwids   = g_new0( GtkWidget *, PREF_MAX_ID );
     self->disposed   = FALSE;
+    self->fileselhack = FALSE;
 
     gtk_window_set_role( GTK_WINDOW( self ), "tr-prefs" );
     title = g_strdup_printf( _("%s Preferences"), g_get_application_name() );
@@ -369,7 +373,8 @@ tr_prefs_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     {
         if( PR_SKIP != defs[ii].status )
         {
-            addwidget( self, ii, GTK_TABLE( table ), off, tips, links );
+            addwidget( self, ii, GTK_TABLE( table ), off, tips, links,
+                       self->prefwids );
             off++;
         }
     }
@@ -405,6 +410,21 @@ tr_prefs_set_property( GObject * object, guint property_id,
             gtk_window_set_transient_for( GTK_WINDOW( self ),
                                           g_value_get_object( value ) );
             break;
+        case PROP_CORE:
+            if( NULL != self->core )
+            {
+                g_signal_handler_disconnect( self->core, self->sigid );
+                g_object_unref( self->core );
+            }
+            self->core = g_value_get_object( value );
+            if( NULL != self->core )
+            {
+                g_object_ref( self->core );
+                self->sigid = g_signal_connect( self->core, "prefs-changed",
+                                                G_CALLBACK( prefschanged ),
+                                                self );
+            }
+            break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec );
             break;
@@ -429,6 +449,9 @@ tr_prefs_get_property( GObject * object, guint property_id,
             trans = gtk_window_get_transient_for( GTK_WINDOW( self ) );
             g_value_set_object( value, trans );
             break;
+        case PROP_CORE:
+            g_value_set_object( value, self->core );
+            break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID( object, property_id, pspec );
             break;
@@ -449,21 +472,29 @@ tr_prefs_dispose( GObject * obj )
 
     g_object_unref( self->combomodel );
 
+    if( NULL != self->core )
+    {
+        g_signal_handler_disconnect( self->core, self->sigid );
+        g_object_unref( self->core );
+    }
+
+    g_free( self->prefwids );
+
     /* Chain up to the parent class */
     parent = g_type_class_peek( g_type_parent( TR_PREFS_TYPE ) );
     parent->dispose( obj );
 }
 
 TrPrefs *
-tr_prefs_new( void )
+tr_prefs_new( GObject * core )
 {
-    return g_object_new( TR_PREFS_TYPE, NULL );
+    return g_object_new( TR_PREFS_TYPE, "core", core, NULL );
 }
 
 TrPrefs *
-tr_prefs_new_with_parent( GtkWindow * parent )
+tr_prefs_new_with_parent( GObject * core, GtkWindow * parent )
 {
-    return g_object_new( TR_PREFS_TYPE, "parent", parent, NULL );
+    return g_object_new( TR_PREFS_TYPE, "core", core, "parent", parent, NULL );
 }
 
 const char *
@@ -627,7 +658,7 @@ pokelink( struct checkctl * link )
 
 static void
 addwidget( TrPrefs * self, int id, GtkTable * table, int off,
-           GtkTooltips * tips, struct checkctl ** links )
+           GtkTooltips * tips, struct checkctl ** links, GtkWidget ** widgets )
 {
     GType       type;
     GtkWidget * add1, * add2;
@@ -639,19 +670,19 @@ addwidget( TrPrefs * self, int id, GtkTable * table, int off,
     add2 = NULL;
     if( G_TYPE_BOOLEAN == type )
     {
-        addwid_bool( self, id, tips, &add1, links );
+        addwid_bool( self, id, tips, &add1, links, widgets );
     }
     else if( G_TYPE_INT == type )
     {
-        addwid_int( self, id, tips, &add1, &add2 );
+        addwid_int( self, id, tips, &add1, &add2, widgets );
     }
     else if( GTK_TYPE_FILE_CHOOSER == type )
     {
-        addwid_file( self, id, tips, &add1, &add2 );
+        addwid_file( self, id, tips, &add1, &add2, widgets );
     }
     else if( GTK_TYPE_COMBO_BOX == type )
     {
-        addwid_combo( self, id, tips, &add1, &add2 );
+        addwid_combo( self, id, tips, &add1, &add2, widgets );
     }
     else
     {
@@ -694,13 +725,14 @@ tipbox( GtkWidget * widget, GtkTooltips * tips, const char * tip )
 
 static void
 addwid_bool( TrPrefs * self, int id, GtkTooltips * tips,
-             GtkWidget ** wid1, struct checkctl ** links )
+             GtkWidget ** wid1, struct checkctl ** links, GtkWidget ** wids )
 {
     GtkWidget  * check;
     gboolean     active;
 
     g_assert( ALEN( defs ) > id && G_TYPE_BOOLEAN == PTYPE( id ) );
     check = gtk_check_button_new_with_mnemonic( gettext( defs[id].label ) );
+    wids[id] = check;
     gtk_tooltips_set_tip( tips, check, gettext( defs[id].tip ), "" );
     if( 0 > defs_bool[id].link )
     {
@@ -740,12 +772,12 @@ checkclick( GtkWidget * widget, gpointer data )
     }
 
     active = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( widget ) );
-    savepref( self, id, ( active ? "yes" : "no" ) );
+    tr_core_set_pref_bool( TR_CORE( self->core ), id, active );
 }
 
 static void
 addwid_int( TrPrefs * self, int id, GtkTooltips * tips,
-            GtkWidget ** wid1, GtkWidget ** wid2 )
+            GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids )
 {
     GtkWidget * spin, * label;
     int         val, * last;
@@ -753,6 +785,7 @@ addwid_int( TrPrefs * self, int id, GtkTooltips * tips,
     g_assert( ALEN( defs ) > id && G_TYPE_INT == PTYPE( id ) );
     spin = gtk_spin_button_new_with_range( defs_int[id].min,
                                            defs_int[id].max, 1 );
+    wids[id] = spin;
     label = gtk_label_new_with_mnemonic( gettext( defs[id].label ) );
     gtk_label_set_mnemonic_widget( GTK_LABEL( label ), spin );
     gtk_misc_set_alignment( GTK_MISC( label ), 0, .5 );
@@ -778,7 +811,6 @@ spinfocus( GtkWidget * widget, GdkEventFocus *event SHUTUP, gpointer data )
 {
     TrPrefs * self;
     int     * last, id, cur;
-    char    * str;
 
     TR_IS_PREFS( data );
     self = TR_PREFS( data );
@@ -788,9 +820,7 @@ spinfocus( GtkWidget * widget, GdkEventFocus *event SHUTUP, gpointer data )
 
     if( cur != *last )
     {
-        str = g_strdup_printf( "%i", cur );
-        savepref( self, id, str );
-        g_free( str );
+        tr_core_set_pref_int( TR_CORE( self->core ), id, cur );
         *last = cur;
     }
 
@@ -806,7 +836,7 @@ spindie( GtkWidget * widget, gpointer data )
 
 static void
 addwid_file( TrPrefs * self, int id, GtkTooltips * tips,
-             GtkWidget ** wid1, GtkWidget ** wid2 )
+             GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids )
 {
     GtkWidget  * file, * label;
     const char * pref;
@@ -814,6 +844,7 @@ addwid_file( TrPrefs * self, int id, GtkTooltips * tips,
     g_assert( ALEN( defs ) > id && GTK_TYPE_FILE_CHOOSER == PTYPE( id ) );
     file = gtk_file_chooser_button_new( gettext( defs_file[id].title ),
                                         defs_file[id].act );
+    wids[id] = file;
     label = gtk_label_new_with_mnemonic( gettext( defs[id].label ) );
     gtk_label_set_mnemonic_widget( GTK_LABEL( label ), file );
     gtk_misc_set_alignment( GTK_MISC( label ), 0, .5 );
@@ -842,7 +873,9 @@ filechosen( GtkWidget * widget, gpointer data )
     self = TR_PREFS( data );
     dir = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( widget ) );
     GETPREFID( widget, id );
-    savepref( self, id, dir );
+    self->fileselhack = TRUE;
+    tr_core_set_pref( TR_CORE( self->core ), id, dir );
+    self->fileselhack = FALSE;
 }
 
 static GtkTreeModel *
@@ -868,15 +901,14 @@ makecombomodel( void )
 
 static void
 addwid_combo( TrPrefs * self, int id, GtkTooltips * tips,
-              GtkWidget ** wid1, GtkWidget ** wid2 )
+              GtkWidget ** wid1, GtkWidget ** wid2, GtkWidget ** wids )
 {
     GtkWidget       * combo, * label;
     GtkCellRenderer * rend;
-    GtkTreeIter       iter;
-    enum tr_torrent_action prefsact, modelact;
 
     g_assert( ALEN( defs ) > id && GTK_TYPE_COMBO_BOX == PTYPE( id ) );
     combo = gtk_combo_box_new();
+    wids[id] = combo;
     label = gtk_label_new_with_mnemonic( gettext( defs[id].label ) );
     gtk_label_set_mnemonic_widget( GTK_LABEL( label ), combo );
     gtk_misc_set_alignment( GTK_MISC( label ), 0, .5 );
@@ -885,25 +917,34 @@ addwid_combo( TrPrefs * self, int id, GtkTooltips * tips,
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT( combo ), rend, TRUE );
     gtk_cell_layout_add_attribute( GTK_CELL_LAYOUT( combo ), rend, "text", 0 );
 
-    prefsact = toraddaction( tr_prefs_get( id ) );
-    if( gtk_tree_model_get_iter_first( self->combomodel, &iter ) )
-    {
-        do
-        {
-            gtk_tree_model_get( self->combomodel, &iter, 1, &modelact, -1 );
-            if( modelact == prefsact )
-            {
-                gtk_combo_box_set_active_iter( GTK_COMBO_BOX( combo ), &iter );
-                break;
-            }
-        }
-        while( gtk_tree_model_iter_next( self->combomodel, &iter ) );
-    }
+    setcombosel( self->combomodel, GTK_COMBO_BOX( combo ), id );
     SETPREFID( combo, id );
     g_signal_connect( combo, "changed", G_CALLBACK( combochosen ), self );
 
     *wid1 = tipbox( label, tips, gettext( defs[id].tip ) );
     *wid2 = tipbox( combo, tips, gettext( defs[id].tip ) );
+}
+
+static void
+setcombosel( GtkTreeModel * model, GtkComboBox * combo, int id )
+{
+    GtkTreeIter            iter;
+    enum tr_torrent_action prefsact, modelact;
+
+    prefsact = toraddaction( tr_prefs_get( id ) );
+    if( gtk_tree_model_get_iter_first( model, &iter ) )
+    {
+        do
+        {
+            gtk_tree_model_get( model, &iter, 1, &modelact, -1 );
+            if( modelact == prefsact )
+            {
+                gtk_combo_box_set_active_iter( combo, &iter );
+                break;
+            }
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
+    }
 }
 
 static void
@@ -922,44 +963,60 @@ combochosen( GtkWidget * widget, gpointer data )
         model = gtk_combo_box_get_model( GTK_COMBO_BOX( widget ) );
         gtk_tree_model_get( model, &iter, 1, &action, -1 );
         GETPREFID( widget, id );
-        savepref( self, id, toractionname( action ) );
+        tr_core_set_pref( TR_CORE( self->core ), id, toractionname( action ) );
     }
 }
 
 static void
-savepref( TrPrefs * self, int id, const char * val )
+prefschanged( TrCore * core SHUTUP, int id, gpointer data )
 {
-    const char   * name, * old;
-    char         * errstr;
-    TrPrefsClass * class;
+    TrPrefs    * prefs;
+    GtkWidget  * wid;
+    gboolean     boolval;
+    int          intval;
+    const char * strval;
 
-    name = tr_prefs_name( id );
-    old = cf_getpref( name );
-    if( NULL == old )
+    TR_IS_PREFS( data );
+    prefs = TR_PREFS( data );
+
+    g_assert( ALEN( defs ) > id && 0 <= id );
+
+    wid = prefs->prefwids[id];
+
+    if( G_TYPE_BOOLEAN == PTYPE( id ) )
     {
-        if( old == val )
+        boolval = tr_prefs_get_bool_with_default( id );
+        if( boolval !=
+            gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( wid ) ) )
         {
-            return;
+            gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( wid ), boolval );
         }
+    }
+    else if( G_TYPE_INT == PTYPE( id ) )
+    {
+        intval = tr_prefs_get_int_with_default( id );
+        if( intval !=
+            gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( wid ) ) )
+        {
+            gtk_spin_button_set_value( GTK_SPIN_BUTTON( wid ), intval );
+        }
+    }
+    else if( GTK_TYPE_FILE_CHOOSER == PTYPE( id ) )
+    {
+        strval = tr_prefs_get( id );
+        if( !prefs->fileselhack && strval !=
+            gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( wid ) ) )
+        {
+            gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( wid ),
+                                                 strval );
+        }
+    }
+    else if( GTK_TYPE_COMBO_BOX == PTYPE( id ) )
+    {
+        setcombosel( prefs->combomodel, GTK_COMBO_BOX( wid ), id );
     }
     else
     {
-        if( 0 == strcmp( old, val ) )
-        {
-            return;
-        }
+        g_assert_not_reached();
     }
-    cf_setpref( name, val );
-
-    /* write prefs to disk */
-    cf_saveprefs( &errstr );
-    if( NULL != errstr )
-    {
-        errmsg( GTK_WINDOW( self ), "%s", errstr );
-        g_free( errstr );
-    }
-
-    /* signal a pref change */
-    class = g_type_class_peek( TR_PREFS_TYPE );
-    g_signal_emit( self, class->changesig, 0, id );
 }

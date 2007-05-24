@@ -54,23 +54,26 @@ struct _TrPrefs
 {
     GtkDialog      parent;
     GtkTreeModel * combomodel;
+    GObject      * core;
+    gulong         sigid;
+    GtkWidget   ** prefwids;
+    gboolean       fileselhack;
     gboolean       disposed;
 };
 
 struct _TrPrefsClass
 {
     GtkDialogClass parent;
-    int            changesig;
 };
 
 GType
 tr_prefs_get_type( void );
 
 TrPrefs *
-tr_prefs_new( void );
+tr_prefs_new( GObject * core );
 
 TrPrefs *
-tr_prefs_new_with_parent( GtkWindow * parent );
+tr_prefs_new_with_parent( GObject * core, GtkWindow * parent );
 
 /* please keep this in sync with defs in tr_prefs.c */
 enum

@@ -174,7 +174,7 @@ corepromptdata( TrCore *, uint8_t *, size_t, gboolean, gpointer );
 static void
 readinitialprefs( struct cbdata * cbdata );
 static void
-prefschanged( GtkWidget * widget, int id, gpointer data );
+prefschanged( TrCore * core, int id, gpointer data );
 static void
 setpex( tr_torrent_t * tor, void * arg );
 static gboolean
@@ -395,6 +395,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
                       G_CALLBACK( corepromptdata ), cbdata );
     g_signal_connect_swapped( cbdata->core, "quit",
                               G_CALLBACK( wannaquit ), cbdata );
+    g_signal_connect( cbdata->core, "prefs-changed",
+                      G_CALLBACK( prefschanged ), cbdata );
 
     /* apply a few prefs */
     readinitialprefs( cbdata );
@@ -575,8 +577,8 @@ exitcheck( gpointer gdata )
         g_source_remove( edata->timer );
     }
     g_free( edata );
-    /* The prefs window need to be destroyed first as destroying it may
-       trigger callbacks that use cbdata->core. Ick. */
+    /* note that cbdata->prefs holds a reference to cbdata->core, and
+       it's destruction may trigger callbacks that use cbdata->core */
     if( NULL != cbdata->prefs )
     {
         gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
@@ -777,7 +779,7 @@ readinitialprefs( struct cbdata * cbdata )
 }
 
 static void
-prefschanged( GtkWidget * widget SHUTUP, int id, gpointer data )
+prefschanged( TrCore * core SHUTUP, int id, gpointer data )
 {
     struct cbdata * cbdata;
     tr_handle_t   * tr;
@@ -942,9 +944,8 @@ handleaction( struct cbdata * data, int act )
           {
               return;
           }
-          data->prefs = tr_prefs_new_with_parent( data->wind );
-          g_signal_connect( data->prefs, "prefs-changed",
-                            G_CALLBACK( prefschanged ), data );
+          data->prefs = tr_prefs_new_with_parent( G_OBJECT( data->core ),
+                                                  data->wind );
           g_signal_connect( data->prefs, "destroy",
                             G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
           gtk_widget_show( GTK_WIDGET( data->prefs ) );
