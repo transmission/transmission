@@ -42,19 +42,19 @@
 
 - (id) init
 {
-    if((self = [super init]))
+    if ((self = [super init]))
 	{
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-		fWhiteGradient = [[CTGradient aquaNormalGradient] retain];
-		fGreyGradient = [[CTGradient progressGrayGradient] retain];
+        fWhiteGradient = [[CTGradient aquaNormalGradient] retain];
+        fGrayGradient = [[CTGradient progressGrayGradient] retain];
         fBlueGradient = [[CTGradient progressBlueGradient] retain];
-		fGreenGradient = [[CTGradient progressGreenGradient] retain];
-		fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
+        fGreenGradient = [[CTGradient progressGreenGradient] retain];
+        fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
         
-		fErrorImage = [[NSImage imageNamed: @"Error"] copy];
-		[fErrorImage setFlipped: YES];
+        fErrorImage = [[NSImage imageNamed: @"Error"] copy];
+        [fErrorImage setFlipped: YES];
     }
 	return self;
 }
@@ -105,7 +105,7 @@
         if ([[info objectForKey: @"Active"] boolValue])
             [fBlueGradient fillRect: completeBounds angle: -90];
         else
-            [fGreyGradient fillRect: completeBounds angle: -90];
+            [fGrayGradient fillRect: completeBounds angle: -90];
     }
     [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
     [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
@@ -121,8 +121,8 @@
     [image compositeToPoint: point operation: NSCompositeSourceOver];
     
     NSRect barBounds;
-    if([[self controlView] isFlipped])
-         barBounds = NSMakeRect(point.x, point.y, width, BAR_HEIGHT);
+    if ([[self controlView] isFlipped])
+        barBounds = NSMakeRect(point.x, point.y, width, BAR_HEIGHT);
     else
         barBounds = NSMakeRect(point.x, point.y - BAR_HEIGHT, width, BAR_HEIGHT);
     [fTransparentGradient fillRect: barBounds angle: -90];
