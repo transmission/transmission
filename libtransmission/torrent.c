@@ -236,11 +236,6 @@ void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
     }
 }
 
-void tr_torrentChangeFolder( tr_torrent_t * tor, const char * path )
-{
-    tor->destination = strdup( path );
-}
-
 char * tr_torrentGetFolder( tr_torrent_t * tor )
 {
     return tor->destination;
