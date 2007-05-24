@@ -36,6 +36,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "ipcparse.h"
 
 #include "conf.h"
 #include "io.h"
@@ -43,17 +44,6 @@
 #include "tr_core.h"
 #include "tr_prefs.h"
 #include "util.h"
-
-/* IPC protocol version */
-#define PROTO_VERS_MIN          ( 1 )
-#define PROTO_VERS_MAX          ( 1 )
-
-/* int, IPC protocol version */
-#define MSG_VERSION             ("version")
-/* list of strings, full paths to torrent files to load */
-#define MSG_ADDFILES            ("addfiles")
-/* request that the server quit */
-#define MSG_QUIT                ("quit")
 
 enum contype { CON_SERV, CON_CLIENT };
 
@@ -63,30 +53,27 @@ struct constate_serv
     gpointer    core;
 };
 
-enum client_cmd { CCMD_ADD, CCMD_QUIT };
-
-struct constate_client {
-  GMainLoop *loop;
-  enum client_cmd cmd;
-  GList *files;
-  gboolean *succeeded;
-  unsigned int msgid;
+struct constate_client
+{
+    GMainLoop  * loop;
+    enum ipc_msg msg;
+    GList      * files;
+    gboolean   * succeeded;
+    unsigned int msgid;
 };
 
-struct constate;
-typedef void (*handler_func_t)(struct constate*, const char*, benc_val_t *);
-struct handlerdef {char *name; handler_func_t func;};
-
-struct constate {
-  GSource *source;
-  int fd;
-  int vers;
-  const struct handlerdef *funcs;
-  enum contype type;
-  union {
-    struct constate_serv serv;
-    struct constate_client client;
-  } u;
+struct constate
+{
+    GSource          * source;
+    int                fd;
+    enum contype       type;
+    struct ipc_funcs * msgs;
+    struct ipc_info    ipc;
+    union
+    {
+        struct constate_serv   serv;
+        struct constate_client client;
+    } u;
 };
 
 static void
@@ -98,44 +85,24 @@ client_connect(char *path, struct constate *con);
 static void
 srv_io_accept(GSource *source, int fd, struct sockaddr *sa, socklen_t len,
               void *vdata);
-static int
-send_msg(struct constate *con, const char *name, benc_val_t *val);
-static int
-send_msg_vers_new(struct constate *con);
-static int
-send_msg_vers_old(struct constate *con);
 static unsigned int
-all_io_received(GSource *source, char *data, unsigned int len, void *vdata);
+srv_io_received(GSource *source, char *data, unsigned int len, void *vdata);
+static unsigned int
+cli_io_received(GSource *source, char *data, unsigned int len, void *vdata);
+static void
+client_sendmsg( struct constate * con );
 static void
 destroycon(struct constate *con);
 static void
 all_io_closed(GSource *source, void *vdata);
 static void
-srv_vers(struct constate *con, const char *name, benc_val_t *val);
+cli_io_sent(GSource *source, unsigned int id, void *vdata);
 static void
-srv_addfile(struct constate *con, const char *name, benc_val_t *val);
+smsg_add( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
-srv_quit( struct constate * con, const char * name, benc_val_t * val );
+smsg_quit( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
-afc_version(struct constate *con, const char *name, benc_val_t *val);
-static void
-afc_io_sent(GSource *source, unsigned int id, void *vdata);
-static int
-ipc_checkversion( benc_val_t * vers );
-static int
-getvers( benc_val_t * dict, const char * key );
-
-static const struct handlerdef gl_funcs_serv[] = {
-  {MSG_VERSION,  srv_vers},
-  {MSG_ADDFILES, srv_addfile},
-  {MSG_QUIT,     srv_quit},
-  {NULL, NULL}
-};
-
-static const struct handlerdef gl_funcs_client[] = {
-  {MSG_VERSION, afc_version},
-  {NULL, NULL}
-};
+all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 
 /* this is only used on the server */
 static char *gl_sockpath = NULL;
@@ -148,9 +115,21 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   con = g_new0(struct constate, 1);
   con->source = NULL;
   con->fd = -1;
-  con->vers = -1;
-  con->funcs = gl_funcs_serv;
   con->type = CON_SERV;
+
+  con->msgs = ipc_initmsgs();
+  if( NULL == con->msgs ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) )
+  {
+      errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
+              strerror( errno ) );
+      g_free( con );
+      return;
+  }
+
+  ipc_setdefmsg( con->msgs, all_default );
+
   con->u.serv.wind = parent;
   con->u.serv.core = core;
 
@@ -160,7 +139,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
 }
 
 static gboolean
-blocking_client( enum client_cmd cmd, GList * files )
+blocking_client( enum ipc_msg msgid, GList * files )
 {
 
   struct constate *con;
@@ -170,11 +149,21 @@ blocking_client( enum client_cmd cmd, GList * files )
   con = g_new0(struct constate, 1);
   con->source = NULL;
   con->fd = -1;
-  con->vers = -1;
-  con->funcs = gl_funcs_client;
   con->type = CON_CLIENT;
+
+  con->msgs = ipc_initmsgs();
+  if( NULL == con->msgs )
+  {
+      fprintf( stderr, _("failed to set up IPC: %s\n"), strerror( errno ) );
+      g_free( con );
+      return FALSE;
+  }
+
+  ipc_setdefmsg( con->msgs, all_default );
+  ipc_newcon( &con->ipc, con->msgs );
+
   con->u.client.loop = g_main_loop_new(NULL, TRUE);
-  con->u.client.cmd = cmd;
+  con->u.client.msg = msgid;
   con->u.client.files = files;
   con->u.client.succeeded = &ret;
   con->u.client.msgid = 0;
@@ -194,13 +183,13 @@ blocking_client( enum client_cmd cmd, GList * files )
 gboolean
 ipc_sendfiles_blocking( GList * files )
 {
-    return blocking_client( CCMD_ADD, files );
+    return blocking_client( IPC_MSG_ADDMANYFILES, files );
 }
 
 gboolean
 ipc_sendquit_blocking( void )
 {
-    return blocking_client( CCMD_QUIT, NULL );
+    return blocking_client( IPC_MSG_QUIT, NULL );
 }
 
 /* open a local socket for clients connections */
@@ -257,6 +246,8 @@ rmsock(void) {
 static gboolean
 client_connect(char *path, struct constate *con) {
   struct sockaddr_un addr;
+  uint8_t          * buf;
+  size_t             size;
 
   if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
     fprintf(stderr, _("failed to create socket: %s\n"), strerror(errno));
@@ -272,13 +263,22 @@ client_connect(char *path, struct constate *con) {
     return FALSE;
   }
 
-  con->source = io_new(con->fd, afc_io_sent, all_io_received,
+  con->source = io_new(con->fd, cli_io_sent, cli_io_received,
                        all_io_closed, con);
-
-  if( NULL != con->source )
+  if( NULL == con->source )
   {
-      send_msg_vers_new( con );
+      close( con->fd );
+      return FALSE;
   }
+
+  buf = ipc_mkvers( &size );
+  if( NULL == buf )
+  {
+      close( con->fd );
+      return FALSE;
+  }
+
+  io_send_keepdata( con->source, buf, size );
 
   return TRUE;
 }
@@ -288,132 +288,159 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
               socklen_t len SHUTUP, void *vdata) {
   struct constate *con = vdata;
   struct constate *newcon;
+  uint8_t        * buf;
+  size_t           size;
 
   newcon = g_new(struct constate, 1);
   memcpy(newcon, con, sizeof(*newcon));
   newcon->fd = fd;
-  newcon->source = io_new(fd, NULL, all_io_received, all_io_closed, newcon);
+  ipc_newcon( &newcon->ipc, con->msgs );
+  newcon->source = io_new(fd, NULL, srv_io_received, all_io_closed, newcon);
 
-  /* XXX need to check for incoming version from client */
-
-  if(NULL != newcon->source)
-    /* XXX need to switch to new version scheme after the next release */
-    send_msg_vers_old( newcon );
-  else {
-    g_free(newcon);
-    close(fd);
+  if( NULL == newcon->source )
+  {
+      g_free( newcon );
+      close( fd );
+      return;
   }
-}
 
-static int
-send_msg(struct constate *con, const char *name, benc_val_t *val) {
-  char *buf;
-  int used, total;
-  benc_val_t dict;
-  char stupid;
-
-  /* construct a dictionary value */
-  /* XXX I shouldn't be constructing benc_val_t's by hand */
-  bzero(&dict, sizeof(dict));
-  dict.type = TYPE_DICT;
-  dict.val.l.alloc = 2;
-  dict.val.l.count = 2;
-  dict.val.l.vals = g_new0(benc_val_t, 2);
-  dict.val.l.vals[0].type = TYPE_STR;
-  dict.val.l.vals[0].val.s.i = strlen(name);
-  dict.val.l.vals[0].val.s.s = (char*)name;
-  dict.val.l.vals[1] = *val;
-
-  /* bencode the dictionary, starting at offset 8 in the buffer */
-  buf = malloc(9);
-  g_assert(NULL != buf);
-  total = 9;
-  used = 8;
-  if(tr_bencSave(&dict, &buf, &used, &total)) {
-    g_assert_not_reached();
+  buf = ipc_mkvers( &size );
+  if( NULL == buf )
+  {
+      g_free( newcon );
+      close( fd );
+      return;
   }
-  g_free(dict.val.l.vals);
 
-  /* write the bencoded data length into the first 8 bytes of the buffer */
-  stupid = buf[8];
-  snprintf(buf, 9, "%08X", (unsigned int)used - 8);
-  buf[8] = stupid;
-
-  /* send the data */
-  return io_send_keepdata(con->source, buf, used);
-}
-
-static int
-send_msg_vers_new( struct constate * con )
-{
-    benc_val_t dict;
-
-    /* XXX ugh, I need to merge the pex branch and use it's benc funcs */
-    bzero( &dict, sizeof dict );
-    dict.type                  = TYPE_DICT;
-    dict.val.l.alloc           = 4;
-    dict.val.l.count           = 4;
-    dict.val.l.vals            = g_new0( benc_val_t, 4 );
-    dict.val.l.vals[0].type    = TYPE_STR;
-    dict.val.l.vals[0].val.s.i = 3;
-    dict.val.l.vals[0].val.s.s = "min";
-    dict.val.l.vals[1].type    = TYPE_INT;
-    dict.val.l.vals[1].val.i   = PROTO_VERS_MIN;
-    dict.val.l.vals[2].type    = TYPE_STR;
-    dict.val.l.vals[2].val.s.i = 3;
-    dict.val.l.vals[2].val.s.s = "max";
-    dict.val.l.vals[3].type    = TYPE_INT;
-    dict.val.l.vals[3].val.i   = PROTO_VERS_MAX;
-
-    return send_msg( con, MSG_VERSION, &dict );
-}
-
-static int
-send_msg_vers_old( struct constate * con )
-{
-    benc_val_t val;
-
-    bzero( &val, sizeof val );
-    val.type  = TYPE_INT;
-    val.val.i = PROTO_VERS_MIN;
-
-    return send_msg( con, MSG_VERSION, &val );
+  io_send_keepdata( newcon->source, buf, size );
 }
 
 static unsigned int
-all_io_received(GSource *source, char *data, unsigned int len, void *vdata) {
-  struct constate *con = vdata;
-  size_t size;
-  char stupid;
-  char *end;
-  benc_val_t msgs;
-  int ii, jj;
+srv_io_received( GSource * source SHUTUP, char * data, unsigned int len,
+                 void * vdata)
+{
+    struct constate * con = vdata;
+    ssize_t           res;
 
-  if(9 > len)
-    return 0;
+    if( IPC_MIN_MSG_LEN > len )
+    {
+        return 0;
+    }
 
-  stupid = data[8];
-  data[8] = '\0';
-  size = strtoul(data, NULL, 16);
-  data[8] = stupid;
+    res = ipc_parse( &con->ipc, data, len, con );
 
-  if(size + 8 > len)
-    return 0;
+    if( 0 > res )
+    {
+        switch( errno )
+        {
+            case EPERM:
+                errmsg( con->u.serv.wind, _("bad IPC protocol version") );
+                break;
+            case EINVAL:
+                errmsg( con->u.serv.wind, _("IPC protocol parse error") );
+                break;
+            default:
+                errmsg( con->u.serv.wind, _("IPC parsing failed: %s"),
+                        strerror( errno ) );
+        }
+        destroycon( con );
+        return 0;
+    }
 
-  if(!tr_bencLoad(data + 8, size, &msgs, &end) && TYPE_DICT == msgs.type) {
-    for(ii = 0; msgs.val.l.count > ii + 1; ii += 2)
-      if(TYPE_STR == msgs.val.l.vals[ii].type)
-        for(jj = 0; NULL != con->funcs[jj].name; jj++)
-          if(0 == strcmp(msgs.val.l.vals[ii].val.s.s, con->funcs[jj].name)) {
-            con->funcs[jj].func(con, msgs.val.l.vals[ii].val.s.s,
-                                msgs.val.l.vals + ii + 1);
+    return res;
+}
+
+static unsigned int
+cli_io_received( GSource * source SHUTUP, char * data, unsigned int len,
+                 void * vdata )
+{
+    struct constate        * con = vdata;
+    struct constate_client * cli = &con->u.client;
+    ssize_t                  res;
+
+    if( IPC_MIN_MSG_LEN > len )
+    {
+        return 0;
+    }
+
+    res = ipc_parse( &con->ipc, data, len, con );
+
+    if( 0 > res )
+    {
+        switch( errno )
+        {
+            case EPERM:
+                fprintf( stderr, _("bad IPC protocol version\n") );
+                break;
+            case EINVAL:
+                fprintf( stderr, _("IPC protocol parse error\n") );
+                break;
+            default:
+                fprintf( stderr, _("IPC parsing failed: %s\n"),
+                         strerror( errno ) );
+                break;
+        }
+        destroycon( con );
+        return 0;
+    }
+
+    if( 0 < res && 0 == cli->msgid )
+    {
+        client_sendmsg( con );
+    }
+
+    return res;
+}
+
+static void
+client_sendmsg( struct constate * con )
+{
+    struct constate_client * cli = &con->u.client;
+    GList                  * ii;
+    uint8_t                * buf;
+    size_t                   size;
+    benc_val_t               packet, * val;
+    int                      saved;
+
+    switch( cli->msg )
+    {
+        case IPC_MSG_ADDMANYFILES:
+            val = ipc_initval( &con->ipc, cli->msg, -1, &packet, TYPE_LIST );
+            if( NULL == val ||
+                tr_bencListReserve( val, g_list_length( cli->files ) ) )
+            {
+                perror( "malloc" );
+                destroycon( con );
+                return;
+            }
+            for( ii = cli->files; NULL != ii; ii = ii->next )
+            {
+                tr_bencInitStr( tr_bencListAdd( val ), ii->data, -1, 0 );
+            }
+            buf = ipc_mkval( &packet, &size );
+            saved = errno;
+            tr_bencFree( &packet );
+            g_list_free( cli->files );
+            cli->files = NULL;
             break;
-          }
-    tr_bencFree(&msgs);
-  }
+        case IPC_MSG_QUIT:
+            buf = ipc_mkempty( &con->ipc, &size, cli->msg, -1 );
+            saved = errno;
+            break;
+        default:
+            g_assert_not_reached();
+            return;
+    }
 
-  return size + 8 +
-    all_io_received(source, data + size + 8, len - size - 8, con);
+    if( NULL == buf )
+    {
+        errno = saved;
+        perror( "malloc" );
+        destroycon( con );
+        return;
+    }
+
+    cli->msgid = io_send_keepdata( con->source, buf, size );
 }
 
 static void
@@ -428,6 +455,7 @@ destroycon(struct constate *con) {
     case CON_SERV:
       break;
     case CON_CLIENT:
+      ipc_freemsgs( con->msgs );
       freestrlist(con->u.client.files);
       g_main_loop_quit(con->u.client.loop);
       break;
@@ -442,157 +470,65 @@ all_io_closed(GSource *source SHUTUP, void *vdata) {
 }
 
 static void
-srv_vers( struct constate * con, const char * name SHUTUP, benc_val_t * val )
-{
-    if( 0 > con->vers )
-    {
-        con->vers = ipc_checkversion( val );
-        if( 0 > con->vers )
-        {
-            fprintf( stderr, _("bad IPC protocol version\n") );
-            destroycon( con );
-            return;
-        }
-    }
-}
+cli_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
+  struct constate_client *cli = &((struct constate*)vdata)->u.client;
 
-static void
-srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
-  struct constate_serv *srv = &con->u.serv;
-  int ii;
-
-  if( NULL == srv->core )
-  {
-      return;
-  }
-
-  if(TYPE_LIST == val->type) {
-    for(ii = 0; ii < val->val.l.count; ii++)
-      if(TYPE_STR == val->val.l.vals[ii].type &&
-         /* XXX somehow escape invalid utf-8 */
-         g_utf8_validate(val->val.l.vals[ii].val.s.s, -1, NULL))
-        tr_core_add( TR_CORE( srv->core ), val->val.l.vals[ii].val.s.s,
-                     toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) ), FALSE );
-    tr_core_torrents_added( TR_CORE( srv->core ) );
-  }
-}
-
-static void
-srv_quit( struct constate * con, const char * name SHUTUP,
-          benc_val_t * val SHUTUP )
-{
-    struct constate_serv * srv;
-
-    srv = &con->u.serv;
-    tr_core_quit( srv->core );
-}
-
-static void
-afc_version(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
-  struct constate_client *afc = &con->u.client;
-  GList *file;
-  benc_val_t list, *str;
-
-  if( 0 > con->vers )
-  {
-      con->vers = ipc_checkversion( val );
-      if( 0 > con->vers )
-      {
-          fprintf( stderr, _("bad IPC protocol version\n") );
-          destroycon( con );
-          return;
-      }
-  }
-  else
-  {
-      return;
-  }
-
-  /* XXX handle getting a non-version tag, invalid data,
-     or nothing (read timeout) */
-  switch( afc->cmd )
-  {
-      case CCMD_ADD:
-          list.type = TYPE_LIST;
-          list.val.l.alloc = g_list_length(afc->files);
-          list.val.l.count = 0;
-          list.val.l.vals = g_new0(benc_val_t, list.val.l.alloc);
-          for(file = afc->files; NULL != file; file = file->next) {
-              str = list.val.l.vals + list.val.l.count;
-              str->type = TYPE_STR;
-              str->val.s.i = strlen(file->data);
-              str->val.s.s = file->data;
-              list.val.l.count++;
-          }
-          g_list_free(afc->files);
-          afc->files = NULL;
-          afc->msgid = send_msg(con, MSG_ADDFILES, &list);
-          tr_bencFree(&list);
-          break;
-      case CCMD_QUIT:
-          bzero( &list, sizeof( list ) );
-          list.type  = TYPE_STR;
-          afc->msgid = send_msg( con, MSG_QUIT, &list );
-          break;
-  }
-}
-
-static void
-afc_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
-  struct constate_client *afc = &((struct constate*)vdata)->u.client;
-
-  if(0 < id && afc->msgid == id) {
-    *(afc->succeeded) = TRUE;
+  if(0 < id && cli->msgid == id) {
+    *(cli->succeeded) = TRUE;
     destroycon(vdata);
   }
 }
 
-int
-ipc_checkversion( benc_val_t * vers )
+static void
+smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag SHUTUP,
+          void * arg )
 {
-    int min, max;
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    enum tr_torrent_action action;
+    benc_val_t           * path;
+    int                    ii;
 
-    if( TYPE_INT == vers->type )
+    if( NULL == srv->core || TYPE_LIST != val->type )
     {
-        if( 0 > vers->val.i )
+        return;
+    }
+
+    action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+    for( ii = 0; ii < val->val.l.count; ii++ )
+    {
+        path = val->val.l.vals + ii;
+        if( TYPE_STR == path->type &&
+            /* XXX somehow escape invalid utf-8 */
+            g_utf8_validate( path->val.s.s, path->val.s.i, NULL ) )
         {
-            return -1;
-        }
-        min = max = vers->val.i;
-    }
-    else if( TYPE_DICT == vers->type )
-    {
-        min = getvers( vers, "min" );
-        max = getvers( vers, "max" );
-        if( 0 > min || 0 > max )
-        {
-            return -1;
+            tr_core_add( TR_CORE( srv->core ), path->val.s.s, action, FALSE );
         }
     }
-    else
-    {
-        return -1;
-    }
-
-    g_assert( PROTO_VERS_MIN <= PROTO_VERS_MAX );
-    if( min > max || PROTO_VERS_MAX < min || PROTO_VERS_MIN > max )
-    {
-        return -1;
-    }
-
-    return MIN( PROTO_VERS_MAX, max );
+    tr_core_torrents_added( TR_CORE( srv->core ) );
 }
 
-int
-getvers( benc_val_t * dict, const char * key )
+static void
+smsg_quit( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag SHUTUP,
+           void * arg SHUTUP )
 {
-    benc_val_t * val;
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
 
-    val = tr_bencDictFind( dict, key );
-    if( NULL == val || TYPE_INT != val->type || 0 > val->val.i )
+    tr_core_quit( srv->core );
+}
+
+static void
+all_default( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag,
+              void * arg )
+{
+    struct constate * con = arg;
+    uint8_t         * buf;
+    size_t            size;
+
+    buf = ipc_mkempty( &con->ipc, &size, IPC_MSG_NOTSUP, tag );
+    if( NULL != buf )
     {
-        return -1;
+        io_send_keepdata( con->source, buf, size );
     }
-
-    return val->val.i;
 }
