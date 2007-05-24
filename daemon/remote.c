@@ -40,6 +40,7 @@
 #include "bsdtree.h"
 #include "client.h"
 #include "errors.h"
+#include "ipcparse.h"
 #include "misc.h"
 #include "transmission.h"
 #include "trcompat.h"
