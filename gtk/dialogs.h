@@ -40,8 +40,8 @@ makeinfowind( GtkWindow * parent, GtkTreeModel * model, GtkTreePath * path,
 
 /* prompt for a download directory for torrents, then add them */
 void
-promptfordir( GtkWindow * parent, TrCore * core, GList * files,
-              enum tr_torrent_action act, gboolean paused );
+promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
+              size_t size, enum tr_torrent_action act, gboolean paused );
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void

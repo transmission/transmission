@@ -76,6 +76,9 @@ struct _TrCoreClass
        void handler( TrCore *, GList *, enum tr_torrent_action, gboolean,
                      gpointer ) */
     int                 promptsig;
+    /* "directory-prompt-data" signal:
+       void handler( TrCore *, uint8_t *, size_t, gboolean, gpointer ) */
+    int                 promptdatasig;
     /* "quit" signal:
        void handler( TrCore *, gpointer ) */
     int                 quitsig;
@@ -137,6 +140,15 @@ tr_core_add_dir( TrCore * self, const char * path, const char * dir,
 int
 tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
                   gboolean paused );
+
+/* Add the torrent data in the given buffer */
+gboolean
+tr_core_add_data( TrCore * self, uint8_t * data, size_t size, gboolean paused );
+
+/* Add the torrent data in the given buffer with the given download directory */
+gboolean
+tr_core_add_data_dir( TrCore * self, uint8_t * data, size_t size,
+                      const char * dir, gboolean paused );
 
 /* Save state, update model, and signal the end of a torrent cluster */
 void

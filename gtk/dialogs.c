@@ -61,6 +61,8 @@ struct dirdata
     GtkWidget             * widget;
     TrCore                * core;
     GList                 * files;
+    uint8_t               * data;
+    size_t                  size;
     enum tr_torrent_action  action;
     gboolean                paused;
 };
@@ -545,15 +547,24 @@ fmtpeercount( GtkLabel * label, int count )
 }
 
 void
-promptfordir( GtkWindow * parent, TrCore * core, GList * files,
-              enum tr_torrent_action act, gboolean paused )
+promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
+              size_t size, enum tr_torrent_action act, gboolean paused )
 {
     struct dirdata * stuff;
     GtkWidget      * wind;
 
-    stuff = g_new( struct dirdata, 1 );
+    stuff = g_new0( struct dirdata, 1 );
     stuff->core    = core;
-    stuff->files   = dupstrlist( files );
+    if( NULL != files )
+    {
+        stuff->files = dupstrlist( files );
+    }
+    if( NULL != data )
+    {
+        stuff->data = g_new( uint8_t, size );
+        memcpy( stuff->data, data, size );
+        stuff->size = size;
+    }
     stuff->action  = act;
     stuff->paused  = paused;
 
@@ -608,6 +619,11 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
             tr_core_add_dir( stuff->core, ii->data, dir,
                              stuff->action, stuff->paused );
         }
+        if( NULL != stuff->data )
+        {
+            tr_core_add_data_dir( stuff->core, stuff->data, stuff->size, dir,
+                                  stuff->paused );
+        }
         tr_core_torrents_added( stuff->core );
         g_free( dir );
     }
@@ -618,6 +634,7 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
     }
 
     freestrlist( stuff->files );
+    g_free( stuff->data );
     g_free( stuff );
     gtk_widget_destroy( widget );
 }

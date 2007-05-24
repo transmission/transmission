@@ -170,6 +170,8 @@ coreerr( TrCore * core, enum tr_core_err code, const char * msg,
 static void
 coreprompt( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer );
 static void
+corepromptdata( TrCore *, uint8_t *, size_t, gboolean, gpointer );
+static void
 readinitialprefs( struct cbdata * cbdata );
 static void
 prefschanged( GtkWidget * widget, int id, gpointer data );
@@ -389,6 +391,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
     g_signal_connect( cbdata->core, "directory-prompt",
                       G_CALLBACK( coreprompt ), cbdata );
+    g_signal_connect( cbdata->core, "directory-prompt-data",
+                      G_CALLBACK( corepromptdata ), cbdata );
     g_signal_connect_swapped( cbdata->core, "quit",
                               G_CALLBACK( wannaquit ), cbdata );
 
@@ -740,7 +744,16 @@ coreprompt( TrCore * core, GList * paths, enum tr_torrent_action act,
 {
     struct cbdata * cbdata = gdata;
 
-    promptfordir( cbdata->wind, core, paths, act, paused );
+    promptfordir( cbdata->wind, core, paths, NULL, 0, act, paused );
+}
+
+void
+corepromptdata( TrCore * core, uint8_t * data, size_t size,
+                gboolean paused, gpointer gdata )
+{
+    struct cbdata * cbdata = gdata;
+
+    promptfordir( cbdata->wind, core, NULL, data, size, TR_TOR_LEAVE, paused );
 }
 
 static void

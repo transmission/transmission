@@ -103,6 +103,8 @@ cli_io_sent(GSource *source, unsigned int id, void *vdata);
 static void
 smsg_add( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
+smsg_addone( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 smsg_quit( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
@@ -142,6 +144,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
   con->msgs = ipc_initmsgs();
   if( NULL == con->msgs ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_ADDMANYFILES, smsg_add ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_ADDONEFILE,   smsg_addone ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFO,      smsg_info ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETINFOALL,   smsg_infoall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTAT,      smsg_info ) ||
@@ -542,6 +545,69 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
             g_utf8_validate( path->val.s.s, path->val.s.i, NULL ) )
         {
             tr_core_add( TR_CORE( srv->core ), path->val.s.s, action, FALSE );
+        }
+    }
+    tr_core_torrents_added( TR_CORE( srv->core ) );
+
+    /* XXX should send info response back with torrent ids */
+    simpleresp( con, tag, IPC_MSG_OK );
+}
+
+static void
+smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
+             void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    enum tr_torrent_action action;
+    benc_val_t           * file, * data, * dir, * start;
+    gboolean               paused;
+
+    if( NULL == val || TYPE_DICT != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    file  = tr_bencDictFind( val, "file" );
+    data  = tr_bencDictFind( val, "data" );
+    dir   = tr_bencDictFind( val, "directory" );
+    start = tr_bencDictFind( val, "autostart" );
+
+    if( ( NULL != file  && TYPE_STR != file->type  ) ||
+        ( NULL != data  && TYPE_STR != data->type  ) ||
+        ( NULL != dir   && TYPE_STR != dir->type   ) ||
+        ( NULL != start && TYPE_INT != start->type ) )
+    {
+        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        return;
+    }
+
+    action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+    paused = ( NULL == start || start->val.i ? FALSE : TRUE );
+    if( NULL != file )
+    {
+        if( NULL == dir )
+        {
+            tr_core_add( srv->core, file->val.s.s, action, paused );
+        }
+        else
+        {
+            tr_core_add_dir( srv->core, file->val.s.s, dir->val.s.s,
+                             action, paused );
+        }
+    }
+    else
+    {
+        if( NULL == dir )
+        {
+            tr_core_add_data( srv->core, data->val.s.s, data->val.s.i,
+                              paused );
+        }
+        else
+        {
+            tr_core_add_data_dir( srv->core, data->val.s.s, data->val.s.i,
+                                  dir->val.s.s, paused );
         }
     }
     tr_core_torrents_added( TR_CORE( srv->core ) );

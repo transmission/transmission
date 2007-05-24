@@ -373,6 +373,41 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
 }
 
 TrTorrent *
+tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
+                          const char * dir, gboolean paused, char ** err )
+{
+    tr_torrent_t * handle;
+    int            errcode;
+
+    g_assert( NULL != dir );
+
+    *err = NULL;
+
+    errcode = -1;
+    handle  = tr_torrentInitData( back, data, size, NULL, TR_FLAG_SAVE,
+                                  &errcode );
+
+    if( NULL == handle )
+    {
+        switch( errcode )
+        {
+            case TR_EINVALID:
+                *err = g_strdup( _("not a valid torrent file") );
+                break;
+            case TR_EDUPLICATE:
+                *err = g_strdup( _("torrent is already open") );
+                break;
+            default:
+                *err = g_strdup( "" );
+                break;
+        }
+        return NULL;
+    }
+
+    return maketorrent( handle, dir, paused );
+}
+
+TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
                            gboolean forcedpause, char ** err )
 {

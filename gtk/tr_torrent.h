@@ -91,6 +91,10 @@ tr_torrent_new( tr_handle_t * handle, const char * path, const char * dir,
                 enum tr_torrent_action act, gboolean paused, char ** err);
 
 TrTorrent *
+tr_torrent_new_with_data( tr_handle_t * handle, uint8_t * data, size_t size,
+                          const char * dir, gboolean paused, char ** err );
+
+TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * handle, benc_val_t * state,
                            gboolean forcepaused, char ** err );
 
