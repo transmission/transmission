@@ -38,9 +38,6 @@
 /* XXX this shouldn't be here */
 enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
 
-typedef void (*add_torrents_func_t)(void*,void*,GList*,const char*,
-                                    enum tr_torrent_action,gboolean);
-
 /* return number of items in array */
 #define ALEN( a )               ( ( signed )( sizeof(a) / sizeof( (a)[0] ) ) )
 

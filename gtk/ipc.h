@@ -25,10 +25,11 @@
 #ifndef TG_IPC_H
 #define TG_IPC_H
 
+#include "tr_core.h"
 #include "util.h"
 
 void
-ipc_socket_setup( void * wind, add_torrents_func_t addfunc,
+ipc_socket_setup( void * wind, TrCore * core,
                   callbackfunc_t quitfunc, void * cbdata );
 
 gboolean

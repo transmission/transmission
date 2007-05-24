@@ -168,6 +168,8 @@ static void
 coreerr( TrCore * core, enum tr_core_err code, const char * msg,
          gpointer gdata );
 static void
+coreprompt( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer );
+static void
 readinitialprefs( struct cbdata * cbdata );
 static void
 prefschanged( GtkWidget * widget, int id, gpointer data );
@@ -184,9 +186,6 @@ getselection( struct cbdata * cbdata );
 static void
 handleaction( struct cbdata *data, int action );
 
-static void
-addtorrents(void *vdata, void *state, GList *files,
-            const char *dir, enum tr_torrent_action act, gboolean paused);
 static void
 safepipe(void);
 static void
@@ -372,7 +371,8 @@ gtksetup( int * argc, char *** argv )
 static void
 appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
 {
-    struct cbdata * cbdata;
+    struct cbdata        * cbdata;
+    enum tr_torrent_action action;
 
     /* fill out cbdata */
     cbdata = g_new0( struct cbdata, 1 );
@@ -385,25 +385,35 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args, gboolean paused )
     cbdata->closing    = FALSE;
     cbdata->errqueue   = NULL;
 
-    /* set up error message handler */
+    /* set up core handlers */
     g_signal_connect( cbdata->core, "error", G_CALLBACK( coreerr ), cbdata );
+    g_signal_connect( cbdata->core, "directory-prompt",
+                      G_CALLBACK( coreprompt ), cbdata );
 
     /* apply a few prefs */
     readinitialprefs( cbdata );
 
+    /* add torrents from command-line and saved state */
+    if( NULL != state )
+    {
+        tr_core_load( cbdata->core, state, paused );
+    }
+    if( NULL != args )
+    {
+        action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+        tr_core_add_list( cbdata->core, args, action, paused );
+    }
+    tr_core_torrents_added( cbdata->core );
+
+    /* set up the ipc socket */
+    ipc_socket_setup( GTK_WINDOW( wind ), cbdata->core, wannaquit, cbdata );
+
     /* set up main window */
     winsetup( cbdata, wind );
-
-    /* add torrents from command-line and saved state */
-    addtorrents( cbdata, state, args, NULL,
-                 toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) ), paused );
 
     /* start model update timer */
     cbdata->timer = g_timeout_add( UPDATE_INTERVAL, updatemodel, cbdata );
     updatemodel( cbdata );
-
-    /* set up the ipc socket now that we're ready to get torrents from it */
-    ipc_socket_setup( GTK_WINDOW( wind ), addtorrents, wannaquit, cbdata );
 
     /* show the window */
     tr_window_show( wind );
@@ -598,6 +608,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
   struct stat sb;
   int prelen = strlen(prefix);
   GList *paths, *freeables;
+  enum tr_torrent_action action;
 
 #ifdef DND_DEBUG
   char *sele = gdk_atom_name(sel->selection);
@@ -660,8 +671,9 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
     /* try to add any torrents we found */
     if( NULL != paths )
     {
-        addtorrents( data, NULL, paths, NULL,
-                     toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) ), FALSE );
+        action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
+        tr_core_add_list( data->core, paths, action, FALSE );
+        tr_core_torrents_added( data->core );
     }
     freestrlist(freeables);
     g_free(files);
@@ -718,6 +730,15 @@ coreerr( TrCore * core SHUTUP, enum tr_core_err code, const char * msg,
     }
 
     g_assert_not_reached();
+}
+
+void
+coreprompt( TrCore * core, GList * paths, enum tr_torrent_action act,
+            gboolean paused, gpointer gdata )
+{
+    struct cbdata * cbdata = gdata;
+
+    promptfordir( cbdata->wind, core, paths, act, paused );
 }
 
 static void
@@ -899,7 +920,7 @@ handleaction( struct cbdata * data, int act )
   switch( act )
   {
       case ACT_OPEN:
-          makeaddwind( data->wind, addtorrents, data );
+          makeaddwind( data->wind, data->core );
           return;
       case ACT_PREF:
           if( NULL != data->prefs )
@@ -999,50 +1020,6 @@ handleaction( struct cbdata * data, int act )
   g_list_free(rows);
 
   if(changed) {
-    updatemodel(data);
-    tr_core_save( data->core );
-  }
-}
-
-static void
-addtorrents( void * vdata, void * state, GList * files, const char * dir,
-             enum tr_torrent_action act, gboolean paused )
-{
-  struct cbdata *data = vdata;
-  const char * pref;
-  int added;
-
-  added   = 0;
-
-  if( NULL != state )
-  {
-      added += tr_core_load( data->core, state, paused );
-  }
-
-  if(NULL != files) {
-    if( NULL == dir )
-    {
-        pref = tr_prefs_get( PREF_ID_ASKDIR );
-        if( NULL != pref && strbool( pref ) )
-        {
-            promptfordir( data->wind, addtorrents, data, files, act, paused );
-            files = NULL;
-        }
-        dir = getdownloaddir();
-    }
-    for( files = g_list_first( files ); NULL != files; files = files->next )
-    {
-      if( tr_core_add_torrent( data->core, files->data, dir, act, paused ) )
-      {
-          added++;
-      }
-    }
-  }
-
-  tr_core_torrents_added( data->core );
-
-  if( 0 < added )
-  {
     updatemodel(data);
     tr_core_save( data->core );
   }

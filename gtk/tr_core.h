@@ -71,6 +71,10 @@ struct _TrCoreClass
     /* "error" signal:
        void handler( TrCore *, enum tr_core_err, const char *, gpointer ) */
     int                 errsig;
+    /* "directory-prompt" signal:
+       void handler( TrCore *, GList *, enum tr_torrent_action, gboolean,
+                     gpointer ) */
+    int                 promptsig;
 };
 
 enum tr_core_err
@@ -112,12 +116,25 @@ tr_core_save( TrCore * self );
 int
 tr_core_load( TrCore * self, benc_val_t * state, gboolean forcepaused );
 
-/* Add a torrent. May trigger "error" signal with TR_CORE_ERR_ADD_TORRENT */
-gboolean
-tr_core_add_torrent( TrCore * self, const char * path, const char * dir,
-                     enum tr_torrent_action act, gboolean paused );
+/* Any the tr_core_add functions below may trigger an "error" signal
+   with TR_CORE_ERR_ADD_TORRENT */
 
-/* Trigger "error" signal with TR_CORE_ERR_NO_MORE_TORRENTS */
+/* Add the torrent at the given path */
+gboolean
+tr_core_add( TrCore * self, const char * path, enum tr_torrent_action act,
+             gboolean paused );
+
+/* Add the torrent at the given path with the given download directory */
+gboolean
+tr_core_add_dir( TrCore * self, const char * path, const char * dir,
+                 enum tr_torrent_action act, gboolean paused );
+
+/* Add a list of torrents with the given paths */
+int
+tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
+                  gboolean paused );
+
+/* Save state, update model, and signal the end of a torrent cluster */
 void
 tr_core_torrents_added( TrCore * self );
 

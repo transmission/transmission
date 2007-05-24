@@ -35,6 +35,7 @@
 
 #include "conf.h"
 #include "tr_core.h"
+#include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
 
@@ -45,6 +46,9 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data );
 static void
 tr_core_marshal_err( GClosure * closure, GValue * ret, guint count,
                      const GValue * vals, gpointer hint, gpointer marshal );
+void
+tr_core_marshal_prompt( GClosure * closure, GValue * ret, guint count,
+                        const GValue * vals, gpointer hint, gpointer marshal );
 static void
 tr_core_dispose( GObject * obj );
 static int
@@ -96,6 +100,14 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                                        tr_core_marshal_err, G_TYPE_NONE,
                                        2, G_TYPE_INT, G_TYPE_STRING );
+
+    core_class = TR_CORE_CLASS( g_class );
+    core_class->promptsig = g_signal_new( "directory-prompt",
+                                          G_TYPE_FROM_CLASS( g_class ),
+                                          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                          tr_core_marshal_prompt, G_TYPE_NONE,
+                                          3, G_TYPE_POINTER, G_TYPE_INT,
+                                          G_TYPE_BOOLEAN );
 }
 
 void
@@ -103,8 +115,8 @@ tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
                      const GValue * vals, gpointer hint SHUTUP,
                      gpointer marshal )
 {
-    typedef void (*TRMarshalErr) ( gpointer, enum tr_core_err, const char *,
-                                   gpointer );
+    typedef void (*TRMarshalErr)
+        ( gpointer, enum tr_core_err, const char *, gpointer );
     TRMarshalErr     callback;
     GCClosure      * cclosure = (GCClosure*) closure;
     enum tr_core_err errcode;
@@ -121,6 +133,33 @@ tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
     callback = (TRMarshalErr) ( NULL == marshal ?
                                 cclosure->callback : marshal );
     callback( inst, errcode, errstr, gdata );
+}
+
+void
+tr_core_marshal_prompt( GClosure * closure, GValue * ret SHUTUP, guint count,
+                        const GValue * vals, gpointer hint SHUTUP,
+                        gpointer marshal )
+{
+    typedef void (*TRMarshalPrompt)
+        ( gpointer, GList *, enum tr_torrent_action, gboolean, gpointer );
+    TRMarshalPrompt        callback;
+    GCClosure            * cclosure = (GCClosure*) closure;
+    GList                * paths;
+    enum tr_torrent_action action;
+    gboolean               paused;
+    gpointer               inst, gdata;
+
+    g_return_if_fail( 4 == count );
+
+    inst    = g_value_peek_pointer( vals );
+    paths   = g_value_get_pointer( vals + 1 );
+    action  = g_value_get_int( vals + 2 );
+    paused  = g_value_get_boolean( vals + 3 );
+    gdata   = closure->data;
+
+    callback = (TRMarshalPrompt) ( NULL == marshal ?
+                                   cclosure->callback : marshal );
+    callback( inst, paths, action, paused, gdata );
 }
 
 void
@@ -468,8 +507,24 @@ tr_core_load( TrCore * self, benc_val_t * state, gboolean forcepaused )
 }
 
 gboolean
-tr_core_add_torrent( TrCore * self, const char * path, const char * dir,
-                     enum tr_torrent_action act, gboolean paused )
+tr_core_add( TrCore * self, const char * path, enum tr_torrent_action act,
+             gboolean paused )
+{
+    GList * list;
+    int     ret;
+
+    TR_IS_CORE( self );
+
+    list = g_list_append( NULL, (void *) path );
+    ret  = tr_core_add_list( self, list, act, paused );
+    g_list_free( list );
+
+    return 1 == ret;
+}
+
+gboolean
+tr_core_add_dir( TrCore * self, const char * path, const char * dir,
+                 enum tr_torrent_action act, gboolean paused )
 {
     TrTorrent * tor;
     char      * errstr;
@@ -491,11 +546,46 @@ tr_core_add_torrent( TrCore * self, const char * path, const char * dir,
     return TRUE;
 }
 
+int
+tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
+                  gboolean paused )
+{
+    TrCoreClass * class;
+    const char  * pref;
+    int           count;
+
+    TR_IS_CORE( self );
+
+    pref = tr_prefs_get( PREF_ID_ASKDIR );
+    if( NULL != pref && strbool( pref ) )
+    {
+        class = g_type_class_peek( TR_CORE_TYPE );
+        g_signal_emit( self, class->promptsig, 0, paths, act, paused );
+        return 0;
+    }
+
+    pref  = getdownloaddir();
+    count = 0;
+    paths = g_list_first( paths );
+    while( NULL != paths )
+    {
+        if( tr_core_add_dir( self, paths->data, pref, act, paused ) )
+        {
+            count++;
+        }
+        paths = paths->next;
+    }
+
+    return count;
+}
+
 void
 tr_core_torrents_added( TrCore * self )
 {
     TR_IS_CORE( self );
 
+    tr_core_update( self );
+    tr_core_save( self );
     tr_core_errsig( self, TR_CORE_ERR_NO_MORE_TORRENTS, NULL );
 }
 

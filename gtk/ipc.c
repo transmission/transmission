@@ -40,6 +40,7 @@
 #include "conf.h"
 #include "io.h"
 #include "ipc.h"
+#include "tr_core.h"
 #include "tr_prefs.h"
 #include "util.h"
 
@@ -58,7 +59,7 @@ enum contype { CON_SERV, CON_CLIENT };
 
 struct constate_serv {
   void *wind;
-  add_torrents_func_t addfunc;
+  gpointer core;
   callbackfunc_t quitfunc;
   void *cbdata;
 };
@@ -141,7 +142,7 @@ static const struct handlerdef gl_funcs_client[] = {
 static char *gl_sockpath = NULL;
 
 void
-ipc_socket_setup( void * parent, add_torrents_func_t addfunc,
+ipc_socket_setup( void * parent, TrCore * core,
                   callbackfunc_t quitfunc, void * cbdata )
 {
   struct constate *con;
@@ -153,10 +154,12 @@ ipc_socket_setup( void * parent, add_torrents_func_t addfunc,
   con->funcs = gl_funcs_serv;
   con->type = CON_SERV;
   con->u.serv.wind = parent;
-  con->u.serv.addfunc = addfunc;
+  con->u.serv.core = core;
   con->u.serv.quitfunc = quitfunc;
   con->u.serv.cbdata = cbdata;
-  
+
+  g_object_add_weak_pointer( G_OBJECT( core ), &con->u.serv.core );
+
   serv_bind(con);
 }
 
@@ -460,19 +463,21 @@ srv_vers( struct constate * con, const char * name SHUTUP, benc_val_t * val )
 static void
 srv_addfile(struct constate *con, const char *name SHUTUP, benc_val_t *val) {
   struct constate_serv *srv = &con->u.serv;
-  GList *files;
   int ii;
 
+  if( NULL == srv->core )
+  {
+      return;
+  }
+
   if(TYPE_LIST == val->type) {
-    files = NULL;
     for(ii = 0; ii < val->val.l.count; ii++)
       if(TYPE_STR == val->val.l.vals[ii].type &&
          /* XXX somehow escape invalid utf-8 */
          g_utf8_validate(val->val.l.vals[ii].val.s.s, -1, NULL))
-        files = g_list_append(files, val->val.l.vals[ii].val.s.s);
-    srv->addfunc( srv->cbdata, NULL, files, NULL,
-                  toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) ), FALSE );
-    g_list_free(files);
+        tr_core_add( TR_CORE( srv->core ), val->val.l.vals[ii].val.s.s,
+                     toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) ), FALSE );
+    tr_core_torrents_added( TR_CORE( srv->core ) );
   }
 }
 

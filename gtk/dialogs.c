@@ -46,9 +46,10 @@
 #define STRIPROOT( path )                                                     \
     ( g_path_is_absolute( (path) ) ? g_path_skip_root( (path) ) : (path) )
 
-struct addcb {
-  add_torrents_func_t addfunc;
-  void *data;
+struct addcb
+{
+  GtkWidget * widget;
+  TrCore * core;
   gboolean autostart;
   gboolean usingaltdir;
   GtkFileChooser *altdir;
@@ -57,8 +58,8 @@ struct addcb {
 
 struct dirdata
 {
-    add_torrents_func_t     addfunc;
-    void                  * cbdata;
+    GtkWidget             * widget;
+    TrCore                * core;
     GList                 * files;
     enum tr_torrent_action  action;
     gboolean                paused;
@@ -101,6 +102,8 @@ struct infowind
 };
 
 static void
+addwindnocore( gpointer gdata, GObject * core );
+static void
 autoclick(GtkWidget *widget, gpointer gdata);
 static void
 dirclick(GtkWidget *widget, gpointer gdata);
@@ -110,13 +113,15 @@ static GtkWidget *
 makeinfotab( TrTorrent * tor, struct infowind * iw );
 static void
 infoupdate( struct infowind * iw, int force );
-void
+static void
 fmtpeercount( GtkLabel * label, int count );
+static void
+promptdirnocore( gpointer gdata, GObject * core );
 static void
 promptresp( GtkWidget * widget, gint resp, gpointer data );
 static void
 quitresp( GtkWidget * widget, gint resp, gpointer data );
-GtkWidget *
+static GtkWidget *
 makefilestab( TrTorrent * tor, GtkTreeModel ** modelret );
 static void
 stylekludge( GObject * obj, GParamSpec * spec, gpointer data );
@@ -136,7 +141,8 @@ updateprogress( GtkTreeModel * model, GtkTreeIter * parent,
                 uint64_t total, float * progress );
 
 void
-makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
+makeaddwind( GtkWindow * parent, TrCore * core )
+{
   GtkWidget *wind = gtk_file_chooser_dialog_new(_("Add a Torrent"), parent,
     GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
@@ -153,12 +159,14 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
     _("Choose a download directory"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
   const char * pref;
 
-  data->addfunc = addfunc;
-  data->data = cbdata;
+  data->widget = wind;
+  data->core = core;
   data->autostart = TRUE;
   data->usingaltdir = FALSE;
   data->altdir = GTK_FILE_CHOOSER(getdir);
   data->altbox = GTK_BUTTON_BOX(bbox);
+
+  g_object_weak_ref( G_OBJECT( core ), addwindnocore, data );
 
   gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_EDGE);
   gtk_box_pack_start_defaults(GTK_BOX(bbox), dircheck);
@@ -194,6 +202,18 @@ makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata) {
   gtk_widget_show_all(wind);
 }
 
+void
+addwindnocore( gpointer gdata, GObject * core SHUTUP )
+{
+    struct addcb * data = gdata;
+
+    /* prevent the response callback from trying to remove the weak
+       reference which no longer exists */
+    data->core = NULL;
+
+    gtk_dialog_response( GTK_DIALOG( data->widget ), GTK_RESPONSE_NONE );
+}
+
 static void
 autoclick(GtkWidget *widget, gpointer gdata) {
   struct addcb *data = gdata;
@@ -222,16 +242,34 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     if(data->usingaltdir)
       dir = gtk_file_chooser_get_filename(data->altdir);
     files = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(widget));
-    stupidgtk = NULL;
-    for(ii = files; NULL != ii; ii = ii->next)
-      stupidgtk = g_list_append(stupidgtk, ii->data);
     action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
-    data->addfunc( data->data, NULL, stupidgtk, dir,
-                   action, !data->autostart );
-    if(NULL != dir)
-      g_free(dir);
+    if( NULL == dir )
+    {
+        stupidgtk = NULL;
+        for( ii = files; NULL != ii; ii = ii->next )
+        {
+            stupidgtk = g_list_append( stupidgtk, ii->data );
+        }
+        tr_core_add_list( data->core, stupidgtk, action, !data->autostart );
+        freestrlist(stupidgtk);
+    }
+    else
+    {
+        for( ii = files; NULL != ii; ii = ii->next )
+        {
+            tr_core_add_dir( data->core, ii->data, dir,
+                             action, !data->autostart );
+            g_free( ii->data );
+        }
+        g_free( dir );
+    }
+    tr_core_torrents_added( data->core );
     g_slist_free(files);
-    freestrlist(stupidgtk);
+  }
+
+  if( NULL != data->core )
+  {
+      g_object_weak_unref( G_OBJECT( data->core ), addwindnocore, data );
   }
 
   g_free( data );
@@ -507,18 +545,19 @@ fmtpeercount( GtkLabel * label, int count )
 }
 
 void
-promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
-              GList * files, enum tr_torrent_action act, gboolean paused )
+promptfordir( GtkWindow * parent, TrCore * core, GList * files,
+              enum tr_torrent_action act, gboolean paused )
 {
     struct dirdata * stuff;
     GtkWidget      * wind;
 
     stuff = g_new( struct dirdata, 1 );
-    stuff->addfunc = addfunc;
-    stuff->cbdata  = cbdata;
+    stuff->core    = core;
     stuff->files   = dupstrlist( files );
     stuff->action  = act;
     stuff->paused  = paused;
+
+    g_object_weak_ref( G_OBJECT( core ), promptdirnocore, stuff );
 
     wind =  gtk_file_chooser_dialog_new( _("Choose a directory"), parent,
                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -530,10 +569,24 @@ promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
     gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( wind ),
                                    getdownloaddir() );
 
+    stuff->widget = wind;
+
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( promptresp ), stuff );
 
     gtk_widget_show_all(wind);
+}
+
+void
+promptdirnocore( gpointer gdata, GObject * core SHUTUP )
+{
+    struct dirdata * stuff = gdata;
+
+    /* prevent the response callback from trying to remove the weak
+       reference which no longer exists */
+    stuff->core = NULL;
+
+    gtk_dialog_response( GTK_DIALOG( stuff->widget ), GTK_RESPONSE_NONE );
 }
 
 static void
@@ -541,6 +594,7 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
 {
     struct dirdata * stuff;
     char           * dir;
+    GList          * ii;
 
     stuff = data;
 
@@ -549,9 +603,18 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
         dir = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( widget ) );
         /* it seems that we will always get a directory */
         g_assert( NULL != dir );
-        stuff->addfunc( stuff->cbdata, NULL, stuff->files, dir,
-                        stuff->action, stuff->paused );
+        for( ii = g_list_first( stuff->files ); NULL != ii; ii = ii->next )
+        {
+            tr_core_add_dir( stuff->core, ii->data, dir,
+                             stuff->action, stuff->paused );
+        }
+        tr_core_torrents_added( stuff->core );
         g_free( dir );
+    }
+
+    if( NULL != stuff->core )
+    {
+        g_object_weak_unref( G_OBJECT( stuff->core ), promptdirnocore, stuff );
     }
 
     freestrlist( stuff->files );

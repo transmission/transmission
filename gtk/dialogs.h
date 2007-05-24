@@ -25,12 +25,13 @@
 #ifndef TG_PREFS_H
 #define TG_PREFS_H
 
+#include "tr_core.h"
 #include "tr_torrent.h"
 #include "util.h"
 
 /* show the "add a torrent" dialog */
 void
-makeaddwind(GtkWindow *parent, add_torrents_func_t addfunc, void *cbdata);
+makeaddwind( GtkWindow * parent, TrCore * core );
 
 /* show the info window for a torrent */
 void
@@ -39,8 +40,8 @@ makeinfowind( GtkWindow * parent, GtkTreeModel * model, GtkTreePath * path,
 
 /* prompt for a download directory for torrents, then add them */
 void
-promptfordir( GtkWindow * parent, add_torrents_func_t addfunc, void *cbdata,
-              GList * files, enum tr_torrent_action act, gboolean paused );
+promptfordir( GtkWindow * parent, TrCore * core, GList * files,
+              enum tr_torrent_action act, gboolean paused );
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void
