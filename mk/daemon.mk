@@ -3,7 +3,7 @@
 include ../mk/config.mk
 include ../mk/common.mk
 
-COMSRCS  = errors.c ipc.c misc.c
+COMSRCS  = errors.c misc.c
 SRVSRCS  = daemon.c server.c torrents.c
 CLISRCS  = client.c remote.c
 PXYSRCS  = proxy.c

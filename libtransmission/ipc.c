@@ -30,10 +30,70 @@
 
 #include "bsdtree.h"
 #include "ipc.h"
-#include "misc.h"
 
 #include "transmission.h"
 #include "bencode.h"
+
+/* begin copy-paste from daemon/misc.h */
+
+#define ARRAYLEN( ary )         ( sizeof( ary ) / sizeof( (ary)[0] ) )
+
+#ifndef MIN
+#define MIN( aa, bb )           ( (aa) < (bb) ? (aa) : (bb) )
+#endif
+#ifndef MAX
+#define MAX( aa, bb )           ( (aa) > (bb) ? (aa) : (bb) )
+#endif
+
+#undef NULL
+#define NULL                    ( ( void * )0 )
+
+#define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
+
+#define SAFEFREE( ptr )                                                       \
+    do                                                                        \
+    {                                                                         \
+        int saved = errno;                                                    \
+        free( ptr );                                                          \
+        errno = saved;                                                        \
+    }                                                                         \
+    while( 0 )
+#define SAFEFREESTRLIST( ptr )                                                \
+    do                                                                        \
+    {                                                                         \
+        int saved = errno;                                                    \
+        FREESTRLIST( ptr );                                                   \
+        errno = saved;                                                        \
+    }                                                                         \
+    while( 0 )
+#define SAFEBENCFREE( val )                                                   \
+    do                                                                        \
+    {                                                                         \
+        int saved = errno;                                                    \
+        tr_bencFree( val );                                                   \
+        errno = saved;                                                        \
+    }                                                                         \
+    while( 0 )
+
+#define INTCMP_FUNC( name, type, id )                                         \
+int                                                                           \
+name( struct type * _icf_first, struct type * _icf_second )                   \
+{                                                                             \
+    if( _icf_first->id < _icf_second->id )                                    \
+    {                                                                         \
+        return -1;                                                            \
+    }                                                                         \
+    else if( _icf_first->id > _icf_second->id )                               \
+    {                                                                         \
+        return 1;                                                             \
+    }                                                                         \
+    else                                                                      \
+    {                                                                         \
+        return 0;                                                             \
+    }                                                                         \
+}
+
+/* end copy-paste from daemon/misc.h */
 
 /* IPC protocol version */
 #define PROTO_VERS_MIN          ( 1 )
