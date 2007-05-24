@@ -25,6 +25,19 @@
 #include "transmission.h"
 #include "peertree.h"
 
+#define PERCENT_PEER_WANTED     25      /* Percent before we start relax peers min activeness */
+#define MIN_UPLOAD_IDLE         60000   /* In high peer situations we wait only 1 min
+                                            until dropping peers for idling */
+#define MAX_UPLOAD_IDLE         240000  /* In low peer situations we wait the
+                                            4 mins until dropping peers for idling */
+#define MIN_KEEP_ALIVE          180000  /* In high peer situations we wait only 3 min
+                                            without a keep-alive */
+#define MAX_KEEP_ALIVE          360000  /* In low peer situations we wait the
+                                            6 mins without a keep-alive */
+#define MIN_CON_TIMEOUT         8000    /* Time to timeout connecting to peer,
+                                            during low peer situations */
+#define MAX_CON_TIMEOUT         30000   /* Time to timeout connecting to peer, 
+                                            during high peer situations */
 #define MAX_REQUEST_COUNT       32
 #define OUR_REQUEST_COUNT       8  /* TODO: we should detect if we are on a
                                       high-speed network and adapt */
