@@ -116,6 +116,8 @@ smsg_look( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
+smsg_torall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static gboolean
 simpleresp( struct constate * con, int64_t tag, enum ipc_msg id );
@@ -146,8 +148,11 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVE,       smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_REMOVEALL,    smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_START,        smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
@@ -793,6 +798,49 @@ smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
                 g_assert_not_reached();
                 break;
         }
+    }
+
+    tr_core_update( srv->core );
+    tr_core_save( srv->core );
+
+    /* XXX this is a lie */
+    simpleresp( con, tag, IPC_MSG_OK );
+}
+
+static void
+smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
+             void * arg )
+{
+    struct constate      * con = arg;
+    struct constate_serv * srv = &con->u.serv;
+    TrTorrent            * tor;
+    GtkTreeModel         * model;
+    GtkTreeIter            iter;
+
+    model = tr_core_model( srv->core );
+    if( gtk_tree_model_get_iter_first( model, &iter ) )
+    {
+        do
+        {
+            gtk_tree_model_get( model, &iter, MC_TORRENT, &tor, -1 );
+            switch( id )
+            {
+                case IPC_MSG_REMOVEALL:
+                    tr_core_delete_torrent( srv->core, &iter );
+                    break;
+                case IPC_MSG_STARTALL:
+                    tr_torrent_start( tor );
+                    break;
+                case IPC_MSG_STOPALL:
+                    tr_torrent_stop( tor );
+                    break;
+                default:
+                    g_assert_not_reached();
+                    break;
+            }
+            g_object_unref( tor );
+        }
+        while( gtk_tree_model_iter_next( model, &iter ) );
     }
 
     tr_core_update( srv->core );
