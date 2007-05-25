@@ -21,6 +21,7 @@
                 fConnectedPeersField = NSTextField; 
                 fCreatorField = NSTextField; 
                 fDataLocationField = NSTextField; 
+                fDateActivityField = NSTextField; 
                 fDateAddedField = NSTextField; 
                 fDateCompletedField = NSTextField; 
                 fDateCreatedField = NSTextField; 

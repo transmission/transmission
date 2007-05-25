@@ -38,7 +38,7 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 268.0
-#define TAB_ACTIVITY_HEIGHT 242.0
+#define TAB_ACTIVITY_HEIGHT 258.0
 #define TAB_PEERS_HEIGHT 279.0
 #define TAB_FILES_HEIGHT 279.0
 #define TAB_OPTIONS_HEIGHT 158.0
@@ -203,6 +203,7 @@
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
+        [fDateActivityField setStringValue: @""];
         
         [fPiecesView setTorrent: nil];
         
@@ -366,6 +367,7 @@
         }
         
         [fDateCompletedField setObjectValue: [torrent dateCompleted]];
+        [fDateActivityField setObjectValue: [torrent dateActivity]];
         
         [fPiecesView updateView: NO];
     }

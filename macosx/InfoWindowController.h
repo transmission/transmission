@@ -38,7 +38,7 @@
     IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
                         * fPiecesField, * fHashField, * fSecureField,
                         * fTorrentLocationField, * fDataLocationField,
-                        * fDateAddedField, * fDateCompletedField,
+                        * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fCreatorField, * fDateCreatedField,
                         * fStateField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
