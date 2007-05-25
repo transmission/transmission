@@ -100,7 +100,7 @@
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
-		A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* BarButton.m */; };
+		A23BBEB70A9BBE77003F7274 /* FilterBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* FilterBarButton.m */; };
 		A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
 		A241528B0C0261B8007DD3B4 /* Globe.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.tiff */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
@@ -351,8 +351,8 @@
 		A26B0B4F0BCFD7B0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
-		A27431D80A68538400FA780A /* BarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BarButton.h; path = macosx/BarButton.h; sourceTree = "<group>"; };
-		A27431D90A68538400FA780A /* BarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BarButton.m; path = macosx/BarButton.m; sourceTree = "<group>"; };
+		A27431D80A68538400FA780A /* FilterBarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilterBarButton.h; path = macosx/FilterBarButton.h; sourceTree = "<group>"; };
+		A27431D90A68538400FA780A /* FilterBarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarButton.m; path = macosx/FilterBarButton.m; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
@@ -490,8 +490,8 @@
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
-				A27431D80A68538400FA780A /* BarButton.h */,
-				A27431D90A68538400FA780A /* BarButton.m */,
+				A27431D80A68538400FA780A /* FilterBarButton.h */,
+				A27431D90A68538400FA780A /* FilterBarButton.m */,
 				A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */,
 				A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */,
 				A2710E740A86796000CE4F7D /* PrefsWindow.h */,
@@ -963,7 +963,7 @@
 				A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */,
 				A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */,
 				A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */,
-				A23BBEB70A9BBE77003F7274 /* BarButton.m in Sources */,
+				A23BBEB70A9BBE77003F7274 /* FilterBarButton.m in Sources */,
 				A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */,
 				A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */,
 				A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */,

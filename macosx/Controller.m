@@ -343,7 +343,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //set filter
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
-    BarButton * currentFilterButton;
+    FilterBarButton * currentFilterButton;
     if ([filterType isEqualToString: @"Pause"])
         currentFilterButton = fPauseFilterButton;
     else if ([filterType isEqualToString: @"Seed"])
@@ -1700,7 +1700,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * oldFilterType = [fDefaults stringForKey: @"Filter"];
     
-    BarButton * prevFilterButton;
+    FilterBarButton * prevFilterButton;
     if ([oldFilterType isEqualToString: @"Pause"])
         prevFilterButton = fPauseFilterButton;
     else if ([oldFilterType isEqualToString: @"Seed"])

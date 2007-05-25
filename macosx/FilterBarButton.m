@@ -22,15 +22,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "BarButton.h"
+#import "FilterBarButton.h"
 
-@interface BarButton (Private)
+@interface FilterBarButton (Private)
 
 - (void) createButtons;
 
 @end
 
-@implementation BarButton
+@implementation FilterBarButton
 
 //height of button should be 17.0
 - (id) initWithCoder: (NSCoder *) coder

@@ -24,7 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface BarButton : NSButton
+@interface FilterBarButton : NSButton
 {
     NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
             * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;

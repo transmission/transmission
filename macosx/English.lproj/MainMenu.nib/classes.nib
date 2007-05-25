@@ -1,7 +1,6 @@
 {
     IBClasses = (
         {CLASS = ActionPopUpButton; LANGUAGE = ObjC; SUPERCLASS = NSPopUpButton; }, 
-        {CLASS = BarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {
                 announceSelectedTorrents = id; 
@@ -54,7 +53,7 @@
                 fDateSortActionItem = NSMenuItem; 
                 fDateSortItem = NSMenuItem; 
                 fDockMenu = NSMenu; 
-                fDownloadFilterButton = BarButton; 
+                fDownloadFilterButton = FilterBarButton; 
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
@@ -63,18 +62,18 @@
                 fNameSortItem = NSMenuItem; 
                 fNextFilterItem = NSMenuItem; 
                 fNextInfoTabItem = NSMenuItem; 
-                fNoFilterButton = BarButton; 
+                fNoFilterButton = FilterBarButton; 
                 fOpenIgnoreDownloadFolder = NSMenuItem; 
                 fOrderSortActionItem = NSMenuItem; 
                 fOrderSortItem = NSMenuItem; 
-                fPauseFilterButton = BarButton; 
+                fPauseFilterButton = FilterBarButton; 
                 fPrevFilterItem = NSMenuItem; 
                 fPrevInfoTabItem = NSMenuItem; 
                 fProgressSortActionItem = NSMenuItem; 
                 fProgressSortItem = NSMenuItem; 
                 fScrollView = NSScrollView; 
                 fSearchFilterField = NSSearchField; 
-                fSeedFilterButton = BarButton; 
+                fSeedFilterButton = FilterBarButton; 
                 fSpeedLimitButton = NSButton; 
                 fStateSortActionItem = NSMenuItem; 
                 fStateSortItem = NSMenuItem; 
@@ -93,6 +92,7 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = FilterBarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
             ACTIONS = {deselectAll = id; revealFile = id; setNextTab = id; setPreviousTab = id; }; 
             CLASS = FirstResponder; 

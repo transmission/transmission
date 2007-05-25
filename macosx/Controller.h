@@ -33,7 +33,7 @@
 #import "DragOverlayWindow.h"
 #import "Badger.h"
 #import "ImageBackgroundView.h"
-#import "BarButton.h"
+#import "FilterBarButton.h"
 
 #import <Growl/Growl.h>
 
@@ -71,7 +71,7 @@
                                     * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet ImageBackgroundView    * fFilterBar;
-    IBOutlet BarButton              * fNoFilterButton, * fPauseFilterButton,
+    IBOutlet FilterBarButton        * fNoFilterButton, * fPauseFilterButton,
                                     * fSeedFilterButton, * fDownloadFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
     IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
