@@ -337,7 +337,7 @@ int tr_peerRead( tr_peer_t * peer )
                 tr_rcTransferred( tor->handle->download, ret );
             }
             
-            if( !tr_peerAmChoking( peer ) )
+            if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
             {
                 tor->activityDate = date;
             }
@@ -541,7 +541,7 @@ writeBegin:
         date              = tr_date();
         peer->outDate     = date;
         
-        if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
+        if( !tr_peerAmChoking( peer ) )
         {
             tor->activityDate = date;
         }
