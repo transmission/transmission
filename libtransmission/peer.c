@@ -287,6 +287,7 @@ int tr_peerRead( tr_peer_t * peer )
 {
     tr_torrent_t * tor = peer->tor;
     int ret;
+    uint64_t date;
 
     /* Try to read */
     for( ;; )
@@ -324,7 +325,8 @@ int tr_peerRead( tr_peer_t * peer )
         {
             break;
         }
-        peer->date  = tr_date();
+        date        = tr_date();
+        peer->date  = date;
         peer->pos  += ret;
         if( NULL != tor )
         {
@@ -334,6 +336,7 @@ int tr_peerRead( tr_peer_t * peer )
             {
                 tr_rcTransferred( tor->handle->download, ret );
             }
+            tor->activityDate = date;
             
             if( ( ret = parseBuf( tor, peer ) ) )
             {
@@ -397,6 +400,7 @@ int tr_peerPulse( tr_peer_t * peer )
     tr_torrent_t * tor = peer->tor;
     int ret, size;
     uint8_t * p;
+    uint64_t date;
 
     if( ( ret = checkPeer( peer ) ) )
     {
@@ -529,7 +533,10 @@ writeBegin:
 
         tor->uploadedCur += ret;
         peer->outTotal   += ret;
-        peer->outDate     = tr_date();
+        
+        date              = tr_date();
+        peer->outDate     = date;
+        tor->activityDate = date;
 
         /* In case this block is done, you may have messages
            pending. Send them before we start the next block */

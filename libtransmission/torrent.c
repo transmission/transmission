@@ -288,7 +288,7 @@ void tr_torrentStart( tr_torrent_t * tor )
     tor->error   = TR_OK;
     tor->tracker = tr_trackerInit( tor );
 
-    tor->date = tr_date();
+    tor->startDate = tr_date();
     tor->die = 0;
     snprintf( name, sizeof( name ), "torrent %p", tor );
 
@@ -474,6 +474,9 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->completedFromTracker = tr_trackerDownloaded( tc );
 
     s->swarmspeed = tr_rcRate( tor->swarmspeed );
+    
+    s->startDate = tor->startDate;
+    s->activityDate = tor->activityDate;
 
     if( s->rateDownload < 0.1 )
     {

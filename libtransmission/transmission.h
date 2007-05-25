@@ -460,6 +460,9 @@ struct tr_stat_s
 
 #define TR_RATIO_NA  -1
     float               ratio;
+    
+    uint64_t            startDate;
+    uint64_t            activityDate;
 };
 
 struct tr_peer_stat_s

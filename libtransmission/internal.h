@@ -194,17 +194,18 @@ struct tr_torrent_s
 
     tr_tracker_t    * tracker;
     tr_io_t         * io;
+    uint64_t          startDate;
     uint64_t          stopDate;
     int               ioLoaded;
 
     int               peerCount;
     tr_peer_t       * peers[TR_MAX_PEER_COUNT];
 
-    uint64_t          date;
     uint64_t          downloadedCur;
     uint64_t          downloadedPrev;
     uint64_t          uploadedCur;
     uint64_t          uploadedPrev;
+    uint64_t          activityDate;
 
     uint8_t           pexDisabled;
 
