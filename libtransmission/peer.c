@@ -336,7 +336,11 @@ int tr_peerRead( tr_peer_t * peer )
             {
                 tr_rcTransferred( tor->handle->download, ret );
             }
-            tor->activityDate = date;
+            
+            if( !tr_peerAmChoking( peer ) )
+            {
+                tor->activityDate = date;
+            }
             
             if( ( ret = parseBuf( tor, peer ) ) )
             {
