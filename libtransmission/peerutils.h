@@ -59,66 +59,75 @@ static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 
 static int checkPeer( tr_peer_t * peer )
 {
-    tr_torrent_t * tor = peer->tor;
-    uint64_t       now;
-    int            ret;
-	int            peersWanted;
-	int            idleTime;
-	int            sizeOfRange;
-
-    now = tr_date();
+	tr_torrent_t * tor = peer->tor;
+    
+	uint64_t now;
+	int      idleTime, peersWanted, percentOfRange;
+	int      ret;
+	
+	now = tr_date();
 	idleTime = now - peer->date;
-	if ( idleTime > MIN_CON_TIMEOUT ) /* get rid of clients with timeout less than 8 seconds and saves on a check later */
+	
+	/* assume any peer over with an idleTime lower than 
+		8 seconds has not timed out */
+	if ( idleTime > MIN_CON_TIMEOUT )
 	{
-		peersWanted = TR_MAX_PEER_COUNT * PERCENT_PEER_WANTED / 100;
+		peersWanted = ( TR_MAX_PEER_COUNT * PERCENT_PEER_WANTED ) / 100;
 		if ( tor->peerCount > peersWanted )
 		{
 			/* strict requirements for connecting timeout */
 			if ( peer->status < PEER_STATUS_CONNECTED )
 			{
-				peer_dbg( "connection timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "connection timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			}
 			
 			/* strict requirements for idle uploading timeout */
 			if ( peer->inRequestCount && idleTime > MIN_UPLOAD_IDLE )
 			{
-				peer_dbg( "idle uploader timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "idle uploader timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			}
 			
 			/* strict requirements for keep-alive timeout */
 			if ( idleTime > MIN_KEEP_ALIVE )
 			{
-				peer_dbg( "peer timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "peer timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			}
 		} 
-		else /* if we are tight for peers be more relaxed on enforcing timeouts,
-                basic equation min + ((max-min) / sizeOfRange) * tor->peerCount */
+		/* if we are tight for peers, relax the enforcement of timeouts */
+		else 
 		{
-			sizeOfRange = TR_MAX_PEER_COUNT - peersWanted;
+			percentOfRange = tor->peerCount / (TR_MAX_PEER_COUNT - peersWanted);
 			
 			/* relax requirements for connecting timeout */
-			if ( peer->status < PEER_STATUS_CONNECTED && idleTime >  MIN_CON_TIMEOUT
-                    + (MAX_CON_TIMEOUT - MIN_CON_TIMEOUT) * tor->peerCount / sizeOfRange)
+			if ( peer->status < PEER_STATUS_CONNECTED && idleTime > MIN_CON_TIMEOUT + 
+				 ( MAX_CON_TIMEOUT - MIN_CON_TIMEOUT ) * percentOfRange )
 			{
-				peer_dbg( "connection timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "connection timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			} 
 					
 			/* relax requirements for idle uploading timeout */
-			if ( peer->inRequestCount && idleTime >  MIN_UPLOAD_IDLE
-                    + (MAX_UPLOAD_IDLE - MIN_UPLOAD_IDLE) * tor->peerCount / sizeOfRange)
+			if ( peer->inRequestCount && idleTime >  MIN_UPLOAD_IDLE + 
+				 ( MAX_UPLOAD_IDLE - MIN_UPLOAD_IDLE ) * percentOfRange )
 			{
-				peer_dbg( "idle uploader timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "idle uploader timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			}
 					
 			/* relax requirements for keep-alive timeout */
-			if ( idleTime >  MIN_KEEP_ALIVE + (MAX_KEEP_ALIVE - MIN_KEEP_ALIVE) * tor->peerCount / sizeOfRange)
+			if ( idleTime >  MIN_KEEP_ALIVE + 
+				 ( MAX_KEEP_ALIVE - MIN_KEEP_ALIVE ) * percentOfRange )
 			{
-				peer_dbg( "peer timeout, idled %i seconds", (idleTime / 1000) );
+				peer_dbg( "peer timeout, idled %i seconds", 
+						  ( idleTime / 1000 ) );
 				return TR_ERROR;
 			}
 		}
