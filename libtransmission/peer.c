@@ -540,7 +540,11 @@ writeBegin:
         
         date              = tr_date();
         peer->outDate     = date;
-        tor->activityDate = date;
+        
+        if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
+        {
+            tor->activityDate = date;
+        }
 
         /* In case this block is done, you may have messages
            pending. Send them before we start the next block */
