@@ -35,7 +35,8 @@
     tr_stat_t    * fStat;
     
     BOOL         fResumeOnWake;
-    NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate;
+    NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate,
+                * fDateActivity;
     
     BOOL        fUseIncompleteFolder;
     NSString    * fDownloadFolder, * fIncompleteFolder;
@@ -202,6 +203,7 @@
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;
+- (NSDate *) dateActivity;
 
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;

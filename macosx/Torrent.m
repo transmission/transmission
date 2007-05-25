@@ -35,6 +35,7 @@
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
+        dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -70,6 +71,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
             dateAdded: nil dateCompleted: nil
+            dateActivity: nil
             ratioSetting: nil ratioLimit: nil
             limitSpeedCustom: nil
             checkUpload: nil uploadLimit: nil
@@ -95,6 +97,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 publicTorrent: [history objectForKey: @"PublicCopy"]
                 dateAdded: [history objectForKey: @"Date"]
 				dateCompleted: [history objectForKey: @"DateCompleted"]
+                dateActivity: [history objectForKey: @"DateActivity"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
@@ -154,7 +157,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
-                    [self dateAdded], @"Date",
+                    fDateAdded, @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
@@ -174,7 +177,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 		[history setObject: [NSNumber numberWithBool: fPex] forKey: @"Pex"];
 	
 	if (fDateCompleted)
-		[history setObject: [self dateAdded] forKey: @"DateCompleted"];
+		[history setObject: fDateCompleted forKey: @"DateCompleted"];
+    
+    NSDate * dateCompleted = [self dateActivity];
+    if (dateCompleted)
+		[history setObject: dateCompleted forKey: @"DateActivity"];
 	
     return history;
 }
@@ -198,6 +205,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fDateAdded release];
 		if (fDateCompleted)
 			[fDateCompleted release];
+        if (fDateActivity)
+			[fDateActivity release];
         
         if (fAnnounceDate)
             [fAnnounceDate release];
@@ -1340,6 +1349,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fDateCompleted;
 }
 
+- (NSDate *) dateActivity
+{
+    uint64_t date = fStat->activityDate;
+    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
+}
+
 - (NSNumber *) stateSortKey
 {
     if (![self isActive])
@@ -1368,6 +1383,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
+        dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
         limitSpeedCustom: (NSNumber *) limitCustom
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
@@ -1407,6 +1423,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
 	if (dateCompleted)
 		fDateCompleted = [dateCompleted retain];
+    if (dateActivity)
+		fDateActivity = [dateActivity retain];
 	
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];

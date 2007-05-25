@@ -21,8 +21,9 @@
                 fConnectedPeersField = NSTextField; 
                 fCreatorField = NSTextField; 
                 fDataLocationField = NSTextField; 
+                fDateAddedField = NSTextField; 
+                fDateCompletedField = NSTextField; 
                 fDateCreatedField = NSTextField; 
-                fDateStartedField = NSTextField; 
                 fDownloadLimitField = NSTextField; 
                 fDownloadLimitLabel = NSTextField; 
                 fDownloadLimitPopUp = NSPopUpButton; 

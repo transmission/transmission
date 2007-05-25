@@ -37,7 +37,7 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 284.0
+#define TAB_INFO_HEIGHT 300.0
 #define TAB_ACTIVITY_HEIGHT 170.0
 #define TAB_PEERS_HEIGHT 279.0
 #define TAB_FILES_HEIGHT 279.0
@@ -176,7 +176,8 @@
         [fTorrentLocationField setToolTip: nil];
         [fDataLocationField setStringValue: @""];
         [fDataLocationField setToolTip: nil];
-        [fDateStartedField setStringValue: @""];
+        [fDateAddedField setStringValue: @""];
+        [fDateCompletedField setStringValue: @""];
         [fCommentView setSelectable: NO];
         
         [fRevealDataButton setHidden: YES];
@@ -253,7 +254,7 @@
         else
             [fTorrentLocationField setToolTip: [torrent torrentLocation]];
         
-        [fDateStartedField setObjectValue: [torrent dateAdded]];
+        [fDateAddedField setObjectValue: [torrent dateAdded]];
         
         [fRevealDataButton setHidden: NO];
         [fRevealTorrentButton setHidden: ![torrent publicTorrent]];
@@ -310,8 +311,7 @@
 
 - (void) updateInfoGeneral
 {   
-    int numberSelected = [fTorrents count];
-    if (numberSelected != 1)
+    if ([fTorrents count] != 1)
         return;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
@@ -323,6 +323,8 @@
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
     [fDataLocationField setToolTip: location];
+    
+    [fDateCompletedField setObjectValue: [torrent dateCompleted]];
 }
 
 - (void) updateInfoActivity
