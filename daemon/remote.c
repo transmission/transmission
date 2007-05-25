@@ -76,6 +76,8 @@ struct opts
 struct torinfo
 {
     int     id;
+    int     infogood;
+    int     statgood;
     char  * name;
     int64_t size;
     char  * state;
@@ -625,6 +627,7 @@ infomsg( const struct cl_info * cinfo )
         RB_INSERT( torlist, &gl_torinfo, tinfo );
     }
 
+    tinfo->infogood = 1;
     free( tinfo->name );
     tinfo->name = strdup_noctrl( cinfo->name );
     tinfo->size = cinfo->size;
@@ -669,6 +672,7 @@ statmsg( const struct cl_stat * st )
         RB_INSERT( torlist, &gl_torinfo, info );
     }
 
+    info->statgood = 1;
     free( info->state );
     info->state     = strdup_noctrl( st->state );
     info->eta       = st->eta;
@@ -903,6 +907,11 @@ printlisting( void )
         RB_REMOVE( tornames, &names, ii );
         RB_REMOVE( torlist, &gl_torinfo, ii );
 
+        if( !ii->infogood || !ii->statgood )
+        {
+            goto free;
+        }
+
         /* massage some numbers into a better format for printing */
         size      = fmtsize( ii->size, &units );
         upspeed   = fmtsize( ii->rateup, &upunits );
@@ -986,6 +995,7 @@ printlisting( void )
         putchar( '\n' );
 
         /* free the stuff for this torrent */
+      free:
         free( ii->name );
         free( ii->state );
         free( ii->errorcode );
