@@ -37,8 +37,8 @@
 #define TAB_OPTIONS_IDENT @"Options"
 
 //15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 300.0
-#define TAB_ACTIVITY_HEIGHT 170.0
+#define TAB_INFO_HEIGHT 268.0
+#define TAB_ACTIVITY_HEIGHT 242.0
 #define TAB_PEERS_HEIGHT 279.0
 #define TAB_FILES_HEIGHT 279.0
 #define TAB_OPTIONS_HEIGHT 158.0
@@ -171,14 +171,12 @@
         
         [fCreatorField setStringValue: @""];
         [fDateCreatedField setStringValue: @""];
+        [fCommentView setSelectable: NO];
         
         [fTorrentLocationField setStringValue: @""];
         [fTorrentLocationField setToolTip: nil];
         [fDataLocationField setStringValue: @""];
         [fDataLocationField setToolTip: nil];
-        [fDateAddedField setStringValue: @""];
-        [fDateCompletedField setStringValue: @""];
-        [fCommentView setSelectable: NO];
         
         [fRevealDataButton setHidden: YES];
         [fRevealTorrentButton setHidden: YES];
@@ -202,6 +200,9 @@
         [fSwarmSpeedField setStringValue: @""];
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
+        
+        [fDateAddedField setStringValue: @""];
+        [fDateCompletedField setStringValue: @""];
         
         [fPiecesView setTorrent: nil];
         
@@ -323,8 +324,6 @@
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
     [fDataLocationField setToolTip: location];
-    
-    [fDateCompletedField setObjectValue: [torrent dateCompleted]];
 }
 
 - (void) updateInfoActivity
@@ -365,6 +364,8 @@
             [fErrorMessageView setString: errorMessage];
             [fErrorMessageView setSelectable: ![errorMessage isEqualToString: @""]];
         }
+        
+        [fDateCompletedField setObjectValue: [torrent dateCompleted]];
         
         [fPiecesView updateView: NO];
     }
