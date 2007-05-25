@@ -682,10 +682,7 @@
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-        {
-            NSNumber * progress;
             return [peer objectForKey: @"Progress"]; //returning nil is fine
-        }
         else if ([ident isEqualToString: @"UL To"])
         {
             NSNumber * rate;

@@ -142,20 +142,20 @@
     
     NSSize shadowOffset = NSMakeSize(0.0, -1.0);
     
-    NSShadow * shadowNormal = [NSShadow alloc]; 
-    [shadowNormal setShadowOffset: shadowOffset]; 
-    [shadowNormal setShadowBlurRadius: 1.0]; 
-    [shadowNormal setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]]; 
+    NSShadow * shadowNormal = [NSShadow alloc];
+    [shadowNormal setShadowOffset: shadowOffset];
+    [shadowNormal setShadowBlurRadius: 1.0];
+    [shadowNormal setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]];
 
-    NSShadow * shadowNormalDim = [NSShadow alloc]; 
-    [shadowNormalDim setShadowOffset: shadowOffset]; 
-    [shadowNormalDim setShadowBlurRadius: 1.0]; 
-    [shadowNormalDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]]; 
+    NSShadow * shadowNormalDim = [NSShadow alloc];
+    [shadowNormalDim setShadowOffset: shadowOffset];
+    [shadowNormalDim setShadowBlurRadius: 1.0];
+    [shadowNormalDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]];
 
-    NSShadow * shadowHighlighted = [NSShadow alloc]; 
-    [shadowHighlighted setShadowOffset: shadowOffset]; 
-    [shadowHighlighted setShadowBlurRadius: 1.0]; 
-    [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]]; 
+    NSShadow * shadowHighlighted = [NSShadow alloc];
+    [shadowHighlighted setShadowOffset: shadowOffset];
+    [shadowHighlighted setShadowBlurRadius: 1.0];
+    [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]];
     
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
@@ -175,9 +175,7 @@
                 boldFont, NSFontAttributeName,
                 shadowHighlighted, NSShadowAttributeName, nil];
     
-    NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes],
-            textSizeBold = [text sizeWithAttributes: highlightedAttributes];
-    
+    NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes];
     NSRect textRect = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
             (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height);
     

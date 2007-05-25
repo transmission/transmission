@@ -2777,8 +2777,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             NSDate * start = [NSDate date];
             BOOL timeUp = NO;
             
-            NSEnumerator * enumerator = [fTorrents objectEnumerator];
-            Torrent * torrent;
+            enumerator = [fTorrents objectEnumerator];
             while (!timeUp && (torrent = [enumerator nextObject]))
                 while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
                 {
