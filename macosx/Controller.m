@@ -1343,7 +1343,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive] && ![torrent isError])
+            if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
             {
                 if ([torrent allDownloaded])
                     desiredSeedActive--;

@@ -445,21 +445,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
     }
     
-    if (wasChecking && !fChecking)
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
-    
-    if ([self isError])
-    {
-        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string") stringByAppendingString:
-                                    [self errorMessage]]];
-    }
-    
+    //check for error
     BOOL wasError = fError;
-    if ((fError = fStat->cannotConnect))
-    {
-        if (!wasError && [self isActive])
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
-    }
+    if ((fError = [self isError]))
+        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
+                                    stringByAppendingString: [self errorMessage]]];
+    
+    //check if stalled
+    BOOL wasStalled = fStalled;
+    fStalled = [fDefaults boolForKey: @"CheckStalled"]
+                && [fDefaults integerForKey: @"StalledSeconds"] < [self stalledSeconds];
+    if (!fError && fStalled)
+        [statusString setString: [NSLocalizedString(@"Stalled, ", "Torrent -> status string")
+                                    stringByAppendingString: statusString]];
+    
+    //update queue for checking (from downloading to seeding), stalled, or error
+    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 
     if ([self isActive] && fStat->status != TR_STATUS_CHECK )
     {
@@ -1353,6 +1355,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     uint64_t date = fStat->activityDate / 1000;
     return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
+}
+
+- (int) stalledSeconds
+{
+    if (![self isActive])
+        return -1;
+    
+    NSDate * started = [NSDate dateWithTimeIntervalSince1970: fStat->startDate / 1000],
+            * activity = [self dateActivity];
+    if (!activity || [started compare: activity] == NSOrderedDescending)
+        return -1.0 * [started timeIntervalSinceNow];
+    else
+        return -1.0 * [activity timeIntervalSinceNow];
+}
+
+- (BOOL) isStalled
+{
+    return fStalled;
 }
 
 - (NSNumber *) stateSortKey

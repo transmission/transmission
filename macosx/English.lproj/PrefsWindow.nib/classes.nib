@@ -25,6 +25,8 @@
                 setRatioStop = id; 
                 setSound = id; 
                 setSpeedLimit = id; 
+                setStalled = id; 
+                setStalledSeconds = id; 
                 setUpdate = id; 
             }; 
             CLASS = PrefsController; 
@@ -51,6 +53,7 @@
                 fSeedingSoundPopUp = NSPopUpButton; 
                 fSpeedLimitDownloadField = NSTextField; 
                 fSpeedLimitUploadField = NSTextField; 
+                fStalledField = NSTextField; 
                 fTransfersView = NSView; 
                 fUpdatePopUp = NSPopUpButton; 
                 fUploadField = NSTextField; 

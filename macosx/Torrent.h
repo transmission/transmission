@@ -56,7 +56,7 @@
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
     int     fCheckUpload, fCheckDownload, fRatioSetting;
-    BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking;
+    BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
     
     int fOrderValue;
     
@@ -204,6 +204,9 @@
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;
 - (NSDate *) dateActivity;
+
+- (int) stalledSeconds;
+- (BOOL) isStalled;
 
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;

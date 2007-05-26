@@ -39,7 +39,7 @@
     
     IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
-    IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField;
+    IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
     
     NSArray                 * fSounds;
     
@@ -67,6 +67,9 @@
 
 - (void) setQueue: (id) sender;
 - (void) setQueueNumber: (id) sender;
+
+- (void) setStalled: (id) sender;
+- (void) setStalledSeconds: (id) sender;
 
 - (void) setDownloadLocation: (id) sender;
 - (void) folderSheetShow: (id) sender;

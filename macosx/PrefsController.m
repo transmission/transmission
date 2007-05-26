@@ -155,6 +155,9 @@
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     
+    //set stalled value
+    [fStalledField setIntValue: [fDefaults integerForKey: @"StalledSeconds"]];
+    
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
     if ([updateCheck isEqualToString: @"Weekly"])
@@ -484,8 +487,26 @@
     }
     
     [fDefaults setInteger: limit forKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
-    
     [self setQueue: nil];
+}
+
+- (void) setStalled: (id) sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+}
+
+- (void) setStalledSeconds: (id) sender
+{
+    int seconds = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", seconds]] || seconds < 0)
+    {
+        NSBeep();
+        [sender setIntValue: [fDefaults integerForKey: @"StalledSeconds"]];
+        return;
+    }
+    
+    [fDefaults setInteger: seconds forKey: @"StalledSeconds"];
+    [self setQueueStalled: nil];
 }
 
 - (void) setDownloadLocation: (id) sender

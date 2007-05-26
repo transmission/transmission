@@ -24,6 +24,8 @@
 	<true/>
 	<key>CheckRemoveDownloading</key>
 	<false/>
+	<key>CheckStalled</key>
+	<true/>
 	<key>CheckUpload</key>
 	<true/>
 	<key>DeleteOriginalTorrent</key>
@@ -98,6 +100,8 @@
 	<integer>10</integer>
 	<key>SpeedLimitUploadLimit</key>
 	<integer>10</integer>
+	<key>StalledSeconds</key>
+	<integer>300</integer>
 	<key>StatusBar</key>
 	<true/>
 	<key>UpdateCheck</key>
