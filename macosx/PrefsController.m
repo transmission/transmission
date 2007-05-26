@@ -506,7 +506,7 @@
     }
     
     [fDefaults setInteger: seconds forKey: @"StalledSeconds"];
-    [self setQueueStalled: nil];
+    [self setStalled: nil];
 }
 
 - (void) setDownloadLocation: (id) sender
