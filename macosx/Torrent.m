@@ -1358,7 +1358,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSDate *) dateActivity
 {
     uint64_t date = fStat->activityDate / 1000;
-    return date == 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
+    return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
 }
 
 - (int) stalledSeconds
