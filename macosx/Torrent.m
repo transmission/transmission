@@ -447,17 +447,21 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //check for error
     BOOL wasError = fError;
-    if ((fError = [self isError]))
-        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
-                                    stringByAppendingString: [self errorMessage]]];
+    fError = [self isError];
     
     //check if stalled
     BOOL wasStalled = fStalled;
-    fStalled = [fDefaults boolForKey: @"CheckStalled"]
+    fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
                 && [fDefaults integerForKey: @"StalledSeconds"] < [self stalledSeconds];
-    if (!fError && fStalled)
+    
+    //create strings for error or stalled
+    if (fError)
+        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
+                                    stringByAppendingString: [self errorMessage]]];
+    else if (fStalled)
         [statusString setString: [NSLocalizedString(@"Stalled, ", "Torrent -> status string")
                                     stringByAppendingString: statusString]];
+    else;
     
     //update queue for checking (from downloading to seeding), stalled, or error
     if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
@@ -1354,20 +1358,21 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSDate *) dateActivity
 {
     uint64_t date = fStat->activityDate / 1000;
-    return date > 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
+    return date == 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
 }
 
 - (int) stalledSeconds
 {
-    if (![self isActive])
+    uint64_t start;
+    if ((start = fStat->startDate) == 0)
         return -1;
     
-    NSDate * started = [NSDate dateWithTimeIntervalSince1970: fStat->startDate / 1000],
+    NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
             * activity = [self dateActivity];
     if (!activity || [started compare: activity] == NSOrderedDescending)
-        return -1.0 * [started timeIntervalSinceNow];
+        return -1 * [started timeIntervalSinceNow];
     else
-        return -1.0 * [activity timeIntervalSinceNow];
+        return -1 * [activity timeIntervalSinceNow];
 }
 
 - (BOOL) isStalled
