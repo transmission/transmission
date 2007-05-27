@@ -479,7 +479,7 @@
     BOOL download = sender == fQueueDownloadField;
     
     int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 1)
     {
         NSBeep();
         [sender setIntValue: [fDefaults integerForKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"]];
@@ -498,7 +498,7 @@
 - (void) setStalledSeconds: (id) sender
 {
     int seconds = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", seconds]] || seconds < 0)
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", seconds]] || seconds < 1)
     {
         NSBeep();
         [sender setIntValue: [fDefaults integerForKey: @"StalledSeconds"]];
