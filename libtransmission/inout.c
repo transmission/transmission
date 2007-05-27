@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2005-2006 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,6 +39,11 @@ struct tr_io_s
     int         * slotPiece;
 
     int           slotsUsed;
+
+	int	writeCount;
+	int	readCount;
+	int	reorderCount;
+	int	hitCount;
 };
 
 #include "fastresume.h"
@@ -58,6 +63,8 @@ static void findSlotForPiece( tr_io_t *, int );
 
 #define readSlot(io,sl,b,s)  readOrWriteSlot(io,sl,b,s,0)
 #define writeSlot(io,sl,b,s) readOrWriteSlot(io,sl,b,s,1)
+
+static int reorderPieces( tr_io_t * io );
 
 /***********************************************************************
  * tr_ioLoadResume
@@ -109,6 +116,11 @@ tr_io_t * tr_ioInit( tr_torrent_t * tor )
         return NULL;
     }
 
+    io->writeCount = 0;
+    io->readCount = 0;
+    io->reorderCount = 0;
+    io->hitCount = 0;
+
     return io;
 }
 
@@ -135,18 +147,40 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
 {
     tr_info_t    * inf = &io->tor->info;
     uint64_t       offset;
+	int            rv;
+	int            reorder = 0;
+	int            slotsUsedOld;
 
-    if( io->pieceSlot[index] < 0 )
+	slotsUsedOld = io->slotsUsed;
+
+	if( io->pieceSlot[index] < 0 )
     {
         findSlotForPiece( io, index );
         tr_inf( "Piece %d: starting in slot %d", index,
                 io->pieceSlot[index] );
+		reorder = 1;
+		io->writeCount += 1;
     }
 
     offset = (uint64_t) io->pieceSlot[index] *
         (uint64_t) inf->pieceSize + (uint64_t) begin;
 
-    return writeBytes( io, offset, length, buf );
+    rv = writeBytes( io, offset, length, buf );
+
+    if (reorder)
+	{
+		tr_dbg( "reorder pieces");
+
+		int reorderRuns = reorderPieces( io );
+
+		if (io->slotsUsed == slotsUsedOld && reorderRuns > 0)
+			tr_err( "reorder runs should have been 0 but was: %d", reorderRuns );
+
+//		tr_inf( "STAT: filesize: %03d writeCount: %03d readCount: %03d hitCount: %03d reorderCount: %03d",
+//				io->slotsUsed,io->writeCount,io->readCount,io->hitCount,io->reorderCount);
+	}
+
+	return rv;
 }
 
 /***********************************************************************
@@ -177,7 +211,7 @@ int tr_ioHash( tr_io_t * io, int index )
     hashFailed = memcmp( hash, &inf->pieces[20*index], SHA_DIGEST_LENGTH );
     if( hashFailed )
     {
-        tr_inf( "Piece %d (slot %d): hash FAILED", index,
+        tr_err( "Piece %d (slot %d): hash FAILED", index,
                 io->pieceSlot[index] );
         tr_cpPieceRem( tor->completion, index );
     }
@@ -288,8 +322,21 @@ static int checkFiles( tr_io_t * io )
         {
             if( !memcmp( hash, &inf->pieces[20*j], SHA_DIGEST_LENGTH ) )
             {
-                io->pieceSlot[j] = i;
-                io->slotPiece[i] = j;
+				if ( io->pieceSlot[j] > 0 && j == i)
+				{
+					// only remove double piece when we found one sitting in the right slot
+
+					tr_inf( "found piece %d (slot: %d) already on slot %d",j,i,io->pieceSlot[j] );
+					io->slotPiece[io->pieceSlot[j]] = -1;
+
+					io->pieceSlot[j] = i;
+					io->slotPiece[i] = j;
+				}
+				else	// we found no double
+				{
+					io->pieceSlot[j] = i;
+					io->slotPiece[i] = j;
+				}
 
                 tr_cpPieceAdd( tor->completion, j );
                 break;
@@ -436,7 +483,12 @@ static int readOrWriteBytes( tr_io_t * io, uint64_t offset, int size,
 
 cleanup:
     tr_lockLock( &tor->lock );
-    return ret;
+
+	if( ret )
+    {
+		tr_err( "readOrWriteBytes: ret: %d",ret );
+    }
+	return ret;
 }
 
 /***********************************************************************
@@ -473,14 +525,24 @@ static void invertSlots( tr_io_t * io, int slot1, int slot2 )
     uint8_t * buf1, * buf2;
     int piece1, piece2, foo;
 
+	io->writeCount += 2;
+	io->readCount += 2;
+
+    buf1 = malloc( inf->pieceSize );
+    buf2 = malloc( inf->pieceSize );
+
+	assert (inf->pieceCount > slot1);
+	assert (inf->pieceCount > slot2);
+	assert (slot1 != slot2);
+
     buf1 = malloc( inf->pieceSize );
     buf2 = malloc( inf->pieceSize );
 
     readSlot( io, slot1, buf1, &foo );
     readSlot( io, slot2, buf2, &foo );
 
-    writeSlot( io, slot1, buf2, &foo );
     writeSlot( io, slot2, buf1, &foo );
+    writeSlot( io, slot1, buf2, &foo );
 
     free( buf1 );
     free( buf2 );
@@ -499,14 +561,49 @@ static void invertSlots( tr_io_t * io, int slot1, int slot2 )
     }
 }
 
-static void reorderPieces( tr_io_t * io )
+static void moveSlot( tr_io_t * io, int slot1, int slot2 )
+{
+	tr_torrent_t * tor = io->tor;
+	tr_info_t    * inf = &tor->info;
+
+	uint8_t * buf1;
+	int piece, foo;
+
+	io->writeCount += 1;
+	io->readCount += 1;
+
+	assert (inf->pieceCount > slot1);
+	assert (inf->pieceCount > slot2);
+	assert (slot1 != slot2);
+
+	buf1 = malloc( inf->pieceSize );
+
+	readSlot( io, slot1, buf1, &foo );	/* from slot1 */
+	writeSlot( io, slot2, buf1, &foo );	/* to slot2 */
+
+	free( buf1 );
+
+	piece = io->slotPiece[slot1];
+
+	io->slotPiece[slot2] = piece;
+	io->slotPiece[slot1] = -1;	/* mark as free */
+
+	if( piece >= 0 )
+	{
+		io->pieceSlot[piece] = slot2;
+	}
+}
+
+static int reorderPieces( tr_io_t * io )
 {
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &tor->info;
 
-    int i, didInvert;
+    int i, didInvert, didInvertReturn = 0;
 
-    /* Try to move pieces to their final places */
+	io->reorderCount += 1;
+
+	/* Try to move pieces to their final places */
     do
     {
         didInvert = 0;
@@ -523,27 +620,57 @@ static void reorderPieces( tr_io_t * io )
                 /* Already in place */
                 continue;
             }
-            if( i >= io->slotsUsed )
+            if( i > io->slotsUsed )
             {
                 /* File is not big enough yet */
                 continue;
             }
 
-            /* Move piece i into slot i */
-            tr_inf( "invert %d and %d", io->pieceSlot[i], i );
-            invertSlots( io, i, io->pieceSlot[i] );
+            /* Move/Invert piece i into slot i */
+			
+			if( io->slotPiece[i] >= 0 )
+			{
+				tr_err( "reorder: invert slot %d and %d (piece %d)", io->pieceSlot[i], i, io->slotPiece[i] );
+				invertSlots( io, i, io->pieceSlot[i] );
+			}
+			else
+			{
+				tr_inf( "reorder: move slot %d to %d (piece %d)", io->pieceSlot[i], i, io->slotPiece[i] );
+				moveSlot( io, io->pieceSlot[i], i );
+				if (i == io->slotsUsed) (io->slotsUsed)++;
+			}
+			
             didInvert = 1;
         }
+		didInvertReturn += didInvert;
     } while( didInvert );
+
+	return didInvertReturn;
+}
+
+static int nextFreeSlotToAppend(tr_io_t * io)
+{
+	tr_torrent_t * tor = io->tor;
+	tr_info_t    * inf = &tor->info;
+
+	while( io->pieceSlot[io->slotsUsed] >= 0 && io->slotsUsed < ( (inf->pieceCount)- 1 ) )
+	{
+		tr_inf( "slotUsed (%d) has piece in %d !", io->slotsUsed, io->pieceSlot[io->slotsUsed] );
+		(io->slotsUsed)++;
+	}
+
+	return (io->slotsUsed)++;
 }
 
 static void findSlotForPiece( tr_io_t * io, int piece )
 {
     int i;
-#if 0
+	int freeSlot;
+
     tr_torrent_t * tor = io->tor;
     tr_info_t    * inf = &tor->info;
 
+#if 0
     tr_dbg( "Entering findSlotForPiece" );
 
     for( i = 0; i < inf->pieceCount; i++ )
@@ -554,24 +681,68 @@ static void findSlotForPiece( tr_io_t * io, int piece )
     printf( "\n" );
 #endif
 
+	/* first we should look for the right slot! */
+
+#define PREFERSIZE 0
+
+	if( piece <= io->slotsUsed )
+	{
+		if( io->slotPiece[piece] >= 0 ) /* if used move it away! */
+		{
+			freeSlot = -1;
+
+			if( PREFERSIZE )
+			{
+				for( i = 0; i < io->slotsUsed; i++ )
+				{
+					if( io->slotPiece[i] < 0 )
+					{
+						freeSlot = i;
+						break;
+					}
+				}
+			}
+			
+			if( freeSlot == -1 )
+				freeSlot = nextFreeSlotToAppend(io);
+
+			tr_inf( "move slot %d (piece %d) to %d", piece, io->slotPiece[piece], freeSlot );
+			moveSlot( io, piece, freeSlot );
+		}
+		else
+		{
+			io->hitCount += 1;
+		}
+
+		io->pieceSlot[piece] = piece;
+		io->slotPiece[piece] = piece;
+		if (piece == io->slotsUsed) (io->slotsUsed)++;
+		goto reorder;
+	}
+
     /* Look for an empty slot somewhere */
-    for( i = 0; i < io->slotsUsed; i++ )
-    {
-        if( io->slotPiece[i] < 0 )
-        {
-            io->pieceSlot[piece] = i;
-            io->slotPiece[i]     = piece;
-            goto reorder;
-        }
+
+	if( PREFERSIZE || io->slotsUsed >= inf->pieceCount )
+	{
+		for( i = 0; i < io->slotsUsed; i++ )
+		{
+			if( io->slotPiece[i] < 0 )
+			{
+				io->pieceSlot[piece] = i;
+				io->slotPiece[i]     = piece;
+				goto reorder;
+			}
+		}
     }
+	
+	freeSlot = nextFreeSlotToAppend(io);
 
-    /* No empty slot, extend the file */
-    io->pieceSlot[piece]         = io->slotsUsed;
-    io->slotPiece[io->slotsUsed] = piece;
-    (io->slotsUsed)++;
+	/* No empty slot, extend the file */
+	io->pieceSlot[piece]    = freeSlot;
+	io->slotPiece[freeSlot] = piece;
 
-  reorder:
-    reorderPieces( io );
+reorder:
+		return;
 
 #if 0
     for( i = 0; i < inf->pieceCount; i++ )
