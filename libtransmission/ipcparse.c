@@ -28,11 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "transmission.h"
+
 #include "bsdtree.h"
 #include "ipcparse.h"
-
-#include "transmission.h"
-#include "bencode.h"
 
 /* begin copy-paste from daemon/misc.h */
 
