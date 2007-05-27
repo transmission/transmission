@@ -26,8 +26,8 @@
 #define TG_IO_H
 
 typedef void (*iofunc_t)(GSource*, void*);
-typedef void (*ioidfunc_t)(GSource*, unsigned int, void*);
-typedef unsigned int (*iodatafunc_t)(GSource*, char*, unsigned int, void*);
+typedef void (*ioidfunc_t)(GSource*, size_t, void*);
+typedef size_t (*iodatafunc_t)(GSource*, void*, size_t, void*);
 typedef void (*ionewfunc_t)(GSource*, int, struct sockaddr*, socklen_t, void*);
 
 GSource *
@@ -39,9 +39,9 @@ io_new_listening(int fd, socklen_t len, ionewfunc_t accepted,
                  iofunc_t closed, void *cbdata);
 
 unsigned int
-io_send(GSource *source, const char *data, unsigned int len);
+io_send(GSource *source, const void *data, size_t len);
 
 unsigned int
-io_send_keepdata(GSource *source, char *data, unsigned int len);
+io_send_keepdata(GSource *source, void *data, size_t len);
 
 #endif /* TG_IO_H */

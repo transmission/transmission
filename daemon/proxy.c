@@ -38,6 +38,7 @@
 #include "errors.h"
 #include "misc.h"
 #include "transmission.h"
+#include "trcompat.h"
 
 static void              usage    ( const char *, ... );
 static enum confpathtype readargs ( int, char **, char ** );

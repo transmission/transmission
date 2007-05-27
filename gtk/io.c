@@ -47,16 +47,16 @@ struct iosource {
   iofunc_t closed;
   void *cbdata;
   char *inbuf;
-  unsigned int inused;
-  unsigned int inmax;
+  size_t inused;
+  size_t inmax;
   GList *outbufs;
   unsigned int lastid;
 };
 
 struct iooutbuf {
   char *data;
-  unsigned int len;
-  unsigned int off;
+  size_t len;
+  size_t off;
   unsigned int id;
 };
 
@@ -179,7 +179,7 @@ newsource(void) {
 }
 
 unsigned int
-io_send(GSource *source, const char *data, unsigned int len) {
+io_send(GSource *source, const void *data, size_t len) {
   char *new = g_new(char, len);
 
   memcpy(new, data, len);
@@ -188,7 +188,7 @@ io_send(GSource *source, const char *data, unsigned int len) {
 }
 
 unsigned int
-io_send_keepdata(GSource *source, char *data, unsigned int len) {
+io_send_keepdata(GSource *source, void *data, size_t len) {
   struct iosource *io = (struct iosource*)source;
   struct iooutbuf *buf = g_new(struct iooutbuf, 1);
 
@@ -266,7 +266,7 @@ io_finalize(GSource *source SHUTUP) {
 }
 
 static void
-io_biggify(char **buf, unsigned int used, unsigned int *max) {
+io_biggify(char **buf, size_t used, size_t *max) {
   if(used + IO_BLOCKSIZE > *max) {
     *max += IO_BLOCKSIZE;
     *buf = g_renew(char, *buf, *max);
@@ -292,7 +292,7 @@ static void
 io_read(struct iosource *io) {
   ssize_t res = 0;
   gboolean newdata = FALSE;
-  unsigned int used;
+  size_t used;
   int err = 0;
 
   g_source_ref((GSource*)io);

@@ -88,10 +88,10 @@ client_connect(char *path, struct constate *con);
 static void
 srv_io_accept(GSource *source, int fd, struct sockaddr *sa, socklen_t len,
               void *vdata);
-static unsigned int
-srv_io_received(GSource *source, char *data, unsigned int len, void *vdata);
-static unsigned int
-cli_io_received(GSource *source, char *data, unsigned int len, void *vdata);
+static size_t
+srv_io_received( GSource * source, void * data, size_t len, void * vdata );
+static size_t
+cli_io_received( GSource * source, void * data, size_t len, void * vdata );
 static void
 client_sendmsg( struct constate * con );
 static void
@@ -99,7 +99,7 @@ destroycon(struct constate *con);
 static void
 all_io_closed(GSource *source, void *vdata);
 static void
-cli_io_sent(GSource *source, unsigned int id, void *vdata);
+cli_io_sent( GSource * source, size_t id, void * vdata );
 static void
 smsg_add( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
@@ -371,9 +371,9 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
   io_send_keepdata( newcon->source, buf, size );
 }
 
-static unsigned int
-srv_io_received( GSource * source SHUTUP, char * data, unsigned int len,
-                 void * vdata)
+static size_t
+srv_io_received( GSource * source SHUTUP, void * data, size_t len,
+                 void * vdata )
 {
     struct constate      * con = vdata;
     struct constate_serv * srv = &con->u.serv;
@@ -412,8 +412,8 @@ srv_io_received( GSource * source SHUTUP, char * data, unsigned int len,
     return res;
 }
 
-static unsigned int
-cli_io_received( GSource * source SHUTUP, char * data, unsigned int len,
+static size_t
+cli_io_received( GSource * source SHUTUP, void * data, size_t len,
                  void * vdata )
 {
     struct constate        * con = vdata;
@@ -532,7 +532,8 @@ all_io_closed(GSource *source SHUTUP, void *vdata) {
 }
 
 static void
-cli_io_sent(GSource *source SHUTUP, unsigned int id, void *vdata) {
+cli_io_sent( GSource * source SHUTUP, size_t id, void *vdata )
+{
   struct constate_client *cli = &((struct constate*)vdata)->u.client;
 
   if(0 < id && cli->msgid == id) {
@@ -621,13 +622,13 @@ smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
     {
         if( NULL == dir )
         {
-            tr_core_add_data( srv->core, data->val.s.s, data->val.s.i,
-                              paused );
+            tr_core_add_data( srv->core, (uint8_t *) data->val.s.s,
+                              data->val.s.i, paused );
         }
         else
         {
-            tr_core_add_data_dir( srv->core, data->val.s.s, data->val.s.i,
-                                  dir->val.s.s, paused );
+            tr_core_add_data_dir( srv->core, (uint8_t *) data->val.s.s,
+                                  data->val.s.i, dir->val.s.s, paused );
         }
     }
     tr_core_torrents_added( TR_CORE( srv->core ) );

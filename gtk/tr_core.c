@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <stdint.h>
 #include <string.h>
 
 #include <gtk/gtk.h>
@@ -195,7 +196,7 @@ tr_core_marshal_data( GClosure * closure, GValue * ret SHUTUP, guint count,
     g_return_if_fail( 4 == count );
 
     inst    = g_value_peek_pointer( vals );
-    data    = (char *) g_value_get_string( vals + 1 );
+    data    = (uint8_t *) g_value_get_string( vals + 1 );
     size    = g_value_get_uint( vals + 2 );
     paused  = g_value_get_boolean( vals + 3 );
     gdata   = closure->data;
