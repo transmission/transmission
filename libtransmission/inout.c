@@ -528,10 +528,7 @@ static void invertSlots( tr_io_t * io, int slot1, int slot2 )
 	io->writeCount += 2;
 	io->readCount += 2;
 
-    buf1 = malloc( inf->pieceSize );
-    buf2 = malloc( inf->pieceSize );
-
-	assert (inf->pieceCount > slot1);
+    assert (inf->pieceCount > slot1);
 	assert (inf->pieceCount > slot2);
 	assert (slot1 != slot2);
 
