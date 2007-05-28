@@ -208,7 +208,7 @@
 - (NSDate *) dateCompleted;
 - (NSDate *) dateActivity;
 
-- (int) stalledSeconds;
+- (int) stalledMinutes;
 - (BOOL) isStalled;
 
 - (NSNumber *) stateSortKey;

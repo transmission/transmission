@@ -464,7 +464,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     //check if stalled
     BOOL wasStalled = fStalled;
     fStalled = [self isActive] && [fDefaults boolForKey: @"CheckStalled"]
-                && [fDefaults integerForKey: @"StalledSeconds"] < [self stalledSeconds];
+                && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
     
     //create strings for error or stalled
     if (fError)
@@ -1378,7 +1378,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return date != 0 ? [NSDate dateWithTimeIntervalSince1970: date] : fDateActivity;
 }
 
-- (int) stalledSeconds
+- (int) stalledMinutes
 {
     uint64_t start;
     if ((start = fStat->startDate) == 0)
@@ -1387,9 +1387,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
             * activity = [self dateActivity];
     if (!activity || [started compare: activity] == NSOrderedDescending)
-        return -1 * [started timeIntervalSinceNow];
+        return -1 * [started timeIntervalSinceNow] / 60;
     else
-        return -1 * [activity timeIntervalSinceNow];
+        return -1 * [activity timeIntervalSinceNow] / 60;
 }
 
 - (BOOL) isStalled

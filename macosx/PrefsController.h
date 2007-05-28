@@ -69,7 +69,7 @@
 - (void) setQueueNumber: (id) sender;
 
 - (void) setStalled: (id) sender;
-- (void) setStalledSeconds: (id) sender;
+- (void) setStalledMinutes: (id) sender;
 
 - (void) setDownloadLocation: (id) sender;
 - (void) folderSheetShow: (id) sender;

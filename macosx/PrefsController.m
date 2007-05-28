@@ -156,7 +156,7 @@
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
     
     //set stalled value
-    [fStalledField setIntValue: [fDefaults integerForKey: @"StalledSeconds"]];
+    [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
     
     //set update check
     NSString * updateCheck = [fDefaults stringForKey: @"UpdateCheck"];
@@ -495,17 +495,17 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
 }
 
-- (void) setStalledSeconds: (id) sender
+- (void) setStalledMinutes: (id) sender
 {
-    int seconds = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", seconds]] || seconds < 1)
+    int minutes = [sender intValue];
+    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", minutes]] || minutes < 1)
     {
         NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: @"StalledSeconds"]];
+        [sender setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
         return;
     }
     
-    [fDefaults setInteger: seconds forKey: @"StalledSeconds"];
+    [fDefaults setInteger: minutes forKey: @"StalledMinutes"];
     [self setStalled: nil];
 }
 

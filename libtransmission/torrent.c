@@ -898,9 +898,13 @@ static int ioInitRemove( tr_torrent_t * tor )
     if( node != NULL )
     {
         if( prev == NULL )
+        {
             ioInitQueue = node->next;
+        }
         else
+        {
             prev->next = node->next;
+        }
     }
 
     tr_lockUnlock( lock );
