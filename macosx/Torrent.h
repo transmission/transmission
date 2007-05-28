@@ -34,6 +34,8 @@
     tr_info_t    * fInfo;
     tr_stat_t    * fStat;
     
+    int fID;
+    
     BOOL         fResumeOnWake;
     NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate,
                 * fDateActivity;
@@ -211,5 +213,9 @@
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
+
+- (int) getID;
+- (tr_info_t *) getInfo;
+- (tr_stat_t *) getStat;
 
 @end

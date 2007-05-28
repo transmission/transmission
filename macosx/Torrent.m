@@ -30,6 +30,8 @@
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
 
+static int static_lastid = 0;
+
 @interface Torrent (Private)
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
@@ -1400,6 +1402,21 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [NSNumber numberWithFloat: [self ratio]];
 }
 
+- (int) getID
+{
+    return fID;
+}
+
+- (tr_info_t *) getInfo
+{
+    return fInfo;
+}
+
+- (tr_stat_t *) getStat
+{
+    return fStat;
+}
+
 @end
 
 @implementation Torrent (Private)
@@ -1418,7 +1435,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     if (!(self = [super init]))
         return nil;
-
+    
+    static_lastid++;
+    fID = static_lastid;
+    
     fLib = lib;
     fDefaults = [NSUserDefaults standardUserDefaults];
 

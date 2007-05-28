@@ -248,6 +248,7 @@ usage( const char * msg, ... )
   "  -S --stop all             Stop all running torrents\n"
   "  -t --type daemon          Use the daemon frontend, transmission-daemon\n"
   "  -t --type gtk             Use the GTK+ frontend, transmission-gtk\n"
+  "  -t --type mac             Use the MacOS X frontend\n"
   "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
   "  -U --upload-unlimited     No upload rate limit\n"
   "  -x --proxy                Use proxy command to connect to frontend\n",
@@ -371,6 +372,14 @@ readargs( int argc, char ** argv, struct opts * opts )
                 else if( 0 == strcasecmp( "gtk", optarg ) )
                 {
                     opts->type  = CONF_PATH_TYPE_GTK;
+                    opts->sock  = NULL;
+                }
+                else if( 0 == strcasecmp( "mac", optarg ) ||
+                         0 == strcasecmp( "osx", optarg ) ||
+                         0 == strcasecmp( "macos", optarg ) ||
+                         0 == strcasecmp( "macosx", optarg ) )
+                {
+                    opts->type  = CONF_PATH_TYPE_OSX;
                     opts->sock  = NULL;
                 }
                 else

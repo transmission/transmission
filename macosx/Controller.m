@@ -168,6 +168,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fBadger = [[Badger alloc] initWithLib: fLib];
         fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib];
+        fIPCController = [[IPCController alloc] init];
+        [fIPCController setDelegate: self];
         
         [GrowlApplicationBridge setGrowlDelegate: self];
         
@@ -189,6 +191,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDisplayedTorrents release];
     [fBadger release];
     [fOverlayWindow release];
+    [fIPCController release];
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
@@ -456,7 +459,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSApplicationTerminateReply) applicationShouldTerminate: (NSApplication *) sender
 {
-    if (!fUpdateInProgress && [fDefaults boolForKey: @"CheckQuit"])
+    if (!fUpdateInProgress && !fRemoteQuit && [fDefaults boolForKey: @"CheckQuit"])
     {
         int active = 0, downloading = 0;
         Torrent * torrent;
@@ -2977,6 +2980,150 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex: 0] 
                 stringByAppendingPathComponent: [[NSProcessInfo processInfo] processName]];
+}
+
+- (void) ipcQuit
+{
+    fRemoteQuit = YES;
+    [NSApp terminate: self];
+}
+
+- (NSArray *) ipcGetTorrentsByID: (NSArray *) idlist
+{
+    NSEnumerator   * torenum, * idenum;
+    Torrent        * tor;
+    NSNumber       * num;
+    NSMutableArray * ret;
+
+    if (!idlist)
+    {
+        return fTorrents;
+    }
+
+    ret = [NSMutableArray array];
+    torenum = [fTorrents objectEnumerator];
+    while ((tor = [torenum nextObject]))
+    {
+        idenum = [idlist objectEnumerator];
+        while ((num = [idenum nextObject]))
+        {
+            if ([num intValue] == [tor getID])
+            {
+                [ret addObject: tor];
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+
+- (NSArray *) ipcGetTorrentsByHash: (NSArray *) hashlist
+{
+    NSEnumerator   * torenum, * hashenum;
+    Torrent        * tor;
+    NSString       * torhash, * listhash;
+    NSMutableArray * ret;
+
+    if (!hashlist)
+        return fTorrents;
+
+    ret = [NSMutableArray array];
+    torenum = [fTorrents objectEnumerator];
+    while ((tor = [torenum nextObject]))
+    {
+        torhash = [tor hashString];
+        hashenum = [hashlist objectEnumerator];
+        while ((listhash = [hashenum nextObject]))
+        {
+            if (NSOrderedSame == [torhash caseInsensitiveCompare: listhash])
+            {
+                [ret addObject: tor];
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+
+- (BOOL) ipcAddTorrents: (NSArray *) torrents
+{
+    /* 'torrents' is NSArray of NSString torrent file paths, should
+       return NO if torrent fails to load */
+    return NO;
+}
+
+- (BOOL) ipcAddTorrentFile: (NSString *) path
+                 directory: (NSString *) dir
+{
+    /* 'path' is path to torrent file, 'dir' is the directory it
+       should download it's files to and may be nil, should return NO
+       if torrent fails to load */
+    return NO;
+}
+
+- (BOOL) ipcAddTorrentFileAutostart: (NSString *) path
+                          directory: (NSString *) dir
+                          autostart: (BOOL) autostart
+{
+    /* 'path' is path to torrent file, 'dir' is the directory it
+       should download it's files to and may be nil, 'autostart' is a
+       boolean indicating if the torrent should be automatically
+       started (or queued to start, I guess), should return NO if
+       torrent fails to load */
+    return NO;
+}
+
+- (BOOL) ipcAddTorrentData: (NSData *) data
+                 directory: (NSString *) dir
+{
+    /* 'data' is the contents of a torrent file, 'dir' is the
+       directory it should download it's files to and may be nil,
+       should return NO if torrent fails to load */
+    return NO;
+}
+
+- (BOOL) ipcAddTorrentDataAutostart: (NSData *) path
+                          directory: (NSString *) dir
+                          autostart: (BOOL) autostart
+{
+    /* 'data' is the contents of a torrent file, 'dir' is the
+       directory it should download it's files to and may be nil,
+       'autostart' is a boolean indicating if the torrent should be
+       automatically started (or queued to start, I guess), should
+       return NO if torrent fails to load */
+    return NO;
+}
+
+- (BOOL) ipcStartTorrents: (NSArray *) torrents
+{
+    if (!torrents)
+        [self resumeAllTorrents: self];
+    else
+        [self resumeTorrents: torrents];
+
+    return YES;
+}
+
+- (BOOL) ipcStopTorrents: (NSArray *) torrents
+{
+    if (!torrents)
+        [self stopAllTorrents: self];
+    else
+        [self stopTorrents: torrents];
+
+    return YES;
+}
+
+- (BOOL) ipcRemoveTorrents: (NSArray *) torrents
+{
+    if (!torrents)
+        torrents = [NSArray arrayWithArray: fTorrents];
+
+    [self confirmRemoveTorrents: torrents deleteData: NO deleteTorrent: NO];
+
+    return YES;
 }
 
 @end

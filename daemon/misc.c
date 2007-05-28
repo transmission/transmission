@@ -76,26 +76,26 @@ pushdir( char * path, const char * file, size_t size )
 void
 confpath( char * buf, size_t len, const char * file, enum confpathtype type )
 {
-    const char * typestr;
+    strlcpy( buf, tr_getPrefsDirectory(), len );
 
     switch( type )
     {
         case CONF_PATH_TYPE_DAEMON:
-            typestr = "daemon";
+            pushdir( buf, "daemon", len );
             break;
         case CONF_PATH_TYPE_GTK:
-            typestr = "gtk";
+            pushdir( buf, "gtk", len );
+            break;
+        case CONF_PATH_TYPE_OSX:
             break;
         default:
             assert( 0 );
             break;
     }
 
-    strlcpy(     buf, tr_getPrefsDirectory(), len );
-    pushdir(     buf, typestr,                len );
     if( NULL != file )
     {
-        pushdir( buf, file,                   len );
+        pushdir( buf, file, len );
     }
 }
 

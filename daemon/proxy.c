@@ -132,7 +132,8 @@ usage( const char * msg, ... )
   "\n"
   "  -h --help                 Display this message and exit\n"
   "  -t --type daemon          Use the daemon frontend, transmission-daemon\n"
-  "  -t --type gtk             Use the GTK+ frontend, transmission-gtk\n",
+  "  -t --type gtk             Use the GTK+ frontend, transmission-gtk\n"
+  "  -t --type mac             Use the Mac OS X frontend\n",
             getmyname(), VERSION_STRING, VERSION_REVISION );
     exit( EXIT_SUCCESS );
 }
@@ -166,6 +167,14 @@ readargs( int argc, char ** argv, char ** sockpath )
                 else if( 0 == strcasecmp( "gtk", optarg ) )
                 {
                     type      = CONF_PATH_TYPE_GTK;
+                    *sockpath = NULL;
+                }
+                else if( 0 == strcasecmp( "mac", optarg ) ||
+                         0 == strcasecmp( "osx", optarg ) ||
+                         0 == strcasecmp( "macos", optarg ) ||
+                         0 == strcasecmp( "macosx", optarg ) )
+                {
+                    type      = CONF_PATH_TYPE_OSX;
                     *sockpath = NULL;
                 }
                 else

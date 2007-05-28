@@ -39,6 +39,7 @@ enum confpathtype
 {
     CONF_PATH_TYPE_DAEMON,
     CONF_PATH_TYPE_GTK,
+    CONF_PATH_TYPE_OSX,
 };
 
 struct bufferevent;

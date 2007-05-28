@@ -34,6 +34,7 @@
 #import "Badger.h"
 #import "ImageBackgroundView.h"
 #import "FilterBarButton.h"
+#import "IPCController.h"
 
 #import <Growl/Growl.h>
 
@@ -49,6 +50,7 @@
     NSUserDefaults                  * fDefaults;
     InfoWindowController            * fInfoController;
     MessageWindowController         * fMessageController;
+    IPCController                   * fIPCController;
 
     IBOutlet NSWindow               * fWindow;
     DragOverlayWindow               * fOverlayWindow;
@@ -97,6 +99,8 @@
     NSMutableArray                  * fAutoImportedNames;
     NSMutableDictionary             * fPendingTorrentDownloads;
     NSTimer                         * fAutoImportTimer;
+
+    BOOL                              fRemoteQuit;
 }
 
 - (void) openFiles:             (NSArray *) filenames;
