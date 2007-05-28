@@ -1394,7 +1394,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) progressSortKey
 {
-    return [NSNumber numberWithFloat: [self progress]];
+    float progress;
+    if ((progress = [self progress]) >= 1.0)
+    {
+        float stopRatio, ratio;
+        if ((stopRatio = [self actualStopRatio]) == INVALID)
+            progress = 3.0;
+        else if (stopRatio > 0 && (ratio = [self ratio]) >= 0 && ratio <= stopRatio)
+            progress += ratio / stopRatio;
+        else;
+    }
+    
+    return [NSNumber numberWithFloat: progress];
 }
 
 - (NSNumber *) ratioSortKey

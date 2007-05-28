@@ -85,7 +85,8 @@
     {
         float stopRatio, ratio;
         if ((stopRatio = [[info objectForKey: @"StopRatio"] floatValue]) != INVALID
-                && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio)
+                && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio
+                && stopRatio != 0)
         {
             if (ratio < 0)
                 ratio = 0;
