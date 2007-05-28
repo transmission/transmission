@@ -89,7 +89,7 @@ bool TRTransfer::UpdateStatus(tr_stat_t *stat, bool shade) {
 bool TRTransfer::IsRunning() {
 	return (fStatus != NULL && 
 			(fStatus->status &
-			          (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)));
+			          (TR_STATUS_CHECK_WAIT | TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)));
 }
 
 
@@ -125,6 +125,9 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		
 		if (fStatus->status & TR_STATUS_PAUSE ) {
 			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->progress);
+		} else if (fStatus->status & TR_STATUS_CHECK_WAIT ) {
+			sprintf(fTimeStr, "Waiting To Check Existing Files (%.2f %%)",
+			        100 * fStatus->progress);
 		} else if (fStatus->status & TR_STATUS_CHECK ) {
 			sprintf(fTimeStr, "Checking Existing Files (%.2f %%)",
 			        100 * fStatus->progress);
@@ -148,7 +151,7 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		textLoc.x = frame.Width() - owner->StringWidth(fTimeStr) - 2;
 		owner->DrawString(fTimeStr, textLoc);
 		
-		if (fStatus->status & (TR_STATUS_DOWNLOAD | TR_STATUS_SEED | TR_STATUS_CHECK )) {
+		if (fStatus->status & (TR_STATUS_DOWNLOAD | TR_STATUS_SEED | TR_STATUS_CHECK | TR_STATUS_CHECK_WAIT )) {
 			// Move to the left of the bottom line.
 			textLoc.Set(frame.left + 2, 
 			            frame.top + fBaselineOffset * 3 + (2 * fLineSpacing) + (fBaselineOffset / 2));

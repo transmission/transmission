@@ -369,7 +369,7 @@ bool TRWindow::QuitRequested() {
 			tr_stat_t *stat = tr_torrentStat(torrent);
 			
 			strItem << info->torrent << ".running";
-			if (stat->status & (TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {
+			if (stat->status & (TR_STATUS_CHECK_WAIT | TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {
 				prefs->SetBool(strItem.String(), true);
 				tr_torrentStop(torrent);
 			} else {

@@ -507,7 +507,11 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
     mb = readablesize(size);
     prog *= 100;
 
-    if( TR_STATUS_CHECK & status )
+    if( TR_STATUS_CHECK_WAIT & status )
+    {
+        top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
+    }
+    else if( TR_STATUS_CHECK & status )
     {
         top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
     }

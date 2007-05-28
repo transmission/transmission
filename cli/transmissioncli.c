@@ -220,6 +220,11 @@ int main( int argc, char ** argv )
         {
             break;
         }
+        else if( s->status & TR_STATUS_CHECK_WAIT )
+        {
+            chars = snprintf( string, sizeof string,
+                "Waiting to check files... %.2f %%", 100.0 * s->progress );
+        }
         else if( s->status & TR_STATUS_CHECK )
         {
             chars = snprintf( string, sizeof string,

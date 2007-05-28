@@ -325,8 +325,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //check to stop for ratio
     float stopRatio;
-    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID
-			&& [self ratio] >= stopRatio)
+    if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
         [self stopTransfer];
         fStat = tr_torrentStat(fHandle);
@@ -654,9 +653,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (float) progressStopRatio
 {
     float stopRatio, ratio;
-    if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) > stopRatio)
+    if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) >= stopRatio)
         return 1.0;
-    else if (stopRatio > 0 && ratio > 0)
+    else if (ratio > 0 && stopRatio > 0)
         return ratio / stopRatio;
     else
         return 0;
