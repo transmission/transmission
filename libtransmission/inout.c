@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <stdlib.h> /* for calloc */
 #include "transmission.h"
 
 struct tr_io_s
@@ -44,6 +45,8 @@ struct tr_io_s
 	int	readCount;
 	int	reorderCount;
 	int	hitCount;
+
+    int checkFilesPassed;
 };
 
 #include "fastresume.h"
@@ -76,7 +79,7 @@ void tr_ioLoadResume( tr_torrent_t * tor )
     tr_io_t * io;
     tr_info_t * inf = &tor->info;
 
-    io      = malloc( sizeof( tr_io_t ) );
+    io      = calloc( 1, sizeof( tr_io_t ) );
     io->tor = tor;
 
     io->pieceSlot = malloc( inf->pieceCount * sizeof( int ) );
@@ -107,7 +110,7 @@ tr_io_t * tr_ioInit( tr_torrent_t * tor )
 {
     tr_io_t * io;
 
-    io      = malloc( sizeof( tr_io_t ) );
+    io      = calloc( 1, sizeof( tr_io_t ) );
     io->tor = tor;
 
     if( checkFiles( io ) )
@@ -237,7 +240,9 @@ int tr_ioHash( tr_io_t * io, int index )
 void tr_ioSync( tr_io_t * io )
 {
     closeFiles( io );
-    fastResumeSave( io );
+
+    if( io->checkFilesPassed )
+        fastResumeSave( io );
 }
 
 /***********************************************************************
@@ -272,6 +277,7 @@ static int checkFiles( tr_io_t * io )
 
     if( !fastResumeLoad( io ) )
     {
+        io->checkFilesPassed = 1;
         return 0;
     }
 
@@ -366,6 +372,7 @@ static int checkFiles( tr_io_t * io )
     }
     free( buf );
 
+    io->checkFilesPassed = i == inf->pieceCount;
     return 0;
 }
 
