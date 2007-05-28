@@ -522,8 +522,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if ([self isSeeding])
     {
-        [info setObject: [NSNumber numberWithFloat: [self ratio]] forKey: @"Ratio"];
-        [info setObject: [NSNumber numberWithFloat: [self actualStopRatio]] forKey: @"StopRatio"];
+        [info setObject: [NSNumber numberWithFloat: [self progressStopRatio]] forKey: @"ProgressStopRatio"];
     }
     
     if (![fDefaults boolForKey: @"SmallView"])
@@ -650,6 +649,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return [fDefaults floatForKey: @"RatioLimit"];
     else
         return INVALID;
+}
+
+- (float) progressStopRatio
+{
+    float stopRatio, ratio;
+    if ((stopRatio = [self actualStopRatio]) == INVALID || (ratio = [self ratio]) > stopRatio)
+        return 1.0;
+    else if (stopRatio > 0 && ratio > 0)
+        return ratio / stopRatio;
+    else
+        return 0;
 }
 
 - (int) checkUpload
@@ -1409,17 +1419,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) progressSortKey
 {
-    #warning make separate method?
     float progress;
     if ((progress = [self progress]) >= 1.0)
-    {
-        float stopRatio, ratio;
-        if ((stopRatio = [self actualStopRatio]) == INVALID)
-            progress = 3.0;
-        else if (stopRatio > 0 && (ratio = [self ratio]) >= 0 && ratio <= stopRatio)
-            progress += ratio / stopRatio;
-        else;
-    }
+       progress += [self progressStopRatio];
     
     return [NSNumber numberWithFloat: progress];
 }

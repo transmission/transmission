@@ -83,15 +83,7 @@
     
     if ([[info objectForKey: @"Seeding"] boolValue])
     {
-        float stopRatio, ratio;
-        if ((stopRatio = [[info objectForKey: @"StopRatio"] floatValue]) != INVALID
-                && (ratio = [[info objectForKey: @"Ratio"] floatValue]) < stopRatio
-                && stopRatio != 0)
-        {
-            if (ratio < 0)
-                ratio = 0;
-            completeBounds.size.width = width * ratio / stopRatio;
-        }
+        completeBounds.size.width = width * [[info objectForKey: @"ProgressStopRatio"] floatValue];
         
         if (completeBounds.size.width < barBounds.size.width)
             [fLightGreenGradient fillRect: barBounds angle: -90];

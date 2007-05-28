@@ -101,6 +101,7 @@
 - (float)       ratioLimit;
 - (void)        setRatioLimit: (float) limit;
 - (float)       actualStopRatio; //returns INVALID if will not stop
+- (float)       progressStopRatio;
 
 - (int)     checkUpload;
 - (void)    setCheckUpload: (int) setting;
