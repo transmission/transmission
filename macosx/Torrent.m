@@ -1402,17 +1402,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [NSNumber numberWithFloat: [self ratio]];
 }
 
-- (int) getID
+- (int) torrentID
 {
     return fID;
 }
 
-- (tr_info_t *) getInfo
+- (tr_info_t *) torrentInfo
 {
     return fInfo;
 }
 
-- (tr_stat_t *) getStat
+- (tr_stat_t *) torrentStat
 {
     return fStat;
 }

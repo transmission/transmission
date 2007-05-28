@@ -214,8 +214,8 @@
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
 
-- (int) getID;
-- (tr_info_t *) getInfo;
-- (tr_stat_t *) getStat;
+- (int) torrentID;
+- (tr_info_t *) torrentInfo;
+- (tr_stat_t *) torrentStat;
 
 @end

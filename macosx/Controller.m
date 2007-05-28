@@ -2990,61 +2990,59 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (NSArray *) ipcGetTorrentsByID: (NSArray *) idlist
 {
-    NSEnumerator   * torenum, * idenum;
-    Torrent        * tor;
-    NSNumber       * num;
-    NSMutableArray * ret;
-
     if (!idlist)
-    {
         return fTorrents;
-    }
-
-    ret = [NSMutableArray array];
-    torenum = [fTorrents objectEnumerator];
-    while ((tor = [torenum nextObject]))
+    
+    NSMutableArray * torrents = [NSMutableArray array];
+    
+    NSEnumerator * torrentEnum = [fTorrents objectEnumerator], * idEnum;
+    int torId;
+    Torrent * torrent;
+    NSNumber * tempId;
+    while ((torrent = [torrentEnum nextObject]))
     {
-        idenum = [idlist objectEnumerator];
-        while ((num = [idenum nextObject]))
+        torId = [torrent torrentID];
+        
+        idEnum = [idlist objectEnumerator];
+        while ((tempId = [idEnum nextObject]))
         {
-            if ([num intValue] == [tor getID])
+            if ([tempId intValue] == torId)
             {
-                [ret addObject: tor];
+                [torrents addObject: torrent];
                 break;
             }
         }
     }
 
-    return ret;
+    return torrents;
 }
 
 - (NSArray *) ipcGetTorrentsByHash: (NSArray *) hashlist
 {
-    NSEnumerator   * torenum, * hashenum;
-    Torrent        * tor;
-    NSString       * torhash, * listhash;
-    NSMutableArray * ret;
-
     if (!hashlist)
         return fTorrents;
-
-    ret = [NSMutableArray array];
-    torenum = [fTorrents objectEnumerator];
-    while ((tor = [torenum nextObject]))
+    
+    NSMutableArray * torrents = [NSMutableArray array];
+    
+    NSEnumerator * torrentEnum = [fTorrents objectEnumerator], * hashEnum;
+    NSString * torHash, * tempHash;
+    Torrent * torrent;
+    while ((torrent = [torrentEnum nextObject]))
     {
-        torhash = [tor hashString];
-        hashenum = [hashlist objectEnumerator];
-        while ((listhash = [hashenum nextObject]))
+        torHash = [torrent hashString];
+        
+        hashEnum = [hashlist objectEnumerator];
+        while ((tempHash = [hashEnum nextObject]))
         {
-            if (NSOrderedSame == [torhash caseInsensitiveCompare: listhash])
+            if ([torHash caseInsensitiveCompare: tempHash] == NSOrderedSame)
             {
-                [ret addObject: tor];
+                [torrents addObject: torrent];
                 break;
             }
         }
     }
-
-    return ret;
+    
+    return torrents;
 }
 
 - (BOOL) ipcAddTorrents: (NSArray *) torrents
