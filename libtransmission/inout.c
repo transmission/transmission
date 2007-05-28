@@ -655,7 +655,7 @@ static int nextFreeSlotToAppend(tr_io_t * io)
 	tr_torrent_t * tor = io->tor;
 	tr_info_t    * inf = &tor->info;
 
-	while( io->pieceSlot[io->slotsUsed] >= 0 && io->slotsUsed < ( (inf->pieceCount)- 1 ) )
+	while( io->slotsUsed < ( (inf->pieceCount) - 1 ) && io->pieceSlot[io->slotsUsed] >= 0 )
 	{
 		tr_inf( "slotUsed (%d) has piece in %d !", io->slotsUsed, io->pieceSlot[io->slotsUsed] );
 		(io->slotsUsed)++;
