@@ -235,7 +235,7 @@ tr_torrent_dispose(GObject *obj) {
 void
 tr_torrent_sever( TrTorrent * self )
 {
-    TR_IS_TORRENT( self );
+    g_return_if_fail (TR_IS_TORRENT( self ));
 
     if( self->severed )
     {

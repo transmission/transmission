@@ -159,6 +159,7 @@
 - (BOOL) isActive;
 - (BOOL) isSeeding;
 - (BOOL) isPaused;
+- (BOOL) isWaitingToChecking;
 - (BOOL) isChecking;
 - (BOOL) isError;
 - (NSString *) errorMessage;

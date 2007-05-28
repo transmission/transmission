@@ -31,6 +31,9 @@
 static tr_torrent_t * torrentRealInit( tr_handle_t *, tr_torrent_t * tor,
                                        uint8_t *, int flags, int * error );
 static void torrentReallyStop( tr_torrent_t * );
+
+static void ioInitAdd ( tr_torrent_t * );
+static int ioInitRemove ( tr_torrent_t * );
 static void downloadLoop( void * );
 
 void tr_setUseCustomUpload( tr_torrent_t * tor, int limit )
@@ -260,8 +263,6 @@ int tr_torrentDuplicateDownload( tr_torrent_t * tor )
 
 void tr_torrentStart( tr_torrent_t * tor )
 {
-    char name[32];
-    
     if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
     {
         /* Join the thread first */
@@ -284,17 +285,17 @@ void tr_torrentStart( tr_torrent_t * tor )
     tor->uploadedPrev   += tor->uploadedCur;
     tor->uploadedCur     = 0;
 
-    tor->status  = TR_STATUS_CHECK;
+    tor->status  = TR_STATUS_CHECK_WAIT;
     tor->error   = TR_OK;
     tor->tracker = tr_trackerInit( tor );
 
     tor->startDate = tr_date();
     tor->die = 0;
-    snprintf( name, sizeof( name ), "torrent %p", tor );
+    tor->thread = THREAD_EMPTY;
 
     tr_lockUnlock( &tor->lock );
 
-    tr_threadCreate( &tor->thread, downloadLoop, tor, name );
+    ioInitAdd ( tor );
 }
 
 static void torrentStop( tr_torrent_t * tor )
@@ -314,7 +315,11 @@ void tr_torrentStop( tr_torrent_t * tor )
 
     /* Don't return until the files are closed, so the UI can trash
      * them if requested */
-    tr_condWait( &tor->cond, &tor->lock );
+    if ( ioInitRemove( tor ) ) /* torrent never got started */
+        tor->status = TR_STATUS_STOPPED;
+    else
+        tr_condWait( &tor->cond, &tor->lock );
+
     tr_lockUnlock( &tor->lock );
 }
 
@@ -768,6 +773,141 @@ int tr_torrentAddCompact( tr_torrent_t * tor, int from,
 }
 
 /***********************************************************************
+ * Push a torrent's call to tr_ioInit through a queue in a worker
+ * thread so that only one torrent can be in checkFiles() at a time.
+ **********************************************************************/
+
+struct tr_io_init_list_t
+{
+    tr_torrent_t              * tor;
+    struct tr_io_init_list_t  * next;
+};
+
+static struct tr_io_init_list_t * ioInitQueue = NULL;
+
+static int ioInitWorkerRunning = 0;
+
+static tr_thread_t ioInitThread;
+
+static tr_lock_t* getIOLock( tr_handle_t * h )
+{
+    static tr_lock_t * lock = NULL;
+
+    tr_sharedLock( h->shared );
+    if( lock == NULL )
+    {
+        lock = calloc( 1, sizeof( tr_lock_t ) );
+        tr_lockInit( lock );
+    }
+    tr_sharedUnlock( h->shared );
+
+    return lock;
+}
+
+static void ioInitWorker( void * user_data )
+{
+    tr_handle_t * h = (tr_handle_t*) user_data;
+
+    for (;;)
+    {
+        char name[32];
+
+        /* find the next torrent to process */
+        tr_torrent_t * tor = NULL;
+        tr_lock_t * lock = getIOLock( h );
+        tr_lockLock( lock );
+        if( ioInitQueue != NULL )
+        {
+            struct tr_io_init_list_t * node = ioInitQueue;
+            ioInitQueue = node->next;
+            tor = node->tor;
+            free( node );
+        }
+        tr_lockUnlock( lock );
+
+        /* if no torrents, this worker thread is done */
+        if( tor == NULL )
+        {
+          break;
+        }
+
+        /* check this torrent's files */
+        tor->status = TR_STATUS_CHECK;
+        
+        tr_dbg( "torrent %s checking files", tor->info.name );
+        tr_lockLock( &tor->lock );
+        tr_cpReset( tor->completion );
+        tor->io = tr_ioInit( tor );
+        tr_lockUnlock( &tor->lock );
+
+        snprintf( name, sizeof( name ), "torrent %p", tor );
+        tr_threadCreate( &tor->thread, downloadLoop, tor, name );
+    }
+
+    ioInitWorkerRunning = 0;
+}
+
+/* add tor to the queue of torrents waiting for an tr_ioInit */
+static void ioInitAdd( tr_torrent_t * tor )
+{
+    tr_lock_t * lock = getIOLock( tor->handle );
+    struct tr_io_init_list_t * node;
+    tr_lockLock( lock );
+
+    /* enqueue this torrent to have its io initialized */
+    node = malloc( sizeof( struct tr_io_init_list_t ) );
+    node->tor = tor;
+    node->next = NULL;
+    if( ioInitQueue == NULL )
+    {
+        ioInitQueue = node;
+    }
+    else
+    {
+        struct tr_io_init_list_t * l = ioInitQueue;
+        while( l->next != NULL )
+        {
+            l = l->next;
+        }
+        l->next = node;
+    }
+
+    /* ensure there's a worker thread to process the queue */
+    if( !ioInitWorkerRunning )
+    {
+        ioInitWorkerRunning = 1;
+        tr_threadCreate( &ioInitThread, ioInitWorker, tor->handle, "ioInit" );
+    }
+    
+    tr_lockUnlock( lock );
+}
+
+/* remove tor from the queue of torrents waiting for an tr_ioInit.
+   return nonzero if tor was found and removed */
+static int ioInitRemove( tr_torrent_t * tor )
+{
+    tr_lock_t * lock = getIOLock( tor->handle );
+    struct tr_io_init_list_t *node, *prev;
+    tr_lockLock( lock );
+
+    /* find tor's node */
+    for( prev = NULL, node = ioInitQueue;
+         node != NULL && node->tor != tor;
+         prev=node, node=node->next );
+
+    if( node != NULL )
+    {
+        if( prev == NULL )
+            ioInitQueue = node->next;
+        else
+            prev->next = node->next;
+    }
+
+    tr_lockUnlock( lock );
+    return node != NULL;
+}
+
+/***********************************************************************
  * downloadLoop
  **********************************************************************/
 static void downloadLoop( void * _tor )
@@ -778,10 +918,9 @@ static void downloadLoop( void * _tor )
     uint8_t      * peerCompact;
     tr_peer_t    * peer;
 
+    tr_dbg ("torrent %s has its own thread", tor->info.name);
     tr_lockLock( &tor->lock );
 
-    tr_cpReset( tor->completion );
-    tor->io     = tr_ioInit( tor );
     tor->status = tr_cpIsSeeding( tor->completion ) ?
                       TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
 

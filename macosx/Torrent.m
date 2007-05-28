@@ -374,6 +374,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             
             break;
 
+        case TR_STATUS_CHECK_WAIT:
+            tempString = [NSLocalizedString(@"Waiting to check existing files", "Torrent -> status string")
+                            stringByAppendingEllipsis];
+            
+            [statusString setString: tempString];
+            [shortStatusString setString: tempString];
+            [remainingTimeString setString: tempString];
+            
+            break;
+
         case TR_STATUS_CHECK:
             tempString = [NSLocalizedString(@"Checking existing files", "Torrent -> status string") stringByAppendingEllipsis];
             
@@ -469,7 +479,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 
-    if ([self isActive] && fStat->status != TR_STATUS_CHECK )
+    if ([self isActive] && ![self isChecking] && ![self isWaitingToChecking] )
     {
         NSString * stringToAppend = @"";
         if (![self allDownloaded])
@@ -552,7 +562,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fError = NO;
     fWaitToStart = NO;
     
-    if ([self isActive] && ![self isChecking])
+    if ([self isActive])
     {
         tr_torrentStop(fHandle);
         [self update];
@@ -563,7 +573,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) stopTransferForQuit
 {
-    if ([self isActive] && ![self isChecking])
+    if ([self isActive])
         tr_torrentStop(fHandle);
 }
 
@@ -1058,6 +1068,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->status == TR_STATUS_PAUSE;
 }
 
+- (BOOL) isWaitingToChecking
+{
+    return fStat->status == TR_STATUS_CHECK_WAIT;
+}
+
 - (BOOL) isChecking
 {
     return fStat->status == TR_STATUS_CHECK;
@@ -1394,6 +1409,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSNumber *) progressSortKey
 {
+    #warning make separate method?
     float progress;
     if ((progress = [self progress]) >= 1.0)
     {

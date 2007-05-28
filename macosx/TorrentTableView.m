@@ -249,7 +249,7 @@
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
 
-        if ([torrent isActive] && ![torrent isChecking])
+        if ([torrent isActive])
             image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
         else if ([torrent isPaused])
         {

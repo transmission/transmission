@@ -25,6 +25,8 @@
 #ifndef TR_BENCODE_H
 #define TR_BENCODE_H 1
 
+#include <stdint.h> /* for int64_t */
+
 typedef struct benc_val_s
 {
     char * begin;

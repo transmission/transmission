@@ -47,6 +47,12 @@ tr_thread_t;
 char * tr_getCacheDirectory();
 char * tr_getTorrentsDirectory();
 
+/**
+ * When instantiating a thread with a deferred call to tr_threadCreate(),
+ * initializing it to THREAD_EMPTY makes calls tr_threadJoin() safe.
+ */ 
+const tr_thread_t THREAD_EMPTY;
+
 void tr_threadCreate ( tr_thread_t *, void (*func)(void *),
                        void * arg, char * name );
 void tr_threadJoin   ( tr_thread_t * );

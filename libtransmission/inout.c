@@ -310,6 +310,11 @@ static int checkFiles( tr_io_t * io )
     {
         int size, j;
 
+        if( tor->status & TR_STATUS_STOPPING )
+        {
+            break;
+        }
+
         if( readSlot( io, i, buf, &size ) )
         {
             break;
