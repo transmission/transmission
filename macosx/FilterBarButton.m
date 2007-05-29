@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "FilterBarButton.h"
+#import "StringAdditions.h"
 
 @implementation FilterBarButton
 
@@ -63,6 +64,47 @@
     [super dealloc];
 }
 
+- (NSImage *) badgeCount: (int) count color: (NSColor *) color
+{
+    NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [[NSFontManager sharedFontManager] convertFont: [NSFont fontWithName: @"Lucida Grande" size: 10.0]
+                        toHaveTrait: NSBoldFontMask], NSFontAttributeName,
+                    [NSColor blackColor], NSForegroundColorAttributeName, nil];
+    
+    NSString * string = [NSString stringWithInt: count];
+    NSSize stringSize = [string sizeWithAttributes: attributes];
+    stringSize.width = ceilf(stringSize.width);
+    
+    float padding = 4.0;
+    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + padding, stringSize.height);
+    
+    //create badge part
+    NSImage * tempBadge = [[NSImage alloc] initWithSize: badgeRect.size];
+    NSBezierPath * bp = [NSBezierPath bezierPathWithOvalInRect: badgeRect];
+    [tempBadge lockFocus];
+    
+    [color set];
+    [bp fill];
+    
+    [tempBadge unlockFocus];
+    
+    //create string part
+    NSImage * badge = [[NSImage alloc] initWithSize: badgeRect.size];
+    [badge lockFocus];
+    
+    [string drawAtPoint: NSMakePoint((badgeRect.size.width - stringSize.width) * 0.5,
+                        (badgeRect.size.height - stringSize.height) * 0.5)
+                    withAttributes: attributes];
+    [tempBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOut];
+    
+    [badge unlockFocus];
+    
+    [tempBadge release];
+    [attributes release];
+    
+    return [badge autorelease];
+}
+
 - (void) setCount: (int) count
 {
     if (fCount == count)
@@ -99,20 +141,20 @@
     [shadowHighlighted setShadowBlurRadius: 1.0];
     [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]];
     
-    NSMutableDictionary * normalAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
                 NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowNormal, NSShadowAttributeName, nil],
-        * normalDimAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+        * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowDim, NSShadowAttributeName, nil],
-        * highlightedAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+        * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowHighlighted, NSShadowAttributeName, nil],
-        * highlightedDimAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+        * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowHighlighted, NSShadowAttributeName, nil];
@@ -149,22 +191,26 @@
     NSRect textRect = NSMakeRect(endSize.width - overlap, (buttonSize.height - textSize.height) * 0.5 + 1.5,
                                 textSize.width, textSize.height);
     
-    NSFont * smallFont;
-    NSSize countSize;
+    //create badge images and adjust size
+    NSImage * badgeNormal, * badgeNormalDim, * badgeHighlighted, * badgeHighlightedDim;
+    NSSize badgeSize;
+    float badgePadding;
     if (fCount > 0)
     {
-        smallFont = [[NSFontManager sharedFontManager] convertFont:
-                        [NSFont fontWithName: @"Lucida Grande" size: 10.0] toHaveTrait: NSBoldFontMask];
+        badgeNormal = [self badgeCount: fCount color: [normalAttributes objectForKey: NSForegroundColorAttributeName]];
+        badgeNormalDim = [self badgeCount: fCount color: [normalDimAttributes objectForKey: NSForegroundColorAttributeName]];
+        badgeHighlighted = [self badgeCount: fCount
+                            color: [highlightedAttributes objectForKey: NSForegroundColorAttributeName]];
+        badgeHighlightedDim = [self badgeCount: fCount
+                                color: [highlightedDimAttributes objectForKey: NSForegroundColorAttributeName]];
         
-        NSMutableDictionary * tempAttributes = [normalAttributes mutableCopy];
-        [tempAttributes setObject: smallFont forKey: NSFontAttributeName];
+        badgeSize = [badgeNormal size];
+        badgeSize.width = ceilf(badgeSize.width);
         
-        countSize = [number sizeWithAttributes: tempAttributes];
-        countSize.width = ceilf(countSize.width);
-        mainSize.width += countSize.width;
-        buttonSize.width += countSize.width;
-        
-        [tempAttributes release];
+        badgePadding = 2.0;
+        float increase = badgeSize.width + badgePadding;
+        mainSize.width += increase;
+        buttonSize.width += increase;
     }
     
     NSPoint leftPoint = NSZeroPoint,
@@ -244,43 +290,35 @@
     //append count
     if (fCount > 0)
     {
-        //change attributes
-        [normalAttributes setObject: smallFont forKey: NSFontAttributeName];
-        [normalDimAttributes setObject: smallFont forKey: NSFontAttributeName];
-        [highlightedAttributes setObject: smallFont forKey: NSFontAttributeName];
-        [highlightedDimAttributes setObject: smallFont forKey: NSFontAttributeName];
-        
-        NSRect countRect = NSMakeRect(NSMaxX(textRect), (buttonSize.height - textSize.height) * 0.5 + 1.5,
-                                countSize.width, countSize.height);
+        NSPoint badgePoint = NSMakePoint(NSMaxX(textRect) + badgePadding * 2.0, (mainSize.height - badgeSize.height) * 0.5 + 1.0);
         
         //normal button
         [fButtonNormal lockFocus];
-        [number drawInRect: countRect withAttributes: normalAttributes];
+        [badgeNormal compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonNormal unlockFocus];
         
-        //normal and dim button
+        //dim button
         [fButtonNormalDim lockFocus];
-        [number drawInRect: countRect withAttributes: normalDimAttributes];
+        [badgeNormalDim compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonNormalDim unlockFocus];
         
         //rolled over button
         [fButtonOver lockFocus];
-        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonOver unlockFocus];
         
-        //pressed button
         [fButtonPressed lockFocus];
-        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonPressed unlockFocus];
         
         //selected button
         [fButtonSelected lockFocus];
-        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonSelected unlockFocus];
         
         //selected and dim button
         [fButtonSelectedDim lockFocus];
-        [number drawInRect: countRect withAttributes: highlightedDimAttributes];
+        [badgeHighlightedDim compositeToPoint: badgePoint operation: NSCompositeSourceOver];
         [fButtonSelectedDim unlockFocus];
     }
     
