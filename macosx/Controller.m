@@ -2977,22 +2977,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) checkSearchFilter: (NSNotification *) notification
 {
     //size search filter to not overlap buttons
-    float pointX = NSMaxX([fPauseFilterButton frame]) + 2.0;
+    float pointX = NSMaxX([fPauseFilterButton frame]) + 5.0;
     NSRect oldFrame = [fSearchFilterField frame],
             frame = NSMakeRect(pointX, oldFrame.origin.y, NSMaxX(oldFrame) - pointX, oldFrame.size.height);
     
-    //make sure it is not too long
-    if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
+    BOOL show;
+    if (show = (frame.size.width >= SEARCH_FILTER_MIN_WIDTH))
     {
-        float different = frame.size.width - SEARCH_FILTER_MAX_WIDTH;
-        frame.origin.x += different;
-        frame.size.width -= different;
+        //make sure it is not too long
+        if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
+        {
+            float different = frame.size.width - SEARCH_FILTER_MAX_WIDTH;
+            frame.origin.x += different;
+            frame.size.width -= different;
+        }
+        [fSearchFilterField setFrame: frame];
     }
-    [fSearchFilterField setFrame: frame];
     
     //hide search filter if it overlaps filter buttons
-    [fSearchFilterField setHidden: frame.size.width < SEARCH_FILTER_MIN_WIDTH];
-    
+    [fSearchFilterField setHidden: !show];
 }
 
 - (void) linkHomepage: (id) sender
