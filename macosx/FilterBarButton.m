@@ -75,8 +75,7 @@
     NSSize stringSize = [string sizeWithAttributes: attributes];
     stringSize.width = ceilf(stringSize.width);
     
-    float padding = 4.0;
-    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + padding, stringSize.height);
+    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + 6.0, stringSize.height);
     
     //create badge part
     NSImage * tempBadge = [[NSImage alloc] initWithSize: badgeRect.size];
@@ -186,7 +185,7 @@
     
     float overlap = 7.0;
     NSSize endSize = [leftOver size],
-            mainSize = NSMakeSize(textSize.width - (overlap * 2.0), endSize.height),
+            mainSize = NSMakeSize(textSize.width - overlap * 2.0, endSize.height),
             buttonSize = NSMakeSize(mainSize.width + 2.0 * endSize.width, endSize.height);
     NSRect textRect = NSMakeRect(endSize.width - overlap, (buttonSize.height - textSize.height) * 0.5 + 1.5,
                                 textSize.width, textSize.height);
