@@ -34,7 +34,7 @@
         fTrackingTag = 0;
         
         fCount = -1;
-        [self createButtonsWithCount: 0];
+        [self setCount: 0];
         
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         
@@ -63,8 +63,7 @@
     [super dealloc];
 }
 
-#warning rename
-- (void) createButtonsWithCount: (int) count
+- (void) setCount: (int) count
 {
     if (fCount == count)
         return;
@@ -100,20 +99,20 @@
     [shadowHighlighted setShadowBlurRadius: 1.0];
     [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]];
     
-    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+    NSMutableDictionary * normalAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
                 NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowNormal, NSShadowAttributeName, nil],
-        * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+        * normalDimAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowDim, NSShadowAttributeName, nil],
-        * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+        * highlightedAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowHighlighted, NSShadowAttributeName, nil],
-        * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+        * highlightedDimAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
                 shadowHighlighted, NSShadowAttributeName, nil];
@@ -123,9 +122,8 @@
     [shadowHighlighted release];
     
     //create button text
-    NSString * text = [self title];
-    if (fCount > 0)
-        text = [text stringByAppendingString: [NSString stringWithFormat: @" (%d)", fCount]];
+    NSString * text = [self title],
+            * number = fCount > 0 ? [NSString stringWithFormat: @" (%d)", fCount] : nil;
     
     //get images
     NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
@@ -150,6 +148,24 @@
             buttonSize = NSMakeSize(mainSize.width + 2.0 * endSize.width, endSize.height);
     NSRect textRect = NSMakeRect(endSize.width - overlap, (buttonSize.height - textSize.height) * 0.5 + 1.5,
                                 textSize.width, textSize.height);
+    
+    NSFont * smallFont;
+    NSSize countSize;
+    if (fCount > 0)
+    {
+        smallFont = [[NSFontManager sharedFontManager] convertFont:
+                        [NSFont fontWithName: @"Lucida Grande" size: 10.0] toHaveTrait: NSBoldFontMask];
+        
+        NSMutableDictionary * tempAttributes = [normalAttributes mutableCopy];
+        [tempAttributes setObject: smallFont forKey: NSFontAttributeName];
+        
+        countSize = [number sizeWithAttributes: tempAttributes];
+        countSize.width = ceilf(countSize.width);
+        mainSize.width += countSize.width;
+        buttonSize.width += countSize.width;
+        
+        [tempAttributes release];
+    }
     
     NSPoint leftPoint = NSZeroPoint,
             mainPoint = NSMakePoint(endSize.width, 0),
@@ -224,6 +240,49 @@
     [fButtonSelectedDim lockFocus];
     [text drawInRect: textRect withAttributes: highlightedDimAttributes];
     [fButtonSelectedDim unlockFocus];
+    
+    //append count
+    if (fCount > 0)
+    {
+        //change attributes
+        [normalAttributes setObject: smallFont forKey: NSFontAttributeName];
+        [normalDimAttributes setObject: smallFont forKey: NSFontAttributeName];
+        [highlightedAttributes setObject: smallFont forKey: NSFontAttributeName];
+        [highlightedDimAttributes setObject: smallFont forKey: NSFontAttributeName];
+        
+        NSRect countRect = NSMakeRect(NSMaxX(textRect), (buttonSize.height - textSize.height) * 0.5 + 1.5,
+                                countSize.width, countSize.height);
+        
+        //normal button
+        [fButtonNormal lockFocus];
+        [number drawInRect: countRect withAttributes: normalAttributes];
+        [fButtonNormal unlockFocus];
+        
+        //normal and dim button
+        [fButtonNormalDim lockFocus];
+        [number drawInRect: countRect withAttributes: normalDimAttributes];
+        [fButtonNormalDim unlockFocus];
+        
+        //rolled over button
+        [fButtonOver lockFocus];
+        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [fButtonOver unlockFocus];
+        
+        //pressed button
+        [fButtonPressed lockFocus];
+        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [fButtonPressed unlockFocus];
+        
+        //selected button
+        [fButtonSelected lockFocus];
+        [number drawInRect: countRect withAttributes: highlightedAttributes];
+        [fButtonSelected unlockFocus];
+        
+        //selected and dim button
+        [fButtonSelectedDim lockFocus];
+        [number drawInRect: countRect withAttributes: highlightedDimAttributes];
+        [fButtonSelectedDim unlockFocus];
+    }
     
     [normalAttributes release];
     [normalDimAttributes release];
