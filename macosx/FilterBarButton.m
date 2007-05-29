@@ -73,8 +73,6 @@
     
     NSString * string = [NSString stringWithInt: count];
     NSSize stringSize = [string sizeWithAttributes: attributes];
-    stringSize.width = ceilf(stringSize.width);
-    
     NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + 6.0, stringSize.height);
     
     //create badge part
@@ -92,8 +90,7 @@
     [badge lockFocus];
     
     [string drawAtPoint: NSMakePoint((badgeRect.size.width - stringSize.width) * 0.5,
-                        (badgeRect.size.height - stringSize.height) * 0.5)
-                    withAttributes: attributes];
+                        (badgeRect.size.height - stringSize.height) * 0.5) withAttributes: attributes];
     [tempBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOut];
     
     [badge unlockFocus];
