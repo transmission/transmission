@@ -85,21 +85,26 @@
     
     NSSize shadowOffset = NSMakeSize(0.0, -1.0);
     
-    NSShadow * shadow = [NSShadow alloc];
-    [shadow setShadowOffset: shadowOffset];
-    [shadow setShadowBlurRadius: 1.0];
-    [shadow setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]];
+    NSShadow * shadowNormal = [NSShadow alloc];
+    [shadowNormal setShadowOffset: shadowOffset];
+    [shadowNormal setShadowBlurRadius: 1.0];
+    [shadowNormal setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]];
 
     NSShadow * shadowDim = [NSShadow alloc];
     [shadowDim setShadowOffset: shadowOffset];
     [shadowDim setShadowBlurRadius: 1.0];
     [shadowDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]];
     
+    NSShadow * shadowHighlighted = [NSShadow alloc];
+    [shadowHighlighted setShadowOffset: shadowOffset];
+    [shadowHighlighted setShadowBlurRadius: 1.0];
+    [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]];
+    
     NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
                 NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
-                shadow, NSShadowAttributeName, nil],
+                shadowNormal, NSShadowAttributeName, nil],
         * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
@@ -107,14 +112,15 @@
         * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor whiteColor], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
-                shadow, NSShadowAttributeName, nil],
+                shadowHighlighted, NSShadowAttributeName, nil],
         * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                 [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
                 boldFont, NSFontAttributeName,
-                shadow, NSShadowAttributeName, nil];
+                shadowHighlighted, NSShadowAttributeName, nil];
     
-    [shadow release];
+    [shadowNormal release];
     [shadowDim release];
+    [shadowHighlighted release];
     
     //create button text
     NSString * text = [self title];
@@ -135,11 +141,10 @@
             * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
     
     //get button sizes and placement
-    NSLog(text);
-    NSSize textSize = [text sizeWithAttributes: normalAttributes];NSLog(NSStringFromSize(textSize));
-    textSize.width = ceilf(textSize.width);NSLog(NSStringFromSize(textSize));
+    NSSize textSize = [text sizeWithAttributes: normalAttributes];
+    textSize.width = ceilf(textSize.width);
     
-    float overlap = 4.0;
+    float overlap = 7.0;
     NSSize endSize = [leftOver size],
             mainSize = NSMakeSize(textSize.width - (overlap * 2.0), endSize.height),
             buttonSize = NSMakeSize(mainSize.width + 2.0 * endSize.width, endSize.height);
