@@ -68,8 +68,7 @@
 {
     NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     [[NSFontManager sharedFontManager] convertFont: [NSFont fontWithName: @"Lucida Grande" size: 10.0]
-                        toHaveTrait: NSBoldFontMask], NSFontAttributeName,
-                    [NSColor blackColor], NSForegroundColorAttributeName, nil];
+                        toHaveTrait: NSBoldFontMask], NSFontAttributeName, nil];
     
     NSString * string = [NSString stringWithInt: count];
     NSSize stringSize = [string sizeWithAttributes: attributes];
