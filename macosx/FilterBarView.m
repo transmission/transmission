@@ -33,6 +33,8 @@
     [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + padding, base)];
     [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + padding, base)];
     [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + padding, base)];
+    
+    [self setNeedsDisplay: YES];
 }
 
 @end

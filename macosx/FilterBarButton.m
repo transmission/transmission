@@ -36,9 +36,6 @@
         fCount = -1;
         [self createButtonsWithCount: 0];
         
-        [self setImage: fButtonNormal];
-        [self setAlternateImage: fButtonPressed];
-        
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         
         [nc addObserver: self selector: @selector(setForActive:)
@@ -66,12 +63,21 @@
     [super dealloc];
 }
 
-//call only once
+#warning rename
 - (void) createButtonsWithCount: (int) count
 {
     if (fCount == count)
         return;
     fCount = count;
+    
+    if (fButtonNormal)
+    {
+        [fButtonNormal release];
+        [fButtonOver release];
+        [fButtonPressed release];
+        [fButtonSelected release];
+        [fButtonSelectedDim release];
+    }
     
     //create attributes
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
@@ -222,7 +228,14 @@
     //resize button
     NSPoint point = [self frame].origin;
     [self setFrame: NSMakeRect(point.x, point.y, buttonSize.width, buttonSize.height)];
-    [self setNeedsDisplay: YES];
+    
+    //set image
+    [self setAlternateImage: fButtonPressed];
+    
+    if ([[self window] isKeyWindow])
+        [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
+    else
+        [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
 }
 
 - (void) mouseEntered: (NSEvent *) event

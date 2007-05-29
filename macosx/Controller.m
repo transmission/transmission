@@ -339,6 +339,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     else
     {
+        //safety
+        if (![sortType isEqualToString: @"Date"])
+            [fDefaults setObject: @"Date" forKey: @"Sort"];
+        
         currentSortItem = fDateSortItem;
         currentSortActionItem = fDateSortActionItem;
     }
@@ -356,7 +360,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else if ([filterType isEqualToString: @"Download"])
         currentFilterButton = fDownloadFilterButton;
     else
+    {
+        //safety
+        if (![filterType isEqualToString: @"None"])
+            [fDefaults setObject: @"None" forKey: @"Filter"];
+        
         currentFilterButton = fNoFilterButton;
+    }
 
     [currentFilterButton setEnabled: YES];
     
@@ -1622,36 +1632,50 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
     
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    BOOL filtering = YES;
-    if ([filterType isEqualToString: @"Pause"])
+    BOOL filtering = [filterType isEqualToString: @"None"];
+    
+    int downloading = 0, seeding = 0, paused = 0, all = 0;
+    BOOL isDownloading = [filterType isEqualToString: @"Download"],
+            isSeeding = [filterType isEqualToString: @"Seed"],
+            isPaused = [filterType isEqualToString: @"Pause"];
+    
+    //get count of each type
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
     {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-            if (![torrent isActive])
-                [tempTorrents addObject: torrent];
-    }
-    else if ([filterType isEqualToString: @"Seed"])
-    {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive])
+        {
             if ([torrent isSeeding])
+            {
+                seeding++;
+                if (isSeeding)
+                    [tempTorrents addObject: torrent];
+            }
+            else
+            {
+                downloading++;
+                if (isDownloading)
+                    [tempTorrents addObject: torrent];
+            }
+        }
+        else
+        {
+            paused++;
+            if (isPaused)
                 [tempTorrents addObject: torrent];
+        }
     }
-    else if ([filterType isEqualToString: @"Download"])
-    {
-        NSEnumerator * enumerator = [fTorrents objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive] && ![torrent isSeeding])
-                [tempTorrents addObject: torrent];
-    }
-    else
-    {
-        filtering = NO;
+    
+    if (!filtering)
         [tempTorrents setArray: fTorrents];
-    }
+    
+    //set buttons with counts
+    [fNoFilterButton createButtonsWithCount: [fTorrents count]];
+    [fDownloadFilterButton createButtonsWithCount: downloading];
+    [fSeedFilterButton createButtonsWithCount: seeding];
+    [fPauseFilterButton createButtonsWithCount: paused];
+    [fFilterBar replaceButtons];
     
     NSString * searchString = [fSearchFilterField stringValue];
     if ([searchString length] > 0)
