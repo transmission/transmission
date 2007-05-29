@@ -35,6 +35,8 @@
     [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + padding, base)];
     
     [self setNeedsDisplay: YES];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"CheckSearchFilter" object: nil];
 }
 
 @end

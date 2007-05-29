@@ -370,8 +370,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [currentFilterButton setEnabled: YES];
     
-    [fFilterBar replaceButtons];
-    
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     
@@ -413,6 +411,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //change that just impacts the dock badge
     [nc addObserver: self selector: @selector(updateDockBadge:)
                     name: @"DockBadgeChange" object: nil];
+    
+    //show and hide the search bar in the filter bar
+    [nc addObserver: self selector: @selector(checkSearchFilter:)
+                    name: @"CheckSearchFilter" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -2965,6 +2967,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) windowDidResize: (NSNotification *) notification
+{
+    [self checkSearchFilter: nil];
+}
+
+- (void) checkSearchFilter: (NSNotification *) notification
 {
     //hide search filter if it overlaps filter buttons
     [fSearchFilterField setHidden: NSMaxX([fPauseFilterButton frame]) + 2.0 > [fSearchFilterField frame].origin.x];
