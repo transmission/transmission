@@ -381,6 +381,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [shortStatusString setString: tempString];
             [remainingTimeString setString: tempString];
             
+            fChecking = YES;
+            
             break;
 
         case TR_STATUS_CHECK:

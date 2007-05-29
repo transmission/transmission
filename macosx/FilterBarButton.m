@@ -25,6 +25,12 @@
 #import "FilterBarButton.h"
 #import "StringAdditions.h"
 
+@interface FilterBarButton (Private)
+
+- (NSImage *) badgeCount: (int) count color: (NSColor *) color;
+
+@end
+
 @implementation FilterBarButton
 
 - (id) initWithCoder: (NSCoder *) coder
@@ -64,46 +70,10 @@
     [super dealloc];
 }
 
-- (NSImage *) badgeCount: (int) count color: (NSColor *) color
-{
-    NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    [[NSFontManager sharedFontManager] convertFont: [NSFont fontWithName: @"Lucida Grande" size: 10.0]
-                        toHaveTrait: NSBoldFontMask], NSFontAttributeName, nil];
-    
-    NSString * string = [NSString stringWithInt: count];
-    NSSize stringSize = [string sizeWithAttributes: attributes];
-    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + 6.0, stringSize.height);
-    
-    //create badge part
-    NSImage * tempBadge = [[NSImage alloc] initWithSize: badgeRect.size];
-    NSBezierPath * bp = [NSBezierPath bezierPathWithOvalInRect: badgeRect];
-    [tempBadge lockFocus];
-    
-    [color set];
-    [bp fill];
-    
-    [tempBadge unlockFocus];
-    
-    //create string part
-    NSImage * badge = [[NSImage alloc] initWithSize: badgeRect.size];
-    [badge lockFocus];
-    
-    [string drawAtPoint: NSMakePoint((badgeRect.size.width - stringSize.width) * 0.5,
-                        (badgeRect.size.height - stringSize.height) * 0.5) withAttributes: attributes];
-    [tempBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOut];
-    
-    [badge unlockFocus];
-    
-    [tempBadge release];
-    [attributes release];
-    
-    return [badge autorelease];
-}
-
-- (void) setCount: (int) count
+- (BOOL) setCount: (int) count
 {
     if (fCount == count)
-        return;
+        return NO;
     fCount = count;
     
     if (fButtonNormal)
@@ -333,6 +303,8 @@
         [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
     else
         [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
+    
+    return YES;
 }
 
 - (void) mouseEntered: (NSEvent *) event
@@ -379,6 +351,46 @@
         [self removeTrackingRect: fTrackingTag];
         fTrackingTag = 0;
     }
+}
+
+@end
+
+@implementation FilterBarButton (Private)
+
+- (NSImage *) badgeCount: (int) count color: (NSColor *) color
+{
+    NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [[NSFontManager sharedFontManager] convertFont: [NSFont fontWithName: @"Lucida Grande" size: 10.0]
+                        toHaveTrait: NSBoldFontMask], NSFontAttributeName, nil];
+    
+    NSString * string = [NSString stringWithInt: count];
+    NSSize stringSize = [string sizeWithAttributes: attributes];
+    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + 6.0, stringSize.height);
+    
+    //create badge part
+    NSImage * tempBadge = [[NSImage alloc] initWithSize: badgeRect.size];
+    NSBezierPath * bp = [NSBezierPath bezierPathWithOvalInRect: badgeRect];
+    [tempBadge lockFocus];
+    
+    [color set];
+    [bp fill];
+    
+    [tempBadge unlockFocus];
+    
+    //create string part
+    NSImage * badge = [[NSImage alloc] initWithSize: badgeRect.size];
+    [badge lockFocus];
+    
+    [string drawAtPoint: NSMakePoint((badgeRect.size.width - stringSize.width) * 0.5,
+                        (badgeRect.size.height - stringSize.height) * 0.5) withAttributes: attributes];
+    [tempBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOut];
+    
+    [badge unlockFocus];
+    
+    [tempBadge release];
+    [attributes release];
+    
+    return [badge autorelease];
 }
 
 @end

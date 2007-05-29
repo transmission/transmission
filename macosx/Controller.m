@@ -1676,11 +1676,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [tempTorrents setArray: fTorrents];
     
     //set buttons with counts
-    [fNoFilterButton setCount: [fTorrents count]];
-    [fDownloadFilterButton setCount: downloading];
-    [fSeedFilterButton setCount: seeding];
-    [fPauseFilterButton setCount: paused];
-    [fFilterBar replaceButtons];
+    BOOL change = NO;
+    if ([fNoFilterButton setCount: [fTorrents count]])
+        change = YES;
+    if ([fDownloadFilterButton setCount: downloading])
+        change = YES;
+    if ([fSeedFilterButton setCount: seeding])
+        change = YES;
+    if ([fPauseFilterButton setCount: paused])
+        change = YES;
+    if (change)
+        [fFilterBar replaceButtons];
     
     NSString * searchString = [fSearchFilterField stringValue];
     if ([searchString length] > 0)

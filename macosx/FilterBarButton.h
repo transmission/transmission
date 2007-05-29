@@ -34,7 +34,7 @@
     NSTrackingRectTag fTrackingTag;
 }
 
-- (void) setCount: (int) count;
+- (BOOL) setCount: (int) count;
 - (void) setEnabled: (BOOL) enable;
 
 - (void) resetBounds: (NSNotification *) notification;
