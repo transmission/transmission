@@ -1634,7 +1634,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
     
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    BOOL filtering = [filterType isEqualToString: @"None"];
+    BOOL filtering = ![filterType isEqualToString: @"None"];
     
     int downloading = 0, seeding = 0, paused = 0, all = 0;
     BOOL isDownloading = [filterType isEqualToString: @"Download"],
