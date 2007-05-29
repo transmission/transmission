@@ -58,6 +58,9 @@
 #define ROW_HEIGHT_SMALL        40.0
 #define WINDOW_REGULAR_WIDTH    468.0
 
+#define SEARCH_FILTER_MIN_WIDTH 55.0
+#define SEARCH_FILTER_MAX_WIDTH 115.0
+
 #define UPDATE_UI_SECONDS           1.0
 #define AUTO_SPEED_LIMIT_SECONDS    5.0
 
@@ -2973,8 +2976,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) checkSearchFilter: (NSNotification *) notification
 {
+    //size search filter to not overlap buttons
+    float pointX = NSMaxX([fPauseFilterButton frame]) + 2.0;
+    NSRect oldFrame = [fSearchFilterField frame],
+            frame = NSMakeRect(pointX, oldFrame.origin.y, NSMaxX(oldFrame) - pointX, oldFrame.size.height);
+    
+    //make sure it is not too long
+    if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
+    {
+        float different = frame.size.width - SEARCH_FILTER_MAX_WIDTH;
+        frame.origin.x += different;
+        frame.size.width -= different;
+    }
+    [fSearchFilterField setFrame: frame];
+    
     //hide search filter if it overlaps filter buttons
-    [fSearchFilterField setHidden: NSMaxX([fPauseFilterButton frame]) + 2.0 > [fSearchFilterField frame].origin.x];
+    [fSearchFilterField setHidden: frame.size.width < SEARCH_FILTER_MIN_WIDTH];
+    
 }
 
 - (void) linkHomepage: (id) sender
