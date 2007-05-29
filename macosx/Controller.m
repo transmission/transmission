@@ -210,6 +210,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
+    [fFilterBar replaceButtons];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
