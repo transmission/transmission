@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2007 Transmission authors and contributors
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,24 +22,17 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "FilterBarView.h"
 
-@interface FilterBarButton : NSButton
+@implementation FilterBarView
+
+- (void) replaceButtons
 {
-    NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
-            * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;
-    int fCount;
-    
-    BOOL fEnabled;
-    NSTrackingRectTag fTrackingTag;
+    float padding = 2.0, base = 3.0;
+    [fNoFilterButton setFrameOrigin: NSMakePoint(padding + 2.0, base)];
+    [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + padding, base)];
+    [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + padding, base)];
+    [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + padding, base)];
 }
-
-- (void) createButtonsWithCount: (int) count;
-- (void) setEnabled: (BOOL) enable;
-
-- (void) resetBounds: (NSNotification *) notification;
-
-- (void) setForActive: (NSNotification *) notification;
-- (void) setForInactive: (NSNotification *) notification;
 
 @end

@@ -33,7 +33,7 @@
 #import "DragOverlayWindow.h"
 #import "Badger.h"
 #import "ImageBackgroundView.h"
-#import "FilterBarButton.h"
+#import "FilterBarView.h"
 #import "IPCController.h"
 
 #import <Growl/Growl.h>
@@ -72,9 +72,9 @@
                                     * fNameSortActionItem, * fStateSortActionItem, * fProgressSortActionItem,
                                     * fDateSortActionItem, * fOrderSortActionItem;
     
-    IBOutlet ImageBackgroundView    * fFilterBar;
-    IBOutlet FilterBarButton        * fNoFilterButton, * fPauseFilterButton,
-                                    * fSeedFilterButton, * fDownloadFilterButton;
+    IBOutlet FilterBarView          * fFilterBar;
+    IBOutlet FilterBarButton        * fNoFilterButton, * fDownloadFilterButton,
+                                    * fSeedFilterButton, * fPauseFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
     IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
                                 
@@ -100,7 +100,7 @@
     NSMutableDictionary             * fPendingTorrentDownloads;
     NSTimer                         * fAutoImportTimer;
 
-    BOOL                              fRemoteQuit;
+    BOOL                            fRemoteQuit;
 }
 
 - (void) openFiles:             (NSArray *) filenames;

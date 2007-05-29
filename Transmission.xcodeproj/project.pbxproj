@@ -62,6 +62,7 @@
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
 		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
 		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
+		A24838820C0BA608005CC3FE /* FilterBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A24838800C0BA608005CC3FE /* FilterBarView.m */; };
 		A24999230B49F1B5001EADA3 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */; };
 		A24D2A640C0A624600A0ED9F /* IPCController.m in Sources */ = {isa = PBXBuildFile; fileRef = A24D2A620C0A624600A0ED9F /* IPCController.m */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
@@ -328,6 +329,8 @@
 		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
 		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
+		A248387F0C0BA608005CC3FE /* FilterBarView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilterBarView.h; path = macosx/FilterBarView.h; sourceTree = "<group>"; };
+		A24838800C0BA608005CC3FE /* FilterBarView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarView.m; path = macosx/FilterBarView.m; sourceTree = "<group>"; };
 		A24999200B49F1B5001EADA3 /* ActionPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ActionPopUpButton.h; path = macosx/ActionPopUpButton.h; sourceTree = "<group>"; };
 		A24999210B49F1B5001EADA3 /* ActionPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionPopUpButton.m; path = macosx/ActionPopUpButton.m; sourceTree = "<group>"; };
 		A24D2A610C0A624600A0ED9F /* IPCController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = IPCController.h; path = macosx/IPCController.h; sourceTree = "<group>"; };
@@ -616,6 +619,8 @@
 				A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */,
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
 				E138A9720C04D88F00C5426C /* CTGradient */,
+				A248387F0C0BA608005CC3FE /* FilterBarView.h */,
+				A24838800C0BA608005CC3FE /* FilterBarView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1208,6 +1213,7 @@
 				E138A9770C04D88F00C5426C /* CTGradient.m in Sources */,
 				E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */,
 				A24D2A640C0A624600A0ED9F /* IPCController.m in Sources */,
+				A24838820C0BA608005CC3FE /* FilterBarView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

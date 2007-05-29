@@ -360,6 +360,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     [currentFilterButton setEnabled: YES];
     
+    [fFilterBar replaceButtons];
+    
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     

@@ -242,7 +242,9 @@ void tr_ioSync( tr_io_t * io )
     closeFiles( io );
 
     if( io->checkFilesPassed )
+    {
         fastResumeSave( io );
+    }
 }
 
 /***********************************************************************
@@ -335,7 +337,7 @@ static int checkFiles( tr_io_t * io )
             {
 				if ( io->pieceSlot[j] > 0 && j == i)
 				{
-					// only remove double piece when we found one sitting in the right slot
+					/* Only remove double piece when we found one sitting in the right slot */
 
 					tr_inf( "found piece %d (slot: %d) already on slot %d",j,i,io->pieceSlot[j] );
 					io->slotPiece[io->pieceSlot[j]] = -1;
@@ -343,7 +345,7 @@ static int checkFiles( tr_io_t * io )
 					io->pieceSlot[j] = i;
 					io->slotPiece[i] = j;
 				}
-				else	// we found no double
+				else /* We found no double */
 				{
 					io->pieceSlot[j] = i;
 					io->slotPiece[i] = j;

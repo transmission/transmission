@@ -94,6 +94,17 @@
         }, 
         {CLASS = FilterBarButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
         {
+            CLASS = FilterBarView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fDownloadFilterButton = FilterBarButton; 
+                fNoFilterButton = FilterBarButton; 
+                fPauseFilterButton = FilterBarButton; 
+                fSeedFilterButton = FilterBarButton; 
+            }; 
+            SUPERCLASS = ImageBackgroundView; 
+        }, 
+        {
             ACTIONS = {deselectAll = id; revealFile = id; setNextTab = id; setPreviousTab = id; }; 
             CLASS = FirstResponder; 
             LANGUAGE = ObjC; 

@@ -24,15 +24,8 @@
 
 #import "FilterBarButton.h"
 
-@interface FilterBarButton (Private)
-
-- (void) createButtons;
-
-@end
-
 @implementation FilterBarButton
 
-//height of button should be 17.0
 - (id) initWithCoder: (NSCoder *) coder
 {
     if ((self = [super initWithCoder: coder]))
@@ -40,7 +33,8 @@
         fEnabled = NO;
         fTrackingTag = 0;
         
-        [self createButtons];
+        fCount = -1;
+        [self createButtonsWithCount: 0];
         
         [self setImage: fButtonNormal];
         [self setAlternateImage: fButtonPressed];
@@ -73,9 +67,83 @@
 }
 
 //call only once
-- (void) createButtons
+- (void) createButtonsWithCount: (int) count
 {
-    NSSize buttonSize = [self frame].size;
+    if (fCount == count)
+        return;
+    fCount = count;
+    
+    //create attributes
+    NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
+                            [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
+    
+    NSSize shadowOffset = NSMakeSize(0.0, -1.0);
+    
+    NSShadow * shadow = [NSShadow alloc];
+    [shadow setShadowOffset: shadowOffset];
+    [shadow setShadowBlurRadius: 1.0];
+    [shadow setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]];
+
+    NSShadow * shadowDim = [NSShadow alloc];
+    [shadowDim setShadowOffset: shadowOffset];
+    [shadowDim setShadowBlurRadius: 1.0];
+    [shadowDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]];
+    
+    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
+                NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName,
+                shadow, NSShadowAttributeName, nil],
+        * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName,
+                shadowDim, NSShadowAttributeName, nil],
+        * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor whiteColor], NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName,
+                shadow, NSShadowAttributeName, nil],
+        * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+                [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
+                boldFont, NSFontAttributeName,
+                shadow, NSShadowAttributeName, nil];
+    
+    [shadow release];
+    [shadowDim release];
+    
+    //create button text
+    NSString * text = [self title];
+    if (fCount > 0)
+        text = [text stringByAppendingString: [NSString stringWithFormat: @" (%d)", fCount]];
+    
+    //get images
+    NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
+            * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
+            * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
+    
+    NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
+            * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
+            * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
+    
+    NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
+            * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
+            * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
+    
+    //get button sizes and placement
+    NSLog(text);
+    NSSize textSize = [text sizeWithAttributes: normalAttributes];NSLog(NSStringFromSize(textSize));
+    textSize.width = ceilf(textSize.width);NSLog(NSStringFromSize(textSize));
+    
+    float overlap = 4.0;
+    NSSize endSize = [leftOver size],
+            mainSize = NSMakeSize(textSize.width - (overlap * 2.0), endSize.height),
+            buttonSize = NSMakeSize(mainSize.width + 2.0 * endSize.width, endSize.height);
+    NSRect textRect = NSMakeRect(endSize.width - overlap, (buttonSize.height - textSize.height) * 0.5 + 1.5,
+                                textSize.width, textSize.height);
+    
+    NSPoint leftPoint = NSZeroPoint,
+            mainPoint = NSMakePoint(endSize.width, 0),
+            rightPoint = NSMakePoint(mainPoint.x + mainSize.width, 0);
+    
     fButtonNormal = [[NSImage alloc] initWithSize: buttonSize];
     fButtonNormalDim = [[NSImage alloc] initWithSize: buttonSize];
     fButtonOver = [[NSImage alloc] initWithSize: buttonSize];
@@ -84,16 +152,6 @@
     fButtonSelectedDim = [[NSImage alloc] initWithSize: buttonSize];
     
     //rolled over button
-    NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
-            * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
-            * mainOver = [NSImage imageNamed: @"FilterButtonOverMain.png"];
-    
-    NSSize endSize = [leftOver size],
-            mainSize = NSMakeSize(buttonSize.width - endSize.width * 2.0, endSize.height);
-    NSPoint leftPoint = NSMakePoint(0, 0),
-            rightPoint = NSMakePoint(buttonSize.width - endSize.width, 0),
-            mainPoint = NSMakePoint(endSize.width, 0);
-
     [mainOver setScalesWhenResized: YES];
     [mainOver setSize: mainSize];
     
@@ -104,10 +162,6 @@
     [fButtonOver unlockFocus];
     
     //pressed button
-    NSImage * leftPressed = [NSImage imageNamed: @"FilterButtonPressedLeft.png"],
-            * rightPressed = [NSImage imageNamed: @"FilterButtonPressedRight.png"],
-            * mainPressed = [NSImage imageNamed: @"FilterButtonPressedMain.png"];
-    
     [mainPressed setScalesWhenResized: YES];
     [mainPressed setSize: mainSize];
     
@@ -118,10 +172,6 @@
     [fButtonPressed unlockFocus];
     
     //selected button
-    NSImage * leftSelected = [NSImage imageNamed: @"FilterButtonSelectedLeft.png"],
-            * rightSelected = [NSImage imageNamed: @"FilterButtonSelectedRight.png"],
-            * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
-    
     [mainSelected setScalesWhenResized: YES];
     [mainSelected setSize: mainSize];
     
@@ -133,55 +183,6 @@
     
     //selected and dimmed button
     fButtonSelectedDim = [fButtonSelected copy];
-
-    //create button text
-    NSString * text = [self title];
-
-    NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
-                            [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
-    
-    NSSize shadowOffset = NSMakeSize(0.0, -1.0);
-    
-    NSShadow * shadowNormal = [NSShadow alloc];
-    [shadowNormal setShadowOffset: shadowOffset];
-    [shadowNormal setShadowBlurRadius: 1.0];
-    [shadowNormal setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.4]];
-
-    NSShadow * shadowNormalDim = [NSShadow alloc];
-    [shadowNormalDim setShadowOffset: shadowOffset];
-    [shadowNormalDim setShadowBlurRadius: 1.0];
-    [shadowNormalDim setShadowColor: [NSColor colorWithDeviceWhite: 1.0 alpha: 0.2]];
-
-    NSShadow * shadowHighlighted = [NSShadow alloc];
-    [shadowHighlighted setShadowOffset: shadowOffset];
-    [shadowHighlighted setShadowBlurRadius: 1.0];
-    [shadowHighlighted setShadowColor: [NSColor colorWithDeviceWhite: 0.0 alpha: 0.4]];
-    
-    NSDictionary * normalAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor colorWithCalibratedRed: 0.259 green: 0.259 blue: 0.259 alpha: 1.0],
-                NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName,
-                shadowNormal, NSShadowAttributeName, nil],
-        * normalDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName,
-                shadowNormalDim, NSShadowAttributeName, nil],
-        * highlightedAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor whiteColor], NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName,
-                shadowHighlighted, NSShadowAttributeName, nil],
-        * highlightedDimAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                [NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0], NSForegroundColorAttributeName,
-                boldFont, NSFontAttributeName,
-                shadowHighlighted, NSShadowAttributeName, nil];
-    
-    NSSize textSizeNormal = [text sizeWithAttributes: normalAttributes];
-    NSRect textRect = NSMakeRect((buttonSize.width - textSizeNormal.width) * 0.5,
-            (buttonSize.height - textSizeNormal.height) * 0.5 + 1.5, textSizeNormal.width, textSizeNormal.height);
-    
-    [shadowNormal release];
-    [shadowNormalDim release];
-    [shadowHighlighted release];
     
     //normal button
     [fButtonNormal lockFocus];
@@ -217,6 +218,11 @@
     [normalDimAttributes release];
     [highlightedAttributes release];
     [highlightedDimAttributes release];
+    
+    //resize button
+    NSPoint point = [self frame].origin;
+    [self setFrame: NSMakeRect(point.x, point.y, buttonSize.width, buttonSize.height)];
+    [self setNeedsDisplay: YES];
 }
 
 - (void) mouseEntered: (NSEvent *) event

@@ -1,7 +1,7 @@
 /******************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2007 Transmission authors and contributors
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,23 +23,15 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import "ImageBackgroundView.h"
+#import "FilterBarButton.h"
 
-@interface FilterBarButton : NSButton
+@interface FilterBarView : ImageBackgroundView
 {
-    NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
-            * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;
-    int fCount;
-    
-    BOOL fEnabled;
-    NSTrackingRectTag fTrackingTag;
+    IBOutlet FilterBarButton * fNoFilterButton, * fDownloadFilterButton,
+                        * fSeedFilterButton, * fPauseFilterButton;
 }
 
-- (void) createButtonsWithCount: (int) count;
-- (void) setEnabled: (BOOL) enable;
-
-- (void) resetBounds: (NSNotification *) notification;
-
-- (void) setForActive: (NSNotification *) notification;
-- (void) setForInactive: (NSNotification *) notification;
+- (void) replaceButtons;
 
 @end
