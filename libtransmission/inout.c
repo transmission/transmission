@@ -41,12 +41,13 @@ struct tr_io_s
 
     int           slotsUsed;
 
-	int	writeCount;
-	int	readCount;
-	int	reorderCount;
-	int	hitCount;
+    int           writeCount;
+    int           readCount;
+    int           reorderCount;
+    int           hitCount;
 
-    int checkFilesPassed;
+    /* private flag to keep from saving aborted fastResume data */
+    char          checkFilesAborted;
 };
 
 #include "fastresume.h"
@@ -116,13 +117,8 @@ tr_io_t * tr_ioInit( tr_torrent_t * tor )
     if( checkFiles( io ) )
     {
         free( io );
-        return NULL;
+        io = NULL;
     }
-
-    io->writeCount = 0;
-    io->readCount = 0;
-    io->reorderCount = 0;
-    io->hitCount = 0;
 
     return io;
 }
@@ -241,7 +237,7 @@ void tr_ioSync( tr_io_t * io )
 {
     closeFiles( io );
 
-    if( io->checkFilesPassed )
+    if( !io->checkFilesAborted )
     {
         fastResumeSave( io );
     }
@@ -276,10 +272,10 @@ static int checkFiles( tr_io_t * io )
 
     io->pieceSlot = malloc( inf->pieceCount * sizeof( int ) );
     io->slotPiece = malloc( inf->pieceCount * sizeof( int ) );
+    io->checkFilesAborted = 0;
 
     if( !fastResumeLoad( io ) )
     {
-        io->checkFilesPassed = 1;
         return 0;
     }
 
@@ -320,6 +316,7 @@ static int checkFiles( tr_io_t * io )
 
         if( tor->status & TR_STATUS_STOPPING )
         {
+            io->checkFilesAborted = 1;
             break;
         }
 
@@ -374,7 +371,6 @@ static int checkFiles( tr_io_t * io )
     }
     free( buf );
 
-    io->checkFilesPassed = i == inf->pieceCount;
     return 0;
 }
 
