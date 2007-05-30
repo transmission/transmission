@@ -40,7 +40,9 @@
         fTrackingTag = 0;
         
         [self createButtons];
+        fCount = -1;
         [self setCount: 0];
+        
         [self setAlternateImage: fButtonPressed];
         [self setImage: fButtonNormal];
         
@@ -73,8 +75,12 @@
 
 - (void) setCount: (int) count
 {
-    [self setToolTip: count == 1 ? NSLocalizedString(@"1 Transfer", "Filter Bar Button -> tool tip")
-            : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), count]];
+    if (count == fCount)
+        return;
+    fCount = count;
+    
+    [self setToolTip: fCount == 1 ? NSLocalizedString(@"1 Transfer", "Filter Bar Button -> tool tip")
+            : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), fCount]];
 }
 
 - (void) mouseEntered: (NSEvent *) event
@@ -172,10 +178,6 @@
     [shadowDim release];
     [shadowHighlighted release];
     
-    //create button text
-    NSString * text = [self title],
-            * number = fCount > 0 ? [NSString stringWithFormat: @" (%d)", fCount] : nil;
-    
     //get images
     NSImage * leftOver = [NSImage imageNamed: @"FilterButtonOverLeft.png"],
             * rightOver = [NSImage imageNamed: @"FilterButtonOverRight.png"],
@@ -190,6 +192,7 @@
             * mainSelected = [NSImage imageNamed: @"FilterButtonSelectedMain.png"];
     
     //get button sizes and placement
+    NSString * text = [self title];
     NSSize textSize = [text sizeWithAttributes: normalAttributes];
     textSize.width = ceilf(textSize.width);
     
