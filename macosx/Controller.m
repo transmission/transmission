@@ -3039,6 +3039,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
 }
 
+#warning move to additions
 - (NSString *) applicationSupportFolder
 {
     return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex: 0] 

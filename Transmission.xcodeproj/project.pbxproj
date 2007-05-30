@@ -48,6 +48,7 @@
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
 		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
 		A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A21567EB0A9A5034004DECD6 /* MessageWindow.nib */; };
+		A215760B0C0D449A0057A26A /* BezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A21576090C0D449A0057A26A /* BezierPathAdditions.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */; };
@@ -308,6 +309,8 @@
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
 		A21567EC0A9A5034004DECD6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A21576090C0D449A0057A26A /* BezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BezierPathAdditions.m; path = macosx/BezierPathAdditions.m; sourceTree = "<group>"; };
+		A215760A0C0D449A0057A26A /* BezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BezierPathAdditions.h; path = macosx/BezierPathAdditions.h; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
 		A21F5B860AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ActionMenuRatioToDisplayRatioTransformer.h; path = macosx/ActionMenuRatioToDisplayRatioTransformer.h; sourceTree = "<group>"; };
@@ -556,6 +559,8 @@
 			children = (
 				A24D2A610C0A624600A0ED9F /* IPCController.h */,
 				A24D2A620C0A624600A0ED9F /* IPCController.m */,
+				A21576090C0D449A0057A26A /* BezierPathAdditions.m */,
+				A215760A0C0D449A0057A26A /* BezierPathAdditions.h */,
 				A2FB057C0BFEB6800095564D /* DragOverlayView.h */,
 				A2FB057D0BFEB6800095564D /* DragOverlayView.m */,
 				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
@@ -1214,6 +1219,7 @@
 				E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */,
 				A24D2A640C0A624600A0ED9F /* IPCController.m in Sources */,
 				A24838820C0BA608005CC3FE /* FilterBarView.m in Sources */,
+				A215760B0C0D449A0057A26A /* BezierPathAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

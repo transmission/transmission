@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "DragOverlayView.h"
+#import "BezierPathAdditions.h"
 
 @implementation DragOverlayView
 
@@ -32,22 +33,7 @@
     {
         //create badge
         NSRect badgeRect = NSMakeRect(0, 0, 325.0, 84.0);
-        
-        float minX = NSMinX(badgeRect),
-            minY = NSMinY(badgeRect),
-            maxX = NSMaxX(badgeRect),
-            maxY = NSMaxY(badgeRect),
-            midX = NSMidX(badgeRect),
-            midY = NSMidY(badgeRect),
-            radius = 15.0;
-        
-        NSBezierPath * bp = [NSBezierPath bezierPath];
-        [bp moveToPoint: NSMakePoint(maxX, midY)];
-        [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, maxY) toPoint: NSMakePoint(midX, maxY) radius: radius];
-        [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, maxY) toPoint: NSMakePoint(minX, midY) radius: radius];
-        [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, minY) toPoint: NSMakePoint(midX, minY) radius: radius];
-        [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
-        [bp closePath];
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: badgeRect radius: 15.0];
         
         fBackBadge = [[NSImage alloc] initWithSize: badgeRect.size];
         [fBackBadge lockFocus];
