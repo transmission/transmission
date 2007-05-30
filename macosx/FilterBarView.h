@@ -32,6 +32,4 @@
                         * fSeedFilterButton, * fPauseFilterButton;
 }
 
-- (void) replaceButtons;
-
 @end

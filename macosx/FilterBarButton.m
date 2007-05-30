@@ -23,11 +23,10 @@
  *****************************************************************************/
 
 #import "FilterBarButton.h"
-#import "StringAdditions.h"
 
 @interface FilterBarButton (Private)
 
-- (NSImage *) badgeCount: (int) count color: (NSColor *) color;
+- (void) createButtons;
 
 @end
 
@@ -40,8 +39,10 @@
         fEnabled = NO;
         fTrackingTag = 0;
         
-        fCount = -1;
+        [self createButtons];
         [self setCount: 0];
+        [self setAlternateImage: fButtonPressed];
+        [self setImage: fButtonNormal];
         
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         
@@ -70,21 +71,64 @@
     [super dealloc];
 }
 
-- (BOOL) setCount: (int) count
+- (void) setCount: (int) count
 {
-    if (fCount == count)
-        return NO;
-    fCount = count;
+    [self setToolTip: count == 1 ? NSLocalizedString(@"1 Transfer", "Filter Bar Button -> tool tip")
+            : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), count]];
+}
+
+- (void) mouseEntered: (NSEvent *) event
+{
+    if (!fEnabled)
+        [self setImage: fButtonOver];
     
-    if (fButtonNormal)
+    [super mouseEntered: event];
+}
+
+- (void) mouseExited: (NSEvent *) event
+{
+    if (!fEnabled)
+        [self setImage: fButtonNormal];
+
+    [super mouseExited: event];
+}
+
+- (void) setEnabled: (BOOL) enable
+{
+    fEnabled = enable;
+    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
+}
+
+- (void) resetBounds: (NSNotification *) notification
+{
+    if (fTrackingTag)
+        [self removeTrackingRect: fTrackingTag];
+    fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
+}
+
+- (void) setForActive: (NSNotification *) notification
+{
+    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
+    [self resetBounds: nil];
+}
+
+- (void) setForInactive: (NSNotification *) notification
+{
+    [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
+    
+    if (fTrackingTag)
     {
-        [fButtonNormal release];
-        [fButtonOver release];
-        [fButtonPressed release];
-        [fButtonSelected release];
-        [fButtonSelectedDim release];
+        [self removeTrackingRect: fTrackingTag];
+        fTrackingTag = 0;
     }
-    
+}
+
+@end
+
+@implementation FilterBarButton (Private)
+
+- (void) createButtons
+{
     //create attributes
     NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
                             [NSFont fontWithName: @"Lucida Grande" size: 12.0] toHaveTrait: NSBoldFontMask];
@@ -155,28 +199,6 @@
             buttonSize = NSMakeSize(mainSize.width + 2.0 * endSize.width, endSize.height);
     NSRect textRect = NSMakeRect(endSize.width - overlap, (buttonSize.height - textSize.height) * 0.5 + 1.5,
                                 textSize.width, textSize.height);
-    
-    //create badge images and adjust size
-    NSImage * badgeNormal, * badgeNormalDim, * badgeHighlighted, * badgeHighlightedDim;
-    NSSize badgeSize;
-    float badgePadding;
-    if (fCount > 0)
-    {
-        badgeNormal = [self badgeCount: fCount color: [normalAttributes objectForKey: NSForegroundColorAttributeName]];
-        badgeNormalDim = [self badgeCount: fCount color: [normalDimAttributes objectForKey: NSForegroundColorAttributeName]];
-        badgeHighlighted = [self badgeCount: fCount
-                            color: [highlightedAttributes objectForKey: NSForegroundColorAttributeName]];
-        badgeHighlightedDim = [self badgeCount: fCount
-                                color: [highlightedDimAttributes objectForKey: NSForegroundColorAttributeName]];
-        
-        badgeSize = [badgeNormal size];
-        badgeSize.width = ceilf(badgeSize.width);
-        
-        badgePadding = 2.0;
-        float increase = badgeSize.width + badgePadding;
-        mainSize.width += increase;
-        buttonSize.width += increase;
-    }
     
     NSPoint leftPoint = NSZeroPoint,
             mainPoint = NSMakePoint(endSize.width, 0),
@@ -252,41 +274,6 @@
     [text drawInRect: textRect withAttributes: highlightedDimAttributes];
     [fButtonSelectedDim unlockFocus];
     
-    //append count
-    if (fCount > 0)
-    {
-        NSPoint badgePoint = NSMakePoint(NSMaxX(textRect) + badgePadding * 2.0, (mainSize.height - badgeSize.height) * 0.5 + 1.0);
-        
-        //normal button
-        [fButtonNormal lockFocus];
-        [badgeNormal compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonNormal unlockFocus];
-        
-        //dim button
-        [fButtonNormalDim lockFocus];
-        [badgeNormalDim compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonNormalDim unlockFocus];
-        
-        //rolled over button
-        [fButtonOver lockFocus];
-        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonOver unlockFocus];
-        
-        [fButtonPressed lockFocus];
-        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonPressed unlockFocus];
-        
-        //selected button
-        [fButtonSelected lockFocus];
-        [badgeHighlighted compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonSelected unlockFocus];
-        
-        //selected and dim button
-        [fButtonSelectedDim lockFocus];
-        [badgeHighlightedDim compositeToPoint: badgePoint operation: NSCompositeSourceOver];
-        [fButtonSelectedDim unlockFocus];
-    }
-    
     [normalAttributes release];
     [normalDimAttributes release];
     [highlightedAttributes release];
@@ -295,102 +282,6 @@
     //resize button
     NSPoint point = [self frame].origin;
     [self setFrame: NSMakeRect(point.x, point.y, buttonSize.width, buttonSize.height)];
-    
-    //set image
-    [self setAlternateImage: fButtonPressed];
-    
-    if ([[self window] isKeyWindow])
-        [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
-    else
-        [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
-    
-    return YES;
-}
-
-- (void) mouseEntered: (NSEvent *) event
-{
-    if (!fEnabled)
-        [self setImage: fButtonOver];
-    
-    [super mouseEntered: event];
-}
-
-- (void) mouseExited: (NSEvent *) event
-{
-    if (!fEnabled)
-        [self setImage: fButtonNormal];
-
-    [super mouseExited: event];
-}
-
-- (void) setEnabled: (BOOL) enable
-{
-    fEnabled = enable;
-    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
-}
-
-- (void) resetBounds: (NSNotification *) notification
-{
-    if (fTrackingTag)
-        [self removeTrackingRect: fTrackingTag];
-    fTrackingTag = [self addTrackingRect: [self bounds] owner: self userData: nil assumeInside: NO];
-}
-
-- (void) setForActive: (NSNotification *) notification
-{
-    [self setImage: fEnabled ? fButtonSelected : fButtonNormal];
-    [self resetBounds: nil];
-}
-
-- (void) setForInactive: (NSNotification *) notification
-{
-    [self setImage: fEnabled ? fButtonSelectedDim : fButtonNormalDim];
-    
-    if (fTrackingTag)
-    {
-        [self removeTrackingRect: fTrackingTag];
-        fTrackingTag = 0;
-    }
-}
-
-@end
-
-@implementation FilterBarButton (Private)
-
-- (NSImage *) badgeCount: (int) count color: (NSColor *) color
-{
-    NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    [[NSFontManager sharedFontManager] convertFont: [NSFont fontWithName: @"Lucida Grande" size: 10.0]
-                        toHaveTrait: NSBoldFontMask], NSFontAttributeName, nil];
-    
-    NSString * string = [NSString stringWithInt: count];
-    NSSize stringSize = [string sizeWithAttributes: attributes];
-    NSRect badgeRect = NSMakeRect(0, 0, stringSize.width + 6.0, stringSize.height);
-    
-    //create badge part
-    NSImage * tempBadge = [[NSImage alloc] initWithSize: badgeRect.size];
-    NSBezierPath * bp = [NSBezierPath bezierPathWithOvalInRect: badgeRect];
-    [tempBadge lockFocus];
-    
-    [color set];
-    [bp fill];
-    
-    [tempBadge unlockFocus];
-    
-    //create string part
-    NSImage * badge = [[NSImage alloc] initWithSize: badgeRect.size];
-    [badge lockFocus];
-    
-    [string drawAtPoint: NSMakePoint((badgeRect.size.width - stringSize.width) * 0.5,
-                        (badgeRect.size.height - stringSize.height) * 0.5) withAttributes: attributes];
-    [tempBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOut];
-    
-    [badge unlockFocus];
-    
-    [tempBadge release];
-    [attributes release];
-    
-    return [badge autorelease];
 }
 
 @end

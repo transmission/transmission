@@ -208,8 +208,6 @@
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
 
-- (void) checkSearchFilter: (NSNotification *) notification;
-
 - (void) showMainWindow:    (id) sender;
 - (void) linkHomepage:      (id) sender;
 - (void) linkForums:        (id) sender;

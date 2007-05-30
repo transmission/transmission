@@ -210,7 +210,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
-    [fFilterBar replaceButtons];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
@@ -415,10 +414,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //change that just impacts the dock badge
     [nc addObserver: self selector: @selector(updateDockBadge:)
                     name: @"DockBadgeChange" object: nil];
-    
-    //show and hide the search bar in the filter bar
-    [nc addObserver: self selector: @selector(checkSearchFilter:)
-                    name: @"CheckSearchFilter" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -1677,17 +1672,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [tempTorrents setArray: fTorrents];
     
     //set buttons with counts
-    BOOL change = NO;
-    if ([fNoFilterButton setCount: [fTorrents count]])
-        change = YES;
-    if ([fDownloadFilterButton setCount: downloading])
-        change = YES;
-    if ([fSeedFilterButton setCount: seeding])
-        change = YES;
-    if ([fPauseFilterButton setCount: paused])
-        change = YES;
-    if (change)
-        [fFilterBar replaceButtons];
+    [fNoFilterButton setCount: [fTorrents count]];
+    [fDownloadFilterButton setCount: downloading];
+    [fSeedFilterButton setCount: seeding];
+    [fPauseFilterButton setCount: paused];
     
     NSString * searchString = [fSearchFilterField stringValue];
     if ([searchString length] > 0)
@@ -2977,11 +2965,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 }
 
 - (void) windowDidResize: (NSNotification *) notification
-{
-    [self checkSearchFilter: nil];
-}
-
-- (void) checkSearchFilter: (NSNotification *) notification
 {
     //size search filter to not overlap buttons
     float pointX = NSMaxX([fPauseFilterButton frame]) + 5.0;

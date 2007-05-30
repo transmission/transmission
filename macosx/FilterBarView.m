@@ -26,7 +26,7 @@
 
 @implementation FilterBarView
 
-- (void) replaceButtons
+- (void) awakeFromNib
 {
     float padding = 2.0, base = 3.0;
     [fNoFilterButton setFrameOrigin: NSMakePoint(padding + 2.0, base)];
@@ -35,8 +35,6 @@
     [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + padding, base)];
     
     [self setNeedsDisplay: YES];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"CheckSearchFilter" object: nil];
 }
 
 @end
