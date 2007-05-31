@@ -698,7 +698,7 @@ static void findSlotForPiece( tr_io_t * io, int piece )
 		{
 			freeSlot = -1;
 
-			if( PREFERSIZE )
+			if( PREFERSIZE || io->slotsUsed >= ( inf->pieceCount - 1 ) )
 			{
 				for( i = 0; i < io->slotsUsed; i++ )
 				{
