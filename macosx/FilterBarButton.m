@@ -40,11 +40,11 @@
         fTrackingTag = 0;
         
         [self createButtons];
-        fCount = -1;
-        [self setCount: 0];
-        
         [self setAlternateImage: fButtonPressed];
         [self setImage: fButtonNormal];
+        
+        fCount = -1;
+        [self setCount: 0];
         
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
         

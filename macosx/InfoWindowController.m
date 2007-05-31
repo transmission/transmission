@@ -289,7 +289,6 @@
     }
     
     //update stats and settings
-    [self updateInfoStats];
     [self updateInfoSettings];
     
     [fPeerTable reloadData];
@@ -880,7 +879,7 @@
         if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
         {
             #warning different for different sorts
-            //NSLog(@"%@", [fPeerTable highlightedTableColumn]);
+            //NSLog(@"%d", [[[[fPeerTable tableColumns] objectAtIndex: 2] headerCell] isHighlighted]);
             
             asc = [descriptor ascending];
         }
