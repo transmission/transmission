@@ -877,12 +877,7 @@
         [descriptors addObject: descriptor];
         
         if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
-        {
-            #warning different for different sorts
-            //NSLog(@"%d", [[[[fPeerTable tableColumns] objectAtIndex: 2] headerCell] isHighlighted]);
-            
             asc = [descriptor ascending];
-        }
     }
     
     //sort by IP after primary sort
