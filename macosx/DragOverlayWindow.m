@@ -76,6 +76,7 @@
     
     NSString * name;
     BOOL folder;
+    int fileCount = 0;
     
     NSString * file;
     NSEnumerator * enumerator = [files objectEnumerator];
@@ -90,6 +91,7 @@
             
             count++;
             size += info->totalSize;
+            fileCount += info->fileCount;
             
             //only useful when one torrent
             if (count == 1)
@@ -102,17 +104,31 @@
         }
     }
     
+    if (count <= 0)
+        return;
+    
+    //set strings and icon
     NSImage * icon = nil;
-    NSString * sizeString = [NSString stringForFileSize: size];
+    NSString * secondString = [NSString stringForFileSize: size];
+    if (count > 1 || folder)
+    {
+        NSString * fileString;
+        if (fileCount == 1)
+            fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> drag files");
+        else
+            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> drag files"), fileCount];
+         secondString = [fileString stringByAppendingString: secondString];
+    }
+    
     if (count == 1)
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
     else
     {
-        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> multiple drag files"), count];
-        sizeString = [sizeString stringByAppendingString: @" Total"];
+        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> drag files"), count];
+        secondString = [secondString stringByAppendingString: @" Total"];
     }
     
-    [[self contentView] setOverlay: icon mainLine: name subLine: sizeString];
+    [[self contentView] setOverlay: icon mainLine: name subLine: secondString];
     
     //stop other animation and set to same progress
     if ([fFadeOutAnimation isAnimating])
