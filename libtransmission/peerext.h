@@ -323,5 +323,6 @@ parseUTPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
         peer_dbg( "GET  extended-pex, no peers" );
     }
 
+    tr_bencFree( &val );
     return TR_OK;
 }

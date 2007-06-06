@@ -214,6 +214,7 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
   }
 
  done:
+  g_free (path);
   if(NULL != err)
     g_error_free(err);
   if(NULL != io)  
@@ -280,6 +281,7 @@ cf_loadprefs(char **errstr) {
     cf_saveprefs(errstr);
   }
 
+  tr_bencFree(&val);
   g_free(data);
 }
 

@@ -31,15 +31,17 @@
 /* macro to shut up "unused parameter" warnings */
 #ifdef __GNUC__
 #define SHUTUP                  __attribute__((unused))
+#define UNUSED                  __attribute__((unused))
 #else
 #define SHUTUP
+#define UNUSED
 #endif
 
 /* XXX this shouldn't be here */
 enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
 
 /* return number of items in array */
-#define ALEN( a )               ( ( signed )( sizeof(a) / sizeof( (a)[0] ) ) )
+#define ALEN(a) ((signed)G_N_ELEMENTS(a))
 
 /* used for a callback function with a data parameter */
 typedef void (*callbackfunc_t)(void*);
@@ -72,10 +74,19 @@ strbool(const char *str);
 char *
 readablesize(guint64 size);
 
+/* return a human-readable string for the transfer rate given in bytes.
+   the string must be g_free()d */
+char *
+readablespeed (double KiBps);
+
+
 /* return a human-readable string for the time given in seconds.
    the string must be g_free()d */
 char *
 readabletime(int secs);
+
+char *
+rfc822date (guint64 epoch_msec);
 
 /* returns a string representing the download ratio.
    the string must be g_free()d */

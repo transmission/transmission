@@ -739,6 +739,7 @@ tr_core_update( TrCore * self )
             gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
             st = tr_torrent_stat( tor );
             g_object_unref( tor );
+            tr_torrent_check_seeding_cap ( tor );
 
             /* XXX find out if setting the same data emits changed signal */
             gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,

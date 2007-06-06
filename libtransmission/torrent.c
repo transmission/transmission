@@ -189,6 +189,7 @@ static tr_torrent_t * torrentRealInit( tr_handle_t * h, tr_torrent_t * tor,
                         tor->blockSize;
     tor->completion = tr_cpInit( tor );
 
+    tor->thread = THREAD_EMPTY;
     tr_lockInit( &tor->lock );
     tr_condInit( &tor->cond );
 
@@ -239,7 +240,7 @@ void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
     }
 }
 
-char * tr_torrentGetFolder( tr_torrent_t * tor )
+const char * tr_torrentGetFolder( tr_torrent_t * tor )
 {
     return tor->destination;
 }
@@ -263,11 +264,8 @@ int tr_torrentDuplicateDownload( tr_torrent_t * tor )
 
 void tr_torrentStart( tr_torrent_t * tor )
 {
-    if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
-    {
-        /* Join the thread first */
-        torrentReallyStop( tor );
-    }
+    /* Join the thread first */
+    torrentReallyStop( tor );
     
     /* Don't start if a torrent with the same name and destination is already active */
     if( tr_torrentDuplicateDownload( tor ) )
@@ -335,8 +333,11 @@ static void torrentReallyStop( tr_torrent_t * tor )
     tor->die = 1;
     tr_threadJoin( &tor->thread );
 
-    tr_trackerClose( tor->tracker );
-    tor->tracker = NULL;
+    if( tor->tracker )
+    {
+        tr_trackerClose( tor->tracker );
+        tor->tracker = NULL;
+    }
 
     tr_lockLock( &tor->lock );
     for( i = 0; i < tor->peerCount; i++ )
@@ -679,11 +680,8 @@ void tr_torrentClose( tr_torrent_t * tor )
     tr_handle_t * h = tor->handle;
     tr_info_t * inf = &tor->info;
 
-    if( tor->status & ( TR_STATUS_STOPPING | TR_STATUS_STOPPED ) )
-    {
-        /* Join the thread first */
-        torrentReallyStop( tor );
-    }
+    /* Join the thread first */
+    torrentReallyStop( tor );
 
     tr_sharedLock( h->shared );
 

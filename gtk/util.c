@@ -81,6 +81,17 @@ readablesize(guint64 size) {
                          gettext(sizestrs[ii]));
 }
 
+char *
+readablespeed (double KiBps)
+{
+  const guint64 bps = KiBps * 1024;
+  char * str = readablesize (bps);
+  char * ret = g_strdup_printf ("%s/s", str);
+  g_free (str);
+  return ret;
+}
+ 
+
 #define SECONDS(s)              ((s) % 60)
 #define MINUTES(s)              ((s) / 60 % 60)
 #define HOURS(s)                ((s) / 60 / 60 % 24)
@@ -108,6 +119,16 @@ readabletime(int secs) {
     return g_strdup_printf(_("%i %s %i %s"),
       WEEKS(secs),   ngettext("week", "weeks", WEEKS(secs)),
       DAYS(secs),    ngettext("hour", "hours", DAYS(secs)));
+}
+
+char *
+rfc822date (guint64 epoch_msec)
+{
+  const time_t secs = epoch_msec / 1000;
+  const struct tm tm = *localtime (&secs);
+  char buf[128];
+  strftime (buf, sizeof(buf), "%a, %d %b %Y %T %Z", &tm);
+  return g_strdup (buf);
 }
 
 char *
@@ -167,37 +188,23 @@ dupstrlist( GList * list )
 }
 
 char *
-joinstrlist(GList *list, char *sep) {
-  GList *ii;
-  int len;
-  char *ret, *dest;
-
-  if(0 > (len = strlen(sep) * (g_list_length(list) - 1)))
-    return NULL;
-
-  for(ii = g_list_first(list); NULL != ii; ii = ii->next)
-    len += strlen(ii->data);
-
-  dest = ret = g_new(char, len + 1);
-
-  for(ii = g_list_first(list); NULL != ii; ii = ii->next) {
-    dest = g_stpcpy(dest, ii->data);
-    if(NULL != ii->next)
-      dest = g_stpcpy(dest, sep);
+joinstrlist(GList *list, char *sep)
+{
+  GList *l;
+  GString *gstr = g_string_new (NULL);
+  for (l=list; l!=NULL; l=l->next) {
+    g_string_append (gstr, (char*)l->data);
+    if (l->next != NULL)
+      g_string_append (gstr, (sep));
   }
-
-  return ret;
+  return g_string_free (gstr, FALSE);
 }
 
 void
-freestrlist(GList *list) {
-  GList *ii;
-
-  if(NULL != list) {
-    for(ii = g_list_first(list); NULL != ii; ii = ii->next)
-      g_free(ii->data);
-    g_list_free(list);
-  }
+freestrlist(GList *list)
+{
+  g_list_foreach (list, (GFunc)g_free, NULL);
+  g_list_free (list);
 }
 
 char *
@@ -303,22 +310,12 @@ const char *
 getdownloaddir( void )
 {
     static char * wd = NULL;
-    const char  * dir;
-
-    dir = tr_prefs_get( PREF_ID_DIR );
-    if( NULL == dir )
-    {
-        if( NULL == wd )
-        {
-            wd = g_new( char, MAX_PATH_LENGTH + 1 );
-            if( NULL == getcwd( wd, MAX_PATH_LENGTH + 1 ) )
-            {
-                snprintf( wd, MAX_PATH_LENGTH + 1, "." );
-            }
-        }
-        dir = wd;
+    const char * dir = tr_prefs_get( PREF_ID_DIR );
+    if (NULL == dir) {
+      if (NULL == wd)
+        wd = g_get_current_dir(),
+      dir = wd;
     }
-
     return dir;
 }
 

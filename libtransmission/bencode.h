@@ -26,6 +26,7 @@
 #define TR_BENCODE_H 1
 
 #include <stdint.h> /* for int64_t */
+#include <string.h> /* for memset */
 
 typedef struct benc_val_s
 {

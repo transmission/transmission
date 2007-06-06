@@ -270,7 +270,7 @@ tr_info_t * tr_torrentInfo( tr_torrent_t * );
 int tr_torrentScrape( tr_torrent_t *, int * s, int * l, int * d );
 
 void   tr_torrentSetFolder( tr_torrent_t *, const char * );
-char * tr_torrentGetFolder( tr_torrent_t * );
+const char * tr_torrentGetFolder( tr_torrent_t * );
 
 int tr_torrentDuplicateDownload( tr_torrent_t * tor );
 

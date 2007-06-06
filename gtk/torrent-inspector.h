@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id:$
  *
  * Copyright (c) 2005-2007 Transmission authors and contributors
  *
@@ -22,24 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TG_PREFS_H
-#define TG_PREFS_H
+#ifndef GTK_TORRENT_INSPECTOR_H
+#define GTK_TORRENT_INSPECTOR_H
 
-#include "tr_core.h"
+#include <gtk/gtkwindow.h>
 #include "tr_torrent.h"
-#include "util.h"
 
-/* show the "add a torrent" dialog */
-void
-makeaddwind( GtkWindow * parent, TrCore * core );
-
-/* prompt for a download directory for torrents, then add them */
-void
-promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
-              size_t size, enum tr_torrent_action act, gboolean paused );
-
-/* prompt if the user wants to quit, calls func with cbdata if they do */
-void
-askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata );
+GtkWidget* torrent_inspector_new ( GtkWindow * parent, TrTorrent * tor );
 
 #endif /* TG_PREFS_H */

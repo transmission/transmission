@@ -238,6 +238,8 @@ void tr_threadJoin( tr_thread_t * t )
 #endif
         tr_dbg( "Thread '%s' joined", t->name );
         free( t->name );
+        t->name = NULL;
+        t->func = NULL;
     }
 }
 

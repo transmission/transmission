@@ -175,6 +175,7 @@ void tr_close( tr_handle_t * h )
     
     tr_sharedClose( h->shared );
     tr_fdClose();
+    free( h->tag );
     free( h );
 
     tr_netResolveThreadClose();

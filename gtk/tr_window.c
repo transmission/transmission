@@ -351,9 +351,9 @@ tr_window_update( TrWindow * self, float downspeed, float upspeed )
     }
 
     /* update the status bar */
-    downstr = readablesize( downspeed * 1024.0 );
-    upstr   = readablesize( upspeed * 1024.0 );
-    str     = g_strdup_printf( _("     Total DL: %s/s     Total UL: %s/s"),
+    downstr = readablespeed ( downspeed );
+    upstr   = readablespeed ( upspeed );
+    str     = g_strdup_printf( _("     Total DL: %s     Total UL: %s"),
                                downstr, upstr );
     g_free( downstr );
     g_free( upstr );
@@ -491,67 +491,26 @@ static void
 formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
             GtkTreeModel * model, GtkTreeIter * iter, gpointer data SHUTUP )
 {
-    char  * name, * mb, * terr, * str, * top, * bottom, * timestr;
+    TrTorrent * gtor;
+    char  * name, * mb, * str, * top, * bottom;
     guint64 size;
-    gfloat  prog;
     int     status, err, eta, tpeers, upeers, dpeers;
 
     gtk_tree_model_get( model, iter, MC_NAME, &name, MC_STAT, &status,
-                        MC_ERR, &err, MC_SIZE, &size, MC_PROG, &prog,
+                        MC_ERR, &err, MC_SIZE, &size,
                         MC_ETA, &eta, MC_PEERS, &tpeers, MC_UPEERS, &upeers,
-                        MC_DPEERS, &dpeers, -1 );
+                        MC_DPEERS, &dpeers, MC_TORRENT, &gtor, -1 );
 
     tpeers = MAX( tpeers, 0 );
     upeers = MAX( upeers, 0 );
     dpeers = MAX( dpeers, 0 );
     mb = readablesize(size);
-    prog *= 100;
 
-    if( TR_STATUS_CHECK_WAIT & status )
-    {
-        top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
-    }
-    else if( TR_STATUS_CHECK & status )
-    {
-        top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
-    }
-    else if( TR_STATUS_DOWNLOAD & status )
-    {
-        if( 0 > eta )
-        {
-            top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
-        }
-        else
-        {
-            timestr = readabletime(eta);
-            top = g_strdup_printf( _("Finishing in %s (%.1f%%)"),
-                                   timestr, prog );
-            g_free(timestr);
-        }
-    }
-    else if(TR_STATUS_SEED & status)
-    {
-        top = g_strdup_printf(
-            ngettext( "Seeding, uploading to %d of %d peer",
-                      "Seeding, uploading to %d of %d peers", tpeers ),
-            dpeers, tpeers );
-    }
-    else if( TR_STATUS_STOPPING & status )
-    {
-        top = g_strdup( _("Stopping...") );
-    }
-    else if( TR_STATUS_PAUSE & status )
-    {
-        top = g_strdup_printf( _("Stopped (%.1f%%)"), prog );
-    }
-    else
-    {
-        top = g_strdup( "" );
-        g_assert_not_reached();
-    }
+    top = tr_torrent_status_str ( gtor );
 
     if( TR_OK != err )
     {
+        char * terr;
         gtk_tree_model_get( model, iter, MC_TERR, &terr, -1 );
         bottom = g_strconcat( _("Error: "), terr, NULL );
         g_free( terr );
@@ -576,6 +535,7 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
     g_free( str );
     g_free( top );
     g_free( bottom );
+    g_object_unref( gtor );
 }
 
 static void
@@ -591,16 +551,16 @@ formatprog( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
     prog = MAX( prog, 0.0 );
     prog = MIN( prog, 1.0 );
 
-    ulstr = readablesize( ul * 1024.0 );
+    ulstr = readablespeed (ul);
     if( 1.0 == prog )
     {
         dlstr = ratiostr( down, up );
-        str = g_strdup_printf( _("Ratio: %s\nUL: %s/s"), dlstr, ulstr );
+        str = g_strdup_printf( _("Ratio: %s\nUL: %s"), dlstr, ulstr );
     }
     else
     {
-        dlstr = readablesize( dl * 1024.0 );
-        str = g_strdup_printf( _("DL: %s/s\nUL: %s/s"), dlstr, ulstr );
+        dlstr = readablespeed( dl );
+        str = g_strdup_printf( _("DL: %s\nUL: %s"), dlstr, ulstr );
     }
     marked = g_markup_printf_escaped( "<small>%s</small>", str );
     g_object_set( rend, "markup", str, "progress", prog, NULL );

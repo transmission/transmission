@@ -40,6 +40,7 @@
 #include "dialogs.h"
 #include "ipc.h"
 #include "msgwin.h"
+#include "torrent-inspector.h"
 #include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
 #include "tr_icon.h"
@@ -682,6 +683,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
         action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
         tr_core_add_list( data->core, paths, action, FALSE );
         tr_core_torrents_added( data->core );
+        g_list_free(paths);
     }
     freestrlist(freeables);
     g_free(files);
@@ -1012,7 +1014,7 @@ handleaction( struct cbdata * data, int act )
                   changed = TRUE;
                   break;
               case ACT_INFO:
-                  makeinfowind( data->wind, model, path, tor );
+                  gtk_widget_show (torrent_inspector_new (data->wind, tor));
                   break;
               case ACT_OPEN:
               case ACT_PREF:

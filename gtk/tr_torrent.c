@@ -147,6 +147,10 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   self->delfile = NULL;
   self->severed = FALSE;
   self->disposed = FALSE;
+  self->ul_cap_enabled = FALSE;
+  self->ul_cap = 0;
+  self->dl_cap_enabled = FALSE;
+  self->dl_cap = 0;
 }
 
 static void
@@ -225,8 +229,8 @@ tr_torrent_dispose(GObject *obj) {
       tr_torrent_sever( self );
   }
 
-  if(NULL != self->delfile)
-    g_free(self->delfile);
+  g_free (self->delfile);
+  g_free (self->dir);
 
   /* Chain up to the parent class */
   parent->dispose(obj);
@@ -317,16 +321,19 @@ tr_torrent_stop( TrTorrent * self )
 }
 
 static TrTorrent *
-maketorrent( tr_torrent_t * handle, const char * dir, gboolean paused )
+maketorrent( tr_torrent_t * handle,
+             const char   * dir,
+             gboolean       paused )
 {
     TrTorrent * tor;
 
     tr_torrentDisablePex( handle,
                           !tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
 
-    tor = g_object_new( TR_TORRENT_TYPE, "torrent-handle", handle,
-                        "download-directory", dir, NULL);
-  
+    tor = g_object_new( TR_TORRENT_TYPE,
+                        "torrent-handle", handle,
+                        "download-directory", dir,
+                        NULL);
     g_object_set( tor, "paused", paused, NULL );
 
     return tor;
@@ -411,11 +418,18 @@ TrTorrent *
 tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
                            gboolean forcedpause, char ** err )
 {
+  TrTorrent * ret;
   tr_torrent_t * handle;
   int ii, errcode;
   benc_val_t *name, *data;
   char *torrent, *hash, *dir;
-  gboolean paused;
+  gboolean paused = FALSE;
+  gboolean ul_cap_enabled = FALSE;
+  gboolean dl_cap_enabled = FALSE;
+  gboolean seeding_cap_enabled = FALSE;
+  gint ul_cap = 0;
+  gint dl_cap = 0;
+  gdouble seeding_cap = 0.0;
 
   *err = NULL;
 
@@ -430,15 +444,18 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     data = state->val.l.vals + ii + 1;
     if(TYPE_STR == name->type &&
        (TYPE_STR == data->type || TYPE_INT == data->type)) {
-      if(0 == strcmp("torrent", name->val.s.s))
-        torrent = data->val.s.s;
-      if(0 == strcmp("hash", name->val.s.s))
-        hash = data->val.s.s;
-      else if(0 == strcmp("dir", name->val.s.s))
-        dir = data->val.s.s;
-      else if(0 == strcmp("paused", name->val.s.s)) {
-        paused = (data->val.i ? TRUE : FALSE);
-      }
+      char * key = name->val.s.s;
+      char * val = data->val.s.s;
+           if (!strcmp (key, "torrent")) torrent = val;
+      else if (!strcmp (key, "hash")) hash = val;
+      else if (!strcmp (key, "dir")) dir = val;
+      else if (!strcmp (key, "paused")) paused = !!data->val.i;
+      else if (!strcmp (key, "ul-cap-speed")) ul_cap = data->val.i;
+      else if (!strcmp (key, "ul-cap-enabled")) ul_cap_enabled = !!data->val.i;
+      else if (!strcmp (key, "dl-cap-speed")) dl_cap = data->val.i;
+      else if (!strcmp (key, "dl-cap-enabled")) dl_cap_enabled = !!data->val.i;
+      else if (!strcmp (key, "seeding-cap-ratio")) seeding_cap = (data->val.i / 100.0);
+      else if (!strcmp (key, "seeding-cap-enabled")) seeding_cap_enabled = !!data->val.i;
     }
   }
 
@@ -467,7 +484,14 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     return NULL;
   }
 
-  return maketorrent( handle, dir, paused || forcedpause );
+  ret = maketorrent( handle, dir, paused || forcedpause );
+  ret->ul_cap = ul_cap; 
+  ret->ul_cap_enabled = ul_cap_enabled; 
+  ret->dl_cap = dl_cap;
+  ret->dl_cap_enabled = dl_cap_enabled; 
+  ret->seeding_cap = seeding_cap;
+  ret->seeding_cap_enabled = seeding_cap_enabled;
+  return ret;
 }
 
 gboolean
@@ -503,7 +527,22 @@ tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
     tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
                     tr_torrentGetFolder( tor->handle ), -1, 1 );
     tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
-                    ( tr_torrent_paused( tor ) ? 1 : 0 ) );
+                    tr_torrent_paused( tor ) ? 1 : 0 );
+
+    tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-speed" ),
+                    tor->ul_cap );
+    tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-enabled" ),
+                    tor->ul_cap_enabled ? 1 : 0 );
+
+    tr_bencInitInt( tr_bencDictAdd( state, "dl-cap-speed" ),
+                    tor->dl_cap );
+    tr_bencInitInt( tr_bencDictAdd( state, "dl-cap-enabled" ),
+                    tor->dl_cap_enabled ? 1 : 0);
+
+    tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-ratio" ),
+                    (int)(tor->dl_cap * 100.0)); /* two decimal places */
+    tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-enabled" ),
+                    tor->seeding_cap_enabled ? 1 : 0);
 
     return TRUE;
 }
@@ -542,4 +581,117 @@ tr_torrent_paused(TrTorrent *tor) {
   tr_stat_t *st = tr_torrentStat(tor->handle);
 
   return (TR_STATUS_INACTIVE & st->status ? TRUE : FALSE);
+}
+
+extern void tr_setUseCustomUpload( tr_torrent_t * tor, int limit );
+extern void tr_setUseCustomDownload( tr_torrent_t * tor, int limit );
+
+
+static void refresh_upload_cap ( TrTorrent *gtor ) {
+  const int cap = gtor->ul_cap_enabled ? gtor->ul_cap : -1;
+  g_message ("setting upload cap to %d...", cap);
+  tr_setUseCustomUpload( gtor->handle, gtor->ul_cap_enabled );
+  tr_setUploadLimit( gtor->handle, cap );
+}
+void
+tr_torrent_set_upload_cap_speed ( TrTorrent *gtor, int KiB_sec ) {
+  gtor->ul_cap = KiB_sec;
+  refresh_upload_cap ( gtor );
+}
+void
+tr_torrent_set_upload_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+  gtor->ul_cap_enabled = b;
+  refresh_upload_cap ( gtor );
+}
+
+static void refresh_download_cap ( TrTorrent *gtor ) {
+  const int cap = gtor->dl_cap_enabled ? gtor->dl_cap : -1;
+  tr_setUseCustomDownload( gtor->handle, gtor->dl_cap_enabled );
+  tr_setDownloadLimit( gtor->handle, cap );
+}
+void
+tr_torrent_set_download_cap_speed ( TrTorrent *gtor, int KiB_sec ) {
+  gtor->dl_cap = KiB_sec;
+  refresh_download_cap( gtor );
+}
+void
+tr_torrent_set_download_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+  gtor->dl_cap_enabled = b;
+  refresh_download_cap( gtor );
+}
+
+void
+tr_torrent_check_seeding_cap ( TrTorrent *gtor) {
+  tr_stat_t * st = tr_torrent_stat( gtor );
+  if ((gtor->seeding_cap_enabled) && (st->ratio >= gtor->seeding_cap))
+    tr_torrent_stop (gtor);
+}
+void
+tr_torrent_set_seeding_cap_ratio ( TrTorrent *gtor, gdouble ratio ) {
+  gtor->seeding_cap = ratio;
+  tr_torrent_check_seeding_cap (gtor);
+}
+void
+tr_torrent_set_seeding_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+  if ((gtor->seeding_cap_enabled = b))
+    tr_torrent_check_seeding_cap (gtor);
+}
+
+char *
+tr_torrent_status_str ( TrTorrent * gtor )
+{
+    char * top = 0;
+
+    tr_stat_t * st = tr_torrent_stat( gtor );
+
+    const int tpeers = MAX (st->peersTotal, 0);
+    const int upeers = MAX (st->peersUploading, 0);
+    const int eta = st->eta;
+    const double prog = st->progress * 100.0; /* [0...100] */
+    const int status = st->status;
+
+    if( TR_STATUS_CHECK_WAIT & status )
+    {
+        top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
+    }
+    else if( TR_STATUS_CHECK & status )
+    {
+        top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
+    }
+    else if( TR_STATUS_DOWNLOAD & status )
+    {
+        if( 0 > eta )
+        {
+            top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
+        }
+        else
+        {
+            char * timestr = readabletime(eta);
+            top = g_strdup_printf( _("Finishing in %s (%.1f%%)"),
+                                   timestr, prog );
+            g_free(timestr);
+        }
+    }
+    else if(TR_STATUS_SEED & status)
+    {
+        top = g_strdup_printf(
+            ngettext( "Seeding, uploading to %d of %d peer",
+                      "Seeding, uploading to %d of %d peers", tpeers ),
+            upeers, tpeers );
+    }
+    else if( TR_STATUS_STOPPING & status )
+    {
+        top = g_strdup( _("Stopping...") );
+    }
+    else if( TR_STATUS_PAUSE & status )
+    {
+        top = g_strdup_printf( _("Stopped (%.1f%%)"), prog );
+    }
+    else
+    {
+        top = g_strdup( "" );
+        g_assert_not_reached();
+    }
+
+    return top;
 }

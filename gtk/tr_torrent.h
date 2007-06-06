@@ -58,8 +58,16 @@ struct _TrTorrent {
   tr_torrent_t *handle;
   char *dir;
   char *delfile;
+
+  /* FIXME: hm, are these heavyweight enough to deserve their own properties? */
   gboolean severed;
   gboolean disposed;
+  gboolean ul_cap_enabled;
+  gboolean dl_cap_enabled;
+  gboolean seeding_cap_enabled;
+  gint ul_cap; /* KiB/sec */
+  gint dl_cap; /* KiB/sec */
+  gdouble seeding_cap; /* ratio to stop seeding at */
 };
 
 struct _TrTorrentClass {
@@ -83,6 +91,26 @@ tr_torrent_start( TrTorrent * tor );
 
 void
 tr_torrent_stop( TrTorrent * tor );
+
+char*
+tr_torrent_status_str ( TrTorrent * tor );
+
+void
+tr_torrent_set_upload_cap_speed ( TrTorrent*, int KiB_sec );
+void
+tr_torrent_set_upload_cap_enabled ( TrTorrent*, gboolean );
+
+void
+tr_torrent_set_download_cap_speed ( TrTorrent*, int KiB_sec );
+void
+tr_torrent_set_download_cap_enabled ( TrTorrent*, gboolean );
+
+void
+tr_torrent_check_seeding_cap ( TrTorrent* );
+void
+tr_torrent_set_seeding_cap_ratio ( TrTorrent*, gdouble ratio );
+void
+tr_torrent_set_seeding_cap_enabled ( TrTorrent*, gboolean );
 
 #ifdef TR_WANT_TORRENT_PRIVATE
 
