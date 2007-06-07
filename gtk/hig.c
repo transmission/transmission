@@ -123,6 +123,9 @@ hig_workarea_add_control (GtkWidget   * table,
                           int           row,
                           GtkWidget   * control)
 {
+  if (GTK_IS_MISC(control))
+    gtk_misc_set_alignment (GTK_MISC(control), 0.0f, 0.5f);
+
   gtk_table_attach (GTK_TABLE(table), control,
                     3, 4, row, row+1,
                     GTK_EXPAND|GTK_SHRINK|GTK_FILL, 0, 0, 0);
@@ -163,4 +166,3 @@ hig_workarea_finish (GtkWidget   * table,
   gtk_widget_set_size_request (w, 0u, 6u);
   gtk_table_attach_defaults (GTK_TABLE(table), w, 0, 4, *row, *row+1);
 }
-
