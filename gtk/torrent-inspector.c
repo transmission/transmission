@@ -1018,7 +1018,7 @@ getdirtotals( GtkTreeStore * store, GtkTreeIter * parent )
     mysize = 0;
     if( gtk_tree_model_iter_children( model, &iter, parent ) ) do
     {
-        if( !gtk_tree_model_iter_has_child( model, &iter ) )
+        if( gtk_tree_model_iter_has_child( model, &iter ) )
         {
             subsize = getdirtotals( store, &iter );
             gtk_tree_store_set( store, &iter, FC_SIZE, subsize, -1 );

@@ -313,7 +313,7 @@ getdownloaddir( void )
     const char * dir = tr_prefs_get( PREF_ID_DIR );
     if (NULL == dir) {
       if (NULL == wd)
-        wd = g_get_current_dir(),
+        wd = g_get_current_dir();
       dir = wd;
     }
     return dir;
