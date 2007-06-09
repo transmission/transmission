@@ -66,6 +66,8 @@
 /* number of fatal signals required to cause an immediate exit */
 #define SIGCOUNT_MAX            3
 
+#if GTK_CHECK_VERSION(2,8,0)
+#define SHOW_LICENSE
 static const char * LICENSE = 
 "The Transmission binaries and source code are distributed under the MIT "
 "license. "
@@ -88,6 +90,7 @@ static const char * LICENSE =
 "CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, "
 "TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE "
 "SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
+#endif
 
 struct cbdata {
     GtkWindow    * wind;
@@ -124,6 +127,10 @@ enum
     ACT_ICON,
     ACTION_COUNT,
 };
+
+#if !GTK_CHECK_VERSION(2,8,0)
+#define GTK_STOCK_INFO NULL
+#endif
 
 struct
 {
@@ -963,8 +970,10 @@ about ( void )
                             NULL };
   g_snprintf (buf, sizeof(buf), _("%s (%d)"), VERSION_STRING, VERSION_REVISION);
   gtk_about_dialog_set_version (a, buf);
+#ifdef SHOW_LICENSE
   gtk_about_dialog_set_license (a, LICENSE);
   gtk_about_dialog_set_wrap_license (a, TRUE);
+#endif
   gtk_about_dialog_set_website (a, "http://transmission.m0k.org/");
   gtk_about_dialog_set_copyright (a, _("Copyright 2005-2007 The Transmission Project"));
   gtk_about_dialog_set_authors (a, authors);
