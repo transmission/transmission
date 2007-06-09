@@ -50,6 +50,7 @@
 #include "util.h"
 
 #include "transmission.h"
+#include "version.h"
 
 #include "img_icon_full.h"
 
@@ -64,6 +65,29 @@
 
 /* number of fatal signals required to cause an immediate exit */
 #define SIGCOUNT_MAX            3
+
+static const char * LICENSE = 
+"The Transmission binaries and source code are distributed under the MIT "
+"license. "
+"\n\n"
+"Permission is hereby granted, free of charge, to any person obtaining "
+"a copy of this software and associated documentation files (the "
+"'Software'), to deal in the Software without restriction, including "
+"without limitation the rights to use, copy, modify, merge, publish, "
+"distribute, sublicense, and/or sell copies of the Software, and to "
+"permit persons to whom the Software is furnished to do so, subject to "
+"the following conditions: "
+"\n\n"
+"The above copyright notice and this permission notice shall be included "
+"in all copies or substantial portions of the Software. "
+"\n\n"
+"THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, "
+"EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF "
+"MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. "
+"IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY "
+"CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, "
+"TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE "
+"SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 
 struct cbdata {
     GtkWindow    * wind;
@@ -91,6 +115,7 @@ enum
     ACT_SEPARATOR1,
     ACT_INFO,
     ACT_DEBUG,
+    ACT_ABOUT,
     ACT_SEPARATOR2,
     ACT_PREF,
     ACT_SEPARATOR3,
@@ -121,8 +146,10 @@ actions[] =
     { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
     { NULL,        GTK_STOCK_PROPERTIES,  0, ACTF_WHEREVER | ACTF_WHATEVER,
       N_("Show additional information about a torrent") },
-    { N_("Open debug window"), NULL,      0, ACTF_MENU     | ACTF_ALWAYS,
+    { N_("Open debug window"), GTK_STOCK_INFO,      0, ACTF_MENU     | ACTF_ALWAYS,
       NULL },
+    { NULL,        GTK_STOCK_ABOUT,      0, ACTF_MENU | ACTF_ALWAYS,
+      N_("About Transmission") },
     { NULL,        NULL,                  0, ACTF_SEPARATOR, NULL },
     { NULL,        GTK_STOCK_PREFERENCES, 0, ACTF_WHEREVER | ACTF_ALWAYS,
       N_("Customize application behavior") },
@@ -923,6 +950,30 @@ getselection( struct cbdata * cbdata )
 }
 
 static void
+about ( void )
+{
+  char buf[128];
+  GtkWidget * w = gtk_about_dialog_new ();
+  GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
+  const char *authors[] = { "Eric Petit (Back-end; OS X)",
+                            "Josh Elsasser (Back-end; GTK+)",
+                            "Mitchell Livingston (Back-end; OS X)",
+                            "Charles Kerr (Back-end; GTK+)",
+                            "Bryan Varner (BeOS)", 
+                            NULL };
+  g_snprintf (buf, sizeof(buf), _("%s (%d)"), VERSION_STRING, VERSION_REVISION);
+  gtk_about_dialog_set_version (a, buf);
+  gtk_about_dialog_set_license (a, LICENSE);
+  gtk_about_dialog_set_wrap_license (a, TRUE);
+  gtk_about_dialog_set_website (a, "http://transmission.m0k.org/");
+  gtk_about_dialog_set_copyright (a, _("Copyright 2005-2007 The Transmission Project"));
+  gtk_about_dialog_set_authors (a, authors);
+  gtk_about_dialog_set_translator_credits (a, _("translator-credits"));
+  g_signal_connect_swapped (w, "response", G_CALLBACK (gtk_widget_destroy), w);
+  gtk_widget_show_all (w);
+}
+
+static void
 handleaction( struct cbdata * data, int act )
 {
   GList *rows, *ii;
@@ -938,6 +989,9 @@ handleaction( struct cbdata * data, int act )
 
   switch( act )
   {
+      case ACT_ABOUT:
+          about ();
+          return;
       case ACT_OPEN:
           makeaddwind( data->wind, data->core );
           return;

@@ -246,7 +246,7 @@ static const char* peer_column_names[N_PEER_COLS] =
   N_("Port"),
   N_("Client"),
   N_("Progress"),
-  N_(""),
+  "",
   N_("Downloading"),
   N_("DL Rate"),
   N_("Uploading"),
@@ -271,10 +271,15 @@ peer_row_set (GtkTreeStore          * store,
               GtkTreeIter           * iter,
               const tr_peer_stat_t  * peer)
 {
+  const char * client = peer->client;
+
+  if (!client || !strcmp(client,"Unknown Client"))
+    client = "";
+
   gtk_tree_store_set (store, iter,
                       PEER_COL_ADDRESS, peer->addr,
                       PEER_COL_PORT, peer->port,
-                      PEER_COL_CLIENT, peer->client,
+                      PEER_COL_CLIENT, client,
                       PEER_COL_PROGRESS, (int)(100.0*peer->progress + 0.5),
                       PEER_COL_IS_CONNECTED, peer->isConnected,
                       PEER_COL_IS_DOWNLOADING, peer->isDownloading,
