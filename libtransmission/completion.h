@@ -54,17 +54,17 @@ void              tr_cpPieceRem( tr_completion_t *, int piece );
 /* Blocks */
 void              tr_cpDownloaderAdd( tr_completion_t *, int block );
 void              tr_cpDownloaderRem( tr_completion_t *, int block );
-int               tr_cpBlockIsComplete( tr_completion_t *, int block );
+int               tr_cpBlockIsComplete( const tr_completion_t *, int block );
 void              tr_cpBlockAdd( tr_completion_t *, int block );
 void              tr_cpBlockRem( tr_completion_t *, int block );
 tr_bitfield_t   * tr_cpBlockBitfield( tr_completion_t * );
 void              tr_cpBlockBitfieldSet( tr_completion_t *, tr_bitfield_t * );
 float             tr_cpPercentBlocksInPiece( tr_completion_t * cp, int piece );
 /* Missing = we don't have it and we are not getting it from any peer yet */
-static inline int tr_cpMissingBlocksForPiece( tr_completion_t * cp, int piece )
+static inline int tr_cpMissingBlocksForPiece( const tr_completion_t * cp, int piece )
 {
     return cp->missingBlocks[piece];
 }
-int               tr_cpMissingBlockInPiece( tr_completion_t *, int piece );
+int               tr_cpMissingBlockInPiece( const tr_completion_t *, int piece );
 int               tr_cpMostMissingBlockInPiece( tr_completion_t *, int piece,
                                                 int * downloaders );

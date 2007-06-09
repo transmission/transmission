@@ -75,7 +75,7 @@ tr_ratecontrol_t * tr_rcInit()
 {
     tr_ratecontrol_t * r;
 
-    r        = calloc( sizeof( tr_ratecontrol_t ), 1 );
+    r        = calloc( 1, sizeof( tr_ratecontrol_t ) );
     r->limit = -1;
     tr_lockInit( &r->lock );
 

@@ -169,16 +169,16 @@ static inline void tr_bitfieldRem( tr_bitfield_t * bitfield, int piece )
 }
 
 #define tr_blockPiece(a) _tr_blockPiece(tor,a)
-static inline int _tr_blockPiece( tr_torrent_t * tor, int block )
+static inline int _tr_blockPiece( const tr_torrent_t * tor, int block )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     return block / ( inf->pieceSize / tor->blockSize );
 }
 
 #define tr_blockSize(a) _tr_blockSize(tor,a)
-static inline int _tr_blockSize( tr_torrent_t * tor, int block )
+static inline int _tr_blockSize( const tr_torrent_t * tor, int block )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     int dummy;
 
     if( block != tor->blockCount - 1 ||
@@ -191,17 +191,17 @@ static inline int _tr_blockSize( tr_torrent_t * tor, int block )
 }
 
 #define tr_blockPosInPiece(a) _tr_blockPosInPiece(tor,a)
-static inline int _tr_blockPosInPiece( tr_torrent_t * tor, int block )
+static inline int _tr_blockPosInPiece( const tr_torrent_t * tor, int block )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     return tor->blockSize *
         ( block % ( inf->pieceSize / tor->blockSize ) );
 }
 
 #define tr_pieceCountBlocks(a) _tr_pieceCountBlocks(tor,a)
-static inline int _tr_pieceCountBlocks( tr_torrent_t * tor, int piece )
+static inline int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     if( piece < inf->pieceCount - 1 ||
         !( tor->blockCount % ( inf->pieceSize / tor->blockSize ) ) )
     {
@@ -211,16 +211,16 @@ static inline int _tr_pieceCountBlocks( tr_torrent_t * tor, int piece )
 }
 
 #define tr_pieceStartBlock(a) _tr_pieceStartBlock(tor,a)
-static inline int _tr_pieceStartBlock( tr_torrent_t * tor, int piece )
+static inline int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     return piece * ( inf->pieceSize / tor->blockSize );
 }
 
 #define tr_pieceSize(a) _tr_pieceSize(tor,a)
-static inline int _tr_pieceSize( tr_torrent_t * tor, int piece )
+static inline int _tr_pieceSize( const tr_torrent_t * tor, int piece )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     if( piece < inf->pieceCount - 1 ||
         !( inf->totalSize % inf->pieceSize ) )
     {
@@ -230,9 +230,9 @@ static inline int _tr_pieceSize( tr_torrent_t * tor, int piece )
 }
 
 #define tr_block(a,b) _tr_block(tor,a,b)
-static inline int _tr_block( tr_torrent_t * tor, int index, int begin )
+static inline int _tr_block( const tr_torrent_t * tor, int index, int begin )
 {
-    tr_info_t * inf = &tor->info;
+    const tr_info_t * inf = &tor->info;
     return index * ( inf->pieceSize / tor->blockSize ) +
         begin / tor->blockSize;
 }

@@ -39,7 +39,7 @@ void tr_fdInit();
  * Returns the file descriptor if successful, otherwise returns
  * one of the TR_ERROR_IO_*.
  **********************************************************************/
-int tr_fdFileOpen( char * folder, char * name, int write );
+int tr_fdFileOpen( const char * folder, const char * name, int write );
 
 /***********************************************************************
  * tr_fdFileRelease
@@ -55,7 +55,7 @@ void tr_fdFileRelease( int file );
  * If the file 'name' in directory 'folder' was open, closes it,
  * flushing data on disk.
  **********************************************************************/
-void tr_fdFileClose( char * folder, char * name );
+void tr_fdFileClose( const char * folder, const char * name );
 
 /***********************************************************************
  * Sockets

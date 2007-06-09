@@ -57,6 +57,6 @@ void        tr_peerSetOptimistic ( tr_peer_t *, int );
 int         tr_peerIsOptimistic  ( tr_peer_t * );
 void        tr_peerBlame         ( tr_peer_t *, int piece, int success );
 struct in_addr * tr_peerAddress  ( tr_peer_t * );
-int         tr_peerGetConnectable( tr_torrent_t *, uint8_t ** );
+int         tr_peerGetConnectable( const tr_torrent_t *, uint8_t ** );
 
 #endif

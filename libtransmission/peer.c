@@ -735,7 +735,7 @@ void tr_peerBlame( tr_peer_t * peer, int piece, int success )
     tr_bitfieldRem( peer->blamefield, piece );
 }
 
-int tr_peerGetConnectable( tr_torrent_t * tor, uint8_t ** _buf )
+int tr_peerGetConnectable( const tr_torrent_t * tor, uint8_t ** _buf )
 {
     int count = 0;
     uint8_t * buf;

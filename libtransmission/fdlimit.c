@@ -67,7 +67,7 @@ static tr_fd_t * gFd = NULL;
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int  OpenFile( int i, char * folder, char * name, int write );
+static int  OpenFile( int i, const char * folder, const char * name, int write );
 static void CloseFile( int i );
 
 
@@ -84,7 +84,7 @@ void tr_fdInit()
         return;
     }
 
-    gFd = calloc( sizeof( tr_fd_t ), 1 );
+    gFd = calloc( 1, sizeof( tr_fd_t ) );
 
     /* Init lock and cond */
     tr_lockInit( &gFd->lock );
@@ -125,7 +125,7 @@ void tr_fdInit()
 /***********************************************************************
  * tr_fdFileOpen
  **********************************************************************/
-int tr_fdFileOpen( char * folder, char * name, int write )
+int tr_fdFileOpen( const char * folder, const char * name, int write )
 {
     int i, winner, ret;
     uint64_t date;
@@ -241,7 +241,7 @@ void tr_fdFileRelease( int file )
 /***********************************************************************
  * tr_fdFileClose
  **********************************************************************/
-void tr_fdFileClose( char * folder, char * name )
+void tr_fdFileClose( const char * folder, const char * name )
 {
     int i;
 
@@ -410,11 +410,11 @@ void tr_fdClose()
  ***********************************************************************
  *
  **********************************************************************/
-static int OpenFile( int i, char * folder, char * name, int write )
+static int OpenFile( int i, const char * folder, const char * name, int write )
 {
     tr_openFile_t * file = &gFd->open[i];
     struct stat sb;
-    char * path;
+    char path[MAX_PATH_LENGTH];
     int ret;
 
     tr_dbg( "Opening %s in %s (%d)", name, folder, write );
@@ -425,7 +425,7 @@ static int OpenFile( int i, char * folder, char * name, int write )
         return TR_ERROR_IO_PARENT;
     }
 
-    asprintf( &path, "%s/%s", folder, name );
+    snprintf( path, sizeof(path), "%s/%s", folder, name );
 
     /* Create subfolders, if any */
     if( write )
@@ -442,7 +442,6 @@ static int OpenFile( int i, char * folder, char * name, int write )
                 {
                     ret = tr_ioErrorFromErrno();
                     tr_err( "Could not create folder '%s'", path );
-                    free( path );
                     return ret;
                 }
             }
@@ -451,7 +450,6 @@ static int OpenFile( int i, char * folder, char * name, int write )
                 if( !S_ISDIR( sb.st_mode ) )
                 {
                     tr_err( "Is not a folder: '%s'", path );
-                    free( path );
                     return TR_ERROR_IO_OTHER;
                 }
             }
@@ -465,11 +463,9 @@ static int OpenFile( int i, char * folder, char * name, int write )
     if( file->file < 0 )
     {
         ret = tr_ioErrorFromErrno();
-        free( path );
         tr_err( "Could not open %s in %s (%d, %d)", name, folder, write, ret );
         return ret;
     }
-    free( path );
 
     return TR_OK;
 }

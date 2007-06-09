@@ -56,7 +56,7 @@ tr_choking_t * tr_chokingInit( tr_handle_t * h )
 {
     tr_choking_t * c;
 
-    c        = calloc( sizeof( tr_choking_t ), 1 );
+    c        = calloc( 1, sizeof( tr_choking_t ) );
     c->h     = h;
     c->slots = 4242;
     tr_lockInit( &c->lock );
