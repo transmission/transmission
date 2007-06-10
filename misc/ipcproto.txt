@@ -120,6 +120,7 @@ the minimum protocol version that the key may be used with.
 Key:     "addfiles"
 Version: 1
 Format:  list of strings
+Replies: "succeeded", "failed", "not-supported", "info"
 Example: 8:addfilesl21:/torrents/foo.torrent20:/home/me/bar.torrente
          "addfiles", ("/torrents/foo.torrent", /home/me/bar.torrent")
 Details: Each string is the absolute path to a torrent metainfo file
@@ -127,11 +128,11 @@ Details: Each string is the absolute path to a torrent metainfo file
          metainfo file is copied (allowing the original to be moved or
          deleted safely) is implementation dependent and may not
          currently be known or changed with this protocol.
-Replies: succeeded, failed, info
 
 Key:     "addfile-detailed"
 Version: 2
 Format:  dict
+Replies: "succeeded", "failed", "not-supported", "info"
 Example: 16:addfile-detailedd4:file19:/tor/wooble.torrente
          "addfile-detailed", {"file": "/tor/wooble.torrent"}
 Details: Dictionary containing information about a torrent for the
@@ -145,23 +146,24 @@ Details: Dictionary containing information about a torrent for the
 Key:     "automap"
 Version: 2
 Format:  boolean
+Replies: "succeeded", "failed", "not-supported"
 Example: 7:automapi1e
          "automap", 1
-Details: Enable (1) or disable (0) automatic port mapping on the
-         server. Other integer values will likely be treated as 1 but
-         this shold not be relied upon.
+Details: Enable (1) or disable (0) automatic port mapping on the server.
 
 Key:     "autostart"
 Version: 2
 Format:  boolean
+Replies: "succeeded", "failed", "not-supported"
 Example: 9:autostarti0e
          "autostart", 0
 Details: Enable (1) or disable (0) automatic starting of new torrents
-         added via "addfiles" message.
+         added via "addfiles" or "addfiles-detailed" messages.
 
 Key:     "directory"
 Version: 2
 Format:  string
+Replies: "succeeded", "failed", "not-supported"
 Example: 9:directory21:/home/roger/downloads
          "directory", "/home/roger/downloads"
 Details: Set the default directory used for any torrents added in the future.
@@ -169,6 +171,7 @@ Details: Set the default directory used for any torrents added in the future.
 Key:     "downlimit"
 Version: 2
 Format:  int
+Replies: "succeeded", "failed", "not-supported"
 Example: 9:downlimiti100e
          "downlimit", 100
 Details: Set the server's download limit in kilobytes per second.
@@ -177,6 +180,7 @@ Details: Set the server's download limit in kilobytes per second.
 Key:     "failed"
 Version: 2
 Format:  string
+Replies: N/A
 Example: 6:failed17:permission denied
          "failed", "permission denied
 Details: Sent in response to a tagged message to indicate failure.
@@ -184,6 +188,7 @@ Details: Sent in response to a tagged message to indicate failure.
 Key:     "get-automap"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "automap"
 Example: 11:get-automap0:
          "get-automap", ""
 Details: Requests that an "automap" message be sent back.
@@ -191,6 +196,7 @@ Details: Requests that an "automap" message be sent back.
 Key:     "get-autostart"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "autostart"
 Example: 13:get-autostart0:
          "get-autostart", ""
 Details: Requests that an "autostart" message be sent back.
@@ -198,6 +204,7 @@ Details: Requests that an "autostart" message be sent back.
 Key:     "get-directory"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "directory"
 Example: 13:get-directory0:
          "get-directory", ""
 Details: Requests that an "directory" message be sent back.
@@ -205,6 +212,7 @@ Details: Requests that an "directory" message be sent back.
 Key:     "get-downlimit"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "downlimit"
 Example: 13:get-downlimit0:
          "get-downlimit", ""
 Details: Requests that a "downlimit" message be sent back.
@@ -212,6 +220,7 @@ Details: Requests that a "downlimit" message be sent back.
 Key:     "get-info"
 Version: 2
 Format:  dict with keys "id" and "type" for lists of ints and strings
+Replies: "failed", "not-supported", "info"
 Example: 8:get-infod2:idli4ei7ei2ee4:typel4:hash4:nameee
          "get-info", {"id": (4, 7, 2), "type": ("hash", "name")}
 Details: Requests that the server send back an "info" message with
@@ -225,6 +234,7 @@ Details: Requests that the server send back an "info" message with
 Key:     "get-info-all"
 Version: 2
 Format:  list of strings
+Replies: "failed", "not-supported", "info"
 Example: 12:get-info-alll4:hash4:namee
          "get-info-all", ("hash", "name")
 Details: Same as "getinfo" message with all torrent IDs specified.
@@ -232,6 +242,7 @@ Details: Same as "getinfo" message with all torrent IDs specified.
 Key:     "get-pex"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "pex"
 Example: 7:get-pex0:
          "get-pex", ""
 Details: Requests that a "pex" message be sent back.
@@ -239,6 +250,7 @@ Details: Requests that a "pex" message be sent back.
 Key:     "get-port"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "port"
 Example: 8:get-port0:
          "get-port", ""
 Details: Requests that a "port" message be sent back.
@@ -246,6 +258,7 @@ Details: Requests that a "port" message be sent back.
 Key:     "get-status"
 Version: 2
 Format:  dict with keys "id" and "type" for lists of ints and strings
+Replies: "failed", "not-supported", "status"
 Example: 10:get-statusd2:idli4ei7ei2ee4:typel5:state9:completedee
          "get-status", {"id": (4, 7, 4), "type": ("state", "completed")}
 Details: Same as "get-info" message except status type strings are used
@@ -254,6 +267,7 @@ Details: Same as "get-info" message except status type strings are used
 Key:     "get-status-all"
 Version: 2
 Format:  list of strings
+Replies: "failed", "not-supported", "status"
 Example: 14:get-status-alll5:state9:completede
          "get-status-all", ("state", "completed")
 Details: Same as "get-status" message with all torrent IDs specified.
@@ -261,6 +275,7 @@ Details: Same as "get-status" message with all torrent IDs specified.
 Key:     "get-supported"
 Version: 2
 Format:  list of strings
+Replies: "failed", "not-supported", "supported"
 Example: 13:get-supportedl6:lookup8:get-port16:addfile-detailede
          "get-supported", ("lookup", "get-port", "addfile-detailed")
 Details: Request that a "supported" message be returned with whichever
@@ -269,6 +284,7 @@ Details: Request that a "supported" message be returned with whichever
 Key:     "get-uplimit"
 Version: 2
 Format:  value is ignored
+Replies: "failed", "not-supported", "uplimit"
 Example: 11:get-uplimit0:
          "get-uplimit", ""
 Details: Requests that an "uplimit" message be sent back.
@@ -276,6 +292,7 @@ Details: Requests that an "uplimit" message be sent back.
 Key:     "lookup"
 Version: 2
 Format:  list of strings
+Replies: "failed", "not-supported", "info"
 Example: 6:lookupl40:0f16ea6965ee5133ea4dbb1e7f516e9fcf3d899ee
          "lookup", ("0f16ea6965ee5133ea4dbb1e7f516e9fcf3d899e")
 Details: Request that the server send back an "info" message with "id"
@@ -284,6 +301,7 @@ Details: Request that the server send back an "info" message with "id"
 Key:     "info"
 Version: 2
 Format:  list of dictionaries
+Replies: N/A
 Example: 4:infold2:idi3e4:name3:fooed2:idi9e4:name3:baree
          "info", ({"id": 4, "name": "foo"}, {"id": 9, "name": "bar"})
 Details: A list containing information for several torrents. The
@@ -294,6 +312,7 @@ Details: A list containing information for several torrents. The
 Key:     "noop"
 Version: 2
 Format:  value is ignored
+Replies: "succeeded", "failed", "not-supported"
 Example: 4:noop0:
          "noop", ""
 Details: This does nothing but keep the connection alive. With a tag
@@ -302,6 +321,7 @@ Details: This does nothing but keep the connection alive. With a tag
 Key:     "not-supported"
 Version: 2
 Format:  value is ignored
+Replies: N/A
 Example: 13:not-supported0:
          "not-supported", ""
 Details: Sent in response to a tagged message to indicated that the
@@ -310,6 +330,7 @@ Details: Sent in response to a tagged message to indicated that the
 Key:     "pex"
 Version: 2
 Format:  boolean
+Replies: "succeeded", "failed", "not-supported"
 Example: 3:pexi0e
          "pex", 0
 Details: Enables or disables peer exchange.
@@ -317,6 +338,7 @@ Details: Enables or disables peer exchange.
 Key:     "port"
 Version: 2
 Format:  int between 0 and 65535
+Replies: "succeeded", "failed", "not-supported"
 Example: 4:porti9090e
          "port", 9090
 Details: Change the port the server uses to listen for incoming peer
@@ -325,13 +347,16 @@ Details: Change the port the server uses to listen for incoming peer
 Key:     "quit"
 Version: 1
 Format:  value is ignored
+Replies: "succeeded", "failed", "not-supported"
 Example: 4:quit0:
          "quit", ""
-Details: Cause the server to quit.
+Details: Cause the server to quit. Note that the connection might be
+         closed without a response being sent.
 
 Key:     "remove"
 Version: 2
 Format:  list of torrent ID ints
+Replies: "succeeded", "failed", "not-supported"
 Example: 5:removeli3ei8ei6ee
          "remove", (3, 8, 6)
 Details: Stop and remove the specified torrents. Note that whether or
@@ -343,6 +368,7 @@ Details: Stop and remove the specified torrents. Note that whether or
 Key:     "remove-all"
 Version: 2
 Format:  value is ignored
+Replies: "succeeded", "failed", "not-supported"
 Example: 10:remove-all0:
          "remove-all", ""
 Details: Like "remove" with all torrent IDs specified.
@@ -350,6 +376,7 @@ Details: Like "remove" with all torrent IDs specified.
 Key:     "start"
 Version: 2
 Format:  list of torrent ID ints
+Replies: "succeeded", "failed", "not-supported"
 Example: 5:startli3ei8ei6ee
          "start", (3, 8, 6)
 Details: List of torrent IDs to start.
@@ -357,6 +384,7 @@ Details: List of torrent IDs to start.
 Key:     "start-all"
 Version: 2
 Format:  value is ignored
+Replies: "succeeded", "failed", "not-supported"
 Example: 9:start-all0:
          "start-all", ""
 Details: Start all torrents.
@@ -364,6 +392,7 @@ Details: Start all torrents.
 Key:     "status"
 Version: 2
 Format:  list of dictionaries
+Replies: N/A
 Example: 4:infold2:idi3e5:state7:seedinged2:idi9e5:state6:pausedee
          "info", ({"id": 3, "state": "seeding"}, {"id": 9, "state" : "paused"})
 Details: Same as "info" message except status type keys are used.
@@ -371,6 +400,7 @@ Details: Same as "info" message except status type keys are used.
 Key:     "stop"
 Version: 2
 Format:  list of torrent ID ints
+Replies: "succeeded", "failed", "not-supported"
 Example: 4:stopli3ei8ei6ee
          "stop", (3, 8, 6)
 Details: List of torrent IDs to stop.
@@ -378,6 +408,7 @@ Details: List of torrent IDs to stop.
 Key:     "stop-all"
 Version: 2
 Format:  value is ignored
+Replies: "succeeded", "failed", "not-supported"
 Example: 8:stop-all0:
          "stop-all", ""
 Details: Stop all torrents.
@@ -385,6 +416,7 @@ Details: Stop all torrents.
 Key:     "succeeded"
 Version: 2
 Format:  value is ignored
+Replies: N/A
 Example: 8:succeeded0:
          "succeeded", ""
 Details: This is used to indicate that a tagged message was processed
@@ -393,6 +425,7 @@ Details: This is used to indicate that a tagged message was processed
 Key:     "supported"
 Version: 2
 Format:  list of strings
+Replies: N/A
 Example: 9:supportedl8:get-port6:lookupe
          "supported", ("get-port", "lookup")
 Details: Sent in response to a "get-supported" message, indicates that
@@ -401,6 +434,7 @@ Details: Sent in response to a "get-supported" message, indicates that
 Key:     "uplimit"
 Version: 2
 Format:  int
+Replies: "succeeded", "failed", "not-supported"
 Example: 7:uplimiti20e
          "uplimit", 20
 Details: Set the server's upload limit in kilobytes per second.
