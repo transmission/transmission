@@ -1251,7 +1251,7 @@ soapRequest( int retry, const char * host, int port, const char * path,
 "    xmlns:s=\"" SOAP_ENVELOPE "\""
 "    s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
 "  <s:Body>"
-"    <u:%s xmlns:u=\%s\">", action->name, type );
+"    <u:%s xmlns:u=\"%s\">", action->name, type );
 
         va_start( ap, action );
         do
