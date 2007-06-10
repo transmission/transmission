@@ -848,29 +848,14 @@ devicePulse( tr_upnp_device_t * dev, int port )
 static tr_http_t *
 makeHttp( int method, const char * host, int port, const char * path )
 {
-    tr_http_t  * ret;
-#ifdef VERBOSE_LOG
-    const char * body;
-    int          len;
-#endif
-
     if( tr_httpIsUrl( path, -1 ) )
     {
-        ret = tr_httpClientUrl( method, "%s", path );
+        return tr_httpClientUrl( method, "%s", path );
     }
     else
     {
-        ret = tr_httpClient( method, host, port, "%s", path );
+        return tr_httpClient( method, host, port, "%s", path );
     }
-
-#ifdef VERBOSE_LOG
-    tr_httpGetRequest( ret, &body, &len );
-    fprintf( vlog, "send http message, %i bytes:\n", len );
-    fwrite( body, 1, len, vlog );
-    fputs( "\n\n", vlog );
-#endif
-
-    return ret;
 }
 
 static tr_http_t *
@@ -879,6 +864,10 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
     tr_http_t  * ret;
     char         numstr[6];
     const char * type;
+#ifdef VERBOSE_LOG
+    const char * body;
+    int          len;
+#endif
 
     ret = NULL;
     switch( dev->state ) 
@@ -939,6 +928,19 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
             assert( 0 );
             break;
     }
+
+#ifdef VERBOSE_LOG
+    if( NULL != ret )
+    {
+        tr_httpGetHeaders( ret, &body, &len );
+        fprintf( vlog, "send http message, %i bytes (headers):\n", len );
+        fwrite( body, 1, len, vlog );
+        tr_httpGetBody( ret, &body, &len );
+        fprintf( vlog, "\n\nsend http message, %i bytes (body):\n", len );
+        fwrite( body, 1, len, vlog );
+        fputs( "\n\n", vlog );
+    }
+#endif
 
     return ret;
 }

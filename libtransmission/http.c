@@ -531,7 +531,14 @@ tr_httpAddBody( tr_http_t * http , const char * fmt , ... )
 }
 
 void
-tr_httpGetRequest( tr_http_t * http, const char ** buf, int * len )
+tr_httpGetHeaders( tr_http_t * http, const char ** buf, int * len )
+{
+    *buf = http->header.buf;
+    *len = http->header.used;
+}
+
+void
+tr_httpGetBody( tr_http_t * http, const char ** buf, int * len )
 {
     *buf = http->body.buf;
     *len = http->body.used;
