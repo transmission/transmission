@@ -107,6 +107,8 @@ smsg_addone( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_quit( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
+smsg_noop( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
 smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
@@ -125,6 +127,8 @@ static void
 smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
+static void
+smsg_sup( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static void
 all_default( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg );
 static gboolean
@@ -167,6 +171,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETSTATALL,   smsg_infoall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_GETUPLIMIT,   smsg_pref ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_LOOKUP,       smsg_look ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_NOOP,         smsg_noop ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_PEX,          smsg_int ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_PORT,         smsg_int ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_QUIT,         smsg_quit ) ||
@@ -176,6 +181,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_STARTALL,     smsg_torall ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STOP,         smsg_tor ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_STOPALL,      smsg_torall ) ||
+      0 > ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
@@ -553,7 +559,7 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -586,7 +592,7 @@ smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
 
     if( NULL == val || TYPE_DICT != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -600,7 +606,7 @@ smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
         ( NULL != dir   && TYPE_STR != dir->type   ) ||
         ( NULL != start && TYPE_INT != start->type ) )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -648,6 +654,13 @@ smsg_quit( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag SHUTUP,
 }
 
 static void
+smsg_noop( enum ipc_msg id SHUTUP, benc_val_t * val SHUTUP, int64_t tag,
+           void * arg )
+{
+    simpleresp( arg, tag, IPC_MSG_OK );
+}
+
+static void
 smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 {
     struct constate      * con = arg;
@@ -661,7 +674,7 @@ smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_DICT != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -671,7 +684,7 @@ smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     if( NULL == ids   || TYPE_LIST != ids->type ||
         NULL == types || TYPE_LIST != types->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
     typeflags = ipc_infotypes( respid, types );
@@ -727,7 +740,7 @@ smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -805,7 +818,7 @@ smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -858,7 +871,7 @@ smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -1008,7 +1021,7 @@ smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_INT != val->type || INT_MAX < val->val.i )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -1018,7 +1031,7 @@ smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
             tr_core_set_pref_bool( srv->core, PREF_ID_NAT, val->val.i );
             break;
         case IPC_MSG_AUTOSTART:
-            simpleresp( con, tag, IPC_MSG_NOTSUP );
+            simpleresp( con, tag, IPC_MSG_BAD );
             return;
         case IPC_MSG_DOWNLIMIT:
             if( 0 > val->val.i )
@@ -1066,7 +1079,7 @@ smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_STR != val->type )
     {
-        simpleresp( con, tag, IPC_MSG_NOTSUP );
+        simpleresp( con, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -1082,16 +1095,71 @@ smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 }
 
 static void
+smsg_sup( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
+{
+    struct constate      * con = arg;
+    benc_val_t             packet, * pkval, * name;
+    int                    ii;
+    enum ipc_msg           found;
+    uint8_t              * buf;
+    size_t                 size;
+
+    if( NULL == val || TYPE_LIST != val->type )
+    {
+        simpleresp( con, tag, IPC_MSG_BAD );
+        return;
+    }
+
+    pkval = ipc_initval( &con->ipc, IPC_MSG_SUP, tag, &packet, TYPE_LIST );
+    if( NULL == pkval )
+    {
+        simpleresp( con, tag, IPC_MSG_FAIL );
+        return;
+    }
+    if( tr_bencListReserve( pkval, val->val.l.count ) )
+    {
+        tr_bencFree( &packet );
+        simpleresp( con, tag, IPC_MSG_FAIL );
+        return;
+    }
+
+    for( ii = 0; val->val.l.count > ii; ii++ )
+    {
+        name = &val->val.l.vals[ii];
+        if( NULL == name || TYPE_STR != name->type )
+        {
+            continue;
+        }
+        found = ipc_msgid( &con->ipc, name->val.s.s );
+        if( IPC__MSG_COUNT == found || !ipc_ishandled( &con->ipc, found ) )
+        {
+            continue;
+        }
+        tr_bencInitStr( tr_bencListAdd( pkval ),
+                        name->val.s.s, name->val.s.i, 1 );
+    }
+
+    buf = ipc_mkval( &packet, &size );
+    tr_bencFree( &packet );
+    if( NULL == buf )
+    {
+        simpleresp( con, tag, IPC_MSG_FAIL );
+    }
+    else
+    {
+        io_send_keepdata( con->source, buf, size );
+    }
+}
+
+static void
 all_default( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
 {
     switch( id )
     {
         case IPC_MSG_FAIL:
         case IPC_MSG_NOTSUP:
+        case IPC_MSG_BAD:
         case IPC_MSG_OK:
-            break;
-        case IPC_MSG_NOOP:
-            simpleresp( arg, tag, IPC_MSG_OK );
             break;
         default:
             simpleresp( arg, tag, IPC_MSG_NOTSUP );
