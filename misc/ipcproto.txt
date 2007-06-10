@@ -6,18 +6,27 @@ Dictionary keys used below will be enclosed in quotation marks, these
 are used for clarity and are not part of the actual key.
 
 The IPC protocol is used to allow processes to control or retrieve
-information from a Transmission frontend, such as transmission-daemon
-or transmission-gtk. This communication is done over a unix-domain
-socket file, such as ~/.transmission/daemon/socket. In this document
-the Transmission frontend will be referred to as the server and the
-process connecting to it as the client.
+information from Transmission frontend, such as transmission-daemon,
+transmission-gtk or the MacOS X frontend. This communication is done
+over a unix-domain socket file such as
+~/.transmission/daemon/socket. In this document the Transmission
+frontend will be referred to as the server and the process connecting
+to it as the client.
 
 Once a client connects to the server's socket, messages may be
 exchanged until either end closes the connection. Messages contain an
 32-bit payload length, encoded as 8 bytes of ASCII hexidecimal,
 followed by the payload. Upper, lower, or mixed case for the length
 are all accpetable and must be handled correctly. Payload lengths
-greater than 2^31 - 8 (ie: 2147483640) are not allowed.
+greater than 2^31 - 8 (ie: 2147483640 decimal, 7FFFFFF8 hex) are not
+allowed.
+
+Bencoded messages will additionally be shown in the following format
+for better readability:
+str  - "this is a string"
+num  - 38795
+list - ("wheeee", 435, "writing docs is boring")
+dict - {"name": "Josh", "beverage": "coffee", "quantity": "too damn much" }
 
 For version 1, the message payload is a bencoded dictionary, the
 valid keys and value formats for which are described below. Multiple
@@ -26,6 +35,7 @@ keys may be used in one message.
 An example version 1 message:
 
 0000000Ed4:porti9090ee
+        {"port": 9090}
 
 For version 2 the message payload is a bencoded list containing a
 message id string followed by a bencoded value, the format of which is
@@ -36,10 +46,12 @@ detail below.
 An example version 2 message:
 
 0000001El12:get-info-alll4:hashee
+        ("get-info-all", ("hash"))
 
 The same message with a tag:
 
 00000021l12:get-info-alll4:hashei5ee
+        ("get-info-all", ("hash"), 5)
 
 Once the connection is made both the client and server must send a
 version 1 style message (ie: the payload is a dictionary and may not
@@ -63,6 +75,7 @@ the only version supported by the server.
 An example message containing minimum and maximum versions 1 and 2:
 
 0000001Dd7:versiond3:mini1e3:maxi2eee
+        {"version": {"min": 1, "max": 2}}
 
 Tagged messages, only supported in version 2, allow a client to tag a
 message with a positive non-zero integer. The server is then required
@@ -78,7 +91,9 @@ message will be sent back.
 An example tagged message and response:
 
 00000010l5:startli8eei15ee
+        ("start", (8), 15)
 00000011l8:succeeded0:i15ee
+        ("succeeded", "", 15)
 
 Some example sessions, including version handshake, are found at the
 end of this file.
@@ -106,6 +121,7 @@ Key:     "addfiles"
 Version: 1
 Format:  list of strings
 Example: 8:addfilesl21:/torrents/foo.torrent20:/home/me/bar.torrente
+         "addfiles", ("/torrents/foo.torrent", /home/me/bar.torrent")
 Details: Each string is the absolute path to a torrent metainfo file
          for the server to add. Note that whether or not the torrent
          metainfo file is copied (allowing the original to be moved or
@@ -115,7 +131,8 @@ Details: Each string is the absolute path to a torrent metainfo file
 Key:     "addfile-detailed"
 Version: 2
 Format:  dict
-Example: 16:addfile-detailedde
+Example: 16:addfile-detailedd4:file19:/tor/wooble.torrente
+         "addfile-detailed", {"file": "/tor/wooble.torrent"}
 Details: Dictionary containing information about a torrent for the
          server to add. Valid keys include:
            "file"       string, filename of torrent metainfo file
@@ -128,6 +145,7 @@ Key:     "automap"
 Version: 2
 Format:  boolean
 Example: 7:automapi1e
+         "automap", 1
 Details: Enable (1) or disable (0) automatic port mapping on the
          server. Other integer values will likely be treated as 1 but
          this shold not be relied upon.
@@ -136,6 +154,7 @@ Key:     "autostart"
 Version: 2
 Format:  boolean
 Example: 9:autostarti0e
+         "autostart", 0
 Details: Enable (1) or disable (0) automatic starting of new torrents
          added via "addfiles" message.
 
@@ -143,12 +162,14 @@ Key:     "directory"
 Version: 2
 Format:  string
 Example: 9:directory21:/home/roger/downloads
+         "directory", "/home/roger/downloads"
 Details: Set the default directory used for any torrents added in the future.
 
 Key:     "downlimit"
 Version: 2
 Format:  int
 Example: 9:downlimiti100e
+         "downlimit", 100
 Details: Set the server's download limit in kilobytes per second.
          Negative values are interpreted as no limit.
 
@@ -156,36 +177,42 @@ Key:     "failed"
 Version: 2
 Format:  string
 Example: 6:failed17:permission denied
+         "failed", "permission denied
 Details: Sent in response to a tagged message to indicate failure.
 
 Key:     "get-automap"
 Version: 2
 Format:  value is ignored
 Example: 11:get-automap0:
+         "get-automap", ""
 Details: Requests that an "automap" message be sent back.
 
 Key:     "get-autostart"
 Version: 2
 Format:  value is ignored
 Example: 13:get-autostart0:
+         "get-autostart", ""
 Details: Requests that an "autostart" message be sent back.
 
 Key:     "get-directory"
 Version: 2
 Format:  value is ignored
-Example: 13:get-directory
+Example: 13:get-directory0:
+         "get-directory", ""
 Details: Requests that an "directory" message be sent back.
 
 Key:     "get-downlimit"
 Version: 2
 Format:  value is ignored
 Example: 13:get-downlimit0:
+         "get-downlimit", ""
 Details: Requests that a "downlimit" message be sent back.
 
 Key:     "get-info"
 Version: 2
 Format:  dict with keys "id" and "type" for lists of ints and strings
 Example: 8:get-infod2:idli4ei7ei2ee4:typel4:hash4:nameee
+         "get-info", {"id": (4, 7, 2), "type": ("hash", "name")}
 Details: Requests that the server send back an "info" message with
          info on all the torrent IDs in "id". The "type" key requests
          what info will be returned. See below for valid values to use
@@ -198,37 +225,43 @@ Key:     "get-info-all"
 Version: 2
 Format:  list of strings
 Example: 12:get-info-alll4:hash4:namee
+         "get-info-all", ("hash", "name")
 Details: Same as "getinfo" message with all torrent IDs specified.
 
 Key:     "get-pex"
 Version: 2
 Format:  value is ignored
 Example: 7:get-pex0:
+         "get-pex", ""
 Details: Requests that a "pex" message be sent back.
 
 Key:     "get-port"
 Version: 2
 Format:  value is ignored
 Example: 8:get-port0:
+         "get-port", ""
 Details: Requests that a "port" message be sent back.
 
 Key:     "get-status"
 Version: 2
 Format:  dict with keys "id" and "type" for lists of ints and strings
-Example: 10:get-statusd2:idli4ei7ei2ee4:typel4:hash4:nameee
+Example: 10:get-statusd2:idli4ei7ei2ee4:typel5:state9:completedee
+         "get-status", {"id": (4, 7, 4), "type": ("state", "completed")}
 Details: Same as "get-info" message except status type strings are used
          instead and the server sends back a "status" message.
 
 Key:     "get-status-all"
 Version: 2
 Format:  list of strings
-Example: 14:get-status-alll4:hash4:namee
+Example: 14:get-status-alll5:state9:completede
+         "get-status-all", ("state", "completed")
 Details: Same as "get-status" message with all torrent IDs specified.
 
 Key:     "get-supported"
 Version: 2
 Format:  list of strings
-Example: 13:get-supportedl6:lookup8:get-porte
+Example: 13:get-supportedl6:lookup8:get-port16:addfile-detailede
+         "get-supported", ("lookup", "get-port", "addfile-detailed")
 Details: Request that a "supported" message be returned with whichever
          of the given message keys are supported.
 
@@ -236,12 +269,14 @@ Key:     "get-uplimit"
 Version: 2
 Format:  value is ignored
 Example: 11:get-uplimit0:
+         "get-uplimit", ""
 Details: Requests that an "uplimit" message be sent back.
 
 Key:     "lookup"
 Version: 2
 Format:  list of strings
 Example: 6:lookupl40:0f16ea6965ee5133ea4dbb1e7f516e9fcf3d899ee
+         "lookup", ("0f16ea6965ee5133ea4dbb1e7f516e9fcf3d899e")
 Details: Request that the server send back an "info" message with "id"
          and "hash" keys for any torrents with the given hashes.
 
@@ -249,6 +284,7 @@ Key:     "info"
 Version: 2
 Format:  list of dictionaries
 Example: 4:infold2:idi3e4:name3:fooed2:idi9e4:name3:baree
+         "info", ({"id": 4, "name": "foo"}, {"id": 9, "name": "bar"})
 Details: A list containing information for several torrents. The
          dictionaries always contain at least an "id" key with the
          integer ID for the torrent, other possible values are listed
@@ -258,6 +294,7 @@ Key:     "noop"
 Version: 2
 Format:  value is ignored
 Example: 4:noop0:
+         "noop", ""
 Details: This does nothing but keep the connection alive. With a tag
          it may be used as a ping.
 
@@ -265,6 +302,7 @@ Key:     "not-supported"
 Version: 2
 Format:  value is ignored
 Example: 13:not-supported0:
+         "not-supported", ""
 Details: Sent in response to a tagged message to indicated that the
          message was not supported.
 
@@ -272,12 +310,14 @@ Key:     "pex"
 Version: 2
 Format:  boolean
 Example: 3:pexi0e
+         "pex", 0
 Details: Enables or disables peer exchange.
 
 Key:     "port"
 Version: 2
 Format:  int between 0 and 65535
 Example: 4:porti9090e
+         "port", 9090
 Details: Change the port the server uses to listen for incoming peer
          connections.
 
@@ -285,12 +325,14 @@ Key:     "quit"
 Version: 1
 Format:  value is ignored
 Example: 4:quit0:
+         "quit", ""
 Details: Cause the server to quit.
 
 Key:     "remove"
 Version: 2
 Format:  list of torrent ID ints
 Example: 5:removeli3ei8ei6ee
+         "remove", (3, 8, 6)
 Details: Stop and remove the specified torrents. Note that whether or
          not the downloaded data or the original torrent files will be
          removed is implementation dependent and may not currently be
@@ -301,49 +343,57 @@ Key:     "remove-all"
 Version: 2
 Format:  value is ignored
 Example: 10:remove-all0:
+         "remove-all", ""
 Details: Like "remove" with all torrent IDs specified.
 
 Key:     "start"
 Version: 2
 Format:  list of torrent ID ints
 Example: 5:startli3ei8ei6ee
+         "start", (3, 8, 6)
 Details: List of torrent IDs to start.
 
 Key:     "start-all"
 Version: 2
 Format:  value is ignored
 Example: 9:start-all0:
+         "start-all", ""
 Details: Start all torrents.
 
 Key:     "status"
 Version: 2
 Format:  list of dictionaries
-Example: 4:infold2:idi3e4:name3:fooed2:idi9e4:name3:baree
+Example: 4:infold2:idi3e5:state7:seedinged2:idi9e5:state6:pausedee
+         "info", ({"id": 3, "state": "seeding"}, {"id": 9, "state" : "paused"})
 Details: Same as "info" message except status type keys are used.
 
 Key:     "stop"
 Version: 2
 Format:  list of torrent ID ints
 Example: 4:stopli3ei8ei6ee
+         "stop", (3, 8, 6)
 Details: List of torrent IDs to stop.
 
 Key:     "stop-all"
 Version: 2
 Format:  value is ignored
 Example: 8:stop-all0:
+         "stop-all", ""
 Details: Stop all torrents.
 
 Key:     "succeeded"
 Version: 2
 Format:  value is ignored
 Example: 8:succeeded0:
+         "succeeded", ""
 Details: This is used to indicate that a tagged message was processed
          successfully.
 
 Key:     "supported"
 Version: 2
 Format:  list of strings
-Example: 9:supportedl6:lookupe
+Example: 9:supportedl8:get-port6:lookupe
+         "supported", ("get-port", "lookup")
 Details: Sent in response to a "get-supported" message, indicates that
          the given messages ate supported.
 
@@ -351,6 +401,7 @@ Key:     "uplimit"
 Version: 2
 Format:  int
 Example: 7:uplimiti20e
+         "uplimit", 20
 Details: Set the server's upload limit in kilobytes per second.
          Negative values are interpreted as no limit.
 
@@ -433,24 +484,50 @@ server to client with <<<. These prefixes and newlines are added for
 clarity, they are not actually sent over the socket.
 
 Quit the server. Note that this is a version 1 client and so version 1
-messages are used. The value for the quit message here is i0e instead
-of 0: as used above, however since it it unused any value is allowed.
+messages are used.
 >>> 0000001Dd7:versiond3:mini1e3:maxi1eee
+            {"version", {"min": 1, "max": 1"}}
 <<< 0000001Dd7:versiond3:mini1e3:maxi2eee
->>> 0000000Bd4:quiti0ee
+            {"version", {"min": 1, "max": 2"}}
+>>> 0000000Bd4:quit0:e
+            {"quit", ""}
 
 Pause all torrents and disable automapping. Note the server happens to
-have sendt it's version before the client.
+have sent it's version before the client. The value for the stop-all
+message here is 5:fnord instead of 0: as used above, since the value
+is unused anything is allowed.
 <<< 0000001Dd7:versiond3:mini1e3:maxi2eee
+            {"version", {"min": 1, "max": 2"}}
 >>> 0000001Dd7:versiond3:mini1e3:maxi2eee
->>> 0000000El8:stop-all0:e
+            {"version", {"min": 1, "max": 2"}}
+>>> 0000000El8:stop-all5:fnorde
+            ("stop-all", "fnord")
 
-Change upload and download limits with tagged responses. Note that the
-server is allowed to return responses out of order, even when the
-messages are not tagged.
+Change upload and download limits with tagged responses.
 >>> 0000001Dd7:versiond3:mini1e3:maxi2eee
+            {"version", {"min": 1, "max": 2"}}
 <<< 0000001Dd7:versiond3:mini1e3:maxi2eee
->>> 00000017l9:downlimiti100ei100el
->>> 00000017l9:downlimiti100ei101el
-<<< 00000014l8:succeeded0:i101el
-<<< 00000014l8:succeeded0:i100el
+            {"version", {"min": 1, "max": 2"}}
+>>> 00000017l9:downlimiti100ei47el
+            ("downlimit", 100, 47)
+>>> 00000017l9:uplimiti20ei48ee
+            ("uplimit", 20, 48)
+<<< 00000014l8:succeeded0:i47ee
+            ("succeeded", "", 47)
+<<< 00000014l8:succeeded0:i48ee
+            (succeeded"", "", 48)
+
+Retrieve the upload and download limits. Note that the server has
+returned the responses in a different order than the requests were
+sent. The server is allowed to do this, a client should use tags if
+this is a concern.
+>>> 0000001Dd7:versiond3:mini1e3:maxi2eee
+            {"version", {"min": 1, "max": 2"}}
+<<< 0000001Dd7:versiond3:mini1e3:maxi2eee
+            {"version", {"min": 1, "max": 2"}}
+>>> 00000015l13:get-downlimiti0ee00000013l13:get-uplimiti0ee
+            ("get-downlimit", 0)
+            ("get-uplimit", 0)
+<<< 0000000Fl9:uplimiti20ee00000012l9:downlimiti100ee
+            ("uplimit", 20)
+            ("downlimit", 100)
