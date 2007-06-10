@@ -62,7 +62,7 @@ static void noop     ( struct bufferevent *, void * );
 static void byebye   ( struct bufferevent *, short, void * );
 static void doread   ( struct bufferevent *, void * );
 static int  queuemsg ( struct client *, uint8_t *, size_t );
-static void msgresp  ( struct client *, int64_t, enum ipc_msg );
+static int  msgresp  ( struct client *, int64_t, enum ipc_msg );
 static void defmsg   ( enum ipc_msg, benc_val_t *, int64_t, void * );
 static void noopmsg  ( enum ipc_msg, benc_val_t *, int64_t, void * );
 static void addmsg1  ( enum ipc_msg, benc_val_t *, int64_t, void * );
@@ -388,20 +388,23 @@ queuemsg( struct client * client, uint8_t * buf, size_t buflen )
     return 0;
 }
 
-void
+int
 msgresp( struct client * client, int64_t tag, enum ipc_msg id )
 {
     uint8_t * buf;
     size_t    buflen;
+    int       ret;
 
     if( 0 >= tag )
     {
-        return;
+        return 0;
     }
 
     buf = ipc_mkempty( &client->ipc, &buflen, id, tag );
-    queuemsg( client, buf, buflen );
+    ret = queuemsg( client, buf, buflen );
     free( buf );
+
+    return ret;
 }
 
 void
@@ -434,7 +437,7 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -487,7 +490,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
 
     if( NULL == dict || TYPE_DICT != dict->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -508,7 +511,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
         val = tr_bencDictFind( dict, "file" );
         if( NULL == val || TYPE_STR != val->type )
         {
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             return;
         }
         /* XXX detect duplicates and return a message indicating so */
@@ -567,7 +570,7 @@ intmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_INT != val->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -607,7 +610,7 @@ strmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_STR != val->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -672,7 +675,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     {
         if( NULL == val || TYPE_LIST != val->type )
         {
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
             return;
         }
@@ -694,7 +697,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     {
         if( NULL == val || TYPE_DICT != val->type )
         {
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
             return;
         }
@@ -703,7 +706,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
         if( NULL == typelist || TYPE_LIST != typelist->type ||
             NULL == idlist   || TYPE_LIST != idlist->type )
         {
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             tr_bencFree( &pk );
             return;
         }
@@ -813,7 +816,7 @@ tormsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     {
         if( NULL == val || TYPE_LIST != val->type )
         {
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             return;
         }
         for( ii = 0; val->val.l.count > ii; ii++ )
@@ -843,7 +846,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -862,7 +865,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
             SHA_DIGEST_LENGTH * 2 != hash->val.s.i )
         {
             tr_bencFree( &pk );
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             return;
         }
         found = torrent_lookup( ( uint8_t * )hash->val.s.s );
@@ -945,7 +948,7 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     if( NULL == val || TYPE_LIST != val->type )
     {
-        msgresp( client, tag, IPC_MSG_NOTSUP );
+        msgresp( client, tag, IPC_MSG_BAD );
         return;
     }
 
@@ -971,11 +974,11 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         if( NULL == name || TYPE_STR != name->type )
         {
             tr_bencFree( &pk );
-            msgresp( client, tag, IPC_MSG_NOTSUP );
+            msgresp( client, tag, IPC_MSG_BAD );
             return;
         }
         found = ipc_msgid( &client->ipc, name->val.s.s );
-        if( IPC__MSG_COUNT == found )
+        if( IPC__MSG_COUNT == found || !ipc_ishandled( &client->ipc, found ) )
         {
             continue;
         }

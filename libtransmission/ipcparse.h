@@ -164,6 +164,7 @@ ssize_t      ipc_parse    ( struct ipc_info *, uint8_t *, ssize_t, void * );
 /* misc info functions, these will always succeed */
 int          ipc_havemsg  ( struct ipc_info *, enum ipc_msg );
 enum ipc_msg ipc_msgid    ( struct ipc_info *, const char * );
+int          ipc_ishandled( struct ipc_info *, enum ipc_msg );
 int          ipc_havetags ( struct ipc_info * );
 int          ipc_infotypes( enum ipc_msg, benc_val_t * );
 const char * ipc_infoname ( enum ipc_msg, int );

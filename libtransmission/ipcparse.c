@@ -1126,6 +1126,18 @@ ipc_msgid( struct ipc_info * info, const char * name )
 }
 
 int
+ipc_ishandled( struct ipc_info * info, enum ipc_msg id )
+{
+    struct msgfunc key;
+
+    assert( MSGVALID( id ) );
+
+    bzero( &key, sizeof key );
+    key.id = id;
+    return ( NULL != RB_FIND( functree, &info->funcs->msgs, &key ) );
+}
+
+int
 ipc_havetags( struct ipc_info * info )
 {
     return !DICTPAYLOAD( info );
