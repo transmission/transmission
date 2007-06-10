@@ -138,6 +138,7 @@ static struct msg gl_msgs[] =
     { "addfile-detailed",    2, IPC_MSG_ADDONEFILE,   RB_ENTRY_INITIALIZER() },
     { "automap",             2, IPC_MSG_AUTOMAP,      RB_ENTRY_INITIALIZER() },
     { "autostart",           2, IPC_MSG_AUTOSTART,    RB_ENTRY_INITIALIZER() },
+    { "bad-format",          2, IPC_MSG_BAD,          RB_ENTRY_INITIALIZER() },
     { "directory",           2, IPC_MSG_DIR,          RB_ENTRY_INITIALIZER() },
     { "downlimit",           2, IPC_MSG_DOWNLIMIT,    RB_ENTRY_INITIALIZER() },
     { "failed",              2, IPC_MSG_FAIL,         RB_ENTRY_INITIALIZER() },
