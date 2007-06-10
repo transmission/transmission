@@ -65,6 +65,7 @@ tr_http_t   * tr_httpClientUrl( int, const char *, ... )
 /* only add headers or body before first pulse */
 void          tr_httpAddHeader( tr_http_t *, const char *, const char * );
 void          tr_httpAddBody( tr_http_t *, const char *, ... ) PRINTF( 2, 3 );
+void          tr_httpGetRequest( tr_http_t *, const char **, int * );
 tr_tristate_t tr_httpPulse( tr_http_t *, const char **, int * );
 char        * tr_httpWhatsMyAddress( tr_http_t * );
 void          tr_httpClose( tr_http_t * );

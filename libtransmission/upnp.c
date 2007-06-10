@@ -24,6 +24,9 @@
 
 #include "transmission.h"
 
+/* uncomment this to log requests and responses to ~/transmission-upnp.log */
+/* #define VERBOSE_LOG */
+
 #define SSDP_ADDR               "239.255.255.250"
 #define SSDP_PORT               1900
 #define SSDP_TYPE               "upnp:rootdevice"
@@ -154,6 +157,10 @@ static const char *
 actionLookup( tr_upnp_action_t * action, const char * key, int len,
               char dir, int getname );
 
+#ifdef VERBOSE_LOG
+static FILE * vlog = NULL;
+#endif 
+
 tr_upnp_t *
 tr_upnpInit()
 {
@@ -167,6 +174,19 @@ tr_upnpInit()
 
     upnp->infd     = -1;
     upnp->outfd    = -1;
+
+#ifdef VERBOSE_LOG
+    if( NULL == vlog )
+    {
+        char path[MAX_PATH_LENGTH];
+        time_t stupid_api;
+        snprintf( path, sizeof path, "%s/transmission-upnp.log",
+                  tr_getHomeDirectory());
+        vlog = fopen( path, "a" );
+        stupid_api = time( NULL );
+        fprintf( vlog, "opened log at %s\n\n", ctime( &stupid_api ) );
+    }
+#endif 
 
     return upnp;
 }
@@ -257,6 +277,14 @@ tr_upnpClose( tr_upnp_t * upnp )
     }
 
     free( upnp );
+
+#ifdef VERBOSE_LOG
+    if( NULL != vlog )
+    {
+        fflush( vlog );
+    }
+#endif 
+
 }
 
 void
@@ -345,6 +373,12 @@ sendSSDP( int fd )
     sin.sin_family      = AF_INET;
     sin.sin_addr.s_addr = inet_addr( SSDP_ADDR );
     sin.sin_port        = htons( SSDP_PORT );
+
+#ifdef VERBOSE_LOG
+    fprintf( vlog, "send ssdp message, %i bytes:\n", len );
+    fwrite( buf, 1, len, vlog );
+    fputs( "\n\n", vlog );
+#endif 
 
     if( 0 > sendto( fd, buf, len, 0,
                     (struct sockaddr*) &sin, sizeof( sin ) ) )
@@ -461,6 +495,11 @@ recvSSDP( int fd, char * buf, int * len )
     }
     else
     {
+#ifdef VERBOSE_LOG
+        fprintf( vlog, "receive ssdp message, %i bytes:\n", *len );
+        fwrite( buf, 1, *len, vlog );
+        fputs( "\n\n", vlog );
+#endif 
         return TR_NET_OK;
     }
 }
@@ -809,14 +848,29 @@ devicePulse( tr_upnp_device_t * dev, int port )
 static tr_http_t *
 makeHttp( int method, const char * host, int port, const char * path )
 {
+    tr_http_t  * ret;
+#ifdef VERBOSE_LOG
+    const char * body;
+    int          len;
+#endif
+
     if( tr_httpIsUrl( path, -1 ) )
     {
-        return tr_httpClientUrl( method, "%s", path );
+        ret = tr_httpClientUrl( method, "%s", path );
     }
     else
     {
-        return tr_httpClient( method, host, port, "%s", path );
+        ret = tr_httpClient( method, host, port, "%s", path );
     }
+
+#ifdef VERBOSE_LOG
+    tr_httpGetRequest( ret, &body, &len );
+    fprintf( vlog, "send http message, %i bytes:\n", len );
+    fwrite( body, 1, len, vlog );
+    fputs( "\n\n", vlog );
+#endif
+
+    return ret;
 }
 
 static tr_http_t *
@@ -922,6 +976,11 @@ devicePulseHttp( tr_upnp_device_t * dev,
     switch( tr_httpPulse( dev->http, &headers, &hlen ) )
     {
         case TR_NET_OK:
+#ifdef VERBOSE_LOG
+    fprintf( vlog, "receive http message, %i bytes:\n", hlen );
+    fwrite( headers, 1, hlen, vlog );
+    fputs( "\n\n", vlog );
+#endif
             code = tr_httpResponseCode( headers, hlen );
             if( SOAP_METHOD_NOT_ALLOWED == code && !dev->soapretry )
             {

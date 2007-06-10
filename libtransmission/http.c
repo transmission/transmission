@@ -530,6 +530,13 @@ tr_httpAddBody( tr_http_t * http , const char * fmt , ... )
     }
 }
 
+void
+tr_httpGetRequest( tr_http_t * http, const char ** buf, int * len )
+{
+    *buf = http->body.buf;
+    *len = http->body.used;
+}
+
 tr_tristate_t
 tr_httpPulse( tr_http_t * http, const char ** data, int * len )
 {

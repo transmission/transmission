@@ -44,6 +44,9 @@ typedef struct tr_thread_s
 }
 tr_thread_t;
 
+/* only for debugging purposes */
+const char * tr_getHomeDirectory( void );
+
 char * tr_getCacheDirectory();
 char * tr_getTorrentsDirectory();
 
