@@ -127,6 +127,7 @@ Details: Each string is the absolute path to a torrent metainfo file
          metainfo file is copied (allowing the original to be moved or
          deleted safely) is implementation dependent and may not
          currently be known or changed with this protocol.
+Replies: succeeded, failed, info
 
 Key:     "addfile-detailed"
 Version: 2
@@ -490,7 +491,7 @@ messages are used.
 <<< 0000001Dd7:versiond3:mini1e3:maxi2eee
             {"version", {"min": 1, "max": 2"}}
 >>> 0000000Bd4:quit0:e
-            {"quit", ""}
+            {"quit": ""}
 
 Pause all torrents and disable automapping. Note the server happens to
 have sent it's version before the client. The value for the stop-all
