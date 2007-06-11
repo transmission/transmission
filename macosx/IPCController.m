@@ -67,6 +67,10 @@ void
 msg_setint   ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 void
 msg_setstr   ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
+void
+msg_empty    ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
+void
+msg_sup      ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 static void
 msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
@@ -155,14 +159,17 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
         0 > ipc_addmsg( _funcs, IPC_MSG_GETSTATALL,   msg_infoall   ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_GETUPLIMIT,   msg_getint    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_LOOKUP,       msg_lookup    ) ||
+        0 > ipc_addmsg( _funcs, IPC_MSG_NOOP,         msg_empty     ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_PEX,          msg_setbool   ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_PORT,         msg_setint    ) ||
+        0 > ipc_addmsg( _funcs, IPC_MSG_QUIT,         msg_empty     ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_REMOVE,       msg_action    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_REMOVEALL,    msg_actionall ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_START,        msg_action    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_STARTALL,     msg_actionall ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_STOP,         msg_action    ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_STOPALL,      msg_actionall ) ||
+        0 > ipc_addmsg( _funcs, IPC_MSG_SUP,          msg_sup       ) ||
         0 > ipc_addmsg( _funcs, IPC_MSG_UPLIMIT,      msg_setint    ) )
     {
         [self release];
@@ -541,7 +548,7 @@ msg_lookup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     hashes = bencarray( val, TYPE_STR );
     if( NULL == hashes )
     {
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -577,7 +584,7 @@ msg_info( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 
   bad:
     NSLog( @"Got bad IPC packet" );
-    [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+    [client sendrespEmpty: IPC_MSG_BAD tag: tag];
 }
 
 void
@@ -591,7 +598,7 @@ msg_infoall( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( NULL == val || TYPE_LIST != val->type )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -613,7 +620,7 @@ msg_action( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( nil == ids )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -684,7 +691,7 @@ msg_addold( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( nil == paths )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -762,7 +769,7 @@ msg_addnew( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 
   bad:
     NSLog( @"Got bad IPC packet" );
-    [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+    [client sendrespEmpty: IPC_MSG_BAD tag: tag];
 }
 
 void
@@ -825,7 +832,7 @@ msg_setbool( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( NULL == val || TYPE_INT != val->type )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -850,7 +857,7 @@ msg_setint( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( NULL == val || TYPE_INT != val->type )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -875,7 +882,7 @@ msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     if( NULL == val || TYPE_STR != val->type )
     {
         NSLog( @"Got bad IPC packet" );
-        [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+        [client sendrespEmpty: IPC_MSG_BAD tag: tag];
         return;
     }
 
@@ -890,9 +897,8 @@ msg_setstr( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
     }
 }
 
-
 void
-msg_default( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+msg_empty( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
 {
     IPCClient * client = arg;
 
@@ -906,7 +912,70 @@ msg_default( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
             [client sendrespEmpty: IPC_MSG_OK tag: tag];
             break;
         default:
-            [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
+            assert( 0 );
             break;
     }
+}
+
+void
+msg_sup( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+{
+    IPCClient       * client = arg;
+    benc_val_t        packet, * pkval, * name;
+    struct ipc_info * ipc;
+    int               ii;
+    enum ipc_msg      found;
+    uint8_t         * buf;
+    size_t            size;
+
+    if( NULL == val || TYPE_LIST != val->type )
+        goto bad;
+
+    ipc   = [client ipc];
+    pkval = ipc_initval( ipc, IPC_MSG_SUP, tag, &packet, TYPE_LIST );
+    if( NULL == pkval )
+        goto fail;
+    if( tr_bencListReserve( pkval, val->val.l.count ) )
+    {
+        tr_bencFree( &packet );
+        goto fail;
+    }
+
+    for( ii = 0; val->val.l.count > ii; ii++ )
+    {
+        name = &val->val.l.vals[ii];
+        if( NULL == name || TYPE_STR != name->type )
+            goto bad;
+        found = ipc_msgid( ipc, name->val.s.s );
+        if( IPC__MSG_COUNT == found || !ipc_ishandled( ipc, found ) )
+        {
+            continue;
+        }
+        tr_bencInitStr( tr_bencListAdd( pkval ),
+                        name->val.s.s, name->val.s.i, 1 );
+    }
+
+    buf = ipc_mkval( &packet, &size );
+    tr_bencFree( &packet );
+    if( NULL == buf )
+        goto fail;
+    [client sendresp: buf size: size ];
+    return;
+
+  bad:
+    NSLog( @"Got bad IPC packet" );
+    [client sendrespEmpty: IPC_MSG_BAD tag: tag];
+    return;
+
+  fail:
+    NSLog( @"Failed to create IPC reply packet" );
+    [[client controller] killclient: client];
+}
+
+void
+msg_default( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg )
+{
+    IPCClient * client = arg;
+
+    [client sendrespEmpty: IPC_MSG_NOTSUP tag: tag];
 }
