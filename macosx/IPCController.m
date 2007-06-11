@@ -359,7 +359,8 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     }
     else if( 0 < res )
     {
-        if( res > [_buf length])
+        assert( res <= [_buf length]);
+        if( res < [_buf length])
         {
             memmove( [_buf mutableBytes], [_buf bytes] + res,
                      [_buf length] - res );
