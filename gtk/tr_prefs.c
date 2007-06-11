@@ -866,16 +866,17 @@ static void
 filechosen( GtkWidget * widget, gpointer data )
 {
     TrPrefs    * self;
-    const char * dir;
+    char       * dir;
     int          id;
 
     TR_IS_PREFS( data );
     self = TR_PREFS( data );
-    dir = gtk_file_chooser_get_current_folder( GTK_FILE_CHOOSER( widget ) );
+    dir = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER( widget ) );
     GETPREFID( widget, id );
     self->fileselhack = TRUE;
     tr_core_set_pref( TR_CORE( self->core ), id, dir );
     self->fileselhack = FALSE;
+    g_free( dir );
 }
 
 static GtkTreeModel *
