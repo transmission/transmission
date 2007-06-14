@@ -168,9 +168,10 @@ int tr_ioWrite( tr_io_t * io, int index, int begin, int length,
 
     if (reorder)
 	{
-		tr_dbg( "reorder pieces");
+		int reorderRuns;
 
-		int reorderRuns = reorderPieces( io );
+		tr_dbg( "reorder pieces");
+		reorderRuns = reorderPieces( io );
 
 		if (io->slotsUsed == slotsUsedOld && reorderRuns > 0)
 			tr_err( "reorder runs should have been 0 but was: %d", reorderRuns );

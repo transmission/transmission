@@ -25,7 +25,7 @@
 #ifndef TR_DAEMON_IPC_H
 #define TR_DAEMON_IPC_H
 
-#include <stdint.h>
+#include <inttypes.h>
 
 /* yay for typedefs, we can't forward declare benc_val_t or tr_info_t
    like with structs */
