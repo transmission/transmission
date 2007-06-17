@@ -195,18 +195,15 @@ trylocksock( const char * sockpath )
     if( NULL == sockpath )
     {
         confpath( path, sizeof path, CONF_FILE_SOCKET, 0 );
-        fd = getsock( path );
+        sockpath = path;
     }
-    else
-    {
-        fd = getsock( sockpath );
-    }
+    fd = getsock( sockpath );
     if( 0 > fd )
     {
         return -1;
     }
     gl_sockfd = fd;
-    strlcpy( gl_sockpath, path, sizeof gl_sockpath );
+    strlcpy( gl_sockpath, sockpath, sizeof gl_sockpath );
 
     return fd;
 }
