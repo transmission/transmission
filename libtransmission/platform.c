@@ -135,7 +135,7 @@ tr_getPrefsDirectory( void )
     char old[MAX_PATH_LENGTH];
     tr_buildPath ( old, sizeof(old), h, ".transmission", NULL );
     tr_migrateResume( old, buf );
-    rmdir( oldDirectory );
+    rmdir( old );
 #endif
 
     return buf;
