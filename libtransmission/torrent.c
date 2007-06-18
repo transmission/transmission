@@ -616,22 +616,22 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
     tr_lockUnlock( &tor->lock );
 }
 
-size_t
+uint64_t
 tr_torrentFileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
 {
-    const tr_file_t * file     = &tor->info.files[fileIndex];
-    const int firstBlock       =  file->offset / tor->blockSize;
-    const int firstBlockOffset =  file->offset % tor->blockSize;
-    const int lastOffset       =  file->length ? file->length-1 : 0;
-    const int lastBlock        = (file->offset + lastOffset) / tor->blockSize;
-    const int lastBlockOffset  = (file->offset + lastOffset) % tor->blockSize;
-    size_t haveBytes = 0;
+    const tr_file_t * file     =  &tor->info.files[fileIndex];
+    const uint64_t firstBlock       =  file->offset / tor->blockSize;
+    const uint64_t firstBlockOffset =  file->offset % tor->blockSize;
+    const uint64_t lastOffset       =  file->length ? (file->length-1) : 0;
+    const uint64_t lastBlock        = (file->offset + lastOffset) / tor->blockSize;
+    const uint64_t lastBlockOffset  = (file->offset + lastOffset) % tor->blockSize;
+    uint64_t haveBytes = 0;
 
     assert( tor != NULL );
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert( file->offset + file->length <= tor->info.totalSize );
-    assert( 0<=firstBlock && firstBlock<tor->blockCount );
-    assert( 0<=lastBlock && lastBlock<tor->blockCount );
+    assert( (int)firstBlock < tor->blockCount );
+    assert( (int)lastBlock < tor->blockCount );
     assert( firstBlock <= lastBlock );
     assert( tr_blockPiece( firstBlock ) == file->firstPiece );
     assert( tr_blockPiece( lastBlock ) == file->lastPiece );
@@ -643,7 +643,7 @@ tr_torrentFileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
     }
     else
     {
-        int i;
+        uint64_t i;
 
         if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
             haveBytes += tor->blockSize - firstBlockOffset;
@@ -662,8 +662,8 @@ tr_torrentFileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
 float
 tr_torrentFileCompletion ( const tr_torrent_t * tor, int fileIndex )
 {
-    const size_t c = tr_torrentFileBytesCompleted ( tor, fileIndex );
-    return (float)c / tor->info.files[fileIndex].length;
+    const uint64_t c = tr_torrentFileBytesCompleted ( tor, fileIndex );
+    return (double)c / tor->info.files[fileIndex].length;
 }
 
 float*

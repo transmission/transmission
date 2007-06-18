@@ -398,7 +398,7 @@ float * tr_torrentCompletion( tr_torrent_t * );
 
 float tr_torrentFileCompletion( const tr_torrent_t *, int fileIndex );
 
-size_t tr_torrentFileBytesCompleted( const tr_torrent_t *, int fileIndex ); 
+uint64_t tr_torrentFileBytesCompleted( const tr_torrent_t *, int fileIndex ); 
 
 
 /***********************************************************************
