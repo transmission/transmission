@@ -555,9 +555,10 @@ uint8_t * readtorrent( const char * path, size_t * size )
     FILE       * file;
 
     /* try to stat the file */
+    errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( "Could not stat file (%s)", path );
+        tr_err( "Couldn't stat file \"%s\" %s", path, strerror(errno) );
         return NULL;
     }
 
@@ -577,19 +578,19 @@ uint8_t * readtorrent( const char * path, size_t * size )
     file = fopen( path, "rb" );
     if( !file )
     {
-        tr_err( "Could not open file (%s)", path );
+        tr_err( "Couldn't open file \"%s\" %s", path, strerror(errno) );
         return NULL;
     }
     buf = malloc( sb.st_size );
     if( NULL == buf )
     {
-        tr_err( "Could not allocate memory (%"PRIu64" bytes)",
+        tr_err( "Couldn't allocate memory (%"PRIu64" bytes)",
                 ( uint64_t )sb.st_size );
     }
     fseek( file, 0, SEEK_SET );
     if( fread( buf, sb.st_size, 1, file ) != 1 )
     {
-        tr_err( "Read error (%s)", path );
+        tr_err( "Error reading \"%s\" %s", path, strerror(errno) );
         free( buf );
         fclose( file );
         return NULL;
