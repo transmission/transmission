@@ -169,8 +169,8 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
     char * pch;
     char * filename;
     char buf[512];
-    size_t fileCount=0, totalSize=0;
-    size_t pieceCount=0, pieceSize=0;
+    uint64_t totalSize=0;
+    int fileCount=0, pieceCount=0, pieceSize=0;
 
     if( ui->builder ) {
         tr_metaInfoBuilderFree( ui->builder );
@@ -188,14 +188,14 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
     }
 
     pch = readablesize( totalSize );
-    g_snprintf( buf, sizeof(buf), "<i>%s; %lu %s</i>",
+    g_snprintf( buf, sizeof(buf), "<i>%s; %d %s</i>",
                 pch, fileCount,
                 ngettext("file", "files", fileCount) );
     gtk_label_set_markup ( GTK_LABEL(ui->size_lb), buf );
     g_free( pch );
 
     pch = readablesize( pieceSize );
-    g_snprintf( buf, sizeof(buf), "<i>%lu %s @ %s</i>",
+    g_snprintf( buf, sizeof(buf), "<i>%d %s @ %s</i>",
                 pieceCount,
                 ngettext("piece", "pieces", pieceCount),
                 pch );
