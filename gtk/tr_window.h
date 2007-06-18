@@ -25,67 +25,15 @@
 #ifndef TR_WINDOW_H
 #define TR_WINDOW_H
 
-#include <glib-object.h>
 #include <gtk/gtk.h>
 
-#define TR_WINDOW_TYPE		  ( tr_window_get_type() )
+typedef GtkWindow TrWindow;
 
-#define TR_WINDOW( obj ) \
-  ( G_TYPE_CHECK_INSTANCE_CAST( (obj),   TR_WINDOW_TYPE, TrWindow ) )
+GtkTreeSelection * tr_window_get_selection( TrWindow* wind );
 
-#define TR_WINDOW_CLASS( class ) \
-  ( G_TYPE_CHECK_CLASS_CAST(    (class), TR_WINDOW_TYPE, TrWindowClass ) )
-
-#define TR_IS_WINDOW( obj ) \
-  ( G_TYPE_CHECK_INSTANCE_TYPE( (obj),   TR_WINDOW_TYPE ) )
-
-#define TR_IS_WINDOW_CLASS( class ) \
-  ( G_TYPE_CHECK_CLASS_TYPE(    (class), TR_WINDOW_TYPE ) )
-
-#define TR_WINDOW_GET_CLASS( obj ) \
-  ( G_TYPE_INSTANCE_GET_CLASS(  (obj),   TR_WINDOW_TYPE, TrWindowClass ) )
-
-typedef struct _TrWindow TrWindow;
-typedef struct _TrWindowClass TrWindowClass;
-
-/* treat the contents of this structure as private */
-struct _TrWindow
-{
-    GtkWindow           parent;
-    GtkScrolledWindow * scroll;
-    GtkTreeView       * view;
-    GtkStatusbar      * status;
-    GtkToolbar        * toolbar;
-    GtkMenuShell      * menu;
-    GObject           * namerend;
-    int                 doubleclick;
-    GList             * actions;
-    GtkAccelGroup     * accel;
-    GtkWidget         * stupidpopuphack;
-    gboolean            disposed;
-};
-
-struct _TrWindowClass
-{
-  GtkWindowClass parent;
-  int            actionsig;
-};
-
-GType
-tr_window_get_type( void );
-
-GtkWidget *
-tr_window_new( void );
-
-void
-tr_window_action_add( TrWindow * wind, int id, int flags, const char * name,
-                      const char * icon, const char * description, guint key );
+GtkWidget * tr_window_new( GtkUIManager* );
 
 void
 tr_window_update( TrWindow * wind, float downspeed, float upspeed );
-
-/* some magic to show the window with a nice initial size */
-void
-tr_window_show( TrWindow * wind );
 
 #endif

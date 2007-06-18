@@ -1,20 +1,11 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /*
- * Pan - A Newsreader for Gtk+
- * Copyright (C) 2002  Charles Kerr <charles@rebelbase.com>
+ * This file Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license. 
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
  */
 
 #include <gtk/gtk.h>
@@ -102,7 +93,7 @@ hig_workarea_add_label_w (GtkWidget   * table,
                           GtkWidget   * l)
 {
   if (GTK_IS_MISC(l))
-    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.0f);
+    gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
   if (GTK_IS_LABEL(l))
     gtk_label_set_use_markup (GTK_LABEL(l), TRUE);
   gtk_table_attach (GTK_TABLE(table), l, 1, 2, row, row+1, GTK_FILL, GTK_FILL, 0, 0);
@@ -165,4 +156,19 @@ hig_workarea_finish (GtkWidget   * table,
   GtkWidget * w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
   gtk_widget_set_size_request (w, 0u, 6u);
   gtk_table_attach_defaults (GTK_TABLE(table), w, 0, 4, *row, *row+1);
+}
+
+void
+hig_message_dialog_set_text (GtkMessageDialog * dialog,
+                             const char       * primary,
+                             const char       * secondary)
+{
+#if GTK_CHECK_VERSION(2,6,0)
+  gtk_message_dialog_set_markup (dialog, primary);
+  gtk_message_dialog_format_secondary_text (dialog, "%s", secondary);
+#else
+  char * pch = g_strdup_printf ("<b>%s</b>\n \n%s", primary, secondary);
+  gtk_message_dialog_set_markup (dialog, pch);
+  g_free (pch);
+#endif
 }

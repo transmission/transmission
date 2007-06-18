@@ -61,7 +61,7 @@ void TRTransfer::Update(BView *owner, const BFont *font) {
  * Returns a bool signaling the view is dirty after the update.
  * 
  * The view is determined to be dirty if the transfer
- * status, progress, eta or the "shade" (even or odd) 
+ * status, percentDone, eta or the "shade" (even or odd) 
  * position in the list changes from the previous state.
  * If the tr_stat_t is in fact different then the new, full
  * status is memcpy'd overtop the existing code.
@@ -73,7 +73,7 @@ bool TRTransfer::UpdateStatus(tr_stat_t *stat, bool shade) {
 	bool dirty = false;
 	if (fStatusLock->Lock()) {
 		if (fStatus->status != stat->status ||
-		    fStatus->progress != stat->progress ||
+		    fStatus->percentDone != stat->percentDone ||
 		    fStatus->eta != stat->eta ||
 		    fShade != shade)
 		{
@@ -124,21 +124,21 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		owner->DrawString(fName->String(), textLoc);
 		
 		if (fStatus->status & TR_STATUS_PAUSE ) {
-			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->progress);
+			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_CHECK_WAIT ) {
 			sprintf(fTimeStr, "Waiting To Check Existing Files (%.2f %%)",
-			        100 * fStatus->progress);
+			        100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_CHECK ) {
 			sprintf(fTimeStr, "Checking Existing Files (%.2f %%)",
-			        100 * fStatus->progress);
+			        100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_DOWNLOAD) {
 			if (fStatus->eta < 0 ) {
 				sprintf(fTimeStr, "--:--:-- Remaining (%.2f %%Complete)",
-				        100 * fStatus->progress);
+				        100 * fStatus->percentDone);
 			} else {
 				sprintf(fTimeStr, "%02d:%02d:%02d Remaining (%.2f %%Complete)",
 				        fStatus->eta / 3600, (fStatus->eta / 60) % 60,
-				        fStatus->eta % 60, 100 * fStatus->progress);
+				        fStatus->eta % 60, 100 * fStatus->percentDone);
 			}
 		} else if (fStatus->status & TR_STATUS_SEED) {
 			sprintf(fTimeStr, "Seeding");
@@ -214,8 +214,8 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		}
 		owner->FillRect(rect);
 	
-		if (fStatus->progress != 0.0f) {
-			rect.right = rect.left + (float)ceil(fStatus->progress * (rect.Width() - 4)),
+		if (fStatus->percentDone != 0.0f) {
+			rect.right = rect.left + (float)ceil(fStatus->percentDone * (rect.Width() - 4)),
 	
 			// Bevel
 			owner->SetHighColor(tint_color(fBarColor, B_LIGHTEN_2_TINT));

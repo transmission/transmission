@@ -754,17 +754,14 @@ int
 addstat( benc_val_t * list, int id, int types )
 {
     tr_stat_t * st;
-    tr_info_t * inf;
 
     st = torrent_stat( id );
     if( NULL == st )
     {
         return 0;
     }
-    inf = torrent_info( id );
-    assert( NULL != inf );
 
-    return ipc_addstat( list, id, inf, st, types );
+    return ipc_addstat( list, id, st, types );
 }
 
 void

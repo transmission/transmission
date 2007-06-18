@@ -173,7 +173,7 @@ static inline int parseBitfield( tr_torrent_t * tor, tr_peer_t * peer,
     {
         peer->bitfield = tr_bitfieldNew( inf->pieceCount );
     }
-    assert( bitfieldSize == peer->bitfield->len );
+    assert( (unsigned)bitfieldSize == peer->bitfield->len );
     memcpy( peer->bitfield->bits, p, bitfieldSize );
 
     peer->pieceCount = 0;

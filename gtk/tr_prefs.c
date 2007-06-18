@@ -127,7 +127,7 @@ defs[] =
 
     /* PREF_ID_ICON */
     { "use-tray-icon",          G_TYPE_BOOLEAN,
-      ( tr_icon_supported() ? PR_ENABLED : PR_DISABLED ),    NULL,
+      ( status_icon_supported() ? PR_ENABLED : PR_DISABLED ),    NULL,
       N_("Display an _icon in the system tray"),
       N_("Use a system tray / dock / notification area icon") },
 

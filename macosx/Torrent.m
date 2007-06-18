@@ -43,12 +43,14 @@ static int static_lastid = 0;
         checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
 		pex: (NSNumber *) pex
-        waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
+        waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
+        filesShouldDownload: (NSArray *) filesShouldDownload filePriorities: (NSArray *) filePriorities;
+- (void) historyFilePriorities: (NSMutableArray *) history forItems: (NSArray *) items;
 
-- (void) createFileList;
+- (void) createFileListShouldDownload: (NSArray *) filesShouldDownload priorities: (NSArray *) filePriorities;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
-        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-        fileSize: (uint64_t) size state: (int) state flatList: (NSMutableArray *) flatList;
+            withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
+            flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index priority: (int) priority;
 - (NSImage *) advancedBar;
 - (void) trashFile: (NSString *) path;
 
@@ -79,7 +81,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             checkUpload: nil uploadLimit: nil
             checkDownload: nil downloadLimit: nil
 			pex: nil
-            waitToStart: nil orderValue: nil];
+            waitToStart: nil orderValue: nil
+            filesShouldDownload: nil filePriorities: nil];
     
     if (self)
     {
@@ -109,7 +112,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 downloadLimit: [history objectForKey: @"DownloadLimit"]
 				pex: [history objectForKey: @"Pex"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
-                orderValue: [history objectForKey: @"OrderValue"]];
+                orderValue: [history objectForKey: @"OrderValue"]
+                filesShouldDownload: [history objectForKey: @"FilesShouldDownload"]
+                filePriorities: [history objectForKey: @"FilePriorities"]];
     
     if (self)
     {
@@ -167,7 +172,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithInt: fCheckDownload], @"CheckDownload",
                     [NSNumber numberWithInt: fDownloadLimit], @"DownloadLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [self orderValue], @"OrderValue", nil];
+                    [self orderValue], @"OrderValue",
+                    nil];
+    
+    //set file should download
+    int fileCount = [self fileCount];
+    NSMutableArray * filesShouldDownload = [NSMutableArray arrayWithCapacity: fileCount];
+    
+    tr_priority_t * priorities = tr_torrentGetFilePriorities(fHandle);
+    int i;
+    for (i = 0; i < fileCount; i++)
+        [filesShouldDownload addObject: [NSNumber numberWithBool: priorities[i] != TR_PRI_DND]];
+    free(priorities);
+    [history setObject: filesShouldDownload forKey: @"FilesShouldDownload"];
+    
+    //set file priorities
+    NSMutableArray * filePriorities = [NSMutableArray arrayWithCapacity: fileCount];
+    [self historyFilePriorities: filePriorities forItems: fFileList];
+    [history setObject: filePriorities forKey: @"FilePriorities"];
     
     if (fUseIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -223,7 +245,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fRemainingTimeString release];
         
         [fFileList release];
-        [fFileFlatList release];
+        [fFlatFileList release];
         
         [fBitmap release];
         free(fPieces);
@@ -284,7 +306,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fStat = tr_torrentStat(fHandle);
     
     //notification when downloading finished
-    if ([self justFinished])
+    if (tr_getComplete(fHandle) || tr_getDone(fHandle))
     {
         BOOL canMove = YES;
         
@@ -322,6 +344,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fStat = tr_torrentStat(fHandle);
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
     }
+    else if (tr_getIncomplete(fHandle))
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+    else;
     
     //check to stop for ratio
     float stopRatio;
@@ -345,6 +370,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+    else if ([self progress] < 1.0)
+        [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
+                "Torrent -> progress string"),
+                [NSString stringForFileSize: [self downloadedValid]], [NSString stringForFileSize: [self size]],
+                100.0 * [self progress], [NSString stringForFileSize: [self uploadedTotal]],
+                [NSString stringForRatio: [self ratio]]];
     else
         [progressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
@@ -439,6 +470,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
 
         case TR_STATUS_SEED:
+        case TR_STATUS_DONE:
             [statusString setString: @""];
             if ([self totalPeers] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
@@ -518,13 +550,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                     [self name], @"Name",
                                     [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
                                     [NSNumber numberWithFloat: [self progress]], @"Progress",
+                                    [NSNumber numberWithFloat: (float)fStat->left/[self size]], @"Left",
                                     [NSNumber numberWithBool: [self isActive]], @"Active",
                                     [NSNumber numberWithBool: [self isError]], @"Error", nil];
     
     if ([self isSeeding])
-    {
         [info setObject: [NSNumber numberWithFloat: [self progressStopRatio]] forKey: @"ProgressStopRatio"];
-    }
     
     if (![fDefaults boolForKey: @"SmallView"])
     {
@@ -609,11 +640,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) resetCache
 {
     tr_torrentRemoveFastResume(fHandle);
-}
-
-- (BOOL) allDownloaded
-{
-    return [self progress] >= 1.0;
 }
 
 - (float) ratio
@@ -1042,6 +1068,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
 
         case TR_STATUS_SEED:
+        case TR_STATUS_DONE:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
             break;
 
@@ -1056,7 +1083,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (float) progress
 {
-    return fStat->progress;
+    return fStat->percentComplete;
 }
 
 - (int) eta
@@ -1071,7 +1098,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) isSeeding
 {
-    return fStat->status == TR_STATUS_SEED;
+    return fStat->status == TR_STATUS_SEED || fStat->status == TR_STATUS_DONE;
 }
 
 - (BOOL) isPaused
@@ -1087,6 +1114,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (BOOL) isChecking
 {
     return fStat->status == TR_STATUS_CHECK;
+}
+
+- (BOOL) allDownloaded
+{
+    return fStat->cpStatus != TR_CP_INCOMPLETE;
 }
 
 - (BOOL) isError
@@ -1105,11 +1137,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         error = NSLocalizedString(@"(unreadable error)", "Torrent -> error string unreadable");
     
     return error;
-}
-
-- (BOOL) justFinished
-{
-    return tr_getFinished(fHandle);
 }
 
 - (NSArray *) peers
@@ -1237,7 +1264,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (uint64_t) downloadedValid
 {
-    return fInfo->totalSize - fStat->left;
+    return fStat->downloadedValid;
 }
 
 - (uint64_t) downloadedTotal
@@ -1289,88 +1316,94 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fInfo->fileCount;
 }
 
-- (BOOL) updateFileProgress
+- (float) fileProgress: (int) index
 {
-    BOOL change = NO;
-    float * progress = tr_torrentCompletion(fHandle);
-    NSNumber * progressNum;
-    NSMutableDictionary * item, * dict;
-    
-    int i, fileCount = [self fileCount];
-    for (i = 0; i < fileCount; i++)
-    {
-        if (!(progressNum = [[fFileFlatList objectAtIndex: i] objectForKey: @"Progress"])
-                || [progressNum floatValue] != progress[i])
-        {
-            item = [fFileFlatList objectAtIndex: i];
-            [item setObject: [NSNumber numberWithFloat: progress[i]] forKey: @"Progress"];
-            change = YES;
-            
-            if (progress[i] == 1.0)
-            {
-                dict = item;
-                while ((dict = [dict objectForKey: @"Parent"]))
-                    [dict setObject: [NSNumber numberWithInt: [[dict objectForKey: @"Remaining"] intValue]-1]
-                            forKey: @"Remaining"];
-                
-                [item setObject: [NSNumber numberWithInt: NSOnState] forKey: @"Check"];
-                [self resetFileCheckStateForItemParent: item];
-            }
-        }
-    }
-    
-    free(progress);
-    
-    return change;
+    return tr_torrentFileCompletion(fHandle, index);
 }
 
-- (void) setFileCheckState: (int) state forFileItem: (NSMutableDictionary *) item
+- (int) checkForFiles: (NSIndexSet *) indexSet
 {
-    [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-    
-    if (![[item objectForKey: @"IsFolder"] boolValue])
-        return;
-    
-    NSMutableDictionary * child;
-    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
-    while ((child = [enumerator nextObject]))
-        if (state != [[child objectForKey: @"Check"] intValue])
-            [self setFileCheckState: state forFileItem: child];
+    BOOL onState = NO, offState = NO;
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    {
+        if (tr_torrentGetFilePriority(fHandle, index) != TR_PRI_DND || [self fileProgress: index] >= 1.0)
+            onState = YES;
+        else
+            offState = YES;
+        
+        if (onState == offState)
+            return NSMixedState;
+    }
+    return onState ? NSOnState : NSOffState;
 }
 
-- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild
+- (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
 {
-    NSMutableDictionary * item;
-    if (!(item = [originalChild objectForKey: @"Parent"]))
-        return originalChild;
-    
-    int state = INVALID;
-    
-    NSMutableDictionary * child;
-    NSEnumerator * enumerator = [[item objectForKey: @"Children"] objectEnumerator];
-    while ((child = [enumerator nextObject]))
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+        if ([self fileProgress: index] < 1.0)
+            return YES;
+    return NO;
+}
+
+- (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
+{
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        if (state == INVALID)
+        tr_priority_t actualPriority;
+        if (state == NSOnState)
         {
-            state = [[child objectForKey: @"Check"] intValue];
-            if (state == NSMixedState)
-                break;
+            int priority = [[[fFlatFileList objectAtIndex: index] objectForKey: @"Priority"] intValue];
+            if (priority == PRIORITY_HIGH)
+                actualPriority = TR_PRI_HIGH;
+            else if (priority == PRIORITY_LOW)
+                actualPriority = TR_PRI_LOW;
+            else
+                actualPriority = TR_PRI_NORMAL;
         }
-        else if (state != [[child objectForKey: @"Check"] intValue])
-        {
-            state = NSMixedState;
-            break;
-        }
-        else;
+        else
+            actualPriority = TR_PRI_DND;
+        
+        tr_torrentSetFilePriority(fHandle, index, actualPriority);
     }
     
-    if (state != [[item objectForKey: @"Check"] intValue])
+    #warning when going seeding to download, update queue
+    [self update];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self]; //for paused torrents
+}
+
+- (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
+{
+    NSNumber * priorityValue = [NSNumber numberWithInt: priority];
+    
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        [item setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
-        return [self resetFileCheckStateForItemParent: item];
+        [[fFlatFileList objectAtIndex: index] setObject: priorityValue forKey: @"Priority"];
+        
+        if ([self checkForFiles: [NSIndexSet indexSetWithIndex: index]] == NSOnState)
+        {
+            tr_priority_t actualPriority;
+            if (priority == PRIORITY_HIGH)
+                actualPriority = TR_PRI_HIGH;
+            else if (priority == PRIORITY_LOW)
+                actualPriority = TR_PRI_LOW;
+            else
+                actualPriority = TR_PRI_NORMAL;
+            tr_torrentSetFilePriority(fHandle, index, actualPriority);
+        }
     }
-    else
-        return originalChild;
+}
+
+- (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
+{
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+        if (priority == [[[fFlatFileList objectAtIndex: index] objectForKey: @"Priority"] intValue])
+            return YES;
+    return NO;
 }
 
 - (NSDate *) dateAdded
@@ -1462,6 +1495,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
 		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
+        filesShouldDownload: (NSArray *) filesShouldDownload filePriorities: (NSArray *) filePriorities;
 {
     if (!(self = [super init]))
         return nil;
@@ -1536,7 +1570,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
     fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
     
-    [self createFileList];
+    [self createFileListShouldDownload: filesShouldDownload priorities: filePriorities];
     
     //set up advanced bar
     fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
@@ -1552,15 +1586,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return self;
 }
 
-- (void) createFileList
+- (void) createFileListShouldDownload: (NSArray *) filesShouldDownload priorities: (NSArray *) filePriorities
 {
     int count = [self fileCount], i;
     tr_file_t * file;
     NSMutableArray * pathComponents;
     NSString * path;
+    int priority;
+    tr_priority_t actualPriority;
     
     NSMutableArray * fileList = [[NSMutableArray alloc] init],
-                    * fileFlatList = [[NSMutableArray alloc] initWithCapacity: count];
+                    * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
     
     for (i = 0; i < count; i++)
     {
@@ -1575,20 +1611,35 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             path = @"";
         
+        priority = filePriorities ? [[filePriorities objectAtIndex: i] intValue] : PRIORITY_NORMAL;
         [self insertPath: pathComponents forSiblings: fileList withParent: nil previousPath: path
-                fileSize: file->length state: NSOnState flatList: fileFlatList];
+                flatList: flatFileList fileSize: file->length index: i priority: priority];
         [pathComponents autorelease];
+        
+        if (!filesShouldDownload || [[filesShouldDownload objectAtIndex: i] boolValue])
+        {
+            if (priority == PRIORITY_HIGH)
+                actualPriority = TR_PRI_HIGH;
+            else if (priority == PRIORITY_LOW)
+                actualPriority = TR_PRI_LOW;
+            else
+                actualPriority = TR_PRI_NORMAL;
+        }
+        else
+            actualPriority = TR_PRI_DND;
+        
+        tr_torrentSetFilePriority(fHandle, i, actualPriority);
     }
     
     fFileList = [[NSArray alloc] initWithArray: fileList];
     [fileList release];
-    fFileFlatList = [[NSArray alloc] initWithArray: fileFlatList];
-    [fileFlatList release];
+    fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
+    [flatFileList release];
 }
 
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
         withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-        fileSize: (uint64_t) size state: (int) state flatList: (NSMutableArray *) flatList
+        flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index priority: (int) priority
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1608,42 +1659,48 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (!dict)
     {
         dict = [NSMutableDictionary dictionaryWithObjectsAndKeys: name, @"Name",
-                                [NSNumber numberWithBool: isFolder], @"IsFolder",
-                                currentPath, @"Path", nil];
-        
+                [NSNumber numberWithBool: isFolder], @"IsFolder", currentPath, @"Path", nil];
         [siblings addObject: dict];
         
         if (isFolder)
         {
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
-            [dict setObject: [NSNumber numberWithInt: 1] forKey: @"Remaining"];
+            [dict setObject: [NSMutableIndexSet indexSetWithIndex: index] forKey: @"Indexes"];
         }
         else
         {
-            [flatList addObject: dict];
+            [dict setObject: [NSIndexSet indexSetWithIndex: index] forKey: @"Indexes"];
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
             [dict setObject: [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]] forKey: @"Icon"];
+            [dict setObject: [NSNumber numberWithInt: priority] forKey: @"Priority"];
+            
+            [flatList addObject: dict];
         }
         
         if (parent)
             [dict setObject: parent forKey: @"Parent"];
-        [dict setObject: [NSNumber numberWithInt: state] forKey: @"Check"];
     }
     else
-    {
-        if (isFolder)
-            [dict setObject: [NSNumber numberWithInt: [[dict objectForKey: @"Remaining"] intValue]+1] forKey: @"Remaining"];
-        
-        int dictState = [[dict objectForKey: @"Check"] intValue];
-        if (dictState != NSMixedState && dictState != state)
-            [dict setObject: [NSNumber numberWithInt: NSMixedState] forKey: @"Check"];
-    }
+        [[dict objectForKey: @"Indexes"] addIndex: index];
     
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
         [self insertPath: components forSiblings: [dict objectForKey: @"Children"]
-            withParent: dict previousPath: currentPath fileSize: size state: state flatList: flatList];
+            withParent: dict previousPath: currentPath flatList: flatList fileSize: size index: index priority: priority];
+    }
+}
+
+- (void) historyFilePriorities: (NSMutableArray *) history forItems: (NSArray *) items
+{
+    NSEnumerator * enumerator = [items objectEnumerator];
+    NSDictionary * item;
+    while ((item = [enumerator nextObject]))
+    {
+        if (![[item objectForKey: @"IsFolder"] boolValue])
+            [history addObject: [item objectForKey: @"Priority"]];
+        else
+            [self historyFilePriorities: history forItems: [item objectForKey: @"Children"]];
     }
 }
 

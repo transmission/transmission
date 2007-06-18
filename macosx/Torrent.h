@@ -25,6 +25,10 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+#define PRIORITY_LOW -1
+#define PRIORITY_NORMAL 0
+#define PRIORITY_HIGH 1
+
 #define INVALID -99
 
 @interface Torrent : NSObject
@@ -53,7 +57,7 @@
     NSImage * fIcon, * fIconFlipped, * fIconSmall;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
-    NSArray * fFileList, * fFileFlatList;
+    NSArray * fFileList, * fFlatFileList;
     
     int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
@@ -92,8 +96,6 @@
 - (NSDate *)    announceDate;
 
 - (void)        resetCache;
-
-- (BOOL)        allDownloaded;
 
 - (float)       ratio;
 - (int)         ratioSetting;
@@ -162,9 +164,9 @@
 - (BOOL) isPaused;
 - (BOOL) isWaitingToChecking;
 - (BOOL) isChecking;
+- (BOOL) allDownloaded;
 - (BOOL) isError;
 - (NSString *) errorMessage;
-- (BOOL) justFinished;
 
 - (NSArray *) peers;
 
@@ -186,12 +188,12 @@
 - (int) peersUploading;
 - (int) peersDownloading;
 
-- (float)       downloadRate;
-- (float)       uploadRate;
-- (uint64_t)	downloadedValid;
-- (uint64_t)    downloadedTotal;
-- (uint64_t)    uploadedTotal;
-- (float)       swarmSpeed;
+- (float) downloadRate;
+- (float) uploadRate;
+- (uint64_t) downloadedValid;
+- (uint64_t) downloadedTotal;
+- (uint64_t) uploadedTotal;
+- (float) swarmSpeed;
 
 - (BOOL) pex;
 - (void) setPex: (BOOL) setting;
@@ -201,9 +203,12 @@
 
 - (NSArray *) fileList;
 - (int) fileCount;
-- (BOOL) updateFileProgress;
-- (void) setFileCheckState: (int) state forFileItem: (NSMutableDictionary *) item;
-- (NSMutableDictionary *) resetFileCheckStateForItemParent: (NSMutableDictionary *) originalChild;
+- (float) fileProgress: (int) index;
+- (int) checkForFiles: (NSIndexSet *) indexSet;
+- (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
+- (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet;
+- (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
+- (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;

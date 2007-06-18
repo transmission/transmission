@@ -285,8 +285,8 @@ static void sendHave( tr_peer_t * peer, int piece )
  **********************************************************************/
 static void sendBitfield( tr_torrent_t * tor, tr_peer_t * peer )
 {
-    uint8_t       * p;
-    tr_bitfield_t * bitfield;
+    uint8_t             * p;
+    const tr_bitfield_t * bitfield;
 
     bitfield = tr_cpPieceBitfield( tor->completion );
     p = getMessagePointer( peer, bitfield->len, PEER_MSG_BITFIELD );

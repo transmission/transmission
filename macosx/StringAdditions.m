@@ -47,7 +47,7 @@
     if (size < 1024)
         return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
 
-    float convertedSize = (float) size;
+    float convertedSize = (float)size;
     NSString * unit;
     if (size < 1048576)
     {

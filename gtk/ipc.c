@@ -788,18 +788,15 @@ static int
 addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
          benc_val_t * val )
 {
-    tr_info_t * inf;
-    tr_stat_t * st;
-
-    inf = tr_torrent_info( tor );
     if( IPC_MSG_INFO == msgid )
     {
+        tr_info_t * inf = tr_torrent_info( tor );
         return ipc_addinfo( val, torid, inf, types );
     }
     else
     {
-        st = tr_torrent_stat( tor );
-        return ipc_addstat( val, torid, inf, st, types );
+        tr_stat_t * st = tr_torrent_stat( tor );
+        return ipc_addstat( val, torid, st, types );
     }
 }
 

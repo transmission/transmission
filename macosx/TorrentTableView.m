@@ -239,7 +239,6 @@
     NSRect rect;
     Torrent * torrent;
     NSImage * image;
-    NSRect buttonRect = NSMakeRect(0, 0, BUTTON_WIDTH, BUTTON_WIDTH);
 
     [super drawRect: r];
 
@@ -264,13 +263,11 @@
             image = nil;
 
         if (image)
-            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) fromRect: buttonRect
-                    operation: NSCompositeSourceOver];
+            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
 
         rect = [self revealRectForRow: i];
         image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
-        [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) fromRect: buttonRect
-                    operation: NSCompositeSourceOver];
+        [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
     }
 }
 

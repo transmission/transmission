@@ -470,8 +470,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
         if( IPC_MSG_INFO == respid )
             res = ipc_addinfo( pkinf, [tor torrentID], [tor torrentInfo], types );
         else
-            res = ipc_addstat( pkinf, [tor torrentID], [tor torrentInfo],
-                               [tor torrentStat], types );
+            res = ipc_addstat( pkinf, [tor torrentID], [tor torrentStat], types );
         if( 0 > res )
         {
             tr_bencFree( &packet );

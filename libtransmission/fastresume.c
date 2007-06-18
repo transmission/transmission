@@ -1,0 +1,415 @@
+/******************************************************************************
+ * $Id:$
+ *
+ * Copyright (c) 2005-2007 Transmission authors and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *****************************************************************************/
+
+/***********************************************************************
+ * Fast resume
+ ***********************************************************************
+ * The format of the resume file is a 4 byte format version (currently 1),
+ * followed by several variable-sized blocks of data.  Each block is
+ * preceded by a 1 byte ID and a 4 byte length.  The currently recognized
+ * IDs are defined below by the FR_ID_* macros.  The length does not include
+ * the 5 bytes for the ID and length.
+ *
+ * The name of the resume file is "resume.<hash>-<tag>", although
+ * older files with a name of "resume.<hash>" will be recognized if
+ * the former doesn't exist.
+ *
+ * All values are stored in the native endianness. Moving a
+ * libtransmission resume file from an architecture to another will not
+ * work, although it will not hurt either (the version will be wrong,
+ * so the resume file will not be read).
+ **********************************************************************/
+
+#include "transmission.h"
+#include "fastresume.h"
+
+/* time_t can be 32 or 64 bits... for consistency we'll hardwire 64 */ 
+typedef uint64_t tr_time_t; 
+
+/* deprecated */
+#define FR_ID_PROGRESS_SLOTS    0x01
+/* number of bytes downloaded */
+#define FR_ID_DOWNLOADED        0x02
+/* number of bytes uploaded */
+#define FR_ID_UPLOADED          0x03
+/* IPs and ports of connectable peers */
+#define FR_ID_PEERS             0x04
+/* progress data:
+ *  - 4 bytes * number of files: mtimes of files
+ *  - 1 bit * number of blocks: whether we have the block or not
+ */
+#define FR_ID_PROGRESS          0x05
+
+/* macros for the length of various pieces of the progress data */
+#define FR_MTIME_LEN( t ) \
+  ( sizeof(tr_time_t) * (t)->info.fileCount )
+#define FR_BLOCK_BITFIELD_LEN( t ) \
+  ( ( (t)->blockCount + 7 ) / 8 )
+#define FR_PROGRESS_LEN( t ) \
+  ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) )
+
+static void
+fastResumeFileName( char * path, size_t size, const tr_torrent_t * tor, int tag )
+{
+    if( tag )
+    {
+        snprintf( path, size, "%s/resume.%s-%s", tr_getCacheDirectory(),
+                  tor->info.hashString, tor->handle->tag );
+    }
+    else
+    {
+        snprintf( path, size, "%s/resume.%s", tr_getCacheDirectory(),
+                  tor->info.hashString );
+    }
+}
+
+static tr_time_t*
+getMTimes( const tr_torrent_t * tor, int * setme_n )
+{
+    int i;
+    const int n = tor->info.fileCount;
+    tr_time_t * m = calloc( n, sizeof(tr_time_t) );
+
+    for( i=0; i<n; ++i ) {
+        char fname[MAX_PATH_LENGTH];
+        struct stat sb;
+        snprintf( fname, sizeof(fname), "%s/%s",
+                  tor->destination, tor->info.files[i].name );
+        if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
+#ifdef SYS_DARWIN
+            m[i] = sb.st_mtimespec.tv_sec;
+#else
+            m[i] = sb.st_mtime;
+#endif
+        }
+    }
+
+    *setme_n = n;
+    return m;
+}
+
+static inline void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
+                                        uint32_t count, FILE * file )
+{
+    uint32_t  datalen = size * count;
+
+    fwrite( &id, 1, 1, file );
+    fwrite( &datalen, 4, 1, file );
+    fwrite( data, size, count, file );
+}
+
+void fastResumeSave( const tr_torrent_t * tor )
+{
+    char      path[MAX_PATH_LENGTH];
+    FILE    * file;
+    const int version = 1;
+    uint64_t  total;
+
+    fastResumeFileName( path, sizeof path, tor, 1 );
+    file = fopen( path, "w" );
+    if( NULL == file ) {
+        tr_err( "Couldn't open '%s' for writing", path );
+        return;
+    }
+    
+    /* Write format version */
+    fwrite( &version, 4, 1, file );
+
+    /* Write progress data */
+    if (1) {
+        int n;
+        tr_time_t * mtimes;
+        uint8_t * buf = malloc( FR_PROGRESS_LEN( tor ) );
+        uint8_t * walk = buf;
+        const tr_bitfield_t * bitfield;
+
+        /* mtimes */
+        mtimes = getMTimes( tor, &n );
+        memcpy( walk, mtimes, n*sizeof(tr_time_t) );
+        walk += n * sizeof(tr_time_t);
+
+        /* completion bitfield */
+        bitfield = tr_cpBlockBitfield( tor->completion );
+        assert( (unsigned)FR_BLOCK_BITFIELD_LEN( tor ) == bitfield->len );
+        memcpy( walk, bitfield->bits, bitfield->len );
+        walk += bitfield->len;
+
+        /* write it */
+        assert( walk-buf == (int)FR_PROGRESS_LEN( tor ) );
+        fastResumeWriteData( FR_ID_PROGRESS, buf, 1, walk-buf, file );
+
+        /* cleanup */
+        free( mtimes );
+        free( buf );
+    }
+
+    /* Write download and upload totals */
+    total = tor->downloadedCur + tor->downloadedPrev;
+    fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
+    total = tor->uploadedCur + tor->uploadedPrev;
+    fastResumeWriteData( FR_ID_UPLOADED, &total, 8, 1, file );
+
+    if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+    {
+        /* Write IPs and ports of connectable peers, if any */
+        int size;
+        uint8_t * buf = NULL;
+        if( ( size = tr_peerGetConnectable( tor, &buf ) ) > 0 )
+        {
+            fastResumeWriteData( FR_ID_PEERS, buf, size, 1, file );
+            free( buf );
+        }
+    }
+
+    fclose( file );
+
+    tr_dbg( "Resume file '%s' written", path );
+}
+
+static int
+fastResumeLoadProgress( const tr_torrent_t  * tor,
+                        tr_bitfield_t       * uncheckedPieces,
+                        FILE                * file )
+{
+    const size_t len = FR_PROGRESS_LEN( tor );
+    uint8_t * buf = calloc( len, 1 );
+    uint8_t * walk = buf;
+
+    if( len != fread( buf, 1, len, file ) ) {
+        tr_inf( "Couldn't read from resume file" );
+        free( buf );
+        return TR_ERROR_IO_OTHER;
+    }
+
+    /* compare file mtimes */
+    if (1) {
+        int i, n;
+        tr_time_t * curMTimes = getMTimes( tor, &n );
+        const tr_time_t * oldMTimes = (const tr_time_t *) walk;
+        for( i=0; i<n; ++i ) {
+            if ( !curMTimes[i] || ( curMTimes[i]!=oldMTimes[i] ) ) {
+                const tr_file_t * file = &tor->info.files[i];
+                tr_inf( "File '%s' mtimes differ-- flaggin pieces [%d..%d]",
+                        file->name, file->firstPiece, file->lastPiece);
+                tr_bitfieldAddRange( uncheckedPieces, 
+                                     file->firstPiece, file->lastPiece );
+            }
+        }
+        free( curMTimes );
+        walk += n * sizeof(tr_time_t);
+    }
+
+    /* get the completion bitfield */
+    if (1) {
+        tr_bitfield_t bitfield;
+        memset( &bitfield, 0, sizeof bitfield );
+        bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
+        bitfield.bits = walk;
+        tr_cpBlockBitfieldSet( tor->completion, &bitfield );
+    }
+
+    free( buf );
+    return TR_OK;
+}
+
+static int
+fastResumeLoadOld( tr_torrent_t   * tor,
+                   tr_bitfield_t  * uncheckedPieces, 
+                   FILE           * file )
+{
+    /* Check the size */
+    const int size = 4 + FR_PROGRESS_LEN( tor );
+    fseek( file, 0, SEEK_END );
+    if( ftell( file ) != size )
+    {
+        tr_inf( "Wrong size for resume file (%d bytes, %d expected)",
+                (int)ftell( file ), size );
+        fclose( file );
+        return 1;
+    }
+
+    /* load progress information */
+    fseek( file, 4, SEEK_SET );
+    if( fastResumeLoadProgress( tor, uncheckedPieces, file ) )
+    {
+        fclose( file );
+        return 1;
+    }
+
+    fclose( file );
+
+    tr_inf( "Fast resuming successful (version 0)" );
+    
+    return 0;
+}
+
+int
+fastResumeLoad( tr_torrent_t   * tor,
+                tr_bitfield_t  * uncheckedPieces )
+{
+    char      path[MAX_PATH_LENGTH];
+    FILE    * file;
+    int       version = 0;
+    uint8_t   id;
+    uint32_t  len;
+    int       ret;
+
+    assert( tor != NULL );
+    assert( uncheckedPieces != NULL );
+
+    /* Open resume file */
+    fastResumeFileName( path, sizeof path, tor, 1 );
+    file = fopen( path, "r" );
+    if( NULL == file )
+    {
+        if( ENOENT == errno )
+        {
+            fastResumeFileName( path, sizeof path, tor, 0 );
+            file = fopen( path, "r" );
+            if( NULL != file )
+            {
+                goto good;
+            }
+            fastResumeFileName( path, sizeof path, tor, 1 );
+        }
+        tr_inf( "Could not open '%s' for reading", path );
+        return 1;
+    }
+  good:
+    tr_dbg( "Resume file '%s' loaded", path );
+
+    /* Check format version */
+    fread( &version, 4, 1, file );
+    if( 0 == version )
+    {
+        return fastResumeLoadOld( tor, uncheckedPieces, file );
+    }
+    if( 1 != version )
+    {
+        tr_inf( "Resume file has version %d, not supported", version );
+        fclose( file );
+        return 1;
+    }
+
+    ret = 1;
+    /* read each block of data */
+    while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
+    {
+        switch( id )
+        {
+            case FR_ID_PROGRESS:
+                /* read progress data */
+                if( (uint32_t)FR_PROGRESS_LEN( tor ) == len )
+                {
+                    if( fastResumeLoadProgress( tor, uncheckedPieces, file ) )
+                    {
+                        if( feof( file ) || ferror( file ) )
+                        {
+                            fclose( file );
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        ret = 0;
+                    }
+                    continue;
+                }
+                break;
+
+            case FR_ID_DOWNLOADED:
+                /* read download total */
+                if( 8 == len)
+                {
+                    if( 1 != fread( &tor->downloadedPrev, 8, 1, file ) )
+                    {
+                        fclose( file );
+                        return 1;
+                    }
+                    continue;
+                }
+                break;
+
+            case FR_ID_UPLOADED:
+                /* read upload total */
+                if( 8 == len)
+                {
+                    if( 1 != fread( &tor->uploadedPrev, 8, 1, file ) )
+                    {
+                        fclose( file );
+                        return 1;
+                    }
+                    continue;
+                }
+                break;
+
+            case FR_ID_PEERS:
+                if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+                {
+                    int used;
+                    uint8_t * buf = malloc( len );
+                    if( 1 != fread( buf, len, 1, file ) )
+                    {
+                        free( buf );
+                        fclose( file );
+                        return 1;
+                    }
+                    used = tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE,
+                                                 buf, len / 6 );
+                    tr_dbg( "found %i peers in resume file, used %i",
+                            len / 6, used );
+                    free( buf );
+                }
+                continue;
+
+            default:
+                break;
+        }
+
+        /* if we didn't read the data, seek past it */
+        tr_inf( "Skipping resume data type %02x, %u bytes", id, len );
+        fseek( file, len, SEEK_CUR );
+    }
+
+    fclose( file );
+
+    if( !ret )
+    {
+        tr_inf( "Fast resuming successful" );
+    }
+    
+    return ret;
+}
+
+void
+fastResumeRemove( tr_torrent_t * tor )
+{
+    char file[MAX_PATH_LENGTH];
+    fastResumeFileName( file, sizeof file, tor, NULL != tor->handle->tag );
+    
+    if ( unlink( file ) )
+    {
+        tr_inf( "Removing fast resume file failed" );
+    }
+}

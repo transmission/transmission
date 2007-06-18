@@ -29,19 +29,8 @@
 #  define lrintf(a) ((int)(0.5+(a)))
 #endif
 
-/* We may try to allocate and free tables of size 0. Quick and dirty
-   way to handle it... */
-void * tr_malloc( size_t size )
-{
-    if( !size )
-        return NULL;
-    return malloc( size );
-}
-void tr_free( void * p )
-{
-    if( p )
-        free( p );
-}
+/* We may try to allocate and free tables of size 0.
+   Quick and dirty way to handle it... */
 #define malloc tr_malloc
 #define free   tr_free
 

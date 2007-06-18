@@ -239,7 +239,13 @@ realparse( tr_info_t * inf, uint8_t * buf, size_t size )
         goto fail;
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
-    inf->pieces = (uint8_t *) tr_bencStealStr( val );
+
+    inf->pieces = calloc ( inf->pieceCount, sizeof(tr_piece_t) );
+
+    for ( i=0; i<inf->pieceCount; ++i )
+    {
+        memcpy (inf->pieces[i].hash, &val->val.s.s[i*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
+    }
 
     /* TODO add more tests so we don't crash on weird files */
 
@@ -363,8 +369,8 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
     if( NULL != val && TYPE_LIST == val->type && 0 < val->val.l.count )
     {
         inf->trackerTiers = 0;
-        inf->trackerList = calloc( sizeof( inf->trackerList[0] ),
-                                   val->val.l.count );
+        inf->trackerList = calloc( val->val.l.count,
+                                   sizeof( inf->trackerList[0] ) );
 
         /* iterate through the announce-list's tiers */
         for( ii = 0; ii < val->val.l.count; ii++ )
@@ -375,7 +381,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                 continue;
             }
             subcount = 0;
-            sublist = calloc( sizeof( sublist[0] ), subval->val.l.count );
+            sublist = calloc( subval->val.l.count, sizeof( sublist[0] ) );
 
             /* iterate through the tier's items */
             for( jj = 0; jj < subval->val.l.count; jj++ )
@@ -411,7 +417,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             /* if we skipped some of the tier's items then trim the sublist */
             else if( 0 < subcount )
             {
-                inf->trackerList[inf->trackerTiers].list = calloc( sizeof( sublist[0] ), subcount );
+                inf->trackerList[inf->trackerTiers].list = calloc( subcount, sizeof( sublist[0] ) );
                 memcpy( inf->trackerList[inf->trackerTiers].list, sublist,
                         sizeof( sublist[0] ) * subcount );
                 inf->trackerList[inf->trackerTiers].count = subcount;
@@ -436,8 +442,8 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
         else if( inf->trackerTiers < val->val.l.count )
         {
             swapping = inf->trackerList;
-            inf->trackerList = calloc( sizeof( inf->trackerList[0] ),
-                                       inf->trackerTiers );
+            inf->trackerList = calloc( inf->trackerTiers,
+                                       sizeof( inf->trackerList[0] ) );
             memcpy( inf->trackerList, swapping,
                     sizeof( inf->trackerList[0] ) * inf->trackerTiers );
             free( swapping );
@@ -461,12 +467,12 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             return 1;
         }
 
-        sublist                   = calloc( sizeof( sublist[0] ), 1 );
+        sublist                   = calloc( 1, sizeof( sublist[0] ) );
         sublist[0].address        = address;
         sublist[0].port           = port;
         sublist[0].announce       = announce;
         sublist[0].scrape         = announceToScrape( announce );
-        inf->trackerList          = calloc( sizeof( inf->trackerList[0] ), 1 );
+        inf->trackerList          = calloc( 1, sizeof( inf->trackerList[0] ) );
         inf->trackerList[0].list  = sublist;
         inf->trackerList[0].count = 1;
         inf->trackerTiers         = 1;

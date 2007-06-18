@@ -188,7 +188,7 @@ tr_core_set_pref_int( TrCore * self, int id, int val );
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */
 enum {
   MC_NAME, MC_SIZE, MC_HASH, MC_STAT, MC_ERR, MC_TERR,
-  MC_PROG, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
+  MC_PROG_C, MC_PROG_D, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
   MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
   MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ID,
   MC_ROW_COUNT

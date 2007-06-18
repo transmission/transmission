@@ -218,8 +218,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     {
         /* info->name, info->totalSize, info->hashString, status, */
         G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_STRING,    G_TYPE_INT,
-        /* error,   errorString,   progress,     rateDownload, rateUpload, */
-        G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
+        /* error,   errorString,   percentComplete, percentDone,  rateDownload, rateUpload, */
+        G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT,    G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
         /* eta,     peersTotal, peersUploading, peersDownloading, seeders, */
         G_TYPE_INT, G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
         /* leechers, completedFromTracker, downloaded,    uploaded */
@@ -264,16 +264,13 @@ tr_core_dispose( GObject * obj )
 #endif
 
     /* sever all remaining torrents in the model */
-    if( gtk_tree_model_get_iter_first( self->model, &iter ) )
+    if( gtk_tree_model_get_iter_first( self->model, &iter ) ) do
     {
-        do
-        {
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            tr_torrent_sever( tor );
-            g_object_unref( tor );
-        }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
+        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+        tr_torrent_sever( tor );
+        g_object_unref( tor );
     }
+    while( gtk_tree_model_iter_next( self->model, &iter ) );
     g_object_unref( self->model );
 
     /* sever and unref all remaining zombie torrents */
@@ -308,27 +305,17 @@ tr_core_new( void )
 GtkTreeModel *
 tr_core_model( TrCore * self )
 {
-    TR_IS_CORE( self );
+    g_return_val_if_fail (TR_IS_CORE(self), NULL);
 
-    if( self->disposed )
-    {
-        return NULL;
-    }
-
-    return self->model;
+    return self->disposed ? NULL : self->model;
 }
 
 tr_handle_t *
 tr_core_handle( TrCore * self )
 {
-    TR_IS_CORE( self );
+    g_return_val_if_fail (TR_IS_CORE(self), NULL);
 
-    if( self->disposed )
-    {
-        return NULL;
-    }
-
-    return self->handle;
+    return self->disposed ? NULL : self->handle;
 }
 
 void
@@ -746,7 +733,8 @@ tr_core_update( TrCore * self )
                                 MC_STAT,        st->status,
                                 MC_ERR,         st->error,
                                 MC_TERR,        st->errorString,
-                                MC_PROG,        st->progress,
+                                MC_PROG_C,      st->percentComplete,
+                                MC_PROG_D,      st->percentDone,
                                 MC_DRATE,       st->rateDownload,
                                 MC_URATE,       st->rateUpload,
                                 MC_ETA,         st->eta,

@@ -43,6 +43,8 @@
 
 - (void) awakeFromNib
 {
+        #warning NSRectFill
+        
         NSSize size = [fImageView bounds].size;
         NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [fImageView bounds]];
         

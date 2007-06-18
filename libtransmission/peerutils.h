@@ -185,16 +185,35 @@ static int checkPeer( tr_peer_t * peer )
     return TR_OK;
 }
 
+static int isPieceInteresting( const tr_torrent_t  * tor,
+                               const tr_peer_t     * peer,
+                               int                   piece )
+{
+    if( tor->info.pieces[piece].priority == TR_PRI_DND ) /* we don't want it */
+        return 0;
+
+    if( !tr_bitfieldHas( peer->bitfield, piece ) ) /* peer doesn't have it */
+        return 0;
+
+    if( tr_bitfieldHas( peer->banfield, piece ) ) /* peer is banned for it */
+        return 0;
+
+    if( tr_cpPieceIsComplete( tor->completion, piece ) ) /* we already have it */
+        return 0;
+
+    return 1;
+}
+
 /***********************************************************************
  * isInteresting
  ***********************************************************************
- * Returns 1 if 'peer' has at least one piece that we haven't completed,
- * or 0 otherwise.
+ * Returns 1 if 'peer' has at least one piece that we want but
+ * haven't completed, or 0 otherwise.
  **********************************************************************/
-static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
+static int isInteresting( const tr_torrent_t * tor, const tr_peer_t * peer )
 {
-    int ii;
-    tr_bitfield_t * bitfield = tr_cpPieceBitfield( tor->completion );
+    int i;
+    const tr_bitfield_t * bitfield = tr_cpPieceBitfield( tor->completion );
 
     if( !peer->bitfield )
     {
@@ -203,13 +222,10 @@ static int isInteresting( tr_torrent_t * tor, tr_peer_t * peer )
     }
 
     assert( bitfield->len == peer->bitfield->len );
-    for( ii = 0; ii < bitfield->len; ii++ )
-    {
-        if( ( peer->bitfield->bits[ii] & ~(bitfield->bits[ii]) ) & 0xFF )
-        {
+
+    for( i=0; i<tor->info.pieceCount; ++i )
+        if( isPieceInteresting( tor, peer, i ) )
             return 1;
-        }
-    }
 
     return 0;
 }
@@ -227,161 +243,103 @@ static void updateInterest( tr_torrent_t * tor, tr_peer_t * peer )
     }
 }
 
-/***********************************************************************
- * chooseBlock
- ***********************************************************************
- * At this point, we know the peer has at least one block we have an
- * interest in. If he has more than one, we choose which one we are
- * going to ask first.
- * Our main goal is to complete pieces, so we look the pieces which are
- * missing less blocks.
- **********************************************************************/
-static inline int chooseBlock( tr_torrent_t * tor, tr_peer_t * peer )
+/** utility structure used by getPreferredPieces() and comparePieces() */
+typedef struct
 {
-    tr_info_t * inf = &tor->info;
+    int piece;
+    tr_priority_t priority;
+    int missingBlockCount;
+    int peerCount;
+}
+PieceCompareData;
+
+/** utility function used by getPreferredPieces */
+int comparePieces (const void * aIn, const void * bIn)
+{
+    const PieceCompareData * a = (const PieceCompareData*) aIn;
+    const PieceCompareData * b = (const PieceCompareData*) bIn;
+
+    /* if one piece has a higher priority, it goes first */
+    if (a->priority != b->priority)
+        return a->priority > b->priority ? -1 : 1;
+
+    /* otherwise if one has fewer missing blocks, it goes first */
+    if (a->missingBlockCount != b->missingBlockCount)
+        return a->missingBlockCount < b->missingBlockCount ? -1 : 1;
+
+    /* otherwise if one has fewer peers, it goes first */
+    if (a->peerCount != b->peerCount)
+        return a->peerCount < b->peerCount ? -1 : 1;
+
+    /* otherwise go with the earlier piece */
+    return a->piece - b->piece;
+}
+
+static int* getPreferredPieces( const tr_torrent_t  * tor,
+                                const tr_peer_t     * peer,
+                                int                 * pieceCount,
+                                int                 * endgame )
+{
+    const tr_info_t * inf = &tor->info;
 
     int i;
-    int missingBlocks, minMissing;
-    int poolSize, * pool;
-    int block, minDownloading;
+    int poolSize = 0;
+    int * pool = malloc ( inf->pieceCount * sizeof(int) );
 
-    /* Choose a piece */
-    pool       = malloc( inf->pieceCount * sizeof( int ) );
-    poolSize   = 0;
-    minMissing = tor->blockCount + 1;
-    for( i = 0; i < inf->pieceCount; i++ )
-    {
-        missingBlocks = tr_cpMissingBlocksForPiece( tor->completion, i );
-        if( missingBlocks < 1 )
-        {
-            /* We already have or are downloading all blocks */
-            continue;
-        }
-        if( !tr_bitfieldHas( peer->bitfield, i ) )
-        {
-            /* The peer doesn't have this piece */
-            continue;
-        }
-        if( peer->banfield && tr_bitfieldHas( peer->banfield, i ) )
-        {
-            /* The peer is banned for this piece */
-            continue;
-        }
+    *endgame = 0;
 
-        /* We are interested in this piece, remember it */
-        if( missingBlocks < minMissing )
-        {
-            minMissing = missingBlocks;
-            poolSize   = 0;
-        }
-        if( missingBlocks <= minMissing )
-        {
-            pool[poolSize++] = i;
-        }
+    for( i=0; i<inf->pieceCount; ++i )
+        if( isPieceInteresting( tor, peer, i ) )
+            if( tr_cpMissingBlocksForPiece( tor->completion, i ) )
+                pool[poolSize++] = i;
+
+    if( !poolSize ) {
+        *endgame = 1;
+        for( i=0; i<inf->pieceCount; ++i )
+            if( isPieceInteresting( tor, peer, i ) )
+                pool[poolSize++] = i;
     }
 
-    if( poolSize )
+#if 0
+fprintf (stderr, "old pool: ");
+for (i=0; i<15 && i<poolSize; ++i ) fprintf (stderr, "%d, ", pool[i] );
+fprintf (stderr, "\n");
+#endif
+
+    /* sort the rest from most interesting to least */
+    if( poolSize > 1 )
     {
-        /* All pieces in 'pool' have 'minMissing' missing blocks. Find
-           the rarest ones. */
-        tr_bitfield_t * bitfield;
-        int piece;
-        int min, foo, j;
-        int * pool2;
-        int   pool2Size;
+        PieceCompareData * p = malloc ( poolSize * sizeof(PieceCompareData) );
 
-        pool2     = malloc( poolSize * sizeof( int ) );
-        pool2Size = 0;
-        min       = TR_MAX_PEER_COUNT + 1;
-        for( i = 0; i < poolSize; i++ )
+        for( i=0; i<poolSize; ++i )
         {
-            foo = 0;
-            for( j = 0; j < tor->peerCount; j++ )
-            {
-                bitfield = tor->peers[j]->bitfield;
-                if( bitfield && tr_bitfieldHas( bitfield, pool[i] ) )
-                {
-                    foo++;
-                }
-            }
-            if( foo < min )
-            {
-                min       = foo;
-                pool2Size = 0;
-            }
-            if( foo <= min )
-            {
-                pool2[pool2Size++] = pool[i];
-            }
-        }
-        free( pool );
+            int j;
+            const int piece = pool[i];
 
-        if( pool2Size < 1 )
-        {
-            /* Shouldn't happen */
-            free( pool2 );
-            return -1;
+            p[i].piece = piece;
+            p[i].priority = inf->pieces[piece].priority;
+            p[i].missingBlockCount = tr_cpMissingBlocksForPiece( tor->completion, piece );
+            p[i].peerCount = 0;
+
+            for( j=0; j<tor->peerCount; ++j )
+                if( tr_bitfieldHas( tor->peers[j]->bitfield, piece ) )
+                    ++p[i].peerCount;
         }
 
-        /* All pieces in pool2 have the same number of missing blocks,
-           and are availabme from the same number of peers. Pick a
-           random one */
-        piece = pool2[tr_rand(pool2Size)];
-        free( pool2 );
+        qsort (p, poolSize, sizeof(PieceCompareData), comparePieces);
 
-        /* Pick a block in this piece */
-        block = tr_cpMissingBlockInPiece( tor->completion, piece );
-        goto check;
+        for( i=0; i<poolSize; ++i )
+            pool[i] = p[i].piece;
+
+        free( p );
     }
 
-    free( pool );
+#if 0
+fprintf (stderr, "new pool: ");
+for (i=0; i<15 && i<poolSize; ++i ) fprintf (stderr, "%d, ", pool[i] );
+fprintf (stderr, "\n");
+#endif
 
-    /* "End game" mode */
-    minDownloading = 255;
-    block = -1;
-    for( i = 0; i < inf->pieceCount; i++ )
-    {
-        int downloaders, block2;
-        if( !tr_bitfieldHas( peer->bitfield, i ) )
-        {
-            /* The peer doesn't have this piece */
-            continue;
-        }
-        if( peer->banfield && tr_bitfieldHas( peer->banfield, i ) )
-        {
-            /* The peer is banned for this piece */
-            continue;
-        }
-        if( tr_cpPieceIsComplete( tor->completion, i ) )
-        {
-            /* We already have it */
-            continue;
-        }
-        block2 = tr_cpMostMissingBlockInPiece( tor->completion, i, &downloaders );
-        if( block2 > -1 && downloaders < minDownloading )
-        {
-            block = block2;
-            minDownloading = downloaders;
-        }
-    }
-
-check:
-    if( block < 0 )
-    {
-        /* Shouldn't happen */
-        return -1;
-    }
-
-    for( i = 0; i < peer->inRequestCount; i++ )
-    {
-        tr_request_t * r;
-        r = &peer->inRequests[i];
-        if( tr_block( r->index, r->begin ) == block )
-        {
-            /* We are already asking this peer for this block */
-            return -1;
-        }
-    }
-
-    return block;
+    *pieceCount = poolSize;
+    return pool;
 }

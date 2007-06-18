@@ -7,6 +7,7 @@
                 applyFilter = id; 
                 applySpeedLimit = id; 
                 copyTorrentFiles = id; 
+                createFile = id; 
                 doNothing = id; 
                 linkForums = id; 
                 linkHomepage = id; 
@@ -57,7 +58,7 @@
                 fDownloadLimitItem = NSMenuItem; 
                 fDownloadMenu = NSMenu; 
                 fDownloadNoLimitItem = NSMenuItem; 
-                fFilterBar = ImageBackgroundView; 
+                fFilterBar = FilterBarView; 
                 fNameSortActionItem = NSMenuItem; 
                 fNameSortItem = NSMenuItem; 
                 fNextFilterItem = NSMenuItem; 

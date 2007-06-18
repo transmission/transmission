@@ -26,8 +26,11 @@
 #include <stdlib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+
 #include "transmission.h"
 #include "platform.h" /* for tr_getTorrentsDirectory */
+
+#include "actions.h"
 #include "tr_torrent.h"
 #include "dot-icons.h"
 #include "hig.h"
@@ -215,7 +218,7 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
 
   gdk_draw_rectangle (da->window, gcs[GRAY], FALSE,
                       grid_bounds.x, grid_bounds.y, 
-                      grid_bounds.width, grid_bounds.height-1);
+                      grid_bounds.width-1, grid_bounds.height-1);
 
   g_free (pieces);
   g_free (completeness);
@@ -596,7 +599,6 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW(w),
                                        GTK_SHADOW_IN);
   gtk_container_add (GTK_CONTAINER(w), v);
-  gtk_widget_set_usize (w, 500u, 0u);
 
 
   vbox = gtk_vbox_new (FALSE, GUI_PAD);
@@ -802,7 +804,6 @@ refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
   const tr_stat_t * stat = tr_torrent_stat( a->gtor );
-  const tr_info_t * info = tr_torrent_info( a->gtor );
   guint64 size;
   char *pch;
 
@@ -810,7 +811,7 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  size = info->totalSize - stat->left;
+  size = stat->downloadedValid;
   pch = readablesize (size);
   gtk_label_set_text (GTK_LABEL(a->valid_dl_lb), pch);
   g_free (pch);
@@ -940,6 +941,7 @@ enum
   FC_KEY,
   FC_INDEX,
   FC_SIZE,
+  FC_PRIORITY,
   N_FILE_COLS
 };
 
@@ -948,20 +950,44 @@ typedef struct
   TrTorrent * gtor;
   GtkTreeModel * model; /* same object as store, but recast */
   GtkTreeStore * store; /* same object as model, but recast */
+  GtkTreeSelection * selection;
 }
 FileData;
 
+static const char*
+priorityToString( const int priority )
+{
+    switch( priority ) {
+        case TR_PRI_HIGH:   return _("High");
+        case TR_PRI_NORMAL: return _("Normal");
+        case TR_PRI_LOW:    return _("Low");
+        case TR_PRI_DND:    return _("Don't Get");
+        default:            return "BUG!";
+    }
+}
+
+static tr_priority_t
+stringToPriority( const char* str )
+{
+    if( !strcmp( str, _( "High" ) ) ) return TR_PRI_HIGH;
+    if( !strcmp( str, _( "Low" ) ) ) return TR_PRI_LOW;
+    if( !strcmp( str, _( "Don't Get" ) ) ) return TR_PRI_DND;;
+    return TR_PRI_NORMAL;
+}
+
 static void
-parsepath( GtkTreeStore  * store,
-           GtkTreeIter   * ret,
-           const char    * path,
-           int             index,
-           uint64_t        size )
+parsepath( const tr_torrent_t  * tor,
+           GtkTreeStore        * store,
+           GtkTreeIter         * ret,
+           const char          * path,
+           int                   index,
+           uint64_t              size )
 {
     GtkTreeModel * model;
     GtkTreeIter  * parent, start, iter;
     char         * file, * lower, * mykey, *escaped=0;
     const char   * stock;
+    int            priority = 0;
 
     model  = GTK_TREE_MODEL( store );
     parent = NULL;
@@ -969,7 +995,7 @@ parsepath( GtkTreeStore  * store,
     if( 0 != strcmp( file, path ) )
     {
         char * dir = g_path_get_dirname( path );
-        parsepath( store, &start, dir, index, size );
+        parsepath( tor, store, &start, dir, index, size );
         parent = &start;
         g_free( dir );
     }
@@ -999,9 +1025,14 @@ parsepath( GtkTreeStore  * store,
         index = -1;
     }
 
+    if (index != -1)
+        priority = tr_torrentGetFilePriority( tor, index );
+
     escaped = g_markup_escape_text (file, -1); 
     gtk_tree_store_set( store, &iter, FC_INDEX, index, FC_LABEL, escaped,
-                        FC_KEY, mykey, FC_STOCK, stock, FC_SIZE, size, -1 );
+                        FC_KEY, mykey, FC_STOCK, stock,
+                        FC_PRIORITY, priorityToString(priority),
+                        FC_SIZE, size, -1 );
   done:
     g_free( escaped );
     g_free( mykey );
@@ -1060,6 +1091,7 @@ updateprogress( GtkTreeModel * model,
 
     if( gtk_tree_model_iter_children( model, &iter, parent ) ) do
     {
+        int oldProg, newProg;
         guint64 subGot, subTotal;
 
         if (gtk_tree_model_iter_has_child( model, &iter ) )
@@ -1079,8 +1111,14 @@ updateprogress( GtkTreeModel * model,
 
         if (!subTotal) subTotal = 1; /* avoid div by zero */
         g_assert (subGot <= subTotal);
-        gtk_tree_store_set (store, &iter,
-                            FC_PROG, (int)(100.0*subGot/subTotal + 0.5), -1);
+
+        /* why not just set it every time?
+           because that causes the "priorities" combobox to pop down */
+        gtk_tree_model_get (model, &iter, FC_PROG, &oldProg, -1);
+        newProg = (int)(100.0*subGot/subTotal + 0.5);
+        if (oldProg != newProg)
+          gtk_tree_store_set (store, &iter,
+                              FC_PROG, (int)(100.0*subGot/subTotal + 0.5), -1);
 
         gotSize += subGot;
         totalSize += subTotal;
@@ -1091,18 +1129,142 @@ updateprogress( GtkTreeModel * model,
     *setmeTotalSize = totalSize;
 }
 
+static GtkTreeModel*
+priority_model_new (void)
+{
+  GtkTreeIter iter;
+  GtkListStore * store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter, 0, _("High"), 1, TR_PRI_HIGH, -1);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter, 0, _("Normal"), 1, TR_PRI_NORMAL, -1);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter, 0, _("Low"), 1, TR_PRI_LOW, -1);
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter, 0, _("Don't Get"), 1, TR_PRI_DND, -1);
+  return GTK_TREE_MODEL (store);
+}
+
+static void
+refreshPriorityActions( GtkTreeSelection * sel )
+{
+    GtkTreeIter iter;
+    GtkTreeModel * model;
+    const gboolean has_selection = gtk_tree_selection_get_selected( sel, &model, &iter );
+
+    action_sensitize ( "priority-high", has_selection );
+    action_sensitize ( "priority-normal", has_selection );
+    action_sensitize ( "priority-low", has_selection );
+    action_sensitize ( "priority-dnd", has_selection );
+
+    if( has_selection )
+    {
+        /* set the action priority base on the model's values */
+        char * pch = NULL;
+        const char * key;
+        gtk_tree_model_get( model, &iter, FC_PRIORITY, &pch, -1 );
+        switch( stringToPriority( pch ) ) {
+            case TR_PRI_HIGH:   key = "priority-high";   break;
+            case TR_PRI_LOW:    key = "priority-low";    break;
+            case TR_PRI_DND:    key = "priority-dnd";    break;
+            default:            key = "priority-normal"; break;
+        }
+        action_toggle( key, TRUE );
+        g_free( pch );
+    }
+}
+
+static void
+set_priority (GtkTreeSelection * selection,
+              GtkTreeStore * store,
+              GtkTreeIter * iter,
+              tr_torrent_t * tor,
+              int priority_val,
+              const char * priority_str)
+{
+    int index;
+    GtkTreeIter child;
+
+    gtk_tree_model_get( GTK_TREE_MODEL(store), iter, FC_INDEX, &index, -1  );
+    if (index >= 0)
+      tr_torrentSetFilePriority( tor, index, priority_val );
+    gtk_tree_store_set( store, iter, FC_PRIORITY, priority_str, -1 );
+
+    if( gtk_tree_model_iter_children( GTK_TREE_MODEL(store), &child, iter ) ) do
+      set_priority( selection, store, &child, tor, priority_val, priority_str );
+    while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &child ) );
+
+    refreshPriorityActions( selection );
+}
+
+static void
+priority_changed_cb (GtkCellRendererText * cell UNUSED,
+                     const gchar         * path,
+		     const gchar         * value,
+		     void                * file_data)
+{
+  GtkTreeIter iter;
+  FileData * d = (FileData*) file_data;
+  if (gtk_tree_model_get_iter_from_string (d->model, &iter, path))
+  {
+    tr_torrent_t  * tor = tr_torrent_handle( d->gtor );
+    const tr_priority_t priority = stringToPriority( value );
+    set_priority( d->selection, d->store, &iter, tor, priority, value );
+  }
+}
+
+/* FIXME: NULL this back out when popup goes down */
+static GtkWidget * popupView = NULL;
+
+static void
+on_popup_menu ( GtkWidget * view, GdkEventButton * event )
+{
+    GtkWidget * menu = action_get_widget ( "/file-popup" );
+    popupView = view;
+    gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL,
+                    (event ? event->button : 0),
+                    (event ? event->time : 0));
+}
+
+static void
+fileSelectionChangedCB( GtkTreeSelection * sel, gpointer unused UNUSED )
+{
+    refreshPriorityActions( sel );
+}
+
+void
+set_selected_file_priority ( tr_priority_t priority_val )
+{
+    if( popupView && GTK_IS_TREE_VIEW(popupView) )
+    {
+        GtkTreeView * view = GTK_TREE_VIEW( popupView );
+        tr_torrent_t * tor = (tr_torrent_t*)
+            g_object_get_data (G_OBJECT(view), "torrent-handle");
+        const char * priority_str = priorityToString( priority_val );
+        GtkTreeModel * model;
+        GtkTreeIter iter;
+        GtkTreeSelection * sel = gtk_tree_view_get_selection (view);
+        gtk_tree_selection_get_selected( sel, &model, &iter );
+
+        set_priority( sel, GTK_TREE_STORE(model), &iter,
+                      tor, priority_val, priority_str );
+    }
+}
+
 GtkWidget *
 file_page_new ( TrTorrent * gtor )
 {
-    GtkWidget * ret;
-    FileData * data;
-    tr_info_t         * inf;
-    GtkTreeStore      * store;
-    int                 ii;
-    GtkWidget         * view, * scroll;
-    GtkCellRenderer   * rend;
-    GtkTreeViewColumn * col;
-    GtkTreeSelection  * sel;
+    GtkWidget           * ret;
+    FileData            * data;
+    tr_info_t           * inf;
+    tr_torrent_t        * tor;
+    GtkTreeStore        * store;
+    int                   ii;
+    GtkWidget           * view, * scroll;
+    GtkCellRenderer     * rend;
+    GtkTreeViewColumn   * col;
+    GtkTreeSelection    * sel;
+    GtkTreeModel        * model;
 
     store = gtk_tree_store_new ( N_FILE_COLS,
                                  G_TYPE_STRING,  /* stock */
@@ -1110,13 +1272,15 @@ file_page_new ( TrTorrent * gtor )
                                  G_TYPE_INT,     /* prog [0..100] */
                                  G_TYPE_STRING,  /* key */
                                  G_TYPE_INT,     /* index */
-                                 G_TYPE_UINT64); /* size */
+                                 G_TYPE_UINT64,  /* size */
+                                 G_TYPE_STRING); /* priority */
 
     /* set up the model */
+    tor = tr_torrent_handle( gtor );
     inf = tr_torrent_info( gtor );
     for( ii = 0; ii < inf->fileCount; ii++ )
     {
-        parsepath( store, NULL, STRIPROOT( inf->files[ii].name ),
+        parsepath( tor, store, NULL, STRIPROOT( inf->files[ii].name ),
                    ii, inf->files[ii].length );
     }
     getdirtotals( store, NULL );
@@ -1125,6 +1289,12 @@ file_page_new ( TrTorrent * gtor )
 
     /* create the view */
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
+    g_object_set_data (G_OBJECT(view), "torrent-handle", tor );
+    g_signal_connect( view, "popup-menu",
+                      G_CALLBACK(on_popup_menu), NULL );
+    g_signal_connect( view, "button-press-event",
+                      G_CALLBACK(on_tree_view_button_pressed), on_popup_menu);
+
     /* add file column */
     
     col = GTK_TREE_VIEW_COLUMN (g_object_new (GTK_TYPE_TREE_VIEW_COLUMN,
@@ -1150,6 +1320,24 @@ file_page_new ( TrTorrent * gtor )
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     gtk_tree_view_expand_all( GTK_TREE_VIEW( view ) );
     gtk_tree_view_set_search_column( GTK_TREE_VIEW( view ), FC_LABEL );
+    g_signal_connect( sel, "changed", G_CALLBACK(fileSelectionChangedCB), NULL );
+    fileSelectionChangedCB( sel, NULL );
+
+
+    /* add priority column */
+    model = priority_model_new ();
+    col = gtk_tree_view_column_new ();
+    gtk_tree_view_column_set_title (col, _("Priority"));
+    rend = gtk_cell_renderer_combo_new ();
+    gtk_tree_view_column_pack_start (col, rend, TRUE);
+    g_object_set (G_OBJECT(rend), "model", model,
+                                  "editable", TRUE,
+                                  "has-entry", FALSE,
+                                  "text-column", 0,
+                                  NULL);
+    g_object_unref (G_OBJECT(model));
+    gtk_tree_view_column_add_attribute (col, rend, "text", FC_PRIORITY);
+    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
     /* create the scrolled window and stick the view in it */
     scroll = gtk_scrolled_window_new( NULL, NULL );
@@ -1166,7 +1354,9 @@ file_page_new ( TrTorrent * gtor )
     data->gtor = gtor;
     data->model = GTK_TREE_MODEL(store);
     data->store = store;
+    data->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     g_object_set_data_full (G_OBJECT(ret), "file-data", data, g_free);
+    g_signal_connect (G_OBJECT(rend), "edited", G_CALLBACK(priority_changed_cb), data);
     return ret;
 }
 
@@ -1271,7 +1461,7 @@ options_page_new ( TrTorrent * gtor )
   hig_workarea_add_section_title (t, &row, _("Seeding"));
   hig_workarea_add_section_spacer (t, row, 1);
 
-    tb = gtk_check_button_new_with_mnemonic (_("Stop Seeding at Ratio:"));
+    tb = gtk_check_button_new_with_mnemonic (_("_Stop Seeding at Ratio:"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(tb), gtor->seeding_cap_enabled);
     g_signal_connect (tb, "toggled", G_CALLBACK(seeding_cap_toggled_cb), gtor);
     a = (GtkAdjustment*) gtk_adjustment_new (gtor->seeding_cap, 0.0, G_MAXDOUBLE, 1, 1, 1);

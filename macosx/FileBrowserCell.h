@@ -26,6 +26,9 @@
 
 @interface FileBrowserCell : NSBrowserCell
 {
+    float fPercent;
 }
+
+- (void) setProgress: (float) progress;
 
 @end

@@ -1,0 +1,30 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                cancelCreateProgress = id; 
+                cancelCreateWindow = id; 
+                create = id; 
+                setLocation = id; 
+            }; 
+            CLASS = CreatorWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fCommentView = NSTextView; 
+                fIcon = NSImageView; 
+                fLocationField = NSTextField; 
+                fNameField = NSTextField; 
+                fOpenCheck = NSButton; 
+                fPiecesField = NSTextField; 
+                fPrivateCheck = NSButton; 
+                fProgressIndicator = NSProgressIndicator; 
+                fProgressView = NSView; 
+                fStatusField = NSTextField; 
+                fTrackerField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

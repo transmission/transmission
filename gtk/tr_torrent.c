@@ -647,7 +647,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
     const int tpeers = MAX (st->peersTotal, 0);
     const int upeers = MAX (st->peersUploading, 0);
     const int eta = st->eta;
-    const double prog = st->progress * 100.0; /* [0...100] */
+    const double prog = st->percentDone * 100.0; /* [0...100] */
     const int status = st->status;
 
     if( TR_STATUS_CHECK_WAIT & status )
@@ -672,11 +672,18 @@ tr_torrent_status_str ( TrTorrent * gtor )
             g_free(timestr);
         }
     }
-    else if(TR_STATUS_SEED & status)
+    else if( TR_STATUS_SEED & status )
     {
         top = g_strdup_printf(
             ngettext( "Seeding, uploading to %d of %d peer",
                       "Seeding, uploading to %d of %d peers", tpeers ),
+            upeers, tpeers );
+    }
+    else if( TR_STATUS_DONE & status )
+    {
+        top = g_strdup_printf(
+            ngettext( "Uploading to %d of %d peer",
+                      "Uploading to %d of %d peers", tpeers ),
             upeers, tpeers );
     }
     else if( TR_STATUS_STOPPING & status )

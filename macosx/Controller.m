@@ -28,6 +28,7 @@
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
+#import "CreatorWindowController.h"
 #import "StringAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
@@ -38,6 +39,7 @@
 
 #import <Sparkle/Sparkle.h>
 
+#define TOOLBAR_CREATE          @"Toolbar Create"
 #define TOOLBAR_OPEN            @"Toolbar Open"
 #define TOOLBAR_REMOVE          @"Toolbar Remove"
 #define TOOLBAR_INFO            @"Toolbar Info"
@@ -170,7 +172,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];
         
         fBadger = [[Badger alloc] initWithLib: fLib];
-        fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib];
         
         fIPCController = [[IPCController alloc] init];
         [fIPCController setDelegate: self];
@@ -195,7 +196,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTorrents release];
     [fDisplayedTorrents release];
     [fBadger release];
-    [fOverlayWindow release];
+    if (fOverlayWindow)
+        [fOverlayWindow release];
     [fIPCController release];
     
     [fAutoImportedNames release];
@@ -212,7 +214,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
-    [fWindow addChildWindow: fOverlayWindow ordered: NSWindowAbove];
     
     fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [fToolbar setDelegate: self];
@@ -414,6 +415,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //change that just impacts the dock badge
     [nc addObserver: self selector: @selector(updateDockBadge:)
                     name: @"DockBadgeChange" object: nil];
+    
+    //open newly created torrent file
+    [nc addObserver: self selector: @selector(openCreatedFile:)
+                    name: @"OpenCreatedTorrentFile" object: nil];
 
     //timer to update the interface every second
     [self updateUI];
@@ -632,7 +637,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * path = [[fPendingTorrentDownloads objectForKey: [[download request] URL]] objectForKey: @"Path"];
     
-    [self openFiles: [NSArray arrayWithObject: path] ignoreDownloadFolder:
+    [self openFiles: [NSArray arrayWithObject: path] forcePath: nil ignoreDownloadFolder:
         ![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Constant"] forceDeleteTorrent: YES];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
@@ -644,19 +649,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO forceDeleteTorrent: NO];
 }
 
-- (void) openFiles: (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore forceDeleteTorrent: (BOOL) delete
+- (void) openFiles: (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
+        forceDeleteTorrent: (BOOL) delete
 {
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
-    if (ignore || [downloadChoice isEqualToString: @"Ask"])
+    if (ignore || (!path && [downloadChoice isEqualToString: @"Ask"]))
     {
         [self openFilesAsk: [filenames mutableCopy] forceDeleteTorrent: delete];
         return;
     }
     
-    if ([fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
+    if (!path && [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
         && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -680,7 +686,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 didEndSelector: @selector(incompleteChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
         return;
     }
-    if ([downloadChoice isEqualToString: @"Constant"]
+    if (!path && [downloadChoice isEqualToString: @"Constant"]
         && access([[[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
@@ -711,13 +717,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent: delete lib: fLib]))
             continue;
-
+        
         //add it to the "File > Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
-
-        NSString * folder = [downloadChoice isEqualToString: @"Constant"]
-            ? [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath]
-            : [torrentPath stringByDeletingLastPathComponent];
+        
+        NSString * folder;
+        if (path)
+            folder = path;
+        else if ([downloadChoice isEqualToString: @"Constant"])
+            folder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
+        else
+            folder = [torrentPath stringByDeletingLastPathComponent];
         
         [torrent setDownloadFolder: folder];
         [torrent update];
@@ -727,6 +737,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
 
     [self updateTorrentsInQueue];
+}
+
+- (void) openCreatedFile: (NSNotification *) notification
+{
+    NSDictionary * dict = [notification userInfo];
+    [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] forcePath: [dict objectForKey: @"Path"]
+            ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [dict release];
 }
 
 - (void) incompleteChoiceClosed: (NSOpenPanel *) openPanel returnCode: (int) code contextInfo: (NSDictionary *) dictionary
@@ -752,7 +770,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFilesWithDict: (NSDictionary *) dictionary
 {
-    [self openFiles: [dictionary objectForKey: @"Filenames"]
+    [self openFiles: [dictionary objectForKey: @"Filenames"] forcePath: nil
         ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue]
         forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue]];
     
@@ -842,7 +860,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO forceDeleteTorrent: NO];
 }
 
 - (void) openShowSheet: (id) sender
@@ -870,7 +888,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFromSheet: (NSDictionary *) dictionary
 {
-    [self openFiles: [dictionary objectForKey: @"Files"]
+    [self openFiles: [dictionary objectForKey: @"Files"] forcePath: nil
         ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] forceDeleteTorrent: NO];
     
     [dictionary release];
@@ -927,6 +945,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSURL * url = [NSURL URLWithString: urlString];
         [self performSelectorOnMainThread: @selector(openURL:) withObject: url waitUntilDone: NO];
     }
+}
+
+- (void) createFile: (id) sender
+{
+    [CreatorWindowController createTorrentFile: fLib];
 }
 
 - (void) resumeSelectedTorrents: (id) sender
@@ -1635,7 +1658,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     BOOL filtering = ![filterType isEqualToString: @"None"];
     
-    int downloading = 0, seeding = 0, paused = 0, all = 0;
+    int downloading = 0, seeding = 0, paused = 0;
     BOOL isDownloading = [filterType isEqualToString: @"Download"],
             isSeeding = [filterType isEqualToString: @"Seed"],
             isPaused = [filterType isEqualToString: @"Pause"];
@@ -2121,11 +2144,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
-        //check if any files can be added
+        //check if any torrent files can be added
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
         tr_torrent_t * tempTor;
+        BOOL torrent = NO;
         while ((file = [enumerator nextObject]))
         {
             int error;
@@ -2133,14 +2157,33 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             {
                 tr_torrentClose(tempTor);
                 
-                [fOverlayWindow setFiles: files];
+                if (!fOverlayWindow)
+                    fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
+                [fOverlayWindow setTorrents: files];
                 
                 return NSDragOperationCopy;
             }
+            else
+            {
+                if (error == TR_EUNSUPPORTED || error == TR_EDUPLICATE)
+                    torrent = YES;
+            }
+        }
+        
+        //create a torrent file if a single file
+        if (!torrent && [files count] == 1)
+        {
+            if (!fOverlayWindow)
+                fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
+            [fOverlayWindow setFile: [[files objectAtIndex: 0] lastPathComponent]];
+            
+            return NSDragOperationCopy;
         }
     }
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
+        if (!fOverlayWindow)
+            fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
         [fOverlayWindow setURL: [[NSURL URLFromPasteboard: pasteboard] relativeString]];
         
         return NSDragOperationCopy;
@@ -2152,19 +2195,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) draggingExited: (id <NSDraggingInfo>) info
 {
-    [fOverlayWindow fadeOut];
+    if (fOverlayWindow)
+        [fOverlayWindow fadeOut];
 }
 
 - (BOOL) performDragOperation: (id <NSDraggingInfo>) info
 {
-    [fOverlayWindow fadeOut];
+    if (fOverlayWindow)
+        [fOverlayWindow fadeOut];
     
     NSPasteboard * pasteboard = [info draggingPasteboard];
     if ([[pasteboard types] containsObject: NSFilenamesPboardType])
     {
+        BOOL torrent = NO, accept = YES;
+        
         //create an array of files that can be opened
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
-        NSEnumerator * enumerator = [[pasteboard propertyListForType: NSFilenamesPboardType] objectEnumerator];
+        NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
+        NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
         tr_torrent_t * tempTor;
         while ((file = [enumerator nextObject]))
@@ -2174,13 +2222,28 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             {
                 tr_torrentClose(tempTor);
                 [filesToOpen addObject: file];
+                
+                torrent = YES;
+            }
+            else
+            {
+                if (error == TR_EUNSUPPORTED || error == TR_EDUPLICATE)
+                    torrent = YES;
             }
         }
         
-        [self application: NSApp openFiles: filesToOpen];
+        if ([filesToOpen count] > 0)
+            [self application: NSApp openFiles: filesToOpen];
+        else
+        {
+            if (!torrent && [files count] == 1)
+                [CreatorWindowController createTorrentFile: fLib forFile: [files objectAtIndex: 0]];
+            else
+                accept = NO;
+        }
         [filesToOpen release];
         
-        return YES;
+        return accept;
     }
     else if ([[pasteboard types] containsObject: NSURLPboardType])
     {
@@ -2397,7 +2460,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
-    if ([ident isEqualToString: TOOLBAR_OPEN])
+    if ([ident isEqualToString: TOOLBAR_CREATE])
+    {
+        [item setLabel: NSLocalizedString(@"Create", "Create toolbar item -> label")];
+        [item setPaletteLabel: NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label")];
+        [item setToolTip: NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip")];
+        [item setImage: [NSImage imageNamed: @"Create.png"]];
+        [item setTarget: self];
+        [item setAction: @selector(createFile:)];
+        [item setAutovalidates: NO];
+    }
+    else if ([ident isEqualToString: TOOLBAR_OPEN])
     {
         [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
@@ -2484,7 +2557,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) t
 {
     return [NSArray arrayWithObjects:
-            TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
             TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED,
             TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, TOOLBAR_FILTER, TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
@@ -2496,7 +2569,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) t
 {
     return [NSArray arrayWithObjects:
-            TOOLBAR_OPEN, TOOLBAR_REMOVE,
+            TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
             NSToolbarSeparatorItemIdentifier,
             TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL,
             NSToolbarFlexibleSpaceItemIdentifier,
@@ -2850,13 +2923,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive])
-        {
-            if ([torrent allDownloaded])
-                seeding++;
-            else
-                downloading++;
-        }
+    {
+        if ([torrent isSeeding])
+            seeding++;
+        else if ([torrent isActive])
+            downloading++;
+        else;
+    }
     
     NSMenuItem * seedingItem = [fDockMenu itemWithTag: DOCK_SEEDING_TAG],
             * downloadingItem = [fDockMenu itemWithTag: DOCK_DOWNLOADING_TAG];

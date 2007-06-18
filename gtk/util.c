@@ -319,126 +319,36 @@ getdownloaddir( void )
     return dir;
 }
 
+/**
+ * don't use more than 50% the height of the screen, nor 80% the width.
+ * but don't be too small, either -- set the minimums to 500 x 300
+ */
 void
-sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
-             GtkPolicyType hscroll, GtkPolicyType vscroll )
+sizingmagic( GtkWindow         * wind,
+             GtkScrolledWindow * scroll,
+             GtkPolicyType       hscroll,
+             GtkPolicyType       vscroll )
 {
+    int width;
+    int height;
     GtkRequisition req;
-    GdkScreen    * screen;
-    int            width, height;
 
-    screen = gtk_widget_get_screen( GTK_WIDGET( wind ) );
+    GdkScreen * screen = gtk_widget_get_screen( GTK_WIDGET( wind ) );
 
     gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER,
-                                    GTK_POLICY_NEVER );
+                                            GTK_POLICY_NEVER );
 
     gtk_widget_size_request( GTK_WIDGET( wind ), &req );
+    req.height = MAX( req.height, 300 );
     height = MIN( req.height, gdk_screen_get_height( screen ) / 5 * 4 );
 
     gtk_scrolled_window_set_policy( scroll, GTK_POLICY_NEVER, vscroll );
-
     gtk_widget_size_request( GTK_WIDGET( wind ), &req );
+    req.width = MAX( req.width, 500 );
     width = MIN( req.width, gdk_screen_get_width( screen ) / 2 );
 
     gtk_window_set_default_size( wind, width, height );
-
     gtk_scrolled_window_set_policy( scroll, hscroll, vscroll );
-}
-
-struct action *
-action_new( int id, int flags, const char * label, const char * stock )
-{
-    struct action * act;
-
-    act        = g_new0( struct action, 1 );
-    act->id    = id;
-    act->flags = flags;
-    act->label = g_strdup( label );
-    act->stock = g_strdup( stock );
-    act->tool  = NULL;
-    act->menu  = NULL;
-
-    return act;
-}
-
-void
-action_free( struct action * act )
-{
-    g_free( act->label );
-    g_free( act->stock );
-    g_free( act );
-}
-
-GtkWidget *
-action_maketool( struct action * act, const char * key,
-                 GCallback func, gpointer data )
-{
-    GtkToolItem * item;
-
-    item = gtk_tool_button_new_from_stock( act->stock );
-    if( NULL != act->label )
-    {
-        gtk_tool_button_set_label( GTK_TOOL_BUTTON( item ), act->label );
-    }
-    g_object_set_data( G_OBJECT( item ), key, act );
-    g_signal_connect( item, "clicked", func, data );
-    gtk_widget_show( GTK_WIDGET( item ) );
-
-    return GTK_WIDGET( item );
-}
-
-GtkWidget *
-action_makemenu( struct action * act, const char * actkey,
-                 GtkAccelGroup * accel, const char * path, guint keyval,
-                 GCallback func, gpointer data )
-{
-    GtkWidget  * item, * label;
-    GdkModifierType mod;
-    GtkStockItem stock;
-    const char * name;
-    char       * joined;
-
-    mod = GDK_CONTROL_MASK;
-    name = act->label;
-    if( NULL == act->stock )
-    {
-        item = gtk_menu_item_new_with_label( act->label );
-    }
-    else
-    {
-        item = gtk_image_menu_item_new_from_stock( act->stock, NULL );
-        if( NULL == act->label )
-        {
-            if( gtk_stock_lookup( act->stock, &stock ) )
-            {
-                name = stock.label;
-                if( 0 == keyval )
-                {
-                    keyval = stock.keyval;
-                    mod    = stock.modifier;
-                }
-            }
-        }
-        else
-        {
-            label = gtk_bin_get_child( GTK_BIN( item ) );
-            gtk_label_set_text( GTK_LABEL( label ), act->label );
-            
-        }
-    }
-
-    if( NULL != accel && 0 < keyval && NULL != name )
-    {
-        joined = g_strjoin( "/", path, name, NULL );
-        gtk_accel_map_add_entry( joined, keyval, mod );
-        gtk_widget_set_accel_path( item, joined, accel );
-        g_free( joined );
-    }
-    g_object_set_data( G_OBJECT( item ), actkey, act );
-    g_signal_connect( item, "activate", func, data );
-    gtk_widget_show( item );
-
-    return item;
 }
 
 void
@@ -519,3 +429,39 @@ errcb(GtkWidget *widget, int resp SHUTUP, gpointer data) {
 
   gtk_widget_destroy(widget);
 }
+
+/* pop up the context menu if a user right-clicks.
+   if the row they right-click on isn't selected, select it. */
+gboolean
+on_tree_view_button_pressed (GtkWidget       * view,
+                             GdkEventButton  * event,
+                             gpointer          func)
+{
+  GtkTreeView * tv = GTK_TREE_VIEW( view );
+
+  if (event->type == GDK_BUTTON_PRESS  &&  event->button == 3)
+  {
+    GtkTreeSelection * selection = gtk_tree_view_get_selection(tv);
+    GtkTreePath *path;
+    if (gtk_tree_view_get_path_at_pos (tv,
+                                       (gint) event->x,
+                                       (gint) event->y,
+                                       &path, NULL, NULL, NULL))
+    {
+      if (!gtk_tree_selection_path_is_selected (selection, path))
+      {
+        gtk_tree_selection_unselect_all (selection);
+        gtk_tree_selection_select_path (selection, path);
+      }
+      gtk_tree_path_free(path);
+    }
+   
+    typedef void (PopupFunc)(GtkWidget*, GdkEventButton*); 
+    ((PopupFunc*)func)(view, event);
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+

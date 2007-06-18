@@ -3,10 +3,10 @@
 include ../mk/config.mk
 include ../mk/common.mk
 
-SRCS = transmission.c bencode.c net.c tracker.c peer.c inout.c \
-       metainfo.c sha1.c utils.c fdlimit.c clients.c completion.c \
-       platform.c ratecontrol.c choking.c natpmp.c upnp.c http.c xml.c \
-       shared.c torrent.c strlcpy.c strlcat.c ipcparse.c
+SRCS = bencode.c choking.c clients.c completion.c fastresume.c fdlimit.c \
+       http.c inout.c ipcparse.c makemeta.c metainfo.c natpmp.c net.c \
+       peer.c platform.c ratecontrol.c sha1.c shared.c strlcat.c strlcpy.c \
+       torrent.c tracker.c transmission.c upnp.c utils.c xml.c 
 
 OBJS = $(SRCS:%.c=%.o)
 

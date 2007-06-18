@@ -27,69 +27,13 @@
 
 #include <gtk/gtk.h>
 
-#if GTK_MAJOR_VERSION > 2 || \
-    ( GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 10 )
-#define TR_ICON_SUPPORTED
-#define tr_icon_supported()     (TRUE)
+#if GTK_CHECK_VERSION(2,10,0)
+#define STATUS_ICON_SUPPORTED
+#define status_icon_supported() (TRUE)
 #else
-#define tr_icon_supported()     (FALSE)
+#define status_icon_supported() (FALSE)
 #endif
 
-#define TR_ICON_TYPE		  ( tr_icon_get_type() )
-
-#define TR_ICON( obj ) \
-  ( G_TYPE_CHECK_INSTANCE_CAST( (obj),   TR_ICON_TYPE, TrIcon ) )
-
-#define TR_ICON_CLASS( class ) \
-  ( G_TYPE_CHECK_CLASS_CAST(    (class), TR_ICON_TYPE, TrIconClass ) )
-
-#define TR_IS_ICON( obj ) \
-  ( G_TYPE_CHECK_INSTANCE_TYPE( (obj),   TR_ICON_TYPE ) )
-
-#define TR_IS_ICON_CLASS( class ) \
-  ( G_TYPE_CHECK_CLASS_TYPE(    (class), TR_ICON_TYPE ) )
-
-#define TR_ICON_GET_CLASS( obj ) \
-  ( G_TYPE_INSTANCE_GET_CLASS(  (obj),   TR_ICON_TYPE, TrIconClass ) )
-
-typedef struct _TrIcon TrIcon;
-typedef struct _TrIconClass TrIconClass;
-
-/* treat the contents of this structure as private */
-struct _TrIcon
-{
-#ifdef TR_ICON_SUPPORTED
-    GtkStatusIcon parent;
-#else
-    GObject       parent;
-#endif
-    GtkWidget   * menu;
-    GList       * actions;
-    int           clickact;
-    gboolean      disposed;
-};
-
-struct _TrIconClass
-{
-#ifdef TR_ICON_SUPPORTED
-    GtkStatusIconClass parent;
-#else
-    GObjectClass       parent;
-#endif
-    int                actionsig;
-};
-
-GType
-tr_icon_get_type( void );
-
-TrIcon *
-tr_icon_new( void );
-
-gboolean
-tr_icon_docked( TrIcon * icon );
-
-void
-tr_icon_action_add( TrIcon * icon, int id, int flags, const char * label,
-                    const char * stock );
+gpointer tr_icon_new( void );
 
 #endif

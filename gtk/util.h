@@ -46,24 +46,6 @@ enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
 /* used for a callback function with a data parameter */
 typedef void (*callbackfunc_t)(void*);
 
-/* flags indicating where and when an action is valid */
-#define ACTF_TOOL       ( 1 << 0 ) /* appear in the toolbar */
-#define ACTF_MENU       ( 1 << 1 ) /* appear in the popup menu */
-#define ACTF_ALWAYS     ( 1 << 2 ) /* available regardless of selection */
-#define ACTF_ACTIVE     ( 1 << 3 ) /* available for active torrent */
-#define ACTF_INACTIVE   ( 1 << 4 ) /* available for inactive torrent */
-#define ACTF_SEPARATOR  ( 1 << 5 ) /* dummy action to create menu separator */
-/* appear in the toolbar and the popup menu */
-#define ACTF_WHEREVER   ( ACTF_TOOL | ACTF_MENU )
-/* available if there is something selected */
-#define ACTF_WHATEVER   ( ACTF_ACTIVE | ACTF_INACTIVE )
-
-/* checking action flags against torrent status */
-#define ACT_ISAVAIL( flags, status ) \
-    ( ( ACTF_ACTIVE   & (flags) && TR_STATUS_ACTIVE   & (status) ) || \
-      ( ACTF_INACTIVE & (flags) && TR_STATUS_INACTIVE & (status) ) || \
-        ACTF_ALWAYS   & (flags) )
-
 /* try to interpret a string as a textual representation of a boolean */
 /* note that this isn't localized */
 gboolean
@@ -131,30 +113,6 @@ getdownloaddir( void );
 
 #ifdef GTK_MAJOR_VERSION
 
-/* action handling */
-struct action
-{
-    int            id;
-    int            flags;
-    char         * label;
-    char         * stock;
-    GtkWidget    * tool;
-    GtkWidget    * menu;
-    callbackfunc_t func;
-    gpointer       data;
-};
-struct action *
-action_new( int id, int flags, const char * label, const char * stock );
-void
-action_free( struct action * act );
-GtkWidget *
-action_maketool( struct action * act, const char * key,
-                 GCallback func, gpointer data );
-GtkWidget *
-action_makemenu( struct action * act, const char * actkey,
-                 GtkAccelGroup * accel, const char * path, guint keyval,
-                 GCallback func, gpointer data );
-
 /* here there be dragons */
 void
 sizingmagic( GtkWindow * wind, GtkScrolledWindow * scroll,
@@ -183,6 +141,13 @@ errmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
 GtkWidget *
 verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
               const char * format, va_list ap );
+
+/* pop up the context menu if a user right-clicks.
+   if the row they right-click on isn't selected, select it. */
+gboolean
+on_tree_view_button_pressed (GtkWidget       * view,
+                             GdkEventButton  * event,
+                             gpointer          unused);
 
 #endif /* GTK_MAJOR_VERSION */
 

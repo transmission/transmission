@@ -705,7 +705,7 @@ ipc_addinfo( benc_val_t * list, int tor, tr_info_t * inf, int types )
 }
 
 int
-ipc_addstat( benc_val_t * list, int tor, tr_info_t * inf,
+ipc_addstat( benc_val_t * list, int tor,
              tr_stat_t * st, int types )
 {
     benc_val_t  * dict, * item;
@@ -746,7 +746,7 @@ ipc_addstat( benc_val_t * list, int tor, tr_info_t * inf,
         switch( 1 << ii )
         {
             case IPC_ST_COMPLETED:
-                tr_bencInitInt( item, st->progress * ( float )inf->totalSize );
+                tr_bencInitInt( item, st->downloadedValid );
                 break;
             case IPC_ST_DOWNSPEED:
                 tr_bencInitInt( item, st->rateDownload * 1024 );

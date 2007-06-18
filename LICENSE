@@ -1,5 +1,15 @@
-The Transmission binaries and source code are distributed under the MIT
-license.
+The Transmission binaries and most of its source code is
+distributed under the MIT license.
+
+Some files are copyrighted by Charles Kerr and are covered by
+the GPL version 2.  Works owned by the Transmission project
+are granted a special exemption to clause 2(b) so that the bulk
+of its code can remain under the MIT license.  This exemption does
+not extend to original or derived works not owned by the
+Transmission project.
+
+The remainder of this text pertains only to the MIT-licensed
+portions of Transmission.
 
 -----
 Permission is hereby granted, free of charge, to any person obtaining

@@ -10,11 +10,18 @@
 		<A NAME="GettingStarted"></A>
 			<div id="banner">
 				<a name="menus"></a>
-				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				<div id="machelp">
+				<a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
 				</div>
 			</div>
 
 			<div id="mainbox">
+				<div id="caticon">
+				<img src="../gfx/TransmissionIcon.png" alt="Adium X icon" height="32" width="32" border="0">
+				</div>
 			<div id="pagetitle">
 				<h1>Welcome to Transmission! </h1>
 			</div>
@@ -28,12 +35,32 @@
 					</td>
 				</tr>
 				<tr>
-					<td valign="top" width="150"><img src="../gfx/torrentlife.png" height="auto" width="150" border="0"></td>
+					<td valign="top" width="150"><img src="../gfx/open.png" height="auto" width="150" border="0"></td>
 					<td valign="top">
-						<p>You'll need to download a torrent file (extension .torrent). These are commonly found at <a href="http://en.wikipedia.org/wiki/BitTorrent_tracker">'tracker' websites</a>. Torrent files contain information about the actual file you want to download (eg a movie).
-						<p>Once you have the torrent file, open it in Transmission - downloading should start immediately. Transmission can even watch for torrent files and then open them automatically via Preferences >> Transfers >> General.
-						<p>You can pause and resume transfers at any time, so long as the files remain in your download folder. If you remove a transfer, in order to resume it you will need to reopen the original torrent file in Transmission.
-						<p>It is good etiquette to share or 'seed' the file for a while (ie leave it uploading) once your download is complete. You can set a default ratio to automatically seed to, and then pause. This can be adjusted in Preferences >> Transfers >> Management, or in real time using the Action menu. </p>
+						<p>Download your file's associated 'torrent file' (extension .torrent). These are commonly found at <a href="http://en.wikipedia.org/wiki/BitTorrent_tracker">'tracker' websites</a>.
+						<p>Once you have the torrent file, drag it into Transmission - downloading should start immediately.
+						<p>You can pause and resume transfers at any time, so long as the files remain in your download folder.
+						<p>It is good etiquette to share or 'seed' the file for a while (ie leave it uploading) once your download is complete.
+						<ul>
+					<li><a href="usingt.html">Downloading and sharing with Transmission</a></li>
+					</ul>
+					</td>
+				</tr>
+			</table>
+				<br>
+			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="One column table with heading">
+				<tr>
+					<td class="blue" colspan="2">
+						<h3>Can I create my own torrents? </h3>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top" width="150"><img src="../gfx/creation.png" height="auto" width="150" border="0"></td>
+					<td valign="top">
+						<p>Yes, you can share a file or folder by dragging it into Transmission. Alternatively, click 'Create' in the toolbar, and choose your file.
+						<p>When the dialogue box appears, enter your tracker address, comments and private status.
+						<p>You can change the torrent filename, as well as where it will be saved to by clicking 'Change'.
+						<p>Once you are done, click 'Create'. Transmission will automatically optimize the torrent file for what you are sharing. 
 					</td>
 				</tr>
 			</table>
@@ -88,6 +115,24 @@
 								<li>options to fine-tune your bandwidth allocation </li>
 							<ul>
 						</p>
+					</td>
+				</tr>
+			</table>
+				<br>
+				
+			<table class="dots" width="100%" border="0" cellspacing="0" cellpadding="0" summary="One column table with heading">
+				<tr>
+					<td class="blue" colspan="2">
+						<h3>Can I choose do download specific files? </h3>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top" width="150"><img src="../gfx/fileselection.png" height="auto" width="150" border="0"></td>
+					<td valign="top">
+						<p>Yes, via the Inspector. Double click any transfer to open it and then click the 'Files' tab. Simply check the boxes next to the files you want to download (the default is all of them).
+						You can even set a priority (red/high or yellow/low) to each file, if you want some to finish faster than others. To do so, use the selector next to the checkboxes.
+						<p>If you are frequently going to selectively download the files in your torrents, you might want to disable "Start Transfers when added" in Preferences >> Transfers >> Management.
+						This way you can organise your transfer before it starts, to avoid wasting download bandwidth.
 					</td>
 				</tr>
 			</table>

@@ -104,7 +104,9 @@
 }
 
 - (void) openFiles:             (NSArray *) filenames;
-- (void) openFiles:             (NSArray *) filenames ignoreDownloadFolder: (BOOL) ignore forceDeleteTorrent: (BOOL) delete;
+- (void) openFiles:             (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
+                                            forceDeleteTorrent: (BOOL) delete;
+- (void) openCreatedFile:       (NSNotification *) notification;
 - (void) openFilesWithDict:     (NSDictionary *) dictionary;
 - (void) openFilesAsk:          (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete;
 - (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
@@ -115,6 +117,8 @@
 - (void) openURLShowSheet:      (id) sender;
 
 - (void) quitSheetDidEnd: (NSWindow *) sheet returnCode: (int) returnCode contextInfo: (void *) contextInfo;
+
+- (void) createFile: (id) sender;
 
 - (void) resumeSelectedTorrents:    (id) sender;
 - (void) resumeAllTorrents:         (id) sender;

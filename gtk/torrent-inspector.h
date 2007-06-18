@@ -28,6 +28,10 @@
 #include <gtk/gtkwindow.h>
 #include "tr_torrent.h"
 
+struct TrTorrent;
+
 GtkWidget* torrent_inspector_new ( GtkWindow * parent, TrTorrent * tor );
+
+void set_selected_file_priority ( tr_priority_t );
 
 #endif /* TG_PREFS_H */

@@ -28,7 +28,7 @@
 
 @implementation DragOverlayWindow
 
-- (id) initWithLib: (tr_handle_t *) lib
+- (id) initWithLib: (tr_handle_t *) lib forWindow: (NSWindow *) window
 {
     if (self = ([super initWithContentRect: NSMakeRect(0, 0, 1.0, 1.0) styleMask: NSBorderlessWindowMask
                     backing: NSBackingStoreBuffered defer: NO]))
@@ -57,6 +57,8 @@
                                 NSViewAnimationFadeOutEffect, NSViewAnimationEffectKey, nil]]];
         [fFadeOutAnimation setDuration: 0.5];
         [fFadeOutAnimation setAnimationBlockingMode: NSAnimationNonblockingThreaded];
+        
+        [window addChildWindow: self ordered: NSWindowAbove];
     }
     return self;
 }
@@ -69,7 +71,7 @@
     [super dealloc];
 }
 
-- (void) setFiles: (NSArray *) files
+- (void) setTorrents: (NSArray *) files
 {
     uint64_t size = 0;
     int count = 0;
@@ -114,9 +116,9 @@
     {
         NSString * fileString;
         if (fileCount == 1)
-            fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> drag files");
+            fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> torrents");
         else
-            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> drag files"), fileCount];
+            fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> torrents"), fileCount];
          secondString = [fileString stringByAppendingString: secondString];
     }
     
@@ -124,7 +126,7 @@
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
     else
     {
-        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> drag files"), count];
+        name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> torrents"), count];
         secondString = [secondString stringByAppendingString: @" Total"];
     }
     
@@ -139,6 +141,23 @@
     [self setFrame: [[self parentWindow] frame] display: YES];
     [fFadeInAnimation startAnimation];
 }
+
+- (void) setFile: (NSString *) file
+{
+        
+    [[self contentView] setOverlay: [NSImage imageNamed: @"Create.png"]
+        mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
+    
+    //stop other animation and set to same progress
+    if ([fFadeOutAnimation isAnimating])
+    {
+        [fFadeOutAnimation stopAnimation];
+        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
+    }
+    [self setFrame: [[self parentWindow] frame] display: YES];
+    [fFadeInAnimation startAnimation];
+}
+
 
 - (void) setURL: (NSString *) url
 {

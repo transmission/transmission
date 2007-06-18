@@ -155,7 +155,7 @@ uint8_t *    ipc_mkvers   ( size_t * );
 uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int, const int * );
 int          ipc_addinfo  ( benc_val_t *, int, tr_info_t *, int );
-int          ipc_addstat  ( benc_val_t *, int, tr_info_t *, tr_stat_t *, int );
+int          ipc_addstat  ( benc_val_t *, int, tr_stat_t *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */

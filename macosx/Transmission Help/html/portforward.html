@@ -6,18 +6,18 @@
 		<title>Port Forwarding FAQ</title>
 	</head>
 	<body>
-		<div id="mainbox">			<div id="banner">				<a name="menus"></a>				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>				</div>			</div>
+		<div id="mainbox">			<div id="banner">				<a name="menus"></a>				<div id="machelp">				<a class="bread" href="../index.html">Transmission Help</a>				</div>				<div id="index">				<a class="leftborder" href="../html/Index2.html">Index</a></div>				</div>			</div>
 			
 			<div id="pagetitle">
 				<h1>Why do I see a red dot and "Port is closed"?</h1>
 			</div>
-			<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission.
+			<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission.			If the port is forwarded, other people in the torrent can see you, thus increasing your potential number of connections, which more importantly, may increase the speed of your download.
 			<p>
 			<div id="pagetitle">
-				<h1>Why do I need to Port Forward?</h1>
+				<h1>When do I need to Port Forward?</h1>
 			</div>
-			<p>Transmission uses a single port for all the torrents you are downloading. If the port has not been opened (ie forwarded) that means only you can make connections to others in the swarm.
-			If the port is forwarded, others can connect to you, thus increasing the potential number of people connected to you, and more importantly increasing the speed of your download.
+			<p>If you share your internet connection with a router, or if your broadband modem is a router itself, then you will need to forward Transmission's port by following the instructions below.			In addition, if you have enabled the Mac OS X firewall, you will need to open a port in that too. See below for details.
+			
 			<p>
 			<div id="pagetitle">
 				<h1>How do I Port Forward?</h1>
@@ -34,11 +34,9 @@
 				</div>
 				
 				<li>If you don't have a compatible router, it is simple to forward Transmission's port manually. For instructions <a href="pfrouter.html">click here</a>.</li>
-			
-				<li>If you don't use a router, that is, your modem is directly connected to your computer, you'll need to open Transmission's port in the Mac OS X firewall. For instructions <a href="pffirewall.html">click here</a>.<br>					Keep in mind that many DSL modems also function as routers, and hence port forwarding as per above may still be necessary, even though your computer is directly connected to the modem.<br>
-				NB: it is highly recommended you enable the Mac OS X firewall if you are not using a router.</li>
-			</ul>	
-				
+				<li>If you don't use a router, that is, your modem is directly connected to your computer, you'll need to open Transmission's port in the Mac OS X firewall. For instructions <a href="pffirewall.html">click here</a>.<br>				<b>NB:</b> it is highly recommended you enable the Mac OS X firewall if you are not using a router.</li>
+			</ul>				<p>Keep in mind that many DSL modems also function as routers, and hence port forwarding as per above may still be necessary, even though your computer is directly connected to the modem.
+				
 			<p>
 			<div id="pagetitle">
 				<h1>How do I know if I've done it right?</h1>

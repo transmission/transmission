@@ -32,6 +32,7 @@
 @interface CTGradient (ProgressBar)
 + (CTGradient *)progressWhiteGradient;
 + (CTGradient *)progressGrayGradient;
++ (CTGradient *)progressLightGrayGradient;
 + (CTGradient *)progressBlueGradient;
 + (CTGradient *)progressGreenGradient;
 + (CTGradient *)progressLightGreenGradient;

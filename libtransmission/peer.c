@@ -423,7 +423,8 @@ int tr_peerPulse( tr_peer_t * peer )
     }
     
     /* Disconnect if seeder and torrent is seeding */
-    if( peer->tor->status == TR_STATUS_SEED && peer->progress >= 1.0 )
+    if(   ( peer->progress >= 1.0 )
+       && ( peer->tor->status & (TR_STATUS_SEED|TR_STATUS_DONE) ) )
     {
         return TR_ERROR;
     }
@@ -553,8 +554,9 @@ writeBegin:
 writeEnd:
 
     /* Ask for a block whenever possible */
-    if( !tr_cpIsSeeding( tor->completion ) &&
-        !peer->amInterested && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
+    if( tr_cpGetStatus( tor->completion ) == TR_CP_INCOMPLETE
+        && !peer->amInterested
+        && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
     {
         /* This peer is no use to us, and it seems there are
            more */
@@ -562,18 +564,41 @@ writeEnd:
         return TR_ERROR;
     }
 
-    if( peer->amInterested && !peer->peerChoking && !peer->banned )
+    if(     peer->amInterested
+        && !peer->peerChoking
+        && !peer->banned
+        &&  peer->inRequestCount < OUR_REQUEST_COUNT )
     {
-        int block;
-        while( peer->inRequestCount < OUR_REQUEST_COUNT )
-        {
-            block = chooseBlock( tor, peer );
-            if( block < 0 )
-            {
-                break;
-            }
-            sendRequest( tor, peer, block );
+        int i;
+        int poolSize=0, endgame=0;
+        int * pool = getPreferredPieces ( tor, peer, &poolSize, &endgame );
+
+        /* TODO: add some asserts to see if this bitfield is really necessary */
+        tr_bitfield_t * blocksAlreadyRequested = tr_bitfieldNew( tor->blockCount );
+        for( i=0; i<peer->inRequestCount; ++i) {
+            const tr_request_t * r = &peer->inRequests[i];
+            const int block = tr_block( r->index, r->begin );
+            tr_bitfieldAdd( blocksAlreadyRequested, block );
         }
+
+        for( i=0; i<poolSize && peer->inRequestCount<OUR_REQUEST_COUNT;  )
+        {
+            int unused;
+            const int piece = pool[i];
+            const int block = endgame
+                ? tr_cpMostMissingBlockInPiece( tor->completion, piece, &unused)
+                : tr_cpMissingBlockInPiece ( tor->completion, piece );
+
+            if( block>=0 && (endgame || !tr_bitfieldHas( blocksAlreadyRequested, block ) ) )
+            {
+                tr_bitfieldAdd( blocksAlreadyRequested, block );
+                sendRequest( tor, peer, block );
+            }
+            else ++i;
+        }
+
+        tr_bitfieldFree( blocksAlreadyRequested );
+        free( pool );
     }
 
     return TR_OK;

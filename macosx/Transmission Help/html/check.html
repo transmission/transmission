@@ -11,6 +11,9 @@
 				<a name="menus"></a>
 				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
 				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
 			</div>
 			<div id="pagetitle">
 				<h1>How do I manually recheck my files?</h1>
@@ -24,18 +27,9 @@
 			<p>To do this:
 				<div summary="To do this" id="taskbox">
 				<ol>
-					<li>In Transmission, click on the magnifying glass next to the torrent in question.
-					<p>This should open a Finder window which displays all the files in your torrent.</li>
-					<li>Select the torrent in Transmission and click "Remove". 
-					<p>NB: make sure you keep a copy of the torrent file - you'll need it later! </li>
-					<li>Open the Terminal. You can find it in /Applications/Utilities. </li>
-					<li>Once inside the Terminal, type "touch " (including a space). Do not hit Enter yet. </li>
-					<li>Drag any one of the files you are downloading into the Terminal window (from the Finder window you opened in step 1).
-					<p>The file path should automagically appear. </li>
-					<li>Now hit "Enter" inside the terminal. </li>
-					<li>Quit Terminal. </li>
-					<li>Reload the torrent file in question into Transmission.
-					<p>Transmission should start rechecking your files!</li>
+					<li>Select the relevant torrent.</li>
+					<li>Pause it, and then go to the Transfers menu >> Remove fast resume cache.</li>
+					<li>Start the torrent again. Transmission will check it first.</li>
 				</ol>
 				</div>
 				

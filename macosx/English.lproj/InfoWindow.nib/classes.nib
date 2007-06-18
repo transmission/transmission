@@ -7,8 +7,10 @@
                 revealDataFile = id; 
                 revealFile = id; 
                 revealTorrentFile = id; 
+                setCheck = id; 
                 setLimitSetting = id; 
                 setPex = id; 
+                setPriority = id; 
                 setRatioLimit = id; 
                 setRatioSetting = id; 
                 setSpeedLimit = id; 
@@ -32,8 +34,13 @@
                 fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
                 fErrorMessageView = NSTextView; 
+                fFileCheckItem = NSMenuItem; 
                 fFileOutline = NSOutlineView; 
+                fFilePriorityHigh = NSMenuItem; 
+                fFilePriorityLow = NSMenuItem; 
+                fFilePriorityNormal = NSMenuItem; 
                 fFileTableStatusField = NSTextField; 
+                fFileUncheckItem = NSMenuItem; 
                 fHashField = NSTextField; 
                 fImageView = NSImageView; 
                 fLeechersField = NSTextField; 

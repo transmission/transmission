@@ -36,9 +36,17 @@
 
 - (void) setImage: (NSImage *) image
 {
+    if (!image)
+        image = [[[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy] autorelease];
+    
     [image setFlipped: YES];
     [image setScalesWhenResized: YES];
     [super setImage: image];
+}
+
+- (void) setProgress: (float) progress
+{
+    fPercent = progress * 100.0;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -85,8 +93,7 @@
                         paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         NSString * statusString = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
-                                                                "Inspector -> Files tab -> file status string"),
-                                    100.0 * [[item objectForKey: @"Progress"] floatValue],
+                                    "Inspector -> Files tab -> file status string"), fPercent,
                                     [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
         
         NSRect statusTextRect = nameTextRect;
