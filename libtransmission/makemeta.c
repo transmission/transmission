@@ -45,7 +45,7 @@ getFiles( const char        * dir,
     DIR * odir = NULL;
     sb.st_size = 0;
 
-    snprintf( buf, sizeof(buf), "%s"TR_PATH_DELIMITER_STR"%s", dir, base );
+    tr_buildPath( buf, sizeof(buf), dir, base, NULL );
     i = stat( buf, &sb );
     if( i ) {
         tr_err("makemeta couldn't stat \"%s\"; skipping. (%s)", buf, strerror(errno));

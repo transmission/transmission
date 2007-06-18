@@ -70,17 +70,20 @@ typedef uint64_t tr_time_t;
   ( FR_MTIME_LEN( t ) + FR_BLOCK_BITFIELD_LEN( t ) )
 
 static void
-fastResumeFileName( char * path, size_t size, const tr_torrent_t * tor, int tag )
+fastResumeFileName( char * buf, size_t buflen, const tr_torrent_t * tor, int tag )
 {
-    if( tag )
+    const char * cacheDir = tr_getCacheDirectory ();
+    const char * hash = tor->info.hashString;
+
+    if( !tag )
     {
-        snprintf( path, size, "%s/resume.%s-%s", tr_getCacheDirectory(),
-                  tor->info.hashString, tor->handle->tag );
+        tr_buildPath( buf, buflen, cacheDir, hash, NULL );
     }
     else
     {
-        snprintf( path, size, "%s/resume.%s", tr_getCacheDirectory(),
-                  tor->info.hashString );
+        char base[1024];
+        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_buildPath( buf, buflen, cacheDir, base, NULL );
     }
 }
 
@@ -94,8 +97,8 @@ getMTimes( const tr_torrent_t * tor, int * setme_n )
     for( i=0; i<n; ++i ) {
         char fname[MAX_PATH_LENGTH];
         struct stat sb;
-        snprintf( fname, sizeof(fname), "%s/%s",
-                  tor->destination, tor->info.files[i].name );
+        tr_buildPath( fname, sizeof(fname),
+                      tor->destination, tor->info.files[i].name, NULL );
         if ( !stat( fname, &sb ) && S_ISREG( sb.st_mode ) ) {
 #ifdef SYS_DARWIN
             m[i] = sb.st_mtimespec.tv_sec;

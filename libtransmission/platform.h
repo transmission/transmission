@@ -47,8 +47,8 @@ tr_thread_t;
 /* only for debugging purposes */
 const char * tr_getHomeDirectory( void );
 
-char * tr_getCacheDirectory();
-char * tr_getTorrentsDirectory();
+const char * tr_getCacheDirectory( void );
+const char * tr_getTorrentsDirectory( void );
 
 /**
  * When instantiating a thread with a deferred call to tr_threadCreate(),

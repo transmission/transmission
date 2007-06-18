@@ -348,7 +348,7 @@ static int getfile( char * buf, int size,
     strcatUTF8( buf, size, prefix, 0 );
     for( ii = 0; jj > ii; ii++ )
     {
-        strcatUTF8( buf, size, "/", 0 );
+        strcatUTF8( buf, size, TR_PATH_DELIMITER_STR, 0 );
         strcatUTF8( buf, size, list[ii], 1 );
     }
     free( list );
@@ -523,16 +523,20 @@ static char * announceToScrape( const char * announce )
     return scrape;
 }
 
-void savedname( char * name, size_t len, const char * hash, const char * tag )
+void
+savedname( char * name, size_t len, const char * hash, const char * tag )
 {
-    if( NULL == tag )
+    const char * torDir = tr_getTorrentsDirectory ();
+
+    if( tag == NULL )
     {
-        snprintf( name, len, "%s/%s", tr_getTorrentsDirectory(), hash );
+        tr_buildPath( name, len, torDir, hash, NULL );
     }
     else
     {
-        snprintf( name, len, "%s/%s-%s",
-                  tr_getTorrentsDirectory(), hash, tag );
+        char base[1024];
+        snprintf( base, sizeof(base), "%s-%s", hash, tag );
+        tr_buildPath( name, len, torDir, base, NULL );
     }
 }
 

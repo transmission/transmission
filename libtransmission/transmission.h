@@ -52,8 +52,13 @@ extern "C" {
 #define INET_ADDRSTRLEN 16
 #endif
 
+#if defined(__MINGW__)
+#define TR_PATH_DELIMITER '\\'
+#define TR_PATH_DELIMITER_STR "\\"
+#else
 #define TR_PATH_DELIMITER '/'
 #define TR_PATH_DELIMITER_STR "/"
+#endif
 
 #define TR_DEFAULT_PORT   9090
 
@@ -133,7 +138,7 @@ void tr_freeMessageList( tr_msg_list_t * list );
  * Returns the full path to a directory which can be used to store
  * preferences. The string belongs to libtransmission, do not free it.
  **********************************************************************/
-char * tr_getPrefsDirectory();
+const char * tr_getPrefsDirectory( void );
 
 /***********************************************************************
  * tr_setBindPort

@@ -66,12 +66,11 @@ int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
 int tr_concat( char ** buf, int * used, int * max,
                const char * data, int len );
 
-/***********************************************************************
- * tr_dupstr
- ***********************************************************************
- * Creates a nul-terminated string 
- **********************************************************************/
-char * tr_dupstr( const char * base, int len );
+/* creates a filename from a series of elements using the
+   correct separator for filenames. */
+void tr_buildPath ( char* buf, size_t buflen,
+                    const char * first_element, ... );
+
 
 int    tr_ioErrorFromErrno( void );
 
@@ -177,10 +176,10 @@ static inline int _tr_block( const tr_torrent_t * tor, int index, int begin )
 ****
 ***/
 
-char* tr_strdup( const char * pch );
-
+char* tr_strdup( const char * str );
+char* tr_strndup( const char * str, int len );
 void* tr_malloc( size_t );
-
+void* tr_calloc( size_t nmemb, size_t size );
 void  tr_free( void* );
 
 /***

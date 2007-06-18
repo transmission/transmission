@@ -81,128 +81,120 @@ tr_getHomeDirectory( void )
 static void
 tr_migrateResume( const char *oldDirectory, const char *newDirectory )
 {
-    DIR * dirh;
-    struct dirent * dirp;
-    char oldFile[MAX_PATH_LENGTH];
-    char newFile[MAX_PATH_LENGTH];
+    DIR * dirh = opendir( oldDirectory );
 
-    if( ( dirh = opendir( oldDirectory ) ) )
+    if( dirh != NULL )
     {
+        struct dirent * dirp;
+
         while( ( dirp = readdir( dirh ) ) )
         {
-            if( strncmp( "resume.", dirp->d_name, 7 ) )
+            if( !strncmp( "resume.", dirp->d_name, 7 ) )
             {
-                continue;
+                char o[MAX_PATH_LENGTH];
+                char n[MAX_PATH_LENGTH];
+                tr_buildPath( o, sizeof(o), oldDirectory, dirp->d_name, NULL );
+                tr_buildPath( n, sizeof(n), newDirectory, dirp->d_name, NULL );
+                rename( o, n );
             }
-            snprintf( oldFile, MAX_PATH_LENGTH, "%s/%s",
-                      oldDirectory, dirp->d_name );
-            snprintf( newFile, MAX_PATH_LENGTH, "%s/%s",
-                      newDirectory, dirp->d_name );
-            rename( oldFile, newFile );
         }
 
         closedir( dirh );
     }
 }
 
-char * tr_getPrefsDirectory()
+const char *
+tr_getPrefsDirectory( void )
 {
-    static char prefsDirectory[MAX_PATH_LENGTH];
-    static int  init = 0;
+    static char   buf[MAX_PATH_LENGTH];
+    static int    init = 0;
+    static size_t buflen = sizeof(buf);
+    const char* h;
 
     if( init )
-    {
-        return prefsDirectory;
-    }
+        return buf;
 
+    h = tr_getHomeDirectory();
 #ifdef SYS_BEOS
-	find_directory( B_USER_SETTINGS_DIRECTORY, dev_for_path("/boot"),
-	                true, prefsDirectory, MAX_PATH_LENGTH );
-	strcat( prefsDirectory, "/Transmission" );
+    find_directory( B_USER_SETTINGS_DIRECTORY,
+                    dev_for_path("/boot"), true, buf, buflen );
+    strcat( buf, "/Transmission" );
 #elif defined( SYS_DARWIN )
-    snprintf( prefsDirectory, MAX_PATH_LENGTH,
-              "%s/Library/Application Support/Transmission",
-              tr_getHomeDirectory() );
+    tr_buildPath ( buf, buflen, h,
+                  "Library", "Application Support", "Transmission", NULL );
 #elif defined(__AMIGAOS4__)
-    snprintf( prefsDirectory, MAX_PATH_LENGTH, "PROGDIR:.transmission" );
+    snprintf( buf, buflen, "PROGDIR:.transmission" );
 #else
-    snprintf( prefsDirectory, MAX_PATH_LENGTH, "%s/.transmission",
-              tr_getHomeDirectory() );
+    tr_buildPath ( buf, buflen, h, ".transmission", NULL );
 #endif
 
-    tr_mkdir( prefsDirectory );
+    tr_mkdir( buf );
     init = 1;
 
 #ifdef SYS_DARWIN
-    char oldDirectory[MAX_PATH_LENGTH];
-    snprintf( oldDirectory, MAX_PATH_LENGTH, "%s/.transmission",
-              tr_getHomeDirectory() );
-    tr_migrateResume( oldDirectory, prefsDirectory );
+    char old[MAX_PATH_LENGTH];
+    tr_buildPath ( old, sizeof(old), h, ".transmission", NULL );
+    tr_migrateResume( old, buf );
     rmdir( oldDirectory );
 #endif
 
-    return prefsDirectory;
+    return buf;
 }
 
-char * tr_getCacheDirectory()
+const char *
+tr_getCacheDirectory( void )
 {
-    static char cacheDirectory[MAX_PATH_LENGTH];
+    static char buf[MAX_PATH_LENGTH];
     static int  init = 0;
+    static const size_t buflen = sizeof(buf);
+    const char * p;
 
     if( init )
-    {
-        return cacheDirectory;
-    }
+        return buf;
 
+    p = tr_getPrefsDirectory();
 #ifdef SYS_BEOS
-    /* XXX hey Bryan, is this fine with you? */
-    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/Cache",
-              tr_getPrefsDirectory() );
+    tr_buildPath( buf, buflen, p, "Cache", NULL );
 #elif defined( SYS_DARWIN )
-    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/Library/Caches/Transmission",
-              tr_getHomeDirectory() );
+    tr_buildPath( buf, buflen, tr_getHomeDirectory(),
+                  "Library", "Caches", "Transmission", NULL );
 #else
-    snprintf( cacheDirectory, MAX_PATH_LENGTH, "%s/cache",
-              tr_getPrefsDirectory() );
+    tr_buildPath( buf, buflen, p, "cache", NULL );
 #endif
 
-    tr_mkdir( cacheDirectory );
+    tr_mkdir( buf );
     init = 1;
 
-    if( strcmp( tr_getPrefsDirectory(), cacheDirectory ) )
-    {
-        tr_migrateResume( tr_getPrefsDirectory(), cacheDirectory );
-    }
+    if( strcmp( p, buf ) )
+        tr_migrateResume( p, buf );
 
-    return cacheDirectory;
+    return buf;
 }
 
-char * tr_getTorrentsDirectory()
+const char *
+tr_getTorrentsDirectory( void )
 {
-    static char torrentsDirectory[MAX_PATH_LENGTH];
+    static char buf[MAX_PATH_LENGTH];
     static int  init = 0;
+    static const size_t buflen = sizeof(buf);
+    const char * p;
 
     if( init )
-    {
-        return torrentsDirectory;
-    }
+        return buf;
+
+    p = tr_getPrefsDirectory ();
 
 #ifdef SYS_BEOS
-    /* XXX hey Bryan, is this fine with you? */
-    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/Torrents",
-              tr_getPrefsDirectory() );
+    tr_buildPath( buf, buflen, p, "Torrents", NULL );
 #elif defined( SYS_DARWIN )
-    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/Torrents",
-              tr_getPrefsDirectory() );
+    tr_buildPath( buf, buflen, p, "Torrents", NULL );
 #else
-    snprintf( torrentsDirectory, MAX_PATH_LENGTH, "%s/torrents",
-              tr_getPrefsDirectory() );
+    tr_buildPath( buf, buflen, p, "torrents", NULL );
 #endif
 
-    tr_mkdir( torrentsDirectory );
+    tr_mkdir( buf );
     init = 1;
-
-    return torrentsDirectory;
+    return buf;
 }
 
 static void ThreadFunc( void * _t )

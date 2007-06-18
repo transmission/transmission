@@ -30,7 +30,7 @@ static int
 readOrWriteBytes ( const tr_torrent_t  * tor,
                    int                   ioMode,
                    int                   fileIndex,
-                   size_t                fileOffset,
+                   uint64_t              fileOffset,
                    void                * buf,
                    size_t                buflen )
 {
@@ -48,7 +48,7 @@ readOrWriteBytes ( const tr_torrent_t  * tor,
         return 0;
     else if ((fd = tr_fdFileOpen ( tor->destination, file->name, TRUE )) < 0)
         ret = fd;
-    else if( lseek( fd, fileOffset, SEEK_SET ) == ((off_t)-1) )
+    else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
         ret = TR_ERROR_IO_OTHER;
     else if( func( fd, buf, buflen ) != buflen )
         ret = tr_ioErrorFromErrno ();
@@ -63,8 +63,10 @@ readOrWriteBytes ( const tr_torrent_t  * tor,
 
 static void
 findFileLocation ( const tr_torrent_t * tor,
-                   int pieceIndex, size_t pieceOffset,
-                   int * fileIndex, size_t * fileOffset )
+                   int                  pieceIndex,
+                   int                  pieceOffset,
+                   int                * fileIndex,
+                   uint64_t           * fileOffset )
 {
     const tr_info_t * info = &tor->info;
 
@@ -72,7 +74,8 @@ findFileLocation ( const tr_torrent_t * tor,
     uint64_t piecePos = ((uint64_t)pieceIndex * info->pieceSize) + pieceOffset;
 
     assert ( 0<=pieceIndex && pieceIndex < info->pieceCount );
-    assert ( pieceOffset < (size_t)tr_pieceSize(pieceIndex) );
+    assert ( 0<=tor->info.pieceSize );
+    assert ( pieceOffset < tr_pieceSize(pieceIndex) );
     assert ( piecePos < info->totalSize );
 
     for ( i=0; info->files[i].length<=piecePos; ++i )
@@ -88,7 +91,7 @@ findFileLocation ( const tr_torrent_t * tor,
 static int
 ensureMinimumFileSize ( const tr_torrent_t  * tor,
                         int                   fileIndex,
-                        size_t                minSize ) /* in bytes */
+                        uint64_t              minSize ) /* in bytes */
 {
     int fd;
     int ret;
@@ -120,13 +123,13 @@ static int
 readOrWritePiece ( tr_torrent_t       * tor,
                    int                  ioMode,
                    int                  pieceIndex,
-                   size_t               pieceOffset,
+                   int                  pieceOffset,
                    uint8_t            * buf,
                    size_t               buflen )
 {
     int ret = 0;
     int fileIndex;
-    size_t fileOffset;
+    uint64_t fileOffset;
     const tr_info_t * info = &tor->info;
 
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
@@ -141,7 +144,7 @@ readOrWritePiece ( tr_torrent_t       * tor,
     while( buflen && !ret )
     {
         const tr_file_t * file = &info->files[fileIndex];
-        const size_t bytesThisPass = MIN( buflen, file->length - fileOffset );
+        const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
         if( ioMode == TR_IO_WRITE )
             ret = ensureMinimumFileSize( tor, fileIndex,

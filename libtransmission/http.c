@@ -135,7 +135,7 @@ tr_httpRequestType( const char * data, int len, char ** method, char ** uri )
     /* copy the method */
     if( 0 <= ret && NULL != method )
     {
-        *method = tr_dupstr( words[0], words[1] - words[0] );
+        *method = tr_strndup( words[0], words[1] - words[0] );
         if( NULL == *method )
         {
             ret = -1;
@@ -144,7 +144,7 @@ tr_httpRequestType( const char * data, int len, char ** method, char ** uri )
     /* copy uri */
     if( 0 <= ret && NULL != uri )
     {
-        *uri = tr_dupstr( words[2], words[3] - words[2] );
+        *uri = tr_strndup( words[2], words[3] - words[2] );
         if( NULL == *uri )
         {
             free( *method );
@@ -371,7 +371,7 @@ tr_httpParseUrl( const char * url, int len,
 
     if( NULL != host )
     {
-        *host = tr_dupstr( url, hostend - url );
+        *host = tr_strndup( url, hostend - url );
     }
     if( NULL != port )
     {
@@ -381,7 +381,7 @@ tr_httpParseUrl( const char * url, int len,
     {
         if( 0 < len - ( pathstart - url ) )
         {
-            *path = tr_dupstr( pathstart, len - ( pathstart - url ) );
+            *path = tr_strndup( pathstart, len - ( pathstart - url ) );
         }
         else
         {
@@ -843,7 +843,7 @@ learnlength( tr_http_t * http )
         {
             http->lengthtype = HTTP_LENGTH_FIXED;
             http->chunkoff = body - http->header.buf;
-            duped = tr_dupstr( hdr[0].data, hdr[0].len );
+            duped = tr_strndup( hdr[0].data, hdr[0].len );
             http->chunklen = strtol( duped, NULL, 10 );
             free( duped );
         }

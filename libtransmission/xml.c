@@ -229,7 +229,7 @@ catrange( char * str, const char * begin, const char * end )
 
     if( NULL == str )
     {
-        return tr_dupstr( begin, end - begin );
+        return tr_strndup( begin, end - begin );
     }
 
     len = strlen( str );

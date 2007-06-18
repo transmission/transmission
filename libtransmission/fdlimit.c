@@ -425,7 +425,9 @@ static int OpenFile( int i, const char * folder, const char * name, int write )
         return TR_ERROR_IO_PARENT;
     }
 
-    snprintf( path, sizeof(path), "%s/%s", folder, name );
+    snprintf( path, sizeof(path), "%s" TR_PATH_DELIMITER_STR "%s",
+              folder,
+              name );
 
     /* Create subfolders, if any */
     if( write )

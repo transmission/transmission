@@ -311,19 +311,24 @@ int tr_concat( char ** buf, int * used, int * max, const char * data, int len )
     return 0;
 }
 
-char *
-tr_dupstr( const char * base, int len )
+void
+tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
 {
-    char * ret;
-
-    ret = malloc( len + 1 );
-    if( NULL != ret )
-    {
-        memcpy( ret, base, len );
-        ret[len] = '\0';
+    va_list vl;
+    char* walk = buf;
+    const char * element = first_element;
+    va_start( vl, first_element );
+    for( ;; ) {
+        const size_t n = strlen( element );
+        memcpy( walk, element, n );
+        walk += n;
+        element = (const char*) va_arg( vl, const char* );
+        if( element == NULL )
+            break;
+        *walk++ = TR_PATH_DELIMITER;
     }
-
-    return ret;
+    *walk = '\0';
+    assert( walk-buf <= (int)buflen );
 }
 
 int
@@ -376,17 +381,28 @@ tr_errorString( int code )
 *****
 ****/
 
-char* tr_strdup( const char * in )
+char*
+tr_strdup( const char * in )
+{
+    return tr_strndup( in, in ? strlen(in) : 0 );
+}
+
+char*
+tr_strndup( const char * in, int len )
 {
     char * out = NULL;
     if( in != NULL )
     {
-        const size_t len = strlen( in );
-        out = malloc( len + 1 );
+        out = tr_calloc( len+1, 1 );
         memcpy( out, in, len );
-        out[len] = '\0';
     }
     return out;
+}
+
+void*
+tr_calloc( size_t nmemb, size_t size )
+{
+    return nmemb && size ? calloc( nmemb, size ) : NULL;
 }
 
 void*

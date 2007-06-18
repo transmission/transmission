@@ -588,7 +588,7 @@ deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
         free( ii );
         return;
     }
-    ii->id = tr_dupstr( id, idLen );
+    ii->id = tr_strndup( id, idLen );
     ii->state = UPNPDEV_STATE_ROOT;
     actionSetup( &ii->getcmd, "GetSpecificPortMappingEntry", 8 );
     actionSetup( &ii->addcmd, "AddPortMapping", 8 );
@@ -1089,7 +1089,7 @@ parseRoot( const char * root, const char *buf, int len,
     {
         basedup = strrchr( root, '/' );
         assert( NULL != basedup );
-        basedup = tr_dupstr( root, basedup - root + 1 );
+        basedup = tr_strndup( root, basedup - root + 1 );
     }
     else
     {

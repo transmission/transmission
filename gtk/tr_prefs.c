@@ -59,7 +59,7 @@
 enum
 {
     PROP_PARENT = 1,
-    PROP_CORE,
+    PROP_CORE
 };
 
 #define PTYPE( id )                                                           \
