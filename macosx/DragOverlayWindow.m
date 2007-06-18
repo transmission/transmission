@@ -145,7 +145,7 @@
 - (void) setFile: (NSString *) file
 {
         
-    [[self contentView] setOverlay: [NSImage imageNamed: @"Create.png"]
+    [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge.png"]
         mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
     
     //stop other animation and set to same progress

@@ -116,6 +116,7 @@
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2DF377C0C222E2D006523C1 /* Creator.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2DF377A0C222E2D006523C1 /* Creator.nib */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
+		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
@@ -312,7 +313,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -427,6 +428,7 @@
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2DF377B0C222E2D006523C1 /* Creator.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Creator.nib; path = macosx/English.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
+		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
@@ -664,6 +666,7 @@
 				4DF7500808A103AD007B0D70 /* Info.png */,
 				4DF7500708A103AD007B0D70 /* Open.png */,
 				A2E9AA750C249AF400085DCF /* Create.png */,
+				A2F011980C27418800576FC0 /* CreateLarge.png */,
 				4DF7500908A103AD007B0D70 /* Remove.png */,
 				35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */,
 				35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */,
@@ -1169,6 +1172,7 @@
 				A241528B0C0261B8007DD3B4 /* Globe.tiff in Resources */,
 				A2DF377C0C222E2D006523C1 /* Creator.nib in Resources */,
 				A2E9AA760C249AF400085DCF /* Create.png in Resources */,
+				A2F011990C27418800576FC0 /* CreateLarge.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
