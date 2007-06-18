@@ -158,26 +158,6 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
     g_object_set_data_full (G_OBJECT(w), "tag", GUINT_TO_POINTER(tag), remove_tag);
 }
 
-static void
-file_mode_toggled_cb (GtkToggleButton *togglebutton, gpointer user_data)
-{
-    if( gtk_toggle_button_get_active( togglebutton ) )
-    {
-        GtkFileChooserButton * w = GTK_FILE_CHOOSER_BUTTON(user_data);
-        gtk_file_chooser_set_action( GTK_FILE_CHOOSER( w ), GTK_FILE_CHOOSER_ACTION_OPEN );
-    }
-}
-
-static void
-dir_mode_toggled_cb (GtkToggleButton *togglebutton, gpointer user_data)
-{
-    if( gtk_toggle_button_get_active( togglebutton ) )
-    {
-        GtkFileChooserButton * w = GTK_FILE_CHOOSER_BUTTON(user_data);
-        gtk_file_chooser_set_action( GTK_FILE_CHOOSER( w ), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
-    }
-}
-
 /***
 ****
 ***/
@@ -223,6 +203,15 @@ file_selection_changed_cb( GtkFileChooser *chooser, gpointer user_data )
     g_free( pch );
 }
 
+static void
+file_chooser_shown_cb( GtkWidget *w, gpointer folder_toggle )
+{
+    const gboolean isFolder = gtk_toggle_button_get_active( folder_toggle );
+    gtk_file_chooser_set_action (GTK_FILE_CHOOSER(w), isFolder
+        ? GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER
+        : GTK_FILE_CHOOSER_ACTION_OPEN );
+}
+
 GtkWidget*
 make_meta_ui( GtkWindow * parent, tr_handle_t * handle )
 {
@@ -256,11 +245,16 @@ make_meta_ui( GtkWindow * parent, tr_handle_t * handle )
         hig_workarea_add_row (t, &row, name, h, NULL);
 
         g_snprintf( name, sizeof(name), "%s:", _("_File"));
-        w = gtk_file_chooser_button_new( _("File or Directory to Add to the New Torrent"),
-                                         GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+
+        w = gtk_file_chooser_dialog_new (_("File or Directory to Add to the New Torrent"),
+                                         NULL,
+                                         GTK_FILE_CHOOSER_ACTION_OPEN,
+                                         GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                         GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                         NULL);
+        g_signal_connect( w, "map", G_CALLBACK(file_chooser_shown_cb), rb_dir );
+        w = gtk_file_chooser_button_new_with_dialog( w );
         g_signal_connect( w, "selection-changed", G_CALLBACK(file_selection_changed_cb), ui );
-        g_signal_connect( rb_file, "toggled", G_CALLBACK(file_mode_toggled_cb), w );
-        g_signal_connect( rb_dir, "toggled", G_CALLBACK(dir_mode_toggled_cb), w );
         hig_workarea_add_row (t, &row, name, w, NULL);
 
         g_snprintf( name, sizeof(name), "<i>%s</i>", _("No Files Selected"));
