@@ -558,7 +558,7 @@ uint8_t * readtorrent( const char * path, size_t * size )
     errno = 0;
     if( stat( path, &sb ) )
     {
-        tr_err( "Couldn't stat file \"%s\" %s", path, strerror(errno) );
+        tr_err( "Couldn't get information for file \"%s\" %s", path, strerror(errno) );
         return NULL;
     }
 
