@@ -365,26 +365,14 @@ benc_val_t * tr_bencListAdd( benc_val_t * list )
 benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
 {
     benc_val_t * keyval, * itemval;
-    int i;
 
     assert( TYPE_DICT == dict->type );
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
-    /* Keep dictionaries sorted by keys alphabetically.
-       BitTornado-based clients (and maybe others) need this. */
-    for( i = 0; i < dict->val.l.count; i += 2 )
-    {
-        assert( TYPE_STR == dict->val.l.vals[i].type );
-        if( strcmp( key, dict->val.l.vals[i].val.s.s ) < 0 )
-            break;
-    }
-    memmove( &dict->val.l.vals[i+2], &dict->val.l.vals[i],
-             ( dict->val.l.count - i ) * sizeof(benc_val_t) );
-    keyval  = &dict->val.l.vals[i];
-    itemval = &dict->val.l.vals[i+1];
-    dict->val.l.count += 2;
-
+    keyval = dict->val.l.vals + dict->val.l.count++;
     tr_bencInitStr( keyval, key, -1, 1 );
+
+    itemval = dict->val.l.vals + dict->val.l.count++;
     tr_bencInit( itemval, TYPE_INT );
 
     return itemval;
