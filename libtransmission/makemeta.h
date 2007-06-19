@@ -11,6 +11,13 @@
 #ifndef TR_MAKEMETA_H
 #define TR_MAKEMETA_H 1
 
+typedef struct tr_metainfo_builder_file_s
+{
+    char * filename;
+    uint64_t size;
+}
+tr_metainfo_builder_file_t;
+
 typedef struct tr_metainfo_builder_s
 {
     /**
@@ -19,8 +26,7 @@ typedef struct tr_metainfo_builder_s
     **/
 
     char * top;
-    char ** files;
-    uint64_t * fileLengths;
+    tr_metainfo_builder_file_t * files;
     uint64_t totalSize;
     int fileCount;
     int pieceSize;

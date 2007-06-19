@@ -14,7 +14,6 @@
 #include <libgen.h>
 #include <dirent.h>
 #include <stdio.h> /* FILE, snprintf, stderr */
-#include <stdlib.h> /* malloc, calloc */
 
 #include "transmission.h"
 #include "internal.h" /* for tr_torrent_t */
@@ -31,7 +30,8 @@
 struct FileList
 {
     struct FileList * next;
-    char filename[MAX_PATH_LENGTH];
+    uint64_t size;
+    char * filename;
 };
 
 static struct FileList*
@@ -62,34 +62,15 @@ getFiles( const char        * dir,
     }
     else if( S_ISREG( sb.st_mode ) )
     {
-        struct FileList * node = malloc( sizeof( struct FileList ) );
-        snprintf( node->filename, sizeof( node->filename ), "%s", buf );
+        struct FileList * node = tr_malloc( sizeof( struct FileList ) );
+        node->size = sb.st_size;
+        node->filename = tr_strdup( buf );
         node->next = list;
         list = node;
     }
 
     return list;
 }
-
-static void
-freeFileList( struct FileList * list )
-{
-    while( list ) {
-        struct FileList * tmp = list->next;
-        free( list );
-        list = tmp;
-    }
-}
-
-static off_t
-getFileSize ( const char * filename )
-{
-    struct stat sb;
-    sb.st_size = 0;
-    stat( filename, &sb );
-    return sb.st_size;
-}
-
 
 static int
 bestPieceSize( uint64_t totalSize )
@@ -110,15 +91,12 @@ bestPieceSize( uint64_t totalSize )
     return MiB / 4;
 }
 
-/****
-*****
-****/
-
-static int pstrcmp( const void * va, const void * vb)
+static int
+builderFileCompare ( const void * va, const void * vb)
 {
-    const char * a = *(const char**) va;
-    const char * b = *(const char**) vb;
-    return strcmp( a, b );
+    const tr_metainfo_builder_file_t * a = (const tr_metainfo_builder_file_t*) va;
+    const tr_metainfo_builder_file_t * b = (const tr_metainfo_builder_file_t*) vb;
+    return strcmp( a->filename, b->filename );
 }
 
 tr_metainfo_builder_t*
@@ -126,11 +104,10 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
 {
     int i;
     struct FileList * files;
-    const struct FileList * walk;
-    tr_metainfo_builder_t * ret = calloc( 1, sizeof(tr_metainfo_builder_t) );
+    struct FileList * walk;
+    tr_metainfo_builder_t * ret = tr_calloc( 1, sizeof(tr_metainfo_builder_t) );
     ret->top = tr_strdup( topFile );
-    ret->handle = handle;
-
+    ret->handle = handle; 
     if (1) {
         struct stat sb;
         stat( topFile, &sb );
@@ -152,20 +129,25 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
 
     for( walk=files; walk!=NULL; walk=walk->next )
         ++ret->fileCount;
-    ret->files = calloc( ret->fileCount, sizeof(char*) );
-    ret->fileLengths = calloc( ret->fileCount, sizeof(uint64_t) );
 
-    for( i=0, walk=files; walk!=NULL; walk=walk->next, ++i )
-        ret->files[i] = tr_strdup( walk->filename );
+    ret->files = tr_calloc( ret->fileCount, sizeof(tr_metainfo_builder_file_t) );
 
-    qsort( ret->files, ret->fileCount, sizeof(char*), pstrcmp );
-    for( i=0; i<ret->fileCount; ++i ) {
-        ret->fileLengths[i] = getFileSize( ret->files[i] );
-        ret->totalSize += ret->fileLengths[i];
+    for( i=0, walk=files; walk!=NULL; ++i )
+    {
+        struct FileList * tmp = walk;
+        tr_metainfo_builder_file_t * file = &ret->files[i];
+        walk = walk->next;
+        file->filename = tmp->filename;
+        file->size = tmp->size;
+        ret->totalSize += tmp->size;
+        tr_free( tmp );
     }
 
-    freeFileList( files );
-    
+    qsort( ret->files,
+           ret->fileCount,
+           sizeof(tr_metainfo_builder_file_t),
+           builderFileCompare );
+
     ret->pieceSize = bestPieceSize( ret->totalSize );
     ret->pieceCount = (int)( ret->totalSize / ret->pieceSize);
     if( ret->totalSize % ret->pieceSize )
@@ -181,9 +163,8 @@ tr_metaInfoBuilderFree( tr_metainfo_builder_t * builder )
     {
         int i;
         for( i=0; i<builder->fileCount; ++i )
-            tr_free( builder->files[i] );
+            tr_free( builder->files[i].filename );
         tr_free( builder->files );
-        tr_free( builder->fileLengths );
         tr_free( builder->top );
         tr_free( builder->comment );
         tr_free( builder->announce );
@@ -200,16 +181,16 @@ static uint8_t*
 getHashInfo ( tr_metainfo_builder_t * b )
 {
     int fileIndex = 0;
-    uint8_t *ret = (uint8_t*) malloc ( SHA_DIGEST_LENGTH * b->pieceCount );
+    uint8_t *ret = (uint8_t*) tr_malloc ( SHA_DIGEST_LENGTH * b->pieceCount );
     uint8_t *walk = ret;
-    uint8_t *buf = malloc( b->pieceSize );
+    uint8_t *buf = tr_malloc( b->pieceSize );
     uint64_t totalRemain;
     uint64_t off = 0;
     FILE * fp;
 
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
-    fp = fopen( b->files[fileIndex], "rb" );
+    fp = fopen( b->files[fileIndex].filename, "rb" );
     while ( totalRemain )
     {
         uint8_t *bufptr = buf;
@@ -220,17 +201,17 @@ getHashInfo ( tr_metainfo_builder_t * b )
 
         while( pieceRemain )
         {
-            const uint64_t n_this_pass = MIN( (b->fileLengths[fileIndex] - off), pieceRemain );
+            const uint64_t n_this_pass = MIN( (b->files[fileIndex].size - off), pieceRemain );
             fread( bufptr, 1, n_this_pass, fp );
             bufptr += n_this_pass;
             off += n_this_pass;
             pieceRemain -= n_this_pass;
-            if( off == b->fileLengths[fileIndex] ) {
+            if( off == b->files[fileIndex].size ) {
                 off = 0;
                 fclose( fp );
                 fp = NULL;
                 if( ++fileIndex < b->fileCount ) {
-                    fp = fopen( b->files[fileIndex], "rb" );
+                    fp = fopen( b->files[fileIndex].filename, "rb" );
                 }
             }
         }
@@ -255,15 +236,15 @@ getHashInfo ( tr_metainfo_builder_t * b )
     if( fp != NULL )
         fclose( fp );
 
-    free( buf );
+    tr_free( buf );
     return ret;
 }
 
 static void
-getFileInfo( const char * topFile,
-             const char * filename,
-             benc_val_t * uninitialized_length,
-             benc_val_t * uninitialized_path )
+getFileInfo( const char                        * topFile,
+             const tr_metainfo_builder_file_t  * file,
+             benc_val_t                        * uninitialized_length,
+             benc_val_t                        * uninitialized_path )
 {
     benc_val_t *sub;
     const char *pch, *prev;
@@ -271,16 +252,16 @@ getFileInfo( const char * topFile,
     int n;
 
     /* get the file size */
-    tr_bencInitInt( uninitialized_length, getFileSize(filename) );
+    tr_bencInitInt( uninitialized_length, file->size );
 
     /* the path list */
     n = 1;
-    for( pch=filename+topLen; *pch; ++pch )
+    for( pch=file->filename+topLen; *pch; ++pch )
         if (*pch == TR_PATH_DELIMITER)
             ++n;
     tr_bencInit( uninitialized_path, TYPE_LIST );
     tr_bencListReserve( uninitialized_path, n );
-    for( prev=pch=filename+topLen; ; ++pch )
+    for( prev=pch=file->filename+topLen; ; ++pch )
     {
         char buf[MAX_PATH_LENGTH];
 
@@ -316,7 +297,7 @@ makeFilesList( benc_val_t                 * list,
         tr_bencDictReserve( dict, 2 );
         length = tr_bencDictAdd( dict, "length" );
         pathVal = tr_bencDictAdd( dict, "path" );
-        getFileInfo( builder->top, builder->files[i], length, pathVal );
+        getFileInfo( builder->top, &builder->files[i], length, pathVal );
     }
 }
 
@@ -344,7 +325,7 @@ makeInfoDict ( benc_val_t             * dict,
     if ( builder->isSingleFile )
     {
         val = tr_bencDictAdd( dict, "length" );
-        tr_bencInitInt( val, builder->fileLengths[0] );
+        tr_bencInitInt( val, builder->files[0].size );
     }
     else
     {
@@ -398,7 +379,7 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder_t * builder )
             builder->failed = 1;
         else if( fwrite( pch, 1, nmemb, fp ) != nmemb )
             builder->failed = 1;
-        free( pch );
+        tr_free( pch );
         fclose( fp );
     }
 
@@ -427,7 +408,7 @@ static tr_lock_t* getQueueLock( tr_handle_t * h )
     tr_sharedLock( h->shared );
     if( lock == NULL )
     {
-        lock = calloc( 1, sizeof( tr_lock_t ) );
+        lock = tr_calloc( 1, sizeof( tr_lock_t ) );
         tr_lockInit( lock );
     }
     tr_sharedUnlock( h->shared );
