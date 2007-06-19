@@ -663,7 +663,11 @@ float
 tr_torrentFileCompletion ( const tr_torrent_t * tor, int fileIndex )
 {
     const uint64_t c = tr_torrentFileBytesCompleted ( tor, fileIndex );
-    return (double)c / tor->info.files[fileIndex].length;
+    uint64_t length = tor->info.files[fileIndex].length;
+    
+    if( !length )
+        return 1.0;
+    return (double)c / length;
 }
 
 float*
