@@ -74,37 +74,31 @@ getFiles( const char        * dir,
 }
 
 static int
-bestPieceSize( uint64_t totalSize, uint64_t fileCount )
+bestPieceSize( uint64_t totalSize, int fileCount )
 {
-    int pieceSize = 1;
     const int minPieceSize = 65536; /* arbitrary; 2^16 */
     const int maxPieceSize = 16777216; /* arbitrary; 2^24 */
-    const int desiredMinPiecesPerFile = 15; /* arbitrary */
-    uint64_t log;
+    const int desiredMinPiecesPerFile = 10; /* arbitrary */
+    const unsigned int desiredPieces = fileCount * desiredMinPiecesPerFile;
 
-    /* start off in the range of (1024..2048] pieces
-       for "normal" torrents... */
-    log = totalSize;
+    /* a good starting range is to have (1024..2048] pieces... */
+    int pieceSize = 1;
+    uint64_t log = totalSize;
     while( log > 2048 ) {
         log >>= 1;
         pieceSize <<= 1;
     }
 
-    /* special case 1: torrents with a lot of small files.
-       try to have a reasonable number of pieces per file,
-       which will reduce overhead on selective downloading
+    /* now try to have N pieces per average file size...
+       this will reduce overhead on selective downloading
        and increase swarm speed. */
-    while( totalSize/pieceSize < (fileCount * desiredMinPiecesPerFile) ) {
-        const int swap = pieceSize >> 1;
-        if( swap < minPieceSize )
-            break;
-        pieceSize = swap;
-    }
-
-    /* special case 2: enormous single-file torrents. our normal
-       case creates unwieldly piece sizes in that case */
-    while( pieceSize < maxPieceSize )
+    while( ( totalSize / pieceSize ) < desiredPieces )
         pieceSize >>= 1;
+
+    /* clamp to our desired range to make sure we
+       haven't gone too far astray... */
+    if( pieceSize < minPieceSize ) pieceSize = minPieceSize;
+    if( pieceSize > maxPieceSize ) pieceSize = maxPieceSize;
 
     return pieceSize;
 }
