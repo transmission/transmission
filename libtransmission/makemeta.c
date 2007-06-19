@@ -56,7 +56,7 @@ getFiles( const char        * dir,
     {
         struct dirent *d;
         for (d = readdir( odir ); d!=NULL; d=readdir( odir ) )
-            if( strcmp( d->d_name,"." ) && strcmp( d->d_name,".." ) )
+            if( d->d_name && d->d_name[0]!='.' ) /* skip dotfiles, ., and .. */
                 list = getFiles( buf, d->d_name, list );
         closedir( odir );
     }

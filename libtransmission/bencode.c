@@ -29,27 +29,20 @@
 
 static int makeroom( benc_val_t * val, int count )
 {
-    int    len;
-    void * new;
-
     assert( TYPE_LIST == val->type || TYPE_DICT == val->type );
 
-    if( val->val.l.count + count <= val->val.l.alloc )
+    if( val->val.l.count + count > val->val.l.alloc )
     {
-        return 0;
-    }
+        /* We need a bigger boat */
+        const int len = val->val.l.alloc + count +
+            ( count % LIST_SIZE ? LIST_SIZE - ( count % LIST_SIZE ) : 0 );
+        void * new = realloc( val->val.l.vals, len * sizeof( benc_val_t ) );
+        if( NULL == new )
+            return 1;
 
-    /* We need a bigger boat */
-    len = val->val.l.alloc + count +
-        ( count % LIST_SIZE ? LIST_SIZE - ( count % LIST_SIZE ) : 0 );
-    new = realloc( val->val.l.vals, len * sizeof( benc_val_t ) );
-    if( NULL == new )
-    {
-        return 1;
+        val->val.l.alloc = len;
+        val->val.l.vals  = new;
     }
-
-    val->val.l.alloc = len;
-    val->val.l.vals  = new;
 
     return 0;
 }
@@ -327,19 +320,11 @@ void _tr_bencInitStr( benc_val_t * val, char * str, int len, int nofree )
 
 int tr_bencInitStrDup( benc_val_t * val, const char * str )
 {
-    char * new = NULL;
+    char * newStr = tr_strdup( str );
+    if( newStr == NULL )
+        return 1;
 
-    if( NULL != str )
-    {
-        new = strdup( str );
-        if( NULL == new )
-        {
-            return 1;
-        }
-    }
-
-    _tr_bencInitStr( val, new, 0, 0 );
-
+    _tr_bencInitStr( val, newStr, 0, 0 );
     return 0;
 }
 
@@ -353,24 +338,14 @@ int tr_bencListReserve( benc_val_t * val, int count )
 {
     assert( TYPE_LIST == val->type );
 
-    if( makeroom( val, count ) )
-    {
-        return 1;
-    }
-
-    return 0;
+    return makeroom( val, count );
 }
 
 int tr_bencDictReserve( benc_val_t * val, int count )
 {
     assert( TYPE_DICT == val->type );
 
-    if( makeroom( val, count * 2 ) )
-    {
-        return 1;
-    }
-
-    return 0;
+    return makeroom( val, count * 2 );
 }
 
 benc_val_t * tr_bencListAdd( benc_val_t * list )
