@@ -281,8 +281,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
 
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
-    [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                            NSURLPboardType, nil]];
+    [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
 
     //register for sleep notifications
     IONotificationPortRef notify;

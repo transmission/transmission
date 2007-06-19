@@ -78,6 +78,8 @@
             [self release];
             return nil;
         }
+        
+        fDefaults = [NSUserDefaults standardUserDefaults];
     }
     return self;
 }
@@ -124,6 +126,17 @@
                                             stringByExpandingTildeInPath] retain];
     [fLocationField setStringValue: [fLocation stringByAbbreviatingWithTildeInPath]];
     [fLocationField setToolTip: fLocation];
+    
+    //set previously saved values
+    NSString * tracker;
+    if ((tracker = [fDefaults stringForKey: @"CreatorTracker"]))
+        [fTrackerField setStringValue: tracker];
+    
+    if ([fDefaults objectForKey: @"CreatorPrivate"])
+        [fPrivateCheck setState: [fDefaults boolForKey: @"CreatorPrivate"] ? NSOnState : NSOffState];
+    
+    if ([fDefaults objectForKey: @"CreatorOpen"])
+        [fOpenCheck setState: [fDefaults boolForKey: @"CreatorOpen"] ? NSOnState : NSOffState];
 }
 
 - (void) dealloc
@@ -213,6 +226,12 @@
     }
     
     fOpenTorrent = [fOpenCheck state] == NSOnState;
+    
+    //store values
+    [fDefaults setObject: trackerString forKey: @"CreatorTracker"];
+    [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
+    [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
+    
     tr_makeMetaInfo(fInfo, [fLocation UTF8String], [trackerString UTF8String], [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);
     

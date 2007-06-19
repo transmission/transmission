@@ -42,6 +42,8 @@
     
     NSTimer * fTimer;
     BOOL fStarted;
+    
+    NSUserDefaults * fDefaults;
 }
 
 + (void) createTorrentFile: (tr_handle_t *) handle;
