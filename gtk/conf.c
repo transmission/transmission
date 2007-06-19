@@ -306,7 +306,6 @@ cf_loadstate(char **errstr) {
   state = g_new0(benc_val_t, 1);
   if(usedold || tr_bencLoad(data, len, state, NULL)) {
     /* XXX all this evil compat code should go away at some point */
-    tr_bencFree(state);
     bzero(state, sizeof(benc_val_t));
     state->type = TYPE_LIST;
     for(line = data; NULL != (eol = strchr(line, PREF_SEP_LINE));
