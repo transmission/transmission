@@ -39,10 +39,13 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 268.0
-#define TAB_ACTIVITY_HEIGHT 258.0
+#define TAB_ACTIVITY_HEIGHT 274.0
 #define TAB_PEERS_HEIGHT 279.0
 #define TAB_FILES_HEIGHT 279.0
 #define TAB_OPTIONS_HEIGHT 158.0
+
+#define PIECES_CONTROL_PROGRESS 0
+#define PIECES_CONTROL_AVAILABLE 1
 
 #define OPTION_POPUP_GLOBAL 0
 #define OPTION_POPUP_NO_LIMIT 1
@@ -96,6 +99,10 @@
     
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
+    
+    //set pieces control
+    [fPiecesControl setSelectedSegment: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
+                                            ? PIECES_CONTROL_AVAILABLE : PIECES_CONTROL_PROGRESS];
     
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
@@ -196,6 +203,7 @@
         [fDataLocationField setSelectable: NO];
         
         [fStateField setStringValue: @""];
+        [fProgressField setStringValue: @""];
         [fRatioField setStringValue: @""];
         
         [fSeedersField setStringValue: @""];
@@ -212,6 +220,7 @@
         [fDateCompletedField setStringValue: @""];
         [fDateActivityField setStringValue: @""];
         
+        [fPiecesControl setEnabled: NO];
         [fPiecesView setTorrent: nil];
         
         if (fPeers)
@@ -276,6 +285,7 @@
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
         
+        [fPiecesControl setEnabled: YES];
         [fPiecesView setTorrent: torrent];
         
         //set file table
@@ -357,11 +367,9 @@
     {
         torrent = [fTorrents objectAtIndex: 0];
         
-        //append percentage to amount downloaded if 1 torrent
-        [fDownloadedValidField setStringValue: [[fDownloadedValidField stringValue]
-                                        stringByAppendingFormat: @" (%.2f%%)", 100.0 * [torrent progress]]];
-        
         [fStateField setStringValue: [torrent stateString]];
+        [fProgressField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
+                    "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
         [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
         [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
         
@@ -975,6 +983,13 @@
     }
     
     return descriptors;
+}
+
+- (void) setPiecesView: (id) sender
+{
+    [[NSUserDefaults standardUserDefaults] setBool: [sender selectedSegment] == PIECES_CONTROL_AVAILABLE
+                            forKey: @"PiecesViewShowAvailability"];
+    [fPiecesView updateView: YES];
 }
 
 - (void) revealTorrentFile: (id) sender

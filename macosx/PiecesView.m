@@ -134,10 +134,6 @@
         [bp fill];
         [fBluePiece unlockFocus];
         
-        [self setToolTip: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
-                        ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
-                        : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
-        
         //actually draw the box
         [self setTorrent: nil];
 }
@@ -193,8 +189,11 @@
         
         [self updateView: YES];
     }
-    
-    [self setHidden: torrent == nil];
+    else
+    {
+        [self setImage: [[fBack copy] autorelease]];
+        [self setNeedsDisplay];
+    }
 }
 
 - (void) updateView: (BOOL) first
@@ -374,27 +373,6 @@
         free(pieces);
     else
         free(piecesPercent);
-}
-
-- (BOOL) acceptsFirstMouse: (NSEvent *) event
-{
-    return YES;
-}
-
-- (void) mouseDown: (NSEvent *) event
-{
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    BOOL showAvailability = ![defaults boolForKey: @"PiecesViewShowAvailability"];
-    
-    [defaults setBool: showAvailability forKey: @"PiecesViewShowAvailability"];
-    
-    [self setToolTip: showAvailability
-        ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
-        : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
-    
-    [self updateView: YES];
-    
-    [super mouseDown: event];
 }
 
 @end

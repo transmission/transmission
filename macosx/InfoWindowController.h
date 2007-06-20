@@ -40,7 +40,7 @@
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fCreatorField, * fDateCreatedField,
-                        * fStateField,
+                        * fStateField, * fProgressField,
                         * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSwarmSpeedField;
     IBOutlet NSTextView * fCommentView;
@@ -51,6 +51,7 @@
                         * fDownloadingFromField, * fUploadingToField, * fCompletedFromTrackerField;
     IBOutlet NSTextView * fErrorMessageView;
     IBOutlet PiecesView * fPiecesView;
+    IBOutlet NSSegmentedControl * fPiecesControl;
     
     IBOutlet NSOutlineView * fFileOutline;
     IBOutlet NSTextField * fFileTableStatusField;
@@ -70,6 +71,8 @@
 
 - (void) setNextTab;
 - (void) setPreviousTab;
+
+- (void) setPiecesView: (id) sender;
 
 - (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;

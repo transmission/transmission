@@ -10,6 +10,7 @@
                 setCheck = id; 
                 setLimitSetting = id; 
                 setPex = id; 
+                setPiecesView = id; 
                 setPriority = id; 
                 setRatioLimit = id; 
                 setRatioSetting = id; 
@@ -47,8 +48,10 @@
                 fNameField = NSTextField; 
                 fPeerTable = NSTableView; 
                 fPexCheck = NSButton; 
+                fPiecesControl = NSSegmentedControl; 
                 fPiecesField = NSTextField; 
                 fPiecesView = PiecesView; 
+                fProgressField = NSTextField; 
                 fRatioField = NSTextField; 
                 fRatioLimitField = NSTextField; 
                 fRatioPopUp = NSPopUpButton; 

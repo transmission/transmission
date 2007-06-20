@@ -157,6 +157,7 @@
 - (NSString *) stateString;
 
 - (float) progress;
+- (float) progressDone;
 - (int) eta;
 
 - (BOOL) isActive;
