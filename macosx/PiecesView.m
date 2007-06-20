@@ -29,9 +29,9 @@
 
 @implementation PiecesView
 
-- (id) init
+- (id) initWithCoder: (NSCoder *) decoder
 {
-    if ((self = [super init]))
+    if ((self = [super initWithCoder: decoder]))
     {
         fTorrent = nil;
         int numPieces = MAX_ACROSS * MAX_ACROSS;
@@ -43,10 +43,8 @@
 
 - (void) awakeFromNib
 {
-        #warning NSRectFill
-        
-        NSSize size = [fImageView bounds].size;
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [fImageView bounds]];
+        NSSize size = [self bounds].size;
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [self bounds]];
         
         //back image
         fBack = [[NSImage alloc] initWithSize: size];
@@ -136,7 +134,7 @@
         [bp fill];
         [fBluePiece unlockFocus];
         
-        [fImageView setToolTip: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
+        [self setToolTip: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
                         ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
                         : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
         
@@ -189,14 +187,14 @@
         else
             fAcross = MAX_ACROSS;
         
-        float width = [fImageView bounds].size.width;
+        float width = [self bounds].size.width;
         fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
         fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
         
         [self updateView: YES];
     }
     
-    [fImageView setHidden: torrent == nil];
+    [self setHidden: torrent == nil];
 }
 
 - (void) updateView: (BOOL) first
@@ -205,8 +203,8 @@
         return;
     
     if (first)
-        [fImageView setImage: [[fBack copy] autorelease]];
-    NSImage * image = [fImageView image];
+        [self setImage: [[fBack copy] autorelease]];
+    NSImage * image = [self image];
 
     int8_t * pieces;
     float * piecesPercent;
@@ -369,7 +367,7 @@
     if (change)
     {
         [image unlockFocus];
-        [fImageView setNeedsDisplay];
+        [self setNeedsDisplay];
     }
     
     if (showAvailablity)
@@ -378,18 +376,25 @@
         free(piecesPercent);
 }
 
-- (void) toggleView
+- (BOOL) acceptsFirstMouse: (NSEvent *) event
+{
+    return YES;
+}
+
+- (void) mouseDown: (NSEvent *) event
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     BOOL showAvailability = ![defaults boolForKey: @"PiecesViewShowAvailability"];
     
     [defaults setBool: showAvailability forKey: @"PiecesViewShowAvailability"];
     
-    [fImageView setToolTip: showAvailability
+    [self setToolTip: showAvailability
         ? NSLocalizedString(@"Piece Availability", "Inspector -> Activity -> detailed pieces view tooltip")
         : NSLocalizedString(@"Piece Progress", "Inspector -> Activity -> detailed pieces view tooltip")];
     
     [self updateView: YES];
+    
+    [super mouseDown: event];
 }
 
 @end

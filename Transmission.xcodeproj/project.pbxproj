@@ -93,7 +93,6 @@
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
-		A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A291DAAD0AC8BEB6003385E9 /* PiecesView.m */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
 		A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */; };
@@ -103,7 +102,7 @@
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
 		A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306580AAD24A80049E2AC /* UKKQueue.m */; };
 		A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */; };
-		A2AA579D0ADFCAB400CA59F6 /* PiecesImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */; };
+		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AF1C390A3D0F6200F1575D /* FileOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */; };
 		A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */; };
 		A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */; };
@@ -389,8 +388,6 @@
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A291DAAC0AC8BEB6003385E9 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
-		A291DAAD0AC8BEB6003385E9 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
 		A29B0C130BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A29B0C140BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
@@ -412,8 +409,8 @@
 		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
 		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
-		A2AA579A0ADFCAB400CA59F6 /* PiecesImageView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesImageView.h; path = macosx/PiecesImageView.h; sourceTree = "<group>"; };
-		A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesImageView.m; path = macosx/PiecesImageView.m; sourceTree = "<group>"; };
+		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
+		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = makemeta.c; path = libtransmission/makemeta.c; sourceTree = "<group>"; };
@@ -887,10 +884,8 @@
 				A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */,
 				A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */,
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
-				A291DAAC0AC8BEB6003385E9 /* PiecesView.h */,
-				A291DAAD0AC8BEB6003385E9 /* PiecesView.m */,
-				A2AA579A0ADFCAB400CA59F6 /* PiecesImageView.h */,
-				A2AA579B0ADFCAB400CA59F6 /* PiecesImageView.m */,
+				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
+				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -1265,9 +1260,8 @@
 				A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */,
 				A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */,
 				A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */,
-				A291DAAF0AC8BEB6003385E9 /* PiecesView.m in Sources */,
 				A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */,
-				A2AA579D0ADFCAB400CA59F6 /* PiecesImageView.m in Sources */,
+				A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */,
 				A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */,
 				A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */,
 				A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */,

@@ -25,7 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
 
-@interface PiecesView : NSObject
+@interface PiecesView : NSImageView
 {
     int8_t  * fPieces;
     
@@ -35,12 +35,9 @@
     
     Torrent * fTorrent;
     int fNumPieces, fAcross, fWidth, fExtraBorder;
-    
-    IBOutlet NSImageView * fImageView;
 }
 
 - (void) setTorrent: (Torrent *) torrent;
 - (void) updateView: (BOOL) first;
-- (void) toggleView;
 
 @end

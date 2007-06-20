@@ -77,18 +77,7 @@
             LANGUAGE = ObjC; 
             SUPERCLASS = NSLevelIndicatorCell; 
         }, 
-        {
-            CLASS = PiecesImageView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {fPiecesView = PiecesView; }; 
-            SUPERCLASS = NSImageView; 
-        }, 
-        {
-            CLASS = PiecesView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {fImageView = NSImageView; }; 
-            SUPERCLASS = NSObject; 
-        }
+        {CLASS = PiecesView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }
     ); 
     IBVersion = 1; 
 }
