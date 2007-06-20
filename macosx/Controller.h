@@ -167,9 +167,11 @@
 - (void) updateUI;
 
 - (void) updateTorrentsInQueue;
+- (int) numToStartFromQueue: (BOOL) downloadQueue;
 
 - (void) torrentFinishedDownloading: (NSNotification *) notification;
 - (void) torrentRestartedDownloading: (NSNotification *) notification;
+
 - (void) updateTorrentHistory;
 
 - (void) sortTorrents;

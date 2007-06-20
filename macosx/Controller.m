@@ -1376,27 +1376,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     BOOL download = [fDefaults boolForKey: @"Queue"],
         seed = [fDefaults boolForKey: @"QueueSeed"];
     
-    //determine the number of downloads needed to start
-    int desiredDownloadActive = download ? [fDefaults integerForKey: @"QueueDownloadNumber"] : 0,
-        desiredSeedActive = seed ? [fDefaults integerForKey: @"QueueSeedNumber"] : 0;
-    
-    Torrent * torrent;
-    NSEnumerator * enumerator;
-    if (download || seed)
-    {
-        enumerator = [fTorrents objectEnumerator];
-        while ((torrent = [enumerator nextObject]))
-            if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
-            {
-                if ([torrent allDownloaded])
-                    desiredSeedActive--;
-                else
-                    desiredDownloadActive--;
-                
-                if (desiredDownloadActive <= 0 && desiredSeedActive <= 0)
-                    break;
-            }
-    }
+    int desiredDownloadActive = [self numToStartFromQueue: YES],
+        desiredSeedActive = [self numToStartFromQueue: NO];
     
     //sort torrents by order value
     NSArray * sortedTorrents;
@@ -1412,7 +1393,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         sortedTorrents = fTorrents;
 
-    enumerator = [sortedTorrents objectEnumerator];
+    Torrent * torrent;
+    NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
         if (![torrent isActive] && [torrent waitingToStart])
@@ -1445,6 +1427,29 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
 }
 
+- (int) numToStartFromQueue: (BOOL) downloadQueue
+{
+    if (![fDefaults boolForKey: downloadQueue ? @"Queue" : @"QueueSeed"])
+        return 0;
+    
+    int desired = [fDefaults integerForKey: downloadQueue ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
+        
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+        if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
+        {
+            if ([torrent allDownloaded] != downloadQueue)
+            {
+                desired--;
+                if (desired <= 0)
+                    return 0;
+            }
+        }
+    
+    return desired;
+}
+
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
@@ -1467,8 +1472,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fWindow isKeyWindow])
         [fBadger incrementCompleted];
     
-    #warning make better
-    if ([fDefaults boolForKey: @"QueueSeed"])
+    if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
     {
         [torrent stopTransfer];
         [torrent setWaitToStart: YES];
@@ -1483,8 +1487,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fInfoController updateInfoStats];
     
-    #warning make better
-    if ([fDefaults boolForKey: @"Queue"])
+    if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] <= 0)
     {
         [torrent stopTransfer];
         [torrent setWaitToStart: YES];
