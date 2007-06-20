@@ -345,7 +345,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
     }
     else if (tr_getIncomplete(fHandle))
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
     else;
     
     //check to stop for ratio
@@ -1704,6 +1704,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
 }
 
+#warning move?
 - (NSImage *) advancedBar
 {
     uint32_t * p;

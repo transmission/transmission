@@ -385,6 +385,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(torrentFinishedDownloading:)
                     name: @"TorrentFinishedDownloading" object: nil];
     
+    [nc addObserver: self selector: @selector(torrentRestartedDownloading:)
+                    name: @"TorrentRestartedDownloading" object: nil];
+    
     [nc addObserver: self selector: @selector(updateControlTint:)
                     name: NSControlTintDidChangeNotification object: nil];
     
@@ -1464,7 +1467,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (![fWindow isKeyWindow])
         [fBadger incrementCompleted];
     
+    #warning make better
     if ([fDefaults boolForKey: @"QueueSeed"])
+    {
+        [torrent stopTransfer];
+        [torrent setWaitToStart: YES];
+    }
+    
+    [self updateTorrentsInQueue];
+}
+
+- (void) torrentRestartedDownloading: (NSNotification *) notification
+{
+    Torrent * torrent = [notification object];
+    
+    [fInfoController updateInfoStats];
+    
+    #warning make better
+    if ([fDefaults boolForKey: @"Queue"])
     {
         [torrent stopTransfer];
         [torrent setWaitToStart: YES];
