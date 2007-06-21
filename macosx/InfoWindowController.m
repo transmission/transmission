@@ -890,6 +890,8 @@
         [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexeSet] forSegment: 0];
         [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexeSet] forSegment: 1];
         [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexeSet] forSegment: 2];
+        
+        [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
     }
     else;
 }
