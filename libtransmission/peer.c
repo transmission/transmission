@@ -25,6 +25,51 @@
 #include "transmission.h"
 #include "peertree.h"
 
+/*****
+******
+*****/
+
+/**
+*** The "SWIFT" system is described by Karthik Tamilmani,
+*** Vinay Pai, and Alexander Mohr of Stony Brook University
+*** in their paper "SWIFT: A System With Incentives For Trading"
+*** http://citeseer.ist.psu.edu/tamilmani04swift.html
+**/
+
+/**
+ * Use SWIFT?
+ */
+static const int SWIFT_ENABLED = 1;
+
+/**
+ * For every byte the peer uploads to us,
+ * allow them to download this many bytes from us
+ */
+static const double SWIFT_REPAYMENT_RATIO = 1.1;
+
+/**
+ * Allow new peers to download this many bytes from
+ * us when getting started.  This can prevent gridlock
+ * with other peers using tit-for-tat algorithms
+ */
+static const int SWIFT_INITIAL_CREDIT = 64 * 1024; /* 64 KiB */
+
+/**
+ * We expend a fraction of our torrent's total upload speed
+ * on on largesse by uniformly distributing free credit to
+ * all of our peers.  This too helps prevent gridlock.
+ */
+static const double SWIFT_LARGESSE = 0.05; /* 5% of our UL */
+
+/**
+ * How frequently to extend largesse-based credit
+ */
+static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
+
+/*****
+******
+*****/
+
 #define PERCENT_PEER_WANTED     25      /* Percent before we start relax peers min activeness */
 #define MIN_UPLOAD_IDLE         60000   /* In high peer situations we wait only 1 min
                                             until dropping peers for idling */
@@ -39,7 +84,7 @@
 #define MAX_CON_TIMEOUT         30000   /* Time to timeout connecting to peer, 
                                             during high peer situations */
 #define MAX_REQUEST_COUNT       32
-#define OUR_REQUEST_COUNT       8  /* TODO: we should detect if we are on a
+#define OUR_REQUEST_COUNT       12 /* TODO: we should detect if we are on a
                                       high-speed network and adapt */
 #define PEX_PEER_CUTOFF         50 /* only try to add new peers from pex if
                                       we have fewer existing peers than this */
@@ -150,6 +195,8 @@ struct tr_peer_s
     tr_ratecontrol_t  * upload;
 
     char              * client;
+
+    int64_t             credit;
 };
 
 #define peer_dbg( a... ) __peer_dbg( peer, ## a )
@@ -190,6 +237,7 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
     peer->addr = addr;
     peer->port = port;
     peer->from = from;
+    peer->credit = SWIFT_INITIAL_CREDIT;
     if( s >= 0 )
     {
         assert( TR_PEER_FROM_INCOMING == from );
@@ -219,14 +267,8 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_bitfieldFree( peer->bitfield );
     tr_bitfieldFree( peer->blamefield );
     tr_bitfieldFree( peer->banfield );
-    if( peer->buf )
-    {
-        free( peer->buf );
-    }
-    if( peer->outMessages )
-    {
-        free( peer->outMessages );
-    }
+    tr_free( peer->buf );
+    tr_free( peer->outMessages );
     if( peer->status > PEER_STATUS_IDLE )
     {
         tr_netClose( peer->socket );
@@ -330,13 +372,6 @@ int tr_peerRead( tr_peer_t * peer )
         peer->pos  += ret;
         if( NULL != tor )
         {
-            tr_rcTransferred( peer->download, ret );
-            tr_rcTransferred( tor->download, ret );
-            if ( !tor->customDownloadLimit )
-            {
-                tr_rcTransferred( tor->handle->download, ret );
-            }
-            
             if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
             {
                 tor->activityDate = date;
@@ -359,19 +394,9 @@ int tr_peerRead( tr_peer_t * peer )
     return TR_OK;
 }
 
-uint64_t tr_peerDate( tr_peer_t * peer )
+uint64_t tr_peerDate( const tr_peer_t * peer )
 {
     return peer->date;
-}
-
-/***********************************************************************
- * tr_peerId
- ***********************************************************************
- *
- **********************************************************************/
-uint8_t * tr_peerId( tr_peer_t * peer )
-{
-    return & peer->id[0];
 }
 
 /***********************************************************************
@@ -389,7 +414,7 @@ struct in_addr * tr_peerAddress( tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-uint8_t * tr_peerHash( tr_peer_t * peer )
+const uint8_t * tr_peerHash( const tr_peer_t * peer )
 {
     return parseBufHash( peer );
 }
@@ -405,6 +430,7 @@ int tr_peerPulse( tr_peer_t * peer )
     int ret, size;
     uint8_t * p;
     uint64_t date;
+    const int isSeeding = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
 
     if( ( ret = checkPeer( peer ) ) )
     {
@@ -511,6 +537,11 @@ writeBegin:
     /* Send pieces if we can */
     while( ( p = blockPending( tor, peer, &size ) ) )
     {
+        if( SWIFT_ENABLED && !isSeeding && (peer->credit<0) )
+        {
+            break;
+        }
+
         if( tor->customUploadLimit
             ? !tr_rcCanTransfer( tor->upload )
             : !tr_rcCanTransfer( tor->handle->upload ) )
@@ -529,12 +560,9 @@ writeBegin:
         }
 
         blockSent( peer, ret );
-        tr_rcTransferred( peer->upload, ret );
-        tr_rcTransferred( tor->upload, ret );
-        if ( !tor->customUploadLimit )
-        {
-            tr_rcTransferred( tor->handle->upload, ret );
-        }
+
+        if( ret > 0 )
+            tr_peerGotBlockFromUs( peer, ret );
 
         tor->uploadedCur += ret;
         peer->outTotal   += ret;
@@ -554,7 +582,7 @@ writeBegin:
 writeEnd:
 
     /* Ask for a block whenever possible */
-    if( tr_cpGetStatus( tor->completion ) == TR_CP_INCOMPLETE
+    if( !isSeeding
         && !peer->amInterested
         && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
     {
@@ -604,39 +632,29 @@ writeEnd:
     return TR_OK;
 }
 
-/***********************************************************************
- * tr_peerIsConnected
- ***********************************************************************
- *
- **********************************************************************/
-int tr_peerIsConnected( tr_peer_t * peer )
+int tr_peerIsConnected( const tr_peer_t * peer )
 {
     return PEER_STATUS_CONNECTED == peer->status;
 }
 
-/***********************************************************************
- * tr_peerIsIncoming
- ***********************************************************************
- *
- **********************************************************************/
-int tr_peerIsFrom( tr_peer_t * peer )
+int tr_peerIsFrom( const tr_peer_t * peer )
 {
     return peer->from;
 }
 
-int tr_peerAmChoking( tr_peer_t * peer )
+int tr_peerAmChoking( const tr_peer_t * peer )
 {
     return peer->amChoking;
 }
-int tr_peerAmInterested( tr_peer_t * peer )
+int tr_peerAmInterested( const tr_peer_t * peer )
 {
     return peer->amInterested;
 }
-int tr_peerIsChoking( tr_peer_t * peer )
+int tr_peerIsChoking( const tr_peer_t * peer )
 {
     return peer->peerChoking;
 }
-int tr_peerIsInterested( tr_peer_t * peer )
+int tr_peerIsInterested( const tr_peer_t * peer )
 {
     return peer->peerInterested;
 }
@@ -646,7 +664,7 @@ int tr_peerIsInterested( tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-float tr_peerProgress( tr_peer_t * peer )
+float tr_peerProgress( const tr_peer_t * peer )
 {
     return peer->progress;
 }
@@ -656,27 +674,22 @@ float tr_peerProgress( tr_peer_t * peer )
  ***********************************************************************
  * Returns peer's listening port in host byte order
  **********************************************************************/
-int tr_peerPort( tr_peer_t * peer )
+int tr_peerPort( const tr_peer_t * peer )
 {
     return ntohs( peer->port );
 }
 
-/***********************************************************************
- * tr_peerBitfield
- ***********************************************************************
- *
- **********************************************************************/
-tr_bitfield_t * tr_peerBitfield( tr_peer_t * peer )
+int tr_peerHasPiece( const tr_peer_t * peer, int pieceIndex )
 {
-    return peer->bitfield;
+    return tr_bitfieldHas( peer->bitfield, pieceIndex );
 }
 
-float tr_peerDownloadRate( tr_peer_t * peer )
+float tr_peerDownloadRate( const tr_peer_t * peer )
 {
     return tr_rcRate( peer->download );
 }
 
-float tr_peerUploadRate( tr_peer_t * peer )
+float tr_peerUploadRate( const tr_peer_t * peer )
 {
     return tr_rcRate( peer->upload );
 }
@@ -693,7 +706,7 @@ void tr_peerUnchoke( tr_peer_t * peer )
     peer->lastChoke = tr_date();
 }
 
-uint64_t tr_peerLastChoke( tr_peer_t * peer )
+uint64_t tr_peerLastChoke( const tr_peer_t * peer )
 {
     return peer->lastChoke;
 }
@@ -703,19 +716,19 @@ void tr_peerSetOptimistic( tr_peer_t * peer, int o )
     peer->optimistic = o;
 }
 
-int tr_peerIsOptimistic( tr_peer_t * peer )
+int tr_peerIsOptimistic( const tr_peer_t * peer )
 {
     return peer->optimistic;
 }
 
-static inline int peerIsBad( tr_peer_t * peer )
+static int peerIsBad( const tr_peer_t * peer )
 {
-    return ( peer->badPcs > 4 + 2 * peer->goodPcs );
+    return peer->badPcs > 4 + 2 * peer->goodPcs;
 }
 
-static inline int peerIsGood( tr_peer_t * peer )
+static int peerIsGood( const tr_peer_t * peer )
 {
-    return ( peer->goodPcs > 3 * peer->badPcs );
+    return peer->goodPcs > 3 * peer->badPcs;
 }
 
 void tr_peerBlame( tr_peer_t * peer, int piece, int success )
@@ -794,4 +807,86 @@ int tr_peerGetConnectable( const tr_torrent_t * tor, uint8_t ** _buf )
     *_buf = buf;
 
     return count * 6;
+}
+
+/***
+****
+***/
+
+void
+tr_peerSentBlockToUs ( tr_peer_t * peer, int byteCount )
+{
+    tr_torrent_t * tor = peer->tor;
+
+    tr_rcTransferred( peer->download, byteCount );
+    tr_rcTransferred( tor->download, byteCount );
+    if ( !tor->customUploadLimit )
+        tr_rcTransferred( tor->handle->download, byteCount );
+
+    peer->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
+}
+
+void
+tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
+{
+    tr_torrent_t * tor = peer->tor;
+
+    tr_rcTransferred( peer->upload, byteCount );
+    tr_rcTransferred( tor->upload, byteCount );
+    if ( !tor->customDownloadLimit )
+        tr_rcTransferred( tor->handle->upload, byteCount );
+
+    peer->credit -= byteCount;
+}
+
+static void
+tr_torrentSwiftPulse ( tr_torrent_t * tor )
+{
+    int i;
+    int deadbeatCount = 0;
+    tr_peer_t ** deadbeats;
+
+    tr_lockLock( &tor->lock );
+
+    deadbeats = tr_calloc( tor->peerCount, sizeof(tr_peer_t*) );
+    for( i=0; i<tor->peerCount; ++i ) {
+        tr_peer_t * peer = tor->peers[ i ];
+        if( tr_peerIsConnected( peer ) && ( peer->credit < 0 ) )
+            deadbeats[deadbeatCount++] = peer;
+    }
+
+    if( deadbeatCount )
+    {
+        const double ul_KiBsec = tr_rcRate( tor->upload );
+        const double ul_KiB = ul_KiBsec * SWIFT_REFRESH_INTERVAL_SEC;
+        const double ul_bytes = ul_KiB * 1024;
+        const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
+        const int freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
+        for( i=0; i<deadbeatCount; ++i )
+            deadbeats[i]->credit = freeCreditPerPeer;
+        tr_dbg( "torrent %s has %d deadbeats, "
+                "who are each being granted %d bytes' credit "
+                "for a total of %.1f KiB, "
+                "%d%% of the torrent's ul speed %.1f\n", 
+            tor->info.name, deadbeatCount, freeCreditPerPeer,
+            ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
+    }
+
+    free( deadbeats );
+
+    tr_lockUnlock( &tor->lock );
+}
+void
+tr_swiftPulse( tr_handle_t * h )
+{
+    static time_t lastPulseTime = 0;
+    const time_t now = time (NULL);
+    tr_torrent_t * tor;
+
+    if( lastPulseTime + SWIFT_REFRESH_INTERVAL_SEC > now )
+        return;
+    lastPulseTime = now;
+
+    for( tor=h->torrentList; tor; tor=tor->next )
+        tr_torrentSwiftPulse( tor );
 }

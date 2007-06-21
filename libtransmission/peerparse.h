@@ -344,6 +344,7 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return ret;
     }
     tr_cpBlockAdd( tor->completion, block );
+    tr_peerSentBlockToUs( peer, len-8 );
     broadcastCancel( tor, index, begin, len - 8 );
 
     if( !tr_cpPieceHasAllBlocks( tor->completion, index ) )
@@ -585,7 +586,7 @@ static inline int parseBufHeader( tr_peer_t * peer )
     return TR_OK;
 }
 
-static uint8_t * parseBufHash( tr_peer_t * peer )
+static const uint8_t * parseBufHash( const tr_peer_t * peer )
 {
     if( 48 > peer->pos )
     {

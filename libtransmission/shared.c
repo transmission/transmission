@@ -293,6 +293,8 @@ static void SharedLoop( void * _s )
             lastchoke = date1;
         }
 
+        tr_swiftPulse ( s->h );
+
         /* Wait up to 20 ms */
         date2 = tr_date();
         if( date2 < date1 + 20 )
@@ -382,14 +384,12 @@ static void ReadPeers( tr_shared_t * s )
 static void DispatchPeers( tr_shared_t * s )
 {
     tr_handle_t * h = s->h;
-    tr_torrent_t * tor;
-    uint8_t * hash;
     int ii;
-    uint64_t now = tr_date();
+    const uint64_t now = tr_date();
 
     for( ii = 0; ii < s->peerCount; )
     {
-        hash = tr_peerHash( s->peers[ii] );
+        const uint8_t * hash = tr_peerHash( s->peers[ii] );
 
         if( !hash && now > tr_peerDate( s->peers[ii] ) + 10000 )
         {
@@ -399,6 +399,8 @@ static void DispatchPeers( tr_shared_t * s )
         }
         if( hash )
         {
+            tr_torrent_t * tor;
+
             for( tor = h->torrentList; tor; tor = tor->next )
             {
                 tr_lockLock( &tor->lock );

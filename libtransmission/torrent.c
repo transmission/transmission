@@ -606,8 +606,7 @@ void tr_torrentAvailability( tr_torrent_t * tor, int8_t * tab, int size )
         tab[i] = 0;
         for( j = 0; j < tor->peerCount; j++ )
         {
-            if( tr_peerBitfield( tor->peers[j] ) &&
-                tr_bitfieldHas( tr_peerBitfield( tor->peers[j] ), piece ) )
+            if( tr_peerHasPiece( tor->peers[j], piece ) )
             {
                 (tab[i])++;
             }

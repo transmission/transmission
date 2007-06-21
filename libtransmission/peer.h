@@ -29,34 +29,37 @@
 
 typedef struct tr_peer_s tr_peer_t; 
 
-tr_peer_t * tr_peerInit          ( struct in_addr, in_port_t, int sock, int );
-void        tr_peerDestroy       ( tr_peer_t * );
-const char *tr_peerClient        ( tr_peer_t * );
-void        tr_peerSetPrivate    ( tr_peer_t *, int );
-void        tr_peerSetTorrent    ( tr_peer_t *, tr_torrent_t * );
-int         tr_peerRead          ( tr_peer_t * );
-uint64_t    tr_peerDate          ( tr_peer_t * );
-uint8_t *   tr_peerId            ( tr_peer_t * );
-uint8_t *   tr_peerHash          ( tr_peer_t * );
-int         tr_peerPulse         ( tr_peer_t * );
-int         tr_peerIsConnected   ( tr_peer_t * );
-int         tr_peerIsFrom        ( tr_peer_t * );
-int         tr_peerAmChoking     ( tr_peer_t * );
-int         tr_peerAmInterested  ( tr_peer_t * );
-int         tr_peerIsChoking     ( tr_peer_t * );
-int         tr_peerIsInterested  ( tr_peer_t * );
-float       tr_peerProgress      ( tr_peer_t * );
-int         tr_peerPort          ( tr_peer_t * );
-tr_bitfield_t * tr_peerBitfield  ( tr_peer_t * );
-float       tr_peerDownloadRate  ( tr_peer_t * );
-float       tr_peerUploadRate    ( tr_peer_t * );
-void        tr_peerChoke         ( tr_peer_t * );
-void        tr_peerUnchoke       ( tr_peer_t * );
-uint64_t    tr_peerLastChoke     ( tr_peer_t * );
-void        tr_peerSetOptimistic ( tr_peer_t *, int );
-int         tr_peerIsOptimistic  ( tr_peer_t * );
-void        tr_peerBlame         ( tr_peer_t *, int piece, int success );
-struct in_addr * tr_peerAddress  ( tr_peer_t * );
-int         tr_peerGetConnectable( const tr_torrent_t *, uint8_t ** );
+tr_peer_t * tr_peerInit            ( struct in_addr, in_port_t, int sock, int );
+void        tr_peerDestroy         ( tr_peer_t * );
+const char *tr_peerClient          ( tr_peer_t * );
+void        tr_peerSetPrivate      ( tr_peer_t *, int );
+void        tr_peerSetTorrent      ( tr_peer_t *, tr_torrent_t * );
+void        tr_peerSentBlockToUs   ( tr_peer_t *, int byteCount );
+void        tr_peerGotBlockFromUs  ( tr_peer_t *, int byteCount );
+int         tr_peerRead            ( tr_peer_t * );
+uint64_t    tr_peerDate            ( const tr_peer_t * );
+const uint8_t *   tr_peerHash            ( const tr_peer_t * );
+int         tr_peerPulse           ( tr_peer_t * );
+int         tr_peerIsConnected     ( const tr_peer_t * );
+int         tr_peerIsFrom          ( const tr_peer_t * );
+int         tr_peerAmChoking       ( const tr_peer_t * );
+int         tr_peerAmInterested    ( const tr_peer_t * );
+int         tr_peerIsChoking       ( const tr_peer_t * );
+int         tr_peerIsInterested    ( const tr_peer_t * );
+float       tr_peerProgress        ( const tr_peer_t * );
+int         tr_peerPort            ( const tr_peer_t * );
+int         tr_peerHasPiece        ( const tr_peer_t *, int pieceIndex );
+float       tr_peerDownloadRate    ( const tr_peer_t * );
+float       tr_peerUploadRate      ( const tr_peer_t * );
+void        tr_peerChoke           ( tr_peer_t * );
+void        tr_peerUnchoke         ( tr_peer_t * );
+uint64_t    tr_peerLastChoke       ( const tr_peer_t * );
+void        tr_peerSetOptimistic   ( tr_peer_t *, int );
+int         tr_peerIsOptimistic    ( const tr_peer_t * );
+void        tr_peerBlame           ( tr_peer_t *, int piece, int success );
+struct in_addr * tr_peerAddress    ( tr_peer_t * );
+int         tr_peerGetConnectable  ( const tr_torrent_t *, uint8_t ** );
+
+void        tr_swiftPulse          ( tr_handle_t * );
 
 #endif
