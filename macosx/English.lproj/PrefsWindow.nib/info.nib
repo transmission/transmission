@@ -11,7 +11,7 @@
 		<key>28</key>
 		<string>294 421 563 313 0 0 1152 842 </string>
 		<key>41</key>
-		<string>152 430 563 305 0 0 1152 842 </string>
+		<string>107 446 563 305 0 0 1152 842 </string>
 		<key>66</key>
 		<string>294 506 563 144 0 0 1152 842 </string>
 	</dict>
@@ -26,6 +26,6 @@
 		<integer>41</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8P135</string>
+	<string>8R218</string>
 </dict>
 </plist>
