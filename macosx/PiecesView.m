@@ -50,7 +50,7 @@
         fBack = [[NSImage alloc] initWithSize: size];
         
         [fBack lockFocus];
-        [[NSColor lightGrayColor] set];
+        [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4] set];
         [bp fill];
         [fBack unlockFocus];
         
