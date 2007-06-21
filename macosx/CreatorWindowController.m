@@ -25,8 +25,6 @@
 #import "CreatorWindowController.h"
 #import "StringAdditions.h"
 
-#define DEFAULT_SAVE_LOCATION @"~/Desktop/"
-
 @interface CreatorWindowController (Private)
 
 + (NSString *) chooseFile;
@@ -122,8 +120,8 @@
     [fPiecesField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@, %@ each", "Create torrent -> info"),
                                         piecesCountString, [NSString stringForFileSize: fInfo->pieceSize]]];
     
-    fLocation = [[[DEFAULT_SAVE_LOCATION stringByAppendingPathComponent: [name stringByAppendingPathExtension: @"torrent"]]
-                                            stringByExpandingTildeInPath] retain];
+    fLocation = [[[[fDefaults stringForKey: @"CreatorLocation"] stringByExpandingTildeInPath] stringByAppendingPathComponent:
+                    [name stringByAppendingPathExtension: @"torrent"]] retain];
     [fLocationField setStringValue: [fLocation stringByAbbreviatingWithTildeInPath]];
     [fLocationField setToolTip: fLocation];
     
@@ -231,6 +229,7 @@
     [fDefaults setObject: trackerString forKey: @"CreatorTracker"];
     [fDefaults setBool: [fPrivateCheck state] == NSOnState forKey: @"CreatorPrivate"];
     [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
+    [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
     tr_makeMetaInfo(fInfo, [fLocation UTF8String], [trackerString UTF8String], [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);

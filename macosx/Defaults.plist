@@ -28,6 +28,8 @@
 	<true/>
 	<key>CheckUpload</key>
 	<true/>
+	<key>CreatorLocation</key>
+	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>
 	<false/>
 	<key>DownloadChoice</key>
