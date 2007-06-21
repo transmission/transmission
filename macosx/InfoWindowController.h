@@ -73,6 +73,7 @@
 - (void) setPreviousTab;
 
 - (void) setPiecesView: (id) sender;
+- (void) setPiecesViewForAvailable: (BOOL) available;
 
 - (void) revealTorrentFile: (id) sender;
 - (void) revealDataFile: (id) sender;

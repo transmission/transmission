@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PiecesView.h"
+#import "InfoWindowController.h"
 
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
@@ -373,6 +374,19 @@
         free(pieces);
     else
         free(piecesPercent);
+}
+
+- (BOOL) acceptsFirstMouse: (NSEvent *) event
+{
+    return YES;
+}
+
+- (void) mouseDown: (NSEvent *) event
+{
+    if (fTorrent)
+        [[[self window] windowController] setPiecesViewForAvailable:
+            ![[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]];
+    [super mouseDown: event];
 }
 
 @end

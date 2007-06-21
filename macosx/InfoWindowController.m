@@ -100,10 +100,6 @@
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
     
-    //set pieces control
-    [fPiecesControl setSelectedSegment: [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"]
-                                            ? PIECES_CONTROL_AVAILABLE : PIECES_CONTROL_PROGRESS];
-    
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
@@ -223,6 +219,11 @@
         [fPiecesControl setEnabled: NO];
         [fPiecesView setTorrent: nil];
         
+        [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_AVAILABLE];
+        [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];
+        [fPiecesControl setEnabled: NO];
+        [fPiecesView setTorrent: nil];
+        
         if (fPeers)
         {
             [fPeers release];
@@ -285,7 +286,12 @@
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
         
+        //set pieces view
+        BOOL piecesAvailableSegment = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
+        [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
+        [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: YES];
+        
         [fPiecesView setTorrent: torrent];
         
         //set file table
@@ -993,8 +999,15 @@
 
 - (void) setPiecesView: (id) sender
 {
-    [[NSUserDefaults standardUserDefaults] setBool: [sender selectedSegment] == PIECES_CONTROL_AVAILABLE
-                            forKey: @"PiecesViewShowAvailability"];
+    [self setPiecesViewForAvailable: [sender selectedSegment] == PIECES_CONTROL_AVAILABLE];
+}
+
+- (void) setPiecesViewForAvailable: (BOOL) available
+{
+    [fPiecesControl setSelected: available forSegment: PIECES_CONTROL_AVAILABLE];
+    [fPiecesControl setSelected: !available forSegment: PIECES_CONTROL_PROGRESS];
+    
+    [[NSUserDefaults standardUserDefaults] setBool: available forKey: @"PiecesViewShowAvailability"];
     [fPiecesView updateView: YES];
 }
 
