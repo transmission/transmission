@@ -216,9 +216,6 @@
         [fDateCompletedField setStringValue: @""];
         [fDateActivityField setStringValue: @""];
         
-        [fPiecesControl setEnabled: NO];
-        [fPiecesView setTorrent: nil];
-        
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: NO forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: NO];
@@ -291,7 +288,6 @@
         [fPiecesControl setSelected: piecesAvailableSegment forSegment: PIECES_CONTROL_AVAILABLE];
         [fPiecesControl setSelected: !piecesAvailableSegment forSegment: PIECES_CONTROL_PROGRESS];
         [fPiecesControl setEnabled: YES];
-        
         [fPiecesView setTorrent: torrent];
         
         //set file table
