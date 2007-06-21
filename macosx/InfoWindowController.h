@@ -79,6 +79,7 @@
 - (void) revealFile: (id) sender;
 
 - (void) setCheck: (id) sender;
+- (void) setOnlySelectedCheck: (id) sender;
 - (void) setPriority: (id) sender;
 
 - (void) setLimitSetting: (id) sender;

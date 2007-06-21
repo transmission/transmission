@@ -600,6 +600,9 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
+    if ([fTorrents count] != 1)
+        return NO;
+    
     SEL action = [menuItem action];
     
     if (action == @selector(revealFile:))
@@ -625,6 +628,9 @@
         }
         return NO;
     }
+    
+    if (action == @selector(setOnlySelectedCheck:))
+        return [fFileOutline selectedRow] != -1;
     
     if (action == @selector(setPriority:))
     {
@@ -1022,18 +1028,30 @@
     int state = sender == fFileCheckItem ? NSOnState : NSOffState;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
-    NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
-    NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
+    NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+    NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
     int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-    {
-        itemIndexes = [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"];
-        if (![usedIndexes containsIndexes: itemIndexes])
-        {
-            [torrent setFileCheckState: state forIndexes: itemIndexes];
-            [usedIndexes addIndexes: itemIndexes];
-        }
-    }
+        [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
+    
+    [torrent setFileCheckState: state forIndexes: itemIndexes];
+    [fFileOutline reloadData];
+}
+
+- (void) setOnlySelectedCheck: (id) sender
+{
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+    NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
+    int i;
+    for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
+    
+    [torrent setFileCheckState: NSOnState forIndexes: itemIndexes];
+    
+    NSMutableIndexSet * remainingItemIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [torrent fileCount])];
+    [remainingItemIndexes removeIndexes: indexSet];
+    [torrent setFileCheckState: NSOffState forIndexes: remainingItemIndexes];
     
     [fFileOutline reloadData];
 }
@@ -1050,10 +1068,12 @@
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+    NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
     int i;
     for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        [torrent setFilePriority: priority forIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
+        [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
     
+    [torrent setFilePriority: priority forIndexes: itemIndexes];
     [fFileOutline reloadData];
 }
 

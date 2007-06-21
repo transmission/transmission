@@ -9,6 +9,7 @@
                 revealTorrentFile = id; 
                 setCheck = id; 
                 setLimitSetting = id; 
+                setOnlySelectedCheck = id; 
                 setPex = id; 
                 setPiecesView = id; 
                 setPriority = id; 
