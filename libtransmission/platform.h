@@ -44,9 +44,7 @@ typedef struct tr_thread_s
 }
 tr_thread_t;
 
-/* only for debugging purposes */
 const char * tr_getHomeDirectory( void );
-
 const char * tr_getCacheDirectory( void );
 const char * tr_getTorrentsDirectory( void );
 
@@ -61,29 +59,13 @@ void tr_threadCreate ( tr_thread_t *, void (*func)(void *),
 void tr_threadJoin   ( tr_thread_t * );
 void tr_lockInit     ( tr_lock_t * );
 void tr_lockClose    ( tr_lock_t * );
+void tr_lockLock     ( tr_lock_t * );
+void tr_lockUnlock   ( tr_lock_t * );
 
-static inline void tr_lockLock( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    acquire_sem( *l );
-#else
-    pthread_mutex_lock( l );
-#endif
-}
-
-static inline void tr_lockUnlock( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    release_sem( *l );
-#else
-    pthread_mutex_unlock( l );
-#endif
-}
-
-void tr_condInit( tr_cond_t * );
-void tr_condWait( tr_cond_t *, tr_lock_t * );
-void tr_condSignal( tr_cond_t * );
-void tr_condClose( tr_cond_t * );
+void tr_condInit     ( tr_cond_t * );
+void tr_condWait     ( tr_cond_t *, tr_lock_t * );
+void tr_condSignal   ( tr_cond_t * );
+void tr_condClose    ( tr_cond_t * );
 
 struct in_addr; /* forward declaration to calm gcc down */
 int

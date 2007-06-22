@@ -264,6 +264,24 @@ void tr_lockClose( tr_lock_t * l )
 #endif
 }
 
+void tr_lockLock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    acquire_sem( *l );
+#else
+    pthread_mutex_lock( l );
+#endif
+}
+
+void tr_lockUnlock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    release_sem( *l );
+#else
+    pthread_mutex_unlock( l );
+#endif
+}
+
 
 void tr_condInit( tr_cond_t * c )
 {

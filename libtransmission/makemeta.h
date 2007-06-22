@@ -21,7 +21,7 @@ tr_metainfo_builder_file_t;
 typedef struct tr_metainfo_builder_s
 {
     /**
-    ***  These are set by tr_makeMetaInfo()
+    ***  These are set by tr_makeMetaInfoBuilderCreate()
     ***  and cleaned up by tr_metaInfoBuilderFree()
     **/
 

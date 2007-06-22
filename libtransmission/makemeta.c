@@ -142,7 +142,7 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
     for( walk=files; walk!=NULL; walk=walk->next )
         ++ret->fileCount;
 
-    ret->files = tr_calloc( ret->fileCount, sizeof(tr_metainfo_builder_file_t) );
+    ret->files = tr_calloc(ret->fileCount, sizeof(tr_metainfo_builder_file_t));
 
     for( i=0, walk=files; walk!=NULL; ++i )
     {
@@ -206,14 +206,16 @@ getHashInfo ( tr_metainfo_builder_t * b )
     while ( totalRemain )
     {
         uint8_t *bufptr = buf;
-        const uint64_t thisPieceSize = MIN( (uint32_t)b->pieceSize, totalRemain );
+        const uint64_t thisPieceSize =
+            MIN( (uint32_t)b->pieceSize, totalRemain );
         uint64_t pieceRemain = thisPieceSize;
 
         assert( b->pieceIndex < b->pieceCount );
 
         while( pieceRemain )
         {
-            const uint64_t n_this_pass = MIN( (b->files[fileIndex].size - off), pieceRemain );
+            const uint64_t n_this_pass =
+                MIN( (b->files[fileIndex].size - off), pieceRemain );
             fread( bufptr, 1, n_this_pass, fp );
             bufptr += n_this_pass;
             off += n_this_pass;

@@ -56,7 +56,7 @@ static const int SWIFT_INITIAL_CREDIT = 64 * 1024; /* 64 KiB */
 
 /**
  * We expend a fraction of our torrent's total upload speed
- * on on largesse by uniformly distributing free credit to
+ * on largesse by uniformly distributing free credit to
  * all of our peers.  This too helps prevent gridlock.
  */
 static const double SWIFT_LARGESSE = 0.05; /* 5% of our UL */
@@ -602,11 +602,11 @@ writeEnd:
         int * pool = getPreferredPieces ( tor, peer, &poolSize, &endgame );
 
         /* TODO: add some asserts to see if this bitfield is really necessary */
-        tr_bitfield_t * blocksAlreadyRequested = tr_bitfieldNew( tor->blockCount );
+        tr_bitfield_t * requestedBlocks = tr_bitfieldNew( tor->blockCount );
         for( i=0; i<peer->inRequestCount; ++i) {
             const tr_request_t * r = &peer->inRequests[i];
             const int block = tr_block( r->index, r->begin );
-            tr_bitfieldAdd( blocksAlreadyRequested, block );
+            tr_bitfieldAdd( requestedBlocks, block );
         }
 
         for( i=0; i<poolSize && peer->inRequestCount<OUR_REQUEST_COUNT;  )
@@ -617,15 +617,15 @@ writeEnd:
                 ? tr_cpMostMissingBlockInPiece( tor->completion, piece, &unused)
                 : tr_cpMissingBlockInPiece ( tor->completion, piece );
 
-            if( block>=0 && (endgame || !tr_bitfieldHas( blocksAlreadyRequested, block ) ) )
+            if( block>=0 && (endgame || !tr_bitfieldHas( requestedBlocks, block ) ) )
             {
-                tr_bitfieldAdd( blocksAlreadyRequested, block );
+                tr_bitfieldAdd( requestedBlocks, block );
                 sendRequest( tor, peer, block );
             }
             else ++i;
         }
 
-        tr_bitfieldFree( blocksAlreadyRequested );
+        tr_bitfieldFree( requestedBlocks );
         free( pool );
     }
 
@@ -659,21 +659,11 @@ int tr_peerIsInterested( const tr_peer_t * peer )
     return peer->peerInterested;
 }
 
-/***********************************************************************
- * tr_peerProgress
- ***********************************************************************
- *
- **********************************************************************/
 float tr_peerProgress( const tr_peer_t * peer )
 {
     return peer->progress;
 }
 
-/***********************************************************************
- * tr_peerPort
- ***********************************************************************
- * Returns peer's listening port in host byte order
- **********************************************************************/
 int tr_peerPort( const tr_peer_t * peer )
 {
     return ntohs( peer->port );
@@ -880,13 +870,13 @@ void
 tr_swiftPulse( tr_handle_t * h )
 {
     static time_t lastPulseTime = 0;
-    const time_t now = time (NULL);
-    tr_torrent_t * tor;
 
-    if( lastPulseTime + SWIFT_REFRESH_INTERVAL_SEC > now )
-        return;
-    lastPulseTime = now;
+    if( lastPulseTime + SWIFT_REFRESH_INTERVAL_SEC <= time( NULL ) )
+    {
+        tr_torrent_t * tor;
+        for( tor=h->torrentList; tor; tor=tor->next )
+            tr_torrentSwiftPulse( tor );
 
-    for( tor=h->torrentList; tor; tor=tor->next )
-        tr_torrentSwiftPulse( tor );
+        lastPulseTime = time( NULL );
+    }
 }
