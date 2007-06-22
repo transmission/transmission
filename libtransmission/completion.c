@@ -377,40 +377,17 @@ tr_cpLeftUntilDone ( const tr_completion_t * cp )
 float
 tr_cpPercentComplete ( const tr_completion_t * cp )
 {
-    int i;
-    uint64_t have=0;
-    const tr_torrent_t * tor;
-
-    assert( cp != NULL );
-    assert( cp->tor != NULL );
-
-    tor = cp->tor;
-    for( i=0; i<tor->info.pieceCount; ++i )
-        have += cp->completeBlocks[ i ];
-
-    return tor->blockCount ? (float)have / (float)tor->blockCount : 0.0f;
+    const uint64_t tilComplete = tr_cpLeftUntilComplete( cp );
+    const uint64_t total = cp->tor->info.totalSize;
+    return 1.0 - (double)tilComplete / total;
 }
 
 float
 tr_cpPercentDone( const tr_completion_t * cp )
 {
-    int i;
-    uint64_t have=0, total=0;
-    const tr_torrent_t * tor;
-
-    assert( cp != NULL );
-    assert( cp->tor != NULL );
-
-    tor = cp->tor;
-
-    for( i=0; i<tor->info.pieceCount; ++i ) {
-        if( tor->info.pieces[i].priority != TR_PRI_DND) {
-            total += tr_cpCountBlocks( cp, i );
-            have += cp->completeBlocks[ i ];
-        }
-    }
-
-    return !total ? 0.0f : (float)have / (float)total;
+    const uint64_t tilDone = tr_cpLeftUntilDone( cp );
+    const uint64_t total = cp->tor->info.totalSize;
+    return 1.0 - (double)tilDone / total;
 }
 
 uint64_t
