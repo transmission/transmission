@@ -909,6 +909,9 @@
     }
     else if ([identifier isEqualToString: @"Priority"])
     {
+        if (![[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+            return;
+        
         int priority = [object intValue], actualPriority;
         if (priority == 0)
             actualPriority = PRIORITY_LOW;

@@ -75,7 +75,8 @@
     if (![self isRowSelected: row])
     {
         NSDictionary * item = [self itemAtRow: row];
-        if ([[item objectForKey: @"IsFolder"] boolValue])
+        if ([[item objectForKey: @"IsFolder"] boolValue]
+                || ![[item objectForKey: @"Torrent"] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
             [fNormalColor set];
         else
         {
@@ -108,7 +109,8 @@
         if ([self isRowSelected: i])
         {
             item = [self itemAtRow: i];
-            if (![[item objectForKey: @"IsFolder"] boolValue])
+            if (![[item objectForKey: @"IsFolder"] boolValue]
+                && [[item objectForKey: @"Torrent"] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
             {
                 priority = [[item objectForKey: @"Priority"] intValue];
                 if (priority == PRIORITY_HIGH)
