@@ -25,11 +25,13 @@
 #ifndef TG_MSGWIN_H
 #define TG_MSGWIN_H
 
+#include "tr_core.h"
+
 void
 msgwin_init( void );
 
 GtkWidget *
-msgwin_create( void );
+msgwin_create( TrCore* core );
 
 void
 msgwin_update( void );

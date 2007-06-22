@@ -269,6 +269,8 @@ void tr_torrentStart( tr_torrent_t * tor )
 {
     /* Join the thread first */
     torrentReallyStop( tor );
+
+    tr_inf("Starting torrent \"%s\"", tor->info.name);
     
     /* Don't start if a torrent with the same name and destination is already active */
     if( tr_torrentDuplicateDownload( tor ) )
@@ -301,6 +303,7 @@ void tr_torrentStart( tr_torrent_t * tor )
 
 static void torrentStop( tr_torrent_t * tor )
 {
+    tr_inf("Stopping torrent \"%s\"", tor->info.name);
     tr_trackerStopped( tor->tracker );
     tr_rcReset( tor->download );
     tr_rcReset( tor->upload );

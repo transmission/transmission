@@ -85,6 +85,8 @@ tr_handle_t * tr_init( const char * tag )
     tr_fdInit();
     h->shared = tr_sharedInit( h );
 
+    tr_inf( TR_NAME " " VERSION_STRING " started" );
+
     return h;
 }
 

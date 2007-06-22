@@ -192,6 +192,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "stop-torrent", (status & TR_STATUS_ACTIVE) != 0);
     action_sensitize( "start-torrent", (status & TR_STATUS_INACTIVE) != 0);
     action_sensitize( "remove-torrent", status != 0);
+    action_sensitize( "recheck-torrent", status != 0);
     action_sensitize( "show-torrent-inspector", status != 0);
 }
 
@@ -1045,7 +1046,7 @@ doAction ( const char * action_name, gpointer user_data )
     {
         if( !data->msgwinopen )
         {
-            GtkWidget * win = msgwin_create();
+            GtkWidget * win = msgwin_create( data->core );
             g_signal_connect( win, "destroy", G_CALLBACK( boolwindclosed ),
                                 &data->msgwinopen );
             data->msgwinopen = TRUE;

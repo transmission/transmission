@@ -225,8 +225,11 @@ checkFiles( tr_io_t * io )
 
     tr_bitfieldClear( io->uncheckedPieces );
 
-    if ( fastResumeLoad( io->tor, io->uncheckedPieces ) )
+    if( fastResumeLoad( io->tor, io->uncheckedPieces ) )
         tr_bitfieldAddRange( io->uncheckedPieces, 0, tor->info.pieceCount-1 );
+
+    if( !tr_bitfieldIsEmpty( io->uncheckedPieces ) )
+        tr_inf( "Rechecking portions of \"%s\"", tor->info.name );
 
     for( i=0; i<tor->info.pieceCount; ++i ) 
     {
@@ -236,7 +239,7 @@ checkFiles( tr_io_t * io )
         if( !tr_bitfieldHas( io->uncheckedPieces, i ) )
             continue;
 
-        tr_inf ( "Checking piece %d because it's not in fast-resume", i );
+        tr_dbg ( "Checking piece %d because it's not in fast-resume", i );
 
         if( !checkPiece( tor, i ) )
            tr_cpPieceAdd( tor->completion, i );

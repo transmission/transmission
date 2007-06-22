@@ -213,7 +213,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
         for( i=0; i<n; ++i ) {
             if ( !curMTimes[i] || ( curMTimes[i]!=oldMTimes[i] ) ) {
                 const tr_file_t * file = &tor->info.files[i];
-                tr_inf( "File '%s' mtimes differ-- flaggin pieces [%d..%d]",
+                tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
                         file->name, file->firstPiece, file->lastPiece);
                 tr_bitfieldAddRange( uncheckedPieces, 
                                      file->firstPiece, file->lastPiece );
