@@ -379,7 +379,8 @@ tr_cpPercentComplete ( const tr_completion_t * cp )
 {
     const uint64_t tilComplete = tr_cpLeftUntilComplete( cp );
     const uint64_t total = cp->tor->info.totalSize;
-    return 1.0 - (double)tilComplete / total;
+    const float f = 1.0 - (double)tilComplete / total;
+    return MAX(0.0, f);
 }
 
 float
@@ -387,7 +388,8 @@ tr_cpPercentDone( const tr_completion_t * cp )
 {
     const uint64_t tilDone = tr_cpLeftUntilDone( cp );
     const uint64_t total = cp->tor->info.totalSize;
-    return 1.0 - (double)tilDone / total;
+    const float f = 1.0 - (double)tilDone / total;
+    return MAX(0.0, f);
 }
 
 uint64_t
