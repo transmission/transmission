@@ -1306,6 +1306,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         [torrent resetCache];
     }
+    #warning reset queue?
 }
 
 - (void) showPreferenceWindow: (id) sender
@@ -2858,19 +2859,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //enable reset cache item
     if (action == @selector(resetCacheForSelectedTorrents:))
-    {
-        if (!canUseTable)
-            return NO;
-        
-        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
-        Torrent * torrent;
-        while ((torrent = [enumerator nextObject]))
-        {
-            if (![torrent isActive])
-                return YES;
-        }
-        return NO;
-    }
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
     
     //enable move torrent file item
     if (action == @selector(moveDataFiles:))

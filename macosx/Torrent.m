@@ -639,7 +639,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) resetCache
 {
+    BOOL paused = [self isPaused];
+    
+    if (!paused)
+        tr_torrentStop(fHandle);
     tr_torrentRemoveFastResume(fHandle);
+    if (!paused)
+        tr_torrentStart(fHandle);
 }
 
 - (float) ratio
@@ -649,7 +655,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (int) ratioSetting
 {
-	return fRatioSetting;
+    return fRatioSetting;
 }
 
 - (void) setRatioSetting: (int) setting
