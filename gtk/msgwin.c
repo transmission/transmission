@@ -51,7 +51,7 @@ get_or_create_tag (GtkTextTagTable * table, const char * key)
   if (!tag) {
     tag = gtk_text_tag_new (key);
     gtk_text_tag_table_add (table, tag);
-    g_object_unref (tag); // table refs it
+    g_object_unref (tag); /* table refs it */
   }
 
   return tag;
