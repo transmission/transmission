@@ -1674,6 +1674,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [NSNumber numberWithBool: isFolder], @"IsFolder", currentPath, @"Path", nil];
         [siblings addObject: dict];
         
+        [dict setObject: self forKey: @"Torrent"];
         if (isFolder)
         {
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
@@ -1685,7 +1686,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
             [dict setObject: [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]] forKey: @"Icon"];
             [dict setObject: [NSNumber numberWithInt: priority] forKey: @"Priority"];
-            [dict setObject: self forKey: @"Torrent"];
             
             [flatList addObject: dict];
         }

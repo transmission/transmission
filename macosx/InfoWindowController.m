@@ -24,6 +24,7 @@
 
 #import "InfoWindowController.h"
 #import "FileBrowserCell.h"
+#import "FilePriorityCell.h"
 #import "StringAdditions.h"
 
 #define MIN_WINDOW_WIDTH 300
@@ -87,8 +88,6 @@
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    [window setBecomesKeyOnlyIfNeeded: YES];
-    
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
@@ -109,13 +108,8 @@
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
     //set file outline
-    NSSegmentedCell * priorityCell = [[fFileOutline tableColumnWithIdentifier: @"Priority"] dataCell];
-    int i;
-    for (i = 0; i < [priorityCell segmentCount]; i++)
-    {
-        [priorityCell setLabel: @"" forSegment: i];
-        [priorityCell setWidth: 6.0 forSegment: i];
-    }
+    FilePriorityCell * priorityCell = [[[FilePriorityCell alloc] initForParentView: fFileOutline] autorelease];
+    [[fFileOutline tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
     
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
@@ -884,15 +878,7 @@
     else if ([identifier isEqualToString: @"Check"])
         [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
     else if ([identifier isEqualToString: @"Priority"])
-    {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSIndexSet * indexeSet = [item objectForKey: @"Indexes"];
-        [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexeSet] forSegment: 0];
-        [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexeSet] forSegment: 1];
-        [(NSSegmentedCell *)cell setSelected: [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexeSet] forSegment: 2];
-        
-        [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
-    }
+        [(FilePriorityCell *)cell setItem: item];
     else;
 }
 
@@ -905,22 +891,6 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         [torrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState
                                         forIndexes: [item objectForKey: @"Indexes"]];
-        [fFileOutline reloadData];
-    }
-    else if ([identifier isEqualToString: @"Priority"])
-    {
-        if (![[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
-            return;
-        
-        int priority = [object intValue], actualPriority;
-        if (priority == 0)
-            actualPriority = PRIORITY_LOW;
-        else if (priority == 2)
-            actualPriority = PRIORITY_HIGH;
-        else
-            actualPriority = PRIORITY_NORMAL;
-        
-        [[fTorrents objectAtIndex: 0] setFilePriority: actualPriority forIndexes: [item objectForKey: @"Indexes"]];
         [fFileOutline reloadData];
     }
     else;
@@ -944,6 +914,7 @@
     }
     else if ([ident isEqualToString: @"Priority"])
     {
+        #warning consider hidden
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
         BOOL low = [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexSet],
@@ -969,6 +940,12 @@
         return FILE_ROW_SMALL_HEIGHT;
     else
         return [outlineView rowHeight];
+}
+
+#warning need?
+- (void) setFileOutlineHoverRowForEvent: (NSEvent *) event
+{
+    [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT] ? event : nil];
 }
 
 - (NSArray *) peerSortDescriptors

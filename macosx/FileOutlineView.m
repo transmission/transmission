@@ -39,6 +39,8 @@
     fNormalColor = [self backgroundColor];
     fHighPriorityColor = [[NSColor colorWithCalibratedRed: 0.678 green: 0.937 blue: 0.451 alpha: 1.0] retain];
     fLowPriorityColor = [[NSColor colorWithCalibratedRed: 0.984 green: 0.878 blue: 0.431 alpha: 1.0] retain];
+    
+    fHoverRow = -1;
 }
 
 - (void) dealloc
@@ -68,6 +70,31 @@
         [self deselectAll: self];
     
     return [self menu];
+}
+
+- (void) setHoverRowForEvent: (NSEvent *) event
+{
+    int row = -1;
+    if (event)
+    {
+        NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+        if (NSPointInRect(point, [self frame]))
+            row = [self rowAtPoint: point];
+    }
+    
+    if (row != fHoverRow)
+    {
+        if (fHoverRow != -1)
+            [self reloadItem: [self itemAtRow: fHoverRow]];
+        fHoverRow = row;
+        if (fHoverRow != -1)
+            [self reloadItem: [self itemAtRow: fHoverRow]];
+    }
+}
+
+- (int) hoverRow
+{
+    return fHoverRow;
 }
 
 - (void) drawRow: (int) row clipRect: (NSRect) clipRect

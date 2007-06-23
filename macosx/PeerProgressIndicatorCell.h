@@ -26,6 +26,6 @@
 
 @interface PeerProgressIndicatorCell : NSLevelIndicatorCell
 {
-    BOOL    isHidden;
+    BOOL fIsHidden;
 }
 @end

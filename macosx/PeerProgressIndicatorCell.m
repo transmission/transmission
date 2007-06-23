@@ -28,17 +28,17 @@
 
 - (BOOL) hidden
 {
-    return isHidden;
+    return fIsHidden;
 }
 
-- (void) setHidden: (BOOL) hidden
+- (void) setHidden: (BOOL) isHidden
 {
-    isHidden = hidden;
+    fIsHidden = isHidden;
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    if (!isHidden)
+    if (!fIsHidden)
         [super drawWithFrame: cellFrame inView: controlView];
 }
 

@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
+#import "FileOutlineView.h"
 #import "PiecesView.h"
 #import <transmission.h>
 
@@ -53,7 +54,7 @@
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
     
-    IBOutlet NSOutlineView * fFileOutline;
+    IBOutlet FileOutlineView * fFileOutline;
     IBOutlet NSTextField * fFileTableStatusField;
     IBOutlet NSMenuItem * fFileCheckItem, * fFileUncheckItem,
                         * fFilePriorityNormal, * fFilePriorityHigh, * fFilePriorityLow;
@@ -61,7 +62,7 @@
     IBOutlet NSPopUpButton * fRatioPopUp, * fUploadLimitPopUp, * fDownloadLimitPopUp;
     IBOutlet NSTextField * fUploadLimitField, * fDownloadLimitField, * fRatioLimitField,
                         * fUploadLimitLabel, * fDownloadLimitLabel;
-	IBOutlet NSButton * fPexCheck;
+    IBOutlet NSButton * fPexCheck;
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
@@ -71,6 +72,8 @@
 
 - (void) setNextTab;
 - (void) setPreviousTab;
+
+- (void) setFileOutlineHoverRowForEvent: (NSEvent *) event;
 
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;

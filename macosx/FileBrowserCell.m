@@ -51,9 +51,7 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    NSMutableDictionary * item;
-    if (!(item = [self objectValue]))
-        return;
+    NSMutableDictionary * item = [self objectValue];
     
     //image
     float imageHeight = cellFrame.size.height - 2.0;

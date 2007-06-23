@@ -27,6 +27,11 @@
 @interface FileOutlineView : NSOutlineView
 {
     NSColor * fNormalColor, * fHighPriorityColor, * fLowPriorityColor;
+    
+    int fHoverRow;
 }
+
+- (void) setHoverRowForEvent: (NSEvent *) event;
+- (int) hoverRow;
 
 @end
