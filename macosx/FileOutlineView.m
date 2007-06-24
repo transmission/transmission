@@ -78,7 +78,7 @@
     if (event)
     {
         NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-        if (NSPointInRect(point, [self frame]))
+        if ([self columnAtPoint: point] == [self columnWithIdentifier: @"Priority"])
             row = [self rowAtPoint: point];
     }
     
