@@ -917,6 +917,10 @@
         #warning consider hidden
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
+        
+        if (![torrent canChangeDownloadCheckForFiles: indexSet])
+            return NSLocalizedString(@"Priority Not Available", "Inspector -> files tab -> tooltip");
+        
         BOOL low = [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexSet],
             normal = [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexSet],
             high = [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexSet];

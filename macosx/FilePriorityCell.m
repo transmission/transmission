@@ -35,7 +35,8 @@
     
     //only for when clicking manually
     Torrent * torrent = [fItem objectForKey: @"Torrent"];
-    if (![torrent canChangeDownloadCheckForFiles: [fItem objectForKey: @"Indexes"]])
+    NSIndexSet * indexes = [fItem objectForKey: @"Indexes"];
+    if (![torrent canChangeDownloadCheckForFiles: indexes])
         return;
     
     int priority = segment, actualPriority;
@@ -46,7 +47,7 @@
     else
         actualPriority = PRIORITY_NORMAL;
     
-    [torrent setFilePriority: actualPriority forIndexes: [fItem objectForKey: @"Indexes"]];
+    [torrent setFilePriority: actualPriority forIndexes: indexes];
     [fParentView reloadData];
 }
 
