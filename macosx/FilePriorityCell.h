@@ -5,7 +5,6 @@
 
 @interface FilePriorityCell : NSSegmentedCell
 {
-    FileOutlineView * fParentView;
     NSMutableDictionary * fItem;
 }
 
