@@ -3,7 +3,7 @@
 
 @implementation FilePriorityCell
 
-- (id) initForParentView: (FileOutlineView *) parentView
+- (id) init
 {
     if ((self = [super init]))
     {
@@ -17,9 +17,6 @@
             [self setLabel: @"" forSegment: i];
             [self setWidth: 6.0 forSegment: i];
         }
-        
-        #warning better way?
-        fParentView = parentView;
     }
     return self;
 }
@@ -48,7 +45,7 @@
         actualPriority = PRIORITY_NORMAL;
     
     [torrent setFilePriority: actualPriority forIndexes: indexes];
-    [fParentView reloadData];
+    [(FileOutlineView *)[self controlView] reloadData];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
@@ -63,8 +60,9 @@
         normal = [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexSet],
         high = [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexSet];
     
-    int row = [fParentView hoverRow];
-    if (row != -1 && [fParentView itemAtRow: row] == fItem)
+    FileOutlineView * view = (FileOutlineView *)[self controlView];
+    int row = [view hoverRow];
+    if (row != -1 && [view itemAtRow: row] == fItem)
     {
         [super setSelected: low forSegment: 0];
         [super setSelected: normal forSegment: 1];

@@ -108,7 +108,7 @@
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
     //set file outline
-    FilePriorityCell * priorityCell = [[[FilePriorityCell alloc] initForParentView: fFileOutline] autorelease];
+    FilePriorityCell * priorityCell = [[[FilePriorityCell alloc] init] autorelease];
     [[fFileOutline tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
     
     //set blank inspector

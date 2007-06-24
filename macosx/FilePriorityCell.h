@@ -9,7 +9,6 @@
     NSMutableDictionary * fItem;
 }
 
-- (id) initForParentView: (FileOutlineView *) parentView;
 - (void) setItem: (NSMutableDictionary *) item;
 
 @end
