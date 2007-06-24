@@ -914,7 +914,6 @@
     }
     else if ([ident isEqualToString: @"Priority"])
     {
-        #warning consider hidden
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
         
@@ -1045,7 +1044,7 @@
     [torrent setFileCheckState: NSOnState forIndexes: itemIndexes];
     
     NSMutableIndexSet * remainingItemIndexes = [NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [torrent fileCount])];
-    [remainingItemIndexes removeIndexes: indexSet];
+    [remainingItemIndexes removeIndexes: itemIndexes];
     [torrent setFileCheckState: NSOffState forIndexes: remainingItemIndexes];
     
     [fFileOutline reloadData];
