@@ -1085,6 +1085,12 @@
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
     [field setHidden: setting != NSOnState];
+    if (setting == NSOnState)
+    {
+        [field selectText: self];
+        [[self window] makeKeyAndOrderFront:self];
+    }
+    
     NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
     [label setHidden: setting != NSOnState];
 }
@@ -1131,6 +1137,11 @@
         [torrent setRatioSetting: setting];
     
     [fRatioLimitField setHidden: setting != NSOnState];
+    if (setting == NSOnState)
+    {
+        [fRatioLimitField selectText: self];
+        [[self window] makeKeyAndOrderFront:self];
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
 }
