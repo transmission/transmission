@@ -1183,43 +1183,38 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) moveDataFiles: (id) sender
 {
-    [self moveDataFileForTorrents: [[NSMutableArray alloc] initWithArray:
-            [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]]];
-}
-
-- (void) moveDataFileForTorrents: (NSMutableArray *) torrents
-{
-    if ([torrents count] <= 0)
-    {
-        [torrents release];
-        return;
-    }
-
-    Torrent * torrent = [torrents objectAtIndex: 0];
-
     NSOpenPanel * panel = [NSOpenPanel openPanel];
-    
     [panel setPrompt: NSLocalizedString(@"Select", "Move torrent -> prompt")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-
-    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\"",
-                        "Move torrent -> select destination folder"), [torrent name]]];
+    
+    NSArray * torrents = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] retain];
+    int count = [torrents count];
+    if (count == 1)
+        [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for \"%@\".",
+                            "Move torrent -> select destination folder"), [[torrents objectAtIndex: 0] name]]];
+    else
+        [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the new folder for %d data files.",
+                            "Move torrent -> select destination folder"), count]];
         
-    [panel beginSheetForDirectory: nil file: [torrent name] modalForWindow: fWindow modalDelegate: self
+    [panel beginSheetForDirectory: nil file: nil modalForWindow: fWindow modalDelegate: self
         didEndSelector: @selector(moveDataFileChoiceClosed:returnCode:contextInfo:) contextInfo: torrents];
 }
 
-- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSMutableArray *) torrents
+- (void) moveDataFileChoiceClosed: (NSOpenPanel *) panel returnCode: (int) code contextInfo: (NSArray *) torrents
 {
-    //move torrent data file to new location
     if (code == NSOKButton)
-        [[torrents objectAtIndex: 0] moveTorrentDataFileTo: [[panel filenames] objectAtIndex: 0]];
+    {
+        //move torrent data file to new location
+        NSEnumerator * enumerator = [torrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            [torrent moveTorrentDataFileTo: [[panel filenames] objectAtIndex: 0]];
+    }
     
-    [torrents removeObjectAtIndex: 0];
-    [self performSelectorOnMainThread: @selector(moveDataFileForTorrents:) withObject: torrents waitUntilDone: NO];
+    [torrents release];
 }
 
 - (void) copyTorrentFiles: (id) sender

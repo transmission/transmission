@@ -887,7 +887,7 @@
 {
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
-    { 
+    {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         [torrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState
                                         forIndexes: [item objectForKey: @"Indexes"]];

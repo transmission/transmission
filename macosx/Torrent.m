@@ -797,11 +797,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: NSLocalizedString(@"A folder cannot be moved to inside itself.",
-                                                        "Move inside iteself alert -> title")];
+                                                        "Move inside itself alert -> title")];
             [alert setInformativeText: [NSString stringWithFormat:
                             NSLocalizedString(@"The move operation of \"%@\" cannot be done.",
-                                                "Move inside iteself alert -> message"), [self name]]];
-            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside iteself alert -> button")];
+                                                "Move inside itself alert -> message"), [self name]]];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move inside itself alert -> button")];
             
             [alert runModal];
             [alert release];
