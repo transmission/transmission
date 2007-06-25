@@ -1339,7 +1339,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         if (tr_torrentGetFilePriority(fHandle, index) != TR_PRI_DND
-                || [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
+                || ![self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
             onState = YES;
         else
             offState = YES;
