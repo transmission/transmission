@@ -55,17 +55,46 @@ const char * tr_getTorrentsDirectory( void );
 const tr_thread_t THREAD_EMPTY;
 
 void tr_threadCreate ( tr_thread_t *, void (*func)(void *),
-                       void * arg, char * name );
+                       void * arg, const char * name );
 void tr_threadJoin   ( tr_thread_t * );
 void tr_lockInit     ( tr_lock_t * );
 void tr_lockClose    ( tr_lock_t * );
+int  tr_lockTryLock  ( tr_lock_t * );
 void tr_lockLock     ( tr_lock_t * );
 void tr_lockUnlock   ( tr_lock_t * );
 
-void tr_condInit     ( tr_cond_t * );
-void tr_condWait     ( tr_cond_t *, tr_lock_t * );
-void tr_condSignal   ( tr_cond_t * );
-void tr_condClose    ( tr_cond_t * );
+void tr_condInit      ( tr_cond_t * );
+void tr_condSignal    ( tr_cond_t * );
+void tr_condBroadcast ( tr_cond_t * );
+void tr_condClose     ( tr_cond_t * );
+void tr_condWait      ( tr_cond_t *, tr_lock_t * );
+
+/***
+**** RW lock:
+**** The lock can be had by one writer or any number of readers.
+***/
+
+typedef struct tr_rwlock_s
+{
+    tr_lock_t lock;
+    tr_cond_t readCond;
+    tr_cond_t writeCond;
+    size_t readCount;
+    size_t wantToRead;
+    size_t wantToWrite;
+    int haveWriter;
+}
+tr_rwlock_t;
+
+void  tr_rwInit          ( tr_rwlock_t * );
+void  tr_rwClose         ( tr_rwlock_t * );
+void  tr_rwReaderLock    ( tr_rwlock_t * );
+int   tr_rwReaderTrylock ( tr_rwlock_t * );
+void  tr_rwReaderUnlock  ( tr_rwlock_t * );
+void  tr_rwWriterLock    ( tr_rwlock_t * );
+int   tr_rwWriterTrylock ( tr_rwlock_t * );
+void  tr_rwWriterUnlock  ( tr_rwlock_t * );
+
 
 struct in_addr; /* forward declaration to calm gcc down */
 int

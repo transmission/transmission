@@ -212,12 +212,13 @@ static void ThreadFunc( void * _t )
     tr_dbg( "Thread '%s' exited", t->name );
 }
 
-void tr_threadCreate( tr_thread_t * t, void (*func)(void *), void * arg,
-                      char * name )
+void tr_threadCreate( tr_thread_t * t,
+                      void (*func)(void *), void * arg,
+                      const char * name )
 {
     t->func = func;
     t->arg  = arg;
-    t->name = strdup( name );
+    t->name = tr_strdup( name );
 #ifdef SYS_BEOS
     t->thread = spawn_thread( (void *) ThreadFunc, name,
                               B_NORMAL_PRIORITY, t );
@@ -231,7 +232,7 @@ const tr_thread_t THREAD_EMPTY = { NULL, NULL, NULL, 0 };
 
 void tr_threadJoin( tr_thread_t * t )
 {
-    if (t->func != NULL)
+    if( t->func != NULL )
     {
 #ifdef SYS_BEOS
         long exit;
@@ -261,6 +262,15 @@ void tr_lockClose( tr_lock_t * l )
     delete_sem( *l );
 #else
     pthread_mutex_destroy( l );
+#endif
+}
+
+int tr_lockTryLock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    #error how is this done in beos
+#else
+    return pthread_mutex_trylock( l );
 #endif
 }
 
@@ -321,6 +331,14 @@ void tr_condSignal( tr_cond_t * c )
     }
 #else
     pthread_cond_signal( c );
+#endif
+}
+void tr_condBroadcast( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    #error how is this done in beos
+#else
+    pthread_cond_broadcast( c );
 #endif
 }
 
@@ -702,3 +720,100 @@ tr_getDefaultRoute( struct in_addr * addr UNUSED )
 }
 
 #endif
+
+/***
+****
+***/
+
+static void
+tr_rwSignal( tr_rwlock_t * rw )
+{
+  if ( rw->wantToWrite )
+    tr_condSignal( &rw->writeCond );
+  else if ( rw->wantToRead )
+    tr_condBroadcast( &rw->readCond );
+}
+
+void
+tr_rwInit ( tr_rwlock_t * rw )
+{
+    memset( rw, 0, sizeof(tr_rwlock_t) );
+    tr_lockInit( &rw->lock );
+    tr_condInit( &rw->readCond );
+    tr_condInit( &rw->writeCond );
+}
+
+void
+tr_rwReaderLock( tr_rwlock_t * rw )
+{
+    tr_lockLock( &rw->lock );
+    rw->wantToRead++;
+    while( rw->haveWriter || rw->wantToWrite )
+        tr_condWait( &rw->readCond, &rw->lock );
+    rw->wantToRead--;
+    rw->readCount++;
+    tr_lockUnlock( &rw->lock );
+}
+
+int
+tr_rwReaderTrylock( tr_rwlock_t * rw )
+{
+    int ret = FALSE;
+    tr_lockLock( &rw->lock );
+    if ( !rw->haveWriter && !rw->wantToWrite ) {
+        rw->readCount++;
+        ret = TRUE;
+    }
+    tr_lockUnlock( &rw->lock );
+    return ret;
+
+}
+
+void
+tr_rwReaderUnlock( tr_rwlock_t * rw )
+{
+    tr_lockLock( &rw->lock );
+    --rw->readCount;
+    if( !rw->readCount )
+        tr_rwSignal( rw );
+    tr_lockUnlock( &rw->lock );
+}
+
+void
+tr_rwWriterLock( tr_rwlock_t * rw )
+{
+    tr_lockLock( &rw->lock );
+    rw->wantToWrite++;
+    while( rw->haveWriter || rw->readCount )
+        tr_condWait( &rw->writeCond, &rw->lock );
+    rw->wantToWrite--;
+    rw->haveWriter = TRUE;
+    tr_lockUnlock( &rw->lock );
+}
+
+int
+tr_rwWriterTrylock( tr_rwlock_t * rw )
+{
+    int ret = FALSE;
+    tr_lockLock( &rw->lock );
+    if( !rw->haveWriter && !rw->readCount )
+        ret = rw->haveWriter = TRUE;
+    tr_lockUnlock( &rw->lock );
+    return ret;
+}
+void
+tr_rwWriterUnlock( tr_rwlock_t * rw )
+{
+    tr_lockLock( &rw->lock );
+    rw->haveWriter = FALSE;
+    tr_rwSignal( rw );
+    tr_lockUnlock( &rw->lock );
+}
+
+void
+tr_rwClose( tr_rwlock_t * rw )
+{
+    tr_condClose( &rw->writeCond );
+    tr_condClose( &rw->readCond );
+    tr_lockClose( &rw->lock );
+}
