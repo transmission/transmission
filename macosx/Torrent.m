@@ -1338,7 +1338,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        if (tr_torrentGetFilePriority(fHandle, index) != TR_PRI_DND || [self fileProgress: index] >= 1.0)
+        if (tr_torrentGetFilePriority(fHandle, index) != TR_PRI_DND
+                || [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
             onState = YES;
         else
             offState = YES;
@@ -1351,6 +1352,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
 {
+    if ([self fileCount] <= 1)
+        return NO;
+    
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if ([self fileProgress: index] < 1.0)
@@ -1413,7 +1417,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         if (priority == [[[fFlatFileList objectAtIndex: index] objectForKey: @"Priority"] intValue]
-                && [self fileProgress: index] < 1.0)
+                && [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
             return YES;
     return NO;
 }
