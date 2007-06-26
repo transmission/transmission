@@ -54,7 +54,6 @@
 struct tor
 {
     int             id;
-    int             deleting;
     uint8_t         hash[SHA_DIGEST_LENGTH];
     tr_torrent_t  * tor;
     int             pexset;
@@ -75,8 +74,8 @@ static int          loadstate  ( void );
 static int          savestate  ( void );
 static int          toridcmp   ( struct tor *, struct tor * );
 static int          torhashcmp ( struct tor *, struct tor * );
-static struct tor * idlookup   ( int, int );
-static struct tor * hashlookup ( const uint8_t *, int );
+static struct tor * idlookup   ( int );
+static struct tor * hashlookup ( const uint8_t * );
 static struct tor * iterate    ( struct tor * );
 
 static struct event_base * gl_base      = NULL;
@@ -183,7 +182,7 @@ torrent_start( int id )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    tor = idlookup( id, 0 );
+    tor = idlookup( id );
     if( NULL == tor )
     {
         return;
@@ -206,7 +205,7 @@ torrent_stop( int id )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    tor = idlookup( id, 0 );
+    tor = idlookup( id );
     if( NULL == tor )
     {
         return;
@@ -228,7 +227,7 @@ torrent_remove( int id )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    tor = idlookup( id, 0 );
+    tor = idlookup( id );
     if( NULL == tor )
     {
         return;
@@ -246,7 +245,7 @@ torrent_info( int id )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    tor = idlookup( id, 0 );
+    tor = idlookup( id );
     if( NULL == tor )
     {
         return NULL;
@@ -263,7 +262,7 @@ torrent_stat( int id )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    tor = idlookup( id, 0 );
+    tor = idlookup( id );
     if( NULL == tor )
     {
         return NULL;
@@ -294,7 +293,7 @@ torrent_lookup( const uint8_t * hashstr )
         hash[ii] = strtol( buf, NULL, 16 );
     }
 
-    tor = hashlookup( hash, 0 );
+    tor = hashlookup( hash );
     if( NULL == tor )
     {
         return -1;
@@ -565,7 +564,6 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     }
     gl_lastid++;
     tor->id       = gl_lastid;
-    tor->deleting = 0;
 
     assert( sizeof( inf->hash ) == sizeof( tor->hash ) );
     inf = tr_torrentInfo( tor->tor );
@@ -589,24 +587,24 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     return tor;
 }
 
+static void
+freetor( struct tor * tor )
+{
+    tr_torrentClose( tor->tor );
+    RB_REMOVE( tortree, &gl_tree, tor );
+    RB_REMOVE( hashtree, &gl_hashes, tor );
+    free( tor );
+}
+
 void
 closetor( struct tor * tor, int calltimer )
 {
-    tr_stat_t  * st;
-
-    if( NULL == tor || tor->deleting )
+    if( NULL != tor )
     {
-        return;
-    }
-    tor->deleting = 1;
+        freetor( tor );
 
-    st = tr_torrentStat( tor->tor );
-    if( TR_STATUS_ACTIVE & st->status )
-    {
-        tr_torrentStop( tor->tor );
+        starttimer( calltimer );
     }
-
-    starttimer( calltimer );
 }
 
 void
@@ -624,36 +622,16 @@ starttimer( int callnow )
     }
 }
 
-void
+static void
 timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
 {
     struct tor         * tor, * next;
     tr_handle_status_t * hs;
-    tr_stat_t          * st;
     int                  stillmore;
     struct timeval       tv;
 
-    stillmore = 0;
-    for( tor = RB_MIN( tortree, &gl_tree ); NULL != tor; tor = next )
-    {
-        next = RB_NEXT( tortree, &gl_tree, tor );
-        if( !tor->deleting )
-        {
-            continue;
-        }
-        st = tr_torrentStat( tor->tor );
-        if( TR_STATUS_PAUSE & st->status )
-        {
-            tr_torrentClose( tor->tor );
-            RB_REMOVE( tortree, &gl_tree, tor );
-            RB_REMOVE( hashtree, &gl_hashes, tor );
-            free( tor );
-        }
-        else
-        {
-            stillmore = 1;
-        }
-    }
+    /* true if we've still got live torrents... */
+    stillmore = tr_torrentCount( gl_handle ) != 0;
 
     if( gl_exiting )
     {
@@ -675,10 +653,7 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
             for( tor = RB_MIN( tortree, &gl_tree ); NULL != tor; tor = next )
             {
                 next = RB_NEXT( tortree, &gl_tree, tor );
-                tr_torrentClose( tor->tor );
-                RB_REMOVE( tortree, &gl_tree, tor );
-                RB_REMOVE( hashtree, &gl_hashes, tor );
-                free( tor );
+                freetor( tor );
             }
             tr_close( gl_handle );
             exit( gl_exitval );
@@ -845,10 +820,7 @@ savestate( void )
     len = 0;
     RB_FOREACH( ii, tortree, &gl_tree )
     {
-        if( !ii->deleting )
-        {
-            len++;
-        }
+        len++;
     }
     if( tr_bencListReserve( list, len ) )
     {
@@ -857,10 +829,6 @@ savestate( void )
 
     RB_FOREACH( ii, tortree, &gl_tree )
     {
-        if( ii->deleting )
-        {
-            continue;
-        }
         tor = tr_bencListAdd( list );
         assert( NULL != tor );
         tr_bencInit( tor, TYPE_DICT );
@@ -915,33 +883,25 @@ torhashcmp( struct tor * left, struct tor * right )
 }
 
 struct tor *
-idlookup( int id, int wantdel )
+idlookup( int id )
 {
     struct tor key, * found;
 
     bzero( &key, sizeof key );
     key.id = id;
     found = RB_FIND( tortree, &gl_tree, &key );
-    if( NULL != found && !wantdel && found->deleting )
-    {
-        found = NULL;
-    }
 
     return found;
 }
 
 struct tor *
-hashlookup( const uint8_t * hash, int wantdel )
+hashlookup( const uint8_t * hash )
 {
     struct tor key, * found;
 
     bzero( &key, sizeof key );
     memcpy( key.hash, hash, sizeof key.hash );
     found = RB_FIND( hashtree, &gl_hashes, &key );
-    if( NULL != found && !wantdel && found->deleting )
-    {
-        found = NULL;
-    }
 
     return found;
 }
@@ -957,11 +917,6 @@ iterate( struct tor * tor )
         tor = RB_MIN( tortree, &gl_tree );
     }
     else
-    {
-        tor = RB_NEXT( tortree, &gl_tree, tor );
-    }
-
-    while( NULL != tor && tor->deleting )
     {
         tor = RB_NEXT( tortree, &gl_tree, tor );
     }
