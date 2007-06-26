@@ -95,24 +95,25 @@ enum ipc_msg
 #define IPC_ST_COMPLETED        ( 1 << 0 )
 #define IPC_ST_DOWNSPEED        ( 1 << 1 )
 #define IPC_ST_DOWNTOTAL        ( 1 << 2 )
-#define IPC_ST_ERROR            ( 1 << 3 )
-#define IPC_ST_ERRMSG           ( 1 << 4 )
-#define IPC_ST_ETA              ( 1 << 5 )
-#define IPC_ST_ID               ( 1 << 6 )
-#define IPC_ST_PEERDOWN         ( 1 << 7 )
-#define IPC_ST_PEERFROM         ( 1 << 8 )
-#define IPC_ST_PEERTOTAL        ( 1 << 9 )
-#define IPC_ST_PEERUP           ( 1 << 10 )
-#define IPC_ST_RUNNING          ( 1 << 11 )
-#define IPC_ST_STATE            ( 1 << 12 )
-#define IPC_ST_SWARM            ( 1 << 13 )
-#define IPC_ST_TRACKER          ( 1 << 14 )
-#define IPC_ST_TKDONE           ( 1 << 15 )
-#define IPC_ST_TKLEECH          ( 1 << 16 )
-#define IPC_ST_TKSEED           ( 1 << 17 )
-#define IPC_ST_UPSPEED          ( 1 << 18 )
-#define IPC_ST_UPTOTAL          ( 1 << 19 )
-#define IPC_ST__MAX             ( 1 << 20 )
+#define IPC_ST_DOWNVALID        ( 1 << 3 )
+#define IPC_ST_ERROR            ( 1 << 4 )
+#define IPC_ST_ERRMSG           ( 1 << 5 )
+#define IPC_ST_ETA              ( 1 << 6 )
+#define IPC_ST_ID               ( 1 << 7 )
+#define IPC_ST_PEERDOWN         ( 1 << 8 )
+#define IPC_ST_PEERFROM         ( 1 << 9 )
+#define IPC_ST_PEERTOTAL        ( 1 << 10 )
+#define IPC_ST_PEERUP           ( 1 << 11 )
+#define IPC_ST_RUNNING          ( 1 << 12 )
+#define IPC_ST_STATE            ( 1 << 13 )
+#define IPC_ST_SWARM            ( 1 << 14 )
+#define IPC_ST_TRACKER          ( 1 << 15 )
+#define IPC_ST_TKDONE           ( 1 << 16 )
+#define IPC_ST_TKLEECH          ( 1 << 17 )
+#define IPC_ST_TKSEED           ( 1 << 18 )
+#define IPC_ST_UPSPEED          ( 1 << 19 )
+#define IPC_ST_UPTOTAL          ( 1 << 20 )
+#define IPC_ST__MAX             ( 1 << 21 )
 
 struct ipc_funcs;
 struct ipc_info;
@@ -155,7 +156,7 @@ uint8_t *    ipc_mkvers   ( size_t * );
 uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int, const int * );
 int          ipc_addinfo  ( benc_val_t *, int, tr_info_t *, int );
-int          ipc_addstat  ( benc_val_t *, int, tr_stat_t *, int );
+int          ipc_addstat  ( benc_val_t *, int, const tr_stat_t *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */

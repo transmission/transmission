@@ -195,6 +195,7 @@ static struct inf gl_stat[] =
     { "completed",              IPC_ST_COMPLETED,     RB_ENTRY_INITIALIZER() },
     { "download-speed",         IPC_ST_DOWNSPEED,     RB_ENTRY_INITIALIZER() },
     { "download-total",         IPC_ST_DOWNTOTAL,     RB_ENTRY_INITIALIZER() },
+    { "download-valid",         IPC_ST_DOWNVALID,     RB_ENTRY_INITIALIZER() },
     { "error",                  IPC_ST_ERROR,         RB_ENTRY_INITIALIZER() },
     { "error-message",          IPC_ST_ERRMSG,        RB_ENTRY_INITIALIZER() },
     { "eta",                    IPC_ST_ETA,           RB_ENTRY_INITIALIZER() },
@@ -706,7 +707,7 @@ ipc_addinfo( benc_val_t * list, int tor, tr_info_t * inf, int types )
 
 int
 ipc_addstat( benc_val_t * list, int tor,
-             tr_stat_t * st, int types )
+             const tr_stat_t * st, int types )
 {
     benc_val_t  * dict, * item;
     int           ii, used;
@@ -753,6 +754,9 @@ ipc_addstat( benc_val_t * list, int tor,
                 break;
             case IPC_ST_DOWNTOTAL:
                 tr_bencInitInt( item, st->downloaded );
+                break;
+            case IPC_ST_DOWNVALID:
+                tr_bencInitInt( item, st->downloadedValid );
                 break;
             case IPC_ST_ERROR:
                 error = st->error;
