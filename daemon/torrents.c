@@ -497,19 +497,23 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
         return NULL;
     }
 
+    if( dir == NULL )
+        dir = gl_dir;
+
     if( NULL != path )
     {
-        tor->tor = tr_torrentInit( gl_handle, path, tor->hash,
+        tor->tor = tr_torrentInit( gl_handle, path, dir,
+                                   tor->hash,
                                    TR_FLAG_SAVE, &errcode );
     }
     else if( NULL != hash )
     {
-        tor->tor = tr_torrentInitSaved( gl_handle, hash, 0, &errcode );
+        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, 0, &errcode );
     }
     else
     {
-        tor->tor = tr_torrentInitData( gl_handle, data, size, tor->hash,
-                                       TR_FLAG_SAVE, &errcode );
+        tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 
+                                       tor->hash, TR_FLAG_SAVE, &errcode );
     }
 
     if( NULL == tor->tor )
@@ -566,8 +570,6 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     assert( sizeof( inf->hash ) == sizeof( tor->hash ) );
     inf = tr_torrentInfo( tor->tor );
     memcpy( tor->hash, inf->hash, sizeof tor->hash );
-
-    tr_torrentSetFolder( tor->tor, ( NULL == dir ? gl_dir : dir ) );
 
     if( TR_FLAG_PRIVATE & inf->flags )
     {
