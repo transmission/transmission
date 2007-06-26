@@ -58,6 +58,8 @@ struct _TrTorrent {
   tr_torrent_t *handle;
   char *dir;
   char *delfile;
+  tr_stat_t stat;
+  time_t lastStatTime;
 
   /* FIXME: hm, are these heavyweight enough to deserve their own properties? */
   gboolean severed;
@@ -80,7 +82,7 @@ tr_torrent_get_type(void);
 tr_torrent_t *
 tr_torrent_handle(TrTorrent *tor);
 
-tr_stat_t *
+const tr_stat_t *
 tr_torrent_stat(TrTorrent *tor);
 
 tr_info_t *
@@ -112,8 +114,6 @@ tr_torrent_set_seeding_cap_ratio ( TrTorrent*, gdouble ratio );
 void
 tr_torrent_set_seeding_cap_enabled ( TrTorrent*, gboolean );
 
-#ifdef TR_WANT_TORRENT_PRIVATE
-
 TrTorrent *
 tr_torrent_new( tr_handle_t * handle, const char * path, const char * dir,
                 enum tr_torrent_action act, gboolean paused, char ** err);
@@ -134,7 +134,5 @@ tr_torrent_state_saved(TrTorrent *tor);
 
 void
 tr_torrent_sever( TrTorrent * tor );
-
-#endif /* TR_WANT_TORRENT_PRIVATE */
 
 #endif

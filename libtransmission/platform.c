@@ -200,6 +200,7 @@ tr_getTorrentsDirectory( void )
 static void ThreadFunc( void * _t )
 {
     tr_thread_t * t = _t;
+    char* name = tr_strdup( t->name );
 
 #ifdef SYS_BEOS
     /* This is required because on BeOS, SIGINT is sent to each thread,
@@ -207,9 +208,10 @@ static void ThreadFunc( void * _t )
     signal( SIGINT, SIG_IGN );
 #endif
 
-    tr_dbg( "Thread '%s' started", t->name );
+    tr_dbg( "Thread '%s' started", name );
     t->func( t->arg );
-    tr_dbg( "Thread '%s' exited", t->name );
+    tr_dbg( "Thread '%s' exited", name );
+    tr_free( name );
 }
 
 void tr_threadCreate( tr_thread_t * t,
@@ -241,7 +243,7 @@ void tr_threadJoin( tr_thread_t * t )
         pthread_join( t->thread, NULL );
 #endif
         tr_dbg( "Thread '%s' joined", t->name );
-        free( t->name );
+        tr_free( t->name );
         t->name = NULL;
         t->func = NULL;
     }
@@ -270,6 +272,7 @@ int tr_lockTryLock( tr_lock_t * l )
 #ifdef SYS_BEOS
     #error how is this done in beos
 #else
+    /* success on zero! */
     return pthread_mutex_trylock( l );
 #endif
 }

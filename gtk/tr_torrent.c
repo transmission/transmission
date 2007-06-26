@@ -31,9 +31,6 @@
 #include "transmission.h"
 #include "bencode.h"
 
-/* XXX */
-#define TR_WANT_TORRENT_PRIVATE
-
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
@@ -41,7 +38,6 @@
 enum {
   TR_TORRENT_HANDLE = 1,
   TR_TORRENT_DIR,
-  TR_TORRENT_PAUSED,
 };
 
 static void
@@ -58,8 +54,6 @@ static void
 tr_torrent_dispose(GObject *obj);
 static void
 tr_torrent_set_folder(TrTorrent *tor);
-static gboolean
-tr_torrent_paused(TrTorrent *tor);
 
 static gpointer
 tracker_boxed_fake_copy( gpointer boxed )
@@ -127,11 +121,6 @@ tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
                               "Directory to download files to", NULL,
                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
   g_object_class_install_property(gobject_class, TR_TORRENT_DIR, pspec);
-
-  pspec = g_param_spec_boolean("paused", "Paused",
-                               "Is the torrent paused or running", TRUE,
-                               G_PARAM_READWRITE);
-  g_object_class_install_property(gobject_class, TR_TORRENT_PAUSED, pspec);
 }
 
 static void
@@ -143,6 +132,7 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
 #endif
 
   self->handle = NULL;
+  self->lastStatTime = 0;
   self->dir = NULL;
   self->delfile = NULL;
   self->severed = FALSE;
@@ -174,12 +164,6 @@ tr_torrent_set_property(GObject *object, guint property_id,
       if(NULL != self->handle && NULL != self->dir)
         tr_torrent_set_folder(self);
       break;
-    case TR_TORRENT_PAUSED:
-      g_assert(NULL != self->handle);
-      if(tr_torrent_paused(self) != g_value_get_boolean(value))
-        (g_value_get_boolean(value) ? tr_torrentStop : tr_torrentStart)
-          (self->handle);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
       break;
@@ -202,9 +186,6 @@ tr_torrent_get_property(GObject *object, guint property_id,
       g_value_set_string(value, (NULL != self->dir ? self->dir :
                                  tr_torrentGetFolder(self->handle)));
       break;
-    case TR_TORRENT_PAUSED:
-      g_value_set_boolean(value, tr_torrent_paused(self));
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
       break;
@@ -225,9 +206,7 @@ tr_torrent_dispose(GObject *obj) {
 #endif
 
   if( !self->severed )
-  {
       tr_torrent_sever( self );
-  }
 
   g_free (self->delfile);
   g_free (self->dir);
@@ -241,47 +220,39 @@ tr_torrent_sever( TrTorrent * self )
 {
     g_return_if_fail (TR_IS_TORRENT( self ));
 
-    if( self->severed )
-    {
-        return;
-    }
-
-#ifdef REFDBG
-    fprintf( stderr, "torrent %p sever\n", self );
-#endif
-
-    if( NULL == self->handle )
+    if( !self->severed )
     {
         self->severed = TRUE;
-        return;
-    }
 
-    if( !tr_torrent_paused( self ) )
-    {
-        tr_torrentStop( self->handle );
+        if( self->handle )
+            tr_torrentClose( self->handle );
     }
-    tr_torrentClose( self->handle );
-    self->severed = TRUE;
 }
 
 tr_torrent_t *
-tr_torrent_handle(TrTorrent *tor) {
-  TR_IS_TORRENT(tor);
+tr_torrent_handle(TrTorrent *tor)
+{
+    g_assert( TR_IS_TORRENT(tor) );
 
-  if(tor->severed)
-    return NULL;
-
-  return tor->handle;
+    return tor->severed ? NULL : tor->handle;
 }
 
-tr_stat_t *
-tr_torrent_stat(TrTorrent *tor) {
-  TR_IS_TORRENT(tor);
+const tr_stat_t *
+tr_torrent_stat(TrTorrent *tor)
+{
+    const time_t now = time( NULL );
 
-  if(tor->severed)
-    return NULL;
+    g_assert( TR_IS_TORRENT(tor) );
 
-  return tr_torrentStat(tor->handle);
+    if( tor->severed )
+        return NULL;
+
+    if( tor->lastStatTime != now ) {
+        tor->lastStatTime = now;
+        tor->stat = *tr_torrentStat( tor->handle );
+    }
+
+    return &tor->stat;
 }
 
 tr_info_t *
@@ -299,12 +270,8 @@ tr_torrent_start( TrTorrent * self )
 {
     TR_IS_TORRENT( self );
 
-    if( self->severed || !tr_torrent_paused( self ) )
-    {
-        return;
-    }
-
-    tr_torrentStart( self->handle );
+    if( !self->severed )
+        tr_torrentStart( self->handle );
 }
 
 void
@@ -312,31 +279,19 @@ tr_torrent_stop( TrTorrent * self )
 {
     TR_IS_TORRENT( self );
 
-    if( self->severed || tr_torrent_paused( self ) )
-    {
-        return;
-    }
-
-    tr_torrentStop( self->handle );
+    if( !self->severed )
+        tr_torrentStop( self->handle );
 }
 
 static TrTorrent *
-maketorrent( tr_torrent_t * handle,
-             const char   * dir,
-             gboolean       paused )
+maketorrent( tr_torrent_t * handle )
 {
-    TrTorrent * tor;
-
     tr_torrentDisablePex( handle,
                           !tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
 
-    tor = g_object_new( TR_TORRENT_TYPE,
-                        "torrent-handle", handle,
-                        "download-directory", dir,
-                        NULL);
-    g_object_set( tor, "paused", paused, NULL );
-
-    return tor;
+    return g_object_new( TR_TORRENT_TYPE,
+                         "torrent-handle", handle,
+                         NULL);
 }
 
 TrTorrent *
@@ -345,16 +300,19 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
 {
   TrTorrent *ret;
   tr_torrent_t *handle;
-  int errcode, flag;
+  int errcode, flags;
 
   g_assert(NULL != dir);
 
   *err = NULL;
 
-  flag    = ( TR_TOR_COPY == act || TR_TOR_MOVE == act ? TR_FLAG_SAVE : 0 );
   errcode = -1;
 
-  handle = tr_torrentInit( back, torrent, NULL, flag, &errcode );
+  flags = ( TR_TOR_COPY == act || TR_TOR_MOVE == act ? TR_FLAG_SAVE : 0 );
+  if( paused )
+      flags |= TR_FLAG_PAUSED;
+
+  handle = tr_torrentInit( back, torrent, dir, NULL, flags, &errcode );
 
   if(NULL == handle) {
     switch(errcode) {
@@ -371,7 +329,7 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
     return NULL;
   }
 
-  ret = maketorrent( handle, dir, paused );
+  ret = maketorrent( handle );
 
   if( TR_TOR_MOVE == act )
     ret->delfile = g_strdup(torrent);
@@ -385,14 +343,18 @@ tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
 {
     tr_torrent_t * handle;
     int            errcode;
+    int            flags;
 
     g_assert( NULL != dir );
 
     *err = NULL;
 
+    flags = TR_FLAG_SAVE;
+    if( paused )
+        flags |= TR_FLAG_PAUSED;
+
     errcode = -1;
-    handle  = tr_torrentInitData( back, data, size, NULL, TR_FLAG_SAVE,
-                                  &errcode );
+    handle  = tr_torrentInitData( back, data, size, dir, NULL, flags, &errcode );
 
     if( NULL == handle )
     {
@@ -411,7 +373,7 @@ tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
         return NULL;
     }
 
-    return maketorrent( handle, dir, paused );
+    return maketorrent( handle );
 }
 
 TrTorrent *
@@ -421,6 +383,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
   TrTorrent * ret;
   tr_torrent_t * handle;
   int ii, errcode;
+  int flags;
   benc_val_t *name, *data;
   char *torrent, *hash, *dir;
   gboolean paused = FALSE;
@@ -463,10 +426,14 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
      (NULL == torrent && NULL == hash) || NULL == dir)
     return NULL;
 
+  flags = 0;
+  if( forcedpause )
+      flags |= TR_FLAG_PAUSED;
+
   if( NULL != hash )
-    handle = tr_torrentInitSaved(back, hash, 0, &errcode);
+    handle = tr_torrentInitSaved(back, hash, dir, flags, &errcode);
   else
-    handle = tr_torrentInit(back, torrent, NULL, 0, &errcode);
+    handle = tr_torrentInit(back, torrent, dir, NULL, flags, &errcode);
 
   if(NULL == handle) {
     torrent = ( NULL == hash ? torrent : hash );
@@ -484,7 +451,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     return NULL;
   }
 
-  ret = maketorrent( handle, dir, paused || forcedpause );
+  ret = maketorrent( handle );
   ret->ul_cap = ul_cap; 
   ret->ul_cap_enabled = ul_cap_enabled; 
   ret->dl_cap = dl_cap;
@@ -526,8 +493,10 @@ tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
     }
     tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
                     tr_torrentGetFolder( tor->handle ), -1, 1 );
+#if 0
     tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
                     tr_torrent_paused( tor ) ? 1 : 0 );
+#endif
 
     tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-speed" ),
                     tor->ul_cap );
@@ -576,13 +545,6 @@ tr_torrent_set_folder(TrTorrent *tor) {
   }
 }
 
-static gboolean
-tr_torrent_paused(TrTorrent *tor) {
-  tr_stat_t *st = tr_torrentStat(tor->handle);
-
-  return (TR_STATUS_INACTIVE & st->status ? TRUE : FALSE);
-}
-
 extern void tr_setUseCustomUpload( tr_torrent_t * tor, int limit );
 extern void tr_setUseCustomDownload( tr_torrent_t * tor, int limit );
 
@@ -622,7 +584,7 @@ tr_torrent_set_download_cap_enabled ( TrTorrent *gtor, gboolean b ) {
 
 void
 tr_torrent_check_seeding_cap ( TrTorrent *gtor) {
-  tr_stat_t * st = tr_torrent_stat( gtor );
+  const tr_stat_t * st = tr_torrent_stat( gtor );
   if ((gtor->seeding_cap_enabled) && (st->ratio >= gtor->seeding_cap))
     tr_torrent_stop (gtor);
 }
@@ -642,62 +604,59 @@ tr_torrent_status_str ( TrTorrent * gtor )
 {
     char * top = 0;
 
-    tr_stat_t * st = tr_torrent_stat( gtor );
+    const tr_stat_t * st = tr_torrent_stat( gtor );
 
     const int tpeers = MAX (st->peersTotal, 0);
     const int upeers = MAX (st->peersUploading, 0);
     const int eta = st->eta;
     const double prog = st->percentDone * 100.0; /* [0...100] */
-    const int status = st->status;
 
-    if( TR_STATUS_CHECK_WAIT & status )
+    switch( st->status )
     {
-        top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
-    }
-    else if( TR_STATUS_CHECK & status )
-    {
-        top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
-    }
-    else if( TR_STATUS_DOWNLOAD & status )
-    {
-        if( 0 > eta )
-        {
-            top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
-        }
-        else
-        {
-            char * timestr = readabletime(eta);
-            top = g_strdup_printf( _("Finishing in %s (%.1f%%)"),
-                                   timestr, prog );
-            g_free(timestr);
-        }
-    }
-    else if( TR_STATUS_SEED & status )
-    {
-        top = g_strdup_printf(
-            ngettext( "Seeding, uploading to %d of %d peer",
-                      "Seeding, uploading to %d of %d peers", tpeers ),
-            upeers, tpeers );
-    }
-    else if( TR_STATUS_DONE & status )
-    {
-        top = g_strdup_printf(
-            ngettext( "Uploading to %d of %d peer",
-                      "Uploading to %d of %d peers", tpeers ),
-            upeers, tpeers );
-    }
-    else if( TR_STATUS_STOPPING & status )
-    {
-        top = g_strdup( _("Stopping...") );
-    }
-    else if( TR_STATUS_PAUSE & status )
-    {
-        top = g_strdup_printf( _("Stopped (%.1f%%)"), prog );
-    }
-    else
-    {
-        top = g_strdup( "" );
-        g_assert_not_reached();
+        case TR_STATUS_CHECK_WAIT:
+            top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
+            break;
+
+        case TR_STATUS_CHECK:
+            top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
+            break;
+
+        case TR_STATUS_DOWNLOAD:
+            if( eta < 0 )
+                top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
+            else {
+                char * timestr = readabletime(eta);
+                top = g_strdup_printf( _("Finishing in %s (%.1f%%)"), timestr, prog );
+                g_free(timestr);
+            }
+            break;
+
+        case TR_STATUS_DONE:
+            top = g_strdup_printf(
+                ngettext( "Uploading to %d of %d peer",
+                          "Uploading to %d of %d peers", tpeers ),
+                          upeers, tpeers );
+            break;
+
+        case TR_STATUS_SEED:
+            top = g_strdup_printf(
+                ngettext( "Seeding, uploading to %d of %d peer",
+                          "Seeding, uploading to %d of %d peers", tpeers ),
+                          upeers, tpeers );
+            break;
+
+        case TR_STATUS_STOPPING:
+            top = g_strdup( _("Stopping...") );
+            break;
+
+        case TR_STATUS_STOPPED:
+            top = g_strdup( _("Stopped") );
+            break;
+
+        default:
+            top = g_strdup_printf("Unrecognized state: %d", st->status );
+            break;
+
     }
 
     return top;

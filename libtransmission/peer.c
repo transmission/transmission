@@ -59,7 +59,7 @@ static const int SWIFT_INITIAL_CREDIT = 64 * 1024; /* 64 KiB */
  * on largesse by uniformly distributing free credit to
  * all of our peers.  This too helps prevent gridlock.
  */
-static const double SWIFT_LARGESSE = 0.05; /* 5% of our UL */
+static const double SWIFT_LARGESSE = 0.10; /* 10% of our UL */
 
 /**
  * How frequently to extend largesse-based credit
@@ -450,7 +450,7 @@ int tr_peerPulse( tr_peer_t * peer )
     
     /* Disconnect if seeder and torrent is seeding */
     if(   ( peer->progress >= 1.0 )
-       && ( peer->tor->status & (TR_STATUS_SEED|TR_STATUS_DONE) ) )
+       && ( peer->tor->cpStatus != TR_CP_INCOMPLETE ) )
     {
         return TR_ERROR;
     }
@@ -836,7 +836,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
     int deadbeatCount = 0;
     tr_peer_t ** deadbeats;
 
-    tr_lockLock( &tor->lock );
+    tr_torrentWriterLock( tor );
 
     deadbeats = tr_calloc( tor->peerCount, sizeof(tr_peer_t*) );
     for( i=0; i<tor->peerCount; ++i ) {
@@ -864,7 +864,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
 
     free( deadbeats );
 
-    tr_lockUnlock( &tor->lock );
+    tr_torrentWriterUnlock( tor );
 }
 void
 tr_swiftPulse( tr_handle_t * h )

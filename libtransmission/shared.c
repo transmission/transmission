@@ -320,9 +320,9 @@ static void SetPublicPort( tr_shared_t * s, int port )
 
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        tr_lockLock( &tor->lock );
+        tr_torrentWriterLock( tor );
         tor->publicPort = port;
-        tr_lockUnlock( &tor->lock );
+        tr_torrentWriterUnlock( tor );
     }
 }
 
@@ -403,22 +403,21 @@ static void DispatchPeers( tr_shared_t * s )
 
             for( tor = h->torrentList; tor; tor = tor->next )
             {
-                tr_lockLock( &tor->lock );
-                if( tor->status & TR_STATUS_INACTIVE )
+                tr_torrentWriterLock( tor );
+                if( tor->cpStatus != TR_RUN_RUNNING )
                 {
-                    tr_lockUnlock( &tor->lock );
+                    tr_torrentWriterUnlock( tor );
                     continue;
                 }
 
-                if( 0 == memcmp( tor->info.hash, hash,
-                            SHA_DIGEST_LENGTH ) )
+                if( !memcmp( tor->info.hash, hash, SHA_DIGEST_LENGTH ) )
                 {
                     /* Found it! */
                     tr_torrentAttachPeer( tor, s->peers[ii] );
-                    tr_lockUnlock( &tor->lock );
+                    tr_torrentWriterUnlock( tor );
                     goto removePeer;
                 }
-                tr_lockUnlock( &tor->lock );
+                tr_torrentWriterUnlock( tor );
             }
 
             /* Couldn't find a torrent, we probably removed it */

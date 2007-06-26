@@ -956,14 +956,8 @@ recheckTorrentForeach (GtkTreeModel * model,
                        gpointer       data UNUSED)
 {
     TrTorrent * gtor = NULL;
-    int status = 0;
-    tr_torrent_t * tor;
-    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, MC_STAT, &status, -1 );
-    tor = tr_torrent_handle( gtor );
-    if( status & TR_STATUS_ACTIVE )
-        tr_torrentStop( tor );
-    tr_torrentRemoveFastResume( tor );
-    tr_torrentStart( tor );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
+    tr_torrentRecheck( tr_torrent_handle( gtor ) );
     g_object_unref( G_OBJECT( gtor ) );
 }
 

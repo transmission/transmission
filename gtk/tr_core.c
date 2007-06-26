@@ -31,9 +31,6 @@
 #include "bencode.h"
 #include "transmission.h"
 
-/* XXX */
-#define TR_WANT_TORRENT_PRIVATE
-
 #include "conf.h"
 #include "tr_core.h"
 #include "tr_prefs.h"
@@ -55,10 +52,6 @@ tr_core_marshal_data( GClosure * closure, GValue * ret, guint count,
                       const GValue * vals, gpointer hint, gpointer marshal );
 static void
 tr_core_dispose( GObject * obj );
-static int
-tr_core_check_torrents( TrCore * self );
-static int
-tr_core_check_zombies( TrCore * self );
 static void
 tr_core_insert( TrCore * self, TrTorrent * tor );
 static void
@@ -238,7 +231,6 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 
     self->model    = GTK_TREE_MODEL( store );
     self->handle   = tr_init( "gtk" );
-    self->zombies  = NULL;
     self->nextid   = 1;
     self->quitting = FALSE;
     self->disposed = FALSE;
@@ -250,7 +242,6 @@ tr_core_dispose( GObject * obj )
     TrCore       * self = (TrCore *) obj;
     GObjectClass * parent;
     GtkTreeIter    iter;
-    GList        * ii;
     TrTorrent    * tor;
 
     if( self->disposed )
@@ -272,17 +263,6 @@ tr_core_dispose( GObject * obj )
     }
     while( gtk_tree_model_iter_next( self->model, &iter ) );
     g_object_unref( self->model );
-
-    /* sever and unref all remaining zombie torrents */
-    if( NULL != self->zombies )
-    {
-        for( ii = g_list_first( self->zombies ); NULL != ii; ii = ii->next )
-        {
-            tr_torrent_sever( ii->data );
-            g_object_unref( ii->data );
-        }
-        g_list_free( self->zombies );
-    }
 
 #ifdef REFDBG
     fprintf( stderr, "core    %p dead\n", self );
@@ -322,29 +302,22 @@ void
 tr_core_shutdown( TrCore * self )
 {
     GtkTreeIter iter;
-    TrTorrent * tor;
 
     TR_IS_CORE( self );
 
     if( self->disposed )
-    {
         return;
-    }
 
     g_assert( !self->quitting );
     self->quitting = TRUE;
 
     /* try to stop all the torrents nicely */
-    if( gtk_tree_model_get_iter_first( self->model, &iter) )
-    {
-        do
-        {
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            tr_torrent_stop( tor );
-            g_object_unref( tor );
-        }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
-    }
+    if ( gtk_tree_model_get_iter_first( self->model, &iter) ) do {
+        TrTorrent * tor;
+        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+        tr_torrent_sever( tor );
+        g_object_unref( tor );
+    } while( gtk_list_store_remove( GTK_LIST_STORE(self->model), &iter ) );
 
     /* shut down nat traversal */
     tr_natTraversalEnable( self->handle, 0 );
@@ -353,78 +326,25 @@ tr_core_shutdown( TrCore * self )
 gboolean
 tr_core_quiescent( TrCore * self )
 {
-    tr_handle_status_t * hstat;
+    const tr_handle_status_t * hstat;
 
     TR_IS_CORE( self );
     g_assert( self->quitting );
 
     if( self->disposed )
-    {
         return TRUE;
-    }
 
-    if( 0 < tr_core_check_torrents( self ) )
-    {
+    if ( tr_torrentCount( self->handle ) != 0 )
         return FALSE;
-    }
 
     hstat = tr_handleStatus( self->handle );
-
     return TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus;
 }
 
 int
 tr_core_check_torrents( TrCore * self )
 {
-    GtkTreeIter iter;
-    tr_stat_t * st;
-    int         count;
-    TrTorrent * tor;
-
-    g_assert( !self->disposed && self->quitting );
-
-    count = 0;
-
-    if( gtk_tree_model_get_iter_first( self->model, &iter) )
-    {
-        do
-        {
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            st = tr_torrent_stat( tor );
-            if( !( TR_STATUS_PAUSE & st->status ) )
-            {
-                count++;
-            }
-            g_object_unref( tor );
-        }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
-    }
-
-    count += tr_core_check_zombies( self );
-
-    return count;
-}
-
-int
-tr_core_check_zombies( TrCore * self )
-{
-    GList     * ii, * next;
-    tr_stat_t * st;
-
-    for( ii = g_list_first( self->zombies ); NULL != ii; ii = next )
-    {
-        next = ii->next;
-        st = tr_torrent_stat( ii->data );
-        if( TR_STATUS_PAUSE & st->status )
-        {
-            tr_torrent_sever( ii->data );
-            g_object_unref( ii->data );
-            /* XXX is this safe to do? */
-            self->zombies = g_list_delete_link( self->zombies, ii );
-        }
-    }
-
-    return g_list_length( self->zombies );
+    return gtk_tree_model_iter_n_children( self->model, NULL );
 }
 
 void
@@ -666,29 +586,16 @@ void
 tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
 {
     TrTorrent * tor;
-    tr_stat_t * st;
 
     TR_IS_CORE( self );
 
     gtk_tree_model_get( self->model, iter, MC_TORRENT, &tor, -1 );
-
     gtk_list_store_remove( GTK_LIST_STORE( self->model ), iter );
-    if( TR_FLAG_SAVE & tr_torrent_info( tor )->flags )
-    {
-        tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
-    }
 
-    st = tr_torrent_stat( tor );
-    if( TR_STATUS_ACTIVE & st->status )
-    {
-        tr_torrentStop( tr_torrent_handle( tor ) );
-        self->zombies = g_list_append( self->zombies, tor );
-    }
-    else
-    {
-        tr_torrent_sever( tor );
-        g_object_unref( tor );
-    }
+    if( TR_FLAG_SAVE & tr_torrent_info( tor )->flags )
+        tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
+
+    tr_torrent_sever( tor );
 }
 
 void
@@ -715,7 +622,7 @@ tr_core_update( TrCore * self )
 {
     GtkTreeIter iter;
     TrTorrent * tor;
-    tr_stat_t * st;
+    const tr_stat_t * st;
 
     TR_IS_CORE( self );
 
@@ -751,11 +658,6 @@ tr_core_update( TrCore * self )
                                 -1 );
         }
         while( gtk_tree_model_iter_next( self->model, &iter ) );
-    }
-
-    if( !self->quitting )
-    {
-        tr_core_check_zombies( self );
     }
 }
 

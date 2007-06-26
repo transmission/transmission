@@ -145,11 +145,11 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
     tr_sharedLock( h->shared );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        tr_lockLock( &tor->lock );
-        if( tor->status & TR_STATUS_DOWNLOAD )
+        tr_torrentReaderLock( tor );
+        if( tor->cpStatus == TR_CP_INCOMPLETE )
             *dl += tr_rcRate( tor->download );
         *ul += tr_rcRate( tor->upload );
-        tr_lockUnlock( &tor->lock );
+        tr_torrentReaderUnlock( tor );
     }
     tr_sharedUnlock( h->shared );
 }

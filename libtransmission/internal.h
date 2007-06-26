@@ -157,9 +157,27 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+void tr_torrentResetTransferStats( tr_torrent_t * );
+
 int tr_torrentAddCompact( tr_torrent_t * tor, int from,
                            uint8_t * buf, int count );
 int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer );
+
+void tr_torrentSetHasPiece( tr_torrent_t * tor, int pieceIndex, int has );
+
+void tr_torrentReaderLock    ( const tr_torrent_t * );
+void tr_torrentReaderUnlock  ( const tr_torrent_t * );
+void tr_torrentWriterLock    ( tr_torrent_t * );
+void tr_torrentWriterUnlock  ( tr_torrent_t * );
+
+typedef enum
+{
+    TR_RUN_CHECKING  = (1<<0), /* checking files' checksums */
+    TR_RUN_RUNNING   = (1<<1), /* seeding or leeching */
+    TR_RUN_STOPPING  = (1<<2), /* stopping */
+    TR_RUN_STOPPED   = (1<<3)  /* stopped */
+}
+run_status_t;
 
 struct tr_torrent_s
 {
@@ -172,7 +190,6 @@ struct tr_torrent_s
     tr_ratecontrol_t * download;
     tr_ratecontrol_t * swarmspeed;
 
-    int               status;
     int               error;
     char              errorString[128];
     int               hasChangedState;
@@ -194,10 +211,12 @@ struct tr_torrent_s
     
     tr_completion_t * completion;
 
-    volatile char     die;
+    volatile char     dieFlag;
+    volatile char     recheckFlag;
+    run_status_t      runStatus;
+    cp_status_t       cpStatus;
     tr_thread_t       thread;
-    tr_lock_t         lock;
-    tr_cond_t         cond;
+    tr_rwlock_t       lock;
 
     tr_tracker_t    * tracker;
     tr_io_t         * io;
@@ -219,7 +238,6 @@ struct tr_torrent_s
     tr_stat_t         stats[2];
     int               statCur;
 
-    tr_torrent_t    * prev;
     tr_torrent_t    * next;
 };
 

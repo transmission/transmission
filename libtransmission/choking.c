@@ -145,7 +145,7 @@ void tr_chokingPulse( tr_choking_t * c )
     peersTotalCount = 0;
     for( tor = c->h->torrentList; tor; tor = tor->next )
     {
-        tr_lockLock( &tor->lock );
+        tr_torrentWriterLock( tor );
         peersTotalCount += tor->peerCount;
     }
 
@@ -310,9 +310,7 @@ void tr_chokingPulse( tr_choking_t * c )
 
     /* Unlock all torrents */
     for( tor = c->h->torrentList; tor; tor = tor->next )
-    {
-        tr_lockUnlock( &tor->lock );
-    }
+        tr_torrentWriterUnlock( tor );
 
     tr_lockUnlock( &c->lock );
 }

@@ -213,8 +213,6 @@ enum
 
 typedef int8_t tr_priority_t;
 
-void tr_torrentInitFilePieces( tr_torrent_t * tor );
-
 /* priorities should be an array of tor->info.fileCount bytes,
  * each holding a value of TR_PRI_NORMAL, _HIGH, _LOW, or _DND. */
 void tr_torrentSetFilePriorities ( tr_torrent_t *, const tr_priority_t * priorities );
@@ -265,7 +263,9 @@ void tr_close( tr_handle_t * );
 #define TR_EUNSUPPORTED 2
 #define TR_EDUPLICATE   3
 #define TR_EOTHER       666
-tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
+tr_torrent_t * tr_torrentInit( tr_handle_t *,
+                               const char * path,
+                               const char * destination,
                                uint8_t * hash, int flags, int * error );
 
 /***********************************************************************
@@ -274,9 +274,10 @@ tr_torrent_t * tr_torrentInit( tr_handle_t *, const char * path,
  * Like tr_torrentInit, except the actual torrent data is passed in
  * instead of the filename.
  **********************************************************************/
-tr_torrent_t * tr_torrentInitData( tr_handle_t *, uint8_t * data,
-                                   size_t size, uint8_t * hash,
-                                   int flags, int * error );
+tr_torrent_t * tr_torrentInitData( tr_handle_t *,
+                                   uint8_t * data, size_t size,
+                                   const char * destination,
+                                   uint8_t * hash, int flags, int * error );
 
 /***********************************************************************
  * tr_torrentInitSaved
@@ -285,7 +286,9 @@ tr_torrent_t * tr_torrentInitData( tr_handle_t *, uint8_t * data,
  * the hash string of a saved torrent file instead of a filename. There
  * are currently no valid flags for this function.
  **********************************************************************/
-tr_torrent_t * tr_torrentInitSaved( tr_handle_t *, const char * hashStr,
+tr_torrent_t * tr_torrentInitSaved( tr_handle_t *,
+                                    const char * hashStr,
+                                    const char * destination,
                                     int flags, int * error );
 
 /***********************************************************************
@@ -317,9 +320,7 @@ tr_info_t * tr_torrentInfo( tr_torrent_t * );
 int tr_torrentScrape( tr_torrent_t *, int * s, int * l, int * d );
 
 void   tr_torrentSetFolder( tr_torrent_t *, const char * );
-char * tr_torrentGetFolder( tr_torrent_t * );
-
-int tr_torrentDuplicateDownload( tr_torrent_t * tor );
+const char * tr_torrentGetFolder( const tr_torrent_t * );
 
 /***********************************************************************
  * tr_torrentStart
@@ -377,7 +378,7 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * );
  * tr_torrentPeers
  ***********************************************************************/
 typedef struct tr_peer_stat_s tr_peer_stat_t;
-tr_peer_stat_t * tr_torrentPeers( tr_torrent_t *, int * peerCount );
+tr_peer_stat_t * tr_torrentPeers( const tr_torrent_t *, int * peerCount );
 void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
 
 /***********************************************************************
@@ -388,9 +389,9 @@ void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
  * to either -1 if we have the piece, otherwise it is set to the number
  * of connected peers who have the piece.
  **********************************************************************/
-void tr_torrentAvailability( tr_torrent_t *, int8_t * tab, int size );
+void tr_torrentAvailability( const tr_torrent_t *, int8_t * tab, int size );
 
-void tr_torrentAmountFinished( tr_torrent_t * tor, float * tab, int size );
+void tr_torrentAmountFinished( const tr_torrent_t * tor, float * tab, int size );
 
 /***********************************************************************
  * tr_torrentCompletion
@@ -414,13 +415,13 @@ uint64_t tr_torrentFileBytesCompleted( const tr_torrent_t *, int fileIndex );
  **********************************************************************/
 void tr_torrentRemoveSaved( tr_torrent_t * );
 
-void tr_torrentRemoveFastResume( tr_torrent_t * tor );
+void tr_torrentRecheck( tr_torrent_t * );
 
 /***********************************************************************
  * tr_torrentClose
  ***********************************************************************
  * Frees memory allocated by tr_torrentInit. If the torrent was running,
- * you must call tr_torrentStop() before closing it.
+ * it is stopped first.
  **********************************************************************/
 void tr_torrentClose( tr_torrent_t * );
 
@@ -459,6 +460,7 @@ struct tr_info_s
     /* Flags */
 #define TR_FLAG_SAVE    0x01 /* save a copy of the torrent file */
 #define TR_FLAG_PRIVATE 0x02 /* do not share information for this torrent */
+#define TR_FLAG_PAUSED  0x04 /* don't start the torrent when adding it */
     int                  flags;
 
     /* Tracker info */
@@ -488,32 +490,38 @@ struct tr_info_s
 
 typedef enum
 {
-   TR_CP_COMPLETE,     /* has every piece */
-   TR_CP_DONE,         /* has all the pieces but the DND ones */
-   TR_CP_INCOMPLETE    /* doesn't have all the desired pieces */
+    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
+    TR_CP_DONE,         /* has all the pieces but the DND ones */
+    TR_CP_COMPLETE      /* has every piece */
 }
 cp_status_t;
+
+typedef enum
+{
+    TR_STATUS_CHECK_WAIT   = (1<<0), /* Waiting in queue to check files */
+    TR_STATUS_CHECK        = (1<<1), /* Checking files */
+    TR_STATUS_DOWNLOAD     = (1<<2), /* Downloading */
+    TR_STATUS_DONE         = (1<<3), /* not at 100% so can't tell the tracker
+                                        we're a seeder, but due to DND files
+                                        there's nothing we want right now */
+    TR_STATUS_SEED         = (1<<4), /* Seeding */
+    TR_STATUS_STOPPING     = (1<<5), /* Sending 'stopped' to the tracker */
+    TR_STATUS_STOPPED      = (1<<6)  /* Sent 'stopped' but thread still
+                                        running (for internal use only) */
+}
+torrent_status_t;
+
+#define TR_STATUS_ACTIVE \
+    (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
+#define TR_STATUS_INACTIVE \
+    (TR_STATUS_STOPPING|TR_STATUS_STOPPED)
 
 /***********************************************************************
  * tr_stat_s
  **********************************************************************/
 struct tr_stat_s
 {
-#define TR_STATUS_CHECK_WAIT (1<<0) /* Waiting in queue to check files */
-#define TR_STATUS_CHECK      (1<<1) /* Checking files */
-#define TR_STATUS_DOWNLOAD   (1<<2) /* Downloading */
-#define TR_STATUS_DONE       (1<<3) /* not at 100% so can't tell the tracker
-                                       we're a seeder, but due to DND files
-                                       there's nothing we want right now */
-#define TR_STATUS_SEED       (1<<4) /* Seeding */
-#define TR_STATUS_STOPPING   (1<<5) /* Sending 'stopped' to the tracker */
-#define TR_STATUS_STOPPED    (1<<6) /* Sent 'stopped' but thread still
-                                       running (for internal use only) */
-#define TR_STATUS_PAUSE      (1<<7) /* Paused */
-
-#define TR_STATUS_ACTIVE   (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
-#define TR_STATUS_INACTIVE (TR_STATUS_STOPPING|TR_STATUS_STOPPED|TR_STATUS_PAUSE)
-    int                 status;
+    torrent_status_t    status;
     cp_status_t         cpStatus;
 
     int                 error;

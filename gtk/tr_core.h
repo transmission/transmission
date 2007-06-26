@@ -60,7 +60,6 @@ struct _TrCore
     GObject             parent;
     GtkTreeModel      * model;
     tr_handle_t       * handle;
-    GList             * zombies;
     int                 nextid;
     gboolean            quitting;
     gboolean            disposed;

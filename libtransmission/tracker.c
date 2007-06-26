@@ -474,6 +474,9 @@ void tr_trackerCompleted( tr_tracker_t * tc )
 
 void tr_trackerStopped( tr_tracker_t * tc )
 {
+    if( tc == NULL )
+        return;
+
     /* If we are already sending a query at the moment, we need to
        reconnect */
     killHttp( &tc->http );
@@ -490,6 +493,9 @@ void tr_trackerClose( tr_tracker_t * tc )
 {
     size_t          ii;
     struct tclist * dead;
+
+    if( tc == NULL )
+        return;
 
     killHttp( &tc->http );
     killHttp( &tc->httpScrape );
@@ -522,11 +528,8 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
     if( tc->started )
     {
         event = "&event=started";
-        
-        tor->downloadedPrev += tor->downloadedCur;
-        tor->downloadedCur   = 0;
-        tor->uploadedPrev   += tor->uploadedCur;
-        tor->uploadedCur     = 0;
+       
+        tr_torrentResetTransferStats( tor );
 
         if( shouldChangePort( tc ) )
         {
@@ -832,7 +835,7 @@ nodict:
 
     if( tc->stopped )
     {
-        tor->status = TR_STATUS_STOPPED;
+        tr_torrentStop( tor );
         tc->stopped = 0;
     }
     else if( shouldChangePort( tc ) )

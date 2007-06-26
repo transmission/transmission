@@ -14,8 +14,6 @@
 struct tr_io_s
 {
     tr_torrent_t * tor;
-
-    tr_bitfield_t * uncheckedPieces;
 };
 
 #include "fastresume.h"
@@ -135,10 +133,6 @@ readOrWritePiece ( tr_torrent_t       * tor,
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
     assert( buflen <= (size_t) tr_pieceSize( pieceIndex ) );
 
-    /* Release the torrent lock so the UI can still update itself if
-       this blocks for a while */
-    tr_lockUnlock( &tor->lock );
-
     findFileLocation ( tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset );
 
     while( buflen && !ret )
@@ -157,8 +151,6 @@ readOrWritePiece ( tr_torrent_t       * tor,
         fileIndex++;
         fileOffset = 0;
     }
-
-    tr_lockLock( &tor->lock );
 
     return ret;
 }
@@ -217,37 +209,46 @@ checkPiece ( tr_torrent_t * tor, int pieceIndex )
     return ret;
 }
 
-static void
-checkFiles( tr_io_t * io )
+int
+tr_ioCheckFiles( tr_torrent_t * tor, int mode )
 {
     int i;
-    tr_torrent_t * tor = io->tor;
+    tr_bitfield_t * uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
 
-    tr_bitfieldClear( io->uncheckedPieces );
+    tr_cpReset( tor->completion );
 
-    if( fastResumeLoad( io->tor, io->uncheckedPieces ) )
-        tr_bitfieldAddRange( io->uncheckedPieces, 0, tor->info.pieceCount-1 );
+    tr_bitfieldClear( uncheckedPieces );
 
-    if( !tr_bitfieldIsEmpty( io->uncheckedPieces ) )
-        tr_inf( "Rechecking portions of \"%s\"", tor->info.name );
+    if( (mode==TR_RECHECK_FORCE) || fastResumeLoad( tor, uncheckedPieces ) )
+        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount-1 );
+
+    if( tr_bitfieldIsEmpty( uncheckedPieces ) ) {
+        tr_bitfieldFree( uncheckedPieces );
+        return TR_OK;
+    }
+
+    if( mode == TR_RECHECK_FAST ) {
+        tr_bitfieldFree( uncheckedPieces );
+        return TR_ERROR_IO_OTHER;
+    }
+
+    tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
 
     for( i=0; i<tor->info.pieceCount; ++i ) 
     {
-        if( tor->status & TR_STATUS_STOPPING )
-            break;
-
-        if( !tr_bitfieldHas( io->uncheckedPieces, i ) )
+        if( !tr_bitfieldHas( uncheckedPieces, i ) )
             continue;
 
         tr_dbg ( "Checking piece %d because it's not in fast-resume", i );
 
-        if( !checkPiece( tor, i ) )
-           tr_cpPieceAdd( tor->completion, i );
-        else
-           tr_cpPieceRem( tor->completion, i );
+        tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
 
-        tr_bitfieldRem( io->uncheckedPieces, i );
+        tr_bitfieldRem( uncheckedPieces, i );
     }
+
+    fastResumeSave( tor );
+    tr_bitfieldFree( uncheckedPieces );
+    return TR_OK;
 }
 
 /****
@@ -255,49 +256,52 @@ checkFiles( tr_io_t * io )
 ****/
 
 tr_io_t*
-tr_ioInit( tr_torrent_t * tor )
+tr_ioInitFast( tr_torrent_t * tor )
 {
-    tr_io_t * io = calloc( 1, sizeof( tr_io_t ) );
-    io->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    tr_io_t * io = tr_calloc( 1, sizeof( tr_io_t ) );
     io->tor = tor;
-    checkFiles( io );
+
+    if( tr_ioCheckFiles( tor, TR_RECHECK_FAST ) )
+    {
+        tr_free( io );
+        io = NULL;
+    }
+
     return io;
 }
+
 
 void
 tr_ioSync( tr_io_t * io )
 {
-    int i;
-    const tr_info_t * info = &io->tor->info;
+    if( io != NULL )
+    {
+        int i;
+        const tr_info_t * info = &io->tor->info;
 
-    for( i=0; i<info->fileCount; ++i )
-        tr_fdFileClose( io->tor->destination, info->files[i].name );
+        for( i=0; i<info->fileCount; ++i )
+            tr_fdFileClose( io->tor->destination, info->files[i].name );
 
-    if( tr_bitfieldIsEmpty( io->uncheckedPieces ) )
         fastResumeSave( io->tor );
+    }
 }
 
 void
 tr_ioClose( tr_io_t * io )
 {
-    tr_ioSync( io );
-
-    tr_bitfieldFree( io->uncheckedPieces );
-    free( io );
+    if( io != NULL )
+    {
+        tr_ioSync( io );
+        tr_free( io );
+    }
 }
 
 
 /* try to load the fast resume file */
-void
+int
 tr_ioLoadResume( tr_torrent_t * tor )
 {
-    tr_io_t * io = calloc( 1, sizeof( tr_io_t ) );
-    io->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-    io->tor = tor;
-    fastResumeLoad( tor, io->uncheckedPieces );
-    tor->ioLoaded = 1;
-    tr_bitfieldFree( io->uncheckedPieces );
-    free( io );
+    return tr_ioCheckFiles ( tor, TR_RECHECK_FAST );
 }
 
 void tr_ioRemoveResume( tr_torrent_t * tor )

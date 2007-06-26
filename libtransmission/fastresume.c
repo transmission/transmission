@@ -211,7 +211,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
         tr_time_t * curMTimes = getMTimes( tor, &n );
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
-            if ( !curMTimes[i] || ( curMTimes[i]!=oldMTimes[i] ) ) {
+            if ( curMTimes[i]!=oldMTimes[i] ) {
                 const tr_file_t * file = &tor->info.files[i];
                 tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
                         file->name, file->firstPiece, file->lastPiece);

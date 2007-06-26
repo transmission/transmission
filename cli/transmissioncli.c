@@ -154,7 +154,7 @@ int main( int argc, char ** argv )
     }
 
     /* Open and parse torrent file */
-    if( !( tor = tr_torrentInit( h, torrentPath, NULL, 0, &error ) ) )
+    if( !( tor = tr_torrentInit( h, torrentPath, ".", NULL, 0, &error ) ) )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_close( h );
@@ -227,7 +227,6 @@ int main( int argc, char ** argv )
 
     tr_natTraversalEnable( h, natTraversal );
     
-    tr_torrentSetFolder( tor, "." );
     tr_torrentStart( tor );
 
     for( ;; )
@@ -246,11 +245,7 @@ int main( int argc, char ** argv )
 
         s = tr_torrentStat( tor );
 
-        if( s->status & TR_STATUS_PAUSE )
-        {
-            break;
-        }
-        else if( s->status & TR_STATUS_CHECK_WAIT )
+        if( s->status & TR_STATUS_CHECK_WAIT )
         {
             chars = snprintf( string, sizeof string,
                 "Waiting to check files... %.2f %%", 100.0 * s->percentDone );

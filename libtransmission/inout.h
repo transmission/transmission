@@ -27,10 +27,19 @@
 
 typedef struct tr_io_s tr_io_t;
 
-void      tr_ioLoadResume  ( tr_torrent_t * );
-void      tr_ioRemoveResume( tr_torrent_t * tor );
+int       tr_ioLoadResume  ( tr_torrent_t * );
+void      tr_ioRemoveResume( tr_torrent_t * );
 
-tr_io_t * tr_ioInit        ( tr_torrent_t * );
+
+enum
+{
+  TR_RECHECK_FAST,  /* only try the fast resume, even if it's incomplete */
+  TR_RECHECK_FORCE  /* ignore the fast resume data; recheck from disk */
+};
+int tr_ioCheckFiles  ( tr_torrent_t *, int recheckMode );
+
+
+tr_io_t * tr_ioInitFast        ( tr_torrent_t * );
 
 /***********************************************************************
  * tr_ioRead, tr_ioWrite
