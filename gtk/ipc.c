@@ -795,7 +795,7 @@ addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
     }
     else
     {
-        tr_stat_t * st = tr_torrent_stat( tor );
+        const tr_stat_t * st = tr_torrent_stat( tor );
         return ipc_addstat( val, torid, st, types );
     }
 }

@@ -306,8 +306,7 @@ msgwin_loadpref( void )
 {
     int level = TR_MSG_INF;
     textbuf = debug_window_text_buffer_new ( );
-    gboolean b = tr_prefs_get_int( PREF_ID_MSGLEVEL, &level );
-g_message ("level from prefs: %d (b==%d)", level, (int)b );
+    tr_prefs_get_int( PREF_ID_MSGLEVEL, &level );
     tr_setMessageLevel( level );
     tr_setMessageQueuing( TRUE );
 }
