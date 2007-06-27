@@ -341,16 +341,10 @@ tr_core_quiescent( TrCore * self )
     return TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus;
 }
 
-int
-tr_core_check_torrents( TrCore * self )
-{
-    return gtk_tree_model_iter_n_children( self->model, NULL );
-}
-
 void
 tr_core_save( TrCore * self )
 {
-    benc_val_t  state, * item;
+    benc_val_t  state;
     int         count;
     GtkTreeIter iter;
     TrTorrent * tor;
@@ -359,16 +353,7 @@ tr_core_save( TrCore * self )
 
     TR_IS_CORE( self );
 
-    count = 0;
-
-    if( gtk_tree_model_get_iter_first( self->model, &iter) )
-    {
-        do
-        {
-            count++;
-        }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
-    }
+    count = gtk_tree_model_iter_n_children( self->model, NULL );
 
     tr_bencInit( &state, TYPE_LIST );
     if( tr_bencListReserve( &state, count ) )
@@ -378,25 +363,22 @@ tr_core_save( TrCore * self )
     }
 
     saved = NULL;
-    if( gtk_tree_model_get_iter_first( self->model, &iter) )
+    if( gtk_tree_model_get_iter_first( self->model, &iter) ) do
     {
-        do
+        benc_val_t * item = tr_bencListAdd( &state );
+        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+        if( tr_torrent_get_state( tor, item ) )
         {
-            item = tr_bencListAdd( &state );
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            if( tr_torrent_get_state( tor, item ) )
-            {
-                saved = g_list_append( saved, tor );
-            }
-            else
-            {
-                tr_bencFree( item );
-                tr_bencInitStr( item, NULL, 0, 1 );
-            }
-            g_object_unref( tor );
+            saved = g_list_append( saved, tor );
         }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
+        else
+        {
+            tr_bencFree( item );
+            tr_bencInitStr( item, NULL, 0, 1 );
+        }
+        g_object_unref( tor );
     }
+    while( gtk_tree_model_iter_next( self->model, &iter ) );
 
     errstr = NULL;
     cf_savestate( &state, &errstr );
@@ -413,42 +395,37 @@ tr_core_save( TrCore * self )
             tr_torrent_state_saved( ii->data );
         }
     }
-    if( NULL != saved )
-    {
-        g_list_free( saved );
-    }
+
+    g_list_free( saved );
 }
 
 int
-tr_core_load( TrCore * self, benc_val_t * state, gboolean forcepaused )
+tr_core_load( TrCore * self, const benc_val_t * state, gboolean forcepaused )
 {
-    int         ii, count;
-    char      * errstr;
-    TrTorrent * tor;
+    int count = 0;
 
     TR_IS_CORE( self );
 
-    if( TYPE_LIST != state->type )
+    if( TYPE_LIST == state->type )
     {
-        return 0;
-    }
-
-    count = 0;
-    for( ii = 0; ii < state->val.l.count; ii++ )
-    {
-        errstr = NULL;
-        tor = tr_torrent_new_with_state( self->handle, state->val.l.vals + ii,
-                                         forcepaused, &errstr );
-        if( NULL == tor )
+        int ii;
+        for( ii = 0; ii < state->val.l.count; ii++ )
         {
-            tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
-            g_free( errstr );
-        }
-        else
-        {
-            g_assert( NULL == errstr );
-            tr_core_insert( self, tor );
-            count++;
+            char * errstr = NULL;
+            TrTorrent * tor = tr_torrent_new_with_state( self->handle,
+                                                     state->val.l.vals + ii,
+                                                     forcepaused, &errstr );
+            if( NULL == tor )
+            {
+                tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
+                g_free( errstr );
+            }
+            else
+            {
+                g_assert( NULL == errstr );
+                tr_core_insert( self, tor );
+                count++;
+            }
         }
     }
 
@@ -499,31 +476,24 @@ int
 tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
                   gboolean paused )
 {
+    const char  * pref = tr_prefs_get( PREF_ID_ASKDIR );
     TrCoreClass * class;
-    const char  * pref;
     int           count;
 
     TR_IS_CORE( self );
 
-    pref = tr_prefs_get( PREF_ID_ASKDIR );
-    if( NULL != pref && strbool( pref ) )
+    if( strbool( pref ) )
     {
         class = g_type_class_peek( TR_CORE_TYPE );
         g_signal_emit( self, class->promptsig, 0, paths, act, paused );
         return 0;
     }
 
-    pref  = getdownloaddir();
+    pref = getdownloaddir();
     count = 0;
-    paths = g_list_first( paths );
-    while( NULL != paths )
-    {
+    for( ; paths; paths=paths->next )
         if( tr_core_add_dir( self, paths->data, pref, act, paused ) )
-        {
             count++;
-        }
-        paths = paths->next;
-    }
 
     return count;
 }
@@ -531,15 +501,13 @@ tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
 gboolean
 tr_core_add_data( TrCore * self, uint8_t * data, size_t size, gboolean paused )
 {
-    TrCoreClass * class;
-    const char  * pref;
+    const char  * pref = tr_prefs_get( PREF_ID_ASKDIR );
 
     TR_IS_CORE( self );
 
-    pref = tr_prefs_get( PREF_ID_ASKDIR );
-    if( NULL != pref && strbool( pref ) )
+    if( strbool( pref ) )
     {
-        class = g_type_class_peek( TR_CORE_TYPE );
+        TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
         g_signal_emit( self, class->promptdatasig, 0, data, size, paused );
         return FALSE;
     }
@@ -552,11 +520,10 @@ tr_core_add_data_dir( TrCore * self, uint8_t * data, size_t size,
                       const char * dir, gboolean paused )
 {
     TrTorrent * tor;
-    char      * errstr;
+    char      * errstr = NULL;
 
     TR_IS_CORE( self );
 
-    errstr = NULL;
     tor = tr_torrent_new_with_data( self->handle, data, size, dir,
                                     paused, &errstr );
     if( NULL == tor )
@@ -626,39 +593,36 @@ tr_core_update( TrCore * self )
 
     TR_IS_CORE( self );
 
-    if( gtk_tree_model_get_iter_first( self->model, &iter ) )
+    if( gtk_tree_model_get_iter_first( self->model, &iter ) ) do
     {
-        do
-        {
-            gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-            st = tr_torrent_stat( tor );
-            g_object_unref( tor );
-            tr_torrent_check_seeding_cap ( tor );
+        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
+        st = tr_torrent_stat( tor );
+        g_object_unref( tor );
+        tr_torrent_check_seeding_cap ( tor );
 
-            /* XXX find out if setting the same data emits changed signal */
-            gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
-                                MC_STAT,        st->status,
-                                MC_ERR,         st->error,
-                                MC_TERR,        st->errorString,
-                                MC_PROG_C,      st->percentComplete,
-                                MC_PROG_D,      st->percentDone,
-                                MC_DRATE,       st->rateDownload,
-                                MC_URATE,       st->rateUpload,
-                                MC_ETA,         st->eta,
-                                MC_PEERS,       st->peersTotal,
-                                MC_UPEERS,      st->peersUploading,
-                                MC_DPEERS,      st->peersDownloading,
-                                MC_SEED,        st->seeders,
-                                MC_LEECH,       st->leechers,
-                                MC_DONE,        st->completedFromTracker,
-                                MC_TRACKER,     st->tracker,
-                                MC_DOWN,        st->downloaded,
-                                MC_UP,          st->uploaded,
-                                MC_LEFT,        st->left,
-                                -1 );
-        }
-        while( gtk_tree_model_iter_next( self->model, &iter ) );
+        /* XXX find out if setting the same data emits changed signal */
+        gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
+                            MC_STAT,        st->status,
+                            MC_ERR,         st->error,
+                            MC_TERR,        st->errorString,
+                            MC_PROG_C,      st->percentComplete,
+                            MC_PROG_D,      st->percentDone,
+                            MC_DRATE,       st->rateDownload,
+                            MC_URATE,       st->rateUpload,
+                            MC_ETA,         st->eta,
+                            MC_PEERS,       st->peersTotal,
+                            MC_UPEERS,      st->peersUploading,
+                            MC_DPEERS,      st->peersDownloading,
+                            MC_SEED,        st->seeders,
+                            MC_LEECH,       st->leechers,
+                            MC_DONE,        st->completedFromTracker,
+                            MC_TRACKER,     st->tracker,
+                            MC_DOWN,        st->downloaded,
+                            MC_UP,          st->uploaded,
+                            MC_LEFT,        st->left,
+                            -1 );
     }
+    while( gtk_tree_model_iter_next( self->model, &iter ) );
 }
 
 void
@@ -690,22 +654,12 @@ tr_core_set_pref( TrCore * self, int id, const char * val )
 
     TR_IS_CORE( self );
 
+    /* don't change anything if the new value is the same as the old one */
     name = tr_prefs_name( id );
     old = cf_getpref( name );
-    if( NULL == old )
-    {
-        if( old == val )
-        {
-            return;
-        }
-    }
-    else
-    {
-        if( 0 == strcmp( old, val ) )
-        {
-            return;
-        }
-    }
+    if( !tr_strcmp( old, val ) )
+        return;
+
     cf_setpref( name, val );
 
     /* write prefs to disk */

@@ -42,8 +42,21 @@
 static void
 errcb(GtkWidget *wind, int resp, gpointer data);
 
+int
+tr_strcmp( const char * a, const char * b )
+{
+    if( a && b ) return strcmp( a, b );
+    if( a ) return 1;
+    if( b ) return -1;
+    return 0;
+}
+
 gboolean
-strbool(const char *str) {
+strbool( const char * str )
+{
+  if( !str )
+    return FALSE;
+
   switch(str[0]) {
     case 'y':
     case 'Y':

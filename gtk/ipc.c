@@ -972,7 +972,7 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
         case IPC_MSG_GETDIR:
             pref = tr_prefs_get( PREF_ID_ASKDIR );
             /* XXX sending back "" when we're prompting is kind of bogus */
-            pref = ( NULL != pref && strbool( pref ) ? "" : getdownloaddir() );
+            pref = strbool( pref ) ? "" : getdownloaddir();
             buf = ipc_mkstr( &con->ipc, &size, IPC_MSG_DIR, tag, pref );
             break;
         case IPC_MSG_GETDOWNLIMIT:

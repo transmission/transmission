@@ -225,6 +225,7 @@ msgwin_create( TrCore * core )
   int ii, curlevel;
 
   win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
+  gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
   gtk_window_set_role( GTK_WINDOW( win ), "debug-window" );
   vbox = gtk_vbox_new( FALSE, 0 );
 

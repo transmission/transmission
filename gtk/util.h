@@ -37,6 +37,9 @@
 #define UNUSED
 #endif
 
+/* NULL-safe version of strcmp */
+int tr_strcmp( const char*, const char * );
+
 /* XXX this shouldn't be here */
 enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
 
