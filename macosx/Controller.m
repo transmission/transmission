@@ -773,6 +773,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //determine the next file that can be opened
     NSString * torrentPath;
     int canAdd;
+    tr_info_t info;
     do
     {
         if ([files count] == 0) //no files left to open
@@ -785,7 +786,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
         torrentPath = [[files objectAtIndex: 0] retain];
         [files removeObjectAtIndex: 0];
-    } while (tr_torrentCouldBeAdded(fLib, [torrentPath UTF8String]) != TR_OK);
+    } while (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) != TR_OK);
 
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
@@ -794,11 +795,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseFiles: NO];
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
-
-    #warning fix!!!
-    /*[panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                        "Open torrent -> select destination folder"),
-                        [NSString stringWithUTF8String: tr_torrentInfo(tempTor)->name]]];*/
+    
+    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
+                        "Open torrent -> select destination folder"), [NSString stringWithUTF8String: info.name]]];
     [panel setMessage: @"Select the download folder "];
     
     NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrentPath, @"Path",
@@ -2019,13 +2018,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //check if an import fails because of an error so it can be tried again
     enumerator = [newNames objectEnumerator];
-    int canAdd;
     while ((file = [enumerator nextObject]))
-    {
-        canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
-        if (canAdd == TR_EINVALID || canAdd == TR_EOTHER)
+        if (tr_torrentParse(fLib, [file UTF8String], NULL, NULL) == TR_EINVALID)
             [fAutoImportedNames removeObject: [file lastPathComponent]];
-    }
     
     [newNames release];
 }
@@ -2149,7 +2144,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
+            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
             if (canAdd == TR_OK)
             {
                 if (!fOverlayWindow)
@@ -2158,7 +2153,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 
                 return NSDragOperationCopy;
             }
-            else if (canAdd == TR_EUNSUPPORTED || canAdd == TR_EDUPLICATE)
+            else if (canAdd == TR_EDUPLICATE)
                 torrent = YES;
             else;
         }
@@ -2211,7 +2206,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
+            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
             if (canAdd == TR_OK)
             {
                 tr_torrentClose(tempTor);
@@ -2219,7 +2214,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                 
                 torrent = YES;
             }
-            else if (canAdd == TR_EUNSUPPORTED || canAdd == TR_EDUPLICATE)
+            else if (canAdd == TR_EDUPLICATE)
                 torrent = YES;
             else;
         }

@@ -611,13 +611,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) resetCache
 {
     #warning look over
-    BOOL paused = [self isPaused];
-    
-    if (!paused)
-        tr_torrentStop(fHandle);
     tr_torrentRecheck(fHandle);
-    if (!paused)
-        tr_torrentStart(fHandle);
 }
 
 - (float) ratio
@@ -1512,6 +1506,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     NSString * currentDownloadFolder = [self shouldUseIncompleteFolder] ? fIncompleteFolder : fDownloadFolder;
     
+    #warning give error for duplicate?
     int error;
     if (hashString)
         fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String], TR_FLAG_SAVE, & error);

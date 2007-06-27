@@ -82,29 +82,21 @@
     
     NSString * file;
     NSEnumerator * enumerator = [files objectEnumerator];
-    tr_torrent_t * tempTor;
-    tr_info_t * info;
+    tr_info_t info;
     while ((file = [enumerator nextObject]))
-    {
-        int error;
-        if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+        if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
         {
-            info = tr_torrentInfo(tempTor);
-            
             count++;
-            size += info->totalSize;
-            fileCount += info->fileCount;
+            size += info.totalSize;
+            fileCount += info.fileCount;
             
             //only useful when one torrent
             if (count == 1)
             {
-                name = [NSString stringWithUTF8String: info->name];
-                folder = info->multifile;
+                name = [NSString stringWithUTF8String: info.name];
+                folder = info.multifile;
             }
-            
-            tr_torrentClose(tempTor);
         }
-    }
     
     if (count <= 0)
         return;
