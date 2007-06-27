@@ -387,7 +387,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         NSString * tempString;
         
-        case TR_STATUS_PAUSE:
+        case TR_STATUS_STOPPED:
             if (fWaitToStart)
             {
                 tempString = ![self allDownloaded]
@@ -600,12 +600,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
-}
-
-- (void) stopTransferForQuit
-{
-    if ([self isActive])
-        tr_torrentStop(fHandle);
 }
 
 - (void) sleep
@@ -1061,7 +1055,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     switch( fStat->status )
     {
-        case TR_STATUS_PAUSE:
+        case TR_STATUS_STOPPED:
             return NSLocalizedString(@"Paused", "Torrent -> status string");
             break;
 
@@ -1114,7 +1108,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) isPaused
 {
-    return fStat->status == TR_STATUS_PAUSE;
+    return fStat->status == TR_STATUS_STOPPED;
 }
 
 - (BOOL) isWaitingToChecking

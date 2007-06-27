@@ -544,7 +544,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //save history and stop running torrents
     [self updateTorrentHistory];
-    [fTorrents makeObjectsPerformSelector: @selector(stopTransferForQuit)];
+    #warning check if all torrents are fully released
+    [fDisplayedTorrents removeAllObjects];
+    [fTorrents removeAllObjects];
     
     //disable NAT traversal
     tr_natTraversalEnable(fLib, 0);
@@ -558,22 +560,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //clear badge
     [fBadger clearBadge];
 
-    //wait for running transfers to stop (5 second timeout)
+    //wait for running transfers to stop and for NAT to be disabled (5 second timeout)
     NSDate * start = [NSDate date];
-    BOOL timeUp = NO;
-    
-    enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while (!timeUp && (torrent = [enumerator nextObject]))
-        while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
-        {
-            usleep(100000);
-            [torrent update];
-        }
-    
-    //wait for NAT to be disabled (same 5 second timeout)
-    while (!([start timeIntervalSinceNow] < -5.0)
-                && tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED)
+    while ([start timeIntervalSinceNow] >= -5.0
+            && (tr_torrentCount(fLib) > 0 || tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED))
         usleep(100000);
 }
 
@@ -1207,7 +1197,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     if (code == NSOKButton)
     {
-        //move torrent data file to new location
         NSEnumerator * enumerator = [torrents objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
