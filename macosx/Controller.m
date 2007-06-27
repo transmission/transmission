@@ -707,23 +707,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
-        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent: delete lib: fLib]))
+        NSString * location;
+        if (path)
+            location = path;
+        else if ([downloadChoice isEqualToString: @"Constant"])
+            location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
+        else
+            location = [torrentPath stringByDeletingLastPathComponent];
+        
+        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location forceDeleteTorrent: delete lib: fLib]))
             continue;
         
         //add it to the "File > Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
-        NSString * folder;
-        if (path)
-            folder = path;
-        else if ([downloadChoice isEqualToString: @"Constant"])
-            folder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
-        else
-            folder = [torrentPath stringByDeletingLastPathComponent];
-        
-        [torrent setDownloadFolder: folder];
         [torrent update];
-        
         [fTorrents addObject: torrent];
         [torrent release];
     }
@@ -772,11 +770,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 //called by the main open method to show sheet for choosing download location
 - (void) openFilesAsk: (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete
 {
+    //determine the next file that can be opened
     NSString * torrentPath;
-    tr_torrent_t * tempTor;
-    int error;
-    
-    //determine next file that can be opened
+    int canAdd;
     do
     {
         if ([files count] == 0) //no files left to open
@@ -788,10 +784,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
     
         torrentPath = [[files objectAtIndex: 0] retain];
-        tempTor = tr_torrentInit(fLib, [torrentPath UTF8String], NULL, 0, &error);
-        
         [files removeObjectAtIndex: 0];
-    } while (!tempTor);
+    } while (tr_torrentCouldBeAdded(fLib, [torrentPath UTF8String]) != TR_OK);
 
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
@@ -801,15 +795,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [panel setCanChooseDirectories: YES];
     [panel setCanCreateDirectories: YES];
 
-    [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
+    #warning fix!!!
+    /*[panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Open torrent -> select destination folder"),
-                        [NSString stringWithUTF8String: tr_torrentInfo(tempTor)->name]]];
+                        [NSString stringWithUTF8String: tr_torrentInfo(tempTor)->name]]];*/
+    [panel setMessage: @"Select the download folder "];
     
     NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrentPath, @"Path",
                                     files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
     [torrentPath release];
-
-    tr_torrentClose(tempTor);
+    
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
 }
@@ -819,15 +814,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (code == NSOKButton)
     {
         NSString * torrentPath = [dictionary objectForKey: @"Path"];
-        Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath forceDeleteTorrent:
-                                [[dictionary objectForKey: @"Delete"] boolValue] lib: fLib];
+        Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath
+                            location: [[openPanel filenames] objectAtIndex: 0]
+                            forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue] lib: fLib];
         
         //add it to the "File > Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
         
-        [torrent setDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
         [torrent update];
-        
         [fTorrents addObject: torrent];
         [torrent release];
         
@@ -2023,18 +2017,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
         [self openFiles: newNames];
     
-    //create temporary torrents to check if an import fails because of an error
+    //check if an import fails because of an error so it can be tried again
     enumerator = [newNames objectEnumerator];
-    int error;
+    int canAdd;
     while ((file = [enumerator nextObject]))
     {
-        tr_torrent_t * tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error);
-        
-        if (tempTor)
-            tr_torrentClose(tempTor);
-        else if (error != TR_EUNSUPPORTED && error != TR_EDUPLICATE)
-            [fAutoImportedNames removeObject: [file lastPathComponent]]; //can try to import later
-        else;
+        canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
+        if (canAdd == TR_EINVALID || canAdd == TR_EOTHER)
+            [fAutoImportedNames removeObject: [file lastPathComponent]];
     }
     
     [newNames release];
@@ -2155,26 +2145,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
-        tr_torrent_t * tempTor;
         BOOL torrent = NO;
+        int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            int error;
-            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+            canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
+            if (canAdd == TR_OK)
             {
-                tr_torrentClose(tempTor);
-                
                 if (!fOverlayWindow)
                     fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
                 [fOverlayWindow setTorrents: files];
                 
                 return NSDragOperationCopy;
             }
-            else
-            {
-                if (error == TR_EUNSUPPORTED || error == TR_EDUPLICATE)
-                    torrent = YES;
-            }
+            else if (canAdd == TR_EUNSUPPORTED || canAdd == TR_EDUPLICATE)
+                torrent = YES;
+            else;
         }
         
         //create a torrent file if a single file
@@ -2222,21 +2208,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
         tr_torrent_t * tempTor;
+        int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            int error;
-            if ((tempTor = tr_torrentInit(fLib, [file UTF8String], NULL, 0, &error)))
+            canAdd = tr_torrentCouldBeAdded(fLib, [file UTF8String]);
+            if (canAdd == TR_OK)
             {
                 tr_torrentClose(tempTor);
                 [filesToOpen addObject: file];
                 
                 torrent = YES;
             }
-            else
-            {
-                if (error == TR_EUNSUPPORTED || error == TR_EDUPLICATE)
-                    torrent = YES;
-            }
+            else if (canAdd == TR_EUNSUPPORTED || canAdd == TR_EDUPLICATE)
+                torrent = YES;
+            else;
         }
         
         if ([filesToOpen count] > 0)

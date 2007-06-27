@@ -36,6 +36,8 @@ static int static_lastid = 0;
 
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
+        downloadFolder: (NSString *) downloadFolder
+        useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
@@ -46,6 +48,9 @@ static int static_lastid = 0;
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
         filesShouldDownload: (NSArray *) filesShouldDownload filePriorities: (NSArray *) filePriorities;
 - (void) historyFilePriorities: (NSMutableArray *) history forItems: (NSArray *) items;
+
+- (BOOL) shouldUseIncompleteFolder;
+- (void) updateDownloadFolder;
 
 - (void) createFileListShouldDownload: (NSArray *) filesShouldDownload priorities: (NSArray *) filePriorities;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
@@ -70,10 +75,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kGreen3 = BE(0x00FF66FF), //0, 255, 102
                 kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
-- (id) initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib
+- (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib
 {
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
+            downloadFolder: location
+            useIncompleteFolder: nil incompleteFolder: nil
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
@@ -86,9 +93,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (self)
     {
-        if ((fUseIncompleteFolder = [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]))
-            fIncompleteFolder = [[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] retain];
-        
         if (!fPublicTorrent)
             [self trashFile: path];
     }
@@ -100,6 +104,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] lib: lib
                 publicTorrent: [history objectForKey: @"PublicCopy"]
+                downloadFolder: [history objectForKey: @"DownloadFolder"]
+                useIncompleteFolder: [history objectForKey: @"UseIncompleteFolder"]
+                incompleteFolder: [history objectForKey: @"IncompleteFolder"]
                 dateAdded: [history objectForKey: @"Date"]
 				dateCompleted: [history objectForKey: @"DateCompleted"]
                 dateActivity: [history objectForKey: @"DateActivity"]
@@ -118,25 +125,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (self)
     {
-        //download folders
-        if (!(fDownloadFolder = [history objectForKey: @"DownloadFolder"]))
-            fDownloadFolder = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
-        [fDownloadFolder retain];
-        
-        NSNumber * statusIncompleteFolder;
-        if ((statusIncompleteFolder = [history objectForKey: @"UseIncompleteFolder"])
-            && (fUseIncompleteFolder = [statusIncompleteFolder boolValue]))
-        {
-            if (!(fIncompleteFolder = [history objectForKey: @"IncompleteFolder"]))
-                fIncompleteFolder = [[fDefaults stringForKey: @"IncompleteDownloadFolder"]
-                                        stringByExpandingTildeInPath];
-            [fIncompleteFolder retain];
-        }
-        else
-            fUseIncompleteFolder = NO;
-        
-        [self updateDownloadFolder];
-        
         //start transfer
         BOOL start = YES;
         NSNumber * active;
@@ -163,6 +151,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [self hashString], @"TorrentHash",
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
+                    fIncompleteFolder, @"IncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
                     fDateAdded, @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
@@ -190,9 +179,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSMutableArray * filePriorities = [NSMutableArray arrayWithCapacity: fileCount];
     [self historyFilePriorities: filePriorities forItems: fFileList];
     [history setObject: filePriorities forKey: @"FilePriorities"];
-    
-    if (fUseIncompleteFolder)
-        [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
 
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
@@ -203,9 +189,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 	if (fDateCompleted)
 		[history setObject: fDateCompleted forKey: @"DateCompleted"];
     
-    NSDate * dateCompleted = [self dateActivity];
-    if (dateCompleted)
-		[history setObject: dateCompleted forKey: @"DateActivity"];
+    NSDate * dateActivity = [self dateActivity];
+    if (dateActivity)
+		[history setObject: dateActivity forKey: @"DateActivity"];
 	
     return history;
 }
@@ -253,7 +239,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [super dealloc];
 }
 
-- (void) setIncompleteFolder: (NSString *) folder
+- (void) changeIncompleteDownloadFolder: (NSString *) folder
 {
     fUseIncompleteFolder = folder != nil;
     if (fIncompleteFolder)
@@ -268,22 +254,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [self updateDownloadFolder];
 }
 
-- (void) setDownloadFolder: (NSString *) folder
+- (void) changeDownloadFolder: (NSString *) folder
 {
     if (fDownloadFolder)
         [fDownloadFolder release];
     fDownloadFolder = [folder retain];
     
     [self updateDownloadFolder];
-}
-
-- (void) updateDownloadFolder
-{
-    if (!fUseIncompleteFolder || [[NSFileManager defaultManager] fileExistsAtPath:
-                                    [fDownloadFolder stringByAppendingPathComponent: [self name]]])
-        tr_torrentSetFolder(fHandle, [fDownloadFolder UTF8String]);
-    else
-        tr_torrentSetFolder(fHandle, [fIncompleteFolder UTF8String]);
 }
 
 - (NSString *) downloadFolder
@@ -633,11 +610,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) resetCache
 {
+    #warning look over
     BOOL paused = [self isPaused];
     
     if (!paused)
         tr_torrentStop(fHandle);
-    tr_torrentRemoveFastResume(fHandle);
+    tr_torrentRecheck(fHandle);
     if (!paused)
         tr_torrentStart(fHandle);
 }
@@ -817,7 +795,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [fIncompleteFolder release];
                 fIncompleteFolder = nil;
             }
-            [self setDownloadFolder: folder];
+            [self changeDownloadFolder: folder];
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
             
@@ -928,9 +906,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSString * folder = [[openPanel filenames] objectAtIndex: 0];
     if (fUseIncompleteFolder)
-        [self setIncompleteFolder: folder];
+        [self changeDownloadFolder: folder];
     else
-        [self setDownloadFolder: folder];
+        [self changeDownloadFolder: folder];
     
     [self startTransfer];
     [self update];
@@ -1497,6 +1475,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
 - (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
         publicTorrent: (NSNumber *) publicTorrent
+        downloadFolder: (NSString *) downloadFolder
+        useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
@@ -1519,13 +1499,25 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fPublicTorrent = path && (publicTorrent ? [publicTorrent boolValue] : ![fDefaults boolForKey: @"DeleteOriginalTorrent"]);
     if (fPublicTorrent)
         fPublicTorrentLocation = [path retain];
-
+    
+    fDownloadFolder = downloadFolder ? downloadFolder : [fDefaults stringForKey: @"DownloadFolder"];
+    fDownloadFolder = [[fDownloadFolder stringByExpandingTildeInPath] retain];
+    
+    fUseIncompleteFolder = useIncompleteFolder ? [useIncompleteFolder boolValue]
+                                : [fDefaults boolForKey: @"UseIncompleteDownloadFolder"];
+    if (fUseIncompleteFolder)
+    {
+        fIncompleteFolder = incompleteFolder ? incompleteFolder : [fDefaults stringForKey: @"IncompleteDownloadFolder"];
+        fIncompleteFolder = [[fIncompleteFolder stringByExpandingTildeInPath] retain];
+    }
+    NSString * currentDownloadFolder = [self shouldUseIncompleteFolder] ? fIncompleteFolder : fDownloadFolder;
+    
     int error;
     if (hashString)
-        fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], TR_FLAG_SAVE, & error);
+        fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String], TR_FLAG_SAVE, & error);
     
     if (!fHandle && path)
-        fHandle = tr_torrentInit(fLib, [path UTF8String], NULL, TR_FLAG_SAVE, & error);
+        fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String], TR_FLAG_SAVE, & error);
 
     if (!fHandle)
     {
@@ -1713,6 +1705,18 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             [self historyFilePriorities: history forItems: [item objectForKey: @"Children"]];
     }
+}
+
+- (BOOL) shouldUseIncompleteFolder
+{
+    return fUseIncompleteFolder &&
+        ![[NSFileManager defaultManager] fileExistsAtPath: [fDownloadFolder stringByAppendingPathComponent: [self name]]];
+}
+
+- (void) updateDownloadFolder
+{
+    NSString * folder = [self shouldUseIncompleteFolder] ? fIncompleteFolder : fDownloadFolder;
+    tr_torrentSetFolder(fHandle, [folder UTF8String]);
 }
 
 #warning move?

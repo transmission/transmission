@@ -70,14 +70,13 @@
     int8_t * fPieces;
 }
 
-- (id) initWithPath: (NSString *) path forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
+- (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 
 - (NSDictionary *) history;
 
-- (void) setIncompleteFolder: (NSString *) folder;
-- (void) setDownloadFolder: (NSString *) folder;
-- (void) updateDownloadFolder;
+- (void) changeIncompleteDownloadFolder: (NSString *) folder;
+- (void) changeDownloadFolder: (NSString *) folder;
 - (NSString *) downloadFolder;
 
 - (void) getAvailability: (int8_t *) tab size: (int) size;
@@ -86,33 +85,32 @@
 - (void) update;
 - (NSDictionary *) infoForCurrentView;
 
-- (void)        startTransfer;
-- (void)        stopTransfer;
-- (void)        stopTransferForQuit;
-- (void)        sleep;
-- (void)        wakeUp;
+- (void) startTransfer;
+- (void) stopTransfer;
+- (void) sleep;
+- (void) wakeUp;
 
-- (void)        announce;
-- (NSDate *)    announceDate;
+- (void) announce;
+- (NSDate *) announceDate;
 
-- (void)        resetCache;
+- (void) resetCache;
 
-- (float)       ratio;
-- (int)         ratioSetting;
-- (void)        setRatioSetting: (int) setting;
-- (float)       ratioLimit;
-- (void)        setRatioLimit: (float) limit;
-- (float)       actualStopRatio; //returns INVALID if will not stop
-- (float)       progressStopRatio;
+- (float) ratio;
+- (int) ratioSetting;
+- (void) setRatioSetting: (int) setting;
+- (float) ratioLimit;
+- (void) setRatioLimit: (float) limit;
+- (float) actualStopRatio; //returns INVALID if will not stop
+- (float) progressStopRatio;
 
-- (int)     checkUpload;
-- (void)    setCheckUpload: (int) setting;
-- (int)     uploadLimit;
-- (void)    setUploadLimit: (int) limit;
-- (int)     checkDownload;
-- (void)    setCheckDownload: (int) setting;
-- (int)     downloadLimit;
-- (void)    setDownloadLimit: (int) limit;
+- (int) checkUpload;
+- (void) setCheckUpload: (int) setting;
+- (int) uploadLimit;
+- (void) setUploadLimit: (int) limit;
+- (int) checkDownload;
+- (void) setCheckDownload: (int) setting;
+- (int) downloadLimit;
+- (void) setDownloadLimit: (int) limit;
 
 - (void) updateSpeedSetting;
 
@@ -130,23 +128,23 @@
 - (BOOL) alertForFolderAvailable;
 - (BOOL) alertForMoveFolderAvailable;
 
-- (NSImage *)   icon;
-- (NSImage *)   iconFlipped;
-- (NSImage *)   iconSmall;
+- (NSImage *) icon;
+- (NSImage *) iconFlipped;
+- (NSImage *) iconSmall;
 
 - (NSString *) name;
-- (uint64_t)   size;
+- (uint64_t) size;
 - (NSString *) trackerAddress;
 - (NSString *) trackerAddressAnnounce;
 
 - (NSString *) comment;
 - (NSString *) creator;
-- (NSDate *)   dateCreated;
+- (NSDate *) dateCreated;
 
-- (int)        pieceSize;
-- (int)        pieceCount;
+- (int) pieceSize;
+- (int) pieceCount;
 - (NSString *) hashString;
-- (BOOL)       privateTorrent;
+- (BOOL) privateTorrent;
 
 - (NSString *) torrentLocation;
 - (NSString *) publicTorrentLocation;
