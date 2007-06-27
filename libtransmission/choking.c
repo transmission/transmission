@@ -29,11 +29,6 @@
 #  define lrintf(a) ((int)(0.5+(a)))
 #endif
 
-/* We may try to allocate and free tables of size 0.
-   Quick and dirty way to handle it... */
-#define malloc tr_malloc
-#define free   tr_free
-
 struct tr_choking_s
 {
     tr_lock_t     lock;
@@ -45,7 +40,7 @@ tr_choking_t * tr_chokingInit( tr_handle_t * h )
 {
     tr_choking_t * c;
 
-    c        = calloc( 1, sizeof( tr_choking_t ) );
+    c        = tr_new0( tr_choking_t, 1 );
     c->h     = h;
     c->slots = 4242;
     tr_lockInit( &c->lock );
@@ -92,14 +87,13 @@ static inline void sortPeers( tr_peer_t ** all, int allCount,
     /* Randomly shuffle non-uploaders, so they are treated equally */
     if( *zeroCount && ( shuffle = tr_rand( *zeroCount ) ) )
     {
-        tr_peer_t ** bak;
-        bak = malloc( shuffle * sizeof( tr_peer_t * ) );
+        tr_peer_t ** bak = tr_new( tr_peer_t*, shuffle );;
         memcpy( bak, zero, shuffle * sizeof( tr_peer_t * ) );
         memmove( zero, &zero[shuffle],
                  ( *zeroCount - shuffle ) * sizeof( tr_peer_t * ) );
         memcpy( &zero[*zeroCount - shuffle], bak,
                  shuffle * sizeof( tr_peer_t * ) );
-        free( bak );
+        tr_free( bak );
     }
 
     /* Sort uploaders by download rate */
@@ -149,8 +143,8 @@ void tr_chokingPulse( tr_choking_t * c )
         peersTotalCount += tor->peerCount;
     }
 
-    canChoke   = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
-    canUnchoke = malloc( peersTotalCount * sizeof( tr_peer_t * ) );
+    canChoke   = tr_new( tr_peer_t*, peersTotalCount );
+    canUnchoke = tr_new( tr_peer_t*, peersTotalCount );
     canChokeCount   = 0;
     canUnchokeCount = 0;
     unchoked        = 0;
@@ -212,10 +206,10 @@ void tr_chokingPulse( tr_choking_t * c )
         }
     }
 
-    canChokeZero      = malloc( canChokeCount * sizeof( tr_peer_t * ) );
-    canChokeNonZero   = malloc( canChokeCount * sizeof( tr_peer_t * ) );
-    canUnchokeZero    = malloc( canUnchokeCount * sizeof( tr_peer_t * ) );
-    canUnchokeNonZero = malloc( canUnchokeCount * sizeof( tr_peer_t * ) );
+    canChokeZero      = tr_new( tr_peer_t*, canChokeCount );
+    canChokeNonZero   = tr_new( tr_peer_t*, canChokeCount );
+    canUnchokeZero    = tr_new( tr_peer_t*, canUnchokeCount );
+    canUnchokeNonZero = tr_new( tr_peer_t*, canUnchokeCount );
 
     sortPeersDescending( canChoke, canChokeCount,
                          canChokeZero, &canChokeZeroCount,
@@ -224,8 +218,8 @@ void tr_chokingPulse( tr_choking_t * c )
                         canUnchokeZero, &canUnchokeZeroCount,
                         canUnchokeNonZero, &canUnchokeNonZeroCount);
 
-    free( canChoke );
-    free( canUnchoke );
+    tr_free( canChoke );
+    tr_free( canUnchoke );
 
     if( mustOptimistic )
     {
@@ -303,10 +297,10 @@ void tr_chokingPulse( tr_choking_t * c )
         tr_peerUnchoke( canUnchokeZero[--canUnchokeZeroCount] );
     }
 
-    free( canChokeZero );
-    free( canChokeNonZero );
-    free( canUnchokeZero );
-    free( canUnchokeNonZero );
+    tr_free( canChokeZero );
+    tr_free( canChokeNonZero );
+    tr_free( canUnchokeZero );
+    tr_free( canUnchokeNonZero );
 
     /* Unlock all torrents */
     for( tor = c->h->torrentList; tor; tor = tor->next )
@@ -318,5 +312,5 @@ void tr_chokingPulse( tr_choking_t * c )
 void tr_chokingClose( tr_choking_t * c )
 {
     tr_lockClose( &c->lock );
-    free( c );
+    tr_free( c );
 }

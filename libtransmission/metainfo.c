@@ -29,7 +29,7 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int realparse( tr_info_t * inf, uint8_t * buf, size_t len );
+static int realparse( tr_info_t * inf, const uint8_t * buf, size_t len );
 static void savedname( char * name, size_t len, const char * hash,
                        const char * tag );
 static uint8_t * readtorrent( const char * path, size_t * len );
@@ -59,13 +59,13 @@ tr_metainfoParseFile( tr_info_t * inf, const char * tag,
     buf = readtorrent( path, &size );
     if( NULL == buf )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     if( realparse( inf, buf, size ) )
     {
         free( buf );
-        return 1;
+        return TR_EINVALID;
     }
 
     if( save )
@@ -73,7 +73,7 @@ tr_metainfoParseFile( tr_info_t * inf, const char * tag,
         if( savetorrent( inf->hashString, tag, buf, size ) )
         {
             free( buf );
-            return 1;
+            return TR_EINVALID;
         }
         savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
     }
@@ -84,28 +84,28 @@ tr_metainfoParseFile( tr_info_t * inf, const char * tag,
 
     free( buf );
 
-    return 0;
+    return TR_OK;
 }
 
 int
 tr_metainfoParseData( tr_info_t * inf, const char * tag,
-                      uint8_t * data, size_t size, int save )
+                      const uint8_t * data, size_t size, int save )
 {
     if( realparse( inf, data, size ) )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     if( save )
     {
         if( savetorrent( inf->hashString, tag, data, size ) )
         {
-            return 1;
+            return TR_EINVALID;
         }
         savedname( inf->torrent, sizeof inf->torrent, inf->hashString, tag );
     }
 
-    return 0;
+    return TR_OK;
 }
 
 int
@@ -132,13 +132,13 @@ tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
     buf = readtorrent( inf->torrent, &size );
     if( NULL == buf )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     if( realparse( inf, buf, size ) )
     {
         free( buf );
-        return 1;
+        return TR_EINVALID;
     }
 
     /* save a new tagged copy of the old untagged torrent */
@@ -147,18 +147,18 @@ tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
         if( savetorrent( hash, tag, buf, size ) )
         {
             free( buf );
-            return 1;
+            return TR_EINVALID;
         }
         savedname( inf->torrent, sizeof inf->torrent, hash, tag );
     }
 
     free( buf );
 
-    return 0;
+    return TR_OK;
 }
 
 int
-realparse( tr_info_t * inf, uint8_t * buf, size_t size )
+realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
 {
     benc_val_t   meta, * beInfo, * val, * val2;
     int          i;
@@ -167,7 +167,7 @@ realparse( tr_info_t * inf, uint8_t * buf, size_t size )
     if( tr_bencLoad( buf, size, &meta, NULL ) )
     {
         tr_err( "Error while parsing bencoded data" );
-        return 1;
+        return TR_EINVALID;
     }
 
     /* Get info hash */
@@ -176,7 +176,7 @@ realparse( tr_info_t * inf, uint8_t * buf, size_t size )
     {
         tr_err( "%s \"info\" dictionary", ( beInfo ? "Invalid" : "Missing" ) );
         tr_bencFree( &meta );
-        return 1;
+        return TR_EINVALID;
     }
     SHA1( (uint8_t *) beInfo->begin,
           (long) beInfo->end - (long) beInfo->begin, inf->hash );
@@ -273,12 +273,12 @@ realparse( tr_info_t * inf, uint8_t * buf, size_t size )
     }
 
     tr_bencFree( &meta );
-    return 0;
+    return TR_OK;
 
   fail:
     tr_metainfoFree( inf );
     tr_bencFree( &meta );
-    return 1;
+    return TR_EINVALID;
 }
 
 void tr_metainfoFree( tr_info_t * inf )
@@ -310,13 +310,13 @@ static int getfile( char * buf, int size,
 
     if( TYPE_LIST != name->type )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     list = calloc( name->val.l.count, sizeof( list[0] ) );
     if( NULL == list )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     for( ii = jj = 0; name->val.l.count > ii; ii++ )
@@ -342,7 +342,7 @@ static int getfile( char * buf, int size,
 
     if( 0 == jj )
     {
-        return 1;
+        return TR_EINVALID;
     }
 
     strcatUTF8( buf, size, prefix, 0 );
@@ -353,7 +353,7 @@ static int getfile( char * buf, int size,
     }
     free( list );
 
-    return 0;
+    return TR_OK;
 }
 
 static int getannounce( tr_info_t * inf, benc_val_t * meta )
@@ -457,14 +457,14 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
         if( NULL == val || TYPE_STR != val->type )
         {
             tr_err( "No \"announce\" entry" );
-            return 1;
+            return TR_EINVALID;
         }
 
         if( tr_httpParseUrl( val->val.s.s, val->val.s.i,
                              &address, &port, &announce ) )
         {
             tr_err( "Invalid announce URL (%s)", val->val.s.s );
-            return 1;
+            return TR_EINVALID;
         }
 
         sublist                   = calloc( 1, sizeof( sublist[0] ) );
@@ -478,7 +478,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
         inf->trackerTiers         = 1;
     }
 
-    return 0;
+    return TR_OK;
 }
 
 static char * announceToScrape( const char * announce )
@@ -614,18 +614,18 @@ int savetorrent( const char * hash, const char * tag,
     if( !file )
     {
         tr_err( "Could not open file (%s) (%s)", path, strerror( errno ) );
-        return 1;
+        return TR_EINVALID;
     }
     fseek( file, 0, SEEK_SET );
     if( fwrite( buf, 1, buflen, file ) != buflen )
     {
         tr_err( "Could not write file (%s) (%s)", path, strerror( errno ) );
         fclose( file );
-        return 1;
+        return TR_EINVALID;
     }
     fclose( file );
 
-    return 0;
+    return TR_OK;
 }
 
 int
@@ -638,14 +638,14 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
     if( NULL == name || TYPE_STR != name->type )
     {
         tr_err( "%s \"name\" string", ( name ? "Invalid" : "Missing" ) );
-        return 1;
+        return TR_EINVALID;
     }
 
     strcatUTF8( inf->name, sizeof( inf->name ), name->val.s.s, 1 );
     if( '\0' == inf->name[0] )
     {
         tr_err( "Invalid \"name\" string" );
-        return 1;
+        return TR_EINVALID;
     }
     inf->totalSize = 0;
 
@@ -658,7 +658,7 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
 
         if( NULL == inf->files )
         {
-            return 1;
+            return TR_EINVALID;
         }
 
         for( ii = 0; files->val.l.count > ii; ii++ )
@@ -670,14 +670,14 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
             {
                 tr_err( "%s \"path\" entry",
                         ( path ? "Invalid" : "Missing" ) );
-                return 1;
+                return TR_EINVALID;
             }
             length = tr_bencDictFind( item, "length" );
             if( NULL == length || TYPE_INT != length->type )
             {
                 tr_err( "%s \"length\" entry",
                         ( length ? "Invalid" : "Missing" ) );
-                return 1;
+                return TR_EINVALID;
             }
             inf->files[ii].length = length->val.i;
             inf->totalSize         += length->val.i;
@@ -692,7 +692,7 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
 
         if( NULL == inf->files )
         {
-            return 1;
+            return TR_EINVALID;
         }
 
         strcatUTF8( inf->files[0].name, sizeof( inf->files[0].name ),
@@ -708,7 +708,7 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
                 ( length ? "invalid" : "missing" ) );
     }
 
-    return 0;
+    return TR_OK;
 }
 
 /***********************************************************************

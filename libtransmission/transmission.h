@@ -263,19 +263,34 @@ void tr_close( tr_handle_t * );
 #define TR_EUNSUPPORTED 2
 #define TR_EDUPLICATE   3
 #define TR_EOTHER       666
-tr_torrent_t * tr_torrentInit( tr_handle_t *,
-                               const char * path,
-                               const char * destination,
-                               int flags, int * error );
+tr_torrent_t * tr_torrentInit( tr_handle_t  * handle,
+                               const char   * metainfo_filename,
+                               const char   * destination,
+                               int            flags,
+                               int          * setme_error );
+
+typedef struct tr_info_s tr_info_t;
 
 /**
- * Checks to see if the specified torrent file could be
- * successfully added to Transmission.
- * returns TR_OK, TR_EDUPLICATE, TR_ERROR_IO_DUP_DOWNLOAD, or TR_EINVALID.
+ * Parses the specified metainfo file.
+ *
+ * Returns TR_OK or TR_INVALID based on whether or not the
+ * metainfo file is successfully parsed.
+ *
+ * If parsing succeeded and "setme_info" is non-NULL,
+ * it will be populated with the file's information.
+ *
+ * If "setme_canAdd" is non-NULL, it will be set to TR_OK,
+ * TR_EDUPLICATE, TR_ERROR_IO_DUP_DOWNLOAD, or TR_EINVALID.
+ *
+ * "destination" is used for the canAdd tests, so it can
+ * be NULL if "setme_canAdd" is too.
  */
-int tr_torrentCanAdd( const tr_handle_t  * handle,
-                      const char         * destination,
-                      const char         * path );
+int tr_torrentParse( const tr_handle_t  * handle,
+                     const char         * metainfo_filename,
+                     const char         * destination,
+                     tr_info_t          * setme_info,
+                     int                * setme_canAdd ); 
 
 /***********************************************************************
  * tr_torrentInitData
@@ -284,7 +299,7 @@ int tr_torrentCanAdd( const tr_handle_t  * handle,
  * instead of the filename.
  **********************************************************************/
 tr_torrent_t * tr_torrentInitData( tr_handle_t *,
-                                   uint8_t * data, size_t size,
+                                   const uint8_t * data, size_t size,
                                    const char * destination,
                                    int flags, int * error );
 
@@ -314,7 +329,6 @@ void tr_torrentDisablePex( tr_torrent_t *, int disable );
  ***********************************************************************
  * Return torrent metainfo.
  **********************************************************************/
-typedef struct tr_info_s tr_info_t;
 tr_info_t * tr_torrentInfo( tr_torrent_t * );
 
 /***********************************************************************

@@ -51,13 +51,13 @@ tr_completion_t * tr_cpInit( tr_torrent_t * tor )
 {
     tr_completion_t * cp;
 
-    cp                   = malloc( sizeof( tr_completion_t ) );
+    cp                   = tr_new( tr_completion_t, 1 );
     cp->tor              = tor;
     cp->blockBitfield    = tr_bitfieldNew( tor->blockCount );
-    cp->blockDownloaders = malloc( tor->blockCount );
+    cp->blockDownloaders = tr_new( uint8_t, tor->blockCount );
     cp->pieceBitfield    = tr_bitfieldNew( tor->info.pieceCount );
-    cp->missingBlocks    = malloc( tor->info.pieceCount * sizeof( int ) );
-    cp->completeBlocks   = malloc( tor->info.pieceCount * sizeof( int ) );
+    cp->missingBlocks    = tr_new( int, tor->info.pieceCount );
+    cp->completeBlocks   = tr_new( int, tor->info.pieceCount );
 
     cp->nBlocksInLastPiece = tr_pieceCountBlocks ( tor->info.pieceCount - 1 );
     cp->nBlocksInPiece = tor->info.pieceCount==1 ? cp->nBlocksInLastPiece
@@ -70,12 +70,12 @@ tr_completion_t * tr_cpInit( tr_torrent_t * tor )
 
 void tr_cpClose( tr_completion_t * cp )
 {
-    tr_bitfieldFree( cp->blockBitfield );
-    free(            cp->blockDownloaders );
+    tr_free(         cp->completeBlocks );
+    tr_free(         cp->missingBlocks );
     tr_bitfieldFree( cp->pieceBitfield );
-    free(            cp->missingBlocks );
-    free(            cp->completeBlocks );
-    free(            cp );
+    tr_free(         cp->blockDownloaders );
+    tr_bitfieldFree( cp->blockBitfield );
+    tr_free(         cp );
 }
 
 void tr_cpReset( tr_completion_t * cp )
@@ -263,7 +263,7 @@ int tr_cpMostMissingBlockInPiece( const tr_completion_t * cp,
     count = tr_cpCountBlocks( cp, piece );
     end   = start + count;
 
-    pool     = malloc( count * sizeof( int ) );
+    pool     = tr_new( int, count );
     poolSize = 0;
     min      = 255;
 
@@ -294,7 +294,7 @@ int tr_cpMostMissingBlockInPiece( const tr_completion_t * cp,
         ret = -1;
     }
 
-    free( pool );
+    tr_free( pool );
     return ret;
 }
 
