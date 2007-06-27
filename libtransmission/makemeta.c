@@ -63,7 +63,7 @@ getFiles( const char        * dir,
     }
     else if( S_ISREG( sb.st_mode ) )
     {
-        struct FileList * node = tr_malloc( sizeof( struct FileList ) );
+        struct FileList * node = tr_new( struct FileList, 1 );
         node->size = sb.st_size;
         node->filename = tr_strdup( buf );
         node->next = list;
@@ -117,7 +117,7 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
     int i;
     struct FileList * files;
     struct FileList * walk;
-    tr_metainfo_builder_t * ret = tr_calloc( 1, sizeof(tr_metainfo_builder_t) );
+    tr_metainfo_builder_t * ret = tr_new0( tr_metainfo_builder_t, 1 );
     ret->top = tr_strdup( topFile );
     ret->handle = handle; 
     if (1) {
@@ -142,7 +142,7 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
     for( walk=files; walk!=NULL; walk=walk->next )
         ++ret->fileCount;
 
-    ret->files = tr_calloc(ret->fileCount, sizeof(tr_metainfo_builder_file_t));
+    ret->files = tr_new0( tr_metainfo_builder_file_t, ret->fileCount );
 
     for( i=0, walk=files; walk!=NULL; ++i )
     {
@@ -193,9 +193,9 @@ static uint8_t*
 getHashInfo ( tr_metainfo_builder_t * b )
 {
     int fileIndex = 0;
-    uint8_t *ret = (uint8_t*) tr_malloc ( SHA_DIGEST_LENGTH * b->pieceCount );
+    uint8_t *ret = tr_new( uint8_t, SHA_DIGEST_LENGTH * b->pieceCount );
     uint8_t *walk = ret;
-    uint8_t *buf = tr_malloc( b->pieceSize );
+    uint8_t *buf = tr_new( uint8_t, b->pieceSize );
     uint64_t totalRemain;
     uint64_t off = 0;
     FILE * fp;
@@ -422,7 +422,7 @@ static tr_lock_t* getQueueLock( tr_handle_t * h )
     tr_sharedLock( h->shared );
     if( lock == NULL )
     {
-        lock = tr_calloc( 1, sizeof( tr_lock_t ) );
+        lock = tr_new0( tr_lock_t, 1 );
         tr_lockInit( lock );
     }
     tr_sharedUnlock( h->shared );

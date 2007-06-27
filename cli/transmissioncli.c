@@ -154,7 +154,7 @@ int main( int argc, char ** argv )
     }
 
     /* Open and parse torrent file */
-    if( !( tor = tr_torrentInit( h, torrentPath, ".", NULL, 0, &error ) ) )
+    if( !( tor = tr_torrentInit( h, torrentPath, ".", 0, &error ) ) )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_close( h );

@@ -502,7 +502,6 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     if( NULL != path )
     {
         tor->tor = tr_torrentInit( gl_handle, path, dir,
-                                   tor->hash,
                                    TR_FLAG_SAVE, &errcode );
     }
     else if( NULL != hash )
@@ -512,7 +511,7 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     else
     {
         tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 
-                                       tor->hash, TR_FLAG_SAVE, &errcode );
+                                       TR_FLAG_SAVE, &errcode );
     }
 
     if( NULL == tor->tor )

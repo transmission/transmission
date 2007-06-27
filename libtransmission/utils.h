@@ -176,11 +176,18 @@ static inline int _tr_block( const tr_torrent_t * tor, int index, int begin )
 ****
 ***/
 
+#define tr_new(struct_type, n_structs)           \
+    ((struct_type *) tr_malloc (((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
+#define tr_new0(struct_type, n_structs)          \
+    ((struct_type *) tr_malloc0 (((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
+
+void* tr_malloc  ( size_t );
+void* tr_malloc0 ( size_t );
+void* tr_calloc  ( size_t nmemb, size_t size );
+void  tr_free    ( void* );
+
 char* tr_strdup( const char * str );
 char* tr_strndup( const char * str, int len );
-void* tr_malloc( size_t );
-void* tr_calloc( size_t nmemb, size_t size );
-void  tr_free( void* );
 
 /***
 ****

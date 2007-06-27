@@ -266,7 +266,16 @@ void tr_close( tr_handle_t * );
 tr_torrent_t * tr_torrentInit( tr_handle_t *,
                                const char * path,
                                const char * destination,
-                               uint8_t * hash, int flags, int * error );
+                               int flags, int * error );
+
+/**
+ * Checks to see if the specified torrent file could be
+ * successfully added to Transmission.
+ * returns TR_OK, TR_EDUPLICATE, TR_ERROR_IO_DUP_DOWNLOAD, or TR_EINVALID.
+ */
+int tr_torrentCanAdd( const tr_handle_t  * handle,
+                      const char         * destination,
+                      const char         * path );
 
 /***********************************************************************
  * tr_torrentInitData
@@ -277,7 +286,7 @@ tr_torrent_t * tr_torrentInit( tr_handle_t *,
 tr_torrent_t * tr_torrentInitData( tr_handle_t *,
                                    uint8_t * data, size_t size,
                                    const char * destination,
-                                   uint8_t * hash, int flags, int * error );
+                                   int flags, int * error );
 
 /***********************************************************************
  * tr_torrentInitSaved
@@ -400,7 +409,7 @@ void tr_torrentAmountFinished( const tr_torrent_t * tor, float * tab, int size )
  * array of floats the same size and order as in tr_info_t. Free the
  * array when done.
  **********************************************************************/
-float * tr_torrentCompletion( tr_torrent_t * );
+float * tr_torrentCompletion( const tr_torrent_t * );
 
 float tr_torrentFileCompletion( const tr_torrent_t *, int fileIndex );
 
@@ -505,9 +514,8 @@ typedef enum
                                         we're a seeder, but due to DND files
                                         there's nothing we want right now */
     TR_STATUS_SEED         = (1<<4), /* Seeding */
-    TR_STATUS_STOPPING     = (1<<5), /* Sending 'stopped' to the tracker */
-    TR_STATUS_STOPPED      = (1<<6)  /* Sent 'stopped' but thread still
-                                        running (for internal use only) */
+    TR_STATUS_STOPPING     = (1<<5), /* Stopping -- closing connections, etc. */
+    TR_STATUS_STOPPED      = (1<<6)  /* Torrent is stopped */
 }
 torrent_status_t;
 

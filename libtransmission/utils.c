@@ -411,6 +411,14 @@ tr_malloc( size_t size )
     return size ? malloc( size ) : NULL;
 }
 
+void*
+tr_malloc0( size_t size )
+{
+    void * ret = tr_malloc( size );
+    memset( ret, 0, size );
+    return ret;
+}
+
 void tr_free( void * p )
 {
     if( p )

@@ -312,7 +312,7 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
   if( paused )
       flags |= TR_FLAG_PAUSED;
 
-  handle = tr_torrentInit( back, torrent, dir, NULL, flags, &errcode );
+  handle = tr_torrentInit( back, torrent, dir, flags, &errcode );
 
   if(NULL == handle) {
     switch(errcode) {
@@ -354,7 +354,7 @@ tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
         flags |= TR_FLAG_PAUSED;
 
     errcode = -1;
-    handle  = tr_torrentInitData( back, data, size, dir, NULL, flags, &errcode );
+    handle  = tr_torrentInitData( back, data, size, dir, flags, &errcode );
 
     if( NULL == handle )
     {
@@ -433,7 +433,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
   if( NULL != hash )
     handle = tr_torrentInitSaved(back, hash, dir, flags, &errcode);
   else
-    handle = tr_torrentInit(back, torrent, dir, NULL, flags, &errcode);
+    handle = tr_torrentInit(back, torrent, dir, flags, &errcode);
 
   if(NULL == handle) {
     torrent = ( NULL == hash ? torrent : hash );
