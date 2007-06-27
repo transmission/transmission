@@ -269,8 +269,8 @@ infoCanAdd( const tr_handle_t   * h,
     if( hashExists( h, info->hash ) )
         return TR_EDUPLICATE;
 
-    if( pathIsInUse( h, destination, info->name ) )
-        return TR_ERROR_IO_DUP_DOWNLOAD;
+    if( destination && pathIsInUse( h, destination, info->name ) )
+        return TR_EDUPLICATE;
 
     return TR_OK;
 }
@@ -279,8 +279,7 @@ int
 tr_torrentParse( const tr_handle_t  * h,
                  const char         * path,
                  const char         * destination,
-                 tr_info_t          * setme_info,
-                 int                * setme_canAdd )
+                 tr_info_t          * setme_info )
 {
     int ret;
     tr_info_t tmp;
@@ -290,8 +289,8 @@ tr_torrentParse( const tr_handle_t  * h,
 
     ret = tr_metainfoParseFile( setme_info, h->tag, path, FALSE );
 
-    if( setme_canAdd )
-       *setme_canAdd = ret ? ret : infoCanAdd( h, destination, setme_info );
+    if( ret == TR_OK )
+        ret = infoCanAdd( h, destination, setme_info );
 
     return ret;
 }
@@ -304,13 +303,10 @@ tr_torrentInit( tr_handle_t   * h,
                 int           * error )
 {
     int val;
-    int err = 0;
     tr_torrent_t * tor = NULL;
 
-    if(( val = tr_torrentParse( h, destination, path, NULL, &err )))
+    if(( val = tr_torrentParse( h, destination, path, NULL )))
         *error = val;
-    else if( err )
-        *error = err;
     else if(!(( tor = tr_new0( tr_torrent_t, 1 ))))
         *error = TR_EOTHER;
     else {
@@ -325,8 +321,7 @@ static int
 tr_torrentParseHash( const tr_handle_t  * h,
                      const char         * hashStr,
                      const char         * destination,
-                     tr_info_t          * setme_info,
-                     int                * setme_canAdd )
+                     tr_info_t          * setme_info )
 {
     int ret;
     tr_info_t tmp;
@@ -336,8 +331,8 @@ tr_torrentParseHash( const tr_handle_t  * h,
 
     ret = tr_metainfoParseHash( setme_info, h->tag, hashStr );
 
-    if( setme_canAdd )
-       *setme_canAdd = ret ? ret : infoCanAdd( h, destination, setme_info );
+    if( ret == TR_OK )
+        ret = infoCanAdd( h, destination, setme_info );
 
     return ret;
 }
@@ -351,13 +346,10 @@ tr_torrentInitSaved( tr_handle_t    * h,
                      int            * error )
 {
     int val;
-    int err = 0;
     tr_torrent_t * tor = NULL;
 
-    if(( val = tr_torrentParseHash( h, hashStr, destination, NULL, &err )))
+    if(( val = tr_torrentParseHash( h, hashStr, destination, NULL )))
         *error = val;
-    else if( err )
-        *error = err;
     else if(!(( tor = tr_new0( tr_torrent_t, 1 ))))
         *error = TR_EOTHER;
     else {
@@ -373,8 +365,7 @@ tr_torrentParseData( const tr_handle_t  * h,
                      const uint8_t      * data,
                      size_t               size,
                      const char         * destination,
-                     tr_info_t          * setme_info,
-                     int                * setme_canAdd )
+                     tr_info_t          * setme_info )
 {
     int ret;
     tr_info_t tmp;
@@ -384,8 +375,8 @@ tr_torrentParseData( const tr_handle_t  * h,
 
     ret = tr_metainfoParseData( setme_info, h->tag, data, size, FALSE );
 
-    if( setme_canAdd )
-       *setme_canAdd = ret ? ret : infoCanAdd( h, destination, setme_info );
+    if( ret == TR_OK )
+        ret = infoCanAdd( h, destination, setme_info );
 
     return ret;
 }
@@ -399,13 +390,10 @@ tr_torrentInitData( tr_handle_t    * h,
                     int            * error )
 {
     int val;
-    int err = 0;
     tr_torrent_t * tor = NULL;
 
-    if(( val = tr_torrentParseData( h, data, size, destination, NULL, &err ) ))
+    if(( val = tr_torrentParseData( h, data, size, destination, NULL )))
         *error = val;
-    else if( err )
-        *error = err;
     else if(!(( tor = tr_new0( tr_torrent_t, 1 ))))
         *error = TR_EOTHER;
     else {

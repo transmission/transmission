@@ -274,23 +274,21 @@ typedef struct tr_info_s tr_info_t;
 /**
  * Parses the specified metainfo file.
  *
- * Returns TR_OK or TR_INVALID based on whether or not the
- * metainfo file is successfully parsed.
+ * Returns TR_OK if it parsed and can be added to Transmission.
+ * Returns TR_INVALID if it couldn't be parsed.
+ * Returns TR_EDUPLICATE if it parsed but can't be added.
  *
- * If parsing succeeded and "setme_info" is non-NULL,
- * it will be populated with the file's information.
+ * "destination" can be NULL if you don't need to know whether
+ * or not the torrent can be added.
  *
- * If "setme_canAdd" is non-NULL, it will be set to TR_OK,
- * TR_EDUPLICATE, TR_ERROR_IO_DUP_DOWNLOAD, or TR_EINVALID.
- *
- * "destination" is used for the canAdd tests, so it can
- * be NULL if "setme_canAdd" is too.
+ " "setme_info" can be NULL if you don't need the information.
+ * If the metainfo can be parsed and setme_info is non-NULL,
+ * it will be filled with the metadata's info.
  */
 int tr_torrentParse( const tr_handle_t  * handle,
                      const char         * metainfo_filename,
                      const char         * destination,
-                     tr_info_t          * setme_info,
-                     int                * setme_canAdd ); 
+                     tr_info_t          * setme_info );
 
 /***********************************************************************
  * tr_torrentInitData
