@@ -285,20 +285,20 @@ void tr_metainfoFree( tr_info_t * inf )
 {
     int ii, jj;
 
-    free( inf->pieces );
-    free( inf->files );
+    tr_free( inf->pieces );
+    tr_free( inf->files );
     
     for( ii = 0; ii < inf->trackerTiers; ii++ )
     {
         for( jj = 0; jj < inf->trackerList[ii].count; jj++ )
         {
-            free( inf->trackerList[ii].list[jj].address );
-            free( inf->trackerList[ii].list[jj].announce );
-            free( inf->trackerList[ii].list[jj].scrape );
+            tr_free( inf->trackerList[ii].list[jj].address );
+            tr_free( inf->trackerList[ii].list[jj].announce );
+            tr_free( inf->trackerList[ii].list[jj].scrape );
         }
-        free( inf->trackerList[ii].list );
+        tr_free( inf->trackerList[ii].list );
     }
-    free( inf->trackerList );
+    tr_free( inf->trackerList );
 }
 
 static int getfile( char * buf, int size,
