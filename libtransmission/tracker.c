@@ -301,6 +301,9 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
     struct tclist * next;
     struct tchead * tier;
 
+    if( tc == NULL )
+        return;
+
     *peerCount = 0;
     *peerCompact = NULL;
     
