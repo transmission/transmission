@@ -305,7 +305,7 @@ tr_torrentInit( tr_handle_t   * h,
     int val;
     tr_torrent_t * tor = NULL;
 
-    if(( val = tr_torrentParse( h, destination, path, NULL )))
+    if(( val = tr_torrentParse( h, path, destination, NULL )))
         *error = val;
     else if(!(( tor = tr_new0( tr_torrent_t, 1 ))))
         *error = TR_EOTHER;
