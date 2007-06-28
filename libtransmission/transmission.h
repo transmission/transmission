@@ -291,6 +291,17 @@ int tr_torrentParse( const tr_handle_t  * handle,
                      const char         * destination,
                      tr_info_t          * setme_info );
 
+/**
+ * Parses the cached metainfo file that matches the given hash string.
+ * See tr_torrentParse() for a description of the arguments
+ */
+int
+tr_torrentParseHash( const tr_handle_t  * h,
+                     const char         * hashStr,
+                     const char         * destination,
+                     tr_info_t          * setme_info );
+
+
 /***********************************************************************
  * tr_torrentInitData
  ***********************************************************************

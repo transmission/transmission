@@ -320,7 +320,7 @@ tr_torrentInit( tr_handle_t   * h,
     return tor;
 }
 
-static int
+int
 tr_torrentParseHash( const tr_handle_t  * h,
                      const char         * hashStr,
                      const char         * destination,
