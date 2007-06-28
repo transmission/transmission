@@ -283,7 +283,8 @@ typedef struct tr_info_s tr_info_t;
  *
  " "setme_info" can be NULL if you don't need the information.
  * If the metainfo can be parsed and setme_info is non-NULL,
- * it will be filled with the metadata's info.
+ * it will be filled with the metadata's info.  You'll need to
+ * call tr_metainfoFree( setme_info ) when done with it.
  */
 int tr_torrentParse( const tr_handle_t  * handle,
                      const char         * metainfo_filename,
