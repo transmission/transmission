@@ -84,6 +84,7 @@
     NSEnumerator * enumerator = [files objectEnumerator];
     tr_info_t info;
     while ((file = [enumerator nextObject]))
+    {
         if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
         {
             count++;
@@ -97,6 +98,8 @@
                 folder = info.multifile;
             }
         }
+        tr_metainfoFree(&info);
+    }
     
     if (count <= 0)
         return;

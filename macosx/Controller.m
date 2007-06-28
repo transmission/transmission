@@ -774,19 +774,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * torrentPath;
     int canAdd;
     tr_info_t info;
-    do
+    while ([files count] > 0)
     {
-        if ([files count] == 0) //no files left to open
-        {
-            [files release];
-            
-            [self updateTorrentHistory];
-            return;
-        }
-    
-        torrentPath = [[files objectAtIndex: 0] retain];
+        torrentPath = [files objectAtIndex: 0];
+        if (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) == TR_OK)
+            break;
+        
+        tr_metainfoFree(&info);
         [files removeObjectAtIndex: 0];
-    } while (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) != TR_OK);
+    }
+    
+    //no files left to open
+    if ([files count] <= 0)
+    {
+        [files release];
+        [self updateTorrentHistory];
+        return;
+    }
 
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
@@ -800,9 +804,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                         "Open torrent -> select destination folder"), [NSString stringWithUTF8String: info.name]]];
     [panel setMessage: @"Select the download folder "];
     
-    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrentPath, @"Path",
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [torrentPath retain], @"Path",
                                     files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
-    [torrentPath release];
+    tr_metainfoFree(&info);
     
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
@@ -2202,16 +2206,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
-        tr_torrent_t * tempTor;
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
             canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
             if (canAdd == TR_OK)
             {
-                tr_torrentClose(tempTor);
                 [filesToOpen addObject: file];
-                
                 torrent = YES;
             }
             else if (canAdd == TR_EDUPLICATE)
