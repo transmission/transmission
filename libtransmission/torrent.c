@@ -287,10 +287,14 @@ tr_torrentParse( const tr_handle_t  * h,
     if( setme_info == NULL )
         setme_info = &tmp;
 
+    memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseFile( setme_info, h->tag, path, FALSE );
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
+
+    if( setme_info == &tmp )
+        tr_metainfoFree( &tmp );
 
     return ret;
 }
@@ -329,10 +333,14 @@ tr_torrentParseHash( const tr_handle_t  * h,
     if( setme_info == NULL )
         setme_info = &tmp;
 
+    memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseHash( setme_info, h->tag, hashStr );
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
+
+    if( setme_info == &tmp )
+        tr_metainfoFree( &tmp );
 
     return ret;
 }
@@ -373,10 +381,14 @@ tr_torrentParseData( const tr_handle_t  * h,
     if( setme_info == NULL )
         setme_info = &tmp;
 
+    memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseData( setme_info, h->tag, data, size, FALSE );
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
+
+    if( setme_info == &tmp )
+        tr_metainfoFree( &tmp );
 
     return ret;
 }
