@@ -237,20 +237,21 @@ tr_torrent_handle(TrTorrent *tor)
     return tor->severed ? NULL : tor->handle;
 }
 
+static tr_stat_t*
+refreshStat( TrTorrent * tor )
+{
+    tor->lastStatTime= time( NULL );
+    tor->stat = *tr_torrentStat( tor->handle );
+    return &tor->stat;
+}
+
 const tr_stat_t *
 tr_torrent_stat(TrTorrent *tor)
 {
-    const time_t now = time( NULL );
-
     g_assert( TR_IS_TORRENT(tor) );
 
-    if( tor->severed )
-        return NULL;
-
-    if( tor->lastStatTime != now ) {
-        tor->lastStatTime = now;
-        tor->stat = *tr_torrentStat( tor->handle );
-    }
+    if( !tor->severed && tor->lastStatTime!=time(NULL) )
+        refreshStat( tor );
 
     return &tor->stat;
 }
@@ -400,7 +401,6 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     return NULL;
 
   torrent = hash = dir = NULL;
-  paused = FALSE;
 
   for(ii = 0; ii + 1 < state->val.l.count; ii += 2) {
     name = state->val.l.vals + ii;
@@ -427,7 +427,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
     return NULL;
 
   flags = 0;
-  if( forcedpause )
+  if( paused || forcedpause )
       flags |= TR_FLAG_PAUSED;
 
   if( NULL != hash )
@@ -493,11 +493,9 @@ tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
     }
     tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
                     tr_torrentGetFolder( tor->handle ), -1, 1 );
-#if 0
-    tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
-                    tr_torrent_paused( tor ) ? 1 : 0 );
-#endif
 
+    tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
+                    (refreshStat(tor)->status & TR_STATUS_INACTIVE) ? 1 : 0);
     tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-speed" ),
                     tor->ul_cap );
     tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-enabled" ),

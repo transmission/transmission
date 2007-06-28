@@ -24,7 +24,6 @@
 
 #include "transmission.h"
 #include "shared.h"
-#define INTERVAL_MSEC 100
 
 /***
 ****  LOCKS
@@ -823,6 +822,9 @@ int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
     int i;
     tr_peer_t * otherPeer;
 
+    assert( tor != NULL );
+    assert( peer != NULL );
+
     if( tor->peerCount >= TR_MAX_PEER_COUNT )
     {
         tr_peerDestroy(  peer );
@@ -951,7 +953,7 @@ torrentThreadLoop ( void * _tor )
         cp_status_t cpStatus;
 
         /* sleep a little while */
-        tr_wait( INTERVAL_MSEC );
+        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1000 : 100 );
 
         /* if we're stopping... */
         if( tor->runStatus == TR_RUN_STOPPING )
