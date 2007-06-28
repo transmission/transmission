@@ -1024,11 +1024,13 @@ torrentThreadLoop ( void * _tor )
             tr_torrentWriterLock( tor );
             cpStatus = tr_cpGetStatus( tor->completion );
             if( cpStatus != tor->cpStatus ) {
-                tor->hasChangedState = tor->cpStatus = cpStatus;
+                tor->cpStatus = cpStatus;
                 if( (cpStatus == TR_CP_COMPLETE)        /* if we're complete */
                     && tor->tracker!=NULL           /* and we have a tracker */
-                    && tor->downloadedCur )          /* and it just happened */
+                    && tor->downloadedCur ) {        /* and it just happened */
                     tr_trackerCompleted( tor->tracker ); /* tell the tracker */
+                    tor->hasChangedState = tor->cpStatus;  /* and the client */
+                }
                 tr_ioSync( tor->io );
             }
             tr_torrentWriterUnlock( tor );
