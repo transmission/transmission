@@ -161,7 +161,9 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
            builderFileCompare );
 
     ret->pieceSize = bestPieceSize( ret->totalSize, ret->fileCount );
-    ret->pieceCount = (int)( ret->totalSize / ret->pieceSize);
+    ret->pieceCount = ret->pieceSize
+        ? (int)( ret->totalSize / ret->pieceSize)
+        : 0;
     if( ret->totalSize % ret->pieceSize )
         ++ret->pieceCount;
 
