@@ -70,7 +70,7 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 ******
 *****/
 
-#define PERCENT_PEER_WANTED     75      /* Percent before we start relax peers min activeness */
+#define PERCENT_PEER_WANTED     25      /* Percent before we start relax peers min activeness */
 #define MIN_UPLOAD_IDLE         60000   /* In high peer situations we wait only 1 min
                                             until dropping peers for idling */
 #define MAX_UPLOAD_IDLE         240000  /* In low peer situations we wait the
