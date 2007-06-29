@@ -306,11 +306,11 @@ setupsigs( struct event_base * base /* XXX */ UNUSED )
     /* XXX event_base_set( base, &ev_int ); */
     signal_add( &ev_int, NULL );
 
-    signal_set( &ev_quit, SIGINT, gotsig, NULL );
+    signal_set( &ev_quit, SIGQUIT, gotsig, NULL );
     /* XXX event_base_set( base, &ev_quit ); */
     signal_add( &ev_quit, NULL );
 
-    signal_set( &ev_term, SIGINT, gotsig, NULL );
+    signal_set( &ev_term, SIGTERM, gotsig, NULL );
     /* XXX event_base_set( base, &ev_term ); */
     signal_add( &ev_term, NULL );
 
