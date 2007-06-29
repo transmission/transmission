@@ -850,51 +850,53 @@ tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
 static void
 tr_torrentSwiftPulse ( tr_torrent_t * tor )
 {
-    int i;
+    /* Preferred # of seconds for the request queue's turnaround time.
+       This is just an arbitrary number. */
+    const int queueTimeSec = 5;
+    const int blockSizeKiB = tor->blockSize / 1024;
     int deadbeatCount = 0;
+    int i;
     tr_peer_t ** deadbeats;
 
     tr_torrentWriterLock( tor );
 
     for( i=0; i<tor->peerCount; ++i )
     {
-        /* preferred # of seconds for the request queue's turnaround time.
-           this is just an arbitrary number. */
-        const int queueTime = 5;
-        int j;
+        double outboundSpeedKiBs;
+        double inboundSpeedKiBs;
+        int j, size;
         tr_peer_t * peer = tor->peers[ i ];
 
         if( !tr_peerIsConnected( peer ) )
             continue;
 
-        /* decide how deep the request queue should be */
-        peer->outRequestMax = queueTime * tr_rcRate(peer->download) / tor->blockSize;
-        peer->inRequestMax += 2; /* room to grow */
-
-        /* make room for new requests */
-        if( peer->outRequestAlloc < peer->outRequestMax ) {
-            peer->outRequestAlloc = peer->outRequestMax;
-            peer->outRequests = tr_renew( tr_request_t, peer->outRequests, peer->outRequestAlloc );
-        }
-
-        /* decide how deep the request queue should be */
-        peer->inRequestMax = queueTime * tr_rcRate(peer->download) / (tor->blockSize/1024);
-        peer->inRequestMax += 2; /* room to grow */
-
-        /* make room for new requests */
+        /* decide how many blocks we'll concurrently ask this peer for */
+        outboundSpeedKiBs = tr_rcRate(peer->upload);
+        size = queueTimeSec * outboundSpeedKiBs / blockSizeKiB;
+        if( size < 4 ) /* don't let it get TOO small */
+            size = 4;
+        size += 4; /* and always leave room to grow */
+        peer->inRequestMax = size;
         if( peer->inRequestAlloc < peer->inRequestMax ) {
             peer->inRequestAlloc = peer->inRequestMax;
             peer->inRequests = tr_renew( tr_request_t, peer->inRequests, peer->inRequestAlloc );
         }
 
-        /* queue shrank... notify completion that we won't be sending those requests */
-        for( j=peer->inRequestMax; j<peer->inRequestCount; ++j ) {
-            tr_request_t * r = &peer->inRequests[j];
-            tr_cpDownloaderRem( tor->completion, tr_block(r->index,r->begin) );
+        /* decide how many blocks we'll concurrently let the peer ask us for */
+        inboundSpeedKiBs = tr_rcRate(peer->download);
+        size = queueTimeSec * inboundSpeedKiBs / blockSizeKiB;
+        if( size < 4 ) /* don't let it get TOO small */
+            size = 4;
+        size += 4; /* and always leave room to grow */
+        peer->outRequestMax = size;
+        if( peer->outRequestAlloc < peer->outRequestMax ) {
+            peer->outRequestAlloc = peer->outRequestMax;
+            peer->outRequests = tr_renew( tr_request_t, peer->outRequests, peer->outRequestAlloc );
         }
     }
 
-    deadbeats = tr_calloc( tor->peerCount, sizeof(tr_peer_t*) );
+    deadbeats = g_new( tr_peer_t*, tor->peerCount );
+    deadbeatCount = 0;
     for( i=0; i<tor->peerCount; ++i ) {
         tr_peer_t * peer = tor->peers[ i ];
         if( tr_peerIsConnected( peer ) && ( peer->credit < 0 ) )
@@ -918,7 +920,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
             ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
     }
 
-    free( deadbeats );
+    tr_free( deadbeats );
 
     tr_torrentWriterUnlock( tor );
 }
