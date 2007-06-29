@@ -111,6 +111,9 @@
 - (void) openFilesAsk:          (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete;
 - (void) openFilesAskWithDict:  (NSDictionary *) dictionary;
 - (void) openShowSheet:         (id) sender;
+
+- (void) duplicateOpenAlert: (NSString *) name;
+
 - (void) openURL:               (NSURL *) torrentURL;
 - (void) openURLEndSheet:       (id) sender;
 - (void) openURLCancelEndSheet: (id) sender;

@@ -703,6 +703,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     Torrent * torrent;
     NSString * torrentPath;
+    tr_info_t info;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
@@ -713,6 +714,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             location = [[fDefaults stringForKey: @"DownloadFolder"] stringByExpandingTildeInPath];
         else
             location = [torrentPath stringByDeletingLastPathComponent];
+        
+        if (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) == TR_EDUPLICATE)
+        {
+            [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+            tr_metainfoFree(&info);
+            continue;
+        }
+        tr_metainfoFree(&info);
         
         if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location forceDeleteTorrent: delete lib: fLib]))
             continue;
@@ -776,8 +785,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     while ([files count] > 0)
     {
         torrentPath = [files objectAtIndex: 0];
-        if (tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info) == TR_OK)
+        canAdd = tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info);
+        if (canAdd == TR_OK)
             break;
+        else if (canAdd == TR_EDUPLICATE)
+            [self duplicateOpenAlert: [NSString stringWithUTF8String: info.name]];
+        else;
         
         tr_metainfoFree(&info);
         [files removeObjectAtIndex: 0];
@@ -816,8 +829,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (code == NSOKButton)
     {
         NSString * torrentPath = [dictionary objectForKey: @"Path"];
-        Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath
-                            location: [[openPanel filenames] objectAtIndex: 0]
+        Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath location: [[openPanel filenames] objectAtIndex: 0]
                             forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue] lib: fLib];
         
         //add it to the "File > Open Recent" menu
@@ -880,6 +892,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] forceDeleteTorrent: NO];
     
     [dictionary release];
+}
+
+- (void) duplicateOpenAlert: (NSString *) name
+{
+    NSAlert * alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Transfer of \"%@\" is already running.",
+                            "Open duplicate alert -> title"), name]];
+    [alert setInformativeText:
+            NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already running transfer.",
+                            "Open duplicate alert -> message")];
+    [alert setAlertStyle: NSWarningAlertStyle];
+    
+    [alert runModal];
+    [alert release];
 }
 
 - (void) openURL: (NSURL *) url
@@ -1284,9 +1311,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-    {
         [torrent resetCache];
-    }
+    
     #warning reset queue?
 }
 
@@ -2000,31 +2026,29 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [newNames replaceObjectAtIndex: i withObject: [path stringByAppendingPathComponent: file]];
     }
     
-    NSEnumerator * enumerator;
-    if (![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"])
+    BOOL ask = [[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Ask"];
+    
+    NSEnumerator * enumerator = [newNames objectEnumerator];
+    int canAdd, count;
+    while ((file = [enumerator nextObject]))
     {
-        enumerator = [newNames objectEnumerator];
-        int count;
-        while ((file = [enumerator nextObject]))
+        canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
+        if (canAdd == TR_OK)
         {
-            count = [fTorrents count];
+            if (!ask)
+                count = [fTorrents count];
             [self openFiles: [NSArray arrayWithObject: file]];
             
             //check if torrent was opened
-            if ([fTorrents count] > count)
+            if (!ask && [fTorrents count] > count)
                 [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Torrent File Auto Added",
                     "Growl notification title") description: [file lastPathComponent]
                     notificationName: GROWL_AUTO_ADD iconData: nil priority: 0 isSticky: NO clickContext: nil];
         }
-    }
-    else
-        [self openFiles: newNames];
-    
-    //check if an import fails because of an error so it can be tried again
-    enumerator = [newNames objectEnumerator];
-    while ((file = [enumerator nextObject]))
-        if (tr_torrentParse(fLib, [file UTF8String], NULL, NULL) == TR_EINVALID)
+        else if (canAdd == TR_EINVALID)
             [fAutoImportedNames removeObject: [file lastPathComponent]];
+        else;
+    }
     
     [newNames release];
 }
