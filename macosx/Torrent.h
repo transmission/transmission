@@ -75,6 +75,8 @@
 
 - (NSDictionary *) history;
 
+- (void) removeTorrent;
+
 - (void) changeIncompleteDownloadFolder: (NSString *) folder;
 - (void) changeDownloadFolder: (NSString *) folder;
 - (NSString *) downloadFolder;

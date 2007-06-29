@@ -204,9 +204,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fPublicTorrentLocation)
             [fPublicTorrentLocation release];
         
-        #warning look into
-        tr_torrentRemoveSaved(fHandle);
-        
         [fDateAdded release];
 		if (fDateCompleted)
 			[fDateCompleted release];
@@ -232,6 +229,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         free(fPieces);
     }
     [super dealloc];
+}
+
+- (void) removeTorrent
+{
+    tr_torrentRemoveSaved(fHandle);
 }
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder

@@ -1115,6 +1115,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
         
+        [torrent removeTorrent];
         [fTorrents removeObject: torrent];
         [fDisplayedTorrents removeObject: torrent];
     }
