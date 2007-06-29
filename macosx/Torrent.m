@@ -138,7 +138,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSDictionary *) history
 {
-    #warning not all being stored
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                     [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
                     [self hashString], @"TorrentHash",
@@ -205,6 +204,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fPublicTorrentLocation)
             [fPublicTorrentLocation release];
         
+        #warning look into
         tr_torrentRemoveSaved(fHandle);
         
         [fDateAdded release];

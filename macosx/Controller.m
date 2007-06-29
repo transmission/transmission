@@ -791,6 +791,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     }
 
+    [files removeObjectAtIndex: 0];
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
     [panel setPrompt: NSLocalizedString(@"Select", "Open torrent -> prompt")];
@@ -801,7 +802,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Open torrent -> select destination folder"), [NSString stringWithUTF8String: info.name]]];
-    [panel setMessage: @"Select the download folder "];
     
     NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [torrentPath retain], @"Path",
                                     files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
