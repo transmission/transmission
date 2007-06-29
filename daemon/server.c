@@ -51,7 +51,7 @@ struct client
 {
     int                  fd;
     struct bufferevent * ev;
-    struct ipc_info      ipc;
+    struct ipc_info    * ipc;
     RB_ENTRY( client )   link;
 };
 
@@ -223,19 +223,28 @@ newclient( int fd, short event UNUSED, void * arg )
             break;
         }
 
+        client->ipc = ipc_newcon( gl_tree );
+        if( NULL == client->ipc )
+        {
+            mallocmsg( sizeof *client->ipc );
+            close( clfd );
+            free( client );
+            return;
+        }
+
         clev = bufferevent_new( clfd, doread, noop, byebye, client );
         if( NULL == clev )
         {
+            errnomsg( "failed to create bufferevent" );
             close( clfd );
+            ipc_freecon( client->ipc );
             free( client );
-            mallocmsg( -1 );
             return;
         }
         /* XXX bufferevent_base_set( gl_base, clev ); */
         bufferevent_settimeout( clev, CLIENT_TIMEOUT, CLIENT_TIMEOUT );
 
         client->fd      = clfd;
-        ipc_newcon( &client->ipc, gl_tree );
         client->ev      = clev;
         old = RB_INSERT( allclients, &gl_clients, client );
         assert( NULL == old );
@@ -246,7 +255,7 @@ newclient( int fd, short event UNUSED, void * arg )
         }
 
         bufferevent_enable( clev, EV_READ );
-        buf = ipc_mkvers( &buflen );
+        buf = ipc_mkvers( &buflen, "Transmission daemon " VERSION_STRING );
         if( 0 > queuemsg( client, buf, buflen ) )
         {
             free( buf );
@@ -298,6 +307,7 @@ byebye( struct bufferevent * ev, short what, void * arg UNUSED )
     RB_REMOVE( allclients, &gl_clients, client );
     bufferevent_free( ev );
     close( client->fd );
+    ipc_freecon( client->ipc );
     if( gl_debug )
     {
         printf( "*** client %i went bye-bye\n", client->fd );
@@ -330,7 +340,7 @@ doread( struct bufferevent * ev, void * arg )
         return;
     }
 
-    res = ipc_parse( &client->ipc, buf, len, client );
+    res = ipc_parse( client->ipc, buf, len, client );
 
     if( gl_exiting )
     {
@@ -400,7 +410,7 @@ msgresp( struct client * client, int64_t tag, enum ipc_msg id )
         return 0;
     }
 
-    buf = ipc_mkempty( &client->ipc, &buflen, id, tag );
+    buf = ipc_mkempty( client->ipc, &buflen, id, tag );
     ret = queuemsg( client, buf, buflen );
     free( buf );
 
@@ -441,7 +451,7 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    added = ipc_initval( &client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
+    added = ipc_initval( client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
     if( NULL == added )
     {
         errnomsg( "failed to build message" );
@@ -520,7 +530,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
 
     if( TORRENT_ID_VALID( tor ) )
     {
-        val = ipc_initval( &client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
+        val = ipc_initval( client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
         if( NULL == val )
         {
             errnomsg( "failed to build message" );
@@ -662,7 +672,7 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     }
 
     /* initialize packet */
-    pkinf = ipc_initval( &client->ipc, respid, tag, &pk, TYPE_LIST );
+    pkinf = ipc_initval( client->ipc, respid, tag, &pk, TYPE_LIST );
     if( NULL == pkinf )
     {
         errnomsg( "failed to build message" );
@@ -847,7 +857,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    pkinf = ipc_initval( &client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
+    pkinf = ipc_initval( client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
     if( NULL == pkinf )
     {
         errnomsg( "failed to build message" );
@@ -897,31 +907,31 @@ prefmsg( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
     switch( id )
     {
         case IPC_MSG_GETAUTOMAP:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_AUTOMAP, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_AUTOMAP, tag,
                              torrent_get_port_mapping() );
             break;
         case IPC_MSG_GETAUTOSTART:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_AUTOSTART, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_AUTOSTART, tag,
                              torrent_get_autostart() );
             break;
         case IPC_MSG_GETDIR:
-            buf = ipc_mkstr( &client->ipc, &buflen, IPC_MSG_DIR, tag,
+            buf = ipc_mkstr( client->ipc, &buflen, IPC_MSG_DIR, tag,
                              torrent_get_directory() );
             break;
         case IPC_MSG_GETDOWNLIMIT:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_DOWNLIMIT, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_DOWNLIMIT, tag,
                              torrent_get_downlimit() );
             break;
         case IPC_MSG_GETPEX:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_PEX, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_PEX, tag,
                              torrent_get_pex() );
             break;
         case IPC_MSG_GETPORT:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_PORT, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_PORT, tag,
                              torrent_get_port() );
             break;
         case IPC_MSG_GETUPLIMIT:
-            buf = ipc_mkint( &client->ipc, &buflen, IPC_MSG_UPLIMIT, tag,
+            buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_UPLIMIT, tag,
                              torrent_get_uplimit() );
             break;
         default:
@@ -949,7 +959,7 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    pkval = ipc_initval( &client->ipc, IPC_MSG_SUP, tag, &pk, TYPE_LIST );
+    pkval = ipc_initval( client->ipc, IPC_MSG_SUP, tag, &pk, TYPE_LIST );
     if( NULL == pkval )
     {
         errnomsg( "failed to build message" );
@@ -974,8 +984,8 @@ supmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
             msgresp( client, tag, IPC_MSG_BAD );
             return;
         }
-        found = ipc_msgid( &client->ipc, name->val.s.s );
-        if( IPC__MSG_COUNT == found || !ipc_ishandled( &client->ipc, found ) )
+        found = ipc_msgid( client->ipc, name->val.s.s );
+        if( IPC__MSG_COUNT == found || !ipc_ishandled( client->ipc, found ) )
         {
             continue;
         }

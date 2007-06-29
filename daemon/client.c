@@ -51,7 +51,7 @@ struct con
 {
     int                  infd;
     int                  outfd;
-    struct ipc_info      ipc;
+    struct ipc_info    * ipc;
     struct bufferevent * evin;
     struct bufferevent * evout;
 };
@@ -168,13 +168,20 @@ client_new_sock( const char * path )
         close( fd );
         return -1;
     }
-    ipc_newcon( &con->ipc, gl_tree );
+    con->ipc = ipc_newcon( gl_tree );
+    if( NULL == con->ipc )
+    {
+        mallocmsg( sizeof *con->ipc );
+        close( fd );
+        free( con );
+    }
     con->infd = fd;
     con->evin = bufferevent_new( fd, canread, didwrite, ohshit, con );
     if( NULL == con->evin )
     {
-        mallocmsg( -1 );
+        errnomsg( "failed to create bufferevent" );
         close( fd );
+        ipc_freecon( con->ipc );
         free( con );
         return -1;
     }
@@ -274,6 +281,7 @@ client_new_cmd( char * const * cmd )
     if( NULL == con->evout )
     {
         bufferevent_free( con->evin );
+        bufferevent_free( con->evout );
         free( con );
         close( tocmd[1] );
         close( fromcmd[0] );
@@ -283,7 +291,18 @@ client_new_cmd( char * const * cmd )
     bufferevent_settimeout( con->evout, SERVER_TIMEOUT, SERVER_TIMEOUT );
     bufferevent_enable( con->evout, EV_READ );
 
-    ipc_newcon( &con->ipc, gl_tree );
+    con->ipc = ipc_newcon( gl_tree );
+    if( NULL == con->ipc )
+    {
+        mallocmsg( sizeof *con->ipc );
+        bufferevent_free( con->evin );
+        bufferevent_free( con->evout );
+        free( con );
+        close( tocmd[1] );
+        close( fromcmd[0] );
+        return -1;
+    }
+
     if( 0 > sendvers( con ) )
     {
         exit( 1 );
@@ -686,7 +705,7 @@ canread( struct bufferevent * evin, void * arg )
         return;
     }
 
-    res = ipc_parse( &con->ipc, buf, len, con );
+    res = ipc_parse( con->ipc, buf, len, con );
     if( 0 > res )
     {
         switch( errno )
@@ -720,7 +739,7 @@ flushreqs( struct con * con )
     benc_val_t       pk, * val;
     struct stritem * jj;
 
-    if( !HASVERS( &con->ipc ) )
+    if( !HASVERS( con->ipc ) )
     {
         return;
     }
@@ -741,7 +760,7 @@ flushreqs( struct con * con )
             case IPC_MSG_STARTALL:
             case IPC_MSG_STOPALL:
             case IPC_MSG_REMOVEALL:
-                buf = ipc_mkempty( &con->ipc, &buflen, req->id, req->tag );
+                buf = ipc_mkempty( con->ipc, &buflen, req->id, req->tag );
                 break;
             case IPC_MSG_ADDMANYFILES:
                 ii = 0;
@@ -749,7 +768,7 @@ flushreqs( struct con * con )
                 {
                     ii++;
                 }
-                val = ipc_initval( &con->ipc, req->id, -1, &pk, TYPE_LIST );
+                val = ipc_initval( con->ipc, req->id, -1, &pk, TYPE_LIST );
                 if( NULL != val && !tr_bencListReserve( val, ii ) )
                 {
                     SLIST_FOREACH( jj, req->strs, next )
@@ -763,7 +782,7 @@ flushreqs( struct con * con )
                 SAFEFREESTRLIST( req->strs );
                 break;
             case IPC_MSG_ADDONEFILE:
-                val = ipc_initval( &con->ipc, req->id, -1, &pk, TYPE_DICT );
+                val = ipc_initval( con->ipc, req->id, -1, &pk, TYPE_DICT );
                 if( NULL != val && !tr_bencDictReserve( val, 1 ) )
                 {
                     tr_bencInitStr( tr_bencDictAdd( val, "data" ),
@@ -778,16 +797,16 @@ flushreqs( struct con * con )
             case IPC_MSG_DOWNLIMIT:
             case IPC_MSG_UPLIMIT:
             case IPC_MSG_PEX:
-                buf = ipc_mkint( &con->ipc, &buflen, req->id, -1, req->num );
+                buf = ipc_mkint( con->ipc, &buflen, req->id, -1, req->num );
                 break;
             case IPC_MSG_DIR:
-                buf = ipc_mkstr( &con->ipc, &buflen, req->id, -1, req->str );
+                buf = ipc_mkstr( con->ipc, &buflen, req->id, -1, req->str );
                 SAFEFREE( req->str );
                 break;
             case IPC_MSG_START:
             case IPC_MSG_STOP:
             case IPC_MSG_REMOVE:
-                val = ipc_initval( &con->ipc, req->id, -1, &pk, TYPE_LIST );
+                val = ipc_initval( con->ipc, req->id, -1, &pk, TYPE_LIST );
                 if( NULL != val && !tr_bencListReserve( val, req->listlen ) )
                 {
                     for( ii = 0; ii < req->listlen; ii++ )
@@ -802,7 +821,7 @@ flushreqs( struct con * con )
                 break;
             case IPC_MSG_GETINFOALL:
             case IPC_MSG_GETSTATALL:
-                buf = ipc_mkgetinfo( &con->ipc, &buflen, req->id, req->tag,
+                buf = ipc_mkgetinfo( con->ipc, &buflen, req->id, req->tag,
                                      req->types, NULL );
                 break;
             default:
@@ -838,7 +857,7 @@ sendvers( struct con * con )
     uint8_t   * buf;
     size_t      len;
 
-    buf = ipc_mkvers( &len );
+    buf = ipc_mkvers( &len, "Transmission remote" VERSION_STRING );
     if( NULL == buf )
     {
         if( EPERM == errno )

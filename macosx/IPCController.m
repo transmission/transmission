@@ -76,10 +76,10 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
 @interface IPCClient : NSObject
 {
-    NSFileHandle  * _handle;
-    struct ipc_info _ipc;
-    IPCController * _controller;
-    NSMutableData * _buf;
+    NSFileHandle    * _handle;
+    struct ipc_info * _ipc;
+    IPCController   * _controller;
+    NSMutableData   * _buf;
 }
 
 - (id)              initClient: (IPCController *) controller
@@ -269,12 +269,13 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
         return nil;
 
     _handle     = [handle retain];
-    ipc_newcon( &_ipc, funcs );
+    _ipc        = ipc_newcon( funcs );
     _controller = controller;
     _buf        = [[NSMutableData alloc] init];
 
-    buf = ipc_mkvers( &size );
-    if( nil == _buf || NULL == buf || ![self sendresp: buf size: size] )
+    buf = ipc_mkvers( &size, "Transmission MacOS X " VERSION_STRING );
+    if( NULL == _ipc || nil == _buf || NULL == buf ||
+        ![self sendresp: buf size: size] )
     {
         [self release];
         return nil;
@@ -295,6 +296,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [_handle release];
     [_buf    release];
+    ipc_freecon( _ipc );
     [super   dealloc];
 }
 
@@ -305,7 +307,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
 
 - (struct ipc_info *) ipc
 {
-    return &_ipc;
+    return _ipc;
 }
 
 - (void) gotdata: (NSNotification *) notification
@@ -338,7 +340,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     if( IPC_MIN_MSG_LEN > [_buf length] )
         return;
 
-    res = ipc_parse( &_ipc, [_buf mutableBytes], [_buf length], self );
+    res = ipc_parse( _ipc, [_buf mutableBytes], [_buf length], self );
 
     if( 0 > res )
     {
@@ -392,7 +394,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     uint8_t * buf;
     size_t    size;
 
-    buf = ipc_mkempty( &_ipc, &size, msgid, tag );
+    buf = ipc_mkempty( _ipc, &size, msgid, tag );
     if( NULL == buf )
         return FALSE;
 
@@ -407,7 +409,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     uint8_t * buf;
     size_t    size;
 
-    buf = ipc_mkint( &_ipc, &size, msgid, tag, val );
+    buf = ipc_mkint( _ipc, &size, msgid, tag, val );
     if( NULL == buf )
         return FALSE;
 
@@ -425,7 +427,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     NSMutableData * sucky;
 
     if( [val canBeConvertedToEncoding: NSUTF8StringEncoding] )
-        buf = ipc_mkstr( &_ipc, &size, msgid, tag,
+        buf = ipc_mkstr( _ipc, &size, msgid, tag,
                          [val cStringUsingEncoding: NSUTF8StringEncoding] );
     else
     {
@@ -434,7 +436,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
         /* XXX this sucks, I should add a length argument to ipc_mkstr() */
         sucky = [NSMutableData dataWithData: data];
         [sucky appendBytes: "" length: 1];
-        buf = ipc_mkstr( &_ipc, &size, msgid, tag, [sucky bytes] );
+        buf = ipc_mkstr( _ipc, &size, msgid, tag, [sucky bytes] );
     }
     if( NULL == buf )
         return FALSE;
@@ -455,7 +457,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     size_t         size;
     int            res;
 
-    pkinf = ipc_initval( &_ipc, respid, tag, &packet, TYPE_LIST );
+    pkinf = ipc_initval( _ipc, respid, tag, &packet, TYPE_LIST );
     if( NULL == pkinf )
         goto fail;
     if( tr_bencListReserve( pkinf, [tors count] ) )

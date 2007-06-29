@@ -71,7 +71,7 @@ struct constate
     int                fd;
     enum contype       type;
     struct ipc_funcs * msgs;
-    struct ipc_info    ipc;
+    struct ipc_info  * ipc;
     union
     {
         struct constate_serv   serv;
@@ -221,8 +221,15 @@ blocking_client( enum ipc_msg msgid, GList * files )
       return FALSE;
   }
 
+  con->ipc = ipc_newcon( con->msgs );
+  if( NULL == con->ipc )
+  {
+      ipc_freemsgs( con->msgs );
+      g_free( con );
+      return FALSE;
+  }
+
   ipc_setdefmsg( con->msgs, all_default );
-  ipc_newcon( &con->ipc, con->msgs );
 
   con->u.client.loop = g_main_loop_new(NULL, TRUE);
   con->u.client.msg = msgid;
@@ -333,7 +340,7 @@ client_connect(char *path, struct constate *con) {
       return FALSE;
   }
 
-  buf = ipc_mkvers( &size );
+  buf = ipc_mkvers( &size, "Transmission GTK+ " VERSION_STRING );
   if( NULL == buf )
   {
       close( con->fd );
@@ -356,19 +363,28 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
   newcon = g_new(struct constate, 1);
   memcpy(newcon, con, sizeof(*newcon));
   newcon->fd = fd;
-  ipc_newcon( &newcon->ipc, con->msgs );
-  newcon->source = io_new(fd, NULL, srv_io_received, all_io_closed, newcon);
 
-  if( NULL == newcon->source )
+  newcon->ipc = ipc_newcon( con->msgs );
+  if( NULL == newcon->ipc )
   {
       g_free( newcon );
       close( fd );
       return;
   }
 
-  buf = ipc_mkvers( &size );
+  newcon->source = io_new(fd, NULL, srv_io_received, all_io_closed, newcon);
+  if( NULL == newcon->source )
+  {
+      ipc_freecon( newcon->ipc );
+      g_free( newcon );
+      close( fd );
+      return;
+  }
+
+  buf = ipc_mkvers( &size, "Transmission GTK+ " VERSION_STRING );
   if( NULL == buf )
   {
+      ipc_freecon( newcon->ipc );
       g_free( newcon );
       close( fd );
       return;
@@ -395,7 +411,7 @@ srv_io_received( GSource * source SHUTUP, void * data, size_t len,
         destroycon( con );
     }
 
-    res = ipc_parse( &con->ipc, data, len, con );
+    res = ipc_parse( con->ipc, data, len, con );
 
     if( 0 > res )
     {
@@ -431,7 +447,7 @@ cli_io_received( GSource * source SHUTUP, void * data, size_t len,
         return 0;
     }
 
-    res = ipc_parse( &con->ipc, data, len, con );
+    res = ipc_parse( con->ipc, data, len, con );
 
     if( 0 > res )
     {
@@ -452,7 +468,7 @@ cli_io_received( GSource * source SHUTUP, void * data, size_t len,
         return 0;
     }
 
-    if( HASVERS( &con->ipc ) && 0 == cli->msgid )
+    if( HASVERS( con->ipc ) && 0 == cli->msgid )
     {
         client_sendmsg( con );
     }
@@ -473,7 +489,7 @@ client_sendmsg( struct constate * con )
     switch( cli->msg )
     {
         case IPC_MSG_ADDMANYFILES:
-            val = ipc_initval( &con->ipc, cli->msg, -1, &packet, TYPE_LIST );
+            val = ipc_initval( con->ipc, cli->msg, -1, &packet, TYPE_LIST );
             if( NULL == val ||
                 tr_bencListReserve( val, g_list_length( cli->files ) ) )
             {
@@ -492,7 +508,7 @@ client_sendmsg( struct constate * con )
             cli->files = NULL;
             break;
         case IPC_MSG_QUIT:
-            buf = ipc_mkempty( &con->ipc, &size, cli->msg, -1 );
+            buf = ipc_mkempty( con->ipc, &size, cli->msg, -1 );
             saved = errno;
             break;
         default:
@@ -518,6 +534,7 @@ destroycon(struct constate *con) {
   if(0 <= con->fd)
     close(con->fd);
   con->fd = -1;
+  ipc_freecon( con->ipc );
 
   switch(con->type) {
     case CON_SERV:
@@ -689,7 +706,7 @@ smsg_info( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     }
     typeflags = ipc_infotypes( respid, types );
 
-    pkval = ipc_initval( &con->ipc, respid, tag, &packet, TYPE_LIST );
+    pkval = ipc_initval( con->ipc, respid, tag, &packet, TYPE_LIST );
     if( NULL == pkval )
     {
         simpleresp( con, tag, IPC_MSG_FAIL );
@@ -747,7 +764,7 @@ smsg_infoall( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     respid = ( IPC_MSG_GETINFOALL == id ? IPC_MSG_INFO : IPC_MSG_STAT );
     typeflags = ipc_infotypes( respid, val );
 
-    pkval = ipc_initval( &con->ipc, respid, tag, &packet, TYPE_LIST );
+    pkval = ipc_initval( con->ipc, respid, tag, &packet, TYPE_LIST );
     if( NULL == pkval )
     {
         simpleresp( con, tag, IPC_MSG_FAIL );
@@ -819,7 +836,7 @@ smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
         return;
     }
 
-    pkval = ipc_initval( &con->ipc, IPC_MSG_INFO, tag, &packet, TYPE_LIST );
+    pkval = ipc_initval( con->ipc, IPC_MSG_INFO, tag, &packet, TYPE_LIST );
     if( NULL == pkval )
     {
         simpleresp( con, tag, IPC_MSG_FAIL );
@@ -962,18 +979,18 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
     {
         case IPC_MSG_GETAUTOMAP:
             hstat = tr_handleStatus( tr_core_handle( srv->core ) );
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_AUTOMAP, tag,
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_AUTOMAP, tag,
                              !TR_NAT_TRAVERSAL_IS_DISABLED(
                                  hstat->natTraversalStatus ) );
             break;
         case IPC_MSG_GETAUTOSTART:
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_AUTOSTART, tag, 1 );
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_AUTOSTART, tag, 1 );
             break;
         case IPC_MSG_GETDIR:
             pref = tr_prefs_get( PREF_ID_ASKDIR );
             /* XXX sending back "" when we're prompting is kind of bogus */
             pref = strbool( pref ) ? "" : getdownloaddir();
-            buf = ipc_mkstr( &con->ipc, &size, IPC_MSG_DIR, tag, pref );
+            buf = ipc_mkstr( con->ipc, &size, IPC_MSG_DIR, tag, pref );
             break;
         case IPC_MSG_GETDOWNLIMIT:
             num = -1;
@@ -981,14 +998,14 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
             {
                 num = tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT );
             }
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_DOWNLIMIT, tag, num );
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_DOWNLIMIT, tag, num );
             break;
         case IPC_MSG_GETPEX:
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_PEX, tag,
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_PEX, tag,
                              tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
             break;
         case IPC_MSG_GETPORT:
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_PORT, tag,
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_PORT, tag,
                              tr_prefs_get_int_with_default( PREF_ID_PORT ) );
             break;
         case IPC_MSG_GETUPLIMIT:
@@ -997,7 +1014,7 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
             {
                 num = tr_prefs_get_int_with_default( PREF_ID_UPLIMIT );
             }
-            buf = ipc_mkint( &con->ipc, &size, IPC_MSG_UPLIMIT, tag, num );
+            buf = ipc_mkint( con->ipc, &size, IPC_MSG_UPLIMIT, tag, num );
             break;
         default:
             g_assert_not_reached();
@@ -1107,7 +1124,7 @@ smsg_sup( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    pkval = ipc_initval( &con->ipc, IPC_MSG_SUP, tag, &packet, TYPE_LIST );
+    pkval = ipc_initval( con->ipc, IPC_MSG_SUP, tag, &packet, TYPE_LIST );
     if( NULL == pkval )
     {
         simpleresp( con, tag, IPC_MSG_FAIL );
@@ -1127,8 +1144,8 @@ smsg_sup( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
         {
             continue;
         }
-        found = ipc_msgid( &con->ipc, name->val.s.s );
-        if( IPC__MSG_COUNT == found || !ipc_ishandled( &con->ipc, found ) )
+        found = ipc_msgid( con->ipc, name->val.s.s );
+        if( IPC__MSG_COUNT == found || !ipc_ishandled( con->ipc, found ) )
         {
             continue;
         }
@@ -1170,7 +1187,7 @@ simpleresp( struct constate * con, int64_t tag, enum ipc_msg id )
     uint8_t         * buf;
     size_t            size;
 
-    buf = ipc_mkempty( &con->ipc, &size, id, tag );
+    buf = ipc_mkempty( con->ipc, &size, id, tag );
     if( NULL == buf )
     {
         return FALSE;

@@ -72,6 +72,10 @@ receive a version value that is an integer instead of a dictionary
 with "min" and "max" keys. This deprecated version format indicates
 the only version supported by the server.
 
+The version dictionary may optionally contain a key "label". This is a
+human-readable name for the software, it is not machine-readable and
+neither servers nor clients should attempt to parse it.
+
 An example message containing minimum and maximum versions 1 and 2:
 
 0000001Dd7:versiond3:mini1e3:maxi2eee

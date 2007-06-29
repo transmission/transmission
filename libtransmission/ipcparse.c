@@ -292,12 +292,29 @@ ipc_freemsgs( struct ipc_funcs * tree )
     free( tree );
 }
 
-void
-ipc_newcon( struct ipc_info * info, struct ipc_funcs * funcs )
+struct ipc_info *
+ipc_newcon( struct ipc_funcs * funcs )
 {
-    bzero( info, sizeof *info );
-    info->funcs = funcs;
-    info->vers  = -1;
+    struct ipc_info * info;
+
+    info = calloc( 1, sizeof *info );
+    if( NULL != info )
+    {
+        info->funcs = funcs;
+        info->vers  = -1;
+    }
+
+    return info;
+}
+
+void
+ipc_freecon( struct ipc_info * info )
+{
+    if( NULL != info )
+    {
+        free( info->label );
+        free( info );
+    }
 }
 
 benc_val_t *
@@ -439,7 +456,7 @@ ipc_mkstr( struct ipc_info * info, size_t * len, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkvers( size_t * len )
+ipc_mkvers( size_t * len, const char * label )
 {
     benc_val_t pk, * dict;
     uint8_t  * ret;
@@ -452,13 +469,15 @@ ipc_mkvers( size_t * len )
     dict = tr_bencDictAdd( &pk, MSGNAME( IPC_MSG_VERSION ) );
 
     tr_bencInit( dict, TYPE_DICT );
-    if( tr_bencDictReserve( dict, 2 ) )
+    if( tr_bencDictReserve( dict, ( NULL == label ? 2 : 3 ) ) )
     {
         SAFEBENCFREE( &pk );
         return NULL;
     }
     tr_bencInitInt( tr_bencDictAdd( dict, "min" ), PROTO_VERS_MIN );
     tr_bencInitInt( tr_bencDictAdd( dict, "max" ), PROTO_VERS_MAX );
+    if( NULL != label )
+        tr_bencInitStr( tr_bencDictAdd( dict, "label" ), label, -1, 1 );
 
     ret = ipc_mkval( &pk, len );
     SAFEBENCFREE( &pk );

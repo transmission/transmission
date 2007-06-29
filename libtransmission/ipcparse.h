@@ -123,9 +123,11 @@ struct ipc_info
 {
     struct ipc_funcs * funcs;
     int                vers;
+    char             * label;
 };
 
 #define HASVERS( info )         ( 0 < (info)->vers )
+#define VERSLABEL( info )       ( (info)->label )
 
 #define TORRENT_ID_VALID( id )  ( 0 < (id) && INT_MAX > (id) )
 
@@ -139,7 +141,8 @@ struct ipc_funcs * ipc_initmsgs ( void );
 int          ipc_addmsg   ( struct ipc_funcs *, enum ipc_msg, trd_msgfunc );
 void         ipc_setdefmsg( struct ipc_funcs *, trd_msgfunc );
 void         ipc_freemsgs ( struct ipc_funcs * );
-void         ipc_newcon   ( struct ipc_info *, struct ipc_funcs * );
+struct ipc_info * ipc_newcon( struct ipc_funcs * );
+void         ipc_freecon  ( struct ipc_info * );
 
 /* message creation */
 /* sets errno to EPERM if requested message not supported by protocol vers */
@@ -152,7 +155,7 @@ uint8_t *    ipc_mkint    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int64_t );
 uint8_t *    ipc_mkstr    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             const char * );
-uint8_t *    ipc_mkvers   ( size_t * );
+uint8_t *    ipc_mkvers   ( size_t *, const char * );
 uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int, const int * );
 int          ipc_addinfo  ( benc_val_t *, int, tr_info_t *, int );
