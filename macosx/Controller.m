@@ -311,7 +311,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             {
                 [fTorrents addObject: torrent];
                 [torrent release];
-                NSLog(@"history restore: %u", (long)[torrent retainCount]);
             }
         
         [history release];
@@ -545,18 +544,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //save history and stop running torrents
     [self updateTorrentHistory];
-    #warning check if all torrents are fully released
-    //Torrent * torrent = [fTorrents objectAtIndex: 0];
-    //NSLog(@"%d", (long)[torrent retainCount]);
     [fDisplayedTorrents removeAllObjects];
-    
-    enumerator = [fTorrents objectEnumerator];
-    //Torrent * torrent;
-    /*while ((torrent = [enumerator nextObject]))
-        [torrent endTorrent];*/
-    
     [fTorrents removeAllObjects];
-    //NSLog(@"%d", (long)[torrent retainCount]);
+    
     //disable NAT traversal
     tr_natTraversalEnable(fLib, 0);
     
@@ -1124,9 +1114,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentOrderValue = [torrent orderValue];
         if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
-        NSLog(@"before");
+        
         [fTorrents removeObject: torrent];
-        [fDisplayedTorrents removeObject: torrent];NSLog(@"after");
+        [fDisplayedTorrents removeObject: torrent];
     }
     [torrents release];
 

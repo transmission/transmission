@@ -630,6 +630,7 @@
         return NO;
     }
     
+    #warning disable if all can't be checked
     if (action == @selector(setOnlySelectedCheck:))
         return [fFileOutline selectedRow] != -1;
     

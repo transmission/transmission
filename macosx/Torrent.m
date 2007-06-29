@@ -190,8 +190,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
-    NSLog(@"Released!");
-    NSLog(@"%d", (long)[self retainCount]);
     if (fHandle)
     {
         tr_torrentClose(fHandle);
@@ -1477,7 +1475,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (!(self = [super init]))
         return nil;
     
-    NSLog(@"init %d", (long)[self retainCount]);
     static_lastid++;
     fID = static_lastid;
     
@@ -1587,9 +1584,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int i;
     for (i = 0; i < MAX_PIECES; i++)
         fPieces[i] = BLANK_PIECE;
-    NSLog(@"end1 %d", (long)[self retainCount]);
+    
     [self update];
-    NSLog(@"end2 %d", (long)[self retainCount]);
     return self;
 }
 
