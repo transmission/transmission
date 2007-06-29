@@ -397,6 +397,20 @@ char * tr_bencSaveMalloc( benc_val_t * val, int * len )
     return buf;
 }
 
+typedef struct
+{
+    const char * key;
+    int index;
+}
+KeyIndex;
+
+static int compareKeyIndex( const void * va, const void * vb )
+{
+    const KeyIndex * a = (const KeyIndex *) va;
+    const KeyIndex * b = (const KeyIndex *) vb;
+    return strcmp( a->key, b->key );
+}
+
 int tr_bencSave( benc_val_t * val, char ** buf, int * used, int * max )
 {
     int ii;    
@@ -405,37 +419,49 @@ int tr_bencSave( benc_val_t * val, char ** buf, int * used, int * max )
     {
         case TYPE_INT:
             if( tr_sprintf( buf, used, max, "i%"PRId64"e", val->val.i ) )
-            {
                 return 1;
-            }
             break;
 
         case TYPE_STR:
             if( tr_sprintf( buf, used, max, "%i:", val->val.s.i ) ||
                 tr_concat( buf, used,  max, val->val.s.s, val->val.s.i ) )
-            {
                 return 1;
-            }
             break;
 
         case TYPE_LIST:
-        case TYPE_DICT:
-            if( tr_sprintf( buf, used, max,
-                            (TYPE_LIST == val->type ? "l" : "d") ) )
-            {
+            if( tr_sprintf( buf, used, max, "l" ) )
                 return 1;
-            }
             for( ii = 0; val->val.l.count > ii; ii++ )
-            {
                 if( tr_bencSave( val->val.l.vals + ii, buf, used, max ) )
-                {
                     return 1;
-                }
-            }
             if( tr_sprintf( buf, used, max, "e" ) )
-            {
                 return 1;
-            }
+            break;
+
+        case TYPE_DICT:
+            /* Keys must be strings and appear in sorted order
+               (sorted as raw strings, not alphanumerics). */
+            if( tr_sprintf( buf, used, max, "d" ) )
+                return 1;
+            if( 1 ) {
+                int i;
+                KeyIndex * indices = tr_new( KeyIndex, val->val.l.count );
+                for( ii=i=0; i<val->val.l.count; i+=2 ) {
+                    indices[ii].key = val->val.l.vals[i].val.s.s;
+                    indices[ii].index = i;
+                    ii++;
+                }
+                qsort( indices, ii, sizeof(KeyIndex), compareKeyIndex );
+                for( i=0; i<ii; ++i ) {
+                    const int index = indices[i].index;
+                    if( tr_bencSave( val->val.l.vals + index,     buf, used, max ) ||
+                        tr_bencSave( val->val.l.vals + index + 1, buf, used, max ) )
+                        return 1;
+                }
+                tr_free( indices );
+            } 
+            if( tr_sprintf( buf, used, max, "e" ) )
+                return 1;
             break;
     }
 
