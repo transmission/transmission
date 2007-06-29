@@ -864,7 +864,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
     {
         double outboundSpeedKiBs;
         double inboundSpeedKiBs;
-        int j, size;
+        int size;
         tr_peer_t * peer = tor->peers[ i ];
 
         if( !tr_peerIsConnected( peer ) )
@@ -895,7 +895,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
         }
     }
 
-    deadbeats = g_new( tr_peer_t*, tor->peerCount );
+    deadbeats = tr_new( tr_peer_t*, tor->peerCount );
     deadbeatCount = 0;
     for( i=0; i<tor->peerCount; ++i ) {
         tr_peer_t * peer = tor->peers[ i ];
