@@ -613,10 +613,19 @@ writeEnd:
         &&  peer->inRequestCount < peer->inRequestMax )
     {
         int i;
-        int poolSize=0, endgame=0;
-        int * pool = getPreferredPieces ( tor, peer, &poolSize, &endgame );
+        int poolSize = 0;
+        int * pool = getPreferredPieces ( tor, peer, &poolSize );
+        const int endgame = !poolSize;
 
-        for( i=0; i<poolSize && peer->inRequestCount<peer->inRequestMax;  )
+        if( endgame ) /* endgame -- request everything we don't already have */
+        {
+            const tr_bitfield_t * blocks = tr_cpBlockBitfield( tor->completion );
+            for( i=0; i<tor->blockCount && peer->inRequestCount<peer->inRequestMax; ++i ) {
+                if( tr_bitfieldHas( blocks, i ) )
+                    sendRequest( tor, peer, i );
+            }
+        }
+        else for( i=0; i<poolSize && peer->inRequestCount<peer->inRequestMax;  )
         {
             int unused;
             const int piece = pool[i];
@@ -629,7 +638,7 @@ writeEnd:
             else ++i;
         }
 
-        free( pool );
+        tr_free( pool );
     }
 
     return TR_OK;

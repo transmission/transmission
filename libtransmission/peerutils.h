@@ -277,28 +277,18 @@ int comparePieces (const void * aIn, const void * bIn)
 
 static int* getPreferredPieces( const tr_torrent_t  * tor,
                                 const tr_peer_t     * peer,
-                                int                 * pieceCount,
-                                int                 * endgame )
+                                int                 * pieceCount )
 {
     const tr_info_t * inf = &tor->info;
 
     int i;
     int poolSize = 0;
-    int * pool = malloc ( inf->pieceCount * sizeof(int) );
-
-    *endgame = 0;
+    int * pool = tr_new( int, inf->pieceCount );
 
     for( i=0; i<inf->pieceCount; ++i )
         if( isPieceInteresting( tor, peer, i ) )
             if( tr_cpMissingBlocksForPiece( tor->completion, i ) )
                 pool[poolSize++] = i;
-
-    if( !poolSize ) {
-        *endgame = 1;
-        for( i=0; i<inf->pieceCount; ++i )
-            if( isPieceInteresting( tor, peer, i ) )
-                pool[poolSize++] = i;
-    }
 
 #if 0
 fprintf (stderr, "old pool: ");
@@ -309,7 +299,7 @@ fprintf (stderr, "\n");
     /* sort the rest from most interesting to least */
     if( poolSize > 1 )
     {
-        PieceCompareData * p = malloc ( poolSize * sizeof(PieceCompareData) );
+        PieceCompareData * p = tr_new( PieceCompareData, poolSize );
 
         for( i=0; i<poolSize; ++i )
         {
@@ -331,7 +321,7 @@ fprintf (stderr, "\n");
         for( i=0; i<poolSize; ++i )
             pool[i] = p[i].piece;
 
-        free( p );
+        tr_free( p );
     }
 
 #if 0
