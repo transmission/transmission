@@ -165,18 +165,19 @@ void tr_rcClose( tr_ratecontrol_t * r )
 static float rateForInterval( tr_ratecontrol_t * r, int interval )
 {
     tr_transfer_t * t = NULL;
-    uint64_t now, start;
-    int i, total;
+    uint64_t now, then, start;
+    float total = 0;
+    int i;
 
-    now = tr_date();
+    now = then = tr_date();
     start = now - interval;
 
     /* Browse the history back in time */
-    total = 0;
     for( i = r->transferStop; i != r->transferStart; i-- )
     {
         t = &r->transfers[i];
-        if( t->date < start )
+        then = t->date;
+        if( then < start )
             break;
 
         total += t->size;
@@ -184,6 +185,7 @@ static float rateForInterval( tr_ratecontrol_t * r, int interval )
         if( !i )
             i = HISTORY_SIZE; /* Loop */
     }
+#if 0
     if( ( r->transferStop + 1 ) % HISTORY_SIZE == r->transferStart
         && i == r->transferStart )
     {
@@ -192,7 +194,10 @@ static float rateForInterval( tr_ratecontrol_t * r, int interval )
          * interval so that we return the correct rate */
         interval = now - t->date;
     }
+#endif
 
-    return ( 1000.0f / 1024.0f ) * total / interval;
+    if( now == then )
+        return 0.0;
+    return ( 1000.0f / 1024.0f ) * total / (now - then);
 }
 

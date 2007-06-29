@@ -237,7 +237,7 @@ static inline int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_ERROR;
     }
 
-    if( peer->outRequestCount >= MAX_REQUEST_COUNT )
+    if( peer->outRequestCount >= peer->outRequestMax )
     {
         tr_err( "Too many requests" );
         return TR_ERROR;
@@ -523,7 +523,8 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
                 }
                 peer_dbg( "GET  unknown extended message '%hhu'", extid );
             }
-            return 1;
+            /* ignore the unknown extension */
+            return 0;
         case AZ_MSG_BT_KEEP_ALIVE:
             return TR_OK;
         case AZ_MSG_AZ_PEER_EXCHANGE:
@@ -536,7 +537,7 @@ static inline int parseMessage( tr_torrent_t * tor, tr_peer_t * peer,
             return 0;
     }
 
-    peer_dbg( "GET  unknown message '%d'", id );
+    tr_err( "GET  unknown message '%d'", id );
     return TR_ERROR;
 }
 

@@ -200,7 +200,7 @@ void tr_chokingPulse( tr_choking_t * c )
             }
             else
             {
-                if( tr_peerLastChoke( peer ) + 10000 < now )
+                if( !tr_peerTimesChoked(peer) || tr_peerLastChoke( peer ) + 10000 < now )
                     canUnchoke[canUnchokeCount++] = peer;
             }
         }

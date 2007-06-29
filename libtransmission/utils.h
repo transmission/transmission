@@ -180,6 +180,8 @@ static inline int _tr_block( const tr_torrent_t * tor, int index, int begin )
     ((struct_type *) tr_malloc (((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
 #define tr_new0(struct_type, n_structs)          \
     ((struct_type *) tr_malloc0 (((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
+#define tr_renew(struct_type, mem, n_structs)    \
+    ((struct_type *) realloc ((mem), ((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
 
 void* tr_malloc  ( size_t );
 void* tr_malloc0 ( size_t );

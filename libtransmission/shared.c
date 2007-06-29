@@ -26,7 +26,8 @@
 #include "peer.h"
 
 /* Maximum number of peers that we keep in our local list */
-#define MAX_PEER_COUNT 42
+/* This is an arbitrary number, but it seems to work well */
+#define MAX_PEER_COUNT 128
 
 struct tr_shared_s
 {

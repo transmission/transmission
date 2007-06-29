@@ -45,6 +45,7 @@ int         tr_peerIsFrom          ( const tr_peer_t * );
 int         tr_peerAmChoking       ( const tr_peer_t * );
 int         tr_peerAmInterested    ( const tr_peer_t * );
 int         tr_peerIsChoking       ( const tr_peer_t * );
+int         tr_peerTimesChoked     ( const tr_peer_t * );
 int         tr_peerIsInterested    ( const tr_peer_t * );
 float       tr_peerProgress        ( const tr_peer_t * );
 int         tr_peerPort            ( const tr_peer_t * );

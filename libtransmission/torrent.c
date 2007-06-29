@@ -544,8 +544,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->peersDownloading = 0;
     for( i=0; i<tor->peerCount; ++i ) {
         const tr_peer_t * peer = tor->peers[i];
-        if( tr_peerIsConnected( peer ) ) {
             ++s->peersTotal;
+        if( tr_peerIsConnected( peer ) ) {
             ++s->peersFrom[tr_peerIsFrom(peer)];
             if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
                 ++s->peersUploading;
@@ -953,7 +953,7 @@ torrentThreadLoop ( void * _tor )
         cp_status_t cpStatus;
 
         /* sleep a little while */
-        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1000 : 100 );
+        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 800 );
 
         /* if we're stopping... */
         if( tor->runStatus == TR_RUN_STOPPING )

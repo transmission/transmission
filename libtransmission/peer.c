@@ -45,7 +45,7 @@ static const int SWIFT_ENABLED = 1;
  * For every byte the peer uploads to us,
  * allow them to download this many bytes from us
  */
-static const double SWIFT_REPAYMENT_RATIO = 1.1;
+static const double SWIFT_REPAYMENT_RATIO = 1.33;
 
 /**
  * Allow new peers to download this many bytes from
@@ -70,7 +70,7 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 ******
 *****/
 
-#define PERCENT_PEER_WANTED     25      /* Percent before we start relax peers min activeness */
+#define PERCENT_PEER_WANTED     75      /* Percent before we start relax peers min activeness */
 #define MIN_UPLOAD_IDLE         60000   /* In high peer situations we wait only 1 min
                                             until dropping peers for idling */
 #define MAX_UPLOAD_IDLE         240000  /* In low peer situations we wait the
@@ -83,9 +83,6 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
                                             during low peer situations */
 #define MAX_CON_TIMEOUT         30000   /* Time to timeout connecting to peer, 
                                             during high peer situations */
-#define MAX_REQUEST_COUNT       32
-#define OUR_REQUEST_COUNT       12 /* TODO: we should detect if we are on a
-                                      high-speed network and adapt */
 #define PEX_PEER_CUTOFF         50 /* only try to add new peers from pex if
                                       we have fewer existing peers than this */
 #define PEX_INTERVAL            60 /* don't send pex messages more frequently
@@ -150,6 +147,7 @@ struct tr_peer_s
     char                peerInterested;
 
     int                 optimistic;
+    int                 timesChoked;
     uint64_t            lastChoke;
 
     uint8_t             id[TR_ID_LEN];
@@ -180,14 +178,18 @@ struct tr_peer_s
     int                 outBlockSending;
 
     int                 inRequestCount;
-    tr_request_t        inRequests[OUR_REQUEST_COUNT];
+    int                 inRequestMax;
+    int                 inRequestAlloc;
+    tr_request_t      * inRequests;
     int                 inIndex;
     int                 inBegin;
     int                 inLength;
     uint64_t            inTotal;
 
     int                 outRequestCount;
-    tr_request_t        outRequests[MAX_REQUEST_COUNT];
+    int                 outRequestMax;
+    int                 outRequestAlloc;
+    tr_request_t      * outRequests;
     uint64_t            outTotal;
     uint64_t            outDate;
 
@@ -232,6 +234,12 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
     tr_peer_t * peer = peerInit();
 
     assert( 0 <= from && TR_PEER_FROM__MAX > from );
+
+    peer->outRequestMax = peer->outRequestAlloc = 2;
+    peer->outRequests = tr_new0( tr_request_t, peer->outRequestAlloc );
+
+    peer->inRequestMax = peer->inRequestAlloc = 2;
+    peer->inRequests = tr_new0( tr_request_t, peer->inRequestAlloc );
 
     peer->socket = s;
     peer->addr = addr;
@@ -354,10 +362,17 @@ int tr_peerRead( tr_peer_t * peer )
             peer->size *= 2;
             peer->buf   = realloc( peer->buf, peer->size );
         }
+#if 0
         /* Never read more than 1K each time, otherwise the rate
            control is no use */
         ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
-                          MIN( 1024, peer->size - peer->pos ) );
+                          MIN( 1024, peer->size - peer->pos ) ); 
+#else
+        /* Hm, it doesn't *seem* to break rate control... */
+        ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
+                          peer->size - peer->pos ); 
+#endif
+
         if( ret & TR_NET_CLOSE )
         {
             peer_dbg( "connection closed" );
@@ -595,21 +610,13 @@ writeEnd:
     if(     peer->amInterested
         && !peer->peerChoking
         && !peer->banned
-        &&  peer->inRequestCount < OUR_REQUEST_COUNT )
+        &&  peer->inRequestCount < peer->inRequestMax )
     {
         int i;
         int poolSize=0, endgame=0;
         int * pool = getPreferredPieces ( tor, peer, &poolSize, &endgame );
 
-        /* TODO: add some asserts to see if this bitfield is really necessary */
-        tr_bitfield_t * requestedBlocks = tr_bitfieldNew( tor->blockCount );
-        for( i=0; i<peer->inRequestCount; ++i) {
-            const tr_request_t * r = &peer->inRequests[i];
-            const int block = tr_block( r->index, r->begin );
-            tr_bitfieldAdd( requestedBlocks, block );
-        }
-
-        for( i=0; i<poolSize && peer->inRequestCount<OUR_REQUEST_COUNT;  )
+        for( i=0; i<poolSize && peer->inRequestCount<peer->inRequestMax;  )
         {
             int unused;
             const int piece = pool[i];
@@ -617,15 +624,11 @@ writeEnd:
                 ? tr_cpMostMissingBlockInPiece( tor->completion, piece, &unused)
                 : tr_cpMissingBlockInPiece ( tor->completion, piece );
 
-            if( block>=0 && (endgame || !tr_bitfieldHas( requestedBlocks, block ) ) )
-            {
-                tr_bitfieldAdd( requestedBlocks, block );
+            if( block>=0 )
                 sendRequest( tor, peer, block );
-            }
             else ++i;
         }
 
-        tr_bitfieldFree( requestedBlocks );
         free( pool );
     }
 
@@ -684,10 +687,16 @@ float tr_peerUploadRate( const tr_peer_t * peer )
     return tr_rcRate( peer->upload );
 }
 
+int tr_peerTimesChoked( const tr_peer_t * peer )
+{
+    return peer->timesChoked;
+}
+
 void tr_peerChoke( tr_peer_t * peer )
 {
     sendChoke( peer, 1 );
     peer->lastChoke = tr_date();
+    ++peer->timesChoked;
 }
 
 void tr_peerUnchoke( tr_peer_t * peer )
@@ -838,6 +847,44 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
 
     tr_torrentWriterLock( tor );
 
+    for( i=0; i<tor->peerCount; ++i )
+    {
+        /* preferred # of seconds for the request queue's turnaround time.
+           this is just an arbitrary number. */
+        const int queueTime = 5;
+        int j;
+        tr_peer_t * peer = tor->peers[ i ];
+
+        if( !tr_peerIsConnected( peer ) )
+            continue;
+
+        /* decide how deep the request queue should be */
+        peer->outRequestMax = queueTime * tr_rcRate(peer->download) / tor->blockSize;
+        peer->inRequestMax += 2; /* room to grow */
+
+        /* make room for new requests */
+        if( peer->outRequestAlloc < peer->outRequestMax ) {
+            peer->outRequestAlloc = peer->outRequestMax;
+            peer->outRequests = tr_renew( tr_request_t, peer->outRequests, peer->outRequestAlloc );
+        }
+
+        /* decide how deep the request queue should be */
+        peer->inRequestMax = queueTime * tr_rcRate(peer->download) / (tor->blockSize/1024);
+        peer->inRequestMax += 2; /* room to grow */
+
+        /* make room for new requests */
+        if( peer->inRequestAlloc < peer->inRequestMax ) {
+            peer->inRequestAlloc = peer->inRequestMax;
+            peer->inRequests = tr_renew( tr_request_t, peer->inRequests, peer->inRequestAlloc );
+        }
+
+        /* queue shrank... notify completion that we won't be sending those requests */
+        for( j=peer->inRequestMax; j<peer->inRequestCount; ++j ) {
+            tr_request_t * r = &peer->inRequests[j];
+            tr_cpDownloaderRem( tor->completion, tr_block(r->index,r->begin) );
+        }
+    }
+
     deadbeats = tr_calloc( tor->peerCount, sizeof(tr_peer_t*) );
     for( i=0; i<tor->peerCount; ++i ) {
         tr_peer_t * peer = tor->peers[ i ];
@@ -847,7 +894,7 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
 
     if( deadbeatCount )
     {
-        const double ul_KiBsec = tr_rcRate( tor->upload );
+        const double ul_KiBsec = tr_rcRate( tor->download );
         const double ul_KiB = ul_KiBsec * SWIFT_REFRESH_INTERVAL_SEC;
         const double ul_bytes = ul_KiB * 1024;
         const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
