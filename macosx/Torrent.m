@@ -138,12 +138,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSDictionary *) history
 {
+    #warning not all being stored
     NSMutableDictionary * history = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                     [NSNumber numberWithBool: fPublicTorrent], @"PublicCopy",
                     [self hashString], @"TorrentHash",
                     fDownloadFolder, @"DownloadFolder",
                     [NSNumber numberWithBool: fUseIncompleteFolder], @"UseIncompleteFolder",
-                    fIncompleteFolder, @"IncompleteFolder",
                     [NSNumber numberWithBool: [self isActive]], @"Active",
                     fDateAdded, @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
@@ -155,6 +155,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [self orderValue], @"OrderValue",
                     nil];
+    
+    if (fIncompleteFolder)
+        [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
     
     //set file should download
     int fileCount = [self fileCount];
@@ -1506,7 +1509,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String], TR_FLAG_SAVE, &error);
+            fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String],
+                                            TR_FLAG_SAVE | TR_FLAG_PAUSED, &error);
         }
         tr_metainfoFree(&info);
     }
@@ -1516,7 +1520,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         {
             currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String], TR_FLAG_SAVE, &error);
+            fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String],
+                                        TR_FLAG_SAVE | TR_FLAG_PAUSED, &error);
         }
         tr_metainfoFree(&info);
     }
