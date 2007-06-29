@@ -311,7 +311,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             {
                 [fTorrents addObject: torrent];
                 [torrent release];
-                NSLog(@"%u", (long)[torrent retainCount]);
+                NSLog(@"history restore: %u", (long)[torrent retainCount]);
             }
         
         [history release];
@@ -551,9 +551,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDisplayedTorrents removeAllObjects];
     
     enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        [torrent endTorrent];
+    //Torrent * torrent;
+    /*while ((torrent = [enumerator nextObject]))
+        [torrent endTorrent];*/
     
     [fTorrents removeAllObjects];
     //NSLog(@"%d", (long)[torrent retainCount]);
@@ -1124,10 +1124,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentOrderValue = [torrent orderValue];
         if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
-        
+        NSLog(@"before");
         [fTorrents removeObject: torrent];
-        [fDisplayedTorrents removeObject: torrent];
-        [torrent endTorrent];
+        [fDisplayedTorrents removeObject: torrent];NSLog(@"after");
     }
     [torrents release];
 

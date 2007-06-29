@@ -309,6 +309,11 @@
     [fFileOutline reloadData];
 }
 
+- (Torrent *) selectedTorrent
+{
+    return fTorrents && [fTorrents count] > 0 ? [fTorrents objectAtIndex: 0] : nil;
+}
+
 - (void) updateInfoStats
 {
     NSString * ident = [[fTabView selectedTabViewItem] identifier];

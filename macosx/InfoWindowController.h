@@ -66,6 +66,7 @@
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
+- (Torrent *) selectedTorrent;
 - (void) updateInfoStats;
 
 - (void) updateRatioForTorrent: (Torrent *) torrent;

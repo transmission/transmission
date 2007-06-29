@@ -1,4 +1,5 @@
 #import "FilePriorityCell.h"
+#import "InfoWindowController.h"
 #import "Torrent.h"
 
 @implementation FilePriorityCell
@@ -31,7 +32,7 @@
     [super setSelected: flag forSegment: segment];
     
     //only for when clicking manually
-    Torrent * torrent = [fItem objectForKey: @"Torrent"];
+    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
     NSIndexSet * indexes = [fItem objectForKey: @"Indexes"];
     if (![torrent canChangeDownloadCheckForFiles: indexes])
         return;
@@ -50,7 +51,7 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    Torrent * torrent = [fItem objectForKey: @"Torrent"];
+    Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
     NSIndexSet * indexSet = [fItem objectForKey: @"Indexes"];
     
     if (![torrent canChangeDownloadCheckForFiles: indexSet])

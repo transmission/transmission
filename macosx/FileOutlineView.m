@@ -24,6 +24,7 @@
 
 #import "FileOutlineView.h"
 #import "FileBrowserCell.h"
+#import "InfoWindowController.h"
 #import "Torrent.h"
 
 @implementation FileOutlineView
@@ -103,7 +104,8 @@
     {
         NSDictionary * item = [self itemAtRow: row];
         if ([[item objectForKey: @"IsFolder"] boolValue]
-                || ![[item objectForKey: @"Torrent"] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+                || ![[(InfoWindowController *)[[self window] windowController] selectedTorrent]
+                        canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
             [fNormalColor set];
         else
         {
@@ -131,13 +133,14 @@
 
     NSDictionary * item;
     int i, priority;
+    Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
     for (i = 0; i < [self numberOfRows]; i++)
     {
         if ([self isRowSelected: i])
         {
             item = [self itemAtRow: i];
             if (![[item objectForKey: @"IsFolder"] boolValue]
-                && [[item objectForKey: @"Torrent"] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+                && [torrent canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
             {
                 priority = [[item objectForKey: @"Priority"] intValue];
                 if (priority == PRIORITY_HIGH)

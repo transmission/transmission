@@ -39,7 +39,6 @@
     tr_stat_t    * fStat;
     
     int fID;
-    BOOL fInitialized;
     
     BOOL         fResumeOnWake;
     NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate,
@@ -75,8 +74,6 @@
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 
 - (NSDictionary *) history;
-
-- (void) endTorrent;
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder;
 - (void) changeDownloadFolder: (NSString *) folder;

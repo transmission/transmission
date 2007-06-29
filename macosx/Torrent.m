@@ -188,24 +188,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return history;
 }
 
-#warning need for now :(
-- (void) endTorrent
-{
-    if (fInitialized)
-    {
-        tr_torrentClose(fHandle);
-        fInitialized = NO;
-    }
-}
-
 - (void) dealloc
 {
     NSLog(@"Released!");
     NSLog(@"%d", (long)[self retainCount]);
     if (fHandle)
     {
-        if (fInitialized)
-            tr_torrentClose(fHandle);
+        tr_torrentClose(fHandle);
         
         if (fDownloadFolder)
             [fDownloadFolder release];
@@ -1485,11 +1474,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue
         filesShouldDownload: (NSArray *) filesShouldDownload filePriorities: (NSArray *) filePriorities;
 {
-    fInitialized = NO;
     if (!(self = [super init]))
         return nil;
     
-    NSLog(@"%d", (long)[self retainCount]);
+    NSLog(@"init %d", (long)[self retainCount]);
     static_lastid++;
     fID = static_lastid;
     
@@ -1540,7 +1528,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [self release];
         return nil;
     }
-    fInitialized = YES;
     
     fInfo = tr_torrentInfo(fHandle);
     
@@ -1600,8 +1587,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int i;
     for (i = 0; i < MAX_PIECES; i++)
         fPieces[i] = BLANK_PIECE;
-
+    NSLog(@"end1 %d", (long)[self retainCount]);
     [self update];
+    NSLog(@"end2 %d", (long)[self retainCount]);
     return self;
 }
 
@@ -1681,7 +1669,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 [NSNumber numberWithBool: isFolder], @"IsFolder", currentPath, @"Path", nil];
         [siblings addObject: dict];
         
-        [dict setObject: self forKey: @"Torrent"];
         if (isFolder)
         {
             [dict setObject: [NSMutableArray array] forKey: @"Children"];
