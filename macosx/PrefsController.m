@@ -438,6 +438,7 @@
 - (void) resetWarnings: (id) sender
 {
     [fDefaults setBool: YES forKey: @"WarningDebug"];
+    [fDefaults setBool: YES forKey: @"WarningDuplicate"];
     [fDefaults setBool: YES forKey: @"WarningRemainingSpace"];
 }
 

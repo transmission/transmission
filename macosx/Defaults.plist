@@ -116,6 +116,8 @@
 	<false/>
 	<key>WarningDebug</key>
 	<true/>
+	<key>WarningDuplicate</key>
+	<true/>
 	<key>WarningRemainingSpace</key>
 	<true/>
 </dict>

@@ -464,7 +464,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                     " This setting can be changed in the Message Log window (accessible from the Window menu).",
                                     "Debug log alert -> informative message")];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Debug log alert -> button")];
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Remind Again", "Debug log alert -> button")];
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Debug log alert -> button")];
         
         if ([alert runModal] == NSAlertSecondButtonReturn)
             [fDefaults setBool: NO forKey: @"WarningDebug"];
@@ -896,16 +896,21 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) duplicateOpenAlert: (NSString *) name
 {
+    if (![fDefaults boolForKey: @"WarningDuplicate"])
+        return;
+    
     NSAlert * alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
-    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"Transfer of \"%@\" is already running.",
+    [alert setMessageText: [NSString stringWithFormat: NSLocalizedString(@"A transfer of \"%@\" is already running.",
                             "Open duplicate alert -> title"), name]];
     [alert setInformativeText:
             NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already running transfer.",
                             "Open duplicate alert -> message")];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
+    [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
     [alert setAlertStyle: NSWarningAlertStyle];
     
-    [alert runModal];
+    if ([alert runModal] == NSAlertSecondButtonReturn)
+        [fDefaults setBool: NO forKey: @"WarningDuplicate"];
     [alert release];
 }
 
