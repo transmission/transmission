@@ -64,7 +64,7 @@
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23BBEB70A9BBE77003F7274 /* FilterBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* FilterBarButton.m */; };
 		A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7140A699178008EE24F /* FilterButtonPressedLeft.png */; };
-		A241528B0C0261B8007DD3B4 /* Globe.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.tiff */; };
+		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
 		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
 		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
@@ -440,7 +440,7 @@
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
-		A2FB06950BFF484A0095564D /* Globe.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Globe.tiff; path = macosx/Images/Globe.tiff; sourceTree = "<group>"; };
+		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0C0C07756200B0BB3C /* client.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = client.c; path = daemon/client.c; sourceTree = "<group>"; };
 		BEFC1C0D0C07756200B0BB3C /* client.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = client.h; path = daemon/client.h; sourceTree = "<group>"; };
@@ -662,7 +662,7 @@
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
-				A2FB06950BFF484A0095564D /* Globe.tiff */,
+				A2FB06950BFF484A0095564D /* Globe.png */,
 				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
@@ -1178,7 +1178,7 @@
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A24103070AF80E390001C8D0 /* FilterButtonPressedLeft.png in Resources */,
-				A241528B0C0261B8007DD3B4 /* Globe.tiff in Resources */,
+				A241528B0C0261B8007DD3B4 /* Globe.png in Resources */,
 				A2DF377C0C222E2D006523C1 /* Creator.nib in Resources */,
 				A2E9AA760C249AF400085DCF /* Create.png in Resources */,
 				A2F011990C27418800576FC0 /* CreateLarge.png in Resources */,

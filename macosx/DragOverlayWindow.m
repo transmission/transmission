@@ -156,7 +156,7 @@
 
 - (void) setURL: (NSString *) url
 {
-    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.tiff"]
+    [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     
     //stop other animation and set to same progress
