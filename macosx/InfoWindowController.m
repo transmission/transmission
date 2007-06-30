@@ -613,7 +613,6 @@
     if (action == @selector(setCheck:))
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSDictionary * item;
         NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
         NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
         int i, index, state = (menuItem == fFileCheckItem) ? NSOnState : NSOffState;
@@ -630,9 +629,24 @@
         return NO;
     }
     
-    #warning disable if all can't be checked
     if (action == @selector(setOnlySelectedCheck:))
-        return [fFileOutline selectedRow] != -1;
+    {
+        Torrent * torrent = [fTorrents objectAtIndex: 0];
+        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
+        NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
+        int i, index;
+        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+        {
+            itemIndexes = [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"];
+            if (![usedIndexes containsIndexes: itemIndexes])
+            {
+                if ([torrent canChangeDownloadCheckForFiles: itemIndexes])
+                    return YES;
+                [usedIndexes addIndexes: itemIndexes];
+            }
+        }
+        return NO;
+    }
     
     if (action == @selector(setPriority:))
     {
@@ -953,7 +967,8 @@
 
 - (void) setFileOutlineHoverRowForEvent: (NSEvent *) event
 {
-    [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT] ? event : nil];
+    [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
+                                        ? event : nil];
 }
 
 - (NSArray *) peerSortDescriptors
