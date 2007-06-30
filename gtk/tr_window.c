@@ -193,6 +193,7 @@ makeview( PrivateData * p )
                                              NULL, NULL );
     gtk_tree_view_column_set_expand( col, TRUE );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
+    gtk_tree_view_column_set_sort_column_id( col, MC_NAME );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
     progrend = tr_cell_renderer_progress_new();
@@ -205,6 +206,7 @@ makeview( PrivateData * p )
     gtk_tree_view_column_set_cell_data_func( col, progrend, formatprog,
                                              NULL, NULL );
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
+    gtk_tree_view_column_set_sort_column_id( col, MC_PROG_D );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
     /* XXX this shouldn't be necessary */
