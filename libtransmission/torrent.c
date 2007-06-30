@@ -169,7 +169,7 @@ torrentRealInit( tr_handle_t   * h,
     int i;
     char name[512];
     
-    tor->info.flags = flags;
+    tor->info.flags |= flags;
 
     tr_sharedLock( h->shared );
 
