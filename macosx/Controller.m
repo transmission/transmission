@@ -1410,7 +1410,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        if (![torrent isActive] && [torrent waitingToStart])
+        if (![torrent isActive] && ![torrent isChecking] && [torrent waitingToStart])
         {
             if (![torrent allDownloaded])
             {
@@ -1450,7 +1450,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
+    {
+        if ([torrent isChecking])
+        {
+            desired--;
+            if (desired <= 0)
+                return 0;
+        }
+        else if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
         {
             if ([torrent allDownloaded] != downloadQueue)
             {
@@ -1459,6 +1466,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                     return 0;
             }
         }
+        else;
+    }
     
     return desired;
 }

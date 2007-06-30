@@ -486,7 +486,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 
-    if ([self isActive] && ![self isChecking] && ![self isWaitingToChecking] )
+    if ([self isActive] && ![self isChecking])
     {
         NSString * stringToAppend = @"";
         if (![self allDownloaded])
@@ -1079,14 +1079,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->status == TR_STATUS_STOPPED;
 }
 
-- (BOOL) isWaitingToChecking
-{
-    return fStat->status == TR_STATUS_CHECK_WAIT;
-}
-
 - (BOOL) isChecking
 {
-    return fStat->status == TR_STATUS_CHECK;
+    return fStat->status == TR_STATUS_CHECK || fStat->status == TR_STATUS_CHECK_WAIT;
 }
 
 - (BOOL) allDownloaded
