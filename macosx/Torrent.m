@@ -818,32 +818,33 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([self allDownloaded] || ![fDefaults boolForKey: @"WarningRemainingSpace"])
         return YES;
     
-    NSString * volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]]
-                                                                                                objectAtIndex: 0];
-    NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
-    uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue],
-            torrentRemaining = fStat->left;
-    
-    if (volumeName && remainingSpace <= torrentRemaining)
+    NSString * volumeName;
+    if ((volumeName = [[[NSFileManager defaultManager] componentsToDisplayForPath: [self downloadFolder]] objectAtIndex: 0]))
     {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
-                                    "Torrent file disk space alert -> title"), [self name]]];
-        [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"The transfer will be paused. Clear up space on \"%@\" to continue.",
-                                            "Torrent file disk space alert -> message"), volumeName]];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
-        [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
-        [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
+        NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
+        uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
-        int result = [alert runModal];
-        [alert release];
-        
-        if (result == NSAlertThirdButtonReturn)
-            [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
-        
-        return result != NSAlertFirstButtonReturn;
+        if (remainingSpace <= fStat->left)
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert setMessageText: [NSString stringWithFormat:
+                                    NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
+                                        "Torrent file disk space alert -> title"), [self name]]];
+            [alert setInformativeText: [NSString stringWithFormat:
+                            NSLocalizedString(@"The transfer will be paused. Clear up space on \"%@\" to continue.",
+                                                "Torrent file disk space alert -> message"), volumeName]];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
+            [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
+            
+            int result = [alert runModal];
+            [alert release];
+            
+            if (result == NSAlertThirdButtonReturn)
+                [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
+            
+            return result != NSAlertFirstButtonReturn;
+        }
     }
     return YES;
 }
@@ -1443,7 +1444,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fID;
 }
 
-- (tr_info_t *) torrentInfo
+- (const tr_info_t *) torrentInfo
 {
     return fInfo;
 }

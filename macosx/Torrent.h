@@ -33,10 +33,10 @@
 
 @interface Torrent : NSObject
 {
-    tr_handle_t  * fLib;
+    tr_handle_t * fLib;
     tr_torrent_t * fHandle;
-    tr_info_t    * fInfo;
-    tr_stat_t    * fStat;
+    const tr_info_t * fInfo;
+    tr_stat_t * fStat;
     
     int fID;
     
@@ -222,7 +222,7 @@
 - (NSNumber *) ratioSortKey;
 
 - (int) torrentID;
-- (tr_info_t *) torrentInfo;
+- (const tr_info_t *) torrentInfo;
 - (tr_stat_t *) torrentStat;
 
 @end
