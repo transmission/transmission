@@ -8,7 +8,6 @@
  * the Transmission project.
  */
 
-#include <stdlib.h> /* for calloc */
 #include "transmission.h"
 
 struct tr_io_s

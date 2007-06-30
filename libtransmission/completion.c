@@ -353,7 +353,7 @@ tr_cpLeftUntilDone ( const tr_completion_t * cp )
                   && info->pieces[info->pieceCount-1].priority != TR_PRI_DND )
         b -= (tor->info.totalSize % tor->blockSize);
 
-    return b * tor->blockSize;
+    return b;
 }
 
 float
