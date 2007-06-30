@@ -648,7 +648,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
             break;
 
         case TR_STATUS_STOPPED:
-            top = g_strdup( _("Stopped") );
+            top = g_strdup_printf( _("Stopped (%.1f%%)"), prog );
             break;
 
         default:

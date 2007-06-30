@@ -1521,7 +1521,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   char *size, *pch;
   GtkWidget *d, *n, *w;
   tr_torrent_t * tor = tr_torrent_handle (gtor);
-  tr_info_t * info = tr_torrent_info (gtor);
+  const tr_info_t * info = tr_torrent_info (gtor);
 
   /* create the dialog */
   pch = g_strdup_printf ("%s: %s",
