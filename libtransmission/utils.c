@@ -484,20 +484,22 @@ tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
     return 1;
 }
 
+static const uint8_t bitmask[8] = { 128u, 64u, 32u, 16u, 8u, 4u, 2u, 1u };
+
 int
 tr_bitfieldHas( const tr_bitfield_t   * bitfield,
                 size_t                  bit )
 {
     if ( bitfield == NULL ) return 0;
     assert( bit / 8u < bitfield->len );
-    return ( bitfield->bits[ bit / 8u ] & ( 1 << ( 7 - ( bit % 8 ) ) ) );
+    return ( bitfield->bits[ bit/8u ] & bitmask[bit%8] );
 }
 
 void
 tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t bit )
 {
     assert( bit / 8u < bitfield->len );
-    bitfield->bits[ bit / 8u ] |= ( 1u << ( 7u - ( bit % 8u ) ) );
+    bitfield->bits[ bit/8u ] |= bitmask[bit%8];
 }
 
 void
@@ -515,8 +517,11 @@ void
 tr_bitfieldRem( tr_bitfield_t   * bitfield,
                 size_t            bit )
 {
-    assert( bit / 8u < bitfield->len );
-    bitfield->bits[ bit / 8u ] &= ~( 1u << ( 7u - ( bit % 8u ) ) );
+    if( bitfield != NULL )
+    {
+        assert( bit / 8u < bitfield->len );
+        bitfield->bits[bit/8u] &= ~bitmask[bit%8];
+    }
 }
 
 void
