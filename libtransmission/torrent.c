@@ -1067,6 +1067,7 @@ torrentThreadLoop ( void * _tor )
             }
 
             /* receive/send messages */
+            tr_torrentWriterLock( tor );
             for( i=0; i<tor->peerCount; ) {
                 tr_peer_t * peer = tor->peers[i];
                 int ret = tr_peerPulse( peer );
@@ -1088,6 +1089,7 @@ torrentThreadLoop ( void * _tor )
                 }
                 i++;
             }
+            tr_torrentWriterUnlock( tor );
         }
     }
 

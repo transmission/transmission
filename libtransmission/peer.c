@@ -646,7 +646,7 @@ writeEnd:
 
 int tr_peerIsConnected( const tr_peer_t * peer )
 {
-    return PEER_STATUS_CONNECTED == peer->status;
+    return peer && (peer->status == PEER_STATUS_CONNECTED);
 }
 
 int tr_peerIsFrom( const tr_peer_t * peer )
