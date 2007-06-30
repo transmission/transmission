@@ -907,8 +907,6 @@ tr_torrentFree( tr_torrent_t * tor )
 
     tr_sharedLock( h->shared );
 
-    h->torrentCount--;
-
     tr_rwClose( &tor->lock );
     tr_cpClose( tor->completion );
 
@@ -930,6 +928,8 @@ tr_torrentFree( tr_torrent_t * tor )
     }
 
     tr_free( tor );
+
+    h->torrentCount--;
 
     tr_sharedUnlock( h->shared );
 }
