@@ -239,7 +239,7 @@ static inline int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
 
     if( peer->outRequestCount >= peer->outRequestMax )
     {
-        tr_err( "Too many requests" );
+        tr_dbg( "Peer is asking for too many blocks!");
         return TR_ERROR;
     }
 
