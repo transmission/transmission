@@ -948,7 +948,7 @@ torrentThreadLoop ( void * _tor )
          tr_lockInit( &checkFilesLock );
     }
 
-    tor->recheckFlag = !tr_ioCheckFiles( tor, TR_RECHECK_FAST );
+    tor->recheckFlag = tr_ioCheckFiles( tor, TR_RECHECK_FAST );
 
     /* loop until the torrent is being deleted */
     while( ! ( tor->dieFlag && (tor->runStatus == TR_RUN_STOPPED) ) )
