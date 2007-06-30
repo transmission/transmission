@@ -807,7 +807,7 @@ addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
 {
     if( IPC_MSG_INFO == msgid )
     {
-        tr_info_t * inf = tr_torrent_info( tor );
+        const tr_info_t * inf = tr_torrent_info( tor );
         return ipc_addinfo( val, torid, inf, types );
     }
     else
@@ -826,7 +826,7 @@ smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
     benc_val_t             packet, * pkval, * hash;
     int                    ii, torid;
     TrTorrent            * tor;
-    tr_info_t            * inf;
+    const tr_info_t      * inf;
     uint8_t              * buf;
     size_t                 size;
 

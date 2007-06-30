@@ -38,8 +38,8 @@ int          torrent_add_data            ( uint8_t *, size_t, const char *, int 
 void         torrent_start               ( int );
 void         torrent_stop                ( int );
 void         torrent_remove              ( int );
-tr_info_t  * torrent_info                ( int );
-tr_stat_t  * torrent_stat                ( int );
+const tr_info_t  * torrent_info          ( int );
+const tr_stat_t  * torrent_stat          ( int );
 int          torrent_lookup              ( const uint8_t * );
 void       * torrent_iter                ( void *, int * );
 

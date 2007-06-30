@@ -85,7 +85,7 @@ tr_torrent_handle(TrTorrent *tor);
 const tr_stat_t *
 tr_torrent_stat(TrTorrent *tor);
 
-tr_info_t *
+const tr_info_t *
 tr_torrent_info(TrTorrent *tor);
 
 void

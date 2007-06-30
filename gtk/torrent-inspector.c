@@ -1256,7 +1256,7 @@ file_page_new ( TrTorrent * gtor )
 {
     GtkWidget           * ret;
     FileData            * data;
-    tr_info_t           * inf;
+    const tr_info_t     * inf;
     tr_torrent_t        * tor;
     GtkTreeStore        * store;
     int                   ii;

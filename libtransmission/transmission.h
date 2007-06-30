@@ -339,7 +339,7 @@ void tr_torrentDisablePex( tr_torrent_t *, int disable );
  ***********************************************************************
  * Return torrent metainfo.
  **********************************************************************/
-tr_info_t * tr_torrentInfo( tr_torrent_t * );
+const tr_info_t * tr_torrentInfo( const tr_torrent_t * );
 
 /***********************************************************************
  * tr_torrentScrape

@@ -415,7 +415,8 @@ tr_torrentInitData( tr_handle_t    * h,
     return tor;
 }
 
-tr_info_t * tr_torrentInfo( tr_torrent_t * tor )
+const tr_info_t *
+tr_torrentInfo( const tr_torrent_t * tor )
 {
     return &tor->info;
 }

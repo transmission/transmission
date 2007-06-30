@@ -256,7 +256,7 @@ tr_torrent_stat(TrTorrent *tor)
     return &tor->stat;
 }
 
-tr_info_t *
+const tr_info_t *
 tr_torrent_info(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
@@ -464,7 +464,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
 gboolean
 tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
 {
-    tr_info_t  * inf;
+    const tr_info_t  * inf;
 
     TR_IS_TORRENT( tor );
 

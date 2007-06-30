@@ -569,7 +569,7 @@ void
 tr_core_insert( TrCore * self, TrTorrent * tor )
 {
     GtkTreeIter iter;
-    tr_info_t * inf;
+    const tr_info_t * inf;
 
     gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
     inf = tr_torrent_info( tor );

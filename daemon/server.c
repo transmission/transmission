@@ -443,7 +443,6 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     int             ii, tor;
     size_t          buflen;
     uint8_t       * buf;
-    tr_info_t     * inf;
 
     if( NULL == val || TYPE_LIST != val->type )
     {
@@ -470,7 +469,7 @@ addmsg1( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
         tor = torrent_add_file( file->val.s.s, NULL, -1 );
         if( TORRENT_ID_VALID( tor ) )
         {
-            inf = torrent_info( tor );
+            const tr_info_t * inf = torrent_info( tor );
             if( 0 > ipc_addinfo( added, tor, inf, 0 ) )
             {
                 errnomsg( "failed to build message" );
@@ -496,7 +495,6 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
     size_t          buflen;
     uint8_t       * buf;
     const char    * dir;
-    tr_info_t     * inf;
 
     if( NULL == dict || TYPE_DICT != dict->type )
     {
@@ -530,6 +528,7 @@ addmsg2( enum ipc_msg id UNUSED, benc_val_t * dict, int64_t tag, void * arg )
 
     if( TORRENT_ID_VALID( tor ) )
     {
+        const tr_info_t * inf;
         val = ipc_initval( client->ipc, IPC_MSG_INFO, tag, &pk, TYPE_LIST );
         if( NULL == val )
         {
@@ -749,29 +748,15 @@ infomsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 int
 addinfo( benc_val_t * list, int id, int types )
 {
-    tr_info_t * inf;
-
-    inf = torrent_info( id );
-    if( NULL == inf )
-    {
-        return 0;
-    }
-
-    return ipc_addinfo( list, id, inf, types );
+    const tr_info_t * inf = torrent_info( id );
+    return inf ? ipc_addinfo( list, id, inf, types ) : 0;
 }
 
 int
 addstat( benc_val_t * list, int id, int types )
 {
-    tr_stat_t * st;
-
-    st = torrent_stat( id );
-    if( NULL == st )
-    {
-        return 0;
-    }
-
-    return ipc_addstat( list, id, st, types );
+    const tr_stat_t * st = torrent_stat( id );
+    return st ? ipc_addstat( list, id, st, types ) : 0;
 }
 
 void
@@ -849,7 +834,6 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
     int             ii;
     benc_val_t    * hash, pk, * pkinf;
     int64_t         found;
-    tr_info_t     * inf;
 
     if( NULL == val || TYPE_LIST != val->type )
     {
@@ -867,6 +851,7 @@ lookmsg( enum ipc_msg id UNUSED, benc_val_t * val, int64_t tag, void * arg )
 
     for( ii = 0; val->val.l.count > ii; ii++ )
     {
+        const tr_info_t * inf;
         hash = &val->val.l.vals[ii];
         if( NULL == hash || TYPE_STR != hash->type ||
             SHA_DIGEST_LENGTH * 2 != hash->val.s.i )

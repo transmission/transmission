@@ -163,7 +163,7 @@ int main( int argc, char ** argv )
 
     if( showInfo )
     {
-        tr_info_t * info = tr_torrentInfo( tor );
+        const tr_info_t * info = tr_torrentInfo( tor );
 
         s = tr_torrentStat( tor );
 
