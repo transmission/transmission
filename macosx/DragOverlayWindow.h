@@ -38,6 +38,7 @@
 - (void) setFile: (NSString *) file;
 - (void) setURL: (NSString *) url;
 
+- (void) fadeIn;
 - (void) fadeOut;
 
 @end

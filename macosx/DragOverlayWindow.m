@@ -125,32 +125,15 @@
         secondString = [secondString stringByAppendingString: @" Total"];
     }
     
-    [[self contentView] setOverlay: icon mainLine: name subLine: secondString];
-    
-    //stop other animation and set to same progress
-    if ([fFadeOutAnimation isAnimating])
-    {
-        [fFadeOutAnimation stopAnimation];
-        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
-    }
-    [self setFrame: [[self parentWindow] frame] display: YES];
-    [fFadeInAnimation startAnimation];
+    [self fadeIn];
 }
 
 - (void) setFile: (NSString *) file
 {
-        
     [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge.png"]
         mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
     
-    //stop other animation and set to same progress
-    if ([fFadeOutAnimation isAnimating])
-    {
-        [fFadeOutAnimation stopAnimation];
-        [fFadeInAnimation setCurrentProgress: 1.0 - [fFadeOutAnimation currentProgress]];
-    }
-    [self setFrame: [[self parentWindow] frame] display: YES];
-    [fFadeInAnimation startAnimation];
+    [self fadeIn];
 }
 
 
@@ -159,6 +142,11 @@
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
     
+    [self fadeIn];
+}
+
+- (void) fadeIn
+{
     //stop other animation and set to same progress
     if ([fFadeOutAnimation isAnimating])
     {

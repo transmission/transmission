@@ -192,7 +192,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
-    # warning cleanup
+    #warning cleanup
     if (fHandle)
     {
         if (fDownloadFolder)

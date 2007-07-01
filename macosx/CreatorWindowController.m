@@ -63,7 +63,7 @@
         fInfo = tr_metaInfoBuilderCreate(handle, [fPath UTF8String]);
         if (fInfo->fileCount == 0)
         {
-            NSAlert * alert = [[[NSAlert alloc] init] autorelease];
+            NSAlert * alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> no files -> button")];
             [alert setMessageText: NSLocalizedString(@"This folder contains no files.",
                                                     "Create torrent -> no files -> title")];
@@ -72,6 +72,7 @@
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];
+            [alert release];
             
             [self release];
             return nil;

@@ -545,10 +545,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fAutoImportTimer release];
     }
     
-    //save history and stop running torrents
+    //save history
     [self updateTorrentHistory];
     
-    //make sure torrent is closed
+    //make sure torrents are closed
     enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
