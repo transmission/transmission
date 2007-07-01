@@ -157,7 +157,7 @@ tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
     return TR_OK;
 }
 
-int
+static int
 realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
 {
     benc_val_t   meta, * beInfo, * val, * val2;
@@ -166,7 +166,7 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
     /* Parse bencoded infos */
     if( tr_bencLoad( buf, size, &meta, NULL ) )
     {
-        tr_err( "Error while parsing bencoded data" );
+        tr_err( "Error while parsing bencoded data [%*.*s]", (int)size, (int)size, (char*)buf );
         return TR_EINVALID;
     }
 
@@ -523,7 +523,7 @@ static char * announceToScrape( const char * announce )
     return scrape;
 }
 
-void
+static void
 savedname( char * name, size_t len, const char * hash, const char * tag )
 {
     const char * torDir = tr_getTorrentsDirectory ();
@@ -548,7 +548,8 @@ void tr_metainfoRemoveSaved( const char * hashString, const char * tag )
     unlink( file );
 }
 
-uint8_t * readtorrent( const char * path, size_t * size )
+static uint8_t *
+readtorrent( const char * path, size_t * size )
 {
     uint8_t    * buf;
     struct stat  sb;
@@ -603,8 +604,9 @@ uint8_t * readtorrent( const char * path, size_t * size )
 }
 
 /* Save a copy of the torrent file in the saved torrent directory */
-int savetorrent( const char * hash, const char * tag,
-                 const uint8_t * buf, size_t buflen )
+static int
+savetorrent( const char * hash, const char * tag,
+             const uint8_t * buf, size_t buflen )
 {
     char   path[MAX_PATH_LENGTH];
     FILE * file;
@@ -628,7 +630,7 @@ int savetorrent( const char * hash, const char * tag,
     return TR_OK;
 }
 
-int
+static int
 parseFiles( tr_info_t * inf, benc_val_t * name,
             benc_val_t * files, benc_val_t * length )
 {

@@ -183,7 +183,7 @@ defs_bool[] =
     { FALSE, PREF_ID_DOWNLIMIT, TRUE },
     { FALSE, -1, FALSE },
     /* PREF_ID_USEUPLIMIT */
-    { TRUE,  PREF_ID_UPLIMIT,   TRUE },
+    { FALSE, PREF_ID_UPLIMIT,   TRUE },
     { FALSE, -1, FALSE },
     /* PREF_ID_ASKDIR */
     { FALSE, PREF_ID_DIR,       FALSE },
