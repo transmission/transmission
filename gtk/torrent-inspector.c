@@ -1284,8 +1284,6 @@ file_page_new ( TrTorrent * gtor )
                    ii, inf->files[ii].length );
     }
     getdirtotals( store, NULL );
-    gtk_tree_sortable_set_sort_column_id( GTK_TREE_SORTABLE( store ),
-                                          FC_KEY, GTK_SORT_ASCENDING );
 
     /* create the view */
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL( store ) );
@@ -1315,6 +1313,7 @@ file_page_new ( TrTorrent * gtor )
     rend = gtk_cell_renderer_progress_new();
     col = gtk_tree_view_column_new_with_attributes (
       _("Progress"), rend, "value", FC_PROG, NULL);
+    gtk_tree_view_column_set_sort_column_id( col, FC_PROG );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
     /* set up view */
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
@@ -1327,6 +1326,7 @@ file_page_new ( TrTorrent * gtor )
     /* add priority column */
     model = priority_model_new ();
     col = gtk_tree_view_column_new ();
+    gtk_tree_view_column_set_sort_column_id( col, FC_PRIORITY );
     gtk_tree_view_column_set_title (col, _("Priority"));
     rend = gtk_cell_renderer_combo_new ();
     gtk_tree_view_column_pack_start (col, rend, TRUE);
