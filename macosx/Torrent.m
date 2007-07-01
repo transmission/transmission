@@ -194,28 +194,27 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     [fDownloadFolder release];
     [fIncompleteFolder release];
-        
-    [fPublicTorrentLocation release];
     
+    [fPublicTorrentLocation release];
     
     [fDateAdded release];
     [fDateCompleted release];
     [fDateActivity release];
-        
+    
     [fAnnounceDate release];
-        
+    
     [fIcon release];
     [fIconFlipped release];
     [fIconSmall release];
-        
+    
     [fProgressString release];
     [fStatusString release];
     [fShortStatusString release];
     [fRemainingTimeString release];
-        
+    
     [fFileList release];
     [fFlatFileList release];
-        
+    
     [fBitmap release];
     
     if (fPieces)

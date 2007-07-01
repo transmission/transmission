@@ -163,7 +163,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
-        fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         
@@ -191,8 +190,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fMessageController release];
     [fPrefsController release];
     
-    [fToolbar release];
-    
     [fTorrents release];
     [fDisplayedTorrents release];
     
@@ -202,7 +199,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fIPCController release];
     
     [fAutoImportedNames release];
-    [fPendingTorrentDownloads release];
+    if (fPendingTorrentDownloads)
+        [fPendingTorrentDownloads release];
     
     tr_close(fLib);
     [super dealloc];
@@ -214,17 +212,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
     [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
-    [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
-    
-    fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
-    [fToolbar setDelegate: self];
-    [fToolbar setAllowsUserCustomization: YES];
-    [fToolbar setAutosavesConfiguration: YES];
-    [fWindow setToolbar: fToolbar];
-    [fWindow setDelegate: self];
+    NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
+    [toolbar setDelegate: self];
+    [toolbar setAllowsUserCustomization: YES];
+    [toolbar setAutosavesConfiguration: YES];
+    [fWindow setToolbar: toolbar];
+    [toolbar release];
     
     [fWindow makeFirstResponder: fTableView];
     [fWindow setExcludedFromWindowsMenu: YES];
+    [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
@@ -524,16 +521,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
     //remove all torrent downloads
-    NSEnumerator * enumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
-    NSDictionary * downloadDict;
-    NSURLDownload * download;
-    while ((downloadDict = [enumerator nextObject]))
+    NSEnumerator * enumerator;
+    if (fPendingTorrentDownloads)
     {
-        download = [downloadDict objectForKey: @"Download"];
-        [download cancel];
-        [download release];
+        enumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
+        NSDictionary * downloadDict;
+        NSURLDownload * download;
+        while ((downloadDict = [enumerator nextObject]))
+        {
+            download = [downloadDict objectForKey: @"Download"];
+            [download cancel];
+            [download release];
+        }
+        [fPendingTorrentDownloads removeAllObjects];
     }
-    [fPendingTorrentDownloads removeAllObjects];
     
     //stop timers
     [fTimer invalidate];
@@ -617,6 +618,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 -(void) download: (NSURLDownload *) download didCreateDestination: (NSString *) path
 {
+    if (!fPendingTorrentDownloads)
+        fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
+    
     [fPendingTorrentDownloads setObject: [NSDictionary dictionaryWithObjectsAndKeys:
                     path, @"Path", download, @"Download", nil] forKey: [[download request] URL]];
 }

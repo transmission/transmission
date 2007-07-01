@@ -56,7 +56,6 @@
     DragOverlayWindow               * fOverlayWindow;
     IBOutlet NSScrollView           * fScrollView;
     IBOutlet TorrentTableView       * fTableView;
-    NSToolbar                       * fToolbar;
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
