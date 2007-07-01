@@ -74,33 +74,19 @@ getFiles( const char        * dir,
 }
 
 static int
-bestPieceSize( uint64_t totalSize, int fileCount )
+bestPieceSize( uint64_t totalSize )
 {
-    const int minPieceSize = 65536; /* arbitrary; 2^16 */
-    const int maxPieceSize = 16777216; /* arbitrary; 2^24 */
-    const int desiredMinPiecesPerFile = 10; /* arbitrary */
-    const unsigned int desiredPieces = fileCount * desiredMinPiecesPerFile;
+    static const uint64_t GiB = 1073741824;
+    static const uint64_t MiB = 1048576;
+    static const uint64_t KiB = 1024;
 
-    /* a good starting range is to have (1024..2048] pieces... */
-    int pieceSize = 1;
-    uint64_t log = totalSize;
-    while( log > 2048 ) {
-        log >>= 1;
-        pieceSize <<= 1;
-    }
+    if( totalSize >= (8*GiB) )
+        return MiB;
 
-    /* now try to have N pieces per average file size...
-       this will reduce overhead on selective downloading
-       and increase swarm speed. */
-    while( ( totalSize / pieceSize ) < desiredPieces )
-        pieceSize >>= 1;
+    if( totalSize <= (8*MiB) )
+        return 256 * KiB;
 
-    /* clamp to our desired range to make sure we
-       haven't gone too far astray... */
-    if( pieceSize < minPieceSize ) pieceSize = minPieceSize;
-    if( pieceSize > maxPieceSize ) pieceSize = maxPieceSize;
-
-    return pieceSize;
+    return 512 * KiB;
 }
 
 static int
@@ -160,7 +146,7 @@ tr_metaInfoBuilderCreate( tr_handle_t * handle, const char * topFile )
            sizeof(tr_metainfo_builder_file_t),
            builderFileCompare );
 
-    ret->pieceSize = bestPieceSize( ret->totalSize, ret->fileCount );
+    ret->pieceSize = bestPieceSize( ret->totalSize );
     ret->pieceCount = ret->pieceSize
         ? (int)( ret->totalSize / ret->pieceSize)
         : 0;
