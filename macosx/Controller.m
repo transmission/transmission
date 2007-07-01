@@ -434,6 +434,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self applyFilter: nil];
     
+    [fWindow makeKeyAndOrderFront: nil]; 
+    
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
