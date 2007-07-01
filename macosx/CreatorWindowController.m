@@ -93,9 +93,10 @@
     
     BOOL multifile = !fInfo->isSingleFile;
     
-    #warning fix when resizing window
-    [fIcon setImage: [[NSWorkspace sharedWorkspace] iconForFileType: multifile
-                        ? NSFileTypeForHFSTypeCode('fldr') : [fPath pathExtension]]];
+    NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: multifile
+                        ? NSFileTypeForHFSTypeCode('fldr') : [fPath pathExtension]];
+    [icon setSize: [fIconView frame].size];
+    [fIconView setImage: icon];
     
     NSString * statusString = [NSString stringForFileSize: fInfo->totalSize];
     if (multifile)

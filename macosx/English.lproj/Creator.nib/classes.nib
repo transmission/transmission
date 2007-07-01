@@ -11,7 +11,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fCommentView = NSTextView; 
-                fIcon = NSImageView; 
+                fIconView = NSImageView; 
                 fLocationField = NSTextField; 
                 fNameField = NSTextField; 
                 fOpenCheck = NSButton; 
