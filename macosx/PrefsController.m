@@ -114,14 +114,14 @@
 {
     fHasLoaded = YES;
     
-    fToolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
-    [fToolbar setDelegate: self];
-    [fToolbar setAllowsUserCustomization: NO];
-    [[self window] setToolbar: fToolbar];
-    [fToolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
-    [fToolbar setSizeMode: NSToolbarSizeModeRegular];
+    NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Preferences Toolbar"];
+    [toolbar setDelegate: self];
+    [toolbar setAllowsUserCustomization: NO];
+    [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
+    [toolbar setSizeMode: NSToolbarSizeModeRegular];
+    [[self window] setToolbar: toolbar];
 
-    [fToolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
+    [toolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
     [self setPrefView: nil];
     
     //set download folder
@@ -637,10 +637,12 @@
         [window setTitle: [sender label]];
     else
     {
+        NSToolbar * toolbar = [window toolbar];
+        NSString * itemIdentifier = [toolbar selectedItemIdentifier];
+        NSEnumerator * enumerator = [[toolbar items] objectEnumerator];
         NSToolbarItem * item;
-        NSEnumerator * enumerator = [[fToolbar items] objectEnumerator];
         while ((item = [enumerator nextObject]))
-            if ([[item itemIdentifier] isEqualToString: [fToolbar selectedItemIdentifier]])
+            if ([[item itemIdentifier] isEqualToString: itemIdentifier])
             {
                 [window setTitle: [item label]];
                 break;

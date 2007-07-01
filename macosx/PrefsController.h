@@ -34,7 +34,6 @@
     NSUserDefaults          * fDefaults;
     BOOL                    fHasLoaded;
     
-    NSToolbar               * fToolbar;
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,

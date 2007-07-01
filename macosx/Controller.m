@@ -198,7 +198,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fOverlayWindow release];
     [fIPCController release];
     
-    [fAutoImportedNames release];
+    if (fAutoImportedNames)
+        [fAutoImportedNames release];
     if (fPendingTorrentDownloads)
         [fPendingTorrentDownloads release];
     
@@ -442,7 +443,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
     
     //auto importing
-    fAutoImportedNames = [[NSMutableArray alloc] init];
     [self checkAutoImportDirectory];
 }
 
@@ -2022,7 +2022,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fAutoImportTimer = nil;
     }
     
-    [fAutoImportedNames removeAllObjects];
+    if (fAutoImportedNames)
+        [fAutoImportedNames removeAllObjects];
     [self checkAutoImportDirectory];
 }
 
@@ -2040,7 +2041,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //only check files that have not been checked yet
     NSMutableArray * newNames = [importedNames mutableCopy];
-    [newNames removeObjectsInArray: fAutoImportedNames];
+    
+    if (fAutoImportedNames)
+        [newNames removeObjectsInArray: fAutoImportedNames];
+    else
+        fAutoImportedNames = [[NSMutableArray alloc] init];
     [fAutoImportedNames setArray: importedNames];
     
     NSString * file;
