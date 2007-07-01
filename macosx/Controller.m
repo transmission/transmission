@@ -161,8 +161,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         fLib = tr_init("macosx");
         
-        fTorrents = [[[NSMutableArray alloc] init] retain];
-        fDisplayedTorrents = [[[NSMutableArray alloc] init] retain];
+        fTorrents = [[NSMutableArray alloc] init];
+        fDisplayedTorrents = [[NSMutableArray alloc] init];
         fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
