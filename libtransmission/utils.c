@@ -342,8 +342,9 @@ tr_ioErrorFromErrno( void )
         case ENOSPC:
             return TR_ERROR_IO_SPACE;
         case EMFILE:
+            return TR_ERROR_IO_FILE_TOO_BIG;
         case EFBIG:
-            return TR_ERROR_IO_RESOURCES;
+            return TR_ERROR_IO_OPEN_FILES;
         default:
             tr_dbg( "generic i/o errno from errno: %s", strerror( errno ) );
             return TR_ERROR_IO_OTHER;
@@ -369,8 +370,10 @@ tr_errorString( int code )
             return "Insufficient free space";
         case TR_ERROR_IO_DUP_DOWNLOAD:
             return "Already active transfer with same name and download folder";
-        case TR_ERROR_IO_RESOURCES:
-            return "Insufficient resources";
+        case TR_ERROR_IO_FILE_TOO_BIG:
+            return "File too large";
+        case TR_ERROR_IO_OPEN_FILES:
+            return "Too many open files";
         case TR_ERROR_IO_OTHER:
             return "Generic I/O error";
     }

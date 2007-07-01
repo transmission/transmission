@@ -77,12 +77,13 @@ extern "C" {
 #define TR_ERROR_ASSERT             0x82000000
 /* I/O errors */
 #define TR_ERROR_IO_MASK            0x000000FF
-#define TR_ERROR_IO_PARENT          0x80000001
-#define TR_ERROR_IO_PERMISSIONS     0x80000002
-#define TR_ERROR_IO_SPACE           0x80000004
-#define TR_ERROR_IO_RESOURCES       0x80000008
-#define TR_ERROR_IO_DUP_DOWNLOAD    0x8000000A
-#define TR_ERROR_IO_OTHER           0x80000010
+#define TR_ERROR_IO_PARENT          ((1<<31) | (1<<0))
+#define TR_ERROR_IO_PERMISSIONS     ((1<<31) | (1<<1))
+#define TR_ERROR_IO_SPACE           ((1<<31) | (1<<2))
+#define TR_ERROR_IO_FILE_TOO_BIG    ((1<<31) | (1<<3))
+#define TR_ERROR_IO_OPEN_FILES      ((1<<31) | (1<<4))
+#define TR_ERROR_IO_DUP_DOWNLOAD    ((1<<31) | (1<<5))
+#define TR_ERROR_IO_OTHER           ((1<<31) | (1<<6))
 /* Misc */
 #define TR_ERROR_TC_MASK            0x00000F00
 #define TR_ERROR_TC_ERROR           0x80000100

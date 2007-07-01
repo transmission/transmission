@@ -799,9 +799,13 @@ ipc_addstat( benc_val_t * list, int tor,
                 {
                     tr_bencInitStr( item, "io-space", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_RESOURCES, error ) )
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_FILE_TOO_BIG, error ) )
                 {
-                    tr_bencInitStr( item, "io-resources", -1, 1 );
+                    tr_bencInitStr( item, "io-file-too-big", -1, 1 );
+                }
+                else if( TR_ERROR_ISSET( TR_ERROR_IO_OPEN_FILES, error ) )
+                {
+                    tr_bencInitStr( item, "io-open-files", -1, 1 );
                 }
                 else if( TR_ERROR_ISSET( TR_ERROR_IO_MASK, error ) )
                 {
