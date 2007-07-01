@@ -192,41 +192,35 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
-    #warning cleanup
-    if (fHandle)
-    {
-        if (fDownloadFolder)
-            [fDownloadFolder release];
-        if (fIncompleteFolder)
-            [fIncompleteFolder release];
+    [fDownloadFolder release];
+    [fIncompleteFolder release];
         
-        if (fPublicTorrentLocation)
-            [fPublicTorrentLocation release];
+    [fPublicTorrentLocation release];
+    
+    
+    [fDateAdded release];
+    [fDateCompleted release];
+    [fDateActivity release];
         
-        [fDateAdded release];
-		if (fDateCompleted)
-			[fDateCompleted release];
-        if (fDateActivity)
-			[fDateActivity release];
+    [fAnnounceDate release];
         
-        if (fAnnounceDate)
-            [fAnnounceDate release];
+    [fIcon release];
+    [fIconFlipped release];
+    [fIconSmall release];
         
-        [fIcon release];
-        [fIconFlipped release];
-        [fIconSmall release];
+    [fProgressString release];
+    [fStatusString release];
+    [fShortStatusString release];
+    [fRemainingTimeString release];
         
-        [fProgressString release];
-        [fStatusString release];
-        [fShortStatusString release];
-        [fRemainingTimeString release];
+    [fFileList release];
+    [fFlatFileList release];
         
-        [fFileList release];
-        [fFlatFileList release];
-        
-        [fBitmap release];
+    [fBitmap release];
+    
+    if (fPieces)
         free(fPieces);
-    }
+    
     [super dealloc];
 }
 

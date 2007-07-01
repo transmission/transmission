@@ -69,7 +69,7 @@
     [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
     
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                    isEqual: [NSColor alternateSelectedControlColor]];
+                                                isEqual: [NSColor alternateSelectedControlColor]];
     NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
                     highlighted ? [NSColor whiteColor] : [NSColor controlTextColor], NSForegroundColorAttributeName,
                     [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
