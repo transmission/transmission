@@ -221,6 +221,7 @@ torrentRealInit( tr_handle_t   * h,
 
     tor->error   = TR_OK;
     tor->runStatus = flags & TR_FLAG_PAUSED ? TR_RUN_STOPPED : TR_RUN_RUNNING;
+    tor->recheckFlag = tr_ioCheckFiles( tor, TR_RECHECK_FAST );
 
     tr_sharedLock( h->shared );
     tor->next = h->torrentList;
@@ -947,8 +948,6 @@ torrentThreadLoop ( void * _tor )
          checkFilesLockInited = TRUE;
          tr_lockInit( &checkFilesLock );
     }
-
-    tor->recheckFlag = tr_ioCheckFiles( tor, TR_RECHECK_FAST );
 
     /* loop until the torrent is being deleted */
     while( ! ( tor->dieFlag && (tor->runStatus == TR_RUN_STOPPED) ) )
