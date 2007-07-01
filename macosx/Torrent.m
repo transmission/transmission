@@ -192,10 +192,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
+    # warning cleanup
     if (fHandle)
     {
-        tr_torrentClose(fHandle);
-        
         if (fDownloadFolder)
             [fDownloadFolder release];
         if (fIncompleteFolder)
@@ -231,9 +230,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [super dealloc];
 }
 
-- (void) removeTorrent
+- (void) closeTorrent
+{
+    tr_torrentClose(fHandle);
+}
+
+- (void) closeRemoveTorrent
 {
     tr_torrentRemoveSaved(fHandle);
+    [self closeTorrent];
 }
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder
@@ -1497,7 +1502,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         fIncompleteFolder = [[fIncompleteFolder stringByExpandingTildeInPath] retain];
     }
     
-    #warning duplicate warning?
     NSString * currentDownloadFolder;
     tr_info_t info;
     int error;

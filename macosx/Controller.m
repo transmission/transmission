@@ -161,8 +161,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         fLib = tr_init("macosx");
         
-        fTorrents = [[NSMutableArray alloc] init];
-        fDisplayedTorrents = [[NSMutableArray alloc] init];
+        fTorrents = [[[NSMutableArray alloc] init] retain];
+        fDisplayedTorrents = [[[NSMutableArray alloc] init] retain];
         fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
@@ -178,7 +178,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         fRemoteQuit = NO;
         
         [GrowlApplicationBridge setGrowlDelegate: self];
-        
         [[UKKQueue sharedFileWatcher] setDelegate: self];
     }
     return self;
@@ -193,8 +192,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fPrefsController release];
     
     [fToolbar release];
+    
     [fTorrents release];
     [fDisplayedTorrents release];
+    
     [fBadger release];
     if (fOverlayWindow)
         [fOverlayWindow release];
@@ -297,9 +298,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //old version saved transfer info in prefs file
     if (!history)
+    {
         if ((history = [fDefaults arrayForKey: @"History"]))
             [history retain];
-    [fDefaults removeObjectForKey: @"History"];
+        [fDefaults removeObjectForKey: @"History"];
+    }
     
     if (history)
     {
@@ -370,7 +373,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         currentFilterButton = fNoFilterButton;
     }
-
+    
     [currentFilterButton setEnabled: YES];
     
     //observe notifications
@@ -431,8 +434,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self applyFilter: nil];
     
-    [fWindow makeKeyAndOrderFront: nil];
-
     if ([fDefaults boolForKey: @"InfoVisible"])
         [self showInfo: nil];
     
@@ -544,6 +545,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //save history and stop running torrents
     [self updateTorrentHistory];
+    
+    //make sure torrent is closed
+    enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent closeTorrent];
+    
     [fDisplayedTorrents removeAllObjects];
     [fTorrents removeAllObjects];
     
@@ -1147,7 +1155,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
             lowestOrderValue = currentOrderValue;
         
-        [torrent removeTorrent];
+        [torrent closeRemoveTorrent];
         [fTorrents removeObject: torrent];
         [fDisplayedTorrents removeObject: torrent];
     }
@@ -1700,12 +1708,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
     
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
-    BOOL filtering = ![filterType isEqualToString: @"None"];
     
     int downloading = 0, seeding = 0, paused = 0;
     BOOL isDownloading = [filterType isEqualToString: @"Download"],
             isSeeding = [filterType isEqualToString: @"Seed"],
             isPaused = [filterType isEqualToString: @"Pause"];
+    BOOL filtering = isDownloading || isSeeding || isPaused;
     
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
