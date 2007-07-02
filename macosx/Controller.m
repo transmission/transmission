@@ -220,6 +220,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fWindow setToolbar: toolbar];
     [toolbar release];
     
+    [fWindow setDelegate: self]; //do manually to avoid placement issue
+    
     [fWindow makeFirstResponder: fTableView];
     [fWindow setExcludedFromWindowsMenu: YES];
     [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
