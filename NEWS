@@ -9,9 +9,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    to avoid hammering the disk
  - Many miscellaneous bugfixes and small improvements
  - OS X:
-   + Overlay when dragging torrent files onto window
+   + Overlay when dragging torrent files, URLs, and data files onto window
    + Ability to set an amount of time to consider a transfer stalled
-   + Various smaller interface changes and improvements
+   + Various smaller interface improvements
  - GTK:
    + Interface significantly reworked to closer match the Mac version
    + Torrent inspector

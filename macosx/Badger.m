@@ -39,24 +39,6 @@
     {
         fLib = lib;
         
-        fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
-        fBadge = [NSImage imageNamed: @"Badge"];
-        fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
-        fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
-        
-        NSShadow * stringShadow = [[NSShadow alloc] init];
-        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
-        [stringShadow setShadowBlurRadius: 4.0];
-        
-        NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
-                                [NSFont fontWithName: @"Helvetica" size: 28.0] toHaveTrait: NSBoldFontMask];
-        
-        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-            [NSColor whiteColor], NSForegroundColorAttributeName,
-            boldFont, NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
-        
-        [stringShadow release];
-        
         fCompleted = 0;
         fCompletedBadged = 0;
         fSpeedBadge = NO;
@@ -69,6 +51,7 @@
 {
     [fDockIcon release];
     [fAttributes release];
+    
     [super dealloc];
 }
 
@@ -81,13 +64,19 @@
         fCompletedBadged = fCompleted;
         
         //force image to reload - copy does not work
-        NSSize iconSize = [fDockIcon size];
-        [fDockIcon release];
+        NSImage * icon = [NSImage imageNamed: @"NSApplicationIcon"];
+        NSSize iconSize = [icon size];
+        
+        if (fDockIcon)
+            [fDockIcon release];
         fDockIcon = [[NSImage alloc] initWithSize: iconSize];
-        [fDockIcon addRepresentation: [[NSImage imageNamed: @"NSApplicationIcon"] bestRepresentationForDevice: nil]];
+        [fDockIcon addRepresentation: [icon bestRepresentationForDevice: nil]];
         
         if (fCompleted > 0)
         {
+            if (!fBadge)
+                fBadge = [NSImage imageNamed: @"Badge"];
+            
             NSRect badgeRect;
             NSSize iconSize = [fDockIcon size];
             badgeRect.size = [fBadge size];
@@ -131,7 +120,14 @@
     BOOL speedChange;
     if (speedChange = (uploadRateString || downloadRateString))
     {
+        if (!fDockIcon)
+            fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         dockIcon = [fDockIcon copy];
+        
+        if (!fUploadBadge)
+            fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
+        if (!fDownloadBadge)
+            fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
         
         NSRect badgeRect;
         badgeRect.size = [fUploadBadge size];
@@ -215,6 +211,22 @@
 //dock icon must have locked focus
 - (void) badgeString: (NSString *) string forRect: (NSRect) rect
 {
+    if (!fAttributes)
+    {
+        NSShadow * stringShadow = [[NSShadow alloc] init];
+        [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
+        [stringShadow setShadowBlurRadius: 4.0];
+        
+        NSFont * boldFont = [[NSFontManager sharedFontManager] convertFont:
+                                [NSFont fontWithName: @"Helvetica" size: 28.0] toHaveTrait: NSBoldFontMask];
+        
+        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
+            [NSColor whiteColor], NSForegroundColorAttributeName,
+            boldFont, NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];
+        
+        [stringShadow release];
+    }
+    
     NSSize stringSize = [string sizeWithAttributes: fAttributes];
     
     //string is in center of image

@@ -523,13 +523,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
     //remove all torrent downloads
-    NSEnumerator * enumerator;
     if (fPendingTorrentDownloads)
     {
-        enumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
+        NSEnumerator * downloadEnumerator = [[fPendingTorrentDownloads allValues] objectEnumerator];
         NSDictionary * downloadDict;
         NSURLDownload * download;
-        while ((downloadDict = [enumerator nextObject]))
+        while ((downloadDict = [downloadEnumerator nextObject]))
         {
             download = [downloadDict objectForKey: @"Download"];
             [download cancel];
@@ -552,7 +551,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentHistory];
     
     //make sure torrents are closed
-    enumerator = [fTorrents objectEnumerator];
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent closeTorrent];
@@ -1188,7 +1187,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [self updateUI];
     [self applyFilter: nil];
-    
     [self updateTorrentHistory];
 }
 
@@ -1333,8 +1331,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
-    
-    #warning reset queue?
 }
 
 - (void) showPreferenceWindow: (id) sender
