@@ -222,6 +222,7 @@ torrentRealInit( tr_handle_t   * h,
     tor->error   = TR_OK;
     tor->runStatus = flags & TR_FLAG_PAUSED ? TR_RUN_STOPPED : TR_RUN_RUNNING;
     tor->recheckFlag = tr_ioCheckFiles( tor, TR_RECHECK_FAST );
+    tor->cpStatus = tr_cpGetStatus( tor->completion );
 
     tr_sharedLock( h->shared );
     tor->next = h->torrentList;
