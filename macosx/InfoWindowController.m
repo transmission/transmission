@@ -601,9 +601,6 @@
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
-    if ([fTorrents count] != 1)
-        return NO;
-    
     SEL action = [menuItem action];
     
     if (action == @selector(revealFile:))
@@ -612,6 +609,9 @@
     
     if (action == @selector(setCheck:))
     {
+        if ([fFileOutline numberOfSelectedRows] <= 0)
+            return NO;
+        
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
         NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
@@ -631,6 +631,9 @@
     
     if (action == @selector(setOnlySelectedCheck:))
     {
+        if ([fFileOutline numberOfSelectedRows] <= 0)
+            return NO;
+        
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
         NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
