@@ -312,8 +312,42 @@
 
 + (CTGradient *)progressYellowGradient
 {
-    #warning someone make a real one!
-    return [CTGradient gradientWithBeginningColor: [NSColor orangeColor] endingColor: [NSColor yellowColor]];
+    CTGradient *newInstance = [[[self class] alloc] init];
+    
+    CTGradientElement color1;
+    color1.red = 0.933;
+    color1.green = 0.831;
+    color1.blue  = 0.227;
+    color1.alpha = 1.00;
+    color1.position = 1;
+    
+    CTGradientElement color2;
+    color2.red = 0.965;
+    color2.green = 0.737;
+    color2.blue  = 0.086;
+    color2.alpha = 1.00;
+    color2.position = 0.5;
+    
+    CTGradientElement color3;
+    color3.red = 0.965;
+    color3.green = 0.831;
+    color3.blue  = 0.169;
+    color3.alpha = 1.00;
+    color3.position = 0.5;
+    
+    CTGradientElement color4;
+    color4.red = 0.965;
+    color4.green = 0.831;
+    color4.blue  = 0.169;
+    color4.alpha = 1.00;
+    color4.position = 0;
+    
+    [newInstance addElement:&color1];
+    [newInstance addElement:&color2];
+    [newInstance addElement:&color3];
+    [newInstance addElement:&color4];
+    
+    return [newInstance autorelease];
 }
 
 + (CTGradient *)progressTransparentGradient
