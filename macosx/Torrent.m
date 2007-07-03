@@ -524,6 +524,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                     [NSNumber numberWithFloat: [self progress]], @"Progress",
                                     [NSNumber numberWithFloat: (float)fStat->left/[self size]], @"Left",
                                     [NSNumber numberWithBool: [self isActive]], @"Active",
+                                    [NSNumber numberWithBool: [self isChecking]], @"Checking",
                                     [NSNumber numberWithBool: [self isError]], @"Error", nil];
     
     if ([self isSeeding])
@@ -1658,7 +1659,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         NSEnumerator * enumerator = [siblings objectEnumerator];
         while ((dict = [enumerator nextObject]))
-            if ([[dict objectForKey: @"Name"] isEqualToString: name] && [[dict objectForKey: @"IsFolder"] boolValue])
+            if ([[dict objectForKey: @"IsFolder"] boolValue] && [[dict objectForKey: @"Name"] isEqualToString: name])
                 break;
     }
     

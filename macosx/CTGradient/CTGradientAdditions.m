@@ -310,6 +310,12 @@
     return [newInstance autorelease];
 }
 
++ (CTGradient *)progressYellowGradient
+{
+    #warning someone make a real one!
+    return [CTGradient gradientWithBeginningColor: [NSColor orangeColor] endingColor: [NSColor yellowColor]];
+}
+
 + (CTGradient *)progressTransparentGradient
 {
     CTGradient *newInstance = [[[self class] alloc] init];

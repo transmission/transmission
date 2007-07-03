@@ -32,7 +32,7 @@
 {
     NSImage * fErrorImage;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fLightGreenGradient,
-                * fGreenGradient, * fBlueGradient, * fTransparentGradient;
+                * fGreenGradient, * fYellowGradient, * fBlueGradient, * fTransparentGradient;
     NSUserDefaults * fDefaults;
 }
 

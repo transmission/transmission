@@ -52,6 +52,7 @@
         fBlueGradient = [[CTGradient progressBlueGradient] retain];
         fGreenGradient = [[CTGradient progressGreenGradient] retain];
         fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
+        fYellowGradient = [[CTGradient progressYellowGradient] retain];
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
         
         fErrorImage = [[NSImage imageNamed: @"Error"] copy];
@@ -100,7 +101,9 @@
         }
     }
     
-    if ([[info objectForKey: @"Seeding"] boolValue])
+    if ([[info objectForKey: @"Checking"] boolValue])
+        [fYellowGradient fillRect: completeBounds angle: -90];
+    else if ([[info objectForKey: @"Seeding"] boolValue])
     {
         NSRect ratioBounds = completeBounds;
         ratioBounds.size.width *= [[info objectForKey: @"ProgressStopRatio"] floatValue];
@@ -109,13 +112,10 @@
             [fLightGreenGradient fillRect: completeBounds angle: -90];
         [fGreenGradient fillRect: ratioBounds angle: -90];
     }
+    else if ([[info objectForKey: @"Active"] boolValue])
+        [fBlueGradient fillRect: completeBounds angle: -90];
     else
-    {
-        if ([[info objectForKey: @"Active"] boolValue])
-            [fBlueGradient fillRect: completeBounds angle: -90];
-        else
-            [fGrayGradient fillRect: completeBounds angle: -90];
-    }
+        [fGrayGradient fillRect: completeBounds angle: -90];
     
     [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
     [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
