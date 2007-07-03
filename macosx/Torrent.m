@@ -531,13 +531,13 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     if (![fDefaults boolForKey: @"SmallView"])
     {
-        [info setObject: fIconFlipped forKey: @"Icon"];
+        [info setObject: [self iconFlipped] forKey: @"Icon"];
         [info setObject: [self progressString] forKey: @"ProgressString"];
         [info setObject: [self statusString] forKey: @"StatusString"];
     }
     else
     {
-        [info setObject: fIconSmall forKey: @"Icon"];
+        [info setObject: [self iconSmall] forKey: @"Icon"];
         [info setObject: [self remainingTimeString] forKey: @"RemainingTimeString"];
         [info setObject: [self shortStatusString] forKey: @"ShortStatusString"];
     }
@@ -935,11 +935,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSImage *) iconFlipped
 {
+    if (!fIconFlipped)
+    {
+        fIconFlipped = [fIcon copy];
+        [fIconFlipped setFlipped: YES];
+    }
     return fIconFlipped;
 }
 
 - (NSImage *) iconSmall
 {
+    if (!fIconSmall)
+    {
+        fIconSmall = [fIcon copy];
+        [fIconSmall setFlipped: YES];
+        [fIconSmall setScalesWhenResized: YES];
+        [fIconSmall setSize: NSMakeSize(16.0, 16.0)];
+    }
     return fIconSmall;
 }
 
@@ -1561,13 +1573,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr')
                                                 : [[self name] pathExtension]] retain];
-    
-    fIconFlipped = [fIcon copy];
-    [fIconFlipped setFlipped: YES];
-    
-    fIconSmall = [fIconFlipped copy];
-    [fIconSmall setScalesWhenResized: YES];
-    [fIconSmall setSize: NSMakeSize(16.0, 16.0)];
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
