@@ -405,7 +405,7 @@ static void DispatchPeers( tr_shared_t * s )
             for( tor = h->torrentList; tor; tor = tor->next )
             {
                 tr_torrentWriterLock( tor );
-                if( tor->cpStatus != TR_RUN_RUNNING )
+                if( tor->runStatus != TR_RUN_RUNNING )
                 {
                     tr_torrentWriterUnlock( tor );
                     continue;
