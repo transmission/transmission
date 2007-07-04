@@ -173,8 +173,9 @@
     //update dock badge
     if (baseChange || fSpeedBadge || speedChange)
     {
-        [NSApp setApplicationIconImage: dockIcon];
-        [dockIcon release];
+        [NSApp setApplicationIconImage: dockIcon ? dockIcon : fDockIcon];
+        if (dockIcon)
+            [dockIcon release];
         
         fSpeedBadge = speedChange;
     }
