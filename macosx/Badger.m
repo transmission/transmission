@@ -64,13 +64,14 @@
         fCompletedBadged = fCompleted;
         
         //force image to reload - copy does not work
-        NSImage * icon = [NSImage imageNamed: @"NSApplicationIcon"];
+        NSImage * icon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         NSSize iconSize = [icon size];
         
         if (fDockIcon)
             [fDockIcon release];
         fDockIcon = [[NSImage alloc] initWithSize: iconSize];
         [fDockIcon addRepresentation: [icon bestRepresentationForDevice: nil]];
+        [icon release];
         
         if (fCompleted > 0)
         {
@@ -82,7 +83,7 @@
             badgeRect.size = [fBadge size];
             badgeRect.origin.x = iconSize.width - badgeRect.size.width;
             badgeRect.origin.y = iconSize.height - badgeRect.size.height;
-                                        
+            
             [fDockIcon lockFocus];
             
             //place badge
