@@ -25,7 +25,7 @@
 	<key>CheckRemoveDownloading</key>
 	<false/>
 	<key>CheckStalled</key>
-	<true/>
+	<false/>
 	<key>CheckUpload</key>
 	<true/>
 	<key>CreatorLocation</key>
