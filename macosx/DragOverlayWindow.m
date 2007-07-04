@@ -86,7 +86,7 @@
     while ((file = [enumerator nextObject]))
     {
         if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
-        {
+        {NSLog(@"asdgas");
             count++;
             size += info.totalSize;
             fileCount += info.fileCount;
@@ -125,6 +125,7 @@
         secondString = [secondString stringByAppendingString: @" Total"];
     }
     
+    [[self contentView] setOverlay: icon mainLine: name subLine: secondString];
     [self fadeIn];
 }
 
@@ -132,7 +133,6 @@
 {
     [[self contentView] setOverlay: [NSImage imageNamed: @"CreateLarge.png"]
         mainLine: NSLocalizedString(@"Create a Torrent File", "Drag overlay -> file") subLine: file];
-    
     [self fadeIn];
 }
 
@@ -141,7 +141,6 @@
 {
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]
         mainLine: NSLocalizedString(@"Web Address", "Drag overlay -> url") subLine: url];
-    
     [self fadeIn];
 }
 
