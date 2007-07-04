@@ -173,9 +173,6 @@
     //update dock badge
     if (baseChange || fSpeedBadge || speedChange)
     {
-        //copy to avoid badge not being cleared
-        if (!dockIcon)
-            dockIcon = [fDockIcon copy];
         [NSApp setApplicationIconImage: dockIcon];
         [dockIcon release];
         
