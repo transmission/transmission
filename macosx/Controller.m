@@ -1331,6 +1331,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         [torrent resetCache];
+    
+    [self applyFilter: nil];
 }
 
 - (void) showPreferenceWindow: (id) sender
