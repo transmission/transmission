@@ -525,6 +525,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                     [NSNumber numberWithBool: [self isActive]], @"Active",
                                     [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
                                     [NSNumber numberWithBool: [self isChecking]], @"Checking",
+                                    [NSNumber numberWithBool: fWaitToStart], @"Waiting",
                                     [NSNumber numberWithBool: [self isError]], @"Error", nil];
     
     if ([self isSeeding])

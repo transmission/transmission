@@ -230,6 +230,46 @@
     return [newInstance autorelease];
 }
 
++ (CTGradient *)progressDarkBlueGradient
+{
+    CTGradient *newInstance = [[[self class] alloc] init];
+    
+    CTGradientElement color1;
+    color1.red = 0.616;
+    color1.green = 0.722;
+    color1.blue  = 0.776;
+    color1.alpha = 1.00;
+    color1.position = 0;
+    
+    CTGradientElement color2;
+    color2.red = 0.525;
+    color2.green = 0.631;
+    color2.blue  = 0.737;
+    color2.alpha = 1.00;
+    color2.position = 0.5;
+    
+    CTGradientElement color3;
+    color3.red = 0.651;
+    color3.green = 0.725;
+    color3.blue  = 0.804;
+    color3.alpha = 1.00;
+    color3.position = 0.5;
+    
+    CTGradientElement color4;
+    color4.red = 0.659;
+    color4.green = 0.733;
+    color4.blue  = 0.800;
+    color4.alpha = 1.00;
+    color4.position = 1;
+    
+    [newInstance addElement:&color1];
+    [newInstance addElement:&color2];
+    [newInstance addElement:&color3];
+    [newInstance addElement:&color4];
+    
+    return [newInstance autorelease];
+}
+
 + (CTGradient *)progressGreenGradient
 {
     CTGradient *newInstance = [[[self class] alloc] init];
@@ -275,30 +315,70 @@
     CTGradient *newInstance = [[[self class] alloc] init];
     
     CTGradientElement color1;
-    color1.red = 0.478;
-    color1.green = 1.00;
-    color1.blue  = 0.55;
+    color1.red = 0.522;
+    color1.green = 0.894;
+    color1.blue  = 0.565;
     color1.alpha = 1.00;
     color1.position = 0;
     
     CTGradientElement color2;
-    color2.red = 0.388;
-    color2.green = 0.92;
-    color2.blue  = 0.44;
+    color2.red = 0.373;
+    color2.green = 0.780;
+    color2.blue  = 0.408;
     color2.alpha = 1.00;
     color2.position = 0.5;
     
     CTGradientElement color3;
-    color3.red = 0.627;
-    color3.green = 1.00;
-    color3.blue  = 0.53;
+    color3.red = 0.659;
+    color3.green = 0.918;
+    color3.blue  = 0.604;
     color3.alpha = 1.00;
     color3.position = 0.5;
     
     CTGradientElement color4;
-    color4.red = 0.675;
-    color4.green = 1.00;
-    color4.blue  = 0.55;
+    color4.red = 0.678;
+    color4.green = 0.929;
+    color4.blue  = 0.608;
+    color4.alpha = 1.00;
+    color4.position = 1;
+    
+    [newInstance addElement:&color1];
+    [newInstance addElement:&color2];
+    [newInstance addElement:&color3];
+    [newInstance addElement:&color4];
+    
+    return [newInstance autorelease];
+}
+
++ (CTGradient *)progressDarkGreenGradient
+{
+    CTGradient *newInstance = [[[self class] alloc] init];
+    
+    CTGradientElement color1;
+    color1.red = 0.627;
+    color1.green = 0.714;
+    color1.blue  = 0.639;
+    color1.alpha = 1.00;
+    color1.position = 0;
+    
+    CTGradientElement color2;
+    color2.red = 0.545;
+    color2.green = 0.635;
+    color2.blue  = 0.561;
+    color2.alpha = 1.00;
+    color2.position = 0.5;
+    
+    CTGradientElement color3;
+    color3.red = 0.690;
+    color3.green = 0.745;
+    color3.blue  = 0.675;
+    color3.alpha = 1.00;
+    color3.position = 0.5;
+    
+    CTGradientElement color4;
+    color4.red = 0.694;
+    color4.green = 0.741;
+    color4.blue  = 0.678;
     color4.alpha = 1.00;
     color4.position = 1;
     
