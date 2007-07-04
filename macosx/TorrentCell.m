@@ -114,6 +114,7 @@
             
             if (ratioBounds.size.width < completeBounds.size.width)
                 [fLightGreenGradient fillRect: completeBounds angle: -90];
+            [fGreenGradient fillRect: ratioBounds angle: -90]; 
         }
         else
             [fBlueGradient fillRect: completeBounds angle: -90];
