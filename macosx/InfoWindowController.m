@@ -672,16 +672,20 @@
         else
             priority = PRIORITY_NORMAL;
         
+        NSIndexSet * fileIndexSet;
         for (i = [indexSet firstIndex]; i != NSNotFound && (!current || !other); i = [indexSet indexGreaterThanIndex: i])
         {
-            if ([torrent hasFilePriority: priority forIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]])
+            fileIndexSet = [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"];
+            if (![torrent canChangeDownloadCheckForFiles: fileIndexSet])
+                continue;
+            else if ([torrent hasFilePriority: priority forIndexes: fileIndexSet])
                 current = YES;
             else
                 other = YES;
         }
         
-        [menuItem setState: current ? (other ? NSMixedState : NSOnState) : NSOffState];
-        return YES;
+        [menuItem setState: current ? NSOnState : NSOffState];
+        return current || other;
     }
     
     return YES;
