@@ -916,8 +916,13 @@
     if ([identifier isEqualToString: @"Check"])
     {
         Torrent * torrent = [fTorrents objectAtIndex: 0];
-        [torrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState
-                                        forIndexes: [item objectForKey: @"Indexes"]];
+        NSIndexSet * indexSet;
+        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+            indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [torrent fileCount])];
+        else
+            indexSet = [item objectForKey: @"Indexes"];
+        
+        [torrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
         [fFileOutline reloadData];
     }
     else;
