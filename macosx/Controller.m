@@ -547,6 +547,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fAutoImportTimer release];
     }
     
+    //remember window states and close all windows
+    [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
+    [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
+    [self showStatusBar: NO animate: NO];
+    [self showFilterBar: NO animate: NO];
+    
     //save history
     [self updateTorrentHistory];
     
@@ -561,12 +567,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     //disable NAT traversal
     tr_natTraversalEnable(fLib, 0);
-    
-    //remember window states and close all windows
-    [fDefaults setBool: [[fInfoController window] isVisible] forKey: @"InfoVisible"];
-    [[NSApp windows] makeObjectsPerformSelector: @selector(close)];
-    [self showStatusBar: NO animate: NO];
-    [self showFilterBar: NO animate: NO];
     
     //clear badge
     [fBadger clearBadge];

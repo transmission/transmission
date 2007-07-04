@@ -31,8 +31,8 @@
 @interface TorrentCell : NSCell
 {
     NSImage * fErrorImage;
-    CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fLightGreenGradient,
-                * fGreenGradient, * fYellowGradient, * fBlueGradient, * fTransparentGradient;
+    CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
+                * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     NSUserDefaults * fDefaults;
 }
 

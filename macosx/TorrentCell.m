@@ -50,8 +50,10 @@
         fGrayGradient = [[CTGradient progressGrayGradient] retain];
         fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
         fBlueGradient = [[CTGradient progressBlueGradient] retain];
+        //fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
         fGreenGradient = [[CTGradient progressGreenGradient] retain];
         fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
+        //fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
         fYellowGradient = [[CTGradient progressYellowGradient] retain];
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
         
@@ -101,19 +103,21 @@
         }
     }
     
-    if ([[info objectForKey: @"Checking"] boolValue])
-        [fYellowGradient fillRect: completeBounds angle: -90];
-    else if ([[info objectForKey: @"Seeding"] boolValue])
+    if ([[info objectForKey: @"Active"] boolValue])
     {
-        NSRect ratioBounds = completeBounds;
-        ratioBounds.size.width *= [[info objectForKey: @"ProgressStopRatio"] floatValue];
-        
-        if (ratioBounds.size.width < completeBounds.size.width)
-            [fLightGreenGradient fillRect: completeBounds angle: -90];
-        [fGreenGradient fillRect: ratioBounds angle: -90];
+        if ([[info objectForKey: @"Checking"] boolValue])
+            [fYellowGradient fillRect: completeBounds angle: -90];
+        else if ([[info objectForKey: @"Seeding"] boolValue])
+        {
+            NSRect ratioBounds = completeBounds;
+            ratioBounds.size.width *= [[info objectForKey: @"ProgressStopRatio"] floatValue];
+            
+            if (ratioBounds.size.width < completeBounds.size.width)
+                [fLightGreenGradient fillRect: completeBounds angle: -90];
+        }
+        else
+            [fBlueGradient fillRect: completeBounds angle: -90];
     }
-    else if ([[info objectForKey: @"Active"] boolValue])
-        [fBlueGradient fillRect: completeBounds angle: -90];
     else
         [fGrayGradient fillRect: completeBounds angle: -90];
     

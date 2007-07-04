@@ -520,10 +520,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     NSMutableDictionary * info = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                     [self name], @"Name",
-                                    [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
                                     [NSNumber numberWithFloat: [self progress]], @"Progress",
                                     [NSNumber numberWithFloat: (float)fStat->left/[self size]], @"Left",
                                     [NSNumber numberWithBool: [self isActive]], @"Active",
+                                    [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
                                     [NSNumber numberWithBool: [self isChecking]], @"Checking",
                                     [NSNumber numberWithBool: [self isError]], @"Error", nil];
     
