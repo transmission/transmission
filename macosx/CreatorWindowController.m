@@ -233,6 +233,7 @@
     [fDefaults setBool: fOpenTorrent forKey: @"CreatorOpen"];
     [fDefaults setObject: [fLocation stringByDeletingLastPathComponent] forKey: @"CreatorLocation"];
     
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"BeginCreateTorrentFile" object: fLocation userInfo: nil];
     tr_makeMetaInfo(fInfo, [fLocation UTF8String], [trackerString UTF8String], [[fCommentView string] UTF8String],
                     [fPrivateCheck state] == NSOnState);
     

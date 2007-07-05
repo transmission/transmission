@@ -11,7 +11,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - OS X:
    + Overlay when dragging torrent files, URLs, and data files onto window
    + Ability to set an amount of time to consider a transfer stalled
-   + Progress bar displays more information
+   + More progress bar colors
    + Various smaller interface improvements
  - GTK:
    + Interface significantly reworked to closer match the Mac version

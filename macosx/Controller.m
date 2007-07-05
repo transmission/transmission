@@ -422,6 +422,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                     name: @"DockBadgeChange" object: nil];
     
     //open newly created torrent file
+    [nc addObserver: self selector: @selector(beginCreateFile:)
+                    name: @"BeginCreateTorrentFile" object: nil];
+    
+    //open newly created torrent file
     [nc addObserver: self selector: @selector(openCreatedFile:)
                     name: @"OpenCreatedTorrentFile" object: nil];
 
@@ -2084,6 +2088,19 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     }
     
     [newNames release];
+}
+
+- (void) beginCreateFile: (NSNotification *) notification
+{
+    if (![fDefaults boolForKey: @"AutoImport"])
+        return;
+    
+    NSString * location = [notification object],
+            * path = [fDefaults stringForKey: @"AutoImportDirectory"];
+    
+    if (location && path && [[[location stringByDeletingLastPathComponent] stringByExpandingTildeInPath]
+                                    isEqualToString: [path stringByExpandingTildeInPath]])
+        [fAutoImportedNames addObject: [location lastPathComponent]];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableview

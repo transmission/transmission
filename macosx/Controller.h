@@ -199,6 +199,8 @@
 - (void) changeAutoImport;
 - (void) checkAutoImportDirectory;
 
+- (void) beginCreateFile: (NSNotification *) notification;
+
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 
 - (void) toggleSmallView: (id) sender;
