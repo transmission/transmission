@@ -181,13 +181,17 @@ static uint8_t*
 getHashInfo ( tr_metainfo_builder_t * b )
 {
     int fileIndex = 0;
-    uint8_t *ret = tr_new( uint8_t, SHA_DIGEST_LENGTH * b->pieceCount );
+    uint8_t *ret = tr_new0( uint8_t, SHA_DIGEST_LENGTH * b->pieceCount );
     uint8_t *walk = ret;
-    uint8_t *buf = tr_new( uint8_t, b->pieceSize );
+    uint8_t *buf;
     uint64_t totalRemain;
     uint64_t off = 0;
     FILE * fp;
 
+    if( !b->totalSize )
+        return ret;
+
+    buf = tr_new( uint8_t, b->pieceSize );
     b->pieceIndex = 0;
     totalRemain = b->totalSize;
     fp = fopen( b->files[fileIndex].filename, "rb" );

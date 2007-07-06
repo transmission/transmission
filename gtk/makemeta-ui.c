@@ -65,12 +65,14 @@ progress_response_cb ( GtkDialog *d UNUSED, int response, gpointer user_data )
 static gboolean
 refresh_cb ( gpointer user_data )
 {
+    int denom;
     char buf[1024];
     double fraction;
     MakeMetaUI * ui = (MakeMetaUI *) user_data;
     GtkProgressBar * p = GTK_PROGRESS_BAR( ui->progressbar );
 
-    fraction = (double)ui->builder->pieceIndex / ui->builder->pieceCount;
+    denom = ui->builder->pieceCount ? ui->builder->pieceCount : 1;
+    fraction = (double)ui->builder->pieceIndex / denom;
     gtk_progress_bar_set_fraction( p, fraction );
     g_snprintf( buf, sizeof(buf), "%s (%d%%)", ui->torrent_name, (int)(fraction*100 + 0.5));
     gtk_progress_bar_set_text( p, buf );
