@@ -443,8 +443,11 @@ errcb(GtkWidget *widget, int resp SHUTUP, gpointer data) {
   gtk_widget_destroy(widget);
 }
 
+typedef void (PopupFunc)(GtkWidget*, GdkEventButton*); 
+
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
+
 gboolean
 on_tree_view_button_pressed (GtkWidget       * view,
                              GdkEventButton  * event,
@@ -469,7 +472,6 @@ on_tree_view_button_pressed (GtkWidget       * view,
       gtk_tree_path_free(path);
     }
    
-    typedef void (PopupFunc)(GtkWidget*, GdkEventButton*); 
     ((PopupFunc*)func)(view, event);
 
     return TRUE;

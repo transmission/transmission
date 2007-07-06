@@ -44,10 +44,12 @@ static GtkTextBuffer * textbuf = NULL;
 static GtkTextTag*
 get_or_create_tag (GtkTextTagTable * table, const char * key)
 {
+  GtkTextTag * tag;
+
   g_assert (table);
   g_assert (key && *key);
 
-  GtkTextTag * tag = gtk_text_tag_table_lookup (table, key);
+  tag = gtk_text_tag_table_lookup (table, key);
   if (!tag) {
     tag = gtk_text_tag_new (key);
     gtk_text_tag_table_add (table, tag);
