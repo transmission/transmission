@@ -275,6 +275,8 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_bitfieldFree( peer->bitfield );
     tr_bitfieldFree( peer->blamefield );
     tr_bitfieldFree( peer->banfield );
+    tr_free( peer->inRequests );
+    tr_free( peer->outRequests );
     tr_free( peer->buf );
     tr_free( peer->outMessages );
     if( peer->status > PEER_STATUS_IDLE )
