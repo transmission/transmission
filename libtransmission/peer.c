@@ -154,6 +154,9 @@ struct tr_peer_s
 
     /* The pieces that the peer has */
     tr_bitfield_t     * bitfield;
+
+    /* blocks we've requested from this peer */
+    tr_bitfield_t     * reqfield;
     int                 pieceCount;
     float               progress;
 
@@ -231,9 +234,18 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
  **********************************************************************/
 tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
 {
-    tr_peer_t * peer = peerInit();
+    tr_peer_t * peer;
 
     assert( 0 <= from && TR_PEER_FROM__MAX > from );
+
+    peer              = tr_new0( tr_peer_t, 1 );
+    peertreeInit( &peer->sentPeers );
+    peer->amChoking   = TRUE;
+    peer->peerChoking = TRUE;
+    peer->date        = tr_date();
+    peer->keepAlive   = peer->date;
+    peer->download    = tr_rcInit();
+    peer->upload      = tr_rcInit();
 
     peer->outRequestMax = peer->outRequestAlloc = 2;
     peer->outRequests = tr_new0( tr_request_t, peer->outRequestAlloc );
@@ -275,6 +287,7 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_bitfieldFree( peer->bitfield );
     tr_bitfieldFree( peer->blamefield );
     tr_bitfieldFree( peer->banfield );
+    tr_bitfieldFree( peer->reqfield );
     tr_free( peer->inRequests );
     tr_free( peer->outRequests );
     tr_free( peer->buf );
@@ -621,10 +634,16 @@ writeEnd:
 
         if( endgame ) /* endgame -- request everything we don't already have */
         {
-            const tr_bitfield_t * blocks = tr_cpBlockBitfield( tor->completion );
-            for( i=0; i<tor->blockCount && peer->inRequestCount<peer->inRequestMax; ++i ) {
-                if( tr_bitfieldHas( blocks, i ) )
-                    sendRequest( tor, peer, i );
+            for( i=0; i<tor->blockCount && peer->inRequestCount<peer->inRequestMax; ++i )
+            {
+                if( !isBlockInteresting( tor, peer, i ) )
+                    continue;
+                if( tr_bitfieldHas( peer->reqfield, i ) ) /* we've already asked them for it */
+                    continue;
+                if( !peer->reqfield )
+                    peer->reqfield = tr_bitfieldNew( tor->blockCount );
+                tr_bitfieldAdd( peer->reqfield, i );
+                sendRequest( tor, peer, i );
             }
         }
         else for( i=0; i<poolSize && peer->inRequestCount<peer->inRequestMax;  )

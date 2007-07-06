@@ -24,26 +24,6 @@
 
 static void updateInterest( tr_torrent_t * tor, tr_peer_t * peer );
 
-/***********************************************************************
- * peerInit
- ***********************************************************************
- * Allocates a new tr_peer_t and returns a pointer to it.
- **********************************************************************/
-static tr_peer_t * peerInit()
-{
-    tr_peer_t * peer;
-
-    peer              = calloc( sizeof( tr_peer_t ), 1 );
-    peertreeInit( &peer->sentPeers );
-    peer->amChoking   = 1;
-    peer->peerChoking = 1;
-    peer->date        = tr_date();
-    peer->keepAlive   = peer->date;
-    peer->download    = tr_rcInit();
-    peer->upload      = tr_rcInit();
-
-    return peer;
-}
 
 static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 {
@@ -189,6 +169,9 @@ static int isPieceInteresting( const tr_torrent_t  * tor,
                                const tr_peer_t     * peer,
                                int                   piece )
 {
+    if( tr_cpPieceIsComplete( tor->completion, piece ) ) /* we already have it */
+        return 0;
+
     if( tor->info.pieces[piece].priority == TR_PRI_DND ) /* we don't want it */
         return 0;
 
@@ -198,7 +181,17 @@ static int isPieceInteresting( const tr_torrent_t  * tor,
     if( tr_bitfieldHas( peer->banfield, piece ) ) /* peer is banned for it */
         return 0;
 
-    if( tr_cpPieceIsComplete( tor->completion, piece ) ) /* we already have it */
+    return 1;
+}
+
+static int isBlockInteresting( const tr_torrent_t  * tor,
+                               const tr_peer_t     * peer,
+                               int                   block )
+{
+    if( !isPieceInteresting( tor, peer, tr_blockPiece( block ) ) ) /* is piece interesting? */
+        return 0;
+
+    if( tr_cpBlockIsComplete( tor->completion, block )) /* we already have it */
         return 0;
 
     return 1;

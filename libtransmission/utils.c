@@ -495,7 +495,7 @@ tr_bitfieldHas( const tr_bitfield_t   * bitfield,
 {
     if ( bitfield == NULL ) return 0;
     assert( bit / 8u < bitfield->len );
-    return ( bitfield->bits[ bit/8u ] & bitmask[bit%8] );
+    return ( bitfield->bits[ bit/8u ] & bitmask[bit%8] ) != 0;
 }
 
 void
