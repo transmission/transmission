@@ -43,7 +43,7 @@ readOrWriteBytes ( const tr_torrent_t  * tor,
 
     if( !file->length )
         return 0;
-    else if ((fd = tr_fdFileOpen ( tor->destination, file->name, TRUE )) < 0)
+    else if ((fd = tr_fdFileOpen ( tor->destination, file->name, ioMode==TR_IO_WRITE )) < 0)
         ret = fd;
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
         ret = TR_ERROR_IO_OTHER;
