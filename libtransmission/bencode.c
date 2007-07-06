@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <ctype.h> /* for isdigit */
 #include "transmission.h"
 
 /* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
@@ -51,115 +52,119 @@ int _tr_bencLoad( char * buf, int len, benc_val_t * val, char ** end )
 {
     char * p, * e, * foo;
 
-    if( NULL == buf || 1 >= len )
-    {
-        return 1;
-    }
-
     if( !end )
     {
         /* So we only have to check once */
         end = &foo;
     }
 
-    if( buf[0] == 'i' )
+    for( ;; )
     {
-        int64_t num;
-
-        e = memchr( &buf[1], 'e', len - 1 );
-        if( NULL == e )
-        {
+        if( !buf || len<1 ) /* no more text to parse... */
             return 1;
-        }
 
-        /* Integer: i1242e */
-        *e = '\0';
-        num = strtoll( &buf[1], &p, 10 );
-        *e = 'e';
-
-        if( p != e )
+        if( *buf=='i' ) /* Integer: i1234e */
         {
-            return 1;
+            int64_t num;
+
+            e = memchr( &buf[1], 'e', len - 1 );
+            if( !e )
+                return 1;
+
+            *e = '\0';
+            num = strtoll( &buf[1], &p, 10 );
+            *e = 'e';
+
+            if( p != e )
+                return 1;
+
+            tr_bencInitInt( val, num );
+            *end = p + 1;
+            break;
         }
-
-        tr_bencInitInt( val, num );
-        *end = p + 1;
-    }
-    else if( buf[0] == 'l' || buf[0] == 'd' )
-    {
-        /* List: l<item1><item2>e
-           Dict: d<string1><item1><string2><item2>e
-           A dictionary is just a special kind of list with an even
-           count of items, and where even items are strings. */
-        char * cur;
-        char   is_dict;
-        char   str_expected;
-
-        is_dict      = ( buf[0] == 'd' );
-        cur          = &buf[1];
-        str_expected = 1;
-        tr_bencInit( val, ( is_dict ? TYPE_DICT : TYPE_LIST ) );
-        while( cur - buf < len && cur[0] != 'e' )
+        else if( *buf=='l' || *buf=='d' )
         {
-            if( makeroom( val, 1 ) ||
-                tr_bencLoad( cur, len - (cur - buf),
-                             &val->val.l.vals[val->val.l.count], &p ) )
+            /* List: l<item1><item2>e
+               Dict: d<string1><item1><string2><item2>e
+               A dictionary is just a special kind of list with an even
+               count of items, and where even items are strings. */
+            char * cur;
+            char   is_dict;
+            char   str_expected;
+
+            is_dict      = ( buf[0] == 'd' );
+            cur          = &buf[1];
+            str_expected = 1;
+            tr_bencInit( val, ( is_dict ? TYPE_DICT : TYPE_LIST ) );
+            while( cur - buf < len && cur[0] != 'e' )
+            {
+                if( makeroom( val, 1 ) ||
+                    tr_bencLoad( cur, len - (cur - buf),
+                                 &val->val.l.vals[val->val.l.count], &p ) )
+                {
+                    tr_bencFree( val );
+                    return 1;
+                }
+                val->val.l.count++;
+                if( is_dict && str_expected &&
+                    val->val.l.vals[val->val.l.count - 1].type != TYPE_STR )
+                {
+                    tr_bencFree( val );
+                    return 1;
+                }
+                str_expected = !str_expected;
+
+                cur = p;
+            }
+
+            if( is_dict && ( val->val.l.count & 1 ) )
             {
                 tr_bencFree( val );
                 return 1;
             }
-            val->val.l.count++;
-            if( is_dict && str_expected &&
-                val->val.l.vals[val->val.l.count - 1].type != TYPE_STR )
+
+            *end = cur + 1;
+            break;
+        }
+        else if( isdigit(*buf) )
+        {
+            int    slen;
+            char * sbuf;
+
+            e = memchr( buf, ':', len );
+            if( NULL == e )
             {
-                tr_bencFree( val );
                 return 1;
             }
-            str_expected = !str_expected;
 
-            cur = p;
+            /* String: 12:whateverword */
+            e[0] = '\0';
+            slen = strtol( buf, &p, 10 );
+            e[0] = ':';
+
+            if( p != e || 0 > slen || len - ( ( p + 1 ) - buf ) < slen )
+            {
+                return 1;
+            }
+
+            sbuf = malloc( slen + 1 );
+            if( NULL == sbuf )
+            {
+                return 1;
+            }
+
+            memcpy( sbuf, p + 1, slen );
+            sbuf[slen] = '\0';
+            tr_bencInitStr( val, sbuf, slen, 0 );
+
+            *end = p + 1 + val->val.s.i;
+            break;
         }
-
-        if( is_dict && ( val->val.l.count & 1 ) )
+        else /* invalid bencoded text... march past it */
         {
-            tr_bencFree( val );
-            return 1;
+            ++buf;
+            --len;
         }
-
-        *end = cur + 1;
-    }
-    else
-    {
-        int    slen;
-        char * sbuf;
-
-        e = memchr( buf, ':', len );
-        if( NULL == e )
-        {
-            return 1;
-        }
-
-        /* String: 12:whateverword */
-        e[0] = '\0';
-        slen = strtol( buf, &p, 10 );
-        e[0] = ':';
-
-        if( p != e || 0 > slen || len - ( ( p + 1 ) - buf ) < slen )
-        {
-            return 1;
-        }
-
-        sbuf = malloc( slen + 1 );
-        if( NULL == sbuf )
-        {
-            return 1;
-        }
-
-        memcpy( sbuf, p + 1, slen );
-        sbuf[slen] = '\0';
-        tr_bencInitStr( val, sbuf, slen, 0 );
-
-        *end = p + 1 + val->val.s.i;
     }
 
     val->begin = buf;
