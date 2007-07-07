@@ -24,10 +24,10 @@
 
 typedef struct tr_ratecontrol_s tr_ratecontrol_t;
 
-tr_ratecontrol_t * tr_rcInit();
+tr_ratecontrol_t * tr_rcInit( void );
 void               tr_rcSetLimit( tr_ratecontrol_t *, int );
-int                tr_rcCanTransfer( tr_ratecontrol_t * );
+int                tr_rcCanTransfer( const tr_ratecontrol_t * );
 void               tr_rcTransferred( tr_ratecontrol_t *, int );
-float              tr_rcRate( tr_ratecontrol_t * );
+float              tr_rcRate( const tr_ratecontrol_t * );
 void               tr_rcReset( tr_ratecontrol_t * );
 void               tr_rcClose( tr_ratecontrol_t * );

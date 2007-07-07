@@ -377,16 +377,11 @@ int tr_peerRead( tr_peer_t * peer )
             peer->size *= 2;
             peer->buf   = realloc( peer->buf, peer->size );
         }
-#if 0
-        /* Never read more than 1K each time, otherwise the rate
-           control is no use */
+
+        /* Read in smallish chunks, otherwise we might read more
+         * than the download cap is supposed to allow us */
         ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
                           MIN( 1024, peer->size - peer->pos ) ); 
-#else
-        /* Hm, it doesn't *seem* to break rate control... */
-        ret = tr_netRecv( peer->socket, &peer->buf[peer->pos],
-                          peer->size - peer->pos ); 
-#endif
 
         if( ret & TR_NET_CLOSE )
         {
@@ -568,26 +563,19 @@ writeBegin:
     while( ( p = blockPending( tor, peer, &size ) ) )
     {
         if( SWIFT_ENABLED && !isSeeding && (peer->credit<0) )
-        {
             break;
-        }
 
         if( tor->customUploadLimit
             ? !tr_rcCanTransfer( tor->upload )
             : !tr_rcCanTransfer( tor->handle->upload ) )
-        {
             break;
-        }
 
         ret = tr_netSend( peer->socket, p, size );
         if( ret & TR_NET_CLOSE )
-        {
             return TR_ERROR;
-        }
-        else if( ret & TR_NET_BLOCK )
-        {
+
+        if( ret & TR_NET_BLOCK )
             break;
-        }
 
         blockSent( peer, ret );
 
@@ -601,9 +589,7 @@ writeBegin:
         peer->outDate     = date;
         
         if( !tr_peerAmChoking( peer ) )
-        {
             tor->activityDate = date;
-        }
 
         /* In case this block is done, you may have messages
            pending. Send them before we start the next block */
