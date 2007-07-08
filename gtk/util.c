@@ -109,29 +109,24 @@ readablespeed (double KiBps)
 #define MINUTES(s)              ((s) / 60 % 60)
 #define HOURS(s)                ((s) / 60 / 60 % 24)
 #define DAYS(s)                 ((s) / 60 / 60 / 24 % 7)
-#define WEEKS(s)                ((s) / 60 / 60 / 24 / 7)
 
 char *
 readabletime(int secs) {
   if(60 > secs)
     return g_strdup_printf(_("%i %s"),
-      SECONDS(secs), ngettext("second", "seconds", SECONDS(secs)));
+      SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
   else if(60 * 60 > secs)
     return g_strdup_printf(_("%i %s %i %s"),
-      MINUTES(secs), ngettext("minute", "minutes", MINUTES(secs)),
-      SECONDS(secs), ngettext("second", "seconds", SECONDS(secs)));
+      MINUTES(secs), ngettext("min", "mins", MINUTES(secs)),
+      SECONDS(secs), ngettext("sec", "secs", SECONDS(secs)));
   else if(60 * 60 * 24 > secs)
     return g_strdup_printf(_("%i %s %i %s"),
-      HOURS(secs),   ngettext("hour", "hours", HOURS(secs)),
-      MINUTES(secs), ngettext("minute", "minutes", MINUTES(secs)));
-  else if(60 * 60 * 24 * 7 > secs)
-    return g_strdup_printf(_("%i %s %i %s"),
-      DAYS(secs),    ngettext("day", "days", DAYS(secs)),
-      HOURS(secs),   ngettext("hour", "hours", HOURS(secs)));
+      HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)),
+      MINUTES(secs), ngettext("min", "mins", MINUTES(secs)));
   else
     return g_strdup_printf(_("%i %s %i %s"),
-      WEEKS(secs),   ngettext("week", "weeks", WEEKS(secs)),
-      DAYS(secs),    ngettext("hour", "hours", DAYS(secs)));
+      DAYS(secs),    ngettext("day", "days", DAYS(secs)),
+      HOURS(secs),   ngettext("hr", "hrs", HOURS(secs)));
 }
 
 char *

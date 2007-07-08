@@ -624,7 +624,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
                 top = g_strdup_printf( _("Stalled (%.1f%%)"), prog );
             else {
                 char * timestr = readabletime(eta);
-                top = g_strdup_printf( _("Finishing in %s (%.1f%%)"), timestr, prog );
+                top = g_strdup_printf( _("%s remaining (%.1f%%)"), timestr, prog );
                 g_free(timestr);
             }
             break;
@@ -638,8 +638,8 @@ tr_torrent_status_str ( TrTorrent * gtor )
 
         case TR_STATUS_SEED:
             top = g_strdup_printf(
-                ngettext( "Seeding, uploading to %d of %d peer",
-                          "Seeding, uploading to %d of %d peers", tpeers ),
+                ngettext( "Seeding to %d of %d peer",
+                          "Seeding to %d of %d peers", tpeers ),
                           upeers, tpeers );
             break;
 

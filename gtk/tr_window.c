@@ -42,6 +42,8 @@ typedef struct
     GtkWidget * scroll;
     GtkWidget * view;
     GtkWidget * status;
+    GtkWidget * ul_lb;
+    GtkWidget * dl_lb;
     GtkTreeSelection * selection;
     GtkCellRenderer * namerend;
 }
@@ -110,7 +112,7 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
         bottom = NULL;
     }
 
-    str = g_markup_printf_escaped( "<big>%s (%s)</big>\n<small>%s\n%s</small>",
+    str = g_markup_printf_escaped( "<b>%s (%s)</b>\n<small>%s\n%s</small>",
                                    name, mb, top,
                                    ( NULL == bottom ? "" : bottom ) );
     g_object_set( rend, "markup", str, NULL );
@@ -245,7 +247,7 @@ GtkWidget *
 tr_window_new( GtkUIManager * ui_manager )
 {
     PrivateData * p = g_new( PrivateData, 1 );
-    GtkWidget *vbox, *w, *self;
+    GtkWidget *vbox, *w, *self, *h;
 
     /* make the window */
     self = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -275,10 +277,21 @@ tr_window_new( GtkUIManager * ui_manager )
     gtk_box_pack_start_defaults( GTK_BOX(vbox), w );
     gtk_container_set_focus_child( GTK_CONTAINER( vbox ), w );
 
+    /* spacer */
+    w = gtk_alignment_new (0.0f, 0.0f, 0.0f, 0.0f);
+    gtk_widget_set_usize (w, 0u, 6u);
+    gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 ); 
+
+
     /* statusbar */
-    w = p->status = gtk_statusbar_new ();
-    gtk_statusbar_push( GTK_STATUSBAR(w), 0, "" );
-    gtk_box_pack_start( GTK_BOX(vbox), w, FALSE, FALSE, 0 );
+    h = gtk_hbox_new( FALSE, 0 );
+    w = p->ul_lb = gtk_label_new( NULL );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
+    w = gtk_vseparator_new( );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
+    w = p->dl_lb = gtk_label_new( NULL );
+    gtk_box_pack_end( GTK_BOX(h), w, FALSE, FALSE, GUI_PAD );
+    gtk_box_pack_start( GTK_BOX(vbox), h, FALSE, FALSE, 0 );
 
     /* show all but the window */
     gtk_widget_show_all( vbox );
@@ -290,18 +303,19 @@ void
 tr_window_update( TrWindow * self, float downspeed, float upspeed )
 {
     PrivateData * p = get_private_data( self );
-    GtkStatusbar * status = GTK_STATUSBAR( p->status );
+    char *tmp1, *tmp2;
 
-    /* update the status bar */
-    char * downstr = readablespeed ( downspeed );
-    char * upstr   = readablespeed ( upspeed );
-    char * str     = g_strdup_printf( _("     Total DL: %s     Total UL: %s"),
-                                      downstr, upstr );
-    g_free( downstr );
-    g_free( upstr );
-    gtk_statusbar_pop( status, 0 );
-    gtk_statusbar_push( status, 0, str );
-    g_free( str );
+    tmp1 = readablespeed( downspeed );
+    tmp2 = g_strdup_printf( _("Total DL: %s"), tmp1 );
+    gtk_label_set_text( GTK_LABEL(p->dl_lb), tmp2 );
+    g_free( tmp2 );
+    g_free( tmp1 );
+
+    tmp1 = readablespeed( upspeed );
+    tmp2 = g_strdup_printf( _("Total UL: %s"), tmp1 );
+    gtk_label_set_text( GTK_LABEL(p->ul_lb), tmp2 );
+    g_free( tmp2 );
+    g_free( tmp1 );
 }
 
 GtkTreeSelection*
