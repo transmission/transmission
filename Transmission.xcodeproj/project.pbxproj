@@ -202,6 +202,8 @@
 		BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E240C07861A00B0BB3C /* bencode.c */; };
 		BEFC1E5E0C07861A00B0BB3C /* bsdqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E250C07861A00B0BB3C /* bsdqueue.h */; };
 		BEFC1E5F0C07861A00B0BB3C /* trcompat.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E260C07861A00B0BB3C /* trcompat.h */; };
+		D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = D4AF3B2D0C41F7A500D46B6B /* list.c */; };
+		D4AF3B300C41F7A600D46B6B /* list.h in Headers */ = {isa = PBXBuildFile; fileRef = D4AF3B2E0C41F7A500D46B6B /* list.h */; };
 		E138A9770C04D88F00C5426C /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9740C04D88F00C5426C /* CTGradient.m */; };
 		E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* CTGradientAdditions.m */; };
 /* End PBXBuildFile section */
@@ -516,6 +518,8 @@
 		BEFC1E250C07861A00B0BB3C /* bsdqueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdqueue.h; path = libtransmission/bsdqueue.h; sourceTree = "<group>"; };
 		BEFC1E260C07861A00B0BB3C /* trcompat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trcompat.h; path = libtransmission/trcompat.h; sourceTree = "<group>"; };
 		BEFC1EEB0C0790CA00B0BB3C /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = libevent/event.h; sourceTree = "<group>"; };
+		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
+		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = "<group>"; };
 		E138A9740C04D88F00C5426C /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradient.m; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* CTGradientAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradientAdditions.h; sourceTree = "<group>"; };
@@ -746,6 +750,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				D4AF3B2D0C41F7A500D46B6B /* list.c */,
+				D4AF3B2E0C41F7A500D46B6B /* list.h */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */,
 				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
 				002C9EE50C19CD2500C2F6F4 /* fastresume.c */,
@@ -973,6 +979,7 @@
 				BEFC1E5E0C07861A00B0BB3C /* bsdqueue.h in Headers */,
 				BEFC1E5F0C07861A00B0BB3C /* trcompat.h in Headers */,
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
+				D4AF3B300C41F7A600D46B6B /* list.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1241,6 +1248,7 @@
 				BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */,
 				002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
+				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
