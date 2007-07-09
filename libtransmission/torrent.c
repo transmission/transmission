@@ -217,10 +217,8 @@ torrentRealInit( tr_handle_t   * h,
     if( !h->isPortSet )
         tr_setBindPort( h, TR_DEFAULT_PORT );
 
-    tor->downloadedPrev += tor->downloadedCur;
-    tor->downloadedCur   = 0;
-    tor->uploadedPrev   += tor->uploadedCur;
-    tor->uploadedCur     = 0;
+    assert( !tor->downloadedCur );
+    assert( !tor->uploadedCur );
 
     tor->error   = TR_OK;
     tor->runStatus = flags & TR_FLAG_PAUSED ? TR_RUN_STOPPED : TR_RUN_RUNNING;
@@ -974,6 +972,7 @@ torrentThreadLoop ( void * _tor )
             tor->io = NULL;
 
             /* close the tracker */
+fprintf(stderr,"sending a 'stopped' message to the tracker...\n");
             tr_trackerStopped( tor->tracker );
             tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
             tr_trackerClose( tor->tracker );

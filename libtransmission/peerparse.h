@@ -310,7 +310,6 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
               index, begin, len - 8 );
 
     updateRequests( peer, index, begin );
-    tor->downloadedCur += len - 8;
 
     /* Sanity checks */
     if( len - 8 != tr_blockSize( block ) )

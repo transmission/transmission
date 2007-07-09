@@ -191,10 +191,8 @@ struct tr_peer_s
     int                 inIndex;
     int                 inBegin;
     int                 inLength;
-    uint64_t            inTotal;
 
     tr_list_t         * outRequests;
-    uint64_t            outTotal;
     uint64_t            outDate;
 
     tr_ratecontrol_t  * download;
@@ -581,9 +579,6 @@ writeBegin:
         if( ret > 0 )
             tr_peerGotBlockFromUs( peer, ret );
 
-        tor->uploadedCur += ret;
-        peer->outTotal   += ret;
-        
         date              = tr_date();
         peer->outDate     = date;
         
@@ -832,6 +827,9 @@ tr_peerSentBlockToUs ( tr_peer_t * peer, int byteCount )
 {
     tr_torrent_t * tor = peer->tor;
 
+    assert( byteCount >= 0 );
+
+    tor->downloadedCur += byteCount;
     tr_rcTransferred( peer->download, byteCount );
     tr_rcTransferred( tor->download, byteCount );
     if ( !tor->customUploadLimit )
@@ -845,6 +843,9 @@ tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
 {
     tr_torrent_t * tor = peer->tor;
 
+    assert( byteCount >= 0 );
+
+    tor->uploadedCur += byteCount;
     tr_rcTransferred( peer->upload, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
     if ( !tor->customDownloadLimit )
