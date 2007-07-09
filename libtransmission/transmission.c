@@ -54,13 +54,14 @@ tr_handle_t * tr_init( const char * tag )
     /* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
        characters, where xx is the major version number, y is the
        minor version number, and z is the maintenance number (Azureus-style) */
-    snprintf( h->id, sizeof h->id, "-TR%02d%01d%01d-",
-              VERSION_MAJOR, VERSION_MINOR, VERSION_MAINTENANCE );
-    for( i = 8; i < TR_ID_LEN; i++ )
+    snprintf( h->id, sizeof h->id, "-TR%06d-", VERSION_REVISION );
+
+    for( i = 10; i < TR_ID_LEN; i++ )
     {
         r        = tr_rand( 36 );
         h->id[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
     }
+    tr_dbg( "Transmission ID is [%s]", h->id );
 
     /* Random key */
     for( i = 0; i < TR_KEY_LEN; i++ )
