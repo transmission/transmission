@@ -828,6 +828,7 @@ tr_peerSentBlockToUs ( tr_peer_t * peer, int byteCount )
     tr_torrent_t * tor = peer->tor;
 
     assert( byteCount >= 0 );
+    assert( byteCount <= tor->info.pieceSize );
 
     tor->downloadedCur += byteCount;
     tr_rcTransferred( peer->download, byteCount );
@@ -844,6 +845,7 @@ tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
     tr_torrent_t * tor = peer->tor;
 
     assert( byteCount >= 0 );
+    assert( byteCount <= tor->info.pieceSize );
 
     tor->uploadedCur += byteCount;
     tr_rcTransferred( peer->upload, byteCount );
