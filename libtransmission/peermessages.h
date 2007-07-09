@@ -123,7 +123,7 @@ blockPending( tr_torrent_t  * tor,
 
         r = (tr_request_t*) peer->outRequests->data;
         assert( r != NULL );
-        peer->outRequests = tr_list_remove( peer->outRequests, r );
+        peer->outRequests = tr_list_remove_data( peer->outRequests, r );
 
         if( !tr_cpPieceIsComplete( tor->completion, r->index ) ) /* sanity clause */
         {

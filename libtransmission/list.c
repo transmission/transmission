@@ -12,28 +12,21 @@
 #include "list.h"
 #include "utils.h"
 
-int
-tr_list_length( const tr_list_t * list )
-{
-    int i = 0;
-    while( list ) {
-        ++i;
-        list = list->next;
-    }
-    return i;
-}
-
-tr_list_t*
-tr_list_alloc( void )
+static tr_list_t*
+node_alloc( void )
 {
     return tr_new0( tr_list_t, 1 );
 }
 
-void
-tr_list_free1( tr_list_t* node )
+static void
+node_free( tr_list_t* node )
 {
     tr_free( node );
 }
+
+/***
+****
+***/
 
 void
 tr_list_free( tr_list_t* list )
@@ -42,14 +35,14 @@ tr_list_free( tr_list_t* list )
     {
         tr_list_t * node = list;
         list = list->next;
-        tr_list_free1( node );
+        node_free( node );
     }
 }
 
 tr_list_t*
 tr_list_prepend( tr_list_t * list, void * data )
 {
-    tr_list_t * node = tr_list_alloc ();
+    tr_list_t * node = node_alloc ();
     node->data = data;
     node->next = list;
     if( list )
@@ -60,16 +53,18 @@ tr_list_prepend( tr_list_t * list, void * data )
 tr_list_t*
 tr_list_append( tr_list_t * list, void * data )
 {
-    tr_list_t * node = list;
-    tr_list_t * l = tr_list_alloc( );
-    l->data = data;
+    tr_list_t * node = node_alloc( );
+    node->data = data;
     if( !list )
-        return l;
-    while( node->next )
-        node = node->next;
-    node->next = l;
-    l->prev = node;
-    return list;
+        return node;
+    else {
+        tr_list_t * l = list;
+        while( l->next )
+            l = l->next;
+        l->next = node;
+        node->prev = l;
+        return list;
+    }
 }
 
 tr_list_t*
@@ -83,7 +78,7 @@ tr_list_find_data ( tr_list_t * list, const void * data )
 }
 
 tr_list_t*
-tr_list_remove( tr_list_t * list, const void * data )
+tr_list_remove_data ( tr_list_t * list, const void * data )
 {
     tr_list_t * node = tr_list_find_data( list, data );
     tr_list_t * prev = node ? node->prev : NULL;
@@ -91,7 +86,7 @@ tr_list_remove( tr_list_t * list, const void * data )
     if( prev ) prev->next = next;
     if( next ) next->prev = prev;
     if( list == node ) list = next;
-    tr_list_free1( node );
+    node_free( node );
     return list;
 }
 
@@ -114,4 +109,3 @@ tr_list_foreach( tr_list_t * list, TrListForeachFunc func )
         list = list->next;
     }
 }
-

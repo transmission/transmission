@@ -19,20 +19,18 @@ typedef struct tr_list_s
 }
 tr_list_t;
 
-void        tr_list_free_1   ( void );
-void        tr_list_free     ( tr_list_t* );
-int         tr_list_length   ( const tr_list_t* );
-tr_list_t*  tr_list_append   ( tr_list_t*, void * data );
-tr_list_t*  tr_list_prepend  ( tr_list_t*, void * data );
-tr_list_t*  tr_list_remove   ( tr_list_t*, const void * data );
-tr_list_t*  tr_list_pop      ( tr_list_t*, void ** setme );
+void        tr_list_free        ( tr_list_t* );
+tr_list_t*  tr_list_append      ( tr_list_t*, void * data );
+tr_list_t*  tr_list_prepend     ( tr_list_t*, void * data );
+tr_list_t*  tr_list_remove_data ( tr_list_t*, const void * data );
+tr_list_t*  tr_list_pop         ( tr_list_t*, void ** setme );
 
 typedef int (*TrListCompareFunc)(const void * a, const void * b);
-tr_list_t*  tr_list_find      ( tr_list_t*, TrListCompareFunc func, const void * b );
-tr_list_t*  tr_list_find_data ( tr_list_t*, const void * data );
+tr_list_t*  tr_list_find        ( tr_list_t*, TrListCompareFunc func, const void * b );
+tr_list_t*  tr_list_find_data   ( tr_list_t*, const void * data );
 
 typedef void (*TrListForeachFunc)(void *);
-void tr_list_foreach( tr_list_t*, TrListForeachFunc func );
+void tr_list_foreach            ( tr_list_t*, TrListForeachFunc func );
 
 #endif /* TR_LIST_H */
 

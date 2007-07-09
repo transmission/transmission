@@ -417,8 +417,9 @@ static inline int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
     req.begin = begin;
     req.length = length;
     while(( l = tr_list_find( peer->outRequests, reqCompare, &req ) )) {
-        tr_free( l->data );
-        peer->outRequests = tr_list_remove( peer->outRequests, l );
+        tr_request_t * r = (tr_request_t *) l->data;
+        peer->outRequests = tr_list_remove_data( peer->outRequests, r );
+        tr_free( r );
     }
 
     return TR_OK;
