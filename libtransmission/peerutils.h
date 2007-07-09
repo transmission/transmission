@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-static void updateInterest( tr_torrent_t * tor, tr_peer_t * peer );
-
-
 static int peerCmp( tr_peer_t * peer1, tr_peer_t * peer2 )
 {
     /* Wait until we got the peers' ids */

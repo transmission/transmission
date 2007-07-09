@@ -237,18 +237,11 @@ static inline int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_ERROR;
     }
 
-    if( peer->outRequestCount >= peer->outRequestMax )
-    {
-        tr_dbg( "Peer is asking for too many blocks!");
-        return TR_ERROR;
-    }
-
-    r         = &peer->outRequests[peer->outRequestCount];
-    r->index  = index;
-    r->begin  = begin;
+    r = tr_new0( tr_request_t, 1 );
+    r->index = index;
+    r->begin = begin;
     r->length = length;
-
-    (peer->outRequestCount)++;
+    peer->outRequests = tr_list_append( peer->outRequests, r );
 
     return TR_OK;
 }
@@ -378,13 +371,22 @@ static inline int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     return TR_OK;
 }
 
+static int reqCompare( const void * va, const void * vb )
+{
+    const tr_request_t * a = (const tr_request_t *) va;
+    const tr_request_t * b = (const tr_request_t *) vb;
+    if( a->index != b->index ) return a->index - b->index;
+    if( a->begin != b->begin ) return a->begin - b->begin;
+    return a->length - b->length;
+}
+
 static inline int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
                                uint8_t * p, int len )
 {
     tr_info_t * inf = &tor->info;
     int index, begin, length;
-    int i;
-    tr_request_t * r;
+    tr_request_t req;
+    tr_list_t * l;
 
     if( len != 12 )
     {
@@ -410,17 +412,13 @@ static inline int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
     peer_dbg( "GET  cancel %d/%d (%d bytes)",
               index, begin, length );
 
-    for( i = 0; i < peer->outRequestCount; i++ )
-    {
-        r = &peer->outRequests[i];
-        if( r->index == index && r->begin == begin &&
-            r->length == length )
-        {
-            (peer->outRequestCount)--;
-            memmove( &r[0], &r[1], sizeof( tr_request_t ) *
-                    ( peer->outRequestCount - i ) );
-            break;
-        }
+    /* remove it from the outRequests list */
+    req.index = index;
+    req.begin = begin;
+    req.length = length;
+    while(( l = tr_list_find( peer->outRequests, reqCompare, &req ) )) {
+        tr_free( l->data );
+        peer->outRequests = tr_list_remove( peer->outRequests, l );
     }
 
     return TR_OK;

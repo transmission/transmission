@@ -104,34 +104,33 @@ fillHeader( tr_peer_t * peer, int size, int id, uint8_t * buf )
     return buf;
 }
 
-static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
-                               int * size )
+static uint8_t *
+blockPending( tr_torrent_t  * tor,
+              tr_peer_t     * peer,
+              int           * size )
 {
-    if( !peer->outBlockLoaded )
+    if( !peer->outBlockLoaded ) /* we need to load the block for the next request */
     {
         uint8_t      * buf;
         tr_request_t * r;
         int            hdrlen;
 
-        if( peer->amChoking || peer->outRequestCount < 1 )
-        {
-            /* No piece to send */
+        if( peer->amChoking )
             return NULL;
-        }
 
-        /* We need to load the block for the next request */
-        r = &peer->outRequests[0];
+        if( !peer->outRequests ) /* nothing to send */
+            return NULL;
 
-        /* Sanity check */
-        if( !tr_cpPieceIsComplete( tor->completion, r->index ) )
+        r = (tr_request_t*) peer->outRequests->data;
+        assert( r != NULL );
+        peer->outRequests = tr_list_remove( peer->outRequests, r );
+
+        if( !tr_cpPieceIsComplete( tor->completion, r->index ) ) /* sanity clause */
         {
-            /* We have been asked for something we don't have, buggy client?
-               Let's just drop this request */
+            /* We've been asked for something we don't have.  buggy client? */
             tr_inf( "Block %d/%d/%d was requested but we don't have it",
                     r->index, r->begin, r->length );
-            (peer->outRequestCount)--;
-            memmove( &peer->outRequests[0], &peer->outRequests[1],
-                     peer->outRequestCount * sizeof( tr_request_t ) );
+            tr_free( r );
             return NULL;
         }
 
@@ -146,21 +145,12 @@ static uint8_t * blockPending( tr_torrent_t * tor, tr_peer_t * peer,
 
         tr_ioRead( tor->io, r->index, r->begin, r->length, buf );
 
-        if( peer->outRequestCount < 1 )
-        {
-            /* We were choked during the read */
-            return NULL;
-        }
-
         peer_dbg( "SEND piece %d/%d (%d bytes)",
                   r->index, r->begin, r->length );
-
         peer->outBlockSize   = hdrlen;
         peer->outBlockLoaded = 1;
 
-        (peer->outRequestCount)--;
-        memmove( &peer->outRequests[0], &peer->outRequests[1],
-                 peer->outRequestCount * sizeof( tr_request_t ) );
+        tr_free( r );
     }
 
     *size = MIN( 1024, peer->outBlockSize );
@@ -234,9 +224,10 @@ static void sendChoke( tr_peer_t * peer, int yes )
 
     if( !yes )
     {
-        /* Drop older requests from the last time it was unchoked,
-           if any */
-        peer->outRequestCount = 0;
+        /* Drop older requests from the last time it was unchoked, if any */
+        tr_list_foreach( peer->outRequests, tr_free );
+        tr_list_free( peer->outRequests );
+        peer->outRequests = NULL;
     }
 
     peer_dbg( "SEND %schoke", yes ? "" : "un" );

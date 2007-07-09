@@ -27,7 +27,7 @@
 
 #define GRANULARITY_MSEC 200
 #define SHORT_INTERVAL_MSEC 1000
-#define LONG_INTERVAL_MSEC 10000
+#define LONG_INTERVAL_MSEC 20000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
 typedef struct
@@ -52,22 +52,18 @@ rateForInterval( const tr_ratecontrol_t * r, int interval_msec )
     uint64_t bytes = 0;
     const uint64_t now = tr_date ();
     int i = r->newest;
-    int real_interval_msec = 0;
     for( ;; )
     {
         if( r->transfers[i].date + interval_msec < now )
             break;
 
         bytes += r->transfers[i].size;
-        real_interval_msec = now - r->transfers[i].date;
 
         if( --i == -1 ) i = HISTORY_SIZE - 1; /* circular history */
         if( i == r->newest ) break; /* we've come all the way around */
     }
 
-    return !bytes || !real_interval_msec
-        ? 0.0
-        : (bytes/1024.0) * (1000.0/real_interval_msec);
+    return (bytes/1024.0) * (1000.0/interval_msec);
 }
 
 /***

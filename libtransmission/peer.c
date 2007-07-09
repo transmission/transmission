@@ -24,6 +24,7 @@
 
 #include "transmission.h"
 #include "peertree.h"
+#include "list.h"
 
 /*****
 ******
@@ -189,10 +190,7 @@ struct tr_peer_s
     int                 inLength;
     uint64_t            inTotal;
 
-    int                 outRequestCount;
-    int                 outRequestMax;
-    int                 outRequestAlloc;
-    tr_request_t      * outRequests;
+    tr_list_t         * outRequests;
     uint64_t            outTotal;
     uint64_t            outDate;
 
@@ -247,9 +245,6 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
     peer->download    = tr_rcInit();
     peer->upload      = tr_rcInit();
 
-    peer->outRequestMax = peer->outRequestAlloc = 2;
-    peer->outRequests = tr_new0( tr_request_t, peer->outRequestAlloc );
-
     peer->inRequestMax = peer->inRequestAlloc = 2;
     peer->inRequests = tr_new0( tr_request_t, peer->inRequestAlloc );
 
@@ -288,8 +283,9 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_bitfieldFree( peer->blamefield );
     tr_bitfieldFree( peer->banfield );
     tr_bitfieldFree( peer->reqfield );
+    tr_list_foreach( peer->outRequests, tr_free );
+    tr_list_free( peer->outRequests );
     tr_free( peer->inRequests );
-    tr_free( peer->outRequests );
     tr_free( peer->buf );
     tr_free( peer->outMessages );
     if( peer->status > PEER_STATUS_IDLE )
@@ -870,7 +866,6 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
     for( i=0; i<tor->peerCount; ++i )
     {
         double outboundSpeedKiBs;
-        double inboundSpeedKiBs;
         int size;
         tr_peer_t * peer = tor->peers[ i ];
 
@@ -887,18 +882,6 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
         if( peer->inRequestAlloc < peer->inRequestMax ) {
             peer->inRequestAlloc = peer->inRequestMax;
             peer->inRequests = tr_renew( tr_request_t, peer->inRequests, peer->inRequestAlloc );
-        }
-
-        /* decide how many blocks we'll concurrently let the peer ask us for */
-        inboundSpeedKiBs = tr_rcRate(peer->download);
-        size = queueTimeSec * inboundSpeedKiBs / blockSizeKiB;
-        if( size < 4 ) /* don't let it get TOO small */
-            size = 4;
-        size += 4; /* and always leave room to grow */
-        peer->outRequestMax = size;
-        if( peer->outRequestAlloc < peer->outRequestMax ) {
-            peer->outRequestAlloc = peer->outRequestMax;
-            peer->outRequests = tr_renew( tr_request_t, peer->outRequests, peer->outRequestAlloc );
         }
     }
 
