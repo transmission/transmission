@@ -23,8 +23,11 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "bencode.h"
+#include "clients.h" /* for tr_clientForId() */
 #include "peertree.h"
 #include "list.h"
+#include "net.h"
 
 /*****
 ******

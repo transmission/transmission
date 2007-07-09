@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include <stdio.h> /* FILE, snprintf, stderr */
 
+#include "trcompat.h" /* for strlcpy */
 #include "transmission.h"
 #include "internal.h" /* for tr_torrent_t */
 #include "bencode.h"

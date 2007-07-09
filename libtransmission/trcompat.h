@@ -24,6 +24,8 @@
 #ifndef TRCOMPAT_H
 #define TRCOMPAT_H
 
+#include <stddef.h> /* for size_t */
+
 #ifndef HAVE_STRLCPY
 size_t
 strlcpy(char *dst, const char *src, size_t siz);

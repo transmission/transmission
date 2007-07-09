@@ -23,6 +23,10 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "bencode.h"
+#include "bsdqueue.h"
+#include "http.h"
+#include "net.h"
 #include "shared.h"
 
 struct tclist

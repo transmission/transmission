@@ -22,8 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "shared.h"
+#include "transmission.h"
+#include "choking.h"
+#include "natpmp.h"
+#include "net.h"
 #include "peer.h"
+#include "shared.h"
+#include "upnp.h"
 
 /* Maximum number of peers that we keep in our local list */
 /* This is an arbitrary number, but it seems to work well */

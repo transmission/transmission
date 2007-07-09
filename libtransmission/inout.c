@@ -9,13 +9,13 @@
  */
 
 #include "transmission.h"
+#include "fastresume.h"
+#include "fdlimit.h"
 
 struct tr_io_s
 {
     tr_torrent_t * tor;
 };
-
-#include "fastresume.h"
 
 /****
 *****  Low-level IO functions

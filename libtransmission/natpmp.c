@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "natpmp.h"
+#include "net.h"
 
 #define PMP_PORT                5351
 #define PMP_MCAST_ADDR          "224.0.0.1"

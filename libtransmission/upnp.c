@@ -23,6 +23,10 @@
  *****************************************************************************/
 
 #include "transmission.h"
+#include "http.h"
+#include "net.h"
+#include "upnp.h"
+#include "xml.h"
 
 /* uncomment this to log requests and responses to ~/transmission-upnp.log */
 /* #define VERBOSE_LOG */

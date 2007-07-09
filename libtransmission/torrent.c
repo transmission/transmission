@@ -22,7 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include "trcompat.h" /* for strlcpy */
 #include "transmission.h"
+#include "metainfo.h"
+#include "net.h" /* tr_netNtop */
 #include "shared.h"
 
 /***
