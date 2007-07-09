@@ -860,9 +860,8 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
        This is just an arbitrary number. */
     const int queueTimeSec = 5;
     const int blockSizeKiB = tor->blockSize / 1024;
-    int deadbeatCount = 0;
+    const int isSeeding = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
     int i;
-    tr_peer_t ** deadbeats;
 
     tr_torrentWriterLock( tor );
 
@@ -888,32 +887,38 @@ tr_torrentSwiftPulse ( tr_torrent_t * tor )
         }
     }
 
-    deadbeats = tr_new( tr_peer_t*, tor->peerCount );
-    deadbeatCount = 0;
-    for( i=0; i<tor->peerCount; ++i ) {
-        tr_peer_t * peer = tor->peers[ i ];
-        if( tr_peerIsConnected( peer ) && ( peer->credit < 0 ) )
-            deadbeats[deadbeatCount++] = peer;
-    }
-
-    if( deadbeatCount )
+    /* if we're not seeding, decide on how much
+       bandwidth to allocate for leechers */
+    if( !isSeeding )
     {
-        const double ul_KiBsec = tr_rcRate( tor->download );
-        const double ul_KiB = ul_KiBsec * SWIFT_REFRESH_INTERVAL_SEC;
-        const double ul_bytes = ul_KiB * 1024;
-        const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
-        const int freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
-        for( i=0; i<deadbeatCount; ++i )
-            deadbeats[i]->credit = freeCreditPerPeer;
-        tr_dbg( "torrent %s has %d deadbeats, "
-                "who are each being granted %d bytes' credit "
-                "for a total of %.1f KiB, "
-                "%d%% of the torrent's ul speed %.1f\n", 
-            tor->info.name, deadbeatCount, freeCreditPerPeer,
-            ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
-    }
+        tr_peer_t ** deadbeats = tr_new( tr_peer_t*, tor->peerCount );
+        int deadbeatCount = 0;
 
-    tr_free( deadbeats );
+        for( i=0; i<tor->peerCount; ++i ) {
+            tr_peer_t * peer = tor->peers[ i ];
+            if( tr_peerIsConnected( peer ) && ( peer->credit < 0 ) )
+                deadbeats[deadbeatCount++] = peer;
+        }
+
+        if( deadbeatCount )
+        {
+            const double ul_KiBsec = tr_rcRate( tor->download );
+            const double ul_KiB = ul_KiBsec * SWIFT_REFRESH_INTERVAL_SEC;
+            const double ul_bytes = ul_KiB * 1024;
+            const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
+            const int freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
+            for( i=0; i<deadbeatCount; ++i )
+                deadbeats[i]->credit = freeCreditPerPeer;
+            tr_dbg( "torrent %s has %d deadbeats, "
+                    "who are each being granted %d bytes' credit "
+                    "for a total of %.1f KiB, "
+                    "%d%% of the torrent's ul speed %.1f\n", 
+                tor->info.name, deadbeatCount, freeCreditPerPeer,
+                ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
+        }
+
+        tr_free( deadbeats );
+    }
 
     tr_torrentWriterUnlock( tor );
 }
