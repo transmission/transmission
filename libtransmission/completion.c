@@ -323,7 +323,7 @@ tr_cpLeftUntilComplete ( const tr_completion_t * cp )
     b *= tor->blockSize;
 
     if( !tr_cpBlockIsComplete( cp, tor->blockCount - 1 ) )
-        b -= (tor->info.totalSize % tor->blockSize);
+        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
     return b;
 }
@@ -351,7 +351,7 @@ tr_cpLeftUntilDone ( const tr_completion_t * cp )
     i = tor->blockCount - 1;
     if( !tr_cpBlockIsComplete( cp, tor->blockCount-1 )
                   && info->pieces[info->pieceCount-1].priority != TR_PRI_DND )
-        b -= (tor->info.totalSize % tor->blockSize);
+        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
     return b;
 }
@@ -382,7 +382,7 @@ tr_cpDownloadedValid( const tr_completion_t * cp )
     uint64_t b = tr_bitfieldCountTrueBits( cp->blockBitfield ) * tor->blockSize;
 
     if( tr_bitfieldHas( cp->blockBitfield, tor->blockCount - 1 ) )
-        b -= (tor->info.totalSize % tor->blockSize);
+        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
    return b;
 }
