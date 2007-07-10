@@ -25,8 +25,8 @@
 #include "transmission.h"
 #include "shared.h"
 
-#define GRANULARITY_MSEC 200
-#define SHORT_INTERVAL_MSEC 1000
+#define GRANULARITY_MSEC 250
+#define SHORT_INTERVAL_MSEC 3000
 #define LONG_INTERVAL_MSEC 20000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 

@@ -958,7 +958,7 @@ torrentThreadLoop ( void * _tor )
         cp_status_t cpStatus;
 
         /* sleep a little while */
-        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 800 );
+        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 600 );
 
         /* if we're stopping... */
         if( tor->runStatus == TR_RUN_STOPPING )
