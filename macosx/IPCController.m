@@ -273,7 +273,7 @@ msg_default  ( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg );
     _controller = controller;
     _buf        = [[NSMutableData alloc] init];
 
-    buf = ipc_mkvers( &size, "Transmission MacOS X " VERSION_STRING );
+    buf = ipc_mkvers( &size, "Transmission MacOS X " LONG_VERSION_STRING );
     if( NULL == _ipc || nil == _buf || NULL == buf ||
         ![self sendresp: buf size: size] )
     {
