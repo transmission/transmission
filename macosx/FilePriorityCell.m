@@ -37,15 +37,15 @@
     if (![torrent canChangeDownloadCheckForFiles: indexes])
         return;
     
-    int priority = segment, actualPriority;
-    if (priority == 0)
-        actualPriority = PRIORITY_LOW;
-    else if (priority == 2)
-        actualPriority = PRIORITY_HIGH;
+    int priority;
+    if (segment == 0)
+        priority = TR_PRI_LOW;
+    else if (segment == 2)
+        priority = TR_PRI_HIGH;
     else
-        actualPriority = PRIORITY_NORMAL;
+        priority = TR_PRI_NORMAL;
     
-    [torrent setFilePriority: actualPriority forIndexes: indexes];
+    [torrent setFilePriority: priority forIndexes: indexes];
     [(FileOutlineView *)[self controlView] reloadData];
 }
 
@@ -57,9 +57,9 @@
     if (![torrent canChangeDownloadCheckForFiles: indexSet])
         return;
     
-    BOOL low = [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexSet],
-        normal = [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexSet],
-        high = [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexSet];
+    BOOL low = [torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet],
+        normal = [torrent hasFilePriority: TR_PRI_NORMAL forIndexes: indexSet],
+        high = [torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet];
     
     FileOutlineView * view = (FileOutlineView *)[self controlView];
     int row = [view hoverRow];

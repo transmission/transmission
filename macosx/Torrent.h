@@ -25,10 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
-#define PRIORITY_LOW -1
-#define PRIORITY_NORMAL 0
-#define PRIORITY_HIGH 1
-
 #define INVALID -99
 
 @interface Torrent : NSObject

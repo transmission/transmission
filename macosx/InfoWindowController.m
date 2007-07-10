@@ -666,11 +666,11 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         
         if (menuItem == fFilePriorityHigh)
-            priority = PRIORITY_HIGH;
+            priority = TR_PRI_HIGH;
         else if (menuItem == fFilePriorityLow)
-            priority = PRIORITY_LOW;
+            priority = TR_PRI_LOW;
         else
-            priority = PRIORITY_NORMAL;
+            priority = TR_PRI_NORMAL;
         
         NSIndexSet * fileIndexSet;
         for (i = [indexSet firstIndex]; i != NSNotFound && (!current || !other); i = [indexSet indexGreaterThanIndex: i])
@@ -952,9 +952,9 @@
         if (![torrent canChangeDownloadCheckForFiles: indexSet])
             return NSLocalizedString(@"Priority Not Available", "Inspector -> files tab -> tooltip");
         
-        BOOL low = [torrent hasFilePriority: PRIORITY_LOW forIndexes: indexSet],
-            normal = [torrent hasFilePriority: PRIORITY_NORMAL forIndexes: indexSet],
-            high = [torrent hasFilePriority: PRIORITY_HIGH forIndexes: indexSet];
+        BOOL low = [torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet],
+            normal = [torrent hasFilePriority: TR_PRI_NORMAL forIndexes: indexSet],
+            high = [torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet];
         
         if (low && !normal && !high)
             return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
@@ -1086,11 +1086,11 @@
 {
     int priority;
     if (sender == fFilePriorityHigh)
-        priority = PRIORITY_HIGH;
+        priority = TR_PRI_HIGH;
     else if (sender == fFilePriorityLow)
-        priority = PRIORITY_LOW;
+        priority = TR_PRI_LOW;
     else
-        priority = PRIORITY_NORMAL;
+        priority = TR_PRI_NORMAL;
     
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];

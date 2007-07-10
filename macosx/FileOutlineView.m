@@ -103,16 +103,17 @@
     if (![self isRowSelected: row])
     {
         NSDictionary * item = [self itemAtRow: row];
+        Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
+        
         if ([[item objectForKey: @"IsFolder"] boolValue]
-                || ![[(InfoWindowController *)[[self window] windowController] selectedTorrent]
-                        canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+                || ![torrent canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
             [fNormalColor set];
         else
         {
-            int priority = [[item objectForKey: @"Priority"] intValue];
-            if (priority == PRIORITY_HIGH)
+            NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
+            if ([torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet])
                 [fHighPriorityColor set];
-            else if (priority == PRIORITY_LOW)
+            else if ([torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet])
                 [fLowPriorityColor set];
             else
                 [fNormalColor set];
@@ -132,6 +133,7 @@
     [super drawRect: r];
 
     NSDictionary * item;
+    NSIndexSet * indexSet;
     int i, priority;
     Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
     for (i = 0; i < [self numberOfRows]; i++)
@@ -139,13 +141,15 @@
         if ([self isRowSelected: i])
         {
             item = [self itemAtRow: i];
-            if (![[item objectForKey: @"IsFolder"] boolValue]
-                && [torrent canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+            if ([[item objectForKey: @"IsFolder"] boolValue])
+                continue;
+            
+            indexSet = [item objectForKey: @"Indexes"];
+            if ([torrent canChangeDownloadCheckForFiles: indexSet])
             {
-                priority = [[item objectForKey: @"Priority"] intValue];
-                if (priority == PRIORITY_HIGH)
+                if ([torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet])
                     [fHighPriorityColor set];
-                else if (priority == PRIORITY_LOW)
+                else if ([torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet])
                     [fLowPriorityColor set];
                 else
                     continue;
