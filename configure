@@ -180,6 +180,23 @@ EOF
   rm -f testconf*
 }
 
+libgen_test()
+{
+  verbose libgen_test
+  cat > testconf.c << EOF
+#include <libgen.h>
+int main()
+{
+  return 0;
+}
+EOF
+  if runcmd $CC -o testconf testconf.c
+  then
+    CFLAGS="$CFLAGS -DHAVE_LIBGEN"
+  fi
+  rm -f testconf*
+}
+
 gettext_test()
 {
   verbose gettext_test
@@ -450,6 +467,7 @@ lrintf_test
 #
 strlcpy_test
 strlcat_test
+libgen_test
 
 #
 # Generate config.mk

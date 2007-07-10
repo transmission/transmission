@@ -36,4 +36,13 @@ size_t
 strlcat(char *dst, const char *src, size_t siz);
 #endif
 
+#ifdef HAVE_LIBGEN
+# include <libgen.h>
+#else
+char *
+dirname(const char *path);
+char *
+basename(const char *path);
+#endif
+
 #endif /* TRCOMPAT_H */
