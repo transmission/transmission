@@ -30,6 +30,4 @@ void fastResumeSave( const tr_torrent_t * tor );
 int fastResumeLoad( tr_torrent_t   * tor,
                     tr_bitfield_t  * uncheckedPieces );
 
-void fastResumeRemove( tr_torrent_t * tor );
-
 #endif

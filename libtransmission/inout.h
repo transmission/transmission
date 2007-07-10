@@ -28,7 +28,6 @@
 typedef struct tr_io_s tr_io_t;
 
 int       tr_ioLoadResume  ( tr_torrent_t * );
-void      tr_ioRemoveResume( tr_torrent_t * );
 
 
 enum

@@ -303,12 +303,6 @@ tr_ioLoadResume( tr_torrent_t * tor )
     return tr_ioCheckFiles ( tor, TR_RECHECK_FAST );
 }
 
-void tr_ioRemoveResume( tr_torrent_t * tor )
-{
-    if( !tor->io )
-        fastResumeRemove( tor );
-}
-
 int
 tr_ioHash( tr_io_t * io, int pieceIndex )
 {
