@@ -270,7 +270,7 @@ void tr_lockClose( tr_lock_t * l )
 int tr_lockTryLock( tr_lock_t * l )
 {
 #ifdef SYS_BEOS
-    #error how is this done in beos
+    return acquire_sem_etc( *l, 1, B_RELATIVE_TIMEOUT, 0 );
 #else
     /* success on zero! */
     return pthread_mutex_trylock( l );
@@ -299,7 +299,9 @@ void tr_lockUnlock( tr_lock_t * l )
 void tr_condInit( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
-    *c = -1;
+    c->sem = create_sem( 1, "" );
+    c->start = 0;
+    c->end = 0;
 #else
     pthread_cond_init( c, NULL );
 #endif
@@ -308,30 +310,51 @@ void tr_condInit( tr_cond_t * c )
 void tr_condWait( tr_cond_t * c, tr_lock_t * l )
 {
 #ifdef SYS_BEOS
-    *c = find_thread( NULL );
+    /* Keep track of that thread */
+    acquire_sem( c->sem );
+    c->threads[c->end] = find_thread( NULL );
+    c->end = ( c->end + 1 ) % BEOS_MAX_THREADS;
+    assert( c->end != c->start ); /* We hit BEOS_MAX_THREADS, arggh */
+    release_sem( c->sem );
+
     release_sem( *l );
-    suspend_thread( *c );
+    suspend_thread( find_thread( NULL ) ); /* Wait for signal */
     acquire_sem( *l );
-    *c = -1;
 #else
     pthread_cond_wait( c, l );
 #endif
 }
 
+#ifdef SYS_BEOS
+static int condTrySignal( tr_cond_t * c )
+{
+    if( c->start == c->end )
+        return 1;
+
+    for( ;; )
+    {
+        thread_info info;
+        get_thread_info( c->threads[c->start], &info );
+        if( info.state == B_THREAD_SUSPENDED )
+        {
+            resume_thread( c->threads[c->start] );
+            c->start = ( c->start + 1 ) % BEOS_MAX_THREADS;
+            break;
+        }
+        /* The thread is not suspended yet, which can happen since
+         * tr_condWait does not atomically suspends after releasing
+         * the semaphore. Wait a bit and try again. */
+        snooze( 5000 );
+    }
+    return 0;
+}
+#endif
 void tr_condSignal( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
-    while( *c != -1 )
-    {
-        thread_info info;
-        get_thread_info( *c, &info );
-        if( info.state == B_THREAD_SUSPENDED )
-        {
-            resume_thread( *c );
-            break;
-        }
-        snooze( 5000 );
-    }
+    acquire_sem( c->sem );
+    condTrySignal( c );
+    release_sem( c->sem );
 #else
     pthread_cond_signal( c );
 #endif
@@ -339,7 +362,9 @@ void tr_condSignal( tr_cond_t * c )
 void tr_condBroadcast( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
-    #error how is this done in beos
+    acquire_sem( c->sem );
+    while( !condTrySignal( c ) );
+    release_sem( c->sem );
 #else
     pthread_cond_broadcast( c );
 #endif
@@ -348,7 +373,7 @@ void tr_condBroadcast( tr_cond_t * c )
 void tr_condClose( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
-    *c = -1; /* Shut up gcc */
+    delete_sem( c->sem );
 #else
     pthread_cond_destroy( c );
 #endif

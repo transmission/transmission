@@ -26,9 +26,16 @@
 
 #ifdef SYS_BEOS
   #include <kernel/OS.h>
+  #define BEOS_MAX_THREADS 256
   typedef thread_id tr_thread_id_t;
   typedef sem_id    tr_lock_t;
-  typedef int       tr_cond_t;
+  typedef struct
+  {
+      sem_id sem;
+      thread_id threads[BEOS_MAX_THREADS];
+      int start;
+      int end;
+  } tr_cond_t;
 #else
   #include <pthread.h>
   typedef pthread_t       tr_thread_id_t;
@@ -40,7 +47,7 @@ typedef struct tr_thread_s
     void          (* func ) ( void * );
     void           * arg;
     char           * name;
-    tr_thread_id_t thread;;
+    tr_thread_id_t thread;
 }
 tr_thread_t;
 
