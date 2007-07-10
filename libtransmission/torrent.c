@@ -1203,13 +1203,40 @@ tr_torrentGetFileDL( const tr_torrent_t * tor,
 
 void
 tr_torrentSetFileDL( tr_torrent_t  * tor,
-                     int             file,
+                     int             fileIndex,
                      int             do_download )
 {
+    int i;
+    tr_file_t * file;
+    const int dnd = !do_download;
+
     tr_torrentWriterLock( tor );
 
-    assert( 0<=file && file<tor->info.fileCount );
-    tor->info.files[file].dnd = !do_download;
+    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
+    file = &tor->info.files[fileIndex];
+    file->dnd = dnd;
+    for( i=file->firstPiece; i<=file->lastPiece; ++i )
+      tor->info.pieces[i].dnd = dnd;
+    fastResumeSave( tor );
+
+    tr_torrentWriterUnlock( tor );
+}
+
+void
+tr_torrentSetFileDLs ( tr_torrent_t * tor, const uint8_t * enabled )
+{
+    int i, j;
+
+    tr_torrentWriterLock( tor );
+
+    for( i=0; i<tor->info.fileCount; ++i ) {
+        const int dnd = !enabled[i];
+        tr_file_t * file = &tor->info.files[i];
+        file->dnd = dnd;
+        for( j=file->firstPiece; j<=file->lastPiece; ++j )
+            tor->info.pieces[j].dnd = dnd;
+    }
+
     fastResumeSave( tor );
 
     tr_torrentWriterUnlock( tor );

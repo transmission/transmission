@@ -233,7 +233,11 @@ tr_priority_t tr_torrentGetFilePriority( const tr_torrent_t *, int file );
 /* returns true if the file's `download' flag is set */
 int tr_torrentGetFileDL( const tr_torrent_t *, int file );
 
-/* set the specified file's `download' flag */
+/* enabled should be an array of tor->info.fileCount bytes,
+ * each holding a nonzero value if the file is to be downloaded */
+void tr_torrentSetFileDLs ( tr_torrent_t *, const uint8_t * enabled );
+
+/* single-file form of tr_torrentSetFileDLs */
 void tr_torrentSetFileDL( tr_torrent_t *, int file, int do_download );
 
 

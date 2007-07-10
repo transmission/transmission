@@ -255,6 +255,7 @@ fastResumeLoadPriorities( tr_torrent_t * tor,
            default:  priority = TR_PRI_NORMAL; break;
        }
        tor->info.files[i].priority = priority;
+fprintf( stderr, "file %d has a priority of %d\n", (int)i, tor->info.files[i].priority );
     }
 
     /* set the dnd flags */
