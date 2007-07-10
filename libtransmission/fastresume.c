@@ -258,8 +258,14 @@ fastResumeLoadPriorities( tr_torrent_t * tor,
     }
 
     /* set the dnd flags */
-    for( i=0; i<n; ++i )
-        tor->info.files[i].dnd = *walk++ == 't';
+    for( i=0; i<n; ++i ) {
+        int j;
+        const char ch = *walk++;
+        tr_file_t * file = &tor->info.files[i];
+        file->dnd = ch == 't';
+        for( j=file->firstPiece; j<=file->lastPiece; ++j )
+            tor->info.pieces[j].dnd = file->dnd;
+    }
 
     free( buf );
     return TR_OK;
