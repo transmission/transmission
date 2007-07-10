@@ -973,7 +973,6 @@ torrentThreadLoop ( void * _tor )
             tor->io = NULL;
 
             /* close the tracker */
-fprintf(stderr,"sending a 'stopped' message to the tracker...\n");
             tr_trackerStopped( tor->tracker );
             tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
             tr_trackerClose( tor->tracker );

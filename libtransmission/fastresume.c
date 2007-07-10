@@ -62,7 +62,7 @@ typedef uint64_t tr_time_t;
 #define FR_ID_PROGRESS          0x05
 /* dnd and priority 
  * char * number of files: l,n,h for low, normal, high priority
- * uint8_t * number of files: nonzero if dnd flag is set
+ * char * number of files: t,f for DND flags
  */
 #define FR_ID_PRIORITY          0x06
 
@@ -195,7 +195,7 @@ void fastResumeSave( const tr_torrent_t * tor )
 
         /* dnd flags */
         for( i=0; i<n; ++i )
-            *walk++ = tor->info.files[i].dnd ? '\1' : '\0';
+            *walk++ = tor->info.files[i].dnd ? 't' : 'f';
 
         /* write it */
         assert( walk - buf == 2*n );
@@ -259,7 +259,7 @@ fastResumeLoadPriorities( tr_torrent_t * tor,
 
     /* set the dnd flags */
     for( i=0; i<n; ++i )
-        tor->info.files[i].dnd = *walk++ != 0;
+        tor->info.files[i].dnd = *walk++ == 't';
 
     free( buf );
     return TR_OK;

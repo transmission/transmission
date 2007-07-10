@@ -1186,7 +1186,7 @@ set_files_enabled( GtkTreeStore     * store,
 
     gtk_tree_model_get( GTK_TREE_MODEL(store), iter, FC_INDEX, &index, -1  );
     if (index >= 0)
-      tr_torrentSetFileDL( tor, index, !enabled );
+      tr_torrentSetFileDL( tor, index, enabled );
     gtk_tree_store_set( store, iter, FC_ENABLED, enabled, -1 );
 
     if( gtk_tree_model_iter_children( GTK_TREE_MODEL(store), &child, iter ) ) do
