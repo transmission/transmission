@@ -255,7 +255,7 @@ newclient( int fd, short event UNUSED, void * arg )
         }
 
         bufferevent_enable( clev, EV_READ );
-        buf = ipc_mkvers( &buflen, "Transmission daemon " VERSION_STRING );
+        buf = ipc_mkvers( &buflen, "Transmission daemon " LONG_VERSION_STRING );
         if( 0 > queuemsg( client, buf, buflen ) )
         {
             free( buf );

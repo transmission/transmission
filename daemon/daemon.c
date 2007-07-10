@@ -119,7 +119,7 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [-dfh]\n"
   "\n"
-  "Transmission %s (r%d) http://transmission.m0k.org/\n"
+  "Transmission %s http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
   "\n"
   "  -d --debug                Print data send and received, implies -f\n"
@@ -128,7 +128,7 @@ usage( const char * msg, ... )
   "  -s --socket <path>        Place the socket file at <path>\n"
   "\n"
   "To add torrents or set options, use the transmission-remote program.\n",
-            getmyname(), VERSION_STRING, VERSION_REVISION );
+            getmyname(), LONG_VERSION_STRING );
     exit( 0 );
 }
 

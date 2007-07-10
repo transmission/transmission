@@ -99,8 +99,8 @@ int main( int argc, char ** argv )
     tr_stat_t    * s;
     tr_handle_status_t * hstat;
 
-    printf( "Transmission %s (%d) - http://transmission.m0k.org/\n\n",
-            VERSION_STRING, VERSION_REVISION );
+    printf( "Transmission %s - http://transmission.m0k.org/\n\n",
+            LONG_VERSION_STRING );
 
     /* Get options */
     if( parseCommandLine( argc, argv ) )

@@ -127,14 +127,14 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [options] [files]...\n"
   "\n"
-  "Transmission %s (r%d) http://transmission.m0k.org/\n"
+  "Transmission %s http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface.\n"
   "\n"
   "  -h --help                 Display this message and exit\n"
   "  -t --type daemon          Use the daemon frontend, transmission-daemon\n"
   "  -t --type gtk             Use the GTK+ frontend, transmission-gtk\n"
   "  -t --type mac             Use the Mac OS X frontend\n",
-            getmyname(), VERSION_STRING, VERSION_REVISION );
+            getmyname(), LONG_VERSION_STRING );
     exit( EXIT_SUCCESS );
 }
 

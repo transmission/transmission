@@ -451,9 +451,9 @@ tr_httpClient( int method, const char * host, int port, const char * fmt, ... )
 
     if( tr_sprintf( EXPANDBUF( http->header ), " HTTP/1.1" CR LF
                     "Host: %s:%d" CR LF
-                    "User-Agent: %s/%d.%d%d" CR LF
+                    "User-Agent: " TR_NAME "/" LONG_VERSION_STRING CR LF
                     "Connection: close" CR LF,
-                    http->host, http->port, TR_NAME, VERSION_MAJOR, VERSION_MINOR, VERSION_MAINTENANCE ) )
+                    http->host, http->port ) )
     {
         goto err;
     }

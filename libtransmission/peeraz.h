@@ -133,7 +133,7 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
     tr_bencInitStr( tr_bencDictAdd( &val, "identity" ),
                     tor->azId, TR_AZ_ID_LEN, 1 );
     tr_bencInitStr( tr_bencDictAdd( &val, "client" ),   TR_NAME, 0, 1 );
-    tr_bencInitStr( tr_bencDictAdd( &val, "version" ),  VERSION_STRING, 0, 1 );
+    tr_bencInitStr( tr_bencDictAdd( &val, "version" ),  SHORT_VERSION_STRING, 0, 1 );
     if( 0 < tor->publicPort )
     {
         tr_bencInitInt( tr_bencDictAdd( &val, "tcp_port" ), tor->publicPort );

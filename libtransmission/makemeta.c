@@ -357,7 +357,7 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder_t * builder )
         tr_bencInitStrDup( val, builder->announce );
 
         val = tr_bencDictAdd( &top, "created by" );
-        tr_bencInitStrDup( val, TR_NAME " " VERSION_STRING );
+        tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
 
         val = tr_bencDictAdd( &top, "creation date" );
         tr_bencInitInt( val, time(0) );

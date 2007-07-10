@@ -2,9 +2,12 @@
 #
 # $Id$
 
-MAJOR=0
-MINOR=7
-MAINT=2
+# constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
+# convention: BETA: "Z" for a beta, "0" for a stable
+MAJOR="0"
+MINOR="7"
+MAINT="2"
+BETA="Z"
 STRING=0.80-svn
 
 # Get current SVN revision from Ids in all source files
@@ -30,21 +33,23 @@ replace_if_differs ()
 
 # Generate version.mk
 cat > mk/version.mk.new << EOF
-VERSION_MAJOR       = $MAJOR
-VERSION_MINOR       = $MINOR
-VERSION_MAINTENANCE = $MAINT
-VERSION_STRING      = $STRING
-VERSION_REVISION    = $REV
+VERSION_MAJOR       = "$MAJOR"
+VERSION_MINOR       = "$MINOR"
+VERSION_MAINTENANCE = "$MAINT"
+VERSION_REVISION    = "$REV"
+VERSION_STRING      = "$MAJOR.$MINOR$MAINT$BETA (r$REV)"
 EOF
 replace_if_differs mk/version.mk.new mk/version.mk
 
 # Generate version.h
 cat > libtransmission/version.h.new << EOF
-#define VERSION_MAJOR       $MAJOR
-#define VERSION_MINOR       $MINOR
-#define VERSION_MAINTENANCE $MAINT
-#define VERSION_STRING      "$STRING"
-#define VERSION_REVISION    $REV
+#define VERSION_MAJOR        "$MAJOR"
+#define VERSION_MINOR        "$MINOR"
+#define VERSION_MAINTENANCE  "$MAINT"
+#define VERSION_REVISION     "$REV"
+#define VERSION_BETA         "$BETA"
+#define SHORT_VERSION_STRING "$MAJOR.$MINOR$MAINT$BETA"
+#define LONG_VERSION_STRING  "$MAJOR.$MINOR$MAINT$BETA (r$REV)"
 EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
 

@@ -56,8 +56,8 @@ tr_handle_t * tr_init( const char * tag )
     /* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
        characters, where xx is the major version number, y is the
        minor version number, and z is the maintenance number (Azureus-style) */
-    snprintf( h->id, sizeof h->id, "-TR%02d%01d%01d-",
-              VERSION_MAJOR, VERSION_MINOR, VERSION_MAINTENANCE );
+    snprintf( h->id, sizeof h->id, "-TR" VERSION_MAJOR VERSION_MINOR VERSION_MAINTENANCE VERSION_BETA "-" );
+    assert( strlen(h->id) == 8 );
     for( i=8; i<TR_ID_LEN; ++i )
     {
         const int r = tr_rand( 36 );
@@ -88,7 +88,7 @@ tr_handle_t * tr_init( const char * tag )
     tr_fdInit();
     h->shared = tr_sharedInit( h );
 
-    tr_inf( TR_NAME " " VERSION_STRING " started" );
+    tr_inf( TR_NAME " " LONG_VERSION_STRING " started" );
 
     return h;
 }

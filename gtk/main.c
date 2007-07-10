@@ -298,7 +298,7 @@ readargs( int argc, char ** argv, gboolean * sendquit, gboolean * startpaused )
                 printf(
 _("usage: %s [-hpq] [files...]\n"
   "\n"
-  "Transmission %s (r%d) http://transmission.m0k.org/\n"
+  "Transmission %s http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
   "\n"
   "  -h --help    display this message and exit\n"
@@ -309,7 +309,7 @@ _("usage: %s [-hpq] [files...]\n"
   "torrent files may be loaded at startup by adding them to the command\n"
   "line. If %s is already running, those torrents will be\n"
   "opened in the running instance.\n"),
-                        name, VERSION_STRING, VERSION_REVISION,
+                        name, LONG_VERSION_STRING,
                         name, name, name );
                 exit(0);
                 break;
@@ -888,7 +888,6 @@ getselection( struct cbdata * cbdata )
 static void
 about ( void )
 {
-  char buf[128];
   GtkWidget * w = gtk_about_dialog_new ();
   GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
   const char *authors[] = { "Eric Petit (Back-end; OS X)",
@@ -897,8 +896,7 @@ about ( void )
                             "Charles Kerr (Back-end; GTK+)",
                             "Bryan Varner (BeOS)", 
                             NULL };
-  g_snprintf (buf, sizeof(buf), _("%s (%d)"), VERSION_STRING, VERSION_REVISION);
-  gtk_about_dialog_set_version (a, buf);
+  gtk_about_dialog_set_version (a, LONG_VERSION_STRING );
 #ifdef SHOW_LICENSE
   gtk_about_dialog_set_license (a, LICENSE);
   gtk_about_dialog_set_wrap_license (a, TRUE);

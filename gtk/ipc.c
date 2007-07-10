@@ -340,7 +340,7 @@ client_connect(char *path, struct constate *con) {
       return FALSE;
   }
 
-  buf = ipc_mkvers( &size, "Transmission GTK+ " VERSION_STRING );
+  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
   if( NULL == buf )
   {
       close( con->fd );
@@ -381,7 +381,7 @@ srv_io_accept(GSource *source SHUTUP, int fd, struct sockaddr *sa SHUTUP,
       return;
   }
 
-  buf = ipc_mkvers( &size, "Transmission GTK+ " VERSION_STRING );
+  buf = ipc_mkvers( &size, "Transmission GTK+ " LONG_VERSION_STRING );
   if( NULL == buf )
   {
       ipc_freecon( newcon->ipc );

@@ -224,7 +224,7 @@ usage( const char * msg, ... )
     printf(
   "usage: %s [options]\n"
   "\n"
-  "Transmission %s (r%d) http://transmission.m0k.org/\n"
+  "Transmission %s http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface.\n"
   "\n"
   "  -a --add <torrent>        Add a torrent\n"
@@ -252,7 +252,7 @@ usage( const char * msg, ... )
   "  -u --upload-limit <int>   Max upload rate in KiB/s\n"
   "  -U --upload-unlimited     No upload rate limit\n"
   "  -x --proxy                Use proxy command to connect to frontend\n",
-            getmyname(), VERSION_STRING, VERSION_REVISION );
+            getmyname(), LONG_VERSION_STRING );
     exit( 0 );
 }
 

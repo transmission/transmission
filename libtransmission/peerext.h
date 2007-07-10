@@ -120,21 +120,13 @@ static char *
 makeExtendedHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * len )
 {
     benc_val_t val, * msgsval;
-    char * buf, * vers;
-
-    /* get human-readable version string */
-    vers = NULL;
-    asprintf( &vers, "%s %s", TR_NAME, VERSION_STRING );
-    if( NULL == vers )
-    {
-        return NULL;
-    }
+    char * buf;
+    char * vers = tr_strdup( TR_NAME " " SHORT_VERSION_STRING );
 
     /* reserve space in toplevel dictionary for v, m, and possibly p */
     tr_bencInit( &val, TYPE_DICT );
     if( tr_bencDictReserve( &val, ( 0 < tor->publicPort ? 3 : 2 ) ) )
     {
-        free( vers );
         tr_bencFree( &val );
         return NULL;
     }

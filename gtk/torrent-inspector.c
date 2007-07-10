@@ -1305,6 +1305,7 @@ file_page_new ( TrTorrent * gtor )
     GtkWidget           * view, * scroll;
     GtkCellRenderer     * rend;
     GtkCellRenderer     * priority_rend;
+    GtkCellRenderer     * enabled_rend;
     GtkTreeViewColumn   * col;
     GtkTreeSelection    * sel;
     GtkTreeModel        * model;
@@ -1366,6 +1367,16 @@ file_page_new ( TrTorrent * gtor )
     g_signal_connect( sel, "changed", G_CALLBACK(fileSelectionChangedCB), NULL );
     fileSelectionChangedCB( sel, NULL );
 
+    /* add "download" checkbox column */
+    col = gtk_tree_view_column_new ();
+    gtk_tree_view_column_set_sort_column_id( col, FC_ENABLED );
+    rend = enabled_rend = gtk_cell_renderer_toggle_new  ();
+    col = gtk_tree_view_column_new_with_attributes (_("Download"),
+                                                    rend,
+                                                    "active", FC_ENABLED,
+                                                    NULL);
+    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
+
     /* add priority column */
     model = priority_model_new ();
     col = gtk_tree_view_column_new ();
@@ -1380,16 +1391,6 @@ file_page_new ( TrTorrent * gtor )
                                   NULL);
     g_object_unref (G_OBJECT(model));
     gtk_tree_view_column_add_attribute (col, rend, "text", FC_PRIORITY);
-    gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
-
-    /* download enabled column */
-    col = gtk_tree_view_column_new ();
-    gtk_tree_view_column_set_sort_column_id( col, FC_ENABLED );
-    rend = gtk_cell_renderer_toggle_new  ();
-    col = gtk_tree_view_column_new_with_attributes (_("Enabled"),
-                                                    rend,
-                                                    "active", FC_ENABLED,
-                                                    NULL);
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
 
     /* create the scrolled window and stick the view in it */
@@ -1410,7 +1411,7 @@ file_page_new ( TrTorrent * gtor )
     data->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );
     g_object_set_data_full (G_OBJECT(ret), "file-data", data, g_free);
     g_signal_connect (G_OBJECT(priority_rend), "edited", G_CALLBACK(priority_changed_cb), data);
-    g_signal_connect( rend, "toggled", G_CALLBACK(enabled_toggled), data );
+    g_signal_connect(enabled_rend, "toggled", G_CALLBACK(enabled_toggled), data );
     return ret;
 }
 

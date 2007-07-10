@@ -857,7 +857,7 @@ sendvers( struct con * con )
     uint8_t   * buf;
     size_t      len;
 
-    buf = ipc_mkvers( &len, "Transmission remote" VERSION_STRING );
+    buf = ipc_mkvers( &len, "Transmission remote" LONG_VERSION_STRING );
     if( NULL == buf )
     {
         if( EPERM == errno )
