@@ -22,8 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "trcompat.h" /* for strlcpy */
 #include "transmission.h"
+#include "fastresume.h"
+#include "trcompat.h" /* for strlcpy */
 #include "metainfo.h"
 #include "net.h" /* tr_netNtop */
 #include "shared.h"
@@ -129,7 +130,7 @@ calculatePiecePriority ( const tr_torrent_t * tor,
                          int                  piece )
 {
     int i;
-    tr_priority_t priority = TR_PRI_DND;
+    tr_priority_t priority = TR_PRI_NORMAL;
 
     for( i=0; i<tor->info.fileCount; ++i )
     {
@@ -1109,10 +1110,11 @@ fprintf(stderr,"sending a 'stopped' message to the tracker...\n");
 ****
 ***/
 
-void
-tr_torrentSetFilePriority( tr_torrent_t   * tor,
-                           int              fileIndex,
-                           tr_priority_t    priority )
+static void
+tr_torrentSetFilePriorityImpl( tr_torrent_t   * tor,
+                               int              fileIndex,
+                               tr_priority_t    priority,
+                               int              doSave )
 {
     int i;
     tr_file_t * file;
@@ -1121,8 +1123,7 @@ tr_torrentSetFilePriority( tr_torrent_t   * tor,
 
     assert( tor != NULL );
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
-    assert( priority==TR_PRI_LOW || priority==TR_PRI_NORMAL
-         || priority==TR_PRI_HIGH || priority==TR_PRI_DND );
+    assert( priority==TR_PRI_LOW || priority==TR_PRI_NORMAL || priority==TR_PRI_HIGH );
 
     file = &tor->info.files[fileIndex];
     file->priority = priority;
@@ -1133,7 +1134,28 @@ tr_torrentSetFilePriority( tr_torrent_t   * tor,
              fileIndex, file->firstPiece, file->lastPiece,
              priority, tor->info.files[fileIndex].name );
 
+    if( doSave )
+        fastResumeSave( tor );
+
     tr_torrentWriterUnlock( tor );
+}
+
+void
+tr_torrentSetFilePriority( tr_torrent_t   * tor,
+                           int              fileIndex,
+                           tr_priority_t    priority )
+{
+    tr_torrentSetFilePriorityImpl( tor, fileIndex, priority, TRUE );
+}
+
+void
+tr_torrentSetFilePriorities( tr_torrent_t         * tor,
+                             const tr_priority_t  * filePriorities )
+{
+    int i;
+    for( i=0; i<tor->info.pieceCount; ++i )
+        tr_torrentSetFilePriorityImpl( tor, i, filePriorities[i], FALSE );
+    fastResumeSave( tor );
 }
 
 tr_priority_t
@@ -1151,15 +1173,6 @@ tr_torrentGetFilePriority( const tr_torrent_t *  tor, int file )
 }
 
 
-void
-tr_torrentSetFilePriorities( tr_torrent_t         * tor,
-                             const tr_priority_t  * filePriorities )
-{
-    int i;
-    for( i=0; i<tor->info.pieceCount; ++i )
-      tr_torrentSetFilePriority( tor, i, filePriorities[i] );
-}
-
 tr_priority_t*
 tr_torrentGetFilePriorities( const tr_torrent_t * tor )
 {
@@ -1173,4 +1186,32 @@ tr_torrentGetFilePriorities( const tr_torrent_t * tor )
     tr_torrentReaderUnlock( tor );
 
     return p;
+}
+
+int
+tr_torrentGetFileDL( const tr_torrent_t * tor,
+                     int                  file )
+{
+    int do_download;
+    tr_torrentReaderLock( tor );
+
+    assert( 0<=file && file<tor->info.fileCount );
+    do_download = !tor->info.files[file].dnd;
+
+    tr_torrentReaderUnlock( tor );
+    return do_download != 0;
+}
+
+void
+tr_torrentSetFileDL( tr_torrent_t  * tor,
+                     int             file,
+                     int             do_download )
+{
+    tr_torrentWriterLock( tor );
+
+    assert( 0<=file && file<tor->info.fileCount );
+    tor->info.files[file].dnd = !do_download;
+    fastResumeSave( tor );
+
+    tr_torrentWriterUnlock( tor );
 }

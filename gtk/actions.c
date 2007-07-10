@@ -39,8 +39,7 @@ static GtkRadioActionEntry priority_toggle_entries[] =
 {
   { "priority-high", NULL, N_("_High"), NULL, NULL, TR_PRI_HIGH },
   { "priority-normal", NULL, N_("_Normal"), NULL, NULL, TR_PRI_NORMAL },
-  { "priority-low", NULL, N_("_Low"), NULL, NULL, TR_PRI_LOW },
-  { "priority-dnd", NULL, N_("_Don't Get"), NULL, NULL, TR_PRI_DND  }
+  { "priority-low", NULL, N_("_Low"), NULL, NULL, TR_PRI_LOW }
 };
 
 extern void set_selected_file_priority ( tr_priority_t ); 

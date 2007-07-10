@@ -60,6 +60,11 @@ typedef uint64_t tr_time_t;
  *  - 1 bit * number of blocks: whether we have the block or not
  */
 #define FR_ID_PROGRESS          0x05
+/* dnd and priority 
+ * char * number of files: l,n,h for low, normal, high priority
+ * uint8_t * number of files: nonzero if dnd flag is set
+ */
+#define FR_ID_PRIORITY          0x06
 
 /* macros for the length of various pieces of the progress data */
 #define FR_MTIME_LEN( t ) \
@@ -167,6 +172,40 @@ void fastResumeSave( const tr_torrent_t * tor )
         free( buf );
     }
 
+
+    /* Write the priorities and DND flags */
+    if( TRUE )
+    {
+        int i;
+        const int n = tor->info.fileCount;
+        char * buf = tr_new0( char, n*2 );
+        char * walk = buf;
+
+        /* priorities */
+        for( i=0; i<n; ++i ) {
+            char ch;
+            const int priority = tor->info.files[i].priority;
+            switch( priority ) {
+               case TR_PRI_LOW:   ch = 'l'; break; /* low */
+               case TR_PRI_HIGH:  ch = 'h'; break; /* high */
+               default:           ch = 'n'; break; /* normal */
+            };
+            *walk++ = ch;
+        }
+
+        /* dnd flags */
+        for( i=0; i<n; ++i )
+            *walk++ = tor->info.files[i].dnd ? '\1' : '\0';
+
+        /* write it */
+        assert( walk - buf == 2*n );
+        fastResumeWriteData( FR_ID_PRIORITY, buf, 1, walk-buf, file );
+
+        /* cleanup */
+        tr_free( buf );
+    }
+
+
     /* Write download and upload totals */
     total = tor->downloadedCur + tor->downloadedPrev;
     fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
@@ -188,6 +227,42 @@ void fastResumeSave( const tr_torrent_t * tor )
     fclose( file );
 
     tr_dbg( "Resume file '%s' written", path );
+}
+
+static int
+fastResumeLoadPriorities( tr_torrent_t * tor,
+                          FILE         * file )
+{
+    const size_t n = tor->info.fileCount;
+    const size_t len = 2 * n;
+    char * buf = tr_new0( char, len );
+    char * walk = buf;
+    size_t i;
+
+    if( len != fread( buf, 1, len, file ) ) {
+        tr_inf( "Couldn't read from resume file" );
+        free( buf );
+        return TR_ERROR_IO_OTHER;
+    }
+
+    /* set file priorities */
+    for( i=0; i<n; ++i ) {
+       tr_priority_t priority;
+       const char ch = *walk++;
+       switch( ch ) {
+           case 'l': priority = TR_PRI_LOW; break;
+           case 'h': priority = TR_PRI_HIGH; break;
+           default:  priority = TR_PRI_NORMAL; break;
+       }
+       tor->info.files[i].priority = priority;
+    }
+
+    /* set the dnd flags */
+    for( i=0; i<n; ++i )
+        tor->info.files[i].dnd = *walk++ != 0;
+
+    free( buf );
+    return TR_OK;
 }
 
 static int
@@ -325,18 +400,31 @@ fastResumeLoad( tr_torrent_t   * tor,
                 /* read progress data */
                 if( (uint32_t)FR_PROGRESS_LEN( tor ) == len )
                 {
-                    if( fastResumeLoadProgress( tor, uncheckedPieces, file ) )
+                    ret = fastResumeLoadProgress( tor, uncheckedPieces, file );
+
+                    if( ret && ( feof(file) || ferror(file) ) )
                     {
-                        if( feof( file ) || ferror( file ) )
-                        {
-                            fclose( file );
-                            return 1;
-                        }
+                        fclose( file );
+                        return 1;
                     }
-                    else
+
+                    continue;
+                }
+                break;
+
+            case FR_ID_PRIORITY:
+
+                /* read priority data */
+                if( len == (uint32_t)(2 * tor->info.fileCount) )
+                {
+                    ret = fastResumeLoadPriorities( tor, file );
+
+                    if( ret && ( feof(file) || ferror(file) ) )
                     {
-                        ret = 0;
+                        fclose( file );
+                        return 1;
                     }
+
                     continue;
                 }
                 break;

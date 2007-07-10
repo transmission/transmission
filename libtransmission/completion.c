@@ -295,7 +295,7 @@ tr_cpGetStatus ( const tr_completion_t * cp )
     for( i=0; i<info->pieceCount; ++i ) {
         if( tr_cpPieceIsComplete( cp, i ) )
             continue;
-        if( info->pieces[i].priority != TR_PRI_DND)
+        if( !info->pieces[i].dnd )
             return TR_CP_INCOMPLETE;
         ret = TR_CP_DONE;
     }
@@ -343,14 +343,13 @@ tr_cpLeftUntilDone ( const tr_completion_t * cp )
     info = &tor->info;
 
     for( i=0; i<info->pieceCount; ++i )
-        if( !tr_cpPieceIsComplete( cp, i ) && info->pieces[i].priority != TR_PRI_DND )
+        if( !tr_cpPieceIsComplete( cp, i ) && !info->pieces[i].dnd )
             b += ( tr_cpCountBlocks( cp, i ) - cp->completeBlocks[ i ] );
 
     b *= tor->blockSize;
 
     i = tor->blockCount - 1;
-    if( !tr_cpBlockIsComplete( cp, tor->blockCount-1 )
-                  && info->pieces[info->pieceCount-1].priority != TR_PRI_DND )
+    if( !tr_cpBlockIsComplete( cp, tor->blockCount-1 ) && !info->pieces[info->pieceCount-1].dnd )
         b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
     return b;

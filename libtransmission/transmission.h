@@ -206,7 +206,6 @@ void tr_setDownloadLimit( tr_torrent_t * tor, int limit );
 
 enum
 {
-    TR_PRI_DND    = -2, /* Do Not Download */
     TR_PRI_LOW    = -1,
     TR_PRI_NORMAL =  0, /* since NORMAL is 0, memset initializes nicely */
     TR_PRI_HIGH   =  1
@@ -215,26 +214,28 @@ enum
 typedef int8_t tr_priority_t;
 
 /* priorities should be an array of tor->info.fileCount bytes,
- * each holding a value of TR_PRI_NORMAL, _HIGH, _LOW, or _DND. */
+ * each holding a value of TR_PRI_NORMAL, _HIGH, or _LOW */
 void tr_torrentSetFilePriorities ( tr_torrent_t *, const tr_priority_t * priorities );
 
 /* single-file form of tr_torrentPrioritizeFiles.
- * priority must be one of TR_PRI_NORMAL, _HIGH, _LOW, or _DND */
+ * priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW */
 void tr_torrentSetFilePriority( tr_torrent_t *, int file, tr_priority_t priority );
 
 /* returns a malloc()ed array of tor->info.fileCount items,
- * each holding a value of TR_PRI_NORMAL, _HIGH, _LOW, or _DND.
+ * each holding a value of TR_PRI_NORMAL, _HIGH, or _LOW.
    free the array when done. */
 tr_priority_t* tr_torrentGetFilePriorities( const tr_torrent_t * );
 
 /* single-file form of tr_torrentGetFilePriorities.
- * returns one of TR_PRI_NORMAL, _HIGH, _LOW, or _DND */
+ * returns one of TR_PRI_NORMAL, _HIGH, or _LOW. */
 tr_priority_t tr_torrentGetFilePriority( const tr_torrent_t *, int file );
 
-/* returns the priority for the specified piece,
- * as ranked by the number of files of various priorities in that piece.
- * a zero priority means DND */
-tr_priority_t tr_torrentGetPiecePriority( const tr_torrent_t *, int pieceIndex );
+/* returns true if the file's `download' flag is set */
+int tr_torrentGetFileDL( const tr_torrent_t *, int file );
+
+/* set the specified file's `download' flag */
+void tr_torrentSetFileDL( tr_torrent_t *, int file, int do_download );
+
 
 /***********************************************************************
  * tr_torrentRates
@@ -467,7 +468,8 @@ typedef struct tr_file_s
 {
     uint64_t length;                /* Length of the file, in bytes */
     char     name[MAX_PATH_LENGTH]; /* Path to the file */
-    int8_t   priority;              /* TR_PRI_HIGH, _NORMAL, _LOW, or _DND */
+    int8_t   priority;              /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t   dnd;                   /* nonzero if the file shouldn't be downloaded */
     int      firstPiece;            /* We need pieces [firstPiece... */
     int      lastPiece;             /* ...lastPiece] to dl this file */
     uint64_t offset;                /* file begins at the torrent's nth byte */
@@ -477,7 +479,8 @@ tr_file_t;
 typedef struct tr_piece_s
 {
     uint8_t  hash[SHA_DIGEST_LENGTH];  /* pieces hash */
-    int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, _LOW, or _DND */
+    int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, or _LOW */
+    int8_t   dnd;                      /*  nonzero if the piece shouldn't be downloaded */
 }
 tr_piece_t;
     

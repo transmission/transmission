@@ -58,7 +58,6 @@ const char * fallback_ui_file =
 "      <menuitem action='priority-high'/>\n"
 "      <menuitem action='priority-normal'/>\n"
 "      <menuitem action='priority-low'/>\n"
-"      <menuitem action='priority-dnd'/>\n"
 "    </menu>\n"
 "  </popup>\n"
 "\n"
