@@ -447,9 +447,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
-    
-    //auto importing
-    [self checkAutoImportDirectory];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
@@ -460,6 +457,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self
         andSelector: @selector(handleOpenContentsEvent:replyEvent:)
         forEventClass: kCoreEventClass andEventID: kAEOpenContents];
+    
+    //auto importing
+    [self checkAutoImportDirectory];
     
     //debug warning
     if ([fDefaults boolForKey: @"WarningDebug"] && [fDefaults integerForKey: @"MessageLevel"] == TR_MSG_DBG)

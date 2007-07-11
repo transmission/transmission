@@ -1313,6 +1313,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
 {
+    #warning multiples
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         tr_torrentSetFileDL(fHandle, index, state != NSOffState);
@@ -1324,6 +1325,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
 {
+    #warning multiples
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
         tr_torrentSetFilePriority(fHandle, index, priority);
