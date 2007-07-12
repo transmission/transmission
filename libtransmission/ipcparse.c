@@ -223,7 +223,7 @@ static int          gotmsg     ( struct ipc_info *, benc_val_t *, benc_val_t *,
 static int          msgcmp     ( struct msg *, struct msg * );
 static int          infcmp     ( struct inf *, struct inf * );
 static struct msg * msglookup  ( const char * );
-static int          filltracker( benc_val_t *, tr_tracker_info_t * );
+static int          filltracker( benc_val_t *, const tr_tracker_info_t * );
 static int          handlercmp ( struct msgfunc *, struct msgfunc * );
 
 RB_GENERATE_STATIC( msgtree, msg, link, msgcmp )
@@ -976,7 +976,7 @@ ipc_parse( struct ipc_info * info, uint8_t * buf, ssize_t total, void * arg )
     return off;
 }
 
-int
+static int
 handlevers( struct ipc_info * info, benc_val_t * dict )
 {
     benc_val_t * vers, * num;
@@ -1036,7 +1036,7 @@ handlevers( struct ipc_info * info, benc_val_t * dict )
     return 0;
 }
 
-int
+static int
 handlemsgs( struct ipc_info * info, benc_val_t * pay, void * arg )
 {
     benc_val_t * name, * val, * tag;
@@ -1083,7 +1083,7 @@ handlemsgs( struct ipc_info * info, benc_val_t * pay, void * arg )
     return 0;
 }
 
-int
+static int
 gotmsg( struct ipc_info * info, benc_val_t * name, benc_val_t * val,
         benc_val_t * tagval, void * arg )
 {
@@ -1269,19 +1269,19 @@ ipc_infoname( enum ipc_msg id, int type )
     return NULL;
 }
 
-int
+static int
 msgcmp( struct msg * first, struct msg * second )
 {
     return strcmp( first->name, second->name );
 }
 
-int
+static int
 infcmp( struct inf * first, struct inf * second )
 {
     return strcmp( first->name, second->name );
 }
 
-struct msg *
+static struct msg *
 msglookup( const char * name )
 {
     static struct msgtree tree = RB_INITIALIZER( &tree );
@@ -1305,8 +1305,8 @@ msglookup( const char * name )
     return RB_FIND( msgtree, &tree, &key );
 }
 
-int
-filltracker( benc_val_t * val, tr_tracker_info_t * tk )
+static int
+filltracker( benc_val_t * val, const tr_tracker_info_t * tk )
 {
     tr_bencInit( val, TYPE_DICT );
     if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )

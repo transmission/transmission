@@ -184,7 +184,7 @@ static void failureAnnouncing( tr_tracker_t * tc )
 static int shouldConnect( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
-    uint64_t       now;
+    const uint64_t now = tr_date();
     
     /* Last tracker failed, try next */
     if( tc->shouldChangeAnnounce == TC_CHANGE_NEXT
@@ -192,8 +192,6 @@ static int shouldConnect( tr_tracker_t * tc )
     {
         return 1;
     }
-    
-    now = tr_date();
     
     /* If last attempt was an error and it did not change trackers,
        then all must have been errors */
@@ -838,7 +836,6 @@ nodict:
 
     if( tc->stopped )
     {
-        tr_torrentStop( tor );
         tc->stopped = 0;
     }
     else if( shouldChangePort( tc ) )
@@ -989,19 +986,21 @@ int tr_trackerDownloaded( const tr_tracker_t * tc )
     return tc ? tc->complete : -1;
 }
 
-tr_tracker_info_t * tr_trackerGet( tr_tracker_t * tc )
+const tr_tracker_info_t * tr_trackerGet( const tr_tracker_t * tc )
 {
-    if( !tc )
-    {
-        return NULL;
-    }
-    return tc->tcCur->tl_inf;
+    return tc ? tc->tcCur->tl_inf : NULL;
 }
 
 int tr_trackerCannotConnect( const tr_tracker_t * tc )
 {
     return tc && tc->completelyUnconnectable;
 }
+
+uint64_t tr_trackerLastResponseDate ( const tr_tracker_t * tc )
+{
+    return tc ? tc->dateOk : 0;
+}
+
 
 /* Blocking version */
 int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d )

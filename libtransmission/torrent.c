@@ -567,7 +567,8 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     if( tor->recheckFlag )
         s->status = TR_STATUS_CHECK_WAIT;
     else switch( tor->runStatus ) {
-        case TR_RUN_STOPPING: s->status = TR_STATUS_STOPPING; break;
+        case TR_RUN_STOPPING: /* fallthrough */
+        case TR_RUN_STOPPING_NET_WAIT: s->status = TR_STATUS_STOPPING; break;
         case TR_RUN_STOPPED: s->status = TR_STATUS_STOPPED; break;
         case TR_RUN_CHECKING: s->status = TR_STATUS_CHECK; break;
         case TR_RUN_RUNNING: switch( tor->cpStatus ) {
@@ -972,12 +973,6 @@ torrentThreadLoop ( void * _tor )
             tr_ioClose( tor->io );
             tor->io = NULL;
 
-            /* close the tracker */
-            tr_trackerStopped( tor->tracker );
-            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
-            tr_trackerClose( tor->tracker );
-            tor->tracker = NULL;
-
             /* close the peers */
             for( i=0; i<tor->peerCount; ++i )
                 tr_peerDestroy( tor->peers[i] );
@@ -988,10 +983,27 @@ torrentThreadLoop ( void * _tor )
             tr_rcReset( tor->upload );
             tr_rcReset( tor->swarmspeed );
 
+            /* tell the tracker we're stopping */
+            tr_trackerStopped( tor->tracker );
+            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+            tor->runStatus = TR_RUN_STOPPING_NET_WAIT;
             tor->stopDate = tr_date();
-            tor->runStatus = TR_RUN_STOPPED;
-
             tr_torrentWriterUnlock( tor );
+        }
+
+        if( tor->runStatus == TR_RUN_STOPPING_NET_WAIT )
+        {
+            /* have we finished telling the tracker that we're stopping? */
+            const uint64_t date = tr_trackerLastResponseDate( tor->tracker );
+            if( date > tor->stopDate )
+            {
+                tr_torrentWriterLock( tor );
+                tr_trackerClose( tor->tracker );
+                tor->tracker = NULL;
+                tor->runStatus = TR_RUN_STOPPED;
+                tr_torrentWriterUnlock( tor );
+            }
+            continue;
         }
 
         /* do we need to check files? */

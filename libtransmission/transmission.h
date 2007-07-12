@@ -568,7 +568,7 @@ struct tr_stat_s
     char                errorString[128];
     int                 cannotConnect;
 
-    tr_tracker_info_t * tracker;
+    const tr_tracker_info_t * tracker;
 
     float               percentComplete;
     float               percentDone;

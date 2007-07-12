@@ -147,10 +147,12 @@ void tr_torrentWriterUnlock  ( tr_torrent_t * );
 
 typedef enum
 {
-    TR_RUN_CHECKING  = (1<<0), /* checking files' checksums */
-    TR_RUN_RUNNING   = (1<<1), /* seeding or leeching */
-    TR_RUN_STOPPING  = (1<<2), /* stopping */
-    TR_RUN_STOPPED   = (1<<3)  /* stopped */
+    TR_RUN_CHECKING           = (1<<0), /* checking files' checksums */
+    TR_RUN_RUNNING            = (1<<1), /* seeding or leeching */
+    TR_RUN_STOPPING           = (1<<2), /* stopping */
+    TR_RUN_STOPPING_NET_WAIT  = (1<<3), /* waiting on network -- we're
+                                           telling tracker we've stopped */
+    TR_RUN_STOPPED            = (1<<4)  /* stopped */
 }
 run_status_t;
 

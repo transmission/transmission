@@ -64,9 +64,13 @@ int tr_trackerDownloaded( const tr_tracker_t * tc );
  ***********************************************************************
  * Return the tracker currently in use.
  **********************************************************************/
-tr_tracker_info_t * tr_trackerGet( tr_tracker_t * tc );
+const tr_tracker_info_t * tr_trackerGet( const tr_tracker_t * tc );
 
 int tr_trackerCannotConnect( const tr_tracker_t * tc );
+
+/* the time of the tracker's last message to us */
+uint64_t tr_trackerLastResponseDate ( const tr_tracker_t * );
+
 
 /***********************************************************************
  * tr_trackerScrape
