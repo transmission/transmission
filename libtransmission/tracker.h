@@ -29,9 +29,9 @@ typedef struct tr_tracker_s tr_tracker_t;
 
 tr_tracker_t * tr_trackerInit      ( tr_torrent_t * );
 
-#define tr_trackerPulse(tc,a,b) tr_trackerAnnouncePulse((tc),(a),(b),0)
-void           tr_trackerAnnouncePulse( tr_tracker_t *, int * peerCount,
-                                        uint8_t ** peerCompact, int );
+void           tr_trackerPulse     ( tr_tracker_t *,
+                                     int          * peerCount,
+                                     uint8_t     ** peerCompact );
 
 void           tr_trackerCompleted( tr_tracker_t * );
 void           tr_trackerStopped  ( tr_tracker_t * );
@@ -42,14 +42,14 @@ void           tr_trackerClose    ( tr_tracker_t * );
  ***********************************************************************
  * Looks for the seeders as returned by the tracker.
  **********************************************************************/
-int tr_trackerSeeders  ( tr_tracker_t * );
+int tr_trackerSeeders  ( const tr_tracker_t * );
 
 /***********************************************************************
  * tr_trackerLeechers
  ***********************************************************************
  * Looks for the leechers as returned by the tracker.
  **********************************************************************/
-int tr_trackerLeechers ( tr_tracker_t * );
+int tr_trackerLeechers ( const tr_tracker_t * );
 
 /***********************************************************************
  * tr_trackerDownloaded
@@ -57,7 +57,7 @@ int tr_trackerLeechers ( tr_tracker_t * );
  * Looks for number of completed downloads as returned by the tracker
  * (from scrape).
  **********************************************************************/
-int tr_trackerDownloaded( tr_tracker_t * tc );
+int tr_trackerDownloaded( const tr_tracker_t * tc );
 
 /***********************************************************************
  * tr_trackerGet
@@ -66,7 +66,7 @@ int tr_trackerDownloaded( tr_tracker_t * tc );
  **********************************************************************/
 tr_tracker_info_t * tr_trackerGet( tr_tracker_t * tc );
 
-int tr_trackerCannotConnect( tr_tracker_t * tc );
+int tr_trackerCannotConnect( const tr_tracker_t * tc );
 
 /***********************************************************************
  * tr_trackerScrape

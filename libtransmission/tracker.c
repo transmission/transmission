@@ -72,7 +72,7 @@ struct tr_tracker_s
     int            hasManyPeers;
     int            complete;
     int            randOffset;
-    
+
     int            completelyUnconnectable;
     int            allUnreachIfError;
     int            lastError;
@@ -272,7 +272,7 @@ static int shouldConnect( tr_tracker_t * tc )
     return 0;
 }
 
-static int shouldScrape( tr_tracker_t * tc )
+static int shouldScrape( const tr_tracker_t * tc )
 {
     uint64_t now, interval;
 
@@ -296,8 +296,10 @@ static int shouldScrape( tr_tracker_t * tc )
     return now > tc->dateScrape + interval;
 }
 
-void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
-                              uint8_t ** peerCompact, int manual )
+void
+tr_trackerPulse( tr_tracker_t    * tc,
+                 int             * peerCount,
+                 uint8_t        ** peerCompact )
 {
     const char   * data;
     char         * address, * announce;
@@ -311,15 +313,9 @@ void tr_trackerAnnouncePulse( tr_tracker_t * tc, int * peerCount,
     *peerCount = 0;
     *peerCompact = NULL;
     
-    if( ( NULL == tc->http ) && ( manual || shouldConnect( tc ) ) )
+    if( ( NULL == tc->http ) && shouldConnect( tc ) )
     {
-        /* if announcing manually, don't consider not reaching a
-           tracker an error */
-        if( manual )
-        {
-            tc->allUnreachIfError = 0;
-        }
-        tc->completelyUnconnectable = 0;
+        tc->completelyUnconnectable = FALSE;
         
         tc->randOffset = tr_rand( 60000 );
         
@@ -978,31 +974,19 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
     tr_bencFree( &scrape );
 }
 
-int tr_trackerSeeders( tr_tracker_t * tc )
+int tr_trackerSeeders( const tr_tracker_t * tc )
 {
-    if( !tc )
-    {
-        return -1;
-    }
-    return tc->seeders;
+    return tc ? tc->seeders : -1;
 }
 
-int tr_trackerLeechers( tr_tracker_t * tc )
+int tr_trackerLeechers( const tr_tracker_t * tc )
 {
-    if( !tc )
-    {
-        return -1;
-    }
-    return tc->leechers;
+    return tc ? tc->leechers : -1;
 }
 
-int tr_trackerDownloaded( tr_tracker_t * tc )
+int tr_trackerDownloaded( const tr_tracker_t * tc )
 {
-    if( !tc )
-    {
-        return -1;
-    }
-    return tc->complete;
+    return tc ? tc->complete : -1;
 }
 
 tr_tracker_info_t * tr_trackerGet( tr_tracker_t * tc )
@@ -1014,13 +998,9 @@ tr_tracker_info_t * tr_trackerGet( tr_tracker_t * tc )
     return tc->tcCur->tl_inf;
 }
 
-int tr_trackerCannotConnect( tr_tracker_t * tc )
+int tr_trackerCannotConnect( const tr_tracker_t * tc )
 {
-    if( !tc )
-    {
-        return 0;
-    }
-    return tc->completelyUnconnectable;
+    return tc && tc->completelyUnconnectable;
 }
 
 /* Blocking version */
