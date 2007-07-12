@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <stdarg.h>
 #include "transmission.h"
 #include "bencode.h"
 #include "clients.h" /* for tr_clientForId() */

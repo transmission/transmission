@@ -28,7 +28,8 @@
 #endif
 #include <sys/types.h>
 #include <dirent.h>
-
+#include <fcntl.h>
+#include <unistd.h> /* getuid getpid close */
 #include "transmission.h"
 
 #if !defined( SYS_BEOS ) && !defined( __AMIGAOS4__ )

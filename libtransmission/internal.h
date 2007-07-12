@@ -32,7 +32,6 @@
 #include <sys/param.h>
 #endif
 #include <stdio.h>
-#include <stdarg.h>
 #ifdef SYS_BEOS
 /* BeOS doesn't declare vasprintf in its headers, but actually
  * implements it */
@@ -40,22 +39,11 @@ int vasprintf( char **, const char *, va_list );
 #endif
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <ctype.h>
 #include <errno.h>
-#include <limits.h>
-#include <signal.h>
 #include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #ifndef __AMIGAOS4__ 
 #include <sys/resource.h>
 #endif
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <fcntl.h>
 #include <assert.h>
 #ifdef SYS_BEOS
 #  define socklen_t uint32_t

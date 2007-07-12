@@ -41,6 +41,9 @@
  * so the resume file will not be read).
  **********************************************************************/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "transmission.h"
 #include "fastresume.h"
 

@@ -76,32 +76,11 @@ int    tr_ioErrorFromErrno( void );
 
 char * tr_errorString( int code );
 
-/***********************************************************************
- * tr_date
- ***********************************************************************
- * Returns the current date in milliseconds
- **********************************************************************/
-static inline uint64_t tr_date()
-{
-    struct timeval tv;
-    gettimeofday( &tv, NULL );
-    return (uint64_t) tv.tv_sec * 1000 + ( tv.tv_usec / 1000 );
-}
+/* return the current date in milliseconds */
+uint64_t tr_date( void );
 
-/***********************************************************************
- * tr_wait
- ***********************************************************************
- * Wait 'delay' milliseconds
- **********************************************************************/
-static inline void tr_wait( uint64_t delay )
-{
-#ifdef SYS_BEOS
-    snooze( 1000 * delay );
-#else
-    usleep( 1000 * delay );
-#endif
-}
-
+/* wait the specified number of milliseconds */
+void tr_wait( uint64_t delay_milliseconds );
 
 #define tr_blockPiece(a) _tr_blockPiece(tor,a)
 static inline int _tr_blockPiece( const tr_torrent_t * tor, int block )

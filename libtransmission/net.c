@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"

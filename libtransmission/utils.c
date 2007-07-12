@@ -23,6 +23,11 @@
  *****************************************************************************/
 
 #include <ctype.h>
+#include <stdarg.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h> /* usleep, stat */
 #include "transmission.h"
 
 #define SPRINTF_BUFSIZE         100
@@ -592,4 +597,26 @@ tr_bitfieldCountTrueBits( const tr_bitfield_t* b )
         ret += trueBitCount[*it];
 
     return ret;
+}
+
+/***
+****
+***/
+
+uint64_t
+tr_date( void )
+{
+    struct timeval tv;
+    gettimeofday( &tv, NULL );
+    return (uint64_t) tv.tv_sec * 1000 + ( tv.tv_usec / 1000 );
+}
+
+void
+tr_wait( uint64_t delay_msec )
+{
+#ifdef SYS_BEOS
+    snooze( 1000 * delay_msec );
+#else
+    usleep( 1000 * delay_msec );
+#endif
 }

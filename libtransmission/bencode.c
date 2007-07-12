@@ -22,7 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <ctype.h> /* for isdigit */
+#include <ctype.h> /* isdigit, isprint */
+#include <stdarg.h>
 #include "transmission.h"
 #include "bencode.h"
 

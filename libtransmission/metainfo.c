@@ -22,9 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h> /* unlink, stat */
 #include "transmission.h"
 #include "bencode.h"
-#include "http.h" /* for tr_httpParseUrl */
+#include "http.h" /* tr_httpParseUrl */
 #include "metainfo.h"
 
 #define TORRENT_MAX_SIZE (5*1024*1024)

@@ -22,6 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef _TR_RATECONTROL_H_
+#define _TR_RATECONTROL_H_
+
 typedef struct tr_ratecontrol_s tr_ratecontrol_t;
 
 tr_ratecontrol_t * tr_rcInit( void );
@@ -31,3 +34,5 @@ void               tr_rcTransferred( tr_ratecontrol_t *, int );
 float              tr_rcRate( const tr_ratecontrol_t * );
 void               tr_rcReset( tr_ratecontrol_t * );
 void               tr_rcClose( tr_ratecontrol_t * );
+
+#endif

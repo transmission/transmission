@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <signal.h>
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"

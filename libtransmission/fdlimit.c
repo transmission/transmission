@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <fcntl.h>
+#include <unistd.h>
 #include "transmission.h"
 
 #define TR_MAX_OPEN_FILES 16 /* That is, real files, not sockets */

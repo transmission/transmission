@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <ctype.h> /* isprint */
 #include "transmission.h"
 
 static int charToInt( char character );
