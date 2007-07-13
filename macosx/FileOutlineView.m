@@ -105,12 +105,11 @@
         NSDictionary * item = [self itemAtRow: row];
         Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
         
-        if ([[item objectForKey: @"IsFolder"] boolValue]
-                || ![torrent canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]])
+        NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
+        if ([[item objectForKey: @"IsFolder"] boolValue] || ![torrent canChangeDownloadCheckForFiles: indexSet])
             [fNormalColor set];
         else
         {
-            NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
             if ([torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet])
                 [fHighPriorityColor set];
             else if ([torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet])

@@ -147,8 +147,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     [NSNumber numberWithInt: fCheckDownload], @"CheckDownload",
                     [NSNumber numberWithInt: fDownloadLimit], @"DownloadLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [self orderValue], @"OrderValue",
-                    nil];
+                    [self orderValue], @"OrderValue", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -1313,10 +1312,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
 {
-    #warning multiples
-    int index;
+    int count = [indexSet count], i = 0, index;
+    int * files = malloc(count * sizeof(int));
+    
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        tr_torrentSetFileDL(fHandle, index, state != NSOffState);
+    {
+        files[i] = index;
+        i++;
+    }
+    tr_torrentSetFileDLs(fHandle, files, count, state != NSOffState);
+    free(files);
     
     [self update];
     if ([self isPaused])
@@ -1325,10 +1330,17 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
 {
-    #warning multiples
-    int index;
+    int count = [indexSet count], i = 0, index;
+    int * files = malloc(count * sizeof(int));
+    
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        tr_torrentSetFilePriority(fHandle, index, priority);
+    {
+        files[i] = index;
+        i++;
+    }
+
+    tr_torrentSetFilePriorities(fHandle, files, count, priority);
+    free(files);
 }
 
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet
