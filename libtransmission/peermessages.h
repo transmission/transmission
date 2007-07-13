@@ -115,7 +115,7 @@ blockPending( tr_torrent_t  * tor,
         tr_request_t * r;
         int            hdrlen;
 
-        if( peer->amChoking )
+        if( peer->isChokedByUs ) /* we don't want to send them anything */
             return NULL;
 
         if( !peer->outRequests ) /* nothing to send */
@@ -220,7 +220,7 @@ static void sendChoke( tr_peer_t * peer, int yes )
     id = ( yes ? PEER_MSG_CHOKE : PEER_MSG_UNCHOKE );
     getMessagePointer( peer, 0, id );
 
-    peer->amChoking = yes;
+    peer->isChokedByUs = yes;
 
     if( !yes )
     {
@@ -245,7 +245,7 @@ static void sendInterest( tr_peer_t * peer, int yes )
     id = ( yes ? PEER_MSG_INTERESTED : PEER_MSG_UNINTERESTED );
     getMessagePointer( peer, 0, id );
 
-    peer->amInterested = yes;
+    peer->isInteresting = yes;
 
     peer_dbg( "SEND %sinterested", yes ? "" : "un" );
 }

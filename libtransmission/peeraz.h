@@ -61,7 +61,7 @@ az_msgs[] = {
 #define azmsgId( idx )  ( az_msgs[(idx)].id )
 #define azmsgCount()    ( (int)(sizeof( az_msgs ) / sizeof( az_msgs[0] ) ) )
 
-static inline int
+static int
 azmsgIdIndex( int id )
 {
     int ii;
@@ -79,7 +79,7 @@ azmsgIdIndex( int id )
     return 0;
 }
 
-static inline int
+static int
 azmsgNameIndex( const char * name, int len )
 {
     int ii;
@@ -272,7 +272,7 @@ sendAZHandshake( tr_torrent_t * tor, tr_peer_t * peer )
     return len;
 }
 
-static inline int
+static int
 parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
                       int * msgidret, int * msglenret )
 {
@@ -338,7 +338,7 @@ parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
     return off;
 }
 
-static inline int
+static int
 parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t      val, * sub, * dict, * subsub;
@@ -453,7 +453,7 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
     return TR_OK;
 }
 
-static inline int
+static int
 parseAZPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
 {
     tr_info_t * info = &tor->info;

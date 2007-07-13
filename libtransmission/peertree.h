@@ -40,7 +40,7 @@ tr_peertree_t;
 #define peertreeNext(tree, item) RB_NEXT(  tr_peertree_s, (tree), (item) )
 #define peertreeFind(tree, item) RB_FIND(  tr_peertree_s, (tree), (item) )
 
-static inline int
+static int
 peertreekeycmp( tr_peertree_entry_t * aa, tr_peertree_entry_t * bb )
 {
     return memcmp( aa->peer, bb->peer, 6 );

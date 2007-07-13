@@ -549,12 +549,12 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
     s->peersDownloading = 0;
     for( i=0; i<tor->peerCount; ++i ) {
         const tr_peer_t * peer = tor->peers[i];
-            ++s->peersTotal;
+        ++s->peersTotal;
         if( tr_peerIsConnected( peer ) ) {
             ++s->peersFrom[tr_peerIsFrom(peer)];
-            if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
+            if( tr_peerIsInterested( peer ) && !tr_peerIsChokedByUs( peer ) )
                 ++s->peersUploading;
-            if( !tr_peerAmChoking( peer ) )
+            if( tr_peerIsInteresting( peer ) && !tr_peerIsChokingUs( peer ) )
                 ++s->peersDownloading;
         }
     }
@@ -630,7 +630,7 @@ tr_torrentPeers( const tr_torrent_t * tor, int * peerCount )
         tr_peer_t * peer;
         struct in_addr * addr;
         int i;
-        for( i = 0; i < tor->peerCount; i++ )
+        for( i=0; i<tor->peerCount; ++i )
         {
             peer = tor->peers[i];
             
@@ -641,21 +641,15 @@ tr_torrentPeers( const tr_torrent_t * tor, int * peerCount )
                            sizeof( peers[i].addr ) );
             }
             
-            peers[i].client        = tr_peerClient( peer );
-            peers[i].isConnected   = tr_peerIsConnected( peer );
-            peers[i].from          = tr_peerIsFrom( peer );
-            peers[i].progress      = tr_peerProgress( peer );
-            peers[i].port          = tr_peerPort( peer );
-            
-            if( ( peers[i].isDownloading = !tr_peerAmChoking( peer ) ) )
-            {
-                peers[i].uploadToRate = tr_peerUploadRate( peer );
-            }
-            if( ( peers[i].isUploading = ( tr_peerAmInterested( peer ) &&
-					   !tr_peerIsChoking( peer ) ) ) )
-            {
-                peers[i].downloadFromRate = tr_peerDownloadRate( peer );
-            }
+            peers[i].client           =  tr_peerClient( peer );
+            peers[i].isConnected      =  tr_peerIsConnected( peer );
+            peers[i].from             =  tr_peerIsFrom( peer );
+            peers[i].progress         =  tr_peerProgress( peer );
+            peers[i].port             =  tr_peerPort( peer );
+            peers[i].isDownloading    = !tr_peerIsChokingUs( peer );
+            peers[i].uploadToRate     =  tr_peerUploadRate( peer );
+            peers[i].isUploading      = !tr_peerIsChokedByUs( peer );
+            peers[i].downloadFromRate =  tr_peerDownloadRate( peer );
         }
     }
     

@@ -210,7 +210,7 @@ makeUTPex( tr_torrent_t * tor, tr_peer_t * peer, char ** buf, int * len )
                           buf, len );
 }
 
-static inline int
+static int
 parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t val, * sub;
@@ -276,7 +276,7 @@ parseExtendedHandshake( tr_peer_t * peer, uint8_t * buf, int len )
     return TR_OK;
 }
 
-static inline int
+static int
 parseUTPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t val, * sub;

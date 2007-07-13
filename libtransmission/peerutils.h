@@ -219,18 +219,14 @@ static int isInteresting( const tr_torrent_t * tor, const tr_peer_t * peer )
 
     return 0;
 }
-static void updateInterest( tr_torrent_t * tor, tr_peer_t * peer )
-{
-    int interested = isInteresting( tor, peer );
 
-    if( interested && !peer->amInterested )
-    {
-        sendInterest( peer, 1 );
-    }
-    if( !interested && peer->amInterested )
-    {
-        sendInterest( peer, 0 );
-    }
+static void
+updateInterest( tr_torrent_t * tor, tr_peer_t * peer )
+{
+    const int i = !!isInteresting( tor, peer );
+
+    if( i != peer->isInteresting )
+        sendInterest( peer, i );
 }
 
 /** utility structure used by getPreferredPieces() and comparePieces() */

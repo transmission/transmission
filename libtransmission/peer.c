@@ -146,10 +146,10 @@ struct tr_peer_s
     int                 advertisedPort; /* listening port we last told peer */
     tr_peertree_t       sentPeers;
 
-    char                amChoking;
-    char                amInterested;
-    char                peerChoking;
-    char                peerInterested;
+    char                isChokedByUs;
+    char                isChokingUs;
+    char                isInteresting;
+    char                isInterested;
 
     int                 optimistic;
     int                 timesChoked;
@@ -238,14 +238,14 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
 
     assert( 0 <= from && TR_PEER_FROM__MAX > from );
 
-    peer              = tr_new0( tr_peer_t, 1 );
+    peer                   = tr_new0( tr_peer_t, 1 );
+    peer->isChokedByUs     = TRUE;
+    peer->isChokingUs      = TRUE;
+    peer->date             = tr_date();
+    peer->keepAlive        = peer->date;
+    peer->download         = tr_rcInit();
+    peer->upload           = tr_rcInit();
     peertreeInit( &peer->sentPeers );
-    peer->amChoking   = TRUE;
-    peer->peerChoking = TRUE;
-    peer->date        = tr_date();
-    peer->keepAlive   = peer->date;
-    peer->download    = tr_rcInit();
-    peer->upload      = tr_rcInit();
 
     peer->inRequestMax = peer->inRequestAlloc = 2;
     peer->inRequests = tr_new0( tr_request_t, peer->inRequestAlloc );
@@ -395,7 +395,7 @@ int tr_peerRead( tr_peer_t * peer )
         peer->pos  += ret;
         if( NULL != tor )
         {
-            if( tr_peerAmInterested( peer ) && !tr_peerIsChoking( peer ) )
+            if( peer->isInteresting && !peer->isChokingUs )
             {
                 tor->activityDate = date;
             }
@@ -583,7 +583,7 @@ writeBegin:
         date              = tr_date();
         peer->outDate     = date;
         
-        if( !tr_peerAmChoking( peer ) )
+        if( !tr_peerIsChokedByUs( peer ) )
             tor->activityDate = date;
 
         /* In case this block is done, you may have messages
@@ -594,7 +594,7 @@ writeEnd:
 
     /* Ask for a block whenever possible */
     if( !isSeeding
-        && !peer->amInterested
+        && !peer->isInteresting
         && tor->peerCount > TR_MAX_PEER_COUNT - 2 )
     {
         /* This peer is no use to us, and it seems there are
@@ -603,8 +603,8 @@ writeEnd:
         return TR_ERROR;
     }
 
-    if(     peer->amInterested
-        && !peer->peerChoking
+    if(     peer->isInteresting
+        && !peer->isChokingUs
         && !peer->banned
         &&  peer->inRequestCount < peer->inRequestMax )
     {
@@ -656,21 +656,21 @@ int tr_peerIsFrom( const tr_peer_t * peer )
     return peer->from;
 }
 
-int tr_peerAmChoking( const tr_peer_t * peer )
+int tr_peerIsChokedByUs( const tr_peer_t * peer )
 {
-    return peer->amChoking;
+    return peer->isChokedByUs;
 }
-int tr_peerAmInterested( const tr_peer_t * peer )
+int tr_peerIsInteresting( const tr_peer_t * peer )
 {
-    return peer->amInterested;
+    return peer->isInteresting;
 }
-int tr_peerIsChoking( const tr_peer_t * peer )
+int tr_peerIsChokingUs( const tr_peer_t * peer )
 {
-    return peer->peerChoking;
+    return peer->isChokingUs;
 }
 int tr_peerIsInterested( const tr_peer_t * peer )
 {
-    return peer->peerInterested;
+    return peer->isInterested;
 }
 
 float tr_peerProgress( const tr_peer_t * peer )
@@ -776,8 +776,9 @@ void tr_peerBlame( tr_peer_t * peer, int piece, int success )
         {
             /* Full ban */
             peer_dbg( "banned (%d / %d)", peer->goodPcs, peer->badPcs );
-            peer->banned = 1;
-            peer->peerInterested = 0;
+            peer->banned = TRUE;
+            peer->isInteresting = FALSE;
+            peer->isInterested = FALSE;
         }
     }
     tr_bitfieldRem( peer->blamefield, piece );

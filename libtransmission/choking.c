@@ -165,7 +165,7 @@ void tr_chokingPulse( tr_choking_t * c )
             /* Choke peers who have lost their interest in us */
             if( !tr_peerIsInterested( peer ) )
             {
-                if( !tr_peerAmChoking( peer ) )
+                if( !tr_peerIsChokedByUs( peer ) )
                 {
                     tr_peerChoke( peer );
                     tr_peerSetOptimistic( peer, 0 );
@@ -177,7 +177,12 @@ void tr_chokingPulse( tr_choking_t * c )
                those we may unchoke. Whatever happens, we never choke a
                peer less than 10 seconds after the time we unchoked him
                (or the other way around). */
-            if( !tr_peerAmChoking( peer ) )
+            if( tr_peerIsChokedByUs( peer ) )
+            {
+                if( !tr_peerTimesChoked(peer) || tr_peerLastChoke( peer ) + 10000 < now )
+                    canUnchoke[canUnchokeCount++] = peer;
+            }
+            else
             {
                 if( tr_peerIsOptimistic( peer ) )
                 {
@@ -198,11 +203,6 @@ void tr_chokingPulse( tr_choking_t * c )
                 unchoked++;
                 if( tr_peerLastChoke( peer ) + 10000 < now )
                     canChoke[canChokeCount++] = peer;
-            }
-            else
-            {
-                if( !tr_peerTimesChoked(peer) || tr_peerLastChoke( peer ) + 10000 < now )
-                    canUnchoke[canUnchokeCount++] = peer;
             }
         }
     }
