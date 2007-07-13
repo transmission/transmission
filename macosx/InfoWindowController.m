@@ -613,20 +613,13 @@
             return NO;
         
         Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
-        NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
+        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+        NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
         int i, index, state = (menuItem == fFileCheckItem) ? NSOnState : NSOffState;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        {
-            itemIndexes = [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"];
-            if (![usedIndexes containsIndexes: itemIndexes])
-            {
-                if ([torrent checkForFiles: itemIndexes] != state && [torrent canChangeDownloadCheckForFiles: itemIndexes])
-                    return YES;
-                [usedIndexes addIndexes: itemIndexes];
-            }
-        }
-        return NO;
+            [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
+        
+        return [torrent checkForFiles: itemIndexes] != state && [torrent canChangeDownloadCheckForFiles: itemIndexes];
     }
     
     if (action == @selector(setOnlySelectedCheck:))
@@ -635,20 +628,13 @@
             return NO;
         
         Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes], * itemIndexes;
-        NSMutableIndexSet * usedIndexes = [NSMutableIndexSet indexSet];
+        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+        NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
         int i, index;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
-        {
-            itemIndexes = [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"];
-            if (![usedIndexes containsIndexes: itemIndexes])
-            {
-                if ([torrent canChangeDownloadCheckForFiles: itemIndexes])
-                    return YES;
-                [usedIndexes addIndexes: itemIndexes];
-            }
-        }
-        return NO;
+            [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
+            
+        return [torrent canChangeDownloadCheckForFiles: itemIndexes];
     }
     
     if (action == @selector(setPriority:))
