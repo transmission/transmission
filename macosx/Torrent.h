@@ -206,6 +206,7 @@
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet;
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
+- (NSArray *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;

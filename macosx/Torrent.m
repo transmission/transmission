@@ -1314,12 +1314,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     int count = [indexSet count], i = 0, index;
     int * files = malloc(count * sizeof(int));
-    
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         files[i] = index;
         i++;
     }
+    
     tr_torrentSetFileDLs(fHandle, files, count, state != NSOffState);
     free(files);
     
@@ -1332,7 +1332,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     int count = [indexSet count], i = 0, index;
     int * files = malloc(count * sizeof(int));
-    
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
         files[i] = index;
@@ -1351,6 +1350,48 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 && [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
             return YES;
     return NO;
+}
+
+- (NSArray *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
+{
+    BOOL low = NO, normal = NO, high = NO;
+    NSMutableArray * priorities = [NSMutableArray arrayWithCapacity: 3];
+    
+    int index, priority;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    {
+        if (![self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
+            continue;
+        
+        priority = tr_torrentGetFilePriority(fHandle, index);
+        if (priority == TR_PRI_LOW)
+        {
+            if (!low)
+                low = YES;
+            else
+                continue;
+        }
+        else if (priority == TR_PRI_HIGH)
+        {
+            if (!high)
+                high = YES;
+            else
+                continue;
+        }
+        else
+        {
+            if (!normal)
+                normal = YES;
+            else
+                continue;
+        }
+        
+        [priorities addObject: [NSNumber numberWithInt: priority]];
+        
+        if (low && normal && high)
+            break;
+    }
+    return priorities;
 }
 
 - (NSDate *) dateAdded

@@ -932,24 +932,23 @@
     }
     else if ([ident isEqualToString: @"Priority"])
     {
-        Torrent * torrent = [fTorrents objectAtIndex: 0];
-        NSIndexSet * indexSet = [item objectForKey: @"Indexes"];
+        NSArray * priorities = [[fTorrents objectAtIndex: 0] filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
         
-        if (![torrent canChangeDownloadCheckForFiles: indexSet])
+        int count = [priorities count];
+        if (count == 0)
             return NSLocalizedString(@"Priority Not Available", "Inspector -> files tab -> tooltip");
-        
-        BOOL low = [torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet],
-            normal = [torrent hasFilePriority: TR_PRI_NORMAL forIndexes: indexSet],
-            high = [torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet];
-        
-        if (low && !normal && !high)
-            return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
-        else if (!low && normal && !high)
-            return NSLocalizedString(@"Normal Priority", "Inspector -> files tab -> tooltip");
-        else if (!low && !normal && high)
-            return NSLocalizedString(@"High Priority", "Inspector -> files tab -> tooltip");
-        else
+        else if (count > 1)
             return NSLocalizedString(@"Multiple Priorities", "Inspector -> files tab -> tooltip");
+        else
+        {
+            int priority = [[priorities objectAtIndex: 0] intValue];
+            if (priority == TR_PRI_LOW)
+                return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
+            else if (priority == TR_PRI_HIGH)
+                return NSLocalizedString(@"High Priority", "Inspector -> files tab -> tooltip");
+            else
+                return NSLocalizedString(@"Normal Priority", "Inspector -> files tab -> tooltip");
+        }
     }
     else
         return nil;
