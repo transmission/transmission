@@ -1239,15 +1239,19 @@ tr_torrentSetFileDL( tr_torrent_t  * tor,
 }
 
 void
-tr_torrentSetFileDLs ( tr_torrent_t * tor, const uint8_t * enabled )
+tr_torrentSetFileDLs ( tr_torrent_t   * tor,
+                       int            * files,
+                       int              fileCount,
+                       int              do_download )
 {
     int i, j;
+    const int dnd = !do_download;
 
     tr_torrentWriterLock( tor );
 
-    for( i=0; i<tor->info.fileCount; ++i ) {
-        const int dnd = !enabled[i];
-        tr_file_t * file = &tor->info.files[i];
+    for( i=0; i<fileCount; ++i ) {
+        const int fileIndex = files[i];
+        tr_file_t * file = &tor->info.files[fileIndex];
         file->dnd = dnd;
         for( j=file->firstPiece; j<=file->lastPiece; ++j )
             tor->info.pieces[j].dnd = dnd;
