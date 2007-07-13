@@ -311,7 +311,7 @@ tr_trackerPulse( tr_tracker_t    * tc,
     *peerCount = 0;
     *peerCompact = NULL;
     
-    if( ( NULL == tc->http ) && shouldConnect( tc ) )
+    if( !tc->http && shouldConnect( tc ) )
     {
         tc->completelyUnconnectable = FALSE;
         
@@ -389,7 +389,7 @@ tr_trackerPulse( tr_tracker_t    * tc,
         tc->shouldChangeAnnounce = TC_CHANGE_NO;
     }
 
-    if( NULL != tc->http )
+    if( tc->http )
     {
         switch( tr_httpPulse( tc->http, &data, &len ) )
         {

@@ -643,12 +643,9 @@ static tr_tristate_t
 sendrequest( tr_http_t * http )
 {
     struct buf * buf;
-    int          ret;
 
-    if( 0 == http->date )
-    {
-        http->date = tr_date();
-    }
+    if( !http->date )
+         http->date = tr_date();
 
     if( 0 > http->sock || tr_date() > http->date + HTTP_TIMEOUT )
     {
@@ -658,15 +655,9 @@ sendrequest( tr_http_t * http )
     buf = ( 0 < http->header.used ? &http->header : &http->body );
     while( 0 < buf->used )
     {
-      ret = tr_netSend( http->sock, (uint8_t *) buf->buf, buf->used );
-        if( ret & TR_NET_CLOSE )
-        {
-            return TR_NET_ERROR;
-        }
-        else if( ret & TR_NET_BLOCK )
-        {
-            return TR_NET_WAIT;
-        }
+        const int ret = tr_netSend( http->sock, buf->buf, buf->used );
+        if( ret & TR_NET_CLOSE ) return TR_NET_ERROR;
+        if( ret & TR_NET_BLOCK ) return TR_NET_WAIT;
         buf->used = 0;
         buf = &http->body;
     }

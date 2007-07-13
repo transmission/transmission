@@ -993,8 +993,13 @@ torrentThreadLoop ( void * _tor )
 
         if( tor->runStatus == TR_RUN_STOPPING_NET_WAIT )
         {
+            uint64_t date;
+            int peerCount;
+            uint8_t * peerCompact;
+            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+
             /* have we finished telling the tracker that we're stopping? */
-            const uint64_t date = tr_trackerLastResponseDate( tor->tracker );
+            date = tr_trackerLastResponseDate( tor->tracker );
             if( date > tor->stopDate )
             {
                 tr_torrentWriterLock( tor );

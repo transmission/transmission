@@ -374,24 +374,17 @@ int tr_netAccept( int b, struct in_addr * addr, in_port_t * port )
     return makeSocketNonBlocking( s );
 }
 
-int tr_netSend( int s, uint8_t * buf, int size )
+int
+tr_netSend( int s, const void * buf, int size )
 {
-    int ret;
+    const int ret = send( s, buf, size, 0 );
+    if( ret >= 0 )
+        return ret;
 
-    ret = send( s, buf, size, 0 );
-    if( ret < 0 )
-    {
-        if( errno == ENOTCONN || errno == EAGAIN || errno == EWOULDBLOCK )
-        {
-            ret = TR_NET_BLOCK;
-        }
-        else
-        {
-            ret = TR_NET_CLOSE;
-        }
-    }
+    if( errno == ENOTCONN || errno == EAGAIN || errno == EWOULDBLOCK )
+        return TR_NET_BLOCK;
 
-    return ret;
+    return TR_NET_CLOSE;
 }
 
 int tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * addr )

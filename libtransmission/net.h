@@ -54,7 +54,7 @@ void tr_netClose   ( int s );
 
 #define TR_NET_BLOCK 0x80000000
 #define TR_NET_CLOSE 0x40000000
-int  tr_netSend    ( int s, uint8_t * buf, int size );
+int  tr_netSend    ( int s, const void * buf, int size );
 #define tr_netRecv( s, buf, size ) tr_netRecvFrom( (s), (buf), (size), NULL )
 int  tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * );
 
