@@ -1160,12 +1160,16 @@ tr_torrentSetFilePriority( tr_torrent_t   * tor,
 }
 
 void
-tr_torrentSetFilePriorities( tr_torrent_t         * tor,
-                             const tr_priority_t  * filePriorities )
+tr_torrentSetFilePriorities( tr_torrent_t        * tor,
+                             int                 * files,
+                             int                   fileCount,
+                             tr_priority_t         priority )
 {
     int i;
-    for( i=0; i<tor->info.pieceCount; ++i )
-        tr_torrentSetFilePriorityImpl( tor, i, filePriorities[i], FALSE );
+    for( i=0; i<fileCount; ++i ) {
+        const int fileIndex = files[i];
+        tr_torrentSetFilePriorityImpl( tor, fileIndex, priority, FALSE );
+    }
     fastResumeSave( tor );
 }
 
