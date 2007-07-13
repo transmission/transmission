@@ -109,12 +109,12 @@
             [fNormalColor set];
         else
         {
-            NSArray * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
+            NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
             if ([priorities count] == 0)
                 [fNormalColor set];
             else
             {
-                int priority = [[priorities objectAtIndex: 0] intValue];
+                int priority = [[priorities anyObject] intValue];
                 if (priority == TR_PRI_LOW)
                     [fLowPriorityColor set];
                 else if (priority == TR_PRI_HIGH)
@@ -148,10 +148,10 @@
             item = [self itemAtRow: i];
             if (![[item objectForKey: @"IsFolder"] boolValue])
             {
-                NSArray * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
+                NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
                 if ([priorities count] == 1)
                 {
-                    int priority = [[priorities objectAtIndex: 0] intValue];
+                    int priority = [[priorities anyObject] intValue];
                     if (priority == TR_PRI_LOW)
                         [fLowPriorityColor set];
                     else if (priority == TR_PRI_HIGH)

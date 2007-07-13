@@ -52,14 +52,14 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
-    NSIndexSet * indexSet = [fItem objectForKey: @"Indexes"];
+    NSSet * priorities = [torrent filePrioritiesForIndexes: [fItem objectForKey: @"Indexes"]];
     
-    if (![torrent canChangeDownloadCheckForFiles: indexSet])
+    if ([priorities count] == 0)
         return;
     
-    BOOL low = [torrent hasFilePriority: TR_PRI_LOW forIndexes: indexSet],
-        normal = [torrent hasFilePriority: TR_PRI_NORMAL forIndexes: indexSet],
-        high = [torrent hasFilePriority: TR_PRI_HIGH forIndexes: indexSet];
+    BOOL low = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]],
+        normal = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]],
+        high = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_HIGH]];
     
     FileOutlineView * view = (FileOutlineView *)[self controlView];
     int row = [view hoverRow];

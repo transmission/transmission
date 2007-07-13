@@ -1352,10 +1352,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return NO;
 }
 
-- (NSArray *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
+- (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
-    NSMutableArray * priorities = [NSMutableArray arrayWithCapacity: 3];
+    NSMutableSet * priorities = [NSMutableSet setWithCapacity: 3];
     
     int index, priority;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
@@ -1366,28 +1366,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         priority = tr_torrentGetFilePriority(fHandle, index);
         if (priority == TR_PRI_LOW)
         {
-            if (!low)
-                low = YES;
-            else
+            if (low)
                 continue;
+            low = YES;
         }
         else if (priority == TR_PRI_HIGH)
         {
-            if (!high)
-                high = YES;
-            else
+            if (high)
                 continue;
+            high = YES;
         }
         else
         {
-            if (!normal)
-                normal = YES;
-            else
+            if (normal)
                 continue;
+            normal = YES;
         }
         
         [priorities addObject: [NSNumber numberWithInt: priority]];
-        
         if (low && normal && high)
             break;
     }

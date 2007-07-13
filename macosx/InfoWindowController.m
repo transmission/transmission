@@ -932,7 +932,7 @@
     }
     else if ([ident isEqualToString: @"Priority"])
     {
-        NSArray * priorities = [[fTorrents objectAtIndex: 0] filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
+        NSSet * priorities = [[fTorrents objectAtIndex: 0] filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
         
         int count = [priorities count];
         if (count == 0)
@@ -941,7 +941,7 @@
             return NSLocalizedString(@"Multiple Priorities", "Inspector -> files tab -> tooltip");
         else
         {
-            int priority = [[priorities objectAtIndex: 0] intValue];
+            int priority = [[priorities anyObject] intValue];
             if (priority == TR_PRI_LOW)
                 return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
             else if (priority == TR_PRI_HIGH)
