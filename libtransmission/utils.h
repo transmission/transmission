@@ -25,6 +25,8 @@
 #ifndef TR_UTILS_H
 #define TR_UTILS_H 1
 
+#include <stdarg.h>
+
 void tr_msgInit( void );
 
 #define tr_err( a... ) tr_msg( TR_MSG_ERR, ## a )
