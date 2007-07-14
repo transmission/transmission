@@ -22,10 +22,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <fcntl.h>
+
 #include "transmission.h"
 
 #define TR_MAX_OPEN_FILES 16 /* That is, real files, not sockets */

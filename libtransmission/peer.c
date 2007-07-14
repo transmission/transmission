@@ -22,7 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdarg.h>
+
 #include "transmission.h"
 #include "bencode.h"
 #include "clients.h" /* for tr_clientForId() */
@@ -232,7 +237,8 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
  ***********************************************************************
  * Initializes a new peer.
  **********************************************************************/
-tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
+tr_peer_t * tr_peerInit( const struct in_addr * addr, in_port_t port,
+                         int s, int from )
 {
     tr_peer_t * peer;
 
@@ -251,7 +257,7 @@ tr_peer_t * tr_peerInit( struct in_addr addr, in_port_t port, int s, int from )
     peer->inRequests = tr_new0( tr_request_t, peer->inRequestAlloc );
 
     peer->socket = s;
-    peer->addr = addr;
+    peer->addr = *addr;
     peer->port = port;
     peer->from = from;
     peer->credit = SWIFT_INITIAL_CREDIT;
@@ -463,7 +469,7 @@ int tr_peerPulse( tr_peer_t * peer )
     /* Connect */
     if( PEER_STATUS_IDLE == peer->status )
     {
-        peer->socket = tr_netOpenTCP( peer->addr, peer->port, 0 );
+        peer->socket = tr_netOpenTCP( &peer->addr, peer->port, 0 );
         if( peer->socket < 0 )
         {
             return TR_ERROR;

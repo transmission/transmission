@@ -27,9 +27,10 @@
 
 #include "transmission.h"
 
+struct in_addr;
 typedef struct tr_peer_s tr_peer_t; 
 
-tr_peer_t * tr_peerInit            ( struct in_addr, in_port_t, int sock, int );
+tr_peer_t * tr_peerInit            ( const struct in_addr *, in_port_t, int sock, int );
 void        tr_peerDestroy         ( tr_peer_t * );
 const char *tr_peerClient          ( tr_peer_t * );
 void        tr_peerSetPrivate      ( tr_peer_t *, int );

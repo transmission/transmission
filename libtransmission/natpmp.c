@@ -22,6 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "transmission.h"
 #include "natpmp.h"
 #include "net.h"
@@ -510,7 +515,7 @@ newreq( int adding, struct in_addr addr, int port )
         return NULL;
     }
 
-    ret->fd = tr_netOpenUDP( addr, htons( PMP_PORT ), 1 );
+    ret->fd = tr_netOpenUDP( &addr, htons( PMP_PORT ), 1 );
     if( 0 > ret->fd )
     {
         free( ret );
@@ -666,7 +671,7 @@ mcastsetup()
     struct in_addr addr;
 
     addr.s_addr = inet_addr( PMP_MCAST_ADDR );
-    fd = tr_netMcastOpen( PMP_PORT, addr );
+    fd = tr_netMcastOpen( PMP_PORT, &addr );
     if( 0 > fd )
     {
         return -1;

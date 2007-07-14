@@ -44,9 +44,6 @@ int vasprintf( char **, const char *, va_list );
 #ifndef __AMIGAOS4__ 
 #include <sys/resource.h>
 #endif
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <assert.h>
 #ifdef SYS_BEOS
 #  define socklen_t uint32_t

@@ -22,6 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "transmission.h"
 #include "fastresume.h"
 #include "trcompat.h" /* for strlcpy */
@@ -864,7 +869,7 @@ int tr_torrentAddCompact( tr_torrent_t * tor, int from,
         memcpy( &addr, buf, 4 ); buf += 4;
         memcpy( &port, buf, 2 ); buf += 2;
 
-        peer = tr_peerInit( addr, port, -1, from );
+        peer = tr_peerInit( &addr, port, -1, from );
         added += tr_torrentAttachPeer( tor, peer );
     }
 

@@ -383,6 +383,10 @@ void tr_condClose( tr_cond_t * c )
 
 #if defined( BSD )
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/sysctl.h>
 #include <net/route.h>
 

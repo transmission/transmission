@@ -22,7 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdarg.h>
+
 #include "transmission.h"
 #include "http.h"
 #include "net.h"
@@ -407,7 +412,7 @@ mcastStart()
     struct in_addr addr;
 
     addr.s_addr = inet_addr( SSDP_ADDR );
-    fd = tr_netMcastOpen( SSDP_PORT, addr );
+    fd = tr_netMcastOpen( SSDP_PORT, &addr );
     if( 0 > fd )
     {
         return -1;

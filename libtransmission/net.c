@@ -22,10 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <netdb.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #include <fcntl.h>
+
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"
@@ -264,7 +267,8 @@ static int createSocket( int type, int priority )
     return makeSocketNonBlocking( s );
 }
 
-int tr_netOpen( struct in_addr addr, in_port_t port, int type, int priority )
+int tr_netOpen( const struct in_addr * addr, in_port_t port,
+                int type, int priority )
 {
     int s;
     struct sockaddr_in sock;
@@ -276,7 +280,7 @@ int tr_netOpen( struct in_addr addr, in_port_t port, int type, int priority )
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
-    sock.sin_addr.s_addr = addr.s_addr;
+    sock.sin_addr.s_addr = addr->s_addr;
     sock.sin_port        = port;
 
     if( connect( s, (struct sockaddr *) &sock,
@@ -292,7 +296,7 @@ int tr_netOpen( struct in_addr addr, in_port_t port, int type, int priority )
 }
 
 #ifdef IP_ADD_MEMBERSHIP
-int tr_netMcastOpen( int port, struct in_addr addr )
+int tr_netMcastOpen( int port, const struct in_addr * addr )
 {
     int fd;
     struct ip_mreq req;
@@ -304,7 +308,7 @@ int tr_netMcastOpen( int port, struct in_addr addr )
     }
 
     memset( &req, 0, sizeof( req ) );
-    req.imr_multiaddr.s_addr = addr.s_addr;
+    req.imr_multiaddr.s_addr = addr->s_addr;
     req.imr_interface.s_addr = htonl( INADDR_ANY );
     if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &req, sizeof ( req ) ) )
     {
@@ -316,7 +320,7 @@ int tr_netMcastOpen( int port, struct in_addr addr )
     return fd;
 }
 #else /* IP_ADD_MEMBERSHIP */
-int tr_netMcastOpen( int port UNUSED, struct in_addr addr UNUSED )
+int tr_netMcastOpen( int port UNUSED, const struct in_addr * addr UNUSED )
 {
     return -1;
 }

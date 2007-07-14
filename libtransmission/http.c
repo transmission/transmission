@@ -22,7 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdarg.h>
+
 #include "transmission.h"
 #include "http.h"
 #include "net.h"
@@ -562,7 +567,7 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
             }
             if( !tr_netResolve( http->host, &addr ) )
             {
-                http->sock = tr_netOpenTCP( addr, htons( http->port ), 1 );
+                http->sock = tr_netOpenTCP( &addr, htons( http->port ), 1 );
                 http->state = HTTP_STATE_CONNECT;
                 break;
             }
@@ -584,7 +589,7 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
                 case TR_NET_OK:
                     tr_netResolveClose( http->resolve );
                     http->resolve = NULL;
-                    http->sock = tr_netOpenTCP( addr, htons( http->port ), 1 );
+                    http->sock = tr_netOpenTCP( &addr, htons( http->port ), 1 );
                     http->state = HTTP_STATE_CONNECT;
             }
             /* fallthrough */
