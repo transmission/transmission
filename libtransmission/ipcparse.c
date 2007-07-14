@@ -1126,6 +1126,8 @@ gotmsg( struct ipc_info * info, benc_val_t * name, benc_val_t * val,
             info->funcs->def( msg->id, val, tag, arg );
         }
     }
+    else if( NULL != info->funcs->def )
+        info->funcs->def( IPC__MSG_UNKNOWN, NULL, tag, arg );
 
     return 0;
 }

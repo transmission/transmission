@@ -75,7 +75,8 @@ enum ipc_msg
     IPC_MSG_SUP,
     IPC_MSG_UPLIMIT,
     IPC_MSG_VERSION,
-    IPC__MSG_COUNT
+    IPC__MSG_COUNT,
+    IPC__MSG_UNKNOWN
 };
 
 #define IPC_INF_COMMENT         ( 1 << 0 )
