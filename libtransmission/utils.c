@@ -486,7 +486,7 @@ tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
     unsigned int i;
 
     for( i=0; i<bitfield->len; ++i )
-        if( *bitfield->bits )
+        if( bitfield->bits[i] )
             return 0;
 
     return 1;
