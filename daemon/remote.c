@@ -843,7 +843,7 @@ sendidreqs( void )
 
     for( ii = 0; ARRAYLEN( reqs ) > ii; ii++)
     {
-        if( SLIST_EMPTY( reqs[ii].list ) )
+        if( NULL == reqs[ii].list || SLIST_EMPTY( reqs[ii].list ) )
         {
             continue;
         }
