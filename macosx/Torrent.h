@@ -162,6 +162,7 @@
 - (BOOL) isPaused;
 - (BOOL) isChecking;
 - (BOOL) allDownloaded;
+- (BOOL) isComplete;
 - (BOOL) isError;
 - (NSString *) errorMessage;
 

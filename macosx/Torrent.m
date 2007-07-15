@@ -320,7 +320,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
-    else if ([self progress] < 1.0)
+    else if (![self isComplete])
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
                 "Torrent -> progress string"),
                 [NSString stringForFileSize: [self downloadedValid]], [NSString stringForFileSize: [self size]],
@@ -1081,6 +1081,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->cpStatus != TR_CP_INCOMPLETE;
 }
 
+- (BOOL) isComplete
+{
+    return fStat->cpStatus == TR_CP_COMPLETE;
+}
+
 - (BOOL) isError
 {
     return fStat->error != 0;
@@ -1300,7 +1305,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
 {
-    if ([self fileCount] <= 1)
+    if ([self fileCount] <= 1 || [self isComplete])
         return NO;
     
     int index;
