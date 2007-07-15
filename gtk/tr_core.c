@@ -213,8 +213,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_STRING,    G_TYPE_INT,
         /* error,   errorString,   percentComplete, percentDone,  rateDownload, rateUpload, */
         G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT,    G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
-        /* eta,     peersTotal, peersUploading, peersDownloading, seeders, */
-        G_TYPE_INT, G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
+        /* eta,     peersConnected, peersUploading, peersDownloading, seeders, */
+        G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
         /* leechers, completedFromTracker, downloaded,    uploaded */
         G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
         /* left,       tracker,               TrTorrent object, ID for IPC */
@@ -610,7 +610,7 @@ tr_core_update( TrCore * self )
                             MC_DRATE,       st->rateDownload,
                             MC_URATE,       st->rateUpload,
                             MC_ETA,         st->eta,
-                            MC_PEERS,       st->peersTotal,
+                            MC_PEERS,       st->peersConnected,
                             MC_UPEERS,      st->peersUploading,
                             MC_DPEERS,      st->peersDownloading,
                             MC_SEED,        st->seeders,

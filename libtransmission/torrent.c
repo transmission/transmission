@@ -549,30 +549,31 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
 
     /* peers... */
     memset( s->peersFrom, 0, sizeof( s->peersFrom ) );
-    s->peersTotal       = 0;
-    s->peersUploading   = 0;
-    s->peersDownloading = 0;
+    s->peersTotal        = tor->peerCount;
+    s->peersConnected    = 0;
+    s->peersUploading    = 0;
+    s->peersDownloading  = 0;
+
     for( i=0; i<tor->peerCount; ++i )
     {
         const tr_peer_t * peer = tor->peers[i];
-        ++s->peersTotal;
+
         if( tr_peerIsConnected( peer ) )
         {
+            ++s->peersConnected;
             ++s->peersFrom[tr_peerIsFrom(peer)];
 
-            /*if( tr_peerIsInterested( peer ) && !tr_peerIsChokedByUs( peer ) )*/
             if( tr_peerDownloadRate( peer ) > 0.01 )
                 ++s->peersUploading;
 
-            /*if( tr_peerIsInteresting( peer ) && !tr_peerIsChokingUs( peer ) )*/
             if( tr_peerUploadRate( peer ) > 0.01 )
                 ++s->peersDownloading;
         }
     }
 
-    s->percentDone = tr_cpPercentDone( tor->completion );
-    s->percentComplete = tr_cpPercentComplete( tor->completion );
-    s->left     = tr_cpLeftUntilDone( tor->completion );
+    s->percentDone     = tr_cpPercentDone     ( tor->completion );
+    s->percentComplete = tr_cpPercentComplete ( tor->completion );
+    s->left            = tr_cpLeftUntilDone   ( tor->completion );
 
 
     if( tor->recheckFlag )
