@@ -1026,6 +1026,10 @@ torrentThreadLoop ( void * _tor )
                 tr_ioCheckFiles( tor, TR_RECHECK_FORCE );
                 setRunState( tor, realStatus );
 
+                tr_torrentWriterLock( tor );
+                tor->cpStatus = tr_cpGetStatus( tor->completion );
+                tr_torrentWriterUnlock( tor );
+
                 tr_lockUnlock( &checkFilesLock );
             }
             continue;
