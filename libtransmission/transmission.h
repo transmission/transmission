@@ -246,6 +246,18 @@ void tr_torrentSetFileDLs ( tr_torrent_t   * tor,
 void tr_torrentSetFileDL( tr_torrent_t *, int file, int do_download );
 
 
+typedef enum
+{
+    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
+    TR_CP_DONE,         /* has all the pieces but the DND ones */
+    TR_CP_COMPLETE      /* has every piece */
+}
+cp_status_t;
+
+cp_status_t tr_torrentGetFileStatus( const tr_torrent_t  * tor,
+                                     int                   fileIndex );
+
+
 /***********************************************************************
  * tr_torrentRates
  ***********************************************************************
@@ -533,14 +545,6 @@ struct tr_info_s
     int                  fileCount;
     tr_file_t          * files;
 };
-
-typedef enum
-{
-    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
-    TR_CP_DONE,         /* has all the pieces but the DND ones */
-    TR_CP_COMPLETE      /* has every piece */
-}
-cp_status_t;
 
 typedef enum
 {
