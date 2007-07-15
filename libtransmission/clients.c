@@ -364,6 +364,10 @@ char * tr_clientForId( uint8_t * id )
     {
         asprintf( &ret, "eXeem" );
     }
+    else if( '\0' == id[0] && 'B' == id[2] && 'S' == id[3] )
+    {
+        asprintf( &ret, "BitSpirit v%u", id[1] );
+    }
 
     /* No match */
     if( !ret )
