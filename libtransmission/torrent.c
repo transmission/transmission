@@ -561,11 +561,11 @@ tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
             ++s->peersFrom[tr_peerIsFrom(peer)];
 
             /*if( tr_peerIsInterested( peer ) && !tr_peerIsChokedByUs( peer ) )*/
-            if( tr_peerUploadRate( peer ) > 0.01 )
+            if( tr_peerDownloadRate( peer ) > 0.01 )
                 ++s->peersUploading;
 
             /*if( tr_peerIsInteresting( peer ) && !tr_peerIsChokingUs( peer ) )*/
-            if( tr_peerDownloadRate( peer ) > 0.01 )
+            if( tr_peerUploadRate( peer ) > 0.01 )
                 ++s->peersDownloading;
         }
     }
@@ -659,10 +659,10 @@ tr_torrentPeers( const tr_torrent_t * tor, int * peerCount )
             peers[i].port             =  tr_peerPort( peer );
 
             peers[i].uploadToRate     =  tr_peerUploadRate( peer );
-            peers[i].isUploading      =  peers[i].uploadToRate > 0.01;
+            peers[i].isDownloading    =  peers[i].uploadToRate > 0.01;
 
             peers[i].downloadFromRate =  tr_peerDownloadRate( peer );
-            peers[i].isDownloading    =  peers[i].downloadFromRate > 0.01;
+            peers[i].isUploading      =  peers[i].downloadFromRate > 0.01;
         }
     }
     
