@@ -403,7 +403,7 @@
     
     if (active)
     {
-        int total = [torrent totalPeers];
+        int total = [torrent totalPeersConnected];
         NSString * connected = [NSString stringWithFormat:
                                 NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
         

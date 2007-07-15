@@ -177,7 +177,7 @@
 - (int) leechers;
 - (int) completedFromTracker;
 
-- (int) totalPeers;
+- (int) totalPeersConnected;
 - (int) totalPeersTracker;
 - (int) totalPeersIncoming;
 - (int) totalPeersCache;

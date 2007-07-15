@@ -379,9 +379,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
         case TR_STATUS_DOWNLOAD:
             [statusString setString: @""];
-            if ([self totalPeers] != 1)
+            if ([self totalPeersConnected] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
-                                                "Torrent -> status string"), [self peersUploading], [self totalPeers]];
+                                                "Torrent -> status string"), [self peersUploading], [self totalPeersConnected]];
             else
                 [statusString appendFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                 "Torrent -> status string"), [self peersUploading]];
@@ -422,9 +422,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
             [statusString setString: @""];
-            if ([self totalPeers] != 1)
+            if ([self totalPeersConnected] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
-                                                [self peersDownloading], [self totalPeers]];
+                                                [self peersDownloading], [self totalPeersConnected]];
             else
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                 [self peersDownloading]];
@@ -1107,7 +1107,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (NSArray *) peers
 {
     int totalPeers, i;
-    tr_peer_stat_t * peers = tr_torrentPeers(fHandle, & totalPeers);
+    tr_peer_stat_t * peers = tr_torrentPeers(fHandle, &totalPeers);
     
     NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
     NSMutableDictionary * dic;
@@ -1180,9 +1180,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->completedFromTracker;
 }
 
-- (int) totalPeers
+- (int) totalPeersConnected
 {
-    return fStat->peersTotal;
+    return fStat->peersConnected;
 }
 
 - (int) totalPeersTracker
@@ -1779,7 +1779,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //determine percentage finished and available
     int have = rintf((float)MAX_PIECES * [self progress]), avail;
-    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeers] <= 0)
+    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeersConnected] <= 0)
         avail = 0;
     else
     {
