@@ -54,7 +54,8 @@
     Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [fItem objectForKey: @"Indexes"]];
     
-    if ([priorities count] == 0)
+    int count = [priorities count];
+    if (count == 0)
         return;
     
     BOOL low = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]],
@@ -82,12 +83,12 @@
                             [NSFont messageFontOfSize: 18.0], NSFontAttributeName, nil];
             
             NSString * text;
-            if (low && !normal && !high)
-              text = @"-";
-            else if (!low && !normal && high)
-                text = @"+";
-            else
+            if (count > 1)
                 text = @"*";
+            else if (low)
+                text = @"-";
+            else
+                text = @"+";
             
             NSSize textSize = [text sizeWithAttributes: attributes];
             NSRect textRect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - textSize.width) * 0.5,
