@@ -630,6 +630,52 @@ tr_torrentStat( tr_torrent_t * tor )
     return s;
 }
 
+/***
+****
+***/
+
+tr_file_stat_t *
+tr_torrentFiles( const tr_torrent_t * tor, int * fileCount )
+{
+    int i;
+    const int n = tor->info.fileCount;
+    tr_file_stat_t * files = tr_new0( tr_file_stat_t, n );
+    tr_file_stat_t * walk = files;
+
+    for( i=0; i<n; ++i, ++walk )
+    {
+        const uint64_t length = tor->info.files[i].length;
+        cp_status_t cp;
+
+        walk->bytesCompleted = tr_torrentFileBytesCompleted( tor, i );
+
+        walk->progress = walk->bytesCompleted / (float)length;
+
+        if( walk->bytesCompleted >= length )
+            cp = TR_CP_COMPLETE;
+        else if( tor->info.files[i].dnd )
+            cp = TR_CP_DONE;
+        else
+            cp = TR_CP_INCOMPLETE;
+
+        walk->completionStatus = cp;
+    }
+
+    *fileCount = n;
+
+    return files;
+}
+
+void
+tr_torrentFilesFree( tr_file_stat_t * files, int fileCount UNUSED )
+{
+    tr_free( files );
+}
+
+/***
+****
+***/
+
 tr_peer_stat_t *
 tr_torrentPeers( const tr_torrent_t * tor, int * peerCount )
 {
@@ -1280,19 +1326,4 @@ tr_torrentSetFileDLs ( tr_torrent_t   * tor,
     fastResumeSave( tor );
 
     tr_torrentWriterUnlock( tor );
-}
-
-cp_status_t
-tr_torrentGetFileStatus( const tr_torrent_t * tor, int fileIndex )
-{
-    const uint64_t bytes = tr_torrentFileBytesCompleted( tor, fileIndex );
-    const tr_file_t * file = &tor->info.files[fileIndex];
-
-    if( bytes >= file->length )
-        return TR_CP_COMPLETE;
-
-    if( file->dnd )
-        return TR_CP_DONE;
-
-    return TR_CP_INCOMPLETE;
 }

@@ -245,19 +245,6 @@ void tr_torrentSetFileDLs ( tr_torrent_t   * tor,
 /* single-file form of tr_torrentSetFileDLs */
 void tr_torrentSetFileDL( tr_torrent_t *, int file, int do_download );
 
-
-typedef enum
-{
-    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
-    TR_CP_DONE,         /* has all the pieces but the DND ones */
-    TR_CP_COMPLETE      /* has every piece */
-}
-cp_status_t;
-
-cp_status_t tr_torrentGetFileStatus( const tr_torrent_t  * tor,
-                                     int                   fileIndex );
-
-
 /***********************************************************************
  * tr_torrentRates
  ***********************************************************************
@@ -434,6 +421,11 @@ typedef struct tr_peer_stat_s tr_peer_stat_t;
 tr_peer_stat_t * tr_torrentPeers( const tr_torrent_t *, int * peerCount );
 void tr_torrentPeersFree( tr_peer_stat_t *, int peerCount );
 
+typedef struct tr_file_stat_s tr_file_stat_t;
+tr_file_stat_t * tr_torrentFiles( const tr_torrent_t *, int * fileCount );
+void tr_torrentFilesFree( tr_file_stat_t *, int fileCount );
+
+
 /***********************************************************************
  * tr_torrentAvailability
  ***********************************************************************
@@ -562,6 +554,14 @@ torrent_status_t;
 #define TR_STATUS_INACTIVE \
     (TR_STATUS_STOPPING|TR_STATUS_STOPPED)
 
+typedef enum
+{
+    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
+    TR_CP_DONE,         /* has all the pieces but the DND ones */
+    TR_CP_COMPLETE      /* has every piece */
+}
+cp_status_t;
+
 /***********************************************************************
  * tr_stat_s
  **********************************************************************/
@@ -601,6 +601,13 @@ struct tr_stat_s
     
     uint64_t            startDate;
     uint64_t            activityDate;
+};
+
+struct tr_file_stat_s
+{
+    uint64_t bytesCompleted;
+    float progress;
+    cp_status_t completionStatus;
 };
 
 struct tr_peer_stat_s
