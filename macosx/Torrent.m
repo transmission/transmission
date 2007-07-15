@@ -1486,7 +1486,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fInfo;
 }
 
-- (tr_stat_t *) torrentStat
+- (const tr_stat_t *) torrentStat
 {
     return fStat;
 }

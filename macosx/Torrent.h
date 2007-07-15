@@ -32,7 +32,7 @@
     tr_handle_t * fLib;
     tr_torrent_t * fHandle;
     const tr_info_t * fInfo;
-    tr_stat_t * fStat;
+    const tr_stat_t * fStat;
     
     int fID;
     
@@ -227,6 +227,6 @@
 
 - (int) torrentID;
 - (const tr_info_t *) torrentInfo;
-- (tr_stat_t *) torrentStat;
+- (const tr_stat_t *) torrentStat;
 
 @end
