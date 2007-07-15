@@ -1084,12 +1084,12 @@ getdirtotals( GtkTreeStore * store, GtkTreeIter * parent )
 }
 
 static void
-updateprogress( GtkTreeModel * model,
-                GtkTreeStore * store,
-                GtkTreeIter  * parent,
-                const float  * progress,
-                guint64      * setmeGotSize,
-                guint64      * setmeTotalSize)
+updateprogress( GtkTreeModel   * model,
+                GtkTreeStore   * store,
+                GtkTreeIter    * parent,
+                tr_file_stat_t * fileStats,
+                guint64        * setmeGotSize,
+                guint64        * setmeTotalSize)
 {
     GtkTreeIter iter;
     guint64 gotSize=0, totalSize=0;
@@ -1101,7 +1101,7 @@ updateprogress( GtkTreeModel * model,
 
         if (gtk_tree_model_iter_has_child( model, &iter ) )
         {
-            updateprogress( model, store, &iter, progress, &subGot, &subTotal);
+            updateprogress( model, store, &iter, fileStats, &subGot, &subTotal);
         }
         else
         {
@@ -1110,7 +1110,7 @@ updateprogress( GtkTreeModel * model,
                                               FC_INDEX, &index,
                                               -1 );
             g_assert( 0 <= index );
-            percent = (int)(progress[index]*100.0 + 0.5); /* [0...100] */
+            percent = (int)(fileStats[index].progress * 100.0 + 0.5); /* [0...100] */
             subGot = (guint64)(subTotal * percent/100.0);
         }
 
@@ -1419,11 +1419,12 @@ static void
 refresh_files (GtkWidget * top)
 {
     guint64 foo, bar;
+    int fileCount = 0;
     FileData * data = (FileData*) g_object_get_data (G_OBJECT(top), "file-data");
     tr_torrent_t * tor = tr_torrent_handle( data->gtor );
-    float * progress = tr_torrentCompletion ( tor );
-    updateprogress (data->model, data->store, NULL, progress, &foo, &bar);
-    free( progress );
+    tr_file_stat_t * fileStats = tr_torrentFiles( tor, &fileCount );
+    updateprogress (data->model, data->store, NULL, fileStats, &foo, &bar);
+    tr_torrentFilesFree( fileStats, fileCount );
 }
 
 

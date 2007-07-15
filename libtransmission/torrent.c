@@ -634,6 +634,49 @@ tr_torrentStat( tr_torrent_t * tor )
 ****
 ***/
 
+static uint64_t
+fileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
+{
+    const tr_file_t * file     =  &tor->info.files[fileIndex];
+    const uint64_t firstBlock       =  file->offset / tor->blockSize;
+    const uint64_t firstBlockOffset =  file->offset % tor->blockSize;
+    const uint64_t lastOffset       =  file->length ? (file->length-1) : 0;
+    const uint64_t lastBlock        = (file->offset + lastOffset) / tor->blockSize;
+    const uint64_t lastBlockOffset  = (file->offset + lastOffset) % tor->blockSize;
+    uint64_t haveBytes = 0;
+
+    assert( tor != NULL );
+    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
+    assert( file->offset + file->length <= tor->info.totalSize );
+    assert( (int)firstBlock < tor->blockCount );
+    assert( (int)lastBlock < tor->blockCount );
+    assert( firstBlock <= lastBlock );
+    assert( tr_blockPiece( firstBlock ) == file->firstPiece );
+    assert( tr_blockPiece( lastBlock ) == file->lastPiece );
+
+    if( firstBlock == lastBlock )
+    {
+        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
+            haveBytes += lastBlockOffset + 1 - firstBlockOffset;
+    }
+    else
+    {
+        uint64_t i;
+
+        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
+            haveBytes += tor->blockSize - firstBlockOffset;
+
+        for( i=firstBlock+1; i<lastBlock; ++i )
+            if( tr_cpBlockIsComplete( tor->completion, i ) )
+               haveBytes += tor->blockSize;
+
+        if( tr_cpBlockIsComplete( tor->completion, lastBlock ) )
+            haveBytes += lastBlockOffset + 1;
+    }
+
+    return haveBytes;
+}
+
 tr_file_stat_t *
 tr_torrentFiles( const tr_torrent_t * tor, int * fileCount )
 {
@@ -647,9 +690,11 @@ tr_torrentFiles( const tr_torrent_t * tor, int * fileCount )
         const uint64_t length = tor->info.files[i].length;
         cp_status_t cp;
 
-        walk->bytesCompleted = tr_torrentFileBytesCompleted( tor, i );
+        walk->bytesCompleted = fileBytesCompleted( tor, i );
 
-        walk->progress = walk->bytesCompleted / (float)length;
+        walk->progress = length
+            ? walk->bytesCompleted / (float)length
+            : 1.0;
 
         if( walk->bytesCompleted >= length )
             cp = TR_CP_COMPLETE;
@@ -755,75 +800,6 @@ void tr_torrentAvailability( const tr_torrent_t * tor, int8_t * tab, int size )
     }
 
     tr_torrentReaderUnlock( tor );
-}
-
-uint64_t
-tr_torrentFileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
-{
-    const tr_file_t * file     =  &tor->info.files[fileIndex];
-    const uint64_t firstBlock       =  file->offset / tor->blockSize;
-    const uint64_t firstBlockOffset =  file->offset % tor->blockSize;
-    const uint64_t lastOffset       =  file->length ? (file->length-1) : 0;
-    const uint64_t lastBlock        = (file->offset + lastOffset) / tor->blockSize;
-    const uint64_t lastBlockOffset  = (file->offset + lastOffset) % tor->blockSize;
-    uint64_t haveBytes = 0;
-
-    assert( tor != NULL );
-    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
-    assert( file->offset + file->length <= tor->info.totalSize );
-    assert( (int)firstBlock < tor->blockCount );
-    assert( (int)lastBlock < tor->blockCount );
-    assert( firstBlock <= lastBlock );
-    assert( tr_blockPiece( firstBlock ) == file->firstPiece );
-    assert( tr_blockPiece( lastBlock ) == file->lastPiece );
-
-    if( firstBlock == lastBlock )
-    {
-        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
-            haveBytes += lastBlockOffset + 1 - firstBlockOffset;
-    }
-    else
-    {
-        uint64_t i;
-
-        if( tr_cpBlockIsComplete( tor->completion, firstBlock ) )
-            haveBytes += tor->blockSize - firstBlockOffset;
-
-        for( i=firstBlock+1; i<lastBlock; ++i )
-            if( tr_cpBlockIsComplete( tor->completion, i ) )
-               haveBytes += tor->blockSize;
-
-        if( tr_cpBlockIsComplete( tor->completion, lastBlock ) )
-            haveBytes += lastBlockOffset + 1;
-    }
-
-    return haveBytes;
-}
-
-float
-tr_torrentFileCompletion ( const tr_torrent_t * tor, int fileIndex )
-{
-    const uint64_t c = tr_torrentFileBytesCompleted ( tor, fileIndex );
-    uint64_t length = tor->info.files[fileIndex].length;
-    
-    if( !length )
-        return 1.0;
-    return (double)c / length;
-}
-
-float*
-tr_torrentCompletion( const tr_torrent_t * tor )
-{
-    int i;
-    float * f;
-    tr_torrentReaderLock( tor );
-
-    f = tr_new0( float, tor->info.fileCount );
-    for( i=0; i<tor->info.fileCount; ++i )
-       f[i] = tr_torrentFileCompletion ( tor, i );
-
-    tr_torrentReaderUnlock( tor );
-    return f;
 }
 
 void tr_torrentAmountFinished( const tr_torrent_t * tor, float * tab, int size )

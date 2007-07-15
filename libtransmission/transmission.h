@@ -439,20 +439,6 @@ void tr_torrentAvailability( const tr_torrent_t *, int8_t * tab, int size );
 void tr_torrentAmountFinished( const tr_torrent_t * tor, float * tab, int size );
 
 /***********************************************************************
- * tr_torrentCompletion
- ***********************************************************************
- * Returns the completion progress for each file in the torrent as an
- * array of floats the same size and order as in tr_info_t. Free the
- * array when done.
- **********************************************************************/
-float * tr_torrentCompletion( const tr_torrent_t * );
-
-float tr_torrentFileCompletion( const tr_torrent_t *, int fileIndex );
-
-uint64_t tr_torrentFileBytesCompleted( const tr_torrent_t *, int fileIndex ); 
-
-
-/***********************************************************************
  * tr_torrentRemoveSaved
  ***********************************************************************
  * Removes the saved copy of a torrent file for torrents which the
