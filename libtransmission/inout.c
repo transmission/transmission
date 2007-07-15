@@ -222,7 +222,7 @@ tr_ioCheckFiles( tr_torrent_t * tor, int mode )
     tr_bitfieldClear( uncheckedPieces );
 
     if( (mode==TR_RECHECK_FORCE) || fastResumeLoad( tor, uncheckedPieces ) )
-        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount-1 );
+        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
 
     if( tr_bitfieldIsEmpty( uncheckedPieces ) ) {
         tr_bitfieldFree( uncheckedPieces );

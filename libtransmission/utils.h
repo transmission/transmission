@@ -189,8 +189,8 @@ void tr_bitfieldFree( tr_bitfield_t*);
 void tr_bitfieldClear( tr_bitfield_t* );
 void tr_bitfieldAdd( tr_bitfield_t*, size_t bit );
 void tr_bitfieldRem( tr_bitfield_t*, size_t bit );
-void tr_bitfieldAddRange( tr_bitfield_t *, size_t first, size_t last );
-void tr_bitfieldRemRange ( tr_bitfield_t*, size_t first, size_t last );
+void tr_bitfieldAddRange( tr_bitfield_t *, size_t begin, size_t end );
+void tr_bitfieldRemRange ( tr_bitfield_t*, size_t begin, size_t end );
 
 int    tr_bitfieldIsEmpty( const tr_bitfield_t* );
 int    tr_bitfieldHas( const tr_bitfield_t *, size_t bit );

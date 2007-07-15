@@ -115,7 +115,7 @@ void tr_cpPieceAdd( tr_completion_t * cp, int piece )
     const int endBlock   = startBlock + n_blocks;
 
     cp->completeBlocks[piece] = n_blocks;
-    tr_bitfieldAddRange( cp->blockBitfield, startBlock, endBlock-1 );
+    tr_bitfieldAddRange( cp->blockBitfield, startBlock, endBlock );
     tr_bitfieldAdd( cp->pieceBitfield, piece );
 }
 
@@ -127,7 +127,7 @@ void tr_cpPieceRem( tr_completion_t * cp, int piece )
     const int endBlock   = startBlock + n_blocks;
 
     cp->completeBlocks[piece] = 0;
-    tr_bitfieldRemRange ( cp->blockBitfield, startBlock, endBlock-1 );
+    tr_bitfieldRemRange ( cp->blockBitfield, startBlock, endBlock );
     tr_bitfieldRem( cp->pieceBitfield, piece );
 }
 
@@ -322,8 +322,8 @@ tr_cpLeftUntilComplete ( const tr_completion_t * cp )
 
     b *= tor->blockSize;
 
-    if( !tr_cpBlockIsComplete( cp, tor->blockCount - 1 ) )
-        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
+    if( tor->blockCount && !tr_cpBlockIsComplete( cp, tor->blockCount - 1 ) )
+          b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
     return b;
 }
@@ -348,9 +348,9 @@ tr_cpLeftUntilDone ( const tr_completion_t * cp )
 
     b *= tor->blockSize;
 
-    i = tor->blockCount - 1;
-    if( !tr_cpBlockIsComplete( cp, tor->blockCount-1 ) && !info->pieces[info->pieceCount-1].dnd )
-        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
+    if( tor->blockCount && !tr_cpBlockIsComplete( cp, tor->blockCount-1 )
+                        && !info->pieces[info->pieceCount-1].dnd )
+          b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
     return b;
 }
@@ -380,7 +380,7 @@ tr_cpDownloadedValid( const tr_completion_t * cp )
 
     uint64_t b = tr_bitfieldCountTrueBits( cp->blockBitfield ) * tor->blockSize;
 
-    if( tr_bitfieldHas( cp->blockBitfield, tor->blockCount - 1 ) )
+    if( tor->blockCount && tr_bitfieldHas( cp->blockBitfield, tor->blockCount - 1 ) )
         b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
 
    return b;

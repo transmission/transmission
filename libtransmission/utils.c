@@ -512,12 +512,12 @@ tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t bit )
 
 void
 tr_bitfieldAddRange( tr_bitfield_t  * bitfield,
-                     size_t           first,
-                     size_t           last )
+                     size_t           begin,
+                     size_t           end )
 {
     /* TODO: there are faster ways to do this */
     unsigned int i;
-    for( i=first; i<=last; ++i )
+    for( i=begin; i<end; ++i )
         tr_bitfieldAdd( bitfield, i );
 }
 
@@ -534,12 +534,12 @@ tr_bitfieldRem( tr_bitfield_t   * bitfield,
 
 void
 tr_bitfieldRemRange ( tr_bitfield_t  * b,
-                      size_t           first,
-                      size_t           last )
+                      size_t           begin,
+                      size_t           end )
 {
     /* TODO: there are faster ways to do this */
     unsigned int i;
-    for( i=first; i<=last; ++i )
+    for( i=begin; i<end; ++i )
         tr_bitfieldRem( b, i );
 }
 
