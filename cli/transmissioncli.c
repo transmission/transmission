@@ -100,7 +100,7 @@ int main( int argc, char ** argv )
 {
     int i, error;
     tr_handle_t  * h;
-    tr_stat_t    * s;
+    const tr_stat_t    * s;
     tr_handle_status_t * hstat;
 
     printf( "Transmission %s - http://transmission.m0k.org/\n\n",

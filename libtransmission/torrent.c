@@ -528,7 +528,8 @@ void tr_manualUpdate( tr_torrent_t * tor UNUSED )
 #endif
 }
 
-tr_stat_t * tr_torrentStat( tr_torrent_t * tor )
+const tr_stat_t *
+tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;
     tr_tracker_t * tc;

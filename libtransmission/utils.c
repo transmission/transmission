@@ -399,10 +399,12 @@ char*
 tr_strndup( const char * in, int len )
 {
     char * out = NULL;
+
     if( in != NULL )
     {
-        out = tr_calloc( len+1, 1 );
+        out = tr_malloc( len+1 );
         memcpy( out, in, len );
+        out[len] = '\0';
     }
     return out;
 }

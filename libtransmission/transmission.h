@@ -425,7 +425,7 @@ void tr_manualUpdate( tr_torrent_t * );
  * to update itself.
  **********************************************************************/
 typedef struct tr_stat_s tr_stat_t;
-tr_stat_t * tr_torrentStat( tr_torrent_t * );
+const tr_stat_t * tr_torrentStat( tr_torrent_t * );
 
 /***********************************************************************
  * tr_torrentPeers

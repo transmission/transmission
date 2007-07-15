@@ -177,45 +177,42 @@ void
 torrent_start( int id )
 {
     struct tor * tor;
-    tr_stat_t  * st;
 
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
     tor = idlookup( id );
-    if( NULL == tor )
+    if( tor != NULL )
     {
-        return;
+        const tr_stat_t  * st = tr_torrentStat( tor->tor );
+
+        if( TR_STATUS_INACTIVE & st->status )
+        {
+            tr_torrentStart( tor->tor );
+            savestate();
+        }
     }
 
-    st = tr_torrentStat( tor->tor );
-    if( TR_STATUS_INACTIVE & st->status )
-    {
-        tr_torrentStart( tor->tor );
-        savestate();
-    }
 }
 
 void
 torrent_stop( int id )
 {
     struct tor * tor;
-    tr_stat_t  * st;
 
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
     tor = idlookup( id );
-    if( NULL == tor )
+    if( tor != NULL )
     {
-        return;
-    }
+        const tr_stat_t  * st = tr_torrentStat( tor->tor );
 
-    st = tr_torrentStat( tor->tor );
-    if( TR_STATUS_ACTIVE & st->status )
-    {
-        tr_torrentStop( tor->tor );
-        savestate();
+        if( TR_STATUS_ACTIVE & st->status )
+        {
+            tr_torrentStop( tor->tor );
+            savestate();
+        }
     }
 }
 
@@ -228,13 +225,11 @@ torrent_remove( int id )
     assert( !gl_exiting );
 
     tor = idlookup( id );
-    if( NULL == tor )
+    if( tor != NULL )
     {
-        return;
+        closetor( tor, 1 );
+        savestate();
     }
-
-    closetor( tor, 1 );
-    savestate();
 }
 
 const tr_info_t *
