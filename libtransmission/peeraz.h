@@ -393,7 +393,7 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 
     /* find the supported message list */
     sub = tr_bencDictFind( &val, "messages" );
-    if( NULL == sub && TYPE_LIST != sub->type )
+    if( !sub || sub->type != TYPE_LIST )
     {
         tr_bencFree( &val );
         peer_dbg( "GET  azureus-handshake, missing 'messages'" );

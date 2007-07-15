@@ -72,6 +72,7 @@ int tr_trackerCannotConnect( const tr_tracker_t * tc );
 uint64_t tr_trackerLastResponseDate ( const tr_tracker_t * );
 
 
+#if 0
 /***********************************************************************
  * tr_trackerScrape
  ***********************************************************************
@@ -79,5 +80,6 @@ uint64_t tr_trackerLastResponseDate ( const tr_tracker_t * );
  * completed downloads if successful.
  **********************************************************************/
 int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d );
+#endif
 
 #endif

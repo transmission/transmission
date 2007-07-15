@@ -1007,6 +1007,7 @@ uint64_t tr_trackerLastResponseDate ( const tr_tracker_t * tc )
 }
 
 
+#if 0
 /* Blocking version */
 int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 {
@@ -1020,6 +1021,7 @@ int tr_trackerScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 
     if( NULL == tc->tcCur->tl_inf->scrape || tc->tcCur->tl_badscrape )
     {
+        tr_trackerClose( tc );
         return 1;
     }
 
@@ -1056,6 +1058,7 @@ scrapeDone:
     tr_trackerClose( tc );
     return ret;
 }
+#endif
 
 static void killHttp( tr_http_t ** http )
 {

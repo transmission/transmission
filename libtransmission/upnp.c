@@ -1002,7 +1002,7 @@ devicePulseHttp( tr_upnp_device_t * dev,
             }
             dev->soapretry = 0;
             *body = tr_httpParse( headers, hlen, NULL );
-            *len = ( NULL == body ? 0 : hlen - ( *body - headers ) );
+            *len = ( NULL == *body ? 0 : hlen - ( *body - headers ) );
             return code;
         case TR_NET_ERROR:
             killHttp( &dev->http );

@@ -348,6 +348,7 @@ static int getfile( char * buf, int size,
 
     if( 0 == jj )
     {
+        free( list );
         return TR_EINVALID;
     }
 

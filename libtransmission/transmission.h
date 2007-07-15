@@ -357,13 +357,9 @@ tr_torrent_t * tr_torrentInitSaved( tr_handle_t *,
  **********************************************************************/
 void tr_torrentDisablePex( tr_torrent_t *, int disable );
 
-/***********************************************************************
- * tr_torrentScrape
- ***********************************************************************
- * Return torrent metainfo.
- **********************************************************************/
 const tr_info_t * tr_torrentInfo( const tr_torrent_t * );
 
+#if 0
 /***********************************************************************
  * tr_torrentScrape
  ***********************************************************************
@@ -374,6 +370,7 @@ const tr_info_t * tr_torrentInfo( const tr_torrent_t * );
  * before returning.
  **********************************************************************/
 int tr_torrentScrape( tr_torrent_t *, int * s, int * l, int * d );
+#endif
 
 void   tr_torrentSetFolder( tr_torrent_t *, const char * );
 const char * tr_torrentGetFolder( const tr_torrent_t * );

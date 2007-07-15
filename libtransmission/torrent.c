@@ -434,10 +434,12 @@ tr_torrentInfo( const tr_torrent_t * tor )
 ****
 ***/
 
+#if 0
 int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 {
     return tr_trackerScrape( tor, s, l, d );
 }
+#endif
 
 void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
 {

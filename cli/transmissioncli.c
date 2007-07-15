@@ -55,13 +55,17 @@ const char * USAGE =
 "  -i, --info           Print metainfo and exit\n"
 "  -n  --nat-traversal  Attempt NAT traversal using NAT-PMP or UPnP IGD\n"
 "  -p, --port <int>     Port we should listen on (default = %d)\n"
+#if 0
 "  -s, --scrape         Print counts of seeders/leechers and exit\n"
+#endif
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
 "  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n";
 
 static int           showHelp      = 0;
 static int           showInfo      = 0;
+#if 0
 static int           showScrape    = 0;
+#endif
 static int           isPrivate     = 0;
 static int           verboseLevel  = 0;
 static int           bindPort      = TR_DEFAULT_PORT;
@@ -202,6 +206,7 @@ int main( int argc, char ** argv )
         goto cleanup;
     }
 
+#if 0
     if( showScrape )
     {
         int seeders, leechers, downloaded;
@@ -218,6 +223,7 @@ int main( int argc, char ** argv )
 
         goto cleanup;
     }
+#endif
 
     signal( SIGINT, sigHandler );
 
@@ -354,9 +360,11 @@ static int parseCommandLine( int argc, char ** argv )
             case 'i':
                 showInfo = 1;
                 break;
+#if 0
             case 's':
                 showScrape = 1;
                 break;
+#endif
             case 'r':
                 isPrivate = 1;
                 break;
