@@ -206,8 +206,9 @@
 
 //methods require fileStats to have been updated recently to be accurate
 - (float) fileProgress: (int) index;
-- (int) checkForFiles: (NSIndexSet *) indexSet;
+- (BOOL) canChangeDownloadCheckForFile: (int) index;
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
+- (int) checkForFiles: (NSIndexSet *) indexSet;
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet;
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;

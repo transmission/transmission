@@ -1301,21 +1301,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fileStat[index].progress;
 }
 
-- (int) checkForFiles: (NSIndexSet *) indexSet
+- (BOOL) canChangeDownloadCheckForFile: (int) index
 {
-    BOOL onState = NO, offState = NO;
-    int index;
-    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-    {
-        if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
-            onState = YES;
-        else
-            offState = YES;
-        
-        if (onState == offState)
-            return NSMixedState;
-    }
-    return onState ? NSOnState : NSOffState;
+    return [self fileCount] > 1 && fileStat[index].completionStatus != TR_CP_COMPLETE;
 }
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
@@ -1331,6 +1319,23 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fileStat[index].completionStatus != TR_CP_COMPLETE)
             return YES;
     return NO;
+}
+
+- (int) checkForFiles: (NSIndexSet *) indexSet
+{
+    BOOL onState = NO, offState = NO;
+    int index;
+    for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
+    {
+        if (tr_torrentGetFileDL(fHandle, index) || ![self canChangeDownloadCheckForFile: index])
+            onState = YES;
+        else
+            offState = YES;
+        
+        if (onState == offState)
+            return NSMixedState;
+    }
+    return onState ? NSOnState : NSOffState;
 }
 
 - (void) setFileCheckState: (int) state forIndexes: (NSIndexSet *) indexSet
@@ -1369,8 +1374,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if (priority == tr_torrentGetFilePriority(fHandle, index)
-                && [self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
+        if (priority == tr_torrentGetFilePriority(fHandle, index) && [self canChangeDownloadCheckForFile: index])
             return YES;
     return NO;
 }
@@ -1383,7 +1387,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     int index, priority;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
     {
-        if (![self canChangeDownloadCheckForFiles: [NSIndexSet indexSetWithIndex: index]])
+        if (![self canChangeDownloadCheckForFile: index])
             continue;
         
         priority = tr_torrentGetFilePriority(fHandle, index);
