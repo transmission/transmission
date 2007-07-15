@@ -659,9 +659,9 @@ tr_torrentPeers( const tr_torrent_t * tor, int * peerCount )
             peers[i].port             =  tr_peerPort( peer );
 
             peers[i].uploadToRate     =  tr_peerUploadRate( peer );
-            peers[i].isDownloading    =  peers[i].uploadToRate > 0.01;
-
             peers[i].downloadFromRate =  tr_peerDownloadRate( peer );
+            
+            peers[i].isDownloading    =  peers[i].uploadToRate > 0.01;
             peers[i].isUploading      =  peers[i].downloadFromRate > 0.01;
         }
     }
