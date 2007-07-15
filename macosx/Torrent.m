@@ -1305,7 +1305,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if ([self fileProgress: index] < 1.0)
+        if (tr_torrentGetFileStatus(fHandle, index) != TR_CP_COMPLETE)
             return YES;
     return NO;
 }
