@@ -445,7 +445,10 @@
 - (void) updateInfoFiles
 {
     if ([fTorrents count] == 1)
+    {
+        [[fTorrents objectAtIndex: 0] updateFileStat];
         [fFileOutline reloadData];
+    }
 }
 
 - (void) updateInfoSettings

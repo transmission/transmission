@@ -170,6 +170,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) dealloc
 {
+    if (fileStat)
+        tr_torrentFilesFree(fileStat, [self fileCount]);
+    
     [fDownloadFolder release];
     [fIncompleteFolder release];
     
@@ -1281,9 +1284,21 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fInfo->fileCount;
 }
 
+- (void) updateFileStat
+{
+    if (fileStat)
+        tr_torrentFilesFree(fileStat, [self fileCount]);
+    
+    int count;
+    fileStat = tr_torrentFiles(fHandle, &count);
+}
+
 - (float) fileProgress: (int) index
 {
-    return tr_torrentFileCompletion(fHandle, index);
+    if (!fileStat)
+        [self updateFileStat];
+        
+    return fileStat[index].progress;
 }
 
 - (int) checkForFiles: (NSIndexSet *) indexSet
@@ -1308,9 +1323,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([self fileCount] <= 1 || [self isComplete])
         return NO;
     
+    if (!fileStat)
+        [self updateFileStat];
+    
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if (tr_torrentGetFileStatus(fHandle, index) != TR_CP_COMPLETE)
+        if (fileStat[index].completionStatus != TR_CP_COMPLETE)
             return YES;
     return NO;
 }

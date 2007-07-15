@@ -53,6 +53,7 @@
     NSImage * fIcon, * fIconFlipped, * fIconSmall;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
+    tr_file_stat_t * fileStat;
     NSArray * fFileList, * fFlatFileList;
     
     int     fUploadLimit, fDownloadLimit;
@@ -201,6 +202,9 @@
 
 - (NSArray *) fileList;
 - (int) fileCount;
+- (void) updateFileStat;
+
+//methods require fileStats to have been updated recently to be accurate
 - (float) fileProgress: (int) index;
 - (int) checkForFiles: (NSIndexSet *) indexSet;
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet;
