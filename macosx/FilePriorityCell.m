@@ -34,8 +34,6 @@
     //only for when clicking manually
     Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
     NSIndexSet * indexes = [fItem objectForKey: @"Indexes"];
-    if (![torrent canChangeDownloadCheckForFiles: indexes])
-        return;
     
     int priority;
     if (segment == 0)

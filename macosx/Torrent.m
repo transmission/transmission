@@ -1303,6 +1303,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (BOOL) canChangeDownloadCheckForFile: (int) index
 {
+    if (!fileStat)
+        [self updateFileStat];
+    
     return [self fileCount] > 1 && fileStat[index].completionStatus != TR_CP_COMPLETE;
 }
 

@@ -38,8 +38,9 @@
     [self setIndentationPerLevel: 14.0];
     
     fNormalColor = [self backgroundColor];
-    fHighPriorityColor = [[NSColor colorWithCalibratedRed: 0.678 green: 0.937 blue: 0.451 alpha: 1.0] retain];
-    fLowPriorityColor = [[NSColor colorWithCalibratedRed: 0.984 green: 0.878 blue: 0.431 alpha: 1.0] retain];
+    fHighPriorityColor = [[NSColor colorWithCalibratedRed: 0.8588 green: 0.9961 blue: 0.8311 alpha: 1.0] retain];
+    fLowPriorityColor = [[NSColor colorWithCalibratedRed: 1.0 green: 0.9529 blue: 0.8078 alpha: 1.0] retain];
+    fMixedPriorityColor = [[NSColor colorWithCalibratedRed: 0.9216 green: 0.9059 blue: 1.0 alpha: 1.0] retain];
     
     fHoverRow = -1;
 }
@@ -48,6 +49,7 @@
 {
     [fHighPriorityColor release];
     [fLowPriorityColor release];
+    [fMixedPriorityColor release];
     
     [super dealloc];
 }
@@ -105,23 +107,22 @@
         NSDictionary * item = [self itemAtRow: row];
         Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
         
-        if ([[item objectForKey: @"IsFolder"] boolValue])
+
+        NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
+        int count = [priorities count];
+        if (count == 0)
             [fNormalColor set];
+        else if (count > 1)
+            [fMixedPriorityColor set];
         else
         {
-            NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
-            if ([priorities count] == 0)
-                [fNormalColor set];
+            int priority = [[priorities anyObject] intValue];
+            if (priority == TR_PRI_LOW)
+                [fLowPriorityColor set];
+            else if (priority == TR_PRI_HIGH)
+                [fHighPriorityColor set];
             else
-            {
-                int priority = [[priorities anyObject] intValue];
-                if (priority == TR_PRI_LOW)
-                    [fLowPriorityColor set];
-                else if (priority == TR_PRI_HIGH)
-                    [fHighPriorityColor set];
-                else
-                    [fNormalColor set];
-            }
+                [fNormalColor set];
         }
         
         NSRect rect = [self rectOfRow: row];
@@ -136,39 +137,39 @@
 - (void) drawRect: (NSRect) r
 {
     [super drawRect: r];
-
+    
     NSDictionary * item;
     NSIndexSet * indexSet;
-    int i, priority;
+    int i, count, priority;
     Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
     for (i = 0; i < [self numberOfRows]; i++)
     {
         if ([self isRowSelected: i])
         {
             item = [self itemAtRow: i];
-            if (![[item objectForKey: @"IsFolder"] boolValue])
-            {
-                NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
-                if ([priorities count] == 1)
-                {
-                    int priority = [[priorities anyObject] intValue];
-                    if (priority == TR_PRI_LOW)
-                        [fLowPriorityColor set];
-                    else if (priority == TR_PRI_HIGH)
-                        [fHighPriorityColor set];
-                    else
-                        continue;
-                
-                    NSRect rect = [self rectOfRow: i];
-                    float width = 14.0;
-                    rect.origin.y += (rect.size.height - width) * 0.5;
-                    rect.origin.x += 3.0;
-                    rect.size.width = width;
-                    rect.size.height = width;
-                    
-                    [[NSBezierPath bezierPathWithOvalInRect: rect] fill];
-                }
-            }
+            if ([[item objectForKey: @"IsFolder"] boolValue])
+                continue;
+            
+            NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
+            if ([priorities count] != 1)
+                continue;
+            
+            priority = [[priorities anyObject] intValue];
+            if (priority == TR_PRI_LOW)
+                [fLowPriorityColor set];
+            else if (priority == TR_PRI_HIGH)
+                [fHighPriorityColor set];
+            else
+                continue;
+        
+            NSRect rect = [self rectOfRow: i];
+            float width = 14.0;
+            rect.origin.y += (rect.size.height - width) * 0.5;
+            rect.origin.x += 3.0;
+            rect.size.width = width;
+            rect.size.height = width;
+            
+            [[NSBezierPath bezierPathWithOvalInRect: rect] fill];
         }
     }
 }
