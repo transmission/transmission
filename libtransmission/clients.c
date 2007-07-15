@@ -366,7 +366,7 @@ char * tr_clientForId( uint8_t * id )
     }
     else if( '\0' == id[0] && 'B' == id[2] && 'S' == id[3] )
     {
-        asprintf( &ret, "BitSpirit v%u", id[1] );
+        asprintf( &ret, "BitSpirit v%u", ( 0 == id[1] ? 1 : id[1] ) );
     }
 
     /* No match */
