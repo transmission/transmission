@@ -1284,22 +1284,10 @@ tr_torrentSetFileDLs ( tr_torrent_t   * tor,
 cp_status_t
 tr_torrentGetFileStatus( const tr_torrent_t * tor, int fileIndex )
 {
-    int i;
-    int isComplete;
-    const tr_file_t * file;
+    const uint64_t bytes = tr_torrentFileBytesCompleted( tor, fileIndex );
+    const tr_file_t * file = &tor->info.files[fileIndex];
 
-    assert( tor != NULL );
-    assert( 0<=fileIndex );
-    assert( fileIndex<tor->info.fileCount );
-
-    file = &tor->info.files[fileIndex];
-
-    isComplete = TRUE;
-    for( i=file->firstPiece; isComplete && i<=file->lastPiece; ++i )
-        if( !tr_cpPieceIsComplete( tor->completion, i ) )
-            isComplete = FALSE;
-
-    if( isComplete )
+    if( bytes >= file->length )
         return TR_CP_COMPLETE;
 
     if( file->dnd )
