@@ -496,7 +496,7 @@ int tr_peerPulse( tr_peer_t * peer )
         buf[20] = 0x80;         /* azureus protocol */
         buf[25] = 0x10;         /* extended messages */
         memcpy( &buf[28], inf->hash, 20 );
-        memcpy( &buf[48], tor->id, 20 );
+        memcpy( &buf[48], tor->peer_id, 20 );
 
         switch( tr_netSend( peer->socket, buf, 68 ) )
         {

@@ -187,7 +187,6 @@ torrentRealInit( tr_handle_t   * h,
     tr_torrentInitFilePieces( tor );
 
     tor->handle   = h;
-    tor->id       = h->id;
     tor->key      = h->key;
     tor->azId     = h->azId;
     tor->hasChangedState = -1;
@@ -687,16 +686,16 @@ tr_torrentFiles( const tr_torrent_t * tor, int * fileCount )
 
     for( i=0; i<n; ++i, ++walk )
     {
-        const uint64_t length = tor->info.files[i].length;
+        const tr_file_t * file = tor->info.files + i;
         cp_status_t cp;
 
         walk->bytesCompleted = fileBytesCompleted( tor, i );
 
-        walk->progress = length
-            ? walk->bytesCompleted / (float)length
+        walk->progress = file->length
+            ? walk->bytesCompleted / (float)file->length
             : 1.0;
 
-        if( walk->bytesCompleted >= length )
+        if( walk->bytesCompleted >= file->length )
             cp = TR_CP_COMPLETE;
         else if( tor->info.files[i].dnd )
             cp = TR_CP_DONE;
@@ -1089,6 +1088,7 @@ torrentThreadLoop ( void * _tor )
                     tor->recheckFlag = TRUE;
                     continue;
                 }
+                tr_peerIdNew ( tor->peer_id, sizeof(tor->peer_id) );
                 tor->tracker = tr_trackerInit( tor );
                 tor->startDate = tr_date();
             }

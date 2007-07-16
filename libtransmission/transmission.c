@@ -28,6 +28,24 @@
 #include "net.h"
 #include "shared.h"
 
+/* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
+   characters, where xx is the major version number, y is the
+   minor version number, and z is the maintenance number (Azureus-style) */
+void
+tr_peerIdNew ( char * buf, int buflen )
+{
+    int i;
+    assert( buflen == TR_ID_LEN + 1 );
+    snprintf( buf, TR_ID_LEN, "-TR" VERSION_MAJOR VERSION_MINOR VERSION_MAINTENANCE VERSION_BETA "-" );
+    assert( strlen(buf) == 8 );
+    for( i=8; i<TR_ID_LEN; ++i ) {
+        const int r = tr_rand( 36 );
+        buf[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
+    }
+    buf[TR_ID_LEN] = '\0';
+}
+
+
 /***********************************************************************
  * tr_init
  ***********************************************************************
@@ -53,18 +71,6 @@ tr_handle_t * tr_init( const char * tag )
         free( h );
         return NULL;
     }
-
-    /* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
-       characters, where xx is the major version number, y is the
-       minor version number, and z is the maintenance number (Azureus-style) */
-    snprintf( h->id, sizeof h->id, "-TR" VERSION_MAJOR VERSION_MINOR VERSION_MAINTENANCE VERSION_BETA "-" );
-    assert( strlen(h->id) == 8 );
-    for( i=8; i<TR_ID_LEN; ++i )
-    {
-        const int r = tr_rand( 36 );
-        h->id[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
-    }
-    tr_dbg( "Transmission ID is [%s]", h->id );
 
     /* Random key */
     for( i=0; i < TR_KEY_LEN; ++i )

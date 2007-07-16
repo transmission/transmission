@@ -132,6 +132,8 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+void tr_peerIdNew ( char* buf, int buflen );
+
 void tr_torrentResetTransferStats( tr_torrent_t * );
 
 int tr_torrentAddCompact( tr_torrent_t * tor, int from,
@@ -156,6 +158,9 @@ typedef enum
 }
 run_status_t;
 
+#define TR_ID_LEN               20
+#define TR_KEY_LEN              20
+
 struct tr_torrent_s
 {
     tr_handle_t * handle;
@@ -171,7 +176,7 @@ struct tr_torrent_s
     char              errorString[128];
     int               hasChangedState;
 
-    char            * id;
+    char              peer_id[TR_ID_LEN+1];
     char            * key;
     uint8_t         * azId;
     int               publicPort;
@@ -234,9 +239,6 @@ struct tr_handle_s
 
     tr_shared_t      * shared;
 
-#define TR_ID_LEN               20
-    char           id[TR_ID_LEN+1];
-#define TR_KEY_LEN              20
     char           key[TR_KEY_LEN+1];
 
     tr_handle_status_t stats[2];

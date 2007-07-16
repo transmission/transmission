@@ -46,7 +46,7 @@ struct tr_tracker_s
 {
     tr_torrent_t * tor;
 
-    char         * id;
+    const char   * peer_id;
     char         * trackerid;
 
     struct tchead * tiers;
@@ -97,7 +97,7 @@ struct tr_tracker_s
 static void        setAnnounce      ( tr_tracker_t * tc, struct tclist * new );
 static void        failureAnnouncing( tr_tracker_t * tc );
 static tr_http_t * getQuery         ( tr_tracker_t * tc );
-static tr_http_t * getScrapeQuery   ( tr_tracker_t * tc );
+static tr_http_t * getScrapeQuery   ( const tr_tracker_t * tc );
 static void        readAnswer       ( tr_tracker_t * tc, const char *, int,
                                       int * peerCount, uint8_t ** peerCompact );
 static void        readScrapeAnswer ( tr_tracker_t * tc, const char *, int );
@@ -120,7 +120,7 @@ tr_tracker_t * tr_trackerInit( tr_torrent_t * tor )
     }
 
     tc->tor            = tor;
-    tc->id             = tor->id;
+    tc->peer_id        = tor->peer_id;
 
     tc->started        = 1;
     
@@ -524,9 +524,11 @@ void tr_trackerClose( tr_tracker_t * tc )
 static tr_http_t * getQuery( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
-    tr_tracker_info_t * tcInf = tc->tcCur->tl_inf;
+    const tr_tracker_info_t * tcInf = tc->tcCur->tl_inf;
 
-    char         * event, * trackerid, * idparam;
+    const char   * trackerid;
+    const char   * event;
+    const char   * idparam;
     uint64_t       left;
     char           start;
     int            numwant = 50;
@@ -584,18 +586,15 @@ static tr_http_t * getQuery( tr_tracker_t * tc )
                           "%s%s"
                           "%s",
                           tcInf->announce, start, tor->escapedHashString,
-                          tc->id, tc->publicPort, tor->uploadedCur, tor->downloadedCur,
+                          tc->peer_id, tc->publicPort, tor->uploadedCur, tor->downloadedCur,
                           left, numwant, tor->key, idparam, trackerid, event );
 }
 
-static tr_http_t * getScrapeQuery( tr_tracker_t * tc )
+static tr_http_t * getScrapeQuery( const tr_tracker_t * tc )
 {
-    tr_torrent_t * tor = tc->tor;
-    tr_tracker_info_t * tcInf = tc->tcCur->tl_inf;
-    char           start;
-
-    start = ( strchr( tcInf->scrape, '?' ) ? '&' : '?' );
-
+    const tr_torrent_t * tor = tc->tor;
+    const tr_tracker_info_t * tcInf = tc->tcCur->tl_inf;
+    const char start = ( strchr( tcInf->scrape, '?' ) ? '&' : '?' );
     return tr_httpClient( TR_HTTP_GET, tcInf->address, tcInf->port,
                           "%s%c"
                           "info_hash=%s",
