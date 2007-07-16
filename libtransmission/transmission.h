@@ -570,8 +570,8 @@ struct tr_stat_s
     int                 peersTotal;
     int                 peersConnected;
     int                 peersFrom[TR_PEER_FROM__MAX];
-    int                 peersUploading;
-    int                 peersDownloading;
+    int                 peersSendingToUs;
+    int                 peersGettingFromUs;
     int                 seeders;
     int                 leechers;
     int                 completedFromTracker;

@@ -552,10 +552,10 @@ tr_torrentStat( tr_torrent_t * tor )
 
     /* peers... */
     memset( s->peersFrom, 0, sizeof( s->peersFrom ) );
-    s->peersTotal        = tor->peerCount;
-    s->peersConnected    = 0;
-    s->peersUploading    = 0;
-    s->peersDownloading  = 0;
+    s->peersTotal          = tor->peerCount;
+    s->peersConnected      = 0;
+    s->peersSendingToUs    = 0;
+    s->peersGettingFromUs  = 0;
 
     for( i=0; i<tor->peerCount; ++i )
     {
@@ -567,10 +567,10 @@ tr_torrentStat( tr_torrent_t * tor )
             ++s->peersFrom[tr_peerIsFrom(peer)];
 
             if( tr_peerDownloadRate( peer ) > 0.01 )
-                ++s->peersUploading;
+                ++s->peersSendingToUs;
 
             if( tr_peerUploadRate( peer ) > 0.01 )
-                ++s->peersDownloading;
+                ++s->peersGettingFromUs;
         }
     }
 

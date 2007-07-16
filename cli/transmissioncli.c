@@ -267,15 +267,15 @@ int main( int argc, char ** argv )
                 "Progress: %.2f %%, %d peer%s, dl from %d (%.2f KB/s), "
                 "ul to %d (%.2f KB/s) [%s]", 100.0 * s->percentDone,
                 s->peersConnected, ( s->peersConnected == 1 ) ? "" : "s",
-                s->peersUploading, s->rateDownload,
-                s->peersDownloading, s->rateUpload,
+                s->peersSendingToUs, s->rateDownload,
+                s->peersGettingFromUs, s->rateUpload,
                 getStringRatio(s->ratio) );
         }
         else if( s->status & TR_STATUS_SEED )
         {
             chars = snprintf( string, sizeof string,
                 "Seeding, uploading to %d of %d peer(s), %.2f KB/s [%s]",
-                s->peersDownloading, s->peersTotal,
+                s->peersGettingFromUs, s->peersTotal,
                 s->rateUpload, getStringRatio(s->ratio) );
         }
         else if( s->status & TR_STATUS_STOPPING )

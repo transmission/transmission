@@ -605,7 +605,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
     const tr_stat_t * st = tr_torrent_stat( gtor );
 
     const int tpeers = MAX (st->peersConnected, 0);
-    const int upeers = MAX (st->peersUploading, 0);
+    const int upeers = MAX (st->peersGettingFromUs, 0);
     const int eta = st->eta;
     const double prog = st->percentDone * 100.0; /* [0...100] */
 

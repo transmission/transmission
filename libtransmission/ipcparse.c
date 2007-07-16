@@ -842,7 +842,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 tr_bencInitInt( item, tor );
                 break;
             case IPC_ST_PEERDOWN:
-                tr_bencInitInt( item, st->peersDownloading );
+                tr_bencInitInt( item, st->peersSendingToUs );
                 break;
             case IPC_ST_PEERFROM:
                 tr_bencInit( item, TYPE_DICT );
@@ -863,7 +863,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 tr_bencInitInt( item, st->peersTotal );
                 break;
             case IPC_ST_PEERUP:
-                tr_bencInitInt( item, st->peersUploading );
+                tr_bencInitInt( item, st->peersGettingFromUs );
                 break;
             case IPC_ST_RUNNING:
                 tr_bencInitInt( item,
