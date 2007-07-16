@@ -993,6 +993,11 @@ torrentThreadLoop ( void * _tor )
         /* sleep a little while */
         tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 600 );
 
+        if( tor->fastResumeDirty ) {
+            tor->fastResumeDirty = FALSE;
+            fastResumeSave( tor );
+        }
+
         /* if we're stopping... */
         if( tor->runStatus == TR_RUN_STOPPING )
         {
@@ -1157,17 +1162,14 @@ torrentThreadLoop ( void * _tor )
 }
 
 
-/***
-****
-****  File prioritization
-****
-***/
+/**
+***  File priorities
+**/
 
-static void
-tr_torrentSetFilePriorityImpl( tr_torrent_t   * tor,
-                               int              fileIndex,
-                               tr_priority_t    priority,
-                               int              doSave )
+void
+tr_torrentSetFilePriority( tr_torrent_t   * tor,
+                           int              fileIndex,
+                           tr_priority_t    priority )
 {
     int i;
     tr_file_t * file;
@@ -1187,18 +1189,9 @@ tr_torrentSetFilePriorityImpl( tr_torrent_t   * tor,
              fileIndex, file->firstPiece, file->lastPiece,
              priority, tor->info.files[fileIndex].name );
 
-    if( doSave )
-        fastResumeSave( tor );
+    tor->fastResumeDirty = TRUE;
 
     tr_torrentWriterUnlock( tor );
-}
-
-void
-tr_torrentSetFilePriority( tr_torrent_t   * tor,
-                           int              fileIndex,
-                           tr_priority_t    priority )
-{
-    tr_torrentSetFilePriorityImpl( tor, fileIndex, priority, TRUE );
 }
 
 void
@@ -1208,11 +1201,8 @@ tr_torrentSetFilePriorities( tr_torrent_t        * tor,
                              tr_priority_t         priority )
 {
     int i;
-    for( i=0; i<fileCount; ++i ) {
-        const int fileIndex = files[i];
-        tr_torrentSetFilePriorityImpl( tor, fileIndex, priority, FALSE );
-    }
-    fastResumeSave( tor );
+    for( i=0; i<fileCount; ++i )
+        tr_torrentSetFilePriority( tor, files[i], priority );
 }
 
 tr_priority_t
@@ -1245,37 +1235,72 @@ tr_torrentGetFilePriorities( const tr_torrent_t * tor )
     return p;
 }
 
+/**
+***  File DND
+**/
+
 int
 tr_torrentGetFileDL( const tr_torrent_t * tor,
                      int                  file )
 {
-    int do_download;
+    int doDownload;
     tr_torrentReaderLock( tor );
 
     assert( 0<=file && file<tor->info.fileCount );
-    do_download = !tor->info.files[file].dnd;
+    doDownload = !tor->info.files[file].dnd;
 
     tr_torrentReaderUnlock( tor );
-    return do_download != 0;
+    return doDownload != 0;
 }
 
 void
 tr_torrentSetFileDL( tr_torrent_t  * tor,
                      int             fileIndex,
-                     int             do_download )
+                     int             doDownload )
 {
+    const tr_file_t * file;
+    const int dnd = !doDownload;
+    int firstPiece, firstPieceDND;
+    int lastPiece, lastPieceDND;
     int i;
-    tr_file_t * file;
-    const int dnd = !do_download;
 
     tr_torrentWriterLock( tor );
 
-    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
     file = &tor->info.files[fileIndex];
-    file->dnd = dnd;
-    for( i=file->firstPiece; i<=file->lastPiece; ++i )
-      tor->info.pieces[i].dnd = dnd;
-    fastResumeSave( tor );
+    firstPiece = file->firstPiece;
+    lastPiece = file->lastPiece;
+
+    /* can't set the first piece to DND unless
+       every file using that piece is DND */
+    firstPieceDND = dnd;
+    for( i=fileIndex-1; firstPieceDND && i>=0; --i ) {
+        if( tor->info.files[i].lastPiece != firstPiece )
+            break;
+        firstPieceDND = tor->info.files[i].dnd;
+    }
+
+    /* can't set the last piece to DND unless
+       every file using that piece is DND */
+    lastPieceDND = dnd;
+    for( i=fileIndex+1; lastPieceDND && i<tor->info.fileCount; ++i ) {
+        if( tor->info.files[i].firstPiece != lastPiece )
+            break;
+        lastPieceDND = tor->info.files[i].dnd;
+    }
+
+    if( firstPiece == lastPiece )
+    {
+        tor->info.pieces[firstPiece].dnd = firstPieceDND && lastPieceDND;
+    }
+    else
+    {
+        tor->info.pieces[firstPiece].dnd = firstPieceDND;
+        tor->info.pieces[lastPiece].dnd = lastPieceDND;
+        for( i=firstPiece+1; i<lastPiece-1; ++i )
+            tor->info.pieces[i].dnd = dnd;
+    }
+
+    tor->fastResumeDirty = TRUE;
 
     tr_torrentWriterUnlock( tor );
 }
@@ -1284,22 +1309,9 @@ void
 tr_torrentSetFileDLs ( tr_torrent_t   * tor,
                        int            * files,
                        int              fileCount,
-                       int              do_download )
+                       int              doDownload )
 {
-    int i, j;
-    const int dnd = !do_download;
-
-    tr_torrentWriterLock( tor );
-
-    for( i=0; i<fileCount; ++i ) {
-        const int fileIndex = files[i];
-        tr_file_t * file = &tor->info.files[fileIndex];
-        file->dnd = dnd;
-        for( j=file->firstPiece; j<=file->lastPiece; ++j )
-            tor->info.pieces[j].dnd = dnd;
-    }
-
-    fastResumeSave( tor );
-
-    tr_torrentWriterUnlock( tor );
+    int i;
+    for( i=0; i<fileCount; ++i )
+        tr_torrentSetFileDL( tor, files[i], doDownload );
 }

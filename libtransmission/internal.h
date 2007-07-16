@@ -204,7 +204,8 @@ struct tr_torrent_s
     tr_io_t         * io;
     uint64_t          startDate;
     uint64_t          stopDate;
-    int               ioLoaded;
+    char              ioLoaded;
+    char              fastResumeDirty;
 
     int               peerCount;
     tr_peer_t       * peers[TR_MAX_PEER_COUNT];
@@ -217,8 +218,8 @@ struct tr_torrent_s
 
     uint8_t           pexDisabled;
 
+    int8_t            statCur;
     tr_stat_t         stats[2];
-    int               statCur;
 
     tr_torrent_t    * next;
 };

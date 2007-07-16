@@ -233,11 +233,13 @@ void fastResumeSave( const tr_torrent_t * tor )
 }
 
 static int
-fastResumeLoadPriorities( tr_torrent_t * tor,
-                          FILE         * file )
+loadPriorities( tr_torrent_t * tor,
+                FILE         * file )
 {
     const size_t n = tor->info.fileCount;
     const size_t len = 2 * n;
+    int *dnd = NULL, dndCount = 0;
+    int *dl = NULL, dlCount = 0;
     char * buf = tr_new0( char, len );
     char * walk = buf;
     size_t i;
@@ -261,16 +263,22 @@ fastResumeLoadPriorities( tr_torrent_t * tor,
     }
 
     /* set the dnd flags */
-    for( i=0; i<n; ++i ) {
-        int j;
-        const char ch = *walk++;
-        tr_file_t * file = &tor->info.files[i];
-        file->dnd = ch == 't';
-        for( j=file->firstPiece; j<=file->lastPiece; ++j )
-            tor->info.pieces[j].dnd = file->dnd;
-    }
+    dl = tr_new( int, len );
+    dnd = tr_new( int, len );
+    for( i=0; i<n; ++i )
+        if( *walk++ == 't' ) /* 't' means the DND flag is true */
+            dnd[dndCount++] = i;
+        else
+            dl[dlCount++] = i;
 
-    free( buf );
+    if( dndCount )
+        tr_torrentSetFileDLs ( tor, dnd, dndCount, FALSE );
+    if( dlCount )
+        tr_torrentSetFileDLs ( tor, dl, dlCount, TRUE );
+
+    tr_free( dnd );
+    tr_free( dl );
+    tr_free( buf );
     return TR_OK;
 }
 
@@ -426,7 +434,7 @@ fastResumeLoad( tr_torrent_t   * tor,
                 /* read priority data */
                 if( len == (uint32_t)(2 * tor->info.fileCount) )
                 {
-                    ret = fastResumeLoadPriorities( tor, file );
+                    ret = loadPriorities( tor, file );
 
                     if( ret && ( feof(file) || ferror(file) ) )
                     {
