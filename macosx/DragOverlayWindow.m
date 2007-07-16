@@ -86,7 +86,7 @@
     while ((file = [enumerator nextObject]))
     {
         if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
-        {NSLog(@"asdgas");
+        {
             count++;
             size += info.totalSize;
             fileCount += info.fileCount;
