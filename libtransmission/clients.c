@@ -221,6 +221,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "FoxTorrent (%c%c%c%c)",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "GR", 2 ) )
+        {
+            asprintf( &ret, "GetRight (%c.%c.%c.%c)",
+                      id[3], id[4], id[5], id[6] );
+        }
         
         if( ret )
         {
