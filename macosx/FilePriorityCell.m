@@ -16,7 +16,7 @@
         for (i = 0; i < [self segmentCount]; i++)
         {
             [self setLabel: @"" forSegment: i];
-            [self setWidth: 6.0 forSegment: i];
+            [self setWidth: 7.0 forSegment: i];
         }
     }
     return self;
