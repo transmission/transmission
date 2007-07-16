@@ -1258,7 +1258,7 @@ tr_torrentSetFileDL( tr_torrent_t  * tor,
                      int             fileIndex,
                      int             doDownload )
 {
-    const tr_file_t * file;
+    tr_file_t * file;
     const int dnd = !doDownload;
     int firstPiece, firstPieceDND;
     int lastPiece, lastPieceDND;
@@ -1267,6 +1267,7 @@ tr_torrentSetFileDL( tr_torrent_t  * tor,
     tr_torrentWriterLock( tor );
 
     file = &tor->info.files[fileIndex];
+    file->dnd = dnd;
     firstPiece = file->firstPiece;
     lastPiece = file->lastPiece;
 
@@ -1296,7 +1297,7 @@ tr_torrentSetFileDL( tr_torrent_t  * tor,
     {
         tor->info.pieces[firstPiece].dnd = firstPieceDND;
         tor->info.pieces[lastPiece].dnd = lastPieceDND;
-        for( i=firstPiece+1; i<lastPiece-1; ++i )
+        for( i=firstPiece+1; i<lastPiece; ++i )
             tor->info.pieces[i].dnd = dnd;
     }
 
