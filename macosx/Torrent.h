@@ -184,8 +184,8 @@
 - (int) totalPeersCache;
 - (int) totalPeersPex;
 
-- (int) peersUploading;
-- (int) peersDownloading;
+- (int) peersSendingToUs;
+- (int) peersGettingFromUs;
 
 - (float) downloadRate;
 - (float) uploadRate;

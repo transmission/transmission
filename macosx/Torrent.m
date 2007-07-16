@@ -384,10 +384,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [statusString setString: @""];
             if ([self totalPeersConnected] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Downloading from %d of %d peers",
-                                                "Torrent -> status string"), [self peersUploading], [self totalPeersConnected]];
+                                                "Torrent -> status string"), [self peersSendingToUs], [self totalPeersConnected]];
             else
                 [statusString appendFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
-                                                "Torrent -> status string"), [self peersUploading]];
+                                                "Torrent -> status string"), [self peersSendingToUs]];
             
             int eta = [self eta];
             if (eta < 0)
@@ -427,10 +427,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [statusString setString: @""];
             if ([self totalPeersConnected] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
-                                                [self peersDownloading], [self totalPeersConnected]];
+                                                [self peersSendingToUs], [self totalPeersConnected]];
             else
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
-                                                [self peersDownloading]];
+                                                [self peersGettingFromUs]];
             
             break;
 
@@ -1209,15 +1209,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 }
 
 //peers uploading to you
-- (int) peersUploading
+- (int) peersSendingToUs
 {
-    return fStat->peersUploading;
+    return fStat->peersSendingToUs;
 }
 
 //peers downloading from you
-- (int) peersDownloading
+- (int) peersGettingFromUs
 {
-    return fStat->peersDownloading;
+    return fStat->peersGettingFromUs;
 }
 
 - (float) downloadRate

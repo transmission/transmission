@@ -432,8 +432,8 @@
     else
         [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
     
-    [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersUploading]] : @""];
-    [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersDownloading]] : @""];
+    [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersSendingToUs]] : @""];
+    [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersGettingFromUs]] : @""];
     
     if (fPeers)
         [fPeers release];
