@@ -31,6 +31,7 @@
 
 #include "conf.h"
 #include "dialogs.h"
+#include "hig.h"
 #include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
 #include "tr_icon.h"
@@ -65,12 +66,6 @@ struct dirdata
     size_t                  size;
     enum tr_torrent_action  action;
     gboolean                paused;
-};
-
-struct quitdata
-{
-    callbackfunc_t func;
-    void         * cbdata;
 };
 
 struct infowind
@@ -115,8 +110,6 @@ static void
 promptdirnocore( gpointer gdata, GObject * core );
 static void
 promptresp( GtkWidget * widget, gint resp, gpointer data );
-static void
-quitresp( GtkWidget * widget, gint resp, gpointer data );
 
 void
 makeaddwind( GtkWindow * parent, TrCore * core )
@@ -363,11 +356,45 @@ promptresp( GtkWidget * widget, gint resp, gpointer data )
     gtk_widget_destroy( widget );
 }
 
+/***
+****
+***/
+
+struct quitdata
+{
+    TrCore          * core;
+    callbackfunc_t    func;
+    void            * cbdata;
+    GtkWidget       * dontask;
+};
+
+static void
+quitresp( GtkWidget * widget, int response, gpointer data )
+{
+    struct quitdata * stuff;
+    gboolean doask;
+
+    stuff = data;
+
+    doask = !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(stuff->dontask) );
+    tr_core_set_pref_bool( stuff->core, PREF_ID_ASKQUIT, doask );
+
+    if( response == GTK_RESPONSE_ACCEPT )
+        stuff->func( stuff->cbdata );
+
+    g_free( stuff );
+    gtk_widget_destroy( widget );
+}
+
 void
-askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata )
+askquit( TrCore          * core,
+         GtkWindow       * parent,
+         callbackfunc_t    func,
+         void            * cbdata )
 {
     struct quitdata * stuff;
     GtkWidget * wind;
+    GtkWidget * dontask;
 
     if( !tr_prefs_get_bool_with_default( PREF_ID_ASKQUIT ) )
     {
@@ -378,30 +405,28 @@ askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata )
     stuff          = g_new( struct quitdata, 1 );
     stuff->func    = func;
     stuff->cbdata  = cbdata;
+    stuff->core    = core;
 
-    wind = gtk_message_dialog_new( parent, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                   _("Are you sure you want to quit %s?"),
+    wind = gtk_message_dialog_new( parent,
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_MESSAGE_QUESTION,
+                                   GTK_BUTTONS_NONE,
+                                   _("Really exit %s?"),
                                    g_get_application_name() );
-    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_YES );
+    gtk_dialog_add_buttons( GTK_DIALOG(wind),
+                            GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                            GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,
+                            NULL );
+   
+    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
+
+    dontask = gtk_check_button_new_with_mnemonic( _("_Don't Ask Me This Again") );
+    stuff->dontask = dontask;
+
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(wind)->vbox), dontask, FALSE, FALSE, GUI_PAD );
+
     g_signal_connect( G_OBJECT( wind ), "response",
                       G_CALLBACK( quitresp ), stuff );
 
     gtk_widget_show_all( wind );
-}
-
-static void
-quitresp( GtkWidget * widget, gint resp, gpointer data )
-{
-    struct quitdata * stuff;
-
-    stuff = data;
-
-    if( GTK_RESPONSE_YES == resp )
-    {
-        stuff->func( stuff->cbdata );
-    }
-
-    g_free( stuff );
-    gtk_widget_destroy( widget );
 }

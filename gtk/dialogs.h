@@ -40,6 +40,6 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
 
 /* prompt if the user wants to quit, calls func with cbdata if they do */
 void
-askquit( GtkWindow * parent, callbackfunc_t func, void * cbdata );
+askquit( TrCore*, GtkWindow* parent, callbackfunc_t func, void * cbdata );
 
 #endif /* TG_PREFS_H */

@@ -445,7 +445,7 @@ winclose( GtkWidget * widget UNUSED, GdkEvent * event UNUSED, gpointer gdata )
     if( cbdata->icon != NULL )
         gtk_widget_hide( GTK_WIDGET( cbdata->wind ) );
     else
-        askquit( cbdata->wind, wannaquit, cbdata );
+        askquit( cbdata->core, cbdata->wind, wannaquit, cbdata );
 
     return TRUE; /* don't propagate event further */
 }
@@ -1021,7 +1021,7 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "quit"))
     {
-        askquit( data->wind, wannaquit, data );
+        askquit( data->core, data->wind, wannaquit, data );
     }
     else if (!strcmp (action_name, "edit-preferences"))
     {
