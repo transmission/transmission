@@ -801,6 +801,10 @@ tormsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
         while( NULL != ( iter = torrent_iter( iter, &ii ) ) )
         {
             func( ii );
+            if( torrent_remove == func )
+            {
+                iter = NULL;
+            }
         }
     }
     /* remove/start/stop requested list of torrents */
