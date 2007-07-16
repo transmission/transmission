@@ -105,7 +105,7 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
     {
         bottom = g_strdup_printf( ngettext( "Downloading from %i of %i peer",
                                             "Downloading from %i of %i peers",
-                                            tpeers ), upeers, tpeers );
+                                            tpeers ), dpeers, tpeers );
     }
     else
     {
