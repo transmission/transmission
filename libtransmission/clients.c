@@ -55,9 +55,9 @@ char * tr_clientForId( uint8_t * id )
             }
             else
             {
-                asprintf( &ret, "Transmission %d.%c%c",
-                        charToInt( id[3] ) * 10 + charToInt( id[4] ),
-                        id[5], id[6] );
+                asprintf( &ret, "Transmission %d.%c%c%s",
+                        charToInt( id[3] ), id[4], id[5],
+                        id[6] == 'Z' ? " (dev)" : "" );
             }
         }
         else if( !memcmp( &id[1], "AZ", 2 ) )

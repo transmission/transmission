@@ -28,9 +28,10 @@
 #include "net.h"
 #include "shared.h"
 
-/* Generate a peer id : "-TRxxyz-" + 12 random alphanumeric
-   characters, where xx is the major version number, y is the
-   minor version number, and z is the maintenance number (Azureus-style) */
+/* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
+   characters, where x is the major version number, y is the
+   minor version number, z is the maintenance number, and b
+   designates beta (Azureus-style) */
 void
 tr_peerIdNew ( char * buf, int buflen )
 {
