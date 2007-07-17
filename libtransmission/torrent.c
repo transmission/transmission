@@ -1103,11 +1103,11 @@ torrentThreadLoop ( void * _tor )
             cpStatus = tr_cpGetStatus( tor->completion );
             if( cpStatus != tor->cpStatus ) {
                 tor->cpStatus = cpStatus;
-                if( (cpStatus == TR_CP_COMPLETE)        /* if we're complete */
+                tor->hasChangedState = tor->cpStatus;  /* tell the client... */
+                if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
                     && tor->tracker!=NULL           /* and we have a tracker */
                     && tor->downloadedCur ) {        /* and it just happened */
                     tr_trackerCompleted( tor->tracker ); /* tell the tracker */
-                    tor->hasChangedState = tor->cpStatus;  /* and the client */
                 }
                 tr_ioSync( tor->io );
             }
