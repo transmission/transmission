@@ -992,11 +992,15 @@ printlisting( void )
         {
             if( NULL == ii->errorcode )
             {
-                printf( " [error: %s]", ii->errormsg );
+                printf( " [error - %s]", ii->errormsg );
+            }
+            else if( NULL == ii->errormsg )
+            {
+                printf( " [error (%s)]", ii->errorcode );
             }
             else
             {
-                printf( " [%s error]", ii->errorcode );
+                printf( " [error (%s) - %s]", ii->errorcode, ii->errormsg );
             }
         }
 
