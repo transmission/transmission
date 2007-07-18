@@ -247,6 +247,7 @@ int main( int argc, char ** argv )
         {
             gotsig = 0;
             tr_torrentStop( tor );
+            tr_natTraversalEnable( h, 0 );
         }
 
         s = tr_torrentStat( tor );
@@ -281,6 +282,10 @@ int main( int argc, char ** argv )
         else if( s->status & TR_STATUS_STOPPING )
         {
             chars = snprintf( string, sizeof string, "Stopping..." );
+        }
+        else if( s->status & TR_STATUS_INACTIVE )
+        {
+            break;
         }
         if( ( signed )sizeof string > chars )
         {
