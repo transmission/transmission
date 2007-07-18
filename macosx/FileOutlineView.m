@@ -134,44 +134,4 @@
     [super drawRow: row clipRect: clipRect];
 }
 
-- (void) drawRect: (NSRect) r
-{
-    [super drawRect: r];
-    
-    NSDictionary * item;
-    NSIndexSet * indexSet;
-    int i, count, priority;
-    Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
-    for (i = 0; i < [self numberOfRows]; i++)
-    {
-        if ([self isRowSelected: i])
-        {
-            item = [self itemAtRow: i];
-            if ([[item objectForKey: @"IsFolder"] boolValue])
-                continue;
-            
-            NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
-            if ([priorities count] != 1)
-                continue;
-            
-            priority = [[priorities anyObject] intValue];
-            if (priority == TR_PRI_LOW)
-                [fLowPriorityColor set];
-            else if (priority == TR_PRI_HIGH)
-                [fHighPriorityColor set];
-            else
-                continue;
-        
-            NSRect rect = [self rectOfRow: i];
-            float width = 14.0;
-            rect.origin.y += (rect.size.height - width) * 0.5;
-            rect.origin.x += 3.0;
-            rect.size.width = width;
-            rect.size.height = width;
-            
-            [[NSBezierPath bezierPathWithOvalInRect: rect] fill];
-        }
-    }
-}
-
 @end

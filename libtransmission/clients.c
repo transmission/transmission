@@ -32,6 +32,8 @@ static int charToInt( char character )
     int value;
     if( character >= 'A' && character <= 'Z' )
         value = 10 + character - 'A';
+    else if( character >= 'a' && character <= 'z')
+        value = 36 + character - 'a';
     else
         value = character - '0';
     

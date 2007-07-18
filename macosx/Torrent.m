@@ -277,6 +277,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
                 [self updateDownloadFolder];
+            else
+                canMove = NO;
             
             [self updateSpeedSetting];
         }

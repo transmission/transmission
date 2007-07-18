@@ -52,6 +52,11 @@
 		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
 		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
+		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
+		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
+		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
+		A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
+		A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */; };
 		A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A21567EB0A9A5034004DECD6 /* MessageWindow.nib */; };
 		A215760B0C0D449A0057A26A /* BezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A21576090C0D449A0057A26A /* BezierPathAdditions.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
@@ -329,6 +334,11 @@
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
+		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
+		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
+		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
+		A20B6FA40C4D97840034AB1D /* PriorityNone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNone.png; path = macosx/Images/PriorityNone.png; sourceTree = "<group>"; };
+		A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNormal.png; path = macosx/Images/PriorityNormal.png; sourceTree = "<group>"; };
 		A21567EC0A9A5034004DECD6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A21576090C0D449A0057A26A /* BezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BezierPathAdditions.m; path = macosx/BezierPathAdditions.m; sourceTree = "<group>"; };
 		A215760A0C0D449A0057A26A /* BezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BezierPathAdditions.h; path = macosx/BezierPathAdditions.h; sourceTree = "<group>"; };
@@ -666,6 +676,11 @@
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
 				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
+				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
+				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
+				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
+				A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */,
+				A20B6F820C4D8A610034AB1D /* PriorityHigh.png */,
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
@@ -1189,6 +1204,11 @@
 				A2DF377C0C222E2D006523C1 /* Creator.nib in Resources */,
 				A2E9AA760C249AF400085DCF /* Create.png in Resources */,
 				A2F011990C27418800576FC0 /* CreateLarge.png in Resources */,
+				A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */,
+				A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */,
+				A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */,
+				A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */,
+				A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

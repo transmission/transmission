@@ -53,48 +53,55 @@
     NSSet * priorities = [torrent filePrioritiesForIndexes: [fItem objectForKey: @"Indexes"]];
     
     int count = [priorities count];
-    if (count == 0)
-        return;
-    
-    BOOL low = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]],
-        normal = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]],
-        high = [priorities containsObject: [NSNumber numberWithInt: TR_PRI_HIGH]];
     
     FileOutlineView * view = (FileOutlineView *)[self controlView];
     int row = [view hoverRow];
-    if (row != -1 && [view itemAtRow: row] == fItem)
+    if (count > 0 && row != -1 && [view itemAtRow: row] == fItem)
     {
-        [super setSelected: low forSegment: 0];
-        [super setSelected: normal forSegment: 1];
-        [super setSelected: high forSegment: 2];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];
+        [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_HIGH]] forSegment: 2];
         
         [super drawWithFrame: cellFrame inView: controlView];
     }
     else
     {
-        if (high || low)
+        NSImage * image;
+        if (count == 0)
         {
-            BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                        isEqual: [NSColor alternateSelectedControlColor]];
-            NSDictionary * attributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                            highlighted ? [NSColor whiteColor] : [NSColor controlTextColor], NSForegroundColorAttributeName,
-                            [NSFont messageFontOfSize: 18.0], NSFontAttributeName, nil];
-            
-            NSString * text;
-            if (count > 1)
-                text = @"*";
-            else if (low)
-                text = @"-";
-            else
-                text = @"+";
-            
-            NSSize textSize = [text sizeWithAttributes: attributes];
-            NSRect textRect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - textSize.width) * 0.5,
-                                    cellFrame.origin.y + (cellFrame.size.height - textSize.height) * 0.5,
-                                    textSize.width, textSize.height);
-            
-            [text drawInRect: textRect withAttributes: attributes];
+            if (!fNoneImage)
+                fNoneImage = [NSImage imageNamed: @"PriorityNone.png"];
+            image = fNoneImage;
         }
+        else if (count > 1)
+        {
+            if (!fMixedImage)
+                fMixedImage = [NSImage imageNamed: @"PriorityMixed.png"];
+            image = fMixedImage;
+        }
+        
+        else if ([priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]])
+        {
+            if (!fNormalImage)
+                fNormalImage = [NSImage imageNamed: @"PriorityNormal.png"];
+            image = fNormalImage;
+        }
+        else if ([priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]])
+        {
+            if (!fLowImage)
+                fLowImage = [NSImage imageNamed: @"PriorityLow.png"];
+            image = fLowImage;
+        }
+        else
+        {
+            if (!fHighImage)
+                fHighImage = [NSImage imageNamed: @"PriorityHigh.png"];
+            image = fHighImage;
+        }
+        
+        NSSize imageSize = [image size];
+        [image compositeToPoint: NSMakePoint(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
+                cellFrame.origin.y + (cellFrame.size.height + imageSize.height) * 0.5) operation: NSCompositeSourceOver];
     }
 }
 
