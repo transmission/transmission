@@ -47,7 +47,7 @@
 #include "util.h"
 
 #ifndef AF_LOCAL
-#define AF_LOCAL AF_INET
+#define AF_LOCAL AF_UNIX
 #endif
 
 #ifndef SUN_LEN
