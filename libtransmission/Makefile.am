@@ -2,6 +2,8 @@ AM_CPPFLAGS = -I. -I@top_srcdir@ -D__TRANSMISSION__
 
 noinst_LIBRARIES = libtransmission.a
 
+EXTRA_DIST = version.h.in
+
 libtransmission_a_SOURCES = \
     basename.c \
     bencode.c \
@@ -67,5 +69,4 @@ noinst_HEADERS = \
     trcompat.h \
     upnp.h \
     utils.h \
-    version.h \
     xml.h
