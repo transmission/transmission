@@ -1,0 +1,52 @@
+%define name transmission
+%define version @VERSION@
+%define release 1
+
+Summary:   Transmission Bittorrent Client
+Name:      %{name}
+Version:   %{version}
+Release:   %{release}
+License:   MIT
+Group:     Applications/Internet
+URL:       http://transmission.m0k.org/
+Epoch:     1
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRequires: glib2-devel >= @GLIB_REQUIRED@
+BuildRequires: gtk2-devel >= @GTK_REQUIRED@
+
+Requires: glib2 >= @GLIB_REQUIRED@
+Requires: gtk2 >= @GTK_REQUIRED@
+
+Provides: %{name}
+
+%description
+Transmission has been built from the ground up to be a lightweight,
+yet powerful BitTorrent client. Its simple, intuitive interface
+strikes a balance between providing useful functionality without
+feature bloat. Furthermore, it is free for anyone to use or modify.
+
+%prep
+%setup -q
+%build
+%configure --program-prefix="" 
+make CFLAGS="$RPM_OPT_FLAGS"
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+%find_lang %{name}
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files -f %{name}.lang
+%defattr(-,root,root)
+%doc AUTHORS LICENSE NEWS README
+%attr(755,root,root) %{_bindir}/%{name}
+%{_datadir}/applications/%{name}.desktop
+%{_datadir}/pixmaps/*
+
+
+%changelog
+
+* Wed Jul 18 2006 Charles Kerr <charles@rebelbase.com>
+- first draft at a spec file, cribbed from Pan's spec file
