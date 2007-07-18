@@ -50,24 +50,39 @@
 /* time_t can be 32 or 64 bits... for consistency we'll hardwire 64 */ 
 typedef uint64_t tr_time_t; 
 
-/* deprecated */
-#define FR_ID_PROGRESS_SLOTS    0x01
-/* number of bytes downloaded */
-#define FR_ID_DOWNLOADED        0x02
-/* number of bytes uploaded */
-#define FR_ID_UPLOADED          0x03
-/* IPs and ports of connectable peers */
-#define FR_ID_PEERS             0x04
-/* progress data:
- *  - 4 bytes * number of files: mtimes of files
- *  - 1 bit * number of blocks: whether we have the block or not
- */
-#define FR_ID_PROGRESS          0x05
-/* dnd and priority 
- * char * number of files: l,n,h for low, normal, high priority
- * char * number of files: t,f for DND flags
- */
-#define FR_ID_PRIORITY          0x06
+enum
+{
+    /* deprecated */
+    FR_ID_PROGRESS_SLOTS = 1,
+
+    /* number of bytes downloaded */
+    FR_ID_DOWNLOADED = 2,
+
+    /* number of bytes uploaded */
+    FR_ID_UPLOADED = 3,
+
+    /* IPs and ports of connectable peers */
+    FR_ID_PEERS = 4,
+
+    /* progress data:
+     *  - 4 bytes * number of files: mtimes of files
+     *  - 1 bit * number of blocks: whether we have the block or not */
+    FR_ID_PROGRESS = 5,
+
+    /* dnd and priority 
+     * char * number of files: l,n,h for low, normal, high priority
+     * char * number of files: t,f for DND flags */
+    FR_ID_PRIORITY = 6,
+
+    /* transfer speeds
+     * uint32_t: the dl speed rate to use when the flag is true
+     * char: t,f for whether or not dl speed is capped
+     * uint32_t: the ul speed rate to use when the flag is true
+     * char: t,f for whether or not ul speed is capped
+     */
+    FR_ID_SPEED = 7
+};
+
 
 /* macros for the length of various pieces of the progress data */
 #define FR_MTIME_LEN( t ) \
@@ -209,6 +224,30 @@ void fastResumeSave( const tr_torrent_t * tor )
     }
 
 
+    /* Write the torrent ul/dl speed caps */
+    if( TRUE )
+    {
+        const int len = ( sizeof(uint32_t) + sizeof(char) ) * 2;
+        char * buf = tr_new0( char, len );
+        char * walk = buf;
+        char enabled;
+        uint32_t i;
+
+        i = (uint32_t) tr_torrentGetMaxSpeedDL( tor );
+        memcpy( walk, &i, 4 ); walk += 4;
+        enabled = tr_torrentIsMaxSpeedEnabledDL( tor ) ? 't' : 'f';
+        *walk++ = enabled;
+
+        i = (uint32_t) tr_torrentGetMaxSpeedUL( tor );
+        memcpy( walk, &i, 4 ); walk += 4;
+        enabled = tr_torrentIsMaxSpeedEnabledUL( tor ) ? 't' : 'f';
+        *walk++ = enabled;
+
+        assert( walk - buf == len );
+        fastResumeWriteData( FR_ID_SPEED, buf, 1, walk-buf, file );
+    }
+
+
     /* Write download and upload totals */
     total = tor->downloadedCur + tor->downloadedPrev;
     fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
@@ -231,6 +270,36 @@ void fastResumeSave( const tr_torrent_t * tor )
 
     tr_dbg( "Resume file '%s' written", path );
 }
+
+static int
+loadSpeeds( tr_torrent_t * tor, FILE * file )
+{
+    const size_t len = 2 * (sizeof(uint32_t) + sizeof(char));
+    char * buf = tr_new0( char, len );
+    char * walk = buf;
+    uint32_t rate;
+    char enabled;
+
+    if( len != fread( buf, 1, len, file ) ) {
+        tr_inf( "Couldn't read from resume file" );
+        free( buf );
+        return TR_ERROR_IO_OTHER;
+    }
+
+    memcpy( &rate, walk, 4 ); walk += 4;
+    memcpy( &enabled, walk, 1 ); walk += 1;
+    tr_torrentSetMaxSpeedDL( tor, rate );
+    tr_torrentEnableMaxSpeedDL( tor, enabled=='t' );
+
+    memcpy( &rate, walk, 4 ); walk += 4;
+    memcpy( &enabled, walk, 1 ); walk += 1;
+    tr_torrentSetMaxSpeedUL( tor, rate );
+    tr_torrentEnableMaxSpeedUL( tor, enabled=='t' );
+
+    tr_free( buf );
+    return TR_OK;
+}
+
 
 static int
 loadPriorities( tr_torrent_t * tor,
@@ -435,6 +504,22 @@ fastResumeLoad( tr_torrent_t   * tor,
                 if( len == (uint32_t)(2 * tor->info.fileCount) )
                 {
                     ret = loadPriorities( tor, file );
+
+                    if( ret && ( feof(file) || ferror(file) ) )
+                    {
+                        fclose( file );
+                        return 1;
+                    }
+
+                    continue;
+                }
+                break;
+
+            case FR_ID_SPEED:
+                /*  read speed data */
+                if( len == (uint32_t)(2*sizeof(uint32_t)+2) )
+                {
+                    ret = loadSpeeds( tor, file );
 
                     if( ret && ( feof(file) || ferror(file) ) )
                     {

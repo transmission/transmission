@@ -162,3 +162,9 @@ tr_rcSetLimit( tr_ratecontrol_t * r, int limit )
     r->limit = limit;
     tr_rwWriterUnlock( &r->lock );
 }
+
+int
+tr_rcGetLimit( const tr_ratecontrol_t * r )
+{
+    return r->limit;
+}

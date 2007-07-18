@@ -196,9 +196,19 @@ typedef struct tr_torrent_s tr_torrent_t;
 typedef void (*tr_callback_t) ( tr_torrent_t *, void * );
 void tr_torrentIterate( tr_handle_t *, tr_callback_t, void * );
 
-void tr_setUseCustomLimit( tr_torrent_t * tor, int limit );
-void tr_setUploadLimit( tr_torrent_t * tor, int limit );
-void tr_setDownloadLimit( tr_torrent_t * tor, int limit );
+/**
+*** Speed Throttle
+**/
+
+void tr_torrentEnableMaxSpeedUL ( tr_torrent_t * , char doThrottle );
+void tr_torrentEnableMaxSpeedDL ( tr_torrent_t * , char doThrottle );
+void tr_torrentSetMaxSpeedUL    ( tr_torrent_t * , int KiB_sec );
+void tr_torrentSetMaxSpeedDL    ( tr_torrent_t * , int KiB_sec );
+
+int tr_torrentIsMaxSpeedEnabledUL ( const tr_torrent_t * );
+int tr_torrentIsMaxSpeedEnabledDL ( const tr_torrent_t * );
+int tr_torrentGetMaxSpeedUL       ( const tr_torrent_t * );
+int tr_torrentGetMaxSpeedDL       ( const tr_torrent_t * );
 
 /***********************************************************************
  * Torrent Priorities

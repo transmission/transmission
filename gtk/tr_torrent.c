@@ -155,6 +155,14 @@ tr_torrent_set_property(GObject *object, guint property_id,
     case TR_TORRENT_HANDLE:
       g_assert(NULL == self->handle);
       self->handle = g_value_get_pointer(value);
+g_message ("setting handle...");
+      if( self->handle ) {
+          self->ul_cap         = tr_torrentGetMaxSpeedUL       ( self->handle );
+          self->ul_cap_enabled = tr_torrentIsMaxSpeedEnabledUL ( self->handle );
+          self->dl_cap         = tr_torrentGetMaxSpeedDL       ( self->handle );
+          self->dl_cap_enabled = tr_torrentIsMaxSpeedEnabledDL ( self->handle );
+g_message ("ul cap [%d] dl_cap [%d]", self->ul_cap, self->dl_cap );
+      }
       if(NULL != self->handle && NULL != self->dir)
         tr_torrent_set_folder(self);
       break;
@@ -388,11 +396,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
   benc_val_t *name, *data;
   char *torrent, *hash, *dir;
   gboolean paused = FALSE;
-  gboolean ul_cap_enabled = FALSE;
-  gboolean dl_cap_enabled = FALSE;
   gboolean seeding_cap_enabled = FALSE;
-  gint ul_cap = 0;
-  gint dl_cap = 0;
   gdouble seeding_cap = 0.0;
 
   *err = NULL;
@@ -413,10 +417,6 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
       else if (!strcmp (key, "hash")) hash = val;
       else if (!strcmp (key, "dir")) dir = val;
       else if (!strcmp (key, "paused")) paused = !!data->val.i;
-      else if (!strcmp (key, "ul-cap-speed")) ul_cap = data->val.i;
-      else if (!strcmp (key, "ul-cap-enabled")) ul_cap_enabled = !!data->val.i;
-      else if (!strcmp (key, "dl-cap-speed")) dl_cap = data->val.i;
-      else if (!strcmp (key, "dl-cap-enabled")) dl_cap_enabled = !!data->val.i;
       else if (!strcmp (key, "seeding-cap-ratio")) seeding_cap = (data->val.i / 100.0);
       else if (!strcmp (key, "seeding-cap-enabled")) seeding_cap_enabled = !!data->val.i;
     }
@@ -452,10 +452,6 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
   }
 
   ret = maketorrent( handle );
-  ret->ul_cap = ul_cap; 
-  ret->ul_cap_enabled = ul_cap_enabled; 
-  ret->dl_cap = dl_cap;
-  ret->dl_cap_enabled = dl_cap_enabled; 
   ret->seeding_cap = seeding_cap;
   ret->seeding_cap_enabled = seeding_cap_enabled;
   return ret;
@@ -493,19 +489,8 @@ tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
     }
     tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
                     tr_torrentGetFolder( tor->handle ), -1, 1 );
-
     tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
                     (refreshStat(tor)->status & TR_STATUS_INACTIVE) ? 1 : 0);
-    tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-speed" ),
-                    tor->ul_cap );
-    tr_bencInitInt( tr_bencDictAdd( state, "ul-cap-enabled" ),
-                    tor->ul_cap_enabled ? 1 : 0 );
-
-    tr_bencInitInt( tr_bencDictAdd( state, "dl-cap-speed" ),
-                    tor->dl_cap );
-    tr_bencInitInt( tr_bencDictAdd( state, "dl-cap-enabled" ),
-                    tor->dl_cap_enabled ? 1 : 0);
-
     tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-ratio" ),
                     (int)(tor->dl_cap * 100.0)); /* two decimal places */
     tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-enabled" ),
@@ -543,56 +528,60 @@ tr_torrent_set_folder(TrTorrent *tor) {
   }
 }
 
-extern void tr_setUseCustomUpload( tr_torrent_t * tor, int limit );
-extern void tr_setUseCustomDownload( tr_torrent_t * tor, int limit );
-
-
-static void refresh_upload_cap ( TrTorrent *gtor ) {
-  const int cap = gtor->ul_cap_enabled ? gtor->ul_cap : -1;
-  g_message ("setting upload cap to %d...", cap);
-  tr_setUseCustomUpload( gtor->handle, gtor->ul_cap_enabled );
-  tr_setUploadLimit( gtor->handle, cap );
+static void
+refresh_upload_cap ( TrTorrent *gtor )
+{
+  tr_torrentEnableMaxSpeedUL( gtor->handle, gtor->ul_cap_enabled );
+  tr_torrentSetMaxSpeedUL( gtor->handle, gtor->ul_cap );
 }
 void
-tr_torrent_set_upload_cap_speed ( TrTorrent *gtor, int KiB_sec ) {
+tr_torrent_set_upload_cap_speed ( TrTorrent *gtor, int KiB_sec )
+{
   gtor->ul_cap = KiB_sec;
   refresh_upload_cap ( gtor );
 }
 void
-tr_torrent_set_upload_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+tr_torrent_set_upload_cap_enabled ( TrTorrent *gtor, gboolean b )
+{
   gtor->ul_cap_enabled = b;
   refresh_upload_cap ( gtor );
 }
 
-static void refresh_download_cap ( TrTorrent *gtor ) {
-  const int cap = gtor->dl_cap_enabled ? gtor->dl_cap : -1;
-  tr_setUseCustomDownload( gtor->handle, gtor->dl_cap_enabled );
-  tr_setDownloadLimit( gtor->handle, cap );
+static void
+refresh_download_cap ( TrTorrent *gtor )
+{
+  tr_torrentEnableMaxSpeedDL( gtor->handle, gtor->dl_cap_enabled );
+  tr_torrentSetMaxSpeedDL( gtor->handle, gtor->dl_cap );
 }
 void
-tr_torrent_set_download_cap_speed ( TrTorrent *gtor, int KiB_sec ) {
+tr_torrent_set_download_cap_speed ( TrTorrent *gtor, int KiB_sec )
+{
   gtor->dl_cap = KiB_sec;
   refresh_download_cap( gtor );
 }
 void
-tr_torrent_set_download_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+tr_torrent_set_download_cap_enabled ( TrTorrent *gtor, gboolean b )
+{
   gtor->dl_cap_enabled = b;
   refresh_download_cap( gtor );
 }
 
 void
-tr_torrent_check_seeding_cap ( TrTorrent *gtor) {
+tr_torrent_check_seeding_cap ( TrTorrent *gtor)
+{
   const tr_stat_t * st = tr_torrent_stat( gtor );
   if ((gtor->seeding_cap_enabled) && (st->ratio >= gtor->seeding_cap))
     tr_torrent_stop (gtor);
 }
 void
-tr_torrent_set_seeding_cap_ratio ( TrTorrent *gtor, gdouble ratio ) {
+tr_torrent_set_seeding_cap_ratio ( TrTorrent *gtor, gdouble ratio )
+{
   gtor->seeding_cap = ratio;
   tr_torrent_check_seeding_cap (gtor);
 }
 void
-tr_torrent_set_seeding_cap_enabled ( TrTorrent *gtor, gboolean b ) {
+tr_torrent_set_seeding_cap_enabled ( TrTorrent *gtor, gboolean b )
+{
   if ((gtor->seeding_cap_enabled = b))
     tr_torrent_check_seeding_cap (gtor);
 }
