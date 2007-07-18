@@ -17,7 +17,7 @@ REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
           sed -e '/\$Id:/!d' -e \
             's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' |
           awk 'BEGIN { REV=0 }
-               //    { if ( $1 > REV ) REV=$1 }
+                     { if ( $1 > REV ) REV=$1 }
                END   { print REV }'`
   
 # Generate files to be included: only overwrite them if changed so make
