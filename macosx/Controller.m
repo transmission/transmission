@@ -3224,15 +3224,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return [fTorrents count] > oldCount;
 }
 
-- (BOOL) ipcAddTorrentFile: (NSString *) path
-                 directory: (NSString *) dir
+- (BOOL) ipcAddTorrentFile: (NSString *) path directory: (NSString *) directory
 {
-    return NO;
+    int oldCount = [fTorrents count];
+    
+    [self openFiles: [NSArray arrayWithObject: path] forcePath: directory ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    
+    return [fTorrents count] > oldCount;
 }
 
-- (BOOL) ipcAddTorrentFileAutostart: (NSString *) path
-                          directory: (NSString *) dir
-                          autostart: (BOOL) autostart
+- (BOOL) ipcAddTorrentFileAutostart: (NSString *) path directory: (NSString *) directory autostart: (BOOL) autostart
 {
     /* 'path' is path to torrent file, 'dir' is the directory it
        should download it's files to and may be nil, 'autostart' is a
@@ -3242,20 +3243,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return NO;
 }
 
-- (BOOL) ipcAddTorrentData: (NSData *) data
-                 directory: (NSString *) dir
+- (BOOL) ipcAddTorrentData: (NSData *) data directory: (NSString *) directory
 {
-    /* 'data' is the contents of a torrent file, 'dir' is the
+    /* 'data' is the contents of a torrent file, 'directory' is the
        directory it should download it's files to and may be nil,
        should return NO if torrent fails to load */
     return NO;
 }
 
-- (BOOL) ipcAddTorrentDataAutostart: (NSData *) path
-                          directory: (NSString *) dir
-                          autostart: (BOOL) autostart
+- (BOOL) ipcAddTorrentDataAutostart: (NSData *) path directory: (NSString *) directory autostart: (BOOL) autostart
 {
-    /* 'data' is the contents of a torrent file, 'dir' is the
+    /* 'data' is the contents of a torrent file, 'directory' is the
        directory it should download it's files to and may be nil,
        'autostart' is a boolean indicating if the torrent should be
        automatically started (or queued to start, I guess), should
