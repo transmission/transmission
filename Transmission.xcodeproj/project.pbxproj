@@ -1495,6 +1495,7 @@
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_STRLCAT",
+					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
 				);
 				PRODUCT_NAME = transmission;
