@@ -3217,17 +3217,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (BOOL) ipcAddTorrents: (NSArray *) torrents
 {
-    /* 'torrents' is NSArray of NSString torrent file paths, should
-       return NO if torrent fails to load */
-    return NO;
+    int oldCount = [fTorrents count];
+    
+    [self openFiles: torrents];
+    
+    return [fTorrents count] > oldCount;
 }
 
 - (BOOL) ipcAddTorrentFile: (NSString *) path
                  directory: (NSString *) dir
 {
-    /* 'path' is path to torrent file, 'dir' is the directory it
-       should download it's files to and may be nil, should return NO
-       if torrent fails to load */
     return NO;
 }
 
