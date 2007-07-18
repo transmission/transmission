@@ -1070,7 +1070,7 @@ static void
 safepipe(void) {
   struct sigaction sa;
 
-  bzero(&sa, sizeof(sa));
+  memset(&sa, 0,  sizeof(sa));
   sa.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &sa, NULL);
 }
@@ -1081,7 +1081,7 @@ setupsighandlers(void) {
   struct sigaction sa;
   int ii;
 
-  bzero(&sa, sizeof(sa));
+  memset(&sa, 0,  sizeof(sa));
   sa.sa_handler = fatalsig;
   for(ii = 0; ii < ALEN(sigs); ii++)
     sigaction(sigs[ii], &sa, NULL);
@@ -1092,7 +1092,7 @@ fatalsig(int sig) {
   struct sigaction sa;
 
   if(SIGCOUNT_MAX <= ++global_sigcount) {
-    bzero(&sa, sizeof(sa));
+    memset(&sa, 0,  sizeof(sa));
     sa.sa_handler = SIG_DFL;
     sigaction(sig, &sa, NULL);
     raise(sig);

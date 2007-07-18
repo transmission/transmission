@@ -223,7 +223,7 @@ makeview( PrivateData * p )
     g_signal_connect( view, "popup-menu",
                       G_CALLBACK(on_popup_menu), NULL );
     g_signal_connect( view, "button-press-event",
-                      G_CALLBACK(on_tree_view_button_pressed), on_popup_menu);
+                      G_CALLBACK(on_tree_view_button_pressed), (void *) on_popup_menu);
     g_signal_connect( view, "row-activated",
                       G_CALLBACK(view_row_activated), NULL);
 

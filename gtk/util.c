@@ -415,7 +415,7 @@ verrmsg_full( GtkWindow * wind, callbackfunc_t func, void * data,
   if(NULL == func)
     funcdata = NULL;
   else
-    funcdata = g_list_append(g_list_append(NULL, func), data);
+      funcdata = g_list_append(g_list_append(NULL, (void *) func), data);
   g_signal_connect(dialog, "response", G_CALLBACK(errcb), funcdata);
   g_free(msg);
 
@@ -429,7 +429,7 @@ errcb(GtkWidget *widget, int resp SHUTUP, gpointer data) {
 
   if(NULL != data) {
     funcdata = g_list_first(data);
-    func = funcdata->data;
+    func = (callbackfunc_t) funcdata->data;
     data = funcdata->next->data;
     func(data);
     g_list_free(funcdata);

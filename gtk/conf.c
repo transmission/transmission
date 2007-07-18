@@ -94,7 +94,7 @@ lockfile(const char *file, char **errstr) {
     return -1;
   }
 
-  bzero(&lk, sizeof(lk));
+  memset(&lk, 0,  sizeof(lk));
   lk.l_start = 0;
   lk.l_len = 0;
   lk.l_type = F_WRLCK;
@@ -247,7 +247,7 @@ cf_loadprefs(char **errstr) {
   if(NULL == data)
     return;
 
-  bzero(&val, sizeof(val));
+  memset(&val, 0,  sizeof(val));
   if(!usedold && !tr_bencLoad(data, len, &val, NULL)) {
     if(TYPE_DICT == val.type) {
       key = NULL;
@@ -306,7 +306,7 @@ cf_loadstate(char **errstr) {
   state = g_new0(benc_val_t, 1);
   if(usedold || tr_bencLoad(data, len, state, NULL)) {
     /* XXX all this evil compat code should go away at some point */
-    bzero(state, sizeof(benc_val_t));
+    memset(state, 0,  sizeof(benc_val_t));
     state->type = TYPE_LIST;
     for(line = data; NULL != (eol = strchr(line, PREF_SEP_LINE));
         line = eol + 1) {
@@ -331,7 +331,7 @@ cf_benc_append(benc_val_t *val, char type, int incsize) {
   if(++val->val.l.count > val->val.l.alloc) {
     val->val.l.alloc += incsize;
     val->val.l.vals = g_renew(benc_val_t, val->val.l.vals, val->val.l.alloc);
-    bzero(val->val.l.vals + val->val.l.alloc - incsize,
+    memset(val->val.l.vals + val->val.l.alloc - incsize, 0,
           incsize * sizeof(benc_val_t));
   }
   val->val.l.vals[val->val.l.count-1].type = type;
@@ -409,7 +409,7 @@ cf_saveprefs(char **errstr) {
 
   *errstr = NULL;
 
-  bzero(&val, sizeof(val));
+  memset(&val, 0,  sizeof(val));
   val.type = TYPE_DICT;
   val.val.l.alloc = val.val.l.count = g_tree_nnodes(gl_prefs) * 2;
   val.val.l.vals = g_new0(benc_val_t, val.val.l.alloc);

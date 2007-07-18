@@ -152,7 +152,7 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
 
   switch (mode) {
     case DRAW_AVAIL:
-      pieces = g_new (gint8, n_cells);
+      pieces = g_new (int8_t, n_cells);
       tr_torrentAvailability ( tor, pieces, n_cells );
       break;
     case DRAW_PROG:
@@ -1336,7 +1336,7 @@ file_page_new ( TrTorrent * gtor )
     g_signal_connect( view, "popup-menu",
                       G_CALLBACK(on_popup_menu), NULL );
     g_signal_connect( view, "button-press-event",
-                      G_CALLBACK(on_tree_view_button_pressed), on_popup_menu);
+                      G_CALLBACK(on_tree_view_button_pressed), (void*) on_popup_menu);
 
     /* add file column */
     

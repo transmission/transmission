@@ -46,6 +46,15 @@
 #include "tr_torrent.h"
 #include "util.h"
 
+#ifndef AF_LOCAL
+#define AF_LOCAL AF_INET
+#endif
+
+#ifndef SUN_LEN
+#define SUN_LEN( sun )                                                       \
+  ( sizeof( *(sun) ) - sizeof( (sun)->sun_path ) + strlen( (sun)->sun_path ) )
+#endif
+
 /* XXX error handling throughout this file is pretty bogus */
 
 enum contype { CON_SERV, CON_CLIENT };
@@ -272,7 +281,7 @@ serv_bind(struct constate *con) {
   if(0 > (con->fd = socket(AF_LOCAL, SOCK_STREAM, 0)))
     goto fail;
 
-  bzero(&sa, sizeof(sa));
+  memset(&sa, 0,  sizeof(sa));
   sa.sun_family = AF_LOCAL;
   strncpy(sa.sun_path, gl_sockpath, sizeof(sa.sun_path) - 1);
 
@@ -323,7 +332,7 @@ client_connect(char *path, struct constate *con) {
     return FALSE;
   }
 
-  bzero(&addr, sizeof(addr));
+  memset(&addr, 0,  sizeof(addr));
   addr.sun_family = AF_UNIX;
   strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 

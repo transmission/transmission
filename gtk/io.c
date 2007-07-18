@@ -165,9 +165,9 @@ newsource(void) {
   io->accepted = NULL;
   io->closed = NULL;
   io->cbdata = NULL;
-  bzero(&io->infd, sizeof(io->infd));
+  memset(&io->infd, 0,  sizeof(io->infd));
   io->infd.fd = -1;
-  bzero(&io->outfd, sizeof(io->outfd));
+  memset(&io->outfd, 0,  sizeof(io->outfd));
   io->outfd.fd = -1;
   io->inbuf = NULL;
   io->inused = 0;
