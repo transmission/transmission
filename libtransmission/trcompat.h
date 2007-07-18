@@ -24,6 +24,7 @@
 #ifndef TRCOMPAT_H
 #define TRCOMPAT_H
 
+#include <stdarg.h>
 #include <stddef.h> /* for size_t */
 
 #ifndef HAVE_STRLCPY
@@ -34,6 +35,11 @@ strlcpy(char *dst, const char *src, size_t siz);
 #ifndef HAVE_STRLCAT
 size_t
 strlcat(char *dst, const char *src, size_t siz);
+#endif
+
+#ifndef HAVE_ASPRINTF
+int asprintf( char **, const char *, ... );
+int vasprintf( char **, const char *, va_list );
 #endif
 
 #ifdef HAVE_LIBGEN

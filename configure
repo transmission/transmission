@@ -180,6 +180,45 @@ EOF
   rm -f testconf*
 }
 
+asprintf_test()
+{
+  verbose asprintf_test
+  cat > testconf.c <<EOF
+#define _GNU_SOURCE
+#include <stdio.h>
+int main()
+{
+  asprintf( NULL, NULL );
+  return 0;
+}
+EOF
+  if runcmd $CC -o testconf testconf.c
+  then
+    CFLAGS="$CFLAGS -DHAVE_ASPRINTF"
+  fi
+  rm -f testconf*
+}
+
+snprintf_test()
+{
+  verbose snprintf_test
+  cat > testconf.c <<EOF
+#include <stdio.h>
+int main()
+{
+  char buf[] = "blueberry";
+  return ( 6 != snprintf( buf, 4, "%s%s", "foo", "bar" ) ||
+           0 != memcmp( buf, "foo\0berry", 9 ) );
+}
+EOF
+  if ! runcmd $CC -o testconf testconf.c || ! runcmd ./testconf
+  then
+    echo "error: broken snprintf() found"
+    exit 1
+  fi
+  rm -f testconf*
+}
+
 libgen_test()
 {
   verbose libgen_test
@@ -467,6 +506,8 @@ lrintf_test
 #
 strlcpy_test
 strlcat_test
+asprintf_test
+snprintf_test
 libgen_test
 
 #

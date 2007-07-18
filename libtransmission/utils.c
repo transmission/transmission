@@ -28,7 +28,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h> /* usleep, stat */
+
 #include "transmission.h"
+#include "trcompat.h"
 
 #define SPRINTF_BUFSIZE         100
 
@@ -318,6 +320,44 @@ int tr_vsprintf( char ** buf, int * used, int * max, const char * fmt,
 
     return 0;
 }
+
+#ifndef HAVE_ASPRINTF
+
+int
+asprintf( char ** buf, const char * format, ... )
+{
+    va_list ap;
+    int     ret;
+
+    va_start( ap, format );
+    ret = vasprintf( buf, format, ap );
+    va_end( ap );
+
+    return ret;
+}
+
+int
+vasprintf( char ** buf, const char * format, va_list ap )
+{
+    va_list ap2;
+    int     ret, used, max;
+
+    va_copy( ap2, ap );
+
+    *buf = NULL;
+    used = 0;
+    max  = 0;
+
+    if( tr_vsprintf( buf, &used, &max, format, ap, ap2 ) )
+    {
+        free( *buf );
+        return -1;
+    }
+
+    return used;
+}
+
+#endif /* HAVE_ASPRINTF */
 
 int tr_concat( char ** buf, int * used, int * max, const char * data, int len )
 {
