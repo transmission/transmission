@@ -8,7 +8,7 @@ if HAVE_BEOS
   BEOS_DIR = beos
 endif
 if HAVE_DARWIN
-  MAC_DIR = macosx Transmission.xcodeproj
+  MAC_DIR = macosx
 endif
 
 SUBDIRS = libtransmission $(DAEMON_DIR) cli $(GTK_DIR) $(BEOS_DIR) $(MAC_DIR)
