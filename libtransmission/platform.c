@@ -227,7 +227,7 @@ void tr_threadCreate( tr_thread_t * t,
                               B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
 #else
-    pthread_create( &t->thread, NULL, (void *) ThreadFunc, t );
+    pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
 #endif
 }
 

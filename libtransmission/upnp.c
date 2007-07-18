@@ -26,11 +26,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <limits.h>
 #include <stdarg.h>
 
 #include "transmission.h"
 #include "http.h"
 #include "net.h"
+#include "trcompat.h"
 #include "upnp.h"
 #include "xml.h"
 

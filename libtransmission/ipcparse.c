@@ -240,7 +240,7 @@ ipc_initmsgs( void )
     if( NULL != tree )
     {
         RB_INIT( &tree->msgs );
-        tree->def = NULL;
+        tree->def = (trd_msgfunc) NULL;
     }
 
     return tree;
@@ -254,7 +254,7 @@ ipc_addmsg( struct ipc_funcs * tree, enum ipc_msg id, trd_msgfunc func )
     assert( MSGVALID( id ) );
     assert( IPC_MSG_VERSION != id );
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.id = id;
     entry = RB_FIND( functree, &tree->msgs, &key );
     assert( NULL == entry );
@@ -1114,7 +1114,7 @@ gotmsg( struct ipc_info * info, benc_val_t * name, benc_val_t * val,
     msg = msglookup( name->val.s.s );
     if( NULL != msg && msg->minvers <= info->vers )
     {
-        bzero( &key, sizeof key );
+        memset( &key, 0, sizeof key );
         key.id  = msg->id;
         handler = RB_FIND( functree, &info->funcs->msgs, &key );
         if( NULL != handler )
@@ -1162,7 +1162,7 @@ ipc_ishandled( struct ipc_info * info, enum ipc_msg id )
 
     assert( MSGVALID( id ) );
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.id = id;
     return ( NULL != RB_FIND( functree, &info->funcs->msgs, &key ) );
 }
@@ -1218,7 +1218,7 @@ ipc_infotypes( enum ipc_msg id, benc_val_t * list )
         return ret;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     for( jj = 0; list->val.l.count > jj; jj++ )
     {
         name = &list->val.l.vals[jj];
@@ -1302,7 +1302,7 @@ msglookup( const char * name )
         }
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.name = name;
     return RB_FIND( msgtree, &tree, &key );
 }

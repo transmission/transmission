@@ -23,7 +23,9 @@
  *****************************************************************************/
 
 #include <ctype.h> /* isprint */
+
 #include "transmission.h"
+#include "trcompat.h"
 
 static int charToInt( char character );
 

@@ -46,7 +46,7 @@ peertreekeycmp( tr_peertree_entry_t * aa, tr_peertree_entry_t * bb )
     return memcmp( aa->peer, bb->peer, 6 );
 }
 
-RB_GENERATE_STATIC( tr_peertree_s, tr_peertree_entry_s, magic, peertreekeycmp );
+RB_GENERATE_STATIC( tr_peertree_s, tr_peertree_entry_s, magic, peertreekeycmp )
 
 static int
 peertreeCount( tr_peertree_t * tree )
