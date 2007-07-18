@@ -28,10 +28,11 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include <libtransmission/transmission.h>
+
 #include "conf.h"
 #include "msgwin.h"
 #include "tr_prefs.h"
-#include "transmission.h"
 #include "util.h"
 
 #define MAX_MSGCOUNT 5000

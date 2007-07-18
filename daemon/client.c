@@ -35,14 +35,15 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bsdqueue.h"
-#include "bsdtree.h"
+#include <libtransmission/bsdqueue.h>
+#include <libtransmission/bsdtree.h>
+#include <libtransmission/bencode.h>
+#include <libtransmission/ipcparse.h>
+#include <libtransmission/trcompat.h>
+
 #include "client.h"
-#include "bencode.h"
 #include "errors.h"
-#include "ipcparse.h"
 #include "misc.h"
-#include "trcompat.h"
 
 /* time out server after this many seconds */
 #define SERVER_TIMEOUT          ( 15 )

@@ -25,8 +25,9 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include <libtransmission/transmission.h>
+
 #include "tr_cell_renderer_progress.h"
-#include "transmission.h"
 #include "util.h"
 
 enum {

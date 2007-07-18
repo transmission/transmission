@@ -13,8 +13,8 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
-#include "transmission.h"
-#include "makemeta.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
 
 #include "hig.h"
 #include "makemeta-ui.h"

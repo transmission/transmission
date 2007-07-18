@@ -41,12 +41,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <libtransmission/trcompat.h>
+#include <libtransmission/version.h>
+
 #include "errors.h"
 #include "misc.h"
 #include "server.h"
 #include "torrents.h"
-#include "trcompat.h"
-#include "version.h"
 
 static void usage       ( const char *, ... );
 static void readargs    ( int, char **, int *, int *, char ** );

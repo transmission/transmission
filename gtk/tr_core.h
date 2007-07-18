@@ -30,7 +30,8 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
-#include "bencode.h"
+#include <libtransmission/bencode.h>
+#include <libtransmission/transmission.h>
 
 #include "util.h"
 

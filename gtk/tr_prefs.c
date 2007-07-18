@@ -29,14 +29,14 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include <libtransmission/transmission.h>
+
 #include "conf.h"
 #include "tr_icon.h"
 #include "tr_core.h"
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "util.h"
-
-#include "transmission.h"
 
 /* used for g_object_set/get_data */
 #define PREF_CHECK_LINK         "tr-prefs-check-link-thingy"

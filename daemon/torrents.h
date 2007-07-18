@@ -27,8 +27,7 @@
 
 #include <limits.h>
 
-/* typedefs suck */
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 struct event_base;
 

@@ -39,13 +39,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bsdtree.h"
-#include "bencode.h"
+#include <libtransmission/bsdtree.h>
+#include <libtransmission/bencode.h>
+#include <libtransmission/transmission.h>
+#include <libtransmission/trcompat.h>
+
 #include "errors.h"
 #include "misc.h"
 #include "torrents.h"
-#include "transmission.h"
-#include "trcompat.h"
 
 #define EXIT_TIMEOUT 10         /* how many seconds to wait on exit */
 #define TIMER_SECS   1          /* timer interval seconds */

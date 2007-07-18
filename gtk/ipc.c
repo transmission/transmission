@@ -34,9 +34,9 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#include "transmission.h"
-#include "bencode.h"
-#include "ipcparse.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
+#include <libtransmission/ipcparse.h>
 
 #include "conf.h"
 #include "io.h"

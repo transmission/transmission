@@ -31,10 +31,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/trcompat.h>
+
 #include "errors.h"
 #include "misc.h"
-#include "transmission.h"
-#include "trcompat.h"
 
 static void pushdir ( char *, const char *, size_t );
 

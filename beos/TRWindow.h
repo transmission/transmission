@@ -9,7 +9,7 @@
 #include <ListItem.h>
 #include <Window.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 #include "TRPrefsWindow.h"
 

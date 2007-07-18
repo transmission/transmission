@@ -11,7 +11,7 @@
 #include <string.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 #include "torrent-inspector.h"
 #include "img_icon_full.h"
 

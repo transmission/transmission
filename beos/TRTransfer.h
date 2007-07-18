@@ -9,7 +9,7 @@
 #include <String.h>
 #include <View.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 class TRTransfer : public BListItem {
 public: // Construction and Controll methods.

@@ -27,8 +27,8 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
-#include "transmission.h"
-#include "platform.h" /* for tr_getTorrentsDirectory */
+#include <libtransmission/transmission.h>
+#include <libtransmission/platform.h> /* for tr_getTorrentsDirectory */
 
 #include "actions.h"
 #include "tr_torrent.h"

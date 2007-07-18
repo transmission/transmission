@@ -7,7 +7,7 @@
 #include <Window.h>
 #include <StringView.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 class TRInfoWindow : public BWindow {
 public:

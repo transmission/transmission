@@ -36,14 +36,15 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bsdqueue.h"
-#include "bsdtree.h"
+#include <libtransmission/bsdqueue.h>
+#include <libtransmission/bsdtree.h>
+#include <libtransmission/ipcparse.h>
+#include <libtransmission/transmission.h>
+#include <libtransmission/trcompat.h>
+
 #include "client.h"
 #include "errors.h"
-#include "ipcparse.h"
 #include "misc.h"
-#include "transmission.h"
-#include "trcompat.h"
 
 #define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
 

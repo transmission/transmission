@@ -29,6 +29,8 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include <libtransmission/transmission.h>
+
 #include "conf.h"
 #include "dialogs.h"
 #include "hig.h"
@@ -37,8 +39,6 @@
 #include "tr_icon.h"
 #include "tr_prefs.h"
 #include "util.h"
-
-#include "transmission.h"
 
 #define UPDATE_INTERVAL         1000
 #define PREFNAME                "transmission-dialog-pref-name"

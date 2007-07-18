@@ -25,8 +25,8 @@
 #ifndef TG_CONF_H
 #define TG_CONF_H
 
-#include "transmission.h"
-#include "bencode.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
 
 gboolean
 cf_init(const char *confdir, char **errstr);

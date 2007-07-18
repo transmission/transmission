@@ -28,8 +28,8 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#include "bencode.h"
-#include "transmission.h"
+#include <libtransmission/bencode.h>
+#include <libtransmission/transmission.h>
 
 #include "conf.h"
 #include "tr_core.h"

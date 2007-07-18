@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <config.h>
+
 #include <sys/param.h>
 #include <errno.h>
 #include <getopt.h>
@@ -52,8 +54,8 @@
 #include "util.h"
 #include "ui.h"
 
-#include "transmission.h"
-#include "version.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/version.h>
 
 /* time in seconds to wait for torrents to stop when exiting */
 #define TRACKER_EXIT_TIMEOUT    10

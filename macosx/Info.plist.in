@@ -38,11 +38,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>%%SHORT_VERSION_STRING%%</string>
+	<string>@VERSION_STRING@</string>
 	<key>CFBundleSignature</key>
 	<string>TR##</string>
 	<key>CFBundleVersion</key>
-	<string>%%BUNDLE_VERSION%%</string>
+	<string>@BUNDLE_VERSION@</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>

@@ -36,10 +36,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bsdtree.h"
-#include "bencode.h"
+#include <libtransmission/bsdtree.h>
+#include <libtransmission/bencode.h>
+#include <libtransmission/ipcparse.h>
+
 #include "errors.h"
-#include "ipcparse.h"
 #include "misc.h"
 #include "server.h"
 #include "torrents.h"

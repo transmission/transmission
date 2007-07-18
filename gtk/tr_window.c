@@ -27,7 +27,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
 #include "actions.h"
 #include "hig.h"

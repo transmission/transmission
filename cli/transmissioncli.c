@@ -28,8 +28,10 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
-#include <transmission.h>
-#include <makemeta.h>
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
+
 #ifdef SYS_BEOS
 #include <kernel/OS.h>
 #define usleep snooze

@@ -26,10 +26,8 @@
 #define TR_TORRENT_H
 
 #include <glib-object.h>
-
-#include "transmission.h"
-#include "bencode.h"
-
+#include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
 #include "util.h"
 
 /* boxed type for tr_tracker_info_t */
