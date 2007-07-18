@@ -155,13 +155,11 @@ tr_torrent_set_property(GObject *object, guint property_id,
     case TR_TORRENT_HANDLE:
       g_assert(NULL == self->handle);
       self->handle = g_value_get_pointer(value);
-g_message ("setting handle...");
       if( self->handle ) {
           self->ul_cap         = tr_torrentGetMaxSpeedUL       ( self->handle );
           self->ul_cap_enabled = tr_torrentIsMaxSpeedEnabledUL ( self->handle );
           self->dl_cap         = tr_torrentGetMaxSpeedDL       ( self->handle );
           self->dl_cap_enabled = tr_torrentIsMaxSpeedEnabledDL ( self->handle );
-g_message ("ul cap [%d] dl_cap [%d]", self->ul_cap, self->dl_cap );
       }
       if(NULL != self->handle && NULL != self->dir)
         tr_torrent_set_folder(self);
