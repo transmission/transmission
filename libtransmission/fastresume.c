@@ -455,6 +455,7 @@ fastResumeLoad( tr_torrent_t   * tor,
                         fclose( file );
                         return 1;
                     }
+                    tor->downloadedCur = 0;
                     continue;
                 }
                 break;
