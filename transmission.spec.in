@@ -2,7 +2,7 @@
 %define version @VERSION@
 %define release 1
 
-Summary:   Transmission Bittorrent Client
+Summary:   Transmission BitTorrent Client
 Name:      %{name}
 Version:   %{version}
 Release:   %{release}

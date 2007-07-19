@@ -268,11 +268,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             && (canMove = [self alertForMoveFolderAvailable]))
         {
             //pause without actually stopping
-            tr_setUseCustomUpload(fHandle, 1);
-            tr_setUploadLimit(fHandle, 0);
+            tr_torrentEnableMaxSpeedUL(fHandle, 1);
+            tr_torrentSetMaxSpeedUL(fHandle, 0);
             
-            tr_setUseCustomDownload(fHandle, 1);
-            tr_setDownloadLimit(fHandle, 0);
+            tr_torrentEnableMaxSpeedDL(fHandle, 1);
+            tr_torrentSetMaxSpeedDL(fHandle, 0);
             
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
@@ -687,11 +687,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) updateSpeedSetting
 {
-    tr_setUseCustomUpload(fHandle, fCheckUpload != NSMixedState);
-    tr_setUploadLimit(fHandle, fCheckUpload == NSOnState ? fUploadLimit : -1);
+    tr_torrentEnableMaxSpeedUL(fHandle, fCheckUpload != NSMixedState);
+    tr_torrentSetMaxSpeedUL(fHandle, fCheckUpload == NSOnState ? fUploadLimit : -1);
     
-    tr_setUseCustomDownload(fHandle, fCheckDownload != NSMixedState);
-    tr_setDownloadLimit(fHandle, fCheckDownload == NSOnState ? fDownloadLimit : -1);
+    tr_torrentEnableMaxSpeedDL(fHandle, fCheckDownload != NSMixedState);
+    tr_torrentSetMaxSpeedDL(fHandle, fCheckDownload == NSOnState ? fDownloadLimit : -1);
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -756,8 +756,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         }
         
         //pause without actually stopping
-        tr_setDownloadLimit(fHandle, 0);
-        tr_setUploadLimit(fHandle, 0);
+        tr_torrentEnableMaxSpeedUL(fHandle, 1);
+        tr_torrentSetMaxSpeedUL(fHandle, 0);
+        
+        tr_torrentEnableMaxSpeedDL(fHandle, 1);
+        tr_torrentSetMaxSpeedDL(fHandle, 0);
         
         if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
                             toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
