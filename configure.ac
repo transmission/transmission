@@ -131,10 +131,10 @@ case $host_os in
     esac
     ;;
 
-  *Darwin*)
+  *darwin*)
     darwin="yes"
     # Make sure the Universal SDK is installed
-    if [ ! -d /Developer/SDKs/MacOSX10.4u.sdk ]; then
+    if test ! -d /Developer/SDKs/MacOSX10.4u.sdk; then
       cat << EOF
 You need to install the Universal SDK in order to build Transmission:
   Get your Xcode CD or package
