@@ -135,7 +135,7 @@ client_init( struct event_base * base )
 int
 client_new_sock( const char * path )
 {
-    struct sockaddr_un sun;
+    struct sockaddr_un sa;
     int                fd;
     struct con       * con;
 
@@ -145,9 +145,9 @@ client_new_sock( const char * path )
 
     gl_proxy = 0;
 
-    memset( &sun, 0, sizeof sun );
-    sun.sun_family = AF_LOCAL;
-    strlcpy( sun.sun_path, path, sizeof sun.sun_path );
+    memset( &sa, 0, sizeof sa );
+    sa.sun_family = AF_LOCAL;
+    strlcpy( sa.sun_path, path, sizeof sa.sun_path );
 
     fd = socket( AF_UNIX, SOCK_STREAM, 0 );
     if( 0 > fd )
@@ -156,7 +156,7 @@ client_new_sock( const char * path )
         return -1;
     }
 
-    if( 0 > connect( fd, ( struct sockaddr * )&sun, SUN_LEN( &sun ) ) )
+    if( 0 > connect( fd, ( struct sockaddr * )&sa, SUN_LEN( &sa ) ) )
     {
         errnomsg( "failed to connect to socket file: %s", path );
         close( fd );

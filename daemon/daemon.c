@@ -252,7 +252,7 @@ getlock( const char * path )
 int
 getsock( const char * path )
 {
-    struct sockaddr_un sun;
+    struct sockaddr_un sa;
     int                fd;
 
     fd = socket( PF_LOCAL, SOCK_STREAM, 0 );
@@ -262,15 +262,15 @@ getsock( const char * path )
         return -1;
     }
 
-    memset( &sun, 0, sizeof sun );
-    sun.sun_family = AF_LOCAL;
-    strlcpy( sun.sun_path, path, sizeof sun.sun_path );
+    memset( &sa, 0, sizeof sa );
+    sa.sun_family = AF_LOCAL;
+    strlcpy( sa.sun_path, path, sizeof sa.sun_path );
     unlink( path );
-    if( 0 > bind( fd, ( struct sockaddr * )&sun, SUN_LEN( &sun ) ) )
+    if( 0 > bind( fd, ( struct sockaddr * )&sa, SUN_LEN( &sa ) ) )
     {
         /* bind can sometimes fail on the first call */
         unlink( path );
-        if( 0 > bind( fd, ( struct sockaddr * )&sun, SUN_LEN( &sun ) ) )
+        if( 0 > bind( fd, ( struct sockaddr * )&sa, SUN_LEN( &sa ) ) )
         {
             errnomsg( "failed to bind socket file: %s", path );
             close( fd );

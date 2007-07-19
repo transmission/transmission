@@ -188,7 +188,7 @@ server_listen( int fd )
 void
 newclient( int fd, short event UNUSED, void * arg )
 {
-    struct sockaddr_un   sun;
+    struct sockaddr_un   sa;
     struct client      * client, * old;
     socklen_t            socklen;
     struct bufferevent * clev;
@@ -211,8 +211,8 @@ newclient( int fd, short event UNUSED, void * arg )
             return;
         }
 
-        socklen = sizeof sun;
-        clfd = accept( fd, ( struct sockaddr * )&sun, &socklen );
+        socklen = sizeof sa;
+        clfd = accept( fd, ( struct sockaddr * )&sa, &socklen );
         if( 0 > clfd )
         {
             if( EWOULDBLOCK != errno && EAGAIN != errno &&

@@ -195,18 +195,18 @@ readargs( int argc, char ** argv, char ** sockpath )
 int
 makesock( enum confpathtype type, const char * path )
 {
-    struct sockaddr_un sun;
+    struct sockaddr_un sa;
     int                fd;
 
-    memset( &sun, 0, sizeof sun );
-    sun.sun_family = AF_LOCAL;
+    memset( &sa, 0, sizeof sa );
+    sa.sun_family = AF_LOCAL;
     if( NULL == path )
     {
-        confpath( sun.sun_path, sizeof sun.sun_path, CONF_FILE_SOCKET, type );
+        confpath( sa.sun_path, sizeof sa.sun_path, CONF_FILE_SOCKET, type );
     }
     else
     {
-        strlcpy( sun.sun_path, path, sizeof sun.sun_path );
+        strlcpy( sa.sun_path, path, sizeof sa.sun_path );
     }
 
     fd = socket( AF_UNIX, SOCK_STREAM, 0 );
@@ -216,9 +216,9 @@ makesock( enum confpathtype type, const char * path )
         return -1;
     }
 
-    if( 0 > connect( fd, ( struct sockaddr * )&sun, SUN_LEN( &sun ) ) )
+    if( 0 > connect( fd, ( struct sockaddr * )&sa, SUN_LEN( &sa ) ) )
     {
-        errnomsg( "failed to connect to socket file: %s", sun.sun_path );
+        errnomsg( "failed to connect to socket file: %s", sa.sun_path );
         close( fd );
         return -1;
     }
