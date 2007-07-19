@@ -22,8 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <config.h>
-
 #include <sys/param.h>
 #include <errno.h>
 #include <getopt.h>

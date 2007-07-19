@@ -7,7 +7,7 @@ SRCS = TRApplication.cpp TRWindow.cpp TRTransfer.cpp \
        TRPrefsWindow.cpp TRInfoWindow.cpp
 OBJS = $(SRCS:%.cpp=%.o)
 
-CXXFLAGS += -I../libtransmission -IlibPrefs
+CXXFLAGS += -I.. -IlibPrefs
 LDLIBS   += ../libtransmission/libtransmission.a
 CXXFLAGS += -IlibPrefs
 LDFLAGS  += -lbe -ltracker

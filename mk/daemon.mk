@@ -14,7 +14,7 @@ CLIOBJS  = $(CLISRCS:%.c=%.o)
 PXYOBJS  = $(PXYSRCS:%.c=%.o)
 SRCS     = $(COMSRCS) $(SRVSRCS) $(CLISRCS) $(PXYSRCS)
 
-CFLAGS  += $(CFLAGS_EVENT) -I../libtransmission
+CFLAGS  += $(CFLAGS_EVENT) -I..
 LDLIBS  += ../libtransmission/libtransmission.a
 LDFLAGS += $(LDFLAGS_EVENT)
 

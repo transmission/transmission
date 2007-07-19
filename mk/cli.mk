@@ -6,7 +6,7 @@ include ../mk/common.mk
 SRCS = transmissioncli.c
 OBJS = $(SRCS:%.c=%.o)
 
-CFLAGS  += -I../libtransmission
+CFLAGS  += -I..
 LDLIBS  += ../libtransmission/libtransmission.a
 
 transmissioncli: $(OBJS) ../libtransmission/libtransmission.a
