@@ -59,7 +59,7 @@ AM_CONDITIONAL([WITH_LIBEVENT],[test "x$use_libevent" = "xyes"])
 
 dnl ----------------------------------------------------------------------------
 dnl
-dnl  GTK+ detection for the GTK+ client
+dnl  detection for the GTK+ client
 
 AM_PATH_GTK_2_0($GTK_MINIMUM,[have_gtk=yes],[have_gtk=no][gthread])
 AC_ARG_WITH(gtk, AC_HELP_STRING([--with-gtk], [Build gtk client]),
@@ -76,6 +76,27 @@ if test "x$want_gtk" = "xyes" ; then
     fi
 fi
 AM_CONDITIONAL([WITH_GTK],[test "x$use_gtk" = "xyes"])
+
+
+dnl ----------------------------------------------------------------------------
+dnl
+dnl  wxWidgets detection for the wxWidgets client
+
+
+AM_OPTIONS_WXCONFIG
+AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
+AC_ARG_WITH(wx, AC_HELP_STRING([--with-wx], [Build wxWidgets client]),
+                [want_wx=$withval],
+                [want_wx=$have_wx])
+use_wx=no
+if test "x$want_wx" = "xyes" ; then
+    if test "x$have_wx" = "xyes"; then
+      use_wx=yes
+    else
+      AC_MSG_ERROR("wxWidgets not found!")
+    fi
+fi
+AM_CONDITIONAL([HAVE_WX],[test "x$use_wx" = "xyes"])
 
 
 
@@ -201,7 +222,9 @@ AC_CONFIG_FILES([Makefile
                  libtransmission/Makefile
                  libtransmission/version.h
                  macosx/Makefile
-                 macosx/Info.plist])
+                 macosx/Info.plist
+                 wx/Makefile
+                 wx/xpm/Makefile])
 
 AC_OUTPUT
 
@@ -209,11 +232,12 @@ echo "
 
 Configuration:
 
-        Source code location:  ${srcdir}
-        Compiler:              ${CXX}
-        Build BeOS client:     ${beos}
-        Build Daemon:          ${use_libevent}
-        Build GTK+ client:     ${use_gtk}
-        Build OS X client:     ${darwin}
+        Source code location:    ${srcdir}
+        Compiler:                ${CXX}
+        Build BeOS client:       ${beos}
+        Build Daemon:            ${use_libevent}
+        Build GTK+ client:       ${use_gtk}
+        Build OS X client:       ${darwin}
+        Build wxWidgets client:  ${use_wx}
 
 "
