@@ -1,3 +1,17 @@
+/*
+ * This file Copyright (C) 2007 Charles Kerr <charles@rebelbase.com>
+ *
+ * This file is licensed by the GPL version 2.  Works owned by the
+ * Transmission project are granted a special exemption to clause 2(b)
+ * so that the bulk of its code can remain under the MIT license. 
+ * This exemption does not extend to derived works not owned by
+ * the Transmission project.
+ */
+
+#include <set>
+#include <map>
+#include <string>
+#include <vector>
 #include <iostream>
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
@@ -31,6 +45,10 @@ public:
 
 protected:
     wxConfig * myConfig;
+
+private:
+    void rebuildTorrentList();
+    wxListCtrl * myTorrentList;
 };
 
 enum
@@ -89,6 +107,125 @@ bool MyApp::OnInit()
     frame->Show( true );
     SetTopWindow( frame );
     return true;
+}
+
+/***
+****
+***/
+
+
+namespace
+{
+    enum
+    {
+        COL_NUMBER,
+        COL_DONE,
+        COL_DOWNLOAD_SPEED,
+        COL_ETA,
+        COL_HASH,
+        COL_NAME,
+        COL_PEERS,
+        COL_RATIO,
+        COL_RECEIVED,
+        COL_REMAINING,
+        COL_SEEDS,
+        COL_SEND,
+        COL_SIZE,
+        COL_STATE,
+        COL_STATUS,
+        COL_TOTAL,
+        COL_UPLOAD_SPEED,
+        N_COLS
+    };
+
+    int getTorrentColumn( const wxString& wxKey )
+    {
+        const std::string key ( wxKey.c_str() );
+        typedef std::map<std::string,int> string2key_t;
+        static string2key_t columns;
+
+        if( columns.empty() )
+        {
+            columns["#"]         = COL_NUMBER;
+            columns["done"]      = COL_DONE;
+            columns["dspeed"]    = COL_DOWNLOAD_SPEED;
+            columns["eta"]       = COL_ETA;
+            columns["hash"]      = COL_HASH;
+            columns["name"]      = COL_NAME;
+            columns["peers"]     = COL_PEERS;
+            columns["ratio"]     = COL_RATIO;
+            columns["received"]  = COL_RECEIVED;
+            columns["remaining"] = COL_REMAINING;
+            columns["seeds"]     = COL_SEEDS; 
+            columns["sent"]      = COL_SEND; 
+            columns["size"]      = COL_SIZE; 
+            columns["state"]     = COL_STATE; 
+            columns["status"]    = COL_STATUS; 
+            columns["total"]     = COL_TOTAL; 
+            columns["uspeed"]    = COL_UPLOAD_SPEED;
+        }
+
+        int i = -1;
+        string2key_t::const_iterator it = columns.find( key );
+        if( it != columns.end() )
+            i = it->second;
+
+        return i;
+    }
+
+    std::vector<int> getTorrentColumns( wxConfig * config )
+    {
+        const wxString key = _T("TorrentListColumns");
+        wxString columnStr;
+        if( !config->Read( key, &columnStr ) )
+            columnStr = _T("name|#|size|done|status|seeds|peers|eta|uspeed|dspeed");
+
+        std::vector<int> cols;
+        while( !columnStr.IsEmpty() )
+        {
+            const wxString key = columnStr.BeforeFirst(_T('|'));
+            columnStr.Remove( 0, key.Len() + 1 );
+            cols.push_back( getTorrentColumn( key ) );
+        }
+        return cols;
+    }
+}
+
+void
+MyFrame :: rebuildTorrentList()
+{
+    myTorrentList->ClearAll( );
+
+    int i = 0;
+    const std::vector<int> cols = getTorrentColumns( myConfig );
+    for( std::vector<int>::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
+    {
+        wxString h;
+
+        switch( *it )
+        {
+            case COL_NUMBER:          h = _T("#"); break;
+            case COL_DONE:            h = _T("Done"); break;
+            case COL_DOWNLOAD_SPEED:  h = _T("Download"); break;
+            case COL_ETA:             h = _T("ETA"); break;
+            case COL_HASH:            h = _T("SHA1 Hash"); break;
+            case COL_NAME:            h = _T("Name"); break;
+            case COL_PEERS:           h = _T("Peers"); break;
+            case COL_RATIO:           h = _T("Ratio"); break;
+            case COL_RECEIVED:        h = _T("Received"); break;
+            case COL_REMAINING:       h = _T("Remaining"); break;
+            case COL_SEEDS:           h = _T("Seeds"); break;
+            case COL_SEND:            h = _T("Send"); break;
+            case COL_SIZE:            h = _T("Size"); break;
+            case COL_STATE:           h = _T("State"); break;
+            case COL_STATUS:          h = _T("Status"); break;
+            case COL_TOTAL:           h = _T("Total"); break;
+            case COL_UPLOAD_SPEED:    h = _T("Upload"); break;
+            default:                  h = _T("Error"); break;
+        }
+
+        myTorrentList->InsertColumn( i++, h );
+    }
 }
 
 /***
@@ -193,24 +330,18 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     ***  Torrent List
     **/
 
-    wxListCtrl * torrents = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-                                            wxLC_REPORT|wxLC_SINGLE_SEL );
-    torrents->InsertColumn( 0, _T("Name") );
-    torrents->InsertColumn( 1, _T("#") );
-    torrents->InsertColumn( 2, _T("Size") );
-    torrents->InsertColumn( 3, _T("Done") );
-    torrents->InsertColumn( 4, _T("Status") );
-    torrents->InsertColumn( 5, _T("Seeds") );
-    torrents->InsertColumn( 6, _T("Peers") );
-    row_sizer->Add( torrents, wxSizerFlags().Expand() );
+    myTorrentList = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                    wxLC_REPORT|wxLC_SINGLE_SEL );
+    rebuildTorrentList();
+    row_sizer->Add( myTorrentList, wxSizerFlags().Expand() );
     row_sizer->AddGrowableCol( 1, 1 );
 
-    i = torrents->InsertItem( 0, _T("Fedora.iso") );
-    torrents->SetItem( i, 1, _T("*"));
-    torrents->SetItem( i, 2, _T("4.4 GiB"));
-    torrents->SetItem( i, 3, _T("50%"));
-    torrents->SetItem( i, 4, _T("0 (77)"));
-    torrents->SetItem( i, 5, _T("1 (128)"));
+    i = myTorrentList->InsertItem( 0, _T("Fedora.iso") );
+    myTorrentList->SetItem( i, 1, _T("*"));
+    myTorrentList->SetItem( i, 2, _T("4.4 GiB"));
+    myTorrentList->SetItem( i, 3, _T("50%"));
+    myTorrentList->SetItem( i, 4, _T("0 (77)"));
+    myTorrentList->SetItem( i, 5, _T("1 (128)"));
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
