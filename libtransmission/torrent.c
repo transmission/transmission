@@ -982,6 +982,27 @@ tr_torrentFree( tr_torrent_t * tor )
 }
 
 static void
+recheckCpState( tr_torrent_t * tor )
+{
+    cp_status_t cpStatus;
+
+    tr_torrentWriterLock( tor );
+
+    cpStatus = tr_cpGetStatus( tor->completion );
+    if( cpStatus != tor->cpStatus ) {
+        tor->cpStatus = cpStatus;
+        tor->hasChangedState = tor->cpStatus;  /* tell the client... */
+        if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
+            && tor->tracker!=NULL           /* and we have a tracker */
+            && tor->downloadedCur ) {        /* and it just happened */
+            tr_trackerCompleted( tor->tracker ); /* tell the tracker */
+        }
+        tr_ioSync( tor->io );
+    }
+    tr_torrentWriterUnlock( tor );
+}
+
+static void
 torrentThreadLoop ( void * _tor )
 {
     static tr_lock_t checkFilesLock;
@@ -997,14 +1018,14 @@ torrentThreadLoop ( void * _tor )
     /* loop until the torrent is being deleted */
     while( ! ( tor->dieFlag && (tor->runStatus == TR_RUN_STOPPED) ) )
     {
-        cp_status_t cpStatus;
-
         /* sleep a little while */
         tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 600 );
 
-        if( tor->fastResumeDirty ) {
+        if( tor->fastResumeDirty )
+        {
             tor->fastResumeDirty = FALSE;
             fastResumeSave( tor );
+            recheckCpState( tor );
         }
 
         /* if we're stopping... */
@@ -1108,19 +1129,7 @@ torrentThreadLoop ( void * _tor )
             }
 
             /* refresh our completion state */
-            tr_torrentWriterLock( tor );
-            cpStatus = tr_cpGetStatus( tor->completion );
-            if( cpStatus != tor->cpStatus ) {
-                tor->cpStatus = cpStatus;
-                tor->hasChangedState = tor->cpStatus;  /* tell the client... */
-                if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
-                    && tor->tracker!=NULL           /* and we have a tracker */
-                    && tor->downloadedCur ) {        /* and it just happened */
-                    tr_trackerCompleted( tor->tracker ); /* tell the tracker */
-                }
-                tr_ioSync( tor->io );
-            }
-            tr_torrentWriterUnlock( tor );
+            recheckCpState( tor );
 
             /* ping the tracker... */
             tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
