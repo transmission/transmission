@@ -39,6 +39,11 @@
 
 #define UPDATE_INTERVAL_MSEC 1500
 
+#if !GTK_CHECK_VERSION(2,6,0)
+#define GTK_STOCK_FILE NULL
+#define GTK_STOCK_DIRECTORY NULL
+#endif
+
 /****
 *****  PIECES VIEW
 ****/
