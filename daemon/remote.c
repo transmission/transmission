@@ -132,9 +132,9 @@ static struct torhashes gl_hashids      = RB_INITIALIZER( &gl_hashids );
 static int              gl_gotlistinfo  = 0;
 static int              gl_gotliststat  = 0;
 
-RB_GENERATE_STATIC( torlist,   torinfo, idlinks,   toridcmp );
-RB_GENERATE_STATIC( tornames,  torinfo, namelinks, tornamecmp );
-RB_GENERATE_STATIC( torhashes, torhash, link,      torhashcmp );
+RB_GENERATE_STATIC( torlist,   torinfo, idlinks,   toridcmp )
+RB_GENERATE_STATIC( tornames,  torinfo, namelinks, tornamecmp )
+RB_GENERATE_STATIC( torhashes, torhash, link,      torhashcmp )
 
 int
 main( int argc, char ** argv )

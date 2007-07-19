@@ -68,6 +68,19 @@ struct bufferevent;
 #undef NULL
 #define NULL                    ( ( void * )0 )
 
+#ifndef AF_LOCAL
+#define AF_LOCAL AF_UNIX
+#endif
+
+#ifndef PF_LOCAL
+#define PF_LOCAL PF_UNIX
+#endif
+
+#ifndef SUN_LEN
+#define SUN_LEN( sun )                                                       \
+  ( sizeof( *(sun) ) - sizeof( (sun)->sun_path ) + strlen( (sun)->sun_path ) )
+#endif
+
 #define SAFEFREE( ptr )                                                       \
     do                                                                        \
     {                                                                         \
