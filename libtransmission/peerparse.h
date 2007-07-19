@@ -113,7 +113,7 @@ static int parseHave( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_ERROR_ASSERT;
     }
 
-    TR_NTOHL( p, piece );
+    piece = tr_ntohl( p );
     if( ( uint32_t )inf->pieceCount <= piece )
     {
         peer_dbg( "GET  have, invalid piece" );
@@ -214,9 +214,9 @@ static int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_OK;
     }
     
-    TR_NTOHL( p,     index );
-    TR_NTOHL( &p[4], begin );
-    TR_NTOHL( &p[8], length );
+    index = tr_ntohl( p );
+    begin = tr_ntohl( &p[4] );
+    length = tr_ntohl( &p[8] );
 
     if( inf->pieceCount <= index )
     {
@@ -293,8 +293,8 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_ERROR_ASSERT;
     }
 
-    TR_NTOHL( p,     index );
-    TR_NTOHL( &p[4], begin );
+    index = tr_ntohl( p );
+    begin = tr_ntohl( &p[4] );
 
     if( inf->pieceCount <= index )
     {
@@ -396,9 +396,9 @@ static int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
         return TR_ERROR_ASSERT;
     }
 
-    TR_NTOHL( p,     index );
-    TR_NTOHL( &p[4], begin );
-    TR_NTOHL( &p[8], length );
+    index = tr_ntohl( p );
+    begin = tr_ntohl( &p[4] );
+    length = tr_ntohl( &p[8] );
 
     if( inf->pieceCount <= index )
     {
@@ -453,7 +453,7 @@ parseMessageHeader( tr_peer_t * peer, uint8_t * buf, int buflen,
     }
 
     /* Get payload size */
-    TR_NTOHL( buf, *msglen );
+    *msglen = tr_ntohl( buf );
 
     if( 4 + *msglen > buflen )
     {

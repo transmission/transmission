@@ -87,7 +87,6 @@ int vasprintf( char **, const char *, va_list );
 
 /* Convenient macros to perform uint32_t endian conversions with
    char pointers */
-#define TR_NTOHL(p,a) (a) = tr_ntohl((p))
 #define TR_HTONL(a,p) tr_htonl((a), ( uint8_t * )(p))
 static inline uint32_t tr_ntohl( uint8_t * p )
 {

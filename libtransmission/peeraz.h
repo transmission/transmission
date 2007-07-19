@@ -284,7 +284,7 @@ parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
         return TR_NET_BLOCK;
     }
     /* message length */
-    TR_NTOHL( buf, msglen );
+    msglen = tr_ntohl( buf );
     msglen += 4;
     off = 4;
     if( msglen > len )
@@ -297,7 +297,7 @@ parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
         return TR_NET_CLOSE;
     }
     /* name length */
-    TR_NTOHL( buf + off, namelen );
+    namelen = tr_ntohl( buf + off );
     off += 4;
     if( off + namelen + 1 > msglen )
     {
