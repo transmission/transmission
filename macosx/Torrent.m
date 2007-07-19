@@ -327,10 +327,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     else if (![self isComplete])
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
-                "Torrent -> progress string"),
-                [NSString stringForFileSize: [self downloadedValid]], [NSString stringForFileSize: [self size]],
-                100.0 * [self progress], [NSString stringForFileSize: [self uploadedTotal]],
-                [NSString stringForRatio: [self ratio]]];
+                "Torrent -> progress string"), [NSString stringForFileSize: [self downloadedValid]],
+                [NSString stringForFileSize: [self size]], 100.0 * [self progress],
+                [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
     else
         [progressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],
@@ -811,6 +810,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         NSDictionary * fsAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
         uint64_t remainingSpace = [[fsAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
+        #warning add  file size to remaining space and add total size
         if (remainingSpace <= fStat->left)
         {
             NSAlert * alert = [[NSAlert alloc] init];
@@ -818,7 +818,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                                     NSLocalizedString(@"Not enough remaining disk space to download \"%@\" completely.",
                                         "Torrent file disk space alert -> title"), [self name]]];
             [alert setInformativeText: [NSString stringWithFormat:
-                            NSLocalizedString(@"The transfer will be paused. Clear up space on \"%@\" to continue.",
+                            NSLocalizedString(@"The transfer will be paused. Clear up space on %@ to continue.",
                                                 "Torrent file disk space alert -> message"), volumeName]];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
