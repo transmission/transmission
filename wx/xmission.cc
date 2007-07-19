@@ -7,12 +7,6 @@
 #include <wx/wx.h>
 extern "C" {
   #include <libtransmission/transmission.h>
-  #include "xpm/transmission.xpm"
-  #include "xpm/fileopen.xpm"
-  #include "xpm/gtk-remove.xpm"
-  #include "xpm/gtk-properties.xpm"
-  #include "xpm/exec.xpm"
-  #include "xpm/stop.xpm"
 }
 
 class MyApp : public wxApp
@@ -82,7 +76,7 @@ bool MyApp::OnInit()
 {
     handle = tr_init( "wx" );
 
-    MyFrame * frame = new MyFrame( _T("Transmission"),
+    MyFrame * frame = new MyFrame( _T("Xmission"),
                                    wxPoint(50,50),
                                    wxSize(450,350));
 
@@ -108,7 +102,12 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     wxFrame((wxFrame*)NULL,-1,title,pos,size),
     myConfig( new wxConfig( _T("xmission") ) )
 {
-    SetIcon( wxIcon( transmission_xpm ) );
+    wxImage::AddHandler( new wxPNGHandler );
+    wxImage transmission_logo ( _T("xpm/transmission.png"), wxBITMAP_TYPE_PNG );
+    wxIcon ico;
+    ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
+    SetIcon( ico );
+    //SetIcon( wxImage( _T("xpm/transmission.png"), wxBITMAP_TYPE_PNG ) );
 
     /**
     ***  Menu
@@ -137,7 +136,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     m = new wxMenu;
     m->Append( ID_SHOW_DEBUG_WINDOW, _T("Show &Debug Window") );
     m->AppendSeparator();
-    m->Append( wxID_ABOUT, _T("&About Transmission") );
+    m->Append( wxID_ABOUT, _T("&About Xmission") );
     menuBar->Append( m, _T("&Help") );
 
     SetMenuBar(menuBar);
@@ -146,16 +145,20 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     ***  Toolbar
     **/
 
+    wxImage open_image( _T("xpm/fileopen.png"),        wxBITMAP_TYPE_PNG );
+    wxImage exec_image( _T("xpm/exec.png"),            wxBITMAP_TYPE_PNG );
+    wxImage stop_image( _T("xpm/stop.png"),            wxBITMAP_TYPE_PNG );
+    wxImage drop_image( _T("xpm/gtk-remove.png"),      wxBITMAP_TYPE_PNG );
+    wxImage info_image( _T("xpm/gtk-properties.png"),  wxBITMAP_TYPE_PNG );
+
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( wxID_OPEN, _T("Open"), wxIcon( fileopen_xpm ) );
-    //toolbar->AddTool( wxID_OPEN, _T("Open"), wxIcon( gtk_open_xpm ) );
-    //toolbar->AddTool( ID_START, _T("Start"), wxIcon( gtk_execute_xpm ) );
-    toolbar->AddTool( ID_START, _T("Start"), wxIcon( exec_xpm ) );
-    toolbar->AddTool( wxID_STOP, _T("Stop"), wxIcon( stop_xpm ) );
-    toolbar->AddTool( wxID_REMOVE, _T("Remove"), wxIcon( gtk_remove_xpm ) );
+    toolbar->AddTool( wxID_OPEN,   _T("Open"), open_image );
+    toolbar->AddTool( ID_START,    _T("Start"), exec_image );
+    toolbar->AddTool( wxID_STOP,   _T("Stop"), stop_image );
+    toolbar->AddTool( wxID_REMOVE, _T("Remove"), drop_image );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_TORRENT_INFO, _("Torrent Info"), wxIcon( gtk_properties_xpm ) );
+    toolbar->AddTool( ID_TORRENT_INFO, _("Torrent Info"), info_image );
     toolbar->Realize();
 
     /**
@@ -163,7 +166,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     **/
 
     CreateStatusBar();
-    SetStatusText(_T("Welcome to Transmission!"));
+    SetStatusText(_T("Welcome to Xmission!"));
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -173,21 +176,21 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
+    wxImage transmission_logo ( _T("xpm/transmission.png"), wxBITMAP_TYPE_PNG );
+    wxIcon ico;
+    ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
+
     wxAboutDialogInfo info;
-    info.SetName(_T("Transmission"));
+    info.SetName(_T("Xmission"));
     info.SetVersion(_T(LONG_VERSION_STRING));
     info.SetCopyright(_T("Copyright 2005-2007 The Transmission Project"));
     info.SetDescription(_T("A fast, lightweight bittorrent client"));
     info.SetWebSite( _T( "http://transmission.m0k.org/" ) );
-    info.SetIcon( wxIcon( transmission_xpm ) );
+    info.SetIcon( ico );
     info.AddDeveloper( "Josh Elsasser (Back-end; GTK+)" );
     info.AddDeveloper ("Charles Kerr (Back-end, GTK+, wxWidgets)");
     info.AddDeveloper( "Mitchell Livingston (Back-end; OS X)" );
     info.AddDeveloper( "Eric Petit (Back-end; OS X)" );
     info.AddDeveloper( "Bryan Varner (BeOS)" );
     wxAboutBox( info );
-
-    //wxMessageBox(_T("Transmission " LONG_VERSION_STRING),
-     //            _T("About Transmission"),
-      //           wxOK|wxICON_INFORMATION, this);
 }
