@@ -147,6 +147,9 @@ EOF
     fi
     ;;
 
+  *solaris*)
+    LIBS="$LIBS -lsocket -lnsl"
+    ;;
 
 esac
 AM_CONDITIONAL([HAVE_BEOS],[test "x$beos" = "xyes"])
