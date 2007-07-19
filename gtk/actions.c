@@ -21,12 +21,6 @@
 #define UNUSED
 #endif
 
-#if !GTK_CHECK_VERSION(2,6,0)
-#define GTK_STOCK_ABOUT NULL
-#endif
-
-
-
 extern void doAction (const char * action_name, gpointer user_data );
 
 static GtkActionGroup * myGroup = 0;

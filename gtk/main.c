@@ -888,8 +888,6 @@ getselection( struct cbdata * cbdata )
 static void
 about ( void )
 {
-#if GTK_CHECK_VERSION(2,6,0)
-
   GtkWidget * w = gtk_about_dialog_new ();
   GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
   const char *authors[] = { "Eric Petit (Back-end; OS X)",
@@ -909,23 +907,6 @@ about ( void )
   gtk_about_dialog_set_translator_credits (a, _("translator-credits"));
   g_signal_connect_swapped (w, "response", G_CALLBACK (gtk_widget_destroy), w);
   gtk_widget_show_all (w);
-
-#else
-
-  GtkWidget * w = gtk_message_dialog_new_with_markup(
-    NULL,
-    GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
-    GTK_MESSAGE_INFO,
-    GTK_BUTTONS_CLOSE,
-    "<b>%s %s</b>\n\n%s\n%s",
-    g_get_application_name(), LONG_VERSION_STRING,
-    "http://transmission.m0k.org/",
-    _("Copyright 2005-2007 The Transmission Project"));
-  g_signal_connect_swapped (w, "response",
-                            G_CALLBACK (gtk_widget_destroy), w);
-  gtk_widget_show_all( w );
-
-#endif
 }
 
 static void

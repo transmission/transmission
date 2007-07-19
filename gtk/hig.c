@@ -163,12 +163,6 @@ hig_message_dialog_set_text (GtkMessageDialog * dialog,
                              const char       * primary,
                              const char       * secondary)
 {
-#if GTK_CHECK_VERSION(2,6,0)
   gtk_message_dialog_set_markup (dialog, primary);
   gtk_message_dialog_format_secondary_text (dialog, "%s", secondary);
-#else
-  char * pch = g_strdup_printf ("<b>%s</b>\n \n%s", primary, secondary);
-  gtk_message_dialog_set_markup (dialog, pch);
-  g_free (pch);
-#endif
 }
