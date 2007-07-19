@@ -135,8 +135,8 @@ getMTimes( const tr_torrent_t * tor, int * setme_n )
     return m;
 }
 
-static inline void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
-                                        uint32_t count, FILE * file )
+static void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
+                                 uint32_t count, FILE * file )
 {
     uint32_t  datalen = size * count;
 

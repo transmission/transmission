@@ -67,10 +67,10 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
 
 #define sortPeersAscending(a,ac,z,zc,n,nc)  sortPeers(a,ac,z,zc,n,nc,0)
 #define sortPeersDescending(a,ac,z,zc,n,nc) sortPeers(a,ac,z,zc,n,nc,1)
-static inline void sortPeers( tr_peer_t ** all, int allCount,
-                              tr_peer_t ** zero, int * zeroCount,
-                              tr_peer_t ** nonZero, int * nonZeroCount,
-                              int order )
+static void sortPeers( tr_peer_t ** all, int allCount,
+                       tr_peer_t ** zero, int * zeroCount,
+                       tr_peer_t ** nonZero, int * nonZeroCount,
+                       int order )
 {
     int i, shuffle;
 

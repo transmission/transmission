@@ -706,7 +706,7 @@ int _tr_blockPiece( const tr_torrent_t * tor, int block )
     return block / ( inf->pieceSize / tor->blockSize );
 }
 
-inline int _tr_blockSize( const tr_torrent_t * tor, int block )
+int _tr_blockSize( const tr_torrent_t * tor, int block )
 {
     const tr_info_t * inf = &tor->info;
     int dummy;
