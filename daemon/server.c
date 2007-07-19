@@ -301,7 +301,7 @@ byebye( struct bufferevent * ev, short what, void * arg UNUSED )
         }
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.ev = ev;
     client = RB_FIND( allclients, &gl_clients, &key );
     assert( NULL != client );

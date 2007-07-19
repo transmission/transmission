@@ -288,7 +288,7 @@ readargs( int argc, char ** argv, struct opts * opts )
     int opt, gotmsg;
 
     gotmsg = 0;
-    bzero( opts, sizeof *opts );
+    memset( opts, 0, sizeof *opts );
     opts->type = CONF_PATH_TYPE_DAEMON;
     SLIST_INIT( &opts->files );
     opts->map = -1;
@@ -492,7 +492,7 @@ hasharg( const char * arg, struct strlist * list, int * all )
     }
 
     /* try to look up the hash in the hash tree */
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     strlcpy( key.hash, listitem->str, sizeof key.hash );
     treeitem = RB_FIND( torhashes, &gl_hashids, &key );
     if( NULL == treeitem )
@@ -622,7 +622,7 @@ infomsg( const struct cl_info * cinfo )
         return;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.id = cinfo->id;
     tinfo = RB_FIND( torlist, &gl_torinfo, &key );
     if( NULL == tinfo )
@@ -667,7 +667,7 @@ statmsg( const struct cl_stat * st )
         return;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.id = st->id;
     info = RB_FIND( torlist, &gl_torinfo, &key );
     if( NULL == info )
@@ -718,7 +718,7 @@ hashmsg( const struct cl_info * inf )
         return;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     strlcpy( key.hash, inf->hash, sizeof key.hash );
     found = RB_FIND( torhashes, &gl_hashids, &key );
     if( NULL != found )
@@ -840,7 +840,7 @@ sendidreqs( void )
     struct torhash   key, * found;
 
     ret = -1;
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
 
     for( ii = 0; ARRAYLEN( reqs ) > ii; ii++)
     {

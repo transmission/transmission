@@ -145,7 +145,7 @@ client_new_sock( const char * path )
 
     gl_proxy = 0;
 
-    bzero( &sun, sizeof sun );
+    memset( &sun, 0, sizeof sun );
     sun.sun_family = AF_LOCAL;
     strlcpy( sun.sun_path, path, sizeof sun.sun_path );
 
@@ -901,7 +901,7 @@ infomsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
         return;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.tag = tag;
     resp = RB_FIND( resptree, &gl_resps, &key );
     if( NULL == resp || NULL == resp->infocb )
@@ -953,7 +953,7 @@ statmsg( enum ipc_msg msgid, benc_val_t * list, int64_t tag,
         return;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.tag = tag;
     resp = RB_FIND( resptree, &gl_resps, &key );
     if( NULL == resp || NULL == resp->statcb )
@@ -1018,7 +1018,7 @@ defmsg( enum ipc_msg msgid, benc_val_t * val, int64_t tag, void * arg UNUSED )
             break;
     }
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.tag = tag;
     resp = RB_FIND( resptree, &gl_resps, &key );
     if( NULL == resp )

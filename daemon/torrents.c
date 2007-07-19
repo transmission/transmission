@@ -278,7 +278,7 @@ torrent_lookup( const uint8_t * hashstr )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
 
-    bzero( buf, sizeof buf );
+    memset( buf, 0, sizeof buf );
     for( ii = 0; sizeof( hash ) > ii; ii++ )
     {
         if( !isxdigit( hashstr[2*ii] ) || !isxdigit( hashstr[1+2*ii] ) )
@@ -657,7 +657,7 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
 
     if( stillmore )
     {
-        bzero( &tv, sizeof tv );
+        memset( &tv, 0, sizeof tv );
         tv.tv_sec  = TIMER_SECS;
         tv.tv_usec = TIMER_USECS;
         evtimer_add( &gl_event, &tv );
@@ -882,7 +882,7 @@ idlookup( int id )
 {
     struct tor key, * found;
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     key.id = id;
     found = RB_FIND( tortree, &gl_tree, &key );
 
@@ -894,7 +894,7 @@ hashlookup( const uint8_t * hash )
 {
     struct tor key, * found;
 
-    bzero( &key, sizeof key );
+    memset( &key, 0, sizeof key );
     memcpy( key.hash, hash, sizeof key.hash );
     found = RB_FIND( hashtree, &gl_hashes, &key );
 

@@ -198,7 +198,7 @@ makesock( enum confpathtype type, const char * path )
     struct sockaddr_un sun;
     int                fd;
 
-    bzero( &sun, sizeof sun );
+    memset( &sun, 0, sizeof sun );
     sun.sun_family = AF_LOCAL;
     if( NULL == path )
     {

@@ -223,7 +223,7 @@ getlock( const char * path )
         return -1;
     }
 
-    bzero( &lk, sizeof lk );
+    memset( &lk, 0, sizeof lk );
     lk.l_start  = 0;
     lk.l_len    = 0;
     lk.l_type   = F_WRLCK;
@@ -262,7 +262,7 @@ getsock( const char * path )
         return -1;
     }
 
-    bzero( &sun, sizeof sun );
+    memset( &sun, 0, sizeof sun );
     sun.sun_family = AF_LOCAL;
     strlcpy( sun.sun_path, path, sizeof sun.sun_path );
     unlink( path );
