@@ -32,6 +32,8 @@ transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 
 AC_CHECK_LIB([crypto],[CRYPTO_new_ex_data])
 AC_CHECK_LIB([ssl],[SSL_library_init])
+AC_SEARCH_LIBS([socket], [socket net])
+AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 
 dnl ----------------------------------------------------------------------------
 dnl
@@ -145,10 +147,6 @@ You need to install the Universal SDK in order to build Transmission:
 EOF
       exit 1
     fi
-    ;;
-
-  *solaris*)
-    LIBS="$LIBS -lsocket -lnsl"
     ;;
 
 esac
