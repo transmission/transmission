@@ -1487,9 +1487,6 @@
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				OTHER_CFLAGS = (
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGEFILE_SOURCE",
-					"-D_GNU_SOURCE",
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
 					"-D__TRANSMISSION__",
@@ -1510,15 +1507,10 @@
 					i386,
 				);
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/build/Debug";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
 				OTHER_CFLAGS = (
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGEFILE_SOURCE",
-					"-D_GNU_SOURCE",
-					"-DSYS_DARWIN",
-					"-DHAVE_OPENSSL",
-					"-D__TRANSMISSION__",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Debug;
@@ -1601,13 +1593,8 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/libevent\"";
 				OTHER_CFLAGS = (
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGEFILE_SOURCE",
-					"-D_GNU_SOURCE",
-					"-DSYS_DARWIN",
-					"-DHAVE_OPENSSL",
-					"-D__TRANSMISSION__",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-daemon";
 				ZERO_LINK = NO;
@@ -1638,13 +1625,8 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/libevent\"";
 				OTHER_CFLAGS = (
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGEFILE_SOURCE",
-					"-D_GNU_SOURCE",
-					"-DSYS_DARWIN",
-					"-DHAVE_OPENSSL",
-					"-D__TRANSMISSION__",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-remote";
 				ZERO_LINK = NO;
@@ -1676,13 +1658,8 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/libevent\"";
 				OTHER_CFLAGS = (
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGEFILE_SOURCE",
-					"-D_GNU_SOURCE",
-					"-DSYS_DARWIN",
-					"-DHAVE_OPENSSL",
-					"-D__TRANSMISSION__",
 				);
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-proxy";
 				ZERO_LINK = NO;
