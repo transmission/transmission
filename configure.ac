@@ -224,7 +224,7 @@ AC_CONFIG_FILES([Makefile
                  macosx/Makefile
                  macosx/Info.plist
                  wx/Makefile
-                 wx/xpm/Makefile])
+                 wx/images/Makefile])
 
 AC_OUTPUT
 
