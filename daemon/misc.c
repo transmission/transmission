@@ -202,3 +202,38 @@ readfile( const char * name, size_t * len )
 
     return buf;
 }
+
+#ifndef HAVE_DAEMON
+
+int
+daemon( int nochdir, int noclose )
+{
+    pid_t child;
+    int   null;
+
+    child = fork();
+    if( 0 > child )
+        return -1;
+    else if( 0 != child )
+        exit( 0 );
+
+    if( 0 > setsid() )
+        return -1;
+
+    if( !nochdir && 0 > chdir( "/" ) )
+        return -1;
+
+    if( !noclose )
+    {
+        null = open( "/dev/null", O_RDWR );
+        if( 0 > null )
+            return -1;
+        if( 0 > dup2( null, 0 ) || 0 > dup2( null, 1 ) || 0 > dup2( null, 2 ) )
+            return -1;
+        close( null );
+    }
+
+    return -1;
+}
+
+#endif

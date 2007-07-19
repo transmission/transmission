@@ -148,4 +148,8 @@ void         absolutify( char *, size_t, const char * );
 int          writefile ( const char *, uint8_t *, ssize_t );
 uint8_t *    readfile  ( const char *, size_t * );
 
+#ifndef HAVE_DAEMON
+int daemon( int, int );
+#endif
+
 #endif /* TR_DAEMON_MISC_H */
