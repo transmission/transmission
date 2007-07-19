@@ -4,6 +4,8 @@
 #include <wx/defs.h>
 #include <wx/config.h>
 #include <wx/toolbar.h>
+#include <wx/splitter.h>
+#include <wx/notebook.h>
 #include <wx/wx.h>
 extern "C" {
   #include <libtransmission/transmission.h>
@@ -161,7 +163,73 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     toolbar->Realize();
 
     /**
-    ***  Status Bar
+    ***  Row 1
+    **/
+
+    wxSplitterWindow * hsplit = new wxSplitterWindow( this );
+
+    wxPanel * row1 = new wxPanel( hsplit, wxID_ANY );
+    wxFlexGridSizer * row_sizer = new wxFlexGridSizer( 2, 0, 5 );
+    row_sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
+    row_sizer->SetFlexibleDirection( wxHORIZONTAL );
+    row1->SetSizer( row_sizer );
+
+    /**
+    ***  Filters
+    **/
+
+    wxListCtrl * filters = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                           wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
+    filters->InsertColumn( wxLIST_FORMAT_LEFT, _T("YYZ") );
+    int i = 0;
+    filters->InsertItem( i++, _T("All") );
+    filters->InsertItem( i++, _T("Downloading (1)") );
+    filters->InsertItem( i++, _T("Completed") );
+    filters->InsertItem( i++, _T("Active (1)") );
+    filters->InsertItem( i++, _T("Inactive") );
+    row_sizer->Add( filters, wxSizerFlags().Expand() );
+
+    /**
+    ***  Torrent List
+    **/
+
+    wxListCtrl * torrents = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                            wxLC_REPORT|wxLC_SINGLE_SEL );
+    torrents->InsertColumn( 0, _T("Name") );
+    torrents->InsertColumn( 1, _T("#") );
+    torrents->InsertColumn( 2, _T("Size") );
+    torrents->InsertColumn( 3, _T("Done") );
+    torrents->InsertColumn( 4, _T("Status") );
+    torrents->InsertColumn( 5, _T("Seeds") );
+    torrents->InsertColumn( 6, _T("Peers") );
+    row_sizer->Add( torrents, wxSizerFlags().Expand() );
+    row_sizer->AddGrowableCol( 1, 1 );
+
+    i = torrents->InsertItem( 0, _T("Fedora.iso") );
+    torrents->SetItem( i, 1, _T("*"));
+    torrents->SetItem( i, 2, _T("4.4 GiB"));
+    torrents->SetItem( i, 3, _T("50%"));
+    torrents->SetItem( i, 4, _T("0 (77)"));
+    torrents->SetItem( i, 5, _T("1 (128)"));
+
+
+    wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
+
+    wxButton * tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
+    notebook->AddPage( tmp, _T("General"), false );
+    tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
+    notebook->AddPage( tmp, _T("Peers"), false );
+    tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
+    notebook->AddPage( tmp, _T("Pieces"), false );
+    tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
+    notebook->AddPage( tmp, _T("Files"), false );
+    tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
+    notebook->AddPage( tmp, _T("Logger"), false );
+
+    hsplit->SplitHorizontally( row1, notebook );
+
+    /**
+    ***  Statusbar
     **/
 
     CreateStatusBar();
