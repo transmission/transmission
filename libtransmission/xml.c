@@ -22,7 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include "transmission.h"
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "utils.h"
 #include "xml.h"
 
 /* http://www.w3.org/TR/2004/REC-xml-20040204/ */

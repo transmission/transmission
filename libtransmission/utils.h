@@ -26,13 +26,14 @@
 #define TR_UTILS_H 1
 
 #include <stdarg.h>
+#include <stdint.h>
 
 void tr_msgInit( void );
 
 #define tr_err( a... ) tr_msg( TR_MSG_ERR, ## a )
 #define tr_inf( a... ) tr_msg( TR_MSG_INF, ## a )
 #define tr_dbg( a... ) tr_msg( TR_MSG_DBG, ## a )
-void tr_msg  ( int level, char * msg, ... ) PRINTF( 2, 3 );
+void tr_msg  ( int level, char * msg, ... );
 
 int  tr_rand ( int );
 
@@ -61,7 +62,7 @@ int tr_strncasecmp( const char * first, const char * second, size_t len );
  * growing the buffer if needed
  **********************************************************************/
 int tr_sprintf( char ** buf, int * used, int * max,
-                const char * format, ... ) PRINTF( 4, 5 );
+                const char * format, ... );
 /* gee, it sure would be nice if BeOS had va_copy() */
 int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
 /* this concatenates some binary data onto the end of a buffer */
@@ -84,26 +85,18 @@ uint64_t tr_date( void );
 /* wait the specified number of milliseconds */
 void tr_wait( uint64_t delay_milliseconds );
 
-#define tr_blockPiece(a) _tr_blockPiece(tor,a)
-int _tr_blockPiece( const tr_torrent_t * tor, int block );
+/***
+****
+***/
 
-#define tr_blockSize(a) _tr_blockSize(tor,a)
-int _tr_blockSize( const tr_torrent_t * tor, int block );
-
-#define tr_blockPosInPiece(a) _tr_blockPosInPiece(tor,a)
-int _tr_blockPosInPiece( const tr_torrent_t * tor, int block );
-
-#define tr_pieceCountBlocks(a) _tr_pieceCountBlocks(tor,a)
-int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece );
-
-#define tr_pieceStartBlock(a) _tr_pieceStartBlock(tor,a)
-int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece );
-
-#define tr_pieceSize(a) _tr_pieceSize(tor,a)
-int _tr_pieceSize( const tr_torrent_t * tor, int piece );
-
-#define tr_block(a,b) _tr_block(tor,a,b)
-int _tr_block( const tr_torrent_t * tor, int index, int begin );
+/* Sometimes the system defines MAX/MIN, sometimes not. In the latter
+   case, define those here since we will use them */
+#ifndef MAX
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#endif
+#ifndef MIN
+#define MIN(a,b) ((a)>(b)?(b):(a))
+#endif
 
 /***
 ****
@@ -128,11 +121,12 @@ char* tr_strndup( const char * str, int len );
 ****
 ***/
 
-struct tr_bitfield_s
+typedef struct tr_bitfield_s
 {
     uint8_t * bits;
     size_t len;
-};
+}
+tr_bitfield_t;
 
 tr_bitfield_t* tr_bitfieldNew( size_t bitcount );
 tr_bitfield_t* tr_bitfieldDup( const tr_bitfield_t* );

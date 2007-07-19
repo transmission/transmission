@@ -23,7 +23,12 @@
  *****************************************************************************/
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,6 +36,8 @@
 
 #include "transmission.h"
 #include "trcompat.h"
+#include "utils.h"
+#include "platform.h"
 
 #define SPRINTF_BUFSIZE         100
 
@@ -694,70 +701,4 @@ tr_wait( uint64_t delay_msec )
 #else
     usleep( 1000 * delay_msec );
 #endif
-}
-
-/***
-****
-***/
-
-int _tr_blockPiece( const tr_torrent_t * tor, int block )
-{
-    const tr_info_t * inf = &tor->info;
-    return block / ( inf->pieceSize / tor->blockSize );
-}
-
-int _tr_blockSize( const tr_torrent_t * tor, int block )
-{
-    const tr_info_t * inf = &tor->info;
-    int dummy;
-
-    if( block != tor->blockCount - 1 ||
-        !( dummy = inf->totalSize % tor->blockSize ) )
-    {
-        return tor->blockSize;
-    }
-
-    return dummy;
-}
-
-int _tr_blockPosInPiece( const tr_torrent_t * tor, int block )
-{
-    const tr_info_t * inf = &tor->info;
-    return tor->blockSize *
-        ( block % ( inf->pieceSize / tor->blockSize ) );
-}
-
-int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece )
-{
-    const tr_info_t * inf = &tor->info;
-    if( piece < inf->pieceCount - 1 ||
-        !( tor->blockCount % ( inf->pieceSize / tor->blockSize ) ) )
-    {
-        return inf->pieceSize / tor->blockSize;
-    }
-    return tor->blockCount % ( inf->pieceSize / tor->blockSize );
-}
-
-int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece )
-{
-    const tr_info_t * inf = &tor->info;
-    return piece * ( inf->pieceSize / tor->blockSize );
-}
-
-int _tr_pieceSize( const tr_torrent_t * tor, int piece )
-{
-    const tr_info_t * inf = &tor->info;
-    if( piece < inf->pieceCount - 1 ||
-        !( inf->totalSize % inf->pieceSize ) )
-    {
-        return inf->pieceSize;
-    }
-    return inf->totalSize % inf->pieceSize;
-}
-
-int _tr_block( const tr_torrent_t * tor, int index, int begin )
-{
-    const tr_info_t * inf = &tor->info;
-    return index * ( inf->pieceSize / tor->blockSize ) +
-        begin / tor->blockSize;
 }

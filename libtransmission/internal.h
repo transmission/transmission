@@ -85,20 +85,10 @@ int vasprintf( char **, const char *, va_list );
    }
 #endif
 
-/* Sometimes the system defines MAX/MIN, sometimes not. In the latter
-   case, define those here since we will use them */
-#ifndef MAX
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#endif
-#ifndef MIN
-#define MIN(a,b) ((a)>(b)?(b):(a))
-#endif
-
 #define TR_MAX_PEER_COUNT 60
 
 typedef struct tr_completion_s tr_completion_t;
 typedef struct tr_shared_s tr_shared_t;
-typedef struct tr_bitfield_s tr_bitfield_t;
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
@@ -129,6 +119,28 @@ void tr_torrentReaderLock    ( const tr_torrent_t * );
 void tr_torrentReaderUnlock  ( const tr_torrent_t * );
 void tr_torrentWriterLock    ( tr_torrent_t * );
 void tr_torrentWriterUnlock  ( tr_torrent_t * );
+
+#define tr_blockPiece(a) _tr_blockPiece(tor,a)
+int _tr_blockPiece( const tr_torrent_t * tor, int block );
+
+#define tr_blockSize(a) _tr_blockSize(tor,a)
+int _tr_blockSize( const tr_torrent_t * tor, int block );
+
+#define tr_blockPosInPiece(a) _tr_blockPosInPiece(tor,a)
+int _tr_blockPosInPiece( const tr_torrent_t * tor, int block );
+
+#define tr_pieceCountBlocks(a) _tr_pieceCountBlocks(tor,a)
+int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece );
+
+#define tr_pieceStartBlock(a) _tr_pieceStartBlock(tor,a)
+int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece );
+
+#define tr_pieceSize(a) _tr_pieceSize(tor,a)
+int _tr_pieceSize( const tr_torrent_t * tor, int piece );
+
+#define tr_block(a,b) _tr_block(tor,a,b)
+int _tr_block( const tr_torrent_t * tor, int index, int begin );
+
 
 typedef enum
 {
