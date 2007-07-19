@@ -1,5 +1,6 @@
 AM_CPPFLAGS = -I@top_srcdir@ @WX_CPPFLAGS@
 AM_CXXFLAGS = @WX_CXXFLAGS@
+SUBDIRS = images
 
 bin_PROGRAMS = Xmission
 
