@@ -81,13 +81,13 @@ fillHeader( tr_peer_t * peer, int size, int id, uint8_t * buf )
 {
     int index;
 
-    TR_HTONL( size - 4, buf );
+    tr_htonl( size - 4, buf );
     buf += 4;
     if( peer->azproto )
     {
         index = azmsgIdIndex( id );
         assert( 0 <= index );
-        TR_HTONL( azmsgLen( index ), buf );
+        tr_htonl( azmsgLen( index ), buf );
         buf += 4;
         memcpy( buf, azmsgStr( index ), azmsgLen( index ) );
         buf += azmsgLen( index );
@@ -138,9 +138,9 @@ blockPending( tr_torrent_t  * tor,
         assert( hdrlen <= ( signed )sizeof peer->outBlock );
         buf = fillHeader( peer, hdrlen, PEER_MSG_PIECE, peer->outBlock );
 
-        TR_HTONL( r->index, buf );
+        tr_htonl( r->index, buf );
         buf += 4;
-        TR_HTONL( r->begin, buf );
+        tr_htonl( r->begin, buf );
         buf += 4;
 
         tr_ioRead( tor->io, r->index, r->begin, r->length, buf );
@@ -261,7 +261,7 @@ static void sendHave( tr_peer_t * peer, int piece )
 
     p = getMessagePointer( peer, 4, PEER_MSG_HAVE );
 
-    TR_HTONL( piece, p );
+    tr_htonl( piece, p );
 
     peer_dbg( "SEND have %d", piece );
 }
@@ -310,9 +310,9 @@ static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
     /* Build the "ask" message */
     p = getMessagePointer( peer, 12, PEER_MSG_REQUEST );
 
-    TR_HTONL( r->index,  p     );
-    TR_HTONL( r->begin,  p + 4 );
-    TR_HTONL( r->length, p + 8 );
+    tr_htonl( r->index,  p     );
+    tr_htonl( r->begin,  p + 4 );
+    tr_htonl( r->length, p + 8 );
 
     tr_cpDownloaderAdd( tor->completion, block );
 
@@ -331,9 +331,9 @@ static void sendCancel( tr_peer_t * peer, int index, int begin,
     uint8_t * p;
     p = getMessagePointer( peer, 12, PEER_MSG_CANCEL );
 
-    TR_HTONL( index,  p     );
-    TR_HTONL( begin,  p + 4 );
-    TR_HTONL( length, p + 8 );
+    tr_htonl( index,  p     );
+    tr_htonl( begin,  p + 4 );
+    tr_htonl( length, p + 8 );
 
     peer_dbg( "SEND cancel %d/%d (%d bytes)", index, begin, length );
 }

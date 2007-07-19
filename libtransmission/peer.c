@@ -226,6 +226,20 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
     tr_dbg( "%s", string );
 }
 
+/* utilities for endian conversions with char pointers */
+
+static uint32_t tr_ntohl( const void * p )
+{
+    uint32_t u;
+    memcpy( &u, p, sizeof( uint32_t ) );
+    return ntohl( u );
+}
+static void tr_htonl( uint32_t a, void * p )
+{
+    const uint32_t u = htonl( a );
+    memcpy ( p, &u, sizeof( uint32_t ) );
+}
+
 #include "peerext.h"
 #include "peeraz.h"
 #include "peermessages.h"

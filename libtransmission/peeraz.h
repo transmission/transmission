@@ -114,9 +114,9 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
     }
 
     /* set length to zero for now, we won't know it until after bencoding */
-    TR_HTONL( 0, buf );
+    tr_htonl( 0, buf );
     /* set name length, name, and version */
-    TR_HTONL( azmsgLen( idx ), buf + 4 );
+    tr_htonl( azmsgLen( idx ), buf + 4 );
     memcpy( buf + 8, azmsgStr( idx ), azmsgLen( idx ) );
     buf[8 + azmsgLen( idx )] = AZ_EXT_VERSION;
 
@@ -187,7 +187,7 @@ makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
 
     tr_bencFree( &val );
     /* we know the length now, fill it in */
-    TR_HTONL( len - 4, buf );
+    tr_htonl( len - 4, buf );
 
     /* XXX is there a way to tell azureus that the public port has changed? */
     peer->advertisedPort = tor->publicPort;
