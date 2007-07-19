@@ -1,8 +1,8 @@
 # Use Xcode do make the actual build
 all:
-	@xcodebuild -alltargets -activeconfiguration | grep -v "^$$"
+	@(cd .. && xcodebuild -alltargets -activeconfiguration | grep -v "^$$")
 clean:
-	@xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$"
+	@(cd .. && xcodebuild -alltargets -activeconfiguration clean | grep -v "^$$")
 
 define PACKAGE_RULE1
 	$(RM) tmp "Transmission $(VERSION_PACKAGE)" \
