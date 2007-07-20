@@ -95,6 +95,7 @@ ensure_tooltip (GtkActionEntry * e)
         for( src=e->label, tgt=(char*)e->tooltip; *src; ++src )
             if( *src != '_' )
                 *tgt++ = *src;
+        *tgt++ = '\0';
     }
 }
 
