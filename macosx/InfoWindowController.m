@@ -1095,8 +1095,7 @@
     [fFileOutline reloadData];
 }
 
-#warning rename to mode
-- (void) setLimitSetting: (id) sender
+- (void) setSpeedMode: (id) sender
 {
     BOOL upload = sender == fUploadLimitPopUp;
     int index = [sender indexOfSelectedItem], mode;

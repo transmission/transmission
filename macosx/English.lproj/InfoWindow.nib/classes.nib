@@ -9,7 +9,6 @@
                 revealFile = id; 
                 revealTorrentFile = id; 
                 setCheck = id; 
-                setLimitSetting = id; 
                 setOnlySelectedCheck = id; 
                 setPex = id; 
                 setPiecesView = id; 
@@ -17,6 +16,7 @@
                 setRatioLimit = id; 
                 setRatioSetting = id; 
                 setSpeedLimit = id; 
+                setSpeedMode = id; 
             }; 
             CLASS = InfoWindowController; 
             LANGUAGE = ObjC; 
@@ -38,7 +38,7 @@
                 fDownloadingFromField = NSTextField; 
                 fErrorMessageView = NSTextView; 
                 fFileCheckItem = NSMenuItem; 
-                fFileOutline = NSOutlineView; 
+                fFileOutline = FileOutlineView; 
                 fFilePriorityHigh = NSMenuItem; 
                 fFilePriorityLow = NSMenuItem; 
                 fFilePriorityNormal = NSMenuItem; 

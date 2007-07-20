@@ -87,7 +87,7 @@
 - (void) setOnlySelectedCheck: (id) sender;
 - (void) setPriority: (id) sender;
 
-- (void) setLimitSetting: (id) sender;
+- (void) setSpeedMode: (id) sender;
 - (void) setSpeedLimit: (id) sender;
 
 - (void) setRatioSetting: (id) sender;
