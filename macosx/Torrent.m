@@ -52,6 +52,10 @@ static int static_lastid = 0;
             withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
             flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index;
 - (NSImage *) advancedBar;
+
+- (void) quickPause;
+- (void) endQuickPause;
+
 - (void) trashFile: (NSString *) path;
 
 @end
@@ -181,6 +185,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [fFileList release];
     [fFlatFileList release];
     
+    [fQuickPauseDict release];
+    
     [fBitmap release];
     
     if (fPieces)
@@ -252,8 +258,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
             && (canMove = [self alertForMoveFolderAvailable]))
         {
-            #warning pause without actually stopping
-            //pause without actually stopping
+            [self quickPause];
             
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
@@ -261,7 +266,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             else
                 canMove = NO;
             
-            #warning unpause
+            [self endQuickPause];
         }
         
         if (!canMove)
@@ -722,8 +727,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             return;
         }
         
-        #warning pause without actually stopping
-        //pause without actually stopping
+        [self quickPause];
         
         if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
                             toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
@@ -739,11 +743,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
             
-            #warning unpause
+            [self endQuickPause];
         }
         else
         {
-            #warning unpause //restart before showing the alert
+            [self endQuickPause];
         
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
@@ -1817,6 +1821,37 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [bar setScalesWhenResized: YES];
     
     return [bar autorelease];
+}
+
+- (void) quickPause
+{
+    if (fQuickPauseDict)
+        return;
+
+    fQuickPauseDict = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [NSNumber numberWithInt: [self uploadSpeedMode]], @"UploadSpeedMode",
+                    [NSNumber numberWithInt: [self uploadSpeedLimit]], @"UploadSpeedLimit",
+                    [NSNumber numberWithInt: [self downloadSpeedMode]], @"DownloadSpeedMode",
+                    [NSNumber numberWithInt: [self downloadSpeedLimit]], @"DownloadSpeedLimit", nil];
+    
+    [self setUploadSpeedMode: TR_SPEEDLIMIT_SINGLE];
+    [self setUploadSpeedLimit: 0];
+    [self setDownloadSpeedMode: TR_SPEEDLIMIT_SINGLE];
+    [self setDownloadSpeedLimit: 0];
+}
+
+- (void) endQuickPause
+{
+    if (!fQuickPauseDict)
+        return
+    
+    [self setUploadSpeedMode: [[fQuickPauseDict objectForKey: @"UploadSpeedMode"] intValue]];
+    [self setUploadSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadSpeedLimit"] intValue]];
+    [self setDownloadSpeedMode: [[fQuickPauseDict objectForKey: @"DownloadSpeedMode"] intValue]];
+    [self setDownloadSpeedLimit: [[fQuickPauseDict objectForKey: @"DownloadSpeedLimit"] intValue]];
+    
+    [fQuickPauseDict release];
+    fQuickPauseDict = nil;
 }
 
 - (void) trashFile: (NSString *) path

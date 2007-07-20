@@ -64,6 +64,8 @@
     
     NSBitmapImageRep * fBitmap;
     int8_t * fPieces;
+    
+    NSDictionary * fQuickPauseDict;
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
