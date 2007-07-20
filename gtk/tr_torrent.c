@@ -137,10 +137,6 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
   self->delfile = NULL;
   self->severed = FALSE;
   self->disposed = FALSE;
-  self->ul_cap_enabled = FALSE;
-  self->ul_cap = 0;
-  self->dl_cap_enabled = FALSE;
-  self->dl_cap = 0;
 }
 
 static void
@@ -155,12 +151,6 @@ tr_torrent_set_property(GObject *object, guint property_id,
     case TR_TORRENT_HANDLE:
       g_assert(NULL == self->handle);
       self->handle = g_value_get_pointer(value);
-      if( self->handle ) {
-          self->ul_cap         = tr_torrentGetMaxSpeedUL       ( self->handle );
-          self->ul_cap_enabled = tr_torrentIsMaxSpeedEnabledUL ( self->handle );
-          self->dl_cap         = tr_torrentGetMaxSpeedDL       ( self->handle );
-          self->dl_cap_enabled = tr_torrentIsMaxSpeedEnabledDL ( self->handle );
-      }
       if(NULL != self->handle && NULL != self->dir)
         tr_torrent_set_folder(self);
       break;
@@ -490,7 +480,7 @@ tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
     tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
                     (refreshStat(tor)->status & TR_STATUS_INACTIVE) ? 1 : 0);
     tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-ratio" ),
-                    (int)(tor->dl_cap * 100.0)); /* two decimal places */
+                    (int)(tor->seeding_cap * 100.0)); /* two decimal places */
     tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-enabled" ),
                     tor->seeding_cap_enabled ? 1 : 0);
 
@@ -524,44 +514,6 @@ tr_torrent_set_folder(TrTorrent *tor) {
                         (NULL == getcwd(wd, MAX_PATH_LENGTH + 1) ? "." : wd));
     g_free(wd);
   }
-}
-
-static void
-refresh_upload_cap ( TrTorrent *gtor )
-{
-  tr_torrentEnableMaxSpeedUL( gtor->handle, gtor->ul_cap_enabled );
-  tr_torrentSetMaxSpeedUL( gtor->handle, gtor->ul_cap );
-}
-void
-tr_torrent_set_upload_cap_speed ( TrTorrent *gtor, int KiB_sec )
-{
-  gtor->ul_cap = KiB_sec;
-  refresh_upload_cap ( gtor );
-}
-void
-tr_torrent_set_upload_cap_enabled ( TrTorrent *gtor, gboolean b )
-{
-  gtor->ul_cap_enabled = b;
-  refresh_upload_cap ( gtor );
-}
-
-static void
-refresh_download_cap ( TrTorrent *gtor )
-{
-  tr_torrentEnableMaxSpeedDL( gtor->handle, gtor->dl_cap_enabled );
-  tr_torrentSetMaxSpeedDL( gtor->handle, gtor->dl_cap );
-}
-void
-tr_torrent_set_download_cap_speed ( TrTorrent *gtor, int KiB_sec )
-{
-  gtor->dl_cap = KiB_sec;
-  refresh_download_cap( gtor );
-}
-void
-tr_torrent_set_download_cap_enabled ( TrTorrent *gtor, gboolean b )
-{
-  gtor->dl_cap_enabled = b;
-  refresh_download_cap( gtor );
 }
 
 void

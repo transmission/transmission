@@ -196,19 +196,34 @@ typedef struct tr_torrent_s tr_torrent_t;
 typedef void (*tr_callback_t) ( tr_torrent_t *, void * );
 void tr_torrentIterate( tr_handle_t *, tr_callback_t, void * );
 
-/**
-*** Speed Throttle
+
+/***********************************************************************
+*** Speed Limits
 **/
 
-void tr_torrentEnableMaxSpeedUL ( tr_torrent_t * , char doThrottle );
-void tr_torrentEnableMaxSpeedDL ( tr_torrent_t * , char doThrottle );
-void tr_torrentSetMaxSpeedUL    ( tr_torrent_t * , int KiB_sec );
-void tr_torrentSetMaxSpeedDL    ( tr_torrent_t * , int KiB_sec );
+typedef enum
+{
+    TR_SPEEDLIMIT_GLOBAL,    /* indirectly follow the global pool's limit */
+    TR_SPEEDLIMIT_SINGLE,    /* directly follow tr_torrentSetMaxSpeed() */
+    TR_SPEEDLIMIT_UNLIMITED  /* no limits at all */
+}
+tr_speedlimit_t;
 
-int tr_torrentIsMaxSpeedEnabledUL ( const tr_torrent_t * );
-int tr_torrentIsMaxSpeedEnabledDL ( const tr_torrent_t * );
-int tr_torrentGetMaxSpeedUL       ( const tr_torrent_t * );
-int tr_torrentGetMaxSpeedDL       ( const tr_torrent_t * );
+enum { TR_UP, TR_DOWN };
+
+void tr_torrentSetSpeedMode( tr_torrent_t     * tor,
+                             int                up_or_down,
+                             tr_speedlimit_t    mode );
+
+tr_speedlimit_t tr_torrentGetSpeedMode( const tr_torrent_t * tor,
+                                        int                  up_or_down);
+
+void tr_torrentSetSpeedLimit( tr_torrent_t   * tor,
+                              int              up_or_down,
+                              int              single_KiB_sec );
+
+int tr_torrentGetSpeedLimit( const tr_torrent_t  * tor,
+                             int                   up_or_down );
 
 /***********************************************************************
  * Torrent Priorities

@@ -75,10 +75,10 @@ enum
     FR_ID_PRIORITY = 6,
 
     /* transfer speeds
-     * uint32_t: the dl speed rate to use when the flag is true
-     * char: t,f for whether or not dl speed is capped
-     * uint32_t: the ul speed rate to use when the flag is true
-     * char: t,f for whether or not ul speed is capped
+     * uint32_t: dl speed rate to use when the mode is single
+     * uint32_t: dl's tr_speedlimit_t
+     * uint32_t: ul speed rate to use when the mode is single
+     * uint32_t: ul's tr_speedlimit_t
      */
     FR_ID_SPEED = 7
 };
@@ -227,21 +227,19 @@ void fastResumeSave( const tr_torrent_t * tor )
     /* Write the torrent ul/dl speed caps */
     if( TRUE )
     {
-        const int len = ( sizeof(uint32_t) + sizeof(char) ) * 2;
+        const int len = sizeof(uint32_t) * 4;
         char * buf = tr_new0( char, len );
         char * walk = buf;
-        char enabled;
         uint32_t i;
 
-        i = (uint32_t) tr_torrentGetMaxSpeedDL( tor );
+        i = (uint32_t) tr_torrentGetSpeedLimit( tor, TR_DOWN );
         memcpy( walk, &i, 4 ); walk += 4;
-        enabled = tr_torrentIsMaxSpeedEnabledDL( tor ) ? 't' : 'f';
-        *walk++ = enabled;
-
-        i = (uint32_t) tr_torrentGetMaxSpeedUL( tor );
+        i = (uint32_t) tr_torrentGetSpeedMode( tor, TR_DOWN );
         memcpy( walk, &i, 4 ); walk += 4;
-        enabled = tr_torrentIsMaxSpeedEnabledUL( tor ) ? 't' : 'f';
-        *walk++ = enabled;
+        i = (uint32_t) tr_torrentGetSpeedLimit( tor, TR_UP );
+        memcpy( walk, &i, 4 ); walk += 4;
+        i = (uint32_t) tr_torrentGetSpeedMode( tor, TR_UP );
+        memcpy( walk, &i, 4 ); walk += 4;
 
         assert( walk - buf == len );
         fastResumeWriteData( FR_ID_SPEED, buf, 1, walk-buf, file );
@@ -274,10 +272,10 @@ void fastResumeSave( const tr_torrent_t * tor )
 static int
 loadSpeeds( tr_torrent_t * tor, FILE * file )
 {
-    const size_t len = 2 * (sizeof(uint32_t) + sizeof(char));
+    const size_t len = sizeof(uint32_t) * 4;
     char * buf = tr_new0( char, len );
     char * walk = buf;
-    uint32_t rate;
+    uint32_t i;
     char enabled;
 
     if( len != fread( buf, 1, len, file ) ) {
@@ -286,15 +284,14 @@ loadSpeeds( tr_torrent_t * tor, FILE * file )
         return TR_ERROR_IO_OTHER;
     }
 
-    memcpy( &rate, walk, 4 ); walk += 4;
-    memcpy( &enabled, walk, 1 ); walk += 1;
-    tr_torrentSetMaxSpeedDL( tor, rate );
-    tr_torrentEnableMaxSpeedDL( tor, enabled=='t' );
-
-    memcpy( &rate, walk, 4 ); walk += 4;
-    memcpy( &enabled, walk, 1 ); walk += 1;
-    tr_torrentSetMaxSpeedUL( tor, rate );
-    tr_torrentEnableMaxSpeedUL( tor, enabled=='t' );
+    memcpy( &i, walk, 4 ); walk += 4;
+    tr_torrentSetSpeedLimit( tor, TR_DOWN, i );
+    memcpy( &i, walk, 4 ); walk += 4;
+    tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit_t)i );
+    memcpy( &i, walk, 4 ); walk += 4;
+    tr_torrentSetSpeedLimit( tor, TR_UP, i );
+    memcpy( &i, walk, 4 ); walk += 4;
+    tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit_t)i );
 
     tr_free( buf );
     return TR_OK;
@@ -517,7 +514,7 @@ fastResumeLoad( tr_torrent_t   * tor,
 
             case FR_ID_SPEED:
                 /*  read speed data */
-                if( len == (uint32_t)(2*sizeof(uint32_t)+2) )
+                if( len == (uint32_t)(sizeof(uint32_t)*4) )
                 {
                     ret = loadSpeeds( tor, file );
 

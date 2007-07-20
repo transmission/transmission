@@ -67,44 +67,39 @@ tr_torrentWriterUnlock( tr_torrent_t * tor )
 ***/
 
 void
-tr_torrentEnableMaxSpeedUL( tr_torrent_t * tor, char doThrottle )
+tr_torrentSetSpeedMode( tr_torrent_t     * tor,
+                        int                up_or_down,
+                        tr_speedlimit_t    mode )
 {
-    tor->customUploadLimit = doThrottle;
+    tr_speedlimit_t * limit = up_or_down==TR_UP
+        ? &tor->uploadLimitMode
+        : &tor->downloadLimitMode;
+    *limit = mode;
 }
+
+tr_speedlimit_t
+tr_torrentGetSpeedMode( const tr_torrent_t * tor,
+                        int                  up_or_down)
+{
+    return up_or_down==TR_UP ? tor->uploadLimitMode
+                             : tor->downloadLimitMode;
+}
+
 void
-tr_torrentEnableMaxSpeedDL( tr_torrent_t * tor, char doThrottle )
+tr_torrentSetSpeedLimit( tr_torrent_t   * tor,
+                         int              up_or_down,
+                         int              single_KiB_sec )
 {
-    tor->customDownloadLimit = doThrottle;
+    tr_ratecontrol_t * rc = up_or_down==TR_UP ? tor->upload : tor->download;
+    tr_rcSetLimit( rc, single_KiB_sec );
 }
-void
-tr_torrentSetMaxSpeedUL( tr_torrent_t * tor, int KiB_sec )
-{
-    tr_rcSetLimit( tor->upload, KiB_sec );
-}
-void
-tr_torrentSetMaxSpeedDL( tr_torrent_t * tor, int KiB_sec )
-{
-    tr_rcSetLimit( tor->download, KiB_sec );
-}
+
 int
-tr_torrentIsMaxSpeedEnabledUL( const tr_torrent_t * tor )
+tr_torrentGetSpeedLimit( const tr_torrent_t  * tor,
+                         int                   up_or_down )
 {
-    return tor->customUploadLimit;
-}
-int
-tr_torrentIsMaxSpeedEnabledDL( const tr_torrent_t * tor )
-{
-    return tor->customDownloadLimit;
-}
-int
-tr_torrentGetMaxSpeedUL( const tr_torrent_t * tor )
-{
-    return tr_rcGetLimit( tor->upload );
-}
-int
-tr_torrentGetMaxSpeedDL( const tr_torrent_t * tor )
-{
-    return tr_rcGetLimit( tor->download );
+    tr_ratecontrol_t * rc = up_or_down==TR_UP ? tor->upload : tor->download;
+    return tr_rcGetLimit( rc );
 }
 
 /***

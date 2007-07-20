@@ -377,12 +377,14 @@ int tr_peerRead( tr_peer_t * peer )
     {
         if( tor )
         {
-            if( tor->customDownloadLimit
-                ? !tr_rcCanTransfer( tor->download )
-                : !tr_rcCanTransfer( tor->handle->download ) )
-            {
-                break;
+            int canDL;
+            switch( tor->downloadLimitMode ) {
+                case TR_SPEEDLIMIT_GLOBAL: canDL = tr_rcCanTransfer( tor->handle->download ); break;
+                case TR_SPEEDLIMIT_SINGLE: canDL = tr_rcCanTransfer( tor->download ); break;
+                default: canDL = TRUE; /* unlimited */
             }
+            if( !canDL )
+                break;
         }
 
         if( peer->size < 1 )
@@ -580,12 +582,16 @@ writeBegin:
     /* Send pieces if we can */
     while( ( p = blockPending( tor, peer, &size ) ) )
     {
-        if( SWIFT_ENABLED && !isSeeding && (peer->credit<0) )
-            break;
+        int canUL;
 
-        if( tor->customUploadLimit
-            ? !tr_rcCanTransfer( tor->upload )
-            : !tr_rcCanTransfer( tor->handle->upload ) )
+        if( SWIFT_ENABLED && !isSeeding && (peer->credit<0) )
+            canUL = FALSE;
+        else switch( tor->uploadLimitMode ) {
+            case TR_SPEEDLIMIT_GLOBAL: canUL = tr_rcCanTransfer( tor->handle->upload ); break;
+            case TR_SPEEDLIMIT_SINGLE: canUL = tr_rcCanTransfer( tor->upload ); break;
+            default: canUL = TRUE; /* unlimited */
+        }
+        if( !canUL )
             break;
 
         ret = tr_netSend( peer->socket, p, size );
@@ -855,8 +861,7 @@ tr_peerSentBlockToUs ( tr_peer_t * peer, int byteCount )
     tor->downloadedCur += byteCount;
     tr_rcTransferred( peer->download, byteCount );
     tr_rcTransferred( tor->download, byteCount );
-    if ( !tor->customUploadLimit )
-        tr_rcTransferred( tor->handle->download, byteCount );
+    tr_rcTransferred( tor->handle->download, byteCount );
 
     peer->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
 }
@@ -872,8 +877,7 @@ tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
     tor->uploadedCur += byteCount;
     tr_rcTransferred( peer->upload, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
-    if ( !tor->customDownloadLimit )
-        tr_rcTransferred( tor->handle->upload, byteCount );
+    tr_rcTransferred( tor->handle->upload, byteCount );
 
     peer->credit -= byteCount;
 }
