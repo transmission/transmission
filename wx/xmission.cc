@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 #include <wx/defs.h>
 #include <wx/config.h>
@@ -21,6 +20,9 @@
 #include <wx/splitter.h>
 #include <wx/notebook.h>
 #include <wx/wx.h>
+#if wxCHECK_VERSION(2,8,0)
+#include <wx/aboutdlg.h>
+#endif
 extern "C" {
   #include <libtransmission/transmission.h>
 }
@@ -138,31 +140,30 @@ namespace
         N_COLS
     };
 
-    int getTorrentColumn( const wxString& wxKey )
+    int getTorrentColumn( const wxString& key )
     {
-        const std::string key ( wxKey.c_str() );
-        typedef std::map<std::string,int> string2key_t;
+        typedef std::map<wxString,int> string2key_t;
         static string2key_t columns;
 
         if( columns.empty() )
         {
-            columns["#"]         = COL_NUMBER;
-            columns["done"]      = COL_DONE;
-            columns["dspeed"]    = COL_DOWNLOAD_SPEED;
-            columns["eta"]       = COL_ETA;
-            columns["hash"]      = COL_HASH;
-            columns["name"]      = COL_NAME;
-            columns["peers"]     = COL_PEERS;
-            columns["ratio"]     = COL_RATIO;
-            columns["received"]  = COL_RECEIVED;
-            columns["remaining"] = COL_REMAINING;
-            columns["seeds"]     = COL_SEEDS; 
-            columns["sent"]      = COL_SEND; 
-            columns["size"]      = COL_SIZE; 
-            columns["state"]     = COL_STATE; 
-            columns["status"]    = COL_STATUS; 
-            columns["total"]     = COL_TOTAL; 
-            columns["uspeed"]    = COL_UPLOAD_SPEED;
+            columns[_T("#")]         = COL_NUMBER;
+            columns[_T("done")]      = COL_DONE;
+            columns[_T("dspeed")]    = COL_DOWNLOAD_SPEED;
+            columns[_T("eta")]       = COL_ETA;
+            columns[_T("hash")]      = COL_HASH;
+            columns[_T("name")]      = COL_NAME;
+            columns[_T("peers")]     = COL_PEERS;
+            columns[_T("ratio")]     = COL_RATIO;
+            columns[_T("received")]  = COL_RECEIVED;
+            columns[_T("remaining")] = COL_REMAINING;
+            columns[_T("seeds")]     = COL_SEEDS; 
+            columns[_T("sent")]      = COL_SEND; 
+            columns[_T("size")]      = COL_SIZE; 
+            columns[_T("state")]     = COL_STATE; 
+            columns[_T("status")]    = COL_STATUS; 
+            columns[_T("total")]     = COL_TOTAL; 
+            columns[_T("uspeed")]    = COL_UPLOAD_SPEED;
         }
 
         int i = -1;
@@ -378,6 +379,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     wxIcon ico;
     ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
 
+#if wxCHECK_VERSION(2,8,0)
     wxAboutDialogInfo info;
     info.SetName(_T("Xmission"));
     info.SetVersion(_T(LONG_VERSION_STRING));
@@ -391,4 +393,11 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.AddDeveloper( "Eric Petit (Back-end; OS X)" );
     info.AddDeveloper( "Bryan Varner (BeOS)" );
     wxAboutBox( info );
+#else
+    wxMessageBox(_T("Xmission " LONG_VERSION_STRING "\n"
+                    "Copyright 2005-2007 The Transmission Project"),
+                 _T("About Xmission"),
+                wxOK|wxICON_INFORMATION, this);
+#endif
+
 }
