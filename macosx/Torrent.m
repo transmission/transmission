@@ -812,8 +812,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         
         uint64_t existingSize = 0;
         NSDirectoryEnumerator * enumerator;
-        if (enumerator = [[NSFileManager defaultManager] enumeratorAtPath:
-                    [[self downloadFolder] stringByAppendingPathComponent: [self name]]])
+        if ((enumerator = [[NSFileManager defaultManager] enumeratorAtPath:
+                    [[self downloadFolder] stringByAppendingPathComponent: [self name]]]))
         {
             NSDictionary * fileAttributes; 
             while ([enumerator nextObject])
@@ -1374,8 +1374,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     free(files);
     
     [self update];
-    if ([self isPaused])
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self]; //for paused torrents
 }
 
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet

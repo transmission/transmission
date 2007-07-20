@@ -1493,29 +1493,29 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentFinishedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
-    
-    [fInfoController updateInfoStats];
-    
-    if ([fDefaults boolForKey: @"PlayDownloadSound"])
+    if ([torrent isActive])
     {
-        NSSound * sound;
-        if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
-            [sound play];
-    }
-    
-    NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
-                                    [torrent dataLocation] , @"Location", nil];
-    [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
-                                description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
-                                iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
-    
-    if (![fWindow isKeyWindow])
-        [fBadger incrementCompleted];
-    
-    if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
-    {
-        [torrent stopTransfer];
-        [torrent setWaitToStart: YES];
+        if ([fDefaults boolForKey: @"PlayDownloadSound"])
+        {
+            NSSound * sound;
+            if ((sound = [NSSound soundNamed: [fDefaults stringForKey: @"DownloadSound"]]))
+                [sound play];
+        }
+        
+        NSDictionary * clickContext = [NSDictionary dictionaryWithObjectsAndKeys: GROWL_DOWNLOAD_COMPLETE, @"Type",
+                                        [torrent dataLocation] , @"Location", nil];
+        [GrowlApplicationBridge notifyWithTitle: NSLocalizedString(@"Download Complete", "Growl notification title")
+                                    description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
+                                    iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
+        
+        if (![fWindow isKeyWindow])
+            [fBadger incrementCompleted];
+        
+        if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
+        {
+            [torrent stopTransfer];
+            [torrent setWaitToStart: YES];
+        }
     }
     
     [self updateTorrentsInQueue];
@@ -1524,13 +1524,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) torrentRestartedDownloading: (NSNotification *) notification
 {
     Torrent * torrent = [notification object];
-    
-    [fInfoController updateInfoStats];
-    
-    if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] <= 0)
+    if ([torrent isActive])
     {
-        [torrent stopTransfer];
-        [torrent setWaitToStart: YES];
+        if ([fDefaults boolForKey: @"Queue"] && [self numToStartFromQueue: YES] <= 0)
+        {
+            [torrent stopTransfer];
+            [torrent setWaitToStart: YES];
+        }
     }
     
     [self updateTorrentsInQueue];

@@ -1507,10 +1507,9 @@
 					i386,
 				);
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
-				OTHER_CFLAGS = (
-				);
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
+				OTHER_CFLAGS = "";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Debug;
@@ -1585,6 +1584,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
@@ -1592,9 +1592,7 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = (
-				);
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				OTHER_CFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-daemon";
 				ZERO_LINK = NO;
@@ -1615,6 +1613,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
@@ -1624,9 +1623,7 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = (
-				);
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				OTHER_CFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-remote";
 				ZERO_LINK = NO;
@@ -1647,6 +1644,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				INSTALL_PATH = "$(HOME)/bin";
 				LIBRARY_SEARCH_PATHS = (
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
@@ -1657,9 +1655,7 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/build/Debug\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = (
-				);
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				OTHER_CFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-proxy";
 				ZERO_LINK = NO;
