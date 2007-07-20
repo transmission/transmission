@@ -74,7 +74,7 @@ tr_ratecontrol_t*
 tr_rcInit( void )
 {
     tr_ratecontrol_t * r = tr_new0( tr_ratecontrol_t, 1 );
-    r->limit = -1;
+    r->limit = 0;
     tr_rwInit( &r->lock );
     return r;
 }
@@ -97,12 +97,7 @@ tr_rcCanTransfer( const tr_ratecontrol_t * r )
     int ret;
     tr_rwReaderLock( (tr_rwlock_t*)&r->lock );
 
-    if( r->limit < 0 ) /* unbounded */
-        ret = TRUE;
-    else if( !r->limit ) /* off */
-        ret = FALSE;
-    else
-        ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
+    ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
 
     tr_rwReaderUnlock( (tr_rwlock_t*)&r->lock );
     return ret;
