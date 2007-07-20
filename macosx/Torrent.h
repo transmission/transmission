@@ -56,9 +56,8 @@
     tr_file_stat_t * fileStat;
     NSArray * fFileList, * fFlatFileList;
     
-    int     fUploadLimit, fDownloadLimit;
     float   fRatioLimit;
-    int     fCheckUpload, fCheckDownload, fRatioSetting;
+    int     fRatioSetting;
     BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
     
     int fOrderValue;
@@ -103,16 +102,15 @@
 - (float) actualStopRatio; //returns INVALID if will not stop
 - (float) progressStopRatio;
 
-- (int) checkUpload;
-- (void) setCheckUpload: (int) setting;
-- (int) uploadLimit;
-- (void) setUploadLimit: (int) limit;
-- (int) checkDownload;
-- (void) setCheckDownload: (int) setting;
-- (int) downloadLimit;
-- (void) setDownloadLimit: (int) limit;
-
-- (void) updateSpeedSetting;
+#warning merge up and down?
+- (int) uploadSpeedMode;
+- (void) setUploadSpeedMode: (int) mode;
+- (int) uploadSpeedLimit;
+- (void) setUploadSpeedLimit: (int) limit;
+- (int) downloadSpeedMode;
+- (void) setDownloadSpeedMode: (int) mode;
+- (int) downloadSpeedLimit;
+- (void) setDownloadSpeedLimit: (int) limit;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;

@@ -41,9 +41,6 @@ static int static_lastid = 0;
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-        limitSpeedCustom: (NSNumber *) limitCustom
-        checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
-        checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
 		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
@@ -82,9 +79,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
-            limitSpeedCustom: nil
-            checkUpload: nil uploadLimit: nil
-            checkDownload: nil downloadLimit: nil
 			pex: nil
             waitToStart: nil orderValue: nil];
     
@@ -109,11 +103,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 dateActivity: [history objectForKey: @"DateActivity"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
-                limitSpeedCustom: [history objectForKey: @"LimitSpeedCustom"]
-                checkUpload: [history objectForKey: @"CheckUpload"]
-                uploadLimit: [history objectForKey: @"UploadLimit"]
-                checkDownload: [history objectForKey: @"CheckDownload"]
-                downloadLimit: [history objectForKey: @"DownloadLimit"]
 				pex: [history objectForKey: @"Pex"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 orderValue: [history objectForKey: @"OrderValue"]];
@@ -142,10 +131,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     fDateAdded, @"Date",
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
-                    [NSNumber numberWithInt: fCheckUpload], @"CheckUpload",
-                    [NSNumber numberWithInt: fUploadLimit], @"UploadLimit",
-                    [NSNumber numberWithInt: fCheckDownload], @"CheckDownload",
-                    [NSNumber numberWithInt: fDownloadLimit], @"DownloadLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
                     [self orderValue], @"OrderValue", nil];
     
@@ -267,12 +252,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
             && (canMove = [self alertForMoveFolderAvailable]))
         {
+            #warning pause without actually stopping
             //pause without actually stopping
-            tr_torrentEnableMaxSpeedUL(fHandle, 1);
-            tr_torrentSetMaxSpeedUL(fHandle, 0);
-            
-            tr_torrentEnableMaxSpeedDL(fHandle, 1);
-            tr_torrentSetMaxSpeedDL(fHandle, 0);
             
             if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
                                     toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
@@ -280,7 +261,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             else
                 canMove = NO;
             
-            [self updateSpeedSetting];
+            #warning unpause
         }
         
         if (!canMove)
@@ -640,57 +621,44 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return 0;
 }
 
-- (int) checkUpload
+- (int) uploadSpeedMode
 {
-    return fCheckUpload;
+    return tr_torrentGetSpeedMode(fHandle, TR_UP);
 }
 
-- (void) setCheckUpload: (int) setting
+- (void) setUploadSpeedMode: (int) mode
 {
-    fCheckUpload = setting;
-    [self updateSpeedSetting];
+    tr_torrentSetSpeedMode(fHandle, TR_UP, mode);
 }
 
-- (int) uploadLimit
+- (int) uploadSpeedLimit
 {
-    return fUploadLimit;
+    return tr_torrentGetSpeedLimit(fHandle, TR_UP);
 }
 
-- (void) setUploadLimit: (int) limit
+- (void) setUploadSpeedLimit: (int) limit
 {
-    fUploadLimit = limit;
-    [self updateSpeedSetting];
+    tr_torrentSetSpeedLimit(fHandle, TR_UP, limit);
 }
 
-- (int) checkDownload
+- (int) downloadSpeedMode
 {
-    return fCheckDownload;
+    return tr_torrentGetSpeedMode(fHandle, TR_DOWN);
 }
 
-- (void) setCheckDownload: (int) setting
+- (void) setDownloadSpeedMode: (int) mode
 {
-    fCheckDownload = setting;
-    [self updateSpeedSetting];
+    tr_torrentSetSpeedMode(fHandle, TR_DOWN, mode);
 }
 
-- (int) downloadLimit
+- (int) downloadSpeedLimit
 {
-    return fDownloadLimit;
+    return tr_torrentGetSpeedLimit(fHandle, TR_DOWN);
 }
 
-- (void) setDownloadLimit: (int) limit
+- (void) setDownloadSpeedLimit: (int) limit
 {
-    fDownloadLimit = limit;
-    [self updateSpeedSetting];
-}
-
-- (void) updateSpeedSetting
-{
-    tr_torrentEnableMaxSpeedUL(fHandle, fCheckUpload != NSMixedState);
-    tr_torrentSetMaxSpeedUL(fHandle, fCheckUpload == NSOnState ? fUploadLimit : -1);
-    
-    tr_torrentEnableMaxSpeedDL(fHandle, fCheckDownload != NSMixedState);
-    tr_torrentSetMaxSpeedDL(fHandle, fCheckDownload == NSOnState ? fDownloadLimit : -1);
+    tr_torrentSetSpeedLimit(fHandle, TR_DOWN, limit);
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -754,12 +722,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             return;
         }
         
+        #warning pause without actually stopping
         //pause without actually stopping
-        tr_torrentEnableMaxSpeedUL(fHandle, 1);
-        tr_torrentSetMaxSpeedUL(fHandle, 0);
-        
-        tr_torrentEnableMaxSpeedDL(fHandle, 1);
-        tr_torrentSetMaxSpeedDL(fHandle, 0);
         
         if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
                             toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
@@ -775,11 +739,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
             
-            [self updateSpeedSetting];
+            #warning unpause
         }
         else
         {
-            [self updateSpeedSetting]; //restart before showing the alert
+            #warning unpause //restart before showing the alert
         
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: NSLocalizedString(@"There was an error moving the data file.", "Move error alert -> title")];
@@ -1523,9 +1487,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-        limitSpeedCustom: (NSNumber *) limitCustom
-        checkUpload: (NSNumber *) checkUpload uploadLimit: (NSNumber *) uploadLimit
-        checkDownload: (NSNumber *) checkDownload downloadLimit: (NSNumber *) downloadLimit
 		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 {
@@ -1585,10 +1546,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     }
     
     fInfo = tr_torrentInfo(fHandle);
-    
-    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(updateSpeedSetting:)
-                name: @"UpdateSpeedSetting" object: nil];
 
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
 	if (dateCompleted)
@@ -1599,12 +1556,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
-    
-    fCheckUpload = checkUpload ? [checkUpload intValue] : NSMixedState;
-    fUploadLimit = uploadLimit ? [uploadLimit intValue] : [fDefaults integerForKey: @"UploadLimit"];
-    fCheckDownload = checkDownload ? [checkDownload intValue] : NSMixedState;
-    fDownloadLimit = downloadLimit ? [downloadLimit intValue] : [fDefaults integerForKey: @"DownloadLimit"];
-    [self updateSpeedSetting];
 	
 	if ([self privateTorrent])
 		fPex = NO;

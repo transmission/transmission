@@ -65,9 +65,6 @@
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
-- (int) stateSettingToPopUpIndex: (int) index;
-- (int) popUpIndexToStateSetting: (int) index;
-
 @end
 
 @implementation InfoWindowController
@@ -457,51 +454,72 @@
     {
         Torrent * torrent;
         
-        //set bandwidth limits
+        //get bandwidth info
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
-        int checkUpload = [torrent checkUpload],
-            checkDownload = [torrent checkDownload],
-            uploadLimit = [torrent uploadLimit],
-            downloadLimit = [torrent downloadLimit];
+        int uploadSpeedMode = [torrent uploadSpeedMode],
+            uploadSpeedLimit = [torrent uploadSpeedLimit],
+            downloadSpeedMode = [torrent downloadSpeedMode],
+            downloadSpeedLimit = [torrent downloadSpeedLimit];
         
-        while ((checkUpload != INVALID || uploadLimit != INVALID
-                || checkDownload != INVALID || downloadLimit != INVALID)
+        while ((uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
+                || downloadSpeedMode != INVALID || downloadSpeedLimit != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (checkUpload != INVALID && checkUpload != [torrent checkUpload])
-                checkUpload = INVALID;
+            if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent uploadSpeedMode])
+                uploadSpeedMode = INVALID;
             
-            if (uploadLimit != INVALID && uploadLimit != [torrent uploadLimit])
-                uploadLimit = INVALID;
+            if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent uploadSpeedLimit])
+                uploadSpeedLimit = INVALID;
             
-            if (checkDownload != INVALID && checkDownload != [torrent checkDownload])
-                checkDownload = INVALID;
+            if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent downloadSpeedMode])
+                downloadSpeedMode = INVALID;
             
-            if (downloadLimit != INVALID && downloadLimit != [torrent downloadLimit])
-                downloadLimit = INVALID;
+            if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent downloadSpeedLimit])
+                downloadSpeedLimit = INVALID;
         }
         
+        //set upload view
+        int index;
+        if (uploadSpeedMode == TR_SPEEDLIMIT_SINGLE)
+            index = OPTION_POPUP_LIMIT;
+        else if (uploadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
+            index = OPTION_POPUP_NO_LIMIT;
+        else if (uploadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
+            index = OPTION_POPUP_GLOBAL;
+        else
+            index = -1;
+        [fUploadLimitPopUp selectItemAtIndex: index];
         [fUploadLimitPopUp setEnabled: YES];
-        [fUploadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkUpload]];
-        [fUploadLimitLabel setHidden: checkUpload != NSOnState];
-        [fUploadLimitField setHidden: checkUpload != NSOnState];
-        if (uploadLimit != INVALID)
-            [fUploadLimitField setIntValue: uploadLimit];
+        
+        [fUploadLimitLabel setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+        [fUploadLimitField setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+        if (uploadSpeedLimit != INVALID)
+            [fUploadLimitField setIntValue: uploadSpeedLimit];
         else
             [fUploadLimitField setStringValue: @""];
         
+        //set download view
+        if (downloadSpeedMode == TR_SPEEDLIMIT_SINGLE)
+            index = OPTION_POPUP_LIMIT;
+        else if (downloadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
+            index = OPTION_POPUP_NO_LIMIT;
+        else if (downloadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
+            index = OPTION_POPUP_GLOBAL;
+        else
+            index = -1;
+        [fDownloadLimitPopUp selectItemAtIndex: index];
         [fDownloadLimitPopUp setEnabled: YES];
-        [fDownloadLimitPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkDownload]];
-        [fDownloadLimitLabel setHidden: checkDownload != NSOnState];
-        [fDownloadLimitField setHidden: checkDownload != NSOnState];
-        if (downloadLimit != INVALID)
-            [fDownloadLimitField setIntValue: downloadLimit];
+        
+        [fDownloadLimitLabel setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+        [fDownloadLimitField setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+        if (downloadSpeedLimit != INVALID)
+            [fDownloadLimitField setIntValue: downloadSpeedLimit];
         else
             [fDownloadLimitField setStringValue: @""];
         
-        //set ratio settings
+        //get ratio info
         enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
@@ -518,8 +536,18 @@
                 ratioLimit = INVALID;
         }
         
+        //set ratio view
+        if (checkRatio == NSOnState)
+            index = OPTION_POPUP_LIMIT;
+        else if (checkRatio == NSOffState)
+            index = OPTION_POPUP_NO_LIMIT;
+        else if (checkRatio == NSMixedState)
+            index = OPTION_POPUP_GLOBAL;
+        else
+            index = -1;
+        [fRatioPopUp selectItemAtIndex: index];
         [fRatioPopUp setEnabled: YES];
-        [fRatioPopUp selectItemAtIndex: [self stateSettingToPopUpIndex: checkRatio]];
+        
         [fRatioLimitField setHidden: checkRatio != NSOnState];
         if (ratioLimit != INVALID)
             [fRatioLimitField setFloatValue: ratioLimit];
@@ -576,30 +604,6 @@
 {
     if ([fTorrents containsObject: torrent])
         [self updateInfoSettings];
-}
-
-- (int) stateSettingToPopUpIndex: (int) index
-{
-    if (index == NSOnState)
-        return OPTION_POPUP_LIMIT;
-    else if (index == NSOffState)
-        return OPTION_POPUP_NO_LIMIT;
-    else if (index == NSMixedState)
-        return OPTION_POPUP_GLOBAL;
-    else
-        return -1;
-}
-
-- (int) popUpIndexToStateSetting: (int) index
-{
-    if (index == OPTION_POPUP_LIMIT)
-        return NSOnState;
-    else if (index == OPTION_POPUP_NO_LIMIT)
-        return NSOffState;
-    else if (index == OPTION_POPUP_GLOBAL)
-        return NSMixedState;
-    else
-        return INVALID;
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
@@ -1091,28 +1095,35 @@
     [fFileOutline reloadData];
 }
 
+#warning rename to mode
 - (void) setLimitSetting: (id) sender
 {
     BOOL upload = sender == fUploadLimitPopUp;
-    int setting;
-    if ((setting = [self popUpIndexToStateSetting: [sender indexOfSelectedItem]]) == INVALID)
-        return;
+    int index = [sender indexOfSelectedItem], mode;
+    if (index == OPTION_POPUP_LIMIT)
+        mode = TR_SPEEDLIMIT_SINGLE;
+    else if (index == OPTION_POPUP_NO_LIMIT)
+        mode = TR_SPEEDLIMIT_UNLIMITED;
+    else
+        mode = TR_SPEEDLIMIT_GLOBAL;
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        upload ? [torrent setCheckUpload: setting] : [torrent setCheckDownload: setting];
+        upload ? [torrent setUploadSpeedMode: mode] : [torrent setDownloadSpeedMode: mode];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
-    [field setHidden: setting != NSOnState];
-    if (setting == NSOnState)
+    
+    BOOL single = mode == TR_SPEEDLIMIT_SINGLE;
+    [field setHidden: !single];
+    if (single)
     {
         [field selectText: self];
         [[self window] makeKeyAndOrderFront:self];
     }
     
     NSTextField * label = upload ? fUploadLimitLabel : fDownloadLimitLabel;
-    [label setHidden: setting != NSOnState];
+    [label setHidden: !single];
 }
 
 - (void) setSpeedLimit: (id) sender
@@ -1128,9 +1139,9 @@
         NSBeep();
         
         torrent = [enumerator nextObject]; //use first torrent
-        limit = upload ? [torrent uploadLimit] : [torrent downloadLimit];
+        limit = upload ? [torrent uploadSpeedLimit] : [torrent downloadSpeedLimit];
         while ((torrent = [enumerator nextObject]))
-            if (limit != (upload ? [torrent uploadLimit] : [torrent downloadLimit]))
+            if (limit != (upload ? [torrent uploadSpeedLimit] : [torrent downloadSpeedLimit]))
             {
                 [sender setStringValue: @""];
                 return;
@@ -1141,23 +1152,28 @@
     else
     {
         while ((torrent = [enumerator nextObject]))
-            upload ? [torrent setUploadLimit: limit] : [torrent setDownloadLimit: limit];
+            upload ? [torrent setUploadSpeedLimit: limit] : [torrent setDownloadSpeedLimit: limit];
     }
 }
 
 - (void) setRatioSetting: (id) sender
 {
-    int setting;
-    if ((setting = [self popUpIndexToStateSetting: [sender indexOfSelectedItem]]) == INVALID)
-        return;
+    int index = [sender indexOfSelectedItem], setting;
+    if (index == OPTION_POPUP_LIMIT)
+        setting = NSOnState;
+    else if (index == OPTION_POPUP_NO_LIMIT)
+        setting = NSOffState;
+    else
+        setting = NSMixedState;
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
         [torrent setRatioSetting: setting];
     
-    [fRatioLimitField setHidden: setting != NSOnState];
-    if (setting == NSOnState)
+    BOOL single = setting == NSOnState;
+    [fRatioLimitField setHidden: !single];
+    if (single)
     {
         [fRatioLimitField selectText: self];
         [[self window] makeKeyAndOrderFront:self];
