@@ -332,15 +332,19 @@
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
     {
-        tr_setGlobalUploadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
-        tr_setGlobalDownloadLimit(fHandle, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
+        tr_setUseGlobalSpeedLimit(fHandle, TR_UP, 1);
+        tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"SpeedLimitUploadLimit"]);
+        
+        tr_setUseGlobalSpeedLimit(fHandle, TR_DOWN, 1);
+        tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]);
     }
     else
     {
-        tr_setGlobalUploadLimit(fHandle, [fDefaults boolForKey: @"CheckUpload"]
-                                        ? [fDefaults integerForKey: @"UploadLimit"] : -1);
-        tr_setGlobalDownloadLimit(fHandle, [fDefaults boolForKey: @"CheckDownload"]
-                                        ? [fDefaults integerForKey: @"DownloadLimit"] : -1);
+        tr_setUseGlobalSpeedLimit(fHandle, TR_UP, [fDefaults boolForKey: @"CheckUpload"]);
+        tr_setGlobalSpeedLimit(fHandle, TR_UP, [fDefaults integerForKey: @"UploadLimit"]);
+        
+        tr_setUseGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults boolForKey: @"CheckDownload"]);
+        tr_setGlobalSpeedLimit(fHandle, TR_DOWN, [fDefaults integerForKey: @"DownloadLimit"]);
     }
 }
 
