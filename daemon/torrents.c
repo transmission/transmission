@@ -423,7 +423,8 @@ torrent_set_uplimit( int uplimit )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
     gl_uplimit = uplimit;
-    tr_setGlobalUploadLimit( gl_handle, uplimit );
+    tr_setGlobalSpeedLimit   ( gl_handle, TR_UP, uplimit );
+    tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, uplimit > 0 );
     savestate();
 }
 
@@ -439,7 +440,8 @@ torrent_set_downlimit( int downlimit )
     assert( NULL != gl_handle );
     assert( !gl_exiting );
     gl_downlimit = downlimit;
-    tr_setGlobalDownloadLimit( gl_handle, downlimit );
+    tr_setGlobalSpeedLimit   ( gl_handle, TR_DOWN, downlimit );
+    tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, downlimit > 0 );
     savestate();
 }
 
@@ -720,14 +722,16 @@ loadstate( void )
     {
         gl_uplimit = num->val.i;
     }
-    tr_setGlobalUploadLimit( gl_handle, gl_uplimit );
+    tr_setGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit );
+    tr_setUseGlobalSpeedLimit( gl_handle, TR_UP, gl_uplimit > 0 );
 
     num = tr_bencDictFind( &top, "download-limit" );
     if( NULL != num && TYPE_INT == num->type )
     {
         gl_downlimit = num->val.i;
     }
-    tr_setGlobalDownloadLimit( gl_handle, gl_downlimit );
+    tr_setGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit );
+    tr_setUseGlobalSpeedLimit( gl_handle, TR_DOWN, gl_downlimit > 0 );
 
     str = tr_bencDictFind( &top, "default-directory" );
     if( NULL != str && TYPE_STR == str->type )

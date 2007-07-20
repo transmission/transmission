@@ -230,8 +230,11 @@ int main( int argc, char ** argv )
     signal( SIGINT, sigHandler );
 
     tr_setBindPort( h, bindPort );
-    tr_setGlobalUploadLimit( h, uploadLimit );
-    tr_setGlobalDownloadLimit( h, downloadLimit );
+  
+    tr_setGlobalSpeedLimit   ( h, TR_UP,   uploadLimit );
+    tr_setUseGlobalSpeedLimit( h, TR_UP,   uploadLimit > 0 );
+    tr_setGlobalSpeedLimit   ( h, TR_DOWN, downloadLimit );
+    tr_setUseGlobalSpeedLimit( h, TR_DOWN, downloadLimit > 0 );
 
     tr_natTraversalEnable( h, natTraversal );
     

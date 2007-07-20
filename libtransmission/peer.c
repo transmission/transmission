@@ -379,9 +379,13 @@ int tr_peerRead( tr_peer_t * peer )
         {
             int canDL;
             switch( tor->downloadLimitMode ) {
-                case TR_SPEEDLIMIT_GLOBAL: canDL = tr_rcCanTransfer( tor->handle->download ); break;
-                case TR_SPEEDLIMIT_SINGLE: canDL = tr_rcCanTransfer( tor->download ); break;
-                default: canDL = TRUE; /* unlimited */
+                case TR_SPEEDLIMIT_GLOBAL:
+                    canDL = !tor->handle->useDownloadLimit ||
+                             tr_rcCanTransfer( tor->handle->download ); break;
+                case TR_SPEEDLIMIT_SINGLE:
+                    canDL = tr_rcCanTransfer( tor->download ); break;
+                default: /* unlimited */
+                    canDL = TRUE;
             }
             if( !canDL )
                 break;
@@ -586,10 +590,17 @@ writeBegin:
 
         if( SWIFT_ENABLED && !isSeeding && (peer->credit<0) )
             canUL = FALSE;
-        else switch( tor->uploadLimitMode ) {
-            case TR_SPEEDLIMIT_GLOBAL: canUL = tr_rcCanTransfer( tor->handle->upload ); break;
-            case TR_SPEEDLIMIT_SINGLE: canUL = tr_rcCanTransfer( tor->upload ); break;
-            default: canUL = TRUE; /* unlimited */
+        else switch( tor->uploadLimitMode )
+        {
+            case TR_SPEEDLIMIT_GLOBAL:
+                canUL = !tor->handle->useUploadLimit ||
+                         tr_rcCanTransfer( tor->handle->upload ); break;
+
+            case TR_SPEEDLIMIT_SINGLE:
+                canUL = tr_rcCanTransfer( tor->upload ); break;
+
+            default: /* unlimited */
+                canUL = TRUE;
         }
         if( !canUL )
             break;

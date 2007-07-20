@@ -230,7 +230,9 @@ struct tr_handle_s
     char             * tag;
     int                isPortSet;
 
+    char               useUploadLimit;
     tr_ratecontrol_t * upload;
+    char               useDownloadLimit;
     tr_ratecontrol_t * download;
 
     tr_shared_t      * shared;

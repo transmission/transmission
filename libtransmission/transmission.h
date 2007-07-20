@@ -165,19 +165,6 @@ void tr_natTraversalEnable( tr_handle_t *, int enable );
 typedef struct tr_handle_status_s tr_handle_status_t;
 tr_handle_status_t * tr_handleStatus( tr_handle_t * );
 
-/***********************************************************************
- * tr_setGlobalUploadLimit
- ***********************************************************************
- * Sets the total upload rate limit in KB/s
- **********************************************************************/
-void tr_setGlobalUploadLimit( tr_handle_t *, int );
-
-/***********************************************************************
- * tr_setGlobalDownloadLimit
- ***********************************************************************
- * Sets the total download rate limit in KB/s
- **********************************************************************/
-void tr_setGlobalDownloadLimit( tr_handle_t *, int );
 
 /***********************************************************************
  * tr_torrentCount
@@ -201,6 +188,8 @@ void tr_torrentIterate( tr_handle_t *, tr_callback_t, void * );
 *** Speed Limits
 **/
 
+enum { TR_UP, TR_DOWN };
+
 typedef enum
 {
     TR_SPEEDLIMIT_GLOBAL,    /* indirectly follow the global pool's limit */
@@ -208,8 +197,6 @@ typedef enum
     TR_SPEEDLIMIT_UNLIMITED  /* no limits at all */
 }
 tr_speedlimit_t;
-
-enum { TR_UP, TR_DOWN };
 
 void tr_torrentSetSpeedMode( tr_torrent_t     * tor,
                              int                up_or_down,
@@ -224,6 +211,19 @@ void tr_torrentSetSpeedLimit( tr_torrent_t   * tor,
 
 int tr_torrentGetSpeedLimit( const tr_torrent_t  * tor,
                              int                   up_or_down );
+
+void tr_setUseGlobalSpeedLimit( tr_handle_t * handle,
+                                int           up_or_down,
+                                int           use_flag );
+
+void tr_setGlobalSpeedLimit( tr_handle_t * handle,
+                             int           up_or_down,
+                             int           global_KiB_sec );
+
+void tr_getGlobalSpeedLimit( tr_handle_t * handle,
+                             int           up_or_down,
+                             int         * setme_is_enabled,
+                             int         * setme_KiBsec );
 
 /***********************************************************************
  * Torrent Priorities

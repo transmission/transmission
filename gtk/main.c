@@ -754,7 +754,6 @@ prefschanged( TrCore * core SHUTUP, int id, gpointer data )
 {
     struct cbdata * cbdata;
     tr_handle_t   * tr;
-    int             num;
     gboolean        boolval;
 
     cbdata = data;
@@ -767,23 +766,23 @@ prefschanged( TrCore * core SHUTUP, int id, gpointer data )
             break;
 
         case PREF_ID_USEDOWNLIMIT:
+            tr_setUseGlobalSpeedLimit( tr, TR_DOWN,
+                tr_prefs_get_bool_with_default( PREF_ID_USEDOWNLIMIT ) );
+            break;
+
         case PREF_ID_DOWNLIMIT:
-            num = -1;
-            if( tr_prefs_get_bool_with_default( PREF_ID_USEDOWNLIMIT ) )
-            {
-                num = tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT );
-            }
-            tr_setGlobalDownloadLimit( tr, num );
+            tr_setGlobalSpeedLimit( tr, TR_DOWN,
+                tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT ) );
             break;
 
         case PREF_ID_USEUPLIMIT:
+            tr_setUseGlobalSpeedLimit( tr, TR_UP,
+                tr_prefs_get_bool_with_default( PREF_ID_USEUPLIMIT ) );
+            break;
+
         case PREF_ID_UPLIMIT:
-            num = -1;
-            if( tr_prefs_get_bool_with_default( PREF_ID_USEUPLIMIT ) )
-            {
-                num = tr_prefs_get_int_with_default( PREF_ID_UPLIMIT );
-            }
-            tr_setGlobalUploadLimit( tr, num );
+            tr_setGlobalSpeedLimit( tr, TR_UP,
+                tr_prefs_get_int_with_default( PREF_ID_UPLIMIT ) );
             break;
 
         case PREF_ID_NAT:

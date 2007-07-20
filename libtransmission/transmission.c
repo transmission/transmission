@@ -136,16 +136,47 @@ tr_handle_status_t * tr_handleStatus( tr_handle_t * h )
     return s;
 }
 
-void tr_setGlobalUploadLimit( tr_handle_t * h, int limit )
+/***
+****
+***/
+
+void
+tr_setUseGlobalSpeedLimit( tr_handle_t  * h,
+                           int            up_or_down,
+                           int            use_flag )
 {
-    tr_rcSetLimit( h->upload, limit );
-    tr_sharedSetLimit( h->shared, limit );
+    char * ch = up_or_down==TR_UP ? &h->useUploadLimit
+                                  : &h->useDownloadLimit;
+    *ch = use_flag;
 }
 
-void tr_setGlobalDownloadLimit( tr_handle_t * h, int limit )
+void
+tr_setGlobalSpeedLimit( tr_handle_t  * h,
+                        int            up_or_down,
+                        int            KiB_sec )
 {
-    tr_rcSetLimit( h->download, limit );
+    if( up_or_down == TR_DOWN )
+        tr_rcSetLimit( h->download, KiB_sec );
+    else {
+        tr_rcSetLimit( h->upload, KiB_sec );
+        tr_sharedSetLimit( h->shared, KiB_sec );
+    }
 }
+
+void
+tr_getGlobalSpeedLimit( tr_handle_t  * h,
+                        int            up_or_down,
+                        int          * setme_enabled,
+                        int          * setme_KiBsec )
+{
+    if( setme_enabled != NULL )
+       *setme_enabled = up_or_down==TR_UP ? h->useUploadLimit
+                                          : h->useDownloadLimit;
+    if( setme_KiBsec != NULL )
+       *setme_KiBsec = tr_rcGetLimit( up_or_down==TR_UP ? h->upload
+                                                        : h->download );
+}
+
 
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
