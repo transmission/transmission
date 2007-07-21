@@ -329,14 +329,14 @@ int tr_fdSocketCreate( int type, int priority )
     int s = -1;
 
     tr_lockLock( &gFd->lock );
-    if( ( priority && gFd->reserved < TR_RESERVED_FDS ) ||
-        ( !priority && gFd->normal < gFd->normalMax ) )
-    {
+
+    if( priority && gFd->reserved >= TR_RESERVED_FDS )
+        priority = FALSE;
+
+    if( priority || ( gFd->normal < gFd->normalMax ) )
        if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
-       {
            tr_err( "Could not create socket (%s)", strerror( errno ) );
-       }
-    }
+
     if( s > -1 )
     {
         SocketSetPriority( s, priority );
