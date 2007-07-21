@@ -104,15 +104,10 @@
 - (float) actualStopRatio; //returns INVALID if will not stop
 - (float) progressStopRatio;
 
-#warning merge up and down?
-- (int) uploadSpeedMode;
-- (void) setUploadSpeedMode: (int) mode;
-- (int) uploadSpeedLimit;
-- (void) setUploadSpeedLimit: (int) limit;
-- (int) downloadSpeedMode;
-- (void) setDownloadSpeedMode: (int) mode;
-- (int) downloadSpeedLimit;
-- (void) setDownloadSpeedLimit: (int) limit;
+- (int) speedMode: (BOOL) upload;
+- (void) setSpeedMode: (int) mode upload: (BOOL) upload;
+- (int) speedLimit: (BOOL) upload;
+- (void) setSpeedLimit: (int) limit upload: (BOOL) upload;
 
 - (void) setWaitToStart: (BOOL) wait;
 - (BOOL) waitingToStart;

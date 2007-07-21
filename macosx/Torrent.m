@@ -626,44 +626,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return 0;
 }
 
-- (int) uploadSpeedMode
+- (int) speedMode: (BOOL) upload
 {
-    return tr_torrentGetSpeedMode(fHandle, TR_UP);
+    return tr_torrentGetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setUploadSpeedMode: (int) mode
+- (void) setSpeedMode: (int) mode upload: (BOOL) upload
 {
-    tr_torrentSetSpeedMode(fHandle, TR_UP, mode);
+    tr_torrentSetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN, mode);
 }
 
-- (int) uploadSpeedLimit
+- (int) uploadSpeedLimit: (BOOL) upload
 {
-    return tr_torrentGetSpeedLimit(fHandle, TR_UP);
+    return tr_torrentGetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setUploadSpeedLimit: (int) limit
+- (void) setUploadSpeedLimit: (int) limit upload: (BOOL) upload
 {
-    tr_torrentSetSpeedLimit(fHandle, TR_UP, limit);
-}
-
-- (int) downloadSpeedMode
-{
-    return tr_torrentGetSpeedMode(fHandle, TR_DOWN);
-}
-
-- (void) setDownloadSpeedMode: (int) mode
-{
-    tr_torrentSetSpeedMode(fHandle, TR_DOWN, mode);
-}
-
-- (int) downloadSpeedLimit
-{
-    return tr_torrentGetSpeedLimit(fHandle, TR_DOWN);
-}
-
-- (void) setDownloadSpeedLimit: (int) limit
-{
-    tr_torrentSetSpeedLimit(fHandle, TR_DOWN, limit);
+    tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
 
 - (void) setWaitToStart: (BOOL) wait
@@ -1829,15 +1809,15 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         return;
 
     fQuickPauseDict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    [NSNumber numberWithInt: [self uploadSpeedMode]], @"UploadSpeedMode",
-                    [NSNumber numberWithInt: [self uploadSpeedLimit]], @"UploadSpeedLimit",
-                    [NSNumber numberWithInt: [self downloadSpeedMode]], @"DownloadSpeedMode",
-                    [NSNumber numberWithInt: [self downloadSpeedLimit]], @"DownloadSpeedLimit", nil];
+                    [NSNumber numberWithInt: [self speedMode: YES]], @"UploadSpeedMode",
+                    [NSNumber numberWithInt: [self speedLimit: YES]], @"UploadSpeedLimit",
+                    [NSNumber numberWithInt: [self speedMode: NO]], @"DownloadSpeedMode",
+                    [NSNumber numberWithInt: [self speedLimit: NO]], @"DownloadSpeedLimit", nil];
     
-    [self setUploadSpeedMode: TR_SPEEDLIMIT_SINGLE];
-    [self setUploadSpeedLimit: 0];
-    [self setDownloadSpeedMode: TR_SPEEDLIMIT_SINGLE];
-    [self setDownloadSpeedLimit: 0];
+    [self setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: YES];
+    [self setSpeedLimit: 0 upload: YES];
+    [self setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: NO];
+    [self setSpeedLimit: 0 upload: NO];
 }
 
 - (void) endQuickPause
@@ -1845,10 +1825,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (!fQuickPauseDict)
         return
     
-    [self setUploadSpeedMode: [[fQuickPauseDict objectForKey: @"UploadSpeedMode"] intValue]];
-    [self setUploadSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadSpeedLimit"] intValue]];
-    [self setDownloadSpeedMode: [[fQuickPauseDict objectForKey: @"DownloadSpeedMode"] intValue]];
-    [self setDownloadSpeedLimit: [[fQuickPauseDict objectForKey: @"DownloadSpeedLimit"] intValue]];
+    [self setSpeedMode: [[fQuickPauseDict objectForKey: @"UploadSpeedMode"] intValue] upload: YES];
+    [self setSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadSpeedLimit"] intValue] upload: YES];
+    [self setSpeedMode: [[fQuickPauseDict objectForKey: @"DownloadSpeedMode"] intValue] upload: NO];
+    [self setSpeedLimit: [[fQuickPauseDict objectForKey: @"DownloadSpeedLimit"] intValue] upload: NO];
     
     [fQuickPauseDict release];
     fQuickPauseDict = nil;

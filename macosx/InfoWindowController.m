@@ -458,25 +458,25 @@
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
         
-        int uploadSpeedMode = [torrent uploadSpeedMode],
-            uploadSpeedLimit = [torrent uploadSpeedLimit],
-            downloadSpeedMode = [torrent downloadSpeedMode],
-            downloadSpeedLimit = [torrent downloadSpeedLimit];
+        int uploadSpeedMode = [torrent speedMode: YES],
+            uploadSpeedLimit = [torrent speedLimit: YES],
+            downloadSpeedMode = [torrent speedMode: NO],
+            downloadSpeedLimit = [torrent speedLimit: NO];
         
         while ((uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
                 || downloadSpeedMode != INVALID || downloadSpeedLimit != INVALID)
                 && (torrent = [enumerator nextObject]))
         {
-            if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent uploadSpeedMode])
+            if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent speedMode: YES])
                 uploadSpeedMode = INVALID;
             
-            if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent uploadSpeedLimit])
+            if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit: YES])
                 uploadSpeedLimit = INVALID;
             
-            if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent downloadSpeedMode])
+            if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent speedMode: NO])
                 downloadSpeedMode = INVALID;
             
-            if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent downloadSpeedLimit])
+            if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
                 downloadSpeedLimit = INVALID;
         }
         
@@ -1109,7 +1109,7 @@
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
-        upload ? [torrent setUploadSpeedMode: mode] : [torrent setDownloadSpeedMode: mode];
+        [torrent setSpeedMode: mode upload: upload];
     
     NSTextField * field = upload ? fUploadLimitField : fDownloadLimitField;
     
@@ -1138,9 +1138,9 @@
         NSBeep();
         
         torrent = [enumerator nextObject]; //use first torrent
-        limit = upload ? [torrent uploadSpeedLimit] : [torrent downloadSpeedLimit];
+        limit = [torrent speedLimit: upload];
         while ((torrent = [enumerator nextObject]))
-            if (limit != (upload ? [torrent uploadSpeedLimit] : [torrent downloadSpeedLimit]))
+            if (limit != [torrent speedLimit: upload])
             {
                 [sender setStringValue: @""];
                 return;
@@ -1151,7 +1151,7 @@
     else
     {
         while ((torrent = [enumerator nextObject]))
-            upload ? [torrent setUploadSpeedLimit: limit] : [torrent setDownloadSpeedLimit: limit];
+            [torrent setSpeedLimit: limit upload: upload];
     }
 }
 
