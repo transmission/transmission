@@ -636,12 +636,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     tr_torrentSetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN, mode);
 }
 
-- (int) uploadSpeedLimit: (BOOL) upload
+- (int) speedLimit: (BOOL) upload
 {
     return tr_torrentGetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setUploadSpeedLimit: (int) limit upload: (BOOL) upload
+- (void) setSpeedLimit: (int) limit upload: (BOOL) upload
 {
     tr_torrentSetSpeedLimit(fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
