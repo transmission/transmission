@@ -931,7 +931,8 @@ void tr_torrentStart( tr_torrent_t * tor )
 
 void tr_torrentStop( tr_torrent_t * tor )
 {
-    setRunState( tor, TR_RUN_STOPPING );
+    if((tor->runStatus != TR_RUN_STOPPING) && (tor->runStatus != TR_RUN_STOPPED) )
+        setRunState( tor, TR_RUN_STOPPING );
 }
 
 void tr_torrentClose( tr_torrent_t * tor )
