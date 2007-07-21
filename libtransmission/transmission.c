@@ -23,8 +23,13 @@
  *****************************************************************************/
 
 #include <signal.h>
+#include <sys/types.h> /* stat */
+#include <sys/stat.h> /* stat */
+#include <unistd.h> /* stat */
+#include <dirent.h> /* opendir */
 #include "transmission.h"
 #include "fdlimit.h"
+#include "list.h"
 #include "net.h"
 #include "shared.h"
 
@@ -223,4 +228,52 @@ void tr_close( tr_handle_t * h )
     free( h );
 
     tr_netResolveThreadClose();
+}
+
+tr_torrent_t **
+tr_loadTorrents ( tr_handle_t   * h,
+                  const char    * destination,
+                  int             flags,
+                  int          * setmeCount )
+{
+    int i, n = 0;
+    struct stat sb;
+    DIR * odir = NULL;
+    const char * torrentDir = tr_getTorrentsDirectory( );
+    tr_torrent_t ** torrents;
+    tr_list_t *l=NULL, *list=NULL;
+
+    if( !stat( torrentDir, &sb )
+        && S_ISDIR( sb.st_mode )
+        && (( odir = opendir ( torrentDir ) )) )
+    {
+        struct dirent *d;
+        for (d = readdir( odir ); d!=NULL; d=readdir( odir ) )
+        {
+            if( d->d_name && d->d_name[0]!='.' ) /* skip dotfiles, ., and .. */
+            {
+                tr_torrent_t * tor;
+                char path[MAX_PATH_LENGTH];
+                tr_buildPath( path, sizeof(path), torrentDir, d->d_name, NULL );
+                tor = tr_torrentInit( h, path, destination, flags, NULL );
+                if( tor != NULL ) {
+                    list = tr_list_append( list, tor );
+                    //fprintf (stderr, "#%d - %s\n", n, tor->info.name );
+                    n++;
+                }
+            }
+        }
+        closedir( odir );
+    }
+
+    torrents = tr_new( tr_torrent_t*, n );
+    for( i=0, l=list; l!=NULL; l=l->next )
+        torrents[i++] = (tr_torrent_t*) l->data;
+    assert( i==n );
+
+    tr_list_free( list );
+
+    *setmeCount = n;
+    tr_inf( "Loaded %d torrents from disk", *setmeCount );
+    return torrents;
 }

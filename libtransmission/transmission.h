@@ -284,6 +284,19 @@ void tr_torrentRates( tr_handle_t *, float *, float * );
  **********************************************************************/
 void tr_close( tr_handle_t * );
 
+
+
+/**
+ *  Load all the torrents in tr_getTorrentsDirectory().
+ *  This can be used at startup to kickstart all the torrents
+ *  from the previous session.
+ */
+tr_torrent_t ** tr_loadTorrents ( tr_handle_t  * h,
+                                  const char   * destination,
+                                  int            flags,
+                                  int          * setmeCount );
+
+
 /***********************************************************************
  * tr_torrentInit
  ***********************************************************************
