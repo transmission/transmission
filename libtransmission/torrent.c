@@ -972,7 +972,7 @@ tr_torrentFree( tr_torrent_t * tor )
 
     h->torrentCount--;
 
-    fprintf(stderr, "closing torrent %s... %d torrents left",
+    tr_inf( "closing torrent %s... %d torrents left",
             tor->info.name, h->torrentCount );
 
     tr_free( tor );
