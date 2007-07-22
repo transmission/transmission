@@ -33,6 +33,7 @@
                 setQuickRatioGlobal = id; 
                 setSort = id; 
                 setSortReverse = id; 
+                showAboutWindow = id; 
                 showInfo = id; 
                 showMainWindow = id; 
                 showMessageWindow = id; 

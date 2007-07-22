@@ -159,6 +159,8 @@
 
 - (void) showPreferenceWindow: (id) sender;
 
+- (void) showAboutWindow: (id) sender;
+
 - (void) showInfo: (id) sender;
 - (void) setInfoTab: (id) sender;
 

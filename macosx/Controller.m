@@ -29,6 +29,7 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
+#import "AboutWindowController.h"
 #import "StringAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
@@ -1346,6 +1347,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [window center];
 
     [window makeKeyAndOrderFront: nil];
+}
+
+- (void) showAboutWindow: (id) sender
+{
+    [[AboutWindowController aboutController] showWindow: nil];
 }
 
 - (void) showInfo: (id) sender

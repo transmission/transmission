@@ -1,126 +1,59 @@
-AUTHORS for Transmission <http://transmission.m0k.org/>
-=======================================================
+The Transmission Project
+http://transmission.m0k.org/
 
-Transmission is written and maintained by:
+Lead Developers <transmission-dev@m0k.org>
+	Eric Petit <titer@m0k.org>  (Creator)
+	Josh Elsasser <josh@elsasser.org>  (Back-end, GTK+ interface, Daemon interface)
+	Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Back-end)
+	Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+ interface)
+	Bryan Varner <bryan@varnernet.com>  (BeOS interface)
 
-Eric Petit <titer@m0k.org>
- + Back-end
- + OS X interface
+Project Contributors
+	Nick Pucius  (Mac OS X Help documentation)
+	Hugo van Heuven, madebysofa  (Icon design, Mac toolbar icons)
 
-Josh Elsasser <josh@elsasser.org>
- + Back-end
- + GTK+ interface
- + Daemon interface
+Translators
+Mac OS, current release:
+	Cédric Luthi  (French)
+	Jorge Carrasco Perez  (Spanish)
+	Ontje Helmich  (German)
+	Thermaikos  (Greek)
 
-Mitchell Livingston <livings124@gmail.com>
- + OS X interface
- + Back-end
+GTK+:
+	Calorì Alessandro  (Italian)
+	Pierre-Henri Quelen  (French)
+	Robert-André Mauchin  (French)
+	Vicente Carro Fernandez  (Spanish)
+	Tomasz Dominikowski  (Polish)
+	Nickolay V. Shmyrev  (Russian)
+	Pavel Shevchuk  (Russian)
+	Lubomir Marinov  (Bulgarian)
+	Mircea Suciu  (Romanian)
+	Daniel Nylander  (Swedish)
+	Jaakko Huhtala  (Finnish)
 
-Charles Kerr <charles@rebelbase.com>
- + Back-end
- + GTK+ interface
+Special Thanks
 
-Bryan Varner <bryan@varnernet.com>
- + BeOS interface
+Image Contributors
+	FOOOD
+	Martin Stadtmueller  (Icon tweaking)
+	Mike Matas <http://www.mikematas.com/>  (Previous toolbar icons)
+	Jonas Rask  (Globe icon)
+	George Tsotsos
+	Rashid Eissing  (Transfers preferences icon)
 
+Other Contributors
+	Omar and Adrien  (Beta testing)
+	BitTorrent Protocol Specification <http://wiki.theory.org/BitTorrentSpecification>
+	vi@nwr.jp  (Free SHA1 implementation)
+	Ahmad M. Afuni  (NetBSD patch)
+	Jeremy Messenger  (FreeBSD patch)
+	John Blitch  (Mac OS X patch)
+	Michael Demars <keul@m0k.org>  (Mac OS X patches)
+	Deanna Phillips  (transmissioncli manpage)
 
-Translators:
-
-C√©dric Luthi
- + French Mac OS X translation
-
-Jorge Carrasco Perez
- + Spanish Mac OS X translation
-
-Ontje Helmich
- + German Mac OS X translation
-
-Thermaikos
- + Greek Mac OS X translation
-
-Calor√¨ Alessandro
- + Italian GTK+ translation
-
-Pierre-Henri Quelen
- + French GTK+ translation
-
-Robert-Andr√© Mauchin
- + French GTK+ translation
-
-Vicente Carro Fernandez
- + Spanish GTK+ translation
-
-Tomasz Dominikowski
- + Polish GTK+ translation
-
-Nickolay V. Shmyrev
- + Russian GTK+ translation
-
-Pavel Shevchuk
- + Russian GTK+ translation
-
-Lubomir Marinov
- + Bulgarian GTK+ translation
-
-Mircea Suciu
- + Romanian GTK+ translation
-
-Daniel Nylander
- + Swedish GTK+ translation
-
-Jaakko Huhtala
- + Finnish GTK+ translation
-
-
+Third-Party Resources
 Thanks to:
-
-Hugo van Heuven, madebysofa
- + Icon design
- + Mac OS X toolbar icons
-
-Omar and Adrien
- + Beta testing
-
-Various people
- + Writing http://wiki.theory.org/BitTorrentSpecification
-
-vi@nwr.jp
- + Free SHA1 implementation (sha1.[ch])
-
-John Blitch
- + Mac OS X patch (Contextual menu)
-
-Ahmad M. Afuni
- + NetBSD patch
-
-Jeremy Messenger
- + FreeBSD patch
-
-Mike Matas <http://www.mikematas.com/>
- + Previous Mac OS X toolbar icons
-
-Martin Stadtmueller
- + Icon tweaking
-
-FOOOD
- + Various images
-
-George Tsotsos
- + Various images
-
-Nick Pucius
- + Mac OS X Help documentation
-
-Michael Demars <keul@m0k.org>
- + OS X interface (Growl notifications, AppleScript)
-
-Rashid Eissing
- + Transfers preferences icon
-
-Deanna Phillips
- + Manpage for transmissioncli
-
-Jonas Rask
- + Globe image
-
-Thanks to M. Uli Kusterer for use of UKKQueue.
+	The Growl Development Team for use of Growl <http://growl.info/>
+	Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
+	M. Uli Kusterer for use of UKKQueue.
