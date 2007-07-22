@@ -471,7 +471,7 @@ static int OpenFile( int i, const char * folder, const char * name, int write )
     /* Now try to really open the file */
     errno = 0;
     file->file = open( path, write ? ( O_RDWR | O_CREAT ) : O_RDONLY, 0666 );
-    if( file->file < 0 )
+    if( write && ( file->file < 0 ) )
     {
         ret = tr_ioErrorFromErrno();
         if( errno )

@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdint.h>
 #include <wx/artprov.h>
 #include <wx/defs.h>
 #include <wx/config.h>
@@ -25,6 +26,7 @@
 #endif
 extern "C" {
   #include <libtransmission/transmission.h>
+  #include <libtransmission/utils.h>
 }
 
 class MyApp : public wxApp
@@ -50,7 +52,11 @@ protected:
 
 private:
     void rebuildTorrentList();
+    void repopulateTorrentList ();
     wxListCtrl * myTorrentList;
+    typedef std::vector<tr_torrent_t*> torrents_t;
+    torrents_t myTorrents;
+    void insertTorrent( tr_torrent_t*, const std::vector<int>& );
 };
 
 enum
@@ -131,7 +137,7 @@ namespace
         COL_RECEIVED,
         COL_REMAINING,
         COL_SEEDS,
-        COL_SEND,
+        COL_SENT,
         COL_SIZE,
         COL_STATE,
         COL_STATUS,
@@ -158,7 +164,7 @@ namespace
             columns[_T("received")]  = COL_RECEIVED;
             columns[_T("remaining")] = COL_REMAINING;
             columns[_T("seeds")]     = COL_SEEDS; 
-            columns[_T("sent")]      = COL_SEND; 
+            columns[_T("sent")]      = COL_SENT; 
             columns[_T("size")]      = COL_SIZE; 
             columns[_T("state")]     = COL_STATE; 
             columns[_T("status")]    = COL_STATUS; 
@@ -174,14 +180,16 @@ namespace
         return i;
     }
 
-    std::vector<int> getTorrentColumns( wxConfig * config )
+    typedef std::vector<int> int_v;
+
+    int_v getTorrentColumns( wxConfig * config )
     {
         const wxString key = _T("TorrentListColumns");
         wxString columnStr;
         if( !config->Read( key, &columnStr ) )
             columnStr = _T("name|#|size|done|status|seeds|peers|eta|uspeed|dspeed");
 
-        std::vector<int> cols;
+        int_v cols;
         while( !columnStr.IsEmpty() )
         {
             const wxString key = columnStr.BeforeFirst(_T('|'));
@@ -190,6 +198,168 @@ namespace
         }
         return cols;
     }
+
+    int bestDecimal( double num ) {
+        if ( num < 10 ) return 2;
+        if ( num < 100 ) return 1;
+        return 0;
+    }
+
+    std::string getReadableSize( uint64_t size )
+    {
+        int i;
+        static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
+            //N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"), N_("PiB"), N_("EiB") };
+        for ( i=0; size>>10; ++i )
+            size = size>>10;
+        char buf[512];
+        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
+        return buf;
+    }
+    std::string getReadableSize( float f )
+    {
+        return getReadableSize( (uint64_t)f );
+    }
+
+    std::string getReadableTime( int i /*seconds*/ )  /*FIXME*/
+    {
+        const int s = i % 60; i /= 60;
+        const int m = i % 60; i /= 60;
+        const int h = i;
+        char buf[64];
+        snprintf( buf, sizeof(buf), "%d:%02d:%02d", h, m, s);
+        return buf;
+    }
+
+    wxString toWxStr( const std::string& s )
+    {
+        return wxString( s.c_str(), wxConvUTF8 );
+    }
+
+    wxString toWxStr( const char * s )
+    {
+        return wxString( s, wxConvUTF8 );
+    }
+}
+
+
+/***
+****
+***/
+
+void
+MyFrame :: insertTorrent( tr_torrent_t * tor,
+                          const int_v        & cols )
+{
+    int row = -1;
+    int col = 0;
+    char buf[512];
+    std::string str;
+    const tr_stat_t * s = tr_torrentStat( tor );
+    const tr_info_t* info = tr_torrentInfo( tor );
+
+
+    for( int_v::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
+    {
+        wxString xstr;
+
+        switch( *it )
+        {
+            case COL_NUMBER:
+                snprintf( buf, sizeof(buf), "%d", 666 );
+                xstr = toWxStr( buf );
+                break;
+
+            case COL_DONE:
+                snprintf( buf, sizeof(buf), "%%%.1f", s->percentDone );
+                xstr = toWxStr( buf );
+                break;
+
+            case COL_DOWNLOAD_SPEED: break;
+                xstr = toWxStr( getReadableSize( s->rateDownload ) + "/s"  );
+                break;
+
+            case COL_ETA:
+                xstr = toWxStr( getReadableTime( s->eta ) );
+                break;
+                
+            case COL_HASH:
+                xstr = toWxStr( info->hashString );
+                break;
+
+            case COL_NAME:
+                xstr = toWxStr( info->name );
+                break;
+
+            case COL_PEERS:
+                /* FIXME: this is all peers, not just leechers */
+                snprintf( buf, sizeof(buf), "%d (%d)", s->peersTotal, s->peersConnected );
+                xstr = toWxStr( buf );
+                break;
+
+            case COL_RATIO:
+                snprintf( buf, sizeof(buf), "%%%d", (int)(s->uploaded / (double)s->downloadedValid) );
+                xstr = toWxStr( buf );
+                break;
+
+            case COL_RECEIVED:
+                xstr = toWxStr( getReadableSize( s->downloaded ) );
+                break;
+
+            case COL_REMAINING:
+                xstr = toWxStr( getReadableSize( s->left ) );
+                break;
+
+            case COL_SEEDS:
+                snprintf( buf, sizeof(buf), "%d", s->seeders ); /* FIXME: %d (%d) */
+                xstr = toWxStr( buf );
+                break;
+
+            case COL_SENT:
+                xstr = toWxStr( getReadableSize( s->uploaded ) );
+                break;
+
+            case COL_SIZE:
+                xstr = toWxStr( getReadableSize( info->totalSize ) );
+                break;
+
+            case COL_STATE:
+                xstr = _T("Fixme");
+                break;
+
+            case COL_STATUS:
+                xstr = _T("Fixme");
+                break;
+
+            case COL_TOTAL:
+                xstr = _T("Fixme");
+                break;
+
+            case COL_UPLOAD_SPEED:
+                xstr = toWxStr( getReadableSize( s->rateUpload ) + "/s" );
+                break;
+
+            default:
+                xstr = _T("Fixme");
+        }
+
+        if( row < 0 )
+            row = myTorrentList->InsertItem( myTorrentList->GetItemCount(), xstr );
+        else
+            myTorrentList->SetItem( row, ++col, xstr );
+    }
+}
+
+
+void
+MyFrame :: repopulateTorrentList ()
+{
+    myTorrentList->DeleteAllItems();
+
+    const int_v cols = getTorrentColumns( myConfig );
+    for( torrents_t::const_iterator it(myTorrents.begin()),
+                                   end(myTorrents.end()); it!=end; ++it )
+        insertTorrent( *it, cols );
 }
 
 void
@@ -198,8 +368,8 @@ MyFrame :: rebuildTorrentList()
     myTorrentList->ClearAll( );
 
     int i = 0;
-    const std::vector<int> cols = getTorrentColumns( myConfig );
-    for( std::vector<int>::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
+    const int_v  cols = getTorrentColumns( myConfig );
+    for( int_v ::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
     {
         wxString h;
 
@@ -216,7 +386,7 @@ MyFrame :: rebuildTorrentList()
             case COL_RECEIVED:        h = _T("Received"); break;
             case COL_REMAINING:       h = _T("Remaining"); break;
             case COL_SEEDS:           h = _T("Seeds"); break;
-            case COL_SEND:            h = _T("Send"); break;
+            case COL_SENT:            h = _T("Sent"); break;
             case COL_SIZE:            h = _T("Size"); break;
             case COL_STATE:           h = _T("State"); break;
             case COL_STATUS:          h = _T("Status"); break;
@@ -227,6 +397,8 @@ MyFrame :: rebuildTorrentList()
 
         myTorrentList->InsertColumn( i++, h );
     }
+
+    repopulateTorrentList ();
 }
 
 /***
@@ -247,6 +419,18 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     wxIcon ico;
     ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
     SetIcon( ico );
+
+    /**
+    ***  Torrents
+    **/
+
+    const int flags = TR_FLAG_PAUSED;
+    const char * destination = "/tmp/asdf";
+    int count = 0;
+    tr_torrent_t ** torrents = tr_loadTorrents ( handle, destination, flags, &count );
+    myTorrents.insert( myTorrents.end(), torrents, torrents+count );
+    tr_free( torrents );
+
 
     /**
     ***  Menu
@@ -336,13 +520,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     rebuildTorrentList();
     row_sizer->Add( myTorrentList, wxSizerFlags().Expand() );
     row_sizer->AddGrowableCol( 1, 1 );
-
-    i = myTorrentList->InsertItem( 0, _T("Fedora.iso") );
-    myTorrentList->SetItem( i, 1, _T("*"));
-    myTorrentList->SetItem( i, 2, _T("4.4 GiB"));
-    myTorrentList->SetItem( i, 3, _T("50%"));
-    myTorrentList->SetItem( i, 4, _T("0 (77)"));
-    myTorrentList->SetItem( i, 5, _T("1 (128)"));
+    repopulateTorrentList ();
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
