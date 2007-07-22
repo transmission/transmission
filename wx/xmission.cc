@@ -46,17 +46,25 @@ public:
     void OnQuit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
+    void OnTimer(wxTimerEvent& event);
 
 protected:
     wxConfig * myConfig;
+    wxTimer myPulseTimer;
 
 private:
     void rebuildTorrentList();
     void repopulateTorrentList ();
+    void refreshTorrentList ();
     wxListCtrl * myTorrentList;
     typedef std::vector<tr_torrent_t*> torrents_t;
     torrents_t myTorrents;
-    void insertTorrent( tr_torrent_t*, const std::vector<int>& );
+    void refreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
+
+    typedef std::map<std::string,int> str2int_t;
+
+    /** torrent hash -> the torrent's row in myTorrentList */
+    str2int_t myHashToRow;
 };
 
 enum
@@ -69,6 +77,7 @@ enum
     ID_EDIT_PREFS,
     ID_SHOW_DEBUG_WINDOW,
     ID_ABOUT,
+    ID_Pulse,
     N_IDS
 };
 
@@ -111,6 +120,7 @@ bool MyApp::OnInit()
     frame->Connect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnOpen );
     frame->Connect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnQuit );
     frame->Connect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnAbout );
+    frame->Connect( ID_Pulse, wxEVT_TIMER, (wxObjectEventFunction) &MyFrame::OnTimer );
 
     frame->Show( true );
     SetTopWindow( frame );
@@ -187,7 +197,7 @@ namespace
         const wxString key = _T("TorrentListColumns");
         wxString columnStr;
         if( !config->Read( key, &columnStr ) )
-            columnStr = _T("name|#|size|done|status|seeds|peers|eta|uspeed|dspeed");
+            columnStr = _T("name|dspeed|uspeed|eta|peers|size|done|status|seeds");
 
         int_v cols;
         while( !columnStr.IsEmpty() )
@@ -245,11 +255,23 @@ namespace
 
 /***
 ****
+****  PEERS LIST
+****
+****
+***/
+
+
+/***
+****
+****  TORRENT LIST
+****
+****
 ***/
 
 void
-MyFrame :: insertTorrent( tr_torrent_t * tor,
-                          const int_v        & cols )
+MyFrame :: refreshTorrent( tr_torrent_t  * tor,
+                           int             myTorrents_index,
+                           const int_v   & cols )
 {
     int row = -1;
     int col = 0;
@@ -257,7 +279,6 @@ MyFrame :: insertTorrent( tr_torrent_t * tor,
     std::string str;
     const tr_stat_t * s = tr_torrentStat( tor );
     const tr_info_t* info = tr_torrentInfo( tor );
-
 
     for( int_v::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
     {
@@ -271,7 +292,7 @@ MyFrame :: insertTorrent( tr_torrent_t * tor,
                 break;
 
             case COL_DONE:
-                snprintf( buf, sizeof(buf), "%%%.1f", s->percentDone );
+                snprintf( buf, sizeof(buf), "%d%%", (int)(s->percentDone*100.0) );
                 xstr = toWxStr( buf );
                 break;
 
@@ -280,7 +301,12 @@ MyFrame :: insertTorrent( tr_torrent_t * tor,
                 break;
 
             case COL_ETA:
-                xstr = toWxStr( getReadableTime( s->eta ) );
+                if( (int)(s->percentDone*100) >= 100 )
+                    xstr = wxString ();
+                else if( s->eta < 0 )
+                    xstr = toWxStr( "\xE2\x88\x9E" ); /* infinity, in utf-8 */
+                else
+                    xstr = toWxStr( getReadableTime( s->eta ) );
                 break;
                 
             case COL_HASH:
@@ -343,59 +369,96 @@ MyFrame :: insertTorrent( tr_torrent_t * tor,
                 xstr = _T("Fixme");
         }
 
-        if( row < 0 )
-            row = myTorrentList->InsertItem( myTorrentList->GetItemCount(), xstr );
-        else
-            myTorrentList->SetItem( row, ++col, xstr );
+        if( col ) {
+            myTorrentList->SetItem( row, col++, xstr );
+        }
+        else {
+            // first column... find the right row to put the info in.
+            // if the torrent's in the list already, update that row.
+            // otherwise, add a new row.
+            if( row < 0 ) {
+                str2int_t::const_iterator it = myHashToRow.find( info->hashString );
+                if( it != myHashToRow.end() ) {
+                    row = it->second;
+                }
+            }
+            if( row >= 0 ) {
+                myTorrentList->SetItem( row, col++, xstr );
+            }
+            else {
+                row = myTorrentList->InsertItem( myTorrentList->GetItemCount(), xstr );
+                col = 1;
+                myHashToRow[info->hashString] = row;
+                myTorrentList->SetItemData( row, myTorrents_index );
+            }
+        }
     }
 }
 
+void
+MyFrame :: refreshTorrentList ()
+{
+    const int_v  cols = getTorrentColumns( myConfig );
+    const int rowCount = myTorrentList->GetItemCount();
+    for( int row=0; row<rowCount; ++row )
+    {
+        int array_index = myTorrentList->GetItemData( row );
+        tr_torrent_t * tor = myTorrents[array_index];
+        refreshTorrent( tor, array_index, cols );
+    }
+}
 
 void
 MyFrame :: repopulateTorrentList ()
 {
+std::cerr << __FILE__ << ':' << __LINE__ << " clearing all items from list" << std::endl;
     myTorrentList->DeleteAllItems();
+    myHashToRow.clear ();
 
     const int_v cols = getTorrentColumns( myConfig );
+    int i = 0;
     for( torrents_t::const_iterator it(myTorrents.begin()),
                                    end(myTorrents.end()); it!=end; ++it )
-        insertTorrent( *it, cols );
+        refreshTorrent( *it, i++, cols );
 }
 
 void
 MyFrame :: rebuildTorrentList()
 {
     myTorrentList->ClearAll( );
+    myHashToRow.clear ();
 
     int i = 0;
     const int_v  cols = getTorrentColumns( myConfig );
     for( int_v ::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
     {
+        int format = wxLIST_FORMAT_LEFT;
+        int width = -1;
         wxString h;
 
         switch( *it )
         {
-            case COL_NUMBER:          h = _T("#"); break;
-            case COL_DONE:            h = _T("Done"); break;
+            case COL_NUMBER:          h = _T("#"); format = wxLIST_FORMAT_CENTRE; break;
+            case COL_DONE:            h = _T("Done"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_DOWNLOAD_SPEED:  h = _T("Download"); break;
-            case COL_ETA:             h = _T("ETA"); break;
+            case COL_ETA:             h = _T("ETA"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_HASH:            h = _T("SHA1 Hash"); break;
-            case COL_NAME:            h = _T("Name"); break;
-            case COL_PEERS:           h = _T("Peers"); break;
-            case COL_RATIO:           h = _T("Ratio"); break;
-            case COL_RECEIVED:        h = _T("Received"); break;
-            case COL_REMAINING:       h = _T("Remaining"); break;
-            case COL_SEEDS:           h = _T("Seeds"); break;
-            case COL_SENT:            h = _T("Sent"); break;
-            case COL_SIZE:            h = _T("Size"); break;
+            case COL_NAME:            h = _T("Name"); width = 500; break;
+            case COL_PEERS:           h = _T("Peers"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_RATIO:           h = _T("Ratio"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_RECEIVED:        h = _T("Received"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_REMAINING:       h = _T("Remaining"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_SEEDS:           h = _T("Seeds"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_SENT:            h = _T("Sent"); format = wxLIST_FORMAT_RIGHT; break;
+            case COL_SIZE:            h = _T("Size");  format = wxLIST_FORMAT_RIGHT; break;
             case COL_STATE:           h = _T("State"); break;
             case COL_STATUS:          h = _T("Status"); break;
             case COL_TOTAL:           h = _T("Total"); break;
-            case COL_UPLOAD_SPEED:    h = _T("Upload"); break;
+            case COL_UPLOAD_SPEED:    h = _T("Upload"); format = wxLIST_FORMAT_RIGHT;break;
             default:                  h = _T("Error"); break;
         }
 
-        myTorrentList->InsertColumn( i++, h );
+        myTorrentList->InsertColumn( i++, h, format, width );
     }
 
     repopulateTorrentList ();
@@ -405,6 +468,12 @@ MyFrame :: rebuildTorrentList()
 ****
 ***/
 
+void
+MyFrame :: OnTimer(wxTimerEvent& event)
+{
+    refreshTorrentList ();
+}
+
 MyFrame::~MyFrame()
 {
     delete myConfig;
@@ -412,7 +481,8 @@ MyFrame::~MyFrame()
 
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     wxFrame((wxFrame*)NULL,-1,title,pos,size),
-    myConfig( new wxConfig( _T("xmission") ) )
+    myConfig( new wxConfig( _T("xmission") ) ),
+    myPulseTimer( this, ID_Pulse )
 {
     wxImage::AddHandler( new wxPNGHandler );
     wxImage transmission_logo ( _T("images/transmission.png"), wxBITMAP_TYPE_PNG );
@@ -425,7 +495,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     **/
 
     const int flags = TR_FLAG_PAUSED;
-    const char * destination = "/tmp/asdf";
+    const char * destination = "/home/charles/torrents";
     int count = 0;
     tr_torrent_t ** torrents = tr_loadTorrents ( handle, destination, flags, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
@@ -520,7 +590,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     rebuildTorrentList();
     row_sizer->Add( myTorrentList, wxSizerFlags().Expand() );
     row_sizer->AddGrowableCol( 1, 1 );
-    repopulateTorrentList ();
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
@@ -544,6 +613,12 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 
     CreateStatusBar();
     SetStatusText(_T("Welcome to Xmission!"));
+
+    /**
+    ***  Refresh
+    **/
+
+    myPulseTimer.Start( 1500 );
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
