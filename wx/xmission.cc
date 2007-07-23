@@ -18,6 +18,7 @@
 #include <wx/defs.h>
 #include <wx/config.h>
 #include <wx/listctrl.h>
+#include <wx/taskbar.h>
 #include <wx/toolbar.h>
 #include <wx/splitter.h>
 #include <wx/notebook.h>
@@ -57,7 +58,6 @@ private:
     void rebuildTorrentList();
     void repopulateTorrentList ();
     void refreshTorrentList ();
-    wxListCtrl * myTorrentList;
     typedef std::vector<tr_torrent_t*> torrents_t;
     torrents_t myTorrents;
     void refreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
@@ -66,6 +66,11 @@ private:
 
     /** torrent hash -> the torrent's row in myTorrentList */
     str2int_t myHashToRow;
+
+    wxListCtrl * myTorrentList;
+    wxTaskBarIcon * myTaskBarIcon;
+    wxIcon * myLogoIcon;
+    wxIcon * myTrayLogo;
 };
 
 enum
@@ -119,8 +124,8 @@ bool MyApp::OnInit()
                                    wxSize(450,350));
 
     frame->Connect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnOpen );
-    frame->Connect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnQuit );
     frame->Connect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnAbout );
+    frame->Connect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnQuit );
     frame->Connect( ID_Pulse, wxEVT_TIMER, (wxObjectEventFunction) &MyFrame::OnTimer );
 
     frame->Show( true );
@@ -216,32 +221,6 @@ namespace
         return 0;
     }
 
-    std::string getReadableSize( uint64_t size )
-    {
-        int i;
-        static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
-            //N_("B"), N_("KiB"), N_("MiB"), N_("GiB"), N_("TiB"), N_("PiB"), N_("EiB") };
-        for ( i=0; size>>10; ++i )
-            size = size>>10;
-        char buf[512];
-        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
-        return buf;
-    }
-    std::string getReadableSize( float f )
-    {
-        return getReadableSize( (uint64_t)f );
-    }
-
-    std::string getReadableTime( int i /*seconds*/ )  /*FIXME*/
-    {
-        const int s = i % 60; i /= 60;
-        const int m = i % 60; i /= 60;
-        const int h = i;
-        char buf[64];
-        snprintf( buf, sizeof(buf), "%d:%02d:%02d", h, m, s);
-        return buf;
-    }
-
     wxString toWxStr( const std::string& s )
     {
         return wxString( s.c_str(), wxConvUTF8 );
@@ -250,6 +229,36 @@ namespace
     wxString toWxStr( const char * s )
     {
         return wxString( s, wxConvUTF8 );
+    }
+
+    wxString getReadableSize( uint64_t size )
+    {
+        int i;
+        static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
+        for ( i=0; size>>10; ++i ) size = size>>10;
+        char buf[512];
+        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
+        return toWxStr( buf );
+    }
+
+    wxString getReadableSize( float f )
+    {
+        return getReadableSize( (uint64_t)f );
+    }
+
+    wxString getReadableSpeed( float f )
+    {
+        wxString xstr = getReadableSize(f);
+        xstr += _T("/s");
+        return xstr;
+    }
+
+    wxString getReadableTime( int i /*seconds*/ )  /*FIXME*/
+    {
+        const int s = i % 60; i /= 60;
+        const int m = i % 60; i /= 60;
+        const int h = i;
+        return wxString::Format( _T("%d:%02d:%02d"), h, m, s );
     }
 }
 
@@ -298,7 +307,7 @@ MyFrame :: refreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_DOWNLOAD_SPEED: break;
-                xstr = toWxStr( getReadableSize( s->rateDownload ) + "/s"  );
+                xstr = getReadableSpeed( s->rateDownload );
                 break;
 
             case COL_ETA:
@@ -307,7 +316,7 @@ MyFrame :: refreshTorrent( tr_torrent_t  * tor,
                 else if( s->eta < 0 )
                     xstr = toWxStr( "\xE2\x88\x9E" ); /* infinity, in utf-8 */
                 else
-                    xstr = toWxStr( getReadableTime( s->eta ) );
+                    xstr = getReadableTime( s->eta );
                 break;
                 
             case COL_HASH:
@@ -330,11 +339,11 @@ MyFrame :: refreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_RECEIVED:
-                xstr = toWxStr( getReadableSize( s->downloaded ) );
+                xstr = getReadableSize( s->downloaded );
                 break;
 
             case COL_REMAINING:
-                xstr = toWxStr( getReadableSize( s->left ) );
+                xstr = getReadableSize( s->left );
                 break;
 
             case COL_SEEDS:
@@ -343,11 +352,11 @@ MyFrame :: refreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_SENT:
-                xstr = toWxStr( getReadableSize( s->uploaded ) );
+                xstr = getReadableSize( s->uploaded );
                 break;
 
             case COL_SIZE:
-                xstr = toWxStr( getReadableSize( info->totalSize ) );
+                xstr = getReadableSize( info->totalSize );
                 break;
 
             case COL_STATE:
@@ -363,7 +372,7 @@ MyFrame :: refreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_UPLOAD_SPEED:
-                xstr = toWxStr( getReadableSize( s->rateUpload ) + "/s" );
+                xstr = getReadableSpeed( s->rateUpload );
                 break;
 
             default:
@@ -412,7 +421,6 @@ MyFrame :: refreshTorrentList ()
 void
 MyFrame :: repopulateTorrentList ()
 {
-std::cerr << __FILE__ << ':' << __LINE__ << " clearing all items from list" << std::endl;
     myTorrentList->DeleteAllItems();
     myHashToRow.clear ();
 
@@ -473,6 +481,16 @@ void
 MyFrame :: OnTimer(wxTimerEvent& event)
 {
     refreshTorrentList ();
+
+
+    float dl, ul;
+    tr_torrentRates( handle, &dl, &ul );
+    wxString s = _("Download: ");
+    s += getReadableSpeed( dl );
+    s += _T("\n");
+    s +=_("Upload: ");
+    s +=  getReadableSpeed( ul );
+    myTaskBarIcon->SetIcon( *myTrayLogo, s );
 }
 
 MyFrame::~MyFrame()
@@ -487,9 +505,16 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 {
     wxImage::AddHandler( new wxPNGHandler );
     wxImage transmission_logo ( _T("images/transmission.png"), wxBITMAP_TYPE_PNG );
-    wxIcon ico;
-    ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
-    SetIcon( ico );
+    myLogoIcon = new wxIcon;
+    myLogoIcon->CopyFromBitmap( wxBitmap( transmission_logo ) );
+    SetIcon( *myLogoIcon );
+#if wxCHECK_VERSION(2,8,0)
+    transmission_logo.Rescale( 24, 24, wxIMAGE_QUALITY_HIGH );
+#else
+    transmission_logo.Rescale( 24, 24 );
+#endif
+    myTrayLogo = new wxIcon;
+    myTrayLogo->CopyFromBitmap( wxBitmap( transmission_logo ) );
 
     /**
     ***  Torrents
@@ -614,11 +639,13 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     **/
 
     myPulseTimer.Start( 1500 );
+
+    myTaskBarIcon = new wxTaskBarIcon( );
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-    Close(TRUE);
+    Close( true );
 }
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
