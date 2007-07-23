@@ -12,7 +12,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "transmission.h"
-#include "fastresume.h"
 #include "fdlimit.h"
 
 struct tr_io_s
@@ -211,46 +210,28 @@ checkPiece ( tr_torrent_t * tor, int pieceIndex )
     return ret;
 }
 
-int
-tr_ioCheckFiles( tr_torrent_t * tor, int mode )
+void
+tr_ioCheckFiles( tr_torrent_t * tor )
 {
-    int i;
-    tr_bitfield_t * uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-
-    tr_cpReset( tor->completion );
-
-    tr_bitfieldClear( uncheckedPieces );
-
-    if( (mode==TR_RECHECK_FORCE) || fastResumeLoad( tor, uncheckedPieces ) )
-        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
-
-    if( tr_bitfieldIsEmpty( uncheckedPieces ) ) {
-        tr_bitfieldFree( uncheckedPieces );
-        return TR_OK;
-    }
-
-    if( mode == TR_RECHECK_FAST ) {
-        tr_bitfieldFree( uncheckedPieces );
-        return TR_ERROR_IO_OTHER;
-    }
-
-    tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
-
-    for( i=0; i<tor->info.pieceCount; ++i ) 
+    if( tor->uncheckedPieces != NULL )
     {
-        if( !tr_bitfieldHas( uncheckedPieces, i ) )
-            continue;
+        int i;
+        tr_bitfield_t * p = tor->uncheckedPieces;
+        tor->uncheckedPieces = NULL;
 
-        tr_dbg ( "Checking piece %d because it's not in fast-resume", i );
+        tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
 
-        tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
+        for( i=0; i<tor->info.pieceCount; ++i ) 
+        {
+            if( !tr_bitfieldHas( p, i ) )
+                continue;
 
-        tr_bitfieldRem( uncheckedPieces, i );
+            tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
+        }
+
+        tr_bitfieldFree( p );
+        tor->fastResumeDirty = TRUE;
     }
-
-    fastResumeSave( tor );
-    tr_bitfieldFree( uncheckedPieces );
-    return TR_OK;
 }
 
 /****
@@ -258,17 +239,10 @@ tr_ioCheckFiles( tr_torrent_t * tor, int mode )
 ****/
 
 tr_io_t*
-tr_ioInitFast( tr_torrent_t * tor )
+tr_ioNew ( tr_torrent_t * tor )
 {
     tr_io_t * io = tr_calloc( 1, sizeof( tr_io_t ) );
     io->tor = tor;
-
-    if( tr_ioCheckFiles( tor, TR_RECHECK_FAST ) )
-    {
-        tr_free( io );
-        io = NULL;
-    }
-
     return io;
 }
 
@@ -283,8 +257,6 @@ tr_ioSync( tr_io_t * io )
 
         for( i=0; i<info->fileCount; ++i )
             tr_fdFileClose( io->tor->destination, info->files[i].name );
-
-        fastResumeSave( io->tor );
     }
 }
 
@@ -296,14 +268,6 @@ tr_ioClose( tr_io_t * io )
         tr_ioSync( io );
         tr_free( io );
     }
-}
-
-
-/* try to load the fast resume file */
-int
-tr_ioLoadResume( tr_torrent_t * tor )
-{
-    return tr_ioCheckFiles ( tor, TR_RECHECK_FAST );
 }
 
 int

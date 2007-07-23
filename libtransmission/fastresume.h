@@ -25,9 +25,22 @@
 #ifndef TR_FAST_RESUME_H
 #define TR_FAST_RESUME_H
 
-void fastResumeSave( const tr_torrent_t * tor );
+void tr_fastResumeSave( const tr_torrent_t * tor );
 
-int fastResumeLoad( tr_torrent_t   * tor,
-                    tr_bitfield_t  * uncheckedPieces );
+enum
+{
+  TR_FR_DOWNLOADED   = (1<<0),
+  TR_FR_UPLOADED     = (1<<1),
+  TR_FR_PEERS        = (1<<2),
+  TR_FR_PROGRESS     = (1<<3),
+  TR_FR_PRIORITY     = (1<<4),
+  TR_FR_SPEEDLIMIT   = (1<<5)
+};
+
+/**
+ * Returns a bitwise-or'ed set of the data loaded from fastresume
+ */
+uint64_t tr_fastResumeLoad( tr_torrent_t   * tor,
+                            tr_bitfield_t  * uncheckedPieces );
 
 #endif

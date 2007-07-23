@@ -97,6 +97,7 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #include "peer.h"
 #include "inout.h"
 #include "ratecontrol.h"
+#include "utils.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -189,7 +190,7 @@ struct tr_torrent_s
     tr_completion_t * completion;
 
     volatile char     dieFlag;
-    volatile char     recheckFlag;
+    tr_bitfield_t   * uncheckedPieces;
     run_status_t      runStatus;
     cp_status_t       cpStatus;
     tr_thread_t       thread;

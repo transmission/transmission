@@ -146,7 +146,8 @@ static void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
     fwrite( data, size, count, file );
 }
 
-void fastResumeSave( const tr_torrent_t * tor )
+void
+tr_fastResumeSave( const tr_torrent_t * tor )
 {
     char      path[MAX_PATH_LENGTH];
     FILE    * file;
@@ -390,17 +391,20 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
         bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = walk;
         tr_cpBlockBitfieldSet( tor->completion, &bitfield );
+/* FIXME: remove the "unchecked pieces" */
     }
 
     free( buf );
     return TR_OK;
 }
 
-static int
+static uint64_t
 fastResumeLoadOld( tr_torrent_t   * tor,
                    tr_bitfield_t  * uncheckedPieces, 
                    FILE           * file )
 {
+    uint64_t ret = 0;
+
     /* Check the size */
     const int size = 4 + FR_PROGRESS_LEN( tor );
     fseek( file, 0, SEEK_END );
@@ -422,21 +426,22 @@ fastResumeLoadOld( tr_torrent_t   * tor,
 
     fclose( file );
 
+    ret |= TR_FR_PROGRESS;
     tr_inf( "Fast resuming successful (version 0)" );
-    
-    return 0;
+
+    return ret;
 }
 
-int
-fastResumeLoad( tr_torrent_t   * tor,
-                tr_bitfield_t  * uncheckedPieces )
+static uint64_t
+fastResumeLoadImpl ( tr_torrent_t   * tor,
+                     tr_bitfield_t  * uncheckedPieces )
 {
     char      path[MAX_PATH_LENGTH];
     FILE    * file;
     int       version = 0;
     uint8_t   id;
     uint32_t  len;
-    int       ret;
+    uint64_t  ret = 0;
 
     assert( tor != NULL );
     assert( uncheckedPieces != NULL );
@@ -444,22 +449,21 @@ fastResumeLoad( tr_torrent_t   * tor,
     /* Open resume file */
     fastResumeFileName( path, sizeof path, tor, 1 );
     file = fopen( path, "r" );
-    if( NULL == file )
+    if( !file )
     {
         if( ENOENT == errno )
         {
             fastResumeFileName( path, sizeof path, tor, 0 );
             file = fopen( path, "r" );
-            if( NULL != file )
+            if( !file )
             {
-                goto good;
+                fastResumeFileName( path, sizeof path, tor, 1 );
+                tr_inf( "Couldn't open '%s' for reading", path );
+                return ret;
             }
-            fastResumeFileName( path, sizeof path, tor, 1 );
         }
-        tr_inf( "Could not open '%s' for reading", path );
-        return 1;
     }
-  good:
+
     tr_dbg( "Resume file '%s' loaded", path );
 
     /* Check format version */
@@ -472,10 +476,9 @@ fastResumeLoad( tr_torrent_t   * tor,
     {
         tr_inf( "Resume file has version %d, not supported", version );
         fclose( file );
-        return 1;
+        return ret;
     }
 
-    ret = 1;
     /* read each block of data */
     while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
     {
@@ -485,14 +488,15 @@ fastResumeLoad( tr_torrent_t   * tor,
                 /* read progress data */
                 if( (uint32_t)FR_PROGRESS_LEN( tor ) == len )
                 {
-                    ret = fastResumeLoadProgress( tor, uncheckedPieces, file );
+                    const int rret = fastResumeLoadProgress( tor, uncheckedPieces, file );
 
-                    if( ret && ( feof(file) || ferror(file) ) )
+                    if( rret && ( feof(file) || ferror(file) ) )
                     {
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
 
+                    ret |= TR_FR_PROGRESS;
                     continue;
                 }
                 break;
@@ -502,14 +506,15 @@ fastResumeLoad( tr_torrent_t   * tor,
                 /* read priority data */
                 if( len == (uint32_t)(2 * tor->info.fileCount) )
                 {
-                    ret = loadPriorities( tor, file );
+                    const int rret = loadPriorities( tor, file );
 
-                    if( ret && ( feof(file) || ferror(file) ) )
+                    if( rret && ( feof(file) || ferror(file) ) )
                     {
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
 
+                    ret |= TR_FR_PRIORITY;
                     continue;
                 }
                 break;
@@ -518,14 +523,15 @@ fastResumeLoad( tr_torrent_t   * tor,
                 /*  read speed data */
                 if( len == FR_SPEED_LEN )
                 {
-                    ret = loadSpeeds( tor, file );
+                    const int rret = loadSpeeds( tor, file );
 
-                    if( ret && ( feof(file) || ferror(file) ) )
+                    if( rret && ( feof(file) || ferror(file) ) )
                     {
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
 
+                    ret |= TR_FR_SPEEDLIMIT;
                     continue;
                 }
                 break;
@@ -537,9 +543,10 @@ fastResumeLoad( tr_torrent_t   * tor,
                     if( 1 != fread( &tor->downloadedPrev, 8, 1, file ) )
                     {
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
                     tor->downloadedCur = 0;
+                    ret |= TR_FR_DOWNLOADED;
                     continue;
                 }
                 break;
@@ -551,8 +558,10 @@ fastResumeLoad( tr_torrent_t   * tor,
                     if( 1 != fread( &tor->uploadedPrev, 8, 1, file ) )
                     {
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
+                    tor->uploadedCur = 0;
+                    ret |= TR_FR_UPLOADED;
                     continue;
                 }
                 break;
@@ -566,13 +575,14 @@ fastResumeLoad( tr_torrent_t   * tor,
                     {
                         free( buf );
                         fclose( file );
-                        return 1;
+                        return ret;
                     }
                     used = tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE,
                                                  buf, len / 6 );
                     tr_dbg( "found %i peers in resume file, used %i",
                             len / 6, used );
                     free( buf );
+                    ret |= TR_FR_PEERS;
                 }
                 continue;
 
@@ -586,11 +596,17 @@ fastResumeLoad( tr_torrent_t   * tor,
     }
 
     fclose( file );
+    return ret;
+}
 
-    if( !ret )
-    {
-        tr_inf( "Fast resuming successful" );
-    }
-    
+uint64_t
+tr_fastResumeLoad( tr_torrent_t   * tor,
+                   tr_bitfield_t  * uncheckedPieces )
+{
+    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces );
+
+    if( ! ( ret & TR_FR_PROGRESS ) )
+        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
+
     return ret;
 }

@@ -180,7 +180,9 @@ torrentRealInit( tr_handle_t   * h,
                  int             flags )
 {
     int i;
+    uint64_t loaded;
     char name[512];
+    tr_bitfield_t * uncheckedPieces;
     
     tor->info.flags |= flags;
 
@@ -231,7 +233,25 @@ torrentRealInit( tr_handle_t   * h,
 
     tor->error   = TR_OK;
     tor->runStatus = flags & TR_FLAG_PAUSED ? TR_RUN_STOPPED : TR_RUN_RUNNING;
-    tor->recheckFlag = tr_ioCheckFiles( tor, TR_RECHECK_FAST );
+
+    uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    loaded = tr_fastResumeLoad( tor, uncheckedPieces );
+    if( tr_bitfieldIsEmpty( uncheckedPieces ) )
+        tr_bitfieldFree( uncheckedPieces );
+    else {
+        tor->uncheckedPieces = uncheckedPieces;
+        fprintf( stderr, "torrent %s has %d unchecked pieces\n", tor->info.name, (int)tr_bitfieldCountTrueBits(tor->uncheckedPieces) );
+    }
+
+
+    if( !(loaded & TR_FR_SPEEDLIMIT ) ) {
+        int limit, enabled;
+        tr_getGlobalSpeedLimit( tor->handle, TR_UP, &enabled, &limit );
+        tr_torrentSetSpeedLimit( tor, TR_UP, limit );
+        tr_getGlobalSpeedLimit( tor->handle, TR_DOWN, &enabled, &limit );
+        tr_torrentSetSpeedLimit( tor, TR_DOWN, limit );
+    }
+
     tor->cpStatus = tr_cpGetStatus( tor->completion );
 
     tr_sharedLock( h->shared );
@@ -444,16 +464,23 @@ int tr_torrentScrape( tr_torrent_t * tor, int * s, int * l, int * d )
 }
 #endif
 
-void tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
+static void
+fastResumeSave( tr_torrent_t * tor )
+{
+    tr_fastResumeSave( tor );
+    tor->fastResumeDirty = FALSE;
+}
+
+void
+tr_torrentSetFolder( tr_torrent_t * tor, const char * path )
 {
     tr_free( tor->destination );
     tor->destination = tr_strdup( path );
-
-    if( !tor->ioLoaded )
-         tor->ioLoaded = tr_ioLoadResume( tor ) == TR_OK;
+    fastResumeSave( tor );
 }
 
-const char* tr_torrentGetFolder( const tr_torrent_t * tor )
+const char*
+tr_torrentGetFolder( const tr_torrent_t * tor )
 {
     return tor->destination;
 }
@@ -582,7 +609,7 @@ tr_torrentStat( tr_torrent_t * tor )
     s->left            = tr_cpLeftUntilDone   ( tor->completion );
 
 
-    if( tor->recheckFlag )
+    if( tor->uncheckedPieces )
         s->status = TR_STATUS_CHECK_WAIT;
     else switch( tor->runStatus ) {
         case TR_RUN_STOPPING: /* fallthrough */
@@ -855,7 +882,9 @@ void tr_torrentRemoveSaved( tr_torrent_t * tor )
 
 void tr_torrentRecheck( tr_torrent_t * tor )
 {
-    tor->recheckFlag = TRUE;
+    if( !tor->uncheckedPieces )
+        tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
 }
 
 
@@ -997,6 +1026,7 @@ recheckCpState( tr_torrent_t * tor )
             tr_trackerCompleted( tor->tracker ); /* tell the tracker */
         }
         tr_ioSync( tor->io );
+        fastResumeSave( tor );
     }
     tr_torrentWriterUnlock( tor );
 }
@@ -1022,7 +1052,6 @@ torrentThreadLoop ( void * _tor )
 
         if( tor->fastResumeDirty )
         {
-            tor->fastResumeDirty = FALSE;
             fastResumeSave( tor );
             recheckCpState( tor );
         }
@@ -1038,6 +1067,7 @@ torrentThreadLoop ( void * _tor )
             /* close the IO */
             tr_ioClose( tor->io );
             tor->io = NULL;
+            fastResumeSave( tor );
 
             /* close the peers */
             for( i=0; i<tor->peerCount; ++i )
@@ -1078,7 +1108,7 @@ torrentThreadLoop ( void * _tor )
         }
 
         /* do we need to check files? */
-        if( tor->recheckFlag )
+        if( tor->uncheckedPieces )
         {
             if( !tr_lockTryLock( &checkFilesLock ) )
             {
@@ -1086,11 +1116,10 @@ torrentThreadLoop ( void * _tor )
 
                 tr_torrentWriterLock( tor );
                 realStatus = tor->runStatus;
-                tor->recheckFlag = FALSE;
                 tor->runStatus = TR_RUN_CHECKING;
                 tr_torrentWriterUnlock( tor );
 
-                tr_ioCheckFiles( tor, TR_RECHECK_FORCE );
+                tr_ioCheckFiles( tor );
                 setRunState( tor, realStatus );
 
                 tr_torrentWriterLock( tor );
@@ -1117,11 +1146,7 @@ torrentThreadLoop ( void * _tor )
             if( tor->io == NULL ) {
                 *tor->errorString = '\0';
                 tr_torrentResetTransferStats( tor );
-                tor->io = tr_ioInitFast( tor );
-                if( tor->io == NULL ) {
-                    tor->recheckFlag = TRUE;
-                    continue;
-                }
+                tor->io = tr_ioNew( tor );
                 tr_peerIdNew ( tor->peer_id, sizeof(tor->peer_id) );
                 tor->tracker = tr_trackerInit( tor );
                 tor->startDate = tr_date();
