@@ -559,16 +559,11 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     **/
 
     wxSplitterWindow * hsplit = new wxSplitterWindow( this );
+    hsplit->SetSashGravity( 0.8 );
 
     wxPanel * row1 = new wxPanel( hsplit, wxID_ANY );
-    wxFlexGridSizer * row_sizer = new wxFlexGridSizer( 2, 0, 5 );
-    row_sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
-    row_sizer->SetFlexibleDirection( wxHORIZONTAL );
-    row1->SetSizer( row_sizer );
 
-    /**
-    ***  Filters
-    **/
+    /* Filters */
 
     wxListCtrl * filters = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                            wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
@@ -579,21 +574,20 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     filters->InsertItem( i++, _T("Completed") );
     filters->InsertItem( i++, _T("Active (1)") );
     filters->InsertItem( i++, _T("Inactive") );
-    row_sizer->Add( filters, wxSizerFlags().Expand() );
 
-    /**
-    ***  Torrent List
-    **/
+    /* Torrent List */
 
     myTorrentList = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                     wxLC_REPORT|wxLC_SINGLE_SEL );
     rebuildTorrentList();
-    row_sizer->Add( myTorrentList, wxSizerFlags().Expand() );
-    row_sizer->AddGrowableCol( 1, 1 );
+
+    wxBoxSizer * boxSizer = new wxBoxSizer( wxHORIZONTAL );
+    boxSizer->Add( filters, 0, wxEXPAND|wxRIGHT, 5 );
+    boxSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
+    row1->SetSizer( boxSizer );
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
-
     wxButton * tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
     notebook->AddPage( tmp, _T("General"), false );
     tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
