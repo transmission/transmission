@@ -124,7 +124,7 @@ tr_core_save( TrCore * self );
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
-tr_core_load( TrCore * self, const benc_val_t * state, gboolean forcepaused );
+tr_core_load( TrCore * self, gboolean forcepaused );
 
 /* Any the tr_core_add functions below may trigger an "error" signal
    with TR_CORE_ERR_ADD_TORRENT */

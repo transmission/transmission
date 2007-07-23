@@ -99,6 +99,9 @@ void
 tr_torrent_set_seeding_cap_enabled ( TrTorrent*, gboolean );
 
 TrTorrent *
+tr_torrent_new_preexisting( tr_torrent_t * tor );
+
+TrTorrent *
 tr_torrent_new( tr_handle_t * handle, const char * path, const char * dir,
                 enum tr_torrent_action act, gboolean paused, char ** err);
 

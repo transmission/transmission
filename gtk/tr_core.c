@@ -31,6 +31,7 @@
 
 #include <libtransmission/bencode.h>
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 
 #include "conf.h"
 #include "tr_core.h"
@@ -401,34 +402,26 @@ tr_core_save( TrCore * self )
 }
 
 int
-tr_core_load( TrCore * self, const benc_val_t * state, gboolean forcepaused )
+tr_core_load( TrCore * self, gboolean forcepaused )
 {
+    int i;
+    int flags;
     int count = 0;
+    tr_torrent_t ** torrents;
+    const char * destination;
 
     TR_IS_CORE( self );
 
-    if( TYPE_LIST == state->type )
-    {
-        int ii;
-        for( ii = 0; ii < state->val.l.count; ii++ )
-        {
-            char * errstr = NULL;
-            TrTorrent * tor = tr_torrent_new_with_state( self->handle,
-                                                     state->val.l.vals + ii,
-                                                     forcepaused, &errstr );
-            if( NULL == tor )
-            {
-                tr_core_errsig( self, TR_CORE_ERR_ADD_TORRENT, errstr );
-                g_free( errstr );
-            }
-            else
-            {
-                g_assert( NULL == errstr );
-                tr_core_insert( self, tor );
-                count++;
-            }
-        }
-    }
+    destination = getdownloaddir( );
+
+    flags = 0;
+    if( forcepaused )
+         flags |= TR_FLAG_PAUSED;
+
+    torrents = tr_loadTorrents ( self->handle, destination, flags, &count );
+    for( i=0; i<count; ++i )
+        tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
+    tr_free( torrents );
 
     return count;
 }
@@ -559,9 +552,7 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
 
     gtk_tree_model_get( self->model, iter, MC_TORRENT, &tor, -1 );
     gtk_list_store_remove( GTK_LIST_STORE( self->model ), iter );
-
-    if( TR_FLAG_SAVE & tr_torrent_info( tor )->flags )
-        tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
+    tr_torrentRemoveSaved( tr_torrent_handle( tor ) );
 
     tr_torrent_sever( tor );
 }

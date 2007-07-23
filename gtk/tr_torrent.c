@@ -291,6 +291,13 @@ maketorrent( tr_torrent_t * handle )
                          NULL);
 }
 
+TrTorrent*
+tr_torrent_new_preexisting( tr_torrent_t * tor )
+{
+    return maketorrent( tor );
+}
+
+
 TrTorrent *
 tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
                 enum tr_torrent_action act, gboolean paused, char **err )

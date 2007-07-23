@@ -412,10 +412,8 @@ appsetup( TrWindow * wind, benc_val_t * state, GList * args,
     readinitialprefs( cbdata );
 
     /* add torrents from command-line and saved state */
-    if( NULL != state )
-    {
-        tr_core_load( cbdata->core, state, paused );
-    }
+    tr_core_load( cbdata->core, paused );
+
     if( NULL != args )
     {
         action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
@@ -735,7 +733,9 @@ readinitialprefs( struct cbdata * cbdata )
     int prefs[] =
     {
         PREF_ID_PORT,
+        PREF_ID_DOWNLIMIT,
         PREF_ID_USEDOWNLIMIT,
+        PREF_ID_UPLIMIT,
         PREF_ID_USEUPLIMIT,
         PREF_ID_NAT,
         PREF_ID_ICON,
@@ -752,12 +752,9 @@ readinitialprefs( struct cbdata * cbdata )
 static void
 prefschanged( TrCore * core SHUTUP, int id, gpointer data )
 {
-    struct cbdata * cbdata;
-    tr_handle_t   * tr;
+    struct cbdata * cbdata = data;
+    tr_handle_t   * tr     = tr_core_handle( cbdata->core );
     gboolean        boolval;
-
-    cbdata = data;
-    tr     = tr_core_handle( cbdata->core );
 
     switch( id )
     {
