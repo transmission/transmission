@@ -97,10 +97,10 @@ namespace
 
     int_v getTorrentColumns( wxConfig * config )
     {
-        const wxString key = _T("TorrentListColumns");
+        const wxString key = _T("torrent-list-columns");
         wxString columnStr;
-        if( !config->Read( key, &columnStr ) )
-            columnStr = _T("name|download-speed|upload-speed|eta|peers|size|done|status|seeds");
+        if( !config->Read( key, &columnStr, _T("name|download-speed|upload-speed|eta|peers|size|done|status|seeds") ) )
+            config->Write( key, columnStr );
 
         int_v cols;
         while( !columnStr.IsEmpty() )
@@ -184,7 +184,6 @@ TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
     myConfig->Read( _T("torrent-sort-is-descending"), &descending, FALSE );
     if( descending )
         prevSortCol = -prevSortCol;
-    std::cerr << __FILE__ << ':' << __LINE__ << " sort col is " << prevSortCol << std::endl;
     Rebuild ();
 }
 
@@ -528,7 +527,6 @@ void
 TorrentListCtrl :: Add( const torrents_t& add )
 {
     myTorrents.insert( myTorrents.end(), add.begin(), add.end() );
-std::cerr << " myTorrents.size() " << myTorrents.size() << std::endl;
     Repopulate ();
 }
 

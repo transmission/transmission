@@ -83,7 +83,7 @@ enum
 
 void MyFrame :: OnOpen( wxCommandEvent& event )
 {
-    const wxString key = _T("LastDirectory");
+    const wxString key = _T("prev-directory");
     wxString directory;
     myConfig->Read( key, &directory );
     wxFileDialog * w = new wxFileDialog( this, _T("message"),
