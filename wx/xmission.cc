@@ -26,10 +26,20 @@
 #if wxCHECK_VERSION(2,8,0)
 #include <wx/aboutdlg.h>
 #endif
-extern "C" {
+
+extern "C"
+{
   #include <libtransmission/transmission.h>
   #include <libtransmission/utils.h>
+
+  #include <images/exec.xpm>
+  #include <images/fileopen.xpm>
+  #include <images/gtk-properties.xpm>
+  #include <images/gtk-remove.xpm>
+  #include <images/stop.xpm>
+  #include <images/transmission.xpm>
 }
+
 #include "torrent-list.h"
 
 class MyApp : public wxApp
@@ -192,8 +202,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     myConfig( new wxConfig( _T("xmission") ) ),
     myPulseTimer( this, ID_Pulse )
 {
-    wxImage::AddHandler( new wxPNGHandler );
-    wxImage transmission_logo ( _T("images/transmission.png"), wxBITMAP_TYPE_PNG );
+    wxImage transmission_logo ( transmission_xpm );
     myLogoIcon = new wxIcon;
     myLogoIcon->CopyFromBitmap( wxBitmap( transmission_logo ) );
     SetIcon( *myLogoIcon );
@@ -242,11 +251,11 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     ***  Toolbar
     **/
 
-    wxImage open_image( _T("images/fileopen.png"),        wxBITMAP_TYPE_PNG );
-    wxImage exec_image( _T("images/exec.png"),            wxBITMAP_TYPE_PNG );
-    wxImage stop_image( _T("images/stop.png"),            wxBITMAP_TYPE_PNG );
-    wxImage drop_image( _T("images/gtk-remove.png"),      wxBITMAP_TYPE_PNG );
-    wxImage info_image( _T("images/gtk-properties.png"),  wxBITMAP_TYPE_PNG );
+    wxImage open_image( fileopen_xpm );
+    wxImage exec_image( exec_xpm );
+    wxImage stop_image( stop_xpm );
+    wxImage drop_image( gtk_remove_xpm );
+    wxImage info_image( gtk_properties_xpm );
 
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
@@ -337,7 +346,7 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxImage transmission_logo ( _T("images/transmission.png"), wxBITMAP_TYPE_PNG );
+    wxImage transmission_logo ( transmission_xpm );
     wxIcon ico;
     ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
 
