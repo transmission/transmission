@@ -301,8 +301,8 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
             // if the torrent's in the list already, update that row.
             // otherwise, add a new row.
             if( row < 0 ) {
-                str2int_t::const_iterator it = myHashToRow.find( info->hashString );
-                if( it != myHashToRow.end() ) {
+                str2int_t::const_iterator it = myHashToItem.find( info->hashString );
+                if( it != myHashToItem.end() ) {
                     row = it->second;
                 }
             }
@@ -312,7 +312,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
             else {
                 row = InsertItem( GetItemCount(), xstr );
                 col = 1;
-                myHashToRow[info->hashString] = row;
+                myHashToItem[info->hashString] = row;
                 SetItemData( row, myTorrents_index );
             }
         }
@@ -479,7 +479,7 @@ TorrentListCtrl :: Resort( )
         const tr_info_t* info = tr_torrentInfo( myTorrents[idx] );
         tmp[info->hashString] = i;
     }
-    myHashToRow.swap( tmp );
+    myHashToItem.swap( tmp );
     uglyHack = NULL;
 }
 
@@ -504,7 +504,7 @@ void
 TorrentListCtrl :: Repopulate ()
 {
     DeleteAllItems();
-    myHashToRow.clear ();
+    myHashToItem.clear ();
 
     const int_v cols = getTorrentColumns( myConfig );
     int i = 0;
@@ -519,7 +519,7 @@ void
 TorrentListCtrl :: Rebuild()
 {
     ClearAll( );
-    myHashToRow.clear ();
+    myHashToItem.clear ();
 
     int i = 0;
     const int_v  cols = getTorrentColumns( myConfig );
@@ -557,11 +557,56 @@ TorrentListCtrl :: Rebuild()
     Repopulate ();
 }
 
+typedef std::set<tr_torrent_t*> torrent_set;
+
 void
-TorrentListCtrl :: Add( const torrents_t& add )
+TorrentListCtrl :: Assign( const torrents_t& torrents )
 {
-    myTorrents.insert( myTorrents.end(), add.begin(), add.end() );
-    Repopulate ();
+    torrent_set prev, cur, removed;
+    torrents_v added;
+    prev.insert( myTorrents.begin(), myTorrents.end() );
+    cur.insert( torrents.begin(), torrents.end() );
+    std::set_difference (prev.begin(), prev.end(), cur.begin(), cur.end(), inserter(removed, removed.begin()));
+    std::set_difference (cur.begin(), cur.end(), prev.begin(), prev.end(), inserter(added, added.begin()));
+    Remove( removed );
+    Add( added );
+    Refresh ();
 }
 
+void
+TorrentListCtrl :: Add( const torrents_v& add )
+{
+    const int_v  cols = getTorrentColumns( myConfig );
+    int i = myTorrents.size();
+    myTorrents.insert( myTorrents.end(), add.begin(), add.end() );
+    for( torrents_v::const_iterator it(add.begin()), end(add.end()); it!=end; ++it )
+        RefreshTorrent( *it, i++, cols );
+    Resort( );
+}
 
+void
+TorrentListCtrl :: Remove( const torrent_set& remove )
+{
+    torrents_v vtmp;
+    str2int_t htmp;
+
+    for( int item=0; item<GetItemCount(); )
+    {
+        tr_torrent_t * tor = myTorrents[GetItemData(item)];
+        const tr_info_t* info = tr_torrentInfo( tor );
+
+        if( remove.count( tor ) )
+        {
+            DeleteItem( item );
+            continue;
+        }
+
+        vtmp.push_back( tor );
+        SetItemData( item, vtmp.size()-1 );
+        htmp[ info->hashString ] = item;
+        ++item;
+    }
+
+    myHashToItem.swap( htmp );
+    myTorrents.swap( vtmp );
+}

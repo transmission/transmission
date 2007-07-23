@@ -76,18 +76,20 @@ class TorrentListCtrl: public wxListCtrl
         void Refresh ();
 
     public:
-        typedef std::vector<tr_torrent_t*> torrents_t;
-        void Add( const torrents_t& add );
+        typedef std::vector<tr_torrent_t*> torrents_v;
+        void Add( const torrents_v& torrents );
+        void Assign( const torrents_v& torrents );
 
     private:
         void Sort( int column );
         void Resort( );
         void RefreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
+        void Remove( const std::set<tr_torrent_t*>& );
         static int Compare( long, long, long );
 
         /** torrent hash -> the torrent's row in myTorrentList */
         typedef std::map<std::string,int> str2int_t;
-        str2int_t myHashToRow;
+        str2int_t myHashToItem;
 
     private:
         void OnSort( wxListEvent& );
@@ -97,7 +99,7 @@ class TorrentListCtrl: public wxListCtrl
     private:
         tr_handle_t * myHandle;
         wxConfig * myConfig;
-        torrents_t myTorrents;
+        torrents_v myTorrents;
         int prevSortCol;
 
     private:

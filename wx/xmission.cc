@@ -51,8 +51,6 @@ class MyApp : public wxApp
     virtual bool OnInit();
 };
 
-IMPLEMENT_APP(MyApp)
-
 namespace
 {
     tr_handle_t * handle = NULL;
@@ -71,6 +69,7 @@ public:
     void OnAbout( wxCommandEvent& );
     void OnOpen( wxCommandEvent& );
     void OnTimer( wxTimerEvent& );
+    void OnItemSelected( wxListEvent& );
 
 private:
     void RefreshFilterCounts( );
@@ -86,6 +85,9 @@ private:
     wxIcon * myLogoIcon;
     wxIcon * myTrayLogo;
     torrents_v myTorrents;
+
+private:
+    DECLARE_EVENT_TABLE()
 };
 
 enum
@@ -99,8 +101,15 @@ enum
     ID_SHOW_DEBUG_WINDOW,
     ID_ABOUT,
     ID_Pulse,
+    ID_Filter,
     N_IDS
 };
+
+BEGIN_EVENT_TABLE(MyFrame, wxFrame)
+    EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnItemSelected )
+END_EVENT_TABLE()
+
+IMPLEMENT_APP(MyApp)
 
 void MyFrame :: OnOpen( wxCommandEvent& event )
 {
@@ -199,6 +208,15 @@ MyFrame :: RefreshFilterCounts( )
             xstr += wxString::Format(_T(" (%d)"), count );
         myFilters->SetItem( i, 0, xstr );
     }
+}
+
+void
+MyFrame :: OnItemSelected( wxListEvent& event )
+{
+    const int item = event.GetIndex ();
+    torrents_v tmp( myTorrents );
+    TorrentFilter :: RemoveFailures( item, tmp );
+    myTorrentList->Assign( tmp );
 }
 
 void
@@ -310,7 +328,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 
     /* Filters */
 
-    myFilters = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxSize(120,-1),
+    myFilters = new wxListCtrl( row1, ID_Filter, wxDefaultPosition, wxSize(120,-1),
                                 wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
     myFilters->InsertColumn( wxLIST_FORMAT_LEFT, _("Filters"), wxLIST_FORMAT_LEFT, 120 );
     for( int i=0; i<TorrentFilter::N_FILTERS; ++i )
@@ -367,6 +385,9 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
     myTorrentList->Add( myTorrents );
     tr_free( torrents );
+
+    wxTimerEvent dummy;
+    OnTimer( dummy );
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
