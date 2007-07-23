@@ -15,13 +15,15 @@
 #include <iostream>
 #include <stdint.h>
 #include <wx/artprov.h>
+#include <wx/bitmap.h>
 #include <wx/defs.h>
 #include <wx/config.h>
+#include <wx/image.h>
 #include <wx/listctrl.h>
+#include <wx/notebook.h>
+#include <wx/splitter.h>
 #include <wx/taskbar.h>
 #include <wx/toolbar.h>
-#include <wx/splitter.h>
-#include <wx/notebook.h>
 #include <wx/wx.h>
 #if wxCHECK_VERSION(2,8,0)
 #include <wx/aboutdlg.h>
@@ -202,17 +204,17 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     myConfig( new wxConfig( _T("xmission") ) ),
     myPulseTimer( this, ID_Pulse )
 {
-    wxImage transmission_logo ( transmission_xpm );
-    myLogoIcon = new wxIcon;
-    myLogoIcon->CopyFromBitmap( wxBitmap( transmission_logo ) );
+    myLogoIcon = new wxIcon( transmission_xpm );
     SetIcon( *myLogoIcon );
-#if wxCHECK_VERSION(2,8,0)
+
+/*#if wxCHECK_VERSION(2,8,0)
     transmission_logo.Rescale( 24, 24, wxIMAGE_QUALITY_HIGH );
 #else
     transmission_logo.Rescale( 24, 24 );
 #endif
     myTrayLogo = new wxIcon;
-    myTrayLogo->CopyFromBitmap( wxBitmap( transmission_logo ) );
+    myTrayLogo->CopyFromBitmap( wxBitmap( transmission_logo ) );*/
+    myTrayLogo = myLogoIcon;
 
 
     /**
@@ -251,20 +253,26 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     ***  Toolbar
     **/
 
-    wxImage open_image( fileopen_xpm );
-    wxImage exec_image( exec_xpm );
-    wxImage stop_image( stop_xpm );
-    wxImage drop_image( gtk_remove_xpm );
-    wxImage info_image( gtk_properties_xpm );
+    wxIcon open_icon( fileopen_xpm );
+    wxIcon exec_icon( exec_xpm );
+    wxIcon stop_icon( stop_xpm );
+    wxIcon drop_icon( gtk_remove_xpm );
+    wxIcon info_icon( gtk_properties_xpm );
+    wxBitmap bitmap;
 
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( wxID_OPEN,   _T("Open"), open_image );
-    toolbar->AddTool( ID_START,    _T("Start"), exec_image );
-    toolbar->AddTool( wxID_STOP,   _T("Stop"), stop_image );
-    toolbar->AddTool( wxID_REMOVE, _T("Remove"), drop_image );
+    bitmap.CopyFromIcon( open_icon );
+    toolbar->AddTool( wxID_OPEN,   _T("Open"), bitmap );
+    bitmap.CopyFromIcon( exec_icon );
+    toolbar->AddTool( ID_START,    _T("Start"), bitmap );
+    bitmap.CopyFromIcon( stop_icon );
+    toolbar->AddTool( wxID_STOP,   _T("Stop"), bitmap );
+    bitmap.CopyFromIcon( drop_icon );
+    toolbar->AddTool( wxID_REMOVE, _T("Remove"), bitmap );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_TORRENT_INFO, _("Torrent Info"), info_image );
+    bitmap.CopyFromIcon( info_icon );
+    toolbar->AddTool( ID_TORRENT_INFO, _("Torrent Info"), bitmap );
     toolbar->Realize();
 
     /**
@@ -346,9 +354,7 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxImage transmission_logo ( transmission_xpm );
-    wxIcon ico;
-    ico.CopyFromBitmap( wxBitmap( transmission_logo ) );
+    wxIcon ico( transmission_xpm );
 
 #if wxCHECK_VERSION(2,8,0)
     wxAboutDialogInfo info;
