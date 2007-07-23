@@ -29,6 +29,48 @@ class TorrentListCtrl: public wxListCtrl
         virtual ~TorrentListCtrl();
 
     public:
+
+        enum ShowMode
+        {
+            SHOW_ALL,
+            SHOW_DOWNLOADING,
+            SHOW_UPLOADING,
+            SHOW_COMPLETE,
+            SHOW_INCOMPLETE,
+            SHOW_ACTIVE,
+            SHOW_INACTIVE,
+            N_FILTERS
+        };
+
+        void SetShowMode( ShowMode );
+
+        int GetShowModeCounts( ShowMode ) const;
+
+    public:
+
+        struct Listener
+        {
+            Listener() {}
+
+            virtual ~Listener() {}
+
+            virtual void OnTorrentListSelectionChanged(
+                TorrentListCtrl*,
+                const std::set<tr_torrent_t*>& ) = 0;
+        };
+
+    private:
+        typedef std::set<Listener*> listeners_t;
+        listeners_t myListeners;
+        void fire_selection_changed( const std::set<tr_torrent_t*>& t ) {
+            for( listeners_t::iterator it(myListeners.begin()), end(myListeners.end()); it!=end; )
+                (*it++)->OnTorrentListSelectionChanged( this, t );
+        }
+    public:
+        void AddListener( Listener* l ) { myListeners.insert(l); }
+        void RemoveListener( Listener* l ) { myListeners.erase(l); }
+
+    public:
         void Rebuild ();
         void Repopulate ();
         void Refresh ();
@@ -40,13 +82,17 @@ class TorrentListCtrl: public wxListCtrl
     private:
         void Sort( int column );
         void Resort( );
-        void OnSort( wxListEvent& );
         void RefreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
         static int Compare( long, long, long );
 
         /** torrent hash -> the torrent's row in myTorrentList */
         typedef std::map<std::string,int> str2int_t;
         str2int_t myHashToRow;
+
+    private:
+        void OnSort( wxListEvent& );
+        void OnItemSelected( wxListEvent& );
+        void OnItemDeselected( wxListEvent& );
 
     private:
         tr_handle_t * myHandle;

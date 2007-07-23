@@ -165,7 +165,9 @@ enum
 };
 
 BEGIN_EVENT_TABLE(TorrentListCtrl, wxListCtrl)
-    EVT_LIST_COL_CLICK(TORRENT_LIST_CTRL, TorrentListCtrl::OnSort)
+    EVT_LIST_COL_CLICK( TORRENT_LIST_CTRL, TorrentListCtrl::OnSort )
+    EVT_LIST_ITEM_SELECTED( TORRENT_LIST_CTRL, TorrentListCtrl::OnItemSelected )
+    EVT_LIST_ITEM_DESELECTED( TORRENT_LIST_CTRL, TorrentListCtrl::OnItemDeselected )
 END_EVENT_TABLE()
 
 TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
@@ -173,7 +175,7 @@ TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
                                     wxWindow          * parent,
                                     const wxPoint     & pos,
                                     const wxSize      & size):
-    wxListCtrl( parent, TORRENT_LIST_CTRL, pos, size, wxLC_REPORT|wxLC_SINGLE_SEL ),
+    wxListCtrl( parent, TORRENT_LIST_CTRL, pos, size, wxLC_REPORT ),
     myHandle( handle ),
     myConfig( config )
 {
@@ -317,6 +319,42 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
     }
 }
 
+/***
+****
+***/
+
+void
+TorrentListCtrl :: OnSort( wxListEvent& event )
+{
+    const int_v  cols = getTorrentColumns( myConfig );
+    const int key = cols[ event.GetColumn() ];
+    Sort( key );
+}
+
+void
+TorrentListCtrl :: OnItemSelected( wxListEvent& event )
+{
+    std::set<tr_torrent_t*> sel;
+    long item = -1;
+    for ( ;; ) {
+        item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if ( item == -1 )
+            break;
+        sel.insert( myTorrents[GetItemData(item)] );
+    }
+    fire_selection_changed( sel );
+}
+
+void
+TorrentListCtrl :: OnItemDeselected( wxListEvent& event )
+{
+    OnItemSelected( event );
+}
+
+/***
+****
+***/
+
 static torrents_t * uglyHack = NULL;
 
 int
@@ -416,14 +454,6 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 }
 
 void
-TorrentListCtrl :: OnSort( wxListEvent& event )
-{
-    const int_v  cols = getTorrentColumns( myConfig );
-    const int key = cols[ event.GetColumn() ];
-    Sort( key );
-}
-
-void
 TorrentListCtrl :: Sort( int column )
 {
     if( column == prevSortCol )
@@ -452,6 +482,10 @@ TorrentListCtrl :: Resort( )
     myHashToRow.swap( tmp );
     uglyHack = NULL;
 }
+
+/***
+****
+***/
 
 void
 TorrentListCtrl :: Refresh ()

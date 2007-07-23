@@ -19,6 +19,7 @@
 #include <wx/defs.h>
 #include <wx/config.h>
 #include <wx/image.h>
+#include <wx/intl.h>
 #include <wx/listctrl.h>
 #include <wx/notebook.h>
 #include <wx/splitter.h>
@@ -42,6 +43,7 @@ extern "C"
   #include <images/transmission.xpm>
 }
 
+#include "torrent-filter.h"
 #include "torrent-list.h"
 
 class MyApp : public wxApp
@@ -55,7 +57,7 @@ namespace
 {
     tr_handle_t * handle = NULL;
 
-    typedef std::vector<tr_torrent_t*> torrents_t;
+    typedef std::vector<tr_torrent_t*> torrents_v;
 }
 
 class MyFrame : public wxFrame
@@ -63,10 +65,15 @@ class MyFrame : public wxFrame
 public:
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
     virtual ~MyFrame();
+
+public:
     void OnQuit( wxCommandEvent& );
     void OnAbout( wxCommandEvent& );
     void OnOpen( wxCommandEvent& );
     void OnTimer( wxTimerEvent& );
+
+private:
+    void RefreshFilterCounts( );
 
 protected:
     wxConfig * myConfig;
@@ -74,9 +81,11 @@ protected:
 
 private:
     TorrentListCtrl * myTorrentList;
+    wxListCtrl * myFilters;
     wxTaskBarIcon * myTaskBarIcon;
     wxIcon * myLogoIcon;
     wxIcon * myTrayLogo;
+    torrents_v myTorrents;
 };
 
 enum
@@ -180,9 +189,24 @@ namespace
 }
 
 void
+MyFrame :: RefreshFilterCounts( )
+{
+    for( int i=0; i<TorrentFilter::N_FILTERS; ++i )
+    {
+        wxString xstr = TorrentFilter::getFilterName( i );
+        const int count = TorrentFilter::CountHits( i, myTorrents );
+        if( count )
+            xstr += wxString::Format(_T(" (%d)"), count );
+        myFilters->SetItem( i, 0, xstr );
+    }
+}
+
+void
 MyFrame :: OnTimer(wxTimerEvent& event)
 {
-    myTorrentList->Refresh ();
+    RefreshFilterCounts( );
+
+    myTorrentList->Refresh ( );
 
     float dl, ul;
     tr_torrentRates( handle, &dl, &ul );
@@ -286,24 +310,21 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 
     /* Filters */
 
-    wxListCtrl * filters = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-                                           wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
-    filters->InsertColumn( wxLIST_FORMAT_LEFT, _T("YYZ") );
-    int i = 0;
-    filters->InsertItem( i++, _T("All") );
-    filters->InsertItem( i++, _T("Downloading (1)") );
-    filters->InsertItem( i++, _T("Completed") );
-    filters->InsertItem( i++, _T("Active (1)") );
-    filters->InsertItem( i++, _T("Inactive") );
+    myFilters = new wxListCtrl( row1, wxID_ANY, wxDefaultPosition, wxSize(120,-1),
+                                wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
+    myFilters->InsertColumn( wxLIST_FORMAT_LEFT, _("Filters"), wxLIST_FORMAT_LEFT, 120 );
+    for( int i=0; i<TorrentFilter::N_FILTERS; ++i )
+        myFilters->InsertItem( i, TorrentFilter::getFilterName(i) );
 
     /* Torrent List */
 
     myTorrentList = new TorrentListCtrl( handle, myConfig, row1 );
 
     wxBoxSizer * boxSizer = new wxBoxSizer( wxHORIZONTAL );
-    boxSizer->Add( filters, 0, wxEXPAND|wxRIGHT, 5 );
+    boxSizer->Add( myFilters, 0, wxEXPAND|wxRIGHT, 5 );
     boxSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
     row1->SetSizer( boxSizer );
+    //boxSizer->SetSizeHints( row1 );
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
@@ -343,7 +364,8 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     const char * destination = "/home/charles/torrents";
     int count = 0;
     tr_torrent_t ** torrents = tr_loadTorrents ( handle, destination, flags, &count );
-    myTorrentList->Add( std::vector<tr_torrent_t*>( torrents, torrents+count ) );
+    myTorrents.insert( myTorrents.end(), torrents, torrents+count );
+    myTorrentList->Add( myTorrents );
     tr_free( torrents );
 }
 
