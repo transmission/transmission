@@ -17,6 +17,7 @@
 #include <wx/artprov.h>
 #include <wx/defs.h>
 #include <wx/config.h>
+#include <wx/listctrl.h>
 #include <wx/toolbar.h>
 #include <wx/splitter.h>
 #include <wx/notebook.h>
@@ -634,11 +635,11 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.SetDescription(_T("A fast, lightweight bittorrent client"));
     info.SetWebSite( _T( "http://transmission.m0k.org/" ) );
     info.SetIcon( ico );
-    info.AddDeveloper( "Josh Elsasser (Back-end; GTK+)" );
-    info.AddDeveloper ("Charles Kerr (Back-end, GTK+, wxWidgets)");
-    info.AddDeveloper( "Mitchell Livingston (Back-end; OS X)" );
-    info.AddDeveloper( "Eric Petit (Back-end; OS X)" );
-    info.AddDeveloper( "Bryan Varner (BeOS)" );
+    info.AddDeveloper( _T("Josh Elsasser (Back-end; GTK+)") );
+    info.AddDeveloper( _T("Charles Kerr (Back-end, GTK+, wxWidgets)") );
+    info.AddDeveloper( _T("Mitchell Livingston (Back-end; OS X)")  );
+    info.AddDeveloper( _T("Eric Petit (Back-end; OS X)")  );
+    info.AddDeveloper( _T("Bryan Varner (BeOS)")  );
     wxAboutBox( info );
 #else
     wxMessageBox(_T("Xmission " LONG_VERSION_STRING "\n"
