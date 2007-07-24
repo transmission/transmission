@@ -59,7 +59,5 @@ float                 tr_cpPercentBlocksInPiece( const tr_completion_t * cp, int
 /* Missing = we don't have it and we are not getting it from any peer yet */
 int                   tr_cpMissingBlocksForPiece( const tr_completion_t * cp, int piece );
 int                   tr_cpMissingBlockInPiece( const tr_completion_t *, int piece );
-int                   tr_cpMostMissingBlockInPiece( const tr_completion_t *, int piece,
-                                                    int * downloaders );
 
 #endif

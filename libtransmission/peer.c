@@ -668,9 +668,7 @@ writeEnd:
         {
             int unused;
             const int piece = pool[i];
-            const int block = endgame
-                ? tr_cpMostMissingBlockInPiece( tor->completion, piece, &unused)
-                : tr_cpMissingBlockInPiece ( tor->completion, piece );
+            const int block = tr_cpMissingBlockInPiece ( tor->completion, piece );
 
             if( block>=0 )
                 sendRequest( tor, peer, block );

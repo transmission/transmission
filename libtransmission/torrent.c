@@ -1372,6 +1372,11 @@ int _tr_blockPiece( const tr_torrent_t * tor, int block )
     return (block * tor->blockSize) / tor->info.pieceSize;
 }
 
+int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece )
+{
+    return (piece * tor->info.pieceSize) / tor->blockSize;
+}
+
 int _tr_blockSize( const tr_torrent_t * tor, int block )
 {
     const tr_info_t * inf = &tor->info;
@@ -1395,12 +1400,6 @@ int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece )
         return inf->pieceSize / tor->blockSize;
     }
     return tor->blockCount % ( inf->pieceSize / tor->blockSize );
-}
-
-int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece )
-{
-    const tr_info_t * inf = &tor->info;
-    return piece * ( inf->pieceSize / tor->blockSize );
 }
 
 int _tr_pieceSize( const tr_torrent_t * tor, int piece )

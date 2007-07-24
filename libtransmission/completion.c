@@ -230,54 +230,6 @@ int tr_cpMissingBlockInPiece( const tr_completion_t * cp, int piece )
     return -1;
 }
 
-int tr_cpMostMissingBlockInPiece( const tr_completion_t * cp,
-                                  int                     piece,
-                                  int                   * downloaders )
-{
-    tr_torrent_t * tor = cp->tor;
-    int start, count, end, i;
-    int * pool, poolSize, min, ret;
-
-    start = tr_pieceStartBlock( piece );
-    count = tr_cpCountBlocks( cp, piece );
-    end   = start + count;
-
-    pool     = tr_new( int, count );
-    poolSize = 0;
-    min      = 255;
-
-    for( i = start; i < end; i++ )
-    {
-        if( tr_cpBlockIsComplete( cp, i ) || cp->blockDownloaders[i] > min )
-        {
-            continue;
-        }
-        if( cp->blockDownloaders[i] < min )
-        {
-            min      = cp->blockDownloaders[i];
-            poolSize = 0;
-        }
-        if( cp->blockDownloaders[i] <= min )
-        {
-            pool[poolSize++] = i;
-        }
-    }
-
-    if( poolSize > 0 )
-    {
-        ret = pool[0];
-        *downloaders = min;
-    }
-    else
-    {
-        ret = -1;
-    }
-
-    tr_free( pool );
-    return ret;
-}
-
-
 /***
 ****
 ***/
