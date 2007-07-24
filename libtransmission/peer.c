@@ -645,34 +645,63 @@ writeEnd:
         && !peer->banned
         &&  peer->inRequestCount < peer->inRequestMax )
     {
-        int i;
         int poolSize = 0;
-        int * pool = getPreferredPieces ( tor, peer, &poolSize );
-        const int endgame = !poolSize;
+        int endgame = FALSE;
+        int openSlots = peer->inRequestMax - peer->inRequestCount;
+        int * pool = getPreferredPieces ( tor, peer, &poolSize, &endgame );
 
-        if( endgame ) /* endgame -- request everything we don't already have */
+        if( !endgame )
         {
-            for( i=0; i<tor->blockCount && peer->inRequestCount<peer->inRequestMax; ++i )
+            /* pool is sorted from most to least desirable pieces,
+               so work our way through starting at beginning */
+            int p;
+            for( p=0; p<poolSize && openSlots>0; )
             {
-                if( !isBlockInteresting( tor, peer, i ) )
-                    continue;
-                if( tr_bitfieldHas( peer->reqfield, i ) ) /* we've already asked them for it */
-                    continue;
-                if( !peer->reqfield )
-                    peer->reqfield = tr_bitfieldNew( tor->blockCount );
-                tr_bitfieldAdd( peer->reqfield, i );
-                sendRequest( tor, peer, i );
+                const int piece = pool[p];
+                const int block = tr_cpMissingBlockInPiece ( tor->completion, piece );
+                if( block < 0 )
+                    ++p;
+                else { 
+                    sendRequest( tor, peer, block );
+                    --openSlots;
+                }
             }
         }
-        else for( i=0; i<poolSize && peer->inRequestCount<peer->inRequestMax;  )
+        else
         {
-            int unused;
-            const int piece = pool[i];
-            const int block = tr_cpMissingBlockInPiece ( tor->completion, piece );
+            /* During endgame we remove the constraint of not asking for
+               pieces we've already requested from a different peer.
+               So if we follow the non-endgame approach of walking through
+               [0..poolCount) we'll bog down asking all peers for 1, then
+               all peers for 2, and so on.  Randomize our starting point
+               into "pool" to reduce such overlap */
+            int piecesLeft = poolSize;
+            int p = tr_rand( poolSize );
+            for( ; openSlots>0 && piecesLeft>0; --piecesLeft, p=(p+1)%poolSize )
+            {
+                const int piece = pool[p]; 
+                const int firstBlock = tr_pieceStartBlock( piece );
+                const int n = tr_pieceCountBlocks( piece );
+                const int end = firstBlock + n;
+                int block;
+                for( block=firstBlock; block<end; ++block )
+                {
+                    /* don't ask for it if we've already got it */
+                    if( tr_cpBlockIsComplete( tor->completion, block ))
+                        continue;
 
-            if( block>=0 )
-                sendRequest( tor, peer, block );
-            else ++i;
+                    /* don't ask for it twice from the same peer */
+                    if( tr_bitfieldHas( peer->reqfield, block ) )
+                        continue;
+
+                    /* ask peer for the piece */
+                    if( !peer->reqfield )
+                         peer->reqfield = tr_bitfieldNew( tor->blockCount );
+                    tr_bitfieldAdd( peer->reqfield, block );
+                    sendRequest( tor, peer, block );
+                    --openSlots;
+                }
+            }
         }
 
         tr_free( pool );

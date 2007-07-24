@@ -181,19 +181,6 @@ static int isPieceInteresting( const tr_torrent_t  * tor,
     return 1;
 }
 
-static int isBlockInteresting( const tr_torrent_t  * tor,
-                               const tr_peer_t     * peer,
-                               int                   block )
-{
-    if( tr_cpBlockIsComplete( tor->completion, block )) /* we already have it */
-        return 0;
-
-    if( !isPieceInteresting( tor, peer, tr_blockPiece( block ))) /* is piece interesting? */
-        return 0;
-
-    return 1;
-}
-
 /***********************************************************************
  * isInteresting
  ***********************************************************************
@@ -263,12 +250,14 @@ int comparePieces (const void * aIn, const void * bIn)
 
 static int* getPreferredPieces( const tr_torrent_t  * tor,
                                 const tr_peer_t     * peer,
-                                int                 * pieceCount )
+                                int                 * pieceCount,
+                                int                 * isEndgame )
 {
     const tr_info_t * inf = &tor->info;
 
     int i;
     int poolSize = 0;
+    int endgame = FALSE;
     int * pool = tr_new( int, inf->pieceCount );
 
     for( i=0; i<inf->pieceCount; ++i )
@@ -276,14 +265,23 @@ static int* getPreferredPieces( const tr_torrent_t  * tor,
             if( tr_cpMissingBlocksForPiece( tor->completion, i ) )
                 pool[poolSize++] = i;
 
+    if( !poolSize ) {
+        endgame = TRUE;
+        for( i=0; i<inf->pieceCount; ++i )
+            if( isPieceInteresting( tor, peer, i ) )
+                pool[poolSize++] = i;
+    }
+
 #if 0
 fprintf (stderr, "old pool: ");
 for (i=0; i<15 && i<poolSize; ++i ) fprintf (stderr, "%d, ", pool[i] );
 fprintf (stderr, "\n");
 #endif
 
-    /* sort the rest from most interesting to least */
-    if( poolSize > 1 )
+    /* sort the rest from most interesting to least...
+       but not in endgame, because it asks for pieces in a
+       scattershot manner anyway and doesn't need them sorted */
+    if( !endgame && ( poolSize > 1 ) )
     {
         PieceCompareData * p = tr_new( PieceCompareData, poolSize );
 
@@ -316,6 +314,7 @@ for (i=0; i<15 && i<poolSize; ++i ) fprintf (stderr, "%d, ", pool[i] );
 fprintf (stderr, "\n");
 #endif
 
+    *isEndgame = endgame;
     *pieceCount = poolSize;
     return pool;
 }
