@@ -539,7 +539,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     {
         tr_torrentStop(fHandle);
         [self update];
-
+        
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
     }
 }

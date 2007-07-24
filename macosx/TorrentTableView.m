@@ -247,8 +247,8 @@
     {
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
-
-        if ([torrent isActive])
+        
+        if ([torrent isActive] && ![torrent isChecking])
             image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
         else if ([torrent isPaused])
         {
@@ -261,7 +261,7 @@
         }
         else
             image = nil;
-
+        
         if (image)
             [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
 
