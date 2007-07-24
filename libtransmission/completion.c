@@ -99,7 +99,7 @@ int tr_cpPieceHasAllBlocks( const tr_completion_t * cp, int piece )
 
 int tr_cpPieceIsComplete( const tr_completion_t * cp, int piece )
 {
-    return tr_bitfieldHas( cp->pieceBitfield, piece );
+    return cp->completeBlocks[piece] >= tr_cpCountBlocks(cp,piece);
 }
 
 const tr_bitfield_t * tr_cpPieceBitfield( const tr_completion_t * cp )

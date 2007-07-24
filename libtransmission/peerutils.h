@@ -166,10 +166,10 @@ static int isPieceInteresting( const tr_torrent_t  * tor,
                                const tr_peer_t     * peer,
                                int                   piece )
 {
-    if( tr_cpPieceIsComplete( tor->completion, piece ) ) /* we already have it */
+    if( tor->info.pieces[piece].dnd ) /* we don't want it */
         return 0;
 
-    if( tor->info.pieces[piece].dnd ) /* we don't want it */
+    if( tr_cpPieceIsComplete( tor->completion, piece ) ) /* we already have it */
         return 0;
 
     if( !tr_bitfieldHas( peer->bitfield, piece ) ) /* peer doesn't have it */
