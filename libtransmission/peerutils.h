@@ -185,10 +185,10 @@ static int isBlockInteresting( const tr_torrent_t  * tor,
                                const tr_peer_t     * peer,
                                int                   block )
 {
-    if( !isPieceInteresting( tor, peer, tr_blockPiece( block ) ) ) /* is piece interesting? */
+    if( tr_cpBlockIsComplete( tor->completion, block )) /* we already have it */
         return 0;
 
-    if( tr_cpBlockIsComplete( tor->completion, block )) /* we already have it */
+    if( !isPieceInteresting( tor, peer, tr_blockPiece( block ))) /* is piece interesting? */
         return 0;
 
     return 1;
