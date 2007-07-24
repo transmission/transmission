@@ -58,7 +58,7 @@ namespace
     typedef std::vector<tr_torrent_t*> torrents_v;
 }
 
-class MyFrame : public wxFrame
+class MyFrame : public wxFrame, public TorrentListCtrl::Listener
 {
 public:
     MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
@@ -68,8 +68,10 @@ public:
     void OnQuit( wxCommandEvent& );
     void OnAbout( wxCommandEvent& );
     void OnOpen( wxCommandEvent& );
+    void OnRecheck( wxCommandEvent& );
     void OnTimer( wxTimerEvent& );
     void OnItemSelected( wxListEvent& );
+    virtual void OnTorrentListSelectionChanged( TorrentListCtrl*, const std::set<tr_torrent_t*>& );
 
 private:
     void RefreshFilterCounts( );
@@ -85,6 +87,7 @@ private:
     wxIcon * myLogoIcon;
     wxIcon * myTrayLogo;
     torrents_v myTorrents;
+    torrents_v mySelectedTorrents;
 
 private:
     DECLARE_EVENT_TABLE()
@@ -107,6 +110,7 @@ enum
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnItemSelected )
+    EVT_MENU( wxID_REFRESH, MyFrame::OnRecheck )
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(MyApp)
@@ -220,6 +224,22 @@ MyFrame :: OnItemSelected( wxListEvent& event )
 }
 
 void
+MyFrame :: OnRecheck( wxCommandEvent& unused )
+{
+    for( torrents_v::iterator it(mySelectedTorrents.begin()),
+                             end(mySelectedTorrents.end()); it!=end; ++it )
+        tr_torrentRecheck( *it );
+}
+
+void
+MyFrame :: OnTorrentListSelectionChanged( TorrentListCtrl* list,
+                                          const std::set<tr_torrent_t*>& torrents )
+{
+    assert( list == myTorrentList );
+    mySelectedTorrents.assign( torrents.begin(), torrents.end() );
+}
+
+void
 MyFrame :: OnTimer(wxTimerEvent& event)
 {
     RefreshFilterCounts( );
@@ -238,6 +258,9 @@ MyFrame :: OnTimer(wxTimerEvent& event)
 
 MyFrame::~MyFrame()
 {
+    myTorrentList->RemoveListener( this );
+    delete myTorrentList;
+
     delete myConfig;
 }
 
@@ -337,6 +360,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     /* Torrent List */
 
     myTorrentList = new TorrentListCtrl( handle, myConfig, row1 );
+    myTorrentList->AddListener( this );
 
     wxBoxSizer * boxSizer = new wxBoxSizer( wxHORIZONTAL );
     boxSizer->Add( myFilters, 0, wxEXPAND|wxRIGHT, 5 );
