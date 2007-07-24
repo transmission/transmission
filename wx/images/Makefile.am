@@ -9,5 +9,6 @@ EXTRA_DIST = \
     gtk-remove.xpm \
     stop.png \
     stop.xpm \
+    systray.xpm \
     transmission.png \
     transmission.xpm

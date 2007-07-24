@@ -40,6 +40,7 @@ extern "C"
   #include <images/gtk-properties.xpm>
   #include <images/gtk-remove.xpm>
   #include <images/stop.xpm>
+  #include <images/systray.xpm>
   #include <images/transmission.xpm>
 }
 
@@ -65,7 +66,7 @@ public:
     virtual ~MyFrame();
 
 public:
-    void OnQuit( wxCommandEvent& );
+    void OnExit( wxCommandEvent& );
     void OnAbout( wxCommandEvent& );
     void OnOpen( wxCommandEvent& );
     void OnRecheck( wxCommandEvent& );
@@ -83,9 +84,9 @@ protected:
 private:
     TorrentListCtrl * myTorrentList;
     wxListCtrl * myFilters;
-    wxTaskBarIcon * myTaskBarIcon;
-    wxIcon * myLogoIcon;
-    wxIcon * myTrayLogo;
+    wxTaskBarIcon myTrayIcon;
+    wxIcon myLogoIcon;
+    wxIcon myTrayIconIcon;
     torrents_v myTorrents;
     torrents_v mySelectedTorrents;
 
@@ -153,7 +154,7 @@ bool MyApp::OnInit()
 
     frame->Connect( wxID_OPEN, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnOpen );
     frame->Connect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnAbout );
-    frame->Connect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnQuit );
+    frame->Connect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction) &MyFrame::OnExit );
     frame->Connect( ID_Pulse, wxEVT_TIMER, (wxObjectEventFunction) &MyFrame::OnTimer );
 
     frame->Show( true );
@@ -253,7 +254,7 @@ MyFrame :: OnTimer(wxTimerEvent& event)
     s += _T("\n");
     s +=_("Upload: ");
     s +=  getReadableSpeed( ul );
-    myTaskBarIcon->SetIcon( *myTrayLogo, s );
+    myTrayIcon.SetIcon( myTrayIconIcon, s );
 }
 
 MyFrame::~MyFrame()
@@ -267,21 +268,10 @@ MyFrame::~MyFrame()
 MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     wxFrame((wxFrame*)NULL,-1,title,pos,size),
     myConfig( new wxConfig( _T("xmission") ) ),
-    myPulseTimer( this, ID_Pulse )
+    myPulseTimer( this, ID_Pulse ),
+    myLogoIcon( transmission_xpm ),
+    myTrayIconIcon( systray_xpm )
 {
-    myLogoIcon = new wxIcon( transmission_xpm );
-    SetIcon( *myLogoIcon );
-
-/*#if wxCHECK_VERSION(2,8,0)
-    transmission_logo.Rescale( 24, 24, wxIMAGE_QUALITY_HIGH );
-#else
-    transmission_logo.Rescale( 24, 24 );
-#endif
-    myTrayLogo = new wxIcon;
-    myTrayLogo->CopyFromBitmap( wxBitmap( transmission_logo ) );*/
-    myTrayLogo = myLogoIcon;
-
-
     /**
     ***  Menu
     **/
@@ -396,8 +386,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 
     myPulseTimer.Start( 1500 );
 
-    myTaskBarIcon = new wxTaskBarIcon( );
-
     /**
     ***  Load the torrents
     **/
@@ -414,9 +402,9 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     OnTimer( dummy );
 }
 
-void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void MyFrame::OnExit(wxCommandEvent& WXUNUSED(event))
 {
-    Close( true );
+    Destroy( );
 }
 
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
