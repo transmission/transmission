@@ -675,6 +675,9 @@ tr_bitfieldCountTrueBits( const tr_bitfield_t* b )
         4,5,5,6,5,6,6,7,5,6,6,7,6,7,7,8,5,6,6,7,6,7,7,8,6,7,7,8,7,8,8,9
     };
 
+    if( !b )
+        return 0;
+
     for( it=b->bits, end=it+b->len; it!=end; ++it )
         ret += trueBitCount[*it];
 

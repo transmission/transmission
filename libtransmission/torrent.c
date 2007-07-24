@@ -608,7 +608,9 @@ tr_torrentStat( tr_torrent_t * tor )
 
 
     if( tor->uncheckedPieces )
-        s->status = TR_STATUS_CHECK_WAIT;
+        s->status = tor->runStatus==TR_RUN_CHECKING
+            ? TR_STATUS_CHECK
+            : TR_STATUS_CHECK_WAIT;
     else switch( tor->runStatus ) {
         case TR_RUN_STOPPING: /* fallthrough */
         case TR_RUN_STOPPING_NET_WAIT: s->status = TR_STATUS_STOPPING; break;
@@ -620,6 +622,10 @@ tr_torrentStat( tr_torrent_t * tor )
             case TR_CP_COMPLETE: s->status = TR_STATUS_SEED; break;
         }
     }
+
+    s->recheckProgress = (tor->uncheckedPieces == NULL)
+        ? 0.0
+        : 1.0 - ((double)tr_bitfieldCountTrueBits(tor->uncheckedPieces) / tor->info.pieceCount);
 
     s->cpStatus = tor->cpStatus;
 

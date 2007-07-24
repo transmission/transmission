@@ -553,16 +553,18 @@ tr_torrent_status_str ( TrTorrent * gtor )
     const int tpeers = MAX (st->peersConnected, 0);
     const int upeers = MAX (st->peersGettingFromUs, 0);
     const int eta = st->eta;
-    const double prog = st->percentDone * 100.0; /* [0...100] */
+    double prog = st->percentDone * 100.0; /* [0...100] */
 
     switch( st->status )
     {
         case TR_STATUS_CHECK_WAIT:
-            top = g_strdup_printf( _("Waiting to check existing files (%.1f%%)"), prog );
+            prog = st->recheckProgress * 100.0; /* [0...100] */
+            top = g_strdup_printf( _("Waiting to check existing files (checked %.1f%%)"), prog );
             break;
 
         case TR_STATUS_CHECK:
-            top = g_strdup_printf( _("Checking existing files (%.1f%%)"), prog );
+            prog = st->recheckProgress * 100.0; /* [0...100] */
+            top = g_strdup_printf( _("Checking existing files (checked %.1f%%)"), prog );
             break;
 
         case TR_STATUS_DOWNLOAD:

@@ -600,6 +600,7 @@ struct tr_stat_s
 
     const tr_tracker_info_t * tracker;
 
+    float               recheckProgress;
     float               percentComplete;
     float               percentDone;
     float               rateDownload;

@@ -35,16 +35,23 @@ readOrWriteBytes ( const tr_torrent_t  * tor,
 {
     const tr_info_t * info = &tor->info;
     const tr_file_t * file = &info->files[fileIndex];
-    int fd, ret;
     typedef size_t (* iofunc) ( int, void *, size_t );
     iofunc func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
+    char path[MAX_PATH_LENGTH];
+    struct stat sb;
+    int fd = -1;
+    int ret;
 
     assert ( 0<=fileIndex && fileIndex<info->fileCount );
     assert ( !file->length || (fileOffset < file->length));
     assert ( fileOffset + buflen <= file->length );
 
+    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+
     if( !file->length )
         return 0;
+    else if ((ioMode==TR_IO_READ) && stat( path, &sb ) ) /* fast check to make sure file exists */
+        ret = tr_ioErrorFromErrno ();
     else if ((fd = tr_fdFileOpen ( tor->destination, file->name, ioMode==TR_IO_WRITE )) < 0)
         ret = fd;
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
@@ -216,25 +223,25 @@ tr_ioCheckFiles( tr_torrent_t * tor )
     if( tor->uncheckedPieces != NULL )
     {
         int i;
-        tr_bitfield_t * p = tor->uncheckedPieces;
-        tor->uncheckedPieces = NULL;
 
         /* remove the unchecked pieces from completion... */
         for( i=0; i<tor->info.pieceCount; ++i ) 
-            if( tr_bitfieldHas( p, i ) )
+            if( tr_bitfieldHas( tor->uncheckedPieces, i ) )
                 tr_cpPieceRem( tor->completion, i );
 
         tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
 
         for( i=0; i<tor->info.pieceCount; ++i ) 
         {
-            if( !tr_bitfieldHas( p, i ) )
+            if( !tr_bitfieldHas( tor->uncheckedPieces, i ) )
                 continue;
 
             tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
+            tr_bitfieldRem( tor->uncheckedPieces, i );
         }
 
-        tr_bitfieldFree( p );
+        tr_bitfieldFree( tor->uncheckedPieces );
+        tor->uncheckedPieces = NULL;
         tor->fastResumeDirty = TRUE;
     }
 }
