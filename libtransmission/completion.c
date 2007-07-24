@@ -126,6 +126,14 @@ void tr_cpPieceRem( tr_completion_t * cp, int piece )
     const int startBlock = tr_pieceStartBlock( piece );
     const int endBlock   = startBlock + n_blocks;
 
+    assert( cp != NULL );
+    assert( 0 <= piece );
+    assert( piece < tor->info.pieceCount );
+    assert( 0 <= startBlock );
+    assert( startBlock < tor->blockCount );
+    assert( startBlock <= endBlock );
+    assert( endBlock < tor->blockCount );
+
     cp->completeBlocks[piece] = 0;
     tr_bitfieldRemRange ( cp->blockBitfield, startBlock, endBlock );
     tr_bitfieldRem( cp->pieceBitfield, piece );

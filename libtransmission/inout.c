@@ -220,6 +220,10 @@ checkPiece ( tr_torrent_t * tor, int pieceIndex )
 void
 tr_ioCheckFiles( tr_torrent_t * tor )
 {
+    assert( tor != NULL );
+    assert( tor->completion != NULL );
+    assert( tor->info.pieceCount > 0 );
+
     if( tor->uncheckedPieces != NULL )
     {
         int i;
