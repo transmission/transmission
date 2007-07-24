@@ -574,7 +574,7 @@ tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
     return 1;
 }
 
-#define BIN(nth) (nth>>3)
+#define BIN(nth) ((unsigned int)nth/8u)
 #define BIT(nth) (1<<(7-(nth%8)))
 
 int
