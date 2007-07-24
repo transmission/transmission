@@ -127,9 +127,6 @@ int _tr_blockPiece( const tr_torrent_t * tor, int block );
 #define tr_blockSize(a) _tr_blockSize(tor,a)
 int _tr_blockSize( const tr_torrent_t * tor, int block );
 
-#define tr_blockPosInPiece(a) _tr_blockPosInPiece(tor,a)
-int _tr_blockPosInPiece( const tr_torrent_t * tor, int block );
-
 #define tr_pieceCountBlocks(a) _tr_pieceCountBlocks(tor,a)
 int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece );
 

@@ -1369,8 +1369,7 @@ tr_torrentSetFileDLs ( tr_torrent_t   * tor,
 
 int _tr_blockPiece( const tr_torrent_t * tor, int block )
 {
-    const tr_info_t * inf = &tor->info;
-    return block / ( inf->pieceSize / tor->blockSize );
+    return (block * tor->blockSize) / tor->info.pieceSize;
 }
 
 int _tr_blockSize( const tr_torrent_t * tor, int block )
@@ -1385,13 +1384,6 @@ int _tr_blockSize( const tr_torrent_t * tor, int block )
     }
 
     return dummy;
-}
-
-int _tr_blockPosInPiece( const tr_torrent_t * tor, int block )
-{
-    const tr_info_t * inf = &tor->info;
-    return tor->blockSize *
-        ( block % ( inf->pieceSize / tor->blockSize ) );
 }
 
 int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece )
