@@ -248,8 +248,12 @@
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
         
-        if ([torrent isActive] && ![torrent isChecking])
-            image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
+        image = nil;
+        if ([torrent isActive])
+        {
+            if (![torrent isChecking])
+                image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
+        }
         else if ([torrent isPaused])
         {
             if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
@@ -259,8 +263,7 @@
             else
                 image = NSPointInRect(fClickPoint, rect) ? fResumeOnIcon : fResumeOffIcon;
         }
-        else
-            image = nil;
+        else;
         
         if (image)
             [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];

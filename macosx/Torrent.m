@@ -357,7 +357,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
 
         case TR_STATUS_CHECK:
-            tempString = [NSLocalizedString(@"Checking existing data", "Torrent -> status string") stringByAppendingEllipsis];
+            tempString = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
             
             [statusString setString: tempString];
             [shortStatusString setString: tempString];
@@ -990,7 +991,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
 
         case TR_STATUS_CHECK:
-            return [NSLocalizedString(@"Checking existing data", "Torrent -> status string") stringByAppendingEllipsis];
+            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
+            break;
+        
+        case TR_STATUS_CHECK_WAIT:
+            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
             break;
 
         case TR_STATUS_DOWNLOAD:
