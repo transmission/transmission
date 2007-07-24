@@ -159,7 +159,8 @@ void tr_cpBlockAdd( tr_completion_t * cp, int block )
 
     if( !tr_cpBlockIsComplete( cp, block ) )
     {
-        const int piece = tr_blockPiece( block );
+        const int piece = block / cp->nBlocksInPiece;
+
         ++cp->completeBlocks[piece];
 
         if( cp->completeBlocks[piece] == tr_cpCountBlocks( cp, piece ) )
