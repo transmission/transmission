@@ -219,6 +219,11 @@ tr_ioCheckFiles( tr_torrent_t * tor )
         tr_bitfield_t * p = tor->uncheckedPieces;
         tor->uncheckedPieces = NULL;
 
+        /* remove the unchecked pieces from completion... */
+        for( i=0; i<tor->info.pieceCount; ++i ) 
+            if( tr_bitfieldHas( p, i ) )
+                tr_cpPieceRem( tor->completion, i );
+
         tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
 
         for( i=0; i<tor->info.pieceCount; ++i ) 

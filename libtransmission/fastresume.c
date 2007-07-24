@@ -356,6 +356,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
                         tr_bitfield_t       * uncheckedPieces,
                         FILE                * file )
 {
+    int i;
     const size_t len = FR_PROGRESS_LEN( tor );
     uint8_t * buf = calloc( len, 1 );
     uint8_t * walk = buf;
@@ -368,7 +369,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
 
     /* compare file mtimes */
     if (1) {
-        int i, n;
+        int n;
         tr_time_t * curMTimes = getMTimes( tor, &n );
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
@@ -391,8 +392,14 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
         bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = walk;
         tr_cpBlockBitfieldSet( tor->completion, &bitfield );
-/* FIXME: remove the "unchecked pieces" */
     }
+
+    /* the files whose mtimes are wrong,
+       remove from completion pending a recheck... */
+    for( i=0; i<tor->info.pieceCount; ++i )
+        if( tr_bitfieldHas( uncheckedPieces, i ) )
+            tr_cpPieceRem( tor->completion, i );
+
 
     free( buf );
     return TR_OK;

@@ -238,10 +238,8 @@ torrentRealInit( tr_handle_t   * h,
     loaded = tr_fastResumeLoad( tor, uncheckedPieces );
     if( tr_bitfieldIsEmpty( uncheckedPieces ) )
         tr_bitfieldFree( uncheckedPieces );
-    else {
+    else
         tor->uncheckedPieces = uncheckedPieces;
-        fprintf( stderr, "torrent %s has %d unchecked pieces\n", tor->info.name, (int)tr_bitfieldCountTrueBits(tor->uncheckedPieces) );
-    }
 
 
     if( !(loaded & TR_FR_SPEEDLIMIT ) ) {
