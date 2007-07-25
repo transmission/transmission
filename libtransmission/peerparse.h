@@ -350,6 +350,13 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     /* Piece is complete, check it */
     if( ( ret = tr_ioHash( tor->io, index ) ) )
     {
+        /* Follow Azureus' and uTorrent's lead in not counting corrupt
+           pieces in our announce data, as it could give us a misleadingly
+           bad share ratio . (Ticket #263) */
+        const int byteCount = tr_pieceSize( index );
+        if( tor->downloadedCur >= byteCount )
+            tor->downloadedCur -= byteCount;
+
         return ret;
     }
     if( !tr_cpPieceIsComplete( tor->completion, index ) )
