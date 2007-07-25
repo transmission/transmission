@@ -685,7 +685,7 @@ writeEnd:
                all peers for 2, and so on.  Randomize our starting point
                into "pool" to reduce such overlap */
             int piecesLeft = poolSize;
-            int p = tr_rand( poolSize );
+            int p = (int)(tr_date() % poolSize);
             for( ; openSlots>0 && piecesLeft>0; --piecesLeft, p=(p+1)%poolSize )
             {
                 const int piece = pool[p]; 
