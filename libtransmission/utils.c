@@ -588,8 +588,6 @@ void
 tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t nth )
 {
     assert( bitfield != NULL );
-    assert( 0 <= nth);
-    assert( 0 <= BIN(nth) );
     assert( BIN(nth) < bitfield->len );
     bitfield->bits[ BIN(nth) ] |= BIT(nth);
 }
@@ -611,7 +609,7 @@ tr_bitfieldRem( tr_bitfield_t   * bitfield,
 {
     if( bitfield != NULL )
     {
-        const int bin = BIN(nth);
+        const size_t bin = BIN(nth);
         assert( bin < bitfield->len );
         bitfield->bits[bin] &= ~BIT(nth);
     }

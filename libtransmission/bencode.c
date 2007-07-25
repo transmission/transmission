@@ -377,7 +377,7 @@ benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
     keyval = dict->val.l.vals + dict->val.l.count++;
-    tr_bencInitStr( keyval, key, -1, 1 );
+    tr_bencInitStr( keyval, (char*)key, -1, 1 );
 
     itemval = dict->val.l.vals + dict->val.l.count++;
     tr_bencInit( itemval, TYPE_INT );

@@ -707,8 +707,8 @@ fileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
     assert( (int)firstBlock < tor->blockCount );
     assert( (int)lastBlock < tor->blockCount );
     assert( firstBlock <= lastBlock );
-    assert( TOR_BLOCK_PIECE( tor, firstBlock ) == file->firstPiece );
-    assert( TOR_BLOCK_PIECE( tor, lastBlock ) == file->lastPiece );
+    assert( (int)TOR_BLOCK_PIECE( tor, firstBlock ) == file->firstPiece );
+    assert( (int)TOR_BLOCK_PIECE( tor, lastBlock ) == file->lastPiece );
 
     if( firstBlock == lastBlock )
     {

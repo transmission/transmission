@@ -354,7 +354,7 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
            pieces in our announce data, as it could give us a misleadingly
            bad share ratio . (Ticket #263) */
         const int byteCount = tr_pieceSize( index );
-        if( tor->downloadedCur >= byteCount )
+        if( tor->downloadedCur >= (uint64_t)byteCount )
             tor->downloadedCur -= byteCount;
 
         return ret;
