@@ -716,7 +716,7 @@ writeEnd:
         tr_free( pool );
     }
 
-    assert( peer->inRequestCount <= peer->inRequestMax );
+    assert( peer->inRequestCount <= peer->inRequestAlloc );
     assert( peer->inRequestMax <= peer->inRequestAlloc );
 
     return TR_OK;
