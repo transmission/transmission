@@ -173,7 +173,7 @@ tr_torrentInitFilePieces( tr_torrent_t * tor )
         uint64_t lastByte;
         int lastBlock;
         if( i == (tor->info.pieceCount-1))
-            lastByte = tor->info.totalSize;
+            lastByte = tor->info.totalSize - 1;
         else {
             lastByte = i + 1;
             lastByte *= tor->info.pieceSize;
