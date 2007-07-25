@@ -130,7 +130,7 @@ sendremote( GList * files, gboolean sendquit );
 static void
 gtksetup( int * argc, char *** argv, struct cbdata* );
 static void
-appsetup( TrWindow * wind, benc_val_t * state, GList * args,
+appsetup( TrWindow * wind, GList * args,
           struct cbdata * , gboolean paused );
 static void
 winsetup( struct cbdata * cbdata, TrWindow * wind );
@@ -246,7 +246,7 @@ main( int argc, char ** argv )
         }
 
         msgwin_loadpref();      /* set message level here before tr_init() */
-        appsetup( mainwind, state, argfiles, cbdata, startpaused );
+        appsetup( mainwind, argfiles, cbdata, startpaused );
         cf_freestate( state );
     }
     else
@@ -382,7 +382,7 @@ gtksetup( int * argc, char *** argv, struct cbdata * callback_data )
 }
 
 static void
-appsetup( TrWindow * wind, benc_val_t * state, GList * args,
+appsetup( TrWindow * wind, GList * args,
           struct cbdata * cbdata, gboolean paused )
 {
     enum tr_torrent_action action;
