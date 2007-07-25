@@ -40,6 +40,8 @@ AboutWindowController * fAboutBoxInstance = nil;
     [fVersionField setStringValue: [NSString stringWithFormat: @"%@ (%@)",
         [info objectForKey: @"CFBundleShortVersionString"], [info objectForKey: (NSString *)kCFBundleVersionKey]]];
     
+    #warning get copyright info from file
+    
     [[fTextView textStorage] setAttributedString: [[[NSAttributedString alloc] initWithPath:
             [[NSBundle mainBundle] pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil] autorelease]];
 

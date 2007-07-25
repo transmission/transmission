@@ -48,8 +48,8 @@ cat > libtransmission/version.h.new << EOF
 #define VERSION_MAINTENANCE  "$MAINT"
 #define VERSION_REVISION     "$REV"
 #define VERSION_BETA         "$BETA"
-#define SHORT_VERSION_STRING "$MAJOR.$MINOR$MAINT$BETA"
-#define LONG_VERSION_STRING  "$MAJOR.$MINOR$MAINT$BETA (r$REV)"
+#define SHORT_VERSION_STRING "$STRING"
+#define LONG_VERSION_STRING  "$STRING ($REV)"
 EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
 
