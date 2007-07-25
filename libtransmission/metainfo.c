@@ -305,6 +305,8 @@ void tr_metainfoFree( tr_info_t * inf )
         tr_free( inf->trackerList[ii].list );
     }
     tr_free( inf->trackerList );
+
+    memset( inf, '\0', sizeof(tr_info_t) );
 }
 
 static int getfile( char * buf, int size,

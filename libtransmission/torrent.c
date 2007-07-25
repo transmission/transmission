@@ -343,7 +343,8 @@ tr_torrentParse( const tr_handle_t  * h,
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
 
-    if( setme_info == &tmp )
+    /* if we allocated a temporary info, free it */
+    if( !ret && ( setme_info == &tmp ) )
         tr_metainfoFree( &tmp );
 
     return ret;
