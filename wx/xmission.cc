@@ -47,6 +47,55 @@ extern "C"
 #include "torrent-filter.h"
 #include "torrent-list.h"
 
+/***
+****
+***/
+
+namespace
+{
+    int bestDecimal( double num ) {
+        if ( num < 10 ) return 2;
+        if ( num < 100 ) return 1;
+        return 0;
+    }
+
+    wxString toWxStr( const char * s )
+    {
+        return wxString( s, wxConvUTF8 );
+    }
+
+    std::string toStr( const wxString& xstr )
+    {
+        return std::string( xstr.mb_str( *wxConvCurrent ) );
+    }
+
+    wxString getReadableSize( uint64_t size )
+    {
+        int i;
+        static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
+        for ( i=0; size>>10; ++i ) size = size>>10;
+        char buf[512];
+        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
+        return toWxStr( buf );
+    }
+
+    wxString getReadableSize( float f )
+    {
+        return getReadableSize( (uint64_t)f );
+    }
+
+    wxString getReadableSpeed( float f )
+    {
+        wxString xstr = getReadableSize(f);
+        xstr += _T("/s");
+        return xstr;
+    }
+}
+
+/***
+****
+***/
+
 class MyApp : public wxApp
 {
     virtual bool OnInit();
@@ -54,6 +103,8 @@ class MyApp : public wxApp
 
 namespace
 {
+    const char * destination = "/home/charles/torrents";
+
     tr_handle_t * handle = NULL;
 
     typedef std::vector<tr_torrent_t*> torrents_v;
@@ -71,11 +122,12 @@ public:
     void OnOpen( wxCommandEvent& );
     void OnRecheck( wxCommandEvent& );
     void OnTimer( wxTimerEvent& );
-    void OnItemSelected( wxListEvent& );
+    void OnFilterSelected( wxListEvent& );
     virtual void OnTorrentListSelectionChanged( TorrentListCtrl*, const std::set<tr_torrent_t*>& );
 
 private:
     void RefreshFilterCounts( );
+    void ApplyCurrentFilter( );
 
 protected:
     wxConfig * myConfig;
@@ -89,6 +141,7 @@ private:
     wxIcon myTrayIconIcon;
     torrents_v myTorrents;
     torrents_v mySelectedTorrents;
+    int myFilter;
 
 private:
     DECLARE_EVENT_TABLE()
@@ -110,7 +163,7 @@ enum
 };
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnItemSelected )
+    EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnFilterSelected )
     EVT_MENU( wxID_REFRESH, MyFrame::OnRecheck )
 END_EVENT_TABLE()
 
@@ -134,9 +187,16 @@ void MyFrame :: OnOpen( wxCommandEvent& event )
         size_t nPaths = paths.GetCount();
         for( size_t i=0; i<nPaths; ++i )
         {
-            const wxString& w = paths[i];
-            std::cerr << w.ToAscii() << std::endl;
+            const std::string filename = toStr( paths[i] );
+            tr_torrent_t * tor = tr_torrentInit( handle,
+                                                 filename.c_str(),
+                                                 destination,
+                                                 0, NULL );
+            if( tor )
+                myTorrents.push_back( tor );
         }
+        ApplyCurrentFilter( );
+
         myConfig->Write( key, w->GetDirectory() );
     }
 
@@ -166,42 +226,6 @@ bool MyApp::OnInit()
 ****
 ***/
 
-namespace
-{
-    int bestDecimal( double num ) {
-        if ( num < 10 ) return 2;
-        if ( num < 100 ) return 1;
-        return 0;
-    }
-
-    wxString toWxStr( const char * s )
-    {
-        return wxString( s, wxConvUTF8 );
-    }
-
-    wxString getReadableSize( uint64_t size )
-    {
-        int i;
-        static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
-        for ( i=0; size>>10; ++i ) size = size>>10;
-        char buf[512];
-        snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
-        return toWxStr( buf );
-    }
-
-    wxString getReadableSize( float f )
-    {
-        return getReadableSize( (uint64_t)f );
-    }
-
-    wxString getReadableSpeed( float f )
-    {
-        wxString xstr = getReadableSize(f);
-        xstr += _T("/s");
-        return xstr;
-    }
-}
-
 void
 MyFrame :: RefreshFilterCounts( )
 {
@@ -216,12 +240,18 @@ MyFrame :: RefreshFilterCounts( )
 }
 
 void
-MyFrame :: OnItemSelected( wxListEvent& event )
+MyFrame :: ApplyCurrentFilter( )
 {
-    const int item = event.GetIndex ();
     torrents_v tmp( myTorrents );
-    TorrentFilter :: RemoveFailures( item, tmp );
+    TorrentFilter :: RemoveFailures( myFilter, tmp );
     myTorrentList->Assign( tmp );
+}
+
+void
+MyFrame :: OnFilterSelected( wxListEvent& event )
+{
+    myFilter = event.GetIndex( );
+    ApplyCurrentFilter( );
 }
 
 void
@@ -270,7 +300,8 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     myConfig( new wxConfig( _T("xmission") ) ),
     myPulseTimer( this, ID_Pulse ),
     myLogoIcon( transmission_xpm ),
-    myTrayIconIcon( systray_xpm )
+    myTrayIconIcon( systray_xpm ),
+    myFilter( TorrentFilter::SHOW_ALL )
 {
     /**
     ***  Menu
@@ -391,7 +422,6 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     **/
 
     const int flags = TR_FLAG_PAUSED;
-    const char * destination = "/home/charles/torrents";
     int count = 0;
     tr_torrent_t ** torrents = tr_loadTorrents ( handle, destination, flags, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
