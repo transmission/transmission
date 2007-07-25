@@ -37,6 +37,11 @@ makeCommonPex( tr_torrent_t * tor, tr_peer_t * peer,
     tr_peertree_entry_t * found;
     benc_val_t            val, * addval, * delval, * extra;
 
+    assert( tor != NULL );
+    assert( peer != NULL );
+    assert( retbuf != NULL );
+    assert( retlen != NULL );
+
     *retbuf = NULL;
     *retlen = 0;
     sent = &peer->sentPeers;

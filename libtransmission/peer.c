@@ -318,6 +318,9 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_rcClose( peer->download );
     tr_rcClose( peer->upload );
     free( peer->client );
+
+    memset( peer, '\0', sizeof(tr_peer_t) );
+
     free( peer );
 }
 
@@ -480,7 +483,12 @@ int tr_peerPulse( tr_peer_t * peer )
     int ret, size;
     uint8_t * p;
     uint64_t date;
-    const int isSeeding = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
+    int isSeeding;
+
+    assert( peer != NULL );
+    assert( peer->tor != NULL );
+
+    isSeeding = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
 
     if( ( ret = checkPeer( peer ) ) )
     {
