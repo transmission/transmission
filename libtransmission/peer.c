@@ -693,7 +693,7 @@ writeEnd:
                 const int n = TR_BLOCKS_IN_PIECE( tor, piece );
                 const int end = firstBlock + n;
                 int block;
-                for( block=firstBlock; block<end; ++block )
+                for( block=firstBlock; openSlots>0 && block<end; ++block )
                 {
                     /* don't ask for it if we've already got it */
                     if( tr_cpBlockIsComplete( tor->completion, block ))
@@ -715,6 +715,9 @@ writeEnd:
 
         tr_free( pool );
     }
+
+    assert( peer->inRequestCount <= peer->inRequestMax );
+    assert( peer->inRequestMax <= peer->inRequestAlloc );
 
     return TR_OK;
 }
