@@ -680,8 +680,8 @@ writeEnd:
             for( ; openSlots>0 && piecesLeft>0; --piecesLeft, p=(p+1)%poolSize )
             {
                 const int piece = pool[p]; 
-                const int firstBlock = tr_pieceStartBlock( piece );
-                const int n = tr_pieceCountBlocks( piece );
+                const int firstBlock = TOR_PIECE_FIRST_BLOCK( tor, piece );
+                const int n = TR_BLOCKS_IN_PIECE( tor, piece );
                 const int end = firstBlock + n;
                 int block;
                 for( block=firstBlock; block<end; ++block )

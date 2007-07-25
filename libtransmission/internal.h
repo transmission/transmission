@@ -121,17 +121,18 @@ void tr_torrentReaderUnlock  ( const tr_torrent_t * );
 void tr_torrentWriterLock    ( tr_torrent_t * );
 void tr_torrentWriterUnlock  ( tr_torrent_t * );
 
-#define tr_blockPiece(a) _tr_blockPiece(tor,a)
-int _tr_blockPiece( const tr_torrent_t * tor, int block );
+
+#define TOR_BLOCK_PIECE(tor,block) \
+    ( (block) / ( (tor)->info.pieceSize / (tor)->blockSize ) )
+
+#define TOR_PIECE_FIRST_BLOCK(tor,piece) \
+    ( (tor)->info.pieces[(piece)].firstBlock )
+
+#define TR_BLOCKS_IN_PIECE(tor,piece) \
+    ( (tor)->info.pieces[(piece)].blockCount )
 
 #define tr_blockSize(a) _tr_blockSize(tor,a)
 int _tr_blockSize( const tr_torrent_t * tor, int block );
-
-#define tr_pieceCountBlocks(a) _tr_pieceCountBlocks(tor,a)
-int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece );
-
-#define tr_pieceStartBlock(a) _tr_pieceStartBlock(tor,a)
-int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece );
 
 #define tr_pieceSize(a) _tr_pieceSize(tor,a)
 int _tr_pieceSize( const tr_torrent_t * tor, int piece );

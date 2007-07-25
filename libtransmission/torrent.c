@@ -168,7 +168,28 @@ tr_torrentInitFilePieces( tr_torrent_t * tor )
     }
 
     for( i=0; i<tor->info.pieceCount; ++i )
-      tor->info.pieces[i].priority = calculatePiecePriority( tor, i );
+    {
+        tr_piece_t * piece = tor->info.pieces + i;
+        uint64_t lastByte;
+        int lastBlock;
+        if( i == (tor->info.pieceCount-1))
+            lastByte = tor->info.totalSize;
+        else {
+            lastByte = i + 1;
+            lastByte *= tor->info.pieceSize;
+            --lastByte;
+        }
+        lastBlock = lastByte / tor->blockSize;
+
+        piece->priority = calculatePiecePriority( tor, i );
+        piece->firstBlock = i * (tor->info.pieceSize / tor->blockSize);
+        piece->blockCount = lastBlock + 1 - piece->firstBlock;
+
+        assert( 0 <= piece->firstBlock );
+        assert( piece->firstBlock <= lastBlock );
+        assert( lastBlock < tor->blockCount );
+        assert( piece->firstBlock + piece->blockCount <= tor->blockCount );
+    }
 }
 
 static void torrentThreadLoop( void * );
@@ -190,8 +211,6 @@ torrentRealInit( tr_handle_t   * h,
 
     tor->destination = tr_strdup( destination );
 
-    tr_torrentInitFilePieces( tor );
-
     tor->handle   = h;
     tor->key      = h->key;
     tor->azId     = h->azId;
@@ -212,6 +231,8 @@ torrentRealInit( tr_handle_t   * h,
     tor->blockCount = ( tor->info.totalSize + tor->blockSize - 1 ) /
                         tor->blockSize;
     tor->completion = tr_cpInit( tor );
+
+    tr_torrentInitFilePieces( tor );
 
     tor->thread = THREAD_EMPTY;
     tr_rwInit( &tor->lock );
@@ -685,8 +706,8 @@ fileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
     assert( (int)firstBlock < tor->blockCount );
     assert( (int)lastBlock < tor->blockCount );
     assert( firstBlock <= lastBlock );
-    assert( tr_blockPiece( firstBlock ) == file->firstPiece );
-    assert( tr_blockPiece( lastBlock ) == file->lastPiece );
+    assert( TOR_BLOCK_PIECE( tor, firstBlock ) == file->firstPiece );
+    assert( TOR_BLOCK_PIECE( tor, lastBlock ) == file->lastPiece );
 
     if( firstBlock == lastBlock )
     {
@@ -1367,16 +1388,6 @@ tr_torrentSetFileDLs ( tr_torrent_t   * tor,
 ****
 ***/
 
-int _tr_blockPiece( const tr_torrent_t * tor, int block )
-{
-    return (block * tor->blockSize) / tor->info.pieceSize;
-}
-
-int _tr_pieceStartBlock( const tr_torrent_t * tor, int piece )
-{
-    return (piece * tor->info.pieceSize) / tor->blockSize;
-}
-
 int _tr_blockSize( const tr_torrent_t * tor, int block )
 {
     const tr_info_t * inf = &tor->info;
@@ -1389,17 +1400,6 @@ int _tr_blockSize( const tr_torrent_t * tor, int block )
     }
 
     return dummy;
-}
-
-int _tr_pieceCountBlocks( const tr_torrent_t * tor, int piece )
-{
-    const tr_info_t * inf = &tor->info;
-    if( piece < inf->pieceCount - 1 ||
-        !( tor->blockCount % ( inf->pieceSize / tor->blockSize ) ) )
-    {
-        return inf->pieceSize / tor->blockSize;
-    }
-    return tor->blockCount % ( inf->pieceSize / tor->blockSize );
 }
 
 int _tr_pieceSize( const tr_torrent_t * tor, int piece )

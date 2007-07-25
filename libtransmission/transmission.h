@@ -514,7 +514,9 @@ typedef struct tr_piece_s
 {
     uint8_t  hash[SHA_DIGEST_LENGTH];  /* pieces hash */
     int8_t   priority;                 /* TR_PRI_HIGH, _NORMAL, or _LOW */
-    int8_t   dnd;                      /*  nonzero if the piece shouldn't be downloaded */
+    int8_t   dnd;                      /* nonzero if the piece shouldn't be downloaded */
+    int      firstBlock;               /* this piece's first byte is in this block */
+    int      blockCount;               /* number of blocks this piece is in */
 }
 tr_piece_t;
     
