@@ -299,7 +299,8 @@ void tr_peerDestroy( tr_peer_t * peer )
     {
         r = &peer->inRequests[i];
         block = tr_block( r->index, r->begin );
-        tr_cpDownloaderRem( tor->completion, block );
+        if( tor != NULL )
+            tr_cpDownloaderRem( tor->completion, block );
     }
     tr_bitfieldFree( peer->bitfield );
     tr_bitfieldFree( peer->blamefield );
