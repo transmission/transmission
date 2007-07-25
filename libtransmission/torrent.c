@@ -358,7 +358,11 @@ tr_torrentInit( tr_handle_t   * h,
                 int           * error )
 {
     int val;
+    int tmpError;
     tr_torrent_t * tor = NULL;
+
+    if( !error )
+         error = &tmpError;
 
     if(( val = tr_torrentParse( h, path, destination, NULL )))
         *error = val;
@@ -405,7 +409,11 @@ tr_torrentInitSaved( tr_handle_t    * h,
                      int            * error )
 {
     int val;
+    int tmpError;
     tr_torrent_t * tor = NULL;
+
+    if( !error )
+         error = &tmpError;
 
     if(( val = tr_torrentParseHash( h, hashStr, destination, NULL )))
         *error = val;
@@ -453,7 +461,11 @@ tr_torrentInitData( tr_handle_t    * h,
                     int            * error )
 {
     int val;
+    int tmpError;
     tr_torrent_t * tor = NULL;
+
+    if( !error )
+         error = &tmpError;
 
     if(( val = tr_torrentParseData( h, data, size, destination, NULL )))
         *error = val;
