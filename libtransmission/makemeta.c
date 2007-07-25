@@ -316,18 +316,7 @@ makeInfoDict ( benc_val_t             * dict,
     char base[MAX_PATH_LENGTH];
 
     tr_bencDictReserve( dict, 5 );
-
-    val = tr_bencDictAdd( dict, "name" );
-    strlcpy( base, builder->top, sizeof( base ) );
-    tr_bencInitStrDup ( val, basename( base ) );
-
-    val = tr_bencDictAdd( dict, "piece length" );
-    tr_bencInitInt( val, builder->pieceSize );
-
-    pch = getHashInfo( builder );
-    val = tr_bencDictAdd( dict, "pieces" );
-    tr_bencInitStr( val, pch, SHA_DIGEST_LENGTH * builder->pieceCount, 0 );
-
+    
     if ( builder->isSingleFile )
     {
         val = tr_bencDictAdd( dict, "length" );
@@ -339,6 +328,17 @@ makeInfoDict ( benc_val_t             * dict,
         tr_bencInit( val, TYPE_LIST );
         makeFilesList( val, builder );
     }
+
+    val = tr_bencDictAdd( dict, "name" );
+    strlcpy( base, builder->top, sizeof( base ) );
+    tr_bencInitStrDup ( val, basename( base ) );
+
+    val = tr_bencDictAdd( dict, "piece length" );
+    tr_bencInitInt( val, builder->pieceSize );
+
+    pch = getHashInfo( builder );
+    val = tr_bencDictAdd( dict, "pieces" );
+    tr_bencInitStr( val, pch, SHA_DIGEST_LENGTH * builder->pieceCount, 0 );
 
     val = tr_bencDictAdd( dict, "private" );
     tr_bencInitInt( val, builder->isPrivate ? 1 : 0 );
@@ -353,27 +353,27 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder_t * builder )
     if ( builder->comment && *builder->comment ) ++n;
     tr_bencDictReserve( &top, n );
 
-        val = tr_bencDictAdd( &top, "announce" );
-        tr_bencInitStrDup( val, builder->announce );
+    val = tr_bencDictAdd( &top, "announce" );
+    tr_bencInitStrDup( val, builder->announce );
+    
+    if( builder->comment && *builder->comment ) {
+        val = tr_bencDictAdd( &top, "comment" );
+        tr_bencInitStrDup( val, builder->comment );
+    }
 
-        val = tr_bencDictAdd( &top, "created by" );
-        tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
+    val = tr_bencDictAdd( &top, "created by" );
+    tr_bencInitStrDup( val, TR_NAME "/" LONG_VERSION_STRING );
 
-        val = tr_bencDictAdd( &top, "creation date" );
-        tr_bencInitInt( val, time(0) );
+    val = tr_bencDictAdd( &top, "creation date" );
+    tr_bencInitInt( val, time(0) );
 
-        val = tr_bencDictAdd( &top, "encoding" );
-        tr_bencInitStrDup( val, "UTF-8" );
+    val = tr_bencDictAdd( &top, "encoding" );
+    tr_bencInitStrDup( val, "UTF-8" );
 
-        if( builder->comment && *builder->comment ) {
-            val = tr_bencDictAdd( &top, "comment" );
-            tr_bencInitStrDup( val, builder->comment );
-        }
-
-        val = tr_bencDictAdd( &top, "info" );
-        tr_bencInit( val, TYPE_DICT );
-        tr_bencDictReserve( val, 666 );
-        makeInfoDict( val, builder );
+    val = tr_bencDictAdd( &top, "info" );
+    tr_bencInit( val, TYPE_DICT );
+    tr_bencDictReserve( val, 666 );
+    makeInfoDict( val, builder );
 
     /* save the file */
     if ( !builder->abortFlag ) {
