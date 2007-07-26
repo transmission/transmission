@@ -318,9 +318,16 @@ tr_cpPercentDone( const tr_completion_t * cp )
 uint64_t
 tr_cpDownloadedValid( const tr_completion_t * cp )
 {
+    uint64_t b = 0;
     const tr_torrent_t * tor = cp->tor;
+    const tr_info_t * info = &tor->info;
+    int i;
 
-    uint64_t b = tr_bitfieldCountTrueBits( cp->blockBitfield ) * tor->blockSize;
+    for( i=0; i<info->pieceCount; ++i )
+        if( tr_cpPieceIsComplete( cp, i ) )
+            ++b;
+
+    b *= tor->blockSize;
 
     if( tor->blockCount && tr_bitfieldHas( cp->blockBitfield, tor->blockCount - 1 ) )
         b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
