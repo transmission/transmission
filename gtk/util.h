@@ -29,13 +29,8 @@
 #include <stdarg.h>
 
 /* macro to shut up "unused parameter" warnings */
-#ifdef __GNUC__
-#define SHUTUP                  __attribute__((unused))
-#define UNUSED                  __attribute__((unused))
-#else
-#define SHUTUP
-#define UNUSED
-#endif
+#define SHUTUP G_GNUC_UNUSED
+#define UNUSED G_GNUC_UNUSED
 
 /* NULL-safe version of strcmp */
 int tr_strcmp( const char*, const char * );

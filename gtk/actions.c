@@ -15,11 +15,7 @@
 #include "torrent-inspector.h"
 #include "img_icon_full.h"
 
-#ifdef __GNUC__
-#define UNUSED __attribute__((unused))
-#else
-#define UNUSED
-#endif
+#define UNUSED G_GNUC_UNUSED
 
 extern void doAction (const char * action_name, gpointer user_data );
 
