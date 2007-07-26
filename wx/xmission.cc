@@ -209,7 +209,7 @@ MyFrame :: OnInfoUpdate( wxUpdateUIEvent& event )
    event.Enable( !mySelectedTorrents.empty() );
 }
 
-void MyFrame :: OnOpen( wxCommandEvent& event )
+void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 {
     const wxString key = _T("prev-directory");
     wxString directory;
@@ -295,7 +295,7 @@ MyFrame :: OnFilterSelected( wxListEvent& event )
 }
 
 void
-MyFrame :: OnRecheck( wxCommandEvent& unused )
+MyFrame :: OnRecheck( wxCommandEvent& WXUNUSED(unused) )
 {
     for( torrents_v::iterator it(mySelectedTorrents.begin()),
                              end(mySelectedTorrents.end()); it!=end; ++it )
@@ -311,7 +311,7 @@ MyFrame :: OnTorrentListSelectionChanged( TorrentListCtrl* list,
 }
 
 void
-MyFrame :: OnTimer(wxTimerEvent& event)
+MyFrame :: OnTimer(wxTimerEvent& WXUNUSED(event) )
 {
     RefreshFilterCounts( );
 

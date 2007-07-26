@@ -345,7 +345,7 @@ TorrentListCtrl :: OnSort( wxListEvent& event )
 }
 
 void
-TorrentListCtrl :: OnItemSelected( wxListEvent& event )
+TorrentListCtrl :: OnItemSelected( wxListEvent& WXUNUSED(event) )
 {
     std::set<tr_torrent_t*> sel;
     long item = -1;
