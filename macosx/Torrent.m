@@ -415,7 +415,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             [statusString setString: @""];
             if ([self totalPeersConnected] != 1)
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
-                                                [self peersSendingToUs], [self totalPeersConnected]];
+                                                [self peersGettingFromUs], [self totalPeersConnected]];
             else
                 [statusString appendFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                 [self peersGettingFromUs]];
@@ -1181,13 +1181,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
-//peers uploading to you
 - (int) peersSendingToUs
 {
     return fStat->peersSendingToUs;
 }
 
-//peers downloading from you
 - (int) peersGettingFromUs
 {
     return fStat->peersGettingFromUs;
