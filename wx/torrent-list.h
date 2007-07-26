@@ -92,6 +92,16 @@ class TorrentListCtrl: public wxListCtrl
         str2int_t myHashToItem;
 
     private:
+        struct TorStat {
+            time_t time;
+            const tr_stat_t * stat;
+            TorStat(): time(0), stat(0) {}
+        };
+        typedef std::map<std::string,TorStat> hash2stat_t;
+        hash2stat_t myHashToStat;
+        const tr_stat_t* getStat( tr_torrent_t* );
+
+    private:
         void OnSort( wxListEvent& );
         void OnItemSelected( wxListEvent& );
         void OnItemDeselected( wxListEvent& );

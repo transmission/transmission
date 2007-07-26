@@ -103,7 +103,7 @@ class MyApp : public wxApp
 
 namespace
 {
-    const char * destination = "/home/charles/torrents";
+    const char * destination = "/home/charles/torrents"; /*FIXME*/
 
     tr_handle_t * handle = NULL;
 
@@ -123,6 +123,11 @@ public:
     void OnRecheck( wxCommandEvent& );
     void OnTimer( wxTimerEvent& );
     void OnFilterSelected( wxListEvent& );
+    void OnStartUpdate( wxUpdateUIEvent& );
+    void OnStopUpdate( wxUpdateUIEvent& );
+    void OnRemoveUpdate( wxUpdateUIEvent& );
+    void OnRefreshUpdate( wxUpdateUIEvent& );
+    void OnInfoUpdate( wxUpdateUIEvent& );
     virtual void OnTorrentListSelectionChanged( TorrentListCtrl*, const std::set<tr_torrent_t*>& );
 
 private:
@@ -150,24 +155,59 @@ private:
 enum
 {
     ID_START,
-    ID_STOP,
-    ID_REMOVE,
-    ID_QUIT,
-    ID_TORRENT_INFO,
     ID_EDIT_PREFS,
     ID_SHOW_DEBUG_WINDOW,
-    ID_ABOUT,
     ID_Pulse,
-    ID_Filter,
-    N_IDS
+    ID_Filter
 };
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnFilterSelected )
     EVT_MENU( wxID_REFRESH, MyFrame::OnRecheck )
+    EVT_UPDATE_UI( ID_START, MyFrame::OnStartUpdate )
+    EVT_UPDATE_UI( wxID_STOP, MyFrame::OnStopUpdate )
+    EVT_UPDATE_UI( wxID_REMOVE, MyFrame::OnRemoveUpdate )
+    EVT_UPDATE_UI( wxID_REFRESH, MyFrame::OnRefreshUpdate )
+    EVT_UPDATE_UI( wxID_PROPERTIES, MyFrame::OnInfoUpdate )
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(MyApp)
+
+void
+MyFrame :: OnStartUpdate( wxUpdateUIEvent& event )
+{
+    unsigned long l = 0;
+    for( torrents_v::iterator it(mySelectedTorrents.begin()),
+                             end(mySelectedTorrents.end()); it!=end; ++it )
+        l |= tr_torrentStat(*it)->status; /* FIXME: expensive */
+    event.Enable( (l & TR_STATUS_INACTIVE)!=0 );
+}
+
+void
+MyFrame :: OnStopUpdate( wxUpdateUIEvent& event )
+{
+    unsigned long l = 0;
+    for( torrents_v::iterator it(mySelectedTorrents.begin()),
+                             end(mySelectedTorrents.end()); it!=end; ++it )
+        l |= tr_torrentStat(*it)->status; /* FIXME: expensive */
+    event.Enable( (l & TR_STATUS_ACTIVE)!=0 );
+}
+
+void
+MyFrame :: OnRemoveUpdate( wxUpdateUIEvent& event )
+{
+   event.Enable( !mySelectedTorrents.empty() );
+}
+void
+MyFrame :: OnRefreshUpdate( wxUpdateUIEvent& event )
+{
+   event.Enable( !mySelectedTorrents.empty() );
+}
+void
+MyFrame :: OnInfoUpdate( wxUpdateUIEvent& event )
+{
+   event.Enable( !mySelectedTorrents.empty() );
+}
 
 void MyFrame :: OnOpen( wxCommandEvent& event )
 {
@@ -303,6 +343,8 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     myTrayIconIcon( systray_xpm ),
     myFilter( TorrentFilter::SHOW_ALL )
 {
+    SetIcon( myLogoIcon );
+
     /**
     ***  Menu
     **/
@@ -323,7 +365,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     menuBar->Append( m, _T("&File") );
 
     m = new wxMenu;
-    m->Append( ID_TORRENT_INFO, _T("Torrent &Info") );
+    m->Append( wxID_PROPERTIES, _T("Torrent &Info") );
     m->Append( wxID_PREFERENCES, _T("Edit &Preferences") );
     menuBar->Append( m, _T("&Edit") );
 
@@ -358,7 +400,7 @@ MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
     toolbar->AddTool( wxID_REMOVE, _T("Remove"), bitmap );
     toolbar->AddSeparator();
     bitmap.CopyFromIcon( info_icon );
-    toolbar->AddTool( ID_TORRENT_INFO, _("Torrent Info"), bitmap );
+    toolbar->AddTool( wxID_PROPERTIES, _("Torrent Info"), bitmap );
     toolbar->Realize();
 
     /**

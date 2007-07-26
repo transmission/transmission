@@ -202,7 +202,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
     int col = 0;
     char buf[512];
     std::string str;
-    const tr_stat_t * s = tr_torrentStat( tor );
+    const tr_stat_t * s = getStat( tor );
     const tr_info_t* info = tr_torrentInfo( tor );
 
     for( int_v::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
@@ -222,12 +222,15 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_DOWNLOAD_SPEED: break;
-                xstr = getReadableSpeed( s->rateDownload );
+                if( s->rateDownload > 0.01 )
+                    xstr = getReadableSpeed( s->rateDownload );
+                else
+                    xstr.Clear( );
                 break;
 
             case COL_ETA:
                 if( (int)(s->percentDone*100) >= 100 )
-                    xstr = wxString ();
+                    xstr.Clear ();
                 else if( s->eta < 0 )
                     xstr = toWxStr( "\xE2\x88\x9E" ); /* infinity, in utf-8 */
                 else
@@ -249,8 +252,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_RATIO:
-                snprintf( buf, sizeof(buf), "%%%d", (int)(s->uploaded / (double)s->downloadedValid) );
-                xstr = toWxStr( buf );
+                xstr = wxString::Format( _T("%%%d"), (int)(s->uploaded / (double)s->downloadedValid) );
                 break;
 
             case COL_RECEIVED:
@@ -262,8 +264,10 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_SEEDS:
-                snprintf( buf, sizeof(buf), "%d", s->seeders ); /* FIXME: %d (%d) */
-                xstr = toWxStr( buf );
+                if( s->seeders > 0 )
+                    xstr = wxString::Format( _T("%d"), s->seeders );
+                else
+                    xstr.Clear ();
                 break;
 
             case COL_SENT:
@@ -274,12 +278,18 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 xstr = getReadableSize( info->totalSize );
                 break;
 
-            case COL_STATE:
-                xstr = _T("Fixme");
-                break;
-
+            case COL_STATE: /* FIXME: divine the meaning of these two columns */
             case COL_STATUS:
-                xstr = _T("Fixme");
+                switch( s->status ) {
+                    case TR_STATUS_STOPPING:    xstr = _("Stopping"); break;
+                    case TR_STATUS_STOPPED:     xstr = _("Stopped"); break;
+                    case TR_STATUS_CHECK:       xstr = _("Checking Files"); break;
+                    case TR_STATUS_CHECK_WAIT:  xstr = _("Waiting to Check"); break;
+                    case TR_STATUS_DOWNLOAD:    xstr = _("Downloading"); break;
+                    case TR_STATUS_DONE:
+                    case TR_STATUS_SEED:        xstr = _("Seeding"); break;
+                    default: assert( 0 );
+                }
                 break;
 
             case COL_TOTAL:
@@ -287,7 +297,10 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_UPLOAD_SPEED:
-                xstr = getReadableSpeed( s->rateUpload );
+                if( s->rateUpload > 0.01 )
+                    xstr = getReadableSpeed( s->rateUpload );
+                else
+                    xstr.Clear( );
                 break;
 
             default:
@@ -355,38 +368,50 @@ TorrentListCtrl :: OnItemDeselected( wxListEvent& event )
 ****
 ***/
 
-static torrents_t * uglyHack = NULL;
+static TorrentListCtrl * uglyHack = NULL;
 
 int
 TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 {
-    const tr_torrent_t * a = (*uglyHack)[item1];
-    const tr_torrent_t * b = (*uglyHack)[item2];
+    TorrentListCtrl * self = uglyHack;
+    tr_torrent_t * a = self->myTorrents[item1];
+    tr_torrent_t * b = self->myTorrents[item2];
     const tr_info_t* ia = tr_torrentInfo( a );
     const tr_info_t* ib = tr_torrentInfo( b );
+    const tr_stat_t* sa = self->getStat( a );
+    const tr_stat_t* sb = self->getStat( b );
     int ret = 0;
 
     switch( abs(sortData) )
     {
         case COL_POSITION:
             ret = item1 - item2;
+            break;
 
         case COL_DONE:
-/*            ccc
-            snprintf( buf, sizeof(buf), "%d%%", (int)(s->percentDone*100.0) );
-            xstr = toWxStr( buf );*/
+            if( sa->percentDone < sb->percentDone )
+                ret = -1;
+            else if( sa->percentDone > sb->percentDone )
+                ret =  1;
+            else
+                ret = 0;
             break;
 
         case COL_DOWNLOAD_SPEED: break;
-            /*xstr = getReadableSpeed( s->rateDownload );*/
+            if( sa->rateDownload < sb->rateDownload )
+                ret = -1;
+            else if( sa->rateDownload > sb->rateDownload )
+                ret =  1;
+            else
+                ret = 0;
             break;
 
         case COL_ETA:
-/*            if( (int)(s->percentDone*100) >= 100 ) */
+            ret = sa->eta - sb->eta;
             break;
             
         case COL_HASH:
-            /*xstr = toWxStr( info->hashString );*/
+            ret = strcmp( ia->hashString, ib->hashString );
             break;
 
         case COL_NAME:
@@ -399,17 +424,34 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             xstr = toWxStr( buf );*/
             break;
 
-        case COL_RATIO:
-            /*snprintf( buf, sizeof(buf), "%%%d", (int)(s->uploaded / (double)s->downloadedValid) );
-            xstr = toWxStr( buf );*/
+        case COL_RATIO: {
+            const double ra = sa->uploaded / (double) sa->downloadedValid;
+            const double rb = sb->uploaded / (double) sb->downloadedValid;
+            if( ra < rb )
+                ret = -1;
+            else if( ra > rb )
+                ret = 1;
+            else
+                ret = 0;
             break;
+        }
 
         case COL_RECEIVED:
-            /*xstr = getReadableSize( s->downloaded );*/
+            if( sa->downloaded < sb->downloaded )
+                ret = -1;
+            else if( sa->downloaded > sb->downloaded )
+                ret = 1;
+            else
+                ret = 0;
             break;
 
         case COL_REMAINING:
-            /*xstr = getReadableSize( s->left );*/
+            if( sa->left < sb->left )
+                ret = -1;
+            else if( sa->left > sb->left )
+                ret = 1;
+            else
+                ret = 0;
             break;
 
         case COL_SEEDS:
@@ -418,7 +460,12 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_SENT:
-            /*xstr = getReadableSize( s->uploaded );*/
+            if( sa->uploaded < sb->uploaded )
+                ret = -1;
+            else if( sa->uploaded > sb->uploaded )
+                ret = 1;
+            else
+                ret = 0;
             break;
 
         case COL_SIZE:
@@ -427,12 +474,9 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             else ret = 0;
             break;
 
-        case COL_STATE:
-            /*xstr = _T("Fixme");*/
-            break;
-
+        case COL_STATE: /* FIXME */
         case COL_STATUS:
-            /*xstr = _T("Fixme");*/
+            ret = sa->status - sb->status;
             break;
 
         case COL_TOTAL:
@@ -440,7 +484,12 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_UPLOAD_SPEED:
-            /*xstr = getReadableSpeed( s->rateUpload );*/
+            if( sa->rateUpload < sb->rateUpload )
+                ret = -1;
+            else if( sa->rateUpload > sb->rateUpload )
+                ret = 1;
+            else
+                ret = 0;
             break;
 
         default:
@@ -465,7 +514,7 @@ TorrentListCtrl :: Sort( int column )
 void
 TorrentListCtrl :: Resort( )
 {
-    uglyHack = &myTorrents;
+    uglyHack = this;
 
     myConfig->Write( _T("torrent-sort-column"), columnKeys[abs(prevSortCol)] );
     myConfig->Write( _T("torrent-sort-is-descending"), prevSortCol < 0 );
@@ -533,7 +582,7 @@ TorrentListCtrl :: Rebuild()
         {
             case COL_POSITION:        h = _("#"); format = wxLIST_FORMAT_CENTRE; break;
             case COL_DONE:            h = _("Done"); format = wxLIST_FORMAT_RIGHT; break;
-            case COL_DOWNLOAD_SPEED:  h = _("Download"); break;
+            case COL_DOWNLOAD_SPEED:  h = _("Down"); width = 50; format = wxLIST_FORMAT_RIGHT; break;
             case COL_ETA:             h = _("ETA"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_HASH:            h = _("SHA1 Hash"); break;
             case COL_NAME:            h = _("Name"); width = 500; break;
@@ -544,10 +593,10 @@ TorrentListCtrl :: Rebuild()
             case COL_SEEDS:           h = _("Seeds"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_SENT:            h = _("Sent"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_SIZE:            h = _("Size");  format = wxLIST_FORMAT_RIGHT; break;
-            case COL_STATE:           h = _("State"); break;
-            case COL_STATUS:          h = _("Status"); break;
+            case COL_STATE:           h = _("State"); width = 120; break;
+            case COL_STATUS:          h = _("Status"); width = 120; break;
             case COL_TOTAL:           h = _("Total"); break;
-            case COL_UPLOAD_SPEED:    h = _("Upload"); format = wxLIST_FORMAT_RIGHT;break;
+            case COL_UPLOAD_SPEED:    h = _("Up"); width = 50; format = wxLIST_FORMAT_RIGHT;break;
             default:                  h = _("Error"); break;
         }
 
@@ -609,4 +658,21 @@ TorrentListCtrl :: Remove( const torrent_set& remove )
 
     myHashToItem.swap( htmp );
     myTorrents.swap( vtmp );
+}
+
+/***
+****
+***/
+
+const tr_stat_t*
+TorrentListCtrl :: getStat( tr_torrent_t * tor )
+{
+    const tr_info_t * info = tr_torrentInfo( tor );
+    const time_t now = time( 0 );
+    TorStat& ts = myHashToStat[ info->hashString ];
+    if( ts.time < now ) {
+        ts.time = now;
+        ts.stat = tr_torrentStat( tor );
+    }
+    return ts.stat;
 }
