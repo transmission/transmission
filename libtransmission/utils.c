@@ -168,6 +168,9 @@ void tr_msg( int level, char * msg, ... )
 int tr_rand( int sup )
 {
     static int init = 0;
+
+    assert( sup > 0 );
+
     if( !init )
     {
         srand( tr_date() );
