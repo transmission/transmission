@@ -37,7 +37,7 @@ VERSION_MAJOR       = "$MAJOR"
 VERSION_MINOR       = "$MINOR"
 VERSION_MAINTENANCE = "$MAINT"
 VERSION_REVISION    = "$REV"
-VERSION_STRING      = "$MAJOR.$MINOR$MAINT$BETA (r$REV)"
+VERSION_STRING      = "$STRING ($REV)"
 EOF
 replace_if_differs mk/version.mk.new mk/version.mk
 
