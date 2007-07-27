@@ -268,13 +268,11 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
         tr_err( "Torrent has no files." );
         goto fail;
     }
-    for( i=0; i<inf->fileCount; ++i )
+
+    if( !inf->totalSize )
     {
-        if( !inf->files[i].length )
-        {
-            tr_err("File #%d, \"%s\" is zero bytes long.", (i+1), inf->files[i].name );
-            goto fail;
-        }
+        tr_err( "Torrent is zero bytes long." );
+        goto fail;
     }
 
     /* TODO add more tests so we don't crash on weird files */
