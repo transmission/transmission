@@ -61,6 +61,7 @@
         
         fPath = [path retain];
         fInfo = tr_metaInfoBuilderCreate(handle, [fPath UTF8String]);
+        
         if (fInfo->fileCount == 0)
         {
             NSAlert * alert = [[NSAlert alloc] init];
@@ -69,6 +70,22 @@
                                                     "Create torrent -> no files -> title")];
             [alert setInformativeText: NSLocalizedString(@"There must be at least one file in a folder to create a torrent file.",
                                                         "Create torrent -> no files -> warning")];
+            [alert setAlertStyle: NSWarningAlertStyle];
+            
+            [alert runModal];
+            [alert release];
+            
+            [self release];
+            return nil;
+        }
+        if (fInfo->totalSize == 0)
+        {
+            NSAlert * alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle: NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
+            [alert setMessageText: NSLocalizedString(@"The total file size is zero bytes.",
+                                                    "Create torrent -> zero size -> title")];
+            [alert setInformativeText: NSLocalizedString(@"A torrent file cannot be created for files with no size.",
+                                                        "Create torrent -> zero size -> warning")];
             [alert setAlertStyle: NSWarningAlertStyle];
             
             [alert runModal];
