@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-16 19:05-0500\n"
+"POT-Creation-Date: 2007-07-27 18:16-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,79 +17,79 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: actions.c:40
+#: actions.c:35
 msgid "_High"
 msgstr ""
 
-#: actions.c:41
+#: actions.c:36
 msgid "_Normal"
 msgstr ""
 
-#: actions.c:42
+#: actions.c:37
 msgid "_Low"
 msgstr ""
 
-#: actions.c:57 makemeta-ui.c:249
+#: actions.c:52 makemeta-ui.c:249
 msgid "_File"
 msgstr ""
 
-#: actions.c:58
+#: actions.c:53
 msgid "_Edit"
 msgstr ""
 
-#: actions.c:59
+#: actions.c:54
 msgid "_Help"
 msgstr ""
 
-#: actions.c:60
+#: actions.c:55
 msgid "_Priority"
 msgstr ""
 
-#: actions.c:63
+#: actions.c:58
 msgid "_Start"
 msgstr ""
 
-#: actions.c:65
+#: actions.c:60
 msgid "Re_check"
 msgstr ""
 
-#: actions.c:67
+#: actions.c:62
 msgid "S_top"
 msgstr ""
 
-#: actions.c:69
+#: actions.c:64
 msgid "_Remove"
 msgstr ""
 
-#: actions.c:71
+#: actions.c:66
 msgid "_Create New Torrent"
 msgstr ""
 
-#: actions.c:73
+#: actions.c:68
 msgid "_Close"
 msgstr ""
 
-#: actions.c:75
+#: actions.c:70
 msgid "_Quit"
 msgstr ""
 
-#: actions.c:77
+#: actions.c:72
 msgid "Edit _Preferences"
 msgstr ""
 
-#: actions.c:79
+#: actions.c:74
 msgid "_Torrent Info"
 msgstr ""
 
-#: actions.c:81
+#: actions.c:76
 msgid "_About Transmission"
 msgstr ""
 
-#: actions.c:83
+#: actions.c:78
 msgid "Show _Debug Window"
 msgstr ""
 
-#: actions.c:85
+#: actions.c:80
 msgid "Show / Hide _Transmission"
 msgstr ""
 
@@ -147,101 +147,105 @@ msgid ""
 "%s"
 msgstr ""
 
-#: dialogs.c:117
+#: dialogs.c:118
 msgid "Add a Torrent"
 msgstr ""
 
-#: dialogs.c:124
+#: dialogs.c:125
 msgid "Automatically _start torrent"
 msgstr ""
 
-#: dialogs.c:126
+#: dialogs.c:127
 msgid "Use alternate _download directory"
 msgstr ""
 
-#: dialogs.c:130 tr_prefs.c:212
+#: dialogs.c:131 tr_prefs.c:212
 msgid "Choose a download directory"
 msgstr ""
 
-#: dialogs.c:159
+#: dialogs.c:160
 msgid "Torrent files"
 msgstr ""
 
-#: dialogs.c:161
+#: dialogs.c:162
 msgid "All files"
 msgstr ""
 
-#: dialogs.c:257 torrent-inspector.c:414 torrent-inspector.c:843
-#: torrent-inspector.c:848
+#: dialogs.c:258 torrent-inspector.c:415 torrent-inspector.c:844
+#: torrent-inspector.c:849
 msgid "?"
 msgstr ""
 
-#: dialogs.c:290
+#: dialogs.c:291
 msgid "Choose a directory"
 msgstr ""
 
-#: dialogs.c:414
+#: dialogs.c:415
 #, c-format
-msgid "Really exit %s?"
+msgid "<b>Really Quit %s?</b>"
 msgstr ""
 
-#: dialogs.c:423
+#: dialogs.c:419
+msgid "This will close all active torrents."
+msgstr ""
+
+#: dialogs.c:427
 msgid "_Don't Ask Me This Again"
 msgstr ""
 
-#: ipc.c:187
+#: ipc.c:197
 #, c-format
 msgid ""
 "Failed to set up IPC:\n"
 "%s"
 msgstr ""
 
-#: ipc.c:219
+#: ipc.c:229
 #, c-format
 msgid "failed to set up IPC: %s\n"
 msgstr ""
 
-#: ipc.c:299
+#: ipc.c:309
 #, c-format
 msgid ""
 "Failed to set up socket:\n"
 "%s"
 msgstr ""
 
-#: ipc.c:322
+#: ipc.c:332
 #, c-format
 msgid "failed to create socket: %s\n"
 msgstr ""
 
-#: ipc.c:331
+#: ipc.c:341
 #, c-format
 msgid "failed to connect to %s: %s\n"
 msgstr ""
 
-#: ipc.c:421
+#: ipc.c:431
 msgid "bad IPC protocol version"
 msgstr ""
 
-#: ipc.c:424
+#: ipc.c:434
 msgid "IPC protocol parse error"
 msgstr ""
 
-#: ipc.c:427
+#: ipc.c:437
 #, c-format
 msgid "IPC parsing failed: %s"
 msgstr ""
 
-#: ipc.c:457
+#: ipc.c:467
 #, c-format
 msgid "bad IPC protocol version\n"
 msgstr ""
 
-#: ipc.c:460
+#: ipc.c:470
 #, c-format
 msgid "IPC protocol parse error\n"
 msgstr ""
 
-#: ipc.c:463
+#: ipc.c:473
 #, c-format
 msgid "IPC parsing failed: %s\n"
 msgstr ""
@@ -268,7 +272,7 @@ msgstr ""
 msgid "Transmission"
 msgstr ""
 
-#: main.c:696
+#: main.c:694
 #, c-format
 msgid ""
 "Failed to load torrent file:\n"
@@ -279,11 +283,11 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: main.c:905
+#: main.c:901
 msgid "Copyright 2005-2007 The Transmission Project"
 msgstr ""
 
-#: main.c:907
+#: main.c:903
 msgid "translator-credits"
 msgstr ""
 
@@ -359,286 +363,286 @@ msgstr ""
 msgid "Commen_t"
 msgstr ""
 
-#: msgwin.c:157
+#: msgwin.c:159
 #, c-format
 msgid "Unable to open \"%s\" for writing: %s"
 msgstr ""
 
-#: msgwin.c:171
+#: msgwin.c:173
 #, c-format
 msgid "Error writing to \"%s\": %s"
 msgstr ""
 
-#: msgwin.c:188
+#: msgwin.c:190
 msgid "Save Debug Log"
 msgstr ""
 
-#: msgwin.c:213 torrent-inspector.c:900
+#: msgwin.c:215 torrent-inspector.c:901
 msgid "Error"
 msgstr ""
 
-#: msgwin.c:214
+#: msgwin.c:216
 msgid "Info"
 msgstr ""
 
-#: msgwin.c:215
+#: msgwin.c:217
 msgid "Debug"
 msgstr ""
 
-#: msgwin.c:242
+#: msgwin.c:244
 msgid "Save"
 msgstr ""
 
-#: msgwin.c:246
+#: msgwin.c:248
 msgid "Clear"
 msgstr ""
 
-#: msgwin.c:253
+#: msgwin.c:255
 msgid "Level "
 msgstr ""
 
-#: msgwin.c:254 msgwin.c:280
+#: msgwin.c:256 msgwin.c:282
 msgid "Select the debug filter level."
 msgstr ""
 
-#: torrent-inspector.c:248
+#: torrent-inspector.c:249
 msgid "Address"
 msgstr ""
 
-#: torrent-inspector.c:249
+#: torrent-inspector.c:250
 msgid "Port"
 msgstr ""
 
-#: torrent-inspector.c:250
+#: torrent-inspector.c:251
 msgid "Client"
 msgstr ""
 
-#: torrent-inspector.c:251 torrent-inspector.c:538 torrent-inspector.c:1360
+#: torrent-inspector.c:252 torrent-inspector.c:539 torrent-inspector.c:1361
 #: tr_window.c:206
 msgid "Progress"
 msgstr ""
 
-#: torrent-inspector.c:253
+#: torrent-inspector.c:254
 msgid "Downloading"
 msgstr ""
 
-#: torrent-inspector.c:254
+#: torrent-inspector.c:255
 msgid "DL Rate"
 msgstr ""
 
-#: torrent-inspector.c:255
+#: torrent-inspector.c:256
 msgid "Uploading"
 msgstr ""
 
-#: torrent-inspector.c:256
+#: torrent-inspector.c:257
 msgid "UL Rate"
 msgstr ""
 
-#: torrent-inspector.c:607
+#: torrent-inspector.c:608
 msgid "Piece Availability"
 msgstr ""
 
-#: torrent-inspector.c:630
+#: torrent-inspector.c:631
 msgid "Peers"
 msgstr ""
 
-#: torrent-inspector.c:647
+#: torrent-inspector.c:648
 msgid "Seeders"
 msgstr ""
 
-#: torrent-inspector.c:655
+#: torrent-inspector.c:656
 msgid "Leechers"
 msgstr ""
 
-#: torrent-inspector.c:663
+#: torrent-inspector.c:664
 msgid "Completed"
 msgstr ""
 
-#: torrent-inspector.c:698
+#: torrent-inspector.c:699
 msgid "Torrent Information"
 msgstr ""
 
-#: torrent-inspector.c:701
+#: torrent-inspector.c:702
 msgid "Tracker"
 msgstr ""
 
-#: torrent-inspector.c:710
+#: torrent-inspector.c:711
 msgid "Pieces"
 msgstr ""
 
-#: torrent-inspector.c:717
+#: torrent-inspector.c:718
 msgid "Hash"
 msgstr ""
 
-#: torrent-inspector.c:721
+#: torrent-inspector.c:722
 msgid "Secure"
 msgstr ""
 
-#: torrent-inspector.c:723
+#: torrent-inspector.c:724
 msgid "Private Torrent, PEX disabled"
 msgstr ""
 
-#: torrent-inspector.c:724
+#: torrent-inspector.c:725
 msgid "Public Torrent"
 msgstr ""
 
-#: torrent-inspector.c:728
+#: torrent-inspector.c:729
 msgid "Comment"
 msgstr ""
 
-#: torrent-inspector.c:741
+#: torrent-inspector.c:742
 msgid "Created By"
 msgstr ""
 
-#: torrent-inspector.c:744
+#: torrent-inspector.c:745
 msgid "Creator"
 msgstr ""
 
-#: torrent-inspector.c:745 util.c:147
+#: torrent-inspector.c:746 util.c:147
 msgid "N/A"
 msgstr ""
 
-#: torrent-inspector.c:748
+#: torrent-inspector.c:749
 msgid "Date"
 msgstr ""
 
-#: torrent-inspector.c:755
+#: torrent-inspector.c:756
 msgid "Location"
 msgstr ""
 
-#: torrent-inspector.c:758
+#: torrent-inspector.c:759
 msgid "Downloaded Data"
 msgstr ""
 
-#: torrent-inspector.c:762
+#: torrent-inspector.c:763
 msgid "Torrent File Path"
 msgstr ""
 
-#: torrent-inspector.c:766
+#: torrent-inspector.c:767
 msgid "Transmission Support Folder"
 msgstr ""
 
-#: torrent-inspector.c:771
+#: torrent-inspector.c:772
 msgid "Torrent File Name"
 msgstr ""
 
-#: torrent-inspector.c:840
+#: torrent-inspector.c:841
 msgid "None"
 msgstr ""
 
-#: torrent-inspector.c:869
+#: torrent-inspector.c:870
 msgid "Transfer"
 msgstr ""
 
-#: torrent-inspector.c:872
+#: torrent-inspector.c:873
 msgid "State"
 msgstr ""
 
-#: torrent-inspector.c:876
+#: torrent-inspector.c:877
 msgid "Valid DL"
 msgstr ""
 
-#: torrent-inspector.c:880
+#: torrent-inspector.c:881
 msgid "Downloaded"
 msgstr ""
 
-#: torrent-inspector.c:884
+#: torrent-inspector.c:885
 msgid "Uploaded"
 msgstr ""
 
-#: torrent-inspector.c:888
+#: torrent-inspector.c:889
 msgid "Ratio"
 msgstr ""
 
-#: torrent-inspector.c:892
+#: torrent-inspector.c:893
 msgid "Remaining"
 msgstr ""
 
-#: torrent-inspector.c:896
+#: torrent-inspector.c:897
 msgid "Swarm Rate"
 msgstr ""
 
-#: torrent-inspector.c:904
+#: torrent-inspector.c:905
 msgid "Completeness"
 msgstr ""
 
-#: torrent-inspector.c:912
+#: torrent-inspector.c:913
 msgid "Dates"
 msgstr ""
 
-#: torrent-inspector.c:915
+#: torrent-inspector.c:916
 msgid "Added"
 msgstr ""
 
-#: torrent-inspector.c:919
+#: torrent-inspector.c:920
 msgid "Last Activity"
 msgstr ""
 
-#: torrent-inspector.c:962 torrent-inspector.c:972 torrent-inspector.c:1143
+#: torrent-inspector.c:963 torrent-inspector.c:973 torrent-inspector.c:1144
 msgid "High"
 msgstr ""
 
-#: torrent-inspector.c:963 torrent-inspector.c:1145
+#: torrent-inspector.c:964 torrent-inspector.c:1146
 msgid "Normal"
 msgstr ""
 
-#: torrent-inspector.c:964 torrent-inspector.c:973 torrent-inspector.c:1147
+#: torrent-inspector.c:965 torrent-inspector.c:974 torrent-inspector.c:1148
 msgid "Low"
 msgstr ""
 
-#: torrent-inspector.c:1346
+#: torrent-inspector.c:1347
 msgid "File"
 msgstr ""
 
-#: torrent-inspector.c:1374
+#: torrent-inspector.c:1375
 msgid "Download"
 msgstr ""
 
-#: torrent-inspector.c:1384
+#: torrent-inspector.c:1385
 msgid "Priority"
 msgstr ""
 
-#: torrent-inspector.c:1493
+#: torrent-inspector.c:1506
 msgid "Transfer Bandwidth"
 msgstr ""
 
-#: torrent-inspector.c:1496
+#: torrent-inspector.c:1509
 msgid "Limit _Download Speed (KiB/s):"
 msgstr ""
 
-#: torrent-inspector.c:1506
+#: torrent-inspector.c:1522
 msgid "Limit _Upload Speed (KiB/s):"
 msgstr ""
 
-#: torrent-inspector.c:1517
+#: torrent-inspector.c:1536
 msgid "Seeding"
 msgstr ""
 
-#: torrent-inspector.c:1520
+#: torrent-inspector.c:1539
 msgid "_Stop Seeding at Ratio:"
 msgstr ""
 
-#: torrent-inspector.c:1585
+#: torrent-inspector.c:1604
 msgid "Torrent Inspector"
 msgstr ""
 
-#: torrent-inspector.c:1612
+#: torrent-inspector.c:1631
 msgid "_Activity"
 msgstr ""
 
-#: torrent-inspector.c:1617
+#: torrent-inspector.c:1636
 msgid "_Peers"
 msgstr ""
 
-#: torrent-inspector.c:1621
+#: torrent-inspector.c:1640
 msgid "_Info"
 msgstr ""
 
-#: torrent-inspector.c:1626
+#: torrent-inspector.c:1645
 msgid "_Files"
 msgstr ""
 
-#: torrent-inspector.c:1631
+#: torrent-inspector.c:1650
 msgid "_Options"
 msgstr ""
 
@@ -769,63 +773,63 @@ msgstr ""
 msgid "Keep a copy and remove the original"
 msgstr ""
 
-#: tr_torrent.c:321 tr_torrent.c:442
+#: tr_torrent.c:324 tr_torrent.c:437
 #, c-format
 msgid "%s: not a valid torrent file"
 msgstr ""
 
-#: tr_torrent.c:324 tr_torrent.c:445
+#: tr_torrent.c:327 tr_torrent.c:440
 #, c-format
 msgid "%s: torrent is already open"
 msgstr ""
 
-#: tr_torrent.c:365
+#: tr_torrent.c:368
 msgid "not a valid torrent file"
 msgstr ""
 
-#: tr_torrent.c:368
+#: tr_torrent.c:371
 msgid "torrent is already open"
 msgstr ""
 
-#: tr_torrent.c:615
+#: tr_torrent.c:562
 #, c-format
-msgid "Waiting to check existing files (%.1f%%)"
+msgid "Waiting to check existing files (checked %.1f%%)"
 msgstr ""
 
-#: tr_torrent.c:619
+#: tr_torrent.c:567
 #, c-format
-msgid "Checking existing files (%.1f%%)"
+msgid "Checking existing files (checked %.1f%%)"
 msgstr ""
 
-#: tr_torrent.c:624
+#: tr_torrent.c:572
 #, c-format
 msgid "Stalled (%.1f%%)"
 msgstr ""
 
-#: tr_torrent.c:627
+#: tr_torrent.c:575
 #, c-format
 msgid "%s remaining (%.1f%%)"
 msgstr ""
 
-#: tr_torrent.c:634
+#: tr_torrent.c:582
 #, c-format
 msgid "Uploading to %d of %d peer"
 msgid_plural "Uploading to %d of %d peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tr_torrent.c:641
+#: tr_torrent.c:589
 #, c-format
 msgid "Seeding to %d of %d peer"
 msgid_plural "Seeding to %d of %d peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tr_torrent.c:647
+#: tr_torrent.c:595
 msgid "Stopping..."
 msgstr ""
 
-#: tr_torrent.c:651
+#: tr_torrent.c:599
 #, c-format
 msgid "Stopped (%.1f%%)"
 msgstr ""
