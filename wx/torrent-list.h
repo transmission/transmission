@@ -74,6 +74,8 @@ class TorrentListCtrl: public wxListCtrl
         void Rebuild ();
         void Repopulate ();
         void Refresh ();
+        void SelectAll ();
+        void DeselectAll ();
 
     public:
         typedef std::vector<tr_torrent_t*> torrents_v;

@@ -19,7 +19,7 @@ namespace
     enum
     {
         COL_POSITION,
-        COL_DONE,
+        COL_PERCENT_DONE,
         COL_DOWNLOAD_SPEED,
         COL_ETA,
         COL_HASH,
@@ -67,7 +67,7 @@ namespace
         if( columns.empty() )
         {
             columns[_T("position")]        = COL_POSITION;
-            columns[_T("done")]            = COL_DONE;
+            columns[_T("done")]            = COL_PERCENT_DONE;
             columns[_T("download-speed")]  = COL_DOWNLOAD_SPEED;
             columns[_T("eta")]             = COL_ETA;
             columns[_T("hash")]            = COL_HASH;
@@ -132,7 +132,8 @@ namespace
     {
         int i;
         static const char *sizestrs[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
-        for ( i=0; size>>10; ++i ) size = size>>10;
+        for ( i=0; size>>10; ++i )
+            size = size >> 10;
         char buf[512];
         snprintf( buf, sizeof(buf), "%.*f %s", bestDecimal(size), (double)size, sizestrs[i] );
         return toWxStr( buf );
@@ -143,9 +144,9 @@ namespace
         return getReadableSize( (uint64_t)f );
     }
 
-    wxString getReadableSpeed( float f )
+    wxString getReadableSpeed( float kib_sec )
     {
-        wxString xstr = getReadableSize(f);
+        wxString xstr = getReadableSize(1024*kib_sec);
         xstr += _T("/s");
         return xstr;
     }
@@ -175,7 +176,7 @@ TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
                                     wxWindow          * parent,
                                     const wxPoint     & pos,
                                     const wxSize      & size):
-    wxListCtrl( parent, TORRENT_LIST_CTRL, pos, size, wxLC_REPORT ),
+    wxListCtrl( parent, TORRENT_LIST_CTRL, pos, size, wxLC_REPORT|wxLC_HRULES ),
     myHandle( handle ),
     myConfig( config )
 {
@@ -216,12 +217,12 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 xstr = toWxStr( buf );
                 break;
 
-            case COL_DONE:
+            case COL_PERCENT_DONE:
                 snprintf( buf, sizeof(buf), "%d%%", (int)(s->percentDone*100.0) );
                 xstr = toWxStr( buf );
                 break;
 
-            case COL_DOWNLOAD_SPEED: break;
+            case COL_DOWNLOAD_SPEED:
                 if( s->rateDownload > 0.01 )
                     xstr = getReadableSpeed( s->rateDownload );
                 else
@@ -247,8 +248,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
 
             case COL_PEERS:
                 /* FIXME: this is all peers, not just leechers */
-                snprintf( buf, sizeof(buf), "%d (%d)", s->peersTotal, s->peersConnected );
-                xstr = toWxStr( buf );
+                xstr = wxString::Format( _("%d of %d"), s->peersConnected, s->peersTotal );
                 break;
 
             case COL_RATIO:
@@ -283,7 +283,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 switch( s->status ) {
                     case TR_STATUS_STOPPING:    xstr = _("Stopping"); break;
                     case TR_STATUS_STOPPED:     xstr = _("Stopped"); break;
-                    case TR_STATUS_CHECK:       xstr = _("Checking Files"); break;
+                    case TR_STATUS_CHECK:       xstr = wxString::Format ( _("Checking Files (%.0f)"), s->recheckProgress );  break;
                     case TR_STATUS_CHECK_WAIT:  xstr = _("Waiting to Check"); break;
                     case TR_STATUS_DOWNLOAD:    xstr = _("Downloading"); break;
                     case TR_STATUS_DONE:
@@ -388,7 +388,7 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             ret = item1 - item2;
             break;
 
-        case COL_DONE:
+        case COL_PERCENT_DONE:
             if( sa->percentDone < sb->percentDone )
                 ret = -1;
             else if( sa->percentDone > sb->percentDone )
@@ -581,10 +581,10 @@ TorrentListCtrl :: Rebuild()
         switch( *it )
         {
             case COL_POSITION:        h = _("#"); format = wxLIST_FORMAT_CENTRE; break;
-            case COL_DONE:            h = _("Done"); format = wxLIST_FORMAT_RIGHT; break;
-            case COL_DOWNLOAD_SPEED:  h = _("Down"); width = 50; format = wxLIST_FORMAT_RIGHT; break;
+            case COL_PERCENT_DONE:    h = _("Done"); width = 50; format = wxLIST_FORMAT_RIGHT; break;
+            case COL_DOWNLOAD_SPEED:  h = _("Down"); width = 80; format = wxLIST_FORMAT_RIGHT; break;
             case COL_ETA:             h = _("ETA"); format = wxLIST_FORMAT_RIGHT; break;
-            case COL_HASH:            h = _("SHA1 Hash"); break;
+            case COL_HASH:            h = _("Checksum"); break;
             case COL_NAME:            h = _("Name"); width = 500; break;
             case COL_PEERS:           h = _("Peers"); format = wxLIST_FORMAT_RIGHT; break;
             case COL_RATIO:           h = _("Ratio"); format = wxLIST_FORMAT_RIGHT; break;
@@ -596,7 +596,7 @@ TorrentListCtrl :: Rebuild()
             case COL_STATE:           h = _("State"); width = 120; break;
             case COL_STATUS:          h = _("Status"); width = 120; break;
             case COL_TOTAL:           h = _("Total"); break;
-            case COL_UPLOAD_SPEED:    h = _("Up"); width = 50; format = wxLIST_FORMAT_RIGHT;break;
+            case COL_UPLOAD_SPEED:    h = _("Up"); width = 80; format = wxLIST_FORMAT_RIGHT;break;
             default:                  h = _("Error"); break;
         }
 
@@ -676,3 +676,22 @@ TorrentListCtrl :: getStat( tr_torrent_t * tor )
     }
     return ts.stat;
 }
+
+/***
+****
+***/
+
+void
+TorrentListCtrl :: SelectAll( )
+{
+    for( int i=0, n=GetItemCount(); i<n; ++i )
+        SetItemState( i, ~0, wxLIST_STATE_SELECTED );
+}
+
+void
+TorrentListCtrl :: DeselectAll( )
+{
+    for( int i=0, n=GetItemCount(); i<n; ++i )
+        SetItemState( i, 0, wxLIST_STATE_SELECTED );
+}
+
