@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-07 13:35-0700\n"
-"PO-Revision-Date: 2007-04-10 15:45+0100\n"
+"PO-Revision-Date: 2007-07-20 21:35+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -18,9 +18,85 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
+#: actions.c:40
+msgid "_High"
+msgstr "_Hög"
+
+#: actions.c:41
+msgid "_Normal"
+msgstr "_Normal"
+
+#: actions.c:42
+msgid "_Low"
+msgstr "_Låg"
+
+#: actions.c:57
+#: makemeta-ui.c:249
+msgid "_File"
+msgstr "_Arkiv"
+
+#: actions.c:58
+msgid "_Edit"
+msgstr "R_edigera"
+
+#: actions.c:59
+msgid "_Help"
+msgstr "_Hjälp"
+
+#: actions.c:60
+msgid "_Priority"
+msgstr "_Prioritet"
+
+#: actions.c:63
+msgid "_Start"
+msgstr "_Starta"
+
+#: actions.c:65
+msgid "Re_check"
+msgstr "Kontrollera _igen"
+
+#: actions.c:67
+msgid "S_top"
+msgstr "S_toppa"
+
+#: actions.c:69
+msgid "_Remove"
+msgstr "_Ta bort"
+
+#: actions.c:71
+msgid "_Create New Torrent"
+msgstr "S_kapa ny torrent"
+
+#: actions.c:73
+msgid "_Close"
+msgstr "_Stäng"
+
+#: actions.c:75
+msgid "_Quit"
+msgstr "A_vsluta"
+
+#: actions.c:77
+msgid "Edit _Preferences"
+msgstr "Redigera _inställningar"
+
+#: actions.c:79
+msgid "_Torrent Info"
+msgstr "_Torrent-information"
+
+#: actions.c:81
+msgid "_About Transmission"
+msgstr "_Om Transmission"
+
+#: actions.c:83
+msgid "Show _Debug Window"
+msgstr "Visa _felsökningsfönstret"
+
+#: actions.c:85
+msgid "Show / Hide _Transmission"
+msgstr "Visa / Dölj _Transmission"
+
 #: conf.c:91
-#: conf.c:370
-#: msgwin.c:164
+#: conf.c:371
 #, c-format
 msgid ""
 "Failed to open the file %s for writing:\n"
@@ -70,8 +146,7 @@ msgstr ""
 "Fel vid läsning från filen %s:\n"
 "%s"
 
-#: conf.c:384
-#: msgwin.c:175
+#: conf.c:385
 #, c-format
 msgid ""
 "Error while writing to the file %s:\n"
@@ -80,7 +155,7 @@ msgstr ""
 "Fel vid skrivning till filen %s:\n"
 "%s"
 
-#: conf.c:390
+#: conf.c:391
 #, c-format
 msgid ""
 "Failed to rename the file %s to %s:\n"
@@ -89,132 +164,67 @@ msgstr ""
 "Misslyckades med att byta namn på filen %s till %s:\n"
 "%s"
 
-#: dialogs.c:138
+#: dialogs.c:117
 msgid "Add a Torrent"
 msgstr "Lägg till en torrent"
 
-#: dialogs.c:145
+#: dialogs.c:124
 msgid "Automatically _start torrent"
 msgstr "Sta_rta torrent automatiskt"
 
-#: dialogs.c:147
+#: dialogs.c:126
 msgid "Use alternate _download directory"
 msgstr "Använd alternativ _hämtningskatalog"
 
-#. PREF_ID_DIR
-#: dialogs.c:151
-#: tr_prefs.c:210
+#: dialogs.c:130
+#: tr_prefs.c:212
 msgid "Choose a download directory"
 msgstr "Välj en hämtningskatalog"
 
-#: dialogs.c:178
+#: dialogs.c:159
 msgid "Torrent files"
 msgstr "Torrent-filer"
 
-#: dialogs.c:180
+#: dialogs.c:161
 msgid "All files"
 msgstr "Alla filer"
 
-#: dialogs.c:250
-#, c-format
-msgid "%s - Properties for %s"
-msgstr "%s - Egenskaper för %s"
-
-#. add general tab
-#: dialogs.c:286
-msgid "General"
-msgstr "Allmänt"
-
-#. add files tab
-#: dialogs.c:292
-msgid "Files"
-msgstr "Filer"
-
-#: dialogs.c:390
-msgid "Tracker:"
-msgstr "Tracker:"
-
-#: dialogs.c:391
-msgid "Announce:"
-msgstr "Annonsering:"
-
-#: dialogs.c:392
-msgid "Scrape:"
-msgstr "Skrapning:"
-
-#: dialogs.c:394
-msgid "Info Hash:"
-msgstr "Informationshash:"
-
-#: dialogs.c:395
-msgid "Piece Size:"
-msgstr "Delstorlek:"
-
-#: dialogs.c:396
-msgid "Pieces:"
-msgstr "Delar:"
-
-#: dialogs.c:397
-msgid "Total Size:"
-msgstr "Total storlek:"
-
-#: dialogs.c:399
-msgid "Seeders:"
-msgstr "Distributörer:"
-
-#: dialogs.c:400
-msgid "Leechers:"
-msgstr "Reciprokörer:"
-
-#: dialogs.c:401
-msgid "Completed:"
-msgstr "Färdig:"
-
-#: dialogs.c:403
-msgid "Directory:"
-msgstr "Katalog:"
-
-#: dialogs.c:405
-msgid "Downloaded:"
-msgstr "Hämtat:"
-
-#: dialogs.c:406
-msgid "Uploaded:"
-msgstr "Skickat:"
-
-#: dialogs.c:407
-msgid "Remaining:"
-msgstr "Återstår:"
-
-#: dialogs.c:497
+#: dialogs.c:257
+#: torrent-inspector.c:414
+#: torrent-inspector.c:843
+#: torrent-inspector.c:848
 msgid "?"
 msgstr "?"
 
-#: dialogs.c:519
+#: dialogs.c:290
 msgid "Choose a directory"
 msgstr "Välj en katalog"
 
-#: dialogs.c:575
+#: dialogs.c:414
 #, c-format
-msgid "Are you sure you want to quit %s?"
-msgstr "Är du säker på att du vill avsluta %s?"
+msgid "Really exit %s?"
+msgstr "Verkligen avsluta %s?"
 
-#: dialogs.c:643
-msgid "File"
-msgstr "Fil"
+#: dialogs.c:423
+msgid "_Don't Ask Me This Again"
+msgstr "_Fråga mig inte igen"
 
-#: dialogs.c:656
-#: tr_window.c:406
-msgid "Progress"
-msgstr "Förlopp"
+#: ipc.c:187
+#, c-format
+msgid ""
+"Failed to set up IPC:\n"
+"%s"
+msgstr ""
+"Misslyckades med att konfigurera IPC:\n"
+"%s"
 
-#. this string is only used to determine the size of the progress bar
-#: dialogs.c:659
-#: tr_window.c:403
-msgid "  fnord    fnord  "
-msgstr "  fnord    fnord  "
+#: ipc.c:219
+#, c-format
+msgid "failed to set up IPC: %s\n"
+msgstr ""
+"misslyckades med att konfigurera IPC: %s\n"
 
-#: ipc.c:242
+#: ipc.c:299
 #, c-format
 msgid ""
 "Failed to set up socket:\n"
@@ -223,68 +233,50 @@ msgstr ""
 "Misslyckades med att sätta upp uttag:\n"
 "%s"
 
-#: ipc.c:263
+#: ipc.c:322
 #, c-format
 msgid "failed to create socket: %s\n"
 msgstr "misslyckades med att skapa uttag: %s\n"
 
-#: ipc.c:272
+#: ipc.c:331
 #, c-format
 msgid "failed to connect to %s: %s\n"
 msgstr "misslyckades med att ansluta till %s: %s\n"
 
-#: ipc.c:453
-#: ipc.c:501
+#: ipc.c:421
+msgid "bad IPC protocol version"
+msgstr "felaktig version av IPC-protokollet"
+
+#: ipc.c:424
+msgid "IPC protocol parse error"
+msgstr "Tolkningsfel i IPC-protokoll"
+
+#: ipc.c:427
+#, c-format
+msgid "IPC parsing failed: %s"
+msgstr "IPC-tolkning misslyckades: %s"
+
+#: ipc.c:457
 #, c-format
 msgid "bad IPC protocol version\n"
 msgstr "felaktig version av IPC-protokollet\n"
 
-#: main.c:113
-msgid "Add a new torrent"
-msgstr "Lägg till en ny torrent"
+#: ipc.c:460
+#, c-format
+msgid "IPC protocol parse error\n"
+msgstr "Tolkningsfel i IPC-protokoll\n"
 
-#: main.c:114
-msgid "Start"
-msgstr "Starta"
+#: ipc.c:463
+#, c-format
+msgid "IPC parsing failed: %s\n"
+msgstr "IPC-tolkning misslyckades: %s\n"
 
-#: main.c:115
-msgid "Start a torrent that is not running"
-msgstr "Starta en torrent som inte kör"
-
-#: main.c:117
-msgid "Stop a torrent that is running"
-msgstr "Stoppa en torrent som kör"
-
-#: main.c:119
-msgid "Remove a torrent"
-msgstr "Ta bort en torrent"
-
-#: main.c:122
-msgid "Show additional information about a torrent"
-msgstr "Visa ytterligare information om en torrent"
-
-#: main.c:123
-msgid "Open debug window"
-msgstr "Öppna felsökningsfönstret"
-
-#: main.c:127
-msgid "Customize application behavior"
-msgstr "Anpassa programmets beteende"
-
-#: main.c:130
-msgid "Close the main window"
-msgstr "Stäng huvudfönstret"
-
-#: main.c:132
-msgid "Exit the program"
-msgstr "Avsluta programmet"
-
-#: main.c:288
+#: main.c:299
 #, c-format
 msgid ""
 "usage: %s [-hpq] [files...]\n"
 "\n"
-"Transmission %s (r%d) http://transmission.m0k.org/\n"
+"Transmission %s http://transmission.m0k.org/\n"
 "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
 "\n"
 "  -h --help    display this message and exit\n"
@@ -298,7 +290,7 @@ msgid ""
 msgstr ""
 "användning: %s [-hpq] [filer...]\n"
 "\n"
-"Transmission %s (r%d) http://transmission.m0k.org/\n"
+"Transmission %s http://transmission.m0k.org/\n"
 "En fri, lättviktig BitTorrent-klient med ett enkelt och intuitivt gränssnitt\n"
 "\n"
 "  -h --help    visa det här meddelandet och avsluta\n"
@@ -306,15 +298,15 @@ msgstr ""
 "  -q --quit    begär att den körande %s-instansen avslutas\n"
 "\n"
 "Endast en instans av %s kan köras samtidigt. Flera torrent-filer\n"
-"kan läses in vid uppstart genom att lägga till dem på kommandoraden.\n"
+"kan läsas in vid uppstart genom att lägga till dem på kommandoraden.\n"
 "Om %s redan körs kommer dessa torrent-filer att öppnas i den\n"
 "körande instansen.\n"
 
-#: main.c:354
+#: main.c:362
 msgid "Transmission"
 msgstr "Transmission"
 
-#: main.c:1097
+#: main.c:696
 #, c-format
 msgid ""
 "Failed to load torrent file:\n"
@@ -329,123 +321,476 @@ msgstr[1] ""
 "Misslyckades med att läsa in torrent-filer:\n"
 "%s"
 
-#: msgwin.c:54
+#: main.c:905
+msgid "Copyright 2005-2007 The Transmission Project"
+msgstr "Copyright 2005-2007 The Transmission Project"
+
+#: main.c:907
+msgid "translator-credits"
+msgstr "Daniel Nylander <po@danielnylander.se>"
+
+#: makemeta-ui.c:87
+msgid "Torrent creation aborted."
+msgstr "Skapandet av torrent avbröts."
+
+#: makemeta-ui.c:88
+msgid "Torrent creation failed."
+msgstr "Skapandet av torrent misslyckades."
+
+#: makemeta-ui.c:99
+msgid "Torrent Created"
+msgstr "Torrent skapad"
+
+#: makemeta-ui.c:130
+msgid "Making Torrent..."
+msgstr "Skapar torrent..."
+
+#: makemeta-ui.c:195
+msgid "file"
+msgid_plural "files"
+msgstr[0] "fil"
+msgstr[1] "filer"
+
+#: makemeta-ui.c:202
+msgid "piece"
+msgid_plural "pieces"
+msgstr[0] "del"
+msgstr[1] "delar"
+
+#: makemeta-ui.c:226
+msgid "Make a New Torrent"
+msgstr "Gör en ny torrent"
+
+#: makemeta-ui.c:238
+msgid "Files"
+msgstr "Filer"
+
+#: makemeta-ui.c:241
+msgid "File _Type"
+msgstr "Fil_typ"
+
+#: makemeta-ui.c:243
+msgid "Directory"
+msgstr "Katalog"
+
+#: makemeta-ui.c:245
+msgid "Single File"
+msgstr "En fil"
+
+#: makemeta-ui.c:251
+msgid "File or Directory to Add to the New Torrent"
+msgstr "Fil eller katalog att lägga till i ny torrent"
+
+#: makemeta-ui.c:262
+msgid "No Files Selected"
+msgstr "Inga filer valda"
+
+#: makemeta-ui.c:276
+msgid "Torrent"
+msgstr "Torrent"
+
+#: makemeta-ui.c:279
+msgid "Private to this Tracker"
+msgstr "Privat för den här trackern"
+
+#: makemeta-ui.c:282
+msgid "Announce _URL"
+msgstr "Annonserings-_url"
+
+#: makemeta-ui.c:287
+msgid "Commen_t"
+msgstr "Kommen_tar"
+
+#: msgwin.c:157
+#, c-format
+msgid "Unable to open \"%s\" for writing: %s"
+msgstr "Kunde inte öppna \"%s\" för skrivning: %s"
+
+#: msgwin.c:171
+#, c-format
+msgid "Error writing to \"%s\": %s"
+msgstr "Fel vid skrivning till \"%s\": %s"
+
+#: msgwin.c:188
+msgid "Save Debug Log"
+msgstr "Spara felsökningslogg"
+
+#: msgwin.c:213
+#: torrent-inspector.c:900
 msgid "Error"
 msgstr "Fel"
 
-#: msgwin.c:55
+#: msgwin.c:214
 msgid "Info"
 msgstr "Info"
 
-#: msgwin.c:56
+#: msgwin.c:215
 msgid "Debug"
 msgstr "Felsökning"
 
-#: msgwin.c:142
-msgid "Save Log"
-msgstr "Spara logg"
+#: msgwin.c:242
+msgid "Save"
+msgstr "Spara"
 
-#: msgwin.c:229
-msgid "???"
-msgstr "???"
+#: msgwin.c:246
+msgid "Clear"
+msgstr "Töm"
 
-#: tr_prefs.c:82
+#: msgwin.c:253
+msgid "Level "
+msgstr "Nivå"
+
+#: msgwin.c:254
+#: msgwin.c:280
+msgid "Select the debug filter level."
+msgstr "Välj filternivån för felsökning."
+
+#: torrent-inspector.c:248
+msgid "Address"
+msgstr "Adress"
+
+#: torrent-inspector.c:249
+msgid "Port"
+msgstr "Port"
+
+#: torrent-inspector.c:250
+msgid "Client"
+msgstr "Klient"
+
+#: torrent-inspector.c:251
+#: torrent-inspector.c:538
+#: torrent-inspector.c:1360
+#: tr_window.c:206
+msgid "Progress"
+msgstr "Förlopp"
+
+#: torrent-inspector.c:253
+msgid "Downloading"
+msgstr "Hämtar"
+
+#: torrent-inspector.c:254
+msgid "DL Rate"
+msgstr "Hämtningshastighet"
+
+#: torrent-inspector.c:255
+msgid "Uploading"
+msgstr "Skickar"
+
+#: torrent-inspector.c:256
+msgid "UL Rate"
+msgstr "Sändningshastighet"
+
+#: torrent-inspector.c:607
+msgid "Piece Availability"
+msgstr "Deltillgänglighet"
+
+#: torrent-inspector.c:630
+msgid "Peers"
+msgstr "Klienter"
+
+#: torrent-inspector.c:647
+msgid "Seeders"
+msgstr "Distributörer"
+
+#: torrent-inspector.c:655
+msgid "Leechers"
+msgstr "Reciprokörer"
+
+#: torrent-inspector.c:663
+msgid "Completed"
+msgstr "Färdig"
+
+#: torrent-inspector.c:698
+msgid "Torrent Information"
+msgstr "Torrent-information"
+
+#: torrent-inspector.c:701
+msgid "Tracker"
+msgstr "Tracker"
+
+#: torrent-inspector.c:710
+msgid "Pieces"
+msgstr "Delar"
+
+#: torrent-inspector.c:717
+msgid "Hash"
+msgstr "Hash"
+
+#: torrent-inspector.c:721
+msgid "Secure"
+msgstr "Säker"
+
+#: torrent-inspector.c:723
+msgid "Private Torrent, PEX disabled"
+msgstr "Privat torrent, PEX inaktiverat"
+
+#: torrent-inspector.c:724
+msgid "Public Torrent"
+msgstr "Publik torrent"
+
+#: torrent-inspector.c:728
+msgid "Comment"
+msgstr "Kommentar"
+
+#: torrent-inspector.c:741
+msgid "Created By"
+msgstr "Skapad av"
+
+#: torrent-inspector.c:744
+msgid "Creator"
+msgstr "Skapare"
+
+#: torrent-inspector.c:745
+#: util.c:147
+msgid "N/A"
+msgstr "-"
+
+#: torrent-inspector.c:748
+msgid "Date"
+msgstr "Datum"
+
+#: torrent-inspector.c:755
+msgid "Location"
+msgstr "Plats"
+
+#: torrent-inspector.c:758
+msgid "Downloaded Data"
+msgstr "Hämtat data"
+
+#: torrent-inspector.c:762
+msgid "Torrent File Path"
+msgstr "Filsökväg för torrent"
+
+#: torrent-inspector.c:766
+msgid "Transmission Support Folder"
+msgstr "Stödmapp för Transmission"
+
+#: torrent-inspector.c:771
+msgid "Torrent File Name"
+msgstr "Filnamn för torrent"
+
+#: torrent-inspector.c:840
+msgid "None"
+msgstr "Ingen"
+
+#: torrent-inspector.c:869
+msgid "Transfer"
+msgstr "Överför"
+
+#: torrent-inspector.c:872
+msgid "State"
+msgstr "Tillstånd"
+
+#: torrent-inspector.c:876
+msgid "Valid DL"
+msgstr "Giltig hämtning"
+
+#: torrent-inspector.c:880
+msgid "Downloaded"
+msgstr "Hämtat"
+
+#: torrent-inspector.c:884
+msgid "Uploaded"
+msgstr "Skickat"
+
+#: torrent-inspector.c:888
+msgid "Ratio"
+msgstr "Förhållande"
+
+#: torrent-inspector.c:892
+msgid "Remaining"
+msgstr "Återstående"
+
+#: torrent-inspector.c:896
+msgid "Swarm Rate"
+msgstr "Svärmförhållande"
+
+#: torrent-inspector.c:904
+msgid "Completeness"
+msgstr "Färdig"
+
+#: torrent-inspector.c:912
+msgid "Dates"
+msgstr "Datum"
+
+#: torrent-inspector.c:915
+msgid "Added"
+msgstr "Lades till"
+
+#: torrent-inspector.c:919
+msgid "Last Activity"
+msgstr "Senaste aktivitet"
+
+#: torrent-inspector.c:962
+#: torrent-inspector.c:972
+#: torrent-inspector.c:1143
+msgid "High"
+msgstr "Hög"
+
+#: torrent-inspector.c:963
+#: torrent-inspector.c:1145
+msgid "Normal"
+msgstr "Normal"
+
+#: torrent-inspector.c:964
+#: torrent-inspector.c:973
+#: torrent-inspector.c:1147
+msgid "Low"
+msgstr "Låg"
+
+#: torrent-inspector.c:1346
+msgid "File"
+msgstr "Fil"
+
+#: torrent-inspector.c:1374
+msgid "Download"
+msgstr "Hämta"
+
+#: torrent-inspector.c:1384
+msgid "Priority"
+msgstr "Prioritet"
+
+#: torrent-inspector.c:1493
+msgid "Transfer Bandwidth"
+msgstr "Överföringsbandbredd"
+
+#: torrent-inspector.c:1496
+msgid "Limit _Download Speed (KiB/s):"
+msgstr "Begränsa _hämtningshastighet (KiB/s):"
+
+#: torrent-inspector.c:1506
+msgid "Limit _Upload Speed (KiB/s):"
+msgstr "Begränsa _sändningshastighet (KiB/s):"
+
+#: torrent-inspector.c:1517
+msgid "Seeding"
+msgstr "Distribuering"
+
+#: torrent-inspector.c:1520
+msgid "_Stop Seeding at Ratio:"
+msgstr "_Sluta distribuera vid förhållandet:"
+
+#: torrent-inspector.c:1585
+msgid "Torrent Inspector"
+msgstr "Torrentinspekterare"
+
+#: torrent-inspector.c:1612
+msgid "_Activity"
+msgstr "_Aktivitet"
+
+#: torrent-inspector.c:1617
+msgid "_Peers"
+msgstr "_Klienter"
+
+#: torrent-inspector.c:1621
+msgid "_Info"
+msgstr "_Info"
+
+#: torrent-inspector.c:1626
+msgid "_Files"
+msgstr "_Filer"
+
+#: torrent-inspector.c:1631
+msgid "_Options"
+msgstr "_Alternativ"
+
+#: tr_prefs.c:84
 msgid "_Limit download speed"
 msgstr "_Begränsa hämtningshastighet"
 
-#: tr_prefs.c:83
+#: tr_prefs.c:85
 msgid "Restrict the download rate"
 msgstr "Begränsa hämtningshastigheten"
 
-#: tr_prefs.c:87
+#: tr_prefs.c:89
 msgid "Maximum _download speed:"
 msgstr "Maximal _hämtningshastighet:"
 
-#: tr_prefs.c:88
+#: tr_prefs.c:90
 msgid "Speed in KiB/sec for restricted download rate"
 msgstr "Hastighet i KiB/s för begränsad hämtningshastighet"
 
-#: tr_prefs.c:92
+#: tr_prefs.c:94
 msgid "Li_mit upload speed"
 msgstr "Be_gränsa sändningshastighet"
 
-#: tr_prefs.c:93
+#: tr_prefs.c:95
 msgid "Restrict the upload rate"
 msgstr "Begränsa sändningshastigheten"
 
-#: tr_prefs.c:97
+#: tr_prefs.c:99
 msgid "Maximum _upload speed:"
 msgstr "Maximal _sändningshastighet:"
 
-#: tr_prefs.c:98
+#: tr_prefs.c:100
 msgid "Speed in KiB/sec for restricted upload rate"
 msgstr "Hastighet i KiB/s för begränsad sändningshastighet"
 
-#: tr_prefs.c:102
+#: tr_prefs.c:104
 msgid "Al_ways prompt for download directory"
 msgstr "Fråga all_tid efter hämtningskatalog"
 
-#: tr_prefs.c:103
+#: tr_prefs.c:105
 msgid "When adding a torrent, always prompt for a directory to download data files into"
 msgstr "När en torrent-fil läggs till, fråga alltid efter en katalog att hämta ner datafilerna till"
 
-#: tr_prefs.c:108
+#: tr_prefs.c:110
 msgid "Download di_rectory:"
 msgstr "Hämtningskata_log:"
 
-#: tr_prefs.c:109
+#: tr_prefs.c:111
 msgid "Destination directory for downloaded data files"
 msgstr "Målkatalog för hämtade datafiler"
 
-#: tr_prefs.c:113
+#: tr_prefs.c:115
 msgid "Listening _port:"
 msgstr "Lyssnings_port:"
 
-#: tr_prefs.c:114
+#: tr_prefs.c:116
 msgid "TCP port number to listen for peer connections"
 msgstr "TCP-portnummer att lyssna på efter klientanslutningar"
 
-#: tr_prefs.c:118
+#: tr_prefs.c:120
 msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
 msgstr "Au_tomatisk portmappning via NAT-PMP eller UPnP"
 
-#: tr_prefs.c:119
+#: tr_prefs.c:121
 msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
 msgstr "Försök att kringgå NAT eller brandvägg för att tillåta inkommande klientanslutningar"
 
-#: tr_prefs.c:123
+#: tr_prefs.c:125
 msgid "Use peer _exchange if possible"
 msgstr "Använd klient_utbyte om möjligt"
 
-#: tr_prefs.c:124
+#: tr_prefs.c:126
 msgid "Perform Azureus or µTorrent compatible peer exchange with any peers which support it"
 msgstr "Genomför Azureus eller µTorrent-kompatibelt klientutbyte med alla parter som har stöd för det"
 
-#: tr_prefs.c:129
+#: tr_prefs.c:131
 msgid "Display an _icon in the system tray"
 msgstr "Visa en _ikon i meddelandefältet"
 
-#: tr_prefs.c:130
+#: tr_prefs.c:132
 msgid "Use a system tray / dock / notification area icon"
 msgstr "Använd en ikon för meddelandefält / docka / notifieringsyta"
 
-#: tr_prefs.c:134
+#: tr_prefs.c:136
 msgid "Confirm _quit"
 msgstr "Bekräfta a_vslut"
 
-#: tr_prefs.c:135
+#: tr_prefs.c:137
 msgid "Prompt for confirmation when quitting"
 msgstr "Fråga efter bekräftelse när programmet avslutas"
 
-#: tr_prefs.c:140
+#: tr_prefs.c:142
 msgid "For torrents added _normally:"
 msgstr "För torrent-filer som lagts till _normalt:"
 
-#: tr_prefs.c:141
+#: tr_prefs.c:143
 msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
 msgstr "Torrent-filer som lagts till via verktygsraden, popupmeny och dra-och-släpp"
 
-#: tr_prefs.c:146
+#: tr_prefs.c:148
 msgid ""
 "For torrents added e_xternally\n"
 "(via the command-line):"
@@ -453,192 +798,205 @@ msgstr ""
 "För torrent-filer som lagts till e_xternt\n"
 "(via kommandoraden):"
 
-#: tr_prefs.c:147
+#: tr_prefs.c:149
 msgid "For torrents added via the command-line only"
 msgstr "Endast för torrent-filer som lagts till via kommandoraden "
 
-#: tr_prefs.c:342
+#: tr_prefs.c:346
 #, c-format
 msgid "%s Preferences"
 msgstr "Inställningar för %s"
 
-#: tr_prefs.c:858
+#: tr_prefs.c:892
 msgid "Use the torrent file where it is"
 msgstr "Används torrent-filen där den finns"
 
-#: tr_prefs.c:861
+#: tr_prefs.c:895
 msgid "Keep a copy of the torrent file"
 msgstr "Behåll en kopia av torrent-filen"
 
-#: tr_prefs.c:864
+#: tr_prefs.c:898
 msgid "Keep a copy and remove the original"
 msgstr "Behåll en kopia och ta bort originalet"
 
-#: tr_torrent.c:314
+#: tr_torrent.c:321
+#: tr_torrent.c:442
 #, c-format
 msgid "%s: not a valid torrent file"
 msgstr "%s: inte en giltig torrent-fil"
 
-#: tr_torrent.c:317
+#: tr_torrent.c:324
+#: tr_torrent.c:445
 #, c-format
 msgid "%s: torrent is already open"
 msgstr "%s: torrent är redan öppnad"
 
-#: tr_window.c:169
-msgid "_File"
-msgstr "_Arkiv"
+#: tr_torrent.c:365
+msgid "not a valid torrent file"
+msgstr "inte en giltig torrent-fil"
 
-#: tr_window.c:355
+#: tr_torrent.c:368
+msgid "torrent is already open"
+msgstr "torrent är redan öppnad"
+
+#: tr_torrent.c:615
 #, c-format
-msgid "     Total DL: %s/s     Total UL: %s/s"
-msgstr "     Totalt hämtat: %s/s     Total skickat: %s/s"
+msgid "Waiting to check existing files (%.1f%%)"
+msgstr "Väntar på att kontrollera befintliga filer (%.1f%%)"
 
-#. note that this renderer is set to ellipsize, just not here
-#: tr_window.c:393
-msgid "Name"
-msgstr "Namn"
-
-#: tr_window.c:511
+#: tr_torrent.c:619
 #, c-format
 msgid "Checking existing files (%.1f%%)"
 msgstr "Kontrollerar befintliga filer (%.1f%%)"
 
-#: tr_window.c:517
+#: tr_torrent.c:624
 #, c-format
 msgid "Stalled (%.1f%%)"
 msgstr "Avstannad (%.1f%%)"
 
-#: tr_window.c:522
+#: tr_torrent.c:627
 #, c-format
-msgid "Finishing in %s (%.1f%%)"
-msgstr "Färdig om %s (%.1f%%)"
+msgid "%s remaining (%.1f%%)"
+msgstr "%s återstår (%.1f%%)"
 
-#: tr_window.c:530
+#: tr_torrent.c:634
 #, c-format
-msgid "Seeding, uploading to %d of %d peer"
-msgid_plural "Seeding, uploading to %d of %d peers"
-msgstr[0] "Distribuerar, sänder till %d av %d klient"
-msgstr[1] "Distribuerar, sänder till %d av %d klienter"
+msgid "Uploading to %d of %d peer"
+msgid_plural "Uploading to %d of %d peers"
+msgstr[0] "Skickar till %d av %d klient"
+msgstr[1] "Skickar till %d av %d klienter"
 
-#: tr_window.c:536
+#: tr_torrent.c:641
+#, c-format
+msgid "Seeding to %d of %d peer"
+msgid_plural "Seeding to %d of %d peers"
+msgstr[0] "Distribuerar till %d av %d klient"
+msgstr[1] "Distribuerar till %d av %d klienter"
+
+#: tr_torrent.c:647
 msgid "Stopping..."
 msgstr "Stoppar..."
 
-#: tr_window.c:540
+#: tr_torrent.c:651
 #, c-format
 msgid "Stopped (%.1f%%)"
 msgstr "Stoppad (%.1f%%)"
 
-#: tr_window.c:551
+#: tr_window.c:101
 msgid "Error: "
 msgstr "Fel: "
 
-#: tr_window.c:556
+#: tr_window.c:106
 #, c-format
 msgid "Downloading from %i of %i peer"
 msgid_plural "Downloading from %i of %i peers"
 msgstr[0] "Hämtar från %i av %i klient"
 msgstr[1] "Hämtar från %i av %i klienter"
 
-#: tr_window.c:593
+#: tr_window.c:144
 #, c-format
 msgid ""
 "Ratio: %s\n"
-"UL: %s/s"
+"UL: %s"
 msgstr ""
-"Ratio: %s\n"
-"Sändning: %s/s"
+"Förhållande: %s\n"
+"Skickat: %s"
 
-#: tr_window.c:598
+#: tr_window.c:149
 #, c-format
 msgid ""
-"DL: %s/s\n"
-"UL: %s/s"
+"DL: %s\n"
+"UL: %s"
 msgstr ""
-"Hämtat: %s/s\n"
-"Skickat: %s/s"
+"Hämtar: %s\n"
+"Skickar: %s"
 
-#: util.c:64
+#: tr_window.c:192
+msgid "Name"
+msgstr "Namn"
+
+#: tr_window.c:203
+msgid "  fnord    fnord  "
+msgstr "  fnord    fnord  "
+
+#: tr_window.c:309
+#, c-format
+msgid "Total DL: %s"
+msgstr "Total hämtning: %s"
+
+#: tr_window.c:315
+#, c-format
+msgid "Total UL: %s"
+msgstr "Total sändning: %s"
+
+#: util.c:77
 msgid "B"
 msgstr "B"
 
-#: util.c:64
+#: util.c:77
 msgid "KiB"
 msgstr "KiB"
 
-#: util.c:64
+#: util.c:77
 msgid "MiB"
 msgstr "MiB"
 
-#: util.c:64
+#: util.c:77
 msgid "GiB"
 msgstr "GiB"
 
-#: util.c:64
+#: util.c:77
 msgid "TiB"
 msgstr "TiB"
 
-#: util.c:64
+#: util.c:77
 msgid "PiB"
 msgstr "PiB"
 
-#: util.c:64
+#: util.c:77
 msgid "EiB"
 msgstr "EiB"
 
-#: util.c:93
+#: util.c:116
 #, c-format
 msgid "%i %s"
 msgstr "%i %s"
 
-#: util.c:94
-#: util.c:98
-msgid "second"
-msgid_plural "seconds"
+#: util.c:117
+#: util.c:121
+msgid "sec"
+msgid_plural "secs"
 msgstr[0] "sekund"
 msgstr[1] "sekunder"
 
-#: util.c:96
-#: util.c:100
-#: util.c:104
-#: util.c:108
+#: util.c:119
+#: util.c:123
+#: util.c:127
 #, c-format
 msgid "%i %s %i %s"
 msgstr "%i %s %i %s"
 
-#: util.c:97
-#: util.c:102
-msgid "minute"
-msgid_plural "minutes"
+#: util.c:120
+#: util.c:125
+msgid "min"
+msgid_plural "mins"
 msgstr[0] "minut"
 msgstr[1] "minuter"
 
-#: util.c:101
-#: util.c:106
-#: util.c:110
-msgid "hour"
-msgid_plural "hours"
+#: util.c:124
+#: util.c:129
+msgid "hr"
+msgid_plural "hrs"
 msgstr[0] "timme"
 msgstr[1] "timmar"
 
-#: util.c:105
+#: util.c:128
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dygn"
 msgstr[1] "dygn"
 
-#: util.c:109
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "vecka"
-msgstr[1] "veckor"
-
-#: util.c:118
-msgid "N/A"
-msgstr "-"
-
-#. this is a UTF-8 infinity symbol
-#: util.c:122
+#: util.c:151
 msgid "∞"
 msgstr "∞"
 
