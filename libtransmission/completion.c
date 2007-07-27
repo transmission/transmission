@@ -324,10 +324,10 @@ tr_cpDownloadedValid( const tr_completion_t * cp )
         if( tr_cpPieceIsComplete( cp, i ) )
             ++b;
 
-    b *= tor->blockSize;
+    b *= info->pieceSize;
 
-    if( tor->blockCount && tr_bitfieldHas( cp->blockBitfield, tor->blockCount - 1 ) )
-        b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
+    if( tr_cpPieceIsComplete( cp, info->pieceCount-1 ) )
+        b -= (info->pieceSize - (info->totalSize % info->pieceSize));
 
    return b;
 }
