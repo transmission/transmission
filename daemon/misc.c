@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -208,32 +209,56 @@ readfile( const char * name, size_t * len )
 int
 daemon( int nochdir, int noclose )
 {
-    pid_t child;
-    int   null;
-
-    child = fork();
-    if( 0 > child )
-        return -1;
-    else if( 0 != child )
-        exit( 0 );
-
-    if( 0 > setsid() )
-        return -1;
-
-    if( !nochdir && 0 > chdir( "/" ) )
-        return -1;
-
-    if( !noclose )
-    {
-        null = open( "/dev/null", O_RDWR );
-        if( 0 > null )
+    switch( fork( ) ) {
+        case 0:
+            break;
+        case -1:
+            fprintf( stderr, "Error daemonizing (fork)! %d - %s\n", errno, strerror(errno) );
             return -1;
-        if( 0 > dup2( null, 0 ) || 0 > dup2( null, 1 ) || 0 > dup2( null, 2 ) )
-            return -1;
-        close( null );
+        default:
+            _exit(0);
     }
 
-    return -1;
+    if( setsid() < 0 ) {
+        fprintf( stderr, "Error daemonizing (setsid)! %d - %s\n", errno, strerror(errno) );
+        return -1;
+    }
+
+    switch( fork( ) ) {
+        case 0:
+            break;
+        case -1:
+            fprintf( stderr, "Error daemonizing (fork2)! %d - %s\n", errno, strerror(errno) );
+            return -1;
+        default:
+            _exit(0);
+    }
+
+    if( !nochdir && 0 > chdir( "/" ) ) {
+        fprintf( stderr, "Error daemonizing (chdir)! %d - %s\n", errno, strerror(errno) );
+        return -1;
+    }
+
+    if( !noclose ) {
+        int fd;
+        fd = open("/dev/null", O_RDONLY);
+        if( fd != 0 ) {
+            dup2( fd,  0 );
+            close( fd );
+        }
+        fd = open("/dev/null", O_WRONLY);
+        if( fd != 1 ) {
+            dup2( fd, 1 );
+            close( fd );
+        }
+        fd = open("/dev/null", O_WRONLY);
+        if( fd != 2 ) {
+            dup2( fd, 2 );
+            close( fd );
+        }
+    }
+
+    return 0;
 }
 
 #endif
