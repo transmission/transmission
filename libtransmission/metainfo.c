@@ -253,8 +253,6 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
         memcpy (inf->pieces[i].hash, &val->val.s.s[i*SHA_DIGEST_LENGTH], SHA_DIGEST_LENGTH);
     }
 
-    /* TODO add more tests so we don't crash on weird files */
-
     /* get file or top directory name */
     val = tr_bencDictFindFirst( beInfo, "name.utf-8", "name", NULL );
     if( parseFiles( inf, tr_bencDictFindFirst( beInfo,
@@ -264,6 +262,22 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
     {
         goto fail;
     }
+
+    if( !inf->fileCount )
+    {
+        tr_err( "Torrent has no files." );
+        goto fail;
+    }
+    for( i=0; i<inf->fileCount; ++i )
+    {
+        if( !inf->files[i].length )
+        {
+            tr_err("File #%d, \"%s\" is zero bytes long.", (i+1), inf->files[i].name );
+            goto fail;
+        }
+    }
+
+    /* TODO add more tests so we don't crash on weird files */
 
     if( (uint64_t) inf->pieceCount !=
         ( inf->totalSize + inf->pieceSize - 1 ) / inf->pieceSize )
