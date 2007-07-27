@@ -596,6 +596,7 @@ tr_torrentStat( tr_torrent_t * tor )
     tr_stat_t * s;
     tr_tracker_t * tc;
     int i;
+    uint64_t doneHave, doneTotal;
 
     tr_torrentReaderLock( tor );
 
@@ -636,10 +637,11 @@ tr_torrentStat( tr_torrent_t * tor )
         }
     }
 
-    s->percentDone     = tr_cpPercentDone     ( tor->completion );
     s->percentComplete = tr_cpPercentComplete ( tor->completion );
-    s->left            = tr_cpLeftUntilDone   ( tor->completion );
 
+    tr_cpDoneStats( tor->completion, &doneHave, &doneTotal );
+    s->percentDone = (float)doneHave / (float)doneTotal;
+    s->left = doneTotal - doneHave;
 
     if( tor->uncheckedPieces )
         s->status = tor->runStatus==TR_RUN_CHECKING

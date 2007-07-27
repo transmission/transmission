@@ -37,9 +37,11 @@ cp_status_t           tr_cpGetStatus ( const tr_completion_t * );
 
 uint64_t              tr_cpDownloadedValid( const tr_completion_t * );
 uint64_t              tr_cpLeftUntilComplete( const tr_completion_t * );
-uint64_t              tr_cpLeftUntilDone( const tr_completion_t * );
 float                 tr_cpPercentComplete( const tr_completion_t * );
-float                 tr_cpPercentDone( const tr_completion_t * );
+void                  tr_cpDoneStats( const tr_completion_t  * cp,
+                                      uint64_t               * setmeHaveBytes,
+                                      uint64_t               * setmeTotalBytes );
+
 
 /* Pieces */
 int                   tr_cpPieceHasAllBlocks( const tr_completion_t *, int piece );

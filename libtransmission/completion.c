@@ -270,31 +270,37 @@ tr_cpLeftUntilComplete ( const tr_completion_t * cp )
     return b;
 }
 
-uint64_t
-tr_cpLeftUntilDone ( const tr_completion_t * cp )
+void
+tr_cpDoneStats( const tr_completion_t  * cp ,
+                uint64_t               * setmeHaveBytes,
+                uint64_t               * setmeTotalBytes )
 {
+    const tr_torrent_t * tor = cp->tor;
+    const tr_info_t * info = &tor->info;
+    uint64_t have=0, total=0;
     int i;
-    uint64_t b=0;
-    const tr_torrent_t * tor;
-    const tr_info_t * info;
 
-    assert( cp != NULL );
-    assert( cp->tor != NULL );
+    for( i=0; i<info->pieceCount; ++i ) {
+        if( !info->pieces[i].dnd ) {
+            total += info->pieceSize;
+            have += cp->completeBlocks[ i ];
+        }
+    }
 
-    tor = cp->tor;
-    info = &tor->info;
+    have *= tor->blockSize;
 
-    for( i=0; i<info->pieceCount; ++i )
-        if( !tr_cpPieceIsComplete( cp, i ) && !info->pieces[i].dnd )
-            b += ( TR_BLOCKS_IN_PIECE(tor,i) - cp->completeBlocks[ i ] );
+    /* the last piece/block is probably smaller than the others */
+    if( !info->pieces[info->pieceCount-1].dnd ) {
+        total -= ( info->pieceSize - ( info->totalSize % info->pieceSize ) );
+        if( tr_cpBlockIsComplete( cp, tor->blockCount-1 ) )
+            have -= ( tor->blockSize - ( info->totalSize % tor->blockSize ) );
+    }
 
-    b *= tor->blockSize;
+    assert( have < total );
+    assert( total <= info->totalSize );
 
-    if( tor->blockCount && !tr_cpBlockIsComplete( cp, tor->blockCount-1 )
-                        && !info->pieces[info->pieceCount-1].dnd )
-          b -= (tor->blockSize - (tor->info.totalSize % tor->blockSize));
-
-    return b;
+    *setmeHaveBytes = have;
+    *setmeTotalBytes = total;
 }
 
 float
@@ -303,15 +309,6 @@ tr_cpPercentComplete ( const tr_completion_t * cp )
     const uint64_t tilComplete = tr_cpLeftUntilComplete( cp );
     const uint64_t total = cp->tor->info.totalSize;
     const float f = 1.0 - (double)tilComplete / total;
-    return MAX(0.0, f);
-}
-
-float
-tr_cpPercentDone( const tr_completion_t * cp )
-{
-    const uint64_t tilDone = tr_cpLeftUntilDone( cp );
-    const uint64_t total = cp->tor->info.totalSize;
-    const float f = 1.0 - (double)tilDone / total;
     return MAX(0.0, f);
 }
 
