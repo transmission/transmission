@@ -226,7 +226,7 @@ torrentRealInit( tr_handle_t   * h,
 
     tor->pexDisabled = 0;
 
-    /* Block size: usually 16 ko, or less if we have to */
+    /* Block size: usually 16 kib, or less if we have to */
     tor->blockSize  = MIN( tor->info.pieceSize, 1 << 14 );
     tor->blockCount = ( tor->info.totalSize + tor->blockSize - 1 ) /
                         tor->blockSize;

@@ -39,7 +39,7 @@ struct tr_completion_s
     tr_bitfield_t * pieceBitfield;
 
     /* a block is complete if and only if we have it */
-    int * completeBlocks;
+    uint16_t * completeBlocks;
 };
 
 tr_completion_t * tr_cpInit( tr_torrent_t * tor )
@@ -51,7 +51,7 @@ tr_completion_t * tr_cpInit( tr_torrent_t * tor )
     cp->blockBitfield    = tr_bitfieldNew( tor->blockCount );
     cp->blockDownloaders = tr_new( uint8_t, tor->blockCount );
     cp->pieceBitfield    = tr_bitfieldNew( tor->info.pieceCount );
-    cp->completeBlocks   = tr_new( int, tor->info.pieceCount );
+    cp->completeBlocks   = tr_new( uint16_t, tor->info.pieceCount );
 
     tr_cpReset( cp );
 
@@ -70,13 +70,11 @@ void tr_cpClose( tr_completion_t * cp )
 void tr_cpReset( tr_completion_t * cp )
 {
     tr_torrent_t * tor = cp->tor;
-    int i;
 
     tr_bitfieldClear( cp->blockBitfield );
     memset( cp->blockDownloaders, 0, tor->blockCount );
     tr_bitfieldClear( cp->pieceBitfield );
-    for( i = 0; i < tor->info.pieceCount; ++i )
-        cp->completeBlocks[i] = 0;
+    memset( cp->completeBlocks, 0, sizeof(uint16_t) * tor->info.pieceCount );
 }
 
 int tr_cpPieceHasAllBlocks( const tr_completion_t * cp, int piece )
