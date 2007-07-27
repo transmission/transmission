@@ -296,7 +296,7 @@ tr_cpDoneStats( const tr_completion_t  * cp ,
             have -= ( tor->blockSize - ( info->totalSize % tor->blockSize ) );
     }
 
-    assert( have < total );
+    assert( have <= total );
     assert( total <= info->totalSize );
 
     *setmeHaveBytes = have;
