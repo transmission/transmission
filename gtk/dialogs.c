@@ -408,18 +408,21 @@ askquit( TrCore          * core,
     stuff->cbdata  = cbdata;
     stuff->core    = core;
 
-    wind = gtk_message_dialog_new( parent,
-                                   GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_QUESTION,
-                                   GTK_BUTTONS_NONE,
-                                   _("Really exit %s?"),
-                                   g_get_application_name() );
+    wind = gtk_message_dialog_new_with_markup( parent,
+                                               GTK_DIALOG_DESTROY_WITH_PARENT,
+                                               GTK_MESSAGE_QUESTION,
+                                               GTK_BUTTONS_NONE,
+                                               _("<b>Really Quit %s?</b>"),
+                                               g_get_application_name() );
+
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(wind),
+                                              _("This will close all active torrents."));
     gtk_dialog_add_buttons( GTK_DIALOG(wind),
                             GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
                             GTK_STOCK_QUIT, GTK_RESPONSE_ACCEPT,
                             NULL );
-   
-    gtk_dialog_set_default_response( GTK_DIALOG( wind ), GTK_RESPONSE_ACCEPT );
+    gtk_dialog_set_default_response( GTK_DIALOG( wind ),
+                                     GTK_RESPONSE_ACCEPT );
 
     dontask = gtk_check_button_new_with_mnemonic( _("_Don't Ask Me This Again") );
     stuff->dontask = dontask;
