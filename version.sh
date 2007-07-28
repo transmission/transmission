@@ -12,7 +12,14 @@ STRING=0.72+
 
 PEERID_PREFIX="-TR072Z-"
 USERAGENT_PREFIX="0.72+"
-SVN_REVISION=`svn info . | sed -ne "s/^Revision: \(.*\:\)\{0,1\}\(.*\)$/\2/p"`
+SVN_REVISION=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
+                     -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
+                     -o -name 'configure' ')' -exec cat '{}' ';' ) | \
+                   sed -e '/\$Id:/!d' -e \
+                     's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' |
+                   awk 'BEGIN { REV=0 }
+                              { if ( $1 > REV ) REV=$1 }
+                        END   { print REV }'`
   
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
