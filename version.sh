@@ -10,15 +10,9 @@ MAINT="2"
 BETA="Z"
 STRING=0.72+
 
-# Get current SVN revision from Ids in all source files
-REV=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
-            -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
-            -o -name 'configure' ')' -exec cat '{}' ';' ) | \
-          sed -e '/\$Id:/!d' -e \
-            's/.*\$Id: [^ ]* \([0-9]*\) .*/\1/' |
-          awk 'BEGIN { REV=0 }
-                     { if ( $1 > REV ) REV=$1 }
-               END   { print REV }'`
+PEERID_PREFIX="-TR072Z-"
+USERAGENT_PREFIX="0.72+"
+SVN_REVISION=`svn info . | sed -ne "s/^Revision: \(.*\:\)\{0,1\}\(.*\)$/\2/p"`
   
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
@@ -43,18 +37,16 @@ replace_if_differs mk/version.mk.new mk/version.mk
 
 # Generate version.h
 cat > libtransmission/version.h.new << EOF
-#define VERSION_MAJOR        "$MAJOR"
-#define VERSION_MINOR        "$MINOR"
-#define VERSION_MAINTENANCE  "$MAINT"
-#define VERSION_REVISION     "$REV"
-#define VERSION_BETA         "$BETA"
-#define SHORT_VERSION_STRING "$STRING"
-#define LONG_VERSION_STRING  "$STRING ($REV)"
+#define PEERID_PREFIX         "$PEERID_PREFIX"
+#define USERAGENT_PREFIX      "$USERAGENT_PREFIX"
+#define SVN_REVISION          "$SVN_REVISION"
+#define SHORT_VERSION_STRING  "$USERAGENT_PREFIX"
+#define LONG_VERSION_STRING   "$USERAGENT_PREFIX r($SVN_REVISION)"
 EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
 
 # Generate Info.plist from Info.plist.in
-sed -e "s/%%BUNDLE_VERSION%%/$REV/" -e "s/%%SHORT_VERSION_STRING%%/$STRING/" \
+sed -e "s/%%BUNDLE_VERSION%%/$SVN_REVISION/" -e "s/%%SHORT_VERSION_STRING%%/$USERAGENT_PREFIX/" \
         < macosx/Info.plist.in > macosx/Info.plist.new
 replace_if_differs macosx/Info.plist.new macosx/Info.plist
 

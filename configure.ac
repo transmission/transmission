@@ -1,6 +1,9 @@
-AC_INIT([Transmission],[0.72Z],[http://bugzilla.gnome.org/enter_bug.cgi?product=Pan])
+AC_INIT([Transmission],[0.72Z],[http://transmission.m0k.org/trac/newticket])
+PEERID_PREFIX="-TR072Z-"
+USERAGENT_PREFIX="0.72+"
+
 AC_PREREQ(2.54)
-AM_CONFIG_HEADER(config.h)
+dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
@@ -183,29 +186,12 @@ dnl  Version files
 
 dnl constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
 dnl convention: BETA: "Z" for a beta, "0" for a stable
-MAJOR="0"
-MINOR="7"
-MAINT="2"
-BETA="Z"
-STRING=0.80-svn
-REV=`svnversion -n`
-AC_SUBST(VERSION_MAJOR,[$MAJOR])
-AC_SUBST(VERSION_MINOR,[$MINOR])
-AC_SUBST(VERSION_MAINTENANCE,[$MAINT])
-AC_SUBST(VERSION_REVISION,[$REV])
-AC_SUBST(VERSION_BETA,[$BETA])
-AC_SUBST(VERSION_STRING,[$MAJOR.$MINOR$MAINT$BETA])
-AC_SUBST(VERSION_STRING_LONG,[$MAJOR.$MINOR$MAINT$BETA-r$REV])
-
-dnl for macosx
-AC_SUBST(BUNDLE_VERSION,[$REV])
-dnl if it's a beta version, include the svn revision number
-if test x${BETA} = "xZ"; then
-  AC_SUBST(VERSION_PACKAGE,$MAJOR.$MINOR$MAINT$BETA-r$REV)
-else
-  AC_SUBST(VERSION_PACKAGE,$MAJOR.$MINOR$MAINT$BETA)
-fi
-AC_SUBST(VERSION_PACKAGE)
+SVN_REVISION=`svn info . | sed -ne "s/^Revision: \(.*\:\)\{0,1\}\(.*\)$/\2/p"`
+AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
+AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
+AC_SUBST(SVN_REVISION,[$SVN_REVISION])
+AC_SUBST(BUNDLE_VERSION,[$SVN_REVISION])
+AC_SUBST(VERSION_PACKAGE,$USERAGENT_PREFIX-r$SVN_REVISION)
 
 
 

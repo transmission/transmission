@@ -42,7 +42,8 @@ tr_peerIdNew ( char * buf, int buflen )
 {
     int i;
     assert( buflen == TR_ID_LEN + 1 );
-    snprintf( buf, TR_ID_LEN, "-TR" VERSION_MAJOR VERSION_MINOR VERSION_MAINTENANCE VERSION_BETA "-" );
+
+    snprintf( buf, TR_ID_LEN, "%s", PEERID_PREFIX );
     assert( strlen(buf) == 8 );
     for( i=8; i<TR_ID_LEN; ++i ) {
         const int r = tr_rand( 36 );
