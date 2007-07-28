@@ -289,12 +289,6 @@
 		35F372130C2D780600DAA8F2 /* InfoWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoWindow.m; path = macosx/InfoWindow.m; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilePriorityCell.h; path = macosx/FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
-		4C9F8F060BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4C9F8F070BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		4C9F8F080BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
-		4C9F8F090BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		4C9F8F0A0BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		4C9F8F0B0BC5B68A002E5433 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsController.h; path = macosx/PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsController.m; path = macosx/PrefsController.m; sourceTree = "<group>"; };
@@ -334,7 +328,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -363,12 +357,6 @@
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
-		A2440F9C0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A2440F9D0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A2440F9E0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = macosx/German.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A2440F9F0BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A2440FA00BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A2440FA10BD331A2006A687A /* German */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = German; path = macosx/German.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
 		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
@@ -402,12 +390,6 @@
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Error.tiff; path = macosx/Images/Error.tiff; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
-		A26B0B430BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A26B0B440BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A26B0B450BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A26B0B460BCFD760008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A26B0B4B0BCFD7A0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A26B0B4F0BCFD7B0008C1579 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* FilterBarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilterBarButton.h; path = macosx/FilterBarButton.h; sourceTree = "<group>"; };
@@ -420,12 +402,6 @@
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
-		A29B0C130BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A29B0C140BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A29B0C150BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A29B0C160BD15F9D0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A29B0C1B0BD15FCB0006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A29B0C200BD15FD70006F230 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = YellowDot.tiff; path = macosx/Images/YellowDot.tiff; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
 		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
@@ -665,6 +641,10 @@
 				A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */,
 				A21F5B860AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.h */,
 				A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */,
+				A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */,
+				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
+				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
+				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.m */,
 				4DE5CC9B0980656F00BE280E /* StringAdditions.h */,
@@ -677,15 +657,14 @@
 				A2DF37050C220D03006523C1 /* CreatorWindowController.m */,
 				A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */,
 				A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */,
+				A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */,
+				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
+				A2FB057C0BFEB6800095564D /* DragOverlayView.h */,
+				A2FB057D0BFEB6800095564D /* DragOverlayView.m */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
 				E1B6FBFD0C0D72430015FE4D /* Prefs Window */,
-				E1B6FC000C0D72A00015FE4D /* Overlay Window */,
 				E138A9720C04D88F00C5426C /* CTGradient */,
 				E1B6FBEB0C0D70AC0015FE4D /* UKKQueue */,
-				35F372120C2D780500DAA8F2 /* InfoWindow.h */,
-				35F372130C2D780600DAA8F2 /* InfoWindow.m */,
-				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
-				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1010,6 +989,10 @@
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
 				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
+				35F372120C2D780500DAA8F2 /* InfoWindow.h */,
+				35F372130C2D780600DAA8F2 /* InfoWindow.m */,
+				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
+				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -1025,21 +1008,6 @@
 				A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */,
 			);
 			name = "Prefs Window";
-			sourceTree = "<group>";
-		};
-		E1B6FC000C0D72A00015FE4D /* Overlay Window */ = {
-			isa = PBXGroup;
-			children = (
-				A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */,
-				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
-				A2FB057C0BFEB6800095564D /* DragOverlayView.h */,
-				A2FB057D0BFEB6800095564D /* DragOverlayView.m */,
-				A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */,
-				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
-				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
-				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
-			);
-			name = "Overlay Window";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1227,6 +1195,8 @@
 				German,
 				Greek,
 				Spanish,
+				Korean,
+				Portuguese,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1523,10 +1493,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
-				4C9F8F060BC5B68A002E5433 /* French */,
-				A26B0B4F0BCFD7B0008C1579 /* Greek */,
-				A29B0C200BD15FD70006F230 /* Spanish */,
-				A2440F9C0BD331A2006A687A /* German */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1535,10 +1501,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
-				4C9F8F090BC5B68A002E5433 /* French */,
-				A26B0B440BCFD760008C1579 /* Greek */,
-				A29B0C140BD15F9D0006F230 /* Spanish */,
-				A2440F9F0BD331A2006A687A /* German */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1547,10 +1509,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A200B9630A227FD0007BBB1E /* English */,
-				4C9F8F070BC5B68A002E5433 /* French */,
-				A26B0B430BCFD760008C1579 /* Greek */,
-				A29B0C130BD15F9D0006F230 /* Spanish */,
-				A2440F9D0BD331A2006A687A /* German */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1567,10 +1525,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A21567EC0A9A5034004DECD6 /* English */,
-				4C9F8F0A0BC5B68A002E5433 /* French */,
-				A26B0B450BCFD760008C1579 /* Greek */,
-				A29B0C150BD15F9D0006F230 /* Spanish */,
-				A2440FA00BD331A2006A687A /* German */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1579,10 +1533,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A22A8D550AEEAFA5007E9CB9 /* English */,
-				4C9F8F080BC5B68A002E5433 /* French */,
-				A26B0B4B0BCFD7A0008C1579 /* Greek */,
-				A29B0C1B0BD15FCB0006F230 /* Spanish */,
-				A2440F9E0BD331A2006A687A /* German */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1591,10 +1541,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2912C530A2956E80097A0CA /* English */,
-				4C9F8F0B0BC5B68A002E5433 /* French */,
-				A26B0B460BCFD760008C1579 /* Greek */,
-				A29B0C160BD15F9D0006F230 /* Spanish */,
-				A2440FA10BD331A2006A687A /* German */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
