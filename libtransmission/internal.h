@@ -121,21 +121,23 @@ void tr_torrentReaderUnlock  ( const tr_torrent_t * );
 void tr_torrentWriterLock    ( tr_torrent_t * );
 void tr_torrentWriterUnlock  ( tr_torrent_t * );
 
+/* get the index of this piece's first block */
+#define tr_torPieceFirstBlock(tor,piece) ( (piece) * (tor)->blockCountInPiece )
 
-#define TOR_BLOCK_PIECE(tor,block) \
-    ( (block) / ( (tor)->info.pieceSize / (tor)->blockSize ) )
+/* what piece index is this block in? */
+#define tr_torBlockPiece(tor,block) ( (block) / (tor)->blockCountInPiece )
 
-#define TOR_PIECE_FIRST_BLOCK(tor,piece) \
-    ( (tor)->info.pieces[(piece)].firstBlock )
+/* how many blocks are in this piece? */
+#define tr_torPieceCountBlocks(tor,piece) \
+    ( ((piece)==((tor)->info.pieceCount-1)) ? (tor)->blockCountInLastPiece : (tor)->blockCountInPiece )
 
-#define TR_BLOCKS_IN_PIECE(tor,piece) \
-    ( (tor)->info.pieces[(piece)].blockCount )
+/* how many bytes are in this piece? */
+#define tr_torPieceCountBytes(tor,piece) \
+    ( ((piece)==((tor)->info.pieceCount-1)) ? (tor)->lastPieceSize : (tor)->info.pieceSize )
 
-#define tr_blockSize(a) _tr_blockSize(tor,a)
-int _tr_blockSize( const tr_torrent_t * tor, int block );
-
-#define tr_pieceSize(a) _tr_pieceSize(tor,a)
-int _tr_pieceSize( const tr_torrent_t * tor, int piece );
+/* how many bytes are in this block? */
+#define tr_torBlockCountBytes(tor,block) \
+    ( ((block)==((tor)->blockCount-1)) ? (tor)->lastBlockSize : (tor)->blockSize )
 
 #define tr_block(a,b) _tr_block(tor,a,b)
 int _tr_block( const tr_torrent_t * tor, int index, int begin );
@@ -184,6 +186,12 @@ struct tr_torrent_s
     /* How many bytes we ask for per request */
     int               blockSize;
     int               blockCount;
+
+    int               lastBlockSize;
+    int               lastPieceSize;
+
+    int               blockCountInPiece;
+    int               blockCountInLastPiece;
     
     tr_completion_t * completion;
 

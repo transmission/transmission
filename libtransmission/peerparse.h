@@ -223,7 +223,7 @@ static int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
         peer_dbg( "GET  request, invalid index" );
         return TR_ERROR_ASSERT;
     }
-    if( tr_pieceSize( index ) < begin + length )
+    if( tr_torPieceCountBytes( tor, index ) < begin + length )
     {
         peer_dbg( "GET  request, invalid begin/length" );
         return TR_ERROR_ASSERT;
@@ -301,7 +301,7 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
         peer_dbg( "GET  piece, invalid index" );
         return TR_ERROR_ASSERT;
     }
-    if( tr_pieceSize( index ) < begin + len - 8 )
+    if( tr_torPieceCountBytes( tor, index ) < begin + len - 8 )
     {
         peer_dbg( "GET  piece, invalid begin/length" );
         return TR_ERROR_ASSERT;
@@ -315,9 +315,9 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     updateRequests( peer, index, begin );
 
     /* Sanity checks */
-    if( len - 8 != tr_blockSize( block ) )
+    if( len - 8 != tr_torBlockCountBytes( tor, block ) )
     {
-        peer_dbg( "wrong size (expecting %d)", tr_blockSize( block ) );
+        peer_dbg( "wrong size (expecting %d)", tr_torBlockCountBytes( tor, block ) );
         return TR_ERROR_ASSERT;
     }
     if( tr_cpBlockIsComplete( tor->completion, block ) )
@@ -405,7 +405,7 @@ static int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
         peer_dbg( "GET  cancel, invalid index" );
         return TR_ERROR_ASSERT;
     }
-    if( tr_pieceSize( index ) < begin + length )
+    if( tr_torPieceCountBytes( tor, index ) < begin + length )
     {
         peer_dbg( "GET  cancel, invalid begin/length" );
         return TR_ERROR_ASSERT;

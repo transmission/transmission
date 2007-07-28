@@ -81,7 +81,7 @@ findFileLocation ( const tr_torrent_t * tor,
 
     assert ( 0<=pieceIndex && pieceIndex < info->pieceCount );
     assert ( 0<=tor->info.pieceSize );
-    assert ( pieceOffset < tr_pieceSize(pieceIndex) );
+    assert ( pieceOffset < tr_torPieceCountBytes( tor, pieceIndex ) );
     assert ( piecePos < info->totalSize );
 
     for ( i=0; info->files[i].length<=piecePos; ++i )
@@ -139,7 +139,7 @@ readOrWritePiece ( tr_torrent_t       * tor,
     const tr_info_t * info = &tor->info;
 
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
-    assert( buflen <= (size_t) tr_pieceSize( pieceIndex ) );
+    assert( buflen <= (size_t) tr_torPieceCountBytes( tor, pieceIndex ) );
 
     findFileLocation ( tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset );
 
@@ -194,7 +194,7 @@ tr_ioRecalculateHash ( tr_torrent_t  * tor,
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
 
     info = &tor->info;
-    n = tr_pieceSize( pieceIndex );
+    n = tr_torPieceCountBytes( tor, pieceIndex );
 
     buf = malloc( n );
     ret = readOrWritePiece ( tor, TR_IO_READ, pieceIndex, 0, buf, n );
