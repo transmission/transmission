@@ -43,7 +43,7 @@ extern "C"
 
   #include <images/exec.xpm>
   #include <images/fileopen.xpm>
-  #include <images/gtk-properties.xpm>
+  #include <images/gtk-info.xpm>
   #include <images/gtk-remove.xpm>
   #include <images/stop.xpm>
   #include <images/systray.xpm>
@@ -555,7 +555,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxIcon exec_icon( exec_xpm );
     wxIcon stop_icon( stop_xpm );
     wxIcon drop_icon( gtk_remove_xpm );
-    wxIcon info_icon( gtk_properties_xpm );
+    wxIcon info_icon( gtk_info_xpm );
     wxBitmap bitmap;
 
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );

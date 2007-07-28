@@ -3,6 +3,8 @@ EXTRA_DIST = \
     exec.xpm \
     fileopen.png \
     fileopen.xpm \
+    gtk-info.png \
+    gtk-info.xpm \
     gtk-properties.png \
     gtk-properties.xpm \
     gtk-remove.png \
