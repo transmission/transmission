@@ -379,16 +379,16 @@ bool MyApp::OnInit()
     if( cmdParser.Parse ( ) )
         return false;
 
-    const wxString name = wxString::Format( _T("MyApp-%s"), wxGetUserId().c_str());
+    const wxString name = wxString::Format( _T("Xmission-%s"), wxGetUserId().c_str());
     myChecker = new wxSingleInstanceChecker( name );
     if ( myChecker->IsAnotherRunning() ) {
-        wxLogError(_("An instance of Transmission is already running."));
+        wxLogError(_("An instance of Xmission is already running."));
         return false;
     }
 
     const bool paused = cmdParser.Found( _("p") );
 
-    MyFrame * frame = new MyFrame( _T("Xmission"),
+    MyFrame * frame = new MyFrame( _("Xmission"),
                                    wxPoint(50,50),
                                    wxSize(900,600),
                                    paused);

@@ -1,0 +1,4 @@
+peers column is awkward to read
+peers column doesn't sort
+pulse doesn't resort items in the torrent list
+resorting the torrent list causes a 'blink', which makes pulsing resort unpleasant

@@ -396,7 +396,7 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
                 ret = 0;
             break;
 
-        case COL_DOWNLOAD_SPEED: break;
+        case COL_DOWNLOAD_SPEED:
             if( sa->rateDownload < sb->rateDownload )
                 ret = -1;
             else if( sa->rateDownload > sb->rateDownload )
