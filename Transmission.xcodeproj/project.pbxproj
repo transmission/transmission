@@ -128,6 +128,14 @@
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
+		BEAC1D300C5AFD03002DDDE5 /* speed-stats.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEAC1D170C5AFD03002DDDE5 /* speed-stats.cc */; };
+		BEAC1D320C5AFD03002DDDE5 /* torrent-filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEAC1D1A0C5AFD03002DDDE5 /* torrent-filter.cc */; };
+		BEAC1D330C5AFD03002DDDE5 /* torrent-list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEAC1D1C0C5AFD03002DDDE5 /* torrent-list.cc */; };
+		BEAC1D340C5AFD03002DDDE5 /* torrent-stats.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEAC1D1E0C5AFD03002DDDE5 /* torrent-stats.cc */; };
+		BEAC1D350C5AFD03002DDDE5 /* xmission.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEAC1D200C5AFD03002DDDE5 /* xmission.cc */; };
+		BEAC1D360C5AFD30002DDDE5 /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
+		BEAC1D370C5AFD34002DDDE5 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
+		BEAC1D3A0C5AFD54002DDDE5 /* libwx_macud-2.5.3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BEAC1D390C5AFD54002DDDE5 /* libwx_macud-2.5.3.0.0.dylib */; };
 		BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
@@ -454,6 +462,32 @@
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
+		BE1A4DBF0C5B050000034AC4 /* stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stop.png; sourceTree = "<group>"; };
+		BE1A4DC00C5B050000034AC4 /* gtk-remove.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "gtk-remove.png"; sourceTree = "<group>"; };
+		BE1A4DC10C5B050000034AC4 /* gtk-remove.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = "gtk-remove.xpm"; sourceTree = "<group>"; };
+		BE1A4DC20C5B050000034AC4 /* fileopen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fileopen.png; sourceTree = "<group>"; };
+		BE1A4DC30C5B050000034AC4 /* transmission.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = transmission.png; sourceTree = "<group>"; };
+		BE1A4DC40C5B050000034AC4 /* systray.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = systray.xpm; sourceTree = "<group>"; };
+		BE1A4DC50C5B050000034AC4 /* exec.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = exec.png; sourceTree = "<group>"; };
+		BE1A4DC60C5B050000034AC4 /* fileopen.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = fileopen.xpm; sourceTree = "<group>"; };
+		BE1A4DC70C5B050000034AC4 /* transmission.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = transmission.xpm; sourceTree = "<group>"; };
+		BE1A4DC80C5B050000034AC4 /* stop.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = stop.xpm; sourceTree = "<group>"; };
+		BE1A4DC90C5B050000034AC4 /* gtk-properties.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = "gtk-properties.xpm"; sourceTree = "<group>"; };
+		BE1A4DCA0C5B050000034AC4 /* exec.xpm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = exec.xpm; sourceTree = "<group>"; };
+		BE1A4DCB0C5B050000034AC4 /* gtk-properties.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "gtk-properties.png"; sourceTree = "<group>"; };
+		BEAC1CEC0C5AFC4C002DDDE5 /* Xmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Xmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEAC1D060C5AFD03002DDDE5 /* foreach.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = foreach.h; sourceTree = "<group>"; };
+		BEAC1D170C5AFD03002DDDE5 /* speed-stats.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = "speed-stats.cc"; sourceTree = "<group>"; };
+		BEAC1D180C5AFD03002DDDE5 /* speed-stats.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "speed-stats.h"; sourceTree = "<group>"; };
+		BEAC1D1A0C5AFD03002DDDE5 /* torrent-filter.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-filter.cc"; sourceTree = "<group>"; };
+		BEAC1D1B0C5AFD03002DDDE5 /* torrent-filter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "torrent-filter.h"; sourceTree = "<group>"; };
+		BEAC1D1C0C5AFD03002DDDE5 /* torrent-list.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-list.cc"; sourceTree = "<group>"; };
+		BEAC1D1D0C5AFD03002DDDE5 /* torrent-list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "torrent-list.h"; sourceTree = "<group>"; };
+		BEAC1D1E0C5AFD03002DDDE5 /* torrent-stats.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-stats.cc"; sourceTree = "<group>"; };
+		BEAC1D1F0C5AFD03002DDDE5 /* torrent-stats.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "torrent-stats.h"; sourceTree = "<group>"; };
+		BEAC1D200C5AFD03002DDDE5 /* xmission.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = xmission.cc; sourceTree = "<group>"; };
+		BEAC1D390C5AFD54002DDDE5 /* libwx_macud-2.5.3.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libwx_macud-2.5.3.0.0.dylib"; path = "/usr/lib/libwx_macud-2.5.3.0.0.dylib"; sourceTree = "<absolute>"; };
+		BEAC1D420C5AFD89002DDDE5 /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = libevent/event.h; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0C0C07756200B0BB3C /* client.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = client.c; path = daemon/client.c; sourceTree = "<group>"; };
 		BEFC1C0D0C07756200B0BB3C /* client.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = client.h; path = daemon/client.h; sourceTree = "<group>"; };
@@ -528,7 +562,6 @@
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
 		BEFC1E250C07861A00B0BB3C /* bsdqueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdqueue.h; path = libtransmission/bsdqueue.h; sourceTree = "<group>"; };
 		BEFC1E260C07861A00B0BB3C /* trcompat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trcompat.h; path = libtransmission/trcompat.h; sourceTree = "<group>"; };
-		BEFC1EEB0C0790CA00B0BB3C /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = libevent/event.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = "<group>"; };
@@ -557,6 +590,16 @@
 				4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */,
 				A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */,
 				A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEAC1CEA0C5AFC4C002DDDE5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEAC1D360C5AFD30002DDDE5 /* libcrypto.0.9.7.dylib in Frameworks */,
+				BEAC1D370C5AFD34002DDDE5 /* libtransmission.a in Frameworks */,
+				BEAC1D3A0C5AFD54002DDDE5 /* libwx_macud-2.5.3.0.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -656,6 +699,7 @@
 				BEFC1C000C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CF90C07822400B0BB3C /* transmission-remote */,
 				BEFC1D430C0783EE00B0BB3C /* transmission-proxy */,
+				BEAC1CEC0C5AFC4C002DDDE5 /* Xmission.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -668,6 +712,7 @@
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
+				BEAC1D050C5AFD03002DDDE5 /* wx */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = Transmission;
@@ -851,9 +896,10 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				BEFC1EEB0C0790CA00B0BB3C /* event.h */,
+				BEAC1D420C5AFD89002DDDE5 /* event.h */,
 				BEFC1C480C07796B00B0BB3C /* libevent.a */,
 				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
+				BEAC1D390C5AFD54002DDDE5 /* libwx_macud-2.5.3.0.0.dylib */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -864,6 +910,44 @@
 				4DDBB71B09E16BF100284745 /* transmissioncli.c */,
 			);
 			name = CLI;
+			sourceTree = "<group>";
+		};
+		BEAC1D050C5AFD03002DDDE5 /* wx */ = {
+			isa = PBXGroup;
+			children = (
+				BEAC1D070C5AFD03002DDDE5 /* images */,
+				BEAC1D060C5AFD03002DDDE5 /* foreach.h */,
+				BEAC1D170C5AFD03002DDDE5 /* speed-stats.cc */,
+				BEAC1D180C5AFD03002DDDE5 /* speed-stats.h */,
+				BEAC1D1A0C5AFD03002DDDE5 /* torrent-filter.cc */,
+				BEAC1D1B0C5AFD03002DDDE5 /* torrent-filter.h */,
+				BEAC1D1C0C5AFD03002DDDE5 /* torrent-list.cc */,
+				BEAC1D1D0C5AFD03002DDDE5 /* torrent-list.h */,
+				BEAC1D1E0C5AFD03002DDDE5 /* torrent-stats.cc */,
+				BEAC1D1F0C5AFD03002DDDE5 /* torrent-stats.h */,
+				BEAC1D200C5AFD03002DDDE5 /* xmission.cc */,
+			);
+			path = wx;
+			sourceTree = "<group>";
+		};
+		BEAC1D070C5AFD03002DDDE5 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				BE1A4DBF0C5B050000034AC4 /* stop.png */,
+				BE1A4DC00C5B050000034AC4 /* gtk-remove.png */,
+				BE1A4DC10C5B050000034AC4 /* gtk-remove.xpm */,
+				BE1A4DC20C5B050000034AC4 /* fileopen.png */,
+				BE1A4DC30C5B050000034AC4 /* transmission.png */,
+				BE1A4DC40C5B050000034AC4 /* systray.xpm */,
+				BE1A4DC50C5B050000034AC4 /* exec.png */,
+				BE1A4DC60C5B050000034AC4 /* fileopen.xpm */,
+				BE1A4DC70C5B050000034AC4 /* transmission.xpm */,
+				BE1A4DC80C5B050000034AC4 /* stop.xpm */,
+				BE1A4DC90C5B050000034AC4 /* gtk-properties.xpm */,
+				BE1A4DCA0C5B050000034AC4 /* exec.xpm */,
+				BE1A4DCB0C5B050000034AC4 /* gtk-properties.png */,
+			);
+			path = images;
 			sourceTree = "<group>";
 		};
 		BEFC1C0B0C07754700B0BB3C /* daemon */ = {
@@ -1061,6 +1145,23 @@
 			productReference = 8D1107320486CEB800E47090 /* Transmission.app */;
 			productType = "com.apple.product-type.application";
 		};
+		BEAC1CEB0C5AFC4C002DDDE5 /* Xmission */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEAC1CEF0C5AFC4C002DDDE5 /* Build configuration list for PBXNativeTarget "Xmission" */;
+			buildPhases = (
+				BEAC1CE80C5AFC4C002DDDE5 /* Resources */,
+				BEAC1CE90C5AFC4C002DDDE5 /* Sources */,
+				BEAC1CEA0C5AFC4C002DDDE5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Xmission;
+			productName = Xmission;
+			productReference = BEAC1CEC0C5AFC4C002DDDE5 /* Xmission.app */;
+			productType = "com.apple.product-type.application";
+		};
 		BEFC1BFF0C07750000B0BB3C /* transmission-daemon */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BEFC1C090C07753800B0BB3C /* Build configuration list for PBXNativeTarget "transmission-daemon" */;
@@ -1137,6 +1238,7 @@
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
 				BEFC1D340C0783EE00B0BB3C /* transmission-proxy */,
+				BEAC1CEB0C5AFC4C002DDDE5 /* Xmission */,
 			);
 		};
 /* End PBXProject section */
@@ -1216,6 +1318,13 @@
 				A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */,
 				A2085E020C53C16F000BC3B7 /* AboutWindow.nib in Resources */,
 				A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEAC1CE80C5AFC4C002DDDE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1330,6 +1439,18 @@
 				35F372150C2D780600DAA8F2 /* InfoWindow.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEAC1CE90C5AFC4C002DDDE5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEAC1D300C5AFD03002DDDE5 /* speed-stats.cc in Sources */,
+				BEAC1D320C5AFD03002DDDE5 /* torrent-filter.cc in Sources */,
+				BEAC1D330C5AFD03002DDDE5 /* torrent-list.cc in Sources */,
+				BEAC1D340C5AFD03002DDDE5 /* torrent-stats.cc in Sources */,
+				BEAC1D350C5AFD03002DDDE5 /* xmission.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1586,6 +1707,41 @@
 			};
 			name = Debug;
 		};
+		BEAC1CF00C5AFC4C002DDDE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				HEADER_SEARCH_PATHS = (
+					.,
+					./wx,
+					"/usr/include/wx-2.5",
+					"/usr/lib/wx/include/mac-unicode-debug-2.5",
+				);
+				INFOPLIST_FILE = macosx/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-D__WXDEBUG__",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				PRODUCT_NAME = Xmission;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
 		BEFC1C0A0C07753800B0BB3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1709,6 +1865,14 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C59D089918A300DD8943 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BEAC1CEF0C5AFC4C002DDDE5 /* Build configuration list for PBXNativeTarget "Xmission" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEAC1CF00C5AFC4C002DDDE5 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
