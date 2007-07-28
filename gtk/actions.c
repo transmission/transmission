@@ -27,7 +27,7 @@ static void action_cb ( GtkAction * a, gpointer user_data )
 }
 
 #if !GTK_CHECK_VERSION(2,8,0)
-#define GTK_STOCK_INFO NULL
+#define GTK_STOCK_INFO GTK_STOCK_PROPERTIES
 #endif
 
 static GtkRadioActionEntry priority_toggle_entries[] =
@@ -70,11 +70,11 @@ static GtkActionEntry entries[] =
     N_("_Quit"), "<control>Q", NULL, G_CALLBACK(action_cb) },
   { "edit-preferences", GTK_STOCK_PREFERENCES,
     N_("Edit _Preferences"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "show-torrent-inspector", GTK_STOCK_PROPERTIES,
+  { "show-torrent-inspector", GTK_STOCK_INFO,
     N_("_Torrent Info"), NULL, NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT,
     N_("_About Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "show-debug-window", GTK_STOCK_INFO,
+  { "show-debug-window", NULL,
     N_("Show _Debug Window"), NULL, NULL, G_CALLBACK(action_cb) },
   { "toggle-main-window", "ICON_TRANSMISSION",
     N_("Show / Hide _Transmission"), NULL, NULL, G_CALLBACK(action_cb) }

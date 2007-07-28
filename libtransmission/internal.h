@@ -71,7 +71,7 @@ int vasprintf( char **, const char *, va_list );
 /* We use OpenSSL whenever possible, since it is likely to be more
    optimized and it is ok to use it with a MIT-licensed application.
    Otherwise, we use the included implementation by vi@nwr.jp. */
-#ifdef HAVE_OPENSSL
+#if defined(HAVE_OPENSSL) || defined(HAVE_LIBSSL)
 #  undef SHA_DIGEST_LENGTH
 #  include <openssl/sha.h>
 #else
