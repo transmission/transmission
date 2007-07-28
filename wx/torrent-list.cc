@@ -247,8 +247,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_PEERS:
-                /* FIXME: this is all peers, not just leechers */
-                xstr = wxString::Format( _("%d of %d"), s->peersConnected, s->peersTotal );
+                xstr = wxString::Format( _("%d of %d"), s->peersConnected, s->leechers );
                 break;
 
             case COL_RATIO:

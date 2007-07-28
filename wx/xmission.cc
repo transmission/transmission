@@ -576,7 +576,9 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     **/
 
     wxSplitterWindow * hsplit = new wxSplitterWindow( this );
+#if wxCHECK_VERSION(2,5,4)
     hsplit->SetSashGravity( 0.8 );
+#endif
 
     wxPanel * row1 = new wxPanel( hsplit, wxID_ANY );
 
