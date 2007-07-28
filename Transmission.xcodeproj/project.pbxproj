@@ -117,7 +117,6 @@
 		A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */; };
 		A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */; };
 		A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */; };
-		A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A2C655640A04FEDC00E9FD82 /* BottomBorder.png */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0820A915F6600890C32 /* RedDot.tiff */; };
 		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
@@ -407,7 +406,6 @@
 		A2A306580AAD24A80049E2AC /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKKQueue.m; path = macosx/UKKQueue/UKKQueue.m; sourceTree = "<group>"; };
 		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
-		A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
@@ -416,7 +414,6 @@
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = makemeta.h; path = libtransmission/makemeta.h; sourceTree = "<group>"; };
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
-		A2C655640A04FEDC00E9FD82 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
 		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
@@ -598,6 +595,10 @@
 				A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */,
 				A21F5B860AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.h */,
 				A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */,
+				A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */,
+				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
+				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
+				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.m */,
 				4DE5CC9B0980656F00BE280E /* StringAdditions.h */,
@@ -615,10 +616,6 @@
 				E1B6FC000C0D72A00015FE4D /* Overlay Window */,
 				E138A9720C04D88F00C5426C /* CTGradient */,
 				E1B6FBEB0C0D70AC0015FE4D /* UKKQueue */,
-				35F372120C2D780500DAA8F2 /* InfoWindow.h */,
-				35F372130C2D780600DAA8F2 /* InfoWindow.m */,
-				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
-				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -670,7 +667,6 @@
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
 				A27A53420A06A62500E1F16F /* StatusSep.png */,
-				A2A84AD20A04FCDC00C898D4 /* BottomBorder.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 				4DF7500808A103AD007B0D70 /* Info.png */,
@@ -702,7 +698,8 @@
 				A200B9620A227FD0007BBB1E /* InfoWindow.nib */,
 				A21567EB0A9A5034004DECD6 /* MessageWindow.nib */,
 				A2DF377A0C222E2D006523C1 /* Creator.nib */,
-				A2C655640A04FEDC00E9FD82 /* BottomBorder.png */,
+				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
+				A2085E000C53C16F000BC3B7 /* AboutWindow.nib */,
 				A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */,
 				A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */,
 				A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */,
@@ -723,8 +720,6 @@
 				A253F7270A699373008EE24F /* FilterButtonSelectedLeft.png */,
 				A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */,
 				A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */,
-				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
-				A2085E000C53C16F000BC3B7 /* AboutWindow.nib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -894,6 +889,8 @@
 			children = (
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
 				A200B83A0A2263BA007BBB1E /* InfoWindowController.m */,
+				35F372120C2D780500DAA8F2 /* InfoWindow.h */,
+				35F372130C2D780600DAA8F2 /* InfoWindow.m */,
 				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
 				A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */,
@@ -902,6 +899,8 @@
 				A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */,
 				A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */,
 				A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */,
+				35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */,
+				35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */,
 			);
 			name = "Info Window";
 			sourceTree = "<group>";
@@ -926,10 +925,6 @@
 				A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */,
 				A2FB057C0BFEB6800095564D /* DragOverlayView.h */,
 				A2FB057D0BFEB6800095564D /* DragOverlayView.m */,
-				A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */,
-				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
-				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
-				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
 			);
 			name = "Overlay Window";
 			sourceTree = "<group>";
@@ -1143,7 +1138,6 @@
 				4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */,
 				4DDFDD22099A5D8E00189D81 /* DownloadBadge.png in Resources */,
 				4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */,
-				A2C655650A04FEDC00E9FD82 /* BottomBorder.png in Resources */,
 				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
 				A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */,
 				A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */,
