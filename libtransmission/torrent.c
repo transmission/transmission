@@ -231,6 +231,7 @@ torrentRealInit( tr_handle_t   * h,
         ( tor->lastPieceSize + tor->blockSize - 1 ) / tor->blockSize;
 
     /* check our work */
+fprintf( stderr, "adding torrent [%s]\n", tor->info.name );
     assert( ( info->pieceSize % tor->blockSize ) == 0 );
     t = info->pieceCount - 1;
     t *= info->pieceSize;
