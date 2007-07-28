@@ -176,7 +176,7 @@ private:
     TorrentListCtrl * myTorrentList;
     TorrentStats * myTorrentStats;
     wxListCtrl * myFilters;
-    wxTaskBarIcon myTrayIcon;
+    wxTaskBarIcon * myTrayIcon;
     wxIcon myLogoIcon;
     wxIcon myTrayIconIcon;
     SpeedStats * mySpeedStats;
@@ -448,8 +448,9 @@ void
 MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
 {
     if( myExitTime ) {
-        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_torrentCount(handle) << " torrents left" << std::endl;
         if ( !tr_torrentCount(handle) ||  myExitTime<time(0) ) {
+            delete myTrayIcon;
+            myTrayIcon = 0;
             Destroy( );
             return;
         }
@@ -473,7 +474,7 @@ MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
     xstr += _T("\n");
     xstr +=_("Upload: ");
     xstr +=  getReadableSpeed( up );
-    myTrayIcon.SetIcon( myTrayIconIcon, xstr );
+    myTrayIcon->SetIcon( myTrayIconIcon, xstr );
 
     myTorrentList->Refresh ( );
 }
@@ -495,6 +496,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myFilter( TorrentFilter::SHOW_ALL ),
     myExitTime( 0 )
 {
+    myTrayIcon = new wxTaskBarIcon;
     SetIcon( myLogoIcon );
 
     long port;
