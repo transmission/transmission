@@ -139,12 +139,12 @@ void tr_bitfieldAddRange( tr_bitfield_t *, size_t begin, size_t end );
 void tr_bitfieldRemRange ( tr_bitfield_t*, size_t begin, size_t end );
 
 int    tr_bitfieldIsEmpty( const tr_bitfield_t* );
-int    tr_bitfieldHas( const tr_bitfield_t *, size_t bit );
 size_t tr_bitfieldCountTrueBits( const tr_bitfield_t* );
 
 tr_bitfield_t* tr_bitfieldNegate( tr_bitfield_t* );
 tr_bitfield_t* tr_bitfieldAnd( tr_bitfield_t*, const tr_bitfield_t* );
 
-
+#define tr_bitfieldHas(bitfield,nth) \
+    ( ( bitfield ) && ( (bitfield)->bits[(nth)>>3] & 128 >>( (nth) & 7 ) ) )
 
 #endif

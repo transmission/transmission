@@ -580,13 +580,6 @@ tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
 #define BIN(nth) ((nth>>3))
 #define BIT(nth) (1<<(7-(nth%8)))
 
-int
-tr_bitfieldHas( const tr_bitfield_t   * bitfield,
-                size_t                  nth )
-{
-    return bitfield && (bitfield->bits[ BIN(nth) ] & BIT(nth) );
-}
-
 void
 tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t nth )
 {
