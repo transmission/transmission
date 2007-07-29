@@ -347,6 +347,13 @@
 		A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileBrowserCell.m; path = macosx/FileBrowserCell.m; sourceTree = "<group>"; };
 		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
+		A22BC9AD0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A22BC9AE0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22BC9AF0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A22BC9B00C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A22BC9B10C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A22BC9B20C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A22BC9B30C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
@@ -1100,6 +1107,7 @@
 				German,
 				Greek,
 				Spanish,
+				Korean,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1376,6 +1384,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
+				A22BC9AE0C5C505200F5FB72 /* Korean */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1384,6 +1393,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
+				A22BC9B10C5C505200F5FB72 /* Korean */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1392,6 +1402,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A200B9630A227FD0007BBB1E /* English */,
+				A22BC9AF0C5C505200F5FB72 /* Korean */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1400,6 +1411,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2085E010C53C16F000BC3B7 /* English */,
+				A22BC9AD0C5C505200F5FB72 /* Korean */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1408,6 +1420,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A21567EC0A9A5034004DECD6 /* English */,
+				A22BC9B20C5C505300F5FB72 /* Korean */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1416,6 +1429,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A22A8D550AEEAFA5007E9CB9 /* English */,
+				A22BC9B00C5C505200F5FB72 /* Korean */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1424,6 +1438,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2912C530A2956E80097A0CA /* English */,
+				A22BC9B30C5C505300F5FB72 /* Korean */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
