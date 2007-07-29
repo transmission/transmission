@@ -22,9 +22,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h> /* unlink, stat */
+
 #include "transmission.h"
 #include "bencode.h"
 #include "http.h" /* tr_httpParseUrl */

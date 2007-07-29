@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <ctype.h> /* isprint */
+#include <string.h>
 
 #include "transmission.h"
 #include "trcompat.h"

@@ -8,9 +8,14 @@
  * the Transmission project.
  */
 
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include "transmission.h"
 #include "fdlimit.h"
 

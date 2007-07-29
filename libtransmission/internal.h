@@ -25,39 +25,31 @@
 #ifndef TR_INTERNAL_H
 #define TR_INTERNAL_H 1
 
-/* Standard headers used here and there.
-   That is probably ugly to put them all here, but it is sooo
-   convenient */
-#if ( defined( __unix__ ) || defined( unix ) ) && !defined( USG )
-#include <sys/param.h>
-#endif
-#include <stdio.h>
+
 #ifdef SYS_BEOS
 /* BeOS doesn't declare vasprintf in its headers, but actually
  * implements it */
-int vasprintf( char **, const char *, va_list );
+extern int vasprintf( char **, const char *, va_list );
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
+
 #ifndef __AMIGAOS4__ 
 #include <sys/resource.h>
 #endif
-#include <assert.h>
+
 #ifdef SYS_BEOS
 #  define socklen_t uint32_t
 #endif
+
 #ifdef BEOS_NETSERVER
 #  define in_port_t uint16_t
 #else
 #  include <arpa/inet.h>
 #endif
 
-#define TR_NAME                 "Transmission"
+#define TR_NAME "Transmission"
 
 #ifndef INADDR_NONE
-#define INADDR_NONE             0xffffffff
+#define INADDR_NONE 0xffffffff
 #endif
 
 #ifdef __GNUC__

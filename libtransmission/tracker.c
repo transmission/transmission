@@ -22,6 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

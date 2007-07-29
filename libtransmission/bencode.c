@@ -22,8 +22,12 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
 #include <ctype.h> /* isdigit, isprint */
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "transmission.h"
 #include "bencode.h"
 

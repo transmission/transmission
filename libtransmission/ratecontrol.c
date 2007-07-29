@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <string.h>
+
 #include "transmission.h"
 #include "shared.h"
 

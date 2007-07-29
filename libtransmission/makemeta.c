@@ -8,12 +8,16 @@
  * the Transmission project.
  */
 
+#include <assert.h>
+#include <errno.h>
 #include <math.h>
+#include <stdio.h> /* FILE, snprintf, stderr */
+#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <stdio.h> /* FILE, snprintf, stderr */
 
 #include "trcompat.h" /* for strlcpy */
 #include "transmission.h"

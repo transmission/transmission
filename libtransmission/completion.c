@@ -22,6 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
+#include <string.h>
+
 #include "transmission.h"
 #include "completion.h"
 

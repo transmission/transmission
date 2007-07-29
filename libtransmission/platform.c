@@ -22,6 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef SYS_BEOS
   #include <fs_info.h>
   #include <FindDirectory.h>
@@ -30,6 +35,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h> /* getuid getpid close */
+
 #include "transmission.h"
 
 #if !defined( SYS_BEOS ) && !defined( __AMIGAOS4__ )
