@@ -33,6 +33,7 @@ extern int vasprintf( char **, const char *, va_list );
 #endif
 
 #ifndef __AMIGAOS4__ 
+#include <sys/types.h>
 #include <sys/resource.h>
 #endif
 
