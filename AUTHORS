@@ -5,7 +5,7 @@ Lead Developers <transmission-dev@m0k.org>
 	Eric Petit <titer@m0k.org>  (Creator)
 	Josh Elsasser <josh@elsasser.org>  (Back-end, GTK+ interface, Daemon interface)
 	Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Back-end)
-	Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+ interface)
+	Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+, wxWidgets)
 	Bryan Varner <bryan@varnernet.com>  (BeOS interface)
 
 Project Contributors
@@ -24,6 +24,7 @@ GTK+:
 	Calorì Alessandro  (Italian)
 	Pierre-Henri Quelen  (French)
 	Robert-André Mauchin  (French)
+	Jan Geboers (Dutch)
 	Vicente Carro Fernandez  (Spanish)
 	Tomasz Dominikowski  (Polish)
 	Nickolay V. Shmyrev  (Russian)
