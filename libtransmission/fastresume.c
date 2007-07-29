@@ -254,6 +254,7 @@ tr_fastResumeSave( const tr_torrent_t * tor )
 
         assert( walk - buf == len );
         fastResumeWriteData( FR_ID_SPEED, buf, 1, walk-buf, file );
+        tr_free( buf );
     }
 
 
