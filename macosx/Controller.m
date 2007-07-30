@@ -1390,10 +1390,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fTableView reloadData];
     
     //update the global DL/UL rates
-    float downloadRate, uploadRate;
-    tr_torrentRates(fLib, & downloadRate, & uploadRate);
     if (![fStatusBar isHidden])
     {
+        float downloadRate, uploadRate;
+        tr_torrentRates(fLib, & downloadRate, & uploadRate);
+        
         [fTotalDLField setStringValue: [NSLocalizedString(@"Total DL: ", "Status bar -> total download")
                                         stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
         [fTotalULField setStringValue: [NSLocalizedString(@"Total UL: ", "Status bar -> total upload")

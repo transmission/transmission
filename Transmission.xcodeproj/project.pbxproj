@@ -354,6 +354,13 @@
 		A22BC9B10C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A22BC9B20C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A22BC9B30C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
+		A22BCA2D0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A22BCA2E0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22BCA2F0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A22BCA300C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A22BCA310C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A22BCA320C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A22BCA330C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
@@ -1108,6 +1115,7 @@
 				Greek,
 				Spanish,
 				Korean,
+				Italian,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1385,6 +1393,7 @@
 			children = (
 				089C165DFE840E0CC02AAC07 /* English */,
 				A22BC9AE0C5C505200F5FB72 /* Korean */,
+				A22BCA2E0C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1394,6 +1403,7 @@
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 				A22BC9B10C5C505200F5FB72 /* Korean */,
+				A22BCA310C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1403,6 +1413,7 @@
 			children = (
 				A200B9630A227FD0007BBB1E /* English */,
 				A22BC9AF0C5C505200F5FB72 /* Korean */,
+				A22BCA2F0C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1412,6 +1423,7 @@
 			children = (
 				A2085E010C53C16F000BC3B7 /* English */,
 				A22BC9AD0C5C505200F5FB72 /* Korean */,
+				A22BCA2D0C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1421,6 +1433,7 @@
 			children = (
 				A21567EC0A9A5034004DECD6 /* English */,
 				A22BC9B20C5C505300F5FB72 /* Korean */,
+				A22BCA320C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1430,6 +1443,7 @@
 			children = (
 				A22A8D550AEEAFA5007E9CB9 /* English */,
 				A22BC9B00C5C505200F5FB72 /* Korean */,
+				A22BCA300C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1439,6 +1453,7 @@
 			children = (
 				A2912C530A2956E80097A0CA /* English */,
 				A22BC9B30C5C505300F5FB72 /* Korean */,
+				A22BCA330C5D5CDA00F5FB72 /* Italian */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";

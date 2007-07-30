@@ -562,6 +562,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (![self isActive])
         return;
     
+    #warning doesn't work!
     tr_manualUpdate(fHandle);
     
     if (fAnnounceDate)
