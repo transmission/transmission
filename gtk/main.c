@@ -1019,6 +1019,16 @@ doAction ( const char * action_name, gpointer user_data )
     {
         askquit( data->core, data->wind, wannaquit, data );
     }
+    else if (!strcmp (action_name, "select-all"))
+    {
+        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        gtk_tree_selection_select_all( s );
+    }
+    else if (!strcmp (action_name, "unselect-all"))
+    {
+        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        gtk_tree_selection_unselect_all( s );
+    }
     else if (!strcmp (action_name, "edit-preferences"))
     {
         if( NULL == data->prefs )
