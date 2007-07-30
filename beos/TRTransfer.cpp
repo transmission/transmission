@@ -19,7 +19,7 @@ TRTransfer::TRTransfer(const char *fullpath, node_ref node, tr_torrent_t *torren
 	fStatusLock = new BLocker("Status Locker", true);
 	
 	fStatus = (tr_stat_t*)calloc(1, sizeof(tr_stat_t));
-	tr_info_t *info = tr_torrentInfo(torrent);
+	const tr_info_t *info = tr_torrentInfo(torrent);
 	fName = new BString("<unknown name>");
 	fName->SetTo(info->name);
 	
@@ -69,7 +69,7 @@ void TRTransfer::Update(BView *owner, const BFont *font) {
  * This is a thread-safe function, as all writing to the 
  * local fStatus requires a successful Lock on fStatusLock.
  */
-bool TRTransfer::UpdateStatus(tr_stat_t *stat, bool shade) {
+bool TRTransfer::UpdateStatus(const tr_stat_t *stat, bool shade) {
 	bool dirty = false;
 	if (fStatusLock->Lock()) {
 		if (fStatus->status != stat->status ||
@@ -123,7 +123,7 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 	if (fStatus != NULL && fStatusLock->Lock()) {
 		owner->DrawString(fName->String(), textLoc);
 		
-		if (fStatus->status & TR_STATUS_PAUSE ) {
+		if (fStatus->status & TR_STATUS_INACTIVE ) {
 			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_CHECK_WAIT ) {
 			sprintf(fTimeStr, "Waiting To Check Existing Files (%.2f %%)",
@@ -131,6 +131,10 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 		} else if (fStatus->status & TR_STATUS_CHECK ) {
 			sprintf(fTimeStr, "Checking Existing Files (%.2f %%)",
 			        100 * fStatus->percentDone);
+		} else if (fStatus->status & TR_STATUS_DONE ) {
+			sprintf(fTimeStr, "Done...");
+		} else if (fStatus->status & TR_STATUS_STOPPED ) {
+			sprintf(fTimeStr, "Stopped...");
 		} else if (fStatus->status & TR_STATUS_DOWNLOAD) {
 			if (fStatus->eta < 0 ) {
 				sprintf(fTimeStr, "--:--:-- Remaining (%.2f %%Complete)",
@@ -156,7 +160,7 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 			textLoc.Set(frame.left + 2, 
 			            frame.top + fBaselineOffset * 3 + (2 * fLineSpacing) + (fBaselineOffset / 2));
 			sprintf(fTransStr, "DL: %.2f KB/s (from %i of %i peer%s)",
-			        fStatus->rateDownload, fStatus->peersUploading, fStatus->peersTotal,
+			        fStatus->rateDownload, fStatus->peersSendingToUs, fStatus->peersTotal,
 			        (fStatus->peersTotal == 1) ? "" : "s");
 			owner->DrawString(fTransStr, textLoc);
 			

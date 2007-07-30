@@ -114,7 +114,7 @@ void TRWindow::LoadSettings() {
 			uploadLimit = 20;
 			prefs.SetInt32("transmission.uploadLimit", uploadLimit);
 		}
-		tr_setGlobalUploadLimit(engine, (int)uploadLimit);
+		tr_setGlobalSpeedLimit(engine, TR_UP, (int)uploadLimit);
 	}
 }
 
@@ -271,8 +271,8 @@ void TRWindow::MessageReceived(BMessage *msg) {
 	} else if (msg->what == TR_INFO) {
 		// Display an Info Window.
 		TRTransfer *transfer = dynamic_cast<TRTransfer*>(transfers->ItemAt(transfers->CurrentSelection()));
-		tr_stat_t *s = tr_torrentStat(transfer->GetTorrent());
-		tr_info_t *i = tr_torrentInfo(transfer->GetTorrent());
+		const tr_stat_t *s = tr_torrentStat(transfer->GetTorrent());
+		const tr_info_t *i = tr_torrentInfo(transfer->GetTorrent());
 		
 		TRInfoWindow *info = new TRInfoWindow(s, i, tr_torrentGetFolder(transfer->GetTorrent()));
 		info->MoveTo(Frame().LeftTop() + BPoint(20, 25));
@@ -365,8 +365,8 @@ bool TRWindow::QuitRequested() {
 		for (int i = 0; i < transfers->CountItems(); i++) {
 			strItem = "download.";
 			tr_torrent_t *torrent = (dynamic_cast<TRTransfer*>(transfers->ItemAt(i)))->GetTorrent(); 
-			tr_info_t *info = tr_torrentInfo(torrent);
-			tr_stat_t *stat = tr_torrentStat(torrent);
+			const tr_info_t *info = tr_torrentInfo(torrent);
+			const tr_stat_t *stat = tr_torrentStat(torrent);
 			
 			strItem << info->torrent << ".running";
 			if (stat->status & (TR_STATUS_CHECK_WAIT | TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)) {

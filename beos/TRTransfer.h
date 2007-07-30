@@ -20,7 +20,7 @@ public: // Construction and Controll methods.
 	inline const char* GetCachedPath() { return cachedPath->String(); };
 	inline tr_torrent_t* GetTorrent()  { return torrent; };
 	
-	bool UpdateStatus(tr_stat_t *stat, bool shade);
+	bool UpdateStatus(const tr_stat_t *stat, bool shade);
 	bool IsRunning();
 	
 public: // BListItem

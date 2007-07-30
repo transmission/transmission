@@ -30,6 +30,7 @@
 /* BeOS doesn't declare vasprintf in its headers, but actually
  * implements it */
 extern int vasprintf( char **, const char *, va_list );
+#include <signal.h>
 #endif
 
 #ifndef __AMIGAOS4__ 

@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 
-TRInfoWindow::TRInfoWindow(tr_stat_t *status, tr_info_t *info, const char *folder) : BWindow(BRect(0, 0, 250, 175), "Info", 
+TRInfoWindow::TRInfoWindow(const tr_stat_t *status, const tr_info_t *info, const char *folder) : BWindow(BRect(0, 0, 250, 175), "Info", 
                           B_FLOATING_WINDOW, B_ASYNCHRONOUS_CONTROLS | /*B_NOT_RESIZABLE*/  B_NOT_ZOOMABLE,
                           B_CURRENT_WORKSPACE)
 {

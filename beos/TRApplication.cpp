@@ -18,6 +18,13 @@
 #include <Resources.h>
 #include <Roster.h>
 
+#ifdef __BEOS__
+	// work-around to get rid of this stupid find_directory_r() on Zeta
+#ifdef find_directory
+#undef find_directory
+#endif
+#endif
+
 int main(int, char**) {
 	TRApplication *app = new TRApplication();
 	if (app->InitCheck() == B_OK) {
@@ -161,8 +168,12 @@ void TRApplication::AboutRequested() {
 	appInfo.GetVersionInfo(&vInfo, B_APP_VERSION_KIND);
 	
 	BString aboutMsg("");
-	aboutMsg << "Transmission\n"
+	aboutMsg << "Transmission : "	         
+	         << "Version " << LONG_VERSION_STRING << '\n'
+	         << "GUI : "
 	         << "Version " << vInfo.major << "." << vInfo.middle << "." << vInfo.minor << "\n"
+	         << "\nMade for BeOS/Haiku/Zeta by\n" 
+	         << "===========================\n"
 	         << "Eric Petit & Bryan Varner\n";
 	BAlert *aboutBox = new BAlert("About Transmission", aboutMsg.String(), "Close");
 	aboutBox->Go();
