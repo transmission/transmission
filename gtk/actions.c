@@ -30,6 +30,10 @@ static void action_cb ( GtkAction * a, gpointer user_data )
 #define GTK_STOCK_INFO GTK_STOCK_PROPERTIES
 #endif
 
+#if !GTK_CHECK_VERSION(2,10,0)
+#define GTK_STOCK_SELECT_ALL NULL
+#endif
+
 static GtkRadioActionEntry priority_toggle_entries[] =
 {
   { "priority-high", NULL, N_("_High"), NULL, NULL, TR_PRI_HIGH },
