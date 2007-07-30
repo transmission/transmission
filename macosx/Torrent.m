@@ -171,8 +171,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [fDateCompleted release];
     [fDateActivity release];
     
-    [fAnnounceDate release];
-    
     [fIcon release];
     [fIconFlipped release];
     [fIconSmall release];
@@ -559,20 +557,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (void) announce
 {
-    if (![self isActive])
-        return;
-    
-    #warning doesn't work!
     tr_manualUpdate(fHandle);
-    
-    if (fAnnounceDate)
-        [fAnnounceDate release];
-    fAnnounceDate = [[NSDate date] retain];
 }
 
-- (NSDate *) announceDate
+- (BOOL) canAnnounce
 {
-    return fAnnounceDate;
+    return tr_torrentCanManualUpdate(fHandle);
 }
 
 - (void) resetCache

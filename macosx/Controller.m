@@ -1324,8 +1324,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSDate * date;
     while ((torrent = [enumerator nextObject]))
     {
-        //time interval returned will be negative
-        if (!(date = [torrent announceDate]) || [date timeIntervalSinceNow] <= ANNOUNCE_WAIT_INTERVAL_SECONDS)
+        if ([torrent canAnnounce])
             [torrent announce];
     }
 }
@@ -2896,8 +2895,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         while ((torrent = [enumerator nextObject]))
         {
             //time interval returned will be negative
-            if ([torrent isActive] &&
-                    (!(date = [torrent announceDate]) || [date timeIntervalSinceNow] <= ANNOUNCE_WAIT_INTERVAL_SECONDS))
+            if ([torrent canAnnounce])
                 return YES;
         }
         return NO;

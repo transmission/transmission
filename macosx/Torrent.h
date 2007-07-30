@@ -37,8 +37,7 @@
     int fID;
     
     BOOL         fResumeOnWake;
-    NSDate       * fDateAdded, * fDateCompleted, * fAnnounceDate,
-                * fDateActivity;
+    NSDate       * fDateAdded, * fDateCompleted, * fDateActivity;
     
     BOOL        fUseIncompleteFolder;
     NSString    * fDownloadFolder, * fIncompleteFolder;
@@ -92,7 +91,7 @@
 - (void) wakeUp;
 
 - (void) announce;
-- (NSDate *) announceDate;
+- (BOOL) canAnnounce;
 
 - (void) resetCache;
 
