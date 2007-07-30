@@ -29,40 +29,40 @@
    The copyright notice above is copied from md5.h by L. Petet Deutsch
    <ghost@aladdin.com>. Thank him since I'm not a good speaker of English. :)
  */
-#ifndef	SHA1_H
-#define	SHA1_H
+#ifndef SHA1_H
+#define SHA1_H
 
-typedef	unsigned int	sha1_word_t;	/* 32bits unsigned integer */
-typedef unsigned char	sha1_byte_t;	/* 8bits unsigned integer */
-#define	BITS		8
+/* We use OpenSSL whenever possible, since it is likely to be more
+   optimized and it is ok to use it with a MIT-licensed application.
+   Otherwise, we use the included implementation by vi@nwr.jp. */
+#if defined(HAVE_OPENSSL) || defined(HAVE_LIBSSL)
 
-/* Define the state of SHA-1 algorithm */
-typedef struct {
-  sha1_byte_t	sha1_buf[64];	/* 512 bits */
-  int		sha1_count;	/* How many bytes are used */
-  sha1_word_t	sha1_size1;		/* Length counter Lower Word */
-  sha1_word_t	sha1_size2;		/* Length counter Upper Word */
-  sha1_word_t	sha1_h[5];		/* Hash output */
-} sha1_state_s;
-#define	SHA1_OUTPUT_SIZE	20	/* in bytes */
+    #undef SHA_DIGEST_LENGTH
+    #include <openssl/sha.h>
 
-/* External Functions */
+#else
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+    #include <stdint.h>
+    #define SHA1_OUTPUT_SIZE 20 /* in bytes */
 
-/* Initialize SHA-1 algorithm */
-void	sha1_init(sha1_state_s *pms);
+    typedef struct sha1_state_s sha1_state_t;
+    typedef uint32_t sha1_word_t;  /* 32bits unsigned integer */
+    typedef uint8_t sha1_byte_t;   /* 8bits unsigned integer */
 
-/* Append a string to SHA-1 algorithm */
-void	sha1_update(sha1_state_s *pms, sha1_byte_t *input_buffer, int length);
+    /* Initialize SHA-1 algorithm */
+    void sha1_init(sha1_state_t *pms);
 
-/* Finish the SHA-1 algorithm and return the hash */
-void	sha1_finish(sha1_state_s *pms, sha1_byte_t output[SHA1_OUTPUT_SIZE]);
+    /* Append a string to SHA-1 algorithm */
+    void sha1_update(sha1_state_t *pms, sha1_byte_t *input_buffer, int length);
 
-#ifdef	__cplusplus
-}
-#endif
+    /* Finish the SHA-1 algorithm and return the hash */
+    void sha1_finish(sha1_state_t *pms, sha1_byte_t output[SHA1_OUTPUT_SIZE]);
 
-#endif
+    /* Convenience version of the above */
+    void tr_sha1( const void * input_buffer, int length, unsigned char * output);
+
+    #define SHA1(in,inlen,out) tr_sha1(in,inlen,out)
+
+#endif /* ifndef HAVE_OPENSSL, HAVE_LIBSSL */
+
+#endif /* #ifndef SHA1_H */

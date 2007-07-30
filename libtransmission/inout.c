@@ -20,6 +20,7 @@
 #include "completion.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "sha1.h"
 #include "utils.h"
 
 struct tr_io_s

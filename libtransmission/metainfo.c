@@ -35,6 +35,7 @@
 #include "bencode.h"
 #include "http.h" /* tr_httpParseUrl */
 #include "metainfo.h"
+#include "sha1.h"
 #include "utils.h"
 
 #define TORRENT_MAX_SIZE (5*1024*1024)

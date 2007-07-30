@@ -33,11 +33,6 @@ extern int vasprintf( char **, const char *, va_list );
 #include <signal.h>
 #endif
 
-#ifndef __AMIGAOS4__ 
-#include <sys/types.h>
-#include <sys/resource.h>
-#endif
-
 #ifdef SYS_BEOS
 #  define socklen_t uint32_t
 #endif
@@ -62,23 +57,6 @@ typedef in_port_t tr_port_t;
 #else
 #  define UNUSED
 #  define PRINTF( fmt, args )
-#endif
-
-/* We use OpenSSL whenever possible, since it is likely to be more
-   optimized and it is ok to use it with a MIT-licensed application.
-   Otherwise, we use the included implementation by vi@nwr.jp. */
-#if defined(HAVE_OPENSSL) || defined(HAVE_LIBSSL)
-#  undef SHA_DIGEST_LENGTH
-#  include <openssl/sha.h>
-#else
-#  include "sha1.h"
-#  define SHA1(p,i,h) \
-   { \
-     sha1_state_s pms; \
-     sha1_init( &pms ); \
-     sha1_update( &pms, (sha1_byte_t *) p, i ); \
-     sha1_finish( &pms, (sha1_byte_t *) h ); \
-   }
 #endif
 
 #define TR_MAX_PEER_COUNT 60

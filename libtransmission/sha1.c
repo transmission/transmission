@@ -29,10 +29,24 @@
    The copyright notice above is copied from md5.h by L. Peter Deutsch
    <ghost@aladdin.com>. Thank him since I'm not a good speaker of English. :)
  */
+
 #include <string.h>
 #include "sha1.h"
 
+#if !defined(HAVE_OPENSSL) && !defined(HAVE_LIBSSL)
+
+#define BITS 8
 #define	INLINE	inline
+
+struct sha1_state_s
+{
+  sha1_byte_t   sha1_buf[64];   /* 512 bits */
+  int           sha1_count;     /* How many bytes are used */
+  sha1_word_t   sha1_size1;             /* Length counter Lower Word */
+  sha1_word_t   sha1_size2;             /* Length counter Upper Word */
+  sha1_word_t   sha1_h[5];              /* Hash output */
+};
+
 /*
  * Packing bytes to a word
  *
@@ -60,7 +74,7 @@ static void unpackup(sha1_byte_t *p, sha1_word_t q)
 /*
  * Processing a block
  */
-static inline void sha1_update_now(sha1_state_s *pms, sha1_byte_t *bp)
+static inline void sha1_update_now(sha1_state_t *pms, sha1_byte_t *bp)
 {
   sha1_word_t	tmp, a, b, c, d, e, w[16+16];
   int	i, s;
@@ -131,9 +145,9 @@ static inline void sha1_update_now(sha1_state_s *pms, sha1_byte_t *bp)
 }
 
 /*
- * Increment sha1_size1, sha1_size2 field of sha1_state_s
+ * Increment sha1_size1, sha1_size2 field of sha1_state_t
  */
-static INLINE void incr(sha1_state_s *pms, int v)
+static INLINE void incr(sha1_state_t *pms, int v)
 {
   sha1_word_t	q;
 
@@ -145,9 +159,9 @@ static INLINE void incr(sha1_state_s *pms, int v)
 }
 
 /*
- * Initialize sha1_state_s as FIPS specifies
+ * Initialize sha1_state_t as FIPS specifies
  */
-void	sha1_init(sha1_state_s *pms)
+void	sha1_init(sha1_state_t *pms)
 {
   memset(pms, 0, sizeof(*pms));
   pms->sha1_h[0] = 0x67452301;	/* Initialize H[0]-H[4] */
@@ -160,7 +174,7 @@ void	sha1_init(sha1_state_s *pms)
 /*
  * Fill block and update output when needed
  */
-void	sha1_update(sha1_state_s *pms, sha1_byte_t *bufp, int length)
+void	sha1_update(sha1_state_t *pms, sha1_byte_t *bufp, int length)
 {
   /* Is the buffer partially filled? */
   if(pms->sha1_count != 0) {
@@ -198,7 +212,7 @@ void	sha1_update(sha1_state_s *pms, sha1_byte_t *bufp, int length)
   }
 }
 
-void	sha1_finish(sha1_state_s *pms, sha1_byte_t output[SHA1_OUTPUT_SIZE])
+void	sha1_finish(sha1_state_t *pms, sha1_byte_t output[SHA1_OUTPUT_SIZE])
 {
   int i;
   sha1_byte_t buf[1];
@@ -233,3 +247,14 @@ void	sha1_finish(sha1_state_s *pms, sha1_byte_t output[SHA1_OUTPUT_SIZE])
     unpackup(output + i * sizeof(sha1_word_t), pms->sha1_h[i]);
   }
 }
+
+void
+tr_sha1( const void * input_buffer, int length, unsigned char * output)
+{
+    sha1_state_t pms;
+    sha1_init( &pms );
+    sha1_update( &pms, (sha1_byte_t *) input_buffer, length );
+    sha1_finish( &pms, (sha1_byte_t *) output );
+}
+
+#endif
