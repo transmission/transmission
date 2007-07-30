@@ -429,7 +429,7 @@ static int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
 
 static int parsePort( tr_peer_t * peer, uint8_t * p, int len )
 {
-    in_port_t port;
+    tr_port_t port;
 
     if( len != 2 )
     {
@@ -437,7 +437,7 @@ static int parsePort( tr_peer_t * peer, uint8_t * p, int len )
         return TR_ERROR_ASSERT;
     }
 
-    port = *( (in_port_t *) p );
+    port = *( (tr_port_t *) p );
     peer_dbg( "GET  port %d", ntohs( port ) );
 
     return TR_OK;

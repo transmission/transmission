@@ -33,11 +33,16 @@
 #include <arpa/inet.h>
 
 #include "transmission.h"
+#include "completion.h"
 #include "fastresume.h"
-#include "trcompat.h" /* for strlcpy */
+#include "inout.h"
 #include "metainfo.h"
 #include "net.h" /* tr_netNtop */
+#include "ratecontrol.h"
 #include "shared.h"
+#include "tracker.h"
+#include "trcompat.h" /* for strlcpy */
+#include "utils.h"
 
 /***
 ****  LOCKS
@@ -978,7 +983,7 @@ int tr_torrentAddCompact( tr_torrent_t * tor, int from,
                            uint8_t * buf, int count )
 {
     struct in_addr addr;
-    in_port_t port;
+    tr_port_t port;
     int i, added;
     tr_peer_t * peer;
 

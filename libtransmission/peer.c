@@ -36,9 +36,13 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "clients.h" /* for tr_clientForId() */
-#include "peertree.h"
+#include "completion.h"
+#include "inout.h"
 #include "list.h"
 #include "net.h"
+#include "peertree.h"
+#include "ratecontrol.h"
+#include "utils.h"
 
 /*****
 ******
@@ -131,7 +135,7 @@ struct tr_peer_s
     tr_torrent_t      * tor;
 
     struct in_addr      addr;
-    in_port_t           port;  /* peer's listening port, 0 if not known */
+    tr_port_t           port;  /* peer's listening port, 0 if not known */
 
 #define PEER_STATUS_IDLE        1 /* Need to connect */
 #define PEER_STATUS_CONNECTING  2 /* Trying to send handshake */
@@ -256,7 +260,7 @@ static void tr_htonl( uint32_t a, void * p )
  ***********************************************************************
  * Initializes a new peer.
  **********************************************************************/
-tr_peer_t * tr_peerInit( const struct in_addr * addr, in_port_t port,
+tr_peer_t * tr_peerInit( const struct in_addr * addr, tr_port_t port,
                          int s, int from )
 {
     tr_peer_t * peer;

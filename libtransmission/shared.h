@@ -27,6 +27,8 @@
 
 #include "transmission.h"
 
+typedef struct tr_shared_s tr_shared_t;
+
 /***********************************************************************
  * tr_sharedInit, tr_sharedClose
  ***********************************************************************

@@ -30,6 +30,7 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "utils.h"
 
 /* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
 #define LIST_SIZE   20 /* number of items to increment list/dict buffer by */

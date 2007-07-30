@@ -37,7 +37,9 @@
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"
+#include "ratecontrol.h"
 #include "shared.h"
+#include "utils.h"
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
    characters, where x is the major version number, y is the

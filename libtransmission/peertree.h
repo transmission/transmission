@@ -64,7 +64,7 @@ peertreeCount( tr_peertree_t * tree )
 }
 
 static tr_peertree_entry_t *
-peertreeGet( tr_peertree_t * tree, struct in_addr * addr, in_port_t port )
+peertreeGet( tr_peertree_t * tree, struct in_addr * addr, tr_port_t port )
 {
     tr_peertree_entry_t entry;
 
@@ -76,7 +76,7 @@ peertreeGet( tr_peertree_t * tree, struct in_addr * addr, in_port_t port )
 }
 
 static tr_peertree_entry_t *
-peertreeAdd( tr_peertree_t * tree, struct in_addr * addr, in_port_t port )
+peertreeAdd( tr_peertree_t * tree, struct in_addr * addr, tr_port_t port )
 {
     tr_peertree_entry_t * entry;
 

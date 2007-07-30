@@ -36,6 +36,7 @@
 #include <fcntl.h>
 
 #include "transmission.h"
+#include "utils.h"
 
 #define TR_MAX_OPEN_FILES 16 /* That is, real files, not sockets */
 #define TR_RESERVED_FDS   16 /* Number of sockets reserved for
@@ -355,7 +356,7 @@ int tr_fdSocketCreate( int type, int priority )
     return s;
 }
 
-int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
+int tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
 {
     int s = -1;
     unsigned len;

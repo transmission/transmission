@@ -41,6 +41,7 @@
 #include "net.h"
 #include "trcompat.h"
 #include "upnp.h"
+#include "utils.h"
 #include "xml.h"
 
 /* uncomment this to log requests and responses to ~/transmission-upnp.log */

@@ -25,7 +25,9 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "ratecontrol.h"
 #include "shared.h"
+#include "utils.h"
 
 #define GRANULARITY_MSEC 250
 #define SHORT_INTERVAL_MSEC 3000

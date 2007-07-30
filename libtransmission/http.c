@@ -37,6 +37,7 @@
 #include "http.h"
 #include "net.h"
 #include "trcompat.h"
+#include "utils.h"
 
 #define HTTP_PORT               80      /* default http port 80 */
 #define HTTP_TIMEOUT            60000   /* one minute http timeout */

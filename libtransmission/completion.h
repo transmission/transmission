@@ -27,6 +27,8 @@
 
 #include "transmission.h"
 
+typedef struct tr_completion_s tr_completion_t;
+
 tr_completion_t     * tr_cpInit( tr_torrent_t * );
 void                  tr_cpClose( tr_completion_t * );
 void                  tr_cpReset( tr_completion_t * );
@@ -44,7 +46,6 @@ void                  tr_cpInvalidateDND ( tr_completion_t * );
 /* Pieces */
 int                   tr_cpPieceHasAllBlocks( const tr_completion_t *, int piece );
 int                   tr_cpPieceIsComplete( const tr_completion_t *, int piece );
-const tr_bitfield_t * tr_cpPieceBitfield( const tr_completion_t* );
 void                  tr_cpPieceAdd( tr_completion_t *, int piece );
 void                  tr_cpPieceRem( tr_completion_t *, int piece );
 
@@ -53,11 +54,13 @@ void                  tr_cpDownloaderAdd( tr_completion_t *, int block );
 void                  tr_cpDownloaderRem( tr_completion_t *, int block );
 int                   tr_cpBlockIsComplete( const tr_completion_t *, int block );
 void                  tr_cpBlockAdd( tr_completion_t *, int block );
-const tr_bitfield_t * tr_cpBlockBitfield( const tr_completion_t * );
-void                  tr_cpBlockBitfieldSet( tr_completion_t *, tr_bitfield_t * );
+void                  tr_cpBlockBitfieldSet( tr_completion_t *, struct tr_bitfield_s * );
 float                 tr_cpPercentBlocksInPiece( const tr_completion_t * cp, int piece );
 /* Missing = we don't have it and we are not getting it from any peer yet */
 int                   tr_cpMissingBlocksForPiece( const tr_completion_t * cp, int piece );
 int                   tr_cpMissingBlockInPiece( const tr_completion_t *, int piece );
+
+const struct tr_bitfield_s * tr_cpPieceBitfield( const tr_completion_t* );
+const struct tr_bitfield_s * tr_cpBlockBitfield( const tr_completion_t * );
 
 #endif

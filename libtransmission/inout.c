@@ -17,7 +17,10 @@
 #include <unistd.h>
 
 #include "transmission.h"
+#include "completion.h"
 #include "fdlimit.h"
+#include "inout.h"
+#include "utils.h"
 
 struct tr_io_s
 {

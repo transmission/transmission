@@ -53,7 +53,9 @@
 #include <unistd.h>
 
 #include "transmission.h"
+#include "completion.h"
 #include "fastresume.h"
+#include "utils.h"
 
 /* time_t can be 32 or 64 bits... for consistency we'll hardwire 64 */ 
 typedef uint64_t tr_time_t; 

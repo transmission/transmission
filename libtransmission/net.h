@@ -46,13 +46,13 @@ void           tr_netResolveClose( tr_resolve_t * );
     tr_netOpen( (addr), (port), SOCK_STREAM, (priority) )
 #define tr_netOpenUDP( addr, port, priority ) \
     tr_netOpen( (addr), (port), SOCK_DGRAM, (priority) )
-int  tr_netOpen    ( const struct in_addr * addr, in_port_t port, int type,
+int  tr_netOpen    ( const struct in_addr * addr, tr_port_t port, int type,
                      int priority );
 int  tr_netMcastOpen( int port, const struct in_addr * addr );
 #define tr_netBindTCP( port ) tr_netBind( (port), SOCK_STREAM )
 #define tr_netBindUDP( port ) tr_netBind( (port), SOCK_DGRAM )
 int  tr_netBind    ( int port, int type );
-int  tr_netAccept  ( int s, struct in_addr *, in_port_t * );
+int  tr_netAccept  ( int s, struct in_addr *, tr_port_t * );
 void tr_netClose   ( int s );
 
 #define TR_NET_BLOCK 0x80000000

@@ -42,10 +42,12 @@ extern int vasprintf( char **, const char *, va_list );
 #  define socklen_t uint32_t
 #endif
 
-#ifdef BEOS_NETSERVER
-#  define in_port_t uint16_t
+#if defined(BEOS_NETSERVER) || defined(__MINGW__)
+#include <stdint.h>
+typedef uint16_t tr_port_t;
 #else
-#  include <arpa/inet.h>
+#include <arpa/inet.h>
+typedef in_port_t tr_port_t;
 #endif
 
 #define TR_NAME "Transmission"
@@ -81,17 +83,10 @@ extern int vasprintf( char **, const char *, va_list );
 
 #define TR_MAX_PEER_COUNT 60
 
-typedef struct tr_completion_s tr_completion_t;
-typedef struct tr_shared_s tr_shared_t;
-
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
-#include "platform.h"
-#include "tracker.h"
+#include "platform.h" /* thread, lock */
 #include "peer.h"
-#include "inout.h"
-#include "ratecontrol.h"
-#include "utils.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -106,7 +101,7 @@ void tr_torrentResetTransferStats( tr_torrent_t * );
 
 int tr_torrentAddCompact( tr_torrent_t * tor, int from,
                            uint8_t * buf, int count );
-int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer );
+int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * );
 
 void tr_torrentSetHasPiece( tr_torrent_t * tor, int pieceIndex, int has );
 
@@ -158,9 +153,9 @@ struct tr_torrent_s
 
     tr_speedlimit_t    uploadLimitMode;
     tr_speedlimit_t    downloadLimitMode;
-    tr_ratecontrol_t * upload;
-    tr_ratecontrol_t * download;
-    tr_ratecontrol_t * swarmspeed;
+    struct tr_ratecontrol_s * upload;
+    struct tr_ratecontrol_s * download;
+    struct tr_ratecontrol_s * swarmspeed;
 
     int               error;
     char              errorString[128];
@@ -187,17 +182,17 @@ struct tr_torrent_s
     int               blockCountInPiece;
     int               blockCountInLastPiece;
     
-    tr_completion_t * completion;
+    struct tr_completion_s * completion;
 
     volatile char     dieFlag;
-    tr_bitfield_t   * uncheckedPieces;
+    struct tr_bitfield_s   * uncheckedPieces;
     run_status_t      runStatus;
     cp_status_t       cpStatus;
     tr_thread_t     * thread;
     tr_rwlock_t     * lock;
 
-    tr_tracker_t    * tracker;
-    tr_io_t         * io;
+    struct tr_tracker_s    * tracker;
+    struct tr_io_s         * io;
     uint64_t          startDate;
     uint64_t          stopDate;
     char              ioLoaded;
@@ -220,9 +215,6 @@ struct tr_torrent_s
     tr_torrent_t    * next;
 };
 
-#include "utils.h"
-#include "completion.h"
-
 struct tr_handle_s
 {
     int                torrentCount;
@@ -232,11 +224,11 @@ struct tr_handle_s
     int                isPortSet;
 
     char               useUploadLimit;
-    tr_ratecontrol_t * upload;
     char               useDownloadLimit;
-    tr_ratecontrol_t * download;
+    struct tr_ratecontrol_s * upload;
+    struct tr_ratecontrol_s * download;
 
-    tr_shared_t      * shared;
+    struct tr_shared_s      * shared;
 
     char           key[TR_KEY_LEN+1];
 

@@ -37,6 +37,7 @@
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"
+#include "utils.h"
 
 
 /***********************************************************************
@@ -271,7 +272,7 @@ static int createSocket( int type, int priority )
     return makeSocketNonBlocking( s );
 }
 
-int tr_netOpen( const struct in_addr * addr, in_port_t port,
+int tr_netOpen( const struct in_addr * addr, tr_port_t port,
                 int type, int priority )
 {
     int s;
@@ -372,7 +373,7 @@ int tr_netBind( int port, int type )
     return s;
 }
 
-int tr_netAccept( int b, struct in_addr * addr, in_port_t * port )
+int tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
 {
     int s;
     if( ( s = tr_fdSocketAccept( b, addr, port ) ) < 0 )

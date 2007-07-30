@@ -34,9 +34,12 @@
 #include "transmission.h"
 #include "bencode.h"
 #include "bsdqueue.h"
+#include "completion.h"
 #include "http.h"
 #include "net.h"
 #include "shared.h"
+#include "tracker.h"
+#include "utils.h"
 
 /* Users aren't allowed to make a manual announce more often than this. */
 static const int MANUAL_ANNOUNCE_INTERVAL_MSEC = (60*1000);
@@ -1109,7 +1112,7 @@ static uint8_t *
 parseOriginalPeers( benc_val_t * bePeers, int * peerCount )
 {
     struct in_addr addr;
-    in_port_t      port;
+    tr_port_t      port;
     uint8_t      * peerCompact;
     benc_val_t   * peer, * addrval, * portval;
     int            ii, count;

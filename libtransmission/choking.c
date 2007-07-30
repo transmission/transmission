@@ -28,6 +28,7 @@
 
 #include "transmission.h"
 #include "choking.h"
+#include "utils.h"
 
 #ifndef HAVE_LRINTF
 #  define lrintf(a) ((int)(0.5+(a)))

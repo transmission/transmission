@@ -38,6 +38,7 @@
 #include "peer.h"
 #include "shared.h"
 #include "upnp.h"
+#include "utils.h"
 
 /* Maximum number of peers that we keep in our local list */
 /* This is an arbitrary number, but it seems to work well */

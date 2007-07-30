@@ -40,7 +40,7 @@ enum
 /**
  * Returns a bitwise-or'ed set of the data loaded from fastresume
  */
-uint64_t tr_fastResumeLoad( tr_torrent_t   * tor,
-                            tr_bitfield_t  * uncheckedPieces );
+uint64_t tr_fastResumeLoad( tr_torrent_t         * tor,
+                            struct tr_bitfield_s * uncheckedPieces );
 
 #endif
