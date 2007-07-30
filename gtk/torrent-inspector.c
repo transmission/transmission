@@ -29,7 +29,6 @@
 #include <gtk/gtk.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/platform.h> /* for tr_getTorrentsDirectory */
 
 #include "actions.h"
 #include "tr_torrent.h"
@@ -415,7 +414,7 @@ fmtpeercount (GtkWidget * l, int count)
     gtk_label_set_text( GTK_LABEL(l), _("?") );
   } else {
     char str[16];
-    snprintf( str, sizeof str, "%i", count );
+    g_snprintf( str, sizeof str, "%i", count );
     gtk_label_set_text( GTK_LABEL(l), str );
   }
 }
@@ -688,7 +687,6 @@ static GtkWidget* info_page_new (tr_torrent_t * tor)
   GtkWidget *l, *w, *fr;
   char *pch;
   char *dname, *bname;
-  const char * default_torrents_dir;
   char buf[256];
   char name[128];
   const char * namefmt = "%s:";
@@ -761,11 +759,8 @@ static GtkWidget* info_page_new (tr_torrent_t * tor)
     hig_workarea_add_row (t, &row, name, l, NULL); 
 
     g_snprintf (name, sizeof(name), namefmt, _("Torrent File Path"));
-    default_torrents_dir = tr_getTorrentsDirectory();
     dname = g_path_get_dirname (info->torrent);
-    l = gtk_label_new (strstr(dname,default_torrents_dir)==dname
-      ? _("Transmission Support Folder")
-      : dname);
+    l = gtk_label_new ( dname );
     hig_workarea_add_row (t, &row, name, l, NULL); 
     g_free (dname);
 

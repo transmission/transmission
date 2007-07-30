@@ -678,7 +678,7 @@ tr_core_set_pref_int( TrCore * self, int id, int val )
 {
     char buf[32];
 
-    snprintf( buf, sizeof buf, "%i", val );
+    g_snprintf( buf, sizeof buf, "%i", val );
 
     tr_core_set_pref( self, id, buf );
 }

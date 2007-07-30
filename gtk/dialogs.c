@@ -259,7 +259,7 @@ fmtpeercount( GtkLabel * label, int count )
     }
     else
     {
-        snprintf( str, sizeof str, "%i", count );
+        g_snprintf( str, sizeof str, "%i", count );
         gtk_label_set_text( label, str );
     }
 }
