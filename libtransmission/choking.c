@@ -35,7 +35,7 @@
 
 struct tr_choking_s
 {
-    tr_lock_t     lock;
+    tr_lock_t   * lock;
     tr_handle_t * h;
     int           slots;
 };
@@ -47,14 +47,14 @@ tr_choking_t * tr_chokingInit( tr_handle_t * h )
     c        = tr_new0( tr_choking_t, 1 );
     c->h     = h;
     c->slots = 4242;
-    tr_lockInit( &c->lock );
+    c->lock  = tr_lockNew( );
 
     return c;
 }
 
 void tr_chokingSetLimit( tr_choking_t * c, int limit )
 {
-    tr_lockLock( &c->lock );
+    tr_lockLock( c->lock );
     if( limit < 0 )
         c->slots = 4242;
     else
@@ -65,7 +65,7 @@ void tr_chokingSetLimit( tr_choking_t * c, int limit )
             50  KB/s -> 10 * 5.00 KB/s
             100 KB/s -> 14 * 7.14 KB/s */
         c->slots = lrintf( sqrt( 2 * limit ) );
-    tr_lockUnlock( &c->lock );
+    tr_lockUnlock( c->lock );
 }
 
 #define sortPeersAscending(a,ac,z,zc,n,nc)  sortPeers(a,ac,z,zc,n,nc,0)
@@ -137,7 +137,7 @@ void tr_chokingPulse( tr_choking_t * c )
     tr_torrent_t * tor;
     uint64_t now = tr_date();
 
-    tr_lockLock( &c->lock );
+    tr_lockLock( c->lock );
 
     /* Lock all torrents and get the total number of peers */
     peersTotalCount = 0;
@@ -310,11 +310,11 @@ void tr_chokingPulse( tr_choking_t * c )
     for( tor = c->h->torrentList; tor; tor = tor->next )
         tr_torrentWriterUnlock( tor );
 
-    tr_lockUnlock( &c->lock );
+    tr_lockUnlock( c->lock );
 }
 
 void tr_chokingClose( tr_choking_t * c )
 {
-    tr_lockClose( &c->lock );
+    tr_lockFree( c->lock );
     tr_free( c );
 }

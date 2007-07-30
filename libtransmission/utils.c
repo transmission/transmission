@@ -50,11 +50,8 @@ static tr_msg_list_t ** messageQueueTail = &messageQueue;
 
 void tr_msgInit( void )
 {
-    if( NULL == messageLock )
-    {
-        messageLock = calloc( 1, sizeof( *messageLock ) );
-        tr_lockInit( messageLock );
-    }
+    if( !messageLock )
+         messageLock = tr_lockNew( );
 }
 
 void tr_setMessageLevel( int level )

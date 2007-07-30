@@ -30,13 +30,382 @@
 #ifdef SYS_BEOS
   #include <fs_info.h>
   #include <FindDirectory.h>
+  #include <kernel/OS.h>
+  #define BEOS_MAX_THREADS 256
+#else
+  #include <pthread.h>
 #endif
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "utils.h"
+
+/***
+****  THREADS
+***/
+
+struct tr_thread_s
+{
+    void          (* func ) ( void * );
+    void           * arg;
+    char           * name;
+
+#ifdef SYS_BEOS
+    thread_id        thread;
+#else
+    pthread_t        thread;
+#endif
+
+};
+
+static void
+ThreadFunc( void * _t )
+{
+    tr_thread_t * t = _t;
+    char* name = tr_strdup( t->name );
+
+#ifdef SYS_BEOS
+    /* This is required because on BeOS, SIGINT is sent to each thread,
+       which kills them not nicely */
+    signal( SIGINT, SIG_IGN );
+#endif
+
+    tr_dbg( "Thread '%s' started", name );
+    t->func( t->arg );
+    tr_dbg( "Thread '%s' exited", name );
+    tr_free( name );
+}
+
+tr_thread_t *
+tr_threadNew( void (*func)(void *),
+              void * arg,
+              const char * name )
+{
+    tr_thread_t * t = tr_new0( tr_thread_t, 1 );
+    t->func = func;
+    t->arg  = arg;
+    t->name = tr_strdup( name );
+
+#ifdef SYS_BEOS
+    t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
+    resume_thread( t->thread );
+#else
+    pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
+#endif
+
+    return t;
+}
+
+void
+tr_threadJoin( tr_thread_t * t )
+{
+    if( t != NULL )
+    {
+#ifdef SYS_BEOS
+        long exit;
+        wait_for_thread( t->thread, &exit );
+#else
+        pthread_join( t->thread, NULL );
+#endif
+
+        tr_dbg( "Thread '%s' joined", t->name );
+        tr_free( t->name );
+        t->name = NULL;
+        t->func = NULL;
+        tr_free( t );
+    }
+}
+
+/***
+****  LOCKS
+***/
+
+struct tr_lock_s
+{
+#ifdef SYS_BEOS
+    sem_id lock;
+#else
+    pthread_mutex_t lock;
+#endif
+};
+
+tr_lock_t*
+tr_lockNew( void )
+{
+    tr_lock_t * l = tr_new0( tr_lock_t, 1 );
+
+#ifdef SYS_BEOS
+    l->lock = create_sem( 1, "" );
+#else
+    pthread_mutex_init( &l->lock, NULL );
+#endif
+
+    return l;
+}
+
+void
+tr_lockFree( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    delete_sem( l->lock );
+#else
+    pthread_mutex_destroy( &l->lock );
+#endif
+    tr_free( l );
+}
+
+int
+tr_lockTryLock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    return acquire_sem_etc( l->lock, 1, B_RELATIVE_TIMEOUT, 0 );
+#else
+    /* success on zero! */
+    return pthread_mutex_trylock( &l->lock );
+#endif
+}
+
+void
+tr_lockLock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    acquire_sem( l->lock );
+#else
+    pthread_mutex_lock( &l->lock );
+#endif
+}
+
+void
+tr_lockUnlock( tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    release_sem( l->lock );
+#else
+    pthread_mutex_unlock( &l->lock );
+#endif
+}
+
+/***
+****  RW LOCK
+***/
+
+struct tr_rwlock_s
+{
+    tr_lock_t * lock;
+    tr_cond_t * readCond;
+    tr_cond_t * writeCond;
+    size_t readCount;
+    size_t wantToRead;
+    size_t wantToWrite;
+    int haveWriter;
+};
+
+static void
+tr_rwSignal( tr_rwlock_t * rw )
+{
+  if ( rw->wantToWrite )
+    tr_condSignal( rw->writeCond );
+  else if ( rw->wantToRead )
+    tr_condBroadcast( rw->readCond );
+}
+
+tr_rwlock_t*
+tr_rwNew ( void )
+{
+    tr_rwlock_t * rw = tr_new0( tr_rwlock_t, 1 );
+    rw->lock = tr_lockNew( );
+    rw->readCond = tr_condNew( );
+    rw->writeCond = tr_condNew( );
+    return rw;
+}
+
+void
+tr_rwReaderLock( tr_rwlock_t * rw )
+{
+    tr_lockLock( rw->lock );
+    rw->wantToRead++;
+    while( rw->haveWriter || rw->wantToWrite )
+        tr_condWait( rw->readCond, rw->lock );
+    rw->wantToRead--;
+    rw->readCount++;
+    tr_lockUnlock( rw->lock );
+}
+
+int
+tr_rwReaderTrylock( tr_rwlock_t * rw )
+{
+    int ret = FALSE;
+    tr_lockLock( rw->lock );
+    if ( !rw->haveWriter && !rw->wantToWrite ) {
+        rw->readCount++;
+        ret = TRUE;
+    }
+    tr_lockUnlock( rw->lock );
+    return ret;
+
+}
+
+void
+tr_rwReaderUnlock( tr_rwlock_t * rw )
+{
+    tr_lockLock( rw->lock );
+    --rw->readCount;
+    if( !rw->readCount )
+        tr_rwSignal( rw );
+    tr_lockUnlock( rw->lock );
+}
+
+void
+tr_rwWriterLock( tr_rwlock_t * rw )
+{
+    tr_lockLock( rw->lock );
+    rw->wantToWrite++;
+    while( rw->haveWriter || rw->readCount )
+        tr_condWait( rw->writeCond, rw->lock );
+    rw->wantToWrite--;
+    rw->haveWriter = TRUE;
+    tr_lockUnlock( rw->lock );
+}
+
+int
+tr_rwWriterTrylock( tr_rwlock_t * rw )
+{
+    int ret = FALSE;
+    tr_lockLock( rw->lock );
+    if( !rw->haveWriter && !rw->readCount )
+        ret = rw->haveWriter = TRUE;
+    tr_lockUnlock( rw->lock );
+    return ret;
+}
+void
+tr_rwWriterUnlock( tr_rwlock_t * rw )
+{
+    tr_lockLock( rw->lock );
+    rw->haveWriter = FALSE;
+    tr_rwSignal( rw );
+    tr_lockUnlock( rw->lock );
+}
+
+void
+tr_rwFree( tr_rwlock_t * rw )
+{
+    tr_condFree( rw->writeCond );
+    tr_condFree( rw->readCond );
+    tr_lockFree( rw->lock );
+    tr_free( rw );
+}
+
+/***
+****  COND
+***/
+
+struct tr_cond_s
+{
+#ifdef SYS_BEOS
+    sem_id sem;
+    thread_id theads[BEOS_MAX_THREADS];
+    int start, end;
+#else
+    pthread_cond_t cond;
+#endif
+};
+
+tr_cond_t*
+tr_condNew( void )
+{
+    tr_cond_t * c = tr_new0( tr_cond_t, 1 );
+#ifdef SYS_BEOS
+    c->sem = create_sem( 1, "" );
+    c->start = 0;
+    c->end = 0;
+#else
+    pthread_cond_init( &c->cond, NULL );
+#endif
+    return c;
+}
+
+void tr_condWait( tr_cond_t * c, tr_lock_t * l )
+{
+#ifdef SYS_BEOS
+    /* Keep track of that thread */
+    acquire_sem( c->sem );
+    c->threads[c->end] = find_thread( NULL );
+    c->end = ( c->end + 1 ) % BEOS_MAX_THREADS;
+    assert( c->end != c->start ); /* We hit BEOS_MAX_THREADS, arggh */
+    release_sem( c->sem );
+
+    release_sem( *l );
+    suspend_thread( find_thread( NULL ) ); /* Wait for signal */
+    acquire_sem( *l );
+#else
+    pthread_cond_wait( &c->cond, &l->lock );
+#endif
+}
+
+#ifdef SYS_BEOS
+static int condTrySignal( tr_cond_t * c )
+{
+    if( c->start == c->end )
+        return 1;
+
+    for( ;; )
+    {
+        thread_info info;
+        get_thread_info( c->threads[c->start], &info );
+        if( info.state == B_THREAD_SUSPENDED )
+        {
+            resume_thread( c->threads[c->start] );
+            c->start = ( c->start + 1 ) % BEOS_MAX_THREADS;
+            break;
+        }
+        /* The thread is not suspended yet, which can happen since
+         * tr_condWait does not atomically suspends after releasing
+         * the semaphore. Wait a bit and try again. */
+        snooze( 5000 );
+    }
+    return 0;
+}
+#endif
+void tr_condSignal( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    acquire_sem( c->sem );
+    condTrySignal( c );
+    release_sem( c->sem );
+#else
+    pthread_cond_signal( &c->cond );
+#endif
+}
+void tr_condBroadcast( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    acquire_sem( c->sem );
+    while( !condTrySignal( c ) );
+    release_sem( c->sem );
+#else
+    pthread_cond_broadcast( &c->cond );
+#endif
+}
+
+void
+tr_condFree( tr_cond_t * c )
+{
+#ifdef SYS_BEOS
+    delete_sem( c->sem );
+#else
+    pthread_cond_destroy( &c->cond );
+#endif
+    tr_free( c );
+}
+
+
+/***
+****  PATHS
+***/
 
 #if !defined( SYS_BEOS ) && !defined( __AMIGAOS4__ )
 
@@ -204,190 +573,11 @@ tr_getTorrentsDirectory( void )
     return buf;
 }
 
-static void ThreadFunc( void * _t )
-{
-    tr_thread_t * t = _t;
-    char* name = tr_strdup( t->name );
+/***
+****  SOCKETS
+***/
 
-#ifdef SYS_BEOS
-    /* This is required because on BeOS, SIGINT is sent to each thread,
-       which kills them not nicely */
-    signal( SIGINT, SIG_IGN );
-#endif
-
-    tr_dbg( "Thread '%s' started", name );
-    t->func( t->arg );
-    tr_dbg( "Thread '%s' exited", name );
-    tr_free( name );
-}
-
-void tr_threadCreate( tr_thread_t * t,
-                      void (*func)(void *), void * arg,
-                      const char * name )
-{
-    t->func = func;
-    t->arg  = arg;
-    t->name = tr_strdup( name );
-#ifdef SYS_BEOS
-    t->thread = spawn_thread( (void *) ThreadFunc, name,
-                              B_NORMAL_PRIORITY, t );
-    resume_thread( t->thread );
-#else
-    pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
-#endif
-}
-
-const tr_thread_t THREAD_EMPTY = { NULL, NULL, NULL, 0 };
-
-void tr_threadJoin( tr_thread_t * t )
-{
-    if( t->func != NULL )
-    {
-#ifdef SYS_BEOS
-        long exit;
-        wait_for_thread( t->thread, &exit );
-#else
-        pthread_join( t->thread, NULL );
-#endif
-        tr_dbg( "Thread '%s' joined", t->name );
-        tr_free( t->name );
-        t->name = NULL;
-        t->func = NULL;
-    }
-}
-
-void tr_lockInit( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    *l = create_sem( 1, "" );
-#else
-    pthread_mutex_init( l, NULL );
-#endif
-}
-
-void tr_lockClose( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    delete_sem( *l );
-#else
-    pthread_mutex_destroy( l );
-#endif
-}
-
-int tr_lockTryLock( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    return acquire_sem_etc( *l, 1, B_RELATIVE_TIMEOUT, 0 );
-#else
-    /* success on zero! */
-    return pthread_mutex_trylock( l );
-#endif
-}
-
-void tr_lockLock( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    acquire_sem( *l );
-#else
-    pthread_mutex_lock( l );
-#endif
-}
-
-void tr_lockUnlock( tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    release_sem( *l );
-#else
-    pthread_mutex_unlock( l );
-#endif
-}
-
-
-void tr_condInit( tr_cond_t * c )
-{
-#ifdef SYS_BEOS
-    c->sem = create_sem( 1, "" );
-    c->start = 0;
-    c->end = 0;
-#else
-    pthread_cond_init( c, NULL );
-#endif
-}
-
-void tr_condWait( tr_cond_t * c, tr_lock_t * l )
-{
-#ifdef SYS_BEOS
-    /* Keep track of that thread */
-    acquire_sem( c->sem );
-    c->threads[c->end] = find_thread( NULL );
-    c->end = ( c->end + 1 ) % BEOS_MAX_THREADS;
-    assert( c->end != c->start ); /* We hit BEOS_MAX_THREADS, arggh */
-    release_sem( c->sem );
-
-    release_sem( *l );
-    suspend_thread( find_thread( NULL ) ); /* Wait for signal */
-    acquire_sem( *l );
-#else
-    pthread_cond_wait( c, l );
-#endif
-}
-
-#ifdef SYS_BEOS
-static int condTrySignal( tr_cond_t * c )
-{
-    if( c->start == c->end )
-        return 1;
-
-    for( ;; )
-    {
-        thread_info info;
-        get_thread_info( c->threads[c->start], &info );
-        if( info.state == B_THREAD_SUSPENDED )
-        {
-            resume_thread( c->threads[c->start] );
-            c->start = ( c->start + 1 ) % BEOS_MAX_THREADS;
-            break;
-        }
-        /* The thread is not suspended yet, which can happen since
-         * tr_condWait does not atomically suspends after releasing
-         * the semaphore. Wait a bit and try again. */
-        snooze( 5000 );
-    }
-    return 0;
-}
-#endif
-void tr_condSignal( tr_cond_t * c )
-{
-#ifdef SYS_BEOS
-    acquire_sem( c->sem );
-    condTrySignal( c );
-    release_sem( c->sem );
-#else
-    pthread_cond_signal( c );
-#endif
-}
-void tr_condBroadcast( tr_cond_t * c )
-{
-#ifdef SYS_BEOS
-    acquire_sem( c->sem );
-    while( !condTrySignal( c ) );
-    release_sem( c->sem );
-#else
-    pthread_cond_broadcast( c );
-#endif
-}
-
-void tr_condClose( tr_cond_t * c )
-{
-#ifdef SYS_BEOS
-    delete_sem( c->sem );
-#else
-    pthread_cond_destroy( c );
-#endif
-}
-
-
-#if defined( BSD )
+#ifdef BSD
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -759,100 +949,3 @@ tr_getDefaultRoute( struct in_addr * addr UNUSED )
 }
 
 #endif
-
-/***
-****
-***/
-
-static void
-tr_rwSignal( tr_rwlock_t * rw )
-{
-  if ( rw->wantToWrite )
-    tr_condSignal( &rw->writeCond );
-  else if ( rw->wantToRead )
-    tr_condBroadcast( &rw->readCond );
-}
-
-void
-tr_rwInit ( tr_rwlock_t * rw )
-{
-    memset( rw, 0, sizeof(tr_rwlock_t) );
-    tr_lockInit( &rw->lock );
-    tr_condInit( &rw->readCond );
-    tr_condInit( &rw->writeCond );
-}
-
-void
-tr_rwReaderLock( tr_rwlock_t * rw )
-{
-    tr_lockLock( &rw->lock );
-    rw->wantToRead++;
-    while( rw->haveWriter || rw->wantToWrite )
-        tr_condWait( &rw->readCond, &rw->lock );
-    rw->wantToRead--;
-    rw->readCount++;
-    tr_lockUnlock( &rw->lock );
-}
-
-int
-tr_rwReaderTrylock( tr_rwlock_t * rw )
-{
-    int ret = FALSE;
-    tr_lockLock( &rw->lock );
-    if ( !rw->haveWriter && !rw->wantToWrite ) {
-        rw->readCount++;
-        ret = TRUE;
-    }
-    tr_lockUnlock( &rw->lock );
-    return ret;
-
-}
-
-void
-tr_rwReaderUnlock( tr_rwlock_t * rw )
-{
-    tr_lockLock( &rw->lock );
-    --rw->readCount;
-    if( !rw->readCount )
-        tr_rwSignal( rw );
-    tr_lockUnlock( &rw->lock );
-}
-
-void
-tr_rwWriterLock( tr_rwlock_t * rw )
-{
-    tr_lockLock( &rw->lock );
-    rw->wantToWrite++;
-    while( rw->haveWriter || rw->readCount )
-        tr_condWait( &rw->writeCond, &rw->lock );
-    rw->wantToWrite--;
-    rw->haveWriter = TRUE;
-    tr_lockUnlock( &rw->lock );
-}
-
-int
-tr_rwWriterTrylock( tr_rwlock_t * rw )
-{
-    int ret = FALSE;
-    tr_lockLock( &rw->lock );
-    if( !rw->haveWriter && !rw->readCount )
-        ret = rw->haveWriter = TRUE;
-    tr_lockUnlock( &rw->lock );
-    return ret;
-}
-void
-tr_rwWriterUnlock( tr_rwlock_t * rw )
-{
-    tr_lockLock( &rw->lock );
-    rw->haveWriter = FALSE;
-    tr_rwSignal( rw );
-    tr_lockUnlock( &rw->lock );
-}
-
-void
-tr_rwClose( tr_rwlock_t * rw )
-{
-    tr_condClose( &rw->writeCond );
-    tr_condClose( &rw->readCond );
-    tr_lockClose( &rw->lock );
-}

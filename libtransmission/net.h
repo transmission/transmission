@@ -34,7 +34,7 @@ int tr_netResolve( const char *, struct in_addr * );
 typedef struct tr_resolve_s tr_resolve_t;
 void           tr_netResolveThreadInit();
 void           tr_netResolveThreadClose();
-tr_resolve_t * tr_netResolveInit( const char * );
+tr_resolve_t * tr_netResolveInit( const char * address );
 tr_tristate_t  tr_netResolvePulse( tr_resolve_t *, struct in_addr * );
 void           tr_netResolveClose( tr_resolve_t * );
 

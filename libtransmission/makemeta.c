@@ -407,20 +407,15 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder_t * builder )
 
 static tr_metainfo_builder_t * queue = NULL;
 
-static int workerIsRunning = 0;
-
-static tr_thread_t workerThread;
+static tr_thread_t * workerThread = NULL;
 
 static tr_lock_t* getQueueLock( tr_handle_t * h )
 {
     static tr_lock_t * lock = NULL;
 
     tr_sharedLock( h->shared );
-    if( lock == NULL )
-    {
-        lock = tr_new0( tr_lock_t, 1 );
-        tr_lockInit( lock );
-    }
+    if( !lock )
+         lock = tr_lockNew( );
     tr_sharedUnlock( h->shared );
 
     return lock;
@@ -450,7 +445,7 @@ static void workerFunc( void * user_data )
         tr_realMakeMetaInfo ( builder );
     }
 
-    workerIsRunning = 0;
+    workerThread = NULL;
 }
 
 void
@@ -480,10 +475,8 @@ tr_makeMetaInfo( tr_metainfo_builder_t  * builder,
     tr_lockLock( lock );
     builder->nextBuilder = queue;
     queue = builder;
-    if( !workerIsRunning ) {
-        workerIsRunning = 1;
-        tr_threadCreate( &workerThread, workerFunc, builder->handle, "makeMeta" );
-    }
+    if( !workerThread )
+         workerThread = tr_threadNew( workerFunc, builder->handle, "makeMeta" );
     tr_lockUnlock( lock );
 }
 

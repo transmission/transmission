@@ -56,10 +56,10 @@ int tr_netResolve( const char * address, struct in_addr * addr )
     return ( addr->s_addr == 0xFFFFFFFF );
 }
 
-static tr_thread_t  resolveThread;
-static tr_lock_t    resolveLock;
-static tr_cond_t    resolveCond;
-static volatile int resolveDie;
+static tr_thread_t  * resolveThread;
+static tr_lock_t    * resolveLock;
+static tr_cond_t    * resolveCond;
+static volatile int   resolveDie;
 static tr_resolve_t * resolveQueue;
 
 static void resolveRelease ( tr_resolve_t * );
@@ -85,9 +85,9 @@ void tr_netResolveThreadInit()
 {
     resolveDie   = 0;
     resolveQueue = NULL;
-    tr_lockInit( &resolveLock );
-    tr_condInit( &resolveCond );
-    tr_threadCreate( &resolveThread, resolveFunc, NULL, "resolve" );
+    resolveLock = tr_lockNew( );
+    resolveCond = tr_condNew( );
+    resolveThread = tr_threadNew( resolveFunc, NULL, "resolve" );
 }
 
 /***********************************************************************
@@ -99,10 +99,10 @@ void tr_netResolveThreadInit()
  **********************************************************************/
 void tr_netResolveThreadClose()
 {
-    tr_lockLock( &resolveLock );
+    tr_lockLock( resolveLock );
     resolveDie = 1;
-    tr_lockUnlock( &resolveLock );
-    tr_condSignal( &resolveCond );
+    tr_lockUnlock( resolveLock );
+    tr_condSignal( resolveCond );
     tr_wait( 200 );
 }
 
@@ -113,15 +113,13 @@ void tr_netResolveThreadClose()
  **********************************************************************/
 tr_resolve_t * tr_netResolveInit( const char * address )
 {
-    tr_resolve_t * r;
-
-    r           = malloc( sizeof( tr_resolve_t ) );
+    tr_resolve_t * r = tr_new0( tr_resolve_t, 1 );
     r->status   = TR_NET_WAIT;
     r->address  = strdup( address );
     r->refcount = 2;
     r->next     = NULL;
 
-    tr_lockLock( &resolveLock );
+    tr_lockLock( resolveLock );
     if( !resolveQueue )
     {
         resolveQueue = r;
@@ -132,8 +130,8 @@ tr_resolve_t * tr_netResolveInit( const char * address )
         for( iter = resolveQueue; iter->next; iter = iter->next );
         iter->next = r;
     }
-    tr_lockUnlock( &resolveLock );
-    tr_condSignal( &resolveCond );
+    tr_lockUnlock( resolveLock );
+    tr_condSignal( resolveCond );
 
     return r;
 }
@@ -147,13 +145,13 @@ tr_tristate_t tr_netResolvePulse( tr_resolve_t * r, struct in_addr * addr )
 {
     tr_tristate_t ret;
 
-    tr_lockLock( &resolveLock );
+    tr_lockLock( resolveLock );
     ret = r->status;
     if( ret == TR_NET_OK )
     {
         *addr = r->addr;
     }
-    tr_lockUnlock( &resolveLock );
+    tr_lockUnlock( resolveLock );
 
     return ret;
 }
@@ -196,20 +194,20 @@ static void resolveFunc( void * arg UNUSED )
     tr_resolve_t * r;
     struct hostent * host;
 
-    tr_lockLock( &resolveLock );
+    tr_lockLock( resolveLock );
 
     while( !resolveDie )
     {
         if( !( r = resolveQueue ) )
         {
-            tr_condWait( &resolveCond, &resolveLock );
+            tr_condWait( resolveCond, resolveLock );
             continue;
         }
 
         /* Blocking resolution */
-        tr_lockUnlock( &resolveLock );
+        tr_lockUnlock( resolveLock );
         host = gethostbyname( r->address );
-        tr_lockLock( &resolveLock );
+        tr_lockLock( resolveLock );
 
         if( host )
         {
@@ -226,8 +224,9 @@ static void resolveFunc( void * arg UNUSED )
     }
 
     /* Clean up  */
-    tr_lockUnlock( &resolveLock );
-    tr_lockClose( &resolveLock );
+    tr_lockUnlock( resolveLock );
+    tr_lockFree( resolveLock );
+    resolveLock = NULL;
     while( ( r = resolveQueue ) )
     {
         resolveQueue = r->next;

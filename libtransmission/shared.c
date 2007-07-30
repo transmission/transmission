@@ -46,9 +46,9 @@
 struct tr_shared_s
 {
     tr_handle_t  * h;
-    volatile int die;
-    tr_thread_t  thread;
-    tr_lock_t    lock;
+    volatile int   die;
+    tr_thread_t  * thread;
+    tr_lock_t    * lock;
 
     /* Incoming connections */
     int          publicPort;
@@ -84,19 +84,16 @@ tr_shared_t * tr_sharedInit( tr_handle_t * h )
 {
     tr_shared_t * s = calloc( 1, sizeof( tr_shared_t ) );
 
-    s->h = h;
-    tr_lockInit( &s->lock );
-
+    s->h          = h;
+    s->lock       = tr_lockNew( );
     s->publicPort = -1;
     s->bindPort   = -1;
     s->bindSocket = -1;
     s->natpmp     = tr_natpmpInit();
     s->upnp       = tr_upnpInit();
     s->choking    = tr_chokingInit( h );
-
-    /* Launch the thread */
-    s->die = 0;
-    tr_threadCreate( &s->thread, SharedLoop, s, "shared" );
+    s->die        = 0;
+    s->thread     = tr_threadNew( SharedLoop, s, "shared" );
 
     return s;
 }
@@ -112,7 +109,7 @@ void tr_sharedClose( tr_shared_t * s )
 
     /* Stop the thread */
     s->die = 1;
-    tr_threadJoin( &s->thread );
+    tr_threadJoin( s->thread );
 
     /* Clean up */
     for( ii = 0; ii < s->peerCount; ii++ )
@@ -123,7 +120,7 @@ void tr_sharedClose( tr_shared_t * s )
     {
         tr_netClose( s->bindSocket );
     }
-    tr_lockClose( &s->lock );
+    tr_lockFree( s->lock );
     tr_natpmpClose( s->natpmp );
     tr_upnpClose( s->upnp );
     tr_chokingClose( s->choking );
@@ -137,11 +134,11 @@ void tr_sharedClose( tr_shared_t * s )
  **********************************************************************/
 void tr_sharedLock( tr_shared_t * s )
 {
-    tr_lockLock( &s->lock );
+    tr_lockLock( s->lock );
 }
 void tr_sharedUnlock( tr_shared_t * s )
 {
-    tr_lockUnlock( &s->lock );
+    tr_lockUnlock( s->lock );
 }
 
 /***********************************************************************

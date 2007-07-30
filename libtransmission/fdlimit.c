@@ -63,8 +63,8 @@ tr_openFile_t;
 
 typedef struct tr_fd_s
 {
-    tr_lock_t       lock;
-    tr_cond_t       cond;
+    tr_lock_t     * lock;
+    tr_cond_t     * cond;
     
     int             reserved;
 
@@ -100,8 +100,8 @@ void tr_fdInit()
     gFd = calloc( 1, sizeof( tr_fd_t ) );
 
     /* Init lock and cond */
-    tr_lockInit( &gFd->lock );
-    tr_condInit( &gFd->cond );
+    gFd->lock = tr_lockNew( );
+    gFd->cond = tr_condNew( );
 
     /* Detect the maximum number of open files or sockets */
     for( i = 0; i < 4096; i++ )
@@ -143,7 +143,7 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
     int i, winner, ret;
     uint64_t date;
 
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
 
     /* Is it already open? */
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
@@ -158,7 +158,7 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
         {
             /* File is being closed by another thread, wait until
              * it's done before we reopen it */
-            tr_condWait( &gFd->cond, &gFd->lock );
+            tr_condWait( gFd->cond, gFd->lock );
             i = -1;
             continue;
         }
@@ -209,13 +209,13 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
         }
 
         /* All used! Wait a bit and try again */
-        tr_condWait( &gFd->cond, &gFd->lock );
+        tr_condWait( gFd->cond, gFd->lock );
     }
 
 open:
     if( ( ret = OpenFile( winner, folder, name, write ) ) )
     {
-        tr_lockUnlock( &gFd->lock );
+        tr_lockUnlock( gFd->lock );
         return ret;
     }
     snprintf( gFd->open[winner].folder, MAX_PATH_LENGTH, "%s", folder );
@@ -225,7 +225,7 @@ open:
 done:
     gFd->open[winner].status = STATUS_USED;
     gFd->open[winner].date   = tr_date();
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
     
     return gFd->open[winner].file;
 }
@@ -236,7 +236,7 @@ done:
 void tr_fdFileRelease( int file )
 {
     int i;
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
 
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
     {
@@ -247,8 +247,8 @@ void tr_fdFileRelease( int file )
         }
     }
     
-    tr_condSignal( &gFd->cond );
-    tr_lockUnlock( &gFd->lock );
+    tr_condSignal( gFd->cond );
+    tr_lockUnlock( gFd->lock );
 }
 
 /***********************************************************************
@@ -258,7 +258,7 @@ void tr_fdFileClose( const char * folder, const char * name )
 {
     int i;
 
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
 
     for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
     {
@@ -273,7 +273,7 @@ void tr_fdFileClose( const char * folder, const char * name )
         }
     }
 
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
 }
 
 
@@ -333,7 +333,7 @@ int tr_fdSocketCreate( int type, int priority )
 {
     int s = -1;
 
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
 
     if( priority && gFd->reserved >= TR_RESERVED_FDS )
         priority = FALSE;
@@ -350,7 +350,7 @@ int tr_fdSocketCreate( int type, int priority )
         else
             gFd->normal++;
     }
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
 
     return s;
 }
@@ -361,7 +361,7 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
     unsigned len;
     struct sockaddr_in sock;
 
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
     if( gFd->normal < gFd->normalMax )
     {
         len = sizeof( sock );
@@ -380,7 +380,7 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
         }
         gFd->normal++;
     }
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
 
     return s;
 }
@@ -390,7 +390,7 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, in_port_t * port )
  **********************************************************************/
 void tr_fdSocketClose( int s )
 {
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
 #ifdef BEOS_NETSERVER
     closesocket( s );
 #else
@@ -400,7 +400,7 @@ void tr_fdSocketClose( int s )
         gFd->reserved--;
     else
         gFd->normal--;
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
 }
 
 /***********************************************************************
@@ -408,8 +408,8 @@ void tr_fdSocketClose( int s )
  **********************************************************************/
 void tr_fdClose()
 {
-    tr_lockClose( &gFd->lock );
-    tr_condClose( &gFd->cond );
+    tr_lockFree( gFd->lock );
+    tr_condFree( gFd->cond );
     free( gFd );
 }
 
@@ -504,7 +504,7 @@ static void CloseFile( int i )
      * it is done */
     while( file->status & STATUS_CLOSING )
     {
-        tr_condWait( &gFd->cond, &gFd->lock );
+        tr_condWait( gFd->cond, gFd->lock );
     }
     if( file->status & STATUS_INVALID )
     {
@@ -518,10 +518,10 @@ static void CloseFile( int i )
     }
     tr_dbg( "Closing %s in %s (%d)", file->name, file->folder, file->write );
     file->status = STATUS_CLOSING;
-    tr_lockUnlock( &gFd->lock );
+    tr_lockUnlock( gFd->lock );
     close( file->file );
-    tr_lockLock( &gFd->lock );
+    tr_lockLock( gFd->lock );
     file->status = STATUS_INVALID;
-    tr_condSignal( &gFd->cond );
+    tr_condSignal( gFd->cond );
 }
 

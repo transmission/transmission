@@ -193,8 +193,8 @@ struct tr_torrent_s
     tr_bitfield_t   * uncheckedPieces;
     run_status_t      runStatus;
     cp_status_t       cpStatus;
-    tr_thread_t       thread;
-    tr_rwlock_t       lock;
+    tr_thread_t     * thread;
+    tr_rwlock_t     * lock;
 
     tr_tracker_t    * tracker;
     tr_io_t         * io;

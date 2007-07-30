@@ -41,7 +41,7 @@ tr_transfer_t;
 
 struct tr_ratecontrol_s
 {
-    tr_rwlock_t lock;
+    tr_rwlock_t * lock;
     int limit;
     int newest;
     tr_transfer_t transfers[HISTORY_SIZE];
@@ -77,7 +77,7 @@ tr_rcInit( void )
 {
     tr_ratecontrol_t * r = tr_new0( tr_ratecontrol_t, 1 );
     r->limit = 0;
-    tr_rwInit( &r->lock );
+    r->lock = tr_rwNew( );
     return r;
 }
 
@@ -85,7 +85,7 @@ void
 tr_rcClose( tr_ratecontrol_t * r )
 {
     tr_rcReset( r );
-    tr_rwClose( &r->lock );
+    tr_rwFree( r->lock );
     tr_free( r );
 }
 
@@ -97,11 +97,11 @@ int
 tr_rcCanTransfer( const tr_ratecontrol_t * r )
 {
     int ret;
-    tr_rwReaderLock( (tr_rwlock_t*)&r->lock );
+    tr_rwReaderLock( (tr_rwlock_t*)r->lock );
 
     ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
 
-    tr_rwReaderUnlock( (tr_rwlock_t*)&r->lock );
+    tr_rwReaderUnlock( (tr_rwlock_t*)r->lock );
     return ret;
 }
 
@@ -109,11 +109,11 @@ float
 tr_rcRate( const tr_ratecontrol_t * r )
 {
     float ret;
-    tr_rwReaderLock( (tr_rwlock_t*)&r->lock );
+    tr_rwReaderLock( (tr_rwlock_t*)r->lock );
 
     ret = rateForInterval( r, LONG_INTERVAL_MSEC );
 
-    tr_rwReaderUnlock( (tr_rwlock_t*)&r->lock );
+    tr_rwReaderUnlock( (tr_rwlock_t*)r->lock );
     return ret;
 }
 
@@ -129,7 +129,7 @@ tr_rcTransferred( tr_ratecontrol_t * r, int size )
     if( size < 100 ) /* don't count small messages */
         return;
     
-    tr_rwWriterLock( &r->lock );
+    tr_rwWriterLock( r->lock );
 
     now = tr_date ();
     if( r->transfers[r->newest].date + GRANULARITY_MSEC >= now )
@@ -140,24 +140,24 @@ tr_rcTransferred( tr_ratecontrol_t * r, int size )
         r->transfers[r->newest].size = size;
     }
 
-    tr_rwWriterUnlock( &r->lock );
+    tr_rwWriterUnlock( r->lock );
 }
 
 void
 tr_rcReset( tr_ratecontrol_t * r )
 {
-    tr_rwWriterLock( &r->lock );
+    tr_rwWriterLock( r->lock );
     r->newest = 0;
     memset( r->transfers, 0, sizeof(tr_transfer_t) * HISTORY_SIZE );
-    tr_rwWriterUnlock( &r->lock );
+    tr_rwWriterUnlock( r->lock );
 }
 
 void
 tr_rcSetLimit( tr_ratecontrol_t * r, int limit )
 {
-    tr_rwWriterLock( &r->lock );
+    tr_rwWriterLock( r->lock );
     r->limit = limit;
-    tr_rwWriterUnlock( &r->lock );
+    tr_rwWriterUnlock( r->lock );
 }
 
 int
