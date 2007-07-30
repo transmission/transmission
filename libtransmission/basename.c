@@ -17,7 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef HAVE_LIBGEN
+#ifndef HAVE_BASENAME
 
 #include <errno.h>
 #include <string.h>
@@ -64,4 +64,4 @@ basename(const char *path)
 	return (bname);
 }
 
-#endif /* HAVE_LIBGEN */
+#endif /* HAVE_BASENAME */

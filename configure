@@ -231,7 +231,7 @@ int main()
 EOF
   if runcmd $CC -o testconf testconf.c
   then
-    CFLAGS="$CFLAGS -DHAVE_LIBGEN"
+    CFLAGS="$CFLAGS -DHAVE_DIRNAME -DHAVE_BASENAME"
   fi
   rm -f testconf*
 }

@@ -17,7 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef HAVE_LIBGEN
+#ifndef HAVE_DIRNAME
 
 #include <errno.h>
 #include <string.h>
@@ -68,4 +68,4 @@ dirname(const char *path)
 	return (dname);
 }
 
-#endif /* HAVE_LIBGEN */
+#endif /* HAVE_DIRNAME */

@@ -19,7 +19,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lrintf strlcpy strlcat daemon])
+AC_CHECK_FUNCS([lrintf strlcpy strlcat daemon dirname basename])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
@@ -33,7 +33,6 @@ ALL_LINGUAS="bg es fi fr it pl ro ru sv"
 AM_GLIB_GNU_GETTEXT
 transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 
-AC_CHECK_LIB([gen],[basename])
 AC_CHECK_LIB([crypto],[CRYPTO_new_ex_data])
 AC_CHECK_LIB([ssl],[SSL_library_init])
 AC_SEARCH_LIBS([socket], [socket net])

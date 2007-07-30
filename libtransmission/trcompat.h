@@ -42,13 +42,14 @@ int asprintf( char **, const char *, ... );
 int vasprintf( char **, const char *, va_list );
 #endif
 
-#ifdef HAVE_LIBGEN
-# include <libgen.h>
-#else
-char *
-dirname(const char *path);
-char *
-basename(const char *path);
+#if defined(HAVE_DIRNAME) || defined(HAVE_BASENAME)
+    #include <libgen.h>
+#endif
+#ifndef HAVE_DIRNAME
+    char* dirname(const char *path);
+#endif
+#ifndef HAVE_BASENAME
+    char* basename(const char *path);
 #endif
 
 #endif /* TRCOMPAT_H */
