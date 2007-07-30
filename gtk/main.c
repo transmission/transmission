@@ -185,6 +185,19 @@ accumulateStatusForeach (GtkTreeModel * model,
 }
 
 static void
+accumulateCanUpdateForeach (GtkTreeModel * model,
+                            GtkTreePath  * path UNUSED,
+                            GtkTreeIter  * iter,
+                            gpointer       accumulated_status)
+{
+    TrTorrent * gtor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &gtor, -1 );
+    *(int*)accumulated_status |=
+        tr_torrentCanManualUpdate( tr_torrent_handle( gtor ) );
+    g_object_unref( G_OBJECT( gtor ) );
+}
+
+static void
 refreshTorrentActions( GtkTreeSelection * s )
 {
     int status = 0;
@@ -194,6 +207,10 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "remove-torrent", status != 0);
     action_sensitize( "recheck-torrent", status != 0);
     action_sensitize( "show-torrent-inspector", status != 0);
+
+    status = 0;
+    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &status );
+    action_sensitize( "update-tracker", status != 0);
 }
 
 static void
@@ -930,6 +947,18 @@ stopTorrentForeach (GtkTreeModel * model,
 }
 
 static void
+updateTrackerForeach (GtkTreeModel * model,
+                      GtkTreePath  * path UNUSED,
+                      GtkTreeIter  * iter,
+                      gpointer       data UNUSED)
+{
+    TrTorrent * tor = NULL;
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+    tr_manualUpdate( tr_torrent_handle( tor ) );
+    g_object_unref( G_OBJECT( tor ) );
+}
+
+static void
 showInfoForeach (GtkTreeModel * model,
                  GtkTreePath  * path UNUSED,
                  GtkTreeIter  * iter,
@@ -987,6 +1016,11 @@ doAction ( const char * action_name, gpointer user_data )
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data->wind );
+    }
+    else if (!strcmp( action_name, "update-tracker"))
+    {
+        GtkTreeSelection * s = tr_window_get_selection(data->wind);
+        gtk_tree_selection_selected_foreach( s, updateTrackerForeach, data->wind );
     }
     else if (!strcmp (action_name, "create-torrent"))
     {

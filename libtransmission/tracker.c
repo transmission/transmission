@@ -38,6 +38,9 @@
 #include "net.h"
 #include "shared.h"
 
+/* Users aren't allowed to make a manual announce more often than this. */
+static const int MANUAL_ANNOUNCE_INTERVAL_MSEC = (60*1000);
+
 struct tclist
 {
     tr_tracker_info_t   * tl_inf;
@@ -45,6 +48,8 @@ struct tclist
     SLIST_ENTRY( tclist ) next;
 };
 SLIST_HEAD( tchead, tclist );
+
+typedef uint8_t tr_flag_t;
 
 struct tr_tracker_s
 {
@@ -62,35 +67,36 @@ struct tr_tracker_s
 #define TC_CHANGE_NEXT      1
 #define TC_CHANGE_NONEXT    2
 #define TC_CHANGE_REDIRECT  4
-    int            shouldChangeAnnounce;
+    uint8_t        shouldChangeAnnounce;
     
     char         * redirectAddress;
     int            redirectAddressLen;
     char         * redirectScrapeAddress;
     int            redirectScrapeAddressLen;
 
-    char           started;
-    char           completed;
-    char           stopped;
+    tr_flag_t      started;
+    tr_flag_t      completed;
+    tr_flag_t      stopped;
+    tr_flag_t      forceAnnounce;
 
     int            interval;
     int            minInterval;
     int            scrapeInterval;
     int            seeders;
     int            leechers;
-    int            hasManyPeers;
     int            complete;
     int            randOffset;
 
-    int            completelyUnconnectable;
-    int            allUnreachIfError;
-    int            lastError;
+    tr_flag_t      hasManyPeers;
+    tr_flag_t      completelyUnconnectable;
+    tr_flag_t      allUnreachIfError;
+    tr_flag_t      lastError;
 
     uint64_t       dateTry;
     uint64_t       dateOk;
     uint64_t       dateScrape;
-    int            lastScrapeFailed;
-    int            scrapeNeeded;
+    tr_flag_t      lastScrapeFailed;
+    tr_flag_t      scrapeNeeded;
 
     tr_http_t    * http;
     tr_http_t    * httpScrape;
@@ -190,10 +196,21 @@ static void failureAnnouncing( tr_tracker_t * tc )
     }
 }
 
+int
+tr_trackerCanManualAnnounce( const tr_tracker_t * tc )
+{
+    return tc && ((tc->dateOk + MANUAL_ANNOUNCE_INTERVAL_MSEC) < tr_date());
+}
+
 static int shouldConnect( tr_tracker_t * tc )
 {
     tr_torrent_t * tor = tc->tor;
     const uint64_t now = tr_date();
+
+    /* User has requested a manual announce
+       and it's been long enough since the last one */
+    if( tc->forceAnnounce && tr_trackerCanManualAnnounce(tc) )
+        return 1;
     
     /* Last tracker failed, try next */
     if( tc->shouldChangeAnnounce == TC_CHANGE_NEXT
@@ -301,6 +318,13 @@ static int shouldScrape( const tr_tracker_t * tc )
     }
 
     return now > tc->dateScrape + interval;
+}
+
+void
+tr_trackerManualAnnounce( tr_tracker_t * tc )
+{
+    if( tc != NULL )
+        tc->forceAnnounce = 1;
 }
 
 void
@@ -838,9 +862,10 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
 
 nodict:
     /* Success */
-    tc->started   = 0;
-    tc->completed = 0;
-    tc->dateOk    = tr_date();
+    tc->started       = 0;
+    tc->completed     = 0;
+    tc->dateOk        = tr_date();
+    tc->forceAnnounce = FALSE;
 
     if( tc->stopped )
     {

@@ -432,12 +432,22 @@ int tr_getDone( tr_torrent_t * tor );
 int tr_getComplete( tr_torrent_t * tor );
 
 
-/***********************************************************************
- * tr_manualUpdate
- ***********************************************************************
- * Reannounce to tracker regardless of wait interval
- **********************************************************************/
+/**
+ * MANUAL ANNOUNCE
+ *
+ * Trackers usually set an announce interval of 15 or 30 minutes.
+ * Users can send one-time announce requests that override this
+ * interval by calling tr_manualUpdate().
+ *
+ * The wait interval for tr_manualUpdate() is much smaller.
+ * You can test whether or not a manual update is possible
+ * (for example, to desensitize the button) by calling
+ * tr_torrentCanManualUpdate().
+ */
+
 void tr_manualUpdate( tr_torrent_t * );
+
+int tr_torrentCanManualUpdate( const tr_torrent_t * );
 
 /***********************************************************************
  * tr_torrentStat

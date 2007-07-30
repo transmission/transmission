@@ -4,6 +4,7 @@ const char * fallback_ui_file =
 "    <menu action='file-menu'>\n"
 "      <menuitem action='add-torrent'/>\n"
 "      <menuitem action='start-torrent'/>\n"
+"      <menuitem action='update-tracker'/>\n"
 "      <menuitem action='stop-torrent'/>\n"
 "      <menuitem action='recheck-torrent'/>\n"
 "      <menuitem action='remove-torrent'/>\n"

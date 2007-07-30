@@ -591,27 +591,18 @@ int tr_getComplete( tr_torrent_t * tor )
     return tr_didStateChangeTo( tor, TR_CP_COMPLETE );
 }
 
-void tr_manualUpdate( tr_torrent_t * tor UNUSED )
+void
+tr_manualUpdate( tr_torrent_t * tor )
 {
-#if 0
-    int peerCount, new;
-    uint8_t * peerCompact;
-
-    if( tor->status != TR_RUN_RUNNING )
-        return;
-    
-    tr_torrentWriterLock( tor );
-    tr_trackerAnnouncePulse( tor->tracker, &peerCount, &peerCompact, 1 );
-    new = 0;
-    if( peerCount > 0 )
-    {
-        new = tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
-                                    peerCompact, peerCount );
-        free( peerCompact );
-    }
-    tr_dbg( "got %i peers from manual announce, used %i", peerCount, new );
-    tr_torrentWriterUnlock( tor );
-#endif
+    if( tor->runStatus == TR_RUN_RUNNING )
+        tr_trackerManualAnnounce( tor->tracker );
+}
+int
+tr_torrentCanManualUpdate( const tr_torrent_t * tor )
+{
+    return ( tor != NULL )
+        && ( tor->runStatus == TR_RUN_RUNNING )
+        && ( tr_trackerCanManualAnnounce( tor->tracker ) );
 }
 
 const tr_stat_t *

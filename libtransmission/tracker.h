@@ -37,6 +37,11 @@ void           tr_trackerCompleted( tr_tracker_t * );
 void           tr_trackerStopped  ( tr_tracker_t * );
 void           tr_trackerClose    ( tr_tracker_t * );
 
+/* if a tracker is running, enqueue a manual announce. */
+void tr_trackerManualAnnounce( tr_tracker_t * );
+
+int tr_trackerCanManualAnnounce( const tr_tracker_t * );
+
 /***********************************************************************
  * tr_trackerSeeders
  ***********************************************************************

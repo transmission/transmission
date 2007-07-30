@@ -81,7 +81,9 @@ static GtkActionEntry entries[] =
   { "show-debug-window", NULL,
     N_("Show _Debug Window"), NULL, NULL, G_CALLBACK(action_cb) },
   { "toggle-main-window", "ICON_TRANSMISSION",
-    N_("Show / Hide _Transmission"), NULL, NULL, G_CALLBACK(action_cb) }
+    N_("Show / Hide _Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
+  { "update-tracker", GTK_STOCK_REFRESH,
+    N_("Update Tracker"), NULL, NULL, G_CALLBACK(action_cb) }
 };
 
 static void
