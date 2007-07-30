@@ -33,6 +33,7 @@ ALL_LINGUAS="bg es fi fr it pl ro ru sv"
 AM_GLIB_GNU_GETTEXT
 transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 
+AC_CHECK_LIB([gen],[basename])
 AC_CHECK_LIB([crypto],[CRYPTO_new_ex_data])
 AC_CHECK_LIB([ssl],[SSL_library_init])
 AC_SEARCH_LIBS([socket], [socket net])
@@ -116,7 +117,7 @@ case $host_os in
    *cygwin|*mingw32*)
      msw="yes"
      CXXFLAGS="$CXXFLAGS -mms-bitfields -mwin32 -mwindows"
-     CPPFLAGS="$CPPFLAGS -DWIN32_LEAN_AND_MEAN"
+     CPPFLAGS="$CPPFLAGS -D__MINGW__ -DWIN32_LEAN_AND_MEAN"
      LIBS="$LIBS -lshell32 -lws2_32"
      transmissionlocaledir="locale"
      if test -z "$host_alias"; then
