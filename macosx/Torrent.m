@@ -555,12 +555,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         tr_torrentStart(fHandle);
 }
 
-- (void) announce
+- (void) manualAnnounce
 {
     tr_manualUpdate(fHandle);
 }
 
-- (BOOL) canAnnounce
+- (BOOL) canManualAnnounce
 {
     return tr_torrentCanManualUpdate(fHandle);
 }

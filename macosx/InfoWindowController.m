@@ -27,9 +27,6 @@
 #import "FilePriorityCell.h"
 #import "StringAdditions.h"
 
-#define MIN_WINDOW_WIDTH 300
-#define MAX_WINDOW_WIDTH 5000
-
 #define FILE_ROW_SMALL_HEIGHT 18.0
 
 #define TAB_INFO_IDENT @"Info"
@@ -734,8 +731,8 @@
     else
         [window setFrame: frame display: YES];
     
-    [window setMinSize: NSMakeSize(MIN_WINDOW_WIDTH, frame.size.height)];
-    [window setMaxSize: NSMakeSize(MAX_WINDOW_WIDTH, frame.size.height)];
+    [window setMinSize: NSMakeSize([window minSize].width, frame.size.height)];
+    [window setMaxSize: NSMakeSize([window maxSize].width, frame.size.height)];
 }
 
 - (void) setNextTab

@@ -90,8 +90,8 @@
 - (void) sleep;
 - (void) wakeUp;
 
-- (void) announce;
-- (BOOL) canAnnounce;
+- (void) manualAnnounce;
+- (BOOL) canManualAnnounce;
 
 - (void) resetCache;
 

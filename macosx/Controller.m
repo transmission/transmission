@@ -70,8 +70,6 @@
 #define DOCK_SEEDING_TAG        101
 #define DOCK_DOWNLOADING_TAG    102
 
-#define ANNOUNCE_WAIT_INTERVAL_SECONDS  -60.0
-
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 
@@ -1324,8 +1322,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSDate * date;
     while ((torrent = [enumerator nextObject]))
     {
-        if ([torrent canAnnounce])
-            [torrent announce];
+        if ([torrent canManualAnnounce])
+            [torrent manualAnnounce];
     }
 }
 
@@ -2883,7 +2881,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return NO;
     }
     
-    //enable announce item
+    //enable manual announce item
     if (action == @selector(announceSelectedTorrents:))
     {
         if (!canUseTable)
@@ -2895,7 +2893,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         while ((torrent = [enumerator nextObject]))
         {
             //time interval returned will be negative
-            if ([torrent canAnnounce])
+            if ([torrent canManualAnnounce])
                 return YES;
         }
         return NO;
