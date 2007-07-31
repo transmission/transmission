@@ -58,13 +58,21 @@ struct tr_thread_s
 
 #ifdef SYS_BEOS
     thread_id        thread;
+#elif defined(WIN32)
+    HANDLE           thread;
 #else
     pthread_t        thread;
 #endif
 
 };
 
-static void
+#ifdef WIN32
+#define ThreadFuncReturnType unsigned WINAPI
+#else
+#define ThreadFuncReturnType void
+#endif
+
+static ThreadFuncReturnType
 ThreadFunc( void * _t )
 {
     tr_thread_t * t = _t;
@@ -79,7 +87,13 @@ ThreadFunc( void * _t )
     tr_dbg( "Thread '%s' started", name );
     t->func( t->arg );
     tr_dbg( "Thread '%s' exited", name );
+
     tr_free( name );
+
+#ifdef WIN32
+    _endthreadex( 0 );
+    return 0;
+#endif
 }
 
 tr_thread_t *
@@ -95,6 +109,8 @@ tr_threadNew( void (*func)(void *),
 #ifdef SYS_BEOS
     t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
+#elif defined(WIN32)
+    t->thread = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, NULL, 0, NULL );
 #else
     pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
 #endif
@@ -110,6 +126,9 @@ tr_threadJoin( tr_thread_t * t )
 #ifdef SYS_BEOS
         long exit;
         wait_for_thread( t->thread, &exit );
+#elif defined(WIN32)
+        WaitForSingleObject(thread->handle, INFINITE);
+        CloseHandle( t->thread );
 #else
         pthread_join( t->thread, NULL );
 #endif
@@ -130,6 +149,8 @@ struct tr_lock_s
 {
 #ifdef SYS_BEOS
     sem_id lock;
+#elif defined(WIN32)
+    CRITICAL_SECTION lock;
 #else
     pthread_mutex_t lock;
 #endif
@@ -142,6 +163,8 @@ tr_lockNew( void )
 
 #ifdef SYS_BEOS
     l->lock = create_sem( 1, "" );
+#elif defined(WIN32)
+    InitializeCriticalSection( &l->lock );
 #else
     pthread_mutex_init( &l->lock, NULL );
 #endif
@@ -154,6 +177,8 @@ tr_lockFree( tr_lock_t * l )
 {
 #ifdef SYS_BEOS
     delete_sem( l->lock );
+#elif defined(WIN32)
+    DeleteCriticalSection( &l->lock );
 #else
     pthread_mutex_destroy( &l->lock );
 #endif
@@ -161,12 +186,13 @@ tr_lockFree( tr_lock_t * l )
 }
 
 int
-tr_lockTryLock( tr_lock_t * l )
+tr_lockTryLock( tr_lock_t * l ) /* success on zero! */
 {
 #ifdef SYS_BEOS
     return acquire_sem_etc( l->lock, 1, B_RELATIVE_TIMEOUT, 0 );
+#elif defined(WIN32)
+    return !TryEnterCriticalSection( &l->lock );
 #else
-    /* success on zero! */
     return pthread_mutex_trylock( &l->lock );
 #endif
 }
@@ -176,6 +202,8 @@ tr_lockLock( tr_lock_t * l )
 {
 #ifdef SYS_BEOS
     acquire_sem( l->lock );
+#elif defined(WIN32)
+    EnterCriticalSection( &l->lock );
 #else
     pthread_mutex_lock( &l->lock );
 #endif
@@ -186,6 +214,8 @@ tr_lockUnlock( tr_lock_t * l )
 {
 #ifdef SYS_BEOS
     release_sem( l->lock );
+#elif defined(WIN32)
+    DeleteCriticalSection( &l->lock );
 #else
     pthread_mutex_unlock( &l->lock );
 #endif
@@ -311,6 +341,8 @@ struct tr_cond_s
     sem_id sem;
     thread_id theads[BEOS_MAX_THREADS];
     int start, end;
+#elif defined(WIN32)
+    CONDITION_VARIABLE cond;
 #else
     pthread_cond_t cond;
 #endif
@@ -324,6 +356,8 @@ tr_condNew( void )
     c->sem = create_sem( 1, "" );
     c->start = 0;
     c->end = 0;
+#elif defined(WIN32)
+    InitializeConditionVariable( &c->cond );
 #else
     pthread_cond_init( &c->cond, NULL );
 #endif
@@ -343,6 +377,8 @@ void tr_condWait( tr_cond_t * c, tr_lock_t * l )
     release_sem( *l );
     suspend_thread( find_thread( NULL ) ); /* Wait for signal */
     acquire_sem( *l );
+#elif defined(WIN32)
+    SleepConditionVariableCS( &c->cond, &l->lock, INFINITE );
 #else
     pthread_cond_wait( &c->cond, &l->lock );
 #endif
@@ -378,6 +414,8 @@ void tr_condSignal( tr_cond_t * c )
     acquire_sem( c->sem );
     condTrySignal( c );
     release_sem( c->sem );
+#elif defined(WIN32)
+    WakeConditionVariable( &c->cond );
 #else
     pthread_cond_signal( &c->cond );
 #endif
@@ -388,6 +426,8 @@ void tr_condBroadcast( tr_cond_t * c )
     acquire_sem( c->sem );
     while( !condTrySignal( c ) );
     release_sem( c->sem );
+#elif defined(WIN32)
+    WakeAllConditionVariable( &c->cond );
 #else
     pthread_cond_broadcast( &c->cond );
 #endif
@@ -398,6 +438,8 @@ tr_condFree( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
     delete_sem( c->sem );
+#elif defined(WIN32)
+    /* a no-op, apparently */
 #else
     pthread_cond_destroy( &c->cond );
 #endif
