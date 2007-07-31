@@ -1,10 +1,9 @@
 
 dist-hook:
-	SCRATCHFILE=macos-subdirs.tar
-	rm -f $(SCRATCHFILE)
-	tar cvf $(SRATCHFILE) `find $(srcdir) | grep -v svn`
-	tar xvf $(SCRATCHFILE) $(distdir)
-	rm -f $(SCRATCHFILE)
+	rm -f subdirs.tar
+	tar cvf subdirs.tar `find $(srcdir) | grep -v svn`
+	tar xvf subdirs.tar $(distdir)
+	rm -f subdirs.tar
 
 # Use Xcode do make the actual build
 all:
