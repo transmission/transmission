@@ -320,10 +320,17 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A204310F0C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A20431100C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A20431110C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A20431120C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A20431130C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A20431140C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A20431150C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E010C53C16F000BC3B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/AboutWindow.nib; sourceTree = "<group>"; };
@@ -1116,6 +1123,7 @@
 				Spanish,
 				Korean,
 				Italian,
+				Russian,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1394,6 +1402,7 @@
 				089C165DFE840E0CC02AAC07 /* English */,
 				A22BC9AE0C5C505200F5FB72 /* Korean */,
 				A22BCA2E0C5D5CDA00F5FB72 /* Italian */,
+				A20431100C5EAF490081E5CC /* Russian */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1404,6 +1413,7 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 				A22BC9B10C5C505200F5FB72 /* Korean */,
 				A22BCA310C5D5CDA00F5FB72 /* Italian */,
+				A20431130C5EAF490081E5CC /* Russian */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1414,6 +1424,7 @@
 				A200B9630A227FD0007BBB1E /* English */,
 				A22BC9AF0C5C505200F5FB72 /* Korean */,
 				A22BCA2F0C5D5CDA00F5FB72 /* Italian */,
+				A20431110C5EAF490081E5CC /* Russian */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1424,6 +1435,7 @@
 				A2085E010C53C16F000BC3B7 /* English */,
 				A22BC9AD0C5C505200F5FB72 /* Korean */,
 				A22BCA2D0C5D5CDA00F5FB72 /* Italian */,
+				A204310F0C5EAF490081E5CC /* Russian */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1434,6 +1446,7 @@
 				A21567EC0A9A5034004DECD6 /* English */,
 				A22BC9B20C5C505300F5FB72 /* Korean */,
 				A22BCA320C5D5CDA00F5FB72 /* Italian */,
+				A20431140C5EAF490081E5CC /* Russian */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1444,6 +1457,7 @@
 				A22A8D550AEEAFA5007E9CB9 /* English */,
 				A22BC9B00C5C505200F5FB72 /* Korean */,
 				A22BCA300C5D5CDA00F5FB72 /* Italian */,
+				A20431120C5EAF490081E5CC /* Russian */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1454,6 +1468,7 @@
 				A2912C530A2956E80097A0CA /* English */,
 				A22BC9B30C5C505300F5FB72 /* Korean */,
 				A22BCA330C5D5CDA00F5FB72 /* Italian */,
+				A20431150C5EAF490081E5CC /* Russian */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
