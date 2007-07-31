@@ -1,9 +1,15 @@
-
-dist-hook:
-	rm -f subdirs.tar
-	tar cvf subdirs.tar `find $(srcdir) | grep -v svn`
-	tar xvf subdirs.tar $(distdir)
-	rm -f subdirs.tar
+EXTRA_DIST = \
+    Sparkle.framework \
+    CTGradient \
+    English.lproj \
+    Italian.lproj \
+    Russian.lproj \
+    UKKQueue \
+    TransmissionHelp \
+    Applescript \
+    Images \
+    Growl.framework \
+    Korean.lproj
 
 # Use Xcode do make the actual build
 all:
