@@ -90,7 +90,7 @@
 		A253F72B0A699373008EE24F /* FilterButtonSelectedMain.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7280A699373008EE24F /* FilterButtonSelectedMain.png */; };
 		A253F72C0A699373008EE24F /* FilterButtonSelectedRight.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
-		A259317E0A73B2CC002F4FE7 /* Transmission Help in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* Transmission Help */; };
+		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
@@ -395,7 +395,7 @@
 		A253F7290A699373008EE24F /* FilterButtonSelectedRight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterButtonSelectedRight.png; path = macosx/Images/FilterButtonSelectedRight.png; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageWindowController.h; path = macosx/MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
-		A259316A0A73B2CC002F4FE7 /* Transmission Help */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Transmission Help"; path = "macosx/Transmission Help"; sourceTree = "<group>"; };
+		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
 		A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToPathTransformer.h; path = macosx/ExpandedPathToPathTransformer.h; sourceTree = "<group>"; };
 		A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToIconTransformer.m; path = macosx/ExpandedPathToIconTransformer.m; sourceTree = "<group>"; };
@@ -673,7 +673,7 @@
 			isa = PBXGroup;
 			children = (
 				A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */,
-				A259316A0A73B2CC002F4FE7 /* Transmission Help */,
+				A259316A0A73B2CC002F4FE7 /* TransmissionHelp */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2085E2F0C53C833000BC3B7 /* LICENSE */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
@@ -1192,7 +1192,7 @@
 				A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */,
 				A232D29E0A70903E00973B12 /* Filter.png in Resources */,
 				A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */,
-				A259317E0A73B2CC002F4FE7 /* Transmission Help in Resources */,
+				A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */,
 				A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */,
 				A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */,
 				A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */,

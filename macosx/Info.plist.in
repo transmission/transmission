@@ -26,7 +26,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Transmission</string>
 	<key>CFBundleHelpBookFolder</key>
-	<string>Transmission Help</string>
+	<string>TransmissionHelp</string>
 	<key>CFBundleHelpBookName</key>
 	<string>Transmission Help</string>
 	<key>CFBundleIconFile</key>
