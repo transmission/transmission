@@ -58,13 +58,11 @@ typedef struct tr_http_s tr_http_t;
 #define TR_HTTP_GET             1
 #define TR_HTTP_POST            2
 #define TR_HTTP_M_POST          3
-tr_http_t   * tr_httpClient( int, const char *, int, const char *, ... )
-              PRINTF( 4, 5 );
-tr_http_t   * tr_httpClientUrl( int, const char *, ... )
-              PRINTF( 2, 3 );
+tr_http_t   * tr_httpClient( int, const char *, int, const char *, ... );
+tr_http_t   * tr_httpClientUrl( int, const char *, ... );
 /* only add headers or body before first pulse */
 void          tr_httpAddHeader( tr_http_t *, const char *, const char * );
-void          tr_httpAddBody( tr_http_t *, const char *, ... ) PRINTF( 2, 3 );
+void          tr_httpAddBody( tr_http_t *, const char *, ... );
 void          tr_httpGetHeaders( tr_http_t *, const char **, int * );
 void          tr_httpGetBody( tr_http_t *, const char **, int * );
 tr_tristate_t tr_httpPulse( tr_http_t *, const char **, int * );

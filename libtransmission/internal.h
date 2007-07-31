@@ -52,11 +52,9 @@ typedef in_port_t tr_port_t;
 #endif
 
 #ifdef __GNUC__
-#  define UNUSED __attribute__((unused))
-#  define PRINTF( fmt, args ) __attribute__((format (printf, fmt, args)))
+#define UNUSED __attribute__((unused))
 #else
-#  define UNUSED
-#  define PRINTF( fmt, args )
+#define UNUSED
 #endif
 
 #define TR_MAX_PEER_COUNT 60
