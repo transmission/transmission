@@ -234,8 +234,7 @@
         [fNameField setToolTip: name];
         [fSizeField setStringValue: [NSString stringForFileSize: [torrent size]]];
         
-        NSString * hashString = [torrent hashString],
-                * commentString = [torrent comment];
+        NSString * hashString = [torrent hashString];
         [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]]];
         [fHashField setStringValue: hashString];
@@ -243,9 +242,12 @@
         [fSecureField setStringValue: [torrent privateTorrent]
                         ? NSLocalizedString(@"Private Torrent, PEX disabled", "Inspector -> is private torrent")
                         : NSLocalizedString(@"Public Torrent", "Inspector -> is not private torrent")];
+        
+        NSString * commentString = [torrent comment];
         [fCommentView setString: commentString];
         
-        [fCreatorField setStringValue: [torrent creator]];
+        NSString * creatorString = [torrent creator];
+        [fCreatorField setStringValue: creatorString];
         [fDateCreatedField setObjectValue: [torrent dateCreated]];
         
         BOOL publicTorrent = [torrent publicTorrent];
@@ -266,8 +268,8 @@
         //allow these fields to be selected
         [fTrackerField setSelectable: YES];
         [fHashField setSelectable: YES];
-        [fCommentView setSelectable: YES];
-        [fCreatorField setSelectable: YES];
+        [fCommentView setSelectable: ![commentString isEqualToString: @""]];
+        [fCreatorField setSelectable: ![creatorString isEqualToString: @""]];
         [fTorrentLocationField setSelectable: YES];
         [fDataLocationField setSelectable: YES];
         
