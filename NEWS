@@ -3,11 +3,12 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 0.80 ()
  - Ability to selectively download and prioritize files
  - Torrent file creation
- - Partial licensing change -- see the LICENSE file for details
+ - Speed and CPU load improvements
  - Fix to UPnP
- - Rechecking torrents is now done one torrent at a time
-   to avoid hammering the disk
+ - Rechecking torrents is now done one-at-a-time to avoid heavy disk load
+ - Better rechecking of torrents that have many files
  - Many miscellaneous improvements and bugfixes
+ - Partial licensing change -- see the LICENSE file for details
  - OS X:
    + Overlay when dragging torrent files, URLs, and data files onto window
    + Ability to set an amount of time to consider a transfer stalled
@@ -15,9 +16,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Various smaller interface improvements
    + Italian, Korean, and Russian translations
  - GTK:
-   + Interface significantly reworked to closer match the Mac version
-   + Torrent inspector
-   + Other minor improvements
+   + Added Torrent Inspector dialog
+   + Added Update Tracker button
+   + Various smaller interface improvements
 
 0.72 (2007/04/30)
  - Reset download/upload amounts when sending "started"
