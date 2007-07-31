@@ -207,67 +207,7 @@ AC_CONFIG_FILES([Makefile
                  gtk/Makefile
                  libtransmission/Makefile
                  libtransmission/version.h
-                 macosx/Sparkle.framework/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/fr.lproj/SUAutomaticUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/fr.lproj/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/fr.lproj/SUUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/de.lproj/SUAutomaticUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/de.lproj/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/de.lproj/SUUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/el.lproj/SUAutomaticUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/el.lproj/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/el.lproj/SUUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/SUStatus.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/es.lproj/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/es.lproj/SUUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/en.lproj/SUAutomaticUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/en.lproj/Makefile
-                 macosx/Sparkle.framework/Versions/A/Resources/en.lproj/SUUpdateAlert.nib/Makefile
-                 macosx/Sparkle.framework/Versions/A/Makefile
-                 macosx/Sparkle.framework/Versions/Makefile
-                 macosx/CTGradient/Makefile
-                 macosx/English.lproj/MainMenu.nib/Makefile
-                 macosx/English.lproj/Makefile
-                 macosx/English.lproj/PrefsWindow.nib/Makefile
-                 macosx/English.lproj/MessageWindow.nib/Makefile
-                 macosx/English.lproj/InfoWindow.nib/Makefile
-                 macosx/English.lproj/Creator.nib/Makefile
-                 macosx/English.lproj/AboutWindow.nib/Makefile
-                 macosx/Italian.lproj/MainMenu.nib/Makefile
-                 macosx/Italian.lproj/Makefile
-                 macosx/Italian.lproj/PrefsWindow.nib/Makefile
-                 macosx/Italian.lproj/MessageWindow.nib/Makefile
-                 macosx/Italian.lproj/InfoWindow.nib/Makefile
-                 macosx/Italian.lproj/Creator.nib/Makefile
-                 macosx/Italian.lproj/AboutWindow.nib/Makefile
-                 macosx/Russian.lproj/MainMenu.nib/Makefile
-                 macosx/Russian.lproj/Makefile
-                 macosx/Russian.lproj/PrefsWindow.nib/Makefile
-                 macosx/Russian.lproj/MessageWindow.nib/Makefile
-                 macosx/Russian.lproj/InfoWindow.nib/Makefile
-                 macosx/Russian.lproj/Creator.nib/Makefile
-                 macosx/Russian.lproj/AboutWindow.nib/Makefile
                  macosx/Makefile
-                 macosx/UKKQueue/Makefile
-                 macosx/TransmissionHelp/gfx/Makefile
-                 macosx/TransmissionHelp/Makefile
-                 macosx/TransmissionHelp/html/Makefile
-                 macosx/TransmissionHelp/styles/Makefile
-                 macosx/Applescript/Makefile
-                 macosx/Images/Makefile
-                 macosx/Growl.framework/Makefile
-                 macosx/Growl.framework/Versions/A/Resources/Makefile
-                 macosx/Growl.framework/Versions/A/Makefile
-                 macosx/Growl.framework/Versions/A/Headers/Makefile
-                 macosx/Growl.framework/Versions/Makefile
-                 macosx/Korean.lproj/MainMenu.nib/Makefile
-                 macosx/Korean.lproj/Makefile
-                 macosx/Korean.lproj/PrefsWindow.nib/Makefile
-                 macosx/Korean.lproj/MessageWindow.nib/Makefile
-                 macosx/Korean.lproj/InfoWindow.nib/Makefile
-                 macosx/Korean.lproj/Creator.nib/Makefile
-                 macosx/Korean.lproj/AboutWindow.nib/Makefile
                  wx/Makefile
                  wx/images/Makefile])
 

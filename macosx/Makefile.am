@@ -1,82 +1,10 @@
-SUBDIRS = \
-    Applescript \
-    CTGradient \
-    English.lproj \
-    Growl.framework \
-    Images Italian.lproj \
-    Korean.lproj \
-    Russian.lproj \
-    Sparkle.framework \
-    TransmissionHelp \
-    UKKQueue
 
-EXTRA_DIST = \
-    AboutWindowController.h \
-    AboutWindowController.m \
-    ActionMenuRatioToDisplayRatioTransformer.h \
-    ActionMenuRatioToDisplayRatioTransformer.m \
-    ActionMenuSpeedToDisplayLimitTransformer.h \
-    ActionMenuSpeedToDisplayLimitTransformer.m \
-    ActionPopUpButton.h \
-    ActionPopUpButton.m \
-    Badger.h \
-    Badger.m \
-    BezierPathAdditions.h \
-    BezierPathAdditions.m \
-    Controller.h \
-    Controller.m \
-    CreatorWindowController.h \
-    CreatorWindowController.m \
-    DragOverlayView.h \
-    DragOverlayView.m \
-    DragOverlayWindow.h \
-    DragOverlayWindow.m \
-    ExpandedPathToIconTransformer.h \
-    ExpandedPathToIconTransformer.m \
-    ExpandedPathToPathTransformer.h \
-    ExpandedPathToPathTransformer.m \
-    FileBrowserCell.h \
-    FileBrowserCell.m \
-    FileOutlineView.h \
-    FileOutlineView.m \
-    FilePriorityCell.h \
-    FilePriorityCell.m \
-    FilterBarButton.h \
-    FilterBarButton.m \
-    FilterBarView.h \
-    FilterBarView.m \
-    ImageBackgroundView.h \
-    ImageBackgroundView.m \
-    InfoWindowController.h \
-    InfoWindowController.m \
-    InfoWindow.h \
-    InfoWindow.m \
-    IPCController.h \
-    IPCController.m \
-    main.m \
-    MessageWindowController.h \
-    MessageWindowController.m \
-    PeerProgressIndicatorCell.h \
-    PeerProgressIndicatorCell.m \
-    PiecesView.h \
-    PiecesView.m \
-    PortChecker.h \
-    PortChecker.m \
-    PrefsController.h \
-    PrefsController.m \
-    PrefsWindow.h \
-    PrefsWindow.m \
-    SpeedLimitToTurtleIconTransformer.h \
-    SpeedLimitToTurtleIconTransformer.m \
-    StringAdditions.h \
-    StringAdditions.m \
-    TorrentCell.h \
-    TorrentCell.m \
-    Torrent.h \
-    Torrent.m \
-    TorrentTableView.h \
-    TorrentTableView.m \
-    Transmission_Prefix.pch
+dist-hook:
+	SCRATCHFILE=macos-subdirs.tar
+	rm -f $(SCRATCHFILE)
+	tar cvf $(SRATCHFILE) `find $(srcdir) | grep -v svn`
+	tar xvf $(SCRATCHFILE) $(distdir)
+	rm -f $(SCRATCHFILE)
 
 # Use Xcode do make the actual build
 all:
