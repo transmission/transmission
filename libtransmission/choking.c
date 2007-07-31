@@ -28,6 +28,8 @@
 
 #include "transmission.h"
 #include "choking.h"
+#include "peer.h"
+#include "platform.h"
 #include "utils.h"
 
 #ifndef HAVE_LRINTF

@@ -42,6 +42,8 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "net.h"
+#include "platform.h"
 #include "utils.h"
 
 /***

@@ -29,9 +29,6 @@
 #include <time.h>
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include "transmission.h"
 #include "bencode.h"
@@ -40,6 +37,7 @@
 #include "inout.h"
 #include "list.h"
 #include "net.h"
+#include "peer.h"
 #include "peertree.h"
 #include "ratecontrol.h"
 #include "utils.h"

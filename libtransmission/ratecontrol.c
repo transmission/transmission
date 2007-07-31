@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
 #include "utils.h"

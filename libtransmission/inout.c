@@ -20,6 +20,8 @@
 #include "completion.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "net.h"
+#include "peer.h"
 #include "sha1.h"
 #include "utils.h"
 

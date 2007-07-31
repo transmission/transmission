@@ -25,7 +25,7 @@
 #ifndef TR_PEER_H
 #define TR_PEER_H 1
 
-#include "transmission.h"
+#include "net.h"
 
 struct in_addr;
 typedef struct tr_peer_s tr_peer_t; 
@@ -34,7 +34,7 @@ tr_peer_t * tr_peerInit            ( const struct in_addr *, tr_port_t, int sock
 void        tr_peerDestroy         ( tr_peer_t * );
 const char *tr_peerClient          ( tr_peer_t * );
 void        tr_peerSetPrivate      ( tr_peer_t *, int );
-void        tr_peerSetTorrent      ( tr_peer_t *, tr_torrent_t * );
+void        tr_peerSetTorrent      ( tr_peer_t *, struct tr_torrent_s * );
 void        tr_peerSentBlockToUs   ( tr_peer_t *, int byteCount );
 void        tr_peerGotBlockFromUs  ( tr_peer_t *, int byteCount );
 int         tr_peerRead            ( tr_peer_t * );
@@ -60,7 +60,7 @@ void        tr_peerSetOptimistic   ( tr_peer_t *, int );
 int         tr_peerIsOptimistic    ( const tr_peer_t * );
 void        tr_peerBlame           ( tr_peer_t *, int piece, int success );
 struct in_addr * tr_peerAddress    ( tr_peer_t * );
-int         tr_peerGetConnectable  ( const tr_torrent_t *, uint8_t ** );
+int         tr_peerGetConnectable  ( const struct tr_torrent_s *, uint8_t ** );
 
 void        tr_swiftPulse          ( tr_handle_t * );
 

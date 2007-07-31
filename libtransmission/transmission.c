@@ -37,6 +37,7 @@
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"
+#include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
 #include "utils.h"

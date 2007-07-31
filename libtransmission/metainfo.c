@@ -35,6 +35,7 @@
 #include "bencode.h"
 #include "http.h" /* tr_httpParseUrl */
 #include "metainfo.h"
+#include "platform.h"
 #include "sha1.h"
 #include "utils.h"
 

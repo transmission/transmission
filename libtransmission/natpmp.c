@@ -29,13 +29,11 @@
 #include <time.h>
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include "transmission.h"
 #include "natpmp.h"
 #include "net.h"
+#include "platform.h" /* tr_getDefaultRoute() */
 #include "utils.h"
 
 #define PMP_PORT                5351

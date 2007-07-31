@@ -37,14 +37,6 @@ extern int vasprintf( char **, const char *, va_list );
 #  define socklen_t uint32_t
 #endif
 
-#if defined(BEOS_NETSERVER) || defined(__MINGW__)
-#include <stdint.h>
-typedef uint16_t tr_port_t;
-#else
-#include <arpa/inet.h>
-typedef in_port_t tr_port_t;
-#endif
-
 #define TR_NAME "Transmission"
 
 #ifndef INADDR_NONE
@@ -61,15 +53,15 @@ typedef in_port_t tr_port_t;
 
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
-#include "platform.h" /* thread, lock */
-#include "peer.h"
-
 #ifndef TRUE
 #define TRUE 1
 #endif
+
 #ifndef FALSE
 #define FALSE 0
 #endif
+
+struct tr_peer_s;
 
 void tr_peerIdNew ( char* buf, int buflen );
 
@@ -77,7 +69,7 @@ void tr_torrentResetTransferStats( tr_torrent_t * );
 
 int tr_torrentAddCompact( tr_torrent_t * tor, int from,
                            uint8_t * buf, int count );
-int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * );
+int tr_torrentAttachPeer( tr_torrent_t * tor, struct tr_peer_s * );
 
 void tr_torrentSetHasPiece( tr_torrent_t * tor, int pieceIndex, int has );
 
@@ -164,8 +156,8 @@ struct tr_torrent_s
     struct tr_bitfield_s   * uncheckedPieces;
     run_status_t      runStatus;
     cp_status_t       cpStatus;
-    tr_thread_t     * thread;
-    tr_rwlock_t     * lock;
+    struct tr_thread_s     * thread;
+    struct tr_rwlock_s     * lock;
 
     struct tr_tracker_s    * tracker;
     struct tr_io_s         * io;
@@ -175,7 +167,7 @@ struct tr_torrent_s
     char              fastResumeDirty;
 
     int               peerCount;
-    tr_peer_t       * peers[TR_MAX_PEER_COUNT];
+    struct tr_peer_s * peers[TR_MAX_PEER_COUNT];
 
     uint64_t          downloadedCur;
     uint64_t          downloadedPrev;

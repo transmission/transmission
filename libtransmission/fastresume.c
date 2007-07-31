@@ -55,6 +55,8 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
+#include "peer.h"
+#include "platform.h"
 #include "utils.h"
 
 /* time_t can be 32 or 64 bits... for consistency we'll hardwire 64 */ 

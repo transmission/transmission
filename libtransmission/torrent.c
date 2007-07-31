@@ -28,9 +28,6 @@
 #include <string.h>
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include "transmission.h"
 #include "completion.h"
@@ -38,6 +35,8 @@
 #include "inout.h"
 #include "metainfo.h"
 #include "net.h" /* tr_netNtop */
+#include "peer.h"
+#include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
 #include "tracker.h"

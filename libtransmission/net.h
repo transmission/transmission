@@ -22,6 +22,16 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#ifndef _TR_NET_H_
+#define _TR_NET_H_
+
+#if defined(BEOS_NETSERVER) || defined(__MINGW__)
+#include <stdint.h>
+typedef uint16_t tr_port_t;
+#else
+#include <arpa/inet.h>
+typedef in_port_t tr_port_t;
+#endif
 
 struct in_addr;
 struct sockaddr_in;
@@ -42,16 +52,11 @@ void           tr_netResolveClose( tr_resolve_t * );
 /***********************************************************************
  * TCP and UDP sockets
  **********************************************************************/
-#define tr_netOpenTCP( addr, port, priority ) \
-    tr_netOpen( (addr), (port), SOCK_STREAM, (priority) )
-#define tr_netOpenUDP( addr, port, priority ) \
-    tr_netOpen( (addr), (port), SOCK_DGRAM, (priority) )
-int  tr_netOpen    ( const struct in_addr * addr, tr_port_t port, int type,
-                     int priority );
+int  tr_netOpenTCP ( const struct in_addr * addr, tr_port_t port, int priority );
+int  tr_netOpenUDP ( const struct in_addr * addr, tr_port_t port, int priority );
 int  tr_netMcastOpen( int port, const struct in_addr * addr );
-#define tr_netBindTCP( port ) tr_netBind( (port), SOCK_STREAM )
-#define tr_netBindUDP( port ) tr_netBind( (port), SOCK_DGRAM )
-int  tr_netBind    ( int port, int type );
+int  tr_netBindTCP ( int port );
+int  tr_netBindUDP ( int port );
 int  tr_netAccept  ( int s, struct in_addr *, tr_port_t * );
 void tr_netClose   ( int s );
 
@@ -65,3 +70,5 @@ void tr_netNtop( const struct in_addr * addr, char * buf, int len );
 
 
 #define tr_addrcmp( aa, bb )    memcmp( ( void * )(aa), ( void * )(bb), 4)
+
+#endif /* _TR_NET_H_ */

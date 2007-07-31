@@ -28,15 +28,13 @@
 #include <string.h>
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
 
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"
+#include "platform.h"
 #include "utils.h"
 
 
@@ -272,8 +270,9 @@ static int createSocket( int type, int priority )
     return makeSocketNonBlocking( s );
 }
 
-int tr_netOpen( const struct in_addr * addr, tr_port_t port,
-                int type, int priority )
+static int
+tr_netOpen( const struct in_addr * addr, tr_port_t port,
+            int type, int priority )
 {
     int s;
     struct sockaddr_in sock;
@@ -298,6 +297,18 @@ int tr_netOpen( const struct in_addr * addr, tr_port_t port,
     }
 
     return s;
+}
+  
+int
+tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
+{
+    return tr_netOpen( addr, port, SOCK_STREAM, priority );
+}
+
+int
+tr_netOpenUDP( const struct in_addr * addr, tr_port_t port, int priority )
+{
+    return tr_netOpen( addr, port, SOCK_DGRAM, priority );
 }
 
 #ifdef IP_ADD_MEMBERSHIP
@@ -331,7 +342,8 @@ int tr_netMcastOpen( int port UNUSED, const struct in_addr * addr UNUSED )
 }
 #endif /* IP_ADD_MEMBERSHIP */
 
-int tr_netBind( int port, int type )
+static int
+tr_netBind( int port, int type )
 {
     int s;
     struct sockaddr_in sock;
@@ -372,6 +384,19 @@ int tr_netBind( int port, int type )
 
     return s;
 }
+
+int
+tr_netBindTCP( int port )
+{
+    return tr_netBind( port, SOCK_STREAM );
+}
+
+int
+tr_netBindUDP( int port )
+{
+    return tr_netBind( port, SOCK_DGRAM );
+}
+
 
 int tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
 {

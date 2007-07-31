@@ -27,15 +27,13 @@
 #include <string.h>
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include "transmission.h"
 #include "choking.h"
 #include "natpmp.h"
 #include "net.h"
 #include "peer.h"
+#include "platform.h"
 #include "shared.h"
 #include "upnp.h"
 #include "utils.h"

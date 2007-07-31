@@ -29,13 +29,12 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "transmission.h"
+#include "net.h"
+#include "platform.h"
 #include "utils.h"
 
 #define TR_MAX_OPEN_FILES 16 /* That is, real files, not sockets */
@@ -88,7 +87,7 @@ static void CloseFile( int i );
 /***********************************************************************
  * tr_fdInit
  **********************************************************************/
-void tr_fdInit()
+void tr_fdInit( void )
 {
     int i, j, s[4096];
 
@@ -407,7 +406,7 @@ void tr_fdSocketClose( int s )
 /***********************************************************************
  * tr_fdClose
  **********************************************************************/
-void tr_fdClose()
+void tr_fdClose( void )
 {
     tr_lockFree( gFd->lock );
     tr_condFree( gFd->cond );
