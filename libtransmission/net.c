@@ -80,7 +80,7 @@ struct tr_resolve_s
  * Initializes the static variables used for resolution and launch the
  * gethostbyname thread.
  **********************************************************************/
-void tr_netResolveThreadInit()
+void tr_netResolveThreadInit( void )
 {
     resolveDie   = 0;
     resolveQueue = NULL;
@@ -96,7 +96,7 @@ void tr_netResolveThreadInit()
  * wait until it does, in case it is stuck in a resolution: we let it
  * die and clean itself up.
  **********************************************************************/
-void tr_netResolveThreadClose()
+void tr_netResolveThreadClose( void )
 {
     tr_lockLock( resolveLock );
     resolveDie = 1;
@@ -289,7 +289,7 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
 
     if( connect( s, (struct sockaddr *) &sock,
                  sizeof( struct sockaddr_in ) ) < 0 &&
-        errno != EINPROGRESS )
+        sockerrno != EINPROGRESS )
     {
         tr_err( "Could not connect socket (%s)", strerror( errno ) );
         tr_netClose( s );
@@ -415,7 +415,7 @@ tr_netSend( int s, const void * buf, int size )
     if( ret >= 0 )
         return ret;
 
-    if( errno == ENOTCONN || errno == EAGAIN || errno == EWOULDBLOCK )
+    if( sockerrno == ENOTCONN || sockerrno == EAGAIN || sockerrno == EWOULDBLOCK )
         return TR_NET_BLOCK;
 
     return TR_NET_CLOSE;
@@ -430,7 +430,7 @@ int tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * addr )
     ret = recvfrom( s, buf, size, 0, ( struct sockaddr * ) addr, &len );
     if( ret < 0 )
     {
-        if( errno == EAGAIN || errno == EWOULDBLOCK )
+        if( sockerrno == EAGAIN || sockerrno == EWOULDBLOCK )
         {
             ret = TR_NET_BLOCK;
         }

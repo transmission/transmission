@@ -400,10 +400,10 @@ sendSSDP( int fd )
     if( 0 > sendto( fd, buf, len, 0,
                     (struct sockaddr*) &sin, sizeof( sin ) ) )
     {
-        if( EAGAIN != errno )
+        if( EAGAIN != sockerrno )
         {
             tr_err( "Could not send SSDP discover message (%s)",
-                    strerror( errno ) );
+                    strerror( sockerrno ) );
         }
         killSock( &fd );
         return -1;
@@ -507,7 +507,7 @@ recvSSDP( int fd, char * buf, int * len )
     }
     else if( TR_NET_CLOSE & *len )
     {
-        tr_err( "Could not receive SSDP message (%s)", strerror( errno ) );
+        tr_err( "Could not receive SSDP message (%s)", strerror( sockerrno ) );
         return TR_NET_ERROR;
     }
     else

@@ -33,15 +33,7 @@ extern int vasprintf( char **, const char *, va_list );
 #include <signal.h>
 #endif
 
-#ifdef SYS_BEOS
-#  define socklen_t uint32_t
-#endif
-
 #define TR_NAME "Transmission"
-
-#ifndef INADDR_NONE
-#define INADDR_NONE 0xffffffff
-#endif
 
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))

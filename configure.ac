@@ -116,7 +116,7 @@ case $host_os in
    *cygwin|*mingw32*)
      msw="yes"
      CXXFLAGS="$CXXFLAGS -mms-bitfields -mwin32 -mwindows"
-     CPPFLAGS="$CPPFLAGS -D__MINGW__ -DWIN32_LEAN_AND_MEAN"
+     CPPFLAGS="$CPPFLAGS -DWIN32 -DWIN32_LEAN_AND_MEAN"
      LIBS="$LIBS -lshell32 -lws2_32"
      transmissionlocaledir="locale"
      if test -z "$host_alias"; then

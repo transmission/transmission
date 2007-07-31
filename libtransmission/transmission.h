@@ -52,7 +52,7 @@ extern "C" {
 #define INET_ADDRSTRLEN 16
 #endif
 
-#if defined(__MINGW__)
+#if defined(WIN32)
 #define TR_PATH_DELIMITER '\\'
 #define TR_PATH_DELIMITER_STR "\\"
 #else

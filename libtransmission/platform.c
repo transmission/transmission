@@ -845,10 +845,10 @@ getroute( int fd, unsigned int * buflen )
         res = recvfrom( fd, buf, len, 0, (struct sockaddr *) &snl, &slen );
         if( 0 > res )
         {
-            if( EAGAIN != errno )
+            if( EAGAIN != sockerrno )
             {
                 tr_err( "failed to read from routing socket (%s)",
-                        strerror( errno ) );
+                        strerror( sockerrno ) );
             }
             free( buf );
             *buflen = 0;

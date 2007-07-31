@@ -25,12 +25,38 @@
 #ifndef _TR_NET_H_
 #define _TR_NET_H_
 
-#if defined(BEOS_NETSERVER) || defined(__MINGW__)
-#include <stdint.h>
-typedef uint16_t tr_port_t;
+#ifdef WIN32
+    #include <stdint.h>
+    #include <winsock2.h>
+    typedef uint16_t tr_port_t;
 #else
-#include <arpa/inet.h>
-typedef in_port_t tr_port_t;
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+    typedef in_port_t tr_port_t;
+#endif
+
+#ifdef SYS_BEOS
+    #include <stdint.h>
+    typedef uint32_t socklen_t;
+#endif
+
+#ifdef WIN32
+    #define EAGAIN       WSAEAGAIN
+    #define ECONNREFUSED WSAECONNREFUSED
+    #define ECONNRESET   WSAECONNRESET
+    #define EHOSTUNREACH WSAEHOSTUNREACH
+    #define EINPROGRESS  WSAEINPROGRESS
+    #define ENOTCONN     WSAENOTCONN
+    #define EWOULDBLOCK  WSAEWOULDBLOCK
+    #define sockerrno WSAGetLastError( )
+#else
+    #include <errno.h>
+    #define sockerrno errno
+#endif
+
+#ifndef INADDR_NONE
+#define INADDR_NONE 0xffffffff
 #endif
 
 struct in_addr;
@@ -42,8 +68,8 @@ struct sockaddr_in;
 int tr_netResolve( const char *, struct in_addr * );
 
 typedef struct tr_resolve_s tr_resolve_t;
-void           tr_netResolveThreadInit();
-void           tr_netResolveThreadClose();
+void           tr_netResolveThreadInit( void );
+void           tr_netResolveThreadClose( void );
 tr_resolve_t * tr_netResolveInit( const char * address );
 tr_tristate_t  tr_netResolvePulse( tr_resolve_t *, struct in_addr * );
 void           tr_netResolveClose( tr_resolve_t * );
@@ -52,13 +78,13 @@ void           tr_netResolveClose( tr_resolve_t * );
 /***********************************************************************
  * TCP and UDP sockets
  **********************************************************************/
-int  tr_netOpenTCP ( const struct in_addr * addr, tr_port_t port, int priority );
-int  tr_netOpenUDP ( const struct in_addr * addr, tr_port_t port, int priority );
+int  tr_netOpenTCP  ( const struct in_addr * addr, tr_port_t port, int priority );
+int  tr_netOpenUDP  ( const struct in_addr * addr, tr_port_t port, int priority );
 int  tr_netMcastOpen( int port, const struct in_addr * addr );
-int  tr_netBindTCP ( int port );
-int  tr_netBindUDP ( int port );
-int  tr_netAccept  ( int s, struct in_addr *, tr_port_t * );
-void tr_netClose   ( int s );
+int  tr_netBindTCP  ( int port );
+int  tr_netBindUDP  ( int port );
+int  tr_netAccept   ( int s, struct in_addr *, tr_port_t * );
+void tr_netClose    ( int s );
 
 #define TR_NET_BLOCK 0x80000000
 #define TR_NET_CLOSE 0x40000000

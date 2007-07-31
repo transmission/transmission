@@ -595,7 +595,7 @@ pulsereq( tr_natpmp_t * pmp )
     }
     else if( TR_NET_CLOSE & res )
     {
-        if( ECONNRESET == errno || ECONNREFUSED == errno )
+        if( ECONNRESET == sockerrno || ECONNREFUSED == sockerrno )
         {
             tr_dbg( "nat-pmp not supported by device" );
             req->nobodyhome = 1;
@@ -651,7 +651,7 @@ sendreq( tr_natpmp_req_t * req )
     }
 
     res = tr_netSend( req->fd, buf, sizeof( buf ) );
-    if( TR_NET_CLOSE & res && EHOSTUNREACH == errno )
+    if( TR_NET_CLOSE & res && EHOSTUNREACH == sockerrno )
     {
         res = TR_NET_BLOCK;
     }
