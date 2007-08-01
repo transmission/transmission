@@ -63,7 +63,7 @@ char * tr_clientForId( uint8_t * id )
             {
                 asprintf( &ret, "Transmission %d.%c%c%s",
                         charToInt( id[3] ), id[4], id[5],
-                        id[6] == 'Z' ? " (dev)" : "" );
+                        id[6] == 'Z' ? "+" : "" );
             }
         }
         else if( !memcmp( &id[1], "AZ", 2 ) )
