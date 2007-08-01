@@ -40,12 +40,14 @@ int  tr_rand ( int );
 void * tr_memmem( const void *, size_t, const void *, size_t );
 
 /***********************************************************************
- * tr_mkdir
+ * tr_mkdirp
  ***********************************************************************
  * Create a directory and any needed parent directories.
  * Note that the string passed in must be writable!
  **********************************************************************/
-int tr_mkdir( char * path );
+int tr_mkdirp( char * path, int permissions );
+
+int tr_mkdir( const char * path, int permissions );
 
 /***********************************************************************
  * tr_strcasecmp

@@ -240,13 +240,15 @@ static void resolveFunc( void * arg UNUSED )
 
 static int makeSocketNonBlocking( int s )
 {
-    int flags;
-
-#ifdef SYS_BEOS
-    flags = 1;
+#ifdef SYS_WIN32
+    unsigned long flags = 1;
+    if( ioctlsocket( sock, FIONBIO, &flags) == SOCKET_ERROR )
+#elif defined(SYS_BEOS)
+    int flags = 1;
     if( setsockopt( s, SOL_SOCKET, SO_NONBLOCK,
                     &flags, sizeof( int ) ) < 0 )
 #else
+    int flags = 1;
     if( ( flags = fcntl( s, F_GETFL, 0 ) ) < 0 ||
         fcntl( s, F_SETFL, flags | O_NONBLOCK ) < 0 )
 #endif

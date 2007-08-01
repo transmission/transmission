@@ -230,7 +230,22 @@ void * tr_memmem ( const void *vbig, size_t big_len,
 #endif
 
 
-int tr_mkdir( char * path )
+int
+tr_mkdir( const char * path, int permissions 
+#ifdef WIN32
+                                             UNUSED
+#endif
+                                                    )
+{
+#ifdef WIN32
+    return mkdir( path );
+#else
+    return mkdir( path, permissions );
+#endif
+}
+
+int
+tr_mkdirp( char * path, int permissions )
 {
     char      * p, * pp;
     struct stat sb;
@@ -254,7 +269,7 @@ int tr_mkdir( char * path )
         if( stat( path, &sb ) )
         {
             /* Folder doesn't exist yet */
-            if( mkdir( path, 0777 ) )
+            if( tr_mkdir( path, permissions ) )
             {
                 tr_err( "Could not create directory %s (%s)", path,
                         strerror( errno ) );

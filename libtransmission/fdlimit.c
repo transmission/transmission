@@ -80,8 +80,8 @@ static tr_fd_t * gFd = NULL;
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int  OpenFile( int i, const char * folder, const char * name, int write );
-static void CloseFile( int i );
+static int  TrOpenFile( int i, const char * folder, const char * name, int write );
+static void TrCloseFile( int i );
 
 
 /***********************************************************************
@@ -166,7 +166,7 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
         {
             /* File is open read-only and needs to be closed then
              * re-opened read-write */
-            CloseFile( i );
+            TrCloseFile( i );
             continue;
         }
         winner = i;
@@ -204,7 +204,7 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
 
         if( winner >= 0 )
         {
-            CloseFile( winner );
+            TrCloseFile( winner );
             goto open;
         }
 
@@ -213,7 +213,7 @@ int tr_fdFileOpen( const char * folder, const char * name, int write )
     }
 
 open:
-    if( ( ret = OpenFile( winner, folder, name, write ) ) )
+    if( ( ret = TrOpenFile( winner, folder, name, write ) ) )
     {
         tr_lockUnlock( gFd->lock );
         return ret;
@@ -269,7 +269,7 @@ void tr_fdFileClose( const char * folder, const char * name )
         if( !strcmp( folder, gFd->open[i].folder ) &&
             !strcmp( name, gFd->open[i].name ) )
         {
-            CloseFile( i );
+            TrCloseFile( i );
         }
     }
 
@@ -423,7 +423,7 @@ void tr_fdClose( void )
  ***********************************************************************
  *
  **********************************************************************/
-static int OpenFile( int i, const char * folder, const char * name, int write )
+static int TrOpenFile( int i, const char * folder, const char * name, int write )
 {
     tr_openFile_t * file = &gFd->open[i];
     struct stat sb;
@@ -453,7 +453,7 @@ static int OpenFile( int i, const char * folder, const char * name, int write )
             *s = '\0';
             if( stat( path, &sb ) )
             {
-                if( mkdir( path, 0777 ) )
+                if( tr_mkdir( path, 0777 ) )
                 {
                     ret = tr_ioErrorFromErrno();
                     tr_err( "Could not create folder '%s'", path );
@@ -490,13 +490,13 @@ static int OpenFile( int i, const char * folder, const char * name, int write )
 }
 
 /***********************************************************************
- * CloseFile
+ * TrCloseFile
  ***********************************************************************
  * We first mark it as closing then release the lock while doing so,
  * because close() may take same time and we don't want to block other
  * threads.
  **********************************************************************/
-static void CloseFile( int i )
+static void TrCloseFile( int i )
 {
     tr_openFile_t * file = &gFd->open[i];
 
@@ -514,7 +514,7 @@ static void CloseFile( int i )
     /* Nobody is closing it already, so let's do it */
     if( file->status & STATUS_USED )
     {
-        tr_err( "CloseFile: closing a file that's being used!" );
+        tr_err( "TrCloseFile: closing a file that's being used!" );
     }
     tr_dbg( "Closing %s in %s (%d)", file->name, file->folder, file->write );
     file->status = STATUS_CLOSING;

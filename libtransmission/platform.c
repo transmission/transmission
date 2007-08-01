@@ -32,6 +32,7 @@
   #include <FindDirectory.h>
   #include <kernel/OS.h>
   #define BEOS_MAX_THREADS 256
+#elif defined(WIN32)
 #else
   #include <pthread.h>
 #endif
@@ -127,7 +128,7 @@ tr_threadJoin( tr_thread_t * t )
         long exit;
         wait_for_thread( t->thread, &exit );
 #elif defined(WIN32)
-        WaitForSingleObject(thread->handle, INFINITE);
+        WaitForSingleObject( t->thread, INFINITE );
         CloseHandle( t->thread );
 #else
         pthread_join( t->thread, NULL );
@@ -548,7 +549,7 @@ tr_getPrefsDirectory( void )
     tr_buildPath ( buf, buflen, h, ".transmission", NULL );
 #endif
 
-    tr_mkdir( buf );
+    tr_mkdirp( buf, 0700 );
     init = 1;
 
 #ifdef SYS_DARWIN
@@ -582,7 +583,7 @@ tr_getCacheDirectory( void )
     tr_buildPath( buf, buflen, p, "cache", NULL );
 #endif
 
-    tr_mkdir( buf );
+    tr_mkdirp( buf, 0700 );
     init = 1;
 
     if( strcmp( p, buf ) )
@@ -612,7 +613,7 @@ tr_getTorrentsDirectory( void )
     tr_buildPath( buf, buflen, p, "torrents", NULL );
 #endif
 
-    tr_mkdir( buf );
+    tr_mkdirp( buf, 0700 );
     init = 1;
     return buf;
 }
