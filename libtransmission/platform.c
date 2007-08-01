@@ -340,7 +340,7 @@ struct tr_cond_s
 {
 #ifdef SYS_BEOS
     sem_id sem;
-    thread_id theads[BEOS_MAX_THREADS];
+    thread_id threads[BEOS_MAX_THREADS];
     int start, end;
 #elif defined(WIN32)
     CONDITION_VARIABLE cond;
