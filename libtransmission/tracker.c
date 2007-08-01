@@ -199,7 +199,9 @@ static void failureAnnouncing( tr_tracker_t * tc )
 int
 tr_trackerCanManualAnnounce( const tr_tracker_t * tc )
 {
-    return tc && ((tc->dateOk + MANUAL_ANNOUNCE_INTERVAL_MSEC) < tr_date());
+    return tc
+        && !tc->forceAnnounce
+        && ((tc->dateOk + MANUAL_ANNOUNCE_INTERVAL_MSEC) < tr_date());
 }
 
 static int shouldConnect( tr_tracker_t * tc )

@@ -28,6 +28,7 @@
 #ifdef WIN32
     #include <stdint.h>
     #include <winsock2.h>
+    typedef int socklen_t;
     typedef uint16_t tr_port_t;
 #else
     #include <sys/socket.h>
