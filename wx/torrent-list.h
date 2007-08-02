@@ -87,7 +87,7 @@ class TorrentListCtrl: public wxListCtrl
         void Resort( );
         void RefreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
         void Remove( const std::set<tr_torrent_t*>& );
-        static int Compare( long, long, long );
+        static int wxCALLBACK Compare( long, long, long );
 
         /** torrent hash -> the torrent's row in myTorrentList */
         typedef std::map<std::string,int> str2int_t;

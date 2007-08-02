@@ -33,8 +33,11 @@
 #include <libtransmission/makemeta.h>
 
 #ifdef SYS_BEOS
-#include <kernel/OS.h>
-#define usleep snooze
+    #include <kernel/OS.h>
+    #define usleep snooze
+#elif defined(WIN32)
+    #include <windows.h>
+    #define usleep(N) Sleep(N/1000)
 #endif
 
 /* macro to shut up "unused parameter" warnings */
@@ -246,7 +249,7 @@ int main( int argc, char ** argv )
         int  chars = 0;
         int result;
 
-        sleep( 1 );
+        usleep( 1000 );
 
         if( gotsig )
         {

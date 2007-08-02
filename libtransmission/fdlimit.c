@@ -340,7 +340,7 @@ int tr_fdSocketCreate( int type, int priority )
 
     if( priority || ( gFd->normal < gFd->normalMax ) )
        if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
-           tr_err( "Could not create socket (%s)", strerror( sockerrno ) );
+           tr_err( "Couldn't create socket (%s)", strerror( sockerrno ) );
 
     if( s > -1 )
     {
@@ -456,7 +456,7 @@ static int TrOpenFile( int i, const char * folder, const char * name, int write 
                 if( tr_mkdir( path, 0777 ) )
                 {
                     ret = tr_ioErrorFromErrno();
-                    tr_err( "Could not create folder '%s'", path );
+                    tr_err( "Couldn't create folder '%s'", path );
                     return ret;
                 }
             }

@@ -270,7 +270,7 @@ static int makeSocketNonBlocking( int s )
         fcntl( s, F_SETFL, flags | O_NONBLOCK ) < 0 )
 #endif
     {
-        tr_err( "Could not set socket to non-blocking mode (%s)",
+        tr_err( "Couldn't set socket to non-blocking mode (%s)",
                 strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
@@ -310,7 +310,7 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
                  sizeof( struct sockaddr_in ) ) < 0 &&
         sockerrno != EINPROGRESS )
     {
-        tr_err( "Could not connect socket (%s)", strerror( sockerrno ) );
+        tr_err( "Couldn't connect socket (%s)", strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
     }
@@ -347,7 +347,7 @@ int tr_netMcastOpen( int port, const struct in_addr * addr )
     req.imr_interface.s_addr = htonl( INADDR_ANY );
     if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&req, sizeof ( req ) ) )
     {
-        tr_err( "Could not join multicast group (%s)", strerror( sockerrno ) );
+        tr_err( "Couldn't join multicast group (%s)", strerror( sockerrno ) );
         tr_netClose( fd );
         return -1;
     }
@@ -396,7 +396,7 @@ tr_netBind( int port, int type )
     if( bind( s, (struct sockaddr *) &sock,
                sizeof( struct sockaddr_in ) ) )
     {
-        tr_err( "Could not bind port %d", port );
+        tr_err( "Couldn't bind port %d", port );
         tr_netClose( s );
         return -1;
     }

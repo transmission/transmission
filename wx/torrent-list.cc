@@ -369,7 +369,7 @@ TorrentListCtrl :: OnItemDeselected( wxListEvent& event )
 
 static TorrentListCtrl * uglyHack = NULL;
 
-int
+int wxCALLBACK
 TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 {
     TorrentListCtrl * self = uglyHack;
