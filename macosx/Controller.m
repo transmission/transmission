@@ -1319,7 +1319,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
     Torrent * torrent;
-    NSDate * date;
     while ((torrent = [enumerator nextObject]))
     {
         if ([torrent canManualAnnounce])
@@ -2889,13 +2888,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
-        NSDate * date;
         while ((torrent = [enumerator nextObject]))
-        {
-            //time interval returned will be negative
             if ([torrent canManualAnnounce])
                 return YES;
-        }
         return NO;
     }
     

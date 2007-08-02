@@ -352,6 +352,13 @@
 		A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuSpeedToDisplayLimitTransformer.m; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileBrowserCell.h; path = macosx/FileBrowserCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileBrowserCell.m; path = macosx/FileBrowserCell.m; sourceTree = "<group>"; };
+		A22A7EBB0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A22A7EBC0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22A7EBD0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A22A7EBE0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A22A7EBF0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A22A7EC00C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A22A7EC10C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A22BC9AD0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/AboutWindow.nib; sourceTree = "<group>"; };
@@ -1403,6 +1410,7 @@
 				A22BC9AE0C5C505200F5FB72 /* Korean */,
 				A22BCA2E0C5D5CDA00F5FB72 /* Italian */,
 				A20431100C5EAF490081E5CC /* Russian */,
+				A22A7EBC0C627FC200E30364 /* Greek */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1414,6 +1422,7 @@
 				A22BC9B10C5C505200F5FB72 /* Korean */,
 				A22BCA310C5D5CDA00F5FB72 /* Italian */,
 				A20431130C5EAF490081E5CC /* Russian */,
+				A22A7EBF0C627FC200E30364 /* Greek */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1425,6 +1434,7 @@
 				A22BC9AF0C5C505200F5FB72 /* Korean */,
 				A22BCA2F0C5D5CDA00F5FB72 /* Italian */,
 				A20431110C5EAF490081E5CC /* Russian */,
+				A22A7EBD0C627FC200E30364 /* Greek */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1436,6 +1446,7 @@
 				A22BC9AD0C5C505200F5FB72 /* Korean */,
 				A22BCA2D0C5D5CDA00F5FB72 /* Italian */,
 				A204310F0C5EAF490081E5CC /* Russian */,
+				A22A7EBB0C627FC200E30364 /* Greek */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1447,6 +1458,7 @@
 				A22BC9B20C5C505300F5FB72 /* Korean */,
 				A22BCA320C5D5CDA00F5FB72 /* Italian */,
 				A20431140C5EAF490081E5CC /* Russian */,
+				A22A7EC00C627FC200E30364 /* Greek */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1458,6 +1470,7 @@
 				A22BC9B00C5C505200F5FB72 /* Korean */,
 				A22BCA300C5D5CDA00F5FB72 /* Italian */,
 				A20431120C5EAF490081E5CC /* Russian */,
+				A22A7EBE0C627FC200E30364 /* Greek */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1469,6 +1482,7 @@
 				A22BC9B30C5C505300F5FB72 /* Korean */,
 				A22BCA330C5D5CDA00F5FB72 /* Italian */,
 				A20431150C5EAF490081E5CC /* Russian */,
+				A22A7EC10C627FC200E30364 /* Greek */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";

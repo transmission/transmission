@@ -1,14 +1,15 @@
 EXTRA_DIST = \
     Sparkle.framework \
     CTGradient \
-    English.lproj \
-    Italian.lproj \
-    Russian.lproj \
     UKKQueue \
     TransmissionHelp \
     Applescript \
     Images \
     Growl.framework \
+    English.lproj \
+    Italian.lproj \
+    Russian.lproj \
+    Greek.lproj \
     Korean.lproj
 
 # Use Xcode do make the actual build
