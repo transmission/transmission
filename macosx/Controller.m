@@ -72,6 +72,7 @@
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
+#define DONATE_URL   @"http://transmission.m0k.org/donate.php"
 
 static void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
@@ -3117,6 +3118,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) linkForums: (id) sender
 {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: FORUM_URL]];
+}
+
+- (void) linkDonate: (id) sender
+{
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: DONATE_URL]];
 }
 
 - (void) prepareForUpdate: (NSNotification *) notification

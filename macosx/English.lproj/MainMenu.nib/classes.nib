@@ -9,6 +9,7 @@
                 copyTorrentFiles = id; 
                 createFile = id; 
                 doNothing = id; 
+                linkDonate = id; 
                 linkForums = id; 
                 linkHomepage = id; 
                 moveDataFiles = id; 

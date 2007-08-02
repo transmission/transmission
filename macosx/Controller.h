@@ -221,9 +221,11 @@
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
 
-- (void) showMainWindow:    (id) sender;
-- (void) linkHomepage:      (id) sender;
-- (void) linkForums:        (id) sender;
+- (void) showMainWindow: (id) sender;
+
+- (void) linkHomepage: (id) sender;
+- (void) linkForums: (id) sender;
+- (void) linkDonate: (id) sender;
 
 - (void) prepareForUpdate:  (NSNotification *) notification;
 
