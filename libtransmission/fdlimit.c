@@ -429,6 +429,7 @@ static int TrOpenFile( int i, const char * folder, const char * name, int write 
     struct stat sb;
     char path[MAX_PATH_LENGTH];
     int ret;
+    int flags;
 
     tr_dbg( "Opening %s in %s (%d)", name, folder, write );
 
@@ -448,7 +449,7 @@ static int TrOpenFile( int i, const char * folder, const char * name, int write 
         char * p = path + strlen( folder ) + 1;
         char * s;
 
-        while( ( s = strchr( p, '/' ) ) )
+        while( ( s = strchr( p, TR_PATH_DELIMITER ) ) )
         {
             *s = '\0';
             if( stat( path, &sb ) )
@@ -468,14 +469,19 @@ static int TrOpenFile( int i, const char * folder, const char * name, int write 
                     return TR_ERROR_IO_OTHER;
                 }
             }
-            *s = '/';
+            *s = TR_PATH_DELIMITER;
             p = s + 1;
         }
     }
 
     /* Now try to really open the file */
     errno = 0;
-    file->file = open( path, write ? ( O_RDWR | O_CREAT ) : O_RDONLY, 0666 );
+    flags = 0;
+#ifdef WIN32
+    flags |= O_BINARY;
+#endif
+    flags |= write ? (O_RDWR | O_CREAT) : O_RDONLY;
+    file->file = open( path, flags, 0666 );
     if( write && ( file->file < 0 ) )
     {
         ret = tr_ioErrorFromErrno();

@@ -167,7 +167,7 @@ tr_fastResumeSave( const tr_torrent_t * tor )
     uint64_t  total;
 
     fastResumeFileName( path, sizeof path, tor, 1 );
-    file = fopen( path, "w" );
+    file = fopen( path, "wb" );
     if( NULL == file ) {
         tr_err( "Couldn't open '%s' for writing", path );
         return;
@@ -468,13 +468,13 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
 
     /* Open resume file */
     fastResumeFileName( path, sizeof path, tor, 1 );
-    file = fopen( path, "r" );
+    file = fopen( path, "rb" );
     if( !file )
     {
         if( ENOENT == errno )
         {
             fastResumeFileName( path, sizeof path, tor, 0 );
-            file = fopen( path, "r" );
+            file = fopen( path, "rb" );
             if( !file )
             {
                 fastResumeFileName( path, sizeof path, tor, 1 );

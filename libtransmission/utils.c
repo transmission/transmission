@@ -48,7 +48,7 @@
 
 static tr_lock_t      * messageLock = NULL;
 static int              messageLevel = 0;
-static int              messageQueuing = 0;
+static int              messageQueuing = FALSE;
 static tr_msg_list_t *  messageQueue = NULL;
 static tr_msg_list_t ** messageQueueTail = &messageQueue;
 
@@ -160,6 +160,7 @@ void tr_msg( int level, char * msg, ... )
         {
             vfprintf( stderr, msg, args1 );
             fputc( '\n', stderr );
+            fflush( stderr );
         }
         va_end( args1 );
     }

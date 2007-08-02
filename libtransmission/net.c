@@ -306,9 +306,12 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
     sock.sin_addr.s_addr = addr->s_addr;
     sock.sin_port        = port;
 
-    if( connect( s, (struct sockaddr *) &sock,
-                 sizeof( struct sockaddr_in ) ) < 0 &&
-        sockerrno != EINPROGRESS )
+    if( ( connect( s, (struct sockaddr *) &sock,
+                   sizeof( struct sockaddr_in ) ) < 0 )
+#ifdef WIN32
+        && ( sockerrno != WSAEWOULDBLOCK )
+#endif
+        && ( sockerrno != EINPROGRESS ) )
     {
         tr_err( "Couldn't connect socket (%s)", strerror( sockerrno ) );
         tr_netClose( s );

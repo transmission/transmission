@@ -748,7 +748,7 @@ getroute( int * buflen )
         if( ENOENT != errno )
         {
             tr_err( "sysctl net.route.0.inet.flags.gateway failed (%s)",
-                    strerror( errno ) );
+                    strerror( sockerrno ) );
         }
         *buflen = 0;
         return NULL;
@@ -764,7 +764,7 @@ getroute( int * buflen )
     if( sysctl( mib, 6, buf, &len, NULL, 0 ) )
     {
         tr_err( "sysctl net.route.0.inet.flags.gateway failed (%s)",
-                strerror( errno ) );
+                strerror( sockerrno ) );
         free( buf );
         *buflen = 0;
         return NULL;
@@ -894,14 +894,14 @@ getsock( void )
     fd = socket( PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE );
     if( 0 > fd )
     {
-        tr_err( "failed to create routing socket (%s)", strerror( errno ) );
+        tr_err( "failed to create routing socket (%s)", strerror( sockerrno ) );
         return -1;
     }
 
     flags = fcntl( fd, F_GETFL );
     if( 0 > flags || 0 > fcntl( fd, F_SETFL, O_NONBLOCK | flags ) )
     {
-        tr_err( "failed to set socket nonblocking (%s)", strerror( errno ) );
+        tr_err( "failed to set socket nonblocking (%s)", strerror( sockerrno ) );
         close( fd );
         return -1;
     }
@@ -920,7 +920,7 @@ getsock( void )
     if( 0 > sendto( fd, &req, sizeof( req ), 0,
                     (struct sockaddr *) &snl, sizeof( snl ) ) )
     {
-        tr_err( "failed to write to routing socket (%s)", strerror( errno ) );
+        tr_err( "failed to write to routing socket (%s)", strerror( sockerrno ) );
         close( fd );
         return -1;
     }
