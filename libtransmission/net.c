@@ -28,8 +28,11 @@
 #include <string.h>
 
 #include <sys/types.h>
+
+#ifndef WIN32
 #include <netdb.h>
 #include <fcntl.h>
+#endif
 
 #include "transmission.h"
 #include "fdlimit.h"
@@ -37,6 +40,20 @@
 #include "platform.h"
 #include "utils.h"
 
+
+void
+tr_netInit( void )
+{
+    static int initialized = FALSE;
+    if( !initialized )
+    {
+#ifdef WIN32
+        WSADATA wsaData;
+        WSAStartup(MAKEWORD(2,2), &wsaData);
+#endif
+        initialized = TRUE;
+    }
+}
 
 /***********************************************************************
  * DNS resolution
@@ -240,9 +257,9 @@ static void resolveFunc( void * arg UNUSED )
 
 static int makeSocketNonBlocking( int s )
 {
-#ifdef SYS_WIN32
+#ifdef WIN32
     unsigned long flags = 1;
-    if( ioctlsocket( sock, FIONBIO, &flags) == SOCKET_ERROR )
+    if( ioctlsocket( s, FIONBIO, &flags) == SOCKET_ERROR )
 #elif defined(SYS_BEOS)
     int flags = 1;
     if( setsockopt( s, SOL_SOCKET, SO_NONBLOCK,
@@ -254,7 +271,7 @@ static int makeSocketNonBlocking( int s )
 #endif
     {
         tr_err( "Could not set socket to non-blocking mode (%s)",
-                strerror( errno ) );
+                strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
     }
@@ -293,7 +310,7 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
                  sizeof( struct sockaddr_in ) ) < 0 &&
         sockerrno != EINPROGRESS )
     {
-        tr_err( "Could not connect socket (%s)", strerror( errno ) );
+        tr_err( "Could not connect socket (%s)", strerror( sockerrno ) );
         tr_netClose( s );
         return -1;
     }
@@ -328,9 +345,9 @@ int tr_netMcastOpen( int port, const struct in_addr * addr )
     memset( &req, 0, sizeof( req ) );
     req.imr_multiaddr.s_addr = addr->s_addr;
     req.imr_interface.s_addr = htonl( INADDR_ANY );
-    if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &req, sizeof ( req ) ) )
+    if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&req, sizeof ( req ) ) )
     {
-        tr_err( "Could not join multicast group (%s)", strerror( errno ) );
+        tr_err( "Could not join multicast group (%s)", strerror( sockerrno ) );
         tr_netClose( fd );
         return -1;
     }
@@ -360,7 +377,7 @@ tr_netBind( int port, int type )
 
 #ifdef SO_REUSEADDR
     optval = 1;
-    setsockopt( s, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof( optval ) );
+    setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof( optval ) );
 #endif
 
 #ifdef SO_REUSEPORT

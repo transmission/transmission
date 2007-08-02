@@ -602,7 +602,7 @@ pulsereq( tr_natpmp_t * pmp )
         }
         else
         {
-            tr_inf( "error reading nat-pmp response (%s)", strerror( errno ) );
+            tr_inf( "error reading nat-pmp response (%s)", strerror( sockerrno ) );
         }
         return TR_NET_ERROR;
     }
@@ -657,7 +657,7 @@ sendreq( tr_natpmp_req_t * req )
     }
     if( TR_NET_CLOSE & res )
     {
-        tr_err( "failed to send nat-pmp request (%s)", strerror( errno ) );
+        tr_err( "failed to send nat-pmp request (%s)", strerror( sockerrno ) );
         return 1;
     }
     else if( !( TR_NET_BLOCK & res ) )

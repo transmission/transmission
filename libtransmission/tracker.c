@@ -30,13 +30,17 @@
 
 #include "transmission.h"
 #include "bencode.h"
-#include "bsdqueue.h"
 #include "completion.h"
 #include "http.h"
 #include "net.h"
 #include "shared.h"
 #include "tracker.h"
 #include "utils.h"
+
+#ifdef WIN32
+#undef SLIST_ENTRY
+#endif
+#include "bsdqueue.h"
 
 /* Users aren't allowed to make a manual announce more often than this. */
 static const int MANUAL_ANNOUNCE_INTERVAL_MSEC = (60*1000);

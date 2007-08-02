@@ -340,7 +340,7 @@ int tr_fdSocketCreate( int type, int priority )
 
     if( priority || ( gFd->normal < gFd->normalMax ) )
        if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
-           tr_err( "Could not create socket (%s)", strerror( errno ) );
+           tr_err( "Could not create socket (%s)", strerror( sockerrno ) );
 
     if( s > -1 )
     {

@@ -35,6 +35,10 @@
 #include <sys/stat.h>
 #include <unistd.h> /* usleep, stat */
 
+#ifdef WIN32
+    #include <windows.h> /* for Sleep */
+#endif
+
 #include "transmission.h"
 #include "trcompat.h"
 #include "utils.h"
@@ -707,11 +711,13 @@ tr_date( void )
 }
 
 void
-tr_wait( uint64_t delay_msec )
+tr_wait( uint64_t delay_milliseconds )
 {
 #ifdef SYS_BEOS
-    snooze( 1000 * delay_msec );
+    snooze( 1000 * delay_milliseconds );
+#elif defined(WIN32)
+    Sleep( (DWORD)delay_milliseconds );
 #else
-    usleep( 1000 * delay_msec );
+    usleep( 1000 * delay_milliseconds );
 #endif
 }

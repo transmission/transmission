@@ -1478,7 +1478,7 @@ main( int argc, char * argv[] )
 
     if( 0 > stat( argv[2], &sb ) )
     {
-        tr_err( "failed to stat file %s: %s", argv[2], strerror( errno ) );
+        tr_err( "failed to stat file %s: %s", argv[2], strerror( sockerrno ) );
         return 1;
     }
 
@@ -1492,7 +1492,7 @@ main( int argc, char * argv[] )
     fd = open( argv[2], O_RDONLY );
     if( 0 > fd )
     {
-        tr_err( "failed to open file %s: %s", argv[2], strerror( errno ) );
+        tr_err( "failed to open file %s: %s", argv[2], strerror( sockerrno ) );
         free( data );
         return 1;
     }
@@ -1501,7 +1501,7 @@ main( int argc, char * argv[] )
     if( sb.st_size > res )
     {
         tr_err( "failed to read file %s: %s", argv[2],
-                ( 0 > res ? strerror( errno ) : "short read count" ) );
+                ( 0 > res ? strerror( sockerrno ) : "short read count" ) );
         close( fd );
         free( data );
         return 1;

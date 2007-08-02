@@ -15,8 +15,8 @@
 #include "speed-stats.h"
 
 BEGIN_EVENT_TABLE( SpeedStats, wxPanel )
-    EVT_PAINT( SpeedStats::OnPaint )
 END_EVENT_TABLE()
+    //EVT_PAINT( SpeedStats::OnPaint )
 
 SpeedStats :: SpeedStats( wxWindow         * parent,
                           wxWindowID         id,

@@ -73,6 +73,7 @@ tr_handle_t * tr_init( const char * tag )
     int           i;
 
     tr_msgInit();
+    tr_netInit();
     tr_netResolveThreadInit();
 
     h = calloc( 1, sizeof( tr_handle_t ) );
@@ -101,8 +102,10 @@ tr_handle_t * tr_init( const char * tag )
         h->azId[i] = tr_rand( 0xff );
     }
 
+#ifndef WIN32
     /* Don't exit when writing on a broken socket */
     signal( SIGPIPE, SIG_IGN );
+#endif
 
     /* Initialize rate and file descripts controls */
     h->upload   = tr_rcInit();

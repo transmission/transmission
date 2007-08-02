@@ -94,6 +94,8 @@ int  tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * );
 
 void tr_netNtop( const struct in_addr * addr, char * buf, int len );
 
+void tr_netInit ( void );
+
 
 #define tr_addrcmp( aa, bb )    memcmp( ( void * )(aa), ( void * )(bb), 4)
 

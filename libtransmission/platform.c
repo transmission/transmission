@@ -33,6 +33,8 @@
   #include <kernel/OS.h>
   #define BEOS_MAX_THREADS 256
 #elif defined(WIN32)
+  #include <windows.h>
+  #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
   #include <pthread.h>
 #endif
@@ -43,6 +45,7 @@
 #include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
+#include "list.h"
 #include "net.h"
 #include "platform.h"
 #include "utils.h"
@@ -111,7 +114,7 @@ tr_threadNew( void (*func)(void *),
     t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
 #elif defined(WIN32)
-    t->thread = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, NULL, 0, NULL );
+    t->thread = (HANDLE) _beginthreadex( NULL, 0, &ThreadFunc, t, 0, NULL );
 #else
     pthread_create( &t->thread, NULL, (void * (*) (void *)) ThreadFunc, t );
 #endif
@@ -216,7 +219,7 @@ tr_lockUnlock( tr_lock_t * l )
 #ifdef SYS_BEOS
     release_sem( l->lock );
 #elif defined(WIN32)
-    DeleteCriticalSection( &l->lock );
+    LeaveCriticalSection( &l->lock );
 #else
     pthread_mutex_unlock( &l->lock );
 #endif
@@ -343,11 +346,25 @@ struct tr_cond_s
     thread_id threads[BEOS_MAX_THREADS];
     int start, end;
 #elif defined(WIN32)
-    CONDITION_VARIABLE cond;
+    tr_list_t * events;
+    tr_lock_t * lock;
 #else
     pthread_cond_t cond;
 #endif
 };
+
+#ifdef WIN32
+static DWORD getContEventTLS( void )
+{
+    static int inited = FALSE;
+    static DWORD event_tls;
+    if( !inited ) {
+        inited = TRUE;
+        event_tls = TlsAlloc();
+    }
+    return event_tls;
+}
+#endif
 
 tr_cond_t*
 tr_condNew( void )
@@ -358,16 +375,19 @@ tr_condNew( void )
     c->start = 0;
     c->end = 0;
 #elif defined(WIN32)
-    InitializeConditionVariable( &c->cond );
+    c->events = NULL;
+    c->lock = tr_lockNew( );
 #else
     pthread_cond_init( &c->cond, NULL );
 #endif
     return c;
 }
 
-void tr_condWait( tr_cond_t * c, tr_lock_t * l )
+void
+tr_condWait( tr_cond_t * c, tr_lock_t * l )
 {
 #ifdef SYS_BEOS
+
     /* Keep track of that thread */
     acquire_sem( c->sem );
     c->threads[c->end] = find_thread( NULL );
@@ -378,10 +398,36 @@ void tr_condWait( tr_cond_t * c, tr_lock_t * l )
     release_sem( *l );
     suspend_thread( find_thread( NULL ) ); /* Wait for signal */
     acquire_sem( *l );
+
 #elif defined(WIN32)
-    SleepConditionVariableCS( &c->cond, &l->lock, INFINITE );
+
+    /* get this thread's cond event */
+    DWORD key = getContEventTLS ( );
+    HANDLE hEvent = TlsGetValue( key );
+    if( !hEvent ) {
+        hEvent = CreateEvent( 0, FALSE, FALSE, 0 );
+        TlsSetValue( key, hEvent );
+    }
+
+    /* add it to the list of events waiting to be signaled */
+    tr_lockLock( c->lock );
+    c->events = tr_list_append( c->events, hEvent );
+    tr_lockUnlock( c->lock );
+
+    /* now wait for it to be signaled */
+    tr_lockUnlock( l );
+    WaitForSingleObject( hEvent, INFINITE );
+    tr_lockLock( l );
+
+    /* remove it from the list of events waiting to be signaled */
+    tr_lockLock( c->lock );
+    c->events = tr_list_remove_data( c->events, hEvent );
+    tr_lockUnlock( c->lock );
+
 #else
+
     pthread_cond_wait( &c->cond, &l->lock );
+
 #endif
 }
 
@@ -409,28 +455,50 @@ static int condTrySignal( tr_cond_t * c )
     return 0;
 }
 #endif
-void tr_condSignal( tr_cond_t * c )
+void
+tr_condSignal( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
+
     acquire_sem( c->sem );
     condTrySignal( c );
     release_sem( c->sem );
+
 #elif defined(WIN32)
-    WakeConditionVariable( &c->cond );
+
+    tr_lockLock( c->lock );
+    if( c->events != NULL )
+        SetEvent( (HANDLE)c->events->data );
+    tr_lockUnlock( c->lock );
+
 #else
+
     pthread_cond_signal( &c->cond );
+
 #endif
 }
-void tr_condBroadcast( tr_cond_t * c )
+
+void
+tr_condBroadcast( tr_cond_t * c )
 {
 #ifdef SYS_BEOS
+
     acquire_sem( c->sem );
     while( !condTrySignal( c ) );
     release_sem( c->sem );
+
 #elif defined(WIN32)
-    WakeAllConditionVariable( &c->cond );
+
+    tr_list_t * l;
+    tr_lockLock( c->lock );
+    for( l=c->events; l!=NULL; l=l->next )
+        SetEvent( (HANDLE)l->data );
+    tr_lockUnlock( c->lock );
+
 #else
+
     pthread_cond_broadcast( &c->cond );
+
 #endif
 }
 
@@ -440,7 +508,8 @@ tr_condFree( tr_cond_t * c )
 #ifdef SYS_BEOS
     delete_sem( c->sem );
 #elif defined(WIN32)
-    /* a no-op, apparently */
+    tr_list_free( c->events );
+    tr_lockFree( c->lock );
 #else
     pthread_cond_destroy( &c->cond );
 #endif
@@ -452,52 +521,40 @@ tr_condFree( tr_cond_t * c )
 ****  PATHS
 ***/
 
-#if !defined( SYS_BEOS ) && !defined( __AMIGAOS4__ )
-
+#if !defined(WIN32) && !defined(SYS_BEOS) && !defined(__AMIGAOS4__)
 #include <pwd.h>
+#endif
 
 const char *
 tr_getHomeDirectory( void )
 {
-    static char     homeDirectory[MAX_PATH_LENGTH];
-    static int      init = 0;
-    char          * envHome;
-    struct passwd * pw;
+    static char buf[MAX_PATH_LENGTH];
+    static int init = 0;
+    const char * envHome;
 
     if( init )
-    {
-        return homeDirectory;
-    }
+        return buf;
 
     envHome = getenv( "HOME" );
-    if( NULL == envHome )
-    {
-        pw = getpwuid( getuid() );
+    if( envHome )
+        snprintf( buf, sizeof(buf), "%s", envHome );
+    else {
+#ifdef WIN32
+        SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, buf );
+#elif defined(SYS_BEOS) || defined(__AMIGAOS4__)
+        *buf = '\0';
+#else
+        struct passwd * pw = getpwuid( getuid() );
         endpwent();
-        if( NULL == pw )
-        {
-            /* XXX need to handle this case */
-            return NULL;
-        }
-        envHome = pw->pw_dir;
+        if( pw != NULL )
+            snprintf( buf, sizeof(buf), "%s", pw->pw_dir );
+#endif
     }
 
-    snprintf( homeDirectory, MAX_PATH_LENGTH, "%s", envHome );
     init = 1;
-
-    return homeDirectory;
+    return buf;
 }
 
-#else
-
-const char *
-tr_getHomeDirectory( void )
-{
-    /* XXX */
-    return "";
-}
-
-#endif /* !SYS_BEOS && !__AMIGAOS4__ */
 
 static void
 tr_migrateResume( const char *oldDirectory, const char *newDirectory )
@@ -545,6 +602,13 @@ tr_getPrefsDirectory( void )
                   "Library", "Application Support", "Transmission", NULL );
 #elif defined(__AMIGAOS4__)
     snprintf( buf, buflen, "PROGDIR:.transmission" );
+#elif defined(WIN32)
+    {
+        char tmp[MAX_PATH_LENGTH];
+        SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, tmp );
+        tr_buildPath( buf, sizeof(buf), tmp, "Transmission", NULL );
+        buflen = strlen( buf );
+    }
 #else
     tr_buildPath ( buf, buflen, h, ".transmission", NULL );
 #endif
@@ -574,7 +638,7 @@ tr_getCacheDirectory( void )
         return buf;
 
     p = tr_getPrefsDirectory();
-#ifdef SYS_BEOS
+#if defined(SYS_BEOS) || defined(WIN32)
     tr_buildPath( buf, buflen, p, "Cache", NULL );
 #elif defined( SYS_DARWIN )
     tr_buildPath( buf, buflen, tr_getHomeDirectory(),
@@ -605,7 +669,7 @@ tr_getTorrentsDirectory( void )
 
     p = tr_getPrefsDirectory ();
 
-#ifdef SYS_BEOS
+#if defined(SYS_BEOS) || defined(WIN32)
     tr_buildPath( buf, buflen, p, "Torrents", NULL );
 #elif defined( SYS_DARWIN )
     tr_buildPath( buf, buflen, p, "Torrents", NULL );
