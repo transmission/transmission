@@ -211,9 +211,9 @@ static int shouldConnect( tr_tracker_t * tc )
 
     /* User has requested a manual announce
        and it's been long enough since the last one */
-    if( tc->forceAnnounce && tr_trackerCanManualAnnounce(tc) )
+    if( tc->forceAnnounce && now > (tc->dateOk+MANUAL_ANNOUNCE_INTERVAL_MSEC) )
         return 1;
-    
+
     /* Last tracker failed, try next */
     if( tc->shouldChangeAnnounce == TC_CHANGE_NEXT
         || tc->shouldChangeAnnounce == TC_CHANGE_REDIRECT )
