@@ -7,6 +7,7 @@ EXTRA_DIST = \
     Images \
     Growl.framework \
     English.lproj \
+    Spanish.lproj \
     Italian.lproj \
     Russian.lproj \
     Greek.lproj \
