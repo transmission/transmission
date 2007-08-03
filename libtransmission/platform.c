@@ -22,12 +22,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef SYS_BEOS
+  #include <signal.h> 
   #include <fs_info.h>
   #include <FindDirectory.h>
   #include <kernel/OS.h>
@@ -395,9 +397,9 @@ tr_condWait( tr_cond_t * c, tr_lock_t * l )
     assert( c->end != c->start ); /* We hit BEOS_MAX_THREADS, arggh */
     release_sem( c->sem );
 
-    release_sem( *l );
+    release_sem( l->lock );
     suspend_thread( find_thread( NULL ) ); /* Wait for signal */
-    acquire_sem( *l );
+    acquire_sem( l->lock );
 
 #elif defined(WIN32)
 

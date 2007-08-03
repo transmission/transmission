@@ -25,14 +25,6 @@
 #ifndef TR_INTERNAL_H
 #define TR_INTERNAL_H 1
 
-
-#ifdef SYS_BEOS
-/* BeOS doesn't declare vasprintf in its headers, but actually
- * implements it */
-extern int vasprintf( char **, const char *, va_list );
-#include <signal.h>
-#endif
-
 #define TR_NAME "Transmission"
 
 #ifdef __GNUC__

@@ -30,6 +30,10 @@
 
 #include <sys/types.h>
 
+#ifdef SYS_BEOS
+extern int vasprintf( char **, const char *, va_list );
+#endif
+
 #include "transmission.h"
 #include "http.h"
 #include "net.h"

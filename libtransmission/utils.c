@@ -37,6 +37,8 @@
 
 #ifdef WIN32
     #include <windows.h> /* for Sleep */
+#elif defined(SYS_BEOS)
+    extern int vasprintf( char **, const char *, va_list );
 #endif
 
 #include "transmission.h"
@@ -423,6 +425,10 @@ tr_buildPath ( char *buf, size_t buflen, const char *first_element, ... )
     va_list vl;
     char* walk = buf;
     const char * element = first_element;
+
+    if( first_element == NULL )
+        return;
+
     va_start( vl, first_element );
     for( ;; ) {
         const size_t n = strlen( element );
