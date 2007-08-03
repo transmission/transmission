@@ -192,8 +192,8 @@ enum { TR_UP, TR_DOWN };
 
 typedef enum
 {
-    TR_SPEEDLIMIT_GLOBAL,    /* indirectly follow the global pool's limit */
-    TR_SPEEDLIMIT_SINGLE,    /* directly follow tr_torrentSetMaxSpeed() */
+    TR_SPEEDLIMIT_GLOBAL,    /* only follow the overall speed limit */
+    TR_SPEEDLIMIT_SINGLE,    /* only follow the per-torrent limit */
     TR_SPEEDLIMIT_UNLIMITED  /* no limits at all */
 }
 tr_speedlimit_t;
