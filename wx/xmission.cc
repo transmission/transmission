@@ -569,15 +569,15 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
         wxToggleButton * tb = new wxToggleButton( panel_1, ID_Filter+i, TorrentFilter::GetName(i) );
         tb->SetValue( true );
         myFilterToggles[i] = tb;
-        buttonSizer->Add( tb, 0, wxTOP|wxRIGHT, 6 );
+        buttonSizer->Add( tb, 0, wxRIGHT, 3 );
     }
 
     myTorrentList = new TorrentListCtrl( handle, myConfig, panel_1 );
     myTorrentList->AddListener( this );
 
     wxBoxSizer * panelSizer = new wxBoxSizer( wxVERTICAL );
-    panelSizer->Add( buttonSizer, 0, wxTOP|wxLEFT|wxRIGHT, 3 );
-    panelSizer->Add( myTorrentList, 1, wxEXPAND|wxALL, 3 );
+    panelSizer->Add( buttonSizer, 0, wxTOP|wxLEFT|wxRIGHT, 4 );
+    panelSizer->Add( myTorrentList, 1, wxEXPAND|wxALL, 4 );
 
     panel_1->SetSizer( panelSizer );
 

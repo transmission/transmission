@@ -52,8 +52,8 @@ TorrentFilter :: GetName( int show, int count )
         case DOWNLOADING: xstr = _("&Uploading");   break;
         case IDLE:        xstr = _("&Idle");        break;
         case STOPPED:     xstr = _("&Stopped");     break;
-        case COMPLETE:    xstr = _("&Complete");    break;
-        case INCOMPLETE:  xstr = _("I&ncomplete");  break;
+        case COMPLETE:    xstr = _("&Done");    break;
+        case INCOMPLETE:  xstr = _("&Not Done");  break;
         default: assert(0);
     }
 
