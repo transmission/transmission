@@ -229,9 +229,11 @@ int main()
   return 0;
 }
 EOF
-  if runcmd $CC -o testconf testconf.c
-  then
-    CFLAGS="$CFLAGS -DHAVE_DIRNAME -DHAVE_BASENAME"
+  if [ "x$SYSTEM" != xBeOS ]; then
+    if runcmd $CC -o testconf testconf.c
+    then
+      CFLAGS="$CFLAGS -DHAVE_DIRNAME -DHAVE_BASENAME"
+    fi
   fi
   rm -f testconf*
 }
