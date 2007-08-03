@@ -14,15 +14,37 @@
 int
 TorrentFilter :: GetFlags( const tr_torrent_t * tor )
 {
-    int ret = 0;
+    int flags = 0;
     const tr_stat_t * s = tr_torrentStat( (tr_torrent_t*)tor );
 
-    if( s->rateUpload > 0.01 ) ret |= FLAG_UPLOADING;
-    if( s->rateDownload > 0.01 ) ret |= FLAG_DOWNLOADING;
-    if( !ret ) ret |= (s->status & TR_STATUS_ACTIVE ) ? FLAG_IDLE : FLAG_STOPPED;
-    ret |= (s->left ? FLAG_INCOMPLETE : FLAG_COMPLETE);
+    switch( s->status )
+    {
+        case TR_STATUS_STOPPING:
+        case TR_STATUS_STOPPED:
+        case TR_STATUS_CHECK:
+        case TR_STATUS_CHECK_WAIT:
+            flags |= FLAG_STOPPED;
+            break;
 
-    return ret;
+        case TR_STATUS_DOWNLOAD:
+            flags |= FLAG_LEECHING;
+            break;
+
+        case TR_STATUS_DONE:
+        case TR_STATUS_SEED:
+            flags |= FLAG_SEEDING;
+            break;
+    }
+
+    flags |= ( ( s->rateUpload + s->rateDownload ) > 0.01 )
+        ? FLAG_ACTIVE
+        : FLAG_IDLE;
+
+    flags |= s->left
+        ? FLAG_DONE
+        : FLAG_NOT_DONE;
+
+    return flags;
 }
 
 void
@@ -32,12 +54,13 @@ TorrentFilter :: CountHits( const torrents_v & torrents,
     memset( counts, '\0', sizeof(int) * N_FILTERS );
     foreach_const( torrents_v, torrents, it ) {
         const int flags = GetFlags( *it );
-        if( flags & FLAG_UPLOADING )    ++counts[UPLOADING];
-        if( flags & FLAG_DOWNLOADING )  ++counts[DOWNLOADING];
-        if( flags & FLAG_IDLE )         ++counts[IDLE];
-        if( flags & FLAG_STOPPED )      ++counts[STOPPED];
-        if( flags & FLAG_COMPLETE )     ++counts[COMPLETE];
-        if( flags & FLAG_INCOMPLETE )   ++counts[INCOMPLETE];
+        if( flags & FLAG_STOPPED )  ++counts[STOPPED];
+        if( flags & FLAG_LEECHING ) ++counts[LEECHING];
+        if( flags & FLAG_SEEDING )  ++counts[SEEDING];
+        if( flags & FLAG_ACTIVE )   ++counts[ACTIVE];
+        if( flags & FLAG_IDLE )     ++counts[IDLE];
+        if( flags & FLAG_DONE )     ++counts[DONE];
+        if( flags & FLAG_NOT_DONE ) ++counts[NOT_DONE];
     }
 }
 
@@ -48,12 +71,13 @@ TorrentFilter :: GetName( int show, int count )
 
     switch( show )
     {
-        case UPLOADING:   xstr = _("&Uploading");   break;
-        case DOWNLOADING: xstr = _("&Uploading");   break;
-        case IDLE:        xstr = _("&Idle");        break;
-        case STOPPED:     xstr = _("&Stopped");     break;
-        case COMPLETE:    xstr = _("&Done");    break;
-        case INCOMPLETE:  xstr = _("&Not Done");  break;
+        case SEEDING:  xstr = _("&Seeds");  break;
+        case LEECHING: xstr = _("&Leeches"); break;
+        case STOPPED:  xstr = _("Sto&pped");  break;
+        case ACTIVE:   xstr = _("&Active");   break;
+        case IDLE:     xstr = _("&Idle");     break;
+        case DONE:     xstr = _("&Done");     break;
+        case NOT_DONE: xstr = _("&Not Done"); break;
         default: assert(0);
     }
 

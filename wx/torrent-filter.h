@@ -21,22 +21,23 @@ class TorrentFilter
 
         typedef std::vector<tr_torrent_t*> torrents_v;
 
-        enum ShowFlags {
-            FLAG_UPLOADING    = (1<<0),
-            FLAG_DOWNLOADING  = (1<<1),
-            FLAG_IDLE         = (1<<2),
-            FLAG_STOPPED      = (1<<3),
-            FLAG_COMPLETE     = (1<<4),
-            FLAG_INCOMPLETE   = (1<<5)
+        enum ShowFlags
+        {
+            FLAG_SEEDING    = (1<<0),
+            FLAG_LEECHING   = (1<<1),
+            FLAG_STOPPED    = (1<<2),
+
+            FLAG_ACTIVE     = (1<<3),
+            FLAG_IDLE       = (1<<4),
+
+            FLAG_DONE       = (1<<5),
+            FLAG_NOT_DONE   = (1<<6)
         };
 
         enum Show {
-            UPLOADING,
-            DOWNLOADING,
-            IDLE,
-            STOPPED,
-            COMPLETE,
-            INCOMPLETE,
+            SEEDING, LEECHING, STOPPED,
+            ACTIVE, IDLE,
+            DONE, NOT_DONE,
             N_FILTERS
         };
 

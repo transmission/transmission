@@ -565,19 +565,24 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     wxBoxSizer * buttonSizer = new wxBoxSizer( wxHORIZONTAL );
 
+    wxStaticText * text = new wxStaticText( panel_1, wxID_ANY, _("Show:") );
+    buttonSizer->Add( text, 0, wxALIGN_CENTER|wxLEFT|wxRIGHT, 3 );
+
+    int rightButtonSpacing[TorrentFilter::N_FILTERS] = { 0, 0, 10, 0, 10, 0, 0 };
     for( int i=0; i<TorrentFilter::N_FILTERS; ++i ) {
         wxToggleButton * tb = new wxToggleButton( panel_1, ID_Filter+i, TorrentFilter::GetName(i) );
         tb->SetValue( true );
         myFilterToggles[i] = tb;
-        buttonSizer->Add( tb, 0, wxRIGHT, 3 );
+        //buttonSizer->Add( tb, 0, wxRIGHT, rightButtonSpacing[i] );
+        buttonSizer->Add( tb, 1, wxEXPAND|wxRIGHT, rightButtonSpacing[i] );
     }
 
     myTorrentList = new TorrentListCtrl( handle, myConfig, panel_1 );
     myTorrentList->AddListener( this );
 
     wxBoxSizer * panelSizer = new wxBoxSizer( wxVERTICAL );
-    panelSizer->Add( buttonSizer, 0, wxTOP|wxLEFT|wxRIGHT, 4 );
-    panelSizer->Add( myTorrentList, 1, wxEXPAND|wxALL, 4 );
+    panelSizer->Add( buttonSizer, 0, wxTOP, 3 );
+    panelSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
 
     panel_1->SetSizer( panelSizer );
 
