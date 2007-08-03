@@ -9,7 +9,9 @@ EXTRA_DIST = \
     gtk-properties.xpm \
     gtk-remove.png \
     gtk-remove.xpm \
-    stop.png \
+    play.xpm \
+    plus.xpm \
+    minus.xpm \
     stop.xpm \
     systray.xpm \
     transmission.png \

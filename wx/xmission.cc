@@ -42,10 +42,11 @@ extern "C"
   #include <libtransmission/transmission.h>
   #include <libtransmission/utils.h>
 
-  #include <images/exec.xpm>
-  #include <images/fileopen.xpm>
-  #include <images/gtk-remove.xpm>
+  #include <images/play.xpm>
   #include <images/stop.xpm>
+  #include <images/plus.xpm>
+  #include <images/minus.xpm>
+
   #include <images/systray.xpm>
   #include <images/transmission.xpm>
 }
@@ -534,10 +535,10 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     ***  Toolbar
     **/
 
-    wxIcon open_icon( fileopen_xpm );
-    wxIcon exec_icon( exec_xpm );
+    wxIcon open_icon( plus_xpm );
+    wxIcon exec_icon( play_xpm );
     wxIcon stop_icon( stop_xpm );
-    wxIcon drop_icon( gtk_remove_xpm );
+    wxIcon drop_icon( minus_xpm );
     wxBitmap bitmap;
 
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
@@ -581,7 +582,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myTorrentList->AddListener( this );
 
     wxBoxSizer * panelSizer = new wxBoxSizer( wxVERTICAL );
-    panelSizer->Add( buttonSizer, 0, wxTOP, 3 );
+    panelSizer->Add( buttonSizer, 0, 0, 0 );
     panelSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
 
     panel_1->SetSizer( panelSizer );
