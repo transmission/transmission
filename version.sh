@@ -48,7 +48,7 @@ cat > libtransmission/version.h.new << EOF
 #define USERAGENT_PREFIX      "$USERAGENT_PREFIX"
 #define SVN_REVISION          "$SVN_REVISION"
 #define SHORT_VERSION_STRING  "$USERAGENT_PREFIX"
-#define LONG_VERSION_STRING   "$USERAGENT_PREFIX r($SVN_REVISION)"
+#define LONG_VERSION_STRING   "$USERAGENT_PREFIX ($SVN_REVISION)"
 EOF
 replace_if_differs libtransmission/version.h.new libtransmission/version.h
 
