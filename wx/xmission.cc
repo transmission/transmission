@@ -29,6 +29,7 @@
 #include <wx/notebook.h>
 #include <wx/snglinst.h>
 #include <wx/splitter.h>
+#include <wx/statline.h>
 #include <wx/taskbar.h>
 #include <wx/tglbtn.h>
 #include <wx/toolbar.h>
@@ -442,6 +443,7 @@ MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
     }
 
     RefreshFilterCounts( );
+    ApplyCurrentFilter( );
 
     mySpeedStats->Update( handle );
 
@@ -541,8 +543,8 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxIcon drop_icon( minus_xpm );
     wxBitmap bitmap;
 
-    wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
-    toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
+    wxToolBar* toolbar = CreateToolBar( wxTB_FLAT );
+    toolbar->SetToolBitmapSize( wxSize( 24, 24 ) );
     bitmap.CopyFromIcon( open_icon );
     toolbar->AddTool( wxID_OPEN,   _T("Open"), bitmap );
     bitmap.CopyFromIcon( exec_icon );
@@ -557,7 +559,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     ***  Row 1
     **/
 
-    wxSplitterWindow * hsplit = new wxSplitterWindow( this );
+    wxSplitterWindow * hsplit = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH );
 #if wxCHECK_VERSION(2,5,4)
     hsplit->SetSashGravity( 0.8 );
 #endif
@@ -582,6 +584,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myTorrentList->AddListener( this );
 
     wxBoxSizer * panelSizer = new wxBoxSizer( wxVERTICAL );
+    panelSizer->Add( new wxStaticLine( panel_1 ), 0, wxEXPAND, 0 );
     panelSizer->Add( buttonSizer, 0, 0, 0 );
     panelSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
 
@@ -630,7 +633,6 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     int count = 0;
     tr_torrent_t ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), flags, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
-    myTorrentList->Add( myTorrents );
     tr_free( torrents );
 
     wxTimerEvent dummy;

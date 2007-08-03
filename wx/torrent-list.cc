@@ -3,7 +3,7 @@
  *
  * This file is licensed by the GPL version 2.  Works owned by the
  * Transmission project are granted a special exemption to clause 2(b)
- * so that the bulk of its code can remain under the MIT license. 
+ * so that the bulk of its code can remain under the MIT license.
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  */
@@ -171,6 +171,8 @@ BEGIN_EVENT_TABLE(TorrentListCtrl, wxListCtrl)
     EVT_LIST_ITEM_DESELECTED( TORRENT_LIST_CTRL, TorrentListCtrl::OnItemDeselected )
 END_EVENT_TABLE()
 
+
+
 TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
                                     wxConfig          * config,
                                     wxWindow          * parent,
@@ -192,6 +194,18 @@ TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
 
 TorrentListCtrl :: ~TorrentListCtrl()
 {
+}
+
+void
+TorrentListCtrl :: SetCell( int item, int column, const wxString& xstr )
+{
+    wxListItem i;
+    i.SetId( item );
+    i.SetColumn( column );
+    i.SetMask( wxLIST_MASK_TEXT );
+    GetItem( i );
+    if( i.GetText() != xstr )
+        SetItem( item, column, xstr );
 }
 
 void
@@ -247,7 +261,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 break;
 
             case COL_PEERS:
-                xstr = wxString::Format( _("%d of %d"), s->peersConnected, s->leechers );
+                xstr = wxString::Format( _("%d (%d)"), s->peersConnected, s->leechers );
                 break;
 
             case COL_RATIO:
@@ -307,7 +321,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
         }
 
         if( col )
-            SetItem( row, col++, xstr );
+            SetCell( row, col++, xstr );
         else {
             // first column... find the right row to put the info in.
             // if the torrent's in the list already, update that row.
@@ -319,7 +333,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
                 }
             }
             if( row >= 0 ) {
-                SetItem( row, col++, xstr );
+                SetCell( row, col++, xstr );
             }
             else {
                 row = InsertItem( GetItemCount(), xstr );
@@ -602,7 +616,7 @@ TorrentListCtrl :: Rebuild()
         InsertColumn( i++, h, format, width );
     }
 
-    Repopulate ();
+    Repopulate( );
 }
 
 typedef std::set<tr_torrent_t*> torrent_set;
@@ -614,11 +628,14 @@ TorrentListCtrl :: Assign( const torrents_t& torrents )
     torrents_v added;
     prev.insert( myTorrents.begin(), myTorrents.end() );
     cur.insert( torrents.begin(), torrents.end() );
-    std::set_difference (prev.begin(), prev.end(), cur.begin(), cur.end(), inserter(removed, removed.begin()));
-    std::set_difference (cur.begin(), cur.end(), prev.begin(), prev.end(), inserter(added, added.begin()));
+    std::set_difference (prev.begin(), prev.end(),
+                         cur.begin(), cur.end(), inserter(removed, removed.begin()));
+    std::set_difference (cur.begin(), cur.end(),
+                         prev.begin(), prev.end(), inserter(added, added.begin()));
     Remove( removed );
     Add( added );
-    Refresh ();
+    Refresh( );
+    Resort( );
 }
 
 void
@@ -629,7 +646,6 @@ TorrentListCtrl :: Add( const torrents_v& add )
     myTorrents.insert( myTorrents.end(), add.begin(), add.end() );
     for( torrents_v::const_iterator it(add.begin()), end(add.end()); it!=end; ++it )
         RefreshTorrent( *it, i++, cols );
-    Resort( );
 }
 
 void
