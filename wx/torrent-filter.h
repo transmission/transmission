@@ -21,29 +21,34 @@ class TorrentFilter
 
         typedef std::vector<tr_torrent_t*> torrents_v;
 
-        enum Show
-        {
-            SHOW_ALL,
-            SHOW_DOWNLOADING,
-            SHOW_UPLOADING,
-            SHOW_COMPLETE,
-            SHOW_INCOMPLETE,
-            SHOW_ACTIVE,
-            SHOW_INACTIVE,
+        enum ShowFlags {
+            FLAG_UPLOADING    = (1<<0),
+            FLAG_DOWNLOADING  = (1<<1),
+            FLAG_IDLE         = (1<<2),
+            FLAG_STOPPED      = (1<<3),
+            FLAG_COMPLETE     = (1<<4),
+            FLAG_INCOMPLETE   = (1<<5)
+        };
+
+        enum Show {
+            UPLOADING,
+            DOWNLOADING,
+            IDLE,
+            STOPPED,
+            COMPLETE,
+            INCOMPLETE,
             N_FILTERS
         };
 
-        static wxString getFilterName( int show );
+        static int GetFlags( const tr_torrent_t * );
 
+        static void CountHits( const torrents_v & torrents,
+                               int              * counts );
+
+        static wxString GetName( int show, int count=0 );
 
         static void RemoveFailures( int           show,
                                     torrents_v  &  torrents );
-
-        static int CountHits ( int                  show,
-                               const torrents_v  &  torrents );
-
-        static bool Test( int            show,
-                          tr_torrent_t * torrent );
 };
 
 

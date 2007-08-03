@@ -30,6 +30,7 @@
 #include <wx/snglinst.h>
 #include <wx/splitter.h>
 #include <wx/taskbar.h>
+#include <wx/tglbtn.h>
 #include <wx/toolbar.h>
 #include <wx/wx.h>
 #if wxCHECK_VERSION(2,8,0)
@@ -43,7 +44,6 @@ extern "C"
 
   #include <images/exec.xpm>
   #include <images/fileopen.xpm>
-  #include <images/gtk-info.xpm>
   #include <images/gtk-remove.xpm>
   #include <images/stop.xpm>
   #include <images/systray.xpm>
@@ -138,7 +138,6 @@ public:
     void OnExit( wxCommandEvent& );
     void OnAbout( wxCommandEvent& );
     void OnOpen( wxCommandEvent& );
-    void OnFilterSelected( wxListEvent& );
 
     void OnStart( wxCommandEvent& );
     void OnStartUpdate( wxUpdateUIEvent& );
@@ -152,13 +151,12 @@ public:
     void OnRecheck( wxCommandEvent& );
     void OnRecheckUpdate( wxUpdateUIEvent& );
 
-    void OnInfo( wxCommandEvent& );
-    void OnInfoUpdate( wxUpdateUIEvent& );
-
     void OnSelectAll( wxCommandEvent& );
     void OnSelectAllUpdate( wxUpdateUIEvent& );
     void OnDeselectAll( wxCommandEvent& );
     void OnDeselectAllUpdate( wxUpdateUIEvent& );
+
+    void OnFilterToggled( wxCommandEvent& );
 
     void OnPulse( wxTimerEvent& );
 
@@ -182,9 +180,10 @@ private:
     SpeedStats * mySpeedStats;
     torrents_v myTorrents;
     torrents_v mySelectedTorrents;
-    int myFilter;
+    int myFilterFlags;
     std::string mySavePath;
     time_t myExitTime;
+    wxToggleButton * myFilterToggles[TorrentFilter::N_FILTERS];
 
 private:
     DECLARE_EVENT_TABLE()
@@ -201,9 +200,9 @@ enum
 };
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
+    EVT_COMMAND_RANGE( ID_Filter, ID_Filter+TorrentFilter::N_FILTERS, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, MyFrame::OnFilterToggled )
     EVT_MENU     ( wxID_ABOUT, MyFrame::OnAbout )
     EVT_TIMER    ( ID_Pulse, MyFrame::OnPulse )
-    EVT_LIST_ITEM_SELECTED( ID_Filter, MyFrame::OnFilterSelected )
     EVT_MENU     ( wxID_EXIT, MyFrame::OnExit )
     EVT_MENU     ( wxID_OPEN, MyFrame::OnOpen )
     EVT_MENU     ( ID_START, MyFrame::OnStart )
@@ -214,8 +213,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI( wxID_REFRESH, MyFrame::OnRecheckUpdate )
     EVT_MENU     ( wxID_REMOVE, MyFrame::OnRemove )
     EVT_UPDATE_UI( wxID_REMOVE, MyFrame::OnRemoveUpdate )
-    EVT_MENU     ( wxID_PROPERTIES, MyFrame::OnInfo )
-    EVT_UPDATE_UI( wxID_PROPERTIES, MyFrame::OnInfoUpdate )
     EVT_MENU     ( wxID_SELECTALL, MyFrame::OnSelectAll )
     EVT_UPDATE_UI( wxID_SELECTALL, MyFrame::OnSelectAllUpdate )
     EVT_MENU     ( ID_DESELECTALL, MyFrame::OnDeselectAll )
@@ -224,6 +221,19 @@ END_EVENT_TABLE()
 
 IMPLEMENT_APP(MyApp)
 
+
+void
+MyFrame :: OnFilterToggled( wxCommandEvent& e )
+{
+    const int index = e.GetId() - ID_Filter;
+    int flags = 1<<index;
+    const bool active = myFilterToggles[index]->GetValue ( );
+    if( active )
+        myFilterFlags |= flags;
+    else
+        myFilterFlags &= ~flags;
+    ApplyCurrentFilter ( );
+}
 
 void
 MyFrame :: OnSelectAll( wxCommandEvent& )
@@ -257,7 +267,7 @@ MyFrame :: OnStartUpdate( wxUpdateUIEvent& event )
 {
     unsigned long l = 0;
     foreach( torrents_v, mySelectedTorrents, it )
-        l |= tr_torrentStat(*it)->status; /* FIXME: expensive */
+        l |= tr_torrentStat(*it)->status;
     event.Enable( (l & TR_STATUS_INACTIVE)!=0 );
 }
 void
@@ -276,7 +286,7 @@ MyFrame :: OnStopUpdate( wxUpdateUIEvent& event )
 {
     unsigned long l = 0;
     foreach( torrents_v, mySelectedTorrents, it )
-        l |= tr_torrentStat(*it)->status; /* FIXME: expensive */
+        l |= tr_torrentStat(*it)->status;
     event.Enable( (l & TR_STATUS_ACTIVE)!=0 );
 }
 void
@@ -317,20 +327,6 @@ MyFrame :: OnRecheck( wxCommandEvent& WXUNUSED(unused) )
 {
     foreach( torrents_v, mySelectedTorrents, it )
         tr_torrentRecheck( *it );
-}
-
-/**
-**/
-
-void
-MyFrame :: OnInfoUpdate( wxUpdateUIEvent& event )
-{
-   event.Enable( !mySelectedTorrents.empty() );
-}
-void
-MyFrame :: OnInfo( wxCommandEvent& WXUNUSED(unused) )
-{
-    std::cerr << "FIXME: info" << std::endl;
 }
 
 /**
@@ -410,31 +406,19 @@ MyApp :: ~MyApp()
 void
 MyFrame :: RefreshFilterCounts( )
 {
+    int hits[ TorrentFilter :: N_FILTERS ];
+    TorrentFilter::CountHits( myTorrents, hits );
     for( int i=0; i<TorrentFilter::N_FILTERS; ++i )
-    {
-        wxString xstr = TorrentFilter::getFilterName( i );
-        const int count = TorrentFilter::CountHits( i, myTorrents );
-        if( count )
-            xstr += wxString::Format(_T(" (%d)"), count );
-        myFilters->SetItem( i, 0, xstr );
-    }
+        myFilterToggles[i]->SetLabel( TorrentFilter::GetName( i, hits[i] ) );
 }
 
 void
 MyFrame :: ApplyCurrentFilter( )
 {
     torrents_v tmp( myTorrents );
-    TorrentFilter :: RemoveFailures( myFilter, tmp );
+    TorrentFilter :: RemoveFailures( myFilterFlags, tmp );
     myTorrentList->Assign( tmp );
 }
-
-void
-MyFrame :: OnFilterSelected( wxListEvent& event )
-{
-    myFilter = event.GetIndex( );
-    ApplyCurrentFilter( );
-}
-
 
 void
 MyFrame :: OnTorrentListSelectionChanged( TorrentListCtrl* list,
@@ -493,7 +477,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myPulseTimer( this, ID_Pulse ),
     myLogoIcon( transmission_xpm ),
     myTrayIconIcon( systray_xpm ),
-    myFilter( TorrentFilter::SHOW_ALL ),
+    myFilterFlags( ~0 ),
     myExitTime( 0 )
 {
     myTrayIcon = new wxTaskBarIcon;
@@ -535,7 +519,6 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     m->Append( wxID_SELECTALL, _T("Select &All") );
     m->Append( ID_DESELECTALL, _T("&Deselect All") );
     m->AppendSeparator();
-    m->Append( wxID_PROPERTIES, _T("Torrent &Info") );
     m->Append( wxID_PREFERENCES, _T("Edit &Preferences") );
     menuBar->Append( m, _T("&Edit") );
 
@@ -555,7 +538,6 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     wxIcon exec_icon( exec_xpm );
     wxIcon stop_icon( stop_xpm );
     wxIcon drop_icon( gtk_remove_xpm );
-    wxIcon info_icon( gtk_info_xpm );
     wxBitmap bitmap;
 
     wxToolBar* toolbar = CreateToolBar( wxNO_BORDER | wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT );
@@ -568,9 +550,6 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     toolbar->AddTool( wxID_STOP,   _T("Stop"), bitmap );
     bitmap.CopyFromIcon( drop_icon );
     toolbar->AddTool( wxID_REMOVE, _T("Remove"), bitmap );
-    toolbar->AddSeparator();
-    bitmap.CopyFromIcon( info_icon );
-    toolbar->AddTool( wxID_PROPERTIES, _("Torrent Info"), bitmap );
     toolbar->Realize();
 
     /**
@@ -582,26 +561,25 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     hsplit->SetSashGravity( 0.8 );
 #endif
 
-    wxPanel * row1 = new wxPanel( hsplit, wxID_ANY );
+    wxPanel * panel_1 = new wxPanel( hsplit, wxID_ANY );
 
-    /* Filters */
+    wxBoxSizer * buttonSizer = new wxBoxSizer( wxHORIZONTAL );
 
-    myFilters = new wxListCtrl( row1, ID_Filter, wxDefaultPosition, wxSize(120,-1),
-                                wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER );
-    myFilters->InsertColumn( wxLIST_FORMAT_LEFT, _("Filters"), wxLIST_FORMAT_LEFT, 120 );
-    for( int i=0; i<TorrentFilter::N_FILTERS; ++i )
-        myFilters->InsertItem( i, TorrentFilter::getFilterName(i) );
+    for( int i=0; i<TorrentFilter::N_FILTERS; ++i ) {
+        wxToggleButton * tb = new wxToggleButton( panel_1, ID_Filter+i, TorrentFilter::GetName(i) );
+        tb->SetValue( true );
+        myFilterToggles[i] = tb;
+        buttonSizer->Add( tb, 0, wxTOP|wxRIGHT, 6 );
+    }
 
-    /* Torrent List */
-
-    myTorrentList = new TorrentListCtrl( handle, myConfig, row1 );
+    myTorrentList = new TorrentListCtrl( handle, myConfig, panel_1 );
     myTorrentList->AddListener( this );
 
-    wxBoxSizer * boxSizer = new wxBoxSizer( wxHORIZONTAL );
-    boxSizer->Add( myFilters, 0, wxEXPAND|wxRIGHT, 5 );
-    boxSizer->Add( myTorrentList, 1, wxEXPAND, 0 );
-    row1->SetSizer( boxSizer );
-    //boxSizer->SetSizeHints( row1 );
+    wxBoxSizer * panelSizer = new wxBoxSizer( wxVERTICAL );
+    panelSizer->Add( buttonSizer, 0, wxTOP|wxLEFT|wxRIGHT, 3 );
+    panelSizer->Add( myTorrentList, 1, wxEXPAND|wxALL, 3 );
+
+    panel_1->SetSizer( panelSizer );
 
 
     wxNotebook * notebook = new wxNotebook( hsplit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_TOP );
@@ -618,7 +596,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
     notebook->AddPage( tmp, _T("Logger") );
 
-    hsplit->SplitHorizontally( row1, notebook );
+    hsplit->SplitHorizontally( panel_1, notebook );
 
     /**
     ***  Statusbar

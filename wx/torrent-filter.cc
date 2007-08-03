@@ -8,76 +8,69 @@
  * the Transmission project.
  */
 
+#include "foreach.h"
 #include "torrent-filter.h"
 
-bool
-TorrentFilter :: Test( int show, tr_torrent_t * tor )
-{
-    if( show == SHOW_ALL )
-        return true;
-
-    const tr_stat_t * stat = tr_torrentStat( tor );
-
-    if( show == SHOW_DOWNLOADING )
-        return stat->status == TR_STATUS_DOWNLOAD;
-
-    if( show == SHOW_UPLOADING )
-        return stat->status == TR_STATUS_SEED;
-
-    if( show == SHOW_COMPLETE )
-        return stat->cpStatus != TR_CP_INCOMPLETE;
-
-    if( show == SHOW_INCOMPLETE )
-        return stat->cpStatus == TR_CP_INCOMPLETE;
-
-    if( show == SHOW_ACTIVE )
-        return ( stat->rateUpload + stat->rateDownload ) >= 0.01;
-
-    if( show == SHOW_INACTIVE )
-        return ( stat->rateUpload + stat->rateDownload ) < 0.01;
-
-    abort ();
-}
-
 int
-TorrentFilter :: CountHits ( int show, const torrents_v& torrents )
+TorrentFilter :: GetFlags( const tr_torrent_t * tor )
 {
-    int i = 0;
+    int ret = 0;
+    const tr_stat_t * s = tr_torrentStat( (tr_torrent_t*)tor );
 
-    for( torrents_v::const_iterator it(torrents.begin()), end(torrents.end()); it!=end; ++it )
-        if( Test( show, *it ) )
-            ++i;
+    if( s->rateUpload > 0.01 ) ret |= FLAG_UPLOADING;
+    if( s->rateDownload > 0.01 ) ret |= FLAG_DOWNLOADING;
+    if( !ret ) ret |= (s->status & TR_STATUS_ACTIVE ) ? FLAG_IDLE : FLAG_STOPPED;
+    ret |= (s->left ? FLAG_INCOMPLETE : FLAG_COMPLETE);
 
-    return i;
+    return ret;
 }
 
 void
-TorrentFilter :: RemoveFailures( int show, torrents_v& torrents )
+TorrentFilter :: CountHits( const torrents_v & torrents,
+                            int              * counts )
+{
+    memset( counts, '\0', sizeof(int) * N_FILTERS );
+    foreach_const( torrents_v, torrents, it ) {
+        const int flags = GetFlags( *it );
+        if( flags & FLAG_UPLOADING )    ++counts[UPLOADING];
+        if( flags & FLAG_DOWNLOADING )  ++counts[DOWNLOADING];
+        if( flags & FLAG_IDLE )         ++counts[IDLE];
+        if( flags & FLAG_STOPPED )      ++counts[STOPPED];
+        if( flags & FLAG_COMPLETE )     ++counts[COMPLETE];
+        if( flags & FLAG_INCOMPLETE )   ++counts[INCOMPLETE];
+    }
+}
+
+wxString
+TorrentFilter :: GetName( int show, int count )
+{
+    wxString xstr;
+
+    switch( show )
+    {
+        case UPLOADING:   xstr = _("&Uploading");   break;
+        case DOWNLOADING: xstr = _("&Uploading");   break;
+        case IDLE:        xstr = _("&Idle");        break;
+        case STOPPED:     xstr = _("&Stopped");     break;
+        case COMPLETE:    xstr = _("&Complete");    break;
+        case INCOMPLETE:  xstr = _("I&ncomplete");  break;
+        default: assert(0);
+    }
+
+    xstr += wxString::Format(_T(" (%d)"), count );
+
+    return xstr;
+}
+
+
+void
+TorrentFilter :: RemoveFailures( int flags, torrents_v& torrents )
 {
     torrents_v tmp;
 
     for( torrents_v::iterator it(torrents.begin()), end(torrents.end()); it!=end; ++it )
-        if( Test( show, *it ) )
+        if( flags & GetFlags ( *it ) )
             tmp.push_back( *it );
 
     torrents.swap( tmp );
-}
-
-
-wxString
-TorrentFilter :: getFilterName( int show )
-{
-    switch( show )
-    {
-        case SHOW_ALL:         return _("All");
-        case SHOW_DOWNLOADING: return _("Downloading");
-        case SHOW_UPLOADING:   return _("Uploading");
-        case SHOW_COMPLETE:    return _("Complete");
-        case SHOW_INCOMPLETE:  return _("Incomplete");
-        case SHOW_ACTIVE:      return _("Active");
-        case SHOW_INACTIVE:    return _("Inactive");
-        default:               abort();
-    }
-
-    return _T(""); //notreached
 }
