@@ -232,6 +232,11 @@ char * tr_clientForId( uint8_t * id )
             asprintf( &ret, "GetRight (%c.%c.%c.%c)",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "PD", 2 ) )
+        {
+            asprintf( &ret, "Pando %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
         
         if( ret )
         {
