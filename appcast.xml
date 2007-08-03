@@ -9,6 +9,34 @@
     <lastBuildDate>Mon, 30 Apr 2007 11:39:00 -0400</lastBuildDate>
 
     <item>
+      <title>Transmission 0.80 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION NOW REQUIRES MAC OS X 10.4 OR LATER. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Ability to selectively download and prioritize files</li>
+ <li>Torrent file creation</li>
+ <li>Speed and CPU load improvements</li>
+ <li>Fix to UPnP</li>
+ <li>Rechecking torrents is now done one-at-a-time to avoid heavy disk load</li>
+ <li>Better rechecking of torrents that have many files</li>
+ <li>Many miscellaneous improvements and bugfixes</li>
+ <li>Partial licensing change -- see the LICENSE file for details</li>
+</ul>
+<h4>Mac-Specific Changes:</h4>
+<ul>
+ <li>Overlay when dragging torrent files, URLs, and data files onto window</li>
+ <li>Ability to set an amount of time to consider a transfer stalled</li>
+ <li>More progress bar colors</li>
+ <li>Various smaller interface improvements</li>
+ <li>Italian, Korean, and Russian translations</li>
+</ul>]]></description>
+      <pubDate>Wed, 18 Apr 2007 10:09:00 -0400</pubDate>
+      <enclosure sparkle:version="1739" sparkle:shortVersionString="0.70" url="http://download.m0k.org/transmission/files/Transmission-0.7.dmg" length="1434737" type="application/octet-stream"/>
+    </item>
+
+    <item>
       <title>Transmission 0.72 Released</title>
       <description><![CDATA[
 <h3>TRANSMISSION NOW REQUIRES MAC OS X 10.4. DO NOT UPDATE ON EARLIER SYSTEMS!</h3>
