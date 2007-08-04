@@ -1297,7 +1297,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         else
             offState = YES;
         
-        if (onState == offState)
+        if (onState && offState)
             return NSMixedState;
     }
     return onState ? NSOnState : NSOffState;
@@ -1404,10 +1404,9 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
             * activity = [self dateActivity];
-    if (!activity || [started compare: activity] == NSOrderedDescending)
-        return -1 * [started timeIntervalSinceNow] / 60;
-    else
-        return -1 * [activity timeIntervalSinceNow] / 60;
+    
+    NSDate * laterDate = !activity || [started compare: activity] == NSOrderedDescending ? started : activity;
+    return -1 * [laterDate timeIntervalSinceNow] / 60;
 }
 
 - (BOOL) isStalled

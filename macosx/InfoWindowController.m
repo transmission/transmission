@@ -621,7 +621,7 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        int i, index, state = (menuItem == fFileCheckItem) ? NSOnState : NSOffState;
+        int i, state = (menuItem == fFileCheckItem) ? NSOnState : NSOffState;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
         
@@ -636,7 +636,7 @@
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
         NSMutableIndexSet * itemIndexes = [NSMutableIndexSet indexSet];
-        int i, index;
+        int i;
         for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
             [itemIndexes addIndexes: [[fFileOutline itemAtRow: i] objectForKey: @"Indexes"]];
             
