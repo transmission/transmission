@@ -32,12 +32,17 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     #include <kernel/OS.h>
-    #define usleep snooze
+    #define wait_msecs(N)  snooze( (N) * 1000 )
+    #define wait_secs(N)   sleep( (N) )
 #elif defined(WIN32)
     #include <windows.h>
-    #define usleep(N) Sleep(N/1000)
+    #define wait_msecs(N)  Sleep( (N) )
+    #define wait_secs(N)   Sleep( N) * 1000 )
+#else
+    #define wait_msecs(N)  usleep( (N) * 1000 )
+    #define wait_secs(N)   sleep( (N) )
 #endif
 
 /* macro to shut up "unused parameter" warnings */
@@ -154,7 +159,7 @@ int main( int argc, char ** argv )
         tr_metainfo_builder_t* builder = tr_metaInfoBuilderCreate( h, sourceFile );
         tr_makeMetaInfo( builder, NULL, announce, comment, isPrivate );
         while( !builder->isDone ) {
-            usleep( 1 );
+            wait_msecs( 1 );
             printf( "." );
         }
         ret = !builder->failed;
@@ -249,7 +254,7 @@ int main( int argc, char ** argv )
         int  chars = 0;
         int result;
 
-        usleep( 1000 );
+        wait_secs( 1 );
 
         if( gotsig )
         {
@@ -328,7 +333,7 @@ int main( int argc, char ** argv )
             /* Port mappings were deleted */
             break;
         }
-        usleep( 500000 );
+        wait_msecs( 500 );
     }
     
 cleanup:
