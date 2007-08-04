@@ -41,7 +41,7 @@ public:	// TRWindow
 	void UpdateList(int32 selection, bool menus);
 	
 	void LoadSettings();
-	
+	BString GetFolder(void);
 	void StopTorrent(tr_torrent_t *torrent);
 	void StartTorrent(tr_torrent_t *torrent);
 	

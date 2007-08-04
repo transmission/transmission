@@ -160,7 +160,9 @@ void TRWindow::AddEntry(BEntry *torrent) {
 			
 			// Try adding the torrent to the engine.
 			int error;
-			tr_torrent_t *nTorrent = tr_torrentInit(engine, path.Path(), NULL, 0, &error);
+			tr_torrent_t *nTorrent;
+			nTorrent = tr_torrentInit(engine, path.Path(), GetFolder().String(),
+				TR_FLAG_PAUSED, &error);
 			if (nTorrent != NULL && Lock()) { // Success. Add the TRTorrent item.
 				transfers->AddItem(new TRTransfer(path.Path(), node, nTorrent));
 				
@@ -397,10 +399,7 @@ void TRWindow::StopTorrent(tr_torrent_t *torrent) {
 	UpdateList(transfers->CurrentSelection(), true);
 }
 
-/**
- * Called from StartTorrent thread.
- */
-void TRWindow::StartTorrent(tr_torrent_t *torrent) {
+BString TRWindow::GetFolder(void) {
 	// Read the settings.
 	BString folder("");
 	Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
@@ -408,14 +407,20 @@ void TRWindow::StartTorrent(tr_torrent_t *torrent) {
 		prefs->SetString("download.folder", "/boot/home/Downloads");
 		folder << "/boot/home/Downloads";
 	}
-	tr_torrentSetFolder(torrent, folder.String());
+	delete prefs;
+	return folder;
+}
+
+/**
+ * Called from StartTorrent thread.
+ */
+void TRWindow::StartTorrent(tr_torrent_t *torrent) {
+	tr_torrentSetFolder(torrent, GetFolder().String());
 	tr_torrentStart(torrent);
 	
 	if (transfers->CurrentSelection() >= 0) {
 		UpdateList(transfers->CurrentSelection(), true);
 	}
-	
-	delete prefs;
 }
 
 /**
