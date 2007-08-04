@@ -47,21 +47,21 @@
     if (size < 1024)
         return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
 
-    float convertedSize = (float)size;
+    float convertedSize;
     NSString * unit;
     if (size < 1048576)
     {
-        convertedSize /= 1024.0;
+        convertedSize = size / 1024.0;
         unit = NSLocalizedString(@" KB", "File size (beware of leading space)");
     }
     else if (size < 1073741824)
     {
-        convertedSize /= 1048576.0;
+        convertedSize = size / 1048576.0;
         unit = NSLocalizedString(@" MB", "File size (beware of leading space)");
     }
     else
     {
-        convertedSize /= 1073741824.0;
+        convertedSize = size / 1073741824.0;
         unit = NSLocalizedString(@" GB", "File size (beware of leading space)");
     }
 
