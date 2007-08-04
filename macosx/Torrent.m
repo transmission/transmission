@@ -1817,7 +1817,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 - (void) endQuickPause
 {
     if (!fQuickPauseDict)
-        return
+        return;
     
     [self setSpeedMode: [[fQuickPauseDict objectForKey: @"UploadSpeedMode"] intValue] upload: YES];
     [self setSpeedLimit: [[fQuickPauseDict objectForKey: @"UploadSpeedLimit"] intValue] upload: YES];
