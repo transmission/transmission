@@ -38,7 +38,7 @@
 #endif
 
 #ifdef SYS_BEOS
-    #include <stdint.h>
+    #include <inttypes.h>
     typedef uint32_t socklen_t;
 #endif
 

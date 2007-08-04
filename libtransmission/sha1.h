@@ -42,7 +42,7 @@
 
 #else
 
-    #include <stdint.h>
+    #include <inttypes.h>
     #define SHA1_OUTPUT_SIZE 20 /* in bytes */
 
     typedef struct sha1_state_s sha1_state_t;

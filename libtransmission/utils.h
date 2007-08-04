@@ -25,8 +25,8 @@
 #ifndef TR_UTILS_H
 #define TR_UTILS_H 1
 
+#include <inttypes.h>
 #include <stdarg.h>
-#include <stdint.h>
 
 void tr_msgInit( void );
 
