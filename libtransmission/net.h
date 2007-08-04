@@ -26,7 +26,7 @@
 #define _TR_NET_H_
 
 #ifdef WIN32
-    #include <stdint.h>
+    #include <inttypes.h>
     #include <winsock2.h>
     typedef int socklen_t;
     typedef uint16_t tr_port_t;

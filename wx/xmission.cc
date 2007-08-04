@@ -8,13 +8,12 @@
  * the Transmission project.
  */
 
+#include <inttypes.h>
 #include <set>
 #include <map>
 #include <string>
 #include <vector>
 #include <iostream>
-
-#include <stdint.h>
 
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
