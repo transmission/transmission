@@ -39,7 +39,7 @@
 #elif defined(WIN32)
     #include <windows.h>
     #define wait_msecs(N)  Sleep( (N) )
-    #define wait_secs(N)   Sleep( N) * 1000 )
+    #define wait_secs(N)   Sleep( (N) * 1000 )
 #else
     #define wait_msecs(N)  usleep( (N) * 1000 )
     #define wait_secs(N)   sleep( (N) )

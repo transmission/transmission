@@ -25,12 +25,15 @@
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
-#include <netdb.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#ifdef __BEOS__
+    #include <netdb.h>
+#endif
 
 #include <sys/types.h>
 
