@@ -30,7 +30,7 @@
 
 #include <sys/types.h>
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 extern int vasprintf( char **, const char *, va_list );
 #endif
 

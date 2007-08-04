@@ -131,7 +131,7 @@ case $host_os in
      AC_SUBST(WINDRES)
      ;;
 
-  *BeOS*)
+  *beos*)
     beos="yes"
     RELEASE=`uname -r`
     case $RELEASE in

@@ -30,16 +30,16 @@
     #include <winsock2.h>
     typedef int socklen_t;
     typedef uint16_t tr_port_t;
+#elif defined(__BEOS__)
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    typedef unsigned short tr_port_t;
+    typedef int socklen_t;
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
     typedef in_port_t tr_port_t;
-#endif
-
-#ifdef SYS_BEOS
-    #include <inttypes.h>
-    typedef uint32_t socklen_t;
 #endif
 
 #ifdef WIN32

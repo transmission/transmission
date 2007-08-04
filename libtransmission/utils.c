@@ -37,7 +37,8 @@
 
 #ifdef WIN32
     #include <windows.h> /* for Sleep */
-#elif defined(SYS_BEOS)
+#elif defined(__BEOS__)
+    #include <kernel/OS.h>
     extern int vasprintf( char **, const char *, va_list );
 #endif
 
@@ -720,7 +721,7 @@ tr_date( void )
 void
 tr_wait( uint64_t delay_milliseconds )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     snooze( 1000 * delay_milliseconds );
 #elif defined(WIN32)
     Sleep( (DWORD)delay_milliseconds );

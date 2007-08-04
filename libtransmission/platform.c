@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
   #include <signal.h> 
   #include <fs_info.h>
   #include <FindDirectory.h>
@@ -62,7 +62,7 @@ struct tr_thread_s
     void           * arg;
     char           * name;
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     thread_id        thread;
 #elif defined(WIN32)
     HANDLE           thread;
@@ -84,7 +84,7 @@ ThreadFunc( void * _t )
     tr_thread_t * t = _t;
     char* name = tr_strdup( t->name );
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     /* This is required because on BeOS, SIGINT is sent to each thread,
        which kills them not nicely */
     signal( SIGINT, SIG_IGN );
@@ -112,7 +112,7 @@ tr_threadNew( void (*func)(void *),
     t->arg  = arg;
     t->name = tr_strdup( name );
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     t->thread = spawn_thread( (void*)ThreadFunc, name, B_NORMAL_PRIORITY, t );
     resume_thread( t->thread );
 #elif defined(WIN32)
@@ -129,7 +129,7 @@ tr_threadJoin( tr_thread_t * t )
 {
     if( t != NULL )
     {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
         long exit;
         wait_for_thread( t->thread, &exit );
 #elif defined(WIN32)
@@ -153,7 +153,7 @@ tr_threadJoin( tr_thread_t * t )
 
 struct tr_lock_s
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     sem_id lock;
 #elif defined(WIN32)
     CRITICAL_SECTION lock;
@@ -167,7 +167,7 @@ tr_lockNew( void )
 {
     tr_lock_t * l = tr_new0( tr_lock_t, 1 );
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     l->lock = create_sem( 1, "" );
 #elif defined(WIN32)
     InitializeCriticalSection( &l->lock );
@@ -181,7 +181,7 @@ tr_lockNew( void )
 void
 tr_lockFree( tr_lock_t * l )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     delete_sem( l->lock );
 #elif defined(WIN32)
     DeleteCriticalSection( &l->lock );
@@ -194,7 +194,7 @@ tr_lockFree( tr_lock_t * l )
 int
 tr_lockTryLock( tr_lock_t * l ) /* success on zero! */
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     return acquire_sem_etc( l->lock, 1, B_RELATIVE_TIMEOUT, 0 );
 #elif defined(WIN32)
     return !TryEnterCriticalSection( &l->lock );
@@ -206,7 +206,7 @@ tr_lockTryLock( tr_lock_t * l ) /* success on zero! */
 void
 tr_lockLock( tr_lock_t * l )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     acquire_sem( l->lock );
 #elif defined(WIN32)
     EnterCriticalSection( &l->lock );
@@ -218,7 +218,7 @@ tr_lockLock( tr_lock_t * l )
 void
 tr_lockUnlock( tr_lock_t * l )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     release_sem( l->lock );
 #elif defined(WIN32)
     LeaveCriticalSection( &l->lock );
@@ -343,7 +343,7 @@ tr_rwFree( tr_rwlock_t * rw )
 
 struct tr_cond_s
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     sem_id sem;
     thread_id threads[BEOS_MAX_THREADS];
     int start, end;
@@ -372,7 +372,7 @@ tr_cond_t*
 tr_condNew( void )
 {
     tr_cond_t * c = tr_new0( tr_cond_t, 1 );
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     c->sem = create_sem( 1, "" );
     c->start = 0;
     c->end = 0;
@@ -388,7 +388,7 @@ tr_condNew( void )
 void
 tr_condWait( tr_cond_t * c, tr_lock_t * l )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 
     /* Keep track of that thread */
     acquire_sem( c->sem );
@@ -433,7 +433,7 @@ tr_condWait( tr_cond_t * c, tr_lock_t * l )
 #endif
 }
 
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 static int condTrySignal( tr_cond_t * c )
 {
     if( c->start == c->end )
@@ -460,7 +460,7 @@ static int condTrySignal( tr_cond_t * c )
 void
 tr_condSignal( tr_cond_t * c )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 
     acquire_sem( c->sem );
     condTrySignal( c );
@@ -483,7 +483,7 @@ tr_condSignal( tr_cond_t * c )
 void
 tr_condBroadcast( tr_cond_t * c )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
 
     acquire_sem( c->sem );
     while( !condTrySignal( c ) );
@@ -507,7 +507,7 @@ tr_condBroadcast( tr_cond_t * c )
 void
 tr_condFree( tr_cond_t * c )
 {
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     delete_sem( c->sem );
 #elif defined(WIN32)
     tr_list_free( c->events );
@@ -523,7 +523,7 @@ tr_condFree( tr_cond_t * c )
 ****  PATHS
 ***/
 
-#if !defined(WIN32) && !defined(SYS_BEOS) && !defined(__AMIGAOS4__)
+#if !defined(WIN32) && !defined(__BEOS__) && !defined(__AMIGAOS4__)
 #include <pwd.h>
 #endif
 
@@ -543,7 +543,7 @@ tr_getHomeDirectory( void )
     else {
 #ifdef WIN32
         SHGetFolderPath( NULL, CSIDL_PROFILE, NULL, 0, buf );
-#elif defined(SYS_BEOS) || defined(__AMIGAOS4__)
+#elif defined(__BEOS__) || defined(__AMIGAOS4__)
         *buf = '\0';
 #else
         struct passwd * pw = getpwuid( getuid() );
@@ -595,7 +595,7 @@ tr_getPrefsDirectory( void )
         return buf;
 
     h = tr_getHomeDirectory();
-#ifdef SYS_BEOS
+#ifdef __BEOS__
     find_directory( B_USER_SETTINGS_DIRECTORY,
                     dev_for_path("/boot"), true, buf, buflen );
     strcat( buf, "/Transmission" );
@@ -640,7 +640,7 @@ tr_getCacheDirectory( void )
         return buf;
 
     p = tr_getPrefsDirectory();
-#if defined(SYS_BEOS) || defined(WIN32)
+#if defined(__BEOS__) || defined(WIN32)
     tr_buildPath( buf, buflen, p, "Cache", NULL );
 #elif defined( SYS_DARWIN )
     tr_buildPath( buf, buflen, tr_getHomeDirectory(),
@@ -671,7 +671,7 @@ tr_getTorrentsDirectory( void )
 
     p = tr_getPrefsDirectory ();
 
-#if defined(SYS_BEOS) || defined(WIN32)
+#if defined(__BEOS__) || defined(WIN32)
     tr_buildPath( buf, buflen, p, "Torrents", NULL );
 #elif defined( SYS_DARWIN )
     tr_buildPath( buf, buflen, p, "Torrents", NULL );

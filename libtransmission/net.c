@@ -260,7 +260,7 @@ static int makeSocketNonBlocking( int s )
 #ifdef WIN32
     unsigned long flags = 1;
     if( ioctlsocket( s, FIONBIO, &flags) == SOCKET_ERROR )
-#elif defined(SYS_BEOS)
+#elif defined(__BEOS__)
     int flags = 1;
     if( setsockopt( s, SOL_SOCKET, SO_NONBLOCK,
                     &flags, sizeof( int ) ) < 0 )
