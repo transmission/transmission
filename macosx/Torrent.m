@@ -1405,7 +1405,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     NSDate * started = [NSDate dateWithTimeIntervalSince1970: start / 1000],
             * activity = [self dateActivity];
     
-    NSDate * laterDate = !activity || [started compare: activity] == NSOrderedDescending ? started : activity;
+    NSDate * laterDate = (!activity || [started compare: activity] == NSOrderedDescending) ? started : activity;
     return -1 * [laterDate timeIntervalSinceNow] / 60;
 }
 
