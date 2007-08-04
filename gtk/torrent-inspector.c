@@ -1381,7 +1381,7 @@ file_page_new ( TrTorrent * gtor )
     rend = priority_rend = gtk_cell_renderer_combo_new ();
     gtk_tree_view_column_pack_start (col, rend, TRUE);
     g_object_set (G_OBJECT(rend), "model", model,
-                                  "editable", TRUE,
+                                  "editable", FALSE,
                                   "has-entry", FALSE,
                                   "text-column", 0,
                                   NULL);
