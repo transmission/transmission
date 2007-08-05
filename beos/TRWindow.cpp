@@ -105,7 +105,7 @@ TRWindow::~TRWindow() {
 	tr_torrentIterate(engine, torrentclose, NULL);
 	const int MAX_EXIT_WAIT_SECS = 10;
 	const time_t deadline = time(0) + MAX_EXIT_WAIT_SECS;
-	while (tr_torrentCount(engine) && time(NULL) < deadline)) {
+	while (tr_torrentCount(engine) && time(NULL) < deadline) {
 		snooze(100000);
 	}
 	/* XXX there's no way to make sure the torrent threads are running so this might crash */
