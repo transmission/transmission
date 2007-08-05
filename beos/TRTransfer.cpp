@@ -88,8 +88,8 @@ bool TRTransfer::UpdateStatus(const tr_stat_t *stat, bool shade) {
 
 bool TRTransfer::IsRunning() {
 	return (fStatus != NULL && 
-			(fStatus->status &
-			          (TR_STATUS_CHECK_WAIT | TR_STATUS_CHECK | TR_STATUS_DOWNLOAD | TR_STATUS_SEED)));
+			(fStatus->status & (TR_STATUS_CHECK_WAIT | TR_STATUS_CHECK |
+			                    TR_STATUS_DOWNLOAD | TR_STATUS_SEED | TR_STATUS_STOPPING)));
 }
 
 
@@ -123,7 +123,7 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 	if (fStatus != NULL && fStatusLock->Lock()) {
 		owner->DrawString(fName->String(), textLoc);
 		
-		if (fStatus->status & TR_STATUS_INACTIVE ) {
+		if (fStatus->status & TR_STATUS_STOPPED ) {
 			sprintf(fTimeStr, "Paused (%.2f %%)", 100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_CHECK_WAIT ) {
 			sprintf(fTimeStr, "Waiting To Check Existing Files (%.2f %%)",
@@ -133,8 +133,6 @@ void TRTransfer::DrawItem(BView *owner, BRect frame, bool) {
 			        100 * fStatus->percentDone);
 		} else if (fStatus->status & TR_STATUS_DONE ) {
 			sprintf(fTimeStr, "Done...");
-		} else if (fStatus->status & TR_STATUS_STOPPED ) {
-			sprintf(fTimeStr, "Stopped...");
 		} else if (fStatus->status & TR_STATUS_DOWNLOAD) {
 			if (fStatus->eta < 0 ) {
 				sprintf(fTimeStr, "--:--:-- Remaining (%.2f %%Complete)",
