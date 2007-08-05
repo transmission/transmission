@@ -108,12 +108,10 @@ char * getStringRatio( float ratio )
 
 int main( int argc, char ** argv )
 {
-    int i, error, closed;
+    int i, error;
     tr_handle_t  * h;
     const tr_stat_t    * s;
     tr_handle_status_t * hstat;
-
-    closed = 0;
 
     printf( "Transmission %s - http://transmission.m0k.org/\n\n",
             LONG_VERSION_STRING );
@@ -325,9 +323,6 @@ int main( int argc, char ** argv )
     }
     fprintf( stderr, "\n" );
 
-    tr_torrentClose( tor );
-    closed = 1;
-
     /* Try for 5 seconds to delete any port mappings for nat traversal */
     tr_natTraversalEnable( h, 0 );
     for( i = 0; i < 10; i++ )
@@ -342,16 +337,7 @@ int main( int argc, char ** argv )
     }
     
 cleanup:
-    /* Close the torrent and wait for 5 seconds for the thread to exit */
-    if( !closed )
-    {
-        tr_torrentClose( tor );
-    }
-    for( i = 0; 10 > i && 0 < tr_torrentCount( h ); i++ )
-    {
-        wait_msecs( 500 );
-    }
-    
+    tr_torrentClose( tor );
     tr_close( h );
 
     return EXIT_SUCCESS;
