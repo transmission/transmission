@@ -61,6 +61,9 @@ private:
 	static bool RemovePath(BListItem *item, void *data);
 	static bool CheckQuitStatus(BListItem *item, void *data);
 	static bool UpdateStats(BListItem *item, void *data);
+	
+	bool stopping;
+	BInvoker *quitter;
 };
 
 /**

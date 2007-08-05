@@ -14,6 +14,8 @@
 #include <String.h>
 
 #include <malloc.h>
+#include <time.h> /* for time() */
+#include <unistd.h> /* for sleep() */
 
 #include "Prefs.h"
 #include "TRApplication.h"
@@ -29,6 +31,8 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
                                B_ASYNCHRONOUS_CONTROLS , B_CURRENT_WORKSPACE)
 {
 	engine = NULL;
+	stopping = false;
+	quitter = NULL;
 	Prefs prefs(TRANSMISSION_SETTINGS);
 	
 	BRect *rectFrame = new BRect();
@@ -92,9 +96,22 @@ TRWindow::TRWindow() : BWindow(BRect(10, 40, 350, 110), "Transmission", B_TITLED
 	Show();
 }
 
+static void torrentclose(tr_torrent_t *torrent, void *)
+{
+	tr_torrentClose(torrent);
+}
+
 TRWindow::~TRWindow() {
+	tr_torrentIterate(engine, torrentclose, NULL);
+	const int MAX_EXIT_WAIT_SECS = 10;
+	const time_t deadline = time(0) + MAX_EXIT_WAIT_SECS;
+	while (tr_torrentCount(engine) && time(NULL) < deadline)) {
+		snooze(100000);
+	}
+	/* XXX there's no way to make sure the torrent threads are running so this might crash */
 	tr_close(engine);
 	stop_watching(this);
+	delete quitter;
 }
 
 
@@ -335,16 +352,22 @@ void TRWindow::MessageReceived(BMessage *msg) {
  * If affimative, then we'll stop all the running torrents.
  */
 bool TRWindow::QuitRequested() {
+	if (stopping)
+		return true;
+
 	bool quit = false;
+	int running;
 	
 	quit_info *quitData = (quit_info*)calloc(1, sizeof(quit_info));
 	quitData->running = 0;
 	transfers->DoForEach(TRWindow::CheckQuitStatus, (void *)quitData);
+	running = quitData->running;
+	free(quitData);
 	
-	if (quitData->running > 0) {
+	if (running > 0) {
 		BString quitMsg("");
-		quitMsg << "There's " << quitData->running << " torrent";
-		if (quitData->running > 1) {
+		quitMsg << "There's " << running << " torrent";
+		if (running > 1) {
 			quitMsg << "s";
 		}
 		quitMsg << " currently running.\n"
@@ -357,7 +380,6 @@ bool TRWindow::QuitRequested() {
 	} else {
 		quit = true;
 	}
-	free(quitData);
 	
 	if (quit) {
 		Prefs *prefs = new Prefs(TRANSMISSION_SETTINGS);
@@ -380,7 +402,15 @@ bool TRWindow::QuitRequested() {
 		}
 		delete prefs;
 		
-		be_app->PostMessage(new BMessage(B_QUIT_REQUESTED));
+		if (running > 0) {
+			stopping = true;
+			BAlert *waiting = new BAlert("Stopping Torrents", "Waiting for torrents to stop...", "Quit");
+			quitter = new BInvoker(new BMessage(B_QUIT_REQUESTED), BMessenger(be_app));
+			waiting->Go(quitter);
+			quit = false;
+		} else {
+			be_app->PostMessage(new BMessage(B_QUIT_REQUESTED));
+		}
 	}
 	return quit;
 }
@@ -429,6 +459,16 @@ void TRWindow::StartTorrent(tr_torrent_t *torrent) {
  * and invalidate the view.
  */
 void TRWindow::UpdateList(int32 selection = -1, bool menus = true) {
+	if (stopping)
+	{
+		quit_info *quitData = (quit_info*)calloc(1, sizeof(quit_info));
+		quitData->running = 0;
+		transfers->DoForEach(TRWindow::CheckQuitStatus, (void *)quitData);
+		if (quitData->running == 0)
+			be_app->PostMessage(new BMessage(B_QUIT_REQUESTED));
+		free(quitData);
+	}
+
 	update_info *upData = (update_info*)calloc(1, sizeof(update_info));
 	upData->running = false;
 	upData->selected = selection;
