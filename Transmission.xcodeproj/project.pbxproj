@@ -320,7 +320,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -457,6 +457,13 @@
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = makemeta.h; path = libtransmission/makemeta.h; sourceTree = "<group>"; };
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
+		A2C19EDA0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A2C19EDB0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/Creator.nib; sourceTree = "<group>"; };
+		A2C19EDC0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A2C19EDD0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2C19EDE0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A2C19EDF0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A2C19EE00C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
 		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
@@ -1437,6 +1444,7 @@
 				A20431130C5EAF490081E5CC /* Russian */,
 				A22A7EBF0C627FC200E30364 /* Greek */,
 				A2603A010C6338FB00F5FDFD /* Spanish */,
+				A2C19EDE0C676F5200E0B235 /* French */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1450,6 +1458,7 @@
 				A20431110C5EAF490081E5CC /* Russian */,
 				A22A7EBD0C627FC200E30364 /* Greek */,
 				A26039FF0C6338FB00F5FDFD /* Spanish */,
+				A2C19EDC0C676F5200E0B235 /* French */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1463,6 +1472,7 @@
 				A204310F0C5EAF490081E5CC /* Russian */,
 				A22A7EBB0C627FC200E30364 /* Greek */,
 				A26039FC0C6338FB00F5FDFD /* Spanish */,
+				A2C19EDA0C676F5200E0B235 /* French */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1476,6 +1486,7 @@
 				A20431140C5EAF490081E5CC /* Russian */,
 				A22A7EC00C627FC200E30364 /* Greek */,
 				A2603A020C6338FB00F5FDFD /* Spanish */,
+				A2C19EDF0C676F5200E0B235 /* French */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1489,6 +1500,7 @@
 				A20431120C5EAF490081E5CC /* Russian */,
 				A22A7EBE0C627FC200E30364 /* Greek */,
 				A2603A000C6338FB00F5FDFD /* Spanish */,
+				A2C19EDD0C676F5200E0B235 /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1502,6 +1514,7 @@
 				A20431150C5EAF490081E5CC /* Russian */,
 				A22A7EC10C627FC200E30364 /* Greek */,
 				A2603A030C6338FB00F5FDFD /* Spanish */,
+				A2C19EE00C676F5200E0B235 /* French */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1515,6 +1528,7 @@
 				A2AE68380C628A63008753C9 /* Russian */,
 				A2AE68390C628A66008753C9 /* Greek */,
 				A26039FD0C6338FB00F5FDFD /* Spanish */,
+				A2C19EDB0C676F5200E0B235 /* French */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";
