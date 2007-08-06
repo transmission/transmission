@@ -334,6 +334,11 @@ char * tr_clientForId( uint8_t * id )
                   charToInt( id[3] ) * 10 + charToInt( id[4] ),
                       id[5], id[6] );
     }
+    else if( !memcmp( id, "DNA", 3 ) )
+    {
+        asprintf( &ret, "BitTorrent DNA %d.%d.%d", charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                    charToInt( id[5] ) * 10 + charToInt( id[6] ), charToInt( id[7] ) * 10 + charToInt( id[8] ) );
+    }
     else if( !memcmp( id, "Plus", 4 ) )
     {
         asprintf( &ret, "Plus! v2 %c.%c%c", id[4], id[5], id[6] );
