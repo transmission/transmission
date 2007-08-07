@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.80 ()
+0.80 (2007/08/07)
  - Ability to selectively download and prioritize files
  - Torrent file creation
  - Speed and CPU load improvements
