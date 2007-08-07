@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#include <sys/time.h>
+#include <stdint.h>
 #include <stdarg.h>
 
 #ifdef WIN32
@@ -131,15 +133,13 @@ TAILQ_HEAD (evkeyvalq, evkeyval);
 
 struct eventop {
 	char *name;
-	void *(*init)(void);
+	void *(*init)(struct event_base *);
 	int (*add)(void *, struct event *);
 	int (*del)(void *, struct event *);
 	int (*recalc)(struct event_base *, void *, int);
 	int (*dispatch)(struct event_base *, void *, struct timeval *);
-	void (*dealloc)(void *);
+	void (*dealloc)(struct event_base *, void *);
 };
-
-#define TIMEOUT_DEFAULT	{5, 0}
 
 void *event_init(void);
 int event_dispatch(void);
@@ -184,6 +184,7 @@ int event_base_loopexit(struct event_base *, struct timeval *);
 
 void event_set(struct event *, int, short, void (*)(int, short, void *), void *);
 int event_once(int, short, void (*)(int, short, void *), void *, struct timeval *);
+int event_base_once(struct event_base *, int, short, void (*)(int, short, void *), void *, struct timeval *);
 
 int event_add(struct event *, struct timeval *);
 int event_del(struct event *);
@@ -299,39 +300,37 @@ void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_
 
 void evtag_init(void);
 
-void evtag_marshal(struct evbuffer *evbuf, u_int8_t tag, const void *data,
-    u_int32_t len);
+void evtag_marshal(struct evbuffer *evbuf, uint8_t tag, const void *data,
+    uint32_t len);
 
-void encode_int(struct evbuffer *evbuf, u_int32_t number);
+void encode_int(struct evbuffer *evbuf, uint32_t number);
 
-void evtag_marshal_int(struct evbuffer *evbuf, u_int8_t tag,
-    u_int32_t integer);
+void evtag_marshal_int(struct evbuffer *evbuf, uint8_t tag, uint32_t integer);
 
-void evtag_marshal_string(struct evbuffer *buf, u_int8_t tag,
+void evtag_marshal_string(struct evbuffer *buf, uint8_t tag,
     const char *string);
 
-void evtag_marshal_timeval(struct evbuffer *evbuf, u_int8_t tag,
+void evtag_marshal_timeval(struct evbuffer *evbuf, uint8_t tag,
     struct timeval *tv);
 
 void evtag_test(void);
 
-int evtag_unmarshal(struct evbuffer *src, u_int8_t *ptag,
-    struct evbuffer *dst);
-int evtag_peek(struct evbuffer *evbuf, u_int8_t *ptag);
-int evtag_peek_length(struct evbuffer *evbuf, u_int32_t *plength);
-int evtag_payload_length(struct evbuffer *evbuf, u_int32_t *plength);
+int evtag_unmarshal(struct evbuffer *src, uint8_t *ptag, struct evbuffer *dst);
+int evtag_peek(struct evbuffer *evbuf, uint8_t *ptag);
+int evtag_peek_length(struct evbuffer *evbuf, uint32_t *plength);
+int evtag_payload_length(struct evbuffer *evbuf, uint32_t *plength);
 int evtag_consume(struct evbuffer *evbuf);
 
-int evtag_unmarshal_int(struct evbuffer *evbuf, u_int8_t need_tag,
-    u_int32_t *pinteger);
+int evtag_unmarshal_int(struct evbuffer *evbuf, uint8_t need_tag,
+    uint32_t *pinteger);
 
-int evtag_unmarshal_fixed(struct evbuffer *src, u_int8_t need_tag, void *data,
+int evtag_unmarshal_fixed(struct evbuffer *src, uint8_t need_tag, void *data,
     size_t len);
 
-int evtag_unmarshal_string(struct evbuffer *evbuf, u_int8_t need_tag,
+int evtag_unmarshal_string(struct evbuffer *evbuf, uint8_t need_tag,
     char **pstring);
 
-int evtag_unmarshal_timeval(struct evbuffer *evbuf, u_int8_t need_tag,
+int evtag_unmarshal_timeval(struct evbuffer *evbuf, uint8_t need_tag,
     struct timeval *ptv);
 
 #ifdef __cplusplus
