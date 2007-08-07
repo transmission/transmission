@@ -5,13 +5,13 @@
 # constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
 # convention: BETA: "Z" for a beta, "0" for a stable
 MAJOR="0"
-MINOR="7"
-MAINT="2"
-BETA="Z"
-STRING=0.72+
+MINOR="8"
+MAINT="0"
+BETA="0"
+STRING=0.80
 
-PEERID_PREFIX="-TR072Z-"
-USERAGENT_PREFIX="0.72+"
+PEERID_PREFIX="-TR0800-"
+USERAGENT_PREFIX="0.80"
 SVN_REVISION=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
                      -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
                      -o -name 'configure' ')' -exec cat '{}' ';' ) | \
