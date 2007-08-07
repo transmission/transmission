@@ -5,13 +5,13 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Mon, 30 Apr 2007 11:39:00 -0400</pubDate>
-    <lastBuildDate>Mon, 30 Apr 2007 11:39:00 -0400</lastBuildDate>
+    <pubDate>Mon, 6 Aug 2007 21:55:00 -0400</pubDate>
+    <lastBuildDate>Mon, 6 Aug 2007 21:55:00 -0400</lastBuildDate>
 
     <item>
       <title>Transmission 0.80 Released</title>
       <description><![CDATA[
-<h3>FINISH ALL DOWNLOADS IN PROGRESS FIRST! AFTER UPDATING, IN-PROGRESS TRANSFER DATA WILL BE LOST!</h3>
+<h3>COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
 
 <h4>Transmission Changes:</h4>
 <ul>
@@ -32,8 +32,8 @@
  <li>Various smaller interface improvements</li>
  <li>Italian, Korean, and Russian translations</li>
 </ul>]]></description>
-      <pubDate>Wed, 18 Apr 2007 10:09:00 -0400</pubDate>
-      <enclosure sparkle:version="1739" sparkle:shortVersionString="0.80" url="http://download.m0k.org/transmission/files/Transmission-0.80.dmg" length="1434737" type="application/octet-stream"/>
+      <pubDate>Mon, 6 Aug 2007 21:55:00 -0400</pubDate>
+      <enclosure sparkle:version="2641" sparkle:shortVersionString="0.80" url="http://download.m0k.org/transmission/files/Transmission-0.80.dmg" length="2063634" type="application/octet-stream"/>
     </item>
 
     <item>
