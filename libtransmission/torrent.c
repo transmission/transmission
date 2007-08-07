@@ -735,8 +735,8 @@ fileBytesCompleted ( const tr_torrent_t * tor, int fileIndex )
     assert( tor != NULL );
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert( file->offset + file->length <= tor->info.totalSize );
-    assert( (int)firstBlock < tor->blockCount );
-    assert( (int)lastBlock < tor->blockCount );
+    assert( ( (int)firstBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
+    assert( ( (int)lastBlock < tor->blockCount ) || (!file->length && file->offset==tor->info.totalSize) );
     assert( firstBlock <= lastBlock );
     assert( (int)tr_torBlockPiece( tor, firstBlock ) == file->firstPiece );
     assert( (int)tr_torBlockPiece( tor, lastBlock ) == file->lastPiece );
