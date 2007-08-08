@@ -357,9 +357,10 @@
     NSRect rect;
     Torrent * torrent;
     NSImage * image;
-
+    BOOL smallView = [fDefaults boolForKey: @"SmallView"];
+    
     [super drawRect: r];
-
+    
     int i;
     for (i = 0; i < [fTorrents count]; i++)
     {
@@ -393,9 +394,8 @@
         [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
         
         //action icon
-        if (![fDefaults boolForKey: @"SmallView"])
+        if (!smallView)
         {
-            #warning make change
             rect = [self actionRectForRow: i];
             image = NSPointInRect(fClickPoint, rect) ? fActionOnIcon : fActionOffIcon;
             [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
@@ -456,7 +456,6 @@
     
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
-    #warning constant
     return NSMakeRect(cellRect.origin.x + PADDING +
                         ([[[fTorrents objectAtIndex: row] iconFlipped] size].width - ACTION_BUTTON_WIDTH) * 0.5,
                         cellRect.origin.y + ACTION_BUTTON_TO_TOP, ACTION_BUTTON_WIDTH, ACTION_BUTTON_HEIGHT);
