@@ -279,13 +279,13 @@ msgstr ""
 "gebruik: %s [-hpq] [bestanden...]\n"
 "\n"
 "Transmission %s http://transmission.m0k.org/\n"
-"Een gratis, lichtgewicht BitTorrent programma met een simpele, intuïtieve interface\n"
+"Een gratis, lichtgewicht BitTorrent programma met een simpele, intu�tieve interface\n"
 "\n"
 "  -h --help    toon deze boodschap en sluit af\n"
 "  -p --paused  start met alle torrents gepauzeerd\n"
 "  -q --quit    vraag aan dat de actieve %s instantie afsluit\n"
 "\n"
-"Slechts één instantie van %s mag tegelijk actief zijn. Meerdere\n"
+"Slechts ��n instantie van %s mag tegelijk actief zijn. Meerdere\n"
 "torrent bestanden mogen ingeladen worden bij het opstarten door ze aan het commando toe te voegen\n"
 "Als %s al actief is, zullen die torrents\n"
 "in de actieve instantie geopend worden.\n"
@@ -378,7 +378,7 @@ msgstr "Torrent"
 
 #: makemeta-ui.c:279
 msgid "Private to this Tracker"
-msgstr "Privé voor deze Tracker"
+msgstr "Priv� voor deze Tracker"
 
 #: makemeta-ui.c:282
 msgid "Announce _URL"
@@ -440,7 +440,7 @@ msgstr "Poort"
 
 #: torrent-inspector.c:251
 msgid "Client"
-msgstr "Cliënt"
+msgstr "Cli�nt"
 
 #: torrent-inspector.c:252 torrent-inspector.c:539 torrent-inspector.c:1361
 #: tr_window.c:206
@@ -744,7 +744,7 @@ msgstr "Peer _uitwisseling gebruiken indien mogelijk"
 
 #: tr_prefs.c:126
 msgid ""
-"Perform Azureus or ÂµTorrent compatible peer exchange with any peers which "
+"Perform Azureus or µTorrent compatible peer exchange with any peers which "
 "support it"
 msgstr "Azureus of uTorrent compatibele peer uitwisseling uitvoeren met peers "
 "die dit ondersteunen"
@@ -973,6 +973,6 @@ msgstr[0] "dag"
 msgstr[1] "dagen"
 
 #: util.c:151
-msgid "â"
-msgstr "â"
+msgid "∞"
+msgstr "∞"
 
