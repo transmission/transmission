@@ -348,7 +348,7 @@
     NSIndexSet * indexes = [[sender representedObject] objectForKey: @"Indexes"];
     [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexes];
     
-    #warning reload inspector -> files
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 #warning only update shown

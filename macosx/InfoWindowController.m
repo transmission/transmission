@@ -107,6 +107,10 @@
     
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
+    
+    //allow for update notifications
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateInfoStats)
+                    name: @"UpdateStats" object: nil];
 }
 
 - (void) dealloc
