@@ -312,10 +312,11 @@
             }
             else
             {
-                NSMenu * menu = [[NSMenu alloc] initWithTitle: name];
-                [menu setAutoenablesItems: NO];
-                [item setSubmenu: menu];
-                [menu setDelegate: self];
+                NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
+                [itemMenu setAutoenablesItems: NO];
+                [item setSubmenu: itemMenu];
+                [itemMenu setDelegate: self];
+                [itemMenu release];
                 
                 icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
             }
