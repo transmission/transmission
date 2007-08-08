@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
+#import <Controller.h>
 
 #define PADDING 3.0
 
@@ -34,25 +35,24 @@
 #define ACTION_BUTTON_HEIGHT 12.0
 #define ACTION_BUTTON_WIDTH 28.0
 
-@class Controller;
-
 @interface TorrentTableView : NSTableView
-
 {
     IBOutlet Controller * fController;
-    NSArray             * fTorrents;
-    NSPoint             fClickPoint;
+    NSArray * fTorrents;
+    NSPoint fClickPoint;
     
-    NSUserDefaults      * fDefaults;
+    NSUserDefaults * fDefaults;
     
-    IBOutlet NSMenu     * fContextRow, * fContextNoRow;
-    NSImage             * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
-                        * fResumeNoWaitOnIcon, * fResumeNoWaitOffIcon, * fRevealOnIcon, * fRevealOffIcon,
-                        * fActionOnIcon, * fActionOffIcon;
+    IBOutlet NSMenu * fContextRow, * fContextNoRow;
+    NSImage * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
+            * fResumeNoWaitOnIcon, * fResumeNoWaitOffIcon, * fRevealOnIcon, * fRevealOffIcon,
+            * fActionOnIcon, * fActionOffIcon;
     
-    NSMutableArray      * fKeyStrokes;
+    NSMutableArray * fKeyStrokes;
     
-    NSDictionary        * fSmallStatusAttributes;
+    NSDictionary * fSmallStatusAttributes;
+
+    Torrent * fMenuTorrent;
 }
 
 - (void) setTorrents: (NSArray *) torrents;

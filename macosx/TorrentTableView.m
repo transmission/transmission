@@ -91,6 +91,9 @@
 {
     [fKeyStrokes release];
     [fSmallStatusAttributes release];
+    
+    [fMenuTorrent release];
+    
     [super dealloc];
 }
 
@@ -253,7 +256,8 @@
     if (row < 0)
         return;
     
-    NSMenu * torrentMenu = [[fTorrents objectAtIndex: row] torrentMenu];
+    fMenuTorrent = [[fTorrents objectAtIndex: row] retain];
+    NSMenu * torrentMenu = [fMenuTorrent torrentMenu];
     [torrentMenu setDelegate: self];
     
     NSRect rect = [self actionRectForRow: row];
@@ -266,25 +270,30 @@
         context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
     
     [NSMenu popUpContextMenu: torrentMenu withEvent: newEvent forView: self];
+    
+    [fMenuTorrent release];
+    fMenuTorrent = nil;
 }
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
-    BOOL create = [menu numberOfItems] <= 0, folder;
+    //this method seems to be called when it shouldn't be
+    if (!fMenuTorrent)
+        return;
     
-    Torrent * torrent = [fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]];
+    BOOL create = [menu numberOfItems] <= 0, folder;
     
     NSMenu * supermenu = [menu supermenu];
     NSArray * items;
     if (supermenu)
         items = [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject] objectForKey: @"Children"];
     else
-        items = [torrent fileList];
+        items = [fMenuTorrent fileList];
     NSEnumerator * enumerator = [items objectEnumerator];
     NSDictionary * dict;
+    NSMenuItem * item;
     while ((dict = [enumerator nextObject]))
     {
-        NSMenuItem * item;
         NSString * name = [dict objectForKey: @"Name"];
         
         folder = [[dict objectForKey: @"IsFolder"] boolValue];
@@ -292,8 +301,6 @@
         if (create)
         {
             item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
-            [menu addItem: item];
-            [item release];
             
             NSImage * icon;
             if (!folder)
@@ -319,6 +326,9 @@
             [icon setSize: NSMakeSize(16.0, 16.0)];
             [item setImage: icon];
             [icon release];
+            
+            [menu addItem: item];
+            [item release];
         }
         else
             item = [menu itemWithTitle: name];
@@ -326,8 +336,8 @@
         if (!folder)
         {
             NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
-            [item setState: [torrent checkForFiles: indexSet]];
-            [item setEnabled: [torrent canChangeDownloadCheckForFiles: indexSet]];
+            [item setState: [fMenuTorrent checkForFiles: indexSet]];
+            [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
         }
     }
 }
@@ -335,9 +345,8 @@
 - (void) checkFile: (id) sender
 {
     NSIndexSet * indexes = [[sender representedObject] objectForKey: @"Indexes"];
-    Torrent * torrent = [fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]];
+    [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexes];
     
-    [torrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexes];
     #warning reload inspector -> files
 }
 
