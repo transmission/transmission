@@ -34,6 +34,8 @@
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     NSUserDefaults * fDefaults;
+    
+    NSMutableDictionary * nameAttributes, * statusAttributes;
 }
 
 - (void) toggleMinimalStatus;

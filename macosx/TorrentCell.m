@@ -40,6 +40,7 @@
 
 @implementation TorrentCell
 
+#warning release?
 - (id) init
 {
     if ((self = [super init]))
@@ -59,6 +60,18 @@
         
         fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
         [fErrorImage setFlipped: YES];
+        
+        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+    
+        nameAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                            paragraphStyle, NSParagraphStyleAttributeName, nil];
+        statusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                            [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                            paragraphStyle, NSParagraphStyleAttributeName, nil];
+        [paragraphStyle release];
+
     }
 	return self;
 }
@@ -169,21 +182,13 @@
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
                                                         isEqual: [NSColor alternateSelectedControlColor]];
     
-    NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-    [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+    [nameAttributes setObject: highlighted ? [NSColor whiteColor] : [NSColor controlTextColor]
+                        forKey: NSForegroundColorAttributeName];
+    [statusAttributes setObject: highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor]
+                        forKey: NSForegroundColorAttributeName];
     
-    NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor controlTextColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                    paragraphStyle, NSParagraphStyleAttributeName, nil];
-    NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                    paragraphStyle, NSParagraphStyleAttributeName, nil];
-    [paragraphStyle release];
-
     NSPoint pen = cellFrame.origin;
-    const float LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0; //standard padding defined in TorrentCell.h
+    const float LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0; //standard padding is defined in TorrentCell.h
     
     NSDictionary * info = [self objectValue];
     
@@ -293,9 +298,6 @@
         else
             [self buildSimpleBar: barWidth point: pen];
     }
-    
-    [nameAttributes release];
-    [statusAttributes release];
 }
 
 @end
