@@ -122,9 +122,9 @@ tr_cpEnsureDoneValid( const tr_completion_t * ccp )
 
     /* the last piece/block is probably smaller than the others */
     if( !info->pieces[info->pieceCount-1].dnd ) {
-        total -= ( info->pieceSize - ( info->totalSize % info->pieceSize ) );
+        total -= ( info->pieceSize - tr_torPieceCountBytes(tor,info->pieceCount-1) );
         if( tr_cpBlockIsComplete( cp, tor->blockCount-1 ) )
-            have -= ( tor->blockSize - ( info->totalSize % tor->blockSize ) );
+            have -= ( tor->blockSize - tr_torBlockCountBytes(tor,tor->blockCount-1) );
     }
 
     assert( have <= total );
