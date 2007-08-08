@@ -391,6 +391,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [nc addObserver: self selector: @selector(torrentRestartedDownloading:)
                     name: @"TorrentRestartedDownloading" object: nil];
     
+    //avoids need of setting delegate
+    [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
+                    name: NSTableViewSelectionDidChangeNotification object: fTableView];
+    
     [nc addObserver: self selector: @selector(updateControlTint:)
                     name: NSControlTintDidChangeNotification object: nil];
     
@@ -2208,8 +2212,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return YES;
 }
 
-#warning get rid of delegate and make a notification
-- (void) tableViewSelectionDidChange: (NSNotification *) notification
+- (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
     [fInfoController updateInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }

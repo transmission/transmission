@@ -76,6 +76,8 @@
                                         [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        [self setDelegate: self];
     }
     
     return self;
@@ -351,55 +353,45 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
-#warning only update shown
-- (void) drawRect: (NSRect) r
+- (void) drawRow: (int) row clipRect: (NSRect) rect
 {
-    NSRect rect;
-    Torrent * torrent;
-    NSImage * image;
-    BOOL smallView = [fDefaults boolForKey: @"SmallView"];
+    [super drawRow: row clipRect: rect];
     
-    [super drawRect: r];
+    Torrent * torrent = [fTorrents objectAtIndex: row];
     
-    int i;
-    for (i = 0; i < [fTorrents count]; i++)
+    //pause/resume icon
+    NSImage * pauseImage = nil;
+    NSRect pauseRect  = [self pauseRectForRow: row];
+    if ([torrent isActive])
     {
-        torrent = [fTorrents objectAtIndex: i];
-        rect  = [self pauseRectForRow: i];
-        
-        //pause/resume icon
-        image = nil;
-        if ([torrent isActive])
-        {
-            if (![torrent isChecking])
-                image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
-        }
-        else if ([torrent isPaused])
-        {
-            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
-                image = NSPointInRect(fClickPoint, rect) ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
-            else if ([torrent waitingToStart])
-                image = NSPointInRect(fClickPoint, rect) ? fPauseOnIcon : fPauseOffIcon;
-            else
-                image = NSPointInRect(fClickPoint, rect) ? fResumeOnIcon : fResumeOffIcon;
-        }
-        else;
-        
-        if (image)
-            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
-        
-        //reveal icon
-        rect = [self revealRectForRow: i];
-        image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
-        [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
-        
-        //action icon
-        if (!smallView)
-        {
-            rect = [self actionRectForRow: i];
-            image = NSPointInRect(fClickPoint, rect) ? fActionOnIcon : fActionOffIcon;
-            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
-        }
+        if (![torrent isChecking])
+            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
+    }
+    else if ([torrent isPaused])
+    {
+        if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
+        else if ([torrent waitingToStart])
+            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
+        else
+            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fResumeOnIcon : fResumeOffIcon;
+    }
+    else;
+    
+    if (pauseImage)
+        [pauseImage compositeToPoint: NSMakePoint(pauseRect.origin.x, NSMaxY(pauseRect)) operation: NSCompositeSourceOver];
+    
+    //reveal icon
+    NSRect revealRect = [self revealRectForRow: row];
+    NSImage * revealImage = NSPointInRect(fClickPoint, revealRect) ? fRevealOnIcon : fRevealOffIcon;
+    [revealImage compositeToPoint: NSMakePoint(revealRect.origin.x, NSMaxY(revealRect)) operation: NSCompositeSourceOver];
+    
+    //action icon
+    if (![fDefaults boolForKey: @"SmallView"])
+    {
+        NSRect actionRect = [self actionRectForRow: row];
+        NSImage * actionImage = NSPointInRect(fClickPoint, actionRect) ? fActionOnIcon : fActionOffIcon;
+        [actionImage compositeToPoint: NSMakePoint(actionRect.origin.x, NSMaxY(actionRect)) operation: NSCompositeSourceOver];
     }
 }
 

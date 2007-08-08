@@ -205,6 +205,8 @@
 
 - (void) sleepCallBack: (natural_t) messageType argument: (void *) messageArgument;
 
+- (void) torrentTableViewSelectionDidChange: (NSNotification *) notification;
+
 - (void) toggleSmallView: (id) sender;
 
 - (void) toggleStatusBar: (id) sender;
