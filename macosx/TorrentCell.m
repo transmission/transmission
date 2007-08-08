@@ -40,7 +40,7 @@
 
 @implementation TorrentCell
 
-#warning release?
+//only called one, so don't worry about release
 - (id) init
 {
     if ((self = [super init]))
@@ -57,9 +57,6 @@
         fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
         fYellowGradient = [[CTGradient progressYellowGradient] retain];
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
-        
-        fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
-        [fErrorImage setFlipped: YES];
         
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
@@ -207,6 +204,12 @@
         //error badge
         if ([[info objectForKey: @"Error"] boolValue])
         {
+            if (!fErrorImage)
+            {
+                fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
+                [fErrorImage setFlipped: YES];
+            }
+            
             NSSize errorIconSize = [fErrorImage size];
             [fErrorImage drawAtPoint: NSMakePoint(pen.x + iconSize.width - errorIconSize.width,
                                                     pen.y + iconSize.height  - errorIconSize.height)
@@ -253,7 +256,18 @@
     else //small size
     {
         //icon
-        NSImage * icon = ![[info objectForKey: @"Error"] boolValue] ? [info objectForKey: @"Icon"] : fErrorImage;
+        NSImage * icon;
+        if ([[info objectForKey: @"Error"] boolValue])
+        {
+            if (!fErrorImage)
+            {
+                fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
+                [fErrorImage setFlipped: YES];
+            }
+            icon = fErrorImage;
+        }
+        else
+            icon = [info objectForKey: @"Icon"];
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
