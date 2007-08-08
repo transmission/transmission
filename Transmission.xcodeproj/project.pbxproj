@@ -99,6 +99,8 @@
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
+		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
+		A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */; };
 		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
@@ -423,6 +425,8 @@
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
 		A27431D80A68538400FA780A /* FilterBarButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilterBarButton.h; path = macosx/FilterBarButton.h; sourceTree = "<group>"; };
 		A27431D90A68538400FA780A /* FilterBarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarButton.m; path = macosx/FilterBarButton.m; sourceTree = "<group>"; };
+		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
+		A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOff.png; path = macosx/Images/ActionOff.png; sourceTree = "<group>"; };
 		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
@@ -723,6 +727,8 @@
 				A2E9AA750C249AF400085DCF /* Create.png */,
 				A2F011980C27418800576FC0 /* CreateLarge.png */,
 				4DF7500908A103AD007B0D70 /* Remove.png */,
+				A277DA090C693D9C00DA2CD4 /* ActionOn.png */,
+				A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */,
 				35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */,
 				35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */,
 				4D6DAAC4090CE00500F43C22 /* RevealOff.png */,
@@ -1240,6 +1246,8 @@
 				A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */,
 				A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */,
 				A2AE68330C628A35008753C9 /* Creator.nib in Resources */,
+				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
+				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

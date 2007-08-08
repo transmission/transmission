@@ -55,6 +55,8 @@
     tr_file_stat_t * fileStat;
     NSArray * fFileList, * fFlatFileList;
     
+    NSMenu * fTorrentMenu;
+    
     float   fRatioLimit;
     int     fRatioSetting;
     BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
@@ -207,6 +209,8 @@
 - (void) setFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
+
+- (NSMenu *) torrentMenu;
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;

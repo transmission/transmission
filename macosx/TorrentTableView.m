@@ -30,19 +30,20 @@
 #define BUTTON_TO_TOP_REGULAR 33.0
 #define BUTTON_TO_TOP_SMALL 20.0
 
-//button layout (from end of bar) is: padding, button, padding, button, padding
-//change BUTTONS_TOTAL_WIDTH in .h when changing these values, add 2.0 to that value
-#define BUTTON_WIDTH 14.0
-#define PADDING 3.0
+#define ACTION_BUTTON_TO_TOP 47.0
 
 @interface TorrentTableView (Private)
 
 - (NSRect) pauseRectForRow: (int) row;
 - (NSRect) revealRectForRow: (int) row;
-- (BOOL) pointInPauseRect: (NSPoint) point;
-- (BOOL) pointInRevealRect: (NSPoint) point;
+- (NSRect) actionRectForRow: (int) row;
+
 - (BOOL) pointInIconRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
+
+- (BOOL) pointInPauseRect: (NSPoint) point;
+- (BOOL) pointInRevealRect: (NSPoint) point;
+- (BOOL) pointInActionRect: (NSPoint) point;
 
 @end
 
@@ -55,11 +56,15 @@
         fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
         fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
         fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
+        fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
         fResumeNoWaitOnIcon = [NSImage imageNamed: @"ResumeNoWaitOn.png"];
         fResumeNoWaitOffIcon = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
-        fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
+        
         fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
         fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
+        
+        fActionOnIcon = [NSImage imageNamed: @"ActionOn.png"];
+        fActionOffIcon = [NSImage imageNamed: @"ActionOff.png"];
         
         fClickPoint = NSZeroPoint;
         
@@ -96,7 +101,14 @@
 {
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
-    if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
+    if ([self pointInActionRect: fClickPoint])
+    {
+        #warning use icon that doesn't change?
+        [self display]; //ensure button is pushed down
+        [self displayTorrentMenuForEvent: event];
+        #warning get icon to change back
+    }
+    else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
     {
         if ([event modifierFlags] & NSAlternateKeyMask)
         {
@@ -234,6 +246,101 @@
     [self scrollRowToVisible: row];
 }
 
+- (void) displayTorrentMenuForEvent: (NSEvent *) event
+{
+    int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
+    if (row < 0)
+        return;
+    
+    NSMenu * torrentMenu = [[fTorrents objectAtIndex: row] torrentMenu];
+    [torrentMenu setDelegate: self];
+    
+    NSRect rect = [self actionRectForRow: row];
+    NSPoint location = rect.origin;
+    location.y += rect.size.height + 5.0;
+    location = [self convertPoint: location toView: nil];
+    
+    NSEvent * newEvent = [NSEvent mouseEventWithType: [event type] location: location
+        modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
+        context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
+    
+    [NSMenu popUpContextMenu: torrentMenu withEvent: newEvent forView: self];
+}
+
+- (void) menuNeedsUpdate: (NSMenu *) menu
+{
+    BOOL create = [menu numberOfItems] <= 0, folder;
+    
+    Torrent * torrent = [fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]];
+    
+    NSMenu * supermenu = [menu supermenu];
+    NSArray * items;
+    if (supermenu)
+        items = [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject] objectForKey: @"Children"];
+    else
+        items = [torrent fileList];
+    NSEnumerator * enumerator = [items objectEnumerator];
+    NSDictionary * dict;
+    while ((dict = [enumerator nextObject]))
+    {
+        NSMenuItem * item;
+        NSString * name = [dict objectForKey: @"Name"];
+        
+        folder = [[dict objectForKey: @"IsFolder"] boolValue];
+        
+        if (create)
+        {
+            item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
+            [menu addItem: item];
+            [item release];
+            
+            NSImage * icon;
+            if (!folder)
+            {
+                [item setAction: @selector(checkFile:)];
+                
+                icon = [[dict objectForKey: @"Icon"] copy];
+                [icon setFlipped: NO];
+            }
+            else
+            {
+                NSMenu * menu = [[NSMenu alloc] initWithTitle: name];
+                [menu setAutoenablesItems: NO];
+                [item setSubmenu: menu];
+                [menu setDelegate: self];
+                
+                icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
+            }
+            
+            [item setRepresentedObject: dict];
+            
+            [icon setScalesWhenResized: YES];
+            [icon setSize: NSMakeSize(16.0, 16.0)];
+            [item setImage: icon];
+            [icon release];
+        }
+        else
+            item = [menu itemWithTitle: name];
+        
+        if (!folder)
+        {
+            NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
+            [item setState: [torrent checkForFiles: indexSet]];
+            [item setEnabled: [torrent canChangeDownloadCheckForFiles: indexSet]];
+        }
+    }
+}
+
+- (void) checkFile: (id) sender
+{
+    NSIndexSet * indexes = [[sender representedObject] objectForKey: @"Indexes"];
+    Torrent * torrent = [fTorrents objectAtIndex: [self rowAtPoint: fClickPoint]];
+    
+    [torrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexes];
+    #warning reload inspector -> files
+}
+
+#warning only update shown
 - (void) drawRect: (NSRect) r
 {
     NSRect rect;
@@ -271,6 +378,10 @@
         rect = [self revealRectForRow: i];
         image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
         [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
+        
+        #warning make change
+        rect = [self actionRectForRow: i];
+        [fActionOffIcon compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
     }
 }
 
@@ -298,18 +409,33 @@
                         cellRect.origin.y + buttonToTop, BUTTON_WIDTH, BUTTON_WIDTH);
 }
 
+- (NSRect) actionRectForRow: (int) row
+{
+    #warning return small icon rect
+    if ([fDefaults boolForKey: @"SmallView"])
+        return NSZeroRect;
+    
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    
+    #warning constant
+    return NSMakeRect(cellRect.origin.x + PADDING +
+                        ([[[fTorrents objectAtIndex: row] iconFlipped] size].width - ACTION_BUTTON_WIDTH) * 0.5,
+                        cellRect.origin.y + ACTION_BUTTON_TO_TOP, ACTION_BUTTON_WIDTH, ACTION_BUTTON_HEIGHT);
+}
+
 - (BOOL) pointInIconRect: (NSPoint) point
 {
     int row = [self rowAtPoint: point];
     if (row < 0)
         return NO;
-
+    
+    #warning move to own method
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
                                                         : [[[fTorrents objectAtIndex: row] iconFlipped] size];
     
-    NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y
-            + (cellRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
+    NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y + (cellRect.size.height - iconSize.height) * 0.5,
+                            iconSize.width, iconSize.height);
     
     return NSPointInRect(point, iconRect);
 }
@@ -335,12 +461,29 @@
 
 - (BOOL) pointInPauseRect: (NSPoint) point
 {
-    return NSPointInRect(point, [self pauseRectForRow: [self rowAtPoint: point]]);
+    int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
+    return NSPointInRect(point, [self pauseRectForRow: row]);
 }
 
 - (BOOL) pointInRevealRect: (NSPoint) point
 {
-    return NSPointInRect(point, [self revealRectForRow: [self rowAtPoint: point]]);
+    int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
+    return NSPointInRect(point, [self revealRectForRow: row]);
+}
+
+- (BOOL) pointInActionRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0)
+        return NO;
+    
+    return NSPointInRect(point, [self actionRectForRow: row]);
 }
 
 @end

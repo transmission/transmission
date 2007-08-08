@@ -183,7 +183,7 @@
     [paragraphStyle release];
 
     NSPoint pen = cellFrame.origin;
-    const float PADDING = 3.0, LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0;
+    const float LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0; //standard padding defined in TorrentCell.h
     
     NSDictionary * info = [self objectValue];
     
@@ -194,7 +194,8 @@
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
-        pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
+        #warning use constant
+        pen.y += (cellFrame.size.height - (iconSize.height + ACTION_BUTTON_HEIGHT)) * 0.5;
         
         [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
                 operation: NSCompositeSourceOver fraction: 1.0];

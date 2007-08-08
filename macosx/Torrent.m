@@ -183,6 +183,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [fFileList release];
     [fFlatFileList release];
     
+    [fTorrentMenu release];
+    
     [fQuickPauseDict release];
     
     [fBitmap release];
@@ -1342,6 +1344,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return NO;
 }
 
+#warning rename to match priorities
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet
 {
     BOOL low = NO, normal = NO, high = NO;
@@ -1378,6 +1381,16 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
             break;
     }
     return priorities;
+}
+
+- (NSMenu *) torrentMenu
+{
+    if (!fTorrentMenu)
+    {
+        fTorrentMenu = [[NSMenu alloc] initWithTitle: [@"TorrentMenu:" stringByAppendingString: [self name]]];
+        [fTorrentMenu setAutoenablesItems: NO];
+    }
+    return fTorrentMenu;
 }
 
 - (NSDate *) dateAdded

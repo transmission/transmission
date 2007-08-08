@@ -25,7 +25,14 @@
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
+#define PADDING 3.0
+
+//button layout (from end of bar) is: padding, button, padding, button, padding
+#define BUTTON_WIDTH 14.0
 #define BUTTONS_TOTAL_WIDTH 39.0
+
+#define ACTION_BUTTON_HEIGHT 12.0
+#define ACTION_BUTTON_WIDTH 28.0
 
 @class Controller;
 
@@ -39,15 +46,18 @@
     NSUserDefaults      * fDefaults;
     
     IBOutlet NSMenu     * fContextRow, * fContextNoRow;
-    NSImage             * fResumeOnIcon, * fResumeOffIcon,
-                        * fPauseOnIcon, * fPauseOffIcon,
-                        * fResumeNoWaitOnIcon, * fResumeNoWaitOffIcon, 
-                        * fRevealOnIcon, * fRevealOffIcon;
+    NSImage             * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
+                        * fResumeNoWaitOnIcon, * fResumeNoWaitOffIcon, * fRevealOnIcon, * fRevealOffIcon,
+                        * fActionOnIcon, * fActionOffIcon;
     
     NSMutableArray      * fKeyStrokes;
     
     NSDictionary        * fSmallStatusAttributes;
 }
+
 - (void) setTorrents: (NSArray *) torrents;
+
+- (void) displayTorrentMenuForEvent: (NSEvent *) event;
+- (void) checkFile: (id) sender;
 
 @end
