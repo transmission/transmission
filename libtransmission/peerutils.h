@@ -41,13 +41,15 @@ checkPeer( tr_peer_t * peer )
     tr_torrent_t * tor = peer->tor;
     const uint64_t now = tr_date( );
     const uint64_t idleTime = now - peer->date;
-    uint64_t lo, hi, minimum;
+    const uint64_t idleSecs = idleTime / 1000u;
+    uint64_t lo, hi, limit;
     int relaxStrictnessIfFewerThanN;
     double strictness;
 
     /* when deciding whether or not to keep a peer, judge its responsiveness
        on a sliding scale that's based on how many other peers are available */
-    relaxStrictnessIfFewerThanN = (int)(((TR_MAX_PEER_COUNT * PERCENT_PEER_WANTED) / 100.0) + 0.5);
+    relaxStrictnessIfFewerThanN =
+        (int)(((TR_MAX_PEER_COUNT * PERCENT_PEER_WANTED) / 100.0) + 0.5);
 
     /* if we have >= relaxIfFewerThan, strictness is 100%.
        if we have zero connections, strictness is 0% */
@@ -59,27 +61,27 @@ checkPeer( tr_peer_t * peer )
     /* test: has it been too long since we were properly connected to them? */
     lo = MIN_CON_TIMEOUT;
     hi = MAX_CON_TIMEOUT;
-    minimum = lo + ((hi-lo) * strictness);
-    if( peer->status < PEER_STATUS_CONNECTED && idleTime > minimum ) {
-        peer_dbg( "connection timeout, idled %i seconds", (int)(idleTime/1000) );
+    limit = lo + ((hi-lo) * strictness);
+    if( peer->status < PEER_STATUS_CONNECTED && idleTime > limit ) {
+        peer_dbg( "connection timeout, idled %"PRIu64" seconds", idleSecs );
         return TR_ERROR;
     }
 
     /* test: have we been waiting on a request for too long? */
     lo = MIN_UPLOAD_IDLE; 
     hi = MAX_UPLOAD_IDLE;
-    minimum = lo + ((hi-lo) * strictness);
-    if( peer->inRequestCount && idleTime > minimum ) {
-        peer_dbg( "idle uploader timeout, idled %d seconds", (int)(idleTime/1000));
+    limit = lo + ((hi-lo) * strictness);
+    if( peer->inRequestCount && idleTime > limit ) {
+        peer_dbg( "idle uploader timeout, idled %"PRIu64" seconds", idleSecs );
         return TR_ERROR;
     }
 
     /* test: has it been too long since the peer gave us any response at all? */
     lo = MIN_KEEP_ALIVE;
     hi = MAX_KEEP_ALIVE;
-    minimum = lo + ((hi-lo) * strictness);
-    if( idleTime > minimum ) {
-        peer_dbg( "peer timeout, idled %d seconds", (int)(idleTime/1000) );
+    limit = lo + ((hi-lo) * strictness);
+    if( idleTime > limit ) {
+        peer_dbg( "peer timeout, idled %"PRIu64" seconds", idleSecs );
         return TR_ERROR;
     }
 

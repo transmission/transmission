@@ -157,6 +157,13 @@ calculatePiecePriority ( const tr_torrent_t * tor,
           && file->lastPiece  >= piece
           && file->priority   >  priority)
               priority = file->priority;
+
+        /* when dealing with multimedia files, getting the first and
+           last pieces can sometimes allow you to preview it a bit
+           before it's fully downloaded... */
+        if ( file->priority >= TR_PRI_NORMAL )
+            if ( file->firstPiece == piece || file->lastPiece == piece )
+                priority = TR_PRI_HIGH;
     }
 
     return priority;
