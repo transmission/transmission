@@ -47,17 +47,6 @@
 	{
         fDefaults = [NSUserDefaults standardUserDefaults];
         
-        fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-        fGrayGradient = [[CTGradient progressGrayGradient] retain];
-        fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
-        fBlueGradient = [[CTGradient progressBlueGradient] retain];
-        fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
-        fGreenGradient = [[CTGradient progressGreenGradient] retain];
-        fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
-        fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
-        fYellowGradient = [[CTGradient progressYellowGradient] retain];
-        fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
-        
         NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
     
@@ -101,6 +90,8 @@
     float left = INVALID;
     if (progress < 1.0)
     {
+        if (!fWhiteGradient)
+            fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
         [fWhiteGradient fillRect: barBounds angle: -90];
         
         left = [[info objectForKey: @"Left"] floatValue];
@@ -110,6 +101,8 @@
             blankBounds.origin.x += width * (progress + left);
             blankBounds.size.width = width * ((1.0 - progress) - left);
             
+            if (!fLightGrayGradient)
+                fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
             [fLightGrayGradient fillRect: blankBounds angle: -90];
         }
     }
@@ -117,18 +110,33 @@
     if ([[info objectForKey: @"Active"] boolValue])
     {
         if ([[info objectForKey: @"Checking"] boolValue])
+        {
+            if (!fYellowGradient)
+                fYellowGradient = [[CTGradient progressYellowGradient] retain];
             [fYellowGradient fillRect: completeBounds angle: -90];
+        }
         else if ([[info objectForKey: @"Seeding"] boolValue])
         {
             NSRect ratioBounds = completeBounds;
             ratioBounds.size.width *= [[info objectForKey: @"ProgressStopRatio"] floatValue];
             
             if (ratioBounds.size.width < completeBounds.size.width)
+            {
+                if (!fLightGreenGradient)
+                    fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
                 [fLightGreenGradient fillRect: completeBounds angle: -90];
+            }
+            
+            if (!fGreenGradient)
+                fGreenGradient = [[CTGradient progressGreenGradient] retain];
             [fGreenGradient fillRect: ratioBounds angle: -90]; 
         }
         else
+        {
+            if (!fBlueGradient)
+                fBlueGradient = [[CTGradient progressBlueGradient] retain];
             [fBlueGradient fillRect: completeBounds angle: -90];
+        }
     }
     else
     {
@@ -138,12 +146,24 @@
                 left = [[info objectForKey: @"Left"] floatValue];
             
             if (left <= 0.0)
+            {
+                if (!fDarkGreenGradient)
+                    fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
                 [fDarkGreenGradient fillRect: completeBounds angle: -90];
+            }
             else
+            {
+                if (!fDarkBlueGradient)
+                    fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
                 [fDarkBlueGradient fillRect: completeBounds angle: -90];
+            }
         }
         else
+        {
+            if (!fGrayGradient)
+                fGrayGradient = [[CTGradient progressGrayGradient] retain];
             [fGrayGradient fillRect: completeBounds angle: -90];
+        }
     }
     
     [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
@@ -164,6 +184,10 @@
         barBounds = NSMakeRect(point.x, point.y, width, BAR_HEIGHT);
     else
         barBounds = NSMakeRect(point.x, point.y - BAR_HEIGHT, width, BAR_HEIGHT);
+    
+    if (!fTransparentGradient)
+        fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
+    
     [fTransparentGradient fillRect: barBounds angle: -90];
     [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
     [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
