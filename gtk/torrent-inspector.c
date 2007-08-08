@@ -108,8 +108,6 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
   GdkGC **gcs = (GdkGC**) g_object_get_data (G_OBJECT(da), "graphics-contexts");
   if (gcs == NULL)
   {
-    gcs = g_new (GdkGC*, N_COLORS+1);
-
     const GdkColor colors [N_COLORS] = {
       RGB_2_GDK (   0, 226, 255 ), /* all */
       RGB_2_GDK (   0, 153, 204 ), /* lots */
@@ -120,6 +118,8 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
       RGB_2_GDK ( 181, 181, 181 ), /* gray */
       RGB_2_GDK ( 255, 164,   0 ), /* blink - orange */
     };
+
+    gcs = g_new (GdkGC*, N_COLORS+1);
 
     for (i=0; i<N_COLORS; ++i) {
       gcs[i] = gdk_gc_new (da->window);
