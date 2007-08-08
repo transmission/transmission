@@ -269,7 +269,7 @@
 
 /* Begin PBXFileReference section */
 		002C9EE50C19CD2500C2F6F4 /* fastresume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fastresume.c; path = libtransmission/fastresume.c; sourceTree = "<group>"; };
-		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = macosx/main.m; sourceTree = "<group>"; };
@@ -327,7 +327,7 @@
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A204310F0C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/AboutWindow.nib; sourceTree = "<group>"; };
-		A20431100C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A20431100C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A20431110C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A20431120C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A20431130C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/MainMenu.nib; sourceTree = "<group>"; };
@@ -355,7 +355,7 @@
 		A2265F3F0B5EF5F40093DDA5 /* FileBrowserCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileBrowserCell.h; path = macosx/FileBrowserCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileBrowserCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileBrowserCell.m; path = macosx/FileBrowserCell.m; sourceTree = "<group>"; };
 		A22A7EBB0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/AboutWindow.nib; sourceTree = "<group>"; };
-		A22A7EBC0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22A7EBC0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A22A7EBD0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A22A7EBE0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22A7EBF0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
@@ -364,14 +364,14 @@
 		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A22BC9AD0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/AboutWindow.nib; sourceTree = "<group>"; };
-		A22BC9AE0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22BC9AE0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A22BC9AF0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A22BC9B00C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BC9B10C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A22BC9B20C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A22BC9B30C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A22BCA2D0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/AboutWindow.nib; sourceTree = "<group>"; };
-		A22BCA2E0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A22BCA2E0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A22BCA2F0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A22BCA300C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BCA310C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
@@ -413,7 +413,7 @@
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
 		A26039FC0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/AboutWindow.nib; sourceTree = "<group>"; };
 		A26039FD0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/Creator.nib; sourceTree = "<group>"; };
-		A26039FE0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A26039FE0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A26039FF0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A2603A000C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2603A010C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
