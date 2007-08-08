@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -344,10 +345,16 @@ tr_httpParseUrl( const char * url, int len,
     const char * pathstart, * hostend;
     int          ii, colon, portnum;
     char         str[6];
-
+    
     if( 0 > len )
     {
         len = strlen( url );
+    }
+
+    while( len && url && isspace(*url) )
+    {
+        --len;
+        ++url;
     }
 
     ii = tr_httpIsUrl( url, len );
