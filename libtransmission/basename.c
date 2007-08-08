@@ -21,6 +21,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <unistd.h> /* for MAXPATHLEN */
 #include <sys/param.h>
 
 char *
