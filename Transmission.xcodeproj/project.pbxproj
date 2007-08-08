@@ -95,7 +95,7 @@
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
 		A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */; };
-		A260C9AC0AA3B8D700FDC1B7 /* Error.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */; };
+		A261A8260C6A0D68003BAFDA /* Error.png in Resources */ = {isa = PBXBuildFile; fileRef = A261A8250C6A0D68003BAFDA /* Error.png */; };
 		A261F1DC0A69A1610002815A /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A261F1DB0A69A1610002815A /* Growl.framework */; };
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
@@ -419,7 +419,7 @@
 		A2603A010C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A2603A020C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A2603A030C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Error.tiff; path = macosx/Images/Error.tiff; sourceTree = "<group>"; };
+		A261A8250C6A0D68003BAFDA /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Error.png; path = macosx/Images/Error.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
 		A2710E740A86796000CE4F7D /* PrefsWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsWindow.h; path = macosx/PrefsWindow.h; sourceTree = "<group>"; };
 		A2710E750A86796000CE4F7D /* PrefsWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsWindow.m; path = macosx/PrefsWindow.m; sourceTree = "<group>"; };
@@ -712,7 +712,7 @@
 				A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */,
 				A20B6F820C4D8A610034AB1D /* PriorityHigh.png */,
 				A2FB06950BFF484A0095564D /* Globe.png */,
-				A260C9AB0AA3B8D700FDC1B7 /* Error.tiff */,
+				A261A8250C6A0D68003BAFDA /* Error.png */,
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
 				A2D4F0820A915F6600890C32 /* RedDot.tiff */,
@@ -1228,7 +1228,6 @@
 				A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */,
 				A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */,
 				A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */,
-				A260C9AC0AA3B8D700FDC1B7 /* Error.tiff in Resources */,
 				35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */,
 				35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */,
 				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
@@ -1248,6 +1247,7 @@
 				A2AE68330C628A35008753C9 /* Creator.nib in Resources */,
 				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
 				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
+				A261A8260C6A0D68003BAFDA /* Error.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

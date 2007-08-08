@@ -57,7 +57,7 @@
         fYellowGradient = [[CTGradient progressYellowGradient] retain];
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
         
-        fErrorImage = [[NSImage imageNamed: @"Error"] copy];
+        fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
         [fErrorImage setFlipped: YES];
     }
 	return self;
