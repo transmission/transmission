@@ -627,7 +627,7 @@
         return;
     
     NSRect windowRect = [window frame];
-    float difference = [view frame].size.height - [[window contentView] frame].size.height;
+    float difference = ([view frame].size.height - [[window contentView] frame].size.height) * [window userSpaceScaleFactor];
     windowRect.origin.y -= difference;
     windowRect.size.height += difference;
     
