@@ -1,0 +1,1005 @@
+# Brazilian Portuguese translation of transmission-gtk.
+# Copyright (C) 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the transmission-gtk package.
+# Raphael Higino <phhigino@gmail.com>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: transmission-gtk\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-07-27 18:16-0500\n"
+"PO-Revision-Date: 2007-08-04 18:08-0300\n"
+"Last-Translator: Raphael Higino <phhigino@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: actions.c:35
+msgid "_High"
+msgstr "_Alta"
+
+#: actions.c:36
+msgid "_Normal"
+msgstr "_Normal"
+
+#: actions.c:37
+msgid "_Low"
+msgstr "_Baixa"
+
+#: actions.c:52
+#: makemeta-ui.c:249
+msgid "_File"
+msgstr "_Arquivo"
+
+#: actions.c:53
+msgid "_Edit"
+msgstr "_Editar"
+
+#: actions.c:54
+msgid "_Help"
+msgstr "Aj_uda"
+
+#: actions.c:55
+msgid "_Priority"
+msgstr "_Prioridade"
+
+#: actions.c:58
+msgid "_Start"
+msgstr "_Iniciar"
+
+#: actions.c:60
+msgid "Re_check"
+msgstr "_Verificar novamente"
+
+#: actions.c:62
+msgid "S_top"
+msgstr "_Parar"
+
+#: actions.c:64
+msgid "_Remove"
+msgstr "_Remover"
+
+#: actions.c:66
+msgid "_Create New Torrent"
+msgstr "_Criar novo Torrent"
+
+#: actions.c:68
+msgid "_Close"
+msgstr "_Fechar"
+
+#: actions.c:70
+msgid "_Quit"
+msgstr "Sai_r"
+
+#: actions.c:72
+msgid "Edit _Preferences"
+msgstr "Editar _preferências"
+
+#: actions.c:74
+msgid "_Torrent Info"
+msgstr "Informações do _Torrent"
+
+#: actions.c:76
+msgid "_About Transmission"
+msgstr "_Sobre o Transmission"
+
+#: actions.c:78
+msgid "Show _Debug Window"
+msgstr "Mostrar janela de _depuração"
+
+#: actions.c:80
+msgid "Show / Hide _Transmission"
+msgstr "Mostrar / Ocultar _Transmission"
+
+#: conf.c:91
+#: conf.c:371
+#, c-format
+msgid ""
+"Failed to open the file %s for writing:\n"
+"%s"
+msgstr ""
+"Falha ao abrir arquivo %s para gravação:\n"
+"%s"
+
+#: conf.c:106
+#, c-format
+msgid "Another copy of %s is already running."
+msgstr "Uma outra cópia de %s já está em execução."
+
+#: conf.c:109
+#, c-format
+msgid ""
+"Failed to lock the file %s:\n"
+"%s"
+msgstr ""
+"Falha ao bloquear o arquivo %s:\n"
+"%s"
+
+#: conf.c:132
+#, c-format
+msgid ""
+"Failed to create the directory %s:\n"
+"%s"
+msgstr ""
+"Falha ao criar o diretório %s:\n"
+"%s"
+
+#: conf.c:205
+#, c-format
+msgid ""
+"Failed to open the file %s for reading:\n"
+"%s"
+msgstr ""
+"Falha ao abrir o arquivo %s para leitura:\n"
+"%s"
+
+#: conf.c:212
+#, c-format
+msgid ""
+"Error while reading from the file %s:\n"
+"%s"
+msgstr ""
+"Erro ao ler do arquivo %s:\n"
+"%s"
+
+#: conf.c:385
+#, c-format
+msgid ""
+"Error while writing to the file %s:\n"
+"%s"
+msgstr ""
+"Erro ao gravar no arquivo %s:\n"
+"%s"
+
+#: conf.c:391
+#, c-format
+msgid ""
+"Failed to rename the file %s to %s:\n"
+"%s"
+msgstr ""
+"Falha ao renomear arquivo %s para %s:\n"
+"%s"
+
+#: dialogs.c:118
+msgid "Add a Torrent"
+msgstr "Adicionar um Torrent"
+
+#: dialogs.c:125
+msgid "Automatically _start torrent"
+msgstr "_Iniciar o Torrent automaticamente"
+
+#: dialogs.c:127
+msgid "Use alternate _download directory"
+msgstr "Usar diretório de download alternativo"
+
+#: dialogs.c:131
+#: tr_prefs.c:212
+msgid "Choose a download directory"
+msgstr "Escolha um diretório de download"
+
+#: dialogs.c:160
+msgid "Torrent files"
+msgstr "Arquivos Torrent"
+
+#: dialogs.c:162
+msgid "All files"
+msgstr "Todos os arquivos"
+
+#: dialogs.c:258
+#: torrent-inspector.c:415
+#: torrent-inspector.c:844
+#: torrent-inspector.c:849
+msgid "?"
+msgstr "?"
+
+#: dialogs.c:291
+msgid "Choose a directory"
+msgstr "Escolha um diretório"
+
+#: dialogs.c:415
+#, c-format
+msgid "<b>Really Quit %s?</b>"
+msgstr "<b>Deseja realmente sair de %s?</b>"
+
+#: dialogs.c:419
+msgid "This will close all active torrents."
+msgstr "Isto fechará todos os torrents ativos."
+
+#: dialogs.c:427
+msgid "_Don't Ask Me This Again"
+msgstr "_Não me pergunte novamente"
+
+#: ipc.c:197
+#, c-format
+msgid ""
+"Failed to set up IPC:\n"
+"%s"
+msgstr ""
+"Falha ao configurar IPC:\n"
+"%s"
+
+#: ipc.c:229
+#, c-format
+msgid "failed to set up IPC: %s\n"
+msgstr "falha ao configurar IPC: %s\n"
+
+#: ipc.c:309
+#, c-format
+msgid ""
+"Failed to set up socket:\n"
+"%s"
+msgstr ""
+"Falha ao configurar o socket:\n"
+"%s"
+
+#: ipc.c:332
+#, c-format
+msgid "failed to create socket: %s\n"
+msgstr "falha ao criar o socket: %s\n"
+
+#: ipc.c:341
+#, c-format
+msgid "failed to connect to %s: %s\n"
+msgstr "falha ao conectar a %s: %s\n"
+
+#: ipc.c:431
+msgid "bad IPC protocol version"
+msgstr "versão inválida do protocolo IPC"
+
+#: ipc.c:434
+msgid "IPC protocol parse error"
+msgstr "Erro de análise do protocolo IPC"
+
+#: ipc.c:437
+#, c-format
+msgid "IPC parsing failed: %s"
+msgstr "Falha de análise de IPC: %s"
+
+#: ipc.c:467
+#, c-format
+msgid "bad IPC protocol version\n"
+msgstr "versão inválida do protocolo IPC\n"
+
+#: ipc.c:470
+#, c-format
+msgid "IPC protocol parse error\n"
+msgstr "Erro de análise do protocolo IPC\n"
+
+#: ipc.c:473
+#, c-format
+msgid "IPC parsing failed: %s\n"
+msgstr "Falha na análise do IPC: %s\n"
+
+#: main.c:299
+#, c-format
+msgid ""
+"usage: %s [-hpq] [files...]\n"
+"\n"
+"Transmission %s http://transmission.m0k.org/\n"
+"A free, lightweight BitTorrent client with a simple, intuitive interface\n"
+"\n"
+"  -h --help    display this message and exit\n"
+"  -p --paused  start with all torrents paused\n"
+"  -q --quit    request that the running %s instance quit\n"
+"\n"
+"Only one instance of %s may run at one time. Multiple\n"
+"torrent files may be loaded at startup by adding them to the command\n"
+"line. If %s is already running, those torrents will be\n"
+"opened in the running instance.\n"
+msgstr ""
+"uso: %s [-hpq] [arquivos...]\n"
+"\n"
+"Transmission %s http://transmission.m0k.org/\n"
+"Um cliente BitTorrent livre e leve com uma interface simples e intuitiva\n"
+"\n"
+"  -h --help    mostra esta mensagem e sai\n"
+"  -p --paused  inicia todos os torrents pausados\n"
+"  -q --quit    solicita que a instância de %s em execução seja fechada\n"
+"\n"
+"Apenas uma instância de %s pode ser executada de cada vez. Múltiplos\n"
+"arquivos torrent podem ser carregados na inicialização adicionando-os\n"
+"à linha de comando. Se %s já estiver em execução, os torrents serão\n"
+"abertos na instância em execução.\n"
+
+#: main.c:362
+msgid "Transmission"
+msgstr "Transmission"
+
+#: main.c:694
+#, c-format
+msgid ""
+"Failed to load torrent file:\n"
+"%s"
+msgid_plural ""
+"Failed to load torrent files:\n"
+"%s"
+msgstr[0] ""
+"Falha ao carregar o arquivo torrent:\n"
+"%s"
+msgstr[1] ""
+"Falha ao carregar os arquivos torrent:\n"
+"%s"
+
+#: main.c:901
+msgid "Copyright 2005-2007 The Transmission Project"
+msgstr "Copyright 2005-2007 O Projeto Transmission"
+
+#: main.c:903
+msgid "translator-credits"
+msgstr "Raphael Higino <phhigino@gmail.com>"
+
+#: makemeta-ui.c:87
+msgid "Torrent creation aborted."
+msgstr "Criação do Torrent abortada."
+
+#: makemeta-ui.c:88
+msgid "Torrent creation failed."
+msgstr "Falha na criação do Torrent."
+
+#: makemeta-ui.c:99
+msgid "Torrent Created"
+msgstr "Torrent criado"
+
+#: makemeta-ui.c:130
+msgid "Making Torrent..."
+msgstr "Criando Torrent..."
+
+#: makemeta-ui.c:195
+msgid "file"
+msgid_plural "files"
+msgstr[0] "arquivo"
+msgstr[1] "arquivos"
+
+#: makemeta-ui.c:202
+msgid "piece"
+msgid_plural "pieces"
+msgstr[0] "pedaço"
+msgstr[1] "pedaços"
+
+#: makemeta-ui.c:226
+msgid "Make a New Torrent"
+msgstr "Criar um novo Torrent"
+
+#: makemeta-ui.c:238
+msgid "Files"
+msgstr "Arquivos"
+
+#: makemeta-ui.c:241
+msgid "File _Type"
+msgstr "_Tipo de arquivo"
+
+#: makemeta-ui.c:243
+msgid "Directory"
+msgstr "Diretório"
+
+#: makemeta-ui.c:245
+msgid "Single File"
+msgstr "Arquivo único"
+
+#: makemeta-ui.c:251
+msgid "File or Directory to Add to the New Torrent"
+msgstr "Arquivo ou diretório para adicionar ao novo Torrent"
+
+#: makemeta-ui.c:262
+msgid "No Files Selected"
+msgstr "Nenhum arquivo selecionado"
+
+#: makemeta-ui.c:276
+msgid "Torrent"
+msgstr "Torrent"
+
+#: makemeta-ui.c:279
+#, fuzzy
+msgid "Private to this Tracker"
+msgstr "Alternar para esta aba"
+
+#: makemeta-ui.c:282
+msgid "Announce _URL"
+msgstr "_URL de anúncio"
+
+#: makemeta-ui.c:287
+msgid "Commen_t"
+msgstr "Comen_tário"
+
+#: msgwin.c:159
+#, c-format
+msgid "Unable to open \"%s\" for writing: %s"
+msgstr "Não é possível abrir \"%s\" para gravação: %s"
+
+#: msgwin.c:173
+#, c-format
+msgid "Error writing to \"%s\": %s"
+msgstr "Erro ao gravar em \"%s\": %s"
+
+#: msgwin.c:190
+msgid "Save Debug Log"
+msgstr "Salvar registro de depuração"
+
+#: msgwin.c:215
+#: torrent-inspector.c:901
+msgid "Error"
+msgstr "Erro"
+
+#: msgwin.c:216
+msgid "Info"
+msgstr "Informação"
+
+#: msgwin.c:217
+msgid "Debug"
+msgstr "Depurar"
+
+#: msgwin.c:244
+msgid "Save"
+msgstr "Salvar"
+
+#: msgwin.c:248
+msgid "Clear"
+msgstr "Limpar"
+
+#: msgwin.c:255
+msgid "Level "
+msgstr "Nível"
+
+#: msgwin.c:256
+#: msgwin.c:282
+msgid "Select the debug filter level."
+msgstr "Selecione o nível do filtro de depuração"
+
+#: torrent-inspector.c:249
+msgid "Address"
+msgstr "Endereço"
+
+#: torrent-inspector.c:250
+msgid "Port"
+msgstr "Porta"
+
+#: torrent-inspector.c:251
+msgid "Client"
+msgstr "Cliente"
+
+#: torrent-inspector.c:252
+#: torrent-inspector.c:539
+#: torrent-inspector.c:1361
+#: tr_window.c:206
+msgid "Progress"
+msgstr "Progresso"
+
+#: torrent-inspector.c:254
+msgid "Downloading"
+msgstr "Baixando"
+
+#: torrent-inspector.c:255
+msgid "DL Rate"
+msgstr "Taxa de download"
+
+#: torrent-inspector.c:256
+msgid "Uploading"
+msgstr "Enviando"
+
+#: torrent-inspector.c:257
+msgid "UL Rate"
+msgstr "Taxa de upload"
+
+#: torrent-inspector.c:608
+msgid "Piece Availability"
+msgstr "Disponibilidade de pedados"
+
+#: torrent-inspector.c:631
+msgid "Peers"
+msgstr "Fontes"
+
+#: torrent-inspector.c:648
+msgid "Seeders"
+msgstr ""
+
+#: torrent-inspector.c:656
+msgid "Leechers"
+msgstr ""
+
+#: torrent-inspector.c:664
+msgid "Completed"
+msgstr "Concluído"
+
+#: torrent-inspector.c:699
+msgid "Torrent Information"
+msgstr "Informações do Torrent"
+
+#: torrent-inspector.c:702
+msgid "Tracker"
+msgstr ""
+
+#: torrent-inspector.c:711
+msgid "Pieces"
+msgstr "Pedaços"
+
+#: torrent-inspector.c:718
+msgid "Hash"
+msgstr "Hash"
+
+#: torrent-inspector.c:722
+msgid "Secure"
+msgstr "Seguro"
+
+#: torrent-inspector.c:724
+msgid "Private Torrent, PEX disabled"
+msgstr "Torrent privado, PEX desabilitado"
+
+#: torrent-inspector.c:725
+msgid "Public Torrent"
+msgstr "Torrent público"
+
+#: torrent-inspector.c:729
+msgid "Comment"
+msgstr "Comentário"
+
+#: torrent-inspector.c:742
+msgid "Created By"
+msgstr "Criado por"
+
+#: torrent-inspector.c:745
+msgid "Creator"
+msgstr "Criador"
+
+#: torrent-inspector.c:746
+#: util.c:147
+msgid "N/A"
+msgstr "N/D"
+
+#: torrent-inspector.c:749
+msgid "Date"
+msgstr "Data"
+
+#: torrent-inspector.c:756
+msgid "Location"
+msgstr "Localização"
+
+#: torrent-inspector.c:759
+msgid "Downloaded Data"
+msgstr "Dados Baixados"
+
+#: torrent-inspector.c:763
+msgid "Torrent File Path"
+msgstr "Caminho do arquivo Torrent"
+
+#: torrent-inspector.c:767
+msgid "Transmission Support Folder"
+msgstr "Pasta de suporte do Transmission"
+
+#: torrent-inspector.c:772
+msgid "Torrent File Name"
+msgstr "Nome do arquivo Torrent"
+
+#: torrent-inspector.c:841
+msgid "None"
+msgstr "Nenhum"
+
+#: torrent-inspector.c:870
+msgid "Transfer"
+msgstr "Transferência"
+
+#: torrent-inspector.c:873
+msgid "State"
+msgstr "Estado"
+
+#: torrent-inspector.c:877
+msgid "Valid DL"
+msgstr "Download válido"
+
+#: torrent-inspector.c:881
+msgid "Downloaded"
+msgstr "Baixado"
+
+#: torrent-inspector.c:885
+msgid "Uploaded"
+msgstr "Enviado"
+
+#: torrent-inspector.c:889
+msgid "Ratio"
+msgstr "Taxa"
+
+#: torrent-inspector.c:893
+msgid "Remaining"
+msgstr "Restantes"
+
+#: torrent-inspector.c:897
+#, fuzzy
+msgid "Swarm Rate"
+msgstr "Taxa do Relógio"
+
+#: torrent-inspector.c:905
+msgid "Completeness"
+msgstr "Completeza"
+
+#: torrent-inspector.c:913
+msgid "Dates"
+msgstr "Datas"
+
+#: torrent-inspector.c:916
+msgid "Added"
+msgstr "Adicionado"
+
+#: torrent-inspector.c:920
+msgid "Last Activity"
+msgstr "Última atividade"
+
+#: torrent-inspector.c:963
+#: torrent-inspector.c:973
+#: torrent-inspector.c:1144
+msgid "High"
+msgstr "Alta"
+
+#: torrent-inspector.c:964
+#: torrent-inspector.c:1146
+msgid "Normal"
+msgstr "Normal"
+
+#: torrent-inspector.c:965
+#: torrent-inspector.c:974
+#: torrent-inspector.c:1148
+msgid "Low"
+msgstr "Baixa"
+
+#: torrent-inspector.c:1347
+msgid "File"
+msgstr "Arquivo"
+
+#: torrent-inspector.c:1375
+msgid "Download"
+msgstr "Download"
+
+#: torrent-inspector.c:1385
+msgid "Priority"
+msgstr "Prioridade"
+
+#: torrent-inspector.c:1506
+msgid "Transfer Bandwidth"
+msgstr "Largura de banda da transferência"
+
+#: torrent-inspector.c:1509
+msgid "Limit _Download Speed (KiB/s):"
+msgstr "Limitar velocidade de _download (kB/s):"
+
+#: torrent-inspector.c:1522
+msgid "Limit _Upload Speed (KiB/s):"
+msgstr "Limitar velocidade de _upload (kB/s):"
+
+#: torrent-inspector.c:1536
+msgid "Seeding"
+msgstr ""
+
+#: torrent-inspector.c:1539
+msgid "_Stop Seeding at Ratio:"
+msgstr ""
+
+#: torrent-inspector.c:1604
+msgid "Torrent Inspector"
+msgstr "Inspetor de Torrents"
+
+#: torrent-inspector.c:1631
+msgid "_Activity"
+msgstr "_Atividade"
+
+#: torrent-inspector.c:1636
+msgid "_Peers"
+msgstr "_Pontos"
+
+#: torrent-inspector.c:1640
+msgid "_Info"
+msgstr "_Informação"
+
+#: torrent-inspector.c:1645
+msgid "_Files"
+msgstr "_Arquivos"
+
+#: torrent-inspector.c:1650
+msgid "_Options"
+msgstr "_Opções"
+
+#: tr_prefs.c:84
+msgid "_Limit download speed"
+msgstr "_Limitar velocidade de download"
+
+#: tr_prefs.c:85
+msgid "Restrict the download rate"
+msgstr "Restringe a taxa de download"
+
+#: tr_prefs.c:89
+msgid "Maximum _download speed:"
+msgstr "Velocidade máxima de _download:"
+
+#: tr_prefs.c:90
+msgid "Speed in KiB/sec for restricted download rate"
+msgstr "Velociodade em kB/s para taxa restrita de download"
+
+#: tr_prefs.c:94
+msgid "Li_mit upload speed"
+msgstr "Li_mitar velocidade de upload"
+
+#: tr_prefs.c:95
+msgid "Restrict the upload rate"
+msgstr "Restringe a velocidade de upload"
+
+#: tr_prefs.c:99
+msgid "Maximum _upload speed:"
+msgstr "Velocidade máxima de _upload:"
+
+#: tr_prefs.c:100
+msgid "Speed in KiB/sec for restricted upload rate"
+msgstr "Velociodade em kB/s para taxa restrita de upload"
+
+#: tr_prefs.c:104
+msgid "Al_ways prompt for download directory"
+msgstr "_Sempre perguntar pelo diretório de download"
+
+#: tr_prefs.c:105
+msgid "When adding a torrent, always prompt for a directory to download data files into"
+msgstr "Ao adiconar um torrent, sempre pergunta por um diretório no qual baixar o arquivo"
+
+#: tr_prefs.c:110
+msgid "Download di_rectory:"
+msgstr "Di_retório de download:"
+
+#: tr_prefs.c:111
+msgid "Destination directory for downloaded data files"
+msgstr "Diretório de destino para os arquivos baixados"
+
+#: tr_prefs.c:115
+msgid "Listening _port:"
+msgstr "Ouvindo _porta:"
+
+#: tr_prefs.c:116
+msgid "TCP port number to listen for peer connections"
+msgstr "Porta TCP para escutar conexões de pontos"
+
+#: tr_prefs.c:120
+msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
+msgstr "Mapeamen_to de portas automático via NAT-PMP ou UPnP"
+
+#: tr_prefs.c:121
+msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
+msgstr "Tentar contornar o NAT ou firewall para permitir conexões de entrada dos pontos"
+
+#: tr_prefs.c:125
+msgid "Use peer _exchange if possible"
+msgstr "Usar _intercâmbio de fontes, se possível"
+
+#: tr_prefs.c:126
+msgid "Perform Azureus or µTorrent compatible peer exchange with any peers which support it"
+msgstr "Executar troca de fontes compatível com Azureus ou µTorrent com qualquer ponto que suporte"
+
+#: tr_prefs.c:131
+msgid "Display an _icon in the system tray"
+msgstr "Exibir um ícone na _bandeja do sistema"
+
+#: tr_prefs.c:132
+msgid "Use a system tray / dock / notification area icon"
+msgstr "Usa um ícone na bandeja do sistema/ acoplador / área de notificação"
+
+#: tr_prefs.c:136
+msgid "Confirm _quit"
+msgstr "Confirmar _saída"
+
+#: tr_prefs.c:137
+msgid "Prompt for confirmation when quitting"
+msgstr "Pedir confirmação ao sair"
+
+#: tr_prefs.c:142
+msgid "For torrents added _normally:"
+msgstr "Para torrents adicionados _normalmente:"
+
+#: tr_prefs.c:143
+msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
+msgstr "Arquivos Torrent adicionados via barra de ferramentas, menu de contexto ou arrastar-e-soltar"
+
+#: tr_prefs.c:148
+msgid ""
+"For torrents added e_xternally\n"
+"(via the command-line):"
+msgstr ""
+"Para torrents adicionados _externamente\n"
+"(via linha de comando):"
+
+#: tr_prefs.c:149
+msgid "For torrents added via the command-line only"
+msgstr "Apenas para torrents adicionados via linha de comando"
+
+#: tr_prefs.c:346
+#, c-format
+msgid "%s Preferences"
+msgstr "Preferências de %s"
+
+#: tr_prefs.c:892
+msgid "Use the torrent file where it is"
+msgstr "Usar o arquivo torrent onde ele estiver"
+
+#: tr_prefs.c:895
+msgid "Keep a copy of the torrent file"
+msgstr "Manter uma cópia do arquivo .torrent"
+
+#: tr_prefs.c:898
+msgid "Keep a copy and remove the original"
+msgstr "Manter uma cópia e remover o original"
+
+#: tr_torrent.c:324
+#: tr_torrent.c:437
+#, c-format
+msgid "%s: not a valid torrent file"
+msgstr "%s: não é um arquivo torrent válido"
+
+#: tr_torrent.c:327
+#: tr_torrent.c:440
+#, c-format
+msgid "%s: torrent is already open"
+msgstr "%s: o torrent já está aberto"
+
+#: tr_torrent.c:368
+msgid "not a valid torrent file"
+msgstr "não é um arquivo torrent válido"
+
+#: tr_torrent.c:371
+msgid "torrent is already open"
+msgstr "O torrent já está aberto"
+
+#: tr_torrent.c:562
+#, c-format
+msgid "Waiting to check existing files (checked %.1f%%)"
+msgstr "Esperando para verificar arquivos existente (%.1f%% verificados)"
+
+#: tr_torrent.c:567
+#, c-format
+msgid "Checking existing files (checked %.1f%%)"
+msgstr "Verificando arquivos existentes (%.1f%% verificados)"
+
+#: tr_torrent.c:572
+#, c-format
+msgid "Stalled (%.1f%%)"
+msgstr "Bloqueado (%.1f%%)"
+
+#: tr_torrent.c:575
+#, c-format
+msgid "%s remaining (%.1f%%)"
+msgstr "%s restantes (%.1f%%)"
+
+#: tr_torrent.c:582
+#, c-format
+msgid "Uploading to %d of %d peer"
+msgid_plural "Uploading to %d of %d peers"
+msgstr[0] "Enviando para %d de %d ponto"
+msgstr[1] "Enviando para %d de %d pontos"
+
+#: tr_torrent.c:589
+#, fuzzy, c-format
+msgid "Seeding to %d of %d peer"
+msgid_plural "Seeding to %d of %d peers"
+msgstr[0] "Introdução de peer completa"
+msgstr[1] ""
+
+#: tr_torrent.c:595
+msgid "Stopping..."
+msgstr "Parando..."
+
+#: tr_torrent.c:599
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Parado (%.1f%%)"
+
+#: tr_window.c:101
+msgid "Error: "
+msgstr "Erro:"
+
+#: tr_window.c:106
+#, c-format
+msgid "Downloading from %i of %i peer"
+msgid_plural "Downloading from %i of %i peers"
+msgstr[0] "Baixando de %i de %i fonte"
+msgstr[1] "Baixando de %i de %i fontes"
+
+#: tr_window.c:144
+#, c-format
+msgid ""
+"Ratio: %s\n"
+"UL: %s"
+msgstr ""
+"Taxa: %s\n"
+"Upload: %s"
+
+#: tr_window.c:149
+#, c-format
+msgid ""
+"DL: %s\n"
+"UL: %s"
+msgstr ""
+"Download: %s\n"
+"Upload: %s"
+
+#: tr_window.c:192
+msgid "Name"
+msgstr "Nome"
+
+#: tr_window.c:203
+msgid "  fnord    fnord  "
+msgstr "  fnord    fnord  "
+
+#: tr_window.c:309
+#, c-format
+msgid "Total DL: %s"
+msgstr "Download total: %s"
+
+#: tr_window.c:315
+#, c-format
+msgid "Total UL: %s"
+msgstr "Upload total: %s"
+
+#: util.c:77
+msgid "B"
+msgstr "B"
+
+#: util.c:77
+msgid "KiB"
+msgstr "kB"
+
+#: util.c:77
+msgid "MiB"
+msgstr "MB"
+
+#: util.c:77
+msgid "GiB"
+msgstr "GB"
+
+#: util.c:77
+msgid "TiB"
+msgstr "TB"
+
+#: util.c:77
+msgid "PiB"
+msgstr "PB"
+
+#: util.c:77
+msgid "EiB"
+msgstr "EB"
+
+#: util.c:116
+#, c-format
+msgid "%i %s"
+msgstr "%i %s"
+
+#: util.c:117
+#: util.c:121
+msgid "sec"
+msgid_plural "secs"
+msgstr[0] "seg"
+msgstr[1] "seg"
+
+#: util.c:119
+#: util.c:123
+#: util.c:127
+#, c-format
+msgid "%i %s %i %s"
+msgstr "%i %s %i %s"
+
+#: util.c:120
+#: util.c:125
+msgid "min"
+msgid_plural "mins"
+msgstr[0] "min"
+msgstr[1] "min"
+
+#: util.c:124
+#: util.c:129
+msgid "hr"
+msgid_plural "hrs"
+msgstr[0] "h"
+msgstr[1] "h"
+
+#: util.c:128
+msgid "day"
+msgid_plural "days"
+msgstr[0] "dia"
+msgstr[1] "dias"
+
+#: util.c:151
+msgid "∞"
+msgstr "∞"
+
