@@ -105,10 +105,9 @@
 
     if ([self pointInActionRect: fClickPoint])
     {
-        #warning use icon that doesn't change?
         [self display]; //ensure button is pushed down
         [self displayTorrentMenuForEvent: event];
-        #warning get icon to change back
+        fClickPoint = NSZeroPoint;
     }
     else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
     {
@@ -384,11 +383,12 @@
         [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
         
         //action icon
-        #warning make change
         if (![fDefaults boolForKey: @"SmallView"])
         {
+            #warning make change
             rect = [self actionRectForRow: i];
-            [fActionOffIcon compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
+            image = NSPointInRect(fClickPoint, rect) ? fActionOnIcon : fActionOffIcon;
+            [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
         }
     }
 }

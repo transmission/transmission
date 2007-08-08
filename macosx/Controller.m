@@ -2208,6 +2208,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return YES;
 }
 
+#warning get rid of delegate and make a notification
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fInfoController updateInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
