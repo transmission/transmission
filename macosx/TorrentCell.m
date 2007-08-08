@@ -194,7 +194,6 @@
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
-        #warning use constant
         pen.y += (cellFrame.size.height - (iconSize.height + ACTION_BUTTON_HEIGHT)) * 0.5;
         
         [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)

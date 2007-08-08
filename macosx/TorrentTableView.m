@@ -34,6 +34,8 @@
 
 @interface TorrentTableView (Private)
 
+- (NSRect) iconRectForRow: (int) row;
+
 - (NSRect) pauseRectForRow: (int) row;
 - (NSRect) revealRectForRow: (int) row;
 - (NSRect) actionRectForRow: (int) row;
@@ -355,6 +357,7 @@
         torrent = [fTorrents objectAtIndex: i];
         rect  = [self pauseRectForRow: i];
         
+        //pause/resume icon
         image = nil;
         if ([torrent isActive])
         {
@@ -374,14 +377,19 @@
         
         if (image)
             [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
-
+        
+        //reveal icon
         rect = [self revealRectForRow: i];
         image = NSPointInRect(fClickPoint, rect) ? fRevealOnIcon : fRevealOffIcon;
         [image compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
         
+        //action icon
         #warning make change
-        rect = [self actionRectForRow: i];
-        [fActionOffIcon compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
+        if (![fDefaults boolForKey: @"SmallView"])
+        {
+            rect = [self actionRectForRow: i];
+            [fActionOffIcon compositeToPoint: NSMakePoint(rect.origin.x, NSMaxY(rect)) operation: NSCompositeSourceOver];
+        }
     }
 }
 
@@ -389,8 +397,24 @@
 
 @implementation TorrentTableView (Private)
 
+- (NSRect) iconRectForRow: (int) row
+{
+    if (row < 0)
+        return NSZeroRect;
+    
+    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
+                                                        : [[[fTorrents objectAtIndex: row] iconFlipped] size];
+    
+    return NSMakeRect(cellRect.origin.x + PADDING, cellRect.origin.y + (cellRect.size.height - iconSize.height) * 0.5,
+                            iconSize.width, iconSize.height);
+}
+
 - (NSRect) pauseRectForRow: (int) row
 {
+    if (row < 0)
+        return NSZeroRect;
+    
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
@@ -401,6 +425,9 @@
 
 - (NSRect) revealRectForRow: (int) row
 {
+    if (row < 0)
+        return NSZeroRect;
+    
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
@@ -411,9 +438,11 @@
 
 - (NSRect) actionRectForRow: (int) row
 {
-    #warning return small icon rect
     if ([fDefaults boolForKey: @"SmallView"])
+        return [self iconRectForRow: row];
+    else if (row < 0)
         return NSZeroRect;
+    else;
     
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
     
@@ -429,15 +458,7 @@
     if (row < 0)
         return NO;
     
-    #warning move to own method
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-    NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
-                                                        : [[[fTorrents objectAtIndex: row] iconFlipped] size];
-    
-    NSRect iconRect = NSMakeRect(cellRect.origin.x + 3.0, cellRect.origin.y + (cellRect.size.height - iconSize.height) * 0.5,
-                            iconSize.width, iconSize.height);
-    
-    return NSPointInRect(point, iconRect);
+    return NSPointInRect(point, [self iconRectForRow: row]);
 }
 
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
