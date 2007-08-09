@@ -374,7 +374,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         currentFilterButton = fNoFilterButton;
     }
     
-    [currentFilterButton setEnabled: YES];
+    [currentFilterButton setState: NSOnState];
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
@@ -1836,8 +1836,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     if (sender != prevFilterButton)
     {
-        [prevFilterButton setEnabled: NO];
-        [sender setEnabled: YES];
+        [prevFilterButton setState: NSOffState];
+        [sender setState: NSOnState];
 
         NSString * filterType;
         if (sender == fDownloadFilterButton)

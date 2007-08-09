@@ -26,12 +26,13 @@
 
 @interface FilterBarButton : NSButton
 {
-    NSImage * fButtonNormal, * fButtonNormalDim, * fButtonOver,
-            * fButtonPressed, * fButtonSelected, * fButtonSelectedDim;
     int fCount;
-    
+    int fState;
     BOOL fEnabled;
     NSTrackingRectTag fTrackingTag;
+    NSBezierPath * fPath, * fEdgePath, * fStepPath;
+    NSDictionary * fNormalAttributes, * fNormalDimAttributes,
+                 * fHighlightedAttributes, * fHighlightedDimAttributes;
 }
 
 - (void) setCount: (int) count;

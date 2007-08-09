@@ -28,6 +28,16 @@
 
 - (void) awakeFromNib
 {
+    [fNoFilterButton setTitle: NSLocalizedString(@"All", @"Filter Bar Button -> title")];
+    [fDownloadFilterButton setTitle: NSLocalizedString(@"Downloading", @"Filter Bar Button -> title")];
+    [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", @"Filter Bar Button -> title")];
+    [fPauseFilterButton setTitle: NSLocalizedString(@"Paused", @"Filter Bar Button -> title")];
+    
+    [fNoFilterButton sizeToFit];
+    [fDownloadFilterButton sizeToFit];
+    [fSeedFilterButton sizeToFit];
+    [fPauseFilterButton sizeToFit];
+    
     float padding = 2.0, base = 3.0;
     [fNoFilterButton setFrameOrigin: NSMakePoint(padding + 2.0, base)];
     [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + padding, base)];
