@@ -78,7 +78,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 }
 
 - (id) copyWithZone: (NSZone *) zone
-{NSLog(@"copy");
+{
     TorrentCell * copy = [super copyWithZone: zone];
     
     copy->fBitmap = nil;
@@ -86,7 +86,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 }
 
 - (void) dealloc
-{NSLog(@"dealloc");
+{
     [fBitmap release];
     if (fPieces)
         free(fPieces);
