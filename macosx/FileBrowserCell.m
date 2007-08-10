@@ -33,6 +33,13 @@
 #define PADDING_BELOW_STATUS_REG 1.0
 #define PADDING_AFTER_TITLE 1.0
 
+@interface FileBrowserCell (Private)
+
+- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
+- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color;
+
+@end
+
 @implementation FileBrowserCell
 
 - (void) awakeFromNib
@@ -53,27 +60,6 @@
 - (void) setProgress: (float) progress
 {
     fPercent = progress * 100.0;
-}
-
-- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
-{
-    if (!fTitleAttributes)
-    {
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
-        
-        fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                            paragraphStyle, NSParagraphStyleAttributeName, nil];
-        
-        [paragraphStyle release];
-    }
-    
-    if (color)
-        [fTitleAttributes setObject: color forKey: NSForegroundColorAttributeName];
-        
-    NSString * title = [[self objectValue] objectForKey: @"Name"];
-    return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
 - (NSRect) titleRectForBounds: (NSRect) bounds
@@ -97,31 +83,6 @@
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_AFTER_TITLE);
     
     return result;
-}
-
-- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color
-{
-    if (!fStatusAttributes)
-    {
-        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
-        
-        fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                                paragraphStyle, NSParagraphStyleAttributeName, nil];
-        
-        [paragraphStyle release];
-    }
-    
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
-    
-    #warning fPercent?
-    NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
-                            "Inspector -> Files tab -> file status string"), fPercent,
-                            [NSString stringForFileSize: [[[self objectValue] objectForKey: @"Size"] unsignedLongLongValue]]];
-    
-    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
 }
 
 - (NSRect) statusRectForBounds: (NSRect) bounds
@@ -173,6 +134,56 @@
     NSRect statusRect = [self statusRectForBounds: cellFrame];
     if (!NSEqualRects(statusRect, NSZeroRect))
         [[self attributedStatusWithColor: highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor]] drawInRect: statusRect];
+}
+
+@end
+
+@implementation FileBrowserCell (Private)
+
+- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
+{
+    if (!fTitleAttributes)
+    {
+        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        
+        fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                            paragraphStyle, NSParagraphStyleAttributeName, nil];
+        
+        [paragraphStyle release];
+    }
+    
+    if (color)
+        [fTitleAttributes setObject: color forKey: NSForegroundColorAttributeName];
+        
+    NSString * title = [[self objectValue] objectForKey: @"Name"];
+    return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
+}
+
+- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color
+{
+    if (!fStatusAttributes)
+    {
+        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        
+        fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                                paragraphStyle, NSParagraphStyleAttributeName, nil];
+        
+        [paragraphStyle release];
+    }
+    
+    if (color)
+        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
+    
+    #warning fPercent?
+    NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
+                            "Inspector -> Files tab -> file status string"), fPercent,
+                            [NSString stringForFileSize: [[[self objectValue] objectForKey: @"Size"] unsignedLongLongValue]]];
+    
+    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
 }
 
 @end
