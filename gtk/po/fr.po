@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: Transmission\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-04-07 13:35-0700\n"
-"PO-Revision-Date: 2007-08-03 00:59-0500\n"
+"PO-Revision-Date: 2007-08-08 22:24-0500\n"
 "Last-Translator: Jean-François Fortin Tam\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -203,9 +203,9 @@ msgid "Choose a directory"
 msgstr "Choisissez un répertoire"
 
 #: dialogs.c:415
-#, fuzzy, c-format
+#, c-format
 msgid "<b>Really Quit %s?</b>"
-msgstr "<b>Réellement quitter %s ?</b>"
+msgstr "<b>Voulez-vous réellement quitter %s ?</b>"
 
 #: dialogs.c:419
 msgid "This will close all active torrents."
@@ -590,7 +590,6 @@ msgid "State"
 msgstr "État"
 
 #: torrent-inspector.c:877
-#, fuzzy
 msgid "Valid DL"
 msgstr "Téléchargement valide"
 
@@ -761,7 +760,7 @@ msgstr "Numéro du port TCP où écouter les connexions des pairs"
 
 #: tr_prefs.c:120
 msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
-msgstr "Mappage de port au_tomatique via NAT-PMP ou UPnP"
+msgstr "Assigner au_tomatiquement les ports via NAT-PMP ou UPnP"
 
 #: tr_prefs.c:121
 msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
@@ -818,7 +817,7 @@ msgstr "%s Préférences"
 
 #: tr_prefs.c:892
 msgid "Use the torrent file where it is"
-msgstr "Utiliser le fichier torrent à son emplacement originel"
+msgstr "Utiliser le fichier à son emplacement originel"
 
 #: tr_prefs.c:895
 msgid "Keep a copy of the torrent file"
@@ -917,7 +916,7 @@ msgid ""
 "DL: %s\n"
 "UL: %s"
 msgstr ""
-"Réception : %s/s\n"
+"Réception : %s\n"
 "Émission : %s"
 
 #: tr_window.c:192
