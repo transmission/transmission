@@ -25,13 +25,12 @@
 #import "FileBrowserCell.h"
 #import "StringAdditions.h"
 
-#define PADDING_BEFORE_IMAGE 2.0
+#define PADDING_HORIZONAL 2.0
 #define IMAGE_FOLDER_SIZE 16.0
 #define IMAGE_ICON_SIZE 32.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
-#define PADDING_ABOVE_TITLE_REG 1.0
-#define PADDING_BELOW_STATUS_REG 1.0
-#define PADDING_AFTER_TITLE 1.0
+#define PADDING_ABOVE_TITLE_REG 2.0
+#define PADDING_BELOW_STATUS_REG 2.0
 
 @interface FileBrowserCell (Private)
 
@@ -71,16 +70,16 @@
     
     if (![[[self objectValue] objectForKey: @"IsFolder"] boolValue])
     {
-        result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x += PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y += PADDING_ABOVE_TITLE_REG;
     }
     else
     {
-        result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x += PADDING_HORIZONAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y += (result.size.height - titleSize.height) * 0.5;
     }
     result.size = titleSize;
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_AFTER_TITLE);
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
     
     return result;
 }
@@ -95,11 +94,11 @@
     
     NSRect result = bounds;
     
-    result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x += PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
     result.origin.y += result.size.height - PADDING_BELOW_STATUS_REG - statusSize.height;
     
     result.size = statusSize;
-    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_AFTER_TITLE);
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
     
     return result;
 }
@@ -108,7 +107,7 @@
 {
     NSRect result = bounds;
     
-    result.origin.x += PADDING_BEFORE_IMAGE;
+    result.origin.x += PADDING_HORIZONAL;
     
     const float IMAGE_SIZE = [[[self objectValue] objectForKey: @"IsFolder"] boolValue] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
     result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
