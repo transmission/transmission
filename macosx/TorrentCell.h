@@ -22,10 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef TORRENTCELL_H
-#define TORRENTCELL_H
-
-#import "Torrent.h"
 #import "CTGradient.h"
 
 @interface TorrentCell : NSCell
@@ -44,5 +40,3 @@
 - (void) toggleMinimalStatus;
 
 @end
-
-#endif

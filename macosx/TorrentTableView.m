@@ -116,7 +116,7 @@
 
     if ([self pointInActionRect: fClickPoint])
     {
-        [self display]; //ensure button is pushed down
+        [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]]; //ensure button is pushed down
         [self displayTorrentMenuForEvent: event];
         fClickPoint = NSZeroPoint;
     }
@@ -146,8 +146,8 @@
 - (void) mouseUp: (NSEvent *) event
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
-    int row = [self rowAtPoint: point];
-    BOOL sameRow = row == [self rowAtPoint: fClickPoint];
+    int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
+    BOOL sameRow = row == oldRow;
     
     if (sameRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
     {
@@ -180,7 +180,7 @@
     [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
-    [self display];
+    [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
