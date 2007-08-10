@@ -51,7 +51,6 @@ static int static_lastid = 0;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
             withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
             flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index;
-- (NSImage *) advancedBar;
 
 - (void) quickPause;
 - (void) endQuickPause;
@@ -483,40 +482,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 	[fStatusString setString: statusString];
 	[fShortStatusString setString: shortStatusString];
 	[fRemainingTimeString setString: remainingTimeString];
-}
-
-- (NSDictionary *) infoForCurrentView
-{
-    NSMutableDictionary * info = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                    [self name], @"Name",
-                                    [NSNumber numberWithFloat: [self progress]], @"Progress",
-                                    [NSNumber numberWithFloat: (float)fStat->left/[self size]], @"Left",
-                                    [NSNumber numberWithBool: [self isActive]], @"Active",
-                                    [NSNumber numberWithBool: [self isSeeding]], @"Seeding",
-                                    [NSNumber numberWithBool: [self isChecking]], @"Checking",
-                                    [NSNumber numberWithBool: fWaitToStart], @"Waiting",
-                                    [NSNumber numberWithBool: [self isError]], @"Error", nil];
-    
-    if ([self isSeeding])
-        [info setObject: [NSNumber numberWithFloat: [self progressStopRatio]] forKey: @"ProgressStopRatio"];
-    
-    if (![fDefaults boolForKey: @"SmallView"])
-    {
-        [info setObject: [self iconFlipped] forKey: @"Icon"];
-        [info setObject: [self progressString] forKey: @"ProgressString"];
-        [info setObject: [self statusString] forKey: @"StatusString"];
-    }
-    else
-    {
-        [info setObject: [self iconSmall] forKey: @"Icon"];
-        [info setObject: [self remainingTimeString] forKey: @"RemainingTimeString"];
-        [info setObject: [self shortStatusString] forKey: @"ShortStatusString"];
-    }
-    
-    if ([fDefaults boolForKey: @"UseAdvancedBar"])
-        [info setObject: [self advancedBar] forKey: @"AdvancedBar"];
-    
-    return info;
 }
 
 - (void) startTransfer
@@ -1020,6 +985,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return fStat->percentDone;
 }
 
+- (float) progressLeft
+{
+    return fStat->left/[self size];
+}
+
 - (int) eta
 {
     return fStat->eta;
@@ -1450,6 +1420,135 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [NSNumber numberWithFloat: [self ratio]];
 }
 
+#warning move?
+- (NSImage *) advancedBar
+{
+    uint32_t * p;
+    uint8_t * bitmapData = [fBitmap bitmapData];
+    int bytesPerRow = [fBitmap bytesPerRow];
+    
+    int pieceCount = [self pieceCount];
+    int8_t * piecesAvailablity = malloc(pieceCount);
+    [self getAvailability: piecesAvailablity size: pieceCount];
+    
+    //lines 2 to 14: blue, green, or gray depending on piece availability
+    int i, h, index = 0;
+    float increment = (float)pieceCount / MAX_PIECES, indexValue = 0;
+    uint32_t color;
+    BOOL change;
+    for (i = 0; i < MAX_PIECES; i++)
+    {
+        change = NO;
+        if (piecesAvailablity[index] < 0)
+        {
+            if (fPieces[i] != -1)
+            {
+                color = kBlue;
+                fPieces[i] = -1;
+                change = YES;
+            }
+        }
+        else if (piecesAvailablity[index] == 0)
+        {
+            if (fPieces[i] != 0)
+            {
+                color = kGray;
+                fPieces[i] = 0;
+                change = YES;
+            }
+        }
+        else if (piecesAvailablity[index] <= 4)
+        {
+            if (fPieces[i] != 1)
+            {
+                color = kGreen1;
+                fPieces[i] = 1;
+                change = YES;
+            }
+        }
+        else if (piecesAvailablity[index] <= 8)
+        {
+            if (fPieces[i] != 2)
+            {
+                color = kGreen2;
+                fPieces[i] = 2;
+                change = YES;
+            }
+        }
+        else
+        {
+            if (fPieces[i] != 3)
+            {
+                color = kGreen3;
+                fPieces[i] = 3;
+                change = YES;
+            }
+        }
+        
+        if (change)
+        {
+            //point to pixel (i, 2) and draw "vertically"
+            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + i;
+            for (h = 2; h < BAR_HEIGHT; h++)
+            {
+                p[0] = color;
+                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
+            }
+        }
+        
+        indexValue += increment;
+        index = (int)indexValue;
+    }
+    
+    //determine percentage finished and available
+    int have = rintf((float)MAX_PIECES * [self progress]), avail;
+    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeersConnected] <= 0)
+        avail = 0;
+    else
+    {
+        float * piecesFinished = malloc(pieceCount * sizeof(float));
+        [self getAmountFinished: piecesFinished size: pieceCount];
+        
+        float available = 0;
+        for (i = 0; i < pieceCount; i++)
+            if (piecesAvailablity[i] > 0)
+                available += 1.0 - piecesFinished[i];
+        
+        avail = rintf(MAX_PIECES * available / (float)pieceCount);
+        if (have + avail > MAX_PIECES) //case if both end in .5 and all pieces are available
+            avail--;
+        
+        free(piecesFinished);
+    }
+    
+    free(piecesAvailablity);
+    
+    //first two lines: dark blue to show progression, green to show available
+    p = (uint32_t *)bitmapData;
+    for (i = 0; i < have; i++)
+    {
+        p[i] = kBlue2;
+        p[i + bytesPerRow / 4] = kBlue2;
+    }
+    for (; i < avail + have; i++)
+    {
+        p[i] = kGreen3;
+        p[i + bytesPerRow / 4] = kGreen3;
+    }
+    for (; i < MAX_PIECES; i++)
+    {
+        p[i] = kWhite;
+        p[i + bytesPerRow / 4] = kWhite;
+    }
+    
+    //actually draw image
+    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
+    [bar addRepresentation: fBitmap];
+    [bar setScalesWhenResized: YES];
+    
+    return [bar autorelease];
+}
+
 - (int) torrentID
 {
     return fID;
@@ -1678,135 +1777,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 {
     NSString * folder = [self shouldUseIncompleteFolderForName: [self name]] ? fIncompleteFolder : fDownloadFolder;
     tr_torrentSetFolder(fHandle, [folder UTF8String]);
-}
-
-#warning move?
-- (NSImage *) advancedBar
-{
-    uint32_t * p;
-    uint8_t * bitmapData = [fBitmap bitmapData];
-    int bytesPerRow = [fBitmap bytesPerRow];
-    
-    int pieceCount = [self pieceCount];
-    int8_t * piecesAvailablity = malloc(pieceCount);
-    [self getAvailability: piecesAvailablity size: pieceCount];
-    
-    //lines 2 to 14: blue, green, or gray depending on piece availability
-    int i, h, index = 0;
-    float increment = (float)pieceCount / (float)MAX_PIECES, indexValue = 0;
-    uint32_t color;
-    BOOL change;
-    for (i = 0; i < MAX_PIECES; i++)
-    {
-        change = NO;
-        if (piecesAvailablity[index] < 0)
-        {
-            if (fPieces[i] != -1)
-            {
-                color = kBlue;
-                fPieces[i] = -1;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] == 0)
-        {
-            if (fPieces[i] != 0)
-            {
-                color = kGray;
-                fPieces[i] = 0;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] <= 4)
-        {
-            if (fPieces[i] != 1)
-            {
-                color = kGreen1;
-                fPieces[i] = 1;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] <= 8)
-        {
-            if (fPieces[i] != 2)
-            {
-                color = kGreen2;
-                fPieces[i] = 2;
-                change = YES;
-            }
-        }
-        else
-        {
-            if (fPieces[i] != 3)
-            {
-                color = kGreen3;
-                fPieces[i] = 3;
-                change = YES;
-            }
-        }
-        
-        if (change)
-        {
-            //point to pixel (i, 2) and draw "vertically"
-            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + i;
-            for (h = 2; h < BAR_HEIGHT; h++)
-            {
-                p[0] = color;
-                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
-            }
-        }
-        
-        indexValue += increment;
-        index = (int)indexValue;
-    }
-    
-    //determine percentage finished and available
-    int have = rintf((float)MAX_PIECES * [self progress]), avail;
-    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeersConnected] <= 0)
-        avail = 0;
-    else
-    {
-        float * piecesFinished = malloc(pieceCount * sizeof(float));
-        [self getAmountFinished: piecesFinished size: pieceCount];
-        
-        float available = 0;
-        for (i = 0; i < pieceCount; i++)
-            if (piecesAvailablity[i] > 0)
-                available += 1.0 - piecesFinished[i];
-        
-        avail = rintf((float)MAX_PIECES * available / (float)pieceCount);
-        if (have + avail > MAX_PIECES) //case if both end in .5 and all pieces are available
-            avail--;
-        
-        free(piecesFinished);
-    }
-    
-    free(piecesAvailablity);
-    
-    //first two lines: dark blue to show progression, green to show available
-    p = (uint32_t *)bitmapData;
-    for (i = 0; i < have; i++)
-    {
-        p[i] = kBlue2;
-        p[i + bytesPerRow / 4] = kBlue2;
-    }
-    for (; i < avail + have; i++)
-    {
-        p[i] = kGreen3;
-        p[i + bytesPerRow / 4] = kGreen3;
-    }
-    for (; i < MAX_PIECES; i++)
-    {
-        p[i] = kWhite;
-        p[i + bytesPerRow / 4] = kWhite;
-    }
-    
-    //actually draw image
-    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
-    [bar addRepresentation: fBitmap];
-    [bar setScalesWhenResized: YES];
-    
-    return [bar autorelease];
 }
 
 - (void) quickPause

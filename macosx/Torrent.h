@@ -85,7 +85,6 @@
 - (void) getAmountFinished: (float *) tab size: (int) size;
 
 - (void) update;
-- (NSDictionary *) infoForCurrentView;
 
 - (void) startTransfer;
 - (void) stopTransfer;
@@ -152,6 +151,7 @@
 
 - (float) progress;
 - (float) progressDone;
+- (float) progressLeft;
 - (int) eta;
 
 - (BOOL) isActive;
@@ -222,6 +222,8 @@
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
+
+- (NSImage *) advancedBar;
 
 - (int) torrentID;
 - (const tr_info_t *) torrentInfo;

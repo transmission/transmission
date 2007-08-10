@@ -76,6 +76,8 @@
                                         [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
+        
+        [self setDelegate: self];
     }
     
     return self;
@@ -100,6 +102,12 @@
 - (void) setTorrents: (NSArray *) torrents
 {
     fTorrents = torrents;
+}
+
+- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell
+        forTableColumn: (NSTableColumn *) tableColumn row: (int) row
+{
+    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
 }
 
 - (void) mouseDown: (NSEvent *) event

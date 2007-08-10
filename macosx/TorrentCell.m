@@ -75,7 +75,7 @@
 
 - (void) buildSimpleBar: (float) width point: (NSPoint) point
 {
-    NSDictionary * info = [self objectValue];
+    Torrent * torrent = [self representedObject];
     
     NSRect barBounds, completeBounds;
     if([[self controlView] isFlipped])
@@ -84,7 +84,7 @@
         barBounds = NSMakeRect(point.x, point.y - BAR_HEIGHT, width, BAR_HEIGHT);
     completeBounds = barBounds;
     
-    float progress = [[info objectForKey: @"Progress"] floatValue];
+    float progress = [torrent progress];
     completeBounds.size.width = progress * width;
     
     float left = INVALID;
@@ -94,7 +94,7 @@
             fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
         [fWhiteGradient fillRect: barBounds angle: -90];
         
-        left = [[info objectForKey: @"Left"] floatValue];
+        left = [torrent progressLeft];
         if ((progress + left) < 1.0)
         {
             NSRect blankBounds = barBounds;
@@ -107,18 +107,18 @@
         }
     }
     
-    if ([[info objectForKey: @"Active"] boolValue])
+    if ([torrent isActive])
     {
-        if ([[info objectForKey: @"Checking"] boolValue])
+        if ([torrent isChecking])
         {
             if (!fYellowGradient)
                 fYellowGradient = [[CTGradient progressYellowGradient] retain];
             [fYellowGradient fillRect: completeBounds angle: -90];
         }
-        else if ([[info objectForKey: @"Seeding"] boolValue])
+        else if ([torrent isSeeding])
         {
             NSRect ratioBounds = completeBounds;
-            ratioBounds.size.width *= [[info objectForKey: @"ProgressStopRatio"] floatValue];
+            ratioBounds.size.width *= [torrent progressStopRatio];
             
             if (ratioBounds.size.width < completeBounds.size.width)
             {
@@ -140,10 +140,10 @@
     }
     else
     {
-        if ([[info objectForKey: @"Waiting"] boolValue])
+        if ([torrent waitingToStart])
         {
             if (left == INVALID)
-                left = [[info objectForKey: @"Left"] floatValue];
+                left = [torrent progressLeft];
             
             if (left <= 0.0)
             {
@@ -172,10 +172,10 @@
 
 - (void) buildAdvancedBar: (float) width point: (NSPoint) point
 {
-    NSDictionary * info = [self objectValue];
+    Torrent * torrent = [self representedObject];
     
     //place actual advanced bar
-    NSImage * image = [info objectForKey: @"AdvancedBar"];
+    NSImage * image = [torrent advancedBar];
     [image setSize: NSMakeSize(width, BAR_HEIGHT)];
     [image compositeToPoint: point operation: NSCompositeSourceOver];
     
@@ -211,12 +211,12 @@
     NSPoint pen = cellFrame.origin;
     const float LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0; //standard padding is defined in TorrentCell.h
     
-    NSDictionary * info = [self objectValue];
+    Torrent * torrent = [self representedObject];
     
     if (![fDefaults boolForKey: @"SmallView"]) //regular size
     {
         //icon
-        NSImage * icon = [info objectForKey: @"Icon"];
+        NSImage * icon = [torrent iconFlipped];
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
@@ -226,7 +226,7 @@
                 operation: NSCompositeSourceOver fraction: 1.0];
         
         //error badge
-        if ([[info objectForKey: @"Error"] boolValue])
+        if ([torrent isError])
         {
             if (!fErrorImage)
             {
@@ -247,14 +247,14 @@
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + PADDING;
         
-        NSString * nameString = [info objectForKey: @"Name"];
+        NSString * nameString = [torrent name];
         NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
         [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, nameSize.height) withAttributes: nameAttributes];
         
         //progress string
         pen.y += nameSize.height + LINE_PADDING - 1.0;
         
-        NSString * progressString = [info objectForKey: @"ProgressString"];
+        NSString * progressString = [torrent progressString];
         NSSize progressSize = [progressString sizeWithAttributes: statusAttributes];
         [progressString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, progressSize.height) withAttributes: statusAttributes];
 
@@ -273,7 +273,7 @@
         pen.x += EXTRA_NAME_SHIFT;
         pen.y += LINE_PADDING;
         
-        NSString * statusString = [info objectForKey: @"StatusString"];
+        NSString * statusString = [torrent statusString];
         NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
         [statusString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, statusSize.height) withAttributes: statusAttributes];
     }
@@ -281,7 +281,7 @@
     {
         //icon
         NSImage * icon;
-        if ([[info objectForKey: @"Error"] boolValue])
+        if ([torrent isError])
         {
             if (!fErrorImage)
             {
@@ -291,7 +291,7 @@
             icon = fErrorImage;
         }
         else
-            icon = [info objectForKey: @"Icon"];
+            icon = [torrent iconSmall];
         NSSize iconSize = [icon size];
         
         pen.x += PADDING;
@@ -307,12 +307,11 @@
         pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
         pen.y = cellFrame.origin.y + LINE_PADDING;
 
-        NSString * nameString = [info objectForKey: @"Name"];
+        NSString * nameString = [torrent name];
         NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
         
-        NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [[info objectForKey: @"Active"] boolValue]
-                                        ? [info objectForKey: @"RemainingTimeString"]
-                                        : [info objectForKey: @"ShortStatusString"];
+        NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
+                                    ? [torrent remainingTimeString] : [torrent shortStatusString];
         NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
         
         [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth - statusSize.width - 2.0 * LINE_PADDING, nameSize.height)
