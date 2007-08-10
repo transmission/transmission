@@ -49,10 +49,21 @@
 - (void) setImage: (NSImage *) image
 {
     if (!image)
-        image = [[[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy] autorelease];
+    {
+        if (!fFolderImage)
+        {
+            fFolderImage = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
+            [fFolderImage setFlipped: YES];
+            [fFolderImage setScalesWhenResized: YES];
+        }
+        image = fFolderImage;
+    }
+    else
+    {
+        [image setFlipped: YES];
+        [image setScalesWhenResized: YES];
+    }
     
-    [image setFlipped: YES];
-    [image setScalesWhenResized: YES];
     [super setImage: image];
 }
 

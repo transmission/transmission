@@ -26,6 +26,8 @@
 
 @interface FileBrowserCell : NSBrowserCell
 {
+    NSImage * fFolderImage;
+    
     float fPercent;
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
