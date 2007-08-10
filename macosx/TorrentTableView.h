@@ -39,7 +39,9 @@
 {
     IBOutlet Controller * fController;
     NSArray * fTorrents;
+    
     NSPoint fClickPoint;
+    BOOL fClickIn;
     
     NSUserDefaults * fDefaults;
     

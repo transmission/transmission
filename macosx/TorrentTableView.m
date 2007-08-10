@@ -69,6 +69,7 @@
         fActionOffIcon = [NSImage imageNamed: @"ActionOff.png"];
         
         fClickPoint = NSZeroPoint;
+        fClickIn = NO;
         
         fKeyStrokes = [[NSMutableArray alloc] init];
         
@@ -116,11 +117,14 @@
 
     if ([self pointInActionRect: fClickPoint])
     {
+        
         [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]]; //ensure button is pushed down
         [self displayTorrentMenuForEvent: event];
         fClickPoint = NSZeroPoint;
     }
-    else if (![self pointInPauseRect: fClickPoint] && ![self pointInRevealRect: fClickPoint])
+    else if ([self pointInPauseRect: fClickPoint] || [self pointInRevealRect: fClickPoint])
+        fClickIn = YES;
+    else
     {
         if ([event modifierFlags] & NSAlternateKeyMask)
         {
@@ -138,7 +142,6 @@
             [super mouseDown: event];
         }
     }
-    else;
 
     [self display];
 }
@@ -180,7 +183,37 @@
     [super mouseUp: event];
 
     fClickPoint = NSZeroPoint;
+    fClickIn = NO;
     [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
+}
+
+- (void) mouseDragged: (NSEvent *) event
+{
+    if (NSEqualPoints(fClickPoint, NSZeroPoint))
+    {
+        [super mouseDragged: event];
+        return;
+    }
+    
+    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    int oldRow = [self rowAtPoint: fClickPoint];
+    
+    BOOL inRect;
+    if ([self pointInRevealRect: fClickPoint])
+        inRect = oldRow == [self rowAtPoint: point] && [self pointInRevealRect: point];
+    else if ([self pointInPauseRect: fClickPoint])
+        inRect = oldRow == [self rowAtPoint: point] && [self pointInPauseRect: point];
+    else
+    {
+        [super mouseDragged: event];
+        return;
+    }
+    
+    if (inRect != fClickIn)
+    {
+        fClickIn = inRect;
+        [self setNeedsDisplayInRect: [self rectOfRow: oldRow]];
+    }
 }
 
 - (NSMenu *) menuForEvent: (NSEvent *) event
@@ -371,16 +404,17 @@
     if ([torrent isActive])
     {
         if (![torrent isChecking])
-            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
+            pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
     }
     else if ([torrent isPaused])
     {
+        BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
         if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
-            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
+            pauseImage = inPauseRect ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
         else if ([torrent waitingToStart])
-            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
+            pauseImage = inPauseRect ? fPauseOnIcon : fPauseOffIcon;
         else
-            pauseImage = NSPointInRect(fClickPoint, pauseRect) ? fResumeOnIcon : fResumeOffIcon;
+            pauseImage = inPauseRect ? fResumeOnIcon : fResumeOffIcon;
     }
     else;
     
@@ -389,7 +423,7 @@
     
     //reveal icon
     NSRect revealRect = [self revealRectForRow: row];
-    NSImage * revealImage = NSPointInRect(fClickPoint, revealRect) ? fRevealOnIcon : fRevealOffIcon;
+    NSImage * revealImage = fClickIn && NSPointInRect(fClickPoint, revealRect) ? fRevealOnIcon : fRevealOffIcon;
     [revealImage compositeToPoint: NSMakePoint(revealRect.origin.x, NSMaxY(revealRect)) operation: NSCompositeSourceOver];
     
     //action icon
