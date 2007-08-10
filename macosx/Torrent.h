@@ -63,9 +63,6 @@
     
     int fOrderValue;
     
-    NSBitmapImageRep * fBitmap;
-    int8_t * fPieces;
-    
     NSDictionary * fQuickPauseDict;
 }
 
@@ -222,8 +219,6 @@
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
-
-- (NSImage *) advancedBar;
 
 - (int) torrentID;
 - (const tr_info_t *) torrentInfo;

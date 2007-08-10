@@ -36,6 +36,9 @@
     NSUserDefaults * fDefaults;
     
     NSMutableDictionary * nameAttributes, * statusAttributes;
+    
+    NSBitmapImageRep * fBitmap;
+    int8_t * fPieces;
 }
 
 - (void) toggleMinimalStatus;

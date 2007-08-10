@@ -2116,11 +2116,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     return [fDisplayedTorrents count];
 }
 
-/*- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
-{
-    return [[fDisplayedTorrents objectAtIndex: row] infoForCurrentView];
-}*/
-
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
     toPasteboard: (NSPasteboard *) pasteboard
 {

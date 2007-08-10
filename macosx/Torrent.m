@@ -25,11 +25,6 @@
 #import "Torrent.h"
 #import "StringAdditions.h"
 
-#define BAR_HEIGHT 12.0
-
-#define MAX_PIECES 324
-#define BLANK_PIECE -99
-
 static int static_lastid = 0;
 
 @interface Torrent (Private)
@@ -60,18 +55,6 @@ static int static_lastid = 0;
 @end
 
 @implementation Torrent
-
-// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
-#define BE OSSwapBigToHostConstInt32
-
-static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
-                kBlue = BE(0x50A0FFFF), //80, 160, 255
-                kBlue2 = BE(0x1E46B4FF), //30, 70, 180
-                kGray  = BE(0x969696FF), //150, 150, 150
-                kGreen1 = BE(0x99FFCCFF), //153, 255, 204
-                kGreen2 = BE(0x66FF99FF), //102, 255, 153
-                kGreen3 = BE(0x00FF66FF), //0, 255, 102
-                kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib
 {
@@ -185,11 +168,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     [fTorrentMenu release];
     
     [fQuickPauseDict release];
-    
-    [fBitmap release];
-    
-    if (fPieces)
-        free(fPieces);
     
     [super dealloc];
 }
@@ -1420,135 +1398,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [NSNumber numberWithFloat: [self ratio]];
 }
 
-#warning move?
-- (NSImage *) advancedBar
-{
-    uint32_t * p;
-    uint8_t * bitmapData = [fBitmap bitmapData];
-    int bytesPerRow = [fBitmap bytesPerRow];
-    
-    int pieceCount = [self pieceCount];
-    int8_t * piecesAvailablity = malloc(pieceCount);
-    [self getAvailability: piecesAvailablity size: pieceCount];
-    
-    //lines 2 to 14: blue, green, or gray depending on piece availability
-    int i, h, index = 0;
-    float increment = (float)pieceCount / MAX_PIECES, indexValue = 0;
-    uint32_t color;
-    BOOL change;
-    for (i = 0; i < MAX_PIECES; i++)
-    {
-        change = NO;
-        if (piecesAvailablity[index] < 0)
-        {
-            if (fPieces[i] != -1)
-            {
-                color = kBlue;
-                fPieces[i] = -1;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] == 0)
-        {
-            if (fPieces[i] != 0)
-            {
-                color = kGray;
-                fPieces[i] = 0;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] <= 4)
-        {
-            if (fPieces[i] != 1)
-            {
-                color = kGreen1;
-                fPieces[i] = 1;
-                change = YES;
-            }
-        }
-        else if (piecesAvailablity[index] <= 8)
-        {
-            if (fPieces[i] != 2)
-            {
-                color = kGreen2;
-                fPieces[i] = 2;
-                change = YES;
-            }
-        }
-        else
-        {
-            if (fPieces[i] != 3)
-            {
-                color = kGreen3;
-                fPieces[i] = 3;
-                change = YES;
-            }
-        }
-        
-        if (change)
-        {
-            //point to pixel (i, 2) and draw "vertically"
-            p = (uint32_t *)(bitmapData + 2 * bytesPerRow) + i;
-            for (h = 2; h < BAR_HEIGHT; h++)
-            {
-                p[0] = color;
-                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
-            }
-        }
-        
-        indexValue += increment;
-        index = (int)indexValue;
-    }
-    
-    //determine percentage finished and available
-    int have = rintf((float)MAX_PIECES * [self progress]), avail;
-    if ([self progress] >= 1.0 || ![self isActive] || [self totalPeersConnected] <= 0)
-        avail = 0;
-    else
-    {
-        float * piecesFinished = malloc(pieceCount * sizeof(float));
-        [self getAmountFinished: piecesFinished size: pieceCount];
-        
-        float available = 0;
-        for (i = 0; i < pieceCount; i++)
-            if (piecesAvailablity[i] > 0)
-                available += 1.0 - piecesFinished[i];
-        
-        avail = rintf(MAX_PIECES * available / (float)pieceCount);
-        if (have + avail > MAX_PIECES) //case if both end in .5 and all pieces are available
-            avail--;
-        
-        free(piecesFinished);
-    }
-    
-    free(piecesAvailablity);
-    
-    //first two lines: dark blue to show progression, green to show available
-    p = (uint32_t *)bitmapData;
-    for (i = 0; i < have; i++)
-    {
-        p[i] = kBlue2;
-        p[i + bytesPerRow / 4] = kBlue2;
-    }
-    for (; i < avail + have; i++)
-    {
-        p[i] = kGreen3;
-        p[i + bytesPerRow / 4] = kGreen3;
-    }
-    for (; i < MAX_PIECES; i++)
-    {
-        p[i] = kWhite;
-        p[i + bytesPerRow / 4] = kWhite;
-    }
-    
-    //actually draw image
-    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
-    [bar addRepresentation: fBitmap];
-    [bar setScalesWhenResized: YES];
-    
-    return [bar autorelease];
-}
-
 - (int) torrentID
 {
     return fID;
@@ -1665,16 +1514,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
     
     [self createFileList];
-    
-    //set up advanced bar
-    fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
-        pixelsWide: MAX_PIECES pixelsHigh: BAR_HEIGHT bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
-        isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
-    
-    fPieces = malloc(MAX_PIECES);
-    int i;
-    for (i = 0; i < MAX_PIECES; i++)
-        fPieces[i] = BLANK_PIECE;
     
     [self update];
     return self;
