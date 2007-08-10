@@ -27,6 +27,8 @@
 @interface FileBrowserCell : NSBrowserCell
 {
     float fPercent;
+    
+    NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
 }
 
 - (void) setProgress: (float) progress;

@@ -31,8 +31,9 @@
 
 - (void) awakeFromNib
 {
-    NSBrowserCell * browserCell = [[[FileBrowserCell alloc] init] autorelease];
+    NSBrowserCell * browserCell = [[FileBrowserCell alloc] init];
     [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
+    [browserCell release];
     
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];

@@ -25,7 +25,13 @@
 #import "FileBrowserCell.h"
 #import "StringAdditions.h"
 
-#define SPACE 2.0
+#define PADDING_BEFORE_IMAGE 2.0
+#define IMAGE_FOLDER_SIZE 16.0
+#define IMAGE_ICON_SIZE 32.0
+#define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
+#define PADDING_ABOVE_TITLE_REG 1.0
+#define PADDING_BELOW_STATUS_REG 1.0
+#define PADDING_AFTER_TITLE 1.0
 
 @implementation FileBrowserCell
 
@@ -49,60 +55,124 @@
     fPercent = progress * 100.0;
 }
 
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+- (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
 {
-    NSMutableDictionary * item = [self objectValue];
-    
-    //image
-    float imageHeight = cellFrame.size.height - 2.0;
-    
-    NSImage * image = [self image];
-    [image setSize: NSMakeSize(imageHeight, imageHeight)];
-    NSRect imageRect = NSMakeRect(cellFrame.origin.x + 2.0 * SPACE,
-                                    cellFrame.origin.y + (cellFrame.size.height - imageHeight) / 2.0,
-                                    imageHeight, imageHeight);
-    
-    [image drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-    
-    //text
-    NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-    [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
-    
-    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                                isEqual: [NSColor alternateSelectedControlColor]];
-    NSDictionary * nameAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    highlighted ? [NSColor whiteColor] : [NSColor controlTextColor], NSForegroundColorAttributeName,
-                    [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                    paragraphStyle, NSParagraphStyleAttributeName, nil];
-    
-    NSString * nameString = [item objectForKey: @"Name"];
-    NSRect nameTextRect = NSMakeRect(NSMaxX(imageRect) + SPACE, cellFrame.origin.y + 1.0,
-            NSMaxX(cellFrame) - NSMaxX(imageRect) - 2.0 * SPACE, [nameString sizeWithAttributes: nameAttributes].height);
-    
-    [nameString drawInRect: nameTextRect withAttributes: nameAttributes];
-    [nameAttributes release];
-    
-    //status text
-    if (![[item objectForKey: @"IsFolder"] boolValue])
+    if (!fTitleAttributes)
     {
-        NSDictionary * statusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                        highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor], NSForegroundColorAttributeName,
-                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                        paragraphStyle, NSParagraphStyleAttributeName, nil];
+        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
         
-        NSString * statusString = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
-                                    "Inspector -> Files tab -> file status string"), fPercent,
-                                    [NSString stringForFileSize: [[item objectForKey: @"Size"] unsignedLongLongValue]]];
+        fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                            paragraphStyle, NSParagraphStyleAttributeName, nil];
         
-        NSRect statusTextRect = nameTextRect;
-        statusTextRect.size.height = [statusString sizeWithAttributes: statusAttributes].height;
-        statusTextRect.origin.y += (cellFrame.size.height + nameTextRect.size.height - statusTextRect.size.height) * 0.5 - 1.0;
-        
-        [statusString drawInRect: statusTextRect withAttributes: statusAttributes];
-        [statusAttributes release];
+        [paragraphStyle release];
     }
     
-    [paragraphStyle release];
+    if (color)
+        [fTitleAttributes setObject: color forKey: NSForegroundColorAttributeName];
+        
+    NSString * title = [[self objectValue] objectForKey: @"Name"];
+    return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
+}
+
+- (NSRect) titleRectForBounds: (NSRect) bounds
+{
+    NSAttributedString * title = [self attributedTitleWithColor: nil];
+    NSSize titleSize = [title size];
+    
+    NSRect result = bounds;
+    
+    if (![[[self objectValue] objectForKey: @"IsFolder"] boolValue])
+    {
+        result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.y += PADDING_ABOVE_TITLE_REG;
+    }
+    else
+    {
+        result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.y += (result.size.height - titleSize.height) * 0.5;
+    }
+    result.size = titleSize;
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_AFTER_TITLE);
+    
+    return result;
+}
+
+- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color
+{
+    if (!fStatusAttributes)
+    {
+        NSMutableParagraphStyle * paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
+        
+        fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                                paragraphStyle, NSParagraphStyleAttributeName, nil];
+        
+        [paragraphStyle release];
+    }
+    
+    if (color)
+        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
+    
+    #warning fPercent?
+    NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
+                            "Inspector -> Files tab -> file status string"), fPercent,
+                            [NSString stringForFileSize: [[[self objectValue] objectForKey: @"Size"] unsignedLongLongValue]]];
+    
+    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
+}
+
+- (NSRect) statusRectForBounds: (NSRect) bounds
+{
+    if ([[[self objectValue] objectForKey: @"IsFolder"] boolValue])
+        return NSZeroRect;
+    
+    NSAttributedString * status = [self attributedStatusWithColor: nil];
+    NSSize statusSize = [status size];
+    
+    NSRect result = bounds;
+    
+    result.origin.x += PADDING_BEFORE_IMAGE + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.y += result.size.height - PADDING_BELOW_STATUS_REG - statusSize.height;
+    
+    result.size = statusSize;
+    result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_AFTER_TITLE);
+    
+    return result;
+}
+
+- (NSRect) imageRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    
+    result.origin.x += PADDING_BEFORE_IMAGE;
+    
+    const float IMAGE_SIZE = [[[self objectValue] objectForKey: @"IsFolder"] boolValue] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
+    result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
+    result.size = NSMakeSize(IMAGE_SIZE, IMAGE_SIZE);
+    
+    return result;
+}
+
+- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+{
+    //icon
+    [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect
+        operation: NSCompositeSourceOver fraction: 1.0];
+    
+    //title
+    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
+                                                isEqual: [NSColor alternateSelectedControlColor]];
+    
+    [[self attributedTitleWithColor: highlighted ? [NSColor whiteColor] : [NSColor controlTextColor]]
+        drawInRect: [self titleRectForBounds: cellFrame]];
+    
+    //status
+    NSRect statusRect = [self statusRectForBounds: cellFrame];
+    if (!NSEqualRects(statusRect, NSZeroRect))
+        [[self attributedStatusWithColor: highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor]] drawInRect: statusRect];
 }
 
 @end
