@@ -28,9 +28,9 @@
 
 #define PADDING 3.0
 
-//button layout (from end of bar) is: padding, button, padding, button, padding
+//button layout (from end of bar) is: button, padding, button, padding
 #define BUTTON_WIDTH 14.0
-#define BUTTONS_TOTAL_WIDTH 39.0
+#define BUTTONS_TOTAL_WIDTH 36.0
 
 #define ACTION_BUTTON_HEIGHT 12.0
 #define ACTION_BUTTON_WIDTH 28.0

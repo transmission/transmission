@@ -29,8 +29,8 @@
 #define IMAGE_FOLDER_SIZE 16.0
 #define IMAGE_ICON_SIZE 32.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
-#define PADDING_ABOVE_TITLE_REG 2.0
-#define PADDING_BELOW_STATUS_REG 2.0
+#define PADDING_ABOVE_TITLE_FILE 2.0
+#define PADDING_BELOW_STATUS_FILE 2.0
 
 @interface FileBrowserCell (Private)
 
@@ -72,6 +72,19 @@
     fPercent = progress * 100.0;
 }
 
+- (NSRect) imageRectForBounds: (NSRect) bounds
+{
+    NSRect result = bounds;
+    
+    result.origin.x += PADDING_HORIZONAL;
+    
+    const float IMAGE_SIZE = [[[self objectValue] objectForKey: @"IsFolder"] boolValue] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
+    result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
+    result.size = NSMakeSize(IMAGE_SIZE, IMAGE_SIZE);
+    
+    return result;
+}
+
 - (NSRect) titleRectForBounds: (NSRect) bounds
 {
     NSAttributedString * title = [self attributedTitleWithColor: nil];
@@ -82,7 +95,7 @@
     if (![[[self objectValue] objectForKey: @"IsFolder"] boolValue])
     {
         result.origin.x += PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
-        result.origin.y += PADDING_ABOVE_TITLE_REG;
+        result.origin.y += PADDING_ABOVE_TITLE_FILE;
     }
     else
     {
@@ -106,23 +119,10 @@
     NSRect result = bounds;
     
     result.origin.x += PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
-    result.origin.y += result.size.height - PADDING_BELOW_STATUS_REG - statusSize.height;
+    result.origin.y += result.size.height - PADDING_BELOW_STATUS_FILE - statusSize.height;
     
     result.size = statusSize;
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
-    
-    return result;
-}
-
-- (NSRect) imageRectForBounds: (NSRect) bounds
-{
-    NSRect result = bounds;
-    
-    result.origin.x += PADDING_HORIZONAL;
-    
-    const float IMAGE_SIZE = [[[self objectValue] objectForKey: @"IsFolder"] boolValue] ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
-    result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
-    result.size = NSMakeSize(IMAGE_SIZE, IMAGE_SIZE);
     
     return result;
 }

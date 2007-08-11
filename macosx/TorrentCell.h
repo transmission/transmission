@@ -31,12 +31,19 @@
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     NSUserDefaults * fDefaults;
     
-    NSMutableDictionary * nameAttributes, * statusAttributes;
+    NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
     NSBitmapImageRep * fBitmap;
     int8_t * fPieces;
 }
 
 - (void) toggleMinimalStatus;
+
+- (NSRect) imageRectForBounds: (NSRect) bounds;
+- (NSRect) titleRectForBounds: (NSRect) bounds;
+- (NSRect) progressRectForBounds: (NSRect) bounds;
+- (NSRect) barRectForBounds: (NSRect) bounds;
+- (NSRect) statusRectForBounds: (NSRect) bounds;
+- (NSRect) minimalStatusRectForBounds: (NSRect) bounds;
 
 @end

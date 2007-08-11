@@ -965,7 +965,7 @@ static int static_lastid = 0;
 
 - (float) progressLeft
 {
-    return fStat->left/[self size];
+    return (float)fStat->left/[self size];
 }
 
 - (int) eta
@@ -1004,7 +1004,7 @@ static int static_lastid = 0;
 }
 
 - (BOOL) isError
-{
+{return YES;
     return fStat->error != 0;
 }
 

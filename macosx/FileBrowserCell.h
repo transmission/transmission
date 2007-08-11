@@ -35,8 +35,8 @@
 
 - (void) setProgress: (float) progress;
 
+- (NSRect) imageRectForBounds: (NSRect) bounds;
 - (NSRect) titleRectForBounds: (NSRect) bounds;
 - (NSRect) statusRectForBounds: (NSRect) bounds;
-- (NSRect) imageRectForBounds: (NSRect) bounds;
 
 @end
