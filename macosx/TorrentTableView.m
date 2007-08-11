@@ -444,19 +444,6 @@
 
 @implementation TorrentTableView (Private)
 
-- (NSRect) iconRectForRow: (int) row
-{
-    if (row < 0)
-        return NSZeroRect;
-    
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-    NSSize iconSize = [fDefaults boolForKey: @"SmallView"] ? [[[fTorrents objectAtIndex: row] iconSmall] size]
-                                                        : [[[fTorrents objectAtIndex: row] iconFlipped] size];
-    
-    return NSMakeRect(cellRect.origin.x + PADDING, cellRect.origin.y + (cellRect.size.height - iconSize.height) * 0.5,
-                            iconSize.width, iconSize.height);
-}
-
 - (NSRect) pauseRectForRow: (int) row
 {
     if (row < 0)

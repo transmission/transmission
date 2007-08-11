@@ -43,7 +43,6 @@
     NSArray                 * fSounds;
     
     SUUpdater               * fUpdater;
-    IBOutlet NSPopUpButton  * fUpdatePopUp;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
@@ -62,7 +61,7 @@
 - (void) setBadge: (id) sender;
 - (void) setSound: (id) sender;
 - (void) resetWarnings: (id) sender;
-- (void) setUpdate: (id) sender;
+- (void) setCheckForUpdate: (id) sender;
 
 - (void) setQueue: (id) sender;
 - (void) setQueueNumber: (id) sender;

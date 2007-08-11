@@ -16,6 +16,8 @@
 	<integer>9090</integer>
 	<key>CheckDownload</key>
 	<false/>
+	<key>CheckForUpdates</key>
+	<true/>
 	<key>CheckQuit</key>
 	<true/>
 	<key>CheckQuitDownloading</key>
@@ -76,8 +78,6 @@
 	<false/>
 	<key>RatioLimit</key>
 	<integer>2</integer>
-	<key>SUScheduledCheckInterval</key>
-	<integer>86400</integer>
 	<key>SeedingSound</key>
 	<string>Submarine</string>
 	<key>ShowInspector</key>
@@ -106,8 +106,6 @@
 	<integer>30</integer>
 	<key>StatusBar</key>
 	<true/>
-	<key>UpdateCheck</key>
-	<string>Daily</string>
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseAdvancedBar</key>
