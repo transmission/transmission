@@ -56,9 +56,7 @@
 - (NSRect) rectForStatusBasedOnProgressRect: (NSRect) progressRect inBounds: (NSRect) bounds;
 
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
-- (NSAttributedString *) attributedProgressWithColor: (NSColor *) color;
-- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color;
-- (NSAttributedString *) attributedMinimalStatusWithColor: (NSColor *) color;
+- (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color;
 
 @end
 
@@ -148,7 +146,10 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (![fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    NSAttributedString * status = [self attributedMinimalStatusWithColor: nil];
+    Torrent * torrent = [self representedObject];
+    NSString * string = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
+                            ? [torrent remainingTimeString] : [torrent shortStatusString];
+    NSAttributedString * status = [self attributedStatusString: string withColor: nil];
     
     NSRect result = bounds;
     result.size = [status size];
@@ -221,7 +222,11 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     //minimal status
     NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
     if (minimal)
-        [[self attributedMinimalStatusWithColor: statusColor] drawInRect: minimalStatusRect];
+    {
+        NSString * string = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
+                                ? [torrent remainingTimeString] : [torrent shortStatusString];
+        [[self attributedStatusString: string withColor: statusColor] drawInRect: minimalStatusRect];
+    }
     
     //title
     NSRect titleRect = [self rectForTitleBasedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
@@ -232,7 +237,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (!minimal)
     {
         progressRect = [self rectForProgressBasedOnTitleRect: titleRect inBounds: cellFrame];
-        [[self attributedProgressWithColor: statusColor] drawInRect: progressRect];
+        [[self attributedStatusString: [torrent progressString] withColor: statusColor] drawInRect: progressRect];
     }
     
     //bar
@@ -244,7 +249,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if (!minimal)
     {
         NSRect statusRect = [self rectForStatusBasedOnProgressRect: progressRect inBounds: cellFrame];
-        [[self attributedStatusWithColor: statusColor] drawInRect: statusRect];
+        [[self attributedStatusString: [torrent statusString] withColor: statusColor] drawInRect: statusRect];
     }
 }
 
@@ -539,7 +544,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    NSSize progressSize = [[self attributedProgressWithColor: nil] size];
+    NSSize progressSize = [[self attributedStatusString: [[self representedObject] progressString] withColor: nil] size];
     
     NSRect result = titleRect;
     
@@ -569,7 +574,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     if ([fDefaults boolForKey: @"SmallView"])
         return NSZeroRect;
     
-    NSSize statusSize = [[self attributedStatusWithColor: nil] size];
+    NSSize statusSize = [[self attributedStatusString: [[self representedObject] statusString] withColor: nil] size];
     
     NSRect result = progressRect;
     result.size.width = MIN(statusSize.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
@@ -589,35 +594,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return [[[NSAttributedString alloc] initWithString: title attributes: fTitleAttributes] autorelease];
 }
 
-- (NSAttributedString *) attributedProgressWithColor: (NSColor *) color
-{
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
-        
-    NSString * progress = [[self representedObject] progressString];
-    return [[[NSAttributedString alloc] initWithString: progress attributes: fStatusAttributes] autorelease];
-}
-
-- (NSAttributedString *) attributedStatusWithColor: (NSColor *) color
-{
-    if (color)
-        [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
-        
-    NSString * status = [[self representedObject] statusString];
-    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
-}
-
-#warning combine?
-- (NSAttributedString *) attributedMinimalStatusWithColor: (NSColor *) color
+- (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color
 {
     if (color)
         [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
     
-    Torrent * torrent = [self representedObject];
-    NSString * status = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
-                                    ? [torrent remainingTimeString] : [torrent shortStatusString];
-    
-    return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];
+    return [[[NSAttributedString alloc] initWithString: string attributes: fStatusAttributes] autorelease];
 }
 
 @end
