@@ -46,7 +46,6 @@
 
 @interface TorrentCell (Private)
 
-#warning make some public
 - (NSImage *) simpleBar: (NSSize) barSize;
 - (NSImage *) advancedBar: (NSSize) barSize;
 - (NSImage *) advancedBarSimple;
@@ -114,12 +113,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         free(fPieces);
     
     [super dealloc];
-}
-
-#warning why!?!?!??!!?!
-- (void) toggleMinimalStatus
-{
-    [fDefaults setBool: ![fDefaults boolForKey: @"SmallStatusRegular"] forKey: @"SmallStatusRegular"];
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
@@ -254,142 +247,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         NSRect statusRect = [self rectForStatusBasedOnProgressRect: progressRect inBounds: cellFrame];
         [[self attributedStatusWithColor: statusColor] drawInRect: statusRect];
     }
-    
-    /*BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: view]
-                                                        isEqual: [NSColor alternateSelectedControlColor]];
-    
-    [nameAttributes setObject: highlighted ? [NSColor whiteColor] : [NSColor controlTextColor]
-                        forKey: NSForegroundColorAttributeName];
-    [statusAttributes setObject: highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor]
-                        forKey: NSForegroundColorAttributeName];
-    
-    NSPoint pen = cellFrame.origin;
-    const float LINE_PADDING = 2.0, EXTRA_NAME_SHIFT = 1.0; //standard padding is defined in TorrentCell.h
-    
-    Torrent * torrent = [self representedObject];
-    
-    if (![fDefaults boolForKey: @"SmallView"]) //regular size
-    {
-        //icon
-        NSImage * icon = [torrent iconFlipped];
-        NSSize iconSize = [icon size];
-        
-        pen.x += PADDING;
-        pen.y += (cellFrame.size.height - (iconSize.height + ACTION_BUTTON_HEIGHT)) * 0.5;
-        
-        [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
-                operation: NSCompositeSourceOver fraction: 1.0];
-        
-        //error badge
-        if ([torrent isError])
-        {
-            if (!fErrorImage)
-            {
-                fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
-                [fErrorImage setFlipped: YES];
-            }
-            
-            NSSize errorIconSize = [fErrorImage size];
-            [fErrorImage drawAtPoint: NSMakePoint(pen.x + iconSize.width - errorIconSize.width,
-                                                    pen.y + iconSize.height  - errorIconSize.height)
-                fromRect: NSMakeRect(0, 0, errorIconSize.width, errorIconSize.height)
-                operation: NSCompositeSourceOver fraction: 1.0];
-        }
-
-        float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
-
-        //name string
-        pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
-        pen.y = cellFrame.origin.y + PADDING;
-        
-        NSString * nameString = [torrent name];
-        NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
-        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, nameSize.height) withAttributes: nameAttributes];
-        
-        //progress string
-        pen.y += nameSize.height + LINE_PADDING - 1.0;
-        
-        NSString * progressString = [torrent progressString];
-        NSSize progressSize = [progressString sizeWithAttributes: statusAttributes];
-        [progressString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, progressSize.height) withAttributes: statusAttributes];
-
-        //progress bar
-        pen.x -= EXTRA_NAME_SHIFT;
-        pen.y += progressSize.height + LINE_PADDING + BAR_HEIGHT;
-        
-        float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
-        
-        if ([fDefaults boolForKey: @"UseAdvancedBar"])
-            [self buildAdvancedBar: barWidth point: pen];
-        else
-            [self buildSimpleBar: barWidth point: pen];
-
-        //status string
-        pen.x += EXTRA_NAME_SHIFT;
-        pen.y += LINE_PADDING;
-        
-        NSString * statusString = [torrent statusString];
-        NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
-        [statusString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth, statusSize.height) withAttributes: statusAttributes];
-    }
-    else //small size
-    {
-        //icon
-        NSImage * icon;
-        if ([torrent isError])
-        {
-            if (!fErrorImage)
-            {
-                fErrorImage = [[NSImage imageNamed: @"Error.png"] copy];
-                [fErrorImage setFlipped: YES];
-            }
-            icon = fErrorImage;
-        }
-        else
-            icon = [torrent iconSmall];
-        NSSize iconSize = [icon size];
-        
-        pen.x += PADDING;
-        pen.y += (cellFrame.size.height - iconSize.height) * 0.5;
-        
-        [icon drawAtPoint: pen fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
-                operation: NSCompositeSourceOver fraction: 1.0];
-
-        //name and status string
-        float mainWidth = cellFrame.size.width - iconSize.width - 3.0 * PADDING - EXTRA_NAME_SHIFT;
-                     
-        //place name string
-        pen.x += iconSize.width + PADDING + EXTRA_NAME_SHIFT;
-        pen.y = cellFrame.origin.y + LINE_PADDING;
-
-        NSString * nameString = [torrent name];
-        NSSize nameSize = [nameString sizeWithAttributes: nameAttributes];
-        
-        NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
-                                    ? [torrent remainingTimeString] : [torrent shortStatusString];
-        NSSize statusSize = [statusString sizeWithAttributes: statusAttributes];
-        
-        [nameString drawInRect: NSMakeRect(pen.x, pen.y, mainWidth - statusSize.width - 2.0 * LINE_PADDING, nameSize.height)
-                        withAttributes: nameAttributes];
-        
-        //place status string
-        pen.x = NSMaxX(cellFrame) - PADDING - statusSize.width;
-        pen.y += (nameSize.height - statusSize.height) * 0.5;
-        
-        [statusString drawInRect: NSMakeRect(pen.x, pen.y, statusSize.width, statusSize.height)
-                        withAttributes: statusAttributes];
-        
-        //progress bar
-        pen.x = cellFrame.origin.x + iconSize.width + 2.0 * PADDING;
-        pen.y = cellFrame.origin.y + nameSize.height + LINE_PADDING + PADDING + BAR_HEIGHT;
-        
-        float barWidth = mainWidth + EXTRA_NAME_SHIFT - BUTTONS_TOTAL_WIDTH + PADDING;
-        
-        if ([fDefaults boolForKey: @"UseAdvancedBar"])
-            [self buildAdvancedBar: barWidth point: pen];
-        else
-            [self buildSimpleBar: barWidth point: pen];
-    }*/
 }
 
 @end

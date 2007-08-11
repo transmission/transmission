@@ -37,8 +37,6 @@
     int8_t * fPieces;
 }
 
-- (void) toggleMinimalStatus;
-
 - (NSRect) imageRectForBounds: (NSRect) bounds;
 - (NSRect) titleRectForBounds: (NSRect) bounds;
 - (NSRect) progressRectForBounds: (NSRect) bounds;

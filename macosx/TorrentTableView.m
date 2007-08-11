@@ -117,7 +117,6 @@
 
     if ([self pointInActionRect: fClickPoint])
     {
-        
         [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]]; //ensure button is pushed down
         [self displayTorrentMenuForEvent: event];
         fClickPoint = NSZeroPoint;
@@ -135,14 +134,15 @@
         {
             if ([self pointInMinimalStatusRect: fClickPoint])
             {
-                [(TorrentCell *)[[self tableColumnWithIdentifier: @"Torrent"] dataCell] toggleMinimalStatus];
+                [fDefaults setBool: ![fDefaults boolForKey: @"SmallStatusRegular"] forKey: @"SmallStatusRegular"];
                 fClickPoint = NSZeroPoint;
             }
 
             [super mouseDown: event];
         }
     }
-
+    
+    #warning make more efficient
     [self display];
 }
 
