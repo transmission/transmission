@@ -202,7 +202,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [fErrorImage drawInRect: errorRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     }
     
-    //title
+    //text color
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
                                                 isEqual: [NSColor alternateSelectedControlColor]];
     NSColor * titleColor, * statusColor;
@@ -218,15 +218,14 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         statusColor = [NSColor darkGrayColor];
     }
     
-    NSRect titleRect = [self titleRectForBounds: cellFrame];
-    [[self attributedTitleWithColor: titleColor] drawInRect: titleRect];
-    
     //minimal status
+    NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
     if (minimal)
-    {
-        NSRect minimalStatusRect = [self minimalStatusRectForBounds: cellFrame];
         [[self attributedMinimalStatusWithColor: statusColor] drawInRect: minimalStatusRect];
-    }
+    
+    //title
+    NSRect titleRect = [self rectForTitleBasedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
+    [[self attributedTitleWithColor: titleColor] drawInRect: titleRect];
     
     //progress
     NSRect progressRect;
