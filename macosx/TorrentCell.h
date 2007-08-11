@@ -22,7 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "CTGradient.h"
+@class CTGradient;
 
 @interface TorrentCell : NSCell
 {

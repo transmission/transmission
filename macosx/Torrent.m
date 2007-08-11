@@ -1004,7 +1004,7 @@ static int static_lastid = 0;
 }
 
 - (BOOL) isError
-{return YES;
+{
     return fStat->error != 0;
 }
 

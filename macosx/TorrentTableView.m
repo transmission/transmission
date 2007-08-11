@@ -507,18 +507,10 @@
     int row = [self rowAtPoint: point];
     if (row < 0 || ![fDefaults boolForKey: @"SmallView"])
         return NO;
-
-    Torrent * torrent = [fTorrents objectAtIndex: row];
-    NSString * statusString = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
-                                    ? [torrent remainingTimeString] : [torrent shortStatusString];
     
-    float statusWidth = [statusString sizeWithAttributes: fSmallStatusAttributes].width + 3.0;
-    
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
-    NSRect statusRect = NSMakeRect(NSMaxX(cellRect) - statusWidth, cellRect.origin.y,
-                                    statusWidth, cellRect.size.height - BUTTON_WIDTH);
-    
-    return NSPointInRect(point, statusRect);
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    return NSPointInRect(point, [cell minimalStatusRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInPauseRect: (NSPoint) point
