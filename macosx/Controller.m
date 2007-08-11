@@ -194,14 +194,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fDisplayedTorrents release];
     
     [fBadger release];
-    if (fOverlayWindow)
-        [fOverlayWindow release];
+    [fOverlayWindow release];
     [fIPCController release];
     
-    if (fAutoImportedNames)
-        [fAutoImportedNames release];
-    if (fPendingTorrentDownloads)
-        [fPendingTorrentDownloads release];
+    [fAutoImportedNames release];
+    [fPendingTorrentDownloads release];
     
     tr_close(fLib);
     [super dealloc];

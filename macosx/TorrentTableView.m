@@ -181,8 +181,9 @@
     {
         if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] revealData];
-        else
+        else if (![self pointInActionRect: point])
             [fController showInfo: nil];
+        else;
     }
     else;
     
