@@ -117,18 +117,26 @@
 
     if ([self pointInActionRect: fClickPoint])
     {
-        [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]]; //ensure button is pushed down
+        int row = [self rowAtPoint: fClickPoint];
+        [self setNeedsDisplayInRect: [self rectOfRow: row]]; //ensure button is pushed down
+        
         [self displayTorrentMenuForEvent: event];
+        
         fClickPoint = NSZeroPoint;
+        [self setNeedsDisplayInRect: [self rectOfRow: row]];
     }
     else if ([self pointInPauseRect: fClickPoint] || [self pointInRevealRect: fClickPoint])
+    {
         fClickIn = YES;
+        [self setNeedsDisplayInRect: [self rectOfRow: [self rowAtPoint: fClickPoint]]];
+    }
     else
     {
         if ([event modifierFlags] & NSAlternateKeyMask)
         {
             [fDefaults setBool: ![fDefaults boolForKey: @"UseAdvancedBar"] forKey: @"UseAdvancedBar"];
             fClickPoint = NSZeroPoint;
+            [self reloadData];
         }
         else
         {
@@ -136,14 +144,12 @@
             {
                 [fDefaults setBool: ![fDefaults boolForKey: @"SmallStatusRegular"] forKey: @"SmallStatusRegular"];
                 fClickPoint = NSZeroPoint;
+                [self reloadData];
             }
 
             [super mouseDown: event];
         }
     }
-    
-    #warning make more efficient
-    [self display];
 }
 
 - (void) mouseUp: (NSEvent *) event
