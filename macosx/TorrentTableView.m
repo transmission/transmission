@@ -34,8 +34,6 @@
 
 @interface TorrentTableView (Private)
 
-- (NSRect) iconRectForRow: (int) row;
-
 - (NSRect) pauseRectForRow: (int) row;
 - (NSRect) revealRectForRow: (int) row;
 - (NSRect) actionRectForRow: (int) row;
@@ -487,10 +485,13 @@
 
 - (NSRect) actionRectForRow: (int) row
 {
-    if ([fDefaults boolForKey: @"SmallView"])
-        return [self iconRectForRow: row];
-    else if (row < 0)
+    if (row < 0)
         return NSZeroRect;
+    else if ([fDefaults boolForKey: @"SmallView"])
+    {
+        TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+        return [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
+    }
     else;
     
     NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
@@ -506,7 +507,8 @@
     if (row < 0)
         return NO;
     
-    return NSPointInRect(point, [self iconRectForRow: row]);
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    return NSPointInRect(point, [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point

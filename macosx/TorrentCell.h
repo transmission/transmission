@@ -37,7 +37,7 @@
     int8_t * fPieces;
 }
 
-- (NSRect) imageRectForBounds: (NSRect) bounds;
+- (NSRect) iconRectForBounds: (NSRect) bounds;
 - (NSRect) titleRectForBounds: (NSRect) bounds;
 - (NSRect) progressRectForBounds: (NSRect) bounds;
 - (NSRect) barRectForBounds: (NSRect) bounds;
