@@ -1,5 +1,10 @@
+This is a somewhat incomplete description of the Azureus messaging
+protocol which is further described here:
+
+http://www.azureuswiki.com/index.php/Azureus_messaging_protocol
+
 Like normal bittorrent messages, all azureus messages begin with the
-length of the rest of the message in bytes ad a 4-byte integer in
+length of the rest of the message in bytes as a 4-byte integer in
 network byte order.  This length does not include the 4 bytes for the
 length itself.
 
