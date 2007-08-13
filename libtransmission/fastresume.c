@@ -92,7 +92,12 @@ enum
      * uint32_t: ul speed rate to use when the mode is single
      * uint32_t: ul's tr_speedlimit_t
      */
-    FR_ID_SPEED = 8
+    FR_ID_SPEED = 8,
+
+    /* active
+     * char: 't' if running, 'f' if paused
+     */
+    FR_ID_RUN = 9
 };
 
 
@@ -148,8 +153,12 @@ getMTimes( const tr_torrent_t * tor, int * setme_n )
     return m;
 }
 
-static void fastResumeWriteData( uint8_t id, void * data, uint32_t size,
-                                 uint32_t count, FILE * file )
+static void
+fastResumeWriteData( uint8_t       id,
+                     const void  * data,
+                     uint32_t      size,
+                     uint32_t      count,
+                     FILE        * file )
 {
     uint32_t  datalen = size * count;
 
@@ -261,6 +270,11 @@ tr_fastResumeSave( const tr_torrent_t * tor )
         tr_free( buf );
     }
 
+    if( TRUE ) /* FR_ID_RUN */
+    {
+        const char is_running = (tor->runStatus == TR_RUN_RUNNING) ? 't' : 'f';
+        fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
+    }
 
     /* Write download and upload totals */
     total = tor->downloadedCur + tor->downloadedPrev;
@@ -555,6 +569,19 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
                     continue;
                 }
                 break;
+
+            case FR_ID_RUN:
+                {
+                    char ch;
+                    if( fread( &ch, 1, 1, file ) != 1 )
+                    {
+                        fclose( file );
+                        return ret;
+                    }
+                    tor->runStatus = ch=='f' ? TR_RUN_STOPPED : TR_RUN_RUNNING;
+                    ret |= TR_FR_RUN;
+                    continue;
+                }
 
             case FR_ID_DOWNLOADED:
                 /* read download total */

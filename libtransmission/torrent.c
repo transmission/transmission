@@ -288,10 +288,18 @@ torrentRealInit( tr_handle_t   * h,
     assert( !tor->uploadedCur );
 
     tor->error   = TR_OK;
-    tor->runStatus = flags & TR_FLAG_PAUSED ? TR_RUN_STOPPED : TR_RUN_RUNNING;
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     loaded = tr_fastResumeLoad( tor, uncheckedPieces );
+
+    /* the `paused' flag has highest precedence...
+       after that, the fastresume setting is used...
+       if that's not found, default to RUNNING */
+    if( flags & TR_FLAG_PAUSED )
+        tor->runStatus = TR_RUN_STOPPED;
+    else if( !(loaded & TR_FR_RUN ) )
+        tor->runStatus = TR_RUN_RUNNING;
+
     if( tr_bitfieldIsEmpty( uncheckedPieces ) )
         tr_bitfieldFree( uncheckedPieces );
     else
