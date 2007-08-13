@@ -61,7 +61,6 @@
 - (NSRect) rectForTitleBasedOnMinimalStatusRect: (NSRect) statusRect withString: (NSAttributedString *) string
             inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForBarInBounds: (NSRect) bounds;
 - (NSRect) rectForStatusWithString: (NSAttributedString *) string
             inBounds: (NSRect) bounds;
 
@@ -166,10 +165,24 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                     inBounds: bounds];
 }
 
-#warning remove other
 - (NSRect) barRectForBounds: (NSRect) bounds
 {
-    return [self rectForBarInBounds: bounds];
+    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
+    
+    NSRect result = bounds;
+    result.size.height = BAR_HEIGHT;
+    result.origin.x = PADDING_HORIZONAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG)
+                        + PADDING_BETWEEN_IMAGE_AND_TITLE - PADDING_LESS_BETWEEN_TITLE_AND_BAR;
+    
+    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
+    if (minimal)
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
+    else
+        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
+    
+    result.size.width = NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL - BUTTONS_TOTAL_WIDTH;
+    
+    return result;
 }
 
 - (NSRect) statusRectForBounds: (NSRect) bounds
@@ -248,9 +261,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
         [progressString drawInRect: progressRect];
     }
     
-    #warning bar is already sized.....
     //bar
-    NSRect barRect = [self rectForBarInBounds: cellFrame];
+    NSRect barRect = [self barRectForBounds: cellFrame];
     NSImage * bar = [fDefaults boolForKey: @"UseAdvancedBar"]
                     ? [self advancedBar: barRect.size.width] : [self simpleBar: barRect.size.width];
     [bar drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
@@ -562,26 +574,6 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL);
-    
-    return result;
-}
-
-- (NSRect) rectForBarInBounds: (NSRect) bounds
-{
-    BOOL minimal = [fDefaults boolForKey: @"SmallView"];
-    
-    NSRect result = bounds;
-    result.size.height = BAR_HEIGHT;
-    result.origin.x = PADDING_HORIZONAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG)
-                        + PADDING_BETWEEN_IMAGE_AND_TITLE - PADDING_LESS_BETWEEN_TITLE_AND_BAR;
-    #warning rename some
-    result.origin.y += PADDING_ABOVE_TITLE + HEIGHT_TITLE;
-    if (minimal)
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_BAR_MIN;
-    else
-        result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
-    
-    result.size.width = NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL - BUTTONS_TOTAL_WIDTH;
     
     return result;
 }
