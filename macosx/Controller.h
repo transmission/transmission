@@ -96,8 +96,10 @@
     IBOutlet NSMenu                 * fDockMenu;
     
     NSMutableArray                  * fAutoImportedNames;
-    NSMutableDictionary             * fPendingTorrentDownloads;
     NSTimer                         * fAutoImportTimer;
+    
+    NSMutableDictionary             * fPendingTorrentDownloads;
+    NSMutableArray                  * fTempTorrentFiles;
 
     BOOL                            fRemoteQuit;
 }
