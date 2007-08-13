@@ -124,8 +124,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             [alert runModal];
             [alert release];
             
-            //activate the already running instance, then kill ourselves right away
-            [[NSWorkspace sharedWorkspace] launchApplication: [dic objectForKey: @"NSApplicationPath"]];
+            //kill ourselves right away
             exit(0);
         }
     }
