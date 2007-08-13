@@ -455,9 +455,9 @@ tr_ioErrorFromErrno( void )
         case ENOSPC:
             return TR_ERROR_IO_SPACE;
         case EMFILE:
-            return TR_ERROR_IO_FILE_TOO_BIG;
-        case EFBIG:
             return TR_ERROR_IO_OPEN_FILES;
+        case EFBIG:
+            return TR_ERROR_IO_FILE_TOO_BIG;
         default:
             tr_dbg( "generic i/o errno from errno: %s", strerror( errno ) );
             return TR_ERROR_IO_OTHER;
