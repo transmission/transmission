@@ -198,6 +198,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
+    [fTempTorrentFiles release];
     
     tr_close(fLib);
     [super dealloc];
@@ -541,6 +542,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fPendingTorrentDownloads removeAllObjects];
     }
     
+    //remove all torrent files in the temporary directory
+    if (fTempTorrentFiles)
+    {
+        NSEnumerator * torrentEnumerator = [fTempTorrentFiles objectEnumerator];
+        NSString * path;
+        while ((path = [torrentEnumerator nextObject]))
+            [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
+        [fTempTorrentFiles removeAllObjects];
+    }
+    
     //stop timers
     [fTimer invalidate];
     [fSpeedLimitTimer invalidate];
@@ -653,8 +664,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
     
-    //delete torrent file if it wasn't already
-    [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
+    //delete temp torrent file on quit
+    if (!fTempTorrentFiles)
+        fTempTorrentFiles = [[NSMutableArray alloc] init];
+    [fTempTorrentFiles addObject: path];
 }
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
@@ -944,6 +957,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
 }
 
+#warning combine
 - (void) openURLEndSheet: (id) sender
 {
     [fURLSheetWindow orderOut: sender];
