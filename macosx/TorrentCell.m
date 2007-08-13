@@ -56,13 +56,11 @@
 - (NSImage *) advancedBar: (float) width;
 - (NSImage *) advancedBarSimple;
 
-#warning rearrange
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForTitleBasedOnMinimalStatusRect: (NSRect) statusRect withString: (NSAttributedString *) string
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
             inBounds: (NSRect) bounds;
 - (NSRect) rectForProgressWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
-- (NSRect) rectForStatusWithString: (NSAttributedString *) string
-            inBounds: (NSRect) bounds;
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusString: (NSString *) string withColor: (NSColor *) color;
@@ -74,14 +72,14 @@
 // Used to optimize drawing. They contain packed RGBA pixels for every color needed.
 #define BE OSSwapBigToHostConstInt32
 
-static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
-                kBlue = BE(0x50A0FFFF), //80, 160, 255
-                kBlue2 = BE(0x1E46B4FF), //30, 70, 180
-                kGray  = BE(0x969696FF), //150, 150, 150
+static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
+                kBlue   = BE(0x50A0FFFF), //80, 160, 255
+                kBlue2  = BE(0x1E46B4FF), //30, 70, 180
+                kGray   = BE(0x969696FF), //150, 150, 150
                 kGreen1 = BE(0x99FFCCFF), //153, 255, 204
                 kGreen2 = BE(0x66FF99FF), //102, 255, 153
                 kGreen3 = BE(0x00FF66FF), //0, 255, 102
-                kWhite = BE(0xFFFFFFFF); //255, 255, 255
+                kWhite  = BE(0xFFFFFFFF); //255, 255, 255
 
 //only called one, so don't worry about release
 - (id) init
@@ -147,8 +145,8 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
 
 - (NSRect) titleRectForBounds: (NSRect) bounds
 {
-    return [self rectForTitleBasedOnMinimalStatusRect: [self minimalStatusRectForBounds: bounds]
-                    withString: [self attributedTitleWithColor: nil] inBounds: bounds];
+    return [self rectForTitleWithString: [self attributedTitleWithColor: nil]
+            basedOnMinimalStatusRect: [self minimalStatusRectForBounds: bounds] inBounds: bounds];
 }
 
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds
@@ -249,7 +247,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     
     //title
     NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
-    NSRect titleRect = [self rectForTitleBasedOnMinimalStatusRect: minimalStatusRect withString: titleString inBounds: cellFrame];
+    NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //progress
@@ -547,7 +545,7 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
     return result;
 }
 
-- (NSRect) rectForTitleBasedOnMinimalStatusRect: (NSRect) statusRect withString: (NSAttributedString *) string
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
             inBounds: (NSRect) bounds
 {
     BOOL minimal = [fDefaults boolForKey: @"SmallView"];
