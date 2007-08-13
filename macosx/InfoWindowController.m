@@ -920,6 +920,8 @@
         
         [torrent setFileCheckState: [object intValue] != NSOffState ? NSOnState : NSOffState forIndexes: indexSet];
         [fFileOutline reloadData];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     }
     else;
 }
