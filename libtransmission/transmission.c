@@ -33,6 +33,8 @@
 #include <unistd.h> /* stat */
 #include <dirent.h> /* opendir */
 
+#include <event.h>
+
 #include "transmission.h"
 #include "fdlimit.h"
 #include "list.h"
@@ -61,6 +63,19 @@ tr_peerIdNew ( char * buf, int buflen )
     buf[TR_ID_LEN] = '\0';
 }
 
+static void
+libeventThreadFunc( void * unused UNUSED )
+{
+    tr_dbg( "libevent thread starting" );
+    event_init( );
+    for ( ;; )
+    {
+        event_dispatch( );
+        tr_wait( 50 ); /* 1/20th of a second */
+    }
+    tr_dbg( "libevent thread exiting" );
+}
+
 
 /***********************************************************************
  * tr_init
@@ -71,6 +86,8 @@ tr_handle_t * tr_init( const char * tag )
 {
     tr_handle_t * h;
     int           i;
+
+    tr_threadNew( libeventThreadFunc, NULL, "libeventThreadFunc" );
 
     tr_msgInit();
     tr_netInit();

@@ -27,6 +27,7 @@
 
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stddef.h> /* for size_t */
 
 void tr_msgInit( void );
 
