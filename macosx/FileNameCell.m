@@ -22,7 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "FileBrowserCell.h"
+#import "FileNameCell.h"
+#import "InfoWindowController.h"
 #import "StringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0
@@ -32,44 +33,28 @@
 #define PADDING_ABOVE_TITLE_FILE 2.0
 #define PADDING_BELOW_STATUS_FILE 2.0
 
-@interface FileBrowserCell (Private)
+@interface FileNameCell (Private)
 
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusWithColor: (NSColor *) color;
 
 @end
 
-@implementation FileBrowserCell
+@implementation FileNameCell
 
-- (void) awakeFromNib
+- (NSImage *) image
 {
-    [self setLeaf: YES];
-}
-
-- (void) setImage: (NSImage *) image
-{
+    NSImage * image = [[self objectValue] objectForKey: @"Icon"];
     if (!image)
     {
         if (!fFolderImage)
         {
             fFolderImage = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
             [fFolderImage setFlipped: YES];
-            [fFolderImage setScalesWhenResized: YES];
         }
         image = fFolderImage;
     }
-    else
-    {
-        [image setFlipped: YES];
-        [image setScalesWhenResized: YES];
-    }
-    
-    [super setImage: image];
-}
-
-- (void) setProgress: (float) progress
-{
-    fPercent = progress * 100.0;
+    return image;
 }
 
 - (NSRect) imageRectForBounds: (NSRect) bounds
@@ -130,13 +115,16 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     //icon
-    [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect
-        operation: NSCompositeSourceOver fraction: 1.0];
+    NSImage * icon = [self image];
+    NSSize iconSize = [icon size];
+    [icon drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
+            operation: NSCompositeSourceOver fraction: 1.0];
     
     //title
     BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
                                                 isEqual: [NSColor alternateSelectedControlColor]];
     
+    #warning mimic torrent cell
     [[self attributedTitleWithColor: highlighted ? [NSColor whiteColor] : [NSColor controlTextColor]]
         drawInRect: [self titleRectForBounds: cellFrame]];
     
@@ -148,7 +136,7 @@
 
 @end
 
-@implementation FileBrowserCell (Private)
+@implementation FileNameCell (Private)
 
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
 {
@@ -188,9 +176,11 @@
     if (color)
         [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
     
-    #warning fPercent?
+    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
+    float percent = [torrent fileProgress: [[[self objectValue] objectForKey: @"Indexes"] firstIndex]] * 100.0;
+    
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",
-                            "Inspector -> Files tab -> file status string"), fPercent,
+                            "Inspector -> Files tab -> file status string"), percent,
                             [NSString stringForFileSize: [[[self objectValue] objectForKey: @"Size"] unsignedLongLongValue]]];
     
     return [[[NSAttributedString alloc] initWithString: status attributes: fStatusAttributes] autorelease];

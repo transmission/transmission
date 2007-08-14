@@ -281,6 +281,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 @implementation TorrentCell (Private)
 
 #warning don't use image
+#warning NSDivideRect ?
 - (NSImage *) simpleBar: (float) width
 {
     Torrent * torrent = [self representedObject];
@@ -288,13 +289,15 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     NSImage * bar = [[NSImage alloc] initWithSize: NSMakeSize(width, BAR_HEIGHT)];
     [bar lockFocus];
     
+    NSRect barBounds = NSMakeRect(0, 0, width, BAR_HEIGHT);
+    
     float progress = [torrent progress], left = [torrent progressLeft];
     
     if (progress < 1.0)
     {
         if (!fWhiteGradient)
             fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-        [fWhiteGradient fillRect: NSMakeRect(0, 0, width, BAR_HEIGHT) angle: -90];
+        [fWhiteGradient fillRect: barBounds angle: -90];
         
         float include = progress + left;
         if (include < 1.0)
@@ -364,7 +367,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     }
     
     [fBarOverlayColor set];
-    [NSBezierPath strokeRect: NSInsetRect(NSMakeRect(0, 0, width, BAR_HEIGHT), 0.5, 0.5)];
+    [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
     
     [bar unlockFocus];
     

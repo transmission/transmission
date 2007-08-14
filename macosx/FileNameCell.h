@@ -24,16 +24,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FileBrowserCell : NSBrowserCell
+@interface FileNameCell : NSActionCell
 {
     NSImage * fFolderImage;
     
-    float fPercent;
-    
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
 }
-
-- (void) setProgress: (float) progress;
 
 - (NSRect) imageRectForBounds: (NSRect) bounds;
 - (NSRect) titleRectForBounds: (NSRect) bounds;

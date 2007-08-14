@@ -1589,7 +1589,10 @@ static int static_lastid = 0;
         {
             [dict setObject: [NSIndexSet indexSetWithIndex: index] forKey: @"Indexes"];
             [dict setObject: [NSNumber numberWithUnsignedLongLong: size] forKey: @"Size"];
-            [dict setObject: [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]] forKey: @"Icon"];
+            
+            NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
+            [icon setFlipped: YES];
+            [dict setObject: icon forKey: @"Icon"];
             
             [flatList addObject: dict];
         }

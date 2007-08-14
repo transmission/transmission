@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
-#import "FileBrowserCell.h"
 #import "FilePriorityCell.h"
 #import "StringAdditions.h"
 
@@ -98,12 +97,9 @@
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
                                             sortDescriptorPrototype]]];
     
+    #warning make button? or just cell?
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
-    
-    //set file outline
-    FilePriorityCell * priorityCell = [[[FilePriorityCell alloc] init] autorelease];
-    [[fFileOutline tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
     
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
@@ -881,19 +877,9 @@
             forTableColumn: (NSTableColumn *) tableColumn item: (id) item
 {
     NSString * identifier = [tableColumn identifier];
-    if ([identifier isEqualToString: @"Name"])
-    {
-        if ([[item objectForKey: @"IsFolder"] boolValue])
-            [cell setImage: nil];
-        else
-        {
-            [cell setImage: [item objectForKey: @"Icon"]];
-            [(FileBrowserCell *)cell setProgress: [[fTorrents objectAtIndex: 0] fileProgress:
-                                                    [[item objectForKey: @"Indexes"] firstIndex]]];
-        }
-    }
-    else if ([identifier isEqualToString: @"Check"])
+    if ([identifier isEqualToString: @"Check"])
         [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
+    #warning is this redundant? what about objectValue, and remove import too
     else if ([identifier isEqualToString: @"Priority"])
         [(FilePriorityCell *)cell setItem: item];
     else;

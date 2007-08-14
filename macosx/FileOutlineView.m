@@ -23,7 +23,8 @@
  *****************************************************************************/
 
 #import "FileOutlineView.h"
-#import "FileBrowserCell.h"
+#import "FileNameCell.h"
+#import "FilePriorityCell.h"
 #import "InfoWindowController.h"
 #import "Torrent.h"
 
@@ -31,9 +32,13 @@
 
 - (void) awakeFromNib
 {
-    NSBrowserCell * browserCell = [[FileBrowserCell alloc] init];
-    [[self tableColumnWithIdentifier: @"Name"] setDataCell: browserCell];
-    [browserCell release];
+    FileNameCell * nameCell = [[FileNameCell alloc] init];
+    [[self tableColumnWithIdentifier: @"Name"] setDataCell: nameCell];
+    [nameCell release];
+    
+    FilePriorityCell * priorityCell = [[FilePriorityCell alloc] init];
+    [[self tableColumnWithIdentifier: @"Priority"] setDataCell: priorityCell];
+    [priorityCell release];
     
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
