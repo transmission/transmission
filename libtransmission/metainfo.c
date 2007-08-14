@@ -310,20 +310,15 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
 
 void tr_metainfoFree( tr_info_t * inf )
 {
-    int ii, jj;
+    int i, j;
 
     tr_free( inf->pieces );
     tr_free( inf->files );
     
-    for( ii = 0; ii < inf->trackerTiers; ii++ )
-    {
-        for( jj = 0; jj < inf->trackerList[ii].count; jj++ )
-        {
-            tr_free( inf->trackerList[ii].list[jj].address );
-            tr_free( inf->trackerList[ii].list[jj].announce );
-            tr_free( inf->trackerList[ii].list[jj].scrape );
-        }
-        tr_free( inf->trackerList[ii].list );
+    for( i=0; i<inf->trackerTiers; ++i ) {
+        for( j=0; j<inf->trackerList[i].count; ++j )
+            tr_trackerInfoClear( &inf->trackerList[i].list[j] );
+        tr_free( inf->trackerList[i].list );
     }
     tr_free( inf->trackerList );
 
@@ -416,10 +411,11 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             /* iterate through the tier's items */
             for( jj = 0; jj < subval->val.l.count; jj++ )
             {
+                tr_tracker_info_t tmp;
+
                 urlval = &subval->val.l.vals[jj];
                 if( TYPE_STR != urlval->type ||
-                    tr_httpParseUrl( urlval->val.s.s, urlval->val.s.i,
-                                     &address, &port, &announce ) )
+                    tr_trackerInfoInit( &tmp, urlval->val.s.s, urlval->val.s.i ) )
                 {
                     continue;
                 }
@@ -427,13 +423,8 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                 /* place the item info in a random location in the sublist */
                 random = tr_rand( subcount + 1 );
                 if( random != subcount )
-                {
                     sublist[subcount] = sublist[random];
-                }
-                sublist[random].address  = address;
-                sublist[random].port     = port;
-                sublist[random].announce = announce;
-                sublist[random].scrape   = announceToScrape( announce );
+                sublist[random] = tmp;
                 subcount++;
             }
 
@@ -481,14 +472,15 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
     }
 
     /* Regular announce value */
-    if( 0 == inf->trackerTiers )
+    val = tr_bencDictFind( meta, "announce" );
+    if( NULL == val || TYPE_STR != val->type )
     {
-        val = tr_bencDictFind( meta, "announce" );
-        if( NULL == val || TYPE_STR != val->type )
-        {
-            tr_err( "No \"announce\" entry" );
-            return TR_EINVALID;
-        }
+        tr_err( "No \"announce\" entry" );
+        return TR_EINVALID;
+    }
+
+    if( !inf->trackerTiers )
+    {
 
         if( tr_httpParseUrl( val->val.s.s, val->val.s.i,
                              &address, &port, &announce ) )
@@ -512,7 +504,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
 }
 
 static char * announceToScrape( const char * announce )
-{   
+{
     char old[]  = "announce";
     int  oldlen = 8;
     char new[]  = "scrape";
@@ -552,6 +544,31 @@ static char * announceToScrape( const char * announce )
 
     return scrape;
 }
+
+int
+tr_trackerInfoInit( tr_tracker_info_t  * info,
+                    const char         * address,
+                    int                  address_len )
+{
+    int ret = tr_httpParseUrl( address, address_len,
+                               &info->address,
+                               &info->port,
+                               &info->announce );
+    if( !ret )
+        info->scrape = announceToScrape( info->announce );
+
+    return ret;
+}
+
+void
+tr_trackerInfoClear( tr_tracker_info_t * info )
+{
+    tr_free( info->address );
+    tr_free( info->announce );
+    tr_free( info->scrape );
+    memset( info, '\0', sizeof(tr_tracker_info_t) );
+}
+
 
 static void
 savedname( char * name, size_t len, const char * hash, const char * tag )

@@ -45,6 +45,12 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+int tr_trackerInfoInit( struct tr_tracker_info_s  * info,
+                        const char                * address,
+                        int                         address_len );
+
+void tr_trackerInfoClear( struct tr_tracker_info_s * info );
+
 struct tr_peer_s;
 
 void tr_peerIdNew ( char* buf, int buflen );
