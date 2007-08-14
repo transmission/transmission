@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I. -I@top_srcdir@ -D__TRANSMISSION__
+AM_CPPFLAGS = -I. -I$(top_srcdir) $(LIBEVENT_CPPFLAGS) -D__TRANSMISSION__
 
 noinst_LIBRARIES = libtransmission.a
 

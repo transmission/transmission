@@ -1,8 +1,8 @@
 AM_CPPFLAGS = \
-    -I@top_srcdir@ \
-    @LIBEVENT_CPPFLAGS@ \
-    @GTK_CFLAGS@ \
-    @GLIB_CFLAGS@ \
+    -I$(top_srcdir) \
+    $(LIBEVENT_CPPFLAGS) \
+    $(GTK_CFLAGS) \
+    $(GLIB_CFLAGS) \
     -DLOCALEDIR=\""$(transmissionlocaledir)"\"
 
 AM_CFLAGS = $(PTHREAD_CFLAGS)
@@ -51,6 +51,7 @@ transmission_gtk_SOURCES = \
 
 transmission_gtk_LDADD = \
     ../libtransmission/libtransmission.a \
-    @GTK_LIBS@ @GLIB_LIBS@ \
-    @LIBEVENT_LIBS@ \
+    $(GTK_LIBS) \
+    $(GLIB_LIBS) \
+    $(LIBEVENT_LIBS) \
     $(PTHREAD_LIBS) -lm
