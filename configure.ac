@@ -40,24 +40,14 @@ AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 
 dnl ----------------------------------------------------------------------------
 dnl
-dnl  libevent detection for the Daemon
+dnl  libevent fun
 
-
-AC_CHECK_LIB([event],[event_init],[have_libevent=yes],[have_libevent=no])
-AC_ARG_WITH(libevent,
-            AC_HELP_STRING([--with-libevent], [Build Daemon]),
-            [want_libevent=$withval],
-            [want_libevent=$have_libevent])
-use_libevent=no
-if test "x$want_libevent" = "xyes" ; then
-    if test "x$have_libevent" = "xyes"; then
-      use_libevent=yes
-    else
-      AC_MSG_ERROR("libevent not found!")
-    fi
-fi
-AM_CONDITIONAL([WITH_LIBEVENT],[test "x$use_libevent" = "xyes"])
-
+AC_CONFIG_SUBDIRS([third-party/libevent])
+AC_MSG_NOTICE([invoking libevent's configure script])
+LIBEVENT_LIBS="\$(top_srcdir)/third-party/libevent/.libs/libevent.a"
+LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent"
+AC_SUBST(LIBEVENT_LIBS)
+AC_SUBST(LIBEVENT_CPPFLAGS)
 
 
 dnl ----------------------------------------------------------------------------
@@ -207,6 +197,7 @@ AC_CONFIG_FILES([Makefile
                  gtk/Makefile
                  libtransmission/Makefile
                  libtransmission/version.h
+                 third-party/Makefile
                  macosx/Makefile
                  wx/Makefile
                  wx/images/Makefile])
@@ -219,8 +210,9 @@ Configuration:
 
         Source code location:    ${srcdir}
         Compiler:                ${CXX}
+        Build libtransmission:   yes
+        Build Daemon:            yes
         Build BeOS client:       ${beos}
-        Build Daemon:            ${use_libevent}
         Build GTK+ client:       ${use_gtk}
         Build OS X client:       ${darwin}
         Build wxWidgets client:  ${use_wx}

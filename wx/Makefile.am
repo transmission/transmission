@@ -1,5 +1,10 @@
-AM_CPPFLAGS = -I@top_srcdir@ @WX_CPPFLAGS@
+AM_CPPFLAGS = \
+    -I@top_srcdir@ \
+    @WX_CPPFLAGS@ \
+    @LIBEVENT_CPPFLAGS@
+
 AM_CXXFLAGS = @WX_CXXFLAGS@
+
 SUBDIRS = images
 
 bin_PROGRAMS = Xmission
@@ -11,4 +16,8 @@ Xmission_SOURCES = \
     torrent-stats.cc \
     xmission.cc
 
-Xmission_LDADD = ../libtransmission/libtransmission.a @WX_LIBS@ $(PTHREAD_LIBS) -lm
+Xmission_LDADD = \
+    ../libtransmission/libtransmission.a \
+    @LIBEVENT_LIBS@ \
+    @WX_LIBS@ \
+    $(PTHREAD_LIBS) -lm
