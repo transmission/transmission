@@ -770,6 +770,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
+#warning forceDeleteTorrent - make NOT delete
 - (void) openCreatedFile: (NSNotification *) notification
 {
     NSDictionary * dict = [notification userInfo];

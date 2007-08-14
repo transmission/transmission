@@ -280,6 +280,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 
 @implementation TorrentCell (Private)
 
+#warning don't use image
 - (NSImage *) simpleBar: (float) width
 {
     Torrent * torrent = [self representedObject];
