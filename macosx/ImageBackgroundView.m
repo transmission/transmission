@@ -28,8 +28,7 @@
 
 - (void) setBackgroundImage: (NSImage *) image
 {
-    if (fBackgroundColor)
-        [fBackgroundColor release];
+    [fBackgroundColor release];
     fBackgroundColor = [[NSColor colorWithPatternImage: image] retain];
     
     [self setNeedsDisplay: YES];
@@ -37,8 +36,7 @@
 
 - (void) dealloc
 {
-    if (fBackgroundColor)
-        [fBackgroundColor release];
+    [fBackgroundColor release];
     [super dealloc];
 }
 

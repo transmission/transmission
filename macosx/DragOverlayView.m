@@ -74,10 +74,8 @@
 {
     [fBackBadge release];
     
-    if (fBadge)
-        [fBadge release];
-    if (fAppIcon)
-        [fAppIcon release];
+    [fBadge release];
+    [fAppIcon release];
     
     [fMainLineAttributes release];
     [fSubLineAttributes release];

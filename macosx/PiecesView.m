@@ -151,20 +151,13 @@
     [fGreen2Piece release];
     [fGreen3Piece release];
     
-    if (fTorrent)
-        [fTorrent release];
+    [fTorrent release];
     [super dealloc];
 }
 
 - (void) setTorrent: (Torrent *) torrent
 {
-    if (fTorrent)
-    {
-        [fTorrent release];
-        
-        if (!torrent)
-            fTorrent = nil;
-    }
+    [fTorrent release];
     
     if (torrent)
     {
@@ -192,7 +185,12 @@
     }
     else
     {
-        [self setImage: [[fBack copy] autorelease]];
+        fTorrent = nil;
+        
+        NSImage * newBack = [fBack copy];
+        [self setImage: newBack];
+        [newBack release];
+        
         [self setNeedsDisplay];
     }
 }
@@ -203,7 +201,11 @@
         return;
     
     if (first)
-        [self setImage: [[fBack copy] autorelease]];
+    {
+        NSImage * newBack = [fBack copy];
+        [self setImage: newBack];
+        [newBack release];
+    }
     NSImage * image = [self image];
 
     int8_t * pieces;

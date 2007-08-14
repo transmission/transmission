@@ -159,8 +159,7 @@
 - (void) dealloc
 {
     [fPath release];
-    if (fLocation)
-        [fLocation release];
+    [fLocation release];
     
     if (fInfo)
         tr_metaInfoBuilderFree(fInfo);

@@ -70,7 +70,7 @@
     [super dealloc];
 }
 
-- (void)sizeToFit
+- (void) sizeToFit
 {
     NSSize size = [[self title] sizeWithAttributes: fNormalAttributes];
     size.width = floorf(size.width + 18.5);
@@ -80,12 +80,12 @@
     [self createPaths];
 }
 
-- (BOOL)isFlipped
+- (BOOL) isFlipped
 {
     return NO;
 }
 
-- (void)drawRect:(NSRect)rect
+- (void) drawRect: (NSRect) rect
 {
     // draw background
     if ([[self cell] isHighlighted])

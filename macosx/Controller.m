@@ -958,7 +958,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             didEndSelector: @selector(urlSheetDidEnd:returnCode:contextInfo:) contextInfo: nil];
 }
 
-#warning combine
 - (void) openURLEndSheet: (id) sender
 {
     [fURLSheetWindow orderOut: sender];

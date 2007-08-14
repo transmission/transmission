@@ -115,20 +115,16 @@
 
 - (void) dealloc
 {
-    if (fTorrents)
-        [fTorrents release];
-    if (fPeers)
-        [fPeers release];
-    if (fFiles)
-        [fFiles release];
+    [fTorrents release];
+    [fPeers release];
+    [fFiles release];
     
     [super dealloc];
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents
 {
-    if (fTorrents)
-        [fTorrents release];
+    [fTorrents release];
     fTorrents = [torrents retain];
 
     int numberSelected = [fTorrents count];
@@ -286,8 +282,7 @@
         
         //set file table
         [fFileOutline deselectAll: nil];
-        if (fFiles)
-            [fFiles release];
+        [fFiles release];
         fFiles = [[torrent fileList] retain];
         
         [self updateInfoFiles];
@@ -435,8 +430,7 @@
     [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersSendingToUs]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersGettingFromUs]] : @""];
     
-    if (fPeers)
-        [fPeers release];
+    [fPeers release];
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
     
     [fPeerTable reloadData];
