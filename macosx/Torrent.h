@@ -27,6 +27,13 @@
 
 #define INVALID -99
 
+typedef enum
+{
+    TORRENT_FILE_DELETE,
+    TORRENT_FILE_SAVE,
+    TORRENT_FILE_DEFAULT
+} torrentFileState;
+
 @interface Torrent : NSObject
 {
     tr_handle_t * fLib;
@@ -66,7 +73,8 @@
     NSDictionary * fQuickPauseDict;
 }
 
-- (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib;
+- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
+        lib: (tr_handle_t *) lib;
 - (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
 
 - (NSDictionary *) history;

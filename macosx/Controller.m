@@ -660,7 +660,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * path = [[fPendingTorrentDownloads objectForKey: [[download request] URL]] objectForKey: @"Path"];
     
     [self openFiles: [NSArray arrayWithObject: path] forcePath: nil ignoreDownloadFolder:
-        ![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Constant"] forceDeleteTorrent: YES];
+        ![[fDefaults stringForKey: @"DownloadChoice"] isEqualToString: @"Constant"] deleteTorrentFile: TORRENT_FILE_DELETE];
     
     [fPendingTorrentDownloads removeObjectForKey: [[download request] URL]];
     [download release];
@@ -673,16 +673,16 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) application: (NSApplication *) app openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO deleteTorrentFile: TORRENT_FILE_DEFAULT];
 }
 
 - (void) openFiles: (NSArray *) filenames forcePath: (NSString *) path ignoreDownloadFolder: (BOOL) ignore
-        forceDeleteTorrent: (BOOL) delete
+        deleteTorrentFile: (torrentFileState) deleteTorrent
 {
     NSString * downloadChoice = [fDefaults stringForKey: @"DownloadChoice"];
     if (ignore || (!path && [downloadChoice isEqualToString: @"Ask"]))
     {
-        [self openFilesAsk: [filenames mutableCopy] forceDeleteTorrent: delete];
+        [self openFilesAsk: [filenames mutableCopy] deleteTorrentFile: deleteTorrent];
         return;
     }
     
@@ -704,7 +704,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         filenames, @"Filenames",
                                         [NSNumber numberWithBool: ignore], @"Ignore",
-                                        [NSNumber numberWithBool: delete], @"Delete", nil];
+                                        [NSNumber numberWithInt: deleteTorrent], @"DeleteTorrent", nil];
         
         [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
                 didEndSelector: @selector(incompleteChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
@@ -727,7 +727,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         filenames, @"Filenames",
                                         [NSNumber numberWithBool: ignore], @"Ignore",
-                                        [NSNumber numberWithBool: delete], @"Delete", nil];
+                                        [NSNumber numberWithInt: deleteTorrent], @"DeleteTorrent", nil];
         
         [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
                 didEndSelector: @selector(downloadChoiceClosed:returnCode:contextInfo:) contextInfo: dict];
@@ -756,7 +756,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         }
         tr_metainfoFree(&info);
         
-        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location forceDeleteTorrent: delete lib: fLib]))
+        if (!(torrent = [[Torrent alloc] initWithPath: torrentPath location: location deleteTorrentFile: deleteTorrent lib: fLib]))
             continue;
         
         //add it to the "File > Open Recent" menu
@@ -770,12 +770,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [self updateTorrentsInQueue];
 }
 
-#warning forceDeleteTorrent - make NOT delete
 - (void) openCreatedFile: (NSNotification *) notification
 {
     NSDictionary * dict = [notification userInfo];
     [self openFiles: [NSArray arrayWithObject: [dict objectForKey: @"File"]] forcePath: [dict objectForKey: @"Path"]
-            ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+            ignoreDownloadFolder: NO deleteTorrentFile: TORRENT_FILE_SAVE];
     [dict release];
 }
 
@@ -804,13 +803,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     [self openFiles: [dictionary objectForKey: @"Filenames"] forcePath: nil
         ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue]
-        forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue]];
+        deleteTorrentFile: [[dictionary objectForKey: @"DeleteTorrent"] intValue]];
     
     [dictionary release];
 }
 
 //called by the main open method to show sheet for choosing download location
-- (void) openFilesAsk: (NSMutableArray *) files forceDeleteTorrent: (BOOL) delete
+- (void) openFilesAsk: (NSMutableArray *) files deleteTorrentFile: (torrentFileState) deleteTorrent
 {
     //determine the next file that can be opened
     NSString * torrentPath;
@@ -851,7 +850,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                         "Open torrent -> select destination folder"), [NSString stringWithUTF8String: info.name]]];
     
     NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [torrentPath retain], @"Path",
-                                    files, @"Files", [NSNumber numberWithBool: delete], @"Delete", nil];
+                                    files, @"Files", [NSNumber numberWithInt: deleteTorrent], @"DeleteTorrent", nil];
     tr_metainfoFree(&info);
     
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
@@ -864,7 +863,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSString * torrentPath = [dictionary objectForKey: @"Path"];
         Torrent * torrent = [[Torrent alloc] initWithPath: torrentPath location: [[openPanel filenames] objectAtIndex: 0]
-                            forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue] lib: fLib];
+                            deleteTorrentFile: [[dictionary objectForKey: @"DeleteTorrent"] intValue] lib: fLib];
         
         //add it to the "File > Open Recent" menu
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: [NSURL fileURLWithPath: torrentPath]];
@@ -882,7 +881,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openFilesAskWithDict: (NSDictionary *) dictionary
 {
     [self openFilesAsk: [dictionary objectForKey: @"Files"]
-            forceDeleteTorrent: [[dictionary objectForKey: @"Delete"] boolValue]];
+            deleteTorrentFile: [[dictionary objectForKey: @"DeleteTorrent"] intValue]];
     [dictionary release];
 }
 
@@ -894,7 +893,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
 - (void) openFiles: (NSArray *) filenames
 {
-    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [self openFiles: filenames forcePath: nil ignoreDownloadFolder: NO deleteTorrentFile: TORRENT_FILE_DEFAULT];
 }
 
 - (void) openShowSheet: (id) sender
@@ -923,7 +922,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 - (void) openFromSheet: (NSDictionary *) dictionary
 {
     [self openFiles: [dictionary objectForKey: @"Files"] forcePath: nil
-        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] forceDeleteTorrent: NO];
+        ignoreDownloadFolder: [[dictionary objectForKey: @"Ignore"] boolValue] deleteTorrentFile: TORRENT_FILE_DEFAULT];
     
     [dictionary release];
 }
@@ -3239,7 +3238,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     int oldCount = [fTorrents count];
     
-    [self openFiles: [NSArray arrayWithObject: path] forcePath: directory ignoreDownloadFolder: NO forceDeleteTorrent: NO];
+    [self openFiles: [NSArray arrayWithObject: path] forcePath: directory ignoreDownloadFolder: NO
+            deleteTorrentFile: TORRENT_FILE_DEFAULT];
     
     return [fTorrents count] > oldCount;
 }
