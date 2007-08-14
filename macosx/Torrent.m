@@ -74,10 +74,12 @@ static uint32_t kRed   = BE(0xFF6450FF), //255, 100, 80
                 kGreen3 = BE(0x00FF66FF), //0, 255, 102
                 kWhite = BE(0xFFFFFFFF); //255, 255, 255
 
-- (id) initWithPath: (NSString *) path location: (NSString *) location forceDeleteTorrent: (BOOL) delete lib: (tr_handle_t *) lib
+- (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
+        lib: (tr_handle_t *) lib
 {
     self = [self initWithHash: nil path: path lib: lib
-            publicTorrent: delete ? [NSNumber numberWithBool: NO] : nil
+            publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT
+                            ? [NSNumber numberWithBool: torrentDelete == TORRENT_FILE_SAVE] : nil
             downloadFolder: location
             useIncompleteFolder: nil incompleteFolder: nil
             dateAdded: nil dateCompleted: nil
