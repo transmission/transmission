@@ -92,13 +92,14 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
         [paragraphStyle setLineBreakMode: NSLineBreakByTruncatingTail];
     
         fTitleAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                            [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
-                            paragraphStyle, NSParagraphStyleAttributeName, nil];
+                                [NSFont messageFontOfSize: 12.0], NSFontAttributeName,
+                                paragraphStyle, NSParagraphStyleAttributeName, nil];
         fStatusAttributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                            [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
-                            paragraphStyle, NSParagraphStyleAttributeName, nil];
+                                [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
+                                paragraphStyle, NSParagraphStyleAttributeName, nil];
         [paragraphStyle release];
-
+        
+        fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
 }
@@ -109,6 +110,8 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     
     copy->fBitmap = nil;
     copy->fPieces = NULL;
+    
+    return copy;
 }
 
 - (void) dealloc
@@ -359,7 +362,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
         }
     }
     
-    [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
+    [fBarOverlayColor set];
     [NSBezierPath strokeRect: NSInsetRect(NSMakeRect(0, 0, width, BAR_HEIGHT), 0.5, 0.5)];
     
     [bar unlockFocus];
@@ -371,18 +374,18 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 {
     NSImage * image = [self advancedBarSimple];
     
+    NSRect barBounds = NSMakeRect(0, 0, width, BAR_HEIGHT);
+    
     [image setScalesWhenResized: YES];
-    [image setSize: NSMakeSize(width, BAR_HEIGHT)];
+    [image setSize: barBounds.size];
     
     [image lockFocus];
-    
-    NSRect barBounds = NSMakeRect(0, 0, width, BAR_HEIGHT);
     
     if (!fTransparentGradient)
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
     [fTransparentGradient fillRect: barBounds angle: 90];
     
-    [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] set];
+    [fBarOverlayColor set];
     [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
     
     [image unlockFocus];

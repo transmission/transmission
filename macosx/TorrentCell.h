@@ -26,13 +26,14 @@
 
 @interface TorrentCell : NSCell
 {
-    NSImage * fErrorImage;
-    CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
-                * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     NSUserDefaults * fDefaults;
+    NSImage * fErrorImage;
     
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
     
+    NSColor * fBarOverlayColor;
+    CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
+                * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     NSBitmapImageRep * fBitmap;
     int8_t * fPieces;
 }
