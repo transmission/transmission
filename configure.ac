@@ -17,6 +17,10 @@ AC_SUBST(WX_MINIMUM)
 
 AC_PROG_CC
 AC_PROG_CXX
+if test "x$GCC" = "xyes" ; then
+    CFLAGS="-g -Os -Wall -W"
+    CXXFLAGS="-g -Os -Wall -W"
+fi
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lrintf strlcpy strlcat daemon dirname basename])
