@@ -290,7 +290,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     {
         if (!fWhiteGradient)
             fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-        [fWhiteGradient fillRect: NSMakeRect(width * progress, 0, width * left, BAR_HEIGHT) angle: -90];
+        [fWhiteGradient fillRect: NSMakeRect(0, 0, width, BAR_HEIGHT) angle: -90];
         
         float include = progress + left;
         if (include < 1.0)
