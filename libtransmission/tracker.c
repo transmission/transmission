@@ -91,6 +91,7 @@ struct tr_tracker_s
     int            complete;
     int            randOffset;
 
+    tr_flag_t      hasManyPeers;
     tr_flag_t      completelyUnconnectable;
     tr_flag_t      allUnreachIfError;
     tr_flag_t      lastError;
@@ -209,6 +210,7 @@ tr_trackerCanManualAnnounce( const tr_tracker_t * tc )
 
 static int shouldConnect( tr_tracker_t * tc )
 {
+    tr_torrent_t * tor = tc->tor;
     const uint64_t now = tr_date();
 
     /* User has requested a manual announce
@@ -264,6 +266,37 @@ static int shouldConnect( tr_tracker_t * tc )
     if( now > tc->dateOk + 1000 * tc->interval + tc->randOffset )
     {
         return 1;
+    }
+
+    /* If there is quite a lot of people on this torrent, stress
+       the tracker a bit until we get a decent number of peers */
+    if( tc->hasManyPeers &&
+        (tr_cpGetStatus ( tor->completion ) == TR_CP_INCOMPLETE ))
+    {
+        /* reannounce in 10 seconds if we have less than 5 peers */
+        if( tor->peerCount < 5 )
+        {
+            if( now > tc->dateOk + 1000 * MAX( 10, tc->minInterval ) )
+            {
+                return 1;
+            }
+        }
+        /* reannounce in 20 seconds if we have less than 10 peers */
+        else if( tor->peerCount < 10 )
+        {
+            if( now > tc->dateOk + 1000 * MAX( 20, tc->minInterval ) )
+            {
+                return 1;
+            }
+        }
+        /* reannounce in 30 seconds if we have less than 15 peers */
+        else if( tor->peerCount < 15 )
+        {
+            if( now > tc->dateOk + 1000 * MAX( 30, tc->minInterval ) )
+            {
+                return 1;
+            }
+        }
     }
 
     return 0;
@@ -778,6 +811,10 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
     }
 
     tc->scrapeNeeded = scrapeNeeded;
+    if( !scrapeNeeded )
+    {
+        tc->hasManyPeers = ( tc->seeders + tc->leechers >= 50 );
+    }
 
     beFoo = tr_bencDictFind( &beAll, "tracker id" );
     if( beFoo )
@@ -821,6 +858,10 @@ static void readAnswer( tr_tracker_t * tc, const char * data, int len,
     if( peerCount > 0 )
     {
         tr_inf( "Tracker: got %d peers", peerCount );
+        if( peerCount >= 50 )
+        {
+            tc->hasManyPeers = 1;
+        }
         *_peerCount = peerCount;
         *_peerCompact = peerCompact;
     }
@@ -963,6 +1004,8 @@ static void readScrapeAnswer( tr_tracker_t * tc, const char * data, int len )
             tr_inf( "Scrape: min_request_interval = %d seconds", tc->scrapeInterval );
         }
     }
+    
+    tc->hasManyPeers = ( tc->seeders + tc->leechers >= 50 );
     
     tr_bencFree( &scrape );
 }
