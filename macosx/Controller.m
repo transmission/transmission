@@ -3243,7 +3243,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     int oldCount = [fTorrents count];
     
-    [self openFiles: [NSArray arrayWithObject: path] forcePath: directory ignoreDownloadFolder: NO deleteTorrentFile: NO];
+    [self openFiles: [NSArray arrayWithObject: path] forcePath: directory ignoreDownloadFolder: NO
+            deleteTorrentFile: TORRENT_FILE_DEFAULT];
     
     return [fTorrents count] > oldCount;
 }
