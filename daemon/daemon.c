@@ -50,28 +50,30 @@
 #include "torrents.h"
 
 static void usage       ( const char *, ... );
-static void readargs    ( int, char **, int *, int *, char ** );
+static void readargs    ( int, char **, int *, int *, char **, char ** );
 static int  trylocksock ( const char * );
 static int  getlock     ( const char * );
 static int  getsock     ( const char * );
 static void exitcleanup ( void );
 static void setupsigs   ( struct event_base * );
 static void gotsig      ( int, short, void * );
+static int  savepid     ( const char * );
 
 static int  gl_lockfd               = -1;
 static char gl_lockpath[MAXPATHLEN] = "";
 static int  gl_sockfd               = -1;
 static char gl_sockpath[MAXPATHLEN] = "";
+static char gl_pidfile[MAXPATHLEN]  = "";
 
 int
 main( int argc, char ** argv )
 {
     struct event_base * evbase;
     int                 nofork, debug, sockfd;
-    char              * sockpath;
+    char              * sockpath, * pidfile;
 
     setmyname( argv[0] );
-    readargs( argc, argv, &nofork, &debug, &sockpath );
+    readargs( argc, argv, &nofork, &debug, &sockpath, &pidfile );
 
     if( !nofork )
     {
@@ -83,6 +85,8 @@ main( int argc, char ** argv )
         errsyslog( 1 );
     }
 
+    if( 0 > savepid( pidfile ) )
+        exit( 1 );
     atexit( exitcleanup );
     sockfd = trylocksock( sockpath );
     if( 0 > sockfd )
@@ -118,7 +122,7 @@ usage( const char * msg, ... )
     }
 
     printf(
-  "usage: %s [-dfh]\n"
+  "usage: %s [-dfh] [-p file] [-s file]\n"
   "\n"
   "Transmission %s http://transmission.m0k.org/\n"
   "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
@@ -126,6 +130,7 @@ usage( const char * msg, ... )
   "  -d --debug                Print data send and received, implies -f\n"
   "  -f --foreground           Run in the foreground and log to stderr\n"
   "  -h --help                 Display this message and exit\n"
+  "  -p --pidfile <path>       Save the process id in a file at <path>\n"
   "  -s --socket <path>        Place the socket file at <path>\n"
   "\n"
   "To add torrents or set options, use the transmission-remote program.\n",
@@ -134,22 +139,25 @@ usage( const char * msg, ... )
 }
 
 void
-readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock )
+readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock,
+          char ** pidfile )
 {
-    char optstr[] = "dfhs:";
+    char optstr[] = "dfhp:s:";
     struct option longopts[] =
     {
         { "debug",              no_argument,       NULL, 'd' },
         { "foreground",         no_argument,       NULL, 'f' },
         { "help",               no_argument,       NULL, 'h' },
+        { "pidfile",            required_argument, NULL, 'p' },
         { "socket",             required_argument, NULL, 's' },
         { NULL, 0, NULL, 0 }
     };
     int opt;
 
-    *nofork = 0;
-    *debug  = 0;
-    *sock   = NULL;
+    *nofork    = 0;
+    *debug     = 0;
+    *sock      = NULL;
+    *pidfile   = NULL;
 
     while( 0 <= ( opt = getopt_long( argc, argv, optstr, longopts, NULL ) ) )
     {
@@ -160,6 +168,9 @@ readargs( int argc, char ** argv, int * nofork, int * debug, char ** sock )
                 /* FALLTHROUGH */
             case 'f':
                 *nofork = 1;
+                break;
+            case 'p':
+                *pidfile = optarg;
                 break;
             case 's':
                 *sock   = optarg;
@@ -294,6 +305,10 @@ exitcleanup( void )
         unlink( gl_lockpath );
         close( gl_lockfd );
     }
+    if( 0 != gl_pidfile[0] )
+    {
+        unlink( gl_pidfile );
+    }
 }
 
 void
@@ -337,4 +352,30 @@ gotsig( int sig, short what UNUSED, void * arg UNUSED )
         signal( sig, SIG_DFL );
         raise( sig );
     }
+}
+
+int
+savepid( const char * file )
+{
+    FILE * pid;
+
+    pid = fopen( file, "wb" );
+    if( NULL == pid )
+    {
+        errnomsg( "failed to open pid file: %s", file );
+        return -1;
+    }
+
+    if( 0 > fprintf( pid, "%d\n", (int) getpid() ) )
+    {
+        errnomsg( "failed to write pid to file: %s", file );
+        fclose( pid );
+        unlink( file );
+        return -1;
+    }
+
+    fclose( pid );
+    strlcpy( gl_pidfile, file, sizeof gl_pidfile );
+
+    return 0;
 }

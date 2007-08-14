@@ -32,6 +32,7 @@
 .Fl h
 .Nm
 .Op Fl df
+.Op Fl p Ar pid-file
 .Op Fl s Ar socket-file
 .Ek
 .Sh DESCRIPTION
@@ -49,6 +50,13 @@ Run in the foreground and print errors to stderr instead of forking
 and logging errors with syslog.
 .It Fl h Fl -help
 Print command-line option descriptions.
+.It Fl p Fl -pidfile Ar pid-file
+Save the daemon's process ID in
+.Ar pid-file .
+.It Fl s Fl -socket Ar socket-file
+Create the unix-domain socket file at
+.Ar socket-file
+instead of the platform-dependent default location.
 .El
 .Sh FILES
 .Pa ~/.transmission
