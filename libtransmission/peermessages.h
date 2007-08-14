@@ -123,7 +123,7 @@ blockPending( tr_torrent_t  * tor,
 
         r = (tr_request_t*) peer->outRequests->data;
         assert( r != NULL );
-        peer->outRequests = tr_list_remove_data( peer->outRequests, r );
+        tr_list_remove_data( &peer->outRequests, r );
 
         if( !tr_cpPieceIsComplete( tor->completion, r->index ) ) /* sanity clause */
         {
@@ -226,7 +226,7 @@ static void sendChoke( tr_peer_t * peer, int yes )
     {
         /* Drop older requests from the last time it was unchoked, if any */
         tr_list_foreach( peer->outRequests, tr_free );
-        tr_list_free( peer->outRequests );
+        tr_list_free( &peer->outRequests );
         peer->outRequests = NULL;
     }
 

@@ -244,7 +244,7 @@ static int parseRequest( tr_torrent_t * tor, tr_peer_t * peer,
     r->index = index;
     r->begin = begin;
     r->length = length;
-    peer->outRequests = tr_list_append( peer->outRequests, r );
+    tr_list_append( &peer->outRequests, r );
 
     return TR_OK;
 }
@@ -418,9 +418,9 @@ static int parseCancel( tr_torrent_t * tor, tr_peer_t * peer,
     req.index = index;
     req.begin = begin;
     req.length = length;
-    while(( l = tr_list_find( peer->outRequests, reqCompare, &req ) )) {
+    while(( l = tr_list_find( peer->outRequests, &req, reqCompare ) )) {
         tr_request_t * r = (tr_request_t *) l->data;
-        peer->outRequests = tr_list_remove_data( peer->outRequests, r );
+        tr_list_remove_data( &peer->outRequests, r );
         tr_free( r );
     }
 

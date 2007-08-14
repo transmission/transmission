@@ -270,7 +270,7 @@ tr_loadTorrents ( tr_handle_t   * h,
                 tr_buildPath( path, sizeof(path), torrentDir, d->d_name, NULL );
                 tor = tr_torrentInit( h, path, destination, flags, NULL );
                 if( tor != NULL ) {
-                    list = tr_list_append( list, tor );
+                    tr_list_append( &list, tor );
                     //fprintf (stderr, "#%d - %s\n", n, tor->info.name );
                     n++;
                 }
@@ -284,7 +284,7 @@ tr_loadTorrents ( tr_handle_t   * h,
         torrents[i++] = (tr_torrent_t*) l->data;
     assert( i==n );
 
-    tr_list_free( list );
+    tr_list_free( &list );
 
     *setmeCount = n;
     tr_inf( "Loaded %d torrents from disk", *setmeCount );
