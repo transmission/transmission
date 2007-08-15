@@ -88,6 +88,17 @@ uint64_t tr_date( void );
 /* wait the specified number of milliseconds */
 void tr_wait( uint64_t delay_milliseconds );
 
+/***********************************************************************
+ * strlcat_utf8
+ ***********************************************************************
+ * According to the official specification, all strings in the torrent
+ * file are supposed to be UTF-8 encoded. However, there are
+ * non-compliant torrents around... If we encounter an invalid UTF-8
+ * character, we assume it is ISO 8859-1 and convert it to UTF-8.
+ **********************************************************************/
+void strlcat_utf8( void *, const void *, size_t, char );
+size_t bufsize_utf8( const void *, int * );
+
 /***
 ****
 ***/

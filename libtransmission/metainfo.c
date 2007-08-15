@@ -56,7 +56,6 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta );
 static char * announceToScrape( const char * announce );
 static int parseFiles( tr_info_t * inf, benc_val_t * name,
                        benc_val_t * files, benc_val_t * length );
-static void strcatUTF8( char *, int, const char *, int );
 
 /***********************************************************************
  * tr_metainfoParse
@@ -205,14 +204,14 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
     val = tr_bencDictFindFirst( &meta, "comment.utf-8", "comment", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
-        strcatUTF8( inf->comment, sizeof( inf->comment ), val->val.s.s, 0 );
+        strlcat_utf8( inf->comment, val->val.s.s, sizeof( inf->comment ), 0 );
     }
     
     /* Creator info */
     val = tr_bencDictFindFirst( &meta, "created by.utf-8", "created by", NULL );
     if( NULL != val && TYPE_STR == val->type )
     {
-        strcatUTF8( inf->creator, sizeof( inf->creator ), val->val.s.s, 0 );
+        strlcat_utf8( inf->creator, val->val.s.s, sizeof( inf->creator ), 0 );
     }
     
     /* Date created */
@@ -370,11 +369,11 @@ static int getfile( char * buf, int size,
         return TR_EINVALID;
     }
 
-    strcatUTF8( buf, size, prefix, 0 );
+    strlcat_utf8( buf, prefix, size, 0 );
     for( ii = 0; jj > ii; ii++ )
     {
-        strcatUTF8( buf, size, TR_PATH_DELIMITER_STR, 0 );
-        strcatUTF8( buf, size, list[ii], 1 );
+        strlcat_utf8( buf, TR_PATH_DELIMITER_STR, size, 0 );
+        strlcat_utf8( buf, list[ii], size, TR_PATH_DELIMITER );
     }
     free( list );
 
@@ -690,7 +689,8 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
         return TR_EINVALID;
     }
 
-    strcatUTF8( inf->name, sizeof( inf->name ), name->val.s.s, 1 );
+    strlcat_utf8( inf->name, name->val.s.s, sizeof( inf->name ),
+                  TR_PATH_DELIMITER );
     if( '\0' == inf->name[0] )
     {
         tr_err( "Invalid \"name\" string" );
@@ -744,8 +744,8 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
             return TR_EINVALID;
         }
 
-        strcatUTF8( inf->files[0].name, sizeof( inf->files[0].name ),
-                    name->val.s.s, 1 );
+        strlcat_utf8( inf->files[0].name, name->val.s.s,
+                      sizeof( inf->files[0].name ), TR_PATH_DELIMITER );
 
         inf->files[0].length = length->val.i;
         inf->totalSize      += length->val.i;
@@ -758,81 +758,4 @@ parseFiles( tr_info_t * inf, benc_val_t * name,
     }
 
     return TR_OK;
-}
-
-/***********************************************************************
- * strcatUTF8
- ***********************************************************************
- * According to the official specification, all strings in the torrent
- * file are supposed to be UTF-8 encoded. However, there are
- * non-compliant torrents around... If we encounter an invalid UTF-8
- * character, we assume it is ISO 8859-1 and convert it to UTF-8.
- **********************************************************************/
-#define WANTBYTES( want, got ) \
-    if( (want) > (got) ) { return; } else { (got) -= (want); }
-static void strcatUTF8( char * s, int len, const char * append, int deslash )
-{
-    const char * p;
-
-    /* don't overwrite the nul at the end */
-    len--;
-
-    /* Go to the end of the destination string */
-    while( s[0] )
-    {
-        s++;
-        len--;
-    }
-
-    /* Now start appending, converting on the fly if necessary */
-    for( p = append; p[0]; )
-    {
-        /* skip over / if requested */
-        if( deslash && '/' == p[0] )
-        {
-            p++;
-            continue;
-        }
-
-        if( !( p[0] & 0x80 ) )
-        {
-            /* ASCII character */
-            WANTBYTES( 1, len );
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xE0 ) == 0xC0 && ( p[1] & 0xC0 ) == 0x80 )
-        {
-            /* 2-bytes UTF-8 character */
-            WANTBYTES( 2, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF0 ) == 0xE0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 )
-        {
-            /* 3-bytes UTF-8 character */
-            WANTBYTES( 3, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF8 ) == 0xF0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 && ( p[3] & 0xC0 ) == 0x80 )
-        {
-            /* 4-bytes UTF-8 character */
-            WANTBYTES( 4, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        /* ISO 8859-1 -> UTF-8 conversion */
-        WANTBYTES( 2, len );
-        *(s++) = 0xC0 | ( ( *p & 0xFF ) >> 6 );
-        *(s++) = 0x80 | ( *(p++) & 0x3F );
-    }
 }
