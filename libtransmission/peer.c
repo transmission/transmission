@@ -259,6 +259,7 @@ struct tr_peer_s
     tr_ratecontrol_t  * upload;
 
     char              * client;
+    int                 extclient;
 
     int64_t             credit;
 };

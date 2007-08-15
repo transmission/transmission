@@ -341,9 +341,11 @@ parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
 static int
 parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
-    benc_val_t      val, * sub, * dict, * subsub;
+    benc_val_t      val, * sub, * sub2, * dict, * subsub;
     tr_bitfield_t * msgs;
-    int             ii, idx;
+    int             ii, idx, newclient;
+    size_t          size;
+    char          * client;
 
     if( tr_bencLoad( buf, len, &val, NULL ) )
     {
@@ -358,28 +360,37 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         return TR_ERROR;
     }
 
-#if 0 /* ugh, we have to deal with encoding if we do this */
     /* get peer's client name */
-    sub  = tr_bencDictFind( &val, "client" );
-    sub2 = tr_bencDictFind( &val, "version" );
-    if( NULL != sub  && TYPE_STR == sub->type &&
-        NULL != sub2 && TYPE_STR == sub->type )
+    newclient = 0;
+    if( !peer->extclient )
     {
-        if( NULL == peer->client ||
-            ( 0 != strncmp( peer->client, sub->val.s.s, sub->val.s.i ) ||
-              ' ' != peer->client[sub->val.s.i] ||
-              0 != strcmp( peer->client + sub->val.s.i + 1, sub2->val.s.s ) ) )
+        sub  = tr_bencDictFind( &val, "client" );
+        sub2 = tr_bencDictFind( &val, "version" );
+        if( NULL != sub  && TYPE_STR == sub->type &&
+            NULL != sub2 && TYPE_STR == sub->type )
         {
-            client = NULL;
-            asprintf( &client, "%s %s", sub->val.s.s, sub2->val.s.s );
-            if( NULL != client )
+            size = bufsize_utf8( sub->val.s.s,  NULL ) +
+                   bufsize_utf8( sub2->val.s.s, NULL );
+            client = calloc( size, 1 );
+            if( NULL == client )
+            {
+                tr_bencFree( &val );
+                return TR_ERROR;
+            }
+            strlcat_utf8( client, sub->val.s.s,  size, 0 );
+            strlcat(      client, " ",           size    );
+            strlcat_utf8( client, sub2->val.s.s, size, 0 );
+            if( NULL == peer->client || 0 != strcmp( client, peer->client ) )
             {
                 free( peer->client );
                 peer->client = client;
+                newclient = 1;
             }
+            else
+                free( client );
+            peer->extclient = 1;
         }
     }
-#endif
 
     /* get the peer's listening port */
     sub = tr_bencDictFind( &val, "tcp_port" );
@@ -400,7 +411,10 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         return TR_ERROR;
     }
 
-    peer_dbg( "GET  azureus-handshake, ok" );
+    if( newclient )
+        peer_dbg( "GET  azureus-handshake, ok (%s)", peer->client );
+    else
+        peer_dbg( "GET  azureus-handshake, ok" );
 
     /* fill bitmask with supported message info */
     msgs = tr_bitfieldNew( azmsgCount() );
