@@ -6,5 +6,3 @@ if [ "$(uname)" == "Darwin" ] ; then
 fi
 
 autoreconf -fiv -I config -I m4
-cd third-party/libevent
-autoreconf -fiv -I config -I m4
