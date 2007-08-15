@@ -542,8 +542,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fPendingTorrentDownloads removeAllObjects];
     }
     
-    //remove all torrent files in the temporary directory
-    #warning move?
+    //remove all remaining torrent files in the temporary directory
     if (fTempTorrentFiles)
     {
         NSEnumerator * torrentEnumerator = [fTempTorrentFiles objectEnumerator];
