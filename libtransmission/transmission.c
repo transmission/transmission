@@ -87,9 +87,8 @@ tr_handle_t * tr_init( const char * tag )
     tr_handle_t * h;
     int           i;
 
-    tr_threadNew( libeventThreadFunc, NULL, "libeventThreadFunc" );
-
     tr_msgInit();
+    tr_threadNew( libeventThreadFunc, NULL, "libeventThreadFunc" );
     tr_netInit();
     tr_netResolveThreadInit();
 
