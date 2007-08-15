@@ -94,7 +94,7 @@
     
     //title
     NSAttributedString * titleString = [self attributedTitleWithColor: highlighted ? [NSColor whiteColor]
-                                                                                    : [NSColor controlTextColor];
+                                                                                    : [NSColor controlTextColor]];
     NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
@@ -102,7 +102,7 @@
     if ([[[self objectValue] objectForKey: @"IsFolder"] boolValue])
     {
         NSAttributedString * statusString = [self attributedStatusWithColor: highlighted ? [NSColor whiteColor]
-                                                                                        : [NSColor darkGrayColor];
+                                                                                        : [NSColor darkGrayColor]];
         NSRect statusRect = [self rectForStatusWithString: statusString inBounds: cellFrame];
         [statusString drawInRect: statusRect];
     }
