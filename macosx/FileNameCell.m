@@ -35,6 +35,9 @@
 
 @interface FileNameCell (Private)
 
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
+
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color;
 - (NSAttributedString *) attributedStatusWithColor: (NSColor *) color;
 
@@ -72,8 +75,46 @@
 
 - (NSRect) titleRectForBounds: (NSRect) bounds
 {
-    NSAttributedString * title = [self attributedTitleWithColor: nil];
-    NSSize titleSize = [title size];
+    return [self rectForTitleWithString: [self attributedTitleWithColor: nil] inBounds: bounds];
+}
+
+- (NSRect) statusRectForBounds: (NSRect) bounds
+{
+    return [self rectForStatusWithString: [self attributedStatusWithColor: nil] inBounds: bounds];
+}
+
+- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+{
+    //icon
+    [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
+                    fraction: 1.0];
+    
+    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
+                                                isEqual: [NSColor alternateSelectedControlColor]];
+    
+    //title
+    NSAttributedString * titleString = [self attributedTitleWithColor: highlighted ? [NSColor whiteColor]
+                                                                                    : [NSColor controlTextColor];
+    NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
+    [titleString drawInRect: titleRect];
+    
+    //status
+    if ([[[self objectValue] objectForKey: @"IsFolder"] boolValue])
+    {
+        NSAttributedString * statusString = [self attributedStatusWithColor: highlighted ? [NSColor whiteColor]
+                                                                                        : [NSColor darkGrayColor];
+        NSRect statusRect = [self rectForStatusWithString: statusString inBounds: cellFrame];
+        [statusString drawInRect: statusRect];
+    }
+}
+
+@end
+
+@implementation FileNameCell (Private)
+
+- (NSRect) rectForTitleWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
+{
+    NSSize titleSize = [string size];
     
     NSRect result = bounds;
     
@@ -93,13 +134,12 @@
     return result;
 }
 
-- (NSRect) statusRectForBounds: (NSRect) bounds
+- (NSRect) rectForStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds
 {
     if ([[[self objectValue] objectForKey: @"IsFolder"] boolValue])
         return NSZeroRect;
     
-    NSAttributedString * status = [self attributedStatusWithColor: nil];
-    NSSize statusSize = [status size];
+    NSSize statusSize = [string size];
     
     NSRect result = bounds;
     
@@ -111,32 +151,6 @@
     
     return result;
 }
-
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
-{
-    //icon
-    NSImage * icon = [self image];
-    NSSize iconSize = [icon size];
-    [icon drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSMakeRect(0, 0, iconSize.width, iconSize.height)
-            operation: NSCompositeSourceOver fraction: 1.0];
-    
-    //title
-    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                                isEqual: [NSColor alternateSelectedControlColor]];
-    
-    #warning mimic torrent cell
-    [[self attributedTitleWithColor: highlighted ? [NSColor whiteColor] : [NSColor controlTextColor]]
-        drawInRect: [self titleRectForBounds: cellFrame]];
-    
-    //status
-    NSRect statusRect = [self statusRectForBounds: cellFrame];
-    if (!NSEqualRects(statusRect, NSZeroRect))
-        [[self attributedStatusWithColor: highlighted ? [NSColor whiteColor] : [NSColor darkGrayColor]] drawInRect: statusRect];
-}
-
-@end
-
-@implementation FileNameCell (Private)
 
 - (NSAttributedString *) attributedTitleWithColor: (NSColor *) color
 {

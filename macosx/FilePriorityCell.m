@@ -22,18 +22,12 @@
     return self;
 }
 
-- (void) setItem: (NSMutableDictionary *) item
-{
-    fItem = item;
-}
-
 - (void) setSelected: (BOOL) flag forSegment: (int) segment
 {
     [super setSelected: flag forSegment: segment];
     
     //only for when clicking manually
     Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
-    NSIndexSet * indexes = [fItem objectForKey: @"Indexes"];
     
     int priority;
     if (segment == 0)
@@ -43,20 +37,21 @@
     else
         priority = TR_PRI_NORMAL;
     
-    [torrent setFilePriority: priority forIndexes: indexes];
+    [torrent setFilePriority: priority forIndexes: [[self objectValue] objectForKey: @"Indexes"]];
     [(FileOutlineView *)[self controlView] reloadData];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
-    NSSet * priorities = [torrent filePrioritiesForIndexes: [fItem objectForKey: @"Indexes"]];
+    NSDictionary * dict = [self objectValue];
+    NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
     
     int count = [priorities count];
     
     FileOutlineView * view = (FileOutlineView *)[self controlView];
     int row = [view hoverRow];
-    if (count > 0 && row != -1 && [view itemAtRow: row] == fItem)
+    if (count > 0 && row != -1 && [view itemAtRow: row] == dict)
     {
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];

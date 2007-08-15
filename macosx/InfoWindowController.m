@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
-#import "FilePriorityCell.h"
 #import "StringAdditions.h"
 
 #define FILE_ROW_SMALL_HEIGHT 18.0
@@ -105,12 +104,13 @@
     [self updateInfoForTorrents: [NSArray array]];
     
     //allow for update notifications
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateInfoStats)
-                    name: @"UpdateStats" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
 }
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fTorrents release];
     [fPeers release];
     [fFiles release];
@@ -879,10 +879,6 @@
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
         [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
-    #warning is this redundant? what about objectValue, and remove import too
-    else if ([identifier isEqualToString: @"Priority"])
-        [(FilePriorityCell *)cell setItem: item];
-    else;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object
@@ -903,7 +899,6 @@
         
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: nil];
     }
-    else;
 }
 
 - (NSString *) outlineView: (NSOutlineView *) outlineView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect

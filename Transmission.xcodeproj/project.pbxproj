@@ -121,6 +121,20 @@
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
+		BE75C3650C72A0EF00DBEFE0 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3580C72A0EF00DBEFE0 /* kqueue.c */; };
+		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
+		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
+		BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35B0C72A0EF00DBEFE0 /* log.c */; };
+		BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
+		BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */; };
+		BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35E0C72A0EF00DBEFE0 /* event.c */; };
+		BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35F0C72A0EF00DBEFE0 /* http.c */; };
+		BE75C36D0C72A0EF00DBEFE0 /* event_tagging.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */; };
+		BE75C36E0C72A0EF00DBEFE0 /* evrpc.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3610C72A0EF00DBEFE0 /* evrpc.c */; };
+		BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3620C72A0EF00DBEFE0 /* evdns.c */; };
+		BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3630C72A0EF00DBEFE0 /* poll.c */; };
+		BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3640C72A0EF00DBEFE0 /* select.c */; };
+		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
@@ -128,7 +142,6 @@
 		BEFC1C1C0C07756200B0BB3C /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C110C07756200B0BB3C /* misc.c */; };
 		BEFC1C1F0C07756200B0BB3C /* server.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C150C07756200B0BB3C /* server.c */; };
 		BEFC1C200C07756200B0BB3C /* torrents.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C170C07756200B0BB3C /* torrents.c */; };
-		BEFC1C490C07796B00B0BB3C /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEFC1C480C07796B00B0BB3C /* libevent.a */; };
 		BEFC1CEF0C07822400B0BB3C /* errors.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0F0C07756200B0BB3C /* errors.c */; };
 		BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1D000C07824D00B0BB3C /* torrents.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C170C07756200B0BB3C /* torrents.c */; };
@@ -136,13 +149,11 @@
 		BEFC1D0E0C07827300B0BB3C /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C110C07756200B0BB3C /* misc.c */; };
 		BEFC1D230C07839E00B0BB3C /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0C0C07756200B0BB3C /* client.c */; };
 		BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		BEFC1D2F0C0783E200B0BB3C /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEFC1C480C07796B00B0BB3C /* libevent.a */; };
 		BEFC1D3E0C0783EE00B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1D3F0C0783EE00B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1D490C07842200B0BB3C /* proxy.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C130C07756200B0BB3C /* proxy.c */; };
 		BEFC1D4F0C07843400B0BB3C /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C110C07756200B0BB3C /* misc.c */; };
 		BEFC1D540C07843900B0BB3C /* errors.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0F0C07756200B0BB3C /* errors.c */; };
-		BEFC1D5A0C07844500B0BB3C /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEFC1C480C07796B00B0BB3C /* libevent.a */; };
 		BEFC1E270C07861A00B0BB3C /* xml.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DEE0C07861A00B0BB3C /* xml.h */; };
 		BEFC1E280C07861A00B0BB3C /* xml.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DEF0C07861A00B0BB3C /* xml.c */; };
 		BEFC1E290C07861A00B0BB3C /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF00C07861A00B0BB3C /* version.h */; };
@@ -220,6 +231,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4D18389609DEC0030047D688;
 			remoteInfo = libtransmission;
+		};
+		BE75C34E0C729ED300DBEFE0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE75C3480C729E9500DBEFE0;
+			remoteInfo = event;
 		};
 		BEFC1C020C07751A00B0BB3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -462,6 +480,24 @@
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
+		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE75C3580C72A0EF00DBEFE0 /* kqueue.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kqueue.c; path = "third-party/libevent/kqueue.c"; sourceTree = "<group>"; };
+		BE75C3590C72A0EF00DBEFE0 /* signal.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = signal.c; path = "third-party/libevent/signal.c"; sourceTree = "<group>"; };
+		BE75C35A0C72A0EF00DBEFE0 /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = "third-party/libevent/buffer.c"; sourceTree = "<group>"; };
+		BE75C35B0C72A0EF00DBEFE0 /* log.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = log.c; path = "third-party/libevent/log.c"; sourceTree = "<group>"; };
+		BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = "third-party/libevent/strlcpy.c"; sourceTree = "<group>"; };
+		BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evbuffer.c; path = "third-party/libevent/evbuffer.c"; sourceTree = "<group>"; };
+		BE75C35E0C72A0EF00DBEFE0 /* event.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = event.c; path = "third-party/libevent/event.c"; sourceTree = "<group>"; };
+		BE75C35F0C72A0EF00DBEFE0 /* http.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = http.c; path = "third-party/libevent/http.c"; sourceTree = "<group>"; };
+		BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = event_tagging.c; path = "third-party/libevent/event_tagging.c"; sourceTree = "<group>"; };
+		BE75C3610C72A0EF00DBEFE0 /* evrpc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evrpc.c; path = "third-party/libevent/evrpc.c"; sourceTree = "<group>"; };
+		BE75C3620C72A0EF00DBEFE0 /* evdns.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = evdns.c; path = "third-party/libevent/evdns.c"; sourceTree = "<group>"; };
+		BE75C3630C72A0EF00DBEFE0 /* poll.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = poll.c; path = "third-party/libevent/poll.c"; sourceTree = "<group>"; };
+		BE75C3640C72A0EF00DBEFE0 /* select.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = select.c; path = "third-party/libevent/select.c"; sourceTree = "<group>"; };
+		BE75C3810C72A1C100DBEFE0 /* evhttp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evhttp.h; path = "third-party/libevent/evhttp.h"; sourceTree = "<group>"; };
+		BE75C3820C72A1C100DBEFE0 /* evdns.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evdns.h; path = "third-party/libevent/evdns.h"; sourceTree = "<group>"; };
+		BE75C3830C72A1C100DBEFE0 /* evrpc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = evrpc.h; path = "third-party/libevent/evrpc.h"; sourceTree = "<group>"; };
+		BE75C3840C72A1C100DBEFE0 /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = "third-party/libevent/event.h"; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0C0C07756200B0BB3C /* client.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = client.c; path = daemon/client.c; sourceTree = "<group>"; };
 		BEFC1C0D0C07756200B0BB3C /* client.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = client.h; path = daemon/client.h; sourceTree = "<group>"; };
@@ -476,7 +512,6 @@
 		BEFC1C160C07756200B0BB3C /* server.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = server.h; path = daemon/server.h; sourceTree = "<group>"; };
 		BEFC1C170C07756200B0BB3C /* torrents.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = torrents.c; path = daemon/torrents.c; sourceTree = "<group>"; };
 		BEFC1C180C07756200B0BB3C /* torrents.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = torrents.h; path = daemon/torrents.h; sourceTree = "<group>"; };
-		BEFC1C480C07796B00B0BB3C /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = libevent/libevent.a; sourceTree = "<group>"; };
 		BEFC1CF90C07822400B0BB3C /* transmission-remote */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-remote"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1D430C0783EE00B0BB3C /* transmission-proxy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-proxy"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1DEE0C07861A00B0BB3C /* xml.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = xml.h; path = libtransmission/xml.h; sourceTree = "<group>"; };
@@ -536,7 +571,6 @@
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
 		BEFC1E250C07861A00B0BB3C /* bsdqueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdqueue.h; path = libtransmission/bsdqueue.h; sourceTree = "<group>"; };
 		BEFC1E260C07861A00B0BB3C /* trcompat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trcompat.h; path = libtransmission/trcompat.h; sourceTree = "<group>"; };
-		BEFC1EEB0C0790CA00B0BB3C /* event.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = event.h; path = libevent/event.h; sourceTree = "<group>"; };
 		D4AF3B2D0C41F7A500D46B6B /* list.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = list.c; path = libtransmission/list.c; sourceTree = "<group>"; };
 		D4AF3B2E0C41F7A500D46B6B /* list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = list.h; path = libtransmission/list.h; sourceTree = "<group>"; };
 		E138A9730C04D88F00C5426C /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = "<group>"; };
@@ -568,13 +602,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE75C3470C729E9500DBEFE0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE75C3860C72A1D300DBEFE0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BEFC1BFE0C07750000B0BB3C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */,
-				BEFC1C490C07796B00B0BB3C /* libevent.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,7 +632,6 @@
 			files = (
 				BEFC1CF40C07822400B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D2D0C0783D900B0BB3C /* libtransmission.a in Frameworks */,
-				BEFC1D2F0C0783E200B0BB3C /* libevent.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,7 +641,6 @@
 			files = (
 				BEFC1D3E0C0783EE00B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */,
 				BEFC1D3F0C0783EE00B0BB3C /* libtransmission.a in Frameworks */,
-				BEFC1D5A0C07844500B0BB3C /* libevent.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -664,6 +710,7 @@
 				BEFC1C000C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CF90C07822400B0BB3C /* transmission-remote */,
 				BEFC1D430C0783EE00B0BB3C /* transmission-proxy */,
+				BE75C3490C729E9500DBEFE0 /* libevent.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -676,6 +723,7 @@
 				4DDBB71F09E16BFE00284745 /* CLI */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
+				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = Transmission;
@@ -851,8 +899,6 @@
 		4DDBB71509E16B3F00284745 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				BEFC1EEB0C0790CA00B0BB3C /* event.h */,
-				BEFC1C480C07796B00B0BB3C /* libevent.a */,
 				4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */,
 			);
 			name = Libraries;
@@ -864,6 +910,30 @@
 				4DDBB71B09E16BF100284745 /* transmissioncli.c */,
 			);
 			name = CLI;
+			sourceTree = "<group>";
+		};
+		BE75C3570C72A0D600DBEFE0 /* libevent */ = {
+			isa = PBXGroup;
+			children = (
+				BE75C3810C72A1C100DBEFE0 /* evhttp.h */,
+				BE75C3820C72A1C100DBEFE0 /* evdns.h */,
+				BE75C3830C72A1C100DBEFE0 /* evrpc.h */,
+				BE75C3840C72A1C100DBEFE0 /* event.h */,
+				BE75C3580C72A0EF00DBEFE0 /* kqueue.c */,
+				BE75C3590C72A0EF00DBEFE0 /* signal.c */,
+				BE75C35A0C72A0EF00DBEFE0 /* buffer.c */,
+				BE75C35B0C72A0EF00DBEFE0 /* log.c */,
+				BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */,
+				BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */,
+				BE75C35E0C72A0EF00DBEFE0 /* event.c */,
+				BE75C35F0C72A0EF00DBEFE0 /* http.c */,
+				BE75C3600C72A0EF00DBEFE0 /* event_tagging.c */,
+				BE75C3610C72A0EF00DBEFE0 /* evrpc.c */,
+				BE75C3620C72A0EF00DBEFE0 /* evdns.c */,
+				BE75C3630C72A0EF00DBEFE0 /* poll.c */,
+				BE75C3640C72A0EF00DBEFE0 /* select.c */,
+			);
+			name = libevent;
 			sourceTree = "<group>";
 		};
 		BEFC1C0B0C07754700B0BB3C /* daemon */ = {
@@ -1003,6 +1073,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE75C3450C729E9500DBEFE0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1014,10 +1091,12 @@
 				4D18389309DEC0030047D688 /* Headers */,
 				4D18389409DEC0030047D688 /* Sources */,
 				BEFC1CA00C077F1200B0BB3C /* Resources */,
+				BE75C3860C72A1D300DBEFE0 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -1060,6 +1139,24 @@
 			productName = Transmission;
 			productReference = 8D1107320486CEB800E47090 /* Transmission.app */;
 			productType = "com.apple.product-type.application";
+		};
+		BE75C3480C729E9500DBEFE0 /* event */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE75C34A0C729EB600DBEFE0 /* Build configuration list for PBXNativeTarget "event" */;
+			buildPhases = (
+				BE75C3510C729EE100DBEFE0 /* ShellScript */,
+				BE75C3450C729E9500DBEFE0 /* Headers */,
+				BE75C3460C729E9500DBEFE0 /* Sources */,
+				BE75C3470C729E9500DBEFE0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = event;
+			productName = event;
+			productReference = BE75C3490C729E9500DBEFE0 /* libevent.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		BEFC1BFF0C07750000B0BB3C /* transmission-daemon */ = {
 			isa = PBXNativeTarget;
@@ -1140,6 +1237,7 @@
 				BEFC1BFF0C07750000B0BB3C /* transmission-daemon */,
 				BEFC1CEA0C07822400B0BB3C /* transmission-remote */,
 				BEFC1D340C0783EE00B0BB3C /* transmission-proxy */,
+				BE75C3480C729E9500DBEFE0 /* event */,
 			);
 		};
 /* End PBXProject section */
@@ -1238,6 +1336,19 @@
 			shellPath = /bin/sh;
 			shellScript = "sh version.sh";
 		};
+		BE75C3510C729EE100DBEFE0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "if [ ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then\nln -s ../macosx-libevent-config.h ./third-party/libevent/config.h\nfi";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1329,6 +1440,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE75C3460C729E9500DBEFE0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE75C3650C72A0EF00DBEFE0 /* kqueue.c in Sources */,
+				BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */,
+				BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */,
+				BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */,
+				BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */,
+				BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */,
+				BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */,
+				BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */,
+				BE75C36D0C72A0EF00DBEFE0 /* event_tagging.c in Sources */,
+				BE75C36E0C72A0EF00DBEFE0 /* evrpc.c in Sources */,
+				BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */,
+				BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */,
+				BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BEFC1BFD0C07750000B0BB3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1375,6 +1506,11 @@
 			isa = PBXTargetDependency;
 			target = 4D18389609DEC0030047D688 /* libtransmission */;
 			targetProxy = 4D9A2BF409E16D30002D0FF9 /* PBXContainerItemProxy */;
+		};
+		BE75C34F0C729ED300DBEFE0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE75C3480C729E9500DBEFE0 /* event */;
+			targetProxy = BE75C34E0C729ED300DBEFE0 /* PBXContainerItemProxy */;
 		};
 		BEFC1C030C07751A00B0BB3C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1606,6 +1742,24 @@
 			};
 			name = Debug;
 		};
+		BE75C34B0C729EB600DBEFE0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				PREBINDING = NO;
+				PRODUCT_NAME = event;
+				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
 		BEFC1C0A0C07753800B0BB3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1729,6 +1883,14 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C59D089918A300DD8943 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE75C34A0C729EB600DBEFE0 /* Build configuration list for PBXNativeTarget "event" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE75C34B0C729EB600DBEFE0 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

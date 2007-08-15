@@ -10,6 +10,4 @@
     NSImage * fLowImage, * fHighImage, * fNormalImage, * fMixedImage, * fNoneImage;
 }
 
-- (void) setItem: (NSMutableDictionary *) item;
-
 @end
