@@ -99,7 +99,7 @@
     [titleString drawInRect: titleRect];
     
     //status
-    if ([[[self objectValue] objectForKey: @"IsFolder"] boolValue])
+    if (![[[self objectValue] objectForKey: @"IsFolder"] boolValue])
     {
         NSAttributedString * statusString = [self attributedStatusWithColor: highlighted ? [NSColor whiteColor]
                                                                                         : [NSColor darkGrayColor]];

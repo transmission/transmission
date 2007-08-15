@@ -879,6 +879,9 @@
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Check"])
         [cell setEnabled: [[fTorrents objectAtIndex: 0] canChangeDownloadCheckForFiles: [item objectForKey: @"Indexes"]]];
+    else if ([identifier isEqualToString: @"Priority"])
+        [cell setRepresentedObject: item];
+    else;
 }
 
 - (void) outlineView: (NSOutlineView *) outlineView setObjectValue: (id) object

@@ -37,14 +37,14 @@
     else
         priority = TR_PRI_NORMAL;
     
-    [torrent setFilePriority: priority forIndexes: [[self objectValue] objectForKey: @"Indexes"]];
+    [torrent setFilePriority: priority forIndexes: [[self representedObject] objectForKey: @"Indexes"]];
     [(FileOutlineView *)[self controlView] reloadData];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
-    NSDictionary * dict = [self objectValue];
+    NSDictionary * dict = [self representedObject];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
     
     int count = [priorities count];
