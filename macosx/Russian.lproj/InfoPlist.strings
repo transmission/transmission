@@ -1,0 +1,4 @@
+﻿/* Localized versions of Info.plist keys */
+
+CFBundleName = "Transmission";
+NSHumanReadableCopyright = "Все права защищены 2005-2007 The Transmission Project";
