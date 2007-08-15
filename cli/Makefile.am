@@ -6,6 +6,7 @@ bin_PROGRAMS = transmission-cli
 transmission_cli_SOURCES = transmissioncli.c
 
 transmission_cli_LDADD = \
-    ../libtransmission/libtransmission.a \
-    $(LIBEVENT_LIBS) \
+    $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/libevent/libevent.la \
     $(PTHREAD_LIBS) -lm
+

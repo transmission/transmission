@@ -17,7 +17,7 @@ Xmission_SOURCES = \
   xmission.cc
 
 Xmission_LDADD = \
-  ../libtransmission/libtransmission.a \
-  $(LIBEVENT_LIBS) \
+  $(top_builddir)/libtransmission/libtransmission.a \
+  $(top_builddir)/third-party/libevent/libevent.la \
   $(WX_LIBS) \
   $(PTHREAD_LIBS) -lm

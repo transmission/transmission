@@ -6,7 +6,7 @@ AC_PREREQ(2.54)
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
-AM_MAINTAINER_MODE
+AC_PROG_LIBTOOL
 
 GLIB_MINIMUM=2.6.0
 GTK_MINIMUM=2.6.0
@@ -48,9 +48,7 @@ dnl  libevent fun
 
 AC_CONFIG_SUBDIRS([third-party/libevent])
 AC_MSG_NOTICE([invoking libevent's configure script])
-LIBEVENT_LIBS="\$(top_srcdir)/third-party/libevent/.libs/libevent.a"
 LIBEVENT_CPPFLAGS="-I\$(top_srcdir)/third-party/libevent"
-AC_SUBST(LIBEVENT_LIBS)
 AC_SUBST(LIBEVENT_CPPFLAGS)
 
 

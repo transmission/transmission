@@ -19,7 +19,12 @@ bin_PROGRAMS = \
     transmission-remote \
     transmission-proxy
 
-COMMON_LDADD = ./libdaemon.a ../libtransmission/libtransmission.a -levent $(PTHREAD_LIBS) -lm
+COMMON_LDADD = \
+    ./libdaemon.a \
+    $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/libevent/libevent.la \
+    $(PTHREAD_LIBS) -lm
+
 transmission_daemon_SOURCES = daemon.c server.c torrents.c
 transmission_daemon_LDADD = $(COMMON_LDADD)
 transmission_remote_SOURCES = client.c remote.c

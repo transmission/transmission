@@ -50,8 +50,8 @@ transmission_gtk_SOURCES = \
     util.c
 
 transmission_gtk_LDADD = \
-    ../libtransmission/libtransmission.a \
+    $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/libevent/libevent.la \
     $(GTK_LIBS) \
     $(GLIB_LIBS) \
-    $(LIBEVENT_LIBS) \
     $(PTHREAD_LIBS) -lm
