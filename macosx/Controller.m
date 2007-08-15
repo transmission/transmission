@@ -817,7 +817,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     tr_info_t info;
     while ([files count] > 0)
     {
-        torrentPath = [files objectAtIndex: 0];
+        torrentPath = [[files objectAtIndex: 0] retain];
         canAdd = tr_torrentParse(fLib, [torrentPath UTF8String], NULL, &info);
         if (canAdd == TR_OK)
             break;
@@ -836,8 +836,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [self updateTorrentHistory];
         return;
     }
-
+    
     [files removeObjectAtIndex: 0];
+    
     NSOpenPanel * panel = [NSOpenPanel openPanel];
 
     [panel setPrompt: NSLocalizedString(@"Select", "Open torrent -> prompt")];
@@ -848,10 +849,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     
     [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
                         "Open torrent -> select destination folder"), [NSString stringWithUTF8String: info.name]]];
-    
-    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: [torrentPath retain], @"Path",
-                                    files, @"Files", [NSNumber numberWithInt: deleteTorrent], @"DeleteTorrent", nil];
     tr_metainfoFree(&info);
+    
+    NSDictionary * dictionary = [[NSDictionary alloc] initWithObjectsAndKeys: torrentPath, @"Path",
+                                    files, @"Files", [NSNumber numberWithInt: deleteTorrent], @"DeleteTorrent", nil];
+    [torrentPath release];
     
     [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: fWindow modalDelegate: self
             didEndSelector: @selector(folderChoiceClosed:returnCode:contextInfo:) contextInfo: dictionary];
