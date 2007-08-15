@@ -111,6 +111,10 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 /* uncomment this to disable support for the azureus protocol bit */
 /* #define DISABLE_AZPROTO */
 
+/* uncomment this to use the new reserved bits proposed here:
+   http://www.azureuswiki.com/index.php/Extension_negotiation_protocol */
+/* #define NEW_AZ_BITS */
+
 #define HANDSHAKE_NAME          "\023BitTorrent protocol"
 #define HANDSHAKE_NAME_LEN      20
 #define HANDSHAKE_FLAGS_OFF     HANDSHAKE_NAME_LEN
@@ -119,6 +123,7 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 #define HANDSHAKE_PEERID_OFF    ( HANDSHAKE_HASH_OFF + SHA_DIGEST_LENGTH )
 #define HANDSHAKE_SIZE          ( HANDSHAKE_PEERID_OFF + TR_ID_LEN )
 
+/* these macros test and set the bit indicating extended messaging support */
 #ifdef DISABLE_EXTMSGS
 #define HANDSHAKE_HAS_EXTMSGS( bits ) ( 0 )
 #define HANDSHAKE_SET_EXTMSGS( bits ) ( (void)0 )
@@ -127,6 +132,7 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 #define HANDSHAKE_SET_EXTMSGS( bits ) ( (bits)[5] |= 0x10 )
 #endif
 
+/* these macros test and set the bit indicating azureus protocol support */
 #ifdef DISABLE_AZPROTO
 #define HANDSHAKE_HAS_AZPROTO( bits ) ( 0 )
 #define HANDSHAKE_SET_AZPROTO( bits ) ( (void)0 )
@@ -134,6 +140,20 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 #define HANDSHAKE_HAS_AZPROTO( bits ) ( (bits)[0] & 0x80 )
 #define HANDSHAKE_SET_AZPROTO( bits ) ( (bits)[0] |= 0x80 )
 #endif
+
+/* these macros are to be used if both extended messaging and the
+   azureus protocol is supported, they indicate which protocol is preferred */
+#ifdef NEW_AZ_BITS
+#define HANDSHAKE_GET_EXTPREF( bits )      ( (bits)[5] & 0x03 )
+#define HANDSHAKE_SET_EXTPREF( bits, val ) ( (bits)[5] |= 0x03 & (val) )
+#else
+#define HANDSHAKE_GET_EXTPREF( bits )      ( 0 )
+#define HANDSHAKE_SET_EXTPREF( bits, val ) ( (void)0 )
+#endif
+#define HANDSHAKE_EXTPREF_FORCE_EXT        ( 0x00 )
+#define HANDSHAKE_EXTPREF_WANT_EXT         ( 0x01 )
+#define HANDSHAKE_EXTPREF_WANT_AZ          ( 0x10 )
+#define HANDSHAKE_EXTPREF_FORCE_AZ         ( 0x11 )
 
 #define PEER_MSG_CHOKE          0
 #define PEER_MSG_UNCHOKE        1
@@ -558,6 +578,8 @@ int tr_peerPulse( tr_peer_t * peer )
         memset( buf + HANDSHAKE_FLAGS_OFF, 0, HANDSHAKE_FLAGS_LEN );
         HANDSHAKE_SET_EXTMSGS( buf + HANDSHAKE_FLAGS_OFF );
         HANDSHAKE_SET_AZPROTO( buf + HANDSHAKE_FLAGS_OFF );
+        HANDSHAKE_SET_EXTPREF( buf + HANDSHAKE_FLAGS_OFF,
+                               HANDSHAKE_EXTPREF_WANT_EXT );
         memcpy( buf + HANDSHAKE_HASH_OFF, inf->hash, SHA_DIGEST_LENGTH );
         memcpy( buf + HANDSHAKE_PEERID_OFF, tor->peer_id, TR_ID_LEN );
 

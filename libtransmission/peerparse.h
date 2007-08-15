@@ -603,7 +603,8 @@ static const uint8_t * parseBufHash( const tr_peer_t * peer )
 static int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
 {
     tr_info_t * inf = &tor->info;
-    int         ii;
+    int         ii, extmsgs, azproto;
+    char      * dbgsup, * dbgwant;
 
     if( 0 != memcmp( peer->buf + HANDSHAKE_HASH_OFF, inf->hash,
                      SHA_DIGEST_LENGTH ) )
@@ -635,26 +636,63 @@ static int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
         }
     }
 
+    extmsgs = 0;
+    azproto = 0;
+    dbgsup  = "";
+    dbgwant = "";
+
     if( HANDSHAKE_HAS_EXTMSGS( peer->buf + HANDSHAKE_FLAGS_OFF ) )
+    {
+        dbgsup = " extended messaging supported";
+        extmsgs = 1;
+    }
+    if( HANDSHAKE_HAS_AZPROTO( peer->buf + HANDSHAKE_FLAGS_OFF ) )
+    {
+        dbgsup = " will use azureus protocol";
+        azproto = 1;
+    }
+    if( extmsgs && azproto )
+    {
+        dbgsup = " both extended and azureus messaging supported";
+        switch( HANDSHAKE_GET_EXTPREF( peer->buf + HANDSHAKE_FLAGS_OFF ) )
+        {
+            case HANDSHAKE_EXTPREF_FORCE_EXT:
+                dbgwant = ", peer forces extended";
+                azproto = 0;
+                break;
+            case HANDSHAKE_EXTPREF_WANT_EXT:
+                dbgwant = ", peer prefers extended";
+                azproto = 0;
+                break;
+            case HANDSHAKE_EXTPREF_WANT_AZ:
+                dbgwant = ", peer prefers azureus";
+                extmsgs = 0;
+                break;
+            case HANDSHAKE_EXTPREF_FORCE_AZ:
+                dbgwant = ", peer forces azureus";
+                extmsgs = 0;
+                break;
+        }
+    }
+    assert( !extmsgs || !azproto );
+
+    if( extmsgs )
     {
         peer->status = PEER_STATUS_CONNECTED;
         peer->extStatus = EXTENDED_SUPPORTED;
-        peer_dbg( "GET  handshake, ok (%s) extended messaging supported",
-                  tr_peerClient( peer ) );
     }
-    else if( HANDSHAKE_HAS_AZPROTO( peer->buf + HANDSHAKE_FLAGS_OFF ) )
+    else if( azproto )
     {
         peer->status  = PEER_STATUS_AZ_GIVER;
         peer->azproto = 1;
         peer->date    = tr_date();
-        peer_dbg( "GET  handshake, ok (%s) will use azureus protocol",
-                  tr_peerClient( peer ) );
     }
     else
     {
         peer->status = PEER_STATUS_CONNECTED;
-        peer_dbg( "GET  handshake, ok (%s)", tr_peerClient( peer ) );
     }
+    peer_dbg( "GET  handshake, ok (%s)%s%s",
+              tr_peerClient( peer ), dbgsup, dbgwant );
 
     return TR_OK;
 }
