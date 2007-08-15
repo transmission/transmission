@@ -1,4 +1,10 @@
 #!/bin/sh
-autoreconf --force --install -I config -I m4
+
+LIBTOOLIZE=libtoolize
+if [ "$(uname)" == "Darwin" ] ; then
+  LIBTOOLIZE=glibtoolize
+fi
+
+autoreconf -fiv -I config -I m4
 cd third-party/libevent
-sh ./autogen.sh
+autoreconf -fiv -I config -I m4
