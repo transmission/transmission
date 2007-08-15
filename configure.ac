@@ -204,6 +204,7 @@ AC_CONFIG_FILES([Makefile
                  wx/Makefile
                  wx/images/Makefile])
 
+ac_configure_args="$ac_configure_args --enable-static --disable-shared"
 AC_OUTPUT
 
 echo "
