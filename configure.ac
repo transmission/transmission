@@ -56,21 +56,25 @@ dnl ----------------------------------------------------------------------------
 dnl
 dnl  detection for the GTK+ client
 
-AM_PATH_GTK_2_0($GTK_MINIMUM,[have_gtk=yes],[have_gtk=no][gthread])
+have_gtk=yes
+PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= $GTK_MINIMUM
+                        glib-2.0 >= $GLIB_MINIMUM
+                        gmodule-2.0 >= $GLIB_MINIMUM
+                        gthread-2.0 >= $GLIB_MINIMUM],, [have_gtk=no])
 AC_ARG_WITH(gtk, AC_HELP_STRING([--with-gtk], [Build gtk client]),
                  [want_gtk=$withval],
                  [want_gtk=$have_gtk])
 use_gtk=no
 if test "x$want_gtk" = "xyes" ; then
     if test "x$have_gtk" = "xyes"; then
-      AM_PATH_GLIB_2_0($GLIB_MINIMUM,,exit 1,gobject gmodule gthread)
-      AM_PATH_GTK_2_0($GTK_MINIMUM,,exit 1,gthread)
       use_gtk=yes
     else
       AC_MSG_ERROR("GTK+ not found!")
     fi
 fi
 AM_CONDITIONAL([WITH_GTK],[test "x$use_gtk" = "xyes"])
+AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_CFLAGS)
 
 
 dnl ----------------------------------------------------------------------------
