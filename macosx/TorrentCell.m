@@ -54,7 +54,7 @@
 
 - (void) drawSimpleBar: (NSRect) barRect;
 - (void) drawAdvancedBar: (NSRect) barRect;
-- (NSImage *) advancedBarSimple;
+- (NSImage *) advancedBar;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
@@ -369,7 +369,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 
 - (void) drawAdvancedBar: (NSRect) barRect
 {
-    [[self advancedBarSimple] drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [[self advancedBar] drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     if (!fTransparentGradient)
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
@@ -379,7 +379,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
-- (NSImage *) advancedBarSimple
+- (NSImage *) advancedBar
 {
     if (!fBitmap)
         fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil

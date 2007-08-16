@@ -27,6 +27,8 @@
 #import "Controller.h"
 #import "Torrent.h"
 
+#define PADDING 3.0
+
 #define BUTTON_TO_TOP_REGULAR 33.0
 #define BUTTON_TO_TOP_SMALL 20.0
 
@@ -474,17 +476,15 @@
 {
     if (row < 0)
         return NSZeroRect;
-    else if ([fDefaults boolForKey: @"SmallView"])
-    {
-        TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
-        return [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]];
-    }
-    else;
     
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row],
+            iconRect = [cell iconRectForBounds: cellRect];
     
-    return NSMakeRect(cellRect.origin.x + PADDING +
-                        ([[[fTorrents objectAtIndex: row] iconFlipped] size].width - ACTION_BUTTON_WIDTH) * 0.5,
+    if ([fDefaults boolForKey: @"SmallView"])
+        return iconRect;
+    else
+        return NSMakeRect(iconRect.origin.x + (iconRect.size.width - ACTION_BUTTON_WIDTH) * 0.5,
                         cellRect.origin.y + ACTION_BUTTON_TO_TOP, ACTION_BUTTON_WIDTH, ACTION_BUTTON_HEIGHT);
 }
 

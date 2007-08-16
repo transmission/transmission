@@ -26,8 +26,6 @@
 #import <transmission.h>
 #import <Controller.h>
 
-#define PADDING 3.0
-
 //button layout (from end of bar) is: button, padding, button, padding
 #define BUTTON_WIDTH 14.0
 #define BUTTONS_TOTAL_WIDTH 36.0
