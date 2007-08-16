@@ -613,7 +613,7 @@ static int parseHandshake( tr_torrent_t * tor, tr_peer_t * peer )
         return TR_ERROR;
     }
 
-    if( 0 == memcmp( peer->buf + HANDSHAKE_PEERID_OFF, tor->peer_id,
+    if( 0 == memcmp( peer->buf + HANDSHAKE_PEERID_OFF, getPeerId(),
                      TR_ID_LEN ) )
     {
         /* We are connected to ourselves... */

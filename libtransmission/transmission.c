@@ -93,30 +93,19 @@ tr_handle_t * tr_init( const char * tag )
     tr_netResolveThreadInit();
 
     h = calloc( 1, sizeof( tr_handle_t ) );
-    if( NULL == h )
-    {
+    if( !h )
         return NULL;
-    }
 
     h->tag = strdup( tag );
-    if( NULL == h->tag )
-    {
+    if( !h->tag ) {
         free( h );
         return NULL;
     }
 
-    /* Random key */
-    for( i=0; i < TR_KEY_LEN; ++i )
-    {
-        const int r = tr_rand( 36 );
-        h->key[i] = ( r < 26 ) ? ( 'a' + r ) : ( '0' + r - 26 ) ;
-    }
 
     /* Azureus identity */
     for( i=0; i < TR_AZ_ID_LEN; ++i )
-    {
         h->azId[i] = tr_rand( 0xff );
-    }
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */

@@ -419,6 +419,12 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
                     continue;
                 }
 
+                if( !inf->primaryAddress ) {
+                     char buf[1024];
+                     snprintf( buf, sizeof(buf), "%s:%d", tmp.address, tmp.port );
+                     inf->primaryAddress = tr_strdup( buf );
+                }
+
                 /* place the item info in a random location in the sublist */
                 random = tr_rand( subcount + 1 );
                 if( random != subcount )
@@ -487,7 +493,6 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             tr_err( "Invalid announce URL (%s)", val->val.s.s );
             return TR_EINVALID;
         }
-
         sublist                   = calloc( 1, sizeof( sublist[0] ) );
         sublist[0].address        = address;
         sublist[0].port           = port;
@@ -497,6 +502,13 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
         inf->trackerList[0].list  = sublist;
         inf->trackerList[0].count = 1;
         inf->trackerTiers         = 1;
+
+        if( !inf->primaryAddress ) {
+            char buf[1024];
+            snprintf( buf, sizeof(buf), "%s:%d", sublist[0].address, sublist[0].port );
+            inf->primaryAddress = tr_strdup( buf );
+        }
+
     }
 
     return TR_OK;

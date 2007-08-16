@@ -113,6 +113,44 @@ tr_torrentGetSpeedLimit( const tr_torrent_t  * tor,
 
 /***
 ****
+***/
+
+static void setRunState( tr_torrent_t *, run_status_t );
+
+static void
+onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
+{
+    tr_torrent_t * tor = (tr_torrent_t *) user_data;
+    tr_tracker_event_t * event = (tr_tracker_event_t *) vevent;
+
+    switch( event->messageType )
+    {
+        case TR_TRACKER_PEERS:
+            tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
+                                  event->peerCompact, event->peerCount );
+            break;
+
+        case TR_TRACKER_WARNING:
+            tr_err( "Tracker: Warning - %s", event->text );
+            tor->error = TR_ERROR_TC_WARNING;
+            strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
+            break;
+
+        case TR_TRACKER_ERROR:
+            tr_err( "Tracker: Error - %s", event->text );
+            tor->error = TR_ERROR_TC_ERROR;
+            strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
+            break;
+
+        case TR_TRACKER_STOPPED:
+            if( tor->runStatus == TR_RUN_STOPPING_NET_WAIT )
+                setRunState( tor, TR_RUN_STOPPED );
+            break;
+    }
+}
+
+/***
+****
 ****  TORRENT INSTANTIATION
 ****
 ***/
@@ -140,7 +178,6 @@ initFilePieces ( tr_info_t * info, int fileIndex )
     lastByte = firstByte + (file->length ? file->length-1 : 0);
     file->firstPiece = getBytePiece( info, firstByte );
     file->lastPiece = getBytePiece( info, lastByte );
-    tr_dbg( "file #%d is in pieces [%d...%d] (%s)", fileIndex, file->firstPiece, file->lastPiece, file->name );
 }
 
 static tr_priority_t
@@ -195,7 +232,6 @@ torrentRealInit( tr_handle_t   * h,
                  const char    * destination,
                  int             flags )
 {
-    int i;
     uint64_t loaded;
     uint64_t t;
     char name[512];
@@ -209,18 +245,8 @@ torrentRealInit( tr_handle_t   * h,
     tor->destination = tr_strdup( destination );
 
     tor->handle   = h;
-    tor->key      = h->key;
     tor->azId     = h->azId;
     tor->hasChangedState = -1;
-    
-    /* Escaped info hash for HTTP queries */
-    for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
-    {
-        snprintf( &tor->escapedHashString[3*i],
-                  sizeof( tor->escapedHashString ) - 3 * i,
-                  "%%%02x", tor->info.hash[i] );
-    }
-
     tor->pexDisabled = 0;
 
     /**
@@ -315,6 +341,11 @@ torrentRealInit( tr_handle_t   * h,
     }
 
     tor->cpStatus = tr_cpGetStatus( tor->completion );
+
+    tor->tracker = tr_trackerNew( tor );
+    tor->trackerSubscription = tr_trackerSubscribe( tor->tracker, onTrackerResponse, tor );
+    if( tor->runStatus == TR_RUN_RUNNING )
+        tr_trackerStart( tor->tracker );
 
     tr_sharedLock( h->shared );
     tor->next = h->torrentList;
@@ -560,6 +591,18 @@ tr_torrentGetFolder( const tr_torrent_t * tor )
     return tor->destination;
 }
 
+void
+tr_torrentChangeMyPort( tr_torrent_t * tor, int port )
+{
+    tr_torrentWriterLock( tor );
+
+    tor->publicPort = port;
+
+    if( tor->tracker )
+        tr_trackerChangeMyPort( tor->tracker );
+
+    tr_torrentWriterUnlock( tor );
+}
 
 /***********************************************************************
  * torrentReallyStop
@@ -614,7 +657,7 @@ void
 tr_manualUpdate( tr_torrent_t * tor )
 {
     if( tor->runStatus == TR_RUN_RUNNING )
-        tr_trackerManualAnnounce( tor->tracker );
+        tr_trackerReannounce( tor->tracker );
 }
 int
 tr_torrentCanManualUpdate( const tr_torrent_t * tor )
@@ -628,7 +671,7 @@ const tr_stat_t *
 tr_torrentStat( tr_torrent_t * tor )
 {
     tr_stat_t * s;
-    tr_tracker_t * tc;
+    struct tr_tracker_s * tc;
     int i;
 
     tr_torrentReaderLock( tor );
@@ -641,10 +684,7 @@ tr_torrentStat( tr_torrent_t * tor )
             sizeof( s->errorString ) );
 
     tc = tor->tracker;
-    s->cannotConnect = tr_trackerCannotConnect( tc );
-    s->tracker = tc
-        ? tr_trackerGet( tc )
-        : &tor->info.trackerList[0].list[0];
+    s->tracker = tr_trackerGetAddress( tor->tracker );
 
     /* peers... */
     memset( s->peersFrom, 0, sizeof( s->peersFrom ) );
@@ -705,10 +745,11 @@ tr_torrentStat( tr_torrent_t * tor )
         ? tr_rcRate( tor->download )
         : 0.0;
     s->rateUpload = tr_rcRate( tor->upload );
-    
-    s->seeders  = tr_trackerSeeders( tc );
-    s->leechers = tr_trackerLeechers( tc );
-    s->completedFromTracker = tr_trackerDownloaded( tc );
+   
+    tr_trackerGetCounts( tc,
+                         &s->completedFromTracker,
+                         &s->leechers, 
+                         &s->seeders );
 
     s->swarmspeed = tr_rcRate( tor->swarmspeed );
     
@@ -994,7 +1035,7 @@ int tr_torrentAttachPeer( tr_torrent_t * tor, tr_peer_t * peer )
 }
 
 int tr_torrentAddCompact( tr_torrent_t * tor, int from,
-                           uint8_t * buf, int count )
+                           const uint8_t * buf, int count )
 {
     struct in_addr addr;
     tr_port_t port;
@@ -1002,14 +1043,15 @@ int tr_torrentAddCompact( tr_torrent_t * tor, int from,
     tr_peer_t * peer;
 
     added = 0;
-    for( i = 0; i < count; i++ )
+    for( i=0; i<count; ++i )
     {
         memcpy( &addr, buf, 4 ); buf += 4;
         memcpy( &port, buf, 2 ); buf += 2;
-
         peer = tr_peerInit( &addr, port, -1, from );
         added += tr_torrentAttachPeer( tor, peer );
     }
+
+    tr_inf( "tr_torrentAddCompact %d peers to %s", added, tor->info.name );
 
     return added;
 }
@@ -1028,6 +1070,8 @@ static void setRunState( tr_torrent_t * tor, run_status_t run )
 void tr_torrentStart( tr_torrent_t * tor )
 {
     setRunState( tor, TR_RUN_RUNNING );
+
+    tr_trackerStart( tor->tracker );
 }
 
 void tr_torrentStop( tr_torrent_t * tor )
@@ -1057,6 +1101,10 @@ tr_torrentFree( tr_torrent_t * tor )
     tr_rcClose( tor->upload );
     tr_rcClose( tor->download );
     tr_rcClose( tor->swarmspeed );
+
+    tr_trackerUnsubscribe( tor->tracker, tor->trackerSubscription );
+    tr_trackerFree( tor->tracker );
+    tor->tracker = NULL;
 
     tr_free( tor->destination );
 
@@ -1093,7 +1141,6 @@ recheckCpState( tr_torrent_t * tor )
         tor->cpStatus = cpStatus;
         tor->hasChangedState = tor->cpStatus;  /* tell the client... */
         if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
-            && tor->tracker!=NULL           /* and we have a tracker */
             && tor->downloadedCur ) {        /* and it just happened */
             tr_trackerCompleted( tor->tracker ); /* tell the tracker */
         }
@@ -1129,8 +1176,6 @@ torrentThreadLoop ( void * _tor )
         if( tor->runStatus == TR_RUN_STOPPING )
         {
             int i;
-            int peerCount;
-            uint8_t * peerCompact;
             tr_torrentWriterLock( tor );
 
             /* close the IO */
@@ -1149,8 +1194,7 @@ torrentThreadLoop ( void * _tor )
             tr_rcReset( tor->swarmspeed );
 
             /* tell the tracker we're stopping */
-            tr_trackerStopped( tor->tracker );
-            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
+            tr_trackerStop( tor->tracker );
             tor->runStatus = TR_RUN_STOPPING_NET_WAIT;
             tor->stopDate = tr_date();
             tr_torrentWriterUnlock( tor );
@@ -1158,21 +1202,11 @@ torrentThreadLoop ( void * _tor )
 
         if( tor->runStatus == TR_RUN_STOPPING_NET_WAIT )
         {
-            uint64_t date;
-            int peerCount;
-            uint8_t * peerCompact;
-            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
-
-            /* have we finished telling the tracker that we're stopping? */
-            date = tr_trackerLastResponseDate( tor->tracker );
-            if( date > tor->stopDate )
-            {
-                tr_torrentWriterLock( tor );
-                tr_trackerClose( tor->tracker );
-                tor->tracker = NULL;
-                tor->runStatus = TR_RUN_STOPPED;
-                tr_torrentWriterUnlock( tor );
-            }
+#if 0
+            tr_torrentWriterLock( tor );
+            tor->runStatus = TR_RUN_STOPPED;
+            tr_torrentWriterUnlock( tor );
+#endif
             continue;
         }
 
@@ -1208,30 +1242,18 @@ torrentThreadLoop ( void * _tor )
         if( tor->runStatus == TR_RUN_RUNNING )
         {
             int i;
-            int peerCount;
-            uint8_t * peerCompact;
 
             /* starting to run... */
-            if( tor->io == NULL ) {
+            if( tor->io == NULL )
+            {
                 *tor->errorString = '\0';
                 tr_torrentResetTransferStats( tor );
                 tor->io = tr_ioNew( tor );
-                tr_peerIdNew ( tor->peer_id, sizeof(tor->peer_id) );
-                tor->tracker = tr_trackerInit( tor );
                 tor->startDate = tr_date();
             }
 
             /* refresh our completion state */
             recheckCpState( tor );
-
-            /* ping the tracker... */
-            tr_trackerPulse( tor->tracker, &peerCount, &peerCompact );
-            if( peerCount > 0 ) {
-                int used = tr_torrentAddCompact( tor, TR_PEER_FROM_TRACKER,
-                                                 peerCompact, peerCount );
-                tr_dbg( "got %i peers from announce, used %i", peerCount, used );
-                free( peerCompact );
-            }
 
             /* Shuffle peers */
             if ( tor->peerCount > 1 ) {

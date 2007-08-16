@@ -40,6 +40,7 @@
 #include "peer.h"
 #include "peertree.h"
 #include "ratecontrol.h"
+#include "trcompat.h" /* for strlcpy */
 #include "utils.h"
 
 /*****
@@ -292,6 +293,16 @@ static void tr_htonl( uint32_t a, void * p )
 {
     const uint32_t u = htonl( a );
     memcpy ( p, &u, sizeof( uint32_t ) );
+}
+
+static const char* getPeerId( void )
+{
+    static char * peerId = NULL;
+    if( !peerId ) {
+        peerId = tr_new0( char, TR_ID_LEN + 1 );
+        tr_peerIdNew( peerId, TR_ID_LEN + 1 );
+    }
+    return peerId;
 }
 
 #include "peerext.h"
@@ -582,7 +593,7 @@ int tr_peerPulse( tr_peer_t * peer )
         HANDSHAKE_SET_EXTPREF( buf + HANDSHAKE_FLAGS_OFF,
                                HANDSHAKE_EXTPREF_WANT_EXT );
         memcpy( buf + HANDSHAKE_HASH_OFF, inf->hash, SHA_DIGEST_LENGTH );
-        memcpy( buf + HANDSHAKE_PEERID_OFF, tor->peer_id, TR_ID_LEN );
+        memcpy( buf + HANDSHAKE_PEERID_OFF, getPeerId(), TR_ID_LEN );
 
         switch( tr_netSend( peer->socket, buf, 68 ) )
         {

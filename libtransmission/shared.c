@@ -330,11 +330,7 @@ static void SetPublicPort( tr_shared_t * s, int port )
     s->publicPort = port;
 
     for( tor = h->torrentList; tor; tor = tor->next )
-    {
-        tr_torrentWriterLock( tor );
-        tor->publicPort = port;
-        tr_torrentWriterUnlock( tor );
-    }
+        tr_torrentChangeMyPort( tor, port );
 }
 
 /***********************************************************************

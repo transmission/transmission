@@ -551,6 +551,7 @@ struct tr_info_s
         int                 count;
     }                  * trackerList;
     int                  trackerTiers;
+    char               * primaryAddress;
 
     /* Torrent info */
     char                 comment[MAX_PATH_LENGTH];
@@ -606,7 +607,6 @@ struct tr_stat_s
 
     int                 error;
     char                errorString[128];
-    int                 cannotConnect;
 
     const tr_tracker_info_t * tracker;
 
