@@ -7,4 +7,4 @@ then
 fi
 export LIBTOOLIZE
 
-autoreconf -fiv -I config -I m4
+autoreconf -fi -I m4
