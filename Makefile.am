@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 if WITH_GTK
   GTK_DIR = gtk
 endif
