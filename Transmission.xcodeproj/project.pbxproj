@@ -12,6 +12,9 @@
 		35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */; };
 		35F372150C2D780600DAA8F2 /* InfoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F372130C2D780600DAA8F2 /* InfoWindow.m */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
+		4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.c */; };
+		4394AC680C74FB6000F367E8 /* publish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC650C74FB6000F367E8 /* publish.c */; };
+		4394AC690C74FB6000F367E8 /* timer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC660C74FB6000F367E8 /* timer.c */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
 		4D118E1A08CB46B20033958F /* PrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.m */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
@@ -292,6 +295,9 @@
 		35F372130C2D780600DAA8F2 /* InfoWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoWindow.m; path = macosx/InfoWindow.m; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilePriorityCell.h; path = macosx/FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
+		4394AC640C74FB6000F367E8 /* ptrarray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ptrarray.c; path = libtransmission/ptrarray.c; sourceTree = "<group>"; };
+		4394AC650C74FB6000F367E8 /* publish.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = publish.c; path = libtransmission/publish.c; sourceTree = "<group>"; };
+		4394AC660C74FB6000F367E8 /* timer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = timer.c; path = libtransmission/timer.c; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsController.h; path = macosx/PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsController.m; path = macosx/PrefsController.m; sourceTree = "<group>"; };
@@ -818,6 +824,9 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				4394AC640C74FB6000F367E8 /* ptrarray.c */,
+				4394AC650C74FB6000F367E8 /* publish.c */,
+				4394AC660C74FB6000F367E8 /* timer.c */,
 				D4AF3B2D0C41F7A500D46B6B /* list.c */,
 				D4AF3B2E0C41F7A500D46B6B /* list.h */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */,
@@ -1383,6 +1392,9 @@
 				002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
 				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
+				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
+				4394AC680C74FB6000F367E8 /* publish.c in Sources */,
+				4394AC690C74FB6000F367E8 /* timer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
