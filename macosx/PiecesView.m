@@ -311,7 +311,10 @@
         [self setNeedsDisplay];
     }
     
-    free(showAvailablity ? pieces : piecesPercent);
+    if (showAvailablity)
+        free(pieces);
+    else
+        free(piecesPercent);
 }
 
 - (BOOL) acceptsFirstMouse: (NSEvent *) event

@@ -56,7 +56,7 @@ typedef enum
 
     NSUserDefaults * fDefaults;
 
-    NSImage * fIcon, * fIconFlipped, * fIconSmall;
+    NSImage * fIcon, * fIconFlipped;
     NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
     tr_file_stat_t * fileStat;
@@ -130,7 +130,6 @@ typedef enum
 
 - (NSImage *) icon;
 - (NSImage *) iconFlipped;
-- (NSImage *) iconSmall;
 
 - (NSString *) name;
 - (uint64_t) size;

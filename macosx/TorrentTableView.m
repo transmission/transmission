@@ -451,7 +451,7 @@
     if (row < 0)
         return NSZeroRect;
     
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row];
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     
@@ -464,7 +464,7 @@
     if (row < 0)
         return NSZeroRect;
     
-    NSRect cellRect = [self frameOfCellAtColumn: [self columnWithIdentifier: @"Torrent"] row: row];
+    NSRect cellRect = [self frameOfCellAtColumn: 0 row: row];
     
     float buttonToTop = [fDefaults boolForKey: @"SmallView"] ? BUTTON_TO_TOP_SMALL : BUTTON_TO_TOP_REGULAR;
     

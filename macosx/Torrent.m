@@ -157,7 +157,6 @@ static int static_lastid = 0;
     
     [fIcon release];
     [fIconFlipped release];
-    [fIconSmall release];
     
     [fProgressString release];
     [fStatusString release];
@@ -830,18 +829,6 @@ static int static_lastid = 0;
         [fIconFlipped setFlipped: YES];
     }
     return fIconFlipped;
-}
-
-- (NSImage *) iconSmall
-{
-    if (!fIconSmall)
-    {
-        fIconSmall = [fIcon copy];
-        [fIconSmall setFlipped: YES];
-        [fIconSmall setScalesWhenResized: YES];
-        [fIconSmall setSize: NSMakeSize(16.0, 16.0)];
-    }
-    return fIconSmall;
 }
 
 - (NSString *) name

@@ -209,7 +209,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     }
     
     //icon
-    NSImage * icon = minimal ? (error ? fErrorImage : [torrent iconSmall]) : [torrent iconFlipped];
+    NSImage * icon = minimal && error ? fErrorImage : [torrent iconFlipped];
     NSRect iconRect = [self iconRectForBounds: cellFrame];
     [icon drawInRect: iconRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
