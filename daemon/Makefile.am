@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I@top_srcdir@
+AM_CPPFLAGS = -I@top_srcdir@ $(LIBEVENT_CPPFLAGS)
 AM_CFLAGS = $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libdaemon.a
