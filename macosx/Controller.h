@@ -67,9 +67,9 @@
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
     IBOutlet NSMenuItem             * fNameSortItem, * fStateSortItem, * fProgressSortItem,
-                                    * fDateSortItem, * fOrderSortItem,
+                                    * fTrackerSortItem, * fDateSortItem, * fOrderSortItem,
                                     * fNameSortActionItem, * fStateSortActionItem, * fProgressSortActionItem,
-                                    * fDateSortActionItem, * fOrderSortActionItem;
+                                    * fTrackerSortActionItem, * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet FilterBarView          * fFilterBar;
     IBOutlet FilterBarButton        * fNoFilterButton, * fDownloadFilterButton,

@@ -54,6 +54,7 @@
 #define SORT_NAME       @"Name"
 #define SORT_STATE      @"State"
 #define SORT_PROGRESS   @"Progress"
+#define SORT_TRACKER    @"Tracker"
 #define SORT_ORDER      @"Order"
 
 #define FILTER_NONE     @"None"
@@ -345,6 +346,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         currentSortItem = fProgressSortItem;
         currentSortActionItem = fProgressSortActionItem;
+    }
+    else if ([sortType isEqualToString: SORT_TRACKER])
+    {
+        currentSortItem = fTrackerSortItem;
+        currentSortActionItem = fTrackerSortActionItem;
     }
     else if ([sortType isEqualToString: SORT_ORDER])
     {
@@ -1407,7 +1413,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
     //resort if necessary or just update the table
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    if ([sortType isEqualToString: @"Progress"] || [sortType isEqualToString: @"State"])
+    if ([sortType isEqualToString: SORT_PROGRESS] || [sortType isEqualToString: SORT_STATE]
+            || [sortType isEqualToString: SORT_TRACKER])
         [self sortTorrents];
     else
         [fTableView reloadData];
@@ -1609,7 +1616,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     BOOL asc = ![fDefaults boolForKey: @"SortReverse"];
     
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name"
-                            ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
+                                            ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease],
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
                                             ascending: asc] autorelease];
     
@@ -1637,6 +1644,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
+    }
+    else if ([sortType isEqualToString: SORT_TRACKER])
+    {
+        NSSortDescriptor * trackerDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"trackerAddress"
+                                                ascending: asc selector: @selector(caseInsensitiveCompare:)] autorelease];
+        
+        descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_ORDER])
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
@@ -1675,6 +1689,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         prevSortItem = fProgressSortItem;
         prevSortActionItem = fProgressSortActionItem;
     }
+    else if ([oldSortType isEqualToString: SORT_TRACKER])
+    {
+        prevSortItem = fTrackerSortItem;
+        prevSortActionItem = fTrackerSortActionItem;
+    }
     else if ([oldSortType isEqualToString: SORT_ORDER])
     {
         prevSortItem = fOrderSortItem;
@@ -1708,6 +1727,12 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             currentSortItem = fProgressSortItem;
             currentSortActionItem = fProgressSortActionItem;
             sortType = SORT_PROGRESS;
+        }
+        else if (sender == fTrackerSortItem || sender == fTrackerSortActionItem)
+        {
+            currentSortItem = fTrackerSortItem;
+            currentSortActionItem = fTrackerSortActionItem;
+            sortType = SORT_TRACKER;
         }
         else if (sender == fOrderSortItem || sender == fOrderSortActionItem)
         {

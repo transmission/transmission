@@ -85,6 +85,8 @@
                 fTotalDLField = NSTextField; 
                 fTotalTorrentsField = NSTextField; 
                 fTotalULField = NSTextField; 
+                fTrackerSortActionItem = NSMenuItem; 
+                fTrackerSortItem = NSMenuItem; 
                 fURLSheetTextField = NSTextField; 
                 fURLSheetWindow = NSWindow; 
                 fUpdater = SUUpdater; 
