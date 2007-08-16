@@ -85,11 +85,13 @@ main( int argc, char ** argv )
         errsyslog( 1 );
     }
 
-    if( NULL != pidfile && 0 > savepid( pidfile ) )
-        exit( 1 );
     atexit( exitcleanup );
     sockfd = trylocksock( sockpath );
     if( 0 > sockfd )
+    {
+        exit( 1 );
+    }
+    if( NULL != pidfile && 0 > savepid( pidfile ) )
     {
         exit( 1 );
     }
@@ -299,14 +301,14 @@ exitcleanup( void )
         unlink( gl_sockpath );
         close( gl_sockfd );
     }
+    if( 0 != gl_pidfile[0] )
+    {
+        unlink( gl_pidfile );
+    }
     if( 0 <= gl_lockfd )
     {
         unlink( gl_lockpath );
         close( gl_lockfd );
-    }
-    if( 0 != gl_pidfile[0] )
-    {
-        unlink( gl_pidfile );
     }
 }
 
