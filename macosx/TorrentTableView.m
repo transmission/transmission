@@ -353,8 +353,6 @@
             NSImage * icon;
             if (!folder)
             {
-                [item setAction: @selector(checkFile:)];
-                
                 icon = [[dict objectForKey: @"Icon"] copy];
                 [icon setFlipped: NO];
             }
@@ -376,18 +374,17 @@
             [item setImage: icon];
             [icon release];
             
+            [item setAction: @selector(checkFile:)];
+            
             [menu addItem: item];
             [item release];
         }
         else
             item = [menu itemWithTitle: name];
         
-        if (!folder)
-        {
-            NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
-            [item setState: [fMenuTorrent checkForFiles: indexSet]];
-            [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
-        }
+        NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
+        [item setState: [fMenuTorrent checkForFiles: indexSet]];
+        [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
     }
 }
 

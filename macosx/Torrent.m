@@ -823,7 +823,6 @@ static int static_lastid = 0;
                                                 : [[self name] pathExtension]] retain];
         [fIcon setFlipped: YES];
     }
-    
     return fIcon;
 }
 
@@ -1369,6 +1368,7 @@ static int static_lastid = 0;
         return [NSNumber numberWithInt: 2];
 }
 
+#warning is progress different when seeding?
 - (NSNumber *) progressSortKey
 {
     float progress;
