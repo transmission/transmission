@@ -5,6 +5,7 @@
             CLASS = AboutWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fCopyrightField = NSTextField; 
                 fLicenseSheet = NSPanel; 
                 fLicenseView = NSTextView; 
                 fTextView = NSTextView; 
