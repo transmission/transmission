@@ -150,10 +150,10 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 #define HANDSHAKE_GET_EXTPREF( bits )      ( 0 )
 #define HANDSHAKE_SET_EXTPREF( bits, val ) ( (void)0 )
 #endif
-#define HANDSHAKE_EXTPREF_FORCE_EXT        ( 0x00 )
-#define HANDSHAKE_EXTPREF_WANT_EXT         ( 0x01 )
-#define HANDSHAKE_EXTPREF_WANT_AZ          ( 0x10 )
-#define HANDSHAKE_EXTPREF_FORCE_AZ         ( 0x11 )
+#define HANDSHAKE_EXTPREF_FORCE_EXT        ( 0x0 )
+#define HANDSHAKE_EXTPREF_WANT_EXT         ( 0x1 )
+#define HANDSHAKE_EXTPREF_WANT_AZ          ( 0x2 )
+#define HANDSHAKE_EXTPREF_FORCE_AZ         ( 0x3 )
 
 #define PEER_MSG_CHOKE          0
 #define PEER_MSG_UNCHOKE        1
