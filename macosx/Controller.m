@@ -50,6 +50,17 @@
 #define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
 #define TOOLBAR_FILTER          @"Toolbar Toggle Filter"
 
+#define SORT_DATE       @"Date"
+#define SORT_NAME       @"Name"
+#define SORT_STATE      @"State"
+#define SORT_PROGRESS   @"Progress"
+#define SORT_ORDER      @"Order"
+
+#define FILTER_NONE     @"None"
+#define FILTER_DOWNLOAD @"Download"
+#define FILTER_SEED     @"Seed"
+#define FILTER_PAUSE    @"Pause"
+
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
@@ -320,22 +331,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     
     NSMenuItem * currentSortItem, * currentSortActionItem;
-    if ([sortType isEqualToString: @"Name"])
+    if ([sortType isEqualToString: SORT_NAME])
     {
         currentSortItem = fNameSortItem;
         currentSortActionItem = fNameSortActionItem;
     }
-    else if ([sortType isEqualToString: @"State"])
+    else if ([sortType isEqualToString: SORT_STATE])
     {
         currentSortItem = fStateSortItem;
         currentSortActionItem = fStateSortActionItem;
     }
-    else if ([sortType isEqualToString: @"Progress"])
+    else if ([sortType isEqualToString: SORT_PROGRESS])
     {
         currentSortItem = fProgressSortItem;
         currentSortActionItem = fProgressSortActionItem;
     }
-    else if ([sortType isEqualToString: @"Order"])
+    else if ([sortType isEqualToString: SORT_ORDER])
     {
         currentSortItem = fOrderSortItem;
         currentSortActionItem = fOrderSortActionItem;
@@ -343,8 +354,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     else
     {
         //safety
-        if (![sortType isEqualToString: @"Date"])
-            [fDefaults setObject: @"Date" forKey: @"Sort"];
+        if (![sortType isEqualToString: SORT_DATE])
+            [fDefaults setObject: SORT_DATE forKey: @"Sort"];
         
         currentSortItem = fDateSortItem;
         currentSortActionItem = fDateSortActionItem;
@@ -356,17 +367,17 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     FilterBarButton * currentFilterButton;
-    if ([filterType isEqualToString: @"Pause"])
+    if ([filterType isEqualToString: FILTER_PAUSE])
         currentFilterButton = fPauseFilterButton;
-    else if ([filterType isEqualToString: @"Seed"])
+    else if ([filterType isEqualToString: FILTER_SEED])
         currentFilterButton = fSeedFilterButton;
-    else if ([filterType isEqualToString: @"Download"])
+    else if ([filterType isEqualToString: FILTER_DOWNLOAD])
         currentFilterButton = fDownloadFilterButton;
     else
     {
         //safety
-        if (![filterType isEqualToString: @"None"])
-            [fDefaults setObject: @"None" forKey: @"Filter"];
+        if (![filterType isEqualToString: FILTER_NONE])
+            [fDefaults setObject: FILTER_NONE forKey: @"Filter"];
         
         currentFilterButton = fNoFilterButton;
     }
@@ -1603,9 +1614,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                             ascending: asc] autorelease];
     
     NSArray * descriptors;
-    if ([sortType isEqualToString: @"Name"])
+    if ([sortType isEqualToString: SORT_NAME])
         descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
-    else if ([sortType isEqualToString: @"State"])
+    else if ([sortType isEqualToString: SORT_STATE])
     {
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"stateSortKey" ascending: !asc] autorelease],
@@ -1617,7 +1628,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
     }
-    else if ([sortType isEqualToString: @"Progress"])
+    else if ([sortType isEqualToString: SORT_PROGRESS])
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"progressSortKey" ascending: asc] autorelease],
@@ -1627,7 +1638,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
     }
-    else if ([sortType isEqualToString: @"Order"])
+    else if ([sortType isEqualToString: SORT_ORDER])
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     else
     {
@@ -1642,28 +1653,29 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fTableView reloadData];
 }
 
+#warning bindings?
 - (void) setSort: (id) sender
 {
     NSString * oldSortType = [fDefaults stringForKey: @"Sort"];
     
     //get checked items
     NSMenuItem * prevSortItem, * prevSortActionItem;
-    if ([oldSortType isEqualToString: @"Name"])
+    if ([oldSortType isEqualToString: SORT_NAME])
     {
         prevSortItem = fNameSortItem;
         prevSortActionItem = fNameSortActionItem;
     }
-    else if ([oldSortType isEqualToString: @"State"])
+    else if ([oldSortType isEqualToString: SORT_STATE])
     {
         prevSortItem = fStateSortItem;
         prevSortActionItem = fStateSortActionItem;
     }
-    else if ([oldSortType isEqualToString: @"Progress"])
+    else if ([oldSortType isEqualToString: SORT_PROGRESS])
     {
         prevSortItem = fProgressSortItem;
         prevSortActionItem = fProgressSortActionItem;
     }
-    else if ([oldSortType isEqualToString: @"Order"])
+    else if ([oldSortType isEqualToString: SORT_ORDER])
     {
         prevSortItem = fOrderSortItem;
         prevSortActionItem = fOrderSortActionItem;
@@ -1683,25 +1695,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         {
             currentSortItem = fNameSortItem;
             currentSortActionItem = fNameSortActionItem;
-            sortType = @"Name";
+            sortType = SORT_NAME;
         }
         else if (sender == fStateSortItem || sender == fStateSortActionItem)
         {
             currentSortItem = fStateSortItem;
             currentSortActionItem = fStateSortActionItem;
-            sortType = @"State";
+            sortType = SORT_STATE;
         }
         else if (sender == fProgressSortItem || sender == fProgressSortActionItem)
         {
             currentSortItem = fProgressSortItem;
             currentSortActionItem = fProgressSortActionItem;
-            sortType = @"Progress";
+            sortType = SORT_PROGRESS;
         }
         else if (sender == fOrderSortItem || sender == fOrderSortActionItem)
         {
             currentSortItem = fOrderSortItem;
             currentSortActionItem = fOrderSortActionItem;
-            sortType = @"Order";
+            sortType = SORT_ORDER;
             
             [fDefaults setBool: NO forKey: @"SortReverse"];
         }
@@ -1709,7 +1721,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         {
             currentSortItem = fDateSortItem;
             currentSortActionItem = fDateSortActionItem;
-            sortType = @"Date";
+            sortType = SORT_DATE;
         }
         
         [fDefaults setObject: sortType forKey: @"Sort"];
@@ -1739,10 +1751,10 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     int downloading = 0, seeding = 0, paused = 0;
-    BOOL isDownloading = [filterType isEqualToString: @"Download"],
-            isSeeding = [filterType isEqualToString: @"Seed"],
-            isPaused = [filterType isEqualToString: @"Pause"];
-    BOOL filtering = isDownloading || isSeeding || isPaused;
+    BOOL isDownload = [filterType isEqualToString: FILTER_DOWNLOAD],
+            isSeed = [filterType isEqualToString: FILTER_SEED],
+            isPause = [filterType isEqualToString: FILTER_PAUSE];
+    BOOL filtering = isDownload || isSeed || isPause;
     
     //get count of each type
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1754,20 +1766,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             if ([torrent isSeeding])
             {
                 seeding++;
-                if (isSeeding)
+                if (isSeed)
                     [tempTorrents addObject: torrent];
             }
             else
             {
                 downloading++;
-                if (isDownloading)
+                if (isDownload)
                     [tempTorrents addObject: torrent];
             }
         }
         else
         {
             paused++;
-            if (isPaused)
+            if (isPause)
                 [tempTorrents addObject: torrent];
         }
     }
@@ -1836,11 +1848,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * oldFilterType = [fDefaults stringForKey: @"Filter"];
     
     FilterBarButton * prevFilterButton;
-    if ([oldFilterType isEqualToString: @"Pause"])
+    if ([oldFilterType isEqualToString: FILTER_PAUSE])
         prevFilterButton = fPauseFilterButton;
-    else if ([oldFilterType isEqualToString: @"Seed"])
+    else if ([oldFilterType isEqualToString: FILTER_SEED])
         prevFilterButton = fSeedFilterButton;
-    else if ([oldFilterType isEqualToString: @"Download"])
+    else if ([oldFilterType isEqualToString: FILTER_DOWNLOAD])
         prevFilterButton = fDownloadFilterButton;
     else
         prevFilterButton = fNoFilterButton;
@@ -1852,13 +1864,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
         NSString * filterType;
         if (sender == fDownloadFilterButton)
-            filterType = @"Download";
+            filterType = FILTER_DOWNLOAD;
         else if (sender == fPauseFilterButton)
-            filterType = @"Pause";
+            filterType = FILTER_PAUSE;
         else if (sender == fSeedFilterButton)
-            filterType = @"Seed";
+            filterType = FILTER_SEED;
         else
-            filterType = @"None";
+            filterType = FILTER_NONE;
 
         [fDefaults setObject: filterType forKey: @"Filter"];
     }
@@ -1871,13 +1883,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     NSButton * button;
-    if ([filterType isEqualToString: @"None"])
+    if ([filterType isEqualToString: FILTER_NONE])
         button = sender == fNextFilterItem ? fDownloadFilterButton : fPauseFilterButton;
-    else if ([filterType isEqualToString: @"Download"])
+    else if ([filterType isEqualToString: FILTER_DOWNLOAD])
         button = sender == fNextFilterItem ? fSeedFilterButton : fNoFilterButton;
-    else if ([filterType isEqualToString: @"Seed"])
+    else if ([filterType isEqualToString: FILTER_SEED])
         button = sender == fNextFilterItem ? fPauseFilterButton : fDownloadFilterButton;
-    else if ([filterType isEqualToString: @"Pause"])
+    else if ([filterType isEqualToString: FILTER_PAUSE])
         button = sender == fNextFilterItem ? fNoFilterButton : fSeedFilterButton;
     else
         button = fNoFilterButton;
