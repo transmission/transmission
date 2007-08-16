@@ -52,8 +52,8 @@
 
 @interface TorrentCell (Private)
 
-- (NSImage *) simpleBar: (float) width;
-- (NSImage *) advancedBar: (float) width;
+- (void) drawSimpleBar: (NSRect) barRect;
+- (void) drawAdvancedBar: (NSRect) barRect;
 - (NSImage *) advancedBarSimple;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
@@ -264,9 +264,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     
     //bar
     NSRect barRect = [self barRectForBounds: cellFrame];
-    NSImage * bar = [fDefaults boolForKey: @"UseAdvancedBar"]
-                    ? [self advancedBar: barRect.size.width] : [self simpleBar: barRect.size.width];
-    [bar drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [fDefaults boolForKey: @"UseAdvancedBar"] ? [self drawAdvancedBar: barRect] : [self drawSimpleBar: barRect];
     
     //status
     if (!minimal)
@@ -280,16 +278,10 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 
 @implementation TorrentCell (Private)
 
-#warning don't use image
 #warning NSDivideRect ?
-- (NSImage *) simpleBar: (float) width
+- (void) drawSimpleBar: (NSRect) barRect
 {
     Torrent * torrent = [self representedObject];
-    
-    NSImage * bar = [[NSImage alloc] initWithSize: NSMakeSize(width, BAR_HEIGHT)];
-    [bar lockFocus];
-    
-    NSRect barBounds = NSMakeRect(0, 0, width, BAR_HEIGHT);
     
     float progress = [torrent progress], left = [torrent progressLeft];
     
@@ -297,48 +289,53 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     {
         if (!fWhiteGradient)
             fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-        [fWhiteGradient fillRect: barBounds angle: -90];
+        [fWhiteGradient fillRect: barRect angle: -90];
         
         float include = progress + left;
         if (include < 1.0)
         {
             if (!fLightGrayGradient)
                 fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
-            [fLightGrayGradient fillRect: NSMakeRect(width * include, 0, width * (1.0 - include), BAR_HEIGHT)
-                                angle: -90];
+            
+            NSRect noIncludeRect = barRect;
+            noIncludeRect.origin.x += barRect.size.width * include;
+            noIncludeRect.size.width *= 1.0 - include;
+            [fLightGrayGradient fillRect: noIncludeRect angle: -90];
         }
     }
     
-    NSRect completeBounds = NSMakeRect(0, 0, width * progress, BAR_HEIGHT);
+    NSRect completeRect = barRect;
+    completeRect.size.width *= progress;
+    
     if ([torrent isActive])
     {
         if ([torrent isChecking])
         {
             if (!fYellowGradient)
                 fYellowGradient = [[CTGradient progressYellowGradient] retain];
-            [fYellowGradient fillRect: completeBounds angle: -90];
+            [fYellowGradient fillRect: completeRect angle: -90];
         }
         else if ([torrent isSeeding])
         {
-            NSRect ratioBounds = completeBounds;
-            ratioBounds.size.width *= [torrent progressStopRatio];
+            NSRect ratioRect = completeRect;
+            ratioRect.size.width *= [torrent progressStopRatio];
             
-            if (ratioBounds.size.width < completeBounds.size.width)
+            if (ratioRect.size.width < completeRect.size.width)
             {
                 if (!fLightGreenGradient)
                     fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
-                [fLightGreenGradient fillRect: completeBounds angle: -90];
+                [fLightGreenGradient fillRect: completeRect angle: -90];
             }
             
             if (!fGreenGradient)
                 fGreenGradient = [[CTGradient progressGreenGradient] retain];
-            [fGreenGradient fillRect: ratioBounds angle: -90]; 
+            [fGreenGradient fillRect: ratioRect angle: -90]; 
         }
         else
         {
             if (!fBlueGradient)
                 fBlueGradient = [[CTGradient progressBlueGradient] retain];
-            [fBlueGradient fillRect: completeBounds angle: -90];
+            [fBlueGradient fillRect: completeRect angle: -90];
         }
     }
     else
@@ -349,51 +346,37 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
             {
                 if (!fDarkGreenGradient)
                     fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
-                [fDarkGreenGradient fillRect: completeBounds angle: -90];
+                [fDarkGreenGradient fillRect: completeRect angle: -90];
             }
             else
             {
                 if (!fDarkBlueGradient)
                     fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
-                [fDarkBlueGradient fillRect: completeBounds angle: -90];
+                [fDarkBlueGradient fillRect: completeRect angle: -90];
             }
         }
         else
         {
             if (!fGrayGradient)
                 fGrayGradient = [[CTGradient progressGrayGradient] retain];
-            [fGrayGradient fillRect: completeBounds angle: -90];
+            [fGrayGradient fillRect: completeRect angle: -90];
         }
     }
     
     [fBarOverlayColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
-    
-    [bar unlockFocus];
-    
-    return [bar autorelease];
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
-- (NSImage *) advancedBar: (float) width
+- (void) drawAdvancedBar: (NSRect) barRect
 {
-    NSImage * image = [self advancedBarSimple];
-    
-    NSRect barBounds = NSMakeRect(0, 0, width, BAR_HEIGHT);
-    
-    [image setScalesWhenResized: YES];
-    [image setSize: barBounds.size];
-    
-    [image lockFocus];
+    [[self advancedBarSimple] drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     if (!fTransparentGradient)
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
-    [fTransparentGradient fillRect: barBounds angle: 90];
+    [fTransparentGradient fillRect: barRect angle: 90];
     
     [fBarOverlayColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barBounds, 0.5, 0.5)];
-    
-    [image unlockFocus];
-    return image;
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
 }
 
 - (NSImage *) advancedBarSimple
