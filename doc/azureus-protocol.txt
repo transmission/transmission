@@ -3,6 +3,10 @@ protocol which is further described here:
 
 http://www.azureuswiki.com/index.php/Azureus_messaging_protocol
 
+A client that understands the azureus messaging protocol should set
+the 8th bit of the first byte of the reserved area in the handshake.
+For example: reserved[0] = 0x80
+
 Like normal bittorrent messages, all azureus messages begin with the
 length of the rest of the message in bytes as a 4-byte integer in
 network byte order.  This length does not include the 4 bytes for the
