@@ -373,7 +373,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     
     if (!fTransparentGradient)
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
-    [fTransparentGradient fillRect: barRect angle: 90];
+    [fTransparentGradient fillRect: barRect angle: -90];
     
     [fBarOverlayColor set];
     [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
