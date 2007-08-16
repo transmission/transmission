@@ -605,7 +605,14 @@ onTrackerScrapeNow( void * vt )
 {
     Tracker * t = (Tracker*) vt;
 
-    assert( tr_ptrArrayEmpty( t->scraping ) );
+    if( !tr_ptrArrayEmpty( t->scraping ) )
+    {
+        /* there's already a scrape going for this tracker...
+           we only one one at a time, so don't do anything yet.
+           when the current scrape is done, onScrapeResponse()
+           will call us again. */
+        return FALSE;
+    }
 
     if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
     {
