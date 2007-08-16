@@ -55,85 +55,17 @@
         [bp fill];
         [fBack unlockFocus];
         
-        //white box image
-        fWhitePiece = [[NSImage alloc] initWithSize: size];
-        
-        [fWhitePiece lockFocus];
-        [[NSColor whiteColor] set];
-        [bp fill];
-        [fWhitePiece unlockFocus];
-        
-        //orange box image
-        fOrangePiece = [[NSImage alloc] initWithSize: size];
-        
-        [fOrangePiece lockFocus];
-        [[NSColor orangeColor] set];
-        [bp fill];
-        [fOrangePiece unlockFocus];
-        
-        //green 1 box image
-        fGreen1Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fGreen1Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 0.8 alpha: 1.0] set];
-        [bp fill];
-        [fGreen1Piece unlockFocus];
-        
-        //green 2 box image
-        fGreen2Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fGreen2Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.4 green: 1.0 blue: 0.6 alpha: 1.0] set];
-        [bp fill];
-        [fGreen2Piece unlockFocus];
-        
-        //green 3 box image
-        fGreen3Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fGreen3Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] set];
-        [bp fill];
-        [fGreen3Piece unlockFocus];
-        
-        //blue 1 box image
-        fBlue1Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fBlue1Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] set];
-        [bp fill];
-        [fBlue1Piece unlockFocus];
-        
-        //blue 2 box image
-        fBlue2Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fBlue2Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] set];
-        [bp fill];
-        [fBlue2Piece unlockFocus];
-        
-        //blue 3 box image
-        fBlue3Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fBlue3Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] set];
-        [bp fill];
-        [fBlue3Piece unlockFocus];
-        
-        //blue 4 box image
-        fBlue4Piece = [[NSImage alloc] initWithSize: size];
-        
-        [fBlue4Piece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] set];
-        [bp fill];
-        [fBlue4Piece unlockFocus];
-        
-        //blue box image
-        fBluePiece = [[NSImage alloc] initWithSize: size];
-        
-        [fBluePiece lockFocus];
-        [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] set];
-        [bp fill];
-        [fBluePiece unlockFocus];
+        //store box colors
+        fWhiteColor = [[NSColor whiteColor] retain];
+        fOrangeColor = [[NSColor orangeColor] retain];
+        fGreen1Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 0.8 alpha: 1.0] retain];
+        fGreen2Color = [[NSColor colorWithCalibratedRed: 0.4 green: 1.0 blue: 0.6 alpha: 1.0] retain];
+        fGreen3Color = [[NSColor colorWithCalibratedRed: 0.0 green: 1.0 blue: 0.4 alpha: 1.0] retain];
+        fBlue1Color = [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] retain];
+        fBlue2Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] retain];
+        fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
+        fBlue4Color = [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] retain];
+        fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
         
         //actually draw the box
         [self setTorrent: nil];
@@ -144,12 +76,17 @@
     free(fPieces);
     
     [fBack release];
-    [fWhitePiece release];
-    [fOrangePiece release];
-    [fBluePiece release];
-    [fGreen1Piece release];
-    [fGreen2Piece release];
-    [fGreen3Piece release];
+    
+    [fWhiteColor release];
+    [fOrangeColor release];
+    [fGreen1Color release];
+    [fGreen2Color release];
+    [fGreen3Color release];
+    [fBlue1Color release];
+    [fBlue2Color release];
+    [fBlue3Color release];
+    [fBlue4Color release];
+    [fBlueColor release];
     
     [fTorrent release];
     [super dealloc];
@@ -227,7 +164,7 @@
     float piecePercent;
     NSPoint point;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
-    NSImage * pieceImage;
+    NSColor * pieceColor;
     BOOL change = NO;
         
     for (i = 0; i < fAcross; i++)
@@ -240,7 +177,7 @@
                 break;
             }
             
-            pieceImage = nil;
+            pieceColor = nil;
             
             if (showAvailablity)
             {
@@ -250,12 +187,12 @@
                     if (first || fPieces[index] == -2)
                     {
                         fPieces[index] = -1;
-                        pieceImage = fBluePiece;
+                        pieceColor = fBlueColor;
                     }
                     else if (fPieces[index] != -1)
                     {
                         fPieces[index] = -2;
-                        pieceImage = fOrangePiece;
+                        pieceColor = fOrangeColor;
                     }
                     else;
                 }
@@ -264,7 +201,7 @@
                     if (first || fPieces[index] != 0)
                     {
                         fPieces[index] = 0;
-                        pieceImage = fWhitePiece;
+                        pieceColor = fWhiteColor;
                     }
                 }
                 else if (piece <= 4)
@@ -272,7 +209,7 @@
                     if (first || fPieces[index] != 1)
                     {
                         fPieces[index] = 1;
-                        pieceImage = fGreen1Piece;
+                        pieceColor = fGreen1Color;
                     }
                 }
                 else if (piece <= 8)
@@ -280,7 +217,7 @@
                     if (first || fPieces[index] != 2)
                     {
                         fPieces[index] = 2;
-                        pieceImage = fGreen2Piece;
+                        pieceColor = fGreen2Color;
                     }
                 }
                 else
@@ -288,7 +225,7 @@
                     if (first || fPieces[index] != 3)
                     {
                         fPieces[index] = 3;
-                        pieceImage = fGreen3Piece;
+                        pieceColor = fGreen3Color;
                     }
                 }
             }
@@ -300,12 +237,12 @@
                     if (first || fPieces[index] == -2)
                     {
                         fPieces[index] = -1;
-                        pieceImage = fBluePiece;
+                        pieceColor = fBlueColor;
                     }
                     else if (fPieces[index] != -1)
                     {
                         fPieces[index] = -2;
-                        pieceImage = fOrangePiece;
+                        pieceColor = fOrangeColor;
                     }
                     else;
                 }
@@ -314,7 +251,7 @@
                     if (first || fPieces[index] != 0)
                     {
                         fPieces[index] = 0;
-                        pieceImage = fWhitePiece;
+                        pieceColor = fWhiteColor;
                     }
                 }
                 else if (piecePercent < 0.25)
@@ -322,7 +259,7 @@
                     if (first || fPieces[index] != 1)
                     {
                         fPieces[index] = 1;
-                        pieceImage = fBlue1Piece;
+                        pieceColor = fBlue1Color;
                     }
                 }
                 else if (piecePercent < 0.5)
@@ -330,7 +267,7 @@
                     if (first || fPieces[index] != 2)
                     {
                         fPieces[index] = 2;
-                        pieceImage = fBlue2Piece;
+                        pieceColor = fBlue2Color;
                     }
                 }
                 else if (piecePercent < 0.75)
@@ -338,7 +275,7 @@
                     if (first || fPieces[index] != 3)
                     {
                         fPieces[index] = 3;
-                        pieceImage = fBlue3Piece;
+                        pieceColor = fBlue3Color;
                     }
                 }
                 else
@@ -346,23 +283,25 @@
                     if (first || fPieces[index] != 4)
                     {
                         fPieces[index] = 4;
-                        pieceImage = fBlue4Piece;
+                        pieceColor = fBlue4Color;
                     }
                 }
             }
             
-            if (pieceImage)
+            if (pieceColor)
             {
-                //drawing actually will occur, so figure out values
+                //drawing actually will occur
                 if (!change)
                 {
                     [image lockFocus];
                     change = YES;
                 }
                 
-                point = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
+                [pieceColor set];
+                
+                rect.origin = NSMakePoint(j * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
                                     [image size].width - (i + 1) * (fWidth + BETWEEN) - fExtraBorder);
-                [pieceImage compositeToPoint: point fromRect: rect operation: NSCompositeSourceOver];
+                NSRectFill(rect);
             }
         }
     
@@ -372,10 +311,7 @@
         [self setNeedsDisplay];
     }
     
-    if (showAvailablity)
-        free(pieces);
-    else
-        free(piecesPercent);
+    free(showAvailablity ? pieces : piecesPercent);
 }
 
 - (BOOL) acceptsFirstMouse: (NSEvent *) event

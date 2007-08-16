@@ -34,6 +34,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     return fAboutBoxInstance;
 }
 
+#warning make completely localized
 - (void) windowDidLoad
 {
     NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
