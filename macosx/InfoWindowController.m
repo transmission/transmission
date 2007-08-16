@@ -223,7 +223,10 @@
     {    
         Torrent * torrent = [fTorrents objectAtIndex: 0];
         
-        [fImageView setImage: [torrent icon]];
+        NSImage * icon = [[torrent icon] copy];
+        [icon setFlipped: NO];
+        [fImageView setImage: icon];
+        [icon release];
         
         NSString * name = [torrent name];
         [fNameField setStringValue: name];

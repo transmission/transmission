@@ -156,7 +156,6 @@ static int static_lastid = 0;
     [fDateActivity release];
     
     [fIcon release];
-    [fIconFlipped release];
     
     [fProgressString release];
     [fStatusString release];
@@ -818,17 +817,14 @@ static int static_lastid = 0;
 
 - (NSImage *) icon
 {
-    return fIcon;
-}
-
-- (NSImage *) iconFlipped
-{
-    if (!fIconFlipped)
+    if (!fIcon)
     {
-        fIconFlipped = [fIcon copy];
-        [fIconFlipped setFlipped: YES];
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr')
+                                                : [[self name] pathExtension]] retain];
+        [fIcon setFlipped: YES];
     }
-    return fIconFlipped;
+    
+    return fIcon;
 }
 
 - (NSString *) name
@@ -1493,9 +1489,6 @@ static int static_lastid = 0;
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fError = NO;
-    
-    fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr')
-                                                : [[self name] pathExtension]] retain];
 
     fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
     fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
