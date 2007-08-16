@@ -85,7 +85,7 @@ main( int argc, char ** argv )
         errsyslog( 1 );
     }
 
-    if( 0 > savepid( pidfile ) )
+    if( NULL != pidfile && 0 > savepid( pidfile ) )
         exit( 1 );
     atexit( exitcleanup );
     sockfd = trylocksock( sockpath );
