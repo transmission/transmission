@@ -18,8 +18,8 @@ AC_SUBST(WX_MINIMUM)
 AC_PROG_CC
 AC_PROG_CXX
 if test "x$GCC" = "xyes" ; then
-    CFLAGS="-g -Os -Wall -W"
-    CXXFLAGS="-g -Os -Wall -W"
+    CFLAGS="-g -Wall -W -O3 -funroll-loops"
+    CXXFLAGS="-g -Wall -W -O3 -funroll-loops"
 fi
 AC_HEADER_STDC
 AC_HEADER_TIME
