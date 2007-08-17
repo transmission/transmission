@@ -34,6 +34,12 @@
 
 #define ACTION_BUTTON_TO_TOP 47.0
 
+#define ACTION_MENU_GLOBAL_TAG 101
+#define ACTION_MENU_UNLIMITED_TAG 102
+#define ACTION_MENU_LIMIT_TAG 103
+
+#define ACTION_MENU_FILE_TAG 201
+
 @interface TorrentTableView (Private)
 
 - (NSRect) pauseRectForRow: (int) row;
@@ -304,9 +310,25 @@
     if (row < 0)
         return;
     
+    //get file menu
     fMenuTorrent = [[fTorrents objectAtIndex: row] retain];
-    NSMenu * torrentMenu = [fMenuTorrent torrentMenu];
-    [torrentMenu setDelegate: self];
+    NSMenu * fileMenu = [fMenuTorrent fileMenu];
+    [fileMenu setDelegate: self];
+    
+    //remove old file menu
+    NSMenuItem * oldFileMenuItem;
+    if ((oldFileMenuItem = [fActionMenu itemWithTag: ACTION_MENU_FILE_TAG]))
+        [fActionMenu removeItem: oldFileMenuItem];
+    
+    //set file menu
+    #warning localize
+    NSMenuItem * fileMenuItem = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Files",
+                                    "torrent action context menu -> files menu") action: NULL keyEquivalent: @""];
+    [fileMenuItem setTag: ACTION_MENU_FILE_TAG];
+    [fileMenuItem setSubmenu: fileMenu];
+    [fActionMenu addItem: fileMenuItem];
+    
+    [fileMenuItem release];
     
     NSRect rect = [self actionRectForRow: row];
     NSPoint location = rect.origin;
@@ -317,7 +339,7 @@
         modifierFlags: [event modifierFlags] timestamp: [event timestamp] windowNumber: [event windowNumber]
         context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
     
-    [NSMenu popUpContextMenu: torrentMenu withEvent: newEvent forView: self];
+    [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -326,17 +348,39 @@
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     //this method seems to be called when it shouldn't be
-    if (!fMenuTorrent)
+    if (!fMenuTorrent || ![menu supermenu])
         return;
     
     BOOL create = [menu numberOfItems] <= 0, folder;
     
     NSMenu * supermenu = [menu supermenu];
     NSArray * items;
-    if (supermenu)
+    NSDictionary * folderDict;
+    #warning move to submethod
+    if (menu == fUploadMenu || menu == fDownloadMenu)
+    {
+        BOOL upload = menu == fUploadMenu;
+        tr_speedlimit_t mode = [fMenuTorrent speedMode: upload];
+        
+        NSMenuItem * item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
+        [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
+        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
+                    "torrent action context menu -> upload/download limit"), [fMenuTorrent speedLimit: upload]]];
+        
+        item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
+        [item setState: mode == TR_SPEEDLIMIT_UNLIMITED ? NSOnState : NSOffState];
+        
+        item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
+        [item setState: mode == TR_SPEEDLIMIT_GLOBAL ? NSOnState : NSOffState];
+        
+        return;
+    }
+    else if ((folderDict = [[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject]))
         items = [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject] objectForKey: @"Children"];
     else
         items = [fMenuTorrent fileList];
+    
+    #warning move rest to submethod
     NSEnumerator * enumerator = [items objectEnumerator];
     NSDictionary * dict;
     NSMenuItem * item;
@@ -386,6 +430,27 @@
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
         [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
     }
+}
+
+- (void) setQuickLimitMode: (id) sender
+{
+    int tag = [sender tag];
+    tr_speedlimit_t mode;
+    if (tag == ACTION_MENU_UNLIMITED_TAG)
+        mode = TR_SPEEDLIMIT_UNLIMITED;
+    else if (tag == ACTION_MENU_LIMIT_TAG)
+        mode = TR_SPEEDLIMIT_SINGLE;
+    else
+        mode = TR_SPEEDLIMIT_GLOBAL;
+    
+    [fMenuTorrent setSpeedMode: mode upload: [sender menu] == fUploadMenu];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+}
+
+- (void) setQuickLimit: (id) sender
+{
+    
 }
 
 - (void) checkFile: (id) sender

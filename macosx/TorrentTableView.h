@@ -51,14 +51,18 @@
     NSMutableArray * fKeyStrokes;
     
     NSDictionary * fSmallStatusAttributes;
-
+    
+    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu;
     Torrent * fMenuTorrent;
-    NSEvent * fMenuEvent;
 }
 
 - (void) setTorrents: (NSArray *) torrents;
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event;
+
+- (void) setQuickLimitMode: (id) sender;
+- (void) setQuickLimit: (id) sender;
+
 - (void) checkFile: (id) sender;
 
 @end

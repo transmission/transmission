@@ -179,9 +179,17 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {checkFile = id; setQuickLimit = id; setQuickLimitMode = id; }; 
             CLASS = TorrentTableView; 
             LANGUAGE = ObjC; 
-            OUTLETS = {fContextNoRow = NSMenu; fContextRow = NSMenu; fController = Controller; }; 
+            OUTLETS = {
+                fActionMenu = NSMenu; 
+                fContextNoRow = NSMenu; 
+                fContextRow = NSMenu; 
+                fController = Controller; 
+                fDownloadMenu = NSMenu; 
+                fUploadMenu = NSMenu; 
+            }; 
             SUPERCLASS = NSTableView; 
         }
     ); 

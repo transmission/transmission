@@ -165,7 +165,7 @@ static int static_lastid = 0;
     [fFileList release];
     [fFlatFileList release];
     
-    [fTorrentMenu release];
+    [fFileMenu release];
     
     [fQuickPauseDict release];
     
@@ -563,6 +563,7 @@ static int static_lastid = 0;
         return 0;
 }
 
+#warning use enum value
 - (int) speedMode: (BOOL) upload
 {
     return tr_torrentGetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN);
@@ -1314,14 +1315,14 @@ static int static_lastid = 0;
     return priorities;
 }
 
-- (NSMenu *) torrentMenu
+- (NSMenu *) fileMenu
 {
-    if (!fTorrentMenu)
+    if (!fFileMenu)
     {
-        fTorrentMenu = [[NSMenu alloc] initWithTitle: [@"TorrentMenu:" stringByAppendingString: [self name]]];
-        [fTorrentMenu setAutoenablesItems: NO];
+        fFileMenu = [[NSMenu alloc] initWithTitle: [@"TorrentMenu:" stringByAppendingString: [self name]]];
+        [fFileMenu setAutoenablesItems: NO];
     }
-    return fTorrentMenu;
+    return fFileMenu;
 }
 
 - (NSDate *) dateAdded

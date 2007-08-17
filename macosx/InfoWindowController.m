@@ -106,7 +106,12 @@
     [self updateInfoForTorrents: [NSArray array]];
     
     //allow for update notifications
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
+    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver: self selector: @selector(updateInfoStats)
+            name: @"UpdateStats" object: nil];
+    
+    [nc addObserver: self selector: @selector(updateInfoSettings)
+            name: @"UpdateSettings" object: nil];
 }
 
 - (void) dealloc

@@ -62,7 +62,7 @@ typedef enum
     tr_file_stat_t * fileStat;
     NSArray * fFileList, * fFlatFileList;
     
-    NSMenu * fTorrentMenu;
+    NSMenu * fFileMenu;
     
     float   fRatioLimit;
     int     fRatioSetting;
@@ -213,7 +213,7 @@ typedef enum
 - (BOOL) hasFilePriority: (int) priority forIndexes: (NSIndexSet *) indexSet;
 - (NSSet *) filePrioritiesForIndexes: (NSIndexSet *) indexSet;
 
-- (NSMenu *) torrentMenu;
+- (NSMenu *) fileMenu;
 
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;
