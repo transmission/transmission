@@ -126,7 +126,6 @@ typedef struct tr_tracker_s
     tr_timer_tag scrapeTag;
     tr_timer_tag reannounceTag;
 
-    struct evhttp_connection * httpConn;
     struct evhttp_request * httpReq;
 
     tr_torrent_t * torrent;
@@ -862,7 +861,6 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
         publishErrorMessage( tor, buf );
     }
 
-    tor->httpConn = NULL;
     tor->httpReq = NULL;
 
     if( isStopped )
@@ -883,6 +881,7 @@ sendTrackerRequest( void * vtor, const char * eventName )
     Torrent * tor = (Torrent *) vtor;
     const tr_tracker_info_t * address = getCurrentAddress( tor->tracker );
     char * uri = buildTrackerRequestURI( tor, eventName );
+    struct evhttp_connection * evcon = NULL;
 
     tr_inf( "tracker request to %s:%d: %s", address->address,
                                             address->port, uri );
@@ -890,19 +889,16 @@ sendTrackerRequest( void * vtor, const char * eventName )
     /* kill any pending requests */
     tr_timerFree( &tor->reannounceTag );
 
-    /* make a connection if we don't have one */
-    if( tor->httpConn == NULL )
-        tor->httpConn = evhttp_connection_new( address->address,
-                                               address->port );
-    if ( tor->httpConn == NULL )
+    evcon = evhttp_connection_new( address->address, address->port );
+    if ( !evcon )
         tr_err( "Can't make a connection to %s:%d", address->address, address->port );
     else {
         tr_free( tor->lastRequest );
         tor->lastRequest = tr_strdup( eventName );
-        evhttp_connection_set_timeout( tor->httpConn, REQ_TIMEOUT_INTERVAL_SEC );
+        evhttp_connection_set_timeout( evcon, REQ_TIMEOUT_INTERVAL_SEC );
         tor->httpReq = evhttp_request_new( onTrackerResponse, tor );
         addCommonHeaders( tor->tracker, tor->httpReq );
-        evhttp_make_request( tor->httpConn, tor->httpReq, EVHTTP_REQ_GET, uri );
+        evhttp_make_request( evcon, tor->httpReq, EVHTTP_REQ_GET, uri );
     }
 
     tr_free( uri );
