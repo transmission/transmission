@@ -72,7 +72,7 @@
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
         
-        fCanResizeVertical = NO;
+        fCanResizeVertical = YES;
     }
     return self;
 }
@@ -82,6 +82,7 @@
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
+    #warning get working again
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
@@ -98,7 +99,6 @@
         [fPeerTable setSortDescriptors: [NSArray arrayWithObject: [[fPeerTable tableColumnWithIdentifier: @"IP"]
                                             sortDescriptorPrototype]]];
     
-    #warning make button? or just cell?
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     

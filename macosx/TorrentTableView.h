@@ -53,6 +53,7 @@
     NSDictionary * fSmallStatusAttributes;
 
     Torrent * fMenuTorrent;
+    NSEvent * fMenuEvent;
 }
 
 - (void) setTorrents: (NSArray *) torrents;
