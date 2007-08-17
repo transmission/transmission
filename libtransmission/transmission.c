@@ -63,12 +63,14 @@ tr_peerIdNew ( char * buf, int buflen )
     buf[TR_ID_LEN] = '\0';
 }
 
+static int shuttingDown = FALSE;
+
 static void
 libeventThreadFunc( void * unused UNUSED )
 {
     tr_dbg( "libevent thread starting" );
     event_init( );
-    for ( ;; )
+    while( !shuttingDown )
     {
         event_dispatch( );
         tr_wait( 50 ); /* 1/20th of a second */
@@ -246,6 +248,9 @@ void tr_close( tr_handle_t * h )
     free( h );
 
     tr_netResolveThreadClose();
+
+    /* end the event thread */
+    shuttingDown = TRUE;
 }
 
 tr_torrent_t **
