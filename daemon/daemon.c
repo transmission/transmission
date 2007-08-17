@@ -344,7 +344,7 @@ gotsig( int sig, short what UNUSED, void * arg UNUSED )
     {
         exiting = 1;
         errmsg( "received fatal signal %i, attempting to exit cleanly", sig );
-        torrent_exit( 0 );
+        server_quit();
     }
     else
     {

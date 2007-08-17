@@ -186,6 +186,21 @@ server_listen( int fd )
 }
 
 void
+server_quit( void )
+{
+    struct client * ii, * next;
+
+    torrent_exit( 0 );
+    gl_exiting = 1;
+
+    for( ii = RB_MIN( allclients, &gl_clients ); NULL != ii; ii = next )
+    {
+        next = RB_NEXT( allclients, &gl_clients, ii );
+        byebye( ii->ev, EVBUFFER_EOF, NULL );
+    }
+}
+
+void
 newclient( int fd, short event UNUSED, void * arg )
 {
     struct sockaddr_un   sa;
@@ -560,16 +575,7 @@ void
 quitmsg( enum ipc_msg id UNUSED, benc_val_t * val UNUSED, int64_t tag UNUSED,
          void * arg UNUSED )
 {
-    struct client * ii, * next;
-
-    torrent_exit( 0 );
-    gl_exiting = 1;
-
-    for( ii = RB_MIN( allclients, &gl_clients ); NULL != ii; ii = next )
-    {
-        next = RB_NEXT( allclients, &gl_clients, ii );
-        byebye( ii->ev, EVBUFFER_EOF, NULL );
-    }
+    server_quit();
 }
 
 void
