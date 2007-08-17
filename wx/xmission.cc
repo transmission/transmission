@@ -378,7 +378,7 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 
 bool MyApp::OnInit()
 {
-    handle = tr_init( NULL );
+    handle = tr_init( "gui" );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
