@@ -30,9 +30,6 @@
 #include "tracker.h"
 #include "utils.h"
 
-#undef tr_dbg
-#define tr_dbg tr_inf
-
 #define MINUTES_TO_MSEC(N) ((N) * 60 * 1000)
 
 /* manual announces via "update tracker" are allowed this frequently */
@@ -227,6 +224,10 @@ static int onTrackerScrapeNow( void* );
 static void
 tr_trackerScrapeSoon( Tracker * t )
 {
+    /* don't start more than one scrape at once for the same tracker... */
+    if( !tr_ptrArrayEmpty( t->scraping ) )
+        return;
+
     if( !t->scrapeTag )
          t->scrapeTag = tr_timerNew( onTrackerScrapeNow, t, NULL, 1000 );
 }
@@ -605,14 +606,7 @@ onTrackerScrapeNow( void * vt )
 {
     Tracker * t = (Tracker*) vt;
 
-    if( !tr_ptrArrayEmpty( t->scraping ) )
-    {
-        /* there's already a scrape going for this tracker...
-           we only one one at a time, so don't do anything yet.
-           when the current scrape is done, onScrapeResponse()
-           will call us again. */
-        return FALSE;
-    }
+    assert( !tr_ptrArrayEmpty( t->scraping ) );
 
     if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
     {
@@ -868,7 +862,6 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
         publishErrorMessage( tor, buf );
     }
 
-    assert( tor->httpConn != NULL );
     tor->httpConn = NULL;
 
     if( isStopped )
@@ -899,15 +892,18 @@ sendTrackerRequest( void * vtor, const char * eventName )
     /* make a connection if we don't have one */
     if( tor->httpConn == NULL )
         tor->httpConn = evhttp_connection_new( address->address,
-                                                address->port );
+                                               address->port );
+    if ( tor->httpConn == NULL )
+        tr_err( "Can't make a connection to %s:%d", address->address, address->port );
+    else {
+        tr_free( tor->lastRequest );
+        tor->lastRequest = tr_strdup( eventName );
+        evhttp_connection_set_timeout( tor->httpConn, REQ_TIMEOUT_INTERVAL_SEC );
+        tor->httpReq = evhttp_request_new( onTrackerResponse, tor );
+        addCommonHeaders( tor->tracker, tor->httpReq );
+        evhttp_make_request( tor->httpConn, tor->httpReq, EVHTTP_REQ_GET, uri );
+    }
 
-    tr_free( tor->lastRequest );
-    tor->lastRequest = tr_strdup( eventName );
-    evhttp_connection_set_timeout( tor->httpConn, REQ_TIMEOUT_INTERVAL_SEC );
-    tor->httpReq = evhttp_request_new( onTrackerResponse, tor );
-    addCommonHeaders( tor->tracker, tor->httpReq );
-
-    evhttp_make_request( tor->httpConn, tor->httpReq, EVHTTP_REQ_GET, uri );
     tr_free( uri );
 
     return FALSE;
