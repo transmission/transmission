@@ -390,8 +390,14 @@
 
 - (void) checkFile: (id) sender
 {
-    NSIndexSet * indexes = [[sender representedObject] objectForKey: @"Indexes"];
-    [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexes];
+    #warning get working
+    NSIndexSet * indexSet;
+    if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
+        indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMenuTorrent fileCount])];
+    else
+        indexSet = [[sender representedObject] objectForKey: @"Indexes"];
+    
+    [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexSet];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }

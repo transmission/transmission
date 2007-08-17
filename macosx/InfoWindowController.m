@@ -698,6 +698,7 @@
 {
     [self updateInfoStats];
     
+    BOOL canResizeHor = NO;
     float height;
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
     {
@@ -705,9 +706,15 @@
         [fPiecesView updateView: YES];
     }
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
+    {
         height = TAB_PEERS_HEIGHT;
+        canResizeHor = YES;
+    }
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
+    {
         height = TAB_FILES_HEIGHT;
+        canResizeHor = YES;
+    }
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
     else
@@ -731,7 +738,7 @@
         [window setFrame: frame display: YES];
     
     [window setMinSize: NSMakeSize([window minSize].width, frame.size.height)];
-    [window setMaxSize: NSMakeSize([window maxSize].width, frame.size.height)];
+    [window setMaxSize: NSMakeSize([window maxSize].width, canResizeHor ? FLT_MAX : frame.size.height)];
 }
 
 - (void) setNextTab
