@@ -33,6 +33,8 @@
     NSArray * fTorrents, * fPeers, * fFiles;
     NSImage * fAppIcon, * fDotGreen, * fDotRed;
     
+    BOOL fCanResizeVertical;
+    
     IBOutlet NSTabView * fTabView;
 
     IBOutlet NSImageView * fImageView;

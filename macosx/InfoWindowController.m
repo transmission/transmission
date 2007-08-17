@@ -71,6 +71,8 @@
         fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
+        
+        fCanResizeVertical = NO;
     }
     return self;
 }
@@ -698,7 +700,7 @@
 {
     [self updateInfoStats];
     
-    BOOL canResizeHor = NO;
+    BOOL canResizeVertical = NO;
     float height;
     if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
     {
@@ -708,12 +710,12 @@
     else if ([identifier isEqualToString: TAB_PEERS_IDENT])
     {
         height = TAB_PEERS_HEIGHT;
-        canResizeHor = YES;
+        canResizeVertical = YES;
     }
     else if ([identifier isEqualToString: TAB_FILES_IDENT])
     {
         height = TAB_FILES_HEIGHT;
-        canResizeHor = YES;
+        canResizeVertical = YES;
     }
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
@@ -728,17 +730,22 @@
     frame.origin.y -= difference;
     frame.size.height += difference;
     
-    if (animate)
+    if (!fCanResizeVertical || !canResizeVertical)
     {
-        [view setHidden: YES];
-        [window setFrame: frame display: YES animate: YES];
-        [view setHidden: NO];
+        if (animate)
+        {
+            [view setHidden: YES];
+            [window setFrame: frame display: YES animate: YES];
+            [view setHidden: NO];
+        }
+        else
+            [window setFrame: frame display: YES];
     }
-    else
-        [window setFrame: frame display: YES];
     
     [window setMinSize: NSMakeSize([window minSize].width, frame.size.height)];
-    [window setMaxSize: NSMakeSize([window maxSize].width, canResizeHor ? FLT_MAX : frame.size.height)];
+    [window setMaxSize: NSMakeSize([window maxSize].width, canResizeVertical ? FLT_MAX : frame.size.height)];
+    
+    fCanResizeVertical = canResizeVertical;
 }
 
 - (void) setNextTab
