@@ -42,10 +42,10 @@
 #define DEFAULT_ANNOUNCE_INTERVAL_MSEC (MINUTES_TO_MSEC(20))
 
 /* this is how long we'll leave a scrape request hanging before timeout */
-#define SCRAPE_TIMEOUT_INTERVAL_SEC 8
+#define SCRAPE_TIMEOUT_INTERVAL_SEC 10
 
 /* this is how long we'll leave a tracker request hanging before timeout */
-#define REQ_TIMEOUT_INTERVAL_SEC 8
+#define REQ_TIMEOUT_INTERVAL_SEC 15
 
 /* the number of peers that is our goal */
 #define NUMWANT 150
@@ -606,7 +606,7 @@ onTrackerScrapeNow( void * vt )
 {
     Tracker * t = (Tracker*) vt;
 
-    assert( !tr_ptrArrayEmpty( t->scraping ) );
+    assert( tr_ptrArrayEmpty( t->scraping ) );
 
     if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
     {
@@ -971,8 +971,9 @@ void
 tr_trackerStart( Torrent * tor )
 {
     tr_peerIdNew( tor->peer_id, sizeof(tor->peer_id) );
-    assert( !tor->reannounceTag && "torrent's already started!" );
-    sendTrackerRequest( tor, "started" );
+
+    if( !tor->reannounceTag )
+        sendTrackerRequest( tor, "started" );
 }
 
 void
