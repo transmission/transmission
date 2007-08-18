@@ -1,0 +1,1017 @@
+# slovak translation of Transmission
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the transmission package.
+# mirek <mirek@host.sk>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Transmission 0.80\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-07-27 18:16-0500\n"
+"PO-Revision-Date: 2007-08-13 18:39+0100\n"
+"Last-Translator: mirek <mirek@host.sk>\n"
+"Language-Team: slovak <sk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n>=2 && n<=4 ? 1 : 2\n"
+"X-Poedit-Language: Slovak\n"
+"X-Poedit-Country: SLOVAKIA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: actions.c:35
+msgid "_High"
+msgstr "_Vysoká"
+
+#: actions.c:36
+msgid "_Normal"
+msgstr "_Normálna"
+
+#: actions.c:37
+msgid "_Low"
+msgstr "_Nízka"
+
+#: actions.c:52
+#: makemeta-ui.c:249
+msgid "_File"
+msgstr "_Súbor"
+
+#: actions.c:53
+msgid "_Edit"
+msgstr "_Upraviť"
+
+#: actions.c:54
+msgid "_Help"
+msgstr "_Pomocník"
+
+#: actions.c:55
+msgid "_Priority"
+msgstr "_Priorita"
+
+#: actions.c:58
+msgid "_Start"
+msgstr "_Spustiť"
+
+#: actions.c:60
+msgid "Re_check"
+msgstr "_Aktualizovať"
+
+#: actions.c:62
+msgid "S_top"
+msgstr "Zas_taviť"
+
+#: actions.c:64
+msgid "_Remove"
+msgstr "_Zmazať"
+
+#: actions.c:66
+msgid "_Create New Torrent"
+msgstr "_Vytvoriť nový torrent"
+
+#: actions.c:68
+msgid "_Close"
+msgstr "_Zavrieť"
+
+#: actions.c:70
+msgid "_Quit"
+msgstr "_Koniec"
+
+#: actions.c:72
+msgid "Edit _Preferences"
+msgstr "Nas_tavenie"
+
+#: actions.c:74
+msgid "_Torrent Info"
+msgstr "Informácie o _torrente"
+
+#: actions.c:76
+msgid "_About Transmission"
+msgstr "_O programe"
+
+#: actions.c:78
+msgid "Show _Debug Window"
+msgstr "Zobraziť _ladiace okno"
+
+#: actions.c:80
+msgid "Show / Hide _Transmission"
+msgstr "Zobraziť / skryť _Transmission"
+
+#: conf.c:91
+#: conf.c:371
+#, c-format
+msgid ""
+"Failed to open the file %s for writing:\n"
+"%s"
+msgstr ""
+"Zlyhalo otvorenie súboru %s pre zápis:\n"
+"%s"
+
+#: conf.c:106
+#, c-format
+msgid "Another copy of %s is already running."
+msgstr "Je spustená iná kópia %s."
+
+#: conf.c:109
+#, c-format
+msgid ""
+"Failed to lock the file %s:\n"
+"%s"
+msgstr ""
+"Zlyhalo uzamknutie súboru %s\n"
+"%s"
+
+#: conf.c:132
+#, c-format
+msgid ""
+"Failed to create the directory %s:\n"
+"%s"
+msgstr ""
+"Zlyhalo vytvorenie priečinku %s:\n"
+"%s"
+
+#: conf.c:205
+#, c-format
+msgid ""
+"Failed to open the file %s for reading:\n"
+"%s"
+msgstr ""
+"Zlyhalo otvorenie súboru %s pre čítanie:\n"
+"%s"
+
+#: conf.c:212
+#, c-format
+msgid ""
+"Error while reading from the file %s:\n"
+"%s"
+msgstr ""
+"Chyba počas čítania zo súboru %s:\n"
+"%s"
+
+#: conf.c:385
+#, c-format
+msgid ""
+"Error while writing to the file %s:\n"
+"%s"
+msgstr ""
+"Chyba počas zápisu do súboru %s:\n"
+"%s"
+
+#: conf.c:391
+#, c-format
+msgid ""
+"Failed to rename the file %s to %s:\n"
+"%s"
+msgstr ""
+"Zlyhalo premenovanie súboru %s na %s:\n"
+"%s"
+
+#: dialogs.c:118
+msgid "Add a Torrent"
+msgstr "Pridať torrent"
+
+#: dialogs.c:125
+msgid "Automatically _start torrent"
+msgstr "Automaticky _spustiť torrent"
+
+#: dialogs.c:127
+msgid "Use alternate _download directory"
+msgstr "Pre _sťahovanie použiť alternatívny priečinok"
+
+#: dialogs.c:131
+#: tr_prefs.c:212
+msgid "Choose a download directory"
+msgstr "Zvoliť priečinok pre sťahovanie"
+
+#: dialogs.c:160
+msgid "Torrent files"
+msgstr "Súbory torrentu"
+
+#: dialogs.c:162
+msgid "All files"
+msgstr "Všetky súbory"
+
+#: dialogs.c:258
+#: torrent-inspector.c:415
+#: torrent-inspector.c:844
+#: torrent-inspector.c:849
+msgid "?"
+msgstr "?"
+
+#: dialogs.c:291
+msgid "Choose a directory"
+msgstr "Zvoliť priečinok"
+
+#: dialogs.c:415
+#, c-format
+msgid "<b>Really Quit %s?</b>"
+msgstr "<b>Naozaj ukončiť %s?</b>"
+
+#: dialogs.c:419
+msgid "This will close all active torrents."
+msgstr "Všetky aktívne torrenty budú zastavené."
+
+#: dialogs.c:427
+msgid "_Don't Ask Me This Again"
+msgstr "_Viac sa už nepýtať"
+
+#: ipc.c:197
+#, c-format
+msgid ""
+"Failed to set up IPC:\n"
+"%s"
+msgstr ""
+"Zlyhalo nastavenie IPC:\n"
+"%s"
+
+#: ipc.c:229
+#, c-format
+msgid "failed to set up IPC: %s\n"
+msgstr "zlyhalo nastavenie IPC: %s\n"
+
+#: ipc.c:309
+#, c-format
+msgid ""
+"Failed to set up socket:\n"
+"%s"
+msgstr ""
+"Zlyhalo nastavenie soketu:\n"
+"%s"
+
+#: ipc.c:332
+#, c-format
+msgid "failed to create socket: %s\n"
+msgstr "zlyhalo vytvorenie soketu: %s\n"
+
+#: ipc.c:341
+#, c-format
+msgid "failed to connect to %s: %s\n"
+msgstr "zlyhalo pripojenie k %s: %s\n"
+
+#: ipc.c:431
+msgid "bad IPC protocol version"
+msgstr "zlá verzia protokolu IPC"
+
+#: ipc.c:434
+msgid "IPC protocol parse error"
+msgstr ""
+
+#: ipc.c:437
+#, c-format
+msgid "IPC parsing failed: %s"
+msgstr ""
+
+#: ipc.c:467
+#, c-format
+msgid "bad IPC protocol version\n"
+msgstr "zlá verzia protokolu IPC\n"
+
+#: ipc.c:470
+#, c-format
+msgid "IPC protocol parse error\n"
+msgstr ""
+
+#: ipc.c:473
+#, c-format
+msgid "IPC parsing failed: %s\n"
+msgstr ""
+
+#: main.c:299
+#, c-format
+msgid ""
+"usage: %s [-hpq] [files...]\n"
+"\n"
+"Transmission %s http://transmission.m0k.org/\n"
+"A free, lightweight BitTorrent client with a simple, intuitive interface\n"
+"\n"
+"  -h --help    display this message and exit\n"
+"  -p --paused  start with all torrents paused\n"
+"  -q --quit    request that the running %s instance quit\n"
+"\n"
+"Only one instance of %s may run at one time. Multiple\n"
+"torrent files may be loaded at startup by adding them to the command\n"
+"line. If %s is already running, those torrents will be\n"
+"opened in the running instance.\n"
+msgstr ""
+"použitie: %s [-hpq] [súbory...]\n"
+"\n"
+"Transmission %s http://transmission.m0k.org/\n"
+"Ľahký BitTorrent klient zdarma s jednoduchým a intuitívnym rozhraním\n"
+"\n"
+"  -h --help    zobrazí túto správu a skončí\n"
+"  -p --paused  spustí sa, ale všetky torrenty budú pozastavené\n"
+"  -q --quit    ukončenie spustenej inštancie %s\n"
+"\n"
+"Naraz môže byť spustená len jedna inštancia %s. Viaceré \n"
+"torrent súbory môžu byť pridané pomocou príkazového riadku pri spustení.\n"
+"Ak už je %s spustený, tieto torrenty budú otvorené v spustenej inštancii.\n"
+
+#: main.c:362
+msgid "Transmission"
+msgstr "Transmission"
+
+#: main.c:694
+#, c-format
+msgid ""
+"Failed to load torrent file:\n"
+"%s"
+msgid_plural ""
+"Failed to load torrent files:\n"
+"%s"
+msgstr[0] ""
+"Zlyhalo načítanie torrent súboru:\n"
+"%s"
+msgstr[1] ""
+"Zlyhalo načítanie torrent súborov:\n"
+"%s"
+msgstr[2] ""
+"Zlyhalo načítanie torrent súborov:\n"
+"%s"
+
+#: main.c:901
+msgid "Copyright 2005-2007 The Transmission Project"
+msgstr "Copyright 2005-2007 Projekt Transmission"
+
+#: main.c:903
+msgid "translator-credits"
+msgstr "translator-credits"
+
+#: makemeta-ui.c:87
+msgid "Torrent creation aborted."
+msgstr "Zlyhalo vytvorenie torrentu."
+
+#: makemeta-ui.c:88
+msgid "Torrent creation failed."
+msgstr "Zlyhalo vytvorenie torrentu."
+
+#: makemeta-ui.c:99
+msgid "Torrent Created"
+msgstr "Torrent bol vytvorený"
+
+#: makemeta-ui.c:130
+msgid "Making Torrent..."
+msgstr "Vytváranie torrentu..."
+
+#: makemeta-ui.c:195
+msgid "file"
+msgid_plural "files"
+msgstr[0] "súbor"
+msgstr[1] "súbory"
+msgstr[2] "súborov"
+
+#: makemeta-ui.c:202
+msgid "piece"
+msgid_plural "pieces"
+msgstr[0] "časť"
+msgstr[1] "časti"
+msgstr[2] "častí"
+
+#: makemeta-ui.c:226
+msgid "Make a New Torrent"
+msgstr "Vytvoriť nový torrent"
+
+#: makemeta-ui.c:238
+msgid "Files"
+msgstr "Súbory"
+
+#: makemeta-ui.c:241
+msgid "File _Type"
+msgstr "_Typ súboru"
+
+#: makemeta-ui.c:243
+msgid "Directory"
+msgstr "Priečinok"
+
+#: makemeta-ui.c:245
+msgid "Single File"
+msgstr "Jeden súbor"
+
+#: makemeta-ui.c:251
+msgid "File or Directory to Add to the New Torrent"
+msgstr "Súbor alebo priečinok pre pridanie do nového torrentu"
+
+#: makemeta-ui.c:262
+msgid "No Files Selected"
+msgstr "Neboli zvolené žiadne súbory"
+
+#: makemeta-ui.c:276
+msgid "Torrent"
+msgstr "Torrent"
+
+#: makemeta-ui.c:279
+msgid "Private to this Tracker"
+msgstr ""
+
+#: makemeta-ui.c:282
+msgid "Announce _URL"
+msgstr "Oznamovacia _URL"
+
+#: makemeta-ui.c:287
+msgid "Commen_t"
+msgstr "Komen_tár"
+
+#: msgwin.c:159
+#, c-format
+msgid "Unable to open \"%s\" for writing: %s"
+msgstr "Nie je možné otvoriť \"%s\" pre zápis: %s"
+
+#: msgwin.c:173
+#, c-format
+msgid "Error writing to \"%s\": %s"
+msgstr "Chyba pri zapisovaní do \"%s\": %s"
+
+#: msgwin.c:190
+msgid "Save Debug Log"
+msgstr "Uložiť záznam o ladení"
+
+#: msgwin.c:215
+#: torrent-inspector.c:901
+msgid "Error"
+msgstr "Chyba"
+
+#: msgwin.c:216
+msgid "Info"
+msgstr "Informácie"
+
+#: msgwin.c:217
+msgid "Debug"
+msgstr "Ladenie"
+
+#: msgwin.c:244
+msgid "Save"
+msgstr "_Uložiť"
+
+#: msgwin.c:248
+msgid "Clear"
+msgstr "Vyčistiť"
+
+#: msgwin.c:255
+msgid "Level "
+msgstr "Úroveň"
+
+#: msgwin.c:256
+#: msgwin.c:282
+msgid "Select the debug filter level."
+msgstr "Zvoliť úroveň ladiaceho filtra."
+
+#: torrent-inspector.c:249
+msgid "Address"
+msgstr "Adresa"
+
+#: torrent-inspector.c:250
+msgid "Port"
+msgstr "Port"
+
+#: torrent-inspector.c:251
+msgid "Client"
+msgstr "Klient"
+
+#: torrent-inspector.c:252
+#: torrent-inspector.c:539
+#: torrent-inspector.c:1361
+#: tr_window.c:206
+msgid "Progress"
+msgstr "Priebeh"
+
+#: torrent-inspector.c:254
+msgid "Downloading"
+msgstr "Sťahovanie"
+
+#: torrent-inspector.c:255
+msgid "DL Rate"
+msgstr "Rýchlosť sťahovania"
+
+#: torrent-inspector.c:256
+msgid "Uploading"
+msgstr "Odosiela sa"
+
+#: torrent-inspector.c:257
+msgid "UL Rate"
+msgstr "Rýchlosť odosielania"
+
+#: torrent-inspector.c:608
+msgid "Piece Availability"
+msgstr "Dostupnosť častí"
+
+#: torrent-inspector.c:631
+msgid "Peers"
+msgstr "Peerovia"
+
+#: torrent-inspector.c:648
+msgid "Seeders"
+msgstr "Seedov"
+
+#: torrent-inspector.c:656
+msgid "Leechers"
+msgstr "Leechov"
+
+#: torrent-inspector.c:664
+msgid "Completed"
+msgstr "Dokončených"
+
+#: torrent-inspector.c:699
+msgid "Torrent Information"
+msgstr "Informácie o torrente"
+
+#: torrent-inspector.c:702
+msgid "Tracker"
+msgstr "Tracker"
+
+#: torrent-inspector.c:711
+msgid "Pieces"
+msgstr "Častí"
+
+#: torrent-inspector.c:718
+msgid "Hash"
+msgstr "Hash"
+
+#: torrent-inspector.c:722
+msgid "Secure"
+msgstr ""
+
+#: torrent-inspector.c:724
+msgid "Private Torrent, PEX disabled"
+msgstr "Privátny torrent, PEX je zakázané"
+
+#: torrent-inspector.c:725
+msgid "Public Torrent"
+msgstr "Verejný torrent"
+
+#: torrent-inspector.c:729
+msgid "Comment"
+msgstr "Komentár"
+
+#: torrent-inspector.c:742
+msgid "Created By"
+msgstr "Vytvorený"
+
+#: torrent-inspector.c:745
+msgid "Creator"
+msgstr "Tvorca"
+
+#: torrent-inspector.c:746
+#: util.c:147
+msgid "N/A"
+msgstr "N/A"
+
+#: torrent-inspector.c:749
+msgid "Date"
+msgstr "Dátum"
+
+#: torrent-inspector.c:756
+msgid "Location"
+msgstr "Umiestnenie"
+
+#: torrent-inspector.c:759
+msgid "Downloaded Data"
+msgstr "Stiahnuté dáta"
+
+#: torrent-inspector.c:763
+msgid "Torrent File Path"
+msgstr "Cesta k súboru s torrentom"
+
+#: torrent-inspector.c:767
+msgid "Transmission Support Folder"
+msgstr ""
+
+#: torrent-inspector.c:772
+msgid "Torrent File Name"
+msgstr "Názov torrent súboru"
+
+#: torrent-inspector.c:841
+msgid "None"
+msgstr "Žiadna"
+
+#: torrent-inspector.c:870
+msgid "Transfer"
+msgstr "Prenos"
+
+#: torrent-inspector.c:873
+msgid "State"
+msgstr "Stav"
+
+#: torrent-inspector.c:877
+msgid "Valid DL"
+msgstr "Platný DL"
+
+#: torrent-inspector.c:881
+msgid "Downloaded"
+msgstr "Stiahnuté"
+
+#: torrent-inspector.c:885
+msgid "Uploaded"
+msgstr "Odoslané"
+
+#: torrent-inspector.c:889
+msgid "Ratio"
+msgstr "Pomer"
+
+#: torrent-inspector.c:893
+msgid "Remaining"
+msgstr "Zostáva"
+
+#: torrent-inspector.c:897
+msgid "Swarm Rate"
+msgstr ""
+
+#: torrent-inspector.c:905
+msgid "Completeness"
+msgstr "Dokončené"
+
+#: torrent-inspector.c:913
+msgid "Dates"
+msgstr "Dátumy"
+
+#: torrent-inspector.c:916
+msgid "Added"
+msgstr "Pridaný"
+
+#: torrent-inspector.c:920
+msgid "Last Activity"
+msgstr "Posledná aktivita"
+
+#: torrent-inspector.c:963
+#: torrent-inspector.c:973
+#: torrent-inspector.c:1144
+msgid "High"
+msgstr "Vysoký"
+
+#: torrent-inspector.c:964
+#: torrent-inspector.c:1146
+msgid "Normal"
+msgstr "Normálna"
+
+#: torrent-inspector.c:965
+#: torrent-inspector.c:974
+#: torrent-inspector.c:1148
+msgid "Low"
+msgstr "Nízky"
+
+#: torrent-inspector.c:1347
+msgid "File"
+msgstr "Súbor"
+
+#: torrent-inspector.c:1375
+msgid "Download"
+msgstr "Stiahnuť"
+
+#: torrent-inspector.c:1385
+msgid "Priority"
+msgstr "Priorita"
+
+#: torrent-inspector.c:1506
+msgid "Transfer Bandwidth"
+msgstr "Prenosová šírka pásma"
+
+#: torrent-inspector.c:1509
+msgid "Limit _Download Speed (KiB/s):"
+msgstr "Obmedziť rýchlosť _sťahovania (KiB/s):"
+
+#: torrent-inspector.c:1522
+msgid "Limit _Upload Speed (KiB/s):"
+msgstr "Obmedziť rýchlosť _odosielania (KiB/s):"
+
+#: torrent-inspector.c:1536
+msgid "Seeding"
+msgstr "Seeduje sa"
+
+#: torrent-inspector.c:1539
+msgid "_Stop Seeding at Ratio:"
+msgstr "_Zastaviť odosielanie pri pomere:"
+
+#: torrent-inspector.c:1604
+msgid "Torrent Inspector"
+msgstr ""
+
+#: torrent-inspector.c:1631
+msgid "_Activity"
+msgstr "_Aktivita"
+
+#: torrent-inspector.c:1636
+msgid "_Peers"
+msgstr "_Peerovia"
+
+#: torrent-inspector.c:1640
+msgid "_Info"
+msgstr "_Informácie"
+
+#: torrent-inspector.c:1645
+msgid "_Files"
+msgstr "_Súbory"
+
+#: torrent-inspector.c:1650
+msgid "_Options"
+msgstr "_Možnosti"
+
+#: tr_prefs.c:84
+msgid "_Limit download speed"
+msgstr "_Obmedziť rýchlosť sťahovania"
+
+#: tr_prefs.c:85
+msgid "Restrict the download rate"
+msgstr "Obmedzenie rýchlosti sťahovania"
+
+#: tr_prefs.c:89
+msgid "Maximum _download speed:"
+msgstr "Maximálna _rýchlosť sťahovania:"
+
+#: tr_prefs.c:90
+msgid "Speed in KiB/sec for restricted download rate"
+msgstr "Rýchlosť v KiB/s pre obmedzenie rýchlosti sťahovania"
+
+#: tr_prefs.c:94
+msgid "Li_mit upload speed"
+msgstr "Ob_medziť rýchlosť odosielania"
+
+#: tr_prefs.c:95
+msgid "Restrict the upload rate"
+msgstr "Obmedzenie rýchlosti odosielania"
+
+#: tr_prefs.c:99
+msgid "Maximum _upload speed:"
+msgstr "Maximálna rýchlosť _odosielania:"
+
+#: tr_prefs.c:100
+msgid "Speed in KiB/sec for restricted upload rate"
+msgstr "Rýchlosť v KiB/s pre obmedzenie rýchlosti odosielania"
+
+#: tr_prefs.c:104
+msgid "Al_ways prompt for download directory"
+msgstr "_Vždy sa pýtať na priečinok pre sťahovanie"
+
+#: tr_prefs.c:105
+msgid "When adding a torrent, always prompt for a directory to download data files into"
+msgstr "Pri pridávaní nového torrentu sa vždy pýtať na priečinok pre ukladanie jeho súborov"
+
+#: tr_prefs.c:110
+msgid "Download di_rectory:"
+msgstr "Priečinok pre _sťahovanie:"
+
+#: tr_prefs.c:111
+msgid "Destination directory for downloaded data files"
+msgstr "Cieľový priečinok pre stiahnuté súbory"
+
+#: tr_prefs.c:115
+msgid "Listening _port:"
+msgstr "_Port pre prichádzajúce spojenie:"
+
+#: tr_prefs.c:116
+msgid "TCP port number to listen for peer connections"
+msgstr "TCP port pre prichádzajúce spojenia od ostatných peerov"
+
+#: tr_prefs.c:120
+msgid "Au_tomatic port mapping via NAT-PMP or UPnP"
+msgstr "Au_tomatické mapovanie portov cez NAT-PMP alebo UPnP"
+
+#: tr_prefs.c:121
+msgid "Attempt to bypass NAT or firewall to allow incoming peer connections"
+msgstr "Pokúsiť sa o obídenie NAT alebo firewalu pre umožnenie prichádzajúceho spojenia od peerov"
+
+#: tr_prefs.c:125
+msgid "Use peer _exchange if possible"
+msgstr ""
+
+#: tr_prefs.c:126
+msgid "Perform Azureus or µTorrent compatible peer exchange with any peers which support it"
+msgstr ""
+
+#: tr_prefs.c:131
+msgid "Display an _icon in the system tray"
+msgstr "Zobraziť _ikonu v oblasti upozornení"
+
+#: tr_prefs.c:132
+msgid "Use a system tray / dock / notification area icon"
+msgstr "Použiť ikonu v oblasti upozornení"
+
+#: tr_prefs.c:136
+msgid "Confirm _quit"
+msgstr "Potvrdiť _ukončenie"
+
+#: tr_prefs.c:137
+msgid "Prompt for confirmation when quitting"
+msgstr "Pri ukončení vyžadovať potvrdenie"
+
+#: tr_prefs.c:142
+msgid "For torrents added _normally:"
+msgstr "Pre _normálne pridané torrenty:"
+
+#: tr_prefs.c:143
+msgid "Torrent files added via the toolbar, popup menu, and drag-and-drop"
+msgstr "Torrenty pridané cez lištu nástrojov, vyskakovacie menu a drag-and-drop"
+
+#: tr_prefs.c:148
+msgid ""
+"For torrents added e_xternally\n"
+"(via the command-line):"
+msgstr ""
+"Pre torrenty pridané e_xterne\n"
+"(pomocou príkazového riadku):"
+
+#: tr_prefs.c:149
+msgid "For torrents added via the command-line only"
+msgstr "Iba pre torrenty pridané pomocou príkazového riadku"
+
+#: tr_prefs.c:346
+#, c-format
+msgid "%s Preferences"
+msgstr "%s nastavenia"
+
+#: tr_prefs.c:892
+msgid "Use the torrent file where it is"
+msgstr "Použiť súbor s torrentom tam, kde je"
+
+#: tr_prefs.c:895
+msgid "Keep a copy of the torrent file"
+msgstr "Uchovať kópiu torrent súboru"
+
+#: tr_prefs.c:898
+msgid "Keep a copy and remove the original"
+msgstr "Uchovať kópiu a zmazať originál"
+
+#: tr_torrent.c:324
+#: tr_torrent.c:437
+#, c-format
+msgid "%s: not a valid torrent file"
+msgstr "%s: neplatný torrent súbor"
+
+#: tr_torrent.c:327
+#: tr_torrent.c:440
+#, c-format
+msgid "%s: torrent is already open"
+msgstr "%s: torrent je už otvorený"
+
+#: tr_torrent.c:368
+msgid "not a valid torrent file"
+msgstr "neplatný torrent súbor"
+
+#: tr_torrent.c:371
+msgid "torrent is already open"
+msgstr "torrent je už otvorený"
+
+#: tr_torrent.c:562
+#, c-format
+msgid "Waiting to check existing files (checked %.1f%%)"
+msgstr "Čakanie na kontrolu existujúcich súborov (skontrolovaných %.1f%%)"
+
+#: tr_torrent.c:567
+#, c-format
+msgid "Checking existing files (checked %.1f%%)"
+msgstr "Kontrola existujúcich súborov (skontrolovaných %.1f%%)"
+
+#: tr_torrent.c:572
+#, c-format
+msgid "Stalled (%.1f%%)"
+msgstr ""
+
+#: tr_torrent.c:575
+#, c-format
+msgid "%s remaining (%.1f%%)"
+msgstr "Zostáva %s (%.1f%%)"
+
+#: tr_torrent.c:582
+#, c-format
+msgid "Uploading to %d of %d peer"
+msgid_plural "Uploading to %d of %d peers"
+msgstr[0] "Odosiela sa %d z celkového počtu %d peer"
+msgstr[1] "Odosiela sa %d z celkového počtu %d peerov"
+msgstr[2] "Odosiela sa %d z celkového počtu %d peerov"
+
+#: tr_torrent.c:589
+#, c-format
+msgid "Seeding to %d of %d peer"
+msgid_plural "Seeding to %d of %d peers"
+msgstr[0] "Seeduje sa %d z celkového počtu %d peer"
+msgstr[1] "Seeduje sa %d z celkového počtu %d peerov"
+msgstr[2] "Seeduje sa %d z celkového počtu %d peerov"
+
+#: tr_torrent.c:595
+msgid "Stopping..."
+msgstr "Zastavuje sa..."
+
+#: tr_torrent.c:599
+#, c-format
+msgid "Stopped (%.1f%%)"
+msgstr "Zastavené (%.1f%%)"
+
+#: tr_window.c:101
+msgid "Error: "
+msgstr "Chyba:"
+
+#: tr_window.c:106
+#, c-format
+msgid "Downloading from %i of %i peer"
+msgid_plural "Downloading from %i of %i peers"
+msgstr[0] "Sťahuje sa od %i z celkového počtu %i peer"
+msgstr[1] "Sťahuje sa od %i z celkového počtu %i peerov"
+msgstr[2] "Sťahuje sa od %i z celkového počtu %i peerov"
+
+#: tr_window.c:144
+#, c-format
+msgid ""
+"Ratio: %s\n"
+"UL: %s"
+msgstr ""
+"Pomer: %s\n"
+"UL: %s"
+
+#: tr_window.c:149
+#, c-format
+msgid ""
+"DL: %s\n"
+"UL: %s"
+msgstr ""
+"DL: %s\n"
+"UL: %s"
+
+#: tr_window.c:192
+msgid "Name"
+msgstr "Názov"
+
+#: tr_window.c:203
+msgid "  fnord    fnord  "
+msgstr "  fnord    fnord  "
+
+#: tr_window.c:309
+#, c-format
+msgid "Total DL: %s"
+msgstr "Celkový DL: %s"
+
+#: tr_window.c:315
+#, c-format
+msgid "Total UL: %s"
+msgstr "Celkový UL: %s"
+
+#: util.c:77
+msgid "B"
+msgstr "B"
+
+#: util.c:77
+msgid "KiB"
+msgstr "KiB"
+
+#: util.c:77
+msgid "MiB"
+msgstr "MiB"
+
+#: util.c:77
+msgid "GiB"
+msgstr "GiB"
+
+#: util.c:77
+msgid "TiB"
+msgstr "TiB"
+
+#: util.c:77
+msgid "PiB"
+msgstr "PiB"
+
+#: util.c:77
+msgid "EiB"
+msgstr "EiB"
+
+#: util.c:116
+#, c-format
+msgid "%i %s"
+msgstr "%i %s"
+
+#: util.c:117
+#: util.c:121
+msgid "sec"
+msgid_plural "secs"
+msgstr[0] "sek"
+msgstr[1] "sek"
+msgstr[2] "sek"
+
+#: util.c:119
+#: util.c:123
+#: util.c:127
+#, c-format
+msgid "%i %s %i %s"
+msgstr "%i %s %i %s"
+
+#: util.c:120
+#: util.c:125
+msgid "min"
+msgid_plural "mins"
+msgstr[0] "min"
+msgstr[1] "min"
+msgstr[2] "min"
+
+#: util.c:124
+#: util.c:129
+msgid "hr"
+msgid_plural "hrs"
+msgstr[0] "hod"
+msgstr[1] "hod"
+msgstr[2] "hod"
+
+#: util.c:128
+msgid "day"
+msgid_plural "days"
+msgstr[0] "deň"
+msgstr[1] "dni"
+msgstr[2] "dní"
+
+#: util.c:151
+msgid "∞"
+msgstr "∞"
+
