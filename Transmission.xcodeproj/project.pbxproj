@@ -437,7 +437,6 @@
 		A27431D90A68538400FA780A /* FilterBarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarButton.m; path = macosx/FilterBarButton.m; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
 		A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOff.png; path = macosx/Images/ActionOff.png; sourceTree = "<group>"; };
-		A27A53420A06A62500E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
@@ -746,6 +745,15 @@
 				A259316A0A73B2CC002F4FE7 /* TransmissionHelp */,
 				A2F8951E0A2D4BA500ED2127 /* Credits.rtf */,
 				A2085E2F0C53C833000BC3B7 /* LICENSE */,
+				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				A200B9620A227FD0007BBB1E /* InfoWindow.nib */,
+				A21567EB0A9A5034004DECD6 /* MessageWindow.nib */,
+				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
+				A2085E000C53C16F000BC3B7 /* AboutWindow.nib */,
+				A2AE68310C628A35008753C9 /* Creator.nib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
@@ -759,7 +767,6 @@
 				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
-				A27A53420A06A62500E1F16F /* StatusSep.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
 				4DF7500808A103AD007B0D70 /* Info.png */,
@@ -786,15 +793,6 @@
 				4DE5CCB90981D27700BE280E /* PauseAll.png */,
 				A25FCDDD0A37695F002BCBBE /* PauseSelected.png */,
 				A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */,
-				4DE5CCCA0981D9BE00BE280E /* Defaults.plist */,
-				8D1107310486CEB800E47090 /* Info.plist */,
-				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
-				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
-				A200B9620A227FD0007BBB1E /* InfoWindow.nib */,
-				A21567EB0A9A5034004DECD6 /* MessageWindow.nib */,
-				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
-				A2085E000C53C16F000BC3B7 /* AboutWindow.nib */,
-				A2AE68310C628A35008753C9 /* Creator.nib */,
 				A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */,
 				A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */,
 				A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */,
