@@ -23,6 +23,11 @@
  *****************************************************************************/
 
 #import "FilterBarView.h"
+#import "FilterBarButton.h"
+
+#define ORIGIN_VERTICAL 3.0
+#define ORIGIN_HORIZONTAL 4.0
+#define PADDING_HORIZONTAL 2.0
 
 @implementation FilterBarView
 
@@ -38,11 +43,10 @@
     [fSeedFilterButton sizeToFit];
     [fPauseFilterButton sizeToFit];
     
-    float padding = 2.0, base = 3.0;
-    [fNoFilterButton setFrameOrigin: NSMakePoint(padding + 2.0, base)];
-    [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + padding, base)];
-    [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + padding, base)];
-    [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + padding, base)];
+    [fNoFilterButton setFrameOrigin: NSMakePoint(ORIGIN_HORIZONTAL, ORIGIN_VERTICAL)];
+    [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
+    [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
+    [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
     
     [self setNeedsDisplay: YES];
 }

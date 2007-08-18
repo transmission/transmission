@@ -24,12 +24,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ImageBackgroundView.h"
-#import "FilterBarButton.h"
+
+@class FilterBarButton;
 
 @interface FilterBarView : ImageBackgroundView
 {
     IBOutlet FilterBarButton * fNoFilterButton, * fDownloadFilterButton,
-                        * fSeedFilterButton, * fPauseFilterButton;
+                             * fSeedFilterButton, * fPauseFilterButton;
 }
 
 @end
