@@ -49,7 +49,7 @@
 #define REQ_TIMEOUT_INTERVAL_SEC 60
 
 /* the number of peers that is our goal */
-#define NUMWANT 150
+#define NUMWANT 80
 
 /* the length of the 'key' argument passed in tracker requests */
 #define TR_KEY_LEN 10
@@ -534,6 +534,7 @@ addCommonHeaders( const Tracker * t,
     snprintf( buf, sizeof(buf), "%s:%d", address->address, address->port );
     evhttp_add_header( req->output_headers, "Host", buf );
     evhttp_add_header( req->output_headers, "Connection", "close" );
+    evhttp_add_header( req->output_headers, "Content-length", "0" );
     evhttp_add_header( req->output_headers, "User-Agent",
                                          TR_NAME "/" LONG_VERSION_STRING );
 }
