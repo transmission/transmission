@@ -352,9 +352,6 @@
     
     BOOL create = [menu numberOfItems] <= 0, folder;
     
-    NSMenu * supermenu = [menu supermenu];
-    NSArray * items;
-    NSDictionary * folderDict;
     #warning move to submethod
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
@@ -391,67 +388,73 @@
         
         return;
     }
-    else if ((folderDict = [[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject]))
-        items = [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject] objectForKey: @"Children"];
-    else
-        items = [fMenuTorrent fileList];
-    
-    #warning move rest to submethod
-    NSEnumerator * enumerator = [items objectEnumerator];
-    NSDictionary * dict;
-    NSMenuItem * item;
-    while ((dict = [enumerator nextObject]))
+    else if ([menu supermenu]) //assume the menu is part of the file list
     {
-        NSString * name = [dict objectForKey: @"Name"];
+        NSMenu * supermenu = [menu supermenu];
+        NSArray * items;
+        NSDictionary * folderDict;
+        if ((folderDict = [[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject]))
+            items = [folderDict objectForKey: @"Children"];
+        else
+            items = [fMenuTorrent fileList];
         
-        folder = [[dict objectForKey: @"IsFolder"] boolValue];
-        
-        if (create)
+        NSEnumerator * enumerator = [items objectEnumerator];
+        NSDictionary * dict;
+        NSMenuItem * item;
+        while ((dict = [enumerator nextObject]))
         {
-            item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
+            NSString * name = [dict objectForKey: @"Name"];
             
-            NSImage * icon;
-            if (!folder)
+            folder = [[dict objectForKey: @"IsFolder"] boolValue];
+            
+            if (create)
             {
-                icon = [[dict objectForKey: @"Icon"] copy];
-                [icon setFlipped: NO];
+                item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
+                
+                NSImage * icon;
+                if (!folder)
+                {
+                    icon = [[dict objectForKey: @"Icon"] copy];
+                    [icon setFlipped: NO];
+                }
+                else
+                {
+                    NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
+                    [itemMenu setAutoenablesItems: NO];
+                    [item setSubmenu: itemMenu];
+                    [itemMenu setDelegate: self];
+                    [itemMenu release];
+                    
+                    icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
+                }
+                
+                [item setRepresentedObject: dict];
+                
+                [icon setScalesWhenResized: YES];
+                [icon setSize: NSMakeSize(16.0, 16.0)];
+                [item setImage: icon];
+                [icon release];
+                
+                [item setAction: @selector(checkFile:)];
+                
+                [menu addItem: item];
+                [item release];
             }
             else
-            {
-                NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
-                [itemMenu setAutoenablesItems: NO];
-                [item setSubmenu: itemMenu];
-                [itemMenu setDelegate: self];
-                [itemMenu release];
-                
-                icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
-            }
+                item = [menu itemWithTitle: name];
             
-            [item setRepresentedObject: dict];
-            
-            [icon setScalesWhenResized: YES];
-            [icon setSize: NSMakeSize(16.0, 16.0)];
-            [item setImage: icon];
-            [icon release];
-            
-            [item setAction: @selector(checkFile:)];
-            
-            [menu addItem: item];
-            [item release];
+            NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
+            [item setState: [fMenuTorrent checkForFiles: indexSet]];
+            [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
         }
-        else
-            item = [menu itemWithTitle: name];
-        
-        NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
-        [item setState: [fMenuTorrent checkForFiles: indexSet]];
-        [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
     }
+    else;
 }
 
 - (void) setQuickLimitMode: (id) sender
 {
     int tag = [sender tag];
-    int mode;
+    tr_speedlimit_t mode;
     if (tag == ACTION_MENU_UNLIMITED_TAG)
         mode = TR_SPEEDLIMIT_UNLIMITED;
     else if (tag == ACTION_MENU_LIMIT_TAG)

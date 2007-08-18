@@ -521,7 +521,6 @@ static int static_lastid = 0;
     return fStat->ratio;
 }
 
-#warning make enum
 - (int) ratioSetting
 {
     return fRatioSetting;
