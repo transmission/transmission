@@ -52,7 +52,7 @@
 #define NUMWANT 150
 
 /* the length of the 'key' argument passed in tracker requests */
-#define TR_KEY_LEN 20
+#define TR_KEY_LEN 10
 
 
 /**
@@ -150,6 +150,53 @@ torrentCompare( const void * va, const void * vb )
     const Torrent * a = (const Torrent*) va;
     const Torrent * b = (const Torrent*) vb;
     return memcmp( a->hash, b->hash, SHA_DIGEST_LENGTH );
+}
+
+/***
+****
+***/
+
+typedef struct
+{
+    char * address;
+    int port;
+    struct evhttp_connection * evconn;
+}
+connection_key_t;
+
+static int
+connectionCompare( const void * va, const void * vb )
+{
+    const connection_key_t * a = (const connection_key_t *) va;
+    const connection_key_t * b = (const connection_key_t *) vb;
+    int ret = strcmp( a->address, b->address );
+    if( ret ) return ret;
+    return a->port - b->port;
+}
+
+static struct evhttp_connection*
+getConnection( const char * address, int port )
+{
+    connection_key_t *val, tmp;
+
+    static tr_ptrArray_t * connections = NULL;
+    if( !connections )
+        connections = tr_ptrArrayNew( );
+
+    tmp.address = (char*) address;
+    tmp.port = port;
+    val = tr_ptrArrayFindSorted( connections, &tmp, connectionCompare );
+
+    if( !val )
+    {
+        val = tr_new( connection_key_t, 1 );
+        val->address = tr_strdup( address );
+        val->port = port;
+        val->evconn = evhttp_connection_new( address, port );
+        tr_ptrArrayInsertSorted( connections, val, connectionCompare );
+    }
+
+    return val->evconn;
 }
 
 /***
@@ -597,6 +644,22 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
         if( ( 0 < numResponses ) && ( numResponses < n_scraping ) )
             t->multiscrapeMax = numResponses;
     }
+    else if( !req )
+    {
+        int i, n;
+        Torrent ** torrents = (Torrent**)
+            tr_ptrArrayPeek( t->scraping, &n );
+        for( i=0; i<n; ++i ) {
+            fprintf( stderr, "null req -- torent #%d is %s\n", i, torrents[i]->torrent->info.name );
+            torrents[i]->scrapeTag = tr_timerNew( t->handle,
+                                                  onTorrentScrapeNow,
+                                                  torrents[i], NULL,
+                                                  t->scrapeIntervalMsec );
+        }
+        tr_ptrArrayClear( t->scraping );
+
+        t->multiscrapeMax = INT_MAX;
+    }
 
     if (( errmsg = updateAddresses( t, req ) )) {
         tr_err( errmsg );
@@ -667,7 +730,7 @@ onTrackerScrapeNow( void * vt )
 
         /* ping the tracker */
         tr_inf( "scrape to %s:%d: %s", address->address, address->port, uri );
-        evcon = evhttp_connection_new( address->address, address->port );
+        evcon = getConnection( address->address, address->port );
         assert( evcon != NULL );
         evhttp_connection_set_timeout( evcon, SCRAPE_TIMEOUT_INTERVAL_SEC );
         req = evhttp_request_new( onScrapeResponse, t );
@@ -860,7 +923,7 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     }
     else
     {
-        tr_inf( "Bad response from tracker '%s' on request '%s'"
+        tr_inf( "Bad response from tracker '%s' on request '%s' "
                 "for torrent '%s'... trying again in 30 seconds",
                 tor->tracker->primaryAddress,
                 tor->lastRequest,
@@ -904,7 +967,7 @@ sendTrackerRequest( void * vtor, const char * eventName )
     /* kill any pending requests */
     tr_timerFree( &tor->reannounceTag );
 
-    evcon = evhttp_connection_new( address->address, address->port );
+    evcon = getConnection( address->address, address->port );
     if ( !evcon )
         tr_err( "Can't make a connection to %s:%d", address->address, address->port );
     else {
@@ -915,8 +978,6 @@ sendTrackerRequest( void * vtor, const char * eventName )
         addCommonHeaders( tor->tracker, tor->httpReq );
         tr_evhttp_make_request( tor->tracker->handle, evcon, tor->httpReq, EVHTTP_REQ_GET, uri );
     }
-
-    tr_free( uri );
 
     return FALSE;
 }
