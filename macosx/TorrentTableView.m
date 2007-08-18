@@ -374,6 +374,23 @@
         
         return;
     }
+    else if (menu == fRatioMenu)
+    {
+        int mode = [fMenuTorrent ratioSetting];
+        
+        NSMenuItem * item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
+        [item setState: mode == NSOnState ? NSOnState : NSOffState];
+        [item setTitle: [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+                    "torrent action context menu -> ratio stop"), [fMenuTorrent ratioLimit]]];
+        
+        item = [menu itemWithTag: ACTION_MENU_UNLIMITED_TAG];
+        [item setState: mode == NSOffState ? NSOnState : NSOffState];
+        
+        item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
+        [item setState: mode == NSMixedState ? NSOnState : NSOffState];
+        
+        return;
+    }
     else if ((folderDict = [[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject]))
         items = [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject] objectForKey: @"Children"];
     else
@@ -434,7 +451,7 @@
 - (void) setQuickLimitMode: (id) sender
 {
     int tag = [sender tag];
-    tr_speedlimit_t mode;
+    int mode;
     if (tag == ACTION_MENU_UNLIMITED_TAG)
         mode = TR_SPEEDLIMIT_UNLIMITED;
     else if (tag == ACTION_MENU_LIMIT_TAG)
@@ -452,6 +469,31 @@
     BOOL upload = [sender menu] == fUploadMenu;
     [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender title] intValue] upload: upload];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+}
+
+- (void) setQuickRatioMode: (id) sender
+
+{
+    int tag = [sender tag];
+    int mode;
+    if (tag == ACTION_MENU_UNLIMITED_TAG)
+        mode = NSOffState;
+    else if (tag == ACTION_MENU_LIMIT_TAG)
+        mode = NSOnState;
+    else
+        mode = NSMixedState;
+    
+    [fMenuTorrent setRatioSetting: mode];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+}
+
+- (void) setQuickRatio: (id) sender
+{
+    [fMenuTorrent setRatioSetting: NSOnState];
+    [fMenuTorrent setRatioLimit: [[sender title] floatValue]];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
 }

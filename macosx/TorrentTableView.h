@@ -52,7 +52,7 @@
     
     NSDictionary * fSmallStatusAttributes;
     
-    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu;
+    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
     Torrent * fMenuTorrent;
 }
 
@@ -62,6 +62,9 @@
 
 - (void) setQuickLimitMode: (id) sender;
 - (void) setQuickLimit: (id) sender;
+
+- (void) setQuickRatioMode: (id) sender;
+- (void) setQuickRatio: (id) sender;
 
 - (void) checkFile: (id) sender;
 
