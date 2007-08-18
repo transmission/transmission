@@ -51,10 +51,10 @@
 #define REQ_TIMEOUT_INTERVAL_SEC 60
 
 /* the number of peers that is our goal */
-#define NUMWANT 80
+#define NUMWANT 50
 
 /* the length of the 'key' argument passed in tracker requests */
-#define TR_KEY_LEN 10
+#define TR_KEY_LEN 20
 
 
 /**
@@ -198,6 +198,7 @@ getConnection( const char * address, int port )
         tr_ptrArrayInsertSorted( connections, val, connectionCompare );
     }
 
+fprintf( stderr, "got a connection to [%s] port [%d]: %p\n", address, port, val->evconn );
     return val->evconn;
 }
 
@@ -276,12 +277,14 @@ static int onTrackerScrapeNow( void* );
 static void
 tr_trackerScrapeSoon( Tracker * t )
 {
+#if 0
     /* don't start more than one scrape at once for the same tracker... */
     if( !tr_ptrArrayEmpty( t->scraping ) )
         return;
 
     if( !t->scrapeTag )
          t->scrapeTag = tr_timerNew( t->handle, onTrackerScrapeNow, t, NULL, 1000 );
+#endif
 }
 
 static Tracker*
@@ -361,10 +364,11 @@ escape( char * out, const uint8_t * in, int in_len )
 {
     const uint8_t *end = in + in_len;
     while( in != end )
-        if( isalnum(*in) )
-            *out++ = (char) *in++;
-        else 
-            out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+//        if( isalnum(*in) )
+ //           *out++ = (char) *in++;
+  //      else 
+            //out += snprintf( out, 4, "%%%02X", (unsigned int)*in++ );
+            out += snprintf( out, 4, "%%%02x", (unsigned int)*in++ );
     *out = '\0';
 }
 
@@ -535,10 +539,10 @@ addCommonHeaders( const Tracker * t,
     tr_tracker_info_t * address = getCurrentAddress( t );
     snprintf( buf, sizeof(buf), "%s:%d", address->address, address->port );
     evhttp_add_header( req->output_headers, "Host", buf );
-    evhttp_add_header( req->output_headers, "Connection", "close" );
-    evhttp_add_header( req->output_headers, "Content-length", "0" );
     evhttp_add_header( req->output_headers, "User-Agent",
                                          TR_NAME "/" LONG_VERSION_STRING );
+    evhttp_add_header( req->output_headers, "Connection", "close" );
+    evhttp_add_header( req->output_headers, "Content-length", "0" );
 }
 
 /***
@@ -971,9 +975,10 @@ sendTrackerRequest( void * vtor, const char * eventName )
     tr_timerFree( &tor->reannounceTag );
 
     evcon = getConnection( address->address, address->port );
-    if ( !evcon )
+    if ( !evcon ) {
         tr_err( "Can't make a connection to %s:%d", address->address, address->port );
-    else {
+        tr_free( uri );
+    } else {
         tr_free( tor->lastRequest );
         tor->lastRequest = tr_strdup( eventName );
         evhttp_connection_set_timeout( evcon, REQ_TIMEOUT_INTERVAL_SEC );

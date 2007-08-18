@@ -69,7 +69,7 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
     struct evhttp_connection * evcon;
     struct evhttp_request * req;
     enum evhttp_cmd_type type;
-    const char * uri;
+    char * uri;
 
 #ifdef DEBUG
     fprintf( stderr, "reading...reads: [%d] writes: [%d]\n", ++reads, writes );
