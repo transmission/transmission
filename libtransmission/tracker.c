@@ -111,7 +111,8 @@ typedef struct tr_tracker_s
        was missed to ensure that we didn't think someone was cheating. */
     char peer_id[TR_ID_LEN + 1];
 
-    /* these are set from the latest scrape or tracker response */
+    /* these are set from the latest scrape or tracker response...
+       -1 means 'unknown' */
     int timesDownloaded;
     int seeders;
     int leechers;
@@ -366,6 +367,9 @@ tr_trackerNew( tr_torrent_t * torrent )
     tor->publisher = tr_publisherNew( );
     tor->tracker = t;
     tor->torrent = torrent;
+    tor->timesDownloaded = -1;
+    tor->seeders = -1;
+    tor->leechers = -1;
     tor->manualAnnounceAllowedAt = ~0;
     memcpy( tor->hash, torrent->info.hash, SHA_DIGEST_LENGTH );
     escape( tor->escaped, torrent->info.hash, SHA_DIGEST_LENGTH );
