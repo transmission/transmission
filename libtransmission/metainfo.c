@@ -313,6 +313,7 @@ void tr_metainfoFree( tr_info_t * inf )
 
     tr_free( inf->pieces );
     tr_free( inf->files );
+    tr_free( inf->primaryAddress );
     
     for( i=0; i<inf->trackerTiers; ++i ) {
         for( j=0; j<inf->trackerList[i].count; ++j )

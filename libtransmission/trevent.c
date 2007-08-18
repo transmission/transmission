@@ -106,6 +106,7 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
             read( fd, &uri, sizeof(char*) );
             tr_dbg( "read http req from pipe: req.cb_arg is %p", req->cb_arg );
             evhttp_make_request( evcon, req, type, uri );
+            tr_free( uri );
             break;
 
         default:
