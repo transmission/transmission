@@ -158,16 +158,13 @@
 
 - (void) fadeOut
 {
-    if ([self alphaValue] > 0.0)
+    //stop other animation and set to same progress
+    if ([fFadeInAnimation isAnimating])
     {
-        //stop other animation and set to same progress
-        if ([fFadeInAnimation isAnimating])
-        {
-            [fFadeInAnimation stopAnimation];
-            [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
-        }
-        [fFadeOutAnimation startAnimation];
+        [fFadeInAnimation stopAnimation];
+        [fFadeOutAnimation setCurrentProgress: 1.0 - [fFadeInAnimation currentProgress]];
     }
+    [fFadeOutAnimation startAnimation];
 }
 
 @end

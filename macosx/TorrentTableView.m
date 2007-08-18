@@ -350,9 +350,6 @@
     if (!fMenuTorrent || ![menu supermenu])
         return;
     
-    BOOL create = [menu numberOfItems] <= 0, folder;
-    
-    #warning move to submethod
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         BOOL upload = menu == fUploadMenu;
@@ -368,8 +365,6 @@
         
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == TR_SPEEDLIMIT_GLOBAL ? NSOnState : NSOffState];
-        
-        return;
     }
     else if (menu == fRatioMenu)
     {
@@ -385,11 +380,11 @@
         
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == NSMixedState ? NSOnState : NSOffState];
-        
-        return;
     }
     else if ([menu supermenu]) //assume the menu is part of the file list
     {
+        BOOL create = [menu numberOfItems] <= 0, folder;
+        
         NSMenu * supermenu = [menu supermenu];
         NSArray * items;
         NSDictionary * folderDict;
