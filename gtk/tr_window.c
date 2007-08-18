@@ -79,6 +79,7 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
 {
     TrTorrent * gtor;
     char  * name, * mb, * str, * top, * bottom;
+    const char * fmt;
     guint64 size;
     int     status, err, eta, tpeers, upeers, dpeers;
 
@@ -112,9 +113,10 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
         bottom = NULL;
     }
 
-    str = g_markup_printf_escaped( "<b>%s (%s)</b>\n<small>%s\n%s</small>",
-                                   name, mb, top,
-                                   ( NULL == bottom ? "" : bottom ) );
+    fmt = err==TR_OK
+        ? "<b>%s (%s)</b>\n<small>%s\n%s</small>"
+        : "<span color='red'><b>%s (%s)</b>\n<small>%s\n%s</small></span>";
+    str = g_markup_printf_escaped( fmt, name, mb, top, (bottom ? bottom : "") );
     g_object_set( rend, "markup", str, NULL );
     g_free( name );
     g_free( mb );
