@@ -28,6 +28,9 @@
  Note:
    The copyright notice above is copied from md5.h by L. Peter Deutsch
    <ghost@aladdin.com>. Thank him since I'm not a good speaker of English. :)
+
+  $Id$
+
  */
 
 #include <string.h>

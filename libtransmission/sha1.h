@@ -28,6 +28,8 @@
  Note:
    The copyright notice above is copied from md5.h by L. Petet Deutsch
    <ghost@aladdin.com>. Thank him since I'm not a good speaker of English. :)
+
+ $Id$
  */
 #ifndef SHA1_H
 #define SHA1_H
