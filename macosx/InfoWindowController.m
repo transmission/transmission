@@ -82,7 +82,6 @@
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    #warning get working again
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     

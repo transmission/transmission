@@ -378,7 +378,6 @@
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == NSMixedState ? NSOnState : NSOffState];
     }
-    #warning better way?
     else if ([menu supermenu]) //assume the menu is part of the file list
     {
         NSMenu * supermenu = [menu supermenu];
@@ -440,13 +439,7 @@
 
 - (void) checkFile: (id) sender
 {
-    #warning get working
-    NSIndexSet * indexSet;
-    if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
-        indexSet = [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [fMenuTorrent fileCount])];
-    else
-        indexSet = [[sender representedObject] objectForKey: @"Indexes"];
-    
+    NSIndexSet * indexSet = [[sender representedObject] objectForKey: @"Indexes"];
     [fMenuTorrent setFileCheckState: [sender state] != NSOnState ? NSOnState : NSOffState forIndexes: indexSet];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
