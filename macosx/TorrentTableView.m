@@ -38,8 +38,6 @@
 #define ACTION_MENU_UNLIMITED_TAG 102
 #define ACTION_MENU_LIMIT_TAG 103
 
-#define ACTION_MENU_FILE_TAG 201
-
 @interface TorrentTableView (Private)
 
 - (NSRect) pauseRectForRow: (int) row;
@@ -52,6 +50,10 @@
 - (BOOL) pointInPauseRect: (NSPoint) point;
 - (BOOL) pointInRevealRect: (NSPoint) point;
 - (BOOL) pointInActionRect: (NSPoint) point;
+
+- (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
+
+- (void) moveItemsFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range toMenu: (NSMenu *) newMenu;
 
 @end
 
@@ -310,25 +312,16 @@
     if (row < 0)
         return;
     
-    //get file menu
+    //get and update file menu
     fMenuTorrent = [[fTorrents objectAtIndex: row] retain];
     NSMenu * fileMenu = [fMenuTorrent fileMenu];
-    [fileMenu setDelegate: self];
+    [self updateFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
     
-    //remove old file menu
-    NSMenuItem * oldFileMenuItem;
-    if ((oldFileMenuItem = [fActionMenu itemWithTag: ACTION_MENU_FILE_TAG]))
-        [fActionMenu removeItem: oldFileMenuItem];
+    //add file menu items to action menu
+    NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
+    [self moveItemsFromMenu: fileMenu inRange: range toMenu: fActionMenu];
     
-    //set file menu
-    NSMenuItem * fileMenuItem = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Files",
-                                    "torrent action context menu -> files menu") action: NULL keyEquivalent: @""];
-    [fileMenuItem setTag: ACTION_MENU_FILE_TAG];
-    [fileMenuItem setSubmenu: fileMenu];
-    [fActionMenu addItem: fileMenuItem];
-    
-    [fileMenuItem release];
-    
+    //place menu below button
     NSRect rect = [self actionRectForRow: row];
     NSPoint location = rect.origin;
     location.y += rect.size.height + 5.0;
@@ -339,6 +332,10 @@
         context: [event context] eventNumber: [event eventNumber] clickCount: [event clickCount] pressure: [event pressure]];
     
     [NSMenu popUpContextMenu: fActionMenu withEvent: newEvent forView: self];
+    
+    //move file menu items back to the torrent's file menu
+    range.location = [fActionMenu numberOfItems] - range.length;
+    [self moveItemsFromMenu: fActionMenu inRange: range toMenu: fileMenu];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -381,67 +378,12 @@
         item = [menu itemWithTag: ACTION_MENU_GLOBAL_TAG];
         [item setState: mode == NSMixedState ? NSOnState : NSOffState];
     }
+    #warning better way?
     else if ([menu supermenu]) //assume the menu is part of the file list
     {
-        BOOL create = [menu numberOfItems] <= 0, folder;
-        
         NSMenu * supermenu = [menu supermenu];
-        NSArray * items;
-        NSDictionary * folderDict;
-        if ((folderDict = [[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]] representedObject]))
-            items = [folderDict objectForKey: @"Children"];
-        else
-            items = [fMenuTorrent fileList];
-        
-        NSEnumerator * enumerator = [items objectEnumerator];
-        NSDictionary * dict;
-        NSMenuItem * item;
-        while ((dict = [enumerator nextObject]))
-        {
-            NSString * name = [dict objectForKey: @"Name"];
-            
-            folder = [[dict objectForKey: @"IsFolder"] boolValue];
-            
-            if (create)
-            {
-                item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
-                
-                NSImage * icon;
-                if (!folder)
-                {
-                    icon = [[dict objectForKey: @"Icon"] copy];
-                    [icon setFlipped: NO];
-                }
-                else
-                {
-                    NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
-                    [itemMenu setAutoenablesItems: NO];
-                    [item setSubmenu: itemMenu];
-                    [itemMenu setDelegate: self];
-                    [itemMenu release];
-                    
-                    icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
-                }
-                
-                [item setRepresentedObject: dict];
-                
-                [icon setScalesWhenResized: YES];
-                [icon setSize: NSMakeSize(16.0, 16.0)];
-                [item setImage: icon];
-                [icon release];
-                
-                [item setAction: @selector(checkFile:)];
-                
-                [menu addItem: item];
-                [item release];
-            }
-            else
-                item = [menu itemWithTitle: name];
-            
-            NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
-            [item setState: [fMenuTorrent checkForFiles: indexSet]];
-            [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
-        }
+        [self updateFileMenu: menu forFiles: [[[supermenu itemAtIndex: [supermenu indexOfItemWithSubmenu: menu]]
+                                                    representedObject] objectForKey: @"Children"]];
     }
     else;
 }
@@ -645,6 +587,73 @@
         return NO;
     
     return NSPointInRect(point, [self actionRectForRow: row]);
+}
+
+- (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files
+{
+    BOOL create = [menu numberOfItems] <= 0;
+    
+    NSEnumerator * enumerator = [files objectEnumerator];
+    NSDictionary * dict;
+    NSMenuItem * item;
+    while ((dict = [enumerator nextObject]))
+    {
+        NSString * name = [dict objectForKey: @"Name"];
+        
+        if (create)
+        {
+            item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
+            
+            NSImage * icon;
+            if (![[dict objectForKey: @"IsFolder"] boolValue])
+            {
+                icon = [[dict objectForKey: @"Icon"] copy];
+                [icon setFlipped: NO];
+            }
+            else
+            {
+                NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
+                [itemMenu setAutoenablesItems: NO];
+                [item setSubmenu: itemMenu];
+                [itemMenu setDelegate: self];
+                [itemMenu release];
+                
+                icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
+            }
+            
+            [item setRepresentedObject: dict];
+            
+            [icon setScalesWhenResized: YES];
+            [icon setSize: NSMakeSize(16.0, 16.0)];
+            [item setImage: icon];
+            [icon release];
+            
+            [item setAction: @selector(checkFile:)];
+            
+            [menu addItem: item];
+            [item release];
+        }
+        else
+            item = [menu itemWithTitle: name];
+        
+        NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
+        [item setState: [fMenuTorrent checkForFiles: indexSet]];
+        [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
+    }
+}
+
+#warning move to additions
+- (void) moveItemsFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range toMenu: (NSMenu *) newMenu
+{
+    NSMenuItem * item;
+    int i;
+    for (i=0; i<range.length; i++)
+    {
+        item = [[oldMenu itemAtIndex: range.location] retain];
+        [oldMenu removeItem: item];
+        [newMenu addItem: item];
+        [item release];
+    }
 }
 
 @end
