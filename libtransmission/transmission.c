@@ -33,8 +33,6 @@
 #include <unistd.h> /* stat */
 #include <dirent.h> /* opendir */
 
-#include <event.h>
-
 #include "transmission.h"
 #include "fdlimit.h"
 #include "list.h"
@@ -42,6 +40,7 @@
 #include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
+#include "trevent.h"
 #include "utils.h"
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -63,20 +62,9 @@ tr_peerIdNew ( char * buf, int buflen )
     buf[TR_ID_LEN] = '\0';
 }
 
-static int shuttingDown = FALSE;
-
-static void
-libeventThreadFunc( void * unused UNUSED )
-{
-    tr_dbg( "libevent thread starting" );
-    event_init( );
-    while( !shuttingDown )
-    {
-        event_dispatch( );
-        tr_wait( 50 ); /* 1/20th of a second */
-    }
-    tr_dbg( "libevent thread exiting" );
-}
+/***
+****
+***/
 
 
 /***********************************************************************
@@ -90,13 +78,14 @@ tr_handle_t * tr_init( const char * tag )
     int           i;
 
     tr_msgInit();
-    tr_threadNew( libeventThreadFunc, NULL, "libeventThreadFunc" );
-    tr_netInit();
-    tr_netResolveThreadInit();
 
-    h = calloc( 1, sizeof( tr_handle_t ) );
+    h = tr_new0( tr_handle_t, 1 );
     if( !h )
         return NULL;
+
+    tr_eventInit( h );
+    tr_netInit();
+    tr_netResolveThreadInit();
 
     h->tag = strdup( tag );
     if( !h->tag ) {
@@ -248,9 +237,7 @@ void tr_close( tr_handle_t * h )
     free( h );
 
     tr_netResolveThreadClose();
-
-    /* end the event thread */
-    shuttingDown = TRUE;
+    tr_eventClose( h );
 }
 
 tr_torrent_t **

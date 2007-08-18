@@ -23,10 +23,11 @@ typedef struct timer_node * tr_timer_tag;
  * zero or from a client call to tr_timerFree).  This is useful
  * if user_data has resources that need to be freed.
  */
-tr_timer_tag  tr_timerNew( int     timer_func( void * user_data ),
-                           void  * user_data,
-                           void    free_func( void * user_data ),
-                           int     timeout_milliseconds );
+tr_timer_tag  tr_timerNew( struct tr_handle_s   * handle,
+                           int                    timer_func( void * user_data ),
+                           void                 * user_data,
+                           void                   free_func( void * user_data ),
+                           int                    timeout_milliseconds );
 
 /**
  * Frees a timer and sets its tag to NULL.

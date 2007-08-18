@@ -28,6 +28,7 @@
 #include "publish.h"
 #include "timer.h"
 #include "tracker.h"
+#include "trevent.h"
 #include "utils.h"
 
 #define MINUTES_TO_MSEC(N) ((N) * 60 * 1000)
@@ -60,6 +61,8 @@
 
 typedef struct
 {
+    tr_handle_t * handle;
+
     tr_ptrArray_t * torrents;
     tr_ptrArray_t * scraping;
     tr_ptrArray_t * scrapeQueue;
@@ -228,12 +231,13 @@ tr_trackerScrapeSoon( Tracker * t )
         return;
 
     if( !t->scrapeTag )
-         t->scrapeTag = tr_timerNew( onTrackerScrapeNow, t, NULL, 1000 );
+         t->scrapeTag = tr_timerNew( t->handle, onTrackerScrapeNow, t, NULL, 1000 );
 }
 
 static Tracker*
-tr_trackerGet( const tr_info_t * info )
+tr_trackerGet( const tr_torrent_t * tor )
 {
+    const tr_info_t * info = &tor->info;
     tr_ptrArray_t * trackers = getTrackerLookupTable( );
     Tracker *t, tmp;
     assert( info != NULL );
@@ -250,6 +254,7 @@ tr_trackerGet( const tr_info_t * info )
         tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
 
         t = tr_new0( Tracker, 1 );
+        t->handle = tor->handle;
         t->primaryAddress = tr_strdup( info->primaryAddress );
         t->scrapeIntervalMsec      = DEFAULT_SCRAPE_INTERVAL_MSEC;
         t->announceIntervalMsec    = DEFAULT_ANNOUNCE_INTERVAL_MSEC;
@@ -353,7 +358,7 @@ Torrent*
 tr_trackerNew( tr_torrent_t * torrent )
 {
     Torrent * tor;
-    Tracker * t = tr_trackerGet( &torrent->info );
+    Tracker * t = tr_trackerGet( torrent );
     assert( getExistingTorrent( t, torrent->info.hash ) == NULL );
 
     /* create a new Torrent and queue it for scraping */
@@ -396,6 +401,8 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
 
     if( !req )
     {
+        tr_inf( "Connecting to %s got a NULL response",
+                t->addresses[t->addressIndex].announce );
         moveToNextAddress = TRUE;
     }
     else if( req->response_code == HTTP_OK )
@@ -548,7 +555,8 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
                 assert( !tor->scrapeTag );
-                tor->scrapeTag = tr_timerNew( onTorrentScrapeNow,
+                tor->scrapeTag = tr_timerNew( t->handle,
+                                              onTorrentScrapeNow,
                                               tor, NULL,
                                               t->scrapeIntervalMsec );
                 tr_dbg( "torrent '%s' scraped.  re-scraping in %d seconds",
@@ -656,9 +664,7 @@ onTrackerScrapeNow( void * vt )
         req = evhttp_request_new( onScrapeResponse, t );
         assert( req );
         addCommonHeaders( t, req );
-        evhttp_make_request( evcon, req, EVHTTP_REQ_GET, uri );
-
-        tr_free( uri );
+        tr_evhttp_make_request( t->handle, evcon, req, EVHTTP_REQ_GET, uri );
     }
 
     return FALSE;
@@ -868,7 +874,8 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     else if( reannounceInterval > 0 ) {
         tr_inf( "torrent '%s' reannouncing in %d seconds",
                 tor->torrent->info.name, (reannounceInterval/1000) );
-        tor->reannounceTag = tr_timerNew( onReannounceNow, tor, NULL,
+        tor->reannounceTag = tr_timerNew( tor->tracker->handle,
+                                          onReannounceNow, tor, NULL,
                                           reannounceInterval );
         tor->manualAnnounceAllowedAt
                            = tr_date() + MANUAL_ANNOUNCE_INTERVAL_MSEC;
@@ -898,7 +905,7 @@ sendTrackerRequest( void * vtor, const char * eventName )
         evhttp_connection_set_timeout( evcon, REQ_TIMEOUT_INTERVAL_SEC );
         tor->httpReq = evhttp_request_new( onTrackerResponse, tor );
         addCommonHeaders( tor->tracker, tor->httpReq );
-        evhttp_make_request( evcon, tor->httpReq, EVHTTP_REQ_GET, uri );
+        tr_evhttp_make_request( tor->tracker->handle, evcon, tor->httpReq, EVHTTP_REQ_GET, uri );
     }
 
     tr_free( uri );

@@ -14,6 +14,7 @@
 #include <event.h>
 
 #include "transmission.h"
+#include "trevent.h"
 #include "timer.h"
 #include "utils.h"
 
@@ -80,7 +81,8 @@ timerCB( int fd UNUSED, short event UNUSED, void * arg )
 
 
 tr_timer_tag
-tr_timerNew( tr_timer_func        func,
+tr_timerNew( tr_handle_t        * handle,
+             tr_timer_func        func,
              void               * user_data,
              tr_data_free_func    free_func,
              int                  timeout_milliseconds )
@@ -99,6 +101,6 @@ tr_timerNew( tr_timer_func        func,
     node->tv.tv_sec  = microseconds / 1000000;
     node->tv.tv_usec = microseconds % 1000000;
     timeout_set( &node->event, timerCB, node );
-    timeout_add( &node->event, &node->tv );
+    tr_event_add( handle, &node->event, &node->tv );
     return node;
 }

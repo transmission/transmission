@@ -172,6 +172,8 @@ struct tr_torrent_s
 
 struct tr_handle_s
 {
+    struct tr_event_handle_s * events;
+
     int                        torrentCount;
     tr_torrent_t             * torrentList;
 

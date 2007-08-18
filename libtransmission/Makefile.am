@@ -36,6 +36,7 @@ libtransmission_a_SOURCES = \
     torrent.c \
     tracker.c \
     transmission.c \
+    trevent.c \
     upnp.c \
     utils.c \
     xml.c
@@ -75,6 +76,7 @@ noinst_HEADERS = \
     tracker.h \
     transmission.h \
     trcompat.h \
+    trevent.h \
     upnp.h \
     utils.h \
     xml.h
