@@ -1051,8 +1051,6 @@ int tr_torrentAddCompact( tr_torrent_t * tor, int from,
         added += tr_torrentAttachPeer( tor, peer );
     }
 
-    tr_inf( "tr_torrentAddCompact %d peers to %s", added, tor->info.name );
-
     return added;
 }
 
