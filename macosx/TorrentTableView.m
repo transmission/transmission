@@ -321,7 +321,6 @@
         [fActionMenu removeItem: oldFileMenuItem];
     
     //set file menu
-    #warning localize
     NSMenuItem * fileMenuItem = [[NSMenuItem alloc] initWithTitle: NSLocalizedString(@"Files",
                                     "torrent action context menu -> files menu") action: NULL keyEquivalent: @""];
     [fileMenuItem setTag: ACTION_MENU_FILE_TAG];
@@ -450,7 +449,11 @@
 
 - (void) setQuickLimit: (id) sender
 {
+    BOOL upload = [sender menu] == fUploadMenu;
+    [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
+    [fMenuTorrent setSpeedLimit: [[sender title] intValue] upload: upload];
     
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
 }
 
 - (void) checkFile: (id) sender
