@@ -27,7 +27,8 @@ typedef void tr_data_free_func( void * user_data );
 
 struct timer_node
 {
-    struct event event;
+    tr_handle_t * handle;
+    struct event * event;
     tr_timer_func * func;
     void * user_data;
     tr_data_free_func * free_func;
@@ -47,7 +48,7 @@ unref( struct timer_node * node, int count )
 
     if( node->free_func != NULL )
         (node->free_func)( node->user_data );
-    event_del( &node->event );
+    tr_event_del( node->handle, node->event );
     tr_free( node );
 }
 
@@ -74,7 +75,7 @@ timerCB( int fd UNUSED, short event UNUSED, void * arg )
     if( !val )
         unref( node, 2 );
     else {
-        timeout_add( &node->event, &node->tv );
+        timeout_add( node->event, &node->tv );
         unref( node, 1 );
     }
 }
@@ -94,13 +95,15 @@ tr_timerNew( tr_handle_t        * handle,
     assert( timeout_milliseconds >= 0 );
 
     node = tr_new( struct timer_node, 1 );
+    node->handle = handle;
+    node->event = tr_new0( struct event, 1 );
     node->func = func;
     node->user_data = user_data;
     node->free_func = free_func;
     node->refcount = 1;
     node->tv.tv_sec  = microseconds / 1000000;
     node->tv.tv_usec = microseconds % 1000000;
-    timeout_set( &node->event, timerCB, node );
-    tr_event_add( handle, &node->event, &node->tv );
+    timeout_set( node->event, timerCB, node );
+    tr_event_add( handle, node->event, &node->tv );
     return node;
 }

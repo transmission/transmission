@@ -25,14 +25,17 @@ enum evhttp_cmd_type;
 struct evhttp_request;
 struct evhttp_connection;
 
-extern void  tr_event_add( struct tr_handle_s  * tr_handle,
-                           struct event        * event,
-                           struct timeval      * interval );
+void  tr_event_add( struct tr_handle_s  * tr_handle,
+                    struct event        * event,
+                    struct timeval      * interval );
 
-extern void tr_evhttp_make_request (struct tr_handle_s        * tr_handle,
-                                    struct evhttp_connection  * evcon,
-                                    struct evhttp_request     * req,
-                                    enum evhttp_cmd_type        type,
-                                    const char                * uri);
+void  tr_event_del( struct tr_handle_s  * tr_handle,
+                    struct event        * event );
+
+void tr_evhttp_make_request (struct tr_handle_s        * tr_handle,
+                             struct evhttp_connection  * evcon,
+                             struct evhttp_request     * req,
+                             enum evhttp_cmd_type        type,
+                             const char                * uri);
 
 #endif

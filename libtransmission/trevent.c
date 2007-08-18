@@ -68,14 +68,10 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
     struct evhttp_request * req;
     enum evhttp_cmd_type type;
     const char * uri;
-    static char * buf = NULL;
 
 #ifdef DEBUG
     fprintf( stderr, "reading...reads: [%d] writes: [%d]\n", ++reads, writes );
 #endif
-
-    if( !buf )
-         buf = tr_new0( char, sizeof(void*) );
 
     ch = '\0';
     do {
@@ -88,9 +84,14 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
     }
     else switch( ch )
     {
+        case 'd': /* event_del */
+            read( fd, &event, sizeof(struct event*) );
+            tr_dbg( "read del event from pipe: event is %p", event );
+            event_del( event );
+            break;
+
         case 'e': /* event_add */
-            event = tr_new0( struct event, 1 );
-            read( fd, event, sizeof(struct event) );
+            read( fd, &event, sizeof(struct event*) );
             read( fd, &interval, sizeof(struct timeval) );
             tr_dbg( "read event from pipe: event.ev_arg is %p", event->ev_arg );
             event_add( event, &interval );
@@ -150,7 +151,7 @@ tr_eventClose( tr_handle_t * handle UNUSED )
 }
 
 void
-tr_event_add (tr_handle_t    * handle,
+tr_event_add( tr_handle_t    * handle,
               struct event   * event,
               struct timeval * interval )
 {
@@ -164,8 +165,26 @@ tr_event_add (tr_handle_t    * handle,
     fprintf( stderr, "reads: [%d] writes: [%d]\n", reads, ++writes );
 #endif
     write( fd, &ch, 1 );
-    write( fd, event, sizeof(struct event) );
+    write( fd, &event, sizeof(struct event*) );
     write( fd, interval, sizeof(struct timeval) );
+    tr_lockUnlock( lock );
+}
+
+void
+tr_event_del( tr_handle_t    * handle,
+              struct event   * event )
+{
+    const char ch = 'd';
+    int fd = handle->events->fds[1];
+    tr_lock_t * lock = handle->events->lock;
+
+    tr_lockLock( lock );
+    tr_dbg( "writing event to pipe: del event %p", event );
+#ifdef DEBUG
+    fprintf( stderr, "reads: [%d] writes: [%d]\n", reads, ++writes );
+#endif
+    write( fd, &ch, 1 );
+    write( fd, &event, sizeof(struct event*) );
     tr_lockUnlock( lock );
 }
 
