@@ -397,16 +397,20 @@ parseBencResponse( struct evhttp_request * req, benc_val_t * setme )
     return ret;
 }
 
-static int
+static char*
 updateAddresses( Tracker * t, const struct evhttp_request * req )
 {
-    int ret = TR_OK;
+    char * ret = NULL;
+    int used = 0, max = 0;
     int moveToNextAddress = FALSE;
 
     if( !req )
     {
-        tr_inf( "Connecting to %s got a NULL response",
-                t->addresses[t->addressIndex].announce );
+        tr_sprintf( &ret, &used, &max,
+                    "Connecting to %s got a NULL response",
+                    t->addresses[t->addressIndex].announce );
+        tr_inf( ret );
+
         moveToNextAddress = TRUE;
     }
     else if( req->response_code == HTTP_OK )
@@ -450,20 +454,17 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
     }
     else 
     {
-        tr_inf( "Connecting to %s gave error [%s]",
-                t->addresses[t->addressIndex].announce, 
-                req->response_code_line );
+        tr_sprintf( &ret, &used, &max,
+                    "Error connecting: %s",
+                    t->addresses[t->addressIndex].announce, 
+                    req->response_code_line );
+
         moveToNextAddress = TRUE;
     }
 
     if( moveToNextAddress )
-    {
         if ( ++t->addressIndex >= t->addressCount )
-        {
             t->addressIndex = 0;
-            ret = TR_ERROR;
-        }
-    }
 
     return ret;
 }
@@ -509,6 +510,7 @@ onTorrentScrapeNow( void * vtor )
 static void
 onScrapeResponse( struct evhttp_request * req, void * vt )
 {
+    char * errmsg;
     Tracker * t = (Tracker*) vt;
 
     tr_inf( "scrape response from  '%s': %s",
@@ -596,7 +598,10 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
             t->multiscrapeMax = numResponses;
     }
 
-    updateAddresses( t, req );
+    if (( errmsg = updateAddresses( t, req ) )) {
+        tr_err( errmsg );
+        tr_free( errmsg );
+    }
 
     if( !tr_ptrArrayEmpty( t->scraping ) )
     {
@@ -785,6 +790,7 @@ setAnnounceInterval( Tracker  * t,
 static void
 onTrackerResponse( struct evhttp_request * req, void * vtor )
 {
+    char * errmsg;
     Torrent * tor = (Torrent *) vtor;
     const int isStopped = !torrentIsRunning( tor );
     int reannounceInterval;
@@ -863,12 +869,10 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
         reannounceInterval = 30 * 1000;
     }
 
-    if( updateAddresses( tor->tracker, req ) )
-    {
-        char buf[1024];
-        snprintf( buf, sizeof(buf), "Unable to connect to \"%s\"",
-                  tor->tracker->primaryAddress );
-        publishErrorMessage( tor, buf );
+    if (( errmsg = updateAddresses( tor->tracker, req ) )) {
+        publishErrorMessage( tor, errmsg );
+        tr_err( errmsg );
+        tr_free( errmsg );
     }
 
     tor->httpReq = NULL;
