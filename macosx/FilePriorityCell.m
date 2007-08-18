@@ -98,7 +98,6 @@
                 fMixedImage = [NSImage imageNamed: @"PriorityMixed.png"];
             image = fMixedImage;
         }
-        
         else if ([priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]])
         {
             if (!fNormalImage)
