@@ -1907,7 +1907,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
-    NSButton * button;
+    FilterBarButton * button;
     if ([filterType isEqualToString: FILTER_NONE])
         button = sender == fNextFilterItem ? fDownloadFilterButton : fPauseFilterButton;
     else if ([filterType isEqualToString: FILTER_DOWNLOAD])

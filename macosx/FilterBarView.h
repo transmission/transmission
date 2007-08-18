@@ -24,8 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ImageBackgroundView.h"
-
-@class FilterBarButton;
+#import "FilterBarButton.h"
 
 @interface FilterBarView : ImageBackgroundView
 {

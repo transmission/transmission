@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #import "FilterBarView.h"
-#import "FilterBarButton.h"
 
 #define ORIGIN_VERTICAL 3.0
 #define ORIGIN_HORIZONTAL 4.0
