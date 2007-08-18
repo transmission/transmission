@@ -946,7 +946,7 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     if( isStopped )
         publishStopped( tor );
     else if( reannounceInterval > 0 ) {
-        tr_inf( "torrent '%s' reannouncing in %d seconds",
+        tr_dbg( "torrent '%s' reannouncing in %d seconds",
                 tor->torrent->info.name, (reannounceInterval/1000) );
         tor->reannounceTag = tr_timerNew( tor->tracker->handle,
                                           onReannounceNow, tor, NULL,

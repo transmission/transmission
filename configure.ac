@@ -33,7 +33,7 @@ dnl AC_PROG_INTLTOOL([0.23],[no-xml])
 GETTEXT_PACKAGE=transmission
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
-ALL_LINGUAS="bg es fi fr it pl ro ru sv"
+ALL_LINGUAS="bg es fi fr it pl ro ru sk sv"
 AM_GLIB_GNU_GETTEXT
 transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 

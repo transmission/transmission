@@ -2,66 +2,69 @@ The Transmission Project
 http://transmission.m0k.org/
 
 Lead Developers <transmission-dev@m0k.org>
-	Eric Petit <titer@m0k.org>  (Creator)
-	Josh Elsasser <josh@elsasser.org>  (Back-end, GTK+ interface, Daemon interface)
-	Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Back-end)
-	Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+, wxWidgets)
-	Bryan Varner <bryan@varnernet.com>  (BeOS interface)
+        Eric Petit <titer@m0k.org>  (Creator)
+        Josh Elsasser <josh@elsasser.org>  (Back-end, GTK+ interface, Daemon interface)
+        Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Back-end)
+        Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+, wxWidgets)
+        Bryan Varner <bryan@varnernet.com>  (BeOS interface)
 
 Project Contributors
-	Nick Pucius  (Mac OS X Help documentation)
-	Hugo van Heuven, madebysofa  (Icon design, Mac toolbar icons)
+        Nick Pucius  (Mac OS X Help documentation)
+        Hugo van Heuven, madebysofa  (Icon design, Mac toolbar icons)
 
 Translators
 Mac OS X, current release:
-	Jorge Carrasco Perez  (Spanish)
-	Etienne Samson  (French)
-	Marco Cavazzuti  (Italian)
-	Thermaikos  (Greek)
-	Jaewoo Chung  (Korean)
-    	Anton Sotkov  (Russian)
-    	Alexander Bykov  (Russian)
+        Jorge Carrasco Perez  (Spanish)
+        Etienne Samson  (French)
+        Marco Cavazzuti  (Italian)
+        Thermaikos  (Greek)
+        Jaewoo Chung  (Korean)
+        Anton Sotkov  (Russian)
+        Alexander Bykov  (Russian)
 
 GTK+:
-	Calorì Alessandro  (Italian)
+        Calorì Alessandro  (Italian)
         Daniel Nylander  (Swedish)
         Filipe Gomes (Portuguese)
         Jaakko Huhtala  (Finnish)
         Jan Geboers (Dutch)
         Lubomir Marinov  (Bulgarian)
         Mircea Suciu  (Romanian)
+        Mirek (Slovakian)
         Nickolay V. Shmyrev  (Russian)
         Pavel Shevchuk  (Russian)
         Pierre-Henri Quelen  (French)
         Raphael Higino (Brazilian Portuguese)
-	Jean-François Fortin Tam  (French)
+        Jean-François Fortin Tam  (French)
         Tomasz Dominikowski  (Polish)
         Vicente Carro Fernandez  (Spanish)
 
 Special Thanks
 
 Image Contributors
-	FOOOD
-	Martin Stadtmueller  (Icon tweaking)
-	Mike Matas <http://www.mikematas.com/>  (Previous toolbar icons)
-	Jonas Rask  (Globe icon)
-	George Tsotsos
-	Rashid Eissing  (Transfers preferences icon)
+        FOOOD
+        Martin Stadtmueller  (Icon tweaking)
+        Mike Matas <http://www.mikematas.com/>  (Previous toolbar icons)
+        Jonas Rask  (Globe icon)
+        George Tsotsos
+        Rashid Eissing  (Transfers preferences icon)
 
 Other Contributors
-	Omar and Adrien  (Beta testing)
-	BitTorrent Protocol Specification <http://wiki.theory.org/BitTorrentSpecification>
-	vi@nwr.jp  (Free SHA1 implementation)
-	Ahmad M. Afuni  (NetBSD patch)
-	Jeremy Messenger  (FreeBSD patch)
-	John Blitch  (Mac OS X patch)
-	Michael Demars <keul@m0k.org>  (Mac OS X patches)
-	Fredrik Modéen (BeOS patches)
-	Deanna Phillips  (transmissioncli manpage)
-	Nicholas Shanks  (Mac OS X patches)
+        Omar and Adrien  (Beta testing)
+        BitTorrent Protocol Specification <http://wiki.theory.org/BitTorrentSpecification>
+        vi@nwr.jp  (Free SHA1 implementation)
+        Ahmad M. Afuni  (NetBSD patch)
+        Jeremy Messenger  (FreeBSD patch)
+        John Blitch  (Mac OS X patch)
+        Michael Demars <keul@m0k.org>  (Mac OS X patches)
+        Fredrik Modéen (BeOS patches)
+        Deanna Phillips  (transmissioncli manpage)
+        Nicholas Shanks  (Mac OS X patches)
+        TooMuchTime  (Technical Advice)
 
 Third-Party Resources
 Thanks to:
-	The Growl Development Team for use of Growl. <http://growl.info/>
-	Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
-	M. Uli Kusterer for use of UKKQueue.
+        Niels Provos for libevent <http://monkey.org/~provos/libevent/>
+        The Growl Development Team for use of Growl. <http://growl.info/>
+        Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
+        M. Uli Kusterer for use of UKKQueue.
