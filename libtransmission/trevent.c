@@ -116,12 +116,30 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
 }
 
 static void
+logFunc( int severity, const char * message )
+{
+    switch( severity )
+    {
+        case _EVENT_LOG_DEBUG: 
+            tr_dbg( "%s", message );
+            break;
+        case _EVENT_LOG_ERR:
+            tr_err( "%s", message );
+            break;
+        default:
+            tr_inf( "%s", message );
+            break;
+    }
+}
+
+static void
 libeventThreadFunc( void * veh )
 {
     tr_event_handle_t * eh = (tr_event_handle_t *) veh;
     tr_dbg( "libevent thread starting" );
 
     event_init( );
+    event_set_log_callback( logFunc );
 
     /* listen to the pipe's read fd */
     event_set( &eh->pipeEvent, eh->fds[0], EV_READ|EV_PERSIST, readFromPipe, NULL );
