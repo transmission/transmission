@@ -33,8 +33,8 @@ cat > mk/version.mk.new << EOF
 VERSION_MAJOR       = "$MAJOR"
 VERSION_MINOR       = "$MINOR"
 VERSION_MAINTENANCE = "$MAINT"
-VERSION_REVISION    = "$REV"
-VERSION_STRING      = "$STRING ($REV)"
+VERSION_REVISION    = "$SVN_REVISION"
+VERSION_STRING      = "$STRING ($SVN_REVISION)"
 EOF
 replace_if_differs mk/version.mk.new mk/version.mk
 
