@@ -198,7 +198,6 @@ getConnection( const char * address, int port )
         tr_ptrArrayInsertSorted( connections, val, connectionCompare );
     }
 
-fprintf( stderr, "got a connection to [%s] port [%d]: %p\n", address, port, val->evconn );
     return val->evconn;
 }
 
@@ -653,13 +652,11 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
         int i, n;
         Torrent ** torrents = (Torrent**)
             tr_ptrArrayPeek( t->scraping, &n );
-        for( i=0; i<n; ++i ) {
-            fprintf( stderr, "null req -- torent #%d is %s\n", i, torrents[i]->torrent->info.name );
+        for( i=0; i<n; ++i )
             torrents[i]->scrapeTag = tr_timerNew( t->handle,
                                                   onTorrentScrapeNow,
                                                   torrents[i], NULL,
                                                   t->scrapeIntervalMsec );
-        }
         tr_ptrArrayClear( t->scraping );
 
         t->multiscrapeMax = INT_MAX;
