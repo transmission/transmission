@@ -924,6 +924,9 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
         reannounceInterval = isStopped
             ? -1
             : tor->tracker->announceIntervalMsec;
+
+        if( bencLoaded )
+            tr_bencFree( &benc );
     }
     else
     {

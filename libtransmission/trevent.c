@@ -90,6 +90,7 @@ readFromPipe( int fd, short eventType UNUSED, void * unused UNUSED )
             read( fd, &event, sizeof(struct event*) );
             tr_dbg( "read del event from pipe: event is %p", event );
             event_del( event );
+            tr_free( event );
             break;
 
         case 'e': /* event_add */
