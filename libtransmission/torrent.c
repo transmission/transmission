@@ -417,8 +417,7 @@ tr_torrentParse( const tr_handle_t  * h,
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
 
-    /* if we allocated a temporary info, free it */
-    if( !ret && ( setme_info == &tmp ) )
+    if( setme_info == &tmp )
         tr_metainfoFree( &tmp );
 
     return ret;
@@ -473,7 +472,6 @@ tr_torrentParseHash( const tr_handle_t  * h,
 
     return ret;
 }
-
 
 tr_torrent_t *
 tr_torrentInitSaved( tr_handle_t    * h,
