@@ -413,7 +413,7 @@ tr_condWait( tr_cond_t * c, tr_lock_t * l )
 
     /* add it to the list of events waiting to be signaled */
     tr_lockLock( c->lock );
-    c->events = tr_list_append( c->events, hEvent );
+    tr_list_append( &c->events, hEvent );
     tr_lockUnlock( c->lock );
 
     /* now wait for it to be signaled */
@@ -423,7 +423,7 @@ tr_condWait( tr_cond_t * c, tr_lock_t * l )
 
     /* remove it from the list of events waiting to be signaled */
     tr_lockLock( c->lock );
-    c->events = tr_list_remove_data( c->events, hEvent );
+    tr_list_remove_data( &c->events, hEvent );
     tr_lockUnlock( c->lock );
 
 #else
@@ -510,7 +510,7 @@ tr_condFree( tr_cond_t * c )
 #ifdef __BEOS__
     delete_sem( c->sem );
 #elif defined(WIN32)
-    tr_list_free( c->events );
+    tr_list_free( &c->events );
     tr_lockFree( c->lock );
 #else
     pthread_cond_destroy( &c->cond );
