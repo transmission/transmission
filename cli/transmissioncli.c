@@ -157,7 +157,7 @@ int main( int argc, char ** argv )
     {
         int ret;
         tr_metainfo_builder_t* builder = tr_metaInfoBuilderCreate( h, sourceFile );
-        tr_makeMetaInfo( builder, NULL, announce, comment, isPrivate );
+        tr_makeMetaInfo( builder, torrentPath, announce, comment, isPrivate );
         while( !builder->isDone ) {
             wait_msecs( 1 );
             printf( "." );
