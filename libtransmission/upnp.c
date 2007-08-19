@@ -48,6 +48,10 @@
 /* uncomment this to log requests and responses to ~/transmission-upnp.log */
 /* #define VERBOSE_LOG */
 
+#ifdef VERBOSE_LOG
+#include "platform.h"
+#endif
+
 #define SSDP_ADDR               "239.255.255.250"
 #define SSDP_PORT               1900
 #define SSDP_TYPE               "upnp:rootdevice"
