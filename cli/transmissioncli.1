@@ -39,6 +39,13 @@
 .Op Fl f Ar script
 .Op Fl n
 .Ar torrent-file
+.Nm
+.Op Fl v Ar level
+.Fl c Ar source-file
+.Fl a Ar announce-url
+.Op Fl p Ar 1
+.Op Fl m Ar comment
+.Ar output-file
 .Ek
 .Sh DESCRIPTION
 The
@@ -48,6 +55,17 @@ scripting capabilities.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.lt Fl c, Fl -create-from Ar source-file
+Create torrent from the specified source file.
+.lt Fl a, Fl -announce Ar announce-url
+Specifies the Announceurl the new torrent will use. Can only be
+used in conjunction with -c or --create-from.
+.lt Fl r, Fl -private
+Sets the private flag for the new torrent. Can only be used in
+conjunction with -c or --create-from.
+.lt Fl m, Fl -comment Ar comment-text
+This optional parameter adds a comment to the new torrent. Can only
+be used in conjunction with -c or --create-from.
 .It Fl h, Fl -help
 Prints a short usage summary.
 .It Fl i, Fl -info
