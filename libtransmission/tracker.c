@@ -374,7 +374,11 @@ tr_trackerFree( Torrent * tor )
     Tracker * t = tor->tracker;
 
     tr_ptrArrayRemoveSorted( t->torrents, tor, torrentCompare );
+    tr_ptrArrayRemoveSorted( t->scrapeQueue, tor, torrentCompare );
+    tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
+    tr_timerFree( &tor->scrapeTag );
+    tr_timerFree( &tor->reannounceTag );
     tr_publisherFree( tor->publisher );
     tr_free( tor->trackerID );
     tr_free( tor->lastRequest );
@@ -396,6 +400,8 @@ tr_trackerFree( Torrent * tor )
             tr_trackerInfoClear( t->redirect );
             tr_free( t->redirect );
         }
+
+        tr_timerFree( &t->scrapeTag );
 
         tr_free( t->primaryAddress );
         tr_free( t->addresses );
@@ -551,9 +557,9 @@ static int
 onTorrentScrapeNow( void * vtor )
 {
     Torrent * tor = (Torrent *) vtor;
-    tr_timerFree( &tor->scrapeTag );
     tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
     tr_trackerScrapeSoon( tor->tracker );
+    tor->scrapeTag = NULL;
     return FALSE;
 }
 
@@ -605,7 +611,6 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                 if(( flags = tr_bencDictFind( tordict, "flags" )))
                     if(( tmp = tr_bencDictFind( flags, "min_request_interval")))
                         t->scrapeIntervalMsec = tmp->val.i * 1000;
-                
 
                 assert( tr_ptrArrayFindSorted(t->scraping,tor,torrentCompare) );
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
