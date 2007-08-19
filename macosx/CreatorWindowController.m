@@ -281,6 +281,7 @@
 {
     NSOpenPanel * panel = [NSOpenPanel openPanel];
     
+    [panel setTitle: NSLocalizedString(@"Create Torrent File", "Create torrent -> select file")];
     [panel setPrompt: NSLocalizedString(@"Select", "Create torrent -> select file")];
     [panel setAllowsMultipleSelection: NO];
     [panel setCanChooseFiles: YES];
