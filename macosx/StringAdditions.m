@@ -37,11 +37,6 @@
 	return [self stringByAppendingString: [NSString ellipsis]];
 }
 
-+ (NSString *) stringWithInt: (int) value
-{
-    return [NSString stringWithFormat: @"%d", value];
-}
-
 + (NSString *) stringForFileSize: (uint64_t) size
 {
     if (size < 1024)

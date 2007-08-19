@@ -395,9 +395,9 @@
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     int seeders = [torrent seeders], leechers = [torrent leechers], downloaded = [torrent completedFromTracker];
-    [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithInt: seeders]];
-    [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithInt: leechers]];
-    [fCompletedFromTrackerField setStringValue: downloaded < 0 ? @"" : [NSString stringWithInt: downloaded]];
+    [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithFormat: @"%d", seeders]];
+    [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithFormat: @"%d", leechers]];
+    [fCompletedFromTrackerField setStringValue: downloaded < 0 ? @"" : [NSString stringWithFormat: @"%d", downloaded]];
     
     BOOL active = [torrent isActive];
     
@@ -432,8 +432,8 @@
     else
         [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
     
-    [fDownloadingFromField setStringValue: active ? [NSString stringWithInt: [torrent peersSendingToUs]] : @""];
-    [fUploadingToField setStringValue: active ? [NSString stringWithInt: [torrent peersGettingFromUs]] : @""];
+    [fDownloadingFromField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersSendingToUs]] : @""];
+    [fUploadingToField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersGettingFromUs]] : @""];
     
     [fPeers release];
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];

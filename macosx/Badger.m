@@ -95,7 +95,7 @@
             badgeRect.origin.y += badgeBottomExtra;
             
             //place badge text
-            [self badgeString: [NSString stringWithInt: fCompleted] forRect: badgeRect];
+            [self badgeString: [NSString stringWithFormat: @"%d", fCompleted] forRect: badgeRect];
                         
             [fDockIcon unlockFocus];
         }

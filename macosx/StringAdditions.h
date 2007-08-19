@@ -29,8 +29,6 @@
 + (NSString *) ellipsis;
 - (NSString *) stringByAppendingEllipsis;
 
-+ (NSString *) stringWithInt: (int) value;
-
 + (NSString *) stringForFileSize: (uint64_t) size;
 + (NSString *) stringForSpeed: (float) speed;
 + (NSString *) stringForSpeedAbbrev: (float) speed;
