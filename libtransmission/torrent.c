@@ -249,6 +249,8 @@ torrentRealInit( tr_handle_t   * h,
     tor->hasChangedState = -1;
     tor->pexDisabled = 0;
 
+    tor->runStatusToSave = -1;
+
     /**
      * Decide on a block size.  constraints:
      * (1) most clients decline requests over 16 KiB
@@ -1081,6 +1083,7 @@ void tr_torrentStop( tr_torrent_t * tor )
 
 void tr_torrentClose( tr_torrent_t * tor )
 {
+    tor->runStatusToSave = tor->runStatus;
     tr_torrentStop( tor );
     tor->dieFlag = TRUE;
 }

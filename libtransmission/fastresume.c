@@ -272,7 +272,10 @@ tr_fastResumeSave( const tr_torrent_t * tor )
 
     if( TRUE ) /* FR_ID_RUN */
     {
-        const char is_running = (tor->runStatus == TR_RUN_RUNNING) ? 't' : 'f';
+        const int run = tor->runStatusToSave>=0
+            ? tor->runStatusToSave
+            : tor->runStatus;
+        const char is_running = (run == TR_RUN_RUNNING) ? 't' : 'f';
         fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
     }
 

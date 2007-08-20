@@ -141,6 +141,7 @@ struct tr_torrent_s
     volatile char              dieFlag;
     struct tr_bitfield_s     * uncheckedPieces;
     run_status_t               runStatus;
+    run_status_t               runStatusToSave;
     cp_status_t                cpStatus;
     struct tr_thread_s       * thread;
     struct tr_rwlock_s       * lock;
