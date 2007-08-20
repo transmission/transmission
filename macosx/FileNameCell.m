@@ -89,20 +89,25 @@
     [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
                     fraction: 1.0];
     
-    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                                isEqual: [NSColor alternateSelectedControlColor]];
+    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
     
     //title
-    NSAttributedString * titleString = [self attributedTitleWithColor: highlighted ? [NSColor whiteColor]
-                                                                                    : [NSColor controlTextColor]];
+    NSColor * specialColor = nil;
+    if ([self isHighlighted]
+            && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
+        specialColor = [NSColor whiteColor];
+    else if ([torrent checkForFiles: [[self objectValue] objectForKey: @"Indexes"]] == NSOffState)
+        specialColor = [NSColor disabledControlTextColor];
+    else;
+    
+    NSAttributedString * titleString = [self attributedTitleWithColor: specialColor ? specialColor : [NSColor controlTextColor]];
     NSRect titleRect = [self rectForTitleWithString: titleString inBounds: cellFrame];
     [titleString drawInRect: titleRect];
     
     //status
     if (![[[self objectValue] objectForKey: @"IsFolder"] boolValue])
     {
-        NSAttributedString * statusString = [self attributedStatusWithColor: highlighted ? [NSColor whiteColor]
-                                                                                        : [NSColor darkGrayColor]];
+        NSAttributedString * statusString = [self attributedStatusWithColor: specialColor ? specialColor : [NSColor darkGrayColor]];
         NSRect statusRect = [self rectForStatusWithString: statusString inBounds: cellFrame];
         [statusString drawInRect: statusRect];
     }

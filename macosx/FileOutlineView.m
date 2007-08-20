@@ -112,23 +112,28 @@
     {
         NSDictionary * item = [self itemAtRow: row];
         Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
+        NSIndexSet * indexes = [item objectForKey: @"Indexes"];
         
-
-        NSSet * priorities = [torrent filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
-        int count = [priorities count];
-        if (count == 0)
+        if ([torrent checkForFiles: indexes] == NSOffState)
             [fNormalColor set];
-        else if (count > 1)
-            [fMixedPriorityColor set];
         else
         {
-            int priority = [[priorities anyObject] intValue];
-            if (priority == TR_PRI_LOW)
-                [fLowPriorityColor set];
-            else if (priority == TR_PRI_HIGH)
-                [fHighPriorityColor set];
-            else
+            NSSet * priorities = [torrent filePrioritiesForIndexes: indexes];
+            int count = [priorities count];
+            if (count == 0)
                 [fNormalColor set];
+            else if (count > 1)
+                [fMixedPriorityColor set];
+            else
+            {
+                int priority = [[priorities anyObject] intValue];
+                if (priority == TR_PRI_LOW)
+                    [fLowPriorityColor set];
+                else if (priority == TR_PRI_HIGH)
+                    [fHighPriorityColor set];
+                else
+                    [fNormalColor set];
+            }
         }
         
         NSRect rect = [self rectOfRow: row];

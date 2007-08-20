@@ -35,7 +35,7 @@
     for (i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])
     {
         item = [[menu itemAtIndex:i] retain];
-        [menu removeItem: item];
+        [menu removeItemAtIndex: i];
         [self insertItem: item atIndex: bottom];
         [item release];
     }
