@@ -26,6 +26,7 @@
 #import "TorrentCell.h"
 #import "Controller.h"
 #import "Torrent.h"
+#import "NSMenuAdditions.h"
 
 #define PADDING 3.0
 
@@ -52,8 +53,6 @@
 - (BOOL) pointInActionRect: (NSPoint) point;
 
 - (void) updateFileMenu: (NSMenu *) menu forFiles: (NSArray *) files;
-
-- (void) moveItemsFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range toMenu: (NSMenu *) newMenu;
 
 @end
 
@@ -319,7 +318,7 @@
     
     //add file menu items to action menu
     NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
-    [self moveItemsFromMenu: fileMenu inRange: range toMenu: fActionMenu];
+    [fActionMenu moveItemsToEndFromMenu: fileMenu inRange: range];
     
     //place menu below button
     NSRect rect = [self actionRectForRow: row];
@@ -335,7 +334,7 @@
     
     //move file menu items back to the torrent's file menu
     range.location = [fActionMenu numberOfItems] - range.length;
-    [self moveItemsFromMenu: fActionMenu inRange: range toMenu: fileMenu];
+    [fileMenu moveItemsToEndFromMenu: fActionMenu inRange: range];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -632,20 +631,6 @@
         NSIndexSet * indexSet = [dict objectForKey: @"Indexes"];
         [item setState: [fMenuTorrent checkForFiles: indexSet]];
         [item setEnabled: [fMenuTorrent canChangeDownloadCheckForFiles: indexSet]];
-    }
-}
-
-#warning move to additions
-- (void) moveItemsFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range toMenu: (NSMenu *) newMenu
-{
-    NSMenuItem * item;
-    int i;
-    for (i=0; i<range.length; i++)
-    {
-        item = [[oldMenu itemAtIndex: range.location] retain];
-        [oldMenu removeItem: item];
-        [newMenu addItem: item];
-        [item release];
     }
 }
 
