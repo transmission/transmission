@@ -26,12 +26,16 @@ Building a Transmission release from the command line:
     $ su (if necessary for the next line)
     $ make install
 
-Building Transmission from SVN:
+Building Transmission from SVN (First Time):
 
     $ svn co svn://svn.m0k.org/Transmission/trunk Transmission
     $ cd Transmission
     $ ./autogen.sh
     $ ./configure -q && make -s
 
-If you miss the silence of 
+Building Transmission from SVN (Updating):
+
+    $ cd Transmission
+    $ svn up
+    $ make -s
 
