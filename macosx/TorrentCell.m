@@ -37,6 +37,7 @@
 #define HEIGHT_STATUS 12.0
 
 #define PADDING_HORIZONAL 2.0
+#define PADDING_ABOVE_IMAGE_REG 9.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
 #define PADDING_ABOVE_TITLE 2.0
 #define PADDING_ABOVE_MIN_STATUS 4.0
@@ -138,7 +139,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     else
     {
         imageSize = IMAGE_SIZE_REG;
-        result.origin.y += (result.size.height - (imageSize + ACTION_BUTTON_HEIGHT)) * 0.5;
+        result.origin.y += PADDING_ABOVE_IMAGE_REG;
     }
     
     result.size = NSMakeSize(imageSize, imageSize);

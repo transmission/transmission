@@ -730,7 +730,7 @@
     NSRect frame = [window frame];
     NSView * view = [[fTabView selectedTabViewItem] view];
     
-    float difference = height - [view frame].size.height;
+    float difference = (height - [view frame].size.height) * [window userSpaceScaleFactor];;
     frame.origin.y -= difference;
     frame.size.height += difference;
     
