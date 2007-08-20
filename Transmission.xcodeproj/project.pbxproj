@@ -35,7 +35,7 @@
 		4DDBB71C09E16BF100284745 /* transmissioncli.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBB71B09E16BF100284745 /* transmissioncli.c */; };
 		4DDFDD22099A5D8E00189D81 /* DownloadBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */; };
 		4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DDFDD21099A5D8E00189D81 /* UploadBadge.png */; };
-		4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* StringAdditions.m */; };
+		4DE5CC9D0980656F00BE280E /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */; };
 		4DE5CCA70980735700BE280E /* Badger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.m */; };
 		4DE5CCA90980739100BE280E /* Badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA80980739100BE280E /* Badge.png */; };
 		4DE5CCBA0981D27700BE280E /* ResumeAll.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCB80981D27700BE280E /* ResumeAll.png */; };
@@ -62,7 +62,7 @@
 		A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FA40C4D97840034AB1D /* PriorityNone.png */; };
 		A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */; };
 		A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A21567EB0A9A5034004DECD6 /* MessageWindow.nib */; };
-		A215760B0C0D449A0057A26A /* BezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A21576090C0D449A0057A26A /* BezierPathAdditions.m */; };
+		A215760B0C0D449A0057A26A /* NSBezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */; };
 		A2173E1C0A33C1B300B0D8AB /* ActionButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */; };
@@ -323,8 +323,8 @@
 		4DDBB71B09E16BF100284745 /* transmissioncli.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = transmissioncli.c; path = cli/transmissioncli.c; sourceTree = "<group>"; };
 		4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownloadBadge.png; path = macosx/Images/DownloadBadge.png; sourceTree = "<group>"; };
 		4DDFDD21099A5D8E00189D81 /* UploadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UploadBadge.png; path = macosx/Images/UploadBadge.png; sourceTree = "<group>"; };
-		4DE5CC9B0980656F00BE280E /* StringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StringAdditions.h; path = macosx/StringAdditions.h; sourceTree = "<group>"; };
-		4DE5CC9C0980656F00BE280E /* StringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = StringAdditions.m; path = macosx/StringAdditions.m; sourceTree = "<group>"; };
+		4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = macosx/NSStringAdditions.h; sourceTree = "<group>"; };
+		4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = macosx/NSStringAdditions.m; sourceTree = "<group>"; };
 		4DE5CCA50980735700BE280E /* Badger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Badger.h; path = macosx/Badger.h; sourceTree = "<group>"; };
 		4DE5CCA60980735700BE280E /* Badger.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = Badger.m; path = macosx/Badger.m; sourceTree = "<group>"; };
 		4DE5CCA80980739100BE280E /* Badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Badge.png; path = macosx/Images/Badge.png; sourceTree = "<group>"; };
@@ -361,8 +361,8 @@
 		A20B6FA40C4D97840034AB1D /* PriorityNone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNone.png; path = macosx/Images/PriorityNone.png; sourceTree = "<group>"; };
 		A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNormal.png; path = macosx/Images/PriorityNormal.png; sourceTree = "<group>"; };
 		A21567EC0A9A5034004DECD6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A21576090C0D449A0057A26A /* BezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = BezierPathAdditions.m; path = macosx/BezierPathAdditions.m; sourceTree = "<group>"; };
-		A215760A0C0D449A0057A26A /* BezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BezierPathAdditions.h; path = macosx/BezierPathAdditions.h; sourceTree = "<group>"; };
+		A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSBezierPathAdditions.m; path = macosx/NSBezierPathAdditions.m; sourceTree = "<group>"; };
+		A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSBezierPathAdditions.h; path = macosx/NSBezierPathAdditions.h; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
 		A21F5B860AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ActionMenuRatioToDisplayRatioTransformer.h; path = macosx/ActionMenuRatioToDisplayRatioTransformer.h; sourceTree = "<group>"; };
@@ -691,10 +691,10 @@
 				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.m */,
-				4DE5CC9B0980656F00BE280E /* StringAdditions.h */,
-				4DE5CC9C0980656F00BE280E /* StringAdditions.m */,
-				A215760A0C0D449A0057A26A /* BezierPathAdditions.h */,
-				A21576090C0D449A0057A26A /* BezierPathAdditions.m */,
+				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
+				4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */,
+				A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */,
+				A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */,
 				A256588A0A9A695400E8A03B /* MessageWindowController.h */,
 				A256588B0A9A695400E8A03B /* MessageWindowController.m */,
 				A2DF37040C220D03006523C1 /* CreatorWindowController.h */,
@@ -1420,7 +1420,7 @@
 				4DF0C5AB0899190500DD8943 /* Controller.m in Sources */,
 				4D118E1A08CB46B20033958F /* PrefsController.m in Sources */,
 				4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */,
-				4DE5CC9D0980656F00BE280E /* StringAdditions.m in Sources */,
+				4DE5CC9D0980656F00BE280E /* NSStringAdditions.m in Sources */,
 				4DE5CCA70980735700BE280E /* Badger.m in Sources */,
 				4DFBC2DF09C0970D00D5C571 /* Torrent.m in Sources */,
 				4DCCBB3E09C3D71100D3CABF /* TorrentCell.m in Sources */,
@@ -1450,7 +1450,7 @@
 				E138A9780C04D88F00C5426C /* CTGradientAdditions.m in Sources */,
 				A24D2A640C0A624600A0ED9F /* IPCController.m in Sources */,
 				A24838820C0BA608005CC3FE /* FilterBarView.m in Sources */,
-				A215760B0C0D449A0057A26A /* BezierPathAdditions.m in Sources */,
+				A215760B0C0D449A0057A26A /* NSBezierPathAdditions.m in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */,
 				35F372150C2D780600DAA8F2 /* InfoWindow.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,

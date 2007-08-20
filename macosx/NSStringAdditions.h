@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id$
+ * $Id: StringAdditions.h 2869 2007-08-19 03:03:28Z livings124 $
  *
- * Copyright (c) 2007 Transmission authors and contributors
+ * Copyright (c) 2005-2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,8 +24,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSBezierPath (BezierPathAdditions)
+@interface NSString (NSStringAdditions)
 
-+ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius;
++ (NSString *) ellipsis;
+- (NSString *) stringByAppendingEllipsis;
+
++ (NSString *) stringForFileSize: (uint64_t) size;
++ (NSString *) stringForSpeed: (float) speed;
++ (NSString *) stringForSpeedAbbrev: (float) speed;
++ (NSString *) stringForRatio: (float) ratio;
+
+- (NSComparisonResult) compareIP: (NSString *) string;
+- (NSComparisonResult) clientCompare: (NSString *) string;
 
 @end

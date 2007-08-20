@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: StringAdditions.m 2869 2007-08-19 03:03:28Z livings124 $
  *
  * Copyright (c) 2005-2007 Transmission authors and contributors
  *
@@ -22,10 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 #import <transmission.h>
 
-@implementation NSString (StringAdditions)
+@implementation NSString (NSStringAdditions)
 
 + (NSString *) ellipsis
 {

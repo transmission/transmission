@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "Badger.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 
 @interface Badger (Private)
 

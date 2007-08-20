@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 
 #define FILE_ROW_SMALL_HEIGHT 18.0
 

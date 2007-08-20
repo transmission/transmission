@@ -25,7 +25,7 @@
 #import "FilterBarButton.h"
 #import "CTGradient.h"
 #import "CTGradientAdditions.h"
-#import "BezierPathAdditions.h"
+#import "NSBezierPathAdditions.h"
 
 @interface FilterBarButton (Private)
 

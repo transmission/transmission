@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "DragOverlayView.h"
-#import "BezierPathAdditions.h"
+#import "NSBezierPathAdditions.h"
 
 @implementation DragOverlayView
 

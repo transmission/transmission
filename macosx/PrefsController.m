@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 #import "UKKQueue.h"
 
 #define DOWNLOAD_FOLDER     0

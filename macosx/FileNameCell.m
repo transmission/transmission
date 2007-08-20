@@ -24,7 +24,7 @@
 
 #import "FileNameCell.h"
 #import "InfoWindowController.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0
 #define IMAGE_FOLDER_SIZE 16.0

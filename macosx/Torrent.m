@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "Torrent.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 
 static int static_lastid = 0;
 

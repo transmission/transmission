@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: BezierPathAdditions.h 2848 2007-08-18 17:25:34Z livings124 $
  *
  * Copyright (c) 2007 Transmission authors and contributors
  *
@@ -22,28 +22,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "BezierPathAdditions.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation NSBezierPath (BezierPathAdditions)
+@interface NSBezierPath (NSBezierPathAdditions)
 
-+ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius
-{
-    float minX = NSMinX(rect),
-        minY = NSMinY(rect),
-        maxX = NSMaxX(rect),
-        maxY = NSMaxY(rect),
-        midX = NSMidX(rect),
-        midY = NSMidY(rect);
-    
-    NSBezierPath * bp = [NSBezierPath bezierPath];
-    [bp moveToPoint: NSMakePoint(maxX, midY)];
-    [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, maxY) toPoint: NSMakePoint(midX, maxY) radius: radius];
-    [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, maxY) toPoint: NSMakePoint(minX, midY) radius: radius];
-    [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, minY) toPoint: NSMakePoint(midX, minY) radius: radius];
-    [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
-    [bp closePath];
-    
-    return bp;
-}
++ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius;
 
 @end

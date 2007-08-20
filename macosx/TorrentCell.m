@@ -24,7 +24,7 @@
 
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 #import "CTGradientAdditions.h"
 
 #define BAR_HEIGHT 12.0

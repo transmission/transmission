@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id$
+ * $Id: BezierPathAdditions.m 2848 2007-08-18 17:25:34Z livings124 $
  *
- * Copyright (c) 2005-2007 Transmission authors and contributors
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,19 +22,28 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "NSBezierPathAdditions.h"
 
-@interface NSString (StringAdditions)
+@implementation NSBezierPath (NSBezierPathAdditions)
 
-+ (NSString *) ellipsis;
-- (NSString *) stringByAppendingEllipsis;
-
-+ (NSString *) stringForFileSize: (uint64_t) size;
-+ (NSString *) stringForSpeed: (float) speed;
-+ (NSString *) stringForSpeedAbbrev: (float) speed;
-+ (NSString *) stringForRatio: (float) ratio;
-
-- (NSComparisonResult) compareIP: (NSString *) string;
-- (NSComparisonResult) clientCompare: (NSString *) string;
++ (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius
+{
+    float minX = NSMinX(rect),
+        minY = NSMinY(rect),
+        maxX = NSMaxX(rect),
+        maxY = NSMaxY(rect),
+        midX = NSMidX(rect),
+        midY = NSMidY(rect);
+    
+    NSBezierPath * bp = [NSBezierPath bezierPath];
+    [bp moveToPoint: NSMakePoint(maxX, midY)];
+    [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, maxY) toPoint: NSMakePoint(midX, maxY) radius: radius];
+    [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, maxY) toPoint: NSMakePoint(minX, midY) radius: radius];
+    [bp appendBezierPathWithArcFromPoint: NSMakePoint(minX, minY) toPoint: NSMakePoint(midX, minY) radius: radius];
+    [bp appendBezierPathWithArcFromPoint: NSMakePoint(maxX, minY) toPoint: NSMakePoint(maxX, midY) radius: radius];
+    [bp closePath];
+    
+    return bp;
+}
 
 @end

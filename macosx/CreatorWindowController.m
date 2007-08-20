@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "CreatorWindowController.h"
-#import "StringAdditions.h"
+#import "NSStringAdditions.h"
 
 @interface CreatorWindowController (Private)
 
