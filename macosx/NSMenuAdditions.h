@@ -26,6 +26,6 @@
 
 @interface NSMenu (NSMenuAdditions)
 
-- (void) moveItemsToEndFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range;
+- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes;
 
 @end

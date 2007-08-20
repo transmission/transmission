@@ -26,15 +26,17 @@
 
 @implementation NSMenu (NSMenuAdditions)
 
-- (void) moveItemsToEndFromMenu: (NSMenu *) oldMenu inRange: (NSRange) range
+- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes
 {
+    int bottom = [self numberOfItems];
+    
     NSMenuItem * item;
-    int i;
-    for (i=0; i<range.length; i++)
+    unsigned int i;
+    for (i = [indexes lastIndex]; i != NSNotFound; i = [indexes indexLessThanIndex: i])
     {
-        item = [[oldMenu itemAtIndex: range.location] retain];
-        [oldMenu removeItem: item];
-        [self addItem: item];
+        item = [[menu itemAtIndex:i] retain];
+        [menu removeItem: item];
+        [self insertItem: item atIndex: bottom];
         [item release];
     }
 }

@@ -317,8 +317,8 @@
     [self updateFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
     
     //add file menu items to action menu
-    NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
-    [fActionMenu moveItemsToEndFromMenu: fileMenu inRange: range];
+    NSRange range =  NSMakeRange(0, [fileMenu numberOfItems]);
+    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
     
     //place menu below button
     NSRect rect = [self actionRectForRow: row];
@@ -334,7 +334,7 @@
     
     //move file menu items back to the torrent's file menu
     range.location = [fActionMenu numberOfItems] - range.length;
-    [fileMenu moveItemsToEndFromMenu: fActionMenu inRange: range];
+    [fileMenu appendItemsFromMenu: fActionMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
