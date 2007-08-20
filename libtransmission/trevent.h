@@ -38,6 +38,6 @@ void tr_evhttp_make_request (struct tr_handle_s        * tr_handle,
                              struct evhttp_connection  * evcon,
                              struct evhttp_request     * req,
                              enum evhttp_cmd_type        type,
-                             const char                * uri);
+                             char                      * uri);
 
 #endif

@@ -136,7 +136,7 @@ static void
 libeventThreadFunc( void * veh )
 {
     tr_event_handle_t * eh = (tr_event_handle_t *) veh;
-    tr_dbg( "libevent thread starting" );
+    tr_dbg( "Starting libevent thread" );
 
     event_init( );
     event_set_log_callback( logFunc );
@@ -150,7 +150,11 @@ libeventThreadFunc( void * veh )
         tr_wait( 50 ); /* 1/20th of a second */
     }
 
-    tr_dbg( "libevent thread exiting" );
+    event_del( &eh->pipeEvent );
+    tr_lockFree( eh->lock );
+    tr_free( eh );
+
+    tr_dbg( "Closing libevent thread" );
 }
 
 void
@@ -167,9 +171,11 @@ tr_eventInit( tr_handle_t * handle )
 }
 
 void
-tr_eventClose( tr_handle_t * handle UNUSED )
+tr_eventClose( tr_handle_t * handle )
 {
-    fprintf( stderr, "%s:%d FIXME\n", __FILE__, __LINE__ );
+    tr_event_handle_t * eh = handle->events;
+
+    eh->isShuttingDown = TRUE;
 }
 
 void
@@ -215,7 +221,7 @@ tr_evhttp_make_request (tr_handle_t               * handle,
                         struct evhttp_connection  * evcon,
                         struct evhttp_request     * req,
                         enum   evhttp_cmd_type      type,
-                        const char                * uri)
+                        char                      * uri)
 {
     const char ch = 'h';
     int fd = handle->events->fds[1];
