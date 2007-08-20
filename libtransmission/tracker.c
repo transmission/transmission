@@ -532,8 +532,19 @@ getCurrentAddress( const Tracker * t )
     assert( t->addresses != NULL );
     assert( t->addressIndex >= 0 );
     assert( t->addressIndex < t->addressCount );
+
     return &t->addresses[t->addressIndex];
 }
+static int
+trackerSupportsScrape( const Tracker * t )
+{
+    const tr_tracker_info_t * info = getCurrentAddress( t );
+
+    return ( info != NULL )
+        && ( info->scrape != NULL )
+        && ( info->scrape[0] != '\0' );
+}
+
 
 static void
 addCommonHeaders( const Tracker * t,
@@ -559,8 +570,10 @@ static int
 onTorrentScrapeNow( void * vtor )
 {
     Torrent * tor = (Torrent *) vtor;
-    tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
-    tr_trackerScrapeSoon( tor->tracker );
+    if( trackerSupportsScrape( tor->tracker ) ) {
+        tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
+        tr_trackerScrapeSoon( tor->tracker );
+    }
     tor->scrapeTag = NULL;
     return FALSE;
 }
@@ -678,10 +691,11 @@ static int
 onTrackerScrapeNow( void * vt )
 {
     Tracker * t = (Tracker*) vt;
+    const tr_tracker_info_t * address = getCurrentAddress( t );
 
     assert( tr_ptrArrayEmpty( t->scraping ) );
 
-    if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
+    if( trackerSupportsScrape( t ) && !tr_ptrArrayEmpty( t->scrapeQueue ) )
     {
         int i, n, len, addr_len, ask_n;
         char *march, *uri;
@@ -689,7 +703,6 @@ onTrackerScrapeNow( void * vt )
             (Torrent**) tr_ptrArrayPeek( t->scrapeQueue, &n );
         struct evhttp_connection *evcon = NULL;
         struct evhttp_request *req = NULL;
-        const tr_tracker_info_t * address = getCurrentAddress( t );
 
         ask_n = n;
         if( ask_n > t->multiscrapeMax )

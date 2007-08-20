@@ -12,7 +12,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,6 +34,7 @@
 
 /* #define DEBUG */
 #ifdef DEBUG
+#include <stdio.h>
 #undef tr_dbg
 #define tr_dbg( a, b... ) fprintf(stderr, a "\n", ##b )
 #endif
@@ -46,9 +46,9 @@
 typedef struct tr_event_handle_s
 {
     int fds[2];
-    int isShuttingDown;
     tr_lock_t * lock;
     tr_handle_t * h;
+    struct event_base * base;
     struct event pipeEvent;
 }
 tr_event_handle_t;
@@ -138,20 +138,18 @@ libeventThreadFunc( void * veh )
     tr_event_handle_t * eh = (tr_event_handle_t *) veh;
     tr_dbg( "Starting libevent thread" );
 
-    event_init( );
+    eh->base = event_init( );
     event_set_log_callback( logFunc );
 
     /* listen to the pipe's read fd */
     event_set( &eh->pipeEvent, eh->fds[0], EV_READ|EV_PERSIST, readFromPipe, NULL );
     event_add( &eh->pipeEvent, NULL );
 
-    while( !eh->isShuttingDown ) {
-        event_dispatch( );
-        tr_wait( 50 ); /* 1/20th of a second */
-    }
+    event_dispatch( );
 
     event_del( &eh->pipeEvent );
     tr_lockFree( eh->lock );
+    event_base_free( eh->base );
     tr_free( eh );
 
     tr_dbg( "Closing libevent thread" );
@@ -175,7 +173,7 @@ tr_eventClose( tr_handle_t * handle )
 {
     tr_event_handle_t * eh = handle->events;
 
-    eh->isShuttingDown = TRUE;
+    event_base_loopexit( eh->base, NULL );
 }
 
 void
