@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: BezierPathAdditions.m 2848 2007-08-18 17:25:34Z livings124 $
+ * $Id$
  *
  * Copyright (c) 2007 Transmission authors and contributors
  *
