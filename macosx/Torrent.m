@@ -419,11 +419,16 @@ static int static_lastid = 0;
     
     //create strings for error or stalled
     if (fError)
-        [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
+    {
+        NSString * errorString = [self errorMessage];
+        if (!errorString || [errorString isEqualToString: @""])
+            [statusString setString: NSLocalizedString(@"Error", "Torrent -> status string")];
+        else
+            [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
                                     stringByAppendingString: [self errorMessage]]];
+    }
     else if (fStalled)
-        [statusString setString: [NSLocalizedString(@"Stalled, ", "Torrent -> status string")
-                                    stringByAppendingString: statusString]];
+        [statusString insertString: NSLocalizedString(@"Stalled, ", "Torrent -> status string") atIndex: 0];
     else;
     
     //update queue for checking (from downloading to seeding), stalled, or error
