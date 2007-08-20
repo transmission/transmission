@@ -33,7 +33,7 @@
 #include "platform.h"
 #include "utils.h"
 
-//#define DEBUG
+/* #define DEBUG */
 #ifdef DEBUG
 #undef tr_dbg
 #define tr_dbg( a, b... ) fprintf(stderr, a "\n", ##b )

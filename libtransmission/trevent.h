@@ -15,9 +15,9 @@
 /**
 **/
 
-extern void tr_eventInit( struct tr_handle_s * tr_handle );
+void tr_eventInit( struct tr_handle_s * tr_handle );
 
-extern void tr_eventClose( struct tr_handle_s * tr_handle );
+void tr_eventClose( struct tr_handle_s * tr_handle );
 
 /**
 **/

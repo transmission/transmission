@@ -308,7 +308,7 @@ tr_ioHash( tr_io_t * io, int pieceIndex )
     const int success = !checkPiece( tor, pieceIndex );
     if( success )
     {
-        tr_inf( "Piece %d hash OK", pieceIndex );
+        tr_dbg( "Piece %d hash OK", pieceIndex );
         tr_cpPieceAdd( tor->completion, pieceIndex );
     }
     else
