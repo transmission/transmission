@@ -231,13 +231,13 @@ void tr_close( tr_handle_t * h )
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
     
+    tr_eventClose( h );
     tr_sharedClose( h->shared );
     tr_fdClose();
     free( h->tag );
     free( h );
 
     tr_netResolveThreadClose();
-    tr_eventClose( h );
 }
 
 tr_torrent_t **
