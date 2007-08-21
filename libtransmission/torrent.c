@@ -359,7 +359,7 @@ tr_torrentParse( const tr_handle_t  * h,
                  const char         * destination,
                  tr_info_t          * setme_info )
 {
-    int ret;
+    int ret, doFree;
     tr_info_t tmp;
 
     if( setme_info == NULL )
@@ -367,12 +367,12 @@ tr_torrentParse( const tr_handle_t  * h,
 
     memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseFile( setme_info, h->tag, path, FALSE );
+    doFree = !ret && (setme_info == &tmp);
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
 
-    /* if we allocated a temporary info, free it */
-    if( !ret && ( setme_info == &tmp ) )
+    if( doFree )
         tr_metainfoFree( &tmp );
 
     return ret;
@@ -410,7 +410,7 @@ tr_torrentParseHash( const tr_handle_t  * h,
                      const char         * destination,
                      tr_info_t          * setme_info )
 {
-    int ret;
+    int ret, doFree;
     tr_info_t tmp;
 
     if( setme_info == NULL )
@@ -418,11 +418,12 @@ tr_torrentParseHash( const tr_handle_t  * h,
 
     memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseHash( setme_info, h->tag, hashStr );
+    doFree = !ret && (setme_info == &tmp);
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
 
-    if( setme_info == &tmp )
+    if( doFree )
         tr_metainfoFree( &tmp );
 
     return ret;
@@ -462,7 +463,7 @@ tr_torrentParseData( const tr_handle_t  * h,
                      const char         * destination,
                      tr_info_t          * setme_info )
 {
-    int ret;
+    int ret, doFree;
     tr_info_t tmp;
 
     if( setme_info == NULL )
@@ -470,11 +471,12 @@ tr_torrentParseData( const tr_handle_t  * h,
 
     memset( setme_info, 0, sizeof( tr_info_t ) );
     ret = tr_metainfoParseData( setme_info, h->tag, data, size, FALSE );
+    doFree = !ret && (setme_info == &tmp);
 
     if( ret == TR_OK )
         ret = infoCanAdd( h, destination, setme_info );
 
-    if( setme_info == &tmp )
+    if( doFree )
         tr_metainfoFree( &tmp );
 
     return ret;
