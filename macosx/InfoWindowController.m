@@ -729,16 +729,16 @@
         height = TAB_INFO_HEIGHT;
     
     NSWindow * window = [self window];
-    NSRect frame = [window frame];
     NSView * view = [[fTabView selectedTabViewItem] view];
+    NSRect windowFrame = [window frame], viewFrame = [view frame];
     
     //save previous size
     if (fCanResizeVertical && !canResizeVertical)
-        [[NSUserDefaults standardUserDefaults] setFloat: [view frame].size.height forKey: @"InspectorHeight"];
+        [[NSUserDefaults standardUserDefaults] setFloat: viewFrame.size.height forKey: @"InspectorHeight"];
     
-    float difference = (height - [view frame].size.height) * [window userSpaceScaleFactor];
-    frame.origin.y -= difference;
-    frame.size.height += difference;
+    float difference = (height - viewFrame.size.height) * [window userSpaceScaleFactor];
+    windowFrame.origin.y -= difference;
+    windowFrame.size.height += difference;
     
     //actually do resize
     if (!fCanResizeVertical || !canResizeVertical)
@@ -746,16 +746,16 @@
         if (animate)
         {
             [view setHidden: YES];
-            [window setFrame: frame display: YES animate: YES];
+            [window setFrame: windowFrame display: YES animate: YES];
             [view setHidden: NO];
         }
         else
-            [window setFrame: frame display: YES];
+            [window setFrame: windowFrame display: YES];
     }
     
-    
-    [window setMinSize: NSMakeSize([window minSize].width, canResizeVertical ? TAB_RESIZABLE_MIN_HEIGHT : frame.size.height)];
-    [window setMaxSize: NSMakeSize([window maxSize].width, canResizeVertical ? FLT_MAX : frame.size.height)];
+    [window setMinSize: NSMakeSize([window minSize].width, !canResizeVertical ? windowFrame.size.height
+            : (windowFrame.size.height - [[[fTabView selectedTabViewItem] view] frame].size.height) + TAB_RESIZABLE_MIN_HEIGHT)];
+    [window setMaxSize: NSMakeSize([window maxSize].width, !canResizeVertical ? windowFrame.size.height : FLT_MAX)];
     
     fCanResizeVertical = canResizeVertical;
 }
