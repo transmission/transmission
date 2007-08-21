@@ -488,11 +488,9 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
                successful, it will be moved to the front of the tier." */
             const int i = t->addressIndex;
             const int j = t->tierFronts[i];
-            if( i != j ) {
-                tr_tracker_info_t swap = t->addresses[i];
-                t->addresses[i] = t->addresses[j];
-                t->addresses[j] = swap;
-            }
+            const tr_tracker_info_t swap = t->addresses[i];
+            t->addresses[i] = t->addresses[j];
+            t->addresses[j] = swap;
         }
     }
     else if(    ( req->response_code == HTTP_MOVEPERM )
@@ -860,7 +858,7 @@ setAnnounceInterval( Tracker  * t,
         t->minAnnounceIntervalMsec = minimum;
 
     if( interval > 0 )
-       t->announceIntervalMsec = interval;
+        t->announceIntervalMsec = interval;
 
     if( t->announceIntervalMsec < t->minAnnounceIntervalMsec )
         t->announceIntervalMsec = t->minAnnounceIntervalMsec;

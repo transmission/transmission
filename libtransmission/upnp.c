@@ -71,14 +71,14 @@
 #define IGD_ADD_CONFLICT        718
 #define IGD_NO_DYNAMIC_MAPPING  725
 
-typedef struct tr_upnp_action_s
+struct upnp_act
 {
     char * name;
     int    len;
     struct { char * name; char * var; char dir; } * args;
-} tr_upnp_action_t;
+};
 
-typedef struct tr_upnp_device_s
+struct upnp_dev
 {
     char                    * id;
     char                    * host;
@@ -103,11 +103,11 @@ typedef struct tr_upnp_device_s
     uint64_t                  lastcheck;
     unsigned int              soapretry : 1;
     tr_http_t               * http;
-    tr_upnp_action_t          getcmd;
-    tr_upnp_action_t          addcmd;
-    tr_upnp_action_t          delcmd;
-    struct tr_upnp_device_s * next;
-} tr_upnp_device_t;
+    struct upnp_act           getcmd;
+    struct upnp_act           addcmd;
+    struct upnp_act           delcmd;
+    struct upnp_dev         * next;
+};
 
 struct tr_upnp_s
 {
@@ -118,68 +118,68 @@ struct tr_upnp_s
     uint64_t           lastdelay;
     unsigned int       active : 1;
     unsigned int       discovering : 1;
-    tr_upnp_device_t * devices;
+    struct upnp_dev  * devices;
 };
 
 static int
 sendSSDP( int fd );
 static int
-mcastStart();
+mcastStart( void );
 static void
 killSock( int * sock );
 static void
 killHttp( tr_http_t ** http );
 static int
-watchSSDP( tr_upnp_device_t ** devices, int fd );
+watchSSDP( struct upnp_dev ** devices, int fd );
 static tr_tristate_t
 recvSSDP( int fd, char * buf, int * len );
 static int
 parseSSDP( char * buf, int len, tr_http_header_t * headers );
 static void
-deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
+deviceAdd( struct upnp_dev ** first, const char * id, int idLen,
            const char * url, int urlLen );
 static void
-deviceRemove( tr_upnp_device_t ** prevptr );
+deviceRemove( struct upnp_dev ** prevptr );
 static int
-deviceStop( tr_upnp_device_t * dev );
+deviceStop( struct upnp_dev * dev );
 static int
-devicePulse( tr_upnp_device_t * dev, int port );
+devicePulse( struct upnp_dev * dev, int port );
 static int
-devicePulseHttp( tr_upnp_device_t * dev,
+devicePulseHttp( struct upnp_dev * dev,
                  const char ** body, int * len );
 static tr_http_t *
-devicePulseGetHttp( tr_upnp_device_t * dev );
+devicePulseGetHttp( struct upnp_dev * dev );
 static int
 parseRoot( const char * root, const char *buf, int len,
            char ** soap, char ** scpd, int * ppp );
 static void
 addUrlbase( const char * base, char ** path );
 static int
-parseScpd( const char *buf, int len, tr_upnp_action_t * getcmd,
-           tr_upnp_action_t * addcmd, tr_upnp_action_t * delcmd );
+parseScpd( const char *buf, int len, struct upnp_act * getcmd,
+           struct upnp_act * addcmd, struct upnp_act * delcmd );
 static int
 parseScpdArgs( const char * buf, const char * end,
-               tr_upnp_action_t * action, char dir );
+               struct upnp_act * action, char dir );
 static int
-parseMapping( tr_upnp_device_t * dev, const char * buf, int len );
+parseMapping( struct upnp_dev * dev, const char * buf, int len );
 static char *
 joinstrs( const char *, const char *, const char * );
 static tr_http_t *
 soapRequest( int retry, const char * host, int port, const char * path,
-             const char * type, tr_upnp_action_t * action, ... );
+             const char * type, struct upnp_act * action, ... );
 static void
-actionSetup( tr_upnp_action_t * action, const char * name, int prealloc );
+actionSetup( struct upnp_act * action, const char * name, int prealloc );
 static void
-actionFree( tr_upnp_action_t * action );
+actionFree( struct upnp_act * action );
 static int
-actionAdd( tr_upnp_action_t * action, char * name, char * var,
+actionAdd( struct upnp_act * action, char * name, char * var,
                       char dir );
 #define actionLookupVar( act, nam, len, dir ) \
     ( actionLookup( (act), (nam), (len), (dir), 0 ) )
 #define actionLookupName( act, var, len, dir ) \
     ( actionLookup( (act), (var), (len), (dir), 1 ) )
 static const char *
-actionLookup( tr_upnp_action_t * action, const char * key, int len,
+actionLookup( struct upnp_act * action, const char * key, int len,
               char dir, int getname );
 
 #ifdef VERBOSE_LOG
@@ -187,7 +187,7 @@ static FILE * vlog = NULL;
 #endif 
 
 tr_upnp_t *
-tr_upnpInit()
+tr_upnpInit( void )
 {
     tr_upnp_t * upnp;
 
@@ -245,8 +245,8 @@ tr_upnpStop( tr_upnp_t * upnp )
 int
 tr_upnpStatus( tr_upnp_t * upnp )
 {
-    tr_upnp_device_t * ii;
-    int                ret;
+    struct upnp_dev * ii;
+    int               ret;
 
     if( !upnp->active )
     {
@@ -315,7 +315,7 @@ tr_upnpClose( tr_upnp_t * upnp )
 void
 tr_upnpPulse( tr_upnp_t * upnp )
 {
-    tr_upnp_device_t ** ii;
+    struct upnp_dev ** ii;
 
     if( upnp->active )
     {
@@ -454,7 +454,7 @@ killHttp( tr_http_t ** http )
 }
 
 static int
-watchSSDP( tr_upnp_device_t ** devices, int fd )
+watchSSDP( struct upnp_dev ** devices, int fd )
 {
     /* XXX what if we get a huge SSDP packet? */
     char buf[512];
@@ -586,10 +586,10 @@ parseSSDP( char * buf, int len, tr_http_header_t * hdr )
 }
 
 static void
-deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
+deviceAdd( struct upnp_dev ** first, const char * id, int idLen,
            const char * url, int urlLen )
 {
-    tr_upnp_device_t * ii;
+    struct upnp_dev * ii;
 
     for( ii = *first; NULL != ii; ii = ii->next )
     {
@@ -626,9 +626,9 @@ deviceAdd( tr_upnp_device_t ** first, const char * id, int idLen,
 }
 
 static void
-deviceRemove( tr_upnp_device_t ** prevptr )
+deviceRemove( struct upnp_dev ** prevptr )
 {
-    tr_upnp_device_t * dead;
+    struct upnp_dev * dead;
 
     dead = *prevptr;
     *prevptr = dead->next;
@@ -652,7 +652,7 @@ deviceRemove( tr_upnp_device_t ** prevptr )
 }
 
 static int
-deviceStop( tr_upnp_device_t * dev )
+deviceStop( struct upnp_dev * dev )
 {
     switch( dev->state )
     {
@@ -670,7 +670,7 @@ deviceStop( tr_upnp_device_t * dev )
 }
 
 static int
-devicePulse( tr_upnp_device_t * dev, int port )
+devicePulse( struct upnp_dev * dev, int port )
 {
     const char * body;
     int          len, code;
@@ -884,7 +884,7 @@ makeHttp( int method, const char * host, int port, const char * path )
 }
 
 static tr_http_t *
-devicePulseGetHttp( tr_upnp_device_t * dev )
+devicePulseGetHttp( struct upnp_dev * dev )
 {
     tr_http_t  * ret;
     char         numstr[6];
@@ -971,7 +971,7 @@ devicePulseGetHttp( tr_upnp_device_t * dev )
 }
 
 static int
-devicePulseHttp( tr_upnp_device_t * dev,
+devicePulseHttp( struct upnp_dev * dev,
                  const char ** body, int * len )
 {
     const char * headers;
@@ -1153,8 +1153,8 @@ addUrlbase( const char * base, char ** path )
 }
 
 static int
-parseScpd( const char * buf, int len, tr_upnp_action_t * getcmd,
-           tr_upnp_action_t * addcmd, tr_upnp_action_t * delcmd )
+parseScpd( const char * buf, int len, struct upnp_act * getcmd,
+           struct upnp_act * addcmd, struct upnp_act * delcmd )
 {
     const char * end, * next, * sub, * name;
 
@@ -1200,7 +1200,7 @@ parseScpd( const char * buf, int len, tr_upnp_action_t * getcmd,
 
 static int
 parseScpdArgs( const char * buf, const char * end,
-               tr_upnp_action_t * action, char dir )
+               struct upnp_act * action, char dir )
 {
     const char * sub, * which;
     char       * name, * var;
@@ -1232,7 +1232,7 @@ parseScpdArgs( const char * buf, const char * end,
 }
 
 static int
-parseMapping( tr_upnp_device_t * dev, const char * buf, int len )
+parseMapping( struct upnp_dev * dev, const char * buf, int len )
 {
     const char * end, * down, * next, * var;
     int          varlen, pret, cret, eret;
@@ -1309,7 +1309,7 @@ joinstrs( const char * first, const char * delim, const char * second )
 
 static tr_http_t *
 soapRequest( int retry, const char * host, int port, const char * path,
-             const char * type, tr_upnp_action_t * action, ... )
+             const char * type, struct upnp_act * action, ... )
 {
     tr_http_t  * http;
     va_list      ap;
@@ -1373,7 +1373,7 @@ soapRequest( int retry, const char * host, int port, const char * path,
 }
 
 static void
-actionSetup( tr_upnp_action_t * action, const char * name, int prealloc )
+actionSetup( struct upnp_act * action, const char * name, int prealloc )
 {
     action->name = strdup( name );
     assert( NULL == action->args );
@@ -1383,7 +1383,7 @@ actionSetup( tr_upnp_action_t * action, const char * name, int prealloc )
 }
 
 static void
-actionFree( tr_upnp_action_t * act )
+actionFree( struct upnp_act * act )
 {
     free( act->name );
     while( 0 < act->len )
@@ -1396,7 +1396,7 @@ actionFree( tr_upnp_action_t * act )
 }
 
 static int
-actionAdd( tr_upnp_action_t * act, char * name, char * var, char dir )
+actionAdd( struct upnp_act * act, char * name, char * var, char dir )
 {
     int    ii;
     void * newbuf;
@@ -1428,7 +1428,7 @@ actionAdd( tr_upnp_action_t * act, char * name, char * var, char dir )
 }
 
 static const char *
-actionLookup( tr_upnp_action_t * act, const char * key, int len,
+actionLookup( struct upnp_act * act, const char * key, int len,
               char dir, int getname )
 {
     int ii;
@@ -1463,95 +1463,3 @@ actionLookup( tr_upnp_action_t * act, const char * key, int len,
 
     return NULL;
 }
-
-#if 0
-/* this code is used for standalone root parsing for debugging purposes */
-/* cc -g -Wall -D__TRANSMISSION__ -o upnp upnp.c xml.c utils.c */
-int
-main( int argc, char * argv[] )
-{
-    struct stat sb;
-    char      * data, * soap, * scpd;
-    int         fd, ppp;
-    ssize_t     res;
-
-    if( 3 != argc )
-    {
-        printf( "usage: %s root-url root-file\n", argv[0] );
-        return 0;
-    }
-
-    tr_msgInit();
-    tr_setMessageLevel( 9 );
-
-    if( 0 > stat( argv[2], &sb ) )
-    {
-        tr_err( "failed to stat file %s: %s", argv[2], strerror( sockerrno ) );
-        return 1;
-    }
-
-    data = malloc( sb.st_size );
-    if( NULL == data )
-    {
-        tr_err( "failed to malloc %zd bytes", ( size_t )sb.st_size );
-        return 1;
-    }
-
-    fd = open( argv[2], O_RDONLY );
-    if( 0 > fd )
-    {
-        tr_err( "failed to open file %s: %s", argv[2], strerror( sockerrno ) );
-        free( data );
-        return 1;
-    }
-
-    res = read( fd, data, sb.st_size );
-    if( sb.st_size > res )
-    {
-        tr_err( "failed to read file %s: %s", argv[2],
-                ( 0 > res ? strerror( sockerrno ) : "short read count" ) );
-        close( fd );
-        free( data );
-        return 1;
-    }
-
-    close( fd );
-
-    if( parseRoot( argv[1], data, sb.st_size, &soap, &scpd, &ppp ) )
-    {
-        tr_err( "root parsing failed" );
-    }
-    else
-    {
-        tr_err( "soap=%s scpd=%s ppp=%s", soap, scpd, ( ppp ? "yes" : "no" ) );
-        free( soap );
-        free( scpd );
-    }
-    free( data );
-
-    return 0;
-}
-
-int  tr_netMcastOpen( int port, struct in_addr addr ) { assert( 0 ); }
-int  tr_netBind    ( int port, int type ) { assert( 0 ); }
-void tr_netClose   ( int s ) { assert( 0 ); }
-int  tr_netRecvFrom( int s, uint8_t * buf, int size, struct sockaddr_in * sin ) { assert( 0 ); }
-int         tr_httpRequestType( const char * data, int len,
-                                char ** method, char ** uri ) { assert( 0 ); }
-int         tr_httpResponseCode( const char * data, int len ) { assert( 0 ); }
-char *      tr_httpParse( const char * data, int len, tr_http_header_t *headers ) { assert( 0 ); }
-int         tr_httpIsUrl( const char * u, int l ) { assert( 0 ); }
-int         tr_httpParseUrl( const char * u, int l, char ** h, int * p, char ** q ) { assert( 0 ); }
-tr_http_t   * tr_httpClient( int t, const char * h, int p, const char * u, ... ) { assert( 0 ); }
-tr_http_t   * tr_httpClientUrl( int t, const char * u, ... ) { assert( 0 ); }
-void          tr_httpAddHeader( tr_http_t * h, const char * n, const char * v ) { assert( 0 ); }
-void          tr_httpAddBody( tr_http_t * h, const char * b, ... ) { assert( 0 ); }
-tr_tristate_t tr_httpPulse( tr_http_t * h, const char ** b, int * l ) { assert( 0 ); }
-char        * tr_httpWhatsMyAddress( tr_http_t * h ) { assert( 0 ); }
-void          tr_httpClose( tr_http_t * h ) { assert( 0 ); }
-
-void tr_lockInit     ( tr_lock_t * l ) {}
-int  pthread_mutex_lock( pthread_mutex_t * m ) { return 0; }
-int  pthread_mutex_unlock( pthread_mutex_t * m ) { return 0; }
-
-#endif
