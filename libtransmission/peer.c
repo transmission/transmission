@@ -305,6 +305,8 @@ static const char* getPeerId( void )
     return peerId;
 }
 
+static void tr_peerPieceIsCorrupt  ( tr_peer_t *, int pieceIndex );
+
 #include "peerext.h"
 #include "peeraz.h"
 #include "peermessages.h"
@@ -969,7 +971,24 @@ int tr_peerGetConnectable( const tr_torrent_t * tor, uint8_t ** _buf )
 ***/
 
 void
-tr_peerSentBlockToUs ( tr_peer_t * peer, int byteCount )
+tr_peerPieceIsCorrupt( tr_peer_t * peer, int pieceIndex )
+{
+    tr_torrent_t * tor = peer->tor;
+
+    const uint64_t byteCount = tr_torPieceCountBytes( tor, pieceIndex );
+
+    /* increment the `corrupt' field */
+    tor->corruptCur += byteCount;
+
+    /* decrement the `downloaded' field */
+    if( tor->downloadedCur >= byteCount )
+        tor->downloadedCur -= byteCount;
+    else
+        tor->downloadedCur = 0;
+}
+
+void
+tr_peerSentBlockToUs( tr_peer_t * peer, int byteCount )
 {
     tr_torrent_t * tor = peer->tor;
 

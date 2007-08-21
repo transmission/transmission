@@ -97,7 +97,10 @@ enum
     /* active
      * char: 't' if running, 'f' if paused
      */
-    FR_ID_RUN = 9
+    FR_ID_RUN = 9,
+
+    /* number of corrupt bytes downloaded */
+    FR_ID_CORRUPT = 10
 };
 
 
@@ -272,7 +275,7 @@ tr_fastResumeSave( const tr_torrent_t * tor )
 
     if( TRUE ) /* FR_ID_RUN */
     {
-        const int run = tor->runStatusToSave>=0
+        const int run = tor->runStatusToSaveIsSet
             ? tor->runStatusToSave
             : tor->runStatus;
         const char is_running = (run == TR_RUN_RUNNING) ? 't' : 'f';
@@ -284,6 +287,8 @@ tr_fastResumeSave( const tr_torrent_t * tor )
     fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
     total = tor->uploadedCur + tor->uploadedPrev;
     fastResumeWriteData( FR_ID_UPLOADED, &total, 8, 1, file );
+    total = tor->corruptCur + tor->corruptPrev;
+    fastResumeWriteData( FR_ID_CORRUPT, &total, 8, 1, file );
 
     if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
     {
@@ -612,6 +617,21 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
                     }
                     tor->uploadedCur = 0;
                     ret |= TR_FR_UPLOADED;
+                    continue;
+                }
+                break;
+
+            case FR_ID_CORRUPT:
+                /* read upload total */
+                if( 8 == len )
+                {
+                    if( 1 != fread( &tor->corruptPrev, 8, 1, file ) )
+                    {
+                        fclose( file );
+                        return ret;
+                    }
+                    tor->corruptCur = 0;
+                    ret |= TR_FR_CORRUPT;
                     continue;
                 }
                 break;

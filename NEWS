@@ -1,5 +1,23 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.90 (2007/xx/yy)
+ - Improved compliance with bittorrent spec.
+ - Multiscrape support added.
+ - Only report downloaded, verified good pieces in tracker `download' field.
+
+0.81 (2007/xx/yy)
+ - Fix 0.80 assertion crashes.
+ - Fix a bug which miscounted how many peers Transmission wants connected
+ - Memory leaks fixed.
+ - OS X:
+   + Multiple fixes to creating torrents and adding new torrents
+   + Updated Russian translation
+ - GTK:
+   + Updated Dutch, Portuguese, French, and Slovakian translations
+ - CLI:
+   + Better support for cli-driven torrent creation.
+   + Fix a bug which misparsed command-line arguments.
+
 0.80 (2007/08/07)
  - Ability to selectively download and prioritize files
  - Torrent file creation

@@ -249,7 +249,7 @@ torrentRealInit( tr_handle_t   * h,
     tor->hasChangedState = -1;
     tor->pexDisabled = 0;
 
-    tor->runStatusToSave = -1;
+    tor->runStatusToSaveIsSet = FALSE;
 
     /**
      * Decide on a block size.  constraints:
@@ -763,6 +763,7 @@ tr_torrentStat( tr_torrent_t * tor )
         ? -1.0f
         : (s->left / s->rateDownload / 1024.0);
 
+    s->corrupt         = tor->corruptCur    + tor->corruptPrev;
     s->uploaded        = tor->uploadedCur   + tor->uploadedPrev;
     s->downloaded      = tor->downloadedCur + tor->downloadedPrev;
     s->downloadedValid = tr_cpDownloadedValid( tor->completion );
@@ -973,6 +974,8 @@ tr_torrentResetTransferStats( tr_torrent_t * tor )
     tor->downloadedCur   = 0;
     tor->uploadedPrev   += tor->uploadedCur;
     tor->uploadedCur     = 0;
+    tor->corruptPrev    += tor->corruptCur;
+    tor->corruptCur      = 0;
 
     tr_torrentWriterUnlock( tor );
 }
@@ -1084,6 +1087,7 @@ void tr_torrentStop( tr_torrent_t * tor )
 void tr_torrentClose( tr_torrent_t * tor )
 {
     tor->runStatusToSave = tor->runStatus;
+    tor->runStatusToSaveIsSet = TRUE;
     tr_torrentStop( tor );
     tor->dieFlag = TRUE;
 }

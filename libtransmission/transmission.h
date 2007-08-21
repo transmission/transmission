@@ -629,6 +629,7 @@ struct tr_stat_s
     uint64_t            downloaded;
     uint64_t            downloadedValid;
     uint64_t            uploaded;
+    uint64_t            corrupt;
     float               swarmspeed;
 
 #define TR_RATIO_NA  -1

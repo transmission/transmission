@@ -140,11 +140,6 @@ tr_cpInvalidateDND ( tr_completion_t * cp )
     cp->doneDirty = TRUE;
 }
 
-int tr_cpPieceHasAllBlocks( const tr_completion_t * cp, int piece )
-{
-    return tr_cpPieceIsComplete( cp, piece );
-}
-
 int tr_cpPieceIsComplete( const tr_completion_t * cp, int piece )
 {
     return cp->completeBlocks[piece] >= tr_torPieceCountBlocks(cp->tor,piece);

@@ -44,7 +44,6 @@ float                 tr_cpPercentDone( const tr_completion_t * );
 void                  tr_cpInvalidateDND ( tr_completion_t * );
 
 /* Pieces */
-int                   tr_cpPieceHasAllBlocks( const tr_completion_t *, int piece );
 int                   tr_cpPieceIsComplete( const tr_completion_t *, int piece );
 void                  tr_cpPieceAdd( tr_completion_t *, int piece );
 void                  tr_cpPieceRem( tr_completion_t *, int piece );

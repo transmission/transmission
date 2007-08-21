@@ -785,6 +785,7 @@ buildTrackerRequestURI( const Torrent * tor, const char * eventName )
                                 "&port=%d"
                                 "&uploaded=%"PRIu64
                                 "&downloaded=%"PRIu64
+                                "&corrupt=%"PRIu64
                                 "&left=%"PRIu64
                                 "&compact=1"
                                 "&numwant=%d"
@@ -797,6 +798,7 @@ buildTrackerRequestURI( const Torrent * tor, const char * eventName )
         torrent->publicPort,
         torrent->uploadedCur,
         torrent->downloadedCur,
+        torrent->corruptCur,
         tr_cpLeftUntilComplete( torrent->completion ),
         numwant,
         tor->tracker->key_param,

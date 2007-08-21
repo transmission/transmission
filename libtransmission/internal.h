@@ -142,6 +142,7 @@ struct tr_torrent_s
     struct tr_bitfield_s     * uncheckedPieces;
     run_status_t               runStatus;
     run_status_t               runStatusToSave;
+    char                       runStatusToSaveIsSet;
     cp_status_t                cpStatus;
     struct tr_thread_s       * thread;
     struct tr_rwlock_s       * lock;
@@ -161,6 +162,8 @@ struct tr_torrent_s
     uint64_t                   downloadedPrev;
     uint64_t                   uploadedCur;
     uint64_t                   uploadedPrev;
+    uint64_t                   corruptCur;
+    uint64_t                   corruptPrev;
     uint64_t                   activityDate;
 
     uint8_t                    pexDisabled;

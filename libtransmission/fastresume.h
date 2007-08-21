@@ -31,11 +31,12 @@ enum
 {
   TR_FR_DOWNLOADED   = (1<<0),
   TR_FR_UPLOADED     = (1<<1),
-  TR_FR_PEERS        = (1<<2),
-  TR_FR_PROGRESS     = (1<<3),
-  TR_FR_PRIORITY     = (1<<4),
-  TR_FR_SPEEDLIMIT   = (1<<5),
-  TR_FR_RUN          = (1<<6),
+  TR_FR_CORRUPT      = (1<<2),
+  TR_FR_PEERS        = (1<<3),
+  TR_FR_PROGRESS     = (1<<4),
+  TR_FR_PRIORITY     = (1<<5),
+  TR_FR_SPEEDLIMIT   = (1<<6),
+  TR_FR_RUN          = (1<<7)
 };
 
 /**

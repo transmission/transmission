@@ -342,7 +342,7 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     tr_peerSentBlockToUs( peer, len-8 );
     broadcastCancel( tor, index, begin, len - 8 );
 
-    if( !tr_cpPieceHasAllBlocks( tor->completion, index ) )
+    if( !tr_cpPieceIsComplete( tor->completion, index ) )
     {
         return TR_OK;
     }
@@ -350,11 +350,8 @@ static int parsePiece( tr_torrent_t * tor, tr_peer_t * peer,
     /* Piece is complete, check it */
     if( ( ret = tr_ioHash( tor->io, index ) ) )
     {
+        tr_peerPieceIsCorrupt( peer, index );
         return ret;
-    }
-    if( !tr_cpPieceIsComplete( tor->completion, index ) )
-    {
-        return TR_OK;
     }
 
     /* Hash OK */
