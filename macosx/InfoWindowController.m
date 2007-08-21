@@ -36,9 +36,8 @@
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 268.0
 #define TAB_ACTIVITY_HEIGHT 274.0
-#define TAB_PEERS_HEIGHT 279.0
-#define TAB_FILES_HEIGHT 279.0
 #define TAB_OPTIONS_HEIGHT 158.0
+#define TAB_RESIZABLE_MIN_HEIGHT 279.0
 
 #define PIECES_CONTROL_PROGRESS 0
 #define PIECES_CONTROL_AVAILABLE 1
@@ -71,8 +70,6 @@
         fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
         fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
         fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
-        
-        fCanResizeVertical = YES;
     }
     return self;
 }
@@ -87,8 +84,11 @@
     
     //select tab
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
-    if ([fTabView indexOfTabViewItemWithIdentifier: identifier] == NSNotFound)
+    
+    if (!identifier || [fTabView indexOfTabViewItemWithIdentifier: identifier] == NSNotFound)
         identifier = TAB_INFO_IDENT;
+    
+    fCanResizeVertical = [identifier isEqualToString: TAB_PEERS_IDENT] || [identifier isEqualToString: TAB_FILES_IDENT];
     
     [fTabView selectTabViewItemWithIdentifier: identifier];
     [self setWindowForTab: identifier animate: NO];
@@ -115,6 +115,10 @@
 
 - (void) dealloc
 {
+    if (fCanResizeVertical)
+        [[NSUserDefaults standardUserDefaults] setFloat: [[[fTabView selectedTabViewItem] view] frame].size.height
+                                                forKey: @"InspectorHeight"];
+    
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
     [fTorrents release];
@@ -711,15 +715,13 @@
         height = TAB_ACTIVITY_HEIGHT;
         [fPiecesView updateView: YES];
     }
-    else if ([identifier isEqualToString: TAB_PEERS_IDENT])
+    else if ([identifier isEqualToString: TAB_PEERS_IDENT] || [identifier isEqualToString: TAB_FILES_IDENT])
     {
-        height = TAB_PEERS_HEIGHT;
         canResizeVertical = YES;
-    }
-    else if ([identifier isEqualToString: TAB_FILES_IDENT])
-    {
-        height = TAB_FILES_HEIGHT;
-        canResizeVertical = YES;
+        
+        //height only needed if resize will take place
+        if (!fCanResizeVertical)
+            height = MAX(TAB_RESIZABLE_MIN_HEIGHT, [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorHeight"]);
     }
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
@@ -730,10 +732,15 @@
     NSRect frame = [window frame];
     NSView * view = [[fTabView selectedTabViewItem] view];
     
-    float difference = (height - [view frame].size.height) * [window userSpaceScaleFactor];;
+    //save previous size
+    if (fCanResizeVertical && !canResizeVertical)
+        [[NSUserDefaults standardUserDefaults] setFloat: [view frame].size.height forKey: @"InspectorHeight"];
+    
+    float difference = (height - [view frame].size.height) * [window userSpaceScaleFactor];
     frame.origin.y -= difference;
     frame.size.height += difference;
     
+    //actually do resize
     if (!fCanResizeVertical || !canResizeVertical)
     {
         if (animate)
@@ -746,7 +753,8 @@
             [window setFrame: frame display: YES];
     }
     
-    [window setMinSize: NSMakeSize([window minSize].width, frame.size.height)];
+    
+    [window setMinSize: NSMakeSize([window minSize].width, canResizeVertical ? TAB_RESIZABLE_MIN_HEIGHT : frame.size.height)];
     [window setMaxSize: NSMakeSize([window maxSize].width, canResizeVertical ? FLT_MAX : frame.size.height)];
     
     fCanResizeVertical = canResizeVertical;

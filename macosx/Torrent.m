@@ -425,7 +425,7 @@ static int static_lastid = 0;
             [statusString setString: NSLocalizedString(@"Error", "Torrent -> status string")];
         else
             [statusString setString: [NSLocalizedString(@"Error: ", "Torrent -> status string")
-                                    stringByAppendingString: [self errorMessage]]];
+                                    stringByAppendingString: errorString]];
     }
     else if (fStalled)
         [statusString insertString: NSLocalizedString(@"Stalled, ", "Torrent -> status string") atIndex: 0];
