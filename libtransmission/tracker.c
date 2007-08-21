@@ -370,9 +370,10 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
     *out = '\0';
 }
 
-void
-tr_trackerFree( Torrent * tor )
+static int
+onTorrentFreeNow( void * vtor )
 {
+    Torrent * tor = (Torrent *) vtor;
     Tracker * t = tor->tracker;
 
     tr_ptrArrayRemoveSorted( t->torrents, tor, torrentCompare );
@@ -410,6 +411,15 @@ tr_trackerFree( Torrent * tor )
         tr_free( t->tierFronts );
         tr_free( t );
     }
+
+    return FALSE;
+}
+
+void
+tr_trackerFree( Torrent * tor )
+{
+    tr_timerNew( tor->tracker->handle,
+                 onTorrentFreeNow, tor, NULL, 0 );
 }
 
 Torrent*
