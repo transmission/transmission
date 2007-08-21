@@ -311,7 +311,7 @@ tr_cpPercentDone( const tr_completion_t * cp )
 {
     tr_cpEnsureDoneValid( cp );
 
-    return (double)cp->doneHave / cp->doneTotal;
+    return cp->doneTotal ? (double)cp->doneHave / cp->doneTotal : 1.0;
 }
 
 uint64_t
