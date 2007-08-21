@@ -710,23 +710,20 @@
     
     BOOL canResizeVertical = NO;
     float height;
-    if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
+    if ([identifier isEqualToString: TAB_INFO_IDENT])
+        height = TAB_INFO_HEIGHT;
+    else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
     {
         height = TAB_ACTIVITY_HEIGHT;
         [fPiecesView updateView: YES];
     }
-    else if ([identifier isEqualToString: TAB_PEERS_IDENT] || [identifier isEqualToString: TAB_FILES_IDENT])
-    {
-        canResizeVertical = YES;
-        
-        //height only needed if resize will take place
-        if (!fCanResizeVertical)
-            height = MAX(TAB_RESIZABLE_MIN_HEIGHT, [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorHeight"]);
-    }
     else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
         height = TAB_OPTIONS_HEIGHT;
     else
-        height = TAB_INFO_HEIGHT;
+    {
+        canResizeVertical = YES;
+        height = MAX(TAB_RESIZABLE_MIN_HEIGHT, [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorHeight"]);
+    }
     
     NSWindow * window = [self window];
     NSView * view = [[fTabView selectedTabViewItem] view];
@@ -754,8 +751,8 @@
     }
     
     [window setMinSize: NSMakeSize([window minSize].width, !canResizeVertical ? windowFrame.size.height
-            : (windowFrame.size.height - [[[fTabView selectedTabViewItem] view] frame].size.height) + TAB_RESIZABLE_MIN_HEIGHT)];
-    [window setMaxSize: NSMakeSize([window maxSize].width, !canResizeVertical ? windowFrame.size.height : FLT_MAX)];
+                            : (windowFrame.size.height - (viewFrame.size.height + difference)) + TAB_RESIZABLE_MIN_HEIGHT)];
+    [window setMaxSize: NSMakeSize(FLT_MAX, !canResizeVertical ? windowFrame.size.height : FLT_MAX)];
     
     fCanResizeVertical = canResizeVertical;
 }
