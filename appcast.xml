@@ -6,8 +6,29 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Mon, 6 Aug 2007 21:55:00 -0400</pubDate>
-    <lastBuildDate>Mon, 6 Aug 2007 21:55:00 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 22 Aug 2007 00:35:00 -0400</lastBuildDate>
 
+	<item>
+      <title>Transmission 0.81 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Fix 0.80 assertion crashes</li>
+ <li>Fix a bug that miscounted how many peers Transmission wants connected</li>
+ <li>Correct incorrect error messages</li>
+ <li>Memory leaks fixed</li>
+</ul>
+<h4>Mac-Specific Changes:</h4>
+<ul>
+ <li>Multiple fixes to creating torrents and adding new torrents</li>
+ <li>Updated Russian and Spanish translations</li>
+</ul>]]></description>
+      <pubDate>Tue, 22 Aug 2007 00:35:00 -0400</pubDate>
+      <enclosure sparkle:version="2896" sparkle:shortVersionString="0.81" url="http://mirror.m0k.org/transmission/files/Transmission-0.81.dmg" length="1934018" type="application/octet-stream"/>
+    </item>
+	
     <item>
       <title>Transmission 0.80 Released</title>
       <description><![CDATA[
