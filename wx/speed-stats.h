@@ -21,31 +21,81 @@
 #ifndef __XMISSION_SPEED_STATS_H__
 #define __XMISSION_SPEED_STATS_H__
 
+#include <ctime>
+#include <vector>
+#include <wx/colour.h>
 #include <wx/panel.h>
 #include <libtransmission/transmission.h>
+
+extern "C"
+{
+    struct tr_torrent_s;
+}
 
 class SpeedStats: public wxPanel
 {
     public:
 
         SpeedStats( wxWindow * parent,
-                      wxWindowID id = wxID_ANY,
-                      const wxPoint& pos = wxDefaultPosition,
-                      const wxSize& size = wxDefaultSize,
-                      long style = wxTAB_TRAVERSAL,
-                      const wxString& name = _T("panel"));
+                    wxWindowID id = wxID_ANY,
+                    const wxPoint& pos = wxDefaultPosition,
+                    const wxSize& size = wxDefaultSize,
+                    long style = wxTAB_TRAVERSAL,
+                    const wxString& name = _T("panel"));
 
-        virtual ~SpeedStats() {}
-
-        void Update( tr_handle_t * handle );
+        virtual ~SpeedStats();
 
     public:
 
-        void OnPaint( wxPaintEvent& );
+        void SetTorrent( struct tr_torrent_s * );
+
+        void Pulse( tr_handle_t * handle );
 
     private:
 
-       DECLARE_EVENT_TABLE()
+        virtual void OnSize( wxSizeEvent& event );
+
+        void OnPaint( wxPaintEvent& );
+
+        DECLARE_EVENT_TABLE()
+
+    private:
+
+        wxBitmap * myBitmap;
+
+        struct tr_torrent_s * myTorrent;
+
+        struct Speed
+        {
+            time_t time;
+            double torrentUp;
+            double torrentDown;
+            double allUp;
+            double allDown;
+            Speed(): time(0),
+                     torrentUp(0), torrentDown(0),
+                     allUp(0), allDown(0) {}
+        };
+            
+        typedef std::vector<Speed> stats_t;
+
+        stats_t myStats;
+
+        double myMaxSpeed;
+
+        int myHistory;
+
+        enum {
+            BACKGROUND,
+            FRAME,
+            TORRENT_UP,
+            TORRENT_DOWN,
+            ALL_UP,
+            ALL_DOWN,
+            N_COLORS
+        };
+
+        wxColour myColors[N_COLORS];
 };
 
 #endif

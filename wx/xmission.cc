@@ -380,7 +380,7 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
 
 bool MyApp::OnInit()
 {
-    handle = tr_init( "gui" );
+    handle = tr_init( "wx" );
 
     wxCmdLineParser cmdParser( cmdLineDesc, argc, argv );
     if( cmdParser.Parse ( ) )
@@ -437,6 +437,9 @@ MyFrame :: OnTorrentListSelectionChanged( TorrentListCtrl* list,
 {
     assert( list == myTorrentList );
     mySelectedTorrents.assign( torrents.begin(), torrents.end() );
+
+    tr_torrent_t * tor = mySelectedTorrents.empty() ? NULL : mySelectedTorrents.front();
+    mySpeedStats->SetTorrent( tor );
 }
 
 void
@@ -454,7 +457,7 @@ MyFrame :: OnPulse(wxTimerEvent& WXUNUSED(event) )
     RefreshFilterCounts( );
     ApplyCurrentFilter( );
 
-    mySpeedStats->Update( handle );
+    mySpeedStats->Pulse( handle );
 
     float down, up;
     tr_torrentRates( handle, &down, &up );
@@ -489,6 +492,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myPulseTimer( this, ID_Pulse ),
     myLogoIcon( transmission_xpm ),
     myTrayIconIcon( systray_xpm ),
+    mySpeedStats( 0 ),
     myFilterFlags( ~0 ),
     myExitTime( 0 )
 {
