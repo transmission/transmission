@@ -83,7 +83,8 @@ SpeedStats :: OnPaint( wxPaintEvent& WXUNUSED(event) )
     const int per_bar = top / num_bars;
 
     // clear
-    wxMemoryDC memDC( *myBitmap );
+    wxMemoryDC memDC;
+    memDC.SelectObject( *myBitmap );
     memDC.SetBackground( myColors[BACKGROUND] );
     memDC.Clear( );
 
@@ -183,12 +184,12 @@ SpeedStats :: Pulse( tr_handle_t * handle )
     Speed s;
     s.time = time( NULL );
     s.allUp = s.time % 30;//allUp;
-    s.allDown = s.time % 15;//allDown;
-    //if( myTorrent ) {
-        //const tr_stat_t * stat = tr_torrentStat( myTorrent );
-        s.torrentUp = s.time % 40;//stat->rateUpload;
-        s.torrentDown = s.time % 25;//stat->rateDownload;
-    //}
+    s.allDown = allDown;
+    if( myTorrent ) {
+        const tr_stat_t * stat = tr_torrentStat( myTorrent );
+        s.torrentUp = stat->rateUpload;
+        s.torrentDown = stat->rateDownload;
+    }
     myStats.push_back( s );
 
     // age off old data
