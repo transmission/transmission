@@ -338,13 +338,42 @@ parseAZMessageHeader( tr_peer_t * peer, uint8_t * buf, int len,
     return off;
 }
 
+static char *
+azclientname( const char * name, const char * version )
+{
+    char * client;
+    size_t size, drop;
+
+    drop = 0;
+
+    if( 0 == strcmp( name, "AzureusBitTyrant" ) )
+    {
+        name = "BitTyrant";
+        size = strlen( version );
+        if( 9 < size && 0 == strcmp( version + size - 9, "BitTyrant" ) )
+            drop = 9;
+    }
+
+    size = bufsize_utf8( name,  NULL ) + bufsize_utf8( version, NULL );
+    if( drop < size )
+        size -= drop;
+    client = calloc( size, 1 );
+    if( NULL == client )
+        return NULL;
+
+    strlcat_utf8( client, name,    size, 0 );
+    strlcat(      client, " ",     size    );
+    strlcat_utf8( client, version, size, 0 );
+
+    return client;
+}
+
 static int
 parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t      val, * sub, * sub2, * dict, * subsub;
     tr_bitfield_t * msgs;
     int             ii, idx, newclient;
-    size_t          size;
     char          * client;
 
     if( tr_bencLoad( buf, len, &val, NULL ) )
@@ -369,17 +398,12 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
         if( NULL != sub  && TYPE_STR == sub->type &&
             NULL != sub2 && TYPE_STR == sub->type )
         {
-            size = bufsize_utf8( sub->val.s.s,  NULL ) +
-                   bufsize_utf8( sub2->val.s.s, NULL );
-            client = calloc( size, 1 );
+            client = azclientname( sub->val.s.s, sub2->val.s.s );
             if( NULL == client )
             {
                 tr_bencFree( &val );
                 return TR_ERROR;
             }
-            strlcat_utf8( client, sub->val.s.s,  size, 0 );
-            strlcat(      client, " ",           size    );
-            strlcat_utf8( client, sub2->val.s.s, size, 0 );
             if( NULL == peer->client || 0 != strcmp( client, peer->client ) )
             {
                 free( peer->client );
