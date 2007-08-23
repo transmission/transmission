@@ -30,5 +30,6 @@ struct event_base;
 int  server_init(   struct event_base * );
 void server_debug( int );
 int  server_listen( int );
+void server_quit( void );
 
 #endif /* TR_DAEMON_SERVER_H */
