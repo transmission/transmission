@@ -61,6 +61,36 @@ SpeedStats :: ~SpeedStats()
     delete myBitmap;
 }
 
+/**
+***
+**/
+
+void
+SpeedStats :: SetColor( int i, const wxColour& c )
+{
+    assert( 0<=i && i<N_COLORS );
+
+    myColors[i] = c;
+}
+
+wxString
+SpeedStats :: GetColorName( int i )
+{
+    static const wxString xstr[N_COLORS] = {
+        _T("background"), _T("frame"),
+        _T("torrent-up"), _T("torrent-down"),
+        _T("all-up"), _T("all-down")
+    };
+
+    wxString ret = _T("speed-color-");
+    ret += xstr[i];
+    return ret;
+}
+
+/**
+***
+**/
+
 void
 SpeedStats :: OnSize( wxSizeEvent& event )
 {

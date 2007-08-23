@@ -18,6 +18,7 @@
  * $Id$
  */
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <set>
 #include <map>
@@ -499,6 +500,10 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     myTrayIcon = new wxTaskBarIcon;
     SetIcon( myLogoIcon );
 
+    /**
+    ***  Prefs
+    **/
+
     long port;
     wxString key = _T("port");
     if( !myConfig->Read( key, &port, 9090 ) )
@@ -508,9 +513,36 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     key = _T("save-path");
     wxString wxstr;
     if( !myConfig->Read( key, &wxstr, wxFileName::GetHomeDir() ) )
-        myConfig->Write( key, wxstr );
+         myConfig->Write( key, wxstr );
     mySavePath = toStr( wxstr );
-    std::cerr << __FILE__ << ':' << __LINE__ << " save-path is [" << mySavePath << ']' << std::endl;
+
+    const wxString default_colors[SpeedStats::N_COLORS] = {
+        _T("#000000"), // background
+        _T("#32cd32"), // frame
+        _T("#ff0000"), // all up
+        _T("#ff00ff"), // all down
+        _T("#ffff00"), // torrent up
+        _T("#00ff88")  // torrent down
+    };
+    wxColor speedColors[SpeedStats::N_COLORS];
+    for( int i=0; i<SpeedStats::N_COLORS; ++i )
+    {
+        key = SpeedStats::GetColorName( i );
+        myConfig->Read( key, &wxstr, _T("") );
+        std::string str = toStr( wxstr );
+        if( (str.size()!=7)
+            || (str[0]!='#')
+            || !isxdigit(str[1]) || !isxdigit(str[2])
+            || !isxdigit(str[3]) || !isxdigit(str[4])
+            || !isxdigit(str[5]) || !isxdigit(str[6]))
+        {
+            myConfig->Write( key, default_colors[i] );
+            str = toStr( default_colors[i] );
+        }
+        int r, g, b;
+        sscanf( str.c_str()+1, "%02x%02x%02x", &r, &g, &b );
+        speedColors[i].Set( r, g, b );
+    }
 
     /**
     ***  Menu
@@ -614,6 +646,8 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
     notebook->AddPage( tmp, _T("Files") );
     mySpeedStats = new SpeedStats( notebook, wxID_ANY );
+    for( int i=0; i<SpeedStats::N_COLORS; ++i )
+        mySpeedStats->SetColor( i, speedColors[i] );
     notebook->AddPage( mySpeedStats, _T("Speed"), true );
     tmp = new wxButton( notebook, wxID_ANY, _T("Hello World"));
     notebook->AddPage( tmp, _T("Logger") );

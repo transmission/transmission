@@ -51,6 +51,22 @@ class SpeedStats: public wxPanel
 
         void Pulse( tr_handle_t * handle );
 
+    public:
+
+        enum {
+            BACKGROUND,
+            FRAME,
+            TORRENT_UP,
+            TORRENT_DOWN,
+            ALL_UP,
+            ALL_DOWN,
+            N_COLORS
+        };
+
+        void SetColor( int, const wxColour& );
+
+        static wxString GetColorName( int );
+
     private:
 
         virtual void OnSize( wxSizeEvent& event );
@@ -84,16 +100,6 @@ class SpeedStats: public wxPanel
         double myMaxSpeed;
 
         int myHistory;
-
-        enum {
-            BACKGROUND,
-            FRAME,
-            TORRENT_UP,
-            TORRENT_DOWN,
-            ALL_UP,
-            ALL_DOWN,
-            N_COLORS
-        };
 
         wxColour myColors[N_COLORS];
 };
