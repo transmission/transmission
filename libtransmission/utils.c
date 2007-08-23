@@ -237,6 +237,24 @@ void * tr_memmem ( const void *vbig, size_t big_len,
 }
 #endif
 
+struct timeval
+timevalSec ( int seconds )
+{
+    struct timeval ret;
+    ret.tv_sec = seconds;
+    ret.tv_usec = 0;
+    return ret;
+}
+
+struct timeval
+timevalMsec ( int milliseconds )
+{
+    struct timeval ret;
+    const unsigned long microseconds = milliseconds * 1000;
+    ret.tv_sec  = microseconds / 1000000;
+    ret.tv_usec = microseconds % 1000000;
+    return ret;
+}
 
 int
 tr_mkdir( const char * path, int permissions 

@@ -77,6 +77,9 @@ int tr_concat( char ** buf, int * used, int * max,
 void tr_buildPath ( char* buf, size_t buflen,
                     const char * first_element, ... );
 
+struct timeval timevalSec ( int seconds );
+struct timeval timevalMsec ( int milliseconds );
+
 
 int    tr_ioErrorFromErrno( void );
 

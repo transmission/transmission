@@ -91,7 +91,6 @@ tr_timerNew( tr_handle_t        * handle,
              int                  timeout_milliseconds )
 {
     struct timer_node * node;
-    const unsigned long microseconds = timeout_milliseconds * 1000;
 
     assert( func != NULL );
     assert( timeout_milliseconds >= 0 );
@@ -103,8 +102,7 @@ tr_timerNew( tr_handle_t        * handle,
     node->user_data = user_data;
     node->free_func = free_func;
     node->refcount = 1;
-    node->tv.tv_sec  = microseconds / 1000000;
-    node->tv.tv_usec = microseconds % 1000000;
+    node->tv = timevalMsec ( timeout_milliseconds );
     timeout_set( node->event, timerCB, node );
     tr_event_add( handle, node->event, &node->tv );
     return node;
