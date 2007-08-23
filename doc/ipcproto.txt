@@ -513,6 +513,9 @@ which support is mandatory is "id".
                       "seeding"     seeding file data to peers
                       "stopping"    contacting tracker to send 'stopped' event
                       "paused"      torrent is not active
+                      "waiting to checking"
+                                    torrent is queued for hash check.
+                                    yes, this it really is called that.
 "swarm-speed"       integer, swarm speed in bytes per second
 "tracker"           dict with the following keys, current active tracker
                       "address"     string, hostname or ip address of tracker
