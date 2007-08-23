@@ -11,7 +11,7 @@ bin_PROGRAMS = Xmission
 
 Xmission_SOURCES = \
   speed-stats.cc \
-  torrent-filter.cc \
+  filter.cc \
   torrent-list.cc \
   torrent-stats.cc \
   xmission.cc

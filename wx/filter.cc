@@ -19,7 +19,7 @@
  */
 
 #include "foreach.h"
-#include "torrent-filter.h"
+#include "filter.h"
 
 int
 TorrentFilter :: GetFlags( const tr_torrent_t * tor )
@@ -29,13 +29,6 @@ TorrentFilter :: GetFlags( const tr_torrent_t * tor )
 
     switch( s->status )
     {
-        case TR_STATUS_STOPPING:
-        case TR_STATUS_STOPPED:
-        case TR_STATUS_CHECK:
-        case TR_STATUS_CHECK_WAIT:
-            flags |= FLAG_STOPPED;
-            break;
-
         case TR_STATUS_DOWNLOAD:
             flags |= FLAG_LEECHING;
             break;
@@ -44,6 +37,12 @@ TorrentFilter :: GetFlags( const tr_torrent_t * tor )
         case TR_STATUS_SEED:
             flags |= FLAG_SEEDING;
             break;
+
+        case TR_STATUS_STOPPING:
+        case TR_STATUS_STOPPED:
+        case TR_STATUS_CHECK:
+        case TR_STATUS_CHECK_WAIT:
+            break;
     }
 
     flags |= ( ( s->rateUpload + s->rateDownload ) > 0.01 )
@@ -51,8 +50,10 @@ TorrentFilter :: GetFlags( const tr_torrent_t * tor )
         : FLAG_IDLE;
 
     flags |= s->left
-        ? FLAG_DONE
-        : FLAG_NOT_DONE;
+        ? FLAG_INCOMPLETE
+        : FLAG_COMPLETE;
+
+    flags |= FLAG_ALL;
 
     return flags;
 }
@@ -64,47 +65,54 @@ TorrentFilter :: CountHits( const torrents_v & torrents,
     memset( counts, '\0', sizeof(int) * N_FILTERS );
     foreach_const( torrents_v, torrents, it ) {
         const int flags = GetFlags( *it );
-        if( flags & FLAG_STOPPED )  ++counts[STOPPED];
-        if( flags & FLAG_LEECHING ) ++counts[LEECHING];
-        if( flags & FLAG_SEEDING )  ++counts[SEEDING];
-        if( flags & FLAG_ACTIVE )   ++counts[ACTIVE];
-        if( flags & FLAG_IDLE )     ++counts[IDLE];
-        if( flags & FLAG_DONE )     ++counts[DONE];
-        if( flags & FLAG_NOT_DONE ) ++counts[NOT_DONE];
+        if( flags & FLAG_ALL )        ++counts[ALL];
+        if( flags & FLAG_LEECHING )   ++counts[LEECHING];
+        if( flags & FLAG_SEEDING )    ++counts[SEEDING];
+        if( flags & FLAG_ACTIVE )     ++counts[ACTIVE];
+        if( flags & FLAG_IDLE )       ++counts[IDLE];
+        if( flags & FLAG_COMPLETE )   ++counts[COMPLETE];
+        if( flags & FLAG_INCOMPLETE ) ++counts[INCOMPLETE];
     }
 }
 
 wxString
 TorrentFilter :: GetName( int show, int count )
 {
-    wxString xstr;
+    static const wxString names[N_FILTERS] = {
+        _("&All"),
+        _("&Complete"),
+        _("&Incomplete"),
+        _("&Seeding"),
+        _("&Leeching"),
+        _("Acti&ve"),
+        _("I&dle")
+    };
 
-    switch( show )
-    {
-        case SEEDING:  xstr = _("&Seeds");  break;
-        case LEECHING: xstr = _("&Leeches"); break;
-        case STOPPED:  xstr = _("Sto&pped");  break;
-        case ACTIVE:   xstr = _("&Active");   break;
-        case IDLE:     xstr = _("&Idle");     break;
-        case DONE:     xstr = _("&Done");     break;
-        case NOT_DONE: xstr = _("&Not Done"); break;
-        default: assert(0);
-    }
+    assert( 0<=show && show<N_FILTERS );
 
-    xstr += wxString::Format(_T(" (%d)"), count );
-
+    wxString xstr = names[show];
+    if( count )
+        xstr += wxString::Format(_T(" (%d)"), count );
     return xstr;
 }
 
-
 void
-TorrentFilter :: RemoveFailures( int flags, torrents_v& torrents )
+TorrentFilter :: RemoveFailures( int            show,
+                                 torrents_v  &  torrents )
 {
     torrents_v tmp;
 
-    for( torrents_v::iterator it(torrents.begin()), end(torrents.end()); it!=end; ++it )
-        if( flags & GetFlags ( *it ) )
+    foreach_const( torrents_v, torrents, it ) {
+        const int flags = GetFlags( *it );
+        if(   ( ( show == ALL )        && ( flags & FLAG_ALL ) )
+           || ( ( show == LEECHING )   && ( flags & FLAG_LEECHING ) )
+           || ( ( show == SEEDING )    && ( flags & FLAG_SEEDING ) )
+           || ( ( show == ACTIVE )     && ( flags & FLAG_ACTIVE ) )
+           || ( ( show == IDLE )       && ( flags & FLAG_IDLE ) )
+           || ( ( show == COMPLETE )   && ( flags & FLAG_COMPLETE ) )
+           || ( ( show == INCOMPLETE ) && ( flags & FLAG_INCOMPLETE ) ) )
             tmp.push_back( *it );
+    }
 
     torrents.swap( tmp );
 }
