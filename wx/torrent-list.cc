@@ -18,7 +18,6 @@
  * $Id$
  */
 
-#include <iostream>
 #include <wx/intl.h>
 #include <torrent-list.h>
 
@@ -534,25 +533,49 @@ TorrentListCtrl :: Sort( int column )
     Resort ();
 }
 
+bool
+TorrentListCtrl :: IsSorted( ) const
+{
+    bool is_sorted = true;
+    long prevItem=-1, curItem=-1;
+
+    uglyHack = const_cast<TorrentListCtrl*>(this);
+    while( is_sorted )
+    {
+        prevItem = curItem;
+        curItem = GetNextItem( curItem, wxLIST_NEXT_ALL, wxLIST_STATE_DONTCARE );
+        if ( curItem == -1 )
+            break;
+        if( prevItem>=0 && curItem>=0 )
+            if( Compare( prevItem, curItem, prevSortCol ) > 0 )
+                is_sorted = false;
+    }
+    uglyHack = 0;
+
+    return is_sorted;
+}
+
 void
 TorrentListCtrl :: Resort( )
 {
-    uglyHack = this;
-
     myConfig->Write( _T("torrent-sort-column"), columnKeys[abs(prevSortCol)] );
     myConfig->Write( _T("torrent-sort-is-descending"), prevSortCol < 0 );
 
-    SortItems( Compare, prevSortCol );
+    if( !IsSorted ( ) )
+    {
+        uglyHack = this;
+        SortItems( Compare, prevSortCol );
 
-    const int n = GetItemCount ();
-    str2int_t tmp;
-    for( int i=0; i<n; ++i ) {
-        int idx = GetItemData( i );
-        const tr_info_t* info = tr_torrentInfo( myTorrents[idx] );
-        tmp[info->hashString] = i;
+        const int n = GetItemCount ();
+        str2int_t tmp;
+        for( int i=0; i<n; ++i ) {
+            int idx = GetItemData( i );
+            const tr_info_t* info = tr_torrentInfo( myTorrents[idx] );
+            tmp[info->hashString] = i;
+        }
+        myHashToItem.swap( tmp );
+        uglyHack = NULL;
     }
-    myHashToItem.swap( tmp );
-    uglyHack = NULL;
 }
 
 /***

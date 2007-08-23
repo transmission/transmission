@@ -120,7 +120,7 @@ class TorrentListCtrl: public wxListCtrl
         void OnSort( wxListEvent& );
         void OnItemSelected( wxListEvent& );
         void OnItemDeselected( wxListEvent& );
-
+        bool IsSorted( ) const;
 
     private:
         tr_handle_t * myHandle;
