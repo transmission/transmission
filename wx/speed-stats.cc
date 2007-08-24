@@ -28,7 +28,7 @@
 #include "foreach.h"
 #include "speed-stats.h"
 
-#define SNAPSHOT_PIXEL_WIDTH 8
+#define SNAPSHOT_PIXEL_WIDTH 2
 
 BEGIN_EVENT_TABLE( SpeedStats, wxPanel )
 EVT_SIZE( SpeedStats::OnSize )
@@ -158,25 +158,29 @@ SpeedStats :: OnPaint( wxPaintEvent& WXUNUSED(event) )
         // torrent upload
         for( int i=0; i<n; ++i )
             points[i].y = draw_height - 10 - int(myStats[i].torrentUp * y_scale);
-        memDC.SetPen( wxPen ( myColors[TORRENT_UP] ) );
+        wxPen pen( myColors[TORRENT_UP] );
+        memDC.SetPen( pen );
         memDC.DrawLines( n, points, 0, 0 );
 
         // torrent download
         for( int i=0; i<n; ++i )
             points[i].y = draw_height - int(myStats[i].torrentDown * y_scale);
-        memDC.SetPen( wxPen ( myColors[TORRENT_DOWN] ) );
+        pen.SetColour( myColors[TORRENT_DOWN] );
+        memDC.SetPen( pen );
         memDC.DrawLines( n, points, 0, 0 );
 
         // all upload
         for( int i=0; i<n; ++i )
-            points[i].y = draw_height - int(myStats[i].torrentUp * y_scale);
-        memDC.SetPen( wxPen ( myColors[ALL_UP] ) );
+            points[i].y = draw_height - int(myStats[i].allUp * y_scale);
+        pen.SetColour( myColors[ALL_UP] );
+        memDC.SetPen( pen );
         memDC.DrawLines( n, points, 0, 0 );
 
         // all download
         for( int i=0; i<n; ++i )
-            points[i].y = draw_height - int(myStats[i].torrentDown * y_scale);
-        memDC.SetPen( wxPen ( myColors[ALL_DOWN] ) );
+            points[i].y = draw_height - int(myStats[i].allDown * y_scale);
+        pen.SetColour( myColors[ALL_DOWN] );
+        memDC.SetPen( pen );
         memDC.DrawLines( n, points, 0, 0 );
 
         delete [] points;
@@ -213,7 +217,7 @@ SpeedStats :: Pulse( tr_handle_t * handle )
     tr_torrentRates( handle, &allDown, &allUp );
     Speed s;
     s.time = time( NULL );
-    s.allUp = s.time % 30;//allUp;
+    s.allUp = allUp;
     s.allDown = allDown;
     if( myTorrent ) {
         const tr_stat_t * stat = tr_torrentStat( myTorrent );

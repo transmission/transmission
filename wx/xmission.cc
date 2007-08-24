@@ -667,7 +667,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     ***  Refresh
     **/
 
-    myPulseTimer.Start( 1500 );
+    myPulseTimer.Start( 500 );
 
     /**
     ***  Load the torrents
