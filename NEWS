@@ -1,5 +1,8 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.82 (2007/xx/yy)
+ - Fix 0.80 bug that could limit transfer speeds
+
 0.81 (2007/08/22)
  - Fix 0.80 assertion crashes
  - Fix a bug that miscounted how many peers Transmission wants connected
