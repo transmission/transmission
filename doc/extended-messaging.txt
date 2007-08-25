@@ -31,6 +31,9 @@ dictionary with the following keys:
         (ie: 6 bytes for IPv4 address and port in network byte order)
         added since the last peer exchange message
     added.f
-        string, one byte of flags for each peer in the above added string
+        string, one byte of flags for each peer in the above added string.
+        according to libtorrent's ut_pex.c:
+        0x01 - peer supports encryption
+        0x02 - peer is a seed
     dropped
         same format as added, contains peers dropped since last peer exchange
