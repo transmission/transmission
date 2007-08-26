@@ -617,8 +617,11 @@
     SEL action = [menuItem action];
     
     if (action == @selector(revealFile:))
-        return [fFileOutline numberOfSelectedRows] > 0 &&
-            [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT];
+        return [fFileOutline numberOfSelectedRows] > 0
+                && [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
+                && [[NSFileManager defaultManager] fileExistsAtPath:
+                    [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent:
+                        [[fFiles objectAtIndex: [fFileOutline selectedRow]] objectForKey: @"Path"]]];
     
     if (action == @selector(setCheck:))
     {
