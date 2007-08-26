@@ -617,11 +617,19 @@
     SEL action = [menuItem action];
     
     if (action == @selector(revealFile:))
-        return [fFileOutline numberOfSelectedRows] > 0
-                && [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
-                && [[NSFileManager defaultManager] fileExistsAtPath:
-                    [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent:
-                        [[fFiles objectAtIndex: [fFileOutline selectedRow]] objectForKey: @"Path"]]];
+    {
+        if (![[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT])
+            return NO;
+        
+        NSString * downloadFolder = [[fTorrents objectAtIndex: 0] downloadFolder];
+        NSIndexSet * indexSet = [fFileOutline selectedRowIndexes];
+        int i;
+        for (i = [indexSet firstIndex]; i != NSNotFound; i = [indexSet indexGreaterThanIndex: i])
+            if ([[NSFileManager defaultManager] fileExistsAtPath:
+                    [downloadFolder stringByAppendingPathComponent: [[fFiles objectAtIndex: i] objectForKey: @"Path"]]])
+                return YES;
+        return NO;
+    }
     
     if (action == @selector(setCheck:))
     {
