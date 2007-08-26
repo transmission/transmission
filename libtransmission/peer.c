@@ -105,8 +105,35 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 #define PEX_INTERVAL            60 /* don't send pex messages more frequently
                                       than PEX_INTERVAL +
                                       rand( PEX_INTERVAL / 10 ) seconds */
-#define PEER_SUPPORTS_EXTENDED_MESSAGES( bits ) ( (bits)[5] & 0x10 )
-#define PEER_SUPPORTS_AZUREUS_PROTOCOL( bits )  ( (bits)[0] & 0x80 )
+
+/* uncomment this to disable support for the extended messaging bit */
+/* #define DISABLE_EXTMSGS */
+/* uncomment this to disable support for the azureus protocol bit */
+/* #define DISABLE_AZPROTO */
+
+#define HANDSHAKE_NAME          "\023BitTorrent protocol"
+#define HANDSHAKE_NAME_LEN      20
+#define HANDSHAKE_FLAGS_OFF     HANDSHAKE_NAME_LEN
+#define HANDSHAKE_FLAGS_LEN     8
+#define HANDSHAKE_HASH_OFF      ( HANDSHAKE_FLAGS_OFF + HANDSHAKE_FLAGS_LEN )
+#define HANDSHAKE_PEERID_OFF    ( HANDSHAKE_HASH_OFF + SHA_DIGEST_LENGTH )
+#define HANDSHAKE_SIZE          ( HANDSHAKE_PEERID_OFF + TR_ID_LEN )
+
+#ifdef DISABLE_EXTMSGS
+#define HANDSHAKE_HAS_EXTMSGS( bits ) ( 0 )
+#define HANDSHAKE_SET_EXTMSGS( bits ) ( (void)0 )
+#else
+#define HANDSHAKE_HAS_EXTMSGS( bits ) ( (bits)[5] & 0x10 )
+#define HANDSHAKE_SET_EXTMSGS( bits ) ( (bits)[5] |= 0x10 )
+#endif
+
+#ifdef DISABLE_AZPROTO
+#define HANDSHAKE_HAS_AZPROTO( bits ) ( 0 )
+#define HANDSHAKE_SET_AZPROTO( bits ) ( (void)0 )
+#else
+#define HANDSHAKE_HAS_AZPROTO( bits ) ( (bits)[0] & 0x80 )
+#define HANDSHAKE_SET_AZPROTO( bits ) ( (bits)[0] |= 0x80 )
+#endif
 
 #define PEER_MSG_CHOKE          0
 #define PEER_MSG_UNCHOKE        1
@@ -522,20 +549,21 @@ int tr_peerPulse( tr_peer_t * peer )
     /* Try to send handshake */
     if( PEER_STATUS_CONNECTING == peer->status )
     {
-        uint8_t buf[68];
-        tr_info_t * inf = &tor->info;
+        uint8_t buf[HANDSHAKE_SIZE];
+        const tr_info_t * inf;
 
-        buf[0] = 19;
-        memcpy( &buf[1], "BitTorrent protocol", 19 );
-        memset( &buf[20], 0, 8 );
-        buf[20] = 0x80;         /* azureus protocol */
-        buf[25] = 0x10;         /* extended messages */
-        memcpy( &buf[28], inf->hash, 20 );
-        memcpy( &buf[48], tor->peer_id, 20 );
+        inf = tr_torrentInfo( tor );
+        assert( 68 == HANDSHAKE_SIZE );
+        memcpy( buf, HANDSHAKE_NAME, HANDSHAKE_NAME_LEN );
+        memset( buf + HANDSHAKE_FLAGS_OFF, 0, HANDSHAKE_FLAGS_LEN );
+        HANDSHAKE_SET_EXTMSGS( buf + HANDSHAKE_FLAGS_OFF );
+        HANDSHAKE_SET_AZPROTO( buf + HANDSHAKE_FLAGS_OFF );
+        memcpy( buf + HANDSHAKE_HASH_OFF, inf->hash, SHA_DIGEST_LENGTH );
+        memcpy( buf + HANDSHAKE_PEERID_OFF, tor->peer_id, TR_ID_LEN );
 
         switch( tr_netSend( peer->socket, buf, 68 ) )
         {
-            case 68:
+            case HANDSHAKE_SIZE:
                 peer_dbg( "SEND handshake" );
                 peer->status = PEER_STATUS_HANDSHAKE;
                 break;
