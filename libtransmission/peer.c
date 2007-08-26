@@ -112,10 +112,6 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 /* uncomment this to disable support for the azureus protocol bit */
 /* #define DISABLE_AZPROTO */
 
-/* uncomment this to use the new reserved bits proposed here:
-   http://www.azureuswiki.com/index.php/Extension_negotiation_protocol */
-/* #define NEW_AZ_BITS */
-
 #define HANDSHAKE_NAME          "\023BitTorrent protocol"
 #define HANDSHAKE_NAME_LEN      20
 #define HANDSHAKE_FLAGS_OFF     HANDSHAKE_NAME_LEN
@@ -144,12 +140,12 @@ static const int SWIFT_REFRESH_INTERVAL_SEC = 5;
 
 /* these macros are to be used if both extended messaging and the
    azureus protocol is supported, they indicate which protocol is preferred */
-#ifdef NEW_AZ_BITS
-#define HANDSHAKE_GET_EXTPREF( bits )      ( (bits)[5] & 0x03 )
-#define HANDSHAKE_SET_EXTPREF( bits, val ) ( (bits)[5] |= 0x03 & (val) )
-#else
+#ifdef DISABLE_EXTENSION_NEGOTIATION
 #define HANDSHAKE_GET_EXTPREF( bits )      ( 0 )
 #define HANDSHAKE_SET_EXTPREF( bits, val ) ( (void)0 )
+#else
+#define HANDSHAKE_GET_EXTPREF( bits )      ( (bits)[5] & 0x03 )
+#define HANDSHAKE_SET_EXTPREF( bits, val ) ( (bits)[5] |= 0x03 & (val) )
 #endif
 #define HANDSHAKE_EXTPREF_FORCE_EXT        ( 0x0 )
 #define HANDSHAKE_EXTPREF_WANT_EXT         ( 0x1 )
