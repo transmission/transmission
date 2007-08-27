@@ -50,8 +50,6 @@
     
     NSMutableArray * fKeyStrokes;
     
-    NSDictionary * fSmallStatusAttributes;
-    
     IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu;
     Torrent * fMenuTorrent;
 }

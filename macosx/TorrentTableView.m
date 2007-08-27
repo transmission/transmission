@@ -80,9 +80,6 @@
         
         fKeyStrokes = [[NSMutableArray alloc] init];
         
-        fSmallStatusAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                        [NSFont messageFontOfSize: 9.0], NSFontAttributeName, nil];
-        
         fDefaults = [NSUserDefaults standardUserDefaults];
         
         [self setDelegate: self];
@@ -100,8 +97,6 @@
 - (void) dealloc
 {
     [fKeyStrokes release];
-    [fSmallStatusAttributes release];
-    
     [fMenuTorrent release];
     
     [super dealloc];
