@@ -2,20 +2,22 @@
 #
 # $Id$
 
-# constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
-# convention: BETA: "Z" for a beta, "0" for a stable
-MAJOR="0"
-MINOR="8"
-MAINT="1"
-BETA="Z"
-STRING=0.81+
+# these should be the only two lines you need to change
+PEERID_PREFIX="-TR080Z-"
+USERAGENT_PREFIX="0.80+"
 
-PEERID_PREFIX="-TR081Z-"
-USERAGENT_PREFIX="0.81+"
+
 SVN_REVISION=`find ./ -name "*\.[ch]" -o -name "*\.cpp" -o -name "*\.po" | \
               xargs grep "\$Id:" | \
               grep -v third-party | \
               cut -d"$Id:" -f3 | cut -d" " -f3 | sort -n | tail -n 1`
+
+if test "x${PEERID_PREFIX//Z/}" = "x$PEERID_PREFIX";
+then
+    STABLE_RELEASE=yes
+else
+    STABLE_RELEASE=no
+fi
   
 # Generate files to be included: only overwrite them if changed so make
 # won't rebuild everything unless necessary
@@ -30,11 +32,9 @@ replace_if_differs ()
 
 # Generate version.mk
 cat > mk/version.mk.new << EOF
-VERSION_MAJOR       = "$MAJOR"
-VERSION_MINOR       = "$MINOR"
-VERSION_MAINTENANCE = "$MAINT"
 VERSION_REVISION    = "$SVN_REVISION"
-VERSION_STRING      = "$STRING ($SVN_REVISION)"
+VERSION_STRING      = "$USERAGENT_PREFIX ($SVN_REVISION)"
+STABLE_RELEASE      = "$STABLE_RELEASE"
 EOF
 replace_if_differs mk/version.mk.new mk/version.mk
 

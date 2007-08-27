@@ -14,7 +14,7 @@ clean:
 # Check if this is a release or an SVN build
 #
 include mk/version.mk
-ifeq ($(VERSION_STRING),$(VERSION_MAJOR).$(VERSION_MINOR))
+ifeq ($(STABLE_RELEASE),"yes")
 VERSION_PACKAGE = $(VERSION_STRING)
 else
 VERSION_PACKAGE = $(VERSION_STRING)-r$(VERSION_REVISION)
