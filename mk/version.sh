@@ -10,8 +10,8 @@ MAINT="1"
 BETA="Z"
 STRING=0.81+
 
-PEERID_PREFIX="-TR080Z-"
-USERAGENT_PREFIX="0.80+"
+PEERID_PREFIX="-TR081Z-"
+USERAGENT_PREFIX="0.81+"
 SVN_REVISION=`find ./ -name "*\.[ch]" -o -name "*\.cpp" -o -name "*\.po" | \
               xargs grep "\$Id:" | \
               grep -v third-party | \
