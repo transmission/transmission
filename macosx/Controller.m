@@ -2990,7 +2990,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             active = NO;
             enumerator = [fTorrents objectEnumerator];
             while ((torrent = [enumerator nextObject]))
-                if ([torrent isActive])
+                if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
                 {
                     active = YES;
                     break;
