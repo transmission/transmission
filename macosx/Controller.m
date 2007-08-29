@@ -251,9 +251,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
     
     [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
-    [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask + NSAlternateKeyMask];
+    [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
     [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
-    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask + NSAlternateKeyMask];
+    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
     
     //set up filter bar
     NSView * contentView = [fWindow contentView];
@@ -2475,9 +2475,9 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     unsigned int statsMask = [fStatusBar autoresizingMask];
     unsigned int filterMask = [fFilterBar autoresizingMask];
     unsigned int scrollMask = [fScrollView autoresizingMask];
-    [fStatusBar setAutoresizingMask: 0];
-    [fFilterBar setAutoresizingMask: 0];
-    [fScrollView setAutoresizingMask: 0];
+    [fStatusBar setAutoresizingMask: NSViewNotSizable];
+    [fFilterBar setAutoresizingMask: NSViewNotSizable];
+    [fScrollView setAutoresizingMask: NSViewNotSizable];
     
     frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate]; 
@@ -2539,8 +2539,8 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //set views to not autoresize
     unsigned int filterMask = [fFilterBar autoresizingMask];
     unsigned int scrollMask = [fScrollView autoresizingMask];
-    [fFilterBar setAutoresizingMask: 0];
-    [fScrollView setAutoresizingMask: 0];
+    [fFilterBar setAutoresizingMask: NSViewNotSizable];
+    [fScrollView setAutoresizingMask: NSViewNotSizable];
     
     frame = [self windowFrameByAddingHeight: heightChange checkLimits: NO];
     [fWindow setFrame: frame display: YES animate: animate];
