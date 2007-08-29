@@ -35,8 +35,7 @@
     if ((self = [super initWithCoder: decoder]))
     {
         fTorrent = nil;
-        int numPieces = MAX_ACROSS * MAX_ACROSS;
-        fPieces = malloc(numPieces);
+        fPieces = malloc(MAX_ACROSS * MAX_ACROSS);
     }
     
     return self;
@@ -44,11 +43,10 @@
 
 - (void) awakeFromNib
 {
-        NSSize size = [self bounds].size;
         NSBezierPath * bp = [NSBezierPath bezierPathWithRect: [self bounds]];
         
         //back image
-        fBack = [[NSImage alloc] initWithSize: size];
+        fBack = [[NSImage alloc] initWithSize: [self bounds].size];
         
         [fBack lockFocus];
         [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.4] set];

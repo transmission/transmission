@@ -1859,7 +1859,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     if (totalCount != 1)
         [totalTorrentsString appendFormat: NSLocalizedString(@"%d Transfers", "Status bar transfer count"), totalCount];
     else
-        [totalTorrentsString appendFormat: NSLocalizedString(@"1 Transfer", "Status bar transfer count")];
+        [totalTorrentsString appendString: NSLocalizedString(@"1 Transfer", "Status bar transfer count")];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
     [totalTorrentsString release];

@@ -34,6 +34,11 @@
     [self setNeedsDisplay: YES];
 }
 
+- (BOOL) isOpaque
+{
+    return YES;
+}
+
 - (void) dealloc
 {
     [fBackgroundColor release];
