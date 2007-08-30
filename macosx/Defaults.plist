@@ -84,6 +84,8 @@
 	<string>Submarine</string>
 	<key>ShowInspector</key>
 	<false/>
+    <key>SleepPrevent</key>
+	<true/>
 	<key>SmallStatusRegular</key>
 	<true/>
 	<key>SmallView</key>

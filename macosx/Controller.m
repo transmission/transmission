@@ -1842,12 +1842,13 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         filtering = YES;
         
+        #warning check multiple trackers
         NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
         NSString * fullString;
         Torrent * torrent;
         
         int i;
-        for (i = [tempTorrents count] - 1; i >= 0; i--)
+        for (i = [tempTorrents count]-1; i >= 0; i--)
         {
             torrent = [tempTorrents objectAtIndex: i];
             if ([filterType isEqualToString: FILTER_TYPE_TRACKER])
@@ -3034,7 +3035,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
-    BOOL active;
+    BOOL active, canSleep;
 
     switch (messageType)
     {
@@ -3058,20 +3059,24 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             break;
 
         case kIOMessageCanSystemSleep:
-            //pevent idle sleep unless all paused
-            active = NO;
-            enumerator = [fTorrents objectEnumerator];
-            while ((torrent = [enumerator nextObject]))
-                if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
-                {
-                    active = YES;
-                    break;
-                }
+            
+            canSleep = YES;
+            if ([fDefaults boolForKey: @"SleepPrevent"])
+            {
+                //prevent idle sleep unless all inactive
+                enumerator = [fTorrents objectEnumerator];
+                while ((torrent = [enumerator nextObject]))
+                    if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
+                    {
+                        canSleep = NO;
+                        break;
+                    }
+            }
 
-            if (active)
-                IOCancelPowerChange(fRootPort, (long) messageArgument);
-            else
+            if (canSleep)
                 IOAllowPowerChange(fRootPort, (long) messageArgument);
+            else
+                IOCancelPowerChange(fRootPort, (long) messageArgument);
             break;
 
         case kIOMessageSystemHasPoweredOn:
