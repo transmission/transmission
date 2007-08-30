@@ -28,6 +28,7 @@
                 resumeWaitingTorrents = id; 
                 revealFile = id; 
                 setFilter = id; 
+                setFilterSearchType = id; 
                 setInfoTab = id; 
                 setLimitGlobalEnabled = id; 
                 setQuickLimitGlobal = id; 

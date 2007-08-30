@@ -62,6 +62,12 @@
 #define FILTER_SEED     @"Seed"
 #define FILTER_PAUSE    @"Pause"
 
+#define FILTER_TYPE_NAME    @"Name"
+#define FILTER_TYPE_TRACKER @"Tracker"
+
+#define FILTER_TYPE_TAG_NAME    401
+#define FILTER_TYPE_TAG_TRACKER 402
+
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
@@ -362,7 +368,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         //safety
         if (![sortType isEqualToString: SORT_DATE])
             [fDefaults setObject: SORT_DATE forKey: @"Sort"];
-        
         currentSortItem = fDateSortItem;
         currentSortActionItem = fDateSortActionItem;
     }
@@ -384,11 +389,25 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         //safety
         if (![filterType isEqualToString: FILTER_NONE])
             [fDefaults setObject: FILTER_NONE forKey: @"Filter"];
-        
         currentFilterButton = fNoFilterButton;
     }
-    
     [currentFilterButton setState: NSOnState];
+    
+    //set filter search type
+    NSString * filterSearchType = [fDefaults stringForKey: @"FilterSearchType"];
+    
+    NSMenu * filterSearchMenu = [[fSearchFilterField cell] searchMenuTemplate];
+    NSString * filterSearchTypeTitle;
+    if ([filterSearchType isEqualToString: FILTER_TYPE_TRACKER])
+        filterSearchTypeTitle = [[filterSearchMenu itemWithTag: FILTER_TYPE_TAG_TRACKER] title];
+    else
+    {
+        //safety
+        if (![filterType isEqualToString: FILTER_TYPE_NAME])
+            [fDefaults setObject: FILTER_TYPE_NAME forKey: @"FilterSearchType"];
+        filterSearchTypeTitle = [[filterSearchMenu itemWithTag: FILTER_TYPE_TAG_NAME] title];
+    }
+    [[fSearchFilterField cell] setPlaceholderString: filterSearchTypeTitle];
     
     //observe notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
@@ -1823,11 +1842,22 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         filtering = YES;
         
+        NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
+        NSString * fullString;
+        Torrent * torrent;
+        
         int i;
         for (i = [tempTorrents count] - 1; i >= 0; i--)
-            if ([[[tempTorrents objectAtIndex: i] name] rangeOfString: searchString
-                                        options: NSCaseInsensitiveSearch].location == NSNotFound)
+        {
+            torrent = [tempTorrents objectAtIndex: i];
+            if ([filterType isEqualToString: FILTER_TYPE_TRACKER])
+                fullString = [torrent trackerAddress];
+            else
+                fullString = [torrent name];
+            
+            if ([fullString rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
                 [tempTorrents removeObjectAtIndex: i];
+        }
     }
     
     [fDisplayedTorrents setArray: tempTorrents];
@@ -1900,6 +1930,32 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         [fDefaults setObject: filterType forKey: @"Filter"];
     }
 
+    [self applyFilter: nil];
+}
+
+- (void) setFilterSearchType: (id) sender
+{
+    NSString * oldFilterType = [fDefaults stringForKey: @"FilterSearchType"];
+    
+    int prevTag, currentTag = [sender tag];
+    if ([oldFilterType isEqualToString: FILTER_TYPE_TRACKER])
+        prevTag = FILTER_TYPE_TAG_TRACKER;
+    else
+        prevTag = FILTER_TYPE_TAG_NAME;
+    
+    if (currentTag != prevTag)
+    {
+        NSString * filterType;
+        if (currentTag == FILTER_TYPE_TAG_TRACKER)
+            filterType = FILTER_TYPE_TRACKER;
+        else
+            filterType = FILTER_TYPE_NAME;
+        
+        [fDefaults setObject: filterType forKey: @"FilterSearchType"];
+        
+        [[fSearchFilterField cell] setPlaceholderString: [sender title]];
+    }
+    
     [self applyFilter: nil];
 }
 
@@ -2954,7 +3010,23 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //enable reverse sort item
     if (action == @selector(setSortReverse:))
         return ![[fDefaults stringForKey: @"Sort"] isEqualToString: @"Order"];
-
+    
+    //check proper filter search item
+    if (action == @selector(setFilterSearchType:))
+    {
+        NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
+        
+        int tag = [menuItem tag];
+        BOOL state;
+        if (tag == FILTER_TYPE_TAG_TRACKER)
+            state = [filterType isEqualToString: FILTER_TYPE_TRACKER];
+        else
+            state = [filterType isEqualToString: FILTER_TYPE_NAME];
+        
+        [menuItem setState: state ? NSOnState : NSOffState];
+        return YES;
+    }
+    
     return YES;
 }
 

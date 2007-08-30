@@ -46,6 +46,8 @@
 	<string>None</string>
 	<key>FilterBar</key>
 	<false/>
+	<key>FilterSearchType</key>
+	<string>Name</string>
 	<key>IncompleteDownloadFolder</key>
 	<string>~/Desktop</string>
 	<key>InfoVisible</key>

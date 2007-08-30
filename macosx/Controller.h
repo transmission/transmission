@@ -186,6 +186,7 @@
 - (void) setSortReverse: (id) sender;
 - (void) applyFilter: (id) sender;
 - (void) setFilter: (id) sender;
+- (void) setFilterSearchType: (id) sender;
 - (void) switchFilter: (id) sender;
 
 - (void) applySpeedLimit: (id) sender;
