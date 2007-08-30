@@ -3035,7 +3035,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
-    BOOL active, canSleep;
+    BOOL active, allowSleep;
 
     switch (messageType)
     {
@@ -3060,20 +3060,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
 
         case kIOMessageCanSystemSleep:
             
-            canSleep = YES;
+            allowSleep = YES;
             if ([fDefaults boolForKey: @"SleepPrevent"])
             {
-                //prevent idle sleep unless all inactive
+                //prevent idle sleep unless no torrents are active
                 enumerator = [fTorrents objectEnumerator];
                 while ((torrent = [enumerator nextObject]))
                     if ([torrent isActive] && ![torrent isStalled] && ![torrent isError])
                     {
-                        canSleep = NO;
+                        allowSleep = NO;
                         break;
                     }
             }
 
-            if (canSleep)
+            if (allowSleep)
                 IOAllowPowerChange(fRootPort, (long) messageArgument);
             else
                 IOCancelPowerChange(fRootPort, (long) messageArgument);
