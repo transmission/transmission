@@ -1678,13 +1678,29 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		4D18389C09DEC01E0047D688 /* Debug */ = {
+		0053D3D30C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(NATIVE_ARCH)";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = s;
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				PREBINDING = NO;
+				PRODUCT_NAME = event;
+				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		0053D3D40C86774200545606 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1702,30 +1718,12 @@
 				);
 				PRODUCT_NAME = transmission;
 			};
-			name = Debug;
+			name = Development;
 		};
-		4DDBB71E09E16BF100284745 /* Debug */ = {
+		0053D3D50C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
-				OTHER_CFLAGS = "";
-				PRODUCT_NAME = transmissioncli;
-			};
-			name = Debug;
-		};
-		4DF0C599089918A300DD8943 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(NATIVE_ARCH)";
 				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/macosx";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1744,9 +1742,104 @@
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
-			name = Debug;
+			name = Development;
 		};
-		4DF0C59D089918A300DD8943 /* Debug */ = {
+		0053D3D60C86774200545606 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
+				OTHER_CFLAGS = "";
+				PRODUCT_NAME = transmissioncli;
+			};
+			name = Development;
+		};
+		0053D3D70C86774200545606 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/libevent\"";
+				OTHER_CFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = "transmission-daemon";
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		0053D3D80C86774200545606 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/libevent\"";
+				OTHER_CFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = "transmission-remote";
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		0053D3D90C86774200545606 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/libevent\"";
+				OTHER_CFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = "transmission-proxy";
+				ZERO_LINK = NO;
+			};
+			name = Development;
+		};
+		0053D3DA0C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -1774,9 +1867,107 @@
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
-			name = Debug;
+			name = Development;
 		};
-		BE75C34B0C729EB600DBEFE0 /* Debug */ = {
+		4D18389C09DEC01E0047D688 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
+				OTHER_CFLAGS = (
+					"-DSYS_DARWIN",
+					"-DHAVE_OPENSSL",
+					"-D__TRANSMISSION__",
+					"-DHAVE_STRLCPY",
+					"-DHAVE_STRLCAT",
+					"-DHAVE_ASPRINTF",
+					"-DHAVE_LIBGEN",
+				);
+				PRODUCT_NAME = transmission;
+			};
+			name = Release;
+		};
+		4DDBB71E09E16BF100284745 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Debug";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
+				OTHER_CFLAGS = "";
+				PRODUCT_NAME = transmissioncli;
+			};
+			name = Release;
+		};
+		4DF0C599089918A300DD8943 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/macosx";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libtransmission\"";
+				INFOPLIST_FILE = macosx/Info.plist;
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Debug\"";
+				PRODUCT_NAME = Transmission;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		4DF0C59D089918A300DD8943 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION_i386 = 4.0;
+				GCC_VERSION_ppc = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
+				GCC_WARN_SIGN_COMPARE = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_LABEL = NO;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
+				OTHER_CFLAGS = "$(inherited)";
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		BE75C34B0C729EB600DBEFE0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -1792,9 +1983,9 @@
 				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
 				ZERO_LINK = NO;
 			};
-			name = Debug;
+			name = Release;
 		};
-		BEFC1C0A0C07753800B0BB3C /* Debug */ = {
+		BEFC1C0A0C07753800B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -1821,9 +2012,9 @@
 				PRODUCT_NAME = "transmission-daemon";
 				ZERO_LINK = NO;
 			};
-			name = Debug;
+			name = Release;
 		};
-		BEFC1CF80C07822400B0BB3C /* Debug */ = {
+		BEFC1CF80C07822400B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -1852,9 +2043,9 @@
 				PRODUCT_NAME = "transmission-remote";
 				ZERO_LINK = NO;
 			};
-			name = Debug;
+			name = Release;
 		};
-		BEFC1D420C0783EE00B0BB3C /* Debug */ = {
+		BEFC1D420C0783EE00B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -1884,7 +2075,7 @@
 				PRODUCT_NAME = "transmission-proxy";
 				ZERO_LINK = NO;
 			};
-			name = Debug;
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -1892,66 +2083,74 @@
 		4D18389B09DEC01E0047D688 /* Build configuration list for PBXNativeTarget "libtransmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4D18389C09DEC01E0047D688 /* Debug */,
+				4D18389C09DEC01E0047D688 /* Release */,
+				0053D3D40C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		4DDBB71D09E16BF100284745 /* Build configuration list for PBXNativeTarget "transmissioncli" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DDBB71E09E16BF100284745 /* Debug */,
+				4DDBB71E09E16BF100284745 /* Release */,
+				0053D3D60C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		4DF0C596089918A300DD8943 /* Build configuration list for PBXNativeTarget "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DF0C599089918A300DD8943 /* Debug */,
+				4DF0C599089918A300DD8943 /* Release */,
+				0053D3D50C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4DF0C59D089918A300DD8943 /* Debug */,
+				4DF0C59D089918A300DD8943 /* Release */,
+				0053D3DA0C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		BE75C34A0C729EB600DBEFE0 /* Build configuration list for PBXNativeTarget "event" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BE75C34B0C729EB600DBEFE0 /* Debug */,
+				BE75C34B0C729EB600DBEFE0 /* Release */,
+				0053D3D30C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		BEFC1C090C07753800B0BB3C /* Build configuration list for PBXNativeTarget "transmission-daemon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFC1C0A0C07753800B0BB3C /* Debug */,
+				BEFC1C0A0C07753800B0BB3C /* Release */,
+				0053D3D70C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		BEFC1CF70C07822400B0BB3C /* Build configuration list for PBXNativeTarget "transmission-remote" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFC1CF80C07822400B0BB3C /* Debug */,
+				BEFC1CF80C07822400B0BB3C /* Release */,
+				0053D3D80C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 		BEFC1D410C0783EE00B0BB3C /* Build configuration list for PBXNativeTarget "transmission-proxy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFC1D420C0783EE00B0BB3C /* Debug */,
+				BEFC1D420C0783EE00B0BB3C /* Release */,
+				0053D3D90C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Development;
 		};
 /* End XCConfigurationList section */
 	};
