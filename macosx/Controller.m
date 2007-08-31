@@ -1147,17 +1147,41 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             int selected = [fTableView numberOfSelectedRows];
             if (selected == 1)
             {
-                title = [NSString stringWithFormat: NSLocalizedString(@"Confirm Removal of \"%@\"",
-                            "Removal confirm panel -> title"),
-                            [[fDisplayedTorrents objectAtIndex: [fTableView selectedRow]] name]];
+                NSString * torrentName = [[fDisplayedTorrents objectAtIndex: [fTableView selectedRow]] name];
+                
+                if (!deleteData && !deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list.",
+                                "Removal confirm panel -> title"), torrentName];
+                else if (deleteData && !deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
+                                " and trash data file.", "Removal confirm panel -> title"), torrentName];
+                else if (!deleteData && deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
+                                " and trash torrent file.", "Removal confirm panel -> title"), torrentName];
+                else
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of \"%@\" from the transfer list"
+                            " and trash both data and torrent files.", "Removal confirm panel -> title"), torrentName];
+                
                 message = NSLocalizedString(@"This transfer is active."
                             " Once removed, continuing the transfer will require the torrent file."
                             " Do you really want to remove it?", "Removal confirm panel -> message");
             }
             else
             {
-                title = [NSString stringWithFormat: NSLocalizedString(@"Confirm Removal of %d Transfers",
-                            "Removal confirm panel -> title"), selected];
+                if (!deleteData && !deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
+                                " from the transfer list.", "Removal confirm panel -> title"), selected];
+                else if (deleteData && !deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
+                                " from the transfer list and trash data file.", "Removal confirm panel -> title"), selected];
+                else if (!deleteData && deleteTorrent)
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
+                                " from the transfer list and trash torrent file.", "Removal confirm panel -> title"), selected];
+                else
+                    title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
+                                " from the transfer list aand trash both data and torrent files.",
+                                "Removal confirm panel -> title"), selected];
+                
                 if (selected == active)
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d active transfers.",
                                 "Removal confirm panel -> message part 1"), active];
