@@ -303,24 +303,26 @@ int
 tr_ioHash( tr_io_t * io, int pieceIndex )
 {
     int i;
-
+    int ret;
     tr_torrent_t * tor = io->tor;
     const int success = !checkPiece( tor, pieceIndex );
+
     if( success )
     {
         tr_dbg( "Piece %d hash OK", pieceIndex );
         tr_cpPieceAdd( tor->completion, pieceIndex );
+        ret = TR_OK;
     }
     else
     {
         tr_err( "Piece %d hash FAILED", pieceIndex );
         tr_cpPieceRem( tor->completion, pieceIndex );
-        return TR_ERROR;
+        ret = TR_ERROR;
     }
 
     /* Assign blame or credit to peers */
-    for( i = 0; i < tor->peerCount; ++i )
+    for( i=0; i<tor->peerCount; ++i )
         tr_peerBlame( tor->peers[i], pieceIndex, success );
 
-    return 0;
+    return ret;
 }
