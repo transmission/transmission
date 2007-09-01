@@ -315,6 +315,7 @@ tr_ioHash( tr_io_t * io, int pieceIndex )
     {
         tr_err( "Piece %d hash FAILED", pieceIndex );
         tr_cpPieceRem( tor->completion, pieceIndex );
+        return TR_ERROR;
     }
 
     /* Assign blame or credit to peers */
