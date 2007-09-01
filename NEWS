@@ -3,7 +3,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 0.90 (2007/xx/yy)
  - Improved compliance with BitTorrent spec
  - Multiscrape support added
- - Only report downloaded, verified good pieces in tracker `download' field.
+ - Only report downloaded, verified good pieces in tracker `download' field
  - OS X:
    + Per-torrent action menu
    + Inspector can be resized vertically in Peers and Files tabs
