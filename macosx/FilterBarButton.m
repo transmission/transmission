@@ -30,6 +30,7 @@
 @interface FilterBarButton (Private)
 
 - (void) createPaths;
+- (void) createGradients;
 - (void) createFontAttributes;
 
 @end
@@ -45,6 +46,7 @@
         fCount = -1;
         [self setCount: 0];
         [self createPaths];
+        [self createGradients];
         [self createFontAttributes];
         
         NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
@@ -62,10 +64,18 @@
     [fPath release];
     [fEdgePath release];
     [fStepPath release];
+    
     [fNormalAttributes release];
     [fNormalDimAttributes release];
     [fHighlightedAttributes release];
+    
     [fHighlightedDimAttributes release];
+    [fHighlightedBackground release];
+    [fHighlightedOutline release];
+    [fActiveBackground release];
+    [fActiveOutline release];
+    [fHoveringBackground release];
+    [fHoveringOutline release];
     
     [super dealloc];
 }
@@ -73,7 +83,7 @@
 - (void) sizeToFit
 {
     NSSize size = [[self title] sizeWithAttributes: fNormalAttributes];
-    size.width = floorf(size.width + 18.5);
+    size.width = floorf(size.width + 14.5);
     size.height += 1;
     [self setFrameSize: size];
     [self setBoundsSize: size];
@@ -90,64 +100,36 @@
     // draw background
     if ([[self cell] isHighlighted])
     {
-        [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 134.0/255 green: 151.0/255
-                                                    blue: 176.0/255 alpha: 1.0]
-                                    endingColor: [NSColor colorWithCalibratedRed: 104.0/255 green: 125.0/255
-                                                    blue: 157.0/255 alpha: 1.0]]
-                                 fillBezierPath: fPath angle: -90.0];
-        [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25]
-//                                  middleColor: [NSColor colorWithCalibratedWhite: 0.5 alpha: 0.00]
-                                   middleColor1: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25]
-                                   middleColor2: [NSColor colorWithCalibratedWhite: 1.0 alpha: 0.50]
-                                    endingColor: [NSColor colorWithCalibratedWhite: 1.0 alpha: 0.50]]
-                                 fillBezierPath: fStepPath angle: -90.0];
+        [fHighlightedBackground fillBezierPath: fPath angle: -90.0];
+        [fHighlightedOutline fillBezierPath: fStepPath angle: -90.0];
     }
-    else switch (fState)
-    {
-        case 1:     // active
-            [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 151.0/255 green: 166.0/255
-                                                        blue: 188.0/255 alpha: 1.0]
-                                        endingColor: [NSColor colorWithCalibratedRed: 126.0/255 green: 144.0/255
-                                                        blue: 171.0/255 alpha: 1.0]]
-                                     fillBezierPath: fPath angle: -90.0];
-            [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25]
-//                                      middleColor: [NSColor colorWithCalibratedWhite: 0.5 alpha: 0.00]
-                                       middleColor1: [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25]
-                                       middleColor2: [NSColor colorWithCalibratedWhite: 1.0 alpha: 0.50]
-                                        endingColor: [NSColor colorWithCalibratedWhite: 1.0 alpha: 0.50]]
-                                     fillBezierPath: fStepPath angle: -90.0];
-            break;
-        case 2:     // hovering
-            [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 164.0/255 green: 177.0/255
-                                                        blue: 196.0/255 alpha: 1.0]
-                                        endingColor: [NSColor colorWithCalibratedRed: 141.0/255 green: 158.0/255
-                                                        blue: 182.0/255 alpha: 1.0]]
-                                     fillBezierPath: fPath angle: -90.0];
-            [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.075] set];
-            [fEdgePath stroke];
-            break;
-        case 3:     // clicked but cell is not highlighted
-            break;
-    }
+    else
+        switch (fState)
+        {
+            case 1:     // active
+                [fActiveBackground fillBezierPath: fPath angle: -90.0];
+                [fActiveOutline fillBezierPath: fStepPath angle: -90.0];
+                break;
+            case 2:     // hovering
+            case 3:     // clicked but cell is not highlighted
+                [fHoveringBackground fillBezierPath: fPath angle: -90.0];
+                [fHoveringOutline setStroke];
+                [fEdgePath stroke];
+                break;
+        }
     
     // draw title
     NSSize titleSize = [[self title] sizeWithAttributes: fNormalAttributes];
     NSPoint titlePos = NSMakePoint(([self bounds].size.width  - titleSize.width)  * 0.5,
                                    ([self bounds].size.height - titleSize.height) * 0.5 + 1.5);
-    if (fEnabled)
-    {
-        if (fState && !(fState == 3 && ![[self cell] isHighlighted]))
-            [[self title] drawAtPoint: titlePos withAttributes: fHighlightedAttributes];
-        else
-            [[self title] drawAtPoint: titlePos withAttributes: fNormalAttributes];
-    }
+    
+    NSDictionary * attributes;
+    if (fState)
+        attributes = fEnabled ? fHighlightedAttributes : fHighlightedDimAttributes;
     else
-    {
-        if (fState)
-            [[self title] drawAtPoint: titlePos withAttributes: fHighlightedDimAttributes];
-        else
-            [[self title] drawAtPoint: titlePos withAttributes: fNormalDimAttributes];
-    }
+        attributes = fEnabled ? fNormalAttributes : fNormalDimAttributes;
+    
+    [[self title] drawAtPoint: titlePos withAttributes: attributes];
 }
 
 - (void) setCount: (int) count
@@ -254,6 +236,24 @@
                     radius: (buttonSize.height - 1.0) / 2.0] retain];
     [fStepPath appendBezierPath: fPath];
     [fStepPath setWindingRule: NSEvenOddWindingRule];
+}
+
+- (void) createGradients
+{
+    NSColor *quarterAlphaBlack = [NSColor colorWithCalibratedWhite: 0.0 alpha: 0.25];
+    NSColor *thirdAlphaWhite = [NSColor colorWithCalibratedWhite: 1.0 alpha: 0.3333];
+    fHighlightedBackground = [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 134.0/255 green: 151.0/255 blue: 176.0/255 alpha: 1.0]
+                                                         endingColor: [NSColor colorWithCalibratedRed: 104.0/255 green: 125.0/255 blue: 157.0/255 alpha: 1.0]] retain];
+    fHighlightedOutline = [[CTGradient gradientWithBeginningColor: quarterAlphaBlack
+                                                     middleColor1: quarterAlphaBlack
+                                                     middleColor2: thirdAlphaWhite
+                                                      endingColor: thirdAlphaWhite] retain];
+    fActiveBackground = [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 151.0/255 green: 166.0/255 blue: 188.0/255 alpha: 1.0]
+                                                    endingColor: [NSColor colorWithCalibratedRed: 126.0/255 green: 144.0/255 blue: 171.0/255 alpha: 1.0]] retain];
+    fActiveOutline = [fHighlightedOutline retain];
+    fHoveringBackground = [[CTGradient gradientWithBeginningColor: [NSColor colorWithCalibratedRed: 164.0/255 green: 177.0/255 blue: 196.0/255 alpha: 1.0]
+                                                      endingColor: [NSColor colorWithCalibratedRed: 141.0/255 green: 158.0/255 blue: 182.0/255 alpha: 1.0]] retain];
+    fHoveringOutline = [[NSColor colorWithCalibratedWhite: 0.0 alpha: 0.075] retain];
 }
 
 - (void) createFontAttributes

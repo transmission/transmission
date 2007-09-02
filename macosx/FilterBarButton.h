@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class CTGradient;
 @interface FilterBarButton : NSButton
 {
     int fCount;
@@ -33,6 +34,10 @@
     NSBezierPath * fPath, * fEdgePath, * fStepPath;
     NSDictionary * fNormalAttributes, * fNormalDimAttributes,
                  * fHighlightedAttributes, * fHighlightedDimAttributes;
+    CTGradient * fHighlightedBackground, * fHighlightedOutline,
+               * fActiveBackground, * fActiveOutline,
+               * fHoveringBackground;
+    NSColor    * fHoveringOutline;
 }
 
 - (void) setCount: (int) count;
