@@ -56,7 +56,9 @@ timerCB( int fd UNUSED, short event UNUSED, void * arg )
     if( !node->doFree )
          node->doFree = !(node->func)(node->user_data);
 
-    if( node->doFree ) {
+    if( !node->doFree )
+        tr_event_add( node->handle, node->event, &node->tv );
+    else {
         if( node->free_func != NULL )
             (node->free_func)( node->user_data );
         tr_event_del( node->handle, node->event );
