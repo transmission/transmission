@@ -500,16 +500,17 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     if( NULL != path )
     {
         tor->tor = tr_torrentInit( gl_handle, path, dir,
-                                   TR_FLAG_SAVE, &errcode );
+                                   TR_FLAG_SAVE | TR_FLAG_PAUSED, &errcode );
     }
     else if( NULL != hash )
     {
-        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, 0, &errcode );
+        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, TR_FLAG_PAUSED,
+                                        &errcode );
     }
     else
     {
         tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 
-                                       TR_FLAG_SAVE, &errcode );
+                                       TR_FLAG_SAVE | TR_FLAG_PAUSED, &errcode );
     }
 
     if( NULL == tor->tor )
