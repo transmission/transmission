@@ -35,33 +35,15 @@ struct timer_node
     void * user_data;
     tr_data_free_func * free_func;
     struct timeval tv;
-    int refcount;
+    uint8_t doFree;
 };
-
-static void
-unref( struct timer_node * node, int count )
-{
-    assert( node != NULL );
-    assert( node->refcount > 0 );
-
-    node->refcount -= count;
-    if( node->refcount > 0 )
-        return;
-
-    if( node->free_func != NULL )
-        (node->free_func)( node->user_data );
-    tr_event_del( node->handle, node->event );
-    tr_free( node );
-}
 
 void
 tr_timerFree( struct timer_node ** node )
 {
-    assert( node != NULL );
-
     if( *node )
     {
-        unref( *node, 1 );
+        (*node)->doFree = 1;
         *node = NULL;
     }
 }
@@ -70,15 +52,15 @@ static void
 timerCB( int fd UNUSED, short event UNUSED, void * arg )
 {
     struct timer_node * node = (struct timer_node *) arg;
-    int val;
 
-    ++node->refcount;
-    val = (node->func)(node->user_data);
-    if( !val )
-        unref( node, 2 );
-    else {
-        timeout_add( node->event, &node->tv );
-        unref( node, 1 );
+    if( !node->doFree )
+         node->doFree = !(node->func)(node->user_data);
+
+    if( node->doFree ) {
+        if( node->free_func != NULL )
+            (node->free_func)( node->user_data );
+        tr_event_del( node->handle, node->event );
+        tr_free( node );
     }
 }
 
@@ -101,7 +83,7 @@ tr_timerNew( tr_handle_t        * handle,
     node->func = func;
     node->user_data = user_data;
     node->free_func = free_func;
-    node->refcount = 1;
+    node->doFree = 0;
     node->tv = timevalMsec ( timeout_milliseconds );
     timeout_set( node->event, timerCB, node );
     tr_event_add( handle, node->event, &node->tv );

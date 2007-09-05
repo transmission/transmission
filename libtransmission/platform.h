@@ -34,6 +34,7 @@ const char * tr_getTorrentsDirectory( void );
 
 tr_thread_t*  tr_threadNew  ( void (*func)(void *), void * arg, const char * name );
 void          tr_threadJoin ( tr_thread_t * );
+int           tr_amInThread ( const tr_thread_t * );
 
 tr_lock_t * tr_lockNew        ( void );
 void        tr_lockFree       ( tr_lock_t * );

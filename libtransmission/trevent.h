@@ -12,6 +12,8 @@
 
 #ifndef TR_EVENT_H
 
+#include <stddef.h> /* for size_t */
+
 /**
 **/
 
@@ -26,18 +28,29 @@ struct event;
 enum evhttp_cmd_type;
 struct evhttp_request;
 struct evhttp_connection;
+struct bufferevent;
 
 void  tr_event_add( struct tr_handle_s  * tr_handle,
-                    struct event        * event,
-                    struct timeval      * interval );
+                    struct event      * event,
+                    struct timeval    * interval );
 
 void  tr_event_del( struct tr_handle_s  * tr_handle,
-                    struct event        * event );
+                    struct event      * event );
 
-void tr_evhttp_make_request (struct tr_handle_s        * tr_handle,
+void tr_evhttp_make_request (struct tr_handle_s          * tr_handle,
                              struct evhttp_connection  * evcon,
                              struct evhttp_request     * req,
                              enum evhttp_cmd_type        type,
                              char                      * uri);
+
+void tr_bufferevent_write( struct tr_handle_s    * tr_handle,
+                           struct bufferevent  * bufferEvent,
+                           const void          * buf,
+                           size_t                buflen );
+
+void tr_setBufferEventMode( struct tr_handle_s   * tr_handle,
+                            struct bufferevent * bufferEvent,
+                            short                mode_enable,
+                            short                mode_disable );
 
 #endif
