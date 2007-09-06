@@ -125,7 +125,7 @@ ensureMinimumFileSize ( const tr_torrent_t  * tor,
         ret = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */
         ret = tr_ioErrorFromErrno ();
-    else if ((size_t)sb.st_size >= minSize) /* already big enough */
+    else if (sb.st_size >= (off_t)minSize) /* already big enough */
         ret = TR_OK;
     else if (!ftruncate( fd, minSize )) /* grow it */
         ret = TR_OK;
