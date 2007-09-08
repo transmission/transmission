@@ -79,7 +79,6 @@
                 fBadge = [NSImage imageNamed: @"Badge"];
             
             NSRect badgeRect;
-            NSSize iconSize = [fDockIcon size];
             badgeRect.size = [fBadge size];
             badgeRect.origin.x = iconSize.width - badgeRect.size.width;
             badgeRect.origin.y = iconSize.height - badgeRect.size.height;
