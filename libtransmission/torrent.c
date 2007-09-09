@@ -1104,7 +1104,7 @@ torrentThreadLoop ( void * _tor )
     while( ! ( tor->dieFlag && (tor->runStatus == TR_RUN_STOPPED) ) )
     {
         /* sleep a little while */
-        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 25 );
+        tr_wait( tor->runStatus == TR_RUN_STOPPED ? 1600 : 100 );
 
         if( tor->fastResumeDirty )
         {
