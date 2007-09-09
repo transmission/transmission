@@ -1,6 +1,6 @@
-AC_INIT([Transmission],[0.81+],[http://transmission.m0k.org/trac/newticket])
-PEERID_PREFIX="-TR081Z-"
-USERAGENT_PREFIX="0.81+"
+AC_INIT([Transmission],[0.82+],[http://transmission.m0k.org/trac/newticket])
+PEERID_PREFIX="-TR082Z-"
+USERAGENT_PREFIX="0.82+"
 
 AC_PREREQ(2.54)
 dnl AM_CONFIG_HEADER(config.h)
