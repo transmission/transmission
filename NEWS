@@ -1,11 +1,11 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.82 (2007/09/09)
- - Fix 0.80 bug that limited transfer speeds
- - Fix 0.80 bug that corrupted torrents > 4GiB
- - Fix 0.80 bug that let bad peers feed us too many pieces.
- - Other minor fixes
+ - Fixed bug that could limit transfer speeds
+ - Fixed bug that corrupted torrents > 4 GB
+ - Fixed bug that could allow bad peers to send too many pieces
  - For peers supporting both Azureus' and LibTorrent's extensions, allow negotiation to decide which to use
+ - Other minor fixes
 
 0.81 (2007/08/22)
  - Fix 0.80 assertion crashes
