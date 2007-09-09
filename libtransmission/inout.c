@@ -38,6 +38,10 @@ struct tr_io_s
 
 enum { TR_IO_READ, TR_IO_WRITE };
 
+#ifdef WIN32
+#define lseek _lseeki64
+#endif
+
 static int
 readOrWriteBytes ( const tr_torrent_t  * tor,
                    int                   ioMode,
