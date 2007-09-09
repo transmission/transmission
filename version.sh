@@ -10,8 +10,8 @@ MAINT="2"
 BETA="0"
 STRING=0.82
 
-PEERID_PREFIX="-TR0810-"
-USERAGENT_PREFIX="0.81"
+PEERID_PREFIX="-TR0820-"
+USERAGENT_PREFIX="0.82"
 SVN_REVISION=`( find . '(' -name '*.[chm]' -o -name '*.cpp' -o -name '*.po' \
                      -o -name '*.mk' -o -name '*.in' -o -name 'Makefile' \
                      -o -name 'configure' ')' -exec cat '{}' ';' ) | \
