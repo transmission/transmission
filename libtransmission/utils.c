@@ -555,7 +555,7 @@ tr_bitfieldNew( size_t bitcount )
     if( NULL == ret )
         return NULL;
 
-    ret->len = ( bitcount + 7u ) / 8u;
+    ret->len = bitcount/8u + 1;
     ret->bits = calloc( ret->len, 1 );
     if( NULL == ret->bits ) {
         free( ret );
