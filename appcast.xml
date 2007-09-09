@@ -6,7 +6,24 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Mon, 6 Aug 2007 21:55:00 -0400</pubDate>
-    <lastBuildDate>Thur, 23 Aug 2007 19:33:00 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 9 Sep 2007 18:00:00 -0400</lastBuildDate>
+
+	<item>
+      <title>Transmission 0.82 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Fixed bug that could limit transfer speeds</li>
+ <li>Fixed bug that corrupted torrents > 4 GB</li>
+ <li>Fixed bug that could allow bad peers to send too many pieces</li>
+ <li>For peers supporting both Azureus's and LibTorrent's extensions, allow negotiation to decide which to use</li>
+ <li>Other minor fixes</li>
+</ul>]]></description>
+      <pubDate>Sun, 9 Sep 2007 18:00:00 -0400</pubDate>
+      <enclosure sparkle:version="3009" sparkle:shortVersionString="0.82" url="http://mirror.m0k.org/transmission/files/Transmission-0.82.dmg" length="1934438" type="application/octet-stream"/>
+    </item>
 
 	<item>
       <title>Transmission 0.81 Released</title>
