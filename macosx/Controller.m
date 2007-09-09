@@ -721,21 +721,20 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
         return;
     }
     
-    #warning make create folder
+    #warning make submethod
     if (!path && [fDefaults boolForKey: @"UseIncompleteDownloadFolder"]
         && access([[[fDefaults stringForKey: @"IncompleteDownloadFolder"] stringByExpandingTildeInPath] UTF8String], 0))
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
         
-        [panel setPrompt: NSLocalizedString(@"Select", "Default incomplete folder cannot be found alert -> prompt")];
+        [panel setPrompt: NSLocalizedString(@"Select", "Default incomplete folder cannot be used alert -> prompt")];
         [panel setAllowsMultipleSelection: NO];
         [panel setCanChooseFiles: NO];
         [panel setCanChooseDirectories: YES];
         [panel setCanCreateDirectories: YES];
 
-        [panel setMessage: NSLocalizedString(@"The incomplete folder cannot be found."
-                                        " Choose a new location or cancel for none.",
-                                        "Default incomplete folder cannot be found alert -> message")];
+        [panel setMessage: NSLocalizedString(@"The incomplete folder cannot be used. Choose a new location or cancel for none.",
+                                        "Default incomplete folder cannot be used alert -> message")];
         
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         filenames, @"Filenames",
@@ -751,14 +750,14 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     {
         NSOpenPanel * panel = [NSOpenPanel openPanel];
         
-        [panel setPrompt: NSLocalizedString(@"Select", "Default folder cannot be found alert -> prompt")];
+        [panel setPrompt: NSLocalizedString(@"Select", "Default folder cannot be used alert -> prompt")];
         [panel setAllowsMultipleSelection: NO];
         [panel setCanChooseFiles: NO];
         [panel setCanChooseDirectories: YES];
         [panel setCanCreateDirectories: YES];
 
-        [panel setMessage: NSLocalizedString(@"The download folder cannot be found. Choose a new location.",
-                                        "Default folder cannot be found alert -> message")];
+        [panel setMessage: NSLocalizedString(@"The download folder cannot be used. Choose a new location.",
+                                        "Default folder cannot be used alert -> message")];
         
         NSDictionary * dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                                         filenames, @"Filenames",

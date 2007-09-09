@@ -118,7 +118,7 @@
     
     NSImage * dockIcon = nil;
     BOOL speedChange;
-    if (speedChange = (uploadRateString || downloadRateString))
+    if ((speedChange = (uploadRateString || downloadRateString)))
     {
         if (!fDockIcon)
             fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];

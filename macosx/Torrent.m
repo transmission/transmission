@@ -747,27 +747,27 @@ static int static_lastid = 0;
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"The folder for downloading \"%@\" cannot be found.",
-                                    "Folder cannot be found alert -> title"), [self name]]];
+                                NSLocalizedString(@"The folder for downloading \"%@\" cannot be used.",
+                                    "Folder cannot be used alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                        NSLocalizedString(@"\"%@\" cannot be found. The transfer will be paused.",
-                                            "Folder cannot be found alert -> message"), [self downloadFolder]]];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Folder cannot be found alert -> button")];
+                        NSLocalizedString(@"\"%@\" cannot be used. The transfer will be paused.",
+                                            "Folder cannot be used alert -> message"), [self downloadFolder]]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Folder cannot be used alert -> button")];
         [alert addButtonWithTitle: [NSLocalizedString(@"Choose New Location",
-                                    "Folder cannot be found alert -> location button") stringByAppendingEllipsis]];
+                                    "Folder cannot be used alert -> location button") stringByAppendingEllipsis]];
         
         if ([alert runModal] != NSAlertFirstButtonReturn)
         {
             NSOpenPanel * panel = [NSOpenPanel openPanel];
             
-            [panel setPrompt: NSLocalizedString(@"Select", "Folder cannot be found alert -> prompt")];
+            [panel setPrompt: NSLocalizedString(@"Select", "Folder cannot be used alert -> prompt")];
             [panel setAllowsMultipleSelection: NO];
             [panel setCanChooseFiles: NO];
             [panel setCanChooseDirectories: YES];
             [panel setCanCreateDirectories: YES];
 
             [panel setMessage: [NSString stringWithFormat: NSLocalizedString(@"Select the download folder for \"%@\"",
-                                "Folder cannot be found alert -> select destination folder"), [self name]]];
+                                "Folder cannot be used alert -> select destination folder"), [self name]]];
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"MakeWindowKey" object: nil];
             [panel beginSheetForDirectory: nil file: nil types: nil modalForWindow: [NSApp keyWindow] modalDelegate: self
@@ -805,12 +805,12 @@ static int static_lastid = 0;
     {
         NSAlert * alert = [[NSAlert alloc] init];
         [alert setMessageText: [NSString stringWithFormat:
-                                NSLocalizedString(@"The folder for moving the completed \"%@\" cannot be found.",
-                                    "Move folder cannot be found alert -> title"), [self name]]];
+                                NSLocalizedString(@"The folder for moving the completed \"%@\" cannot be used.",
+                                    "Move folder cannot be used alert -> title"), [self name]]];
         [alert setInformativeText: [NSString stringWithFormat:
-                                NSLocalizedString(@"\"%@\" cannot be found. The file will remain in its current location.",
-                                    "Move folder cannot be found alert -> message"), fDownloadFolder]];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move folder cannot be found alert -> button")];
+                                NSLocalizedString(@"\"%@\" cannot be used. The file will remain in its current location.",
+                                    "Move folder cannot be used alert -> message"), fDownloadFolder]];
+        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Move folder cannot be used alert -> button")];
         
         [alert runModal];
         [alert release];
