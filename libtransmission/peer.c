@@ -270,7 +270,7 @@ static void __peer_dbg( tr_peer_t * peer, char * msg, ... )
 
     va_start( args, msg );
     snprintf( string, sizeof string, "%08x:%04x ",
-             (uint32_t) peer->addr.s_addr, peer->port );
+             (uint32_t) ntohl(peer->addr.s_addr), tr_peerPort(peer) );
     vsnprintf( &string[14], sizeof( string ) - 14, msg, args );
     va_end( args ); 
 
