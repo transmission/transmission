@@ -8,6 +8,13 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Per-torrent action menu
    + Inspector can be resized vertically in Peers and Files tabs
 
+0.82 (2007/09/09)
+ - Fixed bug that could limit transfer speeds
+ - Fixed bug that corrupted torrents > 4 GB
+ - Fixed bug that could allow bad peers to send too many pieces
+ - For peers supporting both Azureus' and LibTorrent's extensions, allow negotiation to decide which to use
+ - Other minor fixes
+
 0.81 (2007/08/22)
  - Fix 0.80 assertion crashes
  - Fix a bug that miscounted how many peers Transmission wants connected
