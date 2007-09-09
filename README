@@ -16,7 +16,7 @@ website: http://transmission.m0k.org/
 Building Transmission
 =====================
 
-Transmission has xcode files that allows it to be built in xcode.
+Transmission has an Xcode project file (Transmission.xcodeproj) that allows it to be built in Xcode.
 
 Building a Transmission release from the command line:
 
