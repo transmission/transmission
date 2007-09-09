@@ -6,9 +6,9 @@
 # convention: BETA: "Z" for a beta, "0" for a stable
 MAJOR="0"
 MINOR="8"
-MAINT="1"
+MAINT="2"
 BETA="0"
-STRING=0.81
+STRING=0.82
 
 PEERID_PREFIX="-TR0810-"
 USERAGENT_PREFIX="0.81"
