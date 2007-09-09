@@ -132,7 +132,6 @@
 		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
 		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
 		BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35B0C72A0EF00DBEFE0 /* log.c */; };
-		BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
 		BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */; };
 		BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35E0C72A0EF00DBEFE0 /* event.c */; };
 		BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35F0C72A0EF00DBEFE0 /* http.c */; };
@@ -142,6 +141,7 @@
 		BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3630C72A0EF00DBEFE0 /* poll.c */; };
 		BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3640C72A0EF00DBEFE0 /* select.c */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
+		BEB8BCD00C8BD34C00DD6B02 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
 		BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
@@ -1482,7 +1482,6 @@
 				BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */,
 				BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */,
 				BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */,
-				BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */,
 				BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */,
 				BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */,
 				BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */,
@@ -1491,6 +1490,7 @@
 				BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */,
 				BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */,
 				BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */,
+				BEB8BCD00C8BD34C00DD6B02 /* strlcpy.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1701,7 +1701,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
@@ -1748,7 +1748,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Development\"";
 				OTHER_CFLAGS = "";
@@ -1760,7 +1760,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1786,7 +1786,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1814,7 +1814,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1876,7 +1876,7 @@
 					ppc,
 					i386,
 				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Development";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
@@ -1902,7 +1902,7 @@
 					ppc,
 					i386,
 				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Release";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Release\"";
 				OTHER_CFLAGS = "";
@@ -1992,7 +1992,7 @@
 					ppc,
 					i386,
 				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Release";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2006,7 +2006,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/libevent\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "";
 				OTHER_CFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-daemon";
@@ -2021,7 +2021,7 @@
 					ppc,
 					i386,
 				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Release";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2052,7 +2052,7 @@
 					ppc,
 					i386,
 				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/build/Release";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
