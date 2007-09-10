@@ -1179,7 +1179,7 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
                                 " from the transfer list and trash torrent file.", "Removal confirm panel -> title"), selected];
                 else
                     title = [NSString stringWithFormat: NSLocalizedString(@"Confirm removal of %d transfers"
-                                " from the transfer list aand trash both data and torrent files.",
+                                " from the transfer list and trash both data and torrent files.",
                                 "Removal confirm panel -> title"), selected];
                 
                 if (selected == active)
