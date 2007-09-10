@@ -30,7 +30,7 @@
 #define LEVEL_DEBUG 2
 
 #define UPDATE_SECONDS  0.6
-#define MAX_LINES       2500
+//#define MAX_LINES       2500
 
 @interface MessageWindowController (Private)
 
@@ -44,20 +44,27 @@
 {
     if ((self = [super initWithWindowNibName: name]))
     {
-        NSMutableParagraphStyle * paragraph = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [paragraph setHeadIndent: 20.0];
-        
-        fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
-                        [NSFont fontWithName: @"Monaco" size: 10], NSFontAttributeName,
-                        paragraph, NSParagraphStyleAttributeName, nil];
-        [paragraph release];
-        
-        fLines = 0;
+        fMessages = [[NSMutableArray alloc] init];
         
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
         
-        [[self window] update]; //make sure nib is loaded right away
+        int level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+        if (level == TR_MSG_ERR)
+            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
+        else if (level == TR_MSG_INF)
+            [fLevelButton selectItemAtIndex: LEVEL_INFO];
+        else if (level == TR_MSG_DBG)
+            [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
+        else
+        {
+            level = TR_MSG_ERR;
+            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
+            [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
+        }
+        
+        tr_setMessageLevel(level);
+        tr_setMessageQueuing(1);
     }
     return self;
 }
@@ -65,7 +72,7 @@
 - (void) dealloc
 {
     [fTimer invalidate];
-    [fAttributes release];
+    [fMessages release];
     
     [super dealloc];
 }
@@ -74,7 +81,7 @@
 {
     [[self window] center];
     
-    int level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
+    int level = tr_getMessageLevel();
     if (level == TR_MSG_ERR)
         [fLevelButton selectItemAtIndex: LEVEL_ERROR];
     else if (level == TR_MSG_INF)
@@ -89,9 +96,6 @@
     }
     
     [self setDebugWarningHidden: level != TR_MSG_DBG];
-    
-    tr_setMessageLevel(level);
-    tr_setMessageQueuing(1);
 }
 
 - (void) updateLog: (NSTimer *) timer
@@ -117,13 +121,8 @@
         else
             levelString = @"???";
         
-        dateString = [[NSDate dateWithTimeIntervalSince1970: currentMessage->when]
-                            descriptionWithCalendarFormat: @"%1m/%d %H:%M:%S" timeZone: nil locale: nil];
-        messageString = [NSString stringWithFormat: @"%s%@ %@ %s",
-                            fLines > 0 ? "\n" : "", dateString, levelString, currentMessage->message];
-        
         //remove the first line if at max number of lines
-        if (fLines == MAX_LINES)
+        /*if (fLines == MAX_LINES)
         {
             unsigned int loc = [[fTextView string] rangeOfString: @"\n"].location;
             if (loc != NSNotFound)
@@ -133,13 +132,40 @@
             fLines++;
         
         [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc] initWithString:
-                                        messageString attributes: fAttributes] autorelease]];
+                                        messageString attributes: fAttributes] autorelease]];*/
+        
+        #warning remove old messages?
+        
+        [fMessages addObject: [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSString stringWithUTF8String: currentMessage->message], @"Message",
+                                [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
+                                levelString, @"Level", nil]];
     }
+    
+    [fMessageView reloadData];
     
     tr_freeMessageList(messages);
     
-    if (shouldScroll)
-        [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];
+    /*if (shouldScroll)
+        [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];*/
+}
+
+- (int) numberOfRowsInTableView: (NSTableView *) tableView
+{
+    return [fMessages count];
+}
+
+- (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) column row: (int) row
+{
+    NSString * ident = [column identifier];
+    NSDictionary * message = [fMessages objectAtIndex: row];
+
+    if ([ident isEqualToString: @"Date"])
+        return [message objectForKey: @"Date"];
+    else if ([ident isEqualToString: @"Level"])
+        return [message objectForKey: @"Level"];
+    else
+        return [message objectForKey: @"Message"];
 }
 
 - (void) changeLevel: (id) sender
@@ -162,13 +188,13 @@
 
 - (void) clearLog: (id) sender
 {
-    [fTextView setString: @""];
-    fLines = 0;
+    [fMessages removeAllObjects];
+    [fMessageView reloadData];
 }
 
 - (void) writeToFile: (id) sender
 {
-    NSString * string = [[fTextView string] retain];
+    /*NSString * string = [[fTextView string] retain];
     
     NSSavePanel * panel = [NSSavePanel savePanel];
     [panel setRequiredFileType: @"txt"];
@@ -176,12 +202,12 @@
     
     [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
             modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];
+            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];*/
 }
 
 - (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
 {
-    if (code == NSOKButton)
+    /*if (code == NSOKButton)
     {
         if (![string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
         {
@@ -199,7 +225,7 @@
         }
     }
     
-    [string release];
+    [string release];*/
 }
 
 - (void) setDebugWarningHidden: (BOOL) hide

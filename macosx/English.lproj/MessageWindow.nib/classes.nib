@@ -9,8 +9,8 @@
                 fDebugWarningField = NSTextField; 
                 fDebugWarningIcon = NSImageView; 
                 fLevelButton = NSPopUpButton; 
+                fMessageView = NSTableView; 
                 fScrollView = NSScrollView; 
-                fTextView = NSTextView; 
             }; 
             SUPERCLASS = NSWindowController; 
         }
