@@ -194,10 +194,15 @@
 
 - (void) writeToFile: (id) sender
 {
+    //make the array sorted by date
+    NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Date" ascending: YES] autorelease];
+    NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
+    NSArray * sortedMessages = [fMessages sortedArrayUsingDescriptors: descriptors];
+    [descriptors release];
+    
     //create the text to output
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
-    
-    NSEnumerator * enumerator = [fMessages objectEnumerator];
+    NSEnumerator * enumerator = [sortedMessages objectEnumerator];
     NSDictionary * message;
     while ((message = [enumerator nextObject]))
         [messageStrings addObject: [self stringForMessage: message]];
