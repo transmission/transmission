@@ -71,7 +71,6 @@
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
-		A234D0D10C79FB3600A82373 /* NSMenuAdditions.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A23BBEB70A9BBE77003F7274 /* FilterBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* FilterBarButton.m */; };
@@ -132,6 +131,7 @@
 		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
 		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
 		BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35B0C72A0EF00DBEFE0 /* log.c */; };
+		BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
 		BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35D0C72A0EF00DBEFE0 /* evbuffer.c */; };
 		BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35E0C72A0EF00DBEFE0 /* event.c */; };
 		BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35F0C72A0EF00DBEFE0 /* http.c */; };
@@ -141,7 +141,6 @@
 		BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3630C72A0EF00DBEFE0 /* poll.c */; };
 		BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3640C72A0EF00DBEFE0 /* select.c */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
-		BEB8BCD00C8BD34C00DD6B02 /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35C0C72A0EF00DBEFE0 /* strlcpy.c */; };
 		BEFC1C040C07753100B0BB3C /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.c */; };
@@ -278,7 +277,6 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
-				A234D0D10C79FB3600A82373 /* NSMenuAdditions.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,7 +340,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -478,7 +476,7 @@
 		A2C19EDA0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/AboutWindow.nib; sourceTree = "<group>"; };
 		A2C19EDB0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2C19EDC0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A2C19EDD0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2C19EDD0C676F5200E0B235 /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2C19EDE0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A2C19EDF0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A2C19EE00C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
@@ -1482,6 +1480,7 @@
 				BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */,
 				BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */,
 				BE75C3680C72A0EF00DBEFE0 /* log.c in Sources */,
+				BE75C3690C72A0EF00DBEFE0 /* strlcpy.c in Sources */,
 				BE75C36A0C72A0EF00DBEFE0 /* evbuffer.c in Sources */,
 				BE75C36B0C72A0EF00DBEFE0 /* event.c in Sources */,
 				BE75C36C0C72A0EF00DBEFE0 /* http.c in Sources */,
@@ -1490,7 +1489,6 @@
 				BE75C36F0C72A0EF00DBEFE0 /* evdns.c in Sources */,
 				BE75C3700C72A0EF00DBEFE0 /* poll.c in Sources */,
 				BE75C3710C72A0EF00DBEFE0 /* select.c in Sources */,
-				BEB8BCD00C8BD34C00DD6B02 /* strlcpy.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1681,32 +1679,15 @@
 		0053D3D30C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = s;
-				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
-				PREBINDING = NO;
 				PRODUCT_NAME = event;
 				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		0053D3D40C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
@@ -1723,22 +1704,10 @@
 		0053D3D50C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/macosx";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libtransmission\"";
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Development\"";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1747,11 +1716,6 @@
 		0053D3D60C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Development\"";
-				OTHER_CFLAGS = "";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Development;
@@ -1759,129 +1723,40 @@
 		0053D3D70C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Development\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-daemon";
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		0053D3D80C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Development\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/build/Development\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-remote";
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		0053D3D90C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Development\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/build/Development\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-proxy";
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		0053D3DA0C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_VERSION_i386 = 4.0;
-				GCC_VERSION_ppc = 4.0;
-				GCC_WARN_ABOUT_RETURN_TYPE = NO;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_LABEL = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = NO;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
-				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "$(inherited)";
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				ZERO_LINK = NO;
 			};
 			name = Development;
 		};
 		4D18389C09DEC01E0047D688 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
@@ -1898,14 +1773,6 @@
 		4DDBB71E09E16BF100284745 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Release\"";
-				OTHER_CFLAGS = "";
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Release;
@@ -1913,25 +1780,10 @@
 		4DF0C599089918A300DD8943 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/macosx";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_3)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/libtransmission\"";
 				INFOPLIST_FILE = macosx/Info.plist;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/build/Release\"";
 				PRODUCT_NAME = Transmission;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1946,134 +1798,39 @@
 				);
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_VERSION_i386 = 4.0;
-				GCC_VERSION_ppc = 4.0;
-				GCC_WARN_ABOUT_RETURN_TYPE = NO;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_LABEL = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = NO;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
-				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
-				OTHER_CFLAGS = "$(inherited)";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		BE75C34B0C729EB600DBEFE0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = s;
-				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
-				PREBINDING = NO;
 				PRODUCT_NAME = event;
 				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		BEFC1C0A0C07753800B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-daemon";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		BEFC1CF80C07822400B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-remote";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
 		BEFC1D420C0783EE00B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"";
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/build/Release\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/libevent\"";
-				OTHER_CFLAGS = "";
-				PREBINDING = NO;
 				PRODUCT_NAME = "transmission-proxy";
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
