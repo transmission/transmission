@@ -68,6 +68,14 @@
 {
     [[self window] center];
     
+    //initially sort peer table by IP
+    if ([[fMessageTable sortDescriptors] count] == 0)
+    {
+        [fMessageTable setSortDescriptors: [NSArray arrayWithObject: [[fMessageTable tableColumnWithIdentifier: @"Date"]
+                                            sortDescriptorPrototype]]];
+        [self updateLog: nil];
+    }
+    
     fErrorImage = [NSImage imageNamed: @"RedDot.tiff"];
     fInfoImage = [NSImage imageNamed: @"YellowDot.tiff"];
     fDebugImage = [NSImage imageNamed: @"GreenDot.tiff"];
@@ -107,14 +115,16 @@
                                 [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
                                 [NSNumber numberWithInt: currentMessage->level], @"Level", nil]];
     
+    tr_freeMessageList(messages);
+    
     #warning still needed?
     int total = [fMessages count];
     if (total > MAX_MESSAGES)
         [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
     
-    [fMessageView reloadData];
+    [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
-    tr_freeMessageList(messages);
+    [fMessageTable reloadData];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
@@ -151,6 +161,13 @@
     return [self stringForMessage: [fMessages objectAtIndex: row]];
 }
 
+- (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
+{
+    [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
+    
+    [fMessageTable reloadData];
+}
+
 - (void) changeLevel: (id) sender
 {
     [self updateLog: nil];
@@ -172,7 +189,7 @@
 - (void) clearLog: (id) sender
 {
     [fMessages removeAllObjects];
-    [fMessageView reloadData];
+    [fMessageTable reloadData];
 }
 
 - (void) writeToFile: (id) sender
