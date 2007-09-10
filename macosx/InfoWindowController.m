@@ -820,8 +820,7 @@
     return nil;
 }
 
-- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell
-            forTableColumn: (NSTableColumn *) tableColumn row: (int) row
+- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     if (tableView == fPeerTable)
     {

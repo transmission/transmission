@@ -34,6 +34,7 @@
 
 @interface MessageWindowController (Private)
 
+- (NSString *) stringForMessage: (NSDictionary *) message;
 - (void) setDebugWarningHidden: (BOOL) hide;
 
 @end
@@ -113,11 +114,11 @@
     {
         int level = currentMessage->level;
         if (level == TR_MSG_ERR)
-            levelString = @"ERR";
+            levelString = @"Error";
         else if (level == TR_MSG_INF)
-            levelString = @"INF";
+            levelString = @"Info";
         else if (level == TR_MSG_DBG)
-            levelString = @"DBG";
+            levelString = @"Debug";
         else
             levelString = @"???";
         
@@ -127,12 +128,7 @@
             unsigned int loc = [[fTextView string] rangeOfString: @"\n"].location;
             if (loc != NSNotFound)
                 [[fTextView textStorage] deleteCharactersInRange: NSMakeRange(0, loc + 1)];
-        }
-        else
-            fLines++;
-        
-        [[fTextView textStorage] appendAttributedString: [[[NSAttributedString alloc] initWithString:
-                                        messageString attributes: fAttributes] autorelease]];*/
+        }*/
         
         #warning remove old messages?
         
@@ -166,6 +162,12 @@
         return [message objectForKey: @"Level"];
     else
         return [message objectForKey: @"Message"];
+}
+
+- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
+{
+    return [self stringForMessage: [fMessages objectAtIndex: row]];
 }
 
 - (void) changeLevel: (id) sender
@@ -226,6 +228,16 @@
     }
     
     [string release];*/
+}
+
+@end
+
+@implementation MessageWindowController (Private)
+
+- (NSString *) stringForMessage: (NSDictionary *) message
+{
+    return [NSString stringWithFormat: @"%@\n%@\n\n%@", [message objectForKey: @"Date"],
+                [message objectForKey: @"Level"], [message objectForKey: @"Message"]];
 }
 
 - (void) setDebugWarningHidden: (BOOL) hide
