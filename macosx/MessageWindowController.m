@@ -30,7 +30,7 @@
 #define LEVEL_DEBUG 2
 
 #define UPDATE_SECONDS  0.6
-//#define MAX_LINES       2500
+#define MAX_MESSAGES    2500
 
 @interface MessageWindowController (Private)
 
@@ -130,13 +130,16 @@
                 [[fTextView textStorage] deleteCharactersInRange: NSMakeRange(0, loc + 1)];
         }*/
         
-        #warning remove old messages?
-        
         [fMessages addObject: [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                 [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
                                 levelString, @"Level", nil]];
     }
+    
+    #warning still needed?
+    int total = [fMessages count];
+    if (total > MAX_MESSAGES)
+        [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
     
     [fMessageView reloadData];
     
