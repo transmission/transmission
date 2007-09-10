@@ -105,11 +105,7 @@
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
-    //keep scrolled to bottom if already at bottom or there is no scroll bar yet
-    NSScroller * scroller = [fScrollView verticalScroller];
-    BOOL shouldScroll = [scroller floatValue] == 1.0 || [scroller isHidden] || [scroller knobProportion] == 1.0;
-    
-    NSString * levelString, * dateString, * messageString;
+    NSString * levelString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
     {
         int level = currentMessage->level;
@@ -144,9 +140,6 @@
     [fMessageView reloadData];
     
     tr_freeMessageList(messages);
-    
-    /*if (shouldScroll)
-        [fTextView scrollRangeToVisible: NSMakeRange([[fTextView string] length], 0)];*/
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
@@ -199,7 +192,15 @@
 
 - (void) writeToFile: (id) sender
 {
-    /*NSString * string = [[fTextView string] retain];
+    //create the text to output
+    NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [fMessages count]];
+    
+    NSEnumerator * enumerator = [fMessages objectEnumerator];
+    NSDictionary * message;
+    while ((message = [enumerator nextObject]))
+        [messageStrings addObject: [self stringForMessage: message]];
+    
+    NSString * fileString = [[messageStrings componentsJoinedByString: @"\n"] retain];
     
     NSSavePanel * panel = [NSSavePanel savePanel];
     [panel setRequiredFileType: @"txt"];
@@ -207,12 +208,12 @@
     
     [panel beginSheetForDirectory: nil file: NSLocalizedString(@"untitled", "Save log panel -> default file name")
             modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: string];*/
+            didEndSelector: @selector(writeToFileSheetClosed:returnCode:contextInfo:) contextInfo: fileString];
 }
 
 - (void) writeToFileSheetClosed: (NSSavePanel *) panel returnCode: (int) code contextInfo: (NSString *) string
 {
-    /*if (code == NSOKButton)
+    if (code == NSOKButton)
     {
         if (![string writeToFile: [panel filename] atomically: YES encoding: NSUTF8StringEncoding error: nil])
         {
@@ -230,7 +231,7 @@
         }
     }
     
-    [string release];*/
+    [string release];
 }
 
 @end
@@ -239,7 +240,7 @@
 
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
-    return [NSString stringWithFormat: @"%@\n%@\n\n%@", [message objectForKey: @"Date"],
+    return [NSString stringWithFormat: @"%@ %@ %@", [message objectForKey: @"Date"],
                 [message objectForKey: @"Level"], [message objectForKey: @"Message"]];
 }
 
