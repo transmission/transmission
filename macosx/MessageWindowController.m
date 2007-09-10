@@ -50,21 +50,7 @@
         fTimer = [NSTimer scheduledTimerWithTimeInterval: UPDATE_SECONDS target: self
                     selector: @selector(updateLog:) userInfo: nil repeats: YES];
         
-        int level = [[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"];
-        if (level == TR_MSG_ERR)
-            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
-        else if (level == TR_MSG_INF)
-            [fLevelButton selectItemAtIndex: LEVEL_INFO];
-        else if (level == TR_MSG_DBG)
-            [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
-        else
-        {
-            level = TR_MSG_ERR;
-            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
-            [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
-        }
-        
-        tr_setMessageLevel(level);
+        tr_setMessageLevel([[NSUserDefaults standardUserDefaults] integerForKey: @"MessageLevel"]);
         tr_setMessageQueuing(1);
     }
     return self;
@@ -82,6 +68,16 @@
 {
     [[self window] center];
     
+    fErrorImage = [NSImage imageNamed: @"RedDot.tiff"];
+    fInfoImage = [NSImage imageNamed: @"YellowDot.tiff"];
+    fDebugImage = [NSImage imageNamed: @"GreenDot.tiff"];
+    
+    //set images to popup button items
+    [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: fErrorImage];
+    [[fLevelButton itemAtIndex: LEVEL_INFO] setImage: fInfoImage];
+    [[fLevelButton itemAtIndex: LEVEL_DEBUG] setImage: fDebugImage];
+    
+    //select proper level in popup button
     int level = tr_getMessageLevel();
     if (level == TR_MSG_ERR)
         [fLevelButton selectItemAtIndex: LEVEL_ERROR];
@@ -105,32 +101,11 @@
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
-    NSString * levelString;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
-    {
-        int level = currentMessage->level;
-        if (level == TR_MSG_ERR)
-            levelString = @"Error";
-        else if (level == TR_MSG_INF)
-            levelString = @"Info";
-        else if (level == TR_MSG_DBG)
-            levelString = @"Debug";
-        else
-            levelString = @"???";
-        
-        //remove the first line if at max number of lines
-        /*if (fLines == MAX_LINES)
-        {
-            unsigned int loc = [[fTextView string] rangeOfString: @"\n"].location;
-            if (loc != NSNotFound)
-                [[fTextView textStorage] deleteCharactersInRange: NSMakeRange(0, loc + 1)];
-        }*/
-        
         [fMessages addObject: [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSString stringWithUTF8String: currentMessage->message], @"Message",
                                 [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                levelString, @"Level", nil]];
-    }
+                                [NSNumber numberWithInt: currentMessage->level], @"Level", nil]];
     
     #warning still needed?
     int total = [fMessages count];
@@ -155,7 +130,17 @@
     if ([ident isEqualToString: @"Date"])
         return [message objectForKey: @"Date"];
     else if ([ident isEqualToString: @"Level"])
-        return [message objectForKey: @"Level"];
+    {
+        int level = [[message objectForKey: @"Level"] intValue];
+        if (level == TR_MSG_ERR)
+            return fErrorImage;
+        else if (level == TR_MSG_INF)
+            return fInfoImage;
+        else if (level == TR_MSG_DBG)
+            return fDebugImage;
+        else
+            return nil;
+    }
     else
         return [message objectForKey: @"Message"];
 }
@@ -240,8 +225,18 @@
 
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
-    return [NSString stringWithFormat: @"%@ %@ %@", [message objectForKey: @"Date"],
-                [message objectForKey: @"Level"], [message objectForKey: @"Message"]];
+    int level = [[message objectForKey: @"Level"] intValue];
+    NSString * levelString;
+    if (level == TR_MSG_ERR)
+        levelString = @"Error";
+    else if (level == TR_MSG_INF)
+        levelString = @"Info";
+    else if (level == TR_MSG_DBG)
+        levelString = @"Debug";
+    else
+        levelString = @"???";
+    
+    return [NSString stringWithFormat: @"%@ %@ %@", [message objectForKey: @"Date"], levelString, [message objectForKey: @"Message"]];
 }
 
 - (void) setDebugWarningHidden: (BOOL) hide

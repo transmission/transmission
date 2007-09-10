@@ -26,7 +26,6 @@
 
 @interface MessageWindowController : NSWindowController
 {
-    //IBOutlet NSTextView * fTextView;
     IBOutlet NSTableView * fMessageView;
     IBOutlet NSScrollView * fScrollView;
     
@@ -35,6 +34,8 @@
     NSMutableArray * fMessages;
     
     NSTimer * fTimer;
+    
+    NSImage * fErrorImage, * fInfoImage, * fDebugImage;
     
     IBOutlet NSTextField * fDebugWarningField;
     IBOutlet NSImageView * fDebugWarningIcon;
