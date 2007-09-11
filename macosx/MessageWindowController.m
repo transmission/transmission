@@ -66,7 +66,11 @@
 
 - (void) awakeFromNib
 {
-    [[self window] center];
+    NSWindow * window = [self window];
+    [window setFrameAutosaveName: @"MessageWindowFrame"];
+    [window setFrameUsingName: @"MessageWindowFrame"];
+    
+    [window center];
     
     //initially sort peer table by IP
     if ([[fMessageTable sortDescriptors] count] == 0)
