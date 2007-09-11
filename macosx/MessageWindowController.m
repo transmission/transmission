@@ -164,8 +164,31 @@
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
 {
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
-    
     [fMessageTable reloadData];
+}
+
+- (void) copy: (id) sender
+{
+    NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
+    NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
+    
+    unsigned int i;
+    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+        [messageStrings addObject: [self stringForMessage: [fMessages objectAtIndex: i]]];
+    
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: self];
+    [pb setString: [messageStrings componentsJoinedByString: @"\n"] forType: NSStringPboardType];
+}
+
+- (BOOL) validateMenuItem: (NSMenuItem *) menuItem
+{
+    SEL action = [menuItem action];
+    
+    if (action == @selector(copy:))
+        return [fMessageTable numberOfSelectedRows] > 0;
+    
+    return YES;
 }
 
 - (void) changeLevel: (id) sender
