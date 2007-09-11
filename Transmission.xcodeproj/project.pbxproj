@@ -10,7 +10,6 @@
 		002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */ = {isa = PBXBuildFile; fileRef = 002C9EE50C19CD2500C2F6F4 /* fastresume.c */; };
 		35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */; };
 		35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */; };
-		35F372150C2D780600DAA8F2 /* InfoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F372130C2D780600DAA8F2 /* InfoWindow.m */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.c */; };
 		4394AC680C74FB6000F367E8 /* publish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC650C74FB6000F367E8 /* publish.c */; };
@@ -295,8 +294,6 @@
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Transmission_Prefix.pch; path = macosx/Transmission_Prefix.pch; sourceTree = "<group>"; };
 		35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOn.png; path = macosx/Images/ResumeNoWaitOn.png; sourceTree = "<group>"; };
 		35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOff.png; path = macosx/Images/ResumeNoWaitOff.png; sourceTree = "<group>"; };
-		35F372120C2D780500DAA8F2 /* InfoWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoWindow.h; path = macosx/InfoWindow.h; sourceTree = "<group>"; };
-		35F372130C2D780600DAA8F2 /* InfoWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoWindow.m; path = macosx/InfoWindow.m; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilePriorityCell.h; path = macosx/FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ptrarray.c; path = libtransmission/ptrarray.c; sourceTree = "<group>"; };
@@ -1017,8 +1014,6 @@
 			children = (
 				A200B8390A2263BA007BBB1E /* InfoWindowController.h */,
 				A200B83A0A2263BA007BBB1E /* InfoWindowController.m */,
-				35F372120C2D780500DAA8F2 /* InfoWindow.h */,
-				35F372130C2D780600DAA8F2 /* InfoWindow.m */,
 				A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */,
 				A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */,
 				A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */,
@@ -1469,7 +1464,6 @@
 				A24838820C0BA608005CC3FE /* FilterBarView.m in Sources */,
 				A215760B0C0D449A0057A26A /* NSBezierPathAdditions.m in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */,
-				35F372150C2D780600DAA8F2 /* InfoWindow.m in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */,
 				A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */,

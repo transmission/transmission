@@ -76,8 +76,6 @@
 - (void) setNextTab;
 - (void) setPreviousTab;
 
-- (void) setFileOutlineHoverRowForEvent: (NSEvent *) event;
-
 - (void) setPiecesView: (id) sender;
 - (void) setPiecesViewForAvailable: (BOOL) available;
 

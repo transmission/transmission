@@ -82,6 +82,9 @@
     [window setFrameAutosaveName: @"InspectorWindowFrame"];
     [window setFrameUsingName: @"InspectorWindowFrame"];
     
+    [window setBecomesKeyOnlyIfNeeded: YES];
+    [window setAcceptsMouseMovedEvents: YES];
+    
     //select tab
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
     
@@ -993,12 +996,11 @@
         return [outlineView rowHeight];
 }
 
-- (void) setFileOutlineHoverRowForEvent: (NSEvent *) event
+- (void) mouseMoved: (NSEvent *) event
 {
     [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
                                         ? event : nil];
 }
-
 - (NSArray *) peerSortDescriptors
 {
     NSMutableArray * descriptors = [NSMutableArray array];
