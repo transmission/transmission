@@ -82,7 +82,7 @@
     
     fErrorImage = [NSImage imageNamed: @"RedDot.tiff"];
     fInfoImage = [NSImage imageNamed: @"YellowDot.tiff"];
-    fDebugImage = [NSImage imageNamed: @"GreenDot.tiff"];
+    fDebugImage = [NSImage imageNamed: @"PurpleDot.png"];
     
     //set images to popup button items
     [[fLevelButton itemAtIndex: LEVEL_ERROR] setImage: fErrorImage];

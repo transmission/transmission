@@ -123,6 +123,7 @@
 		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
+		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
@@ -486,6 +487,7 @@
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
+		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
@@ -764,6 +766,7 @@
 				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
 				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
 				A2D4F0820A915F6600890C32 /* RedDot.tiff */,
+				A2EF7DEB0C96297400FA9811 /* PurpleDot.png */,
 				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
@@ -1337,6 +1340,7 @@
 				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
 				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
 				A261A8260C6A0D68003BAFDA /* Error.png in Resources */,
+				A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
