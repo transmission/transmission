@@ -30,7 +30,7 @@
 #define LEVEL_DEBUG 2
 
 #define UPDATE_SECONDS  0.6
-#define MAX_MESSAGES    2500
+#define MAX_MESSAGES    4000
 
 @interface MessageWindowController (Private)
 
@@ -70,8 +70,6 @@
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
     
-    [window center];
-    
     //initially sort peer table by IP
     if ([[fMessageTable sortDescriptors] count] == 0)
     {
@@ -95,14 +93,8 @@
         [fLevelButton selectItemAtIndex: LEVEL_ERROR];
     else if (level == TR_MSG_INF)
         [fLevelButton selectItemAtIndex: LEVEL_INFO];
-    else if (level == TR_MSG_DBG)
-        [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
     else
-    {
-        level = TR_MSG_ERR;
-        [fLevelButton selectItemAtIndex: LEVEL_ERROR];
-        [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
-    }
+        [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
     
     [self setDebugWarningHidden: level != TR_MSG_DBG];
 }
@@ -121,7 +113,6 @@
     
     tr_freeMessageList(messages);
     
-    #warning still needed?
     int total = [fMessages count];
     if (total > MAX_MESSAGES)
     {
@@ -158,10 +149,8 @@
             return fErrorImage;
         else if (level == TR_MSG_INF)
             return fInfoImage;
-        else if (level == TR_MSG_DBG)
-            return fDebugImage;
         else
-            return nil;
+            return fDebugImage;
     }
     else
         return [message objectForKey: @"Message"];
@@ -289,12 +278,10 @@
         levelString = @"Error";
     else if (level == TR_MSG_INF)
         levelString = @"Info";
-    else if (level == TR_MSG_DBG)
-        levelString = @"Debug";
     else
-        levelString = @"???";
+        levelString = @"Debug";
     
-    return [NSString stringWithFormat: @"%@ %@ %@", [message objectForKey: @"Date"], levelString, [message objectForKey: @"Message"]];
+    return [NSString stringWithFormat: @"%@ [%@] %@", [message objectForKey: @"Date"], levelString, [message objectForKey: @"Message"]];
 }
 
 - (void) setDebugWarningHidden: (BOOL) hide

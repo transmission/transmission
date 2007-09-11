@@ -101,6 +101,11 @@
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
+    //set priority item images
+    [fFilePriorityNormal setImage: [NSImage imageNamed: @"PriorityNormal.png"]];
+    [fFilePriorityLow setImage: [NSImage imageNamed: @"PriorityLow.png"]];
+    [fFilePriorityHigh setImage: [NSImage imageNamed: @"PriorityHigh.png"]];
+    
     //set blank inspector
     [self updateInfoForTorrents: [NSArray array]];
     
