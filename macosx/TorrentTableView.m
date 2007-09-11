@@ -449,10 +449,7 @@
     NSImage * pauseImage = nil;
     NSRect pauseRect  = [self pauseRectForRow: row];
     if ([torrent isActive])
-    {
-        if (![torrent isChecking])
-            pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
-    }
+        pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
     else if ([torrent isPaused])
     {
         BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
