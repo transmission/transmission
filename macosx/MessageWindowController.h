@@ -27,7 +27,6 @@
 @interface MessageWindowController : NSWindowController
 {
     IBOutlet NSTableView * fMessageTable;
-    IBOutlet NSScrollView * fScrollView;
     
     IBOutlet NSPopUpButton * fLevelButton;
     

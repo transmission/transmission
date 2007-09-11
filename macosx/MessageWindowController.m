@@ -120,7 +120,15 @@
     #warning still needed?
     int total = [fMessages count];
     if (total > MAX_MESSAGES)
+    {
+        //remove the oldest
+        NSSortDescriptor * descriptor = [[[NSSortDescriptor alloc] initWithKey: @"Date" ascending: YES] autorelease];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: descriptor, nil];
+        [fMessages sortUsingDescriptors: descriptors];
+        [descriptors release];
+        
         [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
+    }
     
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
     
@@ -169,6 +177,9 @@
 
 - (void) copy: (id) sender
 {
+    NSPasteboard * pb = [NSPasteboard generalPasteboard];
+    [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: self];
+    
     NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
     
@@ -176,8 +187,6 @@
     for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
         [messageStrings addObject: [self stringForMessage: [fMessages objectAtIndex: i]]];
     
-    NSPasteboard * pb = [NSPasteboard generalPasteboard];
-    [pb declareTypes: [NSArray arrayWithObject: NSStringPboardType] owner: self];
     [pb setString: [messageStrings componentsJoinedByString: @"\n"] forType: NSStringPboardType];
 }
 
