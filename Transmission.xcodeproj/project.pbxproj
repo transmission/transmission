@@ -1716,6 +1716,7 @@
 		0053D3D60C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Development;
@@ -1723,6 +1724,7 @@
 		0053D3D70C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Development;
@@ -1730,6 +1732,7 @@
 		0053D3D80C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Development;
@@ -1737,6 +1740,7 @@
 		0053D3D90C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = Development;
@@ -1773,6 +1777,7 @@
 		4DDBB71E09E16BF100284745 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = transmissioncli;
 			};
 			name = Release;
@@ -1816,6 +1821,7 @@
 		BEFC1C0A0C07753800B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Release;
@@ -1823,6 +1829,7 @@
 		BEFC1CF80C07822400B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
@@ -1830,6 +1837,7 @@
 		BEFC1D420C0783EE00B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
 				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = Release;

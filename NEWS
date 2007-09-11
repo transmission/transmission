@@ -6,6 +6,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Only report downloaded, verified good pieces in tracker `download' field
  - OS X:
    + Per-torrent action menu
+   + Redesigned message log
    + Inspector can be resized vertically in Peers and Files tabs
 
 0.82 (2007/09/09)
