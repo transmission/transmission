@@ -1001,6 +1001,7 @@
     [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
                                         ? event : nil];
 }
+
 - (NSArray *) peerSortDescriptors
 {
     NSMutableArray * descriptors = [NSMutableArray array];
