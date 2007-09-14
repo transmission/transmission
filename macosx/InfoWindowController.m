@@ -808,6 +808,17 @@
         
         if ([ident isEqualToString: @"Connected"])
             return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
+        else if ([ident isEqualToString: @"Encryption"])
+        {
+            /*if ([[peer objectForKey: @"Encryption"] boolValue])
+            {
+                if (!fLockImage)
+                    fLockImage = [NSImage imageNamed: @"Lock.tiff"];
+                return fLockImage;
+            }
+            else*/
+                return nil;
+        }
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
@@ -862,10 +873,11 @@
     if (tableView == fPeerTable)
     {
         NSDictionary * peer = [fPeers objectAtIndex: row];
+        BOOL connected = [[peer objectForKey: @"Connected"] boolValue];
         
-        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 3];
+        NSMutableArray * components = [NSMutableArray arrayWithCapacity: connected ? 4 : 2];
         
-        if ([[peer objectForKey: @"Connected"] boolValue])
+        if (connected)
             [components addObject: [NSString stringWithFormat:
                                     NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
                                     [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
@@ -887,9 +899,39 @@
         else
             [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
         
+        /*if (connected && [[peer objectForKey: @"Encryption"] boolValue])
+            [components addObject: @"Encrypted Connection"];*/
+        
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;
+}
+
+- (NSArray *) peerSortDescriptors
+{
+    NSMutableArray * descriptors = [NSMutableArray array];
+    
+    NSArray * oldDescriptors = [fPeerTable sortDescriptors];
+    BOOL useSecond = YES, asc = YES;
+    if ([oldDescriptors count] > 0)
+    {
+        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
+        [descriptors addObject: descriptor];
+        
+        if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
+            asc = [descriptor ascending];
+    }
+    
+    //sort by IP after primary sort
+    if (useSecond)
+    {
+        NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
+                                                                        selector: @selector(compareIP:)];
+        [descriptors addObject: secondDescriptor];
+        [secondDescriptor release];
+    }
+    
+    return descriptors;
 }
 
 - (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
@@ -1000,33 +1042,6 @@
 {
     [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
                                         ? event : nil];
-}
-
-- (NSArray *) peerSortDescriptors
-{
-    NSMutableArray * descriptors = [NSMutableArray array];
-    
-    NSArray * oldDescriptors = [fPeerTable sortDescriptors];
-    BOOL useSecond = YES, asc = YES;
-    if ([oldDescriptors count] > 0)
-    {
-        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
-        [descriptors addObject: descriptor];
-        
-        if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
-            asc = [descriptor ascending];
-    }
-    
-    //sort by IP after primary sort
-    if (useSecond)
-    {
-        NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
-                                                                        selector: @selector(compareIP:)];
-        [descriptors addObject: secondDescriptor];
-        [secondDescriptor release];
-    }
-    
-    return descriptors;
 }
 
 - (void) setPiecesView: (id) sender

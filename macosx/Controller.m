@@ -92,10 +92,9 @@
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 #define DONATE_URL   @"http://transmission.m0k.org/donate.php"
 
-static void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
+void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
-    Controller * c = controller;
-    [c sleepCallBack: messageType argument: messageArgument];
+    [(Controller *)controller sleepCallBack: messageType argument: messageArgument];
 }
 
 @implementation Controller
@@ -302,11 +301,11 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
-    if (fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator))
+    if ((fRootPort = IORegisterForSystemPower(self, & notify, sleepCallBack, & iterator)) != 0)
         CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(notify), kCFRunLoopCommonModes);
     else
         NSLog(@"Could not IORegisterForSystemPower");
-
+    
     //load previous transfers
     NSArray * history = [[NSArray alloc] initWithContentsOfFile: [[self applicationSupportFolder]
                                                 stringByAppendingPathComponent: @"Transfers.plist"]];
@@ -3083,7 +3082,6 @@ static void sleepCallBack(void * controller, io_service_t y, natural_t messageTy
             break;
 
         case kIOMessageCanSystemSleep:
-            
             allowSleep = YES;
             if ([fDefaults boolForKey: @"SleepPrevent"])
             {
