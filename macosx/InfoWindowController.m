@@ -63,19 +63,13 @@
 
 @implementation InfoWindowController
 
-- (id) initWithWindowNibName: (NSString *) name
-{
-    if ((self = [super initWithWindowNibName: name]))
-    {
-        fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-        fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
-        fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
-    }
-    return self;
-}
-
 - (void) awakeFromNib
 {
+    //get images
+    fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
+    fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
+    fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
+    
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
@@ -873,14 +867,17 @@
     if (tableView == fPeerTable)
     {
         NSDictionary * peer = [fPeers objectAtIndex: row];
-        BOOL connected = [[peer objectForKey: @"Connected"] boolValue];
+        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
         
-        NSMutableArray * components = [NSMutableArray arrayWithCapacity: connected ? 4 : 2];
-        
-        if (connected)
+        if ([[peer objectForKey: @"Connected"] boolValue])
+        {
             [components addObject: [NSString stringWithFormat:
                                     NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
                                     [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
+            
+            /*if ([[peer objectForKey: @"Encryption"] boolValue])
+                [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];*/
+        }
         
         int port;
         if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
@@ -898,9 +895,6 @@
             [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
         else
             [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
-        
-        /*if (connected && [[peer objectForKey: @"Encryption"] boolValue])
-            [components addObject: @"Encrypted Connection"];*/
         
         return [components componentsJoinedByString: @"\n"];
     }
