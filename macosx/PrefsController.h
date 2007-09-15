@@ -34,7 +34,7 @@
     NSUserDefaults          * fDefaults;
     BOOL                    fHasLoaded;
     
-    IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fNetworkView;
+    IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fAdvancedView;
     
     IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;

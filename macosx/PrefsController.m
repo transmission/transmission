@@ -35,7 +35,7 @@
 #define TOOLBAR_GENERAL     @"TOOLBAR_GENERAL"
 #define TOOLBAR_TRANSFERS   @"TOOLBAR_TRANSFERS"
 #define TOOLBAR_BANDWIDTH   @"TOOLBAR_BANDWIDTH"
-#define TOOLBAR_NETWORK     @"TOOLBAR_NETWORK"
+#define TOOLBAR_ADVANCED    @"TOOLBAR_ADVANCED"
 
 @interface PrefsController (Private)
 
@@ -195,10 +195,10 @@
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
     }
-    else if ([ident isEqualToString: TOOLBAR_NETWORK])
+    else if ([ident isEqualToString: TOOLBAR_ADVANCED])
     {
-        [item setLabel: NSLocalizedString(@"Network", "Preferences -> Network toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Network.png"]];
+        [item setLabel: NSLocalizedString(@"Advanced", "Preferences -> Advanced toolbar item title")];
+        [item setImage: [NSImage imageNamed: @"Advanced.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -225,7 +225,7 @@
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
-                                        TOOLBAR_BANDWIDTH, TOOLBAR_NETWORK, nil];
+                                        TOOLBAR_BANDWIDTH, TOOLBAR_ADVANCED, nil];
 }
 
 - (void) setPort: (id) sender
@@ -264,13 +264,13 @@
         if (fNatStatus == TR_NAT_TRAVERSAL_MAPPED)
         {
             [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
-                                                "Preferences -> Network -> port map status")];
+                                                "Preferences -> Advanced -> port map status")];
             [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
         }
         else if (fNatStatus == TR_NAT_TRAVERSAL_NOTFOUND || fNatStatus == TR_NAT_TRAVERSAL_ERROR)
         {
             [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
-                                                "Preferences -> Network -> port map status")];
+                                                "Preferences -> Advanced -> port map status")];
             [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
         }
         else
@@ -285,7 +285,7 @@
         fPublicPort = stat->publicPort;
         
         [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",
-                                            "Preferences -> Network -> port status") stringByAppendingEllipsis]];
+                                            "Preferences -> Advanced -> port status") stringByAppendingEllipsis]];
         [fPortStatusImage setImage: nil];
         [fPortStatusProgress startAnimation: self];
         
@@ -300,20 +300,20 @@
     switch ([portChecker status])
     {
         case PORT_STATUS_OPEN:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
             break;
         case PORT_STATUS_STEALTH:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
             break;
         case PORT_STATUS_CLOSED:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status")];
+            [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
             break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
-                                                "Preferences -> Network -> port status")];
+                                                "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.tiff"]];
             break;
     }
@@ -589,8 +589,8 @@
             view = fTransfersView;
         else if ([identifier isEqualToString: TOOLBAR_BANDWIDTH])
             view = fBandwidthView;
-        else if ([identifier isEqualToString: TOOLBAR_NETWORK])
-            view = fNetworkView;
+        else if ([identifier isEqualToString: TOOLBAR_ADVANCED])
+            view = fAdvancedView;
         else;
     }
     
@@ -625,8 +625,8 @@
             }
     }
     
-    //for network view make sure progress indicator hides itself
-    if (view == fNetworkView && [fPortStatusImage image])
+    //for advanced view make sure progress indicator hides itself
+    if (view == fAdvancedView && [fPortStatusImage image])
         [fPortStatusProgress setDisplayedWhenStopped: NO];
 }
 

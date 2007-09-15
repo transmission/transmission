@@ -32,6 +32,7 @@
             CLASS = PrefsController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fAdvancedView = NSView; 
                 fBandwidthView = NSView; 
                 fDownloadField = NSTextField; 
                 fDownloadSoundPopUp = NSPopUpButton; 
@@ -42,7 +43,6 @@
                 fNatCheck = NSButton; 
                 fNatStatusField = NSTextField; 
                 fNatStatusImage = NSImageView; 
-                fNetworkView = NSView; 
                 fPortField = NSTextField; 
                 fPortStatusField = NSTextField; 
                 fPortStatusImage = NSImageView; 

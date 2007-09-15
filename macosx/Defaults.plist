@@ -42,6 +42,8 @@
 	<integer>100</integer>
 	<key>DownloadSound</key>
 	<string>Glass</string>
+	<key>EncryptionRequire</key>
+	<false/>
 	<key>Filter</key>
 	<string>None</string>
 	<key>FilterBar</key>
@@ -84,7 +86,7 @@
 	<string>Submarine</string>
 	<key>ShowInspector</key>
 	<false/>
-    <key>SleepPrevent</key>
+	<key>SleepPrevent</key>
 	<true/>
 	<key>SmallStatusRegular</key>
 	<true/>
