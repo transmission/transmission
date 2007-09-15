@@ -178,7 +178,7 @@
             
             [fPexCheck setEnabled: NO];
             [fPexCheck setState: NSOffState];
-            [fPexCheck setToolTip: @""];
+            [fPexCheck setToolTip: nil];
         }
         
         [fImageView setImage: fAppIcon];
@@ -481,11 +481,9 @@
     if ([fTorrents count] == 0)
         return;
 
-    Torrent * torrent;
-    
     //get bandwidth info
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    torrent = [enumerator nextObject]; //first torrent
+    Torrent * torrent = [enumerator nextObject]; //first torrent
     
     int uploadSpeedMode = [torrent speedMode: YES],
         uploadSpeedLimit = [torrent speedLimit: YES],
@@ -601,7 +599,7 @@
     [fPexCheck setEnabled: pexEnabled];
     [fPexCheck setState: pexState];
     [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
-                                "Inspector -> pex check") : @""];
+                                "Inspector -> pex check") : nil];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
