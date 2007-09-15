@@ -108,11 +108,7 @@
     
     //allow for update notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver: self selector: @selector(updateInfoStats)
-            name: @"UpdateStats" object: nil];
-    
-    [nc addObserver: self selector: @selector(updateInfoSettings)
-            name: @"UpdateSettings" object: nil];
+    [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
 }
 
 - (void) dealloc
@@ -308,7 +304,7 @@
     }
     
     //update stats and settings
-    [self updateInfoSettings];
+    [self updateInfoStats];
     
     [fPeerTable reloadData];
     [fFileOutline deselectAll: nil];
@@ -331,6 +327,8 @@
         [self updateInfoGeneral];
     else if ([ident isEqualToString: TAB_FILES_IDENT])
         [self updateInfoFiles];
+    else if ([ident isEqualToString: TAB_OPTIONS_IDENT])
+        [self updateInfoSettings];
     else;
 }
 
@@ -579,14 +577,15 @@
                 pexState = NSMixedState;
         }
 		
-        #warning change even when already active
 		[fPexCheck setEnabled: pexEnabled];
 		[fPexCheck setState: pexState];
-        [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on public torrents when paused.",
+        [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
                                     "Inspector -> pex check") : @""];
     }
     else
     {
+        #warning move
+        
         [fUploadLimitPopUp setEnabled: NO];
         [fUploadLimitPopUp selectItemAtIndex: -1];
         [fUploadLimitField setHidden: YES];
@@ -608,14 +607,6 @@
         [fPexCheck setState: NSOffState];
         [fPexCheck setToolTip: @""];
     }
-    
-    [self updateInfoStats];
-}
-
-- (void) updateRatioForTorrent: (Torrent *) torrent
-{
-    if ([fTorrents containsObject: torrent])
-        [self updateInfoSettings];
 }
 
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem

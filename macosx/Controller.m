@@ -2113,7 +2113,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [self updateTorrentsInQueue];
     [fInfoController updateInfoStats];
-    [fInfoController updateRatioForTorrent: torrent];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {

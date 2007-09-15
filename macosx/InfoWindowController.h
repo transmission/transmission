@@ -71,8 +71,6 @@
 - (Torrent *) selectedTorrent;
 - (void) updateInfoStats;
 
-- (void) updateRatioForTorrent: (Torrent *) torrent;
-
 - (void) setNextTab;
 - (void) setPreviousTab;
 

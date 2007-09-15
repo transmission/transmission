@@ -394,7 +394,7 @@
     
     [fMenuTorrent setSpeedMode: mode upload: [sender menu] == fUploadMenu];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 - (void) setQuickLimit: (id) sender
@@ -403,7 +403,7 @@
     [fMenuTorrent setSpeedMode: TR_SPEEDLIMIT_SINGLE upload: upload];
     [fMenuTorrent setSpeedLimit: [[sender title] intValue] upload: upload];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 - (void) setQuickRatioMode: (id) sender
@@ -420,7 +420,7 @@
     
     [fMenuTorrent setRatioSetting: mode];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 - (void) setQuickRatio: (id) sender
@@ -428,7 +428,7 @@
     [fMenuTorrent setRatioSetting: NSOnState];
     [fMenuTorrent setRatioLimit: [[sender title] floatValue]];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateSettings" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 - (void) checkFile: (id) sender
