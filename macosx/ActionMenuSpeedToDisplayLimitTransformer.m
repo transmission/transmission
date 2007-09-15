@@ -38,7 +38,7 @@
 
 - (id) transformedValue: (id) value
 {
-    return value == nil ?  nil : [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
+    return value == nil ? nil : [NSString stringWithFormat: NSLocalizedString(@"Limit (%d KB/s)",
                     "Action context menu -> upload/download limit"), [value intValue]];
 }
 

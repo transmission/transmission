@@ -566,21 +566,24 @@
 		enumerator = [fTorrents objectEnumerator];
         torrent = [enumerator nextObject]; //first torrent
 		
-		BOOL pexEnabled = ![torrent privateTorrent];
+		BOOL pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
 		int pexState = [torrent pex] ? NSOnState : NSOffState;
 		
 		while ((pexEnabled || pexState != NSMixedState)
                 && (torrent = [enumerator nextObject]))
         {
             if (pexEnabled)
-                pexEnabled = ![torrent privateTorrent];
+                pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
             
             if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
                 pexState = NSMixedState;
         }
 		
+        #warning change even when already active
 		[fPexCheck setEnabled: pexEnabled];
 		[fPexCheck setState: pexState];
+        [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on public torrents when paused.",
+                                    "Inspector -> pex check") : @""];
     }
     else
     {
@@ -603,6 +606,7 @@
 		
 		[fPexCheck setEnabled: NO];
         [fPexCheck setState: NSOffState];
+        [fPexCheck setToolTip: @""];
     }
     
     [self updateInfoStats];

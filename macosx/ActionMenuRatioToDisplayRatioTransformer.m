@@ -38,7 +38,7 @@
 
 - (id) transformedValue: (id) value
 {
-    return value == nil ?  nil : [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
+    return value == nil ? nil : [NSString stringWithFormat: NSLocalizedString(@"Stop at Ratio (%.2f)",
                                                 "Action context menu -> ratio stop"), [value floatValue]];
 }
 
