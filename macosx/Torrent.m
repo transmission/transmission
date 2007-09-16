@@ -1039,7 +1039,7 @@ static int static_lastid = 0;
             if (peer->isUploading)
                 [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
             
-            //[dic setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
+            [dic setObject: [NSNumber numberWithBool: /*peer->isEncrypted*/NO] forKey: @"Encryption"];
             
             [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         }

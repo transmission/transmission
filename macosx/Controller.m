@@ -2647,8 +2647,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) doNothing: (id) sender {}
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier:
-    (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+- (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
     NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
 
@@ -2743,7 +2742,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return nil;
     }
 
-    return item;
+    return [item autorelease];
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) t

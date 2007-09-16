@@ -209,7 +209,7 @@
         return nil;
     }
 
-    return item;
+    return [item autorelease];
 }
 
 - (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar

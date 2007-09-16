@@ -792,13 +792,13 @@
             return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
         else if ([ident isEqualToString: @"Encryption"])
         {
-            /*if ([[peer objectForKey: @"Encryption"] boolValue])
+            if ([[peer objectForKey: @"Encryption"] boolValue])
             {
                 if (!fLockImage)
                     fLockImage = [NSImage imageNamed: @"Lock.tiff"];
                 return fLockImage;
             }
-            else*/
+            else
                 return nil;
         }
         else if ([ident isEqualToString: @"Client"])
@@ -863,8 +863,8 @@
                                     NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
                                     [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
             
-            /*if ([[peer objectForKey: @"Encryption"] boolValue])
-                [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];*/
+            if ([[peer objectForKey: @"Encryption"] boolValue])
+                [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
         }
         
         int port;
