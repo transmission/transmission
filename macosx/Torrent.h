@@ -57,7 +57,7 @@ typedef enum
     NSUserDefaults * fDefaults;
 
     NSImage * fIcon;
-    NSMutableString * fNameString, * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
+    NSString * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
     tr_file_stat_t * fileStat;
     NSArray * fFileList, * fFlatFileList;

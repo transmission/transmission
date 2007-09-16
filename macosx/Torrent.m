@@ -279,10 +279,10 @@ static int static_lastid = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
 	
-	NSMutableString * progressString = [NSMutableString stringWithString: @""],
-					* remainingTimeString = [NSMutableString stringWithString: @""],
-					* statusString = [NSMutableString string],
-					* shortStatusString = [NSMutableString string];
+	NSMutableString * progressString = [[NSMutableString alloc] initWithString: @""],
+					* remainingTimeString = [[NSMutableString alloc] initWithString: @""],
+					* statusString = [[NSMutableString alloc] initWithString: @""],
+					* shortStatusString = [[NSMutableString alloc] initWithString: @""];
 
     if (![self allDownloaded])
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
@@ -461,10 +461,18 @@ static int static_lastid = 0;
         [shortStatusString appendString: stringToAppend];
     }
 	
-	[fProgressString setString: progressString];
-	[fStatusString setString: statusString];
-	[fShortStatusString setString: shortStatusString];
-	[fRemainingTimeString setString: remainingTimeString];
+    //retain the strings
+    [fProgressString release];
+    fProgressString = progressString;
+    
+    [fStatusString release];
+	fStatusString = statusString;
+    
+    [fShortStatusString release];
+    fShortStatusString = shortStatusString;
+    
+    [fRemainingTimeString release];
+    fRemainingTimeString = remainingTimeString;
 }
 
 - (void) startTransfer
@@ -1497,11 +1505,6 @@ static int static_lastid = 0;
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fError = NO;
-
-    fProgressString = [[NSMutableString alloc] initWithCapacity: 50];
-    fStatusString = [[NSMutableString alloc] initWithCapacity: 75];
-    fShortStatusString = [[NSMutableString alloc] initWithCapacity: 30];
-    fRemainingTimeString = [[NSMutableString alloc] initWithCapacity: 30];
     
     [self createFileList];
     

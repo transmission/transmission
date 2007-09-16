@@ -165,8 +165,7 @@
     fUpdater = updater;
 }
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident
-                    willBeInsertedIntoToolbar: (BOOL) flag
+- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
     NSToolbarItem * item;
     item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
