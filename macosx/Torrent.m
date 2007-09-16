@@ -279,10 +279,10 @@ static int static_lastid = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
 	
-	NSMutableString * progressString = [[NSMutableString alloc] initWithString: @""],
-					* remainingTimeString = [[NSMutableString alloc] initWithString: @""],
-					* statusString = [[NSMutableString alloc] initWithString: @""],
-					* shortStatusString = [[NSMutableString alloc] initWithString: @""];
+	NSMutableString * progressString = [[NSMutableString alloc] init],
+					* remainingTimeString = [[NSMutableString alloc] init],
+					* statusString = [[NSMutableString alloc] init],
+					* shortStatusString = [[NSMutableString alloc] init];
 
     if (![self allDownloaded])
         [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
@@ -466,7 +466,7 @@ static int static_lastid = 0;
     fProgressString = progressString;
     
     [fStatusString release];
-	fStatusString = statusString;
+    fStatusString = statusString;
     
     [fShortStatusString release];
     fShortStatusString = shortStatusString;
