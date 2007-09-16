@@ -186,22 +186,16 @@ static int static_lastid = 0;
 - (void) changeIncompleteDownloadFolder: (NSString *) folder
 {
     fUseIncompleteFolder = folder != nil;
-    if (fIncompleteFolder)
-    {
-        [fIncompleteFolder release];
-        fIncompleteFolder = nil;
-    }
     
-    if (folder)
-        fIncompleteFolder = [folder retain];
+    [fIncompleteFolder release];
+    fIncompleteFolder = fUseIncompleteFolder ? [folder retain] : nil;
     
     [self updateDownloadFolder];
 }
 
 - (void) changeDownloadFolder: (NSString *) folder
 {
-    if (fDownloadFolder)
-        [fDownloadFolder release];
+    [fDownloadFolder release];
     fDownloadFolder = [folder retain];
     
     [self updateDownloadFolder];
@@ -255,8 +249,7 @@ static int static_lastid = 0;
             fIncompleteFolder = nil;
         }
 		
-		if (fDateCompleted)
-			[fDateCompleted release];
+		[fDateCompleted release];
 		fDateCompleted = [[NSDate alloc] init];
         
         fStat = tr_torrentStat(fHandle);
@@ -322,8 +315,7 @@ static int static_lastid = 0;
             break;
 
         case TR_STATUS_CHECK_WAIT:
-            tempString = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string")
-                            stringByAppendingEllipsis];
+            tempString = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
             
             [statusString setString: tempString];
             [shortStatusString setString: tempString];
