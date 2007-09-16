@@ -1,0 +1,53 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Troubleshooting Automatic Port Forwarding</title>
+	</head>
+	<body>
+		<div id="mainbox">
+			<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp">
+				<a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>UPnP</h1>
+			</div>
+			<p>If the port mapping is unsuccessful and you have a UPnP compatible router, make sure:
+			<ul>
+				<li>UPnP is enabled. Consult your router's documentation for instructions. If your router doesn't support UPnP, you will have to forward <a href="pfrouter.html">manually</a>.</li>
+				<li>DMZ mode is disabled.</li>
+				<li>The port has not already been forwarded manually.
+			</ul>
+			
+			<p>If you are still having problems, open the Message Log (in the Window menu) and post the debug output on the <a href="http://transmission.m0k.org/forum/viewforum.php?f=2">support forums</a>.
+			Make sure you pause your torrents first; then clear the log, and toggle "Automatically forward port". Post this output.
+			
+			<div id="pagetitle">
+				<h1>Airport</h1>
+			</div>
+			<p>If you have an Apple Airport, make sure NAT-PMP is enabled. To do this:
+				<div summary="To do this" id="taskbox">
+				<ol>
+					<li>Open Airport Admin Utility</li>
+					<li>Select your base station and click "Configure".</li>
+					<li>In the "AirPort" tab, click "Base Station Options...".</li>
+					<li>In the "Ethernet Port Security" tab, check the "Enable NAT Port Mapping Protocol" checkbox.</li>
+					<li>Click "OK".</li>
+					<li>Click "Update".
+					<p>NB: NAT-PMP requires MacOS X 10.4 Tiger, as well as up to date Airport software and firmware.</li>
+				</ol>
+				</div>
+				
+			</div>
+
+		</div>
+	</body>
+	
+</html>

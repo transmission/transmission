@@ -1,0 +1,33 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Troubleshooting Port Still Closed</title>
+	</head>
+	<body>
+		<div id="mainbox">
+			<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp">
+				<a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>My port maps successfully, but it is still closed?</h1>
+			</div>
+			<p>Make sure the OS X firewall is either disabled, or you have <a href="pffirewall.html">allowed Transmission's port</a>.
+			The firewall can cause the port to remain closed, even if it has been successfully mapped by the router.
+			
+			<p>If you have multiple routers in your home network, you must forward Transmission's port on all of them, otherwise it will continue to show up as closed.
+			Transmission can only automatically port map the router the computer is directly connected to. Any others in between this router and your modem will have to be <a href="pfrouter.html">forwarded manually</a>.
+			For detailed instructions, <a href="http://www.portforward.com/help/doublerouterportforwarding.htm">click here</a>.
+			</div>
+
+		</div>
+	</body>
+	
+</html>

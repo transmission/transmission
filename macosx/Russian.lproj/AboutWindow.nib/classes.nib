@@ -1,0 +1,18 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {hideLicense = id; showLicense = id; }; 
+            CLASS = AboutWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fLicenseSheet = NSPanel; 
+                fLicenseView = NSTextView; 
+                fTextView = NSTextView; 
+                fVersionField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

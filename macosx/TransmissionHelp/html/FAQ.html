@@ -1,0 +1,88 @@
+<html>
+
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
+		<title>Frequently Asked Questions</title>
+	</head>
+	<body>
+		<div id="mainbox">
+		<A NAME="TransFAQ"></A>
+		<div id="banner">
+				<a name="menus"></a>
+				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
+				</div>
+				<div id="index">
+				<a class="leftborder" href="../html/Index2.html">Index</a></div>
+				</div>
+			</div>
+			<div id="pagetitle">
+				<h1>Why is my download so slow? </h1>
+			</div>
+				<p>Read these tips for <a href="Speed.html">maximizing your download speed</a>.
+				<p>Some Internet Service Providers (ISPs) block traffic on well known peer to peer ports. If this applies to your ISP, try changing the port Transmission uses. 
+				Some ISPs also throttle all peer to peer (esp BitTorrent) traffic, which can slow or even stop your transfers. Protocol encryption is not a feature at the moment, however is slated for a future release.
+				
+				<p>Ultimately, the speed you get depends on the quality of the peers you are downloading from. If they have dial up connections, you are only going to be able to download at dial up speeds. 
+				Furthermore, if there are few seeds and many peers, more people will be fighting for the same scarce pieces which will slow things down. 
+				Best results are achieved when the torrent has more seeds than peers. 
+				<p>
+			<div id="pagetitle">
+				<h1>Why isn't my torrent downloading at all? </h1>
+			</div>
+				<p>Normally this is because the tracker is down, and thus Transmission is unable to interact with other peers. DHT (trackerless torrents) is not a feature at the moment, however is slated for a future release. 
+				<p>If there are no seeders in the swarm, and all the other peers have sent you what they have, you (and everyone else) will not be able to complete the download, and your speed will drop to zero.
+				<p>Torrents take a while to get going and so may not download much (if at all) initially. Most torrents are downloading at some rate after 15 or so minutes. 
+				<p>
+			<div id="pagetitle">
+				<h1>Transmission crashed, what should I do? </h1>
+			</div>
+				<p>Post the crash log on the <a href="http://transmission.m0k.org/forum/viewforum.php?f=2">support forums</a> so that the issue can be fixed as quickly as possible. Crash logs are held in ~/Library/Logs/CrashReporter/
+				<p>If your torrents' progress are incorrect when you reopen Transmission (eg they are starting from 0%) then you should manually recheck them. <a href="check.html">Click here</a> for instructions.
+				<p>
+			<div id="pagetitle">
+				<h1>What is PEX? </h1>
+			</div>
+				<p>PEX (Peer Exchange) is a method of discovering new peers via other peers, rather than the tracker. It allows Transmission to attach to the swarm much quicker. 
+				PEX is automatically disabled for privately tracked torrents.
+				<p>
+			<div id="pagetitle">
+				<h1>Why can I only connect to around 60 peers? </h1>
+			</div>
+				<p>This is a constraint imposed on Transmission, as more than this number is unnecessary. A global limit is set at 200 peers. 
+				<p>
+			<div id="pagetitle">
+				<h1>What is Growl? </h1>
+			</div>
+				<p>Growl is a notification system. Lots of applications can interface with it.<br>
+				<a href="http://growl.info">http://growl.info</a> 
+				<p>
+			<div id="pagetitle">
+				<h1>What do the colors mean in the advanced progress bar/pieces box? </h1>
+			</div>
+				<p><font color="blue">Blue</font>: we have this piece <br>
+				<font color="gray">Gray/White</font>: no connected peers have this piece <br>
+				<font color="green">Green</font>: connected peers have this piece (the darker the green, the more there are) <br>
+				
+				<p>The fine, dark blue line on top of the bar shows the global progression, while the green line following it shows how much of the remaining download is actually available.<br>
+				
+				<p>
+			<div id="pagetitle">
+				<h1>What are seeds/peers/leechers? </h1>
+			</div>
+				<p>Peers are people you are connected to. If they have the whole file and are only uploading, they are referred to as a 'seeder'. If they only have part of the torrent, and are downloading and uploading, they are referred to as a 'leecher'. 
+				<p>
+			<div id="pagetitle">
+				<h1>What is the ratio shown during seeding? </h1>
+			</div>
+				<p>This shows your upload/download ratio. 1.00 means you have uploaded as much as you have downloaded, 2.00 means you have uploaded twice the amount you have downloaded, etc. 
+				<p>
+			<div id="pagetitle">
+				<h1>What are 'nightlies'?</h1>
+			</div>
+				<p>'Nightlies' are releases on the bleeding edge of development. They normally contain new features and bugfixes, but are not officially supported (although you are more than welcome to discuss them on the Transmission forums). You can try one out <a href="http://transmission.bogg.org/">here</a>.
+		
+		</div>
+	</body>
+	
+</html>
