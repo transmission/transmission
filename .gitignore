@@ -17,5 +17,7 @@ gtk/transmission-gtk
 libtransmission/*.a
 libtransmission/.depend
 libtransmission/version.h
+macosx/Info.plist
+macosx/Transmission.app
 mk/config.mk
 mk/version.mk
