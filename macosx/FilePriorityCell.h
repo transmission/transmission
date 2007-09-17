@@ -27,8 +27,6 @@
 
 @interface FilePriorityCell : NSSegmentedCell
 {
-    NSMutableDictionary * fItem;
-    
     NSImage * fLowImage, * fHighImage, * fNormalImage, * fMixedImage, * fNoneImage;
 }
 

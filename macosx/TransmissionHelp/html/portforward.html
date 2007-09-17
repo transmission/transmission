@@ -1,65 +1,1 @@
-<html>
-	<a name="PortForwarding"></a>
-	<head>
-		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
-		<title>Port Forwarding FAQ</title>
-	</head>
-	<body>
-		<div id="mainbox">			<div id="banner">				<a name="menus"></a>				<div id="machelp">				<a class="bread" href="../index.html">Transmission Help</a>				</div>				<div id="index">				<a class="leftborder" href="../html/Index2.html">Index</a></div>				</div>			</div>
-			
-			<div id="pagetitle">
-				<h1>Why do I see a red dot and "Port is closed"?</h1>
-			</div>
-			<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission.			If the port is forwarded, other people in the torrent can see you, thus increasing your potential number of connections, which more importantly, may increase the speed of your download.
-			<p>
-			<div id="pagetitle">
-				<h1>When do I need to Port Forward?</h1>
-			</div>
-			<p>If you share your internet connection with a router, or if your broadband modem is a router itself, then you will need to forward Transmission's port by following the instructions below.			In addition, if you have enabled the Mac OS X firewall, you will need to open a port in that too. See below for details.
-			
-			<p>
-			<div id="pagetitle">
-				<h1>How do I Port Forward?</h1>
-			</div>
-			<ul>
-				<li>If you have an Apple Airport, or a UPnP compatible router, Transmission can map its port automatically. Most routers manufactured since 2001 have this feature.
-				<div summary="To do this" id="taskbox">
-					<ol>
-						<li>Open Transmission. </li>
-						<li>Go to Preferences >> Network, and check 'Automatically map port'. </li>
-						<li>You should see a success notification and green dots.</li>
-						<p>If you get a red dot and the message 'Error mapping port', <a href="upnp.html">click here</a>.</li>
-					</ol>				
-				</div>
-				
-				<li>If you don't have a compatible router, it is simple to forward Transmission's port manually. For instructions <a href="pfrouter.html">click here</a>.</li>
-				<li>If you don't use a router, that is, your modem is directly connected to your computer, you'll need to open Transmission's port in the Mac OS X firewall. For instructions <a href="pffirewall.html">click here</a>.<br>				<b>NB:</b> it is highly recommended you enable the Mac OS X firewall if you are not using a router.</li>
-			</ul>				<p>Keep in mind that many DSL modems also function as routers, and hence port forwarding as per above may still be necessary, even though your computer is directly connected to the modem.
-				
-			<p>
-			<div id="pagetitle">
-				<h1>How do I know if I've done it right?</h1>
-			</div>
-			
-			<div summary="To do this" id="taskbox">
-				<ol>
-					<li>Open Transmission. </li>
-					<li>Go to Preferences >> Network. </li>
-					<li>Check the notification next to 'Incoming TCP Port'. </li>
-				</ol>
-			</div>
-			<p>
-			<ul>
-				<li>If you get a green dot and 'Port is Open' then you have successfully port forwarded! </li>
-				<li>If you get a red dot and the message 'Port is Stealth' or 'Port is Closed' then you haven't forwarded correctly.<br>
-				 NB: If Transmission has successfully mapped the port automatically, but the notification still indicates 'Closed/Stealth' <a href="multiple.html">click here</a>.</li>
-				
-			</ul>
-
-			</p>
-			
-		</div>
-	</body>
-	
-</html>
+<html>	<a name="PortForwarding"></a>	<head>		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />		<title>Port Forwarding FAQ</title>	</head>	<body>		<div id="mainbox">			<div id="banner">				<a name="menus"></a>				<div id="machelp">				<a class="bread" href="../index.html">Transmission Help</a>				</div>				<div id="index">				<a class="leftborder" href="../html/Index2.html">Index</a></div>				</div>			</div>						<div id="pagetitle">				<h1>Why do I see a red dot and "Port is closed"?</h1>			</div>			<p>You haven't port forwarded correctly. Port forwarding opens a port in your firewall or router so that incoming connections from the outside world can be made with Transmission.			If the port is forwarded, other people in the torrent can see you, thus increasing your potential number of connections, which more importantly, may increase the speed of your download.			<p>			<div id="pagetitle">				<h1>When do I need to Port Forward?</h1>			</div>			<p>If you share your internet connection with a router, or if your broadband modem is a router itself, then you will need to forward Transmission's port by following the instructions below.			In addition, if you have enabled the Mac OS X firewall, you will need to open a port in that too. See below for details.						<p>			<div id="pagetitle">				<h1>How do I Port Forward?</h1>			</div>			<ul>				<li>If you have an Apple Airport, or a UPnP compatible router, Transmission can map its port automatically. Most routers manufactured since 2001 have this feature.				<div summary="To do this" id="taskbox">					<ol>						<li>Open Transmission. </li>						<li>Go to Preferences >> Advanced, and check 'Automatically map port'. </li>						<li>You should see a success notification and green dots.</li>						<p>If you get a red dot and the message 'Error mapping port', <a href="upnp.html">click here</a>.</li>					</ol>								</div>								<li>If you don't have a compatible router, it is simple to forward Transmission's port manually. For instructions <a href="pfrouter.html">click here</a>.</li>				<li>If you don't use a router, that is, your modem is directly connected to your computer, you'll need to open Transmission's port in the Mac OS X firewall. For instructions <a href="pffirewall.html">click here</a>.<br>				<b>NB:</b> it is highly recommended you enable the Mac OS X firewall if you are not using a router.</li>			</ul>				<p>Keep in mind that many DSL modems also function as routers, and hence port forwarding as per above may still be necessary, even though your computer is directly connected to the modem.							<p>			<div id="pagetitle">				<h1>How do I know if I've done it right?</h1>			</div>						<div summary="To do this" id="taskbox">				<ol>					<li>Open Transmission. </li>					<li>Go to Preferences >> Advanced. </li>					<li>Check the notification next to 'Incoming TCP Port'. </li>				</ol>			</div>			<p>			<ul>				<li>If you get a green dot and 'Port is Open' then you have successfully port forwarded! </li>				<li>If you get a red dot and the message 'Port is Stealth' or 'Port is Closed' then you haven't forwarded correctly.<br>				 NB: If Transmission has successfully mapped the port automatically, but the notification still indicates 'Closed/Stealth' <a href="multiple.html">click here</a>.</li>							</ul>			</p>					</div>	</body>	</html>
