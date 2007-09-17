@@ -80,25 +80,8 @@
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
-        
-        //set play sound
-        NSMutableArray * sounds = [NSMutableArray array];
-        NSEnumerator * soundEnumerator;
-        
-        //get list of all sounds and sort alphabetically
-        if (soundEnumerator = [[NSFileManager defaultManager] enumeratorAtPath: @"System/Library/Sounds"])
-        {
-            NSString * sound;
-            while ((sound = [soundEnumerator nextObject]))
-            {
-                sound = [sound stringByDeletingPathExtension];
-                if ([NSSound soundNamed: sound])
-                    [sounds addObject: sound];
-            }
-        }
-        
-        fSounds = [[sounds sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)] retain];
     }
+    
     return self;
 }
 
@@ -106,7 +89,6 @@
 {
     if (fNatStatusTimer)
         [fNatStatusTimer invalidate];
-    [fSounds release];
     
     [super dealloc];
 }
@@ -319,6 +301,41 @@
     [portChecker release];
 }
 
+- (NSArray *) sounds
+{
+    NSMutableArray * sounds = [[NSMutableArray alloc] init];
+    
+    NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds",
+                                [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil];
+    BOOL isDirectory;
+    NSEnumerator * soundEnumerator;
+    NSString * sound;
+    
+    NSString * directory;
+    NSEnumerator * enumerator = [directories objectEnumerator];
+    while ((directory = [enumerator nextObject]))
+        if ([[NSFileManager defaultManager] fileExistsAtPath: directory isDirectory: &isDirectory] && isDirectory)
+        {
+                soundEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath: directory] objectEnumerator];
+                while ((sound = [soundEnumerator nextObject]))
+                {
+                    sound = [sound stringByDeletingPathExtension];
+                    if ([NSSound soundNamed: sound])
+                        [sounds addObject: sound];
+                }
+        }
+    
+    return sounds;
+}
+
+- (void) setSound: (id) sender
+{
+    //play sound when selecting
+    NSSound * sound;
+    if ((sound = [NSSound soundNamed: [sender titleOfSelectedItem]]))
+        [sound play];
+}
+
 - (void) applySpeedSettings: (id) sender
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
@@ -420,14 +437,6 @@
 - (void) setBadge: (id) sender
 {   
     [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];
-}
-
-- (void) setSound: (id) sender
-{
-    //play sound when selecting
-    NSSound * sound;
-    if ((sound = [NSSound soundNamed: [sender titleOfSelectedItem]]))
-        [sound play];
 }
 
 - (void) resetWarnings: (id) sender

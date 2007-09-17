@@ -40,8 +40,6 @@
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
     IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
     
-    NSArray                 * fSounds;
-    
     SUUpdater               * fUpdater;
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
@@ -58,8 +56,15 @@
 - (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
-- (void) setBadge: (id) sender;
+- (void) setPort: (id) sender;
+- (void) setNat: (id) sender;
+- (void) updatePortStatus;
+- (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
+
+- (NSArray *) sounds;
 - (void) setSound: (id) sender;
+
+- (void) setBadge: (id) sender;
 - (void) resetWarnings: (id) sender;
 - (void) setCheckForUpdate: (id) sender;
 
@@ -72,11 +77,6 @@
 - (void) setDownloadLocation: (id) sender;
 - (void) folderSheetShow: (id) sender;
 - (void) incompleteFolderSheetShow: (id) sender;
-
-- (void) setPort: (id) sender;
-- (void) setNat: (id) sender;
-- (void) updatePortStatus;
-- (void) portCheckerDidFinishProbing: (PortChecker *) portChecker;
 
 - (void) applyRatioSetting: (id) sender;
 - (void) updateRatioStopField;
