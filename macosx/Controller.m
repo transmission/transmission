@@ -1709,7 +1709,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView reloadData];
 }
 
-#warning bindings?
 - (void) setSort: (id) sender
 {
     NSString * oldSortType = [fDefaults stringForKey: @"Sort"];

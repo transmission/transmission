@@ -98,7 +98,6 @@
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */; };
-		A27A53570A06A76400E1F16F /* StatusSep.png in Resources */ = {isa = PBXBuildFile; fileRef = A27A53560A06A76400E1F16F /* StatusSep.png */; };
 		A27ABC240A6ADE410020EC71 /* ImageBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */; };
 		A289EB0C0A33C56D00B082A3 /* ButtonBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */; };
 		A28DBADC0A33C1D800F4B4A7 /* ActionButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */; };
@@ -440,7 +439,6 @@
 		A27431D90A68538400FA780A /* FilterBarButton.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilterBarButton.m; path = macosx/FilterBarButton.m; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
 		A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOff.png; path = macosx/Images/ActionOff.png; sourceTree = "<group>"; };
-		A27A53560A06A76400E1F16F /* StatusSep.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusSep.png; path = macosx/Images/StatusSep.png; sourceTree = "<group>"; };
 		A27ABC210A6ADE410020EC71 /* ImageBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageBackgroundView.h; path = macosx/ImageBackgroundView.h; sourceTree = "<group>"; };
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
@@ -805,7 +803,6 @@
 				A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */,
 				A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */,
 				A29597340A72A9E10057248B /* StatusBarBackground.png */,
-				A27A53560A06A76400E1F16F /* StatusSep.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
 			);
@@ -1295,7 +1292,6 @@
 				4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */,
 				4DDFDD22099A5D8E00189D81 /* DownloadBadge.png in Resources */,
 				4DDFDD23099A5D8E00189D81 /* UploadBadge.png in Resources */,
-				A27A53570A06A76400E1F16F /* StatusSep.png in Resources */,
 				A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */,
 				A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */,
 				A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */,
