@@ -64,6 +64,8 @@
 - (NSArray *) sounds;
 - (void) setSound: (id) sender;
 
+- (void) setEncryptionRequired: (id) sender;
+
 - (void) setBadge: (id) sender;
 - (void) resetWarnings: (id) sender;
 - (void) setCheckForUpdate: (id) sender;

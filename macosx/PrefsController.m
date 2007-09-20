@@ -78,6 +78,9 @@
         //set NAT
         tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
         
+        //set encryption
+        //tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED);
+        
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
     }
@@ -334,6 +337,11 @@
     NSSound * sound;
     if ((sound = [NSSound soundNamed: [sender titleOfSelectedItem]]))
         [sound play];
+}
+
+- (void) setEncryptionRequired: (id) sender
+{
+    //tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED);
 }
 
 - (void) applySpeedSettings: (id) sender

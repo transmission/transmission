@@ -18,6 +18,7 @@
                 setBadge = id; 
                 setCheckForUpdate = id; 
                 setDownloadLocation = id; 
+                setEncryptionRequired = id; 
                 setGlobalLimit = id; 
                 setNat = id; 
                 setPort = id; 
