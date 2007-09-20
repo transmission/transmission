@@ -287,11 +287,9 @@
 
 /* Begin PBXFileReference section */
 		002C9EE50C19CD2500C2F6F4 /* fastresume.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fastresume.c; path = libtransmission/fastresume.c; sourceTree = "<group>"; };
-		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = macosx/main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Transmission_Prefix.pch; path = macosx/Transmission_Prefix.pch; sourceTree = "<group>"; };
@@ -358,7 +356,6 @@
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
-		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A2041D520C9AC523000ACFFB /* Lock.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Lock.tiff; path = macosx/Images/Lock.tiff; sourceTree = "<group>"; };
 		A204310F0C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/AboutWindow.nib; sourceTree = "<group>"; };
 		A20431100C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -369,7 +366,6 @@
 		A20431150C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
-		A2085E010C53C16F000BC3B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/AboutWindow.nib; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
@@ -377,7 +373,6 @@
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
 		A20B6FA40C4D97840034AB1D /* PriorityNone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNone.png; path = macosx/Images/PriorityNone.png; sourceTree = "<group>"; };
 		A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityNormal.png; path = macosx/Images/PriorityNormal.png; sourceTree = "<group>"; };
-		A21567EC0A9A5034004DECD6 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSBezierPathAdditions.m; path = macosx/NSBezierPathAdditions.m; sourceTree = "<group>"; };
 		A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSBezierPathAdditions.h; path = macosx/NSBezierPathAdditions.h; sourceTree = "<group>"; };
 		A2173E1B0A33C1B300B0D8AB /* ActionButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButtonPressed.png; path = macosx/Images/ActionButtonPressed.png; sourceTree = "<group>"; };
@@ -395,7 +390,6 @@
 		A22A7EBF0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A22A7EC00C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A22A7EC10C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A22A8D550AEEAFA5007E9CB9 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A22BC9AD0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/AboutWindow.nib; sourceTree = "<group>"; };
 		A22BC9AE0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -461,7 +455,6 @@
 		A27ABC220A6ADE410020EC71 /* ImageBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ImageBackgroundView.m; path = macosx/ImageBackgroundView.m; sourceTree = "<group>"; };
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
-		A2912C530A2956E80097A0CA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
 		A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = YellowDot.tiff; path = macosx/Images/YellowDot.tiff; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
@@ -478,7 +471,6 @@
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
-		A2AE68320C628A35008753C9 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2AE68360C628A58008753C9 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2AE68370C628A5E008753C9 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2AE68380C628A63008753C9 /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/Creator.nib; sourceTree = "<group>"; };
@@ -506,6 +498,14 @@
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
+		A2FA345C0CA323DC00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/AboutWindow.nib; sourceTree = "<group>"; };
+		A2FA34610CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/Creator.nib; sourceTree = "<group>"; };
+		A2FA34620CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2FA34630CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A2FA34640CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = macosx/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2FA34650CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A2FA34660CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A2FA34670CA323EA00C432EE /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = macosx/en.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
@@ -1259,6 +1259,7 @@
 				Korean,
 				Italian,
 				Russian,
+				en,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1575,12 +1576,12 @@
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				089C165DFE840E0CC02AAC07 /* English */,
 				A22BC9AE0C5C505200F5FB72 /* Korean */,
 				A22BCA2E0C5D5CDA00F5FB72 /* Italian */,
 				A20431100C5EAF490081E5CC /* Russian */,
 				A22A7EBC0C627FC200E30364 /* Greek */,
 				A26039FE0C6338FB00F5FDFD /* Spanish */,
+				A2FA34620CA323EA00C432EE /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1588,13 +1589,13 @@
 		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				29B97319FDCFA39411CA2CEA /* English */,
 				A22BC9B10C5C505200F5FB72 /* Korean */,
 				A22BCA310C5D5CDA00F5FB72 /* Italian */,
 				A20431130C5EAF490081E5CC /* Russian */,
 				A22A7EBF0C627FC200E30364 /* Greek */,
 				A2603A010C6338FB00F5FDFD /* Spanish */,
 				A2C19EDE0C676F5200E0B235 /* French */,
+				A2FA34650CA323EA00C432EE /* en */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1602,13 +1603,13 @@
 		A200B9620A227FD0007BBB1E /* InfoWindow.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A200B9630A227FD0007BBB1E /* English */,
 				A22BC9AF0C5C505200F5FB72 /* Korean */,
 				A22BCA2F0C5D5CDA00F5FB72 /* Italian */,
 				A20431110C5EAF490081E5CC /* Russian */,
 				A22A7EBD0C627FC200E30364 /* Greek */,
 				A26039FF0C6338FB00F5FDFD /* Spanish */,
 				A2C19EDC0C676F5200E0B235 /* French */,
+				A2FA34630CA323EA00C432EE /* en */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1616,13 +1617,13 @@
 		A2085E000C53C16F000BC3B7 /* AboutWindow.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A2085E010C53C16F000BC3B7 /* English */,
 				A22BC9AD0C5C505200F5FB72 /* Korean */,
 				A22BCA2D0C5D5CDA00F5FB72 /* Italian */,
 				A204310F0C5EAF490081E5CC /* Russian */,
 				A22A7EBB0C627FC200E30364 /* Greek */,
 				A26039FC0C6338FB00F5FDFD /* Spanish */,
 				A2C19EDA0C676F5200E0B235 /* French */,
+				A2FA345C0CA323DC00C432EE /* en */,
 			);
 			name = AboutWindow.nib;
 			sourceTree = "<group>";
@@ -1630,13 +1631,13 @@
 		A21567EB0A9A5034004DECD6 /* MessageWindow.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A21567EC0A9A5034004DECD6 /* English */,
 				A22BC9B20C5C505300F5FB72 /* Korean */,
 				A22BCA320C5D5CDA00F5FB72 /* Italian */,
 				A20431140C5EAF490081E5CC /* Russian */,
 				A22A7EC00C627FC200E30364 /* Greek */,
 				A2603A020C6338FB00F5FDFD /* Spanish */,
 				A2C19EDF0C676F5200E0B235 /* French */,
+				A2FA34660CA323EA00C432EE /* en */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1644,13 +1645,13 @@
 		A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A22A8D550AEEAFA5007E9CB9 /* English */,
 				A22BC9B00C5C505200F5FB72 /* Korean */,
 				A22BCA300C5D5CDA00F5FB72 /* Italian */,
 				A20431120C5EAF490081E5CC /* Russian */,
 				A22A7EBE0C627FC200E30364 /* Greek */,
 				A2603A000C6338FB00F5FDFD /* Spanish */,
 				A2C19EDD0C676F5200E0B235 /* French */,
+				A2FA34640CA323EA00C432EE /* en */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1658,13 +1659,13 @@
 		A2912C520A2956E80097A0CA /* PrefsWindow.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A2912C530A2956E80097A0CA /* English */,
 				A22BC9B30C5C505300F5FB72 /* Korean */,
 				A22BCA330C5D5CDA00F5FB72 /* Italian */,
 				A20431150C5EAF490081E5CC /* Russian */,
 				A22A7EC10C627FC200E30364 /* Greek */,
 				A2603A030C6338FB00F5FDFD /* Spanish */,
 				A2C19EE00C676F5200E0B235 /* French */,
+				A2FA34670CA323EA00C432EE /* en */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1672,13 +1673,13 @@
 		A2AE68310C628A35008753C9 /* Creator.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				A2AE68320C628A35008753C9 /* English */,
 				A2AE68360C628A58008753C9 /* Korean */,
 				A2AE68370C628A5E008753C9 /* Italian */,
 				A2AE68380C628A63008753C9 /* Russian */,
 				A2AE68390C628A66008753C9 /* Greek */,
 				A26039FD0C6338FB00F5FDFD /* Spanish */,
 				A2C19EDB0C676F5200E0B235 /* French */,
+				A2FA34610CA323EA00C432EE /* en */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";
