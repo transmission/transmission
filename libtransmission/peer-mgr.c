@@ -182,7 +182,6 @@ disconnectPeer( tr_peer * peer )
 
     if( peer->msgs != NULL )
     {
-fprintf( stderr, "PUB unsub peer %p from msgs %p\n", peer, peer->msgs );
         tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
         tr_peerMsgsFree( peer->msgs );
         peer->msgs = NULL;
@@ -634,7 +633,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             peer->msgs = tr_peerMsgsNew( t->tor, peer );
             peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
             peer->peerSupportsEncryption = peerSupportsEncryption ? 1 : 0;
-            fprintf( stderr, "PUB sub peer %p to msgs %p\n", peer, peer->msgs );
             peer->msgsTag = tr_peerMsgsSubscribe( peer->msgs, msgsCallbackFunc, t );
         }
     }

@@ -61,7 +61,31 @@ void tr_msgInit( void )
          messageLock = tr_lockNew( );
 }
 
-void tr_setMessageLevel( int level )
+FILE*
+tr_getLog( void )
+{
+    static int initialized = FALSE;
+    static FILE * file= NULL;
+
+    if( !initialized )
+    {
+        const char * str = getenv( "TR_DEBUG_FD" );
+        int fd;
+        if( str && *str )
+            fd = atoi( str );
+        switch( fd ) {
+            case 1: file = stdout; break;
+            case 2: file = stderr; break;
+            default: file = NULL; break;
+        }
+        initialized = TRUE;
+    }
+
+    return file;
+}
+
+void
+tr_setMessageLevel( int level )
 {
     tr_msgInit();
     tr_lockLock( messageLock );
@@ -120,10 +144,13 @@ void tr_msg( int level, char * msg, ... )
 {
     va_list       args1, args2;
     tr_msg_list * newmsg;
-    int             len1, len2;
+    int           len1, len2;
+    FILE        * fp;
 
     assert( NULL != messageLock );
     tr_lockLock( messageLock );
+
+    fp = tr_getLog( );
 
     if( !messageLevel )
     {
@@ -148,6 +175,8 @@ void tr_msg( int level, char * msg, ... )
                 tr_vsprintf( &newmsg->message, &len1, &len2, msg,
                              args1, args2 );
                 va_end( args2 );
+                if( fp != NULL )
+                    fprintf( fp, "%s\n", newmsg->message );
                 if( NULL == newmsg->message )
                 {
                     free( newmsg );
@@ -161,9 +190,11 @@ void tr_msg( int level, char * msg, ... )
         }
         else
         {
-            vfprintf( stderr, msg, args1 );
-            fputc( '\n', stderr );
-            fflush( stderr );
+            if( fp == NULL )
+                fp = stderr;
+            vfprintf( fp, msg, args1 );
+            fputc( '\n', fp );
+            fflush( fp );
         }
         va_end( args1 );
     }

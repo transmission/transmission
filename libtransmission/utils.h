@@ -28,6 +28,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h> /* for size_t */
+#include <stdio.h> /* FILE* */
 
 void tr_msgInit( void );
 
@@ -35,6 +36,7 @@ void tr_msgInit( void );
 #define tr_inf( a... ) tr_msg( TR_MSG_INF, ## a )
 #define tr_dbg( a... ) tr_msg( TR_MSG_DBG, ## a )
 void tr_msg  ( int level, char * msg, ... );
+FILE* tr_getLog( void );
 
 int  tr_rand ( int );
 

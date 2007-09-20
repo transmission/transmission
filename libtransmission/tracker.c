@@ -265,9 +265,6 @@ tr_trackerScrapeSoon( Tracker * t )
          t->scrapeTimer = tr_timerNew( t->handle, onTrackerScrapeNow, t, 1000 );
 }
 
-static int trackerCount = 0;
-static int torrentCount = 0;
-
 static Tracker*
 tr_trackerGet( const tr_torrent * tor )
 {
@@ -288,7 +285,6 @@ tr_trackerGet( const tr_torrent * tor )
         tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
 
         t = tr_new0( Tracker, 1 );
-fprintf( stderr, "TRACKER new tracker %p addr %s; counts are trackers %d torrents %d\n", t, info->primaryAddress, ++trackerCount, torrentCount );
         t->handle = tor->handle;
         t->primaryAddress = tr_strdup( info->primaryAddress );
         t->scrapeIntervalMsec      = DEFAULT_SCRAPE_INTERVAL_MSEC;
@@ -363,7 +359,6 @@ onTorrentFreeNow( void * vtor )
     tr_ptrArrayRemoveSorted( t->scrapeQueue, tor, torrentCompare );
     tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
-fprintf( stderr, "TRACKER freeing torrent %p name %s; counts are trackers %d torrents %d\n", tor, tor->torrent->info.name, trackerCount, --torrentCount );
     tr_timerFree( &tor->scrapeTimer );
     tr_timerFree( &tor->reannounceTimer );
     tr_publisherFree( &tor->publisher );
@@ -377,8 +372,6 @@ fprintf( stderr, "TRACKER freeing torrent %p name %s; counts are trackers %d tor
     {
         int i;
         tr_ptrArrayRemoveSorted( getTrackerLookupTable( ), t, trackerCompare );
-
-fprintf( stderr, "TRACKER freeing tracker %p; counts are trackers %d torrents %d\n", t, --trackerCount, torrentCount );
 
         if( t->connection != NULL )
             evhttp_connection_free( t->connection );
@@ -419,7 +412,6 @@ tr_trackerNew( tr_torrent * torrent )
 
     /* create a new Torrent and queue it for scraping */
     tor = tr_new0( Torrent, 1 );
-fprintf( stderr, "TRACKER new torrent %p name %s; counts are trackers %d torrents %d\n", tor, torrent->info.name, trackerCount, ++torrentCount );
     tor->publisher = tr_publisherNew( );
     tor->tracker = t;
     tor->torrent = torrent;

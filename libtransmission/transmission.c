@@ -234,8 +234,8 @@ tr_getGlobalSpeedLimit( tr_handle  * h,
                                                         : h->download );
 }
 
-
-void tr_torrentRates( tr_handle * h, float * dl, float * ul )
+void
+tr_torrentRates( tr_handle * h, float * dl, float * ul )
 {
     tr_torrent * tor;
 
@@ -253,12 +253,14 @@ void tr_torrentRates( tr_handle * h, float * dl, float * ul )
     tr_sharedUnlock( h->shared );
 }
 
-int tr_torrentCount( tr_handle * h )
+int
+tr_torrentCount( tr_handle * h )
 {
     return h->torrentCount;
 }
 
-void tr_torrentIterate( tr_handle * h, tr_callback_t func, void * d )
+void
+tr_torrentIterate( tr_handle * h, tr_callback_t func, void * d )
 {
     tr_torrent * tor, * next;
 
@@ -273,28 +275,21 @@ static void
 tr_closeImpl( void * vh )
 {
     tr_handle * h = vh;
-fprintf( stderr, "in tr_closeImpl\n" );
     tr_peerMgrFree( h->peerMgr );
-fprintf( stderr, "calling mgr free\n" );
 
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
 
-fprintf( stderr, "calling shared close\n" );
     tr_sharedClose( h->shared );
-fprintf( stderr, "calling fd close\n" );
     tr_fdClose();
 
-fprintf( stderr, "setting h->closed to TRUE\n" );
     h->isClosed = TRUE;
 }
 void
 tr_close( tr_handle * h )
 {
-    fprintf( stderr, "torrentCount is %d\n", h->torrentCount );
     assert( tr_torrentCount( h ) == 0 );
 
-fprintf( stderr, "here I am in tr_close...\n" );
     tr_runInEventThread( h, tr_closeImpl, h );
     while( !h->isClosed )
         tr_wait( 200 );
@@ -307,6 +302,7 @@ fprintf( stderr, "here I am in tr_close...\n" );
 
     free( h->tag );
     free( h );
+    fprintf( stderr, "tr_close() completed.\n" );
 }
 
 tr_torrent **

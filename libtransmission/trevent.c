@@ -211,7 +211,6 @@ libeventThreadFunc( void * veh )
     eh->h->events = eh;
 
     event_dispatch( );
-fprintf( stderr, "w00t!!!!!!!!!!!!!!!!!!!\n" );
 
     tr_lockFree( eh->lock );
     event_base_free( eh->base );

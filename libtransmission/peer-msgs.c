@@ -135,17 +135,19 @@ struct tr_peermsgs
 static void
 myDebug( const char * file, int line, const struct tr_peermsgs * msgs, const char * fmt, ... )
 {
-    va_list args;
-    const char * addr = tr_peerIoGetAddrStr( msgs->io );
-    struct evbuffer * buf = evbuffer_new( );
-    evbuffer_add_printf( buf, "[%s:%d] %s (%p) ", file, line, addr, msgs );
-    va_start( args, fmt );
-    evbuffer_add_vprintf( buf, fmt, args );
-    va_end( args );
-
-    fprintf( stderr, "%s\n", EVBUFFER_DATA(buf) );
-
-    evbuffer_free( buf );
+    FILE * fp = tr_getLog( );
+    if( fp != NULL )
+    {
+        va_list args;
+        const char * addr = tr_peerIoGetAddrStr( msgs->io );
+        struct evbuffer * buf = evbuffer_new( );
+        evbuffer_add_printf( buf, "[%s:%d] %s (%p) ", file, line, addr, msgs );
+        va_start( args, fmt );
+        evbuffer_add_vprintf( buf, fmt, args );
+        va_end( args );
+        fprintf( fp, "%s\n", EVBUFFER_DATA(buf) );
+        evbuffer_free( buf );
+    }
 }
 
 #define dbgmsg(handshake, fmt...) myDebug(__FILE__, __LINE__, handshake, ##fmt )
@@ -448,7 +450,6 @@ sendLtepHandshake( tr_peermsgs * msgs )
         tr_bencInitInt( tr_bencDictAdd( &val, "p" ), port );
     tr_bencInitStr( tr_bencDictAdd( &val, "v" ), v, 0, 1 );
     buf = tr_bencSaveMalloc( &val,  &len );
-    tr_bencPrint( &val );
 
     msglen = sizeof(tr_msgid) + sizeof(ltep_msgid) + len;
     tr_peerIoWriteUint32( msgs->io, outbuf, msglen );

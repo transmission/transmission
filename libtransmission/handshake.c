@@ -138,17 +138,19 @@ enum
 static void
 myDebug( const char * file, int line, const tr_handshake * handshake, const char * fmt, ... )
 {
-    va_list args;
-    const char * addr = tr_peerIoGetAddrStr( handshake->io );
-    struct evbuffer * buf = evbuffer_new( );
-    evbuffer_add_printf( buf, "[%s:%d] %s (%p) ", file, line, addr, handshake );
-    va_start( args, fmt );
-    evbuffer_add_vprintf( buf, fmt, args );
-    va_end( args );
-
-    fprintf( stderr, "%s\n", EVBUFFER_DATA(buf) );
-
-    evbuffer_free( buf );
+    FILE * fp = tr_getLog( );
+    if( fp != NULL )
+    {
+        va_list args;
+        const char * addr = tr_peerIoGetAddrStr( handshake->io );
+        struct evbuffer * buf = evbuffer_new( );
+        evbuffer_add_printf( buf, "[%s:%d] %s (%p) ", file, line, addr, handshake );
+        va_start( args, fmt );
+        evbuffer_add_vprintf( buf, fmt, args );
+        va_end( args );
+        fprintf( stderr, "%s\n", EVBUFFER_DATA(buf) );
+        evbuffer_free( buf );
+    }
 }
 
 #define dbgmsg(handshake, fmt...) myDebug(__FILE__, __LINE__, handshake, ##fmt )
