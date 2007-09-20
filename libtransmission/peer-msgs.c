@@ -154,14 +154,20 @@ myDebug( const char * file, int line, const struct tr_peermsgs * msgs, const cha
 ***  EVENTS
 **/
 
-static const tr_peermsgs_event blankEvent = { 0, 0, 0, 0 };
+static const tr_peermsgs_event blankEvent = { 0, 0, 0, 0, 0.0f };
 
 static void
-publishEvent( tr_peermsgs * peer, int eventType )
+publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
+{
+    tr_publisherPublish( msgs->publisher, msgs->info, e );
+}
+
+static void
+fireGotError( tr_peermsgs * msgs )
 {
     tr_peermsgs_event e = blankEvent;
-    e.eventType = eventType;
-    tr_publisherPublish( peer->publisher, peer, &e );
+    e.eventType = TR_PEERMSG_GOT_ERROR;
+    publish( msgs, &e );
 }
 
 static void
@@ -169,7 +175,16 @@ fireNeedReq( tr_peermsgs * msgs )
 {
     tr_peermsgs_event e = blankEvent;
     e.eventType = TR_PEERMSG_NEED_REQ;
-    tr_publisherPublish( msgs->publisher, msgs, &e );
+    publish( msgs, &e );
+}
+
+static void
+firePeerProgress( tr_peermsgs * msgs )
+{
+    tr_peermsgs_event e = blankEvent;
+    e.eventType = TR_PEERMSG_PEER_PROGRESS;
+    e.progress = msgs->info->progress;
+    publish( msgs, &e );
 }
 
 static void
@@ -178,24 +193,18 @@ fireClientHave( tr_peermsgs * msgs, uint32_t pieceIndex )
     tr_peermsgs_event e = blankEvent;
     e.eventType = TR_PEERMSG_CLIENT_HAVE;
     e.pieceIndex = pieceIndex;
-    tr_publisherPublish( msgs->publisher, msgs, &e );
+    publish( msgs, &e );
 }
 
 static void
-fireGotBlock( tr_peermsgs * peer, uint32_t pieceIndex, uint32_t offset, uint32_t length )
+fireGotBlock( tr_peermsgs * msgs, uint32_t pieceIndex, uint32_t offset, uint32_t length )
 {
     tr_peermsgs_event e = blankEvent;
     e.eventType = TR_PEERMSG_CLIENT_BLOCK;
     e.pieceIndex = pieceIndex;
     e.offset = offset;
     e.length = length;
-    tr_publisherPublish( peer->publisher, peer, &e );
-}
-
-static void
-fireGotError( tr_peermsgs * peer )
-{
-    publishEvent( peer, TR_PEERMSG_GOT_ERROR );
+    publish( msgs, &e );
 }
 
 /**
@@ -647,6 +656,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
             dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
             updateInterest( msgs );
+            firePeerProgress( msgs );
             break;
 
         case BT_BITFIELD:
@@ -657,7 +667,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
             updateInterest( msgs );
             fireNeedReq( msgs );
-            /* FIXME: maybe unchoke */
+            firePeerProgress( msgs );
             break;
 
         case BT_REQUEST: {
@@ -1034,7 +1044,7 @@ didWrite( struct bufferevent * evin UNUSED, void * vpeer )
 static void
 gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * vpeer )
 {
-    fireGotError( (tr_peermsgs*)vpeer );
+    fireGotError( vpeer );
 }
 
 static void

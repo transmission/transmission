@@ -522,8 +522,9 @@ broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length
 }
 
 static void
-msgsCallbackFunc( void * source UNUSED, void * vevent, void * vt )
+msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 {
+    tr_peer * peer = vpeer;
     Torrent * t = (Torrent *) vt;
     const tr_peermsgs_event * e = (const tr_peermsgs_event *) vevent;
 
@@ -540,12 +541,22 @@ msgsCallbackFunc( void * source UNUSED, void * vevent, void * vt )
             broadcastClientHave( t, e->pieceIndex );
             break;
 
+        case TR_PEERMSG_PEER_PROGRESS: { /* if we're both seeds, then disconnect. */
+            const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
+            const int peerIsSeed = e->progress >= 1.0;
+            if( clientIsSeed && peerIsSeed ) {
+                fprintf( stderr, "DISCONNECTING FROM PEER because both of us are seeds\n" );
+                peer->doDisconnect = 1;
+            }
+            break;
+        }
+
         case TR_PEERMSG_CLIENT_BLOCK:
             broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );
             break;
 
         case TR_PEERMSG_GOT_ERROR:
-            /* FIXME */
+            peer->doDisconnect = 1;
             break;
 
         default:
