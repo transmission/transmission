@@ -58,12 +58,12 @@ typedef struct _TrCoreClass TrCoreClass;
 /* treat the contents of this structure as private */
 struct _TrCore
 {
-    GObject             parent;
-    GtkTreeModel      * model;
-    tr_handle_t       * handle;
-    int                 nextid;
-    gboolean            quitting;
-    gboolean            disposed;
+    GObject           parent;
+    GtkTreeModel    * model;
+    tr_handle       * handle;
+    int               nextid;
+    gboolean          quitting;
+    gboolean          disposed;
 };
 
 struct _TrCoreClass
@@ -106,7 +106,7 @@ GtkTreeModel *
 tr_core_model( TrCore * self );
 
 /* Returns the libtransmission handle */
-tr_handle_t *
+tr_handle *
 tr_core_handle( TrCore * self );
 
 /* Try to politely stop all torrents and nat traversal */

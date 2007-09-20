@@ -80,7 +80,7 @@ struct infowind
     guint                   timer;
     struct
     {
-        tr_tracker_info_t * track;
+        tr_tracker_info   * track;
         GtkLabel          * trackwid;
         GtkLabel          * annwid;
         GtkLabel          * scrwid;

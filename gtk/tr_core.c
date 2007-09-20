@@ -292,7 +292,7 @@ tr_core_model( TrCore * self )
     return self->disposed ? NULL : self->model;
 }
 
-tr_handle_t *
+tr_handle *
 tr_core_handle( TrCore * self )
 {
     g_return_val_if_fail (TR_IS_CORE(self), NULL);
@@ -328,7 +328,7 @@ tr_core_shutdown( TrCore * self )
 gboolean
 tr_core_quiescent( TrCore * self )
 {
-    const tr_handle_status_t * hstat;
+    const tr_handle_status * hstat;
 
     TR_IS_CORE( self );
     g_assert( self->quitting );
@@ -407,7 +407,7 @@ tr_core_load( TrCore * self, gboolean forcepaused )
     int i;
     int flags;
     int count = 0;
-    tr_torrent_t ** torrents;
+    tr_torrent ** torrents;
     const char * destination;
 
     TR_IS_CORE( self );
@@ -561,7 +561,7 @@ void
 tr_core_insert( TrCore * self, TrTorrent * tor )
 {
     GtkTreeIter iter;
-    const tr_info_t * inf;
+    const tr_info * inf;
 
     gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
     inf = tr_torrent_info( tor );
@@ -581,7 +581,7 @@ tr_core_update( TrCore * self )
 {
     GtkTreeIter iter;
     TrTorrent * tor;
-    const tr_stat_t * st;
+    const tr_stat * st;
 
     TR_IS_CORE( self );
 

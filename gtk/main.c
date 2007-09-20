@@ -158,7 +158,7 @@ readinitialprefs( struct cbdata * cbdata );
 static void
 prefschanged( TrCore * core, int id, gpointer data );
 static void
-setpex( tr_torrent_t * tor, void * arg );
+setpex( tr_torrent * tor, void * arg );
 static gboolean
 updatemodel(gpointer gdata);
 static void
@@ -767,7 +767,7 @@ static void
 prefschanged( TrCore * core SHUTUP, int id, gpointer data )
 {
     struct cbdata * cbdata = data;
-    tr_handle_t   * tr     = tr_core_handle( cbdata->core );
+    tr_handle     * tr     = tr_core_handle( cbdata->core );
     gboolean        boolval;
 
     switch( id )
@@ -829,7 +829,7 @@ g_message ("foo");
 }
 
 void
-setpex( tr_torrent_t * tor, void * arg )
+setpex( tr_torrent * tor, void * arg )
 {
     gboolean * val;
 

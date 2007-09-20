@@ -62,6 +62,6 @@ void        tr_peerBlame           ( tr_peer_t *, int piece, int success );
 struct in_addr * tr_peerAddress    ( tr_peer_t * );
 int         tr_peerGetConnectable  ( const struct tr_torrent *, uint8_t ** );
 
-void        tr_swiftPulse          ( tr_handle_t * );
+void        tr_swiftPulse          ( tr_handle * );
 
 #endif

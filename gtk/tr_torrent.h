@@ -30,7 +30,7 @@
 #include <libtransmission/bencode.h>
 #include "util.h"
 
-/* boxed type for tr_tracker_info_t */
+/* boxed type for tr_tracker_info */
 #define TR_TRACKER_BOXED_TYPE (tr_tracker_boxed_get_type ())
 GType
 tr_tracker_boxed_get_type( void );
@@ -53,10 +53,10 @@ typedef struct _TrTorrentClass TrTorrentClass;
 /* treat the contents of this structure as private */
 struct _TrTorrent {
   GObject parent;
-  tr_torrent_t *handle;
+  tr_torrent *handle;
   char *dir;
   char *delfile;
-  tr_stat_t stat;
+  tr_stat stat;
   time_t lastStatTime;
 
   /* FIXME: hm, are these heavyweight enough to deserve their own properties? */
@@ -73,13 +73,13 @@ struct _TrTorrentClass {
 GType
 tr_torrent_get_type(void);
 
-tr_torrent_t *
+tr_torrent *
 tr_torrent_handle(TrTorrent *tor);
 
-const tr_stat_t *
+const tr_stat *
 tr_torrent_stat(TrTorrent *tor);
 
-const tr_info_t *
+const tr_info *
 tr_torrent_info(TrTorrent *tor);
 
 void
@@ -99,18 +99,18 @@ void
 tr_torrent_set_seeding_cap_enabled ( TrTorrent*, gboolean );
 
 TrTorrent *
-tr_torrent_new_preexisting( tr_torrent_t * tor );
+tr_torrent_new_preexisting( tr_torrent * tor );
 
 TrTorrent *
-tr_torrent_new( tr_handle_t * handle, const char * path, const char * dir,
+tr_torrent_new( tr_handle * handle, const char * path, const char * dir,
                 enum tr_torrent_action act, gboolean paused, char ** err);
 
 TrTorrent *
-tr_torrent_new_with_data( tr_handle_t * handle, uint8_t * data, size_t size,
+tr_torrent_new_with_data( tr_handle * handle, uint8_t * data, size_t size,
                           const char * dir, gboolean paused, char ** err );
 
 TrTorrent *
-tr_torrent_new_with_state( tr_handle_t * handle, benc_val_t * state,
+tr_torrent_new_with_state( tr_handle * handle, benc_val_t * state,
                            gboolean forcepaused, char ** err );
 
 gboolean

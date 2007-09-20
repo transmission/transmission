@@ -62,7 +62,7 @@
 
 typedef struct
 {
-    tr_handle_t * handle;
+    tr_handle * handle;
 
     tr_ptrArray * torrents;
     tr_ptrArray * scraping;

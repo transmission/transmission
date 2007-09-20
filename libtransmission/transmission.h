@@ -103,12 +103,10 @@ extern "C" {
  **********************************************************************/
 
 typedef struct tr_handle tr_handle;
-typedef struct tr_handle tr_handle_t;
 
 tr_handle * tr_init( const char * tag );
 
 typedef struct tr_tracker_info tr_tracker_info;
-typedef struct tr_tracker_info tr_tracker_info_t;
 
 /**
 ***
@@ -142,7 +140,6 @@ int tr_getMessageLevel( void );
  * Enable or disable message queuing
  **********************************************************************/
 typedef struct tr_msg_list tr_msg_list;
-typedef struct tr_msg_list tr_msg_list_t;
 void tr_setMessageQueuing( int );
 
 /***********************************************************************
@@ -185,7 +182,6 @@ void tr_natTraversalEnable( tr_handle *, int enable );
  * Returns some status info for the given handle.
  **********************************************************************/
 typedef struct tr_handle_status tr_handle_status;
-typedef struct tr_handle_status tr_handle_status_t;
 tr_handle_status * tr_handleStatus( tr_handle * );
 
 
@@ -203,7 +199,6 @@ int tr_torrentCount( tr_handle * h );
  * Iterates on open torrents
  **********************************************************************/
 typedef struct tr_torrent tr_torrent;
-typedef struct tr_torrent tr_torrent_t;
 typedef void (*tr_callback_t) ( tr_torrent *, void * );
 void tr_torrentIterate( tr_handle *, tr_callback_t, void * );
 
@@ -342,7 +337,6 @@ tr_torrent * tr_torrentInit( tr_handle  * handle,
                              int          * setme_error );
 
 typedef struct tr_info tr_info;
-typedef struct tr_info tr_info_t;
 
 /**
  * Parses the specified metainfo file.
@@ -485,19 +479,16 @@ int tr_torrentCanManualUpdate( const tr_torrent * );
  * to update itself.
  **********************************************************************/
 typedef struct tr_stat tr_stat;
-typedef struct tr_stat tr_stat_t;
 const tr_stat * tr_torrentStat( tr_torrent * );
 
 /***********************************************************************
  * tr_torrentPeers
  ***********************************************************************/
 typedef struct tr_peer_stat tr_peer_stat;
-typedef struct tr_peer_stat tr_peer_stat_t;
 tr_peer_stat * tr_torrentPeers( const tr_torrent *, int * peerCount );
 void tr_torrentPeersFree( tr_peer_stat *, int peerCount );
 
 typedef struct tr_file_stat tr_file_stat;
-typedef struct tr_file_stat tr_file_stat_t;
 tr_file_stat * tr_torrentFiles( const tr_torrent *, int * fileCount );
 void tr_torrentFilesFree( tr_file_stat *, int fileCount );
 

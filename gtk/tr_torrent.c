@@ -225,7 +225,7 @@ tr_torrent_sever( TrTorrent * self )
     }
 }
 
-tr_torrent_t *
+tr_torrent *
 tr_torrent_handle(TrTorrent *tor)
 {
     g_assert( TR_IS_TORRENT(tor) );
@@ -233,7 +233,7 @@ tr_torrent_handle(TrTorrent *tor)
     return tor->severed ? NULL : tor->handle;
 }
 
-static tr_stat_t*
+static tr_stat*
 refreshStat( TrTorrent * tor )
 {
     tor->lastStatTime= time( NULL );
@@ -241,7 +241,7 @@ refreshStat( TrTorrent * tor )
     return &tor->stat;
 }
 
-const tr_stat_t *
+const tr_stat *
 tr_torrent_stat(TrTorrent *tor)
 {
     g_assert( TR_IS_TORRENT(tor) );
@@ -252,7 +252,7 @@ tr_torrent_stat(TrTorrent *tor)
     return &tor->stat;
 }
 
-const tr_info_t *
+const tr_info *
 tr_torrent_info(TrTorrent *tor) {
   TR_IS_TORRENT(tor);
 
@@ -281,7 +281,7 @@ tr_torrent_stop( TrTorrent * self )
 }
 
 static TrTorrent *
-maketorrent( tr_torrent_t * handle )
+maketorrent( tr_torrent * handle )
 {
     tr_torrentDisablePex( handle,
                           !tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
@@ -292,18 +292,18 @@ maketorrent( tr_torrent_t * handle )
 }
 
 TrTorrent*
-tr_torrent_new_preexisting( tr_torrent_t * tor )
+tr_torrent_new_preexisting( tr_torrent * tor )
 {
     return maketorrent( tor );
 }
 
 
 TrTorrent *
-tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
+tr_torrent_new( tr_handle * back, const char *torrent, const char *dir,
                 enum tr_torrent_action act, gboolean paused, char **err )
 {
   TrTorrent *ret;
-  tr_torrent_t *handle;
+  tr_torrent *handle;
   int errcode, flags;
 
   g_assert(NULL != dir);
@@ -342,12 +342,12 @@ tr_torrent_new( tr_handle_t * back, const char *torrent, const char *dir,
 }
 
 TrTorrent *
-tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
+tr_torrent_new_with_data( tr_handle * back, uint8_t * data, size_t size,
                           const char * dir, gboolean paused, char ** err )
 {
-    tr_torrent_t * handle;
-    int            errcode;
-    int            flags;
+    tr_torrent * handle;
+    int          errcode;
+    int          flags;
 
     g_assert( NULL != dir );
 
@@ -381,11 +381,11 @@ tr_torrent_new_with_data( tr_handle_t * back, uint8_t * data, size_t size,
 }
 
 TrTorrent *
-tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
+tr_torrent_new_with_state( tr_handle * back, benc_val_t * state,
                            gboolean forcedpause, char ** err )
 {
   TrTorrent * ret;
-  tr_torrent_t * handle;
+  tr_torrent * handle;
   int ii, errcode;
   int flags;
   benc_val_t *name, *data;
@@ -455,7 +455,7 @@ tr_torrent_new_with_state( tr_handle_t * back, benc_val_t * state,
 gboolean
 tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
 {
-    const tr_info_t  * inf;
+    const tr_info * inf;
 
     TR_IS_TORRENT( tor );
 
@@ -526,7 +526,7 @@ tr_torrent_set_folder(TrTorrent *tor) {
 void
 tr_torrent_check_seeding_cap ( TrTorrent *gtor)
 {
-  const tr_stat_t * st = tr_torrent_stat( gtor );
+  const tr_stat * st = tr_torrent_stat( gtor );
   if ((gtor->seeding_cap_enabled) && (st->ratio >= gtor->seeding_cap))
     tr_torrent_stop (gtor);
 }
@@ -548,7 +548,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
 {
     char * top = 0;
 
-    const tr_stat_t * st = tr_torrent_stat( gtor );
+    const tr_stat * st = tr_torrent_stat( gtor );
 
     const int tpeers = MAX (st->peersConnected, 0);
     const int upeers = MAX (st->peersGettingFromUs, 0);

@@ -103,12 +103,12 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 /***********************************************************************
  * tr_init
  ***********************************************************************
- * Allocates a tr_handle_t structure and initializes a few things
+ * Allocates a tr_handle structure and initializes a few things
  **********************************************************************/
-tr_handle_t * tr_init( const char * tag )
+tr_handle * tr_init( const char * tag )
 {
-    tr_handle_t * h;
-    int           i;
+    tr_handle * h;
+    int         i;
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -117,7 +117,7 @@ tr_handle_t * tr_init( const char * tag )
 
     tr_msgInit();
 
-    h = tr_new0( tr_handle_t, 1 );
+    h = tr_new0( tr_handle, 1 );
     if( !h )
         return NULL;
 
@@ -158,27 +158,27 @@ tr_handle_t * tr_init( const char * tag )
  ***********************************************************************
  * 
  **********************************************************************/
-void tr_setBindPort( tr_handle_t * h, int port )
+void tr_setBindPort( tr_handle * h, int port )
 {
     h->isPortSet = 1;
     tr_sharedSetPort( h->shared, port );
 }
 
 int
-tr_getPublicPort( const tr_handle_t * h )
+tr_getPublicPort( const tr_handle * h )
 {
     assert( h != NULL );
     return tr_sharedGetPublicPort( h->shared );
 }
 
-void tr_natTraversalEnable( tr_handle_t * h, int enable )
+void tr_natTraversalEnable( tr_handle * h, int enable )
 {
     tr_sharedLock( h->shared );
     tr_sharedTraversalEnable( h->shared, enable );
     tr_sharedUnlock( h->shared );
 }
 
-tr_handle_status * tr_handleStatus( tr_handle_t * h )
+tr_handle_status * tr_handleStatus( tr_handle * h )
 {
     tr_handle_status * s;
 
@@ -200,9 +200,9 @@ tr_handle_status * tr_handleStatus( tr_handle_t * h )
 ***/
 
 void
-tr_setUseGlobalSpeedLimit( tr_handle_t  * h,
-                           int            up_or_down,
-                           int            use_flag )
+tr_setUseGlobalSpeedLimit( tr_handle  * h,
+                           int          up_or_down,
+                           int          use_flag )
 {
     char * ch = up_or_down==TR_UP ? &h->useUploadLimit
                                   : &h->useDownloadLimit;
@@ -210,9 +210,9 @@ tr_setUseGlobalSpeedLimit( tr_handle_t  * h,
 }
 
 void
-tr_setGlobalSpeedLimit( tr_handle_t  * h,
-                        int            up_or_down,
-                        int            KiB_sec )
+tr_setGlobalSpeedLimit( tr_handle  * h,
+                        int          up_or_down,
+                        int          KiB_sec )
 {
     if( up_or_down == TR_DOWN )
         tr_rcSetLimit( h->download, KiB_sec );
@@ -221,9 +221,9 @@ tr_setGlobalSpeedLimit( tr_handle_t  * h,
 }
 
 void
-tr_getGlobalSpeedLimit( tr_handle_t  * h,
-                        int            up_or_down,
-                        int          * setme_enabled,
+tr_getGlobalSpeedLimit( tr_handle  * h,
+                        int          up_or_down,
+                        int        * setme_enabled,
                         int          * setme_KiBsec )
 {
     if( setme_enabled != NULL )
@@ -235,7 +235,7 @@ tr_getGlobalSpeedLimit( tr_handle_t  * h,
 }
 
 
-void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
+void tr_torrentRates( tr_handle * h, float * dl, float * ul )
 {
     tr_torrent * tor;
 
@@ -253,12 +253,12 @@ void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
     tr_sharedUnlock( h->shared );
 }
 
-int tr_torrentCount( tr_handle_t * h )
+int tr_torrentCount( tr_handle * h )
 {
     return h->torrentCount;
 }
 
-void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
+void tr_torrentIterate( tr_handle * h, tr_callback_t func, void * d )
 {
     tr_torrent * tor, * next;
 
@@ -272,7 +272,7 @@ void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
 static void
 tr_closeImpl( void * vh )
 {
-    tr_handle_t * h = vh;
+    tr_handle * h = vh;
 fprintf( stderr, "in tr_closeImpl\n" );
     tr_peerMgrFree( h->peerMgr );
 fprintf( stderr, "calling mgr free\n" );
@@ -289,7 +289,7 @@ fprintf( stderr, "setting h->closed to TRUE\n" );
     h->isClosed = TRUE;
 }
 void
-tr_close( tr_handle_t * h )
+tr_close( tr_handle * h )
 {
     fprintf( stderr, "torrentCount is %d\n", h->torrentCount );
     assert( tr_torrentCount( h ) == 0 );
@@ -310,10 +310,10 @@ fprintf( stderr, "here I am in tr_close...\n" );
 }
 
 tr_torrent **
-tr_loadTorrents ( tr_handle_t   * h,
-                  const char    * destination,
-                  int             flags,
-                  int          * setmeCount )
+tr_loadTorrents ( tr_handle   * h,
+                  const char  * destination,
+                  int           flags,
+                  int         * setmeCount )
 {
     int i, n = 0;
     struct stat sb;

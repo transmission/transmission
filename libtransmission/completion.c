@@ -93,7 +93,7 @@ static void
 tr_cpEnsureDoneValid( const tr_completion * ccp )
 {
     const tr_torrent * tor = ccp->tor;
-    const tr_info_t * info = &tor->info;
+    const tr_info * info = &tor->info;
     uint64_t have=0, total=0;
     int i;
     tr_completion * cp ;
@@ -294,7 +294,7 @@ tr_cpDownloadedValid( const tr_completion * cp )
 {
     uint64_t b = 0;
     const tr_torrent * tor = cp->tor;
-    const tr_info_t * info = &tor->info;
+    const tr_info * info = &tor->info;
     int i;
 
     for( i=0; i<info->pieceCount; ++i )

@@ -90,7 +90,7 @@ debug_window_text_buffer_new ( void )
 void
 msgwin_update( void )
 {
-  tr_msg_list_t * msgs, * ii;
+  tr_msg_list * msgs, * ii;
 
   g_assert( textbuf != NULL );
 

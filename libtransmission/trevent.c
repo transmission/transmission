@@ -44,7 +44,7 @@
 typedef struct tr_event_handle
 {
     tr_lock * lock;
-    tr_handle_t * h;
+    tr_handle * h;
     tr_thread * thread;
     tr_list * commands;
     struct event_base * base;
@@ -223,7 +223,7 @@ fprintf( stderr, "w00t!!!!!!!!!!!!!!!!!!!\n" );
 }
 
 void
-tr_eventInit( tr_handle_t * handle )
+tr_eventInit( tr_handle * handle )
 {
     tr_event_handle * eh;
 
@@ -235,7 +235,7 @@ tr_eventInit( tr_handle_t * handle )
 }
 
 void
-tr_eventClose( tr_handle_t * handle )
+tr_eventClose( tr_handle * handle )
 {
     tr_event_handle * eh = handle->events;
 
@@ -261,7 +261,7 @@ pushList( struct tr_event_handle * eh, struct tr_event_command * command )
 }
 
 void
-tr_evhttp_make_request (tr_handle_t               * handle,
+tr_evhttp_make_request (tr_handle                 * handle,
                         struct evhttp_connection  * evcon,
                         struct evhttp_request     * req,
                         enum   evhttp_cmd_type      type,
@@ -282,7 +282,7 @@ tr_evhttp_make_request (tr_handle_t               * handle,
 }
 
 void
-tr_bufferevent_write( tr_handle_t           * handle,
+tr_bufferevent_write( tr_handle             * handle,
                       struct bufferevent    * bufev,
                       const void            * buf,
                       size_t                  buflen )

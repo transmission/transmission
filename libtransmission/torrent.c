@@ -37,7 +37,6 @@
 #include "inout.h"
 #include "metainfo.h"
 #include "net.h" /* tr_netNtop */
-#include "peer.h"
 #include "peer-mgr.h"
 #include "platform.h"
 #include "ratecontrol.h"
@@ -280,10 +279,10 @@ recheckDoneCB( tr_torrent * tor )
 }
 
 static void
-torrentRealInit( tr_handle_t * h,
-                 tr_torrent  * tor,
-                 const char  * destination,
-                 int           flags )
+torrentRealInit( tr_handle  * h,
+                 tr_torrent * tor,
+                 const char * destination,
+                 int          flags )
 {
     uint64_t loaded;
     uint64_t t;
@@ -415,9 +414,9 @@ torrentRealInit( tr_handle_t * h,
 }
 
 static int
-pathIsInUse ( const tr_handle_t   * h,
-              const char          * destination,
-              const char          * name )
+pathIsInUse ( const tr_handle   * h,
+              const char        * destination,
+              const char        * name )
 {
     const tr_torrent * tor;
     
@@ -430,8 +429,8 @@ pathIsInUse ( const tr_handle_t   * h,
 }
 
 static int
-hashExists( const tr_handle_t   * h,
-            const uint8_t       * hash )
+hashExists( const tr_handle   * h,
+            const uint8_t     * hash )
 {
     const tr_torrent * tor;
 
@@ -443,8 +442,8 @@ hashExists( const tr_handle_t   * h,
 }
 
 static int
-infoCanAdd( const tr_handle_t   * h,
-            const char          * destination,
+infoCanAdd( const tr_handle   * h,
+            const char        * destination,
             const tr_info     * info )
 {
     if( hashExists( h, info->hash ) )
@@ -457,9 +456,9 @@ infoCanAdd( const tr_handle_t   * h,
 }
 
 int
-tr_torrentParse( const tr_handle_t  * h,
-                 const char         * path,
-                 const char         * destination,
+tr_torrentParse( const tr_handle  * h,
+                 const char       * path,
+                 const char       * destination,
                  tr_info          * setme_info )
 {
     int ret, doFree;
@@ -482,11 +481,11 @@ tr_torrentParse( const tr_handle_t  * h,
 }
  
 tr_torrent *
-tr_torrentInit( tr_handle_t   * h,
-                const char    * path,
-                const char    * destination,
-                int             flags,
-                int           * error )
+tr_torrentInit( tr_handle   * h,
+                const char  * path,
+                const char  * destination,
+                int           flags,
+                int         * error )
 {
     int val;
     int tmpError;
@@ -508,9 +507,9 @@ tr_torrentInit( tr_handle_t   * h,
 }
 
 int
-tr_torrentParseHash( const tr_handle_t  * h,
-                     const char         * hashStr,
-                     const char         * destination,
+tr_torrentParseHash( const tr_handle  * h,
+                     const char       * hashStr,
+                     const char       * destination,
                      tr_info          * setme_info )
 {
     int ret, doFree;
@@ -533,11 +532,11 @@ tr_torrentParseHash( const tr_handle_t  * h,
 }
 
 tr_torrent *
-tr_torrentInitSaved( tr_handle_t    * h,
-                     const char     * hashStr,
-                     const char     * destination,
-                     int              flags,
-                     int            * error )
+tr_torrentInitSaved( tr_handle    * h,
+                     const char   * hashStr,
+                     const char   * destination,
+                     int            flags,
+                     int          * error )
 {
     int val;
     int tmpError;
@@ -559,10 +558,10 @@ tr_torrentInitSaved( tr_handle_t    * h,
 }
 
 static int
-tr_torrentParseData( const tr_handle_t  * h,
-                     const uint8_t      * data,
-                     size_t               size,
-                     const char         * destination,
+tr_torrentParseData( const tr_handle  * h,
+                     const uint8_t    * data,
+                     size_t             size,
+                     const char       * destination,
                      tr_info          * setme_info )
 {
     int ret, doFree;
@@ -585,7 +584,7 @@ tr_torrentParseData( const tr_handle_t  * h,
 }
 
 tr_torrent *
-tr_torrentInitData( tr_handle_t    * h,
+tr_torrentInitData( tr_handle      * h,
                     const uint8_t  * data,
                     size_t           size,
                     const char     * destination,
@@ -1003,7 +1002,7 @@ static void
 tr_torrentFree( tr_torrent * tor )
 {
     tr_torrent * t;
-    tr_handle_t * h = tor->handle;
+    tr_handle * h = tor->handle;
     tr_info * inf = &tor->info;
 fprintf( stderr, "closing torrent %s\n", tor->info.name );
 

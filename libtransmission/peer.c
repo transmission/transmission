@@ -1075,7 +1075,7 @@ tr_torrentSwiftPulse ( tr_torrent * tor )
     tr_torrentWriterUnlock( tor );
 }
 void
-tr_swiftPulse( tr_handle_t * h )
+tr_swiftPulse( tr_handle * h )
 {
     static time_t lastPulseTime = 0;
 

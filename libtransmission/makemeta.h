@@ -13,14 +13,14 @@
 #ifndef TR_MAKEMETA_H
 #define TR_MAKEMETA_H 1
 
-typedef struct tr_metainfo_builder_file_s
+typedef struct tr_metainfo_builder_file
 {
     char * filename;
     uint64_t size;
 }
-tr_metainfo_builder_file_t;
+tr_metainfo_builder_file;
 
-typedef struct tr_metainfo_builder_s
+typedef struct tr_metainfo_builder
 {
     /**
     ***  These are set by tr_makeMetaInfoBuilderCreate()
@@ -28,13 +28,13 @@ typedef struct tr_metainfo_builder_s
     **/
 
     char * top;
-    tr_metainfo_builder_file_t * files;
+    tr_metainfo_builder_file * files;
     uint64_t totalSize;
     int fileCount;
     int pieceSize;
     int pieceCount;
     int isSingleFile;
-    tr_handle_t * handle;
+    tr_handle * handle;
 
     /**
     ***  These are set inside tr_makeMetaInfo()
@@ -64,19 +64,17 @@ typedef struct tr_metainfo_builder_s
     ***  The client should never use these fields.
     **/
 
-    struct tr_metainfo_builder_s * nextBuilder;
+    struct tr_metainfo_builder * nextBuilder;
 }
-tr_metainfo_builder_t;
+tr_metainfo_builder;
 
 
-
-
-tr_metainfo_builder_t*
-tr_metaInfoBuilderCreate( tr_handle_t  * handle,
-                          const char   * topFile );
+tr_metainfo_builder*
+tr_metaInfoBuilderCreate( tr_handle   * handle,
+                          const char  * topFile );
 
 void
-tr_metaInfoBuilderFree( tr_metainfo_builder_t* );
+tr_metaInfoBuilderFree( tr_metainfo_builder* );
 
 /**
  * 'outputFile' if NULL, builder->top + ".torrent" will be used.
@@ -89,11 +87,11 @@ tr_metaInfoBuilderFree( tr_metainfo_builder_t* );
  * the caller must pass the builder to tr_metaInfoBuilderFree().
  */
 void
-tr_makeMetaInfo( tr_metainfo_builder_t  * builder,
-                 const char             * outputFile,
-                 const char             * announce,
-                 const char             * comment,
-                 int                      isPrivate );
+tr_makeMetaInfo( tr_metainfo_builder  * builder,
+                 const char           * outputFile,
+                 const char           * announce,
+                 const char           * comment,
+                 int                    isPrivate );
 
 
 #endif

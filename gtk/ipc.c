@@ -817,12 +817,12 @@ addinfo( TrTorrent * tor, enum ipc_msg msgid, int torid, int types,
 {
     if( IPC_MSG_INFO == msgid )
     {
-        const tr_info_t * inf = tr_torrent_info( tor );
+        const tr_info * inf = tr_torrent_info( tor );
         return ipc_addinfo( val, torid, inf, types );
     }
     else
     {
-        const tr_stat_t * st = tr_torrent_stat( tor );
+        const tr_stat * st = tr_torrent_stat( tor );
         return ipc_addstat( val, torid, st, types );
     }
 }
@@ -836,7 +836,7 @@ smsg_look( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
     benc_val_t             packet, * pkval, * hash;
     int                    ii, torid;
     TrTorrent            * tor;
-    const tr_info_t      * inf;
+    const tr_info        * inf;
     uint8_t              * buf;
     size_t                 size;
 
@@ -981,7 +981,7 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
     struct constate_serv * srv = &con->u.serv;
     uint8_t              * buf;
     size_t                 size;
-    tr_handle_status_t   * hstat;
+    tr_handle_status     * hstat;
     const char           * pref;
     int                    num;
 

@@ -78,8 +78,8 @@ release_gobject_array (gpointer data)
 static gboolean
 refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
 {
-  tr_torrent_t * tor = tr_torrent_handle( TR_TORRENT(gtor) );
-  const tr_info_t * info = tr_torrent_info( TR_TORRENT(gtor) );
+  tr_torrent * tor = tr_torrent_handle( TR_TORRENT(gtor) );
+  const tr_info * info = tr_torrent_info( TR_TORRENT(gtor) );
   int mode = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(da), "draw-mode"));
 
   GdkColormap * colormap = gtk_widget_get_colormap (da);
@@ -261,21 +261,21 @@ static const char* peer_column_names[N_PEER_COLS] =
 
 static int compare_peers (const void * a, const void * b)
 {
-  const tr_peer_stat_t * pa = (const tr_peer_stat_t *) a;
-  const tr_peer_stat_t * pb = (const tr_peer_stat_t *) b;
+  const tr_peer_stat * pa = a;
+  const tr_peer_stat * pb = b;
   return strcmp (pa->addr, pb->addr);
 }
 static int compare_addr_to_peer (const void * a, const void * b)
 {
   const char * addr = (const char *) a;
-  const tr_peer_stat_t * peer = (const tr_peer_stat_t *) b;
+  const tr_peer_stat * peer = b;
   return strcmp (addr, peer->addr);
 }
 
 static void
-peer_row_set (GtkTreeStore          * store,
-              GtkTreeIter           * iter,
-              const tr_peer_stat_t  * peer)
+peer_row_set (GtkTreeStore        * store,
+              GtkTreeIter         * iter,
+              const tr_peer_stat  * peer)
 {
   const char * client = peer->client;
 
@@ -297,9 +297,9 @@ peer_row_set (GtkTreeStore          * store,
 }
 
 static void
-append_peers_to_model (GtkTreeStore          * store,
-                       const tr_peer_stat_t  * peers,
-                       int                     n_peers)
+append_peers_to_model (GtkTreeStore        * store,
+                       const tr_peer_stat  * peers,
+                       int                   n_peers)
 {
   int i;
   for (i=0; i<n_peers; ++i) {
@@ -310,7 +310,7 @@ append_peers_to_model (GtkTreeStore          * store,
 }
 
 static GtkTreeModel*
-peer_model_new (tr_torrent_t * tor)
+peer_model_new (tr_torrent * tor)
 {
   GtkTreeStore * m = gtk_tree_store_new (N_PEER_COLS,
                                          G_TYPE_STRING,  /* addr */
@@ -325,8 +325,8 @@ peer_model_new (tr_torrent_t * tor)
                                          G_TYPE_FLOAT);  /* uploadToRate */
 
   int n_peers = 0;
-  tr_peer_stat_t * peers = tr_torrentPeers (tor, &n_peers);
-  qsort (peers, n_peers, sizeof(tr_peer_stat_t), compare_peers);
+  tr_peer_stat * peers = tr_torrentPeers (tor, &n_peers);
+  qsort (peers, n_peers, sizeof(tr_peer_stat), compare_peers);
   append_peers_to_model (m, peers, n_peers);
   tr_torrentPeersFree( peers, 0 );
   return GTK_TREE_MODEL (m);
@@ -449,11 +449,11 @@ refresh_peers (GtkWidget * top)
   int n_peers;
   GtkTreeIter iter;
   PeerData * p = (PeerData*) g_object_get_data (G_OBJECT(top), "peer-data");
-  tr_torrent_t * tor = tr_torrent_handle ( p->gtor );
+  tr_torrent * tor = tr_torrent_handle ( p->gtor );
   GtkTreeModel * model = p->model;
   GtkTreeStore * store = p->store;
-  tr_peer_stat_t * peers;
-  const tr_stat_t * stat = tr_torrent_stat( p->gtor );
+  tr_peer_stat * peers;
+  const tr_stat * stat = tr_torrent_stat( p->gtor );
 
   /**
   ***  merge the peer diffs into the tree model.
@@ -465,15 +465,15 @@ refresh_peers (GtkWidget * top)
 
   n_peers = 0;
   peers = tr_torrentPeers (tor, &n_peers);
-  qsort (peers, n_peers, sizeof(tr_peer_stat_t), compare_peers);
+  qsort (peers, n_peers, sizeof(tr_peer_stat), compare_peers);
 
   i = 0;
   if (gtk_tree_model_get_iter_first (model, &iter)) do
   {
     char * addr = NULL;
-    tr_peer_stat_t * peer = NULL;
+    tr_peer_stat * peer = NULL;
     gtk_tree_model_get (model, &iter, PEER_COL_ADDRESS, &addr, -1);
-    peer = bsearch (addr, peers, n_peers, sizeof(tr_peer_stat_t),
+    peer = bsearch (addr, peers, n_peers, sizeof(tr_peer_stat),
                     compare_addr_to_peer);
     g_free (addr);
 
@@ -485,8 +485,8 @@ refresh_peers (GtkWidget * top)
 
       peer_row_set (store, &iter, peer);
 
-      /* remove it from the tr_peer_stat_t list */
-      g_memmove (peer, peer+1, sizeof(tr_peer_stat_t)*n_rhs);
+      /* remove it from the tr_peer_stat list */
+      g_memmove (peer, peer+1, sizeof(tr_peer_stat)*n_rhs);
       --n_peers;
     }
     else if (!gtk_tree_store_remove (store, &iter))
@@ -511,7 +511,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   guint i;
   GtkTreeModel *m;
   GtkWidget *h, *v, *w, *ret, *da, *sw, *l, *vbox, *hbox;
-  tr_torrent_t * tor = tr_torrent_handle (gtor);
+  tr_torrent * tor = tr_torrent_handle (gtor);
   PeerData * p = g_new (PeerData, 1);
   char name[64];
 
@@ -714,7 +714,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 *****  INFO TAB
 ****/
 
-static GtkWidget* info_page_new (tr_torrent_t * tor)
+static GtkWidget* info_page_new (tr_torrent * tor)
 {
   int row = 0;
   GtkWidget *t = hig_workarea_create ();
@@ -725,8 +725,8 @@ static GtkWidget* info_page_new (tr_torrent_t * tor)
   char name[128];
   const char * namefmt = "%s:";
   GtkTextBuffer * b;
-  tr_tracker_info_t * track;
-  const tr_info_t* info = tr_torrentInfo(tor);
+  tr_tracker_info * track;
+  const tr_info * info = tr_torrentInfo(tor);
 
   hig_workarea_add_section_title (t, &row, _("Torrent Information"));
   hig_workarea_add_section_spacer (t, row, 5);
@@ -833,7 +833,7 @@ static void
 refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
-  const tr_stat_t * stat = tr_torrent_stat( a->gtor );
+  const tr_stat * stat = tr_torrent_stat( a->gtor );
   guint64 size;
   char *pch;
 
@@ -1005,12 +1005,12 @@ stringToPriority( const char* str )
 }
 
 static void
-parsepath( const tr_torrent_t  * tor,
-           GtkTreeStore        * store,
-           GtkTreeIter         * ret,
-           const char          * path,
-           int                   index,
-           uint64_t              size )
+parsepath( const tr_torrent  * tor,
+           GtkTreeStore      * store,
+           GtkTreeIter       * ret,
+           const char        * path,
+           int                 index,
+           uint64_t            size )
 {
     GtkTreeModel * model;
     GtkTreeIter  * parent, start, iter;
@@ -1117,7 +1117,7 @@ static void
 updateprogress( GtkTreeModel   * model,
                 GtkTreeStore   * store,
                 GtkTreeIter    * parent,
-                tr_file_stat_t * fileStats,
+                tr_file_stat   * fileStats,
                 guint64        * setmeGotSize,
                 guint64        * setmeTotalSize)
 {
@@ -1206,10 +1206,10 @@ refreshPriorityActions( GtkTreeSelection * sel )
 }
 
 static void
-set_files_enabled( GtkTreeStore     * store,
-                   GtkTreeIter      * iter,
-                   tr_torrent_t     * tor,
-                   gboolean           enabled )
+set_files_enabled( GtkTreeStore   * store,
+                   GtkTreeIter    * iter,
+                   tr_torrent     * tor,
+                   gboolean         enabled )
 {
     int index;
     GtkTreeIter child;
@@ -1228,7 +1228,7 @@ static void
 set_priority (GtkTreeSelection * selection,
               GtkTreeStore * store,
               GtkTreeIter * iter,
-              tr_torrent_t * tor,
+              tr_torrent * tor,
               int priority_val,
               const char * priority_str)
 {
@@ -1257,7 +1257,7 @@ priority_changed_cb (GtkCellRendererText * cell UNUSED,
   FileData * d = (FileData*) file_data;
   if (gtk_tree_model_get_iter_from_string (d->model, &iter, path))
   {
-    tr_torrent_t  * tor = tr_torrent_handle( d->gtor );
+    tr_torrent  * tor = tr_torrent_handle( d->gtor );
     const tr_priority_t priority = stringToPriority( value );
     set_priority( d->selection, d->store, &iter, tor, priority, value );
   }
@@ -1288,8 +1288,7 @@ set_selected_file_priority ( tr_priority_t priority_val )
     if( popupView && GTK_IS_TREE_VIEW(popupView) )
     {
         GtkTreeView * view = GTK_TREE_VIEW( popupView );
-        tr_torrent_t * tor = (tr_torrent_t*)
-            g_object_get_data (G_OBJECT(view), "torrent-handle");
+        tr_torrent * tor = g_object_get_data (G_OBJECT(view), "torrent-handle");
         const char * priority_str = priorityToString( priority_val );
         GtkTreeModel * model;
         GtkTreeIter iter;
@@ -1328,8 +1327,8 @@ file_page_new ( TrTorrent * gtor )
 {
     GtkWidget           * ret;
     FileData            * data;
-    const tr_info_t     * inf;
-    tr_torrent_t        * tor;
+    const tr_info       * inf;
+    tr_torrent          * tor;
     GtkTreeStore        * store;
     int                   ii;
     GtkWidget           * view, * scroll;
@@ -1451,8 +1450,8 @@ refresh_files (GtkWidget * top)
     guint64 foo, bar;
     int fileCount = 0;
     FileData * data = (FileData*) g_object_get_data (G_OBJECT(top), "file-data");
-    tr_torrent_t * tor = tr_torrent_handle( data->gtor );
-    tr_file_stat_t * fileStats = tr_torrentFiles( tor, &fileCount );
+    tr_torrent * tor = tr_torrent_handle( data->gtor );
+    tr_file_stat * fileStats = tr_torrentFiles( tor, &fileCount );
     updateprogress (data->model, data->store, NULL, fileStats, &foo, &bar);
     tr_torrentFilesFree( fileStats, fileCount );
 }
@@ -1465,7 +1464,7 @@ refresh_files (GtkWidget * top)
 static void
 speed_toggled_cb( GtkToggleButton * tb, gpointer gtor, int up_or_down )
 {
-  tr_torrent_t * tor = tr_torrent_handle (gtor);
+  tr_torrent * tor = tr_torrent_handle (gtor);
   gboolean b = gtk_toggle_button_get_active(tb);
   tr_torrentSetSpeedMode( tor, up_or_down, b ? TR_SPEEDLIMIT_SINGLE
                                              : TR_SPEEDLIMIT_GLOBAL );
@@ -1499,7 +1498,7 @@ sensitize_from_check_cb (GtkToggleButton *toggle, gpointer w)
 static void
 setSpeedLimit( GtkSpinButton* spin, gpointer gtor, int up_or_down )
 {
-  tr_torrent_t * tor = tr_torrent_handle (gtor);
+  tr_torrent * tor = tr_torrent_handle (gtor);
   int KiB_sec = gtk_spin_button_get_value_as_int (spin);
   tr_torrentSetSpeedLimit( tor, up_or_down, KiB_sec );
 }
@@ -1528,7 +1527,7 @@ options_page_new ( TrTorrent * gtor )
   gboolean b;
   GtkAdjustment *a;
   GtkWidget *t, *w, *tb;
-  tr_torrent_t * tor = tr_torrent_handle (gtor);
+  tr_torrent * tor = tr_torrent_handle (gtor);
 
   row = 0;
   t = hig_workarea_create ();
@@ -1624,8 +1623,8 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   guint tag;
   char *size, *pch;
   GtkWidget *d, *n, *w;
-  tr_torrent_t * tor = tr_torrent_handle (gtor);
-  const tr_info_t * info = tr_torrent_info (gtor);
+  tr_torrent * tor = tr_torrent_handle (gtor);
+  const tr_info * info = tr_torrent_info (gtor);
 
   /* create the dialog */
   pch = g_strdup_printf ("%s: %s",

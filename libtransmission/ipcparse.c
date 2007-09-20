@@ -223,7 +223,7 @@ static int          gotmsg     ( struct ipc_info *, benc_val_t *, benc_val_t *,
 static int          msgcmp     ( struct msg *, struct msg * );
 static int          infcmp     ( struct inf *, struct inf * );
 static struct msg * msglookup  ( const char * );
-static int          filltracker( benc_val_t *, const tr_tracker_info_t * );
+static int          filltracker( benc_val_t *, const tr_tracker_info * );
 static int          handlercmp ( struct msgfunc *, struct msgfunc * );
 
 RB_GENERATE_STATIC( msgtree, msg, link, msgcmp )
@@ -1308,7 +1308,7 @@ msglookup( const char * name )
 }
 
 static int
-filltracker( benc_val_t * val, const tr_tracker_info_t * tk )
+filltracker( benc_val_t * val, const tr_tracker_info * tk )
 {
     tr_bencInit( val, TYPE_DICT );
     if( tr_bencDictReserve( val, ( NULL == tk->scrape ? 3 : 4 ) ) )

@@ -56,7 +56,7 @@ struct tor
 {
     int             id;
     uint8_t         hash[SHA_DIGEST_LENGTH];
-    tr_torrent_t  * tor;
+    tr_torrent    * tor;
     int             pexset;
     int             pex;
     RB_ENTRY( tor ) idlinks;
@@ -80,7 +80,7 @@ static struct tor * hashlookup ( const uint8_t * );
 static struct tor * iterate    ( struct tor * );
 
 static struct event_base * gl_base      = NULL;
-static tr_handle_t       * gl_handle    = NULL;
+static tr_handle         * gl_handle    = NULL;
 static struct tortree      gl_tree      = RB_INITIALIZER( &gl_tree );
 static struct hashtree     gl_hashes    = RB_INITIALIZER( &gl_hashes );
 static int                 gl_lastid    = 0;
@@ -185,7 +185,7 @@ torrent_start( int id )
     tor = idlookup( id );
     if( tor != NULL )
     {
-        const tr_stat_t  * st = tr_torrentStat( tor->tor );
+        const tr_stat  * st = tr_torrentStat( tor->tor );
 
         if( TR_STATUS_INACTIVE & st->status )
         {
@@ -207,7 +207,7 @@ torrent_stop( int id )
     tor = idlookup( id );
     if( tor != NULL )
     {
-        const tr_stat_t  * st = tr_torrentStat( tor->tor );
+        const tr_stat  * st = tr_torrentStat( tor->tor );
 
         if( TR_STATUS_ACTIVE & st->status )
         {
@@ -233,7 +233,7 @@ torrent_remove( int id )
     }
 }
 
-const tr_info_t *
+const tr_info *
 torrent_info( int id )
 {
     struct tor * tor;
@@ -250,7 +250,7 @@ torrent_info( int id )
     return tr_torrentInfo( tor->tor );
 }
 
-const tr_stat_t *
+const tr_stat *
 torrent_stat( int id )
 {
     struct tor * tor;
@@ -473,7 +473,7 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
 {
     struct tor * tor, * found;
     int          errcode;
-    const tr_info_t  * inf;
+    const tr_info  * inf;
 
     assert( ( NULL != path && NULL == hash && NULL == data ) ||
             ( NULL == path && NULL != hash && NULL == data ) ||
@@ -623,10 +623,10 @@ starttimer( int callnow )
 static void
 timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
 {
-    struct tor         * tor, * next;
-    tr_handle_status_t * hs;
-    int                  stillmore;
-    struct timeval       tv;
+    struct tor       * tor, * next;
+    tr_handle_status * hs;
+    int                stillmore;
+    struct timeval     tv;
 
     /* true if we've still got live torrents... */
     stillmore = tr_torrentCount( gl_handle ) != 0;
@@ -827,8 +827,8 @@ savestate( void )
 
     RB_FOREACH( ii, tortree, &gl_tree )
     {
-        const tr_info_t * inf;
-        const tr_stat_t * st;
+        const tr_info * inf;
+        const tr_stat * st;
         tor = tr_bencListAdd( list );
         assert( NULL != tor );
         tr_bencInit( tor, TYPE_DICT );

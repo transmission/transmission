@@ -35,8 +35,8 @@ typedef struct
     GtkWidget * private_check;
     GtkWidget * dialog;
     GtkWidget * progress_dialog;
-    tr_metainfo_builder_t * builder;
-    tr_handle_t * handle;
+    tr_metainfo_builder * builder;
+    tr_handle * handle;
 }
 MakeMetaUI;
 
@@ -217,7 +217,7 @@ file_chooser_shown_cb( GtkWidget *w, gpointer folder_toggle )
 }
 
 GtkWidget*
-make_meta_ui( GtkWindow * parent, tr_handle_t * handle )
+make_meta_ui( GtkWindow * parent, tr_handle * handle )
 {
     int row = 0;
     GtkWidget *d, *t, *w, *h, *rb_file, *rb_dir;

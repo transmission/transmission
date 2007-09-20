@@ -84,7 +84,7 @@ static int           downloadLimit = -1;
 static char          * torrentPath = NULL;
 static int           natTraversal  = 0;
 static sig_atomic_t  gotsig        = 0;
-static tr_torrent_t  * tor;
+static tr_torrent    * tor;
 
 static char          * finishCall   = NULL;
 static char          * announce     = NULL;
@@ -109,9 +109,9 @@ char * getStringRatio( float ratio )
 int main( int argc, char ** argv )
 {
     int i, error;
-    tr_handle_t  * h;
-    const tr_stat_t    * s;
-    tr_handle_status_t * hstat;
+    tr_handle  * h;
+    const tr_stat    * s;
+    tr_handle_status * hstat;
 
     printf( "Transmission %s - http://transmission.m0k.org/\n\n",
             LONG_VERSION_STRING );
@@ -156,7 +156,7 @@ int main( int argc, char ** argv )
     if( sourceFile && *sourceFile ) /* creating a torrent */
     {
         int ret;
-        tr_metainfo_builder_t* builder = tr_metaInfoBuilderCreate( h, sourceFile );
+        tr_metainfo_builder * builder = tr_metaInfoBuilderCreate( h, sourceFile );
         tr_makeMetaInfo( builder, torrentPath, announce, comment, isPrivate );
         while( !builder->isDone ) {
             wait_msecs( 1 );
@@ -177,7 +177,7 @@ int main( int argc, char ** argv )
 
     if( showInfo )
     {
-        const tr_info_t * info = tr_torrentInfo( tor );
+        const tr_info * info = tr_torrentInfo( tor );
 
         s = tr_torrentStat( tor );
 

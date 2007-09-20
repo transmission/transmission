@@ -16,6 +16,6 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 
-GtkWidget* make_meta_ui( GtkWindow * parent, tr_handle_t * handle );
+GtkWidget* make_meta_ui( GtkWindow * parent, tr_handle * handle );
 
 #endif
