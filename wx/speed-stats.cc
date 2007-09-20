@@ -192,7 +192,7 @@ SpeedStats :: OnPaint( wxPaintEvent& WXUNUSED(event) )
 }
 
 void
-SpeedStats :: SetTorrent( tr_torrent_t * tor )
+SpeedStats :: SetTorrent( tr_torrent * tor )
 {
     if( tor != myTorrent )
     {
@@ -210,7 +210,7 @@ SpeedStats :: SetTorrent( tr_torrent_t * tor )
 }
 
 void
-SpeedStats :: Pulse( tr_handle_t * handle )
+SpeedStats :: Pulse( tr_handle * handle )
 {
     // add a new record
     float allUp, allDown;
@@ -220,7 +220,7 @@ SpeedStats :: Pulse( tr_handle_t * handle )
     s.allUp = allUp;
     s.allDown = allDown;
     if( myTorrent ) {
-        const tr_stat_t * stat = tr_torrentStat( myTorrent );
+        const tr_stat * stat = tr_torrentStat( myTorrent );
         s.torrentUp = stat->rateUpload;
         s.torrentDown = stat->rateDownload;
     }

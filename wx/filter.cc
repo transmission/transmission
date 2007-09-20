@@ -22,10 +22,10 @@
 #include "filter.h"
 
 int
-TorrentFilter :: GetFlags( const tr_torrent_t * tor )
+TorrentFilter :: GetFlags( const tr_torrent * tor )
 {
     int flags = 0;
-    const tr_stat_t * s = tr_torrentStat( (tr_torrent_t*)tor );
+    const tr_stat * s = tr_torrentStat( (tr_torrent*)tor );
 
     switch( s->status )
     {

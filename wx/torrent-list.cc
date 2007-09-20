@@ -23,7 +23,7 @@
 
 namespace
 {
-    typedef std::vector<tr_torrent_t*> torrents_t;
+    typedef std::vector<tr_torrent*> torrents_t;
 
     enum
     {
@@ -182,11 +182,11 @@ END_EVENT_TABLE()
 
 
 
-TorrentListCtrl :: TorrentListCtrl( tr_handle_t       * handle,
-                                    wxConfig          * config,
-                                    wxWindow          * parent,
-                                    const wxPoint     & pos,
-                                    const wxSize      & size):
+TorrentListCtrl :: TorrentListCtrl( tr_handle       * handle,
+                                    wxConfig        * config,
+                                    wxWindow        * parent,
+                                    const wxPoint   & pos,
+                                    const wxSize    & size):
     wxListCtrl( parent, TORRENT_LIST_CTRL, pos, size, wxLC_REPORT|wxLC_HRULES ),
     myHandle( handle ),
     myConfig( config )
@@ -218,15 +218,15 @@ TorrentListCtrl :: SetCell( int item, int column, const wxString& xstr )
 }
 
 void
-TorrentListCtrl :: RefreshTorrent( tr_torrent_t  * tor,
-                                   int             myTorrents_index,
-                                   const int_v   & cols )
+TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
+                                   int            myTorrents_index,
+                                   const int_v  & cols )
 {
     int row = -1;
     int col = 0;
     char buf[512];
     std::string str;
-    const tr_stat_t * s = getStat( tor );
+    const tr_stat * s = getStat( tor );
     const tr_info_t* info = tr_torrentInfo( tor );
 
     for( int_v::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
@@ -369,7 +369,7 @@ TorrentListCtrl :: OnSort( wxListEvent& event )
 void
 TorrentListCtrl :: OnItemSelected( wxListEvent& WXUNUSED(event) )
 {
-    std::set<tr_torrent_t*> sel;
+    std::set<tr_torrent*> sel;
     long item = -1;
     for ( ;; ) {
         item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -396,12 +396,12 @@ int wxCALLBACK
 TorrentListCtrl :: Compare( long item1, long item2, long sortData )
 {
     TorrentListCtrl * self = uglyHack;
-    tr_torrent_t * a = self->myTorrents[item1];
-    tr_torrent_t * b = self->myTorrents[item2];
-    const tr_info_t* ia = tr_torrentInfo( a );
-    const tr_info_t* ib = tr_torrentInfo( b );
-    const tr_stat_t* sa = self->getStat( a );
-    const tr_stat_t* sb = self->getStat( b );
+    tr_torrent * a = self->myTorrents[item1];
+    tr_torrent * b = self->myTorrents[item2];
+    const tr_info* ia = tr_torrentInfo( a );
+    const tr_info* ib = tr_torrentInfo( b );
+    const tr_stat* sa = self->getStat( a );
+    const tr_stat* sb = self->getStat( b );
     int ret = 0;
 
     switch( abs(sortData) )
@@ -590,7 +590,7 @@ TorrentListCtrl :: Refresh ()
     for( int row=0; row<rowCount; ++row )
     {
         int array_index = GetItemData( row );
-        tr_torrent_t * tor = myTorrents[array_index];
+        tr_torrent * tor = myTorrents[array_index];
         RefreshTorrent( tor, array_index, cols );
     }
 }
@@ -652,7 +652,7 @@ TorrentListCtrl :: Rebuild()
     Repopulate( );
 }
 
-typedef std::set<tr_torrent_t*> torrent_set;
+typedef std::set<tr_torrent*> torrent_set;
 
 void
 TorrentListCtrl :: Assign( const torrents_t& torrents )
@@ -689,7 +689,7 @@ TorrentListCtrl :: Remove( const torrent_set& remove )
 
     for( int item=0; item<GetItemCount(); )
     {
-        tr_torrent_t * tor = myTorrents[GetItemData(item)];
+        tr_torrent * tor = myTorrents[GetItemData(item)];
         const tr_info_t* info = tr_torrentInfo( tor );
 
         if( remove.count( tor ) )
@@ -712,8 +712,8 @@ TorrentListCtrl :: Remove( const torrent_set& remove )
 ****
 ***/
 
-const tr_stat_t*
-TorrentListCtrl :: getStat( tr_torrent_t * tor )
+const tr_stat*
+TorrentListCtrl :: getStat( tr_torrent * tor )
 {
     const tr_info_t * info = tr_torrentInfo( tor );
     const time_t now = time( 0 );

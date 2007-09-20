@@ -42,7 +42,7 @@ class TorrentFilter
 
     public:
 
-        typedef std::vector<tr_torrent_t*> torrents_v;
+        typedef std::vector<tr_torrent*> torrents_v;
 
         enum Show {
             ALL,
@@ -52,7 +52,7 @@ class TorrentFilter
             N_FILTERS
         };
 
-        static int GetFlags( const tr_torrent_t * );
+        static int GetFlags( const tr_torrent * );
 
         static void CountHits( const torrents_v & torrents,
                                int              * counts );

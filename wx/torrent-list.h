@@ -66,13 +66,13 @@ class TorrentListCtrl: public wxListCtrl
 
             virtual void OnTorrentListSelectionChanged(
                 TorrentListCtrl*,
-                const std::set<tr_torrent_t*>& ) = 0;
+                const std::set<tr_torrent*>& ) = 0;
         };
 
     private:
         typedef std::set<Listener*> listeners_t;
         listeners_t myListeners;
-        void fire_selection_changed( const std::set<tr_torrent_t*>& t ) {
+        void fire_selection_changed( const std::set<tr_torrent*>& t ) {
             for( listeners_t::iterator it(myListeners.begin()), end(myListeners.end()); it!=end; )
                 (*it++)->OnTorrentListSelectionChanged( this, t );
         }
@@ -88,15 +88,15 @@ class TorrentListCtrl: public wxListCtrl
         void DeselectAll ();
 
     public:
-        typedef std::vector<tr_torrent_t*> torrents_v;
+        typedef std::vector<tr_torrent*> torrents_v;
         void Assign( const torrents_v& torrents );
 
     private:
         void Add( const torrents_v& torrents );
         void Sort( int column );
         void Resort( );
-        void RefreshTorrent( tr_torrent_t*, int, const std::vector<int>& );
-        void Remove( const std::set<tr_torrent_t*>& );
+        void RefreshTorrent( tr_torrent*, int, const std::vector<int>& );
+        void Remove( const std::set<tr_torrent*>& );
         static int wxCALLBACK Compare( long, long, long );
 
         /** torrent hash -> the torrent's row in myTorrentList */
@@ -109,12 +109,12 @@ class TorrentListCtrl: public wxListCtrl
     private:
         struct TorStat {
             time_t time;
-            const tr_stat_t * stat;
+            const tr_stat * stat;
             TorStat(): time(0), stat(0) {}
         };
         typedef std::map<std::string,TorStat> hash2stat_t;
         hash2stat_t myHashToStat;
-        const tr_stat_t* getStat( tr_torrent_t* );
+        const tr_stat* getStat( tr_torrent* );
 
     private:
         void OnSort( wxListEvent& );
@@ -123,7 +123,7 @@ class TorrentListCtrl: public wxListCtrl
         bool IsSorted( ) const;
 
     private:
-        tr_handle_t * myHandle;
+        tr_handle * myHandle;
         wxConfig * myConfig;
         torrents_v myTorrents;
         int prevSortCol;

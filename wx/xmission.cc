@@ -135,9 +135,9 @@ class MyApp : public wxApp
 
 namespace
 {
-    tr_handle_t * handle = NULL;
+    tr_handle * handle = NULL;
 
-    typedef std::vector<tr_torrent_t*> torrents_v;
+    typedef std::vector<tr_torrent*> torrents_v;
 }
 
 class MyFrame : public wxFrame, public TorrentListCtrl::Listener
@@ -172,7 +172,7 @@ public:
 
     void OnPulse( wxTimerEvent& );
 
-    virtual void OnTorrentListSelectionChanged( TorrentListCtrl*, const std::set<tr_torrent_t*>& );
+    virtual void OnTorrentListSelectionChanged( TorrentListCtrl*, const std::set<tr_torrent*>& );
 
 private:
     void RefreshFilterCounts( );
@@ -368,10 +368,10 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
         for( size_t i=0; i<nPaths; ++i )
         {
             const std::string filename = toStr( paths[i] );
-            tr_torrent_t * tor = tr_torrentInit( handle,
-                                                 filename.c_str(),
-                                                 mySavePath.c_str(),
-                                                 TR_FLAG_SAVE, NULL );
+            tr_torrent * tor = tr_torrentInit( handle,
+                                               filename.c_str(),
+                                               mySavePath.c_str(),
+                                               TR_FLAG_SAVE, NULL );
             if( tor )
                 myTorrents.push_back( tor );
         }
@@ -439,12 +439,12 @@ MyFrame :: ApplyCurrentFilter( )
 
 void
 MyFrame :: OnTorrentListSelectionChanged( TorrentListCtrl* list,
-                                          const std::set<tr_torrent_t*>& torrents )
+                                          const std::set<tr_torrent*>& torrents )
 {
     assert( list == myTorrentList );
     mySelectedTorrents.assign( torrents.begin(), torrents.end() );
 
-    tr_torrent_t * tor = mySelectedTorrents.empty() ? NULL : mySelectedTorrents.front();
+    tr_torrent * tor = mySelectedTorrents.empty() ? NULL : mySelectedTorrents.front();
     mySpeedStats->SetTorrent( tor );
 }
 
@@ -677,7 +677,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     if( paused )
         flags |= TR_FLAG_PAUSED;
     int count = 0;
-    tr_torrent_t ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), flags, &count );
+    tr_torrent ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), flags, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
     tr_free( torrents );
 

@@ -29,7 +29,7 @@
 
 extern "C"
 {
-    struct tr_torrent_s;
+    struct tr_torrent;
 }
 
 class SpeedStats: public wxPanel
@@ -47,9 +47,9 @@ class SpeedStats: public wxPanel
 
     public:
 
-        void SetTorrent( struct tr_torrent_s * );
+        void SetTorrent( struct tr_torrent * );
 
-        void Pulse( tr_handle_t * handle );
+        void Pulse( tr_handle * handle );
 
     public:
 
@@ -79,7 +79,7 @@ class SpeedStats: public wxPanel
 
         wxBitmap * myBitmap;
 
-        struct tr_torrent_s * myTorrent;
+        struct tr_torrent * myTorrent;
 
         struct Speed
         {
