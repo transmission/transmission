@@ -31,6 +31,8 @@
 
 #include <sys/types.h>
 
+#include "evdns.h"
+
 #ifdef __BEOS__
 extern int vasprintf( char **, const char *, va_list );
 #endif
@@ -84,7 +86,6 @@ struct tr_http_s {
 #define HTTP_LENGTH_FIXED       3
 #define HTTP_LENGTH_CHUNKED     4
     char           lengthtype;
-    tr_resolve_t * resolve;
     char         * host;
     int            port;
     int            sock;
@@ -567,6 +568,20 @@ tr_httpGetBody( tr_http_t * http, const char ** buf, int * len )
     *len = http->body.used;
 }
 
+static void
+resolve_cb( int result, char type, int count, int ttl, void *addresses, void *arg)
+{
+    tr_http_t * http = (tr_http_t *) arg;
+
+    if( (result!=DNS_ERR_NONE) || (type!=DNS_IPv4_A) || (ttl<0) || (count<1) )
+        http->state = HTTP_STATE_ERROR;
+    else {
+         struct in_addr *in_addrs = addresses;
+         http->sock = tr_netOpenTCP( &in_addrs[0], htons(http->port), 1 );
+         http->state = HTTP_STATE_CONNECT;
+    }
+}
+
 tr_tristate_t
 tr_httpPulse( tr_http_t * http, const char ** data, int * len )
 {
@@ -586,8 +601,7 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
                 http->state = HTTP_STATE_CONNECT;
                 break;
             }
-            http->resolve = tr_netResolveInit( http->host );
-            if( NULL == http->resolve )
+            if( evdns_resolve_ipv4( http->host, 0, resolve_cb, http ) )
             {
                 goto err;
             }
@@ -595,19 +609,7 @@ tr_httpPulse( tr_http_t * http, const char ** data, int * len )
             /* fallthrough */
 
         case HTTP_STATE_RESOLVE:
-            switch( tr_netResolvePulse( http->resolve, &addr ) )
-            {
-                case TR_NET_WAIT:
-                    return TR_NET_WAIT;
-                case TR_NET_ERROR:
-                    goto err;
-                case TR_NET_OK:
-                    tr_netResolveClose( http->resolve );
-                    http->resolve = NULL;
-                    http->sock = tr_netOpenTCP( &addr, htons( http->port ), 1 );
-                    http->state = HTTP_STATE_CONNECT;
-            }
-            /* fallthrough */
+            return TR_NET_WAIT;
 
         case HTTP_STATE_CONNECT:
             switch( sendrequest( http ) )
@@ -897,15 +899,8 @@ tr_httpWhatsMyAddress( tr_http_t * http )
 void
 tr_httpClose( tr_http_t * http )
 {
-    if( NULL != http->resolve )
-    {
-        tr_netResolveClose( http->resolve );
-    }
     free( http->host );
-    if( 0 <= http->sock )
-    {
-        tr_netClose( http->sock );
-    }
+    tr_netClose( http->sock );
     free( http->header.buf );
     free( http->body.buf );
     free( http );

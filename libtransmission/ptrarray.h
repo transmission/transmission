@@ -16,24 +16,25 @@
 /**
  * A simple pointer array that resizes itself dynamically.
  */
-typedef struct tr_ptrArray_s tr_ptrArray_t;
+typedef struct tr_ptrArray tr_ptrArray;
 
-tr_ptrArray_t * tr_ptrArrayNew         ( void );
-void            tr_ptrArrayFree        ( tr_ptrArray_t* );
-void**          tr_ptrArrayPeek        ( tr_ptrArray_t*, int * size );
-void**          tr_ptrArrayBase        ( tr_ptrArray_t* );
-void            tr_ptrArrayClear       ( tr_ptrArray_t* );
-int             tr_ptrArrayInsert      ( tr_ptrArray_t*, void*, int pos );
-int             tr_ptrArrayAppend      ( tr_ptrArray_t*, void* );
-void            tr_ptrArrayErase       ( tr_ptrArray_t*, int begin, int end );
-int             tr_ptrArraySize        ( const tr_ptrArray_t* );
-int             tr_ptrArrayEmpty       ( const tr_ptrArray_t* );
+tr_ptrArray * tr_ptrArrayNew     ( void );
 
-int             tr_ptrArrayInsertSorted( tr_ptrArray_t*, void*,
-                                         int compare(const void*,const void*) );
-void*           tr_ptrArrayRemoveSorted( tr_ptrArray_t*, void*,
-                                         int compare(const void*,const void*) );
-void*           tr_ptrArrayFindSorted  ( tr_ptrArray_t*, void*,
-                                         int compare(const void*,const void*) );
+void    tr_ptrArrayFree          ( tr_ptrArray* );
+void*   tr_ptrArrayNth           ( tr_ptrArray*, int n );
+void**  tr_ptrArrayPeek          ( tr_ptrArray*, int * size );
+void**  tr_ptrArrayBase          ( tr_ptrArray* );
+void    tr_ptrArrayClear         ( tr_ptrArray* );
+int     tr_ptrArrayInsert        ( tr_ptrArray*, void*, int pos );
+int     tr_ptrArrayAppend        ( tr_ptrArray*, void* );
+void    tr_ptrArrayErase         ( tr_ptrArray*, int begin, int end );
+int     tr_ptrArraySize          ( const tr_ptrArray* );
+int     tr_ptrArrayEmpty         ( const tr_ptrArray* );
+int     tr_ptrArrayInsertSorted  ( tr_ptrArray*, void*,
+                                   int compare(const void*,const void*) );
+void*   tr_ptrArrayRemoveSorted  ( tr_ptrArray*, void*,
+                                   int compare(const void*,const void*) );
+void*   tr_ptrArrayFindSorted    ( tr_ptrArray*, const void*,
+                                   int compare(const void*,const void*) );
 
 #endif

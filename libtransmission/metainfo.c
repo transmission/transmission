@@ -33,10 +33,10 @@
 
 #include "transmission.h"
 #include "bencode.h"
+#include "crypto.h" /* tr_sha1 */
 #include "http.h" /* tr_httpParseUrl */
 #include "metainfo.h"
 #include "platform.h"
-#include "sha1.h"
 #include "utils.h"
 
 #define TORRENT_MAX_SIZE (5*1024*1024)
@@ -44,7 +44,7 @@
 /***********************************************************************
  * Local prototypes
  **********************************************************************/
-static int realparse( tr_info_t * inf, const uint8_t * buf, size_t len );
+static int realparse( tr_info * inf, const uint8_t * buf, size_t len );
 static void savedname( char * name, size_t len, const char * hash,
                        const char * tag );
 static uint8_t * readtorrent( const char * path, size_t * len );
@@ -52,9 +52,9 @@ static int savetorrent( const char * hash, const char * tag,
                         const uint8_t * buf, size_t buflen );
 static int getfile( char * buf, int size,
                     const char * prefix, benc_val_t * name );
-static int getannounce( tr_info_t * inf, benc_val_t * meta );
+static int getannounce( tr_info * inf, benc_val_t * meta );
 static char * announceToScrape( const char * announce );
-static int parseFiles( tr_info_t * inf, benc_val_t * name,
+static int parseFiles( tr_info * inf, benc_val_t * name,
                        benc_val_t * files, benc_val_t * length );
 
 /***********************************************************************
@@ -63,7 +63,7 @@ static int parseFiles( tr_info_t * inf, benc_val_t * name,
  *
  **********************************************************************/
 int
-tr_metainfoParseFile( tr_info_t * inf, const char * tag,
+tr_metainfoParseFile( tr_info * inf, const char * tag,
                       const char * path, int save )
 {
     uint8_t * buf;
@@ -102,7 +102,7 @@ tr_metainfoParseFile( tr_info_t * inf, const char * tag,
 }
 
 int
-tr_metainfoParseData( tr_info_t * inf, const char * tag,
+tr_metainfoParseData( tr_info * inf, const char * tag,
                       const uint8_t * data, size_t size, int save )
 {
     if( realparse( inf, data, size ) )
@@ -123,7 +123,7 @@ tr_metainfoParseData( tr_info_t * inf, const char * tag,
 }
 
 int
-tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
+tr_metainfoParseHash( tr_info * inf, const char * tag, const char * hash )
 {
     struct stat sb;
     uint8_t   * buf;
@@ -172,7 +172,7 @@ tr_metainfoParseHash( tr_info_t * inf, const char * tag, const char * hash )
 }
 
 static int
-realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
+realparse( tr_info * inf, const uint8_t * buf, size_t size )
 {
     benc_val_t   meta, * beInfo, * val, * val2;
     int          i;
@@ -192,8 +192,9 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
         tr_bencFree( &meta );
         return TR_EINVALID;
     }
-    SHA1( (uint8_t *) beInfo->begin,
-          (long) beInfo->end - (long) beInfo->begin, inf->hash );
+
+    tr_sha1( inf->hash, beInfo->begin, beInfo->end - beInfo->begin, NULL );
+
     for( i = 0; i < SHA_DIGEST_LENGTH; i++ )
     {
         snprintf( inf->hashString + i * 2, sizeof( inf->hashString ) - i * 2,
@@ -254,7 +255,7 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
     }
     inf->pieceCount = val->val.s.i / SHA_DIGEST_LENGTH;
 
-    inf->pieces = calloc ( inf->pieceCount, sizeof(tr_piece_t) );
+    inf->pieces = calloc ( inf->pieceCount, sizeof(tr_piece) );
 
     for ( i=0; i<inf->pieceCount; ++i )
     {
@@ -307,7 +308,7 @@ realparse( tr_info_t * inf, const uint8_t * buf, size_t size )
     return TR_EINVALID;
 }
 
-void tr_metainfoFree( tr_info_t * inf )
+void tr_metainfoFree( tr_info * inf )
 {
     int i, j;
 
@@ -322,7 +323,7 @@ void tr_metainfoFree( tr_info_t * inf )
     }
     tr_free( inf->trackerList );
 
-    memset( inf, '\0', sizeof(tr_info_t) );
+    memset( inf, '\0', sizeof(tr_info) );
 }
 
 static int getfile( char * buf, int size,
@@ -381,12 +382,12 @@ static int getfile( char * buf, int size,
     return TR_OK;
 }
 
-static int getannounce( tr_info_t * inf, benc_val_t * meta )
+static int getannounce( tr_info * inf, benc_val_t * meta )
 {
     benc_val_t        * val, * subval, * urlval;
     char              * address, * announce;
     int                 ii, jj, port, random, subcount;
-    tr_tracker_info_t * sublist;
+    tr_tracker_info   * sublist;
     void * swapping;
 
     /* Announce-list */
@@ -411,7 +412,7 @@ static int getannounce( tr_info_t * inf, benc_val_t * meta )
             /* iterate through the tier's items */
             for( jj = 0; jj < subval->val.l.count; jj++ )
             {
-                tr_tracker_info_t tmp;
+                tr_tracker_info tmp;
 
                 urlval = &subval->val.l.vals[jj];
                 if( TYPE_STR != urlval->type ||
@@ -558,9 +559,9 @@ static char * announceToScrape( const char * announce )
 }
 
 int
-tr_trackerInfoInit( tr_tracker_info_t  * info,
-                    const char         * address,
-                    int                  address_len )
+tr_trackerInfoInit( tr_tracker_info  * info,
+                    const char       * address,
+                    int                address_len )
 {
     int ret = tr_httpParseUrl( address, address_len,
                                &info->address,
@@ -573,12 +574,12 @@ tr_trackerInfoInit( tr_tracker_info_t  * info,
 }
 
 void
-tr_trackerInfoClear( tr_tracker_info_t * info )
+tr_trackerInfoClear( tr_tracker_info * info )
 {
     tr_free( info->address );
     tr_free( info->announce );
     tr_free( info->scrape );
-    memset( info, '\0', sizeof(tr_tracker_info_t) );
+    memset( info, '\0', sizeof(tr_tracker_info) );
 }
 
 
@@ -690,7 +691,7 @@ savetorrent( const char * hash, const char * tag,
 }
 
 static int
-parseFiles( tr_info_t * inf, benc_val_t * name,
+parseFiles( tr_info * inf, benc_val_t * name,
             benc_val_t * files, benc_val_t * length )
 {
     benc_val_t * item, * path;

@@ -27,7 +27,7 @@
 
 #include "transmission.h"
 
-typedef struct tr_shared_s tr_shared_t;
+typedef struct tr_shared tr_shared;
 
 /***********************************************************************
  * tr_sharedInit, tr_sharedClose
@@ -35,8 +35,8 @@ typedef struct tr_shared_s tr_shared_t;
  * Starts / stops a thread to handle running things that are shared
  * among the torrents: NAT-PMP/UPnP, incoming connections, peer choking
  **********************************************************************/
-tr_shared_t * tr_sharedInit           ( tr_handle_t * );
-void          tr_sharedClose          ( tr_shared_t * );
+tr_shared * tr_sharedInit           ( tr_handle * );
+void        tr_sharedClose          ( tr_shared * );
 
 /***********************************************************************
  * tr_sharedLock, tr_sharedUnlock
@@ -44,8 +44,8 @@ void          tr_sharedClose          ( tr_shared_t * );
  * Gets / releases exclusive access to ressources used by the shared
  * thread
  **********************************************************************/
-void          tr_sharedLock           ( tr_shared_t * );
-void          tr_sharedUnlock         ( tr_shared_t * );
+void          tr_sharedLock           ( tr_shared * );
+void          tr_sharedUnlock         ( tr_shared * );
 
 /***********************************************************************
  * tr_sharedSetPort
@@ -53,8 +53,8 @@ void          tr_sharedUnlock         ( tr_shared_t * );
  * Changes the port for incoming connections.  tr_sharedGetPublicPort
  * should be called with the shared lock held.
  **********************************************************************/
-void         tr_sharedSetPort         ( tr_shared_t *, int port );
-int          tr_sharedGetPublicPort   ( tr_shared_t * s );
+void         tr_sharedSetPort         ( tr_shared *, int port );
+int          tr_sharedGetPublicPort   ( tr_shared * s );
 
 /***********************************************************************
  * tr_sharedTraversalEnable, tr_sharedTraversalStatus
@@ -62,15 +62,9 @@ int          tr_sharedGetPublicPort   ( tr_shared_t * s );
  * Enables/disables and retrieves the status of NAT traversal.  Should
  * be called with the shared lock held.
  **********************************************************************/
-void         tr_sharedTraversalEnable ( tr_shared_t *, int enable );
-int          tr_sharedTraversalStatus ( tr_shared_t * );
+void         tr_sharedTraversalEnable ( tr_shared *, int enable );
+int          tr_sharedTraversalStatus ( tr_shared * );
 
-/***********************************************************************
- * tr_sharedSetLimit
- ***********************************************************************
- *
- **********************************************************************/
-void         tr_sharedSetLimit        ( tr_shared_t *, int limit );
 
 #endif
 

@@ -27,39 +27,34 @@
 
 #include "transmission.h"
 
-typedef struct tr_completion_s tr_completion_t;
+typedef struct tr_completion tr_completion;
 
-tr_completion_t     * tr_cpInit( tr_torrent_t * );
-void                  tr_cpClose( tr_completion_t * );
-void                  tr_cpReset( tr_completion_t * );
+tr_completion  * tr_cpInit( tr_torrent * );
+void             tr_cpClose( tr_completion * );
+void             tr_cpReset( tr_completion * );
 
 /* General */
 
-cp_status_t           tr_cpGetStatus ( const tr_completion_t * );
-uint64_t              tr_cpDownloadedValid( const tr_completion_t * );
-uint64_t              tr_cpLeftUntilComplete( const tr_completion_t * );
-uint64_t              tr_cpLeftUntilDone( const tr_completion_t * );
-float                 tr_cpPercentComplete( const tr_completion_t * );
-float                 tr_cpPercentDone( const tr_completion_t * );
-void                  tr_cpInvalidateDND ( tr_completion_t * );
+cp_status_t      tr_cpGetStatus ( const tr_completion * );
+uint64_t         tr_cpDownloadedValid( const tr_completion * );
+uint64_t         tr_cpLeftUntilComplete( const tr_completion * );
+uint64_t         tr_cpLeftUntilDone( const tr_completion * );
+float            tr_cpPercentComplete( const tr_completion * );
+float            tr_cpPercentDone( const tr_completion * );
+void             tr_cpInvalidateDND ( tr_completion * );
 
 /* Pieces */
-int                   tr_cpPieceIsComplete( const tr_completion_t *, int piece );
-void                  tr_cpPieceAdd( tr_completion_t *, int piece );
-void                  tr_cpPieceRem( tr_completion_t *, int piece );
+int              tr_cpPieceIsComplete( const tr_completion *, int piece );
+void             tr_cpPieceAdd( tr_completion *, int piece );
+void             tr_cpPieceRem( tr_completion *, int piece );
 
 /* Blocks */
-void                  tr_cpDownloaderAdd( tr_completion_t *, int block );
-void                  tr_cpDownloaderRem( tr_completion_t *, int block );
-int                   tr_cpBlockIsComplete( const tr_completion_t *, int block );
-void                  tr_cpBlockAdd( tr_completion_t *, int block );
-void                  tr_cpBlockBitfieldSet( tr_completion_t *, struct tr_bitfield_s * );
-float                 tr_cpPercentBlocksInPiece( const tr_completion_t * cp, int piece );
-/* Missing = we don't have it and we are not getting it from any peer yet */
-int                   tr_cpMissingBlocksForPiece( const tr_completion_t * cp, int piece );
-int                   tr_cpMissingBlockInPiece( const tr_completion_t *, int piece );
+int              tr_cpBlockIsComplete( const tr_completion *, int block );
+void             tr_cpBlockAdd( tr_completion *, int block );
+void             tr_cpBlockBitfieldSet( tr_completion *, struct tr_bitfield * );
+float            tr_cpPercentBlocksInPiece( const tr_completion * cp, int piece );
 
-const struct tr_bitfield_s * tr_cpPieceBitfield( const tr_completion_t* );
-const struct tr_bitfield_s * tr_cpBlockBitfield( const tr_completion_t * );
+const struct tr_bitfield * tr_cpPieceBitfield( const tr_completion* );
+const struct tr_bitfield * tr_cpBlockBitfield( const tr_completion * );
 
 #endif

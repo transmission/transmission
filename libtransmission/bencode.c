@@ -364,7 +364,7 @@ benc_val_t * tr_bencListAdd( benc_val_t * list )
 {
     benc_val_t * item;
 
-    assert( TYPE_LIST == list->type );
+    assert( tr_bencIsList( list ) );
     assert( list->val.l.count < list->val.l.alloc );
 
     item = &list->val.l.vals[list->val.l.count];
@@ -378,7 +378,7 @@ benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
 {
     benc_val_t * keyval, * itemval;
 
-    assert( TYPE_DICT == dict->type );
+    assert( tr_bencIsDict( dict ) );
     assert( dict->val.l.count + 2 <= dict->val.l.alloc );
 
     keyval = dict->val.l.vals + dict->val.l.count++;
@@ -478,4 +478,32 @@ int tr_bencSave( benc_val_t * val, char ** buf, int * used, int * max )
     }
 
     return 0;
+}
+
+/**
+***
+**/
+
+int
+tr_bencIsStr ( const benc_val_t * val )
+{
+    return val!=NULL && val->type==TYPE_STR;
+}
+
+int
+tr_bencIsInt ( const benc_val_t * val )
+{
+    return val!=NULL && val->type==TYPE_INT;
+}
+
+int
+tr_bencIsList( const benc_val_t * val )
+{
+    return val!=NULL && val->type==TYPE_LIST;
+}
+
+int
+tr_bencIsDict( const benc_val_t * val )
+{
+    return val!=NULL && val->type==TYPE_DICT;
 }

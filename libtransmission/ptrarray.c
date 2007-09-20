@@ -19,19 +19,19 @@
 
 #define GROW 32
 
-struct tr_ptrArray_s
+struct tr_ptrArray
 {
     void ** items;
     int n_items;
     int n_alloc;
 };
 
-tr_ptrArray_t*
+tr_ptrArray*
 tr_ptrArrayNew( void )
 {
-    tr_ptrArray_t * p;
+    tr_ptrArray * p;
 
-    p = tr_new( tr_ptrArray_t, 1 );
+    p = tr_new( tr_ptrArray, 1 );
     p->n_items = 0;
     p->n_alloc = GROW;
     p->items = tr_new( void*, p->n_alloc );
@@ -40,7 +40,7 @@ tr_ptrArrayNew( void )
 }
 
 void
-tr_ptrArrayFree( tr_ptrArray_t * t )
+tr_ptrArrayFree( tr_ptrArray * t )
 {
     assert( t != NULL );
     assert( t->items != NULL );
@@ -50,32 +50,42 @@ tr_ptrArrayFree( tr_ptrArray_t * t )
 }
 
 void**
-tr_ptrArrayPeek( tr_ptrArray_t * t, int * size )
+tr_ptrArrayPeek( tr_ptrArray * t, int * size )
 {
     *size = t->n_items;
     return t->items;
 }
 
+void*
+tr_ptrArrayNth( tr_ptrArray* t, int i )
+{
+    assert( t != NULL  );
+    assert( i >= 0 );
+    assert( i < t->n_items );
+
+    return t->items[i];
+}
+
 int
-tr_ptrArraySize( const tr_ptrArray_t * t )
+tr_ptrArraySize( const tr_ptrArray * t )
 {
     return t->n_items;
 }
 
 int
-tr_ptrArrayEmpty( const tr_ptrArray_t * t )
+tr_ptrArrayEmpty( const tr_ptrArray * t )
 {
     return t->n_items == 0;
 }
 
 void
-tr_ptrArrayClear( tr_ptrArray_t * t )
+tr_ptrArrayClear( tr_ptrArray * t )
 {
     t->n_items = 0;
 }
 
 int
-tr_ptrArrayInsert( tr_ptrArray_t * t, void * ptr, int pos )
+tr_ptrArrayInsert( tr_ptrArray * t, void * ptr, int pos )
 {
     if( pos<0 || pos>t->n_items )
         pos = t->n_items;
@@ -95,13 +105,13 @@ tr_ptrArrayInsert( tr_ptrArray_t * t, void * ptr, int pos )
 }
 
 int
-tr_ptrArrayAppend( tr_ptrArray_t * t, void * ptr )
+tr_ptrArrayAppend( tr_ptrArray * t, void * ptr )
 {
     return tr_ptrArrayInsert( t, ptr, -1 );
 }
 
 void
-tr_ptrArrayErase( tr_ptrArray_t * t, int begin, int end )
+tr_ptrArrayErase( tr_ptrArray * t, int begin, int end )
 {
     assert( begin >= 0 );
     if( end < 0 ) end = t->n_items;
@@ -120,12 +130,11 @@ tr_ptrArrayErase( tr_ptrArray_t * t, int begin, int end )
 **/
 
 int
-tr_ptrArrayLowerBound( const tr_ptrArray_t * t,
-                       void                * ptr,
-                       int                   compare( const void *,const void * ),
-                       int                 * exact_match )
+tr_ptrArrayLowerBound( const tr_ptrArray * t,
+                       const void        * ptr,
+                       int                 compare( const void *,const void * ),
+                       int               * exact_match )
 {
-    int c = -1;
     int len = t->n_items;
     int first = 0;
 
@@ -133,7 +142,7 @@ tr_ptrArrayLowerBound( const tr_ptrArray_t * t,
     {
         int half = len / 2;
         int middle = first + half;
-        c = compare( t->items[middle], ptr );
+        const int c = compare( t->items[middle], ptr );
         if( c < 0 ) {
             first = middle + 1;
             len = len - half - 1;
@@ -154,18 +163,18 @@ tr_ptrArrayLowerBound( const tr_ptrArray_t * t,
 } 
 
 int
-tr_ptrArrayInsertSorted( tr_ptrArray_t  * t,
-                         void           * ptr,
-                         int              compare(const void*,const void*) )
+tr_ptrArrayInsertSorted( tr_ptrArray  * t,
+                         void         * ptr,
+                         int            compare(const void*,const void*) )
 {
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, NULL );
     return tr_ptrArrayInsert( t, ptr, pos );
 }
 
 void*
-tr_ptrArrayFindSorted( tr_ptrArray_t  * t,
-                       void           * ptr,
-                       int              compare(const void*,const void*) )
+tr_ptrArrayFindSorted( tr_ptrArray  * t,
+                       const void   * ptr,
+                       int            compare(const void*,const void*) )
 {
     int match;
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, &match );
@@ -173,9 +182,9 @@ tr_ptrArrayFindSorted( tr_ptrArray_t  * t,
 }
 
 void*
-tr_ptrArrayRemoveSorted( tr_ptrArray_t  * t,
-                         void           * ptr,
-                         int              compare(const void*,const void*) )
+tr_ptrArrayRemoveSorted( tr_ptrArray  * t,
+                         void         * ptr,
+                         int            compare(const void*,const void*) )
 {
     void * ret = NULL;
     int match;

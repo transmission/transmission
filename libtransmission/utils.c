@@ -49,11 +49,11 @@
 
 #define SPRINTF_BUFSIZE         100
 
-static tr_lock_t      * messageLock = NULL;
-static int              messageLevel = 0;
-static int              messageQueuing = FALSE;
-static tr_msg_list_t *  messageQueue = NULL;
-static tr_msg_list_t ** messageQueueTail = &messageQueue;
+static tr_lock      * messageLock = NULL;
+static int            messageLevel = 0;
+static int            messageQueuing = FALSE;
+static tr_msg_list *  messageQueue = NULL;
+static tr_msg_list ** messageQueueTail = &messageQueue;
 
 void tr_msgInit( void )
 {
@@ -89,9 +89,9 @@ void tr_setMessageQueuing( int enabled )
     tr_lockUnlock( messageLock );
 }
 
-tr_msg_list_t * tr_getQueuedMessages( void )
+tr_msg_list * tr_getQueuedMessages( void )
 {
-    tr_msg_list_t * ret;
+    tr_msg_list * ret;
 
     assert( NULL != messageLock );
     tr_lockLock( messageLock );
@@ -103,9 +103,9 @@ tr_msg_list_t * tr_getQueuedMessages( void )
     return ret;
 }
 
-void tr_freeMessageList( tr_msg_list_t * list )
+void tr_freeMessageList( tr_msg_list * list )
 {
-    tr_msg_list_t * next;
+    tr_msg_list * next;
 
     while( NULL != list )
     {
@@ -118,8 +118,8 @@ void tr_freeMessageList( tr_msg_list_t * list )
 
 void tr_msg( int level, char * msg, ... )
 {
-    va_list         args1, args2;
-    tr_msg_list_t * newmsg;
+    va_list       args1, args2;
+    tr_msg_list * newmsg;
     int             len1, len2;
 
     assert( NULL != messageLock );
@@ -185,6 +185,65 @@ int tr_rand( int sup )
     return rand() % sup;
 }
 
+/***
+****
+***/
+
+void
+tr_set_compare( const void * va, size_t aCount,
+                const void * vb, size_t bCount,
+                int compare( const void * a, const void * b ),
+                size_t elementSize,
+                tr_set_func in_a_cb,
+                tr_set_func in_b_cb,
+                tr_set_func in_both_cb,
+                void * userData )
+{
+    const uint8_t * a = (const uint8_t *) va;
+    const uint8_t * b = (const uint8_t *) vb;
+    const uint8_t * aend = a + elementSize*aCount;
+    const uint8_t * bend = b + elementSize*bCount;
+
+    while( a!=aend || b!=bend )
+    {
+        if( a==aend )
+        {
+            (*in_b_cb)( (void*)b, userData );
+            b += elementSize;
+        }
+        else if ( b==bend )
+        {
+            (*in_a_cb)( (void*)a, userData );
+            a += elementSize;
+        }
+        else
+        {
+            const int val = (*compare)( a, b );
+
+            if( !val )
+            {
+                (*in_both_cb)( (void*)a, userData );
+                a += elementSize;
+                b += elementSize;
+            }
+            else if( val < 0 )
+            {
+                (*in_a_cb)( (void*)a, userData );
+                a += elementSize;
+            }
+            else if( val > 0 )
+            {
+                (*in_b_cb)( (void*)b, userData );
+                b += elementSize;
+            }
+        }
+    }
+}
+
+/***
+****
+***/
+
 
 #if 0
 void*
@@ -236,6 +295,46 @@ void * tr_memmem ( const void *vbig, size_t big_len,
     return NULL;
 }
 #endif
+
+/**
+***
+**/
+
+int
+tr_compareUint8 (  uint8_t a,  uint8_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
+tr_compareUint16( uint16_t a, uint16_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
+tr_compareUint32( uint32_t a, uint32_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+int
+tr_compareUint64( uint64_t a, uint64_t b )
+{
+    if( a < b ) return -1;
+    if( a > b ) return 1;
+    return 0;
+}
+
+/**
+***
+**/
 
 struct timeval
 timevalSec ( int seconds )
@@ -566,14 +665,14 @@ void tr_free( void * p )
 ****/
 
 /* note that the argument is how many bits are needed, not bytes */
-tr_bitfield_t*
+tr_bitfield*
 tr_bitfieldNew( size_t bitcount )
 {
-    tr_bitfield_t * ret = calloc( 1, sizeof(tr_bitfield_t) );
+    tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
     if( NULL == ret )
         return NULL;
 
-    ret->len = ( bitcount + 7u ) / 8u;
+    ret->len = (bitcount+7u) / 8u;
     ret->bits = calloc( ret->len, 1 );
     if( NULL == ret->bits ) {
         free( ret );
@@ -583,17 +682,17 @@ tr_bitfieldNew( size_t bitcount )
     return ret;
 }
 
-tr_bitfield_t*
-tr_bitfieldDup( const tr_bitfield_t * in )
+tr_bitfield*
+tr_bitfieldDup( const tr_bitfield * in )
 {
-    tr_bitfield_t * ret = calloc( 1, sizeof(tr_bitfield_t) );
+    tr_bitfield * ret = calloc( 1, sizeof(tr_bitfield) );
     ret->len = in->len;
     ret->bits = malloc( ret->len );
     memcpy( ret->bits, in->bits, ret->len );
     return ret;
 }
 
-void tr_bitfieldFree( tr_bitfield_t * bitfield )
+void tr_bitfieldFree( tr_bitfield * bitfield )
 {
     if( bitfield )
     {
@@ -603,13 +702,13 @@ void tr_bitfieldFree( tr_bitfield_t * bitfield )
 }
 
 void
-tr_bitfieldClear( tr_bitfield_t * bitfield )
+tr_bitfieldClear( tr_bitfield * bitfield )
 {
     memset( bitfield->bits, 0, bitfield->len );
 }
 
 int
-tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
+tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
 {
     unsigned int i;
 
@@ -624,7 +723,7 @@ tr_bitfieldIsEmpty( const tr_bitfield_t * bitfield )
 #define BIT(nth) (1<<(7-(nth%8)))
 
 void
-tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t nth )
+tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
     assert( bitfield != NULL );
     assert( BIN(nth) < bitfield->len );
@@ -632,9 +731,9 @@ tr_bitfieldAdd( tr_bitfield_t  * bitfield, size_t nth )
 }
 
 void
-tr_bitfieldAddRange( tr_bitfield_t  * bitfield,
-                     size_t           begin,
-                     size_t           end )
+tr_bitfieldAddRange( tr_bitfield  * bitfield,
+                     size_t         begin,
+                     size_t         end )
 {
     /* TODO: there are faster ways to do this */
     unsigned int i;
@@ -643,8 +742,8 @@ tr_bitfieldAddRange( tr_bitfield_t  * bitfield,
 }
 
 void
-tr_bitfieldRem( tr_bitfield_t   * bitfield,
-                size_t            nth )
+tr_bitfieldRem( tr_bitfield   * bitfield,
+                size_t          nth )
 {
     if( bitfield != NULL )
     {
@@ -655,9 +754,9 @@ tr_bitfieldRem( tr_bitfield_t   * bitfield,
 }
 
 void
-tr_bitfieldRemRange ( tr_bitfield_t  * b,
-                      size_t           begin,
-                      size_t           end )
+tr_bitfieldRemRange ( tr_bitfield  * b,
+                      size_t         begin,
+                      size_t         end )
 {
     /* TODO: there are faster ways to do this */
     unsigned int i;
@@ -665,8 +764,8 @@ tr_bitfieldRemRange ( tr_bitfield_t  * b,
         tr_bitfieldRem( b, i );
 }
 
-tr_bitfield_t*
-tr_bitfieldNegate( tr_bitfield_t * b )
+tr_bitfield*
+tr_bitfieldNegate( tr_bitfield * b )
 {
     uint8_t *it;
     const uint8_t *end;
@@ -677,8 +776,8 @@ tr_bitfieldNegate( tr_bitfield_t * b )
     return b;
 }
 
-tr_bitfield_t*
-tr_bitfieldAnd( tr_bitfield_t * a, const tr_bitfield_t * b )
+tr_bitfield*
+tr_bitfieldAnd( tr_bitfield * a, const tr_bitfield * b )
 {
     uint8_t *ait;
     const uint8_t *aend, *bit;
@@ -692,7 +791,7 @@ tr_bitfieldAnd( tr_bitfield_t * a, const tr_bitfield_t * b )
 }
 
 size_t
-tr_bitfieldCountTrueBits( const tr_bitfield_t* b )
+tr_bitfieldCountTrueBits( const tr_bitfield* b )
 {
     size_t ret = 0;
     const uint8_t *it, *end;

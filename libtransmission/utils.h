@@ -138,28 +138,50 @@ char* tr_strndup( const char * str, int len );
 ****
 ***/
 
-typedef struct tr_bitfield_s
+typedef void (tr_set_func)(void * element, void * userData );
+
+void tr_set_compare( const void * a, size_t aCount,
+                     const void * b, size_t bCount,
+                     int compare( const void * a, const void * b ),
+                     size_t elementSize,
+                     tr_set_func in_a_cb,
+                     tr_set_func in_b_cb,
+                     tr_set_func in_both_cb,
+                     void * userData );
+                    
+int tr_compareUint8 (  uint8_t a,  uint8_t b );
+int tr_compareUint16( uint16_t a, uint16_t b );
+int tr_compareUint32( uint32_t a, uint32_t b );
+int tr_compareUint64( uint64_t a, uint64_t b );
+
+/***
+****
+***/
+
+struct tr_bitfield
 {
     uint8_t * bits;
     size_t len;
-}
-tr_bitfield_t;
+};
 
-tr_bitfield_t* tr_bitfieldNew( size_t bitcount );
-tr_bitfield_t* tr_bitfieldDup( const tr_bitfield_t* );
-void tr_bitfieldFree( tr_bitfield_t*);
+typedef struct tr_bitfield tr_bitfield;
+typedef struct tr_bitfield tr_bitfield_t;
 
-void tr_bitfieldClear( tr_bitfield_t* );
-void tr_bitfieldAdd( tr_bitfield_t*, size_t bit );
-void tr_bitfieldRem( tr_bitfield_t*, size_t bit );
-void tr_bitfieldAddRange( tr_bitfield_t *, size_t begin, size_t end );
-void tr_bitfieldRemRange ( tr_bitfield_t*, size_t begin, size_t end );
+tr_bitfield* tr_bitfieldNew( size_t bitcount );
+tr_bitfield* tr_bitfieldDup( const tr_bitfield* );
+void tr_bitfieldFree( tr_bitfield*);
 
-int    tr_bitfieldIsEmpty( const tr_bitfield_t* );
-size_t tr_bitfieldCountTrueBits( const tr_bitfield_t* );
+void tr_bitfieldClear( tr_bitfield* );
+void tr_bitfieldAdd( tr_bitfield*, size_t bit );
+void tr_bitfieldRem( tr_bitfield*, size_t bit );
+void tr_bitfieldAddRange( tr_bitfield *, size_t begin, size_t end );
+void tr_bitfieldRemRange ( tr_bitfield*, size_t begin, size_t end );
 
-tr_bitfield_t* tr_bitfieldNegate( tr_bitfield_t* );
-tr_bitfield_t* tr_bitfieldAnd( tr_bitfield_t*, const tr_bitfield_t* );
+int    tr_bitfieldIsEmpty( const tr_bitfield* );
+size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
+
+tr_bitfield* tr_bitfieldNegate( tr_bitfield* );
+tr_bitfield* tr_bitfieldAnd( tr_bitfield*, const tr_bitfield* );
 
 #define tr_bitfieldHas(bitfield,nth) \
     ( ( bitfield ) && ( (bitfield)->bits[(nth)>>3] & 128 >>( (nth) & 7 ) ) )

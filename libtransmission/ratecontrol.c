@@ -38,13 +38,13 @@
 typedef struct
 {
     uint64_t date;
-    int      size;
+    uint64_t size;
 }
 tr_transfer_t;
 
-struct tr_ratecontrol_s
+struct tr_ratecontrol
 {
-    tr_lock_t * lock;
+    tr_lock * lock;
     int limit;
     int newest;
     tr_transfer_t transfers[HISTORY_SIZE];
@@ -52,14 +52,14 @@ struct tr_ratecontrol_s
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
 static float
-rateForInterval( const tr_ratecontrol_t * r, int interval_msec )
+rateForInterval( const tr_ratecontrol * r, int interval_msec )
 {
     uint64_t bytes = 0;
-    const uint64_t now = tr_date ();
+    const uint64_t cutoff = tr_date () - interval_msec;
     int i = r->newest;
     for( ;; )
     {
-        if( r->transfers[i].date + interval_msec < now )
+        if( r->transfers[i].date < cutoff )
             break;
 
         bytes += r->transfers[i].size;
@@ -75,17 +75,17 @@ rateForInterval( const tr_ratecontrol_t * r, int interval_msec )
 ****
 ***/
 
-tr_ratecontrol_t*
+tr_ratecontrol*
 tr_rcInit( void )
 {
-    tr_ratecontrol_t * r = tr_new0( tr_ratecontrol_t, 1 );
+    tr_ratecontrol * r = tr_new0( tr_ratecontrol, 1 );
     r->limit = 0;
     r->lock = tr_lockNew( );
     return r;
 }
 
 void
-tr_rcClose( tr_ratecontrol_t * r )
+tr_rcClose( tr_ratecontrol * r )
 {
     tr_rcReset( r );
     tr_lockFree( r->lock );
@@ -97,26 +97,34 @@ tr_rcClose( tr_ratecontrol_t * r )
 ***/
 
 int
-tr_rcCanTransfer( const tr_ratecontrol_t * r )
+tr_rcCanTransfer( const tr_ratecontrol * r )
 {
     int ret;
-    tr_lockLock( (tr_lock_t*)r->lock );
 
-    ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
+    if( r == NULL )
+        ret = 0;
+    else {
+        tr_lockLock( (tr_lock*)r->lock );
+        ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
+        tr_lockUnlock( (tr_lock*)r->lock );
+    }
 
-    tr_lockUnlock( (tr_lock_t*)r->lock );
     return ret;
 }
 
 float
-tr_rcRate( const tr_ratecontrol_t * r )
+tr_rcRate( const tr_ratecontrol * r )
 {
     float ret;
-    tr_lockLock( (tr_lock_t*)r->lock );
 
-    ret = rateForInterval( r, LONG_INTERVAL_MSEC );
+    if( r == NULL )
+        ret = 0.0f;
+    else {
+        tr_lockLock( (tr_lock*)r->lock );
+        ret = rateForInterval( r, LONG_INTERVAL_MSEC );
+        tr_lockUnlock( (tr_lock*)r->lock );
+    }
 
-    tr_lockUnlock( (tr_lock_t*)r->lock );
     return ret;
 }
 
@@ -125,14 +133,14 @@ tr_rcRate( const tr_ratecontrol_t * r )
 ***/
 
 void
-tr_rcTransferred( tr_ratecontrol_t * r, int size )
+tr_rcTransferred( tr_ratecontrol * r, size_t size )
 {
     uint64_t now;
 
     if( size < 100 ) /* don't count small messages */
         return;
     
-    tr_lockLock( (tr_lock_t*)r->lock );
+    tr_lockLock( (tr_lock*)r->lock );
 
     now = tr_date ();
     if( r->transfers[r->newest].date + GRANULARITY_MSEC >= now )
@@ -143,28 +151,28 @@ tr_rcTransferred( tr_ratecontrol_t * r, int size )
         r->transfers[r->newest].size = size;
     }
 
-    tr_lockUnlock( (tr_lock_t*)r->lock );
+    tr_lockUnlock( (tr_lock*)r->lock );
 }
 
 void
-tr_rcReset( tr_ratecontrol_t * r )
+tr_rcReset( tr_ratecontrol * r )
 {
-    tr_lockLock( (tr_lock_t*)r->lock );
+    tr_lockLock( (tr_lock*)r->lock );
     r->newest = 0;
     memset( r->transfers, 0, sizeof(tr_transfer_t) * HISTORY_SIZE );
-    tr_lockUnlock( (tr_lock_t*)r->lock );
+    tr_lockUnlock( (tr_lock*)r->lock );
 }
 
 void
-tr_rcSetLimit( tr_ratecontrol_t * r, int limit )
+tr_rcSetLimit( tr_ratecontrol * r, int limit )
 {
-    tr_lockLock( (tr_lock_t*)r->lock );
+    tr_lockLock( (tr_lock*)r->lock );
     r->limit = limit;
-    tr_lockUnlock( (tr_lock_t*)r->lock );
+    tr_lockUnlock( (tr_lock*)r->lock );
 }
 
 int
-tr_rcGetLimit( const tr_ratecontrol_t * r )
+tr_rcGetLimit( const tr_ratecontrol * r )
 {
     return r->limit;
 }

@@ -585,7 +585,7 @@ ipc_mkgetinfo( struct ipc_info * info, size_t * len, enum ipc_msg id,
 }
 
 int
-ipc_addinfo( benc_val_t * list, int tor, const tr_info_t * inf, int types )
+ipc_addinfo( benc_val_t * list, int tor, const tr_info * inf, int types )
 {
     benc_val_t * dict, * item, * file, * tier;
     int          ii, jj, kk;
@@ -727,7 +727,7 @@ ipc_addinfo( benc_val_t * list, int tor, const tr_info_t * inf, int types )
 
 int
 ipc_addstat( benc_val_t * list, int tor,
-             const tr_stat_t * st, int types )
+             const tr_stat * st, int types )
 {
     benc_val_t  * dict, * item;
     int           ii, used;

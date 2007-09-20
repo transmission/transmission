@@ -20,38 +20,41 @@
 
 #include "transmission.h"
 #include "completion.h"
+#include "crypto.h"
+#include "fastresume.h"
 #include "fdlimit.h"
 #include "inout.h"
+#include "list.h"
 #include "net.h"
-#include "peer.h"
-#include "sha1.h"
+#include "platform.h"
+#include "peer-mgr.h"
 #include "utils.h"
 
-struct tr_io_s
+struct tr_io
 {
-    tr_torrent_t * tor;
+    tr_torrent * tor;
 };
 
 /****
 *****  Low-level IO functions
 ****/
 
-enum { TR_IO_READ, TR_IO_WRITE };
-
 #ifdef WIN32
 #define lseek _lseeki64
 #endif
 
+enum { TR_IO_READ, TR_IO_WRITE };
+
 static int
-readOrWriteBytes ( const tr_torrent_t  * tor,
+readOrWriteBytes ( const tr_torrent    * tor,
                    int                   ioMode,
                    int                   fileIndex,
                    uint64_t              fileOffset,
                    void                * buf,
                    size_t                buflen )
 {
-    const tr_info_t * info = &tor->info;
-    const tr_file_t * file = &info->files[fileIndex];
+    const tr_info * info = &tor->info;
+    const tr_file * file = &info->files[fileIndex];
     typedef size_t (* iofunc) ( int, void *, size_t );
     iofunc func = ioMode == TR_IO_READ ? (iofunc)read : (iofunc)write;
     char path[MAX_PATH_LENGTH];
@@ -85,13 +88,13 @@ readOrWriteBytes ( const tr_torrent_t  * tor,
 }
 
 static void
-findFileLocation ( const tr_torrent_t * tor,
+findFileLocation ( const tr_torrent * tor,
                    int                  pieceIndex,
                    int                  pieceOffset,
                    int                * fileIndex,
                    uint64_t           * fileOffset )
 {
-    const tr_info_t * info = &tor->info;
+    const tr_info * info = &tor->info;
 
     int i;
     uint64_t piecePos = ((uint64_t)pieceIndex * info->pieceSize) + pieceOffset;
@@ -112,14 +115,14 @@ findFileLocation ( const tr_torrent_t * tor,
 }
 
 static int
-ensureMinimumFileSize ( const tr_torrent_t  * tor,
+ensureMinimumFileSize ( const tr_torrent  * tor,
                         int                   fileIndex,
                         uint64_t              minSize ) /* in bytes */
 {
     int fd;
     int ret;
     struct stat sb;
-    const tr_file_t * file = &tor->info.files[fileIndex];
+    const tr_file * file = &tor->info.files[fileIndex];
 
     assert ( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert ( minSize <= file->length );
@@ -143,17 +146,17 @@ ensureMinimumFileSize ( const tr_torrent_t  * tor,
 }
 
 static int
-readOrWritePiece ( tr_torrent_t       * tor,
-                   int                  ioMode,
-                   int                  pieceIndex,
-                   int                  pieceOffset,
-                   uint8_t            * buf,
-                   size_t               buflen )
+readOrWritePiece ( tr_torrent       * tor,
+                   int                ioMode,
+                   int                pieceIndex,
+                   int                pieceOffset,
+                   uint8_t          * buf,
+                   size_t             buflen )
 {
     int ret = 0;
     int fileIndex;
     uint64_t fileOffset;
-    const tr_info_t * info = &tor->info;
+    const tr_info * info = &tor->info;
 
     assert( 0<=pieceIndex && pieceIndex<tor->info.pieceCount );
     assert( buflen <= (size_t) tr_torPieceCountBytes( tor, pieceIndex ) );
@@ -162,7 +165,7 @@ readOrWritePiece ( tr_torrent_t       * tor,
 
     while( buflen && !ret )
     {
-        const tr_file_t * file = &info->files[fileIndex];
+        const tr_file * file = &info->files[fileIndex];
         const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
         if( ioMode == TR_IO_WRITE )
@@ -181,15 +184,15 @@ readOrWritePiece ( tr_torrent_t       * tor,
 }
 
 int
-tr_ioRead( tr_io_t * io, int pieceIndex, int begin, int len, uint8_t * buf )
+tr_ioRead( tr_torrent * tor, int pieceIndex, int begin, int len, uint8_t * buf )
 {
-    return readOrWritePiece ( io->tor, TR_IO_READ, pieceIndex, begin, buf, len );
+    return readOrWritePiece ( tor, TR_IO_READ, pieceIndex, begin, buf, len );
 }
 
 int
-tr_ioWrite( tr_io_t * io, int pieceIndex, int begin, int len, uint8_t * buf )
+tr_ioWrite( tr_torrent * tor, int pieceIndex, int begin, int len, uint8_t * buf )
 {
-    return readOrWritePiece ( io->tor, TR_IO_WRITE, pieceIndex, begin, buf, len );
+    return readOrWritePiece ( tor, TR_IO_WRITE, pieceIndex, begin, buf, len );
 }
 
 /****
@@ -197,14 +200,14 @@ tr_ioWrite( tr_io_t * io, int pieceIndex, int begin, int len, uint8_t * buf )
 ****/
 
 static int
-tr_ioRecalculateHash ( tr_torrent_t  * tor,
+tr_ioRecalculateHash ( tr_torrent    * tor,
                        int             pieceIndex,
                        uint8_t       * setme )
 {
     int n;
     int ret;
     uint8_t * buf;
-    const tr_info_t * info;
+    const tr_info * info;
 
     assert( tor != NULL );
     assert( setme != NULL );
@@ -215,16 +218,15 @@ tr_ioRecalculateHash ( tr_torrent_t  * tor,
 
     buf = malloc( n );
     ret = readOrWritePiece ( tor, TR_IO_READ, pieceIndex, 0, buf, n );
-    if( !ret ) {
-        SHA1( buf, n, setme );
-    }
+    if( !ret )
+        tr_sha1( setme, buf, n, NULL );
     free( buf );
 
     return ret;
 }
 
 static int
-checkPiece ( tr_torrent_t * tor, int pieceIndex )
+checkPiece ( tr_torrent * tor, int pieceIndex )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
     int ret = tr_ioRecalculateHash( tor, pieceIndex, hash )
@@ -234,81 +236,24 @@ checkPiece ( tr_torrent_t * tor, int pieceIndex )
     return ret;
 }
 
-void
-tr_ioCheckFiles( tr_torrent_t * tor )
-{
-    assert( tor != NULL );
-    assert( tor->completion != NULL );
-    assert( tor->info.pieceCount > 0 );
-
-    if( tor->uncheckedPieces != NULL )
-    {
-        int i;
-
-        /* remove the unchecked pieces from completion... */
-        for( i=0; i<tor->info.pieceCount; ++i ) 
-            if( tr_bitfieldHas( tor->uncheckedPieces, i ) )
-                tr_cpPieceRem( tor->completion, i );
-
-        tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
-
-        for( i=0; i<tor->info.pieceCount; ++i ) 
-        {
-            if( !tr_bitfieldHas( tor->uncheckedPieces, i ) )
-                continue;
-
-            tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
-            tr_bitfieldRem( tor->uncheckedPieces, i );
-        }
-
-        tr_bitfieldFree( tor->uncheckedPieces );
-        tor->uncheckedPieces = NULL;
-        tor->fastResumeDirty = TRUE;
-    }
-}
-
-/****
-*****  Life Cycle
-****/
-
-tr_io_t*
-tr_ioNew ( tr_torrent_t * tor )
-{
-    tr_io_t * io = tr_calloc( 1, sizeof( tr_io_t ) );
-    io->tor = tor;
-    return io;
-}
-
+/**
+***
+**/
 
 void
-tr_ioSync( tr_io_t * io )
+tr_ioClose( const tr_torrent * tor )
 {
-    if( io != NULL )
-    {
-        int i;
-        const tr_info_t * info = &io->tor->info;
+    int i;
+    const tr_info * info = &tor->info;
 
-        for( i=0; i<info->fileCount; ++i )
-            tr_fdFileClose( io->tor->destination, info->files[i].name );
-    }
-}
-
-void
-tr_ioClose( tr_io_t * io )
-{
-    if( io != NULL )
-    {
-        tr_ioSync( io );
-        tr_free( io );
-    }
+    for( i=0; i<info->fileCount; ++i )
+        tr_fdFileClose( tor->destination, info->files[i].name );
 }
 
 int
-tr_ioHash( tr_io_t * io, int pieceIndex )
+tr_ioHash( tr_torrent * tor, int pieceIndex )
 {
-    int i;
     int ret;
-    tr_torrent_t * tor = io->tor;
     const int success = !checkPiece( tor, pieceIndex );
 
     if( success )
@@ -324,9 +269,137 @@ tr_ioHash( tr_io_t * io, int pieceIndex )
         ret = TR_ERROR;
     }
 
-    /* Assign blame or credit to peers */
-    for( i=0; i<tor->peerCount; ++i )
-        tr_peerBlame( tor->peers[i], pieceIndex, success );
+    tr_peerMgrSetBlame( tor->handle->peerMgr, tor->info.hash, pieceIndex, success );
 
     return ret;
+}
+
+/**
+***
+**/
+
+struct recheck_node
+{
+    tr_torrent * torrent;
+    tr_recheck_done_cb recheck_done_cb;
+    run_status_t status_when_done;
+};
+
+static void
+fireCheckDone( tr_torrent          * torrent,
+               tr_recheck_done_cb    recheck_done_cb,
+               run_status_t          status_when_done )
+{
+    torrent->runStatus = status_when_done;
+    (*recheck_done_cb)( torrent );
+}
+
+struct recheck_node currentNode;
+
+static tr_list * recheckList = NULL;
+
+static tr_thread * recheckThread = NULL;
+
+static int stopCurrent = FALSE;
+
+static void
+recheckThreadFunc( void * unused UNUSED )
+{
+    for( ;; )
+    {
+        int i;
+        tr_torrent * tor;
+
+        struct recheck_node * node = (struct recheck_node*) recheckList ? recheckList->data : NULL;
+        if( node == NULL )
+            break;
+
+        currentNode = *node;
+        tor = currentNode.torrent;
+        tr_list_remove_data( &recheckList, node );
+        tr_free( node );
+
+        if( tor->uncheckedPieces == NULL ) {
+            fireCheckDone( tor, currentNode.recheck_done_cb, currentNode.status_when_done );
+            continue;
+        }
+
+        tor->runStatus = TR_RUN_CHECKING;
+
+        /* remove the unchecked pieces from completion... */
+        for( i=0; i<tor->info.pieceCount; ++i ) 
+            if( tr_bitfieldHas( tor->uncheckedPieces, i ) )
+                tr_cpPieceRem( tor->completion, i );
+
+        tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
+
+        for( i=0; i<tor->info.pieceCount && !stopCurrent; ++i ) 
+        {
+            if( !tr_bitfieldHas( tor->uncheckedPieces, i ) )
+                continue;
+
+            tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
+            tr_bitfieldRem( tor->uncheckedPieces, i );
+        }
+
+        if( !stopCurrent )
+        {
+            tr_bitfieldFree( tor->uncheckedPieces );
+            tor->uncheckedPieces = NULL;
+        }
+        stopCurrent = FALSE;
+        tr_fastResumeSave( tor );
+        fireCheckDone( tor, currentNode.recheck_done_cb, currentNode.status_when_done );
+    }
+
+    recheckThread = NULL;
+}
+
+void
+tr_ioRecheckAdd( tr_torrent          * tor,
+                 tr_recheck_done_cb    recheck_done_cb,
+                 run_status_t          status_when_done )
+{
+    if( tor->uncheckedPieces == NULL )
+    {
+        fireCheckDone( tor, recheck_done_cb, status_when_done );
+    }
+    else
+    {
+        struct recheck_node * node;
+        node = tr_new( struct recheck_node, 1 );
+        node->torrent = tor;
+        node->recheck_done_cb = recheck_done_cb;
+        node->status_when_done = status_when_done;
+        tr_list_append( &recheckList, node );
+
+        tor->runStatus = TR_RUN_CHECKING_WAIT;
+
+        if( recheckThread == NULL )
+            recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
+    }
+}
+
+static int
+compareRecheckByTorrent( const void * va, const void * vb )
+{
+    const struct recheck_node * a = ( const struct recheck_node * ) va;
+    const struct recheck_node * b = ( const struct recheck_node * ) vb;
+    return a->torrent - b->torrent;
+}
+
+void
+tr_ioRecheckRemove( tr_torrent * tor )
+{
+    if( tor == currentNode.torrent )
+        stopCurrent = TRUE;
+    else {
+        struct recheck_node tmp;
+        tmp.torrent = tor;
+        struct recheck_node * node = tr_list_remove( &recheckList, &tmp, compareRecheckByTorrent );
+        if( node != NULL ) {
+            fireCheckDone( tor, node->recheck_done_cb, node->status_when_done );
+            tr_free( node );
+        }
+    }
 }

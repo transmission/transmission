@@ -25,7 +25,7 @@
 #ifndef TR_FAST_RESUME_H
 #define TR_FAST_RESUME_H
 
-void tr_fastResumeSave( const tr_torrent_t * tor );
+void tr_fastResumeSave( const tr_torrent * tor );
 
 enum
 {
@@ -42,7 +42,7 @@ enum
 /**
  * Returns a bitwise-or'ed set of the data loaded from fastresume
  */
-uint64_t tr_fastResumeLoad( tr_torrent_t         * tor,
-                            struct tr_bitfield_s * uncheckedPieces );
+uint64_t tr_fastResumeLoad( tr_torrent         * tor,
+                            struct tr_bitfield * uncheckedPieces );
 
 #endif

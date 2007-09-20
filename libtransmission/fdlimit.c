@@ -63,8 +63,8 @@ tr_openFile_t;
 
 typedef struct tr_fd_s
 {
-    tr_lock_t     * lock;
-    tr_cond_t     * cond;
+    tr_lock       * lock;
+    tr_cond       * cond;
     
     int             reserved;
 
@@ -390,17 +390,20 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
  **********************************************************************/
 void tr_fdSocketClose( int s )
 {
-    tr_lockLock( gFd->lock );
+    if( s >= 0 )
+    {
+        tr_lockLock( gFd->lock );
 #ifdef BEOS_NETSERVER
-    closesocket( s );
+        closesocket( s );
 #else
-    close( s );
+        close( s );
 #endif
-    if( SocketGetPriority( s ) )
-        gFd->reserved--;
-    else
-        gFd->normal--;
-    tr_lockUnlock( gFd->lock );
+        if( SocketGetPriority( s ) )
+            gFd->reserved--;
+        else
+            gFd->normal--;
+        tr_lockUnlock( gFd->lock );
+    }
 }
 
 /***********************************************************************

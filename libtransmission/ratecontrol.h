@@ -25,15 +25,15 @@
 #ifndef _TR_RATECONTROL_H_
 #define _TR_RATECONTROL_H_
 
-typedef struct tr_ratecontrol_s tr_ratecontrol_t;
+typedef struct tr_ratecontrol tr_ratecontrol;
 
-tr_ratecontrol_t * tr_rcInit( void );
-void               tr_rcSetLimit( tr_ratecontrol_t *, int );
-int                tr_rcGetLimit( const tr_ratecontrol_t * );
-int                tr_rcCanTransfer( const tr_ratecontrol_t * );
-void               tr_rcTransferred( tr_ratecontrol_t *, int );
-float              tr_rcRate( const tr_ratecontrol_t * );
-void               tr_rcReset( tr_ratecontrol_t * );
-void               tr_rcClose( tr_ratecontrol_t * );
+tr_ratecontrol * tr_rcInit( void );
+void             tr_rcSetLimit( tr_ratecontrol *, int );
+int              tr_rcGetLimit( const tr_ratecontrol * );
+int              tr_rcCanTransfer( const tr_ratecontrol * );
+void             tr_rcTransferred( tr_ratecontrol *, size_t byteCount );
+float            tr_rcRate( const tr_ratecontrol * );
+void             tr_rcReset( tr_ratecontrol * );
+void             tr_rcClose( tr_ratecontrol * );
 
 #endif

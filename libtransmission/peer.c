@@ -174,7 +174,7 @@ typedef struct tr_request_s
 
 struct tr_peer_s
 {
-    tr_torrent_t      * tor;
+    tr_torrent        * tor;
 
     struct in_addr      addr;
     tr_port_t           port;  /* peer's listening port, 0 if not known */
@@ -214,10 +214,10 @@ struct tr_peer_s
     uint8_t             id[TR_ID_LEN];
 
     /* The pieces that the peer has */
-    tr_bitfield_t     * bitfield;
+    tr_bitfield       * bitfield;
 
     /* blocks we've requested from this peer */
-    tr_bitfield_t     * reqfield;
+    tr_bitfield       * reqfield;
     int                 pieceCount;
     float               progress;
 
@@ -225,9 +225,9 @@ struct tr_peer_s
     int                 badPcs;
     int                 banned;
     /* The pieces that the peer is contributing to */
-    tr_bitfield_t     * blamefield;
+    tr_bitfield       * blamefield;
     /* The bad pieces that the peer has contributed to */
-    tr_bitfield_t     * banfield;
+    tr_bitfield       * banfield;
 
     uint8_t           * buf;
     int                 size;
@@ -249,11 +249,11 @@ struct tr_peer_s
     int                 inBegin;
     int                 inLength;
 
-    tr_list_t         * outRequests;
+    tr_list           * outRequests;
     uint64_t            outDate;
 
-    tr_ratecontrol_t  * download;
-    tr_ratecontrol_t  * upload;
+    tr_ratecontrol    * download;
+    tr_ratecontrol    * upload;
 
     char              * client;
     int                 extclient;
@@ -289,16 +289,6 @@ static void tr_htonl( uint32_t a, void * p )
 {
     const uint32_t u = htonl( a );
     memcpy ( p, &u, sizeof( uint32_t ) );
-}
-
-static const char* getPeerId( void )
-{
-    static char * peerId = NULL;
-    if( !peerId ) {
-        peerId = tr_new0( char, TR_ID_LEN + 1 );
-        tr_peerIdNew( peerId, TR_ID_LEN + 1 );
-    }
-    return peerId;
 }
 
 static void tr_peerPieceIsCorrupt  ( tr_peer_t *, int pieceIndex );
@@ -353,7 +343,7 @@ tr_peer_t * tr_peerInit( const struct in_addr * addr, tr_port_t port,
 
 void tr_peerDestroy( tr_peer_t * peer )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
     tr_request_t * r;
     int i, block;
 
@@ -423,7 +413,7 @@ void tr_peerSetPrivate( tr_peer_t * peer, int private )
     }
 }
 
-void tr_peerSetTorrent( tr_peer_t * peer, tr_torrent_t * tor )
+void tr_peerSetTorrent( tr_peer_t * peer, tr_torrent * tor )
 {
     peer->tor = tor;
 }
@@ -435,7 +425,7 @@ void tr_peerSetTorrent( tr_peer_t * peer, tr_torrent_t * tor )
  **********************************************************************/
 int tr_peerRead( tr_peer_t * peer )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
     int ret;
     uint64_t date;
 
@@ -542,7 +532,7 @@ const uint8_t * tr_peerHash( const tr_peer_t * peer )
  **********************************************************************/
 int tr_peerPulse( tr_peer_t * peer )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
     int ret, size;
     uint8_t * p;
     uint64_t date;
@@ -580,7 +570,7 @@ int tr_peerPulse( tr_peer_t * peer )
     if( PEER_STATUS_CONNECTING == peer->status )
     {
         uint8_t buf[HANDSHAKE_SIZE];
-        const tr_info_t * inf;
+        const tr_info * inf;
 
         inf = tr_torrentInfo( tor );
         assert( 68 == HANDSHAKE_SIZE );
@@ -793,7 +783,7 @@ int tr_peerIsConnected( const tr_peer_t * peer )
     return peer && (peer->status == PEER_STATUS_CONNECTED);
 }
 
-int tr_peerIsFrom( const tr_peer_t * peer )
+int tr_peerGetFrom( const tr_peer_t * peer )
 {
     return peer->from;
 }
@@ -885,7 +875,7 @@ static int peerIsGood( const tr_peer_t * peer )
 
 void tr_peerBlame( tr_peer_t * peer, int piece, int success )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
 
     if( !peer->blamefield || !tr_bitfieldHas( peer->blamefield, piece ) )
     {
@@ -926,7 +916,7 @@ void tr_peerBlame( tr_peer_t * peer, int piece, int success )
     tr_bitfieldRem( peer->blamefield, piece );
 }
 
-int tr_peerGetConnectable( const tr_torrent_t * tor, uint8_t ** _buf )
+int tr_peerGetConnectable( const tr_torrent * tor, uint8_t ** _buf )
 {
     int count = 0;
     uint8_t * buf;
@@ -969,7 +959,7 @@ int tr_peerGetConnectable( const tr_torrent_t * tor, uint8_t ** _buf )
 void
 tr_peerPieceIsCorrupt( tr_peer_t * peer, int pieceIndex )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
 
     const uint64_t byteCount = tr_torPieceCountBytes( tor, pieceIndex );
 
@@ -986,7 +976,7 @@ tr_peerPieceIsCorrupt( tr_peer_t * peer, int pieceIndex )
 void
 tr_peerSentBlockToUs( tr_peer_t * peer, int byteCount )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
 
     assert( byteCount >= 0 );
     assert( byteCount <= tor->info.pieceSize );
@@ -1002,7 +992,7 @@ tr_peerSentBlockToUs( tr_peer_t * peer, int byteCount )
 void
 tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
 {
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
 
     assert( byteCount >= 0 );
     assert( byteCount <= tor->info.pieceSize );
@@ -1016,7 +1006,7 @@ tr_peerGotBlockFromUs ( tr_peer_t * peer, int byteCount )
 }
 
 static void
-tr_torrentSwiftPulse ( tr_torrent_t * tor )
+tr_torrentSwiftPulse ( tr_torrent * tor )
 {
     /* Preferred # of seconds for the request queue's turnaround time.
        This is just an arbitrary number. */
@@ -1091,7 +1081,7 @@ tr_swiftPulse( tr_handle_t * h )
 
     if( lastPulseTime + SWIFT_REFRESH_INTERVAL_SEC <= time( NULL ) )
     {
-        tr_torrent_t * tor;
+        tr_torrent * tor;
         for( tor=h->torrentList; tor; tor=tor->next )
             tr_torrentSwiftPulse( tor );
 

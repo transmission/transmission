@@ -25,11 +25,9 @@
 #ifndef TR_IO_H
 #define TR_IO_H 1
 
-typedef struct tr_io_s tr_io_t;
+struct tr_torrent;
 
-void tr_ioCheckFiles  ( tr_torrent_t * );
-
-tr_io_t * tr_ioNew ( tr_torrent_t * );
+typedef struct tr_io tr_io;
 
 /***********************************************************************
  * tr_ioRead, tr_ioWrite
@@ -39,24 +37,29 @@ tr_io_t * tr_ioNew ( tr_torrent_t * );
  * TR_ERROR_ASSERT if the parameters are incorrect, one of the
  * TR_ERROR_IO_* otherwise.
  **********************************************************************/
-int tr_ioRead  ( tr_io_t *, int index, int begin, int len, uint8_t * );
-int tr_ioWrite ( tr_io_t *, int index, int begin, int len, uint8_t * );
+int tr_ioRead  ( struct tr_torrent*, int index, int begin, int len, uint8_t * );
+int tr_ioWrite ( struct tr_torrent *, int index, int begin, int len, uint8_t * );
 
-/***********************************************************************
- * tr_ioHash
- ***********************************************************************
- * Hashes the specified piece and updates the completion accordingly.
- **********************************************************************/
-int tr_ioHash ( tr_io_t *, int piece );
+/* hashes the specified piece and updates the completion accordingly. */
+int tr_ioHash ( tr_torrent*, int piece );
 
-/***********************************************************************
- * tr_ioSync
- ***********************************************************************
- * Flush all data on disc by closing all files, and update the cache
- * file.
- **********************************************************************/
-void tr_ioSync( tr_io_t * );
+/* close all the files associated with this torrent*/
+void tr_ioClose( const tr_torrent * );
 
-void      tr_ioClose       ( tr_io_t * );
+/**
+***
+**/
+
+typedef void (*tr_recheck_done_cb)( tr_torrent * tor );
+
+void tr_ioRecheckAdd( tr_torrent          * tor,
+                      tr_recheck_done_cb    recheck_done_cb,
+                      run_status_t          status_when_done );
+
+void tr_ioRecheckRemove( tr_torrent * tor );
+
+/**
+***
+**/
 
 #endif

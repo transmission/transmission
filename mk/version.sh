@@ -2,11 +2,9 @@
 #
 # $Id$
 
-# convention: -TR MAJOR MINOR MAINT BETA - (each a single char)
-# BETA: "Z" for beta, "0" for stable 
 # these should be the only two lines you need to change
-PEERID_PREFIX="-TR082Z-"
-USERAGENT_PREFIX="0.82+"
+PEERID_PREFIX="-TR080Z-"
+USERAGENT_PREFIX="0.80+"
 
 
 SVN_REVISION=`find ./ -name "*\.[ch]" -o -name "*\.cpp" -o -name "*\.po" | \

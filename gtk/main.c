@@ -167,8 +167,6 @@ static GList *
 getselection( struct cbdata * cbdata );
 
 static void
-safepipe(void);
-static void
 setupsighandlers(void);
 static void
 fatalsig(int sig);
@@ -228,7 +226,6 @@ main( int argc, char ** argv )
     GList      * argfiles;
     gboolean     didinit, didlock, sendquit, startpaused;
 
-    safepipe();                 /* ignore SIGPIPE */
     argfiles = readargs( argc, argv, &sendquit, &startpaused );
     didinit = cf_init( tr_getPrefsDirectory(), NULL );
     didlock = FALSE;
@@ -1105,15 +1102,6 @@ doAction ( const char * action_name, gpointer user_data )
     }
 }
 
-
-static void
-safepipe(void) {
-  struct sigaction sa;
-
-  memset(&sa, 0,  sizeof(sa));
-  sa.sa_handler = SIG_IGN;
-  sigaction(SIGPIPE, &sa, NULL);
-}
 
 static void
 setupsighandlers(void) {

@@ -97,7 +97,7 @@ azmsgNameIndex( const char * name, int len )
 }
 
 static uint8_t *
-makeAZHandshake( tr_torrent_t * tor, tr_peer_t * peer, int * buflen )
+makeAZHandshake( tr_torrent * tor, tr_peer_t * peer, int * buflen )
 {
     char       * buf;
     benc_val_t   val, * msgsval, * msgdictval;
@@ -224,7 +224,7 @@ peertreeToBencAZ( tr_peertree_t * tree, benc_val_t * val )
 }
 
 static int
-makeAZPex( tr_torrent_t * tor, tr_peer_t * peer, char ** buf, int * len )
+makeAZPex( tr_torrent * tor, tr_peer_t * peer, char ** buf, int * len )
 {
     benc_val_t val;
 
@@ -235,7 +235,7 @@ makeAZPex( tr_torrent_t * tor, tr_peer_t * peer, char ** buf, int * len )
 }
 
 static int
-sendAZHandshake( tr_torrent_t * tor, tr_peer_t * peer )
+sendAZHandshake( tr_torrent * tor, tr_peer_t * peer )
 {
     uint8_t * buf;
     int len;
@@ -372,7 +372,7 @@ static int
 parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 {
     benc_val_t      val, * sub, * sub2, * dict, * subsub;
-    tr_bitfield_t * msgs;
+    tr_bitfield   * msgs;
     int             ii, idx, newclient;
     char          * client;
 
@@ -492,9 +492,9 @@ parseAZHandshake( tr_peer_t * peer, uint8_t * buf, int len )
 }
 
 static int
-parseAZPex( tr_torrent_t * tor, tr_peer_t * peer, uint8_t * buf, int len )
+parseAZPex( tr_torrent * tor, tr_peer_t * peer, uint8_t * buf, int len )
 {
-    tr_info_t * info = &tor->info;
+    tr_info * info = &tor->info;
     benc_val_t  val, * list, * pair;
     int         ii, used;
 

@@ -24,46 +24,30 @@
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
-typedef struct tr_lock_s   tr_lock_t;
-typedef struct tr_cond_s   tr_cond_t;
-typedef struct tr_thread_s tr_thread_t;
+typedef struct tr_lock   tr_lock;
+typedef struct tr_cond   tr_cond;
+typedef struct tr_thread tr_thread;
 
 const char * tr_getHomeDirectory( void );
 const char * tr_getCacheDirectory( void );
 const char * tr_getTorrentsDirectory( void );
 
-tr_thread_t*  tr_threadNew  ( void (*func)(void *), void * arg, const char * name );
-void          tr_threadJoin ( tr_thread_t * );
+tr_thread*   tr_threadNew  ( void (*func)(void *), void * arg, const char * name );
+void         tr_threadJoin ( tr_thread * );
+int          tr_amInThread ( const tr_thread * );
 int           tr_amInThread ( const tr_thread_t * );
 
-tr_lock_t * tr_lockNew        ( void );
-void        tr_lockFree       ( tr_lock_t * );
-int         tr_lockTryLock    ( tr_lock_t * );
-void        tr_lockLock       ( tr_lock_t * );
-void        tr_lockUnlock     ( tr_lock_t * );
+tr_lock *    tr_lockNew        ( void );
+void         tr_lockFree       ( tr_lock * );
+int          tr_lockTryLock    ( tr_lock * );
+void         tr_lockLock       ( tr_lock * );
+void         tr_lockUnlock     ( tr_lock * );
 
-tr_cond_t * tr_condNew       ( void );
-void        tr_condFree      ( tr_cond_t * );
-void        tr_condSignal    ( tr_cond_t * );
-void        tr_condBroadcast ( tr_cond_t * );
-void        tr_condWait      ( tr_cond_t *, tr_lock_t * );
-
-/***
-**** RW lock:
-**** The lock can be had by one writer or any number of readers.
-***/
-
-typedef struct tr_rwlock_s tr_rwlock_t;
-
-tr_rwlock_t*  tr_rwNew           ( void );
-void          tr_rwFree          ( tr_rwlock_t * );
-void          tr_rwReaderLock    ( tr_rwlock_t * );
-int           tr_rwReaderTrylock ( tr_rwlock_t * );
-void          tr_rwReaderUnlock  ( tr_rwlock_t * );
-void          tr_rwWriterLock    ( tr_rwlock_t * );
-int           tr_rwWriterTrylock ( tr_rwlock_t * );
-void          tr_rwWriterUnlock  ( tr_rwlock_t * );
-
+tr_cond *    tr_condNew       ( void );
+void         tr_condFree      ( tr_cond * );
+void         tr_condSignal    ( tr_cond * );
+void         tr_condBroadcast ( tr_cond * );
+void         tr_condWait      ( tr_cond *, tr_lock * );
 
 struct in_addr; /* forward declaration to calm gcc down */
 int

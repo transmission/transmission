@@ -21,14 +21,13 @@
 #include <unistd.h>
 #include <dirent.h>
 
-#include "trcompat.h" /* for strlcpy */
+#include "crypto.h" /* tr_sha1 */
+#include "trcompat.h" /* strlcpy */
 #include "transmission.h"
-#include "internal.h" /* for tr_torrent_t */
 #include "bencode.h"
 #include "makemeta.h"
 #include "platform.h" /* threads, locks */
 #include "shared.h" /* shared lock */
-#include "sha1.h"
 #include "utils.h" /* buildpath */
 #include "version.h"
 
@@ -231,7 +230,7 @@ getHashInfo ( tr_metainfo_builder_t * b )
 
         assert( bufptr-buf == (int)thisPieceSize );
         assert( pieceRemain == 0 );
-        SHA1( buf, thisPieceSize, walk );
+        tr_sha1( buf, walk, thisPieceSize, NULL );
         walk += SHA_DIGEST_LENGTH;
 
         if( b->abortFlag ) {
@@ -410,11 +409,11 @@ static void tr_realMakeMetaInfo ( tr_metainfo_builder_t * builder )
 
 static tr_metainfo_builder_t * queue = NULL;
 
-static tr_thread_t * workerThread = NULL;
+static tr_thread * workerThread = NULL;
 
-static tr_lock_t* getQueueLock( tr_handle_t * h )
+static tr_lock* getQueueLock( tr_handle_t * h )
 {
-    static tr_lock_t * lock = NULL;
+    static tr_lock * lock = NULL;
 
     tr_sharedLock( h->shared );
     if( !lock )
@@ -433,7 +432,7 @@ static void workerFunc( void * user_data )
         tr_metainfo_builder_t * builder = NULL;
 
         /* find the next builder to process */
-        tr_lock_t * lock = getQueueLock ( handle );
+        tr_lock * lock = getQueueLock ( handle );
         tr_lockLock( lock );
         if( queue != NULL ) {
             builder = queue;
@@ -458,7 +457,7 @@ tr_makeMetaInfo( tr_metainfo_builder_t  * builder,
                  const char             * comment,
                  int                      isPrivate )
 {
-    tr_lock_t * lock;
+    tr_lock * lock;
 
     builder->abortFlag = 0;
     builder->isDone = 0;

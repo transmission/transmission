@@ -27,7 +27,7 @@
 
 #include <inttypes.h>
 
-/* yay for typedefs, we can't forward declare benc_val_t or tr_info_t
+/* yay for typedefs, we can't forward declare benc_val_t or tr_info
    like with structs */
 #include "bencode.h"
 #include "transmission.h"
@@ -159,8 +159,8 @@ uint8_t *    ipc_mkstr    ( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
 uint8_t *    ipc_mkvers   ( size_t *, const char * );
 uint8_t *    ipc_mkgetinfo( struct ipc_info *, size_t *, enum ipc_msg, int64_t,
                             int, const int * );
-int          ipc_addinfo  ( benc_val_t *, int, const tr_info_t *, int );
-int          ipc_addstat  ( benc_val_t *, int, const tr_stat_t *, int );
+int          ipc_addinfo  ( benc_val_t *, int, const tr_info *, int );
+int          ipc_addstat  ( benc_val_t *, int, const tr_stat *, int );
 
 /* sets errno to EINVAL on parse error or
    EPERM for unsupported protocol version */

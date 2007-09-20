@@ -22,4 +22,4 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-char * tr_clientForId( uint8_t * );
+char * tr_clientForId( const uint8_t * );

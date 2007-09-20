@@ -42,7 +42,7 @@ void               tr_publisherUnsubscribe ( tr_publisher_t    * publisher,
 
 tr_publisher_t *   tr_publisherNew         ( void );
 
-void               tr_publisherFree        ( tr_publisher_t    * publisher );
+void               tr_publisherFree        ( tr_publisher_t   ** publisher );
 
 void               tr_publisherPublish     ( tr_publisher_t    * publisher,
                                              void              * source,

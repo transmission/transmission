@@ -28,7 +28,6 @@
 #include "net.h"
 #include "ptrarray.h"
 #include "publish.h"
-#include "timer.h"
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
@@ -65,9 +64,9 @@ typedef struct
 {
     tr_handle_t * handle;
 
-    tr_ptrArray_t * torrents;
-    tr_ptrArray_t * scraping;
-    tr_ptrArray_t * scrapeQueue;
+    tr_ptrArray * torrents;
+    tr_ptrArray * scraping;
+    tr_ptrArray * scrapeQueue;
 
     /* these are set from the latest scrape or tracker response */
     int announceIntervalMsec;
@@ -78,8 +77,8 @@ typedef struct
        back than we asked for */
     int multiscrapeMax;
 
-    tr_tracker_info_t * redirect;
-    tr_tracker_info_t * addresses;
+    tr_tracker_info * redirect;
+    tr_tracker_info * addresses;
     int addressIndex;
     int addressCount;
     int * tierFronts;
@@ -91,14 +90,16 @@ typedef struct
        This is immutable for the life of the tracker object. */
     char key_param[TR_KEY_LEN+1];
 
-    tr_timer_tag scrapeTag;
+    tr_timer * scrapeTimer;
+
+    struct evhttp_connection * connection;
 }
 Tracker;
 
 /* this is the Torrent struct, but since it's the pointer
    passed around in the public API of this tracker module,
-   its *public* name is tr_tracker_s... wheee */
-typedef struct tr_tracker_s
+   its *public* name is tr_tracker... wheee */
+typedef struct tr_tracker
 {
     tr_publisher_t * publisher;
 
@@ -129,12 +130,12 @@ typedef struct tr_tracker_s
 
     Tracker * tracker;
 
-    tr_timer_tag scrapeTag;
-    tr_timer_tag reannounceTag;
+    tr_timer * scrapeTimer;
+    tr_timer * reannounceTimer;
 
     struct evhttp_request * httpReq;
 
-    tr_torrent_t * torrent;
+    tr_torrent * torrent;
 }
 Torrent;
 
@@ -158,47 +159,27 @@ torrentCompare( const void * va, const void * vb )
 ****
 ***/
 
-typedef struct
-{
-    char * address;
-    int port;
-    struct evhttp_connection * evconn;
-}
-connection_key_t;
-
-static int
-connectionCompare( const void * va, const void * vb )
-{
-    const connection_key_t * a = (const connection_key_t *) va;
-    const connection_key_t * b = (const connection_key_t *) vb;
-    int ret = strcmp( a->address, b->address );
-    if( ret ) return ret;
-    return a->port - b->port;
-}
-
 static struct evhttp_connection*
-getConnection( const char * address, int port )
+getConnection( Tracker * tracker, const char * address, int port )
 {
-    connection_key_t *val, tmp;
-
-    static tr_ptrArray_t * connections = NULL;
-    if( !connections )
-         connections = tr_ptrArrayNew( );
-
-    tmp.address = (char*) address;
-    tmp.port = port;
-    val = tr_ptrArrayFindSorted( connections, &tmp, connectionCompare );
-
-    if( !val )
+    if( tracker->connection != NULL )
     {
-        val = tr_new( connection_key_t, 1 );
-        val->address = tr_strdup( address );
-        val->port = port;
-        val->evconn = evhttp_connection_new( address, port );
-        tr_ptrArrayInsertSorted( connections, val, connectionCompare );
+        char * a = NULL;
+        unsigned short p = 0;
+        evhttp_connection_get_peer( tracker->connection, &a, &p );
+
+        /* old one matches -- reuse it */
+        if( a && !strcmp(a,address) && p==port )
+            return tracker->connection;
+
+        /* old one doesn't match -- throw it away */
+        evhttp_connection_free( tracker->connection );
+        tracker->connection = NULL;
     }
 
-    return val->evconn;
+    /* make a new connection */
+    tracker->connection = evhttp_connection_new( address, port );
+    return tracker->connection;
 }
 
 /***
@@ -252,10 +233,10 @@ publishStopped( Torrent * tor )
 ****  LIFE CYCLE
 ***/
 
-static tr_ptrArray_t *
+static tr_ptrArray *
 getTrackerLookupTable( void )
 {
-    static tr_ptrArray_t * myTrackers = NULL;
+    static tr_ptrArray * myTrackers = NULL;
     if( !myTrackers )
          myTrackers = tr_ptrArrayNew( );
     return myTrackers;
@@ -280,17 +261,18 @@ tr_trackerScrapeSoon( Tracker * t )
     if( !tr_ptrArrayEmpty( t->scraping ) )
         return;
 
-    if( !t->scrapeTag )
-         t->scrapeTag = tr_timerNew( t->handle,
-                                     onTrackerScrapeNow, t,
-                                     NULL, 1000 );
+    if( !t->scrapeTimer )
+         t->scrapeTimer = tr_timerNew( t->handle, onTrackerScrapeNow, t, 1000 );
 }
 
+static int trackerCount = 0;
+static int torrentCount = 0;
+
 static Tracker*
-tr_trackerGet( const tr_torrent_t * tor )
+tr_trackerGet( const tr_torrent * tor )
 {
-    const tr_info_t * info = &tor->info;
-    tr_ptrArray_t * trackers = getTrackerLookupTable( );
+    const tr_info * info = &tor->info;
+    tr_ptrArray * trackers = getTrackerLookupTable( );
     Tracker *t, tmp;
     assert( info != NULL );
     assert( info->primaryAddress && *info->primaryAddress );
@@ -302,10 +284,11 @@ tr_trackerGet( const tr_torrent_t * tor )
     if( t == NULL ) /* no such tracker.... create one */
     {
         int i, j, sum, *iwalk;
-        tr_tracker_info_t * nwalk;
+        tr_tracker_info * nwalk;
         tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
 
         t = tr_new0( Tracker, 1 );
+fprintf( stderr, "TRACKER new tracker %p addr %s; counts are trackers %d torrents %d\n", t, info->primaryAddress, ++trackerCount, torrentCount );
         t->handle = tor->handle;
         t->primaryAddress = tr_strdup( info->primaryAddress );
         t->scrapeIntervalMsec      = DEFAULT_SCRAPE_INTERVAL_MSEC;
@@ -319,7 +302,7 @@ tr_trackerGet( const tr_torrent_t * tor )
 
         for( sum=i=0; i<info->trackerTiers; ++i )
              sum += info->trackerList[i].count;
-        t->addresses = nwalk = tr_new0( tr_tracker_info_t, sum );
+        t->addresses = nwalk = tr_new0( tr_tracker_info, sum );
         t->addressIndex = 0;
         t->addressCount = sum;
         t->tierFronts = iwalk = tr_new0( int, sum );
@@ -330,7 +313,7 @@ tr_trackerGet( const tr_torrent_t * tor )
 
             for( j=0; j<info->trackerList[i].count; ++j )
             {
-                const tr_tracker_info_t * src = &info->trackerList[i].list[j];
+                const tr_tracker_info * src = &info->trackerList[i].list[j];
                 nwalk->address = tr_strdup( src->address );
                 nwalk->port = src->port;
                 nwalk->announce = tr_strdup( src->announce );
@@ -370,7 +353,7 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
     *out = '\0';
 }
 
-static int
+static void
 onTorrentFreeNow( void * vtor )
 {
     Torrent * tor = (Torrent *) vtor;
@@ -380,17 +363,25 @@ onTorrentFreeNow( void * vtor )
     tr_ptrArrayRemoveSorted( t->scrapeQueue, tor, torrentCompare );
     tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
-    tr_timerFree( &tor->scrapeTag );
-    tr_timerFree( &tor->reannounceTag );
-    tr_publisherFree( tor->publisher );
+fprintf( stderr, "TRACKER freeing torrent %p name %s; counts are trackers %d torrents %d\n", tor, tor->torrent->info.name, trackerCount, --torrentCount );
+    tr_timerFree( &tor->scrapeTimer );
+    tr_timerFree( &tor->reannounceTimer );
+    tr_publisherFree( &tor->publisher );
     tr_free( tor->trackerID );
     tr_free( tor->lastRequest );
+    if( tor->httpReq != NULL )
+        evhttp_request_free( tor->httpReq );
     tr_free( tor );
 
     if( tr_ptrArrayEmpty( t->torrents ) ) /* last one.. free the tracker too */
     {
         int i;
         tr_ptrArrayRemoveSorted( getTrackerLookupTable( ), t, trackerCompare );
+
+fprintf( stderr, "TRACKER freeing tracker %p; counts are trackers %d torrents %d\n", t, --trackerCount, torrentCount );
+
+        if( t->connection != NULL )
+            evhttp_connection_free( t->connection );
 
         tr_ptrArrayFree( t->torrents );
         tr_ptrArrayFree( t->scrapeQueue );
@@ -404,26 +395,23 @@ onTorrentFreeNow( void * vtor )
             tr_free( t->redirect );
         }
 
-        tr_timerFree( &t->scrapeTag );
+        tr_timerFree( &t->scrapeTimer );
 
         tr_free( t->primaryAddress );
         tr_free( t->addresses );
         tr_free( t->tierFronts );
         tr_free( t );
     }
-
-    return FALSE;
 }
 
 void
 tr_trackerFree( Torrent * tor )
 {
-    tr_timerNew( tor->tracker->handle,
-                 onTorrentFreeNow, tor, NULL, 0 );
+    tr_runInEventThread( tor->tracker->handle, onTorrentFreeNow, tor );
 }
 
 Torrent*
-tr_trackerNew( tr_torrent_t * torrent )
+tr_trackerNew( tr_torrent * torrent )
 {
     Torrent * tor;
     Tracker * t = tr_trackerGet( torrent );
@@ -431,6 +419,7 @@ tr_trackerNew( tr_torrent_t * torrent )
 
     /* create a new Torrent and queue it for scraping */
     tor = tr_new0( Torrent, 1 );
+fprintf( stderr, "TRACKER new torrent %p name %s; counts are trackers %d torrents %d\n", tor, torrent->info.name, trackerCount, ++torrentCount );
     tor->publisher = tr_publisherNew( );
     tor->tracker = t;
     tor->torrent = torrent;
@@ -488,7 +477,7 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
                successful, it will be moved to the front of the tier." */
             const int i = t->addressIndex;
             const int j = t->tierFronts[i];
-            const tr_tracker_info_t swap = t->addresses[i];
+            const tr_tracker_info swap = t->addresses[i];
             t->addresses[i] = t->addresses[j];
             t->addresses[j] = swap;
         }
@@ -497,21 +486,21 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
              || ( req->response_code == HTTP_MOVETEMP ) )
     {
         const char * loc = evhttp_find_header( req->input_headers, "Location" );
-        tr_tracker_info_t tmp;
+        tr_tracker_info tmp;
         if( tr_trackerInfoInit( &tmp, loc, -1 ) ) /* a bad redirect? */
         {
             moveToNextAddress = TRUE;
         }
         else if( req->response_code == HTTP_MOVEPERM )
         {
-            tr_tracker_info_t * cur = &t->addresses[t->addressIndex];
+            tr_tracker_info * cur = &t->addresses[t->addressIndex];
             tr_trackerInfoClear( cur );
             *cur = tmp;
         }
         else if( req->response_code == HTTP_MOVETEMP )
         {
             if( t->redirect == NULL )
-                t->redirect = tr_new0( tr_tracker_info_t, 1 );
+                t->redirect = tr_new0( tr_tracker_info, 1 );
             else
                 tr_trackerInfoClear( t->redirect );
             *t->redirect = tmp;
@@ -534,7 +523,7 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
     return ret;
 }
 
-static tr_tracker_info_t *
+static tr_tracker_info *
 getCurrentAddress( const Tracker * t )
 {
     assert( t->addresses != NULL );
@@ -546,7 +535,7 @@ getCurrentAddress( const Tracker * t )
 static int
 trackerSupportsScrape( const Tracker * t )
 {
-    const tr_tracker_info_t * info = getCurrentAddress( t );
+    const tr_tracker_info * info = getCurrentAddress( t );
 
     return ( info != NULL )
         && ( info->scrape != NULL )
@@ -559,7 +548,7 @@ addCommonHeaders( const Tracker * t,
                   struct evhttp_request * req )
 {
     char buf[1024];
-    tr_tracker_info_t * address = getCurrentAddress( t );
+    tr_tracker_info * address = getCurrentAddress( t );
     snprintf( buf, sizeof(buf), "%s:%d", address->address, address->port );
     evhttp_add_header( req->output_headers, "Host", buf );
     evhttp_add_header( req->output_headers, "Connection", "close" );
@@ -582,7 +571,7 @@ onTorrentScrapeNow( void * vtor )
         tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
         tr_trackerScrapeSoon( tor->tracker );
     }
-    tor->scrapeTag = NULL;
+    tor->scrapeTimer = NULL;
     return FALSE;
 }
 
@@ -638,11 +627,8 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                 assert( tr_ptrArrayFindSorted(t->scraping,tor,torrentCompare) );
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
-                assert( !tor->scrapeTag );
-                tor->scrapeTag = tr_timerNew( t->handle,
-                                              onTorrentScrapeNow,
-                                              tor, NULL,
-                                              t->scrapeIntervalMsec );
+                assert( !tor->scrapeTimer );
+                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, tor, t->scrapeIntervalMsec );
                 tr_dbg( "Torrent '%s' scrape successful."
                         "  Rescraping in %d seconds",
                         tor->torrent->info.name, t->scrapeIntervalMsec/1000 );
@@ -699,7 +685,7 @@ static int
 onTrackerScrapeNow( void * vt )
 {
     Tracker * t = (Tracker*) vt;
-    const tr_tracker_info_t * address = getCurrentAddress( t );
+    const tr_tracker_info * address = getCurrentAddress( t );
 
     assert( tr_ptrArrayEmpty( t->scraping ) );
 
@@ -743,7 +729,7 @@ onTrackerScrapeNow( void * vt )
         /* ping the tracker */
         tr_inf( "Sending scrape to tracker %s:%d: %s",
                 address->address, address->port, uri );
-        evcon = getConnection( address->address, address->port );
+        evcon = getConnection( t, address->address, address->port );
         evhttp_connection_set_timeout( evcon, SCRAPE_TIMEOUT_INTERVAL_SEC );
         req = evhttp_request_new( onScrapeResponse, t );
         assert( req );
@@ -751,7 +737,7 @@ onTrackerScrapeNow( void * vt )
         tr_evhttp_make_request( t->handle, evcon, req, EVHTTP_REQ_GET, uri );
     }
 
-    t->scrapeTag = NULL;
+    t->scrapeTimer = NULL;
     return FALSE;
 }
 
@@ -772,7 +758,7 @@ torrentIsRunning( const Torrent * tor )
 static char*
 buildTrackerRequestURI( const Torrent * tor, const char * eventName )
 {
-    const tr_torrent_t * torrent = tor->torrent;
+    const tr_torrent * torrent = tor->torrent;
     const int stopping = !strcmp( eventName, "stopped" );
     const int numwant = stopping ? 0 : NUMWANT;
     char buf[4096];
@@ -964,9 +950,8 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     else if( reannounceInterval > 0 ) {
         tr_dbg( "torrent '%s' reannouncing in %d seconds",
                 tor->torrent->info.name, (reannounceInterval/1000) );
-        tor->reannounceTag = tr_timerNew( tor->tracker->handle,
-                                          onReannounceNow, tor, NULL,
-                                          reannounceInterval );
+        assert( tor->reannounceTimer == NULL );
+        tor->reannounceTimer = tr_timerNew( tor->tracker->handle, onReannounceNow, tor, reannounceInterval );
         tor->manualAnnounceAllowedAt
                            = tr_date() + MANUAL_ANNOUNCE_INTERVAL_MSEC;
     }
@@ -976,7 +961,7 @@ static int
 sendTrackerRequest( void * vtor, const char * eventName )
 {
     Torrent * tor = (Torrent *) vtor;
-    const tr_tracker_info_t * address = getCurrentAddress( tor->tracker );
+    const tr_tracker_info * address = getCurrentAddress( tor->tracker );
     char * uri = buildTrackerRequestURI( tor, eventName );
     struct evhttp_connection * evcon = NULL;
 
@@ -987,9 +972,9 @@ sendTrackerRequest( void * vtor, const char * eventName )
             uri );
 
     /* kill any pending requests */
-    tr_timerFree( &tor->reannounceTag );
+    tr_timerFree( &tor->reannounceTimer );
 
-    evcon = getConnection( address->address, address->port );
+    evcon = getConnection( tor->tracker, address->address, address->port );
     if ( !evcon ) {
         tr_err( "Can't make a connection to %s:%d", address->address, address->port );
         tr_free( uri );
@@ -1011,7 +996,7 @@ onReannounceNow( void * vtor )
 {
     Torrent * tor = (Torrent *) vtor;
     sendTrackerRequest( tor, "" );
-    tor->reannounceTag = NULL;
+    tor->reannounceTimer = NULL;
     return FALSE;
 }
 
@@ -1034,7 +1019,7 @@ tr_trackerUnsubscribe( Torrent           * tor,
     tr_publisherUnsubscribe( tor->publisher, tag );
 }
 
-const tr_tracker_info_t *
+const tr_tracker_info *
 tr_trackerGetAddress( const Torrent * tor )
 {
     return getCurrentAddress( tor->tracker );
@@ -1070,7 +1055,7 @@ tr_trackerStart( Torrent * tor )
 {
     tr_peerIdNew( tor->peer_id, sizeof(tor->peer_id) );
 
-    if( !tor->reannounceTag && !tor->httpReq )
+    if( !tor->reannounceTimer && !tor->httpReq )
         sendTrackerRequest( tor, "started" );
 }
 

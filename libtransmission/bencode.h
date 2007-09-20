@@ -90,4 +90,9 @@ char * tr_bencSaveMalloc( benc_val_t * val, int * len );
 int    tr_bencSave( benc_val_t * val, char ** buf,
                           int * used, int * max );
 
+int    tr_bencIsStr   ( const benc_val_t * val );
+int    tr_bencIsInt   ( const benc_val_t * val );
+int    tr_bencIsList  ( const benc_val_t * val );
+int    tr_bencIsDict  ( const benc_val_t * val );
+
 #endif

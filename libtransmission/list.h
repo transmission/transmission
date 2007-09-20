@@ -13,41 +13,49 @@
 #ifndef TR_LIST_H
 #define TR_LIST_H
 
-typedef struct tr_list_s
+typedef struct tr_list
 {
-    void              * data;
-    struct tr_list_s  * next;
-    struct tr_list_s  * prev;
+    void            * data;
+    struct tr_list  * next;
+    struct tr_list  * prev;
 }
-tr_list_t;
+tr_list;
 
 typedef int (*TrListCompareFunc)(const void * a, const void * b);
 typedef void (*TrListForeachFunc)(void *);
 
-void        tr_list_free           ( tr_list_t         ** list );
+int         tr_list_size           ( const tr_list    * list );
 
-void        tr_list_append         ( tr_list_t         ** list,
-                                     void               * data );
+void        tr_list_free           ( tr_list         ** list );
 
-void        tr_list_prepend        ( tr_list_t         ** list,
-                                     void               * data );
+void        tr_list_append         ( tr_list         ** list,
+                                     void             * data );
 
-void        tr_list_remove_data    ( tr_list_t         ** list,
-                                     const void         * data );
+void        tr_list_prepend        ( tr_list         ** list,
+                                     void             * data );
 
-void        tr_list_insert_sorted  ( tr_list_t         ** list,
-                                     void               * data,
-                                     TrListCompareFunc    compare_func );
+void*       tr_list_pop_front      ( tr_list         ** list );
 
-tr_list_t*  tr_list_find           ( tr_list_t          * list,
-                                     const void         * b,
-                                     TrListCompareFunc    compare_func );
+void*       tr_list_remove_data    ( tr_list         ** list,
+                                     const void       * data );
 
-tr_list_t*  tr_list_find_data      ( tr_list_t          * list,
-                                     const void         * data );
+void*       tr_list_remove         ( tr_list         ** list,
+                                     const void       * b,
+                                     TrListCompareFunc  compare_func );
 
-void        tr_list_foreach        ( tr_list_t          * list,
-                                     TrListForeachFunc    foreach_func );
+void        tr_list_insert_sorted  ( tr_list         ** list,
+                                     void             * data,
+                                     TrListCompareFunc  compare_func );
+
+tr_list*  tr_list_find           ( tr_list          * list,
+                                   const void       * b,
+                                   TrListCompareFunc  compare_func );
+
+tr_list*  tr_list_find_data      ( tr_list          * list,
+                                   const void       * data );
+
+void        tr_list_foreach      ( tr_list          * list,
+                                   TrListForeachFunc  foreach_func );
 
 #endif /* TR_LIST_H */
 

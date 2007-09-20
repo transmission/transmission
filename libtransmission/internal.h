@@ -45,30 +45,26 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
-int tr_trackerInfoInit( struct tr_tracker_info_s  * info,
-                        const char                * address,
-                        int                         address_len );
+int tr_trackerInfoInit( struct tr_tracker_info  * info,
+                        const char              * address,
+                        int                       address_len );
 
-void tr_trackerInfoClear( struct tr_tracker_info_s * info );
-
-struct tr_peer_s;
+void tr_trackerInfoClear( struct tr_tracker_info * info );
 
 void tr_peerIdNew ( char* buf, int buflen );
 
-void tr_torrentResetTransferStats( tr_torrent_t * );
+void tr_torrentResetTransferStats( tr_torrent * );
 
-int tr_torrentAddCompact( tr_torrent_t * tor, int from,
-                           const uint8_t * buf, int count );
-int tr_torrentAttachPeer( tr_torrent_t * tor, struct tr_peer_s * );
+void tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has );
 
-void tr_torrentSetHasPiece( tr_torrent_t * tor, int pieceIndex, int has );
+void tr_torrentLock    ( const tr_torrent * );
+void tr_torrentUnlock  ( const tr_torrent * );
 
-void tr_torrentReaderLock    ( const tr_torrent_t * );
-void tr_torrentReaderUnlock  ( const tr_torrent_t * );
-void tr_torrentWriterLock    ( tr_torrent_t * );
-void tr_torrentWriterUnlock  ( tr_torrent_t * );
+void tr_torrentChangeMyPort  ( tr_torrent *, int port );
 
-void tr_torrentChangeMyPort  ( tr_torrent_t *, int port );
+int tr_torrentExists( tr_handle *, const uint8_t * );
+tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
+tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 
 /* get the index of this piece's first block */
 #define tr_torPieceFirstBlock(tor,piece) ( (piece) * (tor)->blockCountInPiece )
@@ -89,36 +85,39 @@ void tr_torrentChangeMyPort  ( tr_torrent_t *, int port );
     ( ((block)==((tor)->blockCount-1)) ? (tor)->lastBlockSize : (tor)->blockSize )
 
 #define tr_block(a,b) _tr_block(tor,a,b)
-int _tr_block( const tr_torrent_t * tor, int index, int begin );
+int _tr_block( const tr_torrent * tor, int index, int begin );
 
 
 typedef enum
 {
-    TR_RUN_CHECKING           = (1<<0), /* checking files' checksums */
-    TR_RUN_RUNNING            = (1<<1), /* seeding or leeching */
-    TR_RUN_STOPPING           = (1<<2), /* stopping */
-    TR_RUN_STOPPING_NET_WAIT  = (1<<3), /* waiting on network -- we're
-                                           telling tracker we've stopped */
+    TR_RUN_CHECKING_WAIT      = (1<<0), /* waiting to be checked */
+    TR_RUN_CHECKING           = (1<<1), /* checking files' checksums */
+    TR_RUN_RUNNING            = (1<<2), /* seeding or leeching */
+    TR_RUN_STOPPING           = (1<<3), /* waiting for acknowledgment from tracker */
     TR_RUN_STOPPED            = (1<<4)  /* stopped */
 }
 run_status_t;
 
 #define TR_ID_LEN  20
 
-struct tr_torrent_s
+struct tr_torrent
 {
-    tr_handle_t               * handle;
-    tr_info_t                   info;
+    tr_handle                 * handle;
+    tr_info                     info;
 
-    tr_speedlimit_t             uploadLimitMode;
-    tr_speedlimit_t             downloadLimitMode;
-    struct tr_ratecontrol_s   * upload;
-    struct tr_ratecontrol_s   * download;
-    struct tr_ratecontrol_s   * swarmspeed;
+    tr_speedlimit               uploadLimitMode;
+    tr_speedlimit               downloadLimitMode;
+    struct tr_ratecontrol     * upload;
+    struct tr_ratecontrol     * download;
+    struct tr_ratecontrol     * swarmspeed;
+
+    struct tr_timer           * saveTimer;
 
     int                        error;
     char                       errorString[128];
     int                        hasChangedState;
+
+    uint8_t                    obfuscatedHash[SHA_DIGEST_LENGTH];
 
     uint8_t                  * azId;
     int                        publicPort;
@@ -136,27 +135,20 @@ struct tr_torrent_s
     int                        blockCountInPiece;
     int                        blockCountInLastPiece;
     
-    struct tr_completion_s   * completion;
+    struct tr_completion     * completion;
 
     volatile char              dieFlag;
-    struct tr_bitfield_s     * uncheckedPieces;
+    struct tr_bitfield       * uncheckedPieces;
     run_status_t               runStatus;
     run_status_t               runStatusToSave;
     char                       runStatusToSaveIsSet;
     cp_status_t                cpStatus;
-    struct tr_thread_s       * thread;
-    struct tr_rwlock_s       * lock;
+    struct tr_lock           * lock;
 
-    struct tr_tracker_s      * tracker;
+    struct tr_tracker        * tracker;
     struct tr_publisher_tag  * trackerSubscription;
-    struct tr_io_s           * io;
     uint64_t                   startDate;
     uint64_t                   stopDate;
-    char                       ioLoaded;
-    char                       fastResumeDirty;
-
-    int                        peerCount;
-    struct tr_peer_s *         peers[TR_MAX_PEER_COUNT];
 
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;
@@ -169,30 +161,35 @@ struct tr_torrent_s
     uint8_t                    pexDisabled;
 
     int8_t                     statCur;
-    tr_stat_t                  stats[2];
+    tr_stat                    stats[2];
 
-    tr_torrent_t             * next;
+    tr_torrent               * next;
 };
 
-struct tr_handle_s
+struct tr_handle
 {
-    struct tr_event_handle_s * events;
+    tr_encryption_mode         encryptionMode;
+
+    struct tr_event_handle   * events;
 
     int                        torrentCount;
-    tr_torrent_t             * torrentList;
+    tr_torrent               * torrentList;
 
     char                     * tag;
     int                        isPortSet;
 
     char                       useUploadLimit;
     char                       useDownloadLimit;
-    struct tr_ratecontrol_s  * upload;
-    struct tr_ratecontrol_s  * download;
+    struct tr_ratecontrol    * upload;
+    struct tr_ratecontrol    * download;
 
-    struct tr_shared_s       * shared;
+    struct tr_peerMgr        * peerMgr;
+    struct tr_shared         * shared;
 
-    tr_handle_status_t         stats[2];
+    tr_handle_status           stats[2];
     int                        statCur;
+
+    uint8_t                    isClosed;
 
 #define TR_AZ_ID_LEN 20
     uint8_t                    azId[TR_AZ_ID_LEN];

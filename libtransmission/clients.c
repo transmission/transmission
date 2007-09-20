@@ -44,7 +44,7 @@ static int charToInt( char character )
     return value;
 }
 
-char * tr_clientForId( uint8_t * id )
+char * tr_clientForId( const uint8_t * id )
 {
     char * ret = NULL;
     

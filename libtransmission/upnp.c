@@ -210,6 +210,7 @@ tr_upnpInit( void )
         vlog = fopen( path, "a" );
         stupid_api = time( NULL );
         fprintf( vlog, "opened log at %s\n\n", ctime( &stupid_api ) );
+        fflush( vlog );
     }
 #endif 
 
@@ -306,10 +307,9 @@ tr_upnpClose( tr_upnp_t * upnp )
 #ifdef VERBOSE_LOG
     if( NULL != vlog )
     {
-        fflush( vlog );
+        fclose( vlog );
     }
-#endif 
-
+#endif
 }
 
 void
@@ -403,6 +403,7 @@ sendSSDP( int fd )
     fprintf( vlog, "send ssdp message, %i bytes:\n", len );
     fwrite( buf, 1, len, vlog );
     fputs( "\n\n", vlog );
+    fflush( vlog );
 #endif 
 
     if( 0 > sendto( fd, buf, len, 0,
@@ -524,6 +525,7 @@ recvSSDP( int fd, char * buf, int * len )
         fprintf( vlog, "receive ssdp message, %i bytes:\n", *len );
         fwrite( buf, 1, *len, vlog );
         fputs( "\n\n", vlog );
+        fflush( vlog );
 #endif 
         return TR_NET_OK;
     }
@@ -964,6 +966,7 @@ devicePulseGetHttp( struct upnp_dev * dev )
         fprintf( vlog, "\n\nsend http message, %i bytes (body):\n", len );
         fwrite( body, 1, len, vlog );
         fputs( "\n\n", vlog );
+        fflush( vlog );
     }
 #endif
 
@@ -1007,6 +1010,7 @@ devicePulseHttp( struct upnp_dev * dev,
     fprintf( vlog, "receive http message, %i bytes:\n", hlen );
     fwrite( headers, 1, hlen, vlog );
     fputs( "\n\n", vlog );
+    fflush( vlog );
 #endif
             code = tr_httpResponseCode( headers, hlen );
             if( SOAP_METHOD_NOT_ALLOWED == code && !dev->soapretry )

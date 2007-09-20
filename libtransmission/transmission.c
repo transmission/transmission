@@ -37,6 +37,7 @@
 #include "fdlimit.h"
 #include "list.h"
 #include "net.h"
+#include "peer-mgr.h"
 #include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
@@ -62,6 +63,38 @@ tr_peerIdNew ( char * buf, int buflen )
     buf[TR_ID_LEN] = '\0';
 }
 
+const char*
+getPeerId( void )
+{
+    static char * peerId = NULL;
+    if( !peerId ) {
+        peerId = tr_new0( char, TR_ID_LEN + 1 );
+        tr_peerIdNew( peerId, TR_ID_LEN + 1 );
+    }
+    return peerId;
+}
+
+/***
+****
+***/
+
+tr_encryption_mode
+tr_getEncryptionMode( tr_handle * handle )
+{
+    assert( handle != NULL );
+
+    return handle->encryptionMode;
+}
+
+void
+tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
+{
+    assert( handle != NULL );
+    assert( mode==TR_ENCRYPTION_PREFERRED || mode==TR_ENCRYPTION_REQUIRED );
+
+    handle->encryptionMode = mode;
+}
+
 /***
 ****
 ***/
@@ -77,15 +110,24 @@ tr_handle_t * tr_init( const char * tag )
     tr_handle_t * h;
     int           i;
 
+#ifndef WIN32
+    /* Don't exit when writing on a broken socket */
+    signal( SIGPIPE, SIG_IGN );
+#endif
+
     tr_msgInit();
 
     h = tr_new0( tr_handle_t, 1 );
     if( !h )
         return NULL;
 
+    h->encryptionMode = TR_ENCRYPTION_PREFERRED;
+
     tr_eventInit( h );
+    while( !h->events )
+        tr_wait( 50 );
+
     tr_netInit();
-    tr_netResolveThreadInit();
 
     h->tag = strdup( tag );
     if( !h->tag ) {
@@ -93,15 +135,11 @@ tr_handle_t * tr_init( const char * tag )
         return NULL;
     }
 
+    h->peerMgr = tr_peerMgrNew( h );
 
     /* Azureus identity */
     for( i=0; i < TR_AZ_ID_LEN; ++i )
         h->azId[i] = tr_rand( 0xff );
-
-#ifndef WIN32
-    /* Don't exit when writing on a broken socket */
-    signal( SIGPIPE, SIG_IGN );
-#endif
 
     /* Initialize rate and file descripts controls */
     h->upload   = tr_rcInit();
@@ -126,6 +164,13 @@ void tr_setBindPort( tr_handle_t * h, int port )
     tr_sharedSetPort( h->shared, port );
 }
 
+int
+tr_getPublicPort( const tr_handle_t * h )
+{
+    assert( h != NULL );
+    return tr_sharedGetPublicPort( h->shared );
+}
+
 void tr_natTraversalEnable( tr_handle_t * h, int enable )
 {
     tr_sharedLock( h->shared );
@@ -133,9 +178,9 @@ void tr_natTraversalEnable( tr_handle_t * h, int enable )
     tr_sharedUnlock( h->shared );
 }
 
-tr_handle_status_t * tr_handleStatus( tr_handle_t * h )
+tr_handle_status * tr_handleStatus( tr_handle_t * h )
 {
-    tr_handle_status_t * s;
+    tr_handle_status * s;
 
     h->statCur = ( h->statCur + 1 ) % 2;
     s = &h->stats[h->statCur];
@@ -171,10 +216,8 @@ tr_setGlobalSpeedLimit( tr_handle_t  * h,
 {
     if( up_or_down == TR_DOWN )
         tr_rcSetLimit( h->download, KiB_sec );
-    else {
+    else
         tr_rcSetLimit( h->upload, KiB_sec );
-        tr_sharedSetLimit( h->shared, KiB_sec );
-    }
 }
 
 void
@@ -194,18 +237,18 @@ tr_getGlobalSpeedLimit( tr_handle_t  * h,
 
 void tr_torrentRates( tr_handle_t * h, float * dl, float * ul )
 {
-    tr_torrent_t * tor;
+    tr_torrent * tor;
 
     *dl = 0.0;
     *ul = 0.0;
     tr_sharedLock( h->shared );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        tr_torrentReaderLock( tor );
+        tr_torrentLock( tor );
         if( tor->cpStatus == TR_CP_INCOMPLETE )
             *dl += tr_rcRate( tor->download );
         *ul += tr_rcRate( tor->upload );
-        tr_torrentReaderUnlock( tor );
+        tr_torrentUnlock( tor );
     }
     tr_sharedUnlock( h->shared );
 }
@@ -217,7 +260,7 @@ int tr_torrentCount( tr_handle_t * h )
 
 void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
 {
-    tr_torrent_t * tor, * next;
+    tr_torrent * tor, * next;
 
     for( tor = h->torrentList; tor; tor = next )
     {
@@ -226,21 +269,47 @@ void tr_torrentIterate( tr_handle_t * h, tr_callback_t func, void * d )
     }
 }
 
-void tr_close( tr_handle_t * h )
+static void
+tr_closeImpl( void * vh )
 {
+    tr_handle_t * h = vh;
+fprintf( stderr, "in tr_closeImpl\n" );
+    tr_peerMgrFree( h->peerMgr );
+fprintf( stderr, "calling mgr free\n" );
+
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
-    
-    tr_eventClose( h );
+
+fprintf( stderr, "calling shared close\n" );
     tr_sharedClose( h->shared );
+fprintf( stderr, "calling fd close\n" );
     tr_fdClose();
+
+fprintf( stderr, "setting h->closed to TRUE\n" );
+    h->isClosed = TRUE;
+}
+void
+tr_close( tr_handle_t * h )
+{
+    fprintf( stderr, "torrentCount is %d\n", h->torrentCount );
+    assert( tr_torrentCount( h ) == 0 );
+
+fprintf( stderr, "here I am in tr_close...\n" );
+    tr_runInEventThread( h, tr_closeImpl, h );
+    while( !h->isClosed )
+        tr_wait( 200 );
+
+    tr_eventClose( h );
+    while( h->events != NULL ) {
+        fprintf( stderr, "waiting for libevent thread to close...\n" );
+        tr_wait( 200 );
+    }
+
     free( h->tag );
     free( h );
-
-    tr_netResolveThreadClose();
 }
 
-tr_torrent_t **
+tr_torrent **
 tr_loadTorrents ( tr_handle_t   * h,
                   const char    * destination,
                   int             flags,
@@ -250,8 +319,8 @@ tr_loadTorrents ( tr_handle_t   * h,
     struct stat sb;
     DIR * odir = NULL;
     const char * torrentDir = tr_getTorrentsDirectory( );
-    tr_torrent_t ** torrents;
-    tr_list_t *l=NULL, *list=NULL;
+    tr_torrent ** torrents;
+    tr_list *l=NULL, *list=NULL;
 
     if( !stat( torrentDir, &sb )
         && S_ISDIR( sb.st_mode )
@@ -262,7 +331,7 @@ tr_loadTorrents ( tr_handle_t   * h,
         {
             if( d->d_name && d->d_name[0]!='.' ) /* skip dotfiles, ., and .. */
             {
-                tr_torrent_t * tor;
+                tr_torrent * tor;
                 char path[MAX_PATH_LENGTH];
                 tr_buildPath( path, sizeof(path), torrentDir, d->d_name, NULL );
                 tor = tr_torrentInit( h, path, destination, flags, NULL );
@@ -276,9 +345,9 @@ tr_loadTorrents ( tr_handle_t   * h,
         closedir( odir );
     }
 
-    torrents = tr_new( tr_torrent_t*, n );
+    torrents = tr_new( tr_torrent*, n );
     for( i=0, l=list; l!=NULL; l=l->next )
-        torrents[i++] = (tr_torrent_t*) l->data;
+        torrents[i++] = (tr_torrent*) l->data;
     assert( i==n );
 
     tr_list_free( &list );

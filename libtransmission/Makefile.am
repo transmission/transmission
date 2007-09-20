@@ -9,12 +9,13 @@ EXTRA_DIST = version.h.in
 libtransmission_a_SOURCES = \
     basename.c \
     bencode.c \
-    choking.c \
     clients.c \
     completion.c \
+    crypto.c \
     dirname.c \
     fastresume.c \
     fdlimit.c \
+    handshake.c \
     http.c \
     inout.c \
     ipcparse.c \
@@ -23,16 +24,16 @@ libtransmission_a_SOURCES = \
     metainfo.c \
     natpmp.c \
     net.c \
-    peer.c \
+    peer-io.c \
+    peer-mgr.c \
+    peer-msgs.c \
     platform.c \
     ptrarray.c \
     publish.c \
     ratecontrol.c \
-    sha1.c \
     shared.c \
     strlcat.c \
     strlcpy.c \
-    timer.c \
     torrent.c \
     tracker.c \
     transmission.c \
@@ -45,11 +46,12 @@ noinst_HEADERS = \
     bencode.h \
     bsdqueue.h \
     bsdtree.h \
-    choking.h \
     clients.h \
+    crypto.h \
     completion.h \
     fastresume.h \
     fdlimit.h \
+    handshake.h \
     http.h \
     inout.h \
     internal.h \
@@ -59,20 +61,15 @@ noinst_HEADERS = \
     metainfo.h \
     natpmp.h \
     net.h \
-    peeraz.h \
-    peerext.h \
-    peer.h \
-    peermessages.h \
-    peerparse.h \
-    peertree.h \
-    peerutils.h \
+    peer-io.h \
+    peer-mgr.h \
+    peer-mgr-private.h \
+    peer-msgs.h \
     platform.h \
     ptrarray.h \
     publish.h \
     ratecontrol.h \
-    sha1.h \
     shared.h \
-    timer.h \
     tracker.h \
     transmission.h \
     trcompat.h \

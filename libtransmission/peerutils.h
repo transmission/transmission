@@ -38,7 +38,7 @@ static int
 checkPeer( tr_peer_t * peer )
 {
     int ret;
-    tr_torrent_t * tor = peer->tor;
+    tr_torrent * tor = peer->tor;
     const uint64_t now = tr_date( );
     const uint64_t idleTime = now - peer->date;
     const uint64_t idleSecs = idleTime / 1000u;
@@ -137,9 +137,9 @@ checkPeer( tr_peer_t * peer )
     return TR_OK;
 }
 
-static int isPieceInteresting( const tr_torrent_t  * tor,
-                               const tr_peer_t     * peer,
-                               int                   piece )
+static int isPieceInteresting( const tr_torrent  * tor,
+                               const tr_peer_t   * peer,
+                               int                 piece )
 {
     if( tor->info.pieces[piece].dnd ) /* we don't want it */
         return 0;
@@ -162,10 +162,10 @@ static int isPieceInteresting( const tr_torrent_t  * tor,
  * Returns 1 if 'peer' has at least one piece that we want but
  * haven't completed, or 0 otherwise.
  **********************************************************************/
-static int isInteresting( const tr_torrent_t * tor, const tr_peer_t * peer )
+static int isInteresting( const tr_torrent * tor, const tr_peer_t * peer )
 {
     int i;
-    const tr_bitfield_t * bitfield = tr_cpPieceBitfield( tor->completion );
+    const tr_bitfield   * bitfield = tr_cpPieceBitfield( tor->completion );
 
     if( !peer->bitfield )
     {
@@ -183,7 +183,7 @@ static int isInteresting( const tr_torrent_t * tor, const tr_peer_t * peer )
 }
 
 static void
-updateInterest( tr_torrent_t * tor, tr_peer_t * peer )
+updateInterest( tr_torrent * tor, tr_peer_t * peer )
 {
     const int i = !!isInteresting( tor, peer );
 
@@ -223,12 +223,12 @@ int comparePieces (const void * aIn, const void * bIn)
     return a->piece - b->piece;
 }
 
-static int* getPreferredPieces( const tr_torrent_t  * tor,
-                                const tr_peer_t     * peer,
-                                int                 * pieceCount,
-                                int                 * isEndgame )
+static int* getPreferredPieces( const tr_torrent  * tor,
+                                const tr_peer_t   * peer,
+                                int               * pieceCount,
+                                int               * isEndgame )
 {
-    const tr_info_t * inf = &tor->info;
+    const tr_info * inf = &tor->info;
 
     int i;
     int poolSize = 0;

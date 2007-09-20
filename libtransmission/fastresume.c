@@ -55,7 +55,7 @@
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
-#include "peer.h"
+#include "peer-mgr.h"
 #include "platform.h"
 #include "utils.h"
 
@@ -74,7 +74,7 @@ enum
     FR_ID_UPLOADED = 3,
 
     /* IPs and ports of connectable peers */
-    FR_ID_PEERS = 4,
+    FR_ID_PEERS_OLD = 4,
 
     /* progress data:
      *  - 4 bytes * number of files: mtimes of files
@@ -88,9 +88,9 @@ enum
 
     /* transfer speeds
      * uint32_t: dl speed rate to use when the mode is single
-     * uint32_t: dl's tr_speedlimit_t
+     * uint32_t: dl's tr_speedlimit
      * uint32_t: ul speed rate to use when the mode is single
-     * uint32_t: ul's tr_speedlimit_t
+     * uint32_t: ul's tr_speedlimit
      */
     FR_ID_SPEED = 8,
 
@@ -100,7 +100,10 @@ enum
     FR_ID_RUN = 9,
 
     /* number of corrupt bytes downloaded */
-    FR_ID_CORRUPT = 10
+    FR_ID_CORRUPT = 10,
+
+    /* IPs and ports of connectable peers */
+    FR_ID_PEERS = 11
 };
 
 
@@ -114,7 +117,7 @@ enum
 #define FR_SPEED_LEN (2 * (sizeof(uint16_t) + sizeof(uint8_t) ) )
 
 static void
-fastResumeFileName( char * buf, size_t buflen, const tr_torrent_t * tor, int tag )
+fastResumeFileName( char * buf, size_t buflen, const tr_torrent * tor, int tag )
 {
     const char * cacheDir = tr_getCacheDirectory ();
     const char * hash = tor->info.hashString;
@@ -132,7 +135,7 @@ fastResumeFileName( char * buf, size_t buflen, const tr_torrent_t * tor, int tag
 }
 
 static tr_time_t*
-getMTimes( const tr_torrent_t * tor, int * setme_n )
+getMTimes( const tr_torrent * tor, int * setme_n )
 {
     int i;
     const int n = tor->info.fileCount;
@@ -171,7 +174,7 @@ fastResumeWriteData( uint8_t       id,
 }
 
 void
-tr_fastResumeSave( const tr_torrent_t * tor )
+tr_fastResumeSave( const tr_torrent * tor )
 {
     char      path[MAX_PATH_LENGTH];
     FILE    * file;
@@ -194,7 +197,7 @@ tr_fastResumeSave( const tr_torrent_t * tor )
         tr_time_t * mtimes;
         uint8_t * buf = malloc( FR_PROGRESS_LEN( tor ) );
         uint8_t * walk = buf;
-        const tr_bitfield_t * bitfield;
+        const tr_bitfield * bitfield;
 
         /* mtimes */
         mtimes = getMTimes( tor, &n );
@@ -283,23 +286,25 @@ tr_fastResumeSave( const tr_torrent_t * tor )
     }
 
     /* Write download and upload totals */
+
     total = tor->downloadedCur + tor->downloadedPrev;
     fastResumeWriteData( FR_ID_DOWNLOADED, &total, 8, 1, file );
+
     total = tor->uploadedCur + tor->uploadedPrev;
     fastResumeWriteData( FR_ID_UPLOADED, &total, 8, 1, file );
+
     total = tor->corruptCur + tor->corruptPrev;
     fastResumeWriteData( FR_ID_CORRUPT, &total, 8, 1, file );
 
     if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
     {
-        /* Write IPs and ports of connectable peers, if any */
-        int size;
-        uint8_t * buf = NULL;
-        if( ( size = tr_peerGetConnectable( tor, &buf ) ) > 0 )
-        {
-            fastResumeWriteData( FR_ID_PEERS, buf, size, 1, file );
-            free( buf );
-        }
+        tr_pex * pex;
+        const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
+                                              tor->info.hash,
+                                              &pex );
+        if( count > 0 )
+            fastResumeWriteData( FR_ID_PEERS, pex, sizeof(tr_pex), count, file );
+        tr_free( pex );
     }
 
     fclose( file );
@@ -308,7 +313,7 @@ tr_fastResumeSave( const tr_torrent_t * tor )
 }
 
 static int
-loadSpeeds( tr_torrent_t * tor, FILE * file )
+loadSpeeds( tr_torrent * tor, FILE * file )
 {
     const size_t len = FR_SPEED_LEN;
     char * buf = tr_new0( char, len );
@@ -325,11 +330,11 @@ loadSpeeds( tr_torrent_t * tor, FILE * file )
     memcpy( &i16, walk, 2 ); walk += 2;
     tr_torrentSetSpeedLimit( tor, TR_DOWN, i16 );
     memcpy( &i8, walk, 1 ); walk += 1;
-    tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit_t)i8 );
+    tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit)i8 );
     memcpy( &i16, walk, 2 ); walk += 2;
     tr_torrentSetSpeedLimit( tor, TR_UP, i16 );
     memcpy( &i8, walk, 1 ); walk += 1;
-    tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit_t)i8 );
+    tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit)i8 );
 
     tr_free( buf );
     return TR_OK;
@@ -337,8 +342,8 @@ loadSpeeds( tr_torrent_t * tor, FILE * file )
 
 
 static int
-loadPriorities( tr_torrent_t * tor,
-                FILE         * file )
+loadPriorities( tr_torrent * tor,
+                FILE       * file )
 {
     const size_t n = tor->info.fileCount;
     const size_t len = 2 * n;
@@ -387,9 +392,9 @@ loadPriorities( tr_torrent_t * tor,
 }
 
 static int
-fastResumeLoadProgress( const tr_torrent_t  * tor,
-                        tr_bitfield_t       * uncheckedPieces,
-                        FILE                * file )
+fastResumeLoadProgress( const tr_torrent  * tor,
+                        tr_bitfield       * uncheckedPieces,
+                        FILE              * file )
 {
     int i;
     const size_t len = FR_PROGRESS_LEN( tor );
@@ -409,7 +414,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
             if ( curMTimes[i]!=oldMTimes[i] ) {
-                const tr_file_t * file = &tor->info.files[i];
+                const tr_file * file = &tor->info.files[i];
                 tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
                         file->name, file->firstPiece, file->lastPiece);
                 tr_bitfieldAddRange( uncheckedPieces, 
@@ -422,7 +427,7 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
 
     /* get the completion bitfield */
     if (1) {
-        tr_bitfield_t bitfield;
+        tr_bitfield bitfield;
         memset( &bitfield, 0, sizeof bitfield );
         bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = walk;
@@ -441,9 +446,9 @@ fastResumeLoadProgress( const tr_torrent_t  * tor,
 }
 
 static uint64_t
-fastResumeLoadOld( tr_torrent_t   * tor,
-                   tr_bitfield_t  * uncheckedPieces, 
-                   FILE           * file )
+fastResumeLoadOld( tr_torrent   * tor,
+                   tr_bitfield  * uncheckedPieces, 
+                   FILE         * file )
 {
     uint64_t ret = 0;
 
@@ -475,8 +480,8 @@ fastResumeLoadOld( tr_torrent_t   * tor,
 }
 
 static uint64_t
-fastResumeLoadImpl ( tr_torrent_t   * tor,
-                     tr_bitfield_t  * uncheckedPieces )
+fastResumeLoadImpl ( tr_torrent   * tor,
+                     tr_bitfield  * uncheckedPieces )
 {
     char      path[MAX_PATH_LENGTH];
     FILE    * file;
@@ -636,10 +641,9 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
                 }
                 break;
 
-            case FR_ID_PEERS:
+            case FR_ID_PEERS_OLD:
                 if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
                 {
-                    int used;
                     uint8_t * buf = malloc( len );
                     if( 1 != fread( buf, len, 1, file ) )
                     {
@@ -647,11 +651,36 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
                         fclose( file );
                         return ret;
                     }
-                    used = tr_torrentAddCompact( tor, TR_PEER_FROM_CACHE,
-                                                 buf, len / 6 );
-                    tr_dbg( "found %i peers in resume file, used %i",
-                            len / 6, used );
+
+                    tr_peerMgrAddPeers( tor->handle->peerMgr,
+                                        tor->info.hash,
+                                        TR_PEER_FROM_CACHE,
+                                        buf, len / 6 );
+
+                    tr_dbg( "found %i peers in resume file", len/6 );
                     free( buf );
+                    ret |= TR_FR_PEERS;
+                }
+
+            case FR_ID_PEERS:
+                if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+                {
+                    const int count = len / sizeof(tr_pex);
+                    tr_pex * pex = tr_new0( tr_pex, count );
+                    if( 1 != fread( pex, sizeof(tr_pex), count, file ) )
+                    {
+                        free( pex );
+                        fclose( file );
+                        return ret;
+                    }
+
+                    tr_peerMgrAddPex( tor->handle->peerMgr,
+                                      tor->info.hash,
+                                      TR_PEER_FROM_CACHE,
+                                      pex, count );
+
+                    tr_dbg( "found %i peers in resume file", len/6 );
+                    free( pex );
                     ret |= TR_FR_PEERS;
                 }
                 continue;
@@ -670,8 +699,8 @@ fastResumeLoadImpl ( tr_torrent_t   * tor,
 }
 
 uint64_t
-tr_fastResumeLoad( tr_torrent_t   * tor,
-                   tr_bitfield_t  * uncheckedPieces )
+tr_fastResumeLoad( tr_torrent   * tor,
+                   tr_bitfield  * uncheckedPieces )
 {
     const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces );
 

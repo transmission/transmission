@@ -33,6 +33,7 @@
 #include "actions.h"
 #include "tr_torrent.h"
 #include "dot-icons.h"
+#include "lock-icon.h"
 #include "hig.h"
 #include "torrent-inspector.h"
 #include "util.h"
@@ -236,6 +237,7 @@ enum
   PEER_COL_CLIENT,
   PEER_COL_PROGRESS,
   PEER_COL_IS_CONNECTED,
+  PEER_COL_IS_ENCRYPTED,
   PEER_COL_IS_DOWNLOADING,
   PEER_COL_DOWNLOAD_RATE,
   PEER_COL_IS_UPLOADING,
@@ -249,6 +251,7 @@ static const char* peer_column_names[N_PEER_COLS] =
   N_("Port"),
   N_("Client"),
   N_("Progress"),
+  " ",
   " ",
   N_("Downloading"),
   N_("DL Rate"),
@@ -283,6 +286,7 @@ peer_row_set (GtkTreeStore          * store,
                       PEER_COL_ADDRESS, peer->addr,
                       PEER_COL_PORT, peer->port,
                       PEER_COL_CLIENT, client,
+                      PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
                       PEER_COL_PROGRESS, (int)(100.0*peer->progress + 0.5),
                       PEER_COL_IS_CONNECTED, peer->isConnected,
                       PEER_COL_IS_DOWNLOADING, peer->isDownloading,
@@ -314,6 +318,7 @@ peer_model_new (tr_torrent_t * tor)
                                          G_TYPE_STRING,  /* client */
                                          G_TYPE_INT,     /* progress [0..100] */
                                          G_TYPE_BOOLEAN, /* isConnected */
+                                         G_TYPE_BOOLEAN, /* isEncrypted */
                                          G_TYPE_BOOLEAN, /* isDownloading */
                                          G_TYPE_FLOAT,   /* downloadFromRate */
                                          G_TYPE_BOOLEAN, /* isUploading */
@@ -344,6 +349,24 @@ render_connection (GtkTreeViewColumn  * column UNUSED,
   g_object_set (renderer, "xalign", (gfloat)0.0,
                           "yalign", (gfloat)0.5,
                           "pixbuf", (is_connected ? gdot : rdot),
+                          NULL);
+}
+
+static void
+render_encrypted (GtkTreeViewColumn  * column UNUSED,
+                  GtkCellRenderer    * renderer,
+                  GtkTreeModel       * tree_model,
+                  GtkTreeIter        * iter,
+                  gpointer             data UNUSED)
+{
+  static GdkPixbuf * lock = NULL;
+  gboolean is_encrypted = FALSE;
+  gtk_tree_model_get (tree_model, iter, PEER_COL_IS_ENCRYPTED, &is_encrypted,
+                                        -1);
+  if (!lock) lock = gdk_pixbuf_new_from_inline (-1, lock_icon, FALSE, NULL);
+  g_object_set (renderer, "xalign", (gfloat)0.0,
+                          "yalign", (gfloat)0.5,
+                          "pixbuf", (is_encrypted ? lock : NULL),
                           NULL);
 }
 
@@ -494,6 +517,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
 
   /* TODO: make this configurable? */
   int view_columns[] = { PEER_COL_IS_CONNECTED,
+                         PEER_COL_IS_ENCRYPTED,
                          PEER_COL_ADDRESS,
                          PEER_COL_CLIENT,
                          PEER_COL_PROGRESS,
@@ -536,6 +560,16 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         r = gtk_cell_renderer_progress_new ();
         c = gtk_tree_view_column_new_with_attributes (
               _("Progress"), r, "value", PEER_COL_PROGRESS, NULL);
+        break;
+
+      case PEER_COL_IS_ENCRYPTED:
+        resizable = FALSE;
+        r = gtk_cell_renderer_pixbuf_new ();
+        c = gtk_tree_view_column_new_with_attributes (t, r, NULL);
+        gtk_tree_view_column_set_sizing (c, GTK_TREE_VIEW_COLUMN_FIXED);
+        gtk_tree_view_column_set_fixed_width (c, 32);
+        gtk_tree_view_column_set_cell_data_func (c, r, render_encrypted,
+                                                 NULL, NULL);
         break;
 
       case PEER_COL_IS_CONNECTED:

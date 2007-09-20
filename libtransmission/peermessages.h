@@ -105,9 +105,9 @@ fillHeader( tr_peer_t * peer, int size, int id, uint8_t * buf )
 }
 
 static uint8_t *
-blockPending( tr_torrent_t  * tor,
-              tr_peer_t     * peer,
-              int           * size )
+blockPending( tr_torrent  * tor,
+              tr_peer_t   * peer,
+              int         * size )
 {
     if( !peer->outBlockLoaded ) /* we need to load the block for the next request */
     {
@@ -143,7 +143,7 @@ blockPending( tr_torrent_t  * tor,
         tr_htonl( r->begin, buf );
         buf += 4;
 
-        tr_ioRead( tor->io, r->index, r->begin, r->length, buf );
+        tr_ioRead( tor, r->index, r->begin, r->length, buf );
 
         peer_dbg( "SEND piece %d/%d (%d bytes)",
                   r->index, r->begin, r->length );
@@ -274,10 +274,10 @@ static void sendHave( tr_peer_t * peer, int piece )
  *  - id   = 5     (1 byte)
  *  - bitfield     (X bytes)
  **********************************************************************/
-static void sendBitfield( tr_torrent_t * tor, tr_peer_t * peer )
+static void sendBitfield( tr_torrent * tor, tr_peer_t * peer )
 {
     uint8_t             * p;
-    const tr_bitfield_t * bitfield;
+    const tr_bitfield   * bitfield;
 
     bitfield = tr_cpPieceBitfield( tor->completion );
     p = getMessagePointer( peer, bitfield->len, PEER_MSG_BITFIELD );
@@ -292,9 +292,9 @@ static void sendBitfield( tr_torrent_t * tor, tr_peer_t * peer )
  ***********************************************************************
  *
  **********************************************************************/
-static void sendRequest( tr_torrent_t * tor, tr_peer_t * peer, int block )
+static void sendRequest( tr_torrent * tor, tr_peer_t * peer, int block )
 {
-    tr_info_t * inf = &tor->info;
+    tr_info * inf = &tor->info;
     tr_request_t * r;
     uint8_t * p;
 
@@ -343,7 +343,7 @@ static void sendCancel( tr_peer_t * peer, int index, int begin,
  ***********************************************************************
  *
  **********************************************************************/
-static void broadcastCancel( tr_torrent_t * tor, int index, int begin,
+static void broadcastCancel( tr_torrent * tor, int index, int begin,
                              int length )
 {
     int i, j;
@@ -385,7 +385,7 @@ static void broadcastCancel( tr_torrent_t * tor, int index, int begin,
  *  - eid  = Y     (1 byte)
  *  - data         (X bytes)
  **********************************************************************/
-static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
+static int sendExtended( tr_torrent * tor, tr_peer_t * peer, int id )
 {
     uint8_t * p;
     char    * buf;
@@ -433,7 +433,7 @@ static int sendExtended( tr_torrent_t * tor, tr_peer_t * peer, int id )
  ***********************************************************************
  *
  **********************************************************************/
-static int sendAZPex( tr_torrent_t * tor, tr_peer_t * peer )
+static int sendAZPex( tr_torrent * tor, tr_peer_t * peer )
 {
     uint8_t * p;
     char    * buf;

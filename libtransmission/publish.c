@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <assert.h>
 #include "list.h"
 #include "publish.h"
 #include "utils.h"
@@ -22,7 +23,7 @@ struct tr_publisher_node
 
 struct tr_publisher_s
 {
-    tr_list_t * list;
+    tr_list * list;
 };
 
 tr_publisher_t*
@@ -32,10 +33,14 @@ tr_publisherNew( void )
 }
 
 void
-tr_publisherFree( tr_publisher_t * p )
+tr_publisherFree( tr_publisher_t ** p )
 {
-    tr_list_free( &p->list );
-    tr_free( p );
+    assert( p != NULL );
+    assert( *p != NULL );
+
+    tr_list_free( &(*p)->list );
+    tr_free( *p );
+    *p = NULL;
 }
 
 tr_publisher_tag
@@ -63,10 +68,10 @@ tr_publisherPublish( tr_publisher_t  * p,
                      void            * source,
                      void            * event )
 {
-    tr_list_t * walk;
+    tr_list * walk;
     for( walk=p->list; walk!=NULL; )
     {
-        tr_list_t * next = walk->next;
+        tr_list * next = walk->next;
         struct tr_publisher_node * node = (struct tr_publisher_node*)walk->data;
         (node->func)(source, event, node->user_data);
         walk = next;
