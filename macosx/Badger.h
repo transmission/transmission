@@ -30,7 +30,7 @@
 
 @interface Badger : NSObject
 {
-    tr_handle_t     * fLib;
+    tr_handle       * fLib;
 
     NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
     NSDictionary    * fAttributes;
@@ -38,7 +38,7 @@
     BOOL            fSpeedBadge;
 }
 
-- (id) initWithLib: (tr_handle_t *) lib;
+- (id) initWithLib: (tr_handle *) lib;
 
 - (void) updateBadge;
 - (void) incrementCompleted;

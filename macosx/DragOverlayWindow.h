@@ -27,12 +27,12 @@
 
 @interface DragOverlayWindow : NSWindow
 {
-    tr_handle_t * fLib;
+    tr_handle * fLib;
     
     NSViewAnimation * fFadeInAnimation, * fFadeOutAnimation;
 }
 
-- (id) initWithLib: (tr_handle_t *) lib forWindow: (NSWindow *) window;
+- (id) initWithLib: (tr_handle *) lib forWindow: (NSWindow *) window;
 
 - (void) setTorrents: (NSArray *) files;
 - (void) setFile: (NSString *) file;

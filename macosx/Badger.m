@@ -33,7 +33,7 @@
 
 @implementation Badger
 
-- (id) initWithLib: (tr_handle_t *) lib
+- (id) initWithLib: (tr_handle *) lib
 {
     if ((self = [super init]))
     {

@@ -36,10 +36,10 @@ typedef enum
 
 @interface Torrent : NSObject
 {
-    tr_handle_t * fLib;
-    tr_torrent_t * fHandle;
-    const tr_info_t * fInfo;
-    const tr_stat_t * fStat;
+    tr_handle * fLib;
+    tr_torrent * fHandle;
+    const tr_info * fInfo;
+    const tr_stat * fStat;
     
     int fID;
     
@@ -59,7 +59,7 @@ typedef enum
     NSImage * fIcon;
     NSString * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
-    tr_file_stat_t * fileStat;
+    tr_file_stat * fileStat;
     NSArray * fFileList, * fFlatFileList;
     
     NSMenu * fFileMenu;
@@ -74,8 +74,8 @@ typedef enum
 }
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
-        lib: (tr_handle_t *) lib;
-- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib;
+        lib: (tr_handle *) lib;
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle *) lib;
 
 - (NSDictionary *) history;
 
@@ -227,7 +227,7 @@ typedef enum
 - (NSNumber *) ratioSortKey;
 
 - (int) torrentID;
-- (const tr_info_t *) torrentInfo;
-- (const tr_stat_t *) torrentStat;
+- (const tr_info *) torrentInfo;
+- (const tr_stat *) torrentStat;
 
 @end

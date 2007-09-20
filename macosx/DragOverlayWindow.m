@@ -28,7 +28,7 @@
 
 @implementation DragOverlayWindow
 
-- (id) initWithLib: (tr_handle_t *) lib forWindow: (NSWindow *) window
+- (id) initWithLib: (tr_handle *) lib forWindow: (NSWindow *) window
 {
     if (self = ([super initWithContentRect: NSMakeRect(0, 0, 1.0, 1.0) styleMask: NSBorderlessWindowMask
                     backing: NSBackingStoreBuffered defer: NO]))
@@ -82,7 +82,7 @@
     
     NSString * file;
     NSEnumerator * enumerator = [files objectEnumerator];
-    tr_info_t info;
+    tr_info info;
     while ((file = [enumerator nextObject]))
     {
         if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)

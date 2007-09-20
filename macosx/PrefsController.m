@@ -49,7 +49,7 @@
 
 @implementation PrefsController
 
-- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle
+- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle *) handle
 {
     if ((self = [self initWithWindowNibName: name]))
     {
@@ -238,7 +238,7 @@
 
 - (void) updatePortStatus
 {
-    tr_handle_status_t * stat = tr_handleStatus(fHandle);
+    tr_handle_status * stat = tr_handleStatus(fHandle);
     
     BOOL change;
     if (change = (fNatStatus != stat->natTraversalStatus))

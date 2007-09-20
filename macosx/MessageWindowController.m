@@ -101,7 +101,7 @@
 
 - (void) updateLog: (NSTimer *) timer
 {
-    tr_msg_list_t * messages, * currentMessage;
+    tr_msg_list * messages, * currentMessage;
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     

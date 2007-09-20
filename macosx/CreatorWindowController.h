@@ -36,7 +36,7 @@
     IBOutlet NSView * fProgressView;
     IBOutlet NSProgressIndicator * fProgressIndicator;
     
-    tr_metainfo_builder_t * fInfo;
+    tr_metainfo_builder * fInfo;
     NSString * fPath, * fLocation;
     BOOL fOpenTorrent;
     
@@ -46,10 +46,10 @@
     NSUserDefaults * fDefaults;
 }
 
-+ (void) createTorrentFile: (tr_handle_t *) handle;
-+ (void) createTorrentFile: (tr_handle_t *) handle forFile: (NSString *) file;
++ (void) createTorrentFile: (tr_handle *) handle;
++ (void) createTorrentFile: (tr_handle *) handle forFile: (NSString *) file;
 
-- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle path: (NSString *) path;
+- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle *) handle path: (NSString *) path;
 
 - (void) setLocation: (id) sender;
 - (void) create: (id) sender;

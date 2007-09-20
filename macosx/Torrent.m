@@ -29,7 +29,7 @@ static int static_lastid = 0;
 
 @interface Torrent (Private)
 
-- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle *) lib
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
@@ -57,7 +57,7 @@ static int static_lastid = 0;
 @implementation Torrent
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (torrentFileState) torrentDelete
-        lib: (tr_handle_t *) lib
+        lib: (tr_handle *) lib
 {
     self = [self initWithHash: nil path: path lib: lib
             publicTorrent: torrentDelete != TORRENT_FILE_DEFAULT
@@ -78,7 +78,7 @@ static int static_lastid = 0;
     return self;
 }
 
-- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle_t *) lib
+- (id) initWithHistory: (NSDictionary *) history lib: (tr_handle *) lib
 {
     self = [self initWithHash: [history objectForKey: @"TorrentHash"]
                 path: [history objectForKey: @"TorrentPath"] lib: lib
@@ -1014,12 +1014,12 @@ static int static_lastid = 0;
 - (NSArray *) peers
 {
     int totalPeers, i;
-    tr_peer_stat_t * peers = tr_torrentPeers(fHandle, &totalPeers);
+    tr_peer_stat * peers = tr_torrentPeers(fHandle, &totalPeers);
     
     NSMutableArray * peerDics = [NSMutableArray arrayWithCapacity: totalPeers];
     NSMutableDictionary * dic;
     
-    tr_peer_stat_t * peer;
+    tr_peer_stat * peer;
     for (i = 0; i < totalPeers; i++)
     {
         peer = &peers[i];
@@ -1396,12 +1396,12 @@ static int static_lastid = 0;
     return fID;
 }
 
-- (const tr_info_t *) torrentInfo
+- (const tr_info *) torrentInfo
 {
     return fInfo;
 }
 
-- (const tr_stat_t *) torrentStat
+- (const tr_stat *) torrentStat
 {
     return fStat;
 }
@@ -1411,7 +1411,7 @@ static int static_lastid = 0;
 @implementation Torrent (Private)
 
 //if a hash is given, attempt to load that; otherwise, attempt to open file at path
-- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle_t *) lib
+- (id) initWithHash: (NSString *) hashString path: (NSString *) path lib: (tr_handle *) lib
         publicTorrent: (NSNumber *) publicTorrent
         downloadFolder: (NSString *) downloadFolder
         useIncompleteFolder: (NSNumber *) useIncompleteFolder incompleteFolder: (NSString *) incompleteFolder
@@ -1446,7 +1446,7 @@ static int static_lastid = 0;
     }
     
     NSString * currentDownloadFolder;
-    tr_info_t info;
+    tr_info info;
     int error;
     if (hashString)
     {
@@ -1507,7 +1507,7 @@ static int static_lastid = 0;
 - (void) createFileList
 {
     int count = [self fileCount], i;
-    tr_file_t * file;
+    tr_file * file;
     NSMutableArray * pathComponents;
     NSString * path;
     

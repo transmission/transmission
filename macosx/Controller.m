@@ -770,7 +770,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     Torrent * torrent;
     NSString * torrentPath;
-    tr_info_t info;
+    tr_info info;
     NSEnumerator * enumerator = [filenames objectEnumerator];
     while ((torrentPath = [enumerator nextObject]))
     {
@@ -848,7 +848,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //determine the next file that can be opened
     NSString * torrentPath;
     int canAdd;
-    tr_info_t info;
+    tr_info info;
     while ([files count] > 0)
     {
         torrentPath = [[files objectAtIndex: 0] retain];

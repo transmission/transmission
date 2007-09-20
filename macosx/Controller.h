@@ -42,7 +42,7 @@
 
 @interface Controller : NSObject <GrowlApplicationBridgeDelegate>
 {
-    tr_handle_t                     * fLib;
+    tr_handle                       * fLib;
     
     NSMutableArray                  * fTorrents, * fDisplayedTorrents;
     

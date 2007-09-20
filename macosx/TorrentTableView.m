@@ -344,7 +344,7 @@
     if (menu == fUploadMenu || menu == fDownloadMenu)
     {
         BOOL upload = menu == fUploadMenu;
-        tr_speedlimit_t mode = [fMenuTorrent speedMode: upload];
+        int mode = [fMenuTorrent speedMode: upload];
         
         NSMenuItem * item = [menu itemWithTag: ACTION_MENU_LIMIT_TAG];
         [item setState: mode == TR_SPEEDLIMIT_SINGLE ? NSOnState : NSOffState];
@@ -384,7 +384,7 @@
 - (void) setQuickLimitMode: (id) sender
 {
     int tag = [sender tag];
-    tr_speedlimit_t mode;
+    int mode;
     if (tag == ACTION_MENU_UNLIMITED_TAG)
         mode = TR_SPEEDLIMIT_UNLIMITED;
     else if (tag == ACTION_MENU_LIMIT_TAG)

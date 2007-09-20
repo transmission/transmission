@@ -29,7 +29,7 @@
 
 @interface PrefsController : NSWindowController
 {
-    tr_handle_t * fHandle;
+    tr_handle * fHandle;
     
     NSUserDefaults          * fDefaults;
     BOOL                    fHasLoaded;
@@ -53,7 +53,7 @@
     int                             fPublicPort, fNatStatus;
 }
 
-- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle_t *) handle;
+- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
 - (void) setPort: (id) sender;
