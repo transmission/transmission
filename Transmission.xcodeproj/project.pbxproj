@@ -13,11 +13,25 @@
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.c */; };
 		4394AC680C74FB6000F367E8 /* publish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC650C74FB6000F367E8 /* publish.c */; };
-		4394AC690C74FB6000F367E8 /* timer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC660C74FB6000F367E8 /* timer.c */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
 		4D118E1A08CB46B20033958F /* PrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.m */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D364D9F091FBB2C00377D12 /* TorrentTableView.m */; };
+		4D36BA6E0CA2F00800A63CA5 /* basename.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA5F0CA2F00800A63CA5 /* basename.c */; };
+		4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA600CA2F00800A63CA5 /* crypto.c */; };
+		4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA610CA2F00800A63CA5 /* crypto.h */; };
+		4D36BA710CA2F00800A63CA5 /* dirname.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA620CA2F00800A63CA5 /* dirname.c */; };
+		4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA630CA2F00800A63CA5 /* handshake.c */; };
+		4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA640CA2F00800A63CA5 /* handshake.h */; };
+		4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA650CA2F00800A63CA5 /* peer-io.c */; };
+		4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA660CA2F00800A63CA5 /* peer-io.h */; };
+		4D36BA760CA2F00800A63CA5 /* peer-mgr-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */; };
+		4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA680CA2F00800A63CA5 /* peer-mgr.c */; };
+		4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA690CA2F00800A63CA5 /* peer-mgr.h */; };
+		4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */; };
+		4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */; };
+		4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */; };
+		4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6D0CA2F00800A63CA5 /* publish.h */; };
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
 		4D4B7F6109E055660053C1EB /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2617F709DECE3D00D08EFA /* libcrypto.0.9.7.dylib */; };
 		4D6DAAC6090CE00500F43C22 /* RevealOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D6DAAC4090CE00500F43C22 /* RevealOff.png */; };
@@ -176,20 +190,10 @@
 		BEFC1E340C07861A00B0BB3C /* strlcat.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFB0C07861A00B0BB3C /* strlcat.c */; };
 		BEFC1E350C07861A00B0BB3C /* shared.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* shared.h */; };
 		BEFC1E360C07861A00B0BB3C /* shared.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFD0C07861A00B0BB3C /* shared.c */; };
-		BEFC1E370C07861A00B0BB3C /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFE0C07861A00B0BB3C /* sha1.h */; };
-		BEFC1E380C07861A00B0BB3C /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFF0C07861A00B0BB3C /* sha1.c */; };
 		BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E000C07861A00B0BB3C /* ratecontrol.h */; };
 		BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E010C07861A00B0BB3C /* ratecontrol.c */; };
 		BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E020C07861A00B0BB3C /* platform.h */; };
 		BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E030C07861A00B0BB3C /* platform.c */; };
-		BEFC1E3D0C07861A00B0BB3C /* peerutils.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E040C07861A00B0BB3C /* peerutils.h */; };
-		BEFC1E3E0C07861A00B0BB3C /* peertree.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E050C07861A00B0BB3C /* peertree.h */; };
-		BEFC1E3F0C07861A00B0BB3C /* peerparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E060C07861A00B0BB3C /* peerparse.h */; };
-		BEFC1E400C07861A00B0BB3C /* peermessages.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E070C07861A00B0BB3C /* peermessages.h */; };
-		BEFC1E410C07861A00B0BB3C /* peerext.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E080C07861A00B0BB3C /* peerext.h */; };
-		BEFC1E420C07861A00B0BB3C /* peeraz.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E090C07861A00B0BB3C /* peeraz.h */; };
-		BEFC1E430C07861A00B0BB3C /* peer.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0A0C07861A00B0BB3C /* peer.h */; };
-		BEFC1E440C07861A00B0BB3C /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0B0C07861A00B0BB3C /* peer.c */; };
 		BEFC1E450C07861A00B0BB3C /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0C0C07861A00B0BB3C /* net.h */; };
 		BEFC1E460C07861A00B0BB3C /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0D0C07861A00B0BB3C /* net.c */; };
 		BEFC1E470C07861A00B0BB3C /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0E0C07861A00B0BB3C /* natpmp.h */; };
@@ -210,8 +214,6 @@
 		BEFC1E560C07861A00B0BB3C /* completion.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.c */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
 		BEFC1E580C07861A00B0BB3C /* clients.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1F0C07861A00B0BB3C /* clients.c */; };
-		BEFC1E590C07861A00B0BB3C /* choking.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E200C07861A00B0BB3C /* choking.h */; };
-		BEFC1E5A0C07861A00B0BB3C /* choking.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E210C07861A00B0BB3C /* choking.c */; };
 		BEFC1E5B0C07861A00B0BB3C /* bsdtree.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E220C07861A00B0BB3C /* bsdtree.h */; };
 		BEFC1E5C0C07861A00B0BB3C /* bencode.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E230C07861A00B0BB3C /* bencode.h */; };
 		BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E240C07861A00B0BB3C /* bencode.c */; };
@@ -298,7 +300,6 @@
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ptrarray.c; path = libtransmission/ptrarray.c; sourceTree = "<group>"; };
 		4394AC650C74FB6000F367E8 /* publish.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = publish.c; path = libtransmission/publish.c; sourceTree = "<group>"; };
-		4394AC660C74FB6000F367E8 /* timer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = timer.c; path = libtransmission/timer.c; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsController.h; path = macosx/PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrefsController.m; path = macosx/PrefsController.m; sourceTree = "<group>"; };
@@ -307,6 +308,21 @@
 		4D2784360905709500687951 /* Transmission.icns */ = {isa = PBXFileReference; explicitFileType = image.icns; name = Transmission.icns; path = macosx/Images/Transmission.icns; sourceTree = "<group>"; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TorrentTableView.h; path = macosx/TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = TorrentTableView.m; path = macosx/TorrentTableView.m; sourceTree = "<group>"; };
+		4D36BA5F0CA2F00800A63CA5 /* basename.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = basename.c; path = libtransmission/basename.c; sourceTree = "<group>"; };
+		4D36BA600CA2F00800A63CA5 /* crypto.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = crypto.c; path = libtransmission/crypto.c; sourceTree = "<group>"; };
+		4D36BA610CA2F00800A63CA5 /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = crypto.h; path = libtransmission/crypto.h; sourceTree = "<group>"; };
+		4D36BA620CA2F00800A63CA5 /* dirname.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = dirname.c; path = libtransmission/dirname.c; sourceTree = "<group>"; };
+		4D36BA630CA2F00800A63CA5 /* handshake.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = handshake.c; path = libtransmission/handshake.c; sourceTree = "<group>"; };
+		4D36BA640CA2F00800A63CA5 /* handshake.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = handshake.h; path = libtransmission/handshake.h; sourceTree = "<group>"; };
+		4D36BA650CA2F00800A63CA5 /* peer-io.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-io.c"; path = "libtransmission/peer-io.c"; sourceTree = "<group>"; };
+		4D36BA660CA2F00800A63CA5 /* peer-io.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-io.h"; path = "libtransmission/peer-io.h"; sourceTree = "<group>"; };
+		4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-mgr-private.h"; path = "libtransmission/peer-mgr-private.h"; sourceTree = "<group>"; };
+		4D36BA680CA2F00800A63CA5 /* peer-mgr.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-mgr.c"; path = "libtransmission/peer-mgr.c"; sourceTree = "<group>"; };
+		4D36BA690CA2F00800A63CA5 /* peer-mgr.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-mgr.h"; path = "libtransmission/peer-mgr.h"; sourceTree = "<group>"; };
+		4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-msgs.c"; path = "libtransmission/peer-msgs.c"; sourceTree = "<group>"; };
+		4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "peer-msgs.h"; path = "libtransmission/peer-msgs.h"; sourceTree = "<group>"; };
+		4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ptrarray.h; path = libtransmission/ptrarray.h; sourceTree = "<group>"; };
+		4D36BA6D0CA2F00800A63CA5 /* publish.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = publish.h; path = libtransmission/publish.h; sourceTree = "<group>"; };
 		4D3EA0A908AE13C600EA10C2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		4D6DAAC4090CE00500F43C22 /* RevealOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOff.png; path = macosx/Images/RevealOff.png; sourceTree = "<group>"; };
 		4D6DAAC5090CE00500F43C22 /* RevealOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RevealOn.png; path = macosx/Images/RevealOn.png; sourceTree = "<group>"; };
@@ -337,7 +353,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A200B9630A227FD0007BBB1E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -541,20 +557,10 @@
 		BEFC1DFB0C07861A00B0BB3C /* strlcat.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = strlcat.c; path = libtransmission/strlcat.c; sourceTree = "<group>"; };
 		BEFC1DFC0C07861A00B0BB3C /* shared.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shared.h; path = libtransmission/shared.h; sourceTree = "<group>"; };
 		BEFC1DFD0C07861A00B0BB3C /* shared.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = shared.c; path = libtransmission/shared.c; sourceTree = "<group>"; };
-		BEFC1DFE0C07861A00B0BB3C /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sha1.h; path = libtransmission/sha1.h; sourceTree = "<group>"; };
-		BEFC1DFF0C07861A00B0BB3C /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = sha1.c; path = libtransmission/sha1.c; sourceTree = "<group>"; };
 		BEFC1E000C07861A00B0BB3C /* ratecontrol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ratecontrol.h; path = libtransmission/ratecontrol.h; sourceTree = "<group>"; };
 		BEFC1E010C07861A00B0BB3C /* ratecontrol.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ratecontrol.c; path = libtransmission/ratecontrol.c; sourceTree = "<group>"; };
 		BEFC1E020C07861A00B0BB3C /* platform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = platform.h; path = libtransmission/platform.h; sourceTree = "<group>"; };
 		BEFC1E030C07861A00B0BB3C /* platform.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = platform.c; path = libtransmission/platform.c; sourceTree = "<group>"; };
-		BEFC1E040C07861A00B0BB3C /* peerutils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peerutils.h; path = libtransmission/peerutils.h; sourceTree = "<group>"; };
-		BEFC1E050C07861A00B0BB3C /* peertree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peertree.h; path = libtransmission/peertree.h; sourceTree = "<group>"; };
-		BEFC1E060C07861A00B0BB3C /* peerparse.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peerparse.h; path = libtransmission/peerparse.h; sourceTree = "<group>"; };
-		BEFC1E070C07861A00B0BB3C /* peermessages.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peermessages.h; path = libtransmission/peermessages.h; sourceTree = "<group>"; };
-		BEFC1E080C07861A00B0BB3C /* peerext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peerext.h; path = libtransmission/peerext.h; sourceTree = "<group>"; };
-		BEFC1E090C07861A00B0BB3C /* peeraz.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peeraz.h; path = libtransmission/peeraz.h; sourceTree = "<group>"; };
-		BEFC1E0A0C07861A00B0BB3C /* peer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = peer.h; path = libtransmission/peer.h; sourceTree = "<group>"; };
-		BEFC1E0B0C07861A00B0BB3C /* peer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = peer.c; path = libtransmission/peer.c; sourceTree = "<group>"; };
 		BEFC1E0C0C07861A00B0BB3C /* net.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = net.h; path = libtransmission/net.h; sourceTree = "<group>"; };
 		BEFC1E0D0C07861A00B0BB3C /* net.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = net.c; path = libtransmission/net.c; sourceTree = "<group>"; };
 		BEFC1E0E0C07861A00B0BB3C /* natpmp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = natpmp.h; path = libtransmission/natpmp.h; sourceTree = "<group>"; };
@@ -576,7 +582,6 @@
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = clients.h; path = libtransmission/clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = clients.c; path = libtransmission/clients.c; sourceTree = "<group>"; };
 		BEFC1E200C07861A00B0BB3C /* choking.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choking.h; path = libtransmission/choking.h; sourceTree = "<group>"; };
-		BEFC1E210C07861A00B0BB3C /* choking.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = choking.c; path = libtransmission/choking.c; sourceTree = "<group>"; };
 		BEFC1E220C07861A00B0BB3C /* bsdtree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdtree.h; path = libtransmission/bsdtree.h; sourceTree = "<group>"; };
 		BEFC1E230C07861A00B0BB3C /* bencode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bencode.h; path = libtransmission/bencode.h; sourceTree = "<group>"; };
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
@@ -826,11 +831,25 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
+				4D36BA5F0CA2F00800A63CA5 /* basename.c */,
+				4D36BA600CA2F00800A63CA5 /* crypto.c */,
+				4D36BA610CA2F00800A63CA5 /* crypto.h */,
+				4D36BA620CA2F00800A63CA5 /* dirname.c */,
+				4D36BA630CA2F00800A63CA5 /* handshake.c */,
+				4D36BA640CA2F00800A63CA5 /* handshake.h */,
+				4D36BA650CA2F00800A63CA5 /* peer-io.c */,
+				4D36BA660CA2F00800A63CA5 /* peer-io.h */,
+				4D36BA670CA2F00800A63CA5 /* peer-mgr-private.h */,
+				4D36BA680CA2F00800A63CA5 /* peer-mgr.c */,
+				4D36BA690CA2F00800A63CA5 /* peer-mgr.h */,
+				4D36BA6A0CA2F00800A63CA5 /* peer-msgs.c */,
+				4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */,
+				4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */,
+				4D36BA6D0CA2F00800A63CA5 /* publish.h */,
 				A24621350C769CF400088E81 /* trevent.h */,
 				A24621360C769CF400088E81 /* trevent.c */,
 				4394AC640C74FB6000F367E8 /* ptrarray.c */,
 				4394AC650C74FB6000F367E8 /* publish.c */,
-				4394AC660C74FB6000F367E8 /* timer.c */,
 				D4AF3B2D0C41F7A500D46B6B /* list.c */,
 				D4AF3B2E0C41F7A500D46B6B /* list.h */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.c */,
@@ -854,20 +873,10 @@
 				BEFC1DFB0C07861A00B0BB3C /* strlcat.c */,
 				BEFC1DFC0C07861A00B0BB3C /* shared.h */,
 				BEFC1DFD0C07861A00B0BB3C /* shared.c */,
-				BEFC1DFE0C07861A00B0BB3C /* sha1.h */,
-				BEFC1DFF0C07861A00B0BB3C /* sha1.c */,
 				BEFC1E000C07861A00B0BB3C /* ratecontrol.h */,
 				BEFC1E010C07861A00B0BB3C /* ratecontrol.c */,
 				BEFC1E020C07861A00B0BB3C /* platform.h */,
 				BEFC1E030C07861A00B0BB3C /* platform.c */,
-				BEFC1E040C07861A00B0BB3C /* peerutils.h */,
-				BEFC1E050C07861A00B0BB3C /* peertree.h */,
-				BEFC1E060C07861A00B0BB3C /* peerparse.h */,
-				BEFC1E070C07861A00B0BB3C /* peermessages.h */,
-				BEFC1E080C07861A00B0BB3C /* peerext.h */,
-				BEFC1E090C07861A00B0BB3C /* peeraz.h */,
-				BEFC1E0A0C07861A00B0BB3C /* peer.h */,
-				BEFC1E0B0C07861A00B0BB3C /* peer.c */,
 				BEFC1E0C0C07861A00B0BB3C /* net.h */,
 				BEFC1E0D0C07861A00B0BB3C /* net.c */,
 				BEFC1E0E0C07861A00B0BB3C /* natpmp.h */,
@@ -889,7 +898,6 @@
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
 				BEFC1E1F0C07861A00B0BB3C /* clients.c */,
 				BEFC1E200C07861A00B0BB3C /* choking.h */,
-				BEFC1E210C07861A00B0BB3C /* choking.c */,
 				BEFC1E220C07861A00B0BB3C /* bsdtree.h */,
 				BEFC1E230C07861A00B0BB3C /* bencode.h */,
 				BEFC1E240C07861A00B0BB3C /* bencode.c */,
@@ -1066,16 +1074,8 @@
 				BEFC1E2E0C07861A00B0BB3C /* transmission.h in Headers */,
 				BEFC1E300C07861A00B0BB3C /* tracker.h in Headers */,
 				BEFC1E350C07861A00B0BB3C /* shared.h in Headers */,
-				BEFC1E370C07861A00B0BB3C /* sha1.h in Headers */,
 				BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */,
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
-				BEFC1E3D0C07861A00B0BB3C /* peerutils.h in Headers */,
-				BEFC1E3E0C07861A00B0BB3C /* peertree.h in Headers */,
-				BEFC1E3F0C07861A00B0BB3C /* peerparse.h in Headers */,
-				BEFC1E400C07861A00B0BB3C /* peermessages.h in Headers */,
-				BEFC1E410C07861A00B0BB3C /* peerext.h in Headers */,
-				BEFC1E420C07861A00B0BB3C /* peeraz.h in Headers */,
-				BEFC1E430C07861A00B0BB3C /* peer.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
 				BEFC1E470C07861A00B0BB3C /* natpmp.h in Headers */,
 				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
@@ -1087,7 +1087,6 @@
 				BEFC1E540C07861A00B0BB3C /* fastresume.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
-				BEFC1E590C07861A00B0BB3C /* choking.h in Headers */,
 				BEFC1E5B0C07861A00B0BB3C /* bsdtree.h in Headers */,
 				BEFC1E5C0C07861A00B0BB3C /* bencode.h in Headers */,
 				BEFC1E5E0C07861A00B0BB3C /* bsdqueue.h in Headers */,
@@ -1095,6 +1094,14 @@
 				A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */,
 				D4AF3B300C41F7A600D46B6B /* list.h in Headers */,
 				A24621410C769D0900088E81 /* trevent.h in Headers */,
+				4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */,
+				4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */,
+				4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */,
+				4D36BA760CA2F00800A63CA5 /* peer-mgr-private.h in Headers */,
+				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
+				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
+				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
+				4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1391,10 +1398,8 @@
 				BEFC1E330C07861A00B0BB3C /* strlcpy.c in Sources */,
 				BEFC1E340C07861A00B0BB3C /* strlcat.c in Sources */,
 				BEFC1E360C07861A00B0BB3C /* shared.c in Sources */,
-				BEFC1E380C07861A00B0BB3C /* sha1.c in Sources */,
 				BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */,
-				BEFC1E440C07861A00B0BB3C /* peer.c in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.c in Sources */,
 				BEFC1E480C07861A00B0BB3C /* natpmp.c in Sources */,
 				BEFC1E4A0C07861A00B0BB3C /* metainfo.c in Sources */,
@@ -1404,15 +1409,20 @@
 				BEFC1E530C07861A00B0BB3C /* fdlimit.c in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.c in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.c in Sources */,
-				BEFC1E5A0C07861A00B0BB3C /* choking.c in Sources */,
 				BEFC1E5D0C07861A00B0BB3C /* bencode.c in Sources */,
 				002C9EE60C19CD2500C2F6F4 /* fastresume.c in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.c in Sources */,
 				D4AF3B2F0C41F7A500D46B6B /* list.c in Sources */,
 				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
 				4394AC680C74FB6000F367E8 /* publish.c in Sources */,
-				4394AC690C74FB6000F367E8 /* timer.c in Sources */,
 				A24621420C769D0900088E81 /* trevent.c in Sources */,
+				4D36BA6E0CA2F00800A63CA5 /* basename.c in Sources */,
+				4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */,
+				4D36BA710CA2F00800A63CA5 /* dirname.c in Sources */,
+				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
+				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
+				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
+				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
