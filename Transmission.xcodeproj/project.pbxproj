@@ -583,7 +583,6 @@
 		BEFC1E1D0C07861A00B0BB3C /* completion.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = completion.c; path = libtransmission/completion.c; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = clients.h; path = libtransmission/clients.h; sourceTree = "<group>"; };
 		BEFC1E1F0C07861A00B0BB3C /* clients.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = clients.c; path = libtransmission/clients.c; sourceTree = "<group>"; };
-		BEFC1E200C07861A00B0BB3C /* choking.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choking.h; path = libtransmission/choking.h; sourceTree = "<group>"; };
 		BEFC1E220C07861A00B0BB3C /* bsdtree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bsdtree.h; path = libtransmission/bsdtree.h; sourceTree = "<group>"; };
 		BEFC1E230C07861A00B0BB3C /* bencode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bencode.h; path = libtransmission/bencode.h; sourceTree = "<group>"; };
 		BEFC1E240C07861A00B0BB3C /* bencode.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = bencode.c; path = libtransmission/bencode.c; sourceTree = "<group>"; };
@@ -899,7 +898,6 @@
 				BEFC1E1D0C07861A00B0BB3C /* completion.c */,
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
 				BEFC1E1F0C07861A00B0BB3C /* clients.c */,
-				BEFC1E200C07861A00B0BB3C /* choking.h */,
 				BEFC1E220C07861A00B0BB3C /* bsdtree.h */,
 				BEFC1E230C07861A00B0BB3C /* bencode.h */,
 				BEFC1E240C07861A00B0BB3C /* bencode.c */,
