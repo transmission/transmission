@@ -314,8 +314,6 @@
         [fFiles release];
         fFiles = [[torrent fileList] retain];
         
-        [self updateInfoFiles];
-        
         int fileCount = [torrent fileCount];
         if (fileCount != 1)
             [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files total",
