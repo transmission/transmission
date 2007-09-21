@@ -166,7 +166,6 @@ getPeer( Torrent * torrent, const struct in_addr * in_addr, int * isNew )
         peer = tr_new0( tr_peer, 1 );
         memcpy( &peer->in_addr, in_addr, sizeof(struct in_addr) );
         tr_ptrArrayInsertSorted( torrent->peers, peer, peerCompare );
-fprintf( stderr, "getPeer: torrent %p now has %d peers\n", torrent, tr_ptrArraySize(torrent->peers) );
     }
 
     return peer;
@@ -394,7 +393,7 @@ getPreferredBlocks( Torrent * t, uint64_t * setmeCount )
     const tr_torrent * tor = t->tor;
 
     pieces = getPreferredPieces( t, &pieceCount );
-fprintf( stderr, "REFILL refillPulse for {%s} got %d of %d pieces\n", tor->info.name, (int)pieceCount, t->tor->info.pieceCount );
+/*fprintf( stderr, "REFILL refillPulse for {%s} got %d of %d pieces\n", tor->info.name, (int)pieceCount, t->tor->info.pieceCount );*/
 
     req = tr_new( uint64_t, pieceCount *  tor->blockCountInPiece );
     reqCount = 0;
@@ -415,7 +414,7 @@ fprintf( stderr, "REFILL refillPulse for {%s} got %d of %d pieces\n", tor->info.
                 unreq[unreqCount++] = block;
     }
 
-fprintf( stderr, "REFILL refillPulse for {%s} reqCount is %d, unreqCount is %d\n", tor->info.name, (int)reqCount, (int)unreqCount );
+/*fprintf( stderr, "REFILL refillPulse for {%s} reqCount is %d, unreqCount is %d\n", tor->info.name, (int)reqCount, (int)unreqCount );*/
     ret = walk = tr_new( uint64_t, unreqCount + reqCount );
     memcpy( walk, unreq, sizeof(uint64_t) * unreqCount );
     walk += unreqCount;
@@ -450,7 +449,7 @@ refillPulse( void * vtorrent )
     blocks = getPreferredBlocks( t, &blockCount );
     peers = getConnectedPeers( t, &peerCount );
 
-fprintf( stderr, "REFILL refillPulse for {%s} got %d blocks\n", tor->info.name, (int)blockCount );
+/*fprintf( stderr, "REFILL refillPulse for {%s} got %d blocks\n", tor->info.name, (int)blockCount );*/
 
     for( i=0; peerCount && i<blockCount; ++i )
     {
@@ -480,7 +479,7 @@ fprintf( stderr, "REFILL refillPulse for {%s} got %d blocks\n", tor->info.name, 
                     break;
 
                 case TR_ADDREQ_OK:
-                    fprintf( stderr, "REFILL peer %p took the request for block %d\n", peers[j]->msgs, block );
+                    /*fprintf( stderr, "REFILL peer %p took the request for block %d\n", peers[j]->msgs, block );*/
                     tr_bitfieldAdd( t->requested, block );
                     j = peerCount;
                     break;
