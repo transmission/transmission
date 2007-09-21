@@ -910,6 +910,9 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     *setmePeersSendingToUs    = 0;
     *setmePeersGettingFromUs  = 0;
 
+    for( i=0; i<TR_PEER_FROM__MAX; ++i )
+        setmePeersFrom[i] = 0;
+
     for( i=0; i<size; ++i )
     {
         const tr_peer * peer = peers[i];
