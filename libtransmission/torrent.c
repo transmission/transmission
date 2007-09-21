@@ -274,6 +274,11 @@ recheckDoneCB( tr_torrent * tor )
 {
     recheckCpState( tor );
 
+    if( tor->doStopAfterHashCheck ) {
+        tor->doStopAfterHashCheck = 0;
+        tr_torrentStop( tor );
+    }
+
     if( tor->runStatus == TR_RUN_RUNNING )
         tr_torrentStartImpl( tor );
 }
@@ -732,7 +737,7 @@ tr_torrentStat( tr_torrent * tor )
 
     tr_torrentLock( tor );
 
-    tor->statCur = ( tor->statCur + 1 ) % 2;
+    tor->statCur = !tor->statCur;
     s = &tor->stats[tor->statCur];
 
     s->error  = tor->error;
@@ -1059,15 +1064,14 @@ tr_torrentStopImpl( void * vtor )
     {
         case TR_RUN_CHECKING_WAIT:
         case TR_RUN_CHECKING:
+            tor->doStopAfterHashCheck = 1;
             tr_ioRecheckRemove( tor );
-            tr_torrentStop( tor );
             break;
 
         case TR_RUN_RUNNING:
             saveFastResumeNow( tor );
             tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
             tor->runStatus = TR_RUN_STOPPING;
-            tor->stopDate = tr_date( );
             tr_trackerStop( tor->tracker );
             tr_ioClose( tor );
             break;
@@ -1089,7 +1093,6 @@ tr_torrentClose( tr_torrent * tor )
 {
     tor->runStatusToSave = tor->runStatus;
     tor->runStatusToSaveIsSet = TRUE;
-    tor->dieFlag = TRUE;
     tr_torrentStop( tor );
     tr_timerNew( tor->handle, freeWhenStopped, tor, 250 );
 }

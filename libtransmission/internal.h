@@ -115,7 +115,6 @@ struct tr_torrent
 
     int                        error;
     char                       errorString[128];
-    int                        hasChangedState;
 
     uint8_t                    obfuscatedHash[SHA_DIGEST_LENGTH];
 
@@ -136,18 +135,14 @@ struct tr_torrent
     
     struct tr_completion     * completion;
 
-    volatile char              dieFlag;
     struct tr_bitfield       * uncheckedPieces;
     run_status_t               runStatus;
     run_status_t               runStatusToSave;
-    char                       runStatusToSaveIsSet;
     cp_status_t                cpStatus;
     struct tr_lock           * lock;
 
     struct tr_tracker        * tracker;
     struct tr_publisher_tag  * trackerSubscription;
-    uint64_t                   startDate;
-    uint64_t                   stopDate;
 
     uint64_t                   downloadedCur;
     uint64_t                   downloadedPrev;
@@ -155,11 +150,17 @@ struct tr_torrent
     uint64_t                   uploadedPrev;
     uint64_t                   corruptCur;
     uint64_t                   corruptPrev;
+
+    uint64_t                   startDate;
+    uint64_t                   stopDate;
     uint64_t                   activityDate;
 
-    uint8_t                    pexDisabled;
+    unsigned int               runStatusToSaveIsSet : 1;
+    unsigned int               hasChangedState : 1;
+    unsigned int               pexDisabled : 1;
+    unsigned int               doStopAfterHashCheck : 1;
+    unsigned int               statCur : 1;
 
-    int8_t                     statCur;
     tr_stat                    stats[2];
 
     tr_torrent               * next;

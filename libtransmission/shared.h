@@ -54,7 +54,7 @@ void          tr_sharedUnlock         ( tr_shared * );
  * should be called with the shared lock held.
  **********************************************************************/
 void         tr_sharedSetPort         ( tr_shared *, int port );
-int          tr_sharedGetPublicPort   ( tr_shared * s );
+int          tr_sharedGetPublicPort   ( const tr_shared * s );
 
 /***********************************************************************
  * tr_sharedTraversalEnable, tr_sharedTraversalStatus
@@ -63,7 +63,7 @@ int          tr_sharedGetPublicPort   ( tr_shared * s );
  * be called with the shared lock held.
  **********************************************************************/
 void         tr_sharedTraversalEnable ( tr_shared *, int enable );
-int          tr_sharedTraversalStatus ( tr_shared * );
+int          tr_sharedTraversalStatus ( const tr_shared * );
 
 
 #endif

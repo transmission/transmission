@@ -169,9 +169,9 @@ void tr_sharedSetPort( tr_shared * s, int port )
     tr_sharedUnlock( s );
 }
 
-int tr_sharedGetPublicPort( tr_shared * s )
+int
+tr_sharedGetPublicPort( const tr_shared * s )
 {
-fprintf( stderr, "%s:%d tr_sharedGetPublicPort returning %d\n", __FILE__, __LINE__, (int)s->publicPort );
     return s->publicPort;
 }
 
@@ -194,9 +194,9 @@ void tr_sharedTraversalEnable( tr_shared * s, int enable )
     }
 }
 
-int tr_sharedTraversalStatus( tr_shared * s )
+int tr_sharedTraversalStatus( const tr_shared * s )
 {
-    int statuses[] = {
+    const int statuses[] = {
         TR_NAT_TRAVERSAL_MAPPED,
         TR_NAT_TRAVERSAL_MAPPING,
         TR_NAT_TRAVERSAL_UNMAPPING,

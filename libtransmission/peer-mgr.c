@@ -605,13 +605,12 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         return;
     }
 
-    fprintf( stderr, "peer-mgr: torrent [%s] finished a handshake; isConnected is %d\n", t->tor->info.name, isConnected );
+    fprintf( stderr, "peer-mgr: torrent [%s] finished a handshake. Connected? %s.\n", t->tor->info.name, (isConnected?"yes":"no") );
 
     /* if we couldn't connect or were snubbed,
      * the peer's probably not worth remembering. */
     if( !ok ) {
         tr_peer * peer = getExistingPeer( t, in_addr );
-        fprintf( stderr, "peer-mgr: torrent [%s] got a bad one, and you know what? fuck them.\n", t->tor->info.name );
         tr_peerIoFree( io );
         --manager->connectionCount;
         if( peer ) {
