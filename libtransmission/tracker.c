@@ -28,6 +28,7 @@
 #include "net.h"
 #include "ptrarray.h"
 #include "publish.h"
+#include "shared.h"
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
@@ -771,7 +772,7 @@ buildTrackerRequestURI( const Torrent * tor, const char * eventName )
         getCurrentAddress(tor->tracker)->announce,
         tor->escaped,
         tor->peer_id,
-        torrent->publicPort,
+        tr_sharedGetPublicPort( torrent->handle->shared ),
         torrent->uploadedCur,
         torrent->downloadedCur,
         torrent->corruptCur,

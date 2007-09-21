@@ -60,7 +60,7 @@ void tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has );
 void tr_torrentLock    ( const tr_torrent * );
 void tr_torrentUnlock  ( const tr_torrent * );
 
-void tr_torrentChangeMyPort  ( tr_torrent *, int port );
+void tr_torrentChangeMyPort  ( tr_torrent * );
 
 int tr_torrentExists( tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
@@ -120,7 +120,6 @@ struct tr_torrent
     uint8_t                    obfuscatedHash[SHA_DIGEST_LENGTH];
 
     uint8_t                  * azId;
-    int                        publicPort;
 
     /* Where to download */
     char                     * destination;

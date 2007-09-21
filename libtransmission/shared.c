@@ -145,12 +145,14 @@ void tr_sharedSetPort( tr_shared * s, int port )
     }
 
     /* Create the new one */
-    /* XXX should handle failure here in a better way */
     s->bindSocket = tr_netBindTCP( port );
-    if( 0 > s->bindSocket )
+
+    /* Notify the trackers */
+    SetPublicPort( s, port );
+
+    /* XXX should handle failure here in a better way */
+    if( s->bindSocket < 0 )
     {
-        /* Notify the trackers */
-        SetPublicPort( s, 0 );
         /* Remove the forwarding for the old port */
         tr_natpmpRemoveForwarding( s->natpmp );
         tr_upnpRemoveForwarding( s->upnp );
@@ -159,11 +161,6 @@ void tr_sharedSetPort( tr_shared * s, int port )
     {
         tr_inf( "Bound listening port %d", port );
         listen( s->bindSocket, 5 );
-        if( port != s->publicPort )
-        {
-            /* Notify the trackers */
-            SetPublicPort( s, port );
-        }
         /* Forward the new port */
         tr_natpmpForwardPort( s->natpmp, port );
         tr_upnpForwardPort( s->upnp, port );
@@ -174,6 +171,7 @@ void tr_sharedSetPort( tr_shared * s, int port )
 
 int tr_sharedGetPublicPort( tr_shared * s )
 {
+fprintf( stderr, "%s:%d tr_sharedGetPublicPort returning %d\n", __FILE__, __LINE__, (int)s->publicPort );
     return s->publicPort;
 }
 
@@ -268,7 +266,7 @@ static void SetPublicPort( tr_shared * s, int port )
     s->publicPort = port;
 
     for( tor = h->torrentList; tor; tor = tor->next )
-        tr_torrentChangeMyPort( tor, port );
+        tr_torrentChangeMyPort( tor );
 }
 
 /***********************************************************************

@@ -359,9 +359,6 @@ torrentRealInit( tr_handle  * h,
                                   info->hash, SHA_DIGEST_LENGTH,
                                   NULL );
  
-    /* We have a new torrent */
-    tor->publicPort = tr_sharedGetPublicPort( h->shared );
-
     tr_sharedUnlock( h->shared );
 
     tr_peerMgrAddTorrent( h->peerMgr, tor );
@@ -667,16 +664,10 @@ tr_torrentGetFolder( const tr_torrent * tor )
 }
 
 void
-tr_torrentChangeMyPort( tr_torrent * tor, int port )
+tr_torrentChangeMyPort( tr_torrent * tor )
 {
-    tr_torrentLock( tor );
-
-    tor->publicPort = port;
-
     if( tor->tracker )
         tr_trackerChangeMyPort( tor->tracker );
-
-    tr_torrentUnlock( tor );
 }
 
 
