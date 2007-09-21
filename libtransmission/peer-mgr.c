@@ -78,13 +78,9 @@ handshakeCompareToAddr( const void * va, const void * vb )
 }
 
 static int
-handshakeCompare( const void * va, const void * vb )
+handshakeCompare( const void * a, const void * b )
 {
-    const tr_handshake * a = va;
-    const tr_handshake * b = vb;
-    return memcmp( tr_handshakeGetAddr( a, NULL ),
-                   tr_handshakeGetAddr( b, NULL ),
-                   sizeof( struct in_addr ) );
+    return handshakeCompareToAddr( a, tr_handshakeGetAddr( b, NULL ) );
 }
 
 static tr_handshake*
@@ -585,7 +581,8 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     ours = tr_ptrArrayRemoveSorted( manager->handshakes,
                                     handshake,
                                     handshakeCompare );
-    assert( handshake == ours );
+    assert( ours != NULL );
+    assert( ours == handshake );
 
     in_addr = tr_peerIoGetAddress( io, &port );
 
