@@ -830,13 +830,13 @@ gotBlock( tr_peermsgs      * msgs,
     key.length = length;
     req = (struct peer_request*) tr_list_remove( &msgs->clientAskedFor, &key,
                                                  peer_request_compare );
-    dbgmsg( msgs, "w00t peer sent us a block.  turnaround time was %d seconds", 
-                     (int)(time(NULL) - req->time_requested) );
     if( req == NULL ) {
         gotUnwantedBlock( msgs, index, offset, length );
         dbgmsg( msgs, "we didn't ask for this message..." );
         return;
     }
+    dbgmsg( msgs, "w00t peer sent us a block.  turnaround time was %d seconds", 
+                     (int)(time(NULL) - req->time_requested) );
     tr_free( req );
     dbgmsg( msgs, "peer has %d more blocks we've asked for",
                   tr_list_size(msgs->clientAskedFor));
