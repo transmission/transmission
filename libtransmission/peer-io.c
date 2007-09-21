@@ -28,6 +28,14 @@
 ***
 **/
 
+struct tr_extensions
+{
+    unsigned int azureusProtocolSupported : 1;
+    unsigned int extendedProtocolSupported : 1;
+    unsigned int fastPeersSupported : 1;
+    /* unsigned int DHTSupported : 1; */
+};
+
 struct tr_peerIo
 {
     struct tr_handle * handle;
@@ -35,10 +43,11 @@ struct tr_peerIo
     struct in_addr in_addr;
     int port;
     int socket;
-    int extensions;
     int encryptionMode;
     struct bufferevent * bufev;
     uint8_t peerId[20];
+
+    tr_extensions extensions;
 
     unsigned int isEncrypted : 1;
     unsigned int isIncoming : 1;
@@ -324,25 +333,55 @@ tr_peerIoGetPeersId( const tr_peerIo * io )
 **/
 
 void
-tr_peerIoSetExtension( tr_peerIo   * io,
-                       int           extensions )
+tr_peerIoEnableAZMP( tr_peerIo * io, int flag )
 {
     assert( io != NULL );
-    assert( ( extensions == LT_EXTENSIONS_NONE )
-         || ( extensions == LT_EXTENSIONS_LTEP )
-         || ( extensions == LT_EXTENSIONS_AZMP ) );
+    assert( flag==0 || flag==1 );
+    
+    io->extensions.azureusProtocolSupported = flag;
+}
 
-    io->extensions = extensions;
+void
+tr_peerIoEnableLTEP( tr_peerIo * io, int flag )
+{
+    assert( io != NULL );
+    assert( flag==0 || flag==1 );
+    
+    io->extensions.extendedProtocolSupported = flag;
+}
+
+void
+tr_peerIoEnableFEXT( tr_peerIo * io, int flag )
+{
+    assert( io != NULL );
+    assert( flag==0 || flag==1 );
+    
+    io->extensions.fastPeersSupported = flag;
 }
 
 int
-tr_peerIoGetExtension( const tr_peerIo * io )
+tr_peerIoSupportsAZMP( const tr_peerIo * io )
 {
     assert( io != NULL );
-
-    return io->extensions;
+    
+    return io->extensions.azureusProtocolSupported;
 }
 
+int
+tr_peerIoSupportsLTEP( const tr_peerIo * io )
+{
+    assert( io != NULL );
+    
+    return io->extensions.extendedProtocolSupported;
+}
+
+int
+tr_peerIoSupportsFEXT( const tr_peerIo * io )
+{
+    assert( io != NULL );
+    
+    return io->extensions.fastPeersSupported;
+}
 /**
 ***
 **/

@@ -29,10 +29,15 @@
 #include "utils.h"
 
 /* enable LibTransmission extension protocol */
-#define ENABLE_LTEP
+#define ENABLE_LTEP */
 
 /* enable Azureus messaging protocol */
-//#define ENABLE_AZMP
+/* (disabled because it's not fully implemented yet) */
+/* #define ENABLE_AZMP */
+
+/* enable fast peers extension protocol */
+/* (disabled because it's not fully implemented yet) */
+/* #define ENABLE_FASTPEER */
 
 /***
 ****
@@ -66,7 +71,7 @@ enum
 
 #ifdef ENABLE_LTEP
 #define HANDSHAKE_HAS_EXTMSGS( bits ) ( ( (bits)[5] & 0x10 ) ? 1 : 0 )
-#define HANDSHAKE_SET_EXTMSGS( bits ) ( ( (bits)[5] |= 0x10 ) ? 1 : 0 )
+#define HANDSHAKE_SET_EXTMSGS( bits ) ( (bits)[5] |= 0x10 )
 #else
 #define HANDSHAKE_HAS_EXTMSGS( bits ) ( 0 )
 #define HANDSHAKE_SET_EXTMSGS( bits ) ( (void)0 )
@@ -74,10 +79,18 @@ enum
 
 #ifdef ENABLE_AZMP
 #define HANDSHAKE_HAS_AZPROTO( bits ) ( ( (bits)[0] & 0x80 ) ? 1 : 0 )
-#define HANDSHAKE_SET_AZPROTO( bits ) ( ( (bits)[0] |= 0x80 ) ? 1 : 0 )
+#define HANDSHAKE_SET_AZPROTO( bits ) ( (bits)[0] |= 0x80 )
 #else
 #define HANDSHAKE_HAS_AZPROTO( bits ) ( 0 )
 #define HANDSHAKE_SET_AZPROTO( bits ) ( (void)0 )
+#endif
+
+#ifdef ENABLE_FASTPEER
+#define HANDSHAKE_HAS_FASTEXT( bits ) ( ( (bits)[7] & 0x04 ) ? 1 : 0 )
+#define HANDSHAKE_SET_FASTEXT( bits ) ( (bits)[7] |= 0x04 )
+#else
+#define HANDSHAKE_HAS_FASTEXT( bits ) ( 0 )
+#define HANDSHAKE_SET_FASTEXT( bits ) ( (void)0 )
 #endif
 
 /* http://www.azureuswiki.com/index.php/Extension_negotiation_protocol
@@ -227,6 +240,8 @@ buildHandshakeMessage( tr_handshake * handshake,
             HANDSHAKE_SET_EXTPREF( walk, extensionPreference );
             break;
     }
+    
+    HANDSHAKE_SET_FASTEXT ( walk );
 
     walk += HANDSHAKE_FLAGS_LEN;
     memcpy( walk, torrentHash, SHA_DIGEST_LENGTH );
@@ -485,9 +500,9 @@ tr_handshakeDone( tr_handshake * handshake, int isConnected );
 static int
 readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
 {
-    int i;
     uint8_t ltep = 0;
     uint8_t azmp = 0;
+    uint8_t fpex = 0;
     uint8_t pstrlen;
     uint8_t * pstr;
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
@@ -586,6 +601,8 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
 
     ltep = HANDSHAKE_HAS_EXTMSGS( reserved );
     azmp = HANDSHAKE_HAS_AZPROTO( reserved );
+    fpex = HANDSHAKE_HAS_FASTEXT( reserved );
+
     if( ltep && azmp ) {
         switch( HANDSHAKE_GET_EXTPREF( reserved ) ) {
             case HANDSHAKE_EXTPREF_LTEP_FORCE:
@@ -599,12 +616,12 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
         }
     }
     assert( !ltep || !azmp );
-         if( ltep ) { i = LT_EXTENSIONS_LTEP; dbgmsg(handshake,"using ltep" ); }
-    else if( azmp ) { i = LT_EXTENSIONS_AZMP; dbgmsg(handshake,"using azmp" ); }
-    else            { i = LT_EXTENSIONS_NONE; dbgmsg(handshake,"using no extensions" ); }
-    tr_peerIoSetExtension( handshake->io, i );
-
-
+    
+         if( ltep ) { tr_peerIoEnableLTEP( handshake->io, 1 ); dbgmsg(handshake,"using ltep" ); }
+    else if( azmp ) { tr_peerIoEnableAZMP( handshake->io, 1 ); dbgmsg(handshake,"using azmp" ); }
+    else if( fpex ) { tr_peerIoEnableFEXT( handshake->io, 1 ); dbgmsg(handshake,"using fext" ); }
+    else            { dbgmsg(handshake,"using no extensions" ); }
+    
     /**
     ***  If this is an incoming message, then we need to send a response handshake
     **/

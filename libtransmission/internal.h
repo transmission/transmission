@@ -155,8 +155,9 @@ struct tr_torrent
     uint64_t                   stopDate;
     uint64_t                   activityDate;
 
+    uint8_t                    hasChangedState;
+
     unsigned int               runStatusToSaveIsSet : 1;
-    unsigned int               hasChangedState : 1;
     unsigned int               pexDisabled : 1;
     unsigned int               doStopAfterHashCheck : 1;
     unsigned int               statCur : 1;

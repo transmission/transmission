@@ -54,6 +54,11 @@ enum
     BT_PIECE           = 7,
     BT_CANCEL          = 8,
     BT_PORT            = 9,
+    BT_SUGGEST         = 13,
+    BT_HAVE_ALL        = 14,
+    BT_HAVE_NONE       = 15,
+    BT_REJECT          = 16,
+    BT_ALLOWED_FAST    = 17,
     BT_LTEP            = 20,
 
     LTEP_HANDSHAKE     = 0,
@@ -722,7 +727,32 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             tr_peerIoReadUint16( msgs->io, inbuf, &msgs->listeningPort );
             break;
         }
-
+        
+        case BT_SUGGEST: {
+            /* tiennou TODO */
+            break;
+        }
+            
+        case BT_HAVE_ALL: {
+            /* tiennou TODO */
+            break;
+        }
+            
+        case BT_HAVE_NONE: {
+            /* tiennou TODO */
+            break;
+        }
+            
+        case BT_REJECT: {
+            /* tiennou TODO */
+            break;
+        }
+            
+        case BT_ALLOWED_FAST: {
+            /* tiennou TODO */
+            break;
+        }
+            
         case BT_LTEP:
             dbgmsg( msgs, "peer sent us a BT_LTEP" );
             parseLtep( msgs, msglen, inbuf );
@@ -1249,20 +1279,14 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
     **/
     if( !tr_peerIoIsIncoming( msgs->io ) )
     {
-        const int extensions = tr_peerIoGetExtension( msgs->io );
-        switch( extensions )
-        {
-            case LT_EXTENSIONS_NONE:
-                /* no-op */
-                break;
-
-            case LT_EXTENSIONS_LTEP:
-                sendLtepHandshake( msgs );
-                break;
-
-            case LT_EXTENSIONS_AZMP:
-                dbgmsg( msgs, "FIXME: need to send AZMP handshake" );
-                break;
+        if ( tr_peerIoSupportsLTEP( msgs->io ) ) {
+            sendLtepHandshake( msgs );
+            
+        } else if ( tr_peerIoSupportsAZMP( msgs->io ) ) {
+            dbgmsg( msgs, "FIXME: need to send AZMP handshake" );
+            
+        } else {
+            /* no-op */
         }
     }
 

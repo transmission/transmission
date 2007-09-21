@@ -23,7 +23,7 @@ struct bufferevent;
 struct tr_handle;
 struct tr_crypto;
 typedef struct tr_peerIo tr_peerIo;
-
+typedef struct tr_extensions tr_extensions;
 
 /**
 ***
@@ -48,17 +48,13 @@ tr_handle* tr_peerIoGetHandle( tr_peerIo * io );
 ***
 **/
 
-enum
-{
-    LT_EXTENSIONS_NONE,
-    LT_EXTENSIONS_LTEP,
-    LT_EXTENSIONS_AZMP
-};
+void  tr_peerIoEnableAZMP( tr_peerIo * io, int flag );
+void  tr_peerIoEnableLTEP( tr_peerIo * io, int flag );
+void  tr_peerIoEnableFEXT( tr_peerIo * io, int flag );
 
-void  tr_peerIoSetExtension( tr_peerIo  * io,
-                             int          lt_extensions );
-
-int   tr_peerIoGetExtension( const tr_peerIo * io );
+int   tr_peerIoSupportsAZMP( const tr_peerIo * io );
+int   tr_peerIoSupportsLTEP( const tr_peerIo * io );
+int   tr_peerIoSupportsFEXT( const tr_peerIo * io );
 
 /**
 ***
