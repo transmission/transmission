@@ -104,9 +104,9 @@ struct cbdata {
     GtkWindow    * wind;
     TrCore       * core;
     GtkWidget    * icon;
+    GtkWidget    * msgwin;
     TrPrefs      * prefs;
     guint          timer;
-    gboolean       msgwinopen;
     gboolean       closing;
     GList        * errqueue;
 };
@@ -161,8 +161,6 @@ static void
 setpex( tr_torrent * tor, void * arg );
 static gboolean
 updatemodel(gpointer gdata);
-static void
-boolwindclosed(GtkWidget *widget, gpointer gdata);
 static GList *
 getselection( struct cbdata * cbdata );
 
@@ -405,9 +403,9 @@ appsetup( TrWindow * wind, GList * args,
     cbdata->wind       = NULL;
     cbdata->core       = tr_core_new();
     cbdata->icon       = NULL;
+    cbdata->msgwin     = NULL;
     cbdata->prefs      = NULL;
     cbdata->timer      = 0;
-    cbdata->msgwinopen = FALSE;
     cbdata->closing    = FALSE;
     cbdata->errqueue   = NULL;
 
@@ -864,13 +862,6 @@ updatemodel(gpointer gdata) {
   return TRUE;
 }
 
-static void
-boolwindclosed(GtkWidget *widget SHUTUP, gpointer gdata) {
-  gboolean *preachy_gcc = gdata;
-  
-  *preachy_gcc = FALSE;
-}
-
 /* returns a GList containing a GtkTreeRowReference to each selected row */
 static GList *
 getselection( struct cbdata * cbdata )
@@ -981,6 +972,13 @@ recheckTorrentForeach (GtkTreeModel * model,
     g_object_unref( G_OBJECT( gtor ) );
 }
 
+static gboolean 
+msgwinclosed()
+{
+  action_toggle( "toggle-debug-window", FALSE );
+  return FALSE;
+}
+
 void
 doAction ( const char * action_name, gpointer user_data )
 {
@@ -1071,14 +1069,20 @@ doAction ( const char * action_name, gpointer user_data )
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
-    else if (!strcmp (action_name, "show-debug-window"))
+    else if (!strcmp (action_name, "toggle-debug-window"))
     {
-        if( !data->msgwinopen )
+        if( !data->msgwin )
         {
             GtkWidget * win = msgwin_create( data->core );
-            g_signal_connect( win, "destroy", G_CALLBACK( boolwindclosed ),
-                                &data->msgwinopen );
-            data->msgwinopen = TRUE;
+            g_signal_connect( win, "destroy", G_CALLBACK( msgwinclosed ), 
+                             NULL );
+            data->msgwin = win;
+        }
+        else
+        {
+            action_toggle("toggle-debug-window", FALSE);
+            gtk_widget_destroy( data->msgwin );
+            data->msgwin = NULL;
         }
     }
     else if (!strcmp (action_name, "show-about-dialog"))

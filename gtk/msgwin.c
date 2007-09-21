@@ -229,6 +229,7 @@ msgwin_create( TrCore * core )
   int ii, curlevel;
 
   win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
+  gtk_window_set_title( GTK_WINDOW( win ), "Transmission Debug Window" );
   gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
   gtk_window_set_role( GTK_WINDOW( win ), "debug-window" );
   vbox = gtk_vbox_new( FALSE, 0 );
@@ -298,7 +299,6 @@ msgwin_create( TrCore * core )
   gtk_container_add( GTK_CONTAINER( scroll ), text );
 
   gtk_box_pack_start( GTK_BOX( vbox ), scroll, TRUE, TRUE, 0 );
-
 
   msgwin_update( );
   gtk_container_add( GTK_CONTAINER( win ), vbox );

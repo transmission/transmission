@@ -52,6 +52,13 @@ priority_changed_cb (GtkAction *action UNUSED, GtkRadioAction *current)
   set_selected_file_priority ( priority );
 }
 
+static GtkToggleActionEntry show_toggle_entries[] = 
+{
+  { "toggle-main-window", NULL, 
+    N_("Show _Main Window"), NULL, NULL, G_CALLBACK(action_cb), TRUE }, 
+  { "toggle-debug-window", NULL,
+    N_("Show _Debug Window"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
+};
 
 static GtkActionEntry entries[] =
 {
@@ -84,10 +91,6 @@ static GtkActionEntry entries[] =
     N_("_Torrent Info"), NULL, NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT,
     N_("_About Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "show-debug-window", NULL,
-    N_("Show _Debug Window"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "toggle-main-window", "ICON_TRANSMISSION",
-    N_("Show / Hide _Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_REFRESH,
     N_("Update Tracker"), NULL, NULL, G_CALLBACK(action_cb) }
 };
@@ -173,6 +176,11 @@ actions_init( GtkUIManager * ui_manager, gpointer callback_user_data )
                                       G_N_ELEMENTS(priority_toggle_entries),
                                       TR_PRI_NORMAL,
                                       G_CALLBACK(priority_changed_cb), NULL);
+
+  gtk_action_group_add_toggle_actions ( action_group, 
+					show_toggle_entries, 
+					G_N_ELEMENTS(show_toggle_entries), 
+					callback_user_data );
 
   gtk_action_group_add_actions( action_group,
                                 entries, n_entries,
