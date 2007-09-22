@@ -31,11 +31,11 @@
 class TorrentListCtrl: public wxListCtrl
 {
     public:
-        TorrentListCtrl( tr_handle_t       * handle,
-                         wxConfig          * config,
-                         wxWindow          * parent, 
-                         const wxPoint     & pos = wxDefaultPosition,
-                         const wxSize      & size = wxDefaultSize );
+        TorrentListCtrl( tr_handle       * handle,
+                         wxConfig        * config,
+                         wxWindow        * parent, 
+                         const wxPoint   & pos = wxDefaultPosition,
+                         const wxSize    & size = wxDefaultSize );
         virtual ~TorrentListCtrl();
 
     public:

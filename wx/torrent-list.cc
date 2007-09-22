@@ -227,7 +227,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
     char buf[512];
     std::string str;
     const tr_stat * s = getStat( tor );
-    const tr_info_t* info = tr_torrentInfo( tor );
+    const tr_info * info = tr_torrentInfo( tor );
 
     for( int_v::const_iterator it(cols.begin()), end(cols.end()); it!=end; ++it )
     {
@@ -570,7 +570,7 @@ TorrentListCtrl :: Resort( )
         str2int_t tmp;
         for( int i=0; i<n; ++i ) {
             int idx = GetItemData( i );
-            const tr_info_t* info = tr_torrentInfo( myTorrents[idx] );
+            const tr_info * info = tr_torrentInfo( myTorrents[idx] );
             tmp[info->hashString] = i;
         }
         myHashToItem.swap( tmp );
@@ -690,7 +690,7 @@ TorrentListCtrl :: Remove( const torrent_set& remove )
     for( int item=0; item<GetItemCount(); )
     {
         tr_torrent * tor = myTorrents[GetItemData(item)];
-        const tr_info_t* info = tr_torrentInfo( tor );
+        const tr_info * info = tr_torrentInfo( tor );
 
         if( remove.count( tor ) )
         {
@@ -715,7 +715,7 @@ TorrentListCtrl :: Remove( const torrent_set& remove )
 const tr_stat*
 TorrentListCtrl :: getStat( tr_torrent * tor )
 {
-    const tr_info_t * info = tr_torrentInfo( tor );
+    const tr_info * info = tr_torrentInfo( tor );
     const time_t now = time( 0 );
     TorStat& ts = myHashToStat[ info->hashString ];
     if( ts.time < now ) {
