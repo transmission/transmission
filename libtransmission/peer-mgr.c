@@ -1261,6 +1261,8 @@ reconnectPulse( void * vt UNUSED )
             initiateHandshake( manager, io );
             --left;
         }
+
+        tr_free( pool );
     }
 
     return TRUE;

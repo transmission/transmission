@@ -454,7 +454,7 @@ tr_peerIoWriteBytes( tr_peerIo        * io,
             /*fprintf( stderr, "encrypting and writing %d bytes to outbuf...\n", byteCount );*/
             tmp = tr_new( uint8_t, byteCount );
             tr_cryptoEncrypt( io->crypto, byteCount, bytes, tmp );
-            tr_bufferevent_write( io->handle, io->bufev, tmp, byteCount );
+            evbuffer_add( outbuf, tmp, byteCount );
             tr_free( tmp );
             break;
 
