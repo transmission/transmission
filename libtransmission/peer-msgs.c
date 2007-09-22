@@ -486,8 +486,6 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
         return;
     }
 
-    tr_bencPrint( &val );
-
     /* check supported messages for utorrent pex */
     sub = tr_bencDictFind( &val, "m" );
     if( tr_bencIsDict( sub ) ) {

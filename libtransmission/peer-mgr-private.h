@@ -44,6 +44,7 @@ typedef struct tr_peer
     char * client;
 
     time_t peerSentDataAt;
+    time_t chokeChangedAt;
 
     struct tr_peermsgs * msgs;
     tr_publisher_tag msgsTag;

@@ -1000,7 +1000,6 @@ tr_torrentFree( tr_torrent * tor )
     tr_torrent * t;
     tr_handle * h = tor->handle;
     tr_info * inf = &tor->info;
-fprintf( stderr, "closing torrent %s\n", tor->info.name );
 
     assert( tor != NULL );
     assert( tor->runStatus == TR_RUN_STOPPED );
