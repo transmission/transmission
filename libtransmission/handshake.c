@@ -65,7 +65,9 @@ enum
     PadC_MAXLEN                    = 512,
     PadD_MAXLEN                    = 512,
     VC_LENGTH                      = 8,
-    KEY_LEN                        = 96
+    KEY_LEN                        = 96,
+    CRYPTO_PROVIDE_PLAINTEXT       = 1,
+    CRYPTO_PROVIDE_CRYPTO          = 2
 };
 
 
@@ -106,7 +108,7 @@ struct tr_handshake
     unsigned int peerSupportsEncryption       : 1;
     unsigned int havePeerID                   : 1;
     unsigned int haveSentBitTorrentHandshake  : 1;
-    unsigned int shunUnencryptedPeers         : 1;
+    unsigned int allowUnencryptedPeers        : 1;
     tr_peerIo * io;
     tr_crypto * crypto;
     struct tr_handle * handle;
@@ -363,10 +365,10 @@ readYb( tr_handshake * handshake, struct evbuffer * inbuf )
 
         /* crypto_provide */
         crypto_provide = 0;
-        crypto_provide |= (1<<0); /* encryption */
-        if( !handshake->shunUnencryptedPeers ) /* plaintext */
-            crypto_provide |= (1<<1);
-        assert( 1<=crypto_provide && crypto_provide<=3 );
+        crypto_provide |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
+        if( handshake->allowUnencryptedPeers ) /* sometimes allow plaintext */
+            crypto_provide |= CRYPTO_PROVIDE_PLAINTEXT;
+        fprintf( stderr, "crypto_provide is %d\n", (int)crypto_provide );
 
         crypto_provide = htonl( crypto_provide );
         tr_cryptoEncrypt( handshake->crypto, sizeof(crypto_provide), &crypto_provide, &crypto_provide );
@@ -482,7 +484,7 @@ readPadD( tr_handshake * handshake, struct evbuffer * inbuf )
     tr_free( tmp );
 
     tr_peerIoSetEncryption( handshake->io,
-                                    handshake->crypto_select );
+                            handshake->crypto_select );
 
     setState( handshake, AWAITING_HANDSHAKE );
     return READ_AGAIN;
@@ -852,7 +854,7 @@ gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if(    ( ( handshake->state == AWAITING_YB ) || ( handshake->state == AWAITING_VC ) )
-        && ( !handshake->shunUnencryptedPeers )
+        && ( handshake->allowUnencryptedPeers )
         && ( !tr_peerIoReconnect( handshake->io ) ) )
     {
         int msgSize; 
@@ -886,7 +888,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
-    handshake->shunUnencryptedPeers = encryption_mode==TR_ENCRYPTION_REQUIRED;
+    handshake->allowUnencryptedPeers = encryption_mode!=TR_ENCRYPTION_REQUIRED;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
