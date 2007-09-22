@@ -787,7 +787,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 }
 
 static int
-canDownload( const tr_peermsgs * msgs UNUSED )
+canDownload( const tr_peermsgs * msgs )
 {
     tr_torrent * tor = msgs->torrent;
 
@@ -960,19 +960,26 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
 }
 
 static ReadState
-canRead( struct bufferevent * evin, void * vpeer )
+canRead( struct bufferevent * evin, void * vmsgs )
 {
     ReadState ret;
-    tr_peermsgs * peer = (tr_peermsgs *) vpeer;
+    tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
 
-    switch( peer->state )
+    if( !canDownload( msgs ) )
     {
-        case AWAITING_BT_LENGTH:  ret = readBtLength  ( peer, inbuf ); break;
-        case AWAITING_BT_MESSAGE: ret = readBtMessage ( peer, inbuf ); break;
-        case READING_BT_PIECE:    ret = readBtPiece   ( peer, inbuf ); break;
+        msgs->notListening = 1;
+        tr_peerIoSetIOMode ( msgs->io, 0, EV_READ );
+        ret = READ_DONE;
+    }
+    else switch( msgs->state )
+    {
+        case AWAITING_BT_LENGTH:  ret = readBtLength  ( msgs, inbuf ); break;
+        case AWAITING_BT_MESSAGE: ret = readBtMessage ( msgs, inbuf ); break;
+        case READING_BT_PIECE:    ret = readBtPiece   ( msgs, inbuf ); break;
         default: assert( 0 );
     }
+
     return ret;
 }
 
@@ -1015,14 +1022,12 @@ pulse( void * vmsgs )
 
     /* if we froze out a downloaded block because of speed limits,
        start listening to the peer again */
-#if 0
-    if( msgs->notListening )
+    if( msgs->notListening && canDownload( msgs ) )
     {
         fprintf( stderr, "msgs %p thawing out...\n", msgs );
         msgs->notListening = 0;
         tr_peerIoSetIOMode ( msgs->io, EV_READ, 0 );
     }
-#endif
 
     if( !canWrite( msgs ) )
     {

@@ -740,7 +740,6 @@ maybeConnect( tr_peerMgr * manager, Torrent * t, tr_peer * peer )
     assert( t != NULL );
     assert( peer != NULL );
 
-#if 0
     if( peer->io != NULL ) { /* already connected */
         fprintf( stderr, "not connecting because we already have an IO for that address\n" );
         return;
@@ -759,7 +758,6 @@ maybeConnect( tr_peerMgr * manager, Torrent * t, tr_peer * peer )
                                peer->port,
                                t->hash );
     initiateHandshake( manager, io );
-#endif
 }
 
 void
@@ -1167,6 +1165,8 @@ rechokePulse( void * vtorrent )
 static int
 reconnectPulse( void * vt UNUSED )
 {
+    static int n = 0;
+    fprintf( stderr, "This console message has annoyed John_Clay %d times.\n", ++n );
 #if 0
     Torrent * t = vt;
     /* FIXME */
