@@ -478,7 +478,8 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 {
     benc_val_t val, * sub;
     uint8_t * tmp = tr_new( uint8_t, len );
-    evbuffer_remove( inbuf, tmp, len );
+
+    tr_peerIoReadBytes( msgs->io, inbuf, tmp, len );
 
     if( tr_bencLoad( tmp, len, &val, NULL ) || val.type!=TYPE_DICT ) {
         dbgmsg( msgs, "GET  extended-handshake, couldn't get dictionary" );
@@ -501,7 +502,7 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
     /* get peer's client name */
     sub = tr_bencDictFind( &val, "v" );
     if( tr_bencIsStr( sub ) ) {
-int i;
+        int i;
         tr_free( msgs->info->client );
         fprintf( stderr, "dictionary says client is [%s]\n", sub->val.s.s );
         msgs->info->client = tr_strndup( sub->val.s.s, sub->val.s.i );
@@ -532,7 +533,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
         return;
 
     tmp = tr_new( uint8_t, msglen );
-    evbuffer_remove( inbuf, tmp, msglen );
+    tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
     if( tr_bencLoad( tmp, msglen, &val, NULL ) || !tr_bencIsDict( &val ) ) {
         dbgmsg( msgs, "GET can't read extended-pex dictionary" );
