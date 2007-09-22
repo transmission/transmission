@@ -67,8 +67,8 @@ enum
     MAX_TRANSFER_IDLE = 240000,
 
     /* this is arbitrary and, hopefully, temporary until we come up
-     * with a better idea */
-    MAX_CONNECTED_PEERS_PER_TORRENT = 40,
+     * with a better idea for managing the connection limits */
+    MAX_CONNECTED_PEERS_PER_TORRENT = 60,
 
     /* if we hang up on a peer for being worthless, don't try to
      * reconnect to it for this long. */
@@ -637,10 +637,8 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEERMSG_PEER_PROGRESS: { /* if we're both seeds, then disconnect. */
             const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
             const int peerIsSeed = e->progress >= 1.0;
-            if( clientIsSeed && peerIsSeed ) {
-                fprintf( stderr, "DISCONNECTING FROM PEER %s because both of us are seeds\n", tr_peerIoGetAddrStr(peer->io) );
+            if( clientIsSeed && peerIsSeed )
                 peer->doDisconnect = 1;
-            }
             break;
         }
 
@@ -649,7 +647,6 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             break;
 
         case TR_PEERMSG_GOT_ERROR:
-            fprintf( stderr, "DISCONNECTING FROM PEER %s because we got an error\n", tr_peerIoGetAddrStr(peer->io));
             peer->doDisconnect = 1;
             reconnectSoon( t );
             break;
@@ -1218,7 +1215,6 @@ reconnectPulse( void * vt UNUSED )
     for( i=0; i<size; ++i ) {
         tr_peer * peer = peers[i];
         if( shouldPeerBeDisconnected( t, peer, liveCount, isSeeding ) ) {
-            fprintf( stderr, "[%s] %s is a bum.  I'm hanging up on them.\n", t->tor->info.name, tr_peerIoGetAddrStr(peer->io) );
             disconnectPeer( peer );
             --liveCount;
         }
