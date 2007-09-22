@@ -1070,7 +1070,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
-    handshake->allowUnencryptedPeers = 0;//encryption_mode!=TR_ENCRYPTION_REQUIRED;
+    handshake->allowUnencryptedPeers = encryption_mode!=TR_ENCRYPTION_REQUIRED;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
