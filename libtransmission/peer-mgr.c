@@ -654,8 +654,8 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     ours = tr_ptrArrayRemoveSorted( manager->handshakes,
                                     handshake,
                                     handshakeCompare );
-    assert( ours != NULL );
-    assert( ours == handshake );
+    //assert( ours != NULL );
+    //assert( ours == handshake );
 
     in_addr = tr_peerIoGetAddress( io, &port );
 
@@ -740,6 +740,7 @@ maybeConnect( tr_peerMgr * manager, Torrent * t, tr_peer * peer )
     assert( t != NULL );
     assert( peer != NULL );
 
+#if 0
     if( peer->io != NULL ) { /* already connected */
         fprintf( stderr, "not connecting because we already have an IO for that address\n" );
         return;
@@ -758,6 +759,7 @@ maybeConnect( tr_peerMgr * manager, Torrent * t, tr_peer * peer )
                                peer->port,
                                t->hash );
     initiateHandshake( manager, io );
+#endif
 }
 
 void

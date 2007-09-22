@@ -789,7 +789,6 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 static int
 canDownload( const tr_peermsgs * msgs UNUSED )
 {
-#if 0
     tr_torrent * tor = msgs->torrent;
 
     if( tor->downloadLimitMode == TR_SPEEDLIMIT_GLOBAL )
@@ -797,7 +796,6 @@ canDownload( const tr_peermsgs * msgs UNUSED )
 
     if( tor->downloadLimitMode == TR_SPEEDLIMIT_SINGLE )
         return tr_rcCanTransfer( tor->download );
-#endif
 
     return TRUE;
 }

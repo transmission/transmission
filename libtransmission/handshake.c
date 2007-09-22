@@ -883,9 +883,11 @@ readIA( tr_handshake * handshake, struct evbuffer * inbuf )
     struct evbuffer * outbuf = evbuffer_new( );
     uint32_t crypto_select;
 
+dbgmsg( handshake, "zbz reading IA..." );
     if( EVBUFFER_LENGTH(inbuf) < needlen )
         return READ_MORE;
 
+dbgmsg( handshake, "zbz reading IA..." );
     /* parse the handshake ... */
     i = parseHandshake( handshake, inbuf );
     if( i != HANDSHAKE_OK ) {
@@ -902,11 +904,13 @@ readIA( tr_handshake * handshake, struct evbuffer * inbuf )
 
     /* send crypto_select */
     {
+dbgmsg( handshake, "handshake->crypto_provide is %d\n", (int)handshake->crypto_provide );
         if( handshake->crypto_provide & CRYPTO_PROVIDE_CRYPTO )
             crypto_select = CRYPTO_PROVIDE_CRYPTO;
         else if( handshake->allowUnencryptedPeers )
             crypto_select = CRYPTO_PROVIDE_PLAINTEXT;
         else {
+dbgmsg( handshake, "gronk..." );
             evbuffer_free( outbuf );
             tr_handshakeDone( handshake, FALSE );
             return READ_DONE;
@@ -1066,7 +1070,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
-    handshake->allowUnencryptedPeers = encryption_mode!=TR_ENCRYPTION_REQUIRED;
+    handshake->allowUnencryptedPeers = 0;//encryption_mode!=TR_ENCRYPTION_REQUIRED;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
