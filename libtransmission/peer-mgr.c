@@ -638,7 +638,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
             const int peerIsSeed = e->progress >= 1.0;
             if( clientIsSeed && peerIsSeed ) {
-                fprintf( stderr, "DISCONNECTING FROM PEER because both of us are seeds\n" );
+                fprintf( stderr, "DISCONNECTING FROM PEER %s because both of us are seeds\n", tr_peerIoGetAddrStr(peer->io) );
                 peer->doDisconnect = 1;
             }
             break;
@@ -649,6 +649,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             break;
 
         case TR_PEERMSG_GOT_ERROR:
+            fprintf( stderr, "DISCONNECTING FROM PEER %s because we got an error\n", tr_peerIoGetAddrStr(peer->io));
             peer->doDisconnect = 1;
             reconnectSoon( t );
             break;
@@ -1208,8 +1209,6 @@ reconnectPulse( void * vt UNUSED )
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &size );
     const int isSeeding = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
 
-fprintf( stderr, "[%s] doing upkeep on our peer connections\n", t->tor->info.name );
-
     /* how many connections do we have? */
     for( i=liveCount=0; i<size; ++i )
         if( peers[i]->msgs != NULL )
@@ -1219,7 +1218,7 @@ fprintf( stderr, "[%s] doing upkeep on our peer connections\n", t->tor->info.nam
     for( i=0; i<size; ++i ) {
         tr_peer * peer = peers[i];
         if( shouldPeerBeDisconnected( t, peer, liveCount, isSeeding ) ) {
-            fprintf( stderr, "%s is a bum.  I'm hanging up on them.\n", tr_peerIoGetAddrStr(peer->io) );
+            fprintf( stderr, "[%s] %s is a bum.  I'm hanging up on them.\n", t->tor->info.name, tr_peerIoGetAddrStr(peer->io) );
             disconnectPeer( peer );
             --liveCount;
         }
@@ -1246,34 +1245,22 @@ fprintf( stderr, "[%s] doing upkeep on our peer connections\n", t->tor->info.nam
         /* sort them s.t. the ones we've already tried are at the last of the list */
         qsort( pool, poolSize, sizeof(tr_peer*), comparePeerByConnectionDate );
 
-        /* debugging */
-        if( poolSize > 0 ) {
-            fprintf( stderr, "here are some peers that I might want to connect to: \n" );
-            for( i=0; i<poolSize; ++i )
-                fprintf( stderr, "%"PRIu64", ", (uint64_t)pool[i]->connectionChangedAt );
-            fprintf( stderr, "\n" );
-        }
-
         /* make some connections */
         for( i=0; i<poolSize && left>0; ++i )
         {
             tr_peer * peer = pool[i];
             tr_peerIo * io;
 
-            if( ( now - peer->connectionChangedAt ) < MIN_HANGUP_PERIOD_SEC ) {
-                fprintf( stderr, "out of candidates\n" );
+            if( ( now - peer->connectionChangedAt ) < MIN_HANGUP_PERIOD_SEC )
                 break;
-            }
 
             /* already have a handshake pending */
-            if( getExistingHandshake( manager, &peer->in_addr ) != NULL ) {
-                fprintf( stderr, "already have a handshake for that address\n" );
+            if( getExistingHandshake( manager, &peer->in_addr ) != NULL )
                 continue;
-            }
 
             /* initiate a connection to the peer */
             io = tr_peerIoNewOutgoing( manager->handle, &peer->in_addr, peer->port, t->hash );
-            fprintf( stderr, "we haven't tried %s in awhile...\n", tr_peerIoGetAddrStr(io) );
+            fprintf( stderr, "[%s] connecting to potential peer %s\n", t->tor->info.name, tr_peerIoGetAddrStr(io) );
             peer->connectionChangedAt = time( NULL );
             initiateHandshake( manager, io );
             --left;
