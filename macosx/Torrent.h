@@ -225,6 +225,7 @@ typedef enum
 - (NSNumber *) stateSortKey;
 - (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
+- (NSNumber *) ratioProgressSortKey;
 
 - (int) torrentID;
 - (const tr_info *) torrentInfo;

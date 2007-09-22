@@ -1681,10 +1681,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"progressSortKey" ascending: asc] autorelease],
+                        * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                            @"ratioProgressSortKey" ascending: asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"ratioSortKey" ascending: asc] autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioDescriptor,
+        descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
     }
     else if ([sortType isEqualToString: SORT_TRACKER])

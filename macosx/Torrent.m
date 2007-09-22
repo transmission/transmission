@@ -1375,19 +1375,19 @@ static int static_lastid = 0;
         return [NSNumber numberWithInt: 2];
 }
 
-#warning is progress different when seeding?
 - (NSNumber *) progressSortKey
 {
-    float progress;
-    if ((progress = [self progress]) >= 1.0)
-       progress += [self progressStopRatio];
-    
-    return [NSNumber numberWithFloat: progress];
+    return [NSNumber numberWithFloat: [self progress]];
 }
 
 - (NSNumber *) ratioSortKey
 {
     return [NSNumber numberWithFloat: [self ratio]];
+}
+
+- (NSNumber *) ratioProgressSortKey
+{
+    return [NSNumber numberWithFloat: [self progressStopRatio]];
 }
 
 - (int) torrentID
