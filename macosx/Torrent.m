@@ -568,13 +568,12 @@ static int static_lastid = 0;
         return 0;
 }
 
-#warning use enum value
-- (int) speedMode: (BOOL) upload
+- (tr_speedlimit) speedMode: (BOOL) upload
 {
     return tr_torrentGetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void) setSpeedMode: (int) mode upload: (BOOL) upload
+- (void) setSpeedMode: (tr_speedlimit) mode upload: (BOOL) upload
 {
     tr_torrentSetSpeedMode(fHandle, upload ? TR_UP : TR_DOWN, mode);
 }

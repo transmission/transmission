@@ -109,8 +109,8 @@ typedef enum
 - (float) actualStopRatio; //returns INVALID if will not stop
 - (float) progressStopRatio;
 
-- (int) speedMode: (BOOL) upload;
-- (void) setSpeedMode: (int) mode upload: (BOOL) upload;
+- (tr_speedlimit) speedMode: (BOOL) upload;
+- (void) setSpeedMode: (tr_speedlimit) mode upload: (BOOL) upload;
 - (int) speedLimit: (BOOL) upload;
 - (void) setSpeedLimit: (int) limit upload: (BOOL) upload;
 
