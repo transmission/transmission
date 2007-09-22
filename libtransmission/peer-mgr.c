@@ -223,6 +223,8 @@ freeTorrent( tr_peerMgr * manager, Torrent * t )
 
     memcpy( hash, t->hash, SHA_DIGEST_LENGTH );
 
+    tr_timerFree( &t->reconnectTimer );
+    tr_timerFree( &t->reconnectSoonTimer );
     tr_timerFree( &t->rechokeTimer );
     tr_timerFree( &t->rechokeSoonTimer );
     tr_timerFree( &t->refillTimer );
@@ -1161,10 +1163,11 @@ rechokePulse( void * vtorrent )
 **/
 
 static int
-reconnectPulse( void * vt )
+reconnectPulse( void * vt UNUSED )
 {
-    static int n = 0;
+#if 0
     Torrent * t = vt;
-    fprintf( stderr, "when this code is written, it will cull out crappy peer connections and initiate new ones within some limit. %p - %d\n", t, ++n );
+    /* FIXME */
+#endif
     return TRUE;
 }

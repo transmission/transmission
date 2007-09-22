@@ -256,6 +256,9 @@ buildHandshakeMessage( tr_handshake * handshake,
     return buf;
 }
 
+static void
+tr_handshakeDone( tr_handshake * handshake, int isConnected );
+
 /***
 ****
 ****  OUTGOING CONNECTIONS
@@ -290,6 +293,19 @@ sendYa( tr_handshake * handshake )
 
     /* cleanup */
     evbuffer_free( outbuf );
+}
+
+static uint32_t
+getCryptoProvide( const tr_handshake * handshake )
+{
+    uint32_t i = 0;
+
+    i |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
+
+    if( handshake->allowUnencryptedPeers ) /* sometimes allow plaintext */
+        i |= CRYPTO_PROVIDE_PLAINTEXT;
+
+   return i;
 }
 
 static int
@@ -364,12 +380,7 @@ readYb( tr_handshake * handshake, struct evbuffer * inbuf )
         evbuffer_add( outbuf, vc, VC_LENGTH );
 
         /* crypto_provide */
-        crypto_provide = 0;
-        crypto_provide |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
-        if( handshake->allowUnencryptedPeers ) /* sometimes allow plaintext */
-            crypto_provide |= CRYPTO_PROVIDE_PLAINTEXT;
-        fprintf( stderr, "crypto_provide is %d\n", (int)crypto_provide );
-
+        crypto_provide = getCryptoProvide( handshake );
         crypto_provide = htonl( crypto_provide );
         tr_cryptoEncrypt( handshake->crypto, sizeof(crypto_provide), &crypto_provide, &crypto_provide );
         evbuffer_add( outbuf, &crypto_provide, sizeof(crypto_provide) );
@@ -456,9 +467,14 @@ readCryptoSelect( tr_handshake * handshake, struct evbuffer * inbuf )
         return READ_MORE;
 
     tr_peerIoReadUint32( handshake->io, inbuf, &crypto_select );
-    assert( crypto_select==1 || crypto_select==2 );
     handshake->crypto_select = crypto_select;
     dbgmsg( handshake, "crypto select is %d", (int)crypto_select );
+    if( ! ( crypto_select & getCryptoProvide( handshake ) ) )
+    {
+        dbgmsg( handshake, "peer selected an encryption option we didn't provide" );
+        tr_handshakeDone( handshake, FALSE );
+        return READ_DONE;
+    }
 
     tr_peerIoReadUint16( handshake->io, inbuf, &pad_d_len );
     dbgmsg( handshake, "pad_d_len is %d", (int)pad_d_len );
@@ -495,9 +511,6 @@ readPadD( tr_handshake * handshake, struct evbuffer * inbuf )
 ****  INCOMING CONNECTIONS
 ****
 ***/
-
-static void
-tr_handshakeDone( tr_handshake * handshake, int isConnected );
 
 static int
 readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
