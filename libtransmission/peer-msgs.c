@@ -114,7 +114,6 @@ struct tr_peermsgs
     struct peer_request blockToUs; /* the block currntly being sent to us */
 
     time_t lastReqAddedAt;
-    time_t gotKeepAliveTime;
     time_t clientSentPexAt;
 
     unsigned int notListening          : 1;
@@ -599,7 +598,7 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
     if( len == 0 ) { /* peer sent us a keepalive message */
         dbgmsg( msgs, "peer sent us a keepalive message..." );
-        msgs->gotKeepAliveTime = time( NULL );
+        msgs->info->peerSentKeepaliveAt = time( NULL );
     } else {
         dbgmsg( msgs, "peer is sending us a message with %"PRIu64" bytes...\n", (uint64_t)len );
         msgs->incomingMessageLength = len;
@@ -938,7 +937,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
     /* update our tables accordingly */
     assert( inlen >= msgs->blockToUs.length );
     msgs->blockToUs.length -= inlen;
-    msgs->info->peerSentDataAt = time( NULL );
+    msgs->info->peerSentBlockAt = time( NULL );
     clientGotBytes( msgs, inlen );
 
     /* if this was the entire block, save it */
@@ -1041,6 +1040,7 @@ pulse( void * vmsgs )
             evbuffer_drain( msgs->outBlock, outlen );
             peerGotBytes( msgs, outlen );
             len -= outlen;
+            msgs->info->peerSentBlockAt = time( NULL );
             dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }
     }

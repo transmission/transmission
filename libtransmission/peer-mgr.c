@@ -29,22 +29,51 @@
 #include "trevent.h"
 #include "utils.h"
 
-/* how frequently to change which peers are choked */
-#define RECHOKE_PERIOD_SECONDS (15 * 1000)
+enum
+{
+    /* how frequently to change which peers are choked */
+    RECHOKE_PERIOD_MSEC = (15 * 1000),
 
-/* how frequently to decide which peers live and die */
-#define RECONNECT_PERIOD_SECONDS (15 * 1000)
+    /* how frequently to decide which peers live and die */
+    RECONNECT_PERIOD_MSEC = (15 * 1000),
 
-#define REFILL_PERIOD_MSEC 1000
+    /* how frequently to refill peers' request lists */
+    REFILL_PERIOD_MSEC = 1000,
 
-/* how many peers to unchoke per-torrent. */
-/* FIXME: make this user-configurable? */
-#define NUM_UNCHOKED_PEERS_PER_TORRENT 8
+    /* how many peers to unchoke per-torrent. */
+    /* FIXME: make this user-configurable? */
+    NUM_UNCHOKED_PEERS_PER_TORRENT = 8,
 
-/* don't change a peer's choke status more often than this */
-#define MIN_CHOKE_PERIOD_SEC 10
+    /* don't change a peer's choke status more often than this */
+    MIN_CHOKE_PERIOD_SEC = 10,
 
-#define SOON_MSEC 2000
+    /* how soon is `soon' in the rechokeSoon, reconnecSoon funcs */
+    SOON_MSEC = 1000,
+
+    /* following the BT spec, we consider ourselves `snubbed' if 
+     * we're we don't get piece data from a peer in this long */
+    SNUBBED_SEC = 60,
+
+    /* if our connection count for a torrent is <= N% of what we wanted,
+     * start relaxing the rules that decide when to disconnect a peer */
+    RELAX_RULES_PERCENTAGE = 25,
+
+    /* if we're not relaxing the rules, disconnect a peer that hasn't
+     * given us anything (or taken, if we're seeding) in this long */
+    MIN_TRANSFER_IDLE = 90000,
+
+    /* even if we're relaxing the rules, disconnect a peer that hasn't
+     * given us anything (or taken, if we're seeding) in this long */
+    MAX_TRANSFER_IDLE = 240000,
+
+    /* this is arbitrary and, hopefully, temporary until we come up
+     * with a better idea */
+    MAX_CONNECTED_PEERS_PER_TORRENT = 40,
+
+    /* if we hang up on a peer for being worthless, don't try to
+     * reconnect to it for this long. */
+    MIN_HANGUP_PERIOD_SEC = 120
+};
 
 /**
 ***
@@ -258,8 +287,6 @@ tr_peerMgrNew( tr_handle * handle )
 void
 tr_peerMgrFree( tr_peerMgr * manager )
 {
-fprintf( stderr, "timer peerMgrFree\n" );
-
     while( !tr_ptrArrayEmpty( manager->handshakes ) )
         tr_handshakeAbort( (tr_handshake*)tr_ptrArrayNth( manager->handshakes, 0) );
     tr_ptrArrayFree( manager->handshakes );
@@ -536,7 +563,7 @@ reconnectNow( Torrent * t )
 {
     reconnectPulse( t );
     tr_timerFree( &t->reconnectTimer );
-    t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_SECONDS );
+    t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
 }
 
 static int
@@ -567,7 +594,7 @@ rechokeNow( Torrent * t )
 {
     rechokePulse( t );
     tr_timerFree( &t->rechokeTimer );
-    t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_SECONDS );
+    t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
 }
 
 static int
@@ -702,6 +729,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
             peer->peerSupportsEncryption = peerSupportsEncryption ? 1 : 0;
             peer->msgsTag = tr_peerMsgsSubscribe( peer->msgs, msgsCallbackFunc, t );
+            peer->connectionChangedAt = time( NULL );
             rechokeSoon( t );
         }
     }
@@ -731,35 +759,6 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
     }
 }
 
-static void
-maybeConnect( tr_peerMgr * manager, Torrent * t, tr_peer * peer )
-{
-    tr_peerIo * io;
-
-    assert( manager != NULL );
-    assert( t != NULL );
-    assert( peer != NULL );
-
-    if( peer->io != NULL ) { /* already connected */
-        fprintf( stderr, "not connecting because we already have an IO for that address\n" );
-        return;
-    }
-    if( !t->isRunning ) { /* torrent's not running */
-        fprintf( stderr, "OUTGOING connection not being made because t [%s] is not running\n", t->tor->info.name );
-        return;
-    }
-    if( getExistingHandshake( manager, &peer->in_addr ) != NULL ) { /* already have a handshake pending */
-        fprintf( stderr, "already have a handshake for that address\n" );
-        return;
-    }
-
-    io = tr_peerIoNewOutgoing( manager->handle,
-                               &peer->in_addr,
-                               peer->port,
-                               t->hash );
-    initiateHandshake( manager, io );
-}
-
 void
 tr_peerMgrAddPex( tr_peerMgr     * manager,
                   const uint8_t  * torrentHash,
@@ -776,7 +775,6 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
         if( isNew ) {
             peer->port = pex->port;
             peer->from = from;
-            maybeConnect( manager, t, peer );
         }
         ++pex;
     }
@@ -805,7 +803,6 @@ tr_peerMgrAddPeers( tr_peerMgr    * manager,
         if( isNew ) {
             peer->port = port;
             peer->from = from;
-            maybeConnect( manager, t, peer );
         }
     }
     reconnectSoon( t );
@@ -879,28 +876,18 @@ void
 tr_peerMgrStartTorrent( tr_peerMgr     * manager,
                         const uint8_t  * torrentHash )
 {
-    int i, peerCount;
     Torrent * t = getExistingTorrent( manager, torrentHash );
-
     t->isRunning = 1;
-
-    peerCount = tr_ptrArraySize( t->peers );
-    for( i=0; i<peerCount; ++i )
-        maybeConnect( manager, t, tr_ptrArrayNth( t->peers, i ) );
+    reconnectNow( t );
 }
 
 void
 tr_peerMgrStopTorrent( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash)
 {
-    int i, peerCount;
     Torrent * t = getExistingTorrent( manager, torrentHash );
-
     t->isRunning = 0;
-
-    peerCount = tr_ptrArraySize( t->peers );
-    for( i=0; i<peerCount; ++i )
-        disconnectPeer( tr_ptrArrayNth( t->peers, i ) );
+    reconnectNow( t );
 }
 
 void
@@ -917,8 +904,8 @@ tr_peerMgrAddTorrent( tr_peerMgr * manager,
     t->tor = tor;
     t->peers = tr_ptrArrayNew( );
     t->requested = tr_bitfieldNew( tor->blockCount );
-    t->rechokeTimer = tr_timerNew( manager->handle, rechokePulse, t, RECHOKE_PERIOD_SECONDS );
-    t->reconnectTimer = tr_timerNew( manager->handle, reconnectPulse, t, RECONNECT_PERIOD_SECONDS );
+    t->rechokeTimer = tr_timerNew( manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+    t->reconnectTimer = tr_timerNew( manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
 
     memcpy( t->hash, tor->info.hash, SHA_DIGEST_LENGTH );
     tr_ptrArrayInsertSorted( manager->torrents, t, torrentCompare );
@@ -1081,7 +1068,7 @@ clientIsSnubbedBy( const tr_peer * peer )
 {
     assert( peer != NULL );
 
-    return peer->peerSentDataAt < (time(NULL) - 30);
+    return peer->peerSentBlockAt < (time(NULL) - SNUBBED_SEC);
 }
 
 /**
@@ -1163,13 +1150,135 @@ rechokePulse( void * vtorrent )
 **/
 
 static int
+shouldPeerBeDisconnected( Torrent * t, tr_peer * peer, int peerCount, int isSeeding )
+{
+    const time_t now = time( NULL );
+    int relaxStrictnessIfFewerThanN;
+    double strictness;
+
+    if( peer->io == NULL ) /* not connected */
+        return FALSE;
+
+    if( !t->isRunning ) /* the torrent is stopped... nobody should be connected */
+        return TRUE;
+
+    if( peer->doDisconnect ) /* someone set a `doDisconnect' flag somewhere */
+        return TRUE;
+
+    /* when deciding whether or not to keep a peer, judge its responsiveness
+       on a sliding scale that's based on how many other peers are available */
+    relaxStrictnessIfFewerThanN =
+        (int)(((TR_MAX_PEER_COUNT * RELAX_RULES_PERCENTAGE) / 100.0) + 0.5);
+
+    /* if we have >= relaxIfFewerThan, strictness is 100%.
+       if we have zero connections, strictness is 0% */
+    if( peerCount >= relaxStrictnessIfFewerThanN )
+        strictness = 1.0;
+    else
+        strictness = peerCount / (double)relaxStrictnessIfFewerThanN;
+
+    /* test: has it been too long since we exchanged block data? */
+    if( ( now - peer->connectionChangedAt ) >= MAX_TRANSFER_IDLE ) {
+        const uint64_t lo = MIN_TRANSFER_IDLE;
+        const uint64_t hi = MAX_TRANSFER_IDLE;
+        const uint64_t limit = lo + ((hi-lo) * strictness);
+        const uint64_t interval = now - (isSeeding ? peer->clientSentBlockAt : peer->peerSentBlockAt);
+        if( interval > limit )
+            return TRUE;
+    }
+
+    /* FIXME: SWE had other tests too... */
+
+    return FALSE;
+}
+
+static int
+comparePeerByConnectionDate( const void * va, const void * vb )
+{
+    const tr_peer * a = *(const tr_peer**) va;
+    const tr_peer * b = *(const tr_peer**) vb;
+    return tr_compareUint64( a->connectionChangedAt, b->connectionChangedAt );
+}
+
+static int
 reconnectPulse( void * vt UNUSED )
 {
-    static int n = 0;
-    fprintf( stderr, "This console message has annoyed John_Clay %d times.\n", ++n );
-#if 0
+    int i, size, liveCount;
     Torrent * t = vt;
-    /* FIXME */
-#endif
+    tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &size );
+    const int isSeeding = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
+
+fprintf( stderr, "[%s] doing upkeep on our peer connections\n", t->tor->info.name );
+
+    /* how many connections do we have? */
+    for( i=liveCount=0; i<size; ++i )
+        if( peers[i]->msgs != NULL )
+            ++liveCount;
+
+    /* disconnect from some peers */
+    for( i=0; i<size; ++i ) {
+        tr_peer * peer = peers[i];
+        if( shouldPeerBeDisconnected( t, peer, liveCount, isSeeding ) ) {
+            fprintf( stderr, "%s is a bum.  I'm hanging up on them.\n", tr_peerIoGetAddrStr(peer->io) );
+            disconnectPeer( peer );
+            --liveCount;
+        }
+    }
+ 
+    /* maybe connect to some new peers */ 
+    if( t->isRunning && (liveCount<MAX_CONNECTED_PEERS_PER_TORRENT) )
+    {
+        int poolSize;
+        int left = MAX_CONNECTED_PEERS_PER_TORRENT - liveCount;
+        tr_peer ** pool;
+        tr_peerMgr * manager = t->manager;
+        const time_t now = time( NULL );
+
+        /* make a list of peers we know about but aren't connected to */
+        poolSize = 0;
+        pool = tr_new0( tr_peer*, size );
+        for( i=0; i<size; ++i ) {
+            tr_peer * peer = peers[i];
+            if( peer->msgs == NULL )
+                pool[poolSize++] = peer;
+        }
+
+        /* sort them s.t. the ones we've already tried are at the last of the list */
+        qsort( pool, poolSize, sizeof(tr_peer*), comparePeerByConnectionDate );
+
+        /* debugging */
+        if( poolSize > 0 ) {
+            fprintf( stderr, "here are some peers that I might want to connect to: \n" );
+            for( i=0; i<poolSize; ++i )
+                fprintf( stderr, "%"PRIu64", ", (uint64_t)pool[i]->connectionChangedAt );
+            fprintf( stderr, "\n" );
+        }
+
+        /* make some connections */
+        for( i=0; i<poolSize && left>0; ++i )
+        {
+            tr_peer * peer = pool[i];
+            tr_peerIo * io;
+
+            if( ( now - peer->connectionChangedAt ) < MIN_HANGUP_PERIOD_SEC ) {
+                fprintf( stderr, "out of candidates\n" );
+                break;
+            }
+
+            /* already have a handshake pending */
+            if( getExistingHandshake( manager, &peer->in_addr ) != NULL ) {
+                fprintf( stderr, "already have a handshake for that address\n" );
+                continue;
+            }
+
+            /* initiate a connection to the peer */
+            io = tr_peerIoNewOutgoing( manager->handle, &peer->in_addr, peer->port, t->hash );
+            fprintf( stderr, "we haven't tried %s in awhile...\n", tr_peerIoGetAddrStr(io) );
+            peer->connectionChangedAt = time( NULL );
+            initiateHandshake( manager, io );
+            --left;
+        }
+    }
+
     return TRUE;
 }
