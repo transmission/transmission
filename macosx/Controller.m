@@ -307,8 +307,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [[self applicationSupportFolder]
-                                                stringByAppendingPathComponent: @"Transfers.plist"]];
+    NSArray * history = [[NSArray alloc] initWithContentsOfFile:
+        [NSHomeDirectory() stringByAppendingPathComponent: @"/Library/Application Support/Transmission/Transfers.plist"]];
     
     //old version saved transfer info in prefs file
     if (!history)
@@ -3289,13 +3289,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (([type isEqualToString: GROWL_DOWNLOAD_COMPLETE] || [type isEqualToString: GROWL_SEEDING_COMPLETE])
             && (location = [clickContext objectForKey: @"Location"]))
         [[NSWorkspace sharedWorkspace] selectFile: location inFileViewerRootedAtPath: nil];
-}
-
-#warning move to additions
-- (NSString *) applicationSupportFolder
-{
-    return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex: 0] 
-                stringByAppendingPathComponent: [[NSProcessInfo processInfo] processName]];
 }
 
 - (void) ipcQuit

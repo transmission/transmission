@@ -234,8 +234,6 @@
 
 - (void) prepareForUpdate:  (NSNotification *) notification;
 
-- (NSString *) applicationSupportFolder;
-
 @end
 
 #endif
