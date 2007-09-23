@@ -1004,6 +1004,8 @@ tr_torrentFree( tr_torrent * tor )
 
     tr_sharedLock( h->shared );
 
+    tr_peerMgrRemoveTorrent( h->peerMgr, tor->info.hash );
+
     tr_lockFree( tor->lock );
     tr_cpClose( tor->completion );
 
@@ -1031,8 +1033,6 @@ tr_torrentFree( tr_torrent * tor )
 
     tr_inf( "closing torrent %s... %d torrents left",
             tor->info.name, h->torrentCount );
-
-    tr_peerMgrRemoveTorrent( h->peerMgr, tor->info.hash );
 
     tr_metainfoFree( inf );
     tr_free( tor );
