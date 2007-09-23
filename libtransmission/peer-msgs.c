@@ -937,7 +937,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
     /* update our tables accordingly */
     assert( inlen >= msgs->blockToUs.length );
     msgs->blockToUs.length -= inlen;
-    msgs->info->peerSentBlockAt = time( NULL );
+    msgs->info->peerSentPieceDataAt = time( NULL );
     clientGotBytes( msgs, inlen );
 
     /* if this was the entire block, save it */
@@ -1040,7 +1040,7 @@ pulse( void * vmsgs )
             evbuffer_drain( msgs->outBlock, outlen );
             peerGotBytes( msgs, outlen );
             len -= outlen;
-            msgs->info->peerSentBlockAt = time( NULL );
+            msgs->info->clientSentPieceDataAt = time( NULL );
             dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }
     }

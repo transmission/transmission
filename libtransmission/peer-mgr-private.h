@@ -43,8 +43,8 @@ typedef struct tr_peer
     /* the client name from the `v' string in LTEP's handshake dictionary */
     char * client;
 
-    time_t clientSentBlockAt;
-    time_t peerSentBlockAt;
+    time_t clientSentPieceDataAt;
+    time_t peerSentPieceDataAt;
     time_t peerSentKeepaliveAt;
     time_t chokeChangedAt;
     time_t connectionChangedAt;

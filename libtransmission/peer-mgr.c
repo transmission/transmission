@@ -1066,7 +1066,7 @@ clientIsSnubbedBy( const tr_peer * peer )
 {
     assert( peer != NULL );
 
-    return peer->peerSentBlockAt < (time(NULL) - SNUBBED_SEC);
+    return peer->peerSentPieceDataAt < (time(NULL) - SNUBBED_SEC);
 }
 
 /**
@@ -1175,12 +1175,12 @@ shouldPeerBeDisconnected( Torrent * t, tr_peer * peer, int peerCount, int isSeed
     else
         strictness = peerCount / (double)relaxStrictnessIfFewerThanN;
 
-    /* test: has it been too long since we exchanged block data? */
+    /* test: has it been too long since we exchanged piece data? */
     if( ( now - peer->connectionChangedAt ) >= MAX_TRANSFER_IDLE ) {
         const uint64_t lo = MIN_TRANSFER_IDLE;
         const uint64_t hi = MAX_TRANSFER_IDLE;
         const uint64_t limit = lo + ((hi-lo) * strictness);
-        const uint64_t interval = now - (isSeeding ? peer->clientSentBlockAt : peer->peerSentBlockAt);
+        const uint64_t interval = now - (isSeeding ? peer->clientSentPieceDataAt : peer->peerSentPieceDataAt);
         if( interval > limit )
             return TRUE;
     }
