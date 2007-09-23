@@ -33,7 +33,6 @@
 #include "actions.h"
 #include "tr_torrent.h"
 #include "dot-icons.h"
-#include "lock-icon.h"
 #include "hig.h"
 #include "torrent-inspector.h"
 #include "util.h"
@@ -359,14 +358,12 @@ render_encrypted (GtkTreeViewColumn  * column UNUSED,
                   GtkTreeIter        * iter,
                   gpointer             data UNUSED)
 {
-  static GdkPixbuf * lock = NULL;
   gboolean is_encrypted = FALSE;
   gtk_tree_model_get (tree_model, iter, PEER_COL_IS_ENCRYPTED, &is_encrypted,
                                         -1);
-  if (!lock) lock = gdk_pixbuf_new_from_inline (-1, lock_icon, FALSE, NULL);
   g_object_set (renderer, "xalign", (gfloat)0.0,
                           "yalign", (gfloat)0.5,
-                          "pixbuf", (is_encrypted ? lock : NULL),
+                          "stock-id", (is_encrypted ? GTK_STOCK_DIALOG_AUTHENTICATION : NULL),
                           NULL);
 }
 
@@ -573,7 +570,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         r = gtk_cell_renderer_pixbuf_new ();
         c = gtk_tree_view_column_new_with_attributes (t, r, NULL);
         gtk_tree_view_column_set_sizing (c, GTK_TREE_VIEW_COLUMN_FIXED);
-        gtk_tree_view_column_set_fixed_width (c, 32);
+        gtk_tree_view_column_set_fixed_width (c, 20);
         gtk_tree_view_column_set_cell_data_func (c, r, render_encrypted,
                                                  NULL, NULL);
         break;
@@ -583,7 +580,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         r = gtk_cell_renderer_pixbuf_new ();
         c = gtk_tree_view_column_new_with_attributes (t, r, NULL);
         gtk_tree_view_column_set_sizing (c, GTK_TREE_VIEW_COLUMN_FIXED);
-        gtk_tree_view_column_set_fixed_width (c, 32);
+        gtk_tree_view_column_set_fixed_width (c, 20);
         gtk_tree_view_column_set_cell_data_func (c, r, render_connection,
                                                  NULL, NULL);
         break;

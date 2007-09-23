@@ -120,7 +120,7 @@ BuiltinIconInfo;
 /* only one icon now... but room to grow ;) */
 const BuiltinIconInfo my_builtin_icons [] =
 {
-    { tr_icon_full, "ICON_TRANSMISSION" }
+    { tr_icon_full, "transmission-logo" }
 };
 
 static void

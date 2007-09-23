@@ -390,7 +390,7 @@ gtksetup( int * argc, char *** argv, struct cbdata * callback_data )
         "}\n"
         "widget \"TransmissionDialog\" style \"transmission-standard\"\n" );
 
-    gtk_window_set_default_icon_name ( "ICON_TRANSMISSION" );
+    gtk_window_set_default_icon_name ( "transmission-logo" );
 }
 
 static void
@@ -902,12 +902,14 @@ about ( void )
   gtk_about_dialog_set_license (a, LICENSE);
   gtk_about_dialog_set_wrap_license (a, TRUE);
 #endif
-  gtk_about_dialog_set_website (a, "http://transmission.m0k.org/");
-  gtk_about_dialog_set_copyright (a, _("Copyright 2005-2007 The Transmission Project"));
-  gtk_about_dialog_set_authors (a, authors);
-  gtk_about_dialog_set_translator_credits (a, _("translator-credits"));
-  g_signal_connect_swapped (w, "response", G_CALLBACK (gtk_widget_destroy), w);
-  gtk_widget_show_all (w);
+  gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
+  gtk_about_dialog_set_comments( a, _("A GTK+ BitTorrent Client.") );
+  gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
+  gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
+  gtk_about_dialog_set_authors( a, authors );
+  gtk_about_dialog_set_translator_credits( a, _("translator-credits") );
+  g_signal_connect_swapped( w, "response", G_CALLBACK (gtk_widget_destroy), w );
+  gtk_widget_show_all( w );
 }
 
 static void
