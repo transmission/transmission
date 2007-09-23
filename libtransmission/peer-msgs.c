@@ -906,7 +906,7 @@ gotBlock( tr_peermsgs      * msgs,
 
     if( tr_cpPieceIsComplete( tor->completion, index ) )
     {
-        if( !tr_ioHash( tor, index ) )
+        if( tr_ioHash( tor, index ) )
         {
             gotBadPiece( msgs, index );
             return;
