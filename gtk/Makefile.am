@@ -10,7 +10,6 @@ noinst_HEADERS = \
     actions.h \
     conf.h \
     dialogs.h \
-    dot-icons.h \
     hig.h \
     img_icon_full.h \
     io.h \

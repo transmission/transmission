@@ -32,7 +32,6 @@
 
 #include "actions.h"
 #include "tr_torrent.h"
-#include "dot-icons.h"
 #include "hig.h"
 #include "torrent-inspector.h"
 #include "util.h"
@@ -338,16 +337,12 @@ render_connection (GtkTreeViewColumn  * column UNUSED,
                    GtkTreeIter        * iter,
                    gpointer             data UNUSED)
 {
-  static GdkPixbuf * rdot = NULL;
-  static GdkPixbuf * gdot = NULL;
   gboolean is_connected = FALSE;
   gtk_tree_model_get (tree_model, iter, PEER_COL_IS_CONNECTED, &is_connected,
-                                        -1);
-  if (!rdot) rdot = gdk_pixbuf_new_from_inline (-1, red_dot, FALSE, NULL);
-  if (!gdot) gdot = gdk_pixbuf_new_from_inline (-1, green_dot, FALSE, NULL);
+                                        -1 );
   g_object_set (renderer, "xalign", (gfloat)0.0,
                           "yalign", (gfloat)0.5,
-                          "pixbuf", (is_connected ? gdot : rdot),
+                          "stock-id", ( is_connected ? GTK_STOCK_CONNECT : GTK_STOCK_DISCONNECT ),
                           NULL);
 }
 
