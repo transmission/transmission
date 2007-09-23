@@ -771,6 +771,7 @@ static void
 clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
+    tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
@@ -780,6 +781,7 @@ static void
 peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
 {
     tr_torrent * tor = msgs->torrent;
+    tor->downloadedCur += byteCount;
     tor->uploadedCur += byteCount;
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
