@@ -645,7 +645,7 @@ saveFastResumeSoon( void * vtor )
     tr_torrent * tor = (tr_torrent *) vtor;
 
     if( tor->saveTimer == NULL )
-        tor->saveTimer = tr_timerNew( tor->handle, saveFastResumeNow, tor, 1000 );
+        tor->saveTimer = tr_timerNew( tor->handle, saveFastResumeNow, tor, 100 );
 }
 
 /**
