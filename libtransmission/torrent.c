@@ -253,8 +253,6 @@ tr_torrentInitFilePieces( tr_torrent * tor )
         tor->info.pieces[i].priority = calculatePiecePriority( tor, i );
 }
 
-static void recheckCpState( tr_torrent * );
-
 static void
 tr_torrentStartImpl( tr_torrent * tor )
 {
@@ -263,7 +261,7 @@ tr_torrentStartImpl( tr_torrent * tor )
 
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
-    recheckCpState( tor );
+    tr_torrentRecheckCompleteness( tor );
     tor->startDate = tr_date();
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
@@ -272,7 +270,7 @@ tr_torrentStartImpl( tr_torrent * tor )
 static void
 recheckDoneCB( tr_torrent * tor )
 {
-    recheckCpState( tor );
+    tr_torrentRecheckCompleteness( tor );
 
     if( tor->doStopAfterHashCheck ) {
         tor->doStopAfterHashCheck = 0;
@@ -635,7 +633,7 @@ saveFastResumeNow( void * vtor )
     tr_torrent * tor = (tr_torrent *) vtor;
 
     tr_fastResumeSave( tor );
-    recheckCpState( tor );
+    tr_torrentRecheckCompleteness( tor );
 
     tr_timerFree( &tor->saveTimer );
     return FALSE;
@@ -1096,8 +1094,8 @@ tr_torrentClose( tr_torrent * tor )
     tr_timerNew( tor->handle, freeWhenStopped, tor, 250 );
 }
 
-static void
-recheckCpState( tr_torrent * tor )
+void
+tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
     cp_status_t cpStatus;
 

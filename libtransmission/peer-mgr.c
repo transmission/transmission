@@ -632,6 +632,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEERMSG_CLIENT_HAVE:
             broadcastClientHave( t, e->pieceIndex );
+            tr_torrentRecheckCompleteness( t->tor );
             break;
 
         case TR_PEERMSG_PEER_PROGRESS: { /* if we're both seeds, then disconnect. */
@@ -699,8 +700,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         --manager->connectionCount;
         return;
     }
-
-    fprintf( stderr, "peer-mgr: torrent [%s] finished a handshake. Connected? %s.\n", t->tor->info.name, (isConnected?"yes":"no") );
 
     /* if we couldn't connect or were snubbed,
      * the peer's probably not worth remembering. */

@@ -377,12 +377,15 @@ render_ul_rate (GtkTreeViewColumn  * column UNUSED,
                 GtkTreeIter        * iter,
                 gpointer             data UNUSED)
 {
-  char * pch;
   float rate = 0.0;
   gtk_tree_model_get (tree_model, iter, PEER_COL_UPLOAD_RATE, &rate, -1);
-  pch = readablespeed (rate);
-  g_object_set (renderer, "text", pch, NULL);
-  g_free (pch); 
+  if( rate < 0.01 )
+    g_object_set (renderer, "text", "", NULL);
+  else {
+    char * pch = readablespeed (rate);
+    g_object_set (renderer, "text", pch, NULL);
+    g_free (pch); 
+  }
 }
 
 static void
@@ -392,12 +395,15 @@ render_dl_rate (GtkTreeViewColumn  * column UNUSED,
                 GtkTreeIter        * iter,
                 gpointer             data UNUSED)
 {
-  char * pch;
   float rate = 0.0;
   gtk_tree_model_get (tree_model, iter, PEER_COL_DOWNLOAD_RATE, &rate, -1);
-  pch = readablespeed (rate);
-  g_object_set (renderer, "text", pch, NULL);
-  g_free (pch); 
+  if( rate < 0.01 )
+    g_object_set (renderer, "text", "", NULL);
+  else {
+    char * pch = readablespeed (rate);
+    g_object_set (renderer, "text", pch, NULL);
+    g_free (pch); 
+  }
 }
 
 static void
