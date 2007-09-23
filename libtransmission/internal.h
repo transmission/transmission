@@ -90,6 +90,7 @@ tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 #define tr_block(a,b) _tr_block(tor,a,b)
 int _tr_block( const tr_torrent * tor, int index, int begin );
 
+uint64_t tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length );
 
 typedef enum
 {

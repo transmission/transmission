@@ -26,9 +26,9 @@ noinst_HEADERS = \
     ui.h \
     util.h
 
-bin_PROGRAMS = transmission-gtk
+bin_PROGRAMS = transmission
 
-transmission_gtk_SOURCES = \
+transmission_SOURCES = \
     actions.c \
     conf.c \
     dialogs.c \
@@ -47,7 +47,7 @@ transmission_gtk_SOURCES = \
     tr_window.c \
     util.c
 
-transmission_gtk_LDADD = \
+transmission_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(GTK_LIBS) \

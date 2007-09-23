@@ -1282,3 +1282,15 @@ int _tr_block( const tr_torrent * tor, int index, int begin )
     return index * ( inf->pieceSize / tor->blockSize ) +
         begin / tor->blockSize;
 }
+
+uint64_t
+tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )
+{
+    uint64_t ret;
+    ret = tor->info.pieceSize;
+    ret *= index;
+    ret += begin;
+    ret += length;
+    return ret;
+}
+

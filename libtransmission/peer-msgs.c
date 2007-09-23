@@ -607,6 +607,17 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
 }
 
 static int
+requestIsValid( const tr_peermsgs * msgs, struct peer_request * req )
+{
+    const tr_torrent * tor = msgs->torrent;
+    assert( req != NULL );
+    assert( req->index < (uint32_t)tor->info.pieceCount );
+    assert( (int)req->offset < tr_torPieceCountBytes( tor, (int)req->index ) );
+    assert( tr_pieceOffset( tor, req->index, req->offset, req->length ) <= tor->info.totalSize );
+    return TRUE;
+}
+
+static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 {
     uint8_t id;
@@ -682,26 +693,23 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             tr_peerIoReadUint32( msgs->io, inbuf, &req->index );
             tr_peerIoReadUint32( msgs->io, inbuf, &req->offset );
             tr_peerIoReadUint32( msgs->io, inbuf, &req->length );
-            if( !msgs->info->peerIsChoked )
+            if( !msgs->info->peerIsChoked && requestIsValid( msgs, req ) )
                 tr_list_append( &msgs->peerAskedFor, req );
+            else
+                tr_free( req );
             break;
         }
 
         case BT_CANCEL: {
             struct peer_request req;
-            tr_list * node;
+            void * data;
             assert( msglen == 12 );
             dbgmsg( msgs, "peer sent us a BT_CANCEL" );
             tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
             tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
             tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-            node = tr_list_find( msgs->peerAskedFor, &req, peer_request_compare );
-            if( node != NULL ) {
-                void * data = node->data;
-                tr_list_remove_data( &msgs->peerAskedFor, data );
-                tr_free( data );
-                dbgmsg( msgs, "found the req that peer is cancelling... cancelled." );
-            }
+            data = tr_list_remove( &msgs->peerAskedFor, &req, peer_request_compare );
+            tr_free( data );
             break;
         }
 
