@@ -1624,7 +1624,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [history addObject: [torrent history]];
 
-    [history writeToFile: [[self applicationSupportFolder] stringByAppendingPathComponent: @"Transfers.plist"] atomically: YES];
+    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent:
+        @"/Library/Application Support/Transmission/Transfers.plist"] atomically: YES];
 }
 
 - (void) sortTorrents
