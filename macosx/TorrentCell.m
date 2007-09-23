@@ -156,7 +156,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds
 {
     Torrent * torrent = [self representedObject];
-    NSString * string = [torrent isActive] && ![fDefaults boolForKey: @"SmallStatusRegular"]
+    NSString * string = [torrent isActive] && ![fDefaults boolForKey: @"DisplaySmallStatusRegular"]
                             ? [torrent remainingTimeString] : [torrent shortStatusString];
     return [self rectForMinimalStatusWithString: [self attributedStatusString: string withColor: nil] inBounds: bounds];
 }
@@ -241,7 +241,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     NSRect minimalStatusRect;
     if (minimal)
     {
-        NSString * string = ![fDefaults boolForKey: @"SmallStatusRegular"] && [torrent isActive]
+        NSString * string = [torrent isActive] && ![fDefaults boolForKey: @"DisplaySmallStatusRegular"]
                                 ? [torrent remainingTimeString] : [torrent shortStatusString];
         NSAttributedString * minimalString = [self attributedStatusString: string withColor: statusColor];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];

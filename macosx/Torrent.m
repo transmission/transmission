@@ -278,14 +278,28 @@ static int static_lastid = 0;
 					* shortStatusString = [[NSMutableString alloc] init];
 
     if (![self allDownloaded])
-        [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
+    {
+        if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+            [progressString appendFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
+                            [NSString stringForFileSize: [self downloadedValid]],
+                            [NSString stringForFileSize: [self downloadedValid] + fStat->left], 100.0 * [self progressDone]];
+        else
+            [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
+    }
     else if (![self isComplete])
-        [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
+    {
+        if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+            [progressString appendFormat: NSLocalizedString(@"%@ selected, uploaded %@ (Ratio: %@)",
+                "Torrent -> progress string"), [NSString stringForFileSize: [self downloadedValid]],
+                [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
+        else
+            [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
                 "Torrent -> progress string"), [NSString stringForFileSize: [self downloadedValid]],
                 [NSString stringForFileSize: [self size]], 100.0 * [self progress],
                 [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
+    }
     else
         [progressString appendFormat: NSLocalizedString(@"%@, uploaded %@ (Ratio: %@)", "Torrent -> progress string"),
                 [NSString stringForFileSize: [self size]], [NSString stringForFileSize: [self uploadedTotal]],

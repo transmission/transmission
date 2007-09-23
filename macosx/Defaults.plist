@@ -34,6 +34,10 @@
 	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>
 	<false/>
+	<key>DisplaySmallStatusRegular</key>
+	<true/>
+	<key>DisplayStatusProgressSelected</key>
+	<false/>
 	<key>DownloadChoice</key>
 	<string>Constant</string>
 	<key>DownloadFolder</key>
@@ -87,8 +91,6 @@
 	<key>ShowInspector</key>
 	<false/>
 	<key>SleepPrevent</key>
-	<true/>
-	<key>SmallStatusRegular</key>
 	<true/>
 	<key>SmallView</key>
 	<false/>

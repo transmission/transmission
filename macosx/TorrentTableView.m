@@ -46,6 +46,7 @@
 - (NSRect) actionRectForRow: (int) row;
 
 - (BOOL) pointInIconRect: (NSPoint) point;
+- (BOOL) pointInProgressRect: (NSPoint) point;
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point;
 
 - (BOOL) pointInPauseRect: (NSPoint) point;
@@ -77,8 +78,6 @@
         
         fClickPoint = NSZeroPoint;
         fClickIn = NO;
-        
-        fKeyStrokes = [[NSMutableArray alloc] init];
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         
@@ -142,9 +141,16 @@
         }
         else
         {
-            if ([self pointInMinimalStatusRect: fClickPoint])
+            if ([self pointInProgressRect: fClickPoint])
             {
-                [fDefaults setBool: ![fDefaults boolForKey: @"SmallStatusRegular"] forKey: @"SmallStatusRegular"];
+                [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"]
+                                        forKey: @"DisplayStatusProgressSelected"];
+                fClickPoint = NSZeroPoint;
+                [self reloadData];
+            } 
+            else if ([self pointInMinimalStatusRect: fClickPoint])
+            {
+                [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
                 fClickPoint = NSZeroPoint;
                 [self reloadData];
             }
@@ -245,6 +251,9 @@
 
 - (void) keyDown: (NSEvent *) event
 {
+    if (!fKeyStrokes)
+        fKeyStrokes = [[NSMutableArray alloc] init];
+    
     unichar newChar = [[event characters] characterAtIndex: 0];
     if (newChar == ' ' || [[NSCharacterSet alphanumericCharacterSet] characterIsMember: newChar]
         || [[NSCharacterSet symbolCharacterSet] characterIsMember: newChar]
@@ -258,9 +267,7 @@
     }
     else
     {
-        if ([fKeyStrokes count] > 0)
-            [fKeyStrokes removeAllObjects];
-        
+        [fKeyStrokes removeAllObjects];
         [super keyDown: event];
     }
 }
@@ -533,6 +540,17 @@
     
     TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
     return NSPointInRect(point, [cell iconRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
+}
+
+- (BOOL) pointInProgressRect: (NSPoint) point
+{
+    int row = [self rowAtPoint: point];
+    if (row < 0 || [fDefaults boolForKey: @"SmallView"])
+        return NO;
+    
+    TorrentCell * cell = [[self tableColumnWithIdentifier: @"Torrent"] dataCell];
+    [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
+    return NSPointInRect(point, [cell progressRectForBounds: [self frameOfCellAtColumn: 0 row: row]]);
 }
 
 - (BOOL) pointInMinimalStatusRect: (NSPoint) point
