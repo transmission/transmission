@@ -224,8 +224,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) awakeFromNib
 {
     [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
-    [fStatusBar setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
-    [fFilterBar setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
     
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [toolbar setDelegate: self];
@@ -3218,7 +3216,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) windowDidBecomeKey: (NSNotification *) notification
 {
+    [fStatusBar setNeedsDisplay: YES];
+    
     [fBadger clearCompleted];
+}
+
+- (void) windowDidResignKey: (NSNotification *) notification
+{
+    [fStatusBar setNeedsDisplay: YES];
 }
 
 - (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize

@@ -179,6 +179,7 @@
             LANGUAGE = ObjC; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = StatusBarView; LANGUAGE = ObjC; SUPERCLASS = ImageBackgroundView; }, 
         {
             ACTIONS = {
                 checkFile = id; 

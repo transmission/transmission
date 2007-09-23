@@ -280,9 +280,12 @@ static int static_lastid = 0;
     if (![self allDownloaded])
     {
         if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
+        {
+            uint64_t downloadedValid = [self downloadedValid];
             [progressString appendFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: [self downloadedValid]],
-                            [NSString stringForFileSize: [self downloadedValid] + fStat->left], 100.0 * [self progressDone]];
+                            [NSString stringForFileSize: downloadedValid],
+                            [NSString stringForFileSize: downloadedValid + fStat->left], 100.0 * [self progressDone]];
+        }
         else
             [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
                             [NSString stringForFileSize: [self downloadedValid]],

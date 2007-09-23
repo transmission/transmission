@@ -32,6 +32,8 @@
 
 - (void) awakeFromNib
 {
+    [self setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
+    
     [fNoFilterButton setTitle: NSLocalizedString(@"All", @"Filter Bar Button -> title")];
     [fDownloadFilterButton setTitle: NSLocalizedString(@"Downloading", @"Filter Bar Button -> title")];
     [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", @"Filter Bar Button -> title")];
@@ -46,8 +48,6 @@
     [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
     [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
     [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
-    
-    [self setNeedsDisplay: YES];
 }
 
 @end
