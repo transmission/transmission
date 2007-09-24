@@ -7,6 +7,7 @@
             OUTLETS = {
                 fCopyrightField = NSTextField; 
                 fLicenseButton = NSButton; 
+                fLicenseCloseButton = NSButton; 
                 fLicenseSheet = NSPanel; 
                 fLicenseView = NSTextView; 
                 fTextView = NSTextView; 
