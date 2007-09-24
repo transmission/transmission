@@ -822,7 +822,7 @@ tr_peerMgrSetBlame( tr_peerMgr     * manager UNUSED,
                     int              pieceIndex UNUSED,
                     int              success UNUSED )
 {
-    fprintf( stderr, "FIXME: tr_peerMgrSetBlame\n" );
+    /*fprintf( stderr, "FIXME: tr_peerMgrSetBlame\n" );*/
 }
 
 int
@@ -1256,7 +1256,7 @@ reconnectPulse( void * vt UNUSED )
 
             /* initiate a connection to the peer */
             io = tr_peerIoNewOutgoing( manager->handle, &peer->in_addr, peer->port, t->hash );
-            fprintf( stderr, "[%s] connecting to potential peer %s\n", t->tor->info.name, tr_peerIoGetAddrStr(io) );
+            /*fprintf( stderr, "[%s] connecting to potential peer %s\n", t->tor->info.name, tr_peerIoGetAddrStr(io) );*/
             peer->connectionChangedAt = time( NULL );
             initiateHandshake( manager, io );
             --left;
