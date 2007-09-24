@@ -1239,7 +1239,6 @@ sendPex( tr_peermsgs * msgs )
         tr_bencFree( &val );
         tr_free( diffs.added );
         tr_free( diffs.dropped );
-        tr_free( diffs.elements );
         tr_free( newPex );
 
         msgs->clientSentPexAt = time( NULL );
@@ -1308,21 +1307,23 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
 }
 
 void
-tr_peerMsgsFree( tr_peermsgs* p )
+tr_peerMsgsFree( tr_peermsgs* msgs )
 {
-    if( p != NULL )
+    if( msgs != NULL )
     {
-        tr_timerFree( &p->pulseTimer );
-        tr_timerFree( &p->pexTimer );
-        tr_publisherFree( &p->publisher );
-        tr_list_foreach( p->clientAskedFor, tr_free );
-        tr_list_free( &p->clientAskedFor );
-        tr_list_foreach( p->peerAskedFor, tr_free );
-        tr_list_free( &p->peerAskedFor );
-        evbuffer_free( p->outMessages );
-        evbuffer_free( p->outBlock );
-        evbuffer_free( p->inBlock );
-        tr_free( p );
+        tr_timerFree( &msgs->pulseTimer );
+        tr_timerFree( &msgs->pexTimer );
+        tr_publisherFree( &msgs->publisher );
+        tr_list_foreach( msgs->clientAskedFor, tr_free );
+        tr_list_free( &msgs->clientAskedFor );
+        tr_list_foreach( msgs->peerAskedFor, tr_free );
+        tr_list_free( &msgs->peerAskedFor );
+        evbuffer_free( msgs->outMessages );
+        evbuffer_free( msgs->outBlock );
+        evbuffer_free( msgs->inBlock );
+        tr_free( msgs->pex );
+        msgs->pexCount = 0;
+        tr_free( msgs );
     }
 }
 

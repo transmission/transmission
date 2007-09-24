@@ -302,6 +302,14 @@ static tr_thread * recheckThread = NULL;
 
 static int stopCurrent = FALSE;
 
+static tr_lock* getRecheckLock( void )
+{
+    static tr_lock * lock = NULL;
+    if( lock == NULL )
+        lock = tr_lockNew( );
+    return lock;
+}
+
 static void
 recheckThreadFunc( void * unused UNUSED )
 {
@@ -309,8 +317,11 @@ recheckThreadFunc( void * unused UNUSED )
     {
         int i;
         tr_torrent * tor;
+        struct recheck_node * node;
 
-        struct recheck_node * node = (struct recheck_node*) recheckList ? recheckList->data : NULL;
+        tr_lockLock( getRecheckLock( ) );
+        fprintf( stderr, "popping `node' from recheckList\n" );
+        node = (struct recheck_node*) recheckList ? recheckList->data : NULL;
         if( node == NULL )
             break;
 
@@ -318,6 +329,7 @@ recheckThreadFunc( void * unused UNUSED )
         tor = currentNode.torrent;
         tr_list_remove_data( &recheckList, node );
         tr_free( node );
+        tr_lockUnlock( getRecheckLock( ) );
 
         if( tor->uncheckedPieces == NULL ) {
             fireCheckDone( tor, currentNode.recheck_done_cb, currentNode.status_when_done );
@@ -352,7 +364,9 @@ recheckThreadFunc( void * unused UNUSED )
         fireCheckDone( tor, currentNode.recheck_done_cb, currentNode.status_when_done );
     }
 
+    fprintf( stderr, "setting old recheck thread to NULL because the queue is empty\n" );
     recheckThread = NULL;
+    tr_lockUnlock( getRecheckLock( ) );
 }
 
 void
@@ -360,24 +374,21 @@ tr_ioRecheckAdd( tr_torrent          * tor,
                  tr_recheck_done_cb    recheck_done_cb,
                  run_status_t          status_when_done )
 {
-    if( tor->uncheckedPieces == NULL )
-    {
-        fireCheckDone( tor, recheck_done_cb, status_when_done );
-    }
-    else
-    {
-        struct recheck_node * node;
-        node = tr_new( struct recheck_node, 1 );
-        node->torrent = tor;
-        node->recheck_done_cb = recheck_done_cb;
-        node->status_when_done = status_when_done;
-        tr_list_append( &recheckList, node );
+    struct recheck_node * node;
+    node = tr_new( struct recheck_node, 1 );
+    node->torrent = tor;
+    node->recheck_done_cb = recheck_done_cb;
+    node->status_when_done = status_when_done;
+    fprintf( stderr, "appending `node' to recheckList\n" );
 
-        tor->runStatus = TR_RUN_CHECKING_WAIT;
-
-        if( recheckThread == NULL )
-            recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
+    tr_lockLock( getRecheckLock( ) );
+    tr_list_append( &recheckList, node );
+    tor->runStatus = TR_RUN_CHECKING_WAIT;
+    if( recheckThread == NULL ) {
+        fprintf( stderr, "creating new recheck thread\n" );
+        recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
     }
+    tr_lockUnlock( getRecheckLock( ) );
 }
 
 static int
