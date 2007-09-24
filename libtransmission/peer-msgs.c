@@ -1239,6 +1239,7 @@ sendPex( tr_peermsgs * msgs )
         tr_bencFree( &val );
         tr_free( diffs.added );
         tr_free( diffs.dropped );
+        tr_free( diffs.elements );
         tr_free( newPex );
 
         msgs->clientSentPexAt = time( NULL );

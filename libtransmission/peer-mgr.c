@@ -723,6 +723,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             peer->port = port;
             peer->io = io;
             peer->msgs = tr_peerMsgsNew( t->tor, peer );
+            tr_free( peer->client );
             peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
             peer->peerSupportsEncryption = peerSupportsEncryption ? 1 : 0;
             peer->msgsTag = tr_peerMsgsSubscribe( peer->msgs, msgsCallbackFunc, t );
