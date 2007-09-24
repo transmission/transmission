@@ -34,8 +34,7 @@ AboutWindowController * fAboutBoxInstance = nil;
     return fAboutBoxInstance;
 }
 
-#warning make completely localized
-- (void) windowDidLoad
+- (void) awakeFromNib
 {
     NSDictionary * info = [[NSBundle mainBundle] infoDictionary];
     [fVersionField setStringValue: [NSString stringWithFormat: @"%@ (%@)",
@@ -46,7 +45,21 @@ AboutWindowController * fAboutBoxInstance = nil;
     
     [[fTextView textStorage] setAttributedString: [[[NSAttributedString alloc] initWithPath:
             [[NSBundle mainBundle] pathForResource: @"Credits" ofType: @"rtf"] documentAttributes: nil] autorelease]];
+    
+    //size license button
+    float oldButtonWidth = [fLicenseButton frame].size.width;
+    
+    [fLicenseButton setTitle: NSLocalizedString(@"License", "About window -> license button")];
+    [fLicenseButton sizeToFit];
+    
+    NSRect buttonFrame = [fLicenseButton frame];
+    buttonFrame.size.width += 10.0;
+    buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
+    [fLicenseButton setFrame: buttonFrame];
+}
 
+- (void) windowDidLoad
+{
     [[self window] center];
 }
 

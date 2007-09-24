@@ -6,6 +6,7 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fCopyrightField = NSTextField; 
+                fLicenseButton = NSButton; 
                 fLicenseSheet = NSPanel; 
                 fLicenseView = NSTextView; 
                 fTextView = NSTextView; 

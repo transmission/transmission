@@ -28,6 +28,7 @@
 {
 	IBOutlet NSTextView * fTextView, * fLicenseView;
     IBOutlet NSTextField * fVersionField, * fCopyrightField;
+    IBOutlet NSButton * fLicenseButton;
     IBOutlet NSPanel * fLicenseSheet;
 }
 
