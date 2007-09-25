@@ -685,7 +685,7 @@ struct tr_peer_stat
 
 struct tr_msg_list
 {
-    int                  level;
+    uint8_t              level;
     time_t               when;
     char               * message;
     struct tr_msg_list * next;

@@ -304,7 +304,6 @@ torrentRealInit( tr_handle  * h,
     tor->destination = tr_strdup( destination );
 
     tor->handle   = h;
-    tor->azId     = h->azId;
     tor->hasChangedState = -1;
     tor->pexDisabled = 0;
 

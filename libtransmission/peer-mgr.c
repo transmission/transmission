@@ -1237,7 +1237,6 @@ reconnectPulse( void * vt UNUSED )
         }
     }
 
-#if 0 
     /* maybe connect to some new peers */ 
     if( t->isRunning && (liveCount<MAX_CONNECTED_PEERS_PER_TORRENT) )
     {
@@ -1282,7 +1281,6 @@ reconnectPulse( void * vt UNUSED )
 
         tr_free( pool );
     }
-#endif
 
     return TRUE;
 }

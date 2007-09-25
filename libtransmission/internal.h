@@ -122,8 +122,6 @@ struct tr_torrent
 
     uint8_t                    obfuscatedHash[SHA_DIGEST_LENGTH];
 
-    uint8_t                  * azId;
-
     /* Where to download */
     char                     * destination;
     
