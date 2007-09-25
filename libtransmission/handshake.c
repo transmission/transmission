@@ -177,18 +177,14 @@ static const char* getStateName( short state )
     switch( state ) {
         case AWAITING_HANDSHAKE:      str = "awaiting handshake"; break;
         case AWAITING_YA:             str = "awaiting ya"; break;
-        //case SENDING_YB:              str = "sending yb"; break;
         case AWAITING_PAD_A:          str = "awaiting pad a"; break;
         case AWAITING_CRYPTO_PROVIDE: str = "awaiting crypto_provide"; break;
         case AWAITING_PAD_C:          str = "awaiting pad c"; break;
         case AWAITING_IA:             str = "awaiting ia"; break;
-        //case SENDING_YA:              str = "sending ya"; break;
         case AWAITING_YB:             str = "awaiting yb"; break;
-        //case SENDING_CRYPTO_PROVIDE:  str = "sending crypto provide"; break;
         case AWAITING_VC:             str = "awaiting vc"; break;
         case AWAITING_CRYPTO_SELECT:  str = "awaiting crypto select"; break;
         case AWAITING_PAD_D:          str = "awaiting pad d"; break;
-        //case SENDING_NONE: str = "sending plaintext handshake"; break;
     }
     return str;
 }
@@ -204,7 +200,6 @@ static void
 setReadState( tr_handshake * handshake, int state )
 {
     setState( handshake, state );
-    //tr_peerIoSetIOMode( handshake->io, EV_READ, EV_WRITE );
 }
 
 static uint8_t *
@@ -384,14 +379,16 @@ sendYa( tr_handshake * handshake )
 }
 
 static uint32_t
-getCryptoProvide( const tr_handshake * handshake )
+getCryptoProvide( const tr_handshake * handshake UNUSED )
 {
     uint32_t i = 0;
 
     i |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
 
+#if 0
     if( handshake->allowUnencryptedPeers ) /* sometimes allow plaintext */
         i |= CRYPTO_PROVIDE_PLAINTEXT;
+#endif
 
    return i;
 }
@@ -468,8 +465,7 @@ readYb( tr_handshake * handshake, struct evbuffer * inbuf )
         evbuffer_add( outbuf, vc, VC_LENGTH );
 
         /* crypto_provide */
-        crypto_provide = getCryptoProvide( handshake );
-        crypto_provide = htonl( crypto_provide );
+        crypto_provide = htonl( getCryptoProvide( handshake ) );
         tr_cryptoEncrypt( handshake->crypto, sizeof(crypto_provide), &crypto_provide, &crypto_provide );
         evbuffer_add( outbuf, &crypto_provide, sizeof(crypto_provide) );
 
