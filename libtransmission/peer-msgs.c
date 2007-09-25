@@ -380,6 +380,29 @@ tr_peerMsgsHave( tr_peermsgs * msgs,
 static int
 pulse( void * vmsgs );
 
+static int
+reqIsValid( const tr_peermsgs * msgs, uint32_t index, uint32_t offset, uint32_t length )
+{
+    const tr_torrent * tor = msgs->torrent;
+
+    if( index >= (uint32_t) tor->info.pieceCount )
+        return FALSE;
+    if ( (int)offset >= tr_torPieceCountBytes( tor, (int)index ) )
+        return FALSE;
+    if( length > MAX_REQUEST_BYTE_COUNT )
+        return FALSE;
+    if( tr_pieceOffset( tor, index, offset, length ) > tor->info.totalSize )
+        return FALSE;
+
+    return TRUE;
+}
+
+static int
+requestIsValid( const tr_peermsgs * msgs, struct peer_request * req )
+{
+    return reqIsValid( msgs, req->index, req->offset, req->length );
+}
+
 int
 tr_peerMsgsAddRequest( tr_peermsgs * msgs,
                        uint32_t      index, 
@@ -393,9 +416,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
 
     assert( msgs != NULL );
     assert( msgs->torrent != NULL );
-    assert( index < ((uint32_t)msgs->torrent->info.pieceCount) );
-    assert( offset < (uint32_t)tr_torPieceCountBytes( msgs->torrent, (int)index ) );
-    assert( (offset + length) <= (uint32_t)tr_torPieceCountBytes( msgs->torrent, (int)index ) );
+    assert( reqIsValid( msgs, index, offset, length ) );
 
     if( msgs->info->clientIsChoked )
         return TR_ADDREQ_CLIENT_CHOKED;
@@ -610,24 +631,6 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
 }
 
 static int
-requestIsValid( const tr_peermsgs * msgs, struct peer_request * req )
-{
-    const tr_torrent * tor = msgs->torrent;
-    assert( req != NULL );
-
-    if( req->index >= (uint32_t) tor->info.pieceCount )
-        return FALSE;
-    if ( (int)req->offset >= tr_torPieceCountBytes( tor, (int)req->index ) )
-        return FALSE;
-    if( req->length > MAX_REQUEST_BYTE_COUNT )
-        return FALSE;
-    if( tr_pieceOffset( tor, req->index, req->offset, req->length ) > tor->info.totalSize )
-        return FALSE;
-
-    return TRUE;
-}
-
-static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 {
     uint8_t id;
@@ -726,13 +729,12 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
         case BT_PIECE: {
             dbgmsg( msgs, "peer sent us a BT_PIECE" );
             assert( msgs->blockToUs.length == 0 );
-            msgs->state = READING_BT_PIECE;
             tr_peerIoReadUint32( msgs->io, inbuf, &msgs->blockToUs.index );
             tr_peerIoReadUint32( msgs->io, inbuf, &msgs->blockToUs.offset );
             msgs->blockToUs.length = msglen - 8;
-            assert( msgs->blockToUs.length > 0 );
             assert( EVBUFFER_LENGTH(msgs->inBlock) == 0 );
             //evbuffer_drain( msgs->inBlock, ~0 );
+            msgs->state = msgs->blockToUs.length ? READING_BT_PIECE : AWAITING_BT_LENGTH;
             return READ_AGAIN;
             break;
         }
@@ -1010,7 +1012,7 @@ static int
 canWrite( const tr_peermsgs * msgs )
 {
     /* don't let our outbuffer get too large */
-    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 1024 )
+    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 2048 )
         return FALSE;
 
     return TRUE;
@@ -1055,7 +1057,7 @@ pulse( void * vmsgs )
     {
         while ( len && canUpload( msgs ) )
         {
-            const size_t outlen = MIN( len, 1024 );
+            const size_t outlen = MIN( len, 2048 );
             tr_peerIoWrite( msgs->io, EVBUFFER_DATA(msgs->outBlock), outlen );
             evbuffer_drain( msgs->outBlock, outlen );
             peerGotBytes( msgs, outlen );
