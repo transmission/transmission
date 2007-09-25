@@ -39,7 +39,22 @@
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     if (!fIsHidden)
+    {
         [super drawWithFrame: cellFrame inView: controlView];
+        if ([self floatValue] >= 1.0)
+        {
+            if (!fCheckImage)
+            {
+                fCheckImage = [NSImage imageNamed: @"CompleteCheck.png"];
+                [fCheckImage setFlipped: YES];
+            }
+            
+            NSSize imageSize = [fCheckImage size];
+            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
+                            cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
+            [fCheckImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+        }
+    }
 }
 
 @end

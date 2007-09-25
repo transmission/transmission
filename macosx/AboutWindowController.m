@@ -69,10 +69,9 @@ AboutWindowController * fAboutBoxInstance = nil;
     fAboutBoxInstance = nil;
 }
 
-#warning localize OK button
 - (IBAction) showLicense: (id) sender
 {
-	[fLicenseView setString: [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"LICENSE" ofType: nil]]];
+    [fLicenseView setString: [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource: @"LICENSE" ofType: nil]]];
     [fLicenseCloseButton setTitle: NSLocalizedString(@"OK", "About window -> license close button")];
 	
 	[NSApp beginSheet: fLicenseSheet modalForWindow: [self window] modalDelegate: nil didEndSelector: nil contextInfo: nil];
