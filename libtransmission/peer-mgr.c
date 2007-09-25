@@ -559,11 +559,18 @@ broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length
 static int reconnectPulse( void * vtorrent );
 
 static void
+restartReconnectTimer( Torrent * t )
+{
+    tr_timerFree( &t->reconnectTimer );
+    if( t->isRunning )
+        t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
+}
+
+static void
 reconnectNow( Torrent * t )
 {
     reconnectPulse( t );
-    tr_timerFree( &t->reconnectTimer );
-    t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
+    restartReconnectTimer( t );
 }
 
 static int
@@ -590,11 +597,18 @@ reconnectSoon( Torrent * t )
 static int rechokePulse( void * vtorrent );
 
 static void
+restartChokeTimer( Torrent * t )
+{
+    tr_timerFree( &t->rechokeTimer );
+    if( t->isRunning )
+        t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+}
+
+static void
 rechokeNow( Torrent * t )
 {
     rechokePulse( t );
-    tr_timerFree( &t->rechokeTimer );
-    t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+    restartChokeTimer( t );
 }
 
 static int
@@ -876,6 +890,7 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
 {
     Torrent * t = getExistingTorrent( manager, torrentHash );
     t->isRunning = 1;
+    restartChokeTimer( t );
     reconnectNow( t );
 }
 
@@ -885,7 +900,9 @@ tr_peerMgrStopTorrent( tr_peerMgr     * manager,
 {
     Torrent * t = getExistingTorrent( manager, torrentHash );
     t->isRunning = 0;
-    reconnectNow( t );
+    tr_timerFree( &t->rechokeTimer );
+    tr_timerFree( &t->reconnectTimer );
+    reconnectPulse( t );
 }
 
 void
@@ -902,8 +919,8 @@ tr_peerMgrAddTorrent( tr_peerMgr * manager,
     t->tor = tor;
     t->peers = tr_ptrArrayNew( );
     t->requested = tr_bitfieldNew( tor->blockCount );
-    t->rechokeTimer = tr_timerNew( manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
-    t->reconnectTimer = tr_timerNew( manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
+    restartChokeTimer( t );
+    restartReconnectTimer( t );
 
     memcpy( t->hash, tor->info.hash, SHA_DIGEST_LENGTH );
     tr_ptrArrayInsertSorted( manager->torrents, t, torrentCompare );

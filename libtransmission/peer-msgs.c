@@ -44,26 +44,30 @@
 
 enum
 {
-    BT_CHOKE           = 0,
-    BT_UNCHOKE         = 1,
-    BT_INTERESTED      = 2,
-    BT_NOT_INTERESTED  = 3,
-    BT_HAVE            = 4,
-    BT_BITFIELD        = 5,
-    BT_REQUEST         = 6,
-    BT_PIECE           = 7,
-    BT_CANCEL          = 8,
-    BT_PORT            = 9,
-    BT_SUGGEST         = 13,
-    BT_HAVE_ALL        = 14,
-    BT_HAVE_NONE       = 15,
-    BT_REJECT          = 16,
-    BT_ALLOWED_FAST    = 17,
-    BT_LTEP            = 20,
+    BT_CHOKE                  = 0,
+    BT_UNCHOKE                = 1,
+    BT_INTERESTED             = 2,
+    BT_NOT_INTERESTED         = 3,
+    BT_HAVE                   = 4,
+    BT_BITFIELD               = 5,
+    BT_REQUEST                = 6,
+    BT_PIECE                  = 7,
+    BT_CANCEL                 = 8,
+    BT_PORT                   = 9,
+    BT_SUGGEST                = 13,
+    BT_HAVE_ALL               = 14,
+    BT_HAVE_NONE              = 15,
+    BT_REJECT                 = 16,
+    BT_ALLOWED_FAST           = 17,
+    BT_LTEP                   = 20,
 
-    LTEP_HANDSHAKE     = 0,
+    LTEP_HANDSHAKE            = 0,
 
-    OUR_LTEP_PEX       = 1
+    OUR_LTEP_PEX              = 1,
+
+    /* disregard requests that want more than this many bytes.
+       it's common practice in for BT clients to use a 16K threshold */
+    MAX_REQUEST_BYTE_COUNT    = (16 * 1024)
 };
 
 enum
@@ -611,9 +615,16 @@ requestIsValid( const tr_peermsgs * msgs, struct peer_request * req )
 {
     const tr_torrent * tor = msgs->torrent;
     assert( req != NULL );
-    assert( req->index < (uint32_t)tor->info.pieceCount );
-    assert( (int)req->offset < tr_torPieceCountBytes( tor, (int)req->index ) );
-    assert( tr_pieceOffset( tor, req->index, req->offset, req->length ) <= tor->info.totalSize );
+
+    if( req->index >= (uint32_t) tor->info.pieceCount )
+        return FALSE;
+    if ( (int)req->offset >= tr_torPieceCountBytes( tor, (int)req->index ) )
+        return FALSE;
+    if( req->length > MAX_REQUEST_BYTE_COUNT )
+        return FALSE;
+    if( tr_pieceOffset( tor, req->index, req->offset, req->length ) > tor->info.totalSize )
+        return FALSE;
+
     return TRUE;
 }
 
