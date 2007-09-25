@@ -198,11 +198,19 @@ publishMessage( Torrent * tor, const char * msg, int type )
     event.text = msg;
     tr_publisherPublish( tor->publisher, tor, &event );
 }
+
+static void
+publishErrorClear( Torrent * tor )
+{
+    publishMessage( tor, NULL, TR_TRACKER_ERROR_CLEAR );
+}
+
 static void
 publishErrorMessage( Torrent * tor, const char * msg )
 {
     publishMessage( tor, msg, TR_TRACKER_ERROR );
 }
+
 static void
 publishWarningMessage( Torrent * tor, const char * msg )
 {
@@ -263,7 +271,7 @@ tr_trackerScrapeSoon( Tracker * t )
         return;
 
     if( !t->scrapeTimer )
-         t->scrapeTimer = tr_timerNew( t->handle, onTrackerScrapeNow, t, 1000 );
+         t->scrapeTimer = tr_timerNew( t->handle, onTrackerScrapeNow, t, 5000 );
 }
 
 static Tracker*
@@ -450,14 +458,11 @@ static char*
 updateAddresses( Tracker * t, const struct evhttp_request * req )
 {
     char * ret = NULL;
-    int used = 0, max = 0;
     int moveToNextAddress = FALSE;
 
     if( !req )
     {
-        tr_sprintf( &ret, &used, &max,
-                    "Connecting to %s got a NULL response",
-                    t->addresses[t->addressIndex].announce );
+        ret = tr_strdup( "No response from tracker -- will keep trying." );
         tr_inf( ret );
 
         moveToNextAddress = TRUE;
@@ -501,11 +506,7 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
     }
     else 
     {
-        tr_sprintf( &ret, &used, &max,
-                    "Error connecting: %s",
-                    t->addresses[t->addressIndex].announce, 
-                    req->response_code_line );
-
+        ret = tr_strdup( "No response from tracker -- will keep trying." );
         moveToNextAddress = TRUE;
     }
 
@@ -604,6 +605,8 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                     continue;
                 }
 
+                publishErrorClear( tor );
+
                 if(( tmp = tr_bencDictFind( tordict, "complete" )))
                     tor->seeders = tmp->val.i;
 
@@ -655,20 +658,22 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
             t->multiscrapeMax = numResponses;
     }
 
-    if (( errmsg = updateAddresses( t, req ) )) {
+    if (( errmsg = updateAddresses( t, req ) ))
         tr_err( errmsg );
-        tr_free( errmsg );
-    }
 
     if( !tr_ptrArrayEmpty( t->scraping ) )
     {
         int i, n;
         Torrent ** torrents =
             (Torrent**) tr_ptrArrayPeek( t->scraping, &n );
-        for( i=0; i<n; ++i )
+        for( i=0; i<n; ++i ) {
+            if( errmsg != NULL )
+                publishErrorMessage( torrents[i], errmsg );
             onTorrentScrapeNow( torrents[i] );
+        }
         tr_ptrArrayClear( t->scraping );
     }
+    tr_free( errmsg );
 
     if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
         tr_trackerScrapeSoon( t );
@@ -861,6 +866,8 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     {
         benc_val_t benc;
         const int bencLoaded = !parseBencResponse( req, &benc );
+
+        publishErrorClear( tor );
 
         if( bencLoaded && benc.type==TYPE_DICT )
         {

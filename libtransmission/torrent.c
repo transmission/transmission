@@ -171,6 +171,11 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
             break;
 
+        case TR_TRACKER_ERROR_CLEAR:
+            tor->error = 0;
+            tor->errorString[0] = '\0';
+            break;
+
         case TR_TRACKER_STOPPED:
             //assert( tor->runStatus == TR_RUN_STOPPING );
             tor->runStatus = TR_RUN_STOPPED;
