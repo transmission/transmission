@@ -93,7 +93,6 @@ tr_shared * tr_sharedInit( tr_handle * h )
  **********************************************************************/
 void tr_sharedClose( tr_shared * s )
 {
-fprintf( stderr, "deleting pulse tag\n" );
     tr_timerFree( &s->pulseTimer );
 
     tr_netClose( s->bindSocket );

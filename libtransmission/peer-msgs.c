@@ -127,7 +127,6 @@ struct tr_peermsgs
     uint8_t state;
 
     uint8_t ut_pex_id;
-    uint16_t listeningPort;
 
     uint16_t pexCount;
 
@@ -518,8 +517,8 @@ for( i=0; i<sub->val.s.i; ++i ) { fprintf( stderr, "[%c] (%d)\n", sub->val.s.s[i
     /* get peer's listening port */
     sub = tr_bencDictFind( &val, "p" );
     if( tr_bencIsInt( sub ) ) {
-        msgs->listeningPort = htons( (uint16_t)sub->val.i );
-        dbgmsg( msgs, "msgs->port is now %hu", msgs->listeningPort );
+        msgs->info->port = htons( (uint16_t)sub->val.i );
+        dbgmsg( msgs, "msgs->port is now %hu", msgs->info->port );
     }
 
     tr_bencFree( &val );
@@ -741,7 +740,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
         case BT_PORT: {
             assert( msglen == 2 );
             dbgmsg( msgs, "peer sent us a BT_PORT" );
-            tr_peerIoReadUint16( msgs->io, inbuf, &msgs->listeningPort );
+            tr_peerIoReadUint16( msgs->io, inbuf, &msgs->info->port );
             break;
         }
         
