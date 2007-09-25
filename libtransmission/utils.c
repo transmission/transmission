@@ -750,15 +750,18 @@ tr_bitfieldIsEmpty( const tr_bitfield * bitfield )
     return 1;
 }
 
-#define BIN(nth) ((nth>>3))
-#define BIT(nth) (1<<(7-(nth%8)))
+int
+tr_bitfieldHas( const tr_bitfield * bitfield, size_t nth )
+{
+    static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
+    return bitfield!=NULL && (bitfield->bits[nth>>3u] & ands[nth&7u] );
+}
 
 void
 tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
-    assert( bitfield != NULL );
-    assert( BIN(nth) < bitfield->len );
-    bitfield->bits[ BIN(nth) ] |= BIT(nth);
+    static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
+    bitfield->bits[nth>>3u] |= ands[nth&7u];
 }
 
 void
@@ -776,12 +779,10 @@ void
 tr_bitfieldRem( tr_bitfield   * bitfield,
                 size_t          nth )
 {
+    static const uint8_t rems[8] = { 127, 191, 223, 239, 247, 251, 253, 254 };
+
     if( bitfield != NULL )
-    {
-        const size_t bin = BIN(nth);
-        assert( bin < bitfield->len );
-        bitfield->bits[bin] &= ~BIT(nth);
-    }
+        bitfield->bits[nth>>3u] &= rems[nth&7u];
 }
 
 void
