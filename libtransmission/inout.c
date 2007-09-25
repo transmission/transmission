@@ -114,6 +114,7 @@ findFileLocation ( const tr_torrent * tor,
     assert ( *fileOffset < info->files[i].length );
 }
 
+#ifdef WIN32
 static int
 ensureMinimumFileSize ( const tr_torrent  * tor,
                         int                   fileIndex,
@@ -144,6 +145,7 @@ ensureMinimumFileSize ( const tr_torrent  * tor,
 
     return ret;
 }
+#endif
 
 static int
 readOrWritePiece ( tr_torrent       * tor,
@@ -168,10 +170,12 @@ readOrWritePiece ( tr_torrent       * tor,
         const tr_file * file = &info->files[fileIndex];
         const uint64_t bytesThisPass = MIN( buflen, file->length - fileOffset );
 
+#ifdef WIN32
         if( ioMode == TR_IO_WRITE )
             ret = ensureMinimumFileSize( tor, fileIndex,
                                          fileOffset + bytesThisPass );
         if( !ret )
+#endif
             ret = readOrWriteBytes( tor, ioMode,
                                     fileIndex, fileOffset, buf, bytesThisPass );
         buf += bytesThisPass;
