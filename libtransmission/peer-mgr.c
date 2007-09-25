@@ -762,11 +762,12 @@ initiateHandshake( tr_peerMgr * manager, tr_peerIo * io )
 void
 tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                        struct in_addr  * addr,
+                       uint16_t          port,
                        int               socket )
 {
     if( getExistingHandshake( manager, addr ) == NULL )
     {
-        tr_peerIo * io = tr_peerIoNewIncoming( manager->handle, addr, socket );
+        tr_peerIo * io = tr_peerIoNewIncoming( manager->handle, addr, port, socket );
         initiateHandshake( manager, io );
     }
 }

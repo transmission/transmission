@@ -38,6 +38,7 @@ tr_peerIo*
 tr_peerIo*
       tr_peerIoNewIncoming( struct tr_handle   * handle,
                             struct in_addr     * addr,
+                            uint16_t             port,
                             int                  socket );
 
 void  tr_peerIoFree      ( tr_peerIo  * io );

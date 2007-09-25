@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +32,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#include <evutil.h>
 
 #include "transmission.h"
 #include "net.h"
@@ -114,9 +117,9 @@ void tr_fdInit( void )
     for( j = 0; j < i; j++ )
     {
 #ifdef BEOS_NETSERVER
-	    closesocket( s[j] );
+        closesocket( s[j] );
 #else
-	    close( s[j] );
+        EVUTIL_CLOSESOCKET( s[j] );
 #endif
     }
 
@@ -355,11 +358,15 @@ int tr_fdSocketCreate( int type, int priority )
     return s;
 }
 
-int tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
+int
+tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
 {
     int s = -1;
     unsigned len;
     struct sockaddr_in sock;
+
+    assert( addr != NULL );
+    assert( port != NULL );
 
     tr_lockLock( gFd->lock );
     if( gFd->normal < gFd->normalMax )
@@ -370,14 +377,8 @@ int tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
     if( s > -1 )
     {
         SocketSetPriority( s, 0 );
-        if( NULL != addr )
-        {
-            *addr = sock.sin_addr;
-        }
-        if( NULL != port )
-        {
-            *port = sock.sin_port;
-        }
+        *addr = sock.sin_addr;
+        *port = sock.sin_port;
         gFd->normal++;
     }
     tr_lockUnlock( gFd->lock );
@@ -396,7 +397,7 @@ void tr_fdSocketClose( int s )
 #ifdef BEOS_NETSERVER
         closesocket( s );
 #else
-        close( s );
+        EVUTIL_CLOSESOCKET( s );
 #endif
         if( SocketGetPriority( s ) )
             gFd->reserved--;

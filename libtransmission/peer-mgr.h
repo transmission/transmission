@@ -40,6 +40,7 @@ int tr_peerMgrIsAcceptingConnections( const tr_peerMgr * manager );
 
 void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                             struct in_addr  * addr,
+                            uint16_t          port,
                             int               socket );
 
 void tr_peerMgrAddPeers( tr_peerMgr     * manager,

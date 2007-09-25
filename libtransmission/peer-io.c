@@ -106,11 +106,10 @@ gotErrorWrapper( struct bufferevent * e, short what, void * userData )
 ***
 **/
 
-//static int total_io = 0;
-
 static tr_peerIo*
 tr_peerIoNew( struct tr_handle  * handle,
               struct in_addr    * in_addr,
+              uint16_t            port,
               const uint8_t     * torrentHash,
               int                 isIncoming,
               int                 socket )
@@ -120,6 +119,7 @@ tr_peerIoNew( struct tr_handle  * handle,
     c->crypto = tr_cryptoNew( torrentHash, isIncoming );
     c->handle = handle;
     c->in_addr = *in_addr;
+    c->port = port;
     c->socket = socket;
     c->rateToPeer = tr_rcInit( );
     c->rateToClient = tr_rcInit( );
@@ -136,17 +136,16 @@ tr_peerIoNew( struct tr_handle  * handle,
 tr_peerIo*
 tr_peerIoNewIncoming( struct tr_handle  * handle,
                       struct in_addr    * in_addr,
+                      uint16_t            port,
                       int                 socket )
 {
-    tr_peerIo * c;
-
     assert( handle != NULL );
     assert( in_addr != NULL );
     assert( socket >= 0 );
 
-    c = tr_peerIoNew( handle, in_addr, NULL, 1, socket );
-    c->port = -1;
-    return c;
+    return tr_peerIoNew( handle, in_addr, port,
+                         NULL, 1,
+                         socket );
 }
 
 tr_peerIo*
@@ -155,17 +154,14 @@ tr_peerIoNewOutgoing( struct tr_handle  * handle,
                       int                 port,
                       const uint8_t     * torrentHash )
 {
-    tr_peerIo * c;
-
     assert( handle != NULL );
     assert( in_addr != NULL );
     assert( port >= 0 );
     assert( torrentHash != NULL );
 
-    c = tr_peerIoNew( handle, in_addr, torrentHash, 0,
-                      tr_netOpenTCP( in_addr, port, 0 ) );
-    c->port = port;
-    return c;
+    return tr_peerIoNew( handle, in_addr, port,
+                         torrentHash, 0,
+                         tr_netOpenTCP( in_addr, port, 0 ) );
 }
 
 void

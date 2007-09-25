@@ -280,15 +280,16 @@ AcceptPeers( tr_shared * s )
     for( ;; )
     {
         int socket;
+        uint16_t port;
         struct in_addr addr;
 
         if( s->bindSocket < 0 || !tr_peerMgrIsAcceptingConnections( s->h->peerMgr ) )
             break;
 
-        socket = tr_netAccept( s->bindSocket, &addr, NULL );
+        socket = tr_netAccept( s->bindSocket, &addr, &port );
         if( socket < 0 )
             break;
 
-        tr_peerMgrAddIncoming( s->h->peerMgr, &addr, socket );
+        tr_peerMgrAddIncoming( s->h->peerMgr, &addr, port, socket );
     }
 }

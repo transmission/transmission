@@ -34,6 +34,8 @@
 #include <fcntl.h>
 #endif
 
+#include <evutil.h>
+
 #include "transmission.h"
 #include "fdlimit.h"
 #include "net.h"
@@ -73,38 +75,33 @@ int tr_netResolve( const char * address, struct in_addr * addr )
  * TCP/UDP sockets
  **********************************************************************/
 
-static int makeSocketNonBlocking( int s )
+static int
+makeSocketNonBlocking( int fd )
 {
-#ifdef WIN32
-    unsigned long flags = 1;
-    if( ioctlsocket( s, FIONBIO, &flags) == SOCKET_ERROR )
-#elif defined(__BEOS__)
-    int flags = 1;
-    if( setsockopt( s, SOL_SOCKET, SO_NONBLOCK,
-                    &flags, sizeof( int ) ) < 0 )
-#else
-    int flags = 1;
-    if( ( flags = fcntl( s, F_GETFL, 0 ) ) < 0 ||
-        fcntl( s, F_SETFL, flags | O_NONBLOCK ) < 0 )
-#endif
+    if( fd >= 0 )
     {
-        tr_err( "Couldn't set socket to non-blocking mode (%s)",
-                strerror( sockerrno ) );
-        tr_netClose( s );
-        return -1;
+#if defined(__BEOS__)
+        int flags = 1;
+        if( setsockopt( fd, SOL_SOCKET, SO_NONBLOCK,
+                        &flags, sizeof( int ) ) < 0 )
+#else
+        if( evutil_make_socket_nonblocking( fd ) )
+#endif
+        {
+            tr_err( "Couldn't set socket to non-blocking mode (%s)",
+                    strerror( sockerrno ) );
+            tr_netClose( fd );
+            fd = -1;
+        }
     }
 
-    return s;
+    return fd;
 }
 
-static int createSocket( int type, int priority )
+static int
+createSocket( int type, int priority )
 {
-    int s;
-    if( ( s = tr_fdSocketCreate( type, priority ) ) < 0 )
-    {
-        return -1;
-    }
-    return makeSocketNonBlocking( s );
+    return makeSocketNonBlocking( tr_fdSocketCreate( type, priority ) );
 }
 
 static int
@@ -238,14 +235,10 @@ tr_netBindUDP( int port )
 }
 
 
-int tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
+int
+tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
 {
-    int s;
-    if( ( s = tr_fdSocketAccept( b, addr, port ) ) < 0 )
-    {
-        return -1;
-    }
-    return makeSocketNonBlocking( s );
+    return makeSocketNonBlocking( tr_fdSocketAccept( b, addr, port ) );
 }
 
 int
