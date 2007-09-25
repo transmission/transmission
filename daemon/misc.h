@@ -29,7 +29,7 @@
 #include <inttypes.h>
 #include <limits.h>
 
-#include <libtransmission/bsdqueue.h>
+#include "bsdqueue.h"
 
 #define CONF_FILE_LOCK          "lock"
 #define CONF_FILE_SOCKET        "socket"

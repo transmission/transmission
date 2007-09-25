@@ -35,12 +35,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libtransmission/bsdqueue.h>
 #include <libtransmission/bsdtree.h>
 #include <libtransmission/bencode.h>
 #include <libtransmission/ipcparse.h>
 #include <libtransmission/trcompat.h>
 
+#include "bsdqueue.h"
 #include "client.h"
 #include "errors.h"
 #include "misc.h"

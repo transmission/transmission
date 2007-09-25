@@ -8,6 +8,7 @@ libdaemon_a_SOURCES = \
     misc.c
 
 noinst_HEADERS = \
+    bsdqueue.h \
     client.h \
     errors.h \
     misc.h \
