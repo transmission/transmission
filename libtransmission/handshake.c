@@ -749,6 +749,7 @@ readYa( tr_handshake * handshake, struct evbuffer  * inbuf )
     const uint8_t *myKey, *secret;
     int len;
 
+dbgmsg( handshake, "in readYa... need %d, have %d", (int)KEY_LEN, (int)EVBUFFER_LENGTH( inbuf ) );
     if( EVBUFFER_LENGTH( inbuf ) < KEY_LEN )
         return READ_MORE;
 
@@ -758,6 +759,7 @@ readYa( tr_handshake * handshake, struct evbuffer  * inbuf )
     memcpy( handshake->mySecret, secret, KEY_LEN );
     tr_sha1( handshake->myReq1, "req1", 4, secret, KEY_LEN, NULL );
 
+dbgmsg( handshake, "sending out our pad a" );
     /* send our public key to the peer */
     walk = outbuf;
     myKey = tr_cryptoGetMyPublicKey( handshake->crypto, &len );
@@ -768,8 +770,7 @@ readYa( tr_handshake * handshake, struct evbuffer  * inbuf )
 
     setReadState( handshake, AWAITING_PAD_A );
     tr_peerIoWrite( handshake->io, outbuf, walk-outbuf );
-
-    return READ_DONE;
+    return READ_AGAIN;
 }
 
 static int
