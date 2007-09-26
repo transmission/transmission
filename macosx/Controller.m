@@ -101,24 +101,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 + (void) initialize
 {
-    //make sure system requirements are met
-    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_3)
-    {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle: NSLocalizedString(@"Quit", "OS update needed -> button")];
-        [alert setMessageText: NSLocalizedString(@"Transmission requires Mac OS X 10.4 or greater.",
-                                                "OS update needed -> title")];
-        [alert setInformativeText: NSLocalizedString(@"Transmission has features that require a more "
-            "up-to-date operating system. The operating system must be updated before this version can run.",
-            "OS update needed -> message")];
-        [alert setAlertStyle: NSWarningAlertStyle];
-        
-        [alert runModal];
-        [alert release];
-        
-        exit(0);
-    }
-    
     //make sure another Transmission.app isn't running already
     NSString * bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];

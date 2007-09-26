@@ -43,7 +43,6 @@
                 stopAllTorrents = id; 
                 stopSelectedTorrents = id; 
                 switchFilter = id; 
-                toggleAdvancedBar = id; 
                 toggleFilterBar = id; 
                 toggleSmallView = id; 
                 toggleSpeedLimit = id; 

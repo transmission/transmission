@@ -252,17 +252,15 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     [titleString drawInRect: titleRect];
     
     //progress
-    NSRect progressRect;
     if (!minimal)
     {
         NSAttributedString * progressString = [self attributedStatusString: [torrent progressString] withColor: statusColor];
-        progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
+        NSRect progressRect = [self rectForProgressWithString: progressString inBounds: cellFrame];
         [progressString drawInRect: progressRect];
     }
     
     //bar
     NSRect barRect = [self barRectForBounds: cellFrame];
-    //[fDefaults boolForKey: @"UseAdvancedBar"] ? [self drawAdvancedBar: barRect] : [self drawSimpleBar: barRect];
     [self drawBar: barRect];
     
     //status
