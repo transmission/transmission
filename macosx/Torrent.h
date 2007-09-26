@@ -190,8 +190,8 @@ typedef enum
 - (float) uploadRate;
 - (uint64_t) haveVerified;
 - (uint64_t) haveTotal;
-- (uint64_t) uploadedTotal;
 - (uint64_t) downloadedTotal;
+- (uint64_t) uploadedTotal;
 - (uint64_t) failedHash;
 - (float) swarmSpeed;
 
