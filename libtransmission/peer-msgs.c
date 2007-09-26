@@ -63,7 +63,7 @@ enum
 
     MAX_REQUEST_BYTE_COUNT  = (16 * 1024), /* drop requests who want too much */
 
-    KEEPALIVE_INTERVAL      = (90 * 1000), /* msec between calls to sendKeepalive() */
+    KEEPALIVE_INTERVAL_SECS = 90,          /* idle seconds before we send a keepalive */
     PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
     PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
 };
@@ -112,12 +112,12 @@ struct tr_peermsgs
 
     tr_timer * pulseTimer;
     tr_timer * pexTimer;
-    tr_timer * keepaliveTimer;
 
     struct peer_request blockToUs; /* the block currntly being sent to us */
 
     time_t lastReqAddedAt;
     time_t clientSentPexAt;
+    time_t clientSentAnythingAt;
 
     unsigned int notListening          : 1;
     unsigned int peerSupportsPex       : 1;
@@ -989,6 +989,13 @@ canRead( struct bufferevent * evin, void * vmsgs )
     return ret;
 }
 
+static void
+sendKeepalive( tr_peermsgs * msgs )
+{
+    dbgmsg( msgs, "sending a keepalive message" );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 0 );
+}
+
 /**
 ***
 **/
@@ -1023,6 +1030,7 @@ canUpload( const tr_peermsgs * msgs )
 static int
 pulse( void * vmsgs )
 {
+    const time_t now = time( NULL );
     tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     size_t len;
 
@@ -1047,13 +1055,15 @@ pulse( void * vmsgs )
             evbuffer_drain( msgs->outBlock, outlen );
             peerGotBytes( msgs, outlen );
             len -= outlen;
-            msgs->info->clientSentPieceDataAt = time( NULL );
+            msgs->info->clientSentPieceDataAt = now;
+            msgs->clientSentAnythingAt = now;
             dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }
     }
     else if(( len = EVBUFFER_LENGTH( msgs->outMessages ) ))
     {
         tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
+        msgs->clientSentAnythingAt = now;
     }
     else if(( msgs->peerAskedFor ))
     {
@@ -1069,6 +1079,10 @@ pulse( void * vmsgs )
         tr_free( tmp );
         dbgmsg( msgs, "putting req into out queue: index %d, offset %d, length %d ... %d blocks left in our queue", (int)req->index, (int)req->offset, (int)req->length, tr_list_size(msgs->peerAskedFor) );
         tr_free( req );
+    }
+    else if( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS )
+    {
+        sendKeepalive( msgs );
     }
 
     return TRUE; /* loop forever */
@@ -1095,13 +1109,6 @@ sendBitfield( tr_peermsgs * msgs )
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + bitfield->len );
     tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_BITFIELD );
     tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, bitfield->bits, bitfield->len );
-}
-
-static void
-sendKeepalive( tr_peermsgs * msgs )
-{
-    dbgmsg( msgs, "sending a keepalive message" );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 0 );
 }
 
 /**
@@ -1251,13 +1258,6 @@ pexPulse( void * vpeer )
     return TRUE;
 }
 
-static int
-keepalivePulse( void * vpeer )
-{
-    sendKeepalive( vpeer );
-    return TRUE;
-}
-
 /**
 ***
 **/
@@ -1283,7 +1283,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
     msgs->info->have = tr_bitfieldNew( torrent->info.pieceCount );
     msgs->pulseTimer = tr_timerNew( msgs->handle, pulse, msgs, PEER_PULSE_INTERVAL );
     msgs->pexTimer = tr_timerNew( msgs->handle, pexPulse, msgs, PEX_INTERVAL );
-    msgs->keepaliveTimer = tr_timerNew( msgs->handle, keepalivePulse, msgs, KEEPALIVE_INTERVAL );
     msgs->outMessages = evbuffer_new( );
     msgs->outBlock = evbuffer_new( );
     msgs->inBlock = evbuffer_new( );
@@ -1318,7 +1317,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 {
     if( msgs != NULL )
     {
-        tr_timerFree( &msgs->keepaliveTimer );
         tr_timerFree( &msgs->pulseTimer );
         tr_timerFree( &msgs->pexTimer );
         tr_publisherFree( &msgs->publisher );
