@@ -47,29 +47,21 @@
     if (size < 1048576)
     {
         convertedSize = size / 1024.0;
-        unit = NSLocalizedString(@" KB", "File size (beware of leading space)");
+        unit = NSLocalizedString(@"KB", "File size (beware of leading space)");
     }
     else if (size < 1073741824)
     {
         convertedSize = size / 1048576.0;
-        unit = NSLocalizedString(@" MB", "File size (beware of leading space)");
+        unit = NSLocalizedString(@"MB", "File size (beware of leading space)");
     }
     else
     {
         convertedSize = size / 1073741824.0;
-        unit = NSLocalizedString(@" GB", "File size (beware of leading space)");
+        unit = NSLocalizedString(@"GB", "File size (beware of leading space)");
     }
-
-    NSString * sizeString;
-    //attempt to have values with 3 digits
-    if (convertedSize < 10.0)
-        sizeString = [NSString stringWithFormat: @"%.2f", convertedSize];
-    else if (convertedSize < 100.0)
-        sizeString = [NSString stringWithFormat: @"%.1f", convertedSize];
-    else
-        sizeString = [NSString stringWithFormat: @"%.0f", convertedSize];
-
-    return [sizeString stringByAppendingString: unit];
+    
+    //attempt to have minimum of 3 digits with at least 1 decimal
+    return [NSString stringWithFormat: convertedSize < 10.0 ? @"%.2f %@" : @"%.1f %@", convertedSize, unit];
 }
 
 + (NSString *) stringForSpeed: (float) speed
