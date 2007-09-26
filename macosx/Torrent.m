@@ -1160,14 +1160,19 @@ static int static_lastid = 0;
     return [self haveVerified] + fStat->haveUnchecked;
 }
 
+- (uint64_t) uploadedTotal
+{
+    return fStat->uploadedEver;
+}
+
 - (uint64_t) downloadedTotal
 {
     return fStat->downloadedEver;
 }
 
-- (uint64_t) uploadedTotal
+- (uint64_t) failedHash
 {
-    return fStat->uploadedEver;
+    return fStat->corruptEver;
 }
 
 - (float) swarmSpeed

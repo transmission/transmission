@@ -332,10 +332,6 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
             }
             else if ([torrent isSeeding])
             {
-                #warning integer-ize!
-                /*NSRect ratioRect = completeRect;
-                ratioRect.size.width *= [torrent progressStopRatio];*/
-                
                 int ratioLeftWidth = leftWidth * (1.0 - [torrent progressStopRatio]);
                 leftWidth -= ratioLeftWidth;
                 

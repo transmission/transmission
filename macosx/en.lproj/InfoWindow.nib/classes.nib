@@ -35,6 +35,7 @@
                 fDownloadedTotalField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
                 fErrorMessageView = NSTextView; 
+                fFailedHashField = NSTextField; 
                 fFileCheckItem = NSMenuItem; 
                 fFileOutline = FileOutlineView; 
                 fFilePriorityHigh = NSMenuItem; 

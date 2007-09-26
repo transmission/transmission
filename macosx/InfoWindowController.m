@@ -35,7 +35,7 @@
 
 //15 spacing at the bottom of each tab
 #define TAB_INFO_HEIGHT 268.0
-#define TAB_ACTIVITY_HEIGHT 274.0
+#define TAB_ACTIVITY_HEIGHT 290.0
 #define TAB_OPTIONS_HEIGHT 158.0
 #define TAB_RESIZABLE_MIN_HEIGHT 279.0
 
@@ -157,6 +157,7 @@
             [fHaveField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
+            [fFailedHashField setStringValue: @""];
             
             //options fields
             [fUploadLimitPopUp setEnabled: NO];
@@ -374,7 +375,7 @@
     if (numberSelected == 0)
         return;
     
-    uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0;
+    uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0, failedHash = 0;
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -383,6 +384,7 @@
         haveVerified += [torrent haveVerified];
         downloadedTotal += [torrent downloadedTotal];
         uploadedTotal += [torrent uploadedTotal];
+        failedHash += [torrent failedHash];
     }
     
     if (have == 0)
@@ -396,6 +398,7 @@
     
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
+    [fFailedHashField setStringValue: [NSString stringForFileSize: failedHash]];
     
     if (numberSelected == 1)
     {
