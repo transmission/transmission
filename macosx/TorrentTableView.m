@@ -133,7 +133,7 @@
     }
     else
     {
-        if ([event modifierFlags] & NSAlternateKeyMask)
+        if (/*[event modifierFlags] & NSAlternateKeyMask*/NO)
         {
             [fDefaults setBool: ![fDefaults boolForKey: @"UseAdvancedBar"] forKey: @"UseAdvancedBar"];
             fClickPoint = NSZeroPoint;

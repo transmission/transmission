@@ -116,8 +116,6 @@
 	<true/>
 	<key>UploadLimit</key>
 	<integer>20</integer>
-	<key>UseAdvancedBar</key>
-	<false/>
 	<key>UseIncompleteDownloadFolder</key>
 	<false/>
 	<key>WarningDebug</key>

@@ -2648,10 +2648,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 }
 
-- (void) toggleAdvancedBar: (id) sender
+/*- (void) toggleAdvancedBar: (id) sender
 {
     [fTableView display];
-}
+}*/
 
 - (void) doNothing: (id) sender {}
 
