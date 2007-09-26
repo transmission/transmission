@@ -181,7 +181,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     else
         result.origin.y += PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS + PADDING_BETWEEN_PROGRESS_AND_BAR;
     
-    result.size.width = NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL - BUTTONS_TOTAL_WIDTH;
+    result.size.width = round(NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL - BUTTONS_TOTAL_WIDTH);
     
     return result;
 }
@@ -278,88 +278,105 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
 
 @implementation TorrentCell (Private)
 
-#warning NSDivideRect ?
 - (void) drawSimpleBar: (NSRect) barRect
 {
     Torrent * torrent = [self representedObject];
     
+    int leftWidth = barRect.size.width;
     float progress = [torrent progress], left = [torrent progressLeft];
     
     if (progress < 1.0)
     {
-        if (!fWhiteGradient)
-            fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
-        [fWhiteGradient fillRect: barRect angle: -90];
+        int rightWidth = leftWidth * progress;
+        leftWidth -= rightWidth;
         
-        float include = progress + left;
-        if (include < 1.0)
+        float rightProgress = 1.0 - progress;
+        if (left < rightProgress)
         {
-            if (!fLightGrayGradient)
-                fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
+            int rightNoIncludeWidth = rightWidth * ((rightProgress - left) / rightProgress);
+            rightWidth -= rightNoIncludeWidth;
             
             NSRect noIncludeRect = barRect;
-            noIncludeRect.origin.x += barRect.size.width * include;
-            noIncludeRect.size.width *= 1.0 - include;
+            noIncludeRect.origin.x += barRect.size.width - rightNoIncludeWidth;
+            noIncludeRect.size.width = rightNoIncludeWidth;
+            
+            if (!fLightGrayGradient)
+                fLightGrayGradient = [[CTGradient progressLightGrayGradient] retain];
             [fLightGrayGradient fillRect: noIncludeRect angle: -90];
         }
+        
+        if (leftWidth > 0)
+        {
+            NSRect includeRect = barRect;
+            includeRect.origin.x += leftWidth;
+            includeRect.size.width = rightWidth;
+            
+            if (!fWhiteGradient)
+                fWhiteGradient = [[CTGradient progressWhiteGradient] retain];
+            [fWhiteGradient fillRect: includeRect angle: -90];
+        }
     }
     
-    NSRect completeRect = barRect;
-    completeRect.size.width *= progress;
-    
-    if ([torrent isActive])
+    if (leftWidth > 0)
     {
-        if ([torrent isChecking])
+        NSRect completeRect = barRect;
+        completeRect.size.width = leftWidth;
+        
+        if ([torrent isActive])
         {
-            if (!fYellowGradient)
-                fYellowGradient = [[CTGradient progressYellowGradient] retain];
-            [fYellowGradient fillRect: completeRect angle: -90];
-        }
-        else if ([torrent isSeeding])
-        {
-            NSRect ratioRect = completeRect;
-            ratioRect.size.width *= [torrent progressStopRatio];
-            
-            if (ratioRect.size.width < completeRect.size.width)
+            if ([torrent isChecking])
             {
-                if (!fLightGreenGradient)
-                    fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
-                [fLightGreenGradient fillRect: completeRect angle: -90];
+                if (!fYellowGradient)
+                    fYellowGradient = [[CTGradient progressYellowGradient] retain];
+                [fYellowGradient fillRect: completeRect angle: -90];
             }
-            
-            if (!fGreenGradient)
-                fGreenGradient = [[CTGradient progressGreenGradient] retain];
-            [fGreenGradient fillRect: ratioRect angle: -90]; 
-        }
-        else
-        {
-            if (!fBlueGradient)
-                fBlueGradient = [[CTGradient progressBlueGradient] retain];
-            [fBlueGradient fillRect: completeRect angle: -90];
-        }
-    }
-    else
-    {
-        if ([torrent waitingToStart])
-        {
-            if (left <= 0.0)
+            else if ([torrent isSeeding])
             {
-                if (!fDarkGreenGradient)
-                    fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
-                [fDarkGreenGradient fillRect: completeRect angle: -90];
+                #warning integer-ize!
+                NSRect ratioRect = completeRect;
+                ratioRect.size.width *= [torrent progressStopRatio];
+                
+                if (ratioRect.size.width < completeRect.size.width)
+                {
+                    if (!fLightGreenGradient)
+                        fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
+                    [fLightGreenGradient fillRect: completeRect angle: -90];
+                }
+                
+                if (!fGreenGradient)
+                    fGreenGradient = [[CTGradient progressGreenGradient] retain];
+                [fGreenGradient fillRect: ratioRect angle: -90]; 
             }
             else
             {
-                if (!fDarkBlueGradient)
-                    fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
-                [fDarkBlueGradient fillRect: completeRect angle: -90];
+                if (!fBlueGradient)
+                    fBlueGradient = [[CTGradient progressBlueGradient] retain];
+                [fBlueGradient fillRect: completeRect angle: -90];
             }
         }
         else
         {
-            if (!fGrayGradient)
-                fGrayGradient = [[CTGradient progressGrayGradient] retain];
-            [fGrayGradient fillRect: completeRect angle: -90];
+            if ([torrent waitingToStart])
+            {
+                if (left <= 0.0)
+                {
+                    if (!fDarkGreenGradient)
+                        fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
+                    [fDarkGreenGradient fillRect: completeRect angle: -90];
+                }
+                else
+                {
+                    if (!fDarkBlueGradient)
+                        fDarkBlueGradient = [[CTGradient progressDarkBlueGradient] retain];
+                    [fDarkBlueGradient fillRect: completeRect angle: -90];
+                }
+            }
+            else
+            {
+                if (!fGrayGradient)
+                    fGrayGradient = [[CTGradient progressGrayGradient] retain];
+                [fGrayGradient fillRect: completeRect angle: -90];
+            }
         }
     }
     
