@@ -154,7 +154,7 @@
                                                             "Inspector -> above tabs -> selected torrents")];
             [fSizeField setStringValue: @""];
     
-            [fDownloadedValidField setStringValue: @""];
+            [fHaveField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
             [fUploadedTotalField setStringValue: @""];
             
@@ -374,17 +374,26 @@
     if (numberSelected == 0)
         return;
     
-    uint64_t  downloadedValid = 0, downloadedTotal = 0, uploadedTotal = 0;
+    uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0;
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
     {
-        downloadedValid += [torrent downloadedValid];
+        have += [torrent haveTotal];
+        haveVerified += [torrent haveVerified];
         downloadedTotal += [torrent downloadedTotal];
         uploadedTotal += [torrent uploadedTotal];
     }
-
-    [fDownloadedValidField setStringValue: [NSString stringForFileSize: downloadedValid]];
+    
+    if (have == 0)
+        [fHaveField setStringValue: [NSString stringForFileSize: 0]];
+    else if (have == haveVerified)
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified", "Inspector -> Activity tab -> have"),
+                                    [NSString stringForFileSize: haveVerified]]];
+    else
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)", "Inspector -> Activity tab -> have"),
+                                    [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
+    
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
     

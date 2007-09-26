@@ -33,7 +33,6 @@
                 fDownloadLimitLabel = NSTextField; 
                 fDownloadLimitPopUp = NSPopUpButton; 
                 fDownloadedTotalField = NSTextField; 
-                fDownloadedValidField = NSTextField; 
                 fDownloadingFromField = NSTextField; 
                 fErrorMessageView = NSTextView; 
                 fFileCheckItem = NSMenuItem; 
@@ -44,6 +43,7 @@
                 fFileTableStatusField = NSTextField; 
                 fFileUncheckItem = NSMenuItem; 
                 fHashField = NSTextField; 
+                fHaveField = NSTextField; 
                 fImageView = NSImageView; 
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 

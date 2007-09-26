@@ -44,7 +44,7 @@
                         * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fCreatorField, * fDateCreatedField,
                         * fStateField, * fProgressField,
-                        * fDownloadedValidField, * fDownloadedTotalField, * fUploadedTotalField,
+                        * fHaveField, * fDownloadedTotalField, * fUploadedTotalField,
                         * fRatioField, * fSwarmSpeedField;
     IBOutlet NSTextView * fCommentView;
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;

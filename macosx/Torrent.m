@@ -281,25 +281,25 @@ static int static_lastid = 0;
     {
         if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
         {
-            uint64_t downloadedValid = [self downloadedValid];
+            uint64_t have = [self haveTotal];
             [progressString appendFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: downloadedValid],
-                            [NSString stringForFileSize: downloadedValid + fStat->left], 100.0 * [self progressDone]];
+                            [NSString stringForFileSize: have], [NSString stringForFileSize: have + fStat->leftUntilDone],
+                            100.0 * [self progressDone]];
         }
         else
             [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: [self downloadedValid]],
+                            [NSString stringForFileSize: [self haveTotal]],
                             [NSString stringForFileSize: [self size]], 100.0 * [self progress]];
     }
     else if (![self isComplete])
     {
         if ([fDefaults boolForKey: @"DisplayStatusProgressSelected"])
             [progressString appendFormat: NSLocalizedString(@"%@ selected, uploaded %@ (Ratio: %@)",
-                "Torrent -> progress string"), [NSString stringForFileSize: [self downloadedValid]],
+                "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
                 [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
         else
             [progressString appendFormat: NSLocalizedString(@"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)",
-                "Torrent -> progress string"), [NSString stringForFileSize: [self downloadedValid]],
+                "Torrent -> progress string"), [NSString stringForFileSize: [self haveTotal]],
                 [NSString stringForFileSize: [self size]], 100.0 * [self progress],
                 [NSString stringForFileSize: [self uploadedTotal]], [NSString stringForRatio: [self ratio]]];
     }
@@ -971,7 +971,7 @@ static int static_lastid = 0;
 
 - (float) progressLeft
 {
-    return (float)fStat->left/[self size];
+    return (float)fStat->leftUntilDone/[self size];
 }
 
 - (int) eta
@@ -1150,19 +1150,24 @@ static int static_lastid = 0;
     return fStat->rateUpload;
 }
 
-- (uint64_t) downloadedValid
+- (uint64_t) haveVerified
 {
-    return fStat->downloadedValid;
+    return fStat->haveValid;
+}
+
+- (uint64_t) haveTotal
+{
+    return [self haveVerified] + fStat->haveUnchecked;
 }
 
 - (uint64_t) downloadedTotal
 {
-    return fStat->downloaded;
+    return fStat->downloadedEver;
 }
 
 - (uint64_t) uploadedTotal
 {
-    return fStat->uploaded;
+    return fStat->uploadedEver;
 }
 
 - (float) swarmSpeed
