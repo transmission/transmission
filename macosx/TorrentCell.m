@@ -287,10 +287,10 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     
     if (progress < 1.0)
     {
-        int rightWidth = leftWidth * progress;
+        float rightProgress = 1.0 - progress, progressLeft = [torrent progressLeft];
+        int rightWidth = leftWidth * rightProgress;
         leftWidth -= rightWidth;
         
-        float rightProgress = 1.0 - progress, progressLeft = [torrent progressLeft];
         if (progressLeft < rightProgress)
         {
             int rightNoIncludeWidth = rightWidth * ((rightProgress - progressLeft) / rightProgress);
@@ -305,7 +305,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
             [fLightGrayGradient fillRect: noIncludeRect angle: -90];
         }
         
-        if (leftWidth > 0)
+        if (rightWidth > 0)
         {
             NSRect includeRect = barRect;
             includeRect.origin.x += leftWidth;
