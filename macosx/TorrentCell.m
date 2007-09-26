@@ -283,17 +283,17 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
     Torrent * torrent = [self representedObject];
     
     int leftWidth = barRect.size.width;
-    float progress = [torrent progress], left = [torrent progressLeft];
+    float progress = [torrent progress];
     
     if (progress < 1.0)
     {
         int rightWidth = leftWidth * progress;
         leftWidth -= rightWidth;
         
-        float rightProgress = 1.0 - progress;
-        if (left < rightProgress)
+        float rightProgress = 1.0 - progress, progressLeft = [torrent progressLeft];
+        if (progressLeft < rightProgress)
         {
-            int rightNoIncludeWidth = rightWidth * ((rightProgress - left) / rightProgress);
+            int rightNoIncludeWidth = rightWidth * ((rightProgress - progressLeft) / rightProgress);
             rightWidth -= rightNoIncludeWidth;
             
             NSRect noIncludeRect = barRect;
@@ -333,19 +333,31 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
             else if ([torrent isSeeding])
             {
                 #warning integer-ize!
-                NSRect ratioRect = completeRect;
-                ratioRect.size.width *= [torrent progressStopRatio];
+                /*NSRect ratioRect = completeRect;
+                ratioRect.size.width *= [torrent progressStopRatio];*/
                 
-                if (ratioRect.size.width < completeRect.size.width)
+                int ratioLeftWidth = leftWidth * (1.0 - [torrent progressStopRatio]);
+                leftWidth -= ratioLeftWidth;
+                
+                if (ratioLeftWidth > 0)
                 {
+                    NSRect ratioLeftRect = barRect;
+                    ratioLeftRect.origin.x += leftWidth;
+                    ratioLeftRect.size.width = ratioLeftWidth;
+                    
                     if (!fLightGreenGradient)
                         fLightGreenGradient = [[CTGradient progressLightGreenGradient] retain];
-                    [fLightGreenGradient fillRect: completeRect angle: -90];
+                    [fLightGreenGradient fillRect: ratioLeftRect angle: -90];
                 }
                 
-                if (!fGreenGradient)
-                    fGreenGradient = [[CTGradient progressGreenGradient] retain];
-                [fGreenGradient fillRect: ratioRect angle: -90]; 
+                if (leftWidth > 0)
+                {
+                    completeRect.size.width = leftWidth;
+                    
+                    if (!fGreenGradient)
+                        fGreenGradient = [[CTGradient progressGreenGradient] retain];
+                    [fGreenGradient fillRect: completeRect angle: -90];
+                }
             }
             else
             {
@@ -358,7 +370,7 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
         {
             if ([torrent waitingToStart])
             {
-                if (left <= 0.0)
+                if ([torrent progressLeft] <= 0.0)
                 {
                     if (!fDarkGreenGradient)
                         fDarkGreenGradient = [[CTGradient progressDarkGreenGradient] retain];
