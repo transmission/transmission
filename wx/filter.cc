@@ -49,7 +49,7 @@ TorrentFilter :: GetFlags( const tr_torrent * tor )
         ? FLAG_ACTIVE
         : FLAG_IDLE;
 
-    flags |= s->left
+    flags |= s->leftUntilDone
         ? FLAG_INCOMPLETE
         : FLAG_COMPLETE;
 

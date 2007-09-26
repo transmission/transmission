@@ -813,6 +813,7 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 typedef struct
 {
   GtkWidget * state_lb;
+  GtkWidget * corrupt_dl_lb;
   GtkWidget * valid_dl_lb;
   GtkWidget * dl_lb;
   GtkWidget * ul_lb;
@@ -832,27 +833,29 @@ refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
   const tr_stat * stat = tr_torrent_stat( a->gtor );
-  guint64 size;
   char *pch;
 
   pch = tr_torrent_status_str( a->gtor );
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  size = stat->downloadedValid;
-  pch = readablesize (size);
+  pch = readablesize (stat->corruptEver);
+  gtk_label_set_text (GTK_LABEL(a->corrupt_dl_lb), pch);
+  g_free (pch);
+
+  pch = readablesize (stat->haveValid);
   gtk_label_set_text (GTK_LABEL(a->valid_dl_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->downloaded);
+  pch = readablesize (stat->downloadedEver);
   gtk_label_set_text (GTK_LABEL(a->dl_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->uploaded);
+  pch = readablesize (stat->uploadedEver);
   gtk_label_set_text (GTK_LABEL(a->ul_lb), pch);
   g_free (pch);
 
-  pch = ratiostr (stat->downloaded, stat->uploaded);
+  pch = ratiostr (stat->downloadedEver, stat->uploadedEver);
   gtk_label_set_text (GTK_LABEL(a->ratio_lb), pch);
   g_free (pch);
 
@@ -860,7 +863,7 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->swarm_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->left);
+  pch = readablesize (stat->leftUntilDone);
   gtk_label_set_text (GTK_LABEL(a->remaining_lb), pch);
   g_free (pch);
 
@@ -899,6 +902,10 @@ activity_page_new (TrTorrent * gtor)
 
     g_snprintf (name, sizeof(name), namefmt, _("State"));
     l = a->state_lb = gtk_label_new (NULL);
+    hig_workarea_add_row (t, &row, name, l, NULL);
+
+    g_snprintf (name, sizeof(name), namefmt, _("Corrupt DL"));
+    l = a->corrupt_dl_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Valid DL"));

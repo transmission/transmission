@@ -760,7 +760,7 @@ tr_torrentStat( tr_torrent * tor )
     s->percentComplete = tr_cpPercentComplete ( tor->completion );
 
     s->percentDone = tr_cpPercentDone( tor->completion );
-    s->left = tr_cpLeftUntilDone( tor->completion );
+    s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
 
     switch( tor->runStatus ) {
         case TR_RUN_CHECKING_WAIT: s->status = TR_STATUS_CHECK_WAIT; break;
@@ -801,16 +801,16 @@ tr_torrentStat( tr_torrent * tor )
 
     s->eta = s->rateDownload < 0.1
         ? -1.0f
-        : (s->left / s->rateDownload / 1024.0);
+        : (s->leftUntilDone / s->rateDownload / 1024.0);
 
-    s->corrupt         = tor->corruptCur    + tor->corruptPrev;
-    s->uploaded        = tor->uploadedCur   + tor->uploadedPrev;
-    s->downloaded      = tor->downloadedCur + tor->downloadedPrev;
-    s->downloadedValid = tr_cpDownloadedValid( tor->completion );
+    s->corruptEver     = tor->corruptCur    + tor->corruptPrev;
+    s->downloadedEver  = tor->downloadedCur + tor->downloadedPrev;
+    s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;
+    s->haveValid       = tr_cpHaveValid( tor->completion );
+    s->haveUnchecked   = tr_cpHaveTotal( tor->completion ) - s->haveValid;
    
-    s->ratio = s->downloaded || s->downloadedValid
-      ? (float)s->uploaded / (float)MAX(s->downloaded, s->downloadedValid)
-      : TR_RATIO_NA; 
+    s->ratio = s->downloadedEver ? s->uploadedEver / (float)s->downloadedEver
+                                 : TR_RATIO_NA;
     
     tr_torrentUnlock( tor );
 

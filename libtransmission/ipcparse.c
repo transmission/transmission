@@ -767,16 +767,14 @@ ipc_addstat( benc_val_t * list, int tor,
         switch( 1 << ii )
         {
             case IPC_ST_COMPLETED:
-                tr_bencInitInt( item, st->downloadedValid );
+            case IPC_ST_DOWNVALID:
+                tr_bencInitInt( item, st->haveValid );
                 break;
             case IPC_ST_DOWNSPEED:
                 tr_bencInitInt( item, st->rateDownload * 1024 );
                 break;
             case IPC_ST_DOWNTOTAL:
-                tr_bencInitInt( item, st->downloaded );
-                break;
-            case IPC_ST_DOWNVALID:
-                tr_bencInitInt( item, st->downloadedValid );
+                tr_bencInitInt( item, st->downloadedEver );
                 break;
             case IPC_ST_ERROR:
                 error = st->error;
@@ -921,7 +919,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 tr_bencInitInt( item, st->rateUpload * 1024 );
                 break;
             case IPC_ST_UPTOTAL:
-                tr_bencInitInt( item, st->uploaded );
+                tr_bencInitInt( item, st->uploadedEver );
                 break;
             default:
                 assert( 0 );

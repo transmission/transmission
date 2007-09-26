@@ -36,7 +36,8 @@ void             tr_cpReset( tr_completion * );
 /* General */
 
 cp_status_t      tr_cpGetStatus ( const tr_completion * );
-uint64_t         tr_cpDownloadedValid( const tr_completion * );
+uint64_t         tr_cpHaveTotal( const tr_completion * );
+uint64_t         tr_cpHaveValid( const tr_completion * );
 uint64_t         tr_cpLeftUntilComplete( const tr_completion * );
 uint64_t         tr_cpLeftUntilDone( const tr_completion * );
 float            tr_cpPercentComplete( const tr_completion * );

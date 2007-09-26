@@ -30,10 +30,10 @@ typedef struct tr_peer
     unsigned int  peerSupportsEncryption : 1;
     unsigned int  doDisconnect : 1;
 
-    struct in_addr in_addr;
-    uint16_t port;
-    struct tr_peerIo * io;
     uint8_t from;
+    uint16_t port;
+    struct in_addr in_addr;
+    struct tr_peerIo * io;
 
     struct tr_bitfield * banned;
     struct tr_bitfield * blame;
@@ -45,7 +45,6 @@ typedef struct tr_peer
 
     time_t clientSentPieceDataAt;
     time_t peerSentPieceDataAt;
-    time_t peerSentKeepaliveAt;
     time_t chokeChangedAt;
     time_t connectionChangedAt;
 

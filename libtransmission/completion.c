@@ -290,7 +290,7 @@ tr_cpGetStatus ( const tr_completion * cp )
 }
 
 uint64_t
-tr_cpDownloadedValid( const tr_completion * cp )
+tr_cpHaveValid( const tr_completion * cp )
 {
     uint64_t b = 0;
     const tr_torrent * tor = cp->tor;
@@ -307,4 +307,10 @@ tr_cpDownloadedValid( const tr_completion * cp )
         b -= (info->pieceSize - (info->totalSize % info->pieceSize));
 
    return b;
+}
+
+uint64_t
+tr_cpHaveTotal( const tr_completion * cp )
+{
+   return cp->completeHave;
 }

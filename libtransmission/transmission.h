@@ -62,11 +62,14 @@ extern "C" {
 
 #define TR_DEFAULT_PORT   9090
 
-#define TR_PEER_FROM__MAX       4
-#define TR_PEER_FROM_INCOMING   0 /* connections made to the listening port */
-#define TR_PEER_FROM_TRACKER    1 /* peers received from a tracker */
-#define TR_PEER_FROM_CACHE      2 /* peers read from the peer cache */
-#define TR_PEER_FROM_PEX        3 /* peers discovered via PEX */
+enum
+{
+    TR_PEER_FROM_INCOMING  = 0,  /* connections made to the listening port */
+    TR_PEER_FROM_TRACKER   = 1,  /* peers received from a tracker */
+    TR_PEER_FROM_CACHE     = 2,  /* peers read from the peer cache */
+    TR_PEER_FROM_PEX       = 3,  /* peers discovered via PEX */
+    TR_PEER_FROM__MAX
+};
 
 /***********************************************************************
  * Error codes
@@ -644,11 +647,31 @@ struct tr_stat
     int                 leechers;
     int                 completedFromTracker;
 
-    uint64_t            left;
-    uint64_t            downloaded;
-    uint64_t            downloadedValid;
-    uint64_t            uploaded;
-    uint64_t            corrupt;
+    /* Byte count of how much data is left to be downloaded until
+     * we're done -- that is, until we've got all the pieces we wanted. */
+    uint64_t            leftUntilDone;
+
+    /* Byte count of all the corrupt data you've ever downloaded for
+     * this torrent.  If you're on a poisoned torrent, this number can
+     * grow very large. */
+    uint64_t            corruptEver;
+
+    /* Byte count of all data you've ever uploaded for this torrent. */
+    uint64_t            uploadedEver;
+
+    /* Byte count of all the non-corrupt data you've ever downloaded
+     * for this torrent.  If you deleted the files and downloaded a second time,
+     * this will be 2*totalSize.. */
+    uint64_t            downloadedEver;
+
+    /* Byte count of all the checksum-verified data we have for this torrent. */
+    uint64_t            haveValid;
+
+    /* Byte count of all the partial piece data we have for this torrent.
+     * As pieces become complete, this value may decrease as portions of it are
+     * moved to `corrupt' or `haveValid'. */
+    uint64_t            haveUnchecked;
+
     float               swarmspeed;
 
 #define TR_RATIO_NA  -1

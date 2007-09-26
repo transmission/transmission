@@ -620,14 +620,15 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
     tr_peerIoReadUint32( msgs->io, inbuf, &len );
 
-    if( len == 0 ) { /* peer sent us a keepalive message */
+    if( len == 0 ) /* peer sent us a keepalive message */
         dbgmsg( msgs, "peer sent us a keepalive message..." );
-        msgs->info->peerSentKeepaliveAt = time( NULL );
-    } else {
+    else {
         dbgmsg( msgs, "peer is sending us a message with %"PRIu64" bytes...\n", (uint64_t)len );
         msgs->incomingMessageLength = len;
         msgs->state = AWAITING_BT_MESSAGE;
-    } return READ_AGAIN;
+    }
+
+    return READ_AGAIN;
 }
 
 static int

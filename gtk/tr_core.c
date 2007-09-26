@@ -609,9 +609,9 @@ tr_core_update( TrCore * self )
                             MC_LEECH,       st->leechers,
                             MC_DONE,        st->completedFromTracker,
                             MC_TRACKER,     st->tracker,
-                            MC_DOWN,        st->downloaded,
-                            MC_UP,          st->uploaded,
-                            MC_LEFT,        st->left,
+                            MC_DOWN,        st->downloadedEver,
+                            MC_UP,          st->uploadedEver,
+                            MC_LEFT,        st->leftUntilDone,
                             -1 );
     }
     while( gtk_tree_model_iter_next( self->model, &iter ) );

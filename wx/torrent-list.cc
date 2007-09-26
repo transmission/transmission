@@ -274,15 +274,15 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
                 break;
 
             case COL_RATIO:
-                xstr = wxString::Format( _T("%%%d"), (int)(s->uploaded / (double)s->downloadedValid) );
+                xstr = wxString::Format( _T("%%%d"), (int)(s->uploadedEver / (double)s->downloadedEver) );
                 break;
 
             case COL_RECEIVED:
-                xstr = getReadableSize( s->downloaded );
+                xstr = getReadableSize( s->downloadedEver );
                 break;
 
             case COL_REMAINING:
-                xstr = getReadableSize( s->left );
+                xstr = getReadableSize( s->leftUntilDone );
                 break;
 
             case COL_SEEDS:
@@ -293,7 +293,7 @@ TorrentListCtrl :: RefreshTorrent( tr_torrent   * tor,
                 break;
 
             case COL_SENT:
-                xstr = getReadableSize( s->uploaded );
+                xstr = getReadableSize( s->uploadedEver );
                 break;
 
             case COL_SIZE:
@@ -447,8 +447,8 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_RATIO: {
-            const double ra = sa->uploaded / (double) sa->downloadedValid;
-            const double rb = sb->uploaded / (double) sb->downloadedValid;
+            const double ra = sa->uploadedEver / (double)(sa->downloadedEver + 0.01);
+            const double rb = sb->uploadedEver / (double)(sb->downloadedEver + 0.01);
             if( ra < rb )
                 ret = -1;
             else if( ra > rb )
@@ -459,18 +459,18 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
         }
 
         case COL_RECEIVED:
-            if( sa->downloaded < sb->downloaded )
+            if( sa->downloadedEver < sb->downloadedEver )
                 ret = -1;
-            else if( sa->downloaded > sb->downloaded )
+            else if( sa->downloadedEver > sb->downloadedEver )
                 ret = 1;
             else
                 ret = 0;
             break;
 
         case COL_REMAINING:
-            if( sa->left < sb->left )
+            if( sa->leftUntilDone < sb->leftUntilDone )
                 ret = -1;
-            else if( sa->left > sb->left )
+            else if( sa->leftUntilDone > sb->leftUntilDone )
                 ret = 1;
             else
                 ret = 0;
@@ -482,9 +482,9 @@ TorrentListCtrl :: Compare( long item1, long item2, long sortData )
             break;
 
         case COL_SENT:
-            if( sa->uploaded < sb->uploaded )
+            if( sa->uploadedEver < sb->uploadedEver )
                 ret = -1;
-            else if( sa->uploaded > sb->uploaded )
+            else if( sa->uploadedEver > sb->uploadedEver )
                 ret = 1;
             else
                 ret = 0;
