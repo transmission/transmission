@@ -38,36 +38,34 @@
 ***
 **/
 
-#define PEX_INTERVAL (60 * 1000)
-
-#define PEER_PULSE_INTERVAL (100)
-
 enum
 {
-    BT_CHOKE                  = 0,
-    BT_UNCHOKE                = 1,
-    BT_INTERESTED             = 2,
-    BT_NOT_INTERESTED         = 3,
-    BT_HAVE                   = 4,
-    BT_BITFIELD               = 5,
-    BT_REQUEST                = 6,
-    BT_PIECE                  = 7,
-    BT_CANCEL                 = 8,
-    BT_PORT                   = 9,
-    BT_SUGGEST                = 13,
-    BT_HAVE_ALL               = 14,
-    BT_HAVE_NONE              = 15,
-    BT_REJECT                 = 16,
-    BT_ALLOWED_FAST           = 17,
-    BT_LTEP                   = 20,
+    BT_CHOKE                = 0,
+    BT_UNCHOKE              = 1,
+    BT_INTERESTED           = 2,
+    BT_NOT_INTERESTED       = 3,
+    BT_HAVE                 = 4,
+    BT_BITFIELD             = 5,
+    BT_REQUEST              = 6,
+    BT_PIECE                = 7,
+    BT_CANCEL               = 8,
+    BT_PORT                 = 9,
+    BT_SUGGEST              = 13,
+    BT_HAVE_ALL             = 14,
+    BT_HAVE_NONE            = 15,
+    BT_REJECT               = 16,
+    BT_ALLOWED_FAST         = 17,
+    BT_LTEP                 = 20,
 
-    LTEP_HANDSHAKE            = 0,
+    LTEP_HANDSHAKE          = 0,
 
-    OUR_LTEP_PEX              = 1,
+    OUR_LTEP_PEX            = 1,
 
-    /* disregard requests that want more than this many bytes.
-       it's common practice in for BT clients to use a 16K threshold */
-    MAX_REQUEST_BYTE_COUNT    = (16 * 1024)
+    MAX_REQUEST_BYTE_COUNT  = (16 * 1024), /* drop requests who want too much */
+
+    KEEPALIVE_INTERVAL      = (90 * 1000), /* msec between calls to sendKeepalive() */
+    PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
+    PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
 };
 
 enum
@@ -114,6 +112,7 @@ struct tr_peermsgs
 
     tr_timer * pulseTimer;
     tr_timer * pexTimer;
+    tr_timer * keepaliveTimer;
 
     struct peer_request blockToUs; /* the block currntly being sent to us */
 
@@ -1092,10 +1091,17 @@ sendBitfield( tr_peermsgs * msgs )
 {
     const tr_bitfield * bitfield = tr_cpPieceBitfield( msgs->torrent->completion );
 
-    dbgmsg( msgs, "sending peer a bitfield message\n", msgs );
+    dbgmsg( msgs, "sending peer a bitfield message" );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + bitfield->len );
     tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_BITFIELD );
     tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, bitfield->bits, bitfield->len );
+}
+
+static void
+sendKeepalive( tr_peermsgs * msgs )
+{
+    dbgmsg( msgs, "sending a keepalive message" );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 0 );
 }
 
 /**
@@ -1245,6 +1251,13 @@ pexPulse( void * vpeer )
     return TRUE;
 }
 
+static int
+keepalivePulse( void * vpeer )
+{
+    sendKeepalive( vpeer );
+    return TRUE;
+}
+
 /**
 ***
 **/
@@ -1270,6 +1283,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
     msgs->info->have = tr_bitfieldNew( torrent->info.pieceCount );
     msgs->pulseTimer = tr_timerNew( msgs->handle, pulse, msgs, PEER_PULSE_INTERVAL );
     msgs->pexTimer = tr_timerNew( msgs->handle, pexPulse, msgs, PEX_INTERVAL );
+    msgs->keepaliveTimer = tr_timerNew( msgs->handle, keepalivePulse, msgs, KEEPALIVE_INTERVAL );
     msgs->outMessages = evbuffer_new( );
     msgs->outBlock = evbuffer_new( );
     msgs->inBlock = evbuffer_new( );
@@ -1304,6 +1318,7 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
 {
     if( msgs != NULL )
     {
+        tr_timerFree( &msgs->keepaliveTimer );
         tr_timerFree( &msgs->pulseTimer );
         tr_timerFree( &msgs->pexTimer );
         tr_publisherFree( &msgs->publisher );
