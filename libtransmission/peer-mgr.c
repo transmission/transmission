@@ -653,7 +653,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
             const int peerIsSeed = e->progress >= 1.0;
             if( clientIsSeed && peerIsSeed )
-                peer->doDisconnect = 1;
+                peer->doPurge = 1;
             break;
         }
 
@@ -662,7 +662,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             break;
 
         case TR_PEERMSG_GOT_ERROR:
-            peer->doDisconnect = 1;
+            peer->doPurge = 1;
             reconnectSoon( t );
             break;
 
@@ -1178,9 +1178,6 @@ shouldPeerBeDisconnected( Torrent * t, tr_peer * peer, int peerCount, int isSeed
     if( !t->isRunning ) /* the torrent is stopped... nobody should be connected */
         return TRUE;
 
-    if( peer->doDisconnect ) /* someone set a `doDisconnect' flag somewhere */
-        return TRUE;
-
     /* when deciding whether or not to keep a peer, judge its responsiveness
        on a sliding scale that's based on how many other peers are available */
     relaxStrictnessIfFewerThanN =
@@ -1229,13 +1226,25 @@ reconnectPulse( void * vt UNUSED )
         if( peers[i]->msgs != NULL )
             ++liveCount;
 
-    /* disconnect from some peers */
-    for( i=0; i<size; ++i ) {
+    /* destroy and/or disconnect from some peers */
+    for( i=0; i<size; )
+    {
         tr_peer * peer = peers[i];
+
+        if( peer->doPurge ) {
+            tr_ptrArrayErase( t->peers, i, i+1 );
+            freePeer( peer );
+            --size;
+            --liveCount;
+            continue;
+        }
+
         if( shouldPeerBeDisconnected( t, peer, liveCount, isSeeding ) ) {
             disconnectPeer( peer );
             --liveCount;
         }
+
+        ++i;
     }
 
     /* maybe connect to some new peers */ 

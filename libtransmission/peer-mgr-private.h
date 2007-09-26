@@ -28,7 +28,7 @@ typedef struct tr_peer
     unsigned int  clientIsChoked : 1;
     unsigned int  clientIsInterested : 1;
     unsigned int  peerSupportsEncryption : 1;
-    unsigned int  doDisconnect : 1;
+    unsigned int  doPurge : 1;
 
     uint8_t from;
     uint16_t port;
