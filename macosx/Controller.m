@@ -177,6 +177,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         fLib = tr_init("macosx");
         
+        [NSApp setDelegate: self];
+        
         fTorrents = [[NSMutableArray alloc] init];
         fDisplayedTorrents = [[NSMutableArray alloc] init];
         
@@ -1450,30 +1452,36 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) updateUI
 {
     [fTorrents makeObjectsPerformSelector: @selector(update)];
-
-    //resort if necessary or just update the table
-    NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    if ([sortType isEqualToString: SORT_PROGRESS] || [sortType isEqualToString: SORT_STATE]
-            || [sortType isEqualToString: SORT_TRACKER])
-        [self sortTorrents];
-    else
-        [fTableView reloadData];
     
-    //update the global DL/UL rates
-    if (![fStatusBar isHidden])
+    if (![NSApp isHidden])
     {
-        float downloadRate, uploadRate;
-        tr_torrentRates(fLib, & downloadRate, & uploadRate);
-        
-        [fTotalDLField setStringValue: [NSLocalizedString(@"Total DL: ", "Status bar -> total download")
-                                        stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
-        [fTotalULField setStringValue: [NSLocalizedString(@"Total UL: ", "Status bar -> total upload")
-                                        stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
-    }
+        if ([fWindow isVisible])
+        {
+            //resort if necessary or just update the table
+            NSString * sortType = [fDefaults stringForKey: @"Sort"];
+            if ([sortType isEqualToString: SORT_PROGRESS] || [sortType isEqualToString: SORT_STATE]
+                    || [sortType isEqualToString: SORT_TRACKER])
+                [self sortTorrents];
+            else
+                [fTableView reloadData];
+            
+            //update the global DL/UL rates
+            if (![fStatusBar isHidden])
+            {
+                float downloadRate, uploadRate;
+                tr_torrentRates(fLib, & downloadRate, & uploadRate);
+                
+                [fTotalDLField setStringValue: [NSLocalizedString(@"Total DL: ", "Status bar -> total download")
+                                                stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
+                [fTotalULField setStringValue: [NSLocalizedString(@"Total UL: ", "Status bar -> total upload")
+                                                stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
+            }
+        }
 
-    //update non-constant parts of info window
-    if ([[fInfoController window] isVisible])
-        [fInfoController updateInfoStats];
+        //update non-constant parts of info window
+        if ([[fInfoController window] isVisible])
+            [fInfoController updateInfoStats];
+    }
 
     //badge dock
     [fBadger updateBadge];
@@ -3219,6 +3227,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fStatusBar setNeedsDisplay: YES];
     
     [fBadger clearCompleted];
+    [self updateUI];
 }
 
 - (void) windowDidResignKey: (NSNotification *) notification
@@ -3256,6 +3265,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //hide search filter if it overlaps filter buttons
     [fSearchFilterField setHidden: !show];
+}
+
+- (void) applicationWillUnhide: (NSNotification *) notification
+{
+    [self updateUI];
 }
 
 - (void) linkHomepage: (id) sender

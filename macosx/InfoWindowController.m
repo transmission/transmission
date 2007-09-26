@@ -388,11 +388,11 @@
     if (have == 0)
         [fHaveField setStringValue: [NSString stringForFileSize: 0]];
     else if (have == haveVerified)
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified", "Inspector -> Activity tab -> have"),
-                                    [NSString stringForFileSize: haveVerified]]];
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified",
+                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: haveVerified]]];
     else
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)", "Inspector -> Activity tab -> have"),
-                                    [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)",
+                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
     
     [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
     [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
