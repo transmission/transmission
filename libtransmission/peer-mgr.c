@@ -721,10 +721,8 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         tr_peer * peer = getExistingPeer( t, in_addr );
         tr_peerIoFree( io );
         --manager->connectionCount;
-        if( peer ) {
-            tr_ptrArrayRemoveSorted( t->peers, peer, peerCompare );
-            freePeer( peer );
-        }
+        if( peer )
+            peer->doPurge = 1;
         return;
     }
 
@@ -1177,6 +1175,11 @@ shouldPeerBeDisconnected( Torrent * t, tr_peer * peer, int peerCount, int isSeed
 
     if( !t->isRunning ) /* the torrent is stopped... nobody should be connected */
         return TRUE;
+
+    /* not enough peers to go around... might as well keep this one;
+     * they might unchoke us or give us a pex or something */
+    if( peerCount < MAX_CONNECTED_PEERS_PER_TORRENT )
+        return FALSE;
 
     /* when deciding whether or not to keep a peer, judge its responsiveness
        on a sliding scale that's based on how many other peers are available */

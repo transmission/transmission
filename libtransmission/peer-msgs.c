@@ -271,16 +271,14 @@ isPeerInteresting( const tr_peermsgs * msgs )
 static void
 sendInterest( tr_peermsgs * msgs, int weAreInterested )
 {
-    const uint32_t len = sizeof(uint8_t);
-    const uint8_t bt_msgid = weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED;
-
     assert( msgs != NULL );
     assert( weAreInterested==0 || weAreInterested==1 );
 
     msgs->info->clientIsInterested = weAreInterested;
     dbgmsg( msgs, ": sending an %s message", (weAreInterested ? "INTERESTED" : "NOT_INTERESTED") );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-    tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
+
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
+    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
 }
 
 static void
@@ -302,9 +300,6 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 
     if( msgs->info->peerIsChoked != choke )
     {
-        const uint32_t len = sizeof(uint8_t);
-        const uint8_t bt_msgid = choke ? BT_CHOKE : BT_UNCHOKE;
-
         msgs->info->peerIsChoked = choke ? 1 : 0;
         if( msgs->info )
         {
@@ -313,8 +308,8 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
         }
 
         dbgmsg( msgs, "sending a %s message", (choke ? "CHOKE" : "UNCHOKE") );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-        tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, choke ? BT_CHOKE : BT_UNCHOKE );
     }
 }
 
@@ -342,10 +337,8 @@ tr_peerMsgsCancel( tr_peermsgs * msgs,
     if( node != NULL )
     {
         /* cancel the request */
-        const uint8_t bt_msgid = BT_CANCEL;
-        const uint32_t len = sizeof(uint8_t) + 3 * sizeof(uint32_t);
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-        tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + 3*sizeof(uint32_t) );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_CANCEL );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, offset );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, length );
@@ -363,11 +356,10 @@ void
 tr_peerMsgsHave( tr_peermsgs * msgs,
                  uint32_t      pieceIndex )
 {
-    const uint8_t bt_msgid = BT_HAVE;
-    const uint32_t len = sizeof(uint8_t) + sizeof(uint32_t);
     dbgmsg( msgs, "w00t telling them we HAVE piece #%d", pieceIndex );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-    tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
+
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
+    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_HAVE );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
 
     updateInterest( msgs );
@@ -409,8 +401,6 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
                        uint32_t      offset, 
                        uint32_t      length )
 {
-    const uint8_t bt_msgid = BT_REQUEST;
-    const uint32_t len = sizeof(uint8_t) + 3 * sizeof(uint32_t);
     struct peer_request * req;
     int maxSize;
 
@@ -432,8 +422,8 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     dbgmsg( msgs, "w00t peer has a max request queue size of %d... adding request for piece %d, offset %d", maxSize, (int)index, (int)offset );
 
     /* queue the request */
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-    tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + 3*sizeof(uint32_t) );
+    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_REQUEST );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, index );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, offset );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, length );
@@ -463,9 +453,6 @@ sendLtepHandshake( tr_peermsgs * msgs )
     const char * v = TR_NAME " " USERAGENT_PREFIX;
     const int port = tr_getPublicPort( msgs->handle );
     struct evbuffer * outbuf = evbuffer_new( );
-    uint32_t msglen;
-    const uint8_t tr_msgid = 20; /* ltep extension id */
-    const uint8_t ltep_msgid = 0; /* handshake id */
 
     dbgmsg( msgs, "sending an ltep handshake" );
     tr_bencInit( &val, TYPE_DICT );
@@ -479,14 +466,12 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_bencInitStr( tr_bencDictAdd( &val, "v" ), v, 0, 1 );
     buf = tr_bencSaveMalloc( &val,  &len );
 
-    msglen = sizeof(tr_msgid) + sizeof(ltep_msgid) + len;
-    tr_peerIoWriteUint32( msgs->io, outbuf, msglen );
-    tr_peerIoWriteBytes ( msgs->io, outbuf, &tr_msgid, 1 );
-    tr_peerIoWriteBytes ( msgs->io, outbuf, &ltep_msgid, 1 );
+    tr_peerIoWriteUint32( msgs->io, outbuf, 2*sizeof(uint8_t) + len );
+    tr_peerIoWriteUint8 ( msgs->io, outbuf, BT_LTEP );
+    tr_peerIoWriteUint8 ( msgs->io, outbuf, LTEP_HANDSHAKE );
     tr_peerIoWriteBytes ( msgs->io, outbuf, buf, len );
 
     tr_peerIoWriteBuf( msgs->io, outbuf );
-
     msgs->hasSentLtepHandshake = 1;
 
     /* cleanup */
@@ -586,7 +571,7 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 {
     uint8_t ltep_msgid;
 
-    tr_peerIoReadBytes( msgs->io, inbuf, &ltep_msgid, 1 );
+    tr_peerIoReadUint8( msgs->io, inbuf, &ltep_msgid );
     msglen--;
 
     if( ltep_msgid == LTEP_HANDSHAKE )
@@ -641,7 +626,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
     if( EVBUFFER_LENGTH(inbuf) < msglen )
         return READ_MORE;
 
-    tr_peerIoReadBytes( msgs->io, inbuf, &id, 1 );
+    tr_peerIoReadUint8( msgs->io, inbuf, &id );
     msglen--;
     dbgmsg( msgs, "peer sent us a message... "
                   "bt id number is %d, and remaining len is %d", (int)id, (int)msglen );
@@ -1075,11 +1060,10 @@ pulse( void * vmsgs )
     {
         struct peer_request * req = tr_list_pop_front( &msgs->peerAskedFor );
         uint8_t * tmp = tr_new( uint8_t, req->length );
-        const uint8_t msgid = BT_PIECE;
-        const uint32_t msglen = sizeof(uint8_t) + sizeof(uint32_t)*2 + req->length;
+        const uint32_t msglen = sizeof(uint8_t) + 2*sizeof(uint32_t) + req->length;
         tr_ioRead( msgs->torrent, req->index, req->offset, req->length, tmp );
         tr_peerIoWriteUint32( msgs->io, msgs->outBlock, msglen );
-        tr_peerIoWriteBytes ( msgs->io, msgs->outBlock, &msgid, 1 );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outBlock, BT_PIECE );
         tr_peerIoWriteUint32( msgs->io, msgs->outBlock, req->index );
         tr_peerIoWriteUint32( msgs->io, msgs->outBlock, req->offset );
         tr_peerIoWriteBytes ( msgs->io, msgs->outBlock, tmp, req->length );
@@ -1107,13 +1091,11 @@ static void
 sendBitfield( tr_peermsgs * msgs )
 {
     const tr_bitfield * bitfield = tr_cpPieceBitfield( msgs->torrent->completion );
-    const uint32_t len = sizeof(uint8_t) + bitfield->len;
-    const uint8_t bt_msgid = BT_BITFIELD;
 
     dbgmsg( msgs, "sending peer a bitfield message\n", msgs );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
-    tr_peerIoWriteBytes( msgs->io, msgs->outMessages, &bt_msgid, 1 );
-    tr_peerIoWriteBytes( msgs->io, msgs->outMessages, bitfield->bits, bitfield->len );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + bitfield->len );
+    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_BITFIELD );
+    tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, bitfield->bits, bitfield->len );
 }
 
 /**
@@ -1184,8 +1166,6 @@ sendPex( tr_peermsgs * msgs )
         uint8_t *tmp, *walk;
         char * benc;
         int bencLen;
-        const uint8_t bt_msgid = BT_LTEP;
-        const uint8_t ltep_msgid = OUR_LTEP_PEX;
 
         /* build the diffs */
         diffs.added = tr_new( tr_pex, newCount );
@@ -1242,9 +1222,9 @@ sendPex( tr_peermsgs * msgs )
 
         /* write the pex message */
         benc = tr_bencSaveMalloc( &val, &bencLen );
-        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 1 + 1 + bencLen );
-        tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, &bt_msgid, 1 );
-        tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, &ltep_msgid, 1 );
+        tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 2*sizeof(uint8_t) + bencLen );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_LTEP );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, OUR_LTEP_PEX );
         tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, benc, bencLen );
 
         /* cleanup */

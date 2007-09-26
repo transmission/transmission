@@ -146,6 +146,10 @@ void tr_peerIoWriteBytes  ( tr_peerIo        * io,
                             const void       * bytes,
                             int                byteCount );
 
+void tr_peerIoWriteUint8  ( tr_peerIo        * io,
+                            struct evbuffer  * outbuf,
+                            uint8_t            writeme );
+
 void tr_peerIoWriteUint16 ( tr_peerIo        * io,
                             struct evbuffer  * outbuf,
                             uint16_t           writeme );
@@ -158,6 +162,10 @@ void tr_peerIoReadBytes   ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
                             void             * bytes,
                             int                byteCount );
+
+void tr_peerIoReadUint8   ( tr_peerIo        * io,
+                            struct evbuffer  * inbuf,
+                            uint8_t          * setme );
 
 void tr_peerIoReadUint16  ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,

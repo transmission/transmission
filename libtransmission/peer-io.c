@@ -469,6 +469,14 @@ tr_peerIoWriteUint16( tr_peerIo        * io,
 }
 
 void
+tr_peerIoWriteUint8( tr_peerIo        * io,
+                     struct evbuffer  * outbuf,
+                     uint8_t            writeme )
+{
+    tr_peerIoWriteBytes( io, outbuf, &writeme, sizeof(uint8_t) );
+}
+
+void
 tr_peerIoWriteUint32( tr_peerIo        * io,
                       struct evbuffer  * outbuf,
                       uint32_t           writeme )
@@ -513,6 +521,14 @@ tr_peerIoReadUint16( tr_peerIo         * io,
     uint16_t tmp;
     tr_peerIoReadBytes( io, inbuf, &tmp, sizeof(uint16_t) );
     *setme = ntohs( tmp );
+}
+
+void
+tr_peerIoReadUint8( tr_peerIo         * io,
+                    struct evbuffer   * inbuf,
+                    uint8_t           * setme )
+{
+    tr_peerIoReadBytes( io, inbuf, setme, sizeof(uint8_t) );
 }
 
 void
