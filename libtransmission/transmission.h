@@ -672,6 +672,13 @@ struct tr_stat
      * moved to `corrupt' or `haveValid'. */
     uint64_t            haveUnchecked;
 
+    /* Byte count of all the non-DND piece data that either we already have,
+     * or that a peer we're connected to has. [0...tr_info.totalSize] */
+    uint64_t            nonDndAvailable;
+
+    /* Byte count of all the non-DND piece data */
+    uint64_t            nonDndSize;
+
     float               swarmspeed;
 
 #define TR_RATIO_NA  -1

@@ -808,6 +808,25 @@ tr_torrentStat( tr_torrent * tor )
     s->uploadedEver    = tor->uploadedCur   + tor->uploadedPrev;
     s->haveValid       = tr_cpHaveValid( tor->completion );
     s->haveUnchecked   = tr_cpHaveTotal( tor->completion ) - s->haveValid;
+
+
+    {
+        int i;
+        tr_bitfield * available = tr_peerMgrGetAvailable( tor->handle->peerMgr,
+                                                          tor->info.hash );
+        s->nonDndSize = 0;
+        s->nonDndAvailable = 0;
+
+        for( i=0; i<tor->info.pieceCount; ++i ) {
+            if( !tor->info.pieces[i].dnd ) {
+                s->nonDndSize += tor->info.pieceSize;
+                if( tr_bitfieldHas( available, i ) )
+                    s->nonDndAvailable += tor->info.pieceSize;
+            }
+        }
+
+        tr_bitfieldFree( available );
+    }
    
     s->ratio = s->downloadedEver ? s->uploadedEver / (float)s->downloadedEver
                                  : TR_RATIO_NA;

@@ -607,7 +607,7 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
     if( len == 0 ) /* peer sent us a keepalive message */
         dbgmsg( msgs, "peer sent us a keepalive message..." );
     else {
-        dbgmsg( msgs, "peer is sending us a message with %"PRIu64" bytes...\n", (uint64_t)len );
+        dbgmsg( msgs, "peer is sending us a message with %"PRIu64" bytes...", (uint64_t)len );
         msgs->incomingMessageLength = len;
         msgs->state = AWAITING_BT_MESSAGE;
     }
@@ -1004,7 +1004,7 @@ static int
 canWrite( const tr_peermsgs * msgs )
 {
     /* don't let our outbuffer get too large */
-    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 2048 )
+    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 8192 )
         return FALSE;
 
     return TRUE;
@@ -1050,7 +1050,7 @@ pulse( void * vmsgs )
     {
         while ( len && canUpload( msgs ) )
         {
-            const size_t outlen = MIN( len, 2048 );
+            const size_t outlen = len; //MIN( len, 2048 );
             tr_peerIoWrite( msgs->io, EVBUFFER_DATA(msgs->outBlock), outlen );
             evbuffer_drain( msgs->outBlock, outlen );
             peerGotBytes( msgs, outlen );

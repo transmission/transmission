@@ -81,6 +81,9 @@ void tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
                                     int8_t           * tab,
                                     int                tabCount );
 
+struct tr_bitfield* tr_peerMgrGetAvailable( const tr_peerMgr * manager,
+                                            const uint8_t    * torrentHash );
+
 void tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                              const uint8_t    * torrentHash,
                              int              * setmePeersTotal,

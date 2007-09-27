@@ -68,7 +68,7 @@ enum
 
     /* this is arbitrary and, hopefully, temporary until we come up
      * with a better idea for managing the connection limits */
-    MAX_CONNECTED_PEERS_PER_TORRENT = 60,
+    MAX_CONNECTED_PEERS_PER_TORRENT = 100,
 
     /* if we hang up on a peer for being worthless, don't try to
      * reconnect to it for this long. */
@@ -650,10 +650,12 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             break;
 
         case TR_PEERMSG_PEER_PROGRESS: { /* if we're both seeds, then disconnect. */
+#if 0
             const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
             const int peerIsSeed = e->progress >= 1.0;
             if( clientIsSeed && peerIsSeed )
                 peer->doPurge = 1;
+#endif
             break;
         }
 
@@ -966,6 +968,25 @@ tr_peerMgrTorrentAvailability( const tr_peerMgr * manager,
     }
 }
 
+/* Returns the pieces that we and/or a connected peer has */
+tr_bitfield*
+tr_peerMgrGetAvailable( const tr_peerMgr * manager,
+                        const uint8_t    * torrentHash )
+{
+    int i, size;
+    const Torrent * t;
+    const tr_peer ** peers;
+    tr_bitfield * pieces;
+
+    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
+    peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
+    pieces = tr_bitfieldDup( tr_cpPieceBitfield( t->tor->completion ) );
+    for( i=0; i<size; ++i )
+        if( peers[i]->io != NULL )
+            tr_bitfieldAnd( pieces, peers[i]->have );
+
+    return pieces;
+}
 
 void
 tr_peerMgrTorrentStats( const tr_peerMgr * manager,
