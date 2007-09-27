@@ -1,6 +1,8 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.90 (2007/xx/yy)
+ - Significant rewrite of the libtransmission back-end
+ - Encryption support, with ability to ignore unencrypted peers
  - Improved compliance with BitTorrent spec
  - Multiscrape support
  - Only report downloaded, verified good pieces in tracker `download' field
