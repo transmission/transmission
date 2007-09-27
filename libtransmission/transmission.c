@@ -123,11 +123,11 @@ tr_handle * tr_init( const char * tag )
 
     h->encryptionMode = TR_ENCRYPTION_PREFERRED;
 
+    tr_netInit(); /* must go before tr_eventInit */
+
     tr_eventInit( h );
     while( !h->events )
         tr_wait( 50 );
-
-    tr_netInit();
 
     h->tag = strdup( tag );
     if( !h->tag ) {
