@@ -16,7 +16,6 @@
 #include <limits.h> /* UCHAR_MAX */
 #include <string.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 
 #include <sys/types.h> /* event.h needs this */
 #include <event.h>
@@ -446,50 +445,29 @@ readYb( tr_handshake * handshake, struct evbuffer * inbuf )
         evbuffer_add( outbuf, buf, SHA_DIGEST_LENGTH );
     }
       
-    /* ENCRYPT(VC, crypto_provide, len(PadC), PadC */
+    /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
+     * PadC is reserved for future extensions to the handshake...
+     * standard practice at this time is for it to be zero-length */
     {
         uint8_t vc[VC_LENGTH] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        uint8_t pad[512];
-        uint16_t i, len;
-        uint32_t crypto_provide;
 
         tr_cryptoEncryptInit( handshake->crypto );
-       
-        /* vc */ 
-        tr_cryptoEncrypt( handshake->crypto, VC_LENGTH, vc, vc );
-        evbuffer_add( outbuf, vc, VC_LENGTH );
-
-        /* crypto_provide */
-        crypto_provide = htonl( getCryptoProvide( handshake ) );
-        tr_cryptoEncrypt( handshake->crypto, sizeof(crypto_provide), &crypto_provide, &crypto_provide );
-        evbuffer_add( outbuf, &crypto_provide, sizeof(crypto_provide) );
-
-        /* len(padc) */
-        i = len = tr_rand( 512 );
-        i = htons( i );
-        tr_cryptoEncrypt( handshake->crypto, sizeof(i), &i, &i );
-        evbuffer_add( outbuf, &i, sizeof(i) );
-
-        /* padc */
-        for( i=0; i<len; ++i ) pad[i] = tr_rand( UCHAR_MAX );
-        tr_cryptoEncrypt( handshake->crypto, len, pad, pad );
-        evbuffer_add( outbuf, pad, len );
+        tr_peerIoSetEncryption( handshake->io, PEER_ENCRYPTION_RC4 );
+      
+        tr_peerIoWriteBytes( handshake->io, outbuf, vc, VC_LENGTH ); 
+        tr_peerIoWriteUint32( handshake->io, outbuf, getCryptoProvide( handshake ) );
+        tr_peerIoWriteUint16( handshake->io, outbuf, 0 );
     }
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
     {
-        uint16_t i;
-        int msgSize;
-        uint8_t * msg = buildHandshakeMessage( handshake, HANDSHAKE_EXTPREF_LTEP_PREFER, &msgSize );
+        int msglen;
+        uint8_t * msg = buildHandshakeMessage( handshake, HANDSHAKE_EXTPREF_LTEP_PREFER, &msglen );
 
-        i = htons( msgSize );
-        tr_cryptoEncrypt( handshake->crypto, sizeof(uint16_t), &i, &i );
-        evbuffer_add( outbuf, &i, sizeof(uint16_t) );
+        tr_peerIoWriteUint16( handshake->io, outbuf, msglen );
+        tr_peerIoWriteBytes( handshake->io, outbuf, msg, msglen );
 
-        tr_cryptoEncrypt( handshake->crypto, msgSize, msg, msg );
-        evbuffer_add( outbuf, msg, HANDSHAKE_SIZE );
         handshake->haveSentBitTorrentHandshake = 1;
-
         tr_free( msg );
     }
 
@@ -940,14 +918,12 @@ dbgmsg( handshake, "we select crypto_select as %d...", (int)crypto_select );
     }
 
 dbgmsg( handshake, "sending pad d" );
-    /* send pad d */
+    /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
+     * PadD is reserved for future extensions to the handshake...
+     * standard practice at this time is for it to be zero-length */
     {
-        uint8_t pad[PadD_MAXLEN];
-        const int len = tr_rand( PadD_MAXLEN );
-        for( i=0; i<len; ++i )
-            pad[i] = tr_rand( UCHAR_MAX );
+        const int len = 0;
         tr_peerIoWriteUint16( handshake->io, outbuf, len );
-        tr_peerIoWriteBytes( handshake->io, outbuf, pad, len );
     }
 
     /* maybe de-encrypt our connection */
