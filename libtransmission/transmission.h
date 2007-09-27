@@ -673,11 +673,12 @@ struct tr_stat
     uint64_t            haveUnchecked;
 
     /* Byte count of all the non-DND piece data that either we already have,
-     * or that a peer we're connected to has. [0...tr_info.totalSize] */
-    uint64_t            nonDndAvailable;
+     * or that a peer we're connected to has. [0...desiredSize] */
+    uint64_t            desiredAvailable;
 
-    /* Byte count of all the non-DND piece data */
-    uint64_t            nonDndSize;
+    /* Byte count of all the piece data we want, whether we currently
+     * have it nor not. [0...tr_info.totalSize] */
+    uint64_t            desiredSize;
 
     float               swarmspeed;
 

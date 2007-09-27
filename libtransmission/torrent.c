@@ -814,14 +814,14 @@ tr_torrentStat( tr_torrent * tor )
         int i;
         tr_bitfield * available = tr_peerMgrGetAvailable( tor->handle->peerMgr,
                                                           tor->info.hash );
-        s->nonDndSize = 0;
-        s->nonDndAvailable = 0;
+        s->desiredSize = 0;
+        s->desiredAvailable = 0;
 
         for( i=0; i<tor->info.pieceCount; ++i ) {
             if( !tor->info.pieces[i].dnd ) {
-                s->nonDndSize += tor->info.pieceSize;
+                s->desiredSize += tor->info.pieceSize;
                 if( tr_bitfieldHas( available, i ) )
-                    s->nonDndAvailable += tor->info.pieceSize;
+                    s->desiredAvailable += tor->info.pieceSize;
             }
         }
 
