@@ -57,7 +57,6 @@ typedef enum
     NSUserDefaults * fDefaults;
 
     NSImage * fIcon;
-    NSString * fProgressString, * fStatusString, * fShortStatusString, * fRemainingTimeString;
     
     tr_file_stat * fileStat;
     NSArray * fFileList, * fFlatFileList;
@@ -156,6 +155,7 @@ typedef enum
 - (float) progressDone;
 - (float) progressLeft;
 - (int) eta;
+- (float) notAvailableDesired;
 
 - (BOOL) isActive;
 - (BOOL) isSeeding;
