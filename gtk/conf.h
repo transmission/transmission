@@ -22,11 +22,32 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+/**
+***
+**/
+
 #ifndef TG_CONF_H
 #define TG_CONF_H
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
+int       pref_int_get            ( const char * key );
+void      pref_int_set            ( const char * key, int value );
+void      pref_int_set_default    ( const char * key, int default_value );
+
+gboolean  pref_flag_get            ( const char * key );
+void      pref_flag_set            ( const char * key, gboolean value );
+void      pref_flag_set_default    ( const char * key, gboolean default_value );
+
+char*     pref_string_get          ( const char * key );
+void      pref_string_set          ( const char * key, const char * value );
+void      pref_string_set_default  ( const char * key, const char * default_value );
+
+void      pref_save                ( char **errstr );
+
+/**
+***
+**/
+
+struct benc_val_s;
 
 gboolean
 cf_init(const char *confdir, char **errstr);
@@ -36,17 +57,11 @@ char *
 cf_sockname(void);
 void
 cf_loadprefs(char **errstr);
-const char *
-cf_getpref(const char *name);
-void
-cf_setpref(const char *name, const char *value);
-void
-cf_saveprefs(char **errstr);
-benc_val_t *
+struct benc_val_s *
 cf_loadstate(char **errstr);
 void
-cf_savestate(benc_val_t *state, char **errstr);
+cf_savestate(struct benc_val_s *state, char **errstr);
 void
-cf_freestate(benc_val_t *state);
+cf_freestate(struct benc_val_s *state);
 
 #endif /* TG_CONF_H */

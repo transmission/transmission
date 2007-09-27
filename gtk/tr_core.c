@@ -118,8 +118,8 @@ tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
     core_class->prefsig = g_signal_new( "prefs-changed",
                                         G_TYPE_FROM_CLASS( g_class ),
                                         G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                        g_cclosure_marshal_VOID__INT,
-                                        G_TYPE_NONE, 1, G_TYPE_INT );
+                                        g_cclosure_marshal_VOID__STRING,
+                                        G_TYPE_NONE, 1, G_TYPE_STRING );
 }
 
 void
@@ -251,6 +251,8 @@ tr_core_dispose( GObject * obj )
         return;
     }
     self->disposed = TRUE;
+
+    pref_save( NULL );
 
 #ifdef REFDBG
     fprintf( stderr, "core    %p dispose\n", self );
@@ -408,21 +410,22 @@ tr_core_load( TrCore * self, gboolean forcepaused )
     int flags;
     int count = 0;
     tr_torrent ** torrents;
-    const char * destination;
+    char * path;
 
     TR_IS_CORE( self );
 
-    destination = getdownloaddir( );
+    path = getdownloaddir( );
 
     flags = 0;
     if( forcepaused )
          flags |= TR_FLAG_PAUSED;
 
-    torrents = tr_loadTorrents ( self->handle, destination, flags, &count );
+    torrents = tr_loadTorrents ( self->handle, path, flags, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
     tr_free( torrents );
 
+    g_free( path );
     return count;
 }
 
@@ -470,43 +473,46 @@ int
 tr_core_add_list( TrCore * self, GList * paths, enum tr_torrent_action act,
                   gboolean paused )
 {
-    const char  * pref = tr_prefs_get( PREF_ID_ASKDIR );
-    TrCoreClass * class;
-    int           count;
+    char * dir;
+    int count;
 
     TR_IS_CORE( self );
 
-    if( strbool( pref ) )
+    if( pref_flag_get( PREF_KEY_DIR_ASK ) )
     {
-        class = g_type_class_peek( TR_CORE_TYPE );
+        TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
         g_signal_emit( self, class->promptsig, 0, paths, act, paused );
         return 0;
     }
 
-    pref = getdownloaddir();
+    dir = getdownloaddir();
     count = 0;
     for( ; paths; paths=paths->next )
-        if( tr_core_add_dir( self, paths->data, pref, act, paused ) )
+        if( tr_core_add_dir( self, paths->data, dir, act, paused ) )
             count++;
 
+    g_free( dir );
     return count;
 }
 
 gboolean
 tr_core_add_data( TrCore * self, uint8_t * data, size_t size, gboolean paused )
 {
-    const char  * pref = tr_prefs_get( PREF_ID_ASKDIR );
-
+    gboolean ret;
+    char * path;
     TR_IS_CORE( self );
 
-    if( strbool( pref ) )
+    if( pref_flag_get( PREF_KEY_DIR_ASK ) )
     {
         TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
         g_signal_emit( self, class->promptdatasig, 0, data, size, paused );
         return FALSE;
     }
 
-    return tr_core_add_data_dir( self, data, size, getdownloaddir(), paused );
+    path = getdownloaddir( );
+    ret = tr_core_add_data_dir( self, data, size, path, paused );
+    g_free( path );
+    return ret;
 }
 
 gboolean
@@ -637,48 +643,48 @@ tr_core_quit( TrCore * self )
     g_signal_emit( self, class->quitsig, 0 );
 }
 
-void
-tr_core_set_pref( TrCore * self, int id, const char * val )
+/**
+***  Prefs
+**/
+
+static void
+commitPrefsChange( TrCore * self, const char * key )
 {
-    const char  * name, * old;
-    char        * errstr;
-    TrCoreClass * class;
+    TrCoreClass * class = g_type_class_peek( TR_CORE_TYPE );
+    pref_save( NULL );
+    g_signal_emit( self, class->prefsig, 0, key );
+}
 
-    TR_IS_CORE( self );
-
-    /* don't change anything if the new value is the same as the old one */
-    name = tr_prefs_name( id );
-    old = cf_getpref( name );
-    if( !tr_strcmp( old, val ) )
-        return;
-
-    cf_setpref( name, val );
-
-    /* write prefs to disk */
-    cf_saveprefs( &errstr );
-    if( NULL != errstr )
+void
+tr_core_set_pref( TrCore * self, const char * key, const char * newval )
+{
+    char * oldval = pref_string_get( key );
+    if( tr_strcmp( oldval, newval ) )
     {
-        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, errstr );
-        g_free( errstr );
+        pref_string_set( key, newval );
+        commitPrefsChange( self, key );
     }
-
-    /* signal a pref change */
-    class = g_type_class_peek( TR_CORE_TYPE );
-    g_signal_emit( self, class->prefsig, 0, id );
+    g_free( oldval );
 }
 
 void
-tr_core_set_pref_bool( TrCore * self, int id, gboolean val )
+tr_core_set_pref_bool( TrCore * self, const char * key, gboolean newval )
 {
-    tr_core_set_pref( self, id, ( val ? "yes" : "no" ) );
+    const gboolean oldval = pref_flag_get( key );
+    if( oldval != newval )
+    {
+        pref_flag_set( key, newval );
+        commitPrefsChange( self, key );
+    }
 }
 
 void
-tr_core_set_pref_int( TrCore * self, int id, int val )
+tr_core_set_pref_int( TrCore * self, const char * key, int newval )
 {
-    char buf[32];
-
-    g_snprintf( buf, sizeof buf, "%i", val );
-
-    tr_core_set_pref( self, id, buf );
+    const int oldval = pref_int_get( key );
+    if( oldval != newval )
+    {
+        pref_int_set( key, newval );
+        commitPrefsChange( self, key );
+    }
 }

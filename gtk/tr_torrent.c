@@ -33,6 +33,7 @@
 
 #include "tr_prefs.h"
 #include "tr_torrent.h"
+#include "conf.h"
 #include "util.h"
 
 enum {
@@ -283,8 +284,7 @@ tr_torrent_stop( TrTorrent * self )
 static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
-    tr_torrentDisablePex( handle,
-                          !tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
+    tr_torrentDisablePex( handle, !pref_flag_get( PREF_KEY_PEX ) );
 
     return g_object_new( TR_TORRENT_TYPE,
                          "torrent-handle", handle,

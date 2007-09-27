@@ -36,6 +36,9 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
+
 #include "conf.h"
 #include "util.h"
 
@@ -65,14 +68,11 @@ cf_benc_append(benc_val_t *val, char type, int incsize);
 static void
 cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
              char **errstr);
-static gboolean
-writefile_traverse(gpointer key, gpointer value, gpointer data);
 static char *
 getstateval(benc_val_t *state, char *line);
 
 static char *gl_confdir = NULL;
 static char *gl_old_confdir = NULL;
-static GTree *gl_prefs = NULL;
 static char *gl_lockpath = NULL;
 static char *gl_old_lockpath = NULL;
 
@@ -180,7 +180,7 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
             gboolean *usedold, char **errstr) {
   char *path;
   GIOChannel *io;
-  GError *err;
+  GError *err = NULL;
   char *ret;
 
   *errstr = NULL;
@@ -222,68 +222,111 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
   return ret;
 }
 
-void
-cf_loadprefs(char **errstr) {
-  char *data, *line, *eol, *sep, *key;
-  gsize len;
-  benc_val_t val;
-  gboolean usedold;
-  int ii;
+/**
+***  Prefs Files
+**/
 
-  *errstr = NULL;
+#define DEFAULT_GROUP "general"
 
-  if(NULL != gl_prefs)
-    g_tree_destroy(gl_prefs);
-
-  gl_prefs = g_tree_new_full((GCompareDataFunc)g_ascii_strcasecmp, NULL,
-                          g_free, g_free);
-
-  data = cf_readfile(FILE_PREFS, OLD_FILE_PREFS, &len, &usedold, errstr);
-  if(NULL != *errstr) {
-    g_assert(NULL == data);
-    return;
-  }
-
-  if(NULL == data)
-    return;
-
-  memset(&val, 0,  sizeof(val));
-  if(!usedold && !tr_bencLoad(data, len, &val, NULL)) {
-    if(TYPE_DICT == val.type) {
-      key = NULL;
-      for(ii = 0; ii < val.val.l.count; ii++) {
-        if(NULL == key) {
-          g_assert(TYPE_STR == val.val.l.vals[ii].type);
-          key = val.val.l.vals[ii].val.s.s;
-        } else {
-          if(TYPE_INT == val.val.l.vals[ii].type)
-            g_tree_insert(gl_prefs, g_strdup(key),
-                         g_strdup_printf("%"PRIu64, val.val.l.vals[ii].val.i));
-          else if(TYPE_STR == val.val.l.vals[ii].type)
-            g_tree_insert(gl_prefs, g_strdup(key),
-                          g_strdup(val.val.l.vals[ii].val.s.s));
-          key = NULL;
-        }
-      }
-    }
-
-  } else {
-    /* XXX remove this in a release or two */
-    for(line = data; NULL != (eol = strchr(line, PREF_SEP_LINE));
-        line = eol + 1) {
-      *eol = '\0';
-      if(g_utf8_validate(line, -1, NULL) &&
-         NULL != (sep = strchr(line, PREF_SEP_KEYVAL))) {
-        *sep = '\0';
-        g_tree_insert(gl_prefs, g_strcompress(line), g_strcompress(sep+1));
-      }
-    }
-    cf_saveprefs(errstr);
-  }
-
-  tr_bencFree(&val);
-  g_free(data);
+static char*
+getPrefsFilename( void )
+{
+    return g_build_filename( tr_getPrefsDirectory(), "gtk", "prefs", NULL );
 }
+
+static GKeyFile*
+getPrefsKeyFile( void )
+{
+    static GKeyFile * myKeyFile = NULL;
+
+    if( myKeyFile == NULL )
+    {
+        char * filename = getPrefsFilename( );
+        myKeyFile = g_key_file_new( );
+        g_key_file_load_from_file( myKeyFile, filename, 0, NULL );
+        g_free( filename );
+    }
+
+    return myKeyFile;
+}
+
+int
+pref_int_get( const char * key )
+{
+    return g_key_file_get_integer( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+}
+void
+pref_int_set( const char * key, int value )
+{
+    g_key_file_set_integer( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+}
+void
+pref_int_set_default( const char * key, int value )
+{
+    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+        pref_int_set( key, value );
+}
+
+gboolean
+pref_flag_get ( const char * key )
+{
+    return g_key_file_get_boolean( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+}
+void
+pref_flag_set( const char * key, gboolean value )
+{
+    g_key_file_set_boolean( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+}
+void
+pref_flag_set_default( const char * key, gboolean value )
+{
+    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+        pref_flag_set( key, value );
+}
+
+char*
+pref_string_get( const char * key )
+{
+    return g_key_file_get_string( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+}
+void
+pref_string_set( const char * key, const char * value )
+{
+    g_key_file_set_string( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+}
+void
+pref_string_set_default( const char * key, const char * value )
+{
+    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+        pref_string_set( key, value );
+}
+
+void
+pref_save(char **errstr)
+{
+    GError * err = NULL;
+    gsize datalen;
+    char * data;
+    char * filename = getPrefsFilename( );
+
+    data = g_key_file_to_data( getPrefsKeyFile(), &datalen, &err );
+    if( !err ) {
+        GIOChannel * out = g_io_channel_new_file( filename, "w+", &err );
+        g_io_channel_write_chars( out, data, datalen, NULL, &err );
+        g_io_channel_unref( out );
+    }
+
+    if( errstr != NULL )
+        *errstr = err ? g_strdup( err->message ) : NULL;
+
+    g_free( filename );
+    g_free( data );
+    g_clear_error( &err );
+}
+
+/**
+***
+**/
 
 benc_val_t *
 cf_loadstate(char **errstr) {
@@ -337,27 +380,13 @@ cf_benc_append(benc_val_t *val, char type, int incsize) {
   val->val.l.vals[val->val.l.count-1].type = type;
 }
 
-const char *
-cf_getpref(const char *name) {
-  g_assert(NULL != gl_prefs);
-
-  return g_tree_lookup(gl_prefs, name);
-}
-
-void
-cf_setpref(const char *name, const char *value) {
-  g_assert(NULL != gl_prefs);
-
-  g_tree_insert(gl_prefs, g_strdup(name), g_strdup(value));
-}
-
 static void
 cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
              char **errstr) {
   char *path = g_build_filename(gl_confdir, file, NULL);
   char *pathtmp = g_build_filename(gl_confdir, tmp, NULL);
   GIOChannel *io = NULL;
-  GError *err;
+  GError *err = NULL;
   char *datastr;
   int len;
   gsize written;
@@ -402,44 +431,24 @@ cf_writebenc(const char *file, const char *tmp, benc_val_t *data,
     free(datastr);
 }
 
-void
-cf_saveprefs(char **errstr) {
-  benc_val_t val;
-  benc_val_t *ptr;
-
-  *errstr = NULL;
-
-  memset(&val, 0,  sizeof(val));
-  val.type = TYPE_DICT;
-  val.val.l.alloc = val.val.l.count = g_tree_nnodes(gl_prefs) * 2;
-  val.val.l.vals = g_new0(benc_val_t, val.val.l.alloc);
-
-  ptr = val.val.l.vals;
-  g_tree_foreach(gl_prefs, writefile_traverse, &ptr);
-  g_assert(ptr - val.val.l.vals == val.val.l.alloc);
-
-  cf_writebenc(FILE_PREFS, FILE_PREFS_TMP, &val, errstr);
-  tr_bencFree(&val);
-}
-
 static gboolean
-writefile_traverse(gpointer key, gpointer value, gpointer data) {
-  benc_val_t **ptr = data;
-  benc_val_t *bkey = *ptr;
-  benc_val_t *bval = (*ptr) + 1;
+strbool( const char * str )
+{
+  if( !str )
+    return FALSE;
 
-  *ptr = (*ptr) + 2;
-
-  bkey->type = TYPE_STR;
-  bkey->val.s.s = g_strdup(key);
-  bkey->val.s.i = strlen(key);
-
-  bval->type = TYPE_STR;
-  bval->val.s.s = g_strdup(value);
-  bval->val.s.i = strlen(value);
+  switch(str[0]) {
+    case 'y': case 't': case 'Y': case '1': case 'j': case 'e':
+      return TRUE;
+    default:
+      if(0 == g_ascii_strcasecmp("on", str))
+        return TRUE;
+      break;
+  }
 
   return FALSE;
 }
+
 
 static char *
 getstateval(benc_val_t *state, char *line) {

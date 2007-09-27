@@ -141,7 +141,7 @@ level_combo_changed_cb( GtkWidget * w, TrCore * core )
         GtkTreeModel * m = gtk_combo_box_get_model( GTK_COMBO_BOX(w) );
         gtk_tree_model_get( m, &iter, 1, &id, -1 );
         tr_setMessageLevel( id );
-        tr_core_set_pref_int( core, PREF_ID_MSGLEVEL, id );
+        tr_core_set_pref_int( core, PREF_KEY_MSGLEVEL, id );
         msgwin_update( );
     }
 }
@@ -259,8 +259,7 @@ msgwin_create( TrCore * core )
 
   store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_INT);
 
-  curlevel = TR_MSG_INF;
-  tr_prefs_get_int( PREF_ID_MSGLEVEL, &curlevel );
+  curlevel = pref_int_get( PREF_KEY_MSGLEVEL );
   for( i=ii=0; i<G_N_ELEMENTS(trLevels); ++i ) {
       GtkTreeIter iter;
       gtk_list_store_append (store, &iter);
@@ -309,9 +308,7 @@ msgwin_create( TrCore * core )
 void
 msgwin_loadpref( void )
 {
-    int level = TR_MSG_INF;
     textbuf = debug_window_text_buffer_new ( );
-    tr_prefs_get_int( PREF_ID_MSGLEVEL, &level );
-    tr_setMessageLevel( level );
+    tr_setMessageLevel( pref_int_get( PREF_KEY_MSGLEVEL ) );
     tr_setMessageQueuing( TRUE );
 }

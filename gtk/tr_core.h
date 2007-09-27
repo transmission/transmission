@@ -172,17 +172,17 @@ tr_core_quit( TrCore * self );
 /* Set a preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void
-tr_core_set_pref( TrCore * self, int id, const char * val );
+tr_core_set_pref( TrCore * self, const char * key, const char * val );
 
 /* Set a boolean preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void
-tr_core_set_pref_bool( TrCore * self, int id, gboolean val );
+tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
 
 /* Set an integer preference value, save the prefs file, and emit the
    "prefs-changed" signal */
 void
-tr_core_set_pref_int( TrCore * self, int id, int val );
+tr_core_set_pref_int( TrCore * self, const char * key, int val );
 
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */

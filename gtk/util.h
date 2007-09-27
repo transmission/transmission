@@ -44,11 +44,6 @@ enum tr_torrent_action { TR_TOR_LEAVE, TR_TOR_COPY, TR_TOR_MOVE };
 /* used for a callback function with a data parameter */
 typedef void (*callbackfunc_t)(void*);
 
-/* try to interpret a string as a textual representation of a boolean */
-/* note that this isn't localized */
-gboolean
-strbool(const char *str);
-
 /* return a human-readable string for the size given in bytes.
    the string must be g_free()d */
 char *
@@ -106,7 +101,7 @@ const char *
 toractionname( enum tr_torrent_action action );
 
 /* retrieve the global download directory */
-const char *
+char *
 getdownloaddir( void );
 
 #ifdef GTK_MAJOR_VERSION

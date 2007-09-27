@@ -105,7 +105,7 @@ struct cbdata {
     TrCore       * core;
     GtkWidget    * icon;
     GtkWidget    * msgwin;
-    TrPrefs      * prefs;
+    GtkWidget    * prefs;
     guint          timer;
     gboolean       closing;
     GList        * errqueue;
@@ -156,7 +156,7 @@ corepromptdata( TrCore *, uint8_t *, size_t, gboolean, gpointer );
 static void
 readinitialprefs( struct cbdata * cbdata );
 static void
-prefschanged( TrCore * core, int id, gpointer data );
+prefschanged( TrCore * core, const char * key, gpointer data );
 static void
 setpex( tr_torrent * tor, void * arg );
 static gboolean
@@ -244,12 +244,7 @@ main( int argc, char ** argv )
         mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
 
         /* try to load prefs and saved state */
-        cf_loadprefs( &err );
-        if( NULL != err )
-        {
-            errmsg( mainwind, "%s", err );
-            g_free( err );
-        }
+        tr_prefs_init_global( );
         state = cf_loadstate( &err );
         if( NULL != err )
         {
@@ -428,7 +423,7 @@ appsetup( TrWindow * wind, GList * args,
 
     if( NULL != args )
     {
-        action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+        action = tr_prefs_get_action( PREF_KEY_ADDIPC );
         tr_core_add_list( cbdata->core, args, action, paused );
     }
     tr_core_torrents_added( cbdata->core );
@@ -659,7 +654,7 @@ gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
     /* try to add any torrents we found */
     if( NULL != paths )
     {
-        action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
+        action = tr_prefs_get_action( PREF_KEY_ADDSTD );
         tr_core_add_list( data->core, paths, action, FALSE );
         tr_core_torrents_added( data->core );
         g_list_free(paths);
@@ -742,87 +737,72 @@ corepromptdata( TrCore * core, uint8_t * data, size_t size,
 static void
 readinitialprefs( struct cbdata * cbdata )
 {
-    int prefs[] =
+    size_t i;
+    const char * keys[] =
     {
-        PREF_ID_PORT,
-        PREF_ID_DOWNLIMIT,
-        PREF_ID_USEDOWNLIMIT,
-        PREF_ID_UPLIMIT,
-        PREF_ID_USEUPLIMIT,
-        PREF_ID_NAT,
-        PREF_ID_ICON,
-        PREF_ID_PEX,
+        PREF_KEY_PORT,
+        PREF_KEY_DL_LIMIT_ENABLED,
+        PREF_KEY_DL_LIMIT,
+        PREF_KEY_UL_LIMIT_ENABLED,
+        PREF_KEY_UL_LIMIT,
+        PREF_KEY_NAT,
+        PREF_KEY_PEX,
+        PREF_KEY_SYSTRAY
     };
-    int ii;
 
-    for( ii = 0; ALEN( prefs ) > ii; ii++ )
-    {
-        prefschanged( NULL, prefs[ii], cbdata );
-    }
+    for( i=0; i<G_N_ELEMENTS(keys); ++i )
+        prefschanged( NULL, keys[i], cbdata );
 }
 
 static void
-prefschanged( TrCore * core SHUTUP, int id, gpointer data )
+prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
 {
     struct cbdata * cbdata = data;
     tr_handle     * tr     = tr_core_handle( cbdata->core );
-    gboolean        boolval;
 
-    switch( id )
+    if( !strcmp( key, PREF_KEY_PORT ) )
     {
-        case PREF_ID_PORT:
-            tr_setBindPort( tr, tr_prefs_get_int_with_default( id ) );
-            break;
-
-        case PREF_ID_USEDOWNLIMIT:
-            tr_setUseGlobalSpeedLimit( tr, TR_DOWN,
-                tr_prefs_get_bool_with_default( PREF_ID_USEDOWNLIMIT ) );
-            break;
-
-        case PREF_ID_DOWNLIMIT:
-            tr_setGlobalSpeedLimit( tr, TR_DOWN,
-                tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT ) );
-            break;
-
-        case PREF_ID_USEUPLIMIT:
-            tr_setUseGlobalSpeedLimit( tr, TR_UP,
-                tr_prefs_get_bool_with_default( PREF_ID_USEUPLIMIT ) );
-            break;
-
-        case PREF_ID_UPLIMIT:
-            tr_setGlobalSpeedLimit( tr, TR_UP,
-                tr_prefs_get_int_with_default( PREF_ID_UPLIMIT ) );
-            break;
-
-        case PREF_ID_NAT:
-            tr_natTraversalEnable( tr, tr_prefs_get_bool_with_default( id ) );
-            break;
-
-        case PREF_ID_ICON:
-            if( tr_prefs_get_bool_with_default( id ) )
-            {
-                makeicon( cbdata );
-            }
-            else if( NULL != cbdata->icon )
-            {
-g_message ("foo");
-                g_object_unref( cbdata->icon );
-                cbdata->icon = NULL;
-            }
-            break;
-
-        case PREF_ID_PEX:
-            boolval = tr_prefs_get_bool_with_default( id );
-            tr_torrentIterate( tr, setpex, &boolval );
-            break;
-
-        case PREF_ID_DIR:
-        case PREF_ID_ASKDIR:
-        case PREF_ID_ADDSTD:
-        case PREF_ID_ADDIPC:
-        case PREF_ID_MSGLEVEL:
-        case PREF_MAX_ID:
-            break;
+        const int port = pref_int_get( key );
+        tr_setBindPort( tr, port );
+    }
+    else if( !strcmp( key, PREF_KEY_DL_LIMIT_ENABLED ) )
+    {
+        const gboolean b = pref_flag_get( key );
+        tr_setUseGlobalSpeedLimit( tr, TR_DOWN, b );
+    }
+    else if( !strcmp( key, PREF_KEY_DL_LIMIT ) )
+    {
+        const int limit = pref_int_get( key );
+        tr_setGlobalSpeedLimit( tr, TR_DOWN, limit );
+    }
+    else if( !strcmp( key, PREF_KEY_UL_LIMIT_ENABLED ) )
+    {
+        const gboolean b = pref_flag_get( key );
+        tr_setUseGlobalSpeedLimit( tr, TR_UP, b );
+    }
+    else if( !strcmp( key, PREF_KEY_UL_LIMIT ) )
+    {
+        const int limit = pref_int_get( key );
+        tr_setGlobalSpeedLimit( tr, TR_UP, limit );
+    }
+    else if( !strcmp( key, PREF_KEY_NAT ) )
+    {
+        const gboolean enabled = pref_flag_get( key );
+        tr_natTraversalEnable( tr, enabled );
+    }
+    else if( !strcmp( key, PREF_KEY_SYSTRAY ) )
+    {
+        if( pref_flag_get( key ) ) {
+            makeicon( cbdata );
+        } else if( cbdata->icon ) {
+            g_object_unref( cbdata->icon );
+            cbdata->icon = NULL;
+        }
+    }
+    else if( !strcmp( key, PREF_KEY_PEX ) )
+    {
+        gboolean enabled = pref_flag_get( key );
+        tr_torrentIterate( tr, setpex, &enabled );
     }
 }
 
@@ -1064,8 +1044,7 @@ doAction ( const char * action_name, gpointer user_data )
     {
         if( NULL == data->prefs )
         {
-            data->prefs = tr_prefs_new_with_parent( G_OBJECT( data->core ),
-                                                    data->wind );
+            data->prefs = tr_prefs_dialog_new( G_OBJECT(data->core), data->wind );
             g_signal_connect( data->prefs, "destroy",
                              G_CALLBACK( gtk_widget_destroyed ), &data->prefs );
             gtk_widget_show( GTK_WIDGET( data->prefs ) );

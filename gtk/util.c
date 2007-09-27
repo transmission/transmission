@@ -35,6 +35,7 @@
 
 #include "tr_prefs.h"
 #include "tr_torrent.h"
+#include "conf.h"
 #include "util.h"
 
 #define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
@@ -49,28 +50,6 @@ tr_strcmp( const char * a, const char * b )
     if( a ) return 1;
     if( b ) return -1;
     return 0;
-}
-
-gboolean
-strbool( const char * str )
-{
-  if( !str )
-    return FALSE;
-
-  switch(str[0]) {
-    case 'y':
-    case 'Y':
-    case '1':
-    case 'j':
-    case 'e':
-      return TRUE;
-    default:
-      if(0 == g_ascii_strcasecmp("on", str))
-        return TRUE;
-      break;
-  }
-
-  return FALSE;
 }
 
 static const char *sizestrs[] = {
@@ -314,15 +293,15 @@ toractionname( enum tr_torrent_action action )
     }
 }
 
-const char *
+char *
 getdownloaddir( void )
 {
     static char * wd = NULL;
-    const char * dir = tr_prefs_get( PREF_ID_DIR );
-    if (NULL == dir) {
-      if (NULL == wd)
-        wd = g_get_current_dir();
-      dir = wd;
+    char * dir = pref_string_get( PREF_KEY_DIR_DEFAULT );
+    if ( dir == NULL ) {
+        if( wd == NULL )
+            wd = g_get_current_dir();
+        dir = g_strdup( wd );
     }
     return dir;
 }

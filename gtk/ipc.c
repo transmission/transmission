@@ -590,7 +590,7 @@ smsg_add( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag, void * arg )
         return;
     }
 
-    action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+    action = tr_prefs_get_action( PREF_KEY_ADDIPC );
     for( ii = 0; ii < val->val.l.count; ii++ )
     {
         path = val->val.l.vals + ii;
@@ -637,7 +637,7 @@ smsg_addone( enum ipc_msg id SHUTUP, benc_val_t * val, int64_t tag,
         return;
     }
 
-    action = toraddaction( tr_prefs_get( PREF_ID_ADDIPC ) );
+    action = tr_prefs_get_action( PREF_KEY_ADDIPC );
     paused = ( NULL == start || start->val.i ? FALSE : TRUE );
     if( NULL != file )
     {
@@ -997,33 +997,28 @@ smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
             buf = ipc_mkint( con->ipc, &size, IPC_MSG_AUTOSTART, tag, 1 );
             break;
         case IPC_MSG_GETDIR:
-            pref = tr_prefs_get( PREF_ID_ASKDIR );
             /* XXX sending back "" when we're prompting is kind of bogus */
-            pref = strbool( pref ) ? "" : getdownloaddir();
+            pref = pref_flag_get( PREF_KEY_DIR_ASK ) ? "" : getdownloaddir();
             buf = ipc_mkstr( con->ipc, &size, IPC_MSG_DIR, tag, pref );
             break;
         case IPC_MSG_GETDOWNLIMIT:
-            num = -1;
-            if( tr_prefs_get_bool_with_default( PREF_ID_USEDOWNLIMIT ) )
-            {
-                num = tr_prefs_get_int_with_default( PREF_ID_DOWNLIMIT );
-            }
+            num = pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED )
+                ? pref_int_get( PREF_KEY_DL_LIMIT )
+                : -1;
             buf = ipc_mkint( con->ipc, &size, IPC_MSG_DOWNLIMIT, tag, num );
             break;
         case IPC_MSG_GETPEX:
             buf = ipc_mkint( con->ipc, &size, IPC_MSG_PEX, tag,
-                             tr_prefs_get_bool_with_default( PREF_ID_PEX ) );
+                             pref_flag_get( PREF_KEY_PEX ) );
             break;
         case IPC_MSG_GETPORT:
             buf = ipc_mkint( con->ipc, &size, IPC_MSG_PORT, tag,
-                             tr_prefs_get_int_with_default( PREF_ID_PORT ) );
+                             pref_flag_get( PREF_KEY_PORT ) );
             break;
         case IPC_MSG_GETUPLIMIT:
-            num = -1;
-            if( tr_prefs_get_bool_with_default( PREF_ID_USEUPLIMIT ) )
-            {
-                num = tr_prefs_get_int_with_default( PREF_ID_UPLIMIT );
-            }
+            num = pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED )
+                ? pref_int_get( PREF_KEY_UL_LIMIT )
+                : -1;
             buf = ipc_mkint( con->ipc, &size, IPC_MSG_UPLIMIT, tag, num );
             break;
         default:
@@ -1052,7 +1047,7 @@ smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     switch( id )
     {
         case IPC_MSG_AUTOMAP:
-            tr_core_set_pref_bool( srv->core, PREF_ID_NAT, val->val.i );
+            tr_core_set_pref_bool( srv->core, PREF_KEY_NAT, val->val.i );
             break;
         case IPC_MSG_AUTOSTART:
             simpleresp( con, tag, IPC_MSG_BAD );
@@ -1060,33 +1055,29 @@ smsg_int( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
         case IPC_MSG_DOWNLIMIT:
             if( 0 > val->val.i )
             {
-                tr_core_set_pref_bool( srv->core, PREF_ID_USEDOWNLIMIT,
-                                       FALSE );
+                tr_core_set_pref_bool( srv->core, PREF_KEY_DL_LIMIT_ENABLED, 0 );
             }
             else
             {
-                tr_core_set_pref_int( srv->core, PREF_ID_DOWNLIMIT,
-                                      val->val.i );
-                tr_core_set_pref_bool( srv->core, PREF_ID_USEDOWNLIMIT, TRUE );
+                tr_core_set_pref_int( srv->core, PREF_KEY_DL_LIMIT, val->val.i );
+                tr_core_set_pref_bool( srv->core, PREF_KEY_DL_LIMIT_ENABLED, 1 );
             }
             break;
         case IPC_MSG_PEX:
-            tr_core_set_pref_bool( srv->core, PREF_ID_PEX, val->val.i );
+            tr_core_set_pref_bool( srv->core, PREF_KEY_PEX, val->val.i );
             break;
         case IPC_MSG_PORT:
-            tr_core_set_pref_int( srv->core, PREF_ID_PORT, val->val.i );
+            tr_core_set_pref_int( srv->core, PREF_KEY_PORT, val->val.i );
             break;
         case IPC_MSG_UPLIMIT:
             if( 0 > val->val.i )
             {
-                tr_core_set_pref_bool( srv->core, PREF_ID_USEUPLIMIT,
-                                       FALSE );
+                tr_core_set_pref_bool( srv->core, PREF_KEY_UL_LIMIT_ENABLED, 0 );
             }
             else
             {
-                tr_core_set_pref_int( srv->core, PREF_ID_UPLIMIT,
-                                      val->val.i );
-                tr_core_set_pref_bool( srv->core, PREF_ID_USEUPLIMIT, TRUE );
+                tr_core_set_pref_int( srv->core, PREF_KEY_UL_LIMIT, val->val.i );
+                tr_core_set_pref_bool( srv->core, PREF_KEY_UL_LIMIT_ENABLED, 1 );
             }
             break;
         default:
@@ -1110,7 +1101,7 @@ smsg_str( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     switch( id )
     {
         case IPC_MSG_DIR:
-            tr_core_set_pref( srv->core, PREF_ID_DIR, val->val.s.s );
+            tr_core_set_pref( srv->core, PREF_KEY_DIR_DEFAULT, val->val.s.s );
             break;
         default:
             g_assert_not_reached();

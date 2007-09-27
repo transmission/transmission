@@ -129,7 +129,7 @@ makeaddwind( GtkWindow * parent, TrCore * core )
   GtkFileFilter *unfilter = gtk_file_filter_new();
   GtkWidget *getdir = gtk_file_chooser_button_new(
     _("Choose a download directory"), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-  const char * pref;
+  char * pref;
 
   data->widget = wind;
   data->core = core;
@@ -148,10 +148,10 @@ makeaddwind( GtkWindow * parent, TrCore * core )
   gtk_box_pack_start_defaults(GTK_BOX(vbox), bbox);
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(autocheck), TRUE);
-  pref = tr_prefs_get( PREF_ID_DIR );
-  if( NULL != pref )
-  {
+  pref = pref_string_get( PREF_KEY_DIR_DEFAULT );
+  if( pref != NULL ) {
       gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER( wind ), pref );
+      g_free( pref );
   }
 
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dircheck), FALSE);
@@ -214,7 +214,8 @@ addresp(GtkWidget *widget, gint resp, gpointer gdata) {
     if(data->usingaltdir)
       dir = gtk_file_chooser_get_filename(data->altdir);
     files = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(widget));
-    action = toraddaction( tr_prefs_get( PREF_ID_ADDSTD ) );
+    action = tr_prefs_get_action( PREF_KEY_ADDSTD );
+
     if( NULL == dir )
     {
         stupidgtk = NULL;
@@ -268,6 +269,7 @@ void
 promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
               size_t size, enum tr_torrent_action act, gboolean paused )
 {
+    char * path;
     struct dirdata * stuff;
     GtkWidget      * wind;
 
@@ -295,8 +297,9 @@ promptfordir( GtkWindow * parent, TrCore * core, GList * files, uint8_t * data,
                                          NULL );
     gtk_file_chooser_set_local_only( GTK_FILE_CHOOSER( wind ), TRUE );
     gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER( wind ), FALSE );
-    gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( wind ),
-                                   getdownloaddir() );
+    path = getdownloaddir( );
+    gtk_file_chooser_set_filename( GTK_FILE_CHOOSER( wind ), path );
+    g_free( path );
 
     stuff->widget = wind;
 
@@ -372,13 +375,10 @@ struct quitdata
 static void
 quitresp( GtkWidget * widget, int response, gpointer data )
 {
-    struct quitdata * stuff;
-    gboolean doask;
+    struct quitdata * stuff = data;
 
-    stuff = data;
-
-    doask = !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(stuff->dontask) );
-    tr_core_set_pref_bool( stuff->core, PREF_ID_ASKQUIT, doask );
+    pref_flag_set( PREF_KEY_ASKQUIT,
+                   !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(stuff->dontask) ) );
 
     if( response == GTK_RESPONSE_ACCEPT )
         stuff->func( stuff->cbdata );
@@ -397,7 +397,7 @@ askquit( TrCore          * core,
     GtkWidget * wind;
     GtkWidget * dontask;
 
-    if( !tr_prefs_get_bool_with_default( PREF_ID_ASKQUIT ) )
+    if( !pref_flag_get( PREF_KEY_ASKQUIT ) )
     {
         func( cbdata );
         return;
