@@ -779,6 +779,33 @@ static int static_lastid = 0;
     return fStat->eta;
 }
 
+- (NSString * ) etaString
+{
+    int eta = [self eta];
+    if (eta < 0)
+        return @"";
+    
+    NSString * timeString;
+    if (eta < 60)
+        return [NSString stringWithFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
+    else if (eta < 3600) //60 * 60
+        return [NSString stringWithFormat: NSLocalizedString(@"%d min %d sec", "Torrent -> remaining time"),
+                                                eta / 60, eta % 60];
+    else if (eta < 86400) //24 * 60 * 60
+        return [NSString stringWithFormat: NSLocalizedString(@"%d hr %d min", "Torrent -> remaining time"),
+                                                eta / 3600, (eta / 60) % 60];
+    else
+    {
+        int days = eta / 86400;
+        if (days > 1)
+            return [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
+                                                    days, (eta / 3600) % 24];
+        else
+            return [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
+                                                    (eta / 3600) % 24];
+    }
+}
+
 - (float) notAvailableDesired
 {//NSLog(@"not available %f", (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size]);
     return (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size];
@@ -915,34 +942,12 @@ static int static_lastid = 0;
     //add time when downloading
     if (fStat->status == TR_STATUS_DOWNLOAD)
     {
-        #warning combine
         int eta = [self eta];
-        if (eta < 0)
-            string = [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
+        if (eta >= 0)
+            string = [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
+                        [self etaString]];
         else
-        {
-            NSString * timeString;
-            if (eta < 60)
-                timeString = [NSString stringWithFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
-            else if (eta < 3600) //60 * 60
-                timeString = [NSString stringWithFormat: NSLocalizedString(@"%d min %d sec", "Torrent -> remaining time"),
-                                                        eta / 60, eta % 60];
-            else if (eta < 86400) //24 * 60 * 60
-                timeString = [NSString stringWithFormat: NSLocalizedString(@"%d hr %d min", "Torrent -> remaining time"),
-                                                        eta / 3600, (eta / 60) % 60];
-            else
-            {
-                int days = eta / 86400;
-                if (days > 1)
-                    timeString = [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
-                                                            days, (eta / 3600) % 24];
-                else
-                    timeString = [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
-                                                            (eta / 3600) % 24];
-            }
-            
-            string = [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"), timeString];
-        }
+            string = [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
     }
     
     return string;
@@ -1007,8 +1012,7 @@ static int static_lastid = 0;
     }
     
     //create strings for error or stalled
-    #warning why fError
-    if (fError)
+    if ([self isError])
     {
         NSString * errorString = [self errorMessage];
         if (!errorString || [errorString isEqualToString: @""])
@@ -1067,8 +1071,6 @@ static int static_lastid = 0;
             string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
             
-            fChecking = YES;
-            
             break;
 
         case TR_STATUS_STOPPING:
@@ -1123,30 +1125,7 @@ static int static_lastid = 0;
 
         case TR_STATUS_DOWNLOAD:
             
-            eta = [self eta];
-            if (eta < 0)
-               string = NSLocalizedString(@"Unknown", "Torrent -> remaining time");
-            else
-            {
-                if (eta < 60)
-                    string = [NSString stringWithFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
-                else if (eta < 3600) //60 * 60
-                    string = [NSString stringWithFormat: NSLocalizedString(@"%d min %d sec", "Torrent -> remaining time"),
-                                                            eta / 60, eta % 60];
-                else if (eta < 86400) //24 * 60 * 60
-                    string = [NSString stringWithFormat: NSLocalizedString(@"%d hr %d min", "Torrent -> remaining time"),
-                                                            eta / 3600, (eta / 60) % 60];
-                else
-                {
-					days = eta / 86400;
-                    if (days > 1)
-                        string = [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
-                                                                days, (eta / 3600) % 24];
-                    else
-                        string = [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
-                                                                (eta / 3600) % 24];
-                }
-            }
+            string = [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
             
             break;
     }

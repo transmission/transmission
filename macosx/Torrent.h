@@ -155,6 +155,8 @@ typedef enum
 - (float) progressDone;
 - (float) progressLeft;
 - (int) eta;
+- (NSString * ) etaString;
+
 - (float) notAvailableDesired;
 
 - (BOOL) isActive;
