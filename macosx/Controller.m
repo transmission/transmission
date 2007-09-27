@@ -2825,7 +2825,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return [fWindow attachedSheet] == nil;
     
     //enable sort and advanced bar items
-    if (action == @selector(setSort:) || action == @selector(toggleAdvancedBar:) || action == @selector(toggleSmallView:))
+    if (action == @selector(setSort:) || /*action == @selector(toggleAdvancedBar:) ||*/ action == @selector(toggleSmallView:))
         return [fWindow isVisible];
 
     //enable show info
@@ -2834,7 +2834,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSString * title = [[fInfoController window] isVisible] ? NSLocalizedString(@"Hide Inspector",
                             "View menu -> Inspector") : NSLocalizedString(@"Show Inspector", "View menu -> Inspector");
         if (![[menuItem title] isEqualToString: title])
-                [menuItem setTitle: title];
+            [menuItem setTitle: title];
 
         return YES;
     }

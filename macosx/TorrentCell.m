@@ -48,9 +48,6 @@
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
-#define MAX_PIECES 324
-#define BLANK_PIECE -99
-
 @interface TorrentCell (Private)
 
 - (void) drawBar: (NSRect) barRect;
