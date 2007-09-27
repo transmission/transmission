@@ -68,18 +68,6 @@
 
 @implementation TorrentCell
 
-// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
-#define BE OSSwapBigToHostConstInt32
-
-static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
-                kBlue   = BE(0x50A0FFFF), //80, 160, 255
-                kBlue2  = BE(0x1E46B4FF), //30, 70, 180
-                kGray   = BE(0x969696FF), //150, 150, 150
-                kGreen1 = BE(0x99FFCCFF), //153, 255, 204
-                kGreen2 = BE(0x66FF99FF), //102, 255, 153
-                kGreen3 = BE(0x00FF66FF), //0, 255, 102
-                kWhite  = BE(0xFFFFFFFF); //255, 255, 255
-
 //only called one, so don't worry about release
 - (id) init
 {
@@ -101,25 +89,6 @@ static uint32_t kRed    = BE(0xFF6450FF), //255, 100, 80
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
-}
-
-- (id) copyWithZone: (NSZone *) zone
-{
-    TorrentCell * copy = [super copyWithZone: zone];
-    
-    copy->fBitmap = nil;
-    copy->fPieces = NULL;
-    
-    return copy;
-}
-
-- (void) dealloc
-{
-    [fBitmap release];
-    if (fPieces)
-        free(fPieces);
-    
-    [super dealloc];
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds
