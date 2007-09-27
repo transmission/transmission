@@ -970,14 +970,19 @@ static int static_lastid = 0;
 }
 
 - (float) progressLeft
-{
-    return (float)fStat->leftUntilDone/[self size];
+{//NSLog(@"left %f",(float)fStat->leftUntilDone / [self size]);
+    return (float)fStat->leftUntilDone / [self size];
 }
 
 - (int) eta
 {
     return fStat->eta;
 }
+
+/*- (float) notAvailableDesired
+{NSLog(@"not available %f", (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size]);
+    return (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size];
+}*/
 
 - (BOOL) isActive
 {
@@ -1056,9 +1061,11 @@ static int static_lastid = 0;
                 [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
             
             [dic setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
-            
-            [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         }
+        
+        #warning why would connected clients have null value?
+        if (peer->client)
+            [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         else
             [dic setObject: @"" forKey: @"Client"]; //needed to be set here for client sort
         
