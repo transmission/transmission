@@ -45,9 +45,9 @@
             NSMutableParagraphStyle *centeredStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
             [centeredStyle setAlignment:NSCenterTextAlignment];
             
-            [[NSString stringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame
-                        withAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                                            [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil]];
+            if (!fAttributes)
+                fAttributes = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 11.0] forKey: NSFontAttributeName];
+            [[NSString stringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame withAttributes: fAttributes];
         }
         else
         {

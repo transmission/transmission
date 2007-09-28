@@ -270,7 +270,7 @@
         
         if (rightWidth > 0)
         {
-            if (![fDefaults boolForKey: @"DisplayProgressBarAvailable"])
+            /*if (![fDefaults boolForKey: @"DisplayProgressBarAvailable"])
             {
                 int notAvailableWidth = barRect.size.width * [torrent notAvailableDesired];
                 //NSLog(@"notAvailableWidth %d rightWidth %d", notAvailableWidth, rightWidth);
@@ -288,7 +288,7 @@
                         fYellowGradient = [[CTGradient progressYellowGradient] retain];
                     [fYellowGradient fillRect: notAvailableRect angle: -90];
                 }
-            }
+            }*/
             
             if (rightWidth > 0)
             {

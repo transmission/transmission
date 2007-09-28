@@ -27,6 +27,7 @@
 @interface PeerProgressIndicatorCell : NSLevelIndicatorCell
 {
     BOOL fIsHidden;
+    NSDictionary * fAttributes;
     NSImage * fCheckImage;
 }
 
