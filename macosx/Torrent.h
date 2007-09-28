@@ -149,8 +149,6 @@ typedef enum
 
 - (BOOL) publicTorrent;
 
-- (NSString *) stateString;
-
 - (float) progress;
 - (float) progressDone;
 - (float) progressLeft;
@@ -174,6 +172,8 @@ typedef enum
 - (NSString *) statusString;
 - (NSString *) shortStatusString;
 - (NSString *) remainingTimeString;
+
+- (NSString *) stateString;
 
 - (int) seeders;
 - (int) leechers;

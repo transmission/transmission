@@ -272,7 +272,7 @@ static int static_lastid = 0;
     
     //check for error
     BOOL wasError = fError;
-    fError = [self isError] && [self isActive];
+    fError = [self isError];
     
     //check if stalled
     BOOL wasStalled = fStalled;
@@ -280,7 +280,7 @@ static int static_lastid = 0;
                 && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
     
     //update queue for checking (from downloading to seeding), stalled, or error
-    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError))
+    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
@@ -723,41 +723,6 @@ static int static_lastid = 0;
     return fPublicTorrent;
 }
 
-- (NSString *) stateString
-{
-    switch( fStat->status )
-    {
-        case TR_STATUS_STOPPED:
-            return NSLocalizedString(@"Paused", "Torrent -> status string");
-            break;
-
-        case TR_STATUS_CHECK:
-            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-            break;
-        
-        case TR_STATUS_CHECK_WAIT:
-            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-            break;
-
-        case TR_STATUS_DOWNLOAD:
-            return NSLocalizedString(@"Downloading", "Torrent -> status string");
-            break;
-
-        case TR_STATUS_SEED:
-        case TR_STATUS_DONE:
-            return NSLocalizedString(@"Seeding", "Torrent -> status string");
-            break;
-
-        case TR_STATUS_STOPPING:
-            return [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
-            break;
-        
-        default:
-            return NSLocalizedString(@"N/A", "Torrent -> status string");
-    }
-}
-
 - (float) progress
 {
     return fStat->percentComplete;
@@ -1020,17 +985,14 @@ static int static_lastid = 0;
     
     if ([self isActive] && ![self isChecking])
     {
-        NSString * stringToAppend = @"";
+        NSString * stringToAppend;
         if (![self allDownloaded])
-        {
             stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
                                 [NSString stringForSpeed: [self downloadRate]]];
-        }
+        else
+            stringToAppend = @"";
         
-        stringToAppend = [stringToAppend stringByAppendingString: [NSLocalizedString(@"UL: ", "Torrent -> status string")
-                                            stringByAppendingString: [NSString stringForSpeed: [self uploadRate]]]];
-
-        string = [string stringByAppendingString: [NSString stringWithFormat: @" - %@", stringToAppend]];
+        string = [NSString stringWithFormat: @"%@ - %@UL: %@", string, stringToAppend, [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
@@ -1119,6 +1081,41 @@ static int static_lastid = 0;
     }
 
     return string;
+}
+
+- (NSString *) stateString
+{
+    switch (fStat->status)
+    {
+        case TR_STATUS_STOPPED:
+            return NSLocalizedString(@"Paused", "Torrent -> status string");
+            break;
+
+        case TR_STATUS_CHECK:
+            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
+            break;
+        
+        case TR_STATUS_CHECK_WAIT:
+            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
+
+        case TR_STATUS_DOWNLOAD:
+            return NSLocalizedString(@"Downloading", "Torrent -> status string");
+            break;
+
+        case TR_STATUS_SEED:
+        case TR_STATUS_DONE:
+            return NSLocalizedString(@"Seeding", "Torrent -> status string");
+            break;
+
+        case TR_STATUS_STOPPING:
+            return [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
+        
+        default:
+            return NSLocalizedString(@"N/A", "Torrent -> status string");
+    }
 }
 
 - (int) seeders
