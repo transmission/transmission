@@ -620,10 +620,9 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                     if(( tmp = tr_bencDictFind( flags, "min_request_interval")))
                         t->scrapeIntervalMsec = tmp->val.i * 1000;
 
-                assert( tr_ptrArrayFindSorted(t->scraping,tor,torrentCompare) ); /* FIXME This is the line that crashes for John_Clay */
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
-                assert( !tor->scrapeTimer );
+                tr_timerFree( &tor->scrapeTimer );
                 tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, tor, t->scrapeIntervalMsec );
                 tr_dbg( "Torrent '%s' scrape successful."
                         "  Rescraping in %d seconds",

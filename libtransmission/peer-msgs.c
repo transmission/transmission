@@ -1110,7 +1110,9 @@ sendBitfield( tr_peermsgs * msgs )
 ***
 **/
 
-#define MAX_DIFFS 50
+/* some peers give us error messages if we send
+   more than this many peers in a single pex message */
+#define MAX_PEX_DIFFS 50
 
 typedef struct
 {
@@ -1129,7 +1131,7 @@ pexAddedCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = (PexDiffs *) userData;
     tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_DIFFS )
+    if( diffs->diffCount < MAX_PEX_DIFFS )
     {
         diffs->diffCount++;
         diffs->added[diffs->addedCount++] = *pex;
@@ -1142,7 +1144,7 @@ pexRemovedCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = (PexDiffs *) userData;
     tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_DIFFS )
+    if( diffs->diffCount < MAX_PEX_DIFFS )
     {
         diffs->diffCount++;
         diffs->dropped[diffs->droppedCount++] = *pex;
@@ -1154,7 +1156,7 @@ pexElementCb( void * vpex, void * userData )
 {
     PexDiffs * diffs = (PexDiffs *) userData;
     tr_pex * pex = (tr_pex *) vpex;
-    if( diffs->diffCount < MAX_DIFFS )
+    if( diffs->diffCount < MAX_PEX_DIFFS )
     {
         diffs->diffCount++;
         diffs->elements[diffs->elementCount++] = *pex;
