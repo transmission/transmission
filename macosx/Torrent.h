@@ -59,7 +59,7 @@ typedef enum
     NSImage * fIcon;
     
     tr_file_stat * fileStat;
-    NSArray * fFileList, * fFlatFileList;
+    NSArray * fFileList;
     
     NSMenu * fFileMenu;
     

@@ -43,9 +43,8 @@ static int static_lastid = 0;
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
-            withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-            flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index;
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
+            previousPath: (NSString *) previousPath fileSize: (uint64_t) size index: (int) index;
 
 - (void) quickPause;
 - (void) endQuickPause;
@@ -158,7 +157,6 @@ static int static_lastid = 0;
     [fIcon release];
     
     [fFileList release];
-    [fFlatFileList release];
     
     [fFileMenu release];
     
@@ -967,7 +965,6 @@ static int static_lastid = 0;
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
-                    
                 
                 string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
                 break;
@@ -1041,35 +1038,30 @@ static int static_lastid = 0;
 
 - (NSString *) remainingTimeString
 {
-    int eta, days;
-    
-    NSString * string;
     switch (fStat->status)
     {
         case TR_STATUS_CHECK_WAIT:
-            string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
+            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
             break;
 
         case TR_STATUS_CHECK:
-            string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
+            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
             break;
 
         case TR_STATUS_DOWNLOAD:
-            string = [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
+            return [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
             break;
         
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
-            string = [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString:
+            return [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString:
                                                                             [NSString stringForRatio: [self ratio]]];
             break;
         
         default:
-            string = @"";
+            return @"";
     }
-
-    return string;
 }
 
 - (NSString *) stateString
@@ -1554,7 +1546,7 @@ static int static_lastid = 0;
     NSMutableArray * pathComponents;
     NSString * path;
     
-    NSMutableArray * fileList = [[NSMutableArray alloc] init],
+    NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count],
                     * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
     
     for (i = 0; i < count; i++)
@@ -1570,20 +1562,17 @@ static int static_lastid = 0;
         else
             path = @"";
         
-        [self insertPath: pathComponents forSiblings: fileList withParent: nil previousPath: path
-                flatList: flatFileList fileSize: file->length index: i];
+        [self insertPath: pathComponents forSiblings: fileList withParent: nil previousPath: path fileSize: file->length index: i];
         [pathComponents autorelease];
     }
     
     fFileList = [[NSArray alloc] initWithArray: fileList];
     [fileList release];
-    fFlatFileList = [[NSArray alloc] initWithArray: flatFileList];
     [flatFileList release];
 }
 
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings
-        withParent: (NSMutableDictionary *) parent previousPath: (NSString *) previousPath
-        flatList: (NSMutableArray *) flatList fileSize: (uint64_t) size index: (int) index
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
+            previousPath: (NSString *) previousPath fileSize: (uint64_t) size index: (int) index
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1619,8 +1608,6 @@ static int static_lastid = 0;
             NSImage * icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
             [icon setFlipped: YES];
             [dict setObject: icon forKey: @"Icon"];
-            
-            [flatList addObject: dict];
         }
         
         if (parent)
@@ -1632,8 +1619,8 @@ static int static_lastid = 0;
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
-        [self insertPath: components forSiblings: [dict objectForKey: @"Children"]
-            withParent: dict previousPath: currentPath flatList: flatList fileSize: size index: index];
+        [self insertPath: components forSiblings: [dict objectForKey: @"Children"] withParent: dict
+                previousPath: currentPath fileSize: size index: index];
     }
 }
 
