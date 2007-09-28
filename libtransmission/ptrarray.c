@@ -160,7 +160,16 @@ tr_ptrArrayLowerBound( const tr_ptrArray * t,
         *exact_match = 0;
 
     return first;
-} 
+}
+
+static void
+assertSortedAndUnique( const tr_ptrArray * t,
+                       int compare(const void*, const void*) )
+{
+    int i;
+    for( i=0; i<t->n_items-2; ++i )
+        assert( compare( t->items[i], t->items[i+1] ) < 0 );
+}
 
 int
 tr_ptrArrayInsertSorted( tr_ptrArray  * t,
@@ -168,7 +177,9 @@ tr_ptrArrayInsertSorted( tr_ptrArray  * t,
                          int            compare(const void*,const void*) )
 {
     const int pos = tr_ptrArrayLowerBound( t, ptr, compare, NULL );
-    return tr_ptrArrayInsert( t, ptr, pos );
+    const int ret = tr_ptrArrayInsert( t, ptr, pos );
+    assertSortedAndUnique( t, compare );
+    return ret;
 }
 
 void*
@@ -193,5 +204,6 @@ tr_ptrArrayRemoveSorted( tr_ptrArray  * t,
         ret = t->items[pos];
         tr_ptrArrayErase( t, pos, pos+1 );
     }
+    assertSortedAndUnique( t, compare );
     return ret;
 }
