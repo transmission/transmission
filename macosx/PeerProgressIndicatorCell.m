@@ -42,11 +42,8 @@
     {
         if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
         {
-            NSMutableParagraphStyle *centeredStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
-            [centeredStyle setAlignment:NSCenterTextAlignment];
-            
             if (!fAttributes)
-                fAttributes = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 11.0] forKey: NSFontAttributeName];
+                fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys: [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil];
             [[NSString stringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame withAttributes: fAttributes];
         }
         else
