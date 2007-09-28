@@ -10,6 +10,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Per-torrent action menu
    + Redesigned message log
    + Inspector can be resized vertically in Peers and Files tabs
+   + Optimizations to decrease memory usage
    + Various smaller interface improvements
 
 0.82 (2007/09/09)

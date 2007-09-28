@@ -272,7 +272,7 @@ static int static_lastid = 0;
     
     //check for error
     BOOL wasError = fError;
-    fError = [self isError];
+    fError = [self isError] && [self isActive];
     
     //check if stalled
     BOOL wasStalled = fStalled;
@@ -280,7 +280,7 @@ static int static_lastid = 0;
                 && [fDefaults integerForKey: @"StalledMinutes"] < [self stalledMinutes];
     
     //update queue for checking (from downloading to seeding), stalled, or error
-    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError && [self isActive]))
+    if ((wasChecking && !fChecking) || (!wasStalled && fStalled) || (!wasError && fError))
         [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateQueue" object: self];
 }
 
@@ -298,7 +298,6 @@ static int static_lastid = 0;
 
 - (void) stopTransfer
 {
-    fError = NO;
     fWaitToStart = NO;
     
     if ([self isActive])
@@ -977,18 +976,15 @@ static int static_lastid = 0;
                     string = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
                 else
                     string = NSLocalizedString(@"Paused", "Torrent -> status string");
-                
                 break;
 
             case TR_STATUS_CHECK_WAIT:
                 string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-                
                 break;
 
             case TR_STATUS_CHECK:
                 string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                         "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-                
                 break;
 
             case TR_STATUS_DOWNLOAD:
@@ -998,7 +994,6 @@ static int static_lastid = 0;
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
-                
                 break;
 
             case TR_STATUS_SEED:
@@ -1009,12 +1004,10 @@ static int static_lastid = 0;
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
-                
                 break;
 
             case TR_STATUS_STOPPING:
                 string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
-                
                 break;
             
             default:
@@ -1060,50 +1053,36 @@ static int static_lastid = 0;
                 string = NSLocalizedString(@"Seeding complete", "Torrent -> status string");
             else
                 string = NSLocalizedString(@"Paused", "Torrent -> status string");
-            
             break;
 
         case TR_STATUS_CHECK_WAIT:
             string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-            
             break;
 
         case TR_STATUS_CHECK:
             string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-            
             break;
 
         case TR_STATUS_STOPPING:
             string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
-            
             break;
         
         default:
-            string = @"";
-    }
-    
-    #warning make "default"
-    if ([self isActive] && ![self isChecking])
-    {
-        NSString * stringToAppend = @"";
-        if (![self allDownloaded])
-        {
-            stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
-                                [NSString stringForSpeed: [self downloadRate]]];
-            string = @"";
-        }
-        else
-        {
-            NSString * ratioString = [NSString stringForRatio: [self ratio]];
-        
-            string = [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ", "Torrent -> status string"), ratioString];
-        }
-        
-        stringToAppend = [stringToAppend stringByAppendingString: [NSLocalizedString(@"UL: ", "Torrent -> status string")
-                                            stringByAppendingString: [NSString stringForSpeed: [self uploadRate]]]];
-
-        string = [string stringByAppendingString: stringToAppend];
+            if ([self isActive])
+            {
+                if (![self allDownloaded])
+                    string = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
+                                        [NSString stringForSpeed: [self downloadRate]]];
+                else
+                    string = [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ", "Torrent -> status string"),
+                                [NSString stringForRatio: [self ratio]]];
+                
+                string = [string stringByAppendingFormat: NSLocalizedString(@"UL: %@", "Torrent -> status string"),
+                                [NSString stringForSpeed: [self uploadRate]]];
+            }
+            else
+                string = @"";
     }
     
     return string;
@@ -1118,25 +1097,21 @@ static int static_lastid = 0;
     {
         case TR_STATUS_CHECK_WAIT:
             string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-            
             break;
 
         case TR_STATUS_CHECK:
             string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-            
             break;
 
         case TR_STATUS_DOWNLOAD:
             string = [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
-            
             break;
         
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
             string = [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString:
                                                                             [NSString stringForRatio: [self ratio]]];
-            
             break;
         
         default:
