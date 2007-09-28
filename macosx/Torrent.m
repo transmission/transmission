@@ -593,7 +593,6 @@ static int static_lastid = 0;
         
         return NO;
     }
-    
     return YES;
 }
 
@@ -760,13 +759,11 @@ static int static_lastid = 0;
                                                 eta / 3600, (eta / 60) % 60];
     else
     {
-        int days = eta / 86400;
+        int days = eta / 86400, hours = (eta / 3600) % 24;
         if (days > 1)
-            return [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"),
-                                                    days, (eta / 3600) % 24];
+            return [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"), days, hours];
         else
-            return [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"),
-                                                    (eta / 3600) % 24];
+            return [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"), hours];
     }
 }
 
@@ -852,11 +849,9 @@ static int static_lastid = 0;
                 [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
             
             [dic setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
+            
+            [dic setObject: [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         }
-        
-        #warning why would connected clients have null value?
-        if (peer->client)
-            [dic setObject: [NSString stringWithCString: (char *) peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
         else
             [dic setObject: @"" forKey: @"Client"]; //needed to be set here for client sort
         
@@ -992,7 +987,7 @@ static int static_lastid = 0;
         else
             stringToAppend = @"";
         
-        string = [NSString stringWithFormat: @"%@ - %@UL: %@", string, stringToAppend, [NSString stringForSpeed: [self uploadRate]]];
+        string = [string stringByAppendingFormat: @" - %@UL: %@", stringToAppend, [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
