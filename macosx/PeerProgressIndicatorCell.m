@@ -48,6 +48,13 @@
         }
         else
         {
+            //attributes not needed anymore
+            if (fAttributes)
+            {
+                [fAttributes release];
+                fAttributes = nil;
+            }
+            
             [super drawWithFrame: cellFrame inView: controlView];
             if ([self floatValue] >= 1.0)
             {

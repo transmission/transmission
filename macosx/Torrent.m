@@ -954,6 +954,9 @@ static int static_lastid = 0;
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
+                
+                string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
+                            [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
                 break;
 
             case TR_STATUS_SEED:
@@ -964,6 +967,9 @@ static int static_lastid = 0;
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
+                    
+                
+                string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
                 break;
 
             case TR_STATUS_STOPPING:
@@ -976,18 +982,6 @@ static int static_lastid = 0;
         
         if (fStalled)
             string = [NSLocalizedString(@"Stalled, ", "Torrent -> status string") stringByAppendingString: string];
-    }
-    
-    if ([self isActive] && ![self isChecking])
-    {
-        NSString * stringToAppend;
-        if (![self allDownloaded])
-            stringToAppend = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
-                                [NSString stringForSpeed: [self downloadRate]]];
-        else
-            stringToAppend = @"";
-        
-        string = [string stringByAppendingFormat: @" - %@UL: %@", stringToAppend, [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
