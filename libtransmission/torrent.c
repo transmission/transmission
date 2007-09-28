@@ -304,7 +304,6 @@ torrentRealInit( tr_handle  * h,
     tor->destination = tr_strdup( destination );
 
     tor->handle   = h;
-    tor->hasChangedState = -1;
     tor->pexDisabled = 0;
 
     tor->runStatusToSaveIsSet = FALSE;
@@ -690,31 +689,6 @@ tr_torrentDisablePex( tr_torrent * tor, int disable )
         disable = TRUE;
 
     tor->pexDisabled = disable;
-}
-
-static int tr_didStateChangeTo ( tr_torrent * tor, int status )
-{
-    int ret;
-
-    tr_torrentLock( tor );
-    if (( ret = tor->hasChangedState == status ))
-        tor->hasChangedState = -1;
-    tr_torrentUnlock( tor );
-
-    return ret;
-}
-
-int tr_getIncomplete( tr_torrent * tor )
-{
-    return tr_didStateChangeTo( tor, TR_CP_INCOMPLETE );
-}
-int tr_getDone( tr_torrent * tor )
-{
-    return tr_didStateChangeTo( tor, TR_CP_DONE );
-}
-int tr_getComplete( tr_torrent * tor )
-{
-    return tr_didStateChangeTo( tor, TR_CP_COMPLETE );
 }
 
 void
@@ -1117,6 +1091,36 @@ tr_torrentClose( tr_torrent * tor )
     tr_timerNew( tor->handle, freeWhenStopped, tor, 250 );
 }
 
+/**
+***  Completeness
+**/
+
+static void
+fireStatusChange( tr_torrent * tor, cp_status_t status )
+{
+    assert( tor != NULL );
+    assert( status==TR_CP_INCOMPLETE || status==TR_CP_DONE || status==TR_CP_COMPLETE );
+
+    if( tor->status_func != NULL )
+        (tor->status_func)( tor, status, tor->status_func_user_data );
+}
+
+void
+tr_torrentSetStatusCallback( tr_torrent             * tor,
+                             tr_torrent_status_func   func,
+                             void                   * user_data )
+{
+    assert( tor != NULL );
+    tor->status_func = func;
+    tor->status_func_user_data = user_data;
+}
+
+void
+tr_torrentClearStatusCallback( tr_torrent * torrent )
+{
+    tr_torrentSetStatusCallback( torrent, NULL, NULL );
+}
+
 void
 tr_torrentRecheckCompleteness( tr_torrent * tor )
 {
@@ -1127,7 +1131,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     cpStatus = tr_cpGetStatus( tor->completion );
     if( cpStatus != tor->cpStatus ) {
         tor->cpStatus = cpStatus;
-        tor->hasChangedState = tor->cpStatus;  /* tell the client... */
+        fireStatusChange( tor, cpStatus );
         if( (cpStatus == TR_CP_COMPLETE) /* ...and if we're complete */
             && tor->downloadedCur ) {        /* and it just happened */
             tr_trackerCompleted( tor->tracker ); /* tell the tracker */

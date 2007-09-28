@@ -443,16 +443,28 @@ void   tr_torrentStart( tr_torrent * );
  **********************************************************************/
 void tr_torrentStop( tr_torrent * );
 
-/***********************************************************************
- * tr_getComplete, tr_getIncomplete and tr_getPartial
- ***********************************************************************
- * The first call after a torrent changed state returns 1. Returns 0
- * in other cases.
- **********************************************************************/
-int tr_getIncomplete( tr_torrent * tor );
-int tr_getDone( tr_torrent * tor );
-int tr_getComplete( tr_torrent * tor );
 
+/**
+***  Register to be notified whenever a torrent's state changes.
+**/
+
+typedef enum
+{
+    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
+    TR_CP_DONE,         /* has all the pieces but the DND ones */
+    TR_CP_COMPLETE      /* has every piece */
+}
+cp_status_t;
+
+typedef void (tr_torrent_status_func)(tr_torrent   * torrent,
+                                      cp_status_t    status,
+                                      void         * user_data );
+
+void tr_torrentSetStatusCallback( tr_torrent             * torrent,
+                                  tr_torrent_status_func   func,
+                                  void                   * user_data );
+
+void tr_torrentClearStatusCallback( tr_torrent * torrent );
 
 /**
  * MANUAL ANNOUNCE
@@ -610,14 +622,6 @@ torrent_status_t;
     (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
 #define TR_STATUS_INACTIVE \
     (TR_STATUS_STOPPING|TR_STATUS_STOPPED)
-
-typedef enum
-{
-    TR_CP_INCOMPLETE,   /* doesn't have all the desired pieces */
-    TR_CP_DONE,         /* has all the pieces but the DND ones */
-    TR_CP_COMPLETE      /* has every piece */
-}
-cp_status_t;
 
 /***********************************************************************
  * tr_stat
