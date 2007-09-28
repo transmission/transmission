@@ -31,12 +31,14 @@ node_free( tr_list* node )
 ***/
 
 void
-tr_list_free( tr_list** list )
+tr_list_free( tr_list** list, TrListForeachFunc data_free_func )
 {
     while( *list )
     {
-        tr_list * node = *list;
+        tr_list *node = *list;
         *list = (*list)->next;
+        if( data_free_func != NULL )
+            data_free_func( node->data );
         node_free( node );
     }
 }

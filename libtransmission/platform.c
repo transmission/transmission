@@ -410,7 +410,7 @@ tr_condFree( tr_cond * c )
 #ifdef __BEOS__
     delete_sem( c->sem );
 #elif defined(WIN32)
-    tr_list_free( &c->events );
+    tr_list_free( &c->events, NULL );
     tr_lockFree( c->lock );
 #else
     pthread_cond_destroy( &c->cond );

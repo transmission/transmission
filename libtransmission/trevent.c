@@ -239,8 +239,7 @@ tr_eventClose( tr_handle * handle )
     tr_event_handle * eh = handle->events;
 
     tr_lockLock( eh->lock );
-    tr_list_foreach( eh->commands, tr_free );
-    tr_list_free( &eh->commands );
+    tr_list_free( &eh->commands, tr_free );
     eh->die = TRUE;
     tr_lockUnlock( eh->lock );
 

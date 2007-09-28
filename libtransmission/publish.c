@@ -38,7 +38,7 @@ tr_publisherFree( tr_publisher_t ** p )
     assert( p != NULL );
     assert( *p != NULL );
 
-    tr_list_free( &(*p)->list );
+    tr_list_free( &(*p)->list, NULL );
     tr_free( *p );
     *p = NULL;
 }

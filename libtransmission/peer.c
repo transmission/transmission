@@ -359,8 +359,7 @@ void tr_peerDestroy( tr_peer_t * peer )
     tr_bitfieldFree( peer->blamefield );
     tr_bitfieldFree( peer->banfield );
     tr_bitfieldFree( peer->reqfield );
-    tr_list_foreach( peer->outRequests, tr_free );
-    tr_list_free( &peer->outRequests );
+    tr_list_free( &peer->outRequests, tr_free );
     tr_free( peer->inRequests );
     tr_free( peer->buf );
     tr_free( peer->outMessages );

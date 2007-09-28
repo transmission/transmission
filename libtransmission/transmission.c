@@ -346,7 +346,7 @@ tr_loadTorrents ( tr_handle   * h,
         torrents[i++] = (tr_torrent*) l->data;
     assert( i==n );
 
-    tr_list_free( &list );
+    tr_list_free( &list, NULL );
 
     *setmeCount = n;
     tr_inf( "Loaded %d torrents from disk", *setmeCount );
