@@ -106,6 +106,14 @@ char * getStringRatio( float ratio )
 
 #define LINEWIDTH 80
 
+static void
+torrentStateChanged( tr_torrent   * torrent UNUSED,
+                     cp_status_t    status UNUSED,
+                     void         * user_data UNUSED )
+{
+    system( finishCall );
+}
+
 int main( int argc, char ** argv )
 {
     int i, error;
@@ -246,13 +254,13 @@ int main( int argc, char ** argv )
 
     tr_natTraversalEnable( h, natTraversal );
     
+    tr_torrentSetStatusCallback( tor, torrentStateChanged, NULL );
     tr_torrentStart( tor );
 
     for( ;; )
     {
         char string[LINEWIDTH];
         int  chars = 0;
-        int result;
 
         wait_secs( 1 );
 
@@ -314,11 +322,6 @@ int main( int argc, char ** argv )
         else if( verboseLevel > 0 )
         {
             fprintf( stderr, "\n" );
-        }
-        
-        if( tr_getDone(tor) || tr_getComplete(tor) )
-        {
-            result = system(finishCall);
         }
     }
     fprintf( stderr, "\n" );
