@@ -46,12 +46,20 @@ static int static_lastid = 0;
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
             previousPath: (NSString *) previousPath fileSize: (uint64_t) size index: (int) index;
 
+- (void) completenessChange: (NSNumber *) status;
+
 - (void) quickPause;
 - (void) endQuickPause;
 
 - (void) trashFile: (NSString *) path;
 
 @end
+
+void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void * torrentData)
+{
+    [(Torrent *)torrentData performSelectorOnMainThread: @selector(completenessChange:)
+                withObject: [[NSNumber alloc] initWithInt: status] waitUntilDone: NO];
+}
 
 @implementation Torrent
 
@@ -167,6 +175,7 @@ static int static_lastid = 0;
 
 - (void) closeTorrent
 {
+    tr_torrentClearStatusCallback(fHandle);
     tr_torrentClose(fHandle);
 }
 
@@ -213,46 +222,8 @@ static int static_lastid = 0;
 {
     fStat = tr_torrentStat(fHandle);
     
-    //notification when downloading finished
-    if (tr_getComplete(fHandle) || tr_getDone(fHandle))
-    {
-        BOOL canMove = YES;
-        
-        //move file from incomplete folder to download folder
-        if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
-            && (canMove = [self alertForMoveFolderAvailable]))
-        {
-            [self quickPause];
-            
-            if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
-                                    toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
-                [self updateDownloadFolder];
-            else
-                canMove = NO;
-            
-            [self endQuickPause];
-        }
-        
-        if (!canMove)
-        {
-            fUseIncompleteFolder = NO;
-            
-            [fDownloadFolder release];
-            fDownloadFolder = fIncompleteFolder;
-            fIncompleteFolder = nil;
-        }
-		
-		[fDateCompleted release];
-		fDateCompleted = [[NSDate alloc] init];
-        
-        fStat = tr_torrentStat(fHandle);
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
-    }
-    else if (tr_getIncomplete(fHandle))
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
-    else;
-    
     //check to stop for ratio
+    #warning fix this!
     float stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
@@ -1511,6 +1482,8 @@ static int static_lastid = 0;
         return nil;
     }
     
+    tr_torrentSetStatusCallback(fHandle, completenessChangeCallback, self);
+    
     fInfo = tr_torrentInfo(fHandle);
 
     fDateAdded = dateAdded ? [dateAdded retain] : [[NSDate alloc] init];
@@ -1633,6 +1606,56 @@ static int static_lastid = 0;
     NSString * folder = [self shouldUseIncompleteFolderForName: [self name]] ? fIncompleteFolder : fDownloadFolder;
     tr_torrentSetFolder(fHandle, [folder UTF8String]);
 }
+
+//status will be retained
+- (void) completenessChange: (NSNumber *) status
+{
+    BOOL canMove;
+    switch ([status intValue])
+    {
+        case TR_CP_DONE:
+        case TR_CP_COMPLETE:
+            canMove = YES;
+        
+            //move file from incomplete folder to download folder
+            if (fUseIncompleteFolder && ![[self downloadFolder] isEqualToString: fDownloadFolder]
+                && (canMove = [self alertForMoveFolderAvailable]))
+            {
+                [self quickPause];
+                
+                if ([[NSFileManager defaultManager] movePath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]
+                                        toPath: [fDownloadFolder stringByAppendingPathComponent: [self name]] handler: nil])
+                    [self updateDownloadFolder];
+                else
+                    canMove = NO;
+                
+                [self endQuickPause];
+            }
+            
+            if (!canMove)
+            {
+                fUseIncompleteFolder = NO;
+                
+                [fDownloadFolder release];
+                fDownloadFolder = fIncompleteFolder;
+                fIncompleteFolder = nil;
+            }
+            
+            [fDateCompleted release];
+            fDateCompleted = [[NSDate alloc] init];
+            
+            fStat = tr_torrentStat(fHandle);
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
+            break;
+        
+        case TR_CP_INCOMPLETE:
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
+            break;
+    }
+    [status release];
+    
+    [self update];
+} 
 
 - (void) quickPause
 {

@@ -34,13 +34,13 @@
 	<string>~/Desktop</string>
 	<key>DeleteOriginalTorrent</key>
 	<false/>
+	<key>DisplayPeerProgressBarNumber</key>
+	<false/>
+	<key>DisplayProgressBarAvailable</key>
+	<false/>
 	<key>DisplaySmallStatusRegular</key>
 	<true/>
 	<key>DisplayStatusProgressSelected</key>
-	<false/>
-    <key>DisplayPeerProgressBarNumber</key>
-	<false/>
-    <key>DisplayProgressBarAvailable</key>
 	<false/>
 	<key>DownloadChoice</key>
 	<string>Constant</string>
