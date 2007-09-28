@@ -1546,8 +1546,7 @@ static int static_lastid = 0;
     NSMutableArray * pathComponents;
     NSString * path;
     
-    NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count],
-                    * flatFileList = [[NSMutableArray alloc] initWithCapacity: count];
+    NSMutableArray * fileList = [[NSMutableArray alloc] initWithCapacity: count];
     
     for (i = 0; i < count; i++)
     {
@@ -1568,7 +1567,6 @@ static int static_lastid = 0;
     
     fFileList = [[NSArray alloc] initWithArray: fileList];
     [fileList release];
-    [flatFileList release];
 }
 
 - (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
