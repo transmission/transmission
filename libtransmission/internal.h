@@ -33,8 +33,6 @@
 #define UNUSED
 #endif
 
-#define TR_MAX_PEER_COUNT 60
-
 typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 
 #ifndef TRUE

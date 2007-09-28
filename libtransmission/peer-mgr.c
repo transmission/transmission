@@ -1205,7 +1205,7 @@ shouldPeerBeDisconnected( Torrent * t, tr_peer * peer, int peerCount, int isSeed
     /* when deciding whether or not to keep a peer, judge its responsiveness
        on a sliding scale that's based on how many other peers are available */
     relaxStrictnessIfFewerThanN =
-        (int)(((TR_MAX_PEER_COUNT * RELAX_RULES_PERCENTAGE) / 100.0) + 0.5);
+        (int)(((MAX_CONNECTED_PEERS_PER_TORRENT * RELAX_RULES_PERCENTAGE) / 100.0) + 0.5);
 
     /* if we have >= relaxIfFewerThan, strictness is 100%.
        if we have zero connections, strictness is 0% */
