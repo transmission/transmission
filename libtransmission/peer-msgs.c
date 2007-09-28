@@ -38,6 +38,9 @@
 ***
 **/
 
+#define MAX_ALLOWED_SET_COUNT   10 /* number of pieces generated for allow-fast,
+                                    threshold for fast-allowing others */
+
 enum
 {
     BT_CHOKE                = 0,
@@ -122,7 +125,10 @@ struct tr_peermsgs
     unsigned int notListening          : 1;
     unsigned int peerSupportsPex       : 1;
     unsigned int hasSentLtepHandshake  : 1;
-
+    
+    tr_bitfield * clientAllowedPieces;
+    tr_bitfield * peerAllowedPieces;
+    
     uint8_t state;
 
     uint8_t ut_pex_id;
@@ -299,10 +305,22 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 
     if( msgs->info->peerIsChoked != choke )
     {
-        msgs->info->peerIsChoked = choke ? 1 : 0;
-
+        msgs->info->peerIsChoked = choke;
+        tr_list * walk;
+        
         if( choke )
-            tr_list_free( &msgs->peerAskedFor, tr_free );
+            for( walk = msgs->peerAskedFor; walk != NULL; )
+            {
+                tr_list * next = walk->next;
+                /* We shouldn't reject a peer's fast allowed requests at choke */
+                struct peer_request *req = walk->data;
+                if ( !tr_bitfieldHas( msgs->peerAllowedPieces, req->index ) )
+                {
+                    tr_list_remove_data( &msgs->peerAskedFor, req );
+                    tr_free( req );
+                }
+                walk = next;
+            }
 
         dbgmsg( msgs, "sending a %s message", (choke ? "CHOKE" : "UNCHOKE") );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
@@ -359,6 +377,72 @@ tr_peerMsgsHave( tr_peermsgs * msgs,
 
     updateInterest( msgs );
 }
+#if 0
+static void
+sendFastSuggest( tr_peermsgs * msgs,
+                 uint32_t      pieceIndex )
+{
+    dbgmsg( msgs, "w00t SUGGESTing them piece #%d", pieceIndex );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
+    tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_SUGGEST );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
+    
+    updateInterest( msgs );
+}
+#endif
+static void
+sendFastHave( tr_peermsgs * msgs,
+              int           all)
+{
+    dbgmsg( msgs, "w00t telling them we %s pieces", (all ? "HAVE_ALL" : "HAVE_NONE" ) );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
+    tr_peerIoWriteUint8( msgs->io, msgs->outMessages, ( all ? BT_HAVE_ALL : BT_HAVE_NONE ) );
+    
+    updateInterest( msgs );
+}
+
+static void
+sendFastReject( tr_peermsgs * msgs,
+                uint32_t      pieceIndex,
+                uint32_t      offset,
+                uint32_t      length )
+{
+    assert( msgs != NULL );
+    assert( length > 0 );
+    
+    /* reject the request */
+    const uint32_t len = sizeof(uint8_t) + 3 * sizeof(uint32_t);
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, len );
+    tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_REJECT );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, offset );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, length );
+}
+
+static void
+sendFastAllowed( tr_peermsgs * msgs,
+                 uint32_t      pieceIndex)
+{
+    dbgmsg( msgs, "w00t telling them we ALLOW_FAST piece #%d", pieceIndex );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
+    tr_peerIoWriteUint8( msgs->io, msgs->outMessages, BT_ALLOWED_FAST );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
+}
+
+
+
+static void
+sendFastAllowedSet( tr_peermsgs * msgs )
+{
+    int i = 0;
+    while (i <= msgs->torrent->info.pieceCount )
+    {
+        if ( tr_bitfieldHas( msgs->peerAllowedPieces, i) )
+            sendFastAllowed( msgs, i );
+        i++;
+    }
+}
+
 
 /**
 ***
@@ -632,7 +716,20 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             dbgmsg( msgs, "w00t peer sent us a BT_CHOKE" );
             assert( msglen == 0 );
             msgs->info->clientIsChoked = 1;
-            tr_list_free( &msgs->peerAskedFor, tr_free );
+            
+            tr_list * walk;
+            for( walk = msgs->peerAskedFor; walk != NULL; )
+            {
+                tr_list * next = walk->next;
+                /* We shouldn't reject a peer's fast allowed requests at choke */
+                struct peer_request *req = walk->data;
+                if ( !tr_bitfieldHas( msgs->peerAllowedPieces, req->index ) )
+                {
+                    tr_list_remove_data( &msgs->peerAskedFor, req );
+                    tr_free( req );
+                }
+                walk = next;
+            }
             tr_list_free( &msgs->clientAskedFor, tr_free );
             break;
 
@@ -685,10 +782,52 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             tr_peerIoReadUint32( msgs->io, inbuf, &req->index );
             tr_peerIoReadUint32( msgs->io, inbuf, &req->offset );
             tr_peerIoReadUint32( msgs->io, inbuf, &req->length );
-            if( !msgs->info->peerIsChoked && requestIsValid( msgs, req ) )
-                tr_list_append( &msgs->peerAskedFor, req );
-            else
+            
+            if ( !requestIsValid( msgs, req ) )
+            {
+                dbgmsg( msgs, "BT_REQUEST: invalid request, ignoring" );
                 tr_free( req );
+                break;
+            }
+            /* 
+                If we're not choking him -> continue
+                If we're choking him
+                    it doesn't support FPE -> He's deaf, reCHOKE and bail...
+                    it support FPE
+                        If the asked piece is not allowed
+                            OR he's above our threshold
+                            OR we don't have the requested piece -> Reject
+                        Else
+                        Asked piece allowed AND he's below our threshold -> continue...
+             */
+    
+
+            if ( msgs->info->peerIsChoked )
+            {
+                if ( !tr_peerIoSupportsFEXT( msgs->io ) )
+                {
+                    dbgmsg( msgs, "BT_REQUEST: peer is choked, ignoring" );
+                    /* Didn't he get it? */
+                    tr_peerMsgsSetChoke( msgs, 1 );
+                    tr_free( req );
+                    break;
+                }
+                else
+                {
+                    if ( !tr_bitfieldHas( msgs->peerAllowedPieces, req->index )
+                         || ( msgs->info->progress * (float)msgs->torrent->info.pieceCount) >= MAX_ALLOWED_SET_COUNT
+                         || !tr_cpPieceIsComplete( msgs->torrent->completion, req->index ) )
+                    {
+                        dbgmsg( msgs, "BT_REQUEST: peer requests an un-fastallowed piece" );
+                        sendFastReject( msgs, req->index, req->offset, req->length );
+                        tr_free( req );
+                        break;
+                    }
+                    dbgmsg( msgs, "BT_REQUEST: fast allowed piece, accepting request" );
+                }    
+            }
+            
+            tr_list_append( &msgs->peerAskedFor, req );
             break;
         }
 
@@ -731,22 +870,50 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
         }
             
         case BT_HAVE_ALL: {
-            /* tiennou TODO */
+            assert( msglen == 0 );
+            dbgmsg( msgs, "peer sent us a BT_HAVE_ALL" );
+            memset( msgs->info->have->bits, 1, msgs->info->have->len );
+            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+            dbgmsg( msgs, "after the HAVE_ALL message, peer progress is %f", msgs->info->progress );
+            updateInterest( msgs );
+            firePeerProgress( msgs );
             break;
         }
             
         case BT_HAVE_NONE: {
-            /* tiennou TODO */
+            assert( msglen == 0 );
+            dbgmsg( msgs, "peer sent us a BT_HAVE_NONE" );
+            memset( msgs->info->have->bits, 1, msgs->info->have->len );
+            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+            dbgmsg( msgs, "after the HAVE_NONE message, peer progress is %f", msgs->info->progress );
+            updateInterest( msgs );
+            firePeerProgress( msgs );
             break;
         }
             
         case BT_REJECT: {
-            /* tiennou TODO */
+            struct peer_request req;
+            tr_list * node;
+            assert( msglen == 12 );
+            dbgmsg( msgs, "peer sent us a BT_REJECT" );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
+            node = tr_list_find( msgs->peerAskedFor, &req, peer_request_compare );
+            if( node != NULL ) {
+                void * data = node->data;
+                tr_list_remove_data( &msgs->peerAskedFor, data );
+                tr_free( data );
+                dbgmsg( msgs, "found the req that peer has rejected... cancelled." );
+            }
             break;
         }
             
         case BT_ALLOWED_FAST: {
-            /* tiennou TODO */
+            assert( msglen == 4 );
+            dbgmsg( msgs, "peer sent us a BT_ALLOWED_FAST" );
+            tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
+            tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 );
             break;
         }
             
@@ -1283,7 +1450,24 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
     msgs->outMessages = evbuffer_new( );
     msgs->outBlock = evbuffer_new( );
     msgs->inBlock = evbuffer_new( );
-
+    msgs->peerAllowedPieces = NULL;
+    msgs->clientAllowedPieces = NULL;
+    
+    if ( tr_peerIoSupportsFEXT( msgs->io ) )
+    {
+        /* This peer is fastpeer-enabled, generate its allowed set
+         * (before registering our callbacks) */
+        if ( !msgs->peerAllowedPieces ) {
+            const struct in_addr *peerAddr = tr_peerIoGetAddress( msgs->io, NULL );
+            
+            msgs->peerAllowedPieces = tr_peerMgrGenerateAllowedSet( MAX_ALLOWED_SET_COUNT,
+                                                                    msgs->torrent->info.pieceCount,
+                                                                    msgs->torrent->info.hash,
+                                                                    peerAddr );
+        }
+        msgs->clientAllowedPieces = tr_bitfieldNew( msgs->torrent->info.pieceCount );
+    }
+    
     tr_peerIoSetIOFuncs( msgs->io, canRead, didWrite, gotError, msgs );
     tr_peerIoSetIOMode( msgs->io, EV_READ|EV_WRITE, 0 );
 
@@ -1304,8 +1488,25 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
             /* no-op */
         }
     }
-
-    sendBitfield( msgs );
+    
+    if ( tr_peerIoSupportsFEXT( msgs->io ) )
+    {
+        /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
+        float completion = tr_cpPercentComplete( msgs->torrent->completion );
+        if ( completion == 0.0f ) {
+            sendFastHave( msgs, 0 );
+        } else if ( completion == 1.0f ) {
+            sendFastHave( msgs, 1 );
+        } else {
+            sendBitfield( msgs );
+        }
+        uint32_t peerProgress = msgs->torrent->info.pieceCount * msgs->info->progress;
+        
+        if ( peerProgress < MAX_ALLOWED_SET_COUNT )
+            sendFastAllowedSet( msgs );
+    } else {
+        sendBitfield( msgs );
+    }
     return msgs;
 }
 

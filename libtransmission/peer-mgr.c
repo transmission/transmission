@@ -19,6 +19,7 @@
 #include "transmission.h"
 #include "clients.h"
 #include "completion.h"
+#include "crypto.h"
 #include "handshake.h"
 #include "net.h"
 #include "peer-io.h"
@@ -274,6 +275,66 @@ freeTorrent( tr_peerMgr * manager, Torrent * t )
 ***
 **/
 
+struct tr_bitfield *
+tr_peerMgrGenerateAllowedSet( const uint32_t         setCount,
+                              const uint32_t         pieceCount,
+                              const uint8_t          infohash[20],
+                              const struct in_addr * ip )
+{
+    /* This has been checked against the spec example implementation. Feeding it with :
+    setCount = 9, pieceCount = 1313, infohash = Oxaa,0xaa,...0xaa, ip = 80.4.4.200
+generate :
+    1059, 431, 808, 1217, 287, 376, 1188, 353, 508
+    but since we're storing in a bitfield, it won't be in this order... */
+    /* TODO : We should translate link-local IPv4 adresses to external IP, 
+     * so that being on same local network gives us the same allowed pieces */
+    
+    printf( "%d piece allowed fast set for torrent with %d pieces and hex infohash\n", setCount, pieceCount );
+    printf( "%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x for node with IP %s:\n",
+            infohash[0], infohash[1], infohash[2], infohash[3], infohash[4], infohash[5], infohash[6], infohash[7], infohash[8], infohash[9],
+            infohash[10], infohash[11], infohash[12], infohash[13], infohash[14], infohash[15], infohash[16], infohash[7], infohash[18], infohash[19],
+            inet_ntoa( *ip ) );
+    
+    uint8_t *seed = malloc(4 + SHA_DIGEST_LENGTH);
+    char buf[4];
+    uint32_t allowedPieceCount = 0;
+    tr_bitfield_t * ret;
+    
+    ret = tr_bitfieldNew( pieceCount );
+    
+    /* We need a seed based on most significant bytes of peer address
+        concatenated with torrent's infohash */
+    *(uint32_t*)buf = ntohl( htonl(ip->s_addr) & 0xffffff00 );
+    
+    memcpy( seed, &buf, 4 );
+    memcpy( seed + 4, infohash, SHA_DIGEST_LENGTH );
+    
+    tr_sha1( seed, seed, 4 + SHA_DIGEST_LENGTH, NULL );
+    
+    while ( allowedPieceCount < setCount )
+    {
+        int i;
+        for ( i = 0 ; i < 5 && allowedPieceCount < setCount ; i++ )
+        {
+            /* We generate indices from 4-byte chunks of the seed */
+            uint32_t j = i * 4;
+            uint32_t y = ntohl( *(uint32_t*)(seed + j) );
+            uint32_t index = y % pieceCount;
+            
+            if ( !tr_bitfieldHas( ret, index ) )
+            {
+                tr_bitfieldAdd( ret, index );
+                allowedPieceCount++;
+            }
+        }
+        /* We randomize the seed, in case we need to iterate more */
+        tr_sha1( seed, seed, SHA_DIGEST_LENGTH, NULL );
+    }
+    tr_free( seed );
+    
+    return ret;
+}
+
 tr_peerMgr*
 tr_peerMgrNew( tr_handle * handle )
 {
@@ -322,6 +383,7 @@ struct tr_refill_piece
     tr_priority_t priority;
     uint32_t piece;
     uint32_t peerCount;
+    uint32_t fastAllowed;
 };
 
 static int
@@ -337,6 +399,10 @@ compareRefillPiece (const void * aIn, const void * bIn)
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)
         return a->peerCount < b->peerCount ? -1 : 1;
+    
+    /* otherwise if one *might be* fastallowed to us */
+    if (a->fastAllowed != b->fastAllowed)
+        return a->fastAllowed < b->fastAllowed ? -1 : 1;
 
     /* otherwise go with the earlier piece */
     return a->piece - b->piece;
@@ -388,6 +454,8 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
+            /* FIXME */
+//            setme->fastAllowed = tr_bitfieldHas( t->tor->allowedList, i);
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
@@ -1117,7 +1185,7 @@ rechokeLeech( Torrent * t )
     const time_t ignorePeersNewerThan = time(NULL) - MIN_CHOKE_PERIOD_SEC;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     ChokeData * choke = tr_new0( ChokeData, peerCount );
-
+    
     /* sort the peers by preference and rate */
     for( i=0; i<peerCount; ++i )
     {

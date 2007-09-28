@@ -36,7 +36,6 @@
 /* #define ENABLE_AZMP */
 
 /* enable fast peers extension protocol */
-/* (disabled because it's not fully implemented yet) */
 /* #define ENABLE_FASTPEER */
 
 /***
@@ -239,7 +238,7 @@ buildHandshakeMessage( tr_handshake * handshake,
             break;
     }
     
-    HANDSHAKE_SET_FASTEXT ( walk );
+    HANDSHAKE_SET_FASTEXT( walk );
 
     walk += HANDSHAKE_FLAGS_LEN;
     memcpy( walk, torrentHash, SHA_DIGEST_LENGTH );
@@ -330,11 +329,10 @@ parseHandshake( tr_handshake     * handshake,
     }
     assert( !ltep || !azmp );
     
-         if( ltep ) { tr_peerIoEnableLTEP( handshake->io, 1 ); dbgmsg(handshake,"using ltep" ); }
-    else if( azmp ) { tr_peerIoEnableAZMP( handshake->io, 1 ); dbgmsg(handshake,"using azmp" ); }
-    else if( fpex ) { tr_peerIoEnableFEXT( handshake->io, 1 ); dbgmsg(handshake,"using fext" ); }
-    else            { dbgmsg(handshake,"using no extensions" ); }
-
+    if( ltep ) { tr_peerIoEnableLTEP( handshake->io, 1 ); dbgmsg(handshake,"using ltep" ); }
+    if( azmp ) { tr_peerIoEnableAZMP( handshake->io, 1 ); dbgmsg(handshake,"using azmp" ); }
+    if( fpex ) { tr_peerIoEnableFEXT( handshake->io, 1 ); dbgmsg(handshake,"using fext" ); }
+        
     return HANDSHAKE_OK;
 }
 
@@ -698,10 +696,9 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     }
     assert( !ltep || !azmp );
     
-         if( ltep ) { tr_peerIoEnableLTEP( handshake->io, 1 ); dbgmsg(handshake,"using ltep" ); }
-    else if( azmp ) { tr_peerIoEnableAZMP( handshake->io, 1 ); dbgmsg(handshake,"using azmp" ); }
-    else if( fpex ) { tr_peerIoEnableFEXT( handshake->io, 1 ); dbgmsg(handshake,"using fext" ); }
-    else            { dbgmsg(handshake,"using no extensions" ); }
+    if( ltep ) { tr_peerIoEnableLTEP( handshake->io, 1 ); dbgmsg(handshake,"using ltep" ); }
+    if( azmp ) { tr_peerIoEnableAZMP( handshake->io, 1 ); dbgmsg(handshake,"using azmp" ); }
+    if( fpex ) { tr_peerIoEnableFEXT( handshake->io, 1 ); dbgmsg(handshake,"using fext" ); }
     
     /**
     ***  If this is an incoming message, then we need to send a response handshake
@@ -945,8 +942,6 @@ dbgmsg( handshake, "sending handshake" );
         else
             ext = 0;
 
-        /* FIXME: do we do something with fast peers here? */
-
         msg = buildHandshakeMessage( handshake, ext, &msgSize );
         tr_peerIoWriteBytes( handshake->io, outbuf, msg, msgSize );
         tr_free( msg );
@@ -1029,7 +1024,6 @@ static void
 gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
 {
     tr_handshake * handshake = (tr_handshake *) arg;
-dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
 
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and
@@ -1038,6 +1032,7 @@ dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
         && ( handshake->allowUnencryptedPeers )
         && ( !tr_peerIoReconnect( handshake->io ) ) )
     {
+        dbgmsg( handshake, "handshake failed, trying plaintext..." );
         int msgSize; 
         uint8_t * msg = buildHandshakeMessage( handshake, HANDSHAKE_EXTPREF_LTEP_PREFER, &msgSize );
         setReadState( handshake, AWAITING_HANDSHAKE );
@@ -1046,7 +1041,7 @@ dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
     }
     else
     {
-dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
+        dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
         tr_handshakeDone( handshake, FALSE );
     }
 }

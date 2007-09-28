@@ -96,7 +96,12 @@ struct tr_peer_stat * tr_peerMgrPeerStats( const tr_peerMgr  * manager,
                                            const uint8_t     * torrentHash,
                                            int               * setmeCount );
 
-
+                             
+struct tr_bitfield *
+tr_peerMgrGenerateAllowedSet( const uint32_t         setCount,
+                              const uint32_t         pieceCount,
+                              const uint8_t          infohash[20],
+                              const struct in_addr * ip );
 
 
 

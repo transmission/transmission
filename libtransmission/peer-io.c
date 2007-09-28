@@ -33,7 +33,6 @@ struct tr_extensions
     unsigned int azureusProtocolSupported : 1;
     unsigned int extendedProtocolSupported : 1;
     unsigned int fastPeersSupported : 1;
-    /* unsigned int DHTSupported : 1; */
 };
 
 struct tr_peerIo
