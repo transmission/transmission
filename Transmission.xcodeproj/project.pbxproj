@@ -102,6 +102,8 @@
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
+		A257C1810CAD3003004E121C /* PeerTableView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A257C17F0CAD3003004E121C /* PeerTableView.h */; };
+		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
@@ -281,6 +283,7 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
+				A257C1810CAD3003004E121C /* PeerTableView.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,6 +430,8 @@
 		A253F6F20A698970008EE24F /* FilterBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterBarBackground.png; path = macosx/Images/FilterBarBackground.png; sourceTree = "<group>"; };
 		A256588A0A9A695400E8A03B /* MessageWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageWindowController.h; path = macosx/MessageWindowController.h; sourceTree = "<group>"; };
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
+		A257C17F0CAD3003004E121C /* PeerTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerTableView.h; path = macosx/PeerTableView.h; sourceTree = "<group>"; };
+		A257C1800CAD3003004E121C /* PeerTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerTableView.m; path = macosx/PeerTableView.m; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
 		A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToPathTransformer.h; path = macosx/ExpandedPathToPathTransformer.h; sourceTree = "<group>"; };
@@ -712,6 +717,8 @@
 				E1B6FBEB0C0D70AC0015FE4D /* UKKQueue */,
 				A21282A50CA6C66800EAEE0F /* StatusBarView.h */,
 				A21282A60CA6C66800EAEE0F /* StatusBarView.m */,
+				A257C17F0CAD3003004E121C /* PeerTableView.h */,
+				A257C1800CAD3003004E121C /* PeerTableView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1483,6 +1490,7 @@
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */,
 				A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */,
 				A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */,
+				A257C1820CAD3003004E121C /* PeerTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -82,6 +82,7 @@
             LANGUAGE = ObjC; 
             SUPERCLASS = NSLevelIndicatorCell; 
         }, 
+        {CLASS = PeerTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
         {CLASS = PiecesView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }
     ); 
     IBVersion = 1; 

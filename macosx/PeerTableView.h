@@ -24,10 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PeerProgressIndicatorCell : NSLevelIndicatorCell
+@interface PeerTableView : NSTableView
 {
-    BOOL fIsHidden;
-    NSImage * fCheckImage;
 }
-
 @end

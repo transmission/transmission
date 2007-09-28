@@ -22,12 +22,19 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "PeerTableView.h"
 
-@interface PeerProgressIndicatorCell : NSLevelIndicatorCell
+@implementation PeerTableView
+
+- (void) mouseDown: (NSEvent *) event
 {
-    BOOL fIsHidden;
-    NSImage * fCheckImage;
+    NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
+    if ([self rowAtPoint: point] != -1 && [self columnAtPoint: point] == [self columnWithIdentifier: @"Progress"])
+    {
+        [[NSUserDefaults standardUserDefaults] setBool: ![[NSUserDefaults standardUserDefaults]
+            boolForKey: @"DisplayPeerProgressBarNumber"] forKey: @"DisplayPeerProgressBarNumber"];
+        [self reloadData];
+    }
 }
 
 @end

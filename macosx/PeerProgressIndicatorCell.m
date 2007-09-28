@@ -40,19 +40,31 @@
 {
     if (!fIsHidden)
     {
-        [super drawWithFrame: cellFrame inView: controlView];
-        if ([self floatValue] >= 1.0)
+        if ([[NSUserDefaults standardUserDefaults] boolForKey: @"DisplayPeerProgressBarNumber"])
         {
-            if (!fCheckImage)
-            {
-                fCheckImage = [NSImage imageNamed: @"CompleteCheck.png"];
-                [fCheckImage setFlipped: YES];
-            }
+            NSMutableParagraphStyle *centeredStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+            [centeredStyle setAlignment:NSCenterTextAlignment];
             
-            NSSize imageSize = [fCheckImage size];
-            NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
+            [[NSString stringWithFormat: @"%.1f%%", [self floatValue] * 100.0] drawInRect: cellFrame
+                        withAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSFont systemFontOfSize: 11.0], NSFontAttributeName, nil]];
+        }
+        else
+        {
+            [super drawWithFrame: cellFrame inView: controlView];
+            if ([self floatValue] >= 1.0)
+            {
+                if (!fCheckImage)
+                {
+                    fCheckImage = [NSImage imageNamed: @"CompleteCheck.png"];
+                    [fCheckImage setFlipped: YES];
+                }
+                
+                NSSize imageSize = [fCheckImage size];
+                NSRect rect = NSMakeRect(cellFrame.origin.x + (cellFrame.size.width - imageSize.width) * 0.5,
                             cellFrame.origin.y + (cellFrame.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
-            [fCheckImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+                [fCheckImage drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            }
         }
     }
 }
