@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id:$
+ * $Id$
  */
 
 #ifndef TR_PREFS_H
@@ -16,6 +16,9 @@
 #include <gtk/gtk.h>
 
 GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
+
+/* if you add a key here,  you /must/ add its
+ * default in tr_prefs_init_global( void ) */
 
 #define PREF_KEY_DL_LIMIT_ENABLED  "download-limit-enabled"
 #define PREF_KEY_DL_LIMIT          "download-limit"
@@ -30,6 +33,7 @@ GtkWidget * tr_prefs_dialog_new( GObject * core, GtkWindow * parent );
 #define PREF_KEY_PEX               "pex-enabled"
 #define PREF_KEY_SYSTRAY           "system-tray-icon-enabled"
 #define PREF_KEY_ASKQUIT           "prompt-before-exit"
+#define PREF_KEY_ENCRYPTED_ONLY    "encrypted-connections-only"
 #define PREF_KEY_MSGLEVEL          "debug-message-level"
 
 void tr_prefs_init_global( void );

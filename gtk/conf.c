@@ -35,6 +35,7 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/bencode.h>
@@ -158,16 +159,12 @@ cf_lock(char **errstr) {
 }
 
 static void
-cf_removelocks(void) {
-  if(NULL != gl_lockpath) {
-    unlink(gl_lockpath);
-    g_free(gl_lockpath);
-  }
-
-  if(NULL != gl_old_lockpath) {
-    unlink(gl_old_lockpath);
-    g_free(gl_old_lockpath);
-  }
+cf_removelocks( void )
+{
+    g_unlink( gl_lockpath );
+    g_free( gl_lockpath );
+    g_unlink( gl_old_lockpath );
+    g_free( gl_old_lockpath );
 }
 
 char *
@@ -231,7 +228,8 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
 static char*
 getPrefsFilename( void )
 {
-    return g_build_filename( tr_getPrefsDirectory(), "gtk", "prefs", NULL );
+    return g_build_filename( tr_getPrefsDirectory(),
+                             CONF_SUBDIR, "prefs.ini", NULL );
 }
 
 static GKeyFile*
@@ -304,10 +302,15 @@ pref_string_set_default( const char * key, const char * value )
 void
 pref_save(char **errstr)
 {
-    GError * err = NULL;
     gsize datalen;
+    GError * err = NULL;
     char * data;
-    char * filename = getPrefsFilename( );
+    char * filename;
+    char * path;
+
+    filename = getPrefsFilename( );
+    path = g_path_get_dirname( filename );
+    mkdir_p( path, 0755 );
 
     data = g_key_file_to_data( getPrefsKeyFile(), &datalen, &err );
     if( !err ) {
@@ -319,9 +322,10 @@ pref_save(char **errstr)
     if( errstr != NULL )
         *errstr = err ? g_strdup( err->message ) : NULL;
 
-    g_free( filename );
-    g_free( data );
     g_clear_error( &err );
+    g_free( data );
+    g_free( path );
+    g_free( filename );
 }
 
 /**

@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  * 
- * $Id:$
+ * $Id$
  */
 
 #include <glib/gi18n.h>
@@ -40,6 +40,7 @@ tr_prefs_init_global( void )
     pref_flag_set_default   ( PREF_KEY_PEX, TRUE );
     pref_flag_set_default   ( PREF_KEY_SYSTRAY, TRUE );
     pref_flag_set_default   ( PREF_KEY_ASKQUIT, TRUE );
+    pref_flag_set_default   ( PREF_KEY_ENCRYPTED_ONLY, FALSE );
 
     pref_string_set_default ( PREF_KEY_ADDSTD, toractionname(TR_TOR_COPY) );
     pref_string_set_default ( PREF_KEY_ADDIPC, toractionname(TR_TOR_COPY) );
@@ -129,7 +130,8 @@ chosen_cb( GtkFileChooser * w, gpointer core )
 static GtkWidget*
 new_path_chooser_button( const char * key, gpointer core )
 {
-    GtkWidget * w = gtk_file_chooser_button_new( "asdf", GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
+    GtkWidget * w = gtk_file_chooser_button_new( NULL,
+                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER );
     char * path = pref_string_get( key );
     g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
     g_signal_connect( w, "selection-changed", G_CALLBACK(chosen_cb), core );
@@ -154,24 +156,28 @@ action_cb( GtkComboBox * w, gpointer core )
 static GtkWidget*
 new_action_combo( const char * key, gpointer core )
 {
+    const char * s;
     GtkTreeIter iter;
     GtkCellRenderer * rend;
     GtkListStore * model;
     GtkWidget * w;
 
     model = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_INT );
+
+    s = _("Use the torrent file where it is");
     gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_LEAVE, 0,
-                        _("Use the torrent file where it is"), -1 );
+    gtk_list_store_set( model, &iter, 1, TR_TOR_LEAVE, 0, s, -1 );
+
+    s = _("Keep a copy of the torrent file");
     gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_COPY, 0,
-                        _("Keep a copy of the torrent file"), -1 );
+    gtk_list_store_set( model, &iter, 1, TR_TOR_COPY, 0, s, -1 );
+
+    s = _("Keep a copy and remove the original");
     gtk_list_store_append( model, &iter );
-    gtk_list_store_set( model, &iter, 1, TR_TOR_MOVE, 0,
-                        _("Keep a copy and remove the original"), -1 );
+    gtk_list_store_set( model, &iter, 1, TR_TOR_MOVE, 0, s, -1 );
 
     w = gtk_combo_box_new_with_model( GTK_TREE_MODEL(model) ); 
-    gtk_combo_box_set_active( GTK_COMBO_BOX(w), pref_int_get(key) );
+    gtk_combo_box_set_active( GTK_COMBO_BOX(w), tr_prefs_get_action(key) );
     g_object_set_data_full( G_OBJECT(w), PREFS_KEY, g_strdup(key), g_free );
     rend = gtk_cell_renderer_text_new( );
     gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(w), rend, TRUE );
@@ -185,54 +191,67 @@ GtkWidget *
 tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
     int row = 0;
+    const char * s;
     GtkWidget * t;
     GtkWidget * w;
     GtkWidget * l;
-    GtkWidget * dialog = gtk_dialog_new_with_buttons( _("Transmission: Preferences"), parent,
-                                                      GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                      GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-                                                      NULL );
-    gtk_window_set_role( GTK_WINDOW(dialog), "transmission-preferences-dialog" );
-    g_signal_connect( dialog, "response", G_CALLBACK(response_cb), core );
+    GtkWidget * d;
+
+    d = gtk_dialog_new_with_buttons( _("Transmission: Preferences"), parent,
+                                     GTK_DIALOG_DESTROY_WITH_PARENT,
+                                     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+                                     NULL );
+
+    gtk_window_set_role( GTK_WINDOW(d), "transmission-preferences-dialog" );
+    g_signal_connect( d, "response", G_CALLBACK(response_cb), core );
 
     t = hig_workarea_create ();
 
     hig_workarea_add_section_title (t, &row, _("Speed Limits"));
     hig_workarea_add_section_spacer (t, row, 4);
 
-        w = new_check_button( _("_Limit Upload Speed"), PREF_KEY_UL_LIMIT_ENABLED, core );
+        s = _("_Limit Upload Speed");
+        w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_spin_button( PREF_KEY_UL_LIMIT, core, 20, INT_MAX );
-        l = hig_workarea_add_row( t, &row, _("Maximum _Upload Speed (KiB/s)"), w, NULL );
+        s = _("Maximum _Upload Speed (KiB/s)");
+        l = hig_workarea_add_row( t, &row, s, w, NULL );
         
-        w = new_check_button( _("Li_mit Download Speed"), PREF_KEY_DL_LIMIT_ENABLED, core );
+        s = _("Li_mit Download Speed");
+        w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_spin_button( PREF_KEY_DL_LIMIT, core, 1, INT_MAX );
-        l = hig_workarea_add_row( t, &row, _("Maximum _Download Speed (KiB/s)"), w, NULL );
+        s = _("Maximum _Download Speed (KiB/s)");
+        l = hig_workarea_add_row( t, &row, s, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Downloads"));
     hig_workarea_add_section_spacer (t, row, 4);
 
-        w = new_check_button( _("Al_ways prompt for download directory"), PREF_KEY_DIR_ASK, core );
+        s = _("Al_ways prompt for download directory");
+        w = new_check_button( s, PREF_KEY_DIR_ASK, core );
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
-        l = hig_workarea_add_row( t, &row, _("Download Di_rectory"), w, NULL );
+        s = _("Download Di_rectory");
+        l = hig_workarea_add_row( t, &row, s, w, NULL );
 
         w = new_action_combo( PREF_KEY_ADDSTD, core );
-        l = hig_workarea_add_row( t, &row, _("For torrents added _normally:"), w, NULL );
+        s = _("For torrents added _normally:");
+        l = hig_workarea_add_row( t, &row, s, w, NULL );
 
         w = new_action_combo( PREF_KEY_ADDIPC, core );
-        l = hig_workarea_add_row( t, &row, _("For torrents added from _command-line:"), w, NULL );
+        s = _("For torrents added from _command-line:");
+        l = hig_workarea_add_row( t, &row, s, w, NULL );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Network"));
     hig_workarea_add_section_spacer (t, row, 2);
         
-        w = new_check_button( _("_Automatic Port Mapping via NAT-PMP or UPnP"), PREF_KEY_NAT, core );
+        s = _("_Automatic Port Mapping via NAT-PMP or UPnP");
+        w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
         w = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX );
@@ -242,17 +261,24 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     hig_workarea_add_section_title (t, &row, _("Options"));
     hig_workarea_add_section_spacer (t, row, 3);
         
-        w = new_check_button( _("Use Peer _Exchange if Possible"), PREF_KEY_PEX, core );
+        s = _("Use Peer _Exchange if Possible");
+        w = new_check_button( s, PREF_KEY_PEX, core );
         hig_workarea_add_wide_control( t, &row, w );
         
-        w = new_check_button( _("Display an Icon in the System _Tray"), PREF_KEY_SYSTRAY, core );
+        s = _("_Ignore Unencrypted Peers");
+        w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
-        w = new_check_button( _("Confirm _quit"), PREF_KEY_ASKQUIT, core );
+        s = _("Display an Icon in the System _Tray");
+        w = new_check_button( s, PREF_KEY_SYSTRAY, core );
+        hig_workarea_add_wide_control( t, &row, w );
+        
+        s = _("Confirm _quit");
+        w = new_check_button( s, PREF_KEY_ASKQUIT, core );
         hig_workarea_add_wide_control( t, &row, w );
 
     hig_workarea_finish (t, &row);
-    gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(dialog)->vbox), t );
-    gtk_widget_show_all( GTK_DIALOG(dialog)->vbox );
-    return dialog;
+    gtk_box_pack_start_defaults( GTK_BOX(GTK_DIALOG(d)->vbox), t );
+    gtk_widget_show_all( GTK_DIALOG(d)->vbox );
+    return d;
 }

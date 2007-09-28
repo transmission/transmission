@@ -747,7 +747,8 @@ readinitialprefs( struct cbdata * cbdata )
         PREF_KEY_UL_LIMIT,
         PREF_KEY_NAT,
         PREF_KEY_PEX,
-        PREF_KEY_SYSTRAY
+        PREF_KEY_SYSTRAY,
+        PREF_KEY_ENCRYPTED_ONLY
     };
 
     for( i=0; i<G_N_ELEMENTS(keys); ++i )
@@ -760,7 +761,13 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     struct cbdata * cbdata = data;
     tr_handle     * tr     = tr_core_handle( cbdata->core );
 
-    if( !strcmp( key, PREF_KEY_PORT ) )
+    if( !strcmp( key, PREF_KEY_ENCRYPTED_ONLY ) )
+    {
+        const gboolean crypto_only = pref_flag_get( key );
+        tr_setEncryptionMode( tr, crypto_only ? TR_ENCRYPTION_REQUIRED
+                                              : TR_ENCRYPTION_PREFERRED );
+    }
+    else if( !strcmp( key, PREF_KEY_PORT ) )
     {
         const int port = pref_int_get( key );
         tr_setBindPort( tr, port );
@@ -792,9 +799,12 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
     }
     else if( !strcmp( key, PREF_KEY_SYSTRAY ) )
     {
-        if( pref_flag_get( key ) ) {
+        if( pref_flag_get( key ) )
+        {
             makeicon( cbdata );
-        } else if( cbdata->icon ) {
+        }
+        else if( cbdata->icon )
+        {
             g_object_unref( cbdata->icon );
             cbdata->icon = NULL;
         }
