@@ -1229,7 +1229,6 @@ pulse( void * vmsgs )
        start listening to the peer again */
     if( msgs->notListening && canDownload( msgs ) )
     {
-        fprintf( stderr, "msgs %p thawing out...\n", msgs );
         msgs->notListening = 0;
         tr_peerIoSetIOMode ( msgs->io, EV_READ, 0 );
     }
