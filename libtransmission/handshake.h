@@ -23,7 +23,6 @@ typedef void (*handshakeDoneCB)(struct tr_handshake * handshake,
                                 struct tr_peerIo    * io,
                                 int                   isConnected,
                                 const uint8_t       * peerId,
-                                int                   peerSupportsEncryption,
                                 void                * userData );
 
 tr_handshake *  tr_handshakeNew( struct tr_peerIo   * io,

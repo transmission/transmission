@@ -21,15 +21,22 @@ struct tr_bitfield;
 struct tr_peerIo;
 struct tr_peermsgs;
 
+enum
+{
+    ENCRYPTION_PREFERENCE_UNKNOWN,
+    ENCRYPTION_PREFERENCE_YES,
+    ENCRYPTION_PREFERENCE_NO
+};
+
 typedef struct tr_peer
 {
     unsigned int  peerIsChoked : 1;
     unsigned int  peerIsInterested : 1;
     unsigned int  clientIsChoked : 1;
     unsigned int  clientIsInterested : 1;
-    unsigned int  peerSupportsEncryption : 1;
     unsigned int  doPurge : 1;
 
+    uint8_t encryption_preference;
     uint8_t from;
     uint16_t port;
     struct in_addr in_addr;

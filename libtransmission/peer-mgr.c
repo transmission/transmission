@@ -746,7 +746,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
                    tr_peerIo       * io,
                    int               isConnected,
                    const uint8_t   * peer_id,
-                   int               peerSupportsEncryption,
                    void            * vmanager )
 {
     int ok = isConnected;
@@ -759,7 +758,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
 
     assert( io != NULL );
     assert( isConnected==0 || isConnected==1 );
-    assert( peerSupportsEncryption==0 || peerSupportsEncryption==1 );
 
     ours = tr_ptrArrayRemoveSorted( manager->handshakes,
                                     handshake,
@@ -807,7 +805,6 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             peer->msgs = tr_peerMsgsNew( t->tor, peer );
             tr_free( peer->client );
             peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
-            peer->peerSupportsEncryption = peerSupportsEncryption ? 1 : 0;
             peer->msgsTag = tr_peerMsgsSubscribe( peer->msgs, msgsCallbackFunc, t );
             peer->connectionChangedAt = time( NULL );
             rechokeSoon( t );
@@ -922,6 +919,17 @@ tr_pexCompare( const void * va, const void * vb )
 
 int tr_pexCompare( const void * a, const void * b );
 
+static int
+peerPrefersCrypto( const tr_peer * peer )
+{
+    if( peer->encryption_preference == ENCRYPTION_PREFERENCE_YES )
+        return TRUE;
+
+    if( peer->encryption_preference == ENCRYPTION_PREFERENCE_NO )
+        return FALSE;
+
+    return tr_peerIoIsEncrypted( peer->io );
+};
 
 int
 tr_peerMgrGetPeers( tr_peerMgr      * manager,
@@ -943,8 +951,8 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
         walk->port = peer->port;
 
         walk->flags = 0;
-        if( peer->peerSupportsEncryption ) walk->flags |= 1;
-        if( peer->progress >= 1.0 )        walk->flags |= 2;
+        if( peerPrefersCrypto(peer) )  walk->flags |= 1;
+        if( peer->progress >= 1.0 )    walk->flags |= 2;
     }
 
     assert( ( walk - pex ) == peerCount );

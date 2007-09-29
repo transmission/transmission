@@ -104,7 +104,6 @@ extern const char* getPeerId( void ) ;
 
 struct tr_handshake
 {
-    unsigned int peerSupportsEncryption       : 1;
     unsigned int havePeerID                   : 1;
     unsigned int haveSentBitTorrentHandshake  : 1;
     unsigned int allowUnencryptedPeers        : 1;
@@ -406,7 +405,6 @@ readYb( tr_handshake * handshake, struct evbuffer * inbuf )
 
     dbgmsg( handshake, "got a %s handshake", (isEncrypted ? "encrypted" : "plaintext") );
 
-    handshake->peerSupportsEncryption = isEncrypted;
     tr_peerIoSetEncryption( handshake->io, isEncrypted ? PEER_ENCRYPTION_RC4
                                                        : PEER_ENCRYPTION_NONE );
     if( !isEncrypted ) {
@@ -1001,7 +999,6 @@ fireDoneFunc( tr_handshake * handshake, int isConnected )
                           handshake->io,
                           isConnected,
                           peer_id,
-                          handshake->peerSupportsEncryption,
                           handshake->doneUserData );
 }
 

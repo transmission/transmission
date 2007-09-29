@@ -122,9 +122,10 @@ struct tr_peermsgs
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
 
-    unsigned int notListening          : 1;
-    unsigned int peerSupportsPex       : 1;
-    unsigned int hasSentLtepHandshake  : 1;
+    unsigned int notListening             : 1;
+    unsigned int peerSupportsPex          : 1;
+    unsigned int clientSentLtepHandshake  : 1;
+    unsigned int peerSentLtepHandshake    : 1;
     
     tr_bitfield * clientAllowedPieces;
     tr_bitfield * peerAllowedPieces;
@@ -529,17 +530,34 @@ sendLtepHandshake( tr_peermsgs * msgs )
     benc_val_t val, *m;
     char * buf;
     int len;
+    int pex;
     const char * v = TR_NAME " " USERAGENT_PREFIX;
     const int port = tr_getPublicPort( msgs->handle );
     struct evbuffer * outbuf = evbuffer_new( );
 
+    if( msgs->clientSentLtepHandshake )
+        return;
+
     dbgmsg( msgs, "sending an ltep handshake" );
+    msgs->clientSentLtepHandshake = 1;
+
+    /* decide if we want to advertise pex support */
+    if( msgs->torrent->pexDisabled )
+        pex = 0;
+    else if( msgs->peerSentLtepHandshake )
+        pex = msgs->peerSupportsPex ? 1 : 0;
+    else
+        pex = 1;
+
     tr_bencInit( &val, TYPE_DICT );
-    tr_bencDictReserve( &val, 3 );
+    tr_bencDictReserve( &val, 4 );
+    tr_bencInitInt( tr_bencDictAdd( &val, "e" ), 1 );
     m  = tr_bencDictAdd( &val, "m" );
     tr_bencInit( m, TYPE_DICT );
-    tr_bencDictReserve( m, 1 );
-    tr_bencInitInt( tr_bencDictAdd( m, "ut_pex" ), OUR_LTEP_PEX );
+    if( pex ) {
+        tr_bencDictReserve( m, 1 );
+        tr_bencInitInt( tr_bencDictAdd( m, "ut_pex" ), OUR_LTEP_PEX );
+    }
     if( port > 0 )
         tr_bencInitInt( tr_bencDictAdd( &val, "p" ), port );
     tr_bencInitStr( tr_bencDictAdd( &val, "v" ), v, 0, 1 );
@@ -551,7 +569,9 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_peerIoWriteBytes ( msgs->io, outbuf, buf, len );
 
     tr_peerIoWriteBuf( msgs->io, outbuf );
-    msgs->hasSentLtepHandshake = 1;
+
+    dbgmsg( msgs, "here is the ltep handshake we sent:" );
+    tr_bencPrint( &val );
 
     /* cleanup */
     tr_bencFree( &val );
@@ -567,12 +587,23 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
     uint8_t * tmp = tr_new( uint8_t, len );
 
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, len );
+    msgs->peerSentLtepHandshake = 1;
 
     if( tr_bencLoad( tmp, len, &val, NULL ) || val.type!=TYPE_DICT ) {
         dbgmsg( msgs, "GET  extended-handshake, couldn't get dictionary" );
         tr_free( tmp );
         return;
     }
+
+    dbgmsg( msgs, "here is the ltep handshake we read:" );
+    tr_bencPrint( &val );
+
+    /* does the peer prefer encrypted connections? */
+    sub = tr_bencDictFind( &val, "e" );
+    if( tr_bencIsInt( sub ) )
+        msgs->info->encryption_preference = sub->val.i
+                                      ? ENCRYPTION_PREFERENCE_YES
+                                      : ENCRYPTION_PREFERENCE_NO;
 
     /* check supported messages for utorrent pex */
     sub = tr_bencDictFind( &val, "m" );
@@ -657,8 +688,7 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     {
         dbgmsg( msgs, "got ltep handshake" );
         parseLtepHandshake( msgs, msglen, inbuf );
-        if( !msgs->hasSentLtepHandshake )
-            sendLtepHandshake( msgs );
+        sendLtepHandshake( msgs );
     }
     else if( ltep_msgid == msgs->ut_pex_id )
     {
