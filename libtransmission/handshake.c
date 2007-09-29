@@ -123,7 +123,6 @@ struct tr_handshake
     uint8_t peer_id[PEER_ID_LEN];
     handshakeDoneCB doneCB;
     void * doneUserData;
-    tr_timer * startTimer;
 };
 
 /**
@@ -1012,7 +1011,6 @@ tr_handshakeDone( tr_handshake * handshake, int isOK )
 
     fireDoneFunc( handshake, isOK );
 
-    tr_timerFree( &handshake->startTimer );
     tr_free( handshake );
 }
 
@@ -1052,23 +1050,6 @@ gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
 ***
 **/
 
-static int
-handshakeStart( void * vhandshake )
-{
-    tr_handshake * handshake = vhandshake;
-    
-    tr_peerIoSetIOMode( handshake->io, EV_READ|EV_WRITE, 0 );
-    tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
-
-    if( tr_peerIoIsIncoming( handshake->io ) )
-        setReadState( handshake, AWAITING_HANDSHAKE );
-    else
-        sendYa( handshake );
-
-    handshake->startTimer = 0; 
-    return FALSE;
-}
-
 tr_handshake*
 tr_handshakeNew( tr_peerIo           * io,
                  tr_encryption_mode    encryption_mode,
@@ -1084,10 +1065,14 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
-    handshake->startTimer = tr_timerNew( handshake->handle,
-                                         handshakeStart,
-                                         handshake,
-                                         1000 );
+    
+    tr_peerIoSetIOMode( handshake->io, EV_READ|EV_WRITE, 0 );
+    tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
+
+    if( tr_peerIoIsIncoming( handshake->io ) )
+        setReadState( handshake, AWAITING_HANDSHAKE );
+    else
+        sendYa( handshake );
 
     return handshake;
 }
@@ -1100,5 +1085,3 @@ tr_handshakeGetAddr( const struct tr_handshake * handshake, uint16_t * port )
 
     return tr_peerIoGetAddress( handshake->io, port );
 }
-
-

@@ -533,11 +533,12 @@ sendLtepHandshake( tr_peermsgs * msgs )
     int pex;
     const char * v = TR_NAME " " USERAGENT_PREFIX;
     const int port = tr_getPublicPort( msgs->handle );
-    struct evbuffer * outbuf = evbuffer_new( );
+    struct evbuffer * outbuf;
 
     if( msgs->clientSentLtepHandshake )
         return;
 
+    outbuf = evbuffer_new( );
     dbgmsg( msgs, "sending an ltep handshake" );
     msgs->clientSentLtepHandshake = 1;
 
@@ -577,7 +578,6 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_bencFree( &val );
     tr_free( buf );
     evbuffer_free( outbuf );
-
 }
 
 static void
