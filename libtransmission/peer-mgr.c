@@ -31,6 +31,8 @@
 #include "trevent.h"
 #include "utils.h"
 
+#include "pthread.h"
+
 enum
 {
     /* how frequently to change which peers are choked */
@@ -106,7 +108,7 @@ struct tr_peerMgr
     int connectionCount;
     tr_ptrArray * handshakes; /* in-process */
     tr_lock * lock;
-    uint8_t isLocked;
+    pthread_t lockThread;
 };
 
 /**
@@ -116,15 +118,15 @@ struct tr_peerMgr
 static void
 managerLock( struct tr_peerMgr * manager )
 {
-    assert( !manager->isLocked );
+    assert( manager->lockThread != pthread_self() );
     tr_lockLock( manager->lock );
-    manager->isLocked = TRUE;
+    manager->lockThread = pthread_self();
 }
 static void
 managerUnlock( struct tr_peerMgr * manager )
 {
-    assert( manager->isLocked );
-    manager->isLocked = FALSE;
+    assert( manager->lockThread == pthread_self() );
+    manager->lockThread = 0;
     tr_lockUnlock( manager->lock );
 }
 static void
@@ -140,10 +142,8 @@ torrentUnlock( Torrent * torrent )
 static int
 torrentIsLocked( Torrent * t )
 {
-    return t!=NULL && t->manager!=NULL && t->manager->isLocked;
+    return t!=NULL && t->manager!=NULL && t->manager->lockThread!=0;
 }
-
-#define managerLock(a) fprintf(stderr,"%s:%d locking\n",__FILE__,__LINE__); managerLock(a);
 
 /**
 ***
@@ -508,6 +508,7 @@ getPreferredPieces( Torrent     * t,
             setme->piece = piece;
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
+            setme->fastAllowed = 0;
             /* FIXME */
 //            setme->fastAllowed = tr_bitfieldHas( t->tor->allowedList, i);
 
@@ -770,8 +771,10 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
     tr_peer * peer = vpeer;
     Torrent * t = (Torrent *) vt;
     const tr_peermsgs_event * e = (const tr_peermsgs_event *) vevent;
+    const int needLock = !torrentIsLocked( t );
 
-    torrentLock( t );
+    if( needLock )
+        torrentLock( t );
 
     switch( e->eventType )
     {
@@ -810,7 +813,8 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             assert(0);
     }
 
-    torrentUnlock( t );
+    if( needLock )
+        torrentUnlock( t );
 }
 
 static void
@@ -894,7 +898,7 @@ initiateHandshake( tr_peerMgr * manager, tr_peerIo * io )
 {
     tr_handshake * handshake;
 
-    assert( manager->isLocked );
+    assert( manager->lockThread!=0 );
     assert( io != NULL );
 
     handshake = tr_handshakeNew( io,

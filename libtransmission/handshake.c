@@ -1084,7 +1084,6 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
-
     handshake->startTimer = tr_timerNew( handshake->handle,
                                          handshakeStart,
                                          handshake,
