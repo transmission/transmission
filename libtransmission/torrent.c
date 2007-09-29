@@ -1079,7 +1079,7 @@ tr_torrentStopImpl( void * vtor )
 void
 tr_torrentStop( tr_torrent * tor )
 {
-    tr_runInEventThread( tor->handle, tr_torrentStopImpl, tor );
+    tr_torrentStopImpl( tor );
 }
 
 void
