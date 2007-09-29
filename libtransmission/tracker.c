@@ -949,7 +949,7 @@ onTrackerResponse( struct evhttp_request * req, void * vtor )
     else if( reannounceInterval > 0 ) {
         tr_dbg( "torrent '%s' reannouncing in %d seconds",
                 tor->torrent->info.name, (reannounceInterval/1000) );
-        assert( tor->reannounceTimer == NULL );
+        tr_timerFree( &tor->reannounceTimer );
         tor->reannounceTimer = tr_timerNew( tor->tracker->handle, onReannounceNow, tor, reannounceInterval );
         tor->manualAnnounceAllowedAt
                            = tr_date() + MANUAL_ANNOUNCE_INTERVAL_MSEC;
