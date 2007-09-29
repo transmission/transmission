@@ -11,29 +11,40 @@ sent is a handshake message, which always has an extended id of 0.
 The handshake message informs the peer which extended messages are
 supported and what their extended id will be.  The message payload is
 a bencoded dictionary which may have some of the following keys:
-    v
-        string, client name and version.  eg: Transmission 0.7
-    p
-        int, tcp port for incoming peer connections
+    e
+        int, 1 or 0. a flag to denote whether the peer prefers
+        encrypted connections.  This is used in ut_pex's "added.f".
     m
         dict containing supported extended messages and the extended id used
+    p
+        int, tcp port for incoming peer connections
+    v
+        string, client name and version.  eg: Transmission 0.7
 
 A peer may re-send the handshake message at any time to add new
 extended message, or to disable previous messages by sending 0 as
 their extended id.
 
-µTorrent peer exchange messages use the key ut_pex in the m
-dictionary.  Peer exchanges messages should be sent approximately once
-every minute.  The payload of a peer exchange message is a bencoded
-dictionary with the following keys:
+uTorrent peer exchange messages use the key "ut_pex" in the m
+dictionary.  If the uTorrent peer has pex disabled, this key
+will not be present.  Exchanges messages should be sent approximately
+once every minute.  The payload of a peer exchange message is a
+bencoded dictionary with the following keys:
+
     added
         string, contains peers in the compact tracker format
         (ie: 6 bytes for IPv4 address and port in network byte order)
         added since the last peer exchange message
+
     added.f
         string, one byte of flags for each peer in the above added string.
         according to libtorrent's ut_pex.c:
         0x01 - peer supports encryption
         0x02 - peer is a seed
+
     dropped
         same format as added, contains peers dropped since last peer exchange
+
+In contrast to Azureus' maximum of 50 peers per pex burst, uTorrent will
+hold up to 200.  alus reports: "uT stores max 200 from other peers, but it
+will send everything it has."
