@@ -235,7 +235,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         [self setRatioSetting: NSOffState];
         [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentStoppedForRatio" object: self];
     }
-
+    
+    //check if checking data
     BOOL wasChecking = fChecking;
     fChecking = fStat->status == TR_STATUS_CHECK || fStat->status == TR_STATUS_CHECK_WAIT;
     
@@ -1607,9 +1608,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     tr_torrentSetFolder(fHandle, [folder UTF8String]);
 }
 
-//status will be retained
+//status has been retained
 - (void) completenessChange: (NSNumber *) status
 {
+    [self update];
+    
     BOOL canMove;
     switch ([status intValue])
     {
@@ -1653,8 +1656,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
     }
     [status release];
-    
-    [self update];
 } 
 
 - (void) quickPause
