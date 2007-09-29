@@ -26,6 +26,7 @@
 #include "crypto.h"
 #include "handshake.h"
 #include "peer-io.h"
+#include "trevent.h"
 #include "utils.h"
 
 /* enable LibTransmission extension protocol */
@@ -122,6 +123,7 @@ struct tr_handshake
     uint8_t peer_id[PEER_ID_LEN];
     handshakeDoneCB doneCB;
     void * doneUserData;
+    tr_timer * startTimer;
 };
 
 /**
@@ -1007,7 +1009,10 @@ tr_handshakeDone( tr_handshake * handshake, int isOK )
 {
     dbgmsg( handshake, "handshakeDone: %s", isOK ? "connected" : "aborting" );
     tr_peerIoSetIOFuncs( handshake->io, NULL, NULL, NULL, NULL );
+
     fireDoneFunc( handshake, isOK );
+
+    tr_timerFree( &handshake->startTimer );
     tr_free( handshake );
 }
 
@@ -1047,6 +1052,23 @@ gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
 ***
 **/
 
+static int
+handshakeStart( void * vhandshake )
+{
+    tr_handshake * handshake = vhandshake;
+    
+    tr_peerIoSetIOMode( handshake->io, EV_READ|EV_WRITE, 0 );
+    tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
+
+    if( tr_peerIoIsIncoming( handshake->io ) )
+        setReadState( handshake, AWAITING_HANDSHAKE );
+    else
+        sendYa( handshake );
+
+    handshake->startTimer = 0; 
+    return FALSE;
+}
+
 tr_handshake*
 tr_handshakeNew( tr_peerIo           * io,
                  tr_encryption_mode    encryption_mode,
@@ -1054,10 +1076,6 @@ tr_handshakeNew( tr_peerIo           * io,
                  void                * doneUserData )
 {
     tr_handshake * handshake;
-
-// w00t
-//static int count = 0;
-//if( count++ ) return NULL;
 
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
@@ -1067,15 +1085,10 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
 
-    tr_peerIoSetIOMode( io, EV_READ|EV_WRITE, 0 );
-    tr_peerIoSetIOFuncs( io, canRead, NULL, gotError, handshake );
-
-dbgmsg( handshake, "new handshake for io %p", io );
-
-    if( tr_peerIoIsIncoming( io ) )
-        setReadState( handshake, AWAITING_HANDSHAKE );
-    else
-        sendYa( handshake );
+    handshake->startTimer = tr_timerNew( handshake->handle,
+                                         handshakeStart,
+                                         handshake,
+                                         1000 );
 
     return handshake;
 }

@@ -143,7 +143,7 @@ torrentIsLocked( Torrent * t )
     return t!=NULL && t->manager!=NULL && t->manager->isLocked;
 }
 
-/* #define managerLock(a) fprintf(stderr,"%s:%d locking\n",__FILE__,__LINE__); managerLock(a); */
+#define managerLock(a) fprintf(stderr,"%s:%d locking\n",__FILE__,__LINE__); managerLock(a);
 
 /**
 ***
