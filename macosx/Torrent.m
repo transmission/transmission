@@ -223,7 +223,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fStat = tr_torrentStat(fHandle);
     
     //check to stop for ratio
-    #warning fix this!
     float stopRatio;
     if ([self isSeeding] && (stopRatio = [self actualStopRatio]) != INVALID && [self ratio] >= stopRatio)
     {
@@ -924,9 +923,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Downloading from %d of 1 peer",
                                                     "Torrent -> status string"), [self peersSendingToUs]];
-                
-                string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
-                            [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
                 break;
 
             case TR_STATUS_SEED:
@@ -937,8 +933,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 else
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
-                
-                string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
                 break;
 
             case TR_STATUS_STOPPING:
@@ -951,6 +945,15 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         if (fStalled)
             string = [NSLocalizedString(@"Stalled, ", "Torrent -> status string") stringByAppendingString: string];
+        
+        if ([self isActive] && ![self isChecking])
+        {
+            if (fStat->status == TR_STATUS_DOWNLOAD)
+                string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
+                        [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
+            else
+                string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
+        }
     }
     
     return string;
