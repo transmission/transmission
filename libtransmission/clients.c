@@ -228,13 +228,17 @@ char * tr_clientForId( const uint8_t * id )
         }
         else if( !memcmp( &id[1], "GR", 2 ) )
         {
-            asprintf( &ret, "GetRight (%c.%c.%c.%c)",
+            asprintf( &ret, "GetRight %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
         else if( !memcmp( &id[1], "PD", 2 ) )
         {
             asprintf( &ret, "Pando %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "WT-", 3 ) )
+        {
+            asprintf( &ret, "BitLet" );
         }
         
         if( ret )
