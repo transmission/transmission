@@ -906,6 +906,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 else
                     string = NSLocalizedString(@"Paused", "Torrent -> status string");
                 break;
+            
+            case TR_STATUS_STOPPING:
+                string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+                break;
 
             case TR_STATUS_CHECK_WAIT:
                 string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
@@ -934,10 +938,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     string = [NSString stringWithFormat: NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
                                                     [self peersGettingFromUs]];
                 break;
-
-            case TR_STATUS_STOPPING:
-                string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
-                break;
             
             default:
                 string = @"";
@@ -946,6 +946,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         if (fStalled)
             string = [NSLocalizedString(@"Stalled, ", "Torrent -> status string") stringByAppendingString: string];
         
+        //append even if error
         if ([self isActive] && ![self isChecking])
         {
             if (fStat->status == TR_STATUS_DOWNLOAD)
@@ -977,6 +978,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             else
                 string = NSLocalizedString(@"Paused", "Torrent -> status string");
             break;
+        
+        case TR_STATUS_STOPPING:
+            string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
 
         case TR_STATUS_CHECK_WAIT:
             string = [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
@@ -986,26 +991,20 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             string = [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
             break;
-
-        case TR_STATUS_STOPPING:
-            string = [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+        
+        case TR_STATUS_DOWNLOAD:
+            string = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, UL: %@", "Torrent -> status string"),
+                            [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
+            break;
+        
+        case TR_STATUS_SEED:
+        case TR_STATUS_DONE:
+            string = [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, UL: %@", "Torrent -> status string"),
+                            [NSString stringForRatio: [self ratio]], [NSString stringForSpeed: [self uploadRate]]];
             break;
         
         default:
-            if ([self isActive])
-            {
-                if (![self allDownloaded])
-                    string = [NSString stringWithFormat: NSLocalizedString(@"DL: %@, ", "Torrent -> status string"),
-                                        [NSString stringForSpeed: [self downloadRate]]];
-                else
-                    string = [NSString stringWithFormat: NSLocalizedString(@"Ratio: %@, ", "Torrent -> status string"),
-                                [NSString stringForRatio: [self ratio]]];
-                
-                string = [string stringByAppendingFormat: NSLocalizedString(@"UL: %@", "Torrent -> status string"),
-                                [NSString stringForSpeed: [self uploadRate]]];
-            }
-            else
-                string = @"";
+            string = @"";
     }
     
     return string;
@@ -1046,6 +1045,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         case TR_STATUS_STOPPED:
             return NSLocalizedString(@"Paused", "Torrent -> status string");
             break;
+        
+        case TR_STATUS_STOPPING:
+            return [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
+            break;
 
         case TR_STATUS_CHECK:
             return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
@@ -1063,10 +1066,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
-            break;
-
-        case TR_STATUS_STOPPING:
-            return [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
             break;
         
         default:
