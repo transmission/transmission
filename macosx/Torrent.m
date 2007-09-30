@@ -1014,15 +1014,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     switch (fStat->status)
     {
-        case TR_STATUS_CHECK_WAIT:
-            return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-            break;
-
-        case TR_STATUS_CHECK:
-            return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
-                                    "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-            break;
-
         case TR_STATUS_DOWNLOAD:
             return [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
             break;
@@ -1034,7 +1025,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             break;
         
         default:
-            return @"";
+            return [self shortStatusString];
     }
 }
 

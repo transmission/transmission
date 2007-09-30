@@ -120,8 +120,8 @@
 - (NSRect) minimalStatusRectForBounds: (NSRect) bounds
 {
     Torrent * torrent = [self representedObject];
-    NSString * string = [torrent isActive] && ![fDefaults boolForKey: @"DisplaySmallStatusRegular"]
-                            ? [torrent remainingTimeString] : [torrent shortStatusString];
+    NSString * string = [fDefaults boolForKey: @"DisplaySmallStatusRegular"]
+                            ? [torrent shortStatusString] : [torrent remainingTimeString];
     return [self rectForMinimalStatusWithString: [self attributedStatusString: string withColor: nil] inBounds: bounds];
 }
 
@@ -204,8 +204,8 @@
     NSRect minimalStatusRect;
     if (minimal)
     {
-        NSString * string = [torrent isActive] && ![fDefaults boolForKey: @"DisplaySmallStatusRegular"]
-                                ? [torrent remainingTimeString] : [torrent shortStatusString];
+        NSString * string = [fDefaults boolForKey: @"DisplaySmallStatusRegular"]
+                            ? [torrent shortStatusString] : [torrent remainingTimeString];
         NSAttributedString * minimalString = [self attributedStatusString: string withColor: statusColor];
         minimalStatusRect = [self rectForMinimalStatusWithString: minimalString inBounds: cellFrame];
         
