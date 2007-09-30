@@ -385,9 +385,9 @@ onTorrentFreeNow( void * vtor )
         if( t->connection != NULL )
             evhttp_connection_free( t->connection );
 
-        tr_ptrArrayFree( t->torrents );
-        tr_ptrArrayFree( t->scrapeQueue );
-        tr_ptrArrayFree( t->scraping );
+        tr_ptrArrayFree( t->torrents, NULL );
+        tr_ptrArrayFree( t->scrapeQueue, NULL );
+        tr_ptrArrayFree( t->scraping, NULL );
 
         for( i=0; i<t->addressCount; ++i )
             tr_trackerInfoClear( &t->addresses[i] );

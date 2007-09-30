@@ -18,9 +18,11 @@
  */
 typedef struct tr_ptrArray tr_ptrArray;
 
-tr_ptrArray * tr_ptrArrayNew     ( void );
+typedef void (*PtrArrayForeachFunc)(void *);
 
-void    tr_ptrArrayFree          ( tr_ptrArray* );
+tr_ptrArray * tr_ptrArrayNew     ( void );
+void    tr_ptrArrayForeach       ( tr_ptrArray*, PtrArrayForeachFunc func );
+void    tr_ptrArrayFree          ( tr_ptrArray*, PtrArrayForeachFunc func );
 void*   tr_ptrArrayNth           ( tr_ptrArray*, int n );
 void**  tr_ptrArrayPeek          ( tr_ptrArray*, int * size );
 void**  tr_ptrArrayBase          ( tr_ptrArray* );

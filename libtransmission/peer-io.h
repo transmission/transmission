@@ -30,16 +30,16 @@ typedef struct tr_extensions tr_extensions;
 **/
 
 tr_peerIo*
-      tr_peerIoNewOutgoing( struct tr_handle   * handle,
-                            struct in_addr     * addr,
-                            int                  port,
-                            const  uint8_t     * torrentHash );
+      tr_peerIoNewOutgoing( struct tr_handle     * handle,
+                            const struct in_addr * addr,
+                            int                    port,
+                            const  uint8_t       * torrentHash );
 
 tr_peerIo*
-      tr_peerIoNewIncoming( struct tr_handle   * handle,
-                            struct in_addr     * addr,
-                            uint16_t             port,
-                            int                  socket );
+      tr_peerIoNewIncoming( struct tr_handle     * handle,
+                            const struct in_addr * addr,
+                            uint16_t               port,
+                            int                    socket );
 
 void  tr_peerIoFree      ( tr_peerIo  * io );
 
@@ -60,6 +60,9 @@ int   tr_peerIoSupportsFEXT( const tr_peerIo * io );
 /**
 ***
 **/
+
+const char*
+       tr_peerIoAddrStr( const struct in_addr * addr, uint16_t port );
 
 const char*
       tr_peerIoGetAddrStr( const tr_peerIo * io );

@@ -40,10 +40,26 @@ tr_ptrArrayNew( void )
 }
 
 void
-tr_ptrArrayFree( tr_ptrArray * t )
+tr_ptrArrayForeach( tr_ptrArray * t, PtrArrayForeachFunc func )
+{
+    int i;
+
+    assert( t != NULL );
+    assert( t->items != NULL );
+    assert( func != NULL );
+
+    for( i=0; i<t->n_items; ++i )
+        func( t->items[i] );
+}
+
+void
+tr_ptrArrayFree( tr_ptrArray * t, PtrArrayForeachFunc func )
 {
     assert( t != NULL );
     assert( t->items != NULL );
+
+    if( func != NULL )
+        tr_ptrArrayForeach( t, func );
 
     tr_free( t->items );
     tr_free( t );

@@ -53,7 +53,6 @@ typedef struct tr_peer
     time_t clientSentPieceDataAt;
     time_t peerSentPieceDataAt;
     time_t chokeChangedAt;
-    time_t connectionChangedAt;
 
     struct tr_peermsgs * msgs;
     tr_publisher_tag msgsTag;

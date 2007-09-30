@@ -106,12 +106,12 @@ gotErrorWrapper( struct bufferevent * e, short what, void * userData )
 **/
 
 static tr_peerIo*
-tr_peerIoNew( struct tr_handle  * handle,
-              struct in_addr    * in_addr,
-              uint16_t            port,
-              const uint8_t     * torrentHash,
-              int                 isIncoming,
-              int                 socket )
+tr_peerIoNew( struct tr_handle     * handle,
+              const struct in_addr * in_addr,
+              uint16_t               port,
+              const uint8_t        * torrentHash,
+              int                    isIncoming,
+              int                    socket )
 {
     tr_peerIo * c;
     c = tr_new0( tr_peerIo, 1 );
@@ -133,10 +133,10 @@ tr_peerIoNew( struct tr_handle  * handle,
 }
 
 tr_peerIo*
-tr_peerIoNewIncoming( struct tr_handle  * handle,
-                      struct in_addr    * in_addr,
-                      uint16_t            port,
-                      int                 socket )
+tr_peerIoNewIncoming( struct tr_handle      * handle,
+                      const struct in_addr  * in_addr,
+                      uint16_t                port,
+                      int                     socket )
 {
     assert( handle != NULL );
     assert( in_addr != NULL );
@@ -148,10 +148,10 @@ tr_peerIoNewIncoming( struct tr_handle  * handle,
 }
 
 tr_peerIo*
-tr_peerIoNewOutgoing( struct tr_handle  * handle,
-                      struct in_addr    * in_addr,
-                      int                 port,
-                      const uint8_t     * torrentHash )
+tr_peerIoNewOutgoing( struct tr_handle      * handle,
+                      const struct in_addr  * in_addr,
+                      int                     port,
+                      const uint8_t         * torrentHash )
 {
     assert( handle != NULL );
     assert( in_addr != NULL );
@@ -204,12 +204,17 @@ tr_peerIoGetAddress( const tr_peerIo * io, uint16_t * port )
 }
 
 const char*
-tr_peerIoGetAddrStr( const tr_peerIo * io )
+tr_peerIoAddrStr( const struct in_addr * addr, uint16_t port )
 {
     static char buf[512];
-    assert( io != NULL );
-    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( io->in_addr ), (unsigned int)io->port );
+    snprintf( buf, sizeof(buf), "%s:%u", inet_ntoa( *addr ), (unsigned int)port );
     return buf;
+}
+
+const char*
+tr_peerIoGetAddrStr( const tr_peerIo * io )
+{
+    return tr_peerIoAddrStr( &io->in_addr, io->port );
 }
 
 void 
