@@ -284,7 +284,7 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "From: tracker";
 
-/* File size (beware of leading space) */
+/* File size */
 "GB" = "GB";
 
 /* Preferences -> General toolbar item title */
@@ -312,7 +312,7 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "It appears that the file \"%1$@\" from %2$@ is not a torrent file.";
 
-/* File size (beware of leading space) */
+/* File size */
 "KB" = "KB";
 
 /* About window -> license button */
@@ -328,7 +328,7 @@
 /* Inspector -> files tab -> tooltip */
 "Low Priority" = "Low Priority";
 
-/* File size (beware of leading space) */
+/* File size */
 "MB" = "MB";
 
 /* Inspector -> files tab -> tooltip */
