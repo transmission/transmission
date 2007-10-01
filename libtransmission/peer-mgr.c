@@ -1539,10 +1539,9 @@ getWeakConnections( Torrent * t, int * setmeSize )
 
         assert( atom != NULL );
 
-        /* if we're both seeds, give a little bit of time for
-         * a mutual pex -- peer-msgs initiates a pex exchange
-         * on startup -- and then disconnect */
-        if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) )
+        if( peer->doPurge )
+            isWeak = TRUE;
+        if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) ) /* pex time */
             isWeak = TRUE;
         else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
             isWeak = FALSE;
