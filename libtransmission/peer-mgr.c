@@ -864,6 +864,22 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 }
 
 static void
+ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
+{
+    if( !peerIsKnown( t, addr ) )
+    {
+        struct peer_atom * a = tr_new( struct peer_atom, 1 );
+        a->addr = *addr;
+        a->port = port;
+        a->flags = flags;
+        a->from = from;
+        a->time = 0;
+fprintf( stderr, "torrent [%s] getting a new atom: %s\n", t->tor->info.name, tr_peerIoAddrStr(&a->addr,a->port) );
+        tr_ptrArrayInsertSorted( t->pool, a, comparePeerAtoms );
+    }
+}
+
+static void
 myHandshakeDoneCB( tr_handshake    * handshake,
                    tr_peerIo       * io,
                    int               isConnected,
@@ -920,6 +936,9 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     else /* looking good */
     {
         tr_peer * peer = getPeer( t, in_addr );
+        uint16_t port;
+        const struct in_addr * addr = tr_peerIoGetAddress( io,  &port );
+        ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         if( peer->msgs != NULL ) { /* we already have this peer */
             tr_peerIoFree( io );
             --manager->connectionCount;
@@ -972,22 +991,6 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
     managerUnlock( manager );
 }
 
-static void
-maybeAddNewAtom( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
-{
-    if( !peerIsKnown( t, addr ) )
-    {
-        struct peer_atom * a = tr_new( struct peer_atom, 1 );
-        a->addr = *addr;
-        a->port = port;
-        a->flags = flags;
-        a->from = from;
-        a->time = 0;
-fprintf( stderr, "torrent [%s] getting a new atom: %s\n", t->tor->info.name, tr_peerIoAddrStr(&a->addr,a->port) );
-        tr_ptrArrayInsertSorted( t->pool, a, comparePeerAtoms );
-    }
-}
-
 void
 tr_peerMgrAddPex( tr_peerMgr     * manager,
                   const uint8_t  * torrentHash,
@@ -1002,7 +1005,7 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
 
     t = getExistingTorrent( manager, torrentHash );
     for( end=pex+pexCount; pex!=end; ++pex )
-        maybeAddNewAtom( t, &pex->in_addr, pex->port, pex->flags, from );
+        ensureAtomExists( t, &pex->in_addr, pex->port, pex->flags, from );
     reconnectSoon( t );
 
     managerUnlock( manager );
@@ -1028,7 +1031,7 @@ tr_peerMgrAddPeers( tr_peerMgr    * manager,
         uint16_t port;
         memcpy( &addr, walk, 4 ); walk += 4;
         memcpy( &port, walk, 2 ); walk += 2;
-        maybeAddNewAtom( t, &addr, port, 0, from );
+        ensureAtomExists( t, &addr, port, 0, from );
     }
     reconnectSoon( t );
 
