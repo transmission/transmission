@@ -1260,7 +1260,7 @@ tr_peerMgrGetAvailable( const tr_peerMgr * manager,
 void
 tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash,
-                        int              * setmePeersTotal,
+                        int              * setmePeersKnown,
                         int              * setmePeersConnected,
                         int              * setmePeersSendingToUs,
                         int              * setmePeersGettingFromUs,
@@ -1275,7 +1275,7 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
 
-    *setmePeersTotal          = size;
+    *setmePeersKnown          = tr_ptrArraySize( t->pool );
     *setmePeersConnected      = 0;
     *setmePeersSendingToUs    = 0;
     *setmePeersGettingFromUs  = 0;

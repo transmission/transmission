@@ -642,7 +642,7 @@ struct tr_stat
     float               rateDownload;
     float               rateUpload;
     int                 eta;
-    int                 peersTotal;
+    int                 peersKnown;
     int                 peersConnected;
     int                 peersFrom[TR_PEER_FROM__MAX];
     int                 peersSendingToUs;

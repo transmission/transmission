@@ -721,7 +721,7 @@ tr_torrentStat( tr_torrent * tor )
 
     tr_peerMgrTorrentStats( tor->handle->peerMgr,
                             tor->info.hash,
-                            &s->peersTotal,
+                            &s->peersKnown,
                             &s->peersConnected,
                             &s->peersSendingToUs,
                             &s->peersGettingFromUs,

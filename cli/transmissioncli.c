@@ -297,7 +297,7 @@ int main( int argc, char ** argv )
         {
             chars = snprintf( string, sizeof string,
                 "Seeding, uploading to %d of %d peer(s), %.2f KB/s [%s]",
-                s->peersGettingFromUs, s->peersTotal,
+                s->peersGettingFromUs, s->peersConnected,
                 s->rateUpload, getStringRatio(s->ratio) );
         }
         else if( s->status & TR_STATUS_STOPPING )
