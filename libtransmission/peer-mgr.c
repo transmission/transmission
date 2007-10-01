@@ -62,6 +62,8 @@ enum
      * with a better idea for managing the connection limits */
     MAX_CONNECTED_PEERS_PER_TORRENT = 60,
 
+    MAX_RECONNECTIONS_PER_MINUTE = MAX_CONNECTED_PEERS_PER_TORRENT,
+    MAX_RECONNECTIONS_PER_PULSE = ((MAX_RECONNECTIONS_PER_MINUTE * RECONNECT_PERIOD_MSEC) / (60*1000)),
 
     ADDED_F_ENCRYPTION_FLAG = 1,
     ADDED_F_SEED_FLAG = 2
@@ -1633,8 +1635,8 @@ reconnectPulse( void * vtorrent )
         struct tr_connection * connections = getWeakConnections( t, &nConnections );
         const int peerCount = tr_ptrArraySize( t->peers );
 
-        fprintf( stderr, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms\n",
-                 t->tor->info.name, nConnections, nCandidates, tr_ptrArraySize(t->pool) );
+        fprintf( stderr, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d\n",
+                 t->tor->info.name, nConnections, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
 
         for( i=0; i<nConnections; ++i )
             fprintf( stderr, "connection #%d: %s @ %.2f\n", i+1,
@@ -1651,7 +1653,7 @@ reconnectPulse( void * vtorrent )
 
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
-        for( i=0; i<nAdd && i<nCandidates; ++i ) {
+        for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i ) {
             struct peer_atom * atom = candidates[i];
             tr_peerIo * io = tr_peerIoNewOutgoing( t->manager->handle, &atom->addr, atom->port, t->hash );
             fprintf( stderr, "RECONNECT adding an outgoing connection...\n" );
