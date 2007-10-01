@@ -29,8 +29,6 @@
 #include "transmission.h"
 #include "trcompat.h"
 
-static int charToInt( char character );
-
 static int charToInt( char character )
 {
     int value;
