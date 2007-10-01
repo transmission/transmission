@@ -236,9 +236,9 @@ char * tr_clientForId( const uint8_t * id )
             asprintf( &ret, "Pando %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
-        else if( !memcmp( &id[1], "WT-", 3 ) )
+        else if( !memcmp( &id[1], "LW", 2 ) )
         {
-            asprintf( &ret, "BitLet" );
+            asprintf( &ret, "LimeWire" );
         }
         
         if( ret )
@@ -368,9 +368,13 @@ char * tr_clientForId( const uint8_t * id )
     {
         asprintf( &ret, "Blizzard Downloader %d.%d", id[3] + 1, id[4] );
     }
+    else if( !memcmp( id, "-WT-", 4 ) )
+    {
+        asprintf( &ret, "BitLet" );
+    }
     else if( !memcmp( id, "LIME", 4 ) )
     {
-        asprintf( &ret, "Limewire" );
+        asprintf( &ret, "LimeWire" );
     }
     else if( !memcmp( id, "-G3", 3 ) )
     {
