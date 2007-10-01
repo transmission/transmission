@@ -41,9 +41,6 @@ void tr_bufferevent_write( struct tr_handle    * tr_handle,
                            const void          * buf,
                            size_t                buflen );
 
-void tr_bufferevent_free( struct tr_handle   * handle,
-                          struct bufferevent * bufev );
-
 
 void tr_setBufferEventMode( struct tr_handle   * tr_handle,
                             struct bufferevent * bufferEvent,

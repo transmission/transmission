@@ -171,7 +171,7 @@ tr_peerIoFree( tr_peerIo * c )
         c->canRead = NULL;
         c->didWrite = NULL;
         c->gotError = NULL;
-        tr_bufferevent_free( c->handle, c->bufev );
+        bufferevent_free( c->bufev );
         tr_netClose( c->socket );
 
         tr_rcClose( c->rateToClient );

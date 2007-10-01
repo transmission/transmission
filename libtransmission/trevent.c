@@ -66,7 +66,6 @@ enum mode
     TR_EV_EVHTTP_MAKE_REQUEST,
     TR_EV_BUFFEREVENT_SET,
     TR_EV_BUFFEREVENT_WRITE,
-    TR_EV_BUFFEREVENT_FREE,
     TR_EV_TIMER_ADD,
     TR_EV_TIMER_DEL,
     TR_EV_EXEC
@@ -148,10 +147,6 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
             case TR_EV_BUFFEREVENT_WRITE:
                 bufferevent_write( cmd->bufev, cmd->buf, cmd->buflen );
                 tr_free( cmd->buf );
-                break;
-
-            case TR_EV_BUFFEREVENT_FREE:
-                bufferevent_free( cmd->bufev );
                 break;
 
             case TR_EV_EXEC:
@@ -414,42 +409,6 @@ tr_runInEventThread( struct tr_handle * handle,
         cmd->mode = TR_EV_EXEC;
         cmd->func = func;
         cmd->user_data = user_data;
-        pushList( handle->events, cmd );
-    }
-}
-
-
-/**
-***
-**/
-
-static int
-bufCompareFunc( const void * va, const void * vb )
-{
-    const struct tr_event_command * a = va;
-    const struct bufferevent * b = vb;
-    return a->bufev == b ? 0 : 1;
-}
-
-void
-tr_bufferevent_free( struct tr_handle   * handle,
-                     struct bufferevent * bufev )
-{
-    void * v;
-    tr_event_handle * eh = handle->events;
-
-    /* purge pending commands from the list */
-    tr_lockLock( eh->lock );
-    while(( v = tr_list_remove( &eh->commands, bufev, bufCompareFunc ) ))
-        tr_free( v );
-    tr_lockUnlock( eh->lock );
-
-    if( tr_amInThread( handle->events->thread ) )
-        bufferevent_free( bufev );
-    else {
-        struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );
-        cmd->mode = TR_EV_BUFFEREVENT_FREE;
-        cmd->bufev = bufev;
         pushList( handle->events, cmd );
     }
 }

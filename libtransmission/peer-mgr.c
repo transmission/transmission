@@ -1086,16 +1086,15 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
                     tr_pex         ** setme_pex )
 {
     const Torrent * t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    int i, peerCount;
     const int isLocked = torrentIsLocked( t );
-    const tr_peer ** peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
-    tr_pex * pex = tr_new( tr_pex, peerCount );
-    tr_pex * walk = pex;
+    int i, peerCount;
+    const tr_peer ** peers;
+    tr_pex * pex;
+    tr_pex * walk;
 
     if( !isLocked )
         torrentLock( (Torrent*)t );
 
-    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
     pex = walk = tr_new( tr_pex, peerCount );
 
@@ -1531,6 +1530,8 @@ getWeakConnections( Torrent * t, int * setmeSize )
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
         const double throughput = (2*tr_peerIoGetRateToPeer( peer->io ))
                                 + tr_peerIoGetRateToClient( peer->io );
+
+        assert( atom != NULL );
 
         /* if we're both seeds, give a little bit of time for
          * a mutual pex -- peer-msgs initiates a pex exchange
