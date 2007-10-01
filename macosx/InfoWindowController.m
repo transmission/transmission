@@ -854,9 +854,8 @@
         NSDictionary * peer = [fPeers objectAtIndex: row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
         
-        [components addObject: [NSString stringWithFormat:
-                                NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
-                                [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
+        [components addObject: [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
+            "Inspector -> Peers tab -> table row tooltip"), [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
         
         if ([[peer objectForKey: @"Encryption"] boolValue])
             [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
@@ -868,15 +867,21 @@
         else
             [components addObject: NSLocalizedString(@"Port: N/A", "Inspector -> Peers tab -> table row tooltip")];
         
-        int from = [[peer objectForKey: @"From"] intValue];
-        if (from == TR_PEER_FROM_INCOMING)
-            [components addObject: NSLocalizedString(@"From: incoming connection", "Inspector -> Peers tab -> table row tooltip")];
-        else if (from == TR_PEER_FROM_CACHE)
-            [components addObject: NSLocalizedString(@"From: cache", "Inspector -> Peers tab -> table row tooltip")];
-        else if (from == TR_PEER_FROM_PEX)
-            [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
-        else
-            [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
+        switch ([[peer objectForKey: @"From"] intValue])
+        {
+            case TR_PEER_FROM_TRACKER:
+                [components addObject: NSLocalizedString(@"From: tracker", "Inspector -> Peers tab -> table row tooltip")];
+                break;
+            case TR_PEER_FROM_INCOMING:
+                [components addObject: NSLocalizedString(@"From: incoming connection", "Inspector -> Peers tab -> table row tooltip")];
+                break;
+            case TR_PEER_FROM_CACHE:
+                [components addObject: NSLocalizedString(@"From: cache", "Inspector -> Peers tab -> table row tooltip")];
+                break;
+            case TR_PEER_FROM_PEX:
+                [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
+                break;
+        }
         
         return [components componentsJoinedByString: @"\n"];
     }
