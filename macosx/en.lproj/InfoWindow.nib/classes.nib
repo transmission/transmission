@@ -46,6 +46,7 @@
                 fHashField = NSTextField; 
                 fHaveField = NSTextField; 
                 fImageView = NSImageView; 
+                fKnownField = NSTextField; 
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 
                 fPeerTable = NSTableView; 

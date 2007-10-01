@@ -1095,6 +1095,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
+- (int) totalPeersKnown
+{
+    return fStat->peersKnown;
+}
+
 - (int) peersSendingToUs
 {
     return fStat->peersSendingToUs;

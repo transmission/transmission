@@ -215,15 +215,17 @@
         [fProgressField setStringValue: @""];
         [fRatioField setStringValue: @""];
         
-        [fSeedersField setStringValue: @""];
-        [fLeechersField setStringValue: @""];
-        [fCompletedFromTrackerField setStringValue: @""];
-        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
-        [fDownloadingFromField setStringValue: @""];
-        [fUploadingToField setStringValue: @""];
         [fSwarmSpeedField setStringValue: @""];
         [fErrorMessageView setString: @""];
         [fErrorMessageView setSelectable: NO];
+        
+        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+        [fDownloadingFromField setStringValue: @""];
+        [fUploadingToField setStringValue: @""];
+        [fKnownField setStringValue: @""];
+        [fSeedersField setStringValue: @""];
+        [fLeechersField setStringValue: @""];
+        [fCompletedFromTrackerField setStringValue: @""];
         
         [fDateAddedField setStringValue: @""];
         [fDateCompletedField setStringValue: @""];
@@ -468,6 +470,7 @@
     
     [fDownloadingFromField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersSendingToUs]] : @""];
     [fUploadingToField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersGettingFromUs]] : @""];
+    [fKnownField setIntValue: [torrent totalPeersKnown]];
     
     [fPeers release];
     fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];

@@ -184,6 +184,7 @@ typedef enum
 - (int) totalPeersIncoming;
 - (int) totalPeersCache;
 - (int) totalPeersPex;
+- (int) totalPeersKnown;
 
 - (int) peersSendingToUs;
 - (int) peersGettingFromUs;

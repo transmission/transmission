@@ -50,8 +50,8 @@
     IBOutlet NSButton * fRevealDataButton, * fRevealTorrentButton;
 
     IBOutlet NSTableView * fPeerTable;
-    IBOutlet NSTextField * fSeedersField, * fLeechersField, * fConnectedPeersField,
-                        * fDownloadingFromField, * fUploadingToField, * fCompletedFromTrackerField;
+    IBOutlet NSTextField * fConnectedPeersField, * fDownloadingFromField, * fUploadingToField, * fKnownField,
+                            * fSeedersField, * fLeechersField, * fCompletedFromTrackerField;
     IBOutlet NSTextView * fErrorMessageView;
     IBOutlet PiecesView * fPiecesView;
     IBOutlet NSSegmentedControl * fPiecesControl;
