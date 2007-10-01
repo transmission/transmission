@@ -1084,11 +1084,13 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
 {
     const Torrent * t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     int i, peerCount;
+    const int isLocked = torrentIsLocked( t );
     const tr_peer ** peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
     tr_pex * pex = tr_new( tr_pex, peerCount );
     tr_pex * walk = pex;
 
-    managerLock( manager );
+    if( !isLocked )
+        torrentLock( (Torrent*)t );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
@@ -1111,7 +1113,9 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
     qsort( pex, peerCount, sizeof(tr_pex), tr_pexCompare );
     *setme_pex = pex;
 
-    managerUnlock( manager );
+    if( !isLocked )
+        torrentUnlock( (Torrent*)t );
+
     return peerCount;
 }
 
