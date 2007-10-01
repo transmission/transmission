@@ -334,7 +334,7 @@
 
 - (Torrent *) selectedTorrent
 {
-    return fTorrents && [fTorrents count] > 0 ? [fTorrents objectAtIndex: 0] : nil;
+    return fTorrents && [fTorrents count] == 1 ? [fTorrents objectAtIndex: 0] : nil;
 }
 
 - (void) updateInfoStats
@@ -430,10 +430,10 @@
         return;
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
-    int seeders = [torrent seeders], leechers = [torrent leechers], downloaded = [torrent completedFromTracker];
-    [fSeedersField setStringValue: seeders < 0 ? @"" : [NSString stringWithFormat: @"%d", seeders]];
-    [fLeechersField setStringValue: leechers < 0 ? @"" : [NSString stringWithFormat: @"%d", leechers]];
-    [fCompletedFromTrackerField setStringValue: downloaded < 0 ? @"" : [NSString stringWithFormat: @"%d", downloaded]];
+    int seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
+    [fSeedersField setStringValue: seeders > 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
+    [fLeechersField setStringValue: leechers > 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
+    [fCompletedFromTrackerField setStringValue: completed > 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
     
     BOOL active = [torrent isActive];
     
@@ -460,16 +460,21 @@
                 [components addObject: [NSString stringWithFormat:
                                         NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
             
-            connected = [NSString stringWithFormat: @"%@: %@", connected, [components componentsJoinedByString: @", "]];
+            connected = [connected stringByAppendingFormat: @": %@", [components componentsJoinedByString: @", "]];
         }
         
         [fConnectedPeersField setStringValue: connected];
+        
+        [fDownloadingFromField setIntValue: [torrent peersSendingToUs]];
+        [fUploadingToField setIntValue: [torrent peersGettingFromUs]];
     }
     else
+    {
         [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+        [fDownloadingFromField setStringValue: @""];
+        [fUploadingToField setStringValue: @""];
+    }
     
-    [fDownloadingFromField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersSendingToUs]] : @""];
-    [fUploadingToField setStringValue: active ? [NSString stringWithFormat: @"%d", [torrent peersGettingFromUs]] : @""];
     [fKnownField setIntValue: [torrent totalPeersKnown]];
     
     [fPeers release];

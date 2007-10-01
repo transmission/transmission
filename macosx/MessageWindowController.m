@@ -89,12 +89,17 @@
     
     //select proper level in popup button
     int level = tr_getMessageLevel();
-    if (level == TR_MSG_ERR)
-        [fLevelButton selectItemAtIndex: LEVEL_ERROR];
-    else if (level == TR_MSG_INF)
-        [fLevelButton selectItemAtIndex: LEVEL_INFO];
-    else
-        [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
+    switch (level)
+        {
+            case TR_MSG_ERR:
+                [fLevelButton selectItemAtIndex: LEVEL_ERROR];
+                break;
+            case TR_MSG_INF:
+                [fLevelButton selectItemAtIndex: LEVEL_INFO];
+                break;
+            case TR_MSG_DBG:
+                [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
+        }
     
     [self setDebugWarningHidden: level != TR_MSG_DBG];
 }
@@ -144,13 +149,17 @@
         return [message objectForKey: @"Date"];
     else if ([ident isEqualToString: @"Level"])
     {
-        int level = [[message objectForKey: @"Level"] intValue];
-        if (level == TR_MSG_ERR)
-            return fErrorImage;
-        else if (level == TR_MSG_INF)
-            return fInfoImage;
-        else
-            return fDebugImage;
+        switch ([[message objectForKey: @"Level"] intValue])
+        {
+            case TR_MSG_ERR:
+                return fErrorImage;
+            case TR_MSG_INF:
+                return fInfoImage;
+            case TR_MSG_DBG:
+                return fDebugImage;
+            default:
+                return nil;
+        }
     }
     else
         return [message objectForKey: @"Message"];
@@ -197,13 +206,19 @@
 {
     [self updateLog: nil];
     
-    int selection = [fLevelButton indexOfSelectedItem], level;
-    if (selection == LEVEL_INFO)
-        level = TR_MSG_INF;
-    else if (selection == LEVEL_DEBUG)
-        level = TR_MSG_DBG;
-    else
-        level = TR_MSG_ERR;
+    int level;
+    switch ([fLevelButton indexOfSelectedItem])
+    {
+        case LEVEL_ERROR:
+            level = TR_MSG_ERR;
+            break;
+        case LEVEL_INFO:
+            level = TR_MSG_INF;
+            break;
+        case LEVEL_DEBUG:
+            level = TR_MSG_DBG;
+            break;
+    }
     
     [self setDebugWarningHidden: level != TR_MSG_DBG];
     
@@ -272,16 +287,23 @@
 
 - (NSString *) stringForMessage: (NSDictionary *) message
 {
-    int level = [[message objectForKey: @"Level"] intValue];
-    NSString * levelString;
-    if (level == TR_MSG_ERR)
-        levelString = @"Error";
-    else if (level == TR_MSG_INF)
-        levelString = @"Info";
-    else
-        levelString = @"Debug";
+    NSString * level;
+    switch ([[message objectForKey: @"Level"] intValue])
+    {
+        case TR_MSG_ERR:
+            level = @"Error";
+            break;
+        case TR_MSG_INF:
+            level = @"Info";
+            break;
+        case TR_MSG_DBG:
+            level = @"Debug";
+            break;
+        default:
+            level = @"";
+    }
     
-    return [NSString stringWithFormat: @"%@ [%@] %@", [message objectForKey: @"Date"], levelString, [message objectForKey: @"Message"]];
+    return [NSString stringWithFormat: @"%@ [%@] %@", [message objectForKey: @"Date"], level, [message objectForKey: @"Message"]];
 }
 
 - (void) setDebugWarningHidden: (BOOL) hide

@@ -1007,13 +1007,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         case TR_STATUS_DOWNLOAD:
             return [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
-            break;
         
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
             return [NSLocalizedString(@"Ratio: ", "Torrent -> status string") stringByAppendingString:
                                                                             [NSString stringForRatio: [self ratio]]];
-            break;
         
         default:
             return [self shortStatusString];
@@ -1026,29 +1024,23 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         case TR_STATUS_STOPPED:
             return NSLocalizedString(@"Paused", "Torrent -> status string");
-            break;
         
         case TR_STATUS_STOPPING:
             return [NSLocalizedString(@"Stopping", "Torrent -> status string") stringByAppendingEllipsis];
-            break;
 
         case TR_STATUS_CHECK:
             return [NSString stringWithFormat: NSLocalizedString(@"Checking existing data (%.2f%%)",
                                     "Torrent -> status string"), 100.0 * fStat->recheckProgress];
-            break;
         
         case TR_STATUS_CHECK_WAIT:
             return [NSLocalizedString(@"Waiting to check existing data", "Torrent -> status string") stringByAppendingEllipsis];
-            break;
 
         case TR_STATUS_DOWNLOAD:
             return NSLocalizedString(@"Downloading", "Torrent -> status string");
-            break;
 
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:
             return NSLocalizedString(@"Seeding", "Torrent -> status string");
-            break;
         
         default:
             return NSLocalizedString(@"N/A", "Torrent -> status string");
