@@ -139,7 +139,6 @@ struct tr_torrent
     run_status_t               runStatus;
     run_status_t               runStatusToSave;
     cp_status_t                cpStatus;
-    struct tr_lock           * lock;
 
     struct tr_tracker        * tracker;
     struct tr_publisher_tag  * trackerSubscription;
@@ -188,6 +187,8 @@ struct tr_handle
     struct tr_peerMgr        * peerMgr;
     struct tr_shared         * shared;
 
+    struct tr_lock           * lock;
+
     tr_handle_status           stats[2];
     int                        statCur;
 
@@ -196,5 +197,10 @@ struct tr_handle
 #define TR_AZ_ID_LEN 20
     uint8_t                    azId[TR_AZ_ID_LEN];
 };
+
+void tr_globalLock       ( struct tr_handle * );
+void tr_globalUnlock     ( struct tr_handle * );
+int  tr_globalIsLocked   ( const struct tr_handle * );
+
 
 #endif

@@ -56,6 +56,38 @@
 ****  THREADS
 ***/
 
+#ifdef __BEOS__
+typedef thread_id tr_thread_id;
+#elif defined(WIN32)
+typedef DWORD tr_thread_id;
+#else
+typedef pthread_t tr_thread_id;
+#endif
+
+static tr_thread_id
+tr_getCurrentThread( void )
+{
+#ifdef __BEOS__
+    return find_thread( NULL );
+#elif defined(WIN32)
+    return GetCurrentThreadId();
+#else
+    return pthread_self( );
+#endif
+}
+
+static int
+tr_areThreadsEqual( tr_thread_id a, tr_thread_id b )
+{
+#ifdef __BEOS__
+    return a == b;
+#elif defined(WIN32)
+    return a == b;
+#else
+    return pthread_equal( a, b );
+#endif
+}
+
 struct tr_thread
 {
     void          (* func ) ( void * );
@@ -72,6 +104,12 @@ struct tr_thread
 #endif
 
 };
+
+int
+tr_amInThread ( const tr_thread * t )
+{
+    return tr_areThreadsEqual( tr_getCurrentThread(), t->thread );
+}
 
 #ifdef WIN32
 #define ThreadFuncReturnType unsigned WINAPI
@@ -122,18 +160,6 @@ tr_threadNew( void (*func)(void *),
 
     return t;
 }
-
-int
-tr_amInThread ( const tr_thread * t )
-{
-#ifdef __BEOS__
-    return find_thread(NULL) == t->thread;
-#elif defined(WIN32)
-    return GetCurrentThreadId() == t->thread_id;
-#else
-    return pthread_equal( t->thread, pthread_self( ) );
-#endif
-}
     
 void
 tr_threadJoin( tr_thread * t )
@@ -163,12 +189,16 @@ tr_threadJoin( tr_thread * t )
 
 struct tr_lock
 {
+    uint32_t depth;
 #ifdef __BEOS__
     sem_id lock;
+    thread_id lockThread;
 #elif defined(WIN32)
     CRITICAL_SECTION lock;
+    DWORD lockThread;
 #else
     pthread_mutex_t lock;
+    pthread_t lockThread;
 #endif
 };
 
@@ -216,25 +246,48 @@ tr_lockTryLock( tr_lock * l ) /* success on zero! */
 void
 tr_lockLock( tr_lock * l )
 {
+    tr_thread_id currentThread = tr_getCurrentThread( );
+    if( l->lockThread == currentThread )
+    {
+        ++l->depth;
+    }
+    else
+    {
 #ifdef __BEOS__
-    acquire_sem( l->lock );
+        acquire_sem( l->lock );
 #elif defined(WIN32)
-    EnterCriticalSection( &l->lock );
+        EnterCriticalSection( &l->lock );
 #else
-    pthread_mutex_lock( &l->lock );
+        pthread_mutex_lock( &l->lock );
 #endif
+        l->lockThread = tr_getCurrentThread( );
+        l->depth = 1;
+    }
+}
+
+int
+tr_lockHave( const tr_lock * l )
+{
+    return ( l->depth > 0 )
+        && ( l->lockThread == tr_getCurrentThread() );
 }
 
 void
 tr_lockUnlock( tr_lock * l )
 {
+    assert( tr_lockHave( l ) );
+
+    if( !--l->depth )
+    {
+        l->lockThread = 0;
 #ifdef __BEOS__
-    release_sem( l->lock );
+        release_sem( l->lock );
 #elif defined(WIN32)
-    LeaveCriticalSection( &l->lock );
+        LeaveCriticalSection( &l->lock );
 #else
-    pthread_mutex_unlock( &l->lock );
+        pthread_mutex_unlock( &l->lock );
 #endif
+    }
 }
 
 /***

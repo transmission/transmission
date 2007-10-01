@@ -415,10 +415,10 @@ static tr_lock* getQueueLock( tr_handle * h )
 {
     static tr_lock * lock = NULL;
 
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
     if( !lock )
          lock = tr_lockNew( );
-    tr_sharedUnlock( h->shared );
+    tr_globalUnlock( h );
 
     return lock;
 }

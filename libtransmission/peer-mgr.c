@@ -29,10 +29,9 @@
 #include "platform.h"
 #include "ptrarray.h"
 #include "ratecontrol.h"
+#include "shared.h"
 #include "trevent.h"
 #include "utils.h"
-
-#include "pthread.h"
 
 enum
 {
@@ -106,8 +105,6 @@ struct tr_peerMgr
     tr_ptrArray * torrents; /* Torrent */
     int connectionCount;
     tr_ptrArray * handshakes; /* in-process */
-    tr_lock * lock;
-    pthread_t lockThread;
 };
 
 /**
@@ -117,16 +114,12 @@ struct tr_peerMgr
 static void
 managerLock( struct tr_peerMgr * manager )
 {
-    assert( manager->lockThread != pthread_self() );
-    tr_lockLock( manager->lock );
-    manager->lockThread = pthread_self();
+    tr_globalLock( manager->handle );
 }
 static void
 managerUnlock( struct tr_peerMgr * manager )
 {
-    assert( manager->lockThread == pthread_self() );
-    manager->lockThread = 0;
-    tr_lockUnlock( manager->lock );
+    tr_globalUnlock( manager->handle );
 }
 static void
 torrentLock( Torrent * torrent )
@@ -141,10 +134,8 @@ torrentUnlock( Torrent * torrent )
 static int
 torrentIsLocked( const Torrent * t )
 {
-    return ( t != NULL )
-        && ( t->manager != NULL )
-        && ( t->manager->lockThread != 0 )
-        && ( t->manager->lockThread == pthread_self( ) );
+    return ( t != NULL ) 
+        && ( tr_globalIsLocked( t->manager->handle ) );
 }
 
 /**
@@ -435,7 +426,6 @@ tr_peerMgrNew( tr_handle * handle )
     m->handle = handle;
     m->torrents = tr_ptrArrayNew( );
     m->handshakes = tr_ptrArrayNew( );
-    m->lock = tr_lockNew( );
     return m;
 }
 
@@ -448,7 +438,6 @@ tr_peerMgrFree( tr_peerMgr * manager )
     tr_ptrArrayFree( manager->torrents, (PtrArrayForeachFunc)freeTorrent );
 
     managerUnlock( manager );
-    tr_lockFree( manager->lock );
     tr_free( manager );
 }
 
@@ -482,7 +471,7 @@ struct tr_refill_piece
     uint32_t piece;
     uint32_t peerCount;
     uint32_t fastAllowed;
-    uint32_t random;
+    uint8_t random;
 };
 
 static int
@@ -504,7 +493,7 @@ compareRefillPiece (const void * aIn, const void * bIn)
         return a->fastAllowed < b->fastAllowed ? -1 : 1;
 
     /* otherwise go with our random seed */
-    return tr_compareUint32( a->random, b->random );
+    return tr_compareUint8( a->random, b->random );
 }
 
 static int
@@ -556,7 +545,7 @@ getPreferredPieces( Torrent     * t,
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
             setme->fastAllowed = 0;
-            setme->random = tr_rand( UINT32_MAX );
+            setme->random = tr_rand( UINT8_MAX );
             /* FIXME */
 //            setme->fastAllowed = tr_bitfieldHas( t->tor->allowedList, i);
 
@@ -819,10 +808,8 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
     tr_peer * peer = vpeer;
     Torrent * t = (Torrent *) vt;
     const tr_peermsgs_event * e = (const tr_peermsgs_event *) vevent;
-    const int needLock = !torrentIsLocked( t );
 
-    if( needLock )
-        torrentLock( t );
+    torrentLock( t );
 
     switch( e->eventType )
     {
@@ -861,8 +848,7 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             assert(0);
     }
 
-    if( needLock )
-        torrentUnlock( t );
+    torrentUnlock( t );
 }
 
 static void
@@ -964,7 +950,6 @@ initiateHandshake( tr_peerMgr * manager, tr_peerIo * io )
 {
     tr_handshake * handshake;
 
-    assert( manager->lockThread!=0 );
     assert( io != NULL );
 
     handshake = tr_handshakeNew( io,
@@ -1091,14 +1076,12 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
                     tr_pex         ** setme_pex )
 {
     const Torrent * t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    const int isLocked = torrentIsLocked( t );
     int i, peerCount;
     const tr_peer ** peers;
     tr_pex * pex;
     tr_pex * walk;
 
-    if( !isLocked )
-        torrentLock( (Torrent*)t );
+    torrentLock( (Torrent*)t );
 
     peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
     pex = walk = tr_new( tr_pex, peerCount );
@@ -1120,8 +1103,7 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
     qsort( pex, peerCount, sizeof(tr_pex), tr_pexCompare );
     *setme_pex = pex;
 
-    if( !isLocked )
-        torrentUnlock( (Torrent*)t );
+    torrentUnlock( (Torrent*)t );
 
     return peerCount;
 }

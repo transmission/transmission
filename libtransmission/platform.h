@@ -41,6 +41,7 @@ void         tr_lockFree       ( tr_lock * );
 int          tr_lockTryLock    ( tr_lock * );
 void         tr_lockLock       ( tr_lock * );
 void         tr_lockUnlock     ( tr_lock * );
+int          tr_lockHave       ( const tr_lock * );
 
 tr_cond *    tr_condNew       ( void );
 void         tr_condFree      ( tr_cond * );

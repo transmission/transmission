@@ -121,6 +121,8 @@ tr_handle * tr_init( const char * tag )
     if( !h )
         return NULL;
 
+    h->lock = tr_lockNew( );
+
     h->encryptionMode = TR_ENCRYPTION_PREFERRED;
 
     tr_netInit(); /* must go before tr_eventInit */
@@ -153,6 +155,28 @@ tr_handle * tr_init( const char * tag )
     return h;
 }
 
+/***
+****
+***/
+
+void
+tr_globalLock( struct tr_handle * handle )
+{
+    tr_lockLock( handle->lock );
+}
+
+void
+tr_globalUnlock( struct tr_handle * handle )
+{
+    tr_lockUnlock( handle->lock );
+}
+
+int
+tr_globalIsLocked( const struct tr_handle * handle )
+{
+    return tr_lockHave( handle->lock );
+}
+
 /***********************************************************************
  * tr_setBindPort
  ***********************************************************************
@@ -173,9 +197,9 @@ tr_getPublicPort( const tr_handle * h )
 
 void tr_natTraversalEnable( tr_handle * h, int enable )
 {
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
     tr_sharedTraversalEnable( h->shared, enable );
-    tr_sharedUnlock( h->shared );
+    tr_globalUnlock( h );
 }
 
 tr_handle_status * tr_handleStatus( tr_handle * h )
@@ -185,12 +209,12 @@ tr_handle_status * tr_handleStatus( tr_handle * h )
     h->statCur = ( h->statCur + 1 ) % 2;
     s = &h->stats[h->statCur];
 
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
 
     s->natTraversalStatus = tr_sharedTraversalStatus( h->shared );
     s->publicPort = tr_sharedGetPublicPort( h->shared );
 
-    tr_sharedUnlock( h->shared );
+    tr_globalUnlock( h );
 
     return s;
 }
@@ -241,7 +265,7 @@ tr_torrentRates( tr_handle * h, float * dl, float * ul )
 
     *dl = 0.0;
     *ul = 0.0;
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
     for( tor = h->torrentList; tor; tor = tor->next )
     {
         tr_torrentLock( tor );
@@ -250,7 +274,7 @@ tr_torrentRates( tr_handle * h, float * dl, float * ul )
         *ul += tr_rcRate( tor->upload );
         tr_torrentUnlock( tor );
     }
-    tr_sharedUnlock( h->shared );
+    tr_globalUnlock( h );
 }
 
 int
@@ -300,6 +324,7 @@ tr_close( tr_handle * h )
         tr_wait( 200 );
     }
 
+    tr_lockFree( h->lock );
     free( h->tag );
     free( h );
     fprintf( stderr, "tr_close() completed.\n" );

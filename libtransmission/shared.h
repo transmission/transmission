@@ -39,15 +39,6 @@ tr_shared * tr_sharedInit           ( tr_handle * );
 void        tr_sharedClose          ( tr_shared * );
 
 /***********************************************************************
- * tr_sharedLock, tr_sharedUnlock
- ***********************************************************************
- * Gets / releases exclusive access to ressources used by the shared
- * thread
- **********************************************************************/
-void          tr_sharedLock           ( tr_shared * );
-void          tr_sharedUnlock         ( tr_shared * );
-
-/***********************************************************************
  * tr_sharedSetPort
  ***********************************************************************
  * Changes the port for incoming connections.  tr_sharedGetPublicPort

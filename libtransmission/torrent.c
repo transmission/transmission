@@ -90,13 +90,13 @@ tr_torrentFindFromObfuscatedHash( tr_handle      * handle,
 void
 tr_torrentLock( const tr_torrent * tor )
 {
-    tr_lockLock ( (tr_lock*)tor->lock );
+    tr_globalLock( tor->handle );
 }
 
 void
 tr_torrentUnlock( const tr_torrent * tor )
 {
-    tr_lockUnlock ( (tr_lock*)tor->lock );
+    tr_globalUnlock( tor->handle );
 }
 
 /***
@@ -299,7 +299,7 @@ torrentRealInit( tr_handle  * h,
     
     tor->info.flags |= flags;
 
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
 
     tor->destination = tr_strdup( destination );
 
@@ -355,8 +355,6 @@ torrentRealInit( tr_handle  * h,
 
     tr_torrentInitFilePieces( tor );
 
-    tor->lock = tr_lockNew( );
-
     tor->upload         = tr_rcInit();
     tor->download       = tr_rcInit();
     tor->swarmspeed     = tr_rcInit();
@@ -364,8 +362,6 @@ torrentRealInit( tr_handle  * h,
     tr_sha1( tor->obfuscatedHash, "req2", 4,
                                   info->hash, SHA_DIGEST_LENGTH,
                                   NULL );
- 
-    tr_sharedUnlock( h->shared );
 
     tr_peerMgrAddTorrent( h->peerMgr, tor );
 
@@ -407,11 +403,11 @@ torrentRealInit( tr_handle  * h,
     tor->tracker = tr_trackerNew( tor );
     tor->trackerSubscription = tr_trackerSubscribe( tor->tracker, onTrackerResponse, tor );
 
-    tr_sharedLock( h->shared );
     tor->next = h->torrentList;
     h->torrentList = tor;
     h->torrentCount++;
-    tr_sharedUnlock( h->shared );
+
+    tr_globalUnlock( h );
 
     tr_ioRecheckAdd( tor, recheckDoneCB, tor->runStatus );
 }
@@ -999,11 +995,10 @@ tr_torrentFree( tr_torrent * tor )
     assert( tor != NULL );
     assert( tor->runStatus == TR_RUN_STOPPED );
 
-    tr_sharedLock( h->shared );
+    tr_globalLock( h );
 
     tr_peerMgrRemoveTorrent( h->peerMgr, tor->info.hash );
 
-    tr_lockFree( tor->lock );
     tr_cpClose( tor->completion );
 
     tr_rcClose( tor->upload );
@@ -1034,7 +1029,7 @@ tr_torrentFree( tr_torrent * tor )
     tr_metainfoFree( inf );
     tr_free( tor );
 
-    tr_sharedUnlock( h->shared );
+    tr_globalUnlock( h );
 }
 
 static int

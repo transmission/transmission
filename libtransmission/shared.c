@@ -44,7 +44,6 @@
 struct tr_shared
 {
     tr_handle    * h;
-    tr_lock      * lock;
     tr_timer     * pulseTimer;
 
     /* Incoming connections */
@@ -75,7 +74,6 @@ tr_shared * tr_sharedInit( tr_handle * h )
     tr_shared * s = calloc( 1, sizeof( tr_shared ) );
 
     s->h          = h;
-    s->lock       = tr_lockNew( );
     s->publicPort = -1;
     s->bindPort   = -1;
     s->bindSocket = -1;
@@ -96,23 +94,9 @@ void tr_sharedClose( tr_shared * s )
     tr_timerFree( &s->pulseTimer );
 
     tr_netClose( s->bindSocket );
-    tr_lockFree( s->lock );
     tr_natpmpClose( s->natpmp );
     tr_upnpClose( s->upnp );
     free( s );
-}
-
-/**
-***
-**/
-
-void tr_sharedLock( tr_shared * s )
-{
-    tr_lockLock( s->lock );
-}
-void tr_sharedUnlock( tr_shared * s )
-{
-    tr_lockUnlock( s->lock );
 }
 
 /***********************************************************************
@@ -128,11 +112,11 @@ void tr_sharedSetPort( tr_shared * s, int port )
     return;
 #endif
 
-    tr_sharedLock( s );
+    tr_globalLock( s->h );
 
     if( port == s->bindPort )
     {
-        tr_sharedUnlock( s );
+        tr_globalUnlock( s->h );
         return;
     }
     s->bindPort = port;
@@ -165,7 +149,7 @@ void tr_sharedSetPort( tr_shared * s, int port )
         tr_upnpForwardPort( s->upnp, port );
     }
 
-    tr_sharedUnlock( s );
+    tr_globalUnlock( s->h );
 }
 
 int
@@ -237,7 +221,7 @@ SharedLoop( void * vs )
     int newPort;
     tr_shared * s = vs;
 
-    tr_sharedLock( s );
+    tr_globalLock( s->h );
 
     /* NAT-PMP and UPnP pulses */
     newPort = -1;
@@ -249,7 +233,7 @@ SharedLoop( void * vs )
     /* Handle incoming connections */
     AcceptPeers( s );
 
-    tr_sharedUnlock( s );
+    tr_globalUnlock( s->h );
 
     return TRUE;
 }
