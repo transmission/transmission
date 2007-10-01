@@ -1326,16 +1326,14 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
     for( i=0; i<size; ++i )
     {
         const tr_peer * peer = peers[i];
-        const int live = peer->io != NULL;
-        tr_peer_stat * stat = ret + i;
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        tr_peer_stat * stat = ret + i;
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
         stat->port             = peer->port;
         stat->from             = atom->from;
         stat->client           = peer->client;
         stat->progress         = peer->progress;
-        stat->isConnected      = live ? 1 : 0;
         stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
         stat->uploadToRate     = tr_peerIoGetRateToPeer( peer->io );
         stat->downloadFromRate = tr_peerIoGetRateToClient( peer->io );
