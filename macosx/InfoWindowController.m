@@ -768,7 +768,7 @@
 
 - (void) setNextTab
 {
-    if ([fTabView indexOfTabViewItem: [fTabView selectedTabViewItem]] == [fTabView numberOfTabViewItems] - 1)
+    if ([fTabView selectedTabViewItem] == [fTabView tabViewItemAtIndex: [fTabView numberOfTabViewItems] - 1])
         [fTabView selectFirstTabViewItem: nil];
     else
         [fTabView selectNextTabViewItem: nil];
@@ -776,7 +776,7 @@
 
 - (void) setPreviousTab
 {
-    if ([fTabView indexOfTabViewItem: [fTabView selectedTabViewItem]] == 0)
+    if ([fTabView selectedTabViewItem] == [fTabView tabViewItemAtIndex: 0])
         [fTabView selectLastTabViewItem: nil];
     else
         [fTabView selectPreviousTabViewItem: nil];

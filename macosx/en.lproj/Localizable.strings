@@ -4,15 +4,6 @@
 /* Torrent -> progress string */
 " - remaining time unknown" = " - remaining time unknown";
 
-/* File size (beware of leading space) */
-" GB" = " GB";
-
-/* File size (beware of leading space) */
-" KB" = " KB";
-
-/* File size (beware of leading space) */
-" MB" = " MB";
-
 /* Removal confirm panel -> message part 2 */
 " Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?" = " Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?";
 
@@ -22,14 +13,26 @@
 /* Inspector -> Files tab -> file status string */
 "%.2f%% of %@" = "%1$.2f%% of %2$@";
 
+/* Inspector -> Activity tab -> have */
+"%@ (%@ verified)" = "%1$@ (%2$@ verified)";
+
 /* Torrent -> progress string */
 "%@ of %@ (%.2f%%)" = "%1$@ of %2$@ (%3$.2f%%)";
 
 /* Torrent -> progress string */
 "%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ of %2$@ (%3$.2f%%), uploaded %4$@ (Ratio: %5$@)";
 
+/* Torrent -> progress string */
+"%@ of %@ selected (%.2f%%)" = "%1$@ of %2$@ selected (%3$.2f%%)";
+
+/* Torrent -> progress string */
+"%@ selected, uploaded %@ (Ratio: %@)" = "%1$@ selected, uploaded %2$@ (Ratio: %3$@)";
+
 /* Inspector -> above tabs -> total size (several torrents selected) */
 "%@ Total" = "%@ Total";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ verified";
 
 /* Create torrent -> info */
 "%@, %@ each" = "%1$@, %2$@ each";
@@ -113,11 +116,11 @@
    Status bar transfer count */
 "1 Transfer" = "1 Transfer";
 
-/* Move folder cannot be found alert -> message */
-"\"%@\" cannot be found. The file will remain in its current location." = "\"%@\" cannot be found. The file will remain in its current location.";
+/* Move folder cannot be used alert -> message */
+"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" cannot be used. The file will remain in its current location.";
 
-/* Folder cannot be found alert -> message */
-"\"%@\" cannot be found. The transfer will be paused." = "\"%@\" cannot be found. The transfer will be paused.";
+/* Folder cannot be used alert -> message */
+"\"%@\" cannot be used. The transfer will be paused." = "\"%@\" cannot be used. The transfer will be paused.";
 
 /* Create torrent -> file already exists warning -> warning */
 "A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "A file with the name \"%1$@\" already exists in the directory \"%2$@\". Choose a new name or directory to create the torrent.";
@@ -133,6 +136,12 @@
 
 /* Open duplicate alert -> title */
 "A transfer of \"%@\" is already running." = "A transfer of \"%@\" is already running.";
+
+/* Preferences -> Advanced toolbar item title */
+"Advanced" = "Advanced";
+
+/* Filter Bar Button -> title */
+"All" = "All";
 
 /* Torrent file disk space alert -> button */
 "Always Download" = "Always Download";
@@ -157,20 +166,38 @@
 /* Torrent -> status string */
 "Checking existing data (%.2f%%)" = "Checking existing data (%.2f%%)";
 
-/* Preferences -> Network -> port status */
+/* Preferences -> Advanced -> port status */
 "Checking port status" = "Checking port status";
 
-/* Folder cannot be found alert -> location button */
+/* Folder cannot be used alert -> location button */
 "Choose New Location" = "Choose New Location";
 
 /* Confirm Quit panel -> title */
 "Confirm Quit" = "Confirm Quit";
 
 /* Removal confirm panel -> title */
-"Confirm Removal of %d Transfers" = "Confirm Removal of %d Transfers";
+"Confirm removal of %d transfers from the transfer list and trash both data and torrent files." = "Confirm removal of %d transfers from the transfer list and trash both data and torrent files.";
 
 /* Removal confirm panel -> title */
-"Confirm Removal of \"%@\"" = "Confirm Removal of \"%@\"";
+"Confirm removal of %d transfers from the transfer list and trash data file." = "Confirm removal of %d transfers from the transfer list and trash data file.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list and trash torrent file." = "Confirm removal of %d transfers from the transfer list and trash torrent file.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list." = "Confirm removal of %d transfers from the transfer list.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash both data and torrent files." = "Confirm removal of \"%@\" from the transfer list and trash both data and torrent files.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash data file." = "Confirm removal of \"%@\" from the transfer list and trash data file.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash torrent file." = "Confirm removal of \"%@\" from the transfer list and trash torrent file.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list." = "Confirm removal of \"%@\" from the transfer list.";
 
 /* Debug log alert -> informative message */
 "Continuous use at this level might increase memory usage. This setting can be changed in the Message Log window (accessible from the Window menu)." = "Continuous use at this level might increase memory usage. This setting can be changed in the Message Log window (accessible from the Window menu).";
@@ -187,14 +214,15 @@
 /* Create toolbar item -> tooltip */
 "Create torrent file" = "Create torrent file";
 
-/* Create toolbar item -> palette label */
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
 "Create Torrent File" = "Create Torrent File";
 
 /* Create torrent -> failed -> title */
 "Creation of \"%@\" failed." = "Creation of \"%@\" failed.";
 
 /* Torrent -> status string */
-"DL: %@, " = "DL: %@, ";
+"DL: %@, UL: %@" = "DL: %1$@, UL: %2$@";
 
 /* Debug log alert -> button
    Open duplicate alert -> button */
@@ -215,7 +243,8 @@
 /* Inspector -> files tab -> tooltip */
 "Download Some" = "Download Some";
 
-/* Torrent -> status string */
+/* Filter Bar Button -> title
+   Torrent -> status string */
 "Downloading" = "Downloading";
 
 /* Torrent -> status string */
@@ -224,11 +253,17 @@
 /* Torrent -> status string */
 "Downloading from %d of 1 peer" = "Downloading from %d of 1 peer";
 
+/* Inspector -> Peers tab -> table row tooltip */
+"Encrypted Connection" = "Encrypted Connection";
+
 /* Transfer speed invalid
    Ratio invalid */
 "error" = "error";
 
-/* Preferences -> Network -> port map status */
+/* Torrent -> status string */
+"Error" = "Error";
+
+/* Preferences -> Advanced -> port map status */
 "Error mapping port" = "Error mapping port";
 
 /* Torrent -> status string */
@@ -248,6 +283,9 @@
 
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "From: tracker";
+
+/* File size (beware of leading space) */
+"GB" = "GB";
 
 /* Preferences -> General toolbar item title */
 "General" = "General";
@@ -274,7 +312,14 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "It appears that the file \"%1$@\" from %2$@ is not a torrent file.";
 
-/* Action context menu -> upload/download limit */
+/* File size (beware of leading space) */
+"KB" = "KB";
+
+/* About window -> license button */
+"License" = "License";
+
+/* torrent action context menu -> upload/download limit
+   Action context menu -> upload/download limit */
 "Limit (%d KB/s)" = "Limit (%d KB/s)";
 
 /* Save log alert panel -> title */
@@ -283,15 +328,15 @@
 /* Inspector -> files tab -> tooltip */
 "Low Priority" = "Low Priority";
 
+/* File size (beware of leading space) */
+"MB" = "MB";
+
 /* Inspector -> files tab -> tooltip */
 "Multiple Priorities" = "Multiple Priorities";
 
 /* No Ratio
    Torrent -> status string */
 "N/A" = "N/A";
-
-/* Preferences -> Network toolbar item title */
-"Network" = "Network";
 
 /* Inspector -> above tabs -> selected torrents */
 "No Torrents Selected" = "No Torrents Selected";
@@ -302,33 +347,34 @@
 /* Torrent file disk space alert -> title */
 "Not enough remaining disk space to download \"%@\" completely." = "Not enough remaining disk space to download \"%@\" completely.";
 
-/* Open duplicate alert -> button
-   Create torrent -> no files -> button
-   Create torrent -> file already exists warning -> button
-   Torrent file copy alert -> button
-   Move folder cannot be found alert -> button
-   Folder cannot be found alert -> button
-   Torrent file disk space alert -> button
-   Create torrent -> no url warning -> button
-   Torrent download failed -> button
-   Create torrent -> failed -> button
-   Move error alert -> button
-   Debug log alert -> button
+/* Debug log alert -> button
+   Open duplicate alert -> button
    Download not a torrent -> button
-   Create torrent -> zero size -> button
-   Move inside itself alert -> button
+   Create torrent -> http warning -> button
    Save log alert panel -> button
-   Create torrent -> http warning -> button */
+   Create torrent -> zero size -> button
+   Move folder cannot be used alert -> button
+   Create torrent -> no url warning -> button
+   Create torrent -> file already exists warning -> button
+   Folder cannot be used alert -> button
+   Torrent file copy alert -> button
+   About window -> license close button
+   Move error alert -> button
+   Create torrent -> failed -> button
+   Create torrent -> no files -> button
+   Move inside itself alert -> button
+   Torrent file disk space alert -> button
+   Torrent download failed -> button */
 "OK" = "OK";
 
 /* Open toolbar item -> label */
 "Open" = "Open";
 
-/* Open toolbar item -> palette label */
-"Open Torrent Files" = "Open Torrent Files";
-
 /* Open toolbar item -> tooltip */
 "Open torrent files" = "Open torrent files";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Open Torrent Files";
 
 /* Pause toolbar item -> label */
 "Pause" = "Pause";
@@ -345,19 +391,23 @@
 /* Pause toolbar item -> tooltip */
 "Pause selected transfers" = "Pause selected transfers";
 
-/* Torrent -> status string */
+/* Filter Bar Button -> title
+   Torrent -> status string */
 "Paused" = "Paused";
 
-/* Preferences -> Network -> port status */
+/* Inspector -> pex check */
+"PEX can only be toggled on paused public torrents." = "PEX can only be toggled on paused public torrents.";
+
+/* Preferences -> Advanced -> port status */
 "Port is closed" = "Port is closed";
 
-/* Preferences -> Network -> port status */
+/* Preferences -> Advanced -> port status */
 "Port is open" = "Port is open";
 
-/* Preferences -> Network -> port status */
+/* Preferences -> Advanced -> port status */
 "Port is stealth" = "Port is stealth";
 
-/* Preferences -> Network -> port map status */
+/* Preferences -> Advanced -> port map status */
 "Port successfully mapped" = "Port successfully mapped";
 
 /* Inspector -> Peers tab -> table row tooltip */
@@ -379,7 +429,6 @@
 "Public Torrent" = "Public Torrent";
 
 /* Transmission already running alert -> button
-   OS update needed -> button
    Confirm Quit panel -> button */
 "Quit" = "Quit";
 
@@ -387,7 +436,7 @@
 "Ratio: " = "Ratio: ";
 
 /* Torrent -> status string */
-"Ratio: %@, " = "Ratio: %@, ";
+"Ratio: %@, UL: %@" = "Ratio: %1$@, UL: %2$@";
 
 /* Removal confirm panel -> button
    Remove toolbar item -> label */
@@ -414,7 +463,8 @@
 /* Resume toolbar item -> tooltip */
 "Resume selected transfers" = "Resume selected transfers";
 
-/* Torrent -> status string */
+/* Filter Bar Button -> title
+   Torrent -> status string */
 "Seeding" = "Seeding";
 
 /* Torrent -> status string */
@@ -429,18 +479,18 @@
 /* Torrent -> status string */
 "Seeding to %d of 1 peer" = "Seeding to %d of 1 peer";
 
-/* Folder cannot be found alert -> prompt
-   Default folder cannot be found alert -> prompt
+/* Default incomplete folder cannot be used alert -> prompt
+   Create torrent -> select file
+   Default folder cannot be used alert -> prompt
    Open torrent -> prompt
    Move torrent -> prompt
-   Default incomplete folder cannot be found alert -> prompt
-   Create torrent -> select file */
+   Folder cannot be used alert -> prompt */
 "Select" = "Select";
 
 /* Create torrent -> select file */
 "Select a file or folder for the torrent file." = "Select a file or folder for the torrent file.";
 
-/* Folder cannot be found alert -> select destination folder
+/* Folder cannot be used alert -> select destination folder
    Open torrent -> select destination folder */
 "Select the download folder for \"%@\"" = "Select the download folder for \"%@\"";
 
@@ -474,23 +524,24 @@
 /* Torrent -> status string */
 "Stalled, " = "Stalled, ";
 
-/* Action context menu -> ratio stop */
+/* torrent action context menu -> ratio stop
+   Action context menu -> ratio stop */
 "Stop at Ratio (%.2f)" = "Stop at Ratio (%.2f)";
 
 /* Torrent -> status string */
 "Stopping" = "Stopping";
 
-/* Default folder cannot be found alert -> message */
-"The download folder cannot be found. Choose a new location." = "The download folder cannot be found. Choose a new location.";
+/* Default folder cannot be used alert -> message */
+"The download folder cannot be used. Choose a new location." = "The download folder cannot be used. Choose a new location.";
 
-/* Folder cannot be found alert -> title */
-"The folder for downloading \"%@\" cannot be found." = "The folder for downloading \"%@\" cannot be found.";
+/* Folder cannot be used alert -> title */
+"The folder for downloading \"%@\" cannot be used." = "The folder for downloading \"%@\" cannot be used.";
 
-/* Move folder cannot be found alert -> title */
-"The folder for moving the completed \"%@\" cannot be found." = "The folder for moving the completed \"%@\" cannot be found.";
+/* Move folder cannot be used alert -> title */
+"The folder for moving the completed \"%@\" cannot be used." = "The folder for moving the completed \"%@\" cannot be used.";
 
-/* Default incomplete folder cannot be found alert -> message */
-"The incomplete folder cannot be found. Choose a new location or cancel for none." = "The incomplete folder cannot be found. Choose a new location or cancel for none.";
+/* Default incomplete folder cannot be used alert -> message */
+"The incomplete folder cannot be used. Choose a new location or cancel for none." = "The incomplete folder cannot be used. Choose a new location or cancel for none.";
 
 /* Debug log alert -> message */
 "The Message Log is set to \"Debug\"" = "The Message Log is set to \"Debug\"";
@@ -581,22 +632,13 @@
 /* Preferences -> Transfers toolbar item title */
 "Transfers" = "Transfers";
 
-/* OS update needed -> message */
-"Transmission has features that require a more up-to-date operating system. The operating system must be updated before this version can run." = "Transmission has features that require a more up-to-date operating system. The operating system must be updated before this version can run.";
-
 /* Transmission already running alert -> title */
 "Transmission is already running." = "Transmission is already running.";
-
-/* OS update needed -> title */
-"Transmission requires Mac OS X 10.4 or greater." = "Transmission requires Mac OS X 10.4 or greater.";
 
 /* Torrent -> location when deleting original */
 "Transmission Support Folder" = "Transmission Support Folder";
 
-/* Torrent -> status string */
-"UL: " = "UL: ";
-
-/* Preferences -> Network -> port status */
+/* Preferences -> Advanced -> port status */
 "Unable to check port status" = "Unable to check port status";
 
 /* Torrent -> remaining time */
