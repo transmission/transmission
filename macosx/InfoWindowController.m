@@ -67,8 +67,6 @@
 {
     //get images
     fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-    fDotGreen = [NSImage imageNamed: @"GreenDot.tiff"];
-    fDotRed = [NSImage imageNamed: @"RedDot.tiff"];
     
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
@@ -798,9 +796,7 @@
         NSString * ident = [column identifier];
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
-        if ([ident isEqualToString: @"Connected"])
-            return [[peer objectForKey: @"Connected"] boolValue] ? fDotGreen : fDotRed;
-        else if ([ident isEqualToString: @"Encryption"])
+        if ([ident isEqualToString: @"Encryption"])
         {
             if ([[peer objectForKey: @"Encryption"] boolValue])
             {
@@ -814,7 +810,7 @@
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])
-            return [peer objectForKey: @"Progress"]; //returning nil is fine
+            return [peer objectForKey: @"Progress"];
         else if ([ident isEqualToString: @"UL To"])
         {
             NSNumber * rate;
@@ -831,15 +827,6 @@
     return nil;
 }
 
-- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
-{
-    if (tableView == fPeerTable)
-    {
-        if ([[tableColumn identifier] isEqualToString: @"Progress"])
-            [cell setHidden: ![[[fPeers objectAtIndex: row] objectForKey: @"Connected"] boolValue]];
-    }
-}
-
 - (void) tableView: (NSTableView *) tableView didClickTableColumn: (NSTableColumn *) tableColumn
 {
     if (tableView == fPeerTable)
@@ -854,7 +841,7 @@
     }
 }
 
-- (BOOL) tableView: (NSTableView *) tableView shouldSelectRow:(int) row
+- (BOOL) tableView: (NSTableView *) tableView shouldSelectRow: (int) row
 {
     return tableView != fPeerTable;
 }
@@ -867,15 +854,12 @@
         NSDictionary * peer = [fPeers objectAtIndex: row];
         NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
         
-        if ([[peer objectForKey: @"Connected"] boolValue])
-        {
-            [components addObject: [NSString stringWithFormat:
-                                    NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
-                                    [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
-            
-            if ([[peer objectForKey: @"Encryption"] boolValue])
-                [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
-        }
+        [components addObject: [NSString stringWithFormat:
+                                NSLocalizedString(@"Progress: %.1f%%", "Inspector -> Peers tab -> table row tooltip"),
+                                [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
+        
+        if ([[peer objectForKey: @"Encryption"] boolValue])
+            [components addObject: NSLocalizedString(@"Encrypted Connection", "Inspector -> Peers tab -> table row tooltip")];
         
         int port;
         if ((port = [[peer objectForKey: @"Port"] intValue]) > 0)
@@ -901,7 +885,7 @@
 
 - (NSArray *) peerSortDescriptors
 {
-    NSMutableArray * descriptors = [NSMutableArray array];
+    NSMutableArray * descriptors = [NSMutableArray arrayWithCapacity: 2];
     
     NSArray * oldDescriptors = [fPeerTable sortDescriptors];
     BOOL useSecond = YES, asc = YES;

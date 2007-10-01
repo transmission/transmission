@@ -122,19 +122,4 @@
     return NSOrderedSame;
 }
 
-- (NSComparisonResult) clientCompare: (NSString *) string
-{
-    BOOL selfBlank = [self isEqualToString: @""],
-        newBlank = [string isEqualToString: @""];
-    
-    if (selfBlank && newBlank)
-        return NSOrderedSame;
-    else if (selfBlank)
-        return NSOrderedDescending;
-    else if (newBlank)
-        return NSOrderedAscending;
-    else
-        return [self caseInsensitiveCompare: string];
-}
-
 @end

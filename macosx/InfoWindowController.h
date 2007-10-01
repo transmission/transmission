@@ -31,7 +31,7 @@
 @interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents, * fPeers, * fFiles;
-    NSImage * fAppIcon, * fDotGreen, * fDotRed, * fLockImage;
+    NSImage * fAppIcon, * fLockImage;
     
     BOOL fCanResizeVertical;
     

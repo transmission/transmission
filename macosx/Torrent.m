@@ -803,26 +803,17 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         peer = &peers[i];
         
         dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithBool: peer->isConnected], @"Connected",
             [NSNumber numberWithInt: peer->from], @"From",
             [NSString stringWithCString: (char *) peer->addr encoding: NSUTF8StringEncoding], @"IP",
-            [NSNumber numberWithInt: peer->port], @"Port", nil];
+            [NSNumber numberWithInt: peer->port], @"Port",
+            [NSNumber numberWithFloat: peer->progress], @"Progress",
+            [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
+            [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding], @"Client", nil];
         
-        if (peer->isConnected)
-        {
-            [dic setObject: [NSNumber numberWithFloat: peer->progress] forKey: @"Progress"];
-            
-            if (peer->isDownloading)
-                [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
-            if (peer->isUploading)
-                [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
-            
-            [dic setObject: [NSNumber numberWithBool: peer->isEncrypted] forKey: @"Encryption"];
-            
-            [dic setObject: [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding] forKey: @"Client"];
-        }
-        else
-            [dic setObject: @"" forKey: @"Client"]; //needed to be set here for client sort
+        if (peer->isDownloading)
+            [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
+        if (peer->isUploading)
+            [dic setObject: [NSNumber numberWithFloat: peer->downloadFromRate] forKey: @"DL From Rate"];
         
         [peerDics addObject: dic];
     }
@@ -945,16 +936,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         if (fStalled)
             string = [NSLocalizedString(@"Stalled, ", "Torrent -> status string") stringByAppendingString: string];
-        
-        //append even if error
-        if ([self isActive] && ![self isChecking])
-        {
-            if (fStat->status == TR_STATUS_DOWNLOAD)
-                string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
-                        [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
-            else
-                string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
-        }
+    }
+    
+    //append even if error
+    if ([self isActive] && ![self isChecking])
+    {
+        if (fStat->status == TR_STATUS_DOWNLOAD)
+            string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
+                    [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
+        else
+            string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
