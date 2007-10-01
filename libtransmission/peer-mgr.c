@@ -61,7 +61,7 @@ enum
 
     /* this is arbitrary and, hopefully, temporary until we come up
      * with a better idea for managing the connection limits */
-    MAX_CONNECTED_PEERS_PER_TORRENT = 100,
+    MAX_CONNECTED_PEERS_PER_TORRENT = 60,
 };
 
 /**
@@ -141,7 +141,10 @@ torrentUnlock( Torrent * torrent )
 static int
 torrentIsLocked( const Torrent * t )
 {
-    return t!=NULL && t->manager!=NULL && t->manager->lockThread!=0;
+    return ( t != NULL )
+        && ( t->manager != NULL )
+        && ( t->manager->lockThread != 0 )
+        && ( t->manager->lockThread == pthread_self( ) );
 }
 
 /**
@@ -1513,9 +1516,9 @@ static struct tr_connection *
 getWeakConnections( Torrent * t, int * setmeSize )
 {
     int i, insize, outsize;
-    const int seeding = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &insize );
     struct tr_connection * ret = tr_new( struct tr_connection, insize );
+    const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
     const time_t now = time( NULL );
 
     assert( torrentIsLocked( t ) );
@@ -1523,19 +1526,30 @@ getWeakConnections( Torrent * t, int * setmeSize )
     for( i=outsize=0; i<insize; ++i )
     {
         tr_peer * peer = peers[i];
+        int isWeak;
+        const int peerIsSeed = peer->progress >= 1.0;
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
-        const double throughput = seeding ? tr_peerIoGetRateToPeer( peer->io )
-                                          : tr_peerIoGetRateToClient( peer->io );
+        const double throughput = (2*tr_peerIoGetRateToPeer( peer->io ))
+                                + tr_peerIoGetRateToClient( peer->io );
 
-        if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
-            continue;
+        /* if we're both seeds, give a little bit of time for
+         * a mutual pex -- peer-msgs initiates a pex exchange
+         * on startup -- and then disconnect */
+        if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) )
+            isWeak = TRUE;
+        else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
+            isWeak = FALSE;
+        else if( throughput >= 5 )
+            isWeak = FALSE;
+        else
+            isWeak = TRUE;
 
-        if( throughput >= 2 )
-            continue;
-
-        ret[outsize].peer = peer;
-        ret[outsize].throughput = throughput;
-        ++outsize;
+        if( isWeak )
+        {
+            ret[outsize].peer = peer;
+            ret[outsize].throughput = throughput;
+            ++outsize;
+        }
     }
 
     qsort( ret, outsize, sizeof(struct tr_connection), compareConnections );
@@ -1603,6 +1617,7 @@ reconnectPulse( void * vtorrent )
     struct peer_atom ** candidates;
     struct tr_connection * connections;
     int i, nCandidates, nConnections, nCull, nAdd;
+    int peerCount;
 
     torrentLock( t );
 
@@ -1626,7 +1641,8 @@ fprintf( stderr, "connection #%d: %s @ %.2f\n", i+1, tr_peerIoAddrStr( &connecti
     }
 
     /* add some new ones */
-    nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - nConnections;
+    peerCount = tr_ptrArraySize( t->peers );
+    nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
     for( i=0; i<nAdd && i<nCandidates; ++i ) {
         struct peer_atom * atom = candidates[i];
         tr_peerIo * io = tr_peerIoNewOutgoing( t->manager->handle, &atom->addr, atom->port, t->hash );

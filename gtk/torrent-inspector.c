@@ -234,7 +234,6 @@ enum
   PEER_COL_PORT,
   PEER_COL_CLIENT,
   PEER_COL_PROGRESS,
-  PEER_COL_IS_CONNECTED,
   PEER_COL_IS_ENCRYPTED,
   PEER_COL_IS_DOWNLOADING,
   PEER_COL_DOWNLOAD_RATE,
@@ -249,7 +248,6 @@ static const char* peer_column_names[N_PEER_COLS] =
   N_("Port"),
   N_("Client"),
   N_("Progress"),
-  " ",
   " ",
   N_("Downloading"),
   N_("DL Rate"),
@@ -286,7 +284,6 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
                       PEER_COL_PROGRESS, (int)(100.0*peer->progress + 0.5),
-                      PEER_COL_IS_CONNECTED, peer->isConnected,
                       PEER_COL_IS_DOWNLOADING, peer->isDownloading,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
                       PEER_COL_IS_UPLOADING, peer->isUploading,
@@ -315,7 +312,6 @@ peer_model_new (tr_torrent * tor)
                                          G_TYPE_INT,     /* port */
                                          G_TYPE_STRING,  /* client */
                                          G_TYPE_INT,     /* progress [0..100] */
-                                         G_TYPE_BOOLEAN, /* isConnected */
                                          G_TYPE_BOOLEAN, /* isEncrypted */
                                          G_TYPE_BOOLEAN, /* isDownloading */
                                          G_TYPE_FLOAT,   /* downloadFromRate */
@@ -328,22 +324,6 @@ peer_model_new (tr_torrent * tor)
   append_peers_to_model (m, peers, n_peers);
   tr_torrentPeersFree( peers, 0 );
   return GTK_TREE_MODEL (m);
-}
-
-static void
-render_connection (GtkTreeViewColumn  * column UNUSED,
-                   GtkCellRenderer    * renderer,
-                   GtkTreeModel       * tree_model,
-                   GtkTreeIter        * iter,
-                   gpointer             data UNUSED)
-{
-  gboolean is_connected = FALSE;
-  gtk_tree_model_get (tree_model, iter, PEER_COL_IS_CONNECTED, &is_connected,
-                                        -1 );
-  g_object_set (renderer, "xalign", (gfloat)0.0,
-                          "yalign", (gfloat)0.5,
-                          "stock-id", ( is_connected ? GTK_STOCK_CONNECT : GTK_STOCK_DISCONNECT ),
-                          NULL);
 }
 
 static void
@@ -405,14 +385,10 @@ render_client (GtkTreeViewColumn   * column UNUSED,
                GtkTreeIter         * iter,
                gpointer              data UNUSED)
 {
-  gboolean is_connected = FALSE;
   char * client = NULL;
-  gtk_tree_model_get (tree_model, iter, PEER_COL_IS_CONNECTED,  &is_connected,
-                                        PEER_COL_CLIENT, &client,
+  gtk_tree_model_get (tree_model, iter, PEER_COL_CLIENT, &client,
                                         -1);
-  if (!is_connected)
-    *client = '\0';
-  g_object_set (renderer, "text", client, NULL);
+  g_object_set (renderer, "text", (client ? client : ""), NULL);
   g_free (client);
 }
 
@@ -514,8 +490,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   char name[64];
 
   /* TODO: make this configurable? */
-  int view_columns[] = { PEER_COL_IS_CONNECTED,
-                         PEER_COL_IS_ENCRYPTED,
+  int view_columns[] = { PEER_COL_IS_ENCRYPTED,
                          PEER_COL_ADDRESS,
                          PEER_COL_CLIENT,
                          PEER_COL_PROGRESS,
@@ -567,16 +542,6 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         gtk_tree_view_column_set_sizing (c, GTK_TREE_VIEW_COLUMN_FIXED);
         gtk_tree_view_column_set_fixed_width (c, 20);
         gtk_tree_view_column_set_cell_data_func (c, r, render_encrypted,
-                                                 NULL, NULL);
-        break;
-
-      case PEER_COL_IS_CONNECTED:
-        resizable = FALSE;
-        r = gtk_cell_renderer_pixbuf_new ();
-        c = gtk_tree_view_column_new_with_attributes (t, r, NULL);
-        gtk_tree_view_column_set_sizing (c, GTK_TREE_VIEW_COLUMN_FIXED);
-        gtk_tree_view_column_set_fixed_width (c, 20);
-        gtk_tree_view_column_set_cell_data_func (c, r, render_connection,
                                                  NULL, NULL);
         break;
 
