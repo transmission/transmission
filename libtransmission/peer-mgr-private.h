@@ -37,7 +37,6 @@ typedef struct tr_peer
     unsigned int  doPurge : 1;
 
     uint8_t encryption_preference;
-    uint8_t from;
     uint16_t port;
     struct in_addr in_addr;
     struct tr_peerIo * io;

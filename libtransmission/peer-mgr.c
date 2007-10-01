@@ -1286,13 +1286,14 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
     for( i=0; i<size; ++i )
     {
         const tr_peer * peer = peers[i];
+        const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
 
         if( peer->io == NULL ) /* not connected */
             continue;
 
         ++*setmePeersConnected;
 
-        ++setmePeersFrom[peer->from];
+        ++setmePeersFrom[atom->from];
 
         if( tr_peerIoGetRateToPeer( peer->io ) > 0.01 )
             ++*setmePeersGettingFromUs;
@@ -1327,10 +1328,11 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         const tr_peer * peer = peers[i];
         const int live = peer->io != NULL;
         tr_peer_stat * stat = ret + i;
+        const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
         stat->port             = peer->port;
-        stat->from             = peer->from;
+        stat->from             = atom->from;
         stat->client           = peer->client;
         stat->progress         = peer->progress;
         stat->isConnected      = live ? 1 : 0;
