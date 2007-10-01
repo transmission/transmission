@@ -39,7 +39,7 @@ enum
     RECHOKE_PERIOD_MSEC = (15 * 1000),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (15 * 1000),
+    RECONNECT_PERIOD_MSEC = (5 * 1000),
 
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 1000,
@@ -335,6 +335,13 @@ removePeer( Torrent * t, tr_peer * peer )
     removed = tr_ptrArrayRemoveSorted  ( t->peers, peer, peerCompare );
     assert( removed == peer );
     freePeer( removed );
+}
+
+static void
+removeAllPeers( Torrent * t )
+{
+    while( !tr_ptrArrayEmpty( t->peers ) )
+        removePeer( t, tr_ptrArrayNth( t->peers, 0 ) );
 }
 
 static void
@@ -1612,46 +1619,51 @@ static int
 reconnectPulse( void * vtorrent )
 {
     Torrent * t = vtorrent;
-    struct peer_atom ** candidates;
-    struct tr_connection * connections;
-    int i, nCandidates, nConnections, nCull, nAdd;
-    int peerCount;
 
     torrentLock( t );
 
-    connections = getWeakConnections( t, &nConnections );
-    candidates = getPeerCandidates( t, &nCandidates );
+    if( !t->isRunning )
+    {
+        removeAllPeers( t );
+    }
+    else
+    {
+        int i, nCandidates, nConnections, nAdd;
+        struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
+        struct tr_connection * connections = getWeakConnections( t, &nConnections );
+        const int peerCount = tr_ptrArraySize( t->peers );
 
-    /* figure out how many peers to disconnect */
-    nCull = nConnections-4; 
+        fprintf( stderr, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms\n",
+                 t->tor->info.name, nConnections, nCandidates, tr_ptrArraySize(t->pool) );
 
-fprintf( stderr, "RECONNECT pulse for [%s]: %d connections, %d candidates, %d atoms, %d cull\n", t->tor->info.name, nConnections, nCandidates, tr_ptrArraySize(t->pool), nCull );
+        for( i=0; i<nConnections; ++i )
+            fprintf( stderr, "connection #%d: %s @ %.2f\n", i+1,
+                     tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
 
-for( i=0; i<nConnections; ++i )
-fprintf( stderr, "connection #%d: %s @ %.2f\n", i+1, tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
+        /* disconnect some peers */
+        for( i=0; i<nConnections && i<(peerCount-5); ++i ) {
+            const double throughput = connections[i].throughput;
+            tr_peer * peer = connections[i].peer;
+            fprintf( stderr, "RECONNECT culling peer %s, whose throughput was %f\n",
+                             tr_peerIoAddrStr(&peer->in_addr, peer->port), throughput );
+            removePeer( t, peer );
+        }
 
-    /* disconnect some peers */
-    for( i=0; i<nCull && i<nConnections; ++i ) {
-        const double throughput = connections[i].throughput;
-        tr_peer * peer = connections[i].peer;
-        fprintf( stderr, "RECONNECT culling peer %s, whose throughput was %f\n", tr_peerIoAddrStr(&peer->in_addr, peer->port), throughput );
-        removePeer( t, peer );
+        /* add some new ones */
+        nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
+        for( i=0; i<nAdd && i<nCandidates; ++i ) {
+            struct peer_atom * atom = candidates[i];
+            tr_peerIo * io = tr_peerIoNewOutgoing( t->manager->handle, &atom->addr, atom->port, t->hash );
+            fprintf( stderr, "RECONNECT adding an outgoing connection...\n" );
+            initiateHandshake( t->manager, io );
+            atom->time = time( NULL );
+        }
+
+        /* cleanup */
+        tr_free( connections );
+        tr_free( candidates );
     }
 
-    /* add some new ones */
-    peerCount = tr_ptrArraySize( t->peers );
-    nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
-    for( i=0; i<nAdd && i<nCandidates; ++i ) {
-        struct peer_atom * atom = candidates[i];
-        tr_peerIo * io = tr_peerIoNewOutgoing( t->manager->handle, &atom->addr, atom->port, t->hash );
-fprintf( stderr, "RECONNECT adding an outgoing connection...\n" );
-        initiateHandshake( t->manager, io );
-        atom->time = time( NULL );
-    }
-
-    /* cleanup */
-    tr_free( connections );
-    tr_free( candidates );
     torrentUnlock( t );
     return TRUE;
 }
