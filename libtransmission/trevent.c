@@ -344,6 +344,8 @@ timerCallback( int fd UNUSED, short event UNUSED, void * vtimer )
         timeout_add( &timer->event, &timer->tv );
     else
         tr_timerFree( &timer );
+
+    tr_free( del );
 }
 
 void
@@ -359,9 +361,11 @@ tr_timerFree( tr_timer ** ptimer )
     /* destroy the timer directly or via the command queue */
     if( timer!=NULL && !timer->inCallback ) {
         if( tr_amInThread( timer->eh->thread ) ) {
+            void * del = tr_list_remove( &timer->eh->commands, timer, timerCompareFunc );
             --timer->eh->timerCount;
             event_del( &timer->event );
             tr_free( timer );
+            tr_free( del );
         } else {
             struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );
             cmd->mode = TR_EV_TIMER_DEL;
