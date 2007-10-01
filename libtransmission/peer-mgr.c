@@ -482,6 +482,7 @@ struct tr_refill_piece
     uint32_t piece;
     uint32_t peerCount;
     uint32_t fastAllowed;
+    uint32_t random;
 };
 
 static int
@@ -502,8 +503,8 @@ compareRefillPiece (const void * aIn, const void * bIn)
     if (a->fastAllowed != b->fastAllowed)
         return a->fastAllowed < b->fastAllowed ? -1 : 1;
 
-    /* otherwise go with the earlier piece */
-    return a->piece - b->piece;
+    /* otherwise go with our random seed */
+    return tr_compareUint32( a->random, b->random );
 }
 
 static int
@@ -555,6 +556,7 @@ getPreferredPieces( Torrent     * t,
             setme->priority = inf->pieces[piece].priority;
             setme->peerCount = 0;
             setme->fastAllowed = 0;
+            setme->random = tr_rand( UINT32_MAX );
             /* FIXME */
 //            setme->fastAllowed = tr_bitfieldHas( t->tor->allowedList, i);
 
