@@ -52,9 +52,6 @@ struct tr_peerIo
     unsigned int isIncoming : 1;
     unsigned int peerIdIsSet : 1;
 
-    tr_ratecontrol   * rateToPeer;
-    tr_ratecontrol   * rateToClient;
-
     tr_can_read_cb     canRead;
     tr_did_write_cb    didWrite;
     tr_net_error_cb    gotError;
@@ -120,8 +117,6 @@ tr_peerIoNew( struct tr_handle     * handle,
     c->in_addr = *in_addr;
     c->port = port;
     c->socket = socket;
-    c->rateToPeer = tr_rcInit( );
-    c->rateToClient = tr_rcInit( );
     c->isIncoming = isIncoming ? 1 : 0;
     c->bufev = bufferevent_new( c->socket,
                                 canReadWrapper,
@@ -173,9 +168,6 @@ tr_peerIoFree( tr_peerIo * c )
         c->gotError = NULL;
         bufferevent_free( c->bufev );
         tr_netClose( c->socket );
-
-        tr_rcClose( c->rateToClient );
-        tr_rcClose( c->rateToPeer );
 
         tr_cryptoFree( c->crypto );
 
@@ -398,7 +390,6 @@ tr_peerIoWrite( tr_peerIo   * io,
                 int           writeme_len )
 {
     tr_bufferevent_write( io->handle, io->bufev, writeme, writeme_len );
-    tr_rcTransferred( io->rateToPeer, writeme_len );
 }
 
 void
@@ -502,14 +493,12 @@ tr_peerIoReadBytes( tr_peerIo        * io,
         case PEER_ENCRYPTION_NONE:
             /*fprintf( stderr, "reading %d plaintext bytes from inbuf...\n", byteCount );*/
             evbuffer_remove(  inbuf, bytes, byteCount );
-            tr_rcTransferred( io->rateToClient, byteCount );
             break;
 
         case PEER_ENCRYPTION_RC4:
             /*fprintf( stderr, "reading AND DECRYPTING %d bytes from inbuf...\n", byteCount );*/
             evbuffer_remove(  inbuf, bytes, byteCount );
             tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
-            tr_rcTransferred( io->rateToClient, byteCount );
             break;
 
         default:
@@ -554,21 +543,3 @@ tr_peerIoDrain( tr_peerIo        * io,
     tr_peerIoReadBytes( io, inbuf, tmp, byteCount );
     tr_free( tmp );
 }
-
-/**
-***
-**/
-
-float
-tr_peerIoGetRateToClient( const tr_peerIo * io )
-{
-    return io==NULL ? 0.0f : tr_rcRate( io->rateToClient );
-
-}
-
-float
-tr_peerIoGetRateToPeer( const tr_peerIo * io )
-{
-    return io==NULL ? 0.0f : tr_rcRate( io->rateToPeer );
-}
-

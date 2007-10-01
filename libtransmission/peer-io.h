@@ -121,10 +121,6 @@ void tr_peerIoWriteBuf( tr_peerIo       * io,
                         struct evbuffer * buf );
 
 
-float tr_peerIoGetRateToClient( const tr_peerIo * io );
-
-float tr_peerIoGetRateToPeer( const tr_peerIo * io );
-
 /**
 ***
 **/

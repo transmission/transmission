@@ -61,7 +61,12 @@ enum
     /* this is arbitrary and, hopefully, temporary until we come up
      * with a better idea for managing the connection limits */
     MAX_CONNECTED_PEERS_PER_TORRENT = 60,
+
+
+    ADDED_F_ENCRYPTION_FLAG = 1,
+    ADDED_F_SEED_FLAG = 2
 };
+
 
 /**
 ***
@@ -70,7 +75,7 @@ enum
 /* We keep one of these for every peer we know about, whether
  * it's connected or not, so the struct must be small.
  * When our current connections underperform, we dip back
- * int this list for new ones. */
+ * into this list for new ones. */
 struct peer_atom
 {   
     uint8_t from;
@@ -271,6 +276,8 @@ getPeer( Torrent * torrent, const struct in_addr * in_addr )
     if( peer == NULL )
     {
         peer = tr_new0( tr_peer, 1 );
+        peer->rateToClient = tr_rcInit( );
+        peer->rateToPeer = tr_rcInit( );
         memcpy( &peer->in_addr, in_addr, sizeof(struct in_addr) );
         tr_ptrArrayInsertSorted( torrent->peers, peer, peerCompare );
     }
@@ -307,6 +314,8 @@ static void
 freePeer( tr_peer * peer )
 {
     disconnectPeer( peer );
+    tr_rcClose( peer->rateToClient );
+    tr_rcClose( peer->rateToPeer );
     tr_free( peer->client );
     tr_free( peer );
 }
@@ -825,13 +834,13 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
             tr_torrentRecheckCompleteness( t->tor );
             break;
 
-        case TR_PEERMSG_PEER_PROGRESS: { /* if we're both seeds, then disconnect. */
-#if 0
-            const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
+        case TR_PEERMSG_PEER_PROGRESS: {
+            struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
             const int peerIsSeed = e->progress >= 1.0;
-            if( clientIsSeed && peerIsSeed )
-                peer->doPurge = 1;
-#endif
+            if( peerIsSeed )
+                atom->flags |= ADDED_F_SEED_FLAG;
+            else
+                atom->flags &= ~ADDED_F_SEED_FLAG;
             break;
         }
 
@@ -1095,8 +1104,8 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
         walk->port = peer->port;
 
         walk->flags = 0;
-        if( peerPrefersCrypto(peer) )  walk->flags |= 1;
-        if( peer->progress >= 1.0 )    walk->flags |= 2;
+        if( peerPrefersCrypto(peer) )  walk->flags |= ADDED_F_ENCRYPTION_FLAG;
+        if( peer->progress >= 1.0 )    walk->flags |= ADDED_F_SEED_FLAG;
     }
 
     assert( ( walk - pex ) == peerCount );
@@ -1295,10 +1304,10 @@ tr_peerMgrTorrentStats( const tr_peerMgr * manager,
 
         ++setmePeersFrom[atom->from];
 
-        if( tr_peerIoGetRateToPeer( peer->io ) > 0.01 )
+        if( tr_rcRate( peer->rateToPeer ) > 0.01 )
             ++*setmePeersGettingFromUs;
 
-        if( tr_peerIoGetRateToClient( peer->io ) > 0.01 )
+        if( tr_rcRate( peer->rateToClient ) > 0.01 )
             ++*setmePeersSendingToUs;
     }
 
@@ -1335,8 +1344,8 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         stat->client           = peer->client;
         stat->progress         = peer->progress;
         stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
-        stat->uploadToRate     = tr_peerIoGetRateToPeer( peer->io );
-        stat->downloadFromRate = tr_peerIoGetRateToClient( peer->io );
+        stat->uploadToRate     = tr_rcRate( peer->rateToPeer );
+        stat->downloadFromRate = tr_rcRate( peer->rateToClient );
         stat->isDownloading    = stat->uploadToRate > 0.01;
         stat->isUploading      = stat->downloadFromRate > 0.01;
     }
@@ -1416,7 +1425,8 @@ rechokeLeech( Torrent * t )
         node->peer = peer;
         node->preferred = peer->peerIsInterested && !clientIsSnubbedBy(peer);
         node->randomKey = tr_rand( INT_MAX );
-        node->rate = tr_peerIoGetRateToClient( peer->io );
+        node->rate = (3*tr_rcRate(peer->rateToPeer))
+                   + (1*tr_rcRate(peer->rateToClient));
     }
 
     qsort( choke, size, sizeof(ChokeData), compareChoke );
@@ -1515,8 +1525,8 @@ getWeakConnections( Torrent * t, int * setmeSize )
         int isWeak;
         const int peerIsSeed = peer->progress >= 1.0;
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
-        const double throughput = (2*tr_peerIoGetRateToPeer( peer->io ))
-                                + tr_peerIoGetRateToClient( peer->io );
+        const double throughput = (3*tr_rcRate(peer->rateToPeer))
+                                + (1*tr_rcRate(peer->rateToClient));
 
         assert( atom != NULL );
 
@@ -1579,7 +1589,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* no need to connect if we're both seeds... */
-        if( seed && ( atom->flags & 2 ) ) {
+        if( seed && (atom->flags & ADDED_F_SEED_FLAG) ) {
             fprintf( stderr, "RECONNECT peer %d (%s) is a seed and so are we...\n", i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
         }

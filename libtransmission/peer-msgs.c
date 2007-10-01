@@ -488,8 +488,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     if( !tr_bitfieldHas( msgs->info->have, index ) )
         return TR_ADDREQ_MISSING;
 
-    maxSize = MIN( 2 + (int)(tr_peerIoGetRateToClient(msgs->io)/10), 100 );
-    //if( ( time(NULL) - msgs->lastReqAddedAt <= 5 ) && ( tr_list_size( msgs->clientAskedFor) >= maxSize ) )
+    maxSize = MIN( 3 + (int)(tr_rcRate(msgs->info->rateToClient)/10), 100 );
     if( tr_list_size( msgs->clientAskedFor) >= maxSize )
         return TR_ADDREQ_FULL;
 
@@ -965,6 +964,7 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
+    tr_rcTransferred( msgs->info->rateToClient, byteCount );
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
 }
@@ -975,6 +975,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->uploadedCur += byteCount;
+    tr_rcTransferred( msgs->info->rateToPeer, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
 }
