@@ -319,6 +319,7 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
         dbgmsg( msgs, "sending a %s message", (choke ? "CHOKE" : "UNCHOKE") );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
         tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, choke ? BT_CHOKE : BT_UNCHOKE );
+        msgs->info->chokeChangedAt = time( NULL );
     }
 }
 
@@ -563,8 +564,10 @@ sendLtepHandshake( tr_peermsgs * msgs )
 
     tr_peerIoWriteBuf( msgs->io, outbuf );
 
+#if 0
     dbgmsg( msgs, "here is the ltep handshake we sent:" );
     tr_bencPrint( &val );
+#endif
 
     /* cleanup */
     tr_bencFree( &val );
@@ -587,8 +590,10 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
         return;
     }
 
+#if 0
     dbgmsg( msgs, "here is the ltep handshake we read:" );
     tr_bencPrint( &val );
+#endif
 
     /* does the peer prefer encrypted connections? */
     sub = tr_bencDictFind( &val, "e" );
@@ -787,16 +792,20 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             firePeerProgress( msgs );
             break;
 
-        case BT_BITFIELD:
+        case BT_BITFIELD: {
+            const int clientIsSeed = tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
             dbgmsg( msgs, "w00t peer sent us a BT_BITFIELD" );
             assert( msglen == msgs->info->have->len );
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+            if( clientIsSeed && ( msgs->info->progress < 1.0 ) )
+                tr_peerMsgsSetChoke( msgs, FALSE );
             dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
             updateInterest( msgs );
             fireNeedReq( msgs );
             firePeerProgress( msgs );
             break;
+        }
 
         case BT_REQUEST: {
             struct peer_request * req;

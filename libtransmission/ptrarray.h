@@ -21,6 +21,7 @@ typedef struct tr_ptrArray tr_ptrArray;
 typedef void (*PtrArrayForeachFunc)(void *);
 
 tr_ptrArray * tr_ptrArrayNew     ( void );
+tr_ptrArray * tr_ptrArrayDup     ( tr_ptrArray* );
 void    tr_ptrArrayForeach       ( tr_ptrArray*, PtrArrayForeachFunc func );
 void    tr_ptrArrayFree          ( tr_ptrArray*, PtrArrayForeachFunc func );
 void*   tr_ptrArrayNth           ( tr_ptrArray*, int n );

@@ -450,12 +450,10 @@ tr_peerIoWriteBytes( tr_peerIo        * io,
     switch( io->encryptionMode )
     {
         case PEER_ENCRYPTION_NONE:
-            /*fprintf( stderr, "writing %d plaintext bytes to outbuf...\n", byteCount );*/
             evbuffer_add( outbuf, bytes, byteCount );
             break;
 
         case PEER_ENCRYPTION_RC4:
-            /*fprintf( stderr, "encrypting and writing %d bytes to outbuf...\n", byteCount );*/
             tmp = tr_new( uint8_t, byteCount );
             tr_cryptoEncrypt( io->crypto, byteCount, bytes, tmp );
             evbuffer_add( outbuf, tmp, byteCount );
@@ -504,12 +502,10 @@ tr_peerIoReadBytes( tr_peerIo        * io,
     switch( io->encryptionMode )
     {
         case PEER_ENCRYPTION_NONE:
-            /*fprintf( stderr, "reading %d plaintext bytes from inbuf...\n", byteCount );*/
             evbuffer_remove(  inbuf, bytes, byteCount );
             break;
 
         case PEER_ENCRYPTION_RC4:
-            /*fprintf( stderr, "reading AND DECRYPTING %d bytes from inbuf...\n", byteCount );*/
             evbuffer_remove(  inbuf, bytes, byteCount );
             tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
             break;
