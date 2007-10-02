@@ -171,20 +171,26 @@ tr_peerIoNewOutgoing( struct tr_handle      * handle,
                          tr_netOpenTCP( in_addr, port, 0 ) );
 }
 
-void
-tr_peerIoFree( tr_peerIo * c )
+static void
+io_dtor( void * vio )
 {
-    if( c != NULL )
+    tr_peerIo * io = vio;
+
+    bufferevent_free( io->bufev );
+    tr_netClose( io->socket );
+    tr_cryptoFree( io->crypto );
+    tr_free( io );
+}
+
+void
+tr_peerIoFree( tr_peerIo * io )
+{
+    if( io != NULL )
     {
-        c->canRead = NULL;
-        c->didWrite = NULL;
-        c->gotError = NULL;
-        bufferevent_free( c->bufev );
-        tr_netClose( c->socket );
-
-        tr_cryptoFree( c->crypto );
-
-        tr_free( c );
+        io->canRead = NULL;
+        io->didWrite = NULL;
+        io->gotError = NULL;
+        tr_runInEventThread( io->handle, io_dtor, io );
     }
 }
 

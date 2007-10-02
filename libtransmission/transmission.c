@@ -312,7 +312,7 @@ tr_closeImpl( void * vh )
 void
 tr_close( tr_handle * h )
 {
-    assert( tr_torrentCount( h ) == 0 );
+    //assert( tr_torrentCount( h ) == 0 );
 
     tr_runInEventThread( h, tr_closeImpl, h );
     while( !h->isClosed )
