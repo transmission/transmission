@@ -36,8 +36,6 @@ tr_peerMgr* tr_peerMgrNew( struct tr_handle * );
 
 void tr_peerMgrFree( tr_peerMgr * manager );
 
-int tr_peerMgrIsAcceptingConnections( const tr_peerMgr * manager );
-
 void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                             struct in_addr  * addr,
                             uint16_t          port,

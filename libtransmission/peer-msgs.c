@@ -108,7 +108,6 @@ struct tr_peermsgs
     tr_publisher_t * publisher;
 
     struct evbuffer * outMessages; /* buffer of all the non-piece messages */
-    struct evbuffer * outBlock;    /* the block we're currently sending */
     struct evbuffer * inBlock;     /* the block we're currently receiving */
     tr_list * peerAskedFor;
     tr_list * clientAskedFor;
@@ -1233,22 +1232,6 @@ pulse( void * vmsgs )
     if( !canWrite( msgs ) )
     {
     }
-#if 0
-    else if(( len = EVBUFFER_LENGTH( msgs->outBlock ) ))
-    {
-        while ( len && canUpload( msgs ) )
-        {
-            const size_t outlen = len; //MIN( len, 2048 );
-            tr_peerIoWrite( msgs->io, EVBUFFER_DATA(msgs->outBlock), outlen );
-            evbuffer_drain( msgs->outBlock, outlen );
-            peerGotBytes( msgs, outlen );
-            len -= outlen;
-            msgs->info->clientSentPieceDataAt = now;
-            msgs->clientSentAnythingAt = now;
-            dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
-        }
-    }
-#endif
     else if(( len = EVBUFFER_LENGTH( msgs->outMessages ) ))
     {
         tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
@@ -1258,25 +1241,25 @@ pulse( void * vmsgs )
     {
         if( canUpload( msgs ) )
         {
-            struct peer_request * req = tr_list_pop_front( &msgs->peerAskedFor );
-            uint8_t * tmp = tr_new( uint8_t, req->length );
-            const uint32_t msglen = sizeof(uint8_t) + 2*sizeof(uint32_t) + req->length;
+            struct peer_request * r = tr_list_pop_front( &msgs->peerAskedFor );
+            uint8_t * tmp = tr_new( uint8_t, r->length );
+            const uint32_t msglen = sizeof(uint8_t) + 2*sizeof(uint32_t) + r->length;
             struct evbuffer * out = evbuffer_new( );
-            assert( requestIsValid( msgs, req ) );
+            assert( requestIsValid( msgs, r ) );
 
             tr_peerIoWriteUint32( msgs->io, out, msglen );
             tr_peerIoWriteUint8 ( msgs->io, out, BT_PIECE );
-            tr_peerIoWriteUint32( msgs->io, out, req->index );
-            tr_peerIoWriteUint32( msgs->io, out, req->offset );
+            tr_peerIoWriteUint32( msgs->io, out, r->index );
+            tr_peerIoWriteUint32( msgs->io, out, r->offset );
             tr_peerIoWriteBuf( msgs->io, out );
 
-            tr_ioRead( msgs->torrent, req->index, req->offset, req->length, tmp );
-            tr_peerIoWrite( msgs->io, tmp, req->length );
-            peerGotBytes( msgs, req->length );
+            tr_ioRead( msgs->torrent, r->index, r->offset, r->length, tmp );
+            tr_peerIoWrite( msgs->io, tmp, r->length );
+            peerGotBytes( msgs, r->length );
 
-            dbgmsg( msgs, "putting req into out queue: index %d, offset %d, length %d ... %d blocks left in our queue", (int)req->index, (int)req->offset, (int)req->length, tr_list_size(msgs->peerAskedFor) );
+            dbgmsg( msgs, "putting req into out queue: index %d, offset %d, length %d ... %d blocks left in our queue", (int)r->index, (int)r->offset, (int)r->length, tr_list_size(msgs->peerAskedFor) );
 
-            tr_free( req );
+            tr_free( r );
             tr_free( tmp );
             evbuffer_free( out );
         }
@@ -1290,9 +1273,9 @@ pulse( void * vmsgs )
 }
 
 static void
-didWrite( struct bufferevent * evin UNUSED, void * vpeer )
+didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
 {
-    pulse( (tr_peermsgs *) vpeer );
+    pulse( vmsgs );
 }
 
 static void
@@ -1487,7 +1470,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
     msgs->pulseTimer = tr_timerNew( msgs->handle, pulse, msgs, PEER_PULSE_INTERVAL );
     msgs->pexTimer = tr_timerNew( msgs->handle, pexPulse, msgs, PEX_INTERVAL );
     msgs->outMessages = evbuffer_new( );
-    msgs->outBlock = evbuffer_new( );
     msgs->inBlock = evbuffer_new( );
     msgs->peerAllowedPieces = NULL;
     msgs->clientAllowedPieces = NULL;
@@ -1560,7 +1542,6 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         tr_list_free( &msgs->clientAskedFor, tr_free );
         tr_list_free( &msgs->peerAskedFor, tr_free );
         evbuffer_free( msgs->outMessages );
-        evbuffer_free( msgs->outBlock );
         evbuffer_free( msgs->inBlock );
         tr_free( msgs->pex );
         msgs->pexCount = 0;

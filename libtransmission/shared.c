@@ -267,7 +267,7 @@ AcceptPeers( tr_shared * s )
         uint16_t port;
         struct in_addr addr;
 
-        if( s->bindSocket < 0 || !tr_peerMgrIsAcceptingConnections( s->h->peerMgr ) )
+        if( s->bindSocket < 0 )
             break;
 
         socket = tr_netAccept( s->bindSocket, &addr, &port );
