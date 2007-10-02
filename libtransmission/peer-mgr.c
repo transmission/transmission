@@ -16,6 +16,7 @@
 #include <stdio.h> /* printf */
 #include <limits.h> /* INT_MAX */
 
+#include <sys/types.h> /* event.h needs this */
 #include <event.h>
 
 #include "transmission.h"
