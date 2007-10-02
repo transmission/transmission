@@ -797,7 +797,11 @@ readCryptoProvide( tr_handshake * handshake, struct evbuffer * inbuf )
     uint8_t obfuscatedTorrentHash[SHA_DIGEST_LENGTH];
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
-    const size_t needlen = SHA_DIGEST_LENGTH + VC_LENGTH + sizeof(crypto_provide) + sizeof(padc_len);
+    const size_t needlen = SHA_DIGEST_LENGTH /* HASH('req1',s) */
+                         + SHA_DIGEST_LENGTH /* HASH('req2', SKEY) xor HASH('req3', S) */
+                         + VC_LENGTH
+                         + sizeof(crypto_provide)
+                         + sizeof(padc_len);
     tr_torrent * tor = NULL;
 
     if( EVBUFFER_LENGTH(inbuf) < needlen )
