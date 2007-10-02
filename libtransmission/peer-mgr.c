@@ -520,14 +520,14 @@ tr_peerMgrFree( tr_peerMgr * manager )
 {
     managerLock( manager );
 
-    /* free the torrents. */
-    tr_ptrArrayFree( manager->torrents, (PtrArrayForeachFunc)torrentDestructor );
-
     /* free the handshakes.  Abort invokes handshakeDoneCB(), which removes
      * the item from manager->handshakes, so this is a little roundabout... */
     while( !tr_ptrArrayEmpty( manager->incomingHandshakes ) )
         tr_handshakeAbort( tr_ptrArrayNth( manager->incomingHandshakes, 0 ) );
     tr_ptrArrayFree( manager->incomingHandshakes, NULL );
+
+    /* free the torrents. */
+    tr_ptrArrayFree( manager->torrents, (PtrArrayForeachFunc)torrentDestructor );
 
     managerUnlock( manager );
     tr_free( manager );
@@ -1466,7 +1466,7 @@ struct tr_connection
     double throughput;
 };
 
-#define LAISSEZ_FAIRE_PERIOD_SECS 60
+#define LAISSEZ_FAIRE_PERIOD_SECS 90
 
 static int
 compareConnections( const void * va, const void * vb )
@@ -1500,16 +1500,23 @@ getWeakConnections( Torrent * t, int * setmeSize )
 
         assert( atom != NULL );
 
-        if( peer->doPurge )
+        if( throughput >= 3 )
+            isWeak = FALSE;
+        else if( peer->doPurge )
             isWeak = TRUE;
-        if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) ) /* pex time */
+        else if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) ) /* pex time */
             isWeak = TRUE;
         else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
             isWeak = FALSE;
-        else if( throughput >= 5 )
-            isWeak = FALSE;
+#if 0
         else
             isWeak = TRUE;
+#else
+        else if( now - peer->pieceDataActivityDate > 180 )
+            isWeak = TRUE;
+        else
+            isWeak = FALSE;
+#endif
 
         if( isWeak )
         {
@@ -1603,7 +1610,7 @@ reconnectPulse( void * vtorrent )
                      tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
 
         /* disconnect some peers */
-        for( i=0; i<nConnections && i<(peerCount-5); ++i ) {
+        for( i=0; i<nConnections && i<(peerCount-5) && i<MAX_RECONNECTIONS_PER_PULSE; ++i ) {
             const double throughput = connections[i].throughput;
             tr_peer * peer = connections[i].peer;
             tordbg( t, "RECONNECT culling peer %s, whose throughput was %f\n",
