@@ -402,26 +402,6 @@ torrentDestructor( Torrent * t )
     tr_free( t );
 }
 
-static int reconnectPulse( void * vtorrent );
-
-static void
-restartReconnectTimer( Torrent * t )
-{
-    tr_timerFree( &t->reconnectTimer );
-    if( t->isRunning )
-        t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
-}
-
-static int rechokePulse( void * vtorrent );
-
-static void
-restartChokeTimer( Torrent * t )
-{
-    tr_timerFree( &t->rechokeTimer );
-    if( t->isRunning )
-        t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
-}
-
 static Torrent*
 torrentConstructor( tr_peerMgr * manager, tr_torrent * tor )
 {
@@ -434,8 +414,6 @@ torrentConstructor( tr_peerMgr * manager, tr_torrent * tor )
     t->peers = tr_ptrArrayNew( );
     t->outgoingHandshakes = tr_ptrArrayNew( );
     t->requested = tr_bitfieldNew( tor->blockCount );
-    restartChokeTimer( t );
-    restartReconnectTimer( t );
     memcpy( t->hash, tor->info.hash, SHA_DIGEST_LENGTH );
 
     return t;
@@ -1095,6 +1073,9 @@ tr_peerMgrGetPeers( tr_peerMgr      * manager,
     return peerCount;
 }
 
+static int reconnectPulse( void * vtorrent );
+static int rechokePulse( void * vtorrent );
+
 void
 tr_peerMgrStartTorrent( tr_peerMgr     * manager,
                         const uint8_t  * torrentHash )
@@ -1104,9 +1085,15 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
     managerLock( manager );
 
     t = getExistingTorrent( manager, torrentHash );
+
+    assert( t != NULL );
+    assert( !t->isRunning );
+    assert( t->reconnectTimer == NULL );
+    assert( t->rechokeTimer == NULL );
+
     t->isRunning = 1;
-    restartChokeTimer( t );
-    restartReconnectTimer( t );
+    t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
+    t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
 
     managerUnlock( manager );
 }
@@ -1504,19 +1491,12 @@ getWeakConnections( Torrent * t, int * setmeSize )
             isWeak = FALSE;
         else if( peer->doPurge )
             isWeak = TRUE;
-        else if( peerIsSeed && clientIsSeed && (now-atom->time >= 30) ) /* pex time */
-            isWeak = TRUE;
+        else if( peerIsSeed && clientIsSeed )
+            isWeak = t->tor->pexDisabled || (now-atom->time>=30);
         else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
             isWeak = FALSE;
-#if 0
         else
-            isWeak = TRUE;
-#else
-        else if( now - peer->pieceDataActivityDate > 180 )
-            isWeak = TRUE;
-        else
-            isWeak = FALSE;
-#endif
+            isWeak = now - peer->pieceDataActivityDate > 180;
 
         if( isWeak )
         {
@@ -1597,26 +1577,21 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nConnections, nAdd;
+        int i, nCandidates, nWeak, nAdd;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
-        struct tr_connection * connections = getWeakConnections( t, &nConnections );
+        struct tr_connection * connections = getWeakConnections( t, &nWeak );
         const int peerCount = tr_ptrArraySize( t->peers );
 
         tordbg( t, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d\n",
-                 t->tor->info.name, nConnections, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
+                 t->tor->info.name, nWeak, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
 
-        for( i=0; i<nConnections; ++i )
+        for( i=0; i<nWeak; ++i )
             tordbg( t, "connection #%d: %s @ %.2f\n", i+1,
                      tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
 
         /* disconnect some peers */
-        for( i=0; i<nConnections && i<(peerCount-5) && i<MAX_RECONNECTIONS_PER_PULSE; ++i ) {
-            const double throughput = connections[i].throughput;
-            tr_peer * peer = connections[i].peer;
-            tordbg( t, "RECONNECT culling peer %s, whose throughput was %f\n",
-                       tr_peerIoAddrStr(&peer->in_addr, peer->port), throughput );
-            removePeer( t, peer );
-        }
+        for( i=0; i<nWeak; ++i )
+            removePeer( t, connections[i].peer );
 
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
