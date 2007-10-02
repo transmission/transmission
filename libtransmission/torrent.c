@@ -904,8 +904,12 @@ tr_torrentPeers( const tr_torrent * tor, int * peerCount )
                                 tor->info.hash, peerCount );
 }
 
-void tr_torrentPeersFree( tr_peer_stat * peers, int peerCount UNUSED )
+void
+tr_torrentPeersFree( tr_peer_stat * peers, int peerCount )
 {
+    int i;
+    for( i=0; i<peerCount; ++i )
+        tr_free( (char*) peers[i].client );
     tr_free( peers );
 }
 

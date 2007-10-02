@@ -1320,7 +1320,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
         stat->port             = peer->port;
         stat->from             = atom->from;
-        stat->client           = peer->client;
+        stat->client           = tr_strdup( peer->client ? peer->client : "" );
         stat->progress         = peer->progress;
         stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
         stat->uploadToRate     = tr_rcRate( peer->rateToPeer );
