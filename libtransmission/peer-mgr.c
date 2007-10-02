@@ -812,11 +812,13 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
         case TR_PEERMSG_PEER_PROGRESS: {
             struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
             const int peerIsSeed = e->progress >= 1.0;
-            if( peerIsSeed )
+            if( peerIsSeed ) {
+                tordbg( t, "marking peer %s as a seed", tr_peerIoAddrStr(&atom->addr,atom->port) );
                 atom->flags |= ADDED_F_SEED_FLAG;
-            else
+            } else {
+                tordbg( t, "marking peer %s as a non-seed", tr_peerIoAddrStr(&atom->addr,atom->port) );
                 atom->flags &= ~ADDED_F_SEED_FLAG;
-            break;
+            } break;
         }
 
         case TR_PEERMSG_CLIENT_BLOCK:
@@ -1455,16 +1457,6 @@ struct tr_connection
 
 #define LAISSEZ_FAIRE_PERIOD_SECS 90
 
-static int
-compareConnections( const void * va, const void * vb )
-{
-    const struct tr_connection * a = va;
-    const struct tr_connection * b = vb;
-    if( a->throughput < b->throughput ) return -1;
-    if( a->throughput > b->throughput ) return 1;
-    return 0;
-}
-
 static struct tr_connection *
 getWeakConnections( Torrent * t, int * setmeSize )
 {
@@ -1480,8 +1472,8 @@ getWeakConnections( Torrent * t, int * setmeSize )
     {
         tr_peer * peer = peers[i];
         int isWeak;
-        const int peerIsSeed = peer->progress >= 1.0;
         const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
         const double throughput = (3*tr_rcRate(peer->rateToPeer))
                                 + (1*tr_rcRate(peer->rateToClient));
 
@@ -1506,7 +1498,6 @@ getWeakConnections( Torrent * t, int * setmeSize )
         }
     }
 
-    qsort( ret, outsize, sizeof(struct tr_connection), compareConnections );
     *setmeSize = outsize;
     return ret;
 }
@@ -1540,19 +1531,22 @@ getPeerCandidates( Torrent * t, int * setmeSize )
 
         /* we don't need two connections to the same peer... */
         if( peerIsInUse( t, &atom->addr ) ) {
-            tordbg( t, "RECONNECT peer %d (%s) is in use...\n", i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+            tordbg( t, "RECONNECT peer %d (%s) is in use..",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
         }
 
         /* no need to connect if we're both seeds... */
         if( seed && (atom->flags & ADDED_F_SEED_FLAG) ) {
-            tordbg( t, "RECONNECT peer %d (%s) is a seed and so are we...\n", i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+            tordbg( t, "RECONNECT peer %d (%s) is a seed and so are we..",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
         }
 
         /* if we used this peer recently, give someone else a turn */
-        if( ( now - atom->time ) <  LAISSEZ_FAIRE_PERIOD_SECS ) {
-            tordbg( t, "RECONNECT peer %d (%s) is in its grace period...\n", i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+        if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) {
+            tordbg( t, "RECONNECT peer %d (%s) is in its grace period..",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
         }
 

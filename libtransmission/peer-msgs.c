@@ -798,8 +798,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             assert( msglen == msgs->info->have->len );
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
-            if( clientIsSeed && ( msgs->info->progress < 1.0 ) )
-                tr_peerMsgsSetChoke( msgs, FALSE );
+            tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
             dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
             updateInterest( msgs );
             fireNeedReq( msgs );
