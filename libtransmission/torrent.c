@@ -1044,10 +1044,10 @@ freeWhenStopped( void * vtor )
     return FALSE;
 }
 
-static void
-tr_torrentStopImpl( void * vtor )
+void
+tr_torrentStop( tr_torrent * tor )
 {
-    tr_torrent * tor = vtor;
+    tr_globalLock( tor->handle );
 
     switch( tor->runStatus )
     {
@@ -1069,21 +1069,21 @@ tr_torrentStopImpl( void * vtor )
         case TR_RUN_STOPPED:
             break;
     }
-}
 
-void
-tr_torrentStop( tr_torrent * tor )
-{
-    tr_torrentStopImpl( tor );
+    tr_globalUnlock( tor->handle );
 }
 
 void
 tr_torrentClose( tr_torrent * tor )
 {
+    tr_globalLock( tor->handle );
+
     tor->runStatusToSave = tor->runStatus;
     tor->runStatusToSaveIsSet = TRUE;
     tr_torrentStop( tor );
     tr_timerNew( tor->handle, freeWhenStopped, tor, 250 );
+
+    tr_globalUnlock( tor->handle );
 }
 
 /**
