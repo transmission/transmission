@@ -1432,20 +1432,14 @@ rechokePulse( void * vtorrent )
 ****
 ***/
 
-struct tr_connection
-{
-    tr_peer * peer;
-    double throughput;
-};
-
 #define LAISSEZ_FAIRE_PERIOD_SECS 90
 
-static struct tr_connection *
+static tr_peer **
 getWeakConnections( Torrent * t, int * setmeSize )
 {
     int i, insize, outsize;
     tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &insize );
-    struct tr_connection * ret = tr_new( struct tr_connection, insize );
+    struct tr_peer ** ret = tr_new( tr_peer*, insize );
     const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
     const time_t now = time( NULL );
 
@@ -1474,11 +1468,7 @@ getWeakConnections( Torrent * t, int * setmeSize )
             isWeak = ( now - peer->pieceDataActivityDate ) > 180;
 
         if( isWeak )
-        {
-            ret[outsize].peer = peer;
-            ret[outsize].throughput = throughput;
-            ++outsize;
-        }
+            ret[outsize++] = peer;
     }
 
     *setmeSize = outsize;
@@ -1556,19 +1546,15 @@ reconnectPulse( void * vtorrent )
     {
         int i, nCandidates, nWeak, nAdd;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
-        struct tr_connection * connections = getWeakConnections( t, &nWeak );
+        struct tr_peer ** connections = getWeakConnections( t, &nWeak );
         const int peerCount = tr_ptrArraySize( t->peers );
 
         tordbg( t, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d",
                  t->tor->info.name, nWeak, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
 
-        for( i=0; i<nWeak; ++i )
-            tordbg( t, "connection #%d: %s @ %.2f", i+1,
-                     tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
-
         /* disconnect some peers */
         for( i=0; i<nWeak; ++i )
-            removePeer( t, connections[i].peer );
+            removePeer( t, connections[i] );
 
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
