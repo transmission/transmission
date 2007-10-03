@@ -1089,13 +1089,15 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
     t = getExistingTorrent( manager, torrentHash );
 
     assert( t != NULL );
-    assert( !t->isRunning );
-    assert( t->reconnectTimer == NULL );
-    assert( t->rechokeTimer == NULL );
+    assert( ( t->isRunning != 0 ) == ( t->reconnectTimer != NULL ) );
+    assert( ( t->isRunning != 0 ) == ( t->rechokeTimer != NULL ) );
 
-    t->isRunning = 1;
-    t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
-    t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+    if( !t->isRunning )
+    {
+        t->isRunning = 1;
+        t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
+        t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+    }
 
     managerUnlock( manager );
 }
