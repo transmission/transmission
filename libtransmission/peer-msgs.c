@@ -1459,86 +1459,91 @@ pexPulse( void * vpeer )
 **/
 
 tr_peermsgs*
-tr_peerMsgsNew( struct tr_torrent * torrent, struct tr_peer * info )
+tr_peerMsgsNew( struct tr_torrent * torrent,
+                struct tr_peer    * info,
+                tr_delivery_func    func,
+                void              * userData,
+                tr_publisher_tag  * setme )
 {
-    tr_peermsgs * msgs;
+    tr_peermsgs * m;
 
     assert( info != NULL );
     assert( info->io != NULL );
 
-    msgs = tr_new0( tr_peermsgs, 1 );
-    msgs->publisher = tr_publisherNew( );
-    msgs->info = info;
-    msgs->handle = torrent->handle;
-    msgs->torrent = torrent;
-    msgs->io = info->io;
-    msgs->info->clientIsChoked = 1;
-    msgs->info->peerIsChoked = 1;
-    msgs->info->clientIsInterested = 0;
-    msgs->info->peerIsInterested = 0;
-    msgs->info->have = tr_bitfieldNew( torrent->info.pieceCount );
-    msgs->pulseTimer = tr_timerNew( msgs->handle, pulse, msgs, PEER_PULSE_INTERVAL );
-    msgs->pexTimer = tr_timerNew( msgs->handle, pexPulse, msgs, PEX_INTERVAL );
-    msgs->outMessages = evbuffer_new( );
-    msgs->inBlock = evbuffer_new( );
-    msgs->peerAllowedPieces = NULL;
-    msgs->clientAllowedPieces = NULL;
+    m = tr_new0( tr_peermsgs, 1 );
+    m->publisher = tr_publisherNew( );
+    m->info = info;
+    m->handle = torrent->handle;
+    m->torrent = torrent;
+    m->io = info->io;
+    m->info->clientIsChoked = 1;
+    m->info->peerIsChoked = 1;
+    m->info->clientIsInterested = 0;
+    m->info->peerIsInterested = 0;
+    m->info->have = tr_bitfieldNew( torrent->info.pieceCount );
+    m->pulseTimer = tr_timerNew( m->handle, pulse, m, PEER_PULSE_INTERVAL );
+    m->pexTimer = tr_timerNew( m->handle, pexPulse, m, PEX_INTERVAL );
+    m->outMessages = evbuffer_new( );
+    m->inBlock = evbuffer_new( );
+    m->peerAllowedPieces = NULL;
+    m->clientAllowedPieces = NULL;
+    setme = tr_publisherSubscribe( m->publisher, func, userData );
     
-    if ( tr_peerIoSupportsFEXT( msgs->io ) )
+    if ( tr_peerIoSupportsFEXT( m->io ) )
     {
         /* This peer is fastpeer-enabled, generate its allowed set
          * (before registering our callbacks) */
-        if ( !msgs->peerAllowedPieces ) {
-            const struct in_addr *peerAddr = tr_peerIoGetAddress( msgs->io, NULL );
+        if ( !m->peerAllowedPieces ) {
+            const struct in_addr *peerAddr = tr_peerIoGetAddress( m->io, NULL );
             
-            msgs->peerAllowedPieces = tr_peerMgrGenerateAllowedSet( MAX_ALLOWED_SET_COUNT,
-                                                                    msgs->torrent->info.pieceCount,
-                                                                    msgs->torrent->info.hash,
-                                                                    peerAddr );
+            m->peerAllowedPieces = tr_peerMgrGenerateAllowedSet( MAX_ALLOWED_SET_COUNT,
+                                                                 m->torrent->info.pieceCount,
+                                                                 m->torrent->info.hash,
+                                                                 peerAddr );
         }
-        msgs->clientAllowedPieces = tr_bitfieldNew( msgs->torrent->info.pieceCount );
+        m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     }
     
-    tr_peerIoSetIOFuncs( msgs->io, canRead, didWrite, gotError, msgs );
-    tr_peerIoSetIOMode( msgs->io, EV_READ|EV_WRITE, 0 );
+    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
+    tr_peerIoSetIOMode( m->io, EV_READ|EV_WRITE, 0 );
 
     /**
     ***  If we initiated this connection,
     ***  we may need to send LTEP/AZMP handshakes.
     ***  Otherwise we'll wait for the peer to send theirs first.
     **/
-    if( !tr_peerIoIsIncoming( msgs->io ) )
+    if( !tr_peerIoIsIncoming( m->io ) )
     {
-        if ( tr_peerIoSupportsLTEP( msgs->io ) ) {
-            sendLtepHandshake( msgs );
+        if ( tr_peerIoSupportsLTEP( m->io ) ) {
+            sendLtepHandshake( m );
             
-        } else if ( tr_peerIoSupportsAZMP( msgs->io ) ) {
-            dbgmsg( msgs, "FIXME: need to send AZMP handshake" );
+        } else if ( tr_peerIoSupportsAZMP( m->io ) ) {
+            dbgmsg( m, "FIXME: need to send AZMP handshake" );
             
         } else {
             /* no-op */
         }
     }
     
-    if ( tr_peerIoSupportsFEXT( msgs->io ) )
+    if ( tr_peerIoSupportsFEXT( m->io ) )
     {
         /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
-        float completion = tr_cpPercentComplete( msgs->torrent->completion );
+        float completion = tr_cpPercentComplete( m->torrent->completion );
         if ( completion == 0.0f ) {
-            sendFastHave( msgs, 0 );
+            sendFastHave( m, 0 );
         } else if ( completion == 1.0f ) {
-            sendFastHave( msgs, 1 );
+            sendFastHave( m, 1 );
         } else {
-            sendBitfield( msgs );
+            sendBitfield( m );
         }
-        uint32_t peerProgress = msgs->torrent->info.pieceCount * msgs->info->progress;
+        uint32_t peerProgress = m->torrent->info.pieceCount * m->info->progress;
         
         if ( peerProgress < MAX_ALLOWED_SET_COUNT )
-            sendFastAllowedSet( msgs );
+            sendFastAllowedSet( m );
     } else {
-        sendBitfield( msgs );
+        sendBitfield( m );
     }
-    return msgs;
+    return m;
 }
 
 void

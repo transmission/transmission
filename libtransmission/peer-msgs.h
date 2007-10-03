@@ -23,7 +23,11 @@ struct tr_bitfield;
 typedef struct tr_peermsgs tr_peermsgs;
 
 tr_peermsgs* tr_peerMsgsNew( struct tr_torrent  * torrent,
-                             struct tr_peer     * peer );
+                             struct tr_peer     * peer,
+                             tr_delivery_func     func,
+                             void               * user,
+                             tr_publisher_tag   * setme );
+
 
 void         tr_peerMsgsSetChoke( tr_peermsgs *, int doChoke );
 

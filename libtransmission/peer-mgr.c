@@ -918,10 +918,9 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         } else {
             peer->port = port;
             peer->io = io;
-            peer->msgs = tr_peerMsgsNew( t->tor, peer );
+            peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );
             tr_free( peer->client );
             peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
-            peer->msgsTag = tr_peerMsgsSubscribe( peer->msgs, msgsCallbackFunc, t );
         }
     }
 
@@ -1578,11 +1577,11 @@ reconnectPulse( void * vtorrent )
         struct tr_connection * connections = getWeakConnections( t, &nWeak );
         const int peerCount = tr_ptrArraySize( t->peers );
 
-        tordbg( t, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d\n",
+        tordbg( t, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d",
                  t->tor->info.name, nWeak, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
 
         for( i=0; i<nWeak; ++i )
-            tordbg( t, "connection #%d: %s @ %.2f\n", i+1,
+            tordbg( t, "connection #%d: %s @ %.2f", i+1,
                      tr_peerIoAddrStr( &connections[i].peer->in_addr, connections[i].peer->port ), connections[i].throughput );
 
         /* disconnect some peers */
