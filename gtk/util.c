@@ -135,29 +135,34 @@ ratiostr(guint64 down, guint64 up) {
 }
 
 gboolean
-mkdir_p(const char *name, mode_t mode) {
-  struct stat sb;
-  char *parent;
-  gboolean ret;
-  int oerrno;
+mkdir_p(const char *name, mode_t mode)
+{
+#if GLIB_CHECK_VERSION(2,8,0)
+    return !g_mkdir_with_parents( name, mode );
+#else
+    struct stat sb;
+    char *parent;
+    gboolean ret;
+    int oerrno;
 
-  if(0 != stat(name, &sb)) {
-    if(ENOENT != errno)
+    if(0 != stat(name, &sb)) {
+      if(ENOENT != errno)
+        return FALSE;
+      parent = g_path_get_dirname(name);
+      ret = mkdir_p(parent, mode);
+      oerrno = errno;
+      g_free(parent);
+      errno = oerrno;
+      return (ret ? (0 == mkdir(name, mode)) : FALSE);
+    }
+
+    if(!S_ISDIR(sb.st_mode)) {
+      errno = ENOTDIR;
       return FALSE;
-    parent = g_path_get_dirname(name);
-    ret = mkdir_p(parent, mode);
-    oerrno = errno;
-    g_free(parent);
-    errno = oerrno;
-    return (ret ? (0 == mkdir(name, mode)) : FALSE);
-  }
+    }
 
-  if(!S_ISDIR(sb.st_mode)) {
-    errno = ENOTDIR;
-    return FALSE;
-  }
-
-  return TRUE;
+    return TRUE;
+#endif
 }
 
 GList *

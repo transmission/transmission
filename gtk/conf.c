@@ -46,16 +46,11 @@
 #define CONF_SUBDIR             "gtk"
 #define FILE_LOCK               "lock"
 #define FILE_SOCKET             "socket"
-#define FILE_PREFS              "prefs"
-#define FILE_PREFS_TMP          "prefs.tmp"
 #define FILE_STATE              "state"
 #define FILE_STATE_TMP          "state.tmp"
 #define OLD_FILE_LOCK           "gtk_lock" /* remove this after next release */
-#define OLD_FILE_PREFS          "gtk_prefs"
 #define OLD_FILE_STATE          "gtk_state"
-#define PREF_SEP_KEYVAL         '\t'
 #define PREF_SEP_LINE           '\n'
-#define STATE_SEP               '\n'
 
 static int
 lockfile(const char *file, char **errstr);
@@ -212,8 +207,7 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
 
  done:
   g_free (path);
-  if(NULL != err)
-    g_error_free(err);
+  g_clear_error( &err );
   if(NULL != io)  
     g_io_channel_unref(io);
   return ret;
@@ -223,7 +217,7 @@ cf_readfile(const char *file, const char *oldfile, gsize *len,
 ***  Prefs Files
 **/
 
-#define DEFAULT_GROUP "general"
+#define GROUP "general"
 
 static char*
 getPrefsFilename( void )
@@ -251,51 +245,51 @@ getPrefsKeyFile( void )
 int
 pref_int_get( const char * key )
 {
-    return g_key_file_get_integer( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+    return g_key_file_get_integer( getPrefsKeyFile( ), GROUP, key, NULL );
 }
 void
 pref_int_set( const char * key, int value )
 {
-    g_key_file_set_integer( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+    g_key_file_set_integer( getPrefsKeyFile( ), GROUP, key, value );
 }
 void
 pref_int_set_default( const char * key, int value )
 {
-    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+    if( !g_key_file_has_key( getPrefsKeyFile( ), GROUP, key, NULL ) )
         pref_int_set( key, value );
 }
 
 gboolean
 pref_flag_get ( const char * key )
 {
-    return g_key_file_get_boolean( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+    return g_key_file_get_boolean( getPrefsKeyFile( ), GROUP, key, NULL );
 }
 void
 pref_flag_set( const char * key, gboolean value )
 {
-    g_key_file_set_boolean( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+    g_key_file_set_boolean( getPrefsKeyFile( ), GROUP, key, value );
 }
 void
 pref_flag_set_default( const char * key, gboolean value )
 {
-    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+    if( !g_key_file_has_key( getPrefsKeyFile( ), GROUP, key, NULL ) )
         pref_flag_set( key, value );
 }
 
 char*
 pref_string_get( const char * key )
 {
-    return g_key_file_get_string( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL );
+    return g_key_file_get_string( getPrefsKeyFile( ), GROUP, key, NULL );
 }
 void
 pref_string_set( const char * key, const char * value )
 {
-    g_key_file_set_string( getPrefsKeyFile( ), DEFAULT_GROUP, key, value );
+    g_key_file_set_string( getPrefsKeyFile( ), GROUP, key, value );
 }
 void
 pref_string_set_default( const char * key, const char * value )
 {
-    if( !g_key_file_has_key( getPrefsKeyFile( ), DEFAULT_GROUP, key, NULL ) )
+    if( !g_key_file_has_key( getPrefsKeyFile( ), GROUP, key, NULL ) )
         pref_string_set( key, value );
 }
 

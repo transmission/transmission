@@ -31,17 +31,17 @@
 
 int       pref_int_get            ( const char * key );
 void      pref_int_set            ( const char * key, int value );
-void      pref_int_set_default    ( const char * key, int default_value );
+void      pref_int_set_default    ( const char * key, int value );
 
-gboolean  pref_flag_get            ( const char * key );
-void      pref_flag_set            ( const char * key, gboolean value );
-void      pref_flag_set_default    ( const char * key, gboolean default_value );
+gboolean  pref_flag_get           ( const char * key );
+void      pref_flag_set           ( const char * key, gboolean value );
+void      pref_flag_set_default   ( const char * key, gboolean value );
 
-char*     pref_string_get          ( const char * key );
-void      pref_string_set          ( const char * key, const char * value );
-void      pref_string_set_default  ( const char * key, const char * default_value );
+char*     pref_string_get         ( const char * key );
+void      pref_string_set         ( const char * key, const char * value );
+void      pref_string_set_default ( const char * key, const char * value );
 
-void      pref_save                ( char **errstr );
+void      pref_save               ( char **errstr );
 
 /**
 ***
