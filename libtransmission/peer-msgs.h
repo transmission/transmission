@@ -10,8 +10,8 @@
  * $Id$
  */
 
-#ifndef TR_P_H
-#define TR_P_H
+#ifndef TR_PEER_MSGS_H
+#define TR_PEER_MSGS_H
 
 #include <inttypes.h>
 #include "publish.h"

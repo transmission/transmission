@@ -145,7 +145,9 @@ struct tr_peermsgs
 **/
 
 static void
-myDebug( const char * file, int line, const struct tr_peermsgs * msgs, const char * fmt, ... )
+myDebug( const char * file, int line,
+         const struct tr_peermsgs * msgs,
+         const char * fmt, ... )
 {
     FILE * fp = tr_getLog( );
     if( fp != NULL )
@@ -232,23 +234,24 @@ isPieceInteresting( const tr_peermsgs   * peer,
     const tr_torrent * torrent = peer->torrent;
     if( torrent->info.pieces[piece].dnd ) /* we don't want it */
         return FALSE;
-    if( tr_cpPieceIsComplete( torrent->completion, piece ) ) /* we already have it */
+    if( tr_cpPieceIsComplete( torrent->completion, piece ) ) /* we have it */
         return FALSE;
     if( !tr_bitfieldHas( peer->info->have, piece ) ) /* peer doesn't have it */
         return FALSE;
-    if( tr_bitfieldHas( peer->info->banned, piece ) ) /* peer is banned for it */
+    if( tr_bitfieldHas( peer->info->banned, piece ) ) /* peer is banned */
         return FALSE;
     return TRUE;
 }
 
-/* "interested" means we'll ask for piece data from the peer if they unchoke us */
+/* "interested" means we'll ask for piece data if they unchoke us */
 static int
 isPeerInteresting( const tr_peermsgs * msgs )
 {
     int i;
     const tr_torrent * torrent;
     const tr_bitfield * bitfield;
-    const int clientIsSeed = tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
+    const int clientIsSeed =
+        tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
 
     if( clientIsSeed )
         return FALSE;
@@ -256,7 +259,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
     torrent = msgs->torrent;
     bitfield = tr_cpPieceBitfield( torrent->completion );
 
-    if( !msgs->info->have ) /* We don't know what this peer has... what should this be? */
+    if( !msgs->info->have )
         return TRUE;
 
     assert( bitfield->len == msgs->info->have->len );
@@ -274,10 +277,12 @@ sendInterest( tr_peermsgs * msgs, int weAreInterested )
     assert( weAreInterested==0 || weAreInterested==1 );
 
     msgs->info->clientIsInterested = weAreInterested;
-    dbgmsg( msgs, ": sending an %s message", (weAreInterested ? "INTERESTED" : "NOT_INTERESTED") );
+    dbgmsg( msgs, ": sending an %s message",
+            weAreInterested ? "INTERESTED" : "NOT_INTERESTED");
 
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
-    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
+    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages,
+                   weAreInterested ? BT_INTERESTED : BT_NOT_INTERESTED );
 }
 
 static void
@@ -306,7 +311,7 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
             for( walk = msgs->peerAskedFor; walk != NULL; )
             {
                 tr_list * next = walk->next;
-                /* We shouldn't reject a peer's fast allowed requests at choke */
+                /* don't reject a peer's fast allowed requests at choke */
                 struct peer_request *req = walk->data;
                 if ( !tr_bitfieldHas( msgs->peerAllowedPieces, req->index ) )
                 {
@@ -318,7 +323,8 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 
         dbgmsg( msgs, "sending a %s message", (choke ? "CHOKE" : "UNCHOKE") );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) );
-        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, choke ? BT_CHOKE : BT_UNCHOKE );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages,
+                                             choke ? BT_CHOKE : BT_UNCHOKE );
         msgs->info->chokeChangedAt = time( NULL );
     }
 }
@@ -366,7 +372,8 @@ tr_peerMsgsHave( tr_peermsgs * msgs,
 {
     dbgmsg( msgs, "w00t telling them we HAVE piece #%d", pieceIndex );
 
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + sizeof(uint32_t) );
+    tr_peerIoWriteUint32( msgs->io, msgs->outMessages,
+                               sizeof(uint8_t) + sizeof(uint32_t) );
     tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_HAVE );
     tr_peerIoWriteUint32( msgs->io, msgs->outMessages, pieceIndex );
 
@@ -613,20 +620,6 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
         }
     }
 
-#if 0
-    /* get peer's client name */
-    sub = tr_bencDictFind( &val, "v" );
-    if( tr_bencIsStr( sub ) ) {
-        int i;
-        tr_free( msgs->info->client );
-        fprintf( stderr, "dictionary says client is [%s]\n", sub->val.s.s );
-        msgs->info->client = tr_strndup( sub->val.s.s, sub->val.s.i );
-for( i=0; i<sub->val.s.i; ++i ) { fprintf( stderr, "[%c] (%d)\n", sub->val.s.s[i], (int)sub->val.s.s[i] );
-                                  if( (int)msgs->info->client[i]==-75 ) msgs->info->client[i]='u'; }
-        fprintf( stderr, "msgs->client is now [%s]\n", msgs->info->client );
-    }
-#endif
-
     /* get peer's listening port */
     sub = tr_bencDictFind( &val, "p" );
     if( tr_bencIsInt( sub ) ) {
@@ -723,6 +716,15 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
     return READ_AGAIN;
 }
 
+static void
+updatePeerProgress( tr_peermsgs * msgs )
+{
+    msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+    dbgmsg( msgs, "peer progress is %f", msgs->info->progress );
+    updateInterest( msgs );
+    firePeerProgress( msgs );
+}
+
 static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 {
@@ -786,10 +788,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             assert( msglen == 4 );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             tr_bitfieldAdd( msgs->info->have, ui32 );
-            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
-            dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
-            updateInterest( msgs );
-            firePeerProgress( msgs );
+            updatePeerProgress( msgs );
             break;
 
         case BT_BITFIELD: {
@@ -797,12 +796,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             dbgmsg( msgs, "w00t peer sent us a BT_BITFIELD" );
             assert( msglen == msgs->info->have->len );
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
-            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
+            updatePeerProgress( msgs );
             tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
-            dbgmsg( msgs, "after the HAVE message, peer progress is %f", msgs->info->progress );
-            updateInterest( msgs );
             fireNeedReq( msgs );
-            firePeerProgress( msgs );
             break;
         }
 
@@ -905,10 +901,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             assert( msglen == 0 );
             dbgmsg( msgs, "peer sent us a BT_HAVE_ALL" );
             memset( msgs->info->have->bits, 1, msgs->info->have->len );
-            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
-            dbgmsg( msgs, "after the HAVE_ALL message, peer progress is %f", msgs->info->progress );
-            updateInterest( msgs );
-            firePeerProgress( msgs );
+            updatePeerProgress( msgs );
             break;
         }
             
@@ -916,10 +909,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             assert( msglen == 0 );
             dbgmsg( msgs, "peer sent us a BT_HAVE_NONE" );
             memset( msgs->info->have->bits, 1, msgs->info->have->len );
-            msgs->info->progress = tr_bitfieldCountTrueBits( msgs->info->have ) / (float)msgs->torrent->info.pieceCount;
-            dbgmsg( msgs, "after the HAVE_NONE message, peer progress is %f", msgs->info->progress );
-            updateInterest( msgs );
-            firePeerProgress( msgs );
+            updatePeerProgress( msgs );
             break;
         }
             
@@ -1093,9 +1083,8 @@ gotBlock( tr_peermsgs      * msgs,
     ***  Write the block
     **/
 
-    if( tr_ioWrite( tor, index, offset, length, EVBUFFER_DATA( inbuf ))) {
+    if( tr_ioWrite( tor, index, offset, length, EVBUFFER_DATA( inbuf )))
         return;
-    }
 
     tr_cpBlockAdd( tor->completion, block );
 
@@ -1298,11 +1287,12 @@ static void
 sendBitfield( tr_peermsgs * msgs )
 {
     const tr_bitfield * bitfield = tr_cpPieceBitfield( msgs->torrent->completion );
+    struct evbuffer * out = msgs->outMessages;
 
     dbgmsg( msgs, "sending peer a bitfield message" );
-    tr_peerIoWriteUint32( msgs->io, msgs->outMessages, sizeof(uint8_t) + bitfield->len );
-    tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_BITFIELD );
-    tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, bitfield->bits, bitfield->len );
+    tr_peerIoWriteUint32( msgs->io, out, sizeof(uint8_t) + bitfield->len );
+    tr_peerIoWriteUint8 ( msgs->io, out, BT_BITFIELD );
+    tr_peerIoWriteBytes ( msgs->io, out, bitfield->bits, bitfield->len );
 }
 
 /**
