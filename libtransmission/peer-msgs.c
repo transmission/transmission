@@ -495,7 +495,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     if( !tr_bitfieldHas( msgs->info->have, index ) )
         return TR_ADDREQ_MISSING;
 
-    maxSize = MIN( 3 + (int)(tr_rcRate(msgs->info->rateToClient)/10), 100 );
+    maxSize = MIN( 3 + (int)(tr_rcRate(msgs->info->rateToClient)/5), 100 );
     if( tr_list_size( msgs->clientAskedFor) >= maxSize )
         return TR_ADDREQ_FULL;
 

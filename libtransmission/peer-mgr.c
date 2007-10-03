@@ -45,11 +45,7 @@ enum
     RECONNECT_PERIOD_MSEC = (5 * 1000),
 
     /* how frequently to refill peers' request lists */
-    REFILL_PERIOD_MSEC = 2000,
-
-    /* how many peers to unchoke per-torrent. */
-    /* FIXME: make this user-configurable? */
-    NUM_UNCHOKED_PEERS_PER_TORRENT = 8,
+    REFILL_PERIOD_MSEC = 1500,
 
     /* don't change a peer's choke status more often than this */
     MIN_CHOKE_PERIOD_SEC = 10,
@@ -61,6 +57,10 @@ enum
     /* this is arbitrary and, hopefully, temporary until we come up
      * with a better idea for managing the connection limits */
     MAX_CONNECTED_PEERS_PER_TORRENT = 60,
+
+    /* how many peers to unchoke per-torrent. */
+    /* FIXME: make this user-configurable? */
+    NUM_UNCHOKED_PEERS_PER_TORRENT = 16, /* arbitrary */
 
     /* another arbitrary number */
     MAX_RECONNECTIONS_PER_MINUTE = 60,
@@ -1558,7 +1558,7 @@ reconnectPulse( void * vtorrent )
 
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
-        for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
+        for( i=0; i<nAdd && i<nCandidates; ++i )
         {
             tr_peerMgr * mgr = t->manager;
 
