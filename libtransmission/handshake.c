@@ -576,6 +576,7 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     uint8_t * pstr;
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
+    char * client;
 
 /* FIXME: use  readHandshake here */
 
@@ -666,7 +667,9 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, sizeof(handshake->peer_id) );
     tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
     handshake->havePeerID = TRUE;
-    dbgmsg( handshake, "peer-id is [%s]", tr_clientForId(handshake->peer_id) );
+    client = tr_clientForId( handshake->peer_id );
+    dbgmsg( handshake, "peer-id is [%s]", client );
+    tr_free( client );
     if( !memcmp( handshake->peer_id, getPeerId(), PEER_ID_LEN ) ) {
         dbgmsg( handshake, "streuth!  we've connected to ourselves." );
         tr_handshakeDone( handshake, FALSE );

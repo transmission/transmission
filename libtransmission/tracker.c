@@ -737,9 +737,7 @@ onTrackerScrapeNow( void * vt )
 static int
 torrentIsRunning( const Torrent * tor )
 {
-    return ( tor != NULL )
-        && ( tor->lastRequest != NULL )
-        && ( strcmp( tor->lastRequest, "stopped" ) );
+    return tor && tor->isRunning;
 }
 
 static char*
@@ -840,13 +838,39 @@ setAnnounceInterval( Tracker  * t,
 
 static int onReannounceNow( void * vtor );
 
+struct response_user_data
+{
+    tr_handle * handle;
+    uint8_t hash[SHA_DIGEST_LENGTH];
+};
+
+static struct response_user_data*
+onTrackerResponseDataNew( Torrent * tor )
+{
+    struct response_user_data * data = tr_new( struct response_user_data, 1 );
+    data->handle = tor->tracker->handle;
+    memcpy( data->hash, tor->hash, SHA_DIGEST_LENGTH );
+    return data;
+}
+
 static void
-onTrackerResponse( struct evhttp_request * req, void * vtor )
+onTrackerResponse( struct evhttp_request * req, void * vdata )
 {
     char * errmsg;
-    Torrent * tor = (Torrent *) vtor;
-    const int isStopped = !torrentIsRunning( tor );
+    Torrent * tor;
+    int isStopped;
     int reannounceInterval;
+    struct response_user_data * data;
+    tr_torrent * t;
+
+    data = vdata;
+    t = tr_torrentFindFromHash( data->handle, data->hash );
+    tr_free( data );
+    if( t == NULL ) /* torrent has been closed */
+        return;
+
+    tor = t->tracker;
+    isStopped = !torrentIsRunning( tor );
 
     tr_inf( "Torrent \"%s\" tracker response: %s",
             tor->name,
@@ -976,7 +1000,7 @@ sendTrackerRequest( void * vt, const char * eventName )
         tr_free( t->lastRequest );
         t->lastRequest = tr_strdup( eventName );
         evhttp_connection_set_timeout( evcon, REQ_TIMEOUT_INTERVAL_SEC );
-        httpReq = evhttp_request_new( onTrackerResponse, t );
+        httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
         addCommonHeaders( t->tracker, httpReq );
         tr_evhttp_make_request( t->tracker->handle, evcon,
                                 httpReq, EVHTTP_REQ_GET, uri );

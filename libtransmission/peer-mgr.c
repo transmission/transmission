@@ -404,6 +404,7 @@ torrentDestructor( Torrent * t )
     tr_bitfieldFree( t->requested );
     tr_ptrArrayFree( t->pool, (PtrArrayForeachFunc)tr_free );
     tr_ptrArrayFree( t->outgoingHandshakes, NULL );
+    tr_ptrArrayFree( t->peers, NULL );
 
     tr_free( t );
 }

@@ -685,7 +685,8 @@ tr_malloc0( size_t size )
     return ret;
 }
 
-void tr_free( void * p )
+void
+tr_free( void * p )
 {
     if( p )
         free( p );
