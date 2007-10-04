@@ -325,34 +325,19 @@ getPeer( Torrent * torrent, const struct in_addr * in_addr )
 }
 
 static void
-disconnectPeer( tr_peer * peer )
-{
-    assert( peer != NULL );
-
-    tr_peerIoFree( peer->io );
-    peer->io = NULL;
-
-    if( peer->msgs != NULL )
-    {
-        tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
-        tr_peerMsgsFree( peer->msgs );
-        peer->msgs = NULL;
-    }
-
-    tr_bitfieldFree( peer->have );
-    peer->have = NULL;
-
-    tr_bitfieldFree( peer->blame );
-    peer->blame = NULL;
-
-    tr_bitfieldFree( peer->banned );
-    peer->banned = NULL;
-}
-
-static void
 peerDestructor( tr_peer * peer )
 {
-    disconnectPeer( peer );
+    assert( peer != NULL );
+    assert( peer->msgs != NULL );
+
+    tr_peerMsgsUnsubscribe( peer->msgs, peer->msgsTag );
+    tr_peerMsgsFree( peer->msgs );
+
+    tr_peerIoFree( peer->io );
+
+    tr_bitfieldFree( peer->have );
+    tr_bitfieldFree( peer->blame );
+    tr_bitfieldFree( peer->banned );
     tr_rcClose( peer->rateToClient );
     tr_rcClose( peer->rateToPeer );
     tr_free( peer->client );
