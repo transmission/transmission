@@ -175,11 +175,6 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             tor->error = 0;
             tor->errorString[0] = '\0';
             break;
-
-        case TR_TRACKER_STOPPED:
-            //assert( tor->runStatus == TR_RUN_STOPPING );
-            tor->runStatus = TR_RUN_STOPPED;
-            break;
     }
 }
 
@@ -259,39 +254,12 @@ tr_torrentInitFilePieces( tr_torrent * tor )
 }
 
 static void
-tr_torrentStartImpl( tr_torrent * tor )
-{
-    assert( tor != NULL );
-    assert( tor->runStatus == TR_RUN_RUNNING );
-
-    *tor->errorString = '\0';
-    tr_torrentResetTransferStats( tor );
-    tr_torrentRecheckCompleteness( tor );
-    tor->startDate = tr_date();
-    tr_trackerStart( tor->tracker );
-    tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
-}
-
-static void
-recheckDoneCB( tr_torrent * tor )
-{
-    tr_torrentRecheckCompleteness( tor );
-
-    if( tor->doStopAfterHashCheck ) {
-        tor->doStopAfterHashCheck = 0;
-        tr_torrentStop( tor );
-    }
-
-    if( tor->runStatus == TR_RUN_RUNNING )
-        tr_torrentStartImpl( tor );
-}
-
-static void
 torrentRealInit( tr_handle  * h,
                  tr_torrent * tor,
                  const char * destination,
                  int          flags )
 {
+    int doStart;
     uint64_t loaded;
     uint64_t t;
     tr_bitfield * uncheckedPieces;
@@ -305,8 +273,6 @@ torrentRealInit( tr_handle  * h,
 
     tor->handle   = h;
     tor->pexDisabled = 0;
-
-    tor->runStatusToSaveIsSet = FALSE;
 
     /**
      * Decide on a block size.  constraints:
@@ -380,9 +346,12 @@ torrentRealInit( tr_handle  * h,
        after that, the fastresume setting is used...
        if that's not found, default to RUNNING */
     if( flags & TR_FLAG_PAUSED )
-        tor->runStatus = TR_RUN_STOPPED;
-    else if( !(loaded & TR_FR_RUN ) )
-        tor->runStatus = TR_RUN_RUNNING;
+        doStart = 0;
+    else if( loaded & TR_FR_RUN )
+        doStart = tor->isRunning;
+    else
+        doStart = 1;
+    tor->isRunning = 0;
 
     if( tr_bitfieldIsEmpty( uncheckedPieces ) )
         tr_bitfieldFree( uncheckedPieces );
@@ -409,7 +378,8 @@ torrentRealInit( tr_handle  * h,
 
     tr_globalUnlock( h );
 
-    tr_ioRecheckAdd( tor, recheckDoneCB, tor->runStatus );
+    if( doStart )
+        tr_torrentStart( tor );
 }
 
 static int
@@ -678,7 +648,6 @@ tr_torrentDisablePex( tr_torrent * tor, int disable )
 {
     assert( tor != NULL );
     assert( disable==0 || disable==1 );
-    //assert( tor->runStatus != TR_RUN_RUNNING );
 
     /* pex is ALWAYS disabled for private torrents */
     if( tor->info.flags & TR_FLAG_PRIVATE )
@@ -690,14 +659,14 @@ tr_torrentDisablePex( tr_torrent * tor, int disable )
 void
 tr_manualUpdate( tr_torrent * tor )
 {
-    if( tor->runStatus == TR_RUN_RUNNING )
-    tr_trackerReannounce( tor->tracker );
+    if( tor->isRunning )
+        tr_trackerReannounce( tor->tracker );
 }
 int
 tr_torrentCanManualUpdate( const tr_torrent * tor )
 {
     return ( tor != NULL )
-        && ( tor->runStatus == TR_RUN_RUNNING )
+        && ( tor->isRunning )
         && ( tr_trackerCanManualAnnounce( tor->tracker ) );
 }
 
@@ -732,17 +701,18 @@ tr_torrentStat( tr_torrent * tor )
     s->percentDone = tr_cpPercentDone( tor->completion );
     s->leftUntilDone = tr_cpLeftUntilDone( tor->completion );
 
-    switch( tor->runStatus ) {
-        case TR_RUN_CHECKING_WAIT: s->status = TR_STATUS_CHECK_WAIT; break;
-        case TR_RUN_CHECKING: s->status = TR_STATUS_CHECK; break;
-        case TR_RUN_STOPPING: s->status = TR_STATUS_STOPPING; break;
-        case TR_RUN_STOPPED: s->status = TR_STATUS_STOPPED; break;
-        case TR_RUN_RUNNING: switch( tor->cpStatus ) {
-            case TR_CP_INCOMPLETE: s->status = TR_STATUS_DOWNLOAD; break;
-            case TR_CP_DONE: s->status = TR_STATUS_DONE; break;
-            case TR_CP_COMPLETE: s->status = TR_STATUS_SEED; break;
-        }
-    }
+    if( tor->recheckState == TR_RECHECK_NOW )
+        s->status = TR_STATUS_CHECK;
+    else if( tor->recheckState == TR_RECHECK_WAIT )
+        s->status = TR_STATUS_CHECK_WAIT;
+    else if( !tor->isRunning )
+        s->status = TR_STATUS_STOPPED;
+    else if( tor->cpStatus == TR_CP_INCOMPLETE )
+        s->status = TR_STATUS_DOWNLOAD;
+    else if( tor->cpStatus == TR_CP_DONE )
+        s->status = TR_STATUS_DONE;
+    else
+        s->status = TR_STATUS_SEED;
 
     s->recheckProgress = (tor->uncheckedPieces == NULL)
         ? 0.0
@@ -754,7 +724,7 @@ tr_torrentStat( tr_torrent * tor )
        messages and other messages, which causes a non-zero
        download rate even tough we are not downloading. So we
        force it to zero not to confuse the user. */
-    s->rateDownload = tor->runStatus==TR_RUN_RUNNING 
+    s->rateDownload = tor->isRunning
         ? tr_rcRate( tor->download )
         : 0.0;
     s->rateUpload = tr_rcRate( tor->upload );
@@ -970,34 +940,19 @@ void tr_torrentRemoveSaved( tr_torrent * tor )
     tr_metainfoRemoveSaved( tor->info.hashString, tor->handle->tag );
 }
 
-void tr_torrentRecheck( tr_torrent * tor )
-{
-    if( !tor->uncheckedPieces )
-        tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-    tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
-
-    tr_ioRecheckAdd( tor, recheckDoneCB, tor->runStatus );
-}
-
 /***
 ****
 ***/
 
-void
-tr_torrentStart( tr_torrent * tor )
-{
-    tr_ioRecheckAdd( tor, recheckDoneCB, TR_RUN_RUNNING );
-}
-
 static void
-tr_torrentFree( tr_torrent * tor )
+freeTorrent( tr_torrent * tor )
 {
     tr_torrent * t;
     tr_handle * h = tor->handle;
     tr_info * inf = &tor->info;
 
     assert( tor != NULL );
-    assert( tor->runStatus == TR_RUN_STOPPED );
+    assert( !tor->isRunning );
 
     tr_globalLock( h );
 
@@ -1036,16 +991,77 @@ tr_torrentFree( tr_torrent * tor )
     tr_globalUnlock( h );
 }
 
-static int
-freeWhenStopped( void * vtor )
+enum
+{
+    AFTER_RECHECK_NONE,
+    AFTER_RECHECK_START,
+    AFTER_RECHECK_STOP,
+    AFTER_RECHECK_CLOSE
+};
+
+static void
+checkAndStartCB( tr_torrent * tor )
+{
+    tr_globalLock( tor->handle );
+
+    tr_torrentRecheckCompleteness( tor );
+
+    tor->isRunning  = 1;
+    *tor->errorString = '\0';
+    tr_torrentResetTransferStats( tor );
+    tr_torrentRecheckCompleteness( tor );
+    tor->startDate = tr_date( );
+    tor->isRunning = 1;
+    tr_trackerStart( tor->tracker );
+    tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
+
+    tr_globalUnlock( tor->handle );
+}
+
+static void
+checkAndStart( void * vtor )
 {
     tr_torrent * tor = vtor;
+    tr_globalLock( tor->handle );
 
-    if( tor->runStatus != TR_RUN_STOPPED ) /* keep waiting */
-        return TRUE;
+    if( !tor->isRunning )
+    {
+        tor->isRunning = 1;
+        tr_ioRecheckAdd( tor, checkAndStartCB );
+    }
 
-    tr_torrentFree( tor );
-    return FALSE;
+    tr_globalUnlock( tor->handle );
+}
+
+void
+tr_torrentRecheck( tr_torrent * tor )
+{
+    if( !tor->uncheckedPieces )
+        tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
+    tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
+
+    tr_ioRecheckAdd( tor, NULL );
+}
+    
+void
+tr_torrentStart( tr_torrent * tor )
+{
+    tr_globalLock( tor->handle );
+
+    tr_runInEventThread( tor->handle, checkAndStart, tor );
+
+    tr_globalUnlock( tor->handle );
+}
+
+
+static void
+stopTorrent( void * vtor )
+{
+    tr_torrent * tor = vtor;
+    tr_ioRecheckRemove( tor );
+    tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
+    tr_trackerStop( tor->tracker );
+    tr_ioClose( tor );
 }
 
 void
@@ -1053,28 +1069,21 @@ tr_torrentStop( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    switch( tor->runStatus )
-    {
-        case TR_RUN_CHECKING_WAIT:
-        case TR_RUN_CHECKING:
-            tor->doStopAfterHashCheck = 1;
-            tr_ioRecheckRemove( tor );
-            break;
-
-        case TR_RUN_RUNNING:
-            saveFastResumeNow( tor );
-            tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
-            tor->runStatus = TR_RUN_STOPPING;
-            tr_trackerStop( tor->tracker );
-            tr_ioClose( tor );
-            break;
-
-        case TR_RUN_STOPPING:
-        case TR_RUN_STOPPED:
-            break;
-    }
+    saveFastResumeNow( tor );
+    tor->isRunning = 0;
+    tr_runInEventThread( tor->handle, stopTorrent, tor );
 
     tr_globalUnlock( tor->handle );
+}
+
+static void
+closeTorrent( void * vtor )
+{
+    tr_torrent * tor = vtor;
+    saveFastResumeNow( tor );
+    tor->isRunning = 0;
+    stopTorrent( tor );
+    freeTorrent( tor );
 }
 
 void
@@ -1082,10 +1091,7 @@ tr_torrentClose( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    tor->runStatusToSave = tor->runStatus;
-    tor->runStatusToSaveIsSet = TRUE;
-    tr_torrentStop( tor );
-    tr_timerNew( tor->handle, freeWhenStopped, tor, 250 );
+    tr_runInEventThread( tor->handle, closeTorrent, tor );
 
     tr_globalUnlock( tor->handle );
 }
@@ -1197,7 +1203,6 @@ tr_torrentGetFilePriority( const tr_torrent *  tor, int file )
 
     return ret;
 }
-
 
 tr_priority_t*
 tr_torrentGetFilePriorities( const tr_torrent * tor )

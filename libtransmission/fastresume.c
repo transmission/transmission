@@ -278,10 +278,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     if( TRUE ) /* FR_ID_RUN */
     {
-        const int run = tor->runStatusToSaveIsSet
-            ? tor->runStatusToSave
-            : tor->runStatus;
-        const char is_running = (run == TR_RUN_RUNNING) ? 't' : 'f';
+        const char is_running = tor->isRunning ? 't' : 'f';
         fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
     }
 
@@ -591,7 +588,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                         fclose( file );
                         return ret;
                     }
-                    tor->runStatus = ch=='f' ? TR_RUN_STOPPED : TR_RUN_RUNNING;
+                    tor->isRunning = ch=='t';
                     ret |= TR_FR_RUN;
                     continue;
                 }

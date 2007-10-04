@@ -92,13 +92,11 @@ uint64_t tr_pieceOffset( const tr_torrent * tor, int index, int begin, int lengt
 
 typedef enum
 {
-    TR_RUN_CHECKING_WAIT      = (1<<0), /* waiting to be checked */
-    TR_RUN_CHECKING           = (1<<1), /* checking files' checksums */
-    TR_RUN_RUNNING            = (1<<2), /* seeding or leeching */
-    TR_RUN_STOPPING           = (1<<3), /* waiting for acknowledgment from tracker */
-    TR_RUN_STOPPED            = (1<<4)  /* stopped */
+   TR_RECHECK_NONE,
+   TR_RECHECK_WAIT,
+   TR_RECHECK_NOW
 }
-run_status_t;
+tr_recheck_state;
 
 #define TR_ID_LEN  20
 
@@ -136,8 +134,6 @@ struct tr_torrent
     struct tr_completion     * completion;
 
     struct tr_bitfield       * uncheckedPieces;
-    run_status_t               runStatus;
-    run_status_t               runStatusToSave;
     cp_status_t                cpStatus;
 
     struct tr_tracker        * tracker;
@@ -157,10 +153,11 @@ struct tr_torrent
     tr_torrent_status_func   * status_func;
     void                     * status_func_user_data;
 
-    unsigned int               runStatusToSaveIsSet : 1;
     unsigned int               pexDisabled : 1;
-    unsigned int               doStopAfterHashCheck : 1;
     unsigned int               statCur : 1;
+    unsigned int               isRunning : 1;
+
+    tr_recheck_state           recheckState;
 
     tr_stat                    stats[2];
 

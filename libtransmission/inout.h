@@ -53,8 +53,7 @@ void tr_ioClose( const tr_torrent * );
 typedef void (*tr_recheck_done_cb)( tr_torrent * tor );
 
 void tr_ioRecheckAdd( tr_torrent          * tor,
-                      tr_recheck_done_cb    recheck_done_cb,
-                      run_status_t          status_when_done );
+                      tr_recheck_done_cb    recheck_done_cb );
 
 void tr_ioRecheckRemove( tr_torrent * tor );
 
