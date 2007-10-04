@@ -166,6 +166,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         fDefaults = [NSUserDefaults standardUserDefaults];
         
+        #warning move nib names to individual classes
         fMessageController = [[MessageWindowController alloc] initWithWindowNibName: @"MessageWindow"];
         fInfoController = [[InfoWindowController alloc] initWithWindowNibName: @"InfoWindow"];
         fPrefsController = [[PrefsController alloc] initWithWindowNibName: @"PrefsWindow" handle: fLib];

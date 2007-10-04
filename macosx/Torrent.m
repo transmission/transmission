@@ -804,7 +804,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt: peer->from], @"From",
-            [NSString stringWithCString: (char *) peer->addr encoding: NSUTF8StringEncoding], @"IP",
+            [NSString stringWithCString: (char *)peer->addr encoding: NSUTF8StringEncoding], @"IP",
             [NSNumber numberWithInt: peer->port], @"Port",
             [NSNumber numberWithFloat: peer->progress], @"Progress",
             [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
