@@ -1011,17 +1011,15 @@ checkAndStartCB( tr_torrent * tor )
     tr_torrentResetTransferStats( tor );
     tr_torrentRecheckCompleteness( tor );
     tor->startDate = tr_date( );
-    tor->isRunning = 1;
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
 
     tr_globalUnlock( tor->handle );
 }
-
-static void
-checkAndStart( void * vtor )
+    
+void
+tr_torrentStart( tr_torrent * tor )
 {
-    tr_torrent * tor = vtor;
     tr_globalLock( tor->handle );
 
     if( !tor->isRunning )
@@ -1036,19 +1034,13 @@ checkAndStart( void * vtor )
 void
 tr_torrentRecheck( tr_torrent * tor )
 {
+    tr_globalLock( tor->handle );
+
     if( !tor->uncheckedPieces )
         tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
 
     tr_ioRecheckAdd( tor, NULL );
-}
-    
-void
-tr_torrentStart( tr_torrent * tor )
-{
-    tr_globalLock( tor->handle );
-
-    tr_runInEventThread( tor->handle, checkAndStart, tor );
 
     tr_globalUnlock( tor->handle );
 }
