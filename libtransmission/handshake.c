@@ -653,7 +653,6 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     }
     else /* outgoing */
     {
-        assert( tr_torrentExists( handshake->handle, hash ) );
         assert( tr_peerIoHasTorrentHash( handshake->io ) );
         if( memcmp( hash, tr_peerIoGetTorrentHash(handshake->io), SHA_DIGEST_LENGTH ) )
         {
