@@ -482,7 +482,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
                        uint32_t      offset, 
                        uint32_t      length )
 {
-    struct peer_request * req;
+    struct peer_request tmp, *req;
     int maxSize;
 
     assert( msgs != NULL );
@@ -499,6 +499,13 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     if( tr_list_size( msgs->clientAskedFor) >= maxSize )
         return TR_ADDREQ_FULL;
 
+    /* have we already asked for this piece? */
+    tmp.index = index;
+    tmp.offset = offset;
+    tmp.length = length;
+    if( tr_list_remove( &msgs->clientAskedFor, &tmp, peer_request_compare ) != NULL )
+        return TR_ADDREQ_DUPLICATE;
+
     dbgmsg( msgs, "w00t peer has a max request queue size of %d... adding request for piece %d, offset %d", maxSize, (int)index, (int)offset );
 
     /* queue the request */
@@ -510,9 +517,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
 
     /* add it to our `requests sent' list */
     req = tr_new( struct peer_request, 1 );
-    req->index = index;
-    req->offset = offset;
-    req->length = length;
+    *req = tmp;
     req->time_requested = msgs->lastReqAddedAt = time( NULL );
     tr_list_append( &msgs->clientAskedFor, req );
     pulse( msgs );

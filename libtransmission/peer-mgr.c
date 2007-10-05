@@ -725,6 +725,7 @@ refillPulse( void * vtorrent )
                     break;
 
                 case TR_ADDREQ_MISSING: 
+                case TR_ADDREQ_DUPLICATE: 
                     ++j;
                     break;
 

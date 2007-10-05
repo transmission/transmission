@@ -45,6 +45,7 @@ void         tr_peerMsgsFree( tr_peermsgs* );
 enum {
     TR_ADDREQ_OK=0,
     TR_ADDREQ_FULL,
+    TR_ADDREQ_DUPLICATE,
     TR_ADDREQ_MISSING,
     TR_ADDREQ_CLIENT_CHOKED
 };
