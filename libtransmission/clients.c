@@ -390,9 +390,9 @@ char * tr_clientForId( const uint8_t * id )
     {
         asprintf( &ret, "eXeem" );
     }
-    else if( '\0' == id[0] && 'B' == id[2] && 'S' == id[3] )
+    else if( '\0' == id[0] && !memcmp( &id[1], "BS", 2 ) )
     {
-        asprintf( &ret, "BitSpirit v%u", ( 0 == id[1] ? 1 : id[1] ) );
+        asprintf( &ret, "BitSpirit %u", ( id[1] == 0 ? 1 : id[1] ) );
     }
 
     /* No match */
