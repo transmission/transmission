@@ -1166,11 +1166,10 @@ typedef enum
         return [outlineView rowHeight];
 }
 
-/*- (void) mouseMoved: (NSEvent *) event
+- (void) mouseMoved: (NSEvent *) event
 {
-    [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
-                                        ? event : nil];
-}*/
+    [fFileOutline setHoverRowForEvent: fCurrentView == fFilesView ? event : nil];
+}
 
 - (void) setPiecesView: (id) sender
 {
