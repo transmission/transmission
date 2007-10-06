@@ -402,19 +402,29 @@ compareRecheckByTorrent( const void * va, const void * vb )
 void
 tr_ioRecheckRemove( tr_torrent * tor )
 {
-    tr_lockLock( getRecheckLock( ) );
+    tr_lock * lock = getRecheckLock( );
+    tr_lockLock( lock );
 
-    if( tor == currentNode.torrent ) {
+    if( tor == currentNode.torrent )
+    {
         stopCurrent = TRUE;
         while( stopCurrent )
-            tr_wait( 50 );
-    } else {
+        {
+            tr_lockUnlock( lock );
+            tr_wait( 100 );
+            tr_lockLock( lock );
+        }
+    }
+    else
+    {
         struct recheck_node tmp;
         tmp.torrent = tor;
-        struct recheck_node * node = tr_list_remove( &recheckList, &tmp, compareRecheckByTorrent );
+        struct recheck_node * node = tr_list_remove( &recheckList,
+                                                     &tmp,
+                                                     compareRecheckByTorrent );
         tr_free( node );
         tor->recheckState = TR_RECHECK_NONE;
     }
 
-    tr_lockUnlock( getRecheckLock( ) );
+    tr_lockUnlock( lock );
 }
