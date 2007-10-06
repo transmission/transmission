@@ -6,15 +6,23 @@
 	<string>58 88 356 240 0 0 1680 1028 </string>
 	<key>IBEditorPositions</key>
 	<dict>
+		<key>1030</key>
+		<string>297 229 360 384 0 0 1680 1028 </string>
+		<key>1057</key>
+		<string>505 337 360 389 0 0 1680 1028 </string>
+		<key>1066</key>
+		<string>665 601 349 202 0 0 1680 1028 </string>
 		<key>549</key>
-		<string>565 283 174 149 0 0 1152 842 </string>
+		<string>870 359 174 149 0 0 1680 1028 </string>
+		<key>965</key>
+		<string>229 571 370 310 0 0 1680 1028 </string>
+		<key>995</key>
+		<string>301 527 370 332 0 0 1680 1028 </string>
 	</dict>
 	<key>IBFramework Version</key>
 	<string>446.1</string>
 	<key>IBLockedObjects</key>
-	<array>
-		<integer>5</integer>
-	</array>
+	<array/>
 	<key>IBLockedTabItems</key>
 	<array>
 		<integer>332</integer>
@@ -22,6 +30,7 @@
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>5</integer>
+		<integer>1066</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>8R4031</string>

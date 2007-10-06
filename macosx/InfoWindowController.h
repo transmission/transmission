@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
 #import "FileOutlineView.h"
+#import "ImageBackgroundView.h"
 #import "PiecesView.h"
 #import <transmission.h>
 
@@ -33,9 +34,13 @@
     NSArray * fTorrents, * fPeers, * fFiles;
     NSImage * fAppIcon, * fLockImage;
     
+    #warning need?
     BOOL fCanResizeVertical;
     
-    IBOutlet NSTabView * fTabView;
+    IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
+    NSView * fCurrentView;
+    IBOutlet NSMatrix * fTabMatrix;
+    IBOutlet ImageBackgroundView * fTabBackBar;
 
     IBOutlet NSImageView * fImageView;
     IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
@@ -70,6 +75,8 @@
 - (void) updateInfoForTorrents: (NSArray *) torrents;
 - (Torrent *) selectedTorrent;
 - (void) updateInfoStats;
+
+- (void) setTab: (id) sender;
 
 - (void) setNextTab;
 - (void) setPreviousTab;

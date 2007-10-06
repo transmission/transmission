@@ -33,11 +33,7 @@
 #define TAB_FILES_IDENT @"Files"
 #define TAB_OPTIONS_IDENT @"Options"
 
-//15 spacing at the bottom of each tab
-#define TAB_INFO_HEIGHT 268.0
-#define TAB_ACTIVITY_HEIGHT 290.0
-#define TAB_OPTIONS_HEIGHT 158.0
-#define TAB_RESIZABLE_MIN_HEIGHT 279.0
+#define TAB_MIN_HEIGHT 250
 
 #define PIECES_CONTROL_PROGRESS 0
 #define PIECES_CONTROL_AVAILABLE 1
@@ -48,13 +44,22 @@
 
 #define INVALID -99
 
+typedef enum
+{
+    TAB_INFO_TAG = 0,
+    TAB_ACTIVITY_TAG,
+    TAB_PEERS_TAG,
+    TAB_FILES_TAG,
+    TAB_OPTIONS_TAG,
+} tabTag;
+
 @interface InfoWindowController (Private)
 
 - (void) updateInfoGeneral;
 - (void) updateInfoActivity;
 - (void) updateInfoPeers;
 - (void) updateInfoFiles;
-- (void) updateInfoSettings;
+- (void) updateInfoOptions;
 
 - (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
@@ -71,22 +76,49 @@
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    [window setFrameAutosaveName: @"InspectorWindowFrame"];
-    [window setFrameUsingName: @"InspectorWindowFrame"];
+    /*[window setFrameAutosaveName: @"InspectorWindowFrame"];
+    [window setFrameUsingName: @"InspectorWindowFrame"];*/
     
     [window setBecomesKeyOnlyIfNeeded: YES];
     [window setAcceptsMouseMovedEvents: YES];
     
-    //select tab
+    //set selected tab
+    fCanResizeVertical = NO;
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
+    int tag;
+    if ([identifier isEqualToString: TAB_INFO_IDENT])
+        tag = TAB_INFO_TAG;
+    else if ([identifier isEqualToString: TAB_ACTIVITY_IDENT])
+        tag = TAB_ACTIVITY_TAG;
+    else if ([identifier isEqualToString: TAB_PEERS_IDENT])
+        tag = TAB_PEERS_TAG;
+    else if ([identifier isEqualToString: TAB_FILES_IDENT])
+        tag = TAB_FILES_TAG;
+    else if ([identifier isEqualToString: TAB_OPTIONS_IDENT])
+        tag = TAB_OPTIONS_TAG;
+    else //safety
+    {
+        [[NSUserDefaults standardUserDefaults] setObject: TAB_INFO_IDENT forKey: @"InspectorSelected"];
+        tag = TAB_INFO_TAG;
+    }
+    [fTabMatrix selectCellWithTag: tag];
+    [self setTab: nil];
     
-    if (!identifier || [fTabView indexOfTabViewItemWithIdentifier: identifier] == NSNotFound)
-        identifier = TAB_INFO_IDENT;
+    //set tab images and tooltips
+    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
+    [[fTabMatrix cellWithTag: TAB_INFO_TAG] setImage: [NSImage imageNamed: @"InfoGeneral.png"]];
+    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setImage: [NSImage imageNamed: @"InfoOptions.png"]];
     
-    fCanResizeVertical = [identifier isEqualToString: TAB_PEERS_IDENT] || [identifier isEqualToString: TAB_FILES_IDENT];
-    
-    [fTabView selectTabViewItemWithIdentifier: identifier];
-    [self setWindowForTab: identifier animate: NO];
+    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_INFO_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag:  TAB_PEERS_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_FILES_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
     
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
@@ -112,8 +144,7 @@
 - (void) dealloc
 {
     if (fCanResizeVertical)
-        [[NSUserDefaults standardUserDefaults] setFloat: [[[fTabView selectedTabViewItem] view] frame].size.height
-                                                forKey: @"InspectorHeight"];
+        [[NSUserDefaults standardUserDefaults] setFloat: [fCurrentView frame].size.height forKey: @"InspectorContentHeight"];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -339,18 +370,24 @@
 
 - (void) updateInfoStats
 {
-    NSString * ident = [[fTabView selectedTabViewItem] identifier];
-    if ([ident isEqualToString: TAB_ACTIVITY_IDENT])
-        [self updateInfoActivity];
-    else if ([ident isEqualToString: TAB_PEERS_IDENT])
-        [self updateInfoPeers];
-    else if ([ident isEqualToString: TAB_INFO_IDENT])
-        [self updateInfoGeneral];
-    else if ([ident isEqualToString: TAB_FILES_IDENT])
-        [self updateInfoFiles];
-    else if ([ident isEqualToString: TAB_OPTIONS_IDENT])
-        [self updateInfoSettings];
-    else;
+    switch ([fTabMatrix selectedTag])
+    {
+        case TAB_INFO_TAG:
+            [self updateInfoGeneral];
+            break;
+        case TAB_ACTIVITY_TAG:
+            [self updateInfoActivity];
+            break;
+        case TAB_PEERS_TAG:
+            [self updateInfoPeers];
+            break;
+        case TAB_FILES_TAG:
+            [self updateInfoFiles];
+            break;
+        case TAB_OPTIONS_TAG:
+            [self updateInfoOptions];
+            break;
+    }
 }
 
 - (void) updateInfoGeneral
@@ -492,7 +529,7 @@
     }
 }
 
-- (void) updateInfoSettings
+- (void) updateInfoOptions
 {
     if ([fTorrents count] == 0)
         return;
@@ -624,7 +661,7 @@
     
     if (action == @selector(revealFile:))
     {
-        if (![[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT])
+        if ([fTabMatrix selectedTag] != TAB_FILES_TAG)
             return NO;
         
         NSString * downloadFolder = [[fTorrents objectAtIndex: 0] downloadFolder];
@@ -721,7 +758,7 @@
     [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
 }
 
-- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
+/*- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
 {
     [self updateInfoStats];
     
@@ -772,22 +809,124 @@
     [window setMaxSize: NSMakeSize(FLT_MAX, !canResizeVertical ? windowFrame.size.height : FLT_MAX)];
     
     fCanResizeVertical = canResizeVertical;
+}*/
+
+- (void) setTab: (id) sender
+{
+    [self updateInfoStats];
+    
+    BOOL oldCanResizeVertical = fCanResizeVertical;
+    
+    NSView * view;
+    NSString * identifier;
+    switch ([fTabMatrix selectedTag])
+    {
+        case TAB_INFO_TAG:
+            view = fInfoView;
+            identifier = TAB_INFO_IDENT;
+            fCanResizeVertical = NO;
+            break;
+        case TAB_ACTIVITY_TAG:
+            view = fActivityView;
+            identifier = TAB_ACTIVITY_IDENT;
+            fCanResizeVertical = NO;
+            
+            [fPiecesView updateView: YES];
+            break;
+        case TAB_PEERS_TAG:
+            view = fPeersView;
+            identifier = TAB_PEERS_IDENT;
+            fCanResizeVertical = YES;
+            break;
+        case TAB_FILES_TAG:
+            view = fFilesView;
+            identifier = TAB_FILES_IDENT;
+            fCanResizeVertical = YES;
+            break;
+        case TAB_OPTIONS_TAG:
+            view = fOptionsView;
+            identifier = TAB_OPTIONS_IDENT;
+            fCanResizeVertical = NO;
+            break;
+        default:
+            return;
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
+    
+    NSWindow * window = [self window];
+    
+    float oldHeight = 0;
+    if (fCurrentView)
+    {
+        if (fCurrentView == view)
+            return;
+        
+        [fCurrentView setHidden: YES];
+        [fCurrentView removeFromSuperview];
+        
+        oldHeight = [fCurrentView frame].size.height;
+    }
+    
+    NSRect windowRect = [window frame], viewRect = [view frame];
+    
+    //save old size
+    if (oldCanResizeVertical)
+        [[NSUserDefaults standardUserDefaults] setFloat: [fCurrentView frame].size.height forKey: @"InspectorContentHeight"];
+    
+    if (fCanResizeVertical)
+    {
+        float height = [[NSUserDefaults standardUserDefaults] floatForKey: @"InspectorContentHeight"];
+        if (height != 0)
+            viewRect.size.height = MAX(height, TAB_MIN_HEIGHT);
+    }
+    
+    float difference = (viewRect.size.height - oldHeight) * [window userSpaceScaleFactor];
+    windowRect.origin.y -= difference;
+    windowRect.size.height += difference;
+    
+    if (fCanResizeVertical)
+    {
+        if (!oldCanResizeVertical)
+        {
+            [window setMinSize: NSMakeSize([window minSize].width, windowRect.size.height - viewRect.size.height + TAB_MIN_HEIGHT)];
+            [window setMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
+        }
+    }
+    else
+    {
+        [window setMinSize: NSMakeSize([window minSize].width, windowRect.size.height)];
+        [window setMaxSize: NSMakeSize(FLT_MAX, windowRect.size.height)];
+    }
+    
+    viewRect.size.width = windowRect.size.width;
+    [view setFrame: viewRect];
+    
+    [window setFrame: windowRect display: YES animate: fCurrentView != nil];
+    [[window contentView] addSubview: view];
+    [view setHidden: NO];
+    
+    fCurrentView = view;
 }
 
 - (void) setNextTab
 {
-    if ([fTabView selectedTabViewItem] == [fTabView tabViewItemAtIndex: [fTabView numberOfTabViewItems] - 1])
-        [fTabView selectFirstTabViewItem: nil];
-    else
-        [fTabView selectNextTabViewItem: nil];
+    int tag = [fTabMatrix selectedTag]+1;
+    if (tag >= [fTabMatrix numberOfColumns])
+        tag = 0;
+    
+    [fTabMatrix selectCellWithTag: tag];
+    [self setTab: nil];
 }
 
 - (void) setPreviousTab
 {
-    if ([fTabView selectedTabViewItem] == [fTabView tabViewItemAtIndex: 0])
-        [fTabView selectLastTabViewItem: nil];
-    else
-        [fTabView selectPreviousTabViewItem: nil];
+    int tag = [fTabMatrix selectedTag]-1;
+    if (tag < 0)
+        tag = [fTabMatrix numberOfColumns]-1;
+    
+    [fTabMatrix selectCellWithTag: tag];
+    [self setTab: nil];
 }
 
 - (int) numberOfRowsInTableView: (NSTableView *) tableView
@@ -1027,11 +1166,11 @@
         return [outlineView rowHeight];
 }
 
-- (void) mouseMoved: (NSEvent *) event
+/*- (void) mouseMoved: (NSEvent *) event
 {
     [fFileOutline setHoverRowForEvent: [[[fTabView selectedTabViewItem] identifier] isEqualToString: TAB_FILES_IDENT]
                                         ? event : nil];
-}
+}*/
 
 - (void) setPiecesView: (id) sender
 {

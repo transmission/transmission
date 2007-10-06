@@ -2,6 +2,8 @@
     IBClasses = (
         {CLASS = FileOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = InfoTabButtonCell; LANGUAGE = ObjC; SUPERCLASS = NSButtonCell; }, 
         {
             ACTIONS = {
                 revealDataFile = id; 
@@ -16,10 +18,12 @@
                 setRatioSetting = id; 
                 setSpeedLimit = id; 
                 setSpeedMode = id; 
+                setTab = id; 
             }; 
             CLASS = InfoWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                fActivityView = NSView; 
                 fCommentView = NSTextView; 
                 fCompletedFromTrackerField = NSTextField; 
                 fConnectedPeersField = NSTextField; 
@@ -43,13 +47,17 @@
                 fFilePriorityNormal = NSMenuItem; 
                 fFileTableStatusField = NSTextField; 
                 fFileUncheckItem = NSMenuItem; 
+                fFilesView = NSView; 
                 fHashField = NSTextField; 
                 fHaveField = NSTextField; 
                 fImageView = NSImageView; 
+                fInfoView = NSView; 
                 fKnownField = NSTextField; 
                 fLeechersField = NSTextField; 
                 fNameField = NSTextField; 
+                fOptionsView = NSView; 
                 fPeerTable = NSTableView; 
+                fPeersView = NSView; 
                 fPexCheck = NSButton; 
                 fPiecesControl = NSSegmentedControl; 
                 fPiecesField = NSTextField; 
@@ -65,7 +73,8 @@
                 fSizeField = NSTextField; 
                 fStateField = NSTextField; 
                 fSwarmSpeedField = NSTextField; 
-                fTabView = NSTabView; 
+                fTabBackBar = ImageBackgroundView; 
+                fTabMatrix = NSMatrix; 
                 fTorrentLocationField = NSTextField; 
                 fTrackerField = NSTextField; 
                 fUploadLimitField = NSTextField; 
