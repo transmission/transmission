@@ -38,6 +38,8 @@ void tr_msgInit( void );
 void tr_msg  ( int level, char * msg, ... );
 FILE* tr_getLog( void );
 
+char* tr_getLogTimeStr( char * buf, int buflen );
+
 int  tr_rand ( int );
 
 void * tr_memmem( const void *, size_t, const void *, size_t );

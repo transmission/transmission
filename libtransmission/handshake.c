@@ -157,13 +157,17 @@ myDebug( const char * file, int line, const tr_handshake * handshake, const char
     if( fp != NULL )
     {
         va_list args;
-        const char * addr = tr_peerIoGetAddrStr( handshake->io );
         struct evbuffer * buf = evbuffer_new( );
-        evbuffer_add_printf( buf, "[%s:%d] %s (%p) ", file, line, addr, handshake->io );
+        char timestr[64];
+        evbuffer_add_printf( buf, "[%s] %s: ",
+                             tr_getLogTimeStr( timestr, sizeof(timestr) ),
+                             tr_peerIoGetAddrStr( handshake->io ) );
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        fprintf( stderr, "%s\n", EVBUFFER_DATA(buf) );
+        evbuffer_add_printf( buf, " (%s:%d)\n", file, line );
+
+        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
         evbuffer_free( buf );
     }
 }
@@ -580,7 +584,7 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
 
 /* FIXME: use  readHandshake here */
 
-    dbgmsg( handshake, "payload: need %d, got %d\n", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
+    dbgmsg( handshake, "payload: need %d, got %d", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
 
     if( EVBUFFER_LENGTH(inbuf) < HANDSHAKE_SIZE )
         return READ_MORE;
@@ -974,7 +978,7 @@ canRead( struct bufferevent * evin, void * arg )
     tr_handshake * handshake = (tr_handshake *) arg;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
     ReadState ret;
-    dbgmsg( handshake, "handling canRead; state is [%s]\n", getStateName(handshake->state) );
+    dbgmsg( handshake, "handling canRead; state is [%s]", getStateName(handshake->state) );
 
     switch( handshake->state )
     {

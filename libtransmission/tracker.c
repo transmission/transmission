@@ -51,7 +51,7 @@
 #define REQ_TIMEOUT_INTERVAL_SEC 60
 
 /* the value of the 'numwant' argument passed in tracker requests */
-#define NUMWANT 75
+#define NUMWANT 128
 
 /* the length of the 'key' argument passed in tracker requests */
 #define TR_KEY_LEN 10

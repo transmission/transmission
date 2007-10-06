@@ -84,6 +84,26 @@ tr_getLog( void )
     return file;
 }
 
+char*
+tr_getLogTimeStr( char * buf, int buflen )
+{
+    char tmp[64];
+    time_t now;
+    struct tm now_tm;
+    struct timeval tv;
+    int milliseconds;
+
+    now = time( NULL );
+    gettimeofday( &tv, NULL );
+
+    localtime_r( &now, &now_tm );
+    strftime( tmp, sizeof(tmp), "%H:%M:%S", &now_tm );
+    milliseconds = (int)(tv.tv_usec / 1000);
+    snprintf( buf, buflen, "%s.%03d", tmp, milliseconds );
+
+    return buf;
+}
+
 void
 tr_setMessageLevel( int level )
 {

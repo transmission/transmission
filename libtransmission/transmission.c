@@ -316,18 +316,16 @@ tr_close( tr_handle * h )
 
     tr_runInEventThread( h, tr_closeImpl, h );
     while( !h->isClosed )
-        tr_wait( 200 );
+        tr_wait( 100 );
 
     tr_eventClose( h );
-    while( h->events != NULL ) {
-        fprintf( stderr, "waiting for libevent thread to close...\n" );
-        tr_wait( 200 );
-    }
+    while( h->events != NULL )
+        tr_wait( 100 );
 
     tr_lockFree( h->lock );
     free( h->tag );
     free( h );
-    fprintf( stderr, "tr_close() completed.\n" );
+    fprintf( stderr, "libtransmission closed cleanly.\n" );
 }
 
 tr_torrent **

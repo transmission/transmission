@@ -56,8 +56,11 @@ typedef struct tr_peer
     struct tr_peermsgs * msgs;
     tr_publisher_tag msgsTag;
 
-    struct tr_ratecontrol * rateToClient;
-    struct tr_ratecontrol * rateToPeer;
+    struct tr_ratecontrol * rcToClient;
+    struct tr_ratecontrol * rcToPeer;
+
+    double rateToClient;
+    double rateToPeer;
 }
 tr_peer;
 
