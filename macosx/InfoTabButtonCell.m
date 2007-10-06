@@ -65,10 +65,16 @@
     }
 }
 
+- (void) setPushed: (BOOL) pushed
+{
+    fPushed = pushed;
+}
+
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
+    #warning dim instead of set selected
     NSImage * image;
-    if ([(NSMatrix *)controlView selectedCell] == self)
+    if ([(NSMatrix *)controlView selectedCell] == self || fPushed)
     {
         if (!fSelectedImage)
             [self setImage: nil];

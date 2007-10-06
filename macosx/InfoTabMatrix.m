@@ -22,15 +22,14 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "InfoTabMatrix.h"
 
-@interface InfoTabButtonCell : NSButtonCell
+@implementation InfoTabMatrix
+
+- (void) highlightCell: (BOOL) flag atRow: (int) row column: (int) column
 {
-    NSImage * fRegularImage, * fSelectedImage;
-    
-    BOOL fPushed;
+    [[self cellAtRow: row column: column] setPushed: flag];
+    [super highlightCell: flag atRow: row column: column];
 }
-
-- (void) setPushed: (BOOL) pushed;
 
 @end

@@ -4,6 +4,7 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = InfoTabButtonCell; LANGUAGE = ObjC; SUPERCLASS = NSButtonCell; }, 
+        {CLASS = InfoTabMatrix; LANGUAGE = ObjC; SUPERCLASS = NSMatrix; }, 
         {
             ACTIONS = {
                 revealDataFile = id; 

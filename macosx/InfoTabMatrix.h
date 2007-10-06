@@ -24,13 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface InfoTabButtonCell : NSButtonCell
+@interface InfoTabMatrix : NSMatrix
 {
-    NSImage * fRegularImage, * fSelectedImage;
-    
-    BOOL fPushed;
 }
-
-- (void) setPushed: (BOOL) pushed;
-
 @end
