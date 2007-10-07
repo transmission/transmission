@@ -70,25 +70,4 @@
     [self setImage: selected ? fSelectedImage : fRegularImage];
 }
 
-/*- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
-{
-    #warning dim instead of set selected
-    NSImage * image;
-    if ([(NSMatrix *)controlView selectedCell] == self || fPushed)
-    {
-        if (!fSelectedImage)
-            [self setImage: nil];
-        image = fSelectedImage;
-    }
-    else
-    {
-        if (!fRegularImage)
-            [self setImage: nil];
-        image = fRegularImage;
-    }
-    
-    [image drawInRect: cellFrame fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-    //[super drawWithFrame: cellFrame inView: controlView];
-}*/
-
 @end
