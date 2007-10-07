@@ -1094,8 +1094,18 @@ tr_peerMgrStartTorrent( tr_peerMgr     * manager,
     if( !t->isRunning )
     {
         t->isRunning = 1;
-        t->reconnectTimer = tr_timerNew( t->manager->handle, reconnectPulse, t, RECONNECT_PERIOD_MSEC );
-        t->rechokeTimer = tr_timerNew( t->manager->handle, rechokePulse, t, RECHOKE_PERIOD_MSEC );
+
+        t->reconnectTimer = tr_timerNew( t->manager->handle,
+                                         reconnectPulse, t,
+                                         RECONNECT_PERIOD_MSEC );
+
+        t->rechokeTimer = tr_timerNew( t->manager->handle,
+                                       rechokePulse, t,
+                                       RECHOKE_PERIOD_MSEC );
+
+        reconnectPulse( t );
+
+        rechokePulse( t );
     }
 
     managerUnlock( manager );
