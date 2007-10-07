@@ -485,7 +485,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         NSDictionary * systemAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
-        if (remainingSpace - [self sizeLeft] <= [self size])
+        if (remainingSpace <= [self sizeLeft])
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
