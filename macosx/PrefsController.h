@@ -53,7 +53,7 @@
     int                             fPublicPort, fNatStatus;
 }
 
-- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle *) handle;
+- (id) initWithHandle: (tr_handle *) handle;
 - (void) setUpdater: (SUUpdater *) updater;
 
 - (void) setPort: (id) sender;

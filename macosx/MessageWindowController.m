@@ -41,9 +41,9 @@
 
 @implementation MessageWindowController
 
-- (id) initWithWindowNibName: (NSString *) name
+- (id) init
 {
-    if ((self = [super initWithWindowNibName: name]))
+    if ((self = [super initWithWindowNibName: @"MessageWindow"]))
     {
         fMessages = [[NSMutableArray alloc] init];
         

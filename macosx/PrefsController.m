@@ -49,9 +49,9 @@
 
 @implementation PrefsController
 
-- (id) initWithWindowNibName: (NSString *) name handle: (tr_handle *) handle
+- (id) initWithHandle: (tr_handle *) handle
 {
-    if ((self = [self initWithWindowNibName: name]))
+    if ((self = [super initWithWindowNibName: @"PrefsWindow"]))
     {
         fDefaults = [NSUserDefaults standardUserDefaults];
         fHandle = handle;

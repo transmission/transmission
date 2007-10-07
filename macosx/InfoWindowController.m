@@ -62,11 +62,17 @@ typedef enum
 - (void) updateInfoFiles;
 - (void) updateInfoOptions;
 
+- (NSView *) tabViewForTag: (int) tag;
 - (NSArray *) peerSortDescriptors;
 
 @end
 
 @implementation InfoWindowController
+
+- (id) init
+{
+    return [super initWithWindowNibName: @"InfoWindow"];
+}
 
 - (void) awakeFromNib
 {
@@ -76,8 +82,15 @@ typedef enum
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
-    /*[window setFrameAutosaveName: @"InspectorWindowFrame"];
-    [window setFrameUsingName: @"InspectorWindowFrame"];*/
+    float windowHeight = [window frame].size.height;
+    
+    [window setFrameAutosaveName: @"InspectorWindow"];
+    [window setFrameUsingName: @"InspectorWindow"];
+    
+    NSRect windowRect = [window frame];
+    windowRect.origin.y -= windowHeight - windowRect.size.height;
+    windowRect.size.height = windowHeight;
+    [window setFrame: windowRect display: NO];
     
     [window setBecomesKeyOnlyIfNeeded: YES];
     [window setAcceptsMouseMovedEvents: YES];
@@ -146,11 +159,12 @@ typedef enum
 
 - (void) dealloc
 {
+    #warning not called?
+    float viewHeight = [[self tabViewForTag: fCurrentTabTag] frame].size.height;
+    
+    //save resizeable view height
     if (fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG)
-    {
-        NSView * view = fCurrentTabTag == TAB_PEERS_TAG ? fPeersView : fFilesView;
-        [[NSUserDefaults standardUserDefaults] setFloat: [view frame].size.height forKey: @"InspectorContentHeight"];
-    }
+        [[NSUserDefaults standardUserDefaults] setFloat: viewHeight forKey: @"InspectorContentHeight"];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -811,26 +825,7 @@ typedef enum
             return;
         
         //get old view
-        NSView * oldView;
-        switch (oldTabTag)
-        {
-            case TAB_INFO_TAG:
-                oldView = fInfoView;
-                break;
-            case TAB_ACTIVITY_TAG:
-                oldView = fActivityView;
-                break;
-            case TAB_PEERS_TAG:
-                oldView = fPeersView;
-                break;
-            case TAB_FILES_TAG:
-                oldView = fFilesView;
-                break;
-            case TAB_OPTIONS_TAG:
-                oldView = fOptionsView;
-                break;
-        }
-        
+        NSView * oldView = [self tabViewForTag: oldTabTag];
         [oldView setHidden: YES];
         [oldView removeFromSuperview];
         
@@ -1005,33 +1000,6 @@ typedef enum
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;
-}
-
-- (NSArray *) peerSortDescriptors
-{
-    NSMutableArray * descriptors = [NSMutableArray arrayWithCapacity: 2];
-    
-    NSArray * oldDescriptors = [fPeerTable sortDescriptors];
-    BOOL useSecond = YES, asc = YES;
-    if ([oldDescriptors count] > 0)
-    {
-        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
-        [descriptors addObject: descriptor];
-        
-        if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
-            asc = [descriptor ascending];
-    }
-    
-    //sort by IP after primary sort
-    if (useSecond)
-    {
-        NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
-                                                                        selector: @selector(compareIP:)];
-        [descriptors addObject: secondDescriptor];
-        [secondDescriptor release];
-    }
-    
-    return descriptors;
 }
 
 - (int) outlineView: (NSOutlineView *) outlineView numberOfChildrenOfItem: (id) item
@@ -1364,6 +1332,56 @@ typedef enum
 	
 	while ((torrent = [enumerator nextObject]))
 		[torrent setPex: state == NSOnState];
+}
+
+@end
+
+@implementation InfoWindowController (Private)
+
+- (NSView *) tabViewForTag: (int) tag
+{
+    switch (tag)
+    {
+        case TAB_INFO_TAG:
+            return fInfoView;
+        case TAB_ACTIVITY_TAG:
+            return fActivityView;
+        case TAB_PEERS_TAG:
+            return fPeersView;
+        case TAB_FILES_TAG:
+            return fFilesView;
+        case TAB_OPTIONS_TAG:
+            return fOptionsView;
+        default:
+            return nil;
+    }
+}
+
+- (NSArray *) peerSortDescriptors
+{
+    NSMutableArray * descriptors = [NSMutableArray arrayWithCapacity: 2];
+    
+    NSArray * oldDescriptors = [fPeerTable sortDescriptors];
+    BOOL useSecond = YES, asc = YES;
+    if ([oldDescriptors count] > 0)
+    {
+        NSSortDescriptor * descriptor = [oldDescriptors objectAtIndex: 0];
+        [descriptors addObject: descriptor];
+        
+        if ((useSecond = ![[descriptor key] isEqualToString: @"IP"]))
+            asc = [descriptor ascending];
+    }
+    
+    //sort by IP after primary sort
+    if (useSecond)
+    {
+        NSSortDescriptor * secondDescriptor = [[NSSortDescriptor alloc] initWithKey: @"IP" ascending: asc
+                                                                        selector: @selector(compareIP:)];
+        [descriptors addObject: secondDescriptor];
+        [secondDescriptor release];
+    }
+    
+    return descriptors;
 }
 
 @end
