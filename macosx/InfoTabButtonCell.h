@@ -29,4 +29,6 @@
     NSImage * fRegularImage, * fSelectedImage;
 }
 
+- (void) setSelectedTab: (BOOL) selected;
+
 @end
