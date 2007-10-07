@@ -551,8 +551,10 @@ static int
 onTorrentScrapeNow( void * vtor )
 {
     Torrent * tor = (Torrent *) vtor;
-    if( trackerSupportsScrape( tor->tracker ) ) {
-        tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
+    if( trackerSupportsScrape( tor->tracker ) )
+    {
+        if( tr_ptrArrayFindSorted( tor->tracker->scrapeQueue, tor, torrentCompare) == NULL )
+            tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
         tr_trackerScrapeSoon( tor->tracker );
     }
     tor->scrapeTimer = NULL;
