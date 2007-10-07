@@ -799,11 +799,6 @@ typedef enum
         default:
             return;
     }
-    
-    //change selected tab item
-    if (oldTabTag != INVALID)
-        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
-    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
         
     [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
     
@@ -879,6 +874,11 @@ typedef enum
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
     [view setHidden: NO];
+    
+    //change selected tab item
+    if (oldTabTag != INVALID)
+        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
+    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
 }
 
 - (void) setNextTab
