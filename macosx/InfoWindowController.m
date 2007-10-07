@@ -82,6 +82,25 @@ typedef enum
     [window setBecomesKeyOnlyIfNeeded: YES];
     [window setAcceptsMouseMovedEvents: YES];
     
+    //set tab images and tooltips
+    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
+    [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
+    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
+    
+    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_INFO_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag:  TAB_PEERS_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_FILES_TAG]];
+    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab tooltip")
+                    forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
+    
     //set selected tab
     fCanResizeVertical = NO;
     fCurrentTabTag = INVALID;
@@ -104,25 +123,6 @@ typedef enum
     }
     [fTabMatrix selectCellWithTag: tag];
     [self setTab: nil];
-    
-    //set tab images and tooltips
-    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
-    [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
-    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: nil];
-    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: nil];
-    [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: nil];
-    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
-    
-    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_INFO_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag:  TAB_PEERS_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_FILES_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
     
     //initially sort peer table by IP
     if ([[fPeerTable sortDescriptors] count] == 0)
