@@ -583,10 +583,8 @@ onScrapeResponse( struct evhttp_request * req, void * vt )
                 Torrent * tor = getExistingTorrent( t, hash );
                 ++numResponses;
                    
-                if( !tor ) {
-                    tr_err( "Got an unrequested scrape response!" );
+                if( !tor )
                     continue;
-                }
 
                 publishErrorClear( tor );
 
