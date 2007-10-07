@@ -84,8 +84,7 @@
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A22A067E0CB83507009694FE /* InfoTabBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = A22A067D0CB83507009694FE /* InfoTabBack.tif */; };
 		A22A06980CB83880009694FE /* InfoTabBorder.tif in Resources */ = {isa = PBXBuildFile; fileRef = A22A06970CB83880009694FE /* InfoTabBorder.tif */; };
-		A22A06F00CB84903009694FE /* InfoTabMatrix.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A22A06EE0CB84903009694FE /* InfoTabMatrix.h */; };
-		A22A06F10CB84903009694FE /* InfoTabMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = A22A06EF0CB84903009694FE /* InfoTabMatrix.m */; };
+		A22A07350CB86B11009694FE /* InfoTabMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = A22A07330CB86B11009694FE /* InfoTabMatrix.m */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */; };
 		A22D602E0CB67E4A00F67A8B /* InfoTabBackAqua.tif in Resources */ = {isa = PBXBuildFile; fileRef = A22D602C0CB67E4A00F67A8B /* InfoTabBackAqua.tif */; };
@@ -107,7 +106,6 @@
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A253F6F30A698970008EE24F /* FilterBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A253F6F20A698970008EE24F /* FilterBarBackground.png */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
-		A257C1810CAD3003004E121C /* PeerTableView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A257C17F0CAD3003004E121C /* PeerTableView.h */; };
 		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
@@ -291,8 +289,6 @@
 			files = (
 				A261F1E40A69A1B10002815A /* Growl.framework in CopyFiles */,
 				A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */,
-				A257C1810CAD3003004E121C /* PeerTableView.h in CopyFiles */,
-				A22A06F00CB84903009694FE /* InfoTabMatrix.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,8 +395,8 @@
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
 		A22A067D0CB83507009694FE /* InfoTabBack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBack.tif; path = macosx/Images/InfoTabBack.tif; sourceTree = "<group>"; };
 		A22A06970CB83880009694FE /* InfoTabBorder.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBorder.tif; path = macosx/Images/InfoTabBorder.tif; sourceTree = "<group>"; };
-		A22A06EE0CB84903009694FE /* InfoTabMatrix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabMatrix.h; path = macosx/InfoTabMatrix.h; sourceTree = "<group>"; };
-		A22A06EF0CB84903009694FE /* InfoTabMatrix.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabMatrix.m; path = macosx/InfoTabMatrix.m; sourceTree = "<group>"; };
+		A22A07320CB86B11009694FE /* InfoTabMatrix.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabMatrix.h; path = macosx/InfoTabMatrix.h; sourceTree = "<group>"; };
+		A22A07330CB86B11009694FE /* InfoTabMatrix.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabMatrix.m; path = macosx/InfoTabMatrix.m; sourceTree = "<group>"; };
 		A22A7EBC0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A22A7EBD0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
 		A22A7EBE0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -739,8 +735,8 @@
 				A257C1800CAD3003004E121C /* PeerTableView.m */,
 				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
 				A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */,
-				A22A06EE0CB84903009694FE /* InfoTabMatrix.h */,
-				A22A06EF0CB84903009694FE /* InfoTabMatrix.m */,
+				A22A07320CB86B11009694FE /* InfoTabMatrix.h */,
+				A22A07330CB86B11009694FE /* InfoTabMatrix.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -842,8 +838,8 @@
 				A29597340A72A9E10057248B /* StatusBarBackground.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
-				A22D602C0CB67E4A00F67A8B /* InfoTabBackAqua.tif */,
 				A22A067D0CB83507009694FE /* InfoTabBack.tif */,
+				A22D602C0CB67E4A00F67A8B /* InfoTabBackAqua.tif */,
 				A22A06970CB83880009694FE /* InfoTabBorder.tif */,
 				A26E75950CB6AB4800226674 /* InfoGeneral.png */,
 				A26E75870CB6AA7500226674 /* InfoOptions.png */,
@@ -1524,7 +1520,7 @@
 				A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.m in Sources */,
 				A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */,
-				A22A06F10CB84903009694FE /* InfoTabMatrix.m in Sources */,
+				A22A07350CB86B11009694FE /* InfoTabMatrix.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

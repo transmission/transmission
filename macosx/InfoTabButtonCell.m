@@ -33,19 +33,17 @@
     [super dealloc];
 }
 
-- (void) setImage: (NSImage *) image
+- (void) setIcon: (NSImage *) image
 {
     //create regular back image
     if (fRegularImage)
         [fRegularImage release];
     fRegularImage = [[NSImage imageNamed: @"InfoTabBack.tif"] copy];
-    [fRegularImage setFlipped: YES];
     
     //create selected back image
     if (fSelectedImage)
         [fSelectedImage release];
     fSelectedImage = [[NSImage imageNamed: @"InfoTabBackAqua.tif"] copy];
-    [fSelectedImage setFlipped: YES];
     
     //composite image to back images
     if (image)
@@ -63,14 +61,16 @@
         [image drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
         [fSelectedImage unlockFocus];
     }
+    
+    [self setImage: fRegularImage];
 }
 
-- (void) setPushed: (BOOL) pushed
+- (void) setSelectedTab: (BOOL) selected
 {
-    fPushed = pushed;
+    [self setImage: selected ? fSelectedImage : fRegularImage];
 }
 
-- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+/*- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     #warning dim instead of set selected
     NSImage * image;
@@ -89,6 +89,6 @@
     
     [image drawInRect: cellFrame fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     //[super drawWithFrame: cellFrame inView: controlView];
-}
+}*/
 
 @end

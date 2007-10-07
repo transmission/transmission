@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "InfoWindowController.h"
+#import "InfoTabButtonCell.h"
 #import "NSStringAdditions.h"
 
 #define FILE_ROW_SMALL_HEIGHT 18.0
@@ -61,7 +62,6 @@ typedef enum
 - (void) updateInfoFiles;
 - (void) updateInfoOptions;
 
-- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate;
 - (NSArray *) peerSortDescriptors;
 
 @end
@@ -84,6 +84,7 @@ typedef enum
     
     //set selected tab
     fCanResizeVertical = NO;
+    fCurrentTabTag = INVALID;
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];
     int tag;
     if ([identifier isEqualToString: TAB_INFO_IDENT])
@@ -106,8 +107,11 @@ typedef enum
     
     //set tab images and tooltips
     [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
-    [[fTabMatrix cellWithTag: TAB_INFO_TAG] setImage: [NSImage imageNamed: @"InfoGeneral.png"]];
-    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setImage: [NSImage imageNamed: @"InfoOptions.png"]];
+    [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
+    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
     
     [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
                     forCell: [fTabMatrix cellWithTag: TAB_INFO_TAG]];
@@ -751,12 +755,12 @@ typedef enum
     return windowRect;
 }
 
-- (void) tabView: (NSTabView *) tabView didSelectTabViewItem: (NSTabViewItem *) tabViewItem
+/*- (void) tabView: (NSTabView *) tabView didSelectTabViewItem: (NSTabViewItem *) tabViewItem
 {
     NSString * identifier = [tabViewItem identifier];
     [self setWindowForTab: identifier animate: YES];
     [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
-}
+}*/
 
 /*- (void) setWindowForTab: (NSString *) identifier animate: (BOOL) animate
 {
@@ -852,6 +856,11 @@ typedef enum
             return;
     }
     
+    //change selected tab item
+    if (fCurrentTabTag != INVALID)
+        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: fCurrentTabTag] setSelectedTab: NO];
+    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
+        
     [[NSUserDefaults standardUserDefaults] setObject: identifier forKey: @"InspectorSelected"];
     
     NSWindow * window = [self window];
@@ -907,6 +916,7 @@ typedef enum
     [view setHidden: NO];
     
     fCurrentView = view;
+    fCurrentTabTag = [fTabMatrix selectedTag];
 }
 
 - (void) setNextTab

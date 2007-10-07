@@ -26,10 +26,19 @@
 
 @implementation InfoTabMatrix
 
-- (void) highlightCell: (BOOL) flag atRow: (int) row column: (int) column
+/*- (BOOL)selectCell:(int)anInt
 {
-    [[self cellAtRow: row column: column] setPushed: flag];
-    [super highlightCell: flag atRow: row column: column];
+NSLog(@"%d", anInt);
 }
+
+- (void)selectCellAtRow:(int)row column:(int)column
+{
+NSLog(@"%d", column);
+}
+
+- (void)highlightCell:(BOOL)flag atRow:(int)row column:(int)column
+{
+NSLog(@"%d", column);
+}*/
 
 @end

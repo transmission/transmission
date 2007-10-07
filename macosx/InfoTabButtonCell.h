@@ -27,10 +27,6 @@
 @interface InfoTabButtonCell : NSButtonCell
 {
     NSImage * fRegularImage, * fSelectedImage;
-    
-    BOOL fPushed;
 }
-
-- (void) setPushed: (BOOL) pushed;
 
 @end

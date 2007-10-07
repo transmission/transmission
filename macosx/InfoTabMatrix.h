@@ -24,6 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#warning remove!?!?!
 @interface InfoTabMatrix : NSMatrix
 {
 }

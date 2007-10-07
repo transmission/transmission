@@ -38,7 +38,9 @@
     BOOL fCanResizeVertical;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
+    #warning streamline
     NSView * fCurrentView;
+    int fCurrentTabTag;
     IBOutlet NSMatrix * fTabMatrix;
     IBOutlet ImageBackgroundView * fTabBackBar;
 
