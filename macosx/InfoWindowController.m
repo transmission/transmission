@@ -410,271 +410,6 @@ typedef enum
     }
 }
 
-- (void) updateInfoGeneral
-{   
-    if ([fTorrents count] != 1)
-        return;
-    
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
-    [fTrackerField setStringValue: tracker];
-    [fTrackerField setToolTip: tracker];
-    
-    NSString * location = [torrent dataLocation];
-    [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
-    [fDataLocationField setToolTip: location];
-}
-
-- (void) updateInfoActivity
-{
-    int numberSelected = [fTorrents count];
-    if (numberSelected == 0)
-        return;
-    
-    uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0, failedHash = 0;
-    Torrent * torrent;
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    while ((torrent = [enumerator nextObject]))
-    {
-        have += [torrent haveTotal];
-        haveVerified += [torrent haveVerified];
-        downloadedTotal += [torrent downloadedTotal];
-        uploadedTotal += [torrent uploadedTotal];
-        failedHash += [torrent failedHash];
-    }
-    
-    if (have == 0)
-        [fHaveField setStringValue: [NSString stringForFileSize: 0]];
-    else if (have == haveVerified)
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified",
-                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: haveVerified]]];
-    else
-        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)",
-                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
-    
-    [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
-    [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
-    [fFailedHashField setStringValue: [NSString stringForFileSize: failedHash]];
-    
-    if (numberSelected == 1)
-    {
-        torrent = [fTorrents objectAtIndex: 0];
-        
-        [fStateField setStringValue: [torrent stateString]];
-        [fProgressField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
-                    "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
-        [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
-        [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
-        
-        NSString * errorMessage = [torrent errorMessage];
-        if (![errorMessage isEqualToString: [fErrorMessageView string]])
-        {
-            [fErrorMessageView setString: errorMessage];
-            [fErrorMessageView setSelectable: ![errorMessage isEqualToString: @""]];
-        }
-        
-        [fDateCompletedField setObjectValue: [torrent dateCompleted]];
-        [fDateActivityField setObjectValue: [torrent dateActivity]];
-        
-        [fPiecesView updateView: NO];
-    }
-}
-
-- (void) updateInfoPeers
-{
-    if ([fTorrents count] != 1)
-        return;
-    Torrent * torrent = [fTorrents objectAtIndex: 0];
-    
-    int seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
-    [fSeedersField setStringValue: seeders > 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
-    [fLeechersField setStringValue: leechers > 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
-    [fCompletedFromTrackerField setStringValue: completed > 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
-    
-    BOOL active = [torrent isActive];
-    
-    if (active)
-    {
-        int total = [torrent totalPeersConnected];
-        NSString * connected = [NSString stringWithFormat:
-                                NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
-        
-        if (total > 0)
-        {
-            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
-            int count;
-            if ((count = [torrent totalPeersTracker]) > 0)
-                [components addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersIncoming]) > 0)
-                [components addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersPex]) > 0)
-                [components addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
-            if ((count = [torrent totalPeersCache]) > 0)
-                [components addObject: [NSString stringWithFormat:
-                                        NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
-            
-            connected = [connected stringByAppendingFormat: @": %@", [components componentsJoinedByString: @", "]];
-        }
-        
-        [fConnectedPeersField setStringValue: connected];
-        
-        [fDownloadingFromField setIntValue: [torrent peersSendingToUs]];
-        [fUploadingToField setIntValue: [torrent peersGettingFromUs]];
-    }
-    else
-    {
-        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
-        [fDownloadingFromField setStringValue: @""];
-        [fUploadingToField setStringValue: @""];
-    }
-    
-    [fKnownField setIntValue: [torrent totalPeersKnown]];
-    
-    [fPeers release];
-    fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
-    
-    [fPeerTable reloadData];
-}
-
-- (void) updateInfoFiles
-{
-    if ([fTorrents count] == 1)
-    {
-        [[fTorrents objectAtIndex: 0] updateFileStat];
-        [fFileOutline reloadData];
-    }
-}
-
-- (void) updateInfoOptions
-{
-    if ([fTorrents count] == 0)
-        return;
-
-    //get bandwidth info
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent = [enumerator nextObject]; //first torrent
-    
-    int uploadSpeedMode = [torrent speedMode: YES],
-        uploadSpeedLimit = [torrent speedLimit: YES],
-        downloadSpeedMode = [torrent speedMode: NO],
-        downloadSpeedLimit = [torrent speedLimit: NO];
-    
-    while ((torrent = [enumerator nextObject])
-            && (uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
-                || downloadSpeedMode != INVALID || downloadSpeedLimit != INVALID))
-    {
-        if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent speedMode: YES])
-            uploadSpeedMode = INVALID;
-        
-        if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit: YES])
-            uploadSpeedLimit = INVALID;
-        
-        if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent speedMode: NO])
-            downloadSpeedMode = INVALID;
-        
-        if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
-            downloadSpeedLimit = INVALID;
-    }
-    
-    //set upload view
-    int index;
-    if (uploadSpeedMode == TR_SPEEDLIMIT_SINGLE)
-        index = OPTION_POPUP_LIMIT;
-    else if (uploadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
-        index = OPTION_POPUP_NO_LIMIT;
-    else if (uploadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
-        index = OPTION_POPUP_GLOBAL;
-    else
-        index = -1;
-    [fUploadLimitPopUp selectItemAtIndex: index];
-    [fUploadLimitPopUp setEnabled: YES];
-    
-    [fUploadLimitLabel setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    [fUploadLimitField setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    if (uploadSpeedLimit != INVALID)
-        [fUploadLimitField setIntValue: uploadSpeedLimit];
-    else
-        [fUploadLimitField setStringValue: @""];
-    
-    //set download view
-    if (downloadSpeedMode == TR_SPEEDLIMIT_SINGLE)
-        index = OPTION_POPUP_LIMIT;
-    else if (downloadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
-        index = OPTION_POPUP_NO_LIMIT;
-    else if (downloadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
-        index = OPTION_POPUP_GLOBAL;
-    else
-        index = -1;
-    [fDownloadLimitPopUp selectItemAtIndex: index];
-    [fDownloadLimitPopUp setEnabled: YES];
-    
-    [fDownloadLimitLabel setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    [fDownloadLimitField setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
-    if (downloadSpeedLimit != INVALID)
-        [fDownloadLimitField setIntValue: downloadSpeedLimit];
-    else
-        [fDownloadLimitField setStringValue: @""];
-    
-    //get ratio info
-    enumerator = [fTorrents objectEnumerator];
-    torrent = [enumerator nextObject]; //first torrent
-    
-    int checkRatio = [torrent ratioSetting];
-    float ratioLimit = [torrent ratioLimit];
-    
-    while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || checkRatio != INVALID))
-    {
-        if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
-            checkRatio = INVALID;
-        
-        if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
-            ratioLimit = INVALID;
-    }
-    
-    //set ratio view
-    if (checkRatio == NSOnState)
-        index = OPTION_POPUP_LIMIT;
-    else if (checkRatio == NSOffState)
-        index = OPTION_POPUP_NO_LIMIT;
-    else if (checkRatio == NSMixedState)
-        index = OPTION_POPUP_GLOBAL;
-    else
-        index = -1;
-    [fRatioPopUp selectItemAtIndex: index];
-    [fRatioPopUp setEnabled: YES];
-    
-    [fRatioLimitField setHidden: checkRatio != NSOnState];
-    if (ratioLimit != INVALID)
-        [fRatioLimitField setFloatValue: ratioLimit];
-    else
-        [fRatioLimitField setStringValue: @""];
-    
-    //set pex check
-    enumerator = [fTorrents objectEnumerator];
-    torrent = [enumerator nextObject]; //first torrent
-    
-    BOOL pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
-    int pexState = [torrent pex] ? NSOnState : NSOffState;
-    
-    while ((torrent = [enumerator nextObject]) && (pexEnabled || pexState != NSMixedState))
-    {
-        if (pexEnabled)
-            pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
-        
-        if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
-            pexState = NSMixedState;
-    }
-    
-    [fPexCheck setEnabled: pexEnabled];
-    [fPexCheck setState: pexState];
-    [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
-                                "Inspector -> pex check") : nil];
-}
-
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
@@ -824,6 +559,9 @@ typedef enum
         if (fCurrentTabTag == oldTabTag)
             return;
         
+        //deselect old tab item
+        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
+        
         //get old view
         NSView * oldView = [self tabViewForTag: oldTabTag];
         [oldView setHidden: YES];
@@ -835,6 +573,9 @@ typedef enum
         if (oldCanResizeVertical)
             [[NSUserDefaults standardUserDefaults] setFloat: [oldView frame].size.height forKey: @"InspectorContentHeight"];
     }
+    
+    //selected tab item
+    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
     
     NSRect windowRect = [window frame], viewRect = [view frame];
     
@@ -869,11 +610,6 @@ typedef enum
     [window setFrame: windowRect display: YES animate: oldTabTag != INVALID];
     [[window contentView] addSubview: view];
     [view setHidden: NO];
-    
-    //change selected tab item
-    if (oldTabTag != INVALID)
-        [(InfoTabButtonCell *)[fTabMatrix cellWithTag: oldTabTag] setSelectedTab: NO];
-    [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
 }
 
 - (void) setNextTab
@@ -1337,6 +1073,271 @@ typedef enum
 @end
 
 @implementation InfoWindowController (Private)
+
+- (void) updateInfoGeneral
+{   
+    if ([fTorrents count] != 1)
+        return;
+    
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
+    [fTrackerField setStringValue: tracker];
+    [fTrackerField setToolTip: tracker];
+    
+    NSString * location = [torrent dataLocation];
+    [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
+    [fDataLocationField setToolTip: location];
+}
+
+- (void) updateInfoActivity
+{
+    int numberSelected = [fTorrents count];
+    if (numberSelected == 0)
+        return;
+    
+    uint64_t have = 0, haveVerified = 0, downloadedTotal = 0, uploadedTotal = 0, failedHash = 0;
+    Torrent * torrent;
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    while ((torrent = [enumerator nextObject]))
+    {
+        have += [torrent haveTotal];
+        haveVerified += [torrent haveVerified];
+        downloadedTotal += [torrent downloadedTotal];
+        uploadedTotal += [torrent uploadedTotal];
+        failedHash += [torrent failedHash];
+    }
+    
+    if (have == 0)
+        [fHaveField setStringValue: [NSString stringForFileSize: 0]];
+    else if (have == haveVerified)
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ verified",
+                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: haveVerified]]];
+    else
+        [fHaveField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ (%@ verified)",
+                "Inspector -> Activity tab -> have"), [NSString stringForFileSize: have], [NSString stringForFileSize: haveVerified]]];
+    
+    [fDownloadedTotalField setStringValue: [NSString stringForFileSize: downloadedTotal]];
+    [fUploadedTotalField setStringValue: [NSString stringForFileSize: uploadedTotal]];
+    [fFailedHashField setStringValue: [NSString stringForFileSize: failedHash]];
+    
+    if (numberSelected == 1)
+    {
+        torrent = [fTorrents objectAtIndex: 0];
+        
+        [fStateField setStringValue: [torrent stateString]];
+        [fProgressField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%.2f%% (%.2f%% selected)",
+                    "Inspector -> Activity tab -> progress"), 100.0 * [torrent progress], 100.0 * [torrent progressDone]]];
+        [fRatioField setStringValue: [NSString stringForRatio: [torrent ratio]]];
+        [fSwarmSpeedField setStringValue: [torrent isActive] ? [NSString stringForSpeed: [torrent swarmSpeed]] : @""];
+        
+        NSString * errorMessage = [torrent errorMessage];
+        if (![errorMessage isEqualToString: [fErrorMessageView string]])
+        {
+            [fErrorMessageView setString: errorMessage];
+            [fErrorMessageView setSelectable: ![errorMessage isEqualToString: @""]];
+        }
+        
+        [fDateCompletedField setObjectValue: [torrent dateCompleted]];
+        [fDateActivityField setObjectValue: [torrent dateActivity]];
+        
+        [fPiecesView updateView: NO];
+    }
+}
+
+- (void) updateInfoPeers
+{
+    if ([fTorrents count] != 1)
+        return;
+    Torrent * torrent = [fTorrents objectAtIndex: 0];
+    
+    int seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
+    [fSeedersField setStringValue: seeders > 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
+    [fLeechersField setStringValue: leechers > 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
+    [fCompletedFromTrackerField setStringValue: completed > 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
+    
+    BOOL active = [torrent isActive];
+    
+    if (active)
+    {
+        int total = [torrent totalPeersConnected];
+        NSString * connected = [NSString stringWithFormat:
+                                NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), total];
+        
+        if (total > 0)
+        {
+            NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
+            int count;
+            if ((count = [torrent totalPeersTracker]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersIncoming]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersPex]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), count]];
+            if ((count = [torrent totalPeersCache]) > 0)
+                [components addObject: [NSString stringWithFormat:
+                                        NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), count]];
+            
+            connected = [connected stringByAppendingFormat: @": %@", [components componentsJoinedByString: @", "]];
+        }
+        
+        [fConnectedPeersField setStringValue: connected];
+        
+        [fDownloadingFromField setIntValue: [torrent peersSendingToUs]];
+        [fUploadingToField setIntValue: [torrent peersGettingFromUs]];
+    }
+    else
+    {
+        [fConnectedPeersField setStringValue: NSLocalizedString(@"info not available", "Inspector -> Peers tab -> peers")];
+        [fDownloadingFromField setStringValue: @""];
+        [fUploadingToField setStringValue: @""];
+    }
+    
+    [fKnownField setIntValue: [torrent totalPeersKnown]];
+    
+    [fPeers release];
+    fPeers = [[[torrent peers] sortedArrayUsingDescriptors: [self peerSortDescriptors]] retain];
+    
+    [fPeerTable reloadData];
+}
+
+- (void) updateInfoFiles
+{
+    if ([fTorrents count] == 1)
+    {
+        [[fTorrents objectAtIndex: 0] updateFileStat];
+        [fFileOutline reloadData];
+    }
+}
+
+- (void) updateInfoOptions
+{
+    if ([fTorrents count] == 0)
+        return;
+
+    //get bandwidth info
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent = [enumerator nextObject]; //first torrent
+    
+    int uploadSpeedMode = [torrent speedMode: YES],
+        uploadSpeedLimit = [torrent speedLimit: YES],
+        downloadSpeedMode = [torrent speedMode: NO],
+        downloadSpeedLimit = [torrent speedLimit: NO];
+    
+    while ((torrent = [enumerator nextObject])
+            && (uploadSpeedMode != INVALID || uploadSpeedLimit != INVALID
+                || downloadSpeedMode != INVALID || downloadSpeedLimit != INVALID))
+    {
+        if (uploadSpeedMode != INVALID && uploadSpeedMode != [torrent speedMode: YES])
+            uploadSpeedMode = INVALID;
+        
+        if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit: YES])
+            uploadSpeedLimit = INVALID;
+        
+        if (downloadSpeedMode != INVALID && downloadSpeedMode != [torrent speedMode: NO])
+            downloadSpeedMode = INVALID;
+        
+        if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit: NO])
+            downloadSpeedLimit = INVALID;
+    }
+    
+    //set upload view
+    int index;
+    if (uploadSpeedMode == TR_SPEEDLIMIT_SINGLE)
+        index = OPTION_POPUP_LIMIT;
+    else if (uploadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
+        index = OPTION_POPUP_NO_LIMIT;
+    else if (uploadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
+        index = OPTION_POPUP_GLOBAL;
+    else
+        index = -1;
+    [fUploadLimitPopUp selectItemAtIndex: index];
+    [fUploadLimitPopUp setEnabled: YES];
+    
+    [fUploadLimitLabel setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    [fUploadLimitField setHidden: uploadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    if (uploadSpeedLimit != INVALID)
+        [fUploadLimitField setIntValue: uploadSpeedLimit];
+    else
+        [fUploadLimitField setStringValue: @""];
+    
+    //set download view
+    if (downloadSpeedMode == TR_SPEEDLIMIT_SINGLE)
+        index = OPTION_POPUP_LIMIT;
+    else if (downloadSpeedMode == TR_SPEEDLIMIT_UNLIMITED)
+        index = OPTION_POPUP_NO_LIMIT;
+    else if (downloadSpeedMode == TR_SPEEDLIMIT_GLOBAL)
+        index = OPTION_POPUP_GLOBAL;
+    else
+        index = -1;
+    [fDownloadLimitPopUp selectItemAtIndex: index];
+    [fDownloadLimitPopUp setEnabled: YES];
+    
+    [fDownloadLimitLabel setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    [fDownloadLimitField setHidden: downloadSpeedMode != TR_SPEEDLIMIT_SINGLE];
+    if (downloadSpeedLimit != INVALID)
+        [fDownloadLimitField setIntValue: downloadSpeedLimit];
+    else
+        [fDownloadLimitField setStringValue: @""];
+    
+    //get ratio info
+    enumerator = [fTorrents objectEnumerator];
+    torrent = [enumerator nextObject]; //first torrent
+    
+    int checkRatio = [torrent ratioSetting];
+    float ratioLimit = [torrent ratioLimit];
+    
+    while ((torrent = [enumerator nextObject]) && (checkRatio != INVALID || checkRatio != INVALID))
+    {
+        if (checkRatio != INVALID && checkRatio != [torrent ratioSetting])
+            checkRatio = INVALID;
+        
+        if (ratioLimit != INVALID && ratioLimit != [torrent ratioLimit])
+            ratioLimit = INVALID;
+    }
+    
+    //set ratio view
+    if (checkRatio == NSOnState)
+        index = OPTION_POPUP_LIMIT;
+    else if (checkRatio == NSOffState)
+        index = OPTION_POPUP_NO_LIMIT;
+    else if (checkRatio == NSMixedState)
+        index = OPTION_POPUP_GLOBAL;
+    else
+        index = -1;
+    [fRatioPopUp selectItemAtIndex: index];
+    [fRatioPopUp setEnabled: YES];
+    
+    [fRatioLimitField setHidden: checkRatio != NSOnState];
+    if (ratioLimit != INVALID)
+        [fRatioLimitField setFloatValue: ratioLimit];
+    else
+        [fRatioLimitField setStringValue: @""];
+    
+    //set pex check
+    enumerator = [fTorrents objectEnumerator];
+    torrent = [enumerator nextObject]; //first torrent
+    
+    BOOL pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
+    int pexState = [torrent pex] ? NSOnState : NSOffState;
+    
+    while ((torrent = [enumerator nextObject]) && (pexEnabled || pexState != NSMixedState))
+    {
+        if (pexEnabled)
+            pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
+        
+        if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
+            pexState = NSMixedState;
+    }
+    
+    [fPexCheck setEnabled: pexEnabled];
+    [fPexCheck setState: pexState];
+    [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
+                                "Inspector -> pex check") : nil];
+}
 
 - (NSView *) tabViewForTag: (int) tag
 {
