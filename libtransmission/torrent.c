@@ -1004,8 +1004,6 @@ checkAndStartCB( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
-    tr_torrentRecheckCompleteness( tor );
-
     tor->isRunning  = 1;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
@@ -1040,7 +1038,7 @@ tr_torrentRecheck( tr_torrent * tor )
         tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
 
-    tr_ioRecheckAdd( tor, NULL );
+    tr_ioRecheckAdd( tor, tr_torrentRecheckCompleteness );
 
     tr_globalUnlock( tor->handle );
 }
