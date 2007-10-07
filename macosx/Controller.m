@@ -90,7 +90,7 @@
 
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
-#define DONATE_URL   @"http://transmission.m0k.org/donate.php"
+#define DONATE_URL  @"http://transmission.m0k.org/donate.php"
 
 void sleepCallBack(void * controller, io_service_t y, natural_t messageType, void * messageArgument)
 {
