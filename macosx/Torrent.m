@@ -485,22 +485,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         NSDictionary * systemAttributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [self downloadFolder]];
         uint64_t remainingSpace = [[systemAttributes objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
         
-        uint64_t existingSize = 0;
-        NSDirectoryEnumerator * enumerator;
-        if ((enumerator = [[NSFileManager defaultManager] enumeratorAtPath:
-                    [[self downloadFolder] stringByAppendingPathComponent: [self name]]]))
-        {
-            NSDictionary * fileAttributes; 
-            while ([enumerator nextObject])
-            {
-                fileAttributes = [enumerator fileAttributes];
-                if (![[fileAttributes objectForKey: NSFileType] isEqualTo: NSFileTypeDirectory])
-                    existingSize += [[fileAttributes objectForKey: NSFileSize] unsignedLongLongValue];
-            }
-        }
-        
-        #warning factor in checked files
-        if (remainingSpace + existingSize <= [self size])
+        if (remainingSpace - [self sizeLeft] <= [self size])
         {
             NSAlert * alert = [[NSAlert alloc] init];
             [alert setMessageText: [NSString stringWithFormat:
@@ -625,6 +610,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fInfo->totalSize;
 }
 
+- (uint64_t) sizeLeft
+{
+    return fStat->leftUntilDone;
+}
+
 - (NSString *) trackerAddress
 {
     return [NSString stringWithFormat: @"http://%s:%d", fStat->tracker->address, fStat->tracker->port];
@@ -703,7 +693,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float) progressLeft
 {//NSLog(@"left %f",(float)fStat->leftUntilDone / [self size]);
-    return (float)fStat->leftUntilDone / [self size];
+    return (float)[self sizeLeft] / [self size];
 }
 
 - (int) eta
@@ -833,7 +823,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             uint64_t have = [self haveTotal];
             string = [NSString stringWithFormat: NSLocalizedString(@"%@ of %@ selected (%.2f%%)", "Torrent -> progress string"),
-                            [NSString stringForFileSize: have], [NSString stringForFileSize: have + fStat->leftUntilDone],
+                            [NSString stringForFileSize: have], [NSString stringForFileSize: have + [self sizeLeft]],
                             100.0 * [self progressDone]];
         }
         else

@@ -131,6 +131,7 @@ typedef enum
 
 - (NSString *) name;
 - (uint64_t) size;
+- (uint64_t) sizeLeft;
 - (NSString *) trackerAddress;
 - (NSString *) trackerAddressAnnounce;
 
