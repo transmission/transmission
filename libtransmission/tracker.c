@@ -44,11 +44,8 @@
 /* unless the tracker tells us otherwise, reannounce this frequently */
 #define DEFAULT_ANNOUNCE_INTERVAL_MSEC (MINUTES_TO_MSEC(20))
 
-/* this is how long we'll leave a scrape request hanging before timeout */
-#define SCRAPE_TIMEOUT_INTERVAL_SEC 60
-
-/* this is how long we'll leave a tracker request hanging before timeout */
-#define REQ_TIMEOUT_INTERVAL_SEC 60
+/* this is how long we'll leave a request hanging before timeout */
+#define TIMEOUT_INTERVAL_SEC 5
 
 /* the value of the 'numwant' argument passed in tracker requests */
 #define NUMWANT 128
@@ -92,8 +89,6 @@ typedef struct
     char key_param[TR_KEY_LEN+1];
 
     tr_timer * scrapeTimer;
-
-    struct evhttp_connection * connection;
 }
 Tracker;
 
@@ -159,27 +154,26 @@ torrentCompare( const void * va, const void * vb )
 ****
 ***/
 
+static int
+freeConnection( void * evcon )
+{
+    evhttp_connection_free( evcon );
+    return FALSE;
+}
+
+static void
+connectionClosedCB( struct evhttp_connection * evcon, void * handle )
+{
+    tr_timerNew( handle, freeConnection, evcon, 100 );
+}
+
 static struct evhttp_connection*
 getConnection( Tracker * tracker, const char * address, int port )
 {
-    if( tracker->connection != NULL )
-    {
-        char * a = NULL;
-        unsigned short p = 0;
-        evhttp_connection_get_peer( tracker->connection, &a, &p );
-
-        /* old one matches -- reuse it */
-        if( a && !strcmp(a,address) && p==port )
-            return tracker->connection;
-
-        /* old one doesn't match -- throw it away */
-        evhttp_connection_free( tracker->connection );
-        tracker->connection = NULL;
-    }
-
-    /* make a new connection */
-    tracker->connection = evhttp_connection_new( address, port );
-    return tracker->connection;
+    struct evhttp_connection * c = evhttp_connection_new( address, port );
+    evhttp_connection_set_timeout( c, TIMEOUT_INTERVAL_SEC );
+    evhttp_connection_set_closecb( c, connectionClosedCB, tracker->handle );
+    return c;
 }
 
 /***
@@ -370,9 +364,6 @@ onTorrentFreeNow( void * vtor )
     {
         int i;
         tr_ptrArrayRemoveSorted( getTrackerLookupTable( ), t, trackerCompare );
-
-        if( t->connection != NULL )
-            evhttp_connection_free( t->connection );
 
         tr_ptrArrayFree( t->torrents, NULL );
         tr_ptrArrayFree( t->scrapeQueue, NULL );
@@ -684,8 +675,8 @@ onTrackerScrapeNow( void * vt )
         char *march, *uri;
         Torrent ** torrents =
             (Torrent**) tr_ptrArrayPeek( t->scrapeQueue, &n );
-        struct evhttp_connection *evcon = NULL;
-        struct evhttp_request *req = NULL;
+        struct evhttp_connection * evcon;
+        struct evhttp_request *req;
 
         ask_n = n;
         if( ask_n > t->multiscrapeMax )
@@ -719,7 +710,6 @@ onTrackerScrapeNow( void * vt )
         tr_inf( "Sending scrape to tracker %s:%d: %s",
                 address->address, address->port, uri );
         evcon = getConnection( t, address->address, address->port );
-        evhttp_connection_set_timeout( evcon, SCRAPE_TIMEOUT_INTERVAL_SEC );
         req = evhttp_request_new( onScrapeResponse, t );
         assert( req );
         addCommonHeaders( t, req );
@@ -856,6 +846,11 @@ onTrackerResponseDataNew( Torrent * tor )
 }
 
 static void
+onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
+{
+}
+
+static void
 onTrackerResponse( struct evhttp_request * req, void * vdata )
 {
     char * errmsg;
@@ -975,7 +970,7 @@ sendTrackerRequest( void * vt, const char * eventName )
     Torrent * t = (Torrent *) vt;
     const tr_tracker_info * address = getCurrentAddress( t->tracker );
     char * uri;
-    struct evhttp_connection * evcon = NULL;
+    struct evhttp_connection * evcon;
     const tr_torrent * tor;
 
     tor = tr_torrentFindFromHash( t->tracker->handle, t->hash );
@@ -1001,8 +996,10 @@ sendTrackerRequest( void * vt, const char * eventName )
         struct evhttp_request * httpReq;
         tr_free( t->lastRequest );
         t->lastRequest = tr_strdup( eventName );
-        evhttp_connection_set_timeout( evcon, REQ_TIMEOUT_INTERVAL_SEC );
-        httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
+        if( eventName && !strcmp( eventName, "stopped" ) )
+            httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
+        else
+            httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
         addCommonHeaders( t->tracker, httpReq );
         tr_evhttp_make_request( t->tracker->handle, evcon,
                                 httpReq, EVHTTP_REQ_GET, uri );

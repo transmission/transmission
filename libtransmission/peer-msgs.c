@@ -1143,7 +1143,10 @@ gotBadPiece( tr_peermsgs * msgs, uint32_t pieceIndex )
 }
 
 static void
-gotUnwantedBlock( tr_peermsgs * msgs, uint32_t index UNUSED, uint32_t offset UNUSED, uint32_t length )
+gotUnwantedBlock( tr_peermsgs * msgs,
+                  uint32_t      index UNUSED,
+                  uint32_t      offset UNUSED,
+                  uint32_t      length )
 {
     reassignBytesToCorrupt( msgs, length );
 }
