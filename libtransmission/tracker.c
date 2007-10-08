@@ -45,7 +45,8 @@
 #define DEFAULT_ANNOUNCE_INTERVAL_MSEC (MINUTES_TO_MSEC(20))
 
 /* this is how long we'll leave a request hanging before timeout */
-#define TIMEOUT_INTERVAL_SEC 5
+#define TIMEOUT_INTERVAL_SEC 40
+#define STOPPING_TIMEOUT_INTERVAL_SEC 8
 
 /* the value of the 'numwant' argument passed in tracker requests */
 #define NUMWANT 128
@@ -171,7 +172,6 @@ static struct evhttp_connection*
 getConnection( Tracker * tracker, const char * address, int port )
 {
     struct evhttp_connection * c = evhttp_connection_new( address, port );
-    evhttp_connection_set_timeout( c, TIMEOUT_INTERVAL_SEC );
     evhttp_connection_set_closecb( c, connectionClosedCB, tracker->handle );
     return c;
 }
@@ -708,6 +708,7 @@ onTrackerScrapeNow( void * vt )
         tr_inf( "Sending scrape to tracker %s:%d: %s",
                 address->address, address->port, uri );
         evcon = getConnection( t, address->address, address->port );
+        evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
         req = evhttp_request_new( onScrapeResponse, t );
         assert( req );
         addCommonHeaders( t, req );
@@ -994,10 +995,13 @@ sendTrackerRequest( void * vt, const char * eventName )
         struct evhttp_request * httpReq;
         tr_free( t->lastRequest );
         t->lastRequest = tr_strdup( eventName );
-        if( eventName && !strcmp( eventName, "stopped" ) )
-            httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
-        else
+        if( !eventName || !strcmp( eventName, "stopped" ) ) {
+            evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
             httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
+        } else {
+            evhttp_connection_set_timeout( evcon, STOPPING_TIMEOUT_INTERVAL_SEC );
+            httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
+        }
         addCommonHeaders( t->tracker, httpReq );
         tr_evhttp_make_request( t->tracker->handle, evcon,
                                 httpReq, EVHTTP_REQ_GET, uri );
