@@ -36,6 +36,10 @@ typedef struct tr_peer
     unsigned int  clientIsInterested : 1;
     unsigned int  doPurge : 1;
 
+
+    /* number of bad pieces they've contributed to */
+    uint8_t strikes;
+
     uint8_t encryption_preference;
     uint16_t port;
     struct in_addr in_addr;

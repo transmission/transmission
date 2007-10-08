@@ -68,9 +68,13 @@ enum
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
-
     /* corresponds to ut_pex's added.f flags */
-    ADDED_F_SEED_FLAG = 2
+    ADDED_F_SEED_FLAG = 2,
+
+    /* number of bad pieces a peer is allowed to send before we ban them */
+    MAX_BAD_PIECES_PER_PEER = 3,
+    /* use for bitwise operations w/peer_atom.myflags */
+    MYFLAG_BANNED = 1
 };
 
 
@@ -86,6 +90,7 @@ struct peer_atom
 {   
     uint8_t from;
     uint8_t flags; /* these match the added_f flags */
+    uint8_t myflags; /* flags that aren't defined in added_f */
     uint16_t port;
     struct in_addr addr; 
     time_t time;
@@ -340,7 +345,6 @@ peerDestructor( tr_peer * peer )
 
     tr_bitfieldFree( peer->have );
     tr_bitfieldFree( peer->blame );
-    tr_bitfieldFree( peer->banned );
     tr_rcClose( peer->rcToClient );
     tr_rcClose( peer->rcToPeer );
     tr_free( peer->client );
@@ -908,16 +912,28 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     }
     else /* looking good */
     {
-        tr_peer * peer = getPeer( t, in_addr );
         uint16_t port;
         const struct in_addr * addr = tr_peerIoGetAddress( io,  &port );
+        struct peer_atom * atom;
         ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
-        tr_free( peer->client );
-        peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
-        if( peer->msgs != NULL ) { /* we already have this peer */
+        atom = getExistingAtom( t, addr );
+        tr_peer * peer = getPeer( t, addr );
+        if( atom->myflags & MYFLAG_BANNED )
+        {
+            tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
             --manager->connectionCount;
-        } else {
+            peer->doPurge = 1;
+        }
+        else if( peer->msgs != NULL ) /* we already have this peer */
+        {
+            tr_peerIoFree( io );
+            --manager->connectionCount;
+        }
+        else
+        {
+            tr_free( peer->client );
+            peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
             peer->port = port;
             peer->io = io;
             peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );
@@ -1002,12 +1018,42 @@ tr_peerMgrAddPeers( tr_peerMgr    * manager,
 **/
 
 void
-tr_peerMgrSetBlame( tr_peerMgr     * manager UNUSED,
-                    const uint8_t  * torrentHash UNUSED,
-                    int              pieceIndex UNUSED,
-                    int              success UNUSED )
+tr_peerMgrSetBlame( tr_peerMgr     * manager,
+                    const uint8_t  * torrentHash,
+                    int              pieceIndex,
+                    int              success )
 {
-    /*fprintf( stderr, "FIXME: tr_peerMgrSetBlame\n" );*/
+    if( !success )
+    {
+        int peerCount, i;
+        Torrent * t = getExistingTorrent( manager, torrentHash );
+        tr_peer ** peers;
+
+        assert( torrentIsLocked( t ) );
+
+        peers = (tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
+        for( i=0; i<peerCount; ++i )
+        {
+            struct peer_atom * atom;
+            tr_peer * peer;
+
+            peer = peers[i];
+            if( !tr_bitfieldHas( peer->blame, pieceIndex ) )
+                continue;
+
+            ++peer->strikes;
+            tordbg( t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
+                       tr_peerIoAddrStr(&peer->in_addr,peer->port),
+                       pieceIndex, (int)peer->strikes );
+            if( peer->strikes < MAX_BAD_PIECES_PER_PEER )
+                continue;
+
+            peer->doPurge = 1;
+            atom = getExistingAtom( t, &peer->in_addr );
+            atom->myflags |= MYFLAG_BANNED;
+            tordbg( t, "banning peer %s due to corrupt data", tr_peerIoAddrStr(&atom->addr,atom->port) );
+        }
+    }
 }
 
 int
@@ -1510,6 +1556,14 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     for( i=outsize=0; i<insize; ++i )
     {
         struct peer_atom * atom = atoms[i];
+
+        /* peer fed us too much bad data ... we only keep it around
+         * now to weed it out in case someone sends it to us via pex */
+        if( atom->myflags & MYFLAG_BANNED ) {
+            tordbg( t, "RECONNECT peer %d (%s) is banned...",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+            continue;
+        }
 
         /* we don't need two connections to the same peer... */
         if( peerIsInUse( t, &atom->addr ) ) {
