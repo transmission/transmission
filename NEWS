@@ -5,6 +5,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Encryption support, with option to ignore unencrypted peers
  - Improved compliance with BitTorrent spec
  - Multiscrape support
+ - Ban peers that send too much bad data
  - Only report downloaded, verified good pieces in tracker `download' field
  - OS X:
    + Per-torrent action menu
