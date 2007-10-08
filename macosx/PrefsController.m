@@ -244,23 +244,24 @@
     if (change = (fNatStatus != stat->natTraversalStatus))
     {
         fNatStatus = stat->natTraversalStatus;
-        
-        if (fNatStatus == TR_NAT_TRAVERSAL_MAPPED)
+        switch (fNatStatus)
         {
-            [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
-                                                "Preferences -> Advanced -> port map status")];
-            [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
-        }
-        else if (fNatStatus == TR_NAT_TRAVERSAL_NOTFOUND || fNatStatus == TR_NAT_TRAVERSAL_ERROR)
-        {
-            [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
-                                                "Preferences -> Advanced -> port map status")];
-            [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
-        }
-        else
-        {
-            [fNatStatusField setStringValue: @""];
-            [fNatStatusImage setImage: nil];
+            case TR_NAT_TRAVERSAL_MAPPED:
+                [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
+                                                    "Preferences -> Advanced -> port map status")];
+                [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
+                break;
+            
+            case TR_NAT_TRAVERSAL_NOTFOUND:
+            case TR_NAT_TRAVERSAL_ERROR:
+                [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
+                                                    "Preferences -> Advanced -> port map status")];
+                [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+                break;
+            
+            default:
+                [fNatStatusField setStringValue: @""];
+                [fNatStatusImage setImage: nil];
         }
     }
     
