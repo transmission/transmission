@@ -362,9 +362,9 @@ static void
 gtksetup( int * argc, char *** argv, struct cbdata * callback_data )
 {
 
-    bindtextdomain( "transmission-gtk", LOCALEDIR );
-    bind_textdomain_codeset( "transmission-gtk", "UTF-8" );
-    textdomain( "transmission-gtk" );
+    bindtextdomain( "transmission", TRANSMISSIONLOCALEDIR );
+    bind_textdomain_codeset( "transmission", "UTF-8" );
+    textdomain( "transmission" );
 
     g_set_application_name( _("Transmission") );
     gtk_init( argc, argv );

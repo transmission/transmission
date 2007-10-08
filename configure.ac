@@ -1,4 +1,4 @@
-AC_INIT([Transmission],[0.82+],[http://transmission.m0k.org/trac/newticket])
+AC_INIT([transmission],[0.82+],[http://transmission.m0k.org/trac/newticket])
 PEERID_PREFIX="-TR082Z-"
 USERAGENT_PREFIX="0.82+"
 
@@ -28,14 +28,6 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 ACX_PTHREAD
-
-dnl AC_PROG_INTLTOOL([0.23],[no-xml])
-GETTEXT_PACKAGE=transmission
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
-ALL_LINGUAS="bg es fi fr it pl ro ru sk sv"
-AM_GLIB_GNU_GETTEXT
-transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
 
 AC_CHECK_LIB([crypto],[CRYPTO_new_ex_data])
 AC_CHECK_LIB([ssl],[SSL_library_init])
@@ -76,6 +68,15 @@ AM_CONDITIONAL([WITH_GTK],[test "x$use_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
+if test "x$use_gtk" = "xyes"; then
+    AC_PROG_INTLTOOL([0.23],[no-xml])
+    GETTEXT_PACKAGE=transmission
+    AC_SUBST(GETTEXT_PACKAGE)
+    AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
+    AM_GLIB_GNU_GETTEXT
+    transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
+    AC_SUBST(transmissionlocaledir)
+fi
 
 dnl ----------------------------------------------------------------------------
 dnl
@@ -190,7 +191,6 @@ AC_SUBST(BUNDLE_VERSION,[$SVN_REVISION])
 AC_SUBST(VERSION_PACKAGE,$USERAGENT_PREFIX-r$SVN_REVISION)
 
 
-
 dnl ----------------------------------------------------------------------------
 dnl
 dnl  Generate the output
@@ -206,7 +206,8 @@ AC_CONFIG_FILES([Makefile
                  third-party/Makefile
                  macosx/Makefile
                  wx/Makefile
-                 wx/images/Makefile])
+                 wx/images/Makefile
+                 po/Makefile.in])
 
 ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
 AC_OUTPUT

@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 if WITH_GTK
-  GTK_DIR = gtk
+  GTK_DIR = gtk po
 endif
 if HAVE_BEOS
   BEOS_DIR = beos
@@ -23,4 +23,5 @@ EXTRA_DIST = \
  AUTHORS \
  LICENSE \
  README \
- third-party
+ third-party \
+ intltool-extract.in intltool-merge.in intltool-update.in 

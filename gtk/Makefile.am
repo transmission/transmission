@@ -2,7 +2,7 @@ AM_CPPFLAGS = \
     -I$(top_srcdir) \
     $(LIBEVENT_CPPFLAGS) \
     $(GTK_CFLAGS) \
-    -DLOCALEDIR=\""$(transmissionlocaledir)"\"
+    -DTRANSMISSIONLOCALEDIR=\""$(transmissionlocaledir)"\"
 
 AM_CFLAGS = $(PTHREAD_CFLAGS)
 
@@ -52,3 +52,9 @@ transmission_LDADD = \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(GTK_LIBS) \
     $(PTHREAD_LIBS) -lm
+
+Productivitydir = $(datadir)/applications
+Productivity_DATA = $(DESKTOP_FILES)
+
+icon_DATA = transmission.png
+icondir = $(datadir)/pixmaps

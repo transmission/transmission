@@ -1,0 +1,19 @@
+[encoding: UTF-8]
+gtk/transmission.desktop.in
+gtk/actions.c
+gtk/conf.c
+gtk/dialogs.c
+gtk/hig.c
+gtk/io.c
+gtk/ipc.c
+gtk/main.c
+gtk/makemeta-ui.c
+gtk/msgwin.c
+gtk/torrent-inspector.c
+gtk/tr_cell_renderer_progress.c
+gtk/tr_core.c
+gtk/tr_icon.c
+gtk/tr_prefs.c
+gtk/tr_torrent.c
+gtk/tr_window.c
+gtk/util.c

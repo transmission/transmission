@@ -12,7 +12,6 @@ daemon/transmission-proxy
 daemon/transmission-remote
 gtk/.depend
 gtk/defines.h
-gtk/po/*.mo
 gtk/transmission-gtk
 libtransmission/*.a
 libtransmission/.depend
@@ -22,3 +21,4 @@ macosx/Info.plist
 macosx/Transmission.app
 mk/config.mk
 mk/version.mk
+po/*.mo
