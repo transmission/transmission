@@ -141,14 +141,7 @@
         }
         else
         {
-            if ([self pointInProgressRect: fClickPoint])
-            {
-                [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"]
-                                        forKey: @"DisplayStatusProgressSelected"];
-                fClickPoint = NSZeroPoint;
-                [self reloadData];
-            } 
-            else if ([self pointInMinimalStatusRect: fClickPoint])
+            if ([self pointInMinimalStatusRect: fClickPoint])
             {
                 [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
                 fClickPoint = NSZeroPoint;
@@ -187,7 +180,12 @@
         [[fTorrents objectAtIndex: row] revealData];
     else if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
     {
-        if ([self pointInIconRect: point])
+        if ([self pointInProgressRect: fClickPoint])
+        {
+            [fDefaults setBool: ![fDefaults boolForKey: @"DisplayStatusProgressSelected"] forKey: @"DisplayStatusProgressSelected"];
+            [self reloadData];
+        }
+        else if ([self pointInIconRect: point])
             [[fTorrents objectAtIndex: row] revealData];
         else if (![self pointInActionRect: point])
             [fController showInfo: nil];
