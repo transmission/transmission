@@ -1047,9 +1047,9 @@ tr_peerMgrSetBlame( tr_peerMgr     * manager,
             if( peer->strikes < MAX_BAD_PIECES_PER_PEER )
                 continue;
 
-            peer->doPurge = 1;
             atom = getExistingAtom( t, &peer->in_addr );
             atom->myflags |= MYFLAG_BANNED;
+            peer->doPurge = 1;
             tordbg( t, "banning peer %s due to corrupt data", tr_peerIoAddrStr(&atom->addr,atom->port) );
         }
     }
@@ -1510,10 +1510,10 @@ getWeakConnections( Torrent * t, int * setmeSize )
 
         assert( atom != NULL );
 
-        if( throughput >= 3 )
-            isWeak = FALSE;
-        else if( peer->doPurge )
+        if( peer->doPurge )
             isWeak = TRUE;
+        else if( throughput >= 3 )
+            isWeak = FALSE;
         else if( peerIsSeed && clientIsSeed )
             isWeak = t->tor->pexDisabled || (now-atom->time>=30);
         else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
