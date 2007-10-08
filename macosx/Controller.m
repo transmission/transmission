@@ -182,29 +182,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return self;
 }
 
-- (void) dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
-    [fInfoController release];
-    [fMessageController release];
-    [fPrefsController release];
-    
-    [fTorrents release];
-    [fDisplayedTorrents release];
-    
-    [fBadger release];
-    [fOverlayWindow release];
-    [fIPCController release];
-    
-    [fAutoImportedNames release];
-    [fPendingTorrentDownloads release];
-    [fTempTorrentFiles release];
-    
-    tr_close(fLib);
-    [super dealloc];
-}
-
 - (void) awakeFromNib
 {
     [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
@@ -608,6 +585,26 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ([start timeIntervalSinceNow] >= -5.0
             && (tr_torrentCount(fLib) > 0 || tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED))
         usleep(100000);
+    
+    //remaining calls the same as dealloc
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [fInfoController release];
+    [fMessageController release];
+    [fPrefsController release];
+    
+    [fTorrents release];
+    [fDisplayedTorrents release];
+    
+    [fBadger release];
+    [fOverlayWindow release];
+    [fIPCController release];
+    
+    [fAutoImportedNames release];
+    [fPendingTorrentDownloads release];
+    [fTempTorrentFiles release];
+    
+    tr_close(fLib);
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent

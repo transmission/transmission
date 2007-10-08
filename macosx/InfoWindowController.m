@@ -159,12 +159,10 @@ typedef enum
 
 - (void) dealloc
 {
-    #warning not called?
-    float viewHeight = [[self tabViewForTag: fCurrentTabTag] frame].size.height;
-    
     //save resizeable view height
     if (fCurrentTabTag == TAB_PEERS_TAG || fCurrentTabTag == TAB_FILES_TAG)
-        [[NSUserDefaults standardUserDefaults] setFloat: viewHeight forKey: @"InspectorContentHeight"];
+        [[NSUserDefaults standardUserDefaults] setFloat: [[self tabViewForTag: fCurrentTabTag] frame].size.height
+            forKey: @"InspectorContentHeight"];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -199,8 +197,7 @@ typedef enum
         }
         else
         {
-            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected",
-                                                            "Inspector -> above tabs -> selected torrents")];
+            [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
             [fSizeField setStringValue: @""];
     
             [fHaveField setStringValue: @""];
