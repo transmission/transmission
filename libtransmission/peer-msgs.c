@@ -228,6 +228,25 @@ protocolSendChoke( tr_peermsgs * msgs, int choke )
     tr_peerIoWriteUint8 ( io, out, choke ? BT_CHOKE : BT_UNCHOKE );
 }
 
+static void
+protocolSendPiece( tr_peermsgs                * msgs,
+                   const struct peer_request  * r,
+                   const uint8_t              * pieceData )
+{
+    tr_peerIo * io = msgs->io;
+    struct evbuffer * out = evbuffer_new( );
+
+    dbgmsg( msgs, "sending block %u:%u->%u", r->index, r->offset, r->length );
+    tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + 2*sizeof(uint32_t) + r->length );
+    tr_peerIoWriteUint8 ( io, out, BT_PIECE );
+    tr_peerIoWriteUint32( io, out, r->index );
+    tr_peerIoWriteUint32( io, out, r->offset );
+    tr_peerIoWriteBytes ( io, out, pieceData, r->length );
+    tr_peerIoWriteBuf   ( io, out );
+
+    evbuffer_free( out );
+}
+
 /**
 ***  EVENTS
 **/
@@ -1383,26 +1402,18 @@ pulse( void * vmsgs )
         if( canUpload( msgs ) )
         {
             struct peer_request * r = tr_list_pop_front( &msgs->peerAskedFor );
-            uint8_t * tmp = tr_new( uint8_t, r->length );
-            const uint32_t msglen = sizeof(uint8_t) + 2*sizeof(uint32_t) + r->length;
-            struct evbuffer * out = evbuffer_new( );
-            assert( requestIsValid( msgs, r ) );
+            uint8_t * buf = tr_new( uint8_t, r->length );
 
-            tr_peerIoWriteUint32( msgs->io, out, msglen );
-            tr_peerIoWriteUint8 ( msgs->io, out, BT_PIECE );
-            tr_peerIoWriteUint32( msgs->io, out, r->index );
-            tr_peerIoWriteUint32( msgs->io, out, r->offset );
-            tr_peerIoWriteBuf( msgs->io, out );
+            if( requestIsValid( msgs, r )
+                && tr_bitfieldHas( msgs->info->have, r->index )
+                && !tr_ioRead( msgs->torrent, r->index, r->offset, r->length, buf ) )
+            {
+                protocolSendPiece( msgs, r, buf );
+                peerGotBytes( msgs, r->length );
+            }
 
-            tr_ioRead( msgs->torrent, r->index, r->offset, r->length, tmp );
-            tr_peerIoWrite( msgs->io, tmp, r->length );
-            peerGotBytes( msgs, r->length );
-
-            dbgmsg( msgs, "Sending block %u:%u->%u (%d blocks left to send)", r->index, r->offset, r->length, tr_list_size(msgs->peerAskedFor) );
-
+            tr_free( buf );
             tr_free( r );
-            tr_free( tmp );
-            evbuffer_free( out );
         }
     }
     else if( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS )
