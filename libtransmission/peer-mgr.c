@@ -845,12 +845,11 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 {
     if( !peerIsKnown( t, addr ) )
     {
-        struct peer_atom * a = tr_new( struct peer_atom, 1 );
+        struct peer_atom * a = tr_new0( struct peer_atom, 1 );
         a->addr = *addr;
         a->port = port;
         a->flags = flags;
         a->from = from;
-        a->time = 0;
         tordbg( t, "got a new atom: %s", tr_peerIoAddrStr(&a->addr,a->port) );
         tr_ptrArrayInsertSorted( t->pool, a, comparePeerAtoms );
     }
