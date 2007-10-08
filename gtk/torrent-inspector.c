@@ -408,7 +408,7 @@ static void
 fmtpeercount (GtkWidget * l, int count)
 {
   if( 0 > count ) {
-    gtk_label_set_text( GTK_LABEL(l), _("?") );
+    gtk_label_set_text( GTK_LABEL(l), "?" );
   } else {
     char str[16];
     g_snprintf( str, sizeof str, "%i", count );
@@ -836,12 +836,12 @@ refresh_activity (GtkWidget * top)
                       *stat->errorString ? stat->errorString : _("None"));
 
   pch = stat->startDate ? rfc822date (stat->startDate)
-                        : g_strdup_printf (_("?"));
+                        : g_strdup_printf ("?");
   gtk_label_set_text (GTK_LABEL(a->date_added_lb), pch);
   g_free (pch);
 
   pch = stat->activityDate ? rfc822date (stat->activityDate)
-                           : g_strdup_printf (_("?"));
+                           : g_strdup_printf ("?");
   gtk_label_set_text (GTK_LABEL(a->last_activity_lb), pch);
   g_free (pch);
 
@@ -1501,7 +1501,7 @@ options_page_new ( TrTorrent * gtor )
 
   row = 0;
   t = hig_workarea_create ();
-  hig_workarea_add_section_title (t, &row, _("Transfer Bandwidth"));
+  hig_workarea_add_section_title (t, &row, _("Speed Limits") );
   hig_workarea_add_section_spacer (t, row, 2);
 
     tb = gtk_check_button_new_with_mnemonic (_("Limit _Download Speed (KiB/s):"));

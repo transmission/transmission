@@ -194,7 +194,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_SUP,          smsg_sup ) ||
       0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
   {
-      errmsg( con->u.serv.wind, _("Failed to set up IPC:\n%s"),
+      errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
               strerror( errno ) );
       g_free( con );
       return;
@@ -226,7 +226,7 @@ blocking_client( enum ipc_msg msgid, GList * files )
   con->msgs = ipc_initmsgs();
   if( NULL == con->msgs )
   {
-      fprintf( stderr, _("failed to set up IPC: %s\n"), strerror( errno ) );
+      g_message( _("Failed to set up IPC: %s"), strerror( errno ) );
       g_free( con );
       return FALSE;
   }
@@ -306,7 +306,7 @@ serv_bind(struct constate *con) {
   return;
 
  fail:
-  errmsg(con->u.serv.wind, _("Failed to set up socket:\n%s"),
+  errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
          strerror(errno));
   if(0 <= con->fd)
     close(con->fd);
@@ -329,7 +329,7 @@ client_connect(char *path, struct constate *con) {
   size_t             size;
 
   if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
-    fprintf(stderr, _("failed to create socket: %s\n"), strerror(errno));
+    g_message( _("Failed to create socket: %s"), strerror(errno));
     return FALSE;
   }
 
@@ -338,7 +338,7 @@ client_connect(char *path, struct constate *con) {
   strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
   if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
-    fprintf(stderr, _("failed to connect to %s: %s\n"), path, strerror(errno));
+    g_message( _("Failed to connect to %s: %s"), path, strerror(errno));
     return FALSE;
   }
 
@@ -428,7 +428,7 @@ srv_io_received( GSource * source SHUTUP, void * data, size_t len,
         switch( errno )
         {
             case EPERM:
-                errmsg( con->u.serv.wind, _("bad IPC protocol version") );
+                errmsg( con->u.serv.wind, _("Bad IPC protocol version") );
                 break;
             case EINVAL:
                 errmsg( con->u.serv.wind, _("IPC protocol parse error") );
@@ -464,14 +464,13 @@ cli_io_received( GSource * source SHUTUP, void * data, size_t len,
         switch( errno )
         {
             case EPERM:
-                fprintf( stderr, _("bad IPC protocol version\n") );
+                g_message( _("Bad IPC protocol version") );
                 break;
             case EINVAL:
-                fprintf( stderr, _("IPC protocol parse error\n") );
+                g_message( _("IPC protocol parse error") );
                 break;
             default:
-                fprintf( stderr, _("IPC parsing failed: %s\n"),
-                         strerror( errno ) );
+                g_message( _("IPC parsing failed: %s"), strerror( errno ) );
                 break;
         }
         destroycon( con );

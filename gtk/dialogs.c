@@ -256,7 +256,7 @@ fmtpeercount( GtkLabel * label, int count )
 
     if( 0 > count )
     {
-        gtk_label_set_text( label, _("?") );
+        gtk_label_set_text( label, "?" );
     }
     else
     {
