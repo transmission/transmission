@@ -98,9 +98,9 @@ typedef enum
     //set tab images and tooltips
     [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
-    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: nil];
-    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: nil];
-    [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: nil];
+    [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
+    [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
+    [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
     
     [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
