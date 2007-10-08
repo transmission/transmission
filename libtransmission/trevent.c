@@ -108,10 +108,15 @@ static void
 pumpList( int i UNUSED, short s UNUSED, void * veh )
 {
     tr_event_handle * eh = veh;
+    int doDie;
 
-    while( !eh->die )
+    for( ;; )
     {
         struct tr_event_command * cmd;
+
+        doDie = eh->die && !eh->timerCount;
+        if( doDie )
+            break;
 
         /* get the next command */
         tr_lockLock( eh->lock );
@@ -161,7 +166,7 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
         tr_free( cmd );
     }
 
-    if( !eh->die )
+    if( !doDie )
         timeout_add( &eh->pulse, &eh->pulseInterval );
     else {
         assert( eh->timerCount ==  0 );
