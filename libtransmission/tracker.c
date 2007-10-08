@@ -259,17 +259,20 @@ tr_trackerScrapeSoon( Tracker * t )
 }
 
 static Tracker*
+getExistingTracker( const char * primaryAddress )
+{
+    tr_ptrArray * trackers = getTrackerLookupTable( );
+    Tracker tmp;
+    assert( primaryAddress && *primaryAddress );
+    tmp.primaryAddress = (char*) primaryAddress;
+    return tr_ptrArrayFindSorted( trackers, &tmp, trackerCompare );
+}
+
+static Tracker*
 tr_trackerGet( const tr_torrent * tor )
 {
     const tr_info * info = &tor->info;
-    tr_ptrArray * trackers = getTrackerLookupTable( );
-    Tracker *t, tmp;
-    assert( info != NULL );
-    assert( info->primaryAddress && *info->primaryAddress );
-    tmp.primaryAddress = info->primaryAddress;
-    t = tr_ptrArrayFindSorted( trackers, &tmp, trackerCompare );
-
-    assert( t==NULL || !strcmp(t->primaryAddress,info->primaryAddress) );
+    Tracker * t = getExistingTracker( info->primaryAddress );
 
     if( t == NULL ) /* no such tracker.... create one */
     {
@@ -316,7 +319,7 @@ tr_trackerGet( const tr_torrent * tor )
         assert( nwalk - t->addresses == sum );
         assert( iwalk - t->tierFronts == sum );
 
-        tr_ptrArrayInsertSorted( trackers, t, trackerCompare );
+        tr_ptrArrayInsertSorted( getTrackerLookupTable( ), t, trackerCompare );
     }
 
     return t;
@@ -553,14 +556,19 @@ onTorrentScrapeNow( void * vtor )
 }
 
 static void
-onScrapeResponse( struct evhttp_request * req, void * vt )
+onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
 {
     char * errmsg;
-    Tracker * t = (Tracker*) vt;
+    Tracker * t;
 
     tr_inf( "Got scrape response from  '%s': %s",
-            t->primaryAddress,
+            primaryAddress,
             (req ? req->response_code_line : "(null)") );
+
+    t = getExistingTracker( primaryAddress );
+    tr_free( primaryAddress );
+    if( t == NULL ) /* tracker has been closed... */
+        return;
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
@@ -709,7 +717,7 @@ onTrackerScrapeNow( void * vt )
                 address->address, address->port, uri );
         evcon = getConnection( t, address->address, address->port );
         evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
-        req = evhttp_request_new( onScrapeResponse, t );
+        req = evhttp_request_new( onScrapeResponse, tr_strdup(t->primaryAddress) );
         assert( req );
         addCommonHeaders( t, req );
         tr_evhttp_make_request( t->handle, evcon, req, EVHTTP_REQ_GET, uri );
