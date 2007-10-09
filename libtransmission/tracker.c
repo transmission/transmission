@@ -50,7 +50,7 @@
 
 /* the value of the 'numwant' argument passed in tracker requests.
  * this should be big, but if it's *too* big trackers will ignore it */
-#define NUMWANT 50
+#define NUMWANT 256
 
 /* the length of the 'key' argument passed in tracker requests */
 #define TR_KEY_LEN 10
