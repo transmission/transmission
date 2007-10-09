@@ -48,8 +48,9 @@
 #define TIMEOUT_INTERVAL_SEC 40
 #define STOPPING_TIMEOUT_INTERVAL_SEC 8
 
-/* the value of the 'numwant' argument passed in tracker requests */
-#define NUMWANT 128
+/* the value of the 'numwant' argument passed in tracker requests.
+ * this should be big, but if it's *too* big trackers will ignore it */
+#define NUMWANT 50
 
 /* the length of the 'key' argument passed in tracker requests */
 #define TR_KEY_LEN 10
@@ -744,8 +745,8 @@ buildTrackerRequestURI( const Torrent     * tor,
                         const tr_torrent  * torrent,
                         const char        * eventName )
 {
-    const int stopping = !strcmp( eventName, "stopped" );
-    const int numwant = stopping ? 0 : NUMWANT;
+    const int isStopping = !strcmp( eventName, "stopped" );
+    const int numwant = isStopping ? 0 : NUMWANT;
     char buf[4096];
 
     snprintf( buf, sizeof(buf), "%s"
@@ -975,6 +976,7 @@ static int
 sendTrackerRequest( void * vt, const char * eventName )
 {
     Torrent * t = (Torrent *) vt;
+    const int isStopping = eventName && !strcmp( eventName, "stopped" );
     const tr_tracker_info * address = getCurrentAddress( t->tracker );
     char * uri;
     struct evhttp_connection * evcon;
@@ -1003,12 +1005,12 @@ sendTrackerRequest( void * vt, const char * eventName )
         struct evhttp_request * httpReq;
         tr_free( t->lastRequest );
         t->lastRequest = tr_strdup( eventName );
-        if( !eventName || !strcmp( eventName, "stopped" ) ) {
-            evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
-            httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
-        } else {
+        if( isStopping ) {
             evhttp_connection_set_timeout( evcon, STOPPING_TIMEOUT_INTERVAL_SEC );
             httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
+        } else {
+            evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
+            httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
         }
         addCommonHeaders( t->tracker, httpReq );
         tr_evhttp_make_request( t->tracker->handle, evcon,

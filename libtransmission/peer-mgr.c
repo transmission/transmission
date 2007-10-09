@@ -1611,8 +1611,12 @@ reconnectPulse( void * vtorrent )
         struct tr_peer ** connections = getWeakConnections( t, &nWeak );
         const int peerCount = tr_ptrArraySize( t->peers );
 
-        tordbg( t, "RECONNECT pulse for [%s]: %d weak connections, %d connection candidates, %d atoms, max per pulse is %d",
-                 t->tor->info.name, nWeak, nCandidates, tr_ptrArraySize(t->pool), (int)MAX_RECONNECTIONS_PER_PULSE );
+        if( nWeak || nCandidates )
+            tordbg( t, "reconnect pulse for [%s]: %d weak connections, "
+                       "%d connection candidates, %d atoms, max per pulse is %d",
+                       t->tor->info.name, nWeak, nCandidates,
+                       tr_ptrArraySize(t->pool),
+                       (int)MAX_RECONNECTIONS_PER_PULSE );
 
         /* disconnect some peers */
         for( i=0; i<nWeak; ++i )
