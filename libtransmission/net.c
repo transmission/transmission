@@ -214,7 +214,7 @@ tr_netBind( int port, int type )
     if( bind( s, (struct sockaddr *) &sock,
                sizeof( struct sockaddr_in ) ) )
     {
-        tr_err( "Couldn't bind port %d", port );
+        tr_err( "Couldn't bind port %d: %s", port, strerror(sockerrno) );
         tr_netClose( s );
         return -1;
     }
