@@ -563,7 +563,7 @@ onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
 
     tr_inf( "Got scrape response from  '%s': %s",
             primaryAddress,
-            (req ? req->response_code_line : "(null)") );
+            ( ( req && req->response_code_line ) ? req->response_code_line : "(null)") );
 
     t = getExistingTracker( primaryAddress );
     tr_free( primaryAddress );
