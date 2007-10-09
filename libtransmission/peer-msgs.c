@@ -272,7 +272,6 @@ fireNeedReq( tr_peermsgs * msgs )
 {
     tr_peermsgs_event e = blankEvent;
     e.eventType = TR_PEERMSG_NEED_REQ;
-    dbgmsg( msgs, "firing NEED_REQ" );
     publish( msgs, &e );
 }
 
@@ -1405,7 +1404,7 @@ pulse( void * vmsgs )
             uint8_t * buf = tr_new( uint8_t, r->length );
 
             if( requestIsValid( msgs, r )
-                && tr_bitfieldHas( msgs->info->have, r->index )
+                && tr_cpPieceIsComplete( msgs->torrent->completion, r->index )
                 && !tr_ioRead( msgs->torrent, r->index, r->offset, r->length, buf ) )
             {
                 protocolSendPiece( msgs, r, buf );
