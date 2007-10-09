@@ -53,8 +53,14 @@ transmission_LDADD = \
     $(GTK_LIBS) \
     $(PTHREAD_LIBS) -lm
 
+DESKTOP_IN_FILES=transmission.desktop.in
+DESKTOP_FILES=$(DESKTOP_IN_FILES:.desktop.in=.desktop)
+
 Productivitydir = $(datadir)/applications
 Productivity_DATA = $(DESKTOP_FILES)
 
 icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
+
+EXTRA_DIST = \
+    $(DESKTOP_IN_FILES)
