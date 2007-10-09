@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 _Name=Transmission BitTorrent Client
-_Comment=A free, lightweight BitTorrent client with a simple, intuitive interface
+_Comment=A free, intuitive BitTorrent client
 Exec=transmission %F
 Icon=transmission.png
 Terminal=false

@@ -15,13 +15,12 @@ endif
 
 SUBDIRS = third-party libtransmission daemon cli $(GTK_DIR) $(BEOS_DIR) $(MAC_DIR) $(WX_DIR)
 
-DISTCLEANFILES = \
- Transmission.desktop
-
 EXTRA_DIST = \
  NEWS \
  AUTHORS \
  LICENSE \
  README \
  third-party \
- intltool-extract.in intltool-merge.in intltool-update.in 
+ intltool-extract.in \
+ intltool-merge.in \
+ intltool-update.in 
