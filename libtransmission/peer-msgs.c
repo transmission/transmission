@@ -1409,6 +1409,7 @@ pulse( void * vmsgs )
             {
                 protocolSendPiece( msgs, r, buf );
                 peerGotBytes( msgs, r->length );
+                msgs->clientSentAnythingAt = now;
             }
 
             tr_free( buf );
