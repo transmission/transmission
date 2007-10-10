@@ -143,6 +143,9 @@
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
 		A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0820A915F6600890C32 /* RedDot.tiff */; };
 		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
+		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
+		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
+		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
@@ -513,6 +516,9 @@
 		A2D688EB0CB498BE009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2D689100CB498F2009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2D6891B0CB4990E009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2DA36270CBC674900C2ED41 /* InfoActivity.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoActivity.png; path = macosx/Images/InfoActivity.png; sourceTree = "<group>"; };
+		A2DA36280CBC674900C2ED41 /* InfoFiles.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoFiles.png; path = macosx/Images/InfoFiles.png; sourceTree = "<group>"; };
+		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
@@ -838,6 +844,9 @@
 				A22A06970CB83880009694FE /* InfoTabBorder.tif */,
 				A26E75950CB6AB4800226674 /* InfoGeneral.png */,
 				A26E75870CB6AA7500226674 /* InfoOptions.png */,
+				A2DA36270CBC674900C2ED41 /* InfoActivity.png */,
+				A2DA36280CBC674900C2ED41 /* InfoFiles.png */,
+				A2DA36290CBC674900C2ED41 /* InfoPeers.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1378,6 +1387,9 @@
 				A26E75960CB6AB4800226674 /* InfoGeneral.png in Resources */,
 				A22A067E0CB83507009694FE /* InfoTabBack.tif in Resources */,
 				A22A06980CB83880009694FE /* InfoTabBorder.tif in Resources */,
+				A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */,
+				A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */,
+				A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
