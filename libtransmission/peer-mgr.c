@@ -936,6 +936,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             peer->port = port;
             peer->io = io;
             peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );
+            atom->time = time( NULL );
         }
     }
 
@@ -1516,7 +1517,7 @@ getWeakConnections( Torrent * t, int * setmeSize )
             isWeak = FALSE;
         else if( peerIsSeed && clientIsSeed )
             isWeak = t->tor->pexDisabled || (now-atom->time>=30);
-        else if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS )
+        else if( !atom->time || ( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) )
             isWeak = FALSE;
         else
             isWeak = ( now - peer->pieceDataActivityDate ) > 180;

@@ -277,7 +277,7 @@ parseHandshake( tr_handshake     * handshake,
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
 
-    dbgmsg( handshake, "payload: need %d, got %d\n", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
+    dbgmsg( handshake, "payload: need %d, got %d", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
 
     if( EVBUFFER_LENGTH(inbuf) < HANDSHAKE_SIZE )
         return READ_MORE;
@@ -877,11 +877,11 @@ readIA( tr_handshake * handshake, struct evbuffer * inbuf )
     struct evbuffer * outbuf = evbuffer_new( );
     uint32_t crypto_select;
 
-dbgmsg( handshake, "zbz reading IA... have %d, need %d", (int)EVBUFFER_LENGTH(inbuf), (int)needlen );
+dbgmsg( handshake, "reading IA... have %d, need %d", (int)EVBUFFER_LENGTH(inbuf), (int)needlen );
     if( EVBUFFER_LENGTH(inbuf) < needlen )
         return READ_MORE;
 
-dbgmsg( handshake, "zbz reading IA..." );
+dbgmsg( handshake, "reading IA..." );
     /* parse the handshake ... */
     i = parseHandshake( handshake, inbuf );
 dbgmsg( handshake, "parseHandshake returned %d", i );
@@ -907,7 +907,7 @@ dbgmsg( handshake, "sending vc" );
 dbgmsg( handshake, "sending crypto_select" );
     /* send crypto_select */
     {
-dbgmsg( handshake, "handshake->crypto_provide is %d\n", (int)handshake->crypto_provide );
+dbgmsg( handshake, "handshake->crypto_provide is %d", (int)handshake->crypto_provide );
         if( handshake->crypto_provide & CRYPTO_PROVIDE_CRYPTO )
             crypto_select = CRYPTO_PROVIDE_CRYPTO;
         else if( handshake->allowUnencryptedPeers )
