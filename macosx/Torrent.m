@@ -43,8 +43,8 @@ static int static_lastid = 0;
 - (void) updateDownloadFolder;
 
 - (void) createFileList;
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
-            previousPath: (NSString *) previousPath fileSize: (uint64_t) size index: (int) index;
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings previousPath: (NSString *) previousPath
+            fileSize: (uint64_t) size index: (int) index;
 
 - (void) completenessChange: (NSNumber *) status;
 
@@ -1506,16 +1506,16 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         else
             path = @"";
         
-        [self insertPath: pathComponents forSiblings: fileList withParent: nil previousPath: path fileSize: file->length index: i];
-        [pathComponents autorelease];
+        [self insertPath: pathComponents forSiblings: fileList previousPath: path fileSize: file->length index: i];
+        [pathComponents release];
     }
     
     fFileList = [[NSArray alloc] initWithArray: fileList];
     [fileList release];
 }
 
-- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings withParent: (NSMutableDictionary *) parent
-            previousPath: (NSString *) previousPath fileSize: (uint64_t) size index: (int) index
+- (void) insertPath: (NSMutableArray *) components forSiblings: (NSMutableArray *) siblings previousPath: (NSString *) previousPath
+            fileSize: (uint64_t) size index: (int) index
 {
     NSString * name = [components objectAtIndex: 0];
     BOOL isFolder = [components count] > 1;
@@ -1525,7 +1525,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         NSEnumerator * enumerator = [siblings objectEnumerator];
         while ((dict = [enumerator nextObject]))
-            if ([[dict objectForKey: @"IsFolder"] boolValue] && [[dict objectForKey: @"Name"] isEqualToString: name])
+            if ([[dict objectForKey: @"Name"] isEqualToString: name] && [[dict objectForKey: @"IsFolder"] boolValue])
                 break;
     }
     
@@ -1552,9 +1552,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [icon setFlipped: YES];
             [dict setObject: icon forKey: @"Icon"];
         }
-        
-        if (parent)
-            [dict setObject: parent forKey: @"Parent"];
     }
     else
         [[dict objectForKey: @"Indexes"] addIndex: index];
@@ -1562,8 +1559,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (isFolder)
     {
         [components removeObjectAtIndex: 0];
-        [self insertPath: components forSiblings: [dict objectForKey: @"Children"] withParent: dict
-                previousPath: currentPath fileSize: size index: index];
+        [self insertPath: components forSiblings: [dict objectForKey: @"Children"] previousPath: currentPath fileSize: size
+                index: index];
     }
 }
 
