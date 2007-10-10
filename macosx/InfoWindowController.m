@@ -512,17 +512,19 @@ typedef enum
     fCurrentTabTag = [fTabMatrix selectedTag];
     
     NSView * view;
-    NSString * identifier;
+    NSString * identifier, * title;;
     switch (fCurrentTabTag)
     {
         case TAB_INFO_TAG:
             view = fInfoView;
             identifier = TAB_INFO_IDENT;
+            title = NSLocalizedString(@"General Info", "Inspector -> title");
             canResizeVertical = NO;
             break;
         case TAB_ACTIVITY_TAG:
             view = fActivityView;
             identifier = TAB_ACTIVITY_IDENT;
+            title = NSLocalizedString(@"Activity", "Inspector -> title");
             canResizeVertical = NO;
             
             [fPiecesView updateView: YES];
@@ -530,16 +532,19 @@ typedef enum
         case TAB_PEERS_TAG:
             view = fPeersView;
             identifier = TAB_PEERS_IDENT;
+            title = NSLocalizedString(@"Peers", "Inspector -> title");
             canResizeVertical = YES;
             break;
         case TAB_FILES_TAG:
             view = fFilesView;
             identifier = TAB_FILES_IDENT;
+            title = NSLocalizedString(@"Files", "Inspector -> title");
             canResizeVertical = YES;
             break;
         case TAB_OPTIONS_TAG:
             view = fOptionsView;
             identifier = TAB_OPTIONS_IDENT;
+            title = NSLocalizedString(@"Options", "Inspector -> title");
             canResizeVertical = NO;
             break;
         default:
@@ -570,6 +575,8 @@ typedef enum
         if (oldCanResizeVertical)
             [[NSUserDefaults standardUserDefaults] setFloat: [oldView frame].size.height forKey: @"InspectorContentHeight"];
     }
+    
+    [window setTitle: [NSString stringWithFormat: @"%@ - %@", title, NSLocalizedString(@"Torrent Inspector", "Inspector -> title")]];
     
     //selected tab item
     [(InfoTabButtonCell *)[fTabMatrix selectedCell] setSelectedTab: YES];
