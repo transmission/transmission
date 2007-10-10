@@ -201,8 +201,8 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "pause-torrent", (status & TR_STATUS_ACTIVE) != 0);
     action_sensitize( "start-torrent", (status & TR_STATUS_INACTIVE) != 0);
     action_sensitize( "remove-torrent", status != 0);
-    action_sensitize( "recheck-torrent", status != 0);
-    action_sensitize( "show-torrent-inspector", status != 0);
+    action_sensitize( "verify-torrent", status != 0);
+    action_sensitize( "show-torrent-properties", status != 0);
 
     status = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &status );
@@ -993,13 +993,13 @@ doAction ( const char * action_name, gpointer user_data )
         gtk_tree_selection_selected_foreach( s, stopTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "recheck-torrent"))
+    else if (!strcmp (action_name, "verify-torrent"))
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "show-torrent-inspector"))
+    else if (!strcmp (action_name, "show-torrent-properties"))
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data->wind );

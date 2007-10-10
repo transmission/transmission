@@ -62,15 +62,15 @@ static GtkToggleActionEntry show_toggle_entries[] =
 
 static GtkActionEntry entries[] =
 {
-  { "file-menu", NULL, N_("_File"), NULL, NULL, NULL },
+  { "torrent-menu", NULL, N_("_Torrent"), NULL, NULL, NULL },
   { "edit-menu", NULL, N_("_Edit"), NULL, NULL, NULL },
   { "help-menu", NULL, N_("_Help"), NULL, NULL, NULL },
   { "priority-menu", NULL, N_("_Priority"), NULL, NULL, NULL },
   { "add-torrent", GTK_STOCK_OPEN, NULL, NULL,  NULL, G_CALLBACK(action_cb) },
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
     N_("_Start"), "<control>S", NULL, G_CALLBACK(action_cb) },
-  { "recheck-torrent", GTK_STOCK_REFRESH,
-    N_("Re_check"), NULL, NULL, G_CALLBACK(action_cb) },
+  { "verify-torrent", NULL,
+    N_("_Verify Local Files"), NULL, NULL, G_CALLBACK(action_cb) },
   { "pause-torrent", GTK_STOCK_MEDIA_PAUSE,
     N_("_Pause"), "<control>P", NULL, G_CALLBACK(action_cb) },
   { "remove-torrent", GTK_STOCK_REMOVE,
@@ -84,15 +84,15 @@ static GtkActionEntry entries[] =
   { "select-all", GTK_STOCK_SELECT_ALL,
     N_("Select _All"), "<control>A", NULL, G_CALLBACK(action_cb) },
   { "unselect-all", NULL,
-    N_("_Deselect All"), "<control>U", NULL, G_CALLBACK(action_cb) },
+    N_("Dese_lect All"), "<shift><control>A", NULL, G_CALLBACK(action_cb) },
   { "edit-preferences", GTK_STOCK_PREFERENCES,
-    N_("Edit _Preferences"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "show-torrent-inspector", GTK_STOCK_INFO,
-    N_("_Torrent Info"), NULL, NULL, G_CALLBACK(action_cb) },
+    NULL, NULL, NULL, G_CALLBACK(action_cb) },
+  { "show-torrent-properties", GTK_STOCK_PROPERTIES,
+    NULL, "<alt>Return", NULL, G_CALLBACK(action_cb) },
   { "show-about-dialog", GTK_STOCK_ABOUT,
     N_("_About Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
-  { "update-tracker", GTK_STOCK_REFRESH,
-    N_("Update Tracker"), NULL, NULL, G_CALLBACK(action_cb) }
+  { "update-tracker", GTK_STOCK_NETWORK,
+    N_("Ask Tracker for More Peers"), NULL, NULL, G_CALLBACK(action_cb) }
 };
 
 static void

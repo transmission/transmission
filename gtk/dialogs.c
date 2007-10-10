@@ -115,7 +115,7 @@ promptresp( GtkWidget * widget, gint resp, gpointer data );
 void
 makeaddwind( GtkWindow * parent, TrCore * core )
 {
-  GtkWidget *wind = gtk_file_chooser_dialog_new(_("Add a Torrent"), parent,
+  GtkWidget *wind = gtk_file_chooser_dialog_new(_("Open Torrent"), parent,
     GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
   struct addcb *data = g_new(struct addcb, 1);

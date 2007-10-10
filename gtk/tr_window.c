@@ -173,7 +173,7 @@ view_row_activated ( GtkTreeView       * tree_view  UNUSED,
                      GtkTreeViewColumn * column     UNUSED,
                      gpointer            user_data  UNUSED )
 {
-    action_activate( "show-torrent-inspector" );
+    action_activate( "show-torrent-properties" );
 }
 
 static GtkWidget*

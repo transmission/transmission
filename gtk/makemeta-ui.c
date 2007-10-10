@@ -250,12 +250,12 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
 
         g_snprintf( name, sizeof(name), "%s:", _("_File"));
 
-        w = gtk_file_chooser_dialog_new (_("File or Directory to Add to the New Torrent"),
-                                         NULL,
-                                         GTK_FILE_CHOOSER_ACTION_OPEN,
-                                         GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-                                         GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                         NULL);
+        w = gtk_file_chooser_dialog_new ( NULL,
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_OPEN,
+                                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                          NULL );
         g_signal_connect( w, "map", G_CALLBACK(file_chooser_shown_cb), rb_dir );
         w = gtk_file_chooser_button_new_with_dialog( w );
         g_signal_connect( w, "selection-changed", G_CALLBACK(file_selection_changed_cb), ui );

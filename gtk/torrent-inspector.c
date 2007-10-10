@@ -1597,25 +1597,16 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   const tr_info * info = tr_torrent_info (gtor);
 
   /* create the dialog */
-  pch = _( "Torrent Info" );
+  size = readablesize( info->totalSize );
+  pch = g_strdup_printf( _( "Properties for %s (%s)" ), info->name, size );
   d = gtk_dialog_new_with_buttons (pch, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);
   gtk_window_set_role (GTK_WINDOW(d), "tr-info" );
   g_signal_connect (d, "response", G_CALLBACK (response_cb), gtor);
   g_object_weak_ref (G_OBJECT(gtor), torrent_destroyed, d);
-
-
-  /* add label with file name and size */
-  size = readablesize( info->totalSize );
-  pch = g_markup_printf_escaped( "<b><big>%s</big>\n%s</b>", info->name, size );
-  w = gtk_label_new (NULL);
-  gtk_label_set_markup (GTK_LABEL(w), pch);
-  gtk_label_set_justify (GTK_LABEL(w), GTK_JUSTIFY_CENTER);
-  gtk_misc_set_alignment (GTK_MISC(w), 0.5f, 0.5f);
-  gtk_box_pack_start (GTK_BOX(GTK_DIALOG(d)->vbox), w, 0, 0, GUI_PAD);
-  g_free (pch);
-  g_free (size);
+  g_free( pch );
+  g_free( size );
 
   /* add the notebook */
   n = gtk_notebook_new ();
