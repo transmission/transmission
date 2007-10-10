@@ -116,7 +116,6 @@ Torrent;
 
 struct tr_peerMgr
 {
-    int connectionCount;
     tr_handle * handle;
     tr_ptrArray * torrents; /* Torrent */
     tr_ptrArray * incomingHandshakes; /* tr_handshake */
@@ -894,20 +893,9 @@ myHandshakeDoneCB( tr_handshake    * handshake,
 
     in_addr = tr_peerIoGetAddress( io, &port );
 
-    if( !t || !t->isRunning )
+    if( !ok || !t || !t->isRunning )
     {
         tr_peerIoFree( io );
-        --manager->connectionCount;
-    }
-    else if( !ok )
-    {
-        /* if we couldn't connect or were snubbed,
-         * the peer's probably not worth remembering. */
-        tr_peer * peer = getExistingPeer( t, in_addr );
-        tr_peerIoFree( io );
-        --manager->connectionCount;
-        if( peer )
-            peer->doPurge = 1;
     }
     else /* looking good */
     {
@@ -921,13 +909,11 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         {
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
-            --manager->connectionCount;
             peer->doPurge = 1;
         }
         else if( peer->msgs != NULL ) /* we already have this peer */
         {
             tr_peerIoFree( io );
-            --manager->connectionCount;
         }
         else
         {
@@ -960,7 +946,6 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
                                                     manager->handle->encryptionMode,
                                                     myHandshakeDoneCB,
                                                     manager );
-        ++manager->connectionCount;
 
         tr_ptrArrayInsertSorted( manager->incomingHandshakes, handshake, handshakeCompare );
     }
@@ -1638,7 +1623,6 @@ reconnectPulse( void * vtorrent )
                                                         mgr->handle->encryptionMode,
                                                         myHandshakeDoneCB,
                                                         mgr );
-            ++mgr->connectionCount;
 
             assert( tr_peerIoGetTorrentHash( io ) != NULL );
 
