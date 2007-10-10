@@ -108,14 +108,14 @@ refresh_pieces (GtkWidget * da, GdkEventExpose * event UNUSED, gpointer gtor)
   if (gcs == NULL)
   {
     const GdkColor colors [N_COLORS] = {
-      RGB_2_GDK (   0, 226, 255 ), /* all */
-      RGB_2_GDK (   0, 153, 204 ), /* lots */
-      RGB_2_GDK (   0, 102, 153 ), /* some */
-      RGB_2_GDK (   0,  51, 102 ), /* few */
-      RGB_2_GDK ( 255, 255, 255 ), /* none */
-      RGB_2_GDK (   0,   0,   0 ), /* black */
-      RGB_2_GDK ( 181, 181, 181 ), /* gray */
-      RGB_2_GDK ( 255, 164,   0 ), /* blink - orange */
+      RGB_2_GDK ( 114, 159, 207 ), /* all */
+      RGB_2_GDK (  52, 101, 164 ), /* lots */
+      RGB_2_GDK (  32,  74, 135 ), /* some */
+      RGB_2_GDK (  85,  87,  83 ), /* few */
+      RGB_2_GDK ( 238, 238, 236 ), /* none - tango aluminum highlight */
+      RGB_2_GDK (  46,  52,  54 ), /* black - tango slate shadow */
+      RGB_2_GDK ( 186, 189, 182 ), /* gray - tango aluminum shadow */
+      RGB_2_GDK ( 252, 233,  79 ), /* blink - tango butter highlight */
     };
 
     gcs = g_new (GdkGC*, N_COLORS+1);
