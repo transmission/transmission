@@ -225,7 +225,7 @@ make_meta_ui( GtkWindow * parent, tr_handle * handle )
     MakeMetaUI * ui = g_new0 ( MakeMetaUI, 1 );
     ui->handle = handle;
 
-    d = gtk_dialog_new_with_buttons( _("Make a New Torrent"),
+    d = gtk_dialog_new_with_buttons( _("Create New Torrent"),
                                      parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,

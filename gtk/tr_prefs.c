@@ -197,7 +197,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     GtkWidget * l;
     GtkWidget * d;
 
-    d = gtk_dialog_new_with_buttons( _("Transmission: Preferences"), parent,
+    d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
                                      NULL );

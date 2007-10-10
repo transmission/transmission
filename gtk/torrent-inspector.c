@@ -1597,16 +1597,13 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
   const tr_info * info = tr_torrent_info (gtor);
 
   /* create the dialog */
-  pch = g_strdup_printf ("%s: %s",
-                         g_get_application_name(),
-                         _("Torrent Inspector"));
+  pch = _( "Torrent Info" );
   d = gtk_dialog_new_with_buttons (pch, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);
   gtk_window_set_role (GTK_WINDOW(d), "tr-info" );
   g_signal_connect (d, "response", G_CALLBACK (response_cb), gtor);
   g_object_weak_ref (G_OBJECT(gtor), torrent_destroyed, d);
-  g_free (pch);
 
 
   /* add label with file name and size */
