@@ -54,10 +54,15 @@
         convertedSize = size / 1048576.0;
         unit = NSLocalizedString(@"MB", "File size");
     }
-    else
+    else if (size < 1099511627776.0)
     {
         convertedSize = size / 1073741824.0;
         unit = NSLocalizedString(@"GB", "File size");
+    }
+    else
+    {
+        convertedSize = size / 1099511627776.0;
+        unit = NSLocalizedString(@"TB", "File size");
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
