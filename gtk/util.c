@@ -61,6 +61,9 @@ readablesize(guint64 size) {
   int ii;
   double small = size;
 
+  if( !size )
+    return g_strdup_printf( _("None") );
+
   for(ii = 0; ii + 1 < ALEN(sizestrs) && 1024.0 <= small / 1024.0; ii++)
     small /= 1024.0;
 
@@ -78,7 +81,7 @@ readablespeed (double KiBps)
 {
   const guint64 bps = KiBps * 1024;
   char * str = readablesize (bps);
-  char * ret = g_strdup_printf ("%s/s", str);
+  char * ret = bps ? g_strdup_printf ("%s/s", str) : g_strdup( str );
   g_free (str);
   return ret;
 }

@@ -13,6 +13,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Inspector can be resized vertically in Peers and Files tabs
    + Optimizations to decrease memory usage
    + Various smaller interface additions and improvements
+ - GTK:
+   + Various smaller interface improvements
 
 0.82 (2007/09/09)
  - Fixed bug that could limit transfer speeds

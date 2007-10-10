@@ -1598,7 +1598,7 @@ torrent_inspector_new ( GtkWindow * parent, TrTorrent * gtor )
 
   /* create the dialog */
   size = readablesize( info->totalSize );
-  pch = g_strdup_printf( _( "Properties for %s (%s)" ), info->name, size );
+  pch = g_strdup_printf( _( "Details for %s (%s)" ), info->name, size );
   d = gtk_dialog_new_with_buttons (pch, parent, 0,
                                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
                                    NULL);

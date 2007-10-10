@@ -2,10 +2,10 @@ The Transmission Project
 http://transmission.m0k.org/
 
 Lead Developers <transmission-dev@m0k.org>
+        Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Backend)
+        Charles Kerr <charles@rebelbase.com>  (Backend, GTK+ client)
         Eric Petit <titer@m0k.org>  (Creator)
-        Josh Elsasser <josh@elsasser.org>  (Back-end, GTK+ interface, Daemon interface)
-        Mitchell Livingston <livings124@gmail.com>  (Mac OS X interface, Back-end)
-        Charles Kerr <charles@rebelbase.com>  (Back-end, GTK+, wxWidgets)
+        Josh Elsasser <josh@elsasser.org>  (Daemon, Backend, GTK+ interface)
         Bryan Varner <bryan@varnernet.com>  (BeOS interface)
 
 Project Contributors

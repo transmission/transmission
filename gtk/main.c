@@ -202,7 +202,7 @@ refreshTorrentActions( GtkTreeSelection * s )
     action_sensitize( "start-torrent", (status & TR_STATUS_INACTIVE) != 0);
     action_sensitize( "remove-torrent", status != 0);
     action_sensitize( "verify-torrent", status != 0);
-    action_sensitize( "show-torrent-properties", status != 0);
+    action_sensitize( "show-torrent-details", status != 0);
 
     status = 0;
     gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &status );
@@ -881,10 +881,10 @@ about ( void )
 {
   GtkWidget * w = gtk_about_dialog_new ();
   GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
-  const char *authors[] = { "Eric Petit (Back-end; OS X)",
-                            "Josh Elsasser (Back-end; GTK+)",
+  const char *authors[] = { "Charles Kerr (Back-end; GTK+)",
                             "Mitchell Livingston (Back-end; OS X)",
-                            "Charles Kerr (Back-end; GTK+)",
+                            "Eric Petit (Back-end; OS X)",
+                            "Josh Elsasser (Daemon; Back-end; GTK+)",
                             "Bryan Varner (BeOS)", 
                             NULL };
   gtk_about_dialog_set_version (a, LONG_VERSION_STRING );
@@ -893,7 +893,7 @@ about ( void )
   gtk_about_dialog_set_wrap_license (a, TRUE);
 #endif
   gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
-  gtk_about_dialog_set_comments( a, _("A GTK+ BitTorrent Client.") );
+  gtk_about_dialog_set_comments( a, _("A simple yet powerful BitTorrent Client") );
   gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
   gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
@@ -999,7 +999,7 @@ doAction ( const char * action_name, gpointer user_data )
         gtk_tree_selection_selected_foreach( s, recheckTorrentForeach, NULL );
         changed |= gtk_tree_selection_count_selected_rows( s ) != 0;
     }
-    else if (!strcmp (action_name, "show-torrent-properties"))
+    else if (!strcmp (action_name, "show-torrent-details"))
     {
         GtkTreeSelection * s = tr_window_get_selection(data->wind);
         gtk_tree_selection_selected_foreach( s, showInfoForeach, data->wind );
