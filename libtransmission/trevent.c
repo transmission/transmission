@@ -204,7 +204,6 @@ libeventThreadFunc( void * veh )
 #endif
 
     eh->base = event_init( );
-    //event_set_log_callback( logFunc );
     evdns_init( );
     timeout_set( &eh->pulse, pumpList, veh );
     timeout_add( &eh->pulse, &eh->pulseInterval );
@@ -242,8 +241,6 @@ tr_eventClose( tr_handle * handle )
     tr_list_free( &eh->commands, tr_free );
     eh->die = TRUE;
     tr_lockUnlock( eh->lock );
-
-    //event_base_loopexit( eh->base, NULL );
 }
 
 /**

@@ -1023,7 +1023,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             tr_peerIoReadUint32( msgs->io, inbuf, &msgs->blockToUs.offset );
             msgs->blockToUs.length = msglen - 8;
             assert( EVBUFFER_LENGTH(msgs->inBlock) == 0 );
-            //evbuffer_drain( msgs->inBlock, ~0 );
             msgs->state = msgs->blockToUs.length ? READING_BT_PIECE : AWAITING_BT_LENGTH;
             return READ_AGAIN;
             break;
@@ -1723,3 +1722,11 @@ tr_peerMsgsUnsubscribe( tr_peermsgs       * peer,
 {
     tr_publisherUnsubscribe( peer->publisher, tag );
 }
+
+int
+tr_peerMsgIsPieceFastAllowed( const tr_peermsgs * peer,
+                              uint32_t            index )
+{
+    return tr_bitfieldHas( peer->clientAllowedPieces, index );
+}
+

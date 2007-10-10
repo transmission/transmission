@@ -312,8 +312,6 @@ tr_closeImpl( void * vh )
 void
 tr_close( tr_handle * h )
 {
-    //assert( tr_torrentCount( h ) == 0 );
-
     tr_runInEventThread( h, tr_closeImpl, h );
     while( !h->isClosed )
         tr_wait( 100 );
@@ -356,7 +354,6 @@ tr_loadTorrents ( tr_handle   * h,
                 tor = tr_torrentInit( h, path, destination, flags, NULL );
                 if( tor != NULL ) {
                     tr_list_append( &list, tor );
-                    //fprintf (stderr, "#%d - %s\n", n, tor->info.name );
                     n++;
                 }
             }

@@ -108,9 +108,9 @@ tr_cryptoNew( const uint8_t * torrentHash,
     crypto->dh->g = BN_bin2bn( dh_G, sizeof(dh_G), NULL );
     DH_generate_key( crypto->dh );
 
-    // DH can generate key sizes that are smaller than the size of
-    // P with exponentially decreasing probability, in which case
-    // the msb's of myPublicKey need to be zeroed appropriately.
+    /* DH can generate key sizes that are smaller than the size of
+       P with exponentially decreasing probability, in which case
+       the msb's of myPublicKey need to be zeroed appropriately. */
     len = DH_size( crypto->dh );
     offset = KEY_LEN - len;
     assert( len <= KEY_LEN );

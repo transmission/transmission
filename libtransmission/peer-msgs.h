@@ -87,6 +87,7 @@ tr_publisher_tag  tr_peerMsgsSubscribe   ( tr_peermsgs       * peer,
 void              tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
                                            tr_publisher_tag    tag );
 
-
+int               tr_peerMsgIsPieceFastAllowed( const tr_peermsgs * peer,
+                                                uint32_t            index );
 
 #endif

@@ -547,18 +547,21 @@ compareRefillPiece (const void * aIn, const void * bIn)
 {
     const struct tr_refill_piece * a = aIn;
     const struct tr_refill_piece * b = bIn;
-
+    
+    /* if one *might be* fastallowed to us, get it first...
+     * I'm putting it on top so we prioritise those pieces at
+     * startup, then we'll have them, and we'll be denied access
+     * to them */
+    if (a->fastAllowed != b->fastAllowed)
+        return a->fastAllowed < b->fastAllowed ? -1 : 1;
+    
     /* if one piece has a higher priority, it goes first */
     if (a->priority != b->priority)
         return a->priority > b->priority ? -1 : 1;
-
+    
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)
         return a->peerCount < b->peerCount ? -1 : 1;
-    
-    /* otherwise if one *might be* fastallowed to us */
-    if (a->fastAllowed != b->fastAllowed)
-        return a->fastAllowed < b->fastAllowed ? -1 : 1;
 
     /* otherwise go with our random seed */
     return tr_compareUint16( a->random, b->random );
@@ -614,13 +617,15 @@ getPreferredPieces( Torrent     * t,
             setme->peerCount = 0;
             setme->fastAllowed = 0;
             setme->random = tr_rand( UINT16_MAX );
-            /* FIXME */
-//            setme->fastAllowed = tr_bitfieldHas( t->tor->allowedList, i);
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
                 if( peer->peerIsInterested && !peer->clientIsChoked && tr_bitfieldHas( peer->have, piece ) )
                     ++setme->peerCount;
+                /* The fast peer extension doesn't force a peer to actually HAVE a fast-allowed piece,
+                    but we're guaranteed to get the same pieces from different peers, 
+                    so we'll build a list and pray one actually have this one */
+                setme->fastAllowed = tr_peerMsgIsPieceFastAllowed( peer->msgs, i);
             }
         }
 
@@ -1611,7 +1616,6 @@ reconnectPulse( void * vtorrent )
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
         for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
-        //for( i=0; i<nCandidates; ++i )
         {
             tr_peerMgr * mgr = t->manager;
 
