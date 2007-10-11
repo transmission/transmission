@@ -1,12 +1,12 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.90 (2007/xx/yy)
- - Significant rewrite of the libtransmission back-end
  - Encryption support, with option to ignore unencrypted peers
- - Improved compliance with BitTorrent spec
- - Multiscrape support
  - Ban peers that send too much bad data
  - Only report downloaded, verified good pieces in tracker `download' field
+ - Improved compliance with BitTorrent spec
+ - Multiscrape support
+ - Significant rewrite of the libtransmission back-end
  - OS X:
    + Per-torrent action menu
    + Redesigned message log
@@ -15,7 +15,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Sort and filter by tracker
    + Various smaller interface additions and improvements
  - GTK:
-   + Various smaller interface improvements
+   + Various interface improvements
+   + Better compliance with the Gnome interface guidelines
 
 0.82 (2007/09/09)
  - Fixed bug that could limit transfer speeds

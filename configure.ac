@@ -87,7 +87,8 @@ AM_OPTIONS_WXCONFIG
 AM_PATH_WXCONFIG($WX_MINIMUM,[have_wx=yes],[have_wx=no])
 AC_ARG_WITH(wx, AC_HELP_STRING([--with-wx], [Build wxWidgets client]),
                 [want_wx=$withval],
-                [want_wx=$have_wx])
+                [want_wx=no])
+dnl                [want_wx=$have_wx])
 use_wx=no
 if test "x$want_wx" = "xyes" ; then
     if test "x$have_wx" = "xyes"; then
