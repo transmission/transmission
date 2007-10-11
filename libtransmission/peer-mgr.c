@@ -1506,16 +1506,22 @@ getWeakConnections( Torrent * t, int * setmeSize )
 
         assert( atom != NULL );
 
-        if( peer->doPurge )
+        if( peer->doPurge ) {
+            tordbg( t, "purging peer %s because it's got doPurge flagged", tr_peerIoAddrStr(&atom->addr,atom->port) );
             isWeak = TRUE;
-        else if( throughput >= 3 )
+        } else if( throughput >= 3 ) {
+            tordbg( t, "keeping peer %s because it's got a good throughput", tr_peerIoAddrStr(&atom->addr,atom->port) );
             isWeak = FALSE;
-        else if( peerIsSeed && clientIsSeed )
+        } else if( peerIsSeed && clientIsSeed ) {
+            tordbg( t, "%s peer is a seed and so are we", tr_peerIoAddrStr(&atom->addr,atom->port) );
             isWeak = t->tor->pexDisabled || (now-atom->time>=30);
-        else if( !atom->time || ( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) )
+        } else if( !atom->time || ( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) ) {
+            tordbg( t, "%s too new to purge", tr_peerIoAddrStr(&atom->addr,atom->port) );
             isWeak = FALSE;
-        else
+        } else {
             isWeak = ( now - peer->pieceDataActivityDate ) > 180;
+            tordbg( t, "%s peer %p", (isWeak?"purging":"keeping"), tr_peerIoAddrStr(&atom->addr,atom->port) );
+        }
 
         if( isWeak )
             ret[outsize++] = peer;
