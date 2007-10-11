@@ -90,16 +90,16 @@
     //select proper level in popup button
     int level = tr_getMessageLevel();
     switch (level)
-        {
-            case TR_MSG_ERR:
-                [fLevelButton selectItemAtIndex: LEVEL_ERROR];
-                break;
-            case TR_MSG_INF:
-                [fLevelButton selectItemAtIndex: LEVEL_INFO];
-                break;
-            case TR_MSG_DBG:
-                [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
-        }
+    {
+        case TR_MSG_ERR:
+            [fLevelButton selectItemAtIndex: LEVEL_ERROR];
+            break;
+        case TR_MSG_INF:
+            [fLevelButton selectItemAtIndex: LEVEL_INFO];
+            break;
+        case TR_MSG_DBG:
+            [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
+    }
     
     [self setDebugWarningHidden: level != TR_MSG_DBG];
 }

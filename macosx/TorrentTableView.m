@@ -86,12 +86,6 @@
     
     return self;
 }
-    
-- (void) awakeFromNib
-{
-    [fContextRow setTitle: @"Context"];
-    [fContextNoRow setTitle: @"Context"];
-}
 
 - (void) dealloc
 {
@@ -157,12 +151,11 @@
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
-    BOOL sameRow = row == oldRow;
     
-    if (sameRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
+    if (row == oldRow && [self pointInPauseRect: point] && [self pointInPauseRect: fClickPoint])
     {
         Torrent * torrent = [fTorrents objectAtIndex: row];
-
+        
         if ([torrent isActive])
             [fController stopTorrents: [NSArray arrayWithObject: torrent]];
         else if ([torrent isPaused])
@@ -176,7 +169,7 @@
         }
         else;
     }
-    else if (sameRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
+    else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] revealData];
     else if ([event clickCount] == 2 && !NSEqualPoints(fClickPoint, NSZeroPoint))
     {
@@ -237,7 +230,6 @@
     {
         if (![self isRowSelected: row])
             [self selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-                
         return fContextRow;
     }
     else
@@ -388,14 +380,21 @@
 
 - (void) setQuickLimitMode: (id) sender
 {
-    int tag = [sender tag];
     int mode;
-    if (tag == ACTION_MENU_UNLIMITED_TAG)
-        mode = TR_SPEEDLIMIT_UNLIMITED;
-    else if (tag == ACTION_MENU_LIMIT_TAG)
-        mode = TR_SPEEDLIMIT_SINGLE;
-    else
-        mode = TR_SPEEDLIMIT_GLOBAL;
+    switch ([sender tag])
+    {
+        case ACTION_MENU_UNLIMITED_TAG:
+            mode = TR_SPEEDLIMIT_UNLIMITED;
+            break;
+        case ACTION_MENU_LIMIT_TAG:
+            mode = TR_SPEEDLIMIT_SINGLE;
+            break;
+        case ACTION_MENU_GLOBAL_TAG:
+            mode = TR_SPEEDLIMIT_GLOBAL;
+            break;
+        default:
+            return;
+    }
     
     [fMenuTorrent setSpeedMode: mode upload: [sender menu] == fUploadMenu];
     
@@ -414,14 +413,21 @@
 - (void) setQuickRatioMode: (id) sender
 
 {
-    int tag = [sender tag];
     int mode;
-    if (tag == ACTION_MENU_UNLIMITED_TAG)
-        mode = NSOffState;
-    else if (tag == ACTION_MENU_LIMIT_TAG)
-        mode = NSOnState;
-    else
-        mode = NSMixedState;
+    switch ([sender tag])
+    {
+        case ACTION_MENU_UNLIMITED_TAG:
+            mode = NSOffState;
+            break;
+        case ACTION_MENU_LIMIT_TAG:
+            mode = NSOnState;
+            break;
+        case ACTION_MENU_GLOBAL_TAG:
+            mode = NSMixedState;
+            break;
+        default:
+            return;
+    }
     
     [fMenuTorrent setRatioSetting: mode];
     
