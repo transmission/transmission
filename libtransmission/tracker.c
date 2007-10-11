@@ -536,6 +536,31 @@ addCommonHeaders( const Tracker * t,
                                          TR_NAME "/" LONG_VERSION_STRING );
 }
 
+/**
+***
+**/
+
+struct torrent_hash
+{
+    tr_handle * handle;
+    uint8_t hash[SHA_DIGEST_LENGTH];
+};
+
+static struct torrent_hash*
+torrentHashNew( Torrent * tor )
+{
+    struct torrent_hash * data = tr_new( struct torrent_hash, 1 );
+    data->handle = tor->tracker->handle;
+    memcpy( data->hash, tor->hash, SHA_DIGEST_LENGTH );
+    return data;
+}
+
+tr_torrent*
+findTorrentFromHash( struct torrent_hash * data )
+{
+    return tr_torrentFindFromHash( data->handle, data->hash );
+}
+
 /***
 ****
 ****  SCRAPE
@@ -543,16 +568,22 @@ addCommonHeaders( const Tracker * t,
 ***/
 
 static int
-onTorrentScrapeNow( void * vtor )
+onTorrentScrapeNow( void * vhash )
 {
-    Torrent * tor = (Torrent *) vtor;
-    if( trackerSupportsScrape( tor->tracker ) )
+    tr_torrent * torrent = findTorrentFromHash( vhash );
+    tr_free( vhash );
+
+    if( torrent != NULL )
     {
-        if( tr_ptrArrayFindSorted( tor->tracker->scrapeQueue, tor, torrentCompare) == NULL )
-            tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
-        tr_trackerScrapeSoon( tor->tracker );
+        Torrent * tor = torrent->tracker;
+        if( trackerSupportsScrape( tor->tracker ) )
+        {
+            if( tr_ptrArrayFindSorted( tor->tracker->scrapeQueue, tor, torrentCompare) == NULL )
+                tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
+            tr_trackerScrapeSoon( tor->tracker );
+        }
+        tor->scrapeTimer = NULL;
     }
-    tor->scrapeTimer = NULL;
     return FALSE;
 }
 
@@ -613,7 +644,7 @@ onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
                 tr_timerFree( &tor->scrapeTimer );
-                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, tor, t->scrapeIntervalMsec );
+                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, torrentHashNew(tor), t->scrapeIntervalMsec );
                 tr_dbg( "Torrent '%s' scrape successful."
                         "  Rescraping in %d seconds",
                         tor->name, t->scrapeIntervalMsec/1000 );
@@ -658,7 +689,7 @@ onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
         for( i=0; i<n; ++i ) {
             if( errmsg != NULL )
                 publishErrorMessage( torrents[i], errmsg );
-            onTorrentScrapeNow( torrents[i] );
+            onTorrentScrapeNow( torrentHashNew(torrents[i]) );
         }
         tr_ptrArrayClear( t->scraping );
     }
@@ -838,39 +869,22 @@ setAnnounceInterval( Tracker  * t,
 
 static int onReannounceNow( void * vtor );
 
-struct response_user_data
-{
-    tr_handle * handle;
-    uint8_t hash[SHA_DIGEST_LENGTH];
-};
-
-static struct response_user_data*
-onTrackerResponseDataNew( Torrent * tor )
-{
-    struct response_user_data * data = tr_new( struct response_user_data, 1 );
-    data->handle = tor->tracker->handle;
-    memcpy( data->hash, tor->hash, SHA_DIGEST_LENGTH );
-    return data;
-}
-
 static void
 onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
 {
 }
 
 static void
-onTrackerResponse( struct evhttp_request * req, void * vdata )
+onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 {
     char * errmsg;
     Torrent * tor;
     int isStopped;
     int reannounceInterval;
-    struct response_user_data * data;
     tr_torrent * t;
 
-    data = vdata;
-    t = tr_torrentFindFromHash( data->handle, data->hash );
-    tr_free( data );
+    t = findTorrentFromHash( torrent_hash );
+    tr_free( torrent_hash );
     if( t == NULL ) /* torrent has been closed */
         return;
 
@@ -1010,7 +1024,7 @@ sendTrackerRequest( void * vt, const char * eventName )
             httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
         } else {
             evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
-            httpReq = evhttp_request_new( onTrackerResponse, onTrackerResponseDataNew(t) );
+            httpReq = evhttp_request_new( onTrackerResponse, torrentHashNew(t) );
         }
         addCommonHeaders( t->tracker, httpReq );
         tr_evhttp_make_request( t->tracker->handle, evcon,
