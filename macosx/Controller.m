@@ -1800,7 +1800,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSArray * selectedTorrents = [fTableView numberOfSelectedRows] > 0
                 ? [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] : nil;
 
-    NSMutableArray * tempTorrents = [[NSMutableArray alloc] initWithCapacity: [fTorrents count]];
+    NSMutableArray * tempTorrents = [NSMutableArray arrayWithCapacity: [fTorrents count]];
     
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
@@ -1872,7 +1872,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [fDisplayedTorrents setArray: tempTorrents];
-    [tempTorrents release];
     
     [self sortTorrentsIgnoreSelected];
     
