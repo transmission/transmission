@@ -78,7 +78,7 @@ static GtkActionEntry entries[] =
   { "create-torrent", GTK_STOCK_NEW,
     N_("Create _New Torrent"), NULL, NULL, G_CALLBACK(action_cb) },
   { "close", GTK_STOCK_CLOSE,
-    N_("_Close"), "<control>C", NULL, G_CALLBACK(action_cb) },
+    N_("_Close"), "<control>W", NULL, G_CALLBACK(action_cb) },
   { "quit", GTK_STOCK_QUIT,
     N_("_Quit"), "<control>Q", NULL, G_CALLBACK(action_cb) },
   { "select-all", GTK_STOCK_SELECT_ALL,

@@ -11,9 +11,9 @@ noinst_HEADERS = \
     conf.h \
     dialogs.h \
     hig.h \
-    img_icon_full.h \
     io.h \
     ipc.h \
+    logo.h \
     makemeta-ui.h \
     msgwin.h \
     torrent-inspector.h \
