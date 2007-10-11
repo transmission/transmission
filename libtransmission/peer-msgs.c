@@ -934,6 +934,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
             tr_bitfieldAdd( msgs->info->have, ui32 );
             updatePeerProgress( msgs );
+            tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
             dbgmsg( msgs, "got Have: %u", ui32 );
             break;
 
