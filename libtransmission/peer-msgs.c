@@ -1632,6 +1632,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAllowedPieces = NULL;
     m->clientAllowedPieces = NULL;
     setme = tr_publisherSubscribe( m->publisher, func, userData );
+    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* error if we don't read or write for 2.5 minutes */
     
     if ( tr_peerIoSupportsFEXT( m->io ) )
     {

@@ -287,6 +287,12 @@ tr_peerIoReconnect( tr_peerIo * io )
     return -1;
 }
 
+void
+tr_peerIoSetTimeoutSecs( tr_peerIo * io, int secs )
+{
+    bufferevent_settimeout( io->bufev, secs, secs );
+}
+
 /**
 ***
 **/
