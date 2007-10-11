@@ -43,7 +43,6 @@
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
     
-    fNormalColor = [self backgroundColor];
     fHighPriorityColor = [[NSColor colorWithCalibratedRed: 0.8588 green: 0.9961 blue: 0.8311 alpha: 1.0] retain];
     fLowPriorityColor = [[NSColor colorWithCalibratedRed: 1.0 green: 0.9529 blue: 0.8078 alpha: 1.0] retain];
     fMixedPriorityColor = [[NSColor colorWithCalibratedRed: 0.9216 green: 0.9059 blue: 1.0 alpha: 1.0] retain];
