@@ -15,7 +15,7 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 #include "torrent-inspector.h"
-#include "img_icon_full.h"
+#include "logo.h"
 
 #define UNUSED G_GNUC_UNUSED
 
