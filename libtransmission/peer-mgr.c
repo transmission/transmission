@@ -909,25 +909,30 @@ myHandshakeDoneCB( tr_handshake    * handshake,
         struct peer_atom * atom;
         ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         atom = getExistingAtom( t, addr );
-        tr_peer * peer = getPeer( t, addr );
+
         if( atom->myflags & MYFLAG_BANNED )
         {
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
-            peer->doPurge = 1;
-        }
-        else if( peer->msgs != NULL ) /* we already have this peer */
-        {
-            tr_peerIoFree( io );
         }
         else
         {
-            tr_free( peer->client );
-            peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
-            peer->port = port;
-            peer->io = io;
-            peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );
-            atom->time = time( NULL );
+            tr_peer * peer = getExistingPeer( t, addr );
+
+            if( peer != NULL ) /* we already have this peer */
+            {
+                tr_peerIoFree( io );
+            }
+            else
+            {
+                peer = getPeer( t, addr );
+                tr_free( peer->client );
+                peer->client = peer_id ? tr_clientForId( peer_id ) : NULL;
+                peer->port = port;
+                peer->io = io;
+                peer->msgs = tr_peerMsgsNew( t->tor, peer, msgsCallbackFunc, t, &peer->msgsTag );
+                atom->time = time( NULL );
+            }
         }
     }
 
