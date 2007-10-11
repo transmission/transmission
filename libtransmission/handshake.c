@@ -1031,7 +1031,7 @@ tr_handshakeAbort( tr_handshake * handshake )
 }
 
 static void
-gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
+gotError( struct bufferevent * evbuf UNUSED, short what, void * arg )
 {
     tr_handshake * handshake = (tr_handshake *) arg;
 
@@ -1051,7 +1051,8 @@ gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * arg )
     }
     else
     {
-        dbgmsg( handshake, "handshake evbuffer got an error!!!!!" );
+        dbgmsg( handshake, "libevent got an error what==%d, errno=%d (%s)",
+                (int)what, errno, strerror(errno) );
         tr_handshakeDone( handshake, FALSE );
     }
 }

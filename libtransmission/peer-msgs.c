@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1430,9 +1431,11 @@ didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
 }
 
 static void
-gotError( struct bufferevent * evbuf UNUSED, short what UNUSED, void * vpeer )
+gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
 {
-    fireGotError( vpeer );
+    dbgmsg( vmsgs, "libevent got an error! what=%d, errno=%d (%s)",
+            (int)what, errno, strerror(errno) );
+    fireGotError( vmsgs );
 }
 
 static void
