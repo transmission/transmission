@@ -76,7 +76,7 @@ static GtkActionEntry entries[] =
   { "remove-torrent", GTK_STOCK_REMOVE,
     N_("_Remove"), "<control>R", NULL, G_CALLBACK(action_cb) },
   { "create-torrent", GTK_STOCK_NEW,
-    N_("_Create New Torrent"), NULL, NULL, G_CALLBACK(action_cb) },
+    N_("Create _New Torrent"), NULL, NULL, G_CALLBACK(action_cb) },
   { "close", GTK_STOCK_CLOSE,
     N_("_Close"), "<control>C", NULL, G_CALLBACK(action_cb) },
   { "quit", GTK_STOCK_QUIT,
@@ -92,7 +92,7 @@ static GtkActionEntry entries[] =
   { "show-about-dialog", GTK_STOCK_ABOUT,
     N_("_About Transmission"), NULL, NULL, G_CALLBACK(action_cb) },
   { "update-tracker", GTK_STOCK_NETWORK,
-    N_("Ask Tracker for More Peers"), NULL, NULL, G_CALLBACK(action_cb) }
+    N_("Ask Tracker for _More Peers"), NULL, NULL, G_CALLBACK(action_cb) }
 };
 
 static void
