@@ -114,32 +114,39 @@
         Torrent * torrent = [(InfoWindowController *)[[self window] windowController] selectedTorrent];
         NSIndexSet * indexes = [item objectForKey: @"Indexes"];
         
-        if ([torrent checkForFiles: indexes] == NSOffState)
-            [fNormalColor set];
-        else
+        if ([torrent checkForFiles: indexes] != NSOffState)
         {
             NSSet * priorities = [torrent filePrioritiesForIndexes: indexes];
             int count = [priorities count];
-            if (count == 0)
-                [fNormalColor set];
-            else if (count > 1)
-                [fMixedPriorityColor set];
-            else
+            if (count > 0)
             {
-                int priority = [[priorities anyObject] intValue];
-                if (priority == TR_PRI_LOW)
-                    [fLowPriorityColor set];
-                else if (priority == TR_PRI_HIGH)
-                    [fHighPriorityColor set];
+                BOOL custom = YES;
+                if (count > 1)
+                    [fMixedPriorityColor set];
                 else
-                    [fNormalColor set];
+                {
+                    switch ([[priorities anyObject] intValue])
+                    {
+                        case TR_PRI_LOW:
+                            [fLowPriorityColor set];
+                            break;
+                        case TR_PRI_HIGH:
+                            [fHighPriorityColor set];
+                            break;
+                        default:
+                            custom = NO;
+                    }
+                }
+                
+                if (custom)
+                {
+                    NSRect rect = [self rectOfRow: row];
+                    rect.size.height -= 1.0;
+            
+                    NSRectFill(rect);
+                }
             }
         }
-        
-        NSRect rect = [self rectOfRow: row];
-        rect.size.height -= 1.0;
-        
-        NSRectFill(rect);
     }
     
     [super drawRow: row clipRect: clipRect];

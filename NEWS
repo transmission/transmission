@@ -12,6 +12,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Redesigned message log
    + Inspector can be resized vertically in Peers and Files tabs
    + Optimizations to decrease memory usage
+   + Sort and filter by tracker
    + Various smaller interface additions and improvements
  - GTK:
    + Various smaller interface improvements
