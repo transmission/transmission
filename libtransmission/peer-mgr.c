@@ -64,7 +64,7 @@ enum
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
-    MAX_RECONNECTIONS_PER_PULSE = 8,
+    MAX_RECONNECTIONS_PER_PULSE = 10,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,

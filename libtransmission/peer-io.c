@@ -24,6 +24,8 @@
 #include "trevent.h"
 #include "utils.h"
 
+#define IO_TIMEOUT_SECS 8
+
 /**
 ***
 **/
@@ -136,6 +138,7 @@ tr_peerIoNew( struct tr_handle     * handle,
                                 didWriteWrapper,
                                 gotErrorWrapper,
                                 c );
+    bufferevent_settimeout( c->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
     bufferevent_enable( c->bufev, EV_READ|EV_WRITE );
     return c;
 }
@@ -275,6 +278,7 @@ tr_peerIoReconnect( tr_peerIo * io )
                                      didWriteWrapper,
                                      gotErrorWrapper,
                                      io );
+        bufferevent_settimeout( io->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
         bufferevent_enable( io->bufev, EV_READ|EV_WRITE );
 
         return 0;
