@@ -69,36 +69,6 @@ struct dirdata
     gboolean                paused;
 };
 
-struct infowind
-{
-    GtkWidget             * widget;
-    TrTorrent             * tor;
-    int64_t                 size;
-    GtkTreeModel          * model;
-    GtkTreeRowReference   * row;
-    GtkTreeModel          * filesmodel;
-    guint                   timer;
-    struct
-    {
-        tr_tracker_info   * track;
-        GtkLabel          * trackwid;
-        GtkLabel          * annwid;
-        GtkLabel          * scrwid;
-        int                 seed;
-        GtkLabel          * seedwid;
-        int                 leech;
-        GtkLabel          * leechwid;
-        int                 done;
-        GtkLabel          * donewid;
-        uint64_t            up;
-        GtkLabel          * upwid;
-        uint64_t            down;
-        GtkLabel          * downwid;
-        uint64_t            left;
-        GtkLabel          * leftwid;
-    }                       inf;
-};
-
 static void
 addwindnocore( gpointer gdata, GObject * core );
 static void

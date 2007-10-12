@@ -240,51 +240,38 @@ urldecode(const char *str, int len) {
 }
 
 GList *
-checkfilenames(int argc, char **argv) {
-  char *pwd = g_get_current_dir();
-  int ii, cd;
-  char *dirstr, *filestr;
-  GList *ret = NULL;
+checkfilenames( int argc, char **argv )
+{
+    int i;
+    GList * ret = NULL;
+    char * pwd = g_get_current_dir( );
 
-  for(ii = 0; ii < argc; ii++) {
-    dirstr = g_path_get_dirname(argv[ii]);
-    if(!g_path_is_absolute(argv[ii])) {
-      filestr = g_build_filename(pwd, dirstr, NULL);
-      g_free(dirstr);
-      dirstr = filestr;
+    for( i=0; i<argc; ++i )
+    {
+        char * filename = g_path_is_absolute( argv[i] )
+            ? g_strdup ( argv[i] )
+            : g_build_filename( pwd, argv[i], NULL );
+
+        if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
+            ret = g_list_append( ret, filename );
+        else
+            g_free( filename );
     }
-    cd = chdir(dirstr);
-    g_free(dirstr);
-    if(0 > cd)
-      continue;
-    dirstr = g_get_current_dir();
-    filestr = g_path_get_basename(argv[ii]);
-    ret = g_list_append(ret, g_build_filename(dirstr, filestr, NULL));
-    g_free(dirstr);
-    g_free(filestr);
-  }
 
-  chdir(pwd);
-  g_free(pwd);
-
-  return ret;
+    g_free( pwd );
+    return ret;
 }
 
 enum tr_torrent_action
 toraddaction( const char * action )
 {
-    if( NULL == action || 0 == strcmp( "copy", action ) )
-    {
+    if( !action || !strcmp( "copy", action ) )
         return TR_TOR_COPY;
-    }
-    else if( 0 == strcmp( "move", action ) )
-    {
+
+    if( !strcmp( "move", action ) )
         return TR_TOR_MOVE;
-    }
-    else
-    {
-        return TR_TOR_LEAVE;
-    }
+
+    return TR_TOR_LEAVE;
 }
 
 const char *
@@ -294,8 +281,10 @@ toractionname( enum tr_torrent_action action )
     {
         case TR_TOR_COPY:
             return "copy";
+
         case TR_TOR_MOVE:
             return "move";
+
         default:
             return "leave";
     }

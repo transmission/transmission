@@ -90,7 +90,7 @@ urldecode(const char *str, int len);
 
 /* return a list of cleaned-up paths, with invalid directories removed */
 GList *
-checkfilenames(int argc, char **argv);
+checkfilenames( int argc, char ** argv );
 
 /* returns the flag for an action string */
 enum tr_torrent_action

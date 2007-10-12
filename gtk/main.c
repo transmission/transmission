@@ -24,7 +24,6 @@
 
 #include <sys/param.h>
 #include <errno.h>
-#include <getopt.h>
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
@@ -123,12 +122,8 @@ static GtkUIManager * myUIManager = NULL;
 
 static sig_atomic_t global_sigcount = 0;
 
-static GList *
-readargs( int argc, char ** argv, gboolean * sendquit, gboolean * paused );
 static gboolean
 sendremote( GList * files, gboolean sendquit );
-static void
-gtksetup( int * argc, char *** argv, struct cbdata* );
 static void
 appsetup( TrWindow * wind, GList * args,
           struct cbdata * , gboolean paused );
@@ -218,13 +213,32 @@ selectionChangedCB( GtkTreeSelection * s, gpointer unused UNUSED )
 int
 main( int argc, char ** argv )
 {
+    char * err;
     struct cbdata * cbdata = g_new (struct cbdata, 1);
-    char       * err;
-    benc_val_t * state;
-    GList      * argfiles;
-    gboolean     didinit, didlock, sendquit, startpaused;
+    GList * argfiles;
+    gboolean didinit, didlock, sendquit, startpaused;
+    char * domain = "transmission";
+    GOptionEntry entries[] = {
+        { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused, _("Start with all torrents paused"), NULL },
+        { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit, _( "Request that the running instance quit"), NULL },
+        { NULL, 0, 0, 0, NULL, NULL, NULL }
+    };
 
-    argfiles = readargs( argc, argv, &sendquit, &startpaused );
+    /* bind the gettext domain */
+    bindtextdomain( domain, TRANSMISSIONLOCALEDIR );
+    bind_textdomain_codeset( domain, "UTF-8" );
+    textdomain( domain );
+    g_set_application_name( _( "Transmission" ) );
+
+    /* initialize gtk */
+    gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, NULL );
+    myUIManager = gtk_ui_manager_new ();
+    actions_init ( myUIManager, cbdata );
+    gtk_ui_manager_add_ui_from_string (myUIManager, fallback_ui_file, -1, NULL);
+    gtk_ui_manager_ensure_update (myUIManager);
+    gtk_window_set_default_icon_name ( "transmission-logo" );
+
+    argfiles = checkfilenames( argc-1, argv+1 );
     didinit = cf_init( tr_getPrefsDirectory(), NULL );
     didlock = FALSE;
     if( didinit )
@@ -233,12 +247,12 @@ main( int argc, char ** argv )
         didlock = sendremote( argfiles, sendquit );
     }
     setupsighandlers();         /* set up handlers for fatal signals */
-    gtksetup( &argc, &argv, cbdata );   /* set up gtk and gettext */
 
     if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
     {
-        GtkWindow  * mainwind;
+        GtkWindow * mainwind;
+        benc_val_t * state;
 
         /* create main window now to be a parent to any error dialogs */
         mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
@@ -270,65 +284,6 @@ main( int argc, char ** argv )
     return 0;
 }
 
-GList *
-readargs( int argc, char ** argv, gboolean * sendquit, gboolean * startpaused )
-{
-    struct option opts[] =
-    {
-        { "help",    no_argument, NULL, 'h' },
-        { "paused",  no_argument, NULL, 'p' },
-        { "quit",    no_argument, NULL, 'q' },
-        { "version", no_argument, NULL, 'v' },
-        { NULL, 0, NULL, 0 }
-    };
-    int          opt;
-    const char * name;
-
-    *sendquit    = FALSE;
-    *startpaused = FALSE;
-
-    gtk_parse_args( &argc, &argv );
-    name = g_get_prgname();
-
-    while( 0 <= ( opt = getopt_long( argc, argv, "hpqv", opts, NULL ) ) )
-    {
-        switch( opt )
-        {
-            case 'p':
-                *startpaused = TRUE;
-                break;
-            case 'q':
-                *sendquit = TRUE;
-                break;
-            case 'v':
-            case 'h':
-                printf(
-_("usage: %s [-hpq] [files...]\n"
-  "\n"
-  "Transmission %s http://transmission.m0k.org/\n"
-  "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
-  "\n"
-  "  -h --help    display this message and exit\n"
-  "  -p --paused  start with all torrents paused\n"
-  "  -q --quit    request that the running %s instance quit\n"
-  "\n"
-  "Only one instance of %s may run at one time. Multiple\n"
-  "torrent files may be loaded at startup by adding them to the command\n"
-  "line. If %s is already running, those torrents will be\n"
-  "opened in the running instance.\n"),
-                        name, LONG_VERSION_STRING,
-                        name, name, name );
-                exit(0);
-                break;
-        }
-    }
-
-    argc -= optind;
-    argv += optind;
-
-    return checkfilenames( argc, argv );
-}
-
 static gboolean
 sendremote( GList * files, gboolean sendquit )
 {
@@ -356,36 +311,6 @@ sendremote( GList * files, gboolean sendquit )
     }
 
     return didlock;
-}
-
-static void
-gtksetup( int * argc, char *** argv, struct cbdata * callback_data )
-{
-
-    bindtextdomain( "transmission", TRANSMISSIONLOCALEDIR );
-    bind_textdomain_codeset( "transmission", "UTF-8" );
-    textdomain( "transmission" );
-
-    g_set_application_name( _("Transmission") );
-    gtk_init( argc, argv );
-
-    /* connect up the actions */
-    myUIManager = gtk_ui_manager_new ();
-    actions_init ( myUIManager, callback_data );
-    gtk_ui_manager_add_ui_from_string (myUIManager, fallback_ui_file, -1, NULL);
-    gtk_ui_manager_ensure_update (myUIManager);
-
-    /* tweak some style properties in dialogs to get closer to the GNOME HiG */
-    gtk_rc_parse_string(
-        "style \"transmission-standard\"\n"
-        "{\n"
-        "    GtkDialog::action-area-border  = 6\n"
-        "    GtkDialog::button-spacing      = 12\n"
-        "    GtkDialog::content-area-border = 6\n"
-        "}\n"
-        "widget \"TransmissionDialog\" style \"transmission-standard\"\n" );
-
-    gtk_window_set_default_icon_name ( "transmission-logo" );
 }
 
 static void
@@ -580,90 +505,91 @@ exitcheck( gpointer gdata )
 }
 
 static void
-gotdrag(GtkWidget *widget SHUTUP, GdkDragContext *dc, gint x SHUTUP,
-        gint y SHUTUP, GtkSelectionData *sel, guint info SHUTUP, guint time,
-        gpointer gdata) {
-  struct cbdata *data = gdata;
-  char prefix[] = "file:";
-  char *files, *decoded, *deslashed, *hostless;
-  int ii, len;
-  GList *errs;
-  struct stat sb;
-  int prelen = strlen(prefix);
-  GList *paths, *freeables;
-  enum tr_torrent_action action;
+gotdrag( GtkWidget         * widget UNUSED,
+         GdkDragContext    * dc,
+         gint                x UNUSED,
+         gint                y UNUSED,
+         GtkSelectionData  * sel,
+         guint               info UNUSED,
+         guint               time,
+         gpointer            gdata )
+{
+    struct cbdata * data = gdata;
+    GList * paths = NULL;
+    GList * freeme = NULL;
 
 #ifdef DND_DEBUG
-  char *sele = gdk_atom_name(sel->selection);
-  char *targ = gdk_atom_name(sel->target);
-  char *type = gdk_atom_name(sel->type);
+    char *sele = gdk_atom_name(sel->selection);
+    char *targ = gdk_atom_name(sel->target);
+    char *type = gdk_atom_name(sel->type);
 
-  fprintf(stderr, "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i\n",
-          sele, targ, type, sel->format, sel->length);
-  g_free(sele);
-  g_free(targ);
-  g_free(type);
-  if(8 == sel->format) {
-    for(ii = 0; ii < sel->length; ii++)
-      fprintf(stderr, "%02X ", sel->data[ii]);
-    fprintf(stderr, "\n");
-  }
+    fprintf(stderr, "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i\n",
+            sele, targ, type, sel->format, sel->length);
+    g_free(sele);
+    g_free(targ);
+    g_free(type);
+    if( sel->format == 8 ) {
+        for( i=0; i<sel->length; ++i )
+            fprintf(stderr, "%02X ", sel->data[i]);
+        fprintf(stderr, "\n");
+    }
 #endif
 
-  errs = NULL;
-  paths = NULL;
-  freeables = NULL;
-  if(gdk_atom_intern("XdndSelection", FALSE) == sel->selection &&
-     8 == sel->format) {
-    /* split file list on carriage returns and linefeeds */
-    files = g_new(char, sel->length + 1);
-    memcpy(files, sel->data, sel->length);
-    files[sel->length] = '\0';
-    for(ii = 0; '\0' != files[ii]; ii++)
-      if('\015' == files[ii] || '\012' == files[ii])
-        files[ii] = '\0';
-
-    /* try to get a usable filename out of the URI supplied and add it */
-    for(ii = 0; ii < sel->length; ii += len + 1) {
-      if('\0' == files[ii])
-        len = 0;
-      else {
-        len = strlen(files + ii);
-        /* de-urlencode the URI */
-        decoded = urldecode(files + ii, len);
-        freeables = g_list_append(freeables, decoded);
-        if(g_utf8_validate(decoded, -1, NULL)) {
-          /* remove the file: prefix */
-          if(prelen < len && 0 == strncmp(prefix, decoded, prelen)) {
-            deslashed = decoded + prelen;
-            /* trim excess / characters from the beginning */
-            while('/' == deslashed[0] && '/' == deslashed[1])
-              deslashed++;
-            /* if the file doesn't exist, the first part might be a hostname */
-            if(0 > g_stat(deslashed, &sb) &&
-               NULL != (hostless = strchr(deslashed + 1, '/')) &&
-               0 == g_stat(hostless, &sb))
-              deslashed = hostless;
-            /* finally, add it to the list of torrents to try adding */
-            paths = g_list_append(paths, deslashed);
-          }
-        }
-      }
-    }
-
-    /* try to add any torrents we found */
-    if( NULL != paths )
+    if( ( sel->format == 8 ) &&
+        ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
     {
-        action = tr_prefs_get_action( PREF_KEY_ADDSTD );
-        tr_core_add_list( data->core, paths, action, FALSE );
-        tr_core_torrents_added( data->core );
-        g_list_free(paths);
-    }
-    freestrlist(freeables);
-    g_free(files);
-  }
+        /* split file list on carriage returns and linefeeds */
+        int i;
+        char * str = g_strndup( (char*)sel->data, sel->length );
+        gchar ** files = g_strsplit_set( str, "\r\n", -1 );
+        for( i=0; files && files[i]; ++i )
+        {
+            char * filename;
+            if( !*files[i] ) /* empty filename... */
+                continue;
 
-  gtk_drag_finish(dc, (NULL != paths), FALSE, time);
+            /* decode the filename */
+            filename = urldecode( files[i], -1 );
+            freeme = g_list_prepend( freeme, filename );
+            if( !g_utf8_validate( filename, -1, NULL ) )
+                continue;
+
+            /* walk past "file://", if present */
+            if( g_str_has_prefix( filename, "file:" ) ) {
+                filename += 5;
+                while( g_str_has_prefix( filename, "//" ) )
+                    ++filename;
+            }
+
+            /* if the file doesn't exist, the first part
+               might be a hostname ... walk past it. */
+            if( !g_file_test( filename, G_FILE_TEST_EXISTS ) ) {
+                char * pch = strchr( filename + 1, '/' );
+                if( pch != NULL )
+                    filename = pch;
+            }
+
+            /* finally, add it to the list of torrents to try adding */
+            if( g_file_test( filename, G_FILE_TEST_EXISTS ) )
+                paths = g_list_prepend( paths, filename );
+        }
+
+        /* try to add any torrents we found */
+        if( paths != NULL )
+        {
+            enum tr_torrent_action action = tr_prefs_get_action( PREF_KEY_ADDSTD );
+            paths = g_list_reverse( paths );
+            tr_core_add_list( data->core, paths, action, FALSE );
+            tr_core_torrents_added( data->core );
+            g_list_free( paths );
+        }
+
+        freestrlist( freeme );
+        g_strfreev( files );
+        g_free( str );
+    }
+
+    gtk_drag_finish(dc, (NULL != paths), FALSE, time);
 }
 
 static void
@@ -893,7 +819,7 @@ about ( void )
   gtk_about_dialog_set_wrap_license (a, TRUE);
 #endif
   gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
-  gtk_about_dialog_set_comments( a, _("A simple yet powerful BitTorrent Client") );
+  gtk_about_dialog_set_comments( a, _("A fast and intuitive BitTorrent client") );
   gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
   gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
