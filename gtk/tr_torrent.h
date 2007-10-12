@@ -30,11 +30,6 @@
 #include <libtransmission/bencode.h>
 #include "util.h"
 
-/* boxed type for tr_tracker_info */
-#define TR_TRACKER_BOXED_TYPE (tr_tracker_boxed_get_type ())
-GType
-tr_tracker_boxed_get_type( void );
-
 #define TR_TORRENT_TYPE		  (tr_torrent_get_type ())
 #define TR_TORRENT(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST ((obj), TR_TORRENT_TYPE, TrTorrent))
@@ -54,7 +49,6 @@ typedef struct _TrTorrentClass TrTorrentClass;
 struct _TrTorrent {
   GObject parent;
   tr_torrent *handle;
-  char *dir;
   char *delfile;
   tr_stat stat;
   time_t lastStatTime;
@@ -108,16 +102,6 @@ tr_torrent_new( tr_handle * handle, const char * path, const char * dir,
 TrTorrent *
 tr_torrent_new_with_data( tr_handle * handle, uint8_t * data, size_t size,
                           const char * dir, gboolean paused, char ** err );
-
-TrTorrent *
-tr_torrent_new_with_state( tr_handle * handle, benc_val_t * state,
-                           gboolean forcepaused, char ** err );
-
-gboolean
-tr_torrent_get_state( TrTorrent * tor, benc_val_t * state );
-
-void
-tr_torrent_state_saved(TrTorrent *tor);
 
 void
 tr_torrent_sever( TrTorrent * tor );

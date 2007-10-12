@@ -29,7 +29,6 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#include <libtransmission/bencode.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
@@ -219,8 +218,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
         /* leechers, completedFromTracker, downloaded,    uploaded */
         G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
-        /* left,       tracker,               TrTorrent object, ID for IPC */
-        G_TYPE_UINT64, TR_TRACKER_BOXED_TYPE, TR_TORRENT_TYPE,  G_TYPE_INT,
+        /* left,       TrTorrent object, ID for IPC */
+        G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
     };
 
 #ifdef REFDBG
@@ -343,64 +342,6 @@ tr_core_quiescent( TrCore * self )
 
     hstat = tr_handleStatus( self->handle );
     return TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus;
-}
-
-void
-tr_core_save( TrCore * self )
-{
-    benc_val_t  state;
-    int         count;
-    GtkTreeIter iter;
-    TrTorrent * tor;
-    char      * errstr;
-    GList     * saved, * ii;
-
-    TR_IS_CORE( self );
-
-    count = gtk_tree_model_iter_n_children( self->model, NULL );
-
-    tr_bencInit( &state, TYPE_LIST );
-    if( tr_bencListReserve( &state, count ) )
-    {
-        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, "malloc failure" );
-        return;
-    }
-
-    saved = NULL;
-    if( gtk_tree_model_get_iter_first( self->model, &iter) ) do
-    {
-        benc_val_t * item = tr_bencListAdd( &state );
-        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-        if( tr_torrent_get_state( tor, item ) )
-        {
-            saved = g_list_append( saved, tor );
-        }
-        else
-        {
-            tr_bencFree( item );
-            tr_bencInitStr( item, NULL, 0, 1 );
-        }
-        g_object_unref( tor );
-    }
-    while( gtk_tree_model_iter_next( self->model, &iter ) );
-
-    errstr = NULL;
-    cf_savestate( &state, &errstr );
-    tr_bencFree( &state );
-    if( NULL != errstr )
-    {
-        tr_core_errsig( self, TR_CORE_ERR_SAVE_STATE, errstr );
-        g_free( errstr );
-    }
-    else
-    {
-        for( ii = saved; NULL != ii; ii = ii->next )
-        {
-            tr_torrent_state_saved( ii->data );
-        }
-    }
-
-    g_list_free( saved );
 }
 
 int
@@ -545,7 +486,6 @@ tr_core_torrents_added( TrCore * self )
     TR_IS_CORE( self );
 
     tr_core_update( self );
-    tr_core_save( self );
     tr_core_errsig( self, TR_CORE_ERR_NO_MORE_TORRENTS, NULL );
 }
 
@@ -614,7 +554,6 @@ tr_core_update( TrCore * self )
                             MC_SEED,        st->seeders,
                             MC_LEECH,       st->leechers,
                             MC_DONE,        st->completedFromTracker,
-                            MC_TRACKER,     st->tracker,
                             MC_DOWN,        st->downloadedEver,
                             MC_UP,          st->uploadedEver,
                             MC_LEFT,        st->leftUntilDone,

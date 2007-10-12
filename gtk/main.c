@@ -216,7 +216,10 @@ main( int argc, char ** argv )
     char * err;
     struct cbdata * cbdata = g_new (struct cbdata, 1);
     GList * argfiles;
-    gboolean didinit, didlock, sendquit, startpaused;
+    gboolean didinit = FALSE;
+    gboolean didlock = FALSE;
+    gboolean sendquit = FALSE;
+    gboolean startpaused = FALSE;
     char * domain = "transmission";
     GOptionEntry entries[] = {
         { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused, _("Start with all torrents paused"), NULL },
@@ -251,24 +254,14 @@ main( int argc, char ** argv )
     if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
     {
-        GtkWindow * mainwind;
-        benc_val_t * state;
-
         /* create main window now to be a parent to any error dialogs */
-        mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
+        GtkWindow * mainwind = GTK_WINDOW( tr_window_new( myUIManager ) );
 
-        /* try to load prefs and saved state */
         tr_prefs_init_global( );
-        state = cf_loadstate( &err );
-        if( NULL != err )
-        {
-            errmsg( mainwind, "%s", err );
-            g_free( err );
-        }
 
-        msgwin_loadpref();      /* set message level here before tr_init() */
+        /* set message level here before tr_init() */
+        msgwin_loadpref( );
         appsetup( mainwind, argfiles, cbdata, startpaused );
-        cf_freestate( state );
     }
     else
     {
@@ -1016,11 +1009,8 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else g_error ("Unhandled action: %s", action_name );
 
-    if(changed)
-    {
+    if( changed )
         updatemodel( data );
-        tr_core_save( data->core );
-    }
 }
 
 

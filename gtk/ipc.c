@@ -924,7 +924,6 @@ smsg_tor( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
     }
 
     tr_core_update( srv->core );
-    tr_core_save( srv->core );
 
     /* XXX this is a lie */
     simpleresp( con, tag, IPC_MSG_OK );
@@ -967,7 +966,6 @@ smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
     }
 
     tr_core_update( srv->core );
-    tr_core_save( srv->core );
 
     /* XXX this is a lie */
     simpleresp( con, tag, IPC_MSG_OK );

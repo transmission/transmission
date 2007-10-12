@@ -55,13 +55,5 @@ gboolean
 cf_lock(char **errstr);
 char *
 cf_sockname(void);
-void
-cf_loadprefs(char **errstr);
-struct benc_val_s *
-cf_loadstate(char **errstr);
-void
-cf_savestate(struct benc_val_s *state, char **errstr);
-void
-cf_freestate(struct benc_val_s *state);
 
 #endif /* TG_CONF_H */

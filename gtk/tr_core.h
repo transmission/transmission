@@ -117,10 +117,6 @@ tr_core_shutdown( TrCore * self );
 gboolean
 tr_core_quiescent( TrCore * self );
 
-/* Save state. May trigger "error" signal with TR_CORE_ERR_SAVE_STATE */
-void
-tr_core_save( TrCore * self );
-
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
@@ -190,7 +186,7 @@ enum {
   MC_NAME, MC_SIZE, MC_HASH, MC_STAT, MC_ERR, MC_TERR,
   MC_PROG_C, MC_PROG_D, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
   MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
-  MC_DOWN, MC_UP, MC_LEFT, MC_TRACKER, MC_TORRENT, MC_ID,
+  MC_DOWN, MC_UP, MC_LEFT, MC_TORRENT, MC_ID,
   MC_ROW_COUNT
 };
 

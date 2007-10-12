@@ -29,61 +29,61 @@
 #include <glib/gi18n.h>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/bencode.h>
 
 #include "tr_prefs.h"
 #include "tr_torrent.h"
 #include "conf.h"
 #include "util.h"
 
-enum {
-  TR_TORRENT_HANDLE = 1,
-  TR_TORRENT_DIR,
-};
-
 static void
-tr_torrent_init(GTypeInstance *instance, gpointer g_class);
-static void
-tr_torrent_set_property(GObject *object, guint property_id,
-                        const GValue *value, GParamSpec *pspec);
-static void
-tr_torrent_get_property(GObject *object, guint property_id,
-                        GValue *value, GParamSpec *pspec);
-static void
-tr_torrent_class_init(gpointer g_class, gpointer g_class_data);
-static void
-tr_torrent_dispose(GObject *obj);
-static void
-tr_torrent_set_folder(TrTorrent *tor);
-
-static gpointer
-tracker_boxed_fake_copy( gpointer boxed )
+tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
 {
-    return boxed;
+  TrTorrent *self = (TrTorrent *)instance;
+
+#ifdef REFDBG
+  fprintf( stderr, "torrent %p init\n", self );
+#endif
+
+  self->handle = NULL;
+  self->lastStatTime = 0;
+  self->delfile = NULL;
+  self->severed = FALSE;
+  self->disposed = FALSE;
 }
 
 static void
-tracker_boxed_fake_free( gpointer boxed SHUTUP )
+tr_torrent_dispose(GObject *obj)
 {
+  GObjectClass *parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
+  TrTorrent *self = (TrTorrent*)obj;
+
+  if(self->disposed)
+    return;
+  self->disposed = TRUE;
+
+#ifdef REFDBG
+  fprintf( stderr, "torrent %p dispose\n", self );
+#endif
+
+  if( !self->severed )
+      tr_torrent_sever( self );
+
+  g_free (self->delfile);
+
+  /* Chain up to the parent class */
+  parent->dispose(obj);
+}
+
+static void
+tr_torrent_class_init(gpointer g_class, gpointer g_class_data UNUSED )
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
+  gobject_class->dispose = tr_torrent_dispose;
 }
 
 GType
-tr_tracker_boxed_get_type( void )
+tr_torrent_get_type(void)
 {
-    static GType type = 0;
-
-    if( 0 == type )
-    {
-        type = g_boxed_type_register_static( "TrTrackerBoxed",
-                                             tracker_boxed_fake_copy,
-                                             tracker_boxed_fake_free );
-    }
-
-    return type;
-}
-
-GType
-tr_torrent_get_type(void) {
   static GType type = 0;
 
   if(0 == type) {
@@ -102,114 +102,6 @@ tr_torrent_get_type(void) {
     type = g_type_register_static(G_TYPE_OBJECT, "TrTorrent", &info, 0);
   }
   return type;
-}
-
-static void
-tr_torrent_class_init(gpointer g_class, gpointer g_class_data SHUTUP) {
-  GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
-  GParamSpec *pspec;
-
-  gobject_class->set_property = tr_torrent_set_property;
-  gobject_class->get_property = tr_torrent_get_property;
-  gobject_class->dispose = tr_torrent_dispose;
-
-  pspec = g_param_spec_pointer("torrent-handle", "Torrent handle",
-                               "Torrent handle from libtransmission",
-                               G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
-  g_object_class_install_property(gobject_class, TR_TORRENT_HANDLE, pspec);
-
-  pspec = g_param_spec_string("download-directory", "Download directory",
-                              "Directory to download files to", NULL,
-                              G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
-  g_object_class_install_property(gobject_class, TR_TORRENT_DIR, pspec);
-}
-
-static void
-tr_torrent_init(GTypeInstance *instance, gpointer g_class SHUTUP) {
-  TrTorrent *self = (TrTorrent *)instance;
-
-#ifdef REFDBG
-  fprintf( stderr, "torrent %p init\n", self );
-#endif
-
-  self->handle = NULL;
-  self->lastStatTime = 0;
-  self->dir = NULL;
-  self->delfile = NULL;
-  self->severed = FALSE;
-  self->disposed = FALSE;
-}
-
-static void
-tr_torrent_set_property(GObject *object, guint property_id,
-                        const GValue *value, GParamSpec *pspec) {
-  TrTorrent *self = (TrTorrent*)object;
-
-  if(self->severed)
-    return;
-
-  switch(property_id) {
-    case TR_TORRENT_HANDLE:
-      g_assert(NULL == self->handle);
-      self->handle = g_value_get_pointer(value);
-      if(NULL != self->handle && NULL != self->dir)
-        tr_torrent_set_folder(self);
-      break;
-    case TR_TORRENT_DIR:
-      g_assert(NULL == self->dir);
-      self->dir = g_value_dup_string(value);
-      if(NULL != self->handle && NULL != self->dir)
-        tr_torrent_set_folder(self);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
-      break;
-  }
-}
-
-static void
-tr_torrent_get_property(GObject *object, guint property_id,
-                        GValue *value, GParamSpec *pspec) {
-  TrTorrent *self = (TrTorrent*)object;
-
-  if(self->severed)
-    return;
-
-  switch(property_id) {
-    case TR_TORRENT_HANDLE:
-      g_value_set_pointer(value, self->handle);
-      break;
-    case TR_TORRENT_DIR:
-      g_value_set_string(value, (NULL != self->dir ? self->dir :
-                                 tr_torrentGetFolder(self->handle)));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
-      break;
-  }
-}
-
-static void
-tr_torrent_dispose(GObject *obj) {
-  GObjectClass *parent = g_type_class_peek(g_type_parent(TR_TORRENT_TYPE));
-  TrTorrent *self = (TrTorrent*)obj;
-
-  if(self->disposed)
-    return;
-  self->disposed = TRUE;
-
-#ifdef REFDBG
-  fprintf( stderr, "torrent %p dispose\n", self );
-#endif
-
-  if( !self->severed )
-      tr_torrent_sever( self );
-
-  g_free (self->delfile);
-  g_free (self->dir);
-
-  /* Chain up to the parent class */
-  parent->dispose(obj);
 }
 
 void
@@ -285,10 +177,9 @@ static TrTorrent *
 maketorrent( tr_torrent * handle )
 {
     tr_torrentDisablePex( handle, !pref_flag_get( PREF_KEY_PEX ) );
-
-    return g_object_new( TR_TORRENT_TYPE,
-                         "torrent-handle", handle,
-                         NULL);
+    TrTorrent * tor = g_object_new( TR_TORRENT_TYPE, NULL );
+    tor->handle = handle;
+    return tor;
 }
 
 TrTorrent*
@@ -316,6 +207,7 @@ tr_torrent_new( tr_handle * back, const char *torrent, const char *dir,
   if( paused )
       flags |= TR_FLAG_PAUSED;
 
+g_message( "dir is [%s]", dir ? dir : "(null)" );
   handle = tr_torrentInit( back, torrent, dir, flags, &errcode );
 
   if(NULL == handle) {
@@ -378,149 +270,6 @@ tr_torrent_new_with_data( tr_handle * back, uint8_t * data, size_t size,
     }
 
     return maketorrent( handle );
-}
-
-TrTorrent *
-tr_torrent_new_with_state( tr_handle * back, benc_val_t * state,
-                           gboolean forcedpause, char ** err )
-{
-  TrTorrent * ret;
-  tr_torrent * handle;
-  int ii, errcode;
-  int flags;
-  benc_val_t *name, *data;
-  char *torrent, *hash, *dir;
-  gboolean paused = FALSE;
-  gboolean seeding_cap_enabled = FALSE;
-  gdouble seeding_cap = 0.0;
-
-  *err = NULL;
-
-  if(TYPE_DICT != state->type)
-    return NULL;
-
-  torrent = hash = dir = NULL;
-
-  for(ii = 0; ii + 1 < state->val.l.count; ii += 2) {
-    name = state->val.l.vals + ii;
-    data = state->val.l.vals + ii + 1;
-    if(TYPE_STR == name->type &&
-       (TYPE_STR == data->type || TYPE_INT == data->type)) {
-      char * key = name->val.s.s;
-      char * val = data->val.s.s;
-           if (!strcmp (key, "torrent")) torrent = val;
-      else if (!strcmp (key, "hash")) hash = val;
-      else if (!strcmp (key, "dir")) dir = val;
-      else if (!strcmp (key, "paused")) paused = !!data->val.i;
-      else if (!strcmp (key, "seeding-cap-ratio")) seeding_cap = (data->val.i / 100.0);
-      else if (!strcmp (key, "seeding-cap-enabled")) seeding_cap_enabled = !!data->val.i;
-    }
-  }
-
-  if((NULL != torrent && NULL != hash) ||
-     (NULL == torrent && NULL == hash) || NULL == dir)
-    return NULL;
-
-  flags = 0;
-  if( paused || forcedpause )
-      flags |= TR_FLAG_PAUSED;
-
-  if( NULL != hash )
-    handle = tr_torrentInitSaved(back, hash, dir, flags, &errcode);
-  else
-    handle = tr_torrentInit(back, torrent, dir, flags, &errcode);
-
-  if(NULL == handle) {
-    torrent = ( NULL == hash ? torrent : hash );
-    switch(errcode) {
-      case TR_EINVALID:
-        *err = g_strdup_printf(_("%s: not a valid torrent file"), torrent);
-        break;
-      case TR_EDUPLICATE:
-        *err = g_strdup_printf(_("%s: torrent is already open"), torrent);
-        break;
-      default:
-        *err = g_strdup(torrent);
-        break;
-    }
-    return NULL;
-  }
-
-  ret = maketorrent( handle );
-  ret->seeding_cap = seeding_cap;
-  ret->seeding_cap_enabled = seeding_cap_enabled;
-  return ret;
-}
-
-gboolean
-tr_torrent_get_state( TrTorrent * tor, benc_val_t * state )
-{
-    const tr_info * inf;
-
-    TR_IS_TORRENT( tor );
-
-    if( tor->severed )
-    {
-        return FALSE;
-    }
-
-    inf = tr_torrentInfo( tor->handle );
-
-    tr_bencInit( state, TYPE_DICT );
-    if( tr_bencDictReserve( state, 3 ) )
-    {
-        return FALSE;
-    }
-
-    if( TR_FLAG_SAVE & inf->flags )
-    {
-        tr_bencInitStr( tr_bencDictAdd( state, "hash" ),
-                        inf->hashString, -1, 1 );
-    }
-    else
-    {
-        tr_bencInitStr( tr_bencDictAdd( state, "torrent" ),
-                        inf->torrent, -1, 1 );
-    }
-    tr_bencInitStr( tr_bencDictAdd( state, "dir" ),
-                    tr_torrentGetFolder( tor->handle ), -1, 1 );
-    tr_bencInitInt( tr_bencDictAdd( state, "paused" ),
-                    (refreshStat(tor)->status & TR_STATUS_INACTIVE) ? 1 : 0);
-    tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-ratio" ),
-                    (int)(tor->seeding_cap * 100.0)); /* two decimal places */
-    tr_bencInitInt( tr_bencDictAdd( state, "seeding-cap-enabled" ),
-                    tor->seeding_cap_enabled ? 1 : 0);
-
-    return TRUE;
-}
-
-/* XXX this should probably be done with a signal */
-void
-tr_torrent_state_saved(TrTorrent *tor) {
-  TR_IS_TORRENT(tor);
-
-  if(tor->severed)
-    return;
-
-  if(NULL != tor->delfile) {
-    unlink(tor->delfile);
-    g_free(tor->delfile);
-    tor->delfile = NULL;
-  }
-}
-
-static void
-tr_torrent_set_folder(TrTorrent *tor) {
-  char *wd;
-
-  if(NULL != tor->dir)
-    tr_torrentSetFolder(tor->handle, tor->dir);
-  else {
-    wd = g_new(char, MAX_PATH_LENGTH + 1);
-    tr_torrentSetFolder(tor->handle,
-                        (NULL == getcwd(wd, MAX_PATH_LENGTH + 1) ? "." : wd));
-    g_free(wd);
-  }
 }
 
 void
