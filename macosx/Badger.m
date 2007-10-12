@@ -67,8 +67,7 @@
         NSImage * icon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
         NSSize iconSize = [icon size];
         
-        if (fDockIcon)
-            [fDockIcon release];
+        [fDockIcon release];
         fDockIcon = [[NSImage alloc] initWithSize: iconSize];
         [fDockIcon addRepresentation: [icon bestRepresentationForDevice: nil]];
         [icon release];
@@ -117,8 +116,8 @@
     }
     
     NSImage * dockIcon = nil;
-    BOOL speedChange;
-    if ((speedChange = (uploadRateString || downloadRateString)))
+    BOOL speedBadge = uploadRateString || downloadRateString;
+    if (speedBadge)
     {
         if (!fDockIcon)
             fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
@@ -171,13 +170,12 @@
     }
     
     //update dock badge
-    if (baseChange || fSpeedBadge || speedChange)
+    if (baseChange || fSpeedBadge || speedBadge)
     {
         [NSApp setApplicationIconImage: dockIcon ? dockIcon : fDockIcon];
-        if (dockIcon)
-            [dockIcon release];
+        [dockIcon release];
         
-        fSpeedBadge = speedChange;
+        fSpeedBadge = speedBadge;
     }
 }
 

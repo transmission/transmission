@@ -309,7 +309,7 @@
     [self updateFileMenu: fileMenu forFiles: [fMenuTorrent fileList]];
     
     //add file menu items to action menu
-    NSRange range =  NSMakeRange(0, [fileMenu numberOfItems]);
+    NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
     [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
     
     //place menu below button
@@ -411,7 +411,6 @@
 }
 
 - (void) setQuickRatioMode: (id) sender
-
 {
     int mode;
     switch ([sender tag])
