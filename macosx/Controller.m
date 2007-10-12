@@ -442,6 +442,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self autoSpeedLimitChange: nil];
     fSpeedLimitTimer = [NSTimer scheduledTimerWithTimeInterval: AUTO_SPEED_LIMIT_SECONDS target: self 
         selector: @selector(autoSpeedLimit) userInfo: nil repeats: YES];
+    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSModalPanelRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer: fSpeedLimitTimer forMode: NSEventTrackingRunLoopMode];
 }
 
 - (void) applicationDidFinishLaunching: (NSNotification *) notification
