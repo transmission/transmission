@@ -192,6 +192,12 @@ char * tr_clientForId( const uint8_t * id )
                       charToInt( id[3] ), charToInt( id[4] ),
                       charToInt( id[5] ) );
         }
+        else if( !memcmp( &id[1], "HL", 2 ) )
+        {
+            asprintf( &ret, "Halite %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
+        }
         else if( !memcmp( &id[1], "AR", 2 ) )
         {
             asprintf( &ret, "Arctic Torrent" );
