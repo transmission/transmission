@@ -103,7 +103,10 @@ enum
     FR_ID_CORRUPT = 10,
 
     /* IPs and ports of connectable peers */
-    FR_ID_PEERS = 11
+    FR_ID_PEERS = 11,
+
+    /* destination of the torrent: zero-terminated string */
+    FR_ID_DESTINATION = 12
 };
 
 
@@ -282,6 +285,13 @@ tr_fastResumeSave( const tr_torrent * tor )
         fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
     }
 
+    if( TRUE ) /* FR_ID_DESTINATION */
+    {
+        const char * d = tor->destination ? tor->destination : "";
+        const int byteCount = strlen( d ) + 1;
+        fastResumeWriteData( FR_ID_DESTINATION, d, 1, byteCount, file );
+    }
+
     /* Write download and upload totals */
 
     total = tor->downloadedCur + tor->downloadedPrev;
@@ -307,6 +317,31 @@ tr_fastResumeSave( const tr_torrent * tor )
     fclose( file );
 
     tr_dbg( "Resume file '%s' written", path );
+}
+
+static int
+loadDestination( tr_torrent * tor, FILE * fp )
+{
+    int pathlen = 0;
+    char path[MAX_PATH_LENGTH];
+
+    for( ;; ) {
+        const int ch = fgetc( fp );
+        if( ch==EOF ) /* end of file */
+            return TR_ERROR_IO_OTHER;
+        if( ch=='\0' ) /* end of string */
+            break;
+        path[pathlen++] = (char) ch;
+    }
+
+    path[pathlen] = '\0';
+
+    if( pathlen ) {
+        tr_free( tor->destination );
+        tor->destination = tr_strdup( path );
+    }
+
+    return TR_OK;
 }
 
 static int
@@ -580,6 +615,21 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                 }
                 break;
 
+            case FR_ID_DESTINATION:
+                {
+                    const int rret = loadDestination( tor, file );
+
+                    if( rret && ( feof(file) || ferror(file) ) )
+                    {
+                        fclose( file );
+                        return ret;
+                    }
+
+                    ret |= TR_FR_DESTINATION;;
+                    continue;
+                }
+                break;
+           
             case FR_ID_RUN:
                 {
                     char ch;

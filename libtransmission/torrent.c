@@ -269,8 +269,6 @@ torrentRealInit( tr_handle  * h,
 
     tr_globalLock( h );
 
-    tor->destination = tr_strdup( destination );
-
     tor->handle   = h;
     tor->pexDisabled = 0;
 
@@ -341,6 +339,13 @@ torrentRealInit( tr_handle  * h,
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     loaded = tr_fastResumeLoad( tor, uncheckedPieces );
+
+    /* a path passed in by the user overrides
+       the one loaded by fastresume... */
+    if( destination && *destination ) {
+        tr_free( tor->destination );
+        tor->destination = tr_strdup( destination );
+    }
 
     /* the `paused' flag has highest precedence...
        after that, the fastresume setting is used...
