@@ -185,9 +185,10 @@
     NSIndexSet * indexes = [fMessageTable selectedRowIndexes];
     NSMutableArray * messageStrings = [NSMutableArray arrayWithCapacity: [indexes count]];
     
-    unsigned int i;
-    for (i = [indexes firstIndex]; i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-        [messageStrings addObject: [self stringForMessage: [fMessages objectAtIndex: i]]];
+    NSEnumerator * enumerator = [[fMessages objectsAtIndexes: indexes] objectEnumerator];
+    NSDictionary * message;
+    while ((message = [enumerator nextObject]))
+        [messageStrings addObject: [self stringForMessage: message]];
     
     [pb setString: [messageStrings componentsJoinedByString: @"\n"] forType: NSStringPboardType];
 }

@@ -36,13 +36,11 @@
 - (void) setIcon: (NSImage *) image
 {
     //create regular back image
-    if (fRegularImage)
-        [fRegularImage release];
+    [fRegularImage release];
     fRegularImage = [[NSImage imageNamed: @"InfoTabBack.tif"] copy];
     
     //create selected back image
-    if (fSelectedImage)
-        [fSelectedImage release];
+    [fSelectedImage release];
     fSelectedImage = [[NSImage imageNamed: @"InfoTabBackAqua.tif"] copy];
     
     //composite image to back images
