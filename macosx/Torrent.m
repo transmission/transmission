@@ -707,7 +707,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (eta < 0)
         return @"";
     
-    NSString * timeString;
     if (eta < 60)
         return [NSString stringWithFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
     else if (eta < 3600) //60 * 60

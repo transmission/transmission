@@ -160,7 +160,6 @@
     
     int i, j, piece, index = -1;
     float piecePercent;
-    NSPoint point;
     NSRect rect = NSMakeRect(0, 0, fWidth, fWidth);
     NSColor * pieceColor;
     BOOL change = NO;

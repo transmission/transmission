@@ -3044,7 +3044,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     NSEnumerator * enumerator;
     Torrent * torrent;
-    BOOL active, allowSleep;
+    BOOL allowSleep;
 
     switch (messageType)
     {

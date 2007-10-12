@@ -185,8 +185,6 @@
     }
     
     //text color
-    BOOL highlighted = [self isHighlighted] && [[self highlightColorWithFrame: cellFrame inView: controlView]
-                                                isEqual: [NSColor alternateSelectedControlColor]];
     NSColor * titleColor, * statusColor;
     if ([self isHighlighted]
             && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
