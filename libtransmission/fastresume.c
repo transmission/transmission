@@ -194,6 +194,13 @@ tr_fastResumeSave( const tr_torrent * tor )
     /* Write format version */
     fwrite( &version, 4, 1, file );
 
+    if( TRUE ) /* FR_ID_DESTINATION */
+    {
+        const char * d = tor->destination ? tor->destination : "";
+        const int byteCount = strlen( d ) + 1;
+        fastResumeWriteData( FR_ID_DESTINATION, d, 1, byteCount, file );
+    }
+
     /* Write progress data */
     if (1) {
         int n;
@@ -283,13 +290,6 @@ tr_fastResumeSave( const tr_torrent * tor )
     {
         const char is_running = tor->isRunning ? 't' : 'f';
         fastResumeWriteData( FR_ID_RUN, &is_running, 1, 1, file );
-    }
-
-    if( TRUE ) /* FR_ID_DESTINATION */
-    {
-        const char * d = tor->destination ? tor->destination : "";
-        const int byteCount = strlen( d ) + 1;
-        fastResumeWriteData( FR_ID_DESTINATION, d, 1, byteCount, file );
     }
 
     /* Write download and upload totals */
@@ -513,6 +513,7 @@ fastResumeLoadOld( tr_torrent   * tor,
 
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
+                     const char   * fallbackDestination,
                      tr_bitfield  * uncheckedPieces )
 {
     char      path[MAX_PATH_LENGTH];
@@ -561,6 +562,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     /* read each block of data */
     while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
     {
+fprintf( stderr, "reading id %d\n", (int)id );
         switch( id )
         {
             case FR_ID_PROGRESS:
@@ -625,7 +627,10 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                         return ret;
                     }
 
-                    ret |= TR_FR_DESTINATION;;
+                    if( tor->destination == NULL )
+                        tor->destination = tr_strdup( fallbackDestination );
+
+                    ret |= TR_FR_DESTINATION;
                     continue;
                 }
                 break;
@@ -740,6 +745,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
         tr_inf( "Skipping resume data type %02x, %u bytes", id, len );
         fseek( file, len, SEEK_CUR );
     }
+fprintf( stderr, "\n\n" );
 
     fclose( file );
     return ret;
@@ -747,9 +753,10 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
 uint64_t
 tr_fastResumeLoad( tr_torrent   * tor,
+                   const char   * fallbackDestination,
                    tr_bitfield  * uncheckedPieces )
 {
-    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces );
+    const uint64_t ret = fastResumeLoadImpl( tor, fallbackDestination, uncheckedPieces );
 
     if( ! ( ret & TR_FR_PROGRESS ) )
         tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
