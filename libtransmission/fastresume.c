@@ -526,6 +526,9 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     assert( tor != NULL );
     assert( uncheckedPieces != NULL );
 
+    /* initialize the fallback values */
+    tor->destination = tr_strdup( fallbackDestination );
+
     /* Open resume file */
     fastResumeFileName( path, sizeof path, tor, 1 );
     file = fopen( path, "rb" );
@@ -545,8 +548,6 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     }
 
     tr_dbg( "Resume file '%s' loaded", path );
-
-    tor->destination = tr_strdup( fallbackDestination );
 
     /* Check format version */
     fread( &version, 4, 1, file );
