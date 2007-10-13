@@ -722,14 +722,16 @@ tr_torrentStat( tr_torrent * tor )
 
     s->cpStatus = tor->cpStatus;
 
-    /* tr_rcRate() doesn't make the difference between 'piece'
-       messages and other messages, which causes a non-zero
-       download rate even tough we are not downloading. So we
-       force it to zero not to confuse the user. */
-    s->rateDownload = tor->isRunning
-        ? tr_rcRate( tor->download )
-        : 0.0;
-    s->rateUpload = tr_rcRate( tor->upload );
+    /* rcRate's averaging code can make it appear that we're
+     * still sending bytes after a torrent stops or all the
+     * peers disconnect, so short-circuit that appearance here */
+    if( tor->isRunning && s->peersConnected ) {
+        s->rateDownload = tr_rcRate( tor->download );
+        s->rateUpload = tr_rcRate( tor->upload );
+    } else {
+        s->rateDownload = 0.0;
+        s->rateUpload = 0.0;
+    }
    
     tr_trackerGetCounts( tc,
                          &s->completedFromTracker,
