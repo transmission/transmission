@@ -710,13 +710,13 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.SetName(_T("Xmission"));
     info.SetVersion(_T(LONG_VERSION_STRING));
     info.SetCopyright(_T("Copyright 2005-2007 The Transmission Project"));
-    info.SetDescription(_T("A fast, lightweight bittorrent client"));
+    info.SetDescription(_T("A fast and easy BitTorrent client"));
     info.SetWebSite( _T( "http://transmission.m0k.org/" ) );
     info.SetIcon( ico );
-    info.AddDeveloper( _T("Josh Elsasser (Back-end; GTK+)") );
     info.AddDeveloper( _T("Charles Kerr (Back-end, GTK+, wxWidgets)") );
     info.AddDeveloper( _T("Mitchell Livingston (Back-end; OS X)")  );
     info.AddDeveloper( _T("Eric Petit (Back-end; OS X)")  );
+    info.AddDeveloper( _T("Josh Elsasser (Back-end; GTK+)") );
     info.AddDeveloper( _T("Bryan Varner (BeOS)")  );
     wxAboutBox( info );
 #else
