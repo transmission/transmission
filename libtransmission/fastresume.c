@@ -320,10 +320,11 @@ tr_fastResumeSave( const tr_torrent * tor )
 }
 
 static int
-loadDestination( tr_torrent * tor, FILE * fp )
+loadFallbackDestination( tr_torrent * tor, FILE * fp )
 {
     int pathlen = 0;
     char path[MAX_PATH_LENGTH];
+    const int haveDestination = tor->destination && *tor->destination;
 
     for( ;; ) {
         const int ch = fgetc( fp );
@@ -336,7 +337,7 @@ loadDestination( tr_torrent * tor, FILE * fp )
 
     path[pathlen] = '\0';
 
-    if( pathlen ) {
+    if( pathlen && !haveDestination ) {
         tr_free( tor->destination );
         tor->destination = tr_strdup( path );
     }
@@ -513,7 +514,6 @@ fastResumeLoadOld( tr_torrent   * tor,
 
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
-                     const char   * fallbackDestination,
                      tr_bitfield  * uncheckedPieces )
 {
     char      path[MAX_PATH_LENGTH];
@@ -525,9 +525,6 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
     assert( tor != NULL );
     assert( uncheckedPieces != NULL );
-
-    /* initialize the fallback values */
-    tor->destination = tr_strdup( fallbackDestination );
 
     /* Open resume file */
     fastResumeFileName( path, sizeof path, tor, 1 );
@@ -621,7 +618,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
             case FR_ID_DESTINATION:
                 {
-                    const int rret = loadDestination( tor, file );
+                    const int rret = loadFallbackDestination( tor, file );
 
                     if( rret && ( feof(file) || ferror(file) ) )
                     {
@@ -751,10 +748,9 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
 uint64_t
 tr_fastResumeLoad( tr_torrent   * tor,
-                   const char   * fallbackDestination,
                    tr_bitfield  * uncheckedPieces )
 {
-    const uint64_t ret = fastResumeLoadImpl( tor, fallbackDestination, uncheckedPieces );
+    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces );
 
     if( ! ( ret & TR_FR_PROGRESS ) )
         tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );

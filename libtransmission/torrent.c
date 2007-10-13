@@ -269,6 +269,8 @@ torrentRealInit( tr_handle  * h,
 
     tr_globalLock( h );
 
+    tor->destination = tr_strdup( destination );
+
     tor->handle   = h;
     tor->pexDisabled = 0;
 
@@ -339,8 +341,7 @@ torrentRealInit( tr_handle  * h,
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
 
-    loaded = tr_fastResumeLoad( tor, destination, uncheckedPieces );
-
+    loaded = tr_fastResumeLoad( tor, uncheckedPieces );
     assert( tor->destination != NULL );
 
     /* the `paused' flag has highest precedence...
