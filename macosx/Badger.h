@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef BADGER_H
-#define BADGER_H
-
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 
@@ -46,5 +43,3 @@
 - (void) clearBadge;
 
 @end
-
-#endif
