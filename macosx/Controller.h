@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
-
 #import <Cocoa/Cocoa.h>
 #import <transmission.h>
 #import "PrefsController.h"
@@ -235,5 +232,3 @@
 - (void) prepareForUpdate:  (NSNotification *) notification;
 
 @end
-
-#endif

@@ -66,6 +66,7 @@
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         
         [stringShadow release];
+        [paragraphStyle release];
     }
     return self;
 }

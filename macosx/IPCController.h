@@ -22,9 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#ifndef IPCCONTROLLER_H
-#define IPCCONTROLLER_H
-
 #import <Cocoa/Cocoa.h>
 
 #include "ipcparse.h"
@@ -66,5 +63,3 @@
 - (void) setDelegate: (id) newdelegate;
 
 @end
-
-#endif
