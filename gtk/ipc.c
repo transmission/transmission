@@ -195,7 +195,7 @@ ipc_socket_setup( GtkWindow * parent, TrCore * core )
       0 > ipc_addmsg( con->msgs, IPC_MSG_UPLIMIT,      smsg_int ) )
   {
       errmsg( con->u.serv.wind, _("Failed to set up IPC: %s"),
-              strerror( errno ) );
+              g_strerror( errno ) );
       g_free( con );
       return;
   }
@@ -226,7 +226,7 @@ blocking_client( enum ipc_msg msgid, GList * files )
   con->msgs = ipc_initmsgs();
   if( NULL == con->msgs )
   {
-      g_message( _("Failed to set up IPC: %s"), strerror( errno ) );
+      g_message( _("Failed to set up IPC: %s"), g_strerror( errno ) );
       g_free( con );
       return FALSE;
   }
@@ -307,7 +307,7 @@ serv_bind(struct constate *con) {
 
  fail:
   errmsg(con->u.serv.wind, _("Failed to set up socket: %s"),
-         strerror(errno));
+         g_strerror(errno));
   if(0 <= con->fd)
     close(con->fd);
   con->fd = -1;
@@ -329,7 +329,7 @@ client_connect(char *path, struct constate *con) {
   size_t             size;
 
   if(0 > (con->fd = socket(AF_UNIX, SOCK_STREAM, 0))) {
-    g_message( _("Failed to create socket: %s"), strerror(errno));
+    g_message( _("Failed to create socket: %s"), g_strerror(errno));
     return FALSE;
   }
 
@@ -338,7 +338,7 @@ client_connect(char *path, struct constate *con) {
   strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
   if(0 > connect(con->fd, (struct sockaddr*)&addr, SUN_LEN(&addr))) {
-    g_message( _("Failed to connect to %s: %s"), path, strerror(errno));
+    g_message( _("Failed to connect to %s: %s"), path, g_strerror(errno));
     return FALSE;
   }
 
@@ -435,7 +435,7 @@ srv_io_received( GSource * source SHUTUP, void * data, size_t len,
                 break;
             default:
                 errmsg( con->u.serv.wind, _("IPC parsing failed: %s"),
-                        strerror( errno ) );
+                        g_strerror( errno ) );
         }
         destroycon( con );
         return 0;
@@ -470,7 +470,7 @@ cli_io_received( GSource * source SHUTUP, void * data, size_t len,
                 g_message( _("IPC protocol parse error") );
                 break;
             default:
-                g_message( _("IPC parsing failed: %s"), strerror( errno ) );
+                g_message( _("IPC parsing failed: %s"), g_strerror( errno ) );
                 break;
         }
         destroycon( con );

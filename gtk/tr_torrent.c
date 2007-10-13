@@ -207,7 +207,6 @@ tr_torrent_new( tr_handle * back, const char *torrent, const char *dir,
   if( paused )
       flags |= TR_FLAG_PAUSED;
 
-g_message( "dir is [%s]", dir ? dir : "(null)" );
   handle = tr_torrentInit( back, torrent, dir, flags, &errcode );
 
   if(NULL == handle) {
@@ -349,7 +348,7 @@ tr_torrent_status_str ( TrTorrent * gtor )
             break;
 
         default:
-            top = g_strdup_printf("Unrecognized state: %d", st->status );
+            top = g_strdup_printf( _("Unrecognized state: %d"), st->status );
             break;
 
     }

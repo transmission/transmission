@@ -126,7 +126,7 @@ usage( const char * msg, ... )
   "usage: %s [-dfh] [-p file] [-s file]\n"
   "\n"
   "Transmission %s http://transmission.m0k.org/\n"
-  "A free, lightweight BitTorrent client with a simple, intuitive interface\n"
+  "A fast and easy BitTorrent client\n"
   "\n"
   "  -d --debug                Print data send and received, implies -f\n"
   "  -f --foreground           Run in the foreground and log to stderr\n"

@@ -156,7 +156,7 @@ save_dialog_response_cb( GtkWidget * d, int response, GtkTextBuffer * textbuf )
       if( !fp )
       {
           errmsg( GTK_WINDOW(d),
-                  _("Unable to open \"%s\" for writing: %s"),
+                  _("Error writing to \"%s\": %s"),
                   filename, g_strerror( errno ) );
       }
       else
@@ -171,7 +171,7 @@ save_dialog_response_cb( GtkWidget * d, int response, GtkTextBuffer * textbuf )
               if( len > fwrite( buf, 1, len, fp ) ) {
                   errmsg( GTK_WINDOW( d ),
                           _("Error writing to \"%s\": %s"),
-                          filename, strerror( errno ) );
+                          filename, g_strerror( errno ) );
               }
               g_free( buf );
           }
@@ -242,11 +242,11 @@ msgwin_create( TrCore * core )
   gtk_toolbar_set_style( GTK_TOOLBAR( toolbar), GTK_TOOLBAR_BOTH_HORIZ );
 
   gtk_toolbar_insert_stock(GTK_TOOLBAR(toolbar), GTK_STOCK_SAVE,
-                           _("Save"), NULL,
+                           NULL, NULL,
                            G_CALLBACK(save_cb), textbuf, -1);
 
   gtk_toolbar_insert_stock(GTK_TOOLBAR(toolbar), GTK_STOCK_CLEAR,
-                           _("Clear"), NULL,
+                           NULL, NULL,
                            G_CALLBACK(clear_cb), textbuf, -1);
 
   gtk_toolbar_insert_space(GTK_TOOLBAR(toolbar), -1);

@@ -7,7 +7,7 @@ are used for clarity and are not part of the actual key.
 
 The IPC protocol is used to allow processes to control or retrieve
 information from Transmission frontend, such as transmission-daemon,
-transmission-gtk or the MacOS X frontend. This communication is done
+or the GTK+ or MacOS X frontends.  This communication is done
 over a unix-domain socket file such as
 ~/.transmission/daemon/socket. In this document the Transmission
 frontend will be referred to as the server and the process connecting

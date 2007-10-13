@@ -87,7 +87,7 @@ formatname( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
     {
         char * terr;
         gtk_tree_model_get( model, iter, MC_TERR, &terr, -1 );
-        bottom = g_strconcat( _("Error: "), terr, NULL );
+        bottom = g_strconcat( _("Error"), ": ", terr, NULL );
         g_free( terr );
     }
     else if( TR_STATUS_DOWNLOAD & status )
@@ -190,7 +190,7 @@ makeview( PrivateData * p )
 
     progrend = tr_cell_renderer_progress_new();
     /* this string is only used to determine the size of the progress bar */
-    str = g_markup_printf_escaped( "<big>%s</big>", _("  fnord    fnord  ") );
+    str = g_markup_printf_escaped( "<big>%s</big>", "  fnord    fnord  " );
     g_object_set( progrend, "bar-sizing", str, NULL );
     g_free(str);
     col = gtk_tree_view_column_new_with_attributes( _("Progress"), progrend,

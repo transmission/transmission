@@ -799,6 +799,7 @@ about ( void )
   gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
   gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
+  /* note to translators: put yourself here for credit in the "About" dialog */
   gtk_about_dialog_set_translator_credits( a, _("translator-credits") );
   g_signal_connect_swapped( w, "response", G_CALLBACK (gtk_widget_destroy), w );
   gtk_widget_show_all( w );

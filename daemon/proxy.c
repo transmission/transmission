@@ -129,11 +129,11 @@ usage( const char * msg, ... )
   "usage: %s [options] [files]...\n"
   "\n"
   "Transmission %s http://transmission.m0k.org/\n"
-  "A free, lightweight BitTorrent client with a simple, intuitive interface.\n"
+  "A fast and easy BitTorrent client\n"
   "\n"
   "  -h --help                 Display this message and exit\n"
   "  -t --type daemon          Use the daemon frontend, transmission-daemon\n"
-  "  -t --type gtk             Use the GTK+ frontend, transmission-gtk\n"
+  "  -t --type gtk             Use the GTK+ frontend, transmission\n"
   "  -t --type mac             Use the Mac OS X frontend\n",
             getmyname(), LONG_VERSION_STRING );
     exit( EXIT_SUCCESS );

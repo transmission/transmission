@@ -21,10 +21,7 @@ Requires: gtk2 >= @GTK_REQUIRED@
 Provides: %{name}
 
 %description
-Transmission has been built from the ground up to be a lightweight,
-yet powerful BitTorrent client. Its simple, intuitive interface
-strikes a balance between providing useful functionality without
-feature bloat. Furthermore, it is free for anyone to use or modify.
+A fast and easy BitTorrent client
 
 %prep
 %setup -q

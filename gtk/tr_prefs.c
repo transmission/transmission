@@ -269,7 +269,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         w = new_check_button( s, PREF_KEY_ENCRYPTED_ONLY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
-        s = _("Display an Icon in the System _Tray");
+        s = _("Show an Icon in the System _Tray");
         w = new_check_button( s, PREF_KEY_SYSTRAY, core );
         hig_workarea_add_wide_control( t, &row, w );
         
