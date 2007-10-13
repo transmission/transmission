@@ -383,8 +383,12 @@ getCryptoProvide( const tr_handshake * handshake UNUSED )
 
     i |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
 
-    if( handshake->allowUnencryptedPeers ) /* sometimes allow plaintext */
+#if 0
+    /* by the time we send a crypto_provide, we _know_
+     * the peer supports encryption. */
+    if( handshake->allowUnencryptedPeers )
         i |= CRYPTO_PROVIDE_PLAINTEXT;
+#endif
 
    return i;
 }
