@@ -1497,7 +1497,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
 
     /* if it's marked for purging, close it */
     if( peer->doPurge ) {
-        tordbg( t, "purging peer %p because its doPurge flag is set", tr_peerIoAddrStr(&atom->addr,atom->port) );
+        tordbg( t, "purging peer %s because its doPurge flag is set", tr_peerIoAddrStr(&atom->addr,atom->port) );
         return TRUE;
     }
 
@@ -1506,7 +1506,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
         const int clientIsSeed = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
         const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
         if( peerIsSeed && clientIsSeed && ( tor->pexDisabled || (now-atom->time>=30) ) ) {
-            tordbg( t, "purging peer %p because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
+            tordbg( t, "purging peer %s because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
             return TRUE;
         }
     }
@@ -1526,7 +1526,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
         const time_t then = peer->pieceDataActivityDate;
         const int idleTime = then ? (now-then) : 0;
         if( idleTime > limit ) {
-            tordbg( t, "purging peer %p it's been %d secs since we shared anything",
+            tordbg( t, "purging peer %s because it's been %d secs since we shared anything",
                        tr_peerIoAddrStr(&atom->addr,atom->port), idleTime );
             return TRUE;
         }
