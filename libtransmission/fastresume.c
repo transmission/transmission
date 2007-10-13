@@ -562,7 +562,6 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     /* read each block of data */
     while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
     {
-fprintf( stderr, "reading id %d\n", (int)id );
         switch( id )
         {
             case FR_ID_PROGRESS:
@@ -745,7 +744,6 @@ fprintf( stderr, "reading id %d\n", (int)id );
         tr_inf( "Skipping resume data type %02x, %u bytes", id, len );
         fseek( file, len, SEEK_CUR );
     }
-fprintf( stderr, "\n\n" );
 
     fclose( file );
     return ret;
