@@ -338,7 +338,7 @@ render_encrypted (GtkTreeViewColumn  * column UNUSED,
                                         -1);
   g_object_set (renderer, "xalign", (gfloat)0.0,
                           "yalign", (gfloat)0.5,
-                          "stock-id", (is_encrypted ? GTK_STOCK_DIALOG_AUTHENTICATION : NULL),
+                          "stock-id", (is_encrypted ? "transmission-lock" : NULL),
                           NULL);
 }
 
@@ -490,10 +490,10 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
   char name[64];
 
   /* TODO: make this configurable? */
-  int view_columns[] = { PEER_COL_IS_ENCRYPTED,
-                         PEER_COL_ADDRESS,
+  int view_columns[] = { PEER_COL_ADDRESS,
                          PEER_COL_CLIENT,
                          PEER_COL_PROGRESS,
+                         PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
                          PEER_COL_DOWNLOAD_RATE };
 

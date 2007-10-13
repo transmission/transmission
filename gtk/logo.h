@@ -1,12 +1,12 @@
 /* GdkPixbuf RGBA C-Source image dump */
 
 #ifdef __SUNPRO_C
-#pragma align 4 (tr_icon_full)
+#pragma align 4 (tr_icon_logo)
 #endif
 #ifdef __GNUC__
-static const guint8 tr_icon_full[] __attribute__ ((__aligned__ (4))) = 
+static const guint8 tr_icon_logo[] __attribute__ ((__aligned__ (4))) = 
 #else
-static const guint8 tr_icon_full[] = 
+static const guint8 tr_icon_logo[] = 
 #endif
 { ""
   /* Pixbuf magic (0x47646b50) */

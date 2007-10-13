@@ -13,6 +13,7 @@ noinst_HEADERS = \
     hig.h \
     io.h \
     ipc.h \
+    lock.h \
     logo.h \
     makemeta-ui.h \
     msgwin.h \

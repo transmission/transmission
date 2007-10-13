@@ -15,6 +15,7 @@
 #include <gtk/gtk.h>
 #include <libtransmission/transmission.h>
 #include "torrent-inspector.h"
+#include "lock.h"
 #include "logo.h"
 
 #define UNUSED G_GNUC_UNUSED
@@ -120,7 +121,8 @@ BuiltinIconInfo;
 /* only one icon now... but room to grow ;) */
 const BuiltinIconInfo my_builtin_icons [] =
 {
-    { tr_icon_full, "transmission-logo" }
+    { tr_icon_logo, "transmission-logo" },
+    { tr_icon_lock, "transmission-lock" }
 };
 
 static void
