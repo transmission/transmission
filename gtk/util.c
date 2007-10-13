@@ -38,7 +38,7 @@
 #include "conf.h"
 #include "util.h"
 
-#define BESTDECIMAL(d)          (10.0 > (d) ? 2 : (100.0 > (d) ? 1 : 0))
+#define BESTDECIMAL(d) ( (d)<100 ? 1 : 0 )
 
 static void
 errcb(GtkWidget *wind, int resp, gpointer data);
