@@ -54,9 +54,14 @@ enum
      * we're we don't get piece data from a peer in this long */
     SNUBBED_SEC = 60,
 
-    /* this is arbitrary and, hopefully, temporary until we come up
-     * with a better idea for managing the connection limits */
+    /* arbitrary */
     MAX_CONNECTED_PEERS_PER_TORRENT = 60,
+
+    /* when many peers are available, keep idle ones this long */
+    MIN_UPLOAD_IDLE_SECS = 60,
+
+    /* when few peers are available, keep idle ones this long */
+    MAX_UPLOAD_IDLE_SECS = 240,
 
     /* how many peers to unchoke per-torrent. */
     /* FIXME: make this user-configurable? */
@@ -1479,53 +1484,69 @@ rechokePulse( void * vtorrent )
 
 /***
 ****
-****
+****  Life and Death
 ****
 ***/
 
-#define LAISSEZ_FAIRE_PERIOD_SECS 90
+static int
+shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
+{
+    const tr_torrent * tor = t->tor;
+    const time_t now = time( NULL );
+    const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+
+    /* if it's marked for purging, close it */
+    if( peer->doPurge ) {
+        tordbg( t, "purging peer %p because its doPurge flag is set", tr_peerIoAddrStr(&atom->addr,atom->port) );
+        return TRUE;
+    }
+
+    /* if we're both seeds and it's been long enough for a pex exchange, close it */
+    if( 1 ) {
+        const int clientIsSeed = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
+        const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
+        if( peerIsSeed && clientIsSeed && ( tor->pexDisabled || (now-atom->time>=30) ) ) {
+            tordbg( t, "purging peer %p because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
+            return TRUE;
+        }
+    }
+
+    /* disconnect if it's been too long since piece data has been transferred.
+     * this is on a sliding scale based on number of available peers... */
+    if( 1 ) {
+        const int relaxStrictnessIfFewerThanN = (int)((MAX_CONNECTED_PEERS_PER_TORRENT * 0.9) + 0.5);
+        /* if we have >= relaxIfFewerThan, strictness is 100%.
+         * if we have zero connections, strictness is 0% */
+        const double strictness = peerCount >= relaxStrictnessIfFewerThanN
+            ? 1.0
+            : peerCount / (double)relaxStrictnessIfFewerThanN;
+        const int lo = MIN_UPLOAD_IDLE_SECS;
+        const int hi = MAX_UPLOAD_IDLE_SECS;
+        const int limit = lo + ((hi-lo) * strictness);
+        const time_t then = peer->pieceDataActivityDate;
+        const int idleTime = then ? (now-then) : 0;
+        if( idleTime > limit ) {
+            tordbg( t, "purging peer %p it's been %d secs since we shared anything",
+                       tr_peerIoAddrStr(&atom->addr,atom->port), idleTime );
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
 
 static tr_peer **
-getWeakConnections( Torrent * t, int * setmeSize )
+getPeersToClose( Torrent * t, int * setmeSize )
 {
-    int i, insize, outsize;
-    tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &insize );
-    struct tr_peer ** ret = tr_new( tr_peer*, insize );
-    const int clientIsSeed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
-    const time_t now = time( NULL );
+    int i, peerCount, outsize;
+    tr_peer ** peers = (tr_peer**) tr_ptrArrayPeek( t->peers, &peerCount );
+    struct tr_peer ** ret = tr_new( tr_peer*, peerCount );
 
     assert( torrentIsLocked( t ) );
 
-    for( i=outsize=0; i<insize; ++i )
-    {
-        tr_peer * peer = peers[i];
-        int isWeak;
-        const struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
-        const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
-        const double throughput = getWeightedThroughput( peer );
-
-        assert( atom != NULL );
-
-        if( peer->doPurge ) {
-            tordbg( t, "purging peer %s because it's got doPurge flagged", tr_peerIoAddrStr(&atom->addr,atom->port) );
-            isWeak = TRUE;
-        } else if( throughput >= 3 ) {
-            tordbg( t, "keeping peer %s because it's got a good throughput", tr_peerIoAddrStr(&atom->addr,atom->port) );
-            isWeak = FALSE;
-        } else if( peerIsSeed && clientIsSeed ) {
-            tordbg( t, "%s peer is a seed and so are we", tr_peerIoAddrStr(&atom->addr,atom->port) );
-            isWeak = t->tor->pexDisabled || (now-atom->time>=30);
-        } else if( !atom->time || ( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) ) {
-            tordbg( t, "%s too new to purge", tr_peerIoAddrStr(&atom->addr,atom->port) );
-            isWeak = FALSE;
-        } else {
-            isWeak = ( now - peer->pieceDataActivityDate ) > 180;
-            tordbg( t, "%s peer %p", (isWeak?"purging":"keeping"), tr_peerIoAddrStr(&atom->addr,atom->port) );
-        }
-
-        if( isWeak )
-            ret[outsize++] = peer;
-    }
+    for( i=outsize=0; i<peerCount; ++i )
+        if( shouldPeerBeClosed( t, peers[i], peerCount ) )
+            ret[outsize++] = peers[i];
 
     *setmeSize = outsize;
     return ret;
@@ -1581,7 +1602,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* if we used this peer recently, give someone else a turn */
-        if( ( now - atom->time ) < LAISSEZ_FAIRE_PERIOD_SECS ) {
+        if( ( now - atom->time ) < 60 ) {
             tordbg( t, "RECONNECT peer %d (%s) is in its grace period..",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
@@ -1608,20 +1629,20 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nWeak, nAdd;
+        int i, nCandidates, nBad, nAdd;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
-        struct tr_peer ** connections = getWeakConnections( t, &nWeak );
+        struct tr_peer ** connections = getPeersToClose( t, &nBad );
         const int peerCount = tr_ptrArraySize( t->peers );
 
-        if( nWeak || nCandidates )
-            tordbg( t, "reconnect pulse for [%s]: %d weak connections, "
+        if( nBad || nCandidates )
+            tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
                        "%d connection candidates, %d atoms, max per pulse is %d",
-                       t->tor->info.name, nWeak, nCandidates,
+                       t->tor->info.name, nBad, nCandidates,
                        tr_ptrArraySize(t->pool),
                        (int)MAX_RECONNECTIONS_PER_PULSE );
 
         /* disconnect some peers */
-        for( i=0; i<nWeak; ++i )
+        for( i=0; i<nBad; ++i )
             removePeer( t, connections[i] );
 
         /* add some new ones */

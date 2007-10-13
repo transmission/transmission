@@ -40,7 +40,7 @@
 **/
 
 #define MAX_ALLOWED_SET_COUNT   10 /* number of pieces generated for allow-fast,
-                                    threshold for fast-allowing others */
+                                      threshold for fast-allowing others */
 
 enum
 {

@@ -341,6 +341,8 @@ torrentRealInit( tr_handle  * h,
 
     loaded = tr_fastResumeLoad( tor, destination, uncheckedPieces );
 
+    assert( tor->destination != NULL );
+
     /* the `paused' flag has highest precedence...
        after that, the fastresume setting is used...
        if that's not found, default to RUNNING */
