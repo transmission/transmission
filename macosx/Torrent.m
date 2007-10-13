@@ -512,6 +512,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) alertForFolderAvailable
 {
+    #warning check for change from incomplete to download folder first
     if (access(tr_torrentGetFolder(fHandle), 0))
     {
         NSAlert * alert = [[NSAlert alloc] init];

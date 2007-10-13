@@ -364,16 +364,10 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A2041D520C9AC523000ACFFB /* Lock.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Lock.tiff; path = macosx/Images/Lock.tiff; sourceTree = "<group>"; };
-		A20431100C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A20431110C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A20431120C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Russian; path = macosx/Russian.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A20431130C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A20431140C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A20431150C5EAF490081E5CC /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -397,25 +391,7 @@
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
 		A22A067D0CB83507009694FE /* InfoTabBack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBack.tif; path = macosx/Images/InfoTabBack.tif; sourceTree = "<group>"; };
 		A22A06970CB83880009694FE /* InfoTabBorder.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBorder.tif; path = macosx/Images/InfoTabBorder.tif; sourceTree = "<group>"; };
-		A22A7EBC0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A22A7EBD0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A22A7EBE0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Greek; path = macosx/Greek.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A22A7EBF0C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A22A7EC00C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A22A7EC10C627FC200E30364 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
-		A22BC9AE0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A22BC9AF0C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A22BC9B00C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = macosx/Korean.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A22BC9B10C5C505200F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A22BC9B20C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A22BC9B30C5C505300F5FB72 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A22BCA2E0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A22BCA2F0C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A22BCA300C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Italian; path = macosx/Italian.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A22BCA310C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A22BCA320C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A22BCA330C5D5CDA00F5FB72 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A22D602C0CB67E4A00F67A8B /* InfoTabBackAqua.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBackAqua.tif; path = macosx/Images/InfoTabBackAqua.tif; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
@@ -449,13 +425,6 @@
 		A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToIconTransformer.h; path = macosx/ExpandedPathToIconTransformer.h; sourceTree = "<group>"; };
 		A25FCDDD0A37695F002BCBBE /* PauseSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PauseSelected.png; path = macosx/Images/PauseSelected.png; sourceTree = "<group>"; };
 		A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeSelected.png; path = macosx/Images/ResumeSelected.png; sourceTree = "<group>"; };
-		A26039FD0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/Creator.nib; sourceTree = "<group>"; };
-		A26039FE0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A26039FF0C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A2603A000C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = macosx/Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A2603A010C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A2603A020C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A2603A030C6338FB00F5FDFD /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = macosx/Spanish.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A261A8250C6A0D68003BAFDA /* Error.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Error.png; path = macosx/Images/Error.png; sourceTree = "<group>"; };
 		A261F1DB0A69A1610002815A /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = macosx/Growl.framework; sourceTree = "<group>"; };
 		A26E75870CB6AA7500226674 /* InfoOptions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoOptions.png; path = macosx/Images/InfoOptions.png; sourceTree = "<group>"; };
@@ -487,10 +456,6 @@
 		A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AboutWindow.nib; path = macosx/AboutWindow.nib; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
-		A2AE68360C628A58008753C9 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Korean; path = macosx/Korean.lproj/Creator.nib; sourceTree = "<group>"; };
-		A2AE68370C628A5E008753C9 /* Italian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Italian; path = macosx/Italian.lproj/Creator.nib; sourceTree = "<group>"; };
-		A2AE68380C628A63008753C9 /* Russian */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Russian; path = macosx/Russian.lproj/Creator.nib; sourceTree = "<group>"; };
-		A2AE68390C628A66008753C9 /* Greek */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Greek; path = macosx/Greek.lproj/Creator.nib; sourceTree = "<group>"; };
 		A2AF1C360A3D0F6200F1575D /* FileOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileOutlineView.h; path = macosx/FileOutlineView.h; sourceTree = "<group>"; };
 		A2AF1C370A3D0F6200F1575D /* FileOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileOutlineView.m; path = macosx/FileOutlineView.m; sourceTree = "<group>"; };
 		A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CompleteCheck.png; path = macosx/Images/CompleteCheck.png; sourceTree = "<group>"; };
@@ -500,12 +465,6 @@
 		A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = makemeta.h; path = libtransmission/makemeta.h; sourceTree = "<group>"; };
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
-		A2C19EDB0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/Creator.nib; sourceTree = "<group>"; };
-		A2C19EDC0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/InfoWindow.nib; sourceTree = "<group>"; };
-		A2C19EDD0C676F5200E0B235 /* French */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = French; path = macosx/French.lproj/Localizable.strings; sourceTree = "<group>"; };
-		A2C19EDE0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		A2C19EDF0C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/MessageWindow.nib; sourceTree = "<group>"; };
-		A2C19EE00C676F5200E0B235 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = macosx/French.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
 		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
 		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
@@ -1625,11 +1584,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D688A70CB4986A009BEC3A /* English */,
-				A22BC9AE0C5C505200F5FB72 /* Korean */,
-				A22BCA2E0C5D5CDA00F5FB72 /* Italian */,
-				A20431100C5EAF490081E5CC /* Russian */,
-				A22A7EBC0C627FC200E30364 /* Greek */,
-				A26039FE0C6338FB00F5FDFD /* Spanish */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1638,12 +1592,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D688850CB4984B009BEC3A /* English */,
-				A22BC9B10C5C505200F5FB72 /* Korean */,
-				A22BCA310C5D5CDA00F5FB72 /* Italian */,
-				A20431130C5EAF490081E5CC /* Russian */,
-				A22A7EBF0C627FC200E30364 /* Greek */,
-				A2603A010C6338FB00F5FDFD /* Spanish */,
-				A2C19EDE0C676F5200E0B235 /* French */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1652,12 +1600,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D688AB0CB49889009BEC3A /* English */,
-				A22BC9AF0C5C505200F5FB72 /* Korean */,
-				A22BCA2F0C5D5CDA00F5FB72 /* Italian */,
-				A20431110C5EAF490081E5CC /* Russian */,
-				A22A7EBD0C627FC200E30364 /* Greek */,
-				A26039FF0C6338FB00F5FDFD /* Spanish */,
-				A2C19EDC0C676F5200E0B235 /* French */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1666,12 +1608,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D688D20CB498AA009BEC3A /* English */,
-				A22BC9B20C5C505300F5FB72 /* Korean */,
-				A22BCA320C5D5CDA00F5FB72 /* Italian */,
-				A20431140C5EAF490081E5CC /* Russian */,
-				A22A7EC00C627FC200E30364 /* Greek */,
-				A2603A020C6338FB00F5FDFD /* Spanish */,
-				A2C19EDF0C676F5200E0B235 /* French */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1680,12 +1616,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D6891B0CB4990E009BEC3A /* English */,
-				A22BC9B00C5C505200F5FB72 /* Korean */,
-				A22BCA300C5D5CDA00F5FB72 /* Italian */,
-				A20431120C5EAF490081E5CC /* Russian */,
-				A22A7EBE0C627FC200E30364 /* Greek */,
-				A2603A000C6338FB00F5FDFD /* Spanish */,
-				A2C19EDD0C676F5200E0B235 /* French */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1694,12 +1624,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D688EB0CB498BE009BEC3A /* English */,
-				A22BC9B30C5C505300F5FB72 /* Korean */,
-				A22BCA330C5D5CDA00F5FB72 /* Italian */,
-				A20431150C5EAF490081E5CC /* Russian */,
-				A22A7EC10C627FC200E30364 /* Greek */,
-				A2603A030C6338FB00F5FDFD /* Spanish */,
-				A2C19EE00C676F5200E0B235 /* French */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1708,12 +1632,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				A2D689100CB498F2009BEC3A /* English */,
-				A2AE68360C628A58008753C9 /* Korean */,
-				A2AE68370C628A5E008753C9 /* Italian */,
-				A2AE68380C628A63008753C9 /* Russian */,
-				A2AE68390C628A66008753C9 /* Greek */,
-				A26039FD0C6338FB00F5FDFD /* Spanish */,
-				A2C19EDB0C676F5200E0B235 /* French */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";
