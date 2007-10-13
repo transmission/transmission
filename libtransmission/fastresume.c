@@ -546,6 +546,8 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
     tr_dbg( "Resume file '%s' loaded", path );
 
+    tor->destination = tr_strdup( fallbackDestination );
+
     /* Check format version */
     fread( &version, 4, 1, file );
     if( 0 == version )
@@ -625,9 +627,6 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                         fclose( file );
                         return ret;
                     }
-
-                    if( tor->destination == NULL )
-                        tor->destination = tr_strdup( fallbackDestination );
 
                     ret |= TR_FR_DESTINATION;
                     continue;

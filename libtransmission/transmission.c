@@ -110,7 +110,6 @@ tr_handle * tr_init( const char * tag )
     tr_handle * h;
     int         i;
 
-ccc
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
     signal( SIGPIPE, SIG_IGN );
