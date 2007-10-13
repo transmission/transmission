@@ -25,6 +25,8 @@
 #import "DragOverlayView.h"
 #import "NSBezierPathAdditions.h"
 
+#define PADDING 10.0
+
 @implementation DragOverlayView
 
 - (id) initWithFrame: (NSRect) frame
@@ -86,8 +88,7 @@
 
 - (void) setOverlay: (NSImage *) icon mainLine: (NSString *) mainLine subLine: (NSString *) subLine
 {
-    if (fBadge)
-        [fBadge release];
+    [fBadge release];
     fBadge = [fBackBadge copy];
     NSSize badgeSize = [fBadge size];
     
@@ -110,12 +111,10 @@
         [icon setSize: iconSize];
     }
     
-    float padding = 10.0;
-    
     [fBadge lockFocus];
     
     //place icon
-    [icon compositeToPoint: NSMakePoint(padding, (badgeSize.height - iconSize.height) * 0.5)
+    [icon compositeToPoint: NSMakePoint(PADDING, (badgeSize.height - iconSize.height) * 0.5)
                 operation: NSCompositeSourceOver];
     [icon release];
     
@@ -123,9 +122,9 @@
     NSSize mainLineSize = [mainLine sizeWithAttributes: fMainLineAttributes];
     NSSize subLineSize = [subLine sizeWithAttributes: fSubLineAttributes];
     
-    NSRect lineRect = NSMakeRect(padding + iconSize.width + 5.0,
+    NSRect lineRect = NSMakeRect(PADDING + iconSize.width + 5.0,
                         (badgeSize.height + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
-                        badgeSize.width - (padding + iconSize.width + 2.0) - padding, mainLineSize.height);
+                        badgeSize.width - (PADDING + iconSize.width + 2.0) - PADDING, mainLineSize.height);
     [mainLine drawInRect: lineRect withAttributes: fMainLineAttributes];
     
     //place sub text

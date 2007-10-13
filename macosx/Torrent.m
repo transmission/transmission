@@ -555,11 +555,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (code != NSOKButton)
         return;
     
-    NSString * folder = [[openPanel filenames] objectAtIndex: 0];
-    if (fUseIncompleteFolder)
-        [self changeDownloadFolder: folder];
-    else
-        [self changeDownloadFolder: folder];
+    [self changeDownloadFolder: [[openPanel filenames] objectAtIndex: 0]];
     
     [self startTransfer];
     [self update];
