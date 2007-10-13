@@ -61,21 +61,9 @@ get_private_data( TrWindow * w )
 ****
 ***/
 
-/* kludge to have the progress bars notice theme changes */
 static void
-stylekludge( GObject * obj, GParamSpec * spec, gpointer data )
-{
-    if( 0 == strcmp( "style", spec->name ) )
-    {
-        tr_cell_renderer_progress_reset_style(
-            TR_CELL_RENDERER_PROGRESS( data ) );
-        gtk_widget_queue_draw( GTK_WIDGET( obj ) );
-    }
-}
-
-static void
-formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
-            GtkTreeModel * model, GtkTreeIter * iter, gpointer data SHUTUP )
+formatname( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
+            GtkTreeModel * model, GtkTreeIter * iter, gpointer data UNUSED )
 {
     TrTorrent * gtor;
     char  * name, * mb, * str, * top, * bottom;
@@ -127,8 +115,8 @@ formatname( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
 }
 
 static void
-formatprog( GtkTreeViewColumn * col SHUTUP, GtkCellRenderer * rend,
-            GtkTreeModel * model, GtkTreeIter * iter, gpointer data SHUTUP )
+formatprog( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
+            GtkTreeModel * model, GtkTreeIter * iter, gpointer data UNUSED )
 {
     char  * dlstr, * ulstr, * str, * marked;
     gfloat  prog, dl, ul;
@@ -212,10 +200,6 @@ makeview( PrivateData * p )
     gtk_tree_view_column_set_sizing( col, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
     gtk_tree_view_column_set_sort_column_id( col, MC_PROG_D );
     gtk_tree_view_append_column( GTK_TREE_VIEW( view ), col );
-
-    /* XXX this shouldn't be necessary */
-    g_signal_connect( view, "notify::style",
-                      G_CALLBACK( stylekludge ), progrend );
 
     gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( view ), TRUE );
     sel = gtk_tree_view_get_selection( GTK_TREE_VIEW( view ) );

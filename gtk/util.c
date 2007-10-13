@@ -169,17 +169,12 @@ mkdir_p(const char *name, mode_t mode)
 }
 
 GList *
-dupstrlist( GList * list )
+dupstrlist( GList * l )
 {
-    GList * ii, * ret;
-
-    ret = NULL;
-    for( ii = g_list_first( list ); NULL != ii; ii = ii->next )
-    {
-        ret = g_list_append( ret, g_strdup( ii->data ) );
-    }
-
-    return ret;
+    GList * ret = NULL;
+    for( ; l!=NULL; l=l->next )
+        ret = g_list_prepend( ret, g_strdup( l->data ) );
+    return g_list_reverse( ret );
 }
 
 char *
@@ -206,10 +201,9 @@ char *
 urldecode(const char *str, int len) {
   int ii, jj;
   char *ret;
-  char buf[3];
 
-  if(0 >= len)
-    len = strlen(str);
+  if( len <= 0 )
+      len = strlen( str );
 
   for(ii = jj = 0; ii < len; ii++, jj++)
     if('%' == str[ii])
@@ -217,13 +211,11 @@ urldecode(const char *str, int len) {
 
   ret = g_new(char, jj + 1);
 
-  buf[2] = '\0';
   for(ii = jj = 0; ii < len; ii++, jj++) {
     switch(str[ii]) {
       case '%':
         if(ii + 2 < len) {
-          buf[0] = str[ii+1];
-          buf[1] = str[ii+2];
+          char buf[3] = { str[ii+1], str[ii+2], '\0' };
           ret[jj] = g_ascii_strtoull(buf, NULL, 16);
         }
         ii += 2;

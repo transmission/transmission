@@ -149,7 +149,7 @@ coreprompt( TrCore *, GList *, enum tr_torrent_action, gboolean, gpointer );
 static void
 corepromptdata( TrCore *, uint8_t *, size_t, gboolean, gpointer );
 static void
-readinitialprefs( struct cbdata * cbdata );
+initializeFromPrefs( struct cbdata * cbdata );
 static void
 prefschanged( TrCore * core, const char * key, gpointer data );
 static void
@@ -222,8 +222,10 @@ main( int argc, char ** argv )
     gboolean startpaused = FALSE;
     char * domain = "transmission";
     GOptionEntry entries[] = {
-        { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused, _("Start with all torrents paused"), NULL },
-        { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit, _( "Request that the running instance quit"), NULL },
+        { "paused", 'p', 0, G_OPTION_ARG_NONE, &startpaused,
+          _("Start with all torrents paused"), NULL },
+        { "quit", 'q', 0, G_OPTION_ARG_NONE, &sendquit,
+          _( "Request that the running instance quit"), NULL },
         { NULL, 0, 0, 0, NULL, NULL, NULL }
     };
 
@@ -243,13 +245,8 @@ main( int argc, char ** argv )
 
     argfiles = checkfilenames( argc-1, argv+1 );
     didinit = cf_init( tr_getPrefsDirectory(), NULL );
-    didlock = FALSE;
-    if( didinit )
-    {
-        /* maybe send remote commands, also try cf_lock() */
-        didlock = sendremote( argfiles, sendquit );
-    }
-    setupsighandlers();         /* set up handlers for fatal signals */
+    didlock = didinit && sendremote( argfiles, sendquit );
+    setupsighandlers( ); /* set up handlers for fatal signals */
 
     if( ( didinit || cf_init( tr_getPrefsDirectory(), &err ) ) &&
         ( didlock || cf_lock( &err ) ) )
@@ -280,28 +277,15 @@ main( int argc, char ** argv )
 static gboolean
 sendremote( GList * files, gboolean sendquit )
 {
-    gboolean didlock;
+    const gboolean didlock = cf_lock( NULL );
 
-    didlock = cf_lock( NULL );
+    /* send files if there's another instance, otherwise start normally */
+    if( !didlock && files )
+        exit( ipc_sendfiles_blocking( files ) ? 0 : 1 );
 
-    if( NULL != files )
-    {
-        /* send files if there's another instance, otherwise start normally */
-        if( !didlock )
-        {
-            exit( ipc_sendfiles_blocking( files ) ? 0 : 1 );
-        }
-    }
-
+    /* either send a quit message or exit if no other instance */
     if( sendquit )
-    {
-        /* either send a quit message or exit if no other instance */
-        if( !didlock )
-        {
-            exit( ipc_sendquit_blocking() ? 0 : 1 );
-        }
-        exit( 0 );
-    }
+        exit( didlock ? 0 : !ipc_sendquit_blocking() );
 
     return didlock;
 }
@@ -334,7 +318,7 @@ appsetup( TrWindow * wind, GList * args,
                       G_CALLBACK( prefschanged ), cbdata );
 
     /* apply a few prefs */
-    readinitialprefs( cbdata );
+    initializeFromPrefs( cbdata );
 
     /* add torrents from command-line and saved state */
     tr_core_load( cbdata->core, paused );
@@ -361,9 +345,9 @@ appsetup( TrWindow * wind, GList * args,
 }
 
 static gboolean
-winclose( GtkWidget * widget UNUSED, GdkEvent * event UNUSED, gpointer gdata )
+winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
 {
-    struct cbdata * cbdata = (struct cbdata *) gdata;
+    struct cbdata * cbdata = gdata;
 
     if( cbdata->icon != NULL )
         gtk_widget_hide( GTK_WIDGET( cbdata->wind ) );
@@ -405,7 +389,7 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
 static void
 makeicon( struct cbdata * cbdata )
 {
-    if( NULL == cbdata->icon )
+    if( cbdata->icon == NULL )
         cbdata->icon = tr_icon_new( );
 }
 
@@ -516,8 +500,8 @@ gotdrag( GtkWidget         * widget UNUSED,
     char *targ = gdk_atom_name(sel->target);
     char *type = gdk_atom_name(sel->type);
 
-    fprintf(stderr, "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i\n",
-            sele, targ, type, sel->format, sel->length);
+    g_message( "dropped file: sel=%s targ=%s type=%s fmt=%i len=%i",
+               sele, targ, type, sel->format, sel->length );
     g_free(sele);
     g_free(targ);
     g_free(type);
@@ -531,7 +515,6 @@ gotdrag( GtkWidget         * widget UNUSED,
     if( ( sel->format == 8 ) &&
         ( sel->selection == gdk_atom_intern( "XdndSelection", FALSE ) ) )
     {
-        /* split file list on carriage returns and linefeeds */
         int i;
         char * str = g_strndup( (char*)sel->data, sel->length );
         gchar ** files = g_strsplit_set( str, "\r\n", -1 );
@@ -600,7 +583,7 @@ setupdrag(GtkWidget *widget, struct cbdata *data) {
 }
 
 static void
-coreerr( TrCore * core SHUTUP, enum tr_core_err code, const char * msg,
+coreerr( TrCore * core UNUSED, enum tr_core_err code, const char * msg,
          gpointer gdata )
 {
     struct cbdata * cbdata = gdata;
@@ -654,7 +637,7 @@ corepromptdata( TrCore * core, uint8_t * data, size_t size,
 }
 
 static void
-readinitialprefs( struct cbdata * cbdata )
+initializeFromPrefs( struct cbdata * cbdata )
 {
     size_t i;
     const char * keys[] =
@@ -771,7 +754,7 @@ updatemodel(gpointer gdata) {
   return TRUE;
 }
 
-/* returns a GList containing a GtkTreeRowReference to each selected row */
+/* returns a GList of GtkTreeRowReferences to each selected row */
 static GList *
 getselection( struct cbdata * cbdata )
 {
@@ -800,10 +783,10 @@ about ( void )
 {
   GtkWidget * w = gtk_about_dialog_new ();
   GtkAboutDialog * a = GTK_ABOUT_DIALOG (w);
-  const char *authors[] = { "Charles Kerr (Back-end; GTK+)",
-                            "Mitchell Livingston (Back-end; OS X)",
-                            "Eric Petit (Back-end; OS X)",
-                            "Josh Elsasser (Daemon; Back-end; GTK+)",
+  const char *authors[] = { "Charles Kerr (Backend; GTK+)",
+                            "Mitchell Livingston (Backend; OS X)",
+                            "Eric Petit (Backend; OS X)",
+                            "Josh Elsasser (Daemon; Backend; GTK+)",
                             "Bryan Varner (BeOS)", 
                             NULL };
   gtk_about_dialog_set_version (a, LONG_VERSION_STRING );
@@ -812,7 +795,7 @@ about ( void )
   gtk_about_dialog_set_wrap_license (a, TRUE);
 #endif
   gtk_about_dialog_set_logo_icon_name( a, "transmission-logo" );
-  gtk_about_dialog_set_comments( a, _("A fast and intuitive BitTorrent client") );
+  gtk_about_dialog_set_comments( a, _("A fast, easy BitTorrent client") );
   gtk_about_dialog_set_website( a, "http://transmission.m0k.org/" );
   gtk_about_dialog_set_copyright( a, _("Copyright 2005-2007 The Transmission Project") );
   gtk_about_dialog_set_authors( a, authors );
@@ -930,7 +913,8 @@ doAction ( const char * action_name, gpointer user_data )
     }
     else if (!strcmp (action_name, "create-torrent"))
     {
-        GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ), tr_core_handle( data->core ) );
+        GtkWidget * w = make_meta_ui( GTK_WINDOW( data->wind ),
+                                      tr_core_handle( data->core ) );
         gtk_widget_show_all( w );
     }
     else if (!strcmp (action_name, "remove-torrent"))
