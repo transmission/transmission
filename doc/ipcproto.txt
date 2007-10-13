@@ -7,7 +7,7 @@ are used for clarity and are not part of the actual key.
 
 The IPC protocol is used to allow processes to control or retrieve
 information from Transmission frontend, such as transmission-daemon,
-or the GTK+ or MacOS X frontends.  This communication is done
+or the GTK+ or Mac OS X frontends.  This communication is done
 over a unix-domain socket file such as
 ~/.transmission/daemon/socket. In this document the Transmission
 frontend will be referred to as the server and the process connecting
@@ -15,9 +15,9 @@ to it as the client.
 
 Once a client connects to the server's socket, messages may be
 exchanged until either end closes the connection. Messages contain an
-32-bit payload length, encoded as 8 bytes of ASCII hexidecimal,
+32-bit payload length, encoded as 8 bytes of ASCII hexadecimal,
 followed by the payload. Upper, lower, or mixed case for the length
-are all accpetable and must be handled correctly. Payload lengths
+are all acceptable and must be handled correctly. Payload lengths
 greater than 2^31 - 8 (ie: 2147483640 decimal, 7FFFFFF8 hex) are not
 allowed.
 
