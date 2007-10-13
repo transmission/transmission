@@ -137,6 +137,10 @@
 /* Open duplicate alert -> title */
 "A transfer of \"%@\" is already running." = "A transfer of \"%@\" is already running.";
 
+/* Inspector -> tab tooltip
+   Inspector -> title */
+"Activity" = "Activity";
+
 /* Preferences -> Advanced toolbar item title */
 "Advanced" = "Advanced";
 
@@ -269,6 +273,10 @@
 /* Torrent -> status string */
 "Error: " = "Error: ";
 
+/* Inspector -> tab tooltip
+   Inspector -> title */
+"Files" = "Files";
+
 /* Filter toolbar item -> label */
 "Filter" = "Filter";
 
@@ -289,6 +297,10 @@
 
 /* Preferences -> General toolbar item title */
 "General" = "General";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+"General Info" = "General Info";
 
 /* View menu -> Filter Bar */
 "Hide Filter Bar" = "Hide Filter Bar";
@@ -376,6 +388,10 @@
 /* Open toolbar item -> palette label */
 "Open Torrent Files" = "Open Torrent Files";
 
+/* Inspector -> tab tooltip
+   Inspector -> title */
+"Options" = "Options";
+
 /* Pause toolbar item -> label */
 "Pause" = "Pause";
 
@@ -394,6 +410,10 @@
 /* Filter Bar Button -> title
    Torrent -> status string */
 "Paused" = "Paused";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+"Peers" = "Peers";
 
 /* Inspector -> pex check */
 "PEX can only be toggled on paused public torrents." = "PEX can only be toggled on paused public torrents.";
@@ -531,6 +551,9 @@
 /* Torrent -> status string */
 "Stopping" = "Stopping";
 
+/* File size */
+"TB" = "TB";
+
 /* Default folder cannot be used alert -> message */
 "The download folder cannot be used. Choose a new location." = "The download folder cannot be used. Choose a new location.";
 
@@ -622,6 +645,9 @@
 
 /* Growl notification title */
 "Torrent File Auto Added" = "Torrent File Auto Added";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Torrent Inspector";
 
 /* Status bar -> total download */
 "Total DL: " = "Total DL: ";
