@@ -690,7 +690,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     msgs->clientSentLtepHandshake = 1;
 
     /* decide if we want to advertise pex support */
-    if( msgs->torrent->pexDisabled )
+    if( !tr_torrentIsPexEnabled( msgs->torrent ) )
         pex = 0;
     else if( msgs->peerSentLtepHandshake )
         pex = msgs->peerSupportsPex ? 1 : 0;
@@ -784,7 +784,7 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     benc_val_t val, * sub;
     uint8_t * tmp;
 
-    if( msgs->torrent->pexDisabled ) /* no sharing! */
+    if( !tr_torrentIsPexEnabled( msgs->torrent ) ) /* no sharing! */
         return;
 
     tmp = tr_new( uint8_t, msglen );
@@ -1511,7 +1511,7 @@ pexElementCb( void * vpex, void * userData )
 static void
 sendPex( tr_peermsgs * msgs )
 {
-    if( msgs->peerSupportsPex && !msgs->torrent->pexDisabled )
+    if( msgs->peerSupportsPex && tr_torrentIsPexEnabled( msgs->torrent ) )
     {
         int i;
         tr_pex * newPex = NULL;
@@ -1633,7 +1633,6 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->peerAllowedPieces = NULL;
     m->clientAllowedPieces = NULL;
     setme = tr_publisherSubscribe( m->publisher, func, userData );
-    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* error if we don't read or write for 2.5 minutes */
     
     if ( tr_peerIoSupportsFEXT( m->io ) )
     {
@@ -1650,6 +1649,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         m->clientAllowedPieces = tr_bitfieldNew( m->torrent->info.pieceCount );
     }
     
+    tr_peerIoSetTimeoutSecs( m->io, 150 ); /* error if we don't read or write for 2.5 minutes */
     tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
     tr_peerIoSetIOMode( m->io, EV_READ|EV_WRITE, 0 );
     ratePulse( m );

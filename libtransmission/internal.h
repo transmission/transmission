@@ -61,6 +61,8 @@ void tr_torrentSetHasPiece( tr_torrent * tor, int pieceIndex, int has );
 void tr_torrentLock    ( const tr_torrent * );
 void tr_torrentUnlock  ( const tr_torrent * );
 
+int tr_torrentIsPexEnabled( const tr_torrent * );
+
 void tr_torrentChangeMyPort  ( tr_torrent * );
 
 int tr_torrentExists( tr_handle *, const uint8_t * );

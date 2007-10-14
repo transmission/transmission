@@ -644,6 +644,17 @@ tr_torrentChangeMyPort( tr_torrent * tor )
         tr_trackerChangeMyPort( tor->tracker );
 }
 
+int
+tr_torrentIsPexEnabled( const tr_torrent * tor )
+{
+    if( tor->info.flags & TR_FLAG_PRIVATE )
+        return FALSE;
+
+    if( tor->pexDisabled )
+        return FALSE;
+
+    return TRUE;
+}
 
 void
 tr_torrentDisablePex( tr_torrent * tor, int disable )

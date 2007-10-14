@@ -1505,7 +1505,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
     if( 1 ) {
         const int clientIsSeed = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
         const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
-        if( peerIsSeed && clientIsSeed && ( tor->pexDisabled || (now-atom->time>=30) ) ) {
+        if( peerIsSeed && clientIsSeed && ( !tr_torrentIsPexEnabled(tor) || (now-atom->time>=30) ) ) {
             tordbg( t, "purging peer %s because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
             return TRUE;
         }
@@ -1602,7 +1602,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* if we used this peer recently, give someone else a turn */
-        if( ( now - atom->time ) < 60 ) {
+        if( ( now - atom->time ) < 180 ) {
             tordbg( t, "RECONNECT peer %d (%s) is in its grace period..",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
             continue;
