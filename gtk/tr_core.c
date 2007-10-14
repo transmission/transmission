@@ -361,7 +361,7 @@ tr_core_load( TrCore * self, gboolean forcepaused )
     if( forcepaused )
          flags |= TR_FLAG_PAUSED;
 
-    torrents = tr_loadTorrents ( self->handle, path, flags, &count );
+    torrents = tr_loadTorrents ( self->handle, NULL, flags, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
     tr_free( torrents );

@@ -69,7 +69,7 @@ enum
 
     KEEPALIVE_INTERVAL_SECS = 90,          /* idle seconds before we send a keepalive */
     PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
-    PEER_PULSE_INTERVAL     = (20),        /* msec between calls to pulse() */
+    PEER_PULSE_INTERVAL     = (133),        /* msec between calls to pulse() */
     RATE_PULSE_INTERVAL     = (333),       /* msec between calls to ratePulse() */
 };
 
