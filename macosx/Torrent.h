@@ -52,8 +52,6 @@ typedef enum
     BOOL        fPublicTorrent;
     NSString    * fPublicTorrentLocation;
 	
-	BOOL fPex;
-
     NSUserDefaults * fDefaults;
 
     NSImage * fIcon;
@@ -200,7 +198,7 @@ typedef enum
 - (float) swarmSpeed;
 
 - (BOOL) pex;
-- (void) setPex: (BOOL) setting;
+- (void) setPex: (BOOL) enabled;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;

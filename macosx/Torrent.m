@@ -135,8 +135,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
 	
+    #warning need?
 	if (![self privateTorrent])
-		[history setObject: [NSNumber numberWithBool: fPex] forKey: @"Pex"];
+		[history setObject: [NSNumber numberWithBool: [self pex]] forKey: @"Pex"];
 	
 	if (fDateCompleted)
 		[history setObject: fDateCompleted forKey: @"DateCompleted"];
@@ -1130,16 +1131,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) pex
 {
-	return fPex;
+	return tr_torrentIsPexEnabled(fHandle);
 }
 
-- (void) setPex: (BOOL) setting
+- (void) setPex: (BOOL) enabled
 {
-	if (![self privateTorrent])
-	{
-		fPex = setting;
-		tr_torrentDisablePex(fHandle, !setting);
-	}
+	tr_torrentDisablePex(fHandle, !enabled);
 }
 
 - (NSNumber *) orderValue
@@ -1464,11 +1461,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
 	
+    #warning need?
+    BOOL pexEnable;
 	if ([self privateTorrent])
-		fPex = NO;
+		pexEnable = NO;
 	else
-		fPex = pex ? [pex boolValue] : YES;
-	tr_torrentDisablePex(fHandle, !fPex);
+		pexEnable = pex ? [pex boolValue] : YES;
+    [self setPex: pexEnable];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;

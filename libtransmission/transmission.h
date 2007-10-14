@@ -403,6 +403,7 @@ tr_torrent * tr_torrentInitSaved( tr_handle *,
  * disabled and cannot be enabled.
  **********************************************************************/
 void tr_torrentDisablePex( tr_torrent *, int disable );
+int tr_torrentIsPexEnabled( const tr_torrent * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
