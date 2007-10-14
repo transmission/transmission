@@ -166,8 +166,9 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [fIcon release];
     
     [fFileList release];
-    
     [fFileMenu release];
+    
+    [fOrderValue release];
     
     [fQuickPauseDict release];
     
@@ -1134,19 +1135,20 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 	return tr_torrentIsPexEnabled(fHandle);
 }
 
-- (void) setPex: (BOOL) enabled
+- (void) setPex: (BOOL) enable
 {
-	tr_torrentDisablePex(fHandle, !enabled);
+	tr_torrentDisablePex(fHandle, !enable);
 }
 
 - (NSNumber *) orderValue
 {
-    return [NSNumber numberWithInt: fOrderValue];
+    return fOrderValue;
 }
 
 - (void) setOrderValue: (int) orderValue
 {
-    fOrderValue = orderValue;
+    [fOrderValue release];
+    fOrderValue = [[NSNumber alloc] initWithInt: orderValue];
 }
 
 - (NSArray *) fileList
@@ -1470,7 +1472,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [self setPex: pexEnable];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
-    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
+    
+    [self setOrderValue: orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1];
     fError = NO;
     
     [self createFileList];

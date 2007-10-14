@@ -65,7 +65,7 @@ typedef enum
     int     fRatioSetting;
     BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
     
-    int fOrderValue;
+    NSNumber * fOrderValue;
     
     NSDictionary * fQuickPauseDict;
 }
@@ -198,7 +198,7 @@ typedef enum
 - (float) swarmSpeed;
 
 - (BOOL) pex;
-- (void) setPex: (BOOL) enabled;
+- (void) setPex: (BOOL) enable;
 
 - (NSNumber *) orderValue;
 - (void) setOrderValue: (int) orderValue;
