@@ -493,10 +493,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if ([torrent isActive])
             {
                 active++;
-                if (![torrent isSeeding])
+                if (![torrent allDownloaded])
                     downloading++;
             }
-
+        
         if ([fDefaults boolForKey: @"CheckQuitDownloading"] ? downloading > 0 : active > 0)
         {
             NSString * message = active == 1

@@ -268,30 +268,30 @@
         
         if (rightWidth > 0)
         {
+            int availableWidth = 0;
             /*if (![fDefaults boolForKey: @"DisplayProgressBarAvailable"])
             {
-                int notAvailableWidth = barRect.size.width * [torrent notAvailableDesired];
                 //NSLog(@"notAvailableWidth %d rightWidth %d", notAvailableWidth, rightWidth);
-                notAvailableWidth = MIN(notAvailableWidth, rightWidth);
+                availableWidth = MAX(0, (float)rightWidth - barRect.size.width * [torrent notAvailableDesired]);
                 
-                if (notAvailableWidth > 0)
+                if (availableWidth > 0)
                 {
-                    rightWidth -= notAvailableWidth;
+                    rightWidth -= availableWidth;
                     
-                    NSRect notAvailableRect = barRect;
-                    notAvailableRect.origin.x += leftWidth + rightWidth;
-                    notAvailableRect.size.width = notAvailableWidth;
+                    NSRect availableRect = barRect;
+                    availableRect.origin.x += leftWidth;
+                    availableRect.size.width = availableWidth;
                     
                     if (!fYellowGradient)
                         fYellowGradient = [[CTGradient progressYellowGradient] retain];
-                    [fYellowGradient fillRect: notAvailableRect angle: -90];
+                    [fYellowGradient fillRect: availableRect angle: -90];
                 }
             }*/
             
             if (rightWidth > 0)
             {
                 NSRect includeRect = barRect;
-                includeRect.origin.x += leftWidth;
+                includeRect.origin.x += leftWidth + availableWidth;
                 includeRect.size.width = rightWidth;
                 
                 if (!fWhiteGradient)
