@@ -676,15 +676,19 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (float) progress
 {
     return fStat->percentComplete;
+    //return (float)[self haveTotal] / [self size];
 }
 
 - (float) progressDone
 {
     return fStat->percentDone;
+    /*uint64_t have = [self haveTotal];
+    return (float)have / (have + [self sizeLeft]);*/
 }
 
 - (float) progressLeft
-{//NSLog(@"left %f",(float)fStat->leftUntilDone / [self size]);
+{
+    //NSLog(@"left %f",(float)fStat->leftUntilDone / [self size]);
     return (float)[self sizeLeft] / [self size];
 }
 
@@ -718,7 +722,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 }
 
 - (float) notAvailableDesired
-{//NSLog(@"not available %f", (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size]);
+{
+    //NSLog(@"not available %f", (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size]);
     return (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size];
 }
 
@@ -1176,7 +1181,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (!fileStat)
         [self updateFileStat];
     
-    return [self fileCount] > 1 && fileStat[index].completionStatus != TR_CP_COMPLETE;
+    return [self fileCount] > 1 && fileStat[index].progress < 1.0;
 }
 
 - (BOOL) canChangeDownloadCheckForFiles: (NSIndexSet *) indexSet
@@ -1189,7 +1194,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     int index;
     for (index = [indexSet firstIndex]; index != NSNotFound; index = [indexSet indexGreaterThanIndex: index])
-        if (fileStat[index].completionStatus != TR_CP_COMPLETE)
+        if (fileStat[index].progress < 1.0)
             return YES;
     return NO;
 }
