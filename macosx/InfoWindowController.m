@@ -806,36 +806,41 @@ typedef enum
         return [[[fTorrents objectAtIndex: 0] downloadFolder] stringByAppendingPathComponent: [item objectForKey: @"Path"]];
     else if ([ident isEqualToString: @"Check"])
     {
-        int check = [cell state];
-        if (check == NSOffState)
-            return NSLocalizedString(@"Don't Download", "Inspector -> files tab -> tooltip");
-        else if (check == NSMixedState)
-            return NSLocalizedString(@"Download Some", "Inspector -> files tab -> tooltip");
-        else
-            return NSLocalizedString(@"Download", "Inspector -> files tab -> tooltip");
+        switch ([cell state])
+        {
+            case NSOffState:
+                return NSLocalizedString(@"Don't Download", "Inspector -> files tab -> tooltip");
+            case NSOnState:
+                return NSLocalizedString(@"Download", "Inspector -> files tab -> tooltip");
+            case NSMixedState:
+                return NSLocalizedString(@"Download Some", "Inspector -> files tab -> tooltip");
+        }
     }
     else if ([ident isEqualToString: @"Priority"])
     {
         NSSet * priorities = [[fTorrents objectAtIndex: 0] filePrioritiesForIndexes: [item objectForKey: @"Indexes"]];
-        
-        int count = [priorities count];
-        if (count == 0)
-            return NSLocalizedString(@"Priority Not Available", "Inspector -> files tab -> tooltip");
-        else if (count > 1)
-            return NSLocalizedString(@"Multiple Priorities", "Inspector -> files tab -> tooltip");
-        else
+        switch([priorities count])
         {
-            int priority = [[priorities anyObject] intValue];
-            if (priority == TR_PRI_LOW)
-                return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
-            else if (priority == TR_PRI_HIGH)
-                return NSLocalizedString(@"High Priority", "Inspector -> files tab -> tooltip");
-            else
-                return NSLocalizedString(@"Normal Priority", "Inspector -> files tab -> tooltip");
+            case 0:
+                return NSLocalizedString(@"Priority Not Available", "Inspector -> files tab -> tooltip");
+            case 1:
+                switch ([[priorities anyObject] intValue])
+                {
+                    case TR_PRI_LOW:
+                        return NSLocalizedString(@"Low Priority", "Inspector -> files tab -> tooltip");
+                    case TR_PRI_HIGH:
+                        return NSLocalizedString(@"High Priority", "Inspector -> files tab -> tooltip");
+                    case TR_PRI_NORMAL:
+                        return NSLocalizedString(@"Normal Priority", "Inspector -> files tab -> tooltip");
+                }
+                break;
+            default:
+                return NSLocalizedString(@"Multiple Priorities", "Inspector -> files tab -> tooltip");
         }
     }
-    else
-        return nil;
+    else;
+    
+    return nil;
 }
 
 - (float) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
@@ -947,13 +952,21 @@ typedef enum
 - (void) setSpeedMode: (id) sender
 {
     BOOL upload = sender == fUploadLimitPopUp;
-    int index = [sender indexOfSelectedItem], mode;
-    if (index == OPTION_POPUP_LIMIT)
-        mode = TR_SPEEDLIMIT_SINGLE;
-    else if (index == OPTION_POPUP_NO_LIMIT)
-        mode = TR_SPEEDLIMIT_UNLIMITED;
-    else
-        mode = TR_SPEEDLIMIT_GLOBAL;
+    int mode;
+    switch ([sender indexOfSelectedItem])
+    {
+        case OPTION_POPUP_LIMIT:
+            mode = TR_SPEEDLIMIT_SINGLE;
+            break;
+        case OPTION_POPUP_NO_LIMIT:
+            mode = TR_SPEEDLIMIT_UNLIMITED;
+            break;
+        case OPTION_POPUP_GLOBAL:
+            mode = TR_SPEEDLIMIT_GLOBAL;
+            break;
+        default:
+            return;
+    }
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
@@ -1006,13 +1019,21 @@ typedef enum
 
 - (void) setRatioSetting: (id) sender
 {
-    int index = [sender indexOfSelectedItem], setting;
-    if (index == OPTION_POPUP_LIMIT)
-        setting = NSOnState;
-    else if (index == OPTION_POPUP_NO_LIMIT)
-        setting = NSOffState;
-    else
-        setting = NSMixedState;
+    int setting;
+    switch ([sender indexOfSelectedItem])
+    {
+        case OPTION_POPUP_LIMIT:
+            setting = NSOnState;
+            break;
+        case OPTION_POPUP_NO_LIMIT:
+            setting = NSOffState;
+            break;
+        case OPTION_POPUP_GLOBAL:
+            setting = NSMixedState;
+            break;
+        default:
+            return;
+    }
     
     Torrent * torrent;
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
