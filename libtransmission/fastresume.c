@@ -106,7 +106,11 @@ enum
     FR_ID_PEERS = 11,
 
     /* destination of the torrent: zero-terminated string */
-    FR_ID_DESTINATION = 12
+    FR_ID_DESTINATION = 12,
+
+    /* pex flag
+     * 't' if pex is enabled, 'f' if disabled */
+    FR_ID_PEX = 13
 };
 
 
@@ -284,6 +288,12 @@ tr_fastResumeSave( const tr_torrent * tor )
         assert( walk - buf == len );
         fastResumeWriteData( FR_ID_SPEED, buf, 1, walk-buf, file );
         tr_free( buf );
+    }
+
+    if( TRUE ) /* FR_ID_PEX */
+    {
+        const char flag = tor->pexDisabled ? 'f' : 't';
+        fastResumeWriteData( FR_ID_PEX, &flag, 1, 1, file );
     }
 
     if( TRUE ) /* FR_ID_RUN */
@@ -641,6 +651,19 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                     }
                     tor->isRunning = ch=='t';
                     ret |= TR_FR_RUN;
+                    continue;
+                }
+           
+            case FR_ID_PEX:
+                {
+                    char ch;
+                    if( fread( &ch, 1, 1, file ) != 1 )
+                    {
+                        fclose( file );
+                        return ret;
+                    }
+                    tor->pexDisabled = ch!='t';
+                    ret |= TR_FR_PEX;
                     continue;
                 }
 

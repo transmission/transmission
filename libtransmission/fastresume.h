@@ -38,6 +38,7 @@ enum
   TR_FR_SPEEDLIMIT   = (1<<6),
   TR_FR_RUN          = (1<<7),
   TR_FR_DESTINATION  = (1<<8),
+  TR_FR_PEX          = (1<<9)
 };
 
 /**
