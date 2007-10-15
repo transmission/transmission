@@ -36,7 +36,6 @@ static int static_lastid = 0;
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 
 - (BOOL) shouldUseIncompleteFolderForName: (NSString *) name;
@@ -74,7 +73,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
-			pex: nil
             waitToStart: nil orderValue: nil];
     
     if (self)
@@ -98,7 +96,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 dateActivity: [history objectForKey: @"DateActivity"]
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
-				pex: [history objectForKey: @"Pex"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
                 orderValue: [history objectForKey: @"OrderValue"]];
     
@@ -135,11 +132,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (fPublicTorrent)
         [history setObject: [self publicTorrentLocation] forKey: @"TorrentPath"];
 	
-    #warning need?
-	if (![self privateTorrent])
-		[history setObject: [NSNumber numberWithBool: [self pex]] forKey: @"Pex"];
-	
-	if (fDateCompleted)
+    if (fDateCompleted)
 		[history setObject: fDateCompleted forKey: @"DateCompleted"];
     
     NSDate * dateActivity = [self dateActivity];
@@ -1391,7 +1384,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-		pex: (NSNumber *) pex
         waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
 {
     if (!(self = [super init]))
@@ -1462,14 +1454,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fRatioSetting = ratioSetting ? [ratioSetting intValue] : NSMixedState;
     fRatioLimit = ratioLimit ? [ratioLimit floatValue] : [fDefaults floatForKey: @"RatioLimit"];
     fFinishedSeeding = NO;
-	
-    #warning need?
-    BOOL pexEnable;
-	if ([self privateTorrent])
-		pexEnable = NO;
-	else
-		pexEnable = pex ? [pex boolValue] : YES;
-    [self setPex: pexEnable];
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     
