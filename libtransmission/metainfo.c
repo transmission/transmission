@@ -227,7 +227,7 @@ realparse( tr_info * inf, const uint8_t * buf, size_t size )
     if( ( NULL != val  && ( TYPE_INT != val->type  || 0 != val->val.i ) ) ||
         ( NULL != val2 && ( TYPE_INT != val2->type || 0 != val2->val.i ) ) )
     {
-        inf->flags |= TR_FLAG_PRIVATE;
+        inf->isPrivate = 1;
     }
     
     /* Piece length */
@@ -664,7 +664,7 @@ parseFiles( tr_info * inf, benc_val_t * name,
     if( files && TYPE_LIST == files->type )
     {
         /* Multi-file mode */
-        inf->multifile = 1;
+        inf->isMultifile = 1;
         inf->fileCount = files->val.l.count;
         inf->files     = calloc( inf->fileCount, sizeof( inf->files[0] ) );
 
@@ -698,7 +698,7 @@ parseFiles( tr_info * inf, benc_val_t * name,
     else if( NULL != length && TYPE_INT == length->type )
     {
         /* Single-file mode */
-        inf->multifile = 0;
+        inf->isMultifile = 0;
         inf->fileCount = 1;
         inf->files     = calloc( 1, sizeof( inf->files[0] ) );
 

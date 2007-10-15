@@ -313,7 +313,7 @@ tr_fastResumeSave( const tr_torrent * tor )
     total = tor->corruptCur + tor->corruptPrev;
     fastResumeWriteData( FR_ID_CORRUPT, &total, 8, 1, file );
 
-    if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+    if( !tor->info.isPrivate )
     {
         tr_pex * pex;
         const int count = tr_peerMgrGetPeers( tor->handle->peerMgr,
@@ -713,7 +713,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                 break;
 
             case FR_ID_PEERS_OLD:
-                if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+                if( !tor->info.isPrivate )
                 {
                     uint8_t * buf = malloc( len );
                     if( 1 != fread( buf, len, 1, file ) )
@@ -734,7 +734,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                 }
 
             case FR_ID_PEERS:
-                if( !( TR_FLAG_PRIVATE & tor->info.flags ) )
+                if( !tor->info.isPrivate )
                 {
                     const int count = len / sizeof(tr_pex);
                     tr_pex * pex = tr_new0( tr_pex, count );

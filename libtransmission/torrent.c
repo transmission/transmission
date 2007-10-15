@@ -257,16 +257,14 @@ static void
 torrentRealInit( tr_handle  * h,
                  tr_torrent * tor,
                  const char * destination,
-                 int          flags )
+                 int          isPaused )
 {
     int doStart;
     uint64_t loaded;
     uint64_t t;
     tr_bitfield * uncheckedPieces;
     tr_info * info = &tor->info;
-    
-    tor->info.flags |= flags;
-
+   
     tr_globalLock( h );
 
     tor->destination = tr_strdup( destination );
@@ -347,7 +345,7 @@ torrentRealInit( tr_handle  * h,
     /* the `paused' flag has highest precedence...
        after that, the fastresume setting is used...
        if that's not found, default to RUNNING */
-    if( flags & TR_FLAG_PAUSED )
+    if( isPaused )
         doStart = 0;
     else if( loaded & TR_FR_RUN )
         doStart = tor->isRunning;
@@ -455,7 +453,7 @@ tr_torrent *
 tr_torrentInit( tr_handle   * h,
                 const char  * path,
                 const char  * destination,
-                int           flags,
+                int           isPaused,
                 int         * error )
 {
     int val;
@@ -470,8 +468,8 @@ tr_torrentInit( tr_handle   * h,
     else if(!(( tor = tr_new0( tr_torrent, 1 ))))
         *error = TR_EOTHER;
     else {
-        tr_metainfoParseFile( &tor->info, h->tag, path, TR_FLAG_SAVE & flags );
-        torrentRealInit( h, tor, destination, flags );
+        tr_metainfoParseFile( &tor->info, h->tag, path, TRUE );
+        torrentRealInit( h, tor, destination, isPaused );
     }
 
     return tor;
@@ -506,7 +504,7 @@ tr_torrent *
 tr_torrentInitSaved( tr_handle    * h,
                      const char   * hashStr,
                      const char   * destination,
-                     int            flags,
+                     int            isPaused,
                      int          * error )
 {
     int val;
@@ -522,7 +520,7 @@ tr_torrentInitSaved( tr_handle    * h,
         *error = TR_EOTHER;
     else {
         tr_metainfoParseHash( &tor->info, h->tag, hashStr );
-        torrentRealInit( h, tor, destination, (TR_FLAG_SAVE|flags) );
+        torrentRealInit( h, tor, destination, isPaused );
     }
 
     return tor;
@@ -559,7 +557,7 @@ tr_torrentInitData( tr_handle      * h,
                     const uint8_t  * data,
                     size_t           size,
                     const char     * destination,
-                    int              flags,
+                    int              isPaused,
                     int            * error )
 {
     int val;
@@ -574,8 +572,8 @@ tr_torrentInitData( tr_handle      * h,
     else if(!(( tor = tr_new0( tr_torrent, 1 ))))
         *error = TR_EOTHER;
     else {
-        tr_metainfoParseData( &tor->info, h->tag, data, size, TR_FLAG_SAVE & flags );
-        torrentRealInit( h, tor, destination, flags );
+        tr_metainfoParseData( &tor->info, h->tag, data, size, TRUE );
+        torrentRealInit( h, tor, destination, isPaused );
     }
 
     return tor;
@@ -647,13 +645,7 @@ tr_torrentChangeMyPort( tr_torrent * tor )
 int
 tr_torrentIsPexEnabled( const tr_torrent * tor )
 {
-    if( tor->info.flags & TR_FLAG_PRIVATE )
-        return FALSE;
-
-    if( tor->pexDisabled )
-        return FALSE;
-
-    return TRUE;
+    return !tor->info.isPrivate && !tor->pexDisabled;
 }
 
 void
@@ -663,7 +655,7 @@ tr_torrentDisablePex( tr_torrent * tor, int disable )
     assert( disable==0 || disable==1 );
 
     /* pex is ALWAYS disabled for private torrents */
-    if( tor->info.flags & TR_FLAG_PRIVATE )
+    if( tor->info.isPrivate )
         disable = TRUE;
 
     tor->pexDisabled = disable;

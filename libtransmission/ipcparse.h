@@ -88,7 +88,6 @@ enum ipc_msg
 #define IPC_INF_NAME            ( 1 << 6 )
 #define IPC_INF_PATH            ( 1 << 7 )
 #define IPC_INF_PRIVATE         ( 1 << 8 )
-#define IPC_INF_SAVED           ( 1 << 9 )
 #define IPC_INF_SIZE            ( 1 << 10 )
 #define IPC_INF_TRACKERS        ( 1 << 11 )
 #define IPC_INF__MAX            ( 1 << 12 )

@@ -371,7 +371,7 @@ void MyFrame :: OnOpen( wxCommandEvent& WXUNUSED(event) )
             tr_torrent * tor = tr_torrentInit( handle,
                                                filename.c_str(),
                                                mySavePath.c_str(),
-                                               TR_FLAG_SAVE, NULL );
+                                               false, NULL );
             if( tor )
                 myTorrents.push_back( tor );
         }
@@ -673,11 +673,8 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
     ***  Load the torrents
     **/
 
-    int flags = 0;
-    if( paused )
-        flags |= TR_FLAG_PAUSED;
     int count = 0;
-    tr_torrent ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), flags, &count );
+    tr_torrent ** torrents = tr_loadTorrents ( handle, mySavePath.c_str(), paused, &count );
     myTorrents.insert( myTorrents.end(), torrents, torrents+count );
     tr_free( torrents );
 

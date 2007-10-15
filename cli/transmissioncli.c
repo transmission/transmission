@@ -210,7 +210,7 @@ int main( int argc, char ** argv )
         {
             printf( "creator:  %s\n", info->creator );
         }
-        if( TR_FLAG_PRIVATE & info->flags )
+        if( info->isPrivate )
         {
             printf( "private flag set\n" );
         }

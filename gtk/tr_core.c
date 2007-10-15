@@ -345,10 +345,9 @@ tr_core_quiescent( TrCore * self )
 }
 
 int
-tr_core_load( TrCore * self, gboolean forcepaused )
+tr_core_load( TrCore * self, gboolean paused )
 {
     int i;
-    int flags;
     int count = 0;
     tr_torrent ** torrents;
     char * path;
@@ -357,11 +356,7 @@ tr_core_load( TrCore * self, gboolean forcepaused )
 
     path = getdownloaddir( );
 
-    flags = 0;
-    if( forcepaused )
-         flags |= TR_FLAG_PAUSED;
-
-    torrents = tr_loadTorrents ( self->handle, NULL, flags, &count );
+    torrents = tr_loadTorrents ( self->handle, NULL, paused, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
     tr_free( torrents );

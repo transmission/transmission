@@ -315,7 +315,7 @@ void tr_close( tr_handle * );
  */
 tr_torrent ** tr_loadTorrents ( tr_handle  * h,
                                 const char   * destination,
-                                int            flags,
+                                int            isPaused,
                                 int          * setmeCount );
 
 
@@ -333,10 +333,10 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
 #define TR_EUNSUPPORTED 2
 #define TR_EDUPLICATE   3
 #define TR_EOTHER       666
-tr_torrent * tr_torrentInit( tr_handle  * handle,
+tr_torrent * tr_torrentInit( tr_handle    * handle,
                              const char   * metainfo_filename,
                              const char   * destination,
-                             int            flags,
+                             int            isPaused,
                              int          * setme_error );
 
 typedef struct tr_info tr_info;
@@ -381,7 +381,8 @@ tr_torrentParseHash( const tr_handle  * h,
 tr_torrent * tr_torrentInitData( tr_handle *,
                                  const uint8_t * data, size_t size,
                                  const char * destination,
-                                 int flags, int * error );
+                                 int isPaused,
+                                 int * error );
 
 /***********************************************************************
  * tr_torrentInitSaved
@@ -393,7 +394,8 @@ tr_torrent * tr_torrentInitData( tr_handle *,
 tr_torrent * tr_torrentInitSaved( tr_handle *,
                                   const char * hashStr,
                                   const char * destination,
-                                  int flags, int * error );
+                                  int isPaused,
+                                  int * error );
 
 /***********************************************************************
  * tr_torrentDisablePex
@@ -574,10 +576,8 @@ struct tr_info
     char                 name[MAX_PATH_LENGTH];
 
     /* Flags */
-#define TR_FLAG_SAVE    0x01 /* save a copy of the torrent file */
-#define TR_FLAG_PRIVATE 0x02 /* do not share information for this torrent */
-#define TR_FLAG_PAUSED  0x04 /* don't start the torrent when adding it */
-    int                  flags;
+    unsigned int isPrivate : 1;
+    unsigned int isMultifile : 1;
 
     /* Tracker info */
     struct
@@ -600,7 +600,6 @@ struct tr_info
     tr_piece           * pieces;
 
     /* Files info */
-    int                  multifile;
     int                  fileCount;
     tr_file            * files;
 };

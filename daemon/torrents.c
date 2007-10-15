@@ -499,18 +499,15 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
 
     if( NULL != path )
     {
-        tor->tor = tr_torrentInit( gl_handle, path, dir,
-                                   TR_FLAG_SAVE | TR_FLAG_PAUSED, &errcode );
+        tor->tor = tr_torrentInit( gl_handle, path, dir, 1, &errcode );
     }
     else if( NULL != hash )
     {
-        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, TR_FLAG_PAUSED,
-                                        &errcode );
+        tor->tor = tr_torrentInitSaved( gl_handle, hash, dir, 1, &errcode );
     }
     else
     {
-        tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 
-                                       TR_FLAG_SAVE | TR_FLAG_PAUSED, &errcode );
+        tor->tor = tr_torrentInitData( gl_handle, data, size, dir, 1, &errcode );
     }
 
     if( NULL == tor->tor )
@@ -567,7 +564,7 @@ opentor( const char * path, const char * hash, uint8_t * data, size_t size,
     inf = tr_torrentInfo( tor->tor );
     memcpy( tor->hash, inf->hash, sizeof tor->hash );
 
-    if( TR_FLAG_PRIVATE & inf->flags )
+    if( inf->isPrivate )
     {
         tor->pexset = 1;
         tor->pex    = 0;
@@ -834,7 +831,7 @@ savestate( void )
         tr_bencInit( tor, TYPE_DICT );
         inf    = tr_torrentInfo( ii->tor );
         st     = tr_torrentStat( ii->tor );
-        pexset = ( ii->pexset && !( TR_FLAG_PRIVATE & inf->flags ) );
+        pexset = ( ii->pexset && !inf->isPrivate );
         if( tr_bencDictReserve( tor, ( pexset ? 4 : 3 ) ) )
         {
             goto nomem;

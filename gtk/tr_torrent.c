@@ -195,7 +195,7 @@ tr_torrent_new( tr_handle * back, const char *torrent, const char *dir,
 {
   TrTorrent *ret;
   tr_torrent *handle;
-  int errcode, flags;
+  int errcode;
 
   g_assert(NULL != dir);
 
@@ -203,11 +203,7 @@ tr_torrent_new( tr_handle * back, const char *torrent, const char *dir,
 
   errcode = -1;
 
-  flags = ( TR_TOR_COPY == act || TR_TOR_MOVE == act ? TR_FLAG_SAVE : 0 );
-  if( paused )
-      flags |= TR_FLAG_PAUSED;
-
-  handle = tr_torrentInit( back, torrent, dir, flags, &errcode );
+  handle = tr_torrentInit( back, torrent, dir, paused, &errcode );
 
   if(NULL == handle) {
     switch(errcode) {
@@ -238,18 +234,13 @@ tr_torrent_new_with_data( tr_handle * back, uint8_t * data, size_t size,
 {
     tr_torrent * handle;
     int          errcode;
-    int          flags;
 
     g_assert( NULL != dir );
 
     *err = NULL;
 
-    flags = TR_FLAG_SAVE;
-    if( paused )
-        flags |= TR_FLAG_PAUSED;
-
     errcode = -1;
-    handle  = tr_torrentInitData( back, data, size, dir, flags, &errcode );
+    handle  = tr_torrentInitData( back, data, size, dir, paused, &errcode );
 
     if( NULL == handle )
     {

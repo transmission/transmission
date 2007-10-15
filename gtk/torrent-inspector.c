@@ -715,7 +715,7 @@ static GtkWidget* info_page_new (tr_torrent * tor)
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Secure"));
-    pch = (info->flags & TR_FLAG_PRIVATE)
+    pch = (info->isPrivate )
       ? _("Private Torrent, PEX disabled")
       : _("Public Torrent");
     l = gtk_label_new (pch);

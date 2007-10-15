@@ -329,7 +329,7 @@ tr_close( tr_handle * h )
 tr_torrent **
 tr_loadTorrents ( tr_handle   * h,
                   const char  * destination,
-                  int           flags,
+                  int           isPaused,
                   int         * setmeCount )
 {
     int i, n = 0;
@@ -351,7 +351,7 @@ tr_loadTorrents ( tr_handle   * h,
                 tr_torrent * tor;
                 char path[MAX_PATH_LENGTH];
                 tr_buildPath( path, sizeof(path), torrentDir, d->d_name, NULL );
-                tor = tr_torrentInit( h, path, destination, flags, NULL );
+                tor = tr_torrentInit( h, path, destination, isPaused, NULL );
                 if( tor != NULL ) {
                     tr_list_append( &list, tor );
                     n++;

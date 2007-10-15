@@ -186,7 +186,6 @@ static struct inf gl_inf[] =
     { "name",                   IPC_INF_NAME,         RB_ENTRY_INITIALIZER() },
     { "path",                   IPC_INF_PATH,         RB_ENTRY_INITIALIZER() },
     { "private",                IPC_INF_PRIVATE,      RB_ENTRY_INITIALIZER() },
-    { "saved",                  IPC_INF_SAVED,        RB_ENTRY_INITIALIZER() },
     { "size",                   IPC_INF_SIZE,         RB_ENTRY_INITIALIZER() },
     { "trackers",               IPC_INF_TRACKERS,     RB_ENTRY_INITIALIZER() },
 };
@@ -681,12 +680,7 @@ ipc_addinfo( benc_val_t * list, int tor, const tr_info * inf, int types )
                 tr_bencInitStr( item, inf->torrent, -1, 1 );
                 break;
             case IPC_INF_PRIVATE:
-                tr_bencInitInt( item,
-                                ( TR_FLAG_PRIVATE & inf->flags ? 1 : 0 ) );
-                break;
-            case IPC_INF_SAVED:
-                tr_bencInitInt( item,
-                                ( TR_FLAG_SAVE & inf->flags ? 1 : 0 ) );
+                tr_bencInitInt( item, inf->isPrivate ? 1 : 0 );
                 break;
             case IPC_INF_SIZE:
                 tr_bencInitInt( item, inf->totalSize );
