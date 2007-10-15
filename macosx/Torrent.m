@@ -744,12 +744,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) allDownloaded
 {
-    return fStat->cpStatus != TR_CP_INCOMPLETE;
+    return [self progressDone] >= 1.0;
 }
 
 - (BOOL) isComplete
 {
-    return fStat->cpStatus == TR_CP_COMPLETE;
+    return [self progress] >= 1.0;
 }
 
 - (BOOL) isError
