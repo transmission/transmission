@@ -630,7 +630,6 @@ torrent_status_t;
 struct tr_stat
 {
     torrent_status_t    status;
-    cp_status_t         cpStatus;
 
     int                 error;
     char                errorString[128];

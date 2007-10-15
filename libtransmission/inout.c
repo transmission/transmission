@@ -68,6 +68,8 @@ readOrWriteBytes ( const tr_torrent    * tor,
 
     tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
 
+fprintf( stderr, "readOrWriteBytes: [%s]\n", path );
+
     if( !file->length )
         return 0;
     else if ((ioMode==TR_IO_READ) && stat( path, &sb ) ) /* fast check to make sure file exists */

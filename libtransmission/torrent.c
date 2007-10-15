@@ -731,8 +731,6 @@ tr_torrentStat( tr_torrent * tor )
         ? 0.0
         : 1.0 - ((double)tr_bitfieldCountTrueBits(tor->uncheckedPieces) / tor->info.pieceCount);
 
-    s->cpStatus = tor->cpStatus;
-
     /* rcRate's averaging code can make it appear that we're
      * still sending bytes after a torrent stops or all the
      * peers disconnect, so short-circuit that appearance here */
