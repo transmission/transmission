@@ -847,22 +847,12 @@ tr_torrentFiles( const tr_torrent * tor, int * fileCount )
     for( i=0; i<n; ++i, ++walk )
     {
         const tr_file * file = tor->info.files + i;
-        cp_status_t cp;
 
         walk->bytesCompleted = fileBytesCompleted( tor, i );
 
         walk->progress = file->length
             ? walk->bytesCompleted / (float)file->length
             : 1.0;
-
-        if( walk->bytesCompleted >= file->length )
-            cp = TR_CP_COMPLETE;
-        else if( tor->info.files[i].dnd )
-            cp = TR_CP_DONE;
-        else
-            cp = TR_CP_INCOMPLETE;
-
-        walk->completionStatus = cp;
     }
 
     *fileCount = n;

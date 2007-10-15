@@ -697,7 +697,6 @@ struct tr_file_stat
 {
     uint64_t bytesCompleted;
     float progress;
-    cp_status_t completionStatus;
 };
 
 struct tr_peer_stat
