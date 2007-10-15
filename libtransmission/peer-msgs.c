@@ -388,19 +388,30 @@ updateInterest( tr_peermsgs * msgs )
         fireNeedReq( msgs );
 }
 
-void
+#define MIN_CHOKE_PERIOD_SEC 10
+
+int
 tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 {
+    int ret;
+    const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
+
     assert( msgs != NULL );
     assert( msgs->info != NULL );
     assert( choke==0 || choke==1 );
 
-    if( msgs->info->peerIsChoked != choke )
+    if( msgs->info->chokeChangedAt > fibrillationTime )
+    {
+        dbgmsg( msgs, "Not changing choke to %d to avoid fibrillation", choke );
+        ret = FALSE;
+    }
+    else if( msgs->info->peerIsChoked != choke )
     {
         msgs->info->peerIsChoked = choke;
-        tr_list * walk;
         
         if( choke )
+        {
+            tr_list * walk;
             for( walk = msgs->peerAskedFor; walk != NULL; )
             {
                 tr_list * next = walk->next;
@@ -413,10 +424,14 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
                 }
                 walk = next;
             }
+        }
 
         protocolSendChoke( msgs, choke );
         msgs->info->chokeChangedAt = time( NULL );
+        ret = TRUE;
     }
+
+    return ret;
 }
 
 /**
@@ -940,6 +955,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
         case BT_BITFIELD: {
             const int clientIsSeed = tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
+            dbgmsg( msgs, "got a bitfield" );
             assert( msglen == msgs->info->have->len );
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             updatePeerProgress( msgs );

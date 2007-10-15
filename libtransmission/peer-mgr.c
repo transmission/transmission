@@ -139,9 +139,9 @@ myDebug( const char * file, int line, const Torrent * t, const char * fmt, ... )
         va_list args;
         struct evbuffer * buf = evbuffer_new( );
         char timestr[64];
-        evbuffer_add_printf( buf, "[%s] %s: ",
-                             tr_getLogTimeStr( timestr, sizeof(timestr) ),
-                             t->tor->info.name );
+        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
+        if( t != NULL )
+            evbuffer_add_printf( buf, "%s ", t->tor->info.name );
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
@@ -955,12 +955,17 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 
     if( getExistingHandshake( manager->incomingHandshakes, addr ) == NULL )
     {
-        tr_peerIo * io = tr_peerIoNewIncoming( manager->handle, addr, port, socket );
+        tr_peerIo * io;
+        tr_handshake * handshake;
 
-        tr_handshake * handshake = tr_handshakeNew( io,
-                                                    manager->handle->encryptionMode,
-                                                    myHandshakeDoneCB,
-                                                    manager );
+        tordbg( NULL, "Got an INCOMING connection with %s", tr_peerIoAddrStr( addr, port ) );
+
+        io = tr_peerIoNewIncoming( manager->handle, addr, port, socket );
+
+        handshake = tr_handshakeNew( io,
+                                     manager->handle->encryptionMode,
+                                     myHandshakeDoneCB,
+                                     manager );
 
         tr_ptrArrayInsertSorted( manager->incomingHandshakes, handshake, handshakeCompare );
     }
@@ -1429,7 +1434,7 @@ static void
 rechoke( Torrent * t )
 {
     int i, peerCount, size=0, unchoked=0;
-    const time_t ignorePeersNewerThan = time(NULL) - MIN_CHOKE_PERIOD_SEC;
+    const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
 
@@ -1440,7 +1445,7 @@ rechoke( Torrent * t )
     {
         tr_peer * peer = peers[i];
         struct ChokeData * node;
-        if( peer->chokeChangedAt > ignorePeersNewerThan )
+        if( peer->chokeChangedAt > fibrillationTime )
             continue;
 
         node = &choke[size++];
@@ -1565,7 +1570,7 @@ compareAtomByTime( const void * va, const void * vb )
 static struct peer_atom **
 getPeerCandidates( Torrent * t, int * setmeSize )
 {
-    int i, insize, outsize;
+    int i, atomCount, retCount;
     struct peer_atom ** atoms;
     struct peer_atom ** ret;
     const time_t now = time( NULL );
@@ -1573,9 +1578,9 @@ getPeerCandidates( Torrent * t, int * setmeSize )
 
     assert( torrentIsLocked( t ) );
 
-    atoms = (struct peer_atom**) tr_ptrArrayPeek( t->pool, &insize );
-    ret = tr_new( struct peer_atom*, insize );
-    for( i=outsize=0; i<insize; ++i )
+    atoms = (struct peer_atom**) tr_ptrArrayPeek( t->pool, &atomCount );
+    ret = tr_new( struct peer_atom*, atomCount );
+    for( i=retCount=0; i<atomCount; ++i )
     {
         struct peer_atom * atom = atoms[i];
 
@@ -1608,11 +1613,11 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             continue;
         }
 
-        ret[outsize++] = atom;
+        ret[retCount++] = atom;
     }
 
-    qsort( ret, outsize, sizeof(struct peer_atom*), compareAtomByTime );
-    *setmeSize = outsize;
+    qsort( ret, retCount, sizeof(struct peer_atom*), compareAtomByTime );
+    *setmeSize = retCount;
     return ret;
 }
 
@@ -1653,7 +1658,12 @@ reconnectPulse( void * vtorrent )
 
             struct peer_atom * atom = candidates[i];
 
-            tr_peerIo * io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
+            tr_peerIo * io;
+
+            tordbg( t, "Starting an OUTGOING connection with %s",
+                       tr_peerIoAddrStr( &atom->addr, atom->port ) );
+
+            io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
 
             tr_handshake * handshake = tr_handshakeNew( io,
                                                         mgr->handle->encryptionMode,
