@@ -406,6 +406,56 @@ timevalMsec ( int milliseconds )
     return ret;
 }
 
+uint8_t *
+tr_loadFile( const char * path, size_t * size )
+{
+    uint8_t    * buf;
+    struct stat  sb;
+    FILE       * file;
+
+    /* try to stat the file */
+    errno = 0;
+    if( stat( path, &sb ) )
+    {
+        tr_err( "Couldn't get information for file \"%s\" %s", path, strerror(errno) );
+        return NULL;
+    }
+
+    if( ( sb.st_mode & S_IFMT ) != S_IFREG )
+    {
+        tr_err( "Not a regular file (%s)", path );
+        return NULL;
+    }
+
+    /* Load the torrent file into our buffer */
+    file = fopen( path, "rb" );
+    if( !file )
+    {
+        tr_err( "Couldn't open file \"%s\" %s", path, strerror(errno) );
+        return NULL;
+    }
+    buf = malloc( sb.st_size );
+    if( NULL == buf )
+    {
+        tr_err( "Couldn't allocate memory (%"PRIu64" bytes)",
+                ( uint64_t )sb.st_size );
+        fclose( file );
+    }
+    fseek( file, 0, SEEK_SET );
+    if( fread( buf, sb.st_size, 1, file ) != 1 )
+    {
+        tr_err( "Error reading \"%s\" %s", path, strerror(errno) );
+        free( buf );
+        fclose( file );
+        return NULL;
+    }
+    fclose( file );
+
+    *size = sb.st_size;
+
+    return buf;
+}
+
 int
 tr_mkdir( const char * path, int permissions 
 #ifdef WIN32

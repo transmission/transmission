@@ -54,6 +54,8 @@ int tr_mkdirp( char * path, int permissions );
 
 int tr_mkdir( const char * path, int permissions );
 
+uint8_t* tr_loadFile( const char * filename, size_t * size );
+
 /***********************************************************************
  * tr_strcasecmp
  ***********************************************************************
