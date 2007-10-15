@@ -95,7 +95,7 @@
             if (count == 1)
             {
                 name = [NSString stringWithUTF8String: info.name];
-                folder = info.multifile;
+                folder = info.isMultifile;
             }
         }
         tr_metainfoFree(&info);

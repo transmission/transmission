@@ -585,7 +585,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     if (!fIcon)
     {
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->multifile ? NSFileTypeForHFSTypeCode('fldr')
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->isMultifile ? NSFileTypeForHFSTypeCode('fldr')
                                                 : [[self name] pathExtension]] retain];
         [fIcon setFlipped: YES];
     }
@@ -650,7 +650,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) privateTorrent
 {
-    return TR_FLAG_PRIVATE & fInfo->flags;
+    return fInfo->isPrivate;
 }
 
 - (NSString *) torrentLocation
@@ -1424,8 +1424,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String],
-                                            TR_FLAG_SAVE | TR_FLAG_PAUSED, &error);
+            fHandle = tr_torrentInitSaved(fLib, [hashString UTF8String], [currentDownloadFolder UTF8String], YES, &error);
         }
         tr_metainfoFree(&info);
     }
@@ -1435,8 +1434,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         {
             currentDownloadFolder = [self shouldUseIncompleteFolderForName: [NSString stringWithUTF8String: info.name]]
                                         ? fIncompleteFolder : fDownloadFolder;
-            fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String],
-                                        TR_FLAG_SAVE | TR_FLAG_PAUSED, &error);
+            fHandle = tr_torrentInit(fLib, [path UTF8String], [currentDownloadFolder UTF8String], YES, &error);
         }
         tr_metainfoFree(&info);
     }
@@ -1485,7 +1483,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         file = &fInfo->files[i];
         
         pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
-        if (fInfo->multifile)
+        if (fInfo->isMultifile)
         {
             path = [pathComponents objectAtIndex: 0];
             [pathComponents removeObjectAtIndex: 0];
