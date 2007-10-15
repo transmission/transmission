@@ -1,0 +1,99 @@
+{
+    IBClasses = (
+        {CLASS = FileOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ImageBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = InfoTabButtonCell; LANGUAGE = ObjC; SUPERCLASS = NSButtonCell; }, 
+        {
+            ACTIONS = {
+                revealDataFile = id; 
+                revealFile = id; 
+                revealTorrentFile = id; 
+                setCheck = id; 
+                setOnlySelectedCheck = id; 
+                setPex = id; 
+                setPiecesView = id; 
+                setPriority = id; 
+                setRatioLimit = id; 
+                setRatioSetting = id; 
+                setSpeedLimit = id; 
+                setSpeedMode = id; 
+                setTab = id; 
+            }; 
+            CLASS = InfoWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fActivityView = NSView; 
+                fCommentView = NSTextView; 
+                fCompletedFromTrackerField = NSTextField; 
+                fConnectedPeersField = NSTextField; 
+                fCreatorField = NSTextField; 
+                fDataLocationField = NSTextField; 
+                fDateActivityField = NSTextField; 
+                fDateAddedField = NSTextField; 
+                fDateCompletedField = NSTextField; 
+                fDateCreatedField = NSTextField; 
+                fDownloadLimitField = NSTextField; 
+                fDownloadLimitLabel = NSTextField; 
+                fDownloadLimitPopUp = NSPopUpButton; 
+                fDownloadedTotalField = NSTextField; 
+                fDownloadingFromField = NSTextField; 
+                fErrorMessageView = NSTextView; 
+                fFailedHashField = NSTextField; 
+                fFileCheckItem = NSMenuItem; 
+                fFileOutline = FileOutlineView; 
+                fFilePriorityHigh = NSMenuItem; 
+                fFilePriorityLow = NSMenuItem; 
+                fFilePriorityNormal = NSMenuItem; 
+                fFileTableStatusField = NSTextField; 
+                fFileUncheckItem = NSMenuItem; 
+                fFilesView = NSView; 
+                fHashField = NSTextField; 
+                fHaveField = NSTextField; 
+                fImageView = NSImageView; 
+                fInfoView = NSView; 
+                fKnownField = NSTextField; 
+                fLeechersField = NSTextField; 
+                fNameField = NSTextField; 
+                fOptionsView = NSView; 
+                fPeerTable = NSTableView; 
+                fPeersView = NSView; 
+                fPexCheck = NSButton; 
+                fPiecesControl = NSSegmentedControl; 
+                fPiecesField = NSTextField; 
+                fPiecesView = PiecesView; 
+                fProgressField = NSTextField; 
+                fRatioField = NSTextField; 
+                fRatioLimitField = NSTextField; 
+                fRatioPopUp = NSPopUpButton; 
+                fRevealDataButton = NSButton; 
+                fRevealTorrentButton = NSButton; 
+                fSecureField = NSTextField; 
+                fSeedersField = NSTextField; 
+                fSizeField = NSTextField; 
+                fStateField = NSTextField; 
+                fSwarmSpeedField = NSTextField; 
+                fTabBackBar = ImageBackgroundView; 
+                fTabMatrix = NSMatrix; 
+                fTorrentLocationField = NSTextField; 
+                fTrackerField = NSTextField; 
+                fUploadLimitField = NSTextField; 
+                fUploadLimitLabel = NSTextField; 
+                fUploadLimitPopUp = NSPopUpButton; 
+                fUploadedTotalField = NSTextField; 
+                fUploadingToField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = NSLevelIndicatorCell; LANGUAGE = ObjC; SUPERCLASS = NSActionCell; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {
+            CLASS = PeerProgressIndicatorCell; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSLevelIndicatorCell; 
+        }, 
+        {CLASS = PeerTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = PiecesView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }
+    ); 
+    IBVersion = 1; 
+}

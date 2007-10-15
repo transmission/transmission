@@ -490,6 +490,13 @@
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
+		A2EA8E3B0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = macosx/fr.lproj/Creator.nib; sourceTree = "<group>"; };
+		A2EA8E3C0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2EA8E3D0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = macosx/fr.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A2EA8E3E0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = macosx/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2EA8E3F0CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = macosx/fr.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A2EA8E400CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = macosx/fr.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A2EA8E410CC3C9830081201C /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = macosx/fr.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
@@ -1263,6 +1270,7 @@
 				Russian,
 				en,
 				es,
+				fr,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1593,6 +1601,7 @@
 			children = (
 				A2D688A70CB4986A009BEC3A /* English */,
 				A27476FF0CC38EE6003CC76D /* es */,
+				A2EA8E3C0CC3C9830081201C /* fr */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1602,6 +1611,7 @@
 			children = (
 				A2D688850CB4984B009BEC3A /* English */,
 				A27477020CC38EE6003CC76D /* es */,
+				A2EA8E3F0CC3C9830081201C /* fr */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1611,6 +1621,7 @@
 			children = (
 				A2D688AB0CB49889009BEC3A /* English */,
 				A27477000CC38EE6003CC76D /* es */,
+				A2EA8E3D0CC3C9830081201C /* fr */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1620,6 +1631,7 @@
 			children = (
 				A2D688D20CB498AA009BEC3A /* English */,
 				A27477030CC38EE6003CC76D /* es */,
+				A2EA8E400CC3C9830081201C /* fr */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1629,6 +1641,7 @@
 			children = (
 				A2D6891B0CB4990E009BEC3A /* English */,
 				A27477010CC38EE6003CC76D /* es */,
+				A2EA8E3E0CC3C9830081201C /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1638,6 +1651,7 @@
 			children = (
 				A2D688EB0CB498BE009BEC3A /* English */,
 				A27477040CC38EE6003CC76D /* es */,
+				A2EA8E410CC3C9830081201C /* fr */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1647,6 +1661,7 @@
 			children = (
 				A2D689100CB498F2009BEC3A /* English */,
 				A27476FE0CC38EE6003CC76D /* es */,
+				A2EA8E3B0CC3C9830081201C /* fr */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";

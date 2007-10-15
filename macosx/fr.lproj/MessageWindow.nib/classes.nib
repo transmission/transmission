@@ -1,0 +1,18 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {changeLevel = id; clearLog = id; writeToFile = id; }; 
+            CLASS = MessageWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fDebugWarningField = NSTextField; 
+                fDebugWarningIcon = NSImageView; 
+                fLevelButton = NSPopUpButton; 
+                fMessageTable = NSTableView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
