@@ -851,7 +851,7 @@ ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8
 
     if( a != NULL )
     {
-        struct peer_atom * a = tr_new0( struct peer_atom, 1 );
+        a = tr_new0( struct peer_atom, 1 );
         a->addr = *addr;
         a->port = port;
         a->flags = flags;
