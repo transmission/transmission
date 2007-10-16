@@ -189,7 +189,7 @@ tr_fastResumeSave( const tr_torrent * tor )
     uint64_t  total;
 
     fastResumeFileName( path, sizeof path, tor, 1 );
-    file = fopen( path, "wb" );
+    file = fopen( path, "wb+" );
     if( NULL == file ) {
         tr_err( "Couldn't open '%s' for writing", path );
         return;

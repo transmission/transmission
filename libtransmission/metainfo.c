@@ -621,7 +621,7 @@ savetorrent( const char * hash, const char * tag,
     FILE * file;
 
     savedname( path, sizeof path, hash, tag );
-    file = fopen( path, "wb" );
+    file = fopen( path, "wb+" );
     if( !file )
     {
         tr_err( "Could not open file (%s) (%s)", path, strerror( errno ) );
