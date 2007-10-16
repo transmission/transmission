@@ -847,19 +847,17 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 static void
 ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
 {
-    struct peer_atom * a = getExistingAtom( t, addr );
-
-    if( a == NULL )
+    if( getExistingAtom( t, addr ) == NULL )
     {
+        struct peer_atom * a;
         a = tr_new0( struct peer_atom, 1 );
         a->addr = *addr;
         a->port = port;
         a->flags = flags;
+        a->from = from;
         tordbg( t, "got a new atom: %s", tr_peerIoAddrStr(&a->addr,a->port) );
         tr_ptrArrayInsertSorted( t->pool, a, comparePeerAtoms );
     }
-
-    a->from = from;
 }
 
 /* FIXME: this is kind of a mess. */
@@ -872,7 +870,7 @@ myHandshakeDoneCB( tr_handshake    * handshake,
 {
     int ok = isConnected;
     uint16_t port;
-    const struct in_addr * in_addr;
+    const struct in_addr * addr;
     tr_peerMgr * manager = (tr_peerMgr*) vmanager;
     Torrent * t;
     tr_handshake * ours;
@@ -899,19 +897,14 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     if( t != NULL )
         torrentLock( t );
 
-    in_addr = tr_peerIoGetAddress( io, &port );
+    addr = tr_peerIoGetAddress( io, &port );
 
     if( !ok || !t || !t->isRunning )
     {
         tr_peerIoFree( io );
-
-        if( t )
-            ++getExistingAtom( t, in_addr )->numFails;
     }
     else /* looking good */
     {
-        uint16_t port;
-        const struct in_addr * addr = tr_peerIoGetAddress( io,  &port );
         struct peer_atom * atom;
         ensureAtomExists( t, addr, port, 0, TR_PEER_FROM_INCOMING );
         atom = getExistingAtom( t, addr );
