@@ -39,89 +39,6 @@
 #include "util.h"
 
 static void
-tr_core_init( GTypeInstance * instance, gpointer g_class );
-static void
-tr_core_class_init( gpointer g_class, gpointer g_class_data );
-static void
-tr_core_marshal_err( GClosure * closure, GValue * ret, guint count,
-                     const GValue * vals, gpointer hint, gpointer marshal );
-void
-tr_core_marshal_prompt( GClosure * closure, GValue * ret, guint count,
-                        const GValue * vals, gpointer hint, gpointer marshal );
-void
-tr_core_marshal_data( GClosure * closure, GValue * ret, guint count,
-                      const GValue * vals, gpointer hint, gpointer marshal );
-static void
-tr_core_dispose( GObject * obj );
-static void
-tr_core_insert( TrCore * self, TrTorrent * tor );
-static void
-tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg );
-
-GType
-tr_core_get_type( void )
-{
-    static GType type = 0;
-
-    if( 0 == type )
-    {
-        static const GTypeInfo info =
-        {
-            sizeof( TrCoreClass ),
-            NULL,                       /* base_init */
-            NULL,                       /* base_finalize */
-            tr_core_class_init,         /* class_init */
-            NULL,                       /* class_finalize */
-            NULL,                       /* class_data */
-            sizeof( TrCore ),
-            0,                          /* n_preallocs */
-            tr_core_init,               /* instance_init */
-            NULL,
-        };
-        type = g_type_register_static( G_TYPE_OBJECT, "TrCore", &info, 0 );
-    }
-
-    return type;
-}
-
-void
-tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
-{
-    GObjectClass * gobject_class;
-    TrCoreClass  * core_class;
-
-    gobject_class = G_OBJECT_CLASS( g_class );
-    gobject_class->dispose = tr_core_dispose;
-
-    core_class = TR_CORE_CLASS( g_class );
-    core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
-                                       G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                       tr_core_marshal_err, G_TYPE_NONE,
-                                       2, G_TYPE_INT, G_TYPE_STRING );
-    core_class->promptsig = g_signal_new( "directory-prompt",
-                                          G_TYPE_FROM_CLASS( g_class ),
-                                          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                          tr_core_marshal_prompt, G_TYPE_NONE,
-                                          3, G_TYPE_POINTER, G_TYPE_INT,
-                                          G_TYPE_BOOLEAN );
-    core_class->promptdatasig = g_signal_new( "directory-prompt-data",
-                                              G_TYPE_FROM_CLASS( g_class ),
-                                              G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                              tr_core_marshal_data,
-                                              G_TYPE_NONE, 3, G_TYPE_STRING,
-                                              G_TYPE_UINT, G_TYPE_BOOLEAN );
-    core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
-                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                        g_cclosure_marshal_VOID__VOID,
-                                        G_TYPE_NONE, 0 );
-    core_class->prefsig = g_signal_new( "prefs-changed",
-                                        G_TYPE_FROM_CLASS( g_class ),
-                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
-                                        g_cclosure_marshal_VOID__STRING,
-                                        G_TYPE_NONE, 1, G_TYPE_STRING );
-}
-
-void
 tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
                      const GValue * vals, gpointer hint SHUTUP,
                      gpointer marshal )
@@ -146,7 +63,7 @@ tr_core_marshal_err( GClosure * closure, GValue * ret SHUTUP, guint count,
     callback( inst, errcode, errstr, gdata );
 }
 
-void
+static void
 tr_core_marshal_prompt( GClosure * closure, GValue * ret SHUTUP, guint count,
                         const GValue * vals, gpointer hint SHUTUP,
                         gpointer marshal )
@@ -173,7 +90,7 @@ tr_core_marshal_prompt( GClosure * closure, GValue * ret SHUTUP, guint count,
     callback( inst, paths, action, paused, gdata );
 }
 
-void
+static void
 tr_core_marshal_data( GClosure * closure, GValue * ret SHUTUP, guint count,
                       const GValue * vals, gpointer hint SHUTUP,
                       gpointer marshal )
@@ -200,44 +117,7 @@ tr_core_marshal_data( GClosure * closure, GValue * ret SHUTUP, guint count,
     callback( inst, data, size, paused, gdata );
 }
 
-void
-tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
-{
-    TrCore * self = (TrCore *) instance;
-    GtkListStore * store;
-
-    /* column types for the model used to store torrent information */
-    /* keep this in sync with the enum near the bottom of tr_core.h */
-    GType types[] =
-    {
-        /* info->name, info->totalSize, info->hashString, status, */
-        G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_STRING,    G_TYPE_INT,
-        /* error,   errorString,   percentComplete, percentDone,  rateDownload, rateUpload, */
-        G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT,    G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
-        /* eta,     peersConnected, peersUploading, peersDownloading, seeders, */
-        G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
-        /* leechers, completedFromTracker, downloaded,    uploaded */
-        G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
-        /* left,       TrTorrent object, ID for IPC */
-        G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
-    };
-
-#ifdef REFDBG
-    fprintf( stderr, "core    %p init\n", self );
-#endif
-
-    /* create the model used to store torrent data */
-    g_assert( ALEN( types ) == MC_ROW_COUNT );
-    store = gtk_list_store_newv( MC_ROW_COUNT, types );
-
-    self->model    = GTK_TREE_MODEL( store );
-    self->handle   = tr_init( "gtk" );
-    self->nextid   = 1;
-    self->quitting = FALSE;
-    self->disposed = FALSE;
-}
-
-void
+static void
 tr_core_dispose( GObject * obj )
 {
     TrCore       * self = (TrCore *) obj;
@@ -278,6 +158,148 @@ tr_core_dispose( GObject * obj )
     parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
     parent->dispose( obj );
 }
+
+
+static void
+tr_core_class_init( gpointer g_class, gpointer g_class_data SHUTUP )
+{
+    GObjectClass * gobject_class;
+    TrCoreClass  * core_class;
+
+    gobject_class = G_OBJECT_CLASS( g_class );
+    gobject_class->dispose = tr_core_dispose;
+
+    core_class = TR_CORE_CLASS( g_class );
+    core_class->errsig = g_signal_new( "error", G_TYPE_FROM_CLASS( g_class ),
+                                       G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                       tr_core_marshal_err, G_TYPE_NONE,
+                                       2, G_TYPE_INT, G_TYPE_STRING );
+    core_class->promptsig = g_signal_new( "directory-prompt",
+                                          G_TYPE_FROM_CLASS( g_class ),
+                                          G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                          tr_core_marshal_prompt, G_TYPE_NONE,
+                                          3, G_TYPE_POINTER, G_TYPE_INT,
+                                          G_TYPE_BOOLEAN );
+    core_class->promptdatasig = g_signal_new( "directory-prompt-data",
+                                              G_TYPE_FROM_CLASS( g_class ),
+                                              G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                              tr_core_marshal_data,
+                                              G_TYPE_NONE, 3, G_TYPE_STRING,
+                                              G_TYPE_UINT, G_TYPE_BOOLEAN );
+    core_class->quitsig = g_signal_new( "quit", G_TYPE_FROM_CLASS( g_class ),
+                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                        g_cclosure_marshal_VOID__VOID,
+                                        G_TYPE_NONE, 0 );
+    core_class->prefsig = g_signal_new( "prefs-changed",
+                                        G_TYPE_FROM_CLASS( g_class ),
+                                        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
+                                        g_cclosure_marshal_VOID__STRING,
+                                        G_TYPE_NONE, 1, G_TYPE_STRING );
+}
+
+static int
+compareProgress( GtkTreeModel   * model,
+                 GtkTreeIter    * a,
+                 GtkTreeIter    * b,
+                 gpointer         user_data UNUSED )
+{
+    gfloat rateUpA, rateUpB;
+    gfloat rateDownA, rateDownB;
+    gfloat percentDoneA, percentDoneB;
+    int ia, ib;
+
+    gtk_tree_model_get( model, a, MC_PROG_D, &percentDoneA,
+                                  MC_DRATE, &rateDownA,
+                                  MC_URATE, &rateUpA,
+                                  -1 );
+    gtk_tree_model_get( model, b, MC_PROG_D, &percentDoneB,
+                                  MC_DRATE, &rateDownB,
+                                  MC_URATE, &rateUpB,
+                                  -1 );
+    ia = (int)( 100.0 * percentDoneA );
+    ib = (int)( 100.0 * percentDoneB );
+    if( ia != ib )
+        return ia - ib;
+
+    ia = (int)( rateUpA + rateDownA );
+    ib = (int)( rateUpB + rateDownB );
+    if( ia != ib )
+        return ia - ib;
+
+    return 0;
+}
+
+static void
+tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
+{
+    TrCore * self = (TrCore *) instance;
+    GtkListStore * store;
+
+    /* column types for the model used to store torrent information */
+    /* keep this in sync with the enum near the bottom of tr_core.h */
+    GType types[] =
+    {
+        /* info->name, info->totalSize, info->hashString, status, */
+        G_TYPE_STRING, G_TYPE_UINT64,   G_TYPE_STRING,    G_TYPE_INT,
+        /* error,   errorString,   percentComplete, percentDone,  rateDownload, rateUpload, */
+        G_TYPE_INT, G_TYPE_STRING, G_TYPE_FLOAT,    G_TYPE_FLOAT, G_TYPE_FLOAT, G_TYPE_FLOAT,
+        /* eta,     peersConnected, peersUploading, peersDownloading, seeders, */
+        G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
+        /* leechers, completedFromTracker, downloaded,    uploaded */
+        G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
+        /* left,       TrTorrent object, ID for IPC */
+        G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
+    };
+
+#ifdef REFDBG
+    fprintf( stderr, "core    %p init\n", self );
+#endif
+
+    /* create the model used to store torrent data */
+    g_assert( ALEN( types ) == MC_ROW_COUNT );
+    store = gtk_list_store_newv( MC_ROW_COUNT, types );
+
+    gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),
+                                     MC_PROG_D,
+                                     compareProgress,
+                                     NULL, NULL );
+
+    self->model    = GTK_TREE_MODEL( store );
+    self->handle   = tr_init( "gtk" );
+    self->nextid   = 1;
+    self->quitting = FALSE;
+    self->disposed = FALSE;
+}
+
+GType
+tr_core_get_type( void )
+{
+    static GType type = 0;
+
+    if( 0 == type )
+    {
+        static const GTypeInfo info =
+        {
+            sizeof( TrCoreClass ),
+            NULL,                       /* base_init */
+            NULL,                       /* base_finalize */
+            tr_core_class_init,         /* class_init */
+            NULL,                       /* class_finalize */
+            NULL,                       /* class_data */
+            sizeof( TrCore ),
+            0,                          /* n_preallocs */
+            tr_core_init,               /* instance_init */
+            NULL,
+        };
+        type = g_type_register_static( G_TYPE_OBJECT, "TrCore", &info, 0 );
+    }
+
+    return type;
+}
+
+/**
+***
+**/
 
 TrCore *
 tr_core_new( void )
@@ -344,6 +366,25 @@ tr_core_quiescent( TrCore * self )
     return TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus;
 }
 
+static void
+tr_core_insert( TrCore * self, TrTorrent * tor )
+{
+    GtkTreeIter iter;
+    const tr_info * inf;
+
+    gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
+    inf = tr_torrent_info( tor );
+    gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
+                        MC_NAME,    inf->name,
+                        MC_SIZE,    inf->totalSize,
+                        MC_HASH,    inf->hashString,
+                        MC_TORRENT, tor,
+                        MC_ID,      self->nextid,
+                        -1);
+    g_object_unref( tor );
+    self->nextid++;
+}
+
 int
 tr_core_load( TrCore * self, gboolean paused )
 {
@@ -379,6 +420,15 @@ tr_core_add( TrCore * self, const char * path, enum tr_torrent_action act,
     g_list_free( list );
 
     return 1 == ret;
+}
+
+static void
+tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
+{
+    TrCoreClass * class;
+
+    class = g_type_class_peek( TR_CORE_TYPE );
+    g_signal_emit( self, class->errsig, 0, type, msg );
 }
 
 gboolean
@@ -499,25 +549,6 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
 }
 
 void
-tr_core_insert( TrCore * self, TrTorrent * tor )
-{
-    GtkTreeIter iter;
-    const tr_info * inf;
-
-    gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
-    inf = tr_torrent_info( tor );
-    gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
-                        MC_NAME,    inf->name,
-                        MC_SIZE,    inf->totalSize,
-                        MC_HASH,    inf->hashString,
-                        MC_TORRENT, tor,
-                        MC_ID,      self->nextid,
-                        -1);
-    g_object_unref( tor );
-    self->nextid++;
-}
-
-void
 tr_core_update( TrCore * self )
 {
     GtkTreeIter iter;
@@ -555,15 +586,6 @@ tr_core_update( TrCore * self )
                             -1 );
     }
     while( gtk_tree_model_iter_next( self->model, &iter ) );
-}
-
-void
-tr_core_errsig( TrCore * self, enum tr_core_err type, const char * msg )
-{
-    TrCoreClass * class;
-
-    class = g_type_class_peek( TR_CORE_TYPE );
-    g_signal_emit( self, class->errsig, 0, type, msg );
 }
 
 void
