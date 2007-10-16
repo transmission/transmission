@@ -203,19 +203,23 @@ compareProgress( GtkTreeModel   * model,
                  GtkTreeIter    * b,
                  gpointer         user_data UNUSED )
 {
+    int ia, ib;
     gfloat rateUpA, rateUpB;
     gfloat rateDownA, rateDownB;
     gfloat percentDoneA, percentDoneB;
-    int ia, ib;
+    guint64 uploadedEverA, uploadedEverB;
 
     gtk_tree_model_get( model, a, MC_PROG_D, &percentDoneA,
                                   MC_DRATE, &rateDownA,
                                   MC_URATE, &rateUpA,
+                                  MC_UP, &uploadedEverA,
                                   -1 );
     gtk_tree_model_get( model, b, MC_PROG_D, &percentDoneB,
                                   MC_DRATE, &rateDownB,
                                   MC_URATE, &rateUpB,
+                                  MC_UP, &uploadedEverB,
                                   -1 );
+
     ia = (int)( 100.0 * percentDoneA );
     ib = (int)( 100.0 * percentDoneB );
     if( ia != ib )
@@ -225,6 +229,9 @@ compareProgress( GtkTreeModel   * model,
     ib = (int)( rateUpB + rateDownB );
     if( ia != ib )
         return ia - ib;
+
+    if( uploadedEverA != uploadedEverB )
+        return uploadedEverA < uploadedEverB ? -1 : 1;
 
     return 0;
 }
