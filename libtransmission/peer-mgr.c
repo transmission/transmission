@@ -97,7 +97,8 @@ struct peer_atom
     uint8_t flags; /* these match the added_f flags */
     uint8_t myflags; /* flags that aren't defined in added_f */
     uint16_t port;
-    struct in_addr addr; 
+    uint16_t numFails;
+    struct in_addr addr;
     time_t time;
 };
 
@@ -288,12 +289,6 @@ getExistingAtom( const Torrent * t, const struct in_addr * addr )
 {
     assert( torrentIsLocked( t ) );
     return tr_ptrArrayFindSorted( t->pool, addr, comparePeerAtomToAddress );
-}
-
-static int
-peerIsKnown( const Torrent * t, const struct in_addr * addr )
-{
-    return getExistingAtom( t, addr ) != NULL;
 }
 
 static int
@@ -852,16 +847,19 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 static void
 ensureAtomExists( Torrent * t, const struct in_addr * addr, uint16_t port, uint8_t flags, uint8_t from )
 {
-    if( !peerIsKnown( t, addr ) )
+    struct peer_atom * a = getExistingAtom( t, addr );
+
+    if( a != NULL )
     {
         struct peer_atom * a = tr_new0( struct peer_atom, 1 );
         a->addr = *addr;
         a->port = port;
         a->flags = flags;
-        a->from = from;
         tordbg( t, "got a new atom: %s", tr_peerIoAddrStr(&a->addr,a->port) );
         tr_ptrArrayInsertSorted( t->pool, a, comparePeerAtoms );
     }
+
+    a->from = from;
 }
 
 /* FIXME: this is kind of a mess. */
@@ -906,6 +904,9 @@ myHandshakeDoneCB( tr_handshake    * handshake,
     if( !ok || !t || !t->isRunning )
     {
         tr_peerIoFree( io );
+
+        if( t )
+            ++getExistingAtom( t, in_addr )->numFails;
     }
     else /* looking good */
     {
@@ -976,7 +977,7 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 void
 tr_peerMgrAddPex( tr_peerMgr     * manager,
                   const uint8_t  * torrentHash,
-                  int              from,
+                  uint8_t          from,
                   const tr_pex   * pex,
                   int              pexCount )
 {
@@ -995,7 +996,7 @@ tr_peerMgrAddPex( tr_peerMgr     * manager,
 void
 tr_peerMgrAddPeers( tr_peerMgr    * manager,
                     const uint8_t * torrentHash,
-                    int             from,
+                    uint8_t         from,
                     const uint8_t * peerCompact,
                     int             peerCount )
 {
@@ -1582,6 +1583,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     ret = tr_new( struct peer_atom*, atomCount );
     for( i=retCount=0; i<atomCount; ++i )
     {
+        int wait, minWait, maxWait;
         struct peer_atom * atom = atoms[i];
 
         /* peer fed us too much bad data ... we only keep it around
@@ -1607,9 +1609,14 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* if we used this peer recently, give someone else a turn */
-        if( ( now - atom->time ) < 180 ) {
-            tordbg( t, "RECONNECT peer %d (%s) is in its grace period..",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+        minWait = 60;
+        maxWait = minWait * 5;
+        wait = atom->numFails * 10;
+        if( wait < minWait ) wait = minWait;
+        if( wait > maxWait ) wait = maxWait;
+        if( ( now - atom->time ) < wait ) {
+            tordbg( t, "RECONNECT peer %d (%s) is in its grace period of %d seconds..",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port), wait );
             continue;
         }
 
@@ -1646,9 +1653,19 @@ reconnectPulse( void * vtorrent )
                        tr_ptrArraySize(t->pool),
                        (int)MAX_RECONNECTIONS_PER_PULSE );
 
-        /* disconnect some peers */
-        for( i=0; i<nBad; ++i )
-            removePeer( t, connections[i] );
+        /* disconnect some peers.
+           if we got transferred piece data, then they might be good peers,
+           so reset their `numFails' weight to zero.  otherwise we connected
+           to them fruitlessly, so mark it as another fail */
+        for( i=0; i<nBad; ++i ) {
+            tr_peer * peer = connections[i];
+            struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+            if( peer->pieceDataActivityDate )
+                atom->numFails = 0;
+            else
+                ++atom->numFails;
+            removePeer( t, peer );
+        }
 
         /* add some new ones */
         nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;

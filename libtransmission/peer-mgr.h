@@ -43,13 +43,13 @@ void tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 
 void tr_peerMgrAddPeers( tr_peerMgr     * manager,
                          const uint8_t  * torrentHash,
-                         int              from,
+                         uint8_t          from,
                          const uint8_t  * peerCompact,
                          int              peerCount );
 
 void tr_peerMgrAddPex( tr_peerMgr     * manager,
                        const uint8_t  * torrentHash,
-                       int              from,
+                       uint8_t          from,
                        const tr_pex   * pex,
                        int              pexCount );
 
