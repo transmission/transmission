@@ -236,6 +236,48 @@ compareProgress( GtkTreeModel   * model,
     return 0;
 }
 
+#define STR_REVERSE "reverse-"
+#define STR_PROGRESS "progress"
+#define STR_NAME "name"
+
+static void
+onSortColumnChanged( GtkTreeSortable * sortable, gpointer unused UNUSED )
+{
+    int column;
+    GtkSortType order;
+    if( gtk_tree_sortable_get_sort_column_id( sortable, &column, &order ) )
+    {
+        GString * gstr = g_string_new( NULL );
+        switch( column ) {
+            case MC_PROG_D: g_string_assign( gstr, STR_PROGRESS ); break;
+            default: g_string_assign( gstr, STR_NAME ); break;
+        }
+        if( order == GTK_SORT_DESCENDING )
+            g_string_prepend( gstr, STR_REVERSE );
+        pref_string_set( PREF_KEY_SORT_COLUMN, gstr->str );
+        g_string_free( gstr, TRUE );
+    }
+}
+
+void
+tr_core_set_sort_column_from_prefs( TrCore * core )
+{
+    char * val = pref_string_get( PREF_KEY_SORT_COLUMN );
+    char * freeme = val;
+    gint column;
+    GtkSortType order = GTK_SORT_ASCENDING;
+    if( g_str_has_prefix( val, STR_REVERSE ) ) {
+        order = GTK_SORT_DESCENDING;
+        val += strlen( STR_REVERSE );
+    }
+    if( !strcmp( val, STR_PROGRESS ) )
+        column = MC_PROG_D;
+    else /* default */
+        column = MC_NAME;
+    gtk_tree_sortable_set_sort_column_id ( GTK_TREE_SORTABLE( core->model ), column, order );
+    g_free( freeme );
+}
+
 static void
 tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
 {
@@ -265,6 +307,7 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
     /* create the model used to store torrent data */
     g_assert( ALEN( types ) == MC_ROW_COUNT );
     store = gtk_list_store_newv( MC_ROW_COUNT, types );
+    g_signal_connect( store, "sort-column-changed", G_CALLBACK(onSortColumnChanged), NULL );
 
     gtk_tree_sortable_set_sort_func( GTK_TREE_SORTABLE(store),
                                      MC_PROG_D,

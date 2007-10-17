@@ -47,6 +47,8 @@ tr_prefs_init_global( void )
 
     pref_int_set_default    ( PREF_KEY_MSGLEVEL, TR_MSG_INF );
 
+    pref_string_set_default ( PREF_KEY_SORT_COLUMN, "name" );
+
     pref_save( NULL );
 }
 

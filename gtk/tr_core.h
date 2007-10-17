@@ -180,6 +180,9 @@ tr_core_set_pref_bool( TrCore * self, const char * key, gboolean val );
 void
 tr_core_set_pref_int( TrCore * self, const char * key, int val );
 
+void
+tr_core_set_sort_column_from_prefs( TrCore * core );
+
 /* column names for the model used to store torrent information */
 /* keep this in sync with the type array in tr_core_init() in tr_core.c */
 enum {

@@ -173,7 +173,7 @@ makeview( PrivateData * p )
     GtkCellRenderer   * namerend, * progrend;
     char              * str;
 
-    view     = gtk_tree_view_new();
+    view = gtk_tree_view_new();
 
     p->selection = gtk_tree_view_get_selection( GTK_TREE_VIEW(view) );
     namerend = gtk_cell_renderer_text_new();

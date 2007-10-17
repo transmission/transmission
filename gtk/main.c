@@ -650,6 +650,7 @@ initializeFromPrefs( struct cbdata * cbdata )
         PREF_KEY_NAT,
         PREF_KEY_PEX,
         PREF_KEY_SYSTRAY,
+        PREF_KEY_SORT_COLUMN,
         PREF_KEY_ENCRYPTED_ONLY
     };
 
@@ -710,6 +711,10 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
             g_object_unref( cbdata->icon );
             cbdata->icon = NULL;
         }
+    }
+    else if( !strcmp( key, PREF_KEY_SORT_COLUMN ) )
+    {
+        tr_core_set_sort_column_from_prefs( cbdata->core );
     }
     else if( !strcmp( key, PREF_KEY_PEX ) )
     {
