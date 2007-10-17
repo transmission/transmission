@@ -35,14 +35,18 @@
 
 #define MINUTES_TO_MSEC(N) ((N) * 60 * 1000)
 
-/* manual announces via "update tracker" are allowed this frequently */
-#define MANUAL_ANNOUNCE_INTERVAL_MSEC (MINUTES_TO_MSEC(10))
+/* we follow uTorrent 1.8's lead of allowing a manual reannounce
+ * every MAX( 60 seconds, min_interval ) */
+#define DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC (60)
 
 /* unless the tracker tells us otherwise, rescrape this frequently */
-#define DEFAULT_SCRAPE_INTERVAL_MSEC (MINUTES_TO_MSEC(15))
+#define DEFAULT_SCRAPE_INTERVAL_SEC (60*15)
 
-/* unless the tracker tells us otherwise, reannounce this frequently */
-#define DEFAULT_ANNOUNCE_INTERVAL_MSEC (MINUTES_TO_MSEC(20))
+/* unless the tracker tells us otherwise, this is the announce interval */
+#define DEFAULT_ANNOUNCE_INTERVAL_SEC (240)
+
+/* unless the tracker tells us otherwise, this is the announce min_interval */
+#define DEFAULT_MIN_ANNOUNCE_INTERVAL_SEC (30)
 
 /* this is how long we'll leave a request hanging before timeout */
 #define TIMEOUT_INTERVAL_SEC 40
@@ -69,9 +73,9 @@ typedef struct
     tr_ptrArray * scrapeQueue;
 
     /* these are set from the latest scrape or tracker response */
-    int announceIntervalMsec;
-    int minAnnounceIntervalMsec;
-    int scrapeIntervalMsec;
+    int announceIntervalSec;
+    int minAnnounceIntervalSec;
+    int scrapeIntervalSec;
 
     /* calculated when we get fewer scrapes
        back than we asked for */
@@ -125,7 +129,7 @@ typedef struct tr_tracker
        NULL means no message has ever been sent */
     char * lastRequest;
 
-    uint64_t manualAnnounceAllowedAt;
+    time_t manualAnnounceAllowedAt;
 
     Tracker * tracker;
 
@@ -284,9 +288,9 @@ tr_trackerGet( const tr_torrent * tor )
         t = tr_new0( Tracker, 1 );
         t->handle = tor->handle;
         t->primaryAddress = tr_strdup( info->primaryAddress );
-        t->scrapeIntervalMsec      = DEFAULT_SCRAPE_INTERVAL_MSEC;
-        t->announceIntervalMsec    = DEFAULT_ANNOUNCE_INTERVAL_MSEC;
-        t->minAnnounceIntervalMsec = DEFAULT_ANNOUNCE_INTERVAL_MSEC;
+        t->scrapeIntervalSec       = DEFAULT_SCRAPE_INTERVAL_SEC;
+        t->announceIntervalSec     = DEFAULT_ANNOUNCE_INTERVAL_SEC;
+        t->minAnnounceIntervalSec  = DEFAULT_MIN_ANNOUNCE_INTERVAL_SEC;
         t->multiscrapeMax = INT_MAX;
         t->torrents    = tr_ptrArrayNew( );
         t->scraping    = tr_ptrArrayNew( );
@@ -639,15 +643,15 @@ onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
 
                 if(( flags = tr_bencDictFind( tordict, "flags" )))
                     if(( tmp = tr_bencDictFind( flags, "min_request_interval")))
-                        t->scrapeIntervalMsec = tmp->val.i * 1000;
+                        t->scrapeIntervalSec = tmp->val.i;
 
                 tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
 
                 tr_timerFree( &tor->scrapeTimer );
-                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, torrentHashNew(tor), t->scrapeIntervalMsec );
+                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, torrentHashNew(tor), t->scrapeIntervalSec*1000 );
                 tr_dbg( "Torrent '%s' scrape successful."
                         "  Rescraping in %d seconds",
-                        tor->name, t->scrapeIntervalMsec/1000 );
+                        tor->name, t->scrapeIntervalSec );
             }
 
             if( !files->val.l.count )
@@ -858,13 +862,13 @@ setAnnounceInterval( Tracker  * t,
     assert( t != NULL );
 
     if( minimum > 0 )
-        t->minAnnounceIntervalMsec = minimum;
+        t->minAnnounceIntervalSec = minimum;
 
     if( interval > 0 )
-        t->announceIntervalMsec = interval;
+        t->announceIntervalSec = interval;
 
-    if( t->announceIntervalMsec < t->minAnnounceIntervalMsec )
-        t->announceIntervalMsec = t->minAnnounceIntervalMsec;
+    if( t->announceIntervalSec < t->minAnnounceIntervalSec )
+        t->announceIntervalSec = t->minAnnounceIntervalSec;
 }
 
 static int onReannounceNow( void * vtor );
@@ -874,13 +878,21 @@ onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
 {
 }
 
+static int
+getManualReannounceIntervalSecs( const Tracker * tracker )
+{
+    return tracker
+        ? MAX( tracker->minAnnounceIntervalSec, DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC )
+        : DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC;
+}
+
 static void
 onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 {
     char * errmsg;
     Torrent * tor;
     int isStopped;
-    int reannounceInterval;
+    int reannounceIntervalSecs;
     tr_torrent * t;
 
     t = findTorrentFromHash( torrent_hash );
@@ -952,9 +964,9 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
             }
         }
 
-        reannounceInterval = isStopped
+        reannounceIntervalSecs = isStopped
             ? -1
-            : tor->tracker->announceIntervalMsec;
+            : tor->tracker->announceIntervalSec;
 
         if( bencLoaded )
             tr_bencFree( &benc );
@@ -967,7 +979,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
                 tor->lastRequest,
                 tor->name );
 
-        reannounceInterval = 30 * 1000;
+        reannounceIntervalSecs = 30;
     }
 
     if (( errmsg = updateAddresses( tor->tracker, req ) )) {
@@ -976,13 +988,12 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         tr_free( errmsg );
     }
 
-    if( !isStopped && reannounceInterval>0 ) {
+    if( !isStopped && reannounceIntervalSecs>0 ) {
         tr_dbg( "torrent '%s' reannouncing in %d seconds",
-                tor->name, (reannounceInterval/1000) );
+                tor->name, (reannounceIntervalSecs) );
         tr_timerFree( &tor->reannounceTimer );
-        tor->reannounceTimer = tr_timerNew( tor->tracker->handle, onReannounceNow, tor, reannounceInterval );
-        tor->manualAnnounceAllowedAt
-                           = tr_date() + MANUAL_ANNOUNCE_INTERVAL_MSEC;
+        tor->reannounceTimer = tr_timerNew( tor->tracker->handle, onReannounceNow, tor, reannounceIntervalSecs*1000 );
+        tor->manualAnnounceAllowedAt = time(NULL) + getManualReannounceIntervalSecs( tor->tracker );
     }
 }
 
@@ -1074,7 +1085,7 @@ tr_trackerCanManualAnnounce ( const Torrent * tor )
     /* return true if this torrent's currently running
        and it's been long enough since the last announce */
     return ( torrentIsRunning( tor ) )
-        && ( tr_date() >= tor->manualAnnounceAllowedAt );
+        && ( time(NULL) >= tor->manualAnnounceAllowedAt );
 }
 
 void
