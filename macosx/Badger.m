@@ -25,6 +25,10 @@
 #import "Badger.h"
 #import "NSStringAdditions.h"
 
+#define COMPLETED_BOTTOM_PADDING 5.0
+#define SPEED_BOTTOM_PADDING 2.0
+#define SPEED_BETWEEN_PADDING 2.0
+
 @interface Badger (Private)
 
 - (void) badgeString: (NSString *) string forRect: (NSRect) rect;
@@ -58,8 +62,8 @@
 - (void) updateBadge
 {
     //set completed badge to top right
-    BOOL baseChange = fCompleted != fCompletedBadged;
-    if (baseChange)
+    BOOL completedChange = fCompleted != fCompletedBadged;
+    if (completedChange)
     {
         fCompletedBadged = fCompleted;
         
@@ -88,9 +92,8 @@
             [fBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
             
             //ignore shadow of badge when placing string
-            float badgeBottomExtra = 5.0;
-            badgeRect.size.height -= badgeBottomExtra;
-            badgeRect.origin.y += badgeBottomExtra;
+            badgeRect.size.height -= COMPLETED_BOTTOM_PADDING;
+            badgeRect.origin.y += COMPLETED_BOTTOM_PADDING;
             
             //place badge text
             [self badgeString: [NSString stringWithFormat: @"%d", fCompleted] forRect: badgeRect];
@@ -135,9 +138,8 @@
             
             //ignore shadow of badge when placing string
             NSRect stringRect = badgeRect;
-            float badgeBottomExtra = 2.0;
-            stringRect.size.height -= badgeBottomExtra;
-            stringRect.origin.y += badgeBottomExtra;
+            stringRect.size.height -= SPEED_BOTTOM_PADDING;
+            stringRect.origin.y += SPEED_BOTTOM_PADDING;
             
             [dockIcon lockFocus];
             
@@ -153,7 +155,7 @@
                 //download rate above upload rate
                 if (uploadRateString)
                 {
-                    float spaceBetween = badgeRect.size.height + 2.0;
+                    float spaceBetween = badgeRect.size.height + SPEED_BETWEEN_PADDING;
                     badgeRect.origin.y += spaceBetween;
                     stringRect.origin.y += spaceBetween;
                 }
@@ -168,7 +170,7 @@
     }
     
     //update dock badge
-    if (baseChange || fSpeedBadge || speedBadge)
+    if (completedChange || fSpeedBadge || speedBadge)
     {
         [NSApp setApplicationIconImage: dockIcon ? dockIcon : fDockIcon];
         [dockIcon release];
