@@ -160,7 +160,7 @@ void tr_freeMessageList( tr_msg_list * list )
     }
 }
 
-void tr_msg( int level, char * msg, ... )
+void tr_msg( int level, const char * msg, ... )
 {
     va_list       args1, args2;
     tr_msg_list * newmsg;
