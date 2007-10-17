@@ -129,8 +129,6 @@
             
             if (!fUploadBadge)
                 fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
-            if (!fDownloadBadge)
-                fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
             
             NSRect badgeRect;
             badgeRect.size = [fUploadBadge size];
@@ -159,7 +157,10 @@
                     badgeRect.origin.y += spaceBetween;
                     stringRect.origin.y += spaceBetween;
                 }
-            
+                
+                if (!fDownloadBadge)
+                    fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
+                
                 //place badge and text
                 [fDownloadBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
                 [self badgeString: downloadRateString forRect: stringRect];

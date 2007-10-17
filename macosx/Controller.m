@@ -2829,8 +2829,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //enable show info
     if (action == @selector(showInfo:))
     {
-        NSString * title = [[fInfoController window] isVisible] ? NSLocalizedString(@"Hide Inspector",
-                            "View menu -> Inspector") : NSLocalizedString(@"Show Inspector", "View menu -> Inspector");
+        NSString * title = [[fInfoController window] isVisible] ? NSLocalizedString(@"Hide Inspector", "View menu -> Inspector")
+                            : NSLocalizedString(@"Show Inspector", "View menu -> Inspector");
         if (![[menuItem title] isEqualToString: title])
             [menuItem setTitle: title];
 

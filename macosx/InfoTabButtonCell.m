@@ -41,7 +41,7 @@
     
     //create selected back image
     [fSelectedImage release];
-    fSelectedImage = [[NSImage imageNamed: @"InfoTabBackAqua.tif"] copy];
+    fSelectedImage = [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy];
     
     //composite image to back images
     if (image)
