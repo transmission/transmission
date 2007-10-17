@@ -1177,9 +1177,9 @@ typedef enum
     Torrent * torrent = [fTorrents objectAtIndex: 0];
     
     int seeders = [torrent seeders], leechers = [torrent leechers], completed = [torrent completedFromTracker];
-    [fSeedersField setStringValue: seeders > 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
-    [fLeechersField setStringValue: leechers > 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
-    [fCompletedFromTrackerField setStringValue: completed > 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
+    [fSeedersField setStringValue: seeders >= 0 ? [NSString stringWithFormat: @"%d", seeders] : @""];
+    [fLeechersField setStringValue: leechers >= 0 ? [NSString stringWithFormat: @"%d", leechers] : @""];
+    [fCompletedFromTrackerField setStringValue: completed >= 0 ? [NSString stringWithFormat: @"%d", completed] : @""];
     
     BOOL active = [torrent isActive];
     
