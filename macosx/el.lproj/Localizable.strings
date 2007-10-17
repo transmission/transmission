@@ -120,7 +120,7 @@
 "\"%@\" cannot be used. The file will remain in its current location." = "Το \"%@\" δεν μπορεί να χρησιμοποιηθεί. Το αρχείο θα παραμείνει στην αρχική του θέση.";
 
 /* Folder cannot be used alert -> message */
-"\"%@\" cannot be used. The transfer will be paused." = Το \"%@\" δεν μπορεί να χρησιμοποιηθεί. Η μεταφορά θα περιέλθει σε παύση.";
+"\"%@\" cannot be used. The transfer will be paused." = "Το \"%@\" δεν μπορεί να χρησιμοποιηθεί. Η μεταφορά θα περιέλθει σε παύση.";
 
 /* Create torrent -> file already exists warning -> warning */
 "A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "Υπάρχει ήδη αρχείο με το όνομα \"%1$@\" στο \"%2$@\". Επιλέξτε άλλο όνομα, ή άλλη τοποθεσία για την δημιουργία του torrent.";
