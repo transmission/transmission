@@ -390,10 +390,9 @@ updateInterest( tr_peermsgs * msgs )
 
 #define MIN_CHOKE_PERIOD_SEC 10
 
-int
+void
 tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 {
-    int ret;
     const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
 
     assert( msgs != NULL );
@@ -403,7 +402,6 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
     if( msgs->info->chokeChangedAt > fibrillationTime )
     {
         dbgmsg( msgs, "Not changing choke to %d to avoid fibrillation", choke );
-        ret = FALSE;
     }
     else if( msgs->info->peerIsChoked != choke )
     {
@@ -428,10 +426,7 @@ tr_peerMsgsSetChoke( tr_peermsgs * msgs, int choke )
 
         protocolSendChoke( msgs, choke );
         msgs->info->chokeChangedAt = time( NULL );
-        ret = TRUE;
     }
-
-    return ret;
 }
 
 /**
