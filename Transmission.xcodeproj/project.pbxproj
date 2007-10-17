@@ -368,6 +368,13 @@
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A2041D520C9AC523000ACFFB /* Lock.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Lock.tiff; path = macosx/Images/Lock.tiff; sourceTree = "<group>"; };
+		A205E08E0CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/Creator.nib; sourceTree = "<group>"; };
+		A205E08F0CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = macosx/el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A205E0900CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A205E0910CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = macosx/el.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A205E0920CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A205E0930CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A205E0940CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -1279,6 +1286,7 @@
 				es,
 				fr,
 				it,
+				el,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1611,6 +1619,7 @@
 				A27476FF0CC38EE6003CC76D /* es */,
 				A2EA8E3C0CC3C9830081201C /* fr */,
 				A2EA8E540CC3DAB80081201C /* it */,
+				A205E08F0CC66BF5001CA81B /* el */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1622,6 +1631,7 @@
 				A27477020CC38EE6003CC76D /* es */,
 				A2EA8E3F0CC3C9830081201C /* fr */,
 				A2EA8E570CC3DAB80081201C /* it */,
+				A205E0920CC66BF5001CA81B /* el */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1633,6 +1643,7 @@
 				A27477000CC38EE6003CC76D /* es */,
 				A2EA8E3D0CC3C9830081201C /* fr */,
 				A2EA8E550CC3DAB80081201C /* it */,
+				A205E0900CC66BF5001CA81B /* el */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1644,6 +1655,7 @@
 				A27477030CC38EE6003CC76D /* es */,
 				A2EA8E400CC3C9830081201C /* fr */,
 				A2EA8E580CC3DAB80081201C /* it */,
+				A205E0930CC66BF5001CA81B /* el */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1655,6 +1667,7 @@
 				A27477010CC38EE6003CC76D /* es */,
 				A2EA8E3E0CC3C9830081201C /* fr */,
 				A2EA8E560CC3DAB80081201C /* it */,
+				A205E0910CC66BF5001CA81B /* el */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1666,6 +1679,7 @@
 				A27477040CC38EE6003CC76D /* es */,
 				A2EA8E410CC3C9830081201C /* fr */,
 				A2EA8E590CC3DAB80081201C /* it */,
+				A205E0940CC66BF5001CA81B /* el */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1677,6 +1691,7 @@
 				A27476FE0CC38EE6003CC76D /* es */,
 				A2EA8E3B0CC3C9830081201C /* fr */,
 				A2EA8E530CC3DAB80081201C /* it */,
+				A205E08E0CC66BF5001CA81B /* el */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";
