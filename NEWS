@@ -5,7 +5,6 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Ban peers that send too much bad data
  - Only report downloaded, verified good pieces in tracker `download' field
  - Improved compliance with BitTorrent spec
- - Multiscrape support
  - Significant rewrite of the libtransmission back-end
  - OS X:
    + Per-torrent action menu

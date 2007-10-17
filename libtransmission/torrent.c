@@ -146,8 +146,8 @@ tr_torrentGetSpeedLimit( const tr_torrent  * tor,
 static void
 onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
 {
-    tr_torrent * tor = (tr_torrent *) user_data;
-    tr_tracker_event_t * event = (tr_tracker_event_t *) vevent;
+    tr_torrent * tor = user_data;
+    tr_tracker_event * event = vevent;
 
     switch( event->messageType )
     {

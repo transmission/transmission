@@ -21,9 +21,11 @@
 ***  Locating a tracker
 **/
 
-struct tr_tracker * tr_trackerNew( tr_torrent * );
+typedef struct tr_tracker tr_tracker;
 
-void  tr_trackerFree ( struct tr_tracker * );
+tr_tracker * tr_trackerNew( const tr_torrent * );
+
+void  tr_trackerFree ( tr_tracker * );
 
 /**
 ***  Tracker Publish / Subscribe
@@ -53,7 +55,7 @@ typedef struct
     const uint8_t * peerCompact;
     int peerCount;
 }
-tr_tracker_event_t;
+tr_tracker_event;
 
 tr_publisher_tag  tr_trackerSubscribe       ( struct tr_tracker * tag,
                                               tr_delivery_func      func,

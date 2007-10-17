@@ -12,13 +12,12 @@
 
 #include <assert.h>
 #include <ctype.h> /* isalnum */
-#include <limits.h> /* INT_MAX */
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <string.h> /* strcmp, strchr */
-#include <sys/queue.h> /* for evhttp */
-#include <sys/types.h> /* for evhttp */
 
+#include <sys/queue.h> /* libevent needs this */
+#include <sys/types.h> /* libevent needs this */
 #include <event.h>
 #include <evhttp.h>
 
@@ -26,60 +25,49 @@
 #include "bencode.h"
 #include "completion.h"
 #include "net.h"
-#include "ptrarray.h"
 #include "publish.h"
 #include "shared.h"
 #include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
 
-#define MINUTES_TO_MSEC(N) ((N) * 60 * 1000)
+enum
+{
+    /* unless the tracker says otherwise, rescrape this frequently */
+    DEFAULT_SCRAPE_INTERVAL_SEC = (60 * 15),
 
-/* we follow uTorrent 1.8's lead of allowing a manual reannounce
- * every MAX( 60 seconds, min_interval ) */
-#define DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC (60)
+    /* unless the tracker says otherwise, this is the announce interval */
+    DEFAULT_ANNOUNCE_INTERVAL_SEC = (60 * 4),
 
-/* unless the tracker tells us otherwise, rescrape this frequently */
-#define DEFAULT_SCRAPE_INTERVAL_SEC (60*15)
+    /* unless the tracker says otherwise, this is the announce min_interval */
+    DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC = (60 * 2),
 
-/* unless the tracker tells us otherwise, this is the announce interval */
-#define DEFAULT_ANNOUNCE_INTERVAL_SEC (240)
+    /* this is how long we'll leave a request hanging before timeout */
+    TIMEOUT_INTERVAL_SEC = 45,
 
-/* unless the tracker tells us otherwise, this is the announce min_interval */
-#define DEFAULT_MIN_ANNOUNCE_INTERVAL_SEC (30)
+    /* this is how long we'll leave a 'stop' request hanging before timeout.
+       we wait less time for this so it doesn't slow down shutdowns */
+    STOP_TIMEOUT_INTERVAL_SEC = 5,
 
-/* this is how long we'll leave a request hanging before timeout */
-#define TIMEOUT_INTERVAL_SEC 40
-#define STOPPING_TIMEOUT_INTERVAL_SEC 8
+    /* the value of the 'numwant' argument passed in tracker requests. */
+    NUMWANT = 200,
 
-/* the value of the 'numwant' argument passed in tracker requests.
- * this should be big, but if it's *too* big trackers will ignore it */
-#define NUMWANT 256
-
-/* the length of the 'key' argument passed in tracker requests */
-#define TR_KEY_LEN 10
-
+    /* the length of the 'key' argument passed in tracker requests */
+    KEYLEN = 10
+};
 
 /**
 ***
 **/
 
-typedef struct
+struct tr_tracker
 {
     tr_handle * handle;
 
-    tr_ptrArray * torrents;
-    tr_ptrArray * scraping;
-    tr_ptrArray * scrapeQueue;
-
     /* these are set from the latest scrape or tracker response */
     int announceIntervalSec;
-    int minAnnounceIntervalSec;
+    int announceMinIntervalSec;
     int scrapeIntervalSec;
-
-    /* calculated when we get fewer scrapes
-       back than we asked for */
-    int multiscrapeMax;
 
     tr_tracker_info * redirect;
     tr_tracker_info * addresses;
@@ -87,22 +75,11 @@ typedef struct
     int addressCount;
     int * tierFronts;
 
-    char * primaryAddress;
-
     /* sent as the "key" argument in tracker requests
        to verify us if our IP address changes.
        This is immutable for the life of the tracker object. */
-    char key_param[TR_KEY_LEN+1];
+    char key_param[KEYLEN+1];
 
-    tr_timer * scrapeTimer;
-}
-Tracker;
-
-/* this is the Torrent struct, but since it's the pointer
-   passed around in the public API of this tracker module,
-   its *public* name is tr_tracker... wheee */
-typedef struct tr_tracker
-{
     tr_publisher_t * publisher;
 
     /* torrent hash string */
@@ -117,11 +94,10 @@ typedef struct tr_tracker
        was missed to ensure that we didn't think someone was cheating. */
     char peer_id[TR_ID_LEN + 1];
 
-    /* these are set from the latest scrape or tracker response...
-       -1 means 'unknown' */
+    /* these are set from the latest tracker response... -1 is 'unknown' */
     int timesDownloaded;
-    int seeders;
-    int leechers;
+    int seederCount;
+    int leecherCount;
     char * trackerID;
 
     /* the last tracker request we sent. (started, stopped, etc.)
@@ -131,33 +107,14 @@ typedef struct tr_tracker
 
     time_t manualAnnounceAllowedAt;
 
-    Tracker * tracker;
-
     tr_timer * scrapeTimer;
     tr_timer * reannounceTimer;
 
     unsigned int isRunning : 1;
-}
-Torrent;
-
-static int
-trackerCompare( const void * va, const void * vb )
-{
-    const Tracker * a = ( const Tracker * ) va;
-    const Tracker * b = ( const Tracker * ) vb;
-    return strcmp( a->primaryAddress, b->primaryAddress );
-}
-
-static int
-torrentCompare( const void * va, const void * vb )
-{
-    const Torrent * a = (const Torrent*) va;
-    const Torrent * b = (const Torrent*) vb;
-    return memcmp( a->hash, b->hash, SHA_DIGEST_LENGTH );
-}
+};
 
 /***
-****
+****  Connections that know how to clean up after themselves
 ***/
 
 static int
@@ -170,14 +127,17 @@ freeConnection( void * evcon )
 static void
 connectionClosedCB( struct evhttp_connection * evcon, void * handle )
 {
+    /* libevent references evcon right after calling this function,
+       so we can't free it yet... defer it to after this call chain
+       has played out */
     tr_timerNew( handle, freeConnection, evcon, 100 );
 }
 
 static struct evhttp_connection*
-getConnection( Tracker * tracker, const char * address, int port )
+getConnection( tr_tracker * t, const char * address, int port )
 {
     struct evhttp_connection * c = evhttp_connection_new( address, port );
-    evhttp_connection_set_closecb( c, connectionClosedCB, tracker->handle );
+    evhttp_connection_set_closecb( c, connectionClosedCB, t->handle );
     return c;
 }
 
@@ -185,157 +145,61 @@ getConnection( Tracker * tracker, const char * address, int port )
 ****  PUBLISH
 ***/
 
-static const tr_tracker_event_t emptyEvent = { 0, NULL, NULL, NULL, 0 };
+static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0 };
 
 static void
-publishMessage( Torrent * tor, const char * msg, int type )
+publishMessage( tr_tracker * t, const char * msg, int type )
 {
-    tr_tracker_event_t event = emptyEvent;
-    event.hash = tor->hash;
+    tr_tracker_event event = emptyEvent;
+    event.hash = t->hash;
     event.messageType = type;
     event.text = msg;
-    tr_publisherPublish( tor->publisher, tor, &event );
+    tr_publisherPublish( t->publisher, t, &event );
 }
 
 static void
-publishErrorClear( Torrent * tor )
+publishErrorClear( tr_tracker * t )
 {
-    publishMessage( tor, NULL, TR_TRACKER_ERROR_CLEAR );
+    publishMessage( t, NULL, TR_TRACKER_ERROR_CLEAR );
 }
 
 static void
-publishErrorMessage( Torrent * tor, const char * msg )
+publishErrorMessage( tr_tracker * t, const char * msg )
 {
-    publishMessage( tor, msg, TR_TRACKER_ERROR );
+    publishMessage( t, msg, TR_TRACKER_ERROR );
 }
 
 static void
-publishWarningMessage( Torrent * tor, const char * msg )
+publishWarning( tr_tracker * t, const char * msg )
 {
-    publishMessage( tor, msg, TR_TRACKER_WARNING );
+    publishMessage( t, msg, TR_TRACKER_WARNING );
 }
 
 static void
-publishNewPeers( Torrent * tor, int count, uint8_t * peers )
+publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
 {
-    tr_tracker_event_t event = emptyEvent;
-    event.hash = tor->hash;
+    tr_tracker_event event = emptyEvent;
+    event.hash = t->hash;
     event.messageType = TR_TRACKER_PEERS;
     event.peerCount = count;
     event.peerCompact = peers;
-    tr_inf( "Torrent \"%s\" got %d new peers", tor->name, count );
-    tr_publisherPublish( tor->publisher, tor, &event );
+    tr_inf( "Torrent \"%s\" got %d new peers", t->name, count );
+    tr_publisherPublish( t->publisher, t, &event );
 }
 
 /***
 ****  LIFE CYCLE
 ***/
 
-static tr_ptrArray *
-getTrackerLookupTable( void )
-{
-    static tr_ptrArray * myTrackers = NULL;
-    if( !myTrackers )
-         myTrackers = tr_ptrArrayNew( );
-    return myTrackers;
-}
-
 static void
 generateKeyParam( char * msg, int len )
 {
     int i;
     const char * pool = "abcdefghijklmnopqrstuvwxyz0123456789";
+    const int poolSize = strlen( pool );
     for( i=0; i<len; ++i )
-        *msg++ = pool[tr_rand(36)];
+        *msg++ = pool[tr_rand(poolSize)];
     *msg = '\0';
-}
-
-static int onTrackerScrapeNow( void* );
-
-static void
-tr_trackerScrapeSoon( Tracker * t )
-{
-    /* don't start more than one scrape at once for the same tracker... */
-    if( !tr_ptrArrayEmpty( t->scraping ) )
-        return;
-
-    if( !t->scrapeTimer )
-         t->scrapeTimer = tr_timerNew( t->handle, onTrackerScrapeNow, t, 5000 );
-}
-
-static Tracker*
-getExistingTracker( const char * primaryAddress )
-{
-    tr_ptrArray * trackers = getTrackerLookupTable( );
-    Tracker tmp;
-    assert( primaryAddress && *primaryAddress );
-    tmp.primaryAddress = (char*) primaryAddress;
-    return tr_ptrArrayFindSorted( trackers, &tmp, trackerCompare );
-}
-
-static Tracker*
-tr_trackerGet( const tr_torrent * tor )
-{
-    const tr_info * info = &tor->info;
-    Tracker * t = getExistingTracker( info->primaryAddress );
-
-    if( t == NULL ) /* no such tracker.... create one */
-    {
-        int i, j, sum, *iwalk;
-        tr_tracker_info * nwalk;
-        tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
-
-        t = tr_new0( Tracker, 1 );
-        t->handle = tor->handle;
-        t->primaryAddress = tr_strdup( info->primaryAddress );
-        t->scrapeIntervalSec       = DEFAULT_SCRAPE_INTERVAL_SEC;
-        t->announceIntervalSec     = DEFAULT_ANNOUNCE_INTERVAL_SEC;
-        t->minAnnounceIntervalSec  = DEFAULT_MIN_ANNOUNCE_INTERVAL_SEC;
-        t->multiscrapeMax = INT_MAX;
-        t->torrents    = tr_ptrArrayNew( );
-        t->scraping    = tr_ptrArrayNew( );
-        t->scrapeQueue = tr_ptrArrayNew( );
-        generateKeyParam( t->key_param, TR_KEY_LEN );
-
-        for( sum=i=0; i<info->trackerTiers; ++i )
-             sum += info->trackerList[i].count;
-        t->addresses = nwalk = tr_new0( tr_tracker_info, sum );
-        t->addressIndex = 0;
-        t->addressCount = sum;
-        t->tierFronts = iwalk = tr_new0( int, sum );
-
-        for( i=0; i<info->trackerTiers; ++i )
-        {
-            const int tierFront = nwalk - t->addresses;
-
-            for( j=0; j<info->trackerList[i].count; ++j )
-            {
-                const tr_tracker_info * src = &info->trackerList[i].list[j];
-                nwalk->address = tr_strdup( src->address );
-                nwalk->port = src->port;
-                nwalk->announce = tr_strdup( src->announce );
-                nwalk->scrape = tr_strdup( src->scrape );
-                ++nwalk;
-
-                *iwalk++ = tierFront;
-            }
-        }
-
-        assert( nwalk - t->addresses == sum );
-        assert( iwalk - t->tierFronts == sum );
-
-        tr_ptrArrayInsertSorted( getTrackerLookupTable( ), t, trackerCompare );
-    }
-
-    return t;
-}
-
-static Torrent *
-getExistingTorrent( Tracker * t, const uint8_t hash[SHA_DIGEST_LENGTH] )
-{
-    Torrent tmp;
-    memcpy( tmp.hash, hash, SHA_DIGEST_LENGTH );
-    return tr_ptrArrayFindSorted( t->torrents, &tmp, torrentCompare );
 }
 
 static void
@@ -350,79 +214,98 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
     *out = '\0';
 }
 
-static void
-onTorrentFreeNow( void * vtor )
+static void scrapeNow( tr_tracker * );
+
+tr_tracker *
+tr_trackerNew( const tr_torrent * torrent )
 {
-    Torrent * tor = (Torrent *) vtor;
-    Tracker * t = tor->tracker;
+    const tr_info * info = &torrent->info;
+    int i, j, sum, *iwalk;
+    tr_tracker_info * nwalk;
+    tr_tracker * t;
 
-    tr_ptrArrayRemoveSorted( t->torrents, tor, torrentCompare );
-    tr_ptrArrayRemoveSorted( t->scrapeQueue, tor, torrentCompare );
-    tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
+    tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
 
-    tr_timerFree( &tor->scrapeTimer );
-    tr_timerFree( &tor->reannounceTimer );
-    tr_publisherFree( &tor->publisher );
-    tr_free( tor->name );
-    tr_free( tor->trackerID );
-    tr_free( tor->lastRequest );
-    tr_free( tor );
+    t = tr_new0( tr_tracker, 1 );
+    t->handle = torrent->handle;
+    t->scrapeIntervalSec       = DEFAULT_SCRAPE_INTERVAL_SEC;
+    t->announceIntervalSec     = DEFAULT_ANNOUNCE_INTERVAL_SEC;
+    t->announceMinIntervalSec  = DEFAULT_ANNOUNCE_MIN_INTERVAL_SEC;
+    generateKeyParam( t->key_param, KEYLEN );
 
-    if( tr_ptrArrayEmpty( t->torrents ) ) /* last one.. free the tracker too */
+    t->publisher = tr_publisherNew( );
+    t->timesDownloaded = -1;
+    t->seederCount = -1;
+    t->leecherCount = -1;
+    t->manualAnnounceAllowedAt = ~(time_t)0;
+    t->name = tr_strdup( info->name );
+    memcpy( t->hash, info->hash, SHA_DIGEST_LENGTH );
+    escape( t->escaped, info->hash, SHA_DIGEST_LENGTH );
+
+    for( sum=i=0; i<info->trackerTiers; ++i )
+         sum += info->trackerList[i].count;
+    t->addresses = nwalk = tr_new0( tr_tracker_info, sum );
+    t->addressIndex = 0;
+    t->addressCount = sum;
+    t->tierFronts = iwalk = tr_new0( int, sum );
+
+    for( i=0; i<info->trackerTiers; ++i )
     {
-        int i;
-        tr_ptrArrayRemoveSorted( getTrackerLookupTable( ), t, trackerCompare );
+        const int tierFront = nwalk - t->addresses;
 
-        tr_ptrArrayFree( t->torrents, NULL );
-        tr_ptrArrayFree( t->scrapeQueue, NULL );
-        tr_ptrArrayFree( t->scraping, NULL );
+        for( j=0; j<info->trackerList[i].count; ++j )
+        {
+            const tr_tracker_info * src = &info->trackerList[i].list[j];
+            nwalk->address = tr_strdup( src->address );
+            nwalk->port = src->port;
+            nwalk->announce = tr_strdup( src->announce );
+            nwalk->scrape = tr_strdup( src->scrape );
+            ++nwalk;
 
-        for( i=0; i<t->addressCount; ++i )
-            tr_trackerInfoClear( &t->addresses[i] );
-
-        if( t->redirect ) {
-            tr_trackerInfoClear( t->redirect );
-            tr_free( t->redirect );
+            *iwalk++ = tierFront;
         }
-
-        tr_timerFree( &t->scrapeTimer );
-
-        tr_free( t->primaryAddress );
-        tr_free( t->addresses );
-        tr_free( t->tierFronts );
-        tr_free( t );
     }
+
+    assert( nwalk - t->addresses == sum );
+    assert( iwalk - t->tierFronts == sum );
+
+    scrapeNow( t );
+fprintf( stderr, "sizeof(tr_tracker) is %d\n", (int)sizeof(tr_tracker) );
+    return t;
+}
+
+static void
+onTrackerFreeNow( void * vt )
+{
+    int i;
+    tr_tracker * t = vt;
+
+    tr_timerFree( &t->scrapeTimer );
+    tr_timerFree( &t->reannounceTimer );
+    tr_publisherFree( &t->publisher );
+    tr_free( t->name );
+    tr_free( t->trackerID );
+    tr_free( t->lastRequest );
+
+    for( i=0; i<t->addressCount; ++i )
+        tr_trackerInfoClear( &t->addresses[i] );
+
+    if( t->redirect ) {
+        tr_trackerInfoClear( t->redirect );
+        tr_free( t->redirect );
+    }
+
+    tr_timerFree( &t->scrapeTimer );
+
+    tr_free( t->addresses );
+    tr_free( t->tierFronts );
+    tr_free( t );
 }
 
 void
-tr_trackerFree( Torrent * tor )
+tr_trackerFree( tr_tracker * t )
 {
-    tr_runInEventThread( tor->tracker->handle, onTorrentFreeNow, tor );
-}
-
-Torrent*
-tr_trackerNew( tr_torrent * torrent )
-{
-    Torrent * tor;
-    Tracker * t = tr_trackerGet( torrent );
-    assert( getExistingTorrent( t, torrent->info.hash ) == NULL );
-
-    /* create a new Torrent and queue it for scraping */
-    tor = tr_new0( Torrent, 1 );
-    tor->publisher = tr_publisherNew( );
-    tor->tracker = t;
-    /*tor->torrent = torrent;*/
-    tor->timesDownloaded = -1;
-    tor->seeders = -1;
-    tor->leechers = -1;
-    tor->manualAnnounceAllowedAt = ~0;
-    tor->name = tr_strdup( torrent->info.name );
-    memcpy( tor->hash, torrent->info.hash, SHA_DIGEST_LENGTH );
-    escape( tor->escaped, torrent->info.hash, SHA_DIGEST_LENGTH );
-    tr_ptrArrayInsertSorted( t->torrents, tor, torrentCompare );
-    tr_ptrArrayInsertSorted( t->scrapeQueue, tor, torrentCompare );
-    tr_trackerScrapeSoon( t );
-    return tor;
+    tr_runInEventThread( t->handle, onTrackerFreeNow, t );
 }
 
 /***
@@ -440,18 +323,19 @@ parseBencResponse( struct evhttp_request * req, benc_val_t * setme )
     for( i=0; ret && i<bodylen; ++i )
         if( !tr_bencLoad( body+i, bodylen-1, setme, NULL ) )
             ret = 0;
+
     return ret;
 }
 
-static char*
-updateAddresses( Tracker * t, const struct evhttp_request * req )
+static const char*
+updateAddresses( tr_tracker * t, const struct evhttp_request * req )
 {
-    char * ret = NULL;
+    const char * ret = NULL;
     int moveToNextAddress = FALSE;
 
     if( !req )
     {
-        ret = tr_strdup( "No response from tracker -- will keep trying." );
+        ret = "No response from tracker -- will keep trying.";
         tr_inf( ret );
 
         moveToNextAddress = TRUE;
@@ -495,7 +379,7 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
     }
     else 
     {
-        ret = tr_strdup( "No response from tracker -- will keep trying." );
+        ret = "No response from tracker -- will keep trying.";
         moveToNextAddress = TRUE;
     }
 
@@ -507,7 +391,7 @@ updateAddresses( Tracker * t, const struct evhttp_request * req )
 }
 
 static tr_tracker_info *
-getCurrentAddress( const Tracker * t )
+getCurrentAddress( const tr_tracker * t )
 {
     assert( t->addresses != NULL );
     assert( t->addressIndex >= 0 );
@@ -516,7 +400,7 @@ getCurrentAddress( const Tracker * t )
     return &t->addresses[t->addressIndex];
 }
 static int
-trackerSupportsScrape( const Tracker * t )
+trackerSupportsScrape( const tr_tracker * t )
 {
     const tr_tracker_info * info = getCurrentAddress( t );
 
@@ -527,11 +411,11 @@ trackerSupportsScrape( const Tracker * t )
 
 
 static void
-addCommonHeaders( const Tracker * t,
+addCommonHeaders( const tr_tracker * t,
                   struct evhttp_request * req )
 {
     char buf[1024];
-    tr_tracker_info * address = getCurrentAddress( t );
+    const tr_tracker_info * address = getCurrentAddress( t );
     snprintf( buf, sizeof(buf), "%s:%d", address->address, address->port );
     evhttp_add_header( req->output_headers, "Host", buf );
     evhttp_add_header( req->output_headers, "Connection", "close" );
@@ -551,18 +435,19 @@ struct torrent_hash
 };
 
 static struct torrent_hash*
-torrentHashNew( Torrent * tor )
+torrentHashNew( tr_tracker * t )
 {
     struct torrent_hash * data = tr_new( struct torrent_hash, 1 );
-    data->handle = tor->tracker->handle;
-    memcpy( data->hash, tor->hash, SHA_DIGEST_LENGTH );
+    data->handle = t->handle;
+    memcpy( data->hash, t->hash, SHA_DIGEST_LENGTH );
     return data;
 }
 
-tr_torrent*
-findTorrentFromHash( struct torrent_hash * data )
+tr_tracker *
+findTrackerFromHash( struct torrent_hash * data )
 {
-    return tr_torrentFindFromHash( data->handle, data->hash );
+    tr_torrent * torrent = tr_torrentFindFromHash( data->handle, data->hash );
+    return torrent ? torrent->tracker : NULL;
 }
 
 /***
@@ -572,45 +457,28 @@ findTorrentFromHash( struct torrent_hash * data )
 ***/
 
 static int
-onTorrentScrapeNow( void * vhash )
-{
-    tr_torrent * torrent = findTorrentFromHash( vhash );
-    tr_free( vhash );
-
-    if( torrent != NULL )
-    {
-        Torrent * tor = torrent->tracker;
-        if( trackerSupportsScrape( tor->tracker ) )
-        {
-            if( tr_ptrArrayFindSorted( tor->tracker->scrapeQueue, tor, torrentCompare) == NULL )
-                tr_ptrArrayInsertSorted( tor->tracker->scrapeQueue, tor, torrentCompare );
-            tr_trackerScrapeSoon( tor->tracker );
-        }
-        tor->scrapeTimer = NULL;
-    }
-    return FALSE;
-}
+onScrapeNow( void * vt );
 
 static void
-onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
+onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
-    char * errmsg;
-    Tracker * t;
+    const char * warning;
+    time_t nextScrapeSec = 60;
+    tr_tracker * t;
 
-    tr_inf( "Got scrape response from  '%s': %s",
-            primaryAddress,
-            ( ( req && req->response_code_line ) ? req->response_code_line : "(null)") );
-
-    t = getExistingTracker( primaryAddress );
-    tr_free( primaryAddress );
-    if( t == NULL ) /* tracker has been closed... */
+    t = findTrackerFromHash( vhash );
+    tr_free( vhash );
+    if( t == NULL ) /* tracker's been closed... */
         return;
+
+    tr_inf( "Got scrape response for  '%s': %s",
+            t->name,
+            ( ( req && req->response_code_line ) ? req->response_code_line
+                                                 : "(null)") );
 
     if( req && ( req->response_code == HTTP_OK ) )
     {
-        int numResponses = 0;
         benc_val_t benc, *files;
-        const int n_scraping = tr_ptrArraySize( t->scraping );
         const int bencLoaded = !parseBencResponse( req, &benc );
 
         if( bencLoaded
@@ -621,140 +489,74 @@ onScrapeResponse( struct evhttp_request * req, void * primaryAddress )
             for( i=0; i<files->val.l.count; i+=2 )
             {
                 const uint8_t* hash =
-                    (const uint8_t*) files->val.l.vals[i].val.s.s;
+                        (const uint8_t*) files->val.l.vals[i].val.s.s;
                 benc_val_t *tmp, *flags;
                 benc_val_t *tordict = &files->val.l.vals[i+1];
-                Torrent * tor = getExistingTorrent( t, hash );
-                ++numResponses;
-                   
-                if( !tor )
+                if( memcmp( t->hash, hash, SHA_DIGEST_LENGTH ) )
                     continue;
 
-                publishErrorClear( tor );
+                publishErrorClear( t );
 
                 if(( tmp = tr_bencDictFind( tordict, "complete" )))
-                    tor->seeders = tmp->val.i;
+                    t->seederCount = tmp->val.i;
 
                 if(( tmp = tr_bencDictFind( tordict, "incomplete" )))
-                    tor->leechers = tmp->val.i;
+                    t->leecherCount = tmp->val.i;
 
                 if(( tmp = tr_bencDictFind( tordict, "downloaded" )))
-                    tor->timesDownloaded = tmp->val.i;
+                    t->timesDownloaded = tmp->val.i;
 
                 if(( flags = tr_bencDictFind( tordict, "flags" )))
                     if(( tmp = tr_bencDictFind( flags, "min_request_interval")))
                         t->scrapeIntervalSec = tmp->val.i;
 
-                tr_ptrArrayRemoveSorted( t->scraping, tor, torrentCompare );
-
-                tr_timerFree( &tor->scrapeTimer );
-                tor->scrapeTimer = tr_timerNew( t->handle, onTorrentScrapeNow, torrentHashNew(tor), t->scrapeIntervalSec*1000 );
                 tr_dbg( "Torrent '%s' scrape successful."
                         "  Rescraping in %d seconds",
-                        tor->name, t->scrapeIntervalSec );
-            }
+                        t->name, t->scrapeIntervalSec );
 
-            if( !files->val.l.count )
-            {
-                /* got an empty files dictionary!  This probably means the
-                   torrents we're scraping have expired from the tracker,
-                   so make sure they're stopped.  It also means any previous
-                   changes to multiscrapeMax are suspect, so reset that. */
-
-                int n;
-                Torrent ** torrents = (Torrent**)
-                    tr_ptrArrayPeek( t->scraping, &n );
-                for( i=0; i<n; ++i )
-                    tr_trackerStop( torrents[i] );
-                tr_ptrArrayClear( t->scraping );
-
-                t->multiscrapeMax = INT_MAX;
+                nextScrapeSec = t->scrapeIntervalSec;
             }
         }
 
         if( bencLoaded )
             tr_bencFree( &benc );
-
-        /* if the tracker gave us back fewer torrents than we
-           thought we should get, maybe our multiscrape string
-           is too big... limit it based on how many we got back */
-        if( ( 0 < numResponses ) && ( numResponses < n_scraping ) )
-            t->multiscrapeMax = numResponses;
     }
 
-    if (( errmsg = updateAddresses( t, req ) ))
-        tr_err( errmsg );
-
-    if( !tr_ptrArrayEmpty( t->scraping ) )
-    {
-        int i, n;
-        Torrent ** torrents =
-            (Torrent**) tr_ptrArrayPeek( t->scraping, &n );
-        for( i=0; i<n; ++i ) {
-            if( errmsg != NULL )
-                publishErrorMessage( torrents[i], errmsg );
-            onTorrentScrapeNow( torrentHashNew(torrents[i]) );
-        }
-        tr_ptrArrayClear( t->scraping );
+    if (( warning = updateAddresses( t, req ) )) {
+        tr_err( warning );
+        publishWarning( t, warning );
     }
-    tr_free( errmsg );
 
-    if( !tr_ptrArrayEmpty( t->scrapeQueue ) )
-        tr_trackerScrapeSoon( t );
+    tr_timerFree( &t->scrapeTimer );
+
+    t->scrapeTimer = tr_timerNew( t->handle,
+                                  onScrapeNow, t,
+                                  nextScrapeSec*1000 );
 }
 
 static int
-onTrackerScrapeNow( void * vt )
+onScrapeNow( void * vt )
 {
-    Tracker * t = (Tracker*) vt;
+    tr_tracker * t = vt;
     const tr_tracker_info * address = getCurrentAddress( t );
 
-    assert( tr_ptrArrayEmpty( t->scraping ) );
-
-    if( trackerSupportsScrape( t ) && !tr_ptrArrayEmpty( t->scrapeQueue ) )
+    if( trackerSupportsScrape( t ) )
     {
-        int i, n, len, addr_len, ask_n;
-        char *march, *uri;
-        Torrent ** torrents =
-            (Torrent**) tr_ptrArrayPeek( t->scrapeQueue, &n );
+        char * uri;
         struct evhttp_connection * evcon;
         struct evhttp_request *req;
+        struct evbuffer * buf = evbuffer_new( );
 
-        ask_n = n;
-        if( ask_n > t->multiscrapeMax )
-            ask_n = t->multiscrapeMax;
+        evbuffer_add_printf( buf, "%s?info_hash=%s", address->scrape, t->escaped );
+        uri = tr_strdup( (char*) EVBUFFER_DATA( buf ) );
+        evbuffer_free( buf );
 
-        /**
-        ***  Build the scrape request
-        **/
-
-        len = addr_len = strlen( address->scrape );
-        for( i=0; i<ask_n; ++i )
-            len += strlen("&info_hash=") + strlen(torrents[i]->escaped);
-        ++len; /* for nul */
-        uri = march = tr_new( char, len );
-        memcpy( march, address->scrape, addr_len ); march += addr_len;
-        for( i=0; i<ask_n; ++i ) {
-            const int elen = strlen( torrents[i]->escaped );
-            *march++ = i?'&':'?';
-            memcpy( march, "info_hash=", 10); march += 10;
-            memcpy( march, torrents[i]->escaped, elen ); march += elen;
-        }
-        *march++ = '\0';
-        assert( march - uri == len );
-
-        /* move the first n_ask torrents from scrapeQueue to scraping */
-        for( i=0; i<ask_n; ++i )
-            tr_ptrArrayInsertSorted( t->scraping, torrents[i], torrentCompare );
-        tr_ptrArrayErase( t->scrapeQueue, 0, ask_n );
-
-        /* ping the tracker */
         tr_inf( "Sending scrape to tracker %s:%d: %s",
                 address->address, address->port, uri );
+
         evcon = getConnection( t, address->address, address->port );
         evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
-        req = evhttp_request_new( onScrapeResponse, tr_strdup(t->primaryAddress) );
-        assert( req );
+        req = evhttp_request_new( onScrapeResponse, torrentHashNew( t ) );
         addCommonHeaders( t, req );
         tr_evhttp_make_request( t->handle, evcon, req, EVHTTP_REQ_GET, uri );
     }
@@ -763,70 +565,74 @@ onTrackerScrapeNow( void * vt )
     return FALSE;
 }
 
+static void
+scrapeNow( tr_tracker * t )
+{
+    onScrapeNow( t );
+}
+
 /***
 ****
 ****  TRACKER REQUESTS
 ****
 ***/
 
-static int
-torrentIsRunning( const Torrent * tor )
-{
-    return tor && tor->isRunning;
-}
-
 static char*
-buildTrackerRequestURI( const Torrent     * tor,
+buildTrackerRequestURI( const tr_tracker  * t,
                         const tr_torrent  * torrent,
                         const char        * eventName )
 {
     const int isStopping = !strcmp( eventName, "stopped" );
     const int numwant = isStopping ? 0 : NUMWANT;
-    char buf[4096];
+    struct evbuffer * buf = evbuffer_new( );
+    char * ret;
 
-    snprintf( buf, sizeof(buf), "%s"
-                                "?info_hash=%s"
-                                "&peer_id=%s"
-                                "&port=%d"
-                                "&uploaded=%"PRIu64
-                                "&downloaded=%"PRIu64
-                                "&corrupt=%"PRIu64
-                                "&left=%"PRIu64
-                                "&compact=1"
-                                "&numwant=%d"
-                                "&key=%s"
-                                "%s%s"
-                                "%s%s",
-        getCurrentAddress(tor->tracker)->announce,
-        tor->escaped,
-        tor->peer_id,
-        tr_sharedGetPublicPort( torrent->handle->shared ),
+    evbuffer_add_printf( buf, "%s"
+                              "?info_hash=%s"
+                              "&peer_id=%s"
+                              "&port=%d"
+                              "&uploaded=%"PRIu64
+                              "&downloaded=%"PRIu64
+                              "&corrupt=%"PRIu64
+                              "&left=%"PRIu64
+                              "&compact=1"
+                              "&numwant=%d"
+                              "&key=%s"
+                              "%s%s"
+                              "%s%s",
+        getCurrentAddress(t)->announce,
+        t->escaped,
+        t->peer_id,
+        tr_sharedGetPublicPort( t->handle->shared ),
         torrent->uploadedCur,
         torrent->downloadedCur,
         torrent->corruptCur,
         tr_cpLeftUntilComplete( torrent->completion ),
         numwant,
-        tor->tracker->key_param,
+        t->key_param,
         ( ( eventName && *eventName ) ? "&event=" : "" ),
         ( ( eventName && *eventName ) ? eventName : "" ),
-        ( ( tor->trackerID && *tor->trackerID ) ? "&trackerid=" : "" ),
-        ( ( tor->trackerID && *tor->trackerID ) ? tor->trackerID : "" ) );
+        ( ( t->trackerID && *t->trackerID ) ? "&trackerid=" : "" ),
+        ( ( t->trackerID && *t->trackerID ) ? t->trackerID : "" ) );
 
-    return tr_strdup( buf );
+    ret = tr_strdup( (char*) EVBUFFER_DATA( buf ) );
+    evbuffer_free( buf );
+    return ret;
 }
 
 /* Convert to compact form */
 static uint8_t *
-parseOldPeers( benc_val_t * bePeers, int * peerCount )
+parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
 {
-    int i, count;
-    uint8_t * compact;
+    int i;
+    uint8_t *compact, *walk;
+    const int peerCount = bePeers->val.l.count;
 
     assert( bePeers->type == TYPE_LIST );
 
-    compact = tr_new( uint8_t, 6 * bePeers->val.l.count );
+    compact = tr_new( uint8_t, peerCount*6 );
 
-    for( i=count=0; i<bePeers->val.l.count; ++i )
+    for( i=0, walk=compact; i<peerCount; ++i )
     {
         struct in_addr addr;
         tr_port_t port;
@@ -837,38 +643,20 @@ parseOldPeers( benc_val_t * bePeers, int * peerCount )
         if( !val || val->type!=TYPE_STR || tr_netResolve(val->val.s.s, &addr) )
             continue;
 
-        memcpy( &compact[6 * count], &addr, 4 );
+        memcpy( walk, &addr, 4 );
+        walk += 4;
 
         val = tr_bencDictFind( peer, "port" );
         if( !val || val->type!=TYPE_INT || val->val.i<0 || val->val.i>0xffff )
             continue;
 
         port = htons( val->val.i );
-        memcpy( &compact[6 * count + 4], &port, 2 );
-        ++count;
+        memcpy( walk, &port, 2 );
+        walk += 2;
     }
 
-    *peerCount = count;
+    *setmePeerCount = peerCount;
     return compact;
-}
-
-/* handle braindead trackers whose minimums is higher
-   than the interval. */
-static void
-setAnnounceInterval( Tracker  * t,
-                     int        minimum,
-                     int        interval )
-{
-    assert( t != NULL );
-
-    if( minimum > 0 )
-        t->minAnnounceIntervalSec = minimum;
-
-    if( interval > 0 )
-        t->announceIntervalSec = interval;
-
-    if( t->announceIntervalSec < t->minAnnounceIntervalSec )
-        t->announceIntervalSec = t->minAnnounceIntervalSec;
 }
 
 static int onReannounceNow( void * vtor );
@@ -878,33 +666,19 @@ onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
 {
 }
 
-static int
-getManualReannounceIntervalSecs( const Tracker * tracker )
-{
-    return tracker
-        ? MAX( tracker->minAnnounceIntervalSec, DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC )
-        : DEFAULT_MANUAL_ANNOUNCE_INTERVAL_SEC;
-}
-
 static void
 onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 {
-    char * errmsg;
-    Torrent * tor;
-    int isStopped;
-    int reannounceIntervalSecs;
-    tr_torrent * t;
+    const char * warning;
+    tr_tracker * t;
+    int err = 0;
 
-    t = findTorrentFromHash( torrent_hash );
-    tr_free( torrent_hash );
-    if( t == NULL ) /* torrent has been closed */
+    t = findTrackerFromHash( torrent_hash );
+    if( t == NULL ) /* tracker has been closed */
         return;
 
-    tor = t->tracker;
-    isStopped = !torrentIsRunning( tor );
-
     tr_inf( "Torrent \"%s\" tracker response: %s",
-            tor->name,
+            t->name,
             ( req ? req->response_code_line : "(null)") );
 
     if( req && ( req->response_code == HTTP_OK ) )
@@ -912,32 +686,32 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         benc_val_t benc;
         const int bencLoaded = !parseBencResponse( req, &benc );
 
-        publishErrorClear( tor );
+        publishErrorClear( t );
 
         if( bencLoaded && benc.type==TYPE_DICT )
         {
             benc_val_t * tmp;
 
             if(( tmp = tr_bencDictFind( &benc, "failure reason" )))
-                publishErrorMessage( tor, tmp->val.s.s );
+                publishErrorMessage( t, tmp->val.s.s );
 
             if(( tmp = tr_bencDictFind( &benc, "warning message" )))
-                publishWarningMessage( tor, tmp->val.s.s );
+                publishWarning( t, tmp->val.s.s );
 
             if(( tmp = tr_bencDictFind( &benc, "interval" )))
-                setAnnounceInterval( tor->tracker, -1, tmp->val.i * 1000 );
+                t->announceIntervalSec = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "min interval" )))
-                setAnnounceInterval( tor->tracker, tmp->val.i * 1000, -1 );
+                t->announceMinIntervalSec = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "tracker id" )))
-                tor->trackerID = tr_strndup( tmp->val.s.s, tmp->val.s.i );
+                t->trackerID = tr_strndup( tmp->val.s.s, tmp->val.s.i );
 
             if(( tmp = tr_bencDictFind( &benc, "complete" )))
-                tor->seeders = tmp->val.i;
+                t->seederCount = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "incomplete" )))
-                tor->leechers = tmp->val.i;
+                t->leecherCount = tmp->val.i;
 
             if(( tmp = tr_bencDictFind( &benc, "peers" )))
             {
@@ -959,55 +733,56 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
                     }
                 }
 
-                publishNewPeers( tor, peerCount, peerCompact );
+                publishNewPeers( t, peerCount, peerCompact );
                 tr_free( peerCompact );
             }
         }
-
-        reannounceIntervalSecs = isStopped
-            ? -1
-            : tor->tracker->announceIntervalSec;
 
         if( bencLoaded )
             tr_bencFree( &benc );
     }
     else
     {
-        tr_inf( "Bad response from tracker '%s' on request '%s' "
-                "for torrent '%s'... trying again in 30 seconds",
-                tor->tracker->primaryAddress,
-                tor->lastRequest,
-                tor->name );
+        tr_inf( "Bad response for torrent '%s' on request '%s' "
+                "... trying again in 30 seconds",
+                t->name, t->lastRequest );
 
-        reannounceIntervalSecs = 30;
+        err = 1;
     }
 
-    if (( errmsg = updateAddresses( tor->tracker, req ) )) {
-        publishErrorMessage( tor, errmsg );
-        tr_err( errmsg );
-        tr_free( errmsg );
+    if (( warning = updateAddresses( t, req ) )) {
+        publishWarning( t, warning );
+        tr_err( warning );
     }
 
-    if( !isStopped && reannounceIntervalSecs>0 ) {
+    /* set reannounce times */
+    tr_timerFree( &t->reannounceTimer );
+    t->reannounceTimer = NULL;
+    t->manualAnnounceAllowedAt = ~(time_t)0;
+    if( t->isRunning )
+    {
         tr_dbg( "torrent '%s' reannouncing in %d seconds",
-                tor->name, (reannounceIntervalSecs) );
-        tr_timerFree( &tor->reannounceTimer );
-        tor->reannounceTimer = tr_timerNew( tor->tracker->handle, onReannounceNow, tor, reannounceIntervalSecs*1000 );
-        tor->manualAnnounceAllowedAt = time(NULL) + getManualReannounceIntervalSecs( tor->tracker );
+                t->name, t->announceIntervalSec );
+
+        t->reannounceTimer = tr_timerNew( t->handle,
+                                          onReannounceNow, t,
+                                          t->announceIntervalSec * 1000 );
+
+        t->manualAnnounceAllowedAt = time(NULL) + t->announceMinIntervalSec;
     }
 }
 
 static int
 sendTrackerRequest( void * vt, const char * eventName )
 {
-    Torrent * t = (Torrent *) vt;
+    tr_tracker * t = vt;
     const int isStopping = eventName && !strcmp( eventName, "stopped" );
-    const tr_tracker_info * address = getCurrentAddress( t->tracker );
+    const tr_tracker_info * address = getCurrentAddress( t );
     char * uri;
     struct evhttp_connection * evcon;
     const tr_torrent * tor;
 
-    tor = tr_torrentFindFromHash( t->tracker->handle, t->hash );
+    tor = tr_torrentFindFromHash( t->handle, t->hash );
     if( tor == NULL )
         return FALSE;    
 
@@ -1022,35 +797,35 @@ sendTrackerRequest( void * vt, const char * eventName )
     /* kill any pending requests */
     tr_timerFree( &t->reannounceTimer );
 
-    evcon = getConnection( t->tracker, address->address, address->port );
+    evcon = getConnection( t, address->address, address->port );
     if ( !evcon ) {
         tr_err( "Can't make a connection to %s:%d", address->address, address->port );
         tr_free( uri );
     } else {
-        struct evhttp_request * httpReq;
+        struct evhttp_request * req;
         tr_free( t->lastRequest );
         t->lastRequest = tr_strdup( eventName );
         if( isStopping ) {
-            evhttp_connection_set_timeout( evcon, STOPPING_TIMEOUT_INTERVAL_SEC );
-            httpReq = evhttp_request_new( onStoppedResponse, t->tracker->handle );
+            evhttp_connection_set_timeout( evcon, STOP_TIMEOUT_INTERVAL_SEC );
+            req = evhttp_request_new( onStoppedResponse, t->handle );
         } else {
             evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
-            httpReq = evhttp_request_new( onTrackerResponse, torrentHashNew(t) );
+            req = evhttp_request_new( onTrackerResponse, torrentHashNew(t) );
         }
-        addCommonHeaders( t->tracker, httpReq );
-        tr_evhttp_make_request( t->tracker->handle, evcon,
-                                httpReq, EVHTTP_REQ_GET, uri );
+        addCommonHeaders( t, req );
+        tr_evhttp_make_request( t->handle, evcon,
+                                req, EVHTTP_REQ_GET, uri );
     }
 
     return FALSE;
 }
 
 static int
-onReannounceNow( void * vtor )
+onReannounceNow( void * vt )
 {
-    Torrent * tor = (Torrent *) vtor;
-    sendTrackerRequest( tor, "" );
-    tor->reannounceTimer = NULL;
+    tr_tracker * t = vt;
+    sendTrackerRequest( t, "" );
+    t->reannounceTimer = NULL;
     return FALSE;
 }
 
@@ -1059,88 +834,86 @@ onReannounceNow( void * vtor )
 ***/
 
 tr_publisher_tag
-tr_trackerSubscribe( Torrent             * tor,
+tr_trackerSubscribe( tr_tracker          * t,
                      tr_delivery_func      func,
                      void                * user_data )
 {
-    return tr_publisherSubscribe( tor->publisher, func, user_data );
+    return tr_publisherSubscribe( t->publisher, func, user_data );
 }
 
 void
-tr_trackerUnsubscribe( Torrent           * tor,
+tr_trackerUnsubscribe( tr_tracker        * t,
                        tr_publisher_tag    tag )
 {
-    tr_publisherUnsubscribe( tor->publisher, tag );
+    tr_publisherUnsubscribe( t->publisher, tag );
 }
 
 const tr_tracker_info *
-tr_trackerGetAddress( const Torrent * tor )
+tr_trackerGetAddress( const tr_tracker   * t )
 {
-    return getCurrentAddress( tor->tracker );
+    return getCurrentAddress( t );
 }
 
 int
-tr_trackerCanManualAnnounce ( const Torrent * tor )
+tr_trackerCanManualAnnounce ( const tr_tracker * t)
 {
-    /* return true if this torrent's currently running
-       and it's been long enough since the last announce */
-    return ( torrentIsRunning( tor ) )
-        && ( time(NULL) >= tor->manualAnnounceAllowedAt );
+    return t->isRunning
+            && ( time(NULL) >= t->manualAnnounceAllowedAt );
 }
 
 void
-tr_trackerGetCounts( const Torrent       * tor,
-                     int                 * setme_completedCount,
-                     int                 * setme_leecherCount,
-                     int                 * setme_seederCount )
+tr_trackerGetCounts( const tr_tracker  * t,
+                     int               * setme_completedCount,
+                     int               * setme_leecherCount,
+                     int               * setme_seederCount )
 {
     if( setme_completedCount )
-       *setme_completedCount = tor->timesDownloaded;
+       *setme_completedCount = t->timesDownloaded;
 
     if( setme_leecherCount )
-       *setme_leecherCount = tor->leechers;
+       *setme_leecherCount = t->leecherCount;
 
     if( setme_seederCount )
-       *setme_seederCount = tor->seeders;
+       *setme_seederCount = t->seederCount;
 }
 
 void
-tr_trackerStart( Torrent * tor )
+tr_trackerStart( tr_tracker * t )
 {
-    tr_peerIdNew( tor->peer_id, sizeof(tor->peer_id) );
+    tr_peerIdNew( t->peer_id, sizeof(t->peer_id) );
 
-    if( !tor->reannounceTimer && !tor->isRunning )
+    if( !t->reannounceTimer && !t->isRunning )
     {
-        tor->isRunning = 1;
-        sendTrackerRequest( tor, "started" );
+        t->isRunning = 1;
+        sendTrackerRequest( t, "started" );
     }
 }
 
 void
-tr_trackerReannounce( Torrent * tor )
+tr_trackerReannounce( tr_tracker * t )
 {
-    sendTrackerRequest( tor, "started" );
+    sendTrackerRequest( t, "started" );
 }
 
 void
-tr_trackerCompleted( Torrent * tor )
+tr_trackerCompleted( tr_tracker * t )
 {
-    sendTrackerRequest( tor, "completed" );
+    sendTrackerRequest( t, "completed" );
 }
 
 void
-tr_trackerStop( Torrent * tor )
+tr_trackerStop( tr_tracker * t )
 {
-    if( tor->isRunning )
+    if( t->isRunning )
     {
-        tor->isRunning = 0;
-        sendTrackerRequest( tor, "stopped" );
+        t->isRunning = 0;
+        sendTrackerRequest( t, "stopped" );
     }
 }
 
 void
-tr_trackerChangeMyPort( Torrent * tor )
+tr_trackerChangeMyPort( tr_tracker * t )
 {
-    if( torrentIsRunning( tor ) )
-        tr_trackerReannounce( tor );
+    if( t->isRunning )
+        tr_trackerReannounce( t );
 }
