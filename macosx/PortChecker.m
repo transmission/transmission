@@ -121,6 +121,7 @@
                 [self callBackWithStatus: PORT_STATUS_ERROR];
             }
         }
+        [shieldsUpProbe release];
     }
     else
     {
