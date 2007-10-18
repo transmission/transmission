@@ -806,8 +806,8 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 
     if( 200<=responseCode && responseCode<=299 )
     {
-        dbgmsg( t, "request succeeded. reannouncing in %d seconds", t->announceIntervalSec );
-
+        dbgmsg( t, "request succeeded. reannouncing in %d seconds",
+                   t->announceIntervalSec );
         t->manualAnnounceAllowedAt = time(NULL)
                                    + t->announceMinIntervalSec;
         t->reannounceTimer = tr_timerNew( t->handle,
@@ -829,7 +829,8 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         /* The request could not be understood by the server due to
          * malformed syntax. The client SHOULD NOT repeat the
          * request without modifications. */
-        publishErrorMessage( t, req->response_code_line );
+        if( req && req->response_code_line )
+            publishErrorMessage( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceTimer = NULL;
     }
@@ -841,7 +842,8 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
          * cases in which the server is aware that it has erred or is
          * incapable of performing the request.  So we pause a bit and
          * try again. */
-        publishWarning( t, req->response_code_line );
+        if( req && req->response_code_line )
+            publishWarning( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceTimer = tr_timerNew( t->handle, onRetry, t, 15 * 1000 );
     }
@@ -850,7 +852,8 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         dbgmsg( t, "unhandled condition... retrying in 120 seconds." );
 
         /* WTF did we get?? */
-        publishErrorMessage( t, req->response_code_line );
+        if( req && req->response_code_line )
+            publishErrorMessage( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceTimer = tr_timerNew( t->handle, onRetry, t, 120 * 1000 );
     }
