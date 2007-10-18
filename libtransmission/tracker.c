@@ -299,7 +299,6 @@ tr_trackerNew( const tr_torrent * torrent )
     assert( iwalk - t->tierFronts == sum );
 
     scrapeNow( t );
-fprintf( stderr, "sizeof(tr_tracker) is %d\n", (int)sizeof(tr_tracker) );
     return t;
 }
 
