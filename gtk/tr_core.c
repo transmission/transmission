@@ -220,13 +220,13 @@ compareProgress( GtkTreeModel   * model,
                                   MC_UP, &uploadedEverB,
                                   -1 );
 
-    ia = (int)( 100.0 * percentDoneA );
-    ib = (int)( 100.0 * percentDoneB );
+    ia = (int)( rateUpA + rateDownA );
+    ib = (int)( rateUpB + rateDownB );
     if( ia != ib )
         return ia - ib;
 
-    ia = (int)( rateUpA + rateDownA );
-    ib = (int)( rateUpB + rateDownB );
+    ia = (int)( 100.0 * percentDoneA );
+    ib = (int)( 100.0 * percentDoneB );
     if( ia != ib )
         return ia - ib;
 
