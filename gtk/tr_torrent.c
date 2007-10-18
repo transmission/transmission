@@ -49,6 +49,7 @@ tr_torrent_init(GTypeInstance *instance, gpointer g_class UNUSED )
   self->delfile = NULL;
   self->severed = FALSE;
   self->disposed = FALSE;
+  self->seeding_cap = 2.0;
 }
 
 static void
