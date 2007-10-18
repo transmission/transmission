@@ -315,16 +315,18 @@ onTrackerFreeNow( void * vt )
     tr_free( t->trackerID );
     tr_free( t->lastRequest );
 
+    /* addresses... */
     for( i=0; i<t->addressCount; ++i )
         tr_trackerInfoClear( &t->addresses[i] );
+    tr_free( t->addresses );
+    tr_free( t->tierFronts );
 
+    /* redirect... */
     if( t->redirect ) {
         tr_trackerInfoClear( t->redirect );
         tr_free( t->redirect );
     }
 
-    tr_free( t->addresses );
-    tr_free( t->tierFronts );
     tr_free( t );
 }
 
@@ -877,6 +879,7 @@ sendTrackerRequest( void * vt, const char * eventName )
             uri );
 
     /* kill any pending requests */
+    dbgmsg( t, "clearing announce timer" );
     tr_timerFree( &t->reannounceTimer );
 
     evcon = getConnection( t, address->address, address->port );
@@ -908,7 +911,9 @@ static int
 onReannounce( void * vt )
 {
     tr_tracker * t = vt;
+    dbgmsg( t, "onReannounce" );
     sendTrackerRequest( t, "" );
+    dbgmsg( t, "onReannounce setting announceTimer to NULL" );
     t->reannounceTimer = NULL;
     return FALSE;
 }
@@ -917,7 +922,9 @@ static int
 onRetry( void * vt )
 {
     tr_tracker * t = vt;
+    dbgmsg( t, "onRetry" );
     sendTrackerRequest( t, t->lastRequest );
+    dbgmsg( t, "onRetry setting announceTimer to NULL" );
     t->reannounceTimer = NULL;
     return FALSE;
 }

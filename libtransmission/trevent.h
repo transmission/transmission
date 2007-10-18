@@ -12,7 +12,8 @@
 
 #ifndef TR_EVENT_H
 
-#include <stddef.h> /* for size_t */
+#include <stddef.h> /* size_t */
+#include <inttypes.h> /* uint64_t */
 
 /**
 **/
@@ -61,7 +62,7 @@ typedef struct tr_timer  tr_timer;
 tr_timer* tr_timerNew( struct tr_handle  * handle,
                        int                 func( void * user_data ),
                        void              * user_data,
-                       int                 timeout_milliseconds );
+                       uint64_t            timeout_milliseconds );
 
 /**
  * Frees a timer and sets the timer pointer to NULL.

@@ -397,10 +397,10 @@ timevalSec ( int seconds )
 }
 
 struct timeval
-timevalMsec ( int milliseconds )
+timevalMsec( uint64_t milliseconds )
 {
     struct timeval ret;
-    const unsigned long microseconds = milliseconds * 1000;
+    const uint64_t microseconds = milliseconds * 1000;
     ret.tv_sec  = microseconds / 1000000;
     ret.tv_usec = microseconds % 1000000;
     return ret;

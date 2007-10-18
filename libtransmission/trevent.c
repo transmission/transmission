@@ -381,7 +381,7 @@ tr_timer*
 tr_timerNew( struct tr_handle * handle,
              timer_func         func,
              void             * user_data,
-             int                timeout_milliseconds )
+             uint64_t           timeout_milliseconds )
 {
     tr_timer * timer = tr_new0( tr_timer, 1 );
     timer->tv = timevalMsec( timeout_milliseconds );

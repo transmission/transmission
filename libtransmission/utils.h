@@ -80,11 +80,11 @@ int tr_concat( char ** buf, int * used, int * max,
 
 /* creates a filename from a series of elements using the
    correct separator for filenames. */
-void tr_buildPath ( char* buf, size_t buflen,
-                    const char * first_element, ... );
+void tr_buildPath( char* buf, size_t buflen,
+                   const char * first_element, ... );
 
-struct timeval timevalSec ( int seconds );
-struct timeval timevalMsec ( int milliseconds );
+struct timeval timevalSec( int seconds );
+struct timeval timevalMsec( uint64_t milliseconds );
 
 
 int    tr_ioErrorFromErrno( void );
