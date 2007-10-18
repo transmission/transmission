@@ -26,8 +26,21 @@
 
 @implementation InfoTabButtonCell
 
+- (void) awakeFromNib
+{
+    NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver: self selector: @selector(updateControlTint:)
+            name: NSControlTintDidChangeNotification object: nil];
+    
+    fSelected = NO;
+}
+
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [fIcon release];
+    
     [fRegularImage release];
     [fSelectedImage release];
     [super dealloc];
@@ -35,37 +48,77 @@
 
 - (void) setIcon: (NSImage *) image
 {
-    //create regular back image
-    [fRegularImage release];
-    fRegularImage = [[NSImage imageNamed: @"InfoTabBack.tif"] copy];
+    [fIcon release];
+    fIcon = image ? [image retain] : nil;
     
-    //create selected back image
-    [fSelectedImage release];
-    fSelectedImage = [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy];
-    
-    //composite image to back images
-    if (image)
+    if (fRegularImage)
     {
-        NSSize imageSize = [image size];
-        NSRect imageRect = NSMakeRect(0, 0, [fRegularImage size].width, [fRegularImage size].height);
-        NSRect rect = NSMakeRect(imageRect.origin.x + (imageRect.size.width - imageSize.width) * 0.5,
-                        imageRect.origin.y + (imageRect.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
-        
-        [fRegularImage lockFocus];
-        [image drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-        [fRegularImage unlockFocus];
-        
-        [fSelectedImage lockFocus];
-        [image drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-        [fSelectedImage unlockFocus];
+        [fRegularImage release];
+        fRegularImage = nil;
+    }
+    if (fSelectedImage)
+    {
+        [fSelectedImage release];
+        fSelectedImage = nil;
     }
     
-    [self setImage: fRegularImage];
+    [self setSelectedTab: fSelected];
 }
 
 - (void) setSelectedTab: (BOOL) selected
 {
-    [self setImage: selected ? fSelectedImage : fRegularImage];
+    fSelected = selected;
+    
+    NSImage * tabImage;
+    BOOL createImage = NO;
+    if (fSelected)
+    {
+        if (!fSelectedImage)
+        {
+            fSelectedImage = [NSColor currentControlTint] == NSGraphiteControlTint ? [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy]
+                                : [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy];
+            createImage = YES;
+        }
+        tabImage = fSelectedImage;
+    }
+    else
+    {
+        if (!fRegularImage)
+        {
+            fRegularImage = [[NSImage imageNamed: @"InfoTabBack.tif"] copy];
+            createImage = YES;
+        }
+        tabImage = fRegularImage;
+    }
+    
+    if (createImage)
+    {
+        if (fIcon)
+        {
+            NSSize iconSize = [fIcon size];
+            NSRect imageRect = NSMakeRect(0, 0, [tabImage size].width, [tabImage size].height);
+            NSRect rect = NSMakeRect(imageRect.origin.x + (imageRect.size.width - iconSize.width) * 0.5,
+                            imageRect.origin.y + (imageRect.size.height - iconSize.height) * 0.5, iconSize.width, iconSize.height);
+
+            [tabImage lockFocus];
+            [fIcon drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+            [tabImage unlockFocus];
+        }
+    }
+    
+    [self setImage: tabImage];
+}
+
+- (void) updateControlTint: (NSNotification *) notification
+{
+    if (fSelectedImage)
+    {
+        [fSelectedImage release];
+        fSelectedImage = nil;
+    }
+    
+    if (fSelected)
+        [self setSelectedTab: YES];
 }
 
 @end

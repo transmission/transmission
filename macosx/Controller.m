@@ -1993,8 +1993,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) updateControlTint: (NSNotification *) notification
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
-        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSBlueControlTint
-            ? [NSImage imageNamed: @"SpeedLimitButtonBlue.png"] : [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"]];
+        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSGraphiteControlTint
+            ? [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"] : [NSImage imageNamed: @"SpeedLimitButtonBlue.png"]];
 }
 
 - (void) applySpeedLimit: (id) sender
