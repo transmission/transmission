@@ -113,6 +113,35 @@ struct tr_tracker
     unsigned int isRunning : 1;
 };
 
+/**
+***
+**/
+
+static void
+myDebug( const char * file, int line, const tr_tracker * t, const char * fmt, ... )
+{   
+    FILE * fp = tr_getLog( );
+    if( fp != NULL )
+    {
+        va_list args;
+        struct evbuffer * buf = evbuffer_new( );
+        char timestr[64];
+        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
+        if( t != NULL )
+            evbuffer_add_printf( buf, "%s ", t->name );
+        va_start( args, fmt );
+        evbuffer_add_vprintf( buf, fmt, args );
+        va_end( args );
+        evbuffer_add_printf( buf, " (%s:%d)\n", file, line );
+
+        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+        evbuffer_free( buf );
+    }
+}
+
+#define dbgmsg(t, fmt...) myDebug(__FILE__, __LINE__, t, ##fmt )
+
+
 /***
 ****  Connections that know how to clean up after themselves
 ***/
@@ -294,8 +323,6 @@ onTrackerFreeNow( void * vt )
         tr_trackerInfoClear( t->redirect );
         tr_free( t->redirect );
     }
-
-    tr_timerFree( &t->scrapeTimer );
 
     tr_free( t->addresses );
     tr_free( t->tierFronts );
@@ -659,11 +686,13 @@ parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
     return compact;
 }
 
-static int onReannounceNow( void * vtor );
+static int onRetry( void * vt );
+static int onReannounce( void * vt );
 
 static void
 onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
 {
+    dbgmsg( NULL, "got a response to some `stop' message" );
 }
 
 static void
@@ -672,10 +701,15 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     const char * warning;
     tr_tracker * t;
     int err = 0;
+    int responseCode;
 
     t = findTrackerFromHash( torrent_hash );
     if( t == NULL ) /* tracker has been closed */
         return;
+
+    dbgmsg( t, "got response from tracker: \"%s\"",
+            ( req && req->response_code_line ) ?  req->response_code_line
+                                               : "(null)" );
 
     tr_inf( "Torrent \"%s\" tracker response: %s",
             t->name,
@@ -692,17 +726,25 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         {
             benc_val_t * tmp;
 
-            if(( tmp = tr_bencDictFind( &benc, "failure reason" )))
+            if(( tmp = tr_bencDictFind( &benc, "failure reason" ))) {
+                dbgmsg( t, "got failure message [%s]", tmp->val.s.s );
                 publishErrorMessage( t, tmp->val.s.s );
+            }
 
-            if(( tmp = tr_bencDictFind( &benc, "warning message" )))
+            if(( tmp = tr_bencDictFind( &benc, "warning message" ))) {
+                dbgmsg( t, "got warning message [%s]", tmp->val.s.s );
                 publishWarning( t, tmp->val.s.s );
+            }
 
-            if(( tmp = tr_bencDictFind( &benc, "interval" )))
+            if(( tmp = tr_bencDictFind( &benc, "interval" ))) {
+                dbgmsg( t, "setting interval to %d", tmp->val.i );
                 t->announceIntervalSec = tmp->val.i;
+            }
 
-            if(( tmp = tr_bencDictFind( &benc, "min interval" )))
+            if(( tmp = tr_bencDictFind( &benc, "min interval" ))) {
+                dbgmsg( t, "setting min interval to %d", tmp->val.i );
                 t->announceMinIntervalSec = tmp->val.i;
+            }
 
             if(( tmp = tr_bencDictFind( &benc, "tracker id" )))
                 t->trackerID = tr_strndup( tmp->val.s.s, tmp->val.s.i );
@@ -755,20 +797,61 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         tr_err( warning );
     }
 
-    /* set reannounce times */
-    tr_timerFree( &t->reannounceTimer );
-    t->reannounceTimer = NULL;
-    t->manualAnnounceAllowedAt = ~(time_t)0;
-    if( t->isRunning )
+    /**
+    ***
+    **/
+
+    responseCode = req ? req->response_code : 503;
+
+    if( 200<=responseCode && responseCode<=299 )
     {
-        tr_dbg( "torrent '%s' reannouncing in %d seconds",
-                t->name, t->announceIntervalSec );
+        dbgmsg( t, "request succeeded. reannouncing in %d seconds", t->announceIntervalSec );
 
+        t->manualAnnounceAllowedAt = time(NULL)
+                                   + t->announceMinIntervalSec;
         t->reannounceTimer = tr_timerNew( t->handle,
-                                          onReannounceNow, t,
+                                          onReannounce, t,
                                           t->announceIntervalSec * 1000 );
+    }
+    else if( 300<=responseCode && responseCode<=399 )
+    {
+        dbgmsg( t, "got a redirect; retrying immediately" );
 
-        t->manualAnnounceAllowedAt = time(NULL) + t->announceMinIntervalSec;
+        /* it's a redirect... updateAddresses() has already
+         * parsed the redirect, all that's left is to retry */
+        onRetry( t );
+    }
+    else if( 400<=responseCode && responseCode<=499 )
+    {
+        dbgmsg( t, "got a 4xx error." );
+
+        /* The request could not be understood by the server due to
+         * malformed syntax. The client SHOULD NOT repeat the
+         * request without modifications. */
+        publishErrorMessage( t, req->response_code_line );
+        t->manualAnnounceAllowedAt = ~(time_t)0;
+        t->reannounceTimer = NULL;
+    }
+    else if( 500<=responseCode && responseCode<=599 )
+    {
+        dbgmsg( t, "got a 5xx error... retrying in 15 seconds." );
+
+        /* Response status codes beginning with the digit "5" indicate
+         * cases in which the server is aware that it has erred or is
+         * incapable of performing the request.  So we pause a bit and
+         * try again. */
+        publishWarning( t, req->response_code_line );
+        t->manualAnnounceAllowedAt = ~(time_t)0;
+        t->reannounceTimer = tr_timerNew( t->handle, onRetry, t, 15 * 1000 );
+    }
+    else
+    {
+        dbgmsg( t, "unhandled condition... retrying in 120 seconds." );
+
+        /* WTF did we get?? */
+        publishErrorMessage( t, req->response_code_line );
+        t->manualAnnounceAllowedAt = ~(time_t)0;
+        t->reannounceTimer = tr_timerNew( t->handle, onRetry, t, 120 * 1000 );
     }
 }
 
@@ -812,6 +895,8 @@ sendTrackerRequest( void * vt, const char * eventName )
             evhttp_connection_set_timeout( evcon, TIMEOUT_INTERVAL_SEC );
             req = evhttp_request_new( onTrackerResponse, torrentHashNew(t) );
         }
+        dbgmsg( t, "sending \"%s\" request to tracker", eventName ? eventName : "reannounce" );
+
         addCommonHeaders( t, req );
         tr_evhttp_make_request( t->handle, evcon,
                                 req, EVHTTP_REQ_GET, uri );
@@ -821,10 +906,19 @@ sendTrackerRequest( void * vt, const char * eventName )
 }
 
 static int
-onReannounceNow( void * vt )
+onReannounce( void * vt )
 {
     tr_tracker * t = vt;
     sendTrackerRequest( t, "" );
+    t->reannounceTimer = NULL;
+    return FALSE;
+}
+
+static int
+onRetry( void * vt )
+{
+    tr_tracker * t = vt;
+    sendTrackerRequest( t, t->lastRequest );
     t->reannounceTimer = NULL;
     return FALSE;
 }
