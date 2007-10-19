@@ -751,14 +751,14 @@ readCryptoProvide( tr_handshake * handshake, struct evbuffer * inbuf )
     /* This next piece is HASH('req2', SKEY) xor HASH('req3', S) ...
      * we can get the first half of that (the obufscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
-    dbgmsg( handshake, "reading obfuscated torrent hash...\n" );
+    dbgmsg( handshake, "reading obfuscated torrent hash..." );
     evbuffer_remove( inbuf, req2, SHA_DIGEST_LENGTH );
     tr_sha1( req3, "req3", 4, handshake->mySecret, KEY_LEN, NULL );
     for( i=0; i<SHA_DIGEST_LENGTH; ++i )
         obfuscatedTorrentHash[i] = req2[i] ^ req3[i];
     tor = tr_torrentFindFromObfuscatedHash( handshake->handle, obfuscatedTorrentHash );
     if( tor != NULL ) {
-        dbgmsg( handshake, "found the torrent; it's [%s]\n", tor->info.name );
+        dbgmsg( handshake, "found the torrent; it's [%s]", tor->info.name );
         tr_peerIoSetTorrentHash( handshake->io, tor->info.hash );
     } else {
         dbgmsg( handshake, "can't find that torrent..." );
@@ -774,10 +774,10 @@ readCryptoProvide( tr_handshake * handshake, struct evbuffer * inbuf )
 
     tr_peerIoReadUint32( handshake->io, inbuf, &crypto_provide );
     handshake->crypto_provide = crypto_provide;
-    dbgmsg( handshake, "crypto_provide is %d\n", (int)crypto_provide );
+    dbgmsg( handshake, "crypto_provide is %d", (int)crypto_provide );
 
     tr_peerIoReadUint16( handshake->io, inbuf, &padc_len );
-    dbgmsg( handshake, "padc is %d\n", (int)padc_len );
+    dbgmsg( handshake, "padc is %d", (int)padc_len );
     handshake->pad_c_len = padc_len;
     setState( handshake, AWAITING_PAD_C );
     return READ_AGAIN;
