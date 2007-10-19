@@ -24,15 +24,10 @@
 
 #include <ctype.h> /* isprint */
 #include <stdio.h>
-#include <stdlib.h> /* bsearch */
 #include <string.h>
-
-#include <sys/types.h> /* event.h needs this */
-#include <event.h>
 
 #include "transmission.h"
 #include "trcompat.h"
-#include "utils.h" /* tr_strdup */
 
 static int charToInt( char character )
 {
@@ -47,213 +42,181 @@ static int charToInt( char character )
     return value;
 }
 
-/*
- * Azureus-style uses the following encoding: '-', two characters for client id,
- * four ascii digits for version number, '-', followed by random numbers.
- * For example: '-AZ2060-'... 
- */
-
-struct az_client
-{
-    const char * abbreviation;
-    int version_width[4];
-    const char * name;
-};
-
-static struct az_client azureus_clients[] =
-{
-    { "AG", {  1,  1,  1,  0 }, "Ares" },
-    { "AR", { -1, -1, -1, -1 }, "Arctic Torrent" },
-    { "AV", { -1, -1, -1, -1 }, "Avicora" },
-    { "AX", {  2,  2,  0,  0 }, "BitPump" },
-    { "AZ", {  1,  1,  1,  1 }, "Azureus" },
-    { "A~", {  1,  1,  1,  0 }, "Ares" },
-    { "BB", {  1,  3,  0,  0 }, "BitBuddy" },
-    { "BC", {  2,  2,  0,  0 }, "BitComet" },
-    { "BF", { -1, -1, -1, -1 }, "Bitflu" },
-    { "BG", {  1,  1,  1,  1 }, "BTG" },
-    { "BR", {  1,  1,  2,  0 }, "BitRocket" },
-    { "BS", { -1, -1, -1, -1 }, "BTSlave" },
-    { "BX", { -1, -1, -1, -1 }, "Bittorrent X" },
-    { "CD", {  2,  2,  0,  0 }, "Enhanced CTorrent" },
-    { "CT", {  1,  1,  2,  0 }, "CTorrent" },
-    { "DE", {  1,  1,  1,  1 }, "DelugeTorrent" },
-    { "DP", { -1, -1, -1, -1 }, "Propagate" },
-    { "EB", { -1, -1, -1, -1 }, "EBit" },
-    { "ES", {  1,  1,  1,  1 }, "Electric Sheep" },
-    { "FT", {  4,  0,  0,  0 }, "FoxTorrent" },
-    { "GR", {  1,  1,  1,  1 }, "GetRight" },
-    { "GS", {  4,  0,  0,  0 }, "GSTorrent" },
-    { "HL", {  1,  1,  1,  0 }, "Halite" },
-    { "HN", { -1, -1, -1, -1 }, "Hydranode" },
-    { "KT", {  1,  1,  1,  0 }, "KTorrent" },
-    { "LH", { -1, -1, -1, -1 }, "LH-ABC" },
-    { "LK", { -1, -1, -1, -1 }, "Linkage" },
-    { "LP", {  2,  2,  0,  0 }, "Lphant" },
-    { "LT", {  1,  1,  1,  1 }, "Libtorrent" },
-    { "LW", { -1, -1, -1, -1 }, "LimeWire" },
-    { "ML", { -1, -1, -1, -1 }, "MLDonkey" },
-    { "MO", { -1, -1, -1, -1 }, "MonoTorrent" },
-    { "MP", { -1, -1, -1, -1 }, "MooPolice" },
-    { "MT", { -1, -1, -1, -1 }, "MoonlightTorrent" },
-    { "PD", {  1,  1,  1,  1 }, "Pando" },
-    { "QD", { -1, -1, -1, -1 }, "QQDownload" },
-    { "QT", { -1, -1, -1, -1 }, "Qt 4 Torrent Example" },
-    { "RT", { -1, -1, -1, -1 }, "Retriever" },
-    { "SB", { -1, -1, -1, -1 }, "Swiftbit" },
-    { "SN", { -1, -1, -1, -1 }, "ShareNet" },
-    { "SS", { -1, -1, -1, -1 }, "SwarmScope" },
-    { "ST", { -1, -1, -1, -1 }, "SymTorrent" },
-    { "SZ", {  1,  1,  1,  1 }, "Shareaza" },
-    { "S~", {  1,  1,  1,  1 }, "Shareaza (beta)" },
-    { "TN", { -1, -1, -1, -1 }, "Torrent.Net" },
-    { "TR", {  1,  2,  1,  0 }, "Transmission" },
-    { "TS", {  1,  1,  1,  1 }, "TorrentStorm" },
-    { "TT", {  1,  1,  1,  1 }, "TuoTu" },
-    { "UL", { -1, -1, -1, -1 }, "uLeecher" },
-    { "UT", {  1,  2,  0,  0 }, "uTorrent" },
-    { "WT", { -1, -1, -1, -1 }, "BitLet" },
-    { "WY", { -1, -1, -1, -1 }, "FireTorrent" },
-    { "XL", { -1, -1, -1, -1 }, "Xunlei" },
-    { "XT", { -1, -1, -1, -1 }, "XanTorrent" },
-    { "XX", {  1,  1,  2,  0 }, "Xtorrent" },
-    { "ZT", { -1, -1, -1, -1 }, "ZipTorrent" },
-    { "lt", {  1,  1,  1,  1 }, "libTorrent" },
-    { "qB", {  1,  1,  1,  0 }, "qBittorrent" },
-    { "st", { -1, -1, -1, -1 }, "sharktorrent" }
-};
-
-static int
-isStyleAzureus( const uint8_t * id )
-{
-    return id[0]=='-' && id[7]=='-';
-}
-
-static char*
-getAzureusAbbreviation( const uint8_t * id, char * setme )
-{
-    setme[0] = id[1];
-    setme[1] = id[2];
-    setme[2] = '\0';
-    return setme;
-}
-
-static int
-compareAzureusAbbreviations( const void * va, const void * vb )
-{
-    const char * abbreviation = va;
-    const struct az_client * b = vb;
-    return strcmp( abbreviation, b->abbreviation );
-}
-
-static const struct az_client*
-getAzureusClient( const uint8_t * peer_id )
-{
-    const struct az_client * ret = NULL;
-    
-    if( isStyleAzureus( peer_id ) )
-    {
-        char abbreviation[3];
-        ret = bsearch( getAzureusAbbreviation( peer_id, abbreviation ),
-                       azureus_clients,
-                       sizeof(azureus_clients) / sizeof(azureus_clients[0]),
-                       sizeof(struct az_client),
-                       compareAzureusAbbreviations );
-    }
-
-    return ret;
-}
-
-
-struct generic_client
-{
-    int offset;
-    char const * id;
-    char const * name;
-};
-
-static struct generic_client generic_clients[] =
-{
-    { 0, "346-", "TorrentTopia" },
-    { 0, "10-------", "JVtorrent" },
-    { 0, "Deadman Walking-", "Deadman" },
-    { 5, "Azureus", "Azureus 2.0.3.2" },
-    { 0, "DansClient", "XanTorrent" },
-    { 4, "btfans", "SimpleBT" },
-    { 0, "eX", "eXeem" },
-    { 0, "PRC.P---", "Bittorrent Plus! II" },
-    { 0, "P87.P---", "Bittorrent Plus!" },
-    { 0, "S587Plus", "Bittorrent Plus!" },
-    { 0, "martini", "Martini Man" },
-    { 0, "Plus---", "Bittorrent Plus" },
-    { 0, "turbobt", "TurboBT" },
-    { 0, "a00---0", "Swarmy" },
-    { 0, "a02---0", "Swarmy" },
-    { 0, "T00---0", "Teeweety" },
-    { 0, "BTDWV-", "Deadman Walking" },
-    { 2, "BS", "BitSpirit" },
-    { 0, "Pando-", "Pando" },
-    { 0, "LIME", "LimeWire" },
-    { 0, "btuga", "BTugaXP" },
-    { 0, "oernu", "BTugaXP" },
-    { 0, "Mbrst", "Burst!" },
-    { 0, "PEERAPP", "PeerApp" },
-    { 0, "Plus", "Plus!" },
-    { 0, "-Qt-", "Qt" },
-    { 0, "exbc", "BitComet" },
-    { 0, "DNA", "BitTorrent DNA" },
-    { 0, "-G3", "G3 Torrent" },
-    { 0, "-FG", "FlashGet" },
-    { 0, "-ML", "MLdonkey" },
-    { 0, "XBT", "XBT" },
-    { 0, "OP", "Opera" },
-    { 2, "RS", "Rufus" }
-};
-
-/***
-****
-***/
-
-char*
-tr_clientForId( const uint8_t * id )
+char * tr_clientForId( const uint8_t * id )
 {
     char * ret = NULL;
     
-    if( isStyleAzureus( id ) )
+    /* Azureus-style */
+    if( id[0] == '-' && id[7] == '-' )
     {
-        const struct az_client * client = getAzureusClient( id );
-
-        if( client != NULL )
+        if( !memcmp( &id[1], "TR", 2 ) )
         {
-            struct evbuffer * buf = evbuffer_new( );
-
-            evbuffer_add_printf( buf, "%s ", client->name );
-
-            if( client->version_width[0] == -1 )
-                evbuffer_add( buf, id+3, 4 );
-            else {
-                int i, offset;
-                for( i=0, offset=3; i<4; ++i ) {
-                    const int width = client->version_width[i];
-                    const int isdigit = isdigit( id[offset] );
-                    if( !width )
-                        break;
-                    if( offset!=3 )
-                        evbuffer_add( buf, (isdigit?".":" "), 1 );
-                    if( !isdigit || width==1 || offset!=3 )
-                        evbuffer_add( buf, id+offset, width );
-                    else{
-                        char * tmp = tr_strndup( (char*)(id+offset), width );
-                        evbuffer_add_printf( buf, "%d", atoi(tmp) );
-                        tr_free( tmp );
-                    }
-                    offset += width;
-                }
+            /* support old-style Transmission id without maintenance number */
+            if ( !memcmp( &id[3], "00", 2 ) )
+            {
+                asprintf( &ret, "Transmission 0.%d",
+                        charToInt( id[5] ) * 10 + charToInt( id[6] ) );
             }
-
-            evbuffer_add( buf, "\0", 1 );
-            ret = tr_strdup( (char*) EVBUFFER_DATA( buf ) );
-            evbuffer_free( buf );
+            else
+            {
+                asprintf( &ret, "Transmission %d.%c%c%s",
+                        charToInt( id[3] ), id[4], id[5],
+                        id[6] == 'Z' ? "+" : "" );
+            }
+        }
+        else if( !memcmp( &id[1], "AZ", 2 ) )
+        {
+            asprintf( &ret, "Azureus %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "UT", 2 ) )
+        {
+            asprintf( &ret, "\xc2\xb5Torrent %c.%d", id[3],
+                      charToInt( id[4] ) * 10 + charToInt( id[5] ) );
+        }
+        else if( !memcmp( &id[1], "BC", 2 ) )
+        {
+            asprintf( &ret, "BitComet %d.%c%c",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "SZ", 2 ) || !memcmp( &id[1], "S~", 2 ) )
+        {
+            asprintf( &ret, "Shareaza %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "BOW", 3 ) )
+        {
+            if( !memcmp( &id[4], "A0C", 3 ) )
+            {
+                asprintf( &ret, "Bits on Wheels 1.0.6" );
+            }
+            else if( !memcmp( &id[4], "A0B", 3 ) )
+            {
+                asprintf( &ret, "Bits on Wheels 1.0.5" );
+            }
+            else
+            {
+                asprintf( &ret, "Bits on Wheels (%c%c%c)",
+                        id[4], id[5], id[6] );
+            }
+        }
+        else if( !memcmp( &id[1], "BR", 2 ) )
+        {
+            asprintf( &ret, "BitRocket %c.%c (%d)",
+                      id[3], id[4], charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "XX", 2 ) )
+        {
+            asprintf( &ret, "Xtorrent %c.%c (%d)",
+                      id[3], id[4], charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "TS", 2 ) )
+        {
+            asprintf( &ret, "TorrentStorm %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "KT", 2 ) )
+        {
+            if( id[5] == 'R' )
+            {
+                asprintf( &ret, "KTorrent %c.%c RC %c",
+                        id[3], id[4], id[6] );
+            }
+            else if( id[5] == 'D' )
+            {
+                asprintf( &ret, "KTorrent %c.%c Dev",
+                        id[3], id[4] );
+            }
+            else
+            {
+                asprintf( &ret, "KTorrent %c.%c.%c",
+                        id[3], id[4], id[5] );
+            }
+        }
+        else if( !memcmp( &id[1], "lt", 2 ) )
+        {
+            asprintf( &ret, "libTorrent %d.%d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ), charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "LT", 2 ) )
+        {
+            asprintf( &ret, "libtorrent %d.%d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ), charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "TT", 2 ) )
+        {
+            asprintf( &ret, "TuoTu %c.%c.%c",
+                      id[3], id[4], id[5] );
+        }
+		else if( !memcmp( &id[1], "ES", 2 ) )
+        {
+            asprintf( &ret, "Electric Sheep %c.%c.%c",
+                      id[3], id[4], id[5] );
+        }
+        else if( !memcmp( &id[1], "CD", 2 ) )
+        {
+            asprintf( &ret, "Enhanced CTorrent %d.%d",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+        }
+		else if( !memcmp( &id[1], "CT", 2 ) )
+        {
+            asprintf( &ret, "CTorrent %c.%c.%d",
+                      id[3], id[4],
+                      charToInt( id[5] ) * 10 + charToInt( id[6] ) );
+        }
+        else if( !memcmp( &id[1], "LP", 2 ) )
+        {
+            asprintf( &ret, "Lphant %d.%c%c",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "AX", 2 ) )
+        {
+            asprintf( &ret, "BitPump %d.%c%c",
+                      charToInt( id[3] ) * 10 + charToInt( id[4] ),
+                      id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "DE", 2 ) )
+        {
+            asprintf( &ret, "Deluge %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
+        }
+        else if( !memcmp( &id[1], "AG", 2 ) )
+        {
+            asprintf( &ret, "Ares Galaxy %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
+        }
+        else if( !memcmp( &id[1], "HL", 2 ) )
+        {
+            asprintf( &ret, "Halite %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
+        }
+        else if( !memcmp( &id[1], "AR", 2 ) )
+        {
+            asprintf( &ret, "Arctic Torrent" );
+        }
+        else if( !memcmp( &id[1], "BG", 2 ) )
+        {
+            asprintf( &ret, "BTG %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+		else if( !memcmp( &id[1], "BB", 2 ) )
+        {
+            asprintf( &ret, "BitBuddy %c.%c%c%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+		else if( !memcmp( &id[1], "qB", 2 ) )
+        {
+            asprintf( &ret, "qBittorrent %d.%d.%d",
+                      charToInt( id[3] ), charToInt( id[4] ),
+                      charToInt( id[5] ) );
         }
         else if( !memcmp( &id[1], "BF", 2 ) )
         {
@@ -262,34 +225,30 @@ tr_clientForId( const uint8_t * id )
                       charToInt( id[4] ) * 10 + charToInt( id[5] ),
                       charToInt( id[3] ) );
         }
-        else if( !memcmp( &id[1], "BOW", 3 ) )
+        else if( !memcmp( &id[1], "FT", 2 ) )
         {
-            if( !memcmp( &id[4], "A0C", 3 ) )
-                asprintf( &ret, "Bits on Wheels 1.0.6" );
-            else if( !memcmp( &id[4], "A0B", 3 ) )
-                asprintf( &ret, "Bits on Wheels 1.0.5" );
-            else
-                asprintf( &ret, "Bits on Wheels (%3.3s", id+4 );
+            asprintf( &ret, "FoxTorrent (%c%c%c%c)",
+                      id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "GR", 2 ) )
+        {
+            asprintf( &ret, "GetRight %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "PD", 2 ) )
+        {
+            asprintf( &ret, "Pando %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
+        else if( !memcmp( &id[1], "LW", 2 ) )
+        {
+            asprintf( &ret, "LimeWire" );
+        }
+        
         if( ret )
         {
-fprintf( stderr, "peer_id [%8.8s] returns [%s]\n", id, ret );
             return ret;
         }
-    }
-
-    /* generic clients */
-    {
-        int i;
-        const int n = sizeof(generic_clients) / sizeof(generic_clients[0]);
-        for( i=0; !ret && i<n; ++i ) {
-            const struct generic_client * client = &generic_clients[i];
-            if( !memcmp( id+client->offset, client->id, strlen(client->id) ) )
-                ret = tr_strdup( client->name );
-        }
-
-        if( ret )
-            return ret;
     }
     
     /* Tornado-style */
@@ -412,6 +371,30 @@ fprintf( stderr, "peer_id [%8.8s] returns [%s]\n", id, ret );
     else if( !memcmp( id, "BLZ", 3 ) )
     {
         asprintf( &ret, "Blizzard Downloader %d.%d", id[3] + 1, id[4] );
+    }
+    else if( !memcmp( id, "-WT-", 4 ) )
+    {
+        asprintf( &ret, "BitLet" );
+    }
+    else if( !memcmp( id, "LIME", 4 ) )
+    {
+        asprintf( &ret, "LimeWire" );
+    }
+    else if( !memcmp( id, "-G3", 3 ) )
+    {
+        asprintf( &ret, "G3 Torrent" );
+    }
+    else if( !memcmp( id, "10-------", 9 ) )
+    {
+        asprintf( &ret, "JVtorrent" );
+    }
+    else if( !memcmp( id, "346-", 4 ) )
+    {
+        asprintf( &ret, "TorrentTopia" );
+    }
+    else if( !memcmp( id, "eX", 2 ) )
+    {
+        asprintf( &ret, "eXeem" );
     }
     else if( '\0' == id[0] && !memcmp( &id[1], "BS", 2 ) )
     {
