@@ -129,6 +129,9 @@ response_cb( GtkDialog* d, int response, gpointer user_data )
         return;
     }
 
+    if( ui->builder == NULL )
+        return;
+
     w = gtk_dialog_new_with_buttons( _("Making Torrent..."), 
                                      GTK_WINDOW(d),
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
