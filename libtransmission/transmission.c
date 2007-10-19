@@ -262,18 +262,15 @@ void
 tr_torrentRates( tr_handle * h, float * dl, float * ul )
 {
     tr_torrent * tor;
-
-    *dl = 0.0;
-    *ul = 0.0;
     tr_globalLock( h );
+
+    *dl = *ul = 0.0;
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        tr_torrentLock( tor );
-        if( tor->cpStatus == TR_CP_INCOMPLETE )
-            *dl += tr_rcRate( tor->download );
+        *dl += tr_rcRate( tor->download );
         *ul += tr_rcRate( tor->upload );
-        tr_torrentUnlock( tor );
     }
+
     tr_globalUnlock( h );
 }
 

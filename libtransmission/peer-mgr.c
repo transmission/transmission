@@ -704,7 +704,7 @@ refillPulse( void * vtorrent )
 
     if( !t->isRunning )
         return TRUE;
-    if( tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE )
+    if( tr_torrentIsSeed( t->tor ) )
         return TRUE;
 
     torrentLock( t );
@@ -1502,7 +1502,7 @@ shouldPeerBeClosed( const Torrent * t, const tr_peer * peer, int peerCount )
 
     /* if we're both seeds and it's been long enough for a pex exchange, close it */
     if( 1 ) {
-        const int clientIsSeed = tr_cpGetStatus( tor->completion ) != TR_CP_INCOMPLETE;
+        const int clientIsSeed = tr_torrentIsSeed( tor );
         const int peerIsSeed = atom->flags & ADDED_F_SEED_FLAG;
         if( peerIsSeed && clientIsSeed && ( !tr_torrentIsPexEnabled(tor) || (now-atom->time>=30) ) ) {
             tordbg( t, "purging peer %s because we're both seeds", tr_peerIoAddrStr(&atom->addr,atom->port) );
@@ -1568,7 +1568,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
     struct peer_atom ** atoms;
     struct peer_atom ** ret;
     const time_t now = time( NULL );
-    const int seed = tr_cpGetStatus( t->tor->completion ) != TR_CP_INCOMPLETE;
+    const int seed = tr_torrentIsSeed( t->tor );
 
     assert( torrentIsLocked( t ) );
 

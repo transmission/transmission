@@ -1176,22 +1176,37 @@ refreshPriorityActions( GtkTreeSelection * sel )
 }
 
 static void
-set_files_enabled( GtkTreeStore   * store,
-                   GtkTreeIter    * iter,
-                   tr_torrent     * tor,
-                   gboolean         enabled )
+subtree_walk_dnd( GtkTreeStore   * store,
+                  GtkTreeIter    * iter,
+                  tr_torrent     * tor,
+                  gboolean         enabled,
+                  GArray         * indices )
 {
     int index;
     GtkTreeIter child;
-
+ 
+    /* update this node */ 
     gtk_tree_model_get( GTK_TREE_MODEL(store), iter, FC_INDEX, &index, -1  );
     if (index >= 0)
-      tr_torrentSetFileDL( tor, index, enabled );
+      g_array_append_val( indices, index );
     gtk_tree_store_set( store, iter, FC_ENABLED, enabled, -1 );
 
+    /* visit the children */
     if( gtk_tree_model_iter_children( GTK_TREE_MODEL(store), &child, iter ) ) do
-      set_files_enabled( store, &child, tor, enabled );
+      subtree_walk_dnd( store, &child, tor, enabled, indices );
     while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &child ) );
+}
+
+static void
+set_subtree_dnd( GtkTreeStore * store,
+                 GtkTreeIter * iter,
+                 tr_torrent  * tor,
+                 gboolean enabled )
+{
+    GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
+    subtree_walk_dnd( store, iter, tor, enabled, indices );
+    tr_torrentSetFileDLs( tor, (int*)indices->data, (int)indices->len, enabled );
+    g_array_free( indices, TRUE );
 }
 
 static void
@@ -1284,10 +1299,10 @@ enabled_toggled (GtkCellRendererToggle  * cell UNUSED,
   gtk_tree_model_get_iter( model, &iter, path );
   gtk_tree_model_get( model, &iter, FC_ENABLED, &enabled, -1 );
   enabled = !enabled;
-  set_files_enabled( GTK_TREE_STORE(model),
-                     &iter,
-                     tr_torrent_handle( data->gtor ),
-                     enabled );
+  set_subtree_dnd( GTK_TREE_STORE(model),
+                   &iter,
+                   tr_torrent_handle( data->gtor ),
+                   enabled );
 
   gtk_tree_path_free( path );
 }

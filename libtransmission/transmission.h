@@ -285,12 +285,9 @@ int tr_torrentGetFileDL( const tr_torrent *, int file );
 
 /* set a batch of files to be downloaded or not. */
 void tr_torrentSetFileDLs ( tr_torrent   * tor,
-                            int            * files,
-                            int              fileCount,
-                            int              do_download );
-
-/* single-file form of tr_torrentSetFileDLs */
-void tr_torrentSetFileDL( tr_torrent *, int file, int do_download );
+                            int          * files,
+                            int            fileCount,
+                            int            do_download );
 
 /***********************************************************************
  * tr_torrentRates

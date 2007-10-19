@@ -589,22 +589,12 @@ tr_torrentInfo( const tr_torrent * tor )
 ****
 ***/
 
-#if 0
-int tr_torrentScrape( tr_torrent * tor, int * s, int * l, int * d )
-{
-    return tr_trackerScrape( tor, s, l, d );
-}
-#endif
-
 static int
 saveFastResumeNow( void * vtor )
 {
     tr_torrent * tor = (tr_torrent *) vtor;
-
     tr_fastResumeSave( tor );
-    tr_torrentRecheckCompleteness( tor );
-
-    tr_timerFree( &tor->saveTimer );
+    tor->saveTimer = NULL;
     return FALSE;
 }
 
@@ -1003,7 +993,8 @@ checkAndStartCB( tr_torrent * tor )
     tor->isRunning  = 1;
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
-    tr_torrentRecheckCompleteness( tor );
+    tor->cpStatus = tr_cpGetStatus( tor->completion );
+    saveFastResumeSoon( tor );
     tor->startDate = tr_date( );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
@@ -1133,6 +1124,12 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
     tr_torrentUnlock( tor );
 }
 
+int
+tr_torrentIsSeed( const tr_torrent * tor )
+{
+    return tor->cpStatus==TR_CP_COMPLETE || tor->cpStatus==TR_CP_DONE;
+}
+
 /**
 ***  File priorities
 **/
@@ -1223,18 +1220,16 @@ tr_torrentGetFileDL( const tr_torrent * tor,
     return doDownload != 0;
 }
 
-void
-tr_torrentSetFileDL( tr_torrent  * tor,
-                     int           fileIndex,
-                     int           doDownload )
+static void
+setFileDND( tr_torrent  * tor,
+            int           fileIndex,
+            int           doDownload )
 {
     tr_file * file;
     const int dnd = !doDownload;
     int firstPiece, firstPieceDND;
     int lastPiece, lastPieceDND;
     int i;
-
-    tr_torrentLock( tor );
 
     file = &tor->info.files[fileIndex];
     file->dnd = dnd;
@@ -1270,12 +1265,6 @@ tr_torrentSetFileDL( tr_torrent  * tor,
         for( i=firstPiece+1; i<lastPiece; ++i )
             tor->info.pieces[i].dnd = dnd;
     }
-
-    tr_cpInvalidateDND ( tor->completion );
-
-    saveFastResumeSoon( tor );
-
-    tr_torrentUnlock( tor );
 }
 
 void
@@ -1285,8 +1274,14 @@ tr_torrentSetFileDLs ( tr_torrent  * tor,
                        int           doDownload )
 {
     int i;
+    tr_torrentLock( tor );
+
     for( i=0; i<fileCount; ++i )
-        tr_torrentSetFileDL( tor, files[i], doDownload );
+        setFileDND( tor, files[i], doDownload );
+    tr_cpInvalidateDND ( tor->completion );
+    saveFastResumeNow( tor );
+
+    tr_torrentUnlock( tor );
 }
 
 /***

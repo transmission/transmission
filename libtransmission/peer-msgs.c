@@ -343,8 +343,7 @@ isPeerInteresting( const tr_peermsgs * msgs )
     int i;
     const tr_torrent * torrent;
     const tr_bitfield * bitfield;
-    const int clientIsSeed =
-        tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
+    const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
 
     if( clientIsSeed )
         return FALSE;
@@ -949,7 +948,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
             break;
 
         case BT_BITFIELD: {
-            const int clientIsSeed = tr_cpGetStatus( msgs->torrent->completion ) != TR_CP_INCOMPLETE;
+            const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
             dbgmsg( msgs, "got a bitfield" );
             assert( msglen == msgs->info->have->len );
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
