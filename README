@@ -14,7 +14,7 @@ Building Transmission
 =====================
 
 Transmission has an Xcode project file (Transmission.xcodeproj)
-that allows it to be built in Xcode.
+for building in Xcode.
 
 Building a Transmission release from the command line:
 
