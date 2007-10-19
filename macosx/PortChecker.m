@@ -47,8 +47,7 @@
                                 [NSString stringWithFormat: @"https://www.grc.com/x/portprobe=%d", portNumber]]
                                 cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval: 15.0];
     
-    NSURLConnection * portProbeConnection;
-    if ((portProbeConnection = [NSURLConnection connectionWithRequest: portProbeRequest delegate: self]))
+    if ([NSURLConnection connectionWithRequest: portProbeRequest delegate: self])
         fPortProbeData = [[NSMutableData data] retain];
     else
     {

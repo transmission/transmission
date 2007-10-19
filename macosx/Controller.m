@@ -1432,6 +1432,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) updateUI
 {
+    #warning make main thread?
     [fTorrents makeObjectsPerformSelector: @selector(update)];
     
     if (![NSApp isHidden])
@@ -1463,7 +1464,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         if ([[fInfoController window] isVisible])
             [fInfoController updateInfoStats];
     }
-
+    
     //badge dock
     [fBadger updateBadge];
 }
@@ -2020,18 +2021,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         * nowDate = [NSCalendarDate calendarDate];
     
     //check if should be on if within range
-    BOOL shouldBeOn;
-    
     int onTime = [onDate hourOfDay] * 60 + [onDate minuteOfHour],
         offTime = [offDate hourOfDay] * 60 + [offDate minuteOfHour],
         nowTime = [nowDate hourOfDay] * 60 + [nowDate minuteOfHour];
     
-    if (onTime == offTime)
-        shouldBeOn = NO;
-    else if (onTime < offTime)
+    BOOL shouldBeOn = NO;
+    if (onTime < offTime)
         shouldBeOn = onTime <= nowTime && nowTime < offTime;
-    else
+    else if (onTime > offTime)
         shouldBeOn = onTime <= nowTime || nowTime < offTime;
+    else;
     
     if ([fDefaults boolForKey: @"SpeedLimit"] != shouldBeOn)
         [self toggleSpeedLimit: nil];
@@ -2256,7 +2255,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
         return NSDragOperationGeneric;
     }
-    else;
     
     return NSDragOperationNone;
 }
@@ -2317,7 +2315,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [indexSet release];
         }
     }
-    else;
     
     return YES;
 }

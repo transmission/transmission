@@ -34,7 +34,6 @@
 {
     if ((self = [super initWithCoder: decoder]))
     {
-        fTorrent = nil;
         fPieces = malloc(MAX_ACROSS * MAX_ACROSS);
     }
     
