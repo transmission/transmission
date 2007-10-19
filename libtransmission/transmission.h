@@ -260,16 +260,12 @@ enum
 
 typedef int8_t tr_priority_t;
 
-/* set a batch of files to a particular priority. */
+/* set a batch of files to a particular priority.
+ * priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW */
 void tr_torrentSetFilePriorities( tr_torrent        * tor,
                                   int               * files,
                                   int                 fileCount,
                                   tr_priority_t       priority );
-
-
-/* single-file form of tr_torrentPrioritizeFiles.
- * priority must be one of TR_PRI_NORMAL, _HIGH, or _LOW */
-void tr_torrentSetFilePriority( tr_torrent *, int file, tr_priority_t priority );
 
 /* returns a malloc()ed array of tor->info.fileCount items,
  * each holding a value of TR_PRI_NORMAL, _HIGH, or _LOW.

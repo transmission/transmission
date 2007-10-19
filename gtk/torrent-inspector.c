@@ -1198,10 +1198,10 @@ subtree_walk_dnd( GtkTreeStore   * store,
 }
 
 static void
-set_subtree_dnd( GtkTreeStore * store,
-                 GtkTreeIter * iter,
-                 tr_torrent  * tor,
-                 gboolean enabled )
+set_subtree_dnd( GtkTreeStore   * store,
+                 GtkTreeIter    * iter,
+                 tr_torrent     * tor,
+                 gboolean         enabled )
 {
     GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
     subtree_walk_dnd( store, iter, tor, enabled, indices );
@@ -1210,24 +1210,39 @@ set_subtree_dnd( GtkTreeStore * store,
 }
 
 static void
-set_priority (GtkTreeSelection * selection,
-              GtkTreeStore * store,
-              GtkTreeIter * iter,
-              tr_torrent * tor,
-              int priority_val,
-              const char * priority_str)
+subtree_walk_priority( GtkTreeStore   * store,
+                       GtkTreeIter    * iter,
+                       tr_torrent     * tor,
+                       int              priority,
+                       GArray         * indices )
 {
     int index;
     GtkTreeIter child;
 
+    /* update this node */ 
     gtk_tree_model_get( GTK_TREE_MODEL(store), iter, FC_INDEX, &index, -1  );
-    if (index >= 0)
-      tr_torrentSetFilePriority( tor, index, priority_val );
-    gtk_tree_store_set( store, iter, FC_PRIORITY, priority_str, -1 );
+    if( index >= 0 )
+        g_array_append_val( indices, index );
+    gtk_tree_store_set( store, iter, FC_PRIORITY, priorityToString(priority), -1 );
 
+    /* visit the children */
     if( gtk_tree_model_iter_children( GTK_TREE_MODEL(store), &child, iter ) ) do
-      set_priority( selection, store, &child, tor, priority_val, priority_str );
+        subtree_walk_priority( store, &child, tor, priority, indices );
     while( gtk_tree_model_iter_next( GTK_TREE_MODEL(store), &child ) );
+
+}
+
+static void
+set_subtree_priority( GtkTreeStore * store,
+                      GtkTreeIter * iter,
+                      tr_torrent * tor,
+                      int priority,
+                      GtkTreeSelection * selection )
+{
+    GArray * indices = g_array_new( FALSE, FALSE, sizeof(int) );
+    subtree_walk_priority( store, iter, tor, priority, indices );
+    tr_torrentSetFilePriorities( tor, (int*)indices->data, (int)indices->len, priority );
+    g_array_free( indices, TRUE );
 
     refreshPriorityActions( selection );
 }
@@ -1238,14 +1253,14 @@ priority_changed_cb (GtkCellRendererText * cell UNUSED,
 		     const gchar         * value,
 		     void                * file_data)
 {
-  GtkTreeIter iter;
-  FileData * d = (FileData*) file_data;
-  if (gtk_tree_model_get_iter_from_string (d->model, &iter, path))
-  {
-    tr_torrent  * tor = tr_torrent_handle( d->gtor );
-    const tr_priority_t priority = stringToPriority( value );
-    set_priority( d->selection, d->store, &iter, tor, priority, value );
-  }
+    GtkTreeIter iter;
+    FileData * d = (FileData*) file_data;
+    if (gtk_tree_model_get_iter_from_string (d->model, &iter, path))
+    {
+        tr_torrent  * tor = tr_torrent_handle( d->gtor );
+        const tr_priority_t priority = stringToPriority( value );
+        set_subtree_priority( d->store, &iter, tor, priority, d->selection );
+    }
 }
 
 /* FIXME: NULL this back out when popup goes down */
@@ -1274,14 +1289,13 @@ set_selected_file_priority ( tr_priority_t priority_val )
     {
         GtkTreeView * view = GTK_TREE_VIEW( popupView );
         tr_torrent * tor = g_object_get_data (G_OBJECT(view), "torrent-handle");
-        const char * priority_str = priorityToString( priority_val );
         GtkTreeModel * model;
         GtkTreeIter iter;
         GtkTreeSelection * sel = gtk_tree_view_get_selection (view);
         gtk_tree_selection_get_selected( sel, &model, &iter );
 
-        set_priority( sel, GTK_TREE_STORE(model), &iter,
-                      tor, priority_val, priority_str );
+        set_subtree_priority( GTK_TREE_STORE(model), &iter,
+                              tor, priority_val, sel );
     }
 }
 

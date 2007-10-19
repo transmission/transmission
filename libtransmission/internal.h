@@ -113,8 +113,6 @@ struct tr_torrent
     struct tr_ratecontrol     * download;
     struct tr_ratecontrol     * swarmspeed;
 
-    struct tr_timer           * saveTimer;
-
     int                        error;
     char                       errorString[128];
 

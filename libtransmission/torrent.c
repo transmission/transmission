@@ -589,22 +589,10 @@ tr_torrentInfo( const tr_torrent * tor )
 ****
 ***/
 
-static int
-saveFastResumeNow( void * vtor )
-{
-    tr_torrent * tor = (tr_torrent *) vtor;
-    tr_fastResumeSave( tor );
-    tor->saveTimer = NULL;
-    return FALSE;
-}
-
 static void
-saveFastResumeSoon( void * vtor )
+saveFastResumeNow( tr_torrent * tor )
 {
-    tr_torrent * tor = (tr_torrent *) vtor;
-
-    if( tor->saveTimer == NULL )
-        tor->saveTimer = tr_timerNew( tor->handle, saveFastResumeNow, tor, 100 );
+    tr_fastResumeSave( tor );
 }
 
 /**
@@ -616,7 +604,7 @@ tr_torrentSetFolder( tr_torrent * tor, const char * path )
 {
     tr_free( tor->destination );
     tor->destination = tr_strdup( path );
-    saveFastResumeSoon( tor );
+    saveFastResumeNow( tor );
 }
 
 const char*
@@ -994,7 +982,7 @@ checkAndStartCB( tr_torrent * tor )
     *tor->errorString = '\0';
     tr_torrentResetTransferStats( tor );
     tor->cpStatus = tr_cpGetStatus( tor->completion );
-    saveFastResumeSoon( tor );
+    saveFastResumeNow( tor );
     tor->startDate = tr_date( );
     tr_trackerStart( tor->tracker );
     tr_peerMgrStartTorrent( tor->handle->peerMgr, tor->info.hash );
@@ -1119,7 +1107,7 @@ tr_torrentRecheckCompleteness( tr_torrent * tor )
             tr_trackerCompleted( tor->tracker ); /* tell the tracker */
         }
         tr_ioClose( tor );
-        saveFastResumeSoon( tor );
+        saveFastResumeNow( tor );
     }
     tr_torrentUnlock( tor );
 }
@@ -1134,15 +1122,13 @@ tr_torrentIsSeed( const tr_torrent * tor )
 ***  File priorities
 **/
 
-void
-tr_torrentSetFilePriority( tr_torrent   * tor,
-                           int            fileIndex,
-                           tr_priority_t  priority )
+static void
+setFilePriority( tr_torrent   * tor,
+                 int            fileIndex,
+                 tr_priority_t  priority )
 {
     int i;
     tr_file * file;
-
-    tr_torrentLock( tor );
 
     assert( tor != NULL );
     assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
@@ -1156,10 +1142,6 @@ tr_torrentSetFilePriority( tr_torrent   * tor,
     tr_dbg ( "Setting file #%d (pieces %d-%d) priority to %d (%s)",
              fileIndex, file->firstPiece, file->lastPiece,
              priority, tor->info.files[fileIndex].name );
-
-    saveFastResumeSoon( tor );
-
-    tr_torrentUnlock( tor );
 }
 
 void
@@ -1169,8 +1151,13 @@ tr_torrentSetFilePriorities( tr_torrent     * tor,
                              tr_priority_t    priority )
 {
     int i;
+    tr_torrentLock( tor );
+
     for( i=0; i<fileCount; ++i )
-        tr_torrentSetFilePriority( tor, files[i], priority );
+        setFilePriority( tor, files[i], priority );
+
+    saveFastResumeNow( tor );
+    tr_torrentUnlock( tor );
 }
 
 tr_priority_t
