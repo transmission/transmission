@@ -84,6 +84,7 @@ static int           downloadLimit = -1;
 static char          * torrentPath = NULL;
 static int           natTraversal  = 0;
 static sig_atomic_t  gotsig        = 0;
+static sig_atomic_t  manualUpdate  = 0;
 static tr_torrent    * tor;
 
 static char          * finishCall   = NULL;
@@ -244,6 +245,7 @@ int main( int argc, char ** argv )
 #endif
 
     signal( SIGINT, sigHandler );
+    signal( SIGHUP, sigHandler );
 
     tr_setBindPort( h, bindPort );
   
@@ -270,18 +272,29 @@ int main( int argc, char ** argv )
             tr_torrentStop( tor );
             tr_natTraversalEnable( h, 0 );
         }
+        
+        if( manualUpdate )
+        {
+            manualUpdate = 0;
+            if ( !tr_torrentCanManualUpdate( tor ) ) {
+                fprintf( stderr, "\rReceived SIGHUP, but can't send a manual update now\n" );
+            else {
+                fprintf( stderr, "\rReceived SIGHUP: manual update scheduled\n" );
+                tr_manualUpdate( tor );
+            }
+        }
 
         s = tr_torrentStat( tor );
 
         if( s->status & TR_STATUS_CHECK_WAIT )
         {
             chars = snprintf( string, sizeof string,
-                "Waiting to check files... %.2f %%", 100.0 * s->percentDone );
+                "Waiting to verify local files... %.2f %%", 100.0 * s->percentDone );
         }
         else if( s->status & TR_STATUS_CHECK )
         {
             chars = snprintf( string, sizeof string,
-                "Checking files... %.2f %%", 100.0 * s->percentDone );
+                "Verifying local files... %.2f %%", 100.0 * s->percentDone );
         }
         else if( s->status & TR_STATUS_DOWNLOAD )
         {
@@ -437,6 +450,10 @@ static void sigHandler( int signal )
     {
         case SIGINT:
             gotsig = 1;
+            break;
+            
+        case SIGHUP:
+            manualUpdate = 1;
             break;
 
         default:

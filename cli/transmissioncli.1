@@ -92,6 +92,10 @@ Specifies the maximum download rate in kB/s, which defaults to -1 for
 no download limit.
 .It Fl f, -finish Ar script
 Specifies a shell script to be executed upon successful download.
+.Sh SIGNALS
+In addition to these options, sending
+.Nm
+a SIGHUP signal can ask the tracker for more peers.
 .El
 .Sh FILES
 .Bl -tag -width Ds -compact
