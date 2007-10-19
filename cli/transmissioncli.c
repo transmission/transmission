@@ -276,7 +276,7 @@ int main( int argc, char ** argv )
         if( manualUpdate )
         {
             manualUpdate = 0;
-            if ( !tr_torrentCanManualUpdate( tor ) ) {
+            if ( !tr_torrentCanManualUpdate( tor ) )
                 fprintf( stderr, "\rReceived SIGHUP, but can't send a manual update now\n" );
             else {
                 fprintf( stderr, "\rReceived SIGHUP: manual update scheduled\n" );
