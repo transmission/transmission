@@ -626,6 +626,8 @@ buildTrackerRequestURI( const tr_tracker  * t,
                               "&compact=1"
                               "&numwant=%d"
                               "&key=%s"
+                              "&supportcrypto=1"
+                              "&requirecrypto=%d"
                               "%s%s"
                               "%s%s",
         getCurrentAddress(t)->announce,
@@ -638,6 +640,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
         tr_cpLeftUntilComplete( torrent->completion ),
         numwant,
         t->key_param,
+        ( t->handle->encryptionMode==TR_ENCRYPTION_REQUIRED ? 1 : 0 ),
         ( ( eventName && *eventName ) ? "&event=" : "" ),
         ( ( eventName && *eventName ) ? eventName : "" ),
         ( ( t->trackerID && *t->trackerID ) ? "&trackerid=" : "" ),
