@@ -66,15 +66,14 @@
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
+    Torrent * torrent = [(FileOutlineView *)controlView torrent];
     NSDictionary * dict = [self representedObject];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
     
     int count = [priorities count];
     
-    FileOutlineView * view = (FileOutlineView *)[self controlView];
-    int hoverRow = [view hoverRow];
-    if (count > 0 && hoverRow != -1 && [view itemAtRow: hoverRow] == dict)
+    int hoverRow = [(FileOutlineView *)controlView hoverRow];
+    if (count > 0 && hoverRow != -1 && [(FileOutlineView *)controlView itemAtRow: hoverRow] == dict)
     {
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];
