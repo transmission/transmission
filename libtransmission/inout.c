@@ -384,8 +384,8 @@ tr_ioRecheckAdd( tr_torrent          * tor,
     node->recheck_done_cb = recheck_done_cb;
 
     tr_lockLock( getRecheckLock( ) );
+    tor->recheckState = recheckList ? TR_RECHECK_WAIT : TR_RECHECK_NOW;
     tr_list_append( &recheckList, node );
-    tor->recheckState = TR_RECHECK_WAIT;
     if( recheckThread == NULL )
         recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
     tr_lockUnlock( getRecheckLock( ) );
