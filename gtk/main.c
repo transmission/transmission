@@ -193,8 +193,8 @@ refreshTorrentActions( GtkTreeSelection * s )
 {
     int status = 0;
     gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &status );
-    action_sensitize( "pause-torrent", (status & TR_STATUS_ACTIVE) != 0);
-    action_sensitize( "start-torrent", (status & TR_STATUS_INACTIVE) != 0);
+    action_sensitize( "pause-torrent", TR_STATUS_IS_ACTIVE(status) );
+    action_sensitize( "start-torrent", !TR_STATUS_IS_ACTIVE(status) );
     action_sensitize( "remove-torrent", status != 0);
     action_sensitize( "verify-torrent", status != 0);
     action_sensitize( "show-torrent-details", status != 0);

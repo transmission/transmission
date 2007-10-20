@@ -187,7 +187,7 @@ torrent_start( int id )
     {
         const tr_stat  * st = tr_torrentStat( tor->tor );
 
-        if( TR_STATUS_INACTIVE & st->status )
+        if( !TR_STATUS_IS_ACTIVE( st->status ) )
         {
             tr_torrentStart( tor->tor );
             savestate();
@@ -209,7 +209,7 @@ torrent_stop( int id )
     {
         const tr_stat  * st = tr_torrentStat( tor->tor );
 
-        if( TR_STATUS_ACTIVE & st->status )
+        if( TR_STATUS_IS_ACTIVE( st->status ) )
         {
             tr_torrentStop( tor->tor );
             savestate();
@@ -839,7 +839,7 @@ savestate( void )
         tr_bencInitStr( tr_bencDictAdd( tor, "hash" ),
                         inf->hashString, 2 * SHA_DIGEST_LENGTH, 1 );
         tr_bencInitInt( tr_bencDictAdd( tor, "paused" ),
-                        ( TR_STATUS_INACTIVE & st->status ? 1 : 0 ) );
+                        !TR_STATUS_IS_ACTIVE( st->status ) );
         tr_bencInitStr( tr_bencDictAdd( tor, "directory" ),
                         tr_torrentGetFolder( ii->tor ), -1, 1 );
         if( pexset )

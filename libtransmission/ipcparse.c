@@ -858,8 +858,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 tr_bencInitInt( item, st->peersGettingFromUs );
                 break;
             case IPC_ST_RUNNING:
-                tr_bencInitInt( item,
-                                ( TR_STATUS_INACTIVE & st->status ? 0 : 1 ) );
+                tr_bencInitInt( item, TR_STATUS_IS_ACTIVE(st->status) );
                 break;
             case IPC_ST_STATE:
                 if( TR_STATUS_CHECK_WAIT & st->status )
@@ -878,7 +877,7 @@ ipc_addstat( benc_val_t * list, int tor,
                 {
                     tr_bencInitStr( item, "seeding", -1, 1 );
                 }
-                else if( TR_STATUS_INACTIVE & st->status )
+                else if( TR_STATUS_STOPPED & st->status )
                 {
                     tr_bencInitStr( item, "paused", -1, 1 );
                 }

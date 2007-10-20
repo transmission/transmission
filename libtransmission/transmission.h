@@ -610,10 +610,7 @@ typedef enum
 }
 tr_torrent_status;
 
-#define TR_STATUS_ACTIVE \
-    (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
-#define TR_STATUS_INACTIVE \
-    (TR_STATUS_STOPPED)
+#define TR_STATUS_IS_ACTIVE(s) ((s) != TR_STATUS_STOPPED)
 
 /***********************************************************************
  * tr_stat
