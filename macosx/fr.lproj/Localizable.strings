@@ -548,9 +548,6 @@
    Action context menu -> ratio stop */
 "Stop at Ratio (%.2f)" = "Arrêter au ratio (%.2f)";
 
-/* Torrent -> status string */
-"Stopping" = "Arrêt";
-
 /* File size */
 "TB" = "To";
 

@@ -548,9 +548,6 @@
    Action context menu -> ratio stop */
 "Stop at Ratio (%.2f)" = "Παύση σε Αναλογία (%.2f)";
 
-/* Torrent -> status string */
-"Stopping" = "Σταμάτημα";
-
 /* File size */
 "TB" = "TB";
 

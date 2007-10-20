@@ -594,9 +594,6 @@
 
 "Stop at Ratio (%.2f)" = "Ferma alla quota (%.2f)";
 
-/* Torrent -> status string */
-"Stopping" = "In interruzione";
-
 /* File size */
 "TB" = "TB";
 

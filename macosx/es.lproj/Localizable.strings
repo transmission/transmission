@@ -595,9 +595,6 @@
 
 "Stop at Ratio (%.2f)" = "Parar con ratio (%.2f)";
 
-/* Torrent -> status string */
-"Stopping" = "Parando";
-
 /* File size */
 "TB" = "TB";
 
