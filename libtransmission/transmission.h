@@ -606,15 +606,14 @@ typedef enum
                                         we're a seeder, but due to DND files
                                         there's nothing we want right now */
     TR_STATUS_SEED         = (1<<4), /* Seeding */
-    TR_STATUS_STOPPING     = (1<<5), /* Stopping -- closing connections, etc. */
-    TR_STATUS_STOPPED      = (1<<6)  /* Torrent is stopped */
+    TR_STATUS_STOPPED      = (1<<5)  /* Torrent is stopped */
 }
 tr_torrent_status;
 
 #define TR_STATUS_ACTIVE \
     (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
 #define TR_STATUS_INACTIVE \
-    (TR_STATUS_STOPPING|TR_STATUS_STOPPED)
+    (TR_STATUS_STOPPED)
 
 /***********************************************************************
  * tr_stat

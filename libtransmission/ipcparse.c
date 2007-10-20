@@ -878,10 +878,6 @@ ipc_addstat( benc_val_t * list, int tor,
                 {
                     tr_bencInitStr( item, "seeding", -1, 1 );
                 }
-                else if( TR_STATUS_STOPPING & st->status )
-                {
-                    tr_bencInitStr( item, "stopping", -1, 1 );
-                }
                 else if( TR_STATUS_INACTIVE & st->status )
                 {
                     tr_bencInitStr( item, "paused", -1, 1 );

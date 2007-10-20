@@ -313,10 +313,6 @@ int main( int argc, char ** argv )
                 s->peersGettingFromUs, s->peersConnected,
                 s->rateUpload, getStringRatio(s->ratio) );
         }
-        else if( s->status & TR_STATUS_STOPPING )
-        {
-            chars = snprintf( string, sizeof string, "Stopping..." );
-        }
         else if( s->status & TR_STATUS_INACTIVE )
         {
             break;
