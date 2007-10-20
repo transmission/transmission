@@ -661,6 +661,8 @@ tr_torrentStat( tr_torrent * tor )
 
     tr_torrentLock( tor );
 
+    tr_torrentRecheckCompleteness( tor );
+
     tor->statCur = !tor->statCur;
     s = &tor->stats[tor->statCur];
 

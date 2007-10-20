@@ -609,7 +609,7 @@ typedef enum
     TR_STATUS_STOPPING     = (1<<5), /* Stopping -- closing connections, etc. */
     TR_STATUS_STOPPED      = (1<<6)  /* Torrent is stopped */
 }
-torrent_status_t;
+tr_torrent_status;
 
 #define TR_STATUS_ACTIVE \
     (TR_STATUS_CHECK_WAIT|TR_STATUS_CHECK|TR_STATUS_DOWNLOAD|TR_STATUS_DONE|TR_STATUS_SEED)
@@ -621,7 +621,7 @@ torrent_status_t;
  **********************************************************************/
 struct tr_stat
 {
-    torrent_status_t    status;
+    tr_torrent_status   status;
 
     int                 error;
     char                errorString[128];
