@@ -201,14 +201,17 @@ AC_CONFIG_FILES([Makefile
                  beos/Makefile
                  cli/Makefile
                  daemon/Makefile
-                 gtk/Makefile
                  libtransmission/Makefile
                  libtransmission/version.h
                  third-party/Makefile
                  macosx/Makefile
                  wx/Makefile
-                 wx/images/Makefile
-                 po/Makefile.in])
+                 wx/images/Makefile])
+
+if test "x$use_gtk" = "xyes"; then
+    AC_CONFIG_FILES([gtk/Makefile
+                     po/Makefile.in])
+fi
 
 ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
 AC_OUTPUT
