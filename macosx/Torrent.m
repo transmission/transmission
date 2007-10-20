@@ -729,17 +729,12 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (BOOL) isActive
 {
-    return fStat->status & TR_STATUS_ACTIVE;
+    return fStat->status != TR_STATUS_STOPPED;
 }
 
 - (BOOL) isSeeding
 {
     return fStat->status == TR_STATUS_SEED || fStat->status == TR_STATUS_DONE;
-}
-
-- (BOOL) isPaused
-{
-    return fStat->status == TR_STATUS_STOPPED;
 }
 
 - (BOOL) isChecking

@@ -158,7 +158,7 @@
         
         if ([torrent isActive])
             [fController stopTorrents: [NSArray arrayWithObject: torrent]];
-        else if ([torrent isPaused])
+        else
         {
             if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask)
                 [fController resumeTorrentsNoWait: [NSArray arrayWithObject: torrent]];
@@ -167,7 +167,6 @@
             else
                 [fController resumeTorrents: [NSArray arrayWithObject: torrent]];
         }
-        else;
     }
     else if (row == oldRow && [self pointInRevealRect: point] && [self pointInRevealRect: fClickPoint])
         [[fTorrents objectAtIndex: row] revealData];
@@ -460,7 +459,7 @@
     NSRect pauseRect  = [self pauseRectForRow: row];
     if ([torrent isActive])
         pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
-    else if ([torrent isPaused])
+    else
     {
         BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
         if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
@@ -470,7 +469,6 @@
         else
             pauseImage = inPauseRect ? fResumeOnIcon : fResumeOffIcon;
     }
-    else;
     
     if (pauseImage)
         [pauseImage compositeToPoint: NSMakePoint(pauseRect.origin.x, NSMaxY(pauseRect)) operation: NSCompositeSourceOver];

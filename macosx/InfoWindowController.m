@@ -1345,13 +1345,13 @@ typedef enum
     enumerator = [fTorrents objectEnumerator];
     torrent = [enumerator nextObject]; //first torrent
     
-    BOOL pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
+    BOOL pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
     int pexState = [torrent pex] ? NSOnState : NSOffState;
     
     while ((torrent = [enumerator nextObject]) && (pexEnabled || pexState != NSMixedState))
     {
         if (pexEnabled)
-            pexEnabled = ![torrent privateTorrent] && [torrent isPaused];
+            pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
         
         if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
             pexState = NSMixedState;

@@ -158,7 +158,6 @@ typedef enum
 
 - (BOOL) isActive;
 - (BOOL) isSeeding;
-- (BOOL) isPaused;
 - (BOOL) isChecking;
 - (BOOL) allDownloaded;
 - (BOOL) isComplete;

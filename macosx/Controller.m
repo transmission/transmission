@@ -2778,7 +2778,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused] && ![torrent waitingToStart])
+            if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2800,7 +2800,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused] && ![torrent waitingToStart])
+            if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2927,7 +2927,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused] && ![torrent waitingToStart])
+            if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2941,7 +2941,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         Torrent * torrent;
         NSEnumerator * enumerator = [fTorrents objectEnumerator];
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused] && [torrent waitingToStart])
+            if (![torrent isActive] && [torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -2955,7 +2955,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused])
+            if (![torrent isActive])
                 return YES;
         return NO;
     }
@@ -2983,7 +2983,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
         Torrent * torrent;
         while ((torrent = [enumerator nextObject]))
-            if ([torrent isPaused] && ![torrent waitingToStart])
+            if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
     }
@@ -3055,7 +3055,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             
             enumerator = [fTorrents objectEnumerator];
             while (!timeUp && (torrent = [enumerator nextObject]))
-                while (![torrent isPaused] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
+                while ([torrent isActive] && !(timeUp = [start timeIntervalSinceNow] < -5.0))
                 {
                     usleep(100000);
                     [torrent update];
