@@ -1241,7 +1241,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         files[i] = index;
         i++;
     }
-
+    
     tr_torrentSetFilePriorities(fHandle, files, count, priority);
     free(files);
 }
