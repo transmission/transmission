@@ -52,16 +52,23 @@
     
     //only for when clicking manually
     int priority;
-    if (segment == 0)
-        priority = TR_PRI_LOW;
-    else if (segment == 2)
-        priority = TR_PRI_HIGH;
-    else
-        priority = TR_PRI_NORMAL;
+    switch (segment)
+    {
+        case 0:
+            priority = TR_PRI_LOW;
+            break;
+        case 1:
+            priority = TR_PRI_NORMAL;
+            break;
+        case 2:
+            priority = TR_PRI_HIGH;
+            break;
+    }
     
-    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
+    FileOutlineView * controlView = (FileOutlineView *)[self controlView];
+    Torrent * torrent = [controlView torrent];
     [torrent setFilePriority: priority forIndexes: [[self representedObject] objectForKey: @"Indexes"]];
-    [(FileOutlineView *)[self controlView] reloadData];
+    [controlView reloadData];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
