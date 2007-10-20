@@ -295,27 +295,6 @@ tr_set_compare( const void * va, size_t aCount,
 ****
 ***/
 
-
-#if 0
-void*
-tr_memmem( const void* haystack, size_t hl,
-           const void* needle,   size_t nl)
-{
-    const char *walk, *end;
-
-    if( !nl )
-        return (void*) haystack;
-
-    if( hl < nl )
-        return NULL;
-
-    for (walk=(const char*)haystack, end=walk+hl-nl; walk!=end; ++walk)
-        if( !memcmp( walk, needle, nl ) )
-            return (void*) walk;
-
-    return NULL;
-}
-#else
 void * tr_memmem ( const void *vbig, size_t big_len,
                    const void *vlittle, size_t little_len )
 {
@@ -345,19 +324,10 @@ void * tr_memmem ( const void *vbig, size_t big_len,
 
     return NULL;
 }
-#endif
 
 /**
 ***
 **/
-
-int
-tr_compareUint8 (  uint8_t a,  uint8_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
 
 int
 tr_compareUint16( uint16_t a, uint16_t b )
@@ -375,26 +345,9 @@ tr_compareUint32( uint32_t a, uint32_t b )
     return 0;
 }
 
-int
-tr_compareUint64( uint64_t a, uint64_t b )
-{
-    if( a < b ) return -1;
-    if( a > b ) return 1;
-    return 0;
-}
-
 /**
 ***
 **/
-
-struct timeval
-timevalSec ( int seconds )
-{
-    struct timeval ret;
-    ret.tv_sec = seconds;
-    ret.tv_usec = 0;
-    return ret;
-}
 
 struct timeval
 timevalMsec( uint64_t milliseconds )
@@ -868,18 +821,6 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
 }
 
 tr_bitfield*
-tr_bitfieldNegate( tr_bitfield * b )
-{
-    uint8_t *it;
-    const uint8_t *end;
-
-    for( it=b->bits, end=it+b->len; it!=end; ++it )
-        *it = ~*it;
-
-    return b;
-}
-
-tr_bitfield*
 tr_bitfieldAnd( tr_bitfield * a, const tr_bitfield * b )
 {
     uint8_t *ait;
@@ -948,116 +889,4 @@ tr_wait( uint64_t delay_milliseconds )
 #else
     usleep( 1000 * delay_milliseconds );
 #endif
-}
-
-#define WANTBYTES( want, got ) \
-    if( (want) > (got) ) { return; } else { (got) -= (want); }
-void
-strlcat_utf8( void * dest, const void * src, size_t len, char skip )
-{
-    char       * s      = dest;
-    const char * append = src;
-    const char * p;
-
-    /* don't overwrite the nul at the end */
-    len--;
-
-    /* Go to the end of the destination string */
-    while( s[0] )
-    {
-        s++;
-        len--;
-    }
-
-    /* Now start appending, converting on the fly if necessary */
-    for( p = append; p[0]; )
-    {
-        /* skip over the requested character */
-        if( skip == p[0] )
-        {
-            p++;
-            continue;
-        }
-
-        if( !( p[0] & 0x80 ) )
-        {
-            /* ASCII character */
-            WANTBYTES( 1, len );
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xE0 ) == 0xC0 && ( p[1] & 0xC0 ) == 0x80 )
-        {
-            /* 2-bytes UTF-8 character */
-            WANTBYTES( 2, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF0 ) == 0xE0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 )
-        {
-            /* 3-bytes UTF-8 character */
-            WANTBYTES( 3, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++);
-            continue;
-        }
-
-        if( ( p[0] & 0xF8 ) == 0xF0 && ( p[1] & 0xC0 ) == 0x80 &&
-            ( p[2] & 0xC0 ) == 0x80 && ( p[3] & 0xC0 ) == 0x80 )
-        {
-            /* 4-bytes UTF-8 character */
-            WANTBYTES( 4, len );
-            *(s++) = *(p++); *(s++) = *(p++);
-            *(s++) = *(p++); *(s++) = *(p++);
-            continue;
-        }
-
-        /* ISO 8859-1 -> UTF-8 conversion */
-        WANTBYTES( 2, len );
-        *(s++) = 0xC0 | ( ( *p & 0xFF ) >> 6 );
-        *(s++) = 0x80 | ( *(p++) & 0x3F );
-    }
-}
-
-size_t
-bufsize_utf8( const void * vstr, int * changed )
-{
-    const char * str = vstr;
-    size_t       ii, grow;
-
-    if( NULL != changed )
-        *changed = 0;
-
-    ii   = 0;
-    grow = 1;
-    while( '\0' != str[ii] )
-    {
-        if( !( str[ii] & 0x80 ) )
-            /* ASCII character */
-            ii++;
-        else if( ( str[ii]   & 0xE0 ) == 0xC0 && ( str[ii+1] & 0xC0 ) == 0x80 )
-            /* 2-bytes UTF-8 character */
-            ii += 2;
-        else if( ( str[ii]   & 0xF0 ) == 0xE0 && ( str[ii+1] & 0xC0 ) == 0x80 &&
-                 ( str[ii+2] & 0xC0 ) == 0x80 )
-            /* 3-bytes UTF-8 character */
-            ii += 3;
-        else if( ( str[ii]   & 0xF8 ) == 0xF0 && ( str[ii+1] & 0xC0 ) == 0x80 &&
-                 ( str[ii+2] & 0xC0 ) == 0x80 && ( str[ii+3] & 0xC0 ) == 0x80 )
-            /* 4-bytes UTF-8 character */
-            ii += 4;
-        else
-        {
-            /* ISO 8859-1 -> UTF-8 conversion */
-            ii++;
-            grow++;
-            if( NULL != changed )
-                *changed = 1;
-        }
-    }
-
-    return ii + grow;
 }

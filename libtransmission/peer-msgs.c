@@ -1063,7 +1063,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
         case BT_HAVE_NONE: {
             assert( msglen == 0 );
             dbgmsg( msgs, "Got a BT_HAVE_NONE" );
-            memset( msgs->info->have->bits, 1, msgs->info->have->len );
+            tr_bitfieldClear( msgs->info->have );
             updatePeerProgress( msgs );
             break;
         }

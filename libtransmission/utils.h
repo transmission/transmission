@@ -83,7 +83,6 @@ int tr_concat( char ** buf, int * used, int * max,
 void tr_buildPath( char* buf, size_t buflen,
                    const char * first_element, ... );
 
-struct timeval timevalSec( int seconds );
 struct timeval timevalMsec( uint64_t milliseconds );
 
 
@@ -96,17 +95,6 @@ uint64_t tr_date( void );
 
 /* wait the specified number of milliseconds */
 void tr_wait( uint64_t delay_milliseconds );
-
-/***********************************************************************
- * strlcat_utf8
- ***********************************************************************
- * According to the official specification, all strings in the torrent
- * file are supposed to be UTF-8 encoded. However, there are
- * non-compliant torrents around... If we encounter an invalid UTF-8
- * character, we assume it is ISO 8859-1 and convert it to UTF-8.
- **********************************************************************/
-void strlcat_utf8( void *, const void *, size_t, char );
-size_t bufsize_utf8( const void *, int * );
 
 /***
 ****
@@ -155,10 +143,8 @@ void tr_set_compare( const void * a, size_t aCount,
                      tr_set_func in_both_cb,
                      void * userData );
                     
-int tr_compareUint8 (  uint8_t a,  uint8_t b );
 int tr_compareUint16( uint16_t a, uint16_t b );
 int tr_compareUint32( uint32_t a, uint32_t b );
-int tr_compareUint64( uint64_t a, uint64_t b );
 
 /***
 ****
@@ -187,7 +173,6 @@ int    tr_bitfieldHas( const tr_bitfield*, size_t bit );
 int    tr_bitfieldIsEmpty( const tr_bitfield* );
 size_t tr_bitfieldCountTrueBits( const tr_bitfield* );
 
-tr_bitfield* tr_bitfieldNegate( tr_bitfield* );
 tr_bitfield* tr_bitfieldAnd( tr_bitfield*, const tr_bitfield* );
 
 #endif
