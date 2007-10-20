@@ -22,8 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "FileOutlineView.h"
 #import "FileNameCell.h"
+#import "FileOutlineView.h"
 #import "Torrent.h"
 #import "NSStringAdditions.h"
 

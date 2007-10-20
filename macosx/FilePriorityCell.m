@@ -73,8 +73,8 @@
     int count = [priorities count];
     
     FileOutlineView * view = (FileOutlineView *)[self controlView];
-    int row = [view hoverRow];
-    if (count > 0 && row != -1 && [view itemAtRow: row] == dict)
+    int hoverRow = [view hoverRow];
+    if (count > 0 && hoverRow != -1 && [view itemAtRow: hoverRow] == dict)
     {
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]] forSegment: 0];
         [super setSelected: [priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]] forSegment: 1];
@@ -97,23 +97,26 @@
                 fMixedImage = [NSImage imageNamed: @"PriorityMixed.png"];
             image = fMixedImage;
         }
-        else if ([priorities containsObject: [NSNumber numberWithInt: TR_PRI_NORMAL]])
-        {
-            if (!fNormalImage)
-                fNormalImage = [NSImage imageNamed: @"PriorityNormal.png"];
-            image = fNormalImage;
-        }
-        else if ([priorities containsObject: [NSNumber numberWithInt: TR_PRI_LOW]])
-        {
-            if (!fLowImage)
-                fLowImage = [NSImage imageNamed: @"PriorityLow.png"];
-            image = fLowImage;
-        }
         else
         {
-            if (!fHighImage)
-                fHighImage = [NSImage imageNamed: @"PriorityHigh.png"];
-            image = fHighImage;
+            switch ([[priorities anyObject] intValue])
+            {
+                case TR_PRI_NORMAL:
+                    if (!fNormalImage)
+                        fNormalImage = [NSImage imageNamed: @"PriorityNormal.png"];
+                    image = fNormalImage;
+                    break;
+                case TR_PRI_LOW:
+                    if (!fLowImage)
+                        fLowImage = [NSImage imageNamed: @"PriorityLow.png"];
+                    image = fLowImage;
+                    break;
+                case TR_PRI_HIGH:
+                    if (!fHighImage)
+                        fHighImage = [NSImage imageNamed: @"PriorityHigh.png"];
+                    image = fHighImage;
+                    break;
+            }
         }
         
         NSSize imageSize = [image size];
