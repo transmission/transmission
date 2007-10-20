@@ -228,6 +228,8 @@ typedef enum
             [fPexCheck setToolTip: nil];
         }
         
+        [fFileOutline setTorrent: nil];
+        
         [fImageView setImage: fAppIcon];
         
         [fNameField setToolTip: nil];
@@ -301,6 +303,8 @@ typedef enum
     else
     {    
         Torrent * torrent = [fTorrents objectAtIndex: 0];
+        
+        [fFileOutline setTorrent: torrent];
         
         NSImage * icon = [[torrent icon] copy];
         [icon setFlipped: NO];
@@ -378,11 +382,6 @@ typedef enum
     [fPeerTable reloadData];
     [fFileOutline deselectAll: nil];
     [fFileOutline reloadData];
-}
-
-- (Torrent *) selectedTorrent
-{
-    return fTorrents && [fTorrents count] == 1 ? [fTorrents objectAtIndex: 0] : nil;
 }
 
 - (void) updateInfoStats

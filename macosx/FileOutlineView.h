@@ -24,12 +24,19 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class Torrent;
+
 @interface FileOutlineView : NSOutlineView
 {
+    Torrent * fTorrent;
+    
     NSColor * fHighPriorityColor, * fLowPriorityColor, * fMixedPriorityColor;
     
     int fHoverRow;
 }
+
+- (void) setTorrent: (Torrent *) torrent;
+- (Torrent *) torrent;
 
 - (void) setHoverRowForEvent: (NSEvent *) event;
 - (int) hoverRow;

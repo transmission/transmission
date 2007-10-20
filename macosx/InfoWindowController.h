@@ -70,7 +70,6 @@
 }
 
 - (void) updateInfoForTorrents: (NSArray *) torrents;
-- (Torrent *) selectedTorrent;
 - (void) updateInfoStats;
 
 - (void) setTab: (id) sender;

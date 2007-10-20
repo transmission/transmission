@@ -22,8 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#import "FileOutlineView.h"
 #import "FileNameCell.h"
-#import "InfoWindowController.h"
+#import "Torrent.h"
 #import "NSStringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0
@@ -89,14 +90,13 @@
     [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver
                     fraction: 1.0];
     
-    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
-    
     //title
     NSColor * specialColor = nil;
     if ([self isHighlighted]
             && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
         specialColor = [NSColor whiteColor];
-    else if ([torrent checkForFiles: [[self objectValue] objectForKey: @"Indexes"]] == NSOffState)
+    else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles:
+                    [[self objectValue] objectForKey: @"Indexes"]] == NSOffState)
         specialColor = [NSColor disabledControlTextColor];
     else;
     
@@ -195,7 +195,7 @@
     if (color)
         [fStatusAttributes setObject: color forKey: NSForegroundColorAttributeName];
     
-    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
+    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     float percent = [torrent fileProgress: [[[self objectValue] objectForKey: @"Indexes"] firstIndex]] * 100.0;
     
     NSString * status = [NSString stringWithFormat: NSLocalizedString(@"%.2f%% of %@",

@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "FilePriorityCell.h"
-#import "InfoWindowController.h"
+#import "FileOutlineView.h"
 #import "Torrent.h"
 
 @implementation FilePriorityCell
@@ -51,8 +51,6 @@
     [super setSelected: flag forSegment: segment];
     
     //only for when clicking manually
-    Torrent * torrent = [[[[self controlView] window] windowController] selectedTorrent];
-    
     int priority;
     if (segment == 0)
         priority = TR_PRI_LOW;
@@ -61,13 +59,14 @@
     else
         priority = TR_PRI_NORMAL;
     
+    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     [torrent setFilePriority: priority forIndexes: [[self representedObject] objectForKey: @"Indexes"]];
     [(FileOutlineView *)[self controlView] reloadData];
 }
 
 - (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
-    Torrent * torrent = [(InfoWindowController *)[[[self controlView] window] windowController] selectedTorrent];
+    Torrent * torrent = [(FileOutlineView *)[self controlView] torrent];
     NSDictionary * dict = [self representedObject];
     NSSet * priorities = [torrent filePrioritiesForIndexes: [dict objectForKey: @"Indexes"]];
     
