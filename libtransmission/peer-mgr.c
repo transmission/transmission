@@ -1281,6 +1281,21 @@ tr_peerMgrGetAvailable( const tr_peerMgr * manager,
     return pieces;
 }
 
+int
+tr_peerMgrHasConnections( const tr_peerMgr * manager,
+                          const uint8_t    * torrentHash )
+{
+    int ret;
+    const Torrent * t;
+    managerLock( (tr_peerMgr*)manager );
+
+    t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
+    ret = t && tr_ptrArraySize( t->peers );
+
+    managerUnlock( (tr_peerMgr*)manager );
+    return ret;
+}
+
 void
 tr_peerMgrTorrentStats( const tr_peerMgr * manager,
                         const uint8_t    * torrentHash,

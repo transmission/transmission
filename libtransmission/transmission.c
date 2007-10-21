@@ -259,16 +259,18 @@ tr_getGlobalSpeedLimit( tr_handle  * h,
 }
 
 void
-tr_torrentRates( tr_handle * h, float * dl, float * ul )
+tr_torrentRates( tr_handle * h, float * toClient, float * toPeer )
 {
-    tr_torrent * tor;
+    const tr_torrent * tor;
     tr_globalLock( h );
 
-    *dl = *ul = 0.0;
+    *toClient = *toPeer = 0.0;
     for( tor = h->torrentList; tor; tor = tor->next )
     {
-        *dl += tr_rcRate( tor->download );
-        *ul += tr_rcRate( tor->upload );
+        float c, p;
+        tr_torrentGetRates( tor, &c, &p );
+        *toClient += c;
+        *toPeer += p;
     }
 
     tr_globalUnlock( h );

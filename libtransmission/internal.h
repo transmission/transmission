@@ -69,6 +69,8 @@ int tr_torrentExists( tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromHash( tr_handle *, const uint8_t * );
 tr_torrent* tr_torrentFindFromObfuscatedHash( tr_handle *, const uint8_t* );
 
+void tr_torrentGetRates( const tr_torrent *, float * toClient, float * toPeer );
+
 /* get the index of this piece's first block */
 #define tr_torPieceFirstBlock(tor,piece) ( (piece) * (tor)->blockCountInPiece )
 

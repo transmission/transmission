@@ -653,6 +653,24 @@ tr_torrentCanManualUpdate( const tr_torrent * tor )
         && ( tr_trackerCanManualAnnounce( tor->tracker ) );
 }
 
+/* rcRate's averaging code can make it appear that we're
+ * still sending bytes after a torrent stops or all the
+ * peers disconnect, so short-circuit that appearance here */
+void
+tr_torrentGetRates( const tr_torrent * tor,
+                    float            * toClient,
+                    float            * toPeer)
+{
+    const int showSpeed = tor->isRunning
+        && tr_peerMgrHasConnections( tor->handle->peerMgr, tor->info.hash );
+
+    if( toClient )
+        *toClient = showSpeed ? tr_rcRate( tor->download ) : 0.0;
+    if( toPeer )
+        *toPeer = showSpeed ? tr_rcRate( tor->upload ) : 0.0;
+}
+
+
 const tr_stat *
 tr_torrentStat( tr_torrent * tor )
 {
@@ -703,16 +721,7 @@ tr_torrentStat( tr_torrent * tor )
         ? 0.0
         : 1.0 - ((double)tr_bitfieldCountTrueBits(tor->uncheckedPieces) / tor->info.pieceCount);
 
-    /* rcRate's averaging code can make it appear that we're
-     * still sending bytes after a torrent stops or all the
-     * peers disconnect, so short-circuit that appearance here */
-    if( tor->isRunning && s->peersConnected ) {
-        s->rateDownload = tr_rcRate( tor->download );
-        s->rateUpload = tr_rcRate( tor->upload );
-    } else {
-        s->rateDownload = 0.0;
-        s->rateUpload = 0.0;
-    }
+    tr_torrentGetRates( tor, &s->rateDownload, &s->rateUpload );
    
     tr_trackerGetCounts( tc,
                          &s->completedFromTracker,
