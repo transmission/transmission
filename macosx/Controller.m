@@ -88,6 +88,8 @@
 #define DOCK_SEEDING_TAG        101
 #define DOCK_DOWNLOADING_TAG    102
 
+#define SUPPORT_FOLDER  @"/Library/Application Support/Transmission/Transfers.plist"
+
 #define WEBSITE_URL @"http://transmission.m0k.org/"
 #define FORUM_URL   @"http://transmission.m0k.org/forum/"
 #define DONATE_URL  @"http://transmission.m0k.org/donate.php"
@@ -266,8 +268,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSLog(@"Could not IORegisterForSystemPower");
     
     //load previous transfers
-    NSArray * history = [[NSArray alloc] initWithContentsOfFile:
-        [NSHomeDirectory() stringByAppendingPathComponent: @"/Library/Application Support/Transmission/Transfers.plist"]];
+    NSArray * history = [[NSArray alloc] initWithContentsOfFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER]];
     
     //old version saved transfer info in prefs file
     if (!history)
@@ -1612,8 +1613,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [history addObject: [torrent history]];
 
-    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent:
-        @"/Library/Application Support/Transmission/Transfers.plist"] atomically: YES];
+    [history writeToFile: [NSHomeDirectory() stringByAppendingPathComponent: SUPPORT_FOLDER] atomically: YES];
 }
 
 - (void) sortTorrents
