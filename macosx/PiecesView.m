@@ -148,7 +148,7 @@
     BOOL showAvailablity = [[NSUserDefaults standardUserDefaults] boolForKey: @"PiecesViewShowAvailability"];
     if (showAvailablity)
     {   
-        pieces = malloc(fNumPieces);
+        pieces = malloc(fNumPieces * sizeof(int8_t));
         [fTorrent getAvailability: pieces size: fNumPieces];
     }
     else

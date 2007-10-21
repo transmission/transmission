@@ -2828,8 +2828,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSString * title = [[fInfoController window] isVisible] ? NSLocalizedString(@"Hide Inspector", "View menu -> Inspector")
                             : NSLocalizedString(@"Show Inspector", "View menu -> Inspector");
-        if (![[menuItem title] isEqualToString: title])
-            [menuItem setTitle: title];
+        [menuItem setTitle: title];
 
         return YES;
     }
@@ -2843,8 +2842,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSString * title = [fStatusBar isHidden] ? NSLocalizedString(@"Show Status Bar", "View menu -> Status Bar")
                             : NSLocalizedString(@"Hide Status Bar", "View menu -> Status Bar");
-        if (![[menuItem title] isEqualToString: title])
-            [menuItem setTitle: title];
+        [menuItem setTitle: title];
 
         return [fWindow isVisible];
     }
@@ -2854,8 +2852,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSString * title = [fFilterBar isHidden] ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar")
                             : NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
-        if (![[menuItem title] isEqualToString: title])
-            [menuItem setTitle: title];
+        [menuItem setTitle: title];
 
         return [fWindow isVisible];
     }
@@ -3023,9 +3020,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
         
-        int tag = [menuItem tag];
         BOOL state;
-        if (tag == FILTER_TYPE_TAG_TRACKER)
+        if ([menuItem tag] == FILTER_TYPE_TAG_TRACKER)
             state = [filterType isEqualToString: FILTER_TYPE_TRACKER];
         else
             state = [filterType isEqualToString: FILTER_TYPE_NAME];
