@@ -9,8 +9,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Significant rewrite of the libtransmission back-end
  - OS X:
    + Per-torrent action menu
+   + Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs
    + Redesigned message log
-   + Inspector can be resized vertically in Peers and Files tabs
    + Optimizations to decrease memory usage
    + Sort and filter by tracker
    + Various smaller interface additions and improvements
