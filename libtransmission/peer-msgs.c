@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h> /* basename */
 
 #include <arpa/inet.h>
 
@@ -156,8 +157,10 @@ myDebug( const char * file, int line,
     if( fp != NULL )
     {
         va_list args;
-        struct evbuffer * buf = evbuffer_new( );
         char timestr[64];
+        struct evbuffer * buf = evbuffer_new( );
+        char * myfile = tr_strdup( file );
+
         evbuffer_add_printf( buf, "[%s] %s [%s]: ",
                              tr_getLogTimeStr( timestr, sizeof(timestr) ),
                              tr_peerIoGetAddrStr( msgs->io ),
@@ -165,9 +168,10 @@ myDebug( const char * file, int line,
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", file, line );
-
+        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
         fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+
+        tr_free( myfile );
         evbuffer_free( buf );
     }
 }

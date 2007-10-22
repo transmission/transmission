@@ -15,6 +15,7 @@
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <string.h> /* strcmp, strchr */
+#include <libgen.h> /* basename */
 
 #include <sys/queue.h> /* libevent needs this */
 #include <sys/types.h> /* libevent needs this */
@@ -124,17 +125,20 @@ myDebug( const char * file, int line, const tr_tracker * t, const char * fmt, ..
     if( fp != NULL )
     {
         va_list args;
-        struct evbuffer * buf = evbuffer_new( );
         char timestr[64];
+        struct evbuffer * buf = evbuffer_new( );
+        char * myfile = tr_strdup( file );
+
         evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( timestr, sizeof(timestr) ) );
         if( t != NULL )
             evbuffer_add_printf( buf, "%s ", t->name );
         va_start( args, fmt );
         evbuffer_add_vprintf( buf, fmt, args );
         va_end( args );
-        evbuffer_add_printf( buf, " (%s:%d)\n", file, line );
-
+        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
         fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+
+        tr_free( myfile );
         evbuffer_free( buf );
     }
 }
