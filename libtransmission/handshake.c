@@ -818,6 +818,7 @@ dbgmsg( handshake, "reading IA..." );
     i = parseHandshake( handshake, inbuf );
 dbgmsg( handshake, "parseHandshake returned %d", i );
     if( i != HANDSHAKE_OK ) {
+        evbuffer_free( outbuf );
         tr_handshakeDone( handshake, FALSE );
         return READ_DONE;
     }

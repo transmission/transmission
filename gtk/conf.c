@@ -132,11 +132,12 @@ cf_removelocks( void )
 gboolean
 cf_lock( char ** errstr )
 {
-    const char * path = getLockFilename( );
+    char * path = getLockFilename( );
     int fd = lockfile( path, errstr );
     if( fd >= 0 )
         gl_lockpath = g_strdup( path );
     g_atexit( cf_removelocks );
+    g_free( path );
     return fd >= 0;
 }
 

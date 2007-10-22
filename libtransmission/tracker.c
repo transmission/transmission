@@ -708,6 +708,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     int responseCode;
 
     t = findTrackerFromHash( torrent_hash );
+    tr_free( torrent_hash );
     if( t == NULL ) /* tracker has been closed */
         return;
 

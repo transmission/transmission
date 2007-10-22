@@ -1642,7 +1642,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->inBlock = evbuffer_new( );
     m->peerAllowedPieces = NULL;
     m->clientAllowedPieces = NULL;
-    setme = tr_publisherSubscribe( m->publisher, func, userData );
+    *setme = tr_publisherSubscribe( m->publisher, func, userData );
     
     if ( tr_peerIoSupportsFEXT( m->io ) )
     {
@@ -1744,4 +1744,3 @@ tr_peerMsgIsPieceFastAllowed( const tr_peermsgs * peer,
 {
     return tr_bitfieldHas( peer->clientAllowedPieces, index );
 }
-
