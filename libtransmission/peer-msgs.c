@@ -1668,26 +1668,12 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     tr_peerIoSetIOMode( m->io, EV_READ|EV_WRITE, 0 );
     ratePulse( m );
 
-    /**
-    ***  If we initiated this connection,
-    ***  we may need to send LTEP/AZMP handshakes.
-    ***  Otherwise we'll wait for the peer to send theirs first.
-    **/
-    if( !tr_peerIoIsIncoming( m->io ) )
-    {
-        if ( tr_peerIoSupportsLTEP( m->io ) ) {
-            sendLtepHandshake( m );
-            
-        } else if ( tr_peerIoSupportsAZMP( m->io ) ) {
-            dbgmsg( m, "FIXME: need to send AZMP handshake" );
-            
-        } else {
-            /* no-op */
-        }
-    }
-    
-    if ( tr_peerIoSupportsFEXT( m->io ) )
-    {
+    if ( tr_peerIoSupportsLTEP( m->io ) )
+        sendLtepHandshake( m );
+
+    if ( !tr_peerIoSupportsFEXT( m->io ) )
+        sendBitfield( m );
+    else {
         /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
         float completion = tr_cpPercentComplete( m->torrent->completion );
         if ( completion == 0.0f ) {
@@ -1701,9 +1687,8 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         
         if ( peerProgress < MAX_ALLOWED_SET_COUNT )
             sendFastAllowedSet( m );
-    } else {
-        sendBitfield( m );
     }
+
     return m;
 }
 

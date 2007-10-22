@@ -32,7 +32,6 @@
 
 struct tr_extensions
 {
-    unsigned int azureusProtocolSupported : 1;
     unsigned int extendedProtocolSupported : 1;
     unsigned int fastPeersSupported : 1;
 };
@@ -354,15 +353,6 @@ tr_peerIoGetPeersId( const tr_peerIo * io )
 **/
 
 void
-tr_peerIoEnableAZMP( tr_peerIo * io, int flag )
-{
-    assert( io != NULL );
-    assert( flag==0 || flag==1 );
-    
-    io->extensions.azureusProtocolSupported = flag;
-}
-
-void
 tr_peerIoEnableLTEP( tr_peerIo * io, int flag )
 {
     assert( io != NULL );
@@ -378,14 +368,6 @@ tr_peerIoEnableFEXT( tr_peerIo * io, int flag )
     assert( flag==0 || flag==1 );
     
     io->extensions.fastPeersSupported = flag;
-}
-
-int
-tr_peerIoSupportsAZMP( const tr_peerIo * io )
-{
-    assert( io != NULL );
-    
-    return io->extensions.azureusProtocolSupported;
 }
 
 int

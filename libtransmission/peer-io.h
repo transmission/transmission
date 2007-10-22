@@ -49,11 +49,9 @@ tr_handle* tr_peerIoGetHandle( tr_peerIo * io );
 ***
 **/
 
-void  tr_peerIoEnableAZMP( tr_peerIo * io, int flag );
 void  tr_peerIoEnableLTEP( tr_peerIo * io, int flag );
 void  tr_peerIoEnableFEXT( tr_peerIo * io, int flag );
 
-int   tr_peerIoSupportsAZMP( const tr_peerIo * io );
 int   tr_peerIoSupportsLTEP( const tr_peerIo * io );
 int   tr_peerIoSupportsFEXT( const tr_peerIo * io );
 
