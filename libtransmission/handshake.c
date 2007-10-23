@@ -654,7 +654,7 @@ readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
 {
     int connectedToSelf;
     char * client;
-    const size_t sizeNeeded = HANDSHAKE_SIZE - PEER_ID_LEN; 
+    const size_t sizeNeeded = PEER_ID_LEN; 
     if( EVBUFFER_LENGTH(inbuf) < sizeNeeded )
         return READ_MORE;
 
