@@ -443,7 +443,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             }
             [self changeDownloadFolder: folder];
             
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
             
             [self endQuickPause];
         }
@@ -556,7 +556,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [self startTransfer];
     [self update];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateInfoSettings" object: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateStats" object: nil];
 }
 
 - (BOOL) alertForMoveFolderAvailable

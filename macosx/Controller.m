@@ -374,9 +374,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [nc addObserver: self selector: @selector(updateUI)
                     name: @"UpdateUI" object: nil];
     
-    [nc addObserver: fInfoController selector: @selector(updateInfoSettings)
-                    name: @"UpdateInfoSettings" object: nil];
-    
     [nc addObserver: self selector: @selector(torrentFinishedDownloading:)
                     name: @"TorrentFinishedDownloading" object: nil];
     
