@@ -7,6 +7,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
  - Improved compliance with BitTorrent spec
  - MSE Tracker Extension support
  - Significant rewrite of the libtransmission back-end
+ - Icon enhanced to support size of 512 x 512
  - OS X:
    + Per-torrent action menu
    + Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs
