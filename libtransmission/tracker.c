@@ -89,7 +89,7 @@ struct tr_tracker
     char * name;
 
     /* corresponds to the peer_id sent as a tracker request parameter.
-       OiNK's op TooMuchTime says: "When the same torrent is opened and
+       one tracker admin says: "When the same torrent is opened and
        closed and opened again without quitting Transmission ...
        change the peerid. It would help sometimes if a stopped event
        was missed to ensure that we didn't think someone was cheating. */
