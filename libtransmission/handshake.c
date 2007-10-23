@@ -116,7 +116,6 @@ enum
 {
     /* incoming */
     AWAITING_HANDSHAKE,
-    AWAITING_PEER_ID,
     AWAITING_YA,
     AWAITING_PAD_A,
     AWAITING_CRYPTO_PROVIDE,
@@ -166,7 +165,6 @@ static const char* getStateName( short state )
     const char * str = "f00!";
     switch( state ) {
         case AWAITING_HANDSHAKE:      str = "awaiting handshake"; break;
-        case AWAITING_PEER_ID:        str = "awaiting peer_id"; break;
         case AWAITING_YA:             str = "awaiting ya"; break;
         case AWAITING_PAD_A:          str = "awaiting pad a"; break;
         case AWAITING_CRYPTO_PROVIDE: str = "awaiting crypto_provide"; break;
@@ -531,13 +529,13 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     uint8_t * pstr;
     uint8_t reserved[HANDSHAKE_FLAGS_LEN];
     uint8_t hash[SHA_DIGEST_LENGTH];
-    const size_t sizeNeeded = HANDSHAKE_SIZE - PEER_ID_LEN; 
+    char * client;
 
 /* FIXME: use  readHandshake here */
 
-    dbgmsg( handshake, "payload: need %d, got %d", (int)sizeNeeded, (int)EVBUFFER_LENGTH(inbuf) );
+    dbgmsg( handshake, "payload: need %d, got %d", (int)HANDSHAKE_SIZE, (int)EVBUFFER_LENGTH(inbuf) );
 
-    if( EVBUFFER_LENGTH(inbuf) < sizeNeeded )
+    if( EVBUFFER_LENGTH(inbuf) < HANDSHAKE_SIZE )
         return READ_MORE;
 
     pstrlen = EVBUFFER_DATA(inbuf)[0]; /* peek, don't read.  We may be
@@ -617,6 +615,19 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
         }
     }
 
+    /* peer id */
+    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, sizeof(handshake->peer_id) );
+    tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
+    handshake->havePeerID = TRUE;
+    client = tr_clientForId( handshake->peer_id );
+    dbgmsg( handshake, "peer-id is [%s]", client );
+    tr_free( client );
+    if( !memcmp( handshake->peer_id, getPeerId(), PEER_ID_LEN ) ) {
+        dbgmsg( handshake, "streuth!  we've connected to ourselves." );
+        tr_handshakeDone( handshake, FALSE );
+        return READ_DONE;
+    }
+
     /**
     *** Extension negotiation
     **/
@@ -645,35 +656,13 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
         handshake->haveSentBitTorrentHandshake = 1;
     }
 
-    setReadState( handshake, AWAITING_PEER_ID );
-    return READ_AGAIN;
-}
-
-static int
-readPeerId( tr_handshake * handshake, struct evbuffer * inbuf )
-{
-    int connectedToSelf;
-    char * client;
-    const size_t sizeNeeded = PEER_ID_LEN; 
-    if( EVBUFFER_LENGTH(inbuf) < sizeNeeded )
-        return READ_MORE;
-
-    /* peer id */
-    tr_peerIoReadBytes( handshake->io, inbuf, handshake->peer_id, sizeof(handshake->peer_id) );
-    tr_peerIoSetPeersId( handshake->io, handshake->peer_id );
-    handshake->havePeerID = TRUE;
-    client = tr_clientForId( handshake->peer_id );
-    dbgmsg( handshake, "peer-id is [%s]", client );
-    tr_free( client );
-
     /* we've completed the BT handshake... pass the work on to peer-msgs */
-    connectedToSelf = memcmp( handshake->peer_id, getPeerId(), PEER_ID_LEN ) != 0;
-    tr_handshakeDone( handshake, !connectedToSelf );
+    tr_handshakeDone( handshake, TRUE );
     return READ_DONE;
 }
 
 static int
-readYa( tr_handshake * handshake, struct evbuffer * inbuf )
+readYa( tr_handshake * handshake, struct evbuffer  * inbuf )
 {
     uint8_t ya[KEY_LEN];
     uint8_t *walk, outbuf[KEY_LEN + PadB_MAXLEN];
@@ -912,25 +901,24 @@ dbgmsg( handshake, "sending handshake" );
 static ReadState
 canRead( struct bufferevent * evin, void * arg )
 {
-    tr_handshake * h = arg;
+    tr_handshake * handshake = (tr_handshake *) arg;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
     ReadState ret;
-    dbgmsg( h, "handling canRead; state is [%s]", getStateName(h->state) );
+    dbgmsg( handshake, "handling canRead; state is [%s]", getStateName(handshake->state) );
 
-    switch( h->state )
+    switch( handshake->state )
     {
-        case AWAITING_HANDSHAKE:       ret = readHandshake    ( h, inbuf ); break;
-        case AWAITING_PEER_ID:         ret = readPeerId       ( h, inbuf ); break;
-        case AWAITING_YA:              ret = readYa           ( h, inbuf ); break;
-        case AWAITING_PAD_A:           ret = readPadA         ( h, inbuf ); break;
-        case AWAITING_CRYPTO_PROVIDE:  ret = readCryptoProvide( h, inbuf ); break;
-        case AWAITING_PAD_C:           ret = readPadC         ( h, inbuf ); break;
-        case AWAITING_IA:              ret = readIA           ( h, inbuf ); break;
+        case AWAITING_HANDSHAKE:       ret = readHandshake    ( handshake, inbuf ); break;
+        case AWAITING_YA:              ret = readYa           ( handshake, inbuf ); break;
+        case AWAITING_PAD_A:           ret = readPadA         ( handshake, inbuf ); break;
+        case AWAITING_CRYPTO_PROVIDE:  ret = readCryptoProvide( handshake, inbuf ); break;
+        case AWAITING_PAD_C:           ret = readPadC         ( handshake, inbuf ); break;
+        case AWAITING_IA:              ret = readIA           ( handshake, inbuf ); break;
 
-        case AWAITING_YB:              ret = readYb           ( h, inbuf ); break;
-        case AWAITING_VC:              ret = readVC           ( h, inbuf ); break;
-        case AWAITING_CRYPTO_SELECT:   ret = readCryptoSelect ( h, inbuf ); break;
-        case AWAITING_PAD_D:           ret = readPadD         ( h, inbuf ); break;
+        case AWAITING_YB:              ret = readYb           ( handshake, inbuf ); break;
+        case AWAITING_VC:              ret = readVC           ( handshake, inbuf ); break;
+        case AWAITING_CRYPTO_SELECT:   ret = readCryptoSelect ( handshake, inbuf ); break;
+        case AWAITING_PAD_D:           ret = readPadD         ( handshake, inbuf ); break;
 
         default: assert( 0 );
     }
