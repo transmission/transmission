@@ -309,8 +309,9 @@
 {
     NSMutableArray * sounds = [NSMutableArray array];
     
+    //until Apple can fix soundNamed to not crash on invalid sound files, don't use custom sounds
     NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds",
-                                [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil];
+                                /*[NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"],*/ nil];
     BOOL isDirectory;
     NSEnumerator * soundEnumerator;
     NSString * sound;
