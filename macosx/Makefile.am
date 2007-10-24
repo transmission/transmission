@@ -84,6 +84,9 @@ EXTRA_DIST = \
     TorrentTableView.h \
     TorrentTableView.m
 
+dist-hook:
+	rm -rf `find $(distdir)/macosx -name ".svn"`
+
 # Use Xcode do make the actual build
 all:
 	@(cd .. && xcodebuild -alltargets -activeconfiguration | grep -v "^$$")
