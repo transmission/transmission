@@ -87,7 +87,8 @@ EXTRA_DIST = \
     TorrentTableView.m
 
 dist-hook:
-	rm -rf `find $(distdir)/macosx -name ".svn"`
+	rm -rf `find $(distdir)/ -type d -name .svn`
+	rm -rf `find $(distdir)/ -type d -name .deps`
 
 # Use Xcode do make the actual build
 all:
