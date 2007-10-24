@@ -73,10 +73,12 @@ noinst_HEADERS = \
     trevent.h \
     upnp.h \
     utils.h \
-    version.h \
     xml.h
 
+BUILT_SOURCES = version.h
+
 EXTRA_DIST = \
+	version.h \
 	version.h.in
 
 do_subst = sed \
