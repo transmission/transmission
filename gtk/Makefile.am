@@ -65,4 +65,5 @@ icon_DATA = transmission.png
 icondir = $(datadir)/pixmaps
 
 EXTRA_DIST = \
-    $(DESKTOP_IN_FILES)
+    $(DESKTOP_IN_FILES) \
+    transmission.png
