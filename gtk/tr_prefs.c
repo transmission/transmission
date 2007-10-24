@@ -216,7 +216,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        w = new_spin_button( PREF_KEY_UL_LIMIT, core, 20, INT_MAX );
+        w = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX );
         s = _("Maximum _Upload Speed (KiB/s)");
         l = hig_workarea_add_row( t, &row, s, w, NULL );
         
@@ -224,7 +224,7 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         hig_workarea_add_wide_control( t, &row, w );
 
-        w = new_spin_button( PREF_KEY_DL_LIMIT, core, 1, INT_MAX );
+        w = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX );
         s = _("Maximum _Download Speed (KiB/s)");
         l = hig_workarea_add_row( t, &row, s, w, NULL );
 
