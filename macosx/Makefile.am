@@ -12,8 +12,77 @@ EXTRA_DIST = \
     fr.lproj \
     it.lproj \
     ko.lproj \
-    ru.lproj \
-    nl.lproj
+    AboutWindowController.h \
+    AboutWindowController.m \
+    ActionMenuRatioToDisplayRatioTransformer.h \
+    ActionMenuRatioToDisplayRatioTransformer.m \
+    ActionMenuSpeedToDisplayLimitTransformer.h \
+    ActionMenuSpeedToDisplayLimitTransformer.m \
+    ActionPopUpButton.h \
+    ActionPopUpButton.m \
+    Badger.h \
+    Badger.m \
+    Controller.h \
+    Controller.m \
+    CreatorWindowController.h \
+    CreatorWindowController.m \
+    DragOverlayView.h \
+    DragOverlayView.m \
+    DragOverlayWindow.h \
+    DragOverlayWindow.m \
+    ExpandedPathToIconTransformer.h \
+    ExpandedPathToIconTransformer.m \
+    ExpandedPathToPathTransformer.h \
+    ExpandedPathToPathTransformer.m \
+    FileNameCell.h \
+    FileNameCell.m \
+    FileOutlineView.h \
+    FileOutlineView.m \
+    FilePriorityCell.h \
+    FilePriorityCell.m \
+    FilterBarButton.h \
+    FilterBarButton.m \
+    FilterBarView.h \
+    FilterBarView.m \
+    ImageBackgroundView.h \
+    ImageBackgroundView.m \
+    InfoTabButtonCell.h \
+    InfoTabButtonCell.m \
+    InfoWindowController.h \
+    InfoWindowController.m \
+    IPCController.h \
+    IPCController.m \
+    main.m \
+    MessageWindowController.h \
+    MessageWindowController.m \
+    NSBezierPathAdditions.h \
+    NSBezierPathAdditions.m \
+    NSMenuAdditions.h \
+    NSMenuAdditions.m \
+    NSStringAdditions.h \
+    NSStringAdditions.m \
+    PeerProgressIndicatorCell.h \
+    PeerProgressIndicatorCell.m \
+    PeerTableView.h \
+    PeerTableView.m \
+    PiecesView.h \
+    PiecesView.m \
+    PortChecker.h \
+    PortChecker.m \
+    PrefsController.h \
+    PrefsController.m \
+    PrefsWindow.h \
+    PrefsWindow.m \
+    SpeedLimitToTurtleIconTransformer.h \
+    SpeedLimitToTurtleIconTransformer.m \
+    StatusBarView.h \
+    StatusBarView.m \
+    TorrentCell.h \
+    TorrentCell.m \
+    Torrent.h \
+    Torrent.m \
+    TorrentTableView.h \
+    TorrentTableView.m
 
 # Use Xcode do make the actual build
 all:

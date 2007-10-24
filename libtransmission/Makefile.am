@@ -4,8 +4,6 @@ AM_CFLAGS = $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
 
-EXTRA_DIST = version.h.in
-
 libtransmission_a_SOURCES = \
     basename.c \
     bencode.c \
@@ -75,4 +73,21 @@ noinst_HEADERS = \
     trevent.h \
     upnp.h \
     utils.h \
+    version.h \
     xml.h
+
+EXTRA_DIST = \
+	version.h.in
+
+do_subst = sed \
+	-e 's,[@]PEERID_PREFIX[@],$(PEERID_PREFIX),g' \
+	-e 's,[@]USERAGENT_PREFIX[@],$(USERAGENT_PREFIX),g' \
+	-e 's,[@]SVN_REVISION[@],$(SVN_REVISION),g' \
+	-e 's,[@]SHORT_VERSION_STRING[@],$(SHORT_VERSION_STRING),g' \
+	-e 's,[@]LONG_VERSION_STRING[@],$(LONG_VERSION_STRING),g' 
+
+version.h: version.h.in
+	$(do_subst) < $(srcdir)/version.h.in > version.h
+
+CLEANFILES = \
+	version.h

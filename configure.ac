@@ -202,7 +202,6 @@ AC_CONFIG_FILES([Makefile
                  cli/Makefile
                  daemon/Makefile
                  libtransmission/Makefile
-                 libtransmission/version.h
                  third-party/Makefile
                  macosx/Makefile
                  wx/Makefile
