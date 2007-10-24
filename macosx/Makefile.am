@@ -11,7 +11,9 @@ EXTRA_DIST = \
     es.lproj \
     fr.lproj \
     it.lproj \
-    ko.lproj
+    ko.lproj \
+    ru.lproj \
+    nl.lproj
 
 # Use Xcode do make the actual build
 all:
