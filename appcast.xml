@@ -5,8 +5,8 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Tue, 23 Oct 2007 22:50:00 -0400</pubDate>
-    <lastBuildDate>Tue, 23 Oct 2007 22:50:00 -0400</lastBuildDate>
+    <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
+    <lastBuildDate>Tue, 23 Oct 2007 23:20:00 -0400</lastBuildDate>
 
 	<item>
       <title>Transmission 0.90 Released</title>
@@ -32,8 +32,8 @@
  <li>Sort and filter by tracker</li>
  <li>Various smaller interface additions and improvements</li>
 </ul>]]></description>
-      <pubDate>Tue, 23 Oct 2007 22:50:00 -0400</pubDate>
-      <enclosure sparkle:version="2641" sparkle:shortVersionString="0.90" url="http://mirrors.m0k.org/transmission/files/Transmission-0.90.dmg" length="2063634" type="application/octet-stream"/>
+      <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
+      <enclosure sparkle:version="3508" sparkle:shortVersionString="0.90" url="http://mirrors.m0k.org/transmission/files/Transmission-0.90.dmg" length="1885981" type="application/octet-stream"/>
     </item>
 
 	<item>

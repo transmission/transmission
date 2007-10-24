@@ -21,7 +21,7 @@ echo CREATING RELEASE DIR
 rm -rf release
 mkdir -p release/Transmission
 echo COPYING TRANSMISSION.APP
-cp -R macosx/Transmission.app ./release/Transmission/
+cp -R build/Release/Transmission.app ./release/Transmission/
 echo CREATING DMG
 #create a BZ2 Compressed DMG
 hdiutil create -srcfolder release/Transmission/ -format UDBZ -noanyowners -fs HFS+ release/Transmission.dmg
