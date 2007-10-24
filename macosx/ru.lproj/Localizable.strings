@@ -594,9 +594,6 @@
 
 "Stop at Ratio (%.2f)" = "Остановить при рейтинге (%.2f)";
 
-/* Torrent -> status string */
-"Stopping" = "Останавливается";
-
 /* File size */
 "TB" = "ТБ";
 
