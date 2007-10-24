@@ -307,7 +307,7 @@
 
 - (NSArray *) sounds
 {
-    NSMutableArray * sounds = [[NSMutableArray alloc] init];
+    NSMutableArray * sounds = [NSMutableArray array];
     
     NSArray * directories = [NSArray arrayWithObjects: @"/System/Library/Sounds", @"/Library/Sounds",
                                 [NSHomeDirectory() stringByAppendingPathComponent: @"Library/Sounds"], nil];
