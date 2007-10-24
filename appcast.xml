@@ -5,8 +5,36 @@
     <link>http://transmission.m0k.org/appcast.xml</link>
     <description>Most recent version available.</description>
     <language>en</language>
-    <pubDate>Mon, 6 Aug 2007 21:55:00 -0400</pubDate>
-    <lastBuildDate>Sun, 9 Sep 2007 18:00:00 -0400</lastBuildDate>
+    <pubDate>Tue, 23 Oct 2007 22:50:00 -0400</pubDate>
+    <lastBuildDate>Tue, 23 Oct 2007 22:50:00 -0400</lastBuildDate>
+
+	<item>
+      <title>Transmission 0.90 Released</title>
+      <description><![CDATA[
+<h3>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
+
+<h4>Transmission Changes:</h4>
+<ul>
+ <li>Encryption support, with option to ignore unencrypted peers</li>
+ <li>Ban peers that send too much bad data</li>
+ <li>Only report downloaded, verified good pieces in tracker `download' field</li>
+ <li>Improved compliance with BitTorrent spec</li>
+ <li>MSE Tracker Extension support</li>
+ <li>Significant rewrite of the libtransmission back-end</li>
+ <li>Icon enhanced to support size of 512 x 512</li>
+</ul>
+<h4>Mac-Specific Changes:</h4>
+<ul>
+ <li>Per-torrent action menu</li>
+ <li>Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs</li>
+ <li>Redesigned message log</li>
+ <li>Optimizations to decrease memory usage</li>
+ <li>Sort and filter by tracker</li>
+ <li>Various smaller interface additions and improvements</li>
+</ul>]]></description>
+      <pubDate>Tue, 23 Oct 2007 22:50:00 -0400</pubDate>
+      <enclosure sparkle:version="2641" sparkle:shortVersionString="0.90" url="http://mirrors.m0k.org/transmission/files/Transmission-0.90.dmg" length="2063634" type="application/octet-stream"/>
+    </item>
 
 	<item>
       <title>Transmission 0.82 Released</title>
