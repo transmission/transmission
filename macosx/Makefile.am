@@ -7,11 +7,13 @@ EXTRA_DIST = \
     Images \
     Growl.framework \
     English.lproj \
-    Spanish.lproj \
-    Italian.lproj \
-    Russian.lproj \
-    Greek.lproj \
-    Korean.lproj
+    el.lproj \
+    es.lproj \
+    fr.lproj \
+    it.lproj \
+    ko.lproj \
+    ru.lproj \
+    nl.lproj
 
 # Use Xcode do make the actual build
 all:
