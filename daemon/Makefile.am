@@ -3,6 +3,11 @@ AM_CFLAGS = $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libdaemon.a
 
+dist_man_MANS = \
+    transmission-daemon.1 \
+    transmission-proxy.1 \
+    transmission-remote.1
+
 libdaemon_a_SOURCES = \
     errors.c \
     misc.c
