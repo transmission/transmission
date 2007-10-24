@@ -1,6 +1,11 @@
 AC_INIT([transmission],[0.90],[http://transmission.m0k.org/trac/newticket])
+
+dnl constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
+dnl convention: BETA: "Z" for a beta, "0" for a stable
 PEERID_PREFIX="-TR090Z-"
 USERAGENT_PREFIX="0.90+"
+AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
+AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
 
 AC_PREREQ(2.54)
 dnl AM_CONFIG_HEADER(config.h)
@@ -175,21 +180,6 @@ esac
 AM_CONDITIONAL([HAVE_BEOS],[test "x$beos" = "xyes"])
 AM_CONDITIONAL([HAVE_DARWIN],[test "x$darwin" = "xyes"])
 AM_CONDITIONAL([HAVE_WINDOWS],[test "x$msw" = "xyes"])
-
-
-dnl ----------------------------------------------------------------------------
-dnl
-dnl  Version files
-
-
-dnl constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
-dnl convention: BETA: "Z" for a beta, "0" for a stable
-SVN_REVISION=`svn info . | sed -ne "s/^Revision: \(.*\:\)\{0,1\}\(.*\)$/\2/p"`
-AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
-AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
-AC_SUBST(SVN_REVISION,[$SVN_REVISION])
-AC_SUBST(BUNDLE_VERSION,[$SVN_REVISION])
-AC_SUBST(VERSION_PACKAGE,$USERAGENT_PREFIX-r$SVN_REVISION)
 
 
 dnl ----------------------------------------------------------------------------

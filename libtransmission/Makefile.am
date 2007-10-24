@@ -75,21 +75,12 @@ noinst_HEADERS = \
     utils.h \
     xml.h
 
-BUILT_SOURCES = version.h
+dist_libtransmission_a_SOURCES = \
+    version.h
 
-EXTRA_DIST = \
-	version.h \
-	version.h.in
-
-do_subst = sed \
-	-e 's,[@]PEERID_PREFIX[@],$(PEERID_PREFIX),g' \
-	-e 's,[@]USERAGENT_PREFIX[@],$(USERAGENT_PREFIX),g' \
-	-e 's,[@]SVN_REVISION[@],$(SVN_REVISION),g' \
-	-e 's,[@]SHORT_VERSION_STRING[@],$(SHORT_VERSION_STRING),g' \
-	-e 's,[@]LONG_VERSION_STRING[@],$(LONG_VERSION_STRING),g' 
-
-version.h: version.h.in
-	$(do_subst) < $(srcdir)/version.h.in > version.h
-
-CLEANFILES = \
-	version.h
+version.h:
+	echo '#define PEERID_PREFIX         "'@PEERID_PREFIX@'"' > version.h
+	echo '#define USERAGENT_PREFIX      "'@USERAGENT_PREFIX@'"' >> version.h
+	echo '#define SVN_REVISION          "'`svn info | grep "Revision" | awk -F': ' '{print $$2}'`'"' >> version.h
+	echo '#define SHORT_VERSION_STRING  "'@USERAGENT_PREFIX@'"' >> version.h
+	echo '#define LONG_VERSION_STRING   "'@USERAGENT_PREFIX@' ('`svn info | grep "Revision" | awk -F': ' '{print $$2}'`')"' >> version.h
