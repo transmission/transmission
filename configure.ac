@@ -1,11 +1,11 @@
-AC_INIT([transmission],[0.82+],[http://transmission.m0k.org/trac/newticket])
-PEERID_PREFIX="-TR082Z-"
-USERAGENT_PREFIX="0.82+"
+AC_INIT([transmission],[0.90],[http://transmission.m0k.org/trac/newticket])
+PEERID_PREFIX="-TR090Z-"
+USERAGENT_PREFIX="0.90+"
 
 AC_PREREQ(2.54)
 dnl AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR(libtransmission/transmission.h)
-AM_INIT_AUTOMAKE(AC_PACKAGE_NAME,AC_PACKAGE_VERSION)
+AM_INIT_AUTOMAKE([1.9 tar-ustar])
 AC_PROG_LIBTOOL
 
 GLIB_MINIMUM=2.6.0
@@ -202,7 +202,6 @@ AC_CONFIG_FILES([Makefile
                  cli/Makefile
                  daemon/Makefile
                  libtransmission/Makefile
-                 libtransmission/version.h
                  third-party/Makefile
                  macosx/Makefile
                  wx/Makefile

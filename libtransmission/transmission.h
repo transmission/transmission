@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#include "version.h"
+#include <libtransmission/version.h>
 
 #include <inttypes.h>
 #ifndef PRId64
