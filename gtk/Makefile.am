@@ -48,6 +48,8 @@ transmission_SOURCES = \
     tr_window.c \
     util.c
 
+dist_man_MANS = transmission.1
+
 transmission_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libevent/libevent.la \

@@ -3,6 +3,8 @@ AM_CFLAGS = $(PTHREAD_CFLAGS)
 
 bin_PROGRAMS = transmission-cli
 
+dist_man_MANS = transmissioncli.1
+
 transmission_cli_SOURCES = transmissioncli.c
 
 transmission_cli_LDADD = \
