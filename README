@@ -20,7 +20,6 @@ Building a Transmission release from the command line:
 
     $ tar xvfz transmission-0.90.tar.gz
     $ cd transmission-0.90
-    $ ./autogen.sh
     $ ./configure -q && make -s
     $ su (if necessary for the next line)
     $ make install
