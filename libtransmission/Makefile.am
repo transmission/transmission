@@ -75,7 +75,10 @@ noinst_HEADERS = \
     utils.h \
     xml.h
 
-dist_libtransmission_a_SOURCES = \
+EXTRA_libtransmission_a_SOURCES = \
+    version.h
+
+BUILT_SOURCES = \
     version.h
 
 version.h:
