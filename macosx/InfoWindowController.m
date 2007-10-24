@@ -316,6 +316,13 @@ typedef enum
         [fNameField setToolTip: name];
         [fSizeField setStringValue: [NSString stringForFileSize: [torrent size]]];
         
+        NSArray * allTrackers = [torrent allTrackers], * subTrackers;
+        NSMutableArray * trackerStrings = [NSMutableArray arrayWithCapacity: [allTrackers count]];
+        NSEnumerator * enumerator = [allTrackers objectEnumerator];
+        while ((subTrackers = [enumerator nextObject]))
+            [trackerStrings addObject: [subTrackers componentsJoinedByString: @", "]];
+        [fTrackerField setToolTip: [trackerStrings componentsJoinedByString: @"\n"]];
+        
         NSString * hashString = [torrent hashString];
         [fPiecesField setStringValue: [NSString stringWithFormat: @"%d, %@", [torrent pieceCount],
                                         [NSString stringForFileSize: [torrent pieceSize]]]];
@@ -1107,7 +1114,6 @@ typedef enum
     
     NSString * tracker = [[torrent trackerAddress] stringByAppendingString: [torrent trackerAddressAnnounce]];
     [fTrackerField setStringValue: tracker];
-    [fTrackerField setToolTip: tracker];
     
     NSString * location = [torrent dataLocation];
     [fDataLocationField setStringValue: [location stringByAbbreviatingWithTildeInPath]];
