@@ -364,7 +364,7 @@
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Torrent.h; path = macosx/Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Torrent.m; path = macosx/Torrent.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; name = Info.plist; path = macosx/Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
 		A2041D520C9AC523000ACFFB /* Lock.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Lock.tiff; path = macosx/Images/Lock.tiff; sourceTree = "<group>"; };
@@ -474,6 +474,13 @@
 		A2A306580AAD24A80049E2AC /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKKQueue.m; path = macosx/UKKQueue/UKKQueue.m; sourceTree = "<group>"; };
 		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
+		A2A362A90CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = macosx/ru.lproj/Creator.nib; sourceTree = "<group>"; };
+		A2A362AA0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2A362AB0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = macosx/ru.lproj/InfoWindow.nib; sourceTree = "<group>"; };
+		A2A362AC0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = macosx/ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A2A362AD0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = macosx/ru.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		A2A362AE0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = macosx/ru.lproj/MessageWindow.nib; sourceTree = "<group>"; };
+		A2A362AF0CCF63F2007B83E5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = macosx/ru.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AboutWindow.nib; path = macosx/AboutWindow.nib; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
@@ -1295,6 +1302,7 @@
 				it,
 				el,
 				ko,
+				ru,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Transmission */;
 			projectDirPath = "";
@@ -1629,6 +1637,7 @@
 				A2EA8E540CC3DAB80081201C /* it */,
 				A205E08F0CC66BF5001CA81B /* el */,
 				A24F967C0CCBF93E00C9314D /* ko */,
+				A2A362AA0CCF63F2007B83E5 /* ru */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1642,6 +1651,7 @@
 				A2EA8E570CC3DAB80081201C /* it */,
 				A205E0920CC66BF5001CA81B /* el */,
 				A24F967F0CCBF93E00C9314D /* ko */,
+				A2A362AD0CCF63F2007B83E5 /* ru */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
@@ -1655,6 +1665,7 @@
 				A2EA8E550CC3DAB80081201C /* it */,
 				A205E0900CC66BF5001CA81B /* el */,
 				A24F967D0CCBF93E00C9314D /* ko */,
+				A2A362AB0CCF63F2007B83E5 /* ru */,
 			);
 			name = InfoWindow.nib;
 			sourceTree = "<group>";
@@ -1668,6 +1679,7 @@
 				A2EA8E580CC3DAB80081201C /* it */,
 				A205E0930CC66BF5001CA81B /* el */,
 				A24F96800CCBF93E00C9314D /* ko */,
+				A2A362AE0CCF63F2007B83E5 /* ru */,
 			);
 			name = MessageWindow.nib;
 			sourceTree = "<group>";
@@ -1681,6 +1693,7 @@
 				A2EA8E560CC3DAB80081201C /* it */,
 				A205E0910CC66BF5001CA81B /* el */,
 				A24F96920CCBFB7700C9314D /* ko */,
+				A2A362AC0CCF63F2007B83E5 /* ru */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1694,6 +1707,7 @@
 				A2EA8E590CC3DAB80081201C /* it */,
 				A205E0940CC66BF5001CA81B /* el */,
 				A24F96810CCBF93E00C9314D /* ko */,
+				A2A362AF0CCF63F2007B83E5 /* ru */,
 			);
 			name = PrefsWindow.nib;
 			sourceTree = "<group>";
@@ -1707,6 +1721,7 @@
 				A2EA8E530CC3DAB80081201C /* it */,
 				A205E08E0CC66BF5001CA81B /* el */,
 				A24F967B0CCBF93E00C9314D /* ko */,
+				A2A362A90CCF63F2007B83E5 /* ru */,
 			);
 			name = Creator.nib;
 			sourceTree = "<group>";
