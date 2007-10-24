@@ -1,0 +1,734 @@
+﻿/* Torrent -> progress string */
+" - %@ remaining" = "- %@ resterend";
+
+/* Torrent -> progress string */
+" - remaining time unknown" = "- resterende tijd onbekend";
+
+/* Removal confirm panel -> message part 2 */
+" Once removed, continuing the transfers will require the torrent files. Do you really want to remove them?" = "Eenmaal verwijderd, zijn de torrent bestanden nodig om de transfer voort te zetten. Bent u zeker dat u ze wil verwijderen?";
+
+/* Inspector -> Activity tab -> progress */
+"%.2f%% (%.2f%% selected)" = "%1$.2f%% (%2$.2f%% geselecteerd)";
+
+/* Inspector -> Files tab -> file status string */
+"%.2f%% of %@" = "%1$.2f%% van %2$@";
+
+/* Inspector -> Activity tab -> have */
+"%@ (%@ verified)" = "%1$@ (%2$@ geverifieerd)";
+
+/* Torrent -> progress string */
+"%@ of %@ (%.2f%%)" = "%1$@ van %2$@ (%3$.2f%%)";
+
+/* Torrent -> progress string */
+"%@ of %@ (%.2f%%), uploaded %@ (Ratio: %@)" = "%1$@ van %2$@ (%3$.2f%%), verstuurd %4$@ (Ratio: %5$@)";
+
+/* Torrent -> progress string */
+"%@ of %@ selected (%.2f%%)" = "%1$@ van %2$@ geselecteerd (%3$.2f%%)";
+
+/* Torrent -> progress string */
+"%@ selected, uploaded %@ (Ratio: %@)" = "%1$@ geselecteerd, geupload %2$@ (Ratio: %3$@)";
+
+/* Inspector -> above tabs -> total size (several torrents selected) */
+"%@ Total" = "%@ Totaal";
+
+/* Inspector -> Activity tab -> have */
+"%@ verified" = "%@ geverifieerd";
+
+/* Create torrent -> info */
+"%@, %@ each" = "%1$@, %2$@ elk";
+
+/* Torrent -> progress string */
+"%@, uploaded %@ (Ratio: %@)" = "%1$@, verstuurd %2$@ (Ratio: %3$@)";
+
+/* Inspector -> Peers tab -> peers */
+"%d cache" = "%d cache";
+
+/* Inspector -> Peers tab -> peers */
+"%d Connected" = "%d Verbonden";
+
+/* Torrent -> remaining time */
+"%d days %d hr" = "%1$d dagen %2$d uur";
+
+/* Dock item - Downloading */
+"%d Downloading" = "%d Downloaden";
+
+/* Inspector -> Files tab -> bottom text (number of files) */
+"%d files total" = "%d bestanden totaal";
+
+/* Drag overlay -> torrents
+   Create torrent -> info */
+
+"%d Files, " = "%d Bestanden, ";
+
+/* Torrent -> remaining time */
+"%d hr %d min" = "%1$d u %2$d min";
+
+/* Inspector -> Peers tab -> peers */
+"%d incoming" = "%d inkomende";
+
+/* Torrent -> remaining time */
+"%d min %d sec" = "%1$d min %2$d sec";
+
+/* Inspector -> Peers tab -> peers */
+"%d PEX" = "%d PEX";
+
+/* Create torrent -> info */
+"%d pieces" = "%d fragmenten";
+
+/* Torrent -> remaining time */
+"%d sec" = "%d sec";
+
+/* Dock item - Seeding */
+"%d Seeding" = "%d Seeden";
+
+/* Drag overlay -> torrents */
+"%d Torrent Files" = "%d Torrent Bestanden";
+
+/* Inspector -> above tabs -> selected torrents */
+"%d Torrents Selected" = "%d Torrents Geselecteerd";
+
+/* Inspector -> Peers tab -> peers */
+"%d tracker" = "%d tracker";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count */
+
+"%d Transfers" = "%d Transfers";
+
+/* File size */
+"%lld bytes" = "%lld bytes";
+
+/* Torrent -> error string unreadable */
+"(unreadable error)" = "(onleesbare error)";
+
+/* Torrent -> remaining time */
+"1 day %d hr" = "1 dag %d uur";
+
+/* Inspector -> Files tab -> bottom text (number of files) */
+"1 file total" = "1 bestand totaal";
+
+/* Drag overlay -> torrents
+   Create torrent -> info */
+
+"1 File, " = "1 Bestand, ";
+
+/* Create torrent -> info */
+"1 piece" = "1 fragment";
+
+/* Filter Bar Button -> tool tip
+   Status bar transfer count */
+
+"1 Transfer" = "1 Transfer";
+
+/* Move folder cannot be used alert -> message */
+"\"%@\" cannot be used. The file will remain in its current location." = "\"%@\" kan niet gebruikt worden. Het bestand zal niet verplaatst worden.";
+
+/* Folder cannot be used alert -> message */
+"\"%@\" cannot be used. The transfer will be paused." = "\"%@\" kan niet gebruikt worden. Het transfer zal gepauzeerd worden.";
+
+/* Create torrent -> file already exists warning -> warning */
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent." = "Een bestand met de naam \"%1$@\" bestaat al in de map \"%2$@\". Kies een nieuwe naam of folder om de torrent te maken.";
+
+/* Move inside itself alert -> title */
+"A folder cannot be moved to inside itself." = "Een map kan niet in zichzelf verplaatst worden.";
+
+/* Create torrent -> zero size -> warning */
+"A torrent file cannot be created for files with no size." = "Een torrent bestand kan niet gemaakt worden voor bestanden zonder grootte.";
+
+/* Create torrent -> file already exists warning -> title */
+"A torrent file with this name and directory cannot be created." = "Een torrent met deze naam en map kan niet gemaakt worden.";
+
+/* Open duplicate alert -> title */
+"A transfer of \"%@\" is already running." = "Een transfer van \"%@\" is al bezig.";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+
+"Activity" = "Activiteit";
+
+/* Preferences -> Advanced toolbar item title */
+"Advanced" = "Geavanceerd";
+
+/* Filter Bar Button -> title */
+"All" = "Alles";
+
+/* Torrent file disk space alert -> button */
+"Always Download" = "Download Altijd";
+
+/* Transfer speed (Bytes per second) */
+"B/s" = "B/s";
+
+/* Preferences -> Bandwidth toolbar item title */
+"Bandwidth" = "Bandbreedte";
+
+/* Growl notification description */
+"Bandwidth settings changed" = "Bandbreedte instelling veranderde";
+
+/* Removal confirm panel -> button
+   Confirm Quit panel -> button */
+
+"Cancel" = "Annuleer";
+
+/* Create torrent -> no url warning -> warning
+   Create torrent -> http warning -> warning */
+
+"Change the tracker address to create the torrent." = "Verander de tracker adres om de torrent te maken.";
+
+/* Torrent -> status string */
+"Checking existing data (%.2f%%)" = "Controleren van data (%.2f%%)";
+
+/* Preferences -> Advanced -> port status */
+"Checking port status" = "Controleren van poort status";
+
+/* Folder cannot be used alert -> location button */
+"Choose New Location" = "Kies Nieuwe Locatie";
+
+/* Confirm Quit panel -> title */
+"Confirm Quit" = "Bevestig Stop";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list and trash both data and torrent files." = "Bevestig de verwijdering van %d transfers van de transfer lijst en de verplaatsing van zowel de data als de torrent bestanden naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list and trash data file." = "Bevestig de verwijdering van %d transfers van de transfer lijst en de verplaatsing van de data naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list and trash torrent file." = "Bevestig de verwijdering van %d transfers van de transfer lijst en de verplaatsing van het torrent bestand naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of %d transfers from the transfer list." = "Bevestig de verwijdering van %d transfers van de transfer lijst.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash both data and torrent files." = "Bevestig de verwijdering van \"%@\" van de transfer lijst en de verplaatsing van zowel de data als de torrent bestanden naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash data file." = "Bevestig de verwijdering van \"%@\" van de transfer lijst en de verplaatsing van de data naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list and trash torrent file." = "Bevestig de verwijdering van \"%@\" van de transfer lijst en de verplaatsing van het torrent bestand naar de prullenmand.";
+
+/* Removal confirm panel -> title */
+"Confirm removal of \"%@\" from the transfer list." = "Bevestig de verwijdering van \"%@\" van de transfer lijst.";
+
+/* Debug log alert -> informative message */
+"Continuous use at this level might increase memory usage. This setting can be changed in the Message Log window (accessible from the Window menu)." = "Constant gebruik aan dit niveau zou geheugen gebruik kunnen verhogen. deze instelling kan gewijzigd worden in het Berichten Log (toegankelijk van het Venster menu).";
+
+/* Torrent file copy alert -> title */
+"Copy of \"%@\" Cannot Be Created" = "Copie van \"%@\" Kan Niet Gemaakt Worden";
+
+/* Create toolbar item -> label */
+"Create" = "Maak";
+
+/* Drag overlay -> file */
+"Create a Torrent File" = "Maak een Torrent Bestand";
+
+/* Create toolbar item -> tooltip */
+"Create torrent file" = "Maak torrent bestand";
+
+/* Create toolbar item -> palette label
+   Create torrent -> select file */
+
+"Create Torrent File" = "Maak Torrent Bestand";
+
+/* Create torrent -> failed -> title */
+"Creation of \"%@\" failed." = "Maken van \"%@\" faalde.";
+
+/* Torrent -> status string */
+"DL: %@, UL: %@" = "DL: %1$@, UL: %2$@";
+
+/* Debug log alert -> button
+   Open duplicate alert -> button */
+
+"Don't Alert Again" = "Waarschuw Niet Meer";
+
+/* Inspector -> files tab -> tooltip */
+"Don't Download" = "Niet Downloaden";
+
+/* Inspector -> files tab -> tooltip */
+"Download" = "Download";
+
+/* Torrent file disk space alert -> button */
+"Download Anyway" = "Download Alsnog";
+
+/* Growl notification title */
+"Download Complete" = "Download Klaar";
+
+/* Inspector -> files tab -> tooltip */
+"Download Some" = "Download Enkele";
+
+/* Filter Bar Button -> title
+   Torrent -> status string */
+
+"Downloading" = "Downloaden";
+
+/* Torrent -> status string */
+"Downloading from %d of %d peers" = "Downloaden van %1$d van %2$d peers";
+
+/* Torrent -> status string */
+"Downloading from %d of 1 peer" = "Downloaden van %d van 1 peer";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Encrypted Connection" = "Gecodeerde Verbinding";
+
+/* Transfer speed invalid
+   Ratio invalid */
+
+"error" = "error";
+
+/* Torrent -> status string */
+"Error" = "Error";
+
+/* Preferences -> Advanced -> port map status */
+"Error mapping port" = "Error toekennen poort";
+
+/* Torrent -> status string */
+"Error: " = "Error: ";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+
+"Files" = "Bestanden";
+
+/* Filter toolbar item -> label */
+"Filter" = "Filter";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: cache" = "Van: cache";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: incoming connection" = "Van: inkomende verbinding";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: peer exchange" = "Van: peer exchange";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"From: tracker" = "Van: tracker";
+
+/* File size */
+"GB" = "GB";
+
+/* Preferences -> General toolbar item title */
+"General" = "Algemeen";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+
+"General Info" = "Algemene Info";
+
+/* View menu -> Filter Bar */
+"Hide Filter Bar" = "Verberg Filter Balk";
+
+/* View menu -> Inspector */
+"Hide Inspector" = "Verberg Infovenster";
+
+/* View menu -> Status Bar */
+"Hide Status Bar" = "Verberg Status Balk";
+
+/* Inspector -> files tab -> tooltip */
+"High Priority" = "Hoge Prioriteit";
+
+/* Inspector -> Peers tab -> peers
+   Inspector -> Files tab -> bottom text (number of files) */
+
+"info not available" = "info niet beschikbaar";
+
+/* Inspector toolbar item -> label */
+"Inspector" = "Infovenster";
+
+/* Download not a torrent -> message */
+"It appears that the file \"%@\" from %@ is not a torrent file." = "Het lijkt dat bestand \"%1$@\" van %2$@ geen torrent bestand is.";
+
+/* File size */
+"KB" = "KB";
+
+/* About window -> license button */
+"License" = "Licentie";
+
+/* torrent action context menu -> upload/download limit
+   Action context menu -> upload/download limit */
+
+"Limit (%d KB/s)" = "Limiet (%d KB/s)";
+
+/* Save log alert panel -> title */
+"Log Could Not Be Saved" = "Log Kon Niet Bewaard Worden";
+
+/* Inspector -> files tab -> tooltip */
+"Low Priority" = "Lage Prioriteit";
+
+/* File size */
+"MB" = "MB";
+
+/* Inspector -> files tab -> tooltip */
+"Multiple Priorities" = "Meerdere Prioriteiten";
+
+/* No Ratio
+   Torrent -> status string */
+
+"N/A" = "N/B";
+
+/* Inspector -> above tabs -> selected torrents */
+"No Torrents Selected" = "Geen Torrents Geselecteerd";
+
+/* Inspector -> files tab -> tooltip */
+"Normal Priority" = "Normale Prioriteit";
+
+/* Torrent file disk space alert -> title */
+"Not enough remaining disk space to download \"%@\" completely." = "Niet genoeg harde-schijf ruimte om \"%@\" volledig te downloaden.";
+
+/* Debug log alert -> button
+   Open duplicate alert -> button
+   Download not a torrent -> button
+   Create torrent -> http warning -> button
+   Save log alert panel -> button
+   Create torrent -> zero size -> button
+   Move folder cannot be used alert -> button
+   Create torrent -> no url warning -> button
+   Create torrent -> file already exists warning -> button
+   Folder cannot be used alert -> button
+   Torrent file copy alert -> button
+   About window -> license close button
+   Move error alert -> button
+   Create torrent -> failed -> button
+   Create torrent -> no files -> button
+   Move inside itself alert -> button
+   Torrent file disk space alert -> button
+   Torrent download failed -> button */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"OK" = "OK";
+
+/* Open toolbar item -> label */
+"Open" = "Open";
+
+/* Open toolbar item -> tooltip */
+"Open torrent files" = "Open torrent bestanden";
+
+/* Open toolbar item -> palette label */
+"Open Torrent Files" = "Open Torrent Bestanden";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+
+"Options" = "Voorkeuren";
+
+/* Pause toolbar item -> label */
+"Pause" = "Pauzeer";
+
+/* Pause All toolbar item -> label */
+"Pause All" = "Pauzeer Alles";
+
+/* Pause All toolbar item -> tooltip */
+"Pause all transfers" = "Pauzeer alle transfers";
+
+/* Pause toolbar item -> palette label */
+"Pause Selected" = "Pauzeer Geselecteerde";
+
+/* Pause toolbar item -> tooltip */
+"Pause selected transfers" = "Pauzeer geselecteerde transfers";
+
+/* Filter Bar Button -> title
+   Torrent -> status string */
+
+"Paused" = "Gepauzeerd";
+
+/* Inspector -> tab tooltip
+   Inspector -> title */
+
+"Peers" = "Peers";
+
+/* Inspector -> pex check */
+"PEX can only be toggled on paused public torrents." = "PEX kan enkel gewijzigd worden bij gepauzeerde publieke torrents.";
+
+/* Preferences -> Advanced -> port status */
+"Port is closed" = "Poort is gesloten";
+
+/* Preferences -> Advanced -> port status */
+"Port is open" = "Poort is open";
+
+/* Preferences -> Advanced -> port status */
+"Port is stealth" = "Poort is stealth";
+
+/* Preferences -> Advanced -> port map status */
+"Port successfully mapped" = "Poort succesvol toegekend";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: %d" = "Poort: %d";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Port: N/A" = "Poort: N/B";
+
+/* Inspector -> files tab -> tooltip */
+"Priority Not Available" = "Prioriteit Niet Beschikbaar";
+
+/* Inspector -> is private torrent */
+"Private Torrent, PEX disabled" = "Private Torrent, PEX uitgeschakeld";
+
+/* Inspector -> Peers tab -> table row tooltip */
+"Progress: %.1f%%" = "Vooruitgang: %.1f%%";
+
+/* Inspector -> is not private torrent */
+"Public Torrent" = "Publieke Torrent";
+
+/* Transmission already running alert -> button
+   Confirm Quit panel -> button */
+
+"Quit" = "Afsluiten";
+
+/* Torrent -> status string */
+"Ratio: " = "Ratio: ";
+
+/* Torrent -> status string */
+"Ratio: %@, UL: %@" = "Ratio: %1$@, UL: %2$@";
+
+/* Removal confirm panel -> button
+   Remove toolbar item -> label */
+
+"Remove" = "Verwijder";
+
+/* Remove toolbar item -> palette label */
+"Remove Selected" = "Verwijder Geselecterde";
+
+/* Remove toolbar item -> tooltip */
+"Remove selected transfers" = "Verwijder geselecteerde transfers";
+
+/* Resume toolbar item -> label */
+"Resume" = "Hervatten";
+
+/* Resume All toolbar item -> label */
+"Resume All" = "Hervat Alles";
+
+/* Resume All toolbar item -> tooltip */
+"Resume all transfers" = "Hervat alle transfers";
+
+/* Resume toolbar item -> palette label */
+"Resume Selected" = "Hervat Geselecteerde";
+
+/* Resume toolbar item -> tooltip */
+"Resume selected transfers" = "Hervat geselecteerde transfers";
+
+/* Filter Bar Button -> title
+   Torrent -> status string */
+
+"Seeding" = "Seeden";
+
+/* Torrent -> status string */
+"Seeding complete" = "Seeden klaar";
+
+/* Growl notification title */
+"Seeding Complete" = "Seeden Klaar";
+
+/* Torrent -> status string */
+"Seeding to %d of %d peers" = "Seeden naar %1$d van %2$d peers";
+
+/* Torrent -> status string */
+"Seeding to %d of 1 peer" = "Seeden naar %d van 1 peer";
+
+/* Default incomplete folder cannot be used alert -> prompt
+   Create torrent -> select file
+   Default folder cannot be used alert -> prompt
+   Open torrent -> prompt
+   Move torrent -> prompt
+   Folder cannot be used alert -> prompt */
+
+
+
+
+
+"Select" = "Selecteer";
+
+/* Create torrent -> select file */
+"Select a file or folder for the torrent file." = "Selecteer een bestand of map voor het torrent bestand.";
+
+/* Folder cannot be used alert -> select destination folder
+   Open torrent -> select destination folder */
+
+"Select the download folder for \"%@\"" = "Selecteer de download map voor \"%@\"";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for %d data files." = "Selecteer de nieuwe map voor %d data bestanden.";
+
+/* Move torrent -> select destination folder */
+"Select the new folder for \"%@\"." = "Selecteer de nieuwe map voor \"%@\".";
+
+/* Main window -> 1st bottom left button (action) tooltip */
+"Shortcuts for changing global settings." = "Snel veranderen van globale instellingen.";
+
+/* View menu -> Filter Bar */
+"Show Filter Bar" = "Toon Filter Balk";
+
+/* View menu -> Inspector */
+"Show Inspector" = "Toon Infovenster";
+
+/* View menu -> Status Bar */
+"Show Status Bar" = "Toon Status Balk";
+
+/* Growl notification title */
+"Speed Limit Auto Disabled" = "Snelheidslimiet Automatisch Uitgeschakeld";
+
+/* Growl notification title */
+"Speed Limit Auto Enabled" = "Snelheidslimiet Automatisch Ingeschakeld";
+
+/* Main window -> 2nd bottom left button (turtle) tooltip */
+"Speed Limit overrides the total bandwidth limits with its own limits." = "Snelheidslimiet overtreft de totale bandbreedte met zijn eigen limieten.";
+
+/* Torrent -> status string */
+"Stalled, " = "Passief, ";
+
+/* torrent action context menu -> ratio stop
+   Action context menu -> ratio stop */
+
+"Stop at Ratio (%.2f)" = "Stop aan Ratio (%.2f)";
+
+/* Torrent -> status string */
+"Stopping" = "Stoppen";
+
+/* File size */
+"TB" = "TB";
+
+/* Default folder cannot be used alert -> message */
+"The download folder cannot be used. Choose a new location." = "De download map kan niet gebruikt worden. Kies een nieuwe Locatie.";
+
+/* Folder cannot be used alert -> title */
+"The folder for downloading \"%@\" cannot be used." = "De map voor het downloaden van \"%@\" kan niet gebruikt worden.";
+
+/* Move folder cannot be used alert -> title */
+"The folder for moving the completed \"%@\" cannot be used." = "De map voor het verplaatsen van vervolledigt \"%@\" kan niet gebruikt worden.";
+
+/* Default incomplete folder cannot be used alert -> message */
+"The incomplete folder cannot be used. Choose a new location or cancel for none." = "De onvoltooide map kan niet gebruikt worden. Kies een nieuwe locatie of annuleer.";
+
+/* Debug log alert -> message */
+"The Message Log is set to \"Debug\"" = "Het Berichten Log staat op \"Debug\"";
+
+/* Move inside itself alert -> message
+   Move error alert -> message */
+
+"The move operation of \"%@\" cannot be done." = "Het verplaatsen van \"%@\" kan niet ongedaan worden.";
+
+/* Torrent download failed -> message */
+"The torrent could not be downloaded from %@ because an error occurred (%@)." = "De torrent kon niet gedownload worden van %1$@ wegens een error (%2$@).";
+
+/* Torrent file copy alert -> message */
+"The torrent file (%@) cannot be found." = "Het torrent bestand (%@) kan niet gevonden worden.";
+
+/* Open duplicate alert -> message */
+"The torrent file cannot be opened because it is a duplicate of an already running transfer." = "Het torrent bestand kan niet worden geopend worden omdat het een duplicaat is van een bestaande transfer.";
+
+/* Create torrent -> zero size -> title */
+"The total file size is zero bytes." = "De totale bestand grootte is nul bytes.";
+
+/* Create torrent -> no url warning -> title */
+"The tracker address cannot be blank." = "Het tracker adres kan niet leeg zijn.";
+
+/* Create torrent -> http warning -> title */
+"The tracker address must begin with \"http://\"." = "Het tracker adres moet beginnen met \"http://\".";
+
+/* Torrent file disk space alert -> message */
+"The transfer will be paused. Clear up space on %@ or deselect files in the torrent inspector to continue." = "De transfer zal gepauzeerd worden. Maak wat ruimte vrij op %@ of deselecteer bestanden in het infovenster.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %d active transfers." = "Er zijn %d actieve transfers.";
+
+/* Confirm Quit panel -> message */
+"There are %d active transfers. Do you really want to quit?" = "Er zijn %d actieve transfers. Wilt u echt afsluiten?";
+
+/* Removal confirm panel -> message part 1 */
+"There are %d transfers (%d active)." = "Er zijn %1$d transfers (%2$d actief).";
+
+/* Transmission already running alert -> message */
+"There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Er is al een copie van Transmission actief. Deze copie kan niet geopend worden voordat de ander afgesloten is.";
+
+/* Confirm Quit panel -> message */
+"There is an active transfer. Do you really want to quit?" = "Er is een actieve transfer. Wilt u echt afsluiten?";
+
+/* Create torrent -> no files -> warning */
+"There must be at least one file in a folder to create a torrent file." = "Er moet minstens een bestand in een folder zitten om een torrent te maken.";
+
+/* Save log alert panel -> message */
+"There was a problem creating the file \"%@\"." = "Er was een probleem bij het maken van het bestand \"%@\".";
+
+/* Move error alert -> title */
+"There was an error moving the data file." = "Er was een error bij het verplaatsen van het data bestand.";
+
+/* Create torrent -> failed -> warning */
+"There was an error parsing the data file. The torrent file was not created." = "Er was een error bij het lezen van het data bestand. Het torrent bestand is niet gemaakt.";
+
+/* Create torrent -> no files -> title */
+"This folder contains no files." = "Deze map bevat geen bestanden.";
+
+/* Removal confirm panel -> message */
+"This transfer is active. Once removed, continuing the transfer will require the torrent file. Do you really want to remove it?" = "Deze transfer is actief. Eenmaal verwijdert is het torrent bestand nodig om de transfer verder te zetten. Bent u zeker dat u het wil verwijderen?";
+
+/* Filter toolbar item -> palette label */
+"Toggle Filter" = "Schakel Filter";
+
+/* Inspector toolbar item -> palette label */
+"Toggle Inspector" = "Schakel Infovenster";
+
+/* Filter toolbar item -> tooltip */
+"Toggle the filter bar" = "Schakel de filter balk";
+
+/* Inspector toolbar item -> tooltip */
+"Toggle the torrent inspector" = "Schakel het infovenster";
+
+/* Torrent download error -> title
+   Download not a torrent -> title */
+
+"Torrent download failed" = "Torrent Download Mislukt";
+
+/* Growl notification title */
+"Torrent File Auto Added" = "Torrent Bestand Automatisch Toegevoegd";
+
+/* Inspector -> title */
+"Torrent Inspector" = "Torrent Infovenster";
+
+/* Status bar -> total download */
+"Total DL: " = "Totaal DL: ";
+
+/* Status bar -> total upload */
+"Total UL: " = "Totaal UL: ";
+
+/* Preferences -> Transfers toolbar item title */
+"Transfers" = "Transfers";
+
+/* Transmission already running alert -> title */
+"Transmission is already running." = "Transmission is al actief.";
+
+/* Torrent -> location when deleting original */
+"Transmission Support Folder" = "Transmission Support Map";
+
+/* Preferences -> Advanced -> port status */
+"Unable to check port status" = "Kan poort status niet controleren";
+
+/* Torrent -> remaining time */
+"Unknown" = "Onbekend";
+
+/* Save log panel -> default file name */
+"untitled" = "zonder titel";
+
+/* Torrent -> status string */
+"Waiting to check existing data" = "Wachten om na te kijken van bestaande data";
+
+/* Torrent -> status string */
+"Waiting to download" = "Wachten om te downloaden";
+
+/* Torrent -> status string */
+"Waiting to seed" = "Wachten om te seeden";
+
+/* Drag overlay -> url */
+"Web Address" = "Web Adres";
