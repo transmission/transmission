@@ -2,7 +2,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.91 (2007/xx/xx)
 - OS X:
-   + Readd Russian localization, fix Korean localization
+   + Re-add Russian localization, fix Korean localization
 
 0.90 (2007/10/23)
  - Encryption support, with option to ignore unencrypted peers
