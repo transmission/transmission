@@ -919,10 +919,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if ([self isActive] && ![self isChecking])
     {
         if (fStat->status == TR_STATUS_DOWNLOAD)
-            string = [string stringByAppendingFormat: @" - DL: %@, UL: %@",
+            string = [string stringByAppendingFormat: NSLocalizedString(@" - DL: %@, UL: %@", "Torrent -> status string"),
                     [NSString stringForSpeed: [self downloadRate]], [NSString stringForSpeed: [self uploadRate]]];
         else
-            string = [string stringByAppendingFormat: @" - UL: %@", [NSString stringForSpeed: [self uploadRate]]];
+            string = [string stringByAppendingFormat: NSLocalizedString(@" - UL: %@", "Torrent -> status string"),
+                        [NSString stringForSpeed: [self uploadRate]]];
     }
     
     return string;
