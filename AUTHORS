@@ -22,6 +22,7 @@ Mac OS X, current release:
         Jaewoo Chung  (Korean)
         Anton Sotkov  (Russian)
         Alexander Bykov  (Russian)
+	Maarten Van Coile  (Dutch)
 
 GTK+:
         Calorì Alessandro  (Italian)
@@ -64,7 +65,7 @@ Other Contributors
 
 Third-Party Resources
 Thanks to:
-        Niels Provos for libevent <http://monkey.org/~provos/libevent/>
+        Niels Provos for use of libevent <http://monkey.org/~provos/libevent/>
         The Growl Development Team for use of Growl. <http://growl.info/>
         Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
         M. Uli Kusterer for use of UKKQueue.
