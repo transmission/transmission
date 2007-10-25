@@ -16,13 +16,14 @@
 #include <stdarg.h>
 #include <netinet/in.h> /* struct in_addr */
 
-
 #include <openssl/bn.h>
 #include <openssl/dh.h>
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
 
+#include <sys/types.h> /* event.h needs this */
 #include <event.h>
+
 #include "crypto.h"
 #include "utils.h"
 

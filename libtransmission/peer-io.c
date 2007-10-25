@@ -16,7 +16,10 @@
 #include <unistd.h>
 #include <netinet/in.h> /* struct in_addr */
 #include <arpa/inet.h> /* inet_ntoa */
+
+#include <sys/types.h> /* event.h needs this */
 #include <event.h>
+
 #include "transmission.h"
 #include "crypto.h"
 #include "net.h"
