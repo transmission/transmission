@@ -27,7 +27,6 @@ EXTRA_DIST = \
   AUTHORS \
   LICENSE \
   README \
-  mk \
   intltool-extract.in \
   intltool-merge.in \
   intltool-update.in 

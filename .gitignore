@@ -19,6 +19,4 @@ libtransmission/version.h
 macosx/English.lproj/*~.nib
 macosx/Info.plist
 macosx/Transmission.app
-mk/config.mk
-mk/version.mk
 po/*.mo
