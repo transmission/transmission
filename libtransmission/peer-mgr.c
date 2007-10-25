@@ -951,7 +951,11 @@ tr_peerMgrAddIncoming( tr_peerMgr      * manager,
 {
     managerLock( manager );
 
-    if( getExistingHandshake( manager->incomingHandshakes, addr ) == NULL )
+    if( getExistingHandshake( manager->incomingHandshakes, addr ) )
+    {
+        tr_netClose( socket );
+    }
+    else /* we don't have a connetion to them yet... */
     {
         tr_peerIo * io;
         tr_handshake * handshake;
