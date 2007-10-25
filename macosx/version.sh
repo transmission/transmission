@@ -33,12 +33,12 @@ replace_if_differs ()
 }
 
 # Generate version.mk
-cat > mk/version.mk.new << EOF
+cat > macosx/version.mk.new << EOF
 VERSION_REVISION    = "$SVN_REVISION"
 VERSION_STRING      = "$USERAGENT_PREFIX ($SVN_REVISION)"
 STABLE_RELEASE      = "$STABLE_RELEASE"
 EOF
-replace_if_differs mk/version.mk.new mk/version.mk
+replace_if_differs macosx/version.mk.new macosx/version.mk
 
 # Generate version.h
 cat > libtransmission/version.h.new << EOF
