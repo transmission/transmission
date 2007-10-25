@@ -647,6 +647,7 @@ tr_getTorrentsDirectory( void )
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
 #include <sys/sysctl.h>
 #include <net/route.h>
 

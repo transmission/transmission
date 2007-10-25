@@ -29,6 +29,8 @@
 
 #include <sys/types.h>
 
+#include <arpa/inet.h> /* inet_addr */
+
 #ifndef WIN32
 #include <netdb.h>
 #include <fcntl.h>

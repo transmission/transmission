@@ -18,7 +18,7 @@
 #include <string.h>
 #include <libgen.h> /* basename */
 
-#include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
 
 #include <sys/types.h> /* event.h needs this */
 #include <event.h>

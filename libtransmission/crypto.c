@@ -14,7 +14,8 @@
 #include <inttypes.h> /* uint8_t */
 #include <string.h> /* memcpy */
 #include <stdarg.h>
-#include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
+
 
 #include <openssl/bn.h>
 #include <openssl/dh.h>
