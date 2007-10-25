@@ -1852,29 +1852,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         filtering = YES;
         
-        NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
         Torrent * torrent;
-        BOOL filterTracker = [filterType isEqualToString: FILTER_TYPE_TRACKER], remove;
+        BOOL filterTracker = [[fDefaults stringForKey: @"FilterSearchType"] isEqualToString: FILTER_TYPE_TRACKER], remove;
         
         int i;
         for (i = [tempTorrents count]-1; i >= 0; i--)
         {
             torrent = [tempTorrents objectAtIndex: i];
-            remove = NO;
+            remove = YES;
             
             if (filterTracker)
             {
                 NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
                 NSArray * subTrackers;
                 NSString * tracker;
-                while (!remove && (subTrackers = [trackerEnumerator nextObject]))
+                while (remove && (subTrackers = [trackerEnumerator nextObject]))
                 {
                     subTrackerEnumerator = [subTrackers objectEnumerator];
                     while ((tracker = [subTrackerEnumerator nextObject]))
                     {
-                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
+                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location != NSNotFound)
                         {
-                            remove = YES;
+                            remove = NO;
                             break;
                         }
                     }
