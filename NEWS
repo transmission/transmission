@@ -1,8 +1,12 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.91 (2007/xx/xx)
+- libtransmission:
+   + Fix 0.90 socket connection leak.
 - OS X:
    + Add Dutch localization, Re-add Russian localization, fix Korean localization
+- gtk:
+   + Fix 0.90 packaging errors.
 
 0.90 (2007/10/23)
  - Encryption support, with option to ignore unencrypted peers
