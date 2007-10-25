@@ -1,8 +1,9 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.91 (2007/xx/xx)
-- libtransmission:
+- libtransmission (all platforms):
    + Fix 0.90 socket connection leak.
+   + Fix 0.90 OpenBSD build error.
 - OS X:
    + Add Dutch localization, Re-add Russian localization, fix Korean localization
 - gtk:

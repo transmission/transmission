@@ -14,7 +14,7 @@
 #define TR_PEER_MGR_PRIVATE_H
 
 #include <inttypes.h> /* uint16_t */
-#include <arpa/inet.h> /* struct in_addr */
+#include <netinet/in.h> /* struct in_addr */
 #include "publish.h" /* tr_publisher_tag */
 
 struct tr_bitfield;

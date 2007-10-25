@@ -38,7 +38,6 @@
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
-    #include <arpa/inet.h>
     typedef in_port_t tr_port_t;
 #endif
 

@@ -14,7 +14,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
+#include <arpa/inet.h> /* inet_ntoa */
 #include <event.h>
 #include "transmission.h"
 #include "crypto.h"
