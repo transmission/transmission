@@ -1,4 +1,5 @@
 EXTRA_DIST = \
+    version.sh \
     Sparkle.framework \
     CTGradient \
     UKKQueue \
