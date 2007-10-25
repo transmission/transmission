@@ -1852,21 +1852,38 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         filtering = YES;
         
-        #warning check multiple trackers
         NSString * filterType = [fDefaults stringForKey: @"FilterSearchType"];
-        NSString * fullString;
         Torrent * torrent;
+        BOOL filterTracker = [filterType isEqualToString: FILTER_TYPE_TRACKER], remove;
         
         int i;
         for (i = [tempTorrents count]-1; i >= 0; i--)
         {
             torrent = [tempTorrents objectAtIndex: i];
-            if ([filterType isEqualToString: FILTER_TYPE_TRACKER])
-                fullString = [torrent trackerAddress];
-            else
-                fullString = [torrent name];
+            remove = NO;
             
-            if ([fullString rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
+            if (filterTracker)
+            {
+                NSEnumerator * trackerEnumerator = [[torrent allTrackers] objectEnumerator], * subTrackerEnumerator;
+                NSArray * subTrackers;
+                NSString * tracker;
+                while (!remove && (subTrackers = [trackerEnumerator nextObject]))
+                {
+                    subTrackerEnumerator = [subTrackers objectEnumerator];
+                    while ((tracker = [subTrackerEnumerator nextObject]))
+                    {
+                        if ([tracker rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound)
+                        {
+                            remove = YES;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+                remove = [[torrent name] rangeOfString: searchString options: NSCaseInsensitiveSearch].location == NSNotFound;
+            
+            if (remove)
                 [tempTorrents removeObjectAtIndex: i];
         }
     }
