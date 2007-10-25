@@ -579,7 +579,10 @@ onScrapeNow( void * vt )
         struct evhttp_request *req;
         struct evbuffer * buf = evbuffer_new( );
 
-        evbuffer_add_printf( buf, "%s?info_hash=%s", address->scrape, t->escaped );
+        evbuffer_add_printf( buf, "%s%sinfo_hash=%s",
+                             address->scrape,
+                             ( strchr(address->scrape, '?') == NULL ? "?" : "&" ),
+                             t->escaped );
         uri = tr_strdup( (char*) EVBUFFER_DATA( buf ) );
         evbuffer_free( buf );
 
@@ -619,8 +622,10 @@ buildTrackerRequestURI( const tr_tracker  * t,
     struct evbuffer * buf = evbuffer_new( );
     char * ret;
 
+    char * ann = getCurrentAddress(t)->announce;
+    
     evbuffer_add_printf( buf, "%s"
-                              "?info_hash=%s"
+                              "%sinfo_hash=%s"
                               "&peer_id=%s"
                               "&port=%d"
                               "&uploaded=%"PRIu64
@@ -634,7 +639,8 @@ buildTrackerRequestURI( const tr_tracker  * t,
                               "&requirecrypto=%d"
                               "%s%s"
                               "%s%s",
-        getCurrentAddress(t)->announce,
+        ann,
+        ( strchr(ann, '?') == NULL ? "?" : "&" ),
         t->escaped,
         t->peer_id,
         tr_sharedGetPublicPort( t->handle->shared ),
