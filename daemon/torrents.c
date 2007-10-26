@@ -608,7 +608,7 @@ starttimer( int callnow )
     if( !evtimer_initialized( &gl_event ) )
     {
         evtimer_set( &gl_event, timerfunc, NULL );
-        /* XXX event_base_set( gl_base, &gl_event ); */
+        event_base_set( gl_base, &gl_event );
     }
 
     if( callnow )
