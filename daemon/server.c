@@ -190,6 +190,9 @@ server_quit( void )
 {
     struct client * ii, * next;
 
+    if(gl_exiting)
+        return;
+
     torrent_exit( 0 );
     gl_exiting = 1;
 
