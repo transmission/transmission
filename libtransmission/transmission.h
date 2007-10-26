@@ -307,7 +307,7 @@ void tr_close( tr_handle * );
  *  from the previous session.
  */
 tr_torrent ** tr_loadTorrents ( tr_handle  * h,
-                                const char   * destination,
+                                const char   * fallback_destination,
                                 int            isPaused,
                                 int          * setmeCount );
 
@@ -329,6 +329,15 @@ tr_torrent ** tr_loadTorrents ( tr_handle  * h,
 tr_torrent * tr_torrentInit( tr_handle    * handle,
                              const char   * metainfo_filename,
                              const char   * destination,
+                             int            isPaused,
+                             int          * setme_error );
+
+/* This is a stupid hack to fix #415.  Probably I should fold all
+ * these torrent constructors into a single function that takes
+ * a function object to hold all these esoteric arguments. */
+tr_torrent * tr_torrentLoad( tr_handle    * handle,
+                             const char   * metainfo_filename,
+                             const char   * fallback_destination,
                              int            isPaused,
                              int          * setme_error );
 

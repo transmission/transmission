@@ -257,6 +257,7 @@ static void
 torrentRealInit( tr_handle  * h,
                  tr_torrent * tor,
                  const char * destination,
+                 int          destinationIsFallback,
                  int          isPaused )
 {
     int doStart;
@@ -266,8 +267,6 @@ torrentRealInit( tr_handle  * h,
     tr_info * info = &tor->info;
    
     tr_globalLock( h );
-
-    tor->destination = tr_strdup( destination );
 
     tor->handle   = h;
     tor->pexDisabled = 0;
@@ -339,7 +338,7 @@ torrentRealInit( tr_handle  * h,
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
 
-    loaded = tr_fastResumeLoad( tor, uncheckedPieces );
+    loaded = tr_fastResumeLoad( tor, uncheckedPieces, destination, destinationIsFallback );
     assert( tor->destination != NULL );
 
     /* the `paused' flag has highest precedence...
@@ -449,12 +448,13 @@ tr_torrentParse( const tr_handle  * h,
     return ret;
 }
  
-tr_torrent *
-tr_torrentInit( tr_handle   * h,
-                const char  * path,
-                const char  * destination,
-                int           isPaused,
-                int         * error )
+static tr_torrent *
+tr_torrentInitImpl( tr_handle   * h,
+                    const char  * path,
+                    const char  * destination,
+                    int           destinationIsFallback,
+                    int           isPaused,
+                    int         * error )
 {
     int val;
     int tmpError;
@@ -469,10 +469,30 @@ tr_torrentInit( tr_handle   * h,
         *error = TR_EOTHER;
     else {
         tr_metainfoParseFile( &tor->info, h->tag, path, TRUE );
-        torrentRealInit( h, tor, destination, isPaused );
+        torrentRealInit( h, tor, destination, destinationIsFallback, isPaused );
     }
 
     return tor;
+}
+
+tr_torrent *
+tr_torrentInit( tr_handle   * h,
+                const char  * path,
+                const char  * destination,
+                int           isPaused,
+                int         * error )
+{
+    return tr_torrentInitImpl( h, path, destination, FALSE, isPaused, error );
+}
+
+tr_torrent *
+tr_torrentLoad( tr_handle    * h,
+                const char   * metainfoFilename,
+                const char   * destination,
+                int            isPaused,
+                int          * error )
+{
+    return tr_torrentInitImpl( h, metainfoFilename, destination, TRUE, isPaused, error );
 }
 
 int
@@ -520,7 +540,7 @@ tr_torrentInitSaved( tr_handle    * h,
         *error = TR_EOTHER;
     else {
         tr_metainfoParseHash( &tor->info, h->tag, hashStr );
-        torrentRealInit( h, tor, destination, isPaused );
+        torrentRealInit( h, tor, destination, FALSE, isPaused );
     }
 
     return tor;
@@ -573,7 +593,7 @@ tr_torrentInitData( tr_handle      * h,
         *error = TR_EOTHER;
     else {
         tr_metainfoParseData( &tor->info, h->tag, data, size, TRUE );
-        torrentRealInit( h, tor, destination, isPaused );
+        torrentRealInit( h, tor, destination, FALSE, isPaused );
     }
 
     return tor;
@@ -1303,4 +1323,3 @@ tr_pieceOffset( const tr_torrent * tor, int index, int begin, int length )
     ret += length;
     return ret;
 }
-

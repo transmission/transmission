@@ -447,7 +447,7 @@ tr_core_load( TrCore * self, gboolean paused )
 
     path = getdownloaddir( );
 
-    torrents = tr_loadTorrents ( self->handle, NULL, paused, &count );
+    torrents = tr_loadTorrents ( self->handle, path, paused, &count );
     for( i=0; i<count; ++i )
         tr_core_insert( self, tr_torrent_new_preexisting( torrents[i] ) );
     tr_free( torrents );
