@@ -79,6 +79,9 @@ enum ipc_msg
     IPC__MSG_UNKNOWN
 };
 
+/* If you add or delete a constant here then you need to renumber the
+   ones after it. They need to be in ascending order starting at zero,
+   with no gaps. */
 #define IPC_INF_COMMENT         ( 1 << 0 )
 #define IPC_INF_CREATOR         ( 1 << 1 )
 #define IPC_INF_DATE            ( 1 << 2 )
@@ -88,10 +91,11 @@ enum ipc_msg
 #define IPC_INF_NAME            ( 1 << 6 )
 #define IPC_INF_PATH            ( 1 << 7 )
 #define IPC_INF_PRIVATE         ( 1 << 8 )
-#define IPC_INF_SIZE            ( 1 << 10 )
-#define IPC_INF_TRACKERS        ( 1 << 11 )
-#define IPC_INF__MAX            ( 1 << 12 )
+#define IPC_INF_SIZE            ( 1 << 9 )
+#define IPC_INF_TRACKERS        ( 1 << 10 )
+#define IPC_INF__MAX            ( 1 << 11 )
 
+/* Ditto for these */
 #define IPC_ST_COMPLETED        ( 1 << 0 )
 #define IPC_ST_DOWNSPEED        ( 1 << 1 )
 #define IPC_ST_DOWNTOTAL        ( 1 << 2 )
