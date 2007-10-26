@@ -30,9 +30,9 @@ typedef struct tr_metainfo_builder
     char * top;
     tr_metainfo_builder_file * files;
     uint64_t totalSize;
-    int fileCount;
-    int pieceSize;
-    int pieceCount;
+    uint32_t fileCount;
+    uint32_t pieceSize;
+    uint32_t pieceCount;
     int isSingleFile;
     tr_handle * handle;
 
@@ -54,7 +54,7 @@ typedef struct tr_metainfo_builder
     ***  tell tr_makeMetaInfo() to abort and clean up after itself.
     **/
 
-    int pieceIndex;
+    uint32_t pieceIndex;
     int abortFlag;
     int isDone;
     int failed; /* only meaningful if isDone is set */

@@ -167,7 +167,7 @@ tr_metaInfoBuilderFree( tr_metainfo_builder * builder )
 {
     if( builder != NULL )
     {
-        int i;
+        uint32_t i;
         for( i=0; i<builder->fileCount; ++i )
             tr_free( builder->files[i].filename );
         tr_free( builder->files );
@@ -186,7 +186,7 @@ tr_metaInfoBuilderFree( tr_metainfo_builder * builder )
 static uint8_t*
 getHashInfo ( tr_metainfo_builder * b )
 {
-    int fileIndex = 0;
+    uint32_t fileIndex = 0;
     uint8_t *ret = tr_new0( uint8_t, SHA_DIGEST_LENGTH * b->pieceCount );
     uint8_t *walk = ret;
     uint8_t *buf;
@@ -296,7 +296,7 @@ static void
 makeFilesList( benc_val_t                 * list,
                const tr_metainfo_builder  * builder )
 {
-    int i = 0;
+    uint32_t i = 0;
 
     tr_bencListReserve( list, builder->fileCount );
 
