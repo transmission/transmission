@@ -330,11 +330,10 @@ tr_fastResumeSave( const tr_torrent * tor )
 }
 
 static int
-loadFallbackDestination( tr_torrent * tor, FILE * fp )
+loadDestination( tr_torrent * tor, FILE * fp, const char * destination, int argIsFallback )
 {
     int pathlen = 0;
     char path[MAX_PATH_LENGTH];
-    const int haveDestination = tor->destination && *tor->destination;
 
     for( ;; ) {
         const int ch = fgetc( fp );
@@ -347,10 +346,10 @@ loadFallbackDestination( tr_torrent * tor, FILE * fp )
 
     path[pathlen] = '\0';
 
-    if( pathlen && !haveDestination ) {
-        tr_free( tor->destination );
-        tor->destination = tr_strdup( path );
-    }
+    if( argIsFallback )
+        tor->destination = tr_strdup( pathlen ? path : destination );
+    else
+        tor->destination = tr_strdup( destination && *destination ? destination : path );
 
     return TR_OK;
 }
@@ -525,7 +524,9 @@ fastResumeLoadOld( tr_torrent   * tor,
 
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
-                     tr_bitfield  * uncheckedPieces )
+                     tr_bitfield  * uncheckedPieces,
+                     const char   * destination,
+                     int            argIsFallback )
 {
     char      path[MAX_PATH_LENGTH];
     FILE    * file;
@@ -629,7 +630,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
             case FR_ID_DESTINATION:
                 {
-                    const int rret = loadFallbackDestination( tor, file );
+                    const int rret = loadDestination( tor, file, destination, argIsFallback );
 
                     if( rret && ( feof(file) || ferror(file) ) )
                     {
@@ -772,12 +773,17 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
 uint64_t
 tr_fastResumeLoad( tr_torrent   * tor,
-                   tr_bitfield  * uncheckedPieces )
+                   tr_bitfield  * uncheckedPieces,
+                   const char   * destination,
+                   int            argIsFallback )
 {
-    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces );
+    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces, destination, argIsFallback );
 
     if( ! ( ret & TR_FR_PROGRESS ) )
         tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
+
+    if( !tor->destination )
+        tor->destination = tr_strdup( destination );
 
     return ret;
 }
