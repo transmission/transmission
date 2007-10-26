@@ -164,15 +164,29 @@ setupsighandlers(void);
 static void
 fatalsig(int sig);
 
+struct counts_data
+{
+    int totalCount;
+    int activeCount;
+    int inactiveCount;
+};
+
 static void
 accumulateStatusForeach (GtkTreeModel * model,
                          GtkTreePath  * path UNUSED,
                          GtkTreeIter  * iter,
-                         gpointer       accumulated_status)
+                         gpointer       user_data )
 {
     int status = 0;
+    struct counts_data * counts = user_data;
+
+    ++counts->totalCount;
+
     gtk_tree_model_get( model, iter, MC_STAT, &status, -1 );
-    *(int*)accumulated_status |= status;
+    if( TR_STATUS_IS_ACTIVE( status ) )
+        ++counts->activeCount;
+    else
+        ++counts->inactiveCount;
 }
 
 static void
@@ -191,17 +205,22 @@ accumulateCanUpdateForeach (GtkTreeModel * model,
 static void
 refreshTorrentActions( GtkTreeSelection * s )
 {
-    int status = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &status );
-    action_sensitize( "pause-torrent", TR_STATUS_IS_ACTIVE(status) );
-    action_sensitize( "start-torrent", !TR_STATUS_IS_ACTIVE(status) );
-    action_sensitize( "remove-torrent", status != 0);
-    action_sensitize( "verify-torrent", status != 0);
-    action_sensitize( "show-torrent-details", status != 0);
+    int canUpdate;
+    struct counts_data counts;
 
-    status = 0;
-    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &status );
-    action_sensitize( "update-tracker", status != 0);
+    counts.activeCount = 0;
+    counts.inactiveCount = 0;
+    counts.totalCount = 0;
+    gtk_tree_selection_selected_foreach( s, accumulateStatusForeach, &counts );
+    action_sensitize( "pause-torrent", counts.activeCount!=0 );
+    action_sensitize( "start-torrent", counts.inactiveCount!=0 );
+    action_sensitize( "remove-torrent", counts.totalCount!=0 );
+    action_sensitize( "verify-torrent", counts.totalCount!=0 );
+    action_sensitize( "show-torrent-details", counts.totalCount!=0 );
+
+    canUpdate = 0;
+    gtk_tree_selection_selected_foreach( s, accumulateCanUpdateForeach, &canUpdate );
+    action_sensitize( "update-tracker", canUpdate!=0 );
 }
 
 static void
