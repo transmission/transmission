@@ -439,24 +439,28 @@ fastResumeLoadProgress( const tr_torrent  * tor,
                         tr_bitfield       * uncheckedPieces,
                         FILE              * file )
 {
-    int i;
     const size_t len = FR_PROGRESS_LEN( tor );
     uint8_t * buf = calloc( len, 1 );
-    uint8_t * walk = buf;
+    int ret = 0;
+    int i;
 
-    if( len != fread( buf, 1, len, file ) ) {
+    if( len != fread( buf, 1, len, file ) )
+    {
         tr_inf( "Couldn't read from resume file" );
-        free( buf );
-        return TR_ERROR_IO_OTHER;
+        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
+        ret = TR_ERROR_IO_OTHER;
     }
-
-    /* compare file mtimes */
-    if (1) {
+    else
+    {
         int n;
+        tr_bitfield bitfield;
+
+        /* compare file mtimes */
         tr_time_t * curMTimes = getMTimes( tor, &n );
+        uint8_t * walk = buf;
         const tr_time_t * oldMTimes = (const tr_time_t *) walk;
         for( i=0; i<n; ++i ) {
-            if ( curMTimes[i]!=oldMTimes[i] ) {
+            if ( !curMTimes[i] || ( curMTimes[i] != oldMTimes[i] ) ) {
                 const tr_file * file = &tor->info.files[i];
                 tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
                         file->name, file->firstPiece, file->lastPiece);
@@ -466,11 +470,8 @@ fastResumeLoadProgress( const tr_torrent  * tor,
         }
         free( curMTimes );
         walk += n * sizeof(tr_time_t);
-    }
 
-    /* get the completion bitfield */
-    if (1) {
-        tr_bitfield bitfield;
+        /* get the completion bitfield */
         memset( &bitfield, 0, sizeof bitfield );
         bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
         bitfield.bits = walk;
@@ -485,7 +486,7 @@ fastResumeLoadProgress( const tr_torrent  * tor,
 
 
     free( buf );
-    return TR_OK;
+    return ret;
 }
 
 static uint64_t
