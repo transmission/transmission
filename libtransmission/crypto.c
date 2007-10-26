@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms */
 #include <assert.h>
 #include <inttypes.h> /* uint8_t */
 #include <string.h> /* memcpy */
@@ -21,7 +22,6 @@
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
 
-#include <sys/types.h> /* event.h needs this */
 #include <event.h>
 
 #include "crypto.h"
