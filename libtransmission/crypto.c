@@ -14,6 +14,8 @@
 #include <inttypes.h> /* uint8_t */
 #include <string.h> /* memcpy */
 #include <stdarg.h>
+
+#include <sys/types.h> /* for event.h, as well as netinet/in.h on some platforms */
 #include <netinet/in.h> /* struct in_addr */
 
 #include <openssl/bn.h>
@@ -21,7 +23,6 @@
 #include <openssl/rc4.h>
 #include <openssl/sha.h>
 
-#include <sys/types.h> /* event.h needs this */
 #include <event.h>
 
 #include "crypto.h"
