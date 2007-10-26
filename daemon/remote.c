@@ -72,6 +72,7 @@ struct opts
     struct strlist    remove;
     char              dir[MAXPATHLEN];
     int               pex;
+    const char *      crypto;
 };
 
 struct torinfo
@@ -174,6 +175,7 @@ main( int argc, char ** argv )
     if( ( o.sendquit                &&   0 > client_quit     (           ) ) ||
         ( '\0' != o.dir[0]          &&   0 > client_dir      ( o.dir     ) ) ||
         ( !SLIST_EMPTY( &o.files )  &&   0 > client_addfiles ( &o.files  ) ) ||
+        ( o.crypto                  &&   0 > client_crypto   ( o.crypto  ) ) ||
         ( o.startall                &&   0 > client_start    ( 0, NULL   ) ) ||
         ( o.stopall                 &&   0 > client_stop     ( 0, NULL   ) ) ||
         ( o.removeall               &&   0 > client_remove   ( 0, NULL   ) ) ||
@@ -229,6 +231,8 @@ usage( const char * msg, ... )
   "A fast and easy BitTorrent client\n"
   "\n"
   "  -a --add <torrent>        Add a torrent\n"
+  "  -c --encryption preferred Prefer peers to use encryption\n"
+  "  -c --encryption required  Require encryption for all peers\n"
   "  -d --download-limit <int> Max download rate in KiB/s\n"
   "  -D --download-unlimited   No download rate limit\n"
   "  -e --enable-pex           Enable peer exchange\n"
@@ -260,10 +264,11 @@ usage( const char * msg, ... )
 int
 readargs( int argc, char ** argv, struct opts * opts )
 {
-    char optstr[] = "a:d:DeEf:hilmMp:qr:s:S:t:u:Ux";
+    char optstr[] = "a:c:d:DeEf:hilmMp:qr:s:S:t:u:Ux";
     struct option longopts[] =
     {
         { "add",                required_argument, NULL, 'a' },
+        { "encryption",         required_argument, NULL, 'c' },
         { "download-limit",     required_argument, NULL, 'd' },
         { "download-unlimited", no_argument,       NULL, 'D' },
         { "enable-pex",         no_argument,       NULL, 'e' },
@@ -306,6 +311,14 @@ readargs( int argc, char ** argv, struct opts * opts )
                 {
                     return -1;
                 }
+                break;
+            case 'c':
+                if(!strcasecmp(optarg, "preferred"))
+                    opts->crypto = "preferred";
+                else if(!strcasecmp(optarg, "required"))
+                    opts->crypto = "required";
+                else
+                    usage("invalid encryption mode: %s", optarg);
                 break;
             case 'd':
                 opts->downlimit = 1;

@@ -191,6 +191,15 @@ Example: 9:downlimiti100e
 Details: Set the server's download limit in kilobytes per second.
          Negative values are interpreted as no limit.
 
+Key:     "encryption"
+Version: 2
+Format:  string
+Replies: "succeeded", "failed", "not-supported", "bad-format"
+Example: 10:encryption8:required
+         "encryption", "required"
+Details: Set the encryption mode for peer connections. Valid values
+         are "required" and "preferred".
+
 Key:     "failed"
 Version: 2
 Format:  string
@@ -230,6 +239,14 @@ Replies: "failed", "not-supported", "bad-format", "downlimit"
 Example: 13:get-downlimit0:
          "get-downlimit", ""
 Details: Requests that a "downlimit" message be sent back.
+
+Key:     "get-encryption"
+Version: 2
+Format:  value is ignored
+Replies: "failed", "not-supported", "bad-format", "encryption"
+Example: 14:get-encryption0:
+         "get-encryption", ""
+Details: Requests that an "encryption" message be sent back.
 
 Key:     "get-info"
 Version: 2

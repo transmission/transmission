@@ -104,10 +104,12 @@ server_init( struct event_base * base )
         0 > ipc_addmsg( gl_tree, IPC_MSG_ADDONEFILE,   addmsg2 ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_AUTOMAP,      intmsg  ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_AUTOSTART,    intmsg  ) ||
+        0 > ipc_addmsg( gl_tree, IPC_MSG_CRYPTO,       strmsg  ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_DOWNLIMIT,    intmsg  ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_DIR,          strmsg  ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_GETAUTOMAP,   prefmsg ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_GETAUTOSTART, prefmsg ) ||
+        0 > ipc_addmsg( gl_tree, IPC_MSG_GETCRYPTO,    prefmsg ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_GETDOWNLIMIT, prefmsg ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_GETDIR,       prefmsg ) ||
         0 > ipc_addmsg( gl_tree, IPC_MSG_GETINFO,      infomsg ) ||
@@ -635,6 +637,17 @@ strmsg( enum ipc_msg id, benc_val_t * val, int64_t tag, void * arg )
 
     switch( id )
     {
+        case IPC_MSG_CRYPTO:
+            if(!strcasecmp(val->val.s.s, "preferred"))
+                torrent_set_encryption(TR_ENCRYPTION_PREFERRED);
+            else if(!strcasecmp(val->val.s.s, "required"))
+                torrent_set_encryption(TR_ENCRYPTION_REQUIRED);
+            else
+            {
+                msgresp(client, tag, IPC_MSG_BAD);
+                return;
+            }
+            break;
         case IPC_MSG_DIR:
             torrent_set_directory( val->val.s.s );
             break;
@@ -902,6 +915,7 @@ prefmsg( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
     struct client * client = arg;
     uint8_t       * buf;
     size_t          buflen;
+    const char    * strval;
 
     switch( id )
     {
@@ -912,6 +926,21 @@ prefmsg( enum ipc_msg id, benc_val_t * val UNUSED, int64_t tag, void * arg )
         case IPC_MSG_GETAUTOSTART:
             buf = ipc_mkint( client->ipc, &buflen, IPC_MSG_AUTOSTART, tag,
                              torrent_get_autostart() );
+            break;
+        case IPC_MSG_GETCRYPTO:
+            switch(torrent_get_encryption())
+            {
+                case TR_ENCRYPTION_PREFERRED:
+                    strval = "preferred";
+                    break;
+                case TR_ENCRYPTION_REQUIRED:
+                    strval = "required";
+                    break;
+                default:
+                    assert(0);
+                    return;
+            }
+            buf = ipc_mkstr(client->ipc, &buflen, IPC_MSG_CRYPTO, tag, strval);
             break;
         case IPC_MSG_GETDIR:
             buf = ipc_mkstr( client->ipc, &buflen, IPC_MSG_DIR, tag,
