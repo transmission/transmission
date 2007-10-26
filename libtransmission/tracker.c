@@ -367,7 +367,7 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req )
 
     if( !req )
     {
-        ret = "No response from tracker -- will keep trying.";
+        ret = "Tracker hasn't responded yet.  Retrying...";
         tr_inf( ret );
 
         moveToNextAddress = TRUE;
@@ -411,7 +411,6 @@ updateAddresses( tr_tracker * t, const struct evhttp_request * req )
     }
     else 
     {
-        ret = "No response from tracker -- will keep trying.";
         moveToNextAddress = TRUE;
     }
 
