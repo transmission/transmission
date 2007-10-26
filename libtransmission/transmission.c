@@ -322,7 +322,6 @@ tr_close( tr_handle * h )
     tr_lockFree( h->lock );
     free( h->tag );
     free( h );
-    fprintf( stderr, "libtransmission closed cleanly.\n" );
 }
 
 tr_torrent **
