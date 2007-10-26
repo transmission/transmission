@@ -36,7 +36,7 @@
 
 - (BOOL) isOpaque
 {
-    return YES;
+    return fBackgroundColor != nil;
 }
 
 - (void) dealloc

@@ -147,6 +147,7 @@
     }
 }
 
+#warning not always working
 - (void) mouseUp: (NSEvent *) event
 {
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
