@@ -4,12 +4,12 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - libtransmission (all platforms):
    + Fix 0.90 socket connection leak
    + Fix 0.90 OpenBSD build error
-   + Fix 0.90 cache bug that could cause "verify local files" to fail.
+   + Fix 0.90 cache bug that could cause "verify local files" to fail
    + Ensure only a single "?" is used for appending arguments to the announce and scrape URL
 - OS X:
    + Fix a crash caused by custom sound files
    + Add Dutch localization, re-add Russian localization, fix Korean localization
-- gtk:
+- GTK:
    + Fix 0.90 packaging errors
    + Fix 0.90 assertion failure: "destination != (void*)0"
 

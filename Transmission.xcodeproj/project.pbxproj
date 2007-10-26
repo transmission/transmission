@@ -1292,6 +1292,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
