@@ -378,17 +378,26 @@ void
 tr_ioRecheckAdd( tr_torrent          * tor,
                  tr_recheck_done_cb    recheck_done_cb )
 {
-    struct recheck_node * node;
-    node = tr_new( struct recheck_node, 1 );
-    node->torrent = tor;
-    node->recheck_done_cb = recheck_done_cb;
+    if( !tr_bitfieldCountTrueBits( tor->uncheckedPieces ) )
+    {
+        /* doesn't need to be checked... */
+        recheck_done_cb( tor );
+    }
+    else
+    {
+        struct recheck_node * node;
 
-    tr_lockLock( getRecheckLock( ) );
-    tor->recheckState = recheckList ? TR_RECHECK_WAIT : TR_RECHECK_NOW;
-    tr_list_append( &recheckList, node );
-    if( recheckThread == NULL )
-        recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
-    tr_lockUnlock( getRecheckLock( ) );
+        node = tr_new( struct recheck_node, 1 );
+        node->torrent = tor;
+        node->recheck_done_cb = recheck_done_cb;
+
+        tr_lockLock( getRecheckLock( ) );
+        tor->recheckState = recheckList ? TR_RECHECK_WAIT : TR_RECHECK_NOW;
+        tr_list_append( &recheckList, node );
+        if( recheckThread == NULL )
+            recheckThread = tr_threadNew( recheckThreadFunc, NULL, "recheckThreadFunc" );
+        tr_lockUnlock( getRecheckLock( ) );
+    }
 }
 
 static int
