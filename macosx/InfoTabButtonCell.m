@@ -75,8 +75,8 @@
     {
         if (!fSelectedImage)
         {
-            fSelectedImage = [NSColor currentControlTint] == NSGraphiteControlTint ? [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy]
-                                : [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy];
+            fSelectedImage = [NSColor currentControlTint] == NSGraphiteControlTint
+                ? [[NSImage imageNamed: @"InfoTabBackGraphite.png"] copy] : [[NSImage imageNamed: @"InfoTabBackBlue.tif"] copy];
             createImage = YES;
         }
         tabImage = fSelectedImage;
