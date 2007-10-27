@@ -154,6 +154,7 @@
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
+		A2FE620C0CD3D19400D683E1 /* InfoTabBackGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FE620B0CD3D19400D683E1 /* InfoTabBackGraphite.png */; };
 		BE75C3650C72A0EF00DBEFE0 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3580C72A0EF00DBEFE0 /* kqueue.c */; };
 		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
 		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
@@ -539,6 +540,7 @@
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
+		A2FE620B0CD3D19400D683E1 /* InfoTabBackGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackGraphite.png; path = macosx/Images/InfoTabBackGraphite.png; sourceTree = "<group>"; };
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75C3580C72A0EF00DBEFE0 /* kqueue.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kqueue.c; path = "third-party/libevent/kqueue.c"; sourceTree = "<group>"; };
 		BE75C3590C72A0EF00DBEFE0 /* signal.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = signal.c; path = "third-party/libevent/signal.c"; sourceTree = "<group>"; };
@@ -849,6 +851,7 @@
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
 				A22A067D0CB83507009694FE /* InfoTabBack.tif */,
 				A2A14A880CC6D25400A7AC1D /* InfoTabBackBlue.tif */,
+				A2FE620B0CD3D19400D683E1 /* InfoTabBackGraphite.png */,
 				A22A06970CB83880009694FE /* InfoTabBorder.tif */,
 				A26E75950CB6AB4800226674 /* InfoGeneral.png */,
 				A26E75870CB6AA7500226674 /* InfoOptions.png */,
@@ -1406,6 +1409,7 @@
 				A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */,
 				A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */,
 				A2A14A890CC6D25400A7AC1D /* InfoTabBackBlue.tif in Resources */,
+				A2FE620C0CD3D19400D683E1 /* InfoTabBackGraphite.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
