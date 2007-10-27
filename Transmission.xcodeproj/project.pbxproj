@@ -89,6 +89,7 @@
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
+		A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */; };
 		A23BBEB70A9BBE77003F7274 /* FilterBarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A27431D90A68538400FA780A /* FilterBarButton.m */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
 		A246004D0A6DCE4600D19088 /* SpeedLimitButtonPressed.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */; };
@@ -404,6 +405,8 @@
 		A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSMenuAdditions.m; path = macosx/NSMenuAdditions.m; sourceTree = "<group>"; };
 		A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayWindow.m; path = macosx/DragOverlayWindow.m; sourceTree = "<group>"; };
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
+		A2399CCB0CD3852300225B2B /* NSApplicationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSApplicationAdditions.h; path = macosx/NSApplicationAdditions.h; sourceTree = "<group>"; };
+		A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSApplicationAdditions.m; path = macosx/NSApplicationAdditions.m; sourceTree = "<group>"; };
 		A246004C0A6DCE4600D19088 /* SpeedLimitButtonPressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonPressed.png; path = macosx/Images/SpeedLimitButtonPressed.png; sourceTree = "<group>"; };
 		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
 		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
@@ -965,6 +968,8 @@
 		A234D0D40C79FB6000A82373 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
+				A2399CCB0CD3852300225B2B /* NSApplicationAdditions.h */,
+				A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */,
 				4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */,
 				4DE5CC9C0980656F00BE280E /* NSStringAdditions.m */,
 				A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */,
@@ -1527,6 +1532,7 @@
 				A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.m in Sources */,
 				A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */,
+				A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
