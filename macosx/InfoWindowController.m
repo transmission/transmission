@@ -24,6 +24,7 @@
 
 #import "InfoWindowController.h"
 #import "InfoTabButtonCell.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define FILE_ROW_SMALL_HEIGHT 18.0
@@ -76,9 +77,6 @@ typedef enum
 
 - (void) awakeFromNib
 {
-    //get images
-    fAppIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-    
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
     
@@ -183,6 +181,9 @@ typedef enum
     {
         if (numberSelected > 0)
         {
+            [fImageView setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter]
+                                    ? NSImageNameMultipleDocuments : @"NSApplicationIcon"]];
+            
             [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected",
                                             "Inspector -> above tabs -> selected torrents"), numberSelected]];
         
@@ -197,6 +198,8 @@ typedef enum
         }
         else
         {
+            [fImageView setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
+            
             [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
             [fSizeField setStringValue: @""];
     
@@ -229,8 +232,6 @@ typedef enum
         }
         
         [fFileOutline setTorrent: nil];
-        
-        [fImageView setImage: fAppIcon];
         
         [fNameField setToolTip: nil];
 
@@ -657,16 +658,7 @@ typedef enum
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
         if ([ident isEqualToString: @"Encryption"])
-        {
-            if ([[peer objectForKey: @"Encryption"] boolValue])
-            {
-                if (!fLockImage)
-                    fLockImage = [NSImage imageNamed: @"Lock.tiff"];
-                return fLockImage;
-            }
-            else
-                return nil;
-        }
+            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock.tiff"] : nil;
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])

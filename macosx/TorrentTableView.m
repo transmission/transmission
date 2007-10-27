@@ -304,22 +304,16 @@
     text = [text lowercaseString];
     
     //select torrent closest to text that isn't before text alphabetically
-    int row;
     NSEnumerator * enumerator = [tempTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
         if ([[[torrent name] lowercaseString] hasPrefix: text])
         {
-            row = [fTorrents indexOfObject: torrent];
-            break;
+            int row = [fTorrents indexOfObject: torrent];
+            [self selectRow: row byExtendingSelection: NO];
+            [self scrollRowToVisible: row];
+            return;
         }
-    
-    //select last torrent alphabetically if no match found
-    if (!torrent)
-        row = [fTorrents indexOfObject: [tempTorrents lastObject]];
-    
-    [self selectRow: row byExtendingSelection: NO];
-    [self scrollRowToVisible: row];
 }
 
 - (void) displayTorrentMenuForEvent: (NSEvent *) event

@@ -32,7 +32,6 @@
 @interface InfoWindowController : NSWindowController
 {
     NSArray * fTorrents, * fPeers, * fFiles;
-    NSImage * fAppIcon, * fLockImage;
     
     IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
     int fCurrentTabTag;
