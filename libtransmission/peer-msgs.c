@@ -1692,6 +1692,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         sendBitfield( m );
     else {
         /* This peer is fastpeer-enabled, send it have-all or have-none if appropriate */
+        uint32_t peerProgress;
         float completion = tr_cpPercentComplete( m->torrent->completion );
         if ( completion == 0.0f ) {
             sendFastHave( m, 0 );
@@ -1700,7 +1701,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
         } else {
             sendBitfield( m );
         }
-        uint32_t peerProgress = m->torrent->info.pieceCount * m->info->progress;
+        peerProgress = m->torrent->info.pieceCount * m->info->progress;
         
         if ( peerProgress < MAX_ALLOWED_SET_COUNT )
             sendFastAllowedSet( m );

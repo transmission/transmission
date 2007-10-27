@@ -968,9 +968,10 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * arg )
         && ( handshake->allowUnencryptedPeers )
         && ( !tr_peerIoReconnect( handshake->io ) ) )
     {
-        dbgmsg( handshake, "handshake failed, trying plaintext..." );
         int msgSize; 
-        uint8_t * msg = buildHandshakeMessage( handshake, &msgSize );
+        uint8_t * msg;
+        dbgmsg( handshake, "handshake failed, trying plaintext..." );
+        msg = buildHandshakeMessage( handshake, &msgSize );
         handshake->haveSentBitTorrentHandshake = 1;
         setReadState( handshake, AWAITING_HANDSHAKE );
         tr_peerIoWrite( handshake->io, msg, msgSize );
