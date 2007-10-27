@@ -1028,6 +1028,9 @@ tr_torrentStart( tr_torrent * tor )
 
     if( !tor->isRunning )
     {
+        if( !tor->uncheckedPieces )
+            tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
+        tr_fastResumeLoad( tor, tor->uncheckedPieces, tor->destination, FALSE );
         tor->isRunning = 1;
         tr_ioRecheckAdd( tor, checkAndStartCB );
     }
