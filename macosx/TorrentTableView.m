@@ -26,6 +26,7 @@
 #import "TorrentCell.h"
 #import "Controller.h"
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 #import "NSMenuAdditions.h"
 
 #define PADDING 3.0
@@ -106,8 +107,15 @@
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
 }
 
+
+- (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
+{
+    return [[fTorrents objectAtIndex: row] name];
+}
+
 - (void) mouseDown: (NSEvent *) event
 {
+    //NSLog(@"down");
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
     if ([self pointInActionRect: fClickPoint])
@@ -150,6 +158,7 @@
 #warning not always working
 - (void) mouseUp: (NSEvent *) event
 {
+    //NSLog(@"up");
     NSPoint point = [self convertPoint: [event locationInWindow] fromView: nil];
     int row = [self rowAtPoint: point], oldRow = [self rowAtPoint: fClickPoint];
     
@@ -239,8 +248,21 @@
     }
 }
 
+- (void) flagsChanged: (NSEvent *) event
+{
+    [self display];
+    [super flagsChanged: event];
+}
+
 - (void) keyDown: (NSEvent *) event
 {
+    //this is handled by the delegate in Leopard
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        [super keyDown: event];
+        return;
+    }
+    
     if (!fKeyStrokes)
         fKeyStrokes = [[NSMutableArray alloc] init];
     
@@ -262,14 +284,15 @@
     }
 }
 
-- (void) flagsChanged: (NSEvent *) event
-{
-    [self display];
-    [super flagsChanged: event];
-}
-
 - (void) insertText: (NSString *) text
 {
+    //this is handled by the delegate in Leopard
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        [super insertText: text];
+        return;
+    }
+    
     //sort torrents by name before finding closest match
     NSSortDescriptor * nameDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"name" ascending: YES
                                             selector: @selector(caseInsensitiveCompare:)] autorelease];
@@ -278,12 +301,14 @@
     NSArray * tempTorrents = [fTorrents sortedArrayUsingDescriptors: descriptors];
     [descriptors release];
     
+    text = [text lowercaseString];
+    
     //select torrent closest to text that isn't before text alphabetically
     int row;
     NSEnumerator * enumerator = [tempTorrents objectEnumerator];
     Torrent * torrent;
     while ((torrent = [enumerator nextObject]))
-        if ([[torrent name] caseInsensitiveCompare: text] != NSOrderedAscending)
+        if ([[[torrent name] lowercaseString] hasPrefix: text])
         {
             row = [fTorrents indexOfObject: torrent];
             break;
