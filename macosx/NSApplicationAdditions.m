@@ -24,10 +24,6 @@
 
 #import "NSApplicationAdditions.h"
 
-#ifndef NSAppKitVersionNumber10_4 
-#define NSAppKitVersionNumber10_4 824 
-#endif
-
 @implementation NSApplication (NSApplicationAdditions)
 
 - (BOOL) isOnLeopardOrBetter

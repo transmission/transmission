@@ -181,8 +181,8 @@ typedef enum
     {
         if (numberSelected > 0)
         {
-            [fImageView setImage: [NSImage imageNamed: /*[NSApp isOnLeopardOrBetter]
-                                    ? NSImageNameMultipleDocuments :*/ @"NSApplicationIcon"]];
+            [fImageView setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter]
+                                    ? NSImageNameMultipleDocuments : @"NSApplicationIcon"]];
             
             [fNameField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Torrents Selected",
                                             "Inspector -> above tabs -> selected torrents"), numberSelected]];
