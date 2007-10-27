@@ -427,10 +427,11 @@ tr_ioRecheckRemove( tr_torrent * tor )
     else
     {
         struct recheck_node tmp;
+        struct recheck_node * node;
         tmp.torrent = tor;
-        struct recheck_node * node = tr_list_remove( &recheckList,
-                                                     &tmp,
-                                                     compareRecheckByTorrent );
+        node = tr_list_remove( &recheckList,
+                               &tmp,
+                               compareRecheckByTorrent );
         tr_free( node );
         tor->recheckState = TR_RECHECK_NONE;
     }

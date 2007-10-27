@@ -441,16 +441,18 @@ generate :
     /* TODO : We should translate link-local IPv4 adresses to external IP, 
      * so that being on same local network gives us the same allowed pieces */
     
+    uint8_t *seed;
+    char buf[4];
+    uint32_t allowedPieceCount = 0;
+    tr_bitfield_t * ret;
+
     printf( "%d piece allowed fast set for torrent with %d pieces and hex infohash\n", setCount, pieceCount );
     printf( "%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x for node with IP %s:\n",
             infohash[0], infohash[1], infohash[2], infohash[3], infohash[4], infohash[5], infohash[6], infohash[7], infohash[8], infohash[9],
             infohash[10], infohash[11], infohash[12], infohash[13], infohash[14], infohash[15], infohash[16], infohash[7], infohash[18], infohash[19],
             inet_ntoa( *ip ) );
     
-    uint8_t *seed = malloc(4 + SHA_DIGEST_LENGTH);
-    char buf[4];
-    uint32_t allowedPieceCount = 0;
-    tr_bitfield_t * ret;
+    seed = malloc(4 + SHA_DIGEST_LENGTH);
     
     ret = tr_bitfieldNew( pieceCount );
     
@@ -1690,20 +1692,19 @@ reconnectPulse( void * vtorrent )
         for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {
             tr_peerMgr * mgr = t->manager;
-
             struct peer_atom * atom = candidates[i];
-
             tr_peerIo * io;
+            tr_handshake * handshake;
 
             tordbg( t, "Starting an OUTGOING connection with %s",
                        tr_peerIoAddrStr( &atom->addr, atom->port ) );
 
             io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
 
-            tr_handshake * handshake = tr_handshakeNew( io,
-                                                        mgr->handle->encryptionMode,
-                                                        myHandshakeDoneCB,
-                                                        mgr );
+            handshake = tr_handshakeNew( io,
+                                         mgr->handle->encryptionMode,
+                                         myHandshakeDoneCB,
+                                         mgr );
 
             assert( tr_peerIoGetTorrentHash( io ) != NULL );
 

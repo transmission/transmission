@@ -41,6 +41,23 @@ AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 
 dnl ----------------------------------------------------------------------------
 dnl
+dnl va_copy
+
+AC_MSG_CHECKING([how to copy va_list])
+AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);],
+    AC_MSG_RESULT([va_copy]),
+        [ AH_TEMPLATE([va_copy], [define if va_copy is not available])
+        AC_TRY_LINK([#include <stdarg.h>], [va_list ap1, ap2; __va_copy(ap1, ap2);],
+        [ AC_DEFINE([va_copy], [__va_copy])
+        AC_MSG_RESULT([__va_copy])],
+        [ AC_DEFINE([va_copy(dest,src)], [memcpy(&dest,&src,sizeof(va_list))])
+        AC_MSG_RESULT([memcpy])]
+    )
+])
+
+
+dnl ----------------------------------------------------------------------------
+dnl
 dnl  libevent fun
 
 AC_CONFIG_SUBDIRS([third-party/libevent])
