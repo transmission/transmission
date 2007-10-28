@@ -34,6 +34,7 @@
 
 @interface MessageWindowController (Private)
 
+- (void) resizeColumn;
 - (NSString *) stringForMessage: (NSDictionary *) message;
 - (void) setDebugWarningHidden: (BOOL) hide;
 
@@ -61,6 +62,8 @@
     [fTimer invalidate];
     [fMessages release];
     
+    [fAttributes release];
+    
     [super dealloc];
 }
 
@@ -69,6 +72,9 @@
     NSWindow * window = [self window];
     [window setFrameAutosaveName: @"MessageWindowFrame"];
     [window setFrameUsingName: @"MessageWindowFrame"];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(resizeColumn)
+                    name: @"NSTableViewColumnDidResizeNotification" object: fMessageTable];
     
     //initially sort peer table by IP
     if ([[fMessageTable sortDescriptors] count] == 0)
@@ -128,6 +134,8 @@
         [descriptors release];
         
         [fMessages removeObjectsInRange: NSMakeRange(0, total-MAX_MESSAGES)];
+        
+        [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, MAX_MESSAGES)]];
     }
     
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
@@ -163,6 +171,26 @@
     }
     else
         return [message objectForKey: @"Message"];
+}
+
+- (float) tableView: (NSTableView *) tableView heightOfRow: (int) row
+{
+    NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
+    
+    int count = 0;
+    float width = [column width];
+    if (width > 0)
+    {
+        if (!fAttributes)
+            fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
+        
+        NSAttributedString * string = [[NSAttributedString alloc] initWithString: [[fMessages objectAtIndex: row]
+                                        objectForKey: @"Message"] attributes: fAttributes];
+        count = [string size].width / width;
+        [string release];
+    }
+    
+    return [tableView rowHeight] * (float)(count+1);
 }
 
 - (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
@@ -285,6 +313,12 @@
 @end
 
 @implementation MessageWindowController (Private)
+
+- (void) resizeColumn
+{
+    [fMessageTable noteHeightOfRowsWithIndexesChanged: [NSIndexSet indexSetWithIndexesInRange:
+                    NSMakeRange(0, [fMessageTable numberOfRows])]];
+}
 
 - (NSString *) stringForMessage: (NSDictionary *) message
 {

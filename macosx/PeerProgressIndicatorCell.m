@@ -26,6 +26,7 @@
 
 @implementation PeerProgressIndicatorCell
 
+#warning exists in 10.5
 - (BOOL) hidden
 {
     return fIsHidden;
