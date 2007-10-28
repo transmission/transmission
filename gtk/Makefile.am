@@ -1,10 +1,12 @@
 AM_CPPFLAGS = \
     -I$(top_srcdir) \
     $(LIBEVENT_CPPFLAGS) \
-    $(GTK_CFLAGS) \
     -DTRANSMISSIONLOCALEDIR=\""$(transmissionlocaledir)"\"
 
-AM_CFLAGS = $(PTHREAD_CFLAGS)
+AM_CFLAGS = \
+    $(GTK_CFLAGS) \
+    $(OPENSSL_CFLAGS) \
+    $(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
     actions.h \
@@ -54,6 +56,7 @@ transmission_LDADD = \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(GTK_LIBS) \
+    $(OPENSSL_LIBS) \
     $(PTHREAD_LIBS) -lm
 
 DESKTOP_IN_FILES=transmission.desktop.in
