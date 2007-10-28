@@ -6,34 +6,29 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Tue, 23 Oct 2007 23:20:00 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 28 Oct 2007 20:10:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 0.90 Released</title>
+      <title>Transmission 0.91 Released</title>
       <description><![CDATA[
 <h3>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
 
 <h4>Transmission Changes:</h4>
 <ul>
- <li>Encryption support, with option to ignore unencrypted peers</li>
- <li>Ban peers that send too much bad data</li>
- <li>Only report downloaded, verified good pieces in tracker `download' field</li>
- <li>Improved compliance with BitTorrent spec</li>
- <li>MSE Tracker Extension support</li>
- <li>Significant rewrite of the libtransmission back-end</li>
- <li>Icon enhanced to support size of 512 x 512</li>
+ <li>Fix 0.90 speed limits</li>
+ <li>Fix 0.90 problems announcing to some trackers</li>
+ <li>Fix 0.90 socket connection leak</li>
+ <li>Fix 0.90 IPC crash</li>
+ <li>Fix 0.90 cache bug that could cause "verify local files" to fail</li>
+ <li>Fix 0.90 build errors on OpenBSD and on older C compilers</li>
 </ul>
 <h4>Mac-Specific Changes:</h4>
 <ul>
- <li>Per-torrent action menu</li>
- <li>Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs</li>
- <li>Redesigned message log</li>
- <li>Optimizations to decrease memory usage</li>
- <li>Sort and filter by tracker</li>
- <li>Various smaller interface additions and improvements</li>
+ <li>Fix a crash caused by custom sound files</li>
+ <li>Add Dutch localization, re-add Russian localization, fix Korean localization</li>
 </ul>]]></description>
-      <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-      <enclosure sparkle:version="3508" sparkle:shortVersionString="0.90" url="http://mirrors.m0k.org/transmission/files/Transmission-0.90.dmg" length="1885981" type="application/octet-stream"/>
+      <pubDate>Sun, 28 Oct 2007 23:20:00 -0400</pubDate>
+      <enclosure sparkle:version="3618" sparkle:shortVersionString="0.91" url="http://mirrors.m0k.org/transmission/files/Transmission-0.91.dmg" length="2099919" type="application/octet-stream"/>
     </item>
     
   </channel>
