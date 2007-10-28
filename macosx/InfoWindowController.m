@@ -94,7 +94,7 @@ typedef enum
     [window setAcceptsMouseMovedEvents: YES];
     
     //set tab images and tooltips
-    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.tif"]];
+    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.png"]];
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
     [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
     [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];
@@ -658,7 +658,7 @@ typedef enum
         NSDictionary * peer = [fPeers objectAtIndex: row];
         
         if ([ident isEqualToString: @"Encryption"])
-            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock.tiff"] : nil;
+            return [[peer objectForKey: @"Encryption"] boolValue] ? [NSImage imageNamed: @"Lock.png"] : nil;
         else if ([ident isEqualToString: @"Client"])
             return [peer objectForKey: @"Client"];
         else if  ([ident isEqualToString: @"Progress"])

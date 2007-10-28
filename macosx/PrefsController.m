@@ -249,14 +249,14 @@
             case TR_NAT_TRAVERSAL_MAPPED:
                 [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
                                                     "Preferences -> Advanced -> port map status")];
-                [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
+                [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
                 break;
             
             case TR_NAT_TRAVERSAL_NOTFOUND:
             case TR_NAT_TRAVERSAL_ERROR:
                 [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
                                                     "Preferences -> Advanced -> port map status")];
-                [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+                [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
                 break;
             
             default:
@@ -286,20 +286,20 @@
     {
         case PORT_STATUS_OPEN:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Advanced -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.tiff"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
             break;
         case PORT_STATUS_STEALTH:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Advanced -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_CLOSED:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Advanced -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.tiff"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
             break;
         case PORT_STATUS_ERROR:
             [fPortStatusField setStringValue: NSLocalizedString(@"Unable to check port status",
                                                 "Preferences -> Advanced -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.tiff"]];
+            [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
     [portChecker release];

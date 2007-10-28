@@ -65,7 +65,6 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A200B9200A22798F007BBB1E /* InfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A200B83A0A2263BA007BBB1E /* InfoWindowController.m */; };
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
-		A2041D530C9AC523000ACFFB /* Lock.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2041D520C9AC523000ACFFB /* Lock.tiff */; };
 		A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */; };
 		A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A2085E2F0C53C833000BC3B7 /* LICENSE */; };
 		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
@@ -82,8 +81,6 @@
 		A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */; };
 		A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
-		A22A067E0CB83507009694FE /* InfoTabBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = A22A067D0CB83507009694FE /* InfoTabBack.tif */; };
-		A22A06980CB83880009694FE /* InfoTabBorder.tif in Resources */ = {isa = PBXBuildFile; fileRef = A22A06970CB83880009694FE /* InfoTabBorder.tif */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
 		A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
@@ -125,9 +122,7 @@
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = A29597340A72A9E10057248B /* StatusBarBackground.png */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
-		A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */; };
 		A29C8B370ACC6EB3000ED9F9 /* PortChecker.m in Sources */ = {isa = PBXBuildFile; fileRef = A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */; };
-		A2A14A890CC6D25400A7AC1D /* InfoTabBackBlue.tif in Resources */ = {isa = PBXBuildFile; fileRef = A2A14A880CC6D25400A7AC1D /* InfoTabBackBlue.tif */; };
 		A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */; };
 		A2A3065C0AAD24A80049E2AC /* UKFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306540AAD24A80049E2AC /* UKFileWatcher.m */; };
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
@@ -142,8 +137,6 @@
 		A2BE9C530C1E4AF7002D16E6 /* makemeta.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */; };
 		A2BF07910B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */; };
 		A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */ = {isa = PBXBuildFile; fileRef = A2D0E0480A54A97C003C72CF /* Bandwidth.png */; };
-		A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0820A915F6600890C32 /* RedDot.tiff */; };
-		A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A2D4F0840A915F7200890C32 /* GreenDot.tiff */; };
 		A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36270CBC674900C2ED41 /* InfoActivity.png */; };
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
@@ -152,6 +145,13 @@
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2EF7DEB0C96297400FA9811 /* PurpleDot.png */; };
 		A2F011990C27418800576FC0 /* CreateLarge.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F011980C27418800576FC0 /* CreateLarge.png */; };
+		A2F151180CD438A4001F3B0E /* YellowDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151150CD438A4001F3B0E /* YellowDot.png */; };
+		A2F151190CD438A4001F3B0E /* RedDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151160CD438A4001F3B0E /* RedDot.png */; };
+		A2F1511A0CD438A4001F3B0E /* GreenDot.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151170CD438A4001F3B0E /* GreenDot.png */; };
+		A2F151200CD438BA001F3B0E /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F1511F0CD438BA001F3B0E /* Lock.png */; };
+		A2F151240CD438DE001F3B0E /* InfoTabBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151210CD438DE001F3B0E /* InfoTabBorder.png */; };
+		A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151220CD438DE001F3B0E /* InfoTabBack.png */; };
+		A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
@@ -369,7 +369,6 @@
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoWindowController.h; path = macosx/InfoWindowController.h; sourceTree = "<group>"; };
 		A200B83A0A2263BA007BBB1E /* InfoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InfoWindowController.m; path = macosx/InfoWindowController.m; sourceTree = "<group>"; };
-		A2041D520C9AC523000ACFFB /* Lock.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Lock.tiff; path = macosx/Images/Lock.tiff; sourceTree = "<group>"; };
 		A205E08E0CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/Creator.nib; sourceTree = "<group>"; };
 		A205E08F0CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = macosx/el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A205E0900CC66BF5001CA81B /* el */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = el; path = macosx/el.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -398,8 +397,6 @@
 		A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuSpeedToDisplayLimitTransformer.m; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
-		A22A067D0CB83507009694FE /* InfoTabBack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBack.tif; path = macosx/Images/InfoTabBack.tif; sourceTree = "<group>"; };
-		A22A06970CB83880009694FE /* InfoTabBorder.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBorder.tif; path = macosx/Images/InfoTabBorder.tif; sourceTree = "<group>"; };
 		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
@@ -464,10 +461,8 @@
 		A289EB0B0A33C56D00B082A3 /* ButtonBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ButtonBorder.png; path = macosx/Images/ButtonBorder.png; sourceTree = "<group>"; };
 		A28DBADB0A33C1D800F4B4A7 /* ActionButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionButton.png; path = macosx/Images/ActionButton.png; sourceTree = "<group>"; };
 		A29597340A72A9E10057248B /* StatusBarBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = StatusBarBackground.png; path = macosx/Images/StatusBarBackground.png; sourceTree = "<group>"; };
-		A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = YellowDot.tiff; path = macosx/Images/YellowDot.tiff; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
 		A29C8B350ACC6EB3000ED9F9 /* PortChecker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PortChecker.m; path = macosx/PortChecker.m; sourceTree = "<group>"; };
-		A2A14A880CC6D25400A7AC1D /* InfoTabBackBlue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = InfoTabBackBlue.tif; path = macosx/Images/InfoTabBackBlue.tif; sourceTree = "<group>"; };
 		A2A1CB770BF29D5500AE959F /* PeerProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerProgressIndicatorCell.h; path = macosx/PeerProgressIndicatorCell.h; sourceTree = "<group>"; };
 		A2A1CB780BF29D5500AE959F /* PeerProgressIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerProgressIndicatorCell.m; path = macosx/PeerProgressIndicatorCell.m; sourceTree = "<group>"; };
 		A2A306530AAD24A80049E2AC /* UKFileWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKFileWatcher.h; path = macosx/UKKQueue/UKFileWatcher.h; sourceTree = "<group>"; };
@@ -491,8 +486,6 @@
 		A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SpeedLimitToTurtleIconTransformer.h; path = macosx/SpeedLimitToTurtleIconTransformer.h; sourceTree = "<group>"; };
 		A2BF078F0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SpeedLimitToTurtleIconTransformer.m; path = macosx/SpeedLimitToTurtleIconTransformer.m; sourceTree = "<group>"; };
 		A2D0E0480A54A97C003C72CF /* Bandwidth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Bandwidth.png; path = macosx/Images/Bandwidth.png; sourceTree = "<group>"; };
-		A2D4F0820A915F6600890C32 /* RedDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RedDot.tiff; path = macosx/Images/RedDot.tiff; sourceTree = "<group>"; };
-		A2D4F0840A915F7200890C32 /* GreenDot.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GreenDot.tiff; path = macosx/Images/GreenDot.tiff; sourceTree = "<group>"; };
 		A2D688850CB4984B009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A2D688A70CB4986A009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = macosx/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A2D688AB0CB49889009BEC3A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = macosx/English.lproj/InfoWindow.nib; sourceTree = "<group>"; };
@@ -524,6 +517,13 @@
 		A2EA8E590CC3DAB80081201C /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = macosx/it.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
+		A2F151150CD438A4001F3B0E /* YellowDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YellowDot.png; path = macosx/Images/YellowDot.png; sourceTree = "<group>"; };
+		A2F151160CD438A4001F3B0E /* RedDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RedDot.png; path = macosx/Images/RedDot.png; sourceTree = "<group>"; };
+		A2F151170CD438A4001F3B0E /* GreenDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GreenDot.png; path = macosx/Images/GreenDot.png; sourceTree = "<group>"; };
+		A2F1511F0CD438BA001F3B0E /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Lock.png; path = macosx/Images/Lock.png; sourceTree = "<group>"; };
+		A2F151210CD438DE001F3B0E /* InfoTabBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBorder.png; path = macosx/Images/InfoTabBorder.png; sourceTree = "<group>"; };
+		A2F151220CD438DE001F3B0E /* InfoTabBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBack.png; path = macosx/Images/InfoTabBack.png; sourceTree = "<group>"; };
+		A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackBlue.png; path = macosx/Images/InfoTabBackBlue.png; sourceTree = "<group>"; };
 		A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButton.png; path = macosx/Images/SpeedLimitButton.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
@@ -790,12 +790,12 @@
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
 				A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */,
 				A20B6F820C4D8A610034AB1D /* PriorityHigh.png */,
-				A2041D520C9AC523000ACFFB /* Lock.tiff */,
 				A2FB06950BFF484A0095564D /* Globe.png */,
 				A261A8250C6A0D68003BAFDA /* Error.png */,
-				A29C8B320ACC6E93000ED9F9 /* YellowDot.tiff */,
-				A2D4F0840A915F7200890C32 /* GreenDot.tiff */,
-				A2D4F0820A915F6600890C32 /* RedDot.tiff */,
+				A2F1511F0CD438BA001F3B0E /* Lock.png */,
+				A2F151150CD438A4001F3B0E /* YellowDot.png */,
+				A2F151160CD438A4001F3B0E /* RedDot.png */,
+				A2F151170CD438A4001F3B0E /* GreenDot.png */,
 				A2EF7DEB0C96297400FA9811 /* PurpleDot.png */,
 				A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */,
 				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
@@ -838,10 +838,10 @@
 				A29597340A72A9E10057248B /* StatusBarBackground.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A253F6F20A698970008EE24F /* FilterBarBackground.png */,
-				A22A067D0CB83507009694FE /* InfoTabBack.tif */,
-				A2A14A880CC6D25400A7AC1D /* InfoTabBackBlue.tif */,
+				A2F151210CD438DE001F3B0E /* InfoTabBorder.png */,
+				A2F151220CD438DE001F3B0E /* InfoTabBack.png */,
+				A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */,
 				A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */,
-				A22A06970CB83880009694FE /* InfoTabBorder.tif */,
 				A26E75950CB6AB4800226674 /* InfoGeneral.png */,
 				A26E75870CB6AA7500226674 /* InfoOptions.png */,
 				A2DA36270CBC674900C2ED41 /* InfoActivity.png */,
@@ -1364,12 +1364,9 @@
 				A232D29E0A70903E00973B12 /* Filter.png in Resources */,
 				A29597350A72A9E10057248B /* StatusBarBackground.png in Resources */,
 				A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */,
-				A2D4F0830A915F6600890C32 /* RedDot.tiff in Resources */,
-				A2D4F0850A915F7200890C32 /* GreenDot.tiff in Resources */,
 				A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */,
 				35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */,
 				35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */,
-				A29C8B330ACC6E93000ED9F9 /* YellowDot.tiff in Resources */,
 				A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */,
 				A241528B0C0261B8007DD3B4 /* Globe.png in Resources */,
 				A2E9AA760C249AF400085DCF /* Create.png in Resources */,
@@ -1386,19 +1383,22 @@
 				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
 				A261A8260C6A0D68003BAFDA /* Error.png in Resources */,
 				A2EF7DEC0C96297400FA9811 /* PurpleDot.png in Resources */,
-				A2041D530C9AC523000ACFFB /* Lock.tiff in Resources */,
 				A24872B60C9B6BB9000F5B92 /* Advanced.png in Resources */,
 				A2A6E3A00CA7E4C900F10FEF /* AboutWindow.nib in Resources */,
 				A2BC19850CA9AF5A00DD302A /* CompleteCheck.png in Resources */,
 				A26E75880CB6AA7500226674 /* InfoOptions.png in Resources */,
 				A26E75960CB6AB4800226674 /* InfoGeneral.png in Resources */,
-				A22A067E0CB83507009694FE /* InfoTabBack.tif in Resources */,
-				A22A06980CB83880009694FE /* InfoTabBorder.tif in Resources */,
 				A2DA362A0CBC674900C2ED41 /* InfoActivity.png in Resources */,
 				A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */,
 				A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */,
-				A2A14A890CC6D25400A7AC1D /* InfoTabBackBlue.tif in Resources */,
 				A2FE61D80CD3D0A500D683E1 /* InfoTabBackGraphite.png in Resources */,
+				A2F151180CD438A4001F3B0E /* YellowDot.png in Resources */,
+				A2F151190CD438A4001F3B0E /* RedDot.png in Resources */,
+				A2F1511A0CD438A4001F3B0E /* GreenDot.png in Resources */,
+				A2F151200CD438BA001F3B0E /* Lock.png in Resources */,
+				A2F151240CD438DE001F3B0E /* InfoTabBorder.png in Resources */,
+				A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */,
+				A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -84,8 +84,8 @@
         [self updateLog: nil];
     }
     
-    fErrorImage = [NSImage imageNamed: @"RedDot.tiff"];
-    fInfoImage = [NSImage imageNamed: @"YellowDot.tiff"];
+    fErrorImage = [NSImage imageNamed: @"RedDot.png"];
+    fInfoImage = [NSImage imageNamed: @"YellowDot.png"];
     fDebugImage = [NSImage imageNamed: @"PurpleDot.png"];
     
     //set images to popup button items
