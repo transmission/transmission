@@ -523,7 +523,32 @@ fastResumeLoadOld( tr_torrent   * tor,
 }
 
 static uint64_t
+internalIdToPublicBitfield( uint8_t id )
+{
+    uint64_t ret = 0;
+
+    switch( id )
+    {
+        case FR_ID_PROGRESS_SLOTS: ret = 0;                 break;
+        case FR_ID_DOWNLOADED:     ret = TR_FR_DOWNLOADED;  break;
+        case FR_ID_UPLOADED:       ret = TR_FR_UPLOADED;    break;
+        case FR_ID_PEERS_OLD:      ret = TR_FR_PEERS;       break;
+        case FR_ID_PROGRESS:       ret = TR_FR_PROGRESS;    break;
+        case FR_ID_PRIORITY:       ret = TR_FR_PRIORITY;    break;
+        case FR_ID_SPEED:          ret = TR_FR_SPEEDLIMIT;  break;
+        case FR_ID_RUN:            ret = TR_FR_RUN;         break;
+        case FR_ID_CORRUPT:        ret = TR_FR_CORRUPT;     break;
+        case FR_ID_PEERS:          ret = TR_FR_PEERS;       break;
+        case FR_ID_DESTINATION:    ret = TR_FR_DESTINATION; break;
+        case FR_ID_PEX:            ret = TR_FR_PEX;         break;
+    }
+
+    return ret;
+}
+
+static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
+                     uint64_t       fieldsToLoad,
                      tr_bitfield  * uncheckedPieces,
                      const char   * destination,
                      int            argIsFallback )
@@ -574,7 +599,7 @@ fastResumeLoadImpl ( tr_torrent   * tor,
     /* read each block of data */
     while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
     {
-        switch( id )
+        if( fieldsToLoad & internalIdToPublicBitfield( id ) ) switch( id )
         {
             case FR_ID_PROGRESS:
                 /* read progress data */
@@ -773,11 +798,12 @@ fastResumeLoadImpl ( tr_torrent   * tor,
 
 uint64_t
 tr_fastResumeLoad( tr_torrent   * tor,
+                   uint64_t       fieldsToLoad,
                    tr_bitfield  * uncheckedPieces,
                    const char   * destination,
                    int            argIsFallback )
 {
-    const uint64_t ret = fastResumeLoadImpl( tor, uncheckedPieces, destination, argIsFallback );
+    const uint64_t ret = fastResumeLoadImpl( tor, fieldsToLoad, uncheckedPieces, destination, argIsFallback );
 
     if( ! ( ret & TR_FR_PROGRESS ) )
         tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
