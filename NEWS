@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.91 (2007/xx/xx)
+0.91 (2007/10/28)
 - libtransmission (all platforms):
    + Fix 0.90 speed limits
    + Fix 0.90 problems announcing to some trackers
