@@ -1,9 +1,9 @@
-AC_INIT([transmission],[0.90],[http://transmission.m0k.org/trac/newticket])
+AC_INIT([transmission],[0.91],[http://transmission.m0k.org/trac/newticket])
 
 dnl constraint: strlen(MAJOR MINOR MAINT BETA) must be 4
 dnl convention: BETA: "Z" for a beta, "0" for a stable
-PEERID_PREFIX="-TR090Z-"
-USERAGENT_PREFIX="0.90+"
+PEERID_PREFIX="-TR0910-"
+USERAGENT_PREFIX="0.91"
 AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
 AC_SUBST(USERAGENT_PREFIX,[$USERAGENT_PREFIX])
 
