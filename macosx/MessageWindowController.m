@@ -193,12 +193,6 @@
     return [tableView rowHeight] * (float)(count+1);
 }
 
-- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
-                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
-{
-    return [self stringForMessage: [fMessages objectAtIndex: row]];
-}
-
 - (void) tableView: (NSTableView *) tableView sortDescriptorsDidChange: (NSArray *) oldDescriptors
 {
     [fMessages sortUsingDescriptors: [fMessageTable sortDescriptors]];
