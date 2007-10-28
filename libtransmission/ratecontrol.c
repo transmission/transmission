@@ -112,6 +112,29 @@ tr_rcCanTransfer( const tr_ratecontrol * r )
     return ret;
 }
 
+size_t
+tr_rcBytesLeft( const tr_ratecontrol * r )
+{
+    size_t bytes = 0;
+
+    if( r != NULL )
+    {
+        float cur, max;
+        size_t kb;
+ 
+        tr_lockLock( (tr_lock*)r->lock );
+
+        cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
+        max = r->limit;
+        kb = max>cur ? max-cur : 0;
+        bytes = kb * 1024u;
+
+        tr_lockUnlock( (tr_lock*)r->lock );
+    }
+
+    return bytes;
+}
+
 float
 tr_rcRate( const tr_ratecontrol * r )
 {
