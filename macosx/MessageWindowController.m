@@ -184,8 +184,8 @@
         if (!fAttributes)
             fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
         
-        NSAttributedString * string = [[NSAttributedString alloc] initWithString: [[fMessages objectAtIndex: row]
-                                        objectForKey: @"Message"] attributes: fAttributes];
+        NSAttributedString * string = [[NSAttributedString alloc] initWithString:
+                                        [[fMessages objectAtIndex: row] objectForKey: @"Message"] attributes: fAttributes];
         count = [string size].width / width;
         [string release];
     }
