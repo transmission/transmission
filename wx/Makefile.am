@@ -1,8 +1,5 @@
-AM_CPPFLAGS = \
-  -I$(top_srcdir) \
-  $(WX_CPPFLAGS) \
-  $(LIBEVENT_CPPFLAGS)
-AM_CFLAGS = $(PTHREAD_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir) $(WX_CPPFLAGS) $(LIBEVENT_CPPFLAGS)
+AM_CFLAGS = $(PTHREAD_CFLAGS) $(OPENSSL_CFLAGS)
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 
 SUBDIRS = images
@@ -19,5 +16,4 @@ Xmission_SOURCES = \
 Xmission_LDADD = \
   $(top_builddir)/libtransmission/libtransmission.a \
   $(top_builddir)/third-party/libevent/libevent.la \
-  $(WX_LIBS) \
-  $(PTHREAD_LIBS) -lm
+  $(WX_LIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm

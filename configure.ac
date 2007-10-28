@@ -34,10 +34,9 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 ACX_PTHREAD
 
-AC_CHECK_LIB([crypto],[CRYPTO_new_ex_data])
-AC_CHECK_LIB([ssl],[SSL_library_init])
 AC_SEARCH_LIBS([socket], [socket net])
 AC_SEARCH_LIBS([gethostbyname], [nsl bind])
+PKG_CHECK_MODULES(OPENSSL, [openssl >= 0.9.8])
 
 dnl ----------------------------------------------------------------------------
 dnl

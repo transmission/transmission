@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I@top_srcdir@ $(LIBEVENT_CPPFLAGS)
-AM_CFLAGS = $(PTHREAD_CFLAGS)
+AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libdaemon.a
 
@@ -29,7 +29,7 @@ COMMON_LDADD = \
     ./libdaemon.a \
     $(top_builddir)/libtransmission/libtransmission.a \
     $(top_builddir)/third-party/libevent/libevent.la \
-    $(PTHREAD_LIBS) -lm
+    $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
 
 transmission_daemon_SOURCES = daemon.c server.c torrents.c
 transmission_daemon_LDADD = $(COMMON_LDADD)
