@@ -1363,15 +1363,14 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 {
     int i, size;
     const Torrent * t;
-    const tr_peer ** peers;
+    tr_peer ** peers;
     tr_peer_stat * ret;
 
     assert( manager != NULL );
     managerLock( (tr_peerMgr*)manager );
 
     t = getExistingTorrent( (tr_peerMgr*)manager, torrentHash );
-    peers = (const tr_peer **) tr_ptrArrayPeek( t->peers, &size );
-
+    peers = getConnectedPeers( (Torrent*)t, &size );
     ret = tr_new0( tr_peer_stat, size );
 
     for( i=0; i<size; ++i )
@@ -1393,6 +1392,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
     }
 
     *setmeCount = size;
+    tr_free( peers );
 
     managerUnlock( (tr_peerMgr*)manager );
     return ret;

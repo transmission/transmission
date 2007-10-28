@@ -338,7 +338,7 @@ torrentRealInit( tr_handle  * h,
 
     uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
 
-    loaded = tr_fastResumeLoad( tor, uncheckedPieces, destination, destinationIsFallback );
+    loaded = tr_fastResumeLoad( tor, ~0, uncheckedPieces, destination, destinationIsFallback );
     assert( tor->destination != NULL );
 
     /* the `paused' flag has highest precedence...
@@ -1030,7 +1030,7 @@ tr_torrentStart( tr_torrent * tor )
     {
         if( !tor->uncheckedPieces )
             tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
-        tr_fastResumeLoad( tor, tor->uncheckedPieces, tor->destination, FALSE );
+        tr_fastResumeLoad( tor, TR_FR_PROGRESS, tor->uncheckedPieces, tor->destination, FALSE );
         tor->isRunning = 1;
         tr_ioRecheckAdd( tor, checkAndStartCB );
     }
