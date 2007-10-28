@@ -45,7 +45,7 @@
 	<key>DownloadChoice</key>
 	<string>Constant</string>
 	<key>DownloadFolder</key>
-	<string>~/Desktop</string>
+	<string>~/Downloads</string>
 	<key>DownloadLimit</key>
 	<integer>100</integer>
 	<key>DownloadSound</key>
@@ -59,7 +59,7 @@
 	<key>FilterSearchType</key>
 	<string>Name</string>
 	<key>IncompleteDownloadFolder</key>
-	<string>~/Desktop</string>
+	<string>~/Downloads</string>
 	<key>InfoVisible</key>
 	<false/>
 	<key>InspectorSelected</key>
@@ -68,8 +68,6 @@
 	<integer>1</integer>
 	<key>MoveChoice</key>
 	<string>Constant</string>
-	<key>MoveFolder</key>
-	<string>~/Desktop</string>
 	<key>NatTraversal</key>
 	<true/>
 	<key>PiecesViewShowAvailability</key>
