@@ -69,8 +69,9 @@
     IBOutlet NSButton * fPexCheck;
 }
 
-- (void) updateInfoForTorrents: (NSArray *) torrents;
+- (void) setInfoForTorrents: (NSArray *) torrents;
 - (void) updateInfoStats;
+- (void) updateOptions;
 
 - (void) setTab: (id) sender;
 

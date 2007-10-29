@@ -2097,6 +2097,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [self updateTorrentsInQueue];
     [fInfoController updateInfoStats];
+    [fInfoController updateOptions];
     
     if ([fDefaults boolForKey: @"PlaySeedingSound"])
     {
@@ -2324,7 +2325,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) torrentTableViewSelectionDidChange: (NSNotification *) notification
 {
-    [fInfoController updateInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
+    [fInfoController setInfoForTorrents: [fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]]];
 }
 
 - (NSDragOperation) draggingEntered: (id <NSDraggingInfo>) info
