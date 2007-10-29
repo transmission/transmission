@@ -148,11 +148,12 @@ typedef enum
     [fFilePriorityHigh setImage: [NSImage imageNamed: @"PriorityHigh.png"]];
     
     //set blank inspector
-    [self updateInfoForTorrents: [NSArray array]];
+    [self setInfoForTorrents: [NSArray array]];
     
     //allow for update notifications
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateInfoStats) name: @"UpdateStats" object: nil];
+    [nc addObserver: self selector: @selector(updateOptions) name: @"UpdateOptions" object: nil];
 }
 
 - (void) dealloc
@@ -171,7 +172,7 @@ typedef enum
     [super dealloc];
 }
 
-- (void) updateInfoForTorrents: (NSArray *) torrents
+- (void) setInfoForTorrents: (NSArray *) torrents
 {
     [fTorrents release];
     fTorrents = [torrents retain];
@@ -386,6 +387,7 @@ typedef enum
     
     //update stats and settings
     [self updateInfoStats];
+    [self updateOptions];
     
     [fPeerTable reloadData];
     [fFileOutline deselectAll: nil];
@@ -1244,7 +1246,36 @@ typedef enum
 {
     if ([fTorrents count] == 0)
         return;
+    
+    //set pex check
+    NSEnumerator * enumerator = [fTorrents objectEnumerator];
+    Torrent * torrent = [enumerator nextObject]; //first torrent
+    
+    BOOL pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
+    int pexState = [torrent pex] ? NSOnState : NSOffState;
+    
+    while ((torrent = [enumerator nextObject]) && (pexEnabled || pexState != NSMixedState))
+    {
+        if (pexEnabled)
+            pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
+        
+        if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
+            pexState = NSMixedState;
+    }
+    
+    [fPexCheck setEnabled: pexEnabled];
+    [fPexCheck setState: pexState];
+    [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
+                                "Inspector -> pex check") : nil];
+}
 
+- (void) updateOptions
+{
+    if ([fTorrents count] == 0)
+        return;
+    
+    [self updateInfoOptions];
+    
     //get bandwidth info
     NSEnumerator * enumerator = [fTorrents objectEnumerator];
     Torrent * torrent = [enumerator nextObject]; //first torrent
@@ -1343,27 +1374,6 @@ typedef enum
         [fRatioLimitField setFloatValue: ratioLimit];
     else
         [fRatioLimitField setStringValue: @""];
-    
-    //set pex check
-    enumerator = [fTorrents objectEnumerator];
-    torrent = [enumerator nextObject]; //first torrent
-    
-    BOOL pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
-    int pexState = [torrent pex] ? NSOnState : NSOffState;
-    
-    while ((torrent = [enumerator nextObject]) && (pexEnabled || pexState != NSMixedState))
-    {
-        if (pexEnabled)
-            pexEnabled = ![torrent privateTorrent] && ![torrent isActive];
-        
-        if (pexState != NSMixedState && pexState != ([torrent pex] ? NSOnState : NSOffState))
-            pexState = NSMixedState;
-    }
-    
-    [fPexCheck setEnabled: pexEnabled];
-    [fPexCheck setState: pexState];
-    [fPexCheck setToolTip: !pexEnabled ? NSLocalizedString(@"PEX can only be toggled on paused public torrents.",
-                                "Inspector -> pex check") : nil];
 }
 
 - (NSView *) tabViewForTag: (int) tag
