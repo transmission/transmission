@@ -2442,7 +2442,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) toggleSmallView: (id) sender
 {
-    BOOL makeSmall = [fDefaults boolForKey: @"SmallView"];
+    BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
+    if (![NSApp isOnLeopardOrBetter])
+        makeSmall != makeSmall;
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     

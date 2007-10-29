@@ -2,7 +2,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.92 (2007/xx/yy)
 - OS X:
-   + Leopard: Fix bug with typing values in Inspector->Options 
+   + Leopard: Fix bug with typing values in Inspector->Options
+   + Leopard: Fix bug with toggling Minimal View
 
 0.91 (2007/10/28)
 - libtransmission (all platforms):
