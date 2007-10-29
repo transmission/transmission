@@ -30,6 +30,7 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "AboutWindowController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
@@ -2011,6 +2012,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             ? [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"] : [NSImage imageNamed: @"SpeedLimitButtonBlue.png"]];
 }
 
+#warning look into
 - (void) applySpeedLimit: (id) sender
 {
     [fPrefsController applySpeedSettings: nil];
@@ -2085,6 +2087,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 }
 
+#warning look into
 - (void) setLimitGlobalEnabled: (id) sender
 {
     [fPrefsController applySpeedSettings: nil];
@@ -2458,7 +2461,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) toggleSmallView: (id) sender
 {
-    BOOL makeSmall = [fDefaults boolForKey: @"SmallView"];
+    BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
+    if (![NSApp isOnLeopardOrBetter])
+        makeSmall != makeSmall;
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
