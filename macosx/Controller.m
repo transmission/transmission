@@ -466,9 +466,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                     " This setting can be changed in the Message Log window (accessible from the Window menu).",
                                     "Debug log alert -> informative message")];
         [alert addButtonWithTitle: NSLocalizedString(@"OK", "Debug log alert -> button")];
-        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Debug log alert -> button")];
         
-        if ([alert runModal] == NSAlertSecondButtonReturn)
+        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+        if (onLeopard)
+            [alert setShowsSuppressionButton: YES];
+        else
+            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Debug log alert -> button")];
+        
+        NSInteger result = [alert runModal];
+        if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
             [fDefaults setBool: NO forKey: @"WarningDebug"];
         [alert release];
     }
@@ -954,11 +960,17 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [alert setInformativeText:
             NSLocalizedString(@"The torrent file cannot be opened because it is a duplicate of an already running transfer.",
                             "Open duplicate alert -> message")];
-    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
-    [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
     [alert setAlertStyle: NSWarningAlertStyle];
+    [alert addButtonWithTitle: NSLocalizedString(@"OK", "Open duplicate alert -> button")];
     
-    if ([alert runModal] == NSAlertSecondButtonReturn)
+    BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+    if (onLeopard)
+        [alert setShowsSuppressionButton: YES];
+    else
+        [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Open duplicate alert -> button")];
+    
+    NSInteger result = [alert runModal];
+    if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
         [fDefaults setBool: NO forKey: @"WarningDuplicate"];
     [alert release];
 }

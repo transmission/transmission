@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 static int static_lastid = 0;
@@ -491,13 +492,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                                         "Torrent file disk space alert -> message"), volumeName]];
             [alert addButtonWithTitle: NSLocalizedString(@"OK", "Torrent file disk space alert -> button")];
             [alert addButtonWithTitle: NSLocalizedString(@"Download Anyway", "Torrent file disk space alert -> button")];
-            [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
             
-            int result = [alert runModal];
-            [alert release];
-            
-            if (result == NSAlertThirdButtonReturn)
+            #warning factor in choice with suppression
+            BOOL onLeopard = [NSApp isOnLeopardOrBetter];
+            if (onLeopard)
+                [alert setShowsSuppressionButton: YES];
+            else
+                [alert addButtonWithTitle: NSLocalizedString(@"Always Download", "Torrent file disk space alert -> button")];
+
+            NSInteger result = [alert runModal];
+            if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertThirdButtonReturn))
                 [fDefaults setBool: NO forKey: @"WarningRemainingSpace"];
+            [alert release];
             
             return result != NSAlertFirstButtonReturn;
         }
