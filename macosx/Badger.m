@@ -63,7 +63,7 @@
 - (void) updateBadge
 {
     //set completed badge to top right
-    BOOL completedChange = [NSApp isOnLeopardOrBetter] && fCompleted != fCompletedBadged;
+    BOOL completedChange = ![NSApp isOnLeopardOrBetter] && fCompleted != fCompletedBadged;
     if (completedChange)
     {
         fCompletedBadged = fCompleted;
@@ -172,7 +172,7 @@
     }
     
     //update dock badge
-    if (completedChange || fSpeedBadge || speedBadge)
+    if (fSpeedBadge || speedBadge || completedChange)
     {
         [NSApp setApplicationIconImage: dockIcon ? dockIcon : fDockIcon];
         [dockIcon release];
