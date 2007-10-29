@@ -23,11 +23,15 @@
  *****************************************************************************/
 
 #import "NSBezierPathAdditions.h"
+#import "NSApplicationAdditions.h"
 
 @implementation NSBezierPath (NSBezierPathAdditions)
 
 + (NSBezierPath *) bezierPathWithRoundedRect: (NSRect) rect radius: (float) radius
 {
+    if ([NSApp isOnLeopardOrBetter])
+        return [self bezierPathWithRoundedRect: rect xRadius: radius yRadius: radius];
+    
     float minX = NSMinX(rect),
         minY = NSMinY(rect),
         maxX = NSMaxX(rect),
