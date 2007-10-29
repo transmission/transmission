@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PrefsController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 
@@ -158,7 +159,7 @@
     if ([ident isEqualToString: TOOLBAR_GENERAL])
     {
         [item setLabel: NSLocalizedString(@"General", "Preferences -> General toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Preferences.png"]];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNamePreferencesGeneral : @"Preferences.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
@@ -182,7 +183,7 @@
     else if ([ident isEqualToString: TOOLBAR_ADVANCED])
     {
         [item setLabel: NSLocalizedString(@"Advanced", "Preferences -> Advanced toolbar item title")];
-        [item setImage: [NSImage imageNamed: @"Advanced.png"]];
+        [item setImage: [NSImage imageNamed: [NSApp isOnLeopardOrBetter] ? NSImageNameAdvanced : @"Advanced.png"]];
         [item setTarget: self];
         [item setAction: @selector(setPrefView:)];
         [item setAutovalidates: NO];
