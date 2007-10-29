@@ -38,6 +38,8 @@ AC_SEARCH_LIBS([socket], [socket net])
 AC_SEARCH_LIBS([gethostbyname], [nsl bind])
 PKG_CHECK_MODULES(OPENSSL, [openssl >= 0.9.4])
 
+AC_SYS_LARGEFILE
+
 dnl ----------------------------------------------------------------------------
 dnl
 dnl va_copy
