@@ -28,8 +28,9 @@
 @interface Badger : NSObject
 {
     tr_handle       * fLib;
-
+    
     NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
+    
     NSDictionary    * fAttributes;
     int             fCompleted, fCompletedBadged;
     BOOL            fSpeedBadge;

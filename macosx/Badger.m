@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "Badger.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define COMPLETED_BOTTOM_PADDING 5.0
@@ -62,7 +63,7 @@
 - (void) updateBadge
 {
     //set completed badge to top right
-    BOOL completedChange = fCompleted != fCompletedBadged;
+    BOOL completedChange = [NSApp isOnLeopardOrBetter] && fCompleted != fCompletedBadged;
     if (completedChange)
     {
         fCompletedBadged = fCompleted;
@@ -183,7 +184,11 @@
 - (void) incrementCompleted
 {
     fCompleted++;
-    [self updateBadge];
+    
+    if ([NSApp isOnLeopardOrBetter])
+        [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat: @"%d", fCompleted]];
+    else
+        [self updateBadge];
 }
 
 - (void) clearCompleted
@@ -191,7 +196,10 @@
     if (fCompleted != 0)
     {
         fCompleted = 0;
-        [self updateBadge];
+        if ([NSApp isOnLeopardOrBetter])
+            [[NSApp dockTile] setBadgeLabel: @""];
+        else
+            [self updateBadge];
     }
 }
 
@@ -201,6 +209,8 @@
     fCompletedBadged = 0;
     fSpeedBadge = NO;
     [NSApp setApplicationIconImage: [NSImage imageNamed: @"NSApplicationIcon"]];
+    if ([NSApp isOnLeopardOrBetter])
+        [[NSApp dockTile] setBadgeLabel: @""];
 }
 
 @end
