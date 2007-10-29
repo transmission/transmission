@@ -30,6 +30,7 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "AboutWindowController.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
