@@ -114,11 +114,11 @@ readabletime(int secs) {
 char *
 rfc822date (guint64 epoch_msec)
 {
-  const time_t secs = epoch_msec / 1000;
-  const struct tm tm = *localtime (&secs);
-  char buf[128];
-  strftime (buf, sizeof(buf), "%a, %d %b %Y %T %Z", &tm);
-  return g_strdup (buf);
+    const time_t secs = epoch_msec / 1000;
+    const struct tm tm = *localtime (&secs);
+    char buf[128];
+    strftime( buf, sizeof(buf), "%a, %d %b %Y %T %Z", &tm );
+    return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
 }
 
 char *
