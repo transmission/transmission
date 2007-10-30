@@ -424,27 +424,27 @@ tr_mkdir( const char * path, int permissions
 }
 
 int
-tr_mkdirp( char * path, int permissions )
+tr_mkdirp( const char * path_in, int permissions )
 {
-    char      * p, * pp;
+    char * path = tr_strdup( path_in );
+    char * p, * pp;
     struct stat sb;
     int done;
 
+    /* walk past the root */
     p = path;
-    while( '/' == *p )
-      p++;
+    while( *p == TR_PATH_DELIMITER )
+        ++p;
+
     pp = p;
     done = 0;
-    while( ( p = strchr( pp, '/' ) ) || ( p = strchr( pp, '\0' ) ) )
+    while( ( p = strchr( pp, TR_PATH_DELIMITER ) ) || ( p = strchr( pp, '\0' ) ) )
     {
-        if( '\0' == *p)
-        {
+        if( !*p )
             done = 1;
-        }
         else
-        {
             *p = '\0';
-        }
+
         if( stat( path, &sb ) )
         {
             /* Folder doesn't exist yet */
@@ -452,7 +452,7 @@ tr_mkdirp( char * path, int permissions )
             {
                 tr_err( "Could not create directory %s (%s)", path,
                         strerror( errno ) );
-                *p = '/';
+                tr_free( path );
                 return 1;
             }
         }
@@ -460,18 +460,19 @@ tr_mkdirp( char * path, int permissions )
         {
             /* Node exists but isn't a folder */
             tr_err( "Remove %s, it's in the way.", path );
-            *p = '/';
+            tr_free( path );
             return 1;
         }
+
         if( done )
-        {
             break;
-        }
-        *p = '/';
+
+        *p = TR_PATH_DELIMITER;
         p++;
         pp = p;
     }
 
+    tr_free( path );
     return 0;
 }
 

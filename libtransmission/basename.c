@@ -25,7 +25,7 @@
 #include <sys/param.h>
 
 char *
-basename(const char *path)
+basename( char * path )
 {
 	static char bname[MAXPATHLEN];
 	size_t len;

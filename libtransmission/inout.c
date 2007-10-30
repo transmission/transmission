@@ -72,7 +72,7 @@ readOrWriteBytes ( const tr_torrent    * tor,
         return 0;
     else if ((ioMode==TR_IO_READ) && stat( path, &sb ) ) /* fast check to make sure file exists */
         ret = tr_ioErrorFromErrno ();
-    else if ((fd = tr_fdFileOpen ( tor->destination, file->name, ioMode==TR_IO_WRITE )) < 0)
+    else if ((fd = tr_fdFileOpen ( path, ioMode==TR_IO_WRITE )) < 0)
         ret = fd;
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
         ret = TR_ERROR_IO_OTHER;
@@ -117,18 +117,21 @@ findFileLocation ( const tr_torrent * tor,
 #ifdef WIN32
 static int
 ensureMinimumFileSize ( const tr_torrent  * tor,
-                        int                   fileIndex,
-                        uint64_t              minSize ) /* in bytes */
+                        int                 fileIndex,
+                        uint64_t            minSize ) /* in bytes */
 {
     int fd;
     int ret;
     struct stat sb;
     const tr_file * file = &tor->info.files[fileIndex];
+    char path[MAX_PATH_LENGTH];
 
     assert ( 0<=fileIndex && fileIndex<tor->info.fileCount );
     assert ( minSize <= file->length );
 
-    fd = tr_fdFileOpen( tor->destination, file->name, TRUE );
+    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+
+    fd = tr_fdFileOpen( path, TRUE );
     if( fd < 0 ) /* bad fd */
         ret = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */
@@ -243,16 +246,6 @@ checkPiece ( tr_torrent * tor, int pieceIndex )
 /**
 ***
 **/
-
-void
-tr_ioClose( const tr_torrent * tor )
-{
-    int i;
-    const tr_info * info = &tor->info;
-
-    for( i=0; i<info->fileCount; ++i )
-        tr_fdFileClose( tor->destination, info->files[i].name );
-}
 
 int
 tr_ioHash( tr_torrent * tor, int pieceIndex )

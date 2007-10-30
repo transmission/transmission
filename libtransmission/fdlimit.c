@@ -31,221 +31,270 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <libgen.h> /* basename, dirname */
 #include <fcntl.h>
 
+#include <sys/queue.h> /* libevent needs this */
+#include <sys/types.h> /* libevent needs this */
+#include <event.h>
+#include <evhttp.h>
 #include <evutil.h>
 
 #include "transmission.h"
+#include "trcompat.h"
 #include "net.h"
 #include "platform.h"
 #include "utils.h"
 
-#define TR_MAX_OPEN_FILES 16 /* That is, real files, not sockets */
-#define TR_RESERVED_FDS   16 /* Number of sockets reserved for
-                                connections to trackers */
+/**
+***
+**/
 
-/***********************************************************************
- * Structures
- **********************************************************************/
-typedef struct tr_openFile_s
+static void
+myDebug( const char * file, int line, const char * fmt, ... )
 {
-    char       folder[MAX_PATH_LENGTH];
-    char       name[MAX_PATH_LENGTH];
-    int        file;
-    int        write;
-
-#define STATUS_INVALID 1
-#define STATUS_UNUSED  2
-#define STATUS_USED    4
-#define STATUS_CLOSING 8
-    int        status;
-
-    uint64_t   date;
-}
-tr_openFile_t;
-
-typedef struct tr_fd_s
-{
-    tr_lock       * lock;
-    tr_cond       * cond;
-    
-    int             reserved;
-
-    int             normal;
-    int             normalMax;
-
-    tr_openFile_t   open[TR_MAX_OPEN_FILES];
-}
-tr_fd_t;
-
-static tr_fd_t * gFd = NULL;
-
-/***********************************************************************
- * Local prototypes
- **********************************************************************/
-static int  TrOpenFile( int i, const char * folder, const char * name, int write );
-static void TrCloseFile( int i );
-
-
-/***********************************************************************
- * tr_fdInit
- **********************************************************************/
-void tr_fdInit( void )
-{
-    int i, j, s[4096];
-
-    if( gFd )
+    FILE * fp = tr_getLog( );
+    if( fp != NULL )
     {
-        tr_err( "tr_fdInit was called before!" );
-        return;
+        va_list args;
+        char s[64];
+        struct evbuffer * buf = evbuffer_new( );
+        char * myfile = tr_strdup( file );
+
+        evbuffer_add_printf( buf, "[%s] ", tr_getLogTimeStr( s, sizeof(s) ) );
+        va_start( args, fmt );
+        evbuffer_add_vprintf( buf, fmt, args );
+        va_end( args );
+        evbuffer_add_printf( buf, " (%s:%d)\n", basename(myfile), line );
+        fwrite( EVBUFFER_DATA(buf), 1, EVBUFFER_LENGTH(buf), fp );
+
+        tr_free( myfile );
+        evbuffer_free( buf );
+    }
+}
+
+#define dbgmsg(fmt...) myDebug(__FILE__, __LINE__, ##fmt )
+
+/**
+***
+**/
+
+enum
+{
+    TR_MAX_OPEN_FILES = 16, /* That is, real files, not sockets */
+
+    TR_RESERVED_FDS   = 16 /* sockets reserved for tracker connections */
+};
+
+struct tr_openfile
+{
+    unsigned int  isCheckedOut : 1;
+    unsigned int  isWritable : 1;
+    char          filename[MAX_PATH_LENGTH];
+    int           file;
+    uint64_t      date;
+};
+
+struct tr_fd_s
+{
+    int                  reserved;
+    int                  normal;
+    int                  normalMax;
+    tr_lock            * lock;
+    tr_cond            * cond;
+    struct tr_openfile   open[TR_MAX_OPEN_FILES];
+};
+
+static struct tr_fd_s * gFd = NULL;
+
+/***
+****
+****  Local Files
+****
+***/
+
+static int
+TrOpenFile( int i, const char * filename, int write )
+{
+    struct tr_openfile * file = &gFd->open[i];
+    struct stat sb;
+    char * dir;
+    int flags;
+
+    tr_dbg( "Opening '%s' (%d)", filename, write );
+
+    /* create subfolders, if any */
+    dir = dirname( tr_strdup( filename ) );
+    if( write && tr_mkdirp( dir, 0700 ) ) {
+        free( dir );
+        return tr_ioErrorFromErrno( );
     }
 
-    gFd = calloc( 1, sizeof( tr_fd_t ) );
-
-    /* Init lock and cond */
-    gFd->lock = tr_lockNew( );
-    gFd->cond = tr_condNew( );
-
-    /* Detect the maximum number of open files or sockets */
-    for( i = 0; i < 4096; i++ )
-    {
-        if( ( s[i] = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
-        {
-            break;
-        }
+    /* Make sure the parent folder exists */
+    if( stat( dir, &sb ) || !S_ISDIR( sb.st_mode ) ) {
+        free( dir );
+        return TR_ERROR_IO_PARENT;
     }
-    for( j = 0; j < i; j++ )
-    {
-#ifdef BEOS_NETSERVER
-        closesocket( s[j] );
-#else
-        EVUTIL_CLOSESOCKET( s[j] );
+
+    errno = 0;
+    flags = 0;
+#ifdef WIN32
+    flags |= O_BINARY;
 #endif
-    }
-
-    tr_dbg( "%d usable file descriptors", i );
-
-    gFd->reserved  = 0;
-    gFd->normal    = 0;
-
-    gFd->normalMax = i - TR_RESERVED_FDS - 10;
-        /* To be safe, in case the UI needs to write a preferences file
-           or something */
-
-    for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
+    flags |= write ? (O_RDWR | O_CREAT) : O_RDONLY;
+    file->file = open( filename, flags, 0666 );
+    free( dir );
+    if( write && ( file->file < 0 ) )
     {
-        gFd->open[i].status = STATUS_INVALID;
+        const int ret = tr_ioErrorFromErrno();
+        if( errno )
+            tr_err( "Couldn't open '%s': %s", filename, strerror(errno) );
+        else
+            tr_err( "Couldn't open '%s'", filename );
+        return ret;
     }
+
+    return TR_OK;
 }
 
-/***********************************************************************
- * tr_fdFileOpen
- **********************************************************************/
-int tr_fdFileOpen( const char * folder, const char * name, int write )
+static int
+fileIsOpen( const struct tr_openfile * o )
 {
-    int i, winner, ret;
-    uint64_t date;
+    return o->file >= 0;
+}
+
+static void
+TrCloseFile( int i )
+{
+    struct tr_openfile * file = &gFd->open[i];
+
+    assert( i >= 0 );
+    assert( i < TR_MAX_OPEN_FILES );
+    assert( fileIsOpen( file ) );
+
+    dbgmsg( "closing %s in slot %d writable %c",
+            file->filename, i, file->isWritable?'y':'n' );
+    close( file->file );
+    file->file = -1;
+    file->isCheckedOut = 0;
+    tr_condSignal( gFd->cond );
+}
+
+static int
+fileIsCheckedOut( const struct tr_openfile * o )
+{
+    return fileIsOpen(o) && o->isCheckedOut;
+}
+
+int
+tr_fdFileOpen( const char * filename, int write )
+{
+    int i, winner;
+    struct tr_openfile * o;
+
+    dbgmsg( "looking for file '%s', writable %c", filename, write?'y':'n' );
 
     tr_lockLock( gFd->lock );
 
     /* Is it already open? */
-    for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
+    for( i=0; i<TR_MAX_OPEN_FILES; ++i )
     {
-        if( gFd->open[i].status & STATUS_INVALID ||
-            strcmp( folder, gFd->open[i].folder ) ||
-            strcmp( name, gFd->open[i].name ) )
-        {
+        o = &gFd->open[i];
+
+        if( !fileIsOpen( o ) )
             continue;
-        }
-        if( gFd->open[i].status & STATUS_CLOSING )
-        {
-            /* File is being closed by another thread, wait until
-             * it's done before we reopen it */
+
+        if( strcmp( filename, o->filename ) )
+            continue;
+
+        if( fileIsCheckedOut( o ) ) {
+            dbgmsg( "found it!  it's open, but checked out.  waiting..." );
             tr_condWait( gFd->cond, gFd->lock );
             i = -1;
             continue;
         }
-        if( gFd->open[i].write < write )
-        {
-            /* File is open read-only and needs to be closed then
-             * re-opened read-write */
+
+        if( write && !o->isWritable ) {
+            dbgmsg( "found it!  it's open and available, but isn't writable. closing..." );
             TrCloseFile( i );
             continue;
         }
+
+        dbgmsg( "found it!  it's ready for use!" );
         winner = i;
         goto done;
     }
 
-    /* Can we open one more file? */
-    for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
-    {
-        if( gFd->open[i].status & STATUS_INVALID )
-        {
-            winner = i;
-            goto open;
-        }
-    }
 
-    /* All slots taken - close the oldest currently unused file */
+    dbgmsg( "it's not already open.  looking for an open slot or an old file." );
     for( ;; )
     {
-        date   = tr_date() + 1;
+        uint64_t date = tr_date() + 1;
         winner = -1;
 
-        for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
+        for( i=0; i<TR_MAX_OPEN_FILES; ++i )
         {
-            if( !( gFd->open[i].status & STATUS_UNUSED ) )
-            {
-                continue;
-            }
-            if( gFd->open[i].date < date )
-            {
+            o = &gFd->open[i];
+
+            if( !fileIsOpen( o ) ) {
                 winner = i;
-                date   = gFd->open[i].date;
+                dbgmsg( "found an empty slot in %d", winner );
+                goto done;
+            }
+
+            if( o->date < date ) {
+                winner = i;
+                date = o->date;
             }
         }
 
-        if( winner >= 0 )
-        {
+        if( winner >= 0 ) {
+            dbgmsg( "closing file '%s', slot #%d", gFd->open[winner].filename, winner );
             TrCloseFile( winner );
-            goto open;
+            goto done;
         }
 
         /* All used! Wait a bit and try again */
+        dbgmsg( "everything's full!  waiting for someone else to finish something" );
         tr_condWait( gFd->cond, gFd->lock );
     }
 
-open:
-    if( ( ret = TrOpenFile( winner, folder, name, write ) ) )
-    {
-        tr_lockUnlock( gFd->lock );
-        return ret;
-    }
-    snprintf( gFd->open[winner].folder, MAX_PATH_LENGTH, "%s", folder );
-    snprintf( gFd->open[winner].name, MAX_PATH_LENGTH, "%s", name );
-    gFd->open[winner].write = write;
-
 done:
-    gFd->open[winner].status = STATUS_USED;
-    gFd->open[winner].date   = tr_date();
+
+    o = &gFd->open[winner];
+    if( !fileIsOpen( o ) )
+    {
+        const int ret = TrOpenFile( winner, filename, write );
+        if( ret ) {
+            tr_lockUnlock( gFd->lock );
+            return ret;
+        }
+
+        dbgmsg( "opened '%s' in slot %d, write %c", filename, winner, write?'y':'n' );
+        strlcpy( gFd->open[winner].filename, filename, MAX_PATH_LENGTH );
+        gFd->open[winner].isWritable = write;
+    }
+
+    dbgmsg( "checking out '%s' in slot %d", filename, winner );
+    gFd->open[winner].isCheckedOut = 1;
+    gFd->open[winner].date = tr_date();
     tr_lockUnlock( gFd->lock );
-    
     return gFd->open[winner].file;
 }
 
-/***********************************************************************
- * tr_fdFileRelease
- **********************************************************************/
-void tr_fdFileRelease( int file )
+void
+tr_fdFileRelease( int file )
 {
     int i;
     tr_lockLock( gFd->lock );
 
-    for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
-    {
-        if( gFd->open[i].file == file )
-        {
-            gFd->open[i].status = STATUS_UNUSED;
+    for( i=0; i<TR_MAX_OPEN_FILES; ++i ) {
+        struct tr_openfile * o = &gFd->open[i];
+        if( o->file == file ) {
+            dbgmsg( "releasing file '%s' in slot #%d", o->filename, i );
+            if( o->isWritable )
+                fsync( o->file ); /* fflush */
+            o->isCheckedOut = 0;
             break;
         }
     }
@@ -254,85 +303,60 @@ void tr_fdFileRelease( int file )
     tr_lockUnlock( gFd->lock );
 }
 
-/***********************************************************************
- * tr_fdFileClose
- **********************************************************************/
-void tr_fdFileClose( const char * folder, const char * name )
-{
-    int i;
+/***
+****
+****  Sockets
+****
+***/
 
-    tr_lockLock( gFd->lock );
-
-    for( i = 0; i < TR_MAX_OPEN_FILES; i++ )
-    {
-        if( gFd->open[i].status & STATUS_INVALID )
-        {
-            continue;
-        }
-        if( !strcmp( folder, gFd->open[i].folder ) &&
-            !strcmp( name, gFd->open[i].name ) )
-        {
-            TrCloseFile( i );
-        }
-    }
-
-    tr_lockUnlock( gFd->lock );
-}
-
-
-/***********************************************************************
- * Sockets
- **********************************************************************/
-typedef struct
+struct tr_socket
 {
     int socket;
     int priority;
-}
-tr_socket_t;
+};
 
 /* Remember the priority of every socket we open, so that we can keep
  * track of how many reserved file descriptors we are using */
-static tr_socket_t * gSockets = NULL;
+static struct tr_socket * gSockets = NULL;
 static int gSocketsSize = 0;
 static int gSocketsCount = 0;
-static void SocketSetPriority( int s, int priority )
+
+static void
+SocketSetPriority( int s, int priority )
 {
-    if( gSocketsSize < 1 )
-    {
-        gSocketsSize = 256;
-        gSockets = malloc( gSocketsSize * sizeof( tr_socket_t ) );
+    if( gSocketsSize <= gSocketsCount ) {
+        gSocketsSize += 64;
+        gSockets = tr_renew( struct tr_socket, gSockets, gSocketsSize );
     }
-    if( gSocketsSize <= gSocketsCount )
-    {
-        gSocketsSize *= 2;
-        gSockets = realloc( gSockets, gSocketsSize * sizeof( tr_socket_t ) );
-    }
+
     gSockets[gSocketsCount].socket = s;
     gSockets[gSocketsCount].priority = priority;
-    gSocketsCount++;
+    ++gSocketsCount;
 }
-static int SocketGetPriority( int s )
+
+static int
+SocketGetPriority( int s )
 {
     int i, ret;
-    for( i = 0; i < gSocketsCount; i++ )
+
+    for( i=0; i<gSocketsCount; ++i )
         if( gSockets[i].socket == s )
             break;
-    if( i >= gSocketsCount )
-    {
+
+    if( i >= gSocketsCount ) {
         tr_err( "could not find that socket (%d)!", s );
         return -1;
     }
+
     ret = gSockets[i].priority;
     gSocketsCount--;
     memmove( &gSockets[i], &gSockets[i+1],
-            ( gSocketsCount - i ) * sizeof( tr_socket_t ) );
+            ( gSocketsCount - i ) * sizeof( struct tr_socket ) );
     return ret;
 }
 
-/***********************************************************************
- * tr_fdSocketCreate
- **********************************************************************/
-int tr_fdSocketCreate( int type, int priority )
+int
+tr_fdSocketCreate( int type, int priority )
 {
     int s = -1;
 
@@ -386,19 +410,23 @@ tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
     return s;
 }
 
-/***********************************************************************
- * tr_fdSocketClose
- **********************************************************************/
-void tr_fdSocketClose( int s )
+static void
+socketClose( int fd )
+{
+#ifdef BEOS_NETSERVER
+    closesocket( fd );
+#else
+    EVUTIL_CLOSESOCKET( fd );
+#endif
+}
+
+void
+tr_fdSocketClose( int s )
 {
     if( s >= 0 )
     {
         tr_lockLock( gFd->lock );
-#ifdef BEOS_NETSERVER
-        closesocket( s );
-#else
-        EVUTIL_CLOSESOCKET( s );
-#endif
+        socketClose( s );
         if( SocketGetPriority( s ) )
             gFd->reserved--;
         else
@@ -407,131 +435,51 @@ void tr_fdSocketClose( int s )
     }
 }
 
-/***********************************************************************
- * tr_fdClose
- **********************************************************************/
-void tr_fdClose( void )
+/***
+****
+****  Startup / Shutdown
+****
+***/
+
+void
+tr_fdInit( void )
 {
+    int i, j, s[4096];
+
+    assert( gFd == NULL );
+
+    gFd = tr_new0( struct tr_fd_s, 1 );
+    gFd->lock = tr_lockNew( );
+    gFd->cond = tr_condNew( );
+
+    /* count the max number of sockets we can use */
+    for( i=0; i<4096; ++i )
+        if( ( s[i] = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
+            break;
+    for( j=0; j<i; ++j )
+        socketClose( s[j] );
+    tr_dbg( "%d usable file descriptors", i );
+
+    /* set some fds aside for the UI or daemon to use */
+    gFd->normalMax = i - TR_RESERVED_FDS - 10;
+
+    for( i=0; i<TR_MAX_OPEN_FILES; ++i )
+        gFd->open[i].file = -1;
+          
+}
+
+void
+tr_fdClose( void )
+{
+    int i = 0;
+
+    for( i=0; i<TR_MAX_OPEN_FILES; ++i )
+        if( fileIsOpen( &gFd->open[i] ) )
+            TrCloseFile( i );
+
     tr_lockFree( gFd->lock );
     tr_condFree( gFd->cond );
-    free( gFd );
+
+    tr_free( gSockets );
+    tr_free( gFd );
 }
-
-
-/***********************************************************************
- * Local functions
- **********************************************************************/
-
-/***********************************************************************
- * CheckFolder
- ***********************************************************************
- *
- **********************************************************************/
-static int TrOpenFile( int i, const char * folder, const char * name, int write )
-{
-    tr_openFile_t * file = &gFd->open[i];
-    struct stat sb;
-    char path[MAX_PATH_LENGTH];
-    int ret;
-    int flags;
-
-    tr_dbg( "Opening %s in %s (%d)", name, folder, write );
-
-    /* Make sure the parent folder exists */
-    if( stat( folder, &sb ) || !S_ISDIR( sb.st_mode ) )
-    {
-        return TR_ERROR_IO_PARENT;
-    }
-
-    snprintf( path, sizeof(path), "%s" TR_PATH_DELIMITER_STR "%s",
-              folder,
-              name );
-
-    /* Create subfolders, if any */
-    if( write )
-    {
-        char * p = path + strlen( folder ) + 1;
-        char * s;
-
-        while( ( s = strchr( p, TR_PATH_DELIMITER ) ) )
-        {
-            *s = '\0';
-            if( stat( path, &sb ) )
-            {
-                if( tr_mkdir( path, 0777 ) )
-                {
-                    ret = tr_ioErrorFromErrno();
-                    tr_err( "Couldn't create folder '%s'", path );
-                    return ret;
-                }
-            }
-            else
-            {
-                if( !S_ISDIR( sb.st_mode ) )
-                {
-                    tr_err( "Is not a folder: '%s'", path );
-                    return TR_ERROR_IO_OTHER;
-                }
-            }
-            *s = TR_PATH_DELIMITER;
-            p = s + 1;
-        }
-    }
-
-    /* Now try to really open the file */
-    errno = 0;
-    flags = 0;
-#ifdef WIN32
-    flags |= O_BINARY;
-#endif
-    flags |= write ? (O_RDWR | O_CREAT) : O_RDONLY;
-    file->file = open( path, flags, 0666 );
-    if( write && ( file->file < 0 ) )
-    {
-        ret = tr_ioErrorFromErrno();
-        if( errno )
-            tr_err( "Couldn't open %s in %s: %s", name, folder, strerror(errno) );
-        else
-            tr_err( "Couldn't open %s in %s", name, folder );
-        return ret;
-    }
-
-    return TR_OK;
-}
-
-/***********************************************************************
- * TrCloseFile
- ***********************************************************************
- * We first mark it as closing then release the lock while doing so,
- * because close() may take same time and we don't want to block other
- * threads.
- **********************************************************************/
-static void TrCloseFile( int i )
-{
-    tr_openFile_t * file = &gFd->open[i];
-
-    /* If it's already being closed by another thread, just wait till
-     * it is done */
-    while( file->status & STATUS_CLOSING )
-    {
-        tr_condWait( gFd->cond, gFd->lock );
-    }
-    if( file->status & STATUS_INVALID )
-    {
-        return;
-    }
-
-    /* Nobody is closing it already, so let's do it */
-    if( file->status & STATUS_USED )
-    {
-        tr_err( "TrCloseFile: closing a file that's being used!" );
-    }
-    tr_dbg( "Closing %s in %s (%d)", file->name, file->folder, file->write );
-    file->status = STATUS_CLOSING;
-    tr_lockUnlock( gFd->lock );
-    close( file->file );
-    tr_lockLock( gFd->lock );
-    file->status = STATUS_INVALID;
-    tr_condSignal( gFd->cond );
-}
-

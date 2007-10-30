@@ -25,7 +25,7 @@
 #include <sys/param.h>
 
 char *
-dirname(const char *path)
+dirname( char *path )
 {
 	static char dname[MAXPATHLEN];
 	size_t len;
