@@ -1998,13 +1998,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applySpeedLimit: (id) sender
 {
-    [fPrefsController applySpeedSettings: nil];
+    [self toggleSpeedLimit: sender];
 }
 
 - (void) toggleSpeedLimit: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"SpeedLimit"] forKey: @"SpeedLimit"];
-    [self applySpeedLimit: nil];
+    [fPrefsController applySpeedSettings: nil];
 }
 
 - (void) autoSpeedLimitChange: (NSNotification *) notification
@@ -2817,6 +2817,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
+    
+    if (action == @selector(applySpeedLimit:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SpeedLimit"] ? NSOnState : NSOffState];
+        return YES;
+    }
 
     //only enable some items if it is in a context menu or the window is useable
     BOOL canUseTable = [fWindow isKeyWindow] || [[menuItem menu] supermenu] != [NSApp mainMenu];
