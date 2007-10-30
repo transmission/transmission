@@ -1,39 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>39 93 433 395 0 0 1440 878 </string>
-	<key>IBEditorPositions</key>
-	<dict>
-		<key>1041</key>
-		<string>469 523 216 149 0 0 1440 878 </string>
-		<key>1480</key>
-		<string>308 633 420 63 0 0 1440 878 </string>
-		<key>1603</key>
-		<string>287 602 477 67 0 0 1440 878 </string>
-		<key>1936</key>
-		<string>151 493 195 111 0 0 1440 878 </string>
-		<key>2043</key>
-		<string>416 277 87 68 0 0 1440 878 </string>
-		<key>29</key>
-		<string>143 618 548 44 0 0 1440 878 </string>
-		<key>456</key>
-		<string>338 441 240 225 0 0 1440 878 </string>
-		<key>581</key>
-		<string>442 528 115 99 0 0 1440 878 </string>
-		<key>589</key>
-		<string>119 534 201 106 0 0 1440 878 </string>
-	</dict>
 	<key>IBFramework Version</key>
-	<string>446.1</string>
-	<key>IBLockedObjects</key>
-	<array>
-		<integer>21</integer>
-	</array>
+	<string>629</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../../Transmission.xcodeproj</string>
 	<key>IBOldestOS</key>
-	<integer>3</integer>
+	<integer>5</integer>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>1639</integer>
+	</array>
 	<key>IBSystem Version</key>
-	<string>8R2218</string>
+	<string>9A581</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
 </dict>
 </plist>

@@ -30,7 +30,6 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "AboutWindowController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
@@ -1792,6 +1791,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setSortReverse: (id) sender
 {
+    [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
     [self sortTorrents];
 }
 
@@ -2444,8 +2444,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) toggleSmallView: (id) sender
 {
     BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
-    if (![NSApp isOnLeopardOrBetter])
-        makeSmall != makeSmall;
+    [fDefaults setBool: makeSmall forKey: @"SmallView"];
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
@@ -2827,9 +2826,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return [fWindow attachedSheet] == nil;
     
     //enable sort and advanced bar items
-    if (action == @selector(setSort:) || /*action == @selector(toggleAdvancedBar:) ||*/ action == @selector(toggleSmallView:))
+    if (action == @selector(setSort:) /*|| action == @selector(toggleAdvancedBar:) ||*/)
         return [fWindow isVisible];
-
+    
+    if (action == @selector(toggleSmallView:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SmallView"] ? NSOnState : NSOffState];
+        return [fWindow isVisible];
+    }
+    
     //enable show info
     if (action == @selector(showInfo:))
     {
@@ -3020,7 +3025,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //enable reverse sort item
     if (action == @selector(setSortReverse:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SortReverse"] ? NSOnState : NSOffState];
         return ![[fDefaults stringForKey: @"Sort"] isEqualToString: @"Order"];
+    }
     
     //check proper filter search item
     if (action == @selector(setFilterSearchType:))
