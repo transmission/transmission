@@ -71,8 +71,6 @@
 				<string>id</string>
 				<key>applyFilter</key>
 				<string>id</string>
-				<key>applySpeedLimit</key>
-				<string>id</string>
 				<key>copyTorrentFiles</key>
 				<string>id</string>
 				<key>createFile</key>
