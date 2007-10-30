@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <libgen.h> /* dirname, basename */
 #include <dirent.h>
 
 #include "crypto.h" /* tr_sha1 */
