@@ -256,7 +256,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fTableView setTorrents: fDisplayedTorrents];
     [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
-
+    
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
 
@@ -1804,6 +1804,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setSortReverse: (id) sender
 {
+    [fDefaults setBool: ![fDefaults boolForKey: @"SortReverse"] forKey: @"SortReverse"];
     [self sortTorrents];
 }
 
@@ -2265,12 +2266,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return nil;
 }
 
-- (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes
-    toPasteboard: (NSPasteboard *) pasteboard
+#warning not working in Leopard
+- (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order with no filter
-    if ([[fDefaults stringForKey: @"Sort"] isEqualToString: @"Order"]
-        && [[fDefaults stringForKey: @"Filter"] isEqualToString: @"None"]
+    if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER]
+        && [[fDefaults stringForKey: @"Filter"] isEqualToString: FILTER_NONE]
         && [[fSearchFilterField stringValue] length] == 0)
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
@@ -2474,8 +2475,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) toggleSmallView: (id) sender
 {
     BOOL makeSmall = ![fDefaults boolForKey: @"SmallView"];
-    if (![NSApp isOnLeopardOrBetter])
-        makeSmall != makeSmall;
+    [fDefaults setBool: makeSmall forKey: @"SmallView"];
     
     [fTableView setRowHeight: makeSmall ? ROW_HEIGHT_SMALL : ROW_HEIGHT_REGULAR];
     
@@ -2848,7 +2848,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
-
+    
     //only enable some items if it is in a context menu or the window is useable
     BOOL canUseTable = [fWindow isKeyWindow] || [[menuItem menu] supermenu] != [NSApp mainMenu];
 
@@ -2857,8 +2857,14 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return [fWindow attachedSheet] == nil;
     
     //enable sort and advanced bar items
-    if (action == @selector(setSort:) || /*action == @selector(toggleAdvancedBar:) ||*/ action == @selector(toggleSmallView:))
+    if (action == @selector(setSort:) /*|| action == @selector(toggleAdvancedBar:) ||*/)
         return [fWindow isVisible];
+    
+    if (action == @selector(toggleSmallView:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SmallView"] ? NSOnState : NSOffState];
+        return [fWindow isVisible];
+    }
 
     //enable show info
     if (action == @selector(showInfo:))
@@ -3050,7 +3056,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //enable reverse sort item
     if (action == @selector(setSortReverse:))
-        return ![[fDefaults stringForKey: @"Sort"] isEqualToString: @"Order"];
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SortReverse"] ? NSOnState : NSOffState];
+        return ![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER];
+    }
     
     //check proper filter search item
     if (action == @selector(setFilterSearchType:))

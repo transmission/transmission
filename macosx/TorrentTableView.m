@@ -115,7 +115,6 @@
 
 - (void) mouseDown: (NSEvent *) event
 {
-    //NSLog(@"down");
     fClickPoint = [self convertPoint: [event locationInWindow] fromView: nil];
 
     if ([self pointInActionRect: fClickPoint])
