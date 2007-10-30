@@ -28,28 +28,16 @@
 #include <stddef.h> /* for size_t */
 
 #ifndef HAVE_STRLCPY
-size_t
-strlcpy(char *dst, const char *src, size_t siz);
+size_t strlcpy(char *dst, const char *src, size_t siz);
 #endif
 
 #ifndef HAVE_STRLCAT
-size_t
-strlcat(char *dst, const char *src, size_t siz);
+size_t strlcat(char *dst, const char *src, size_t siz);
 #endif
 
 #ifndef HAVE_ASPRINTF
 int asprintf( char **, const char *, ... );
 int vasprintf( char **, const char *, va_list );
-#endif
-
-#if defined(HAVE_DIRNAME) || defined(HAVE_BASENAME)
-    #include <libgen.h>
-#endif
-#ifndef HAVE_DIRNAME
-    char* dirname( char *path);
-#endif
-#ifndef HAVE_BASENAME
-    char* basename( char *path );
 #endif
 
 #endif /* TRCOMPAT_H */

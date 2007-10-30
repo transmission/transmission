@@ -4,12 +4,10 @@ AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 noinst_LIBRARIES = libtransmission.a
 
 libtransmission_a_SOURCES = \
-    basename.c \
     bencode.c \
     clients.c \
     completion.c \
     crypto.c \
-    dirname.c \
     fastresume.c \
     fdlimit.c \
     handshake.c \
