@@ -17,10 +17,8 @@
 		4D118E1A08CB46B20033958F /* PrefsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.m */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		4D364DA0091FBB2C00377D12 /* TorrentTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D364D9F091FBB2C00377D12 /* TorrentTableView.m */; };
-		4D36BA6E0CA2F00800A63CA5 /* basename.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA5F0CA2F00800A63CA5 /* basename.c */; };
 		4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA600CA2F00800A63CA5 /* crypto.c */; };
 		4D36BA700CA2F00800A63CA5 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA610CA2F00800A63CA5 /* crypto.h */; };
-		4D36BA710CA2F00800A63CA5 /* dirname.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA620CA2F00800A63CA5 /* dirname.c */; };
 		4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA630CA2F00800A63CA5 /* handshake.c */; };
 		4D36BA730CA2F00800A63CA5 /* handshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA640CA2F00800A63CA5 /* handshake.h */; };
 		4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA650CA2F00800A63CA5 /* peer-io.c */; };
@@ -319,10 +317,8 @@
 		4D2784360905709500687951 /* Transmission.icns */ = {isa = PBXFileReference; explicitFileType = image.icns; name = Transmission.icns; path = macosx/Images/Transmission.icns; sourceTree = "<group>"; };
 		4D364D9E091FBB2C00377D12 /* TorrentTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TorrentTableView.h; path = macosx/TorrentTableView.h; sourceTree = "<group>"; };
 		4D364D9F091FBB2C00377D12 /* TorrentTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = TorrentTableView.m; path = macosx/TorrentTableView.m; sourceTree = "<group>"; };
-		4D36BA5F0CA2F00800A63CA5 /* basename.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = basename.c; path = libtransmission/basename.c; sourceTree = "<group>"; };
 		4D36BA600CA2F00800A63CA5 /* crypto.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = crypto.c; path = libtransmission/crypto.c; sourceTree = "<group>"; };
 		4D36BA610CA2F00800A63CA5 /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = crypto.h; path = libtransmission/crypto.h; sourceTree = "<group>"; };
-		4D36BA620CA2F00800A63CA5 /* dirname.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = dirname.c; path = libtransmission/dirname.c; sourceTree = "<group>"; };
 		4D36BA630CA2F00800A63CA5 /* handshake.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = handshake.c; path = libtransmission/handshake.c; sourceTree = "<group>"; };
 		4D36BA640CA2F00800A63CA5 /* handshake.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = handshake.h; path = libtransmission/handshake.h; sourceTree = "<group>"; };
 		4D36BA650CA2F00800A63CA5 /* peer-io.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = "peer-io.c"; path = "libtransmission/peer-io.c"; sourceTree = "<group>"; };
@@ -879,10 +875,8 @@
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
 			isa = PBXGroup;
 			children = (
-				4D36BA5F0CA2F00800A63CA5 /* basename.c */,
 				4D36BA600CA2F00800A63CA5 /* crypto.c */,
 				4D36BA610CA2F00800A63CA5 /* crypto.h */,
-				4D36BA620CA2F00800A63CA5 /* dirname.c */,
 				4D36BA630CA2F00800A63CA5 /* handshake.c */,
 				4D36BA640CA2F00800A63CA5 /* handshake.h */,
 				4D36BA650CA2F00800A63CA5 /* peer-io.c */,
@@ -1483,9 +1477,7 @@
 				4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */,
 				4394AC680C74FB6000F367E8 /* publish.c in Sources */,
 				A24621420C769D0900088E81 /* trevent.c in Sources */,
-				4D36BA6E0CA2F00800A63CA5 /* basename.c in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* crypto.c in Sources */,
-				4D36BA710CA2F00800A63CA5 /* dirname.c in Sources */,
 				4D36BA720CA2F00800A63CA5 /* handshake.c in Sources */,
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
