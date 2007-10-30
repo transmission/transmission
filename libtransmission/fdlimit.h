@@ -31,6 +31,8 @@
  **********************************************************************/
 void tr_fdInit( void );
 
+void tr_fdClose( void );
+
 /***********************************************************************
  * tr_fdFileOpen
  ***********************************************************************
@@ -41,7 +43,7 @@ void tr_fdInit( void );
  * Returns the file descriptor if successful, otherwise returns
  * one of the TR_ERROR_IO_*.
  **********************************************************************/
-int tr_fdFileOpen( const char * folder, const char * name, int write );
+int tr_fdFileOpen( const char * filename, int write );
 
 /***********************************************************************
  * tr_fdFileRelease
@@ -50,14 +52,6 @@ int tr_fdFileOpen( const char * folder, const char * name, int write );
  * moment and can safely be closed.
  **********************************************************************/
 void tr_fdFileRelease( int file );
-
-/***********************************************************************
- * tr_fdFileClose
- ***********************************************************************
- * If the file 'name' in directory 'folder' was open, closes it,
- * flushing data on disk.
- **********************************************************************/
-void tr_fdFileClose( const char * folder, const char * name );
 
 /***********************************************************************
  * Sockets

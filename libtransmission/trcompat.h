@@ -46,10 +46,10 @@ int vasprintf( char **, const char *, va_list );
     #include <libgen.h>
 #endif
 #ifndef HAVE_DIRNAME
-    char* dirname(const char *path);
+    char* dirname( char *path);
 #endif
 #ifndef HAVE_BASENAME
-    char* basename(const char *path);
+    char* basename( char *path );
 #endif
 
 #endif /* TRCOMPAT_H */
