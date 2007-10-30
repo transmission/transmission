@@ -732,8 +732,6 @@ refillPulse( void * vtorrent )
         assert( begin < (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
         assert( (begin + length) <= (uint32_t)tr_torPieceCountBytes( tor, (int)index ) );
 
-fprintf( stderr, "looking for a peer that will take my request for block #%"PRIu64"\n", block );
-
         /* find a peer who can ask for this block */
         for( j=0; j<peerCount; )
         {
@@ -751,7 +749,6 @@ fprintf( stderr, "looking for a peer that will take my request for block #%"PRIu
                     break;
 
                 case TR_ADDREQ_OK:
-                    fprintf( stderr, "peer %d will take it\n", j );
                     tr_bitfieldAdd( t->requested, block );
                     j = peerCount;
                     break;
