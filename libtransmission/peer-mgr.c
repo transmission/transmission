@@ -544,6 +544,7 @@ getConnectedPeers( Torrent * t, int * setmeCount )
 struct tr_refill_piece
 {
     tr_priority_t priority;
+    int percentDone;
     uint16_t random;
     uint32_t piece;
     uint32_t peerCount;
@@ -566,6 +567,10 @@ compareRefillPiece (const void * aIn, const void * bIn)
     /* if one piece has a higher priority, it goes first */
     if (a->priority != b->priority)
         return a->priority > b->priority ? -1 : 1;
+
+    /* try to fill partial pieces */
+    if( a->percentDone != b->percentDone )
+        return a->percentDone > b->percentDone ? -1 : 1;
     
     /* otherwise if one has fewer peers, it goes first */
     if (a->peerCount != b->peerCount)
@@ -625,6 +630,7 @@ getPreferredPieces( Torrent     * t,
             setme->peerCount = 0;
             setme->fastAllowed = 0;
             setme->random = tr_rand( UINT16_MAX );
+            setme->percentDone = (int)( 100.0 * tr_cpPercentBlocksInPiece( tor->completion, piece ) );
 
             for( k=0; k<peerCount; ++k ) {
                 const tr_peer * peer = peers[k];
@@ -637,7 +643,7 @@ getPreferredPieces( Torrent     * t,
             }
         }
 
-        qsort (p, poolSize, sizeof(struct tr_refill_piece), compareRefillPiece);
+        qsort( p, poolSize, sizeof(struct tr_refill_piece), compareRefillPiece );
 
         for( j=0; j<poolSize; ++j )
             pool[j] = p[j].piece;

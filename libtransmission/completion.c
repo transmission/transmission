@@ -137,7 +137,11 @@ tr_cpInvalidateDND ( tr_completion * cp )
 int
 tr_cpPieceIsComplete( const tr_completion * cp, int piece )
 {
-    return cp->completeBlocks[piece] >= tr_torPieceCountBlocks(cp->tor,piece);
+    assert( piece >= 0 );
+    assert( piece < cp->tor->info.pieceCount );
+    assert( cp->completeBlocks[piece] <= tr_torPieceCountBlocks(cp->tor,piece) );
+
+    return cp->completeBlocks[piece] == tr_torPieceCountBlocks(cp->tor,piece);
 }
 
 const tr_bitfield * tr_cpPieceBitfield( const tr_completion * cp )
