@@ -154,7 +154,7 @@
     }
 }
 
-#warning not always working
+#warning not working on Leopard
 - (void) mouseUp: (NSEvent *) event
 {
     //NSLog(@"up");

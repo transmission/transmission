@@ -2094,7 +2094,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
 }
 
-#warning look into
 - (void) setLimitGlobalEnabled: (id) sender
 {
     [fPrefsController applySpeedSettings: nil];
@@ -2260,7 +2259,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return nil;
 }
 
-#warning not working in Leopard
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
 {
     //only allow reordering of rows if sorting by order with no filter
@@ -2269,8 +2267,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         && [[fSearchFilterField stringValue] length] == 0)
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
-        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes]
-                                forType: TORRENT_TABLE_VIEW_DATA_TYPE];
+        [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
         return YES;
     }
     return NO;

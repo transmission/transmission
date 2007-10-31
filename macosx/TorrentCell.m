@@ -156,6 +156,11 @@
                     inBounds: bounds];
 }
 
+- (NSUInteger) hitTestForEvent: (NSEvent *) event inRect: (NSRect) cellFrame ofView: (NSView *) controlView
+{
+    return NSCellHitContentArea;
+}
+
 - (void) drawInteriorWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
 {
     [super drawInteriorWithFrame: cellFrame inView: controlView];
