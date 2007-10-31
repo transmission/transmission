@@ -782,10 +782,6 @@ ipc_addstat( benc_val_t * list, int tor,
                 {
                     tr_bencInitStr( item, "assert", -1, 1 );
                 }
-                else if( TR_ERROR_ISSET( TR_ERROR_IO_PARENT, error ) )
-                {
-                    tr_bencInitStr( item, "io-parent", -1, 1 );
-                }
                 else if( TR_ERROR_ISSET( TR_ERROR_IO_PERMISSIONS, error ) )
                 {
                     tr_bencInitStr( item, "io-permissions", -1, 1 );
