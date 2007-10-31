@@ -2,6 +2,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.92 (2007/xx/yy)
 - OS X:
+   + Leopard: Time Machine will ignore incomplete files
    + Leopard: Fix bug with typing values in Inspector->Options
    + Leopard: Fix bug with toggling Minimal View
 
