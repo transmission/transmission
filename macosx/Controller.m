@@ -2253,7 +2253,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return [fDisplayedTorrents count];
 }
 
-#warning need?
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     return nil;

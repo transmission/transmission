@@ -1475,6 +1475,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [self createFileList];
     
     [self update];
+    
+    //mark incomplete files to be ignored by Time Machine
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
+        CSBackupSetItemExcluded((CFURLRef)url, ![self allDownloaded], false);
+    }
+    
     return self;
 }
 
@@ -1609,11 +1617,25 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [fDateCompleted release];
             fDateCompleted = [[NSDate alloc] init];
             
+            //allow to be backed up by Time Machine
+            if ([NSApp isOnLeopardOrBetter])
+            {
+                NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
+                CSBackupSetItemExcluded((CFURLRef)url, false, false);
+            }
+            
             fStat = tr_torrentStat(fHandle);
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentFinishedDownloading" object: self];
             break;
         
         case TR_CP_INCOMPLETE:
+            //do not allow to be backed up by Time Machine
+            if ([NSApp isOnLeopardOrBetter])
+            {
+                NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
+                CSBackupSetItemExcluded((CFURLRef)url, true, false);
+            }
+            
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
             break;
     }
