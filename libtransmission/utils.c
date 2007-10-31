@@ -787,6 +787,7 @@ tr_bitfieldAdd( tr_bitfield  * bitfield, size_t nth )
 {
     static const uint8_t ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
     bitfield->bits[nth>>3u] |= ands[nth&7u];
+    assert( tr_bitfieldHas( bitfield, nth ) );
 }
 
 void
@@ -808,6 +809,8 @@ tr_bitfieldRem( tr_bitfield   * bitfield,
 
     if( bitfield != NULL )
         bitfield->bits[nth>>3u] &= rems[nth&7u];
+
+    assert( !tr_bitfieldHas( bitfield, nth ) );
 }
 
 void

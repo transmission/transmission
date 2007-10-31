@@ -207,9 +207,9 @@ tr_ioWrite( tr_torrent * tor, int pieceIndex, int begin, int len, uint8_t * buf 
 ****/
 
 static int
-tr_ioRecalculateHash ( tr_torrent    * tor,
-                       int             pieceIndex,
-                       uint8_t       * setme )
+tr_ioRecalculateHash( tr_torrent    * tor,
+                      int             pieceIndex,
+                      uint8_t       * setme )
 {
     int n;
     int ret;
@@ -223,17 +223,17 @@ tr_ioRecalculateHash ( tr_torrent    * tor,
     info = &tor->info;
     n = tr_torPieceCountBytes( tor, pieceIndex );
 
-    buf = malloc( n );
-    ret = readOrWritePiece ( tor, TR_IO_READ, pieceIndex, 0, buf, n );
+    buf = tr_new( uint8_t, n );
+    ret = tr_ioRead( tor, pieceIndex, 0, n, buf );
     if( !ret )
         tr_sha1( setme, buf, n, NULL );
-    free( buf );
+    tr_free( buf );
 
     return ret;
 }
 
 static int
-checkPiece ( tr_torrent * tor, int pieceIndex )
+checkPiece( tr_torrent * tor, int pieceIndex )
 {
     uint8_t hash[SHA_DIGEST_LENGTH];
     int ret = tr_ioRecalculateHash( tor, pieceIndex, hash )
