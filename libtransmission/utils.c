@@ -647,8 +647,6 @@ tr_errorString( int code )
             return "Generic error";
         case TR_ERROR_ASSERT:
             return "Assert error";
-        case TR_ERROR_IO_PARENT:
-            return "Download folder does not exist";
         case TR_ERROR_IO_PERMISSIONS:
             return "Insufficient permissions";
         case TR_ERROR_IO_SPACE:

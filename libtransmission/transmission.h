@@ -80,7 +80,6 @@ enum
 #define TR_ERROR_ASSERT             0x82000000
 /* I/O errors */
 #define TR_ERROR_IO_MASK            0x000000FF
-#define TR_ERROR_IO_PARENT          0x80000001
 #define TR_ERROR_IO_PERMISSIONS     0x80000002
 #define TR_ERROR_IO_SPACE           0x80000004
 #define TR_ERROR_IO_FILE_TOO_BIG    0x80000008
