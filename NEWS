@@ -4,7 +4,6 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - All Platforms:
    + Fix 0.90 data corruption bugs.
 - OS X:
-   + Leopard: Time Machine will ignore incomplete downloads
    + Leopard: Fix bug with typing values in Inspector->Options
    + Leopard: Fix bug with toggling Minimal View
 - GTK
