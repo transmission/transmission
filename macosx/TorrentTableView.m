@@ -64,19 +64,6 @@
 {
     if ((self = [super initWithCoder: decoder]))
     {
-        fResumeOnIcon = [NSImage imageNamed: @"ResumeOn.png"];
-        fResumeOffIcon = [NSImage imageNamed: @"ResumeOff.png"];
-        fPauseOnIcon = [NSImage imageNamed: @"PauseOn.png"];
-        fPauseOffIcon = [NSImage imageNamed: @"PauseOff.png"];
-        fResumeNoWaitOnIcon = [NSImage imageNamed: @"ResumeNoWaitOn.png"];
-        fResumeNoWaitOffIcon = [NSImage imageNamed: @"ResumeNoWaitOff.png"];
-        
-        fRevealOnIcon = [NSImage imageNamed: @"RevealOn.png"];
-        fRevealOffIcon = [NSImage imageNamed: @"RevealOff.png"];
-        
-        fActionOnIcon = [NSImage imageNamed: @"ActionOn.png"];
-        fActionOffIcon = [NSImage imageNamed: @"ActionOff.png"];
-        
         fClickPoint = NSZeroPoint;
         fClickIn = NO;
         
@@ -477,16 +464,17 @@
     NSImage * pauseImage = nil;
     NSRect pauseRect  = [self pauseRectForRow: row];
     if ([torrent isActive])
-        pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? fPauseOnIcon : fPauseOffIcon;
+        pauseImage = fClickIn && NSPointInRect(fClickPoint, pauseRect) ? [NSImage imageNamed: @"PauseOn.png"]
+                                                                        : [NSImage imageNamed: @"PauseOff.png"];
     else
     {
         BOOL inPauseRect = fClickIn && NSPointInRect(fClickPoint, pauseRect);
         if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
-            pauseImage = inPauseRect ? fResumeNoWaitOnIcon : fResumeNoWaitOffIcon;
+            pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeNoWaitOn.png"] : [NSImage imageNamed: @"ResumeNoWaitOff.png"];
         else if ([torrent waitingToStart])
-            pauseImage = inPauseRect ? fPauseOnIcon : fPauseOffIcon;
+            pauseImage = inPauseRect ? [NSImage imageNamed: @"PauseOn.png"] : [NSImage imageNamed: @"PauseOff.png"];
         else
-            pauseImage = inPauseRect ? fResumeOnIcon : fResumeOffIcon;
+            pauseImage = inPauseRect ? [NSImage imageNamed: @"ResumeOn.png"] : [NSImage imageNamed: @"ResumeOff.png"];
     }
     
     if (pauseImage)
@@ -494,14 +482,16 @@
     
     //reveal icon
     NSRect revealRect = [self revealRectForRow: row];
-    NSImage * revealImage = fClickIn && NSPointInRect(fClickPoint, revealRect) ? fRevealOnIcon : fRevealOffIcon;
+    NSImage * revealImage = fClickIn && NSPointInRect(fClickPoint, revealRect) ? [NSImage imageNamed: @"RevealOn.png"]
+                                                                                : [NSImage imageNamed: @"RevealOff.png"];
     [revealImage compositeToPoint: NSMakePoint(revealRect.origin.x, NSMaxY(revealRect)) operation: NSCompositeSourceOver];
     
     //action icon
     if (![fDefaults boolForKey: @"SmallView"])
     {
         NSRect actionRect = [self actionRectForRow: row];
-        NSImage * actionImage = NSPointInRect(fClickPoint, actionRect) ? fActionOnIcon : fActionOffIcon;
+        NSImage * actionImage = NSPointInRect(fClickPoint, actionRect) ? [NSImage imageNamed: @"ActionOn.png"]
+                                                                        : [NSImage imageNamed: @"ActionOff.png"];
         [actionImage compositeToPoint: NSMakePoint(actionRect.origin.x, NSMaxY(actionRect)) operation: NSCompositeSourceOver];
     }
 }

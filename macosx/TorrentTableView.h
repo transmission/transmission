@@ -44,9 +44,6 @@
     NSUserDefaults * fDefaults;
     
     IBOutlet NSMenu * fContextRow, * fContextNoRow;
-    NSImage * fResumeOnIcon, * fResumeOffIcon, * fPauseOnIcon, * fPauseOffIcon,
-            * fResumeNoWaitOnIcon, * fResumeNoWaitOffIcon, * fRevealOnIcon, * fRevealOffIcon,
-            * fActionOnIcon, * fActionOffIcon;
     
     NSMutableArray * fKeyStrokes;
     

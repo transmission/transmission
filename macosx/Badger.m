@@ -51,7 +51,7 @@
         
         if ([NSApp isOnLeopardOrBetter])
         {
-            BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: fLib];
+            BadgeView * view = [[BadgeView alloc] initWithFrame: [[[NSApp dockTile] contentView] frame] lib: lib];
             [[NSApp dockTile] setContentView: view];
             [view release];
         }
@@ -217,7 +217,7 @@
     }
 }
 
-//for quitting
+//for quitting -- only needed by Tiger
 - (void) clearBadge
 {
     if (![NSApp isOnLeopardOrBetter])

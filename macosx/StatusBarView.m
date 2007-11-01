@@ -33,12 +33,12 @@
 
 - (BOOL) isOpaque
 {
-    return [[self window] isKeyWindow];
+    return [[self window] isMainWindow];
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    if ([[self window] isKeyWindow])
+    if ([[self window] isMainWindow])
         [super drawRect: rect];
 }
 

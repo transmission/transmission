@@ -45,6 +45,12 @@
     return self;
 }
 
+- (void) dealloc
+{
+    [fAttributes release];
+    [super dealloc];
+}
+
 - (void) drawRect: (NSRect) rect
 {
     [[NSImage imageNamed: @"NSApplicationIcon"] drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
