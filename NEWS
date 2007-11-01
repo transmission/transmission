@@ -1,10 +1,13 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+1.00 (zzzz/xx/yy)
+- OS X:
+   + Leopard: Time Machine will ignore incomplete downloads
+
 0.92 (2007/xx/yy)
 - All Platforms:
    + Fix 0.90 data corruption bugs.
 - OS X:
-   + Leopard: Time Machine will ignore incomplete downloads
    + Leopard: Fix bug with typing values in Inspector->Options
    + Leopard: Fix bug with toggling Minimal View
 - GTK
