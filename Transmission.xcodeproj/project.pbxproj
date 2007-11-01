@@ -126,6 +126,7 @@
 		A2A3065E0AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306560AAD24A80049E2AC /* UKFNSubscribeFileWatcher.m */; };
 		A2A306600AAD24A80049E2AC /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A306580AAD24A80049E2AC /* UKKQueue.m */; };
 		A2A306620AAD24A80049E2AC /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */; };
+		A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A6321A0CD9751700E3DA60 /* BadgeView.m */; };
 		A2A6E3A00CA7E4C900F10FEF /* AboutWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */; };
 		A2AA579D0ADFCAB400CA59F6 /* PiecesView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */; };
 		A2AE68330C628A35008753C9 /* Creator.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2AE68310C628A35008753C9 /* Creator.nib */; };
@@ -469,6 +470,8 @@
 		A2A306580AAD24A80049E2AC /* UKKQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKKQueue.m; path = macosx/UKKQueue/UKKQueue.m; sourceTree = "<group>"; };
 		A2A306590AAD24A80049E2AC /* UKMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UKMainThreadProxy.h; path = macosx/UKKQueue/UKMainThreadProxy.h; sourceTree = "<group>"; };
 		A2A3065A0AAD24A80049E2AC /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = UKMainThreadProxy.m; path = macosx/UKKQueue/UKMainThreadProxy.m; sourceTree = "<group>"; };
+		A2A632190CD9751700E3DA60 /* BadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeView.h; path = macosx/BadgeView.h; sourceTree = "<group>"; };
+		A2A6321A0CD9751700E3DA60 /* BadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeView.m; path = macosx/BadgeView.m; sourceTree = "<group>"; };
 		A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AboutWindow.nib; path = macosx/AboutWindow.nib; sourceTree = "<group>"; };
 		A2AA579A0ADFCAB400CA59F6 /* PiecesView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PiecesView.h; path = macosx/PiecesView.h; sourceTree = "<group>"; };
 		A2AA579B0ADFCAB400CA59F6 /* PiecesView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PiecesView.m; path = macosx/PiecesView.m; sourceTree = "<group>"; };
@@ -715,6 +718,8 @@
 				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.m */,
+				A2A632190CD9751700E3DA60 /* BadgeView.h */,
+				A2A6321A0CD9751700E3DA60 /* BadgeView.m */,
 				A256588A0A9A695400E8A03B /* MessageWindowController.h */,
 				A256588B0A9A695400E8A03B /* MessageWindowController.m */,
 				A2DF37040C220D03006523C1 /* CreatorWindowController.h */,
@@ -1529,6 +1534,7 @@
 				A257C1820CAD3003004E121C /* PeerTableView.m in Sources */,
 				A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */,
 				A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */,
+				A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
