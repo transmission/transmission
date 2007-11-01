@@ -220,7 +220,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     #warning find a better way
     //check if the file is created for Time Machine
-    if (fNeedSetTimeMachine)
+    if (fNeedSetTimeMachine && [self isActive])
     {
         NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
         fNeedSetTimeMachine = CSBackupSetItemExcluded((CFURLRef)url, ![self allDownloaded], false) != noErr;
