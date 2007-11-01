@@ -3237,7 +3237,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fWindow makeKeyAndOrderFront: nil];
 }
 
-- (void) windowDidBecomeKey: (NSNotification *) notification
+- (void) windowDidBecomeMain: (NSNotification *) notification
 {
     [fStatusBar setNeedsDisplay: YES];
     
@@ -3245,7 +3245,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self updateUI];
 }
 
-- (void) windowDidResignKey: (NSNotification *) notification
+- (void) windowDidResignMain: (NSNotification *) notification
 {
     [fStatusBar setNeedsDisplay: YES];
 }
