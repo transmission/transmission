@@ -89,15 +89,13 @@ AM_CONDITIONAL([WITH_GTK],[test "x$use_gtk" = "xyes"])
 AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_CFLAGS)
 
-if test "x$use_gtk" = "xyes"; then
-    IT_PROG_INTLTOOL([0.23],[no-xml])
-    GETTEXT_PACKAGE=transmission
-    AC_SUBST(GETTEXT_PACKAGE)
-    AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
-    AM_GLIB_GNU_GETTEXT
-    transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
-    AC_SUBST(transmissionlocaledir)
-fi
+IT_PROG_INTLTOOL([0.23],[no-xml])
+GETTEXT_PACKAGE=transmission
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
+AM_GLIB_GNU_GETTEXT
+transmissionlocaledir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(transmissionlocaledir)
 
 dnl ----------------------------------------------------------------------------
 dnl
@@ -211,12 +209,9 @@ AC_CONFIG_FILES([Makefile
                  third-party/Makefile
                  macosx/Makefile
                  wx/Makefile
-                 wx/images/Makefile])
-
-if test "x$use_gtk" = "xyes"; then
-    AC_CONFIG_FILES([gtk/Makefile
-                     po/Makefile.in])
-fi
+                 wx/images/Makefile
+                 gtk/Makefile
+                 po/Makefile.in])
 
 ac_configure_args="$ac_configure_args --enable-static --disable-shared -q"
 AC_OUTPUT
