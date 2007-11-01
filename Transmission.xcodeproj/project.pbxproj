@@ -1856,12 +1856,97 @@
 				);
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
 			name = Release;
+		};
+		A250CFEB0CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = "Release - Debug";
+		};
+		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = macosx;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
+				INFOPLIST_FILE = macosx/Info.plist;
+				PRODUCT_NAME = Transmission;
+				WRAPPER_EXTENSION = app;
+			};
+			name = "Release - Debug";
+		};
+		A250CFED0CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
+				PRODUCT_NAME = transmissioncli;
+			};
+			name = "Release - Debug";
+		};
+		A250CFEE0CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = (
+					"-DSYS_DARWIN",
+					"-DHAVE_OPENSSL",
+					"-D__TRANSMISSION__",
+					"-DHAVE_STRLCPY",
+					"-DHAVE_STRLCAT",
+					"-DHAVE_ASPRINTF",
+					"-DHAVE_LIBGEN",
+				);
+				PRODUCT_NAME = transmission;
+			};
+			name = "Release - Debug";
+		};
+		A250CFEF0CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
+				PRODUCT_NAME = "transmission-daemon";
+			};
+			name = "Release - Debug";
+		};
+		A250CFF00CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
+				PRODUCT_NAME = "transmission-remote";
+			};
+			name = "Release - Debug";
+		};
+		A250CFF10CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = .;
+				PRODUCT_NAME = "transmission-proxy";
+			};
+			name = "Release - Debug";
+		};
+		A250CFF20CDA19680068B4B6 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
+				PRODUCT_NAME = event;
+				USER_HEADER_SEARCH_PATHS = "./third-party/libevent ./third-party/libevent/compat";
+			};
+			name = "Release - Debug";
 		};
 		BE75C34B0C729EB600DBEFE0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1903,6 +1988,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4D18389C09DEC01E0047D688 /* Release */,
+				A250CFEE0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D40C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1912,6 +1998,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DDBB71E09E16BF100284745 /* Release */,
+				A250CFED0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D60C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1921,6 +2008,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C599089918A300DD8943 /* Release */,
+				A250CFEC0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D50C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1930,6 +2018,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DF0C59D089918A300DD8943 /* Release */,
+				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
 				0053D3DA0C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1939,6 +2028,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE75C34B0C729EB600DBEFE0 /* Release */,
+				A250CFF20CDA19680068B4B6 /* Release - Debug */,
 				0053D3D30C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1948,6 +2038,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFC1C0A0C07753800B0BB3C /* Release */,
+				A250CFEF0CDA19680068B4B6 /* Release - Debug */,
 				0053D3D70C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1957,6 +2048,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFC1CF80C07822400B0BB3C /* Release */,
+				A250CFF00CDA19680068B4B6 /* Release - Debug */,
 				0053D3D80C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1966,6 +2058,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFC1D420C0783EE00B0BB3C /* Release */,
+				A250CFF10CDA19680068B4B6 /* Release - Debug */,
 				0053D3D90C86774200545606 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
