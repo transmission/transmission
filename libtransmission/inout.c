@@ -62,9 +62,9 @@ readOrWriteBytes( const tr_torrent  * tor,
     int fd = -1;
     int ret;
 
-    assert ( 0<=fileIndex && fileIndex<info->fileCount );
-    assert ( !file->length || (fileOffset < file->length));
-    assert ( fileOffset + buflen <= file->length );
+    assert( 0<=fileIndex && fileIndex<info->fileCount );
+    assert( !file->length || (fileOffset < file->length));
+    assert( fileOffset + buflen <= file->length );
 
     tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
 
@@ -89,29 +89,29 @@ readOrWriteBytes( const tr_torrent  * tor,
 
 static void
 findFileLocation( const tr_torrent * tor,
-                  int                  pieceIndex,
-                  int                  pieceOffset,
-                  int                * fileIndex,
-                  uint64_t           * fileOffset )
+                  int                pieceIndex,
+                  int                pieceOffset,
+                  int              * fileIndex,
+                  uint64_t         * fileOffset )
 {
     const tr_info * info = &tor->info;
 
     int i;
     uint64_t piecePos = ((uint64_t)pieceIndex * info->pieceSize) + pieceOffset;
 
-    assert ( 0<=pieceIndex && pieceIndex < info->pieceCount );
-    assert ( 0<=tor->info.pieceSize );
-    assert ( pieceOffset < tr_torPieceCountBytes( tor, pieceIndex ) );
-    assert ( piecePos < info->totalSize );
+    assert( 0<=pieceIndex && pieceIndex < info->pieceCount );
+    assert( 0<=tor->info.pieceSize );
+    assert( pieceOffset < tr_torPieceCountBytes( tor, pieceIndex ) );
+    assert( piecePos < info->totalSize );
 
-    for ( i=0; info->files[i].length<=piecePos; ++i )
-      piecePos -= info->files[i].length;
+    for( i=0; info->files[i].length<=piecePos; ++i )
+        piecePos -= info->files[i].length;
 
     *fileIndex = i;
     *fileOffset = piecePos;
 
-    assert ( 0<=*fileIndex && *fileIndex<info->fileCount );
-    assert ( *fileOffset < info->files[i].length );
+    assert( 0<=*fileIndex && *fileIndex<info->fileCount );
+    assert( *fileOffset < info->files[i].length );
 }
 
 #ifdef WIN32
@@ -126,10 +126,10 @@ ensureMinimumFileSize( const tr_torrent  * tor,
     const tr_file * file = &tor->info.files[fileIndex];
     char path[MAX_PATH_LENGTH];
 
-    assert ( 0<=fileIndex && fileIndex<tor->info.fileCount );
-    assert ( minBytes <= file->length );
+    assert( 0<=fileIndex && fileIndex<tor->info.fileCount );
+    assert( minBytes <= file->length );
 
-    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+    tr_buildPath( path, sizeof(path), tor->destination, file->name, NULL );
 
     fd = tr_fdFileOpen( path, TRUE );
     if( fd < 0 ) /* bad fd */
@@ -191,13 +191,21 @@ readOrWritePiece( tr_torrent  * tor,
 }
 
 int
-tr_ioRead( tr_torrent * tor, int pieceIndex, int begin, int len, uint8_t * buf )
+tr_ioRead( tr_torrent  * tor,
+           int           pieceIndex,
+           int           begin,
+           int           len,
+           uint8_t     * buf )
 {
     return readOrWritePiece( tor, TR_IO_READ, pieceIndex, begin, buf, len );
 }
 
 int
-tr_ioWrite( tr_torrent * tor, int pieceIndex, int begin, int len, uint8_t * buf )
+tr_ioWrite( tr_torrent  * tor,
+            int           pieceIndex,
+            int           begin,
+            int           len,
+            uint8_t     * buf )
 {
     return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, buf, len );
 }
