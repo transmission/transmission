@@ -163,8 +163,9 @@ myDebug( const char * file, int line,
         struct evbuffer * buf = evbuffer_new( );
         char * myfile = tr_strdup( file );
 
-        evbuffer_add_printf( buf, "[%s] %s [%s]: ",
+        evbuffer_add_printf( buf, "[%s] %s - %s [%s]: ",
                              tr_getLogTimeStr( timestr, sizeof(timestr) ),
+                             msgs->torrent->info.name,
                              tr_peerIoGetAddrStr( msgs->io ),
                              msgs->info->client );
         va_start( args, fmt );

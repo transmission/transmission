@@ -89,6 +89,8 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
+    TR_MAX_SOCKETS = 1024,
+
     TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
     TR_RESERVED_FDS   = 16 /* sockets reserved for tracker connections */
@@ -125,16 +127,17 @@ static int
 TrOpenFile( int i, const char * filename, int write )
 {
     struct tr_openfile * file = &gFd->open[i];
-    char * dir;
     int flags;
 
     tr_dbg( "Opening '%s' (%d)", filename, write );
 
     /* create subfolders, if any */
-    dir = dirname( tr_strdup( filename ) );
-    if( write && tr_mkdirp( dir, 0700 ) ) {
-        free( dir );
-        return tr_ioErrorFromErrno( );
+    if( write ) {
+        char * dir = dirname( tr_strdup( filename ) );
+        const int val = tr_mkdirp( dir, 0700 );
+        tr_free( dir );
+        if( val )
+            return tr_ioErrorFromErrno( );
     }
 
     /* open the file */
@@ -144,7 +147,6 @@ TrOpenFile( int i, const char * filename, int write )
 #endif
     errno = 0;
     file->fd = open( filename, flags, 0600 );
-    free( dir );
     if( file->fd < 0 ) {
         if( errno ) {
             tr_err( "Couldn't open '%s': %s", filename, strerror(errno) );
@@ -232,7 +234,7 @@ tr_fdFileOpen( const char * filename, int write )
     dbgmsg( "it's not already open.  looking for an open slot or an old file." );
     for( ;; )
     {
-        uint64_t date = tr_date() + 1;
+        uint64_t date = tr_date( ) + 1;
         winner = -1;
 
         for( i=0; i<TR_MAX_OPEN_FILES; ++i )
@@ -280,7 +282,7 @@ done:
 
     dbgmsg( "checking out '%s' in slot %d", filename, winner );
     o->isCheckedOut = 1;
-    o->date = tr_date();
+    o->date = tr_date( );
     tr_lockUnlock( gFd->lock );
     return o->fd;
 }
@@ -295,8 +297,7 @@ tr_fdFileRelease( int file )
         struct tr_openfile * o = &gFd->open[i];
         if( o->fd == file ) {
             dbgmsg( "releasing file '%s' in slot #%d", o->filename, i );
-            if( o->isWritable )
-                fsync( o->fd ); /* fflush */
+            fsync( o->fd );
             o->isCheckedOut = 0;
             break;
         }
@@ -328,23 +329,23 @@ socketWasReserved( int fd )
 }
 
 int
-tr_fdSocketCreate( int type, int priority )
+tr_fdSocketCreate( int type, int isReserved )
 {
     int s = -1;
     tr_lockLock( gFd->lock );
 
-    if( priority && gFd->reserved >= TR_RESERVED_FDS )
-        priority = FALSE;
+    if( isReserved && gFd->reserved >= TR_RESERVED_FDS )
+        isReserved = FALSE;
 
-    if( priority || ( gFd->normal < gFd->normalMax ) )
+    if( isReserved || ( gFd->normal < gFd->normalMax ) )
         if( ( s = socket( AF_INET, type, 0 ) ) < 0 )
             tr_err( "Couldn't create socket (%s)", strerror( sockerrno ) );
 
     if( s > -1 )
     {
-        setSocketPriority( s, priority );
+        setSocketPriority( s, isReserved );
 
-        if( priority )
+        if( isReserved )
             ++gFd->reserved;
         else
             ++gFd->normal;
@@ -375,7 +376,7 @@ tr_fdSocketAccept( int b, struct in_addr * addr, tr_port_t * port )
     }
     if( s > -1 )
     {
-        setSocketPriority( s, 0 );
+        setSocketPriority( s, FALSE );
         *addr = sock.sin_addr;
         *port = sock.sin_port;
         gFd->normal++;
@@ -423,7 +424,7 @@ tr_fdSocketClose( int s )
 void
 tr_fdInit( void )
 {
-    int i, j, s[4096];
+    int i, j, s[TR_MAX_SOCKETS];
 
     assert( gFd == NULL );
 
@@ -432,7 +433,7 @@ tr_fdInit( void )
     gFd->cond = tr_condNew( );
 
     /* count the max number of sockets we can use */
-    for( i=0; i<4096; ++i )
+    for( i=0; i<TR_MAX_SOCKETS; ++i )
         if( ( s[i] = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
             break;
     for( j=0; j<i; ++j )
