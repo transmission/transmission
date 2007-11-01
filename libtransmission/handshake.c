@@ -810,7 +810,7 @@ readIA( tr_handshake * handshake, struct evbuffer * inbuf )
 {
     int i;
     const size_t needlen = handshake->ia_len;
-    struct evbuffer * outbuf = evbuffer_new( );
+    struct evbuffer * outbuf;
     uint32_t crypto_select;
 
 dbgmsg( handshake, "reading IA... have %d, need %d", (int)EVBUFFER_LENGTH(inbuf), (int)needlen );
@@ -822,7 +822,6 @@ dbgmsg( handshake, "reading IA..." );
     i = parseHandshake( handshake, inbuf );
 dbgmsg( handshake, "parseHandshake returned %d", i );
     if( i != HANDSHAKE_OK ) {
-        evbuffer_free( outbuf );
         tr_handshakeDone( handshake, FALSE );
         return READ_DONE;
     }
@@ -832,6 +831,7 @@ dbgmsg( handshake, "parseHandshake returned %d", i );
     **/
 
     tr_cryptoEncryptInit( handshake->crypto );
+    outbuf = evbuffer_new( );
 
 dbgmsg( handshake, "sending vc" );
     /* send VC */
