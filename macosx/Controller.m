@@ -592,11 +592,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //wait for running transfers to stop and for NAT to be disabled (5 second timeout)
     NSDate * startDate = [NSDate date];
     
-    tr_close(fLib);
-    
     while ([startDate timeIntervalSinceNow] >= -5.0 && tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED)
         usleep(100000);
     
+    //remaining calls the same as dealloc 
     [fInfoController release];
     [fMessageController release];
     [fPrefsController release];
@@ -611,6 +610,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fAutoImportedNames release];
     [fPendingTorrentDownloads release];
     [fTempTorrentFiles release];
+    
+    tr_close(fLib);
 }
 
 - (void) handleOpenContentsEvent: (NSAppleEventDescriptor *) event replyEvent: (NSAppleEventDescriptor *) replyEvent
