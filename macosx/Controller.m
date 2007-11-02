@@ -521,6 +521,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    //stop timers and notification checking
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [fTimer invalidate];
+    [fSpeedLimitTimer invalidate];
+    if (fAutoImportTimer)
+    {   
+        if ([fAutoImportTimer isValid])
+            [fAutoImportTimer invalidate];
+        [fAutoImportTimer release];
+    }
+    
     //remove all torrent downloads
     if (fPendingTorrentDownloads)
     {
@@ -544,16 +556,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         while ((path = [torrentEnumerator nextObject]))
             [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
         [fTempTorrentFiles removeAllObjects];
-    }
-    
-    //stop timers
-    [fTimer invalidate];
-    [fSpeedLimitTimer invalidate];
-    if (fAutoImportTimer)
-    {   
-        if ([fAutoImportTimer isValid])
-            [fAutoImportTimer invalidate];
-        [fAutoImportTimer release];
     }
     
     //remember window states and close all windows
@@ -587,8 +589,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         usleep(100000);
     
     //remaining calls the same as dealloc
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    
     [fInfoController release];
     [fMessageController release];
     [fPrefsController release];
