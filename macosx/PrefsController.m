@@ -73,8 +73,7 @@
             [[UKKQueue sharedFileWatcher] addPath: [autoPath stringByExpandingTildeInPath]];
         
         //set bind port
-        int bindPort = [fDefaults integerForKey: @"BindPort"];
-        tr_setBindPort(fHandle, bindPort);
+        tr_setBindPort(fHandle, [fDefaults integerForKey: @"BindPort"]);
         
         //set NAT
         tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);

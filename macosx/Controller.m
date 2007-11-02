@@ -588,11 +588,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fBadger clearBadge];
     
     //wait for running transfers to stop and for NAT to be disabled (5 second timeout)
-    NSDate * start = [NSDate date];
+    NSDate * startDate = [NSDate date];
     
     tr_close(fLib);
     
-    while ([start timeIntervalSinceNow] >= -5.0 && tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED)
+    while ([startDate timeIntervalSinceNow] >= -5.0 && tr_handleStatus(fLib)->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED)
         usleep(100000);
     
     //remaining calls the same as dealloc
