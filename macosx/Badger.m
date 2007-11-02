@@ -173,11 +173,8 @@
                     stringRect.origin.y += spaceBetween;
                 }
                 
-                if (!fDownloadBadge)
-                    fDownloadBadge = [NSImage imageNamed: @"DownloadBadge"];
-                
                 //place badge and text
-                [fDownloadBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+                [[NSImage imageNamed: @"DownloadBadge"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
                 [self badgeString: downloadRateString forRect: stringRect];
             }
             

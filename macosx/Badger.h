@@ -29,7 +29,7 @@
 {
     tr_handle       * fLib;
     
-    NSImage         * fDockIcon, * fBadge, * fUploadBadge, * fDownloadBadge;
+    NSImage         * fDockIcon, * fBadge, * fUploadBadge;
     
     NSDictionary    * fAttributes;
     int             fCompleted, fCompletedBadged;

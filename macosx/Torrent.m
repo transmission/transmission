@@ -1631,7 +1631,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             if ([NSApp isOnLeopardOrBetter])
             {
                 NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-                CSBackupSetItemExcluded((CFURLRef)url, false, false);
+                fNeedSetTimeMachine = CSBackupSetItemExcluded((CFURLRef)url, false, false) != noErr;
             }
             
             fStat = tr_torrentStat(fHandle);
@@ -1643,7 +1643,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             if ([NSApp isOnLeopardOrBetter])
             {
                 NSURL *url = [NSURL fileURLWithPath: [[self downloadFolder] stringByAppendingPathComponent: [self name]]];
-                CSBackupSetItemExcluded((CFURLRef)url, true, false);
+                fNeedSetTimeMachine = CSBackupSetItemExcluded((CFURLRef)url, true, false) != noErr;
             }
             
             [[NSNotificationCenter defaultCenter] postNotificationName: @"TorrentRestartedDownloading" object: self];
