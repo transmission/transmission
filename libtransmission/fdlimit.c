@@ -133,9 +133,9 @@ TrOpenFile( int i, const char * filename, int write )
 
     /* create subfolders, if any */
     if( write ) {
-        char * dir = dirname( tr_strdup( filename ) );
-        const int val = tr_mkdirp( dir, 0700 );
-        tr_free( dir );
+        char * tmp = tr_strdup( filename );
+        const int val = tr_mkdirp( dirname(tmp), 0700 );
+        tr_free( tmp );
         if( val )
             return tr_ioErrorFromErrno( );
     }
