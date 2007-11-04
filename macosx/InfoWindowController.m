@@ -955,6 +955,12 @@ typedef enum
     return nil;
 }
 
+#warning should keep?
+- (BOOL) outlineView: (NSOutlineView *) outlineView isGroupItem: (id) item
+{
+    return /*[[item objectForKey: @"IsFolder"] boolValue]*/NO;
+}
+
 - (float) outlineView: (NSOutlineView *) outlineView heightOfRowByItem: (id) item
 {
     if ([[item objectForKey: @"IsFolder"] boolValue])

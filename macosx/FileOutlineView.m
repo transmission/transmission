@@ -25,6 +25,7 @@
 #import "FileOutlineView.h"
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
+#import "NSApplicationAdditions.h"
 #import "Torrent.h"
 
 @implementation FileOutlineView
@@ -114,11 +115,12 @@
     return fHoverRow;
 }
 
+#warning remove unneeded code
 - (void) drawRow: (int) row clipRect: (NSRect) clipRect
 {
-    if (![self isRowSelected: row])
+    NSDictionary * item = [self itemAtRow: row];
+    if (![self isRowSelected: row] && (![NSApp isOnLeopardOrBetter] || ![[item objectForKey: @"IsFolder"] boolValue]))
     {
-        NSDictionary * item = [self itemAtRow: row];
         NSIndexSet * indexes = [item objectForKey: @"Indexes"];
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)

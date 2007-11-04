@@ -31,8 +31,4 @@
     NSMutableDictionary * fTitleAttributes, * fStatusAttributes;
 }
 
-- (NSRect) imageRectForBounds: (NSRect) bounds;
-- (NSRect) titleRectForBounds: (NSRect) bounds;
-- (NSRect) statusRectForBounds: (NSRect) bounds;
-
 @end

@@ -477,7 +477,6 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
         {
             if (fPieces[i] != 0)
             {
-                #warning make nicer color
                 color = kGray;
                 fPieces[i] = 0;
                 change = YES;
