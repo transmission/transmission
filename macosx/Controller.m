@@ -2495,6 +2495,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [self setWindowSizeToFit];
 }
 
+- (void) togglePiecesBar: (id) sender
+{
+    [fDefaults setBool: ![fDefaults boolForKey: @"PiecesBar"] forKey: @"PiecesBar"];
+    [fTableView reloadData];
+}
+
 - (void) toggleStatusBar: (id) sender
 {
     [self showStatusBar: [fStatusBar isHidden] animate: YES];
@@ -2854,12 +2860,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return [fWindow attachedSheet] == nil;
     
     //enable sort and advanced bar items
-    if (action == @selector(setSort:) /*|| action == @selector(toggleAdvancedBar:) ||*/)
+    if (action == @selector(setSort:))
         return [fWindow isVisible];
     
     if (action == @selector(toggleSmallView:))
     {
         [menuItem setState: [fDefaults boolForKey: @"SmallView"] ? NSOnState : NSOffState];
+        return [fWindow isVisible];
+    }
+    
+    if (action == @selector(togglePiecesBar:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"PiecesBar"] ? NSOnState : NSOffState];
         return [fWindow isVisible];
     }
 

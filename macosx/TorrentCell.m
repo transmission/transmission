@@ -48,9 +48,22 @@
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
+#define MAX_PIECES 324
+#define BLANK_PIECE -99
+
 @interface TorrentCell (Private)
 
+// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
+static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
+                kBlue1  = OSSwapBigToHostConstInt32(0x84FFFFFF), //204, 255, 255
+                kBlue2  = OSSwapBigToHostConstInt32(0x6BFFFFFF), //153, 255, 255
+                kBlue3  = OSSwapBigToHostConstInt32(0x6B84FFFF), //153, 204, 255
+                kBlue4  = OSSwapBigToHostConstInt32(0x426BFFFF), //102, 153, 255
+                kGray   = OSSwapBigToHostConstInt32(0x969696FF); //150, 150, 150
+
 - (void) drawBar: (NSRect) barRect;
+- (void) drawRegularBar: (NSRect) barRect;
+- (void) drawPiecesBar: (NSRect) barRect;
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds;
 - (NSRect) rectForTitleWithString: (NSAttributedString *) string basedOnMinimalStatusRect: (NSRect) statusRect
@@ -86,6 +99,25 @@
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
 	return self;
+}
+
+- (id) copyWithZone: (NSZone *) zone
+{
+    TorrentCell * copy = [super copyWithZone: zone];
+    
+    copy->fBitmap = nil;
+    copy->fPieces = NULL;
+    
+    return copy;
+}
+
+- (void) dealloc
+{
+    [fBitmap release];
+    if (fPieces)
+        free(fPieces);
+    
+    [super dealloc];
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds
@@ -229,8 +261,7 @@
     }
     
     //bar
-    NSRect barRect = [self barRectForBounds: cellFrame];
-    [self drawBar: barRect];
+    [self drawBar: [self barRectForBounds: cellFrame]];
     
     //status
     if (!minimal)
@@ -245,6 +276,25 @@
 @implementation TorrentCell (Private)
 
 - (void) drawBar: (NSRect) barRect
+{
+    if ([fDefaults boolForKey: @"PiecesBar"])
+    {
+        NSRect regularBarRect = barRect, piecesBarRect = barRect;
+        regularBarRect.size.height /= 3;
+        piecesBarRect.origin.y += regularBarRect.size.height;
+        piecesBarRect.size.height -= regularBarRect.size.height;
+        
+        [self drawRegularBar: regularBarRect];
+        [self drawPiecesBar: piecesBarRect];
+    }
+    else
+        [self drawRegularBar: barRect];
+    
+    [fBarOverlayColor set];
+    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
+}
+
+- (void) drawRegularBar: (NSRect) barRect
 {
     Torrent * torrent = [self representedObject];
     
@@ -376,9 +426,128 @@
             }
         }
     }
+}
+
+- (void) drawPiecesBar: (NSRect) barRect
+{
+    if (!fBitmap)
+        fBitmap = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: nil
+            pixelsWide: MAX_PIECES pixelsHigh: barRect.size.height bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
+            isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
-    [fBarOverlayColor set];
-    [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
+    uint32_t * p;
+    uint8_t * bitmapData = [fBitmap bitmapData];
+    int bytesPerRow = [fBitmap bytesPerRow];
+    
+    if (!fPieces)
+    {
+        fPieces = malloc(MAX_PIECES);
+        int i;
+        for (i = 0; i < MAX_PIECES; i++)
+            fPieces[i] = BLANK_PIECE;
+    }
+    
+    #warning add flashing orange
+    
+    Torrent * torrent = [self representedObject];
+    
+    #warning redo like pieces view
+    int pieceCount = [torrent pieceCount];
+    float * piecePercent = malloc(pieceCount * sizeof(float));
+    [torrent getAmountFinished: piecePercent size: pieceCount];
+    
+    //lines 2 to 14: blue, green, or gray depending on piece availability
+    int i, h, index = 0;
+    float increment = (float)pieceCount / MAX_PIECES, indexValue = 0;
+    uint32_t color;
+    BOOL change;
+    for (i = 0; i < MAX_PIECES; i++)
+    {
+        change = NO;
+        if (piecePercent[index] >= 1.0)
+        {
+            if (fPieces[i] != -1)
+            {
+                color = kBlue;
+                fPieces[i] = -1;
+                change = YES;
+            }
+        }
+        else if (piecePercent[index] <= 0.0)
+        {
+            if (fPieces[i] != 0)
+            {
+                #warning make nicer color
+                color = kGray;
+                fPieces[i] = 0;
+                change = YES;
+            }
+        }
+        else if (piecePercent[index] <= 0.25)
+        {
+            if (fPieces[i] != 1)
+            {
+                color = kBlue1;
+                fPieces[i] = 1;
+                change = YES;
+            }
+        }
+        else if (piecePercent[index] <= 0.5)
+        {
+            if (fPieces[i] != 2)
+            {
+                color = kBlue2;
+                fPieces[i] = 2;
+                change = YES;
+            }
+        }
+        else if (piecePercent[index] <= 0.75)
+        {
+            if (fPieces[i] != 3)
+            {
+                color = kBlue3;
+                fPieces[i] = 3;
+                change = YES;
+            }
+        }
+        else
+        {
+            if (fPieces[i] != 4)
+            {
+                color = kBlue4;
+                fPieces[i] = 4;
+                change = YES;
+            }
+        }
+        
+        if (change)
+        {
+            //draw vertically
+            p = (uint32_t *)(bitmapData) + i;
+            for (h = 0; h < barRect.size.height; h++)
+            {
+                p[0] = color;
+                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
+            }
+        }
+        
+        indexValue += increment;
+        index = (int)indexValue;
+    }
+    
+    free(piecePercent);
+    
+    //actually draw image
+    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
+    [bar setFlipped: YES];
+    [bar addRepresentation: fBitmap];
+    
+    [bar drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [bar release];
+    
+    if (!fTransparentGradient)
+        fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
+    [fTransparentGradient fillRect: barRect angle: -90];
 }
 
 - (NSRect) rectForMinimalStatusWithString: (NSAttributedString *) string inBounds: (NSRect) bounds

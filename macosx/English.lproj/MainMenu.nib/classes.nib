@@ -147,6 +147,8 @@
 				<string>id</string>
 				<key>toggleFilterBar</key>
 				<string>id</string>
+				<key>togglePiecesBar</key>
+				<string>id</string>
 				<key>toggleSmallView</key>
 				<string>id</string>
 				<key>toggleSpeedLimit</key>

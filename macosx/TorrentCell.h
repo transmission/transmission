@@ -34,6 +34,9 @@
     NSColor * fBarOverlayColor;
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
+    
+    NSBitmapImageRep * fBitmap;
+    int8_t * fPieces;
 }
 
 - (NSRect) iconRectForBounds: (NSRect) bounds;
