@@ -59,7 +59,7 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
                 kBlue2  = OSSwapBigToHostConstInt32(0x6BFFFFFF), //153, 255, 255
                 kBlue3  = OSSwapBigToHostConstInt32(0x6B84FFFF), //153, 204, 255
                 kBlue4  = OSSwapBigToHostConstInt32(0x426BFFFF), //102, 153, 255
-                kGray   = OSSwapBigToHostConstInt32(0x969696FF); //150, 150, 150
+                kGray   = OSSwapBigToHostConstInt32(0xE9E9E9FF); //100, 100, 100
 
 - (void) drawBar: (NSRect) barRect;
 - (void) drawRegularBar: (NSRect) barRect;
