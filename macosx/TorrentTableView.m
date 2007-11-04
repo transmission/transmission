@@ -121,23 +121,14 @@
     }
     else
     {
-        if (/*[event modifierFlags] & NSAlternateKeyMask*/NO)
+        if ([self pointInMinimalStatusRect: fClickPoint])
         {
-            [fDefaults setBool: ![fDefaults boolForKey: @"UseAdvancedBar"] forKey: @"UseAdvancedBar"];
+            [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
             fClickPoint = NSZeroPoint;
             [self reloadData];
         }
-        else
-        {
-            if ([self pointInMinimalStatusRect: fClickPoint])
-            {
-                [fDefaults setBool: ![fDefaults boolForKey: @"DisplaySmallStatusRegular"] forKey: @"DisplaySmallStatusRegular"];
-                fClickPoint = NSZeroPoint;
-                [self reloadData];
-            }
 
-            [super mouseDown: event];
-        }
+        [super mouseDown: event];
     }
 }
 

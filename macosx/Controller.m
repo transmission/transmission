@@ -2498,7 +2498,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) togglePiecesBar: (id) sender
 {
     [fDefaults setBool: ![fDefaults boolForKey: @"PiecesBar"] forKey: @"PiecesBar"];
-    [fTableView reloadData];
+    [fTableView display];
 }
 
 - (void) toggleStatusBar: (id) sender
@@ -2658,11 +2658,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fWindow makeFirstResponder: fTableView];
     }
 }
-
-/*- (void) toggleAdvancedBar: (id) sender
-{
-    [fTableView display];
-}*/
 
 - (void) doNothing: (id) sender {}
 
@@ -2859,7 +2854,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (action == @selector(openShowSheet:) || action == @selector(openURLShowSheet:))
         return [fWindow attachedSheet] == nil;
     
-    //enable sort and advanced bar items
+    //enable sort options
     if (action == @selector(setSort:))
         return [fWindow isVisible];
     
