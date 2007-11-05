@@ -5,7 +5,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
 
-0.92 (2007/xx/yy)
+0.92 (2007/11/05)
 - All Platforms:
    + Fix 0.90 data corruption bugs
    + Fix 0.90 possible delay when quitting
