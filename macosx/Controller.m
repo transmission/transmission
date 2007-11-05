@@ -411,10 +411,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [nc addObserver: self selector: @selector(updateTorrentsInQueue)
                     name: @"UpdateQueue" object: nil];
     
-    //change that just impacts the dock badge
-    [nc addObserver: self selector: @selector(updateDockBadge:)
-                    name: @"DockBadgeChange" object: nil];
-    
     //open newly created torrent file
     [nc addObserver: self selector: @selector(beginCreateFile:)
                     name: @"BeginCreateTorrentFile" object: nil];
@@ -589,7 +585,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //clear badge
     [fBadger clearBadge];
     
-    //wait for running transfers to stop and for NAT to be disabled (5 second timeout)
+    //wait for NAT to be disabled (5 second timeout)
     NSDate * startDate = [NSDate date];
     
     #warning do this in tr_close?
@@ -612,6 +608,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPendingTorrentDownloads release];
     [fTempTorrentFiles release];
     
+    //complete cleanup
     tr_close(fLib);
 }
 
@@ -3207,11 +3204,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     return fDockMenu;
-}
-
-- (void) updateDockBadge: (NSNotification *) notification
-{
-    [fBadger updateBadge];
 }
 
 - (NSRect) windowWillUseStandardFrame: (NSWindow *) window defaultFrame: (NSRect) defaultFrame

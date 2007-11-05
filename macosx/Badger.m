@@ -55,6 +55,10 @@
             [[NSApp dockTile] setContentView: view];
             [view release];
         }
+        
+        //change that just impacts the dock badge
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge)
+                                                name: @"DockBadgeChange" object: nil];
     }
     
     return self;
@@ -62,6 +66,8 @@
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     [fDockIcon release];
     [fAttributes release];
     

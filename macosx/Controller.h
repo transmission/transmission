@@ -216,8 +216,6 @@
 
 - (void) doNothing: (id) sender; //needed for menu items that use bindings with no associated action
 
-- (void) updateDockBadge: (NSNotification *) notification;
-
 - (void) setWindowSizeToFit;
 - (NSRect) sizedWindowFrame;
 
