@@ -288,7 +288,17 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
         [self drawPiecesBar: piecesBarRect];
     }
     else
+    {
+        if (fPieces)
+        {
+            free(fPieces);
+            fPieces = NULL;
+            [fBitmap release];
+            fBitmap = nil;
+        }
+        
         [self drawRegularBar: barRect];
+    }
     
     [fBarOverlayColor set];
     [NSBezierPath strokeRect: NSInsetRect(barRect, 0.5, 0.5)];
