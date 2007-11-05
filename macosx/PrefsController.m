@@ -222,7 +222,7 @@
         return;
     }
     
-    [fDefaults setInteger: fPublicPort forKey: @"BindPort"];
+    [fDefaults setInteger: port forKey: @"BindPort"];
     
     tr_setBindPort(fHandle, port);
     
