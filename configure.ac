@@ -1,4 +1,4 @@
-AC_INIT([transmission],[0.91Z],[http://transmission.m0k.org/trac/newticket])
+AC_INIT([transmission],[0.92Z],[http://transmission.m0k.org/trac/newticket])
 PEERID_PREFIX="-TR092Z-"
 USERAGENT_PREFIX="0.92+"
 AC_SUBST(PEERID_PREFIX,[$PEERID_PREFIX])
