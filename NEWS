@@ -3,7 +3,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 0.92 (2007/xx/yy)
 - All Platforms:
    + Fix 0.90 data corruption bugs
-   + Fix 0.91 UPnP fix
+   + Fix 0.91 UPnP failures
    + Fix 0.90 possible delay when quitting
    + Fix 0.90 small memory leaks
 - OS X:
