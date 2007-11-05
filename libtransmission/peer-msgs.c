@@ -450,7 +450,6 @@ sendFastReject( tr_peermsgs * msgs,
                 uint32_t      length )
 {
     assert( msgs != NULL );
-    assert( length > 0 );
 
     if( tr_peerIoSupportsFEXT( msgs->io ) )
     {
