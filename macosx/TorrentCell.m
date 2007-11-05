@@ -461,19 +461,20 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
     
     Torrent * torrent = [self representedObject];
     
-    #warning redo like pieces view
-    int pieceCount = [torrent pieceCount];
+    int pieceCount = MIN([torrent pieceCount], MAX_PIECES);
     float * piecePercent = malloc(pieceCount * sizeof(float));
     [torrent getAmountFinished: piecePercent size: pieceCount];
     
     //lines 2 to 14: blue, green, or gray depending on piece availability
-    int i, h, index = 0;
-    float increment = (float)pieceCount / MAX_PIECES, indexValue = 0;
+    int i, h, index;
+    float increment = (float)pieceCount / MAX_PIECES;
     uint32_t color;
     BOOL change;
     for (i = 0; i < MAX_PIECES; i++)
     {
+        index = i * increment;
         change = NO;
+        
         if (piecePercent[index] >= 1.0)
         {
             if (fPieces[i] != -1)
@@ -539,9 +540,6 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
                 p = (uint32_t *)((uint8_t *)p + bytesPerRow);
             }
         }
-        
-        indexValue += increment;
-        index = (int)indexValue;
     }
     
     free(piecePercent);
