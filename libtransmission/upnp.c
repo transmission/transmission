@@ -31,8 +31,6 @@
 #include <string.h>
 #include <time.h>
 
-#include <arpa/inet.h> /* inet_addr */
-
 #ifdef __BEOS__
     #include <netdb.h>
 #endif

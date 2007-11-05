@@ -38,6 +38,7 @@
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
+    #include <arpa/inet.h>
     typedef in_port_t tr_port_t;
 #endif
 
@@ -52,10 +53,6 @@
 #else
     #include <errno.h>
     #define sockerrno errno
-#endif
-
-#ifndef INADDR_NONE
-#define INADDR_NONE 0xffffffff
 #endif
 
 struct in_addr;

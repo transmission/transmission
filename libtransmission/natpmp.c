@@ -33,7 +33,6 @@
 #endif
 
 #include <sys/types.h>
-#include <arpa/inet.h> /* inet_addr */
 
 #include "transmission.h"
 #include "natpmp.h"
