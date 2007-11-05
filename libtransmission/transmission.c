@@ -308,15 +308,25 @@ tr_closeImpl( void * vh )
 
     h->isClosed = TRUE;
 }
+
+static int
+deadlineReached( const uint64_t deadline )
+{
+    return tr_date( ) >= deadline;
+}
+
 void
 tr_close( tr_handle * h )
 {
+    const int maxwait_msec = 6 * 1000;
+    const uint64_t deadline = tr_date( ) + maxwait_msec;
+
     tr_runInEventThread( h, tr_closeImpl, h );
-    while( !h->isClosed )
+    while( !h->isClosed && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
     tr_eventClose( h );
-    while( h->events != NULL )
+    while( h->events && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
     tr_lockFree( h->lock );
