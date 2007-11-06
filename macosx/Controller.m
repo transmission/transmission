@@ -1856,11 +1856,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [tempTorrents setArray: fTorrents];
     
     //set buttons with counts
-    #warning reimplement
-    /*[fNoFilterButton setCount: [fTorrents count]];
-    [fDownloadFilterButton setCount: downloading];
-    [fSeedFilterButton setCount: seeding];
-    [fPauseFilterButton setCount: paused];*/
+    #warning make better
+    [fNoFilterButton setToolTip: [fTorrents count] == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
+        : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), [fTorrents count]]];
+    [fDownloadFilterButton setToolTip: downloading == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
+        : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), downloading]];
+    [fSeedFilterButton setToolTip: seeding == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
+        : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), seeding]];
+    [fPauseFilterButton setToolTip: paused == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
+        : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), paused]];
     
     NSString * searchString = [fSearchFilterField stringValue];
     if ([searchString length] > 0)

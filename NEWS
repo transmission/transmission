@@ -2,7 +2,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 1.00 (zzzz/xx/yy)
 - All Platforms:
-   + UPnP now performed with MiniUPnP
+   + UPnP now performed by MiniUPnP
 - OS X:
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
