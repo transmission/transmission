@@ -1855,7 +1855,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (!filtering)
         [tempTorrents setArray: fTorrents];
     
-    //set buttons with counts
+    //set button tooltips
     #warning make better
     [fNoFilterButton setToolTip: [fTorrents count] == 1 ? NSLocalizedString(@"1 Transfer", "Filter Button -> tool tip")
         : [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Filter Bar Button -> tool tip"), [fTorrents count]]];

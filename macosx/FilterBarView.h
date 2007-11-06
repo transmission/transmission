@@ -23,10 +23,12 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "ImageBackgroundView.h"
 
-@interface FilterBarView : ImageBackgroundView
+@class CTGradient;
+
+@interface FilterBarView : NSView
 {
+    CTGradient * fGradient;
 }
 
 @end
