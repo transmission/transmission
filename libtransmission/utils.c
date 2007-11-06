@@ -164,7 +164,8 @@ tr_vasprintf( char **strp, const char *fmt, va_list ap )
 {
     int ret;
     struct evbuffer * buf = evbuffer_new( );
-    if( evbuffer_add_vprintf( buf, fmt, ap ) )
+    *strp = NULL;
+    if( evbuffer_add_vprintf( buf, fmt, ap ) < 0 )
         ret = -1;
     else {
         ret = EVBUFFER_LENGTH( buf );
@@ -188,7 +189,6 @@ tr_asprintf( char **strp, const char *fmt, ...)
 
 void tr_msg( int level, const char * fmt, ... )
 {
-    tr_msg_list * newmsg;
     FILE * fp;
 
     assert( NULL != messageLock );
@@ -198,8 +198,7 @@ void tr_msg( int level, const char * fmt, ... )
 
     if( !messageLevel )
     {
-        char * env;
-        env          = getenv( "TR_DEBUG" );
+        char * env = getenv( "TR_DEBUG" );
         messageLevel = ( env ? atoi( env ) : 0 ) + 1;
         messageLevel = MAX( 1, messageLevel );
     }
@@ -214,23 +213,27 @@ void tr_msg( int level, const char * fmt, ... )
         tr_vasprintf( &text, fmt, ap );
         va_end( ap );
 
-        if( messageQueuing )
+        if( text != NULL )
         {
-            newmsg = tr_new0( tr_msg_list, 1 );
-            newmsg->level = level;
-            newmsg->when = time( NULL );
-            newmsg->message = text;
+            if( messageQueuing )
+            {
+                tr_msg_list * newmsg;
+                newmsg = tr_new0( tr_msg_list, 1 );
+                newmsg->level = level;
+                newmsg->when = time( NULL );
+                newmsg->message = text;
 
-            *messageQueueTail = newmsg;
-            messageQueueTail = &newmsg->next;
-        }
-        else
-        {
-            if( fp == NULL )
-                fp = stderr;
-            fprintf( stderr, "%s\n", text );
-            tr_free( text );
-            fflush( fp );
+                *messageQueueTail = newmsg;
+                messageQueueTail = &newmsg->next;
+            }
+            else
+            {
+                if( fp == NULL )
+                    fp = stderr;
+                fprintf( stderr, "%s\n", text );
+                tr_free( text );
+                fflush( fp );
+            }
         }
     }
 
