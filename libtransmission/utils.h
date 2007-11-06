@@ -42,31 +42,18 @@ char* tr_getLogTimeStr( char * buf, int buflen );
 
 int  tr_rand ( int );
 
-/***********************************************************************
- * tr_mkdirp
- ***********************************************************************
- * Create a directory and any needed parent directories.
- * Note that the string passed in must be writable!
- **********************************************************************/
+int tr_asprintf(char **strp, const char *fmt, ...);
+
 int tr_mkdirp( const char * path, int permissions );
 
 int tr_mkdir( const char * path, int permissions );
 
 uint8_t* tr_loadFile( const char * filename, size_t * size );
 
-/***********************************************************************
- * tr_sprintf
- ***********************************************************************
- * Appends to the end of a buffer using printf formatting,
- * growing the buffer if needed
- **********************************************************************/
-int tr_sprintf( char ** buf, int * used, int * max,
-                const char * format, ... );
-/* gee, it sure would be nice if BeOS had va_copy() */
-int tr_vsprintf( char **, int *, int *, const char *, va_list, va_list );
-/* this concatenates some binary data onto the end of a buffer */
-int tr_concat( char ** buf, int * used, int * max,
-               const char * data, int len );
+int tr_vasprintf( char **strp, const char *fmt, va_list ap );
+
+int tr_asprintf( char **strp, const char *fmt, ...);
+
 
 /* creates a filename from a series of elements using the
    correct separator for filenames. */

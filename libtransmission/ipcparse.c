@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "utils.h"
 
 #include "ipcparse.h"
 #include "bsdtree.h"
@@ -363,40 +364,24 @@ ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkval( benc_val_t * pk, size_t * len )
+ipc_mkval( benc_val_t * pk, size_t * setmeSize )
 {
-    char * buf, hex[IPC_MIN_MSG_LEN+1];
-    int    used, max;
+    int bencSize = 0;
+    char * benc = tr_bencSave( pk, &bencSize );
+    uint8_t * ret = NULL;
 
-    used = IPC_MIN_MSG_LEN;
-    max  = IPC_MIN_MSG_LEN;
-    buf  = malloc( IPC_MIN_MSG_LEN );
-    if( NULL == buf )
-    {
-        return NULL;
-    }
-
-    if( tr_bencSave( pk, &buf, &used, &max ) )
-    {
-        SAFEFREE( buf );
-        return NULL;
-    }
-
-    /* ok, this check is pretty laughable */
-    if( IPC_MAX_MSG_LEN < used )
-    {
-        free( buf );
+    if( bencSize > IPC_MAX_MSG_LEN )
         errno = EFBIG;
-        return NULL;
+    else {
+        const size_t size = IPC_MIN_MSG_LEN + bencSize;
+        ret = tr_new( uint8_t, size );
+        snprintf( (char*)ret, size, "%0*X", IPC_MIN_MSG_LEN, bencSize );
+        memcpy( ret + IPC_MIN_MSG_LEN, benc, bencSize );
+        *setmeSize = size;
     }
 
-    assert( 0 <= used );
-    snprintf( hex, sizeof hex, "%0*X",
-              IPC_MIN_MSG_LEN, used - IPC_MIN_MSG_LEN );
-    memcpy( buf, hex, IPC_MIN_MSG_LEN );
-    *len = used;
-
-    return ( uint8_t * )buf;
+    tr_free( benc );
+    return ret;
 }
 
 uint8_t *

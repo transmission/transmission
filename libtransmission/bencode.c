@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <event.h>
+
 #include "transmission.h"
 #include "bencode.h"
 #include "utils.h"
@@ -390,96 +392,77 @@ benc_val_t * tr_bencDictAdd( benc_val_t * dict, const char * key )
     return itemval;
 }
 
-char * tr_bencSaveMalloc( benc_val_t * val, int * len )
-{
-    char * buf   = NULL;
-    int alloc = 0;
-
-    *len = 0;
-    if( tr_bencSave( val, &buf, len, &alloc ) )
-    {
-        if( NULL != buf )
-        {
-            free(buf);
-        }
-        *len = 0;
-        return NULL;
-    }
-
-    return buf;
-}
-
-typedef struct
+struct KeyIndex
 {
     const char * key;
     int index;
-}
-KeyIndex;
+};
 
 static int compareKeyIndex( const void * va, const void * vb )
 {
-    const KeyIndex * a = (const KeyIndex *) va;
-    const KeyIndex * b = (const KeyIndex *) vb;
+    const struct KeyIndex * a = va;
+    const struct KeyIndex * b = vb;
     return strcmp( a->key, b->key );
 }
 
-int tr_bencSave( benc_val_t * val, char ** buf, int * used, int * max )
+static void
+saveImpl( struct evbuffer * out, const benc_val_t * val )
 {
-    int ii;    
+    int ii;
 
     switch( val->type )
     {
         case TYPE_INT:
-            if( tr_sprintf( buf, used, max, "i%"PRId64"e", val->val.i ) )
-                return 1;
+            evbuffer_add_printf( out, "i%"PRId64"e", val->val.i );
             break;
 
         case TYPE_STR:
-            if( tr_sprintf( buf, used, max, "%i:", val->val.s.i ) ||
-                tr_concat( buf, used,  max, val->val.s.s, val->val.s.i ) )
-                return 1;
+            evbuffer_add_printf( out, "i:%*.*s", val->val.i, val->val.i, val->val.i, val->val.s );
             break;
 
         case TYPE_LIST:
-            if( tr_sprintf( buf, used, max, "l" ) )
-                return 1;
+            evbuffer_add_printf( out, "l" );
             for( ii = 0; val->val.l.count > ii; ii++ )
-                if( tr_bencSave( val->val.l.vals + ii, buf, used, max ) )
-                    return 1;
-            if( tr_sprintf( buf, used, max, "e" ) )
-                return 1;
+                saveImpl( out, val->val.l.vals + ii );
+            evbuffer_add_printf( out, "e" );
             break;
 
         case TYPE_DICT:
             /* Keys must be strings and appear in sorted order
                (sorted as raw strings, not alphanumerics). */
-            if( tr_sprintf( buf, used, max, "d" ) )
-                return 1;
+            evbuffer_add_printf( out, "d" );
             if( 1 ) {
                 int i;
-                KeyIndex * indices = tr_new( KeyIndex, val->val.l.count );
+                struct KeyIndex * indices = tr_new( struct KeyIndex, val->val.l.count );
                 for( ii=i=0; i<val->val.l.count; i+=2 ) {
                     indices[ii].key = val->val.l.vals[i].val.s.s;
                     indices[ii].index = i;
                     ii++;
                 }
-                qsort( indices, ii, sizeof(KeyIndex), compareKeyIndex );
+                qsort( indices, ii, sizeof(struct KeyIndex), compareKeyIndex );
                 for( i=0; i<ii; ++i ) {
                     const int index = indices[i].index;
-                    if( tr_bencSave( val->val.l.vals + index,     buf, used, max ) ||
-                        tr_bencSave( val->val.l.vals + index + 1, buf, used, max ) ) {
-                        tr_free( indices );
-                        return 1;
-                    }
+                    saveImpl( out, val->val.l.vals + index );
+                    saveImpl( out, val->val.l.vals + index + 1 );
                 }
                 tr_free( indices );
-            } 
-            if( tr_sprintf( buf, used, max, "e" ) )
-                return 1;
+            }
+            evbuffer_add_printf( out, "e" );
             break;
     }
+}
 
-    return 0;
+char*
+tr_bencSave( const benc_val_t * val, int * len )
+{
+    struct evbuffer * buf = evbuffer_new( );
+    char * ret;
+    saveImpl( buf, val );
+    if( len != NULL )
+        *len = EVBUFFER_LENGTH( buf );
+    ret = tr_strndup( (char*) EVBUFFER_DATA( buf ), EVBUFFER_LENGTH( buf ) );
+    evbuffer_free( buf );
+    return ret;
 }
 
 /**

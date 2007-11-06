@@ -35,9 +35,4 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 size_t strlcat(char *dst, const char *src, size_t siz);
 #endif
 
-#ifndef HAVE_ASPRINTF
-int asprintf( char **, const char *, ... );
-int vasprintf( char **, const char *, va_list );
-#endif
-
 #endif /* TRCOMPAT_H */

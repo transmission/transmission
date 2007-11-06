@@ -878,7 +878,7 @@ savestate( void )
         }
     }
 
-    buf = ( uint8_t * )tr_bencSaveMalloc( &top, &len );
+    buf = ( uint8_t * )tr_bencSave( &top, &len );
     SAFEBENCFREE( &top );
     if( NULL == buf )
     {

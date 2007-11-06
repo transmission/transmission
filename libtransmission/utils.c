@@ -35,19 +35,18 @@
 #include <sys/stat.h>
 #include <unistd.h> /* usleep, stat */
 
+#include "event.h"
+
 #ifdef WIN32
     #include <windows.h> /* for Sleep */
 #elif defined(__BEOS__)
     #include <kernel/OS.h>
-    extern int vasprintf( char **, const char *, va_list );
 #endif
 
 #include "transmission.h"
 #include "trcompat.h"
 #include "utils.h"
 #include "platform.h"
-
-#define SPRINTF_BUFSIZE         100
 
 static tr_lock      * messageLock = NULL;
 static int            messageLevel = 0;
@@ -160,12 +159,37 @@ void tr_freeMessageList( tr_msg_list * list )
     }
 }
 
-void tr_msg( int level, const char * msg, ... )
+int
+tr_vasprintf( char **strp, const char *fmt, va_list ap )
 {
-    va_list       args1, args2;
+    int ret;
+    struct evbuffer * buf = evbuffer_new( );
+    if( evbuffer_add_vprintf( buf, fmt, ap ) )
+        ret = -1;
+    else {
+        ret = EVBUFFER_LENGTH( buf );
+        *strp = tr_strndup( (char*)EVBUFFER_DATA(buf), ret );
+    }
+    evbuffer_free( buf );
+    return ret;
+
+}
+
+int
+tr_asprintf( char **strp, const char *fmt, ...)
+{
+    int ret;
+    va_list ap;
+    va_start( ap, fmt );
+    ret = tr_vasprintf( strp, fmt, ap );
+    va_end( ap );
+    return ret;
+}
+
+void tr_msg( int level, const char * fmt, ... )
+{
     tr_msg_list * newmsg;
-    int           len1, len2;
-    FILE        * fp;
+    FILE * fp;
 
     assert( NULL != messageLock );
     tr_lockLock( messageLock );
@@ -182,41 +206,32 @@ void tr_msg( int level, const char * msg, ... )
 
     if( messageLevel >= level )
     {
-        va_start( args1, msg );
+        va_list ap;
+        char * text;
+
+        /* build the text message */
+        va_start( ap, fmt );
+        tr_vasprintf( &text, fmt, ap );
+        va_end( ap );
+
         if( messageQueuing )
         {
-            newmsg = calloc( 1, sizeof( *newmsg ) );
-            if( NULL != newmsg )
-            {
-                newmsg->level = level;
-                newmsg->when = time( NULL );
-                len1 = len2 = 0;
-                va_start( args2, msg );
-                tr_vsprintf( &newmsg->message, &len1, &len2, msg,
-                             args1, args2 );
-                va_end( args2 );
-                if( fp != NULL )
-                    fprintf( fp, "%s\n", newmsg->message );
-                if( NULL == newmsg->message )
-                {
-                    free( newmsg );
-                }
-                else
-                {
-                    *messageQueueTail = newmsg;
-                    messageQueueTail = &newmsg->next;
-                }
-            }
+            newmsg = tr_new0( tr_msg_list, 1 );
+            newmsg->level = level;
+            newmsg->when = time( NULL );
+            newmsg->message = text;
+
+            *messageQueueTail = newmsg;
+            messageQueueTail = &newmsg->next;
         }
         else
         {
             if( fp == NULL )
                 fp = stderr;
-            vfprintf( fp, msg, args1 );
-            fputc( '\n', fp );
+            fprintf( stderr, "%s\n", text );
+            tr_free( text );
             fflush( fp );
         }
-        va_end( args1 );
     }
 
     tr_lockUnlock( messageLock );
@@ -439,106 +454,6 @@ tr_mkdirp( const char * path_in, int permissions )
     }
 
     tr_free( path );
-    return 0;
-}
-
-int tr_sprintf( char ** buf, int * used, int * max, const char * format, ... )
-{
-    va_list ap1, ap2;
-    int     ret;
-
-    va_start( ap1, format );
-    va_start( ap2, format );
-    ret = tr_vsprintf( buf, used, max, format, ap1, ap2 );
-    va_end( ap2 );
-    va_end( ap1 );
-
-    return ret;
-}
-
-int tr_vsprintf( char ** buf, int * used, int * max, const char * fmt,
-                 va_list ap1, va_list ap2 )
-{
-    int     want;
-
-    want = vsnprintf( NULL, 0, fmt, ap1 );
-
-    if( tr_concat( buf, used, max, NULL, want ) )
-    {
-        return 1;
-    }
-    assert( *used + want + 1 <= *max );
-
-    *used += vsnprintf( *buf + *used, *max - *used, fmt, ap2 );
-
-    return 0;
-}
-
-#ifndef HAVE_ASPRINTF
-
-int
-asprintf( char ** buf, const char * format, ... )
-{
-    va_list ap;
-    int     ret;
-
-    va_start( ap, format );
-    ret = vasprintf( buf, format, ap );
-    va_end( ap );
-
-    return ret;
-}
-
-int
-vasprintf( char ** buf, const char * format, va_list ap )
-{
-    va_list ap2;
-    int     used, max;
-
-    va_copy( ap2, ap );
-
-    *buf = NULL;
-    used = 0;
-    max  = 0;
-
-    if( tr_vsprintf( buf, &used, &max, format, ap, ap2 ) )
-    {
-        free( *buf );
-        return -1;
-    }
-
-    return used;
-}
-
-#endif /* HAVE_ASPRINTF */
-
-int tr_concat( char ** buf, int * used, int * max, const char * data, int len )
-{
-    int     newmax;
-    char  * newbuf;
-
-    newmax = *max;
-    while( *used + len + 1 > newmax )
-    {
-        newmax += SPRINTF_BUFSIZE;
-    }
-    if( newmax > *max )
-    {
-        newbuf = realloc( *buf, newmax );
-        if( NULL == newbuf )
-        {
-            return 1;
-        }
-        *buf = newbuf;
-        *max = newmax;
-    }
-
-    if( NULL != data )
-    {
-        memcpy( *buf + *used, data, len );
-        *used += len;
-    }
-
     return 0;
 }
 

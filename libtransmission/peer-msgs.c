@@ -697,7 +697,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     if( port > 0 )
         tr_bencInitInt( tr_bencDictAdd( &val, "p" ), port );
     tr_bencInitStr( tr_bencDictAdd( &val, "v" ), v, 0, 1 );
-    buf = tr_bencSaveMalloc( &val,  &len );
+    buf = tr_bencSave( &val, &len );
 
     tr_peerIoWriteUint32( msgs->io, outbuf, 2*sizeof(uint8_t) + len );
     tr_peerIoWriteUint8 ( msgs->io, outbuf, BT_LTEP );
@@ -1620,7 +1620,7 @@ sendPex( tr_peermsgs * msgs )
         tr_bencInitStr( dropped, tmp, walk-tmp, FALSE );
 
         /* write the pex message */
-        benc = tr_bencSaveMalloc( &val, &bencLen );
+        benc = tr_bencSave( &val, &bencLen );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 2*sizeof(uint8_t) + bencLen );
         tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_LTEP );
         tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, OUR_LTEP_PEX );

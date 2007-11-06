@@ -30,11 +30,6 @@
 #include "peer-mgr.h"
 #include "utils.h"
 
-struct tr_io
-{
-    tr_torrent * tor;
-};
-
 /****
 *****  Low-level IO functions
 ****/
