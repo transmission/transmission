@@ -25,15 +25,15 @@
 #ifndef TR_UPNP_H
 #define TR_UPNP_H 1
 
-typedef struct tr_upnp_s tr_upnp_t; 
+typedef struct tr_upnp tr_upnp; 
 
-tr_upnp_t * tr_upnpInit             ( void );
-void        tr_upnpStart            ( tr_upnp_t * );
-void        tr_upnpStop             ( tr_upnp_t * );
-int         tr_upnpStatus           ( tr_upnp_t * );
-void        tr_upnpForwardPort      ( tr_upnp_t *, int );
-void        tr_upnpRemoveForwarding ( tr_upnp_t * );
-void        tr_upnpPulse            ( tr_upnp_t * );
-void        tr_upnpClose            ( tr_upnp_t * );
+tr_upnp * tr_upnpInit             ( void );
+void      tr_upnpStart            ( tr_upnp * );
+void      tr_upnpStop             ( tr_upnp * );
+int       tr_upnpStatus           ( tr_upnp * );
+void      tr_upnpForwardPort      ( tr_upnp *, int );
+void      tr_upnpRemoveForwarding ( tr_upnp * );
+void      tr_upnpPulse            ( tr_upnp * );
+void      tr_upnpClose            ( tr_upnp * );
 
 #endif

@@ -83,7 +83,7 @@ typedef struct tr_natpmp_req_s
     int                  gotport;
 } tr_natpmp_req_t;
 
-struct tr_natpmp_s
+struct tr_natpmp
 {
 #define PMP_STATE_IDLE          1
 #define PMP_STATE_ADDING        2
@@ -114,7 +114,7 @@ typedef struct tr_natpmp_parse_s
 tr_natpmp_parse_t;
 
 static void
-unmap( tr_natpmp_t * pmp );
+unmap( tr_natpmp * pmp );
 static int
 checktime( tr_natpmp_uptime_t * uptime, uint32_t seen );
 static void
@@ -126,20 +126,20 @@ killreq( tr_natpmp_req_t ** req );
 static void
 resetreq( tr_natpmp_req_t * req );
 static tr_tristate_t
-pulsereq( tr_natpmp_t * req );
+pulsereq( tr_natpmp * req );
 static int
 sendreq( tr_natpmp_req_t * req );
 static int
 mcastsetup();
 static void
-mcastpulse( tr_natpmp_t * pmp );
+mcastpulse( tr_natpmp * pmp );
 static tr_tristate_t
 parseresponse( uint8_t * buf, int len, int port, tr_natpmp_parse_t * parse );
 
-tr_natpmp_t *
+tr_natpmp *
 tr_natpmpInit()
 {
-    tr_natpmp_t * pmp;
+    tr_natpmp * pmp;
 
     pmp = calloc( 1, sizeof( *pmp ) );
     if( NULL == pmp )
@@ -170,7 +170,7 @@ tr_natpmpInit()
 }
 
 void
-tr_natpmpStart( tr_natpmp_t * pmp )
+tr_natpmpStart( tr_natpmp * pmp )
 {
     if( !pmp->active )
     {
@@ -184,7 +184,7 @@ tr_natpmpStart( tr_natpmp_t * pmp )
 }
 
 void
-tr_natpmpStop( tr_natpmp_t * pmp )
+tr_natpmpStop( tr_natpmp * pmp )
 {
     if( pmp->active )
     {
@@ -196,7 +196,7 @@ tr_natpmpStop( tr_natpmp_t * pmp )
 }
 
 int
-tr_natpmpStatus( tr_natpmp_t * pmp )
+tr_natpmpStatus( tr_natpmp * pmp )
 {
     int ret;
     
@@ -239,14 +239,14 @@ tr_natpmpStatus( tr_natpmp_t * pmp )
 }
 
 void
-tr_natpmpForwardPort( tr_natpmp_t * pmp, int port )
+tr_natpmpForwardPort( tr_natpmp * pmp, int port )
 {
     tr_inf( "nat-pmp set port %i", port );
     pmp->newport = port;
 }
 
 void
-tr_natpmpRemoveForwarding( tr_natpmp_t * pmp )
+tr_natpmpRemoveForwarding( tr_natpmp * pmp )
 {
     tr_inf( "nat-pmp unset port" );
     pmp->newport = -1;
@@ -254,7 +254,7 @@ tr_natpmpRemoveForwarding( tr_natpmp_t * pmp )
 }
 
 void
-tr_natpmpClose( tr_natpmp_t * pmp )
+tr_natpmpClose( tr_natpmp * pmp )
 {
     /* try to send at least one delete request if we have a port mapping */
     tr_natpmpStop( pmp );
@@ -265,7 +265,7 @@ tr_natpmpClose( tr_natpmp_t * pmp )
 }
 
 void
-tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
+tr_natpmpPulse( tr_natpmp * pmp, int * publicPort )
 {
     if( 0 <= pmp->mcastfd )
     {
@@ -443,7 +443,7 @@ tr_natpmpPulse( tr_natpmp_t * pmp, int * publicPort )
 }
 
 void
-unmap( tr_natpmp_t * pmp )
+unmap( tr_natpmp * pmp )
 {
     switch( pmp->state )
     {
@@ -567,7 +567,7 @@ resetreq( tr_natpmp_req_t * req )
 }
 
 static tr_tristate_t
-pulsereq( tr_natpmp_t * pmp )
+pulsereq( tr_natpmp * pmp )
 {
     tr_natpmp_req_t  * req = pmp->req;
     struct sockaddr_in sin;
@@ -692,7 +692,7 @@ mcastsetup()
 }
 
 static void
-mcastpulse( tr_natpmp_t * pmp )
+mcastpulse( tr_natpmp * pmp )
 {
     struct sockaddr_in sin;
     uint8_t            buf[16];

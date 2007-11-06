@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I. -I$(top_srcdir) -D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS)
+AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/third-party/ -D__TRANSMISSION__ $(LIBEVENT_CPPFLAGS)
 AM_CFLAGS = $(OPENSSL_CFLAGS) $(PTHREAD_CFLAGS)
 
 noinst_LIBRARIES = libtransmission.a
@@ -11,7 +11,6 @@ libtransmission_a_SOURCES = \
     fastresume.c \
     fdlimit.c \
     handshake.c \
-    http.c \
     inout.c \
     ipcparse.c \
     list.c \
@@ -34,8 +33,7 @@ libtransmission_a_SOURCES = \
     transmission.c \
     trevent.c \
     upnp.c \
-    utils.c \
-    xml.c
+    utils.c
 
 noinst_HEADERS = \
     bencode.h \
@@ -46,7 +44,6 @@ noinst_HEADERS = \
     fastresume.h \
     fdlimit.h \
     handshake.h \
-    http.h \
     inout.h \
     internal.h \
     ipcparse.h \
@@ -69,8 +66,7 @@ noinst_HEADERS = \
     trcompat.h \
     trevent.h \
     upnp.h \
-    utils.h \
-    xml.h
+    utils.h
 
 EXTRA_libtransmission_a_SOURCES = \
     version.h

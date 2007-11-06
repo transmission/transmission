@@ -16,4 +16,5 @@ Xmission_SOURCES = \
 Xmission_LDADD = \
   $(top_builddir)/libtransmission/libtransmission.a \
   $(top_builddir)/third-party/libevent/libevent.la \
+  $(top_builddir)/third-party/miniupnp/libminiupnp.a \
   $(WX_LIBS) $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm

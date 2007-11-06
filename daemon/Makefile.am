@@ -28,6 +28,7 @@ bin_PROGRAMS = \
 COMMON_LDADD = \
     ./libdaemon.a \
     $(top_builddir)/libtransmission/libtransmission.a \
+    $(top_builddir)/third-party/miniupnp/libminiupnp.a \
     $(top_builddir)/third-party/libevent/libevent.la \
     $(OPENSSL_LIBS) $(PTHREAD_LIBS) -lm
 

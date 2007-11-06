@@ -295,40 +295,6 @@ tr_set_compare( const void * va, size_t aCount,
 ****
 ***/
 
-void * tr_memmem ( const void *vbig, size_t big_len,
-                   const void *vlittle, size_t little_len )
-{
-    const char *big = vbig;
-    const char *little = vlittle;
-    size_t ii, jj;
-
-    if( 0 == big_len || 0 == little_len )
-    {
-        return NULL;
-    }
-
-    for( ii = 0; ii + little_len <= big_len; ii++ )
-    {
-        for( jj = 0; jj < little_len; jj++ )
-        {
-            if( big[ii + jj] != little[jj] )
-            {
-                break;
-            }
-        }
-        if( jj == little_len )
-        {
-            return (char*)big + ii;
-        }
-    }
-
-    return NULL;
-}
-
-/**
-***
-**/
-
 int
 tr_compareUint16( uint16_t a, uint16_t b )
 {
@@ -474,22 +440,6 @@ tr_mkdirp( const char * path_in, int permissions )
 
     tr_free( path );
     return 0;
-}
-
-int
-tr_strncasecmp( const char * s1, const char * s2, size_t n )
-{
-    if ( !n )
-        return 0;
-
-    while( n-- != 0 && tolower( *s1 ) == tolower( *s2 ) ) {
-        if( !n || !*s1 || !*s2 )
-	    break;
-        ++s1;
-        ++s2;
-    }
-
-    return tolower(*(unsigned char *) s1) - tolower(*(unsigned char *) s2);
 }
 
 int tr_sprintf( char ** buf, int * used, int * max, const char * format, ... )

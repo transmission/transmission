@@ -25,15 +25,15 @@
 #ifndef TR_NATPMP_H
 #define TR_NATPMP_H 1
 
-typedef struct tr_natpmp_s tr_natpmp_t; 
+typedef struct tr_natpmp tr_natpmp; 
 
-tr_natpmp_t * tr_natpmpInit();
-void        tr_natpmpStart( tr_natpmp_t * );
-void        tr_natpmpStop( tr_natpmp_t * );
-int         tr_natpmpStatus( tr_natpmp_t * );
-void        tr_natpmpForwardPort( tr_natpmp_t *, int );
-void        tr_natpmpRemoveForwarding( tr_natpmp_t * );
-void        tr_natpmpPulse( tr_natpmp_t *, int * );
-void        tr_natpmpClose( tr_natpmp_t * );
+tr_natpmp * tr_natpmpInit();
+void        tr_natpmpStart( tr_natpmp * );
+void        tr_natpmpStop( tr_natpmp * );
+int         tr_natpmpStatus( tr_natpmp * );
+void        tr_natpmpForwardPort( tr_natpmp *, int );
+void        tr_natpmpRemoveForwarding( tr_natpmp * );
+void        tr_natpmpPulse( tr_natpmp *, int * );
+void        tr_natpmpClose( tr_natpmp * );
 
 #endif

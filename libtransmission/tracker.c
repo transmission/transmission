@@ -624,7 +624,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
     char * ann = getCurrentAddress(t)->announce;
     
     evbuffer_add_printf( buf, "%s"
-                              "%sinfo_hash=%s"
+                              "%cinfo_hash=%s"
                               "&peer_id=%s"
                               "&port=%d"
                               "&uploaded=%"PRIu64
@@ -639,7 +639,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
                               "%s%s"
                               "%s%s",
         ann,
-        ( strchr(ann, '?') == NULL ? "?" : "&" ),
+        strchr(ann, '?') ? '&' : '?',
         t->escaped,
         t->peer_id,
         tr_sharedGetPublicPort( t->handle->shared ),

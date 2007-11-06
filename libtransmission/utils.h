@@ -42,8 +42,6 @@ char* tr_getLogTimeStr( char * buf, int buflen );
 
 int  tr_rand ( int );
 
-void * tr_memmem( const void *, size_t, const void *, size_t );
-
 /***********************************************************************
  * tr_mkdirp
  ***********************************************************************
@@ -55,14 +53,6 @@ int tr_mkdirp( const char * path, int permissions );
 int tr_mkdir( const char * path, int permissions );
 
 uint8_t* tr_loadFile( const char * filename, size_t * size );
-
-/***********************************************************************
- * tr_strcasecmp
- ***********************************************************************
- * A case-insensitive strncmp()
- **********************************************************************/
-#define tr_strcasecmp( ff, ss ) ( tr_strncasecmp( (ff), (ss), ULONG_MAX ) )
-int tr_strncasecmp( const char * first, const char * second, size_t len );
 
 /***********************************************************************
  * tr_sprintf

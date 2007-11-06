@@ -207,6 +207,7 @@ AC_CONFIG_FILES([Makefile
                  daemon/Makefile
                  libtransmission/Makefile
                  third-party/Makefile
+                 third-party/miniupnp/Makefile
                  macosx/Makefile
                  wx/Makefile
                  wx/images/Makefile
