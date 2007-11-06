@@ -35,6 +35,8 @@
     CTGradient * fWhiteGradient, * fGrayGradient, * fLightGrayGradient, * fBlueGradient, * fDarkBlueGradient, 
                 * fGreenGradient, * fLightGreenGradient, * fDarkGreenGradient, * fYellowGradient, * fTransparentGradient;
     
+    NSColor * fGrayColor, * fBlueColor, * fBlue1Color, * fBlue2Color, * fBlue3Color, * fBlue4Color;
+    
     NSBitmapImageRep * fBitmap;
     int8_t * fPieces;
 }

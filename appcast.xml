@@ -6,7 +6,7 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Mon, 07 Nov 2007 16:45:00 -0400</lastBuildDate>
+    <lastBuildDate>Mon, 05 Nov 2007 16:45:00 -0400</lastBuildDate>
 
 	<item>
       <title>Transmission 0.92 Released</title>
@@ -24,8 +24,8 @@
  <li>Leopard: Fix bug with typing values in Inspector->Options</li>
  <li>Leopard: Fix bug with toggling Minimal View</li>
 </ul>]]></description>
-      <pubDate>Mon, 07 Nov 2007 16:45:00 -0400</pubDate>
-      <enclosure sparkle:version="3711" sparkle:shortVersionString="0.92" url="http://mirrors.m0k.org/transmission/files/Transmission-0.92.dmg" length="2143155" type="application/octet-stream"/>
+      <pubDate>Mon, 05 Nov 2007 16:45:00 -0400</pubDate>
+      <enclosure sparkle:version="3711" sparkle:shortVersionString="0.92" url="http://mirrors.m0k.org/transmission/files/Transmission-0.92.dmg" length="2145246" type="application/octet-stream"/>
     </item>
     
   </channel>

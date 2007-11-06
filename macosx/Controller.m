@@ -295,6 +295,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     //set sort
+    #warning clean up
     NSString * sortType = [fDefaults stringForKey: @"Sort"];
     
     NSMenuItem * currentSortItem, * currentSortActionItem;
@@ -335,6 +336,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [currentSortActionItem setState: NSOnState];
     
     //set filter
+    #warning clean up
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
     FilterBarButton * currentFilterButton;

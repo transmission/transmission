@@ -53,14 +53,6 @@
 
 @interface TorrentCell (Private)
 
-// Used to optimize drawing. They contain packed RGBA pixels for every color needed.
-static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
-                kBlue1  = OSSwapBigToHostConstInt32(0x84FFFFFF), //204, 255, 255
-                kBlue2  = OSSwapBigToHostConstInt32(0x6BFFFFFF), //153, 255, 255
-                kBlue3  = OSSwapBigToHostConstInt32(0x6B84FFFF), //153, 204, 255
-                kBlue4  = OSSwapBigToHostConstInt32(0x426BFFFF), //102, 153, 255
-                kGray   = OSSwapBigToHostConstInt32(0xE9E9E9FF); //100, 100, 100
-
 - (void) drawBar: (NSRect) barRect;
 - (void) drawRegularBar: (NSRect) barRect;
 - (void) drawPiecesBar: (NSRect) barRect;
@@ -95,6 +87,14 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
                                 [NSFont messageFontOfSize: 9.0], NSFontAttributeName,
                                 paragraphStyle, NSParagraphStyleAttributeName, nil];
         [paragraphStyle release];
+        
+        //store box colors
+        fGrayColor = [[NSColor colorWithCalibratedRed: 0.9 green: 0.9 blue: 0.9 alpha: 1.0] retain];
+        fBlue1Color = [[NSColor colorWithCalibratedRed: 0.8 green: 1.0 blue: 1.0 alpha: 1.0] retain];
+        fBlue2Color = [[NSColor colorWithCalibratedRed: 0.6 green: 1.0 blue: 1.0 alpha: 1.0] retain];
+        fBlue3Color = [[NSColor colorWithCalibratedRed: 0.6 green: 0.8 blue: 1.0 alpha: 1.0] retain];
+        fBlue4Color = [[NSColor colorWithCalibratedRed: 0.4 green: 0.6 blue: 1.0 alpha: 1.0] retain];
+        fBlueColor = [[NSColor colorWithCalibratedRed: 0.0 green: 0.4 blue: 0.8 alpha: 1.0] retain];
         
         fBarOverlayColor = [[NSColor colorWithDeviceWhite: 0.0 alpha: 0.2] retain];
     }
@@ -445,10 +445,6 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
             pixelsWide: MAX_PIECES pixelsHigh: barRect.size.height bitsPerSample: 8 samplesPerPixel: 4 hasAlpha: YES
             isPlanar: NO colorSpaceName: NSCalibratedRGBColorSpace bytesPerRow: 0 bitsPerPixel: 0];
     
-    uint32_t * p;
-    uint8_t * bitmapData = [fBitmap bitmapData];
-    int bytesPerRow = [fBitmap bytesPerRow];
-    
     if (!fPieces)
     {
         fPieces = malloc(MAX_PIECES);
@@ -468,89 +464,71 @@ static uint32_t kBlue   = OSSwapBigToHostConstInt32(0x50A0FFFF), //80, 160, 255
     //lines 2 to 14: blue, green, or gray depending on piece availability
     int i, h, index;
     float increment = (float)pieceCount / MAX_PIECES;
-    uint32_t color;
+    NSColor * pieceColor;
     BOOL change;
     for (i = 0; i < MAX_PIECES; i++)
     {
         index = i * increment;
-        change = NO;
+        pieceColor = nil;
         
         if (piecePercent[index] >= 1.0)
         {
             if (fPieces[i] != -1)
             {
-                color = kBlue;
+                pieceColor = fBlueColor;
                 fPieces[i] = -1;
-                change = YES;
             }
         }
         else if (piecePercent[index] <= 0.0)
         {
             if (fPieces[i] != 0)
             {
-                color = kGray;
+                pieceColor = fGrayColor;
                 fPieces[i] = 0;
-                change = YES;
             }
         }
         else if (piecePercent[index] <= 0.25)
         {
             if (fPieces[i] != 1)
             {
-                color = kBlue1;
+                pieceColor = fBlue1Color;
                 fPieces[i] = 1;
-                change = YES;
             }
         }
         else if (piecePercent[index] <= 0.5)
         {
             if (fPieces[i] != 2)
             {
-                color = kBlue2;
+                pieceColor = fBlue2Color;
                 fPieces[i] = 2;
-                change = YES;
             }
         }
         else if (piecePercent[index] <= 0.75)
         {
             if (fPieces[i] != 3)
             {
-                color = kBlue3;
+                pieceColor = fBlue3Color;
                 fPieces[i] = 3;
-                change = YES;
             }
         }
         else
         {
             if (fPieces[i] != 4)
             {
-                color = kBlue4;
+                pieceColor = fBlue4Color;
                 fPieces[i] = 4;
-                change = YES;
             }
         }
         
-        if (change)
-        {
-            //draw vertically
-            p = (uint32_t *)(bitmapData) + i;
+        if (pieceColor)
             for (h = 0; h < barRect.size.height; h++)
-            {
-                p[0] = color;
-                p = (uint32_t *)((uint8_t *)p + bytesPerRow);
-            }
-        }
+                [fBitmap setColor: pieceColor atX: i y: h];
     }
     
     free(piecePercent);
     
     //actually draw image
-    NSImage * bar = [[NSImage alloc] initWithSize: [fBitmap size]];
-    [bar setFlipped: YES];
-    [bar addRepresentation: fBitmap];
-    
-    [bar drawInRect: barRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
-    [bar release];
+    [fBitmap drawInRect: barRect];
     
     if (!fTransparentGradient)
         fTransparentGradient = [[CTGradient progressTransparentGradient] retain];
