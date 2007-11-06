@@ -69,8 +69,7 @@
                                     * fTrackerSortActionItem, * fDateSortActionItem, * fOrderSortActionItem;
     
     IBOutlet FilterBarView          * fFilterBar;
-    IBOutlet FilterBarButton        * fNoFilterButton, * fDownloadFilterButton,
-                                    * fSeedFilterButton, * fPauseFilterButton;
+    IBOutlet NSButton               * fNoFilterButton, * fDownloadFilterButton, * fSeedFilterButton, * fPauseFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
     IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
                                 

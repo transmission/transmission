@@ -461,7 +461,6 @@
     float * piecePercent = malloc(pieceCount * sizeof(float));
     [torrent getAmountFinished: piecePercent size: pieceCount];
     
-    //lines 2 to 14: blue, green, or gray depending on piece availability
     int i, h, index;
     float increment = (float)pieceCount / MAX_PIECES;
     NSColor * pieceColor;

@@ -22,32 +22,15 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "FilterBarView.h"
+#warning needed?
 
-#define ORIGIN_VERTICAL 3.0
-#define ORIGIN_HORIZONTAL 4.0
-#define PADDING_HORIZONTAL 2.0
+#import "FilterBarView.h"
 
 @implementation FilterBarView
 
 - (void) awakeFromNib
 {
     [self setBackgroundImage: [NSImage imageNamed: @"FilterBarBackground.png"]];
-    
-    [fNoFilterButton setTitle: NSLocalizedString(@"All", @"Filter Bar Button -> title")];
-    [fDownloadFilterButton setTitle: NSLocalizedString(@"Downloading", @"Filter Bar Button -> title")];
-    [fSeedFilterButton setTitle: NSLocalizedString(@"Seeding", @"Filter Bar Button -> title")];
-    [fPauseFilterButton setTitle: NSLocalizedString(@"Paused", @"Filter Bar Button -> title")];
-    
-    [fNoFilterButton sizeToFit];
-    [fDownloadFilterButton sizeToFit];
-    [fSeedFilterButton sizeToFit];
-    [fPauseFilterButton sizeToFit];
-    
-    [fNoFilterButton setFrameOrigin: NSMakePoint(ORIGIN_HORIZONTAL, ORIGIN_VERTICAL)];
-    [fDownloadFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fNoFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
-    [fSeedFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fDownloadFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
-    [fPauseFilterButton setFrameOrigin: NSMakePoint(NSMaxX([fSeedFilterButton frame]) + PADDING_HORIZONTAL, ORIGIN_VERTICAL)];
 }
 
 @end

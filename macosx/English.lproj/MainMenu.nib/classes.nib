@@ -9,17 +9,6 @@
 			<string>FilterBarView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>fDownloadFilterButton</key>
-				<string>FilterBarButton</string>
-				<key>fNoFilterButton</key>
-				<string>FilterBarButton</string>
-				<key>fPauseFilterButton</key>
-				<string>FilterBarButton</string>
-				<key>fSeedFilterButton</key>
-				<string>FilterBarButton</string>
-			</dict>
 			<key>SUPERCLASS</key>
 			<string>ImageBackgroundView</string>
 		</dict>
@@ -173,7 +162,7 @@
 				<key>fDockMenu</key>
 				<string>NSMenu</string>
 				<key>fDownloadFilterButton</key>
-				<string>FilterBarButton</string>
+				<string>NSButton</string>
 				<key>fDownloadLimitItem</key>
 				<string>NSMenuItem</string>
 				<key>fDownloadMenu</key>
@@ -191,7 +180,7 @@
 				<key>fNextInfoTabItem</key>
 				<string>NSMenuItem</string>
 				<key>fNoFilterButton</key>
-				<string>FilterBarButton</string>
+				<string>NSButton</string>
 				<key>fOpenIgnoreDownloadFolder</key>
 				<string>NSMenuItem</string>
 				<key>fOrderSortActionItem</key>
@@ -199,7 +188,7 @@
 				<key>fOrderSortItem</key>
 				<string>NSMenuItem</string>
 				<key>fPauseFilterButton</key>
-				<string>FilterBarButton</string>
+				<string>NSButton</string>
 				<key>fPrevFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fPrevInfoTabItem</key>
@@ -213,7 +202,7 @@
 				<key>fSearchFilterField</key>
 				<string>NSSearchField</string>
 				<key>fSeedFilterButton</key>
-				<string>FilterBarButton</string>
+				<string>NSButton</string>
 				<key>fSpeedLimitButton</key>
 				<string>NSButton</string>
 				<key>fStateSortActionItem</key>
@@ -251,14 +240,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FilterBarButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

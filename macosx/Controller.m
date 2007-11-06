@@ -339,7 +339,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     #warning clean up
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
-    FilterBarButton * currentFilterButton;
+    NSButton * currentFilterButton;
     if ([filterType isEqualToString: FILTER_PAUSE])
         currentFilterButton = fPauseFilterButton;
     else if ([filterType isEqualToString: FILTER_SEED])
@@ -1154,8 +1154,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                             " and trash both data and torrent files.", "Removal confirm panel -> title"), torrentName];
                 
                 message = NSLocalizedString(@"This transfer is active."
-                            " Once removed, continuing the transfer will require the torrent file."
-                            " Do you really want to remove it?", "Removal confirm panel -> message");
+                            " Once removed, continuing the transfer will require the torrent file.",
+                            "Removal confirm panel -> message");
             }
             else
             {
@@ -1180,8 +1180,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     message = [NSString stringWithFormat: NSLocalizedString(@"There are %d transfers (%d active).",
                                 "Removal confirm panel -> message part 1"), selected, active];
                 message = [message stringByAppendingString:
-                    NSLocalizedString(@" Once removed, continuing the transfers will require the torrent files."
-                    " Do you really want to remove them?", "Removal confirm panel -> message part 2")];
+                    NSLocalizedString(@" Once removed, continuing the transfers will require the torrent files.",
+                                "Removal confirm panel -> message part 2")];
             }
 
             NSBeginAlertSheet(title, NSLocalizedString(@"Remove", "Removal confirm panel -> button"),
@@ -1856,10 +1856,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [tempTorrents setArray: fTorrents];
     
     //set buttons with counts
-    [fNoFilterButton setCount: [fTorrents count]];
+    #warning reimplement
+    /*[fNoFilterButton setCount: [fTorrents count]];
     [fDownloadFilterButton setCount: downloading];
     [fSeedFilterButton setCount: seeding];
-    [fPauseFilterButton setCount: paused];
+    [fPauseFilterButton setCount: paused];*/
     
     NSString * searchString = [fSearchFilterField stringValue];
     if ([searchString length] > 0)
@@ -1942,7 +1943,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     NSString * oldFilterType = [fDefaults stringForKey: @"Filter"];
     
-    FilterBarButton * prevFilterButton;
+    NSButton * prevFilterButton;
     if ([oldFilterType isEqualToString: FILTER_PAUSE])
         prevFilterButton = fPauseFilterButton;
     else if ([oldFilterType isEqualToString: FILTER_SEED])
@@ -1999,11 +2000,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self applyFilter: nil];
 }
 
+#warning improve
 - (void) switchFilter: (id) sender
 {
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
     
-    FilterBarButton * button;
+    NSButton * button;
     if ([filterType isEqualToString: FILTER_NONE])
         button = sender == fNextFilterItem ? fDownloadFilterButton : fPauseFilterButton;
     else if ([filterType isEqualToString: FILTER_DOWNLOAD])
