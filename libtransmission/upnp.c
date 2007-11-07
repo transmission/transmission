@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <stdio.h> /* printf */
@@ -70,10 +70,12 @@ tr_upnpStart( tr_upnp * handle )
     {
         char portStr[16];
         snprintf( portStr, sizeof(portStr), "%d", handle->port );
-        handle->isForwarding = UPNP_AddPortMapping( handle->urls.controlURL,
-                                                    handle->data.servicetype,
-                                                    portStr, portStr, handle->lanaddr,
-                                                    "Transmission", "TCP" );
+        handle->isForwarding = ( handle->urls.controlURL != NULL ) && 
+                               ( handle->data.servicetype != NULL ) &&
+                               ( UPNP_AddPortMapping( handle->urls.controlURL,
+                                                      handle->data.servicetype,
+                                                      portStr, portStr, handle->lanaddr,
+                                                      "Transmission", "TCP" ) );
 
         tr_dbg( "UPNP Port Forwarding via '%s', service '%s'.  (local address: %s:%d)",
                 handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, handle->port );
