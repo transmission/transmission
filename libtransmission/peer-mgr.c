@@ -17,7 +17,6 @@
 #include <limits.h> /* INT_MAX */
 
 #include <libgen.h> /* basename */
-#include <sys/types.h> /* event.h needs this */
 #include <arpa/inet.h> /* inet_ntoa */
 
 #include <event.h>

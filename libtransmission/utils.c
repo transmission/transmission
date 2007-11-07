@@ -35,8 +35,6 @@
 #include <sys/stat.h>
 #include <unistd.h> /* usleep, stat */
 
-#include <sys/queue.h> /* libevent needs this */
-#include <sys/types.h> /* libevent needs this */
 #include "event.h"
 
 #ifdef WIN32

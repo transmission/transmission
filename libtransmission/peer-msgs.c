@@ -20,7 +20,6 @@
 
 #include <netinet/in.h> /* struct in_addr */
 
-#include <sys/types.h> /* event.h needs this */
 #include <event.h>
 
 #include "transmission.h"

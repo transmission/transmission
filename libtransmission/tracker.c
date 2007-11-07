@@ -17,8 +17,7 @@
 #include <string.h> /* strcmp, strchr */
 #include <libgen.h> /* basename */
 
-#include <sys/queue.h> /* libevent needs this */
-#include <sys/types.h> /* libevent needs this */
+#include <sys/queue.h> /* evhttp.h needs this */
 #include <event.h>
 #include <evhttp.h>
 

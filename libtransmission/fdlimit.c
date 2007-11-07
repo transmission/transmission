@@ -35,8 +35,7 @@
 #include <libgen.h> /* basename, dirname */
 #include <fcntl.h>
 
-#include <sys/queue.h> /* libevent needs this */
-#include <sys/types.h> /* libevent needs this */
+#include <sys/queue.h> /* evhttp.h needs this */
 #include <event.h>
 #include <evhttp.h>
 #include <evutil.h>

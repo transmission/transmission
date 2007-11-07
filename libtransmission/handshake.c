@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <libgen.h> /* basename */
 
-#include <sys/types.h> /* event.h needs this */
 #include <event.h>
 
 #include "clients.h"
