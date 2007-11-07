@@ -18,7 +18,7 @@ for building in Xcode.
 
 Building a Transmission release from the command line:
 
-    $ tar xvfz transmission-0.90.tar.gz
+    $ tar xvfj transmission-0.92.tar.bz2
     $ cd transmission-0.90
     $ ./configure -q && make -s
     $ su (if necessary for the next line)
