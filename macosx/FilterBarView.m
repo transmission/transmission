@@ -25,6 +25,8 @@
 #import "FilterBarView.h"
 #import "CTGradient.h"
 
+#warning combine
+
 @implementation FilterBarView
 
 - (void) awakeFromNib
@@ -41,7 +43,6 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    NSRect bounds = [self bounds];
     [fGradient fillRect: rect angle: 90];
 }
 

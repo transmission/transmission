@@ -23,9 +23,12 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "ImageBackgroundView.h"
 
-@interface StatusBarView : ImageBackgroundView
+@class CTGradient;
+
+@interface StatusBarView : NSView
 {
+    CTGradient * fGradient;
 }
+
 @end

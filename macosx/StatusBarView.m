@@ -23,23 +23,27 @@
  *****************************************************************************/
 
 #import "StatusBarView.h"
+#import "CTGradient.h"
+
+#warning combine
 
 @implementation StatusBarView
 
 - (void) awakeFromNib
 {
-    [self setBackgroundImage: [NSImage imageNamed: @"StatusBarBackground.png"]];
+    NSColor * beginningColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
+    NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
+    fGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
 }
 
 - (BOOL) isOpaque
 {
-    return [[self window] isMainWindow];
+    return YES;
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    if ([[self window] isMainWindow])
-        [super drawRect: rect];
+    [fGradient fillRect: rect angle: 90];
 }
 
 @end

@@ -22,6 +22,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#warning class needed?
+
 #import "ImageBackgroundView.h"
 
 @implementation ImageBackgroundView
