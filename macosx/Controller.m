@@ -3246,15 +3246,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) windowDidBecomeMain: (NSNotification *) notification
 {
-    [fStatusBar setNeedsDisplay: YES];
-    
     [fBadger clearCompleted];
     [self updateUI];
-}
-
-- (void) windowDidResignMain: (NSNotification *) notification
-{
-    [fStatusBar setNeedsDisplay: YES];
 }
 
 - (NSSize) windowWillResize: (NSWindow *) sender toSize: (NSSize) proposedFrameSize
