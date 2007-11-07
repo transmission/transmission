@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sys/queue.h> /* libevent needs this */
+#include <sys/types.h> /* libevent needs this */
 #include <event.h>
 
 #include "transmission.h"
