@@ -58,6 +58,16 @@
 #define SORT_TRACKER    @"Tracker"
 #define SORT_ORDER      @"Order"
 
+typedef enum
+{
+    SORT_ORDER_TAG = 0,
+    SORT_DATE_TAG = 1,
+    SORT_NAME_TAG = 2,
+    SORT_PROGRESS_TAG = 3,
+    SORT_STATE_TAG = 4,
+    SORT_TRACKER_TAG = 5
+} sortTag;
+
 #define FILTER_NONE     @"None"
 #define FILTER_DOWNLOAD @"Download"
 #define FILTER_SEED     @"Seed"
@@ -291,47 +301,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [history release];
     }
-    
-    //set sort
-    #warning clean up
-    NSString * sortType = [fDefaults stringForKey: @"Sort"];
-    
-    NSMenuItem * currentSortItem, * currentSortActionItem;
-    if ([sortType isEqualToString: SORT_NAME])
-    {
-        currentSortItem = fNameSortItem;
-        currentSortActionItem = fNameSortActionItem;
-    }
-    else if ([sortType isEqualToString: SORT_STATE])
-    {
-        currentSortItem = fStateSortItem;
-        currentSortActionItem = fStateSortActionItem;
-    }
-    else if ([sortType isEqualToString: SORT_PROGRESS])
-    {
-        currentSortItem = fProgressSortItem;
-        currentSortActionItem = fProgressSortActionItem;
-    }
-    else if ([sortType isEqualToString: SORT_TRACKER])
-    {
-        currentSortItem = fTrackerSortItem;
-        currentSortActionItem = fTrackerSortActionItem;
-    }
-    else if ([sortType isEqualToString: SORT_ORDER])
-    {
-        currentSortItem = fOrderSortItem;
-        currentSortActionItem = fOrderSortActionItem;
-    }
-    else
-    {
-        //safety
-        if (![sortType isEqualToString: SORT_DATE])
-            [fDefaults setObject: SORT_DATE forKey: @"Sort"];
-        currentSortItem = fDateSortItem;
-        currentSortActionItem = fDateSortActionItem;
-    }
-    [currentSortItem setState: NSOnState];
-    [currentSortActionItem setState: NSOnState];
     
     //set filter
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -1709,93 +1678,39 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) setSort: (id) sender
 {
-    NSString * oldSortType = [fDefaults stringForKey: @"Sort"];
-    
-    //get checked items
-    NSMenuItem * prevSortItem, * prevSortActionItem;
-    if ([oldSortType isEqualToString: SORT_NAME])
+    NSString * sortType;
+    switch ([sender tag])
     {
-        prevSortItem = fNameSortItem;
-        prevSortActionItem = fNameSortActionItem;
-    }
-    else if ([oldSortType isEqualToString: SORT_STATE])
-    {
-        prevSortItem = fStateSortItem;
-        prevSortActionItem = fStateSortActionItem;
-    }
-    else if ([oldSortType isEqualToString: SORT_PROGRESS])
-    {
-        prevSortItem = fProgressSortItem;
-        prevSortActionItem = fProgressSortActionItem;
-    }
-    else if ([oldSortType isEqualToString: SORT_TRACKER])
-    {
-        prevSortItem = fTrackerSortItem;
-        prevSortActionItem = fTrackerSortActionItem;
-    }
-    else if ([oldSortType isEqualToString: SORT_ORDER])
-    {
-        prevSortItem = fOrderSortItem;
-        prevSortActionItem = fOrderSortActionItem;
-    }
-    else
-    {
-        prevSortItem = fDateSortItem;
-        prevSortActionItem = fDateSortActionItem;
-    }
-    
-    if (sender != prevSortItem && sender != prevSortActionItem)
-    {
-        //get new items to check
-        NSMenuItem * currentSortItem, * currentSortActionItem;
-        NSString * sortType;
-        if (sender == fNameSortItem || sender == fNameSortActionItem)
-        {
-            currentSortItem = fNameSortItem;
-            currentSortActionItem = fNameSortActionItem;
-            sortType = SORT_NAME;
-        }
-        else if (sender == fStateSortItem || sender == fStateSortActionItem)
-        {
-            currentSortItem = fStateSortItem;
-            currentSortActionItem = fStateSortActionItem;
-            sortType = SORT_STATE;
-        }
-        else if (sender == fProgressSortItem || sender == fProgressSortActionItem)
-        {
-            currentSortItem = fProgressSortItem;
-            currentSortActionItem = fProgressSortActionItem;
-            sortType = SORT_PROGRESS;
-        }
-        else if (sender == fTrackerSortItem || sender == fTrackerSortActionItem)
-        {
-            currentSortItem = fTrackerSortItem;
-            currentSortActionItem = fTrackerSortActionItem;
-            sortType = SORT_TRACKER;
-        }
-        else if (sender == fOrderSortItem || sender == fOrderSortActionItem)
-        {
-            currentSortItem = fOrderSortItem;
-            currentSortActionItem = fOrderSortActionItem;
+        case SORT_ORDER_TAG:
             sortType = SORT_ORDER;
-            
             [fDefaults setBool: NO forKey: @"SortReverse"];
-        }
-        else
-        {
-            currentSortItem = fDateSortItem;
-            currentSortActionItem = fDateSortActionItem;
+            break;
+            
+        case SORT_DATE_TAG:
             sortType = SORT_DATE;
-        }
+            break;
         
-        [fDefaults setObject: sortType forKey: @"Sort"];
-    
-        [prevSortItem setState: NSOffState];
-        [prevSortActionItem setState: NSOffState];
-        [currentSortItem setState: NSOnState];
-        [currentSortActionItem setState: NSOnState];
+        case SORT_NAME_TAG:
+            sortType = SORT_NAME;
+            break;
+        
+        case SORT_PROGRESS_TAG:
+            sortType = SORT_PROGRESS;
+            break;
+        
+        case SORT_STATE_TAG:
+            sortType = SORT_STATE;
+            break;
+        
+        case SORT_TRACKER_TAG:
+            sortType = SORT_TRACKER;
+            break;
+        
+        default:
+            return;
     }
-
+    
+    [fDefaults setObject: sortType forKey: @"Sort"];
     [self sortTorrents];
 }
 
@@ -2001,7 +1916,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self applyFilter: nil];
 }
 
-#warning improve
+#warning improve with matrix
 - (void) switchFilter: (id) sender
 {
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -2858,7 +2773,35 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //enable sort options
     if (action == @selector(setSort:))
+    {
+        NSString * sortType;
+        switch ([menuItem tag])
+        {
+            case SORT_ORDER_TAG:
+                sortType = SORT_ORDER;
+                break;
+            case SORT_DATE_TAG:
+                sortType = SORT_DATE;
+                break;
+            case SORT_NAME_TAG:
+                sortType = SORT_NAME;
+                break;
+            case SORT_PROGRESS_TAG:
+                sortType = SORT_PROGRESS;
+                break;
+            case SORT_STATE_TAG:
+                sortType = SORT_STATE;
+                break;
+            case SORT_TRACKER_TAG:
+                sortType = SORT_TRACKER;
+                break;
+            default:
+                sortType = @"";
+        }
+        
+        [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
         return [fWindow isVisible];
+    }
     
     if (action == @selector(toggleSmallView:))
     {

@@ -29,13 +29,13 @@
 
 - (id) initWithFrame: (NSRect) rect
 {
-	if ((self = [super initWithFrame: rect]))
+    if ((self = [super initWithFrame: rect]))
     {
         NSColor * beginningColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
         NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
         fGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
-	}
-	return self;
+    }
+    return self;
 }
 
 - (void) dealloc

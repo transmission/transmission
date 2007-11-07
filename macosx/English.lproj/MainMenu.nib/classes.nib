@@ -145,10 +145,6 @@
 			<dict>
 				<key>fActionButton</key>
 				<string>NSButton</string>
-				<key>fDateSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fDateSortItem</key>
-				<string>NSMenuItem</string>
 				<key>fDockMenu</key>
 				<string>NSMenu</string>
 				<key>fDownloadFilterButton</key>
@@ -161,10 +157,6 @@
 				<string>NSMenuItem</string>
 				<key>fFilterBar</key>
 				<string>StatusBarView</string>
-				<key>fNameSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fNameSortItem</key>
-				<string>NSMenuItem</string>
 				<key>fNextFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fNextInfoTabItem</key>
@@ -173,19 +165,11 @@
 				<string>NSButton</string>
 				<key>fOpenIgnoreDownloadFolder</key>
 				<string>NSMenuItem</string>
-				<key>fOrderSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fOrderSortItem</key>
-				<string>NSMenuItem</string>
 				<key>fPauseFilterButton</key>
 				<string>NSButton</string>
 				<key>fPrevFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fPrevInfoTabItem</key>
-				<string>NSMenuItem</string>
-				<key>fProgressSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fProgressSortItem</key>
 				<string>NSMenuItem</string>
 				<key>fScrollView</key>
 				<string>NSScrollView</string>
@@ -195,10 +179,6 @@
 				<string>NSButton</string>
 				<key>fSpeedLimitButton</key>
 				<string>NSButton</string>
-				<key>fStateSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fStateSortItem</key>
-				<string>NSMenuItem</string>
 				<key>fStatusBar</key>
 				<string>StatusBarView</string>
 				<key>fTableView</key>
@@ -209,10 +189,6 @@
 				<string>NSTextField</string>
 				<key>fTotalULField</key>
 				<string>NSTextField</string>
-				<key>fTrackerSortActionItem</key>
-				<string>NSMenuItem</string>
-				<key>fTrackerSortItem</key>
-				<string>NSMenuItem</string>
 				<key>fURLSheetTextField</key>
 				<string>NSTextField</string>
 				<key>fURLSheetWindow</key>
@@ -292,19 +268,11 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ImageBackgroundView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>StatusBarView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>ImageBackgroundView</string>
+			<string>NSView</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
