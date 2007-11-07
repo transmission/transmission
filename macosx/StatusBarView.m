@@ -25,8 +25,6 @@
 #import "StatusBarView.h"
 #import "CTGradient.h"
 
-#warning combine
-
 @implementation StatusBarView
 
 - (void) awakeFromNib

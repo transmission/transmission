@@ -6,14 +6,6 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>FilterBarView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ImageBackgroundView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -170,7 +162,7 @@
 				<key>fDownloadNoLimitItem</key>
 				<string>NSMenuItem</string>
 				<key>fFilterBar</key>
-				<string>FilterBarView</string>
+				<string>StatusBarView</string>
 				<key>fNameSortActionItem</key>
 				<string>NSMenuItem</string>
 				<key>fNameSortItem</key>
@@ -210,7 +202,7 @@
 				<key>fStateSortItem</key>
 				<string>NSMenuItem</string>
 				<key>fStatusBar</key>
-				<string>ImageBackgroundView</string>
+				<string>StatusBarView</string>
 				<key>fTableView</key>
 				<string>TorrentTableView</string>
 				<key>fTotalDLField</key>
