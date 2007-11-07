@@ -3265,8 +3265,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSRect oldFrame = [fSearchFilterField frame],
             frame = NSMakeRect(pointX, oldFrame.origin.y, NSMaxX(oldFrame) - pointX, oldFrame.size.height);
     
-    BOOL show;
-    if (show = (frame.size.width >= SEARCH_FILTER_MIN_WIDTH))
+    BOOL show = frame.size.width >= SEARCH_FILTER_MIN_WIDTH;
+    if (show)
     {
         //make sure it is not too long
         if (frame.size.width > SEARCH_FILTER_MAX_WIDTH)
