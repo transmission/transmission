@@ -108,7 +108,6 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 tr_handle * tr_init( const char * tag )
 {
     tr_handle * h;
-    int         i;
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -138,10 +137,6 @@ tr_handle * tr_init( const char * tag )
     }
 
     h->peerMgr = tr_peerMgrNew( h );
-
-    /* Azureus identity */
-    for( i=0; i < TR_AZ_ID_LEN; ++i )
-        h->azId[i] = tr_rand( 0xff );
 
     /* Initialize rate and file descripts controls */
     h->upload   = tr_rcInit();
