@@ -75,7 +75,7 @@ typedef enum
     return [super initWithWindowNibName: @"InfoWindow"];
 }
 
-- (void) awakeFromNib
+- (void) awakeFromNib 334 16
 {
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
@@ -94,7 +94,6 @@ typedef enum
     [window setAcceptsMouseMovedEvents: YES];
     
     //set tab images and tooltips
-    [fTabBackBar setBackgroundImage: [NSImage imageNamed: @"InfoTabBorder.png"]];
     [[fTabMatrix cellWithTag: TAB_INFO_TAG] setIcon: [NSImage imageNamed: @"InfoGeneral.png"]];
     [[fTabMatrix cellWithTag: TAB_ACTIVITY_TAG] setIcon: [NSImage imageNamed: @"InfoActivity.png"]];
     [[fTabMatrix cellWithTag: TAB_PEERS_TAG] setIcon: [NSImage imageNamed: @"InfoPeers.png"]];

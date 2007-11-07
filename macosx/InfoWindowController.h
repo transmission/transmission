@@ -25,7 +25,6 @@
 #import <Cocoa/Cocoa.h>
 #import "Torrent.h"
 #import "FileOutlineView.h"
-#import "ImageBackgroundView.h"
 #import "PiecesView.h"
 #import <transmission.h>
 
@@ -36,7 +35,6 @@
     IBOutlet NSView * fInfoView, * fActivityView, * fPeersView, * fFilesView, * fOptionsView;
     int fCurrentTabTag;
     IBOutlet NSMatrix * fTabMatrix;
-    IBOutlet ImageBackgroundView * fTabBackBar;
 
     IBOutlet NSImageView * fImageView;
     IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,

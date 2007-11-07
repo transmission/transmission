@@ -145,8 +145,6 @@
 			<dict>
 				<key>fActionButton</key>
 				<string>NSButton</string>
-				<key>fBottomBar</key>
-				<string>ImageBackgroundView</string>
 				<key>fDateSortActionItem</key>
 				<string>NSMenuItem</string>
 				<key>fDateSortItem</key>

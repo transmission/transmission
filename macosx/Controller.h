@@ -29,7 +29,6 @@
 #import "MessageWindowController.h"
 #import "DragOverlayWindow.h"
 #import "Badger.h"
-#import "ImageBackgroundView.h"
 #import "StatusBarView.h"
 #import "IPCController.h"
 
@@ -56,7 +55,6 @@
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
-    IBOutlet ImageBackgroundView    * fBottomBar;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     NSTimer                         * fSpeedLimitTimer;
     

@@ -187,8 +187,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) awakeFromNib
 {
-    [fBottomBar setBackgroundImage: [NSImage imageNamed: @"BottomBorder.png"]];
-    
     NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
