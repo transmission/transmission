@@ -75,7 +75,7 @@ typedef enum
     return [super initWithWindowNibName: @"InfoWindow"];
 }
 
-- (void) awakeFromNib 334 16
+- (void) awakeFromNib
 {
     //window location and size
     NSPanel * window = (NSPanel *)[self window];
