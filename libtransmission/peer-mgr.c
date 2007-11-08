@@ -71,7 +71,7 @@ enum
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
-    MAX_RECONNECTIONS_PER_PULSE = 10,
+    MAX_RECONNECTIONS_PER_PULSE = 5,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -1711,7 +1711,8 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
-        nAdd = MAX_CONNECTED_PEERS_PER_TORRENT - peerCount;
+        nAdd = !peerCount ? MAX_CONNECTED_PEERS_PER_TORRENT
+                          : MAX_RECONNECTIONS_PER_PULSE;
         for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {
             tr_peerMgr * mgr = t->manager;
