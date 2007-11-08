@@ -503,11 +503,11 @@ tr_peerIoReadBytes( tr_peerIo        * io,
     switch( io->encryptionMode )
     {
         case PEER_ENCRYPTION_NONE:
-            evbuffer_remove(  inbuf, bytes, byteCount );
+            evbuffer_remove( inbuf, bytes, byteCount );
             break;
 
         case PEER_ENCRYPTION_RC4:
-            evbuffer_remove(  inbuf, bytes, byteCount );
+            evbuffer_remove( inbuf, bytes, byteCount );
             tr_cryptoDecrypt( io->crypto, byteCount, bytes, bytes );
             break;
 

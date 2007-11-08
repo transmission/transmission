@@ -25,7 +25,6 @@
 #include "fdlimit.h"
 #include "inout.h"
 #include "list.h"
-#include "net.h"
 #include "platform.h"
 #include "peer-mgr.h"
 #include "utils.h"

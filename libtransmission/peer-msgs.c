@@ -965,6 +965,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
     if( !messageLengthIsCorrect( msgs, id, msglen ) )
     {
+        dbgmsg( msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen );
         fireGotError( msgs );
         return READ_DONE;
     }
@@ -1036,7 +1037,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 	    break;
 	}
 
-	case BT_PIECE: {
+	case BT_PIECE:
 	    dbgmsg( msgs, "got a Piece!" );
 	    assert( msgs->blockToUs.length == 0 );
 	    tr_peerIoReadUint32( msgs->io, inbuf, &msgs->blockToUs.index );
@@ -1046,14 +1047,13 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 	    msgs->state = msgs->blockToUs.length ? READING_BT_PIECE : AWAITING_BT_LENGTH;
 	    return READ_AGAIN;
 	    break;
-	}
 
-	case BT_PORT: {
+	case BT_PORT:
 	    dbgmsg( msgs, "Got a BT_PORT" );
 	    tr_peerIoReadUint16( msgs->io, inbuf, &msgs->info->port );
 	    break;
-	}
-    
+   
+#if 0 
 	case BT_SUGGEST: {
 	    /* FIXME(tiennou) */
 	    uint32_t index;
@@ -1089,6 +1089,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 	    tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 );
 	    break;
 	}
+#endif
 	
 	case BT_LTEP:
 	    dbgmsg( msgs, "Got a BT_LTEP" );
@@ -1305,7 +1306,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
                         msgs->blockToUs.index,
                         msgs->blockToUs.offset,
                         EVBUFFER_LENGTH( msgs->inBlock ) );
-        evbuffer_drain( msgs->inBlock, ~0 );
+        evbuffer_drain( msgs->inBlock, EVBUFFER_LENGTH( msgs->inBlock ) );
         msgs->state = AWAITING_BT_LENGTH;
     }
 
