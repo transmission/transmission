@@ -913,6 +913,12 @@ myHandshakeDoneCB( tr_handshake    * handshake,
 
     if( !ok || !t || !t->isRunning )
     {
+        if( t ) {
+            struct peer_atom * atom = getExistingAtom( t, addr );
+            if( atom )
+                ++atom->numFails;
+        }
+
         tr_peerIoFree( io );
     }
     else /* looking good */
@@ -1583,12 +1589,18 @@ getPeersToClose( Torrent * t, int * setmeSize )
 }
 
 static int
-compareAtomByTime( const void * va, const void * vb )
+compareCandidates( const void * va, const void * vb )
 {
     const struct peer_atom * a = * (const struct peer_atom**) va;
     const struct peer_atom * b = * (const struct peer_atom**) vb;
-    if( a->time < b->time ) return -1;
-    if( a->time > b->time ) return 1;
+    int i;
+
+    if(( i = tr_compareUint16( a->numFails, b->numFails )))
+        return i;
+
+    if( a->time != b->time )
+        return a->time < b->time ? -1 : 1;
+
     return 0;
 }
 
@@ -1632,10 +1644,17 @@ getPeerCandidates( Torrent * t, int * setmeSize )
             continue;
         }
 
+        /* we're wasting our time trying to connect to this bozo. */
+        if( atom->numFails > 10 ) {
+            tordbg( t, "RECONNECT peer %d (%s) gives us nothing but failure.",
+                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+            continue;
+        }
+
         /* if we used this peer recently, give someone else a turn */
-        minWait = 60; /* one minute */
-        maxWait = (60 * 10); /* ten minutes */
-        wait = atom->numFails * 15; /* add 15 secs to the wait interval for each consecutive failure*/
+        minWait = 10; /* ten seconds */
+        maxWait = (60 * 20); /* twenty minutes */
+        wait = atom->numFails * 30; /* add 15 secs to the wait interval for each consecutive failure*/
         if( wait < minWait ) wait = minWait;
         if( wait > maxWait ) wait = maxWait;
         if( ( now - atom->time ) < wait ) {
@@ -1647,7 +1666,7 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         ret[retCount++] = atom;
     }
 
-    qsort( ret, retCount, sizeof(struct peer_atom*), compareAtomByTime );
+    qsort( ret, retCount, sizeof(struct peer_atom*), compareCandidates );
     *setmeSize = retCount;
     return ret;
 }
