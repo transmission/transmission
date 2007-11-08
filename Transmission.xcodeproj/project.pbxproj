@@ -212,8 +212,6 @@
 		BEFC1E300C07861A00B0BB3C /* tracker.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DF70C07861A00B0BB3C /* tracker.h */; };
 		BEFC1E310C07861A00B0BB3C /* tracker.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF80C07861A00B0BB3C /* tracker.c */; };
 		BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DF90C07861A00B0BB3C /* torrent.c */; };
-		BEFC1E330C07861A00B0BB3C /* strlcpy.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFA0C07861A00B0BB3C /* strlcpy.c */; };
-		BEFC1E340C07861A00B0BB3C /* strlcat.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFB0C07861A00B0BB3C /* strlcat.c */; };
 		BEFC1E350C07861A00B0BB3C /* shared.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1DFC0C07861A00B0BB3C /* shared.h */; };
 		BEFC1E360C07861A00B0BB3C /* shared.c in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1DFD0C07861A00B0BB3C /* shared.c */; };
 		BEFC1E390C07861A00B0BB3C /* ratecontrol.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E000C07861A00B0BB3C /* ratecontrol.h */; };
@@ -601,8 +599,6 @@
 		BEFC1DF70C07861A00B0BB3C /* tracker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tracker.h; path = libtransmission/tracker.h; sourceTree = "<group>"; };
 		BEFC1DF80C07861A00B0BB3C /* tracker.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = tracker.c; path = libtransmission/tracker.c; sourceTree = "<group>"; };
 		BEFC1DF90C07861A00B0BB3C /* torrent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = torrent.c; path = libtransmission/torrent.c; sourceTree = "<group>"; };
-		BEFC1DFA0C07861A00B0BB3C /* strlcpy.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = libtransmission/strlcpy.c; sourceTree = "<group>"; };
-		BEFC1DFB0C07861A00B0BB3C /* strlcat.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = strlcat.c; path = libtransmission/strlcat.c; sourceTree = "<group>"; };
 		BEFC1DFC0C07861A00B0BB3C /* shared.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = shared.h; path = libtransmission/shared.h; sourceTree = "<group>"; };
 		BEFC1DFD0C07861A00B0BB3C /* shared.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = shared.c; path = libtransmission/shared.c; sourceTree = "<group>"; };
 		BEFC1E000C07861A00B0BB3C /* ratecontrol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ratecontrol.h; path = libtransmission/ratecontrol.h; sourceTree = "<group>"; };
@@ -929,8 +925,6 @@
 				BEFC1DF70C07861A00B0BB3C /* tracker.h */,
 				BEFC1DF80C07861A00B0BB3C /* tracker.c */,
 				BEFC1DF90C07861A00B0BB3C /* torrent.c */,
-				BEFC1DFA0C07861A00B0BB3C /* strlcpy.c */,
-				BEFC1DFB0C07861A00B0BB3C /* strlcat.c */,
 				BEFC1DFC0C07861A00B0BB3C /* shared.h */,
 				BEFC1DFD0C07861A00B0BB3C /* shared.c */,
 				BEFC1E000C07861A00B0BB3C /* ratecontrol.h */,
@@ -1528,8 +1522,6 @@
 				BEFC1E2F0C07861A00B0BB3C /* transmission.c in Sources */,
 				BEFC1E310C07861A00B0BB3C /* tracker.c in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.c in Sources */,
-				BEFC1E330C07861A00B0BB3C /* strlcpy.c in Sources */,
-				BEFC1E340C07861A00B0BB3C /* strlcat.c in Sources */,
 				BEFC1E360C07861A00B0BB3C /* shared.c in Sources */,
 				BEFC1E3A0C07861A00B0BB3C /* ratecontrol.c in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.c in Sources */,
