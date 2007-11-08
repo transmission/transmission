@@ -89,13 +89,13 @@ struct tr_handshake
 {
     unsigned int havePeerID                   : 1;
     unsigned int haveSentBitTorrentHandshake  : 1;
-    unsigned int allowUnencryptedPeers        : 1;
     tr_peerIo * io;
     tr_crypto * crypto;
     struct tr_handle * handle;
     uint8_t myPublicKey[KEY_LEN];
     uint8_t mySecret[KEY_LEN];
     uint8_t state;
+    tr_encryption_mode encryptionMode;
     uint16_t pad_c_len;
     uint16_t pad_d_len;
     uint16_t  ia_len;
@@ -324,20 +324,53 @@ sendYa( tr_handshake * handshake )
 }
 
 static uint32_t
-getCryptoProvide( const tr_handshake * handshake UNUSED )
+getCryptoProvide( const tr_handshake * handshake )
 {
-    uint32_t i = 0;
+    uint32_t provide = 0;
 
-    i |= CRYPTO_PROVIDE_CRYPTO; /* always allow crypto */
+    switch( handshake->encryptionMode )
+    {
+        case TR_ENCRYPTION_REQUIRED:
+        case TR_ENCRYPTION_PREFERRED:
+            provide |= CRYPTO_PROVIDE_CRYPTO;
+            break;
 
-#if 0
-    /* by the time we send a crypto_provide, we _know_
-     * the peer supports encryption. */
-    if( handshake->allowUnencryptedPeers )
-        i |= CRYPTO_PROVIDE_PLAINTEXT;
-#endif
+        case TR_PLAINTEXT_PREFERRED:
+            provide |= CRYPTO_PROVIDE_CRYPTO | CRYPTO_PROVIDE_PLAINTEXT;
+            break;
+    }
 
-   return i;
+    return provide;
+}
+
+static uint32_t
+getCryptoSelect( const tr_handshake * handshake, uint32_t crypto_provide )
+{
+    uint32_t choices[4];
+    int i, nChoices=0;
+
+    switch( handshake->encryptionMode )
+    {
+        case TR_ENCRYPTION_REQUIRED:
+            choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+            break;
+
+        case TR_ENCRYPTION_PREFERRED:
+            choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+            choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
+            break;
+
+        case TR_PLAINTEXT_PREFERRED:
+            choices[nChoices++] = CRYPTO_PROVIDE_PLAINTEXT;
+            choices[nChoices++] = CRYPTO_PROVIDE_CRYPTO;
+            break;
+    }
+
+    for( i=0; i<nChoices; ++i )
+        if( crypto_provide & choices[i] )
+            return choices[i];
+
+    return 0;
 }
 
 static int
@@ -544,7 +577,7 @@ readHandshake( tr_handshake * handshake, struct evbuffer * inbuf )
     {
         tr_peerIoSetEncryption( handshake->io, PEER_ENCRYPTION_NONE );
 
-        if( !handshake->allowUnencryptedPeers )
+        if( handshake->encryptionMode == TR_ENCRYPTION_REQUIRED )
         {
             dbgmsg( handshake, "peer is unencrypted, and we're disallowing that" );
             tr_handshakeDone( handshake, FALSE );
@@ -840,23 +873,16 @@ dbgmsg( handshake, "sending vc" );
         tr_peerIoWriteBytes( handshake->io, outbuf, vc, VC_LENGTH );
     }
 
-dbgmsg( handshake, "sending crypto_select" );
     /* send crypto_select */
-    {
-dbgmsg( handshake, "handshake->crypto_provide is %d", (int)handshake->crypto_provide );
-        if( handshake->crypto_provide & CRYPTO_PROVIDE_CRYPTO )
-            crypto_select = CRYPTO_PROVIDE_CRYPTO;
-        else if( handshake->allowUnencryptedPeers )
-            crypto_select = CRYPTO_PROVIDE_PLAINTEXT;
-        else {
-dbgmsg( handshake, "gronk..." );
-            evbuffer_free( outbuf );
-            tr_handshakeDone( handshake, FALSE );
-            return READ_DONE;
-        }
-
-dbgmsg( handshake, "we select crypto_select as %d...", (int)crypto_select );
+    crypto_select = getCryptoSelect( handshake, handshake->crypto_provide );
+    if( crypto_select ) {
+        dbgmsg( handshake, "selecting crypto mode '%d'", (int)crypto_select );
         tr_peerIoWriteUint32( handshake->io, outbuf, crypto_select );
+    } else {
+        dbgmsg( handshake, "peer didn't offer an encryption mode we like." );
+        evbuffer_free( outbuf );
+        tr_handshakeDone( handshake, FALSE );
+        return READ_DONE;
     }
 
 dbgmsg( handshake, "sending pad d" );
@@ -964,7 +990,7 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * arg )
      * have encountered a peer that doesn't do encryption... reconnect and
      * try a plaintext handshake */
     if(    ( ( handshake->state == AWAITING_YB ) || ( handshake->state == AWAITING_VC ) )
-        && ( handshake->allowUnencryptedPeers )
+        && ( handshake->encryptionMode != TR_ENCRYPTION_REQUIRED )
         && ( !tr_peerIoReconnect( handshake->io ) ) )
     {
         int msgSize; 
@@ -990,7 +1016,7 @@ gotError( struct bufferevent * evbuf UNUSED, short what, void * arg )
 
 tr_handshake*
 tr_handshakeNew( tr_peerIo           * io,
-                 tr_encryption_mode    encryption_mode,
+                 tr_encryption_mode    encryptionMode,
                  handshakeDoneCB       doneCB,
                  void                * doneUserData )
 {
@@ -999,7 +1025,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake = tr_new0( tr_handshake, 1 );
     handshake->io = io;
     handshake->crypto = tr_peerIoGetCrypto( io );
-    handshake->allowUnencryptedPeers = encryption_mode!=TR_ENCRYPTION_REQUIRED;
+    handshake->encryptionMode = encryptionMode;
     handshake->doneCB = doneCB;
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
@@ -1009,8 +1035,16 @@ tr_handshakeNew( tr_peerIo           * io,
 
     if( tr_peerIoIsIncoming( handshake->io ) )
         setReadState( handshake, AWAITING_HANDSHAKE );
-    else
+    else if( encryptionMode != TR_PLAINTEXT_PREFERRED )
         sendYa( handshake );
+    else {
+        int msgSize; 
+        uint8_t * msg = buildHandshakeMessage( handshake, &msgSize );
+        handshake->haveSentBitTorrentHandshake = 1;
+        setReadState( handshake, AWAITING_HANDSHAKE );
+        tr_peerIoWrite( handshake->io, msg, msgSize );
+        tr_free( msg );
+    }
 
     return handshake;
 }

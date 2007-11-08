@@ -116,6 +116,7 @@ typedef struct tr_tracker_info tr_tracker_info;
 
 typedef enum
 {
+    TR_PLAINTEXT_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
     TR_ENCRYPTION_REQUIRED
 }
