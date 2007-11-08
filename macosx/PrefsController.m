@@ -79,7 +79,7 @@
         tr_natTraversalEnable(fHandle, [fDefaults boolForKey: @"NatTraversal"]);
         
         //set encryption
-        tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED);
+        [self setEncryptionMode: nil];
         
         //actually set bandwidth limits
         [self applySpeedSettings: nil];
@@ -341,9 +341,10 @@
         [sound play];
 }
 
-- (void) setEncryptionRequired: (id) sender
+- (void) setEncryptionMode: (id) sender
 {
-    tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED);
+    tr_setEncryptionMode(fHandle, [fDefaults boolForKey: @"EncryptionPrefer"] ? 
+        ([fDefaults boolForKey: @"EncryptionRequire"] ? TR_ENCRYPTION_REQUIRED : TR_ENCRYPTION_PREFERRED) : TR_PLAINTEXT_PREFERRED);
 }
 
 - (void) applySpeedSettings: (id) sender

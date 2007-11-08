@@ -50,6 +50,8 @@
 	<integer>100</integer>
 	<key>DownloadSound</key>
 	<string>Glass</string>
+	<key>EncryptionPrefer</key>
+	<true/>
 	<key>EncryptionRequire</key>
 	<false/>
 	<key>Filter</key>

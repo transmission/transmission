@@ -1,78 +1,167 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = MenuButton; LANGUAGE = ObjC; SUPERCLASS = NSButton; }, 
-        {CLASS = NSDatePicker; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
-        {
-            ACTIONS = {
-                applyRatioSetting = id; 
-                applySpeedSettings = id; 
-                folderSheetShow = id; 
-                helpForNetwork = id; 
-                importFolderSheetShow = id; 
-                incompleteFolderSheetShow = id; 
-                resetWarnings = id; 
-                setAutoImport = id; 
-                setAutoSize = id; 
-                setAutoSpeedLimit = id; 
-                setBadge = id; 
-                setCheckForUpdate = id; 
-                setDownloadLocation = id; 
-                setEncryptionRequired = id; 
-                setGlobalLimit = id; 
-                setNat = id; 
-                setPort = id; 
-                setQueue = id; 
-                setQueueNumber = id; 
-                setRatioStop = id; 
-                setSound = id; 
-                setSpeedLimit = id; 
-                setStalled = id; 
-                setStalledMinutes = id; 
-            }; 
-            CLASS = PrefsController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                fAdvancedView = NSView; 
-                fBandwidthView = NSView; 
-                fDownloadField = NSTextField; 
-                fDownloadSoundPopUp = NSPopUpButton; 
-                fFolderPopUp = NSPopUpButton; 
-                fGeneralView = NSView; 
-                fImportFolderPopUp = NSPopUpButton; 
-                fIncompleteFolderPopUp = NSPopUpButton; 
-                fNatCheck = NSButton; 
-                fNatStatusField = NSTextField; 
-                fNatStatusImage = NSImageView; 
-                fPortField = NSTextField; 
-                fPortStatusField = NSTextField; 
-                fPortStatusImage = NSImageView; 
-                fPortStatusProgress = NSProgressIndicator; 
-                fQueueDownloadField = NSTextField; 
-                fQueueSeedField = NSTextField; 
-                fRatioStopField = NSTextField; 
-                fSeedingSoundPopUp = NSPopUpButton; 
-                fSpeedLimitDownloadField = NSTextField; 
-                fSpeedLimitUploadField = NSTextField; 
-                fStalledField = NSTextField; 
-                fTransfersView = NSView; 
-                fUploadField = NSTextField; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = PrefsWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
-        {
-            ACTIONS = {checkForUpdates = id; }; 
-            CLASS = SUUpdater; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = TorrentTableView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {fContextNoRow = NSMenu; fContextRow = NSMenu; fController = Controller; }; 
-            SUPERCLASS = NSTableView; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>applyRatioSetting</key>
+				<string>id</string>
+				<key>applySpeedSettings</key>
+				<string>id</string>
+				<key>folderSheetShow</key>
+				<string>id</string>
+				<key>helpForNetwork</key>
+				<string>id</string>
+				<key>importFolderSheetShow</key>
+				<string>id</string>
+				<key>incompleteFolderSheetShow</key>
+				<string>id</string>
+				<key>resetWarnings</key>
+				<string>id</string>
+				<key>setAutoImport</key>
+				<string>id</string>
+				<key>setAutoSize</key>
+				<string>id</string>
+				<key>setAutoSpeedLimit</key>
+				<string>id</string>
+				<key>setBadge</key>
+				<string>id</string>
+				<key>setCheckForUpdate</key>
+				<string>id</string>
+				<key>setDownloadLocation</key>
+				<string>id</string>
+				<key>setEncryptionMode</key>
+				<string>id</string>
+				<key>setGlobalLimit</key>
+				<string>id</string>
+				<key>setNat</key>
+				<string>id</string>
+				<key>setPort</key>
+				<string>id</string>
+				<key>setQueue</key>
+				<string>id</string>
+				<key>setQueueNumber</key>
+				<string>id</string>
+				<key>setRatioStop</key>
+				<string>id</string>
+				<key>setSound</key>
+				<string>id</string>
+				<key>setSpeedLimit</key>
+				<string>id</string>
+				<key>setStalled</key>
+				<string>id</string>
+				<key>setStalledMinutes</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PrefsController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>fAdvancedView</key>
+				<string>NSView</string>
+				<key>fBandwidthView</key>
+				<string>NSView</string>
+				<key>fDownloadField</key>
+				<string>NSTextField</string>
+				<key>fDownloadSoundPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>fFolderPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>fGeneralView</key>
+				<string>NSView</string>
+				<key>fImportFolderPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>fIncompleteFolderPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>fNatCheck</key>
+				<string>NSButton</string>
+				<key>fNatStatusField</key>
+				<string>NSTextField</string>
+				<key>fNatStatusImage</key>
+				<string>NSImageView</string>
+				<key>fPortField</key>
+				<string>NSTextField</string>
+				<key>fPortStatusField</key>
+				<string>NSTextField</string>
+				<key>fPortStatusImage</key>
+				<string>NSImageView</string>
+				<key>fPortStatusProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>fQueueDownloadField</key>
+				<string>NSTextField</string>
+				<key>fQueueSeedField</key>
+				<string>NSTextField</string>
+				<key>fRatioStopField</key>
+				<string>NSTextField</string>
+				<key>fSeedingSoundPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>fSpeedLimitDownloadField</key>
+				<string>NSTextField</string>
+				<key>fSpeedLimitUploadField</key>
+				<string>NSTextField</string>
+				<key>fStalledField</key>
+				<string>NSTextField</string>
+				<key>fTransfersView</key>
+				<string>NSView</string>
+				<key>fUploadField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSMenu</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSDatePicker</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PrefsWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
