@@ -25,8 +25,8 @@
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
-#define SPEED_BOTTOM_PADDING 2.0
-#define SPEED_BETWEEN_PADDING 2.0
+#define BOTTOM_PADDING 2.0
+#define BETWEEN_PADDING 2.0
 
 @interface BadgeView (Private)
 
@@ -78,8 +78,8 @@
             
             //ignore shadow of badge when placing string
             NSRect stringRect = badgeRect;
-            stringRect.size.height -= SPEED_BOTTOM_PADDING;
-            stringRect.origin.y += SPEED_BOTTOM_PADDING;
+            stringRect.size.height -= BOTTOM_PADDING;
+            stringRect.origin.y += BOTTOM_PADDING;
             
             if (uploadRateString)
             {
@@ -94,7 +94,7 @@
                 //download rate above upload rate
                 if (uploadRateString)
                 {
-                    float spaceBetween = badgeRect.size.height + SPEED_BETWEEN_PADDING;
+                    float spaceBetween = badgeRect.size.height + BETWEEN_PADDING;
                     badgeRect.origin.y += spaceBetween;
                     stringRect.origin.y += spaceBetween;
                 }
@@ -121,7 +121,6 @@
         [stringShadow setShadowOffset: NSMakeSize(2.0, -2.0)];
         [stringShadow setShadowBlurRadius: 4.0];
         
-        #warning center here?
         fAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:
             [NSColor whiteColor], NSForegroundColorAttributeName,
             [NSFont boldSystemFontOfSize: 26.0], NSFontAttributeName, stringShadow, NSShadowAttributeName, nil];

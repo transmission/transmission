@@ -1514,7 +1514,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ ! -e ./third-party/libevent/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then ln -s ../macosx-libevent-config.h ./third-party/libevent/config.h; fi";
+			shellScript = "if [ ! -e ./third-party/libevent/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then ln -s ../macosx-libevent-config.h ./third-party/libevent/config.h; fi\n\nif [ ! -e ./third-party/libevent/event-config.h -a ! ./third-party/macosx-libevent-event-config.h -ef ./third-party/libevent/event-config.h ]; then ln -s ../macosx-libevent-event-config.h ./third-party/libevent/event-config.h; fi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1822,14 +1822,17 @@
 			buildSettings = {
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party";
+				USER_HEADER_SEARCH_PATHS = "third-party/libevent";
 			};
 			name = Development;
 		};
 		0053D3D40C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "third-party";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent",
+					"third-party",
+				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
@@ -1909,7 +1912,10 @@
 		4D18389C09DEC01E0047D688 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "third-party";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent",
+					"third-party",
+				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
@@ -1998,7 +2004,10 @@
 		A250CFEE0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = "third-party";
+				HEADER_SEARCH_PATHS = (
+					"third-party/libevent",
+					"third-party",
+				);
 				OTHER_CFLAGS = (
 					"-DSYS_DARWIN",
 					"-DHAVE_OPENSSL",
@@ -2041,7 +2050,7 @@
 			buildSettings = {
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party";
+				USER_HEADER_SEARCH_PATHS = "third-party/libevent";
 			};
 			name = "Release - Debug";
 		};
@@ -2106,7 +2115,7 @@
 			buildSettings = {
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
-				USER_HEADER_SEARCH_PATHS = "third-party";
+				USER_HEADER_SEARCH_PATHS = "third-party/libevent";
 			};
 			name = Release;
 		};
