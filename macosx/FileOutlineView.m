@@ -26,6 +26,7 @@
 #import "FileNameCell.h"
 #import "FilePriorityCell.h"
 #import "Torrent.h"
+#import "CTGradient.h"
 
 @implementation FileOutlineView
 
@@ -42,18 +43,26 @@
     [self setAutoresizesOutlineColumn: NO];
     [self setIndentationPerLevel: 14.0];
     
-    fHighPriorityColor = [[NSColor colorWithCalibratedRed: 0.8588 green: 0.9961 blue: 0.8311 alpha: 1.0] retain];
-    fLowPriorityColor = [[NSColor colorWithCalibratedRed: 1.0 green: 0.9529 blue: 0.8078 alpha: 1.0] retain];
-    fMixedPriorityColor = [[NSColor colorWithCalibratedRed: 0.9216 green: 0.9059 blue: 1.0 alpha: 1.0] retain];
+    NSColor * beginningColor = [NSColor colorWithCalibratedRed: 217.0/255.0 green: 250.0/255.0 blue: 211.0/255.0 alpha: 1.0];
+    NSColor * endingColor = [NSColor colorWithCalibratedRed: 200.0/255.0 green: 231.0/255.0 blue: 194.0/255.0 alpha: 1.0];
+    fHighPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    
+    beginningColor = [NSColor colorWithCalibratedRed: 255.0/255.0 green: 243.0/255.0 blue: 206.0/255.0 alpha: 1.0];
+    endingColor = [NSColor colorWithCalibratedRed: 235.0/255.0 green: 226.0/255.0 blue: 192.0/255.0 alpha: 1.0];
+    fLowPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+    
+    beginningColor = [NSColor colorWithCalibratedRed: 225.0/255.0 green: 218.0/255.0 blue: 255.0/255.0 alpha: 1.0];
+    endingColor = [NSColor colorWithCalibratedRed: 214.0/255.0 green: 207.0/255.0 blue: 242.0/255.0 alpha: 1.0];
+    fMixedPriorityGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
     
     fHoverRow = -1;
 }
 
 - (void) dealloc
 {
-    [fHighPriorityColor release];
-    [fLowPriorityColor release];
-    [fMixedPriorityColor release];
+    [fHighPriorityGradient release];
+    [fLowPriorityGradient release];
+    [fMixedPriorityGradient release];
     
     [super dealloc];
 }
@@ -123,35 +132,31 @@
         
         if ([fTorrent checkForFiles: indexes] != NSOffState)
         {
+            CTGradient * gradient = nil;
+            
             NSSet * priorities = [fTorrent filePrioritiesForIndexes: indexes];
             int count = [priorities count];
-            if (count > 0)
+            if (count == 1)
             {
-                BOOL custom = YES;
-                if (count > 1)
-                    [fMixedPriorityColor set];
-                else
+                switch ([[priorities anyObject] intValue])
                 {
-                    switch ([[priorities anyObject] intValue])
-                    {
-                        case TR_PRI_LOW:
-                            [fLowPriorityColor set];
-                            break;
-                        case TR_PRI_HIGH:
-                            [fHighPriorityColor set];
-                            break;
-                        default:
-                            custom = NO;
-                    }
+                    case TR_PRI_LOW:
+                        gradient = fLowPriorityGradient;
+                        break;
+                    case TR_PRI_HIGH:
+                        gradient = fHighPriorityGradient;
+                        break;
                 }
-                
-                if (custom)
-                {
-                    NSRect rect = [self rectOfRow: row];
-                    rect.size.height -= 1.0;
+            }
+            else if (count > 1)
+                gradient = fMixedPriorityGradient;
+            else;
             
-                    NSRectFill(rect);
-                }
+            if (gradient)
+            {
+                NSRect rect = [self rectOfRow: row];
+                rect.size.height -= 1.0;
+                [gradient fillRect: rect angle: 90];
             }
         }
     }
