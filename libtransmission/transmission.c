@@ -90,7 +90,9 @@ void
 tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 {
     assert( handle != NULL );
-    assert( mode==TR_ENCRYPTION_PREFERRED || mode==TR_ENCRYPTION_REQUIRED );
+    assert( mode==TR_ENCRYPTION_PREFERRED
+         || mode==TR_ENCRYPTION_REQUIRED
+         || mode==TR_PLAINTEXT_PREFERRED );
 
     handle->encryptionMode = mode;
 }
