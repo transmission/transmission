@@ -299,6 +299,10 @@ tr_closeImpl( void * vh )
 
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
+    
+    tr_natTraversalEnable( h, 0 );
+    while( tr_handleStatus( h )->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED )
+        tr_wait( 100 );
 
     tr_sharedClose( h->shared );
     tr_fdClose();

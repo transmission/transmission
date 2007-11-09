@@ -105,9 +105,10 @@
     [toolbar setAllowsUserCustomization: NO];
     [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [toolbar setSizeMode: NSToolbarSizeModeRegular];
-    [[self window] setToolbar: toolbar];
-
     [toolbar setSelectedItemIdentifier: TOOLBAR_GENERAL];
+    [[self window] setToolbar: toolbar];
+    [toolbar release];
+    
     [self setPrefView: nil];
     
     //set download folder
@@ -240,8 +241,8 @@
 {
     tr_handle_status * stat = tr_handleStatus(fHandle);
     
-    BOOL change;
-    if (change = (fNatStatus != stat->natTraversalStatus))
+    BOOL change = fNatStatus != stat->natTraversalStatus;
+    if (change)
     {
         fNatStatus = stat->natTraversalStatus;
         switch (fNatStatus)
