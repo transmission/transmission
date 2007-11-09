@@ -208,7 +208,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fWindow makeFirstResponder: fTableView];
     [fWindow setExcludedFromWindowsMenu: YES];
-    [fWindow setAcceptsMouseMovedEvents: YES]; //ensure filter buttons display correctly
     
     //set table size
     if ([fDefaults boolForKey: @"SmallView"])
@@ -2696,7 +2695,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             TOOLBAR_FILTER, TOOLBAR_INFO, nil];
 }
 
-#warning validateUserInterfaceItem: ???
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
 {
     NSString * ident = [toolbarItem itemIdentifier];
