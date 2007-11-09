@@ -526,7 +526,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSString * path;
         while ((path = [torrentEnumerator nextObject]))
             [[NSFileManager defaultManager] removeFileAtPath: path handler: nil];
-        [fTempTorrentFiles removeAllObjects];
     }
     
     //remember window states and close all windows
@@ -1409,7 +1408,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) updateUI
 {
-    #warning make main thread?
     [fTorrents makeObjectsPerformSelector: @selector(update)];
     
     if (![NSApp isHidden])
