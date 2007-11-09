@@ -29,6 +29,7 @@ struct tr_upnp
     char lanaddr[16];
     unsigned int isForwarding : 1;
     unsigned int isEnabled : 1;
+    unsigned int hasDiscovered : 1;
 };
 
 /**
@@ -39,13 +40,7 @@ tr_upnp*
 tr_upnpInit( void )
 {
     tr_upnp * ret = tr_new0( tr_upnp, 1 );
-    struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
-    if( UPNP_GetValidIGD( devlist, &ret->urls, &ret->data, ret->lanaddr, sizeof(ret->lanaddr))) {
-        tr_dbg( "Found Internet Gateway Device '%s'", ret->urls.controlURL );
-        tr_dbg( "Local LAN IP Address is '%s'", ret->lanaddr );
-    }
     ret->port = -1;
-    freeUPNPDevlist( devlist );
     return ret;
 }
 
@@ -53,7 +48,8 @@ void
 tr_upnpClose( tr_upnp * handle )
 {
     tr_upnpStop( handle );
-    FreeUPNPUrls( &handle->urls );
+    if( handle->hasDiscovered )
+        FreeUPNPUrls( &handle->urls );
     tr_free( handle );
 }
 
@@ -64,6 +60,17 @@ tr_upnpClose( tr_upnp * handle )
 void
 tr_upnpStart( tr_upnp * handle )
 {
+    if( !handle->hasDiscovered )
+    {
+        struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
+        if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
+            tr_dbg( "Found Internet Gateway Device '%s'", handle->urls.controlURL );
+            tr_dbg( "Local LAN IP Address is '%s'", handle->lanaddr );
+        }
+        freeUPNPDevlist( devlist );
+        handle->hasDiscovered = 1;
+    }
+
     handle->isEnabled = 1;
 
     if( handle->port >= 0 )
