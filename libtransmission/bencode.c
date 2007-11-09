@@ -22,7 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <assert.h>
 #include <ctype.h> /* isdigit, isprint */
 #include <stdarg.h>
 #include <stdio.h>

@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
 #include "list.h"
 #include "publish.h"
 #include "utils.h"

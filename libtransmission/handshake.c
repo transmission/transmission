@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h> /* UCHAR_MAX */

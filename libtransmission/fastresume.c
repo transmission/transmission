@@ -41,7 +41,6 @@
  * so the resume file will not be read).
  **********************************************************************/
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

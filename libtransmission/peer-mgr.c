@@ -10,7 +10,6 @@
  * $Id$
  */
 
-#include <assert.h>
 #include <string.h> /* memcpy, memcmp */
 #include <stdlib.h> /* qsort */
 #include <stdio.h> /* printf */

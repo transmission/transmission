@@ -90,6 +90,17 @@ void tr_wait( uint64_t delay_milliseconds );
 ****
 ***/
 
+#ifdef SYS_DARWIN
+#include <Foundation/Foundation.h>
+#define assert(A) NSCParameterAssert(A)
+#else
+#include <assert.h>
+#endif
+
+/***
+****
+***/
+
 #define tr_new(struct_type, n_structs)           \
     ((struct_type *) tr_malloc (((size_t) sizeof (struct_type)) * ((size_t) (n_structs))))
 #define tr_new0(struct_type, n_structs)          \
