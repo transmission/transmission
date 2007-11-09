@@ -91,7 +91,7 @@ void tr_wait( uint64_t delay_milliseconds );
 ***/
 
 #ifdef SYS_DARWIN
-#include <Foundation/Foundation.h>
+#include <Foundation/NSException.h>
 #define assert(A) NSCParameterAssert(A)
 #else
 #include <assert.h>
