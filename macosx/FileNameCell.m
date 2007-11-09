@@ -89,7 +89,6 @@
     //icon
     [[self image] drawInRect: [self imageRectForBounds: cellFrame] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
-    #warning factor in selected folder
     //title
     NSColor * specialColor = nil;
     if ([self isHighlighted]

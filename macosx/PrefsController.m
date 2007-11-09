@@ -131,6 +131,7 @@
     [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
     
     //set port
+    #warning why no binding?
     [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
     fNatStatus = -1;
     

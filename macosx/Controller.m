@@ -2165,10 +2165,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) indexes toPasteboard: (NSPasteboard *) pasteboard
 {
-    //only allow reordering of rows if sorting by order with no filter
-    if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER]
-        && [[fDefaults stringForKey: @"Filter"] isEqualToString: FILTER_NONE]
-        && [[fSearchFilterField stringValue] length] == 0)
+    //only allow reordering of rows if sorting by order
+    if ([[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER])
     {
         [pasteboard declareTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE] owner: self];
         [pasteboard setData: [NSKeyedArchiver archivedDataWithRootObject: indexes] forType: TORRENT_TABLE_VIEW_DATA_TYPE];
@@ -2177,7 +2175,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return NO;
 }
 
-- (NSDragOperation) tableView: (NSTableView *) t validateDrop: (id <NSDraggingInfo>) info
+- (NSDragOperation) tableView: (NSTableView *) tableView validateDrop: (id <NSDraggingInfo>) info
     proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
 {
     NSPasteboard * pasteboard = [info draggingPasteboard];
@@ -2205,33 +2203,40 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData:
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
-        //move torrent in array 
-        NSArray * movingTorrents = [[fDisplayedTorrents objectsAtIndexes: indexes] retain];
-        [fDisplayedTorrents removeObjectsInArray: movingTorrents];
-        
-        //determine the insertion index now that transfers to move have been removed
+        //determine where to move them
         int i, decrease = 0;
         for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
-            decrease++;
+            newRow--;
+        
+        //reinsert into array
+        int insertIndex = newRow > 0 ? [[[fDisplayedTorrents objectAtIndex: newRow-1] orderValue] intValue] + 1 : 0;
+        
+        //get all torrents to reorder
+        NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
+                                                @"orderValue" ascending: YES] autorelease];
+        NSArray * descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+        
+        NSMutableArray * sortedTorrents = [[fTorrents sortedArrayUsingDescriptors: descriptors] mutableCopy];
+        [descriptors release];
+        
+        //remove objects to reinsert
+        NSArray * movingTorrents = [[fDisplayedTorrents objectsAtIndexes: indexes] retain];
+        [sortedTorrents removeObjectsInArray: movingTorrents];
         
         //insert objects at new location
         for (i = 0; i < [movingTorrents count]; i++)
-            [fDisplayedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: newRow - decrease + i];
+            [sortedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
         
         [movingTorrents release];
-        
+                
         //redo order values
-        int low = [indexes firstIndex], high = [indexes lastIndex];
-        if (newRow < low)
-            low = newRow;
-        else if (newRow > high + 1)
-            high = newRow - 1;
-        else;
+        i = 0;
+        for (i = 0; i < [sortedTorrents count]; i++)
+            [[sortedTorrents objectAtIndex: i] setOrderValue: i];
         
-        for (i = low; i <= high; i++)
-            [[fDisplayedTorrents objectAtIndex: i] setOrderValue: i];
+        [sortedTorrents release];
         
-        [fTableView reloadData];
+        [self applyFilter: nil];
         
         //set selected rows if needed
         if (selectedTorrents)
