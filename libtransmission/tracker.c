@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <assert.h>
 #include <ctype.h> /* isalnum */
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>

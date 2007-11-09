@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

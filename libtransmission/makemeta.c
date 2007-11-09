@@ -10,6 +10,7 @@
  * $Id$
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <math.h>
 #include <stdio.h> /* FILE, snprintf, stderr */
