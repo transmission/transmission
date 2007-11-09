@@ -71,7 +71,7 @@ struct tr_peerIo
 static void
 didWriteWrapper( struct bufferevent * e, void * userData )
 {
-    tr_peerIo * c = (tr_peerIo *) userData;
+    tr_peerIo * c = userData;
     if( c->didWrite != NULL )
         (*c->didWrite)( e, c->userData );
 }
@@ -80,7 +80,7 @@ static void
 canReadWrapper( struct bufferevent * e, void * userData )
 {
     int done = 0;
-    tr_peerIo * c = (tr_peerIo *) userData;
+    tr_peerIo * c = userData;
     tr_handle * handle = c->handle;
 
     if( c->canRead == NULL )
@@ -110,7 +110,7 @@ canReadWrapper( struct bufferevent * e, void * userData )
 static void
 gotErrorWrapper( struct bufferevent * e, short what, void * userData )
 {
-    tr_peerIo * c = (tr_peerIo *) userData;
+    tr_peerIo * c = userData;
     if( c->gotError != NULL )
         (*c->gotError)( e, what, c->userData );
 }

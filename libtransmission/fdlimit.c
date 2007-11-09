@@ -33,11 +33,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h> /* basename, dirname */
-#include <fcntl.h>
+#include <fcntl.h> /* O_LARGEFILE */
 
-#include <sys/queue.h> /* evhttp.h needs this */
 #include <event.h>
-#include <evhttp.h>
 #include <evutil.h>
 
 #include "transmission.h"
@@ -88,7 +86,7 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
-    TR_MAX_SOCKETS = 1024,
+    TR_MAX_SOCKETS = 512,
 
     TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
@@ -141,6 +139,9 @@ TrOpenFile( int i, const char * filename, int write )
 
     /* open the file */
     flags = write ? (O_RDWR | O_CREAT) : O_RDONLY;
+#ifdef O_LARGEFILE
+    flags |= O_LARGEFILE;
+#endif
 #ifdef WIN32
     flags |= O_BINARY;
 #endif
