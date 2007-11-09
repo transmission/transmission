@@ -932,6 +932,10 @@ myHandshakeDoneCB( tr_handshake    * handshake,
             tordbg( t, "banned peer %s tried to reconnect", tr_peerIoAddrStr(&atom->addr,atom->port) );
             tr_peerIoFree( io );
         }
+        else if( tr_ptrArraySize( t->peers ) >= MAX_CONNECTED_PEERS_PER_TORRENT )
+        {
+            tr_peerIoFree( io );
+        }
         else
         {
             tr_peer * peer = getExistingPeer( t, addr );
