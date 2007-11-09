@@ -109,14 +109,6 @@ tr_core_model( TrCore * self );
 tr_handle *
 tr_core_handle( TrCore * self );
 
-/* Try to politely stop all torrents and nat traversal */
-void
-tr_core_shutdown( TrCore * self );
-
-/* Returns true if the shutdown has completed */
-gboolean
-tr_core_quiescent( TrCore * self );
-
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
