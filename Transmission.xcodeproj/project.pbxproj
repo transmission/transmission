@@ -359,7 +359,7 @@
 		4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = TorrentCell.m; path = macosx/TorrentCell.m; sourceTree = "<group>"; };
 		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TorrentCell.h; path = macosx/TorrentCell.h; sourceTree = "<group>"; };
 		4DDBB71909E16BAE00284745 /* transmissioncli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = transmissioncli; sourceTree = BUILT_PRODUCTS_DIR; };
-		4DDBB71B09E16BF100284745 /* transmissioncli.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = transmissioncli.c; path = cli/transmissioncli.c; sourceTree = "<group>"; };
+		4DDBB71B09E16BF100284745 /* transmissioncli.c */ = {isa = PBXFileReference; fileEncoding = 5; lastKnownFileType = sourcecode.c.c; name = transmissioncli.c; path = cli/transmissioncli.c; sourceTree = "<group>"; };
 		4DDFDD20099A5D8E00189D81 /* DownloadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownloadBadge.png; path = macosx/Images/DownloadBadge.png; sourceTree = "<group>"; };
 		4DDFDD21099A5D8E00189D81 /* UploadBadge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UploadBadge.png; path = macosx/Images/UploadBadge.png; sourceTree = "<group>"; };
 		4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = macosx/NSStringAdditions.h; sourceTree = "<group>"; };
@@ -1861,7 +1861,11 @@
 		0053D3D70C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Development;
@@ -1869,7 +1873,11 @@
 		0053D3D80C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Development;
@@ -1877,7 +1885,11 @@
 		0053D3D90C86774200545606 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = Development;
@@ -2016,7 +2028,11 @@
 		A250CFEF0CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = "Release - Debug";
@@ -2024,7 +2040,11 @@
 		A250CFF00CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -2032,7 +2052,11 @@
 		A250CFF10CDA19680068B4B6 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = "Release - Debug";
@@ -2114,7 +2138,11 @@
 		BEFC1C0A0C07753800B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-daemon";
 			};
 			name = Release;
@@ -2122,7 +2150,11 @@
 		BEFC1CF80C07822400B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
@@ -2130,7 +2162,11 @@
 		BEFC1D420C0783EE00B0BB3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = .;
+				HEADER_SEARCH_PATHS = (
+					.,
+					"third-party/",
+					"third-party/libevent",
+				);
 				PRODUCT_NAME = "transmission-proxy";
 			};
 			name = Release;
