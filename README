@@ -18,8 +18,8 @@ for building in Xcode.
 
 Building a Transmission release from the command line:
 
-    $ tar xvfj transmission-0.92.tar.bz2
-    $ cd transmission-0.90
+    $ tar xvfj transmission-1.0.tar.bz2
+    $ cd transmission-1.0
     $ ./configure -q && make -s
     $ su (if necessary for the next line)
     $ make install
