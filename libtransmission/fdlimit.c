@@ -297,7 +297,7 @@ tr_fdFileRelease( int file )
         struct tr_openfile * o = &gFd->open[i];
         if( o->fd == file ) {
             dbgmsg( "releasing file '%s' in slot #%d", o->filename, i );
-            fsync( o->fd );
+            /* fsync( o->fd ); */
             o->isCheckedOut = 0;
             break;
         }
