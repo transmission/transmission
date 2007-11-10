@@ -712,7 +712,6 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 {
     const char * warning;
     tr_tracker * t;
-    int err = 0;
     int responseCode;
 
     t = findTrackerFromHash( torrent_hash );
@@ -796,14 +795,6 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         if( bencLoaded )
             tr_bencFree( &benc );
     }
-    else
-    {
-        tr_inf( "Bad response for torrent '%s' on request '%s' "
-                "... trying again in 30 seconds",
-                t->name, t->lastRequest );
-
-        err = 1;
-    }
 
     if (( warning = updateAddresses( t, req ) )) {
         publishWarning( t, warning );
@@ -848,7 +839,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     }
     else if( 500<=responseCode && responseCode<=599 )
     {
-        dbgmsg( t, "got a 5xx error... retrying in 15 seconds." );
+        dbgmsg( t, "Got a 5xx error... retrying in 15 seconds." );
 
         /* Response status codes beginning with the digit "5" indicate
          * cases in which the server is aware that it has erred or is
@@ -861,7 +852,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     }
     else
     {
-        dbgmsg( t, "unhandled condition... retrying in 120 seconds." );
+        dbgmsg( t, "Invalid response from tracker... retrying in 120 seconds." );
 
         /* WTF did we get?? */
         if( req && req->response_code_line )
