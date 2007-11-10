@@ -952,7 +952,7 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
 }
 
 static void
-clientGotBlock( tr_peermsgs * msgs, struct evbuffer * inbuf, const struct peer_request * req );
+clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_request * req );
 
 static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
@@ -960,12 +960,15 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
     uint8_t id;
     uint32_t ui32;
     uint32_t msglen = msgs->incomingMessageLength;
+    const size_t startBufLen = EVBUFFER_LENGTH( inbuf );
 
     if( EVBUFFER_LENGTH(inbuf) < msglen )
         return READ_MORE;
 
     tr_peerIoReadUint8( msgs->io, inbuf, &id );
-    dbgmsg( msgs, "got BT id %d, len %d", (int)id, (int)msglen );
+    dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)EVBUFFER_LENGTH(inbuf) );
+
+assert( messageLengthIsCorrect( msgs, id, msglen ) );
 
     if( !messageLengthIsCorrect( msgs, id, msglen ) )
     {
@@ -978,132 +981,142 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
     switch( id )
     {
-	case BT_CHOKE:
-	    dbgmsg( msgs, "got Choke" );
-	    msgs->info->clientIsChoked = 1;
-	    cancelAllRequestsToPeer( msgs );
-	    cancelAllRequestsToClientExceptFast( msgs );
-	    break;
+        case BT_CHOKE:
+            dbgmsg( msgs, "got Choke" );
+            msgs->info->clientIsChoked = 1;
+            cancelAllRequestsToPeer( msgs );
+            cancelAllRequestsToClientExceptFast( msgs );
+            break;
 
-	case BT_UNCHOKE:
-	    dbgmsg( msgs, "got Unchoke" );
-	    msgs->info->clientIsChoked = 0;
-	    fireNeedReq( msgs );
-	    break;
+        case BT_UNCHOKE:
+            dbgmsg( msgs, "got Unchoke" );
+            msgs->info->clientIsChoked = 0;
+            fireNeedReq( msgs );
+            break;
 
-	case BT_INTERESTED:
-	    dbgmsg( msgs, "got Interested" );
-	    msgs->info->peerIsInterested = 1;
-	    tr_peerMsgsSetChoke( msgs, 0 );
-	    break;
+        case BT_INTERESTED:
+            dbgmsg( msgs, "got Interested" );
+            msgs->info->peerIsInterested = 1;
+            tr_peerMsgsSetChoke( msgs, 0 );
+            break;
 
-	case BT_NOT_INTERESTED:
-	    dbgmsg( msgs, "got Not Interested" );
-	    msgs->info->peerIsInterested = 0;
-	    break;
+        case BT_NOT_INTERESTED:
+            dbgmsg( msgs, "got Not Interested" );
+            msgs->info->peerIsInterested = 0;
+            break;
 
-	case BT_HAVE:
-	    tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-	    dbgmsg( msgs, "got Have: %u", ui32 );
-	    tr_bitfieldAdd( msgs->info->have, ui32 );
-	    updatePeerProgress( msgs );
-	    tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
-	    break;
+        case BT_HAVE:
+            tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
+            dbgmsg( msgs, "got Have: %u", ui32 );
+            tr_bitfieldAdd( msgs->info->have, ui32 );
+            updatePeerProgress( msgs );
+            tr_rcTransferred( msgs->torrent->swarmspeed, msgs->torrent->info.pieceSize );
+            break;
 
-	case BT_BITFIELD: {
-	    const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
-	    dbgmsg( msgs, "got a bitfield" );
-	    tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
-	    updatePeerProgress( msgs );
-	    tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
-	    fireNeedReq( msgs );
-	    break;
-	}
-
-	case BT_REQUEST: {
-	    struct peer_request req;
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-	    dbgmsg( msgs, "got Request: %u:%u->%u", req.index, req.offset, req.length );
-	    peerMadeRequest( msgs, &req );
-	    break;
-	}
-
-	case BT_CANCEL: {
-	    struct peer_request req;
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-	    dbgmsg( msgs, "got a Cancel %u:%u->%u", req.index, req.offset, req.length );
-	    tr_free( tr_list_remove( &msgs->peerAskedForFast, &req, compareRequest ) );
-	    tr_free( tr_list_remove( &msgs->peerAskedFor, &req, compareRequest ) );
-	    break;
-	}
-
-	case BT_PIECE: {
-            struct peer_request req;
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-            req.length = msglen - 8;
-	    dbgmsg( msgs, "got a Block %u:%u->%u", req.index, req.offset, req.length );
-            clientGotBlock( msgs, inbuf, &req );
-	    break;
+        case BT_BITFIELD: {
+            const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
+            dbgmsg( msgs, "got a bitfield" );
+            tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
+            updatePeerProgress( msgs );
+            tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
+            fireNeedReq( msgs );
+            break;
         }
 
-	case BT_PORT:
-	    dbgmsg( msgs, "Got a BT_PORT" );
-	    tr_peerIoReadUint16( msgs->io, inbuf, &msgs->info->port );
-	    break;
-   
-#if 0 
-	case BT_SUGGEST: {
-	    /* FIXME(tiennou) */
-	    uint32_t index;
-	    tr_peerIoReadUint32( msgs->io, inbuf, &index );
-	    break;
-	}
-	
-	case BT_HAVE_ALL:
-	    dbgmsg( msgs, "Got a BT_HAVE_ALL" );
-            tr_bitfieldAddRange( msgs->info->have, 0, msgs->torrent->info.pieceCount );
-	    updatePeerProgress( msgs );
-	    break;
-	
-	case BT_HAVE_NONE:
-	    dbgmsg( msgs, "Got a BT_HAVE_NONE" );
-	    tr_bitfieldClear( msgs->info->have );
-	    updatePeerProgress( msgs );
-	    break;
-	
-	case BT_REJECT: {
-	    struct peer_request req;
-	    dbgmsg( msgs, "Got a BT_REJECT" );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
-	    tr_free( tr_list_remove( &msgs->clientAskedFor, &req, compareRequest ) );
-	    break;
-	}
-	
-	case BT_ALLOWED_FAST: {
-	    dbgmsg( msgs, "Got a BT_ALLOWED_FAST" );
-	    tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-	    tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 );
-	    break;
-	}
-#endif
-	
-	case BT_LTEP:
-	    dbgmsg( msgs, "Got a BT_LTEP" );
-	    parseLtep( msgs, msglen, inbuf );
-	    break;
+        case BT_REQUEST: {
+            struct peer_request req;
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
+            dbgmsg( msgs, "got Request: %u:%u->%u", req.index, req.offset, req.length );
+            peerMadeRequest( msgs, &req );
+            break;
+        }
 
-	default:
-	    dbgmsg( msgs, "peer sent us an UNKNOWN: %d", (int)id );
-	    tr_peerIoDrain( msgs->io, inbuf, msglen );
-	    break;
+        case BT_CANCEL: {
+            struct peer_request req;
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
+            dbgmsg( msgs, "got a Cancel %u:%u->%u", req.index, req.offset, req.length );
+            tr_free( tr_list_remove( &msgs->peerAskedForFast, &req, compareRequest ) );
+            tr_free( tr_list_remove( &msgs->peerAskedFor, &req, compareRequest ) );
+            break;
+        }
+
+        case BT_PIECE: {
+            uint8_t * block;
+            struct peer_request req;
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
+            req.length = msglen - 8;
+            block = tr_new( uint8_t, req.length );
+            tr_peerIoReadBytes( msgs->io, inbuf, block, req.length );
+            dbgmsg( msgs, "got a Block %u:%u->%u", req.index, req.offset, req.length );
+            clientGotBlock( msgs, block, &req );
+            tr_free( block );
+            break;
+        }
+
+        case BT_PORT:
+            dbgmsg( msgs, "Got a BT_PORT" );
+            tr_peerIoReadUint16( msgs->io, inbuf, &msgs->info->port );
+            break;
+
+#if 0 
+        case BT_SUGGEST: {
+            /* FIXME(tiennou) */
+            uint32_t index;
+            tr_peerIoReadUint32( msgs->io, inbuf, &index );
+            break;
+        }
+
+        case BT_HAVE_ALL:
+            dbgmsg( msgs, "Got a BT_HAVE_ALL" );
+            tr_bitfieldAddRange( msgs->info->have, 0, msgs->torrent->info.pieceCount );
+            updatePeerProgress( msgs );
+            break;
+
+        case BT_HAVE_NONE:
+            dbgmsg( msgs, "Got a BT_HAVE_NONE" );
+            tr_bitfieldClear( msgs->info->have );
+            updatePeerProgress( msgs );
+            break;
+
+        case BT_REJECT: {
+            struct peer_request req;
+            dbgmsg( msgs, "Got a BT_REJECT" );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.index );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.offset );
+            tr_peerIoReadUint32( msgs->io, inbuf, &req.length );
+            tr_free( tr_list_remove( &msgs->clientAskedFor, &req, compareRequest ) );
+            break;
+        }
+
+        case BT_ALLOWED_FAST: {
+            dbgmsg( msgs, "Got a BT_ALLOWED_FAST" );
+            tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
+            tr_bitfieldAdd( msgs->clientAllowedPieces, ui32 );
+            break;
+        }
+#endif
+
+        case BT_LTEP:
+            dbgmsg( msgs, "Got a BT_LTEP" );
+            parseLtep( msgs, msglen, inbuf );
+            break;
+
+        default:
+            dbgmsg( msgs, "peer sent us an UNKNOWN: %d", (int)id );
+            tr_peerIoDrain( msgs->io, inbuf, msglen );
+assert( 0 );
+            break;
     }
+
+
+    dbgmsg( msgs, "startBufLen was %d, msglen was %d, current inbuf len is %d", (int)startBufLen, (int)(msglen+1), (int)EVBUFFER_LENGTH(inbuf) );
+assert( msglen + 1 == msgs->incomingMessageLength );
+assert( EVBUFFER_LENGTH(inbuf) == startBufLen - msgs->incomingMessageLength );
 
     msgs->incomingMessageLength = -1;
     msgs->state = AWAITING_BT_LENGTH;
@@ -1186,19 +1199,16 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
 }
 
 static void
-clientGotBlock( tr_peermsgs * msgs, struct evbuffer * inbuf, const struct peer_request * req )
+clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_request * req )
 {
     int i;
-    uint8_t * data;
     tr_torrent * tor = msgs->torrent;
     const int block = _tr_block( tor, req->index, req->offset );
     struct peer_request *myreq;
 
     assert( msgs != NULL );
-    assert( inbuf != NULL );
     assert( req != NULL );
     assert( req->length > 0 );
-    assert( EVBUFFER_LENGTH( inbuf ) >= req->length );
     assert( req->length == (uint32_t)tr_torBlockCountBytes( msgs->torrent, block ) );
 
     /* save the block */
@@ -1235,12 +1245,9 @@ clientGotBlock( tr_peermsgs * msgs, struct evbuffer * inbuf, const struct peer_r
     ***  Save the block
     **/
 
-    data = tr_new( uint8_t, req->length );
-    tr_peerIoReadBytes( msgs->io, inbuf, data, req->length );
     msgs->info->peerSentPieceDataAt = time( NULL );
     clientGotBytes( msgs, req->length );
     i = tr_ioWrite( tor, req->index, req->offset, req->length, data );
-    tr_free( data );
     if( i )
         return;
 
