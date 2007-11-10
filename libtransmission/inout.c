@@ -195,13 +195,13 @@ tr_ioRead( tr_torrent  * tor,
 }
 
 int
-tr_ioWrite( tr_torrent  * tor,
-            int           pieceIndex,
-            int           begin,
-            int           len,
-            uint8_t     * buf )
+tr_ioWrite( tr_torrent     * tor,
+            int              pieceIndex,
+            int              begin,
+            int              len,
+            const uint8_t  * buf )
 {
-    return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, buf, len );
+    return readOrWritePiece( tor, TR_IO_WRITE, pieceIndex, begin, (void*)buf, len );
 }
 
 /****
