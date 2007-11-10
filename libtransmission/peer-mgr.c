@@ -548,6 +548,7 @@ struct tr_refill_piece
     uint32_t piece;
     uint32_t peerCount;
     uint32_t fastAllowed;
+    uint32_t suggested;
 };
 
 static int
@@ -557,7 +558,7 @@ compareRefillPiece (const void * aIn, const void * bIn)
     const struct tr_refill_piece * b = bIn;
     
     /* if one *might be* fastallowed to us, get it first...
-     * I'm putting it on top so we prioritise those pieces at
+     * I'm putting it on top so we prioritize those pieces at
      * startup, then we'll have them, and we'll be denied access
      * to them */
     if (a->fastAllowed != b->fastAllowed)
@@ -566,6 +567,10 @@ compareRefillPiece (const void * aIn, const void * bIn)
     /* if one piece has a higher priority, it goes first */
     if (a->priority != b->priority)
         return a->priority > b->priority ? -1 : 1;
+    
+    /* otherwise if one was suggested to us, get it */
+    if (a->suggested != b->suggested)
+        return a->suggested < b->suggested ? -1 : 1;
 
     /* try to fill partial pieces */
     if( a->percentDone != b->percentDone )
@@ -638,7 +643,10 @@ getPreferredPieces( Torrent     * t,
                 /* The fast peer extension doesn't force a peer to actually HAVE a fast-allowed piece,
                     but we're guaranteed to get the same pieces from different peers, 
                     so we'll build a list and pray one actually have this one */
-                setme->fastAllowed = tr_peerMsgIsPieceFastAllowed( peer->msgs, i);
+                setme->fastAllowed = tr_peerMsgsIsPieceFastAllowed( peer->msgs, i );
+                /* Also, if someone SUGGESTed a piece to us, prioritize it over non-suggested others
+                 */
+                setme->suggested   = tr_peerMsgsIsPieceSuggested( peer->msgs, i );
             }
         }
 
