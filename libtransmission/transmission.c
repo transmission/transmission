@@ -295,6 +295,11 @@ static void
 tr_closeImpl( void * vh )
 {
     tr_handle * h = vh;
+    tr_torrent * t;
+
+    for( t=h->torrentList; t!=NULL; t=t->next )
+        tr_torrentClose( t );
+
     tr_peerMgrFree( h->peerMgr );
 
     tr_rcClose( h->upload );
