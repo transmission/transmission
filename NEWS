@@ -10,8 +10,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 0.93 (2007/xx/yy)
 - All Platforms:
-   + Fix bug that could cause good peer connections to be dropped
-   + Fix 0.90 bug that connected to far more peers than we could use
+   + Fix "router death" bug that impaired internet use by
+     cycling through too many peer connections too quickly.
+   + Fix bug that could cause good peer connections to be lost
    + Tweak our request queue code to improve download speeds
 
 0.92 (2007/11/05)
