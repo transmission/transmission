@@ -445,11 +445,13 @@ generate :
     uint32_t allowedPieceCount = 0;
     tr_bitfield_t * ret;
 
+#if 0
     printf( "%d piece allowed fast set for torrent with %d pieces and hex infohash\n", setCount, pieceCount );
     printf( "%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x for node with IP %s:\n",
             infohash[0], infohash[1], infohash[2], infohash[3], infohash[4], infohash[5], infohash[6], infohash[7], infohash[8], infohash[9],
             infohash[10], infohash[11], infohash[12], infohash[13], infohash[14], infohash[15], infohash[16], infohash[7], infohash[18], infohash[19],
             inet_ntoa( *ip ) );
+#endif
     
     seed = malloc(4 + SHA_DIGEST_LENGTH);
     
