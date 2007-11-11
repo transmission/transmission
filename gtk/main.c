@@ -442,9 +442,9 @@ wannaquit( void * vdata )
         cbdata->timer = 0;
     }
 
-    /* freeze the gui */
-    if( cbdata->wind )
-        gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
+    /* clear the UI */
+    gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
+    gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
 
     /* shut down libT */
     g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
