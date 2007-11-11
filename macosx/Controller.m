@@ -1533,7 +1533,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                     description: [torrent name] notificationName: GROWL_DOWNLOAD_COMPLETE
                                     iconData: nil priority: 0 isSticky: NO clickContext: clickContext];
         
-        if (![fWindow isKeyWindow])
+        if (![fWindow isMainWindow])
             [fBadger incrementCompleted];
         
         if ([fDefaults boolForKey: @"QueueSeed"] && [self numToStartFromQueue: NO] <= 0)
@@ -2405,6 +2405,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTableView display];
 }
 
+- (void) toggleAvailabilityBar: (id) sender
+{
+    [fDefaults setBool: ![fDefaults boolForKey: @"DisplayProgressBarAvailable"] forKey: @"DisplayProgressBarAvailable"];
+    [fTableView display];
+}
+
 - (void) toggleStatusBar: (id) sender
 {
     [self showStatusBar: [fStatusBar isHidden] animate: YES];
@@ -2798,6 +2804,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (action == @selector(togglePiecesBar:))
     {
         [menuItem setState: [fDefaults boolForKey: @"PiecesBar"] ? NSOnState : NSOffState];
+        return [fWindow isVisible];
+    }
+    
+    if (action == @selector(toggleAvailabilityBar:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"DisplayProgressBarAvailable"] ? NSOnState : NSOffState];
         return [fWindow isVisible];
     }
 

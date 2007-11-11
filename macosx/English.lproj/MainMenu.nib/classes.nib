@@ -126,6 +126,8 @@
 				<string>id</string>
 				<key>switchFilter</key>
 				<string>id</string>
+				<key>toggleAvailabilityBar</key>
+				<string>id</string>
 				<key>toggleFilterBar</key>
 				<string>id</string>
 				<key>togglePiecesBar</key>

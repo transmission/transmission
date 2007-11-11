@@ -200,6 +200,7 @@
 
 - (void) toggleSmallView: (id) sender;
 - (void) togglePiecesBar: (id) sender;
+- (void) toggleAvailabilityBar: (id) sender;
 
 - (void) toggleStatusBar: (id) sender;
 - (void) showStatusBar: (BOOL) show animate: (BOOL) animate;
