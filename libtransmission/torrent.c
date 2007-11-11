@@ -1089,6 +1089,7 @@ tr_torrentClose( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
+    tr_torrentClearStatusCallback( tor );
     tr_runInEventThread( tor->handle, closeTorrent, tor );
 
     tr_globalUnlock( tor->handle );
