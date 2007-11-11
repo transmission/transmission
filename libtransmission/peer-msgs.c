@@ -1765,3 +1765,4 @@ tr_peerMsgsIsPieceSuggested( const tr_peermsgs * peer,
 {
     return tr_bitfieldHas( peer->clientSuggestedPieces, index );
 }
+

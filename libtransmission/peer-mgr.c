@@ -1311,7 +1311,7 @@ tr_peerMgrGetAvailable( const tr_peerMgr * manager,
     pieces = tr_bitfieldDup( tr_cpPieceBitfield( t->tor->completion ) );
     for( i=0; i<size; ++i )
         if( peers[i]->io != NULL )
-            tr_bitfieldAnd( pieces, peers[i]->have );
+            tr_bitfieldOr( pieces, peers[i]->have );
 
     managerUnlock( (tr_peerMgr*)manager );
     return pieces;
