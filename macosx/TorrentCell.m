@@ -344,9 +344,9 @@
                     notAvailableRect.origin.x += leftWidth + rightWidth;
                     notAvailableRect.size.width = notAvailableWidth;
                     
-                    if (!fYellowGradient)
-                        fYellowGradient = [[CTGradient progressYellowGradient] retain];
-                    [fYellowGradient fillRect: notAvailableRect angle: -90];
+                    if (!fRedGradient)
+                        fRedGradient = [[CTGradient progressRedGradient] retain];
+                    [fRedGradient fillRect: notAvailableRect angle: -90];
                 }
             }
             

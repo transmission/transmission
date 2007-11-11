@@ -38,6 +38,7 @@
 + (CTGradient *)progressGreenGradient;
 + (CTGradient *)progressLightGreenGradient;
 + (CTGradient *)progressDarkGreenGradient;
++ (CTGradient *)progressRedGradient;
 + (CTGradient *)progressYellowGradient;
 + (CTGradient *)progressTransparentGradient;
 @end
