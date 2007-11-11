@@ -242,33 +242,9 @@
 {
     tr_handle_status * stat = tr_handleStatus(fHandle);
     
-    BOOL change = fNatStatus != stat->natTraversalStatus;
-    if (change)
+    if (fNatStatus != stat->natTraversalStatus || fPublicPort != stat->publicPort)
     {
         fNatStatus = stat->natTraversalStatus;
-        switch (fNatStatus)
-        {
-            case TR_NAT_TRAVERSAL_MAPPED:
-                [fNatStatusField setStringValue: NSLocalizedString(@"Port successfully mapped",
-                                                    "Preferences -> Advanced -> port map status")];
-                [fNatStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
-                break;
-            
-            case TR_NAT_TRAVERSAL_NOTFOUND:
-            case TR_NAT_TRAVERSAL_ERROR:
-                [fNatStatusField setStringValue: NSLocalizedString(@"Error mapping port",
-                                                    "Preferences -> Advanced -> port map status")];
-                [fNatStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
-                break;
-            
-            default:
-                [fNatStatusField setStringValue: @""];
-                [fNatStatusImage setImage: nil];
-        }
-    }
-    
-    if (change || fPublicPort != stat->publicPort)
-    {
         fPublicPort = stat->publicPort;
         
         [fPortStatusField setStringValue: [NSLocalizedString(@"Checking port status",

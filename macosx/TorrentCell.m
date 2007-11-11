@@ -280,7 +280,7 @@
     if ([fDefaults boolForKey: @"PiecesBar"])
     {
         NSRect regularBarRect = barRect, piecesBarRect = barRect;
-        regularBarRect.size.height /= 3;
+        regularBarRect.size.height /= 2.5;
         piecesBarRect.origin.y += regularBarRect.size.height;
         piecesBarRect.size.height -= regularBarRect.size.height;
         
