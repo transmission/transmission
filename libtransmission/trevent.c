@@ -228,7 +228,7 @@ tr_eventInit( tr_handle * handle )
     eh = tr_new0( tr_event_handle, 1 );
     eh->lock = tr_lockNew( );
     eh->h = handle;
-    eh->pulseInterval = timevalMsec( 20 );
+    eh->pulseInterval = timevalMsec( 100 );
     eh->thread = tr_threadNew( libeventThreadFunc, eh, "libeventThreadFunc" );
 }
 
