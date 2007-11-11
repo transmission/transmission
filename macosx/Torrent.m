@@ -169,16 +169,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     [super dealloc];
 }
 
-- (void) closeTorrent
-{
-    tr_torrentClearStatusCallback(fHandle);
-    tr_torrentClose(fHandle);
-}
-
 - (void) closeRemoveTorrent
 {
     tr_torrentRemoveSaved(fHandle);
-    [self closeTorrent];
+    tr_torrentClose(fHandle);
 }
 
 - (void) changeIncompleteDownloadFolder: (NSString *) folder

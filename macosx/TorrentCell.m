@@ -464,7 +464,6 @@
     int i, h, index;
     float increment = (float)pieceCount / MAX_PIECES;
     NSColor * pieceColor;
-    BOOL change;
     for (i = 0; i < MAX_PIECES; i++)
     {
         index = i * increment;

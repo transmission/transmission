@@ -536,12 +536,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //save history
     [self updateTorrentHistory];
     
-    //make sure torrents are closed
-    NSEnumerator * enumerator = [fTorrents objectEnumerator];
-    Torrent * torrent;
-    while ((torrent = [enumerator nextObject]))
-        [torrent closeTorrent];
-    
     [fDisplayedTorrents removeAllObjects];
     [fTorrents removeAllObjects];
     
@@ -2228,7 +2222,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             [sortedTorrents insertObject: [movingTorrents objectAtIndex: i] atIndex: insertIndex + i];
         
         [movingTorrents release];
-                
+        
         //redo order values
         i = 0;
         for (i = 0; i < [sortedTorrents count]; i++)
@@ -2326,6 +2320,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         BOOL torrent = NO, accept = YES;
         
+        #warning replace ifs with switch
         //create an array of files that can be opened
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
