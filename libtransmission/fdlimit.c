@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h> /* basename, dirname */
-#include <fcntl.h>
+#include <fcntl.h> /* O_LARGEFILE */
 
 #include <sys/queue.h> /* libevent needs this */
 #include <sys/types.h> /* libevent needs this */
@@ -89,7 +89,7 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
-    TR_MAX_SOCKETS = 1024,
+    TR_MAX_SOCKETS = 512,
 
     TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
@@ -142,6 +142,9 @@ TrOpenFile( int i, const char * filename, int write )
 
     /* open the file */
     flags = write ? (O_RDWR | O_CREAT) : O_RDONLY;
+#ifdef O_LARGEFILE
+    flags |= O_LARGEFILE;
+#endif
 #ifdef WIN32
     flags |= O_BINARY;
 #endif
@@ -297,7 +300,7 @@ tr_fdFileRelease( int file )
         struct tr_openfile * o = &gFd->open[i];
         if( o->fd == file ) {
             dbgmsg( "releasing file '%s' in slot #%d", o->filename, i );
-            fsync( o->fd );
+            /* fsync( o->fd ); */
             o->isCheckedOut = 0;
             break;
         }
