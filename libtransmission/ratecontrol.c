@@ -22,12 +22,11 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <string.h>
+#include <string.h> /* memset */
 
 #include "transmission.h"
 #include "platform.h"
 #include "ratecontrol.h"
-#include "shared.h"
 #include "utils.h"
 
 #define GRANULARITY_MSEC 250
@@ -35,19 +34,18 @@
 #define LONG_INTERVAL_MSEC 20000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
-typedef struct
+struct tr_transfer
 {
     uint64_t date;
     uint64_t size;
-}
-tr_transfer_t;
+};
 
 struct tr_ratecontrol
 {
     tr_lock * lock;
     int limit;
     int newest;
-    tr_transfer_t transfers[HISTORY_SIZE];
+    struct tr_transfer transfers[HISTORY_SIZE];
 };
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
@@ -182,7 +180,7 @@ tr_rcReset( tr_ratecontrol * r )
 {
     tr_lockLock( (tr_lock*)r->lock );
     r->newest = 0;
-    memset( r->transfers, 0, sizeof(tr_transfer_t) * HISTORY_SIZE );
+    memset( r->transfers, 0, sizeof(struct tr_transfer) * HISTORY_SIZE );
     tr_lockUnlock( (tr_lock*)r->lock );
 }
 

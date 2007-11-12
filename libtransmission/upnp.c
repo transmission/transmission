@@ -64,8 +64,8 @@ tr_upnpStart( tr_upnp * handle )
     {
         struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
-            tr_dbg( "Found Internet Gateway Device '%s'", handle->urls.controlURL );
-            tr_dbg( "Local LAN IP Address is '%s'", handle->lanaddr );
+            tr_dbg( "UPNP: Found Internet Gateway Device '%s'", handle->urls.controlURL );
+            tr_dbg( "UPNP: Local LAN IP Address is '%s'", handle->lanaddr );
         }
         freeUPNPDevlist( devlist );
         handle->hasDiscovered = 1;
@@ -84,9 +84,9 @@ tr_upnpStart( tr_upnp * handle )
                                                       portStr, portStr, handle->lanaddr,
                                                       "Transmission", "TCP" ) );
 
-        tr_dbg( "UPNP Port Forwarding via '%s', service '%s'.  (local address: %s:%d)",
+        tr_inf( "UPNP: Port Forwarding via '%s', service '%s'.  (local address: %s:%d)",
                 handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, handle->port );
-        tr_dbg( "UPNP Port Forwarding Enabled?  %s", (handle->isForwarding?"Yes":"No") );
+        tr_inf( "UPNP: Port Forwarding Enabled?  %s", (handle->isForwarding?"Yes":"No") );
     }
 }
 
