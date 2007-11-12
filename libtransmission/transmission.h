@@ -411,19 +411,6 @@ int tr_torrentIsPexEnabled( const tr_torrent * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
 
-#if 0
-/***********************************************************************
- * tr_torrentScrape
- ***********************************************************************
- * Asks the tracker for the count of seeders and leechers. Returns 0
- * and fills 's' and 'l' if successful. Otherwise returns 1 if the
- * tracker doesn't support the scrape protocol, is unreachable or
- * replied with some error. tr_torrentScrape may block up to 20 seconds
- * before returning.
- **********************************************************************/
-int tr_torrentScrape( tr_torrent *, int * s, int * l, int * d );
-#endif
-
 void   tr_torrentSetFolder( tr_torrent *, const char * );
 const char * tr_torrentGetFolder( const tr_torrent * );
 

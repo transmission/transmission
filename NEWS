@@ -4,6 +4,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - All Platforms:
    + UPnP now performed by MiniUPnP
    + Option to prefer not using encryption
+   + Restore `scrape' feature in the command-line interface client
 - OS X:
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
