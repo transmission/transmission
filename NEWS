@@ -1,6 +1,6 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.93 (2007/11/11)
+0.93 (2007/11/12)
 - All Platforms:
    + Fix "router death" bug that impaired internet connectivity
    + Fix bug that could cause good peer connections to be lost
