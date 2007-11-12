@@ -20,6 +20,8 @@
 
 #include <netinet/in.h> /* struct in_addr */
 
+#include <sys/queue.h> /* libevent needs this */
+#include <sys/types.h> /* libevent needs this */
 #include <event.h>
 
 #include "transmission.h"

@@ -17,9 +17,10 @@
 #include <limits.h> /* INT_MAX */
 
 #include <libgen.h> /* basename */
-#include <sys/types.h> /* event.h needs this */
 #include <arpa/inet.h> /* inet_ntoa */
 
+#include <sys/queue.h> /* libevent needs this */
+#include <sys/types.h> /* libevent needs this */
 #include <event.h>
 
 #include "transmission.h"
