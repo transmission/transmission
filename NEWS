@@ -6,6 +6,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Fix bug that could cause good peer connections to be lost
    + Tweak request queue code to improve download speeds
    + Consume less battery power on laptops
+   + Fix minor IPC parsing error
 
 0.92 (2007/11/05)
 - All Platforms:
