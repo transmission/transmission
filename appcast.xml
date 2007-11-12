@@ -6,26 +6,22 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Mon, 07 Nov 2007 16:45:00 -0400</lastBuildDate>
+    <lastBuildDate>Mon, 11 Nov 2007 23:22:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 0.92 Released</title>
+      <title>Transmission 0.93 Released</title>
       <description><![CDATA[
 <h3>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h3>
 
 <h4>Transmission Changes:</h4>
 <ul>
- <li>Fix 0.90 data corruption bugs</li>
- <li>Fix 0.90 possible delay when quitting</li>
- <li>Fix 0.90 small memory leaks</li>
-</ul>
-<h4>Mac-Specific Changes:</h4>
-<ul>
- <li>Leopard: Fix bug with typing values in Inspector->Options</li>
- <li>Leopard: Fix bug with toggling Minimal View</li>
+ <li>Fix "router death" bug that impaired internet connectivity</li>
+ <li>Fix bug that could cause good peer connections to be lost</li>
+ <li>Tweak request queue code to improve download speeds</li>
+ <li>Consume less battery power on laptops</li>
 </ul>]]></description>
-      <pubDate>Mon, 07 Nov 2007 16:45:00 -0400</pubDate>
-      <enclosure sparkle:version="3711" sparkle:shortVersionString="0.92" url="http://mirrors.m0k.org/transmission/files/Transmission-0.92.dmg" length="2143155" type="application/octet-stream"/>
+      <pubDate>Mon, 11 Nov 2007 23:22:00 -0400</pubDate>
+      <enclosure sparkle:version="3800" sparkle:shortVersionString="0.93" url="http://mirrors.m0k.org/transmission/files/Transmission-0.93.dmg" length="2145380" type="application/octet-stream"/>
     </item>
     
   </channel>
