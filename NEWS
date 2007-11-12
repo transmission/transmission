@@ -1,10 +1,10 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.93 (2007/xx/yy)
+0.93 (2007/11/11)
 - All Platforms:
    + Fix "router death" bug that impaired internet connectivity
    + Fix bug that could cause good peer connections to be lost
-   + Tweak our request queue code to improve download speeds
+   + Tweak request queue code to improve download speeds
    + Consume less battery power on laptops
 
 0.92 (2007/11/05)
