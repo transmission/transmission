@@ -251,6 +251,14 @@ publish( tr_peermsgs * msgs, tr_peermsgs_event * e )
 }
 
 static void
+fireGotAssertError( tr_peermsgs * msgs )
+{
+    tr_peermsgs_event e = blankEvent;
+    e.eventType = TR_PEERMSG_GOT_ASSERT_ERROR;
+    publish( msgs, &e );
+}
+
+static void
 fireGotError( tr_peermsgs * msgs )
 {
     tr_peermsgs_event e = blankEvent;
@@ -968,12 +976,13 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
     }
 }
 
-static void
+static int
 clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_request * req );
 
 static int
 readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
 {
+    int ret;
     uint8_t id;
     uint32_t ui32;
     uint32_t msglen = msgs->incomingMessageLength;
@@ -985,8 +994,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
     tr_peerIoReadUint8( msgs->io, inbuf, &id );
     dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)EVBUFFER_LENGTH(inbuf) );
 
-assert( messageLengthIsCorrect( msgs, id, msglen ) );
-
     if( !messageLengthIsCorrect( msgs, id, msglen ) )
     {
         dbgmsg( msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen );
@@ -995,7 +1002,7 @@ assert( messageLengthIsCorrect( msgs, id, msglen ) );
     }
 
     --msglen;
-
+    ret = 0;
     switch( id )
     {
         case BT_CHOKE:
@@ -1073,7 +1080,7 @@ assert( messageLengthIsCorrect( msgs, id, msglen ) );
             block = tr_new( uint8_t, req.length );
             tr_peerIoReadBytes( msgs->io, inbuf, block, req.length );
             dbgmsg( msgs, "got a Block %u:%u->%u", req.index, req.offset, req.length );
-            clientGotBlock( msgs, block, &req );
+            ret = clientGotBlock( msgs, block, &req );
             tr_free( block );
             break;
         }
@@ -1134,14 +1141,27 @@ assert( 0 );
             break;
     }
 
-
     dbgmsg( msgs, "startBufLen was %d, msglen was %d, current inbuf len is %d", (int)startBufLen, (int)(msglen+1), (int)EVBUFFER_LENGTH(inbuf) );
-assert( msglen + 1 == msgs->incomingMessageLength );
-assert( EVBUFFER_LENGTH(inbuf) == startBufLen - msgs->incomingMessageLength );
 
-    msgs->incomingMessageLength = -1;
-    msgs->state = AWAITING_BT_LENGTH;
-    return READ_AGAIN;
+    if( ret == (int)TR_ERROR_ASSERT )
+    {
+        fireGotAssertError( msgs );
+        return READ_DONE;
+    }
+    else if( ret == TR_OK )
+    {
+        assert( msglen + 1 == msgs->incomingMessageLength );
+        assert( EVBUFFER_LENGTH(inbuf) == startBufLen - msgs->incomingMessageLength );
+
+        msgs->incomingMessageLength = -1;
+        msgs->state = AWAITING_BT_LENGTH;
+        return READ_AGAIN;
+    }
+    else
+    {
+        fireGotError( msgs );
+        return READ_DONE;
+    }
 }
 
 static void
@@ -1219,7 +1239,7 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
     tr_bitfieldAdd( msgs->info->blame, index );
 }
 
-static void
+static int
 clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_request * req )
 {
     int i;
@@ -1229,8 +1249,13 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
 
     assert( msgs != NULL );
     assert( req != NULL );
-    assert( req->length > 0 );
-    assert( req->length == (uint32_t)tr_torBlockCountBytes( msgs->torrent, block ) );
+
+    if( req->length != (uint32_t)tr_torBlockCountBytes( msgs->torrent, block ) )
+    {
+        dbgmsg( msgs, "wrong block size -- expected %u, got %d",
+                tr_torBlockCountBytes( msgs->torrent, block ), req->length );
+        return TR_ERROR_ASSERT;
+    }
 
     /* save the block */
     dbgmsg( msgs, "got block %u:%u->%u", req->index, req->offset, req->length );
@@ -1243,7 +1268,7 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
     if( myreq == NULL ) {
         clientGotUnwantedBlock( msgs, req );
         dbgmsg( msgs, "we didn't ask for this message..." );
-        return;
+        return 0;
     }
 
     dbgmsg( msgs, "got block %u:%u->%u (turnaround time %d secs)", 
@@ -1259,7 +1284,7 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
     if( tr_cpBlockIsComplete( tor->completion, block ) ) {
         dbgmsg( msgs, "we have this block already..." );
         clientGotUnwantedBlock( msgs, req );
-        return;
+        return 0;
     }
 
     /**
@@ -1270,16 +1295,7 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
     clientGotBytes( msgs, req->length );
     i = tr_ioWrite( tor, req->index, req->offset, req->length, data );
     if( i )
-        return;
-
-#warning this sanity check is here to help track down the excess corrupt data bug, but is expensive and should be removed before the next release
-{
-    uint8_t * check = tr_new( uint8_t, req->length );
-    const int val = tr_ioRead( tor, req->index, req->offset, req->length, check );
-    assert( !val );
-    assert( !memcmp( check, data, req->length ) );
-    tr_free( check );
-}
+        return 0;
 
     tr_cpBlockAdd( tor->completion, block );
 
@@ -1296,11 +1312,13 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
         if( tr_ioHash( tor, req->index ) )
         {
             gotBadPiece( msgs, req->index );
-            return;
+            return 0;
         }
 
         fireClientHave( msgs, req->index );
     }
+
+    return 0;
 }
 
 static ReadState

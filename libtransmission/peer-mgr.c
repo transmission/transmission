@@ -813,6 +813,20 @@ broadcastGotBlock( Torrent * t, uint32_t index, uint32_t offset, uint32_t length
 }
 
 static void
+addStrike( Torrent * t, tr_peer * peer )
+{
+    tordbg( t, "increasing peer %s strike count to %d", tr_peerIoAddrStr(&peer->in_addr,peer->port), peer->strikes+1 );
+
+    if( ++peer->strikes >= MAX_BAD_PIECES_PER_PEER )
+    {
+        struct peer_atom * atom = getExistingAtom( t, &peer->in_addr );
+        atom->myflags |= MYFLAG_BANNED;
+        peer->doPurge = 1;
+        tordbg( t, "banning peer %s", tr_peerIoAddrStr(&atom->addr,atom->port) );
+    }
+}
+
+static void
 msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 {
     tr_peer * peer = vpeer;
@@ -853,6 +867,11 @@ msgsCallbackFunc( void * vpeer, void * vevent, void * vt )
 
         case TR_PEERMSG_CLIENT_BLOCK:
             broadcastGotBlock( t, e->pieceIndex, e->offset, e->length );
+            break;
+
+        case TR_PEERMSG_GOT_ASSERT_ERROR:
+            addStrike( t, peer );
+            peer->doPurge = 1;
             break;
 
         case TR_PEERMSG_GOT_ERROR:
@@ -1069,24 +1088,14 @@ tr_peerMgrSetBlame( tr_peerMgr     * manager,
         peers = (tr_peer **) tr_ptrArrayPeek( t->peers, &peerCount );
         for( i=0; i<peerCount; ++i )
         {
-            struct peer_atom * atom;
-            tr_peer * peer;
-
-            peer = peers[i];
-            if( !tr_bitfieldHas( peer->blame, pieceIndex ) )
-                continue;
-
-            ++peer->strikes;
-            tordbg( t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
-                       tr_peerIoAddrStr(&peer->in_addr,peer->port),
-                       pieceIndex, (int)peer->strikes );
-            if( peer->strikes < MAX_BAD_PIECES_PER_PEER )
-                continue;
-
-            atom = getExistingAtom( t, &peer->in_addr );
-            atom->myflags |= MYFLAG_BANNED;
-            peer->doPurge = 1;
-            tordbg( t, "banning peer %s due to corrupt data", tr_peerIoAddrStr(&atom->addr,atom->port) );
+            tr_peer * peer = peers[i];
+            if( tr_bitfieldHas( peer->blame, pieceIndex ) )
+            {
+                tordbg( t, "peer %s contributed to corrupt piece (%d); now has %d strikes",
+                           tr_peerIoAddrStr(&peer->in_addr,peer->port),
+                           pieceIndex, (int)peer->strikes+1 );
+                addStrike( t, peer );
+            }
         }
     }
 }
