@@ -85,7 +85,8 @@
     tr_info info;
     while ((file = [enumerator nextObject]))
     {
-        if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
+        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame
+            && tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
         {
             count++;
             size += info.totalSize;

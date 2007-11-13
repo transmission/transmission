@@ -2198,7 +2198,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 [pasteboard dataForType: TORRENT_TABLE_VIEW_DATA_TYPE]];
         
         //determine where to move them
-        int i, decrease = 0;
+        int i;
         for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
             newRow--;
         
@@ -2267,18 +2267,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
-            if (canAdd == TR_OK)
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                if (!fOverlayWindow)
-                    fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
-                [fOverlayWindow setTorrents: files];
-                
-                return NSDragOperationCopy;
+                switch (canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                {
+                    case TR_OK:
+                        if (!fOverlayWindow)
+                            fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
+                        [fOverlayWindow setTorrents: files];
+                        
+                        return NSDragOperationCopy;
+                    
+                    case TR_EDUPLICATE:
+                        torrent = YES;
+                }
             }
-            else if (canAdd == TR_EDUPLICATE)
-                torrent = YES;
-            else;
         }
         
         //create a torrent file if a single file
@@ -2304,6 +2307,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return NSDragOperationNone;
 }
 
+#warning when dragging a torrent file that already exists, it gives a weird result
 - (void) draggingExited: (id <NSDraggingInfo>) info
 {
     if (fOverlayWindow)
@@ -2320,7 +2324,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         BOOL torrent = NO, accept = YES;
         
-        #warning replace ifs with switch
         //create an array of files that can be opened
         NSMutableArray * filesToOpen = [[NSMutableArray alloc] init];
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
@@ -2329,15 +2332,19 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
-            if (canAdd == TR_OK)
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                [filesToOpen addObject: file];
-                torrent = YES;
+                switch(tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                {
+                    case TR_OK:
+                        [filesToOpen addObject: file];
+                        torrent = YES;
+                        break;
+                        
+                    case TR_EDUPLICATE:
+                        torrent = YES;
+                }
             }
-            else if (canAdd == TR_EDUPLICATE)
-                torrent = YES;
-            else;
         }
         
         if ([filesToOpen count] > 0)

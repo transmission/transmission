@@ -72,9 +72,8 @@
         
         if (uploadRateString || downloadRateString)
         {
-            NSRect badgeRect;
+            NSRect badgeRect = NSZeroRect;
             badgeRect.size = [[NSImage imageNamed: @"UploadBadge"] size];
-            badgeRect.origin = NSZeroPoint;
             
             //ignore shadow of badge when placing string
             NSRect stringRect = badgeRect;

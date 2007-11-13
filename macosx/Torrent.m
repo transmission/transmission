@@ -749,7 +749,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (float) notAvailableDesired
 {
-    //NSLog(@"not available %f", (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size]);
     return (float)(fStat->desiredSize - fStat->desiredAvailable) / [self size];
 }
 

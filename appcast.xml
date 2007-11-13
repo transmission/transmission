@@ -6,7 +6,7 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Tue, 12 Nov 2007 16:22:00 -0400</lastBuildDate>
+    <lastBuildDate>Mon, 12 Nov 2007 16:22:00 -0400</lastBuildDate>
 
 	<item>
       <title>Transmission 0.93 Released</title>
@@ -22,7 +22,7 @@
 </ul>
 
 <h4>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h4>]]></description>
-      <pubDate>Tue, 12 Nov 2007 16:22:00 -0400</pubDate>
+      <pubDate>Mon, 12 Nov 2007 16:22:00 -0400</pubDate>
       <enclosure sparkle:version="3811" sparkle:shortVersionString="0.93" url="http://mirrors.m0k.org/transmission/files/Transmission-0.93.dmg" length="2142946" type="application/octet-stream"/>
     </item>
     
