@@ -38,7 +38,7 @@
 
 - (id) transformedValue: (id) value
 {
-    return value == nil ? nil : [value lastPathComponent];
+    return value == nil ? nil : [[NSFileManager defaultManager] displayNameAtPath:value];
 }
 
 @end
