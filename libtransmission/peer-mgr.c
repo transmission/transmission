@@ -60,10 +60,10 @@ enum
     MAX_CONNECTED_PEERS_PER_TORRENT = 60,
 
     /* when many peers are available, keep idle ones this long */
-    MIN_UPLOAD_IDLE_SECS = 60,
+    MIN_UPLOAD_IDLE_SECS = (60 * 3),
 
     /* when few peers are available, keep idle ones this long */
-    MAX_UPLOAD_IDLE_SECS = 240,
+    MAX_UPLOAD_IDLE_SECS = (60 * 10),
 
     /* how many peers to unchoke per-torrent. */
     /* FIXME: make this user-configurable? */
