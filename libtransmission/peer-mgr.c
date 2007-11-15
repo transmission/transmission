@@ -1480,8 +1480,8 @@ clientIsSnubbedBy( const tr_peer * peer )
 static double
 getWeightedThroughput( const tr_peer * peer )
 {
-    return ( 3 * peer->rateToPeer )
-         + ( 1 * peer->rateToClient );
+    return ( 1 * peer->rateToPeer )
+         + ( 3 * peer->rateToClient );
 }
 
 static void
