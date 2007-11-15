@@ -1,5 +1,9 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.94 (2007/xx/yy)
+- All Platforms:
+   + Fix tracker redirect error (ticket #482)
+
 0.93 (2007/11/12)
 - All Platforms:
    + Fix "router death" bug that impaired internet connectivity
