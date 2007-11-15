@@ -427,7 +427,8 @@ getCurrentAddress( const tr_tracker * t )
     assert( t->addressIndex >= 0 );
     assert( t->addressIndex < t->addressCount );
 
-    return &t->addresses[t->addressIndex];
+    return t->redirect ? t->redirect
+                       : t->addresses + t->addressIndex;
 }
 static int
 trackerSupportsScrape( const tr_tracker * t )
@@ -894,8 +895,10 @@ sendTrackerRequest( void * vt, const char * eventName )
         tr_free( uri );
     } else {
         struct evhttp_request * req;
-        tr_free( t->lastRequest );
-        t->lastRequest = tr_strdup( eventName );
+        if( eventName != t->lastRequest ) {
+            tr_free( t->lastRequest );
+            t->lastRequest = tr_strdup( eventName );
+        }
         if( isStopping ) {
             evhttp_connection_set_timeout( evcon, STOP_TIMEOUT_INTERVAL_SEC );
             req = evhttp_request_new( onStoppedResponse, t->handle );
