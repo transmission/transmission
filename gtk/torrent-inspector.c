@@ -820,7 +820,7 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->ul_lb), pch);
   g_free (pch);
 
-  pch = ratiostr (stat->downloadedEver, stat->uploadedEver);
+  pch = g_strdup_printf( "%.1f", stat->ratio );
   gtk_label_set_text (GTK_LABEL(a->ratio_lb), pch);
   g_free (pch);
 

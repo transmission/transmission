@@ -269,8 +269,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
         /* leechers, completedFromTracker, downloaded,    uploaded */
         G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
-        /* left,       TrTorrent object, ID for IPC */
-        G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
+        /* ratio,      left,          TrTorrent object, ID for IPC */
+        G_TYPE_FLOAT,  G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
     };
 
 #ifdef REFDBG
@@ -562,6 +562,7 @@ tr_core_update( TrCore * self )
                             MC_DONE,        st->completedFromTracker,
                             MC_DOWN,        st->downloadedEver,
                             MC_UP,          st->uploadedEver,
+                            MC_RATIO,       st->ratio,
                             MC_LEFT,        st->leftUntilDone,
                             -1 );
     }
