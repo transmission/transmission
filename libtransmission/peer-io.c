@@ -403,7 +403,8 @@ tr_peerIoWrite( tr_peerIo   * io,
                 const void  * writeme,
                 int           writeme_len )
 {
-    tr_bufferevent_write( io->handle, io->bufev, writeme, writeme_len );
+    assert( tr_amInEventThread( io->handle ) );
+    bufferevent_write( io->bufev, (void*)writeme, writeme_len );
 }
 
 void

@@ -65,7 +65,6 @@ enum mode
 {
     TR_EV_EVHTTP_MAKE_REQUEST,
     TR_EV_BUFFEREVENT_SET,
-    TR_EV_BUFFEREVENT_WRITE,
     TR_EV_TIMER_ADD,
     TR_EV_TIMER_DEL,
     TR_EV_EXEC
@@ -147,11 +146,6 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
            case TR_EV_BUFFEREVENT_SET:
                 bufferevent_enable( cmd->bufev, cmd->enable );
                 bufferevent_disable( cmd->bufev, cmd->disable );
-                break;
-
-            case TR_EV_BUFFEREVENT_WRITE:
-                bufferevent_write( cmd->bufev, cmd->buf, cmd->buflen );
-                tr_free( cmd->buf );
                 break;
 
             case TR_EV_EXEC:
@@ -255,6 +249,13 @@ pushList( struct tr_event_handle * eh, struct tr_event_command * command )
     tr_lockUnlock( eh->lock );
 }
 
+int
+tr_amInEventThread( struct tr_handle * handle )
+{
+    return tr_amInThread( handle->events->thread );
+}
+
+
 void
 tr_evhttp_make_request (tr_handle                 * handle,
                         struct evhttp_connection  * evcon,
@@ -272,24 +273,6 @@ tr_evhttp_make_request (tr_handle                 * handle,
         cmd->req = req;
         cmd->evtype = type;
         cmd->uri = uri;
-        pushList( handle->events, cmd );
-    }
-}
-
-void
-tr_bufferevent_write( tr_handle             * handle,
-                      struct bufferevent    * bufev,
-                      const void            * buf,
-                      size_t                  buflen )
-{
-    if( tr_amInThread( handle->events->thread ) )
-        bufferevent_write( bufev, (void*)buf, buflen );
-    else {
-        struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );
-        cmd->mode = TR_EV_BUFFEREVENT_WRITE;
-        cmd->bufev = bufev;
-        cmd->buf = tr_strndup( buf, buflen );
-        cmd->buflen = buflen;
         pushList( handle->events, cmd );
     }
 }
