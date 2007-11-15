@@ -1480,8 +1480,9 @@ clientIsSnubbedBy( const tr_peer * peer )
 static double
 getWeightedThroughput( const tr_peer * peer )
 {
+    /* FIXME: tweak this */
     return ( 1 * peer->rateToPeer )
-         + ( 3 * peer->rateToClient );
+         + ( 1 * peer->rateToClient );
 }
 
 static void
