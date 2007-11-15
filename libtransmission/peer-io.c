@@ -250,9 +250,11 @@ tr_peerIoSetIOFuncs( tr_peerIo          * io,
 }
 
 void
-tr_peerIoSetIOMode( tr_peerIo * c, short enable, short disable )
+tr_peerIoSetIOMode( tr_peerIo * io, short enable, short disable )
 {
-    tr_setBufferEventMode( c->handle, c->bufev, enable, disable );
+    assert( tr_amInEventThread( io->handle ) );
+    bufferevent_enable( io->bufev, enable );
+    bufferevent_disable( io->bufev, disable );
 }
 
 int
