@@ -1438,8 +1438,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 struct ChokeData
 {
     tr_peer * peer;
-    float rate;
-    int randomKey;
+    double rate;
     int preferred;
     int doUnchoke;
 };
@@ -1447,22 +1446,17 @@ struct ChokeData
 static int
 compareChoke( const void * va, const void * vb )
 {
+    int i;
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
+
+    if(( i = (int)( 10 * ( a->rate - b->rate ))))
+        return i;
 
     if( a->preferred != b->preferred )
         return a->preferred ? -1 : 1;
 
-    if( a->preferred )
-    {
-        if( a->rate > b->rate ) return -1;
-        if( a->rate < b->rate ) return 1;
-        return 0;
-    }
-    else
-    {
-        return a->randomKey - b->randomKey;
-    }
+    return 0;
 }
 
 static int
@@ -1480,7 +1474,7 @@ clientIsSnubbedBy( const tr_peer * peer )
 static double
 getWeightedThroughput( const tr_peer * peer )
 {
-    /* FIXME: tweak this */
+    /* FIXME: tweak this? */
     return ( 1 * peer->rateToPeer )
          + ( 1 * peer->rateToClient );
 }
@@ -1506,7 +1500,6 @@ rechoke( Torrent * t )
         node = &choke[size++];
         node->peer = peer;
         node->preferred = peer->peerIsInterested && !clientIsSnubbedBy(peer);
-        node->randomKey = tr_rand( INT_MAX );
         node->rate = getWeightedThroughput( peer );
     }
 

@@ -569,6 +569,9 @@ pumpRequestQueue( tr_peermsgs * msgs )
         fireNeedReq( msgs );
 }
 
+static int
+pulse( void * vmsgs );
+
 int
 tr_peerMsgsAddRequest( tr_peermsgs * msgs,
                        uint32_t      index, 
@@ -623,6 +626,7 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     req = tr_new0( struct peer_request, 1 );
     *req = tmp;
     tr_list_append( &msgs->clientWillAskFor, req );
+    pulse( msgs );
     return TR_ADDREQ_OK;
 }
 
