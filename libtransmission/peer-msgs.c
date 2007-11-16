@@ -1286,6 +1286,9 @@ clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_requ
     dbgmsg( msgs, "peer has %d more blocks we've asked for",
                   tr_list_size(msgs->clientAskedFor));
 
+    tr_free( myreq );
+    myreq = NULL;
+
     /**
     *** Error checks
     **/
