@@ -735,6 +735,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
 #if 0
     dbgmsg( msgs, "here is the ltep handshake we sent:" );
     tr_bencPrint( &val );
+    dbgmsg( msgs, "here is the ltep handshake we read [%s]:", tr_bencSave( &val, NULL ) );
 #endif
 
     /* cleanup */
@@ -761,6 +762,7 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 #if 0
     dbgmsg( msgs, "here is the ltep handshake we read:" );
     tr_bencPrint( &val );
+    dbgmsg( msgs, "here is the ltep handshake we read [%s]:", tr_bencSave( &val, NULL ) );
 #endif
 
     /* does the peer prefer encrypted connections? */
@@ -839,8 +841,11 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     {
         dbgmsg( msgs, "got ltep handshake" );
         parseLtepHandshake( msgs, msglen, inbuf );
-        sendLtepHandshake( msgs );
-        sendPex( msgs );
+        if( tr_peerIoSupportsLTEP( msgs->io ) )
+        {
+            sendLtepHandshake( msgs );
+            sendPex( msgs );
+        }
     }
     else if( ltep_msgid == msgs->ut_pex_id )
     {
