@@ -38,7 +38,6 @@ int          tr_amInThread ( const tr_thread * );
 
 tr_lock *    tr_lockNew        ( void );
 void         tr_lockFree       ( tr_lock * );
-int          tr_lockTryLock    ( tr_lock * );
 void         tr_lockLock       ( tr_lock * );
 void         tr_lockUnlock     ( tr_lock * );
 int          tr_lockHave       ( const tr_lock * );
