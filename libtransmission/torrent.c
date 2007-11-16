@@ -1046,6 +1046,16 @@ tr_torrentStart( tr_torrent * tor )
     tr_globalUnlock( tor->handle );
 }
 
+static void
+torrentRecheckDoneImpl( void * vtor )
+{
+    tr_torrentRecheckCompleteness( vtor );
+}
+static void
+torrentRecheckDoneCB( tr_torrent * tor )
+{
+    tr_runInEventThread( tor->handle, torrentRecheckDoneImpl, tor );
+}
 void
 tr_torrentRecheck( tr_torrent * tor )
 {
@@ -1055,7 +1065,7 @@ tr_torrentRecheck( tr_torrent * tor )
         tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
 
-    tr_ioRecheckAdd( tor, tr_torrentRecheckCompleteness );
+    tr_ioRecheckAdd( tor, torrentRecheckDoneCB );
 
     tr_globalUnlock( tor->handle );
 }
