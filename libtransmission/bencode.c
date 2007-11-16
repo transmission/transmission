@@ -418,7 +418,8 @@ saveImpl( struct evbuffer * out, const benc_val_t * val )
 
         case TYPE_STR:
             evbuffer_add_printf( out, "%i:", (int)val->val.i );
-            evbuffer_add( out, val->val.s.s, val->val.i );
+            if( val->val.s.s != NULL )
+                evbuffer_add( out, val->val.s.s, val->val.i );
             break;
 
         case TYPE_LIST:
