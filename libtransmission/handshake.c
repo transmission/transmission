@@ -1030,7 +1030,6 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
     
-    tr_peerIoSetIOMode( handshake->io, EV_READ|EV_WRITE, 0 );
     tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
 
     if( tr_peerIoIsIncoming( handshake->io ) )

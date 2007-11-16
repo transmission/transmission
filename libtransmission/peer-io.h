@@ -108,11 +108,9 @@ void  tr_peerIoSetIOFuncs( tr_peerIo        * io,
                            tr_net_error_cb    errcb,
                            void             * user_data );
 
-void  tr_peerIoSetIOMode ( tr_peerIo   * io,
-                           short         enable_mode,
-                           short         disable_mode );
-
 size_t tr_peerIoWriteBytesWaiting( const tr_peerIo * io );
+
+void tr_peerIoTryRead( tr_peerIo * io );
 
 void tr_peerIoWrite( tr_peerIo   * io,
                      const void  * writeme,

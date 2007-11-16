@@ -98,7 +98,6 @@ canReadWrapper( struct bufferevent * e, void * userData )
                 if( EVBUFFER_LENGTH( e->input ) )
                     continue;
             case READ_MORE:
-                tr_peerIoSetIOMode( c, EV_READ, 0 );
             case READ_DONE:
                 done = 1;
         }
@@ -118,6 +117,8 @@ gotErrorWrapper( struct bufferevent * e, short what, void * userData )
 /**
 ***
 **/
+
+void bufferevent_setwatermark(struct bufferevent *, short, size_t, size_t);
 
 static tr_peerIo*
 tr_peerIoNew( struct tr_handle     * handle,
@@ -142,6 +143,8 @@ tr_peerIoNew( struct tr_handle     * handle,
                                 c );
     bufferevent_settimeout( c->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
     bufferevent_enable( c->bufev, EV_READ|EV_WRITE );
+    bufferevent_setwatermark( c->bufev, EV_READ, 0, 1024 );
+
     return c;
 }
 
@@ -233,6 +236,13 @@ tr_peerIoGetAddrStr( const tr_peerIo * io )
     return tr_peerIoAddrStr( &io->in_addr, io->port );
 }
 
+void
+tr_peerIoTryRead( tr_peerIo * io )
+{
+    if( EVBUFFER_LENGTH( io->bufev->input ) )
+        canReadWrapper( io->bufev, io );
+}
+
 void 
 tr_peerIoSetIOFuncs( tr_peerIo          * io,
                      tr_can_read_cb       readcb,
@@ -245,16 +255,7 @@ tr_peerIoSetIOFuncs( tr_peerIo          * io,
     io->gotError = errcb;
     io->userData = userData;
 
-    if( EVBUFFER_LENGTH( io->bufev->input ) )
-        canReadWrapper( io->bufev, io );
-}
-
-void
-tr_peerIoSetIOMode( tr_peerIo * io, short enable, short disable )
-{
-    assert( tr_amInEventThread( io->handle ) );
-    bufferevent_enable( io->bufev, enable );
-    bufferevent_disable( io->bufev, disable );
+    tr_peerIoTryRead( io );
 }
 
 int
@@ -284,6 +285,7 @@ tr_peerIoReconnect( tr_peerIo * io )
                                      io );
         bufferevent_settimeout( io->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
         bufferevent_enable( io->bufev, EV_READ|EV_WRITE );
+        bufferevent_setwatermark( io->bufev, EV_READ, 0, 1024 );
 
         return 0;
     }
