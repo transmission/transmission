@@ -1756,6 +1756,9 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         tr_list_free( &msgs->clientAskedFor, tr_free );
         tr_list_free( &msgs->peerAskedForFast, tr_free );
         tr_list_free( &msgs->peerAskedFor, tr_free );
+        tr_bitfieldFree( msgs->peerAllowedPieces );
+        tr_bitfieldFree( msgs->clientAllowedPieces );
+        tr_bitfieldFree( msgs->clientSuggestedPieces );
         evbuffer_free( msgs->outMessages );
         evbuffer_free( msgs->outBlock );
         tr_free( msgs->pex );
