@@ -1867,6 +1867,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
         [fDefaults setObject: filterType forKey: @"Filter"];
     }
+    else
+        [sender setState: NSOnState];
 
     [self applyFilter: nil];
 }
