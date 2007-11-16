@@ -140,7 +140,6 @@ struct tr_peermsgs
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
 
-    unsigned int notListening             : 1;
     unsigned int peerSupportsPex          : 1;
     unsigned int clientSentLtepHandshake  : 1;
     unsigned int peerSentLtepHandshake    : 1;
@@ -874,11 +873,11 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
 }
 
 static int
-readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf )
+readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     uint32_t len;
 
-    if( EVBUFFER_LENGTH(inbuf) < sizeof(len) )
+    if( inlen < sizeof(len) )
         return READ_MORE;
 
     tr_peerIoReadUint32( msgs->io, inbuf, &len );
@@ -895,14 +894,14 @@ dbgmsg( msgs, "readBtLength: got a length of %d, msgs->state is now %d", (int)le
 }
 
 static int
-readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf );
+readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen );
 
 static int
-readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf )
+readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     uint8_t id;
 
-    if( EVBUFFER_LENGTH(inbuf) < sizeof(uint8_t) )
+    if( inlen < sizeof(uint8_t) )
         return READ_MORE;
 
     tr_peerIoReadUint8( msgs->io, inbuf, &id );
@@ -918,7 +917,7 @@ readBtId( tr_peermsgs * msgs, struct evbuffer * inbuf )
         msgs->state = AWAITING_BT_MESSAGE;
         return READ_AGAIN;
     }
-    else return readBtMessage( msgs, inbuf );
+    else return readBtMessage( msgs, inbuf, inlen-1 );
 }
 
 static void
@@ -1029,14 +1028,14 @@ static int
 clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_request * req );
 
 static int
-readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
+readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     struct peer_request * req = &msgs->incoming.blockReq;
     dbgmsg( msgs, "In readBtPiece" );
 
     if( !req->length )
     {
-        if( EVBUFFER_LENGTH( inbuf ) < 8 )
+        if( inlen < 8 )
             return READ_MORE;
 
         tr_peerIoReadUint32( msgs->io, inbuf, &req->index );
@@ -1051,7 +1050,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
 
         /* read in another chunk of data */
         const size_t nLeft = req->length - EVBUFFER_LENGTH(msgs->incoming.block);
-        size_t n = MIN( nLeft, EVBUFFER_LENGTH(inbuf) );
+        size_t n = MIN( nLeft, inlen );
         uint8_t * buf = tr_new( uint8_t, n );
         tr_peerIoReadBytes( msgs->io, inbuf, buf, n );
         evbuffer_add( msgs->incoming.block, buf, n );
@@ -1079,7 +1078,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf )
 }
 
 static int
-readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf )
+readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     uint32_t ui32;
     uint32_t msglen = msgs->incoming.length;
@@ -1090,12 +1089,12 @@ dbgmsg( msgs, "in readBtMessage" );
 
     --msglen; // id length
 
-    if( EVBUFFER_LENGTH(inbuf) < msglen ) {
+    if( inlen < msglen ) {
         dbgmsg( msgs, " too short!!! " );
         return READ_MORE;
     }
 
-    dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)EVBUFFER_LENGTH(inbuf) );
+    dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)inlen );
 
     if( !messageLengthIsCorrect( msgs, id, msglen+1 ) )
     {
@@ -1264,18 +1263,20 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_rcTransferred( tor->handle->upload, byteCount );
 }
 
-static int
-canDownload( const tr_peermsgs * msgs )
+static size_t
+getDownloadMax( const tr_peermsgs * msgs )
 {
-    tr_torrent * tor = msgs->torrent;
+    static const size_t maxval = ~0;
+    const tr_torrent * tor = msgs->torrent;
 
     if( tor->downloadLimitMode == TR_SPEEDLIMIT_GLOBAL )
-        return !tor->handle->useDownloadLimit || tr_rcCanTransfer( tor->handle->download );
+        return tor->handle->useDownloadLimit
+            ? tr_rcBytesLeft( tor->handle->download ) : maxval;
 
     if( tor->downloadLimitMode == TR_SPEEDLIMIT_SINGLE )
-        return tr_rcCanTransfer( tor->download );
+        return tr_rcBytesLeft( tor->download );
 
-    return TRUE;
+    return maxval;
 }
 
 static void
@@ -1406,20 +1407,19 @@ canRead( struct bufferevent * evin, void * vmsgs )
     ReadState ret;
     tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
+    const size_t buflen = EVBUFFER_LENGTH( inbuf );
+    const size_t inlen = MIN( buflen, getDownloadMax( msgs ) );
 
-dbgmsg( msgs, "canRead, state is %d", msgs->state );
-    if( !canDownload( msgs ) )
+    if( !inlen )
     {
-dbgmsg( msgs, "oh, but canDownload failed" );
-        msgs->notListening = 1;
         ret = READ_DONE;
     }
     else switch( msgs->state )
     {
-        case AWAITING_BT_LENGTH:  ret = readBtLength  ( msgs, inbuf ); break;
-        case AWAITING_BT_ID:      ret = readBtId      ( msgs, inbuf ); break;
-        case AWAITING_BT_MESSAGE: ret = readBtMessage ( msgs, inbuf ); break;
-        case AWAITING_BT_PIECE:   ret = readBtPiece   ( msgs, inbuf ); break;
+        case AWAITING_BT_LENGTH:  ret = readBtLength ( msgs, inbuf, inlen ); break;
+        case AWAITING_BT_ID:      ret = readBtId     ( msgs, inbuf, inlen ); break;
+        case AWAITING_BT_MESSAGE: ret = readBtMessage( msgs, inbuf, inlen ); break;
+        case AWAITING_BT_PIECE:   ret = readBtPiece  ( msgs, inbuf, inlen ); break;
         default: assert( 0 );
     }
 
@@ -1495,13 +1495,7 @@ pulse( void * vmsgs )
     struct peer_request * r;
     size_t len;
 
-    /* if we froze out a downloaded block because of speed limits,
-       start listening to the peer again */
-    if( msgs->notListening && canDownload( msgs ) )
-    {
-        msgs->notListening = 0;
-        tr_peerIoTryRead( msgs->io );
-    }
+    tr_peerIoTryRead( msgs->io );
 
     pumpRequestQueue( msgs );
 
@@ -1557,12 +1551,6 @@ pulse( void * vmsgs )
     }
 
     return TRUE; /* loop forever */
-}
-
-static void
-didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
-{
-    pulse( vmsgs );
 }
 
 static void
@@ -1789,7 +1777,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     }
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
+    tr_peerIoSetIOFuncs( m->io, canRead, NULL, gotError, m );
     ratePulse( m );
 
     if ( tr_peerIoSupportsLTEP( m->io ) )
