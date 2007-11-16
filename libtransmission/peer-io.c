@@ -29,6 +29,8 @@
 
 #define IO_TIMEOUT_SECS 8
 
+#define TR_RDBUF 2048
+
 /**
 ***
 **/
@@ -143,7 +145,7 @@ tr_peerIoNew( struct tr_handle     * handle,
                                 c );
     bufferevent_settimeout( c->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
     bufferevent_enable( c->bufev, EV_READ|EV_WRITE );
-    bufferevent_setwatermark( c->bufev, EV_READ, 0, 1024 );
+    bufferevent_setwatermark( c->bufev, EV_READ, 0, TR_RDBUF );
 
     return c;
 }
@@ -285,7 +287,7 @@ tr_peerIoReconnect( tr_peerIo * io )
                                      io );
         bufferevent_settimeout( io->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
         bufferevent_enable( io->bufev, EV_READ|EV_WRITE );
-        bufferevent_setwatermark( io->bufev, EV_READ, 0, 1024 );
+        bufferevent_setwatermark( io->bufev, EV_READ, 0, TR_RDBUF );
 
         return 0;
     }
