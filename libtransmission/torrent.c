@@ -1005,8 +1005,10 @@ enum
 };
 
 static void
-checkAndStartCB( tr_torrent * tor )
+checkAndStartImpl( void * vtor )
 {
+    tr_torrent * tor = vtor;
+
     tr_globalLock( tor->handle );
 
     tor->isRunning  = 1;
@@ -1020,7 +1022,13 @@ checkAndStartCB( tr_torrent * tor )
 
     tr_globalUnlock( tor->handle );
 }
-    
+
+static void
+checkAndStartCB( tr_torrent * tor )
+{
+    tr_runInEventThread( tor->handle, checkAndStartImpl, tor );
+}
+
 void
 tr_torrentStart( tr_torrent * tor )
 {
