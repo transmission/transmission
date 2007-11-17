@@ -60,7 +60,6 @@ struct tr_peerIo
     unsigned int peerIdIsSet : 1;
 
     tr_can_read_cb     canRead;
-    tr_did_write_cb    didWrite;
     tr_net_error_cb    gotError;
     void             * userData;
 
@@ -70,14 +69,6 @@ struct tr_peerIo
 /**
 ***
 **/
-
-static void
-didWriteWrapper( struct bufferevent * e, void * userData )
-{
-    tr_peerIo * c = userData;
-    if( c->didWrite != NULL )
-        (*c->didWrite)( e, c->userData );
-}
 
 static void
 canReadWrapper( struct bufferevent * e, void * userData )
@@ -141,7 +132,7 @@ tr_peerIoNew( struct tr_handle     * handle,
     c->isIncoming = isIncoming ? 1 : 0;
     c->bufev = bufferevent_new( c->socket,
                                 canReadWrapper,
-                                didWriteWrapper,
+                                NULL,
                                 gotErrorWrapper,
                                 c );
     bufferevent_settimeout( c->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
@@ -199,7 +190,6 @@ tr_peerIoFree( tr_peerIo * io )
     if( io != NULL )
     {
         io->canRead = NULL;
-        io->didWrite = NULL;
         io->gotError = NULL;
         tr_runInEventThread( io->handle, io_dtor, io );
     }
@@ -249,12 +239,10 @@ tr_peerIoTryRead( tr_peerIo * io )
 void 
 tr_peerIoSetIOFuncs( tr_peerIo          * io,
                      tr_can_read_cb       readcb,
-                     tr_did_write_cb      writecb,
                      tr_net_error_cb      errcb,
                      void               * userData )
 {
     io->canRead = readcb;
-    io->didWrite = writecb;
     io->gotError = errcb;
     io->userData = userData;
 
@@ -282,9 +270,7 @@ tr_peerIoReconnect( tr_peerIo * io )
         bufferevent_free( io->bufev );
 
         io->bufev = bufferevent_new( io->socket,
-                                     canReadWrapper,
-                                     didWriteWrapper,
-                                     gotErrorWrapper,
+                                     canReadWrapper, NULL, gotErrorWrapper,
                                      io );
         bufferevent_settimeout( io->bufev, IO_TIMEOUT_SECS, IO_TIMEOUT_SECS );
         bufferevent_enable( io->bufev, EV_READ|EV_WRITE );

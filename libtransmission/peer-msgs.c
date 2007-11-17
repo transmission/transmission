@@ -1777,7 +1777,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     }
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, NULL, gotError, m );
+    tr_peerIoSetIOFuncs( m->io, canRead, gotError, m );
     ratePulse( m );
 
     if ( tr_peerIoSupportsLTEP( m->io ) )
