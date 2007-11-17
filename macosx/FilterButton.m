@@ -31,8 +31,8 @@
     if ((self = [super initWithCoder: coder]))
     {
         fCount = -1;
-	}
-	return self;
+    }
+    return self;
 }
 
 - (void) setCount: (int) count

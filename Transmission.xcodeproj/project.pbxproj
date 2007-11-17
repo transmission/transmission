@@ -522,8 +522,8 @@
 		A2EA8E570CC3DAB80081201C /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = macosx/it.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A2EA8E580CC3DAB80081201C /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = macosx/it.lproj/MessageWindow.nib; sourceTree = "<group>"; };
 		A2EA8E590CC3DAB80081201C /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = macosx/it.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
-		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterButton.h; sourceTree = "<group>"; };
-		A2ED7D8E0CEF431B00970975 /* FilterButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterButton.m; sourceTree = "<group>"; };
+		A2ED7D8D0CEF431B00970975 /* FilterButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterButton.h; path = macosx/FilterButton.h; sourceTree = "<group>"; };
+		A2ED7D8E0CEF431B00970975 /* FilterButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterButton.m; path = macosx/FilterButton.m; sourceTree = "<group>"; };
 		A2EF7DEB0C96297400FA9811 /* PurpleDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PurpleDot.png; path = macosx/Images/PurpleDot.png; sourceTree = "<group>"; };
 		A2F011980C27418800576FC0 /* CreateLarge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CreateLarge.png; path = macosx/Images/CreateLarge.png; sourceTree = "<group>"; };
 		A2F151150CD438A4001F3B0E /* YellowDot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YellowDot.png; path = macosx/Images/YellowDot.png; sourceTree = "<group>"; };
