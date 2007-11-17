@@ -174,12 +174,16 @@
 {
     NSSavePanel * panel = [NSSavePanel savePanel];
 
-    [panel setPrompt: @"Select"];
+    [panel setPrompt: NSLocalizedString(@"Select", "Create torrent -> location sheet -> button")];
+    [panel setMessage: NSLocalizedString(@"Select the name and location for the torrent file.",
+                                        "Create torrent -> location sheet -> message")]; 
+    
     [panel setRequiredFileType: @"torrent"];
     [panel setCanSelectHiddenExtension: YES];
-
-    [panel beginSheetForDirectory: nil file: [fLocation lastPathComponent] modalForWindow: [self window] modalDelegate: self
-            didEndSelector: @selector(locationSheetClosed:returnCode:contextInfo:) contextInfo: nil];
+    
+    [panel beginSheetForDirectory: [fLocation stringByDeletingLastPathComponent] file: [fLocation lastPathComponent]
+            modalForWindow: [self window] modalDelegate: self didEndSelector: @selector(locationSheetClosed:returnCode:contextInfo:)
+            contextInfo: nil];
 }
 
 - (void) create: (id) sender
