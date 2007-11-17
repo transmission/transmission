@@ -159,6 +159,9 @@
 
 - (void) fadeOut
 {
+    if ([self alphaValue] <= 0.0)
+        return;
+    
     //stop other animation and set to same progress
     if ([fFadeInAnimation isAnimating])
     {

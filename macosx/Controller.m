@@ -1899,7 +1899,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self applyFilter: nil];
 }
 
-#warning improve with matrix
 - (void) switchFilter: (id) sender
 {
     NSString * filterType = [fDefaults stringForKey: @"Filter"];
@@ -2309,7 +2308,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return NSDragOperationNone;
 }
 
-#warning when dragging a torrent file that already exists on and off, it gives a weird result
 - (void) draggingExited: (id <NSDraggingInfo>) info
 {
     if (fOverlayWindow)
