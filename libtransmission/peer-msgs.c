@@ -1825,7 +1825,8 @@ tr_peerMsgsFree( tr_peermsgs* msgs )
         evbuffer_free( msgs->outMessages );
         evbuffer_free( msgs->outBlock );
         tr_free( msgs->pex );
-        msgs->pexCount = 0;
+
+        memset( msgs, ~0, sizeof( tr_peermsgs ) );
         tr_free( msgs );
     }
 }
