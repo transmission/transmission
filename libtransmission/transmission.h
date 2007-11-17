@@ -683,14 +683,28 @@ struct tr_file_stat
     float progress;
 };
 
+typedef enum
+{
+    TR_PEER_STATUS_HANDSHAKE,
+    TR_PEER_STATUS_PEER_IS_CHOKED,
+    TR_PEER_STATUS_CLIENT_IS_CHOKED,
+    TR_PEER_STATUS_CLIENT_IS_INTERESTED,
+    TR_PEER_STATUS_READY,
+    TR_PEER_STATUS_REQUEST_SENT,
+    TR_PEER_STATUS_ACTIVE
+}
+tr_peer_status;
+
 struct tr_peer_stat
 {
-    char    addr[INET_ADDRSTRLEN];
-    const char * client;
+    char addr[INET_ADDRSTRLEN];
+    char client[80];
     
     unsigned int isEncrypted   : 1;
     unsigned int isDownloading : 1;
     unsigned int isUploading   : 1;
+
+    tr_peer_status status;
 
     uint8_t  from;
     uint16_t port;

@@ -35,6 +35,7 @@
 #include "ptrarray.h"
 #include "ratecontrol.h"
 #include "shared.h"
+#include "trcompat.h" /* strlcpy */
 #include "trevent.h"
 #include "utils.h"
 
@@ -1413,15 +1414,16 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
         tr_peer_stat * stat = ret + i;
 
         tr_netNtop( &peer->in_addr, stat->addr, sizeof(stat->addr) );
+        strlcpy( stat->client, (peer->client ? peer->client : ""), sizeof(stat->client) );
         stat->port             = peer->port;
         stat->from             = atom->from;
-        stat->client           = tr_strdup( peer->client ? peer->client : "" );
         stat->progress         = peer->progress;
         stat->isEncrypted      = tr_peerIoIsEncrypted( peer->io ) ? 1 : 0;
         stat->uploadToRate     = peer->rateToPeer;
         stat->downloadFromRate = peer->rateToClient;
         stat->isDownloading    = stat->uploadToRate > 0.01;
         stat->isUploading      = stat->downloadFromRate > 0.01;
+        stat->status           = peer->status;
     }
 
     *setmeCount = size;
@@ -1482,7 +1484,7 @@ getWeightedThroughput( const tr_peer * peer )
 static void
 rechoke( Torrent * t )
 {
-    int i, peerCount, size=0, unchoked=0;
+    int i, peerCount, size=0;
     const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
@@ -1505,14 +1507,11 @@ rechoke( Torrent * t )
 
     qsort( choke, size, sizeof(struct ChokeData), compareChoke );
 
-    for( i=0; i<size && i<NUM_UNCHOKED_PEERS_PER_TORRENT; ++i ) {
+    for( i=0; i<size && i<NUM_UNCHOKED_PEERS_PER_TORRENT; ++i )
         choke[i].doUnchoke = 1;
-        ++unchoked;
-    }
 
     for( ; i<size; ++i ) {
         choke[i].doUnchoke = 1;
-        ++unchoked;
         if( choke[i].peer->peerIsInterested )
             break;
     }

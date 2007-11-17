@@ -140,6 +140,7 @@ struct tr_peermsgs
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
 
+    unsigned int peerSentBitfield         : 1;
     unsigned int peerSupportsPex          : 1;
     unsigned int clientSentLtepHandshake  : 1;
     unsigned int peerSentLtepHandshake    : 1;
@@ -1026,6 +1027,19 @@ messageLengthIsCorrect( const tr_peermsgs * msg, uint8_t id, uint32_t len )
 static int
 clientGotBlock( tr_peermsgs * msgs, const uint8_t * block, const struct peer_request * req );
 
+static void
+clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
+{
+    tr_torrent * tor = msgs->torrent;
+    tor->activityDate = tr_date( );
+    tor->downloadedCur += byteCount;
+    msgs->info->pieceDataActivityDate = time( NULL );
+    tr_rcTransferred( msgs->info->rcToClient, byteCount );
+    tr_rcTransferred( tor->download, byteCount );
+    tr_rcTransferred( tor->handle->download, byteCount );
+}
+
+
 static int
 readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
@@ -1053,6 +1067,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         uint8_t * buf = tr_new( uint8_t, n );
         tr_peerIoReadBytes( msgs->io, inbuf, buf, n );
         evbuffer_add( msgs->incoming.block, buf, n );
+        clientGotBytes( msgs, n );
         tr_free( buf );
         dbgmsg( msgs, "got %d bytes for block %u:%u->%u ... %d remain",
                (int)n, req->index, req->offset, req->length,
@@ -1138,6 +1153,7 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         case BT_BITFIELD: {
             const int clientIsSeed = tr_torrentIsSeed( msgs->torrent );
             dbgmsg( msgs, "got a bitfield" );
+            msgs->peerSentBitfield = 1;
             tr_peerIoReadBytes( msgs->io, inbuf, msgs->info->have->bits, msglen );
             updatePeerProgress( msgs );
             tr_peerMsgsSetChoke( msgs, !clientIsSeed || (msgs->info->progress<1.0) );
@@ -1230,18 +1246,6 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 
     msgs->state = AWAITING_BT_LENGTH;
     return READ_AGAIN;
-}
-
-static void
-clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
-{
-    tr_torrent * tor = msgs->torrent;
-    tor->activityDate = tr_date( );
-    tor->downloadedCur += byteCount;
-    msgs->info->pieceDataActivityDate = time( NULL );
-    tr_rcTransferred( msgs->info->rcToClient, byteCount );
-    tr_rcTransferred( tor->download, byteCount );
-    tr_rcTransferred( tor->handle->download, byteCount );
 }
 
 static void
@@ -1368,7 +1372,6 @@ clientGotBlock( tr_peermsgs                * msgs,
     **/
 
     msgs->info->peerSentPieceDataAt = time( NULL );
-    clientGotBytes( msgs, req->length );
     i = tr_ioWrite( tor, req->index, req->offset, req->length, data );
     if( i )
         return 0;
@@ -1480,6 +1483,33 @@ popNextRequest( tr_peermsgs * msgs )
     return ret;
 }
 
+static void
+updatePeerStatus( tr_peermsgs * msgs )
+{
+    tr_peer * peer = msgs->info;
+
+    if( !msgs->peerSentBitfield )
+        peer->status = TR_PEER_STATUS_HANDSHAKE;
+
+    else if( ( time(NULL) - peer->pieceDataActivityDate ) < 3 )
+        peer->status = TR_PEER_STATUS_ACTIVE;
+
+    else if( peer->clientIsChoked )
+        peer->status = TR_PEER_STATUS_CLIENT_IS_CHOKED;
+
+    else if( peer->peerIsChoked )
+        peer->status = TR_PEER_STATUS_PEER_IS_CHOKED;
+
+    else if( msgs->clientAskedFor != NULL )
+        peer->status = TR_PEER_STATUS_REQUEST_SENT;
+
+    else if( peer->clientIsInterested )
+        peer->status = TR_PEER_STATUS_CLIENT_IS_INTERESTED;
+
+    else
+        peer->status = TR_PEER_STATUS_READY;
+}
+
 static int
 pulse( void * vmsgs )
 {
@@ -1489,8 +1519,8 @@ pulse( void * vmsgs )
     size_t len;
 
     tr_peerIoTryRead( msgs->io );
-
     pumpRequestQueue( msgs );
+    updatePeerStatus( msgs );
 
     if( !canWrite( msgs ) )
     {
@@ -1740,6 +1770,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     m->handle = torrent->handle;
     m->torrent = torrent;
     m->io = info->io;
+    m->info->status = TR_PEER_STATUS_HANDSHAKE;
     m->info->clientIsChoked = 1;
     m->info->peerIsChoked = 1;
     m->info->clientIsInterested = 0;

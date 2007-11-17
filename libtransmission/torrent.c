@@ -880,11 +880,8 @@ tr_torrentPeers( const tr_torrent * tor, int * peerCount )
 }
 
 void
-tr_torrentPeersFree( tr_peer_stat * peers, int peerCount )
+tr_torrentPeersFree( tr_peer_stat * peers, int peerCount UNUSED )
 {
-    int i;
-    for( i=0; i<peerCount; ++i )
-        tr_free( (char*) peers[i].client );
     tr_free( peers );
 }
 

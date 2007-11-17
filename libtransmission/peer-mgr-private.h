@@ -36,6 +36,7 @@ typedef struct tr_peer
     unsigned int  clientIsInterested : 1;
     unsigned int  doPurge : 1;
 
+    tr_peer_status status;
 
     /* number of bad pieces they've contributed to */
     uint8_t strikes;

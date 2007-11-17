@@ -239,6 +239,7 @@ enum
   PEER_COL_DOWNLOAD_RATE,
   PEER_COL_IS_UPLOADING,
   PEER_COL_UPLOAD_RATE,
+  PEER_COL_STATUS,
   N_PEER_COLS
 };
 
@@ -252,7 +253,8 @@ static const char* peer_column_names[N_PEER_COLS] =
   N_("Downloading"),
   N_("DL Rate"),
   N_("Uploading"),
-  N_("UL Rate")
+  N_("UL Rate"),
+  N_("Status")
 };
 
 static int compare_peers (const void * a, const void * b)
@@ -288,6 +290,7 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
                       PEER_COL_IS_UPLOADING, peer->isUploading,
                       PEER_COL_UPLOAD_RATE, peer->uploadToRate,
+                      PEER_COL_STATUS, peer->status,
                       -1);
 }
 
@@ -316,7 +319,8 @@ peer_model_new (tr_torrent * tor)
                                          G_TYPE_BOOLEAN, /* isDownloading */
                                          G_TYPE_FLOAT,   /* downloadFromRate */
                                          G_TYPE_BOOLEAN, /* isUploading */
-                                         G_TYPE_FLOAT);  /* uploadToRate */
+                                         G_TYPE_FLOAT,   /* uploadToRate */
+                                         G_TYPE_INT );   /* tr_peer_status */
 
   int n_peers = 0;
   tr_peer_stat * peers = tr_torrentPeers (tor, &n_peers);
@@ -340,6 +344,30 @@ render_encrypted (GtkTreeViewColumn  * column UNUSED,
                           "yalign", (gfloat)0.5,
                           "stock-id", (is_encrypted ? "transmission-lock" : NULL),
                           NULL);
+}
+
+static void
+render_status( GtkTreeViewColumn  * column UNUSED,
+               GtkCellRenderer    * renderer,
+               GtkTreeModel       * tree_model,
+               GtkTreeIter        * iter,
+               gpointer             data UNUSED )
+{
+    int status;
+    const char * text;
+    gtk_tree_model_get( tree_model, iter, PEER_COL_STATUS, &status, -1 );
+    switch( status )
+    {
+        case TR_PEER_STATUS_HANDSHAKE:            text = _( "Handshaking" ); break;
+        case TR_PEER_STATUS_PEER_IS_CHOKED:       text = _( "Peer is Choked" ); break;
+        case TR_PEER_STATUS_CLIENT_IS_CHOKED:     text = _( "Choked" ); break;
+        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked and Interested" ); break;
+        case TR_PEER_STATUS_READY:                text = _( "Ready" ); break;
+        case TR_PEER_STATUS_REQUEST_SENT:         text = _( "Request Sent" ); break;
+        case TR_PEER_STATUS_ACTIVE           :    text = _( "Active" ); break;
+        default:                                  text = "BUG"; break;
+    }
+    g_object_set (renderer, "text", text, NULL);
 }
 
 static void
@@ -495,7 +523,8 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_PROGRESS,
                          PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
-                         PEER_COL_DOWNLOAD_RATE };
+                         PEER_COL_DOWNLOAD_RATE,
+                         PEER_COL_STATUS };
 
   m  = peer_model_new (tor);
   v = gtk_tree_view_new_with_model (m);
@@ -568,6 +597,13 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         gtk_tree_view_column_set_cell_data_func (c, r, render_ul_rate,
                                                  NULL, NULL);
         break;
+
+      case PEER_COL_STATUS:
+        r = gtk_cell_renderer_text_new( );
+        c = gtk_tree_view_column_new_with_attributes (t, r, "text", col, NULL);
+        gtk_tree_view_column_set_cell_data_func (c, r, render_status, NULL, NULL);
+        break;
+        
 
       default:
         abort ();
