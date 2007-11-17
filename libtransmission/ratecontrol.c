@@ -29,9 +29,9 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-#define GRANULARITY_MSEC 250
+#define GRANULARITY_MSEC 200
 #define SHORT_INTERVAL_MSEC 2000
-#define LONG_INTERVAL_MSEC 10000
+#define LONG_INTERVAL_MSEC 8000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
 struct tr_transfer
@@ -94,22 +94,6 @@ tr_rcClose( tr_ratecontrol * r )
 ****
 ***/
 
-int
-tr_rcCanTransfer( const tr_ratecontrol * r )
-{
-    int ret;
-
-    if( r == NULL )
-        ret = 0;
-    else {
-        tr_lockLock( (tr_lock*)r->lock );
-        ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
-        tr_lockUnlock( (tr_lock*)r->lock );
-    }
-
-    return ret;
-}
-
 size_t
 tr_rcBytesLeft( const tr_ratecontrol * r )
 {
@@ -117,15 +101,14 @@ tr_rcBytesLeft( const tr_ratecontrol * r )
 
     if( r != NULL )
     {
-        float cur, max;
-        size_t kb;
+        float cur, max, kb;
  
         tr_lockLock( (tr_lock*)r->lock );
 
         cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
         max = r->limit;
         kb = max>cur ? max-cur : 0;
-        bytes = kb * 1024u;
+        bytes = (size_t)(kb * 1024u);
 
         tr_lockUnlock( (tr_lock*)r->lock );
     }

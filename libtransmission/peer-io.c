@@ -29,8 +29,7 @@
 
 #define IO_TIMEOUT_SECS 8
 
-/* arbitrary. */
-#define TR_RDBUF (1024*6)
+#define TR_RDBUF 2048
 
 /**
 ***
