@@ -477,7 +477,7 @@ refresh_peers (GtkWidget * top)
   fmtpeercount (p->leechers_lb, stat->leechers);
   fmtpeercount (p->completed_lb, stat->completedFromTracker );
 
-  tr_torrentPeersFree( peers );
+  free( peers );
 }
 
 static GtkWidget* peer_page_new ( TrTorrent * gtor )
