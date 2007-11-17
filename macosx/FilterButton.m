@@ -28,7 +28,7 @@
 
 - (id) initWithCoder: (NSCoder *) coder
 {
-	if ((self = [super initWithCoder: coder]))
+    if ((self = [super initWithCoder: coder]))
     {
         fCount = -1;
 	}
