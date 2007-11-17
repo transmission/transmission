@@ -26,9 +26,13 @@
 
 @implementation FilterButton
 
-- (void) awakeFromNib
+- (id) initWithCoder: (NSCoder *) coder
 {
-    fCount = -1;
+	if ((self = [super initWithCoder: coder]))
+    {
+        fCount = -1;
+	}
+	return self;
 }
 
 - (void) setCount: (int) count
