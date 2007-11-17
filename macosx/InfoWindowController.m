@@ -141,6 +141,24 @@ typedef enum
     //set file table
     [fFileOutline setDoubleAction: @selector(revealFile:)];
     
+    //set table header tool tips
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        [[fPeerTable tableColumnWithIdentifier: @"Encryption"] setHeaderToolTip: NSLocalizedString(@"Encrypted Connection",
+                                                                            "inspector -> peer table -> header tool tip")];
+        [[fPeerTable tableColumnWithIdentifier: @"Progress"] setHeaderToolTip: NSLocalizedString(@"Available",
+                                                                            "inspector -> peer table -> header tool tip")];
+        [[fPeerTable tableColumnWithIdentifier: @"UL To"] setHeaderToolTip: NSLocalizedString(@"Uploading To Peer",
+                                                                            "inspector -> peer table -> header tool tip")];
+        [[fPeerTable tableColumnWithIdentifier: @"DL From"] setHeaderToolTip: NSLocalizedString(@"Downloading From Peer",
+                                                                            "inspector -> peer table -> header tool tip")];
+        
+        [[fFileOutline tableColumnWithIdentifier: @"Check"] setHeaderToolTip: NSLocalizedString(@"Download",
+                                                                            "inspector -> file table -> header tool tip")];
+        [[fFileOutline tableColumnWithIdentifier: @"Priority"] setHeaderToolTip: NSLocalizedString(@"Priority",
+                                                                            "inspector -> file table -> header tool tip")];                                                               
+    }
+    
     //set priority item images
     [fFilePriorityNormal setImage: [NSImage imageNamed: @"PriorityNormal.png"]];
     [fFilePriorityLow setImage: [NSImage imageNamed: @"PriorityLow.png"]];
