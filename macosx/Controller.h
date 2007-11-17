@@ -30,6 +30,7 @@
 #import "DragOverlayWindow.h"
 #import "Badger.h"
 #import "StatusBarView.h"
+#import "FilterButton.h"
 #import "IPCController.h"
 
 #import <Growl/Growl.h>
@@ -62,7 +63,7 @@
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
     
     IBOutlet StatusBarView          * fFilterBar;
-    IBOutlet NSButton               * fNoFilterButton, * fDownloadFilterButton, * fSeedFilterButton, * fPauseFilterButton;
+    IBOutlet FilterButton           * fNoFilterButton, * fDownloadFilterButton, * fSeedFilterButton, * fPauseFilterButton;
     IBOutlet NSSearchField          * fSearchFilterField;
     IBOutlet NSMenuItem             * fNextFilterItem, * fPrevFilterItem;
                                 
