@@ -68,7 +68,7 @@ enum
     KEEPALIVE_INTERVAL_SECS = 90,
 
     PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
-    PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
+    PEER_PULSE_INTERVAL     = (250),       /* msec between calls to pulse() */
     RATE_PULSE_INTERVAL     = (333),       /* msec between calls to ratePulse() */
      
     /* Fast Peers Extension constants */
@@ -888,7 +888,6 @@ readBtLength( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         msgs->incoming.length = len;
         msgs->state = AWAITING_BT_ID;
     }
-dbgmsg( msgs, "readBtLength: got a length of %d, msgs->state is now %d", (int)len, (int)msgs->state );
 
     return READ_AGAIN;
 }
@@ -1085,14 +1084,10 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
     const uint8_t id = msgs->incoming.id;
     const size_t startBufLen = EVBUFFER_LENGTH( inbuf );
 
-dbgmsg( msgs, "in readBtMessage" );
-
     --msglen; // id length
 
-    if( inlen < msglen ) {
-        dbgmsg( msgs, " too short!!! " );
+    if( inlen < msglen )
         return READ_MORE;
-    }
 
     dbgmsg( msgs, "got BT id %d, len %d, buffer size is %d", (int)id, (int)msglen, (int)inlen );
 
@@ -1230,8 +1225,6 @@ dbgmsg( msgs, "in readBtMessage" );
             break;
     }
 
-    dbgmsg( msgs, "startBufLen was %d, msglen was %d, current inbuf len is %d", (int)startBufLen, (int)(msglen+1), (int)EVBUFFER_LENGTH(inbuf) );
-
     assert( msglen + 1 == msgs->incoming.length );
     assert( EVBUFFER_LENGTH(inbuf) == startBufLen - msglen );
 
@@ -1298,7 +1291,8 @@ reassignBytesToCorrupt( tr_peermsgs * msgs, uint32_t byteCount )
 static void
 gotBadPiece( tr_peermsgs * msgs, uint32_t pieceIndex )
 {
-    const uint32_t byteCount = tr_torPieceCountBytes( msgs->torrent, (int)pieceIndex );
+    const uint32_t byteCount =
+        tr_torPieceCountBytes( msgs->torrent, (int)pieceIndex );
     reassignBytesToCorrupt( msgs, byteCount );
 }
 
@@ -1317,7 +1311,9 @@ addPeerToBlamefield( tr_peermsgs * msgs, uint32_t index )
 }
 
 static int
-clientGotBlock( tr_peermsgs * msgs, const uint8_t * data, const struct peer_request * req )
+clientGotBlock( tr_peermsgs                * msgs,
+                const uint8_t              * data,
+                const struct peer_request  * req )
 {
     int i;
     tr_torrent * tor = msgs->torrent;
@@ -1408,18 +1404,18 @@ canRead( struct bufferevent * evin, void * vmsgs )
     tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
     const size_t buflen = EVBUFFER_LENGTH( inbuf );
-    const size_t inlen = MIN( buflen, getDownloadMax( msgs ) );
+    const size_t n = MIN( buflen, getDownloadMax( msgs ) );
 
-    if( !inlen )
+    if( !n )
     {
         ret = READ_DONE;
     }
     else switch( msgs->state )
     {
-        case AWAITING_BT_LENGTH:  ret = readBtLength ( msgs, inbuf, inlen ); break;
-        case AWAITING_BT_ID:      ret = readBtId     ( msgs, inbuf, inlen ); break;
-        case AWAITING_BT_MESSAGE: ret = readBtMessage( msgs, inbuf, inlen ); break;
-        case AWAITING_BT_PIECE:   ret = readBtPiece  ( msgs, inbuf, inlen ); break;
+        case AWAITING_BT_LENGTH:  ret = readBtLength ( msgs, inbuf, n ); break;
+        case AWAITING_BT_ID:      ret = readBtId     ( msgs, inbuf, n ); break;
+        case AWAITING_BT_MESSAGE: ret = readBtMessage( msgs, inbuf, n ); break;
+        case AWAITING_BT_PIECE:   ret = readBtPiece  ( msgs, inbuf, n ); break;
         default: assert( 0 );
     }
 
@@ -1441,10 +1437,7 @@ static int
 canWrite( const tr_peermsgs * msgs )
 {
     /* don't let our outbuffer get too large */
-    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 4096 )
-        return FALSE;
-
-    return TRUE;
+    return tr_peerIoWriteBytesWaiting( msgs->io ) < 4096;
 }
 
 static size_t
@@ -1556,9 +1549,14 @@ pulse( void * vmsgs )
 static void
 gotError( struct bufferevent * evbuf UNUSED, short what, void * vmsgs )
 {
-    dbgmsg( vmsgs, "libevent got an error! what=%d, errno=%d (%s)",
-            (int)what, errno, strerror(errno) );
-    fireGotError( vmsgs );
+    if( what & EVBUFFER_TIMEOUT )
+        dbgmsg( vmsgs, "libevent got a timeout, what=%hd", what );
+
+    if( what & ( EVBUFFER_EOF | EVBUFFER_ERROR ) ) {
+        dbgmsg( vmsgs, "libevent got an error! what=%hd, errno=%d (%s)",
+                what, errno, strerror(errno) );
+        fireGotError( vmsgs );
+    }
 }
 
 static void
