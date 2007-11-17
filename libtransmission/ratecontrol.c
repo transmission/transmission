@@ -29,9 +29,9 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-#define GRANULARITY_MSEC 200
-#define SHORT_INTERVAL_MSEC 2000
-#define LONG_INTERVAL_MSEC 8000
+#define GRANULARITY_MSEC 100
+#define SHORT_INTERVAL_MSEC 3000
+#define LONG_INTERVAL_MSEC 6000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
 struct tr_transfer
