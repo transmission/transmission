@@ -57,8 +57,8 @@ static GtkToggleActionEntry show_toggle_entries[] =
 {
   { "toggle-main-window", NULL, 
     N_("Show _Main Window"), NULL, NULL, G_CALLBACK(action_cb), TRUE }, 
-  { "toggle-debug-window", NULL,
-    N_("Show _Debug Window"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
+  { "toggle-message-log", NULL,
+    N_("Show Message _Log"), NULL, NULL, G_CALLBACK(action_cb), FALSE }
 };
 
 static GtkActionEntry entries[] =

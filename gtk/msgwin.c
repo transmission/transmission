@@ -187,7 +187,7 @@ static void
 save_cb( GtkWidget * w, GtkTextBuffer * textbuf )
 {
   GtkWindow * window = GTK_WINDOW( gtk_widget_get_toplevel( w ) );
-  GtkWidget * d = gtk_file_chooser_dialog_new( _("Save Debug Log"), window,
+  GtkWidget * d = gtk_file_chooser_dialog_new( _("Save Log"), window,
                                                GTK_FILE_CHOOSER_ACTION_SAVE,
                                                GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                                GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -229,9 +229,9 @@ msgwin_create( TrCore * core )
   int ii, curlevel;
 
   win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
-  gtk_window_set_title( GTK_WINDOW( win ), _( "Debug Window" ) );
+  gtk_window_set_title( GTK_WINDOW( win ), _( "Message Log" ) );
   gtk_window_set_default_size( GTK_WINDOW( win ), 600, 400 );
-  gtk_window_set_role( GTK_WINDOW( win ), "debug-window" );
+  gtk_window_set_role( GTK_WINDOW( win ), "message-log" );
   vbox = gtk_vbox_new( FALSE, 0 );
 
   /**

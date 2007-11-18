@@ -844,7 +844,7 @@ recheckTorrentForeach (GtkTreeModel * model,
 static gboolean 
 msgwinclosed()
 {
-  action_toggle( "toggle-debug-window", FALSE );
+  action_toggle( "toggle-message-log", FALSE );
   return FALSE;
 }
 
@@ -938,7 +938,7 @@ doAction ( const char * action_name, gpointer user_data )
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
-    else if (!strcmp (action_name, "toggle-debug-window"))
+    else if (!strcmp (action_name, "toggle-message-log"))
     {
         if( !data->msgwin )
         {
@@ -949,7 +949,7 @@ doAction ( const char * action_name, gpointer user_data )
         }
         else
         {
-            action_toggle("toggle-debug-window", FALSE);
+            action_toggle("toggle-message-log", FALSE);
             gtk_widget_destroy( data->msgwin );
             data->msgwin = NULL;
         }
