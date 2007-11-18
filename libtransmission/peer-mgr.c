@@ -74,7 +74,7 @@ enum
     RECHOKE_PERIOD_MSEC = (1000),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (5 * 1000),
+    RECONNECT_PERIOD_MSEC = (6 * 1000),
 
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 666,
@@ -87,7 +87,7 @@ enum
     SNUBBED_SEC = 60,
 
     /* arbitrary */
-    MAX_CONNECTED_PEERS_PER_TORRENT = 60,
+    MAX_CONNECTED_PEERS_PER_TORRENT = 50,
 
     /* when many peers are available, keep idle ones this long */
     MIN_UPLOAD_IDLE_SECS = (60 * 3),
@@ -97,7 +97,7 @@ enum
 
     /* how many peers to unchoke per-torrent. */
     /* FIXME: make this user-configurable? */
-    NUM_UNCHOKED_PEERS_PER_TORRENT = 20, /* arbitrary */
+    NUM_UNCHOKED_PEERS_PER_TORRENT = 10, /* arbitrary */
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
@@ -1807,10 +1807,9 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nBad, nAdd;
+        int i, nCandidates, nBad;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
         struct tr_peer ** connections = getPeersToClose( t, &nBad );
-        const int peerCount = tr_ptrArraySize( t->peers );
 
         if( nBad || nCandidates )
             tordbg( t, "reconnect pulse for [%s]: %d bad connections, "
@@ -1834,9 +1833,7 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
-        nAdd = !peerCount ? MAX_CONNECTED_PEERS_PER_TORRENT
-                          : MAX_RECONNECTIONS_PER_PULSE;
-        for( i=0; i<nAdd && i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
+        for( i=0; i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {
             tr_peerMgr * mgr = t->manager;
             struct peer_atom * atom = candidates[i];
