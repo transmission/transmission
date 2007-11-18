@@ -170,6 +170,7 @@
         return [message objectForKey: @"Message"];
 }
 
+#warning don't cut off end
 - (float) tableView: (NSTableView *) tableView heightOfRow: (int) row
 {
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
@@ -239,8 +240,6 @@
             level = TR_MSG_DBG;
             break;
     }
-    
-    [self setDebugWarningHidden: level != TR_MSG_DBG];
     
     tr_setMessageLevel(level);
     [[NSUserDefaults standardUserDefaults] setInteger: level forKey: @"MessageLevel"];
