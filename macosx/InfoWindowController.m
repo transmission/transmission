@@ -799,6 +799,8 @@ typedef enum
             NSNumber * rate;
             return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
         }
+        else if ([ident isEqualToString: @"Status"])
+            return [peer objectForKey: @"Status"];
         else
             return [peer objectForKey: @"IP"];
     }
