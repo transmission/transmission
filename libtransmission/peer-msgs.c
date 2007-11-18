@@ -1440,34 +1440,29 @@ sendKeepalive( tr_peermsgs * msgs )
 ***
 **/
 
-static int
-canWrite( const tr_peermsgs * msgs )
-{
-    /* don't let our outbuffer get too large */
-    return tr_peerIoWriteBytesWaiting( msgs->io ) < 4096;
-}
-
 static size_t
 getUploadMax( const tr_peermsgs * msgs )
 {
     static const size_t maxval = ~0;
     const tr_torrent * tor = msgs->torrent;
     const int useSwift = SWIFT_ENABLED && !tr_torrentIsSeed( msgs->torrent );
-    const size_t swiftBytes = msgs->info->credit;
-    size_t speedBytes;
-
-    if( !canWrite( msgs ) )
-        return 0;
+    const size_t swiftLeft = msgs->info->credit;
+    size_t speedLeft;
+    size_t bufLeft;
+    size_t ret;
 
     if( tor->uploadLimitMode == TR_SPEEDLIMIT_GLOBAL )
-        speedBytes = tor->handle->useUploadLimit ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
+        speedLeft = tor->handle->useUploadLimit ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
     else if( tor->uploadLimitMode == TR_SPEEDLIMIT_SINGLE )
-        speedBytes = tr_rcBytesLeft( tor->upload );
+        speedLeft = tr_rcBytesLeft( tor->upload );
     else
-        speedBytes = ~0;
+        speedLeft = ~0;
 
-    return useSwift ? MIN( speedBytes, swiftBytes )
-                    : speedBytes;
+    bufLeft = 4096 - tr_peerIoWriteBytesWaiting( msgs->io );
+    ret = MIN( speedLeft, bufLeft );
+    if( useSwift)
+        ret = MIN( ret, swiftLeft );
+    return ret;
 }
 
 static int
@@ -1525,7 +1520,6 @@ pulse( void * vmsgs )
     const time_t now = time( NULL );
     tr_peermsgs * msgs = vmsgs;
     struct peer_request * r;
-    size_t len;
 
     tr_peerIoTryRead( msgs->io );
     pumpRequestQueue( msgs );
@@ -1539,7 +1533,7 @@ pulse( void * vmsgs )
 
         assert( len );
 
-        if( outlen && canWrite( msgs ) )
+        if( outlen )
         {
             tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen );
             evbuffer_drain( msgs->outBlock, outlen );
@@ -1551,12 +1545,14 @@ pulse( void * vmsgs )
 
             dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }
+        else dbgmsg( msgs, "stalled writing block... uploadMax %lu, outlen %lu", uploadMax, outlen );
     }
 
     if( !msgs->sendingBlock )
     {
-        if(( len = EVBUFFER_LENGTH( msgs->outMessages ) ))
+        if(( EVBUFFER_LENGTH( msgs->outMessages ) ))
         {
+            dbgmsg( msgs, "flushing outMessages..." );
             tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
             msgs->clientSentAnythingAt = now;
         }

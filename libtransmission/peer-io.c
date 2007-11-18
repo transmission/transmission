@@ -400,7 +400,7 @@ tr_peerIoWrite( tr_peerIo   * io,
                 int           writeme_len )
 {
     assert( tr_amInEventThread( io->handle ) );
-    bufferevent_write( io->bufev, (void*)writeme, writeme_len );
+    bufferevent_write( io->bufev, writeme, writeme_len );
 }
 
 void
