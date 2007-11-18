@@ -37,9 +37,6 @@
     NSTimer * fTimer;
     
     NSImage * fErrorImage, * fInfoImage, * fDebugImage;
-    
-    IBOutlet NSTextField * fDebugWarningField;
-    IBOutlet NSImageView * fDebugWarningIcon;
 }
 
 - (void) updateLog: (NSTimer *) timer;

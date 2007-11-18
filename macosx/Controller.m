@@ -419,28 +419,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //auto importing
     [self checkAutoImportDirectory];
-    
-    //debug warning
-    if ([fDefaults boolForKey: @"WarningDebug"] && [fDefaults integerForKey: @"MessageLevel"] == TR_MSG_DBG)
-    {
-        NSAlert * alert = [[NSAlert alloc] init];
-        [alert setMessageText: NSLocalizedString(@"The Message Log is set to \"Debug\"", "Debug log alert -> message")];
-        [alert setInformativeText: NSLocalizedString(@"Continuous use at this level might increase memory usage."
-                                    " This setting can be changed in the Message Log window (accessible from the Window menu).",
-                                    "Debug log alert -> informative message")];
-        [alert addButtonWithTitle: NSLocalizedString(@"OK", "Debug log alert -> button")];
-        
-        BOOL onLeopard = [NSApp isOnLeopardOrBetter];
-        if (onLeopard)
-            [alert setShowsSuppressionButton: YES];
-        else
-            [alert addButtonWithTitle: NSLocalizedString(@"Don't Alert Again", "Debug log alert -> button")];
-        
-        NSInteger result = [alert runModal];
-        if ((onLeopard ? [[alert suppressionButton] state] == NSOnState : result == NSAlertSecondButtonReturn))
-            [fDefaults setBool: NO forKey: @"WarningDebug"];
-        [alert release];
-    }
 }
 
 - (BOOL) applicationShouldHandleReopen: (NSApplication *) app hasVisibleWindows: (BOOL) visibleWindows

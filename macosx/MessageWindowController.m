@@ -36,7 +36,6 @@
 
 - (void) resizeColumn;
 - (NSString *) stringForMessage: (NSDictionary *) message;
-- (void) setDebugWarningHidden: (BOOL) hide;
 
 @end
 
@@ -106,8 +105,6 @@
         case TR_MSG_DBG:
             [fLevelButton selectItemAtIndex: LEVEL_DEBUG];
     }
-    
-    [self setDebugWarningHidden: level != TR_MSG_DBG];
 }
 
 - (void) updateLog: (NSTimer *) timer
@@ -333,12 +330,6 @@
     }
     
     return [NSString stringWithFormat: @"%@ [%@] %@", [message objectForKey: @"Date"], level, [message objectForKey: @"Message"]];
-}
-
-- (void) setDebugWarningHidden: (BOOL) hide
-{
-    [fDebugWarningField setHidden: hide];
-    [fDebugWarningIcon setHidden: hide];
 }
 
 @end

@@ -124,8 +124,6 @@
 	<integer>20</integer>
 	<key>UseIncompleteDownloadFolder</key>
 	<false/>
-	<key>WarningDebug</key>
-	<true/>
 	<key>WarningDuplicate</key>
 	<true/>
 	<key>WarningRemainingSpace</key>
