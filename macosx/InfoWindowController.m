@@ -800,7 +800,25 @@ typedef enum
             return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
         }
         else if ([ident isEqualToString: @"Status"])
-            return [peer objectForKey: @"Status"];
+        {
+            switch ([[peer objectForKey: @"Status"] intValue]) 
+            { 
+                case TR_PEER_STATUS_HANDSHAKE:
+                    return NSLocalizedString(@"Handshaking", "peer -> status");
+                case TR_PEER_STATUS_PEER_IS_CHOKED:
+                    return NSLocalizedString(@"Peer is Choked", "peer -> status");
+                case TR_PEER_STATUS_CLIENT_IS_CHOKED:
+                    return NSLocalizedString(@"Choked", "peer -> status");
+                case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
+                    return NSLocalizedString(@"Choked and Interested", "peer -> status");
+                case TR_PEER_STATUS_READY:
+                    return NSLocalizedString(@"Ready", "peer -> status");
+                case TR_PEER_STATUS_REQUEST_SENT:
+                    return NSLocalizedString(@"Request Sent", "peer -> status");
+                case TR_PEER_STATUS_ACTIVE:
+                    return NSLocalizedString(@"Active", "peer -> status");
+            }
+        }
         else
             return [peer objectForKey: @"IP"];
     }

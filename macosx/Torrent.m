@@ -808,34 +808,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     {
         peer = &peers[i];
         
-        NSString * statusString;
-        switch (peer->status) 
-        { 
-            case TR_PEER_STATUS_HANDSHAKE:
-                statusString = NSLocalizedString(@"Handshaking", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_PEER_IS_CHOKED:
-                statusString = NSLocalizedString(@"Peer is Choked", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_CLIENT_IS_CHOKED:
-                statusString = NSLocalizedString(@"Choked", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
-                statusString = NSLocalizedString(@"Choked and Interested", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_READY:
-                statusString = NSLocalizedString(@"Ready", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_REQUEST_SENT:
-                statusString = NSLocalizedString(@"Request Sent", "peer -> status");
-                break; 
-            case TR_PEER_STATUS_ACTIVE:
-                statusString = NSLocalizedString(@"Active", "peer -> status");
-                break; 
-            default:
-                statusString = @""; 
-        } 
-        
         dic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithInt: peer->from], @"From",
             [NSString stringWithCString: (char *)peer->addr encoding: NSUTF8StringEncoding], @"IP",
@@ -843,7 +815,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             [NSNumber numberWithFloat: peer->progress], @"Progress",
             [NSNumber numberWithBool: peer->isEncrypted], @"Encryption",
             [NSString stringWithCString: (char *)peer->client encoding: NSUTF8StringEncoding], @"Client",
-            statusString, @"Status", nil];
+            [NSNumber numberWithInt: peer->status], @"Status", nil];
         
         if (peer->isDownloading)
             [dic setObject: [NSNumber numberWithFloat: peer->uploadToRate] forKey: @"UL To Rate"];
