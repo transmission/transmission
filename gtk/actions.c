@@ -71,7 +71,7 @@ static GtkActionEntry entries[] =
   { "start-torrent", GTK_STOCK_MEDIA_PLAY,
     N_("_Start"), "<control>S", NULL, G_CALLBACK(action_cb) },
   { "verify-torrent", NULL,
-    N_("_Verify Local Files"), NULL, NULL, G_CALLBACK(action_cb) },
+    N_("_Verify Local Data"), NULL, NULL, G_CALLBACK(action_cb) },
   { "pause-torrent", GTK_STOCK_MEDIA_PAUSE,
     N_("_Pause"), "<control>P", NULL, G_CALLBACK(action_cb) },
   { "remove-torrent", GTK_STOCK_REMOVE,
