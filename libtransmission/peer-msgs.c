@@ -144,6 +144,7 @@ struct tr_peermsgs
     unsigned int peerSupportsPex          : 1;
     unsigned int clientSentLtepHandshake  : 1;
     unsigned int peerSentLtepHandshake    : 1;
+    unsigned int sendingBlock             : 1;
     
     tr_bitfield * clientAllowedPieces;
     tr_bitfield * peerAllowedPieces;
@@ -565,6 +566,8 @@ pumpRequestQueue( tr_peermsgs * msgs )
     while( ( count < max ) && ( msgs->clientWillAskFor != NULL ) )
     {
         struct peer_request * r = tr_list_pop_front( &msgs->clientWillAskFor );
+        assert( requestIsValid( msgs, r ) );
+        assert( tr_bitfieldHas( msgs->info->have, r->index ) );
         protocolSendRequest( msgs, r );
         r->time_requested = msgs->lastReqAddedAt = time( NULL );
         tr_list_append( &msgs->clientAskedFor, r );
@@ -639,7 +642,6 @@ tr_peerMsgsAddRequest( tr_peermsgs * msgs,
     req = tr_new0( struct peer_request, 1 );
     *req = tmp;
     tr_list_append( &msgs->clientWillAskFor, req );
-    pulse( msgs );
     return TR_ADDREQ_OK;
 }
 
@@ -1442,15 +1444,7 @@ static int
 canWrite( const tr_peermsgs * msgs )
 {
     /* don't let our outbuffer get too large */
-    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 4096 )
-        return FALSE;
-
-    /* SWIFT */
-    if( SWIFT_ENABLED && !tr_torrentIsSeed( msgs->torrent )
-                      && ( msgs->info->credit < 0 ) )
-        return FALSE;
-
-    return TRUE;
+    return tr_peerIoWriteBytesWaiting( msgs->io ) < 4096;
 }
 
 static size_t
@@ -1458,18 +1452,22 @@ getUploadMax( const tr_peermsgs * msgs )
 {
     static const size_t maxval = ~0;
     const tr_torrent * tor = msgs->torrent;
+    const int useSwift = SWIFT_ENABLED && !tr_torrentIsSeed( msgs->torrent );
+    const size_t swiftBytes = msgs->info->credit;
+    size_t speedBytes;
 
     if( !canWrite( msgs ) )
         return 0;
 
     if( tor->uploadLimitMode == TR_SPEEDLIMIT_GLOBAL )
-        return tor->handle->useUploadLimit
-            ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
+        speedBytes = tor->handle->useUploadLimit ? tr_rcBytesLeft( tor->handle->upload ) : maxval;
+    else if( tor->uploadLimitMode == TR_SPEEDLIMIT_SINGLE )
+        speedBytes = tr_rcBytesLeft( tor->upload );
+    else
+        speedBytes = ~0;
 
-    if( tor->uploadLimitMode == TR_SPEEDLIMIT_SINGLE )
-        return tr_rcBytesLeft( tor->upload );
-
-    return maxval;
+    return useSwift ? MIN( speedBytes, swiftBytes )
+                    : speedBytes;
 }
 
 static int
@@ -1533,55 +1531,63 @@ pulse( void * vmsgs )
     pumpRequestQueue( msgs );
     updatePeerStatus( msgs );
 
-    if( !canWrite( msgs ) )
-    {
-    }
-    else if(( len = EVBUFFER_LENGTH( msgs->outBlock ) ))
+    if( msgs->sendingBlock )
     {
         const size_t uploadMax = getUploadMax( msgs );
+        size_t len = EVBUFFER_LENGTH( msgs->outBlock );
         const size_t outlen = MIN( len, uploadMax );
-        tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen );
-        evbuffer_drain( msgs->outBlock, outlen );
-        msgs->clientSentAnythingAt = now;
-        peerGotBytes( msgs, outlen );
-        len -= outlen;
-        dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
-        fflush( stdout );
-    }
-    else if(( len = EVBUFFER_LENGTH( msgs->outMessages ) ))
-    {
-        tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
-        msgs->clientSentAnythingAt = now;
-    }
-    else if( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS )
-    {
-        sendKeepalive( msgs );
-    }
 
-    if( !EVBUFFER_LENGTH( msgs->outBlock )
-        && (( r = popNextRequest( msgs )))
-        && requestIsValid( msgs, r )
-        && tr_cpPieceIsComplete( msgs->torrent->completion, r->index ) )
-    {
-        uint8_t * buf = tr_new( uint8_t, r->length );
+        assert( len );
 
-        if( !tr_ioRead( msgs->torrent, r->index, r->offset, r->length, buf ) )
+        if( outlen && canWrite( msgs ) )
         {
-            tr_peerIo * io = msgs->io;
-            struct evbuffer * out = msgs->outBlock;
+            tr_peerIoWrite( msgs->io, EVBUFFER_DATA( msgs->outBlock ), outlen );
+            evbuffer_drain( msgs->outBlock, outlen );
+            peerGotBytes( msgs, outlen );
 
-            dbgmsg( msgs, "sending block %u:%u->%u", r->index, r->offset, r->length );
-            tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + 2*sizeof(uint32_t) + r->length );
-            tr_peerIoWriteUint8 ( io, out, BT_PIECE );
-            tr_peerIoWriteUint32( io, out, r->index );
-            tr_peerIoWriteUint32( io, out, r->offset );
-            tr_peerIoWriteBytes ( io, out, buf, r->length );
+            len -= outlen;
+            msgs->clientSentAnythingAt = now;
+            msgs->sendingBlock = len!=0;
+
+            dbgmsg( msgs, "wrote %d bytes; %d left in block", (int)outlen, (int)len );
         }
+    }
 
-        tr_free( buf );
-        tr_free( r );
+    if( !msgs->sendingBlock )
+    {
+        if(( len = EVBUFFER_LENGTH( msgs->outMessages ) ))
+        {
+            tr_peerIoWriteBuf( msgs->io, msgs->outMessages );
+            msgs->clientSentAnythingAt = now;
+        }
+        else if( !EVBUFFER_LENGTH( msgs->outBlock )
+            && (( r = popNextRequest( msgs )))
+            && requestIsValid( msgs, r )
+            && tr_cpPieceIsComplete( msgs->torrent->completion, r->index ) )
+        {
+            uint8_t * buf = tr_new( uint8_t, r->length );
 
-        pulse( msgs ); /* start sending it right away */
+            if( !tr_ioRead( msgs->torrent, r->index, r->offset, r->length, buf ) )
+            {
+                tr_peerIo * io = msgs->io;
+                struct evbuffer * out = msgs->outBlock;
+
+                dbgmsg( msgs, "sending block %u:%u->%u", r->index, r->offset, r->length );
+                tr_peerIoWriteUint32( io, out, sizeof(uint8_t) + 2*sizeof(uint32_t) + r->length );
+                tr_peerIoWriteUint8 ( io, out, BT_PIECE );
+                tr_peerIoWriteUint32( io, out, r->index );
+                tr_peerIoWriteUint32( io, out, r->offset );
+                tr_peerIoWriteBytes ( io, out, buf, r->length );
+                msgs->sendingBlock = 1;
+            }
+
+            tr_free( buf );
+            tr_free( r );
+        }
+        else if( ( now - msgs->clientSentAnythingAt ) > KEEPALIVE_INTERVAL_SECS )
+        {
+            sendKeepalive( msgs );
+        }
     }
 
     return TRUE; /* loop forever */

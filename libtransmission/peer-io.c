@@ -30,7 +30,7 @@
 #define IO_TIMEOUT_SECS 8
 
 /* arbitrary */
-#define TR_RDBUF (1024*3)
+#define TR_RDBUF (1024*8)
 
 /**
 ***
@@ -407,8 +407,9 @@ void
 tr_peerIoWriteBuf( tr_peerIo       * io,
                    struct evbuffer * buf )
 {
-    tr_peerIoWrite( io, EVBUFFER_DATA(buf), EVBUFFER_LENGTH(buf) );
-    evbuffer_drain( buf, ~0 );
+    const size_t n = EVBUFFER_LENGTH( buf );
+    tr_peerIoWrite( io, EVBUFFER_DATA(buf), n );
+    evbuffer_drain( buf, n );
 }
 
 /**

@@ -1593,28 +1593,28 @@ swiftPulse( void * vtorrent )
         tr_peer ** peers = getConnectedPeers( t, &peerCount );
         tr_peer ** deadbeats = tr_new( tr_peer*, peerCount );
 
+        const double ul_KiBsec = tr_rcRate( t->tor->upload );
+        const double ul_KiB = ul_KiBsec * (SWIFT_PERIOD_MSEC/1000.0);
+        const double ul_bytes = ul_KiB * 1024;
+        const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
+        int freeCreditPerPeer;
+
         for( i=0; i<peerCount; ++i ) {
             tr_peer * peer = peers[i];
-            if( peer->credit < 0 )
+            if( peer->credit <= 0 )
                 deadbeats[deadbeatCount++] =  peer;
         }
 
-        if( deadbeatCount )
-        {
-            const double ul_KiBsec = tr_rcRate( t->tor->upload );
-            const double ul_KiB = ul_KiBsec * (SWIFT_PERIOD_MSEC/1000.0);
-            const double ul_bytes = ul_KiB * 1024;
-            const double freeCreditTotal = ul_bytes * SWIFT_LARGESSE;
-            const int freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
-            for( i=0; i<deadbeatCount; ++i )
-                deadbeats[i]->credit = freeCreditPerPeer;
-            tordbg( t, "%d deadbeats, "
-                       "who are each being granted %d bytes' credit "
-                       "for a total of %.1f KiB, "
-                       "%d%% of the torrent's ul speed %.1f\n",
-                deadbeatCount, freeCreditPerPeer,
-                ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
-        }
+        freeCreditPerPeer = (int)( freeCreditTotal / deadbeatCount );
+        for( i=0; i<deadbeatCount; ++i )
+            deadbeats[i]->credit = freeCreditPerPeer;
+
+        tordbg( t, "%d deadbeats, "
+            "who are each being granted %d bytes' credit "
+            "for a total of %.1f KiB, "
+            "%d%% of the torrent's ul speed %.1f\n",
+            deadbeatCount, freeCreditPerPeer,
+            ul_KiBsec*SWIFT_LARGESSE, (int)(SWIFT_LARGESSE*100), ul_KiBsec );
 
         tr_free( deadbeats );
         tr_free( peers );
@@ -1731,29 +1731,37 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         /* peer fed us too much bad data ... we only keep it around
          * now to weed it out in case someone sends it to us via pex */
         if( atom->myflags & MYFLAG_BANNED ) {
+#if 0
             tordbg( t, "RECONNECT peer %d (%s) is banned...",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+#endif
             continue;
         }
 
         /* we don't need two connections to the same peer... */
         if( peerIsInUse( t, &atom->addr ) ) {
+#if 0
             tordbg( t, "RECONNECT peer %d (%s) is in use..",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+#endif
             continue;
         }
 
         /* no need to connect if we're both seeds... */
         if( seed && (atom->flags & ADDED_F_SEED_FLAG) ) {
+#if 0
             tordbg( t, "RECONNECT peer %d (%s) is a seed and so are we..",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+#endif
             continue;
         }
 
         /* we're wasting our time trying to connect to this bozo. */
         if( atom->numFails > 10 ) {
+#if 0
             tordbg( t, "RECONNECT peer %d (%s) gives us nothing but failure.",
                     i, tr_peerIoAddrStr(&atom->addr,atom->port) );
+#endif
             continue;
         }
 
