@@ -29,7 +29,7 @@
 #include "ratecontrol.h"
 #include "utils.h"
 
-#define GRANULARITY_MSEC 100
+#define GRANULARITY_MSEC 250
 #define SHORT_INTERVAL_MSEC 3000
 #define LONG_INTERVAL_MSEC 6000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
@@ -108,7 +108,7 @@ tr_rcBytesLeft( const tr_ratecontrol * r )
         cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
         max = r->limit;
         kb = max>cur ? max-cur : 0;
-        bytes = (size_t)(kb * 1024u);
+        bytes = (size_t)(kb * 1024);
 
         tr_lockUnlock( (tr_lock*)r->lock );
     }

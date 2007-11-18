@@ -408,12 +408,12 @@ char * tr_clientForId( const uint8_t * id )
             isprint( id[3] ) && isprint( id[4] ) && isprint( id[5] ) &&
             isprint( id[6] ) && isprint( id[7] ) )
         {
-            tr_asprintf( &ret, "unknown client (%c%c%c%c%c%c%c%c)",
+            tr_asprintf( &ret, "%c%c%c%c%c%c%c%c",
                   id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
         }
         else
         {
-            tr_asprintf( &ret, "unknown client (0x%02x%02x%02x%02x%02x%02x%02x%02x)",
+            tr_asprintf( &ret, "0x%02x%02x%02x%02x%02x%02x%02x%02x",
                   id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7] );
         }
     }

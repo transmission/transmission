@@ -36,7 +36,7 @@
 #include "torrent-inspector.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 1500
+#define UPDATE_INTERVAL_MSEC 2000
 
 /****
 *****  PIECES VIEW
@@ -361,10 +361,11 @@ render_status( GtkTreeViewColumn  * column UNUSED,
         case TR_PEER_STATUS_HANDSHAKE:            text = _( "Handshaking" ); break;
         case TR_PEER_STATUS_PEER_IS_CHOKED:       text = _( "Peer is Choked" ); break;
         case TR_PEER_STATUS_CLIENT_IS_CHOKED:     text = _( "Choked" ); break;
-        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked and Interested" ); break;
+        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked & Interested" ); break;
         case TR_PEER_STATUS_READY:                text = _( "Ready" ); break;
         case TR_PEER_STATUS_REQUEST_SENT:         text = _( "Request Sent" ); break;
         case TR_PEER_STATUS_ACTIVE           :    text = _( "Active" ); break;
+        case TR_PEER_STATUS_ACTIVE_AND_CHOKED:    text = _( "Active & Choked" ); break;
         default:                                  text = "BUG"; break;
     }
     g_object_set (renderer, "text", text, NULL);

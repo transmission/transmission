@@ -1034,6 +1034,7 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
     msgs->info->pieceDataActivityDate = time( NULL );
+    msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
@@ -1255,6 +1256,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tor->activityDate = tr_date( );
     tor->uploadedCur += byteCount;
     msgs->info->pieceDataActivityDate = time( NULL );
+    msgs->info->credit -= byteCount;
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
@@ -1440,7 +1442,15 @@ static int
 canWrite( const tr_peermsgs * msgs )
 {
     /* don't let our outbuffer get too large */
-    return tr_peerIoWriteBytesWaiting( msgs->io ) < 4096;
+    if( tr_peerIoWriteBytesWaiting( msgs->io ) > 4096 )
+        return FALSE;
+
+    /* SWIFT */
+    if( SWIFT_ENABLED && !tr_torrentIsSeed( msgs->torrent )
+                      && ( msgs->info->credit < 0 ) )
+        return FALSE;
+
+    return TRUE;
 }
 
 static size_t
@@ -1492,19 +1502,20 @@ updatePeerStatus( tr_peermsgs * msgs )
         peer->status = TR_PEER_STATUS_HANDSHAKE;
 
     else if( ( time(NULL) - peer->pieceDataActivityDate ) < 3 )
-        peer->status = TR_PEER_STATUS_ACTIVE;
-
-    else if( peer->clientIsChoked )
-        peer->status = TR_PEER_STATUS_CLIENT_IS_CHOKED;
+        peer->status = peer->clientIsChoked
+                       ? TR_PEER_STATUS_ACTIVE_AND_CHOKED
+                       : TR_PEER_STATUS_ACTIVE;
 
     else if( peer->peerIsChoked )
         peer->status = TR_PEER_STATUS_PEER_IS_CHOKED;
 
+    else if( peer->clientIsChoked )
+        peer->status = peer->clientIsInterested 
+                       ? TR_PEER_STATUS_CLIENT_IS_INTERESTED
+                       : TR_PEER_STATUS_CLIENT_IS_CHOKED;
+
     else if( msgs->clientAskedFor != NULL )
         peer->status = TR_PEER_STATUS_REQUEST_SENT;
-
-    else if( peer->clientIsInterested )
-        peer->status = TR_PEER_STATUS_CLIENT_IS_INTERESTED;
 
     else
         peer->status = TR_PEER_STATUS_READY;
