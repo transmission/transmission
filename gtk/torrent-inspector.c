@@ -36,7 +36,7 @@
 #include "torrent-inspector.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 2000
+#define UPDATE_INTERVAL_MSEC 4000
 
 /****
 *****  PIECES VIEW
