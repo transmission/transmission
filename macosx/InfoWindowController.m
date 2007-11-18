@@ -100,17 +100,6 @@ typedef enum
     [[fTabMatrix cellWithTag: TAB_FILES_TAG] setIcon: [NSImage imageNamed: @"InfoFiles.png"]];
     [[fTabMatrix cellWithTag: TAB_OPTIONS_TAG] setIcon: [NSImage imageNamed: @"InfoOptions.png"]];
     
-    [fTabMatrix setToolTip: NSLocalizedString(@"General Info", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_INFO_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Activity", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_ACTIVITY_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Peers", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag:  TAB_PEERS_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Files", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_FILES_TAG]];
-    [fTabMatrix setToolTip: NSLocalizedString(@"Options", "Inspector -> tab tooltip")
-                    forCell: [fTabMatrix cellWithTag: TAB_OPTIONS_TAG]];
-    
     //set selected tab
     fCurrentTabTag = INVALID;
     NSString * identifier = [[NSUserDefaults standardUserDefaults] stringForKey: @"InspectorSelected"];

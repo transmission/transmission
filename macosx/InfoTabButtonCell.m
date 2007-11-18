@@ -28,6 +28,8 @@
 
 - (void) awakeFromNib
 {
+    [(NSMatrix *)[self controlView] setToolTip: [self title] forCell: self];
+    
     NSNotificationCenter * nc = [NSNotificationCenter defaultCenter];
     [nc addObserver: self selector: @selector(updateControlTint:)
             name: NSControlTintDidChangeNotification object: nil];
