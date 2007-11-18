@@ -150,7 +150,7 @@
 				<key>fDockMenu</key>
 				<string>NSMenu</string>
 				<key>fDownloadFilterButton</key>
-				<string>NSButton</string>
+				<string>FilterButton</string>
 				<key>fDownloadLimitItem</key>
 				<string>NSMenuItem</string>
 				<key>fDownloadMenu</key>
@@ -164,11 +164,11 @@
 				<key>fNextInfoTabItem</key>
 				<string>NSMenuItem</string>
 				<key>fNoFilterButton</key>
-				<string>NSButton</string>
+				<string>FilterButton</string>
 				<key>fOpenIgnoreDownloadFolder</key>
 				<string>NSMenuItem</string>
 				<key>fPauseFilterButton</key>
-				<string>NSButton</string>
+				<string>FilterButton</string>
 				<key>fPrevFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fPrevInfoTabItem</key>
@@ -178,7 +178,7 @@
 				<key>fSearchFilterField</key>
 				<string>NSSearchField</string>
 				<key>fSeedFilterButton</key>
-				<string>NSButton</string>
+				<string>FilterButton</string>
 				<key>fSpeedLimitButton</key>
 				<string>NSButton</string>
 				<key>fStatusBar</key>
