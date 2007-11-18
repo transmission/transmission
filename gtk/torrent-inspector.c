@@ -36,7 +36,7 @@
 #include "torrent-inspector.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 4000
+#define UPDATE_INTERVAL_MSEC 2000
 
 /****
 *****  PIECES VIEW
@@ -815,13 +815,13 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 typedef struct
 {
   GtkWidget * state_lb;
-  GtkWidget * corrupt_dl_lb;
-  GtkWidget * valid_dl_lb;
+  GtkWidget * progress_lb;
+  GtkWidget * have_lb;
   GtkWidget * dl_lb;
   GtkWidget * ul_lb;
+  GtkWidget * failed_lb;
   GtkWidget * ratio_lb;
   GtkWidget * err_lb;
-  GtkWidget * remaining_lb;
   GtkWidget * swarm_lb;
   GtkWidget * date_added_lb;
   GtkWidget * last_activity_lb;
@@ -835,19 +835,23 @@ refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
   const tr_stat * stat = tr_torrent_stat( a->gtor );
-  char *pch;
+  char *pch, *pch2, *pch3;
 
   pch = tr_torrent_status_str( a->gtor );
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->corruptEver);
-  gtk_label_set_text (GTK_LABEL(a->corrupt_dl_lb), pch);
+  pch = g_strdup_printf( "%.1f%% (%.1f%% selected)", stat->percentComplete*100.0, stat->percentDone*100.0 );
+  gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->haveValid);
-  gtk_label_set_text (GTK_LABEL(a->valid_dl_lb), pch);
-  g_free (pch);
+  pch = readablesize( stat->haveValid + stat->haveUnchecked );
+  pch2 = readablesize( stat->haveValid );
+  pch3 = g_strdup_printf( _("%s (%s verified)"), pch, pch2 );
+  gtk_label_set_text( GTK_LABEL( a->have_lb ), pch3 );
+  g_free( pch3 );
+  g_free( pch2 );
+  g_free( pch );
 
   pch = readablesize (stat->downloadedEver);
   gtk_label_set_text (GTK_LABEL(a->dl_lb), pch);
@@ -857,16 +861,16 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->ul_lb), pch);
   g_free (pch);
 
+  pch = readablesize (stat->corruptEver);
+  gtk_label_set_text (GTK_LABEL(a->failed_lb), pch);
+  g_free (pch);
+
   pch = g_strdup_printf( "%.1f", stat->ratio );
   gtk_label_set_text (GTK_LABEL(a->ratio_lb), pch);
   g_free (pch);
 
   pch = readablespeed (stat->swarmspeed);
   gtk_label_set_text (GTK_LABEL(a->swarm_lb), pch);
-  g_free (pch);
-
-  pch = readablesize (stat->leftUntilDone);
-  gtk_label_set_text (GTK_LABEL(a->remaining_lb), pch);
   g_free (pch);
 
   gtk_label_set_text (GTK_LABEL(a->err_lb),
@@ -906,12 +910,12 @@ activity_page_new (TrTorrent * gtor)
     l = a->state_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Corrupt DL"));
-    l = a->corrupt_dl_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Progress"));
+    l = a->progress_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Valid DL"));
-    l = a->valid_dl_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Have") );
+    l = a->have_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Downloaded"));
@@ -922,12 +926,12 @@ activity_page_new (TrTorrent * gtor)
     l = a->ul_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Ratio"));
-    l = a->ratio_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Failed DL"));
+    l = a->failed_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Remaining"));
-    l = a->remaining_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Ratio"));
+    l = a->ratio_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Swarm Rate"));
