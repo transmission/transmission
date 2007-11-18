@@ -1481,7 +1481,7 @@ tr_peerMgrPeerStats( const tr_peerMgr  * manager,
 struct ChokeData
 {
     tr_peer * peer;
-    double rate;
+    int rate;
     int preferred;
     int doUnchoke;
 };
@@ -1489,13 +1489,16 @@ struct ChokeData
 static int
 compareChoke( const void * va, const void * vb )
 {
-    int i;
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
 
-    if(( i = (int)( 10 * ( a->rate - b->rate ))))
-        return i;
+    /* primary key: larger speeds */
+    if( a->rate > b->rate )
+        return -1;
+    if ( a->rate < b->rate )
+        return 1;
 
+    /* secondary key: perferred peers */
     if( a->preferred != b->preferred )
         return a->preferred ? -1 : 1;
 
@@ -1515,20 +1518,20 @@ clientIsSnubbedBy( const tr_peer * peer )
 **/
 
 static double
-getWeightedThroughput( const tr_peer * peer )
+getWeightedThroughput( const tr_peer * peer, int clientIsSeed )
 {
-    /* FIXME: tweak this? */
-    return /* 1 * peer->rateToPeer )
-         +*/ ( 1 * peer->rateToClient );
+    return (int)( 10.0 * ( clientIsSeed ? peer->rateToPeer
+                                        : peer->rateToClient ) );
 }
 
 static void
 rechoke( Torrent * t )
 {
-    int i, peerCount, size=0;
+    int i, peerCount, size=0, unchoked=0;
     const time_t fibrillationTime = time(NULL) - MIN_CHOKE_PERIOD_SEC;
     tr_peer ** peers = getConnectedPeers( t, &peerCount );
     struct ChokeData * choke = tr_new0( struct ChokeData, peerCount );
+    const int clientIsSeed = tr_torrentIsSeed( t->tor );
 
     assert( torrentIsLocked( t ) );
     
@@ -1537,21 +1540,27 @@ rechoke( Torrent * t )
     {
         tr_peer * peer = peers[i];
         struct ChokeData * node;
-        if( peer->chokeChangedAt > fibrillationTime )
+        if( peer->chokeChangedAt > fibrillationTime ) {
+            if( !peer->peerIsChoked )
+                ++unchoked;
             continue;
+        }
 
         node = &choke[size++];
         node->peer = peer;
         node->preferred = peer->peerIsInterested && !clientIsSnubbedBy(peer);
-        node->rate = getWeightedThroughput( peer );
+        node->rate = getWeightedThroughput( peer, clientIsSeed );
     }
 
     qsort( choke, size, sizeof(struct ChokeData), compareChoke );
 
-    for( i=0; i<size && i<NUM_UNCHOKED_PEERS_PER_TORRENT; ++i )
+    for( i=0; i<size && unchoked<NUM_UNCHOKED_PEERS_PER_TORRENT; ++i ) {
         choke[i].doUnchoke = 1;
+        ++unchoked;
+    }
 
     for( ; i<size; ++i ) {
+        ++unchoked;
         choke[i].doUnchoke = 1;
         if( choke[i].peer->peerIsInterested )
             break;
