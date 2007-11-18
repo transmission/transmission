@@ -810,13 +810,15 @@ typedef enum
                 case TR_PEER_STATUS_CLIENT_IS_CHOKED:
                     return NSLocalizedString(@"Choked", "peer -> status");
                 case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
-                    return NSLocalizedString(@"Choked and Interested", "peer -> status");
+                    return NSLocalizedString(@"Choked & Interested", "peer -> status");
                 case TR_PEER_STATUS_READY:
                     return NSLocalizedString(@"Ready", "peer -> status");
                 case TR_PEER_STATUS_REQUEST_SENT:
                     return NSLocalizedString(@"Request Sent", "peer -> status");
                 case TR_PEER_STATUS_ACTIVE:
                     return NSLocalizedString(@"Active", "peer -> status");
+                case TR_PEER_STATUS_ACTIVE_AND_CHOKED:
+                    return NSLocalizedString(@"Active & Interested", "peer -> status");
             }
         }
         else
