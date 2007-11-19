@@ -125,6 +125,7 @@ typedef struct tr_global_stats
     double ratio;             /* total up / total down */
     uint64_t filesAdded;      /* number of files added */
     uint64_t sessionCount;    /* program started N times */
+    uint64_t secondsActive;   /* how long Transmisson's been running */
 }
 tr_global_stats;
 

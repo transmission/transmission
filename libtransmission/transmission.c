@@ -354,6 +354,7 @@ tr_getGlobalStats( const tr_handle * handle, tr_global_stats * setme )
     setme->ratio            = 23;
     setme->filesAdded       = 42;
     setme->sessionCount     = 666;
+    setme->secondsActive    = 2112;
 }
 
 tr_torrent **
