@@ -116,7 +116,7 @@ void tr_close( tr_handle * );
 ***
 **/
 
-typedef struct tr_global_stats
+typedef struct tr_session_stats
 {
     uint64_t downloadedGigs;  /* total down / GiB */
     uint64_t downloadedBytes; /* total down % GiB */
@@ -127,9 +127,16 @@ typedef struct tr_global_stats
     uint64_t sessionCount;    /* program started N times */
     uint64_t secondsActive;   /* how long Transmisson's been running */
 }
-tr_global_stats;
+tr_session_stats;
 
-void tr_getGlobalStats( const tr_handle * handle, tr_global_stats * setme );
+/* stats accumulated across all the times that Transmission's been used. */
+void tr_getCumulativeSessionStats( const tr_handle   * handle,
+                                   tr_session_stats  * setme );
+
+/* stats accumulated during this current session.
+   'sessionCount' is pretty useless here, eh? :) */
+void tr_getSessionStats( const tr_handle   * handle,
+                         tr_session_stats  * setme );
 
 
 /**
