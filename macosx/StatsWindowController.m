@@ -80,6 +80,9 @@ tr_handle * fLib;
     [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.uploadedGigs bytes: stats.uploadedBytes]];
     [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.downloadedGigs bytes: stats.downloadedBytes]];
     [fRatioField setStringValue: [NSString stringForRatio: stats.ratio]];
+    
+    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
+                                        stats.sessionCount]];
 }
 
 @end
