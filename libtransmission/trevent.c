@@ -65,7 +65,6 @@ enum mode
 {
     TR_EV_EVHTTP_MAKE_REQUEST,
     TR_EV_TIMER_ADD,
-    TR_EV_TIMER_DEL,
     TR_EV_EXEC
 };
 
@@ -129,12 +128,6 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
             case TR_EV_TIMER_ADD:
                 timeout_add( &cmd->timer->event, &cmd->timer->tv );
                 ++eh->timerCount;
-                break;
-
-            case TR_EV_TIMER_DEL:
-                event_del( &cmd->timer->event );
-                tr_free( cmd->timer );
-                --eh->timerCount;
                 break;
 
             case TR_EV_EVHTTP_MAKE_REQUEST:
@@ -320,18 +313,13 @@ tr_timerFree( tr_timer ** ptimer )
 
     /* destroy the timer directly or via the command queue */
     if( timer!=NULL && !timer->inCallback ) {
-        if( tr_amInThread( timer->eh->thread ) ) {
-            void * del = tr_list_remove( &timer->eh->commands, timer, timerCompareFunc );
-            --timer->eh->timerCount;
-            event_del( &timer->event );
-            tr_free( timer );
-            tr_free( del );
-        } else {
-            struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );
-            cmd->mode = TR_EV_TIMER_DEL;
-            cmd->timer = timer;
-            pushList( timer->eh, cmd );
-        }
+        void * del;
+        assert( tr_amInEventThread( timer->eh->h ) );
+        del = tr_list_remove( &timer->eh->commands, timer, timerCompareFunc );
+        --timer->eh->timerCount;
+        event_del( &timer->event );
+        tr_free( timer );
+        tr_free( del );
     }
 }
 
