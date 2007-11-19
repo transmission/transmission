@@ -92,9 +92,9 @@ enum
 
     TR_RESERVED_FDS   = 16, /* sockets reserved for tracker connections */
 
-    TR_MKDIR_PERM = 0777,
+    TR_MKDIR_PERM = 0755,
 
-    TR_CREAT_PERM = 0666
+    TR_CREAT_PERM = 0644
 };
 
 struct tr_openfile
