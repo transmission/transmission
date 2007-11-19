@@ -140,7 +140,7 @@ int  tr_peerIoIsEncrypted( const tr_peerIo * io );
 void tr_peerIoWriteBytes  ( tr_peerIo        * io,
                             struct evbuffer  * outbuf,
                             const void       * bytes,
-                            int                byteCount );
+                            size_t             byteCount );
 
 void tr_peerIoWriteUint8  ( tr_peerIo        * io,
                             struct evbuffer  * outbuf,
@@ -157,7 +157,7 @@ void tr_peerIoWriteUint32 ( tr_peerIo        * io,
 void tr_peerIoReadBytes   ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
                             void             * bytes,
-                            int                byteCount );
+                            size_t             byteCount );
 
 void tr_peerIoReadUint8   ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
@@ -173,7 +173,7 @@ void tr_peerIoReadUint32  ( tr_peerIo        * io,
 
 void tr_peerIoDrain       ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
-                            int                byteCount );
+                            size_t             byteCount );
 
 
 #endif
