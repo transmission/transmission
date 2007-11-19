@@ -30,6 +30,7 @@
 @interface StatsWindowController (Private)
 
 - (void) updateStats;
+- (NSString *) timeString: (uint64_t) seconds;
 
 @end
 
@@ -81,9 +82,17 @@ tr_handle * fLib;
     [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.downloadedGigs bytes: stats.downloadedBytes]];
     [fRatioField setStringValue: [NSString stringForRatio: stats.ratio]];
     
+    [fTimeField setStringValue: [self timeString: stats.secondsActive]];
+    
+    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
+                                        stats.sessionCount]];
+}
+
+- (NSString *) timeString: (uint64_t) seconds
+{
     NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 4];
-    uint64_t seconds = stats.secondsActive;
-    if (stats.secondsActive >= 86400) //24 * 60 * 60
+    
+    if (seconds >= 86400) //24 * 60 * 60
     {
         int days = seconds / 86400;
         if (days == 1)
@@ -93,22 +102,20 @@ tr_handle * fLib;
                                     seconds / 86400]];
         seconds %= 86400;
     }
-    if (stats.secondsActive >= 3600) //60 * 60
+    if (seconds >= 3600) //60 * 60
     {
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hours", "stats window -> running time"),
                                 seconds / 3600]];
         seconds %= 3600;
     }
-    if (stats.secondsActive >= 60)
+    if (seconds >= 60)
     {
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), seconds / 60]];
         seconds %= 60;
     }
     [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d sec", "stats window -> running time"), seconds]];
-    [fTimeField setStringValue: [timeArray componentsJoinedByString: @" "]];
     
-    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
-                                        stats.sessionCount]];
+    return [timeArray componentsJoinedByString: @" "];
 }
 
 @end
