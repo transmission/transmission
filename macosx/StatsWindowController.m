@@ -81,6 +81,32 @@ tr_handle * fLib;
     [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.downloadedGigs bytes: stats.downloadedBytes]];
     [fRatioField setStringValue: [NSString stringForRatio: stats.ratio]];
     
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 4];
+    uint64_t seconds = stats.secondsActive;
+    if (stats.secondsActive >= 86400) //24 * 60 * 60
+    {
+        int days = seconds / 86400;
+        if (days == 1)
+            [timeArray addObject: NSLocalizedString(@"1 day", "stats window -> running time")];
+        else
+            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "stats window -> running time"),
+                                    seconds / 86400]];
+        seconds %= 86400;
+    }
+    if (stats.secondsActive >= 3600) //60 * 60
+    {
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hours", "stats window -> running time"),
+                                seconds / 3600]];
+        seconds %= 3600;
+    }
+    if (stats.secondsActive >= 60)
+    {
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), seconds / 60]];
+        seconds %= 60;
+    }
+    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d sec", "stats window -> running time"), seconds]];
+    [fTimeField setStringValue: [timeArray componentsJoinedByString: @" "]];
+    
     [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
                                         stats.sessionCount]];
 }

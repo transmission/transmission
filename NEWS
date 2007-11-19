@@ -6,13 +6,14 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Option to prefer not using encryption
    + Restore `scrape' feature in the command-line interface client
 - OS X:
+   + Statistics window
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
    + Availability Bar (overlay on regular bar)
 
 0.94 (2007/xx/yy)
 - All Platforms:
-   + Fix tracker redirect error (ticket #482)
+   + Fix tracker redirect error
 
 0.93 (2007/12/11)
 - All Platforms:
