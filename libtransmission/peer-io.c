@@ -446,7 +446,7 @@ void
 tr_peerIoWriteBytes( tr_peerIo        * io,
                      struct evbuffer  * outbuf,
                      const void       * bytes,
-                     int                byteCount )
+                     size_t             byteCount )
 {
     uint8_t * tmp;
 
@@ -502,9 +502,9 @@ void
 tr_peerIoReadBytes( tr_peerIo        * io,
                     struct evbuffer  * inbuf,
                     void             * bytes,
-                    int                byteCount )
+                    size_t             byteCount )
 {
-    assert( (int)EVBUFFER_LENGTH( inbuf ) >= byteCount );
+    assert( EVBUFFER_LENGTH( inbuf ) >= byteCount );
 
     switch( io->encryptionMode )
     {
@@ -553,7 +553,7 @@ tr_peerIoReadUint32( tr_peerIo         * io,
 void
 tr_peerIoDrain( tr_peerIo        * io,
                 struct evbuffer  * inbuf,
-                int                byteCount )
+                size_t             byteCount )
 {
     uint8_t * tmp = tr_new( uint8_t, byteCount );
     tr_peerIoReadBytes( io, inbuf, tmp, byteCount );
