@@ -1413,7 +1413,8 @@ canRead( struct bufferevent * evin, void * vmsgs )
     tr_peermsgs * msgs = (tr_peermsgs *) vmsgs;
     struct evbuffer * inbuf = EVBUFFER_INPUT ( evin );
     const size_t buflen = EVBUFFER_LENGTH( inbuf );
-    const size_t n = MIN( buflen, getDownloadMax( msgs ) );
+    const size_t downloadMax = getDownloadMax( msgs );
+    const size_t n = MIN( buflen, downloadMax );
 
     if( !n )
     {
