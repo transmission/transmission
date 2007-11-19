@@ -1047,6 +1047,7 @@ static int
 readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
 {
     struct peer_request * req = &msgs->incoming.blockReq;
+    assert( EVBUFFER_LENGTH(inbuf) >= inlen );
     dbgmsg( msgs, "In readBtPiece" );
 
     if( !req->length )
@@ -1068,6 +1069,7 @@ readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
         const size_t nLeft = req->length - EVBUFFER_LENGTH(msgs->incoming.block);
         size_t n = MIN( nLeft, inlen );
         uint8_t * buf = tr_new( uint8_t, n );
+        assert( EVBUFFER_LENGTH(inbuf) >= n );
         tr_peerIoReadBytes( msgs->io, inbuf, buf, n );
         evbuffer_add( msgs->incoming.block, buf, n );
         clientGotBytes( msgs, n );
