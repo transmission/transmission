@@ -90,11 +90,7 @@ enum
 
     TR_MAX_OPEN_FILES = 8, /* real files, not sockets */
 
-    TR_RESERVED_FDS   = 16, /* sockets reserved for tracker connections */
-
-    TR_MKDIR_PERM = 0755,
-
-    TR_CREAT_PERM = 0644
+    TR_RESERVED_FDS = 16 /* sockets reserved for tracker connections */
 };
 
 struct tr_openfile
@@ -135,7 +131,7 @@ TrOpenFile( int i, const char * filename, int write )
     /* create subfolders, if any */
     if( write ) {
         char * tmp = tr_strdup( filename );
-        const int val = tr_mkdirp( dirname(tmp), TR_MKDIR_PERM );
+        const int val = tr_mkdirp( dirname(tmp), 0777 );
         tr_free( tmp );
         if( val )
             return tr_ioErrorFromErrno( );
@@ -150,7 +146,7 @@ TrOpenFile( int i, const char * filename, int write )
     flags |= O_BINARY;
 #endif
     errno = 0;
-    file->fd = open( filename, flags, TR_CREAT_PERM );
+    file->fd = open( filename, flags, 0666 );
     if( file->fd < 0 ) {
         if( errno ) {
             tr_err( "Couldn't open '%s': %s", filename, strerror(errno) );
