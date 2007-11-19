@@ -75,8 +75,8 @@ tr_handle * fLib;
 
 - (void) updateStats
 {
-    tr_global_stats stats;
-    tr_getGlobalStats(fLib, &stats);
+    tr_session_stats stats;
+    tr_getCumulativeSessionStats(fLib, &stats);
     
     [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.uploadedGigs bytes: stats.uploadedBytes]];
     [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.downloadedGigs bytes: stats.downloadedBytes]];
