@@ -340,6 +340,22 @@ tr_close( tr_handle * h )
     free( h );
 }
 
+void
+tr_getGlobalStats( const tr_handle * handle, tr_global_stats * setme )
+{
+    assert( handle != NULL );
+    assert( setme != NULL );
+
+    /* FIXME */
+    setme->downloadedGigs   = 4;
+    setme->downloadedBytes  = 8;
+    setme->uploadedGigs     = 15;
+    setme->uploadedBytes    = 16;
+    setme->ratio            = 23;
+    setme->filesAdded       = 42;
+    setme->sessionCount     = 666;
+}
+
 tr_torrent **
 tr_loadTorrents ( tr_handle   * h,
                   const char  * fallbackDestination,

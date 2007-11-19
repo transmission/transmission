@@ -96,8 +96,8 @@ enum
 /***********************************************************************
  * tr_init
  ***********************************************************************
- * Initializes a libtransmission instance. Returns a obscure handle to
- * be passed to all functions below. The tag argument is a short string
+ * Initializes a libtransmission instance and returns an opaque handle
+ * to be passed to functions below. The tag argument is a short string
  * unique to the program invoking tr_init(), it is currently used as
  * part of saved torrent files' names to prevent one frontend from
  * deleting a torrent used by another. The following tags are used:
@@ -108,7 +108,28 @@ typedef struct tr_handle tr_handle;
 
 tr_handle * tr_init( const char * tag );
 
-typedef struct tr_tracker_info tr_tracker_info;
+/* shut down a libtransmission instance created by tr_init(). */
+void tr_close( tr_handle * );
+
+
+/**
+***
+**/
+
+typedef struct tr_global_stats
+{
+    uint64_t downloadedGigs;  /* total down / GiB */
+    uint64_t downloadedBytes; /* total down % GiB */
+    uint64_t uploadedGigs;    /* total up / GiB */
+    uint64_t uploadedBytes;   /* total up % GiB */
+    double ratio;             /* total up / total down */
+    uint64_t filesAdded;      /* number of files added */
+    uint64_t sessionCount;    /* program started N times */
+}
+tr_global_stats;
+
+void tr_getGlobalStats( const tr_handle * handle, tr_global_stats * setme );
+
 
 /**
 ***
@@ -291,13 +312,6 @@ void tr_torrentSetFileDLs ( tr_torrent   * tor,
  * Gets the total download and upload rates
  **********************************************************************/
 void tr_torrentRates( tr_handle *, float *, float * );
-
-/***********************************************************************
- * tr_close
- ***********************************************************************
- * Frees memory allocated by tr_init.
- **********************************************************************/
-void tr_close( tr_handle * );
 
 
 
@@ -554,6 +568,15 @@ typedef struct tr_piece
 }
 tr_piece;
     
+typedef struct tr_tracker_info
+{
+    char * address;
+    int    port;
+    char * announce;
+    char * scrape;
+}
+tr_tracker_info;
+
 struct tr_info
 {
     /* Path to torrent */
@@ -721,14 +744,6 @@ struct tr_msg_list
     time_t               when;
     char               * message;
     struct tr_msg_list * next;
-};
-
-struct tr_tracker_info
-{
-    char * address;
-    int    port;
-    char * announce;
-    char * scrape;
 };
 
 struct tr_handle_status
