@@ -98,6 +98,8 @@
 		A24F19210A3A796800C9C145 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.m */; };
 		A257C1820CAD3003004E121C /* PeerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.m */; };
+		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
+		A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A25892750CF1FCE800CCCDDF /* StatsWindow.xib */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
@@ -442,6 +444,9 @@
 		A256588B0A9A695400E8A03B /* MessageWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MessageWindowController.m; path = macosx/MessageWindowController.m; sourceTree = "<group>"; };
 		A257C17F0CAD3003004E121C /* PeerTableView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PeerTableView.h; path = macosx/PeerTableView.h; sourceTree = "<group>"; };
 		A257C1800CAD3003004E121C /* PeerTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PeerTableView.m; path = macosx/PeerTableView.m; sourceTree = "<group>"; };
+		A25892620CF1F7E800CCCDDF /* StatsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatsWindowController.h; path = macosx/StatsWindowController.h; sourceTree = "<group>"; };
+		A25892630CF1F7E800CCCDDF /* StatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatsWindowController.m; path = macosx/StatsWindowController.m; sourceTree = "<group>"; };
+		A25892760CF1FCE800CCCDDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/StatsWindow.xib; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
 		A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToPathTransformer.h; path = macosx/ExpandedPathToPathTransformer.h; sourceTree = "<group>"; };
@@ -749,6 +754,8 @@
 				A256588B0A9A695400E8A03B /* MessageWindowController.m */,
 				A2DF37040C220D03006523C1 /* CreatorWindowController.h */,
 				A2DF37050C220D03006523C1 /* CreatorWindowController.m */,
+				A25892620CF1F7E800CCCDDF /* StatsWindowController.h */,
+				A25892630CF1F7E800CCCDDF /* StatsWindowController.m */,
 				A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */,
 				A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */,
 				A234D0D40C79FB6000A82373 /* Additions */,
@@ -814,6 +821,7 @@
 				A21567EB0A9A5034004DECD6 /* MessageWindow.nib */,
 				A2912C520A2956E80097A0CA /* PrefsWindow.nib */,
 				A2AE68310C628A35008753C9 /* Creator.nib */,
+				A25892750CF1FCE800CCCDDF /* StatsWindow.xib */,
 				A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
@@ -1476,6 +1484,7 @@
 				A2F151240CD438DE001F3B0E /* InfoTabBorder.png in Resources */,
 				A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */,
 				A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */,
+				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1607,6 +1616,7 @@
 				A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.m in Sources */,
 				A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */,
+				A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1784,6 +1794,14 @@
 				A24F96920CCBFB7700C9314D /* ko */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A25892750CF1FCE800CCCDDF /* StatsWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A25892760CF1FCE800CCCDDF /* English */,
+			);
+			name = StatsWindow.xib;
 			sourceTree = "<group>";
 		};
 		A2912C520A2956E80097A0CA /* PrefsWindow.nib */ = {

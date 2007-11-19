@@ -29,6 +29,7 @@
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
+#import "StatsWindowController.h"
 #import "AboutWindowController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -1365,6 +1366,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) showMessageWindow: (id) sender
 {
     [fMessageController showWindow: nil];
+}
+
+- (void) showStatsWindow: (id) sender
+{
+    [[StatsWindowController statsWindow: fLib] showWindow: nil];
 }
 
 - (void) updateUI

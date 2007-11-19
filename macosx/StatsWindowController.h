@@ -1,7 +1,7 @@
 /******************************************************************************
- * $Id: StringAdditions.h 2869 2007-08-19 03:03:28Z livings124 $
+ * $Id$
  *
- * Copyright (c) 2005-2007 Transmission authors and contributors
+ * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,19 +23,14 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <transmission.h>
 
-@interface NSString (NSStringAdditions)
+@interface StatsWindowController : NSWindowController
+{
+    IBOutlet NSTextField * fUploadedField, * fDownloadedField, * fRatioField, * fTimeField;
+    NSTimer * fTimer;
+}
 
-+ (NSString *) ellipsis;
-- (NSString *) stringByAppendingEllipsis;
-
-+ (NSString *) stringForFileSize: (uint64_t) size;
-+ (NSString *) stringForLargeFileSizeGigs: (uint64_t) gigs bytes: (uint64_t) bytes;
-
-+ (NSString *) stringForSpeed: (float) speed;
-+ (NSString *) stringForSpeedAbbrev: (float) speed;
-+ (NSString *) stringForRatio: (float) ratio;
-
-- (NSComparisonResult) compareIP: (NSString *) string;
++ (StatsWindowController *) statsWindow: (tr_handle *) lib;
 
 @end

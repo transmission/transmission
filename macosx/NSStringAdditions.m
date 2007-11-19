@@ -39,30 +39,40 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    if (size < 1024)
-        return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
+    [self stringForLargeFileSizeGigs: size / 1073741824 bytes: size % 1073741824];
+}
 
++ (NSString *) stringForLargeFileSizeGigs: (uint64_t) gigs bytes: (uint64_t) bytes
+{
     float convertedSize;
     NSString * unit;
-    if (size < 1048576)
+    if (gigs == 0)
     {
-        convertedSize = size / 1024.0;
-        unit = NSLocalizedString(@"KB", "File size");
-    }
-    else if (size < 1073741824)
-    {
-        convertedSize = size / 1048576.0;
-        unit = NSLocalizedString(@"MB", "File size");
-    }
-    else if (size < 1099511627776.0)
-    {
-        convertedSize = size / 1073741824.0;
-        unit = NSLocalizedString(@"GB", "File size");
+        if (bytes < 1024)
+            return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), bytes];
+        else if (bytes < 1048576)
+        {
+            convertedSize = bytes / 1024.0;
+            unit = NSLocalizedString(@"KB", "File size");
+        }
+        else
+        {
+            convertedSize = bytes / 1048576.0;
+            unit = NSLocalizedString(@"MB", "File size");
+        }
     }
     else
     {
-        convertedSize = size / 1099511627776.0;
-        unit = NSLocalizedString(@"TB", "File size");
+        if (gigs < 1024)
+        {
+            convertedSize = (float)gigs + bytes / 1073741824.0;
+            unit = NSLocalizedString(@"GB", "File size");
+        }
+        else
+        {
+            convertedSize = gigs / 1024.0;
+            unit = NSLocalizedString(@"TB", "File size");
+        }
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal

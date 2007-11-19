@@ -120,6 +120,8 @@
 				<string>id</string>
 				<key>showPreferenceWindow</key>
 				<string>id</string>
+				<key>showStatsWindow</key>
+				<string>id</string>
 				<key>stopAllTorrents</key>
 				<string>id</string>
 				<key>stopSelectedTorrents</key>

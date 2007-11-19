@@ -157,6 +157,7 @@
 - (void) setInfoTab: (id) sender;
 
 - (void) showMessageWindow: (id) sender;
+- (void) showStatsWindow: (id) sender;
 
 - (void) updateControlTint: (NSNotification *) notification;
 
