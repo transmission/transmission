@@ -341,7 +341,8 @@ tr_close( tr_handle * h )
 }
 
 void
-tr_getSessionStats( const tr_handle * handle, tr_session_stats * setme )
+tr_getSessionStats( const tr_handle   * handle,
+                    tr_session_stats  * setme )
 {
     assert( handle != NULL );
     assert( setme != NULL );
@@ -358,7 +359,8 @@ tr_getSessionStats( const tr_handle * handle, tr_session_stats * setme )
 }
 
 void
-tr_getAccumulatedStats( const tr_handle * handle, tr_session_stats * setme )
+tr_getCumulativeSessionStats( const tr_handle   * handle,
+                              tr_session_stats  * setme )
 {
     tr_getSessionStats( handle, setme );
 }
