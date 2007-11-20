@@ -659,11 +659,17 @@ tr_torrentDisablePex( tr_torrent * tor, int disable )
     tor->pexDisabled = disable;
 }
 
+static void
+tr_manualUpdateImpl( void * vtor )
+{
+    tr_torrent * tor = vtor;
+    if( tor->isRunning )
+        tr_trackerReannounce( tor->tracker );
+}
 void
 tr_manualUpdate( tr_torrent * tor )
 {
-    if( tor->isRunning )
-        tr_trackerReannounce( tor->tracker );
+    tr_runInEventThread( tor->handle, tr_manualUpdateImpl, tor );
 }
 int
 tr_torrentCanManualUpdate( const tr_torrent * tor )
