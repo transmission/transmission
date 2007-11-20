@@ -96,8 +96,8 @@ enum
 /***********************************************************************
  * tr_init
  ***********************************************************************
- * Initializes a libtransmission instance. Returns a obscure handle to
- * be passed to all functions below. The tag argument is a short string
+ * Initializes a libtransmission instance and returns an opaque handle
+ * to be passed to functions below. The tag argument is a short string
  * unique to the program invoking tr_init(), it is currently used as
  * part of saved torrent files' names to prevent one frontend from
  * deleting a torrent used by another. The following tags are used:
@@ -108,7 +108,35 @@ typedef struct tr_handle tr_handle;
 
 tr_handle * tr_init( const char * tag );
 
-typedef struct tr_tracker_info tr_tracker_info;
+/* shut down a libtransmission instance created by tr_init(). */
+void tr_close( tr_handle * );
+
+
+/**
+***
+**/
+
+typedef struct tr_session_stats
+{
+    uint64_t downloadedGigs;  /* total down / GiB */
+    uint64_t downloadedBytes; /* total down % GiB */
+    uint64_t uploadedGigs;    /* total up / GiB */
+    uint64_t uploadedBytes;   /* total up % GiB */
+    double ratio;             /* total up / total down */
+    uint64_t filesAdded;      /* number of files added */
+    uint64_t sessionCount;    /* program started N times */
+    uint64_t secondsActive;   /* how long Transmisson's been running */
+}
+tr_session_stats;
+
+/* stats from the current and past sessions. */
+void tr_getCumulativeSessionStats( const tr_handle   * handle,
+                                   tr_session_stats  * setme );
+
+/* stats from the current session. */
+void tr_getSessionStats( const tr_handle   * handle,
+                         tr_session_stats  * setme );
+
 
 /**
 ***
@@ -116,6 +144,7 @@ typedef struct tr_tracker_info tr_tracker_info;
 
 typedef enum
 {
+    TR_PLAINTEXT_PREFERRED,
     TR_ENCRYPTION_PREFERRED,
     TR_ENCRYPTION_REQUIRED
 }
@@ -291,13 +320,6 @@ void tr_torrentSetFileDLs ( tr_torrent   * tor,
  **********************************************************************/
 void tr_torrentRates( tr_handle *, float *, float * );
 
-/***********************************************************************
- * tr_close
- ***********************************************************************
- * Frees memory allocated by tr_init.
- **********************************************************************/
-void tr_close( tr_handle * );
-
 
 
 /**
@@ -409,19 +431,6 @@ void tr_torrentDisablePex( tr_torrent *, int disable );
 int tr_torrentIsPexEnabled( const tr_torrent * );
 
 const tr_info * tr_torrentInfo( const tr_torrent * );
-
-#if 0
-/***********************************************************************
- * tr_torrentScrape
- ***********************************************************************
- * Asks the tracker for the count of seeders and leechers. Returns 0
- * and fills 's' and 'l' if successful. Otherwise returns 1 if the
- * tracker doesn't support the scrape protocol, is unreachable or
- * replied with some error. tr_torrentScrape may block up to 20 seconds
- * before returning.
- **********************************************************************/
-int tr_torrentScrape( tr_torrent *, int * s, int * l, int * d );
-#endif
 
 void   tr_torrentSetFolder( tr_torrent *, const char * );
 const char * tr_torrentGetFolder( const tr_torrent * );
@@ -566,6 +575,15 @@ typedef struct tr_piece
 }
 tr_piece;
     
+typedef struct tr_tracker_info
+{
+    char * address;
+    int    port;
+    char * announce;
+    char * scrape;
+}
+tr_tracker_info;
+
 struct tr_info
 {
     /* Path to torrent */
@@ -695,14 +713,29 @@ struct tr_file_stat
     float progress;
 };
 
+typedef enum
+{
+    TR_PEER_STATUS_HANDSHAKE,
+    TR_PEER_STATUS_PEER_IS_CHOKED,
+    TR_PEER_STATUS_CLIENT_IS_CHOKED,
+    TR_PEER_STATUS_CLIENT_IS_INTERESTED,
+    TR_PEER_STATUS_READY,
+    TR_PEER_STATUS_ACTIVE_AND_CHOKED,
+    TR_PEER_STATUS_REQUEST_SENT,
+    TR_PEER_STATUS_ACTIVE
+}
+tr_peer_status;
+
 struct tr_peer_stat
 {
-    char    addr[INET_ADDRSTRLEN];
-    const char * client;
+    char addr[INET_ADDRSTRLEN];
+    char client[80];
     
     unsigned int isEncrypted   : 1;
     unsigned int isDownloading : 1;
     unsigned int isUploading   : 1;
+
+    tr_peer_status status;
 
     uint8_t  from;
     uint16_t port;
@@ -718,14 +751,6 @@ struct tr_msg_list
     time_t               when;
     char               * message;
     struct tr_msg_list * next;
-};
-
-struct tr_tracker_info
-{
-    char * address;
-    int    port;
-    char * announce;
-    char * scrape;
 };
 
 struct tr_handle_status

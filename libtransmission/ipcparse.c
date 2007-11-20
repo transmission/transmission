@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "transmission.h"
+#include "utils.h"
 
 #include "ipcparse.h"
 #include "bsdtree.h"
@@ -140,11 +141,13 @@ static struct msg gl_msgs[] =
     { "automap",             2, IPC_MSG_AUTOMAP,      RB_ENTRY_INITIALIZER() },
     { "autostart",           2, IPC_MSG_AUTOSTART,    RB_ENTRY_INITIALIZER() },
     { "bad-format",          2, IPC_MSG_BAD,          RB_ENTRY_INITIALIZER() },
+    { "encryption",          2, IPC_MSG_CRYPTO,       RB_ENTRY_INITIALIZER() },
     { "directory",           2, IPC_MSG_DIR,          RB_ENTRY_INITIALIZER() },
     { "downlimit",           2, IPC_MSG_DOWNLIMIT,    RB_ENTRY_INITIALIZER() },
     { "failed",              2, IPC_MSG_FAIL,         RB_ENTRY_INITIALIZER() },
     { "get-automap",         2, IPC_MSG_GETAUTOMAP,   RB_ENTRY_INITIALIZER() },
     { "get-autostart",       2, IPC_MSG_GETAUTOSTART, RB_ENTRY_INITIALIZER() },
+    { "get-encryption",      2, IPC_MSG_GETCRYPTO,    RB_ENTRY_INITIALIZER() },
     { "get-directory",       2, IPC_MSG_GETDIR,       RB_ENTRY_INITIALIZER() },
     { "get-downlimit",       2, IPC_MSG_GETDOWNLIMIT, RB_ENTRY_INITIALIZER() },
     { "get-info",            2, IPC_MSG_GETINFO,      RB_ENTRY_INITIALIZER() },
@@ -361,40 +364,24 @@ ipc_initval( struct ipc_info * info, enum ipc_msg id, int64_t tag,
 }
 
 uint8_t *
-ipc_mkval( benc_val_t * pk, size_t * len )
+ipc_mkval( benc_val_t * pk, size_t * setmeSize )
 {
-    char * buf, hex[IPC_MIN_MSG_LEN+1];
-    int    used, max;
+    int bencSize = 0;
+    char * benc = tr_bencSave( pk, &bencSize );
+    uint8_t * ret = NULL;
 
-    used = IPC_MIN_MSG_LEN;
-    max  = IPC_MIN_MSG_LEN;
-    buf  = malloc( IPC_MIN_MSG_LEN );
-    if( NULL == buf )
-    {
-        return NULL;
-    }
-
-    if( tr_bencSave( pk, &buf, &used, &max ) )
-    {
-        SAFEFREE( buf );
-        return NULL;
-    }
-
-    /* ok, this check is pretty laughable */
-    if( IPC_MAX_MSG_LEN < used )
-    {
-        free( buf );
+    if( bencSize > IPC_MAX_MSG_LEN )
         errno = EFBIG;
-        return NULL;
+    else {
+        const size_t size = IPC_MIN_MSG_LEN + bencSize;
+        ret = tr_new( uint8_t, size );
+        snprintf( (char*)ret, size, "%0*X", IPC_MIN_MSG_LEN, bencSize );
+        memcpy( ret + IPC_MIN_MSG_LEN, benc, bencSize );
+        *setmeSize = size;
     }
 
-    assert( 0 <= used );
-    snprintf( hex, sizeof hex, "%0*X",
-              IPC_MIN_MSG_LEN, used - IPC_MIN_MSG_LEN );
-    memcpy( buf, hex, IPC_MIN_MSG_LEN );
-    *len = used;
-
-    return ( uint8_t * )buf;
+    tr_free( benc );
+    return ret;
 }
 
 uint8_t *

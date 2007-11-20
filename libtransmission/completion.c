@@ -48,6 +48,21 @@ struct tr_completion
     uint64_t completeHave;
 };
 
+static void
+tr_cpReset( tr_completion * cp )
+{
+    tr_torrent * tor = cp->tor;
+
+    tr_bitfieldClear( cp->pieceBitfield );
+    tr_bitfieldClear( cp->blockBitfield );
+    memset( cp->completeBlocks, 0, sizeof(uint16_t) * tor->info.pieceCount );
+
+    cp->doneDirty = TRUE;
+    cp->doneHave = 0;
+    cp->doneTotal = 0;
+    cp->completeHave = 0;
+}
+
 tr_completion * tr_cpInit( tr_torrent * tor )
 {
     tr_completion * cp;
@@ -69,20 +84,6 @@ void tr_cpClose( tr_completion * cp )
     tr_bitfieldFree( cp->pieceBitfield );
     tr_bitfieldFree( cp->blockBitfield );
     tr_free(         cp );
-}
-
-void tr_cpReset( tr_completion * cp )
-{
-    tr_torrent * tor = cp->tor;
-
-    tr_bitfieldClear( cp->pieceBitfield );
-    tr_bitfieldClear( cp->blockBitfield );
-    memset( cp->completeBlocks, 0, sizeof(uint16_t) * tor->info.pieceCount );
-
-    cp->doneDirty = TRUE;
-    cp->doneHave = 0;
-    cp->doneTotal = 0;
-    cp->completeHave = 0;
 }
 
 /**
@@ -310,11 +311,11 @@ tr_cpHaveValid( const tr_completion * cp )
     if( tr_cpPieceIsComplete( cp, info->pieceCount-1 ) )
         b -= (info->pieceSize - (info->totalSize % info->pieceSize));
 
-   return b;
+    return b;
 }
 
 uint64_t
 tr_cpHaveTotal( const tr_completion * cp )
 {
-   return cp->completeHave;
+    return cp->completeHave;
 }

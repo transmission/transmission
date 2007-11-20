@@ -90,7 +90,9 @@ void
 tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 {
     assert( handle != NULL );
-    assert( mode==TR_ENCRYPTION_PREFERRED || mode==TR_ENCRYPTION_REQUIRED );
+    assert( mode==TR_ENCRYPTION_PREFERRED
+         || mode==TR_ENCRYPTION_REQUIRED
+         || mode==TR_PLAINTEXT_PREFERRED );
 
     handle->encryptionMode = mode;
 }
@@ -108,7 +110,6 @@ tr_setEncryptionMode( tr_handle * handle, tr_encryption_mode mode )
 tr_handle * tr_init( const char * tag )
 {
     tr_handle * h;
-    int         i;
 
 #ifndef WIN32
     /* Don't exit when writing on a broken socket */
@@ -138,10 +139,6 @@ tr_handle * tr_init( const char * tag )
     }
 
     h->peerMgr = tr_peerMgrNew( h );
-
-    /* Azureus identity */
-    for( i=0; i < TR_AZ_ID_LEN; ++i )
-        h->azId[i] = tr_rand( 0xff );
 
     /* Initialize rate and file descripts controls */
     h->upload   = tr_rcInit();
@@ -298,10 +295,19 @@ static void
 tr_closeImpl( void * vh )
 {
     tr_handle * h = vh;
+    tr_torrent * t;
+
+    for( t=h->torrentList; t!=NULL; t=t->next )
+        tr_torrentClose( t );
+
     tr_peerMgrFree( h->peerMgr );
 
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
+    
+    tr_natTraversalEnable( h, 0 );
+    while( tr_handleStatus( h )->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED )
+        tr_wait( 100 );
 
     tr_sharedClose( h->shared );
     tr_fdClose();
@@ -332,6 +338,31 @@ tr_close( tr_handle * h )
     tr_lockFree( h->lock );
     free( h->tag );
     free( h );
+}
+
+void
+tr_getSessionStats( const tr_handle   * handle,
+                    tr_session_stats  * setme )
+{
+    assert( handle != NULL );
+    assert( setme != NULL );
+
+    /* FIXME */
+    setme->downloadedGigs   = 4;
+    setme->downloadedBytes  = 8;
+    setme->uploadedGigs     = 15;
+    setme->uploadedBytes    = 16;
+    setme->ratio            = 23;
+    setme->filesAdded       = 42;
+    setme->sessionCount     = 666;
+    setme->secondsActive    = 2112;
+}
+
+void
+tr_getCumulativeSessionStats( const tr_handle   * handle,
+                              tr_session_stats  * setme )
+{
+    tr_getSessionStats( handle, setme );
 }
 
 tr_torrent **

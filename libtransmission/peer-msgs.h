@@ -65,6 +65,7 @@ typedef enum
     TR_PEERMSG_CLIENT_BLOCK,
     TR_PEERMSG_PEER_PROGRESS,
     TR_PEERMSG_GOT_ERROR,
+    TR_PEERMSG_GOT_ASSERT_ERROR,
     TR_PEERMSG_CANCEL,
     TR_PEERMSG_NEED_REQ
 }
@@ -87,7 +88,10 @@ tr_publisher_tag  tr_peerMsgsSubscribe   ( tr_peermsgs       * peer,
 void              tr_peerMsgsUnsubscribe ( tr_peermsgs       * peer,
                                            tr_publisher_tag    tag );
 
-int               tr_peerMsgIsPieceFastAllowed( const tr_peermsgs * peer,
-                                                uint32_t            index );
+int               tr_peerMsgsIsPieceFastAllowed( const tr_peermsgs * peer,
+                                                 uint32_t            index );
+
+int               tr_peerMsgsIsPieceSuggested( const tr_peermsgs * peer,
+                                              uint32_t            index );
 
 #endif

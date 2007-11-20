@@ -99,20 +99,16 @@ const uint8_t*
 
 typedef enum { READ_MORE, READ_AGAIN, READ_DONE } ReadState;
 typedef ReadState (*tr_can_read_cb)(struct bufferevent*, void* user_data);
-typedef void (*tr_did_write_cb)(struct bufferevent *, void *);
 typedef void (*tr_net_error_cb)(struct bufferevent *, short what, void *);
 
 void  tr_peerIoSetIOFuncs( tr_peerIo        * io,
                            tr_can_read_cb     readcb,
-                           tr_did_write_cb    writecb,
                            tr_net_error_cb    errcb,
                            void             * user_data );
 
-void  tr_peerIoSetIOMode ( tr_peerIo   * io,
-                           short         enable_mode,
-                           short         disable_mode );
-
 size_t tr_peerIoWriteBytesWaiting( const tr_peerIo * io );
+
+void tr_peerIoTryRead( tr_peerIo * io );
 
 void tr_peerIoWrite( tr_peerIo   * io,
                      const void  * writeme,
@@ -144,7 +140,7 @@ int  tr_peerIoIsEncrypted( const tr_peerIo * io );
 void tr_peerIoWriteBytes  ( tr_peerIo        * io,
                             struct evbuffer  * outbuf,
                             const void       * bytes,
-                            int                byteCount );
+                            size_t             byteCount );
 
 void tr_peerIoWriteUint8  ( tr_peerIo        * io,
                             struct evbuffer  * outbuf,
@@ -161,7 +157,7 @@ void tr_peerIoWriteUint32 ( tr_peerIo        * io,
 void tr_peerIoReadBytes   ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
                             void             * bytes,
-                            int                byteCount );
+                            size_t             byteCount );
 
 void tr_peerIoReadUint8   ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
@@ -177,7 +173,7 @@ void tr_peerIoReadUint32  ( tr_peerIo        * io,
 
 void tr_peerIoDrain       ( tr_peerIo        * io,
                             struct evbuffer  * inbuf,
-                            int                byteCount );
+                            size_t             byteCount );
 
 
 #endif

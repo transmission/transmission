@@ -27,8 +27,6 @@ libtransmission_a_SOURCES = \
     publish.c \
     ratecontrol.c \
     shared.c \
-    strlcat.c \
-    strlcpy.c \
     torrent.c \
     tracker.c \
     transmission.c \

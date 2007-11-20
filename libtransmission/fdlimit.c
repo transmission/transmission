@@ -35,10 +35,7 @@
 #include <libgen.h> /* basename, dirname */
 #include <fcntl.h> /* O_LARGEFILE */
 
-#include <sys/queue.h> /* libevent needs this */
-#include <sys/types.h> /* libevent needs this */
 #include <event.h>
-#include <evhttp.h>
 #include <evutil.h>
 
 #include "transmission.h"
@@ -89,11 +86,11 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
-    TR_MAX_SOCKETS = 512,
+    TR_MAX_SOCKETS = 320,
 
-    TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
+    TR_MAX_OPEN_FILES = 8, /* real files, not sockets */
 
-    TR_RESERVED_FDS   = 16 /* sockets reserved for tracker connections */
+    TR_RESERVED_FDS = 16 /* sockets reserved for tracker connections */
 };
 
 struct tr_openfile
@@ -134,7 +131,7 @@ TrOpenFile( int i, const char * filename, int write )
     /* create subfolders, if any */
     if( write ) {
         char * tmp = tr_strdup( filename );
-        const int val = tr_mkdirp( dirname(tmp), 0700 );
+        const int val = tr_mkdirp( dirname(tmp), 0777 );
         tr_free( tmp );
         if( val )
             return tr_ioErrorFromErrno( );
@@ -149,7 +146,7 @@ TrOpenFile( int i, const char * filename, int write )
     flags |= O_BINARY;
 #endif
     errno = 0;
-    file->fd = open( filename, flags, 0600 );
+    file->fd = open( filename, flags, 0666 );
     if( file->fd < 0 ) {
         if( errno ) {
             tr_err( "Couldn't open '%s': %s", filename, strerror(errno) );

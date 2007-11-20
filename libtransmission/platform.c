@@ -231,22 +231,11 @@ tr_lockFree( tr_lock * l )
     tr_free( l );
 }
 
-int
-tr_lockTryLock( tr_lock * l ) /* success on zero! */
-{
-#ifdef __BEOS__
-    return acquire_sem_etc( l->lock, 1, B_RELATIVE_TIMEOUT, 0 );
-#elif defined(WIN32)
-    return !TryEnterCriticalSection( &l->lock );
-#else
-    return pthread_mutex_trylock( &l->lock );
-#endif
-}
-
 void
 tr_lockLock( tr_lock * l )
 {
-    tr_thread_id currentThread = tr_getCurrentThread( );
+    const tr_thread_id currentThread = tr_getCurrentThread( );
+
     if( l->lockThread == currentThread )
     {
         ++l->depth;
@@ -260,7 +249,7 @@ tr_lockLock( tr_lock * l )
 #else
         pthread_mutex_lock( &l->lock );
 #endif
-        l->lockThread = tr_getCurrentThread( );
+        l->lockThread = currentThread;
         l->depth = 1;
     }
 }

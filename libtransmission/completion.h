@@ -31,7 +31,6 @@ typedef struct tr_completion tr_completion;
 
 tr_completion  * tr_cpInit( tr_torrent * );
 void             tr_cpClose( tr_completion * );
-void             tr_cpReset( tr_completion * );
 
 /* General */
 

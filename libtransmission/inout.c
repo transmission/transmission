@@ -25,15 +25,9 @@
 #include "fdlimit.h"
 #include "inout.h"
 #include "list.h"
-#include "net.h"
 #include "platform.h"
 #include "peer-mgr.h"
 #include "utils.h"
-
-struct tr_io
-{
-    tr_torrent * tor;
-};
 
 /****
 *****  Low-level IO functions
@@ -77,7 +71,7 @@ readOrWriteBytes( const tr_torrent  * tor,
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
         ret = TR_ERROR_IO_OTHER;
     else if( func( fd, buf, buflen ) != buflen )
-        ret = tr_ioErrorFromErrno ();
+        ret = tr_ioErrorFromErrno( );
     else
         ret = TR_OK;
  

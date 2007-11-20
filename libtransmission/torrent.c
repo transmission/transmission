@@ -880,11 +880,8 @@ tr_torrentPeers( const tr_torrent * tor, int * peerCount )
 }
 
 void
-tr_torrentPeersFree( tr_peer_stat * peers, int peerCount )
+tr_torrentPeersFree( tr_peer_stat * peers, int peerCount UNUSED )
 {
-    int i;
-    for( i=0; i<peerCount; ++i )
-        tr_free( (char*) peers[i].client );
     tr_free( peers );
 }
 
@@ -1005,8 +1002,10 @@ enum
 };
 
 static void
-checkAndStartCB( tr_torrent * tor )
+checkAndStartImpl( void * vtor )
 {
+    tr_torrent * tor = vtor;
+
     tr_globalLock( tor->handle );
 
     tor->isRunning  = 1;
@@ -1020,7 +1019,13 @@ checkAndStartCB( tr_torrent * tor )
 
     tr_globalUnlock( tor->handle );
 }
-    
+
+static void
+checkAndStartCB( tr_torrent * tor )
+{
+    tr_runInEventThread( tor->handle, checkAndStartImpl, tor );
+}
+
 void
 tr_torrentStart( tr_torrent * tor )
 {
@@ -1038,6 +1043,16 @@ tr_torrentStart( tr_torrent * tor )
     tr_globalUnlock( tor->handle );
 }
 
+static void
+torrentRecheckDoneImpl( void * vtor )
+{
+    tr_torrentRecheckCompleteness( vtor );
+}
+static void
+torrentRecheckDoneCB( tr_torrent * tor )
+{
+    tr_runInEventThread( tor->handle, torrentRecheckDoneImpl, tor );
+}
 void
 tr_torrentRecheck( tr_torrent * tor )
 {
@@ -1047,7 +1062,7 @@ tr_torrentRecheck( tr_torrent * tor )
         tor->uncheckedPieces = tr_bitfieldNew( tor->info.pieceCount );
     tr_bitfieldAddRange( tor->uncheckedPieces, 0, tor->info.pieceCount );
 
-    tr_ioRecheckAdd( tor, tr_torrentRecheckCompleteness );
+    tr_ioRecheckAdd( tor, torrentRecheckDoneCB );
 
     tr_globalUnlock( tor->handle );
 }
@@ -1089,6 +1104,7 @@ tr_torrentClose( tr_torrent * tor )
 {
     tr_globalLock( tor->handle );
 
+    tr_torrentClearStatusCallback( tor );
     tr_runInEventThread( tor->handle, closeTorrent, tor );
 
     tr_globalUnlock( tor->handle );
