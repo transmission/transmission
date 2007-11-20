@@ -110,13 +110,7 @@ struct cbdata {
     GList        * errqueue;
 };
 
-struct exitdata {
-    struct cbdata * cbdata;
-    time_t          started;
-    guint           timer;
-};
-
-#define CBDATA_PTR              "callback-data-pointer"
+#define CBDATA_PTR "callback-data-pointer"
 
 static GtkUIManager * myUIManager = NULL;
 
@@ -133,8 +127,6 @@ static void
 makeicon( struct cbdata * cbdata );
 static void
 wannaquit( void * vdata );
-static gboolean
-exitcheck(gpointer gdata);
 static void
 setupdrag(GtkWidget *widget, struct cbdata *data);
 static void
@@ -255,6 +247,7 @@ main( int argc, char ** argv )
     g_set_application_name( _( "Transmission" ) );
 
     /* initialize gtk */
+    g_thread_init( NULL );
     gtk_init_with_args( &argc, &argv, _("[torrent files]"), entries, domain, NULL );
     myUIManager = gtk_ui_manager_new ();
     actions_init ( myUIManager, cbdata );
@@ -412,92 +405,49 @@ makeicon( struct cbdata * cbdata )
         cbdata->icon = tr_icon_new( );
 }
 
-static void
-wannaquit( void * vdata )
+static gpointer
+quitThreadFunc( gpointer gdata )
 {
-  struct cbdata * data;
-  struct exitdata *edata;
+    struct cbdata * cbdata = gdata;
 
-  data = vdata;
-  if( data->closing )
-  {
-      return;
-  }
-  data->closing = TRUE;
+    tr_close( tr_core_handle( cbdata->core ) );
 
-  /* stop the update timer */
-  if(0 < data->timer)
-    g_source_remove(data->timer);
-  data->timer = 0;
-
-  /* pause torrents and stop nat traversal */
-  tr_core_shutdown( data->core );
-
-  /* set things up to wait for torrents to stop */
-  edata = g_new0(struct exitdata, 1);
-  edata->cbdata = data;
-  edata->started = time(NULL);
-  /* check if torrents are still running */
-  if(exitcheck(edata)) {
-    /* yes, start the exit timer and disable widgets */
-    edata->timer = g_timeout_add(EXIT_CHECK_INTERVAL, exitcheck, edata);
-    if( NULL != data->wind )
-    {
-        gtk_widget_set_sensitive( GTK_WIDGET( data->wind ), FALSE );
-    }
-  }
-}
-
-static gboolean
-exitcheck( gpointer gdata )
-{
-    struct exitdata    * edata;
-    struct cbdata      * cbdata;
-
-    edata  = gdata;
-    cbdata = edata->cbdata;
-
-    /* keep waiting until we're ready to quit or we hit the exit timeout */
-    if( time( NULL ) - edata->started < TRACKER_EXIT_TIMEOUT )
-    {
-        if( !tr_core_quiescent( cbdata->core ) )
-        {
-            updatemodel( cbdata );
-            return TRUE;
-        }
-    }
-
-    /* exit otherwise */
-    if( 0 < edata->timer )
-    {
-        g_source_remove( edata->timer );
-    }
-    g_free( edata );
-    /* note that cbdata->prefs holds a reference to cbdata->core, and
-       it's destruction may trigger callbacks that use cbdata->core */
-    if( NULL != cbdata->prefs )
-    {
+    /* shutdown the gui */
+    if( cbdata->prefs )
         gtk_widget_destroy( GTK_WIDGET( cbdata->prefs ) );
-    }
-    if( NULL != cbdata->wind )
-    {
+    if( cbdata->wind )
         gtk_widget_destroy( GTK_WIDGET( cbdata->wind ) );
-    }
     g_object_unref( cbdata->core );
-    if( NULL != cbdata->icon )
-    {
+    if( cbdata->icon )
         g_object_unref( cbdata->icon );
-    }
-    g_assert( 0 == cbdata->timer );
-    if( NULL != cbdata->errqueue )
-    {
-        g_list_foreach( cbdata->errqueue, (GFunc) g_free, NULL );
+    if( cbdata->errqueue ) {
+        g_list_foreach( cbdata->errqueue, (GFunc)g_free, NULL );
         g_list_free( cbdata->errqueue );
     }
     g_free( cbdata );
-    gtk_main_quit();
 
-    return FALSE;
+    /* exit the gtk main loop */
+    gtk_main_quit( );
+    return NULL;
+}
+
+static void
+wannaquit( void * vdata )
+{
+    struct cbdata * cbdata = vdata;
+
+    /* stop the update timer */
+    if( cbdata->timer ) {
+        g_source_remove( cbdata->timer );
+        cbdata->timer = 0;
+    }
+
+    /* clear the UI */
+    gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
+    gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
+
+    /* shut down libT */
+    g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
 }
 
 static void
@@ -894,7 +844,7 @@ recheckTorrentForeach (GtkTreeModel * model,
 static gboolean 
 msgwinclosed()
 {
-  action_toggle( "toggle-debug-window", FALSE );
+  action_toggle( "toggle-message-log", FALSE );
   return FALSE;
 }
 
@@ -988,7 +938,7 @@ doAction ( const char * action_name, gpointer user_data )
             gtk_widget_show( GTK_WIDGET( data->prefs ) );
         }
     }
-    else if (!strcmp (action_name, "toggle-debug-window"))
+    else if (!strcmp (action_name, "toggle-message-log"))
     {
         if( !data->msgwin )
         {
@@ -999,7 +949,7 @@ doAction ( const char * action_name, gpointer user_data )
         }
         else
         {
-            action_toggle("toggle-debug-window", FALSE);
+            action_toggle("toggle-message-log", FALSE);
             gtk_widget_destroy( data->msgwin );
             data->msgwin = NULL;
         }

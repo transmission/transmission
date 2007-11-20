@@ -36,7 +36,7 @@
 #include "torrent-inspector.h"
 #include "util.h"
 
-#define UPDATE_INTERVAL_MSEC 1500
+#define UPDATE_INTERVAL_MSEC 2000
 
 /****
 *****  PIECES VIEW
@@ -239,6 +239,7 @@ enum
   PEER_COL_DOWNLOAD_RATE,
   PEER_COL_IS_UPLOADING,
   PEER_COL_UPLOAD_RATE,
+  PEER_COL_STATUS,
   N_PEER_COLS
 };
 
@@ -252,7 +253,8 @@ static const char* peer_column_names[N_PEER_COLS] =
   N_("Downloading"),
   N_("DL Rate"),
   N_("Uploading"),
-  N_("UL Rate")
+  N_("UL Rate"),
+  N_("Status")
 };
 
 static int compare_peers (const void * a, const void * b)
@@ -288,6 +290,7 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
                       PEER_COL_IS_UPLOADING, peer->isUploading,
                       PEER_COL_UPLOAD_RATE, peer->uploadToRate,
+                      PEER_COL_STATUS, peer->status,
                       -1);
 }
 
@@ -316,7 +319,8 @@ peer_model_new (tr_torrent * tor)
                                          G_TYPE_BOOLEAN, /* isDownloading */
                                          G_TYPE_FLOAT,   /* downloadFromRate */
                                          G_TYPE_BOOLEAN, /* isUploading */
-                                         G_TYPE_FLOAT);  /* uploadToRate */
+                                         G_TYPE_FLOAT,   /* uploadToRate */
+                                         G_TYPE_INT );   /* tr_peer_status */
 
   int n_peers = 0;
   tr_peer_stat * peers = tr_torrentPeers (tor, &n_peers);
@@ -340,6 +344,31 @@ render_encrypted (GtkTreeViewColumn  * column UNUSED,
                           "yalign", (gfloat)0.5,
                           "stock-id", (is_encrypted ? "transmission-lock" : NULL),
                           NULL);
+}
+
+static void
+render_status( GtkTreeViewColumn  * column UNUSED,
+               GtkCellRenderer    * renderer,
+               GtkTreeModel       * tree_model,
+               GtkTreeIter        * iter,
+               gpointer             data UNUSED )
+{
+    int status;
+    const char * text;
+    gtk_tree_model_get( tree_model, iter, PEER_COL_STATUS, &status, -1 );
+    switch( status )
+    {
+        case TR_PEER_STATUS_HANDSHAKE:            text = _( "Handshaking" ); break;
+        case TR_PEER_STATUS_PEER_IS_CHOKED:       text = _( "Peer is Choked" ); break;
+        case TR_PEER_STATUS_CLIENT_IS_CHOKED:     text = _( "Choked" ); break;
+        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked & Interested" ); break;
+        case TR_PEER_STATUS_READY:                text = _( "Ready" ); break;
+        case TR_PEER_STATUS_REQUEST_SENT:         text = _( "Request Sent" ); break;
+        case TR_PEER_STATUS_ACTIVE           :    text = _( "Active" ); break;
+        case TR_PEER_STATUS_ACTIVE_AND_CHOKED:    text = _( "Active & Choked" ); break;
+        default:                                  text = "BUG"; break;
+    }
+    g_object_set (renderer, "text", text, NULL);
 }
 
 static void
@@ -477,7 +506,7 @@ refresh_peers (GtkWidget * top)
   fmtpeercount (p->leechers_lb, stat->leechers);
   fmtpeercount (p->completed_lb, stat->completedFromTracker );
 
-  free (peers);
+  free( peers );
 }
 
 static GtkWidget* peer_page_new ( TrTorrent * gtor )
@@ -495,7 +524,11 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_PROGRESS,
                          PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
-                         PEER_COL_DOWNLOAD_RATE };
+                         PEER_COL_DOWNLOAD_RATE
+#if 0
+                         , PEER_COL_STATUS
+#endif
+                       };
 
   m  = peer_model_new (tor);
   v = gtk_tree_view_new_with_model (m);
@@ -568,6 +601,13 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
         gtk_tree_view_column_set_cell_data_func (c, r, render_ul_rate,
                                                  NULL, NULL);
         break;
+
+      case PEER_COL_STATUS:
+        r = gtk_cell_renderer_text_new( );
+        c = gtk_tree_view_column_new_with_attributes (t, r, "text", col, NULL);
+        gtk_tree_view_column_set_cell_data_func (c, r, render_status, NULL, NULL);
+        break;
+        
 
       default:
         abort ();
@@ -778,13 +818,13 @@ static GtkWidget* info_page_new (tr_torrent * tor)
 typedef struct
 {
   GtkWidget * state_lb;
-  GtkWidget * corrupt_dl_lb;
-  GtkWidget * valid_dl_lb;
+  GtkWidget * progress_lb;
+  GtkWidget * have_lb;
   GtkWidget * dl_lb;
   GtkWidget * ul_lb;
+  GtkWidget * failed_lb;
   GtkWidget * ratio_lb;
   GtkWidget * err_lb;
-  GtkWidget * remaining_lb;
   GtkWidget * swarm_lb;
   GtkWidget * date_added_lb;
   GtkWidget * last_activity_lb;
@@ -798,19 +838,23 @@ refresh_activity (GtkWidget * top)
 {
   Activity * a = (Activity*) g_object_get_data (G_OBJECT(top), "activity-data");
   const tr_stat * stat = tr_torrent_stat( a->gtor );
-  char *pch;
+  char *pch, *pch2, *pch3;
 
   pch = tr_torrent_status_str( a->gtor );
   gtk_label_set_text (GTK_LABEL(a->state_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->corruptEver);
-  gtk_label_set_text (GTK_LABEL(a->corrupt_dl_lb), pch);
+  pch = g_strdup_printf( "%.1f%% (%.1f%% selected)", stat->percentComplete*100.0, stat->percentDone*100.0 );
+  gtk_label_set_text (GTK_LABEL(a->progress_lb), pch);
   g_free (pch);
 
-  pch = readablesize (stat->haveValid);
-  gtk_label_set_text (GTK_LABEL(a->valid_dl_lb), pch);
-  g_free (pch);
+  pch = readablesize( stat->haveValid + stat->haveUnchecked );
+  pch2 = readablesize( stat->haveValid );
+  pch3 = g_strdup_printf( _("%s (%s verified)"), pch, pch2 );
+  gtk_label_set_text( GTK_LABEL( a->have_lb ), pch3 );
+  g_free( pch3 );
+  g_free( pch2 );
+  g_free( pch );
 
   pch = readablesize (stat->downloadedEver);
   gtk_label_set_text (GTK_LABEL(a->dl_lb), pch);
@@ -820,16 +864,16 @@ refresh_activity (GtkWidget * top)
   gtk_label_set_text (GTK_LABEL(a->ul_lb), pch);
   g_free (pch);
 
-  pch = ratiostr (stat->downloadedEver, stat->uploadedEver);
+  pch = readablesize (stat->corruptEver);
+  gtk_label_set_text (GTK_LABEL(a->failed_lb), pch);
+  g_free (pch);
+
+  pch = g_strdup_printf( "%.1f", stat->ratio );
   gtk_label_set_text (GTK_LABEL(a->ratio_lb), pch);
   g_free (pch);
 
   pch = readablespeed (stat->swarmspeed);
   gtk_label_set_text (GTK_LABEL(a->swarm_lb), pch);
-  g_free (pch);
-
-  pch = readablesize (stat->leftUntilDone);
-  gtk_label_set_text (GTK_LABEL(a->remaining_lb), pch);
   g_free (pch);
 
   gtk_label_set_text (GTK_LABEL(a->err_lb),
@@ -869,12 +913,12 @@ activity_page_new (TrTorrent * gtor)
     l = a->state_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Corrupt DL"));
-    l = a->corrupt_dl_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Progress"));
+    l = a->progress_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Valid DL"));
-    l = a->valid_dl_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Have") );
+    l = a->have_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Downloaded"));
@@ -885,12 +929,12 @@ activity_page_new (TrTorrent * gtor)
     l = a->ul_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Ratio"));
-    l = a->ratio_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Failed DL"));
+    l = a->failed_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
-    g_snprintf (name, sizeof(name), namefmt, _("Remaining"));
-    l = a->remaining_lb = gtk_label_new (NULL);
+    g_snprintf (name, sizeof(name), namefmt, _("Ratio"));
+    l = a->ratio_lb = gtk_label_new (NULL);
     hig_workarea_add_row (t, &row, name, l, NULL);
 
     g_snprintf (name, sizeof(name), namefmt, _("Swarm Rate"));

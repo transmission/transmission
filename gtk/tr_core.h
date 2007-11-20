@@ -109,14 +109,6 @@ tr_core_model( TrCore * self );
 tr_handle *
 tr_core_handle( TrCore * self );
 
-/* Try to politely stop all torrents and nat traversal */
-void
-tr_core_shutdown( TrCore * self );
-
-/* Returns true if the shutdown has completed */
-gboolean
-tr_core_quiescent( TrCore * self );
-
 /* Load saved state, return number of torrents added. May trigger one
    or more "error" signals with TR_CORE_ERR_ADD_TORRENT */
 int
@@ -189,7 +181,7 @@ enum {
   MC_NAME, MC_SIZE, MC_HASH, MC_STAT, MC_ERR, MC_TERR,
   MC_PROG_C, MC_PROG_D, MC_DRATE, MC_URATE, MC_ETA, MC_PEERS,
   MC_UPEERS, MC_DPEERS, MC_SEED, MC_LEECH, MC_DONE,
-  MC_DOWN, MC_UP, MC_LEFT, MC_TORRENT, MC_ID,
+  MC_DOWN, MC_UP, MC_RATIO, MC_LEFT, MC_TORRENT, MC_ID,
   MC_ROW_COUNT
 };
 

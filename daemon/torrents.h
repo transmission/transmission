@@ -57,5 +57,7 @@ void         torrent_set_downlimit       ( int );
 int          torrent_get_downlimit       ( void );
 void         torrent_set_directory       ( const char * );
 const char * torrent_get_directory       ( void );
+void         torrent_set_encryption      ( tr_encryption_mode );
+tr_encryption_mode torrent_get_encryption      ( void );
 
 #endif /* TR_DAEMON_TORRENTS_H */

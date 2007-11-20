@@ -17,8 +17,7 @@
 #include <string.h> /* strcmp, strchr */
 #include <libgen.h> /* basename */
 
-#include <sys/queue.h> /* libevent needs this */
-#include <sys/types.h> /* libevent needs this */
+#include <sys/queue.h> /* evhttp.h needs this */
 #include <event.h>
 #include <evhttp.h>
 
@@ -625,7 +624,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
     char * ann = getCurrentAddress(t)->announce;
     
     evbuffer_add_printf( buf, "%s"
-                              "%sinfo_hash=%s"
+                              "%cinfo_hash=%s"
                               "&peer_id=%s"
                               "&port=%d"
                               "&uploaded=%"PRIu64
@@ -640,7 +639,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
                               "%s%s"
                               "%s%s",
         ann,
-        ( strchr(ann, '?') == NULL ? "?" : "&" ),
+        strchr(ann, '?') ? '&' : '?',
         t->escaped,
         t->peer_id,
         tr_sharedGetPublicPort( t->handle->shared ),
@@ -714,7 +713,6 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 {
     const char * warning;
     tr_tracker * t;
-    int err = 0;
     int responseCode;
 
     t = findTrackerFromHash( torrent_hash );
@@ -798,14 +796,6 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
         if( bencLoaded )
             tr_bencFree( &benc );
     }
-    else
-    {
-        tr_inf( "Bad response for torrent '%s' on request '%s' "
-                "... trying again in 30 seconds",
-                t->name, t->lastRequest );
-
-        err = 1;
-    }
 
     if (( warning = updateAddresses( t, req ) )) {
         publishWarning( t, warning );
@@ -850,7 +840,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     }
     else if( 500<=responseCode && responseCode<=599 )
     {
-        dbgmsg( t, "got a 5xx error... retrying in 15 seconds." );
+        dbgmsg( t, "Got a 5xx error... retrying in 15 seconds." );
 
         /* Response status codes beginning with the digit "5" indicate
          * cases in which the server is aware that it has erred or is
@@ -863,7 +853,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     }
     else
     {
-        dbgmsg( t, "unhandled condition... retrying in 120 seconds." );
+        dbgmsg( t, "Invalid response from tracker... retrying in 120 seconds." );
 
         /* WTF did we get?? */
         if( req && req->response_code_line )

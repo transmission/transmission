@@ -63,11 +63,6 @@ readabletime(int secs);
 char *
 rfc822date (guint64 epoch_msec);
 
-/* returns a string representing the download ratio.
-   the string must be g_free()d */
-char *
-ratiostr(guint64 down, guint64 up);
-
 /* create a directory and any missing parent directories */
 gboolean
 mkdir_p(const char *name, mode_t mode);

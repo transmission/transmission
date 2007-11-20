@@ -121,22 +121,6 @@ rfc822date (guint64 epoch_msec)
     return g_locale_to_utf8( buf, -1, NULL, NULL, NULL );
 }
 
-char *
-ratiostr(guint64 down, guint64 up) {
-  double ratio;
-
-  if(0 == up && 0 == down)
-    return g_strdup(_("N/A"));
-
-  if(0 == down)
-    /* this is a UTF-8 infinity symbol */
-    return g_strdup("\xE2\x88\x9E");
-
-  ratio = (double)up / (double)down;
-
-  return g_strdup_printf("%.*f", BESTDECIMAL(ratio), ratio);
-}
-
 gboolean
 mkdir_p(const char *name, mode_t mode)
 {

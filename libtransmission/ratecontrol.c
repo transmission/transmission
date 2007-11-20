@@ -22,32 +22,30 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <string.h>
+#include <string.h> /* memset */
 
 #include "transmission.h"
 #include "platform.h"
 #include "ratecontrol.h"
-#include "shared.h"
 #include "utils.h"
 
 #define GRANULARITY_MSEC 250
-#define SHORT_INTERVAL_MSEC 3000
-#define LONG_INTERVAL_MSEC 20000
+#define SHORT_INTERVAL_MSEC 4000
+#define LONG_INTERVAL_MSEC 8000
 #define HISTORY_SIZE (LONG_INTERVAL_MSEC / GRANULARITY_MSEC)
 
-typedef struct
+struct tr_transfer
 {
     uint64_t date;
     uint64_t size;
-}
-tr_transfer_t;
+};
 
 struct tr_ratecontrol
 {
     tr_lock * lock;
     int limit;
     int newest;
-    tr_transfer_t transfers[HISTORY_SIZE];
+    struct tr_transfer transfers[HISTORY_SIZE];
 };
 
 /* return the xfer rate over the last `interval' seconds in KiB/sec */
@@ -96,22 +94,6 @@ tr_rcClose( tr_ratecontrol * r )
 ****
 ***/
 
-int
-tr_rcCanTransfer( const tr_ratecontrol * r )
-{
-    int ret;
-
-    if( r == NULL )
-        ret = 0;
-    else {
-        tr_lockLock( (tr_lock*)r->lock );
-        ret = rateForInterval( r, SHORT_INTERVAL_MSEC ) < r->limit;
-        tr_lockUnlock( (tr_lock*)r->lock );
-    }
-
-    return ret;
-}
-
 size_t
 tr_rcBytesLeft( const tr_ratecontrol * r )
 {
@@ -119,15 +101,14 @@ tr_rcBytesLeft( const tr_ratecontrol * r )
 
     if( r != NULL )
     {
-        float cur, max;
-        size_t kb;
+        float cur, max, kb;
  
         tr_lockLock( (tr_lock*)r->lock );
 
         cur = rateForInterval( r, SHORT_INTERVAL_MSEC );
         max = r->limit;
         kb = max>cur ? max-cur : 0;
-        bytes = kb * 1024u;
+        bytes = (size_t)(kb * 1024);
 
         tr_lockUnlock( (tr_lock*)r->lock );
     }
@@ -182,7 +163,7 @@ tr_rcReset( tr_ratecontrol * r )
 {
     tr_lockLock( (tr_lock*)r->lock );
     r->newest = 0;
-    memset( r->transfers, 0, sizeof(tr_transfer_t) * HISTORY_SIZE );
+    memset( r->transfers, 0, sizeof(struct tr_transfer) * HISTORY_SIZE );
     tr_lockUnlock( (tr_lock*)r->lock );
 }
 

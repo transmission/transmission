@@ -823,7 +823,7 @@ tr_bitfieldRemRange ( tr_bitfield  * b,
 }
 
 tr_bitfield*
-tr_bitfieldAnd( tr_bitfield * a, const tr_bitfield * b )
+tr_bitfieldOr( tr_bitfield * a, const tr_bitfield * b )
 {
     uint8_t *ait;
     const uint8_t *aend, *bit;
@@ -831,7 +831,7 @@ tr_bitfieldAnd( tr_bitfield * a, const tr_bitfield * b )
     assert( a->len == b->len );
 
     for( ait=a->bits, bit=b->bits, aend=ait+a->len; ait!=aend; ++ait, ++bit )
-        *ait &= *bit;
+        *ait |= *bit;
 
     return a;
 }

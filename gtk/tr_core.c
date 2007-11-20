@@ -122,39 +122,12 @@ tr_core_dispose( GObject * obj )
 {
     TrCore       * self = (TrCore *) obj;
     GObjectClass * parent;
-    GtkTreeIter    iter;
-    TrTorrent    * tor;
 
     if( self->disposed )
-    {
         return;
-    }
+
     self->disposed = TRUE;
-
     pref_save( NULL );
-
-#ifdef REFDBG
-    fprintf( stderr, "core    %p dispose\n", self );
-#endif
-
-    /* sever all remaining torrents in the model */
-    if( gtk_tree_model_get_iter_first( self->model, &iter ) ) do
-    {
-        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-        tr_torrent_sever( tor );
-        g_object_unref( tor );
-    }
-    while( gtk_tree_model_iter_next( self->model, &iter ) );
-    g_object_unref( self->model );
-
-#ifdef REFDBG
-    fprintf( stderr, "core    %p dead\n", self );
-#endif
-
-    /* close the libtransmission instance */
-    tr_close( self->handle );
-
-    /* Chain up to the parent class */
     parent = g_type_class_peek( g_type_parent( TR_CORE_TYPE ) );
     parent->dispose( obj );
 }
@@ -296,8 +269,8 @@ tr_core_init( GTypeInstance * instance, gpointer g_class SHUTUP )
         G_TYPE_INT, G_TYPE_INT,     G_TYPE_INT,     G_TYPE_INT,       G_TYPE_INT,
         /* leechers, completedFromTracker, downloaded,    uploaded */
         G_TYPE_INT,  G_TYPE_INT,           G_TYPE_UINT64, G_TYPE_UINT64,
-        /* left,       TrTorrent object, ID for IPC */
-        G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
+        /* ratio,      left,          TrTorrent object, ID for IPC */
+        G_TYPE_FLOAT,  G_TYPE_UINT64, TR_TORRENT_TYPE,  G_TYPE_INT,
     };
 
 #ifdef REFDBG
@@ -371,49 +344,6 @@ tr_core_handle( TrCore * self )
     g_return_val_if_fail (TR_IS_CORE(self), NULL);
 
     return self->disposed ? NULL : self->handle;
-}
-
-void
-tr_core_shutdown( TrCore * self )
-{
-    GtkTreeIter iter;
-
-    TR_IS_CORE( self );
-
-    if( self->disposed )
-        return;
-
-    g_assert( !self->quitting );
-    self->quitting = TRUE;
-
-    /* try to stop all the torrents nicely */
-    if ( gtk_tree_model_get_iter_first( self->model, &iter) ) do {
-        TrTorrent * tor;
-        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-        tr_torrent_sever( tor );
-        g_object_unref( tor );
-    } while( gtk_list_store_remove( GTK_LIST_STORE(self->model), &iter ) );
-
-    /* shut down nat traversal */
-    tr_natTraversalEnable( self->handle, 0 );
-}
-
-gboolean
-tr_core_quiescent( TrCore * self )
-{
-    const tr_handle_status * hstat;
-
-    TR_IS_CORE( self );
-    g_assert( self->quitting );
-
-    if( self->disposed )
-        return TRUE;
-
-    if ( tr_torrentCount( self->handle ) != 0 )
-        return FALSE;
-
-    hstat = tr_handleStatus( self->handle );
-    return TR_NAT_TRAVERSAL_DISABLED == hstat->natTraversalStatus;
 }
 
 static void
@@ -632,6 +562,7 @@ tr_core_update( TrCore * self )
                             MC_DONE,        st->completedFromTracker,
                             MC_DOWN,        st->downloadedEver,
                             MC_UP,          st->uploadedEver,
+                            MC_RATIO,       st->ratio,
                             MC_LEFT,        st->leftUntilDone,
                             -1 );
     }

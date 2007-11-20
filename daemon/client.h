@@ -64,6 +64,7 @@ int  client_pex      ( int );
 int  client_downlimit( int );
 int  client_uplimit  ( int );
 int  client_dir      ( const char * );
+int  client_crypto   ( const char * );
 int  client_start    ( size_t, const int * );
 int  client_stop     ( size_t, const int * );
 int  client_remove   ( size_t, const int * );

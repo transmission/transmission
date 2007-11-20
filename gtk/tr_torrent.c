@@ -299,12 +299,12 @@ tr_torrent_status_str ( TrTorrent * gtor )
     {
         case TR_STATUS_CHECK_WAIT:
             prog = st->recheckProgress * 100.0; /* [0...100] */
-            top = g_strdup_printf( _("Waiting to verify local files (%.1f%% tested)"), prog );
+            top = g_strdup_printf( _("Waiting to verify local data (%.1f%% tested)"), prog );
             break;
 
         case TR_STATUS_CHECK:
             prog = st->recheckProgress * 100.0; /* [0...100] */
-            top = g_strdup_printf( _("Verifying local files (%.1f%% tested)"), prog );
+            top = g_strdup_printf( _("Verifying local data (%.1f%% tested)"), prog );
             break;
 
         case TR_STATUS_DOWNLOAD:

@@ -496,6 +496,31 @@ client_dir( const char * dir )
 }
 
 int
+client_crypto( const char * mode )
+{
+    struct req * req;
+    char       * modecpy;
+
+    modecpy = strdup( mode );
+    if( NULL == modecpy )
+    {
+        mallocmsg( strlen( mode ) );
+        return -1;
+    }
+
+    req = addreq( IPC_MSG_CRYPTO, -1, NULL );
+    if( NULL == req )
+    {
+        free( modecpy );
+        return -1;
+    }
+
+    req->str = modecpy;
+
+    return 0;
+}
+
+int
 addintlistreq( enum ipc_msg which, size_t len, const int * list )
 {
     struct req * req;
@@ -800,6 +825,7 @@ flushreqs( struct con * con )
             case IPC_MSG_PEX:
                 buf = ipc_mkint( con->ipc, &buflen, req->id, -1, req->num );
                 break;
+            case IPC_MSG_CRYPTO:
             case IPC_MSG_DIR:
                 buf = ipc_mkstr( con->ipc, &buflen, req->id, -1, req->str );
                 SAFEFREE( req->str );

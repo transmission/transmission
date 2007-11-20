@@ -97,6 +97,7 @@ static int                 gl_mapping   = 0;
 static int                 gl_uplimit   = -1;
 static int                 gl_downlimit = -1;
 static char                gl_dir[MAXPATHLEN];
+static tr_encryption_mode  gl_crypto    = TR_ENCRYPTION_PREFERRED;
 
 RB_GENERATE_STATIC( tortree, tor, idlinks, toridcmp )
 RB_GENERATE_STATIC( hashtree, tor, hashlinks, torhashcmp )
@@ -467,6 +468,20 @@ torrent_get_directory( void )
     return gl_dir;
 }
 
+void
+torrent_set_encryption(tr_encryption_mode mode)
+{
+    tr_setEncryptionMode(gl_handle, mode);
+    gl_crypto = mode;
+    savestate();
+}
+
+tr_encryption_mode
+torrent_get_encryption(void)
+{
+    return tr_getEncryptionMode(gl_handle);
+}
+
 struct tor *
 opentor( const char * path, const char * hash, uint8_t * data, size_t size,
          const char * dir )
@@ -737,6 +752,17 @@ loadstate( void )
         strlcpy( gl_dir, str->val.s.s, sizeof gl_dir );
     }
 
+    str = tr_bencDictFind( &top, "encryption-mode" );
+    if( NULL != str && TYPE_STR == str->type )
+    {
+        if(!strcasecmp(str->val.s.s, "preferred"))
+            gl_crypto = TR_ENCRYPTION_PREFERRED;
+        else if(!strcasecmp(str->val.s.s, "required"))
+            gl_crypto = TR_ENCRYPTION_REQUIRED;
+    }
+
+    tr_setEncryptionMode(gl_handle, gl_crypto);
+
     list = tr_bencDictFind( &top, "torrents" );
     if( NULL == list || TYPE_LIST != list->type )
     {
@@ -794,7 +820,7 @@ savestate( void )
     int          len, pexset;
 
     tr_bencInit( &top, TYPE_DICT );
-    if( tr_bencDictReserve( &top, 8 ) )
+    if( tr_bencDictReserve( &top, 9 ) )
     {
       nomem:
         tr_bencFree( &top );
@@ -809,6 +835,10 @@ savestate( void )
     tr_bencInitInt( tr_bencDictAdd( &top, "download-limit" ), gl_downlimit );
     tr_bencInitStr( tr_bencDictAdd( &top, "default-directory" ),
                     gl_dir, -1, 1 );
+    if(TR_ENCRYPTION_REQUIRED == gl_crypto)
+        tr_bencInitStr(tr_bencDictAdd(&top, "encryption-mode"), "required", -1, 1);
+    else
+        tr_bencInitStr(tr_bencDictAdd(&top, "encryption-mode"), "preferred", -1, 1);
     list = tr_bencDictAdd( &top, "torrents" );
     tr_bencInit( list, TYPE_LIST );
 
@@ -848,7 +878,7 @@ savestate( void )
         }
     }
 
-    buf = ( uint8_t * )tr_bencSaveMalloc( &top, &len );
+    buf = ( uint8_t * )tr_bencSave( &top, &len );
     SAFEBENCFREE( &top );
     if( NULL == buf )
     {
