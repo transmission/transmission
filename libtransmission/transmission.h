@@ -129,12 +129,11 @@ typedef struct tr_session_stats
 }
 tr_session_stats;
 
-/* stats accumulated across all the times that Transmission's been used. */
+/* stats from the current and past sessions. */
 void tr_getCumulativeSessionStats( const tr_handle   * handle,
                                    tr_session_stats  * setme );
 
-/* stats accumulated during this current session.
-   'sessionCount' is pretty useless here, eh? :) */
+/* stats from the current session. */
 void tr_getSessionStats( const tr_handle   * handle,
                          tr_session_stats  * setme );
 

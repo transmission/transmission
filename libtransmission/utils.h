@@ -42,8 +42,6 @@ char* tr_getLogTimeStr( char * buf, int buflen );
 
 int  tr_rand ( int );
 
-int tr_asprintf(char **strp, const char *fmt, ...);
-
 int tr_mkdirp( const char * path, int permissions );
 
 int tr_mkdir( const char * path, int permissions );
