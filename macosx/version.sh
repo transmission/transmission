@@ -14,7 +14,7 @@ SVN_REVISION=`find ./ -name "*\.[ch]" -o -name "*\.cpp" -o -name "*\.po" | \
               grep -v third-party | \
               cut -d"$Id:" -f3 | cut -d" " -f3 | sort -n | tail -n 1`
 
-if test "x${PEERID_PREFIX//Z/}" = "x$PEERID_PREFIX";
+if [[ "x${PEERID_PREFIX//0-/}" != "x$PEERID_PREFIX" ]]
 then
     STABLE_RELEASE=yes
 else
