@@ -524,8 +524,11 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_PROGRESS,
                          PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
-                         PEER_COL_DOWNLOAD_RATE,
-                         PEER_COL_STATUS };
+                         PEER_COL_DOWNLOAD_RATE
+#if 0
+                         , PEER_COL_STATUS
+#endif
+                       };
 
   m  = peer_model_new (tor);
   v = gtk_tree_view_new_with_model (m);
