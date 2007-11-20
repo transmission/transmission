@@ -153,6 +153,8 @@
 		A2F6DB090A55F31C0058D1E5 /* SpeedLimitButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F6DB070A55F31C0058D1E5 /* SpeedLimitButton.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FE620C0CD3D19400D683E1 /* InfoTabBackGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FE620B0CD3D19400D683E1 /* InfoTabBackGraphite.png */; };
+		BE1958A20CF2971F00F028EC /* event-config.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1958A00CF2971F00F028EC /* event-config.h */; };
+		BE1958A30CF2971F00F028EC /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1958A10CF2971F00F028EC /* config.h */; };
 		BE75C3650C72A0EF00DBEFE0 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3580C72A0EF00DBEFE0 /* kqueue.c */; };
 		BE75C3660C72A0EF00DBEFE0 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C3590C72A0EF00DBEFE0 /* signal.c */; };
 		BE75C3670C72A0EF00DBEFE0 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = BE75C35A0C72A0EF00DBEFE0 /* buffer.c */; };
@@ -537,6 +539,8 @@
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
 		A2FB06950BFF484A0095564D /* Globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Globe.png; path = macosx/Images/Globe.png; sourceTree = "<group>"; };
 		A2FE620B0CD3D19400D683E1 /* InfoTabBackGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackGraphite.png; path = macosx/Images/InfoTabBackGraphite.png; sourceTree = "<group>"; };
+		BE1958A00CF2971F00F028EC /* event-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "event-config.h"; path = "third-party/libevent/event-config.h"; sourceTree = "<group>"; };
+		BE1958A10CF2971F00F028EC /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = "third-party/libevent/config.h"; sourceTree = "<group>"; };
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75C3580C72A0EF00DBEFE0 /* kqueue.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = kqueue.c; path = "third-party/libevent/kqueue.c"; sourceTree = "<group>"; };
 		BE75C3590C72A0EF00DBEFE0 /* signal.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = signal.c; path = "third-party/libevent/signal.c"; sourceTree = "<group>"; };
@@ -989,6 +993,8 @@
 		BE75C3570C72A0D600DBEFE0 /* libevent */ = {
 			isa = PBXGroup;
 			children = (
+				BE1958A00CF2971F00F028EC /* event-config.h */,
+				BE1958A10CF2971F00F028EC /* config.h */,
 				A2BC19DF0CA9D82300DD302A /* evutil.h */,
 				4D36BBC80CA309AA00A63CA5 /* evutil.c */,
 				BE75C3810C72A1C100DBEFE0 /* evhttp.h */,
@@ -1151,6 +1157,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE1958A20CF2971F00F028EC /* event-config.h in Headers */,
+				BE1958A30CF2971F00F028EC /* config.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1441,7 +1449,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "if [ ! -e ./third-party/libevent/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then ln -s ../macosx-libevent-config.h ./third-party/libevent/config.h; fi";
+			shellScript = "if [ ! -e ./third-party/libevent/config.h -a ! ./third-party/macosx-libevent-config.h -ef ./third-party/libevent/config.h ]; then ln -s ../macosx-libevent-config.h ./third-party/libevent/config.h; fi\n\nif [ ! -e ./third-party/libevent/event-config.h -a ! ./third-party/macosx-libevent-event-config.h -ef ./third-party/libevent/event-config.h ]; then ln -s ../macosx-libevent-event-config.h ./third-party/libevent/event-config.h; fi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
