@@ -68,8 +68,10 @@ enum
     KEEPALIVE_INTERVAL_SECS = 90,
 
     PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
-    PEER_PULSE_INTERVAL     = (250),       /* msec between calls to pulse() */
-    RATE_PULSE_INTERVAL     = (333),       /* msec between calls to ratePulse() */
+    PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
+    RATE_PULSE_INTERVAL     = (250),       /* msec between calls to ratePulse() */
+
+    MAX_OUTBUF_SIZE         = 4096,
      
     /* Fast Peers Extension constants */
     MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */
@@ -1461,7 +1463,7 @@ getUploadMax( const tr_peermsgs * msgs )
     else
         speedLeft = ~0;
 
-    bufLeft = 4096 - tr_peerIoWriteBytesWaiting( msgs->io );
+    bufLeft = MAX_OUTBUF_SIZE - tr_peerIoWriteBytesWaiting( msgs->io );
     ret = MIN( speedLeft, bufLeft );
     if( useSwift)
         ret = MIN( ret, swiftLeft );
