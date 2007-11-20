@@ -788,28 +788,6 @@ typedef enum
             NSNumber * rate;
             return (rate = [peer objectForKey: @"DL From Rate"]) ? [NSString stringForSpeedAbbrev: [rate floatValue]] : @"";
         }
-        else if ([ident isEqualToString: @"Status"])
-        {
-            switch ([[peer objectForKey: @"Status"] intValue]) 
-            { 
-                case TR_PEER_STATUS_HANDSHAKE:
-                    return NSLocalizedString(@"Handshaking", "peer -> status");
-                case TR_PEER_STATUS_PEER_IS_CHOKED:
-                    return NSLocalizedString(@"Peer is Choked", "peer -> status");
-                case TR_PEER_STATUS_CLIENT_IS_CHOKED:
-                    return NSLocalizedString(@"Choked", "peer -> status");
-                case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
-                    return NSLocalizedString(@"Choked & Interested", "peer -> status");
-                case TR_PEER_STATUS_READY:
-                    return NSLocalizedString(@"Ready", "peer -> status");
-                case TR_PEER_STATUS_REQUEST_SENT:
-                    return NSLocalizedString(@"Request Sent", "peer -> status");
-                case TR_PEER_STATUS_ACTIVE:
-                    return NSLocalizedString(@"Active", "peer -> status");
-                case TR_PEER_STATUS_ACTIVE_AND_CHOKED:
-                    return NSLocalizedString(@"Active & Interested", "peer -> status");
-            }
-        }
         else
             return [peer objectForKey: @"IP"];
     }
@@ -841,7 +819,7 @@ typedef enum
     if (tableView == fPeerTable)
     {
         NSDictionary * peer = [fPeers objectAtIndex: row];
-        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 4];
+        NSMutableArray * components = [NSMutableArray arrayWithCapacity: 5];
         
         [components addObject: [NSString stringWithFormat: NSLocalizedString(@"Progress: %.1f%%",
             "Inspector -> Peers tab -> table row tooltip"), [[peer objectForKey: @"Progress"] floatValue] * 100.0]];
@@ -869,6 +847,34 @@ typedef enum
                 break;
             case TR_PEER_FROM_PEX:
                 [components addObject: NSLocalizedString(@"From: peer exchange", "Inspector -> Peers tab -> table row tooltip")];
+                break;
+        }
+        
+        switch ([[peer objectForKey: @"Status"] intValue]) 
+        { 
+            case TR_PEER_STATUS_HANDSHAKE:
+                [components addObject: NSLocalizedString(@"Handshaking", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_PEER_IS_CHOKED:
+                [components addObject: NSLocalizedString(@"Peer is Choked", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_CLIENT_IS_CHOKED:
+                [components addObject: NSLocalizedString(@"Choked", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
+                [components addObject: NSLocalizedString(@"Choked & Interested", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_READY:
+                [components addObject: NSLocalizedString(@"Ready", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_REQUEST_SENT:
+                [components addObject: NSLocalizedString(@"Request Sent", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_ACTIVE:
+                [components addObject: NSLocalizedString(@"Active", "peer -> status")];
+                break;
+            case TR_PEER_STATUS_ACTIVE_AND_CHOKED:
+                [components addObject: NSLocalizedString(@"Active & Interested", "peer -> status")];
                 break;
         }
         

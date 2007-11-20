@@ -69,23 +69,26 @@ tr_handle * fLib;
     fStatsWindowInstance = nil;
 }
 
+#warning make like pref window panel
+
 @end
 
 @implementation StatsWindowController (Private)
 
 - (void) updateStats
 {
-    tr_session_stats stats;
-    tr_getCumulativeSessionStats(fLib, &stats);
+    tr_session_stats statsAll, statsSession;
+    tr_getCumulativeSessionStats(fLib, &statsAll);
+    tr_getSessionStats(fLib, &statsSession);
     
-    [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.uploadedGigs bytes: stats.uploadedBytes]];
-    [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: stats.downloadedGigs bytes: stats.downloadedBytes]];
-    [fRatioField setStringValue: [NSString stringForRatio: stats.ratio]];
+    [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsAll.uploadedGigs bytes: statsAll.uploadedBytes]];
+    [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsAll.downloadedGigs bytes: statsAll.downloadedBytes]];
+    [fRatioField setStringValue: [NSString stringForRatio: statsAll.ratio]];
     
-    [fTimeField setStringValue: [self timeString: stats.secondsActive]];
+    [fTimeField setStringValue: [self timeString: statsAll.secondsActive]];
     
     [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
-                                        stats.sessionCount]];
+                                        statsAll.sessionCount]];
 }
 
 - (NSString *) timeString: (uint64_t) seconds

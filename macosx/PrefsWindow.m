@@ -24,6 +24,8 @@
 
 #import "PrefsWindow.h"
 
+#warning elliminate this class
+
 @implementation PrefsWindow
 
 - (void) keyDown: (NSEvent *) event
