@@ -333,7 +333,7 @@
         
         if (rightWidth > 0)
         {
-            if ([fDefaults boolForKey: @"DisplayProgressBarAvailable"])
+            if ([torrent isActive] && ![torrent allDownloaded] && [fDefaults boolForKey: @"DisplayProgressBarAvailable"])
             {
                 int notAvailableWidth = MIN(barRect.size.width * [torrent notAvailableDesired], rightWidth);
                 rightWidth -= notAvailableWidth;

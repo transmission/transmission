@@ -69,8 +69,6 @@ tr_handle * fLib;
     fStatsWindowInstance = nil;
 }
 
-#warning make like pref window panel
-
 @end
 
 @implementation StatsWindowController (Private)
