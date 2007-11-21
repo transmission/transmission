@@ -61,7 +61,7 @@ char * tr_clientForId( const uint8_t * id )
             {
                 asprintf( &ret, "Transmission %d.%c%c%s",
                         charToInt( id[3] ), id[4], id[5],
-                        id[6] == 'Z' ? "+" : "" );
+                        id[6] == 'Z' || id[6] == 'X' ? "+" : "" );
             }
         }
         else if( !memcmp( &id[1], "AZ", 2 ) )
