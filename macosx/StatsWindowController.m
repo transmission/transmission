@@ -113,8 +113,7 @@ tr_handle * fLib;
         if (days == 1)
             [timeArray addObject: NSLocalizedString(@"1 day", "stats window -> running time")];
         else
-            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "stats window -> running time"),
-                                    seconds / 86400]];
+            [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d days", "stats window -> running time"), days]];
         seconds %= 86400;
     }
     if (seconds >= 3600) //60 * 60
