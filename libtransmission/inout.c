@@ -66,7 +66,7 @@ readOrWriteBytes( const tr_torrent  * tor,
         return 0;
     else if ((ioMode==TR_IO_READ) && stat( path, &sb ) ) /* does file exist? */
         ret = tr_ioErrorFromErrno ();
-    else if ((fd = tr_fdFileOpen ( path, ioMode==TR_IO_WRITE )) < 0)
+    else if ((fd = tr_fdFileCheckout ( path, ioMode==TR_IO_WRITE )) < 0)
         ret = fd;
     else if( lseek( fd, (off_t)fileOffset, SEEK_SET ) == ((off_t)-1) )
         ret = TR_ERROR_IO_OTHER;
@@ -76,7 +76,7 @@ readOrWriteBytes( const tr_torrent  * tor,
         ret = TR_OK;
  
     if( fd >= 0 )
-        tr_fdFileRelease( fd );
+        tr_fdFileReturn( fd );
 
     return ret;
 }
@@ -125,7 +125,7 @@ ensureMinimumFileSize( const tr_torrent  * tor,
 
     tr_buildPath( path, sizeof(path), tor->destination, file->name, NULL );
 
-    fd = tr_fdFileOpen( path, TRUE );
+    fd = tr_fdFileCheckout( path, TRUE );
     if( fd < 0 ) /* bad fd */
         ret = fd;
     else if (fstat (fd, &sb) ) /* how big is the file? */
@@ -138,7 +138,7 @@ ensureMinimumFileSize( const tr_torrent  * tor,
         ret = tr_ioErrorFromErrno ();
 
     if( fd >= 0 )
-        tr_fdFileRelease( fd );
+        tr_fdFileReturn( fd );
 
     return ret;
 }

@@ -33,6 +33,7 @@
 #include "completion.h"
 #include "crypto.h" /* for tr_sha1 */
 #include "fastresume.h"
+#include "fdlimit.h" /* tr_fdFileClose */
 #include "handshake.h"
 #include "inout.h"
 #include "metainfo.h"
@@ -1077,10 +1078,20 @@ tr_torrentRecheck( tr_torrent * tor )
 static void
 stopTorrent( void * vtor )
 {
+    int i;
+
     tr_torrent * tor = vtor;
     tr_ioRecheckRemove( tor );
     tr_peerMgrStopTorrent( tor->handle->peerMgr, tor->info.hash );
     tr_trackerStop( tor->tracker );
+
+    for( i=0; i<tor->info.fileCount; ++i )
+    {
+        char path[MAX_PATH_LENGTH];
+        const tr_file * file = &tor->info.files[i];
+        tr_buildPath( path, sizeof(path), tor->destination, file->name, NULL );
+        tr_fdFileClose( path );
+    }
 }
 
 void
