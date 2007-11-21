@@ -79,13 +79,24 @@ tr_handle * fLib;
     tr_getCumulativeSessionStats(fLib, &statsAll);
     tr_getSessionStats(fLib, &statsSession);
     
-    [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsAll.uploadedGigs bytes: statsAll.uploadedBytes]];
-    [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsAll.downloadedGigs bytes: statsAll.downloadedBytes]];
-    [fRatioField setStringValue: [NSString stringForRatio: statsAll.ratio]];
+    [fUploadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsSession.uploadedGigs bytes: statsSession.uploadedBytes]];
+    [fUploadedAllField setStringValue: [[NSString stringForLargeFileSizeGigs: statsAll.uploadedGigs bytes: statsAll.uploadedBytes]
+                                        stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
-    [fTimeField setStringValue: [self timeString: statsAll.secondsActive]];
+    [fDownloadedField setStringValue: [NSString stringForLargeFileSizeGigs: statsSession.downloadedGigs
+                                        bytes: statsSession.downloadedBytes]];
+    [fDownloadedAllField setStringValue: [[NSString stringForLargeFileSizeGigs: statsAll.downloadedGigs
+        bytes: statsAll.downloadedBytes] stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
-    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Times", "stats window -> times opened"),
+    [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
+    [fRatioAllField setStringValue: [[NSString stringForRatio: statsAll.ratio]
+                                    stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    
+    [fTimeField setStringValue: [self timeString: statsSession.secondsActive]];
+    [fTimeAllField setStringValue: [[self timeString: statsAll.secondsActive]
+                                    stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    
+    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
 }
 

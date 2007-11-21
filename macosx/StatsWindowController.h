@@ -27,7 +27,8 @@
 
 @interface StatsWindowController : NSWindowController
 {
-    IBOutlet NSTextField * fUploadedField, * fDownloadedField, * fRatioField, * fTimeField, * fNumOpenedField;
+    IBOutlet NSTextField * fUploadedField, * fUploadedAllField, * fDownloadedField, * fDownloadedAllField,
+                        * fRatioField, * fRatioAllField, * fTimeField, * fTimeAllField, * fNumOpenedField;
     NSTimer * fTimer;
 }
 
