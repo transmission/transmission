@@ -32,6 +32,7 @@
 #include "peer-mgr-private.h"
 #include "peer-msgs.h"
 #include "ratecontrol.h"
+#include "stats.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -783,17 +784,14 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
 #endif
 
     /* does the peer prefer encrypted connections? */
-    sub = tr_bencDictFind( &val, "e" );
-    if( tr_bencIsInt( sub ) )
+    if(( sub = tr_bencDictFindType( &val, "e", TYPE_INT )))
         msgs->info->encryption_preference = sub->val.i
                                       ? ENCRYPTION_PREFERENCE_YES
                                       : ENCRYPTION_PREFERENCE_NO;
 
     /* check supported messages for utorrent pex */
-    sub = tr_bencDictFind( &val, "m" );
-    if( tr_bencIsDict( sub ) ) {
-        sub = tr_bencDictFind( sub, "ut_pex" );
-        if( tr_bencIsInt( sub ) ) {
+    if(( sub = tr_bencDictFindType( &val, "m", TYPE_DICT ))) {
+        if(( sub = tr_bencDictFindType( sub, "ut_pex", TYPE_INT ))) {
             msgs->peerSupportsPex = 1;
             msgs->ut_pex_id = (uint8_t) sub->val.i;
             dbgmsg( msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id );
@@ -801,8 +799,7 @@ parseLtepHandshake( tr_peermsgs * msgs, int len, struct evbuffer * inbuf )
     }
 
     /* get peer's listening port */
-    sub = tr_bencDictFind( &val, "p" );
-    if( tr_bencIsInt( sub ) ) {
+    if(( sub = tr_bencDictFindType( &val, "p", TYPE_INT ))) {
         msgs->info->port = htons( (uint16_t)sub->val.i );
         dbgmsg( msgs, "msgs->port is now %hu", msgs->info->port );
     }
@@ -823,14 +820,13 @@ parseUtPex( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
     tmp = tr_new( uint8_t, msglen );
     tr_peerIoReadBytes( msgs->io, inbuf, tmp, msglen );
 
-    if( tr_bencLoad( tmp, msglen, &val, NULL ) || !tr_bencIsDict( &val ) ) {
+    if( tr_bencLoad( tmp, msglen, &val, NULL ) || ( val.type != TYPE_DICT ) ) {
         dbgmsg( msgs, "GET can't read extended-pex dictionary" );
         tr_free( tmp );
         return;
     }
 
-    sub = tr_bencDictFind( &val, "added" );
-    if( tr_bencIsStr(sub) && ((sub->val.s.i % 6) == 0)) {
+    if(( sub = tr_bencDictFindType( &val, "added", TYPE_STR ))) {
         const int n = sub->val.s.i / 6 ;
         dbgmsg( msgs, "got %d peers from uT pex", n );
         tr_peerMgrAddPeers( msgs->handle->peerMgr,
@@ -1042,8 +1038,8 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
     tr_rcTransferred( tor->download, byteCount );
     tr_rcTransferred( tor->handle->download, byteCount );
+    tr_statsAddDownloaded( msgs->handle, byteCount );
 }
-
 
 static int
 readBtPiece( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
@@ -1266,6 +1262,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
     tr_rcTransferred( tor->upload, byteCount );
     tr_rcTransferred( tor->handle->upload, byteCount );
+    tr_statsAddUploaded( msgs->handle, byteCount );
 }
 
 static size_t

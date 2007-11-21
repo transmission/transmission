@@ -34,6 +34,29 @@
 #include "bencode.h"
 #include "utils.h"
 
+/**
+***
+**/
+
+static int
+tr_bencIsInt ( const benc_val_t * val ) {
+    return val!=NULL && val->type==TYPE_INT;
+}
+
+static int
+tr_bencIsList( const benc_val_t * val ) {
+    return val!=NULL && val->type==TYPE_LIST;
+}
+
+static int
+tr_bencIsDict( const benc_val_t * val ) {
+    return val!=NULL && val->type==TYPE_DICT;
+}
+
+/**
+***
+**/
+
 /* setting to 1 to help expose bugs with tr_bencListAdd and tr_bencDictAdd */
 #define LIST_SIZE   20 /* number of items to increment list/dict buffer by */
 
@@ -194,7 +217,7 @@ static void __bencPrint( benc_val_t * val, int space )
     switch( val->type )
     {
         case TYPE_INT:
-            fprintf( stderr, "int:  %"PRId64"\n", val->val.i );
+            fprintf( stderr, "int:  %"PRId64"\n", tr_bencGetInt(val) );
             break;
 
         case TYPE_STR:
@@ -413,7 +436,7 @@ saveImpl( struct evbuffer * out, const benc_val_t * val )
     switch( val->type )
     {
         case TYPE_INT:
-            evbuffer_add_printf( out, "i%"PRId64"e", val->val.i );
+            evbuffer_add_printf( out, "i%"PRId64"e", tr_bencGetInt(val) );
             break;
 
         case TYPE_STR:
@@ -470,26 +493,16 @@ tr_bencSave( const benc_val_t * val, int * len )
 ***
 **/
 
-int
-tr_bencIsStr ( const benc_val_t * val )
+benc_val_t*
+tr_bencDictFindType( benc_val_t * val, const char * key, int type )
 {
-    return val!=NULL && val->type==TYPE_STR;
+    benc_val_t * ret = tr_bencDictFind( val, key );
+    return ret && ret->type == type ? ret : NULL;
 }
 
-int
-tr_bencIsInt ( const benc_val_t * val )
+int64_t
+tr_bencGetInt ( const benc_val_t * val )
 {
-    return val!=NULL && val->type==TYPE_INT;
-}
-
-int
-tr_bencIsList( const benc_val_t * val )
-{
-    return val!=NULL && val->type==TYPE_LIST;
-}
-
-int
-tr_bencIsDict( const benc_val_t * val )
-{
-    return val!=NULL && val->type==TYPE_DICT;
+    assert( tr_bencIsInt( val ) );
+    return val->val.i;
 }

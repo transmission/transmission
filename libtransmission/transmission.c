@@ -41,6 +41,7 @@
 #include "platform.h"
 #include "ratecontrol.h"
 #include "shared.h"
+#include "stats.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -148,6 +149,8 @@ tr_handle * tr_init( const char * tag )
     h->shared = tr_sharedInit( h );
 
     tr_inf( TR_NAME " " LONG_VERSION_STRING " started" );
+
+    tr_statsInit( h );
 
     return h;
 }
@@ -335,34 +338,10 @@ tr_close( tr_handle * h )
     while( h->events && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
+    tr_statsClose( h );
     tr_lockFree( h->lock );
     free( h->tag );
     free( h );
-}
-
-void
-tr_getSessionStats( const tr_handle   * handle,
-                    tr_session_stats  * setme )
-{
-    assert( handle != NULL );
-    assert( setme != NULL );
-
-    /* FIXME */
-    setme->downloadedGigs   = 4;
-    setme->downloadedBytes  = 8;
-    setme->uploadedGigs     = 15;
-    setme->uploadedBytes    = 16;
-    setme->ratio            = 23;
-    setme->filesAdded       = 42;
-    setme->sessionCount     = 666;
-    setme->secondsActive    = 2112;
-}
-
-void
-tr_getCumulativeSessionStats( const tr_handle   * handle,
-                              tr_session_stats  * setme )
-{
-    tr_getSessionStats( handle, setme );
 }
 
 tr_torrent **
