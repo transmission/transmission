@@ -68,8 +68,8 @@ enum
     KEEPALIVE_INTERVAL_SECS = 90,
 
     PEX_INTERVAL            = (60 * 1000), /* msec between calls to sendPex() */
-    PEER_PULSE_INTERVAL     = (250),       /* msec between calls to pulse() */
-    RATE_PULSE_INTERVAL     = (333),       /* msec between calls to ratePulse() */
+    PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
+    RATE_PULSE_INTERVAL     = (250),       /* msec between calls to ratePulse() */
      
     /* Fast Peers Extension constants */
     MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */

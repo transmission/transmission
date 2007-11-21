@@ -33,25 +33,43 @@ void tr_fdInit( void );
 
 void tr_fdClose( void );
 
-/***********************************************************************
- * tr_fdFileOpen
- ***********************************************************************
- * If it isn't open already, tries to open the file 'name' in the
- * directory 'folder'. If 'name' itself contains '/'s, required
- * subfolders are created. The file is open read-write if 'write' is 1
- * (created if necessary), read-only if 0.
- * Returns the file descriptor if successful, otherwise returns
- * one of the TR_ERROR_IO_*.
- **********************************************************************/
-int tr_fdFileOpen( const char * filename, int write );
+/**
+ * Returns an fd to the specified filename.
+ *
+ * A small repository of open files is kept to avoid the overhead of continually
+ * opening and closing the same files when writing piece data during download.
+ * It's also used to ensure that only one client uses the file at a time.
+ * Clients must check out a file to use it, then return it, like a library, when done.
+ *
+ * if write is nonzero and dirname(filename) doesn't exist, dirname is created.
+ * if write is nonzero and filename doesn't exist, filename is created.
+ * returns the fd if successful; otherwise, one of TR_ERROR_IO_*
+ *
+ * @see tr_fdFileReturn
+ * @see tr_fdFileClose
+ */
+int tr_fdFileCheckout( const char * filename, int write );
 
-/***********************************************************************
- * tr_fdFileRelease
- ***********************************************************************
- * Indicates that the file whose descriptor is 'file' is unused at the
- * moment and can safely be closed.
- **********************************************************************/
-void tr_fdFileRelease( int file );
+/**
+ * Returns an fd from tr_fdFileCheckout() so that other clients may borrow it.
+ *
+ * @see tr_fdFileCheckout
+ * @see tr_fdFileClose
+ */
+void tr_fdFileReturn( int file );
+
+/**
+ * Closes a file that's being held by our file repository.
+ *
+ * If the file isn't checked out, it's closed immediately.
+ * If the file is currently checked out, it will be closed upon its return.
+ *
+ * @see tr_fdFileCheckout
+ * @see tr_fdFileReturn
+ */
+void tr_fdFileClose( const char * filename );
+
+
 
 /***********************************************************************
  * Sockets
