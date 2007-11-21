@@ -58,6 +58,7 @@
 #define SORT_PROGRESS   @"Progress"
 #define SORT_TRACKER    @"Tracker"
 #define SORT_ORDER      @"Order"
+#define SORT_ACTIVITY   @"Activity"
 
 typedef enum
 {
@@ -66,7 +67,8 @@ typedef enum
     SORT_NAME_TAG = 2,
     SORT_PROGRESS_TAG = 3,
     SORT_STATE_TAG = 4,
-    SORT_TRACKER_TAG = 5
+    SORT_TRACKER_TAG = 5,
+    SORT_ACTIVITY_TAG = 6,
 } sortTag;
 
 #define FILTER_NONE     @"None"
@@ -1383,11 +1385,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         {
             //resort if necessary or just update the table
             NSString * sortType = [fDefaults stringForKey: @"Sort"];
-            if ([sortType isEqualToString: SORT_PROGRESS] || [sortType isEqualToString: SORT_STATE]
-                    || [sortType isEqualToString: SORT_TRACKER])
-                [self sortTorrents];
-            else
+            if ([sortType isEqualToString: SORT_ORDER] || [sortType isEqualToString: SORT_DATE]
+                    || [sortType isEqualToString: SORT_NAME])
                 [fTableView reloadData];
+            else
+                [self sortTorrents];
             
             //update the global DL/UL rates
             if (![fStatusBar isHidden])
@@ -1432,7 +1434,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     else
         sortedTorrents = fTorrents;
-
+    
     Torrent * torrent;
     NSEnumerator * enumerator = [sortedTorrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -1628,13 +1630,20 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     else if ([sortType isEqualToString: SORT_ORDER])
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
+    else if ([sortType isEqualToString: SORT_ACTIVITY])
+    {
+        NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivity" ascending: !asc] autorelease],
+                        * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: !asc] autorelease];
+        
+        descriptors = [[NSArray alloc] initWithObjects: activityDescriptor, dateDescriptor, orderDescriptor, nil];
+    }
     else
     {
         NSSortDescriptor * dateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateAdded" ascending: asc] autorelease];
     
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
-
+    
     [fDisplayedTorrents sortUsingDescriptors: descriptors];
     [descriptors release];
     
@@ -1650,27 +1659,24 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             sortType = SORT_ORDER;
             [fDefaults setBool: NO forKey: @"SortReverse"];
             break;
-            
         case SORT_DATE_TAG:
             sortType = SORT_DATE;
             break;
-        
         case SORT_NAME_TAG:
             sortType = SORT_NAME;
             break;
-        
         case SORT_PROGRESS_TAG:
             sortType = SORT_PROGRESS;
             break;
-        
         case SORT_STATE_TAG:
             sortType = SORT_STATE;
             break;
-        
         case SORT_TRACKER_TAG:
             sortType = SORT_TRACKER;
             break;
-        
+        case SORT_ACTIVITY_TAG:
+            sortType = SORT_ACTIVITY;
+            break;
         default:
             return;
     }
@@ -2772,6 +2778,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 break;
             case SORT_TRACKER_TAG:
                 sortType = SORT_TRACKER;
+                break;
+            case SORT_ACTIVITY_TAG:
+                sortType = SORT_ACTIVITY;
                 break;
             default:
                 sortType = @"";
