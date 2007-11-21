@@ -96,7 +96,10 @@ tr_handle * fLib;
     [fTimeAllField setStringValue: [[self timeString: statsAll.secondsActive]
                                     stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
-    [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
+    if (statsAll.sessionCount == 1)
+        [fNumOpenedField setStringValue: NSLocalizedString(@"1 time", "stats window -> times opened")];
+    else
+        [fNumOpenedField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d times", "stats window -> times opened"),
                                         statsAll.sessionCount]];
 }
 
