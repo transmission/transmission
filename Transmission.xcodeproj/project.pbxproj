@@ -101,6 +101,8 @@
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
 		A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A25892750CF1FCE800CCCDDF /* StatsWindow.xib */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
+		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
+		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
 		A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */; };
 		A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = A25FCDDD0A37695F002BCBBE /* PauseSelected.png */; };
@@ -448,6 +450,8 @@
 		A25892630CF1F7E800CCCDDF /* StatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatsWindowController.m; path = macosx/StatsWindowController.m; sourceTree = "<group>"; };
 		A25892760CF1FCE800CCCDDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/StatsWindow.xib; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
+		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
+		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
 		A25E74450AF5089E006F11AE /* ExpandedPathToPathTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ExpandedPathToPathTransformer.h; path = macosx/ExpandedPathToPathTransformer.h; sourceTree = "<group>"; };
 		A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToIconTransformer.m; path = macosx/ExpandedPathToIconTransformer.m; sourceTree = "<group>"; };
@@ -966,6 +970,8 @@
 				BEFC1E230C07861A00B0BB3C /* bencode.h */,
 				BEFC1E240C07861A00B0BB3C /* bencode.c */,
 				BEFC1E260C07861A00B0BB3C /* trcompat.h */,
+				A25D2CBA0CF4C7190096A262 /* stats.h */,
+				A25D2CBB0CF4C7190096A262 /* stats.c */,
 			);
 			name = libtransmission;
 			sourceTree = "<group>";
@@ -1192,6 +1198,7 @@
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
 				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
 				4D36BA7C0CA2F00800A63CA5 /* publish.h in Headers */,
+				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1559,6 +1566,7 @@
 				4D36BA740CA2F00800A63CA5 /* peer-io.c in Sources */,
 				4D36BA770CA2F00800A63CA5 /* peer-mgr.c in Sources */,
 				4D36BA790CA2F00800A63CA5 /* peer-msgs.c in Sources */,
+				A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

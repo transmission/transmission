@@ -68,7 +68,7 @@ typedef enum
     SORT_PROGRESS_TAG = 3,
     SORT_STATE_TAG = 4,
     SORT_TRACKER_TAG = 5,
-    SORT_ACTIVITY_TAG = 6,
+    SORT_ACTIVITY_TAG = 6
 } sortTag;
 
 #define FILTER_NONE     @"None"
