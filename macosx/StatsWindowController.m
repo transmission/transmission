@@ -119,8 +119,7 @@ tr_handle * fLib;
     }
     if (seconds >= 3600) //60 * 60
     {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hours", "stats window -> running time"),
-                                seconds / 3600]];
+        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "stats window -> running time"), seconds / 3600]];
         seconds %= 3600;
     }
     if (seconds >= 60)
