@@ -434,8 +434,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         
         [self quickPause];
         
+        //allow if file can be moved or does not exist
         if ([[NSFileManager defaultManager] movePath: [oldFolder stringByAppendingPathComponent: [self name]]
-                            toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil])
+                            toPath: [folder stringByAppendingPathComponent: [self name]] handler: nil]
+            || ![[NSFileManager defaultManager] fileExistsAtPath: [oldFolder stringByAppendingPathComponent: [self name]]])
         {
             //get rid of both incomplete folder and old download folder, even if move failed
             fUseIncompleteFolder = NO;
