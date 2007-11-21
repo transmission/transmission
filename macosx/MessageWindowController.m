@@ -175,16 +175,10 @@
 {
     NSTableColumn * column = [tableView tableColumnWithIdentifier: @"Message"];
     
-    int count = 0;
-    float width = [column width];
-    if (width > 0)
-    {
-        if (!fAttributes)
-            fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
-        
-        count = [[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width / width;
-    }
+    if (!fAttributes)
+        fAttributes = [[[[column dataCell] attributedStringValue] attributesAtIndex: 0 effectiveRange: NULL] retain];
     
+    int count = [[[fMessages objectAtIndex: row] objectForKey: @"Message"] sizeWithAttributes: fAttributes].width / [column width];
     return [tableView rowHeight] * (float)(count+1);
 }
 
