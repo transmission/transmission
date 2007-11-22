@@ -179,10 +179,33 @@ tr_globalIsLocked( const struct tr_handle * handle )
  ***********************************************************************
  * 
  **********************************************************************/
-void tr_setBindPort( tr_handle * h, int port )
+
+struct bind_port_data
 {
-    h->isPortSet = 1;
-    tr_sharedSetPort( h->shared, port );
+    tr_handle * handle;
+    int port;
+};
+
+static void
+tr_setBindPortImpl( void * vdata )
+{
+    struct bind_port_data * data = vdata;
+    tr_handle * handle = data->handle;
+    const int port = data->port;
+
+    handle->isPortSet = 1;
+    tr_sharedSetPort( handle->shared, port );
+
+    tr_free( data );
+}
+
+void
+tr_setBindPort( tr_handle * handle, int port )
+{
+    struct bind_port_data * data = tr_new( struct bind_port_data, 1 );
+    data->handle = handle;
+    data->port = port;
+    tr_runInEventThread( handle, tr_setBindPortImpl, data );
 }
 
 int
