@@ -60,7 +60,7 @@ extern "C" {
 #define TR_PATH_DELIMITER_STR "/"
 #endif
 
-#define TR_DEFAULT_PORT   9090
+#define TR_DEFAULT_PORT   51413
 
 enum
 {
