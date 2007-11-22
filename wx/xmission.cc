@@ -511,7 +511,7 @@ MyFrame :: MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
     long port;
     wxString key = _T("port");
-    if( !myConfig->Read( key, &port, 9090 ) )
+    if( !myConfig->Read( key, &port, TR_DEFAULT_PORT ) )
         myConfig->Write( key, port );
     tr_setBindPort( handle, port );
 

@@ -13,7 +13,7 @@
 	<key>BadgeUploadRate</key>
 	<true/>
 	<key>BindPort</key>
-	<integer>9090</integer>
+	<integer>51413</integer>
 	<key>CheckDownload</key>
 	<false/>
 	<key>CheckForUpdates</key>

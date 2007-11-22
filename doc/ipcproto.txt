@@ -34,8 +34,8 @@ keys may be used in one message.
 
 An example version 1 message:
 
-0000000Ed4:porti9090ee
-        {"port": 9090}
+0000000Ed4:porti51413ee
+        {"port": 51413}
 
 For version 2 the message payload is a bencoded list containing a
 message id string followed by a bencoded value, the format of which is
@@ -353,8 +353,8 @@ Key:     "port"
 Version: 2
 Format:  int between 0 and 65535
 Replies: "succeeded", "failed", "not-supported", "bad-format"
-Example: 4:porti9090e
-         "port", 9090
+Example: 4:porti51413e
+         "port", 51413
 Details: Change the port the server uses to listen for incoming peer
          connections.
 
