@@ -61,7 +61,7 @@ enum
 
     LTEP_HANDSHAKE          = 0,
 
-    OUR_LTEP_PEX            = 1,
+    TR_LTEP_PEX             = 1,
 
     MAX_REQUEST_BYTE_COUNT  = (16 * 1024), /* drop requests who want too much */
 
@@ -736,7 +736,7 @@ sendLtepHandshake( tr_peermsgs * msgs )
     tr_bencInit( m, TYPE_DICT );
     if( pex ) {
         tr_bencDictReserve( m, 1 );
-        tr_bencInitInt( tr_bencDictAdd( m, "ut_pex" ), OUR_LTEP_PEX );
+        tr_bencInitInt( tr_bencDictAdd( m, "ut_pex" ), TR_LTEP_PEX );
     }
     if( port > 0 )
         tr_bencInitInt( tr_bencDictAdd( &val, "p" ), port );
@@ -860,7 +860,7 @@ parseLtep( tr_peermsgs * msgs, int msglen, struct evbuffer * inbuf )
             sendPex( msgs );
         }
     }
-    else if( ltep_msgid == msgs->ut_pex_id )
+    else if( ltep_msgid == TR_LTEP_PEX )
     {
         dbgmsg( msgs, "got ut pex" );
         msgs->peerSupportsPex = 1;
@@ -1742,7 +1742,7 @@ sendPex( tr_peermsgs * msgs )
         benc = tr_bencSave( &val, &bencLen );
         tr_peerIoWriteUint32( msgs->io, msgs->outMessages, 2*sizeof(uint8_t) + bencLen );
         tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, BT_LTEP );
-        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, OUR_LTEP_PEX );
+        tr_peerIoWriteUint8 ( msgs->io, msgs->outMessages, msgs->ut_pex_id );
         tr_peerIoWriteBytes ( msgs->io, msgs->outMessages, benc, bencLen );
 
         /* cleanup */
