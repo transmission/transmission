@@ -3344,12 +3344,27 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (BOOL) ipcAddTorrentFileAutostart: (NSString *) path directory: (NSString *) directory autostart: (BOOL) autostart
 {
-    /* 'path' is path to torrent file, 'dir' is the directory it
-       should download it's files to and may be nil, 'autostart' is a
-       boolean indicating if the torrent should be automatically
-       started (or queued to start, I guess), should return NO if
-       torrent fails to load */
-    return NO;
+    NSArray * torrents;
+    if (autostart)
+        torrents = [fTorrents copy];
+    BOOL success = [self ipcAddTorrentFile: path directory: directory];
+    
+    if (success && autostart)
+    {
+        NSEnumerator * enumerator = [torrents objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if (![torrents containsObject: torrent])
+                break;
+        
+        if (torrent)
+            [torrent startTransfer];
+        else
+            success = NO;
+    }
+    
+    [torrents release];
+    return success;
 }
 
 - (BOOL) ipcAddTorrentData: (NSData *) data directory: (NSString *) directory
