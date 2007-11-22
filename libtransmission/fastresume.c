@@ -788,7 +788,6 @@ fastResumeLoadImpl ( tr_torrent   * tor,
         }
 
         /* if we didn't read the data, seek past it */
-        tr_inf( "Skipping resume data type %02x, %u bytes", id, len );
         fseek( file, len, SEEK_CUR );
     }
 

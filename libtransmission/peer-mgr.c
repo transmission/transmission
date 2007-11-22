@@ -97,7 +97,7 @@ enum
 
     /* how many peers to unchoke per-torrent. */
     /* FIXME: make this user-configurable? */
-    NUM_UNCHOKED_PEERS_PER_TORRENT = 10, /* arbitrary */
+    NUM_UNCHOKED_PEERS_PER_TORRENT = 20, /* arbitrary */
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
