@@ -125,7 +125,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [self orderValue], @"OrderValue", nil];
+                    [NSNumber numberWithInt: fOrderValue], @"OrderValue", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -161,8 +161,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     [fFileList release];
     [fFileMenu release];
-    
-    [fOrderValue release];
     
     [fQuickPauseDict release];
     
@@ -1151,15 +1149,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 	tr_torrentDisablePex(fHandle, !enable);
 }
 
-- (NSNumber *) orderValue
+- (int) orderValue
 {
     return fOrderValue;
 }
 
 - (void) setOrderValue: (int) orderValue
 {
-    [fOrderValue release];
-    fOrderValue = [[NSNumber alloc] initWithInt: orderValue];
+    fOrderValue = orderValue;
 }
 
 - (NSArray *) fileList
@@ -1364,11 +1361,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         return [NSNumber numberWithInt: 1];
     else
         return [NSNumber numberWithInt: 2];
-}
-
-- (NSNumber *) progressSortKey
-{
-    return [NSNumber numberWithFloat: [self progress]];
 }
 
 - (NSNumber *) ratioSortKey

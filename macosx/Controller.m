@@ -1144,7 +1144,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     while ((torrent = [enumerator nextObject]))
         [torrent setWaitToStart: NO];
 
-    NSNumber * lowestOrderValue = nil, * currentOrderValue;
+    int lowestOrderValue = -1, currentOrderValue;
 
     enumerator = [torrents objectEnumerator];
     while ((torrent = [enumerator nextObject]))
@@ -1158,7 +1158,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         //determine lowest order value
         currentOrderValue = [torrent orderValue];
-        if (!lowestOrderValue || [lowestOrderValue compare: currentOrderValue] == NSOrderedDescending)
+        if (lowestOrderValue < currentOrderValue)
             lowestOrderValue = currentOrderValue;
         
         [torrent closeRemoveTorrent];
@@ -1168,7 +1168,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [torrents release];
 
     //reset the order values if necessary
-    if ([lowestOrderValue intValue] < [fTorrents count])
+    if (lowestOrderValue < [fTorrents count])
     {
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"orderValue" ascending: YES] autorelease];
@@ -1178,7 +1178,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [descriptors release];
 
         int i;
-        for (i = [lowestOrderValue intValue]; i < [tempTorrents count]; i++)
+        for (i = lowestOrderValue; i < [tempTorrents count]; i++)
             [[tempTorrents objectAtIndex: i] setOrderValue: i];
     }
     
@@ -1602,7 +1602,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSSortDescriptor * stateDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                                 @"stateSortKey" ascending: !asc] autorelease],
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: !asc] autorelease],
+                                            @"progress" ascending: !asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"ratioSortKey" ascending: !asc] autorelease];
         
@@ -1612,7 +1612,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     else if ([sortType isEqualToString: SORT_PROGRESS])
     {
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"progressSortKey" ascending: asc] autorelease],
+                                            @"progress" ascending: asc] autorelease],
                         * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"ratioProgressSortKey" ascending: asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
@@ -2189,7 +2189,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             newRow--;
         
         //reinsert into array
-        int insertIndex = newRow > 0 ? [[[fDisplayedTorrents objectAtIndex: newRow-1] orderValue] intValue] + 1 : 0;
+        int insertIndex = newRow > 0 ? [[fDisplayedTorrents objectAtIndex: newRow-1] orderValue] + 1 : 0;
         
         //get all torrents to reorder
         NSSortDescriptor * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey:

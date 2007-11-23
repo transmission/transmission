@@ -61,11 +61,11 @@ typedef enum
     
     NSMenu * fFileMenu;
     
-    float   fRatioLimit;
-    int     fRatioSetting;
-    BOOL    fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
+    float fRatioLimit;
+    int fRatioSetting;
+    BOOL fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
     
-    NSNumber * fOrderValue;
+    int fOrderValue;
     
     NSDictionary * fQuickPauseDict;
     
@@ -201,7 +201,7 @@ typedef enum
 - (BOOL) pex;
 - (void) setPex: (BOOL) enable;
 
-- (NSNumber *) orderValue;
+- (int) orderValue;
 - (void) setOrderValue: (int) orderValue;
 
 - (NSArray *) fileList;
@@ -229,7 +229,6 @@ typedef enum
 - (BOOL) isStalled;
 
 - (NSNumber *) stateSortKey;
-- (NSNumber *) progressSortKey;
 - (NSNumber *) ratioSortKey;
 - (NSNumber *) ratioProgressSortKey;
 
