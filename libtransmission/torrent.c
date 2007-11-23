@@ -882,8 +882,13 @@ tr_torrentFilesFree( tr_file_stat * files, int fileCount UNUSED )
 tr_peer_stat *
 tr_torrentPeers( const tr_torrent * tor, int * peerCount )
 {
-    return tr_peerMgrPeerStats( tor->handle->peerMgr,
-                                tor->info.hash, peerCount );
+    tr_peer_stat * ret = NULL;
+
+    if( tor != NULL )
+        ret = tr_peerMgrPeerStats( tor->handle->peerMgr,
+                                   tor->info.hash, peerCount );
+
+    return ret;
 }
 
 void
