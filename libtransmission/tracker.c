@@ -986,6 +986,29 @@ tr_trackerGetCounts( const tr_tracker  * t,
        *setme_seederCount = t->seederCount;
 }
 
+struct request_data
+{
+    tr_tracker * t;
+    const char * command;
+};
+
+static void
+sendRequestFromEventThreadImpl( void * vdata )
+{
+    struct request_data * data = vdata;
+    sendTrackerRequest( data->t, data->command );
+    tr_free( data );
+}
+
+static void
+sendRequestFromEventThread( tr_tracker * t, const char * command )
+{
+    struct request_data * data = tr_new( struct request_data, 1 );
+    data->t = t;
+    data->command = command;
+    tr_runInEventThread( t->handle, sendRequestFromEventThreadImpl, t );
+}
+
 void
 tr_trackerStart( tr_tracker * t )
 {
@@ -994,20 +1017,20 @@ tr_trackerStart( tr_tracker * t )
     if( !t->reannounceTimer && !t->isRunning )
     {
         t->isRunning = 1;
-        sendTrackerRequest( t, "started" );
+        sendRequestFromEventThread( t, "started" );
     }
 }
 
 void
 tr_trackerReannounce( tr_tracker * t )
 {
-    sendTrackerRequest( t, "started" );
+    sendRequestFromEventThread( t, "started" );
 }
 
 void
 tr_trackerCompleted( tr_tracker * t )
 {
-    sendTrackerRequest( t, "completed" );
+    sendRequestFromEventThread( t, "completed" );
 }
 
 void
@@ -1016,7 +1039,7 @@ tr_trackerStop( tr_tracker * t )
     if( t->isRunning )
     {
         t->isRunning = 0;
-        sendTrackerRequest( t, "stopped" );
+        sendRequestFromEventThread( t, "stopped" );
     }
 }
 
