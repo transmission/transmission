@@ -528,45 +528,61 @@ tr_core_delete_torrent( TrCore * self, GtkTreeIter * iter )
     tr_torrent_sever( tor );
 }
 
-void
-tr_core_update( TrCore * self )
+static gboolean
+update_foreach( GtkTreeModel * model,
+                GtkTreePath  * path UNUSED,
+                GtkTreeIter  * iter,
+                gpointer       data UNUSED)
 {
-    GtkTreeIter iter;
     TrTorrent * tor;
     const tr_stat * st;
 
-    TR_IS_CORE( self );
+    gtk_tree_model_get( model, iter, MC_TORRENT, &tor, -1 );
+    st = tr_torrent_stat( tor );
+    tr_torrent_check_seeding_cap ( tor );
+    g_object_unref( tor );
 
-    if( gtk_tree_model_get_iter_first( self->model, &iter ) ) do
-    {
-        gtk_tree_model_get( self->model, &iter, MC_TORRENT, &tor, -1 );
-        st = tr_torrent_stat( tor );
-        g_object_unref( tor );
-        tr_torrent_check_seeding_cap ( tor );
+    gtk_list_store_set( GTK_LIST_STORE( model ), iter,
+                        MC_STAT,        st->status,
+                        MC_ERR,         st->error,
+                        MC_TERR,        st->errorString,
+                        MC_PROG_C,      st->percentComplete,
+                        MC_PROG_D,      st->percentDone,
+                        MC_DRATE,       st->rateDownload,
+                        MC_URATE,       st->rateUpload,
+                        MC_ETA,         st->eta,
+                        MC_PEERS,       st->peersConnected,
+                        MC_UPEERS,      st->peersGettingFromUs,
+                        MC_DPEERS,      st->peersSendingToUs,
+                        MC_SEED,        st->seeders,
+                        MC_LEECH,       st->leechers,
+                        MC_DONE,        st->completedFromTracker,
+                        MC_DOWN,        st->downloadedEver,
+                        MC_UP,          st->uploadedEver,
+                        MC_RATIO,       st->ratio,
+                        MC_LEFT,        st->leftUntilDone,
+                        -1 );
 
-        /* XXX find out if setting the same data emits changed signal */
-        gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
-                            MC_STAT,        st->status,
-                            MC_ERR,         st->error,
-                            MC_TERR,        st->errorString,
-                            MC_PROG_C,      st->percentComplete,
-                            MC_PROG_D,      st->percentDone,
-                            MC_DRATE,       st->rateDownload,
-                            MC_URATE,       st->rateUpload,
-                            MC_ETA,         st->eta,
-                            MC_PEERS,       st->peersConnected,
-                            MC_UPEERS,      st->peersGettingFromUs,
-                            MC_DPEERS,      st->peersSendingToUs,
-                            MC_SEED,        st->seeders,
-                            MC_LEECH,       st->leechers,
-                            MC_DONE,        st->completedFromTracker,
-                            MC_DOWN,        st->downloadedEver,
-                            MC_UP,          st->uploadedEver,
-                            MC_RATIO,       st->ratio,
-                            MC_LEFT,        st->leftUntilDone,
-                            -1 );
-    }
-    while( gtk_tree_model_iter_next( self->model, &iter ) );
+    return FALSE;
+}
+
+void
+tr_core_update( TrCore * self )
+{
+    int column;
+    GtkSortType order;
+    GtkTreeSortable * sortable;
+
+    /* pause sorting */
+    sortable = GTK_TREE_SORTABLE( self->model );
+    gtk_tree_sortable_get_sort_column_id( sortable, &column, &order );
+    gtk_tree_sortable_set_sort_column_id( sortable, GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, order );
+
+    /* refresh the model */
+    gtk_tree_model_foreach( self->model, update_foreach, NULL );
+
+    /* resume sorting */
+    gtk_tree_sortable_set_sort_column_id( sortable, column, order );
 }
 
 void
