@@ -723,9 +723,24 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->eta;
 }
 
-- (NSString * ) etaString
+- (int) etaRatio
 {
-    int eta = [self eta];
+    if (![self isSeeding])
+        return -1;
+    
+    float uploadRate = [self uploadRate];
+    if (uploadRate < 0.1)
+        return -1;
+    
+    float stopRatio = [self actualStopRatio], ratio = [self ratio];
+    if (stopRatio == INVALID || ratio >= stopRatio)
+        return -1;
+    
+    return (float)MAX([self downloadedTotal], [self haveVerified]) * (stopRatio - ratio) / uploadRate / 1024.0;
+}
+
+- (NSString * ) etaString: (int) eta
+{
     if (eta < 0)
         return @"";
     
@@ -868,10 +883,19 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     //add time when downloading
     if (fStat->status == TR_STATUS_DOWNLOAD)
     {
-        string = [self eta] >= 0
-            ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"), [self etaString]]
+        int eta = [self eta];
+        string = eta >= 0 ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
+                                [self etaString: eta]]
             : [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
     }
+    else if ([self isSeeding] && fRatioSetting != NSOffState)
+    {
+        int eta = [self etaRatio];
+        string = eta >= 0 ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
+                                [self etaString: eta]]
+            : [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
+    }
+    else;
     
     return string;
 }
@@ -1006,7 +1030,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     switch (fStat->status)
     {
         case TR_STATUS_DOWNLOAD:
-            return [self eta] >= 0 ? [self etaString] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
+            return [self eta] >= 0 ? [self etaString: [self eta]] : NSLocalizedString(@"Unknown", "Torrent -> remaining time");
         
         case TR_STATUS_SEED:
         case TR_STATUS_DONE:

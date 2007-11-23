@@ -153,8 +153,10 @@ typedef enum
 - (float) progress;
 - (float) progressDone;
 - (float) progressLeft;
+
 - (int) eta;
-- (NSString * ) etaString;
+- (int) etaRatio;
+- (NSString * ) etaString: (int) eta;
 
 - (float) notAvailableDesired;
 
