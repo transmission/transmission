@@ -1006,7 +1006,7 @@ sendRequestFromEventThread( tr_tracker * t, const char * command )
     struct request_data * data = tr_new( struct request_data, 1 );
     data->t = t;
     data->command = command;
-    tr_runInEventThread( t->handle, sendRequestFromEventThreadImpl, t );
+    tr_runInEventThread( t->handle, sendRequestFromEventThreadImpl, data );
 }
 
 void
