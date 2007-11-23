@@ -223,6 +223,7 @@ typedef enum
 - (NSDate *) dateAdded;
 - (NSDate *) dateCompleted;
 - (NSDate *) dateActivity;
+- (NSDate *) dateActivityOrAdd;
 
 - (int) stalledMinutes;
 - (BOOL) isStalled;
