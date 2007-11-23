@@ -881,21 +881,13 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 [NSString stringForRatio: [self ratio]]];
     
     //add time when downloading
-    if (fStat->status == TR_STATUS_DOWNLOAD)
+    if (fStat->status == TR_STATUS_DOWNLOAD || ([self isSeeding] && fRatioSetting != NSOffState))
     {
-        int eta = [self eta];
+        int eta = fStat->status == TR_STATUS_DOWNLOAD ? [self eta] : [self etaRatio];
         string = eta >= 0 ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
                                 [self etaString: eta]]
             : [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
     }
-    else if ([self isSeeding] && fRatioSetting != NSOffState)
-    {
-        int eta = [self etaRatio];
-        string = eta >= 0 ? [string stringByAppendingFormat: NSLocalizedString(@" - %@ remaining", "Torrent -> progress string"),
-                                [self etaString: eta]]
-            : [string stringByAppendingString: NSLocalizedString(@" - remaining time unknown", "Torrent -> progress string")];
-    }
-    else;
     
     return string;
 }
