@@ -192,9 +192,6 @@ struct tr_handle
     int                        statCur;
 
     uint8_t                    isClosed;
-
-#define TR_AZ_ID_LEN 20
-    uint8_t                    azId[TR_AZ_ID_LEN];
 };
 
 void tr_globalLock       ( struct tr_handle * );
