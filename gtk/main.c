@@ -371,11 +371,12 @@ winclose( GtkWidget * w UNUSED, GdkEvent * event UNUSED, gpointer gdata )
 
 static void
 rowChangedCB( GtkTreeModel  * model UNUSED,
-              GtkTreePath   * path UNUSED,
+              GtkTreePath   * path,
               GtkTreeIter   * iter UNUSED,
               gpointer        sel)
 {
-    refreshTorrentActions( GTK_TREE_SELECTION(sel) );
+    if( gtk_tree_selection_path_is_selected ( sel, path ) )
+        refreshTorrentActions( GTK_TREE_SELECTION(sel) );
 }
 
 static void
@@ -394,6 +395,7 @@ winsetup( struct cbdata * cbdata, TrWindow * wind )
     gtk_tree_view_set_model ( gtk_tree_selection_get_tree_view(sel), model );
     g_signal_connect( model, "row-changed", G_CALLBACK(rowChangedCB), sel );
     g_signal_connect( wind, "delete-event", G_CALLBACK( winclose ), cbdata );
+    refreshTorrentActions( sel );
     
     setupdrag( GTK_WIDGET(wind), cbdata );
 }
