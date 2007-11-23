@@ -1604,7 +1604,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                         * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"progress" ascending: !asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratioSortKey" ascending: !asc] autorelease];
+                                            @"ratio" ascending: !asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: stateDescriptor, progressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];
@@ -1614,9 +1614,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSSortDescriptor * progressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
                                             @"progress" ascending: asc] autorelease],
                         * ratioProgressDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratioProgressSortKey" ascending: asc] autorelease],
+                                            @"progressStopRatio" ascending: asc] autorelease],
                         * ratioDescriptor = [[[NSSortDescriptor alloc] initWithKey:
-                                            @"ratioSortKey" ascending: asc] autorelease];
+                                            @"ratio" ascending: asc] autorelease];
         
         descriptors = [[NSArray alloc] initWithObjects: progressDescriptor, ratioProgressDescriptor, ratioDescriptor,
                                                             nameDescriptor, orderDescriptor, nil];

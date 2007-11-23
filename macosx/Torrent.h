@@ -229,8 +229,6 @@ typedef enum
 - (BOOL) isStalled;
 
 - (NSNumber *) stateSortKey;
-- (NSNumber *) ratioSortKey;
-- (NSNumber *) ratioProgressSortKey;
 
 - (int) torrentID;
 - (const tr_info *) torrentInfo;

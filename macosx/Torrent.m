@@ -1363,16 +1363,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         return [NSNumber numberWithInt: 2];
 }
 
-- (NSNumber *) ratioSortKey
-{
-    return [NSNumber numberWithFloat: [self ratio]];
-}
-
-- (NSNumber *) ratioProgressSortKey
-{
-    return [NSNumber numberWithFloat: [self progressStopRatio]];
-}
-
 - (int) torrentID
 {
     return fID;
