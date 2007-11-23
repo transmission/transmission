@@ -149,6 +149,7 @@ myDebug( const char * file, int line, const tr_tracker * t, const char * fmt, ..
 ****  Connections that know how to clean up after themselves
 ***/
 
+#if 0
 static int
 freeConnection( void * evcon )
 {
@@ -164,12 +165,13 @@ connectionClosedCB( struct evhttp_connection * evcon, void * handle )
        has played out */
     tr_timerNew( handle, freeConnection, evcon, 100 );
 }
+#endif
 
 static struct evhttp_connection*
 getConnection( tr_tracker * t, const char * address, int port )
 {
     struct evhttp_connection * c = evhttp_connection_new( address, port );
-    evhttp_connection_set_closecb( c, connectionClosedCB, t->handle );
+    //evhttp_connection_set_closecb( c, connectionClosedCB, t->handle );
     return c;
 }
 
@@ -1013,6 +1015,7 @@ tr_trackerCompleted( tr_tracker * t )
 void
 tr_trackerStop( tr_tracker * t )
 {
+dbgmsg( t, " tr_trackerStop called .... t->isRunning is %d", (int)t->isRunning );
     if( t->isRunning )
     {
         t->isRunning = 0;
