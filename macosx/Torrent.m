@@ -1109,6 +1109,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     return fStat->rateUpload;
 }
 
+- (float) totalRate
+{
+    return [self downloadRate] + [self uploadRate];
+}
+
 - (uint64_t) haveVerified
 {
     return fStat->haveValid;
@@ -1461,7 +1466,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     
-    [self setOrderValue: orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1];
+    fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
     fError = NO;
     
     [self createFileList];

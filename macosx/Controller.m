@@ -1632,10 +1632,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     else if ([sortType isEqualToString: SORT_ACTIVITY])
     {
+        NSSortDescriptor * rateDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"totalRate" ascending: !asc]
+                                                    autorelease];
         NSSortDescriptor * activityDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"dateActivityOrAdd" ascending: !asc]
                                                     autorelease];
         
-        descriptors = [[NSArray alloc] initWithObjects: activityDescriptor, orderDescriptor, nil];
+        descriptors = [[NSArray alloc] initWithObjects: rateDescriptor, activityDescriptor, orderDescriptor, nil];
     }
     else
     {

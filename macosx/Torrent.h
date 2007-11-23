@@ -191,6 +191,7 @@ typedef enum
 
 - (float) downloadRate;
 - (float) uploadRate;
+- (float) totalRate;
 - (uint64_t) haveVerified;
 - (uint64_t) haveTotal;
 - (uint64_t) downloadedTotal;
