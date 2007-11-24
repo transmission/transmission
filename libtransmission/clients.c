@@ -240,6 +240,11 @@ char * tr_clientForId( const uint8_t * id )
             tr_asprintf( &ret, "Pando %c.%c.%c.%c",
                       id[3], id[4], id[5], id[6] );
         }
+        else if( !memcmp( &id[1], "WY", 2 ) )
+        {
+            tr_asprintf( &ret, "    zo %c.%c.%c.%c",
+                      id[3], id[4], id[5], id[6] );
+        }
         else if( !memcmp( &id[1], "LW", 2 ) )
         {
             tr_asprintf( &ret, "LimeWire" );
