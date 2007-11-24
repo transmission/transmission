@@ -2316,7 +2316,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
-        int canAdd;
         while ((file = [enumerator nextObject]))
         {
             if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)

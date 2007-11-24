@@ -10,6 +10,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
    + Availability Bar (overlay on regular bar)
+   + Display remaining time for seeding transfers
+   + Option to sort by total activity
 
 0.94 (2007/xx/yy)
 - All Platforms:
