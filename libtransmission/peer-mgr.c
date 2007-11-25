@@ -1775,9 +1775,9 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* if we used this peer recently, give someone else a turn */
-        minWait = 10; /* ten seconds */
+        minWait = 60;
         maxWait = (60 * 20); /* twenty minutes */
-        wait = atom->numFails * 30; /* add 15 secs to the wait interval for each consecutive failure*/
+        wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
         if( wait < minWait ) wait = minWait;
         if( wait > maxWait ) wait = maxWait;
         if( ( now - atom->time ) < wait ) {
