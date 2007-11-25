@@ -19,10 +19,10 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Automatically ban peers that send us too many corrupt pieces
    + Fix a crash that occurred if a peer sent us an incomplete message
    + Fix portmapping crash
-   + Fix bug that left files open after their torrents were stopped (#451)
+   + Fix bug that left files open after their torrents were stopped
    + Fix 0.93 file permissions bug
    + Fix tracker redirect error
-   + Fix LTEP PEX bug reported by Adrian Ulrich
+   + Fix LTEP PEX bug
 
 0.93 (2007/12/11)
 - All Platforms:
