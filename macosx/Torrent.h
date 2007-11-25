@@ -129,6 +129,7 @@ typedef enum
 - (NSImage *) icon;
 
 - (NSString *) name;
+- (BOOL) folder;
 - (uint64_t) size;
 - (uint64_t) sizeLeft;
 - (NSString *) trackerAddress;

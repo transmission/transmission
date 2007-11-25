@@ -37,8 +37,9 @@
     IBOutlet NSMatrix * fTabMatrix;
 
     IBOutlet NSImageView * fImageView;
-    IBOutlet NSTextField * fNameField, * fSizeField, * fTrackerField,
-                        * fPiecesField, * fHashField, * fSecureField,
+    IBOutlet NSTextField * fNameField, * fBasicInfoField;
+    
+    IBOutlet NSTextField * fTrackerField, * fPiecesField, * fHashField, * fSecureField,
                         * fTorrentLocationField, * fDataLocationField,
                         * fDateAddedField, * fDateCompletedField, * fDateActivityField,
                         * fCreatorField, * fDateCreatedField,
@@ -56,7 +57,6 @@
     IBOutlet NSSegmentedControl * fPiecesControl;
     
     IBOutlet FileOutlineView * fFileOutline;
-    IBOutlet NSTextField * fFileTableStatusField;
     IBOutlet NSMenuItem * fFileCheckItem, * fFileUncheckItem,
                         * fFilePriorityNormal, * fFilePriorityHigh, * fFilePriorityLow;
     

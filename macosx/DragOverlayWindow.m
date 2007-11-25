@@ -115,7 +115,7 @@
             fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> torrents");
         else
             fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> torrents"), fileCount];
-         secondString = [fileString stringByAppendingString: secondString];
+        secondString = [fileString stringByAppendingString: secondString];
     }
     
     if (count == 1)

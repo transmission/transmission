@@ -195,20 +195,24 @@ typedef enum
                                             "Inspector -> above tabs -> selected torrents"), numberSelected]];
         
             uint64_t size = 0;
+            int fileCount = 0;
             NSEnumerator * enumerator = [torrents objectEnumerator];
             Torrent * torrent;
             while ((torrent = [enumerator nextObject]))
+            {
                 size += [torrent size];
+                fileCount += [torrent fileCount];
+            }
             
-            [fSizeField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%@ Total",
-                "Inspector -> above tabs -> total size (several torrents selected)"), [NSString stringForFileSize: size]]];
+            [fBasicInfoField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Files, %@ Total",
+                                                "Inspector -> torrents"), fileCount, [NSString stringForFileSize: size]]];
         }
         else
         {
             [fImageView setImage: [NSImage imageNamed: @"NSApplicationIcon"]];
             
             [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
-            [fSizeField setStringValue: @""];
+            [fBasicInfoField setStringValue: @""];
     
             [fHaveField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
@@ -305,8 +309,6 @@ typedef enum
             [fFiles release];
             fFiles = nil;
         }
-        [fFileTableStatusField setStringValue: NSLocalizedString(@"info not available",
-                                        "Inspector -> Files tab -> bottom text (number of files)")];
     }
     else
     {    
@@ -322,7 +324,20 @@ typedef enum
         NSString * name = [torrent name];
         [fNameField setStringValue: name];
         [fNameField setToolTip: name];
-        [fSizeField setStringValue: [NSString stringForFileSize: [torrent size]]];
+        
+        NSString * basicString = [NSString stringForFileSize: [torrent size]];
+        if ([torrent folder])
+        {
+            NSString * fileString;
+            int fileCount = [torrent fileCount];
+            if (fileCount == 1)
+                fileString = NSLocalizedString(@"1 File, ", "Inspector -> above tabs -> selected torrents");
+            else
+                fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ",
+                                "Inspector -> above tabs -> selected torrents"), fileCount];
+            basicString = [fileString stringByAppendingString: basicString];
+        }
+        [fBasicInfoField setStringValue: basicString];
         
         NSArray * allTrackers = [torrent allTrackers], * subTrackers;
         NSMutableArray * trackerStrings = [NSMutableArray arrayWithCapacity: [allTrackers count]];
@@ -381,14 +396,6 @@ typedef enum
         [fFileOutline deselectAll: nil];
         [fFiles release];
         fFiles = [[torrent fileList] retain];
-        
-        int fileCount = [torrent fileCount];
-        if (fileCount != 1)
-            [fFileTableStatusField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d files total",
-                                "Inspector -> Files tab -> bottom text (number of files)"), fileCount]];
-        else
-            [fFileTableStatusField setStringValue: NSLocalizedString(@"1 file total",
-                                "Inspector -> Files tab -> bottom text (number of files)")];
     }
     
     //update stats and settings

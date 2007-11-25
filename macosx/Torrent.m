@@ -593,7 +593,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     if (!fIcon)
     {
-        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: fInfo->isMultifile ? NSFileTypeForHFSTypeCode('fldr')
+        fIcon = [[[NSWorkspace sharedWorkspace] iconForFileType: [self folder] ? NSFileTypeForHFSTypeCode('fldr')
                                                 : [[self name] pathExtension]] retain];
         [fIcon setFlipped: YES];
     }
@@ -603,6 +603,11 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (NSString *) name
 {
     return [NSString stringWithUTF8String: fInfo->name];
+}
+
+- (BOOL) folder
+{
+    return fInfo->isMultifile;
 }
 
 - (uint64_t) size
@@ -1515,7 +1520,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         file = &fInfo->files[i];
         
         pathComponents = [[[NSString stringWithUTF8String: file->name] pathComponents] mutableCopy];
-        if (fInfo->isMultifile)
+        if ([self folder])
         {
             path = [pathComponents objectAtIndex: 0];
             [pathComponents removeObjectAtIndex: 0];

@@ -120,6 +120,8 @@
 			<dict>
 				<key>fActivityView</key>
 				<string>NSView</string>
+				<key>fBasicInfoField</key>
+				<string>NSTextField</string>
 				<key>fCommentView</key>
 				<string>NSTextView</string>
 				<key>fCompletedFromTrackerField</key>
@@ -162,8 +164,6 @@
 				<string>NSMenuItem</string>
 				<key>fFilePriorityNormal</key>
 				<string>NSMenuItem</string>
-				<key>fFileTableStatusField</key>
-				<string>NSTextField</string>
 				<key>fFileUncheckItem</key>
 				<string>NSMenuItem</string>
 				<key>fFilesView</key>
@@ -211,8 +211,6 @@
 				<key>fSecureField</key>
 				<string>NSTextField</string>
 				<key>fSeedersField</key>
-				<string>NSTextField</string>
-				<key>fSizeField</key>
 				<string>NSTextField</string>
 				<key>fStateField</key>
 				<string>NSTextField</string>
