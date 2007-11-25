@@ -11,7 +11,7 @@
  */
 
 #include <assert.h>
-#include <string.h> /* memcpy, memcmp */
+#include <string.h> /* memcpy, memcmp, strstr */
 #include <stdlib.h> /* qsort */
 #include <stdio.h> /* printf */
 #include <limits.h> /* INT_MAX */
@@ -1482,8 +1482,9 @@ struct ChokeData
 {
     tr_peer * peer;
     int rate;
-    int preferred;
-    int doUnchoke;
+    uint8_t preferred;
+    uint8_t preferred_t;
+    uint8_t doUnchoke;
 };
 
 static int
@@ -1491,26 +1492,20 @@ compareChoke( const void * va, const void * vb )
 {
     const struct ChokeData * a = va;
     const struct ChokeData * b = vb;
-
-    /* primary key: larger speeds */
-    if( a->rate > b->rate )
-        return -1;
-    if ( a->rate < b->rate )
-        return 1;
-
-    /* secondary key: perferred peers */
-    if( a->preferred != b->preferred )
-        return a->preferred ? -1 : 1;
-
+    if( a->rate > b->rate ) return -1;
+    if( a->rate < b->rate ) return 1;
+    if( a->preferred_t != b->preferred_t ) return a->preferred_t ? -1 : 1;
+    if( a->preferred   != b->preferred   ) return a->preferred   ? -1 : 1;
     return 0;
 }
 
 static int
-clientIsSnubbedBy( const tr_peer * peer )
+clientIsSnubbedBy( const tr_peer * peer, int clientIsSeed )
 {
     assert( peer != NULL );
 
-    return peer->peerSentPieceDataAt < (time(NULL) - SNUBBED_SEC);
+    return !clientIsSeed
+        && ( peer->peerSentPieceDataAt < (time(NULL) - SNUBBED_SEC ) );
 }
 
 /**
@@ -1548,7 +1543,8 @@ rechoke( Torrent * t )
 
         node = &choke[size++];
         node->peer = peer;
-        node->preferred = peer->peerIsInterested && !clientIsSnubbedBy(peer);
+        node->preferred = peer->peerIsInterested && !clientIsSnubbedBy( peer, clientIsSeed );
+        node->preferred_t = node->preferred && peer->client && strstr( peer->client, "Transmission" );
         node->rate = getWeightedThroughput( peer, clientIsSeed );
     }
 
