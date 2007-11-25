@@ -40,7 +40,7 @@ enum
 /**
  * Use SWIFT?
  */
-static const int SWIFT_ENABLED = 0;
+static const int SWIFT_ENABLED = 1;
 
 /**
  * For every byte the peer uploads to us,
