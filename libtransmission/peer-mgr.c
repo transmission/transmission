@@ -60,7 +60,7 @@ static const int SWIFT_INITIAL_CREDIT = 64 * 1024; /* 64 KiB */
  * on largesse by uniformly distributing free credit to
  * all of our peers.  This too helps prevent gridlock.
  */
-static const double SWIFT_LARGESSE = 0.10; /* 10% of our UL */
+static const double SWIFT_LARGESSE = 0.15; /* 15% of our UL */
 
 /**
  * How frequently to extend largesse-based credit
@@ -101,7 +101,7 @@ enum
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
-    MAX_RECONNECTIONS_PER_PULSE = 5,
+    MAX_RECONNECTIONS_PER_PULSE = 3,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,
@@ -1771,9 +1771,9 @@ getPeerCandidates( Torrent * t, int * setmeSize )
         }
 
         /* if we used this peer recently, give someone else a turn */
-        minWait = 10; /* ten seconds */
+        minWait = 60;
         maxWait = (60 * 20); /* twenty minutes */
-        wait = atom->numFails * 30; /* add 15 secs to the wait interval for each consecutive failure*/
+        wait = atom->numFails * 30; /* add 30 secs to the wait interval for each consecutive failure*/
         if( wait < minWait ) wait = minWait;
         if( wait > maxWait ) wait = maxWait;
         if( ( now - atom->time ) < wait ) {
