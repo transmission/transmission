@@ -3,7 +3,7 @@
 	<head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
-		<title>Troubleshooting Automatic Port Forwarding</title>
+		<title>Troubleshooting a Closed/Stealth port</title>
 	</head>
 	<body>
 		<div id="mainbox">
@@ -16,10 +16,11 @@
 				<a class="leftborder" href="../html/Index2.html">Index</a></div>
 				</div>
 			</div>
+			<p>If your port is still not open, even after you have enabled automatic port forwarding, here are some tips you can use which may get it working.
 			<div id="pagetitle">
 				<h1>UPnP</h1>
 			</div>
-			<p>If the port mapping is unsuccessful and you have a UPnP compatible router, make sure:
+			<p>For UPnP compatible routers, make sure:
 			<ul>
 				<li>UPnP is enabled. Consult your router's documentation for instructions. If your router doesn't support UPnP, you will have to forward <a href="pfrouter.html">manually</a>.</li>
 				<li>DMZ mode is disabled.</li>
@@ -48,6 +49,20 @@
 			</div>
 
 		</div>
-	</body>
-	
-</html>
+					<div id="pagetitle">
+						<h1>Double NAT</h1>
+					</div>
+					<p>Another possible reason your port remains closed could be because your router is not the only device on the network which needs to be configured.
+					
+					<p>Make sure the OS X firewall is either disabled, or you have <a href="pffirewall.html">allowed Transmission's port</a>.
+					The firewall can cause the port to remain closed, even if it has been successfully mapped by the router.
+
+					<p>If you have multiple routers in your home network, you must forward Transmission's port on all of them, otherwise it will continue to show up as closed.
+					Transmission can only automatically port map the router the computer is directly connected to. Any others in between this router and your modem will have to be <a href="pfrouter.html">forwarded manually</a>.
+					For detailed instructions, <a href="http://www.portforward.com/help/doublerouterportforwarding.htm">click here</a>.
+					</div>
+
+				</div>
+			</body>
+
+		</html>
