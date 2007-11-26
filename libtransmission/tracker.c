@@ -246,7 +246,7 @@ escape( char * out, const uint8_t * in, int in_len ) /* rfc2396 */
     *out = '\0';
 }
 
-static void scrapeNow( tr_tracker * );
+static int onScrapeNow( void * vt );
 
 tr_tracker *
 tr_trackerNew( const tr_torrent * torrent )
@@ -301,7 +301,13 @@ tr_trackerNew( const tr_torrent * torrent )
     assert( nwalk - t->addresses == sum );
     assert( iwalk - t->tierFronts == sum );
 
-    scrapeNow( t );
+    /* scrape sometime in the next two minutes.
+       scrapes are staggered out like this to prevent
+       hundreds of scrapes from going out at the same time */
+    t->scrapeTimer = tr_timerNew( t->handle,
+                                  onScrapeNow, t,
+                                  tr_rand(120)*1000 );
+
     return t;
 }
 
@@ -487,9 +493,6 @@ findTrackerFromHash( struct torrent_hash * data )
 ****
 ***/
 
-static int
-onScrapeNow( void * vt );
-
 static void
 onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
@@ -597,12 +600,6 @@ onScrapeNow( void * vt )
 
     t->scrapeTimer = NULL;
     return FALSE;
-}
-
-static void
-scrapeNow( tr_tracker * t )
-{
-    onScrapeNow( t );
 }
 
 /***
