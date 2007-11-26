@@ -678,7 +678,11 @@ tr_strndup( const char * in, int len )
 {
     char * out = NULL;
 
-    if( in != NULL )
+    if( len < 0 )
+    {
+        out = tr_strdup( in );
+    }
+    else if( in != NULL )
     {
         out = tr_malloc( len+1 );
         memcpy( out, in, len );
