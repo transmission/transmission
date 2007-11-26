@@ -52,6 +52,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <event.h>
+
 #include "transmission.h"
 #include "completion.h"
 #include "fastresume.h"
@@ -329,198 +331,9 @@ tr_fastResumeSave( const tr_torrent * tor )
     tr_dbg( "Resume file '%s' written", path );
 }
 
-static int
-loadDestination( tr_torrent * tor, FILE * fp, const char * destination, int argIsFallback )
-{
-    int pathlen = 0;
-    char path[MAX_PATH_LENGTH];
-
-    for( ;; ) {
-        const int ch = fgetc( fp );
-        if( ch==EOF ) /* end of file */
-            return TR_ERROR_IO_OTHER;
-        if( ch=='\0' ) /* end of string */
-            break;
-        path[pathlen++] = (char) ch;
-    }
-
-    path[pathlen] = '\0';
-
-    if( argIsFallback )
-        tor->destination = tr_strdup( pathlen ? path : destination );
-    else
-        tor->destination = tr_strdup( destination && *destination ? destination : path );
-
-    return TR_OK;
-}
-
-static int
-loadSpeeds( tr_torrent * tor, FILE * file )
-{
-    const size_t len = FR_SPEED_LEN;
-    char * buf = tr_new0( char, len );
-    char * walk = buf;
-    uint16_t i16;
-    uint8_t i8;
-
-    if( len != fread( buf, 1, len, file ) ) {
-        tr_inf( "Couldn't read from resume file" );
-        free( buf );
-        return TR_ERROR_IO_OTHER;
-    }
-
-    memcpy( &i16, walk, 2 ); walk += 2;
-    tr_torrentSetSpeedLimit( tor, TR_DOWN, i16 );
-    memcpy( &i8, walk, 1 ); walk += 1;
-    tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit)i8 );
-    memcpy( &i16, walk, 2 ); walk += 2;
-    tr_torrentSetSpeedLimit( tor, TR_UP, i16 );
-    memcpy( &i8, walk, 1 ); walk += 1;
-    tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit)i8 );
-
-    tr_free( buf );
-    return TR_OK;
-}
-
-
-static int
-loadPriorities( tr_torrent * tor,
-                FILE       * file )
-{
-    const size_t n = tor->info.fileCount;
-    const size_t len = 2 * n;
-    int *dnd = NULL, dndCount = 0;
-    int *dl = NULL, dlCount = 0;
-    char * buf = tr_new0( char, len );
-    char * walk = buf;
-    size_t i;
-
-    if( len != fread( buf, 1, len, file ) ) {
-        tr_inf( "Couldn't read from resume file" );
-        free( buf );
-        return TR_ERROR_IO_OTHER;
-    }
-
-    /* set file priorities */
-    for( i=0; i<n; ++i ) {
-       tr_priority_t priority;
-       const char ch = *walk++;
-       switch( ch ) {
-           case 'l': priority = TR_PRI_LOW; break;
-           case 'h': priority = TR_PRI_HIGH; break;
-           default:  priority = TR_PRI_NORMAL; break;
-       }
-       tor->info.files[i].priority = priority;
-    }
-
-    /* set the dnd flags */
-    dl = tr_new( int, len );
-    dnd = tr_new( int, len );
-    for( i=0; i<n; ++i )
-        if( *walk++ == 't' ) /* 't' means the DND flag is true */
-            dnd[dndCount++] = i;
-        else
-            dl[dlCount++] = i;
-
-    if( dndCount )
-        tr_torrentSetFileDLs ( tor, dnd, dndCount, FALSE );
-    if( dlCount )
-        tr_torrentSetFileDLs ( tor, dl, dlCount, TRUE );
-
-    tr_free( dnd );
-    tr_free( dl );
-    tr_free( buf );
-    return TR_OK;
-}
-
-static int
-fastResumeLoadProgress( const tr_torrent  * tor,
-                        tr_bitfield       * uncheckedPieces,
-                        FILE              * file )
-{
-    const size_t len = FR_PROGRESS_LEN( tor );
-    uint8_t * buf = calloc( len, 1 );
-    int ret = 0;
-    int i;
-
-    if( len != fread( buf, 1, len, file ) )
-    {
-        tr_inf( "Couldn't read from resume file" );
-        tr_bitfieldAddRange( uncheckedPieces, 0, tor->info.pieceCount );
-        ret = TR_ERROR_IO_OTHER;
-    }
-    else
-    {
-        int n;
-        tr_bitfield bitfield;
-
-        /* compare file mtimes */
-        tr_time_t * curMTimes = getMTimes( tor, &n );
-        uint8_t * walk = buf;
-        const tr_time_t * oldMTimes = (const tr_time_t *) walk;
-        for( i=0; i<n; ++i ) {
-            if ( !curMTimes[i] || ( curMTimes[i] != oldMTimes[i] ) ) {
-                const tr_file * file = &tor->info.files[i];
-                tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
-                        file->name, file->firstPiece, file->lastPiece);
-                tr_bitfieldAddRange( uncheckedPieces, 
-                                     file->firstPiece, file->lastPiece+1 );
-            }
-        }
-        free( curMTimes );
-        walk += n * sizeof(tr_time_t);
-
-        /* get the completion bitfield */
-        memset( &bitfield, 0, sizeof bitfield );
-        bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
-        bitfield.bits = walk;
-        tr_cpBlockBitfieldSet( tor->completion, &bitfield );
-    }
-
-    /* the files whose mtimes are wrong,
-       remove from completion pending a recheck... */
-    for( i=0; i<tor->info.pieceCount; ++i )
-        if( tr_bitfieldHas( uncheckedPieces, i ) )
-            tr_cpPieceRem( tor->completion, i );
-
-
-    free( buf );
-    return ret;
-}
-
-static uint64_t
-fastResumeLoadOld( tr_torrent   * tor,
-                   tr_bitfield  * uncheckedPieces, 
-                   FILE         * file )
-{
-    uint64_t ret = 0;
-
-    /* Check the size */
-    const int size = 4 + FR_PROGRESS_LEN( tor );
-    fseek( file, 0, SEEK_END );
-    if( ftell( file ) != size )
-    {
-        tr_inf( "Wrong size for resume file (%d bytes, %d expected)",
-                (int)ftell( file ), size );
-        fclose( file );
-        return 1;
-    }
-
-    /* load progress information */
-    fseek( file, 4, SEEK_SET );
-    if( fastResumeLoadProgress( tor, uncheckedPieces, file ) )
-    {
-        fclose( file );
-        return 1;
-    }
-
-    fclose( file );
-
-    ret |= TR_FR_PROGRESS;
-    tr_inf( "Fast resuming successful (version 0)" );
-
-    return ret;
-}
+/***
+****
+***/
 
 static uint64_t
 internalIdToPublicBitfield( uint8_t id )
@@ -546,6 +359,272 @@ internalIdToPublicBitfield( uint8_t id )
     return ret;
 }
 
+static void
+readBytes( void * target, const uint8_t ** source, size_t byteCount )
+{
+    memcpy( target, *source, byteCount );
+    *source += byteCount;
+}
+
+static uint64_t
+parseDownloaded( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    if( len != sizeof(uint64_t) )
+        return 0;
+    readBytes( &tor->downloadedPrev, &buf, sizeof(uint64_t) );
+    return TR_FR_DOWNLOADED;
+}
+
+static uint64_t
+parseUploaded( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    if( len != sizeof(uint64_t) )
+        return 0;
+    readBytes( &tor->uploadedPrev, &buf, sizeof(uint64_t) );
+    return TR_FR_UPLOADED;
+}
+
+static uint64_t
+parseCorrupt( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    if( len != sizeof(uint64_t) )
+        return 0;
+    readBytes( &tor->corruptPrev, &buf, sizeof(uint64_t) );
+    return TR_FR_CORRUPT;
+}
+
+static uint64_t
+parseProgress( const tr_torrent  * tor,
+               const uint8_t     * buf,
+               uint32_t            len,
+               tr_bitfield       * uncheckedPieces )
+{
+    int i;
+    uint64_t ret = 0;
+   
+    if( len == FR_PROGRESS_LEN( tor ) )
+    {
+        int n;
+        tr_bitfield bitfield;
+
+        /* compare file mtimes */
+        tr_time_t * curMTimes = getMTimes( tor, &n );
+        const uint8_t * walk = buf;
+        const tr_time_t * oldMTimes = (const tr_time_t *) walk;
+        for( i=0; i<n; ++i ) {
+            if ( !curMTimes[i] || ( curMTimes[i] != oldMTimes[i] ) ) {
+                const tr_file * file = &tor->info.files[i];
+                tr_dbg( "File '%s' mtimes differ-- flagging pieces [%d..%d] for recheck",
+                        file->name, file->firstPiece, file->lastPiece);
+                tr_bitfieldAddRange( uncheckedPieces, 
+                                     file->firstPiece, file->lastPiece+1 );
+            }
+        }
+        free( curMTimes );
+        walk += n * sizeof(tr_time_t);
+
+        /* get the completion bitfield */
+        memset( &bitfield, 0, sizeof bitfield );
+        bitfield.len = FR_BLOCK_BITFIELD_LEN( tor );
+        bitfield.bits = (uint8_t*) walk;
+        tr_cpBlockBitfieldSet( tor->completion, &bitfield );
+
+        ret = TR_FR_PROGRESS;
+    }
+
+    /* the files whose mtimes are wrong,
+       remove from completion pending a recheck... */
+    for( i=0; i<tor->info.pieceCount; ++i )
+        if( tr_bitfieldHas( uncheckedPieces, i ) )
+            tr_cpPieceRem( tor->completion, i );
+
+    return ret;
+}
+
+static uint64_t
+parsePriorities( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    uint64_t ret = 0;
+
+    if( len == (uint32_t)(2 * tor->info.fileCount) )
+    {
+        const size_t n = tor->info.fileCount;
+        const size_t len = 2 * n;
+        int *dnd = NULL, dndCount = 0;
+        int *dl = NULL, dlCount = 0;
+        size_t i;
+        const uint8_t * walk = buf;
+
+        /* set file priorities */
+        for( i=0; i<n; ++i ) {
+           tr_priority_t priority;
+           const char ch = *walk++;
+           switch( ch ) {
+               case 'l': priority = TR_PRI_LOW; break;
+               case 'h': priority = TR_PRI_HIGH; break;
+               default:  priority = TR_PRI_NORMAL; break;
+           }
+           tor->info.files[i].priority = priority;
+        }
+
+        /* set the dnd flags */
+        dl = tr_new( int, len );
+        dnd = tr_new( int, len );
+        for( i=0; i<n; ++i )
+            if( *walk++ == 't' ) /* 't' means the DND flag is true */
+                dnd[dndCount++] = i;
+            else
+                dl[dlCount++] = i;
+
+        if( dndCount )
+            tr_torrentSetFileDLs ( tor, dnd, dndCount, FALSE );
+        if( dlCount )
+            tr_torrentSetFileDLs ( tor, dl, dlCount, TRUE );
+
+        tr_free( dnd );
+        tr_free( dl );
+
+        ret = TR_FR_PRIORITY;
+    }
+
+    return ret;
+}
+
+static uint64_t
+parseSpeedLimit( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    uint64_t ret = 0;
+
+    if( len == FR_SPEED_LEN )
+    {
+        uint8_t i8;
+        uint16_t i16;
+
+        readBytes( &i16, &buf, sizeof(i16) );
+        tr_torrentSetSpeedLimit( tor, TR_DOWN, i16 );
+        readBytes( &i8, &buf, sizeof(i8) );
+        tr_torrentSetSpeedMode( tor, TR_DOWN, (tr_speedlimit)i8 );
+        readBytes( &i16, &buf, sizeof(i16) );
+        tr_torrentSetSpeedLimit( tor, TR_UP, i16 );
+        readBytes( &i8, &buf, sizeof(i8) );
+        tr_torrentSetSpeedMode( tor, TR_UP, (tr_speedlimit)i8 );
+
+        ret = TR_FR_SPEEDLIMIT;
+    }
+
+    return ret;
+}
+
+static uint64_t
+parseRun( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    if( len != 1 )
+        return 0;
+    tor->isRunning = *buf=='t';
+    return TR_FR_RUN;
+}
+
+static uint64_t
+parsePex( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    if( len != 1 )
+        return 0;
+    tor->pexDisabled = *buf!='t';
+    return TR_FR_PEX;
+}
+
+static uint64_t
+parsePeers( tr_torrent * tor, const uint8_t * buf, uint32_t len )
+{
+    uint64_t ret = 0;
+
+    if( !tor->info.isPrivate )
+    {
+        const int count = len / sizeof(tr_pex);
+        tr_peerMgrAddPex( tor->handle->peerMgr,
+                          tor->info.hash,
+                          TR_PEER_FROM_CACHE,
+                          (tr_pex*)buf, count );
+        tr_dbg( "found %i peers in resume file", count );
+        ret = TR_FR_PEERS;
+    }
+
+    return ret;
+}
+
+static uint64_t
+parseDestination( tr_torrent * tor, const uint8_t * buf, uint32_t len,
+                  const char * destination, int argIsFallback )
+{
+    if( argIsFallback )
+        tor->destination = tr_strdup( len ? (const char*)buf : destination );
+    else
+        tor->destination = tr_strdup( len ? destination : (const char*)buf );
+
+    return TR_FR_DESTINATION;
+}
+
+static uint64_t
+parseVersion1( tr_torrent * tor, const uint8_t * buf, const uint8_t * end,
+               uint64_t fieldsToLoad,
+               tr_bitfield  * uncheckedPieces,
+               const char * destination, int argIsFallback )
+{
+    uint64_t ret = 0;
+
+    while( end-buf >= 5 )
+    {
+        uint8_t id;
+        uint32_t len;
+        readBytes( &id, &buf, sizeof(id) );
+        readBytes( &len, &buf, sizeof(len) );
+
+        if( fieldsToLoad & internalIdToPublicBitfield( id ) ) switch( id )
+        {
+            case FR_ID_DOWNLOADED:  ret |= parseDownloaded( tor, buf, len ); break;
+            case FR_ID_UPLOADED:    ret |= parseUploaded( tor, buf, len ); break;
+            case FR_ID_PROGRESS:    ret |= parseProgress( tor, buf, len, uncheckedPieces ); break;
+            case FR_ID_PRIORITY:    ret |= parsePriorities( tor, buf, len ); break;
+            case FR_ID_SPEED:       ret |= parseSpeedLimit( tor, buf, len ); break;
+            case FR_ID_RUN:         ret |= parseRun( tor, buf, len ); break;
+            case FR_ID_CORRUPT:     ret |= parseCorrupt( tor, buf, len ); break;
+            case FR_ID_PEERS:       ret |= parsePeers( tor, buf, len ); break;
+            case FR_ID_PEX:         ret |= parsePex( tor, buf, len ); break;
+            case FR_ID_DESTINATION: ret |= parseDestination( tor, buf, len, destination, argIsFallback ); break;
+            default:                tr_dbg( "Skipping unknown resume code %d", (int)id ); break;
+        }
+
+        buf += len;
+    }
+
+    return ret;
+}
+
+static uint8_t* 
+loadResumeFile( const tr_torrent * tor, size_t * len )
+{
+    uint8_t * ret = NULL;
+    char path[MAX_PATH_LENGTH];
+    const char * cacheDir = tr_getCacheDirectory ();
+    const char * hash = tor->info.hashString;
+
+    if( !ret && tor->handle->tag )
+    {
+        char base[1024];
+        snprintf( base, sizeof(base), "%s-%s", hash, tor->handle->tag );
+        tr_buildPath( path, sizeof(path), cacheDir, base, NULL );
+        ret = tr_loadFile( path, len );
+    }
+
+    if( !ret )
+    {
+        tr_buildPath( path, sizeof(path), cacheDir, hash, NULL );
+        ret = tr_loadFile( path, len );
+    }
+
+    return ret;
+}
+
 static uint64_t
 fastResumeLoadImpl ( tr_torrent   * tor,
                      uint64_t       fieldsToLoad,
@@ -553,246 +632,27 @@ fastResumeLoadImpl ( tr_torrent   * tor,
                      const char   * destination,
                      int            argIsFallback )
 {
-    char      path[MAX_PATH_LENGTH];
-    FILE    * file;
-    int       version = 0;
-    uint8_t   id;
-    uint32_t  len;
-    uint64_t  ret = 0;
+    uint64_t ret = 0;
+    size_t size = 0;
+    uint8_t * buf = loadResumeFile( tor, &size );
 
-    assert( tor != NULL );
-    assert( uncheckedPieces != NULL );
-
-    /* Open resume file */
-    fastResumeFileName( path, sizeof path, tor, 1 );
-    file = fopen( path, "rb" );
-    if( !file )
-    {
-        if( ENOENT == errno )
-        {
-            fastResumeFileName( path, sizeof path, tor, 0 );
-            file = fopen( path, "rb" );
-            if( !file )
-            {
-                fastResumeFileName( path, sizeof path, tor, 1 );
-                tr_inf( "Couldn't open '%s' for reading", path );
-                return ret;
-            }
-        }
-    }
-
-    tr_dbg( "Resume file '%s' loaded", path );
-
-    /* Check format version */
-    fread( &version, 4, 1, file );
-    if( 0 == version )
-    {
-        return fastResumeLoadOld( tor, uncheckedPieces, file );
-    }
-    if( 1 != version )
-    {
-        tr_inf( "Resume file has version %d, not supported", version );
-        fclose( file );
-        return ret;
-    }
-
-    /* read each block of data */
-    while( 1 == fread( &id, 1, 1, file ) && 1 == fread( &len, 4, 1, file ) )
-    {
-        if( fieldsToLoad & internalIdToPublicBitfield( id ) ) switch( id )
-        {
-            case FR_ID_PROGRESS:
-                /* read progress data */
-                if( (uint32_t)FR_PROGRESS_LEN( tor ) == len )
-                {
-                    const int rret = fastResumeLoadProgress( tor, uncheckedPieces, file );
-
-                    if( rret && ( feof(file) || ferror(file) ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-
-                    ret |= TR_FR_PROGRESS;
-                    continue;
-                }
-                break;
-
-            case FR_ID_PRIORITY:
-
-                /* read priority data */
-                if( len == (uint32_t)(2 * tor->info.fileCount) )
-                {
-                    const int rret = loadPriorities( tor, file );
-
-                    if( rret && ( feof(file) || ferror(file) ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-
-                    ret |= TR_FR_PRIORITY;
-                    continue;
-                }
-                break;
-
-            case FR_ID_SPEED:
-                /*  read speed data */
-                if( len == FR_SPEED_LEN )
-                {
-                    const int rret = loadSpeeds( tor, file );
-
-                    if( rret && ( feof(file) || ferror(file) ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-
-                    ret |= TR_FR_SPEEDLIMIT;
-                    continue;
-                }
-                break;
-
-            case FR_ID_DESTINATION:
-                {
-                    const int rret = loadDestination( tor, file, destination, argIsFallback );
-
-                    if( rret && ( feof(file) || ferror(file) ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-
-                    ret |= TR_FR_DESTINATION;
-                    continue;
-                }
-                break;
-           
-            case FR_ID_RUN:
-                {
-                    char ch;
-                    if( fread( &ch, 1, 1, file ) != 1 )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-                    tor->isRunning = ch=='t';
-                    ret |= TR_FR_RUN;
-                    continue;
-                }
-           
-            case FR_ID_PEX:
-                {
-                    char ch;
-                    if( fread( &ch, 1, 1, file ) != 1 )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-                    tor->pexDisabled = ch!='t';
-                    ret |= TR_FR_PEX;
-                    continue;
-                }
-
-            case FR_ID_DOWNLOADED:
-                /* read download total */
-                if( 8 == len)
-                {
-                    if( 1 != fread( &tor->downloadedPrev, 8, 1, file ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-                    tor->downloadedCur = 0;
-                    ret |= TR_FR_DOWNLOADED;
-                    continue;
-                }
-                break;
-
-            case FR_ID_UPLOADED:
-                /* read upload total */
-                if( 8 == len)
-                {
-                    if( 1 != fread( &tor->uploadedPrev, 8, 1, file ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-                    tor->uploadedCur = 0;
-                    ret |= TR_FR_UPLOADED;
-                    continue;
-                }
-                break;
-
-            case FR_ID_CORRUPT:
-                /* read upload total */
-                if( 8 == len )
-                {
-                    if( 1 != fread( &tor->corruptPrev, 8, 1, file ) )
-                    {
-                        fclose( file );
-                        return ret;
-                    }
-                    tor->corruptCur = 0;
-                    ret |= TR_FR_CORRUPT;
-                    continue;
-                }
-                break;
-
-            case FR_ID_PEERS_OLD:
-                if( !tor->info.isPrivate )
-                {
-                    uint8_t * buf = malloc( len );
-                    if( 1 != fread( buf, len, 1, file ) )
-                    {
-                        free( buf );
-                        fclose( file );
-                        return ret;
-                    }
-
-                    tr_peerMgrAddPeers( tor->handle->peerMgr,
-                                        tor->info.hash,
-                                        TR_PEER_FROM_CACHE,
-                                        buf, len / 6 );
-
-                    tr_dbg( "found %i peers in resume file", len/6 );
-                    free( buf );
-                    ret |= TR_FR_PEERS;
-                }
-
-            case FR_ID_PEERS:
-                if( !tor->info.isPrivate )
-                {
-                    const int count = len / sizeof(tr_pex);
-                    tr_pex * pex = tr_new0( tr_pex, count );
-                    if( 1 != fread( pex, sizeof(tr_pex), count, file ) )
-                    {
-                        free( pex );
-                        fclose( file );
-                        return ret;
-                    }
-
-                    tr_peerMgrAddPex( tor->handle->peerMgr,
-                                      tor->info.hash,
-                                      TR_PEER_FROM_CACHE,
-                                      pex, count );
-
-                    tr_dbg( "found %i peers in resume file", len/6 );
-                    free( pex );
-                    ret |= TR_FR_PEERS;
-                }
-                continue;
-
-            default:
-                break;
+    if( !buf )
+        tr_inf( "Couldn't read resume file for '%s'", tor->info.name );
+    else {
+        const uint8_t * walk = buf;
+        const uint8_t * end = walk + size;
+        if( end - walk >= 4 ) {
+            uint32_t version;
+            readBytes( &version, &walk, sizeof(version) );
+            if( version == 1 )
+                ret |= parseVersion1 ( tor, walk, end, fieldsToLoad, uncheckedPieces, destination, argIsFallback );
+            else
+                tr_inf( "Unsupported resume file %d for '%s'", version, tor->info.name );
         }
 
-        /* if we didn't read the data, seek past it */
-        tr_dbg( "Skipping resume data type %02x, %u bytes", id, len );
-        fseek( file, len, SEEK_CUR );
+        tr_free( buf );
     }
 
-    fclose( file );
     return ret;
 }
 
