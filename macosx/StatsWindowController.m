@@ -79,13 +79,12 @@ tr_handle * fLib;
     tr_getCumulativeSessionStats(fLib, &statsAll);
     tr_getSessionStats(fLib, &statsSession);
     
-    #warning make display better
-    [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedMiB * 1048576]];
-    [fUploadedAllField setStringValue: [[NSString stringForFileSize: statsAll.uploadedMiB * 1048576]
+    [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedBytes]];
+    [fUploadedAllField setStringValue: [[NSString stringForFileSize: statsAll.uploadedBytes]
                                         stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
-    [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedMiB * 1048576]];
-    [fDownloadedAllField setStringValue: [[NSString stringForFileSize: statsAll.downloadedMiB * 1048576]
+    [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedBytes]];
+    [fDownloadedAllField setStringValue: [[NSString stringForFileSize: statsAll.downloadedBytes]
                                             stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
     [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
