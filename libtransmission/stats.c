@@ -21,6 +21,15 @@
 ****
 ***/
 
+struct tr_stats_handle
+{
+    tr_session_stats single;
+    tr_session_stats cumulative;
+    uint32_t bytes_up;
+    uint32_t bytes_down;
+    time_t startTime;
+};
+
 static void
 parseCumulativeStats( tr_session_stats  * setme,
                       const uint8_t     * content,
@@ -32,17 +41,11 @@ parseCumulativeStats( tr_session_stats  * setme,
     {
         const benc_val_t * val;
 
-        if(( val = tr_bencDictFindType( &top, "uploaded-gigabytes", TYPE_INT )))
-            setme->uploadedGigs = (uint64_t) tr_bencGetInt( val );
+        if(( val = tr_bencDictFindType( &top, "uploaded-mib", TYPE_INT )))
+            setme->uploadedMiB = (uint64_t) tr_bencGetInt( val );
 
-        if(( val = tr_bencDictFindType( &top, "uploaded-bytes", TYPE_INT )))
-            setme->uploadedBytes = (uint64_t) tr_bencGetInt( val );
-
-        if(( val = tr_bencDictFindType( &top, "downloaded-gigabytes", TYPE_INT )))
-            setme->downloadedGigs = (uint64_t) tr_bencGetInt( val );
-
-        if(( val = tr_bencDictFindType( &top, "downloaded-bytes", TYPE_INT )))
-            setme->downloadedBytes = (uint64_t) tr_bencGetInt( val );
+        if(( val = tr_bencDictFindType( &top, "downloaded-mib", TYPE_INT )))
+            setme->downloadedMiB = (uint64_t) tr_bencGetInt( val );
 
         if(( val = tr_bencDictFindType( &top, "files-added", TYPE_INT )))
             setme->filesAdded = (uint64_t) tr_bencGetInt( val );
@@ -57,19 +60,53 @@ parseCumulativeStats( tr_session_stats  * setme,
     }
 }
 
+static char*
+getFilename( char * buf, size_t buflen )
+{
+    tr_buildPath( buf, buflen, tr_getPrefsDirectory(), "stats.benc", NULL );
+    return buf;
+}
+
 static void
 loadCumulativeStats( tr_session_stats * setme )
 {
     size_t len;
     uint8_t * content;
-    char path[MAX_PATH_LENGTH];
+    char filename[MAX_PATH_LENGTH];
 
-    tr_buildPath( path, sizeof(path), tr_getPrefsDirectory(), "stats.benc", NULL );
-    content = tr_loadFile( path, &len );
+    getFilename( filename, sizeof(filename) );
+    content = tr_loadFile( filename, &len );
     if( content != NULL )
         parseCumulativeStats( setme, content, len );
 
     tr_free( content );
+}
+
+static void
+saveCumulativeStats( const tr_session_stats * stats )
+{
+    FILE * fp;
+    char * str;
+    char filename[MAX_PATH_LENGTH];
+    int len;
+    benc_val_t top, *val;
+
+    tr_bencInit( &top, TYPE_DICT );
+    tr_bencDictReserve( &top, 5 );
+    tr_bencInitInt( tr_bencDictAdd( &top, "uploaded-mib" ), stats->uploadedMiB );
+    tr_bencInitInt( tr_bencDictAdd( &top, "downloaded-mib" ), stats->downloadedMiB );
+    tr_bencInitInt( tr_bencDictAdd( &top, "files-added" ), stats->filesAdded );
+    tr_bencInitInt( tr_bencDictAdd( &top, "session-count" ), stats->sessionCount );
+    tr_bencInitInt( tr_bencDictAdd( &top, "seconds-active" ), stats->secondsActive );
+
+    str = tr_bencSave( &top, &len );
+    getFilename( filename, sizeof(filename) );
+    fp = fopen( filename, "wb+" );
+    fwrite( str, 1, len, fp );
+    fclose( fp );
+    tr_free( str );
+
+    tr_BencFree( &top );
 }
 
 /***
@@ -79,69 +116,82 @@ loadCumulativeStats( tr_session_stats * setme )
 void
 tr_statsInit( tr_handle * handle )
 {
-    memset( &handle->sessionStats, 0, sizeof( tr_session_stats ) );
-    memset( &handle->cumulativeStats, 0, sizeof( tr_session_stats ) );
-
-    loadCumulativeStats( &handle->cumulativeStats );
+    struct tr_stats_handle * stats = tr_new0( struct tr_stats_handle, 1 );
+    loadCumulativeStats( &stats->cumulative );
+    stats->cumulative.sessionCount++;
+    stats->startTime = time(NULL);
+    handle->sessionStats = stats;
 }
 
 void
-tr_statsClose( const tr_handle * handle UNUSED )
+tr_statsClose( tr_handle * handle )
 {
-    fprintf( stderr, "FIXME" );
-}
+    tr_session_stats tmp;
+    tr_getCumulativeSessionStats( handle, &tmp );
+    saveCumulativeStats( &tmp );
 
-static void
-updateRatio( tr_session_stats * stats UNUSED )
-{
-    fprintf( stderr, "FIXME" );
+    tr_free( handle->sessionStats );
+    handle->sessionStats = NULL;
 }
 
 void
 tr_getSessionStats( const tr_handle   * handle,
                     tr_session_stats  * setme )
 {
-    *setme = handle->sessionStats;
-    updateRatio( setme );
+    const struct tr_stats_handle * stats = handle->sessionStats;
+    *setme = stats->single;
+    setme->ratio = (double)setme->uploadedMiB / (double)setme->downloadedMiB;
+    setme->secondsActive += (time(NULL) - stats->startTime );
 }
 
 void
 tr_getCumulativeSessionStats( const tr_handle   * handle,
                               tr_session_stats  * setme )
 {
-    *setme = handle->cumulativeStats;
-    updateRatio( setme );
+    const struct tr_stats_handle * stats = handle->sessionStats;
+    *setme = stats->cumulative;
+    setme->ratio = (double)setme->uploadedMiB / (double)setme->downloadedMiB;
+    setme->secondsActive += (time(NULL) - stats->startTime );
 }
 
 /**
 ***
 **/
 
-static void
-add( uint64_t * gigs, uint64_t * bytes, uint32_t addme )
-{
-    uint64_t i;
-    const uint64_t GIGABYTE = 1073741824;
-    i = *bytes;
-    i += addme;
-    *gigs += i / GIGABYTE;
-    *bytes = i % GIGABYTE;
-}
+#define MiB 1048576
 
 void
 tr_statsAddUploaded( tr_handle * handle, uint32_t bytes )
 {
-    add( &handle->sessionStats.uploadedGigs,
-         &handle->sessionStats.uploadedBytes, bytes );
-    add( &handle->cumulativeStats.uploadedGigs,
-         &handle->cumulativeStats.uploadedBytes, bytes );
+    struct tr_stats_handle * stats = handle->sessionStats;
+    stats->bytes_up += bytes;
+    if( stats->bytes_up >= MiB )
+    {
+        const uint32_t megs = stats->bytes_up / MiB;
+        stats->bytes_up %= MiB;
+        stats->single.uploadedMiB += megs;
+        stats->cumulative.uploadedMiB += megs;
+    }
 }
 
 void
 tr_statsAddDownloaded( tr_handle * handle, uint32_t bytes )
 {
-    add( &handle->sessionStats.downloadedGigs,
-         &handle->sessionStats.downloadedBytes, bytes );
-    add( &handle->cumulativeStats.downloadedGigs,
-         &handle->cumulativeStats.downloadedBytes, bytes );
+    struct tr_stats_handle * stats = handle->sessionStats;
+    stats->bytes_down += bytes;
+    if( stats->bytes_down >= MiB )
+    {
+        const uint32_t megs = stats->bytes_down / MiB;
+        stats->bytes_down %= MiB;
+        stats->single.downloadedMiB += megs;
+        stats->cumulative.downloadedMiB += megs;
+    }
+}
+
+void
+tr_torrentAdded( tr_handle * handle, const tr_torrent * torrent )
+{
+    struct tr_stats_handle * stats = handle->sessionStats;
+    stats->cumulative.filesAdded += torrent->info.fileCount;
+    stats->single.filesAdded += torrent->info.fileCount;
 }

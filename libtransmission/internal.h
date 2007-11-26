@@ -194,8 +194,7 @@ struct tr_handle
 
     uint8_t                    isClosed;
 
-    tr_session_stats           sessionStats;
-    tr_session_stats           cumulativeStats;
+    struct tr_stats_handle   * sessionStats;
 };
 
 void tr_globalLock       ( struct tr_handle * );

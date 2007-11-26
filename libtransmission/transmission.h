@@ -118,10 +118,8 @@ void tr_close( tr_handle * );
 
 typedef struct tr_session_stats
 {
-    uint64_t downloadedGigs;  /* total down / GiB */
-    uint64_t downloadedBytes; /* total down % GiB */
-    uint64_t uploadedGigs;    /* total up / GiB */
-    uint64_t uploadedBytes;   /* total up % GiB */
+    uint64_t uploadedMiB;     /* total up */
+    uint64_t downloadedMiB;   /* total down */
     double ratio;             /* total up / total down */
     uint64_t filesAdded;      /* number of files added */
     uint64_t sessionCount;    /* program started N times */

@@ -15,7 +15,7 @@
 
 void tr_statsInit( tr_handle * handle );
 
-void tr_statsClose( const tr_handle * handle );
+void tr_statsClose( tr_handle * handle );
 
 void tr_statsAddUploaded( tr_handle * handle, uint32_t bytes );
 
