@@ -119,14 +119,12 @@ tr_statsInit( tr_handle * handle )
     stats->cumulative.sessionCount++;
     stats->startTime = time(NULL);
     handle->sessionStats = stats;
-fprintf( stderr, "handle %p sessionStats is %p\n", handle, handle->sessionStats );
 }
 
 void
 tr_statsClose( tr_handle * handle )
 {
     tr_session_stats tmp;
-fprintf( stderr, "handle %p sessionStats is %p\n", handle, handle->sessionStats );
     tr_getCumulativeSessionStats( handle, &tmp );
     saveCumulativeStats( &tmp );
 
