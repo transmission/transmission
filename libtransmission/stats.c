@@ -140,7 +140,7 @@ tr_getSessionStats( const tr_handle   * handle,
 {
     const struct tr_stats_handle * stats = handle->sessionStats;
     *setme = stats->single;
-    setme->ratio = (double)setme->uploadedMiB / (double)setme->downloadedMiB;
+    setme->ratio = setme->downloadedMiB ? (double)setme->uploadedMiB / (double)setme->downloadedMiB : TR_RATIO_NA;
     setme->secondsActive += (time(NULL) - stats->startTime );
 }
 
@@ -150,7 +150,7 @@ tr_getCumulativeSessionStats( const tr_handle   * handle,
 {
     const struct tr_stats_handle * stats = handle->sessionStats;
     *setme = stats->cumulative;
-    setme->ratio = (double)setme->uploadedMiB / (double)setme->downloadedMiB;
+    setme->ratio = setme->downloadedMiB ? (double)setme->uploadedMiB / (double)setme->downloadedMiB : TR_RATIO_NA;
     setme->secondsActive += (time(NULL) - stats->startTime );
 }
 

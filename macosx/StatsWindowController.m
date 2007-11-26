@@ -88,8 +88,11 @@ tr_handle * fLib;
                                             stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
     
     [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
-    [fRatioAllField setStringValue: [[NSString stringForRatio: statsAll.ratio]
-                                    stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    
+    NSString * totalRatioString = statsAll.ratio != TR_RATIO_NA
+        ? [[NSString stringForRatio: statsAll.ratio] stringByAppendingString: NSLocalizedString(@" total", "stats total")]
+        : NSLocalizedString(@"Total N/A", "stats total");
+    [fRatioAllField setStringValue: totalRatioString];
     
     [fTimeField setStringValue: [self timeString: statsSession.secondsActive]];
     [fTimeAllField setStringValue: [[self timeString: statsAll.secondsActive]
