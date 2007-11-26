@@ -37,6 +37,7 @@
 .Op Fl d Ar download-rate
 .Op Fl u Ar upload-rate
 .Op Fl f Ar script
+.Op Fl o Ar output-dir
 .Op Fl n
 .Ar torrent-file
 .Nm
@@ -55,15 +56,15 @@ scripting capabilities.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.lt Fl c, Fl -create-from Ar source-file
+.It Fl c, Fl -create-from Ar source-file
 Create torrent from the specified source file.
-.lt Fl a, Fl -announce Ar announce-url
-Specifies the Announceurl the new torrent will use. Can only be
+.It Fl a, Fl -announce Ar announce-url
+Specifies the announce-url the new torrent will use. Can only be
 used in conjunction with -c or --create-from.
-.lt Fl r, Fl -private
+.It Fl r, Fl -private
 Sets the private flag for the new torrent. Can only be used in
 conjunction with -c or --create-from.
-.lt Fl m, Fl -comment Ar comment-text
+.It Fl m, Fl -comment Ar comment-text
 This optional parameter adds a comment to the new torrent. Can only
 be used in conjunction with -c or --create-from.
 .It Fl h, Fl -help
@@ -72,6 +73,8 @@ Prints a short usage summary.
 Shows information from the specified torrent file, such as the
 cryptographic hash, the tracker, announcement, file size and file
 name.
+.It Fl o, Fl -output-dir Ar directory
+Uses the specified directory as destination for downloaded data.
 .It Fl s, -scrape
 Prints the number of seeders and leechers for the specified torrent
 file, and exits.
@@ -95,7 +98,7 @@ Specifies a shell script to be executed upon successful download.
 .Sh SIGNALS
 In addition to these options, sending
 .Nm
-a SIGHUP signal can ask the tracker for more peers.
+a SIGHUP signal will contact the tracker for more peers.
 .El
 .Sh FILES
 .Bl -tag -width Ds -compact

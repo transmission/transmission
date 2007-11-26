@@ -41,7 +41,7 @@
 #endif
 
 const char * USAGE =
-"Usage: %s [options] file.torrent [options]\n\n"
+"Usage: %s [-car[-m]] [-dfinpsuv] [-h] file.torrent [output-dir]\n\n"
 "Options:\n"
 "  -c, --create-from <file>  Create torrent from the specified source file.\n"
 "  -a, --announce <url> Used in conjunction with -c.\n"
@@ -65,7 +65,8 @@ static int           verboseLevel  = 0;
 static int           bindPort      = TR_DEFAULT_PORT;
 static int           uploadLimit   = 20;
 static int           downloadLimit = -1;
-static char          * torrentPath = NULL;
+static char        * torrentPath   = NULL;
+static char        * savePath      = ".";
 static int           natTraversal  = 0;
 static sig_atomic_t  gotsig        = 0;
 static sig_atomic_t  manualUpdate  = 0;
@@ -161,7 +162,7 @@ int main( int argc, char ** argv )
     }
 
     /* Open and parse torrent file */
-    if( !( tor = tr_torrentInit( h, torrentPath, ".", 0, &error ) ) )
+    if( !( tor = tr_torrentInit( h, torrentPath, savePath, 0, &error ) ) )
     {
         printf( "Failed opening torrent file `%s'\n", torrentPath );
         tr_close( h );
@@ -350,23 +351,24 @@ static int parseCommandLine( int argc, char ** argv )
     for( ;; )
     {
         static struct option long_options[] =
-          { { "help",     no_argument,       NULL, 'h' },
-            { "info",     no_argument,       NULL, 'i' },
-            { "scrape",   no_argument,       NULL, 's' },
-            { "private",  no_argument,       NULL, 'r' },
-            { "verbose",  required_argument, NULL, 'v' },
-            { "port",     required_argument, NULL, 'p' },
-            { "upload",   required_argument, NULL, 'u' },
-            { "download", required_argument, NULL, 'd' },
-            { "finish",   required_argument, NULL, 'f' },
-            { "create",   required_argument, NULL, 'c' },
-            { "comment",  required_argument, NULL, 'm' },
-            { "announce", required_argument, NULL, 'a' },
-            { "nat-traversal", no_argument,  NULL, 'n' },
+          { { "help",     no_argument,          NULL, 'h' },
+            { "info",     no_argument,          NULL, 'i' },
+            { "scrape",   no_argument,          NULL, 's' },
+            { "private",  no_argument,          NULL, 'r' },
+            { "verbose",  required_argument,    NULL, 'v' },
+            { "port",     required_argument,    NULL, 'p' },
+            { "upload",   required_argument,    NULL, 'u' },
+            { "download", required_argument,    NULL, 'd' },
+            { "finish",   required_argument,    NULL, 'f' },
+            { "create",   required_argument,    NULL, 'c' },
+            { "comment",  required_argument,    NULL, 'm' },
+            { "announce", required_argument,    NULL, 'a' },
+            { "nat-traversal", no_argument,     NULL, 'n' },
+            { "output-dir", required_argument,  NULL, 'o' },
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:n",
+        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:n:o",
                          long_options, &optind );
         if( c < 0 )
         {
@@ -413,12 +415,14 @@ static int parseCommandLine( int argc, char ** argv )
             case 'n':
                 natTraversal = 1;
                 break;
+            case 'o':
+                savePath = optarg;
             default:
                 return 1;
         }
     }
 
-    if( optind > argc - 1  )
+    if( optind >= argc )
     {
         return !showHelp;
     }
