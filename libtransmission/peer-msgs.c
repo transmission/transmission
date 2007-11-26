@@ -1442,12 +1442,23 @@ sendKeepalive( tr_peermsgs * msgs )
 ***
 **/
 
+static int
+isSwiftEnabled( const tr_peermsgs * msgs )
+{
+    /* rationale: SWIFT is good for getting rid of deadbeats, but most
+     * private trackers have ratios where you _want_ to feed deadbeats
+     * as much as possible.  So we disable SWIFT on private torrents */
+    return SWIFT_ENABLED
+        && !tr_torrentIsSeed( msgs->torrent )
+        && !tr_torrentIsPrivate( msgs->torrent );
+}
+
 static size_t
 getUploadMax( const tr_peermsgs * msgs )
 {
     static const size_t maxval = ~0;
     const tr_torrent * tor = msgs->torrent;
-    const int useSwift = SWIFT_ENABLED && !tr_torrentIsSeed( msgs->torrent );
+    const int useSwift = isSwiftEnabled( msgs );
     const size_t swiftLeft = msgs->info->credit;
     size_t speedLeft;
     size_t bufLeft;

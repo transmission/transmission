@@ -642,9 +642,18 @@ tr_torrentChangeMyPort( tr_torrent * tor )
 }
 
 int
+tr_torrentIsPrivate( const tr_torrent * tor )
+{
+    return tor
+        && tor->info.isPrivate;
+}
+
+int
 tr_torrentIsPexEnabled( const tr_torrent * tor )
 {
-    return !tor->info.isPrivate && !tor->pexDisabled;
+    return tor
+        && !tr_torrentIsPrivate( tor )
+        && !tor->pexDisabled;
 }
 
 void

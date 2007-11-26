@@ -43,6 +43,8 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+int tr_torrentIsPrivate( const tr_torrent * );
+
 void tr_torrentRecheckCompleteness( tr_torrent * );
 
 int tr_trackerInfoInit( struct tr_tracker_info  * info,
