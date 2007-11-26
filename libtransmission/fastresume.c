@@ -66,17 +66,11 @@ typedef uint64_t tr_time_t;
 
 enum
 {
-    /* deprecated */
-    FR_ID_PROGRESS_SLOTS = 1,
-
     /* number of bytes downloaded */
     FR_ID_DOWNLOADED = 2,
 
     /* number of bytes uploaded */
     FR_ID_UPLOADED = 3,
-
-    /* IPs and ports of connectable peers */
-    FR_ID_PEERS_OLD = 4,
 
     /* progress data:
      *  - 4 bytes * number of files: mtimes of files
@@ -342,10 +336,8 @@ internalIdToPublicBitfield( uint8_t id )
 
     switch( id )
     {
-        case FR_ID_PROGRESS_SLOTS: ret = 0;                 break;
         case FR_ID_DOWNLOADED:     ret = TR_FR_DOWNLOADED;  break;
         case FR_ID_UPLOADED:       ret = TR_FR_UPLOADED;    break;
-        case FR_ID_PEERS_OLD:      ret = TR_FR_PEERS;       break;
         case FR_ID_PROGRESS:       ret = TR_FR_PROGRESS;    break;
         case FR_ID_PRIORITY:       ret = TR_FR_PRIORITY;    break;
         case FR_ID_SPEED:          ret = TR_FR_SPEEDLIMIT;  break;
