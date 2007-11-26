@@ -55,7 +55,8 @@ const char * USAGE =
 "  -p, --port <int>     Port we should listen on (default = %d)\n"
 "  -s, --scrape         Print counts of seeders/leechers and exit\n"
 "  -u, --upload <int>   Maximum upload rate (-1 = no limit, default = 20)\n"
-"  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n";
+"  -v, --verbose <int>  Verbose level (0 to 2, default = 0)\n"
+"  -y, --recheck        Force a recheck of the torrent data\n";
 
 static int           showHelp      = 0;
 static int           showInfo      = 0;
@@ -68,6 +69,7 @@ static int           downloadLimit = -1;
 static char        * torrentPath   = NULL;
 static char        * savePath      = ".";
 static int           natTraversal  = 0;
+static int           recheckData   = 0;
 static sig_atomic_t  gotsig        = 0;
 static sig_atomic_t  manualUpdate  = 0;
 static tr_torrent    * tor;
@@ -274,6 +276,12 @@ int main( int argc, char ** argv )
                 tr_manualUpdate( tor );
             }
         }
+        
+        if( recheckData )
+        {
+            recheckData = 0;
+            tr_torrentRecheck( tor );
+        }
 
         s = tr_torrentStat( tor );
 
@@ -364,11 +372,12 @@ static int parseCommandLine( int argc, char ** argv )
             { "comment",  required_argument,    NULL, 'm' },
             { "announce", required_argument,    NULL, 'a' },
             { "nat-traversal", no_argument,     NULL, 'n' },
+            { "recheck",  no_argument,          NULL, 'y' },
             { "output-dir", required_argument,  NULL, 'o' },
             { 0, 0, 0, 0} };
 
         int c, optind = 0;
-        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:n:o",
+        c = getopt_long( argc, argv, "hisrv:p:u:d:f:c:m:a:n:o:y",
                          long_options, &optind );
         if( c < 0 )
         {
@@ -414,6 +423,9 @@ static int parseCommandLine( int argc, char ** argv )
                 break;
             case 'n':
                 natTraversal = 1;
+                break;
+            case 'y':
+                recheckData = 1;
                 break;
             case 'o':
                 savePath = optarg;
