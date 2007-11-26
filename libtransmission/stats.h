@@ -21,6 +21,6 @@ void tr_statsAddUploaded( tr_handle * handle, uint32_t bytes );
 
 void tr_statsAddDownloaded( tr_handle * handle, uint32_t bytes );
 
-void tr_torrentAdded( tr_handle * handle, const tr_torrent * torrent );
+void tr_statsFileCreated( tr_handle * handle );
 
 #endif

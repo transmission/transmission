@@ -173,9 +173,9 @@ tr_statsAddDownloaded( tr_handle * handle, uint32_t bytes )
 }
 
 void
-tr_torrentAdded( tr_handle * handle, const tr_torrent * torrent )
+tr_statsFileCreated( tr_handle * handle )
 {
     struct tr_stats_handle * stats = handle->sessionStats;
-    stats->cumulative.filesAdded += torrent->info.fileCount;
-    stats->single.filesAdded += torrent->info.fileCount;
+    ++stats->cumulative.filesAdded;
+    ++stats->single.filesAdded;
 }

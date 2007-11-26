@@ -27,6 +27,7 @@
 #include "list.h"
 #include "platform.h"
 #include "peer-mgr.h"
+#include "stats.h"
 #include "utils.h"
 
 /****
@@ -55,16 +56,18 @@ readOrWriteBytes( const tr_torrent  * tor,
     struct stat sb;
     int fd = -1;
     int ret;
+    int fileExists;
 
     assert( 0<=fileIndex && fileIndex<info->fileCount );
     assert( !file->length || (fileOffset < file->length));
     assert( fileOffset + buflen <= file->length );
 
     tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+    fileExists = !stat( path, &sb );
 
     if( !file->length )
         return 0;
-    else if ((ioMode==TR_IO_READ) && stat( path, &sb ) ) /* does file exist? */
+    else if ((ioMode==TR_IO_READ) && !fileExists ) /* does file exist? */
         ret = tr_ioErrorFromErrno ();
     else if ((fd = tr_fdFileCheckout ( path, ioMode==TR_IO_WRITE )) < 0)
         ret = fd;
@@ -74,6 +77,9 @@ readOrWriteBytes( const tr_torrent  * tor,
         ret = tr_ioErrorFromErrno( );
     else
         ret = TR_OK;
+
+    if((ret==TR_OK) && (ioMode==TR_IO_WRITE) && !fileExists )
+        tr_statsFileCreated( tor->handle );
  
     if( fd >= 0 )
         tr_fdFileReturn( fd );
