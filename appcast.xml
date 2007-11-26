@@ -6,24 +6,26 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Mon, 12 Nov 2007 16:22:00 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 25 Nov 2007 19:05:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 0.93 Released</title>
+      <title>Transmission 0.94 Released</title>
       <description><![CDATA[
 <h4>Transmission Changes:</h4>
 <ul>
- <li>Fix "router death" bug that impaired internet connectivity</li>
- <li>Fix bug that could cause good peer connections to be lost</li>
- <li>Tweak request queue code to improve download speeds</li>
- <li>Better handling of very large files on 32bit systems</li>
- <li>Consume less battery power on laptops</li>
- <li>Fix minor IPC parsing error</li>
+ <li>Faster average download speeds</li>
+ <li>Automatically ban peers that send us too many corrupt pieces</li>
+ <li>Fix a crash that occurred if a peer sent us an incomplete message</li>
+ <li>Fix portmapping crash</li>
+ <li>Fix bug that left files open after their torrents were stopped</li>
+ <li>Fix 0.93 file permissions bug</li>
+ <li>Fix tracker redirect error</li>
+ <li>Fix LTEP PEX bug</li>
 </ul>
 
 <h4>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h4>]]></description>
-      <pubDate>Mon, 12 Nov 2007 16:22:00 -0400</pubDate>
-      <enclosure sparkle:version="3811" sparkle:shortVersionString="0.93" url="http://mirrors.m0k.org/transmission/files/Transmission-0.93.dmg" length="2142946" type="application/octet-stream"/>
+      <pubDate>Sun, 25 Nov 2007 19:05:00 -0400</pubDate>
+      <enclosure sparkle:version="3959" sparkle:shortVersionString="0.94" url="http://mirrors.m0k.org/transmission/files/Transmission-0.94.dmg" length="2405004" type="application/octet-stream"/>
     </item>
     
   </channel>
