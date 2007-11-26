@@ -326,8 +326,6 @@ tr_closeImpl( void * vh )
     for( t=h->torrentList; t!=NULL; t=t->next )
         tr_torrentClose( t );
 
-    tr_statsClose( h );
-
     tr_peerMgrFree( h->peerMgr );
 
     tr_rcClose( h->upload );
