@@ -30,7 +30,6 @@
 - (NSString *) stringByAppendingEllipsis;
 
 + (NSString *) stringForFileSize: (uint64_t) size;
-+ (NSString *) stringForLargeFileSizeGigs: (uint64_t) gigs bytes: (uint64_t) bytes;
 
 + (NSString *) stringForSpeed: (float) speed;
 + (NSString *) stringForSpeedAbbrev: (float) speed;

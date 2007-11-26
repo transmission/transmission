@@ -106,7 +106,7 @@ saveCumulativeStats( const tr_session_stats * stats )
     fclose( fp );
     tr_free( str );
 
-    tr_BencFree( &top );
+    tr_bencFree( &top );
 }
 
 /***

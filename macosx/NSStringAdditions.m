@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: StringAdditions.m 2869 2007-08-19 03:03:28Z livings124 $
+ * $Id$
  *
  * Copyright (c) 2005-2007 Transmission authors and contributors
  *
@@ -39,40 +39,30 @@
 
 + (NSString *) stringForFileSize: (uint64_t) size
 {
-    [self stringForLargeFileSizeGigs: size / 1073741824 bytes: size % 1073741824];
-}
+    if (size < 1024)
+        return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), size];
 
-+ (NSString *) stringForLargeFileSizeGigs: (uint64_t) gigs bytes: (uint64_t) bytes
-{
     float convertedSize;
     NSString * unit;
-    if (gigs == 0)
+    if (size < 1048576)
     {
-        if (bytes < 1024)
-            return [NSString stringWithFormat: NSLocalizedString(@"%lld bytes", "File size"), bytes];
-        else if (bytes < 1048576)
-        {
-            convertedSize = bytes / 1024.0;
-            unit = NSLocalizedString(@"KB", "File size");
-        }
-        else
-        {
-            convertedSize = bytes / 1048576.0;
-            unit = NSLocalizedString(@"MB", "File size");
-        }
+        convertedSize = size / 1024.0;
+        unit = NSLocalizedString(@"KB", "File size");
+    }
+    else if (size < 1073741824)
+    {
+        convertedSize = size / 1048576.0;
+        unit = NSLocalizedString(@"MB", "File size");
+    }
+    else if (size < 1099511627776.0)
+    {
+        convertedSize = size / 1073741824.0;
+        unit = NSLocalizedString(@"GB", "File size");
     }
     else
     {
-        if (gigs < 1024)
-        {
-            convertedSize = (float)gigs + bytes / 1073741824.0;
-            unit = NSLocalizedString(@"GB", "File size");
-        }
-        else
-        {
-            convertedSize = gigs / 1024.0;
-            unit = NSLocalizedString(@"TB", "File size");
-        }
+        convertedSize = size / 1099511627776.0;
+        unit = NSLocalizedString(@"TB", "File size");
     }
     
     //attempt to have minimum of 3 digits with at least 1 decimal
