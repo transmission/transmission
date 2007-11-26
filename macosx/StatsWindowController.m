@@ -107,7 +107,7 @@ tr_handle * fLib;
 
 - (NSString *) timeString: (uint64_t) seconds
 {
-    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 4];
+    NSMutableArray * timeArray = [NSMutableArray arrayWithCapacity: 3];
     
     if (seconds >= 86400) //24 * 60 * 60
     {
@@ -123,12 +123,7 @@ tr_handle * fLib;
         [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d hr", "stats window -> running time"), seconds / 3600]];
         seconds %= 3600;
     }
-    if (seconds >= 60)
-    {
-        [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), seconds / 60]];
-        seconds %= 60;
-    }
-    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d sec", "stats window -> running time"), seconds]];
+    [timeArray addObject: [NSString stringWithFormat: NSLocalizedString(@"%d min", "stats window -> running time"), seconds / 60]];
     
     return [timeArray componentsJoinedByString: @" "];
 }
