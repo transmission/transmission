@@ -205,7 +205,9 @@ typedef enum
             }
             
             [fBasicInfoField setStringValue: [NSString stringWithFormat: NSLocalizedString(@"%d Files, %@ Total",
-                                                "Inspector -> torrents"), fileCount, [NSString stringForFileSize: size]]];
+                                    "Inspector -> above tabs -> selected torrents"), fileCount, [NSString stringForFileSize: size]]];
+            [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes",
+                                            "Inspector -> above tabs -> selected torrents"), size]];
         }
         else
         {
@@ -213,6 +215,7 @@ typedef enum
             
             [fNameField setStringValue: NSLocalizedString(@"No Torrents Selected", "Inspector -> above tabs -> selected torrents")];
             [fBasicInfoField setStringValue: @""];
+            [fBasicInfoField setToolTip: @""];
     
             [fHaveField setStringValue: @""];
             [fDownloadedTotalField setStringValue: @""];
@@ -338,6 +341,8 @@ typedef enum
             basicString = [fileString stringByAppendingString: basicString];
         }
         [fBasicInfoField setStringValue: basicString];
+        [fBasicInfoField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes",
+                                        "Inspector -> above tabs -> selected torrents"), [torrent size]]];
         
         NSArray * allTrackers = [torrent allTrackers], * subTrackers;
         NSMutableArray * trackerStrings = [NSMutableArray arrayWithCapacity: [allTrackers count]];

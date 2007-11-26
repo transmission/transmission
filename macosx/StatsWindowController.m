@@ -80,12 +80,20 @@ tr_handle * fLib;
     tr_getSessionStats(fLib, &statsSession);
     
     [fUploadedField setStringValue: [NSString stringForFileSize: statsSession.uploadedBytes]];
+    [fUploadedField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
+                                    statsSession.uploadedBytes]];
     [fUploadedAllField setStringValue: [[NSString stringForFileSize: statsAll.uploadedBytes]
                                         stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    [fUploadedAllField setToolTip: [NSString stringWithFormat:NSLocalizedString(@"%u bytes", "stats -> bytes"),
+                                    statsAll.uploadedBytes]];
     
     [fDownloadedField setStringValue: [NSString stringForFileSize: statsSession.downloadedBytes]];
+    [fDownloadedField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
+                                    statsSession.downloadedBytes]];
     [fDownloadedAllField setStringValue: [[NSString stringForFileSize: statsAll.downloadedBytes]
                                             stringByAppendingString: NSLocalizedString(@" total", "stats total")]];
+    [fDownloadedAllField setToolTip: [NSString stringWithFormat: NSLocalizedString(@"%u bytes", "stats -> bytes"),
+                                        statsAll.downloadedBytes]];
     
     [fRatioField setStringValue: [NSString stringForRatio: statsSession.ratio]];
     
