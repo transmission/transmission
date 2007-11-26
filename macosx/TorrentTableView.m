@@ -609,10 +609,7 @@
             
             NSImage * icon;
             if (![[dict objectForKey: @"IsFolder"] boolValue])
-            {
-                icon = [[dict objectForKey: @"Icon"] copy];
-                [icon setFlipped: NO];
-            }
+                icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
             else
             {
                 NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
@@ -621,7 +618,7 @@
                 [itemMenu setDelegate: self];
                 [itemMenu release];
                 
-                icon = [[[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')] copy];
+                icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
             }
             
             [item setRepresentedObject: dict];
@@ -629,7 +626,6 @@
             [icon setScalesWhenResized: YES];
             [icon setSize: NSMakeSize(16.0, 16.0)];
             [item setImage: icon];
-            [icon release];
             
             [item setAction: @selector(checkFile:)];
             

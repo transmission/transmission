@@ -713,13 +713,10 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 - (float) progressDone
 {
     return fStat->percentDone;
-    /*uint64_t have = [self haveTotal];
-    return (float)have / (have + [self sizeLeft]);*/
 }
 
 - (float) progressLeft
 {
-    //NSLog(@"left %f",(float)fStat->leftUntilDone / [self size]);
     return (float)[self sizeLeft] / [self size];
 }
 
