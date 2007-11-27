@@ -43,7 +43,8 @@
 
 #include <sys/types.h>
 #include <dirent.h>
-#include <unistd.h> /* getuid getpid */
+#include <fcntl.h>
+#include <unistd.h> /* getuid getpid close */
 
 #include "transmission.h"
 #include "list.h"
@@ -624,3 +625,381 @@ tr_getTorrentsDirectory( void )
     init = 1;
     return buf;
 }
+
+/***
+****  SOCKETS
+***/
+
+#ifdef BSD
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
+#include <sys/sysctl.h>
+#include <net/route.h>
+
+static uint8_t *
+getroute( int * buflen );
+static int
+parseroutes( uint8_t * buf, int len, struct in_addr * addr );
+
+int
+tr_getDefaultRoute( struct in_addr * addr )
+{
+    uint8_t * buf;
+    int len;
+
+    buf = getroute( &len );
+    if( NULL == buf )
+    {
+        tr_err( "failed to get default route (BSD)" );
+        return 1;
+    }
+
+    len = parseroutes( buf, len, addr );
+    free( buf );
+
+    return len;
+}
+
+#ifndef SA_SIZE
+#define ROUNDUP( a, size ) \
+    ( ( (a) & ( (size) - 1 ) ) ? ( 1 + ( (a) | ( (size) - 1 ) ) ) : (a) )
+#define SA_SIZE( sap ) \
+    ( sap->sa_len ? ROUNDUP( (sap)->sa_len, sizeof( u_long ) ) : \
+                    sizeof( u_long ) )
+#endif /* !SA_SIZE */
+#define NEXT_SA( sap ) \
+    (struct sockaddr *) ( (caddr_t) (sap) + ( SA_SIZE( (sap) ) ) )
+
+static uint8_t *
+getroute( int * buflen )
+{
+    int     mib[6];
+    size_t  len;
+    uint8_t * buf;
+
+    mib[0] = CTL_NET;
+    mib[1] = PF_ROUTE;
+    mib[2] = 0;
+    mib[3] = AF_INET;
+    mib[4] = NET_RT_FLAGS;
+    mib[5] = RTF_GATEWAY;
+
+    if( sysctl( mib, 6, NULL, &len, NULL, 0 ) )
+    {
+        if( ENOENT != errno )
+        {
+            tr_err( "sysctl net.route.0.inet.flags.gateway failed (%s)",
+                    strerror( sockerrno ) );
+        }
+        *buflen = 0;
+        return NULL;
+    }
+
+    buf = malloc( len );
+    if( NULL == buf )
+    {
+        *buflen = 0;
+        return NULL;
+    }
+
+    if( sysctl( mib, 6, buf, &len, NULL, 0 ) )
+    {
+        tr_err( "sysctl net.route.0.inet.flags.gateway failed (%s)",
+                strerror( sockerrno ) );
+        free( buf );
+        *buflen = 0;
+        return NULL;
+    }
+
+    *buflen = len;
+
+    return buf;
+}
+
+static int
+parseroutes( uint8_t * buf, int len, struct in_addr * addr )
+{
+    uint8_t            * end;
+    struct rt_msghdr   * rtm;
+    struct sockaddr    * sa;
+    struct sockaddr_in * sin;
+    int                  ii;
+    struct in_addr       dest, gw;
+
+    end = buf + len;
+    while( end > buf + sizeof( *rtm ) )
+    {
+        rtm = (struct rt_msghdr *) buf;
+        buf += rtm->rtm_msglen;
+        if( end >= buf )
+        {
+            dest.s_addr = INADDR_NONE;
+            gw.s_addr   = INADDR_NONE;
+            sa = (struct sockaddr *) ( rtm + 1 );
+
+            for( ii = 0; ii < RTAX_MAX && (uint8_t *) sa < buf; ii++ )
+            {
+                if( buf < (uint8_t *) NEXT_SA( sa ) )
+                {
+                    break;
+                }
+
+                if( rtm->rtm_addrs & ( 1 << ii ) )
+                {
+                    if( AF_INET == sa->sa_family )
+                    {
+                        sin = (struct sockaddr_in *) sa;
+                        switch( ii )
+                        {
+                            case RTAX_DST:
+                                dest = sin->sin_addr;
+                                break;
+                            case RTAX_GATEWAY:
+                                gw = sin->sin_addr;
+                                break;
+                        }
+                    }
+                    sa = NEXT_SA( sa );
+                }
+            }
+
+            if( INADDR_ANY == dest.s_addr && INADDR_NONE != gw.s_addr )
+            {
+                *addr = gw;
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+#elif defined( linux ) || defined( __linux ) || defined( __linux__ )
+
+#include <linux/types.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+
+#define SEQNUM 195909
+
+static int
+getsock( void );
+static uint8_t *
+getroute( int fd, unsigned int * buflen );
+static int
+parseroutes( uint8_t * buf, unsigned int len, struct in_addr * addr );
+
+int
+tr_getDefaultRoute( struct in_addr * addr )
+{
+    int fd, ret;
+    unsigned int len;
+    uint8_t * buf;
+
+    ret = 1;
+    fd = getsock();
+    if( 0 <= fd )
+    {
+        while( ret )
+        {
+            buf = getroute( fd, &len );
+            if( NULL == buf )
+            {
+                break;
+            }
+            ret = parseroutes( buf, len, addr );
+            free( buf );
+        }
+        close( fd );
+    }
+
+    if( ret )
+    {
+        tr_err( "failed to get default route (Linux)" );
+    }
+
+    return ret;
+}
+
+static int
+getsock( void )
+{
+    int fd, flags;
+    struct
+    {
+        struct nlmsghdr nlh;
+        struct rtgenmsg rtg;
+    } req;
+    struct sockaddr_nl snl;
+
+    fd = socket( PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE );
+    if( 0 > fd )
+    {
+        tr_err( "failed to create routing socket (%s)", strerror( sockerrno ) );
+        return -1;
+    }
+
+    flags = fcntl( fd, F_GETFL );
+    if( 0 > flags || 0 > fcntl( fd, F_SETFL, O_NONBLOCK | flags ) )
+    {
+        tr_err( "failed to set socket nonblocking (%s)", strerror( sockerrno ) );
+        close( fd );
+        return -1;
+    }
+
+    bzero( &snl, sizeof( snl ) );
+    snl.nl_family = AF_NETLINK;
+
+    bzero( &req, sizeof( req ) );
+    req.nlh.nlmsg_len = NLMSG_LENGTH( sizeof( req.rtg ) );
+    req.nlh.nlmsg_type = RTM_GETROUTE;
+    req.nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP;
+    req.nlh.nlmsg_seq = SEQNUM;
+    req.nlh.nlmsg_pid = 0;
+    req.rtg.rtgen_family = AF_INET;
+
+    if( 0 > sendto( fd, &req, sizeof( req ), 0,
+                    (struct sockaddr *) &snl, sizeof( snl ) ) )
+    {
+        tr_err( "failed to write to routing socket (%s)", strerror( sockerrno ) );
+        close( fd );
+        return -1;
+    }
+
+    return fd;
+}
+
+static uint8_t *
+getroute( int fd, unsigned int * buflen )
+{
+    void             * buf;
+    unsigned int       len;
+    ssize_t            res;
+    struct sockaddr_nl snl;
+    socklen_t          slen;
+
+    len = 8192;
+    buf = calloc( 1, len );
+    if( NULL == buf )
+    {
+        *buflen = 0;
+        return NULL;
+    }
+
+    for( ;; )
+    {
+        bzero( &snl, sizeof( snl ) );
+        slen = sizeof( snl );
+        res = recvfrom( fd, buf, len, 0, (struct sockaddr *) &snl, &slen );
+        if( 0 > res )
+        {
+            if( EAGAIN != sockerrno )
+            {
+                tr_err( "failed to read from routing socket (%s)",
+                        strerror( sockerrno ) );
+            }
+            free( buf );
+            *buflen = 0;
+            return NULL;
+        }
+        if( slen < sizeof( snl ) || AF_NETLINK != snl.nl_family )
+        {
+            tr_err( "bad address" );
+            free( buf );
+            *buflen = 0;
+            return NULL;
+        }
+
+        if( 0 == snl.nl_pid )
+        {
+            break;
+        }
+    }
+
+    *buflen = res;
+
+    return buf;
+}
+
+static int
+parseroutes( uint8_t * buf, unsigned int len, struct in_addr * addr )
+{
+    struct nlmsghdr * nlm;
+    struct nlmsgerr * nle;
+    struct rtmsg    * rtm;
+    struct rtattr   * rta;
+    int               rtalen;
+    struct in_addr    gw, dst;
+
+    nlm = ( struct nlmsghdr * ) buf;
+    while( NLMSG_OK( nlm, len ) )
+    {
+        gw.s_addr = INADDR_ANY;
+        dst.s_addr = INADDR_ANY;
+        if( NLMSG_ERROR == nlm->nlmsg_type )
+        {
+            nle = (struct nlmsgerr *) NLMSG_DATA( nlm );
+            if( NLMSG_LENGTH( NLMSG_ALIGN( sizeof( struct nlmsgerr ) ) ) >
+                nlm->nlmsg_len )
+            {
+                tr_err( "truncated netlink error" );
+            }
+            else
+            {
+                tr_err( "netlink error (%s)", strerror( nle->error ) );
+            }
+            return 1;
+        }
+        else if( RTM_NEWROUTE == nlm->nlmsg_type && SEQNUM == nlm->nlmsg_seq &&
+                 getpid() == (pid_t) nlm->nlmsg_pid &&
+                 NLMSG_LENGTH( sizeof( struct rtmsg ) ) <= nlm->nlmsg_len )
+        {
+            rtm = NLMSG_DATA( nlm );
+            rta = RTM_RTA( rtm );
+            rtalen = RTM_PAYLOAD( nlm );
+
+            while( RTA_OK( rta, rtalen ) )
+            {
+                if( sizeof( struct in_addr ) <= RTA_PAYLOAD( rta ) )
+                {
+                    switch( rta->rta_type )
+                    {
+                        case RTA_GATEWAY:
+                            memcpy( &gw, RTA_DATA( rta ), sizeof( gw ) );
+                            break;
+                        case RTA_DST:
+                            memcpy( &dst, RTA_DATA( rta ), sizeof( dst ) );
+                            break;
+                    }
+                }
+                rta = RTA_NEXT( rta, rtalen );
+            }
+        }
+
+        if( INADDR_NONE != gw.s_addr && INADDR_ANY != gw.s_addr &&
+            INADDR_ANY == dst.s_addr )
+        {
+            *addr = gw;
+            return 0;
+        }
+
+        nlm = NLMSG_NEXT( nlm, len );
+    }
+
+    return 1;
+}
+
+#else /* not BSD or Linux */
+
+int
+tr_getDefaultRoute( struct in_addr * addr UNUSED )
+{
+    tr_inf( "don't know how to get default route on this platform" );
+    return 1;
+}
+
+#endif

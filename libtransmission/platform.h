@@ -21,7 +21,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
-
 #ifndef TR_PLATFORM_H
 #define TR_PLATFORM_H
 
@@ -48,5 +47,9 @@ void         tr_condFree      ( tr_cond * );
 void         tr_condSignal    ( tr_cond * );
 void         tr_condBroadcast ( tr_cond * );
 void         tr_condWait      ( tr_cond *, tr_lock * );
+
+struct in_addr; /* forward declaration to calm gcc down */
+int
+tr_getDefaultRoute( struct in_addr * addr );
 
 #endif
