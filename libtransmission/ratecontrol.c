@@ -141,9 +141,6 @@ tr_rcTransferred( tr_ratecontrol * r, size_t size )
 {
     uint64_t now;
 
-    if( size < 100 ) /* don't count small messages */
-        return;
-    
     tr_lockLock( (tr_lock*)r->lock );
 
     now = tr_date ();
