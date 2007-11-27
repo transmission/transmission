@@ -55,9 +55,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
-/* time in seconds to wait for torrents to stop when exiting */
-#define TRACKER_EXIT_TIMEOUT    10
-
 /* interval in milliseconds to update the torrent list display */
 #define UPDATE_INTERVAL         1000
 
