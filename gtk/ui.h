@@ -23,6 +23,7 @@ const char * fallback_ui_file =
 "    </menu>\n"
 "    <menu action='help-menu'>\n"
 "      <menuitem action='toggle-message-log'/>\n"
+"      <menuitem action='show-stats'/>\n"
 "      <separator/>\n"
 "      <menuitem action='show-about-dialog'/>\n"
 "    </menu>\n"

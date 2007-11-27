@@ -41,6 +41,7 @@
 #include "ipc.h"
 #include "makemeta-ui.h"
 #include "msgwin.h"
+#include "stats.h"
 #include "torrent-inspector.h"
 #include "tr_cell_renderer_progress.h"
 #include "tr_core.h"
@@ -697,10 +698,8 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
 void
 setpex( tr_torrent * tor, void * arg )
 {
-    gboolean * val;
-
-    val = arg;
-    tr_torrentDisablePex( tor, !(*val) );
+    const gboolean * val = arg;
+    tr_torrentDisablePex( tor, !*val );
 }
 
 gboolean
@@ -859,6 +858,12 @@ doAction ( const char * action_name, gpointer user_data )
     if (!strcmp (action_name, "add-torrent"))
     {
         makeaddwind( data->wind, data->core );
+    }
+    else if (!strcmp (action_name, "show-stats"))
+    {
+        GtkWidget * dialog = stats_dialog_create( data->wind,
+                                                  data->core );
+        gtk_widget_show( dialog );
     }
     else if (!strcmp (action_name, "start-torrent"))
     {

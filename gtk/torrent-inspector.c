@@ -664,7 +664,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
     gtk_widget_set_usize (w, 0u, GUI_PAD);
     gtk_box_pack_start (GTK_BOX(vbox), w, FALSE, FALSE, 0);
 
-    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Peers"));
+    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Connected Peers"));
     l = gtk_label_new (NULL);
     gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
     gtk_label_set_markup (GTK_LABEL(l), name);

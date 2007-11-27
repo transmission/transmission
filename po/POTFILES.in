@@ -9,6 +9,7 @@ gtk/ipc.c
 gtk/main.c
 gtk/makemeta-ui.c
 gtk/msgwin.c
+gtk/stats.c
 gtk/torrent-inspector.c
 gtk/tr_cell_renderer_progress.c
 gtk/tr_core.c

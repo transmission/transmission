@@ -92,8 +92,8 @@ formatname( GtkTreeViewColumn * col UNUSED, GtkCellRenderer * rend,
     }
     else if( TR_STATUS_DOWNLOAD & status )
     {
-        bottom = g_strdup_printf( ngettext( "Downloading from %i of %i peer",
-                                            "Downloading from %i of %i peers",
+        bottom = g_strdup_printf( ngettext( "Downloading from %i of %i connections",
+                                            "Downloading from %i of %i connections",
                                             tpeers ), dpeers, tpeers );
     }
     else
