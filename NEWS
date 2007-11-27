@@ -5,6 +5,8 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + UPnP now performed by MiniUPnP
    + Option to prefer not using encryption
    + Restore `scrape' feature in the command-line interface client
+   + Fix memory corruption error on startup
+   + Fix speed 0.90 speed limit bugs
 - OS X:
    + Statistics window
    + Leopard: Time Machine will ignore incomplete downloads
