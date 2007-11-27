@@ -353,22 +353,37 @@ render_status( GtkTreeViewColumn  * column UNUSED,
                GtkTreeIter        * iter,
                gpointer             data UNUSED )
 {
+    GString * gstr = g_string_new( NULL );
     int status;
-    const char * text;
     gtk_tree_model_get( tree_model, iter, PEER_COL_STATUS, &status, -1 );
-    switch( status )
+
+    if( status & TR_PEER_STATUS_HANDSHAKE )
     {
-        case TR_PEER_STATUS_HANDSHAKE:            text = _( "Handshaking" ); break;
-        case TR_PEER_STATUS_PEER_IS_CHOKED:       text = _( "Peer is Choked" ); break;
-        case TR_PEER_STATUS_CLIENT_IS_CHOKED:     text = _( "Choked" ); break;
-        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked & Interested" ); break;
-        case TR_PEER_STATUS_READY:                text = _( "Ready" ); break;
-        case TR_PEER_STATUS_REQUEST_SENT:         text = _( "Request Sent" ); break;
-        case TR_PEER_STATUS_ACTIVE           :    text = _( "Active" ); break;
-        case TR_PEER_STATUS_ACTIVE_AND_CHOKED:    text = _( "Active & Choked" ); break;
-        default:                                  text = "BUG"; break;
+        g_string_append( gstr, _("Handshaking") );
     }
-    g_object_set (renderer, "text", text, NULL);
+    else
+    {
+        if( status & TR_PEER_STATUS_CLIENT_IS_SENDING )
+            g_string_append( gstr, _("Uploading to peer") );
+        else if( status & TR_PEER_STATUS_PEER_IS_INTERESTED )
+            g_string_append( gstr, _("Peer wants our data") );
+        else if( status & TR_PEER_STATUS_PEER_IS_CHOKED )
+            g_string_append( gstr, _("Refusing to send data to peer") );
+
+        g_string_append( gstr, " - " );
+
+        if( status & TR_PEER_STATUS_PEER_IS_SENDING )
+            g_string_append( gstr, _("Downloading from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_SENT_REQUEST )
+            g_string_append( gstr, _("Requesting data from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_IS_INTERESTED )
+            g_string_append( gstr, _("Waiting to request data from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_IS_CHOKED )
+            g_string_append( gstr, _("Peer will not send us data") );
+    }
+
+    g_object_set( renderer, "text", gstr->str, NULL );
+    g_string_free( gstr, TRUE );
 }
 
 static void
@@ -525,7 +540,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
                          PEER_COL_IS_ENCRYPTED,
                          PEER_COL_UPLOAD_RATE,
                          PEER_COL_DOWNLOAD_RATE
-#if 0
+#if 1
                          , PEER_COL_STATUS
 #endif
                        };

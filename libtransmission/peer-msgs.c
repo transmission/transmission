@@ -143,6 +143,9 @@ struct tr_peermsgs
     time_t clientSentPexAt;
     time_t clientSentAnythingAt;
 
+    time_t clientSentPieceDataAt;
+    time_t peerSentPieceDataAt;
+
     unsigned int peerSentBitfield         : 1;
     unsigned int peerSupportsPex          : 1;
     unsigned int clientSentLtepHandshake  : 1;
@@ -1033,6 +1036,7 @@ clientGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->downloadedCur += byteCount;
+    msgs->peerSentPieceDataAt = time( NULL );
     msgs->info->pieceDataActivityDate = time( NULL );
     msgs->info->credit += (int)(byteCount * SWIFT_REPAYMENT_RATIO);
     tr_rcTransferred( msgs->info->rcToClient, byteCount );
@@ -1257,6 +1261,7 @@ peerGotBytes( tr_peermsgs * msgs, uint32_t byteCount )
     tr_torrent * tor = msgs->torrent;
     tor->activityDate = tr_date( );
     tor->uploadedCur += byteCount;
+    msgs->clientSentPieceDataAt = time( NULL );
     msgs->info->pieceDataActivityDate = time( NULL );
     msgs->info->credit -= byteCount;
     tr_rcTransferred( msgs->info->rcToPeer, byteCount );
@@ -1502,29 +1507,35 @@ popNextRequest( tr_peermsgs * msgs )
 static void
 updatePeerStatus( tr_peermsgs * msgs )
 {
+    const time_t now = time( NULL );
     tr_peer * peer = msgs->info;
+    tr_peer_status status = 0;
 
     if( !msgs->peerSentBitfield )
-        peer->status = TR_PEER_STATUS_HANDSHAKE;
+        status |= TR_PEER_STATUS_HANDSHAKE;
 
-    else if( ( time(NULL) - peer->pieceDataActivityDate ) < 3 )
-        peer->status = peer->clientIsChoked
-                       ? TR_PEER_STATUS_ACTIVE_AND_CHOKED
-                       : TR_PEER_STATUS_ACTIVE;
+    if( msgs->info->peerIsChoked )
+        status |= TR_PEER_STATUS_PEER_IS_CHOKED;
 
-    else if( peer->peerIsChoked )
-        peer->status = TR_PEER_STATUS_PEER_IS_CHOKED;
+    if( msgs->info->peerIsInterested )
+        status |= TR_PEER_STATUS_PEER_IS_INTERESTED;
 
-    else if( peer->clientIsChoked )
-        peer->status = peer->clientIsInterested 
-                       ? TR_PEER_STATUS_CLIENT_IS_INTERESTED
-                       : TR_PEER_STATUS_CLIENT_IS_CHOKED;
+    if( msgs->info->clientIsChoked )
+        status |= TR_PEER_STATUS_CLIENT_IS_CHOKED;
 
-    else if( msgs->clientAskedFor != NULL )
-        peer->status = TR_PEER_STATUS_REQUEST_SENT;
+    if( msgs->info->clientIsInterested )
+        status |= TR_PEER_STATUS_CLIENT_IS_INTERESTED;
 
-    else
-        peer->status = TR_PEER_STATUS_READY;
+    if( ( now - msgs->clientSentPieceDataAt ) < 3 )
+        status |= TR_PEER_STATUS_CLIENT_IS_SENDING;
+
+    if( ( now - msgs->peerSentPieceDataAt ) < 3 )
+        status |= TR_PEER_STATUS_PEER_IS_SENDING;
+
+    if( msgs->clientAskedFor != NULL )
+        status |= TR_PEER_STATUS_CLIENT_SENT_REQUEST;
+
+    peer->status = status;
 }
 
 static int

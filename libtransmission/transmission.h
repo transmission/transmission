@@ -713,14 +713,16 @@ struct tr_file_stat
 
 typedef enum
 {
-    TR_PEER_STATUS_HANDSHAKE,
-    TR_PEER_STATUS_PEER_IS_CHOKED,
-    TR_PEER_STATUS_CLIENT_IS_CHOKED,
-    TR_PEER_STATUS_CLIENT_IS_INTERESTED,
-    TR_PEER_STATUS_READY,
-    TR_PEER_STATUS_ACTIVE_AND_CHOKED,
-    TR_PEER_STATUS_REQUEST_SENT,
-    TR_PEER_STATUS_ACTIVE
+    TR_PEER_STATUS_HANDSHAKE             = (1<<0), /* we're handshaking with peer */
+
+    TR_PEER_STATUS_PEER_IS_SENDING       = (1<<1), /* peer is sending data to us */
+    TR_PEER_STATUS_PEER_IS_INTERESTED    = (1<<2), /* we have data the peer wants */
+    TR_PEER_STATUS_PEER_IS_CHOKED        = (1<<3), /* we refuse to send data to the peer */
+
+    TR_PEER_STATUS_CLIENT_IS_SENDING     = (1<<4), /* we're sending data to the peer */
+    TR_PEER_STATUS_CLIENT_SENT_REQUEST   = (1<<5), /* we've sent the peer a request */
+    TR_PEER_STATUS_CLIENT_IS_INTERESTED  = (1<<6), /* peer has data that we want */
+    TR_PEER_STATUS_CLIENT_IS_CHOKED      = (1<<7), /* peer refuses to send data to us */
 }
 tr_peer_status;
 
