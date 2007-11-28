@@ -6,14 +6,14 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Option to prefer not using encryption
    + Restore `scrape' feature in the command-line interface client
    + Fix memory corruption error on startup
-   + Fix speed 0.90 speed limit bugs
+   + Fix 0.90 speed limit bugs
 - OS X:
    + Statistics window
    + Leopard: Time Machine will ignore incomplete downloads
    + Pieces Bar (return of Advanced Bar)
    + Availability Bar (overlay on regular bar)
    + Display remaining time for seeding transfers
-   + Option to sort by total activity
+   + Sort by total activity
 
 0.94 (2007/11/25)
 - All Platforms:

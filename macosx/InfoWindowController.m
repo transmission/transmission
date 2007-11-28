@@ -862,34 +862,36 @@ typedef enum
                 break;
         }
         
-        switch ([[peer objectForKey: @"Status"] intValue]) 
-        { 
-            case TR_PEER_STATUS_HANDSHAKE:
-                [components addObject: NSLocalizedString(@"Handshaking", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_PEER_IS_CHOKED:
-                [components addObject: NSLocalizedString(@"Peer is Choked", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_CLIENT_IS_CHOKED:
-                [components addObject: NSLocalizedString(@"Choked", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_CLIENT_IS_INTERESTED:
-                [components addObject: NSLocalizedString(@"Choked & Interested", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_READY:
-                [components addObject: NSLocalizedString(@"Ready", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_REQUEST_SENT:
-                [components addObject: NSLocalizedString(@"Request Sent", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_ACTIVE:
-                [components addObject: NSLocalizedString(@"Active", "peer -> status")];
-                break;
-            case TR_PEER_STATUS_ACTIVE_AND_CHOKED:
-                [components addObject: NSLocalizedString(@"Active & Interested", "peer -> status")];
-                break;
+        int status = [[peer objectForKey: @"Status"] intValue];
+        if (status & TR_PEER_STATUS_HANDSHAKE)
+            [components addObject: NSLocalizedString(@"Handshaking", "peer -> status")];
+        else
+        {
+            NSString * firstString;
+            if (status & TR_PEER_STATUS_CLIENT_IS_SENDING)
+                firstString = NSLocalizedString(@"Uploading to peer", "peer -> status");
+            else if (status & TR_PEER_STATUS_PEER_IS_INTERESTED)
+                firstString = NSLocalizedString(@"Peer wants our data", "peer -> status");
+            else if (status & TR_PEER_STATUS_PEER_IS_CHOKED)
+                firstString = NSLocalizedString(@"Refusing to send data to peer", "peer -> status");
+            else
+                firstString = @"";
+            
+            NSString * secondString;
+            if (status & TR_PEER_STATUS_PEER_IS_SENDING)
+                secondString = NSLocalizedString(@"Downloading from peer", "peer -> status");
+            else if (status & TR_PEER_STATUS_CLIENT_SENT_REQUEST)
+                secondString = NSLocalizedString(@"Requesting data from peer", "peer -> status");
+            else if (status & TR_PEER_STATUS_CLIENT_IS_INTERESTED)
+                secondString = NSLocalizedString(@"Waiting to request data from peer", "peer -> status");
+            else if (status & TR_PEER_STATUS_CLIENT_IS_CHOKED)
+                secondString = NSLocalizedString(@"Peer will not send us data", "peer -> status");
+            else
+                secondString = @"";
+            
+            [components addObject: [NSString stringWithFormat: @"%@ - %@", firstString, secondString]];
         }
-        
+                
         return [components componentsJoinedByString: @"\n"];
     }
     return nil;
