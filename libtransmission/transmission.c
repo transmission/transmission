@@ -347,10 +347,12 @@ deadlineReached( const uint64_t deadline )
     return tr_date( ) >= deadline;
 }
 
+#define SHUTDOWN_MAX_SECONDS 30
+
 void
 tr_close( tr_handle * h )
 {
-    const int maxwait_msec = 6 * 1000;
+    const int maxwait_msec = SHUTDOWN_MAX_SECONDS * 1000;
     const uint64_t deadline = tr_date( ) + maxwait_msec;
 
     tr_runInEventThread( h, tr_closeImpl, h );

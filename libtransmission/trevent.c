@@ -63,7 +63,6 @@ static int writes = 0;
 
 enum mode
 {
-    TR_EV_EVHTTP_MAKE_REQUEST,
     TR_EV_TIMER_ADD,
     TR_EV_EXEC
 };
@@ -128,11 +127,6 @@ pumpList( int i UNUSED, short s UNUSED, void * veh )
             case TR_EV_TIMER_ADD:
                 timeout_add( &cmd->timer->event, &cmd->timer->tv );
                 ++eh->timerCount;
-                break;
-
-            case TR_EV_EVHTTP_MAKE_REQUEST:
-                evhttp_make_request( cmd->evcon, cmd->req, cmd->evtype, cmd->uri );
-                tr_free( cmd->uri );
                 break;
 
             case TR_EV_EXEC:
@@ -240,28 +234,6 @@ int
 tr_amInEventThread( struct tr_handle * handle )
 {
     return tr_amInThread( handle->events->thread );
-}
-
-
-void
-tr_evhttp_make_request (tr_handle                 * handle,
-                        struct evhttp_connection  * evcon,
-                        struct evhttp_request     * req,
-                        enum   evhttp_cmd_type      type,
-                        char                      * uri)
-{
-    if( tr_amInThread( handle->events->thread ) ) {
-        evhttp_make_request( evcon, req, type, uri );
-        tr_free( uri );
-    } else {
-        struct tr_event_command * cmd = tr_new0( struct tr_event_command, 1 );
-        cmd->mode = TR_EV_EVHTTP_MAKE_REQUEST;
-        cmd->evcon = evcon;
-        cmd->req = req;
-        cmd->evtype = type;
-        cmd->uri = uri;
-        pushList( handle->events, cmd );
-    }
 }
 
 /**

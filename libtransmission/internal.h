@@ -195,6 +195,7 @@ struct tr_handle
     uint8_t                    isClosed;
 
     struct tr_stats_handle   * sessionStats;
+    struct tr_tracker_handle * tracker;
 };
 
 void tr_globalLock       ( struct tr_handle * );

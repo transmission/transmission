@@ -31,12 +31,6 @@ struct evhttp_request;
 struct evhttp_connection;
 struct bufferevent;
 
-void tr_evhttp_make_request (struct tr_handle          * tr_handle,
-                             struct evhttp_connection  * evcon,
-                             struct evhttp_request     * req,
-                             enum evhttp_cmd_type        type,
-                             char                      * uri);
-
 /**
 ***
 **/
