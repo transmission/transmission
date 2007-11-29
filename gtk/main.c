@@ -431,9 +431,22 @@ quitThreadFunc( gpointer gdata )
     return NULL;
 }
 
+/* since there are no buttons in the dialog, gtk tries to
+ * select one of the labels, which looks ugly... so force
+ * the dialog's primary and secondary labels to be unselectable */
+static void
+deselectLabels( GtkWidget * w, gpointer unused UNUSED )
+{
+    if( GTK_IS_LABEL( w ) )
+        gtk_label_set_selectable( GTK_LABEL(w), FALSE );
+    else if( GTK_IS_CONTAINER( w ) )
+        gtk_container_foreach( GTK_CONTAINER(w), deselectLabels, NULL );
+}
+
 static void
 wannaquit( void * vdata )
 {
+    GtkWidget * w;
     struct cbdata * cbdata = vdata;
 
     /* stop the update timer */
@@ -442,9 +455,21 @@ wannaquit( void * vdata )
         cbdata->timer = 0;
     }
 
+    w = gtk_message_dialog_new( cbdata->wind,
+                                GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_INFO,
+                                GTK_BUTTONS_NONE,
+                                _("Closing Connections" ) );
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(w),
+                                              _("Sending upload/download totals to tracker..." ) );
+    gtk_container_foreach( GTK_CONTAINER(GTK_DIALOG(w)->vbox), deselectLabels, NULL );
+    gtk_widget_show( w );
+
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
     gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
+
+    
 
     /* shut down libT */
     g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
