@@ -463,7 +463,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             return NSTerminateLater;
         }
     }
-
+    
     return NSTerminateNow;
 }
 
@@ -516,6 +516,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
     
+    //show quit window
+    QuittingWindowController * quitController = [[QuittingWindowController alloc] init];
+    [quitController showWindow: self];
+    
     //save history
     [self updateTorrentHistory];
     
@@ -524,8 +528,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //clear badge
     [fBadger clearBadge];
-    
-    [[[QuittingWindowController alloc] init] showWindow: self];
     
     //remaining calls the same as dealloc 
     [fInfoController release];

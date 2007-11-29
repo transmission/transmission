@@ -35,6 +35,8 @@
 - (void) awakeFromNib
 {
     [fMessageField setStringValue: [NSLocalizedString(@"Shutting Down", "Quitting Window -> message") stringByAppendingEllipsis]];
+    
+    [fProgressBar setUsesThreadedAnimation: YES];
     [fProgressBar startAnimation: nil];
     
     [[self window] center];
