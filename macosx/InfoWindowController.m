@@ -864,28 +864,28 @@ typedef enum
         
         int status = [[peer objectForKey: @"Status"] intValue];
         if (status & TR_PEER_STATUS_HANDSHAKE)
-            [components addObject: NSLocalizedString(@"Handshaking", "peer -> status")];
+            [components addObject: NSLocalizedString(@"Handshaking", "Inspector -> peer -> status")];
         else
         {
             NSString * firstString;
             if (status & TR_PEER_STATUS_CLIENT_IS_SENDING)
-                firstString = NSLocalizedString(@"Uploading to peer", "peer -> status");
+                firstString = NSLocalizedString(@"Uploading to peer", "Inspector -> peer -> status");
             else if (status & TR_PEER_STATUS_PEER_IS_INTERESTED)
-                firstString = NSLocalizedString(@"Peer wants our data", "peer -> status");
+                firstString = NSLocalizedString(@"Peer wants our data", "Inspector -> peer -> status");
             else if (status & TR_PEER_STATUS_PEER_IS_CHOKED)
-                firstString = NSLocalizedString(@"Refusing to send data to peer", "peer -> status");
+                firstString = NSLocalizedString(@"Refusing to send data to peer", "Inspector -> peer -> status");
             else
                 firstString = @"";
             
             NSString * secondString;
             if (status & TR_PEER_STATUS_PEER_IS_SENDING)
-                secondString = NSLocalizedString(@"Downloading from peer", "peer -> status");
+                secondString = NSLocalizedString(@"Downloading from peer", "Inspector -> peer -> status");
             else if (status & TR_PEER_STATUS_CLIENT_SENT_REQUEST)
-                secondString = NSLocalizedString(@"Requesting data from peer", "peer -> status");
+                secondString = NSLocalizedString(@"Requesting data from peer", "Inspector -> peer -> status");
             else if (status & TR_PEER_STATUS_CLIENT_IS_INTERESTED)
-                secondString = NSLocalizedString(@"Waiting to request data from peer", "peer -> status");
+                secondString = NSLocalizedString(@"Waiting to request data from peer", "Inspector -> peer -> status");
             else if (status & TR_PEER_STATUS_CLIENT_IS_CHOKED)
-                secondString = NSLocalizedString(@"Peer will not send us data", "peer -> status");
+                secondString = NSLocalizedString(@"Peer will not send us data", "Inspector -> peer -> status");
             else
                 secondString = @"";
             

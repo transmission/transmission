@@ -31,6 +31,7 @@
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "AboutWindowController.h"
+#import "ButtonToolbarItem.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -2564,16 +2565,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) doNothing: (id) sender {}
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) t itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
-    NSToolbarItem * item = [[NSToolbarItem alloc] initWithItemIdentifier: ident];
-
+    ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];
+    
+    NSButton * button = [[NSButton alloc] initWithFrame: NSZeroRect];
+    [item setView: button];
+    
+    [button setBezelStyle: NSTexturedRoundedBezelStyle];
+    [button setStringValue: @""];
+    
+    NSSize buttonSize = NSMakeSize(35.0, 25.0);
+    [item setMinSize: buttonSize];
+    [item setMaxSize: buttonSize];
+    
+    NSImage * image;
+    
     if ([ident isEqualToString: TOOLBAR_CREATE])
     {
         [item setLabel: NSLocalizedString(@"Create", "Create toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Create.png"]];
+        image = [NSImage imageNamed: @"Create.png"];
         [item setTarget: self];
         [item setAction: @selector(createFile:)];
         [item setAutovalidates: NO];
@@ -2583,7 +2596,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Open.png"]];
+        image = [NSImage imageNamed: @"Open.png"];
         [item setTarget: self];
         [item setAction: @selector(openShowSheet:)];
         [item setAutovalidates: NO];
@@ -2593,7 +2606,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Remove", "Remove toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Remove.png"]];
+        image = [NSImage imageNamed: @"Remove.png"];
         [item setTarget: self];
         [item setAction: @selector(removeNoDelete:)];
     }
@@ -2602,7 +2615,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Inspector", "Inspector toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Info.png"]];
+        image = [NSImage imageNamed: @"Info.png"];
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
         [item setAutovalidates: NO];
@@ -2612,7 +2625,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Pause All", "Pause All toolbar item -> label")];
         [item setPaletteLabel: [item label]];
         [item setToolTip: NSLocalizedString(@"Pause all transfers", "Pause All toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"PauseAll.png"]];
+        image = [NSImage imageNamed: @"PauseAll.png"];
         [item setTarget: self];
         [item setAction: @selector(stopAllTorrents:)];
     }
@@ -2621,7 +2634,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Resume All", "Resume All toolbar item -> label")];
         [item setPaletteLabel: [item label]];
         [item setToolTip: NSLocalizedString(@"Resume all transfers", "Resume All toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"ResumeAll.png"]];
+        image = [NSImage imageNamed: @"ResumeAll.png"];
         [item setTarget: self];
         [item setAction: @selector(resumeAllTorrents:)];
     }
@@ -2630,7 +2643,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Pause", "Pause toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Pause Selected", "Pause toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Pause selected transfers", "Pause toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
+        image = [NSImage imageNamed: @"PauseSelected.png"];
         [item setTarget: self];
         [item setAction: @selector(stopSelectedTorrents:)];
     }
@@ -2639,7 +2652,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Resume", "Resume toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Resume Selected", "Resume toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Resume selected transfers", "Resume toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
+        image = [NSImage imageNamed: @"ResumeSelected.png"];
         [item setTarget: self];
         [item setAction: @selector(resumeSelectedTorrents:)];
     }
@@ -2648,21 +2661,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setLabel: NSLocalizedString(@"Filter", "Filter toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"Filter.png"]];
+        image = [NSImage imageNamed: @"Filter.png"];
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
         [item setAutovalidates: NO];
     }
     else
     {
+        [button release];
         [item release];
         return nil;
     }
+    
+    [image setScalesWhenResized: YES];
+    [image setSize: NSMakeSize(16.0, 16.0)];
+    [button setImage: image];
+    
+    [button release];
 
     return [item autorelease];
 }
 
-- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) t
+- (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
@@ -2674,7 +2694,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             NSToolbarCustomizeToolbarItemIdentifier, nil];
 }
 
-- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) t
+- (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
