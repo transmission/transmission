@@ -285,7 +285,7 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_PORT, peer->port,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
-                      PEER_COL_PROGRESS, (int)(100.0*peer->progress + 0.5),
+                      PEER_COL_PROGRESS, (int)(100.0*peer->progress),
                       PEER_COL_IS_DOWNLOADING, peer->isDownloading,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
                       PEER_COL_IS_UPLOADING, peer->isUploading,
@@ -1169,7 +1169,7 @@ updateprogress( GtkTreeModel   * model,
                                               FC_INDEX, &index,
                                               -1 );
             g_assert( 0 <= index );
-            percent = (int)(fileStats[index].progress * 100.0 + 0.5); /* [0...100] */
+            percent = (int)(fileStats[index].progress * 100.0); /* [0...100] */
             subGot = (guint64)(subTotal * percent/100.0);
         }
 
@@ -1179,10 +1179,10 @@ updateprogress( GtkTreeModel   * model,
         /* why not just set it every time?
            because that causes the "priorities" combobox to pop down */
         gtk_tree_model_get (model, &iter, FC_PROG, &oldProg, -1);
-        newProg = (int)(100.0*subGot/subTotal + 0.5);
+        newProg = (int)(100.0*subGot/subTotal);
         if (oldProg != newProg)
           gtk_tree_store_set (store, &iter,
-                              FC_PROG, (int)(100.0*subGot/subTotal + 0.5), -1);
+                              FC_PROG, (int)(100.0*subGot/subTotal), -1);
 
         gotSize += subGot;
         totalSize += subTotal;

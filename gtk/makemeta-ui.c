@@ -76,7 +76,7 @@ refresh_cb ( gpointer user_data )
     denom = ui->builder->pieceCount ? ui->builder->pieceCount : 1;
     fraction = (double)ui->builder->pieceIndex / denom;
     gtk_progress_bar_set_fraction( p, fraction );
-    g_snprintf( buf, sizeof(buf), "%s (%d%%)", ui->torrent_name, (int)(fraction*100 + 0.5));
+    g_snprintf( buf, sizeof(buf), "%s (%d%%)", ui->torrent_name, (int)(fraction*100));
     gtk_progress_bar_set_text( p, buf );
 
     if( ui->builder->isDone )
