@@ -42,6 +42,7 @@
 #include "ratecontrol.h"
 #include "shared.h"
 #include "stats.h"
+#include "tracker.h"
 #include "trevent.h"
 #include "utils.h"
 
@@ -322,6 +323,8 @@ tr_closeImpl( void * vh )
 {
     tr_handle * h = vh;
     tr_torrent * t;
+
+    tr_trackerShuttingDown( h );
 
     for( t=h->torrentList; t!=NULL; t=t->next )
         tr_torrentClose( t );

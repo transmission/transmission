@@ -620,12 +620,11 @@ struct tr_tracker_request
 };
 
 static void
-freeRequest( struct tr_tracker_request ** req )
+freeRequest( struct tr_tracker_request * req )
 {
-    tr_free( (*req)->address );
-    tr_free( (*req)->uri );
-    tr_free( (*req) );
-    *req = NULL;
+    tr_free( req->address );
+    tr_free( req->uri );
+    tr_free( req );
 }
 
 static void
@@ -752,6 +751,20 @@ ensureGlobalsExist( tr_handle * handle )
     }
 }
 
+static void
+freeRequest2( void * req )
+{
+    freeRequest( req );
+}
+
+void
+tr_trackerShuttingDown( tr_handle * handle )
+{
+    /* since we're shutting down, we don't need to scrape anymore... */
+    if( handle->tracker )
+        tr_list_free( &handle->tracker->scrapeQueue, freeRequest2 );
+}
+
 static int
 maybeFreeGlobals( tr_handle * handle )
 {
@@ -823,7 +836,7 @@ invokeNextInQueue( tr_handle * handle, tr_list ** list )
 {
     struct tr_tracker_request * req = tr_list_pop_front( list );
     invokeRequest( handle, req );
-    freeRequest( &req );
+    freeRequest( req );
 }
 
 static int
