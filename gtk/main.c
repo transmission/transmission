@@ -447,7 +447,9 @@ static void
 wannaquit( void * vdata )
 {
     GtkWidget * w;
+#if GTK_CHECK_VERSION(2,10,0)
     GtkWidget * i;
+#endif
     struct cbdata * cbdata = vdata;
 
     /* stop the update timer */
@@ -461,9 +463,11 @@ wannaquit( void * vdata )
                                 GTK_MESSAGE_INFO,
                                 GTK_BUTTONS_NONE,
                                 _("Closing Connections" ) );
+#if GTK_CHECK_VERSION(2,10,0)
     i = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
     gtk_widget_show( i );
     gtk_message_dialog_set_image( GTK_MESSAGE_DIALOG(w), i );
+#endif
     gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(w),
                                               _("Sending upload/download totals to tracker..." ) );
     gtk_container_foreach( GTK_CONTAINER(GTK_DIALOG(w)->vbox), deselectLabels, NULL );
