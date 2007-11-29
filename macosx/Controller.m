@@ -31,6 +31,7 @@
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "AboutWindowController.h"
+#import "QuittingWindowController.h"
 #import "ButtonToolbarItem.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -523,6 +524,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //clear badge
     [fBadger clearBadge];
+    
+    [[[QuittingWindowController alloc] init] showWindow: self];
     
     //remaining calls the same as dealloc 
     [fInfoController release];
