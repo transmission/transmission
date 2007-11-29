@@ -34,7 +34,9 @@
 
 - (void) awakeFromNib
 {
-    [fMessageField setStringValue: [NSLocalizedString(@"Shutting Down", "Quitting Window -> message") stringByAppendingEllipsis]];
+    [[self window] setTitle: NSLocalizedString(@"Closing Connections", "Quitting window -> title")];
+    [fMessageField setStringValue: [NSLocalizedString(@"Sending upload/download totals to tracker", "Quitting window -> message")
+                                    stringByAppendingEllipsis]];
     
     [fProgressBar setUsesThreadedAnimation: YES];
     [fProgressBar startAnimation: nil];
