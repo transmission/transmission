@@ -65,7 +65,6 @@
 		A200B9B60A22893D007BBB1E /* InfoWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A200B9620A227FD0007BBB1E /* InfoWindow.nib */; };
 		A2085DDC0C53BC74000BC3B7 /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */; };
 		A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A2085E2F0C53C833000BC3B7 /* LICENSE */; };
-		A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A20AB97A0A5C622A004F81FA /* SmallTurtle.png */; };
 		A20B6F6B0C4D842B0034AB1D /* PriorityLow.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */; };
 		A20B6F830C4D8A610034AB1D /* PriorityHigh.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F820C4D8A610034AB1D /* PriorityHigh.png */; };
 		A20B6F8C0C4D90980034AB1D /* PriorityMixed.png in Resources */ = {isa = PBXBuildFile; fileRef = A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */; };
@@ -79,14 +78,17 @@
 		A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */; };
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
-		A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */; };
+		A22BC9A30C5BBCF100F5FB72 /* BottomBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */; };
+		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
+		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
+		A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA50D00D1790079CFED /* TurtleGraphite.png */; };
+		A22D3AAE0D00D22A0079CFED /* ActionPopUp.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */; };
+		A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
 		A2399CCD0CD3852300225B2B /* NSApplicationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */; };
 		A241528B0C0261B8007DD3B4 /* Globe.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB06950BFF484A0095564D /* Globe.png */; };
-		A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */; };
-		A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */; };
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
 		A24621420C769D0900088E81 /* trevent.c in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.c */; };
 		A24872B60C9B6BB9000F5B92 /* Advanced.png in Resources */ = {isa = PBXBuildFile; fileRef = A24872B50C9B6BB9000F5B92 /* Advanced.png */; };
@@ -113,7 +115,6 @@
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */; };
 		A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A28E1DB80CFFD41800E16385 /* BottomBarView.m */; };
-		A28E1E0A0D00555400E16385 /* ActionGear.png in Resources */ = {isa = PBXBuildFile; fileRef = A28E1E090D00555400E16385 /* ActionGear.png */; };
 		A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A28E1E150D00574A00E16385 /* ActionPopUpButton.m */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A29B0C270BD15FEF0006F230 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = A2F8951E0A2D4BA500ED2127 /* Credits.rtf */; };
@@ -396,7 +397,6 @@
 		A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutWindowController.h; path = macosx/AboutWindowController.h; sourceTree = "<group>"; };
 		A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutWindowController.m; path = macosx/AboutWindowController.m; sourceTree = "<group>"; };
 		A2085E2F0C53C833000BC3B7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		A20AB97A0A5C622A004F81FA /* SmallTurtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SmallTurtle.png; path = macosx/Images/SmallTurtle.png; sourceTree = "<group>"; };
 		A20B6F6A0C4D842B0034AB1D /* PriorityLow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityLow.png; path = macosx/Images/PriorityLow.png; sourceTree = "<group>"; };
 		A20B6F820C4D8A610034AB1D /* PriorityHigh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityHigh.png; path = macosx/Images/PriorityHigh.png; sourceTree = "<group>"; };
 		A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PriorityMixed.png; path = macosx/Images/PriorityMixed.png; sourceTree = "<group>"; };
@@ -413,7 +413,12 @@
 		A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuSpeedToDisplayLimitTransformer.m; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
-		A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBorder.png; path = macosx/Images/BottomBorder.png; sourceTree = "<group>"; };
+		A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBack.png; path = macosx/Images/BottomBack.png; sourceTree = "<group>"; };
+		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
+		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
+		A22D3AA50D00D1790079CFED /* TurtleGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleGraphite.png; path = macosx/Images/TurtleGraphite.png; sourceTree = "<group>"; };
+		A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionPopUp.png; path = macosx/Images/ActionPopUp.png; sourceTree = "<group>"; };
+		A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBackInactive.png; path = macosx/Images/BottomBackInactive.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
 		A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSMenuAdditions.m; path = macosx/NSMenuAdditions.m; sourceTree = "<group>"; };
@@ -421,8 +426,6 @@
 		A2385DD30BFE06C800B24EF6 /* DragOverlayWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayWindow.h; path = macosx/DragOverlayWindow.h; sourceTree = "<group>"; };
 		A2399CCB0CD3852300225B2B /* NSApplicationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSApplicationAdditions.h; path = macosx/NSApplicationAdditions.h; sourceTree = "<group>"; };
 		A2399CCC0CD3852300225B2B /* NSApplicationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSApplicationAdditions.m; path = macosx/NSApplicationAdditions.m; sourceTree = "<group>"; };
-		A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonBlue.png; path = macosx/Images/SpeedLimitButtonBlue.png; sourceTree = "<group>"; };
-		A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SpeedLimitButtonGraphite.png; path = macosx/Images/SpeedLimitButtonGraphite.png; sourceTree = "<group>"; };
 		A24621350C769CF400088E81 /* trevent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trevent.h; path = libtransmission/trevent.h; sourceTree = "<group>"; };
 		A24621360C769CF400088E81 /* trevent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = trevent.c; path = libtransmission/trevent.c; sourceTree = "<group>"; };
 		A24872B50C9B6BB9000F5B92 /* Advanced.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Advanced.png; path = macosx/Images/Advanced.png; sourceTree = "<group>"; };
@@ -472,7 +475,6 @@
 		A28E1DB80CFFD41800E16385 /* BottomBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BottomBarView.m; path = macosx/BottomBarView.m; sourceTree = "<group>"; };
 		A28E1DD50CFFD8A700E16385 /* BottomBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BottomBarView.h; path = macosx/BottomBarView.h; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
-		A28E1E090D00555400E16385 /* ActionGear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionGear.png; path = macosx/Images/ActionGear.png; sourceTree = "<group>"; };
 		A28E1E140D00574A00E16385 /* ActionPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ActionPopUpButton.h; path = macosx/ActionPopUpButton.h; sourceTree = "<group>"; };
 		A28E1E150D00574A00E16385 /* ActionPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ActionPopUpButton.m; path = macosx/ActionPopUpButton.m; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
@@ -850,7 +852,6 @@
 				A2F151170CD438A4001F3B0E /* GreenDot.png */,
 				A2EF7DEB0C96297400FA9811 /* PurpleDot.png */,
 				A2BC19840CA9AF5A00DD302A /* CompleteCheck.png */,
-				A20AB97A0A5C622A004F81FA /* SmallTurtle.png */,
 				A2D0E0480A54A97C003C72CF /* Bandwidth.png */,
 				A21DFF0F0A292B2B007C5F76 /* Transfers.png */,
 				A24872B50C9B6BB9000F5B92 /* Advanced.png */,
@@ -861,9 +862,12 @@
 				A2E9AA750C249AF400085DCF /* Create.png */,
 				A2F011980C27418800576FC0 /* CreateLarge.png */,
 				4DF7500908A103AD007B0D70 /* Remove.png */,
+				A22D3AA30D00D1790079CFED /* Turtle.png */,
+				A22D3AA40D00D1790079CFED /* TurtleBlue.png */,
+				A22D3AA50D00D1790079CFED /* TurtleGraphite.png */,
 				A277DA090C693D9C00DA2CD4 /* ActionOn.png */,
 				A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */,
-				A28E1E090D00555400E16385 /* ActionGear.png */,
+				A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */,
 				35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */,
 				35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */,
 				4D6DAAC4090CE00500F43C22 /* RevealOff.png */,
@@ -880,9 +884,8 @@
 				4DE5CCB90981D27700BE280E /* PauseAll.png */,
 				A25FCDDD0A37695F002BCBBE /* PauseSelected.png */,
 				A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */,
-				A22BC9A20C5BBCF100F5FB72 /* BottomBorder.png */,
-				A246004F0A6DCE6600D19088 /* SpeedLimitButtonBlue.png */,
-				A24600500A6DCE6600D19088 /* SpeedLimitButtonGraphite.png */,
+				A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */,
+				A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */,
 				A232D29D0A70903E00973B12 /* Filter.png */,
 				A2F151210CD438DE001F3B0E /* InfoTabBorder.png */,
 				A2F151220CD438DE001F3B0E /* InfoTabBack.png */,
@@ -1452,9 +1455,6 @@
 				A25FCDEF0A3769A6002BCBBE /* PauseSelected.png in Resources */,
 				A25FCDF00A3769AC002BCBBE /* ResumeSelected.png in Resources */,
 				A2D0E0490A54A97C003C72CF /* Bandwidth.png in Resources */,
-				A20AB97B0A5C622A004F81FA /* SmallTurtle.png in Resources */,
-				A24600510A6DCE6600D19088 /* SpeedLimitButtonBlue.png in Resources */,
-				A24600520A6DCE6600D19088 /* SpeedLimitButtonGraphite.png in Resources */,
 				A232D29E0A70903E00973B12 /* Filter.png in Resources */,
 				A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */,
 				A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */,
@@ -1470,7 +1470,7 @@
 				A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */,
 				A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */,
 				A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */,
-				A22BC9A30C5BBCF100F5FB72 /* BottomBorder.png in Resources */,
+				A22BC9A30C5BBCF100F5FB72 /* BottomBack.png in Resources */,
 				A2AE68330C628A35008753C9 /* Creator.nib in Resources */,
 				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
 				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
@@ -1494,7 +1494,11 @@
 				A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */,
 				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
 				A2E165C80CFE45AF0047F575 /* QuittingWindow.xib in Resources */,
-				A28E1E0A0D00555400E16385 /* ActionGear.png in Resources */,
+				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
+				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
+				A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */,
+				A22D3AAE0D00D22A0079CFED /* ActionPopUp.png in Resources */,
+				A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

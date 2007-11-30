@@ -32,7 +32,10 @@
     if ((self = [super initWithFrame: rect]))
     {
         if ([NSApp isOnLeopardOrBetter])
-            fBackgroundColor = [[NSColor colorWithPatternImage: [NSImage imageNamed: @"BottomBorder.png"]] retain];
+        {
+            fBackgroundColor = [[NSColor colorWithPatternImage: [NSImage imageNamed: @"BottomBack.png"]] retain];
+            fBackgroundInactiveColor = [[NSColor colorWithPatternImage: [NSImage imageNamed: @"BottomBackInactive.png"]] retain];
+        }
     }
     return self;
 }
@@ -40,12 +43,13 @@
 - (void) dealloc
 {
     [fBackgroundColor release];
+    [fBackgroundInactiveColor release];
     [super dealloc];
 }
 
 - (BOOL) isOpaque
 {
-    return [NSApp isOnLeopardOrBetter] && [[self window] isMainWindow];
+    return [NSApp isOnLeopardOrBetter];
 }
 
 - (BOOL) mouseDownCanMoveWindow
@@ -55,9 +59,11 @@
 
 - (void) drawRect: (NSRect) rect
 {
-    if ([NSApp isOnLeopardOrBetter] && [[self window] isMainWindow])
+    if ([NSApp isOnLeopardOrBetter])
     {
-        [fBackgroundColor set];
+        NSColor * color = [[self window] isMainWindow] ? fBackgroundColor : fBackgroundInactiveColor;
+        [color set];
+        
         [[NSGraphicsContext currentContext] setPatternPhase: [self frame].origin];
         NSRectFill([self bounds]);
     }

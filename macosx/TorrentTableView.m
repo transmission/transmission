@@ -94,7 +94,6 @@
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
 }
 
-
 - (NSString *) tableView: (NSTableView *) tableView typeSelectStringForTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     return [[fTorrents objectAtIndex: row] name];

@@ -1915,7 +1915,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 {
     if ([fDefaults boolForKey: @"SpeedLimit"])
         [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSGraphiteControlTint
-            ? [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"] : [NSImage imageNamed: @"SpeedLimitButtonBlue.png"]];
+            ? [NSImage imageNamed: @"TurtleGraphite.png"] : [NSImage imageNamed: @"TurtleBlue.png"]];
 }
 
 - (void) toggleSpeedLimit: (id) sender

@@ -42,8 +42,8 @@
         return nil;
     
     return [value boolValue] ? ([NSColor currentControlTint] == NSGraphiteControlTint
-            ? [NSImage imageNamed: @"SpeedLimitButtonGraphite.png"] : [NSImage imageNamed: @"SpeedLimitButtonBlue.png"])
-            : [NSImage imageNamed: @"SmallTurtle.png"];
+            ? [NSImage imageNamed: @"TurtleGraphite.png"] : [NSImage imageNamed: @"TurtleBlue.png"])
+            : [NSImage imageNamed: @"Turtle.png"];
 }
 
 @end

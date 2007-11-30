@@ -30,7 +30,8 @@
 {
 	if ((self = [super initWithCoder: coder]))
     {
-        fImage = [NSImage imageNamed: @"ActionGear.png"];
+        fImage = [NSImage imageNamed: @"ActionPopUp.png"];
+        [fImage setFlipped: YES];
 	}
 	return self;
 }
@@ -40,8 +41,8 @@
     [super drawRect: rect];
     
     NSSize imageSize = [fImage size];
-    NSRect imageRect = NSMakeRect(rect.origin.x + 4.0, rect.origin.y + (rect.size.height - imageSize.height) * 0.5,
-                                    imageSize.width, imageSize.height);
+    NSRect imageRect = NSMakeRect(rect.origin.x + (rect.size.width - imageSize.width) * 0.5,
+                        rect.origin.y + (rect.size.height - imageSize.height) * 0.5, imageSize.width, imageSize.height);
     
 	[fImage drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
 }

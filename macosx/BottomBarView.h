@@ -26,7 +26,7 @@
 
 @interface BottomBarView : NSView
 {
-    NSColor * fBackgroundColor;
+    NSColor * fBackgroundColor, * fBackgroundInactiveColor;
 }
 
 @end
