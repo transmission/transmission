@@ -91,7 +91,8 @@
     
     //title
     NSColor * specialColor = nil;
-    if ([self isHighlighted] && [[controlView window] isKeyWindow] && [[controlView window] firstResponder] == controlView)
+    if ([self isHighlighted]
+            && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
         specialColor = [NSColor whiteColor];
     else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles:
                     [[self objectValue] objectForKey: @"Indexes"]] == NSOffState)
