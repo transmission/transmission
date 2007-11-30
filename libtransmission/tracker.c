@@ -35,7 +35,7 @@
 enum
 {
     /* seconds between tracker pulses */
-    PULSE_INTERVAL_SEC = 1,
+    PULSE_INTERVAL_MSEC = 750,
 
     /* maximum number of concurrent tracker socket connections */
     MAX_TRACKER_SOCKETS = 16,
@@ -66,15 +66,6 @@ enum
 /**
 ***
 **/
-
-enum
-{
-    TR_REQ_STARTED,
-    TR_REQ_COMPLETED,
-    TR_REQ_STOPPED,
-    TR_REQ_REANNOUNCE,
-    TR_REQ_COUNT
-};
 
 struct tr_tracker
 {
@@ -116,14 +107,12 @@ struct tr_tracker
     int leecherCount;
     char * trackerID;
 
-    /* the last tracker request we sent. (started, stopped, etc.)
-       automatic announces are an empty string;
-       NULL means no message has ever been sent */
-    char * lastRequest;
-
     time_t manualAnnounceAllowedAt;
     time_t reannounceAt;
     time_t scrapeAt;
+
+    time_t resendRequestAt;
+    int resendRequestType;
 
     unsigned int isRunning     : 1;
 };
@@ -207,6 +196,13 @@ tr_tracker *
 findTrackerFromHash( struct torrent_hash * data )
 {
     tr_torrent * torrent = tr_torrentFindFromHash( data->handle, data->hash );
+    return torrent ? torrent->tracker : NULL;
+}
+
+tr_tracker *
+findTracker( tr_handle * handle, const uint8_t * hash )
+{
+    tr_torrent * torrent = tr_torrentFindFromHash( handle, hash );
     return torrent ? torrent->tracker : NULL;
 }
 
@@ -540,9 +536,10 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
     const char * warning;
     time_t nextScrapeSec = 60;
-    tr_tracker * t;
+    tr_tracker * t = findTrackerFromHash( vhash );
 
-    t = findTrackerFromHash( vhash );
+    dbgmsg( t, "Got scrape response for '%s': %s", (t ? t->name : "(null)"), (req ? req->response_code_line : "(no line)") );
+
     tr_free( vhash );
     if( t == NULL ) /* tracker's been closed... */
         return;
@@ -610,13 +607,25 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
 ****
 ***/
 
+enum
+{
+    TR_REQ_STARTED,
+    TR_REQ_COMPLETED,
+    TR_REQ_STOPPED,
+    TR_REQ_REANNOUNCE,
+    TR_REQ_SCRAPE,
+    TR_REQ_COUNT
+};
+
 struct tr_tracker_request
 {
     int port;
     int timeout;
+    int reqtype; /* TR_REQ_* */
     char * address;
     char * uri;
     struct evhttp_request * req;
+    uint8_t torrent_hash[SHA_DIGEST_LENGTH];
 };
 
 static void
@@ -693,7 +702,7 @@ buildTrackerRequestURI( const tr_tracker  * t,
 static struct tr_tracker_request*
 createRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
 {
-    static const char* strings[TR_REQ_COUNT] = { "started", "completed", "stopped", "" };
+    static const char* strings[TR_REQ_COUNT] = { "started", "completed", "stopped", "", "err" };
     const tr_torrent * torrent = tr_torrentFindFromHash( handle, tracker->hash );
     const tr_tracker_info * address = getCurrentAddress( tracker );
     const int isStopping = reqtype == TR_REQ_STOPPED;
@@ -705,9 +714,11 @@ createRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
     req->port = address->port;
     req->uri = buildTrackerRequestURI( tracker, torrent, eventName );
     req->timeout = isStopping ? STOP_TIMEOUT_INTERVAL_SEC : TIMEOUT_INTERVAL_SEC;
+    req->reqtype = reqtype;
     req->req = isStopping
         ? evhttp_request_new( onStoppedResponse, handle )
         : evhttp_request_new( onTrackerResponse, torrentHashNew(handle, tracker) );
+    memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
     addCommonHeaders( tracker, req->req );
 
     return req;
@@ -724,7 +735,9 @@ createScrape( tr_handle * handle, const tr_tracker * tracker )
     req->port = a->port;
     req->timeout = TIMEOUT_INTERVAL_SEC;
     req->req = evhttp_request_new( onScrapeResponse, torrentHashNew( handle, tracker ) );
+    req->reqtype = TR_REQ_SCRAPE;
     tr_asprintf( &req->uri, "%s%cinfo_hash=%s", a->scrape, strchr(a->scrape,'?')?'&':'?', tracker->escaped );
+    memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
     addCommonHeaders( tracker, req->req );
 
     return req;
@@ -746,7 +759,7 @@ ensureGlobalsExist( tr_handle * handle )
     if( handle->tracker == NULL )
     {
         handle->tracker = tr_new0( struct tr_tracker_handle, 1 );
-        handle->tracker->pulseTimer = tr_timerNew( handle, pulse, handle, PULSE_INTERVAL_SEC*1000 );
+        handle->tracker->pulseTimer = tr_timerNew( handle, pulse, handle, PULSE_INTERVAL_MSEC );
         dbgmsg( NULL, "creating tracker timer" );
     }
 }
@@ -821,21 +834,44 @@ getConnection( tr_handle * handle, const char * address, int port )
     return c;
 }
 
-static void
+static int
 invokeRequest( tr_handle * handle, const struct tr_tracker_request * req )
 {
+    int err;
     struct evhttp_connection * evcon = getConnection( handle, req->address, req->port );
-    ++handle->tracker->socketCount;
-    dbgmsg( NULL, "incrementing socket count to %d, sending '%s' to tracker %s:%d", handle->tracker->socketCount, req->uri, req->address, req->port );
+    dbgmsg( NULL, "sending '%s' to tracker %s:%d, timeout is %d", req->uri, req->address, req->port, (int)req->timeout );
     evhttp_connection_set_timeout( evcon, req->timeout );
-    evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri );
+    err = evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri );
+    if( !err ) {
+        ++handle->tracker->socketCount;
+        dbgmsg( NULL, "incremented socket count to %d", handle->tracker->socketCount );
+    }
+    return err;
 }
 
 static void
 invokeNextInQueue( tr_handle * handle, tr_list ** list )
 {
     struct tr_tracker_request * req = tr_list_pop_front( list );
-    invokeRequest( handle, req );
+    const int err = invokeRequest( handle, req );
+
+    if( err )
+    {
+        tr_tracker * t = findTracker( handle, req->torrent_hash );
+        if( t != NULL )
+        {
+            if( req->reqtype == TR_REQ_SCRAPE ) {
+                t->scrapeAt = time(NULL) + 30;
+                dbgmsg( t, "scrape failed... retrying in 30 seconds" );
+            }
+            else {
+                dbgmsg( t, "request [%s] failed... retrying in 30 seconds", req->uri );
+                t->resendRequestAt = time(NULL) + 30;
+                t->resendRequestType = req->reqtype;
+            }
+        }
+    }
+
     freeRequest( req );
 }
 
@@ -848,15 +884,6 @@ socketIsAvailable( tr_handle * handle )
 static void ensureGlobalsExist( tr_handle * );
 
 static void
-enqueueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
-{
-    struct tr_tracker_request * req;
-    ensureGlobalsExist( handle );
-    req = createRequest( handle, tracker, reqtype );
-    tr_list_append( &handle->tracker->requestQueue, req );
-}
-
-static void
 enqueueScrape( tr_handle * handle, const tr_tracker * tracker )
 {
     struct tr_tracker_request * req;
@@ -865,27 +892,56 @@ enqueueScrape( tr_handle * handle, const tr_tracker * tracker )
     tr_list_append( &handle->tracker->scrapeQueue, req );
 }
 
+static void
+enqueueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
+{
+    struct tr_tracker_request * req;
+    ensureGlobalsExist( handle );
+    req = createRequest( handle, tracker, reqtype );
+    tr_list_append( &handle->tracker->requestQueue, req );
+}
+
+/**
+ * This function is called when there's been an error invoking a request,
+ * or when the tracker has returned back a server error that might require
+ * the request to be re-sent.
+ */
+static void
+maybeRequeueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
+{
+    /* FIXME */
+    enqueueRequest( handle, tracker, reqtype );
+}
+
 static int
 pulse( void * vhandle )
 {
     tr_handle * handle = vhandle;
     struct tr_tracker_handle * th = handle->tracker;
-    tr_torrent * t;
+    tr_torrent * tor;
     const time_t now = time( NULL );
 
     if( handle->tracker->socketCount || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
         dbgmsg( NULL, "tracker pulse... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
     /* upkeep: queue periodic rescrape / reannounce */
-    for( t=handle->torrentList; t; t=t->next ) {
-        tr_tracker * tracker = t->tracker;
-        if( tracker->scrapeAt && trackerSupportsScrape( tracker ) && ( now >= tracker->scrapeAt ) ) {
-            tracker->scrapeAt = 0;
-            enqueueScrape( handle, tracker );
+    for( tor=handle->torrentList; tor; tor=tor->next )
+    {
+        tr_tracker * t = tor->tracker;
+
+        if( t->resendRequestAt && ( now >= t->resendRequestAt ) ) {
+            t->resendRequestAt = 0;
+            maybeRequeueRequest( handle, t, t->resendRequestType );
         }
-        if( tracker->reannounceAt && tracker->isRunning && ( now >= tracker->reannounceAt ) ) {
-            tracker->reannounceAt = 0;
-            enqueueRequest( handle, tracker, TR_REQ_REANNOUNCE );
+
+        if( t->scrapeAt && trackerSupportsScrape( t ) && ( now >= t->scrapeAt ) ) {
+            t->scrapeAt = 0;
+            enqueueScrape( handle, t );
+        }
+
+        if( t->reannounceAt && t->isRunning && ( now >= t->reannounceAt ) ) {
+            t->reannounceAt = 0;
+            enqueueRequest( handle, t, TR_REQ_REANNOUNCE );
         }
     }
 
@@ -999,7 +1055,6 @@ onTrackerFreeNow( void * vt )
     tr_publisherFree( &t->publisher );
     tr_free( t->name );
     tr_free( t->trackerID );
-    tr_free( t->lastRequest );
 
     /* addresses... */
     for( i=0; i<t->addressCount; ++i )
