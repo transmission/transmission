@@ -2580,11 +2580,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [button setBezelStyle: NSTexturedRoundedBezelStyle];
     [button setStringValue: @""];
     
-    NSSize buttonSize = NSMakeSize(35.0, 25.0);
+    NSSize buttonSize = NSMakeSize(36.0, 25.0);
     [item setMinSize: buttonSize];
     [item setMaxSize: buttonSize];
-    
-    NSImage * image;
     
     if ([ident isEqualToString: TOOLBAR_CREATE])
     {
