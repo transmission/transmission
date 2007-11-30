@@ -170,6 +170,7 @@ onTrackerResponse( void * tracker UNUSED, void * vevent, void * user_data )
             tr_err( "Tracker: Error - %s", event->text );
             tor->error = TR_ERROR_TC_ERROR;
             strlcpy( tor->errorString, event->text, sizeof(tor->errorString) );
+            tr_torrentStop( tor );
             break;
 
         case TR_TRACKER_ERROR_CLEAR:

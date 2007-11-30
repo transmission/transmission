@@ -35,7 +35,7 @@
 enum
 {
     /* seconds between tracker pulses */
-    PULSE_INTERVAL_MSEC = 750,
+    PULSE_INTERVAL_MSEC = 1000,
 
     /* maximum number of concurrent tracker socket connections */
     MAX_TRACKER_SOCKETS = 16,
@@ -110,9 +110,6 @@ struct tr_tracker
     time_t manualAnnounceAllowedAt;
     time_t reannounceAt;
     time_t scrapeAt;
-
-    time_t resendRequestAt;
-    int resendRequestType;
 
     unsigned int isRunning     : 1;
 };
@@ -215,11 +212,14 @@ static const tr_tracker_event emptyEvent = { 0, NULL, NULL, NULL, 0 };
 static void
 publishMessage( tr_tracker * t, const char * msg, int type )
 {
-    tr_tracker_event event = emptyEvent;
-    event.hash = t->hash;
-    event.messageType = type;
-    event.text = msg;
-    tr_publisherPublish( t->publisher, t, &event );
+    if( t != NULL )
+    {
+        tr_tracker_event event = emptyEvent;
+        event.hash = t->hash;
+        event.messageType = type;
+        event.text = msg;
+        tr_publisherPublish( t->publisher, t, &event );
+    }
 }
 
 static void
@@ -229,8 +229,9 @@ publishErrorClear( tr_tracker * t )
 }
 
 static void
-publishErrorMessage( tr_tracker * t, const char * msg )
+publishErrorMessageAndStop( tr_tracker * t, const char * msg )
 {
+    t->isRunning = 0;
     publishMessage( t, msg, TR_TRACKER_ERROR );
 }
 
@@ -411,7 +412,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 
             if(( tmp = tr_bencDictFind( &benc, "failure reason" ))) {
                 dbgmsg( t, "got failure message [%s]", tmp->val.s.s );
-                publishErrorMessage( t, tmp->val.s.s );
+                publishErrorMessageAndStop( t, tmp->val.s.s );
             }
 
             if(( tmp = tr_bencDictFind( &benc, "warning message" ))) {
@@ -496,13 +497,15 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
     }
     else if( 400<=responseCode && responseCode<=499 )
     {
-        dbgmsg( t, "got a 4xx error." );
+        const char * err = req && req->response_code_line
+            ? req->response_code_line
+            : "Unspecified 4xx error from tracker.";
+        dbgmsg( t, err );
 
         /* The request could not be understood by the server due to
          * malformed syntax. The client SHOULD NOT repeat the
          * request without modifications. */
-        if( req && req->response_code_line )
-            publishErrorMessage( t, req->response_code_line );
+        publishErrorMessageAndStop( t, err );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceAt = 0;
     }
@@ -525,7 +528,7 @@ onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
 
         /* WTF did we get?? */
         if( req && req->response_code_line )
-            publishErrorMessage( t, req->response_code_line );
+            publishWarning( t, req->response_code_line );
         t->manualAnnounceAllowedAt = ~(time_t)0;
         t->reannounceAt = time(NULL) + 60;
     }
@@ -538,7 +541,7 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
     time_t nextScrapeSec = 60;
     tr_tracker * t = findTrackerFromHash( vhash );
 
-    dbgmsg( t, "Got scrape response for '%s': %s", (t ? t->name : "(null)"), (req ? req->response_code_line : "(no line)") );
+    dbgmsg( t, "Got scrape response for '%s': %s (%d)", (t ? t->name : "(null)"), (req ? req->response_code_line : "(no line)"), (req ? req->response_code : -1) );
 
     tr_free( vhash );
     if( t == NULL ) /* tracker's been closed... */
@@ -824,6 +827,7 @@ connectionClosedCB( struct evhttp_connection * evcon, void * vhandle )
 
     --handle->tracker->socketCount;
     dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
+    pulse( handle );
 }
 
 static struct evhttp_connection*
@@ -834,44 +838,26 @@ getConnection( tr_handle * handle, const char * address, int port )
     return c;
 }
 
-static int
+static void
 invokeRequest( tr_handle * handle, const struct tr_tracker_request * req )
 {
-    int err;
     struct evhttp_connection * evcon = getConnection( handle, req->address, req->port );
-    dbgmsg( NULL, "sending '%s' to tracker %s:%d, timeout is %d", req->uri, req->address, req->port, (int)req->timeout );
+    tr_tracker * t = findTracker( handle, req->torrent_hash );
+    dbgmsg( t, "sending '%s' to tracker %s:%d, timeout is %d", req->uri, req->address, req->port, (int)req->timeout );
     evhttp_connection_set_timeout( evcon, req->timeout );
-    err = evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri );
-    if( !err ) {
+    if( evhttp_make_request( evcon, req->req, EVHTTP_REQ_GET, req->uri ))
+        publishErrorMessageAndStop( t, "Tracker could not be reached." );
+    else {
         ++handle->tracker->socketCount;
-        dbgmsg( NULL, "incremented socket count to %d", handle->tracker->socketCount );
+        dbgmsg( t, "incremented socket count to %d", handle->tracker->socketCount );
     }
-    return err;
 }
 
 static void
 invokeNextInQueue( tr_handle * handle, tr_list ** list )
 {
     struct tr_tracker_request * req = tr_list_pop_front( list );
-    const int err = invokeRequest( handle, req );
-
-    if( err )
-    {
-        tr_tracker * t = findTracker( handle, req->torrent_hash );
-        if( t != NULL )
-        {
-            if( req->reqtype == TR_REQ_SCRAPE ) {
-                t->scrapeAt = time(NULL) + 30;
-                dbgmsg( t, "scrape failed... retrying in 30 seconds" );
-            }
-            else {
-                dbgmsg( t, "request [%s] failed... retrying in 30 seconds", req->uri );
-                t->resendRequestAt = time(NULL) + 30;
-                t->resendRequestType = req->reqtype;
-            }
-        }
-    }
-
+    invokeRequest( handle, req );
     freeRequest( req );
 }
 
@@ -901,18 +887,6 @@ enqueueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
     tr_list_append( &handle->tracker->requestQueue, req );
 }
 
-/**
- * This function is called when there's been an error invoking a request,
- * or when the tracker has returned back a server error that might require
- * the request to be re-sent.
- */
-static void
-maybeRequeueRequest( tr_handle * handle, const tr_tracker * tracker, int reqtype )
-{
-    /* FIXME */
-    enqueueRequest( handle, tracker, reqtype );
-}
-
 static int
 pulse( void * vhandle )
 {
@@ -928,11 +902,6 @@ pulse( void * vhandle )
     for( tor=handle->torrentList; tor; tor=tor->next )
     {
         tr_tracker * t = tor->tracker;
-
-        if( t->resendRequestAt && ( now >= t->resendRequestAt ) ) {
-            t->resendRequestAt = 0;
-            maybeRequeueRequest( handle, t, t->resendRequestType );
-        }
 
         if( t->scrapeAt && trackerSupportsScrape( t ) && ( now >= t->scrapeAt ) ) {
             t->scrapeAt = 0;
