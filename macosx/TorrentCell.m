@@ -223,8 +223,7 @@
     
     //text color
     NSColor * titleColor, * statusColor;
-    if ([self isHighlighted]
-            && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
+    if ([self isHighlighted] && [[controlView window] isKeyWindow] && [[controlView window] firstResponder] == controlView)
     {
         titleColor = [NSColor whiteColor];
         statusColor = [NSColor whiteColor];
