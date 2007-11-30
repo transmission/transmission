@@ -24,26 +24,26 @@
 
 #import "ActionPopUpButton.h"
 
-#warning needed?
-
 @implementation ActionPopUpButton
 
 - (id) initWithCoder: (NSCoder *) coder
 {
 	if ((self = [super initWithCoder: coder]))
     {
-        fImage = [NSImage imageNamed: @"ActionButton.png"];
-        [fImage setFlipped: YES];
-        fImagePressed = [NSImage imageNamed: @"ActionButtonPressed.png"];
-        [fImagePressed setFlipped: YES];
+        fImage = [NSImage imageNamed: @"ActionGear.png"];
 	}
 	return self;
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    NSImage * image = [[self cell] isHighlighted] ? fImagePressed : fImage;
-	[image drawInRect: [self bounds] fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    [super drawRect: rect];
+    
+    NSSize imageSize = [fImage size];
+    NSRect imageRect = NSMakeRect(rect.origin.x + 4.0, rect.origin.y + (rect.size.height - imageSize.height) * 0.5,
+                                    imageSize.width, imageSize.height);
+    
+	[fImage drawInRect: imageRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
 }
 
 @end

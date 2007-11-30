@@ -258,7 +258,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [contentView addSubview: fStatusBar];
     [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];
-
+    
     [fActionButton setToolTip: NSLocalizedString(@"Shortcuts for changing global settings.",
                                 "Main window -> 1st bottom left button (action) tooltip")];
     [fSpeedLimitButton setToolTip: NSLocalizedString(@"Speed Limit overrides the total bandwidth limits with its own limits.",
@@ -1403,9 +1403,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 float downloadRate, uploadRate;
                 tr_torrentRates(fLib, & downloadRate, & uploadRate);
                 
-                [fTotalDLField setStringValue: [NSLocalizedString(@"Total DL: ", "Status bar -> total download")
+                [fTotalDLField setStringValue: [NSLocalizedString(@"DL: ", "Status bar -> total download")
                                                 stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
-                [fTotalULField setStringValue: [NSLocalizedString(@"Total UL: ", "Status bar -> total upload")
+                [fTotalULField setStringValue: [NSLocalizedString(@"UL: ", "Status bar -> total upload")
                                                 stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
             }
         }

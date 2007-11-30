@@ -22,10 +22,45 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "BottomBarView.h"
+#import "NSApplicationAdditions.h"
 
-@interface ActionPopUpButton : NSPopUpButton
+@implementation BottomBarView
+
+- (id) initWithFrame: (NSRect) rect
 {
-    NSImage * fImage;
+    if ((self = [super initWithFrame: rect]))
+    {
+        if ([NSApp isOnLeopardOrBetter])
+            fBackgroundColor = [[NSColor colorWithPatternImage: [NSImage imageNamed: @"BottomBorder.png"]] retain];
+    }
+    return self;
 }
+
+- (void) dealloc
+{
+    [fBackgroundColor release];
+    [super dealloc];
+}
+
+- (BOOL) isOpaque
+{
+    return [NSApp isOnLeopardOrBetter] && [[self window] isMainWindow];
+}
+
+- (BOOL) mouseDownCanMoveWindow
+{
+    return YES;
+}
+
+- (void) drawRect: (NSRect) rect
+{
+    if ([NSApp isOnLeopardOrBetter] && [[self window] isMainWindow])
+    {
+        [fBackgroundColor set];
+        [[NSGraphicsContext currentContext] setPatternPhase: [self frame].origin];
+        NSRectFill([self bounds]);
+    }
+}
+
 @end
