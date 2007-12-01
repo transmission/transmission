@@ -41,7 +41,6 @@
 #include "utils.h"
 
 #define PMP_PORT                5351
-#define PMP_MCAST_ADDR          "224.0.0.1"
 #define PMP_INITIAL_DELAY       250     /* ms, 1/4 second */
 #define PMP_TOTAL_DELAY         120000  /* ms, 2 minutes */
 #define PMP_VERSION             0

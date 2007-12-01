@@ -40,6 +40,7 @@
 
 #include "transmission.h"
 #include "fdlimit.h"
+#include "natpmp.h"
 #include "net.h"
 #include "platform.h"
 #include "utils.h"
@@ -217,7 +218,7 @@ tr_netBind( int port, int type )
      * This can probably be done cleaner, but since we're only using SOCK_DGRAM
      * for nat-pmp, this quick fix should work. */
     if ( SOCK_DGRAM == type )
-        sock.sin_addr.s_addr = inet_addr("224.0.0.1");
+        sock.sin_addr.s_addr = inet_addr( PMP_MCAST_ADDR );
     else
         sock.sin_addr.s_addr = INADDR_ANY;
 
