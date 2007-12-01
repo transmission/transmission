@@ -210,7 +210,17 @@ tr_netBind( int port, int type )
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
-    sock.sin_addr.s_addr = INADDR_ANY;
+
+    /* Leopard closes a SO_REUSEADDR + INADDR_ANY hole, so we can't
+     * use INADDR_ANY when binding for nat-pmp. For details, refer to
+     * http://www.uwsg.indiana.edu/hypermail/linux/kernel/9902.1/0828.html .
+     * This can probably be done cleaner, but since we're only using SOCK_DGRAM
+     * for nat-pmp, this quick fix should work. */
+    if ( SOCK_DGRAM == type )
+        sock.sin_addr.s_addr = inet_addr("224.0.0.1");
+    else
+        sock.sin_addr.s_addr = INADDR_ANY;
+
     sock.sin_port        = htons( port );
 
     if( bind( s, (struct sockaddr *) &sock,
