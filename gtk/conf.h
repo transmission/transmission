@@ -55,5 +55,7 @@ gboolean
 cf_lock(char **errstr);
 char *
 cf_sockname(void);
+void
+cf_check_older_configs(void);
 
 #endif /* TG_CONF_H */
