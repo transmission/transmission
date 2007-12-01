@@ -1403,10 +1403,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 float downloadRate, uploadRate;
                 tr_torrentRates(fLib, & downloadRate, & uploadRate);
                 
-                [fTotalDLField setStringValue: [NSLocalizedString(@"DL: ", "Status bar -> total download")
-                                                stringByAppendingString: [NSString stringForSpeed: downloadRate]]];
-                [fTotalULField setStringValue: [NSLocalizedString(@"UL: ", "Status bar -> total upload")
-                                                stringByAppendingString: [NSString stringForSpeed: uploadRate]]];
+                [fTotalDLField setStringValue: [NSString stringForSpeed: downloadRate]];
+                [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];
             }
         }
 
