@@ -30,8 +30,8 @@
 #define BUTTON_WIDTH 14.0
 #define BUTTONS_TOTAL_WIDTH 36.0
 
-#define ACTION_BUTTON_HEIGHT 12.0
-#define ACTION_BUTTON_WIDTH 28.0
+#define ACTION_BUTTON_HEIGHT 14.0
+#define ACTION_BUTTON_WIDTH 32.0
 
 @interface TorrentTableView : NSTableView
 {
