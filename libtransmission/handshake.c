@@ -968,7 +968,7 @@ void
 tr_handshakeDone( tr_handshake * handshake, int isOK )
 {
     dbgmsg( handshake, "handshakeDone: %s", isOK ? "connected" : "aborting" );
-    tr_peerIoSetIOFuncs( handshake->io, NULL, NULL, NULL );
+    tr_peerIoSetIOFuncs( handshake->io, NULL, NULL, NULL, NULL );
 
     fireDoneFunc( handshake, isOK );
 
@@ -1030,7 +1030,7 @@ tr_handshakeNew( tr_peerIo           * io,
     handshake->doneUserData = doneUserData;
     handshake->handle = tr_peerIoGetHandle( io );
     
-    tr_peerIoSetIOFuncs( handshake->io, canRead, gotError, handshake );
+    tr_peerIoSetIOFuncs( handshake->io, canRead, NULL, gotError, handshake );
 
     if( tr_peerIoIsIncoming( handshake->io ) )
         setReadState( handshake, AWAITING_HANDSHAKE );

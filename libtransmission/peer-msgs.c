@@ -1410,6 +1410,12 @@ clientGotBlock( tr_peermsgs                * msgs,
     return 0;
 }
 
+static void
+didWrite( struct bufferevent * evin UNUSED, void * vmsgs )
+{
+    pulse( vmsgs );
+}
+
 static ReadState
 canRead( struct bufferevent * evin, void * vmsgs )
 {
@@ -1843,7 +1849,7 @@ tr_peerMsgsNew( struct tr_torrent * torrent,
     }
     
     tr_peerIoSetTimeoutSecs( m->io, 150 ); /* timeout after N seconds of inactivity */
-    tr_peerIoSetIOFuncs( m->io, canRead, gotError, m );
+    tr_peerIoSetIOFuncs( m->io, canRead, didWrite, gotError, m );
     ratePulse( m );
 
     if ( tr_peerIoSupportsLTEP( m->io ) )
