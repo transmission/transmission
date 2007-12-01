@@ -255,6 +255,19 @@ pref_save(char **errstr)
 ****
 ***/
 
+#if !GLIB_CHECK_VERSION(2,8,0)
+static void
+tr_file_set_contents( const char * filename, const void * out, size_t len, GError* unused UNUSED )
+{
+    FILE * fp = fopen( filename, "wb+" );
+    if( fp != NULL ) {
+        fwrite( out, 1, len, fp );
+        fclose( fp );
+    }
+}
+#define g_file_set_contents tr_file_set_contents
+#endif
+
 static char*
 getCompat08PrefsFilename( void )
 {
