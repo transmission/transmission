@@ -251,6 +251,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     //set up status bar
     [fStatusBar setHidden: YES];
     
+    [fTotalDLField setToolTip: NSLocalizedString(@"Total download speed", "Status Bar -> speed tooltip")];
+    [fTotalULField setToolTip: NSLocalizedString(@"Total upload speed", "Status Bar -> speed tooltip")];
+    
     NSRect statusBarFrame = [fStatusBar frame];
     statusBarFrame.size.width = windowSize.width;
     [fStatusBar setFrame: statusBarFrame];
