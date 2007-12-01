@@ -349,18 +349,14 @@ tr_core_handle( TrCore * self )
 static void
 tr_core_insert( TrCore * self, TrTorrent * tor )
 {
-    GtkTreeIter iter;
-    const tr_info * inf;
-
-    gtk_list_store_append( GTK_LIST_STORE( self->model ), &iter );
-    inf = tr_torrent_info( tor );
-    gtk_list_store_set( GTK_LIST_STORE( self->model ), &iter,
-                        MC_NAME,    inf->name,
-                        MC_SIZE,    inf->totalSize,
-                        MC_HASH,    inf->hashString,
-                        MC_TORRENT, tor,
-                        MC_ID,      self->nextid,
-                        -1);
+    const tr_info * inf = tr_torrent_info( tor );
+    gtk_list_store_insert_with_values( GTK_LIST_STORE( self->model ), NULL, 0, 
+                                       MC_NAME,    inf->name,
+                                       MC_SIZE,    inf->totalSize,
+                                       MC_HASH,    inf->hashString,
+                                       MC_TORRENT, tor,
+                                       MC_ID,      self->nextid,
+                                       -1);
     g_object_unref( tor );
     self->nextid++;
 }
