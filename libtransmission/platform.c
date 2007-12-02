@@ -241,8 +241,6 @@ tr_lockFree( tr_lock * l )
 void
 tr_lockLock( tr_lock * l )
 {
-    const tr_thread_id currentThread = tr_getCurrentThread( );
-
 #ifdef __BEOS__
     acquire_sem( l->lock );
 #elif defined(WIN32)
@@ -250,8 +248,9 @@ tr_lockLock( tr_lock * l )
 #else
     pthread_mutex_lock( &l->lock );
 #endif
-    l->lockThread = currentThread;
+    l->lockThread = tr_getCurrentThread( );
     ++l->depth;
+/* fprintf( stderr, "thread %lu acquired lock %p... depth is now %d\n", (unsigned long)l->lockThread, l, l->depth ); */
     assert( l->depth >= 1 );
 }
 
@@ -265,10 +264,14 @@ tr_lockHave( const tr_lock * l )
 void
 tr_lockUnlock( tr_lock * l )
 {
+/* fprintf( stderr, "thread %lu releasing lock %p... depth before release is %d\n", (unsigned long)l->lockThread, l, l->depth ); */
+
     assert( l->depth > 0 );
     assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ));
     assert( tr_lockHave( l ) );
 
+    --l->depth;
+    assert( l->depth >= 0 );
 #ifdef __BEOS__
     release_sem( l->lock );
 #elif defined(WIN32)
@@ -276,8 +279,6 @@ tr_lockUnlock( tr_lock * l )
 #else
     pthread_mutex_unlock( &l->lock );
 #endif
-    --l->depth;
-    assert( l->depth >= 0 );
 }
 
 /***
