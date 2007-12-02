@@ -99,10 +99,12 @@ const uint8_t*
 
 typedef enum { READ_MORE, READ_AGAIN, READ_DONE } ReadState;
 typedef ReadState (*tr_can_read_cb)(struct bufferevent*, void* user_data);
+typedef void (*tr_did_write_cb)(struct bufferevent *, void *);
 typedef void (*tr_net_error_cb)(struct bufferevent *, short what, void *);
 
 void  tr_peerIoSetIOFuncs( tr_peerIo        * io,
                            tr_can_read_cb     readcb,
+                           tr_did_write_cb    writecb,
                            tr_net_error_cb    errcb,
                            void             * user_data );
 

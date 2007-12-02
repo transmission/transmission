@@ -285,7 +285,7 @@ peer_row_set (GtkTreeStore        * store,
                       PEER_COL_PORT, peer->port,
                       PEER_COL_CLIENT, client,
                       PEER_COL_IS_ENCRYPTED, peer->isEncrypted,
-                      PEER_COL_PROGRESS, (int)(100.0*peer->progress + 0.5),
+                      PEER_COL_PROGRESS, (int)(100.0*peer->progress),
                       PEER_COL_IS_DOWNLOADING, peer->isDownloading,
                       PEER_COL_DOWNLOAD_RATE, peer->downloadFromRate,
                       PEER_COL_IS_UPLOADING, peer->isUploading,
@@ -353,22 +353,37 @@ render_status( GtkTreeViewColumn  * column UNUSED,
                GtkTreeIter        * iter,
                gpointer             data UNUSED )
 {
+    GString * gstr = g_string_new( NULL );
     int status;
-    const char * text;
     gtk_tree_model_get( tree_model, iter, PEER_COL_STATUS, &status, -1 );
-    switch( status )
+
+    if( status & TR_PEER_STATUS_HANDSHAKE )
     {
-        case TR_PEER_STATUS_HANDSHAKE:            text = _( "Handshaking" ); break;
-        case TR_PEER_STATUS_PEER_IS_CHOKED:       text = _( "Peer is Choked" ); break;
-        case TR_PEER_STATUS_CLIENT_IS_CHOKED:     text = _( "Choked" ); break;
-        case TR_PEER_STATUS_CLIENT_IS_INTERESTED: text = _( "Choked & Interested" ); break;
-        case TR_PEER_STATUS_READY:                text = _( "Ready" ); break;
-        case TR_PEER_STATUS_REQUEST_SENT:         text = _( "Request Sent" ); break;
-        case TR_PEER_STATUS_ACTIVE           :    text = _( "Active" ); break;
-        case TR_PEER_STATUS_ACTIVE_AND_CHOKED:    text = _( "Active & Choked" ); break;
-        default:                                  text = "BUG"; break;
+        g_string_append( gstr, _("Handshaking") );
     }
-    g_object_set (renderer, "text", text, NULL);
+    else
+    {
+        if( status & TR_PEER_STATUS_CLIENT_IS_SENDING )
+            g_string_append( gstr, _("Uploading to peer") );
+        else if( status & TR_PEER_STATUS_PEER_IS_INTERESTED )
+            g_string_append( gstr, _("Peer wants our data") );
+        else if( status & TR_PEER_STATUS_PEER_IS_CHOKED )
+            g_string_append( gstr, _("Refusing to send data to peer") );
+
+        g_string_append( gstr, " - " );
+
+        if( status & TR_PEER_STATUS_PEER_IS_SENDING )
+            g_string_append( gstr, _("Downloading from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_SENT_REQUEST )
+            g_string_append( gstr, _("Requesting data from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_IS_INTERESTED )
+            g_string_append( gstr, _("Waiting to request data from peer") );
+        else if( status & TR_PEER_STATUS_CLIENT_IS_CHOKED )
+            g_string_append( gstr, _("Peer will not send us data") );
+    }
+
+    g_object_set( renderer, "text", gstr->str, NULL );
+    g_string_free( gstr, TRUE );
 }
 
 static void
@@ -664,7 +679,7 @@ static GtkWidget* peer_page_new ( TrTorrent * gtor )
     gtk_widget_set_usize (w, 0u, GUI_PAD);
     gtk_box_pack_start (GTK_BOX(vbox), w, FALSE, FALSE, 0);
 
-    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Peers"));
+    g_snprintf (name, sizeof(name), "<b>%s</b>", _("Connected Peers"));
     l = gtk_label_new (NULL);
     gtk_misc_set_alignment (GTK_MISC(l), 0.0f, 0.5f);
     gtk_label_set_markup (GTK_LABEL(l), name);
@@ -1154,7 +1169,7 @@ updateprogress( GtkTreeModel   * model,
                                               FC_INDEX, &index,
                                               -1 );
             g_assert( 0 <= index );
-            percent = (int)(fileStats[index].progress * 100.0 + 0.5); /* [0...100] */
+            percent = (int)(fileStats[index].progress * 100.0); /* [0...100] */
             subGot = (guint64)(subTotal * percent/100.0);
         }
 
@@ -1164,10 +1179,10 @@ updateprogress( GtkTreeModel   * model,
         /* why not just set it every time?
            because that causes the "priorities" combobox to pop down */
         gtk_tree_model_get (model, &iter, FC_PROG, &oldProg, -1);
-        newProg = (int)(100.0*subGot/subTotal + 0.5);
+        newProg = (int)(100.0*subGot/subTotal);
         if (oldProg != newProg)
           gtk_tree_store_set (store, &iter,
-                              FC_PROG, (int)(100.0*subGot/subTotal + 0.5), -1);
+                              FC_PROG, (int)(100.0*subGot/subTotal), -1);
 
         gotSize += subGot;
         totalSize += subTotal;

@@ -43,6 +43,7 @@ typedef enum { TR_NET_OK, TR_NET_ERROR, TR_NET_WAIT } tr_tristate_t;
 #define FALSE 0
 #endif
 
+int tr_torrentIsPrivate( const tr_torrent * );
 
 void tr_torrentRecheckCompleteness( tr_torrent * );
 
@@ -192,6 +193,9 @@ struct tr_handle
     int                        statCur;
 
     uint8_t                    isClosed;
+
+    struct tr_stats_handle   * sessionStats;
+    struct tr_tracker_handle * tracker;
 };
 
 void tr_globalLock       ( struct tr_handle * );

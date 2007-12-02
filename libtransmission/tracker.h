@@ -27,6 +27,8 @@ tr_tracker * tr_trackerNew( const tr_torrent * );
 
 void  tr_trackerFree ( tr_tracker * );
 
+void  tr_trackerShuttingDown( tr_handle * );
+
 /**
 ***  Tracker Publish / Subscribe
 **/

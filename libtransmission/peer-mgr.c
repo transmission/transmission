@@ -74,7 +74,7 @@ enum
     RECHOKE_PERIOD_MSEC = (1000),
 
     /* how frequently to decide which peers live and die */
-    RECONNECT_PERIOD_MSEC = (6 * 1000),
+    RECONNECT_PERIOD_MSEC = (2 * 1000),
 
     /* how frequently to refill peers' request lists */
     REFILL_PERIOD_MSEC = 666,
@@ -97,11 +97,11 @@ enum
 
     /* how many peers to unchoke per-torrent. */
     /* FIXME: make this user-configurable? */
-    NUM_UNCHOKED_PEERS_PER_TORRENT = 10, /* arbitrary */
+    NUM_UNCHOKED_PEERS_PER_TORRENT = 16, /* arbitrary */
 
     /* set this too high and there will be a lot of churn.
      * set it too low and you'll get peers too slowly */
-    MAX_RECONNECTIONS_PER_PULSE = 3,
+    MAX_RECONNECTIONS_PER_PULSE = 2,
 
     /* corresponds to ut_pex's added.f flags */
     ADDED_F_ENCRYPTION_FLAG = 1,

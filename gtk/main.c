@@ -54,9 +54,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 
-/* time in seconds to wait for torrents to stop when exiting */
-#define TRACKER_EXIT_TIMEOUT    10
-
 /* interval in milliseconds to update the torrent list display */
 #define UPDATE_INTERVAL         1000
 
@@ -433,9 +430,25 @@ quitThreadFunc( gpointer gdata )
     return NULL;
 }
 
+/* since there are no buttons in the dialog, gtk tries to
+ * select one of the labels, which looks ugly... so force
+ * the dialog's primary and secondary labels to be unselectable */
+static void
+deselectLabels( GtkWidget * w, gpointer unused UNUSED )
+{
+    if( GTK_IS_LABEL( w ) )
+        gtk_label_set_selectable( GTK_LABEL(w), FALSE );
+    else if( GTK_IS_CONTAINER( w ) )
+        gtk_container_foreach( GTK_CONTAINER(w), deselectLabels, NULL );
+}
+
 static void
 wannaquit( void * vdata )
 {
+    GtkWidget * w;
+#if GTK_CHECK_VERSION(2,10,0)
+    GtkWidget * i;
+#endif
     struct cbdata * cbdata = vdata;
 
     /* stop the update timer */
@@ -444,9 +457,26 @@ wannaquit( void * vdata )
         cbdata->timer = 0;
     }
 
+    w = gtk_message_dialog_new( cbdata->wind,
+                                GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
+                                GTK_MESSAGE_INFO,
+                                GTK_BUTTONS_NONE,
+                                _("Closing Connections" ) );
+#if GTK_CHECK_VERSION(2,10,0)
+    i = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
+    gtk_widget_show( i );
+    gtk_message_dialog_set_image( GTK_MESSAGE_DIALOG(w), i );
+#endif
+    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(w),
+                                              _("Sending upload/download totals to tracker..." ) );
+    gtk_container_foreach( GTK_CONTAINER(GTK_DIALOG(w)->vbox), deselectLabels, NULL );
+    gtk_widget_show( w );
+
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
     gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
+
+    
 
     /* shut down libT */
     g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
@@ -697,10 +727,8 @@ prefschanged( TrCore * core UNUSED, const char * key, gpointer data )
 void
 setpex( tr_torrent * tor, void * arg )
 {
-    gboolean * val;
-
-    val = arg;
-    tr_torrentDisablePex( tor, !(*val) );
+    const gboolean * val = arg;
+    tr_torrentDisablePex( tor, !*val );
 }
 
 gboolean

@@ -1,5 +1,17 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.95 (2007/12/xx)
+- All Platforms:
+   + Fix port mapping bug that bit both Leopard and Linux
+   + Fix bug that let speed-limited torrents upload too quickly
+   + Fix router slowdown caused by sending too many tracker requests at once
+   + Faster average upload speeds
+   + Faster connection to peers after starting a torrent
+   + Fix memory corruption error
+   + Disable SWIFT for ratio-based trackers
+- GTK:
+   + Fix Nokia 770 crash
+
 0.94 (2007/11/25)
 - All Platforms:
    + Faster average download speeds
@@ -28,7 +40,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - OS X:
    + Leopard: Fix bug with typing values in Inspector->Options
    + Leopard: Fix bug with toggling Minimal View
-- GTK
+- GTK:
    + Better support for large files on some Linux systems
    + Fix localization error in torrent inspector's dates
 
@@ -48,42 +60,44 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Fix 0.90 crash-on-start with assertion failure: "destination != (void*)0"
 
 0.90 (2007/10/23)
- - Encryption support, with option to ignore unencrypted peers
- - Ban peers that send too much bad data
- - Only report downloaded, verified good pieces in tracker `download' field
- - Improved compliance with BitTorrent spec
- - MSE Tracker Extension support
- - Significant rewrite of the libtransmission back-end
- - Icon enhanced to support size of 512 x 512
- - OS X:
+- All Platforms:
+   + Encryption support, with option to ignore unencrypted peers
+   + Only report downloaded, verified good pieces in tracker `download' field
+   + Improved compliance with BitTorrent spec
+   + MSE Tracker Extension support
+   + Significant rewrite of the libtransmission back-end
+- OS X:
    + Per-torrent action menu
    + Redesigned inspector with additional statistics and ability to be resized vertically in Peers and Files tabs
    + Redesigned message log
    + Optimizations to decrease memory usage
    + Sort and filter by tracker
+   + Icon enhanced to support size of 512 x 512
    + Various smaller interface additions and improvements
- - GTK:
+- GTK:
    + Various interface improvements
    + Better compliance with the Gnome interface guidelines
 
 0.82 (2007/09/09)
- - Fixed bug that could limit transfer speeds
- - Fixed bug that corrupted torrents > 4 GB
- - Fixed bug that could allow bad peers to send too many pieces
- - For peers supporting both Azureus's and LibTorrent's extensions, allow negotiation to decide which to use
- - Other minor fixes
+- All Platforms:
+   + Fixed bug that could limit transfer speeds
+   + Fixed bug that corrupted torrents > 4 GB
+   + Fixed bug that could allow bad peers to send too many pieces
+   + For peers supporting both Azureus' and LibTorrent's extensions, allow negotiation to decide which to use
+   +  Other minor fixes
 
 0.81 (2007/08/22)
- - Fix 0.80 assertion crashes
- - Fix a bug that miscounted how many peers Transmission wants connected
- - Correct incorrect error messages
- - Memory leaks fixed
- - OS X:
+- All Platforms:
+   + Fix 0.80 assertion crashes
+   + Fix a bug that miscounted how many peers Transmission wants connected
+   + Clarify misleading error messages
+   + Fix memory leaks
+- OS X:
    + Multiple fixes to creating torrents and adding new torrents
    + Updated Russian and Spanish translations
- - GTK:
+- GTK:
    + Updated Dutch, Portuguese, French, and Slovakian translations
- - CLI:
+- CLI:
    + Better support for cli-driven torrent creation
    + Fix a bug that misparsed command-line arguments
 

@@ -26,6 +26,8 @@
 void
 tr_prefs_init_global( void )
 {
+    cf_check_older_configs( );
+
     pref_flag_set_default   ( PREF_KEY_DL_LIMIT_ENABLED, FALSE );
     pref_int_set_default    ( PREF_KEY_DL_LIMIT, 100 );
     pref_flag_set_default   ( PREF_KEY_UL_LIMIT_ENABLED, FALSE );

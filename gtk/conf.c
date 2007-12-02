@@ -38,6 +38,7 @@
 #include <glib/gstdio.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/bencode.h>
 
 #include "conf.h"
 #include "util.h"
@@ -248,4 +249,93 @@ pref_save(char **errstr)
     g_free( data );
     g_free( path );
     g_free( filename );
+}
+
+/***
+****
+***/
+
+#if !GLIB_CHECK_VERSION(2,8,0)
+static void
+tr_file_set_contents( const char * filename, const void * out, size_t len, GError* unused UNUSED )
+{
+    FILE * fp = fopen( filename, "wb+" );
+    if( fp != NULL ) {
+        fwrite( out, 1, len, fp );
+        fclose( fp );
+    }
+}
+#define g_file_set_contents tr_file_set_contents
+#endif
+
+static char*
+getCompat08PrefsFilename( void )
+{
+    assert( gl_confdir != NULL );
+    return g_build_filename( gl_confdir, "prefs", NULL );
+}
+
+static void
+translate_08_to_09( const char* oldfile, const char* newfile )
+{
+    static struct pref_entry {
+	const char* oldkey;
+	const char* newkey;
+    } pref_table[] = {
+	{ "add-behavior-ipc",       "add-behavior-ipc"},
+	{ "add-behavior-standard",  "add-behavior-standard"},
+	{ "download-directory",     "default-download-directory"},
+	{ "download-limit",         "download-limit"},
+	{ "use-download-limit",     "download-limit-enabled" },
+	{ "listening-port",         "listening-port"},
+	{ "use-nat-traversal",      "nat-traversal-enabled"},
+	{ "use-peer-exchange",      "pex-enabled"},
+	{ "ask-quit",               "prompt-before-exit"},
+	{ "ask-download-directory", "prompt-for-download-directory"},
+	{ "use-tray-icon",          "system-tray-icon-enabled"},
+	{ "upload-limit",           "upload-limit"},
+	{ "use-upload-limit",       "upload-limit-enabled"}
+    };
+
+    GString * out = g_string_new( NULL );
+    gchar * contents = NULL;
+    gsize contents_len = 0;
+    benc_val_t top;
+
+    memset( &top, 0, sizeof(benc_val_t) );
+
+    if( g_file_get_contents( oldfile, &contents, &contents_len, NULL )
+        && !tr_bencLoad( contents, contents_len, &top, NULL )
+        && top.type==TYPE_DICT )
+    {
+        unsigned int i;
+        g_string_append( out, "\n[general]\n" );
+        for ( i=0; i<G_N_ELEMENTS(pref_table); ++i ) {
+            const benc_val_t * val = tr_bencDictFind( &top, pref_table[i].oldkey );
+            if( val != NULL ) {
+                const char * valstr = val->val.s.s;
+                if( !strcmp( valstr, "yes" ) ) valstr = "true";
+                if( !strcmp( valstr, "no" ) ) valstr = "false";
+                g_string_append_printf( out, "%s=%s\n", pref_table[i].newkey, valstr );
+            }
+        }
+    }
+
+    g_file_set_contents( newfile, out->str, out->len, NULL );
+    g_string_free( out, TRUE );
+    g_free( contents );
+}
+
+void
+cf_check_older_configs( void )
+{
+    char * cfn = getPrefsFilename( );
+    char * cfn08 = getCompat08PrefsFilename( );
+
+    if( !g_file_test( cfn,   G_FILE_TEST_IS_REGULAR )
+      && g_file_test( cfn08, G_FILE_TEST_IS_REGULAR ) )
+        translate_08_to_09( cfn08, cfn );
+
+    g_free( cfn08 );
+    g_free( cfn );
 }

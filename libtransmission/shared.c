@@ -52,7 +52,7 @@ struct tr_shared
     int bindSocket;
 
     /* NAT-PMP/UPnP */
-    tr_natpmp_t  * natpmp;
+    tr_natpmp    * natpmp;
     tr_upnp_t    * upnp;
 };
 
