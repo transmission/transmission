@@ -39,6 +39,9 @@
   #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
   #define _XOPEN_SOURCE 500 /* needed for recursive locks. */
+  #ifndef __USE_UNIX98
+  #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
+  #endif
   #include <pthread.h>
 #endif
 
@@ -249,18 +252,21 @@ tr_lockLock( tr_lock * l )
 #endif
     l->lockThread = currentThread;
     ++l->depth;
+    assert( l->depth >= 1 );
 }
 
 int
 tr_lockHave( const tr_lock * l )
 {
     return ( l->depth > 0 )
-        && ( l->lockThread == tr_getCurrentThread() );
+        && ( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ) );
 }
 
 void
 tr_lockUnlock( tr_lock * l )
 {
+    assert( l->depth > 0 );
+    assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ));
     assert( tr_lockHave( l ) );
 
 #ifdef __BEOS__
@@ -271,6 +277,7 @@ tr_lockUnlock( tr_lock * l )
     pthread_mutex_unlock( &l->lock );
 #endif
     --l->depth;
+    assert( l->depth >= 0 );
 }
 
 /***
