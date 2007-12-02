@@ -38,6 +38,7 @@
   #include <windows.h>
   #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
+  #define _XOPEN_SOURCE 500 /* needed for recursive locks. */
   #include <pthread.h>
 #endif
 
@@ -189,7 +190,7 @@ tr_threadJoin( tr_thread * t )
 
 struct tr_lock
 {
-    uint32_t depth;
+    int depth;
 #ifdef __BEOS__
     sem_id lock;
     thread_id lockThread;
@@ -210,9 +211,12 @@ tr_lockNew( void )
 #ifdef __BEOS__
     l->lock = create_sem( 1, "" );
 #elif defined(WIN32)
-    InitializeCriticalSection( &l->lock );
+    InitializeCriticalSection( &l->lock ); /* critical sections support recursion */
 #else
-    pthread_mutex_init( &l->lock, NULL );
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init( &attr );
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+    pthread_mutex_init( &l->lock, &attr );
 #endif
 
     return l;
@@ -236,22 +240,15 @@ tr_lockLock( tr_lock * l )
 {
     const tr_thread_id currentThread = tr_getCurrentThread( );
 
-    if( l->lockThread == currentThread )
-    {
-        ++l->depth;
-    }
-    else
-    {
 #ifdef __BEOS__
-        acquire_sem( l->lock );
+    acquire_sem( l->lock );
 #elif defined(WIN32)
-        EnterCriticalSection( &l->lock );
+    EnterCriticalSection( &l->lock );
 #else
-        pthread_mutex_lock( &l->lock );
+    pthread_mutex_lock( &l->lock );
 #endif
-        l->lockThread = currentThread;
-        l->depth = 1;
-    }
+    l->lockThread = currentThread;
+    ++l->depth;
 }
 
 int
@@ -266,17 +263,14 @@ tr_lockUnlock( tr_lock * l )
 {
     assert( tr_lockHave( l ) );
 
-    if( !--l->depth )
-    {
-        l->lockThread = 0;
 #ifdef __BEOS__
-        release_sem( l->lock );
+    release_sem( l->lock );
 #elif defined(WIN32)
-        LeaveCriticalSection( &l->lock );
+    LeaveCriticalSection( &l->lock );
 #else
-        pthread_mutex_unlock( &l->lock );
+    pthread_mutex_unlock( &l->lock );
 #endif
-    }
+    --l->depth;
 }
 
 /***
@@ -851,10 +845,10 @@ getsock( void )
         return -1;
     }
 
-    bzero( &snl, sizeof( snl ) );
+    memset( &snl, 0, sizeof(snl) );
     snl.nl_family = AF_NETLINK;
 
-    bzero( &req, sizeof( req ) );
+    memset( &req, 0, sizeof(req) );
     req.nlh.nlmsg_len = NLMSG_LENGTH( sizeof( req.rtg ) );
     req.nlh.nlmsg_type = RTM_GETROUTE;
     req.nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP;
@@ -892,8 +886,8 @@ getroute( int fd, unsigned int * buflen )
 
     for( ;; )
     {
-        bzero( &snl, sizeof( snl ) );
         slen = sizeof( snl );
+        memset( &snl, 0, slen );
         res = recvfrom( fd, buf, len, 0, (struct sockaddr *) &snl, &slen );
         if( 0 > res )
         {
