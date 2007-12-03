@@ -109,7 +109,6 @@ struct tr_fd_s
     int                  normal;
     int                  normalMax;
     tr_lock            * lock;
-    tr_cond            * cond;
     struct tr_openfile   open[TR_MAX_OPEN_FILES];
 };
 
@@ -180,7 +179,6 @@ TrCloseFile( int i )
     close( o->fd );
     o->fd = -1;
     o->isCheckedOut = 0;
-    tr_condSignal( gFd->cond );
 }
 
 static int
@@ -215,7 +213,7 @@ tr_fdFileCheckout( const char * filename, int write )
 
         if( fileIsCheckedOut( o ) ) {
             dbgmsg( "found it!  it's open, but checked out.  waiting..." );
-            tr_condWait( gFd->cond, gFd->lock );
+            tr_wait( 100 );
             i = -1; /* reloop */
             continue;
         }
@@ -262,7 +260,7 @@ tr_fdFileCheckout( const char * filename, int write )
 
         /* All used! Wait a bit and try again */
         dbgmsg( "everything's full!  waiting for someone else to finish something" );
-        tr_condWait( gFd->cond, gFd->lock );
+        tr_wait( 100 );
     }
 
 done:
@@ -309,7 +307,6 @@ tr_fdFileReturn( int fd )
         break;
     }
     
-    tr_condSignal( gFd->cond );
     tr_lockUnlock( gFd->lock );
 }
 
@@ -335,7 +332,6 @@ tr_fdFileClose( const char * filename )
         }
     }
     
-    tr_condSignal( gFd->cond );
     tr_lockUnlock( gFd->lock );
 }
 
@@ -462,7 +458,6 @@ tr_fdInit( void )
 
     gFd = tr_new0( struct tr_fd_s, 1 );
     gFd->lock = tr_lockNew( );
-    gFd->cond = tr_condNew( );
 
     /* count the max number of sockets we can use */
     for( i=0; i<TR_MAX_SOCKETS; ++i )
@@ -490,7 +485,6 @@ tr_fdClose( void )
             TrCloseFile( i );
 
     tr_lockFree( gFd->lock );
-    tr_condFree( gFd->cond );
 
     tr_list_free( &reservedSockets, NULL );
     tr_free( gFd );
