@@ -749,18 +749,18 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     if (eta < 60)
         return [NSString stringWithFormat: NSLocalizedString(@"%d sec", "Torrent -> remaining time"), eta];
     else if (eta < 3600) //60 * 60
-        return [NSString stringWithFormat: NSLocalizedString(@"%d min %d sec", "Torrent -> remaining time"),
+        return [NSString stringWithFormat: NSLocalizedString(@"%d min %02d sec", "Torrent -> remaining time"),
                                                 eta / 60, eta % 60];
     else if (eta < 86400) //24 * 60 * 60
-        return [NSString stringWithFormat: NSLocalizedString(@"%d hr %d min", "Torrent -> remaining time"),
+        return [NSString stringWithFormat: NSLocalizedString(@"%d hr %02d min", "Torrent -> remaining time"),
                                                 eta / 3600, (eta / 60) % 60];
     else
     {
         int days = eta / 86400, hours = (eta / 3600) % 24;
         if (days > 1)
-            return [NSString stringWithFormat: NSLocalizedString(@"%d days %d hr", "Torrent -> remaining time"), days, hours];
+            return [NSString stringWithFormat: NSLocalizedString(@"%d days %02d hr", "Torrent -> remaining time"), days, hours];
         else
-            return [NSString stringWithFormat: NSLocalizedString(@"1 day %d hr", "Torrent -> remaining time"), hours];
+            return [NSString stringWithFormat: NSLocalizedString(@"1 day %02d hr", "Torrent -> remaining time"), hours];
     }
 }
 
