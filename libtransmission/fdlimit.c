@@ -254,8 +254,10 @@ tr_fdFileCheckout( const char * filename, int write )
         }
 
         if( winner >= 0 ) {
-            dbgmsg( "closing file '%s', slot #%d", gFd->open[winner].filename, winner );
-            TrCloseFile( winner );
+            if( fileIsOpen( &gFd->open[i] ) ) {
+                dbgmsg( "closing file '%s', slot #%d", gFd->open[winner].filename, winner );
+                TrCloseFile( winner );
+            }
         } else { 
             dbgmsg( "everything's full!  waiting for someone else to finish something" );
             tr_lockUnlock( gFd->lock );
