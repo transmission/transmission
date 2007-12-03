@@ -25,7 +25,6 @@
 #define TR_PLATFORM_H
 
 typedef struct tr_lock   tr_lock;
-typedef struct tr_cond   tr_cond;
 typedef struct tr_thread tr_thread;
 
 const char * tr_getHomeDirectory( void );
@@ -41,12 +40,6 @@ void         tr_lockFree       ( tr_lock * );
 void         tr_lockLock       ( tr_lock * );
 void         tr_lockUnlock     ( tr_lock * );
 int          tr_lockHave       ( const tr_lock * );
-
-tr_cond *    tr_condNew       ( void );
-void         tr_condFree      ( tr_cond * );
-void         tr_condSignal    ( tr_cond * );
-void         tr_condBroadcast ( tr_cond * );
-void         tr_condWait      ( tr_cond *, tr_lock * );
 
 struct in_addr; /* forward declaration to calm gcc down */
 int

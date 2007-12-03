@@ -38,6 +38,10 @@
   #include <windows.h>
   #include <shlobj.h> /* for CSIDL_APPDATA, CSIDL_PROFILE */
 #else
+  #define _XOPEN_SOURCE 500 /* needed for recursive locks. */
+  #ifndef __USE_UNIX98
+  #define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
+  #endif
   #include <pthread.h>
 #endif
 
@@ -189,7 +193,7 @@ tr_threadJoin( tr_thread * t )
 
 struct tr_lock
 {
-    uint32_t depth;
+    int depth;
 #ifdef __BEOS__
     sem_id lock;
     thread_id lockThread;
@@ -210,9 +214,12 @@ tr_lockNew( void )
 #ifdef __BEOS__
     l->lock = create_sem( 1, "" );
 #elif defined(WIN32)
-    InitializeCriticalSection( &l->lock );
+    InitializeCriticalSection( &l->lock ); /* critical sections support recursion */
 #else
-    pthread_mutex_init( &l->lock, NULL );
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init( &attr );
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
+    pthread_mutex_init( &l->lock, &attr );
 #endif
 
     return l;
@@ -234,232 +241,43 @@ tr_lockFree( tr_lock * l )
 void
 tr_lockLock( tr_lock * l )
 {
-    const tr_thread_id currentThread = tr_getCurrentThread( );
-
-    if( l->lockThread == currentThread )
-    {
-        ++l->depth;
-    }
-    else
-    {
 #ifdef __BEOS__
-        acquire_sem( l->lock );
+    acquire_sem( l->lock );
 #elif defined(WIN32)
-        EnterCriticalSection( &l->lock );
+    EnterCriticalSection( &l->lock );
 #else
-        pthread_mutex_lock( &l->lock );
+    pthread_mutex_lock( &l->lock );
 #endif
-        l->lockThread = currentThread;
-        l->depth = 1;
-    }
+    assert( l->depth >= 0 );
+    if( l->depth )
+        assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ) );
+    l->lockThread = tr_getCurrentThread( );
+    ++l->depth;
 }
 
 int
 tr_lockHave( const tr_lock * l )
 {
     return ( l->depth > 0 )
-        && ( l->lockThread == tr_getCurrentThread() );
+        && ( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ) );
 }
 
 void
 tr_lockUnlock( tr_lock * l )
 {
-    assert( tr_lockHave( l ) );
+    assert( l->depth > 0 );
+    assert( tr_areThreadsEqual( l->lockThread, tr_getCurrentThread() ));
 
-    if( !--l->depth )
-    {
-        l->lockThread = 0;
+    --l->depth;
+    assert( l->depth >= 0 );
 #ifdef __BEOS__
-        release_sem( l->lock );
-#elif defined(WIN32)
-        LeaveCriticalSection( &l->lock );
-#else
-        pthread_mutex_unlock( &l->lock );
-#endif
-    }
-}
-
-/***
-****  COND
-***/
-
-struct tr_cond
-{
-#ifdef __BEOS__
-    sem_id sem;
-    thread_id threads[BEOS_MAX_THREADS];
-    int start, end;
-#elif defined(WIN32)
-    tr_list * events;
-    tr_lock * lock;
-#else
-    pthread_cond_t cond;
-#endif
-};
-
-#ifdef WIN32
-static DWORD getContEventTLS( void )
-{
-    static int inited = FALSE;
-    static DWORD event_tls;
-    if( !inited ) {
-        inited = TRUE;
-        event_tls = TlsAlloc();
-    }
-    return event_tls;
-}
-#endif
-
-tr_cond*
-tr_condNew( void )
-{
-    tr_cond * c = tr_new0( tr_cond, 1 );
-#ifdef __BEOS__
-    c->sem = create_sem( 1, "" );
-    c->start = 0;
-    c->end = 0;
-#elif defined(WIN32)
-    c->events = NULL;
-    c->lock = tr_lockNew( );
-#else
-    pthread_cond_init( &c->cond, NULL );
-#endif
-    return c;
-}
-
-void
-tr_condWait( tr_cond * c, tr_lock * l )
-{
-#ifdef __BEOS__
-
-    /* Keep track of that thread */
-    acquire_sem( c->sem );
-    c->threads[c->end] = find_thread( NULL );
-    c->end = ( c->end + 1 ) % BEOS_MAX_THREADS;
-    assert( c->end != c->start ); /* We hit BEOS_MAX_THREADS, arggh */
-    release_sem( c->sem );
-
     release_sem( l->lock );
-    suspend_thread( find_thread( NULL ) ); /* Wait for signal */
-    acquire_sem( l->lock );
-
 #elif defined(WIN32)
-
-    /* get this thread's cond event */
-    DWORD key = getContEventTLS ( );
-    HANDLE hEvent = TlsGetValue( key );
-    if( !hEvent ) {
-        hEvent = CreateEvent( 0, FALSE, FALSE, 0 );
-        TlsSetValue( key, hEvent );
-    }
-
-    /* add it to the list of events waiting to be signaled */
-    tr_lockLock( c->lock );
-    tr_list_append( &c->events, hEvent );
-    tr_lockUnlock( c->lock );
-
-    /* now wait for it to be signaled */
-    tr_lockUnlock( l );
-    WaitForSingleObject( hEvent, INFINITE );
-    tr_lockLock( l );
-
-    /* remove it from the list of events waiting to be signaled */
-    tr_lockLock( c->lock );
-    tr_list_remove_data( &c->events, hEvent );
-    tr_lockUnlock( c->lock );
-
+    LeaveCriticalSection( &l->lock );
 #else
-
-    pthread_cond_wait( &c->cond, &l->lock );
-
+    pthread_mutex_unlock( &l->lock );
 #endif
 }
-
-#ifdef __BEOS__
-static int condTrySignal( tr_cond * c )
-{
-    if( c->start == c->end )
-        return 1;
-
-    for( ;; )
-    {
-        thread_info info;
-        get_thread_info( c->threads[c->start], &info );
-        if( info.state == B_THREAD_SUSPENDED )
-        {
-            resume_thread( c->threads[c->start] );
-            c->start = ( c->start + 1 ) % BEOS_MAX_THREADS;
-            break;
-        }
-        /* The thread is not suspended yet, which can happen since
-         * tr_condWait does not atomically suspends after releasing
-         * the semaphore. Wait a bit and try again. */
-        snooze( 5000 );
-    }
-    return 0;
-}
-#endif
-void
-tr_condSignal( tr_cond * c )
-{
-#ifdef __BEOS__
-
-    acquire_sem( c->sem );
-    condTrySignal( c );
-    release_sem( c->sem );
-
-#elif defined(WIN32)
-
-    tr_lockLock( c->lock );
-    if( c->events != NULL )
-        SetEvent( (HANDLE)c->events->data );
-    tr_lockUnlock( c->lock );
-
-#else
-
-    pthread_cond_signal( &c->cond );
-
-#endif
-}
-
-void
-tr_condBroadcast( tr_cond * c )
-{
-#ifdef __BEOS__
-
-    acquire_sem( c->sem );
-    while( !condTrySignal( c ) );
-    release_sem( c->sem );
-
-#elif defined(WIN32)
-
-    tr_list * l;
-    tr_lockLock( c->lock );
-    for( l=c->events; l!=NULL; l=l->next )
-        SetEvent( (HANDLE)l->data );
-    tr_lockUnlock( c->lock );
-
-#else
-
-    pthread_cond_broadcast( &c->cond );
-
-#endif
-}
-
-void
-tr_condFree( tr_cond * c )
-{
-#ifdef __BEOS__
-    delete_sem( c->sem );
-#elif defined(WIN32)
-    tr_list_free( &c->events, NULL );
-    tr_lockFree( c->lock );
-#else
-    pthread_cond_destroy( &c->cond );
-#endif
-    tr_free( c );
-}
-
 
 /***
 ****  PATHS
@@ -851,10 +669,10 @@ getsock( void )
         return -1;
     }
 
-    bzero( &snl, sizeof( snl ) );
+    memset( &snl, 0, sizeof(snl) );
     snl.nl_family = AF_NETLINK;
 
-    bzero( &req, sizeof( req ) );
+    memset( &req, 0, sizeof(req) );
     req.nlh.nlmsg_len = NLMSG_LENGTH( sizeof( req.rtg ) );
     req.nlh.nlmsg_type = RTM_GETROUTE;
     req.nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP;
@@ -892,8 +710,8 @@ getroute( int fd, unsigned int * buflen )
 
     for( ;; )
     {
-        bzero( &snl, sizeof( snl ) );
         slen = sizeof( snl );
+        memset( &snl, 0, slen );
         res = recvfrom( fd, buf, len, 0, (struct sockaddr *) &snl, &slen );
         if( 0 > res )
         {
