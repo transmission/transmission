@@ -1199,9 +1199,9 @@ readBtMessage( tr_peermsgs * msgs, struct evbuffer * inbuf, size_t inlen )
             break;
             
         case BT_SUGGEST: {
+            const tr_bitfield * bt = tr_cpPieceBitfield( msgs->torrent->completion );
             dbgmsg( msgs, "Got a BT_SUGGEST" );
             tr_peerIoReadUint32( msgs->io, inbuf, &ui32 );
-            const tr_bitfield * bt = tr_cpPieceBitfield( msgs->torrent->completion );
             if( tr_bitfieldHas( bt, ui32 ) )
                 tr_bitfieldAdd( msgs->clientSuggestedPieces, ui32 );
             break;
