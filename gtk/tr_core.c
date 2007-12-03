@@ -350,7 +350,8 @@ static void
 tr_core_insert( TrCore * self, TrTorrent * tor )
 {
     const tr_info * inf = tr_torrent_info( tor );
-    gtk_list_store_insert_with_values( GTK_LIST_STORE( self->model ), NULL, 0, 
+    GtkTreeIter unused;
+    gtk_list_store_insert_with_values( GTK_LIST_STORE( self->model ), &unused, 0, 
                                        MC_NAME,    inf->name,
                                        MC_SIZE,    inf->totalSize,
                                        MC_HASH,    inf->hashString,
