@@ -190,7 +190,7 @@ fileIsCheckedOut( const struct tr_openfile * o )
 int
 tr_fdFileCheckout( const char * filename, int write )
 {
-    int i, winner;
+    int i, winner = -1;
     struct tr_openfile * o;
 
     assert( filename && *filename );
@@ -213,7 +213,9 @@ tr_fdFileCheckout( const char * filename, int write )
 
         if( fileIsCheckedOut( o ) ) {
             dbgmsg( "found it!  it's open, but checked out.  waiting..." );
-            tr_wait( 100 );
+            tr_lockUnlock( gFd->lock );
+            tr_wait( 200 );
+            tr_lockLock( gFd->lock );
             i = -1; /* reloop */
             continue;
         }
@@ -226,16 +228,15 @@ tr_fdFileCheckout( const char * filename, int write )
 
         dbgmsg( "found it!  it's ready for use!" );
         winner = i;
-        goto done;
+        break;
     }
 
-
     dbgmsg( "it's not already open.  looking for an open slot or an old file." );
-    for( ;; )
+    while( winner < 0 )
     {
         uint64_t date = tr_date( ) + 1;
-        winner = -1;
 
+        /* look for the file that's been open longest */
         for( i=0; i<TR_MAX_OPEN_FILES; ++i )
         {
             o = &gFd->open[i];
@@ -243,7 +244,7 @@ tr_fdFileCheckout( const char * filename, int write )
             if( !fileIsOpen( o ) ) {
                 winner = i;
                 dbgmsg( "found an empty slot in %d", winner );
-                goto done;
+                break;
             }
 
             if( date > o->date ) {
@@ -255,16 +256,15 @@ tr_fdFileCheckout( const char * filename, int write )
         if( winner >= 0 ) {
             dbgmsg( "closing file '%s', slot #%d", gFd->open[winner].filename, winner );
             TrCloseFile( winner );
-            goto done;
+        } else { 
+            dbgmsg( "everything's full!  waiting for someone else to finish something" );
+            tr_lockUnlock( gFd->lock );
+            tr_wait( 200 );
+            tr_lockLock( gFd->lock );
         }
-
-        /* All used! Wait a bit and try again */
-        dbgmsg( "everything's full!  waiting for someone else to finish something" );
-        tr_wait( 100 );
     }
 
-done:
-
+    assert( winner >= 0 );
     o = &gFd->open[winner];
     if( !fileIsOpen( o ) )
     {
