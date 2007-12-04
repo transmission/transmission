@@ -106,7 +106,6 @@
         return;
     
     //set strings and icon
-    NSImage * icon = nil;
     NSString * secondString = [NSString stringForFileSize: size];
     if (count > 1 || folder)
     {
@@ -118,12 +117,14 @@
         secondString = [fileString stringByAppendingString: secondString];
     }
     
+    NSImage * icon;
     if (count == 1)
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
     else
     {
         name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> torrents"), count];
         secondString = [secondString stringByAppendingString: @" Total"];
+        icon = [NSImage imageNamed: @"TransmissionDocument.icns"];
     }
     
     [[self contentView] setOverlay: icon mainLine: name subLine: secondString];

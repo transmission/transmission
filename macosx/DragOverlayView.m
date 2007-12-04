@@ -26,6 +26,7 @@
 #import "NSBezierPathAdditions.h"
 
 #define PADDING 10.0
+#define ICON_WIDTH 64.0
 
 @implementation DragOverlayView
 
@@ -76,9 +77,7 @@
 - (void) dealloc
 {
     [fBackBadge release];
-    
     [fBadge release];
-    [fAppIcon release];
     
     [fMainLineAttributes release];
     [fSubLineAttributes release];
@@ -92,39 +91,19 @@
     fBadge = [fBackBadge copy];
     NSSize badgeSize = [fBadge size];
     
-    //get icon
-    NSSize iconSize = NSMakeSize(64.0, 64.0);
-    if (!icon)
-    {
-        if (!fAppIcon)
-        {
-            fAppIcon = [[NSImage imageNamed: @"TransmissionDocument.icns"] copy];
-            [fAppIcon setScalesWhenResized: YES];
-            [fAppIcon setSize: iconSize];
-        }
-        icon = [fAppIcon retain];
-    }
-    else
-    {
-        icon = [icon copy];
-        [icon setScalesWhenResized: YES];
-        [icon setSize: iconSize];
-    }
-    
-    [fBadge lockFocus];
-    
     //place icon
-    [icon compositeToPoint: NSMakePoint(PADDING, (badgeSize.height - iconSize.height) * 0.5)
-                operation: NSCompositeSourceOver];
-    [icon release];
+    [fBadge lockFocus];
+    const float WIDTH = 64.0;
+    [icon drawInRect: NSMakeRect(PADDING, (badgeSize.height - ICON_WIDTH) * 0.5, ICON_WIDTH, ICON_WIDTH) fromRect: NSZeroRect
+            operation: NSCompositeSourceOver fraction: 1.0];
     
     //place main text
     NSSize mainLineSize = [mainLine sizeWithAttributes: fMainLineAttributes];
     NSSize subLineSize = [subLine sizeWithAttributes: fSubLineAttributes];
     
-    NSRect lineRect = NSMakeRect(PADDING + iconSize.width + 5.0,
+    NSRect lineRect = NSMakeRect(PADDING + ICON_WIDTH + 5.0,
                         (badgeSize.height + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
-                        badgeSize.width - (PADDING + iconSize.width + 2.0) - PADDING, mainLineSize.height);
+                        badgeSize.width - (PADDING + ICON_WIDTH + 2.0) - PADDING, mainLineSize.height);
     [mainLine drawInRect: lineRect withAttributes: fMainLineAttributes];
     
     //place sub text
