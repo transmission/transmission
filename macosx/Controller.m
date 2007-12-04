@@ -1400,14 +1400,25 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             else
                 [self sortTorrents];
             
-            //update the global DL/UL rates
+            //update status bar
             if (![fStatusBar isHidden])
             {
+                //set rates
                 float downloadRate, uploadRate;
                 tr_torrentRates(fLib, & downloadRate, & uploadRate);
                 
                 [fTotalDLField setStringValue: [NSString stringForSpeed: downloadRate]];
                 [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];
+                
+                //set status button text
+                tr_session_stats stats;
+                tr_getCumulativeSessionStats(fLib, &stats);
+                
+                NSString * statusString = [NSLocalizedString(@"Total Ratio: ", "status bar -> status button text")
+                                            stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                
+                [fStatusButton setTitle: statusString];
+                [fStatusButton sizeToFit];
             }
         }
 

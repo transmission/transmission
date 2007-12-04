@@ -193,6 +193,8 @@
 				<string>NSButton</string>
 				<key>fStatusBar</key>
 				<string>StatusBarView</string>
+				<key>fStatusButton</key>
+				<string>NSButton</string>
 				<key>fTableView</key>
 				<string>TorrentTableView</string>
 				<key>fTotalDLField</key>
@@ -233,6 +235,14 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>FilterButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkFile</key>
@@ -269,14 +279,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FilterButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

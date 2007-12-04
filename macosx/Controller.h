@@ -58,9 +58,11 @@
     
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     NSTimer                         * fSpeedLimitTimer;
+    IBOutlet NSTextField            * fTotalTorrentsField;
     
     IBOutlet StatusBarView          * fStatusBar;
-    IBOutlet NSTextField            * fTotalDLField, * fTotalULField, * fTotalTorrentsField;
+    IBOutlet NSButton               * fStatusButton;
+    IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
     
     IBOutlet StatusBarView          * fFilterBar;
     IBOutlet FilterButton           * fNoFilterButton, * fDownloadFilterButton, * fSeedFilterButton, * fPauseFilterButton;
