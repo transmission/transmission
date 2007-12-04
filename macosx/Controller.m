@@ -1816,12 +1816,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSString * totalTorrentsString;
     int totalCount = [fTorrents count];
     if (totalCount != 1)
-        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d Transfers", "Status bar transfer count"), totalCount];
+        totalTorrentsString = [NSString stringWithFormat: NSLocalizedString(@"%d transfers", "Status bar transfer count"), totalCount];
     else
-        totalTorrentsString = NSLocalizedString(@"1 Transfer", "Status bar transfer count");
+        totalTorrentsString = NSLocalizedString(@"1 transfer", "Status bar transfer count");
     
     if (filtering)
-        totalTorrentsString = [NSString stringWithFormat: @"%d/%@", [fDisplayedTorrents count], totalTorrentsString];
+        totalTorrentsString = [NSString stringWithFormat: @"%d of %@", [fDisplayedTorrents count], totalTorrentsString];
     
     [fTotalTorrentsField setStringValue: totalTorrentsString];
 
