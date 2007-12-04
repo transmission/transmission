@@ -132,8 +132,9 @@
     //string is in center of image
     rect.origin.x += (rect.size.width - stringSize.width) * 0.5;
     rect.origin.y += (rect.size.height - stringSize.height) * 0.5;
+    rect.size = stringSize;
                         
-    [string drawAtPoint: rect.origin withAttributes: fAttributes];
+    [string drawInRect: rect withAttributes: fAttributes];
 }
 
 @end

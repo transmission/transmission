@@ -92,35 +92,21 @@
     {
         NSImage * image;
         if (count == 0)
-        {
-            if (!fNoneImage)
-                fNoneImage = [NSImage imageNamed: @"PriorityNone.png"];
-            image = fNoneImage;
-        }
+            image = [NSImage imageNamed: @"PriorityNone.png"];
         else if (count > 1)
-        {
-            if (!fMixedImage)
-                fMixedImage = [NSImage imageNamed: @"PriorityMixed.png"];
-            image = fMixedImage;
-        }
+            image = [NSImage imageNamed: @"PriorityMixed.png"];
         else
         {
             switch ([[priorities anyObject] intValue])
             {
                 case TR_PRI_NORMAL:
-                    if (!fNormalImage)
-                        fNormalImage = [NSImage imageNamed: @"PriorityNormal.png"];
-                    image = fNormalImage;
+                    image = [NSImage imageNamed: @"PriorityNormal.png"];
                     break;
                 case TR_PRI_LOW:
-                    if (!fLowImage)
-                        fLowImage = [NSImage imageNamed: @"PriorityLow.png"];
-                    image = fLowImage;
+                    image = [NSImage imageNamed: @"PriorityLow.png"];
                     break;
                 case TR_PRI_HIGH:
-                    if (!fHighImage)
-                        fHighImage = [NSImage imageNamed: @"PriorityHigh.png"];
-                    image = fHighImage;
+                    image = [NSImage imageNamed: @"PriorityHigh.png"];
                     break;
             }
         }

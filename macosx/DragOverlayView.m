@@ -91,9 +91,9 @@
     fBadge = [fBackBadge copy];
     NSSize badgeSize = [fBadge size];
     
-    //place icon
     [fBadge lockFocus];
-    const float WIDTH = 64.0;
+    
+    //place icon
     [icon drawInRect: NSMakeRect(PADDING, (badgeSize.height - ICON_WIDTH) * 0.5, ICON_WIDTH, ICON_WIDTH) fromRect: NSZeroRect
             operation: NSCompositeSourceOver fraction: 1.0];
     
