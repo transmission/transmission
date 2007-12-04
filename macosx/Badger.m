@@ -220,10 +220,14 @@
     }
 }
 
-//for quitting -- only needed by Tiger
 - (void) clearBadge
 {
-    if (![NSApp isOnLeopardOrBetter])
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        [self clearCompleted];
+        [[NSApp dockTile] setContentView: nil];
+    }
+    else
     {
         fSpeedBadge = NO;
         fCompleted = 0;
