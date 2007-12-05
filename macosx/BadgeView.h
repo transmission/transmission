@@ -32,7 +32,6 @@
     NSDictionary * fAttributes;
     
     BOOL fQuitting;
-    NSProgressIndicator * fQuitIndicator;
 }
 
 - (id) initWithFrame: (NSRect) frame lib: (tr_handle *) lib;

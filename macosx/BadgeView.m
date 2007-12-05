@@ -63,6 +63,7 @@
     
     if (fQuitting)
     {
+        [self badge: [NSImage imageNamed: @"UploadBadge"] string: @"Quitting" atHeight: 0.0];
         return;
     }
     
@@ -76,22 +77,14 @@
         float downloadRate, uploadRate;
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
+        BOOL upload;
+        if ((upload = checkUpload && uploadRate >= 0.1))
+            [self badge: [NSImage imageNamed: @"UploadBadge"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
         if (checkDownload && downloadRate >= 0.1)
-            downloadRateString = [NSString stringForSpeedAbbrev: downloadRate];
-        if (checkUpload && uploadRate >= 0.1)
-            uploadRateString = [NSString stringForSpeedAbbrev: uploadRate];
-        
-        if (uploadRateString || downloadRateString)
         {
-           if (uploadRateString)
-                [self badge: [NSImage imageNamed: @"UploadBadge"] string: uploadRateString atHeight: 0.0];
-            
-            if (downloadRateString)
-            {
-                //download rate above upload rate
-                float bottom = uploadRateString ? [[NSImage imageNamed: @"UploadBadge"] size].height + BETWEEN_PADDING : 0.0;
-                [self badge: [NSImage imageNamed: @"DownloadBadge"] string: downloadRateString atHeight: bottom];
-            }
+            //download rate above upload rate
+            float bottom = upload ? [[NSImage imageNamed: @"UploadBadge"] size].height + BETWEEN_PADDING : 0.0;
+            [self badge: [NSImage imageNamed: @"DownloadBadge"] string: [NSString stringForSpeedAbbrev: downloadRate] atHeight: bottom];
         }
     }
 }
