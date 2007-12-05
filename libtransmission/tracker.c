@@ -379,15 +379,19 @@ parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
     return compact;
 }
 
+static void onReqDone( tr_handle * handle );
+
 static void
-onTrackerResponse( struct evhttp_request * req, void * torrent_hash )
+onTrackerResponse( struct evhttp_request * req, void * vhash )
 {
     const char * warning;
-    tr_tracker * t;
     int responseCode;
+    struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
+    tr_tracker * t = findTrackerFromHash( torrent_hash );
 
-    t = findTrackerFromHash( torrent_hash );
+    onReqDone( torrent_hash->handle );
     tr_free( torrent_hash );
+
     if( t == NULL ) /* tracker has been closed */
         return;
 
@@ -539,11 +543,14 @@ onScrapeResponse( struct evhttp_request * req, void * vhash )
 {
     const char * warning;
     time_t nextScrapeSec = 60;
-    tr_tracker * t = findTrackerFromHash( vhash );
+    struct torrent_hash * torrent_hash = (struct torrent_hash*) vhash;
+    tr_tracker * t = findTrackerFromHash( torrent_hash );
+
+    onReqDone( torrent_hash->handle );
+    tr_free( torrent_hash );
 
     dbgmsg( t, "Got scrape response for '%s': %s (%d)", (t ? t->name : "(null)"), (req ? req->response_code_line : "(no line)"), (req ? req->response_code : -1) );
 
-    tr_free( vhash );
     if( t == NULL ) /* tracker's been closed... */
         return;
 
@@ -817,17 +824,10 @@ connectionClosedCB( struct evhttp_connection * evcon, void * vhandle )
 {
     tr_handle * handle = vhandle;
 
-    assert( handle );
-    assert( handle->tracker );
-
     /* libevent references evcon right after calling this function,
        so we can't free it yet... defer it to after this call chain
        has played out */
     tr_timerNew( handle, freeConnection, evcon, 100 );
-
-    --handle->tracker->socketCount;
-    dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
-    pulse( handle );
 }
 
 static struct evhttp_connection*
@@ -927,6 +927,14 @@ pulse( void * vhandle )
         dbgmsg( NULL, "tracker pulse done... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
     return maybeFreeGlobals( handle );
+}
+
+static void
+onReqDone( tr_handle * handle )
+{
+    pulse( handle );
+    --handle->tracker->socketCount;
+    dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
 }
 
 /***
