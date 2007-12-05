@@ -5,6 +5,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + UPnP now performed by MiniUPnP
    + Option to prefer not using encryption
    + Restore `scrape' feature in the command-line interface client
+   + Updated icon
 - OS X:
    + Statistics window
    + Pieces Bar (return of Advanced Bar)
@@ -16,7 +17,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 - GTK+:
    + Statistics window
 
-0.95 (2007/12/xx)
+0.95 (2007/12/04)
 - All Platforms:
    + Fix router errors caused by sending too many tracker requests at once
    + Fix bug that let speed-limited torrents upload too quickly

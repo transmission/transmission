@@ -6,26 +6,28 @@
     <description>Most recent version available.</description>
     <language>en</language>
     <pubDate>Tue, 23 Oct 2007 23:20:00 -0400</pubDate>
-    <lastBuildDate>Sun, 25 Nov 2007 19:05:00 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 4 Dec 2007 22:45:00 -0400</lastBuildDate>
 
 	<item>
-      <title>Transmission 0.94 Released</title>
+      <title>Transmission 0.95 Released</title>
       <description><![CDATA[
-<h4>Transmission Changes:</h4>
+<h4>Core Changes:</h4>
 <ul>
- <li>Faster average download speeds</li>
- <li>Automatically ban peers that send us too many corrupt pieces</li>
- <li>Fix a crash that occurred if a peer sent us an incomplete message</li>
- <li>Fix portmapping crash</li>
- <li>Fix bug that left files open after their torrents were stopped</li>
- <li>Fix 0.93 file permissions bug</li>
- <li>Fix tracker redirect error</li>
- <li>Fix LTEP PEX bug</li>
+ <li>Fix router errors caused by sending too many tracker requests at once</li>
+ <li>Fix bug that let speed-limited torrents upload too quickly</li>
+ <li>Faster average upload speedse</li>
+ <li>Faster connection to peers after starting a torrent</li>
+ <li>Fix memory corruption error</li>
+ <li>Disable SWIFT for ratio-based trackers</li>
+</ul>
+<h4>Mac Changes:</h4>
+<ul>
+ <li>Leopard: Fix for NAT-PMP port mapping</li>
 </ul>
 
 <h4>TRANSMISSION 0.72 AND EARLIER: COMPLETE YOUR DOWNLOADS BEFORE UPGRADING OR YOU WILL LOSE DATA!</h4>]]></description>
-      <pubDate>Sun, 25 Nov 2007 19:05:00 -0400</pubDate>
-      <enclosure sparkle:version="3959" sparkle:shortVersionString="0.94" url="http://mirrors.m0k.org/transmission/files/Transmission-0.94.dmg" length="2405004" type="application/octet-stream"/>
+      <pubDate>Tue, 4 Dec 2007 22:45:00 -0400</pubDate>
+      <enclosure sparkle:version="4067" sparkle:shortVersionString="0.95" url="http://mirrors.m0k.org/transmission/files/Transmission-0.95.dmg" length="2406867" type="application/octet-stream"/>
     </item>
     
   </channel>
