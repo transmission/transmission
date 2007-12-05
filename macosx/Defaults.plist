@@ -120,6 +120,8 @@
 	<integer>30</integer>
 	<key>StatusBar</key>
 	<true/>
+	<key>StatusLabel</key>
+	<string>RatioTotal</string>
 	<key>UploadLimit</key>
 	<integer>20</integer>
 	<key>UseIncompleteDownloadFolder</key>

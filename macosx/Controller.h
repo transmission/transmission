@@ -182,6 +182,8 @@
 - (void) setFilterSearchType: (id) sender;
 - (void) switchFilter: (id) sender;
 
+- (void) setStatusLabel: (id) sender;
+
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;
 - (void) autoSpeedLimit;

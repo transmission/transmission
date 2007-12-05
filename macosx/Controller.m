@@ -84,6 +84,19 @@ typedef enum
 #define FILTER_TYPE_TAG_NAME    401
 #define FILTER_TYPE_TAG_TRACKER 402
 
+#define STATUS_RATIO_TOTAL      @"RatioTotal"
+#define STATUS_RATIO_SESSION    @"RatioSession"
+#define STATUS_TRANSFER_TOTAL   @"TransferTotal"
+#define STATUS_TRANSFER_SESSION @"TransferSession"
+
+typedef enum
+{
+    STATUS_RATIO_TOTAL_TAG = 0,
+    STATUS_RATIO_SESSION_TAG = 1,
+    STATUS_TRANSFER_TOTAL_TAG = 2,
+    STATUS_TRANSFER_SESSION_TAG = 3
+} statusTag;
+
 #define GROWL_DOWNLOAD_COMPLETE @"Download Complete"
 #define GROWL_SEEDING_COMPLETE  @"Seeding Complete"
 #define GROWL_AUTO_ADD          @"Torrent Auto Added"
@@ -1411,11 +1424,43 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 [fTotalULField setStringValue: [NSString stringForSpeed: uploadRate]];
                 
                 //set status button text
-                tr_session_stats stats;
-                tr_getCumulativeSessionStats(fLib, &stats);
-                
-                NSString * statusString = [NSLocalizedString(@"Total Ratio: ", "status bar -> status button text")
-                                            stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                NSString * statusLabel = [fDefaults stringForKey: @"StatusLabel"], * statusString;
+                if ([statusLabel isEqualToString: STATUS_RATIO_TOTAL])
+                {
+                    tr_session_stats stats;
+                    tr_getCumulativeSessionStats(fLib, &stats);
+                    
+                    statusString = [NSLocalizedString(@"Total Ratio: ", "status bar -> status button text")
+                                                stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                }
+                else if ([statusLabel isEqualToString: STATUS_RATIO_SESSION])
+                {
+                    tr_session_stats stats;
+                    tr_getSessionStats(fLib, &stats);
+                    
+                    statusString = [NSLocalizedString(@"Ratio: ", "status bar -> status button text")
+                                                stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                }
+                else if ([statusLabel isEqualToString: STATUS_TRANSFER_TOTAL])
+                {
+                    tr_session_stats stats;
+                    tr_getCumulativeSessionStats(fLib, &stats);
+                    
+                    statusString = [NSString stringWithFormat: NSLocalizedString(@"Total DL: %@ Total UL: %@",
+                        "status bar -> status button text"),
+                        [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
+                }
+                else if ([statusLabel isEqualToString: STATUS_TRANSFER_SESSION])
+                {
+                    tr_session_stats stats;
+                    tr_getSessionStats(fLib, &stats);
+                    
+                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@ UL: %@",
+                        "status bar -> status button text"),
+                        [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
+                }
+                else
+                    statusString = @"";
                 
                 [fStatusButton setTitle: statusString];
                 [fStatusButton sizeToFit];
@@ -1920,6 +1965,31 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         button = fNoFilterButton;
     
     [self setFilter: button];
+}
+
+- (void) setStatusLabel: (id) sender
+{
+    NSString * statusLabel;
+    switch ([sender tag])
+    {
+        case STATUS_RATIO_TOTAL_TAG:
+            statusLabel = STATUS_RATIO_TOTAL;
+            break;
+        case STATUS_RATIO_SESSION_TAG:
+            statusLabel = STATUS_RATIO_SESSION;
+            break;
+        case STATUS_TRANSFER_TOTAL_TAG:
+            statusLabel = STATUS_TRANSFER_TOTAL;
+            break;
+        case STATUS_TRANSFER_SESSION_TAG:
+            statusLabel = STATUS_TRANSFER_SESSION;
+            break;
+        default:
+            return;
+    }
+    
+    [fDefaults setObject: statusLabel forKey: @"StatusLabel"];
+    [self updateUI];
 }
 
 - (void) updateControlTint: (NSNotification *) notification
@@ -2817,6 +2887,32 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [menuItem setState: [sortType isEqualToString: [fDefaults stringForKey: @"Sort"]] ? NSOnState : NSOffState];
         return [fWindow isVisible];
+    }
+    
+    //enable sort options
+    if (action == @selector(setStatusLabel:))
+    {
+        NSString * statusLabel;
+        switch ([menuItem tag])
+        {
+            case STATUS_RATIO_TOTAL_TAG:
+                statusLabel = STATUS_RATIO_TOTAL;
+                break;
+            case STATUS_RATIO_SESSION_TAG:
+                statusLabel = STATUS_RATIO_SESSION;
+                break;
+            case STATUS_TRANSFER_TOTAL_TAG:
+                statusLabel = STATUS_TRANSFER_TOTAL;
+                break;
+            case STATUS_TRANSFER_SESSION_TAG:
+                statusLabel = STATUS_TRANSFER_SESSION;
+                break;
+            default:
+                statusLabel = @"";;
+        }
+        
+        [menuItem setState: [statusLabel isEqualToString: [fDefaults stringForKey: @"StatusLabel"]] ? NSOnState : NSOffState];
+        return YES;
     }
     
     if (action == @selector(toggleSmallView:))

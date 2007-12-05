@@ -118,6 +118,8 @@
 				<string>id</string>
 				<key>setSortReverse</key>
 				<string>id</string>
+				<key>setStatusLabel</key>
+				<string>id</string>
 				<key>showAboutWindow</key>
 				<string>id</string>
 				<key>showInfo</key>
@@ -235,14 +237,6 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>FilterButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkFile</key>
@@ -279,6 +273,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FilterButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
