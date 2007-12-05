@@ -10,8 +10,7 @@ Lead Developers <transmission-dev@m0k.org>
 
 Project Contributors
         Nick Pucius  (Mac OS X Help documentation)
-        Hugo van Heuven, madebysofa  (Icon design, Mac toolbar icons)
-        Anthony Ryan  (Redesigned icon, Mac inspector icons)
+	Hugo van Heuven, madebysofa  (Main icon design)
 
 Translators
 Mac OS X, current release:
@@ -44,9 +43,9 @@ GTK+:
 Special Thanks
 
 Image Contributors
-        FOOOD
-        Martin Stadtmueller  (Icon tweaking)
+	Anthony Ryan  (Mac inspector icons)
 	Rick Patrick  (Toolbar icons)
+	FOOOD
         Mike Matas <http://www.mikematas.com/>  (Previous toolbar icons)
         Jonas Rask  (Globe icon)
         George Tsotsos

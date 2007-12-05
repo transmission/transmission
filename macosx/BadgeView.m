@@ -64,7 +64,7 @@
     if (fQuitting)
     {
         #warning make better
-        [self badge: [NSImage imageNamed: @"UploadBadge"] string: @"Quitting" atHeight: 0.0];
+        //[self badge: [NSImage imageNamed: @"UploadBadge"] string: @"Quitting" atHeight: 0.0];
         return;
     }
     
@@ -72,9 +72,6 @@
         checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
     if (checkDownload || checkUpload)
     {
-        //set upload and download rate badges
-        NSString * downloadRateString = nil, * uploadRateString = nil;
-        
         float downloadRate, uploadRate;
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
