@@ -748,7 +748,7 @@ createScrape( tr_handle * handle, const tr_tracker * tracker )
     req->timeout = TIMEOUT_INTERVAL_SEC;
     req->req = evhttp_request_new( onScrapeResponse, torrentHashNew( handle, tracker ) );
     req->reqtype = TR_REQ_SCRAPE;
-    tr_asprintf( &req->uri, "%s%cinfo_hash=%s", a->scrape, strchr(a->scrape,'?')?'&':'?', tracker->escaped );
+    asprintf( &req->uri, "%s%cinfo_hash=%s", a->scrape, strchr(a->scrape,'?')?'&':'?', tracker->escaped );
     memcpy( req->torrent_hash, tracker->hash, SHA_DIGEST_LENGTH );
     addCommonHeaders( tracker, req->req );
 
