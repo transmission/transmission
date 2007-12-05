@@ -1425,38 +1425,28 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 
                 //set status button text
                 NSString * statusLabel = [fDefaults stringForKey: @"StatusLabel"], * statusString;
-                if ([statusLabel isEqualToString: STATUS_RATIO_TOTAL])
+                BOOL total;
+                if ((total = [statusLabel isEqualToString: STATUS_RATIO_TOTAL]) || [statusLabel isEqualToString: STATUS_RATIO_SESSION])
                 {
                     tr_session_stats stats;
-                    tr_getCumulativeSessionStats(fLib, &stats);
+                    if (total)
+                        tr_getCumulativeSessionStats(fLib, &stats);
+                    else
+                        tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSLocalizedString(@"Total Ratio: ", "status bar -> status button text")
-                                                stringByAppendingString: [NSString stringForRatio: stats.ratio]];
+                    statusString = [NSLocalizedString(@"Ratio: ", "status bar -> status label")
+                                    stringByAppendingString: [NSString stringForRatio: stats.ratio]];
                 }
-                else if ([statusLabel isEqualToString: STATUS_RATIO_SESSION])
+                else if ((total = [statusLabel isEqualToString: STATUS_TRANSFER_TOTAL])
+                            || [statusLabel isEqualToString: STATUS_TRANSFER_SESSION])
                 {
                     tr_session_stats stats;
-                    tr_getSessionStats(fLib, &stats);
+                    if (total)
+                        tr_getCumulativeSessionStats(fLib, &stats);
+                    else
+                        tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSLocalizedString(@"Ratio: ", "status bar -> status button text")
-                                                stringByAppendingString: [NSString stringForRatio: stats.ratio]];
-                }
-                else if ([statusLabel isEqualToString: STATUS_TRANSFER_TOTAL])
-                {
-                    tr_session_stats stats;
-                    tr_getCumulativeSessionStats(fLib, &stats);
-                    
-                    statusString = [NSString stringWithFormat: NSLocalizedString(@"Total DL: %@ Total UL: %@",
-                        "status bar -> status button text"),
-                        [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
-                }
-                else if ([statusLabel isEqualToString: STATUS_TRANSFER_SESSION])
-                {
-                    tr_session_stats stats;
-                    tr_getSessionStats(fLib, &stats);
-                    
-                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@ UL: %@",
-                        "status bar -> status button text"),
+                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@ UL: %@", "status bar -> status label"),
                         [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
                 }
                 else
