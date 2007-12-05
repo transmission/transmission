@@ -148,11 +148,8 @@
                 fDockIcon = [[NSImage imageNamed: @"NSApplicationIcon"] copy];
             dockIcon = [fDockIcon copy];
             
-            if (!fUploadBadge)
-                fUploadBadge = [NSImage imageNamed: @"UploadBadge"];
-            
             NSRect badgeRect;
-            badgeRect.size = [fUploadBadge size];
+            badgeRect.size = [[NSImage imageNamed: @"UploadBadge"] size];
             badgeRect.origin = NSZeroPoint;
             
             //ignore shadow of badge when placing string
@@ -165,7 +162,7 @@
             if (uploadRateString)
             {
                 //place badge and text
-                [fUploadBadge compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
+                [[NSImage imageNamed: @"UploadBadge"] compositeToPoint: badgeRect.origin operation: NSCompositeSourceOver];
                 [self badgeString: uploadRateString forRect: stringRect];
             }
             
@@ -220,12 +217,13 @@
     }
 }
 
-- (void) clearBadge
+- (void) setQuitting
 {
     if ([NSApp isOnLeopardOrBetter])
     {
         [self clearCompleted];
-        [[NSApp dockTile] setContentView: nil];
+        [(BadgeView *)[[NSApp dockTile] contentView] setQuitting];
+        [[NSApp dockTile] display];
     }
     else
     {

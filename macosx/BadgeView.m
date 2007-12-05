@@ -30,7 +30,7 @@
 
 @interface BadgeView (Private)
 
-- (void) badgeString: (NSString *) string forRect: (NSRect) rect;
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height;
 
 @end
 
@@ -41,8 +41,14 @@
     if ((self = [super initWithFrame: frame]))
     {
         fLib = lib;
+        fQuitting = NO;
     }
     return self;
+}
+
+- (void) setQuitting
+{
+    fQuitting = YES;
 }
 
 - (void) dealloc
@@ -54,6 +60,11 @@
 - (void) drawRect: (NSRect) rect
 {
     [[NSImage imageNamed: @"NSApplicationIcon"] drawInRect: rect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
+    
+    if (fQuitting)
+    {
+        return;
+    }
     
     BOOL checkDownload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeDownloadRate"],
         checkUpload = [[NSUserDefaults standardUserDefaults] boolForKey: @"BadgeUploadRate"];
@@ -72,36 +83,14 @@
         
         if (uploadRateString || downloadRateString)
         {
-            NSRect badgeRect = NSZeroRect;
-            badgeRect.size = [[NSImage imageNamed: @"UploadBadge"] size];
-            
-            //ignore shadow of badge when placing string
-            NSRect stringRect = badgeRect;
-            stringRect.size.height -= BOTTOM_PADDING;
-            stringRect.origin.y += BOTTOM_PADDING;
-            
-            if (uploadRateString)
-            {
-                //place badge and text
-                [[NSImage imageNamed: @"UploadBadge"] drawInRect: badgeRect fromRect: NSZeroRect
-                                                        operation: NSCompositeSourceOver fraction: 1.0];
-                [self badgeString: uploadRateString forRect: stringRect];
-            }
+           if (uploadRateString)
+                [self badge: [NSImage imageNamed: @"UploadBadge"] string: uploadRateString atHeight: 0.0];
             
             if (downloadRateString)
             {
                 //download rate above upload rate
-                if (uploadRateString)
-                {
-                    float spaceBetween = badgeRect.size.height + BETWEEN_PADDING;
-                    badgeRect.origin.y += spaceBetween;
-                    stringRect.origin.y += spaceBetween;
-                }
-                
-                //place badge and text
-                [[NSImage imageNamed: @"DownloadBadge"] drawInRect: badgeRect fromRect: NSZeroRect
-                                                        operation: NSCompositeSourceOver fraction: 1.0];
-                [self badgeString: downloadRateString forRect: stringRect];
+                float bottom = uploadRateString ? [[NSImage imageNamed: @"UploadBadge"] size].height + BETWEEN_PADDING : 0.0;
+                [self badge: [NSImage imageNamed: @"DownloadBadge"] string: downloadRateString atHeight: bottom];
             }
         }
     }
@@ -112,7 +101,7 @@
 @implementation BadgeView (Private)
 
 //dock icon must have locked focus
-- (void) badgeString: (NSString *) string forRect: (NSRect) rect
+- (void) badge: (NSImage *) badge string: (NSString *) string atHeight: (float) height
 {
     if (!fAttributes)
     {
@@ -127,14 +116,24 @@
         [stringShadow release];
     }
     
-    NSSize stringSize = [string sizeWithAttributes: fAttributes];
+    NSRect badgeRect = NSZeroRect;
+    badgeRect.size = [badge size];
+    badgeRect.origin.y = height;
+    
+    [badge drawInRect: badgeRect fromRect: NSZeroRect operation: NSCompositeSourceOver fraction: 1.0];
     
     //string is in center of image
-    rect.origin.x += (rect.size.width - stringSize.width) * 0.5;
-    rect.origin.y += (rect.size.height - stringSize.height) * 0.5;
-    rect.size = stringSize;
-                        
-    [string drawInRect: rect withAttributes: fAttributes];
+    NSSize stringSize = [string sizeWithAttributes: fAttributes];
+    
+    NSRect stringRect = badgeRect;
+    stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
+    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5;
+    stringRect.size = stringSize;
+    
+    //adjust for shadow
+    stringRect.origin.y += 1.0;
+    
+    [string drawInRect: stringRect withAttributes: fAttributes];
 }
 
 @end

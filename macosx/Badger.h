@@ -29,7 +29,7 @@
 {
     tr_handle       * fLib;
     
-    NSImage         * fDockIcon, * fBadge, * fUploadBadge;
+    NSImage         * fDockIcon, * fBadge;
     
     NSDictionary    * fAttributes;
     int             fCompleted, fCompletedBadged;
@@ -41,6 +41,6 @@
 - (void) updateBadge;
 - (void) incrementCompleted;
 - (void) clearCompleted;
-- (void) clearBadge;
+- (void) setQuitting;
 
 @end

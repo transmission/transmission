@@ -31,7 +31,6 @@
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "AboutWindowController.h"
-#import "QuittingWindowController.h"
 #import "ButtonToolbarItem.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
@@ -490,6 +489,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) applicationWillTerminate: (NSNotification *) notification
 {
+    [fBadger setQuitting];
+    
     //stop timers and notification checking
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
@@ -532,18 +533,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [self showStatusBar: NO animate: NO];
     [self showFilterBar: NO animate: NO];
     
-    //show quit window
-    QuittingWindowController * quitController = [[QuittingWindowController alloc] init];
-    [quitController showWindow: self];
-    
     //save history
     [self updateTorrentHistory];
     
     [fDisplayedTorrents removeAllObjects];
     [fTorrents removeAllObjects];
-    
-    //clear badge
-    [fBadger clearBadge];
     
     //remaining calls the same as dealloc 
     [fInfoController release];
@@ -553,7 +547,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fTorrents release];
     [fDisplayedTorrents release];
     
-    [fBadger release];
     [fOverlayWindow release];
     [fIPCController release];
     
@@ -1446,7 +1439,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     else
                         tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@ UL: %@", "status bar -> status label"),
+                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@   UL: %@",
+                        "status bar -> status label (3 spaces between)"),
                         [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
                 }
                 else
