@@ -141,8 +141,6 @@
 		A2DA362B0CBC674900C2ED41 /* InfoFiles.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36280CBC674900C2ED41 /* InfoFiles.png */; };
 		A2DA362C0CBC674900C2ED41 /* InfoPeers.png in Resources */ = {isa = PBXBuildFile; fileRef = A2DA36290CBC674900C2ED41 /* InfoPeers.png */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.m */; };
-		A2E165BC0CFE44250047F575 /* QuittingWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E165BB0CFE44250047F575 /* QuittingWindowController.m */; };
-		A2E165C80CFE45AF0047F575 /* QuittingWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2E165C70CFE45AF0047F575 /* QuittingWindow.xib */; };
 		A2E23AC60CB5E1930002BB25 /* InfoTabButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */; };
 		A2E9AA760C249AF400085DCF /* Create.png in Resources */ = {isa = PBXBuildFile; fileRef = A2E9AA750C249AF400085DCF /* Create.png */; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.m */; };
@@ -521,9 +519,6 @@
 		A2DA36290CBC674900C2ED41 /* InfoPeers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoPeers.png; path = macosx/Images/InfoPeers.png; sourceTree = "<group>"; };
 		A2DF37040C220D03006523C1 /* CreatorWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CreatorWindowController.h; path = macosx/CreatorWindowController.h; sourceTree = "<group>"; };
 		A2DF37050C220D03006523C1 /* CreatorWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CreatorWindowController.m; path = macosx/CreatorWindowController.m; sourceTree = "<group>"; };
-		A2E165BA0CFE44250047F575 /* QuittingWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QuittingWindowController.h; path = macosx/QuittingWindowController.h; sourceTree = "<group>"; };
-		A2E165BB0CFE44250047F575 /* QuittingWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QuittingWindowController.m; path = macosx/QuittingWindowController.m; sourceTree = "<group>"; };
-		A2E165C70CFE45AF0047F575 /* QuittingWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = QuittingWindow.xib; path = macosx/QuittingWindow.xib; sourceTree = "<group>"; };
 		A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InfoTabButtonCell.h; path = macosx/InfoTabButtonCell.h; sourceTree = "<group>"; };
 		A2E23AC40CB5E1930002BB25 /* InfoTabButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = InfoTabButtonCell.m; path = macosx/InfoTabButtonCell.m; sourceTree = "<group>"; };
 		A2E9AA750C249AF400085DCF /* Create.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Create.png; path = macosx/Images/Create.png; sourceTree = "<group>"; };
@@ -771,8 +766,6 @@
 				A25892630CF1F7E800CCCDDF /* StatsWindowController.m */,
 				A2085DD90C53BC74000BC3B7 /* AboutWindowController.h */,
 				A2085DDA0C53BC74000BC3B7 /* AboutWindowController.m */,
-				A2E165BA0CFE44250047F575 /* QuittingWindowController.h */,
-				A2E165BB0CFE44250047F575 /* QuittingWindowController.m */,
 				A234D0D40C79FB6000A82373 /* Additions */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
 				E1B6FBFD0C0D72430015FE4D /* Prefs Window */,
@@ -842,7 +835,6 @@
 				A2AE68310C628A35008753C9 /* Creator.nib */,
 				A25892750CF1FCE800CCCDDF /* StatsWindow.xib */,
 				A2A6E39F0CA7E4C900F10FEF /* AboutWindow.nib */,
-				A2E165C70CFE45AF0047F575 /* QuittingWindow.xib */,
 				A20B6FA40C4D97840034AB1D /* PriorityNone.png */,
 				A20B6F8B0C4D90980034AB1D /* PriorityMixed.png */,
 				A20B6FAD0C4D9B040034AB1D /* PriorityNormal.png */,
@@ -1499,7 +1491,6 @@
 				A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */,
 				A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */,
 				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
-				A2E165C80CFE45AF0047F575 /* QuittingWindow.xib in Resources */,
 				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
 				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
 				A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */,
@@ -1640,7 +1631,6 @@
 				A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */,
-				A2E165BC0CFE44250047F575 /* QuittingWindowController.m in Sources */,
 				A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */,
 				A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */,
 			);

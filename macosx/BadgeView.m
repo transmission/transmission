@@ -63,6 +63,7 @@
     
     if (fQuitting)
     {
+        #warning make better
         [self badge: [NSImage imageNamed: @"UploadBadge"] string: @"Quitting" atHeight: 0.0];
         return;
     }
