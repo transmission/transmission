@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "StatusBarView.h"
-#import "CTGradient.h"
+#import "NSApplicationAdditions.h"
 
 @implementation StatusBarView
 
@@ -31,9 +31,12 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        NSColor * beginningColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
-        NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
-        fGradient = [[CTGradient gradientWithBeginningColor: beginningColor endingColor: endingColor] retain];
+        if ([NSApp isOnLeopardOrBetter])
+        {
+            NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
+            NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
+            fGradient = [[NSGradient alloc] initWithStartingColor: startingColor endingColor: endingColor];
+        }
     }
     return self;
 }
@@ -46,12 +49,12 @@
 
 - (BOOL) isOpaque
 {
-    return YES;
+    return [NSApp isOnLeopardOrBetter];
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    [fGradient fillRect: rect angle: 90];
+    [fGradient drawInRect: rect angle: 90];
 }
 
 @end

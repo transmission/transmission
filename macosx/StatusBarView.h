@@ -28,7 +28,7 @@
 
 @interface StatusBarView : NSView
 {
-    CTGradient * fGradient;
+    NSGradient * fGradient;
 }
 
 @end
