@@ -27,6 +27,8 @@
 @interface ButtonGroupToolbarItem : NSToolbarItem
 {
     NSArray * fLabels, * fIdentifiers;
+    
+    BOOL fMenuCreated;
 }
 
 - (void) setLabels: (NSArray *) labels;
