@@ -2730,6 +2730,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [groupItem setAction: @selector(allToolbarClicked:)];
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, nil]];
+        [groupItem setLabels: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
+                                        NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
         [segmentedControl setImage: [NSImage imageNamed: @"PauseAll.png"] forSegment: 0];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause all transfers",
@@ -2763,6 +2765,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [groupItem setAction: @selector(selectedToolbarClicked:)];
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED, nil]];
+        [groupItem setLabels: [NSArray arrayWithObjects: NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
+                                        NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
         [segmentedControl setImage: [NSImage imageNamed: @"PauseSelected.png"] forSegment: 0];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause selected transfers",
@@ -2794,9 +2798,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 #warning use constants
 - (void) allToolbarClicked: (id) sender
 {
-    if ([sender selectedSegment] == 0)
+    if ([sender tag] == 0)
         [self stopAllTorrents: sender];
-    else if ([sender selectedSegment] == 1)
+    else if ([sender tag] == 1)
         [self resumeAllTorrents: sender];
     else;
 }
@@ -2804,9 +2808,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 #warning use constants
 - (void) selectedToolbarClicked: (id) sender
 {
-    if ([sender selectedSegment] == 0)
+    if ([sender tag] == 0)
         [self stopSelectedTorrents: sender];
-    else if ([sender selectedSegment] == 1)
+    else if ([sender tag] == 1)
         [self resumeSelectedTorrents: sender];
     else;
 }

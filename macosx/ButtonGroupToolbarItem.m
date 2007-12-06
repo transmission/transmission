@@ -32,6 +32,12 @@
     [super dealloc];
 }
 
+- (void) setLabels: (NSArray *) labels
+{
+    [fLabels release];
+    fLabels = [labels retain];
+}
+
 - (void) setIdentifiers: (NSArray *) identifiers
 {
     [fIdentifiers release];
@@ -48,13 +54,30 @@
             [[[NSToolbarItem alloc] initWithItemIdentifier: [fIdentifiers objectAtIndex: i]] autorelease]] forSegment: i];
 }
 
-/*- (NSMenuItem *) menuFormRepresentation
+- (NSMenuItem *) menuFormRepresentation
 {
-    NSMenuItem * menu = [[NSMenuItem alloc] initWithTitle: [self label] action: [self action] keyEquivalent: @""];
-    [menu setTarget: [self target]];
-    [menu setEnabled: [[self target] validateToolbarItem: self]];
+    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: NULL keyEquivalent: @""];
+    NSMenu * menu = [[NSMenu alloc] initWithTitle: [self label]];
+    [menuItem setSubmenu: menu];
     
-    return [menu autorelease];
-}*/
+    [menu setAutoenablesItems: NO];
+    
+    NSMenuItem * addItem;
+    int i;
+    for (i = 0; i < [(NSSegmentedControl *)[self view] segmentCount]; i++)
+    {
+        addItem = [[NSMenuItem alloc] initWithTitle: [fLabels objectAtIndex: i] action: [self action] keyEquivalent: @""];
+        [addItem setTarget: [self target]];
+        [addItem setTag: i];
+        [addItem setEnabled: [[self target] validateToolbarItem:
+            [[[NSToolbarItem alloc] initWithItemIdentifier: [fIdentifiers objectAtIndex: i]] autorelease]]];
+        
+        [menu addItem: addItem];
+        [addItem release];
+    }
+    
+    [menu release];
+    return [menuItem autorelease];
+}
 
 @end

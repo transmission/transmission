@@ -33,11 +33,11 @@
 
 - (NSMenuItem *) menuFormRepresentation
 {
-    NSMenuItem * menu = [[NSMenuItem alloc] initWithTitle: [self label] action: [self action] keyEquivalent: @""];
-    [menu setTarget: [self target]];
-    [menu setEnabled: [[self target] validateToolbarItem: self]];
+    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: [self action] keyEquivalent: @""];
+    [menuItem setTarget: [self target]];
+    [menuItem setEnabled: [[self target] validateToolbarItem: self]];
     
-    return [menu autorelease];
+    return [menuItem autorelease];
 }
 
 @end
