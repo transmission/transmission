@@ -73,6 +73,7 @@
 		A21282A80CA6C66800EAEE0F /* StatusBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A21282A60CA6C66800EAEE0F /* StatusBarView.m */; };
 		A21567ED0A9A5034004DECD6 /* MessageWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A21567EB0A9A5034004DECD6 /* MessageWindow.nib */; };
 		A215760B0C0D449A0057A26A /* NSBezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */; };
+		A219798B0D07B78400438EA7 /* ButtonGroupToolbarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A219798A0D07B78400438EA7 /* ButtonGroupToolbarItem.m */; };
 		A21DFF100A292B2B007C5F76 /* Transfers.png in Resources */ = {isa = PBXBuildFile; fileRef = A21DFF0F0A292B2B007C5F76 /* Transfers.png */; };
 		A21F5B890AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */; };
 		A21F5C040AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */; };
@@ -406,6 +407,8 @@
 		A21282A60CA6C66800EAEE0F /* StatusBarView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = StatusBarView.m; path = macosx/StatusBarView.m; sourceTree = "<group>"; };
 		A21576090C0D449A0057A26A /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSBezierPathAdditions.m; path = macosx/NSBezierPathAdditions.m; sourceTree = "<group>"; };
 		A215760A0C0D449A0057A26A /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSBezierPathAdditions.h; path = macosx/NSBezierPathAdditions.h; sourceTree = "<group>"; };
+		A21979890D07B78400438EA7 /* ButtonGroupToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonGroupToolbarItem.h; path = macosx/ButtonGroupToolbarItem.h; sourceTree = "<group>"; };
+		A219798A0D07B78400438EA7 /* ButtonGroupToolbarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonGroupToolbarItem.m; path = macosx/ButtonGroupToolbarItem.m; sourceTree = "<group>"; };
 		A21DFF0F0A292B2B007C5F76 /* Transfers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Transfers.png; path = macosx/Images/Transfers.png; sourceTree = "<group>"; };
 		A21F5B860AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ActionMenuRatioToDisplayRatioTransformer.h; path = macosx/ActionMenuRatioToDisplayRatioTransformer.h; sourceTree = "<group>"; };
 		A21F5B870AF25FB6008CE5CE /* ActionMenuRatioToDisplayRatioTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuRatioToDisplayRatioTransformer.m; path = macosx/ActionMenuRatioToDisplayRatioTransformer.m; sourceTree = "<group>"; };
@@ -780,6 +783,8 @@
 				A28E1DD50CFFD8A700E16385 /* BottomBarView.h */,
 				A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */,
 				A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */,
+				A21979890D07B78400438EA7 /* ButtonGroupToolbarItem.h */,
+				A219798A0D07B78400438EA7 /* ButtonGroupToolbarItem.m */,
 				A257C17F0CAD3003004E121C /* PeerTableView.h */,
 				A257C1800CAD3003004E121C /* PeerTableView.m */,
 				A2E23AC30CB5E1930002BB25 /* InfoTabButtonCell.h */,
@@ -1633,6 +1638,7 @@
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */,
 				A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */,
 				A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */,
+				A219798B0D07B78400438EA7 /* ButtonGroupToolbarItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

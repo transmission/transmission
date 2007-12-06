@@ -213,6 +213,8 @@
 - (void) toggleFilterBar: (id) sender;
 - (void) showFilterBar: (BOOL) show animate: (BOOL) animate;
 
+- (void) selectedToolbarClicked: (id) sender;
+
 - (void) doNothing: (id) sender; //needed for menu items that use bindings with no associated action
 
 - (void) setWindowSizeToFit;

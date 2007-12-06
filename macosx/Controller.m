@@ -32,6 +32,7 @@
 #import "StatsWindowController.h"
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"
+#import "ButtonGroupToolbarItem.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -43,15 +44,17 @@
 
 #import <Sparkle/Sparkle.h>
 
-#define TOOLBAR_CREATE          @"Toolbar Create"
-#define TOOLBAR_OPEN            @"Toolbar Open"
-#define TOOLBAR_REMOVE          @"Toolbar Remove"
-#define TOOLBAR_INFO            @"Toolbar Info"
-#define TOOLBAR_PAUSE_ALL       @"Toolbar Pause All"
-#define TOOLBAR_RESUME_ALL      @"Toolbar Resume All"
-#define TOOLBAR_PAUSE_SELECTED  @"Toolbar Pause Selected"
-#define TOOLBAR_RESUME_SELECTED @"Toolbar Resume Selected"
-#define TOOLBAR_FILTER          @"Toolbar Toggle Filter"
+#define TOOLBAR_CREATE                  @"Toolbar Create"
+#define TOOLBAR_OPEN                    @"Toolbar Open"
+#define TOOLBAR_REMOVE                  @"Toolbar Remove"
+#define TOOLBAR_INFO                    @"Toolbar Info"
+#define TOOLBAR_PAUSE_ALL               @"Toolbar Pause All"
+#define TOOLBAR_RESUME_ALL              @"Toolbar Resume All"
+#define TOOLBAR_PAUSE_RESUME_ALL        @"Toolbar Pause / Resume All"
+#define TOOLBAR_PAUSE_SELECTED          @"Toolbar Pause Selected"
+#define TOOLBAR_RESUME_SELECTED         @"Toolbar Resume Selected"
+#define TOOLBAR_PAUSE_RESUME_SELECTED   @"Toolbar Pause / Resume Selected"
+#define TOOLBAR_FILTER                  @"Toolbar Toggle Filter"
 
 #define SORT_DATE       @"Date"
 #define SORT_NAME       @"Name"
@@ -214,7 +217,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) awakeFromNib
 {
-    NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"Transmission Toolbar"];
+    NSToolbar * toolbar = [[NSToolbar alloc] initWithIdentifier: @"TRMainToolbar"];
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
     [toolbar setAutosavesConfiguration: YES];
@@ -2637,7 +2640,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
 {
-    ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];
+    ButtonToolbarItem * item = [[[ButtonToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
     
     NSButton * button = [[NSButton alloc] initWithFrame: NSZeroRect];
     [button setBezelStyle: NSTexturedRoundedBezelStyle];
@@ -2707,23 +2710,70 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setTarget: self];
         [item setAction: @selector(resumeAllTorrents:)];
     }
-    else if ([ident isEqualToString: TOOLBAR_PAUSE_SELECTED])
+    else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_ALL])
     {
-        [item setLabel: NSLocalizedString(@"Pause", "Pause toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Pause Selected", "Pause toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Pause selected transfers", "Pause toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"PauseSelected.png"]];
-        [item setTarget: self];
-        [item setAction: @selector(stopSelectedTorrents:)];
+        ButtonGroupToolbarItem * groupItem = [[[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
+        
+        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
+        [groupItem setView: segmentedControl];
+        
+        [segmentedControl setSegmentCount: 2];
+        [(NSSegmentedCell *)[segmentedControl cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+        
+        NSSize groupSize = NSMakeSize(72.0, 25.0);
+        [groupItem setMinSize: groupSize];
+        [groupItem setMaxSize: groupSize];
+        
+        [groupItem setLabel: NSLocalizedString(@"Apply All", "All toolbar item -> label")];
+        [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label")];
+        [groupItem setTarget: self];
+        [groupItem setAction: @selector(allToolbarClicked:)];
+        
+        [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, nil]];
+        
+        [segmentedControl setImage: [NSImage imageNamed: @"PauseAll.png"] forSegment: 0];
+        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause all transfers",
+                                                        "All toolbar item -> tooltip") forSegment: 0];
+        
+        [segmentedControl setImage: [NSImage imageNamed: @"ResumeAll.png"] forSegment: 1];
+        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume all transfers",
+                                                        "All toolbar item -> tooltip") forSegment: 1];
+        
+        [segmentedControl release];
+        return groupItem;
     }
-    else if ([ident isEqualToString: TOOLBAR_RESUME_SELECTED])
+
+    else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
     {
-        [item setLabel: NSLocalizedString(@"Resume", "Resume toolbar item -> label")];
-        [item setPaletteLabel: NSLocalizedString(@"Resume Selected", "Resume toolbar item -> palette label")];
-        [item setToolTip: NSLocalizedString(@"Resume selected transfers", "Resume toolbar item -> tooltip")];
-        [item setImage: [NSImage imageNamed: @"ResumeSelected.png"]];
-        [item setTarget: self];
-        [item setAction: @selector(resumeSelectedTorrents:)];
+        ButtonGroupToolbarItem * groupItem = [[[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
+        
+        NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
+        [groupItem setView: segmentedControl];
+        
+        [segmentedControl setSegmentCount: 2];
+        [(NSSegmentedCell *)[segmentedControl cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+        
+        NSSize groupSize = NSMakeSize(72.0, 25.0);
+        [groupItem setMinSize: groupSize];
+        [groupItem setMaxSize: groupSize];
+        
+        [groupItem setLabel: NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label")];
+        [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label")];
+        [groupItem setTarget: self];
+        [groupItem setAction: @selector(selectedToolbarClicked:)];
+        
+        [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED, nil]];
+        
+        [segmentedControl setImage: [NSImage imageNamed: @"PauseSelected.png"] forSegment: 0];
+        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause selected transfers",
+                                                        "Selected toolbar item -> tooltip") forSegment: 0];
+        
+        [segmentedControl setImage: [NSImage imageNamed: @"ResumeSelected.png"] forSegment: 1];
+        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume selected transfers",
+                                                        "Selected toolbar item -> tooltip") forSegment: 1];
+        
+        [segmentedControl release];
+        return groupItem;
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
@@ -2736,20 +2786,37 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setAutovalidates: NO];
     }
     else
-    {
-        [item release];
         return nil;
-    }
 
-    return [item autorelease];
+    return item;
+}
+
+#warning use constants
+- (void) allToolbarClicked: (id) sender
+{
+    if ([sender selectedSegment] == 0)
+        [self stopAllTorrents: sender];
+    else if ([sender selectedSegment] == 1)
+        [self resumeAllTorrents: sender];
+    else;
+}
+
+#warning use constants
+- (void) selectedToolbarClicked: (id) sender
+{
+    if ([sender selectedSegment] == 0)
+        [self stopSelectedTorrents: sender];
+    else if ([sender selectedSegment] == 1)
+        [self resumeSelectedTorrents: sender];
+    else;
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
     return [NSArray arrayWithObjects:
             TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
-            TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED,
-            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, TOOLBAR_FILTER, TOOLBAR_INFO,
+            TOOLBAR_PAUSE_RESUME_SELECTED, TOOLBAR_PAUSE_RESUME_ALL,
+            TOOLBAR_FILTER, TOOLBAR_INFO,
             NSToolbarSeparatorItemIdentifier,
             NSToolbarSpaceItemIdentifier,
             NSToolbarFlexibleSpaceItemIdentifier,
@@ -2761,7 +2828,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     return [NSArray arrayWithObjects:
             TOOLBAR_CREATE, TOOLBAR_OPEN, TOOLBAR_REMOVE,
             NSToolbarSeparatorItemIdentifier,
-            TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL,
+            TOOLBAR_PAUSE_RESUME_ALL,
             NSToolbarFlexibleSpaceItemIdentifier,
             TOOLBAR_FILTER, TOOLBAR_INFO, nil];
 }
@@ -2769,7 +2836,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (BOOL) validateToolbarItem: (NSToolbarItem *) toolbarItem
 {
     NSString * ident = [toolbarItem itemIdentifier];
-
+    
     //enable remove item
     if ([ident isEqualToString: TOOLBAR_REMOVE])
         return [fTableView numberOfSelectedRows] > 0;
