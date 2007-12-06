@@ -14,6 +14,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Leopard: Time Machine will ignore incomplete downloads
    + Display remaining time for seeding transfers
    + Sort by total activity
+   + Leopard: Fix bug where text fields would reject localized double values
 - GTK+:
    + Statistics window
 

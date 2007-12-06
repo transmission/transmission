@@ -57,8 +57,7 @@
         }
         
         //change that just impacts the dock badge
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge)
-                                                name: @"DockBadgeChange" object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(updateBadge) name: @"DockBadgeChange" object: nil];
     }
     
     return self;

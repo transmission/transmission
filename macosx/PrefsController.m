@@ -400,7 +400,6 @@
     return NO;
 }
 
-
 - (void) setBadge: (id) sender
 {   
     [[NSNotificationCenter defaultCenter] postNotificationName: @"DockBadgeChange" object: self];

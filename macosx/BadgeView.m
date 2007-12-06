@@ -75,8 +75,8 @@
         float downloadRate, uploadRate;
         tr_torrentRates(fLib, &downloadRate, &uploadRate);
         
-        BOOL upload;
-        if ((upload = checkUpload && uploadRate >= 0.1))
+        BOOL upload = checkUpload && uploadRate >= 0.1;
+        if (upload)
             [self badge: [NSImage imageNamed: @"UploadBadge"] string: [NSString stringForSpeedAbbrev: uploadRate] atHeight: 0.0];
         if (checkDownload && downloadRate >= 0.1)
         {
@@ -118,11 +118,8 @@
     
     NSRect stringRect = badgeRect;
     stringRect.origin.x += (badgeRect.size.width - stringSize.width) * 0.5;
-    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5;
+    stringRect.origin.y += (badgeRect.size.height - stringSize.height) * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
-    
-    //adjust for shadow
-    stringRect.origin.y += 1.0;
     
     [string drawInRect: stringRect withAttributes: fAttributes];
 }
