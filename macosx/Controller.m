@@ -2718,8 +2718,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [groupItem setAction: @selector(allToolbarClicked:)];
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, nil]];
-        [groupItem setLabels: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
-                                        NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
         [segmentedControl setImage: [NSImage imageNamed: @"PauseAll.png"] forSegment: TOOLBAR_PAUSE_TAG];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause all transfers",
@@ -2728,6 +2726,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [segmentedControl setImage: [NSImage imageNamed: @"ResumeAll.png"] forSegment: TOOLBAR_RESUME_TAG];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume all transfers",
                                                         "All toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
+        
+        [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
+                                        NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
         [segmentedControl release];
         return groupItem;
@@ -2753,8 +2754,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [groupItem setAction: @selector(selectedToolbarClicked:)];
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED, nil]];
-        [groupItem setLabels: [NSArray arrayWithObjects: NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
-                                        NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
         [segmentedControl setImage: [NSImage imageNamed: @"PauseSelected.png"] forSegment: TOOLBAR_PAUSE_TAG];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause selected transfers",
@@ -2763,6 +2762,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [segmentedControl setImage: [NSImage imageNamed: @"ResumeSelected.png"] forSegment: TOOLBAR_RESUME_TAG];
         [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume selected transfers",
                                                         "Selected toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
+        
+        [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
+                                        NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
         [segmentedControl release];
         return groupItem;

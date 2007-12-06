@@ -26,12 +26,11 @@
 
 @interface ButtonGroupToolbarItem : NSToolbarItem
 {
-    NSArray * fLabels, * fIdentifiers;
-    
-    BOOL fMenuCreated;
+    NSArray * fIdentifiers;
 }
 
-- (void) setLabels: (NSArray *) labels;
 - (void) setIdentifiers: (NSArray *) identifiers;
+
+- (void) createMenu: (NSArray *) labels;
 
 @end

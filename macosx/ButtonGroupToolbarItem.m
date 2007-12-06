@@ -32,12 +32,6 @@
     [super dealloc];
 }
 
-- (void) setLabels: (NSArray *) labels
-{
-    [fLabels release];
-    fLabels = [labels retain];
-}
-
 - (void) setIdentifiers: (NSArray *) identifiers
 {
     [fIdentifiers release];
@@ -54,36 +48,34 @@
             [[[NSToolbarItem alloc] initWithItemIdentifier: [fIdentifiers objectAtIndex: i]] autorelease]] forSegment: i];
 }
 
+- (void) createMenu: (NSArray *) labels
+{
+    NSMenuItem * menuItem = [[NSMenuItem alloc] initWithTitle: [self label] action: NULL keyEquivalent: @""];
+    NSMenu * menu = [[NSMenu alloc] initWithTitle: [self label]];
+    [menuItem setSubmenu: menu];
+    
+    [menu setAutoenablesItems: NO];
+    
+    NSMenuItem * addItem;
+    int i;
+    for (i = 0; i < [(NSSegmentedControl *)[self view] segmentCount]; i++)
+    {
+        addItem = [[NSMenuItem alloc] initWithTitle: [labels objectAtIndex: i] action: [self action] keyEquivalent: @""];
+        [addItem setTarget: [self target]];
+        [addItem setTag: i];
+        
+        [menu addItem: addItem];
+        [addItem release];
+    }
+    
+    [menu release];
+    [self setMenuFormRepresentation: menuItem];
+    [menuItem release];
+}
+
 - (NSMenuItem *) menuFormRepresentation
 {
-    NSMenuItem * menuItem;
-    if (!fMenuCreated)
-    {
-        fMenuCreated = YES;
-        
-        menuItem = [[[NSMenuItem alloc] initWithTitle: [self label] action: NULL keyEquivalent: @""] autorelease];
-        NSMenu * menu = [[NSMenu alloc] initWithTitle: [self label]];
-        [menuItem setSubmenu: menu];
-        
-        [menu setAutoenablesItems: NO];
-        
-        NSMenuItem * addItem;
-        int i;
-        for (i = 0; i < [(NSSegmentedControl *)[self view] segmentCount]; i++)
-        {
-            addItem = [[NSMenuItem alloc] initWithTitle: [fLabels objectAtIndex: i] action: [self action] keyEquivalent: @""];
-            [addItem setTarget: [self target]];
-            [addItem setTag: i];
-            
-            [menu addItem: addItem];
-            [addItem release];
-        }
-        
-        [menu release];
-        [self setMenuFormRepresentation: menuItem];
-    }
-    else
-        menuItem = [super menuFormRepresentation];
+    NSMenuItem * menuItem = [super menuFormRepresentation];
     
     int i;
     for (i = 0; i < [(NSSegmentedControl *)[self view] segmentCount]; i++)
