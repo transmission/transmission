@@ -2644,9 +2644,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) doNothing: (id) sender {}
 
-- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+- (ButtonToolbarItem *) standardToolbarButtonWithIdentifier: (NSString *) ident
 {
-    ButtonToolbarItem * item = [[[ButtonToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
+    ButtonToolbarItem * item = [[ButtonToolbarItem alloc] initWithItemIdentifier: ident];
     
     NSButton * button = [[NSButton alloc] initWithFrame: NSZeroRect];
     [button setBezelStyle: NSTexturedRoundedBezelStyle];
@@ -2659,8 +2659,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [item setMinSize: buttonSize];
     [item setMaxSize: buttonSize];
     
+    return [item autorelease];
+}
+
+- (NSToolbarItem *) toolbar: (NSToolbar *) toolbar itemForItemIdentifier: (NSString *) ident willBeInsertedIntoToolbar: (BOOL) flag
+{
     if ([ident isEqualToString: TOOLBAR_CREATE])
     {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
         [item setLabel: NSLocalizedString(@"Create", "Create toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip")];
@@ -2668,9 +2675,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setTarget: self];
         [item setAction: @selector(createFile:)];
         [item setAutovalidates: NO];
+        
+        return item;
     }
     else if ([ident isEqualToString: TOOLBAR_OPEN])
     {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
         [item setLabel: NSLocalizedString(@"Open", "Open toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip")];
@@ -2678,18 +2689,26 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setTarget: self];
         [item setAction: @selector(openShowSheet:)];
         [item setAutovalidates: NO];
+        
+        return item;
     }
     else if ([ident isEqualToString: TOOLBAR_REMOVE])
     {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
         [item setLabel: NSLocalizedString(@"Remove", "Remove toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip")];
         [item setImage: [NSImage imageNamed: @"Remove.png"]];
         [item setTarget: self];
         [item setAction: @selector(removeNoDelete:)];
+        
+        return item;
     }
     else if ([ident isEqualToString: TOOLBAR_INFO])
     {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
         [item setLabel: NSLocalizedString(@"Inspector", "Inspector toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip")];
@@ -2697,10 +2716,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
         [item setAutovalidates: NO];
+        
+        return item;
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_ALL])
     {
-        ButtonGroupToolbarItem * groupItem = [[[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
+        ButtonGroupToolbarItem * groupItem = [[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
         [groupItem setView: segmentedControl];
@@ -2731,12 +2752,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                         NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
         
         [segmentedControl release];
-        return groupItem;
+        return [groupItem autorelease];
     }
-
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
     {
-        ButtonGroupToolbarItem * groupItem = [[[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident] autorelease];
+        ButtonGroupToolbarItem * groupItem = [[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
         [groupItem setView: segmentedControl];
@@ -2767,10 +2787,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                         NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];
         
         [segmentedControl release];
-        return groupItem;
+        return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_FILTER])
     {
+        ButtonToolbarItem * item = [self standardToolbarButtonWithIdentifier: ident];
+        
         [item setLabel: NSLocalizedString(@"Filter", "Filter toolbar item -> label")];
         [item setPaletteLabel: NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label")];
         [item setToolTip: NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip")];
@@ -2778,11 +2800,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
         [item setAutovalidates: NO];
+        
+        return item;
     }
     else
         return nil;
-
-    return item;
 }
 
 - (void) allToolbarClicked: (id) sender
