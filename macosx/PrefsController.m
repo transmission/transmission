@@ -382,17 +382,24 @@
 
 - (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
 {
-    #warning release!
+    [fInitialString release];
     fInitialString = [[control stringValue] retain];
+    
+    return YES;
 }
 
 - (BOOL) control: (NSControl *) control didFailToFormatString: (NSString *) string errorDescription: (NSString *) error
 {
     NSBeep();
     if (fInitialString)
+    {
         [control setStringValue: fInitialString];
+        [fInitialString release];
+        fInitialString = nil;
+    }
     return NO;
 }
+
 
 - (void) setBadge: (id) sender
 {   
