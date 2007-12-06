@@ -90,8 +90,8 @@
 
 - (void) dealloc
 {
-    if (fNatStatusTimer)
-        [fNatStatusTimer invalidate];
+    if (fPortStatusTimer)
+        [fPortStatusTimer invalidate];
     
     [super dealloc];
 }
@@ -131,19 +131,16 @@
     [fSpeedLimitDownloadField setIntValue: [fDefaults integerForKey: @"SpeedLimitDownloadLimit"]];
     
     //set port
-    #warning why no binding?
     [fPortField setIntValue: [fDefaults integerForKey: @"BindPort"]];
     fNatStatus = -1;
     
     [self updatePortStatus];
-    fNatStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
+    fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
                         selector: @selector(updatePortStatus) userInfo: nil repeats: YES];
     
     //set queue values
     [fQueueDownloadField setIntValue: [fDefaults integerForKey: @"QueueDownloadNumber"]];
     [fQueueSeedField setIntValue: [fDefaults integerForKey: @"QueueSeedNumber"]];
-    
-    //set stalled value
     [fStalledField setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
 }
 
@@ -210,22 +207,13 @@
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS,
-                                        TOOLBAR_BANDWIDTH, TOOLBAR_ADVANCED, nil];
+    return [NSArray arrayWithObjects: TOOLBAR_GENERAL, TOOLBAR_TRANSFERS, TOOLBAR_BANDWIDTH, TOOLBAR_ADVANCED, nil];
 }
 
 - (void) setPort: (id) sender
 {
     int port = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", port]])
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: @"BindPort"]];
-        return;
-    }
-    
     [fDefaults setInteger: port forKey: @"BindPort"];
-    
     tr_setBindPort(fHandle, port);
     
     fPublicPort = -1;
@@ -361,16 +349,7 @@
 
 - (void) setRatioStop: (id) sender
 {
-    float ratio = [sender floatValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%.2f", ratio]] || ratio < 0)
-    {
-        NSBeep();
-        [sender setFloatValue: [fDefaults floatForKey: @"RatioLimit"]];
-        return;
-    }
-    
-    [fDefaults setFloat: ratio forKey: @"RatioLimit"];
-    
+    [fDefaults setFloat: [sender floatValue] forKey: @"RatioLimit"];
     [self applyRatioSetting: nil];
 }
 
@@ -385,41 +364,34 @@
 
 - (void) setGlobalLimit: (id) sender
 {
-    BOOL upload = sender == fUploadField;
-    
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 0)
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: upload ? @"UploadLimit" : @"DownloadLimit"]];
-        return;
-    }
-    
-    [fDefaults setInteger: limit forKey: upload ? @"UploadLimit" : @"DownloadLimit"];
-    
+    [fDefaults setInteger: [sender intValue] forKey: sender == fUploadField ? @"UploadLimit" : @"DownloadLimit"];
     [self applySpeedSettings: self];
 }
 
 - (void) setSpeedLimit: (id) sender
 {
-    BOOL upload = sender == fSpeedLimitUploadField;
-    
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]])
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: upload ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"]];
-        return;
-    }
-    
-    [fDefaults setInteger: limit forKey: upload ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
-    
+    [fDefaults setInteger: [sender intValue] forKey: sender == fSpeedLimitUploadField
+                                                        ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
     [self applySpeedSettings: self];
 }
 
 - (void) setAutoSpeedLimit: (id) sender
 {
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AutoSpeedLimitChange" object: self];
+}
+
+- (BOOL) control: (NSControl *) control textShouldBeginEditing: (NSText *) fieldEditor
+{
+    #warning release!
+    fInitialString = [[control stringValue] retain];
+}
+
+- (BOOL) control: (NSControl *) control didFailToFormatString: (NSString *) string errorDescription: (NSString *) error
+{
+    NSBeep();
+    if (fInitialString)
+        [control setStringValue: fInitialString];
+    return NO;
 }
 
 - (void) setBadge: (id) sender
@@ -429,7 +401,6 @@
 
 - (void) resetWarnings: (id) sender
 {
-    [fDefaults setBool: YES forKey: @"WarningDebug"];
     [fDefaults setBool: YES forKey: @"WarningDuplicate"];
     [fDefaults setBool: YES forKey: @"WarningRemainingSpace"];
 }
@@ -449,17 +420,7 @@
 
 - (void) setQueueNumber: (id) sender
 {
-    BOOL download = sender == fQueueDownloadField;
-    
-    int limit = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", limit]] || limit < 1)
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"]];
-        return;
-    }
-    
-    [fDefaults setInteger: limit forKey: download ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
+    [fDefaults setInteger: [sender intValue] forKey: sender == fQueueDownloadField ? @"QueueDownloadNumber" : @"QueueSeedNumber"];
     [self setQueue: nil];
 }
 
@@ -470,15 +431,7 @@
 
 - (void) setStalledMinutes: (id) sender
 {
-    int minutes = [sender intValue];
-    if (![[sender stringValue] isEqualToString: [NSString stringWithFormat: @"%d", minutes]] || minutes < 1)
-    {
-        NSBeep();
-        [sender setIntValue: [fDefaults integerForKey: @"StalledMinutes"]];
-        return;
-    }
-    
-    [fDefaults setInteger: minutes forKey: @"StalledMinutes"];
+    [fDefaults setInteger: [sender intValue] forKey: @"StalledMinutes"];
     [self setStalled: nil];
 }
 

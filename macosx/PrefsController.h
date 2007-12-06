@@ -36,6 +36,8 @@
     
     IBOutlet NSView         * fGeneralView, * fTransfersView, * fBandwidthView, * fAdvancedView;
     
+    NSString * fInitialString;
+    
     IBOutlet NSPopUpButton  * fFolderPopUp, * fIncompleteFolderPopUp, * fImportFolderPopUp,
                             * fDownloadSoundPopUp, * fSeedingSoundPopUp;
     IBOutlet NSTextField    * fRatioStopField, * fQueueDownloadField, * fQueueSeedField, * fStalledField;
@@ -49,7 +51,7 @@
     IBOutlet NSButton               * fNatCheck;
     IBOutlet NSImageView            * fPortStatusImage;
     IBOutlet NSProgressIndicator    * fPortStatusProgress;
-    NSTimer                         * fNatStatusTimer;
+    NSTimer                         * fPortStatusTimer;
     int                             fPublicPort, fNatStatus;
 }
 
