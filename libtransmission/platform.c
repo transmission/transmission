@@ -22,12 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <assert.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #ifdef __BEOS__
   #include <signal.h> 
   #include <fs_info.h>
@@ -44,6 +38,12 @@
   #endif
   #include <pthread.h>
 #endif
+
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <dirent.h>
