@@ -22,9 +22,9 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import "ButtonGroupToolbarItem.h"
+#import "GroupToolbarItem.h"
 
-@implementation ButtonGroupToolbarItem
+@implementation GroupToolbarItem
 
 - (void) dealloc
 {

@@ -32,7 +32,8 @@
 #import "StatsWindowController.h"
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"
-#import "ButtonGroupToolbarItem.h"
+#import "GroupToolbarItem.h"
+#import "ToolbarSegmentedCell.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "UKKQueue.h"
@@ -2721,9 +2722,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_ALL])
     {
-        ButtonGroupToolbarItem * groupItem = [[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident];
+        GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
+        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
@@ -2760,9 +2762,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
     {
-        ButtonGroupToolbarItem * groupItem = [[ButtonGroupToolbarItem alloc] initWithItemIdentifier: ident];
+        GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
+        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         

@@ -24,13 +24,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface ButtonGroupToolbarItem : NSToolbarItem
+
+@interface ToolbarSegmentedCell : NSSegmentedCell
 {
-    NSArray * fIdentifiers;
 }
-
-- (void) setIdentifiers: (NSArray *) identifiers;
-
-- (void) createMenu: (NSArray *) labels;
 
 @end
