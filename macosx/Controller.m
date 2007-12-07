@@ -2725,9 +2725,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
         [groupItem setView: segmentedControl];
+        NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
         [segmentedControl setSegmentCount: 2];
-        [(NSSegmentedCell *)[segmentedControl cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+        [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
         
         [groupItem setLabel: NSLocalizedString(@"Apply All", "All toolbar item -> label")];
         [groupItem setPaletteLabel: NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label")];
@@ -2736,17 +2737,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL, nil]];
         
-        [(NSSegmentedCell *)[segmentedControl cell] setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
         [segmentedControl setImage: [NSImage imageNamed: @"PauseAll.png"] forSegment: TOOLBAR_PAUSE_TAG];
-        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause all transfers",
-                                                        "All toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedCell setToolTip: NSLocalizedString(@"Pause all transfers",
+                                    "All toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
         
-        [(NSSegmentedCell *)[segmentedControl cell] setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
+        [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
         [segmentedControl setImage: [NSImage imageNamed: @"ResumeAll.png"] forSegment: TOOLBAR_RESUME_TAG];
-        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume all transfers",
-                                                        "All toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
-        NSLog(@"%d %d", [(NSSegmentedCell *)[segmentedControl cell] tagForSegment: TOOLBAR_PAUSE_TAG],
-        [(NSSegmentedCell *)[segmentedControl cell] tagForSegment: TOOLBAR_RESUME_TAG]);
+        [segmentedCell setToolTip: NSLocalizedString(@"Resume all transfers",
+                                    "All toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
         
         [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause All", "All toolbar item -> label"),
                                         NSLocalizedString(@"Resume All", "All toolbar item -> label"), nil]];
@@ -2765,9 +2764,10 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
         [groupItem setView: segmentedControl];
+        NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
         [segmentedControl setSegmentCount: 2];
-        [(NSSegmentedCell *)[segmentedControl cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+        [segmentedCell setTrackingMode: NSSegmentSwitchTrackingMomentary];
         
         NSSize groupSize = NSMakeSize(72.0, 25.0);
         [groupItem setMinSize: groupSize];
@@ -2780,15 +2780,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         [groupItem setIdentifiers: [NSArray arrayWithObjects: TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED, nil]];
         
-        [(NSSegmentedCell *)[segmentedControl cell] setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedCell setTag: TOOLBAR_PAUSE_TAG forSegment: TOOLBAR_PAUSE_TAG];
         [segmentedControl setImage: [NSImage imageNamed: @"PauseSelected.png"] forSegment: TOOLBAR_PAUSE_TAG];
-        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Pause selected transfers",
-                                                        "Selected toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
+        [segmentedCell setToolTip: NSLocalizedString(@"Pause selected transfers",
+                                    "Selected toolbar item -> tooltip") forSegment: TOOLBAR_PAUSE_TAG];
         
-        [(NSSegmentedCell *)[segmentedControl cell] setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
+        [segmentedCell setTag: TOOLBAR_RESUME_TAG forSegment: TOOLBAR_RESUME_TAG];
         [segmentedControl setImage: [NSImage imageNamed: @"ResumeSelected.png"] forSegment: TOOLBAR_RESUME_TAG];
-        [(NSSegmentedCell *)[segmentedControl cell] setToolTip: NSLocalizedString(@"Resume selected transfers",
-                                                        "Selected toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
+        [segmentedCell setToolTip: NSLocalizedString(@"Resume selected transfers",
+                                    "Selected toolbar item -> tooltip") forSegment: TOOLBAR_RESUME_TAG];
         
         [groupItem createMenu: [NSArray arrayWithObjects: NSLocalizedString(@"Pause Selected", "Selected toolbar item -> label"),
                                         NSLocalizedString(@"Resume Selected", "Selected toolbar item -> label"), nil]];

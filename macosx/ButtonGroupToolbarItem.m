@@ -41,7 +41,6 @@
 - (void) validate
 {
     NSSegmentedControl * control = (NSSegmentedControl *)[self view];
-    NSLog(@"%d %d", [(NSSegmentedCell *)[control cell] tagForSegment: 0], [(NSSegmentedCell *)[control cell] tagForSegment: 1]);
     
     int i;
     for (i = 0; i < [control segmentCount]; i++)
