@@ -36,6 +36,7 @@
 
 - (void) resizeColumn;
 - (NSString *) stringForMessage: (NSDictionary *) message;
+- (NSString *) fileForMessage: (NSDictionary *) message;
 
 @end
 
@@ -199,6 +200,12 @@
     [fMessageTable reloadData];
 }
 
+- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+                tableColumn: (NSTableColumn *) column row: (int) row mouseLocation: (NSPoint) mouseLocation
+{
+    return [self fileForMessage: [fMessages objectAtIndex: row]];
+}
+
 - (void) copy: (id) sender
 {
     NSPasteboard * pb = [NSPasteboard generalPasteboard];
@@ -318,24 +325,34 @@
     switch ([[message objectForKey: @"Level"] intValue])
     {
         case TR_MSG_ERR:
-            level = @"Error";
+            level = @"[Error]";
             break;
         case TR_MSG_INF:
-            level = @"Info";
+            level = @"[Info]";
             break;
         case TR_MSG_DBG:
-            level = @"Debug";
+            level = @"[Debug]";
             break;
         default:
             level = @"";
     }
     
-    NSString * file = [message objectForKey: @"File"],
-        * fileString = file ? [NSString stringWithFormat: @" %@:%@", [message objectForKey: @"File"], [message objectForKey: @"Line"]]
-                            : @"";
+    NSMutableArray * strings = [NSMutableArray arrayWithObjects: [message objectForKey: @"Date"], level,
+                                [message objectForKey: @"Message"], nil];
+    NSString * file;
+    if ((file = [self fileForMessage: message]))
+        [strings insertObject: file atIndex: 1];
     
-    return [NSString stringWithFormat: @"%@%@ [%@] %@", [message objectForKey: @"Date"], fileString, level,
-                                                            [message objectForKey: @"Message"]];
+    return [strings componentsJoinedByString: @" "];
+}
+
+- (NSString *) fileForMessage: (NSDictionary *) message
+{
+    NSString * file;
+    if ((file = [message objectForKey: @"File"]))
+        return [NSString stringWithFormat: @"%@:%@", [message objectForKey: @"File"], [message objectForKey: @"Line"]];
+    else
+        return nil;
 }
 
 @end

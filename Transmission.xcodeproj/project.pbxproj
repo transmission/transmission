@@ -338,7 +338,7 @@
 		35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOff.png; path = macosx/Images/ResumeNoWaitOff.png; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilePriorityCell.h; path = macosx/FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
-		3C7A118D0D0B2EB800B5701F /* libnatpmp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libnatpmp.a; path = build/Release/libnatpmp.a; sourceTree = "<group>"; };
+		3C7A118D0D0B2EB800B5701F /* libnatpmp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnatpmp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C7A11910D0B2EE300B5701F /* getgateway.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getgateway.c; path = "third-party/libnatpmp/getgateway.c"; sourceTree = "<group>"; };
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = getgateway.h; path = "third-party/libnatpmp/getgateway.h"; sourceTree = "<group>"; };
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = natpmp.c; path = "third-party/libnatpmp/natpmp.c"; sourceTree = "<group>"; };
@@ -835,7 +835,6 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
-				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
@@ -843,6 +842,7 @@
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
+				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = Transmission;
