@@ -10,7 +10,8 @@
  * $Id$
  */
 
-#include <stdio.h> /* printf */
+#include <assert.h>
+#include <stdio.h> /* snprintf */
 
 #include <miniupnp/miniwget.h>
 #include <miniupnp/miniupnpc.h>
@@ -18,8 +19,21 @@
 
 #include "transmission.h"
 #include "internal.h"
+#include "shared.h"
 #include "utils.h"
 #include "upnp.h"
+
+#define KEY "Port Mapping (UPNP): "
+
+typedef enum
+{
+    TR_UPNP_IDLE,
+    TR_UPNP_ERR,
+    TR_UPNP_DISCOVER,
+    TR_UPNP_MAP,
+    TR_UPNP_UNMAP
+}
+tr_upnp_state;
 
 struct tr_upnp
 {
@@ -27,9 +41,9 @@ struct tr_upnp
     struct IGDdatas data;
     int port;
     char lanaddr[16];
-    unsigned int isForwarding : 1;
-    unsigned int isEnabled : 1;
+    unsigned int isMapped;
     unsigned int hasDiscovered : 1;
+    tr_upnp_state state;
 };
 
 /**
@@ -47,7 +61,9 @@ tr_upnpInit( void )
 void
 tr_upnpClose( tr_upnp * handle )
 {
-    tr_upnpStop( handle );
+    assert( !handle->isMapped );
+    assert( ( handle->state == TR_UPNP_IDLE ) || ( handle->state == TR_UPNP_ERR ) );
+
     if( handle->hasDiscovered )
         FreeUPNPUrls( &handle->urls );
     tr_free( handle );
@@ -57,91 +73,89 @@ tr_upnpClose( tr_upnp * handle )
 ***
 **/
 
-void
-tr_upnpStart( tr_upnp * handle )
+int
+tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
 {
-    if( !handle->hasDiscovered )
+    int ret;
+
+    if( handle->state == TR_UPNP_IDLE )
+    {
+        if( !handle->hasDiscovered )
+            handle->state = TR_UPNP_DISCOVER;
+    }
+
+    if( handle->state == TR_UPNP_DISCOVER )
     {
         struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
-            tr_dbg( "UPNP: Found Internet Gateway Device '%s'", handle->urls.controlURL );
-            tr_dbg( "UPNP: Local LAN IP Address is '%s'", handle->lanaddr );
+            tr_inf( KEY "found Internet Gateway Device '%s'", handle->urls.controlURL );
+            tr_inf( KEY "local LAN IP Address is '%s'", handle->lanaddr );
+            handle->state = TR_UPNP_IDLE;
+            handle->hasDiscovered = 1;
+        } else {
+            handle->state = TR_UPNP_ERR;
         }
         freeUPNPDevlist( devlist );
-        handle->hasDiscovered = 1;
     }
 
-    handle->isEnabled = 1;
+    if( handle->state == TR_UPNP_IDLE )
+    {
+        if( handle->isMapped && ( !isEnabled || ( handle->port != port ) ) )
+            handle->state = TR_UPNP_UNMAP;
+    }
 
-    if( handle->port >= 0 )
+    if( handle->state == TR_UPNP_UNMAP )
     {
         char portStr[16];
         snprintf( portStr, sizeof(portStr), "%d", handle->port );
-        handle->isForwarding = ( handle->urls.controlURL != NULL ) && 
-                               ( handle->data.servicetype != NULL ) &&
-                               ( UPNP_AddPortMapping( handle->urls.controlURL,
-                                                      handle->data.servicetype,
-                                                      portStr, portStr, handle->lanaddr,
-                                                      "Transmission", "TCP" ) );
-
-        tr_inf( "UPNP: Port Forwarding via '%s', service '%s'.  (local address: %s:%d)",
-                handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, handle->port );
-        tr_inf( "UPNP: Port Forwarding Enabled?  %s", (handle->isForwarding?"Yes":"No") );
-    }
-}
-
-void
-tr_upnpRemoveForwarding ( tr_upnp * handle )
-{
-    handle->port = -1;
-
-    if( handle->isForwarding )
-    {
-        char portStr[16];
-        snprintf( portStr, sizeof(portStr), "%d", handle->port );
-
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.servicetype,
                                 portStr, "TCP" );
-        tr_dbg( "Stopping port forwarding of '%s', service '%s'",
+        tr_dbg( KEY "stopping port forwarding of '%s', service '%s'",
                 handle->urls.controlURL, handle->data.servicetype );
-
-        handle->isForwarding = FALSE;
+        handle->isMapped = 0;
+        handle->state = TR_UPNP_IDLE;
+        handle->port = -1;
     }
-}
 
-void
-tr_upnpForwardPort( tr_upnp * handle, int publicPort )
-{
-    tr_upnpRemoveForwarding( handle ); /* remove the old forwarding */
+    if( handle->state == TR_UPNP_IDLE )
+    {
+        if( isEnabled && !handle->isMapped )
+            handle->state = TR_UPNP_MAP;
+    }
 
-    handle->port = publicPort;
+    if( handle->state == TR_UPNP_MAP )
+    {
+        char portStr[16];
+        snprintf( portStr, sizeof(portStr), "%d", port );
+        handle->isMapped = ( handle->urls.controlURL != NULL ) && 
+                           ( handle->data.servicetype != NULL ) &&
+                           ( UPNP_AddPortMapping( handle->urls.controlURL,
+                                                  handle->data.servicetype,
+                                                  portStr, portStr, handle->lanaddr,
+                                                  "Transmission", "TCP" ) );
+        tr_inf( KEY "port forwarding via '%s', service '%s'.  (local address: %s:%d)",
+                handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, handle->port );
+        if( handle->isMapped ) {
+            tr_inf( KEY "port forwarding successful!" );
+            handle->port = port;
+            handle->state = TR_UPNP_IDLE;
+        } else {
+            tr_err( KEY "port forwarding failed" );
+            handle->port = -1;
+            handle->state = TR_UPNP_ERR;
+        }
+    }
 
-    if( handle->isEnabled )
-        tr_upnpStart( handle );
-}
-
-void
-tr_upnpStop( tr_upnp * handle )
-{
-    tr_upnpRemoveForwarding( handle );
-    handle->isEnabled = 0;
-}
-
-int
-tr_upnpStatus( tr_upnp * handle )
-{
-    if( !handle->isEnabled )
-        return TR_NAT_TRAVERSAL_DISABLED;
-
-    if( !handle->isForwarding )
-        return TR_NAT_TRAVERSAL_ERROR;
-
-    return TR_NAT_TRAVERSAL_MAPPED;
-}
-
-void
-tr_upnpPulse( tr_upnp * handle UNUSED )
-{
-    /* no-op */
+    if( handle->state == TR_UPNP_ERR )
+        ret = TR_NAT_TRAVERSAL_ERROR;
+    else if( ( handle->state == TR_UPNP_IDLE ) && handle->isMapped )
+        ret = TR_NAT_TRAVERSAL_MAPPED;
+    else if( ( handle->state == TR_UPNP_IDLE ) && !handle->isMapped )
+        ret = TR_NAT_TRAVERSAL_UNMAPPED;
+    else if( handle->state == TR_UPNP_MAP )
+        ret = TR_NAT_TRAVERSAL_MAPPING;
+    else if( handle->state == TR_UPNP_UNMAP )
+        ret = TR_NAT_TRAVERSAL_UNMAPPING;
+    return ret;
 }

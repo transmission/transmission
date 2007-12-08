@@ -648,7 +648,7 @@ timerfunc( int fd UNUSED, short event UNUSED, void * arg UNUSED )
         if( !stillmore )
         {
             hs = tr_handleStatus( gl_handle );
-            if( TR_NAT_TRAVERSAL_DISABLED != hs->natTraversalStatus )
+            if( TR_NAT_TRAVERSAL_UNMAPPED != hs->natTraversalStatus )
             {
                 stillmore = 1;
             }

@@ -41,8 +41,4 @@ void         tr_lockLock       ( tr_lock * );
 void         tr_lockUnlock     ( tr_lock * );
 int          tr_lockHave       ( const tr_lock * );
 
-struct in_addr; /* forward declaration to calm gcc down */
-int
-tr_getDefaultRoute( struct in_addr * addr );
-
 #endif

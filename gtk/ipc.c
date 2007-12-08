@@ -971,6 +971,9 @@ smsg_torall( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag,
     simpleresp( con, tag, IPC_MSG_OK );
 }
 
+#define TR_NAT_TRAVERSAL_IS_DISABLED( st ) \
+    ( TR_NAT_TRAVERSAL_UNMAPPED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
+
 static void
 smsg_pref( enum ipc_msg id, benc_val_t * val SHUTUP, int64_t tag, void * arg )
 {

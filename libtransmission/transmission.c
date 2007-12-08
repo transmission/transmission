@@ -324,6 +324,7 @@ tr_closeImpl( void * vh )
     tr_handle * h = vh;
     tr_torrent * t;
 
+    tr_sharedShuttingDown( h->shared );
     tr_trackerShuttingDown( h );
 
     for( t=h->torrentList; t!=NULL; t=t->next )
@@ -334,13 +335,6 @@ tr_closeImpl( void * vh )
     tr_rcClose( h->upload );
     tr_rcClose( h->download );
     
-    tr_natTraversalEnable( h, 0 );
-    while( tr_handleStatus( h )->natTraversalStatus != TR_NAT_TRAVERSAL_DISABLED )
-        tr_wait( 100 );
-
-    tr_sharedClose( h->shared );
-    tr_fdClose();
-
     h->isClosed = TRUE;
 }
 
@@ -366,6 +360,7 @@ tr_close( tr_handle * h )
     while( h->events && !deadlineReached( deadline ) )
         tr_wait( 100 );
 
+    tr_fdClose( );
     tr_statsClose( h );
     tr_lockFree( h->lock );
     free( h->tag );

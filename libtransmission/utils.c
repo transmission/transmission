@@ -187,7 +187,8 @@ tr_asprintf( char **strp, const char *fmt, ...)
     return ret;
 }
 
-void tr_msg( int level, const char * fmt, ... )
+void
+tr_msg( const char * file, int line, int level, const char * fmt, ... )
 {
     FILE * fp;
 
@@ -222,6 +223,8 @@ void tr_msg( int level, const char * fmt, ... )
                 newmsg->level = level;
                 newmsg->when = time( NULL );
                 newmsg->message = text;
+                newmsg->file = file;
+                newmsg->line = line;
 
                 *messageQueueTail = newmsg;
                 messageQueueTail = &newmsg->next;

@@ -750,20 +750,24 @@ struct tr_msg_list
     uint8_t              level;
     time_t               when;
     char               * message;
+    const char         * file;
+    int                  line;
     struct tr_msg_list * next;
 };
 
+typedef enum
+{
+    TR_NAT_TRAVERSAL_MAPPING,
+    TR_NAT_TRAVERSAL_MAPPED,
+    TR_NAT_TRAVERSAL_UNMAPPING,
+    TR_NAT_TRAVERSAL_UNMAPPED,
+    TR_NAT_TRAVERSAL_ERROR,
+}
+tr_nat_traversal_status;
+
 struct tr_handle_status
 {
-#define TR_NAT_TRAVERSAL_MAPPING        1
-#define TR_NAT_TRAVERSAL_MAPPED         2
-#define TR_NAT_TRAVERSAL_NOTFOUND       3
-#define TR_NAT_TRAVERSAL_ERROR          4
-#define TR_NAT_TRAVERSAL_UNMAPPING      5
-#define TR_NAT_TRAVERSAL_DISABLED       6
-#define TR_NAT_TRAVERSAL_IS_DISABLED( st ) \
-  ( TR_NAT_TRAVERSAL_DISABLED == (st) || TR_NAT_TRAVERSAL_UNMAPPING == (st) )
-    int natTraversalStatus;
+    tr_nat_traversal_status natTraversalStatus;
     int publicPort;
 };
 

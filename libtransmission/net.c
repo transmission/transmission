@@ -145,43 +145,6 @@ tr_netOpenTCP( const struct in_addr * addr, tr_port_t port, int priority )
     return tr_netOpen( addr, port, SOCK_STREAM, priority );
 }
 
-int
-tr_netOpenUDP( const struct in_addr * addr, tr_port_t port, int priority )
-{
-    return tr_netOpen( addr, port, SOCK_DGRAM, priority );
-}
-
-#ifdef IP_ADD_MEMBERSHIP
-int tr_netMcastOpen( int port, const struct in_addr * addr )
-{
-    int fd;
-    struct ip_mreq req;
-
-    fd = tr_netBindUDP( port );
-    if( 0 > fd )
-    {
-        return -1;
-    }
-
-    memset( &req, 0, sizeof( req ) );
-    req.imr_multiaddr.s_addr = addr->s_addr;
-    req.imr_interface.s_addr = htonl( INADDR_ANY );
-    if( setsockopt( fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&req, sizeof ( req ) ) )
-    {
-        tr_err( "Couldn't join multicast group (%s)", strerror( sockerrno ) );
-        tr_netClose( fd );
-        return -1;
-    }
-
-    return fd;
-}
-#else /* IP_ADD_MEMBERSHIP */
-int tr_netMcastOpen( int port UNUSED, const struct in_addr * addr UNUSED )
-{
-    return -1;
-}
-#endif /* IP_ADD_MEMBERSHIP */
-
 static int
 tr_netBind( int port, int type )
 {
@@ -201,27 +164,9 @@ tr_netBind( int port, int type )
     setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof( optval ) );
 #endif
 
-#ifdef SO_REUSEPORT
-    if( SOCK_DGRAM == type )
-    {
-        optval = 1;
-        setsockopt( s, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof( optval ) );
-    }
-#endif
-
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
-
-    /* Leopard closes a SO_REUSEADDR + INADDR_ANY hole, so we can't
-     * use INADDR_ANY when binding for nat-pmp. For details, refer to
-     * http://www.uwsg.indiana.edu/hypermail/linux/kernel/9902.1/0828.html .
-     * This can probably be done cleaner, but since we're only using SOCK_DGRAM
-     * for nat-pmp, this quick fix should work. */
-    if ( SOCK_DGRAM == type )
-        sock.sin_addr.s_addr = inet_addr( PMP_MCAST_ADDR );
-    else
-        sock.sin_addr.s_addr = INADDR_ANY;
-
+    sock.sin_addr.s_addr = INADDR_ANY;
     sock.sin_port        = htons( port );
 
     if( bind( s, (struct sockaddr *) &sock,
@@ -240,13 +185,6 @@ tr_netBindTCP( int port )
 {
     return tr_netBind( port, SOCK_STREAM );
 }
-
-int
-tr_netBindUDP( int port )
-{
-    return tr_netBind( port, SOCK_DGRAM );
-}
-
 
 int
 tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )

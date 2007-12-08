@@ -208,6 +208,7 @@ AC_CONFIG_FILES([Makefile
                  libtransmission/Makefile
                  third-party/Makefile
                  third-party/miniupnp/Makefile
+                 third-party/libnatpmp/Makefile
                  macosx/Makefile
                  wx/Makefile
                  wx/images/Makefile
