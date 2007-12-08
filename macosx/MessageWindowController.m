@@ -330,12 +330,9 @@
             level = @"";
     }
     
-    NSString * fileString, * file = [message objectForKey: @"File"];
-    if ((file = [message objectForKey: @"File"]))
-        fileString = [NSString stringWithFormat: @" %@:%d", [message objectForKey: @"File"],
-                                        [[message objectForKey: @"Line"] intValue]];
-    else
-        fileString = @"";
+    NSString * file = [message objectForKey: @"File"],
+        * fileString = file ? [NSString stringWithFormat: @" %@:%@", [message objectForKey: @"File"], [message objectForKey: @"Line"]]
+                            : @"";
     
     return [NSString stringWithFormat: @"%@%@ [%@] %@", [message objectForKey: @"Date"], fileString, level,
                                                             [message objectForKey: @"Message"]];
