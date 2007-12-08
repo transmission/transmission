@@ -66,7 +66,7 @@ Other Contributors
 Third-Party Resources
 Thanks to:
         Niels Provos for use of libevent <http://monkey.org/~provos/libevent/>
-	Thomas Bernard for use of MiniUPnP. <http://miniupnp.tuxfamily.org/>
+	Thomas Bernard for use of MiniUPnP and libnatpmp. <http://miniupnp.tuxfamily.org/>
         The Growl Development Team for use of Growl. <http://growl.info/>
         Andy Matuschak for use of Sparkle. <http://sparkle.andymatuschak.org/>
         M. Uli Kusterer for use of UKKQueue.

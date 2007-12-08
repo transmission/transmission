@@ -2,7 +2,7 @@ NEWS file for Transmission <http://transmission.m0k.org/>
 
 1.00 (zzzz/xx/yy)
 - All Platforms:
-   + UPnP now performed by MiniUPnP
+   + Port forwarding now performed by MiniUPnP and libnatpmp
    + Option to prefer not using encryption
    + Restore `scrape' feature in the command-line interface client
    + Updated icon

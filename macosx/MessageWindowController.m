@@ -113,11 +113,22 @@
     if ((messages = tr_getQueuedMessages()) == NULL)
         return;
     
+    NSMutableDictionary * message;
     for (currentMessage = messages; currentMessage != NULL; currentMessage = currentMessage->next)
-        [fMessages addObject: [NSDictionary dictionaryWithObjectsAndKeys:
-                                [NSString stringWithUTF8String: currentMessage->message], @"Message",
-                                [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
-                                [NSNumber numberWithInt: currentMessage->level], @"Level", nil]];
+    {
+        message  = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                    [NSString stringWithUTF8String: currentMessage->message], @"Message",
+                    [NSDate dateWithTimeIntervalSince1970: currentMessage->when], @"Date",
+                    [NSNumber numberWithInt: currentMessage->level], @"Level", nil];
+        
+        if (currentMessage->file != NULL)
+        {
+            [message setObject: [NSString stringWithUTF8String: currentMessage->file] forKey: @"File"];
+            [message setObject: [NSNumber numberWithInt: currentMessage->line] forKey: @"Line"];
+        }
+                                
+        [fMessages addObject: message];
+    }
     
     tr_freeMessageList(messages);
     
@@ -319,7 +330,15 @@
             level = @"";
     }
     
-    return [NSString stringWithFormat: @"%@ [%@] %@", [message objectForKey: @"Date"], level, [message objectForKey: @"Message"]];
+    NSString * fileString, * file = [message objectForKey: @"File"];
+    if ((file = [message objectForKey: @"File"]))
+        fileString = [NSString stringWithFormat: @" %@:%d", [message objectForKey: @"File"],
+                                        [[message objectForKey: @"Line"] intValue]];
+    else
+        fileString = @"";
+    
+    return [NSString stringWithFormat: @"%@%@ [%@] %@", [message objectForKey: @"Date"], fileString, level,
+                                                            [message objectForKey: @"Message"]];
 }
 
 @end
