@@ -24,7 +24,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface ToolbarSegmentedCell : NSSegmentedCell
 {
 }

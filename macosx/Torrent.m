@@ -210,7 +210,6 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 {
     fStat = tr_torrentStat(fHandle);
     
-    #warning find a better way
     //check if the file is created for Time Machine
     if (fNeedSetTimeMachine && [self isActive])
     {

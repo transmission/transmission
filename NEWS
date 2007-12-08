@@ -7,14 +7,15 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Restore `scrape' feature in the command-line interface client
    + Updated icon
 - OS X:
+   + Redesigned Leopard-like look
    + Statistics window
    + Pieces Bar (return of Advanced Bar)
    + Availability Bar (overlay on regular bar)
-   + Redesigned Leopard-like look
    + Leopard: Time Machine will ignore incomplete downloads
    + Display remaining time for seeding transfers
    + Sort by total activity
-   + Leopard: Fix bug where text fields would reject localized double values
+   + Leopard: Fix bug where text fields would reject localized decimal values
+   + Fix bug where dragging non-torrent files over the main window would result in excessive memory usage
 - GTK+:
    + Statistics window
 

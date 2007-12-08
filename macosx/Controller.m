@@ -228,6 +228,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [toolbar setDelegate: self];
     [toolbar setAllowsUserCustomization: YES];
     [toolbar setAutosavesConfiguration: YES];
+    [toolbar setDisplayMode: NSToolbarDisplayModeIconOnly];
     [fWindow setToolbar: toolbar];
     [toolbar release];
     
@@ -292,7 +293,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrefsController setUpdater: fUpdater];
     
     [fTableView setTorrents: fDisplayedTorrents];
-    [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[TorrentCell alloc] init]];
+    [[fTableView tableColumnWithIdentifier: @"Torrent"] setDataCell: [[[TorrentCell alloc] init] autorelease]];
     
     [fTableView registerForDraggedTypes: [NSArray arrayWithObject: TORRENT_TABLE_VIEW_DATA_TYPE]];
     [fWindow registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, NSURLPboardType, nil]];
@@ -2725,7 +2726,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
+        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         
@@ -2757,7 +2758,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [groupItem setMaxSize: groupSize];
         
         [segmentedControl release];
-        
         return [groupItem autorelease];
     }
     else if ([ident isEqualToString: TOOLBAR_PAUSE_RESUME_SELECTED])
@@ -2765,7 +2765,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         GroupToolbarItem * groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier: ident];
         
         NSSegmentedControl * segmentedControl = [[NSSegmentedControl alloc] initWithFrame: NSZeroRect];
-        [segmentedControl setCell: [[ToolbarSegmentedCell alloc] init]];
+        [segmentedControl setCell: [[[ToolbarSegmentedCell alloc] init] autorelease]];
         [groupItem setView: segmentedControl];
         NSSegmentedCell * segmentedCell = (NSSegmentedCell *)[segmentedControl cell];
         

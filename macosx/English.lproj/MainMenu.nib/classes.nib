@@ -56,6 +56,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>allToolbarClicked</key>
+				<string>id</string>
 				<key>announceSelectedTorrents</key>
 				<string>id</string>
 				<key>applyFilter</key>
@@ -101,6 +103,8 @@
 				<key>resumeWaitingTorrents</key>
 				<string>id</string>
 				<key>revealFile</key>
+				<string>id</string>
+				<key>selectedToolbarClicked</key>
 				<string>id</string>
 				<key>setFilter</key>
 				<string>id</string>
@@ -237,6 +241,14 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>FilterButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>checkFile</key>
@@ -273,14 +285,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>FilterButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
