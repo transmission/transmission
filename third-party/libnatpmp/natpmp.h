@@ -20,6 +20,7 @@
 #define NATPMP_PORT (5351)
 
 #include <time.h>
+#include <sys/time.h> /* struct timeval */
 #include <netinet/in.h>
 
 typedef struct {
