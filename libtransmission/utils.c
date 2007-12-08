@@ -192,9 +192,6 @@ tr_msg( const char * file, int line, int level, const char * fmt, ... )
 {
     FILE * fp;
 
-    if( file == NULL )
-        file = "";
-
     assert( NULL != messageLock );
     tr_lockLock( messageLock );
 
