@@ -11,6 +11,12 @@
 		35B038130AC5B6EB00A10FDF /* ResumeNoWaitOn.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */; };
 		35B038140AC5B6EC00A10FDF /* ResumeNoWaitOff.png in Resources */ = {isa = PBXBuildFile; fileRef = 35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */; };
+		3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
+		3C7A11960D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
+		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
+		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
+		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
+		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.c */; };
 		4394AC680C74FB6000F367E8 /* publish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC650C74FB6000F367E8 /* publish.c */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
@@ -332,6 +338,11 @@
 		35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ResumeNoWaitOff.png; path = macosx/Images/ResumeNoWaitOff.png; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FilePriorityCell.h; path = macosx/FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FilePriorityCell.m; path = macosx/FilePriorityCell.m; sourceTree = "<group>"; };
+		3C7A118D0D0B2EB800B5701F /* libnatpmp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libnatpmp.a; path = build/Release/libnatpmp.a; sourceTree = "<group>"; };
+		3C7A11910D0B2EE300B5701F /* getgateway.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getgateway.c; path = "third-party/libnatpmp/getgateway.c"; sourceTree = "<group>"; };
+		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = getgateway.h; path = "third-party/libnatpmp/getgateway.h"; sourceTree = "<group>"; };
+		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = natpmp.c; path = "third-party/libnatpmp/natpmp.c"; sourceTree = "<group>"; };
+		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = natpmp.h; path = "third-party/libnatpmp/natpmp.h"; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ptrarray.c; path = libtransmission/ptrarray.c; sourceTree = "<group>"; };
 		4394AC650C74FB6000F367E8 /* publish.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = publish.c; path = libtransmission/publish.c; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = macosx/Images/TransmissionDocument.icns; sourceTree = "<group>"; };
@@ -658,6 +669,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		3C7A118B0D0B2EB800B5701F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4DDBB71709E16BAE00284745 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -809,6 +827,7 @@
 				BEFC1D430C0783EE00B0BB3C /* transmission-proxy */,
 				BE75C3490C729E9500DBEFE0 /* libevent.a */,
 				BE1183480CE160960002D0F3 /* libminiupnp.a */,
+				3C7A118D0D0B2EB800B5701F /* libnatpmp.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -816,6 +835,7 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				4D1838DC09DEC04A0047D688 /* libtransmission */,
 				4DDBB71F09E16BFE00284745 /* CLI */,
@@ -920,6 +940,17 @@
 				A24F19070A3A790800C9C145 /* Sparkle.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3C7A11880D0B2E6700B5701F /* libnatpmp */ = {
+			isa = PBXGroup;
+			children = (
+				3C7A11910D0B2EE300B5701F /* getgateway.c */,
+				3C7A11920D0B2EE300B5701F /* getgateway.h */,
+				3C7A11930D0B2EE300B5701F /* natpmp.c */,
+				3C7A11940D0B2EE300B5701F /* natpmp.h */,
+			);
+			name = libnatpmp;
 			sourceTree = "<group>";
 		};
 		4D1838DC09DEC04A0047D688 /* libtransmission */ = {
@@ -1179,6 +1210,15 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		3C7A11890D0B2EB800B5701F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */,
+				3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D18389309DEC0030047D688 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1246,6 +1286,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		3C7A118C0D0B2EB800B5701F /* natpmp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3C7A119B0D0B2EE300B5701F /* Build configuration list for PBXNativeTarget "natpmp" */;
+			buildPhases = (
+				3C7A11890D0B2EB800B5701F /* Headers */,
+				3C7A118A0D0B2EB800B5701F /* Sources */,
+				3C7A118B0D0B2EB800B5701F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = natpmp;
+			productName = natpmp;
+			productReference = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		4D18389609DEC0030047D688 /* libtransmission */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4D18389B09DEC01E0047D688 /* Build configuration list for PBXNativeTarget "libtransmission" */;
@@ -1427,6 +1484,7 @@
 				BEFC1D340C0783EE00B0BB3C /* transmission-proxy */,
 				BE75C3480C729E9500DBEFE0 /* event */,
 				BE1183470CE160960002D0F3 /* miniupnp */,
+				3C7A118C0D0B2EB800B5701F /* natpmp */,
 			);
 		};
 /* End PBXProject section */
@@ -1550,6 +1608,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3C7A118A0D0B2EB800B5701F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */,
+				3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D18389409DEC0030047D688 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1645,6 +1712,8 @@
 				A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.m in Sources */,
+				3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */,
+				3C7A11960D0B2EE300B5701F /* natpmp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1966,6 +2035,47 @@
 			};
 			name = Development;
 		};
+		3C7A118E0D0B2EB800B5701F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = natpmp;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		3C7A118F0D0B2EB800B5701F /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = natpmp;
+				ZERO_LINK = YES;
+			};
+			name = "Release - Debug";
+		};
+		3C7A11900D0B2EB800B5701F /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = natpmp;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
 		4D18389C09DEC01E0047D688 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2227,6 +2337,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3C7A119B0D0B2EE300B5701F /* Build configuration list for PBXNativeTarget "natpmp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3C7A118E0D0B2EB800B5701F /* Release */,
+				3C7A118F0D0B2EB800B5701F /* Release - Debug */,
+				3C7A11900D0B2EB800B5701F /* Development */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
 		4D18389B09DEC01E0047D688 /* Build configuration list for PBXNativeTarget "libtransmission" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
