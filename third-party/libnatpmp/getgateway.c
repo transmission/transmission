@@ -17,7 +17,7 @@
 #include <ctype.h>
 #include <netinet/in.h>
 #include <sys/param.h>
-#ifdef BSD
+#if defined(BSD) || defined(__APPLE__)
 #include <stdlib.h>
 #include <sys/sysctl.h>
 #include <sys/socket.h>
@@ -60,7 +60,7 @@ int getdefaultgateway(in_addr_t * addr)
 }
 #endif
 
-#ifdef BSD 
+#if defined(BSD) || defined(__APPLE__)
 
 #define ROUNDUP(a) \
 	((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
