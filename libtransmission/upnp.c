@@ -373,7 +373,9 @@ sendSSDP( int fd )
 
     if( 0 > fd )
     {
-        fd = tr_netBindUDP( 0 );
+        struct in_addr addr;
+        addr.s_addr = inet_addr( SSDP_ADDR );
+        fd = tr_netBindUDP( 0, &addr );
         if( 0 > fd )
         {
             return -1;

@@ -71,7 +71,7 @@ int  tr_netOpenTCP  ( const struct in_addr * addr, tr_port_t port, int priority 
 int  tr_netOpenUDP  ( const struct in_addr * addr, tr_port_t port, int priority );
 int  tr_netMcastOpen( int port, const struct in_addr * addr );
 int  tr_netBindTCP  ( int port );
-int  tr_netBindUDP  ( int port );
+int  tr_netBindUDP  ( int port, const struct in_addr * addr );
 int  tr_netAccept   ( int s, struct in_addr *, tr_port_t * );
 void tr_netClose    ( int s );
 

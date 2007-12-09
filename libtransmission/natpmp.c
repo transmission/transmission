@@ -40,6 +40,7 @@
 #include "platform.h" /* tr_getDefaultRoute() */
 #include "utils.h"
 
+#define PMP_MCAST_ADDR          "224.0.0.1"
 #define PMP_PORT                5351
 #define PMP_INITIAL_DELAY       250     /* ms, 1/4 second */
 #define PMP_TOTAL_DELAY         120000  /* ms, 2 minutes */
@@ -136,7 +137,7 @@ static tr_tristate_t
 parseresponse( uint8_t * buf, int len, int port, tr_natpmp_parse_t * parse );
 
 tr_natpmp *
-tr_natpmpInit()
+tr_natpmpInit( void )
 {
     tr_natpmp * pmp;
 
@@ -673,7 +674,7 @@ sendreq( tr_natpmp_req_t * req )
 }
 
 static int
-mcastsetup()
+mcastsetup( void )
 {
     int fd;
     struct in_addr addr;

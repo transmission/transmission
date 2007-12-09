@@ -36,6 +36,4 @@ void        tr_natpmpRemoveForwarding( tr_natpmp * );
 void        tr_natpmpPulse( tr_natpmp *, int * );
 void        tr_natpmpClose( tr_natpmp * );
 
-#define PMP_MCAST_ADDR "224.0.0.1"
-
 #endif

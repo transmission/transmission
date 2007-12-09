@@ -157,7 +157,7 @@ int tr_netMcastOpen( int port, const struct in_addr * addr )
     int fd;
     struct ip_mreq req;
 
-    fd = tr_netBindUDP( port );
+    fd = tr_netBindUDP( port, addr );
     if( 0 > fd )
     {
         return -1;
@@ -183,7 +183,7 @@ int tr_netMcastOpen( int port UNUSED, const struct in_addr * addr UNUSED )
 #endif /* IP_ADD_MEMBERSHIP */
 
 static int
-tr_netBind( int port, int type )
+tr_netBind( int port, int type, const struct in_addr * addr )
 {
     int s;
     struct sockaddr_in sock;
@@ -211,18 +211,13 @@ tr_netBind( int port, int type )
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
-
-    /* Leopard closes a SO_REUSEADDR + INADDR_ANY hole, so we can't
-     * use INADDR_ANY when binding for nat-pmp. For details, refer to
-     * http://www.uwsg.indiana.edu/hypermail/linux/kernel/9902.1/0828.html .
-     * This can probably be done cleaner, but since we're only using SOCK_DGRAM
-     * for nat-pmp, this quick fix should work. */
-    if ( SOCK_DGRAM == type )
-        sock.sin_addr.s_addr = inet_addr( PMP_MCAST_ADDR );
-    else
+    if( addr != NULL ) {
+        sock.sin_addr.s_addr = addr->s_addr;
+        tr_inf( "using the specified address\n" );
+    } else { 
         sock.sin_addr.s_addr = INADDR_ANY;
-
-    sock.sin_port        = htons( port );
+        tr_inf( "using INADDR_ANY\n" );
+    }
 
     if( bind( s, (struct sockaddr *) &sock,
                sizeof( struct sockaddr_in ) ) )
@@ -238,15 +233,14 @@ tr_netBind( int port, int type )
 int
 tr_netBindTCP( int port )
 {
-    return tr_netBind( port, SOCK_STREAM );
+    return tr_netBind( port, SOCK_STREAM, NULL );
 }
 
 int
-tr_netBindUDP( int port )
+tr_netBindUDP( int port, const struct in_addr * addr )
 {
-    return tr_netBind( port, SOCK_DGRAM );
+    return tr_netBind( port, SOCK_DGRAM, addr );
 }
-
 
 int
 tr_netAccept( int b, struct in_addr * addr, tr_port_t * port )
