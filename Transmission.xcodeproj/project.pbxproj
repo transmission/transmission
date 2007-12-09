@@ -90,7 +90,6 @@
 		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
 		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
 		A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA50D00D1790079CFED /* TurtleGraphite.png */; };
-		A22D3AAE0D00D22A0079CFED /* ActionPopUp.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */; };
 		A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
@@ -123,7 +122,6 @@
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */; };
 		A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A28E1DB80CFFD41800E16385 /* BottomBarView.m */; };
-		A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A28E1E150D00574A00E16385 /* ActionPopUpButton.m */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrow.png */; };
 		A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrow.png */; };
@@ -162,7 +160,8 @@
 		A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151220CD438DE001F3B0E /* InfoTabBack.png */; };
 		A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
-		A2F41D8A0D0B897C006CE378 /* UpDownArrowsTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */; };
+		A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DA80D0B9152006CE378 /* ActionGear.png */; };
+		A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FE61D80CD3D0A500D683E1 /* InfoTabBackGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */; };
 		BE1183570CE160C50002D0F3 /* bsdqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834D0CE160C50002D0F3 /* bsdqueue.h */; };
@@ -435,7 +434,6 @@
 		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
 		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
 		A22D3AA50D00D1790079CFED /* TurtleGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleGraphite.png; path = macosx/Images/TurtleGraphite.png; sourceTree = "<group>"; };
-		A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionPopUp.png; path = macosx/Images/ActionPopUp.png; sourceTree = "<group>"; };
 		A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBackInactive.png; path = macosx/Images/BottomBackInactive.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
@@ -493,8 +491,6 @@
 		A28E1DB80CFFD41800E16385 /* BottomBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BottomBarView.m; path = macosx/BottomBarView.m; sourceTree = "<group>"; };
 		A28E1DD50CFFD8A700E16385 /* BottomBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BottomBarView.h; path = macosx/BottomBarView.h; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
-		A28E1E140D00574A00E16385 /* ActionPopUpButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ActionPopUpButton.h; path = macosx/ActionPopUpButton.h; sourceTree = "<group>"; };
-		A28E1E150D00574A00E16385 /* ActionPopUpButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ActionPopUpButton.m; path = macosx/ActionPopUpButton.m; sourceTree = "<group>"; };
 		A29AF4F60D01BADC00D097EC /* DownArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrow.png; path = macosx/Images/DownArrow.png; sourceTree = "<group>"; };
 		A29AF4F80D01BAEB00D097EC /* UpArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrow.png; path = macosx/Images/UpArrow.png; sourceTree = "<group>"; };
 		A29C8B340ACC6EB3000ED9F9 /* PortChecker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PortChecker.h; path = macosx/PortChecker.h; sourceTree = "<group>"; };
@@ -565,7 +561,8 @@
 		A2F151210CD438DE001F3B0E /* InfoTabBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBorder.png; path = macosx/Images/InfoTabBorder.png; sourceTree = "<group>"; };
 		A2F151220CD438DE001F3B0E /* InfoTabBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBack.png; path = macosx/Images/InfoTabBack.png; sourceTree = "<group>"; };
 		A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackBlue.png; path = macosx/Images/InfoTabBackBlue.png; sourceTree = "<group>"; };
-		A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpDownArrowsTemplate.png; path = macosx/Images/UpDownArrowsTemplate.png; sourceTree = "<group>"; };
+		A2F41DA80D0B9152006CE378 /* ActionGear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionGear.png; path = macosx/Images/ActionGear.png; sourceTree = "<group>"; };
+		A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangTemplate.png; path = macosx/Images/YingYangTemplate.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
@@ -778,8 +775,6 @@
 				A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */,
 				A25E74470AF5089E006F11AE /* ExpandedPathToIconTransformer.h */,
 				A25E74460AF5089E006F11AE /* ExpandedPathToIconTransformer.m */,
-				A28E1E140D00574A00E16385 /* ActionPopUpButton.h */,
-				A28E1E150D00574A00E16385 /* ActionPopUpButton.m */,
 				4DE5CCA50980735700BE280E /* Badger.h */,
 				4DE5CCA60980735700BE280E /* Badger.m */,
 				A2A632190CD9751700E3DA60 /* BadgeView.h */,
@@ -877,7 +872,7 @@
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
 				A29AF4F80D01BAEB00D097EC /* UpArrow.png */,
 				A29AF4F60D01BADC00D097EC /* DownArrow.png */,
-				A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */,
+				A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */,
 				A2F151150CD438A4001F3B0E /* YellowDot.png */,
 				A2F151160CD438A4001F3B0E /* RedDot.png */,
 				A2F151170CD438A4001F3B0E /* GreenDot.png */,
@@ -896,9 +891,9 @@
 				A22D3AA30D00D1790079CFED /* Turtle.png */,
 				A22D3AA40D00D1790079CFED /* TurtleBlue.png */,
 				A22D3AA50D00D1790079CFED /* TurtleGraphite.png */,
+				A2F41DA80D0B9152006CE378 /* ActionGear.png */,
 				A277DA090C693D9C00DA2CD4 /* ActionOn.png */,
 				A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */,
-				A22D3AAD0D00D22A0079CFED /* ActionPopUp.png */,
 				35B037F90AC5B53800A10FDF /* ResumeNoWaitOn.png */,
 				35B037FA0AC5B53800A10FDF /* ResumeNoWaitOff.png */,
 				4D6DAAC4090CE00500F43C22 /* RevealOff.png */,
@@ -1565,11 +1560,11 @@
 				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
 				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
 				A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */,
-				A22D3AAE0D00D22A0079CFED /* ActionPopUp.png in Resources */,
 				A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */,
 				A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */,
 				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
-				A2F41D8A0D0B897C006CE378 /* UpDownArrowsTemplate.png in Resources */,
+				A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */,
+				A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1713,7 +1708,6 @@
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */,
 				A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */,
-				A28E1E160D00574A00E16385 /* ActionPopUpButton.m in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.m in Sources */,
 				3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */,

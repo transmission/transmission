@@ -288,14 +288,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ActionPopUpButton</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSPopUpButton</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>StatusBarView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
