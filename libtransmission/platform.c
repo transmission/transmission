@@ -375,7 +375,7 @@ tr_getPrefsDirectory( void )
     tr_buildPath ( buf, buflen, h, ".transmission", NULL );
 #endif
 
-    tr_mkdirp( buf, 0700 );
+    tr_mkdirp( buf, 0777 );
     init = 1;
 
 #ifdef SYS_DARWIN
@@ -409,7 +409,7 @@ tr_getCacheDirectory( void )
     tr_buildPath( buf, buflen, p, "cache", NULL );
 #endif
 
-    tr_mkdirp( buf, 0700 );
+    tr_mkdirp( buf, 0777 );
     init = 1;
 
     if( strcmp( p, buf ) )
@@ -439,7 +439,7 @@ tr_getTorrentsDirectory( void )
     tr_buildPath( buf, buflen, p, "torrents", NULL );
 #endif
 
-    tr_mkdirp( buf, 0700 );
+    tr_mkdirp( buf, 0777 );
     init = 1;
     return buf;
 }
