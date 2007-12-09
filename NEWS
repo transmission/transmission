@@ -19,6 +19,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Statistics window
 
 0.96 (2007/12/yy)
+- All Platforms:
+   + Fix nasty 0.95 data corruption error
+   + Fix 0.95 bug that broke UPNP
 - OS X:
    + Fix bug where dragging non-torrent files over the main window could result in excessive memory usage
 
