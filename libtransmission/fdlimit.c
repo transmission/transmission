@@ -254,7 +254,7 @@ tr_fdFileCheckout( const char * filename, int write )
         }
 
         if( winner >= 0 ) {
-            if( fileIsOpen( &gFd->open[i] ) ) {
+            if( fileIsOpen( &gFd->open[winner] ) ) {
                 dbgmsg( "closing file '%s', slot #%d", gFd->open[winner].filename, winner );
                 TrCloseFile( winner );
             }
