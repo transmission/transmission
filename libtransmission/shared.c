@@ -93,9 +93,34 @@ natPulse( tr_shared * s )
 }
 
 static void
-checkForIncomingPeers( tr_shared * s )
+incomingPeersPulse( tr_shared * s )
 {
-    for( ;; )
+    if( s->bindSocket >= 0 && ( s->bindPort != s->publicPort ) )
+    {
+        tr_inf( NATKEY "closing port %d", s->bindPort );
+        tr_netClose( s->bindSocket );
+        s->bindSocket = -1;
+    }
+
+    if( s->bindPort != s->publicPort )
+    {
+        int socket;
+        errno = 0;
+        socket = tr_netBindTCP( s->publicPort );
+        if( socket >= 0 ) {
+            tr_inf( NATKEY "opened port %d to listen for incoming peer connections", s->publicPort );
+            s->bindPort = s->publicPort;
+            s->bindSocket = socket;
+            listen( s->bindSocket, 5 );
+        } else {
+            tr_err( NATKEY "unable to open port %d to listen for incoming peer connections (errno is %d - %s)",
+                    s->publicPort, errno, strerror(errno) );
+            s->bindPort = -1;
+            s->bindSocket = -1;
+        }
+    }
+    
+    for( ;; ) /* check for new incoming peer connections */    
     {
         int socket;
         uint16_t port;
@@ -122,7 +147,7 @@ sharedPulse( void * vshared )
 
     if( !shared->isShuttingDown )
     {
-        checkForIncomingPeers( shared );
+        incomingPeersPulse( shared );
     }
     else if( ( shared->natStatus == TR_NAT_TRAVERSAL_ERROR ) || ( shared->natStatus == TR_NAT_TRAVERSAL_UNMAPPED ) )
     {

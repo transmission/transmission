@@ -156,6 +156,7 @@ tr_netBind( int port, int type )
 
     if( ( s = createSocket( type, 1 ) ) < 0 )
     {
+        tr_err( "Couldn't create socket of type %d", type );
         return -1;
     }
 
@@ -176,7 +177,8 @@ tr_netBind( int port, int type )
         tr_netClose( s );
         return -1;
     }
-
+     
+    tr_inf( "Bound socket %d to port %d", port, s );
     return s;
 }
 
