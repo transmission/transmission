@@ -41,9 +41,7 @@
     if (!value)
         return nil;
     
-    return [value boolValue] ? ([NSColor currentControlTint] == NSGraphiteControlTint
-            ? [NSImage imageNamed: @"TurtleGraphite.png"] : [NSImage imageNamed: @"TurtleBlue.png"])
-            : [NSImage imageNamed: @"Turtle.png"];
+    return [value boolValue] ? [NSImage imageNamed: @"TurtleBlue.png"] : [NSImage imageNamed: @"Turtle.png"];
 }
 
 @end

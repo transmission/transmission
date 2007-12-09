@@ -383,9 +383,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [nc addObserver: self selector: @selector(torrentTableViewSelectionDidChange:)
                     name: NSTableViewSelectionDidChangeNotification object: fTableView];
     
-    [nc addObserver: self selector: @selector(updateControlTint:)
-                    name: NSControlTintDidChangeNotification object: nil];
-    
     [nc addObserver: self selector: @selector(prepareForUpdate:)
                     name: SUUpdaterWillRestartNotification object: nil];
     fUpdateInProgress = NO;
@@ -1990,13 +1987,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fDefaults setObject: statusLabel forKey: @"StatusLabel"];
     [self updateUI];
-}
-
-- (void) updateControlTint: (NSNotification *) notification
-{
-    if ([fDefaults boolForKey: @"SpeedLimit"])
-        [fSpeedLimitButton setImage: [NSColor currentControlTint] == NSGraphiteControlTint
-            ? [NSImage imageNamed: @"TurtleGraphite.png"] : [NSImage imageNamed: @"TurtleBlue.png"]];
 }
 
 - (void) toggleSpeedLimit: (id) sender

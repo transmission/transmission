@@ -89,7 +89,6 @@
 		A22BC9A30C5BBCF100F5FB72 /* BottomBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */; };
 		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
 		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
-		A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA50D00D1790079CFED /* TurtleGraphite.png */; };
 		A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
@@ -435,7 +434,6 @@
 		A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBack.png; path = macosx/Images/BottomBack.png; sourceTree = "<group>"; };
 		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
 		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
-		A22D3AA50D00D1790079CFED /* TurtleGraphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleGraphite.png; path = macosx/Images/TurtleGraphite.png; sourceTree = "<group>"; };
 		A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBackInactive.png; path = macosx/Images/BottomBackInactive.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
@@ -897,7 +895,6 @@
 				4DF7500908A103AD007B0D70 /* Remove.png */,
 				A22D3AA30D00D1790079CFED /* Turtle.png */,
 				A22D3AA40D00D1790079CFED /* TurtleBlue.png */,
-				A22D3AA50D00D1790079CFED /* TurtleGraphite.png */,
 				A2F41DA80D0B9152006CE378 /* ActionGear.png */,
 				A277DA090C693D9C00DA2CD4 /* ActionOn.png */,
 				A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */,
@@ -1565,7 +1562,6 @@
 				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
 				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
 				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
-				A22D3AA80D00D1790079CFED /* TurtleGraphite.png in Resources */,
 				A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */,
 				A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */,
 				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
