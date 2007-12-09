@@ -1447,8 +1447,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     else
                         tr_getSessionStats(fLib, &stats);
                     
-                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@   UL: %@",
-                        "status bar -> status label (3 spaces between)"),
+                    statusString = [NSString stringWithFormat: NSLocalizedString(@"DL: %@  UL: %@",
+                        "status bar -> status label (2 spaces between)"),
                         [NSString stringForFileSize: stats.downloadedBytes], [NSString stringForFileSize: stats.uploadedBytes]];
                 }
                 else
@@ -1459,7 +1459,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 
                 //width ends up being too long
                 NSRect statusFrame = [fStatusButton frame];
-                statusFrame.size.width -= 23.0;
+                statusFrame.size.width -= 25.0;
                 [fStatusButton setFrame: statusFrame];
             }
         }

@@ -15,9 +15,12 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Display remaining time for seeding transfers
    + Sort by total activity
    + Leopard: Fix bug where text fields would reject localized decimal values
-   + Fix bug where dragging non-torrent files over the main window would result in excessive memory usage
 - GTK+:
    + Statistics window
+
+0.96 (2007/12/yy)
+- OS X:
+   + Fix bug where dragging non-torrent files over the main window could result in excessive memory usage
 
 0.95 (2007/12/04)
 - All Platforms:
