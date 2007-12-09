@@ -85,7 +85,8 @@
     tr_info info;
     while ((file = [enumerator nextObject]))
     {
-        if (tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
+        if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame
+            && tr_torrentParse(fLib, [file UTF8String], NULL, &info) == TR_OK)
         {
             count++;
             size += info.totalSize;
@@ -105,7 +106,6 @@
         return;
     
     //set strings and icon
-    NSImage * icon = nil;
     NSString * secondString = [NSString stringForFileSize: size];
     if (count > 1 || folder)
     {
@@ -114,15 +114,17 @@
             fileString = NSLocalizedString(@"1 File, ", "Drag overlay -> torrents");
         else
             fileString= [NSString stringWithFormat: NSLocalizedString(@"%d Files, ", "Drag overlay -> torrents"), fileCount];
-         secondString = [fileString stringByAppendingString: secondString];
+        secondString = [fileString stringByAppendingString: secondString];
     }
     
+    NSImage * icon;
     if (count == 1)
         icon = [[NSWorkspace sharedWorkspace] iconForFileType: folder ? NSFileTypeForHFSTypeCode('fldr') : [name pathExtension]];
     else
     {
         name = [NSString stringWithFormat: NSLocalizedString(@"%d Torrent Files", "Drag overlay -> torrents"), count];
         secondString = [secondString stringByAppendingString: @" Total"];
+        icon = [NSImage imageNamed: @"TransmissionDocument.icns"];
     }
     
     [[self contentView] setOverlay: icon mainLine: name subLine: secondString];
@@ -158,6 +160,9 @@
 
 - (void) fadeOut
 {
+    if ([self alphaValue] <= 0.0)
+        return;
+    
     //stop other animation and set to same progress
     if ([fFadeInAnimation isAnimating])
     {

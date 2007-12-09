@@ -1,5 +1,9 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
+0.96 (2007/12/yy)
+- OS X:
+   + Fix bug where dragging non-torrent files over the main window could result in excessive memory usage
+
 0.95 (2007/12/04)
 - All Platforms:
    + Fix router errors caused by sending too many tracker requests at once

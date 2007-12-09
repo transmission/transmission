@@ -2342,18 +2342,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
-            if (canAdd == TR_OK)
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                if (!fOverlayWindow)
-                    fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
-                [fOverlayWindow setTorrents: files];
-                
-                return NSDragOperationCopy;
+                switch (canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                {
+                    case TR_OK:
+                        if (!fOverlayWindow)
+                            fOverlayWindow = [[DragOverlayWindow alloc] initWithLib: fLib forWindow: fWindow];
+                        [fOverlayWindow setTorrents: files];
+                        
+                        return NSDragOperationCopy;
+                    
+                    case TR_EDUPLICATE:
+                        torrent = YES;
+                }
             }
-            else if (canAdd == TR_EDUPLICATE)
-                torrent = YES;
-            else;
         }
         
         //create a torrent file if a single file
@@ -2400,18 +2403,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         NSArray * files = [pasteboard propertyListForType: NSFilenamesPboardType];
         NSEnumerator * enumerator = [files objectEnumerator];
         NSString * file;
-        int canAdd;
         while ((file = [enumerator nextObject]))
         {
-            canAdd = tr_torrentParse(fLib, [file UTF8String], NULL, NULL);
-            if (canAdd == TR_OK)
+            if ([[file pathExtension] caseInsensitiveCompare: @"torrent"] == NSOrderedSame)
             {
-                [filesToOpen addObject: file];
-                torrent = YES;
+                switch(tr_torrentParse(fLib, [file UTF8String], NULL, NULL))
+                {
+                    case TR_OK:
+                        [filesToOpen addObject: file];
+                        torrent = YES;
+                        break;
+                        
+                    case TR_EDUPLICATE:
+                        torrent = YES;
+                }
             }
-            else if (canAdd == TR_EDUPLICATE)
-                torrent = YES;
-            else;
         }
         
         if ([filesToOpen count] > 0)
