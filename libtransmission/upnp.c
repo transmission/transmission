@@ -11,7 +11,9 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h> /* snprintf */
+#include <string.h> /* strerror */
 
 #include <miniupnp/miniwget.h>
 #include <miniupnp/miniupnpc.h>
@@ -87,6 +89,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
     if( handle->state == TR_UPNP_DISCOVER )
     {
         struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
+        errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
             tr_inf( KEY "found Internet Gateway Device '%s'", handle->urls.controlURL );
             tr_inf( KEY "local LAN IP Address is '%s'", handle->lanaddr );
@@ -94,6 +97,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->hasDiscovered = 1;
         } else {
             handle->state = TR_UPNP_ERR;
+            tr_err( KEY "UPNP_GetValidIGD failed.  (errno %d - %s)", errno, strerror(errno) );
         }
         freeUPNPDevlist( devlist );
     }
@@ -128,6 +132,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
     {
         char portStr[16];
         snprintf( portStr, sizeof(portStr), "%d", port );
+        errno = 0;
         handle->isMapped = ( handle->urls.controlURL != NULL ) && 
                            ( handle->data.servicetype != NULL ) &&
                            ( UPNP_AddPortMapping( handle->urls.controlURL,
@@ -141,7 +146,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_err( KEY "port forwarding failed" );
+            tr_err( KEY "port forwarding failed (errno %d - %s)", errno, strerror(errno) );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
         }
