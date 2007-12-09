@@ -1459,6 +1459,11 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 
                 [fStatusButton setTitle: statusString];
                 [fStatusButton sizeToFit];
+                
+                //width ends up being too long
+                NSRect statusFrame = [fStatusButton frame];
+                statusFrame.size.width -= 23.0;
+                [fStatusButton setFrame: statusFrame];
             }
         }
 

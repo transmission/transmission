@@ -162,6 +162,7 @@
 		A2F151250CD438DE001F3B0E /* InfoTabBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151220CD438DE001F3B0E /* InfoTabBack.png */; };
 		A2F151260CD438DE001F3B0E /* InfoTabBackBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */; };
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
+		A2F41D8A0D0B897C006CE378 /* UpDownArrowsTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FE61D80CD3D0A500D683E1 /* InfoTabBackGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */; };
 		BE1183570CE160C50002D0F3 /* bsdqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834D0CE160C50002D0F3 /* bsdqueue.h */; };
@@ -564,6 +565,7 @@
 		A2F151210CD438DE001F3B0E /* InfoTabBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBorder.png; path = macosx/Images/InfoTabBorder.png; sourceTree = "<group>"; };
 		A2F151220CD438DE001F3B0E /* InfoTabBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBack.png; path = macosx/Images/InfoTabBack.png; sourceTree = "<group>"; };
 		A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackBlue.png; path = macosx/Images/InfoTabBackBlue.png; sourceTree = "<group>"; };
+		A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpDownArrowsTemplate.png; path = macosx/Images/UpDownArrowsTemplate.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
@@ -875,6 +877,7 @@
 				A2F1511F0CD438BA001F3B0E /* Lock.png */,
 				A29AF4F80D01BAEB00D097EC /* UpArrow.png */,
 				A29AF4F60D01BADC00D097EC /* DownArrow.png */,
+				A2F41D890D0B897C006CE378 /* UpDownArrowsTemplate.png */,
 				A2F151150CD438A4001F3B0E /* YellowDot.png */,
 				A2F151160CD438A4001F3B0E /* RedDot.png */,
 				A2F151170CD438A4001F3B0E /* GreenDot.png */,
@@ -1566,6 +1569,7 @@
 				A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */,
 				A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */,
 				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
+				A2F41D8A0D0B897C006CE378 /* UpDownArrowsTemplate.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,6 +26,8 @@
 
 @implementation ActionPopUpButton
 
+#warning look into ellimination
+
 - (id) initWithCoder: (NSCoder *) coder
 {
 	if ((self = [super initWithCoder: coder]))
