@@ -2722,7 +2722,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setImage: [NSImage imageNamed: @"Info.png"]];
         [item setTarget: self];
         [item setAction: @selector(showInfo:)];
-        [item setAutovalidates: NO];
         
         return item;
     }
@@ -2814,7 +2813,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [item setImage: [NSImage imageNamed: @"Filter.png"]];
         [item setTarget: self];
         [item setAction: @selector(toggleFilterBar:)];
-        [item setAutovalidates: NO];
         
         return item;
     }
@@ -2924,6 +2922,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
             if (![torrent isActive] && ![torrent waitingToStart])
                 return YES;
         return NO;
+    }
+    
+    //set info image
+    if ([ident isEqualToString: TOOLBAR_INFO])
+    {
+        [toolbarItem setImage: [[fInfoController window] isVisible] ? [NSImage imageNamed: @"InfoBlue"]
+                                                                    : [NSImage imageNamed: @"Info"]];
+        return YES;
+    }
+    
+    //set filter image
+    if ([ident isEqualToString: TOOLBAR_FILTER])
+    {
+        [toolbarItem setImage: ![fFilterBar isHidden] ? [NSImage imageNamed: @"FilterBlue"] : [NSImage imageNamed: @"Filter"]];
+        return YES;
     }
 
     return YES;

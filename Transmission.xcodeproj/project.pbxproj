@@ -162,6 +162,8 @@
 		A2F40AE40A361C00006B8288 /* Transmission.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D2784360905709500687951 /* Transmission.icns */; };
 		A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DA80D0B9152006CE378 /* ActionGear.png */; };
 		A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */; };
+		A2F41DBC0D0B96C0006CE378 /* FilterBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DBA0D0B96C0006CE378 /* FilterBlue.png */; };
+		A2F41DBD0D0B96C0006CE378 /* InfoBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A2F41DBB0D0B96C0006CE378 /* InfoBlue.png */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.m */; };
 		A2FE61D80CD3D0A500D683E1 /* InfoTabBackGraphite.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FE61D70CD3D0A500D683E1 /* InfoTabBackGraphite.png */; };
 		BE1183570CE160C50002D0F3 /* bsdqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834D0CE160C50002D0F3 /* bsdqueue.h */; };
@@ -563,6 +565,8 @@
 		A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoTabBackBlue.png; path = macosx/Images/InfoTabBackBlue.png; sourceTree = "<group>"; };
 		A2F41DA80D0B9152006CE378 /* ActionGear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionGear.png; path = macosx/Images/ActionGear.png; sourceTree = "<group>"; };
 		A2F41DAA0D0B916B006CE378 /* YingYangTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = YingYangTemplate.png; path = macosx/Images/YingYangTemplate.png; sourceTree = "<group>"; };
+		A2F41DBA0D0B96C0006CE378 /* FilterBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = FilterBlue.png; path = macosx/Images/FilterBlue.png; sourceTree = "<group>"; };
+		A2F41DBB0D0B96C0006CE378 /* InfoBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = InfoBlue.png; path = macosx/Images/InfoBlue.png; sourceTree = "<group>"; };
 		A2F8951E0A2D4BA500ED2127 /* Credits.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Credits.rtf; path = macosx/Credits.rtf; sourceTree = "<group>"; };
 		A2FB057C0BFEB6800095564D /* DragOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DragOverlayView.h; path = macosx/DragOverlayView.h; sourceTree = "<group>"; };
 		A2FB057D0BFEB6800095564D /* DragOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = DragOverlayView.m; path = macosx/DragOverlayView.m; sourceTree = "<group>"; };
@@ -883,7 +887,10 @@
 				A24872B50C9B6BB9000F5B92 /* Advanced.png */,
 				4D2784360905709500687951 /* Transmission.icns */,
 				4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */,
+				A232D29D0A70903E00973B12 /* Filter.png */,
+				A2F41DBA0D0B96C0006CE378 /* FilterBlue.png */,
 				4DF7500808A103AD007B0D70 /* Info.png */,
+				A2F41DBB0D0B96C0006CE378 /* InfoBlue.png */,
 				4DF7500708A103AD007B0D70 /* Open.png */,
 				A2E9AA750C249AF400085DCF /* Create.png */,
 				A2F011980C27418800576FC0 /* CreateLarge.png */,
@@ -912,7 +919,6 @@
 				A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */,
 				A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */,
 				A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */,
-				A232D29D0A70903E00973B12 /* Filter.png */,
 				A2F151210CD438DE001F3B0E /* InfoTabBorder.png */,
 				A2F151220CD438DE001F3B0E /* InfoTabBack.png */,
 				A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */,
@@ -1565,6 +1571,8 @@
 				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
 				A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */,
 				A2F41DAB0D0B916B006CE378 /* YingYangTemplate.png in Resources */,
+				A2F41DBC0D0B96C0006CE378 /* FilterBlue.png in Resources */,
+				A2F41DBD0D0B96C0006CE378 /* InfoBlue.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
