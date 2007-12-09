@@ -228,9 +228,6 @@ tr_msg( const char * file, int line, int level, const char * fmt, ... )
 
                 *messageQueueTail = newmsg;
                 messageQueueTail = &newmsg->next;
-
-                if( strstr( file, "fdlimit.c" ) )
-                    fprintf( stderr, "%s\n", text );
             }
             else
             {
