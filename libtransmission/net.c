@@ -211,6 +211,7 @@ tr_netBind( int port, int type, const struct in_addr * addr )
 
     memset( &sock, 0, sizeof( sock ) );
     sock.sin_family      = AF_INET;
+    sock.sin_port = htons(port);
     if( addr != NULL ) {
         sock.sin_addr.s_addr = addr->s_addr;
         tr_inf( "using the specified address\n" );
