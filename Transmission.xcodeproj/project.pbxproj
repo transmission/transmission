@@ -281,7 +281,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3C7A118C0D0B2EB800B5701F /* natpmp */;
+			remoteGlobalIDString = 3C7A118C0D0B2EB800B5701F;
 			remoteInfo = natpmp;
 		};
 		BE1183750CE161040002D0F3 /* PBXContainerItemProxy */ = {
