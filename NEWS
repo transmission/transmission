@@ -1,9 +1,9 @@
 NEWS file for Transmission <http://transmission.m0k.org/>
 
-0.96 (2007/12/yy)
+0.96 (2007/12/10)
 - All Platforms:
    + Fix 0.95 data corruption error
-   + Fix 0.95 bug that broke UPNP
+   + Fix 0.95 bug that broke UPnP
 - OS X:
    + Fix bug where dragging non-torrent files over the main window could cause excessive memory use
 
