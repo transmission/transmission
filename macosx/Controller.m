@@ -258,7 +258,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
     
     //set up filter bar
-    if ([NSApp isOnLeopardOrBetter])
+    if (![NSApp isOnLeopardOrBetter])
     {
         [fNoFilterButton sizeToFit];
         [fDownloadFilterButton sizeToFit];
