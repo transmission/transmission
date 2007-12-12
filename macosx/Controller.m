@@ -251,14 +251,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
     
     //set info and filter keyboard shortcuts
-    unichar rightChar = NSRightArrowFunctionKey, leftChar = NSLeftArrowFunctionKey;
-    [fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
-    [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
+    /*[fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
+    [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
     
-    [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
+    [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
     [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
-    [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & leftChar length: 1]];
-    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
+    [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
+    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];*/
     
     //set up filter bar
     if (![NSApp isOnLeopardOrBetter])
