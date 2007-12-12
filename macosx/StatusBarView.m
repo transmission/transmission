@@ -60,7 +60,7 @@
 - (void) drawRect: (NSRect) rect
 {
     if (fShow)
-        [fGradient drawInRect: rect angle: 90];
+        [fGradient fillRect: rect angle: 90];
 }
 
 @end
