@@ -31,6 +31,7 @@
 #import "Badger.h"
 #import "StatusBarView.h"
 #import "FilterButton.h"
+#import "MenuLabel.h"
 #import "IPCController.h"
 
 #import <Growl/Growl.h>
@@ -62,6 +63,8 @@
     
     IBOutlet StatusBarView          * fStatusBar;
     IBOutlet NSButton               * fStatusButton;
+    IBOutlet MenuLabel              * fStatusTigerField;
+    IBOutlet NSImageView            * fStatusTigerImageView;
     IBOutlet NSTextField            * fTotalDLField, * fTotalULField;
     
     IBOutlet StatusBarView          * fFilterBar;

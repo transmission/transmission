@@ -14,6 +14,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>MenuLabel</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSMenu</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -193,6 +201,10 @@
 				<string>StatusBarView</string>
 				<key>fStatusButton</key>
 				<string>NSButton</string>
+				<key>fStatusTigerField</key>
+				<string>MenuLabel</string>
+				<key>fStatusTigerImageView</key>
+				<string>NSImageView</string>
 				<key>fTableView</key>
 				<string>TorrentTableView</string>
 				<key>fTotalDLField</key>

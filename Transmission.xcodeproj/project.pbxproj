@@ -105,6 +105,7 @@
 		A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A25892630CF1F7E800CCCDDF /* StatsWindowController.m */; };
 		A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A25892750CF1FCE800CCCDDF /* StatsWindow.xib */; };
 		A259317E0A73B2CC002F4FE7 /* TransmissionHelp in Resources */ = {isa = PBXBuildFile; fileRef = A259316A0A73B2CC002F4FE7 /* TransmissionHelp */; };
+		A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = A25AFDE80D1038AD0092A1BA /* MenuLabel.m */; };
 		A25D2CBD0CF4C73E0096A262 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = A25D2CBB0CF4C7190096A262 /* stats.c */; };
 		A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */ = {isa = PBXBuildFile; fileRef = A25D2CBA0CF4C7190096A262 /* stats.h */; };
 		A25E74650AF5097C006F11AE /* ExpandedPathToPathTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */; };
@@ -469,6 +470,8 @@
 		A25892630CF1F7E800CCCDDF /* StatsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatsWindowController.m; path = macosx/StatsWindowController.m; sourceTree = "<group>"; };
 		A25892760CF1FCE800CCCDDF /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = macosx/English.lproj/StatsWindow.xib; sourceTree = "<group>"; };
 		A259316A0A73B2CC002F4FE7 /* TransmissionHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TransmissionHelp; path = macosx/TransmissionHelp; sourceTree = "<group>"; };
+		A25AFDE70D1038AD0092A1BA /* MenuLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuLabel.h; path = macosx/MenuLabel.h; sourceTree = "<group>"; };
+		A25AFDE80D1038AD0092A1BA /* MenuLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuLabel.m; path = macosx/MenuLabel.m; sourceTree = "<group>"; };
 		A25D2CBA0CF4C7190096A262 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stats.h; path = libtransmission/stats.h; sourceTree = "<group>"; };
 		A25D2CBB0CF4C7190096A262 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stats.c; path = libtransmission/stats.c; sourceTree = "<group>"; };
 		A25E74440AF5089E006F11AE /* ExpandedPathToPathTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ExpandedPathToPathTransformer.m; path = macosx/ExpandedPathToPathTransformer.m; sourceTree = "<group>"; };
@@ -772,6 +775,8 @@
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.m */,
 				4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */,
 				4DCCBB3C09C3D71100D3CABF /* TorrentCell.m */,
+				A25AFDE70D1038AD0092A1BA /* MenuLabel.h */,
+				A25AFDE80D1038AD0092A1BA /* MenuLabel.m */,
 				A26397530D0F714300D36DF2 /* ActionPopUpButton.h */,
 				A26397540D0F714300D36DF2 /* ActionPopUpButton.m */,
 				A2BF078E0B066E0800757C92 /* SpeedLimitToTurtleIconTransformer.h */,
@@ -1718,6 +1723,7 @@
 				3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */,
 				3C7A11960D0B2EE300B5701F /* natpmp.c in Sources */,
 				A26397550D0F714300D36DF2 /* ActionPopUpButton.m in Sources */,
+				A25AFDE90D1038AD0092A1BA /* MenuLabel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

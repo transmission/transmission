@@ -290,7 +290,15 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //set up status bar
     [fStatusBar setHidden: YES];
-    [fStatusBar setShowOnTiger: YES];
+    
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        [fStatusBar setShowOnTiger: YES];
+        
+        [fStatusButton setHidden: YES];
+        [fStatusTigerField setHidden: NO];
+        [fStatusTigerImageView setHidden: NO];
+    }
     
     [fTotalDLField setToolTip: NSLocalizedString(@"Total download speed", "Status Bar -> speed tooltip")];
     [fTotalULField setToolTip: NSLocalizedString(@"Total upload speed", "Status Bar -> speed tooltip")];
@@ -1474,6 +1482,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 
                 [fStatusButton setTitle: statusString];
                 [fStatusButton sizeToFit];
+                
+                [fStatusTigerField setStringValue: statusString];
+                [fStatusTigerField sizeToFit];
                 
                 //width ends up being too long
                 NSRect statusFrame = [fStatusButton frame];
