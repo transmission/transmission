@@ -250,14 +250,20 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if ([NSApp isOnLeopardOrBetter])
         [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
     
-    //set info and filter keyboard shortcuts
-    /*[fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
-    [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
+    if (![NSApp isOnLeopardOrBetter])
+    {
+        //set info and filter keyboard shortcuts
+        /*[fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
+        [fPrevInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
+        
+        [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
+        [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
+        [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
+        [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];*/
+    }
     
-    [fNextFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSRightArrowFunctionKey length: 1]];
-    [fNextFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
-    [fPrevFilterItem setKeyEquivalent: [NSString stringWithCharacters: & NSLeftArrowFunctionKey length: 1]];
-    [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];*/
+    if ([NSApp isOnLeopardOrBetter])
+        [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
     
     //set up filter bar
     if (![NSApp isOnLeopardOrBetter])
