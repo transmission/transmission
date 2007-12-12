@@ -25,6 +25,7 @@
 #import "FileNameCell.h"
 #import "FileOutlineView.h"
 #import "Torrent.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define PADDING_HORIZONAL 2.0
@@ -91,7 +92,7 @@
     
     //title
     NSColor * specialColor = nil;
-    if ([self isHighlighted]
+    if ([NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
             && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
         specialColor = [NSColor whiteColor];
     else if ([[(FileOutlineView *)[self controlView] torrent] checkForFiles:

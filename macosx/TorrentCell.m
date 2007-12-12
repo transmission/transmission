@@ -24,6 +24,7 @@
 
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "CTGradientAdditions.h"
 
@@ -223,7 +224,7 @@
     
     //text color
     NSColor * titleColor, * statusColor;
-    if ([self isHighlighted]
+    if ([NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
         && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
     {
         titleColor = [NSColor whiteColor];
