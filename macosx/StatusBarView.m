@@ -36,7 +36,7 @@
             
         NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
         NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
-        fGradient = [[NSGradient alloc] initWithStartingColor: startingColor endingColor: endingColor];
+        fGradient = [[CTGradient gradientWithBeginningColor: startingColor endingColor: endingColor] retain];
     }
     return self;
 }
