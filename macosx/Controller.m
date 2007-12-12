@@ -247,6 +247,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                                 + [fTableView rowHeight] + [fTableView intercellSpacing].height;
     [fWindow setContentMinSize: contentMinSize];
     
+    if ([NSApp isOnLeopardOrBetter])
+        [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
+    
     //set info and filter keyboard shortcuts
     unichar rightChar = NSRightArrowFunctionKey, leftChar = NSLeftArrowFunctionKey;
     [fNextInfoTabItem setKeyEquivalent: [NSString stringWithCharacters: & rightChar length: 1]];
@@ -300,7 +303,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     NSRect statusBarFrame = [fStatusBar frame];
     statusBarFrame.size.width = windowSize.width;
     [fStatusBar setFrame: statusBarFrame];
-
+    
     [contentView addSubview: fStatusBar];
     [fStatusBar setFrameOrigin: NSMakePoint(0, NSMaxY([contentView frame]))];
     [self showStatusBar: [fDefaults boolForKey: @"StatusBar"] animate: NO];

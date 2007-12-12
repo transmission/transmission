@@ -87,10 +87,8 @@
 		A2265F420B5EF5F40093DDA5 /* FileNameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A2265F400B5EF5F40093DDA5 /* FileNameCell.m */; };
 		A226FDAC0D0CDF20005A7F71 /* libnatpmp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7A118D0D0B2EB800B5701F /* libnatpmp.a */; };
 		A22A8D560AEEAFA5007E9CB9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A22A8D540AEEAFA5007E9CB9 /* Localizable.strings */; };
-		A22BC9A30C5BBCF100F5FB72 /* BottomBack.png in Resources */ = {isa = PBXBuildFile; fileRef = A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */; };
 		A22D3AA60D00D1790079CFED /* Turtle.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA30D00D1790079CFED /* Turtle.png */; };
 		A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AA40D00D1790079CFED /* TurtleBlue.png */; };
-		A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */ = {isa = PBXBuildFile; fileRef = A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */; };
 		A232D29E0A70903E00973B12 /* Filter.png in Resources */ = {isa = PBXBuildFile; fileRef = A232D29D0A70903E00973B12 /* Filter.png */; };
 		A234D0D20C79FB3600A82373 /* NSMenuAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */; };
 		A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2385DD20BFE06C800B24EF6 /* DragOverlayWindow.m */; };
@@ -122,7 +120,6 @@
 		A2710E770A86796000CE4F7D /* PrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = A2710E750A86796000CE4F7D /* PrefsWindow.m */; };
 		A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA090C693D9C00DA2CD4 /* ActionOn.png */; };
 		A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */ = {isa = PBXBuildFile; fileRef = A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */; };
-		A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = A28E1DB80CFFD41800E16385 /* BottomBarView.m */; };
 		A2912C540A2956E80097A0CA /* PrefsWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = A2912C520A2956E80097A0CA /* PrefsWindow.nib */; };
 		A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F60D01BADC00D097EC /* DownArrow.png */; };
 		A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A29AF4F80D01BAEB00D097EC /* UpArrow.png */; };
@@ -440,10 +437,8 @@
 		A21F5C020AF26DD5008CE5CE /* ActionMenuSpeedToDisplayLimitTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ActionMenuSpeedToDisplayLimitTransformer.m; path = macosx/ActionMenuSpeedToDisplayLimitTransformer.m; sourceTree = "<group>"; };
 		A2265F3F0B5EF5F40093DDA5 /* FileNameCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileNameCell.h; path = macosx/FileNameCell.h; sourceTree = "<group>"; };
 		A2265F400B5EF5F40093DDA5 /* FileNameCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FileNameCell.m; path = macosx/FileNameCell.m; sourceTree = "<group>"; };
-		A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBack.png; path = macosx/Images/BottomBack.png; sourceTree = "<group>"; };
 		A22D3AA30D00D1790079CFED /* Turtle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Turtle.png; path = macosx/Images/Turtle.png; sourceTree = "<group>"; };
 		A22D3AA40D00D1790079CFED /* TurtleBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TurtleBlue.png; path = macosx/Images/TurtleBlue.png; sourceTree = "<group>"; };
-		A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BottomBackInactive.png; path = macosx/Images/BottomBackInactive.png; sourceTree = "<group>"; };
 		A232D29D0A70903E00973B12 /* Filter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Filter.png; path = macosx/Images/Filter.png; sourceTree = "<group>"; };
 		A234D0CF0C79FB3600A82373 /* NSMenuAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NSMenuAdditions.h; path = macosx/NSMenuAdditions.h; sourceTree = "<group>"; };
 		A234D0D00C79FB3600A82373 /* NSMenuAdditions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NSMenuAdditions.m; path = macosx/NSMenuAdditions.m; sourceTree = "<group>"; };
@@ -499,8 +494,6 @@
 		A27477040CC38EE6003CC76D /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = macosx/es.lproj/PrefsWindow.nib; sourceTree = "<group>"; };
 		A277DA090C693D9C00DA2CD4 /* ActionOn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOn.png; path = macosx/Images/ActionOn.png; sourceTree = "<group>"; };
 		A277DA0A0C693D9C00DA2CD4 /* ActionOff.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ActionOff.png; path = macosx/Images/ActionOff.png; sourceTree = "<group>"; };
-		A28E1DB80CFFD41800E16385 /* BottomBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BottomBarView.m; path = macosx/BottomBarView.m; sourceTree = "<group>"; };
-		A28E1DD50CFFD8A700E16385 /* BottomBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BottomBarView.h; path = macosx/BottomBarView.h; sourceTree = "<group>"; };
 		A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonToolbarItem.h; path = macosx/ButtonToolbarItem.h; sourceTree = "<group>"; };
 		A29AF4F60D01BADC00D097EC /* DownArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DownArrow.png; path = macosx/Images/DownArrow.png; sourceTree = "<group>"; };
 		A29AF4F80D01BAEB00D097EC /* UpArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UpArrow.png; path = macosx/Images/UpArrow.png; sourceTree = "<group>"; };
@@ -813,8 +806,6 @@
 				A21282A60CA6C66800EAEE0F /* StatusBarView.m */,
 				A2ED7D8D0CEF431B00970975 /* FilterButton.h */,
 				A2ED7D8E0CEF431B00970975 /* FilterButton.m */,
-				A28E1DB80CFFD41800E16385 /* BottomBarView.m */,
-				A28E1DD50CFFD8A700E16385 /* BottomBarView.h */,
 				A2C89D5F0CFCBF57004CC2BC /* ButtonToolbarItem.m */,
 				A28E1DDF0CFFD8EC00E16385 /* ButtonToolbarItem.h */,
 				A21979890D07B78400438EA7 /* GroupToolbarItem.h */,
@@ -928,8 +919,6 @@
 				4DE5CCB90981D27700BE280E /* PauseAll.png */,
 				A25FCDDD0A37695F002BCBBE /* PauseSelected.png */,
 				A25FCDDE0A37695F002BCBBE /* ResumeSelected.png */,
-				A22BC9A20C5BBCF100F5FB72 /* BottomBack.png */,
-				A22D3AB90D00D31F0079CFED /* BottomBackInactive.png */,
 				A2F151210CD438DE001F3B0E /* InfoTabBorder.png */,
 				A2F151220CD438DE001F3B0E /* InfoTabBack.png */,
 				A2F151230CD438DE001F3B0E /* InfoTabBackBlue.png */,
@@ -1552,7 +1541,6 @@
 				A20B6FA50C4D97840034AB1D /* PriorityNone.png in Resources */,
 				A20B6FAE0C4D9B040034AB1D /* PriorityNormal.png in Resources */,
 				A2085E3F0C53C949000BC3B7 /* LICENSE in Resources */,
-				A22BC9A30C5BBCF100F5FB72 /* BottomBack.png in Resources */,
 				A2AE68330C628A35008753C9 /* Creator.nib in Resources */,
 				A277DA0B0C693D9C00DA2CD4 /* ActionOn.png in Resources */,
 				A277DA0C0C693D9C00DA2CD4 /* ActionOff.png in Resources */,
@@ -1577,7 +1565,6 @@
 				A25892770CF1FCE800CCCDDF /* StatsWindow.xib in Resources */,
 				A22D3AA60D00D1790079CFED /* Turtle.png in Resources */,
 				A22D3AA70D00D1790079CFED /* TurtleBlue.png in Resources */,
-				A22D3ABA0D00D31F0079CFED /* BottomBackInactive.png in Resources */,
 				A29AF4F70D01BADC00D097EC /* DownArrow.png in Resources */,
 				A29AF4F90D01BAEB00D097EC /* UpArrow.png in Resources */,
 				A2F41DA90D0B9152006CE378 /* ActionGear.png in Resources */,
@@ -1726,7 +1713,6 @@
 				A2ED7D8F0CEF431B00970975 /* FilterButton.m in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.m in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.m in Sources */,
-				A28E1DBA0CFFD41800E16385 /* BottomBarView.m in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.m in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.m in Sources */,
 				3C7A11950D0B2EE300B5701F /* getgateway.c in Sources */,
