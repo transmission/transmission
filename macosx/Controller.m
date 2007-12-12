@@ -258,6 +258,26 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fPrevFilterItem setKeyEquivalentModifierMask: NSCommandKeyMask | NSAlternateKeyMask];
     
     //set up filter bar
+    if ([NSApp isOnLeopardOrBetter])
+    {
+        [fNoFilterButton sizeToFit];
+        [fDownloadFilterButton sizeToFit];
+        [fSeedFilterButton sizeToFit];
+        [fPauseFilterButton sizeToFit];
+        
+        NSRect downloadRect = [fDownloadFilterButton frame];
+        downloadRect.origin.x = NSMaxX([fNoFilterButton frame]) + 2.0;
+        [fDownloadFilterButton setFrame: downloadRect];
+        
+        NSRect seedRect = [fSeedFilterButton frame];
+        seedRect.origin.x = NSMaxX(downloadRect) + 2.0;
+        [fSeedFilterButton setFrame: seedRect];
+        
+        NSRect pauseRect = [fPauseFilterButton frame];
+        pauseRect.origin.x = NSMaxX(seedRect) + 2.0;
+        [fPauseFilterButton setFrame: pauseRect];
+    }
+    
     NSView * contentView = [fWindow contentView];
     NSSize windowSize = [contentView convertSize: [fWindow frame].size fromView: nil];
     [fFilterBar setHidden: YES];
