@@ -248,14 +248,20 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     [fWindow setContentMinSize: contentMinSize];
     
     if ([NSApp isOnLeopardOrBetter])
-        [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
-    
-    if ([NSApp isOnLeopardOrBetter])
-        [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
-    
-    
-    if (![NSApp isOnLeopardOrBetter])
     {
+        [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
+        [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
+    }
+    else
+    {
+        //status bar
+        [fStatusBar setShowOnTiger: YES];
+        
+        [fStatusButton setHidden: YES];
+        [fStatusTigerField setHidden: NO];
+        [fStatusTigerImageView setHidden: NO];
+        
+        //filter bar
         [fNoFilterButton sizeToFit];
         [fDownloadFilterButton sizeToFit];
         [fSeedFilterButton sizeToFit];
@@ -290,15 +296,6 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //set up status bar
     [fStatusBar setHidden: YES];
-    
-    if (![NSApp isOnLeopardOrBetter])
-    {
-        [fStatusBar setShowOnTiger: YES];
-        
-        [fStatusButton setHidden: YES];
-        [fStatusTigerField setHidden: NO];
-        [fStatusTigerImageView setHidden: NO];
-    }
     
     [fTotalDLField setToolTip: NSLocalizedString(@"Total download speed", "Status Bar -> speed tooltip")];
     [fTotalULField setToolTip: NSLocalizedString(@"Total upload speed", "Status Bar -> speed tooltip")];
@@ -1480,16 +1477,21 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                 else
                     statusString = @"";
                 
-                [fStatusButton setTitle: statusString];
-                [fStatusButton sizeToFit];
-                
-                [fStatusTigerField setStringValue: statusString];
-                [fStatusTigerField sizeToFit];
-                
-                //width ends up being too long
-                NSRect statusFrame = [fStatusButton frame];
-                statusFrame.size.width -= 25.0;
-                [fStatusButton setFrame: statusFrame];
+                if ([NSApp isOnLeopardOrBetter])
+                {
+                    [fStatusButton setTitle: statusString];
+                    [fStatusButton sizeToFit];
+                    
+                    //width ends up being too long
+                    NSRect statusFrame = [fStatusButton frame];
+                    statusFrame.size.width -= 25.0;
+                    [fStatusButton setFrame: statusFrame];
+                }
+                else
+                {
+                    [fStatusTigerField setStringValue: statusString];
+                    [fStatusTigerField sizeToFit];
+                }
             }
         }
 
