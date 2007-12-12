@@ -290,6 +290,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     //set up status bar
     [fStatusBar setHidden: YES];
+    [fStatusBar setShowOnTiger: YES];
     
     [fTotalDLField setToolTip: NSLocalizedString(@"Total download speed", "Status Bar -> speed tooltip")];
     [fTotalULField setToolTip: NSLocalizedString(@"Total upload speed", "Status Bar -> speed tooltip")];

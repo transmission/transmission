@@ -24,6 +24,7 @@
 
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
+#import "CTGradient.h"
 
 @implementation StatusBarView
 
@@ -31,12 +32,11 @@
 {
     if ((self = [super initWithFrame: rect]))
     {
-        if ([NSApp isOnLeopardOrBetter])
-        {
-            NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
-            NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
-            fGradient = [[NSGradient alloc] initWithStartingColor: startingColor endingColor: endingColor];
-        }
+        fShow = [NSApp isOnLeopardOrBetter];
+            
+        NSColor * startingColor = [NSColor colorWithCalibratedRed: 208.0/255.0 green: 208.0/255.0 blue: 208.0/255.0 alpha: 1.0];
+        NSColor * endingColor = [NSColor colorWithCalibratedRed: 233.0/255.0 green: 233.0/255.0 blue: 233.0/255.0 alpha: 1.0];
+        fGradient = [[NSGradient alloc] initWithStartingColor: startingColor endingColor: endingColor];
     }
     return self;
 }
@@ -47,14 +47,20 @@
     [super dealloc];
 }
 
+- (void) setShowOnTiger: (BOOL) show
+{
+    fShow = [NSApp isOnLeopardOrBetter] || show;
+}
+
 - (BOOL) isOpaque
 {
-    return [NSApp isOnLeopardOrBetter];
+    return fShow;
 }
 
 - (void) drawRect: (NSRect) rect
 {
-    [fGradient drawInRect: rect angle: 90];
+    if (fShow)
+        [fGradient drawInRect: rect angle: 90];
 }
 
 @end

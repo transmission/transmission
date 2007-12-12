@@ -28,7 +28,11 @@
 
 @interface StatusBarView : NSView
 {
-    NSGradient * fGradient;
+    BOOL fShow;
+    
+    CTGradient * fGradient;
 }
+
+- (void) setShowOnTiger: (BOOL) show;
 
 @end
