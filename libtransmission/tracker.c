@@ -972,8 +972,6 @@ tr_trackerNew( const tr_torrent * torrent )
     tr_tracker_info * nwalk;
     tr_tracker * t;
 
-    tr_dbg( "making a new tracker for \"%s\"", info->primaryAddress );
-
     t = tr_new0( tr_tracker, 1 );
     t->handle = torrent->handle;
     t->scrapeIntervalSec       = DEFAULT_SCRAPE_INTERVAL_SEC;

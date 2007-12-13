@@ -322,7 +322,7 @@ tr_fastResumeSave( const tr_torrent * tor )
 
     fclose( file );
 
-    tr_dbg( "Resume file '%s' written", path );
+    tr_dbg( "Wrote resume file for '%s'", tor->info.name );
 }
 
 /***
