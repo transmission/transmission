@@ -251,17 +251,20 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         [fWindow setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
         [[fTotalTorrentsField cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [fBottomTigerBar setHidden: YES];
     }
     else
     {
         //status bar
         [fStatusBar setShowOnTiger: YES];
-        [fBottomTigerBar setShowOnTiger: YES];
         
         [fStatusButton setHidden: YES];
         [fStatusTigerField setHidden: NO];
         [fStatusTigerImageView setHidden: NO];
+        
+        //bottom bar
+        [fBottomTigerBar setShowOnTiger: YES];
+        [fBottomTigerBar setHidden: NO];
+        [fBottomTigerLine setHidden: NO];
         
         //filter bar
         [fNoFilterButton sizeToFit];
