@@ -7,7 +7,7 @@
  * This exemption does not extend to derived works not owned by
  * the Transmission project.
  *
- * $Id:$
+ * $Id$
  */
 
 #include <assert.h>
@@ -144,7 +144,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         if( isEnabled && !nat->isMapped )
             nat->state = TR_NATPMP_SEND_MAP;
 
-        else if( nat->isMapped && time(NULL) <= nat->renewTime )
+        else if( nat->isMapped && time(NULL) >= nat->renewTime )
             nat->state = TR_NATPMP_SEND_MAP;
     }
 
