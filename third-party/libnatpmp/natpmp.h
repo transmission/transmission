@@ -56,8 +56,8 @@ typedef struct {
 #define NATPMP_RESPTYPE_UDPPORTMAPPING (2)
 
 /* Values to pass to sendnewportmappingrequest() */
-#define NATPMP_PROTOCOL_TCP (1)
-#define NATPMP_PROTOCOL_UDP (2)
+#define NATPMP_PROTOCOL_UDP (1)
+#define NATPMP_PROTOCOL_TCP (2)
 
 /* NATPMP_ERR_INVALIDARGS : invalid arguments passed to the function */
 #define NATPMP_ERR_INVALIDARGS (-1)
