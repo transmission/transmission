@@ -13,16 +13,13 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <netinet/in.h>
 #include <sys/param.h>
-#if defined(BSD) || defined(__APPLE__)
-#include <stdlib.h>
-#include <sys/sysctl.h>
-#include <sys/socket.h>
-#include <net/route.h>
-#endif
 #include "getgateway.h"
 
 #ifdef __linux__
@@ -62,50 +59,147 @@ int getdefaultgateway(in_addr_t * addr)
 
 #if defined(BSD) || defined(__APPLE__)
 
-#define ROUNDUP(a) \
-	((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
+#include <errno.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/in.h> /* struct in_addr */
+#include <sys/sysctl.h>
+#include <net/route.h>
 
-int getdefaultgateway(in_addr_t * addr)
+#ifndef SA_SIZE
+#define ROUNDUP( a, size ) \
+    ( ( (a) & ( (size) - 1 ) ) ? ( 1 + ( (a) | ( (size) - 1 ) ) ) : (a) )
+#define SA_SIZE( sap ) \
+    ( sap->sa_len ? ROUNDUP( (sap)->sa_len, sizeof( u_long ) ) : \
+                    sizeof( u_long ) )
+#endif /* !SA_SIZE */
+#define NEXT_SA( sap ) \
+    (struct sockaddr *) ( (caddr_t) (sap) + ( SA_SIZE( (sap) ) ) )
+
+static uint8_t *
+getroute( int * buflen )
 {
-	int mib[] = {CTL_NET, PF_ROUTE, 0, AF_INET,
-	             NET_RT_DUMP, 0, 0/*tableid*/};
-	size_t l;
-	char * buf, * p;
-	struct rt_msghdr * rt;
-	struct sockaddr * sa;
-	struct sockaddr * sa_tab[RTAX_MAX];
-	int i;
-	int r = -1;
-	if(sysctl(mib, sizeof(mib)/sizeof(int), 0, &l, 0, 0) < 0) {
-		return -1;
-	}
-	if(l>0) {
-		buf = malloc(l);
-		if(sysctl(mib, sizeof(mib)/sizeof(int), buf, &l, 0, 0) < 0) {
-			return -1;
-		}
-		for(p=buf; p<buf+l; p+=rt->rtm_msglen) {
-			rt = (struct rt_msghdr *)p;
-			sa = (struct sockaddr *)(rt + 1);
-			for(i=0; i<RTAX_MAX; i++) {
-				if(rt->rtm_addrs & (1 << i)) {
-					sa_tab[i] = sa;
-					sa = (struct sockaddr *)((char *)sa + ROUNDUP(sa->sa_len));
-				} else {
-					sa_tab[i] = NULL;
-				}
-			}
-			if( ((rt->rtm_addrs & (RTA_DST|RTA_GATEWAY)) == (RTA_DST|RTA_GATEWAY))
-              && sa_tab[RTAX_DST]->sa_family == AF_INET
-              && sa_tab[RTAX_GATEWAY]->sa_family == AF_INET) {
-				if(((struct sockaddr_in *)sa_tab[RTAX_DST])->sin_addr.s_addr == 0) {
-					*addr = ((struct sockaddr_in *)(sa_tab[RTAX_GATEWAY]))->sin_addr.s_addr;
-					r = 0;
-				}
-			}
-		}
-		free(buf);
-	}
-	return r;
+    int     mib[6];
+    size_t  len;
+    uint8_t * buf;
+
+    mib[0] = CTL_NET;
+    mib[1] = PF_ROUTE;
+    mib[2] = 0;
+    mib[3] = AF_INET;
+    mib[4] = NET_RT_FLAGS;
+    mib[5] = RTF_GATEWAY;
+
+    if( sysctl( mib, 6, NULL, &len, NULL, 0 ) )
+    {
+        if( ENOENT != errno )
+        {
+            fprintf(stderr, "sysctl net.route.0.inet.flags.gateway failed (%s)",
+                    strerror( errno ) );
+        }
+        *buflen = 0;
+        return NULL;
+    }
+
+    buf = malloc( len );
+    if( NULL == buf )
+    {
+        *buflen = 0;
+        return NULL;
+    }
+
+    if( sysctl( mib, 6, buf, &len, NULL, 0 ) )
+    {
+        fprintf(stderr, "sysctl net.route.0.inet.flags.gateway failed (%s)",
+                strerror( errno ) );
+        free( buf );
+        *buflen = 0;
+        return NULL;
+    }
+
+    *buflen = len;
+
+    return buf;
 }
+
+static int
+parseroutes( uint8_t * buf, int len, struct in_addr * addr )
+{
+    uint8_t            * end;
+    struct rt_msghdr   * rtm;
+    struct sockaddr    * sa;
+    struct sockaddr_in * sin;
+    int                  ii;
+    struct in_addr       dest, gw;
+
+    end = buf + len;
+    while( end > buf + sizeof( *rtm ) )
+    {
+        rtm = (struct rt_msghdr *) buf;
+        buf += rtm->rtm_msglen;
+        if( end >= buf )
+        {
+            dest.s_addr = INADDR_NONE;
+            gw.s_addr   = INADDR_NONE;
+            sa = (struct sockaddr *) ( rtm + 1 );
+
+            for( ii = 0; ii < RTAX_MAX && (uint8_t *) sa < buf; ii++ )
+            {
+                if( buf < (uint8_t *) NEXT_SA( sa ) )
+                {
+                    break;
+                }
+
+                if( rtm->rtm_addrs & ( 1 << ii ) )
+                {
+                    if( AF_INET == sa->sa_family )
+                    {
+                        sin = (struct sockaddr_in *) sa;
+                        switch( ii )
+                        {
+                            case RTAX_DST:
+                                dest = sin->sin_addr;
+                                break;
+                            case RTAX_GATEWAY:
+                                gw = sin->sin_addr;
+                                break;
+                        }
+                    }
+                    sa = NEXT_SA( sa );
+                }
+            }
+
+            if( INADDR_ANY == dest.s_addr && INADDR_NONE != gw.s_addr )
+            {
+                *addr = gw;
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+int
+getdefaultgateway( struct in_addr * addr )
+{
+    uint8_t * buf;
+    int len;
+
+    buf = getroute( &len );
+    if( NULL == buf )
+    {
+        fprintf(stderr, "failed to get default route (BSD)" );
+        return 1;
+    }
+
+    len = parseroutes( buf, len, addr );
+    free( buf );
+
+    return len;
+}
+
 #endif
