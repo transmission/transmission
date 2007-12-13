@@ -257,10 +257,13 @@ publishNewPeers( tr_tracker * t, int count, uint8_t * peers )
 ****
 ***/
 
+static void onReqDone( tr_handle * handle );
+
 static void
-onStoppedResponse( struct evhttp_request * req UNUSED, void * handle UNUSED )
+onStoppedResponse( struct evhttp_request * req UNUSED, void * handle )
 {
     dbgmsg( NULL, "got a response to some `stop' message" );
+    onReqDone( handle );
 }
 
 static int
@@ -378,8 +381,6 @@ parseOldPeers( benc_val_t * bePeers, int * setmePeerCount )
     *setmePeerCount = peerCount;
     return compact;
 }
-
-static void onReqDone( tr_handle * handle );
 
 static void
 onTrackerResponse( struct evhttp_request * req, void * vhash )
@@ -756,6 +757,7 @@ createScrape( tr_handle * handle, const tr_tracker * tracker )
 struct tr_tracker_handle
 {
     int socketCount;
+    unsigned int isShuttingDown : 1;
     tr_timer * pulseTimer;
     tr_list * requestQueue;
     tr_list * scrapeQueue;
@@ -783,9 +785,13 @@ freeRequest2( void * req )
 void
 tr_trackerShuttingDown( tr_handle * handle )
 {
-    /* since we're shutting down, we don't need to scrape anymore... */
     if( handle->tracker )
+    {
+        /* since we're shutting down, we don't need to scrape anymore... */
         tr_list_free( &handle->tracker->scrapeQueue, freeRequest2 );
+
+        handle->tracker->isShuttingDown = 1;
+    }
 }
 
 static int
@@ -864,7 +870,10 @@ invokeNextInQueue( tr_handle * handle, tr_list ** list )
 static int
 socketIsAvailable( tr_handle * handle )
 {
-    return handle->tracker->socketCount < MAX_TRACKER_SOCKETS;
+    int max = MAX_TRACKER_SOCKETS;
+    if( handle->tracker->isShuttingDown )
+        max *= 2;
+    return handle->tracker->socketCount < max;
 }
 
 static void ensureGlobalsExist( tr_handle * );
