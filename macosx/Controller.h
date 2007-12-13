@@ -57,6 +57,7 @@
     
     IBOutlet NSMenuItem             * fOpenIgnoreDownloadFolder;
     
+    IBOutlet StatusBarView          * fBottomTigerBar;
     IBOutlet NSButton               * fActionButton, * fSpeedLimitButton;
     NSTimer                         * fSpeedLimitTimer;
     IBOutlet NSTextField            * fTotalTorrentsField;

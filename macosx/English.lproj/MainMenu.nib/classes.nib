@@ -163,6 +163,8 @@
 			<dict>
 				<key>fActionButton</key>
 				<string>NSButton</string>
+				<key>fBottomTigerBar</key>
+				<string>StatusBarView</string>
 				<key>fDockMenu</key>
 				<string>NSMenu</string>
 				<key>fDownloadFilterButton</key>
