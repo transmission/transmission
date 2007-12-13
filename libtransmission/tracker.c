@@ -40,6 +40,11 @@ enum
     /* maximum number of concurrent tracker socket connections */
     MAX_TRACKER_SOCKETS = 16,
 
+    /* maximum number of concurrent tracker socket connections during shutdown.
+     * all the peer connections should be gone by now, so we can hog more 
+     * connections to send `stop' messages to the trackers */
+    MAX_TRACKER_SOCKETS_DURING_SHUTDOWN = 64,
+
     /* unless the tracker says otherwise, rescrape this frequently */
     DEFAULT_SCRAPE_INTERVAL_SEC = (60 * 15),
 
@@ -870,9 +875,9 @@ invokeNextInQueue( tr_handle * handle, tr_list ** list )
 static int
 socketIsAvailable( tr_handle * handle )
 {
-    int max = MAX_TRACKER_SOCKETS;
-    if( handle->tracker->isShuttingDown )
-        max *= 2;
+    const int max = handle->tracker->isShuttingDown
+                      ? MAX_TRACKER_SOCKETS_DURING_SHUTDOWN
+                      : MAX_TRACKER_SOCKETS;
     return handle->tracker->socketCount < max;
 }
 
