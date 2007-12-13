@@ -49,7 +49,7 @@
 
 - (void) setShowOnTiger: (BOOL) show
 {
-    fShow = [NSApp isOnLeopardOrBetter] || show;
+    fShow = show || [NSApp isOnLeopardOrBetter];
 }
 
 - (BOOL) isOpaque

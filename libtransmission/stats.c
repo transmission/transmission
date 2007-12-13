@@ -138,7 +138,10 @@ tr_getSessionStats( const tr_handle   * handle,
 {
     const struct tr_stats_handle * stats = handle->sessionStats;
     *setme = stats->single;
-    setme->ratio = setme->downloadedBytes ? (double)setme->uploadedBytes / (double)setme->downloadedBytes : TR_RATIO_NA;
+    
+    setme->ratio = setme->downloadedBytes ? (double)setme->uploadedBytes / (double)setme->downloadedBytes
+                                            : ( setme->uploadedBytes ? TR_RATIO_INF : TR_RATIO_NA );
+    
     setme->secondsActive += ( time(NULL) - stats->startTime );
 }
 

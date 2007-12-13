@@ -11,9 +11,9 @@ NEWS file for Transmission <http://transmission.m0k.org/>
    + Statistics window
    + Pieces Bar (return of Advanced Bar)
    + Availability Bar (overlay on regular bar)
-   + Leopard: Time Machine will ignore incomplete downloads
    + Display remaining time for seeding transfers
    + Sort by total activity
+   + Leopard: Time Machine will ignore incomplete downloads
    + Leopard: Fix bug where text fields would reject localized decimal values
 - GTK+:
    + Statistics window
