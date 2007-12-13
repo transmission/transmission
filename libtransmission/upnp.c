@@ -65,7 +65,9 @@ void
 tr_upnpClose( tr_upnp * handle )
 {
     assert( !handle->isMapped );
-    assert( ( handle->state == TR_UPNP_IDLE ) || ( handle->state == TR_UPNP_ERR ) );
+    assert( ( handle->state == TR_UPNP_IDLE )
+         || ( handle->state == TR_UPNP_ERR )
+         || ( handle->state == TR_UPNP_DISCOVER ) );
 
     if( handle->hasDiscovered )
         FreeUPNPUrls( &handle->urls );
