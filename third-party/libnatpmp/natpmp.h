@@ -1,4 +1,4 @@
-/* $Id: natpmp.h,v 1.3 2007/12/02 00:12:47 nanard Exp $ */
+/* $Id: natpmp.h,v 1.6 2007/12/13 14:55:16 nanard Exp $ */
 /* libnatpmp
  * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
  *
@@ -20,7 +20,7 @@
 #define NATPMP_PORT (5351)
 
 #include <time.h>
-#include <sys/time.h> /* struct timeval */
+#include <sys/time.h>
 #include <netinet/in.h>
 
 typedef struct {
@@ -52,13 +52,14 @@ typedef struct {
 
 /* possible values for type field of natpmpresp_t */
 #define NATPMP_RESPTYPE_PUBLICADDRESS (0)
-#define NATPMP_RESPTYPE_TCPPORTMAPPING (1)
-#define NATPMP_RESPTYPE_UDPPORTMAPPING (2)
+#define NATPMP_RESPTYPE_UDPPORTMAPPING (1)
+#define NATPMP_RESPTYPE_TCPPORTMAPPING (2)
 
 /* Values to pass to sendnewportmappingrequest() */
 #define NATPMP_PROTOCOL_UDP (1)
 #define NATPMP_PROTOCOL_TCP (2)
 
+/* return values */
 /* NATPMP_ERR_INVALIDARGS : invalid arguments passed to the function */
 #define NATPMP_ERR_INVALIDARGS (-1)
 /* NATPMP_ERR_SOCKETERROR : socket() failed. check errno for details */
@@ -130,6 +131,9 @@ int sendpublicaddressrequest(natpmp_t * p);
  * Arguments :
  * protocol is either NATPMP_PROTOCOL_TCP or NATPMP_PROTOCOL_UDP,
  * lifetime is in seconds.
+ * To remove a port mapping, set lifetime to zero.
+ * To remove all port mappings to the host, set lifetime and both ports
+ * to zero.
  * Return values :
  * 12 = OK (size of the request)
  * NATPMP_ERR_INVALIDARGS
