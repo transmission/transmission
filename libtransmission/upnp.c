@@ -56,6 +56,7 @@ tr_upnp*
 tr_upnpInit( void )
 {
     tr_upnp * ret = tr_new0( tr_upnp, 1 );
+    ret->state = TR_UPNP_DISCOVER;
     ret->port = -1;
     return ret;
 }
@@ -80,13 +81,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
 {
     int ret;
 
-    if( handle->state == TR_UPNP_IDLE )
-    {
-        if( !handle->hasDiscovered )
-            handle->state = TR_UPNP_DISCOVER;
-    }
-
-    if( handle->state == TR_UPNP_DISCOVER )
+    if( isEnabled && ( handle->state == TR_UPNP_DISCOVER ) )
     {
         struct UPNPDev * devlist;
         errno = 0;
@@ -157,15 +152,15 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         }
     }
 
-    if( handle->state == TR_UPNP_ERR )
-        ret = TR_NAT_TRAVERSAL_ERROR;
-    else if( ( handle->state == TR_UPNP_IDLE ) && handle->isMapped )
-        ret = TR_NAT_TRAVERSAL_MAPPED;
-    else if( ( handle->state == TR_UPNP_IDLE ) && !handle->isMapped )
-        ret = TR_NAT_TRAVERSAL_UNMAPPED;
-    else if( handle->state == TR_UPNP_MAP )
-        ret = TR_NAT_TRAVERSAL_MAPPING;
-    else if( handle->state == TR_UPNP_UNMAP )
-        ret = TR_NAT_TRAVERSAL_UNMAPPING;
+    switch( handle->state )
+    {
+        case TR_UPNP_DISCOVER: ret = TR_NAT_TRAVERSAL_UNMAPPED; break;
+        case TR_UPNP_MAP:      ret = TR_NAT_TRAVERSAL_MAPPING; break;
+        case TR_UPNP_UNMAP:    ret = TR_NAT_TRAVERSAL_UNMAPPING; break;
+        case TR_UPNP_IDLE:     ret = handle->isMapped ? TR_NAT_TRAVERSAL_MAPPED
+                                                      : TR_NAT_TRAVERSAL_UNMAPPED; break;
+        default:               ret = TR_NAT_TRAVERSAL_ERROR; break;
+    }
+
     return ret;
 }

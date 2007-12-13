@@ -35,6 +35,7 @@ typedef enum
 {
     TR_NATPMP_IDLE,
     TR_NATPMP_ERR,
+    TR_NATPMP_DISCOVER,
     TR_NATPMP_RECV_PUB,
     TR_NATPMP_SEND_MAP,
     TR_NATPMP_RECV_MAP,
@@ -46,7 +47,8 @@ tr_natpmp_state;
 struct tr_natpmp
 {
     int port;
-    int isMapped;
+    unsigned int isMapped      : 1;
+    unsigned int hasDiscovered : 1;
     time_t renewTime;
     tr_natpmp_state state;
     natpmp_t natpmp;
@@ -70,15 +72,9 @@ logVal( const char * func, int ret )
 struct tr_natpmp*
 tr_natpmpInit( void )
 {
-    struct tr_natpmp * nat = tr_new0( struct tr_natpmp, 1 );
-    int val;
-
-    val = initnatpmp( &nat->natpmp );
-    logVal( "initnatpmp", val );
-    val = sendpublicaddressrequest( &nat->natpmp );
-    logVal( "sendpublicaddressrequest", val );
-
-    nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
+    struct tr_natpmp * nat;
+    nat = tr_new0( struct tr_natpmp, 1 );
+    nat->state = TR_NATPMP_DISCOVER;
     nat->port = -1;
     return nat;
 }
@@ -97,6 +93,16 @@ int
 tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
 {
     int ret;
+
+    if( isEnabled && ( nat->state == TR_NATPMP_DISCOVER ) )
+    {
+        int val = initnatpmp( &nat->natpmp );
+        logVal( "initnatpmp", val );
+        val = sendpublicaddressrequest( &nat->natpmp );
+        logVal( "sendpublicaddressrequest", val );
+        nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
+        nat->hasDiscovered = 1;
+    }
 
     if( nat->state == TR_NATPMP_RECV_PUB )
     {
@@ -141,7 +147,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
 
     if( nat->state == TR_NATPMP_IDLE )
     {
-        if( isEnabled && !nat->isMapped )
+        if( isEnabled && !nat->isMapped && nat->hasDiscovered )
             nat->state = TR_NATPMP_SEND_MAP;
 
         else if( nat->isMapped && time(NULL) >= nat->renewTime )
@@ -171,15 +177,15 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         }
     }
 
-    if( nat->state == TR_NATPMP_ERR )
-        ret = TR_NAT_TRAVERSAL_ERROR;
-    else if( ( nat->state == TR_NATPMP_IDLE ) &&  ( nat->isMapped ) )
-        ret = TR_NAT_TRAVERSAL_MAPPED;
-    else if( ( nat->state == TR_NATPMP_IDLE ) &&  ( !nat->isMapped ) )
-        ret = TR_NAT_TRAVERSAL_UNMAPPED;
-    else if( ( nat->state == TR_NATPMP_SEND_MAP ) || ( nat->state == TR_NATPMP_RECV_MAP ) )
-        ret = TR_NAT_TRAVERSAL_MAPPING;
-    else if( ( nat->state == TR_NATPMP_SEND_UNMAP ) || ( nat->state == TR_NATPMP_RECV_UNMAP ) )
-        ret = TR_NAT_TRAVERSAL_UNMAPPING;
+    switch( nat->state ) {
+        case TR_NATPMP_IDLE:        ret = nat->isMapped ? TR_NAT_TRAVERSAL_MAPPED : TR_NAT_TRAVERSAL_UNMAPPED; break;
+        case TR_NATPMP_DISCOVER:    ret = TR_NAT_TRAVERSAL_UNMAPPED; break;
+        case TR_NATPMP_RECV_PUB:
+        case TR_NATPMP_SEND_MAP:
+        case TR_NATPMP_RECV_MAP:    ret = TR_NAT_TRAVERSAL_MAPPING; break;
+        case TR_NATPMP_SEND_UNMAP:
+        case TR_NATPMP_RECV_UNMAP:  ret = TR_NAT_TRAVERSAL_UNMAPPING; break;
+        default:                    ret = TR_NAT_TRAVERSAL_ERROR; break;
+    }
     return ret;
 }
