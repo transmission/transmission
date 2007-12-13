@@ -1,66 +1,9 @@
-/* $Id: getgateway.c,v 1.4 2007/11/22 18:01:37 nanard Exp $ */
-/* libnatpmp
- * Copyright (c) 2007, Thomas BERNARD <miniupnp@free.fr>
- *
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <netinet/in.h>
-#include <sys/param.h>
-#include "getgateway.h"
-
-#ifdef __linux__
-int getdefaultgateway(in_addr_t * addr)
-{
-	long d, g;
-	char buf[256];
-	int line = 0;
-	FILE * f;
-	char * p;
-	f = fopen("/proc/net/route", "r");
-	if(!f)
-		return -1;
-	while(fgets(buf, sizeof(buf), f)) {
-		if(line > 0) {
-			p = buf;
-			while(*p && !isspace(*p))
-				p++;
-			while(*p && isspace(*p))
-				p++;
-			if(sscanf(p, "%lx%lx", &d, &g)==2) {
-				if(d == 0) { /* default */
-					*addr = g;
-					fclose(f);
-					return 0;
-				}
-			}
-		}
-		line++;
-	}
-	/* not found ! */
-	if(f)
-		fclose(f);
-	return -1;
-}
-#endif
-
+#include <errno.h>
 #if defined(BSD) || defined(__APPLE__)
 
-#include <errno.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -68,6 +11,30 @@ int getdefaultgateway(in_addr_t * addr)
 #include <netinet/in.h> /* struct in_addr */
 #include <sys/sysctl.h>
 #include <net/route.h>
+
+static uint8_t *
+getroute( int * buflen );
+static int
+parseroutes( uint8_t * buf, int len, struct in_addr * addr );
+
+int
+getdefaultgateway( struct in_addr * addr )
+{
+    uint8_t * buf;
+    int len;
+
+    buf = getroute( &len );
+    if( NULL == buf )
+    {
+        fprintf(stderr, "failed to get default route (BSD)" );
+        return 1;
+    }
+
+    len = parseroutes( buf, len, addr );
+    free( buf );
+
+    return len;
+}
 
 #ifndef SA_SIZE
 #define ROUNDUP( a, size ) \
@@ -183,23 +150,52 @@ parseroutes( uint8_t * buf, int len, struct in_addr * addr )
     return 1;
 }
 
-int
-getdefaultgateway( struct in_addr * addr )
+#elif defined( linux ) || defined( __linux ) || defined( __linux__ )
+
+#include <stdio.h>
+#include <ctype.h>
+#include <netinet/in.h>
+#include <sys/param.h>
+
+int getdefaultgateway(in_addr_t * addr)
 {
-    uint8_t * buf;
-    int len;
+	long d, g;
+	char buf[256];
+	int line = 0;
+	FILE * f;
+	char * p;
+	f = fopen("/proc/net/route", "r");
+	if(!f)
+		return -1;
+	while(fgets(buf, sizeof(buf), f)) {
+		if(line > 0) {
+			p = buf;
+			while(*p && !isspace(*p))
+				p++;
+			while(*p && isspace(*p))
+				p++;
+			if(sscanf(p, "%lx%lx", &d, &g)==2) {
+				if(d == 0) { /* default */
+					*addr = g;
+					fclose(f);
+					return 0;
+				}
+			}
+		}
+		line++;
+	}
+	/* not found ! */
+	if(f)
+		fclose(f);
+	return -1;
+}
 
-    buf = getroute( &len );
-    if( NULL == buf )
-    {
-        fprintf(stderr, "failed to get default route (BSD)" );
-        return 1;
-    }
+#else /* not BSD or Linux */
 
-    len = parseroutes( buf, len, addr );
-    free( buf );
-
-    return len;
+int getdefaultgateway( struct in_addr * addr  )
+{
+    printf( "don't know how to get default route on this platform" );
+    return 1;
 }
 
 #endif
