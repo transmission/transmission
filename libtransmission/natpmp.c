@@ -28,6 +28,7 @@
 #include "utils.h"
 
 #define LIFETIME_SECS 3600
+#define COMMAND_WAIT_SECS 8
 
 #define KEY "Port Mapping (NAT-PMP): "
 
@@ -50,6 +51,7 @@ struct tr_natpmp
     unsigned int isMapped      : 1;
     unsigned int hasDiscovered : 1;
     time_t renewTime;
+    time_t commandTime;
     tr_natpmp_state state;
     natpmp_t natpmp;
 };
@@ -89,6 +91,18 @@ tr_natpmpClose( tr_natpmp * nat )
     tr_free( nat );
 }
 
+static int
+canSendCommand( const struct tr_natpmp * nat )
+{
+    return time(NULL) >= nat->commandTime;
+}
+
+static void
+setCommandTime( struct tr_natpmp * nat )
+{
+    nat->commandTime = time(NULL) + COMMAND_WAIT_SECS;
+}
+
 int
 tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
 {
@@ -102,9 +116,10 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
         logVal( "sendpublicaddressrequest", val );
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_PUB;
         nat->hasDiscovered = 1;
+        setCommandTime( nat );
     }
 
-    if( nat->state == TR_NATPMP_RECV_PUB )
+    if( ( nat->state == TR_NATPMP_RECV_PUB ) && canSendCommand( nat ) )
     {
         natpmpresp_t response;
         const int val = readnatpmpresponseorretry( &nat->natpmp, &response );
@@ -123,11 +138,12 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->state = TR_NATPMP_SEND_UNMAP;
     }
 
-    if( nat->state == TR_NATPMP_SEND_UNMAP )
+    if( ( nat->state == TR_NATPMP_SEND_UNMAP ) && canSendCommand( nat ) )
     {
         const int val = sendnewportmappingrequest( &nat->natpmp, NATPMP_PROTOCOL_TCP, nat->port, nat->port, 0 );
         logVal( "sendnewportmappingrequest", val );
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_UNMAP;
+        setCommandTime( nat );
     }
 
     if( nat->state == TR_NATPMP_RECV_UNMAP )
@@ -154,11 +170,12 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->state = TR_NATPMP_SEND_MAP;
     }
 
-    if( nat->state == TR_NATPMP_SEND_MAP )
+    if( ( nat->state == TR_NATPMP_SEND_MAP ) && canSendCommand( nat ) )
     {
         const int val = sendnewportmappingrequest( &nat->natpmp, NATPMP_PROTOCOL_TCP, port, port, LIFETIME_SECS );
         logVal( "sendnewportmappingrequest", val );
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_MAP;
+        setCommandTime( nat );
     }
 
     if( nat->state == TR_NATPMP_RECV_MAP )
