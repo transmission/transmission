@@ -191,6 +191,18 @@ new_action_combo( const char * key, gpointer core )
     return w;
 }
 
+static void
+target_cb( GtkWidget * widget, gpointer target )
+{
+    gtk_widget_set_sensitive( GTK_WIDGET(target), gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
+}
+
+static void
+target_invert_cb( GtkWidget * widget, gpointer target )
+{
+    gtk_widget_set_sensitive( GTK_WIDGET(target), !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
+}
+
 GtkWidget *
 tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
@@ -217,11 +229,15 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         s = _("_Limit Upload Speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_UL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_UL_LIMIT, core, 0, INT_MAX );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_UL_LIMIT_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
 
         s = _("Li_mit Download Speed (KiB/s)");
         w = new_check_button( s, PREF_KEY_DL_LIMIT_ENABLED, core );
         w2 = new_spin_button( PREF_KEY_DL_LIMIT, core, 0, INT_MAX );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), pref_flag_get( PREF_KEY_DL_LIMIT_ENABLED ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
 
     hig_workarea_add_section_divider( t, &row );
@@ -231,6 +247,8 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
         s = _("P_rompt for download directory");
         w = new_check_button( s, PREF_KEY_DIR_ASK, core );
         w2 = new_path_chooser_button( PREF_KEY_DIR_DEFAULT, core );
+        gtk_widget_set_sensitive( GTK_WIDGET(w2), !pref_flag_get( PREF_KEY_DIR_ASK ) );
+        g_signal_connect( w, "toggled", G_CALLBACK(target_invert_cb), w2 );
         hig_workarea_add_double_control( t, &row, w, w2 );
 
         w = new_action_combo( PREF_KEY_ADDSTD, core );
