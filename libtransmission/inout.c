@@ -247,8 +247,38 @@ checkPiece( tr_torrent * tor, int pieceIndex )
     const int ret = tr_ioRecalculateHash( tor, pieceIndex, hash )
         || memcmp( hash, tor->info.pieces[pieceIndex].hash, SHA_DIGEST_LENGTH );
     tr_dbg ("torrent [%s] piece %d hash check: %s",
-            tor->info.name, pieceIndex, (ret?"FAILED":"OK"));
+            tor->info.name, pieceIndex, ( ret ? "FAILED" : "OK" ));
     return ret;
+}
+
+static void
+checkFile( tr_torrent   * tor,
+           int            fileIndex,
+           tr_bitfield  * uncheckedPieces,
+           int          * abortFlag )
+{
+    int i;
+    int nofile;
+    struct stat sb;
+    char path[MAX_PATH_LENGTH];
+    const tr_file * file = &tor->info.files[fileIndex];
+
+    tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
+    nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
+
+    for( i=file->firstPiece; i<file->lastPiece && (!*abortFlag); ++i )
+    {
+        if( nofile )
+        {
+            tr_torrentSetHasPiece( tor, i, 0 );
+        }
+        else if( tr_bitfieldHas( uncheckedPieces, i ) )
+        {
+            const int check = checkPiece( tor, i );
+            tr_torrentSetHasPiece( tor, i, !check );
+            tr_bitfieldRem( uncheckedPieces, i );
+        }
+    }
 }
 
 /**
@@ -351,15 +381,8 @@ recheckThreadFunc( void * unused UNUSED )
                 tr_cpPieceRem( tor->completion, i );
 
         tr_inf( "Verifying some pieces of \"%s\"", tor->info.name );
-
-        for( i=0; i<tor->info.pieceCount && !stopCurrent; ++i ) 
-        {
-            if( !tr_bitfieldHas( tor->uncheckedPieces, i ) )
-                continue;
-
-            tr_torrentSetHasPiece( tor, i, !checkPiece( tor, i ) );
-            tr_bitfieldRem( tor->uncheckedPieces, i );
-        }
+        for( i=0; i<tor->info.fileCount && !stopCurrent; ++i )
+            checkFile( tor, i, tor->uncheckedPieces, &stopCurrent );
 
         tor->recheckState = TR_RECHECK_NONE;
 
