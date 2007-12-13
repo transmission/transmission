@@ -904,6 +904,9 @@ pulse( void * vhandle )
     tr_torrent * tor;
     const time_t now = time( NULL );
 
+    if( handle->tracker == NULL )
+        return FALSE;
+
     if( handle->tracker->socketCount || tr_list_size(th->requestQueue) || tr_list_size(th->scrapeQueue) )
         dbgmsg( NULL, "tracker pulse... %d sockets, %d reqs left, %d scrapes left", handle->tracker->socketCount, tr_list_size(th->requestQueue), tr_list_size(th->scrapeQueue) );
 
@@ -941,9 +944,12 @@ pulse( void * vhandle )
 static void
 onReqDone( tr_handle * handle )
 {
-    pulse( handle );
-    --handle->tracker->socketCount;
-    dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
+    if( handle->tracker )
+    {
+        pulse( handle );
+        --handle->tracker->socketCount;
+        dbgmsg( NULL, "decrementing socket count to %d", handle->tracker->socketCount );
+    }
 }
 
 /***
