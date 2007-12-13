@@ -41,6 +41,12 @@ hig_workarea_add_wide_control (GtkWidget   * table,
                                int         * row,
                                GtkWidget   * w);
 
+void
+hig_workarea_add_double_control (GtkWidget * table,
+                               int       * row,
+                               GtkWidget * wl,
+                               GtkWidget * wr);
+
 GtkWidget*
 hig_workarea_add_wide_checkbutton (GtkWidget   * table,
                                    int         * row,

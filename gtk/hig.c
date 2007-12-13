@@ -77,6 +77,23 @@ hig_workarea_add_wide_control (GtkWidget * table,
   ++*row;
 }
 
+void
+hig_workarea_add_double_control (GtkWidget * table,
+                               int       * row,
+                               GtkWidget * wl,
+                               GtkWidget * wr)
+{
+  gtk_table_attach (GTK_TABLE(table), wl,
+                    1, 2, *row, *row+1,
+                    GTK_EXPAND|GTK_SHRINK|GTK_FILL, 0, 0, 0);
+
+  gtk_table_attach (GTK_TABLE(table), wr,
+                    3, 4, *row, *row+1,
+                    GTK_EXPAND|GTK_SHRINK|GTK_FILL, 0, 0, 0);
+
+  ++*row;
+}
+
 GtkWidget *
 hig_workarea_add_wide_checkbutton   (GtkWidget   * table,
                                      int         * row,
