@@ -88,7 +88,12 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
 
     if( handle->state == TR_UPNP_DISCOVER )
     {
-        struct UPNPDev * devlist = upnpDiscover( 2000, NULL );
+        struct UPNPDev * devlist;
+        errno = 0;
+        devlist = upnpDiscover( 2000, NULL );
+        if( devlist == NULL ) {
+            tr_err( KEY "upnpDiscover returned NULL (errno %d - %s)", errno, strerror(errno) );
+        }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
             tr_inf( KEY "found Internet Gateway Device '%s'", handle->urls.controlURL );
