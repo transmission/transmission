@@ -444,12 +444,16 @@ deselectLabels( GtkWidget * w, gpointer unused UNUSED )
 }
 
 static void
+do_exit_cb( GtkWidget *w UNUSED, gpointer data UNUSED )
+{
+    exit( 0 );
+}
+
+static void
 wannaquit( void * vdata )
 {
-    GtkWidget * w;
-#if GTK_CHECK_VERSION(2,10,0)
-    GtkWidget * i;
-#endif
+    char * str;
+    GtkWidget * r, * p, * b, * w, *c;
     struct cbdata * cbdata = vdata;
 
     /* stop the update timer */
@@ -458,26 +462,35 @@ wannaquit( void * vdata )
         cbdata->timer = 0;
     }
 
-    w = gtk_message_dialog_new( cbdata->wind,
-                                GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT,
-                                GTK_MESSAGE_INFO,
-                                GTK_BUTTONS_NONE,
-                                _("Closing Connections" ) );
-#if GTK_CHECK_VERSION(2,10,0)
-    i = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
-    gtk_widget_show( i );
-    gtk_message_dialog_set_image( GTK_MESSAGE_DIALOG(w), i );
-#endif
-    gtk_message_dialog_format_secondary_text( GTK_MESSAGE_DIALOG(w),
-                                              _("Sending upload/download totals to tracker..." ) );
-    gtk_container_foreach( GTK_CONTAINER(GTK_DIALOG(w)->vbox), deselectLabels, NULL );
-    gtk_widget_show( w );
+    c = GTK_WIDGET( cbdata->wind );
+    gtk_container_remove( GTK_CONTAINER( c ), gtk_bin_get_child( GTK_BIN( c ) ) );
+
+    r = gtk_alignment_new(0.5, 0.5, 0.01, 0.01);
+    gtk_container_add(GTK_CONTAINER(c), r);
+
+    p = gtk_table_new(2, 2, FALSE);
+    gtk_container_add(GTK_CONTAINER(r), p);
+
+    w = gtk_image_new_from_stock( GTK_STOCK_NETWORK, GTK_ICON_SIZE_DIALOG );
+    gtk_table_attach(GTK_TABLE(p), w, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 2, 2);
+
+    w = gtk_label_new("");
+    str = g_strdup_printf( "<b>%s</b>\n%s", _("Closing Connections"), _("Sending upload/download totals to tracker...") );
+    gtk_label_set_markup(GTK_LABEL(w), str );
+    gtk_table_attach(GTK_TABLE(p), w, 1, 2, 0, 1, GTK_FILL, GTK_FILL, 10, 0);
+    g_free( str );
+
+    b = gtk_alignment_new(0.0, 1.0, 0.01, 0.01);
+    w = gtk_button_new_with_label( _( "_Quit Immediately" ) );
+    gtk_button_set_image( GTK_BUTTON(w), gtk_image_new_from_stock( GTK_STOCK_QUIT, GTK_ICON_SIZE_BUTTON ) );
+    g_signal_connect(w, "clicked", G_CALLBACK(do_exit_cb), NULL);
+    gtk_container_add(GTK_CONTAINER(b), w);
+    gtk_table_attach(GTK_TABLE(p), b, 1, 2, 1, 2, GTK_FILL, GTK_FILL, 10, 0);
+
+    gtk_widget_show_all(r);
 
     /* clear the UI */
     gtk_list_store_clear( GTK_LIST_STORE( tr_core_model( cbdata->core ) ) );
-    gtk_widget_set_sensitive( GTK_WIDGET( cbdata->wind ), FALSE );
-
-    
 
     /* shut down libT */
     g_thread_create( quitThreadFunc, vdata, TRUE, NULL );
