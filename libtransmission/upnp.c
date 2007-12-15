@@ -93,13 +93,14 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         }
         errno = 0;
         if( UPNP_GetValidIGD( devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr))) {
-            tr_inf( KEY "found Internet Gateway Device '%s'", handle->urls.controlURL );
-            tr_inf( KEY "local LAN IP Address is '%s'", handle->lanaddr );
+            tr_inf( KEY "Found Internet Gateway Device '%s'", handle->urls.controlURL );
+            tr_inf( KEY "Local LAN IP Address is '%s'", handle->lanaddr );
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = 1;
         } else {
             handle->state = TR_UPNP_ERR;
             tr_err( KEY "UPNP_GetValidIGD failed.  (errno %d - %s)", errno, strerror(errno) );
+            tr_err( KEY "If your router supports UPnP, please make sure UPnP is enabled!" );
         }
         freeUPNPDevlist( devlist );
     }
@@ -117,7 +118,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
         UPNP_DeletePortMapping( handle->urls.controlURL,
                                 handle->data.servicetype,
                                 portStr, "TCP" );
-        tr_dbg( KEY "stopping port forwarding of '%s', service '%s'",
+        tr_dbg( KEY "Stopping port forwarding of '%s', service '%s'",
                 handle->urls.controlURL, handle->data.servicetype );
         handle->isMapped = 0;
         handle->state = TR_UPNP_IDLE;
@@ -141,14 +142,15 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
                                                   handle->data.servicetype,
                                                   portStr, portStr, handle->lanaddr,
                                                   "Transmission", "TCP" ) );
-        tr_inf( KEY "port forwarding via '%s', service '%s'.  (local address: %s:%d)",
+        tr_inf( KEY "Port forwarding via '%s', service '%s'.  (local address: %s:%d)",
                 handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, port );
         if( handle->isMapped ) {
-            tr_inf( KEY "port forwarding successful!" );
+            tr_inf( KEY "Port forwarding successful!" );
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         } else {
-            tr_err( KEY "port forwarding failed (errno %d - %s)", errno, strerror(errno) );
+            tr_err( KEY "Port forwarding failed (errno %d - %s)", errno, strerror(errno) );
+            tr_err( KEY "If your router supports UPnP, please make sure UPnP is enabled!" );
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
         }
