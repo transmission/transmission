@@ -72,7 +72,13 @@ enum
     PEER_PULSE_INTERVAL     = (100),       /* msec between calls to pulse() */
     RATE_PULSE_INTERVAL     = (250),       /* msec between calls to ratePulse() */
 
-    MAX_OUTBUF_SIZE         = 4096,
+    /* 13 is the size of the BitTorrent overhead of a BT_PIECE message...
+     * since all (or nearly all) piece requests are 16 K, this typically
+     * means we'd fill a 4096 K outbuf 5 times (4096, 4096, 4096, 4096, 16)
+     * but by adding the 13 here we can shorten it to 4 refills... not sure
+     * if this actually makes any difference since the libevent layer smooths
+     * things out anyway, but it doesn't hurt either... */
+    MAX_OUTBUF_SIZE         = (4096 + 13),
      
     /* Fast Peers Extension constants */
     MAX_FAST_ALLOWED_COUNT   = 10,          /* max. number of pieces we fast-allow to another peer */

@@ -86,7 +86,7 @@ myDebug( const char * file, int line, const char * fmt, ... )
 
 enum
 {
-    TR_MAX_SOCKETS = 320,
+    TR_MAX_SOCKETS = 512,
 
     TR_MAX_OPEN_FILES = 8, /* real files, not sockets */
 
