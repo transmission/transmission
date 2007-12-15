@@ -266,7 +266,7 @@ checkFile( tr_torrent   * tor,
     tr_buildPath ( path, sizeof(path), tor->destination, file->name, NULL );
     nofile = stat( path, &sb ) || !S_ISREG( sb.st_mode );
 
-    for( i=file->firstPiece; i<file->lastPiece && (!*abortFlag); ++i )
+    for( i=file->firstPiece; i<=file->lastPiece && (!*abortFlag); ++i )
     {
         if( nofile )
         {
