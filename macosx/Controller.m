@@ -259,6 +259,9 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         [fBottomTigerBar setHidden: NO];
         [fBottomTigerLine setHidden: NO];
         
+        [fActionButton setBezelStyle: NSSmallSquareBezelStyle];
+        [fSpeedLimitButton setBezelStyle: NSSmallSquareBezelStyle];
+        
         //status bar
         [fStatusBar setShowOnTiger: YES];
         [fStatusButton setHidden: YES];
