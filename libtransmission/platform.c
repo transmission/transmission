@@ -54,6 +54,7 @@
 #include "list.h"
 #include "net.h"
 #include "platform.h"
+#include "trcompat.h"
 #include "utils.h"
 
 /***
@@ -287,7 +288,7 @@ tr_lockUnlock( tr_lock * l )
 #include <pwd.h>
 #endif
 
-const char *
+static const char *
 tr_getHomeDirectory( void )
 {
     static char buf[MAX_PATH_LENGTH];
@@ -348,32 +349,44 @@ tr_getPrefsDirectory( void )
 {
     static char   buf[MAX_PATH_LENGTH];
     static int    init = 0;
-    static size_t buflen = sizeof(buf);
-    const char* h;
+    const char * trhome;
 
     if( init )
         return buf;
 
-    h = tr_getHomeDirectory();
-#ifdef __BEOS__
-    find_directory( B_USER_SETTINGS_DIRECTORY,
-                    dev_for_path("/boot"), true, buf, buflen );
-    strcat( buf, "/Transmission" );
-#elif defined( SYS_DARWIN )
-    tr_buildPath ( buf, buflen, h,
-                  "Library", "Application Support", "Transmission", NULL );
-#elif defined(__AMIGAOS4__)
-    snprintf( buf, buflen, "PROGDIR:.transmission" );
-#elif defined(WIN32)
+    trhome = getenv( "TRANSMISSION_HOME" );
+    if( trhome != NULL )
     {
-        char tmp[MAX_PATH_LENGTH];
-        SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, tmp );
-        tr_buildPath( buf, sizeof(buf), tmp, "Transmission", NULL );
-        buflen = strlen( buf );
+        strlcpy( buf, trhome, sizeof( buf ) );
     }
+    else
+    {
+#ifdef __BEOS__
+        find_directory( B_USER_SETTINGS_DIRECTORY,
+                        dev_for_path("/boot"), true,
+                        buf, sizeof( buf ) );
+        strcat( buf, "/Transmission" );
+#elif defined( SYS_DARWIN )
+        const char * h = tr_getHomeDirectory( );
+        tr_buildPath ( buf, sizeof( buf ),
+                       tr_getHomeDirectory( ),
+                       "Library",
+                       "Application Support",
+                       "Transmission",
+                       NULL );
+#elif defined(__AMIGAOS4__)
+        strlcpy( buf, "PROGDIR:.transmission", sizeof( buf ) );
+#elif defined(WIN32)
+        char appdata[MAX_PATH_LENGTH];
+        SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, appdata );
+        tr_buildPath( buf, sizeof(buf),
+                      appdata,
+                      "Transmission",
+                      NULL );
 #else
-    tr_buildPath ( buf, buflen, h, ".transmission", NULL );
+        tr_buildPath ( buf, sizeof(buf), tr_getHomeDirectory( ), ".transmission", NULL );
 #endif
+    }
 
     tr_mkdirp( buf, 0777 );
     init = 1;

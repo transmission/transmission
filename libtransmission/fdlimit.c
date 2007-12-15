@@ -88,7 +88,7 @@ enum
 {
     TR_MAX_SOCKETS = 512,
 
-    TR_MAX_OPEN_FILES = 8, /* real files, not sockets */
+    TR_MAX_OPEN_FILES = 16, /* real files, not sockets */
 
     TR_RESERVED_FDS = 16 /* sockets reserved for tracker connections */
 };

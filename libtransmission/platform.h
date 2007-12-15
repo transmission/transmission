@@ -27,7 +27,6 @@
 typedef struct tr_lock   tr_lock;
 typedef struct tr_thread tr_thread;
 
-const char * tr_getHomeDirectory( void );
 const char * tr_getCacheDirectory( void );
 const char * tr_getTorrentsDirectory( void );
 
