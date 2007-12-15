@@ -174,14 +174,18 @@ tr_peerIoNewOutgoing( struct tr_handle      * handle,
                       int                     port,
                       const uint8_t         * torrentHash )
 {
+    int socket;
+
     assert( handle != NULL );
     assert( in_addr != NULL );
     assert( port >= 0 );
     assert( torrentHash != NULL );
 
-    return tr_peerIoNew( handle, in_addr, port,
-                         torrentHash, 0,
-                         tr_netOpenTCP( in_addr, port, 0 ) );
+    socket = tr_netOpenTCP( in_addr, port, 0 );
+
+    return socket < 0
+        ? NULL 
+        : tr_peerIoNew( handle, in_addr, port, torrentHash, 0, socket );
 }
 
 static void

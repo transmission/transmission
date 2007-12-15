@@ -110,8 +110,12 @@ enum
 
     /* number of bad pieces a peer is allowed to send before we ban them */
     MAX_BAD_PIECES_PER_PEER = 3,
+
     /* use for bitwise operations w/peer_atom.myflags */
-    MYFLAG_BANNED = 1
+    MYFLAG_BANNED = 1,
+
+    /* unreachable for now... but not banned.  if they try to connect to us it's okay */
+    MYFLAG_UNREACHABLE = 2
 };
 
 
@@ -1735,40 +1739,26 @@ getPeerCandidates( Torrent * t, int * setmeSize )
 
         /* peer fed us too much bad data ... we only keep it around
          * now to weed it out in case someone sends it to us via pex */
-        if( atom->myflags & MYFLAG_BANNED ) {
-#if 0
-            tordbg( t, "RECONNECT peer %d (%s) is banned...",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
-#endif
+        if( atom->myflags & MYFLAG_BANNED )
             continue;
-        }
+
+        /* peer was unconnectable before, so we're not going to keep trying.
+         * this is needs a separate flag from `banned', since if they try
+         * to connect to us later, we'll let them in */
+        if( atom->myflags & MYFLAG_UNREACHABLE )
+            continue;
 
         /* we don't need two connections to the same peer... */
-        if( peerIsInUse( t, &atom->addr ) ) {
-#if 0
-            tordbg( t, "RECONNECT peer %d (%s) is in use..",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
-#endif
+        if( peerIsInUse( t, &atom->addr ) )
             continue;
-        }
 
         /* no need to connect if we're both seeds... */
-        if( seed && (atom->flags & ADDED_F_SEED_FLAG) ) {
-#if 0
-            tordbg( t, "RECONNECT peer %d (%s) is a seed and so are we..",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
-#endif
+        if( seed && (atom->flags & ADDED_F_SEED_FLAG) )
             continue;
-        }
 
         /* we're wasting our time trying to connect to this bozo. */
-        if( atom->numFails > 10 ) {
-#if 0
-            tordbg( t, "RECONNECT peer %d (%s) gives us nothing but failure.",
-                    i, tr_peerIoAddrStr(&atom->addr,atom->port) );
-#endif
+        if( atom->numFails > 10 )
             continue;
-        }
 
         /* if we used this peer recently, give someone else a turn */
         minWait = 60;
@@ -1803,7 +1793,7 @@ reconnectPulse( void * vtorrent )
     }
     else
     {
-        int i, nCandidates, nBad;
+        int i, nCandidates, nBad, addMax;
         struct peer_atom ** candidates = getPeerCandidates( t, &nCandidates );
         struct tr_peer ** connections = getPeersToClose( t, &nBad );
 
@@ -1829,26 +1819,35 @@ reconnectPulse( void * vtorrent )
         }
 
         /* add some new ones */
+        addMax = tr_ptrArraySize(t->pool)
+            ? MAX_RECONNECTIONS_PER_PULSE
+            : MAX_CONNECTED_PEERS_PER_TORRENT;
+          
         for( i=0; i<nCandidates && i<MAX_RECONNECTIONS_PER_PULSE; ++i )
         {
             tr_peerMgr * mgr = t->manager;
             struct peer_atom * atom = candidates[i];
             tr_peerIo * io;
-            tr_handshake * handshake;
 
             tordbg( t, "Starting an OUTGOING connection with %s",
                        tr_peerIoAddrStr( &atom->addr, atom->port ) );
 
             io = tr_peerIoNewOutgoing( mgr->handle, &atom->addr, atom->port, t->hash );
+            if( io == NULL )
+            {
+                atom->myflags |= MYFLAG_UNREACHABLE;
+            }
+            else
+            {
+                tr_handshake * handshake = tr_handshakeNew( io,
+                                                            mgr->handle->encryptionMode,
+                                                            myHandshakeDoneCB,
+                                                            mgr );
 
-            handshake = tr_handshakeNew( io,
-                                         mgr->handle->encryptionMode,
-                                         myHandshakeDoneCB,
-                                         mgr );
+                assert( tr_peerIoGetTorrentHash( io ) != NULL );
 
-            assert( tr_peerIoGetTorrentHash( io ) != NULL );
-
-            tr_ptrArrayInsertSorted( t->outgoingHandshakes, handshake, handshakeCompare );
+                tr_ptrArrayInsertSorted( t->outgoingHandshakes, handshake, handshakeCompare );
+            }
 
             atom->time = time( NULL );
         }
