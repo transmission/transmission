@@ -131,9 +131,11 @@ tr_netOpen( const struct in_addr * addr, tr_port_t port,
 #endif
         && ( sockerrno != EINPROGRESS ) )
     {
-        tr_err( "Couldn't connect socket (%s)", strerror( sockerrno ) );
+        tr_err( "Couldn't connect socket %d to %s, port %d (errno %d - %s)",
+                s, inet_ntoa(*addr), port,
+                sockerrno, strerror(sockerrno) );
         tr_netClose( s );
-        return -1;
+        s = -1;
     }
 
     return s;
