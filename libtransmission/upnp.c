@@ -142,7 +142,7 @@ tr_upnpPulse( tr_upnp * handle, int port, int isEnabled )
                                                   portStr, portStr, handle->lanaddr,
                                                   "Transmission", "TCP" ) );
         tr_inf( KEY "port forwarding via '%s', service '%s'.  (local address: %s:%d)",
-                handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, handle->port );
+                handle->urls.controlURL, handle->data.servicetype, handle->lanaddr, port );
         if( handle->isMapped ) {
             tr_inf( KEY "port forwarding successful!" );
             handle->port = port;
