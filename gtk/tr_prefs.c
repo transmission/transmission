@@ -12,6 +12,7 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <third-party/miniupnp/miniwget.h>
 #include <libtransmission/transmission.h>
 #include "conf.h"
 #include "hig.h"
@@ -203,6 +204,35 @@ target_invert_cb( GtkWidget * widget, gpointer target )
     gtk_widget_set_sensitive( GTK_WIDGET(target), !gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(widget) ) );
 }
 
+static gpointer
+test_port( gpointer l )
+{
+    GObject * o = G_OBJECT( l );
+    GtkSpinButton * spin = GTK_SPIN_BUTTON( g_object_get_data( o, "tr-port-spin" ) );
+
+    const int port = gtk_spin_button_get_value_as_int( spin );
+    int isOpen;
+    int size;
+    char * text;
+    char url[256];
+
+    g_usleep( G_USEC_PER_SEC * 3 ); /* give portmapping time to kick in */
+    snprintf( url, sizeof(url), "http://transmission.m0k.org/PortCheck.php?port=%d", port );
+    text = miniwget( url, &size );
+    g_message(" got len %d, [%*.*s]", size, size, size, text );
+    isOpen = text && *text=='1';
+    gtk_label_set_markup( GTK_LABEL(l), isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>") );
+
+    return NULL;
+}
+
+static void
+testing_port_cb( GtkWidget * unused UNUSED, gpointer l )
+{
+    gtk_label_set_markup( GTK_LABEL(l), _( "<i>Testing port...</i>" ) );
+    g_thread_create( test_port, l, FALSE, NULL );
+}
+
 GtkWidget *
 tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
 {
@@ -211,7 +241,11 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     GtkWidget * t;
     GtkWidget * w, * w2;
     GtkWidget * l;
+    GtkWidget * h;
     GtkWidget * d;
+    GtkTooltips * tips;
+
+    tips = gtk_tooltips_new( );
 
     d = gtk_dialog_new_with_buttons( _("Preferences"), parent,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -263,12 +297,25 @@ tr_prefs_dialog_new( GObject * core, GtkWindow * parent )
     hig_workarea_add_section_title (t, &row, _("Network"));
     hig_workarea_add_section_spacer (t, row, 2);
         
-        s = _("_Automatic Port Mapping via NAT-PMP or UPnP");
+        s = _("_Automatically map port" );
         w = new_check_button( s, PREF_KEY_NAT, core );
         hig_workarea_add_wide_control( t, &row, w );
+        gtk_tooltips_set_tip( GTK_TOOLTIPS( tips ), w, _( "NAT traversal uses either NAT-PMP or UPnP" ), NULL );
 
-        w = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX );
-        l = hig_workarea_add_row( t, &row, _("Listening _Port"), w, NULL );
+        h = gtk_hbox_new( FALSE, GUI_PAD );
+        w2 = new_spin_button( PREF_KEY_PORT, core, 1, INT_MAX );
+        gtk_box_pack_start( GTK_BOX(h), w2, FALSE, FALSE, 0 );
+        l = gtk_label_new( NULL );
+        gtk_misc_set_alignment( GTK_MISC(l), 0.0f, 0.5f );
+        gtk_box_pack_start( GTK_BOX(h), l, FALSE, FALSE, 0 );
+        hig_workarea_add_row( t, &row, _("Incoming TCP _Port"), h, w );
+
+        g_object_set_data( G_OBJECT(l), "tr-port-spin", w2 );
+        g_object_set_data( G_OBJECT(l), "tr-core", core );
+        testing_port_cb( NULL, l );
+
+        g_signal_connect( w, "toggled", G_CALLBACK(toggled_cb), l );
+        g_signal_connect( w2, "value-changed", G_CALLBACK(testing_port_cb), l );
 
     hig_workarea_add_section_divider( t, &row );
     hig_workarea_add_section_title (t, &row, _("Options"));
