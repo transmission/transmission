@@ -105,6 +105,14 @@ setCommandTime( struct tr_natpmp * nat )
     nat->commandTime = time(NULL) + COMMAND_WAIT_SECS;
 }
 
+static void
+setErrorState( struct tr_natpmp * nat )
+{
+    tr_err( KEY "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" );
+    tr_err( KEY "NAT-PMP port forwarding unsuccessful, trying UPnP next" );
+    nat->state = TR_NATPMP_ERR;
+}
+
 int
 tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
 {
@@ -130,8 +138,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             tr_inf( KEY "found public address %s", inet_ntoa( response.publicaddress.addr ) );
             nat->state = TR_NATPMP_IDLE;
         } else if( val != NATPMP_TRYAGAIN ) {
-            tr_err( KEY "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" );
-            nat->state = TR_NATPMP_ERR;
+            setErrorState( nat );
         }
     }
 
@@ -160,8 +167,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->port = -1;
             nat->isMapped = 0;
         } else if( val != NATPMP_TRYAGAIN ) {
-            tr_err( KEY "If your router supports NAT-PMP, please make sure NAT-PMP is enabled!" );
-            nat->state = TR_NATPMP_ERR;
+            setErrorState( nat );
         }
     }
 
@@ -194,7 +200,7 @@ tr_natpmpPulse( struct tr_natpmp * nat, int port, int isEnabled )
             nat->port = resp.newportmapping.privateport;
             tr_inf( KEY "port %d mapped successfully", nat->port );
         } else if( val != NATPMP_TRYAGAIN ) {
-            nat->state = TR_NATPMP_ERR;
+            setErrorState( nat );
         }
     }
 
