@@ -51,8 +51,8 @@
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
 
-#define GROUP_BORDER_X -4.0
-#define GROUP_BORDER_Y -1.0
+#define GROUP_BORDER_X 4.0
+#define GROUP_BORDER_Y 1.0
 
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
@@ -253,7 +253,7 @@
     
     if (groupIndex != -1)
         [[[GroupsWindowController groupsController] gradientForIndex: [torrent groupValue]] fillBezierPath:
-            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(titleRect, GROUP_BORDER_X, GROUP_BORDER_Y) radius: 7.0] angle: 90];
+            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(titleRect, -GROUP_BORDER_X, -GROUP_BORDER_Y) radius: 7.0] angle: 90];
     
     [titleString drawInRect: titleRect];
     
@@ -560,6 +560,7 @@
     
     result.size = [string size];
     result.size.width = MIN(result.size.width, NSMaxX(bounds) - result.origin.x - PADDING_HORIZONAL
+                            - ([[self representedObject] groupValue] != -1 ? GROUP_BORDER_X : 0)
                             - (minimal ? PADDING_BETWEEN_TITLE_AND_MIN_STATUS + statusRect.size.width : 0));
     
     return result;

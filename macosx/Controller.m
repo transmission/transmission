@@ -2048,14 +2048,16 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
-    #warning if not group menu, return
-    int i, keep = (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu ) ? 2 : 0;
-    for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
-        [menu removeItemAtIndex: i];
-    
-    NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)];
-    [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [groupMenu numberOfItems])]
-            atBottom: NO];
+    if (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu)
+    {
+        int i, keep = (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu) ? 2 : 0;
+        for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
+            [menu removeItemAtIndex: i];
+        
+        NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)];
+        [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange:
+                NSMakeRange(0, [groupMenu numberOfItems])] atBottom: NO];
+    }
 }
 
 - (void) setGroup: (id) sender
