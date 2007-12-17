@@ -3076,6 +3076,24 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         return YES;
     }
     
+    if (action == @selector(setGroup:))
+    {
+        BOOL checked = NO;
+        
+        int index = [[menuItem representedObject] intValue];
+        NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+        Torrent * torrent;
+        while ((torrent = [enumerator nextObject]))
+            if (index == [torrent groupValue])
+            {
+                checked = YES;
+                break;
+            }
+        
+        [menuItem setState: checked ? NSOnState : NSOffState];
+        return canUseTable && [fTableView numberOfSelectedRows] > 0;
+    }
+    
     if (action == @selector(toggleSmallView:))
     {
         [menuItem setState: [fDefaults boolForKey: @"SmallView"] ? NSOnState : NSOffState];
