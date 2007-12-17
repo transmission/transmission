@@ -102,6 +102,8 @@
 	<false/>
 	<key>Sort</key>
 	<string>Order</string>
+	<key>SortByGroup</key>
+	<false/>
 	<key>SortReverse</key>
 	<false/>
 	<key>SpeedLimit</key>

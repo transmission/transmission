@@ -181,7 +181,9 @@
 - (void) sortTorrents;
 - (void) sortTorrentsIgnoreSelected;
 - (void) setSort: (id) sender;
+- (void) setSortByGroup: (id) sender;
 - (void) setSortReverse: (id) sender;
+
 - (void) applyFilter: (id) sender;
 - (void) setFilter: (id) sender;
 - (void) setFilterSearchType: (id) sender;

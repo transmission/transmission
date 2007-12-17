@@ -122,6 +122,8 @@
 				<string>id</string>
 				<key>setSort</key>
 				<string>id</string>
+				<key>setSortByGroup</key>
+				<string>id</string>
 				<key>setSortReverse</key>
 				<string>id</string>
 				<key>setStatusLabel</key>

@@ -255,6 +255,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     
     [menu addItem: [NSMenuItem separatorItem]];
     
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, 16.0, 16.0) radius: 4.0];
+    
     NSEnumerator * enumerator = [fGroups objectEnumerator];
     NSDictionary * dict;
     while ((dict = [enumerator nextObject]))
@@ -263,7 +265,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         [item setTarget: target];
         
         NSImage * icon = [[NSImage alloc] initWithSize: NSMakeSize(16.0, 16.0)];
-        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, 16.0, 16.0) radius: 4.0];
         
         [icon lockFocus];
         [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 90];

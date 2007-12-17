@@ -1691,6 +1691,8 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
                     * orderDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"orderValue"
                                             ascending: asc] autorelease];
     
+    BOOL sortByOrder = [sortType isEqualToString: SORT_ORDER];
+    
     NSArray * descriptors;
     if ([sortType isEqualToString: SORT_NAME])
         descriptors = [[NSArray alloc] initWithObjects: nameDescriptor, orderDescriptor, nil];
@@ -1725,7 +1727,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         
         descriptors = [[NSArray alloc] initWithObjects: trackerDescriptor, nameDescriptor, orderDescriptor, nil];
     }
-    else if ([sortType isEqualToString: SORT_ORDER])
+    else if (sortByOrder)
         descriptors = [[NSArray alloc] initWithObjects: orderDescriptor, nil];
     else if ([sortType isEqualToString: SORT_ACTIVITY])
     {
@@ -1743,6 +1745,18 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         descriptors = [[NSArray alloc] initWithObjects: dateDescriptor, orderDescriptor, nil];
     }
     
+    if (!sortByOrder && [fDefaults boolForKey: @"SortByGroup"])
+    {
+        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupValue" ascending: asc] autorelease];
+        
+        NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
+        [temp addObject: groupDescriptor];
+        [temp addObjectsFromArray: descriptors];
+        
+        [descriptors release];
+        descriptors = temp;
+    }
+    
     [fDisplayedTorrents sortUsingDescriptors: descriptors];
     [descriptors release];
     
@@ -1757,6 +1771,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
         case SORT_ORDER_TAG:
             sortType = SORT_ORDER;
             [fDefaults setBool: NO forKey: @"SortReverse"];
+            [fDefaults setBool: NO forKey: @"SortByGroup"];
             break;
         case SORT_DATE_TAG:
             sortType = SORT_DATE;
@@ -1781,6 +1796,12 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     }
     
     [fDefaults setObject: sortType forKey: @"Sort"];
+    [self sortTorrents];
+}
+
+- (void) setSortByGroup: (id) sender
+{
+    [fDefaults setBool: ![fDefaults boolForKey: @"SortByGroup"] forKey: @"SortByGroup"];
     [self sortTorrents];
 }
 
@@ -3304,6 +3325,13 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     if (action == @selector(setSortReverse:))
     {
         [menuItem setState: [fDefaults boolForKey: @"SortReverse"] ? NSOnState : NSOffState];
+        return ![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER];
+    }
+    
+    //enable group sort item
+    if (action == @selector(setSortByGroup:))
+    {
+        [menuItem setState: [fDefaults boolForKey: @"SortByGroup"] ? NSOnState : NSOffState];
         return ![[fDefaults stringForKey: @"Sort"] isEqualToString: SORT_ORDER];
     }
     
