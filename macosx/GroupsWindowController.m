@@ -25,6 +25,7 @@
 #import "GroupsWindowController.h"
 #import "GradientCell.h"
 #import "CTGradient.h"
+#import "NSBezierPathAdditions.h"
 #import "NSApplicationAdditions.h"
 
 typedef enum
@@ -261,23 +262,15 @@ GroupsWindowController * fGroupsWindowInstance = nil;
         item = [[NSMenuItem alloc] initWithTitle: [dict objectForKey: @"Name"] action: action keyEquivalent: @""];
         [item setTarget: target];
         
-        /*NSImage * icon;
-        if (![[dict objectForKey: @"IsFolder"] boolValue])
-            icon = [[NSWorkspace sharedWorkspace] iconForFileType: [name pathExtension]];
-        else
-        {
-            NSMenu * itemMenu = [[NSMenu alloc] initWithTitle: name];
-            [itemMenu setAutoenablesItems: NO];
-            [item setSubmenu: itemMenu];
-            [itemMenu setDelegate: self];
-            [itemMenu release];
-            
-            icon = [[NSWorkspace sharedWorkspace] iconForFileType: NSFileTypeForHFSTypeCode('fldr')];
-        }
+        NSImage * icon = [[NSImage alloc] initWithSize: NSMakeSize(16.0, 16.0)];
+        NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: NSMakeRect(0.0, 0.0, 16.0, 16.0) radius: 4.0];
         
-        [icon setScalesWhenResized: YES];
-        [icon setSize: NSMakeSize(16.0, 16.0)];
-        [item setImage: icon];*/
+        [icon lockFocus];
+        [[self gradientForColor: [dict objectForKey: @"Color"]] fillBezierPath: bp angle: 90];
+        [icon unlockFocus];
+        
+        [item setImage: icon];
+        [icon release];
         
         [item setRepresentedObject: [dict objectForKey: @"Index"]];
         
