@@ -393,7 +393,8 @@ tr_getPrefsDirectory( void )
 
 #ifdef SYS_DARWIN
     char old[MAX_PATH_LENGTH];
-    tr_buildPath ( old, sizeof(old), h, ".transmission", NULL );
+    tr_buildPath ( old, sizeof(old),
+                   tr_getHomeDirectory(), ".transmission", NULL );
     tr_migrateResume( old, buf );
     rmdir( old );
 #endif
