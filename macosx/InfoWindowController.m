@@ -49,10 +49,10 @@
 typedef enum
 {
     TAB_INFO_TAG = 0,
-    TAB_ACTIVITY_TAG,
-    TAB_PEERS_TAG,
-    TAB_FILES_TAG,
-    TAB_OPTIONS_TAG,
+    TAB_ACTIVITY_TAG = 1,
+    TAB_PEERS_TAG = 2,
+    TAB_FILES_TAG = 3,
+    TAB_OPTIONS_TAG = 4
 } tabTag;
 
 @interface InfoWindowController (Private)

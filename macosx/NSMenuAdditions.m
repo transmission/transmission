@@ -26,9 +26,9 @@
 
 @implementation NSMenu (NSMenuAdditions)
 
-- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes
+- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes atBottom: (BOOL) bottom
 {
-    int bottom = [self numberOfItems];
+    int bottomIndex = bottom ? [self numberOfItems] : 0;
     
     NSMenuItem * item;
     unsigned int i;
@@ -36,7 +36,7 @@
     {
         item = [[menu itemAtIndex:i] retain];
         [menu removeItemAtIndex: i];
-        [self insertItem: item atIndex: bottom];
+        [self insertItem: item atIndex: bottomIndex];
         [item release];
     }
 }

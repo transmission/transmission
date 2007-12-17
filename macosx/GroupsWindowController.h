@@ -24,8 +24,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSMenu (NSMenuAdditions)
+@class CTGradient;
 
-- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes atBottom: (BOOL) bottom;
+@interface GroupsWindowController : NSWindowController
+{
+    NSMutableArray * fGroups;
+    
+    IBOutlet NSTableView * fTableView;
+    IBOutlet NSSegmentedControl * fAddRemoveControl;
+    
+    NSMutableDictionary * fCurrentColorDict;
+}
+
++ (GroupsWindowController *) groupsController;
+- (CTGradient *) gradientForIndex: (int) index;
+
+- (void) addRemoveGroup: (id) sender;
+
+- (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action;
 
 @end

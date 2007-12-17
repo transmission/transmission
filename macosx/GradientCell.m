@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- *
+ * 
  * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,10 +22,16 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "GradientCell.h"
+#import "CTGradient.h"
+#import "NSBezierPathAdditions.h"
 
-@interface NSMenu (NSMenuAdditions)
+@implementation GradientCell
 
-- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes atBottom: (BOOL) bottom;
+- (void) drawWithFrame: (NSRect) cellFrame inView: (NSView *) controlView
+{
+    NSBezierPath * bp = [NSBezierPath bezierPathWithRoundedRect: cellFrame radius: 4.0];
+    [[self objectValue] fillBezierPath: bp angle: 90];
+}
 
 @end

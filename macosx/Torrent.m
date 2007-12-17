@@ -37,7 +37,8 @@ static int static_lastid = 0;
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-        waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
+        waitToStart: (NSNumber *) waitToStart
+        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue;
 
 - (BOOL) shouldUseIncompleteFolderForName: (NSString *) name;
 - (void) updateDownloadFolder;
@@ -74,7 +75,7 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
             dateAdded: nil dateCompleted: nil
             dateActivity: nil
             ratioSetting: nil ratioLimit: nil
-            waitToStart: nil orderValue: nil];
+            waitToStart: nil orderValue: nil groupValue: nil];
     
     if (self)
     {
@@ -98,7 +99,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                 ratioSetting: [history objectForKey: @"RatioSetting"]
                 ratioLimit: [history objectForKey: @"RatioLimit"]
                 waitToStart: [history objectForKey: @"WaitToStart"]
-                orderValue: [history objectForKey: @"OrderValue"]];
+                orderValue: [history objectForKey: @"OrderValue"]
+                groupValue: [history objectForKey: @"GroupValue"]];
     
     if (self)
     {
@@ -125,7 +127,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
                     [NSNumber numberWithInt: fRatioSetting], @"RatioSetting",
                     [NSNumber numberWithFloat: fRatioLimit], @"RatioLimit",
                     [NSNumber numberWithBool: fWaitToStart], @"WaitToStart",
-                    [NSNumber numberWithInt: fOrderValue], @"OrderValue", nil];
+                    [NSNumber numberWithInt: fOrderValue], @"OrderValue",
+                    [NSNumber numberWithInt: fGroupValue], @"GroupValue", nil];
     
     if (fIncompleteFolder)
         [history setObject: fIncompleteFolder forKey: @"IncompleteFolder"];
@@ -145,6 +148,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
     if (fileStat)
         tr_torrentFilesFree(fileStat, [self fileCount]);
     
@@ -1181,6 +1186,22 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fOrderValue = orderValue;
 }
 
+- (int) groupValue
+{
+    return fGroupValue;
+}
+
+- (void) setGroupValue: (int) goupValue
+{
+    fGroupValue = goupValue;
+}
+
+- (void) checkGroupValue: (NSNotification *) notification
+{
+    if (fGroupValue != -1 && [[[notification userInfo] objectForKey: @"Indexes"] containsIndex: fGroupValue])
+        fGroupValue = -1;
+}
+
 - (NSArray *) fileList
 {
     return fFileList;
@@ -1412,7 +1433,8 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
         dateAdded: (NSDate *) dateAdded dateCompleted: (NSDate *) dateCompleted
         dateActivity: (NSDate *) dateActivity
         ratioSetting: (NSNumber *) ratioSetting ratioLimit: (NSNumber *) ratioLimit
-        waitToStart: (NSNumber *) waitToStart orderValue: (NSNumber *) orderValue;
+        waitToStart: (NSNumber *) waitToStart
+        orderValue: (NSNumber *) orderValue groupValue: (NSNumber *) groupValue;
 {
     if (!(self = [super init]))
         return nil;
@@ -1484,9 +1506,14 @@ void completenessChangeCallback(tr_torrent * torrent, cp_status_t status, void *
     fWaitToStart = waitToStart ? [waitToStart boolValue] : [fDefaults boolForKey: @"AutoStartDownload"];
     
     fOrderValue = orderValue ? [orderValue intValue] : tr_torrentCount(fLib) - 1;
+    fGroupValue = groupValue ? [groupValue intValue] : -1;;
+    
     fError = NO;
     
     [self createFileList];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(checkGroupValue:)
+        name: @"GroupValueRemoved" object: nil];
     
     [self update];
     

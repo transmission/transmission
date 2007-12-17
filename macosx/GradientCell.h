@@ -1,6 +1,6 @@
 /******************************************************************************
  * $Id$
- *
+ * 
  * Copyright (c) 2007 Transmission authors and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,8 +24,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSMenu (NSMenuAdditions)
+@class CTGradient;
 
-- (void) appendItemsFromMenu: (NSMenu *) menu atIndexes: (NSIndexSet *) indexes atBottom: (BOOL) bottom;
+@interface GradientCell : NSCell
+{
+}
 
 @end

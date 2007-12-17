@@ -126,6 +126,8 @@
 				<string>id</string>
 				<key>showAboutWindow</key>
 				<string>id</string>
+				<key>showGroups</key>
+				<string>id</string>
 				<key>showInfo</key>
 				<string>id</string>
 				<key>showMainWindow</key>
@@ -179,6 +181,8 @@
 				<string>NSMenuItem</string>
 				<key>fFilterBar</key>
 				<string>StatusBarView</string>
+				<key>fGroupsSetMenu</key>
+				<string>NSMenu</string>
 				<key>fNextFilterItem</key>
 				<string>NSMenuItem</string>
 				<key>fNextInfoTabItem</key>

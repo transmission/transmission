@@ -88,8 +88,7 @@
     fTorrents = torrents;
 }
 
-- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell
-        forTableColumn: (NSTableColumn *) tableColumn row: (int) row
+- (void) tableView: (NSTableView *) tableView willDisplayCell: (id) cell forTableColumn: (NSTableColumn *) tableColumn row: (int) row
 {
     [cell setRepresentedObject: [fTorrents objectAtIndex: row]];
 }
@@ -292,6 +291,43 @@
         }
 }
 
+#warning get rect to actually change
+- (NSString *) tableView: (NSTableView *) tableView toolTipForCell: (NSCell *) cell rect: (NSRectPointer) rect
+    tableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row mouseLocation: (NSPoint) mousePoint
+{
+    if ([self pointInActionRect: mousePoint])
+    {
+        *rect = [self actionRectForRow: row];
+        
+        return NSLocalizedString(@"Shortcuts for changing transfer settings.", "Torrent Table -> tooltip");
+    }
+    else if ([self pointInPauseRect: mousePoint])
+    {
+        *rect = [self pauseRectForRow: row];
+        
+        Torrent * torrent = [fTorrents objectAtIndex: row];
+        if ([torrent isActive])
+            return NSLocalizedString(@"Pause the transfer.", "Torrent Table -> tooltip");
+        else
+        {
+            if ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask && [fDefaults boolForKey: @"Queue"])
+                return NSLocalizedString(@"Resume the transfer right away.", "Torrent Table -> tooltip");
+            else if ([torrent waitingToStart])
+                return NSLocalizedString(@"Stop waiting to start.", "Torrent Table -> tooltip");
+            else
+                return NSLocalizedString(@"Resume the transfer.", "Torrent Table -> tooltip");
+        }
+    }
+    else if ([self pointInRevealRect: mousePoint])
+    {
+        *rect = [self revealRectForRow: row];
+        
+        return NSLocalizedString(@"Reveal the data file in Finder.", "Torrent Table -> tooltip");
+    }
+    
+    return nil;
+}
+
 - (void) displayTorrentMenuForEvent: (NSEvent *) event
 {
     int row = [self rowAtPoint: [self convertPoint: [event locationInWindow] fromView: nil]];
@@ -305,7 +341,7 @@
     
     //add file menu items to action menu
     NSRange range = NSMakeRange(0, [fileMenu numberOfItems]);
-    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
+    [fActionMenu appendItemsFromMenu: fileMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     //place menu below button
     NSRect rect = [self actionRectForRow: row];
@@ -321,7 +357,7 @@
     
     //move file menu items back to the torrent's file menu
     range.location = [fActionMenu numberOfItems] - range.length;
-    [fileMenu appendItemsFromMenu: fActionMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
+    [fileMenu appendItemsFromMenu: fActionMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: range] atBottom: YES];
     
     [fMenuTorrent release];
     fMenuTorrent = nil;
@@ -604,7 +640,7 @@
         
         if (create)
         {
-            item = [[NSMenuItem alloc] initWithTitle: name action: NULL keyEquivalent: @""];
+            item = [[NSMenuItem alloc] initWithTitle: name action: @selector(checkFile:) keyEquivalent: @""];
             
             NSImage * icon;
             if (![[dict objectForKey: @"IsFolder"] boolValue])
@@ -625,8 +661,6 @@
             [icon setScalesWhenResized: YES];
             [icon setSize: NSMakeSize(16.0, 16.0)];
             [item setImage: icon];
-            
-            [item setAction: @selector(checkFile:)];
             
             [menu addItem: item];
             [item release];

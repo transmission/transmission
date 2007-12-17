@@ -138,7 +138,6 @@
     [self fadeIn];
 }
 
-
 - (void) setURL: (NSString *) url
 {
     [[self contentView] setOverlay: [NSImage imageNamed: @"Globe.png"]

@@ -80,6 +80,8 @@
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
     
+    IBOutlet NSMenu                 * fGroupsSetMenu;
+    
     IBOutlet NSWindow               * fURLSheetWindow;
     IBOutlet NSTextField            * fURLSheetTextField;
 
@@ -186,6 +188,9 @@
 - (void) switchFilter: (id) sender;
 
 - (void) setStatusLabel: (id) sender;
+
+- (void) showGroups: (id) sender;
+- (void) setGroup: (id) sender;
 
 - (void) toggleSpeedLimit: (id) sender;
 - (void) autoSpeedLimitChange: (NSNotification *) notification;

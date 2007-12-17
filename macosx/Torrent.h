@@ -65,7 +65,7 @@ typedef enum
     int fRatioSetting;
     BOOL fFinishedSeeding, fWaitToStart, fError, fChecking, fStalled;
     
-    int fOrderValue;
+    int fOrderValue, fGroupValue;
     
     NSDictionary * fQuickPauseDict;
     
@@ -207,6 +207,10 @@ typedef enum
 
 - (int) orderValue;
 - (void) setOrderValue: (int) orderValue;
+
+- (int) groupValue;
+- (void) setGroupValue: (int) groupValue;
+- (void) checkGroupValue: (NSNotification *) notification;
 
 - (NSArray *) fileList;
 - (int) fileCount;

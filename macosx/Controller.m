@@ -30,12 +30,14 @@
 #import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
+#import "GroupsWindowController.h"
 #import "AboutWindowController.h"
 #import "ButtonToolbarItem.h"
 #import "GroupToolbarItem.h"
 #import "ToolbarSegmentedCell.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#import "NSMenuAdditions.h"
 #import "UKKQueue.h"
 #import "ActionMenuSpeedToDisplayLimitTransformer.h"
 #import "ActionMenuRatioToDisplayRatioTransformer.h"
@@ -2022,6 +2024,35 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     [fDefaults setObject: statusLabel forKey: @"StatusLabel"];
     [self updateUI];
+}
+
+- (void) showGroups: (id) sender
+{
+    [[GroupsWindowController groupsController] showWindow: self];
+}
+
+- (void) menuNeedsUpdate: (NSMenu *) menu
+{
+    #warning if not group menu, return
+    int i, keep = menu == fGroupsSetMenu ? 2 : 0;
+    for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
+        [menu removeItemAtIndex: i];
+    
+    NSMenu * groupMenu = [[GroupsWindowController groupsController] groupMenuWithTarget: self action: @selector(setGroup:)];
+    [menu appendItemsFromMenu: groupMenu atIndexes: [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [groupMenu numberOfItems])]
+            atBottom: NO];
+}
+
+- (void) setGroup: (id) sender
+{
+    NSEnumerator * enumerator = [[fDisplayedTorrents objectsAtIndexes: [fTableView selectedRowIndexes]] objectEnumerator];
+    Torrent * torrent;
+    while ((torrent = [enumerator nextObject]))
+        [torrent setGroupValue: [[sender representedObject] intValue]];
+    
+    [self updateUI];
+    [self applyFilter: nil];
+    [self updateTorrentHistory];
 }
 
 - (void) toggleSpeedLimit: (id) sender

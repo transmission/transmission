@@ -24,8 +24,10 @@
 
 #import "TorrentCell.h"
 #import "TorrentTableView.h"
+#import "GroupsWindowController.h"
 #import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
+#import "NSBezierPathAdditions.h"
 #import "CTGradientAdditions.h"
 
 #define BAR_HEIGHT 12.0
@@ -48,6 +50,9 @@
 #define PADDING_BETWEEN_PROGRESS_AND_BAR 2.0
 #define PADDING_BETWEEN_TITLE_AND_BAR_MIN 3.0
 #define PADDING_BETWEEN_BAR_AND_STATUS 2.0
+
+#define GROUP_BORDER_X -4.0
+#define GROUP_BORDER_Y -1.0
 
 #define MAX_PIECES 324
 #define BLANK_PIECE -99
@@ -223,18 +228,12 @@
     }
     
     //text color
-    NSColor * titleColor, * statusColor;
-    if ([NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
-        && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]])
-    {
-        titleColor = [NSColor whiteColor];
-        statusColor = [NSColor whiteColor];
-    }
-    else
-    {
-        titleColor = [NSColor controlTextColor];
-        statusColor = [NSColor darkGrayColor];
-    }
+    BOOL selected = [NSApp isOnLeopardOrBetter] ? [self backgroundStyle] == NSBackgroundStyleDark : [self isHighlighted]
+                    && [[self highlightColorWithFrame: cellFrame inView: controlView] isEqual: [NSColor alternateSelectedControlColor]];
+    int groupIndex = [torrent groupValue];
+    
+    NSColor * titleColor = selected && groupIndex == -1 ? [NSColor whiteColor] : [NSColor controlTextColor],
+            * statusColor = selected ? [NSColor whiteColor] : [NSColor darkGrayColor];
     
     //minimal status
     NSRect minimalStatusRect;
@@ -251,6 +250,11 @@
     //title
     NSAttributedString * titleString = [self attributedTitleWithColor: titleColor];
     NSRect titleRect = [self rectForTitleWithString: titleString basedOnMinimalStatusRect: minimalStatusRect inBounds: cellFrame];
+    
+    if (groupIndex != -1)
+        [[[GroupsWindowController groupsController] gradientForIndex: [torrent groupValue]] fillBezierPath:
+            [NSBezierPath bezierPathWithRoundedRect: NSInsetRect(titleRect, GROUP_BORDER_X, GROUP_BORDER_Y) radius: 7.0] angle: 90];
+    
     [titleString drawInRect: titleRect];
     
     //progress
