@@ -2034,7 +2034,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
 - (void) menuNeedsUpdate: (NSMenu *) menu
 {
     #warning if not group menu, return
-    int i, keep = menu == fGroupsSetMenu ? 2 : 0;
+    int i, keep = (menu == fGroupsSetMenu || menu == fGroupsSetContextMenu ) ? 2 : 0;
     for (i = [menu numberOfItems]-1 - keep; i >= 0; i--)
         [menu removeItemAtIndex: i];
     

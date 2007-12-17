@@ -110,6 +110,8 @@
 				<string>id</string>
 				<key>setFilterSearchType</key>
 				<string>id</string>
+				<key>setGroup</key>
+				<string>id</string>
 				<key>setInfoTab</key>
 				<string>id</string>
 				<key>setLimitGlobalEnabled</key>
@@ -181,6 +183,8 @@
 				<string>NSMenuItem</string>
 				<key>fFilterBar</key>
 				<string>StatusBarView</string>
+				<key>fGroupsSetContextMenu</key>
+				<string>NSMenu</string>
 				<key>fGroupsSetMenu</key>
 				<string>NSMenu</string>
 				<key>fNextFilterItem</key>

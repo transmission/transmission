@@ -80,7 +80,7 @@
     IBOutlet NSMenuItem             * fUploadLimitItem, * fUploadNoLimitItem,
                                     * fDownloadLimitItem, * fDownloadNoLimitItem;
     
-    IBOutlet NSMenu                 * fGroupsSetMenu;
+    IBOutlet NSMenu                 * fGroupsSetMenu, * fGroupsSetContextMenu;
     
     IBOutlet NSWindow               * fURLSheetWindow;
     IBOutlet NSTextField            * fURLSheetTextField;
