@@ -28,6 +28,8 @@
 #import "NSBezierPathAdditions.h"
 #import "NSApplicationAdditions.h"
 
+#define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
+
 typedef enum
 {
     ADD_TAG = 0,
@@ -112,6 +114,8 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [[fTableView tableColumnWithIdentifier: @"Color"] setDataCell: cell];
     [cell release];
     
+    [fTableView registerForDraggedTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE]];
+    
     if ([NSApp isOnLeopardOrBetter])
         [[self window] setContentBorderThickness: [[fTableView enclosingScrollView] frame].origin.y forEdge: NSMinYEdge];
     
@@ -157,7 +161,6 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 
 - (id) tableView: (NSTableView *) tableView objectValueForTableColumn: (NSTableColumn *) tableColumn row: (NSInteger) row
 {
-    #warning consider color column ?
     NSString * identifier = [tableColumn identifier];
     if ([identifier isEqualToString: @"Color"])
         return [self gradientForColor: [[fGroups objectAtIndex: row] objectForKey: @"Color"]];
@@ -193,6 +196,71 @@ GroupsWindowController * fGroupsWindowInstance = nil;
 - (void) tableViewSelectionDidChange: (NSNotification *) notification
 {
     [fAddRemoveControl setEnabled: [fTableView numberOfSelectedRows] > 0 forSegment: REMOVE_TAG];
+}
+
+- (BOOL) tableView: (NSTableView *) tableView writeRowsWithIndexes: (NSIndexSet *) rowIndexes toPasteboard: (NSPasteboard *) pboard
+{
+    [pboard declareTypes: [NSArray arrayWithObject: GROUP_TABLE_VIEW_DATA_TYPE] owner: self];
+    [pboard setData: [NSKeyedArchiver archivedDataWithRootObject: rowIndexes] forType: GROUP_TABLE_VIEW_DATA_TYPE];
+    return YES;
+}
+
+- (NSDragOperation) tableView: (NSTableView *) tableView validateDrop: (id <NSDraggingInfo>) info
+    proposedRow: (int) row proposedDropOperation: (NSTableViewDropOperation) operation
+{
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+    if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
+    {
+        [fTableView setDropRow: row dropOperation: NSTableViewDropAbove];
+        return NSDragOperationGeneric;
+    }
+    
+    return NSDragOperationNone;
+}
+
+- (BOOL) tableView: (NSTableView *) t acceptDrop: (id <NSDraggingInfo>) info
+    row: (int) newRow dropOperation: (NSTableViewDropOperation) operation
+{
+    NSPasteboard * pasteboard = [info draggingPasteboard];
+    if ([[pasteboard types] containsObject: GROUP_TABLE_VIEW_DATA_TYPE])
+    {
+        NSIndexSet * indexes = [NSKeyedUnarchiver unarchiveObjectWithData: [pasteboard dataForType: GROUP_TABLE_VIEW_DATA_TYPE]];
+        
+        NSArray * selectedGroups = [fGroups objectsAtIndexes: [fTableView selectedRowIndexes]];
+        
+        //determine where to move them
+        int i;
+        for (i = [indexes firstIndex]; i < newRow && i != NSNotFound; i = [indexes indexGreaterThanIndex: i])
+            newRow--;
+        
+        //remove objects to reinsert
+        NSArray * movingGroups = [[fGroups objectsAtIndexes: indexes] retain];
+        [fGroups removeObjectsAtIndexes: indexes];
+        
+        //insert objects at new location
+        for (i = 0; i < [movingGroups count]; i++)
+            [fGroups insertObject: [movingGroups objectAtIndex: i] atIndex: newRow + i];
+        
+        [movingGroups release];
+        
+        if ([selectedGroups count] > 0)
+        {
+            NSEnumerator * enumerator = [selectedGroups objectEnumerator];
+            NSMutableIndexSet * indexSet = [[NSMutableIndexSet alloc] init];
+            NSDictionary * dict;
+            while ((dict = [enumerator nextObject]))
+                [indexSet addIndex: [fGroups indexOfObject: dict]];
+            
+            [fTableView selectRowIndexes: indexSet byExtendingSelection: NO];
+            [indexSet release];
+        }
+        
+        [fTableView reloadData];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
+    }
+    
+    return YES;
 }
 
 - (void) addRemoveGroup: (id) sender
