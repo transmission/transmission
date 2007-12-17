@@ -240,6 +240,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
             return;
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
     [self saveGroups];
 }
 
@@ -303,6 +304,7 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     [fTableView reloadData];
     
     [self saveGroups];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateUI" object: self];
 }
 
 @end

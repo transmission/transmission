@@ -1438,13 +1438,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     {
         if ([fWindow isVisible])
         {
-            //resort if necessary or just update the table
-            NSString * sortType = [fDefaults stringForKey: @"Sort"];
-            if ([sortType isEqualToString: SORT_ORDER] || [sortType isEqualToString: SORT_DATE]
-                    || [sortType isEqualToString: SORT_NAME])
-                [fTableView reloadData];
-            else
-                [self sortTorrents];
+            [self sortTorrents];
             
             //update status bar
             if (![fStatusBar isHidden])
