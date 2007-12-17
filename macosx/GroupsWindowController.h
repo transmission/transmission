@@ -39,6 +39,8 @@
 + (GroupsWindowController *) groupsController;
 - (CTGradient *) gradientForIndex: (int) index;
 
+- (int) orderValueForIndex: (int) index;
+
 - (void) addRemoveGroup: (id) sender;
 
 - (NSMenu *) groupMenuWithTarget: (id) target action: (SEL) action;

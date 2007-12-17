@@ -210,6 +210,7 @@ typedef enum
 
 - (int) groupValue;
 - (void) setGroupValue: (int) groupValue;
+- (int) groupOrderValue;
 - (void) checkGroupValue: (NSNotification *) notification;
 
 - (NSArray *) fileList;

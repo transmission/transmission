@@ -1741,7 +1741,7 @@ void sleepCallBack(void * controller, io_service_t y, natural_t messageType, voi
     
     if (!sortByOrder && [fDefaults boolForKey: @"SortByGroup"])
     {
-        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupValue" ascending: asc] autorelease];
+        NSSortDescriptor * groupDescriptor = [[[NSSortDescriptor alloc] initWithKey: @"groupOrderValue" ascending: asc] autorelease];
         
         NSMutableArray * temp = [[NSMutableArray alloc] initWithCapacity: [descriptors count]+1];
         [temp addObject: groupDescriptor];

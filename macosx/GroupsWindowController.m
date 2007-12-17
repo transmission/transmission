@@ -138,6 +138,18 @@ GroupsWindowController * fGroupsWindowInstance = nil;
     return nil;
 }
 
+- (int) orderValueForIndex: (int) index
+{
+    if (index != -1)
+    {
+        int i;
+        for (i = 0; i < [fGroups count]; i++)
+            if (index == [[[fGroups objectAtIndex: i] objectForKey: @"Index"] intValue])
+                return i;
+    }
+    return -1;
+}
+
 - (NSInteger) numberOfRowsInTableView: (NSTableView *) tableview
 {
     return [fGroups count];
