@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #import "PortChecker.h"
+#import "NSApplicationAdditions.h"
 
 @implementation PortChecker
 
@@ -36,6 +37,13 @@
     return self;
 }
 
+- (void) dealloc
+{
+    [fPortProbeData release];
+    [fConnection release];
+    [super dealloc];
+}
+
 - (port_status_t) status
 {
     return fStatus;
@@ -44,16 +52,23 @@
 - (void) probePort: (int) portNumber
 {
     NSURLRequest * portProbeRequest = [NSURLRequest requestWithURL: [NSURL URLWithString:
-                                [NSString stringWithFormat: @"https://www.grc.com/x/portprobe=%d", portNumber]]
-                                cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval: 15.0];
+                [NSString stringWithFormat: @"http://transmission.m0k.org/PortCheck.php?port=%d", portNumber]] cachePolicy:
+                [NSApp isOnLeopardOrBetter] ? NSURLRequestReloadIgnoringLocalAndRemoteCacheData : NSURLRequestReloadIgnoringCacheData
+                timeoutInterval: 15.0];
     
-    if ([NSURLConnection connectionWithRequest: portProbeRequest delegate: self])
+    
+    if ((fConnection = [[NSURLConnection alloc] initWithRequest: portProbeRequest delegate: self]))
         fPortProbeData = [[NSMutableData data] retain];
     else
     {
         NSLog(@"Unable to get port status: failed to initiate connection");
         [self callBackWithStatus: PORT_STATUS_ERROR];
     }
+}
+
+- (void) endProbe
+{
+    [fConnection cancel];
 }
 
 - (void) callBackWithStatus: (port_status_t) status
@@ -80,55 +95,23 @@
 {
     NSLog(@"Unable to get port status: connection failed (%@)", [error localizedDescription]);
     [self callBackWithStatus: PORT_STATUS_ERROR];
-    [fPortProbeData release];
 }
 
 - (void) connectionDidFinishLoading: (NSURLConnection *) connection
 {
-    NSXMLDocument * shieldsUpProbe = [[NSXMLDocument alloc] initWithData: fPortProbeData
-                                        options: NSXMLDocumentTidyHTML error: nil];
+    NSString * probeString = [[NSString alloc] initWithData: fPortProbeData encoding: NSASCIIStringEncoding];
     
-    if (shieldsUpProbe)
-    {
-        NSArray * nodes = [shieldsUpProbe nodesForXPath: @"/html/body/center/table[3]/tr/td[2]" error: nil];
-        if ([nodes count] != 1)
-        {
-            NSArray * title = [shieldsUpProbe nodesForXPath: @"/html/head/title" error: nil];
-            // This may happen when we probe twice too quickly
-            if ([title count] != 1 || ![[[title objectAtIndex: 0] stringValue] isEqualToString:
-                                                                    @"NanoProbe System Already In Use"])
-            {
-                NSLog(@"Unable to get port status: invalid (outdated) XPath expression");
-                [[shieldsUpProbe XMLData] writeToFile: @"/tmp/shieldsUpProbe.html" atomically: YES];
-                [self callBackWithStatus: PORT_STATUS_ERROR];
-            }
-        }
-        else
-        {
-            NSString * portStatus = [[[[nodes objectAtIndex: 0] stringValue] stringByTrimmingCharactersInSet:
-                                                [[NSCharacterSet letterCharacterSet] invertedSet]] lowercaseString];
-            
-            if ([portStatus isEqualToString: @"open"])
-                [self callBackWithStatus: PORT_STATUS_OPEN];
-            else if ([portStatus isEqualToString: @"stealth"])
-                [self callBackWithStatus: PORT_STATUS_STEALTH];
-            else if ([portStatus isEqualToString: @"closed"])
-                [self callBackWithStatus: PORT_STATUS_CLOSED];
-            else
-            {
-                NSLog(@"Unable to get port status: unknown port state");
-                [self callBackWithStatus: PORT_STATUS_ERROR];
-            }
-        }
-        [shieldsUpProbe release];
-    }
+    port_status_t status;
+    if ([probeString isEqualToString: @"0"])
+        status = PORT_STATUS_OPEN;
+    else if ([probeString isEqualToString: @"1"])
+        status = PORT_STATUS_CLOSED;
     else
-    {
-        NSLog(@"Unable to get port status: failed to create xml document");
-        [self callBackWithStatus: PORT_STATUS_ERROR];
-    }
-
-    [fPortProbeData release];
+        status = PORT_STATUS_ERROR;
+    
+    [self callBackWithStatus: status];
+    
+    [probeString release];
 }
 
 @end

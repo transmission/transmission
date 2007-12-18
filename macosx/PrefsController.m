@@ -228,6 +228,7 @@
 
 - (void) updatePortStatus
 {
+#warning look into
     tr_handle_status * stat = tr_handleStatus(fHandle);
     if (fNatStatus != stat->natTraversalStatus || fPublicPort != stat->publicPort)
     {
@@ -239,8 +240,13 @@
         [fPortStatusImage setImage: nil];
         [fPortStatusProgress startAnimation: self];
         
-        PortChecker * portChecker = [[PortChecker alloc] initWithDelegate: self];
-        [portChecker probePort: fPublicPort];
+        if (fPortChecker)
+        {
+            [fPortChecker endProbe];
+            [fPortChecker release];
+        }
+        fPortChecker = [[PortChecker alloc] initWithDelegate: self];
+        [fPortChecker probePort: fPublicPort];
     }
 }
 
@@ -253,10 +259,6 @@
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is open", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"GreenDot.png"]];
             break;
-        case PORT_STATUS_STEALTH:
-            [fPortStatusField setStringValue: NSLocalizedString(@"Port is stealth", "Preferences -> Advanced -> port status")];
-            [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
-            break;
         case PORT_STATUS_CLOSED:
             [fPortStatusField setStringValue: NSLocalizedString(@"Port is closed", "Preferences -> Advanced -> port status")];
             [fPortStatusImage setImage: [NSImage imageNamed: @"RedDot.png"]];
@@ -267,7 +269,8 @@
             [fPortStatusImage setImage: [NSImage imageNamed: @"YellowDot.png"]];
             break;
     }
-    [portChecker release];
+    [fPortChecker release];
+    fPortChecker = nil;
 }
 
 - (NSArray *) sounds

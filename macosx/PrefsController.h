@@ -46,7 +46,8 @@
 
     IBOutlet NSTextField    * fUploadField, * fDownloadField,
                             * fSpeedLimitUploadField, * fSpeedLimitDownloadField;
-
+    
+    PortChecker                     * fPortChecker;
     IBOutlet NSTextField            * fPortField, * fPortStatusField;
     IBOutlet NSButton               * fNatCheck;
     IBOutlet NSImageView            * fPortStatusImage;

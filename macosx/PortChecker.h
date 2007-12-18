@@ -24,18 +24,26 @@
 
 #import <Cocoa/Cocoa.h>
 
-typedef enum { PORT_STATUS_OPEN, PORT_STATUS_STEALTH, PORT_STATUS_CLOSED, PORT_STATUS_ERROR } port_status_t;
+typedef enum
+{
+    PORT_STATUS_OPEN,
+    PORT_STATUS_CLOSED,
+    PORT_STATUS_ERROR
+} port_status_t;
 
 @interface PortChecker : NSObject
 {    
     id              fDelegate;
     port_status_t   fStatus;
-
+    
+    NSURLConnection * fConnection;
     NSMutableData   * fPortProbeData;
 }
 
 - (id) initWithDelegate: (id) delegate;
 - (void) probePort: (int) portNumber;
+- (void) endProbe;
+
 - (void) callBackWithStatus: (port_status_t) status;
 - (port_status_t) status;
 
